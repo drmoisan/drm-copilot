@@ -1,0 +1,2 @@
+tests/fixtures/cleanup_worktrees/preserve/exit-codes/skipped/wt	agent-memory/atomic-executor/aaa-lesson.md	untracked	PRESERVE	GENUINELY_NEW	null	true	true		absent	object	clean	cleanup-wt-host-tokens-v1	preserve/exit-codes/skipped fixture: the valid record of the pair
+tests/fixtures/cleanup_worktrees/preserve/exit-codes/skipped/wt	agent-memory/atomic-executor/zzz-broken.md	untracked	PRESERVE	PROBABLY_USEFUL	null	true	true		absent	object	clean	cleanup-wt-host-tokens-v1	preserve/exit-codes/skipped fixture: verdict out of vocabulary, skipped

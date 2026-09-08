@@ -3,16 +3,16 @@
 Timestamp: 2026-09-08T09-49
 Task: [P2-T4] [expect-fail]
 Command: gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-preserve-file-consolidation-637-r2 (the workflow's test step runs `bash scripts/bash/shell-qc.sh test`, which invokes bats with no formatter flag and therefore emits TAP)
-EXIT_CODE: PENDING-CI
+EXIT_CODE: 1
 ExpectedExitCode: 1
-Output Summary: PENDING-CI ROUND
+Output Summary: CI run 34213641449 (head SHA `005b7b3074db361060e841e3875e2424efa42110`) emitted the TAP plan line `1..349`. This test is red, which is the required outcome for this `[expect-fail]` task: `not ok 290 a stale advisory crlf value does not override an LF target`. Exactly three tests failed in the run - 289, 290, and 291 - and they are the three `[expect-fail]` cases and no others; the other 346 tests passed.
 
 RouteSubstitution:
 - Plan command (denied in this worktree):
   `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a817693674107cbe5 && bats -t -f stale tests/shell/test_cleanup_worktrees_preserve.bats'"`
 - Substitute: the CI route, for the reason recorded in
-  `evidence/regression-testing/fail-before-untracked.2026-09-08T09-49.md`. **`[P2-T4]` stays
-  unchecked in the plan until the orchestrator supplies the run-log values.**
+  `evidence/regression-testing/fail-before-untracked.2026-09-08T09-49.md`. The orchestrator
+  dispatched the run and supplied the run-log values recorded below.
 
 ## Assertion to be discharged from the CI run log
 
@@ -58,4 +58,31 @@ property AC-16 names.
 
 Together with `[P2-T3]` and `[P2-T5]` this contributes to **AC-42**.
 
-Verdict: PENDING-CI ROUND. The expected outcome is a recorded failure.
+## Discharge from the CI run log
+
+- Run: `34213641449` at `https://github.com/drmoisan/drm-copilot/actions/runs/34213641449`
+- Head SHA: `005b7b3074db361060e841e3875e2424efa42110`
+- Run conclusion: `failure`. For this `[expect-fail]` task that conclusion is the required outcome,
+  not a defect: the test named below is expected to be red until its implementing phase lands.
+- TAP plan line: `1..349`
+- The `not ok` line, verbatim from the run log:
+
+      not ok 290 a stale advisory crlf value does not override an LF target
+
+- Observed exit code: 1. `ExpectedExitCode: 1` is declared above, so this gate normalizes to `pass`.
+- The three failing tests in the run are 289, 290, and 291, which are exactly the three
+  `[expect-fail]` tests `[P2-T2]` authored. No pre-existing test regressed: the suite grew from the
+  343-test baseline recorded in `evidence/baseline/baseline-shell-qc-test.2026-09-08T09-49.md` to
+  349 tests, and 346 of them pass.
+
+Verdict: PASS as an `[expect-fail]` record. The failure is recorded, is the expected outcome, and is
+attributable to the absent implementation rather than to a defect in the test.
+
+## Relocation note, added 2026-09-08T10-45
+
+`[P5-T9]` took both pre-authorized splits. The test named above now lives in
+`tests/shell/test_cleanup_worktrees_preserve_eol.bats` rather than in
+`tests/shell/test_cleanup_worktrees_preserve.bats`, together with every other line-ending test.
+The test name is unchanged and the CI discharge locates a test by its TAP `ok` or `not ok` line
+rather than by file, so the record above is unaffected. The decision and its reasoning are
+recorded in `evidence/other/library-split-decision.2026-09-08T10-30.md`.

@@ -78,6 +78,10 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
 - `DIRTY|<worktree-path>|<status-porcelain-line>` — a dirty worktree that blocked
   removal.
 - `ACTION|<verb>|<target>|<result>` — apply-mode action results.
+- `PRESERVE|<worktree-path>|<source-path>|<verdict>` — a manifest `preserved_files[]`
+  finding staged onto the consolidation branch; `verdict` in `DEAD_ONE_OFF |
+  ALREADY_SOLVED_ELSEWHERE | STALE_OR_CONTRADICTED | GENUINELY_NEW | STILL_RELEVANT`. The
+  per-file outcome is reported by the companion `ACTION|preserve-stage|...` record.
 - `ORPHAN_DIR|<path>|<size>` — a directory under a worktree-tracking root that carries
   no `.git` pointer file and no `git worktree list` entry. `<size>` is best-effort and
   may be the literal `unknown`. The record is advisory: it reports the directory, and

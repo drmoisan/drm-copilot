@@ -1,0 +1,1 @@
+tests/fixtures/cleanup_worktrees/preserve/index-absent/wt	agent-memory/atomic-executor/first-lesson.md	untracked	PRESERVE	GENUINELY_NEW	null	true	false	- [First lesson](null) — the entry that would create the index	absent	object	clean	cleanup-wt-host-tokens-v1	preserve/index-absent fixture: the destination index does not exist

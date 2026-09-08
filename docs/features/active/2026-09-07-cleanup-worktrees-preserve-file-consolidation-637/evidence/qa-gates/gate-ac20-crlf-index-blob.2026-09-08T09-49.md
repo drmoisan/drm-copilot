@@ -72,9 +72,23 @@ A worktree-against-index difference check is deliberately not used here: that co
 same end-of-line conversion to both sides and reports no difference even when the index blob was
 normalized, so it cannot detect the failure this gate exists to detect.
 
-**Deferred spans.** The `git add` and `git rev-parse :path` spans the plan names are deferred to the
-orchestrator, which owns staging for this run. When staging occurs, the index object name for this
-path is expected to be `0c8babf1bae26e47e802aee1408a0c27edf31710`; a different value would indicate
-the exception stopped applying.
+**Deferred spans, now discharged by the orchestrator.** The `add` and `rev-parse :path` spans the
+plan names were deferred to the orchestrator, which owns staging for this run. The orchestrator
+subsequently staged the tree with a real `add` and reported that
+`rev-parse :tests/fixtures/cleanup_worktrees/preserve/eol-crlf/MEMORY.md` returned
+`0c8babf1bae26e47e802aee1408a0c27edf31710`.
 
-Verdict: PASS. The CRLF fixture is created and is proven to survive git's end-of-line conversion.
+- Actor: the orchestrator, not this executor.
+- Observed index object name: `0c8babf1bae26e47e802aee1408a0c27edf31710`.
+- Predicted index object name, recorded above before staging occurred:
+  `0c8babf1bae26e47e802aee1408a0c27edf31710`.
+
+The two are equal, so the index blob is byte-identical to the CRLF working file and the
+`.gitattributes` `-text` exception applied to the real staging operation exactly as the substitute
+comparison predicted. This was a falsifiable prediction: had the exception not applied, git would
+have normalized the blob to LF and the index object name would have been
+`f4127703c7e8981c9fe157128a106bbf03805280`, the value the negative control above recorded for the
+same bytes under the default `* text=auto eol=lf` rule.
+
+Verdict: PASS. The CRLF fixture is created, is proven to survive git's end-of-line conversion, and
+the prediction was confirmed against a real staging operation.

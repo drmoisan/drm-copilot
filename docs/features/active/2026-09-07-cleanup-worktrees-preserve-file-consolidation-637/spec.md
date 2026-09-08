@@ -918,7 +918,7 @@ an enumeration size, or a population.
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
 - [ ] **AC-19** The bats test `a mixed line ending target is refused and reported as EOL-MIXED` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-20** The bats test `the crlf fixture still contains a carriage return in the working
+- [x] **AC-20** The bats test `the crlf fixture still contains a carriage return in the working
       tree` in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
 - [x] **AC-21** `.gitattributes` contains the single-line token
       `tests/fixtures/cleanup_worktrees/preserve/eol-crlf/** -text`.
@@ -947,21 +947,21 @@ an enumeration size, or a population.
       `IGNORED-TARGET` and contains no `--force`.
 - [ ] **AC-31** The bats test `the preserve exit codes distinguish clean, skipped, and blocked runs`
       in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-32** The bats tests `the git stub replays a scenario response for add` and
+- [x] **AC-32** The bats tests `the git stub replays a scenario response for add` and
       `the git stub replays a scenario response for check-ignore` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` pass.
-- [ ] **AC-33** `.claude/skills/cleanup-merged-worktrees/SKILL.md` contains the single-line token
+- [x] **AC-33** `.claude/skills/cleanup-merged-worktrees/SKILL.md` contains the single-line token
       `PRESERVE|` and that token appears in the `## Report Line Contract` bullet list.
-- [ ] **AC-34** `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
+- [x] **AC-34** `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
       is byte-identical to `.claude/skills/cleanup-merged-worktrees/SKILL.md`, verified with `cmp`.
-- [ ] **AC-35** `python -m pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`
+- [x] **AC-35** `python -m pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`
       exits 0.
-- [ ] **AC-36** `git diff --stat epic/cleanup-merged-worktrees-hardening-integration -- scripts/bash/cleanup_worktrees_lib.sh`
+- [x] **AC-36** `git diff --stat epic/cleanup-merged-worktrees-hardening-integration -- scripts/bash/cleanup_worktrees_lib.sh`
       prints nothing, and `git status --porcelain -- scripts/bash/cleanup_worktrees_lib.sh` prints
       nothing.
-- [ ] **AC-37** `git diff --stat epic/cleanup-merged-worktrees-hardening-integration -- .claude/hooks`
+- [x] **AC-37** `git diff --stat epic/cleanup-merged-worktrees-hardening-integration -- .claude/hooks`
       prints nothing, and `git status --porcelain -- .claude/hooks` prints nothing.
-- [ ] **AC-38** Every file created or changed by this work is at or below 500 lines, verified per
+- [x] **AC-38** Every file created or changed by this work is at or below 500 lines, verified per
       file with `wc -l` against the changed-file list. Markdown files are exempt.
 - [ ] **AC-39** A single pass of `bash scripts/bash/shell-qc.sh format`, then
       `bash scripts/bash/shell-qc.sh check`, then `bash scripts/bash/shell-qc.sh test` completes
@@ -971,11 +971,11 @@ an enumeration size, or a population.
       `Bash coverage (lines): NN.N%` and the printed value is at least 85.0; the merged
       `artifacts/pester/kcov/cov.xml` is produced and its summary is recorded under
       `evidence/qa-gates/`.
-- [ ] **AC-41** No coverage configuration in the change adds an `exclude` entry matching any path
+- [x] **AC-41** No coverage configuration in the change adds an `exclude` entry matching any path
       under `scripts/`.
-- [ ] **AC-42** Fail-before evidence is recorded under `evidence/regression-testing/` showing the
+- [x] **AC-42** Fail-before evidence is recorded under `evidence/regression-testing/` showing the
       tests named in AC-08, AC-16, and AC-22 failing against the pre-change tree.
-- [ ] **AC-43** No test creates or reads a temporary file; the changed test files and fixtures
+- [x] **AC-43** No test creates or reads a temporary file; the changed test files and fixtures
       contain no `mktemp` and no `BATS_TEST_TMPDIR`.
 
 ## Open Questions
