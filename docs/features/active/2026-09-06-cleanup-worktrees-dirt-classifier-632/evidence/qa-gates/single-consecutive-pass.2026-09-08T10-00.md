@@ -57,7 +57,7 @@ The coverage stage is **CI-measured, not local**. `kcov` has no local route in t
 only by a dispatch of `.github/workflows/_shell-coverage.yml` against a pushed commit, and the
 figures are read from that run's merged Cobertura artifact.
 
-CoverageRunId: NOT AVAILABLE
+CoverageRunId: 34229386300 (conclusion success, headSha 7d7a661f88c082184a892e153922f22af43e6a40; dispatched by the orchestrator under EA-4 after this artifact was first written, and recorded here rather than left as NOT AVAILABLE)
 
 The post-change dispatch (P5-T7), the artifact read (P5-T8) and the delta comparison (P5-T9) are
 owned by the orchestrator, which holds the `gh` credential; this executor has no `gh` route. Those

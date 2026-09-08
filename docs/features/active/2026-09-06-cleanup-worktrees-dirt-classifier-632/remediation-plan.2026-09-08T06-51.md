@@ -2267,7 +2267,7 @@ Round-4 departures.
   the cycle-start digest rather than against the epic base, because cycle 1 legitimately
   changed the stub and a base-anchored diff would report those changes as this cycle's.
 
-- [ ] [P5-T6] Stage the cycle-2 changes with `git add -A`, commit them, and push the
+- [x] [P5-T6] Stage the cycle-2 changes with `git add -A`, commit them, and push the
   branch. Record `evidence/other/remediation-commit-and-push.2026-09-08T10-00.md` with
   `Timestamp:`, the commands, `EXIT_CODE:` for each, the branch name, the
   `git status --porcelain` output taken immediately after `git add -A` and before the
@@ -2280,7 +2280,7 @@ Round-4 departures.
   `tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv`, and
   `tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats`.
 
-- [ ] [P5-T7] Dispatch the coverage workflow against the pushed branch with
+- [x] [P5-T7] Dispatch the coverage workflow against the pushed branch with
   `gh workflow run .github/workflows/_shell-coverage.yml --ref bug/cleanup-worktrees-dirt-classifier-632-r2`,
   wait for the run to conclude, and record
   `evidence/qa-gates/shell-coverage-dispatch.2026-09-08T10-00.md` with `Timestamp:`,
@@ -2291,7 +2291,7 @@ Round-4 departures.
   commit P5-T6 pushed, recorded as an observation rather than asserted against a literal
   written into this plan.
 
-- [ ] [P5-T8] Download that run's merged Cobertura artifact and read the figures directly
+- [x] [P5-T8] Download that run's merged Cobertura artifact and read the figures directly
   from `kcov-merged/cov.xml`. Record
   `evidence/qa-gates/dirt-lib-coverage.2026-09-08T10-00.md` with `Timestamp:`, `Command:`,
   `EXIT_CODE:`, `PostChangeRepoLineCoverage:`, `PostChangeDirtLibLineCoverage:`,
@@ -2300,7 +2300,7 @@ Round-4 departures.
   numbers, both are at or above `85.0`, and the artifact states that kcov measures no
   branch coverage so no branch gate applies to bash.
 
-- [ ] [P5-T9] Compare against the P0-T6 baseline and record
+- [x] [P5-T9] Compare against the P0-T6 baseline and record
   `evidence/qa-gates/coverage-delta.2026-09-08T10-00.md` with `Timestamp:`, `Command:`,
   `EXIT_CODE:`, `BaselineRepoLineCoverage:`, `PostChangeRepoLineCoverage:`,
   `BaselineDirtLibLineCoverage:`, `PostChangeDirtLibLineCoverage:`, a per-file table
@@ -2344,7 +2344,7 @@ Round-4 departures.
   P4-T7's artifact; and the artifact names the coverage stage as CI-measured with its run
   id rather than claiming a local run.
 
-- [ ] [P5-T12] Write the cycle-2 closing summary at
+- [x] [P5-T12] Write the cycle-2 closing summary at
   `evidence/other/cycle2-closure.2026-09-08T10-00.md`, stating for each of N1, N2's four
   sites, the systemic gate, and O1 the change made, the test that holds it, and the
   evidence artifact. Then stage and commit the documentation and evidence written after
