@@ -228,3 +228,56 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     [[ "$log" == *"diff --no-color -U0 -- src/Legacy/Legacy.csproj"* ]]
     [[ "$log" == *"diff --no-color -U0 --cached -- src/Legacy/Legacy.csproj"* ]]
 }
+
+@test "dirt_index_and_worktree_delta: an MM entry whose working-tree content is on main is UNIQUE" {
+    dirt dirt_index_and_worktree_delta
+    [ "$status" -eq 0 ]
+    # N3's rung-4 direction. Both porcelain columns are content-bearing, so content exists
+    # in the index AND in the working tree as two distinct blobs. Rung 4's tracked half
+    # compares main to the WORKING TREE only: its probe exits 0 here and main holds content
+    # at the path, so the rung would answer CONTENT_ON_MAIN on the strength of a comparison
+    # that says nothing about the index blob. That blob is in no commit, so the worktree
+    # would aggregate ALL_DISPOSABLE and --clear-disposable would run reset --hard and drop
+    # it. The entry must fail closed instead.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||MM|src/a.cs'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *'CONTENT_ON_MAIN||MM|src/a.cs'* ]]
+    [[ "$output" != *"ALL_DISPOSABLE"* ]]
+}
+
+@test "dirt_index_and_worktree_delta: an MM entry whose working-tree blob is in history is UNIQUE" {
+    dirt dirt_index_and_worktree_delta
+    [ "$status" -eq 0 ]
+    # N3's rung-5 direction, in the same fixture and reached by a different route: this
+    # entry's rung-4 probe exits 1, so it advances to rung 5, which hashes the WORKING-TREE
+    # file and finds that blob in history. Rung 5 reads the same single location rung 4
+    # does, so the same two-blob argument applies and the same disposable verdict would be
+    # wrong. The scenario supplies both a hash-object payload and a matching find-object
+    # payload, which is what makes the absence assertion below able to fail: without the
+    # new guard the ladder reaches rung 5, finds ffff3333, and answers CONTENT_IN_HISTORY.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||MM|src/b.cs'* ]]
+    [[ "$output" != *'CONTENT_IN_HISTORY|ffff3333|MM|src/b.cs'* ]]
+}
+
+@test "dirt_index_and_worktree_delta: a UU entry whose working-tree content is on main is UNIQUE" {
+    dirt dirt_index_and_worktree_delta
+    [ "$status" -eq 0 ]
+    # The unmerged shape of the same defect, and the reason the guard's character class is
+    # not narrowed to M A R C. An unmerged entry holds content at index stages 2 and 3, so
+    # a UU entry whose working-tree copy has been edited back to main's content reaches
+    # rung 4's positive answer by exactly the route the MM entry above does, while two
+    # index-side blobs that are in no commit sit behind it.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||UU|src/c.cs'* ]]
+    [[ "$output" != *'CONTENT_ON_MAIN||UU|src/c.cs'* ]]
+}
+
+@test "dirt_index_and_worktree_delta: the M-space control entry in the same fixture is still CONTENT_ON_MAIN" {
+    dirt dirt_index_and_worktree_delta
+    [ "$status" -eq 0 ]
+    # The positive direction, and the reason all four entries live in ONE fixture so that a
+    # single status read serves both directions. This entry's Y column is a space, so the
+    # index blob and the working-tree blob are the same blob and one probe accounts for
+    # both. Rung 4 must still answer CONTENT_ON_MAIN for it. A "fix" that simply disabled
+    # rungs 4 and 5 would pass the three tests above and fail here.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|CONTENT_ON_MAIN||M |docs/tracked.md'* ]]
+}

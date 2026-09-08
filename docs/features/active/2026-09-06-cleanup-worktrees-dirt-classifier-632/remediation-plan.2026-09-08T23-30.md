@@ -813,7 +813,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
 
 ### Phase 1 — The N3 fixture, the failing tests, and the fail-before record
 
-- [ ] [P1-T1] Create the scenario directory
+- [x] [P1-T1] Create the scenario directory
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_index_and_worktree_delta/` and copy into
   it, verbatim, the six non-classifier fixture files named in D2 from
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_unique/`: `worktree-list.out`,
@@ -823,7 +823,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   `git status --porcelain --untracked-files=all tests/fixtures/cleanup_worktrees/scenarios/dirt_index_and_worktree_delta`
   lists the new directory as untracked.
 
-- [ ] [P1-T2] Write the twelve classifier fixture files for
+- [x] [P1-T2] Write the twelve classifier fixture files for
   `dirt_index_and_worktree_delta` exactly as tabulated in D2:
   `status._repo-wt_dirt.out`, `diff-quiet..src_a.cs.rc`,
   `rev-parse.verify.main_src_a.cs.rc`, `hash-object.src_a.cs.out`,
@@ -842,7 +842,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   `hash-object.src_a.cs.out`, `hash-object.src_b.cs.out`, `hash-object.src_c.cs.out`, and
   `log.find-object.bbbb1111.out`.
 
-- [ ] [P1-T3] Update the membership test in
+- [x] [P1-T3] Update the membership test in
   `tests/shell/test_cleanup_worktrees_dirt_classify.bats` in this same task: add
   `dirt_index_and_worktree_delta` to the explicit scenario list at `:220-231`, change the
   asserted record literal at `:253` from `34` to `38`, and update the explanatory comment
@@ -858,7 +858,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   members of the six defined tokens; only the verdicts change, and this test asserts
   membership and counts rather than particular verdicts.
 
-- [ ] [P1-T4] Add four tests to
+- [x] [P1-T4] Add four tests to
   `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`, driving
   `classify_worktree_dirt` through the existing `dirt` helper at that file's `:41-44`. The
   titles are fixed here so the later TAP searches have exact targets:
@@ -883,7 +883,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   each of the four `@test` titles above appears exactly once in that file, checked with
   `grep -cF` on each title.
 
-- [ ] [P1-T5] Create `tests/shell/test_cleanup_worktrees_dirt_content_locations.bats`
+- [x] [P1-T5] Create `tests/shell/test_cleanup_worktrees_dirt_content_locations.bats`
   implementing exactly the two tests specified in D5, with a header stating the subject
   (the missing-comparison defect family: R1, N1 and N3), the mechanism, the two excluded
   verdicts and why each is excluded, and the statement that no temporary file is created.
@@ -904,7 +904,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   reports at least `1`, which is the exclusion being written into the suite rather than
   left implicit; and `wc -l` on the file reports at most `300`.
 
-- [ ] [P1-T6] `[expect-fail]` Run
+- [x] [P1-T6] `[expect-fail]` Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_failclosed.bats tests/shell/test_cleanup_worktrees_dirt_content_locations.bats`
   before any library change and record
   `evidence/regression-testing/fail-before-index-blob-unaccounted.2026-09-09T00-30.md`

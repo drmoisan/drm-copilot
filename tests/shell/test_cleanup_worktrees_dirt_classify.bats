@@ -222,7 +222,8 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
         dirt_build_artifact_plus_content dirt_classifier_read_error \
         dirt_clear_all_disposable dirt_clear_clean_failed dirt_clear_reset_failed \
         dirt_clear_reverify_order dirt_content_in_history dirt_content_on_main \
-        dirt_history_depth_fallback dirt_history_read_error dirt_mixed_unique_blocks \
+        dirt_history_depth_fallback dirt_history_read_error \
+        dirt_index_and_worktree_delta dirt_mixed_unique_blocks \
         dirt_pipe_path dirt_quoted_path dirt_rename_split dirt_session_artifact \
         dirt_staged_probe_diffindex_error dirt_staged_probe_revlist_error \
         dirt_staged_tree_is_commit dirt_staged_tree_no_match \
@@ -247,10 +248,11 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     # above, and its verdicts would never be checked for membership.
     on_disk="$(find "${SCEN}" -maxdepth 1 -type d -name 'dirt_*' | wc -l)"
     [ "$iterated" -eq "$on_disk" ]
-    # The union must be exactly the thirty-four records these scenarios produce:
-    # twenty-eight scenarios, of which six carry two status entries each. Without this
-    # count the membership check would pass vacuously over an empty union.
-    [ "$seen" -eq 34 ]
+    # The union must be exactly the thirty-eight records these scenarios produce:
+    # twenty-nine scenarios, of which six carry two status entries each and one carries
+    # four. Without this count the membership check would pass vacuously over an empty
+    # union.
+    [ "$seen" -eq 38 ]
     [ -z "$offenders" ]
 }
 
