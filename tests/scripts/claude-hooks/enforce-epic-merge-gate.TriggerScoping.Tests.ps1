@@ -130,4 +130,45 @@ Describe 'enforce-epic-merge-gate.ps1 trigger scoping (issue #545)' {
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
+
+    Context 'R-2.a wrapper-led segments stay in scope' {
+        # Every case in this context drives the pure decision seam with all three
+        # checkpoint read seams mocked to return null, so no case reads live
+        # orchestration state from disk. An in-scope command therefore necessarily
+        # denies, and each assertion turns on the scope filter alone.
+        It 'R2a-C1 denies a gh pr merge --merge carried inside a bash -c argument' {
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
+
+            $envelope = ConvertTo-MergeGateEnvelope -Command 'bash -c "gh pr merge --merge 688"'
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $envelope
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+
+        It 'R2a-N1 still allows a commit message quoting the merge phrase and the merge flag' {
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
+
+            $envelope = ConvertTo-MergeGateEnvelope -Command 'git commit -m "gh pr merge --merge 688"'
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $envelope
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'R2a-N2 keeps a gh pr merge --merge relocated through xargs in scope' {
+            # Preservation pin, not a regression case. The pipe delimits segments, the
+            # second segment is wrapper-led through xargs, and nothing in it is quoted,
+            # so --merge is already a plain token and the command already denies.
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
+
+            $envelope = ConvertTo-MergeGateEnvelope -Command 'echo 688 | xargs gh pr merge --merge'
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $envelope
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+    }
 }

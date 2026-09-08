@@ -83,4 +83,24 @@ Describe 'Codex enforce-epic-merge-gate trigger scoping (issue #545)' {
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
         }
     }
+
+    Context 'R-2.a wrapper-led segments stay in scope' {
+        # Every case in this context drives the pure decision seam with both checkpoint
+        # texts supplied as empty parameters, so no case reads live orchestration state
+        # from disk. An in-scope command therefore necessarily denies, and each
+        # assertion turns on the scope filter alone.
+        It 'R2a-X1 denies a gh pr merge --merge carried inside a bash -c argument' {
+            $payload = ConvertTo-CodexMergeTriggerScopingPayload -Command 'bash -c "gh pr merge --merge 688"'
+            $decision = Invoke-CodexEpicMergeDecision -PayloadRaw $payload -ChildCheckpointRaw '' -EpicCheckpointRaw ''
+            $decision | Should -Not -BeNullOrEmpty
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+
+        It 'R2a-X2 still allows a commit message quoting the merge phrase and the merge flag' {
+            $payload = ConvertTo-CodexMergeTriggerScopingPayload -Command 'git commit -m "gh pr merge --merge 688"'
+            $decision = Invoke-CodexEpicMergeDecision -PayloadRaw $payload -ChildCheckpointRaw '' -EpicCheckpointRaw ''
+            $decision | Should -BeNullOrEmpty
+        }
+    }
 }
