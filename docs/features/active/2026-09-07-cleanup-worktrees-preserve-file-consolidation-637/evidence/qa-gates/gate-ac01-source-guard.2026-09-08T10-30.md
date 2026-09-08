@@ -3,8 +3,8 @@
 Timestamp: 2026-09-08T10-30
 Task: `[P3-T8]`
 Command: gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-preserve-file-consolidation-637-r2 (the workflow's test step runs `bash scripts/bash/shell-qc.sh test`, which invokes bats with no formatter flag and therefore emits TAP)
-EXIT_CODE: PENDING-CI
-Output Summary: PENDING-CI ROUND
+EXIT_CODE: 0
+Output Summary: DISCHARGED by CI round C, run 34219866134, conclusion success. TAP plan line `1..375`; 375 passing; the run carried zero `not ok` lines. Superseded as the gate of record by gate-ac01-source-guard.2026-09-08T10-45.md, which asserts both split libraries; discharged here for completeness.
 
 RouteSubstitution:
 - Plan command (denied in this worktree):
@@ -60,4 +60,25 @@ why this is recorded rather than assumed.
 
 This is pre-verification of the behavior, not a discharge of the gate. The gate is the bats run.
 
-Verdict: PENDING-CI ROUND.
+Verdict: DISCHARGED. The named test(s) each carry an `ok` line in run 34219866134 and no `not ok` line names any of them.
+
+## Discharge — CI round C
+
+Timestamp: 2026-09-08T12-10
+Task: `[P3-T8]`
+Run: 34219866134
+URL: https://github.com/drmoisan/drm-copilot/actions/runs/34219866134
+Head SHA: 62c7332923cab355e2bcf7f64b658a1e1ca07511
+Conclusion: success
+EXIT_CODE: 0
+TAP plan line: `1..375`
+Passing: 375. Failing: 0. **The run carried zero `not ok` lines.**
+
+The suite grew from the 343-test baseline to 375 and no pre-existing test regressed.
+Verbatim TAP `ok` line for each test this gate names, read from the run log:
+
+    ok 290 preserve library defines functions only and runs no work at source time
+
+The three-part assertion the plan states is satisfied in its full-suite substitute
+form: the run exited 0, the plan line `1..375` was printed, and no `not ok` line
+appears anywhere in the run, so none names any of the 1 test(s) above.

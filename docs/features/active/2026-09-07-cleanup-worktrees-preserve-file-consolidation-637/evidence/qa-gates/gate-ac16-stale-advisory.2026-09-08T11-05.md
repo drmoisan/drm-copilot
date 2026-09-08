@@ -3,8 +3,8 @@
 Timestamp: 2026-09-08T11-05
 Task: `[P6-T8]`
 Command: gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-preserve-file-consolidation-637-r2 (the workflow's test step runs `bash scripts/bash/shell-qc.sh test`, which invokes bats with no formatter flag and therefore emits TAP)
-EXIT_CODE: PENDING-CI
-Output Summary: PENDING-CI ROUND
+EXIT_CODE: 0
+Output Summary: DISCHARGED by CI round C, run 34219866134, conclusion success. TAP plan line `1..375`; 375 passing; the run carried zero `not ok` lines. Satisfies AC-16 and completes the pass-after half of the fail-before record.
 
 RouteSubstitution:
 - Plan command (denied in this worktree):
@@ -73,4 +73,45 @@ always answers no.
 
 This is pre-verification of the behavior, not a discharge of the gate. The gate is the bats run.
 
-Verdict: PENDING-CI ROUND.
+Verdict: DISCHARGED. The named test(s) each carry an `ok` line in run 34219866134 and no `not ok` line names any of them.
+
+## Discharge — CI round C
+
+Timestamp: 2026-09-08T12-10
+Task: `[P6-T8]`
+Run: 34219866134
+URL: https://github.com/drmoisan/drm-copilot/actions/runs/34219866134
+Head SHA: 62c7332923cab355e2bcf7f64b658a1e1ca07511
+Conclusion: success
+EXIT_CODE: 0
+TAP plan line: `1..375`
+Passing: 375. Failing: 0. **The run carried zero `not ok` lines.**
+
+The suite grew from the 343-test baseline to 375 and no pre-existing test regressed.
+Verbatim TAP `ok` line for each test this gate names, read from the run log:
+
+    ok 313 a stale advisory crlf value does not override an LF target
+
+The three-part assertion the plan states is satisfied in its full-suite substitute form:
+the run exited 0, the plan line `1..375` was printed, and no `not ok` line appears
+anywhere in the run, so none names any of the 1 test(s) above.
+
+### Fail-before / pass-after transition
+
+This gate completes the pass-after half of a fail-before record. The same test was red at
+the Phase 2 checkpoint and is green now.
+
+**Red** — run 34213641449,
+`https://github.com/drmoisan/drm-copilot/actions/runs/34213641449`, plan line `1..349`,
+which carried exactly three `not ok` lines:
+
+    not ok 289 an untracked preserve record is staged and reported
+    not ok 290 a stale advisory crlf value does not override an LF target
+    not ok 291 a host token match aborts the pass before any staging
+
+**Green** — run 34219866134,
+`https://github.com/drmoisan/drm-copilot/actions/runs/34219866134`, plan line `1..375`,
+zero `not ok` lines, with this gate's test carrying the `ok` line quoted above.
+
+The TAP sequence numbers differ between the two runs because the suite grew by thirty-two
+tests between them. The test *names* are the stable identity and they match exactly.

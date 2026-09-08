@@ -548,12 +548,12 @@ blanket waiver.
       fixture manifest and canned `jq` stub output. `no-jq/` exists and carries a single `.gitkeep`
       file and no executable named `jq`; the placeholder file is required because git does not track
       an empty directory and the fixture must survive a fresh checkout.
-- [ ] [P3-T8] Gate the source-guard test. Run
+- [x] [P3-T8] Gate the source-guard test. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f defines tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac01-source-guard.<timestamp>.md` records the four required fields.
       Satisfies **AC-01**.
-- [ ] [P3-T9] Gate the unresolvable-`jq` test. Run
+- [x] [P3-T9] Gate the unresolvable-`jq` test. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f unresolvable tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       The test this gate runs drives `preserve_resolve_jq`, which `[P3-T2]` creates in this phase,
       and asserts both that the status is 127 and that stderr carries the single-line token
@@ -561,17 +561,17 @@ blanket waiver.
       `not ok` line appears, and `evidence/qa-gates/gate-ac05-jq-127.<timestamp>.md` records the four
       required fields with an `Output Summary:` recording that the test asserted both the 127 status
       and the presence of that diagnostic token on stderr. Satisfies **AC-05**.
-- [ ] [P3-T10] Gate the manifest-rejection test. Run
+- [x] [P3-T10] Gate the manifest-rejection test. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f schema_version tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac06-manifest-rejected.<timestamp>.md` records the four required
       fields. Satisfies **AC-06**.
-- [ ] [P3-T11] Gate the malformed-scan test. Run
+- [x] [P3-T11] Gate the malformed-scan test. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f malformed tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac26-scan-malformed.<timestamp>.md` records the four required fields.
       Satisfies **AC-26**.
-- [ ] [P3-T12] Gate the field-matrix test. Run
+- [x] [P3-T12] Gate the field-matrix test. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f vocabulary tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac28-field-matrix.<timestamp>.md` records the four required fields.
@@ -697,25 +697,25 @@ blanket waiver.
       observable through the stub's `stub-git:` stderr log. `/dev/null` is a character device, not a
       temporary file. Acceptance: the suite contains no `mktemp` call and no `BATS_TEST_TMPDIR`
       reference, and the `/dev` seam is used by at least one test.
-- [ ] [P4-T12] Gate the untracked-staging test that Phase 2 recorded failing. Run
+- [x] [P4-T12] Gate the untracked-staging test that Phase 2 recorded failing. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f untracked tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac08-untracked-staged.<timestamp>.md` records the four required fields.
       Satisfies **AC-08**.
-- [ ] [P4-T13] Gate the dispatch and usage tests. Run
+- [x] [P4-T13] Gate the dispatch and usage tests. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f dispatches tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f unknown tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f CLEANUP_WT_MANIFEST_PATH tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, each of the three runs prints the TAP plan line `1..1`, no `not ok`
       line appears in any of them, and `evidence/qa-gates/gate-ac02-ac03-ac04-dispatch.<timestamp>.md`
       records the four required fields with all three plan lines in `Output Summary:`. Satisfies
       **AC-02**, **AC-03**, and **AC-04**.
-- [ ] [P4-T14] Gate the precondition, ordering, and per-record outcome tests. Run
+- [x] [P4-T14] Gate the precondition, ordering, and per-record outcome tests. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f MISSING-WORKTREE tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f modified tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f LC_ALL tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f memory_index_line tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, each of the four runs prints the TAP plan line `1..1`, no `not ok`
       line appears in any of them, and
       `evidence/qa-gates/gate-ac07-ac09-ac10-ac12.<timestamp>.md` records the four required fields
       with all four plan lines in `Output Summary:`. Satisfies **AC-07**, **AC-09**, **AC-10**, and
       **AC-12**.
-- [ ] [P4-T15] Gate the missing-source, ignored-target, and exit-code tests. Run
+- [x] [P4-T15] Gate the missing-source, ignored-target, and exit-code tests. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f MISSING-SOURCE tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f ignored tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f distinguish tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, each of the three runs prints the TAP plan line `1..1`, no `not ok`
       line appears in any of them, and
@@ -756,17 +756,17 @@ blanket waiver.
       `an absent destination index is created and reported as CREATED`, and
       `a duplicate index entry is skipped and does not change the exit code`. Acceptance: all three
       test names appear in the file.
-- [ ] [P5-T6] Gate the verbatim-append test. Run
+- [x] [P5-T6] Gate the verbatim-append test. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f verbatim tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac11-index-verbatim.<timestamp>.md` records the four required fields.
       Satisfies **AC-11**.
-- [ ] [P5-T7] Gate the index-creation test. Run
+- [x] [P5-T7] Gate the index-creation test. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f CREATED tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac13-index-created.<timestamp>.md` records the four required fields.
       Satisfies **AC-13**.
-- [ ] [P5-T8] Gate the duplicate-index test. Run
+- [x] [P5-T8] Gate the duplicate-index test. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f duplicate tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac14-index-duplicate.<timestamp>.md` records the four required fields.
@@ -854,17 +854,17 @@ blanket waiver.
       `a mixed line ending target is refused and reported as EOL-MIXED`. Phase 2's
       `a stale advisory crlf value does not override an LF target` is expected to turn green in this
       phase and is gated in P6-T8. Acceptance: all four test names appear in the file.
-- [ ] [P6-T8] Gate the stale-advisory test that Phase 2 recorded failing. Run
+- [x] [P6-T8] Gate the stale-advisory test that Phase 2 recorded failing. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f stale tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac16-stale-advisory.<timestamp>.md` records the four required fields.
       Satisfies **AC-16**.
-- [ ] [P6-T9] Gate the unterminated-line and advisory-mismatch tests. Run
+- [x] [P6-T9] Gate the unterminated-line and advisory-mismatch tests. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f unterminated tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f ADVISORY-MISMATCH tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, both runs print the TAP plan line `1..1`, no `not ok` line appears in
       either, and `evidence/qa-gates/gate-ac15-ac17-eol.<timestamp>.md` records the four required
       fields with both plan lines in `Output Summary:`. Satisfies **AC-15** and **AC-17**.
-- [ ] [P6-T10] Gate the CRLF-target and mixed-endings tests. Run
+- [x] [P6-T10] Gate the CRLF-target and mixed-endings tests. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f crlf[[:space:]]target tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f EOL-MIXED tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, both runs print the TAP plan line `1..1`, no `not ok` line appears in
       either, and `evidence/qa-gates/gate-ac18-ac19-eol.<timestamp>.md` records the four required
@@ -933,7 +933,7 @@ blanket waiver.
       `a pattern set id mismatch is reported and the local scan governs`. Phase 2's
       `a host token match aborts the pass before any staging` is expected to turn green in this phase
       and is gated in P7-T10. Acceptance: all four test names appear in the file.
-- [ ] [P7-T10] Gate the host-token hard-stop test that Phase 2 recorded failing. Run
+- [x] [P7-T10] Gate the host-token hard-stop test that Phase 2 recorded failing. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f aborts tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       The test itself asserts exit status 3 and that no `stub-git:` line in the output carries `add`
       as its subcommand operand. Because the stub echoes its whole argv at
@@ -945,12 +945,12 @@ blanket waiver.
       Acceptance: exit code 0, the TAP plan line printed is `1..1`, no `not ok` line appears, and
       `evidence/qa-gates/gate-ac22-host-token-hard-stop.<timestamp>.md` records the four required
       fields. Satisfies **AC-22**.
-- [ ] [P7-T11] Gate the pattern-detection and revision-syntax tests. Run
+- [x] [P7-T11] Gate the pattern-detection and revision-syntax tests. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f detected tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f revision tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, both runs print the TAP plan line `1..1`, no `not ok` line appears in
       either, and `evidence/qa-gates/gate-ac23-ac24-patterns.<timestamp>.md` records the four
       required fields with both plan lines in `Output Summary:`. Satisfies **AC-23** and **AC-24**.
-- [ ] [P7-T12] Gate the scan-scope and pattern-set-identifier tests. Run
+- [x] [P7-T12] Gate the scan-scope and pattern-set-identifier tests. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bats -t -f reads tests/shell/test_cleanup_worktrees_preserve.bats && bats -t -f governs tests/shell/test_cleanup_worktrees_preserve.bats'"`.
       Acceptance: exit code 0, both runs print the TAP plan line `1..1`, no `not ok` line appears in
       either, and `evidence/qa-gates/gate-ac25-ac27-scan-scope.<timestamp>.md` records the four
@@ -1090,7 +1090,7 @@ When the loop restarts because the format stage rewrote a file, re-run `[P9-T3]`
 `evidence/qa-gates/gate-ac38-line-caps.<timestamp>.md` before `[P10-T5]` may be recorded. No stage
 may be recorded as `SKIPPED`.
 
-- [ ] [P10-T1] Capture the pre-format tree state and the pre-format drift signal. This task runs two
+- [x] [P10-T1] Capture the pre-format tree state and the pre-format drift signal. This task runs two
       separate spans. Span one, on the Windows side:
       `git status --porcelain -- scripts tools .claude/lib/bash`.
       The pathspec scopes the capture to the three roots `discover_shell_scripts` walks at
@@ -1106,7 +1106,7 @@ may be recorded as `SKIPPED`.
       printed any diff hunk and how many `shellcheck` findings were printed. The artifact's
       `Command:` and `EXIT_CODE:` record the `check` span; the porcelain listing is recorded in
       `Output Summary:`. This task does not require exit 0; it is an observation.
-- [ ] [P10-T2] Run the format stage. Run
+- [x] [P10-T2] Run the format stage. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh format'"`,
       then immediately re-run span one of P10-T1, that is
       `git status --porcelain -- scripts tools .claude/lib/bash`,
@@ -1128,7 +1128,7 @@ may be recorded as `SKIPPED`.
       repair rewrites a file. `evidence/qa-gates/final-qc-format.<timestamp>.md` records the four
       required fields plus both porcelain listings and the exit code of each porcelain invocation.
       The artifact's `Command:` and `EXIT_CODE:` record the format invocation.
-- [ ] [P10-T3] Run the lint and format-diff stage. Run
+- [x] [P10-T3] Run the lint and format-diff stage. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh check'"`.
       Acceptance: exit code 0, the output carries no `shfmt` diff hunk and no `shellcheck` finding,
       and `evidence/qa-gates/final-qc-check.<timestamp>.md` records the four required fields.
@@ -1170,14 +1170,14 @@ may be recorded as `SKIPPED`.
       `EXIT_CODE: 0`, and an `Output Summary:` restating the recorded values in one line. If the
       post-change value is below the baseline value, the verdict is remediation-required and this
       task stays unchecked until a further test-adding pass restores it.
-- [ ] [P10-T8] Re-run the push-down contract suite as the last gate, because Phase 8 edited a
+- [x] [P10-T8] Re-run the push-down contract suite as the last gate, because Phase 8 edited a
       `.claude/**` file and later phases may have touched the bundle. Run
       `pwsh -NoProfile -Command "Set-Location -LiteralPath 'RESOLVED-WINDOWS-ROOT'; poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q"`,
       substituting the `ResolvedWindowsRoot:` value that `[P0-T2]` recorded for the quoted
       `RESOLVED-WINDOWS-ROOT` token before running the span. Acceptance: exit code 0, the summary line contains the word `passed`
       and no `failed` count, and `evidence/qa-gates/final-qc-pushdown.<timestamp>.md` records the
       four required fields.
-- [ ] [P10-T9] Reconcile the checklist. Verify that every `AC-nn` checkbox in
+- [x] [P10-T9] Reconcile the checklist. Verify that every `AC-nn` checkbox in
       `docs/features/active/2026-09-07-cleanup-worktrees-preserve-file-consolidation-637/spec.md`
       that this plan claims is backed by a named evidence artifact that exists on disk and carries
       all four required fields. Acceptance:

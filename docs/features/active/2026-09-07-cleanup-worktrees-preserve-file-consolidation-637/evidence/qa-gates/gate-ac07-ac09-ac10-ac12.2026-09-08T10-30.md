@@ -3,8 +3,8 @@
 Timestamp: 2026-09-08T10-30
 Task: `[P4-T14]`
 Command: gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-preserve-file-consolidation-637-r2 (the workflow's test step runs `bash scripts/bash/shell-qc.sh test`, which invokes bats with no formatter flag and therefore emits TAP)
-EXIT_CODE: PENDING-CI
-Output Summary: PENDING-CI ROUND
+EXIT_CODE: 0
+Output Summary: DISCHARGED by CI round C, run 34219866134, conclusion success. TAP plan line `1..375`; 375 passing; the run carried zero `not ok` lines. Satisfies AC-07, AC-09, AC-10, and AC-12.
 
 RouteSubstitution:
 - Plan command (denied in this worktree):
@@ -80,4 +80,28 @@ exist. The index is not read, not created, and not appended to.
 
 This is pre-verification of the behavior, not a discharge of the gate. The gate is the bats run.
 
-Verdict: PENDING-CI ROUND.
+Verdict: DISCHARGED. The named test(s) each carry an `ok` line in run 34219866134 and no `not ok` line names any of them.
+
+## Discharge — CI round C
+
+Timestamp: 2026-09-08T12-10
+Task: `[P4-T14]`
+Run: 34219866134
+URL: https://github.com/drmoisan/drm-copilot/actions/runs/34219866134
+Head SHA: 62c7332923cab355e2bcf7f64b658a1e1ca07511
+Conclusion: success
+EXIT_CODE: 0
+TAP plan line: `1..375`
+Passing: 375. Failing: 0. **The run carried zero `not ok` lines.**
+
+The suite grew from the 343-test baseline to 375 and no pre-existing test regressed.
+Verbatim TAP `ok` line for each test this gate names, read from the run log:
+
+    ok 298 a missing consolidation worktree reports MISSING-WORKTREE and stages nothing
+    ok 299 a modified preserve record is staged and reported
+    ok 300 records are emitted in LC_ALL=C order regardless of manifest order
+    ok 301 a null memory_index_line stages the file and touches no index
+
+The three-part assertion the plan states is satisfied in its full-suite substitute form:
+the run exited 0, the plan line `1..375` was printed, and no `not ok` line appears
+anywhere in the run, so none names any of the 4 test(s) above.
