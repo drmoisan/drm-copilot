@@ -1190,7 +1190,7 @@ Round-4 departures.
 
 ### Phase 1 — N1: rung 4's tracked half must not resolve from an empty pathspec
 
-- [ ] [P1-T1] Create the scenario directory
+- [x] [P1-T1] Create the scenario directory
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_tracked_staged_only_blob/` and copy
   into it, verbatim, the six non-classifier fixture files listed in this plan's fixture
   section from `tests/fixtures/cleanup_worktrees/scenarios/dirt_unique/`. Acceptance: for
@@ -1198,7 +1198,7 @@ Round-4 departures.
   `0`, and `git status --porcelain tests/fixtures/cleanup_worktrees/scenarios/dirt_tracked_staged_only_blob`
   lists the new directory as untracked.
 
-- [ ] [P1-T2] Write the six classifier fixture files for
+- [x] [P1-T2] Write the six classifier fixture files for
   `dirt_tracked_staged_only_blob` exactly as tabulated in this plan's fixture section:
   `status._repo-wt_dirt.out`, `diff-quiet..staged_only.md.rc`,
   `rev-parse.verify.main_staged_only.md.rc`, `hash-object.staged_only.md.rc`,
@@ -1207,7 +1207,7 @@ Round-4 departures.
   `AD staged_only.md`, and the five `.rc` files contain `0`, `1`, `128`, `0`, and `0`
   respectively.
 
-- [ ] [P1-T3] Add a test titled
+- [x] [P1-T3] Add a test titled
   `dirt_tracked_staged_only_blob: an AD entry whose content is only a staged blob is UNIQUE`
   to `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`, driving
   `classify_worktree_dirt` through the existing `dirt` helper at that file's `:41-44`. It
@@ -1216,14 +1216,14 @@ Round-4 departures.
   `CONTENT_ON_MAIN||AD|` and `ALL_DISPOSABLE`. Acceptance: the `@test` title appears once
   in that file.
 
-- [ ] [P1-T4] Add the positive-direction test titled
+- [x] [P1-T4] Add the positive-direction test titled
   `dirt_tracked_staged_only_blob: a tracked entry whose content is on main is still CONTENT_ON_MAIN`
   to the same file, asserting the record
   `DIRTFILE|/repo-wt/dirt|CONTENT_ON_MAIN||M |docs/tracked.md` from the same scenario.
   Acceptance: the `@test` title appears once in that file, and both new tests name the
   same scenario, so one probe result serves both directions.
 
-- [ ] [P1-T5] `[expect-fail]` Run
+- [x] [P1-T5] `[expect-fail]` Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`
   before any library change and record
   `evidence/regression-testing/fail-before-rung4-path-in-main.2026-09-08T08-00.md` with
@@ -1235,7 +1235,7 @@ Round-4 departures.
   `dirt_tracked_staged_only_blob: a tracked entry whose content is on main is still CONTENT_ON_MAIN`.
   The second line proves the fixture drives the ladder rather than failing to load.
 
-- [ ] [P1-T6] Apply decision D1 to `scripts/bash/cleanup_worktrees_dirt_lib.sh`: declare
+- [x] [P1-T6] Apply decision D1 to `scripts/bash/cleanup_worktrees_dirt_lib.sh`: declare
   `erc=0` among the locals of `classify_dirt_entry`, and inside the existing
   `if ((drc == 0)); then` branch of rung 4's tracked half at `:297`, issue
   `cleanup_wt_git --no-optional-locks -C "$wt" rev-parse --verify --quiet "main:$rel"`
@@ -1252,7 +1252,7 @@ Round-4 departures.
   `:332`, which is the wrap-independent way to show the new read did not acquire a stderr
   redirect.
 
-- [ ] [P1-T7] Extend the library's header comment block with a paragraph explaining why
+- [x] [P1-T7] Extend the library's header comment block with a paragraph explaining why
   rung 4's tracked positive answer is conditional, in the same register and layout as the
   existing `TWO-WAY CLASSIFICATION OF NON-ZERO EXITS` (`:40-46`) and
   `NO --ignored ON THE STATUS READ` (`:29-33`) paragraphs: `diff --quiet` exits 0 both when
@@ -1264,7 +1264,7 @@ Round-4 departures.
   `grep -cF 'EMPTY PATHSPEC IS NOT A MATCH.' scripts/bash/cleanup_worktrees_dirt_lib.sh`
   reports `1`.
 
-- [ ] [P1-T8] Re-run
+- [x] [P1-T8] Re-run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`
   and record `evidence/regression-testing/pass-after-rung4-path-in-main.2026-09-08T08-00.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, the TAP plan line, and the `ok`/`not ok`
@@ -1272,7 +1272,7 @@ Round-4 departures.
   contains a line beginning `ok ` whose text ends with
   `dirt_tracked_staged_only_blob: an AD entry whose content is only a staged blob is UNIQUE`.
 
-- [ ] [P1-T9] Update the membership test in
+- [x] [P1-T9] Update the membership test in
   `tests/shell/test_cleanup_worktrees_dirt_classify.bats`: add
   `dirt_tracked_staged_only_blob` to the explicit scenario list at `:220-228`, change the
   asserted record literal at `:250` from `30` to `32`, and update the explanatory comment
@@ -1283,7 +1283,7 @@ Round-4 departures.
   `grep -c 'dirt_tracked_staged_only_blob' tests/shell/test_cleanup_worktrees_dirt_classify.bats`
   reports `1`.
 
-- [ ] [P1-T10] Re-run the three suites that exercise the rung-4 tracked half or the
+- [x] [P1-T10] Re-run the three suites that exercise the rung-4 tracked half or the
   non-mutation property, to confirm the narrowing disturbed nothing:
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_classify.bats tests/shell/test_cleanup_worktrees_dirt_clear.bats tests/shell/test_cleanup_worktrees_dirt_regression.bats`.
   Record `evidence/regression-testing/sibling-check-phase1.2026-09-08T08-00.md` with

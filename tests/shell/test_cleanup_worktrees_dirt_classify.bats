@@ -225,7 +225,8 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
         dirt_pipe_path dirt_quoted_path dirt_rename_split dirt_session_artifact \
         dirt_staged_probe_diffindex_error dirt_staged_probe_revlist_error \
         dirt_staged_tree_is_commit dirt_staged_tree_no_match \
-        dirt_staged_tree_worktree_delta dirt_tracked_read_errors dirt_unique; do
+        dirt_staged_tree_worktree_delta dirt_tracked_read_errors \
+        dirt_tracked_staged_only_blob dirt_unique; do
         iterated=$((iterated + 1))
         out="$(env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/${s}" \
             bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; classify_worktree_dirt '${WT}' 2>/dev/null")" || true
@@ -244,10 +245,10 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     # above, and its verdicts would never be checked for membership.
     on_disk="$(find "${SCEN}" -maxdepth 1 -type d -name 'dirt_*' | wc -l)"
     [ "$iterated" -eq "$on_disk" ]
-    # The union must be exactly the thirty records these scenarios produce: twenty-five
-    # scenarios, of which five carry two status entries each. Without this count the
-    # membership check would pass vacuously over an empty union.
-    [ "$seen" -eq 30 ]
+    # The union must be exactly the thirty-two records these scenarios produce:
+    # twenty-six scenarios, of which six carry two status entries each. Without this
+    # count the membership check would pass vacuously over an empty union.
+    [ "$seen" -eq 32 ]
     [ -z "$offenders" ]
 }
 

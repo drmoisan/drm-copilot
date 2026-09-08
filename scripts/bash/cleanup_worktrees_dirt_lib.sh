@@ -45,6 +45,16 @@
 # `hash-object`, `log --find-object`, and `diff-index --cached --quiet` exiting above 1.
 # Collapsing the two into one blanket rule would make CONTENT_IN_HISTORY unreachable.
 #
+# EMPTY PATHSPEC IS NOT A MATCH. `diff --quiet main -- <path>` exits 0 for two distinct
+# reasons: the compared content is identical, and the pathspec selected no paths at all.
+# Only the first supports a disposable verdict, so rung 4's tracked positive answer is
+# conditional. The reachable case is an AD entry, added to the index and then removed
+# from the working tree, whose content exists only as a staged blob; reading its exit 0
+# as a match would clear content held nowhere else. The answer is therefore gated on
+# `rev-parse --verify --quiet main:<path>`, which asks whether main has content at that
+# path to be equal to. A non-zero answer emits nothing and advances the ladder to the
+# hash-object guard. This is the vacuous confinement rung 3 already guards against.
+#
 # Record contract (pipe-delimited, one record per line; the file path is LAST so a path
 # containing the delimiter is still recoverable):
 #   DIRTFILE|<worktree-path>|<verdict>|<detail>|<status-code>|<file-path>
@@ -228,7 +238,7 @@ classify_dirt_entry() {
 	# Echoes exactly one `<verdict>|<detail>` line and always returns 0.
 	local wt="$1" xy="$2" rel="$3" staged="$4"
 	local x="${xy:0:1}" y="${xy:1:1}" untracked=0 blob="" hrc=0 mrc=0 mainblob="" brc=0
-	local drc=0 vrc=0 lrc=0 range found
+	local drc=0 erc=0 vrc=0 lrc=0 range found
 
 	# A C-quoted payload is returned UNIQUE immediately with no unquoting attempt. One
 	# branch, deterministic, and failing in the safe direction; attempting to unquote
@@ -295,8 +305,16 @@ classify_dirt_entry() {
 		cleanup_wt_git --no-optional-locks -C "$wt" diff --quiet main -- "$rel" \
 			>/dev/null || drc=$?
 		if ((drc == 0)); then
-			printf 'CONTENT_ON_MAIN|\n'
-			return 0
+			# See EMPTY PATHSPEC IS NOT A MATCH in the header. Only stdout is
+			# discarded: the stub logs its argv to stderr, and redirecting that
+			# stream too would hide this read from the argv assertions. --quiet
+			# already suppresses git's own diagnostic on the negative answer.
+			cleanup_wt_git --no-optional-locks -C "$wt" rev-parse --verify --quiet \
+				"main:$rel" >/dev/null || erc=$?
+			if ((erc == 0)); then
+				printf 'CONTENT_ON_MAIN|\n'
+				return 0
+			fi
 		fi
 		if ((drc > 1)); then
 			printf 'UNIQUE|\n'

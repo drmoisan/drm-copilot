@@ -156,3 +156,31 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     # CONTENT_IN_HISTORY is the fail-closed branch rather than a ladder that stopped early.
     [[ "$log" == *"--find-object"* ]]
 }
+
+@test "dirt_tracked_staged_only_blob: an AD entry whose content is only a staged blob is UNIQUE" {
+    dirt dirt_tracked_staged_only_blob
+    [ "$status" -eq 0 ]
+    # N1's negative direction. AD means the file was added to the index and then removed
+    # from the working tree, so its content exists ONLY as a staged blob: in no commit and
+    # not on disk. The rung-4 tracked probe exits 0 here, but it does so because the
+    # pathspec selected nothing, not because the content matches main's. Rung 4 must not
+    # read that exit as a match. It advances instead, and the blob read exits 128 because
+    # the file is absent from the worktree, so the entry fails closed to UNIQUE. Were it
+    # CONTENT_ON_MAIN the worktree would aggregate ALL_DISPOSABLE and the clear would
+    # discard the index entry, leaving the staged blob unreachable.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||AD|staged_only.md'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *'CONTENT_ON_MAIN||AD|'* ]]
+    [[ "$output" != *"ALL_DISPOSABLE"* ]]
+}
+
+@test "dirt_tracked_staged_only_blob: a tracked entry whose content is on main is still CONTENT_ON_MAIN" {
+    dirt dirt_tracked_staged_only_blob
+    [ "$status" -eq 0 ]
+    # The other half of the pin, and the reason both entries live in ONE fixture: the
+    # narrowing must reject the empty-pathspec case without disabling the rung. This entry
+    # is present in main and its content equals main's, so both of rung 4's tracked reads
+    # answer affirmatively and the disposable verdict still stands. A fix that simply
+    # stopped rung 4 emitting CONTENT_ON_MAIN would pass the AD test above and fail here.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|CONTENT_ON_MAIN||M |docs/tracked.md'* ]]
+}
