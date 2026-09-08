@@ -5,7 +5,7 @@
 **Feature Folder:** `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545`
 **Work Mode:** `full-bug` (resolved from `issue.md`, `- Work Mode: full-bug`)
 **Remediation inputs:** `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/remediation-inputs.2026-09-07T20-45.md`
-**Working branch:** `bug/enforcement-hook-trigger-matches-whole-command-text-545-r3`
+**Working branch:** `bug/enforcement-hook-trigger-matches-whole-command-text-545-r4`
 **Cycle:** 2 of a hard cap of 3. Exit gate: `blocking_count == 0` on the next `feature-review` reaudit.
 
 ## Diff anchors — there are two, and they are not interchangeable
@@ -16,17 +16,19 @@
   else. It is the only correct base for the question "was any frozen literal deleted anywhere in
   this feature", because a literal deleted earlier in the #545 work does not appear as a removed
   line against any later base.
-- **Cycle-scope anchor:** `26dba29533ba70f6cd80d14ac3c87ac24ca82aca`, the committed head of
-  `bug/enforcement-hook-trigger-matches-whole-command-text-545-r3` at the start of this cycle. Read
-  directly from `.git/refs/heads/bug/enforcement-hook-trigger-matches-whole-command-text-545-r3` in
-  the current tree, which holds exactly that 40-character value. Used by the changed-file scope
+- **Cycle-scope anchor:** `26dba29533ba70f6cd80d14ac3c87ac24ca82aca`, the committed head of the
+  working branch at the point this cycle's plan was committed.
+  `26dba29533ba70f6cd80d14ac3c87ac24ca82aca` is the parent of the plan commit
+  `459d245f893f3337d61496b2602830e381d1d7a3` and is confirmed by
+  `git rev-parse 459d245f893f3337d61496b2602830e381d1d7a3^`. Do not read it from a branch ref: both
+  `…-545-r3` and `…-545-r4` now point at the plan commit. Used by the changed-file scope
   assertion in `[P5-T4]`, and by nothing else. It is the only correct base for the question "what
   did cycle 2 change", because the branch already carries the entire #545 change and the cycle-1
   remediation.
 
 Every task below that runs `git diff` names which anchor it uses. Neither substitutes for the
 other. A scope assertion anchored at the feature-wide commit enumerates the whole feature and can
-never report a six-file cycle scope; a frozen-literal check anchored at the cycle-scope commit
+never report the twenty-one-path cycle scope; a frozen-literal check anchored at the cycle-scope commit
 cannot see a deletion made earlier in the feature and would pass vacuously.
 
 ---
@@ -128,13 +130,17 @@ pre-edit body of all six; `[P5-T3]` re-verifies that all six are byte-unchanged.
    `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` is at exactly 500 with zero
    headroom. R-2 does not touch it and no task here may. Current counts of the files this plan does
    touch, measured in the current tree: `.claude/hooks/hook-command-scanner.ps1` 450,
-   `.codex/hooks/hook-command-scanner.ps1` 450, `.claude/hooks/enforce-epic-merge-gate.ps1` 473,
+   `.codex/hooks/hook-command-scanner.ps1` 450,
+   `.claude/hooks/enforce-epic-merge-gate.ps1` 472 as `wc -l` reports it — the file has no trailing
+   newline, so it carries 473 lines of content and 28 lines of `wc -l` headroom,
    `.codex/hooks/enforce-epic-merge-gate.ps1` 174,
    `.claude/hooks/enforce-parallel-abandon-gate.ps1` 331,
    `.claude/hooks/enforce-pr-author-skill-helpers.ps1` 240, `.claude/hooks/validate-bash.ps1` 420.
    The two tightest are the scanner pair (50 lines of headroom each) and the Claude merge gate
-   (27 lines). Where an edit would exceed 500, shorten the added comment prose; do not delete the
-   comment-based help block and do not drop a code line.
+   (28 lines by `wc -l`, 27 lines of content). Edit 2 adds 14 lines, so the post-edit count of
+   `.claude/hooks/enforce-epic-merge-gate.ps1` is 486 by `wc -l`. Where an edit would exceed 500,
+   shorten the added comment prose; do not delete the comment-based help block and do not drop a
+   code line.
 5. **Evidence paths are non-overridable.** Every artifact this plan names resolves under
    `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/evidence/<kind>/`.
    No `artifacts/` sub-path is a valid evidence destination. If any caller supplies one, reject it,
@@ -144,13 +150,16 @@ pre-edit body of all six; `[P5-T3]` re-verifies that all six are byte-unchanged.
    carrying `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Where a non-zero exit is
    the expected outcome the artifact additionally carries `ExpectedExitCode: <int>`. `<capture-timestamp>`
    is the executor's own `yyyy-MM-ddTHH-mm` capture time.
-7. **PowerShell batch budget.** The cap is 3 production plus 3 test PowerShell files per batch. The
-   resolved session id is `worktree-agent-a478b73e41951af31-e3281c7b`; the state file is
-   `.claude/state/powershell-batch-budget.worktree-agent-a478b73e41951af31-e3281c7b.json`. Each
-   batch **opens** with a reset task that first lists `.claude/state/` and cross-checks the composed
-   file name against the names actually present there, then deletes the state file, then lists the
-   directory again. Bundle mirrors are written with `cp`, which does not pass through the PreToolUse
-   hook and therefore consumes no slot. Batch composition, all four within the cap:
+7. **PowerShell batch budget.** The cap is 3 production plus 3 test PowerShell files per batch.
+   The session id is resolved at runtime, not stated here:
+   `.claude/hooks/enforce-powershell-batch-budget.ps1` derives it from `CLAUDE_SESSION_ID`, then
+   `<root>/.claude/state/current-session-id`, then its fallback, so it is worktree-specific and the
+   cycle-1 value `worktree-agent-a478b73e41951af31-e3281c7b` does not apply to this relaunch. Each
+   batch **opens** with a reset task that lists `.claude/state/`, records every
+   `powershell-batch-budget.*.json` name observed together with its contents, deletes every such
+   file with `rm -f`, then lists the directory again. Bundle mirrors are written with `cp`, which
+   does not pass through the PreToolUse hook and therefore consumes no slot. Batch composition, all
+   four within the cap:
 
    | Batch | Production files (canonical) | Test files |
    |---|---|---|
@@ -163,14 +172,20 @@ pre-edit body of all six; `[P5-T3]` re-verifies that all six are byte-unchanged.
    `mcp__drm-copilot__run_poshqc_analyze`, Pester is `mcp__drm-copilot__run_poshqc_test` with
    `scan_folders`, with per-suite and per-case results read from `artifacts/pester/pester-junit.xml`.
    Every test-bearing evidence artifact carries a `TOOLCHAIN_SUBSTITUTION` note naming the substitute
-   route actually used. Do not silently skip a stage.
+   route actually used. Do not silently skip a stage. The `workspace_root` for every MCP call is
+   `C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ae0df3e53c9c9883f`. Before the
+   first MCP call, confirm with `git rev-parse --show-toplevel` that the executing worktree is that
+   path; if it is not, record the observed path and stop with `BLOCKED` rather than passing a path
+   from another worktree.
 9. **Coverage route.** The MCP test runner must NOT be used for any coverage figure: it resolves
    runsettings from the installed VS Code extension and cannot see this branch's `CodeCoverage.Path`
    entries. Coverage comes from a `workflow_dispatch` of `.github/workflows/_poshqc.yml`. **The
    executor has no `gh` in its tool allowlist. The dispatch and the figure-reading are ORCHESTRATOR
    work; the executor consumes supplied figures only.** See `[P0-T9]` and `[P5-T7]`.
-10. **Observed success-case output of each tool**, taken from the recorded runs of cycle 1 in this
-    same worktree rather than from documentation:
+10. **Observed success-case output of each tool**, taken from the recorded runs of cycle 1 in the
+    cycle-1 worktree rather than from documentation. The run has since relaunched into
+    `agent-ae0df3e53c9c9883f`; these are observations of tool behaviour, not of that checkout, so
+    they carry over unchanged:
     - `mcp__drm-copilot__run_poshqc_format` exits 0 whether or not it rewrote a file. Its exit code
       alone gates nothing, so every format task additionally records a `git status --porcelain`
       capture before and after plus the SHA-256 of each in-scope file before and after, and states
@@ -333,8 +348,11 @@ the loop, replacing the trailing `return $false`:
         $scanText.IndexOf(($optionName + ' ' + $optionValue), $comparison) -ge 0)
 ```
 
-Extend the function's `.DESCRIPTION` by one sentence naming the raw-scan leg, and change its
-`.PARAMETER` documentation from `Token` to `Segment`.
+Extend the function's `.DESCRIPTION` by one sentence naming the raw-scan leg. The function's
+comment-based help currently declares `.SYNOPSIS`, `.DESCRIPTION`, and `.OUTPUTS` and carries no
+`.PARAMETER` entry at all — re-derived against `.claude/hooks/enforce-parallel-abandon-gate.ps1`
+lines 96–113 — so add a `.PARAMETER Segment` entry rather than renaming an existing `.PARAMETER
+Token` entry, which does not exist.
 
 **4b.** `Test-ParallelAbandonCommandInScope` line 166: replace
 `if (Test-ParallelAbandonSegmentDisposition -Token @($segment.Tokens)) {` with
@@ -432,7 +450,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
 
 ### Phase 0 — Baseline capture (cycle 2)
 
-- [ ] [P0-T1] Read the repository policy files in the order defined by `policy-compliance-order`:
+- [x] [P0-T1] Read the repository policy files in the order defined by `policy-compliance-order`:
       `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`,
       `.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md`, `.claude/rules/powershell.md`,
       `.claude/rules/python.md`. Write
@@ -441,7 +459,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       paths in the order above, `Command:`, `EXIT_CODE: 0`, and `Output Summary:`. Each of the seven
       paths appears in the artifact exactly as written above. A missing path fails this task.
 
-- [ ] [P0-T2] Read the four cycle-2 review artifacts and this plan's inputs:
+- [x] [P0-T2] Read the four cycle-2 review artifacts and this plan's inputs:
       `remediation-inputs.2026-09-07T20-45.md`, `code-review.2026-09-07T20-45.md`,
       `policy-audit.2026-09-07T20-45.md`, `feature-audit.2026-09-07T20-45.md`, all in the feature
       folder root. Write
@@ -451,34 +469,43 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       no change to `Test-CommandLineFlag` or `Get-CommandLineFlagValue`; no F-1 through F-7 fix; no
       attempt to fix the two ambient-state failures. `EXIT_CODE: 0`.
 
-- [ ] [P0-T3] Capture the git baseline. Run, in this order:
+- [x] [P0-T3] Capture the git baseline. Run, in this order:
       `git rev-parse HEAD`;
+      `git merge-base --is-ancestor 26dba29533ba70f6cd80d14ac3c87ac24ca82aca HEAD`;
       `git status --porcelain`;
       `git diff --stat 6dff80ed4596bec088d548b23013e6077e32c484 -- .`.
       Write `evidence/remediation-baseline/baseline-git-state.<capture-timestamp>.md`.
       **Acceptance:** the recorded `git rev-parse HEAD` output is the 40-character string
-      `26dba29533ba70f6cd80d14ac3c87ac24ca82aca`. If it is any other value, the working tree is not
-      at the cycle-scope anchor this plan was authored against: record the observed value and stop
-      with `BLOCKED`. The artifact also records the `git status --porcelain` line count and the
-      final `N files changed` summary line of the feature-wide `--stat`. `EXIT_CODE: 0`.
+      `459d245f893f3337d61496b2602830e381d1d7a3`, the commit that added this plan, and
+      `git merge-base --is-ancestor 26dba29533ba70f6cd80d14ac3c87ac24ca82aca HEAD` exits 0,
+      confirming the cycle-scope anchor is reachable. If either check fails, record the observed
+      values and stop with `BLOCKED`. The artifact also records the `git status --porcelain` line
+      count and the final `N files changed` summary line of the feature-wide `--stat`.
+      `EXIT_CODE: 0`.
 
-- [ ] [P0-T4] Capture the formatting baseline. Run `mcp__drm-copilot__run_poshqc_format` with
-      `workspace_root=C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a478b73e41951af31`
+- [x] [P0-T4] Capture the formatting baseline. Run `mcp__drm-copilot__run_poshqc_format` with
+      `workspace_root=C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ae0df3e53c9c9883f`
       and no `scan_folders` argument, with a `git status --porcelain` capture immediately before and
       immediately after. Write
       `evidence/remediation-baseline/baseline-poshqc-format.<capture-timestamp>.md`.
-      **Acceptance:** the artifact records both porcelain captures verbatim and the set-difference
+      This is the first MCP call of the run, so standing constraint 8's worktree confirmation is
+      discharged here: run `git rev-parse --show-toplevel` before the formatter and record its
+      output.
+      **Acceptance:** the recorded `git rev-parse --show-toplevel` output resolves to
+      `C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ae0df3e53c9c9883f`; if it does
+      not, record the observed path and stop with `BLOCKED` without issuing the MCP call. The
+      artifact records both porcelain captures verbatim and the set-difference
       count of paths present after and absent before, computed with `comm -13` over the two sorted
       captures. That count must be `0`. `EXIT_CODE: 0`. Recording the exit code alone does not
       satisfy this task, because the formatter exits 0 whether or not it rewrote a file.
 
-- [ ] [P0-T5] Capture the lint baseline. Run `mcp__drm-copilot__run_poshqc_analyze` with the same
+- [x] [P0-T5] Capture the lint baseline. Run `mcp__drm-copilot__run_poshqc_analyze` with the same
       `workspace_root` and no `scan_folders` argument. Write
       `evidence/remediation-baseline/baseline-poshqc-analyze.<capture-timestamp>.md`.
       **Acceptance:** the artifact records the literal result value `ok: true`. Any other value is a
       baseline that must be reported and not worked around. `EXIT_CODE: 0`.
 
-- [ ] [P0-T6] Capture the Claude hook-suite baseline. Run `mcp__drm-copilot__run_poshqc_test` with
+- [x] [P0-T6] Capture the Claude hook-suite baseline. Run `mcp__drm-copilot__run_poshqc_test` with
       `scan_folders=["tests/scripts/claude-hooks"]` and read
       `artifacts/pester/pester-junit.xml`. Write
       `evidence/remediation-baseline/baseline-claude-hooks-pester.<capture-timestamp>.md`.
@@ -492,7 +519,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       name must be row 1 of the tolerated-failures table. `ExpectedExitCode: 1`, and the observed
       `EXIT_CODE:` is recorded as the folder-wide failed-test count.
 
-- [ ] [P0-T7] Capture the Codex hook-suite baseline. Run `mcp__drm-copilot__run_poshqc_test` with
+- [x] [P0-T7] Capture the Codex hook-suite baseline. Run `mcp__drm-copilot__run_poshqc_test` with
       `scan_folders=["tests/scripts/codex-hooks"]`. Write
       `evidence/remediation-baseline/baseline-codex-hooks-pester.<capture-timestamp>.md`.
       **Acceptance:** as `[P0-T6]`, with per-suite rows for
@@ -501,7 +528,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       each recording `failures` 0 and `errors` 0. Every folder-wide failure named must be row 2 of
       the tolerated-failures table. `ExpectedExitCode: 1`.
 
-- [ ] [P0-T8] Capture the Python contract baseline. Run
+- [x] [P0-T8] Capture the Python contract baseline. Run
       `poetry run pytest tests/scripts/dev_tools/test_parallel_abandon_token_seam.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_poshqc_bundled_parity.py -p no:cacheprovider --no-header -q`.
       Write `evidence/remediation-baseline/baseline-python-contracts.<capture-timestamp>.md`.
       **Acceptance:** `EXIT_CODE: 0` and the recorded summary line reports `22 passed`. No Python
@@ -509,24 +536,27 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       none is recorded; the artifact states that in one sentence. The seam module's own count is
       recorded separately as `10 passed`, taken from a second run of
       `poetry run pytest tests/scripts/dev_tools/test_parallel_abandon_token_seam.py -p no:cacheprovider --no-header -q`,
-      because that number is the one `[P5-T6]` compares against.
+      because that number is the one `[P3-T10]` compares against.
 
-- [ ] [P0-T9] Record the per-file PowerShell coverage baseline. Transcribe the five
+- [x] [P0-T9] Record the per-file PowerShell coverage baseline. Transcribe the seven
       orchestrator-supplied figures from CI run `34158596238` of `.github/workflows/_poshqc.yml` at
       commit `3b4f10b9` that correspond to files this cycle edits:
       `.claude/hooks/validate-bash.ps1` = **94.4444**;
       `.claude/hooks/enforce-epic-merge-gate.ps1` = **96.6102**;
       `.codex/hooks/enforce-epic-merge-gate.ps1` = **98.5075**;
       `.claude/hooks/enforce-pr-author-skill-helpers.ps1` = **95.5224**;
-      `.claude/hooks/enforce-parallel-abandon-gate.ps1` = **92.7536**.
-      Additionally record the two `hook-command-scanner.ps1` baselines when the orchestrator supplies
-      them from the same run; both paths are present in the coverage list at
-      `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`. If run `34158596238` reports no
-      `LINE` counter for a scanner path, record `BASELINE_NOT_REPORTED: <path> | run 34158596238`
-      together with the orchestrator's written reason; that is the only authorized substitute and it
-      does not relieve the post-change threshold in `[P5-T7]`. Write
+      `.claude/hooks/enforce-parallel-abandon-gate.ps1` = **92.7536**;
+      `.claude/hooks/hook-command-scanner.ps1` = **97.7778** (missed 4, covered 176, total 180);
+      `.codex/hooks/hook-command-scanner.ps1` = **100.0000** (missed 0, covered 180, total 180).
+      All seven are reported by run `34158596238`, so all seven are numeric and none is substituted.
+      The two scanner figures were derived from the `poshqc-test-results` artifact of that run by
+      summing the JaCoCo `LINE` counters per `<sourcefile>` in `powershell-coverage.xml`, the same
+      method that reproduces the other five figures exactly; both scanner paths are present in the
+      coverage list at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` at lines 253 and
+      255. Write
       `evidence/remediation-baseline/baseline-per-file-coverage.<capture-timestamp>.md`.
-      **Acceptance:** the artifact records each figure as a numeric percentage, never a placeholder;
+      **Acceptance:** the artifact records all seven figures as numeric percentages, never a
+      placeholder and never a `BASELINE_NOT_REPORTED` marker;
       records the run id `34158596238`, the commit `3b4f10b9`, and the workflow path
       `.github/workflows/_poshqc.yml`; states explicitly that `.codex/hooks/validate-bash.ps1` is
       **not** carried because this cycle does not edit it; and carries a `TOOLCHAIN_SUBSTITUTION`
@@ -534,7 +564,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       because it resolves runsettings from the installed VS Code extension and cannot see this
       branch's `CodeCoverage.Path` entries. `EXIT_CODE: 0` for the transcription.
 
-- [ ] [P0-T10] Record the pre-edit body of the six fail-closed-correct flag call sites named in the
+- [x] [P0-T10] Record the pre-edit body of the six fail-closed-correct flag call sites named in the
       Scope section, so `[P5-T3]` has something to compare against. For each of the six, capture the
       enclosing function's full body with `sed -n '<start>,<end>p' <file>`. Write
       `evidence/remediation-baseline/baseline-failclosed-call-sites.<capture-timestamp>.md`.
@@ -542,7 +572,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       for each in one sentence why flag absence is fail-closed there. The six file paths and line
       numbers must match the Scope table exactly. `EXIT_CODE: 0`.
 
-- [ ] [P0-T11] Record the pre-edit line-count inventory. Run
+- [x] [P0-T11] Record the pre-edit line-count inventory. Run
       `wc -l .claude/hooks/hook-command-scanner.ps1 .codex/hooks/hook-command-scanner.ps1 .claude/hooks/enforce-epic-merge-gate.ps1 .codex/hooks/enforce-epic-merge-gate.ps1 .claude/hooks/enforce-parallel-abandon-gate.ps1 .claude/hooks/enforce-pr-author-skill-helpers.ps1 .claude/hooks/validate-bash.ps1 .codex/hooks/enforce-orchestration-preimplementation-gate.ps1`.
       Write `evidence/remediation-baseline/baseline-line-counts.<capture-timestamp>.md`.
       **Acceptance:** the artifact records all eight counts. The seven counts for the files this
@@ -553,27 +583,28 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
 
 ### Phase 1 — Batch A: the shared raw-scan predicate
 
-- [ ] [P1-T1] Open batch A. First run `ls -1 .claude/state/` and record the listing. Compose the
-      expected state-file name from the resolved session id
-      `worktree-agent-a478b73e41951af31-e3281c7b` as
-      `powershell-batch-budget.worktree-agent-a478b73e41951af31-e3281c7b.json` and compare it
-      character for character against the names observed. Then run
-      `rm -f ".claude/state/powershell-batch-budget.worktree-agent-a478b73e41951af31-e3281c7b.json"`
-      and run `ls -1 .claude/state/` again. Write
-      `evidence/qa-gates/batch-a-budget-reset.<capture-timestamp>.md`.
-      **Acceptance:** the artifact records the pre-reset listing, the composed name, the result of
-      the character comparison, the deletion command, `EXIT_CODE: 0`, and the post-reset listing.
-      The post-reset listing must contain no file whose name begins `powershell-batch-budget.`. If
-      the composed name matches no observed name and the directory is non-empty, record the
-      divergence and delete every `powershell-batch-budget.*.json` present instead, recording that
-      substitution. A bare exit code does not satisfy this task, because `rm -f` on an absent path
-      also exits 0.
+- [x] [P1-T1] Open batch A. First run `ls -1 .claude/state/` and record the listing. Record every
+      `powershell-batch-budget.*.json` name observed and, for each, its contents. Then delete every
+      `powershell-batch-budget.*.json` present with `rm -f`, and run `ls -1 .claude/state/` again.
+      Write `evidence/qa-gates/batch-a-budget-reset.<capture-timestamp>.md`.
+      **Acceptance:** the artifact records the pre-reset listing, every observed
+      `powershell-batch-budget.*.json` name with its contents, the deletion command,
+      `EXIT_CODE: 0`, and the post-reset listing.
+      The post-reset listing must contain no file whose name begins `powershell-batch-budget.`. A
+      bare exit code does not satisfy this task, because `rm -f` on an absent path also exits 0. An
+      empty pre-reset listing is a valid observation and is recorded as such; `.claude/state/` holds
+      no budget file at the time this plan was authored.
 
-- [ ] [P1-T2] `[expect-fail]` Add the predicate's own unit cases to
+- [x] [P1-T2] `[expect-fail]` Add the predicate's own unit cases to
       `tests/scripts/claude-hooks/hook-command-scanner.Tests.ps1` and
       `tests/scripts/codex-hooks/hook-command-scanner.Tests.ps1`, in a new
-      `Context 'R-2 raw-scan predicate'` placed immediately before the existing
-      `Context 'D12 public parser contract'`. Add exactly these five `It` names to each file, with
+      `Context 'R-2 raw-scan predicate'`. In
+      `tests/scripts/claude-hooks/hook-command-scanner.Tests.ps1` place it immediately before the
+      existing `Context 'D12 public parser contract'` at line 322.
+      `tests/scripts/codex-hooks/hook-command-scanner.Tests.ps1` carries no such Context — its final
+      Context is `Context 'wrapper carve-out set'` at line 310 — so in that file append the new
+      Context after `Context 'wrapper carve-out set'`. Both files carry the `Get-SegmentList` helper
+      at line 30, which every case uses. Add exactly these five `It` names to each file, with
       identical fixtures, and give the Context a leading comment stating that every case drives a
       pure predicate over a literal fixture with no disk I/O, no child process, no temporary file,
       and no ambient state:
@@ -593,7 +624,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       plan quotes verbatim above as the text the executor must create. `wc -l` on each suite file is
       at or under 500.
 
-- [ ] [P1-T3] `[expect-fail]` Record the fail-before state of the ten new cases. Run
+- [x] [P1-T3] `[expect-fail]` Record the fail-before state of the ten new cases. Run
       `mcp__drm-copilot__run_poshqc_test` with
       `scan_folders=["tests/scripts/claude-hooks","tests/scripts/codex-hooks"]` and read
       `artifacts/pester/pester-junit.xml`. Write
@@ -606,23 +637,28 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       `hook-command-scanner.Tests.ps1` on each side, which must be exactly 5 higher than the
       `[P0-T6]` and `[P0-T7]` baselines for those suites.
 
-- [ ] [P1-T4] Apply Edit 1 to `.claude/hooks/hook-command-scanner.ps1`.
+- [x] [P1-T4] Apply Edit 1 to `.claude/hooks/hook-command-scanner.ps1`.
       **Acceptance:** `grep -F -c 'function Test-CommandLineSegmentRawScan {'` returns `1`;
-      `grep -n 'IsWrapperLed -or' .claude/hooks/hook-command-scanner.ps1` reports the new predicate's
-      return line in addition to the existing selection clause, so the count of lines matching
-      `-F 'IsWrapperLed'` rises from 3 to 4; `wc -l .claude/hooks/hook-command-scanner.ps1` is at or
+      `grep -n 'IsWrapperLed -or' .claude/hooks/hook-command-scanner.ps1` returns exactly one line,
+      the new predicate's return line. It returns nothing before this edit: the selection clause at
+      line 151 spells the flag `$isWrapperLed` in lowercase and places it last, so it never matches
+      this pattern. `grep -F -c 'IsWrapperLed'` rises from 3 to 4;
+      `wc -l .claude/hooks/hook-command-scanner.ps1` is at or
       under 500 and the observed value is recorded in `[P1-T8]`.
       `git diff 26dba29533ba70f6cd80d14ac3c87ac24ca82aca -- .claude/hooks/hook-command-scanner.ps1`
       produces exactly one hunk, and that hunk contains no `-` line, so nothing existing was removed
       or altered.
 
-- [ ] [P1-T5] Apply Edit 1 to `.codex/hooks/hook-command-scanner.ps1`, byte-identically to the
+- [x] [P1-T5] Apply Edit 1 to `.codex/hooks/hook-command-scanner.ps1`, byte-identically to the
       Claude copy.
-      **Acceptance:** the same three checks as `[P1-T4]` against the Codex path, plus
+      **Acceptance:** the same three checks as `[P1-T4]` against the Codex path — the two files are
+      byte-identical today, so the Codex copy's selection clause at line 151 also spells the flag
+      `$isWrapperLed` in lowercase and also places it last, and `grep -F -c 'IsWrapperLed'` there
+      likewise rises from 3 to 4 — plus
       `cmp -s .claude/hooks/hook-command-scanner.ps1 .codex/hooks/hook-command-scanner.ps1` exits 0,
       which is the property the two files already hold at 450 lines each and must continue to hold.
 
-- [ ] [P1-T6] Mirror both scanner copies into the bundles and verify parity:
+- [x] [P1-T6] Mirror both scanner copies into the bundles and verify parity:
       `cp .claude/hooks/hook-command-scanner.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-scanner.ps1`
       and
       `cp .codex/hooks/hook-command-scanner.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-scanner.ps1`.
@@ -631,14 +667,14 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       records the `sha256sum` of all four files, with the Claude pair equal to each other and the
       Codex pair equal to each other. `EXIT_CODE: 0`.
 
-- [ ] [P1-T7] Record the pass-after state of the ten cases. Re-run the `[P1-T3]` command and write
+- [x] [P1-T7] Record the pass-after state of the ten cases. Re-run the `[P1-T3]` command and write
       `evidence/regression-testing/pass-after-r2-predicate.<capture-timestamp>.md`.
       **Acceptance:** the same ten-row table now records `status` `passed` on every row. The
       per-suite `failures` and `errors` counts for `hook-command-scanner.Tests.ps1` are 0 on both
       sides, and each side's `tests` count is exactly 5 higher than its `[P0-T6]` / `[P0-T7]`
       baseline. Both folder-wide failure lists contain only the two tolerated names.
 
-- [ ] [P1-T8] Run the batch-A toolchain gate: format, then analyze, then the two hook-test folders,
+- [x] [P1-T8] Run the batch-A toolchain gate: format, then analyze, then the two hook-test folders,
       in that order, restarting from format if any stage fails or rewrites a file. Write
       `evidence/qa-gates/batch-a-toolchain.<capture-timestamp>.md`.
       **Acceptance:** the artifact records, per stage, the exact command and `EXIT_CODE:`. For
@@ -649,11 +685,15 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       copies, each at or under 500. `Output Summary:` states whether a restart from stage 1 was
       required and, if so, how many.
 
-- [ ] [P1-T9] Close batch A with a budget reset, using the `[P1-T1]` procedure. Write
+- [x] [P1-T9] Close batch A with a budget reset, using the `[P1-T1]` procedure. Write
       `evidence/qa-gates/batch-a-close-reset.<capture-timestamp>.md`.
-      **Acceptance:** the artifact records the pre-reset state-file contents, showing at most 2
-      entries in `prodFiles` and at most 2 in `testFiles`; the deletion command with `EXIT_CODE: 0`;
-      and a post-reset listing of `.claude/state/` containing no `powershell-batch-budget.` file.
+      **Acceptance:** the artifact records the contents of every `powershell-batch-budget.*.json`
+      observed before the reset, and each such file shows at most 2 entries in `prodFiles` and at
+      most 2 in `testFiles`; the deletion command with `EXIT_CODE: 0`; and a post-reset listing of
+      `.claude/state/` containing no `powershell-batch-budget.` file. Batch A wrote two production
+      and two test PowerShell files through the PreToolUse hook, so exactly one budget file is
+      expected here; if the pre-reset listing is empty, record that observation and the reason it
+      diverges from the expectation rather than treating the task as vacuously satisfied.
 
 ### Phase 2 — Batch B: R-2.a, the merge-gate scope filter on both runtimes
 
@@ -673,8 +713,18 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       | It name | Command fixture | Expected decision |
       |---|---|---|
       | `R2a-C1 denies a gh pr merge --merge carried inside a bash -c argument` | `bash -c "gh pr merge --merge 688"` | `deny`, reason matches `EPIC_MERGE_GATE_BLOCKED` |
-      | `R2a-C2 denies a gh pr merge --merge relocated through xargs` | `echo 688 \| xargs gh pr merge --merge` | `deny`, reason matches `EPIC_MERGE_GATE_BLOCKED` |
       | `R2a-N1 still allows a commit message quoting the merge phrase and the merge flag` | `git commit -m "gh pr merge --merge 688"` | `allow` |
+      | `R2a-N2 keeps a gh pr merge --merge relocated through xargs in scope` | `echo 688 \| xargs gh pr merge --merge` | `deny`, reason matches `EPIC_MERGE_GATE_BLOCKED` |
+
+      `R2a-N2` is a preservation pin, not a regression case. `|` is a segment delimiter
+      (`.claude/hooks/hook-command-scanner.ps1` line 31), so the second segment of that fixture is
+      `xargs gh pr merge --merge`.
+      `xargs` is in `$script:CommandLineWrapperNames` (lines 21–24), so the segment is
+      wrapper-led and `Resolve-CommandLineInvocation` already matches it by raw containment
+      (`.claude/hooks/hook-command-invocation.ps1` lines 202–205). Nothing in the segment is quoted,
+      so `--merge` is already a plain token and `Test-CommandLineFlag`'s token loop (lines 449–452)
+      already returns true. The command therefore already denies today, and this case pins that it
+      keeps denying.
 
       Give the Context a leading comment stating that every case drives the pure decision seam with
       all three checkpoint seams mocked, so no case reads live orchestration state.
@@ -695,15 +745,18 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       **Acceptance:** `grep -F -c` on each of the two `It` names returns `1` in that file. `wc -l` is
       at or under 500.
 
-- [ ] [P2-T4] `[expect-fail]` Record the fail-before state of the five new merge-gate cases. Run
+- [ ] [P2-T4] `[expect-fail]` Record the pre-change state of the five new merge-gate cases, two of
+      which are expected to fail and three of which are expected to pass. Run
       `mcp__drm-copilot__run_poshqc_test` with
       `scan_folders=["tests/scripts/claude-hooks","tests/scripts/codex-hooks"]` and write
       `evidence/regression-testing/fail-before-r2a-merge-gate.<capture-timestamp>.md`.
-      **Acceptance:** the artifact carries a five-row table. `R2a-C1`, `R2a-C2`, and `R2a-X1` record
-      a `status` other than `passed`; `R2a-N1` and `R2a-X2` record `passed`, because the negatives
-      pin behaviour that is already correct and must stay correct. Three non-passing and two passing
-      is the required split; any other split fails this task and must be reported rather than
-      adjusted. `ExpectedExitCode:` is set to the folder-wide failed-test count recorded.
+      **Acceptance:** the artifact carries a five-row table. `R2a-C1` and `R2a-X1` record a `status`
+      other than `passed`; `R2a-N1`, `R2a-N2`, and `R2a-X2` record `passed`, because each pins
+      behaviour that is already correct — `R2a-N2` in particular, because an unquoted `xargs`
+      segment already exposes `--merge` as a token and is already in scope. Two non-passing and
+      three passing is the required split; any other split fails this task and must be reported
+      rather than adjusted. `ExpectedExitCode:` is set to the folder-wide failed-test count
+      recorded.
 
 - [ ] [P2-T5] Apply Edit 2 to `.claude/hooks/enforce-epic-merge-gate.ps1`.
       **Acceptance:** `grep -F -c 'Test-CommandLineSegmentRawScan' .claude/hooks/enforce-epic-merge-gate.ps1`
@@ -732,7 +785,15 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       for the four pre-existing `It` names in the Claude suite's `PR-number extraction comes from
       the matched segment only` Context, for the existing
       `allows a printf whose double-quoted text mentions the gated merge phrase`, and for the
-      existing Codex `allows a quoted mention of the gated merge phrase`. Those three preservation
+      existing Codex `allows a quoted mention of the gated merge phrase` and for the three
+      pre-existing `It` names in the Claude suite's
+      `Context 'the false-allow direction of the whole-line PR-number defect'` —
+      `takes the PR number from the merge operand 777, not from the authorized item number 501 in
+      the cd path`, `denies merging unauthorized PR 777 even though authorized item 501 appears
+      earlier on the line`, and
+      `still allows merging the authorized PR 501 when 501 is the merge operand`. The second of
+      these is the case execution amendment EA-2 makes binding on this feature; a non-passing row on
+      it blocks this phase. Those preservation
       rows are the AT-4 paired negative the reaudit requires; a non-passing row on any of them means
       an existing allow was turned into a deny and blocks this phase. Per-suite `failures` and
       `errors` are 0 for both edited suites and for `enforce-epic-merge-gate.Tests.ps1` and
@@ -801,7 +862,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       adjusted. `ExpectedExitCode:` is set to the folder-wide failed-test count recorded.
 
 - [ ] [P3-T5] Apply Edit 4 (all three parts) to `.claude/hooks/enforce-parallel-abandon-gate.ps1`.
-      **Acceptance, four conditions, all of which must hold.**
+      **Acceptance, five conditions, all of which must hold.**
       (1) `grep -F -c 'Test-CommandLineSegmentRawScan' .claude/hooks/enforce-parallel-abandon-gate.ps1`
       returns `2`, one occurrence in `Test-ParallelAbandonSegmentDisposition` and one in
       `Test-ParallelAbandonCommandConfirmed`.
@@ -811,8 +872,14 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       breaks them.
       (3) `sed -n '41,42p' .claude/hooks/enforce-parallel-abandon-gate.ps1` reproduces the two token
       assignments at those exact line numbers, byte-unchanged.
-      (4) `grep -F -c '-Token @($segment.Tokens)' .claude/hooks/enforce-parallel-abandon-gate.ps1`
-      returns `0`, confirming both call sites were converted to the `-Segment` form.
+      (4) `grep -c -e ' -Token ' .claude/hooks/enforce-parallel-abandon-gate.ps1` returns `0`,
+      confirming both call sites were converted to the `-Segment` form: line 166 currently reads
+      `-Token @($segment.Tokens)` and line 202 currently reads `-Token $tokens`, so a pattern
+      matching only the first would not detect a half-converted file. The `-e` form is required
+      because a pattern beginning with `-` is otherwise parsed as an option bundle and grep exits 2.
+      (5) The `.DESCRIPTION` sentence added by Edit 4a describes the raw-scan leg without naming
+      `Test-CommandLineSegmentRawScan`, so condition (1)'s count of `2` covers the two executable
+      references only.
       `wc -l` is at or under 500.
 
 - [ ] [P3-T6] Apply Edit 5 to `.claude/hooks/enforce-pr-author-skill-helpers.ps1`.
@@ -851,9 +918,10 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       for the three pre-existing `It` names in the abandon suite (`AT-11 takes a grep whose quoted
       search term is the disposition token out of scope`, `AT-12 brings the equals-joined spelling of
       the disposition option into scope`, and `does not accept a confirmation marker that sits in a
-      different segment from the disposition token`) and for all fourteen pre-existing `It` names in
-      the pr-author trigger-scoping suite, including the seven wrapper deny pins and `allows a quoted
-      --body-file mention inside a JSON receipt value`. A non-passing row on any of those seventeen
+      different segment from the disposition token`) and for all eighteen pre-existing `It` names in
+      the pr-author trigger-scoping suite, including the seven wrapper deny pins, the seven `PR_*`
+      reason-code cases, and `allows a quoted
+      --body-file mention inside a JSON receipt value`. A non-passing row on any of those twenty-one
       blocks this phase. Per-suite `failures` and `errors` are 0 for both edited suites and for
       `enforce-parallel-abandon-gate.Tests.ps1`, `enforce-pr-author-skill.epic-base-branch.Tests.ps1`,
       and `enforce-pr-author-skill.OrchestratorStatePreflight.Tests.ps1`. The only folder-wide
@@ -952,17 +1020,36 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
 
 - [ ] [P5-T1] Run the full final QA loop in order — format, lint, test — restarting from format if
       any stage fails or rewrites a file, and continuing until all three complete in a single pass.
-      Stage 1: `mcp__drm-copilot__run_poshqc_format` with the standing `workspace_root` and no
-      `scan_folders`, with `git status --porcelain` captured before and after and the `sha256sum` of
-      all eleven touched PowerShell files captured before and after. Stage 2:
-      `mcp__drm-copilot__run_poshqc_analyze` with the same arguments. Stage 3:
+      Stage 1: `mcp__drm-copilot__run_poshqc_format` with
+      `workspace_root=C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ae0df3e53c9c9883f`
+      and no `scan_folders`,
+      with `git status --porcelain` captured before and after and the `sha256sum` of
+      all twenty-one touched PowerShell files — the seven canonical production files of standing
+      constraint 4, their seven bundle mirrors, and the seven test suites edited by `[P1-T2]`,
+      `[P2-T2]`, `[P2-T3]`, `[P3-T2]`, `[P3-T3]`, and `[P4-T2]` — captured before and after.
+      Stage 2: `mcp__drm-copilot__run_poshqc_analyze` with the same arguments. Stage 3:
       `mcp__drm-copilot__run_poshqc_test` with
       `scan_folders=["tests/scripts/claude-hooks","tests/scripts/codex-hooks"]`. Write
       `evidence/qa-gates/final-qa-loop.<capture-timestamp>.md`.
       **Acceptance:** stage 1 records both porcelain captures and a set-difference count of `0`,
-      and every one of the eleven `sha256sum` values is identical before and after; stage 2 records
-      `ok: true`; stage 3 records per-suite `failures` and `errors` of 0 for all nine suites this
-      cycle edited or depends on, and names every folder-wide failure, each of which must be one of
+      and every one of the twenty-one `sha256sum` values is identical before and after; stage 2
+      records `ok: true`; stage 3 records per-suite `failures` and `errors` of 0 for each of these
+      fourteen suites, named here so the evidence set is fixed rather than chosen at run time:
+      `tests/scripts/claude-hooks/hook-command-scanner.Tests.ps1`,
+      `tests/scripts/codex-hooks/hook-command-scanner.Tests.ps1`,
+      `tests/scripts/claude-hooks/enforce-epic-merge-gate.TriggerScoping.Tests.ps1`,
+      `tests/scripts/codex-hooks/enforce-epic-merge-gate-trigger-scoping.Tests.ps1`,
+      `tests/scripts/claude-hooks/enforce-parallel-abandon-gate.TriggerScoping.Tests.ps1`,
+      `tests/scripts/claude-hooks/enforce-pr-author-skill.TriggerScoping.Tests.ps1`,
+      `tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1`,
+      `tests/scripts/claude-hooks/enforce-epic-merge-gate.Tests.ps1`,
+      `tests/scripts/codex-hooks/enforce-epic-merge-gate-decision-surface.Tests.ps1`,
+      `tests/scripts/claude-hooks/enforce-parallel-abandon-gate.Tests.ps1`,
+      `tests/scripts/claude-hooks/enforce-pr-author-skill.epic-base-branch.Tests.ps1`,
+      `tests/scripts/claude-hooks/enforce-pr-author-skill.OrchestratorStatePreflight.Tests.ps1`,
+      `tests/scripts/claude-hooks/validate-bash.Tests.ps1`, and
+      `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`. Stage 3 also names every
+      folder-wide failure, each of which must be one of
       the two tolerated rows. `Output Summary:` states the number of restarts from stage 1, which
       may be zero.
 
@@ -989,7 +1076,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       `git add -A` followed by
       `git diff --cached --name-only 26dba29533ba70f6cd80d14ac3c87ac24ca82aca`, and additionally
       `git status --porcelain`. Write `evidence/qa-gates/cycle-scope.<capture-timestamp>.md`.
-      **Acceptance:** the enumerated set contains exactly these eighteen paths and no other:
+      **Acceptance:** the enumerated set contains exactly these twenty-one paths and no other:
       the seven canonical production files listed in standing constraint 4;
       `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-scanner.ps1`,
       `.../claude-customizations/.claude/hooks/enforce-epic-merge-gate.ps1`,
@@ -998,11 +1085,18 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       `.../claude-customizations/.claude/hooks/validate-bash.ps1`,
       `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-scanner.ps1`,
       `.../codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate.ps1`;
-      and the four edited suites plus `tests/scripts/claude-hooks/hook-command-scanner.Tests.ps1`,
-      `tests/scripts/codex-hooks/hook-command-scanner.Tests.ps1`, and
-      `tests/scripts/codex-hooks/enforce-epic-merge-gate-trigger-scoping.Tests.ps1`. Paths under the
-      feature folder's `evidence/` tree and `spec.md` are additionally permitted and are listed
-      separately. Any other PowerShell path in the set blocks closure. The `git add -A` span is
+      and the seven suites this cycle edits, enumerated rather than described:
+      `tests/scripts/claude-hooks/hook-command-scanner.Tests.ps1`,
+      `tests/scripts/codex-hooks/hook-command-scanner.Tests.ps1`,
+      `tests/scripts/claude-hooks/enforce-epic-merge-gate.TriggerScoping.Tests.ps1`,
+      `tests/scripts/codex-hooks/enforce-epic-merge-gate-trigger-scoping.Tests.ps1`,
+      `tests/scripts/claude-hooks/enforce-parallel-abandon-gate.TriggerScoping.Tests.ps1`,
+      `tests/scripts/claude-hooks/enforce-pr-author-skill.TriggerScoping.Tests.ps1`, and
+      `tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1`. Paths under the
+      feature folder's `evidence/` tree, `spec.md`, and `remediation-plan.2026-09-07T20-45.md` are
+      additionally permitted and are listed separately; the plan file is in the anchored diff
+      because the plan commit `459d245f` sits between the cycle-scope anchor and HEAD. Any other
+      PowerShell path in the set blocks closure. The `git add -A` span is
       required because a name-listing diff enumerates tracked changes only and would report an empty
       list for a file this cycle creates; the porcelain span is required because it is the only view
       that survives if the change is committed before this task runs.
@@ -1021,7 +1115,8 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       the #545 work does not appear as a removed line against the cycle-scope anchor.
 
 - [ ] [P5-T6] Re-verify the line-cap inventory. Run the `[P0-T11]` `wc -l` command plus the same
-      count over the seven bundle mirrors and the seven test suites touched or depended on. Write
+      count over the seven bundle mirrors and the seven test suites edited by `[P1-T2]`, `[P2-T2]`,
+      `[P2-T3]`, `[P3-T2]`, `[P3-T3]`, and `[P4-T2]`. Write
       `evidence/qa-gates/final-line-counts.<capture-timestamp>.md`.
       **Acceptance:** every recorded count is at or under 500, and
       `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` still reads exactly `500`,
@@ -1062,12 +1157,12 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
 - [ ] [P5-T8] Record the coverage delta. Using the `[P0-T9]` baselines and the `[P5-T7]`
       post-change values, write `evidence/qa-gates/final-coverage-delta.<capture-timestamp>.md`.
       **Acceptance:** the artifact carries a seven-row table, one row per canonical path, each with a
-      baseline percentage, a post-change percentage, and their arithmetic difference. For the five
-      paths carrying a baseline from run `34158596238`, the difference must be at or above `0.0000`.
-      For a scanner path whose baseline `[P0-T9]` recorded as `BASELINE_NOT_REPORTED`, the row
-      records that marker in the baseline column, records no difference, and the post-change value
-      must still be at or above `85.0000`; that is the only authorized substitution and the artifact
-      must reproduce the orchestrator's written reason. If any of the five comparable rows shows a
+      baseline percentage, a post-change percentage, and their arithmetic difference. All seven rows
+      carry a numeric baseline from run `34158596238`, a numeric post-change value, and a difference
+      at or above `0.0000`. No row may record a `BASELINE_NOT_REPORTED` marker in place of a number:
+      run `34158596238` reports a `LINE` counter for every one of the seven paths, including both
+      scanner paths, so a marker in any baseline column is a recording error rather than a permitted
+      substitution. If any of the seven rows shows a
       negative difference, the outcome is remediation-required and must not be reported as PASS:
       identify the uncovered new statement by reading the per-line `LINE` counters for that path in
       the `artifacts/pester/powershell-coverage.xml` produced by the `[P5-T7]` run, add one pinning
@@ -1085,7 +1180,9 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       **Acceptance:** the artifact carries one row per command with four columns — command, decision
       at the feature-wide anchor, decision at the post-fix head, and the `It` name that pins it —
       and every row's post-fix decision equals its anchor decision. Every `It` name cited must be one
-      of the twenty-one names created by `[P1-T2]`, `[P2-T2]`, `[P2-T3]`, `[P3-T2]`, `[P3-T3]`, and
+      of the twenty-two distinct names, carried by twenty-seven cases because `[P1-T2]`'s five names
+      are added to both scanner suites, created by `[P1-T2]`, `[P2-T2]`, `[P2-T3]`, `[P3-T2]`,
+      `[P3-T3]`, and
       `[P4-T2]`, or one of the preservation names enumerated in `[P2-T8]`, `[P3-T9]`, and `[P4-T6]`.
       A row with no pinning `It` name fails this task. The artifact additionally states that the
       `.codex` runtime carries no `cd`-chain rule and therefore contributes no R-2.d row, and cites
@@ -1104,7 +1201,11 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
 - [ ] [P5-T11] Run the evidence-location validator:
       `python scripts/dev_tools/validate_evidence_locations.py --root .`. Write
       `evidence/qa-gates/evidence-locations.<capture-timestamp>.md`.
-      **Acceptance:** `EXIT_CODE: 0` and the artifact reproduces the validator's output. It also
+      **Acceptance:** `EXIT_CODE: 0`. A clean run of this validator prints no lines at all — it
+      emits one `VIOLATION: <path> — use <path> instead` line per violation and exits 1 — so the
+      artifact records the observed stdout verbatim and states `(no output)` when it is empty. A
+      non-empty stdout with exit 0 is not a possible outcome and must be reported rather than
+      recorded as a pass. It also
       records the result of `ls -1 artifacts/ 2>/dev/null | sort`, and states that no path this plan
       wrote falls under `artifacts/baselines/`, `artifacts/baseline/`, `artifacts/qa/`,
       `artifacts/qa-gates/`, `artifacts/evidence/`, `artifacts/coverage/`,
@@ -1127,7 +1228,8 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       `[P4-T5]`;
       (6) format, analyze, and test completed in a single pass — `[P5-T1]`;
       (7) per-file coverage re-measured via `_poshqc.yml` dispatch, all seven at or above 85.0000
-      with no regression on the five comparable rows — `[P5-T7]`, `[P5-T8]`;
+      with no regression on any of the seven rows, each of which carries a numeric baseline from run
+      `34158596238` — `[P5-T7]`, `[P5-T8]`;
       (8) frozen literals and the two abandon token assignments unchanged — `[P5-T5]`;
       (9) every touched file at or under 500 lines and the 500-line Codex preimplementation gate
       untouched — `[P5-T6]`;
@@ -1144,9 +1246,9 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
 
 ## Rollback
 
-Every edit in this plan is additive at the statement level and is confined to eighteen paths. To
+Every edit in this plan is additive at the statement level and is confined to twenty-one paths. To
 revert the whole cycle: `git checkout 26dba29533ba70f6cd80d14ac3c87ac24ca82aca -- <paths>` for the
-eighteen paths enumerated in `[P5-T4]`, then re-run `[P5-T1]`. No schema, no reason-code string, no
+twenty-one paths enumerated in `[P5-T4]`, then re-run `[P5-T1]`. No schema, no reason-code string, no
 frozen literal, and no public parser signature other than the private
 `Test-ParallelAbandonSegmentDisposition` parameter changes, so no consumer outside the four edited
 hooks is affected by a revert.
