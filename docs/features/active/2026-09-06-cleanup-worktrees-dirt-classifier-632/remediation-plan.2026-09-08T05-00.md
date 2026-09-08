@@ -6,13 +6,17 @@
   `spec.md` only. `user-story.md` is present but is not an acceptance-criteria source under this
   mode. The three unchecked boxes in `spec.md` `## Context` (lines 24-27) are the
   Blocker/High/Medium/Low severity radio block, not acceptance criteria.
-- Branch: `bug/cleanup-worktrees-dirt-classifier-632-r2` at `388e1a78bfd1aaf73853e58f31d963b1aaee5d48`
-  (re-derived from `.git/refs/heads/bug/cleanup-worktrees-dirt-classifier-632-r2` when this revision
-  was written). `ad6bc946bbf0ad9e69756b2155eae19771a232d8` is the commit the CI coverage run
-  `34182198357` measured and remains the anchor for the P0-T7 baseline only. `ad6bc946..388e1a78`
-  touches `docs/` alone, so every code citation in this plan holds at both commits; the head-SHA
-  assertion in P8-T5 anchors on `388e1a78`, because anchoring it on `ad6bc946` would let the
-  assertion pass without the executor committing anything.
+- Branch: `bug/cleanup-worktrees-dirt-classifier-632-r2` at `eac077a2858e6c357d1c4e118a3ca0bb5cd85e16`
+  (re-derived from `.git/refs/heads/bug/cleanup-worktrees-dirt-classifier-632-r2` in the main
+  repository, reached through the `gitdir:` pointer in this worktree's `.git` file, when this
+  revision was written). `ad6bc946bbf0ad9e69756b2155eae19771a232d8` is the commit the CI coverage
+  run `34182198357` measured and remains the anchor for the P0-T7 baseline only.
+  `ad6bc946..eac077a2` touches `docs/` alone, so every code citation in this plan holds at all
+  three of `ad6bc946`, `388e1a78`, and `eac077a2`.
+  P8-T5 states its head-SHA assertion against a pre-commit SHA the executor records in the same
+  artifact rather than against a SHA quoted here. A quoted SHA goes stale on every further
+  docs-only commit to this branch, and once it is stale the assertion holds before the executor
+  commits anything, which is the vacuous-pass class this plan's Gate Ownership section rules out.
 - Worktree: `C:\Users\DanMoisan\repos\drm-copilot\.claude\worktrees\agent-ac72d35e7980bc69d`
 - Base: `origin/epic/cleanup-merged-worktrees-hardening-integration` at `4ffe680ebcebaabbba10faaa490e46a717686535`
 
@@ -68,7 +72,7 @@ disposable rung, into the cleared set; that prohibition is already stated at
 `scripts/bash/cleanup_worktrees_dirt_lib.sh:29-33` and is reinforced by a new test in Phase 7 that
 asserts no status read the library issues carries `--ignored`.
 
-Consequence for coverage: retaining the rung costs no coverage. `dirt_is_session_artifact` and its
+Consequence for coverage: retaining the rung is coverage-neutral. `dirt_is_session_artifact` and its
 emission site are already exercised by the `dirt_session_artifact` scenario — the matcher body at
 `scripts/bash/cleanup_worktrees_dirt_lib.sh:126-129` and the emission at `:244-245` are absent from
 the uncovered set. Lines 74-77 are reported uncovered because they are the interior of the
@@ -85,10 +89,17 @@ from the merged Cobertura report rather than predicting it.
 `remediation-inputs.2026-09-08T05-00.md` (AC-1, AC-14, AC-15, AC-31, AC-32).
 
 **Out of scope, deferred with a stated disposition:** the advisory findings F7 through F14 from
-`code-review.2026-09-08T05-00.md`. None blocks merge on its own; F7 and F9 would consume headroom
-in `scripts/bash/cleanup_worktrees_lib.sh`, which is at 496 of 500 lines and which this plan does
-not modify at all. Phase 8 records them for a follow-up issue rather than leaving them
-undispositioned.
+`code-review.2026-09-08T05-00.md`, with one split. None blocks merge on its own; F7 and F9 would
+consume headroom in `scripts/bash/cleanup_worktrees_lib.sh`, which is at 496 of 500 lines and which
+this plan does not modify at all. Phase 8 records them for a follow-up issue rather than leaving
+them undispositioned.
+
+F14 is the split one. `remediation-inputs.2026-09-08T05-00.md:164` records AC-15 as contradicted by
+both R2 and F14, so deferring F14 whole would leave half of a recorded contradiction open while
+P8-T10 checked AC-15 off. Its acceptance-criteria half is therefore **in scope** and is closed by
+P1-T11, which takes the narrow-the-AC branch of the remedy that document states at `:153`. Its
+documentation half — the `SKILL.md` omission that detached, `main`, and `bare` registrations are
+never classified — stays deferred alongside F13, whose second clause records the same gap.
 
 ## Binding Constraints
 
@@ -265,19 +276,23 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   that the TaskMaster checkout is not present in this worktree so the provenance rests on the
   issue's own run record rather than on a re-execution, the decision to retain the rung, the
   explicit prohibition on `--ignored`, and the coverage consequence stated in the Decision B block
-  above: retaining the rung costs no coverage, because `dirt_is_session_artifact` at
+  above, written with the exact single-word literal `coverage-neutral`: retaining the rung is
+  coverage-neutral, because `dirt_is_session_artifact` at
   `scripts/bash/cleanup_worktrees_dirt_lib.sh:126-129` and its emission site at `:244-245` are
   already exercised by the `dirt_session_artifact` scenario and are absent from the uncovered set,
   and lines 74-77 are reported uncovered only because they are the interior of a multi-line array
   assignment whose statement kcov attributes to its closing line 78 — an instrumentation property
   unrelated to this decision.
   Acceptance: that file exists and contains the literals `.gitignore:6`, `Decision: RETAIN`,
-  `--ignored`, and `costs no coverage`.
+  `--ignored`, and `coverage-neutral`. The asserted token is the single hyphenated word rather than
+  a multi-word phrase because a phrase drawn from prose straddles a line break once the artifact
+  wraps, and a line-oriented search then reports zero matches although the text is present.
 
 - [ ] [P1-T3] In `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`,
   replace AC-1 (the first item of `## Acceptance Criteria`) with an unchecked `- [ ]` item whose
-  sourcing clause reads: sourced by `scripts/bash/cleanup-worktrees.sh` and by every
-  `tests/shell/test_cleanup_worktrees_*.bats` suite that itself sources
+  sourcing clause uses the exact single-word literal `self-sourcing` and reads: sourced by
+  `scripts/bash/cleanup-worktrees.sh` and by every self-sourcing
+  `tests/shell/test_cleanup_worktrees_*.bats` suite, meaning every suite that itself sources
   `scripts/bash/cleanup_worktrees_lib.sh`; and add the exclusion note naming the three suites that
   fall outside that set: `tests/shell/test_cleanup_worktrees_scan_helper.bats` (sources no
   cleanup-worktrees library), `tests/shell/test_cleanup_worktrees_scan_seam.bats` (sources only
@@ -285,9 +300,13 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   `tests/shell/test_cleanup_worktrees_cli.bats` (references
   `scripts/bash/cleanup_worktrees_dirt_lib.sh` but not `scripts/bash/cleanup_worktrees_lib.sh`, so
   it too shows zero in the `cleanup_worktrees_lib.sh` column P7-T8 tabulates).
-  Acceptance: `spec.md` AC-1 begins `- [ ] ` and contains the exact literal
-  `that itself sources`, the exact literal `test_cleanup_worktrees_scan_seam.bats`, and the exact
-  literal `test_cleanup_worktrees_cli.bats`.
+  Acceptance: `spec.md` AC-1 begins `- [ ] `;
+  `grep -c -F 'self-sourcing' docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`
+  reports exactly `1`, up from `0` before this task; and AC-1 contains the exact literal
+  `test_cleanup_worktrees_scan_seam.bats` and the exact literal `test_cleanup_worktrees_cli.bats`.
+  The narrowing is asserted through the single-word token `self-sourcing` rather than a phrase
+  because a phrase straddles a line break once the criterion wraps and a line-oriented search then
+  reports zero matches. The three filename literals are single-line tokens and are unaffected.
 
 - [ ] [P1-T4] In `spec.md`, change the AC-14 checkbox and the AC-15 checkbox from `- [x]` to
   `- [ ]`. AC-14 is the criterion beginning "A tracked, modified `*.csproj` entry whose diff
@@ -355,11 +374,22 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   bullet that states toolchain verification runs through the `wsl -d Ubuntu -- bash -lc '...'` form
   with a bullet stating the split: `shfmt`, `shellcheck`, and `bats` run natively in the agent
   worktree; `kcov` has no local route and coverage is measured by dispatching
-  `.github/workflows/_shell-coverage.yml` against the pushed branch.
-  Acceptance: that bullet contains the literal `has no local route`, and `spec.md` as a whole
-  contains zero occurrences of the literal `wsl -d Ubuntu` and zero occurrences of the literal
-  `agent-a3944b95a7d58e712`. This is the whole-file assertion deferred from P1-T5 and P1-T7; it is
-  placed here because P1-T8 is the last of the three tasks that remove those literals.
+  `.github/workflows/_shell-coverage.yml` against the pushed branch. The word `natively` must
+  appear in this bullet and nowhere else in `spec.md`; the sentence P1-T7 adds to `## Test Strategy`
+  must state the same split without using that word, so the count assertion below stays at one.
+  Acceptance:
+  `grep -c -F 'natively' docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`
+  reports exactly `1`, up from `0` before this task, and that occurrence is inside the replaced
+  assumption bullet; and `spec.md` as a whole contains zero occurrences of the literal
+  `wsl -d Ubuntu` and zero occurrences of the literal `agent-a3944b95a7d58e712`. The positive half
+  is asserted through the single-word token `natively` rather than the phrase describing the kcov
+  route because that phrase straddles a line break once the bullet wraps. This is the whole-file
+  assertion deferred from P1-T5 and P1-T7; it is placed here because P1-T8 is the last of the three
+  tasks that remove those literals. The zero-occurrence half is stated over `wsl -d Ubuntu` rather
+  than over the bare token `wsl` because `spec.md` line 17 records the environment as
+  `bash toolchain under WSL Ubuntu` and `## Assumptions, Constraints, Dependencies` describes the
+  operator running the tool through WSL; neither is a command form, both survive this plan, and an
+  assertion over the bare token would therefore be unsatisfiable.
 
 - [ ] [P1-T9] In `spec.md` `## Proposed Fix` (a level-two heading, at line 159 as the file stands
   before Phase 1 runs), append a subsection headed
@@ -374,11 +404,48 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   Decision B: the re-derived provenance of the 2026-09-06 observation, the `.gitignore:6` fact, the
   reachability mechanism (the inspected checkout's own ignore state, with no change to the status
   read), the prohibition on `--ignored`, and the coverage consequence exactly as the Decision B
-  block states it — retaining the rung costs no coverage, because the matcher and its emission site
-  are already exercised by `dirt_session_artifact`, and lines 74-77 are reported uncovered only as
-  the kcov multi-line-statement attribution property, not as a reachability property.
-  Acceptance: `spec.md` contains the literal `Decision 5 — DISPOSABLE_SESSION_ARTIFACT` and the
-  literal `costs no coverage`.
+  block states it, written with the exact single-word literal `coverage-neutral` — retaining the
+  rung is coverage-neutral, because the matcher and its emission site are already exercised by
+  `dirt_session_artifact`, and lines 74-77 are reported uncovered only as the kcov
+  multi-line-statement attribution property, not as a reachability property.
+  Acceptance: `spec.md` contains the literal `Decision 5 — DISPOSABLE_SESSION_ARTIFACT`, and
+  `grep -c -F 'coverage-neutral' docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`
+  reports exactly `1`, up from `0` before this task. The single-word token replaces the phrase for
+  the wrap reason stated in P1-T2; the heading literal is asserted as written because it is the
+  opening run of a short bold heading line that carries no wrapping point before it.
+
+- [ ] [P1-T11] In `spec.md` `## Acceptance Criteria`, narrow AC-15 — the criterion beginning
+  "For each worktree with dirt, report mode emits exactly one `DIRTFILE|` record" — so its scope is
+  the non-detached candidate registrations the report classifies, and append an exclusion clause
+  naming detached, `main`, and `bare` registrations as never classified, citing the
+  `is_detached_candidate` guard that precedes the classification call in `run_report`. The
+  criterion remains `- [ ]`.
+  The narrowing is required because `run_report` skips detached registrations before it calls
+  `classify_worktree_dirt`: `is_detached_candidate "$wflags" && continue` at
+  `scripts/bash/cleanup_worktrees_lib.sh:482` runs ahead of the
+  `classify_worktree_dirt "$wpath" || rc=$?` call at `:486`, and the `main`/`bare` guard at `:485`
+  excludes those two registration kinds as well. AC-15's present text is therefore false for a
+  dirty detached worktree, and stays false after Phase 3's fix, which addresses the path field of
+  the records that are emitted rather than which registrations produce records at all.
+  `remediation-inputs.2026-09-08T05-00.md:164` records AC-15 as contradicted by two findings, R2
+  and F14, and `:153` states F14 as "Detached-HEAD registrations receive no dirt records, against
+  AC-15's literal text" with the remedy "Extend classification to them, or narrow the AC". Phase 3
+  closes the R2 half; this task closes the F14 half by taking the narrow-the-AC branch. The other
+  branch, extending classification to detached registrations, is not taken: it would modify
+  `scripts/bash/cleanup_worktrees_lib.sh`, which Binding Constraint 1 excludes at 496 of 500 lines.
+  Without this task the contradiction would survive the plan while P8-T10 checked AC-15 off, which
+  `.claude/skills/acceptance-criteria-tracking/SKILL.md` rules 1 and 4 prohibit.
+  Acceptance: the fifteenth checkbox item of `## Acceptance Criteria` — AC-15, whose ordinal
+  position is unchanged by P1-T3, P1-T4, and P1-T6 because none of those tasks reorders or inserts
+  ahead of it — begins `- [ ] `;
+  `grep -c -F 'is_detached_candidate' docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`
+  reports exactly `1`, up from `0` before this task, and that occurrence is inside AC-15; and
+  `## Acceptance Criteria` still contains exactly `45` checkbox items of which exactly `33` are
+  `- [x]`. `is_detached_candidate` is asserted rather than a prose phrase because it is a single
+  identifier token that cannot straddle a line break. The two counts are unchanged from P1-T6
+  because this task edits the text of an item P1-T4 has already unchecked and adds no item; the
+  assertion is stated so that a narrowing that accidentally added or re-checked a criterion fails
+  here rather than at P8-T10.
 
 ---
 
@@ -503,8 +570,11 @@ other path reaches rung 6 and is `UNIQUE`.
   not raise a missing-file error — `respond`
   (`tests/fixtures/cleanup_worktrees/stub-bin/git:95-109`) falls through to exit 0 with no stdout
   for an unmatched key — so the entry would resolve `UNIQUE` through the `hash-object`-empty
-  fail-closed branch at `scripts/bash/cleanup_worktrees_dirt_lib.sh:282-285` and the P3-T2
-  assertion would pass for the wrong reason, indistinguishable from a hash-object read failure.
+  fail-closed branch of `scripts/bash/cleanup_worktrees_dirt_lib.sh`, the branch whose condition
+  line reads verbatim `if ((hrc != 0)) || [[ -z $blob ]]; then`, and the P3-T2 assertion would pass
+  for the wrong reason, indistinguishable from a hash-object read failure. That branch is line 282
+  as the file stands at `eac077a2`, but it is cited by its verbatim condition rather than by number
+  because P2-T4 inserts a comment block above line 231 and shifts every line below it.
   Under the unfixed split the first entry's payload truncates to `draft.md`, so the reads are
   `hash-object.draft.md` and `rev-parse.main_draft.md`; supply both, with the `rev-parse` response
   equal to the `hash-object` response, which resolves the entry `CONTENT_ON_MAIN`. Under the fixed
@@ -556,7 +626,7 @@ other path reaches rung 6 and is `UNIQUE`.
 
 - [ ] [P3-T4] In `scripts/bash/cleanup_worktrees_dirt_lib.sh`, replace the line that currently
   reads `[[ $rel == *" -> "* ]] && rel="${rel#* -> }"` inside `classify_worktree_dirt` (line 367 as
-  the file stood at `388e1a78`; the number has shifted by Phase 2's insertion, so the line content
+  the file stands at `eac077a2`; the number has shifted by Phase 2's insertion, so the line content
   is the anchor) with the following three lines, whose spelling is required rather than
   illustrative, because `shfmt` will not normalise between a `case` form, a quoted `== "R"`, and
   the unquoted form the acceptance condition searches for:
@@ -645,12 +715,20 @@ other path reaches rung 6 and is `UNIQUE`.
   `evidence/regression-testing/fail-before-diff-header-anchor.2026-09-08T06-00.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, the verbatim failing line, and
   `Output Summary:`.
-  Acceptance: the artifact records a non-zero `EXIT_CODE:` and contains a `not ok` line for
-  `dirt_build_artifact_plus_content: an added content line beginning with plus-plus-plus is counted and the entry is UNIQUE`.
+  Acceptance: the artifact records a non-zero `EXIT_CODE:`, contains a `not ok` line for
+  `dirt_build_artifact_plus_content: an added content line beginning with plus-plus-plus is counted and the entry is UNIQUE`,
+  and contains an `ok` line for
+  `dirt_build_artifact_added_file: a dev-null header is still skipped and the entry is DISPOSABLE_BUILD_ARTIFACT`.
+  Both halves are required, matching the guard P2-T3 and P3-T3 carry: the `ok` half proves the
+  added-file fixture is not simply broken. That half is satisfiable against the unfixed filter
+  because the fixture's `--- /dev/null` and `+++ b/src/Legacy/Legacy.csproj` headers both match the
+  unanchored `"+++ "* | "--- "*` pattern and are skipped, so the entry resolves
+  `DISPOSABLE_BUILD_ARTIFACT` before P4-T5 lands as well as after it. Without the `ok` half a
+  fixture that produced no record at all would satisfy this task.
 
 - [ ] [P4-T5] In `scripts/bash/cleanup_worktrees_dirt_lib.sh`, replace the header-skip pattern
   line that currently reads `"+++ "* | "--- "*) continue ;;` inside
-  `dirt_diff_is_hintpath_confined` (line 159 at `388e1a78`; Phase 2's and Phase 3's insertions are
+  `dirt_diff_is_hintpath_confined` (line 159 at `eac077a2`; Phase 2's and Phase 3's insertions are
   both below this line and do not shift it, but the line content is used as the anchor for
   consistency with the other two library edits) with one anchored to the four
   forms git emits — a `---` header prefixed `a/`, a `+++` header prefixed `b/`, and the two
@@ -664,13 +742,25 @@ other path reaches rung 6 and is `UNIQUE`.
   anchored replacement carries the `a/` and `b/` prefixes inside the quotes), and
   `bash -n scripts/bash/cleanup_worktrees_dirt_lib.sh` exits 0.
 
-- [ ] [P4-T6] Re-run
-  `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_classify.bats` and write
-  `evidence/regression-testing/pass-after-diff-header-anchor.2026-09-08T06-00.md` with
+- [ ] [P4-T6] Re-run the three suites that read the header-skip branch —
+  `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_classify.bats tests/shell/test_cleanup_worktrees_dirt_clear.bats tests/shell/test_cleanup_worktrees_dirt_regression.bats`
+  — and write `evidence/regression-testing/pass-after-diff-header-anchor.2026-09-08T06-00.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, the plan line, the `ok`/`not ok` counts, and
   `Output Summary:`.
-  Acceptance: `EXIT_CODE: 0`, the recorded `not ok` count is `0`, and the output contains an `ok`
-  line for each of the two descriptions quoted in P4-T3.
+  The two clear-mode suites are included because `dirt_clear_all_disposable` and
+  `dirt_clear_clean_failed` each carry a
+  `diff._repo-wt_dirt.src_Legacy_Legacy.csproj.out` whose first two lines are genuine
+  `--- a/src/Legacy/Legacy.csproj` and `+++ b/src/Legacy/Legacy.csproj` headers that P4-T5's
+  anchored pattern must continue to skip. A mis-anchored replacement leaves those two entries
+  counted as changed content, resolves them `UNIQUE`, and turns the clear into a
+  `REFUSED-UNIQUE` — a failure that surfaces nowhere in
+  `tests/shell/test_cleanup_worktrees_dirt_classify.bats` and would otherwise first appear at
+  P6-T7, three phases later.
+  Acceptance: `EXIT_CODE: 0`, the recorded `not ok` count is `0`, the output contains an `ok`
+  line for each of the two descriptions quoted in P4-T3, and the output contains an `ok` line for
+  `dirt_clear_all_disposable: the clear result record reports OK` and for
+  `dirt_clear_clean_failed: a non-zero clean reports FAILED and retries no removal`, the two
+  pre-existing clear-mode tests that consume those genuine-header fixtures.
 
 - [ ] [P4-T7] Write `evidence/regression-testing/sibling-check-phase4.2026-09-08T06-00.md` with
   `Timestamp:`, `Command:` naming the P4-T6 run, `EXIT_CODE:`, and `Output Summary:` naming the
@@ -713,8 +803,14 @@ mutation probe demonstrating that the new pin can fail.
 - [ ] [P5-T2] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_probe_revlist_error/`
   with a `status._repo-wt_dirt.out` of exactly one line `M  src/a.cs` and a `rev-list.HEAD.rc` of
   `128`, so `dirt_staged_tree_commit` returns 2 from
-  `scripts/bash/cleanup_worktrees_dirt_lib.sh:97-99` and rung 1 takes its `staged == "ERROR"`
-  branch at `:232-234`. Supply **no** lower-rung response and no `diff-quiet..src_a.cs.rc`: the X
+  `scripts/bash/cleanup_worktrees_dirt_lib.sh:97-99` and rung 1 takes the branch whose condition
+  line reads verbatim `if [[ $staged == "ERROR" ]]; then`. That branch is line 232 as the file
+  stands at `eac077a2`, but it is cited by its verbatim condition rather than by number because
+  P2-T4 inserts a comment block above line 231 and shifts every line below it; the `:97-99`
+  citation is left as a line number because the earliest-positioned edit this plan makes to this
+  file is P4-T5's docstring amendment at line 136, so every line at or above 135 keeps its number
+  through execution.
+  Supply **no** lower-rung response and no `diff-quiet..src_a.cs.rc`: the X
   column is `M` and the Y column is a space, so rung 1's gate is entered and the `ERROR` branch
   prints `UNIQUE` and returns before rung 2 is reached. Adding a lower-rung file here would create
   a fixture entry no code path reads.
@@ -903,18 +999,33 @@ must remain byte-identical. Every edit in this phase is applied to both files.
   checkout containing such a worktree exits non-zero from report mode where it previously exited 0
   and produced a complete report. State that this is deliberate, that the alternative would make an
   incomplete report indistinguishable from a report about a clean worktree, and cross-reference the
-  analogous apply-mode note in the End-to-End Workflow.
-  Acceptance: `.claude/skills/cleanup-merged-worktrees/SKILL.md` contains the literal
-  `returns git's non-zero exit code`.
+  analogous apply-mode note in the End-to-End Workflow. The word `indistinguishable` must appear in
+  this new paragraph and nowhere else in the file.
+  Acceptance:
+  `grep -c -F 'indistinguishable' .claude/skills/cleanup-merged-worktrees/SKILL.md`
+  reports exactly `1`, up from `0` before this task, and that occurrence is inside the new
+  paragraph in `## Report Line Contract`. The asserted token is a single word rather than the
+  sentence describing the exit-code behaviour because that sentence straddles a line break once the
+  paragraph wraps and a line-oriented search then reports zero matches. The file carries no
+  occurrence of `indistinguishable` at `eac077a2`, so the count moves from `0` to `1` only if the
+  executor writes the paragraph.
 
 - [ ] [P7-T2] In the same `## Report Line Contract` section, extend the `DIRTFILE|` bullet with a
   sentence recording Decision B: `DISPOSABLE_SESSION_ARTIFACT` matches three fixed repository paths
   under `artifacts/`, is repository-agnostic, and cannot fire in a checkout that gitignores
   `artifacts/` — which drm-copilot does at `.gitignore:6` — because the status read never carries
   `--ignored`; and that the rung is retained for consumer checkouts and must not be made reachable
-  by adding `--ignored`.
-  Acceptance: `.claude/skills/cleanup-merged-worktrees/SKILL.md` contains the literal
-  `must not be made reachable by adding`.
+  by adding `--ignored`. The hyphenated word `repository-agnostic` must appear in this new sentence
+  and nowhere else in the file.
+  Acceptance:
+  `grep -c -F 'repository-agnostic' .claude/skills/cleanup-merged-worktrees/SKILL.md`
+  reports exactly `1`, up from `0` before this task, and that occurrence is inside the `DIRTFILE|`
+  bullet of `## Report Line Contract`. The asserted token is a single hyphenated word rather than
+  the clause prohibiting `--ignored` because that clause straddles a line break once the bullet
+  wraps. The existing statement at `.claude/skills/cleanup-merged-worktrees/SKILL.md:373-375`, that
+  status is read without `--ignored` so an ignored file never becomes an entry, sits in
+  `## Prohibited Shortcuts` and is a different location; it carries no occurrence of
+  `repository-agnostic`, so it does not satisfy this task and does not disturb the count.
 
 - [ ] [P7-T3] Copy `.claude/skills/cleanup-merged-worktrees/SKILL.md` over
   `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
@@ -974,7 +1085,7 @@ must remain byte-identical. Every edit in this phase is applied to both files.
   Acceptance: `EXIT_CODE: 0`; the recorded table shows every suite whose
   `cleanup_worktrees_lib.sh` column is non-zero also has a non-zero
   `cleanup_worktrees_dirt_lib.sh` column; the table has exactly `11` such suites, being the ten
-  measured at `388e1a78` plus `test_cleanup_worktrees_dirt_failclosed.bats`; and
+  measured at `eac077a2` plus `test_cleanup_worktrees_dirt_failclosed.bats`; and
   `test_cleanup_worktrees_scan_helper.bats`, `test_cleanup_worktrees_scan_seam.bats`, and
   `test_cleanup_worktrees_cli.bats` each show zero in the `cleanup_worktrees_lib.sh` column, which
   is what places all three outside the narrowed AC-1 text written in P1-T3.
@@ -1029,9 +1140,12 @@ runs; that is an orchestration precondition, not an acceptance condition of this
 
 - [ ] [P8-T5] Stage and commit every change this plan made, then push
   `bug/cleanup-worktrees-dirt-classifier-632-r2`. Write
-  `evidence/other/remediation-commit-and-push.2026-09-08T07-00.md` with `Timestamp:`, the
-  `git add`, `git commit`, and `git push` commands, their `EXIT_CODE:` values, the resulting head
-  SHA, a `git status --porcelain` span taken after the commit, and a
+  `evidence/other/remediation-commit-and-push.2026-09-08T07-00.md` with `Timestamp:`, a
+  `git rev-parse HEAD` span taken immediately before the `git add` and recorded on its own line in
+  the exact form `PreCommitHeadSha: <sha>`, the `git add`, `git commit`, and `git push` commands,
+  their `EXIT_CODE:` values, a second `git rev-parse HEAD` span taken after the commit and recorded
+  in the exact form `PostCommitHeadSha: <sha>`, a `git status --porcelain` span taken after the
+  commit, and a
   `git diff --name-status origin/epic/cleanup-merged-worktrees-hardening-integration...HEAD` span.
   Acceptance: all three `EXIT_CODE:` values are `0`, the recorded `git status --porcelain` span is
   empty, the recorded name-status span lists
@@ -1039,14 +1153,17 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`,
   `.claude/skills/cleanup-merged-worktrees/SKILL.md`, and
   `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/evidence/qa-gates/shell-qc-test-coverage.2026-09-08T04-30.md`,
-  and the artifact records a head SHA different from `388e1a78bfd1aaf73853e58f31d963b1aaee5d48`.
+  and the artifact contains a `PreCommitHeadSha:` line and a `PostCommitHeadSha:` line whose values
+  differ.
   The coverage-evidence file was committed in `388e1a78` and is therefore already tracked; it still
   appears in the three-dot name-status span, because that span covers every commit on this branch
-  since the merge base with
-  `origin/epic/cleanup-merged-worktrees-hardening-integration`. The head-SHA comparison names
-  `388e1a78` rather than `ad6bc946` for a reason that decides whether the condition can fail: the
-  branch head was already `388e1a78` before this task ran, so a comparison against `ad6bc946` would
-  hold even if the executor committed nothing.
+  since the merge base with `origin/epic/cleanup-merged-worktrees-hardening-integration`.
+  The head-SHA comparison is stated against the pre-commit SHA this artifact itself records, and
+  not against a SHA quoted in this plan, because a quoted SHA goes stale on every further
+  docs-only commit to this branch: `ad6bc946` was superseded by `388e1a78` and `388e1a78` by
+  `eac077a2` during preflight alone, and against any superseded SHA the condition holds before the
+  executor commits anything. The self-relative form cannot go stale, because the two SHAs are read
+  in the same task on either side of the commit.
   The porcelain span and the anchored name-status span are both required: the anchored diff cannot
   report a newly created file until it is staged, and the porcelain span goes empty once the commit
   lands, so neither alone establishes the state.
@@ -1116,7 +1233,13 @@ runs; that is an orchestration precondition, not an acceptance condition of this
 - [ ] [P8-T12] Write `evidence/other/deferred-findings.2026-09-08T07-00.md` recording the
   disposition of the eight advisory findings F7 through F14 from
   `code-review.2026-09-08T05-00.md`: for each, its title, why it does not block this remediation
-  cycle, and the reason for deferral. Record explicitly that F7 and F9 target
+  cycle, and the reason for deferral. F14 is the one finding of the eight that is split rather than
+  wholly deferred, and its disposition line must say so: its acceptance-criteria half is closed by
+  P1-T11, which narrows AC-15 so the criterion no longer asserts dirt records for registrations
+  `run_report` never classifies, and only its documentation half remains deferred — the `SKILL.md`
+  omission that detached, `main`, and `bare` registrations are never classified, which is the same
+  gap F13's second clause records and is deferred alongside F13 for that reason. Record explicitly
+  that F7 and F9 target
   `scripts/bash/cleanup_worktrees_lib.sh`, which is at 496 of 500 lines and which this plan does
   not modify, so acting on them requires the `cleanup_worktrees_report_lib.sh` extraction
   contingency recorded in the `## Risks & Mitigations` bullet of `spec.md` that begins
@@ -1126,8 +1249,8 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   acceptance criteria and two `Proposed Fix` subsections above it, all of which shift its line
   numbers before this task runs.
   Acceptance: the artifact names all eight identifiers `F7` through `F14`, each with a one-line
-  disposition, contains the literal `496`, and contains the literal
-  `cleanup_worktrees_report_lib.sh`.
+  disposition, contains the literal `496`, contains the literal
+  `cleanup_worktrees_report_lib.sh`, and the F14 disposition line contains the literal `P1-T11`.
 
 ---
 
@@ -1143,5 +1266,21 @@ runs; that is an orchestration precondition, not an acceptance condition of this
 | R6a | none (documented) | none (existing scenario) | P7-T4 | P1-T1, P7-T1, P7-T6, P7-T7 |
 | R6b | none (retained) | none (existing scenario) | P7-T5 | P1-T2, P7-T2, P7-T3, P7-T6 |
 | AC-1 | P1-T3 | none | P7-T8 | P7-T8, P8-T10 |
-| AC-31 | P1-T5, P1-T7, P1-T8 | none | none | P8-T11 |
-| AC-32 | P1-T5 | none | none | P8-T6, P8-T7, P8-T8 |
+| AC-14 | P4-T5 | P4-T1, P4-T2 | P4-T3 (`++`-leading content line plus the dev-null-header counterpart) | P4-T4, P4-T6, P4-T7, P8-T10 |
+| AC-15 | P3-T4 (record path), P1-T11 (AC narrowing) | P3-T1 | P3-T2 (untracked ` -> ` path plus genuine `R` entry) | P3-T3, P3-T5, P3-T6, P8-T10 |
+| AC-31 | P1-T5, P1-T7, P1-T8 | none | none | P8-T1, P8-T2, P8-T3, P8-T11, P8-T10 |
+| AC-32 | P1-T5 | none | none | P8-T6, P8-T7, P8-T8, P8-T10 |
+| AC-39 | P2-T4 | P2-T1 | P2-T2 (`MM` and `M ` entries in one fixture) | P2-T3, P2-T5, P2-T6, P8-T10 |
+| AC-40 | P3-T4 | P3-T1 | P3-T2 (both directions) | P3-T3, P3-T5, P3-T6, P8-T10 |
+| AC-41 | P4-T5 | P4-T1, P4-T2 | P4-T3 (both directions) | P4-T4, P4-T6, P4-T7, P8-T10 |
+| AC-42 | none (pins only) | P5-T1, P5-T2, P5-T3 | P2-T2 (2 directions) plus P5-T4 (3), five in total | P5-T5, P5-T6, P8-T10 |
+| AC-43 | none (documented) | none (existing `dirty_worktree_status_error`) | P7-T4 | P1-T1, P7-T1, P7-T3, P7-T6, P7-T7, P8-T10 |
+| AC-44 | none (retained) | none (existing `dirt_session_artifact`) | P7-T5 | P1-T2, P7-T2, P7-T3, P7-T6, P8-T10 |
+| AC-45 | none (coverage gate) | P6-T1, P6-T2, P6-T3 | P6-T4, P6-T5, P6-T6 | P6-T7, P6-T8, P8-T6, P8-T7, P8-T8, P8-T10 |
+
+The twelve acceptance-criteria rows above are the complete set P8-T10 checks off: AC-1, AC-14,
+AC-15, AC-31, AC-32, and AC-39 through AC-45. Every one carries at least one task in the
+`Fix task` or `Both-directions pin` column and at least one evidence artifact task, so no criterion
+is checked off on a task that produces no record. The rows whose `Fix task` cell reads `none` are
+criteria this cycle pins or measures rather than changes code for; the reason is stated in the
+cell.
