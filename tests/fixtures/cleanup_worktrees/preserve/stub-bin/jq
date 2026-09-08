@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# Recording jq stub for the cleanup-worktrees preserve bats suite, wired through the
+# CLEANUP_WT_JQ_BIN seam. It never parses JSON and writes nothing to disk: it replays
+# canned tab-separated stdout and an exit code from the scenario directory named by
+# CLEANUP_WT_STUB_SCENARIO, and echoes each invocation as a `stub-jq: <argv>` line to
+# STDERR so tests can assert which filter ran. The invocation log is on stderr (not
+# stdout) so a caller capturing jq stdout via command substitution receives only the
+# canned records; under bats `run` the stderr log still merges into $output.
+#
+# No test invokes a real jq. The production code resolves its jq through
+# preserve_resolve_jq, which honors CLEANUP_WT_JQ_BIN when that value is non-empty and
+# executable, so pointing that variable at this file replaces jq entirely.
+#
+# Lookup contract, mirroring tests/fixtures/cleanup_worktrees/stub-bin/git exactly:
+#   For each invocation the stub derives a KEY, then:
+#     - if <scenario>/<KEY>.out exists, its bytes are written to stdout;
+#     - if <scenario>/<KEY>.rc  exists, the stub exits with that integer;
+#     - otherwise stdout is empty and the exit code is 0.
+#   Path characters outside [A-Za-z0-9._-] are replaced with `_` when forming a KEY.
+#
+# KEY scheme:
+#   jq [options] <filter> <file>  -> jq.<sanitized last non-flag operand>, falling
+#                                    back to the bare key `jq` when the scenario
+#                                    supplies no operand-specific fixture. Most
+#                                    scenarios supply only `jq.out`, because a
+#                                    scenario directory already scopes one manifest.
+#
+# The canned `jq.out` bytes are the tab-separated `@tsv` records the production filter
+# would emit, one per preserved_files[] entry, in the fixed column order defined by
+# spec.md D3:
+#   worktree_path, source_path, change_class, disposition, verdict, target_path,
+#   memory_index_line_present, memory_index_line_is_null, memory_index_line,
+#   line_ending, host_token_scan_type, host_token_scan_result,
+#   host_token_scan_pattern_set_id, evidence
+set -uo pipefail
+
+# Echo the full invocation to stderr for argv assertions.
+printf 'stub-jq: %s\n' "$*" >&2
+
+scenario=${CLEANUP_WT_STUB_SCENARIO:-}
+
+sanitize() {
+	# Replace every character outside [A-Za-z0-9._-] with an underscore.
+	local s=${1:-}
+	printf '%s' "${s//[^A-Za-z0-9._-]/_}"
+}
+
+respond() {
+	# Replay <scenario>/<key>.out to stdout (if present) and exit <scenario>/<key>.rc
+	# (default 0). With no scenario configured, emit nothing and exit 0.
+	local key="$1"
+	local rc=0
+	if [[ -n $scenario ]]; then
+		if [[ -f "$scenario/$key.out" ]]; then
+			cat "$scenario/$key.out"
+		fi
+		if [[ -f "$scenario/$key.rc" ]]; then
+			rc=$(cat "$scenario/$key.rc")
+		fi
+	fi
+	exit "$rc"
+}
+
+# Derive the operand-specific key from the last non-flag argument, which for the
+# production invocation shape is the manifest path. Dash-leading tokens are skipped so
+# an option value never becomes the key.
+target=""
+for a in "$@"; do
+	[[ $a == -* ]] && continue
+	target=$a
+done
+operand_key="jq.$(sanitize "$target")"
+
+if [[ -n $scenario ]] &&
+	{ [[ -f "$scenario/$operand_key.out" ]] || [[ -f "$scenario/$operand_key.rc" ]]; }; then
+	respond "$operand_key"
+fi
+
+respond "jq"

@@ -30,11 +30,27 @@ source "$SCRIPT_DIR/cleanup_worktrees_actions_lib.sh"
 # shellcheck source=scripts/bash/cleanup_worktrees_detached_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_detached_lib.sh"
-# The disposable-dirt classifier is called BY run_report and BY delete_candidate in the
-# libraries above; every function is resolved at call time, so it is sourced last.
+# Neither of the three libraries below requires being sourced last, and neither claims to
+# be. Each library's source-time work is limited to function definitions plus constant and
+# environment-default variable assignments; none of them calls a function while being
+# sourced, and no function name is defined by more than one library, so no later source can
+# shadow an earlier definition. Bash resolves a function name when the call runs, not when
+# the caller is defined, so the cross-library calls resolve whatever the order: the
+# disposable-dirt classifier is called BY run_report and BY delete_candidate in the
+# libraries above, and the preserve library calls cleanup_wt_git from the enumeration
+# library and consolidation_worktree_path from the actions library. The order here is
+# therefore grouping for readability only.
 # shellcheck source=scripts/bash/cleanup_worktrees_dirt_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_dirt_lib.sh"
+# The line-ending and index group is placed immediately before the preserve library, whose
+# read-only planning phase calls the functions it defines.
+# shellcheck source=scripts/bash/cleanup_worktrees_preserve_eol_lib.sh
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/cleanup_worktrees_preserve_eol_lib.sh"
+# shellcheck source=scripts/bash/cleanup_worktrees_preserve_lib.sh
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/cleanup_worktrees_preserve_lib.sh"
 
 usage() {
 	# Print the wrapper usage/help text.
@@ -50,6 +66,16 @@ Commands:
                        re-verification, removing worktrees without force and deleting
                        branches with -D. Never acts on NOT_MERGED,
                        HAS_UNIQUE_RESIDUALS, or PROTECTED_CURRENT candidates.
+  preserve | --preserve
+                       Stage the manifest's preserved_files[] findings onto the
+                       consolidation branch. Takes no operand; the manifest path comes
+                       from CLEANUP_WT_MANIFEST_PATH. Copies each named source file
+                       verbatim, carries its MEMORY.md index line across using the
+                       destination file's own re-derived line-ending convention, and
+                       refuses the whole pass when the incoming bytes carry a
+                       host-identifying token. Exit 0 clean, 1 something was skipped or
+                       an index was created, 3 host-token hard stop, 127 a required tool
+                       could not be resolved.
   --help | -h | help   Print this help and exit 0.
 
 Flags:
@@ -76,6 +102,10 @@ DIRTSUM|<worktree>|<aggregate>|<detail>, exactly one per dirty worktree. The ver
 DISPOSABLE_BUILD_ARTIFACT, DISPOSABLE_SESSION_ARTIFACT, CONTENT_ON_MAIN, CONTENT_IN_HISTORY,
 STAGED_TREE_IS_COMMIT, and UNIQUE; the aggregate is ALL_DISPOSABLE or HAS_UNIQUE. Both are
 read-only records and neither unlocks a destructive action on its own.
+
+PRESERVE|<worktree-path>|<source-path>|<verdict> (preserve mode), a manifest
+preserved_files[] finding staged onto the consolidation branch, whose per-file outcome is
+reported by the companion ACTION|preserve-stage|... record.
 
 Advisory, read-only records (report and apply mode; none unlocks a destructive action):
 ORPHAN_DIR|<path>|<size> for a scanned directory with no .git pointer file and no
@@ -110,12 +140,21 @@ Environment overrides:
                                scan stubs (tests only).
   CLEANUP_WT_CONSOLIDATION_PATH Override the derived consolidation worktree path
                                (<main-worktree-path>-wt/documentationandmemories).
+  CLEANUP_WT_MANIFEST_PATH     Path to the cleanup-worktrees manifest read by preserve
+                               mode. Defaults to
+                               artifacts/orchestration/cleanup-worktrees-manifest.json.
+  CLEANUP_WT_JQ_BIN            Path to the jq binary used to read that manifest; an empty
+                               or nonexistent value is treated as missing (falls back to
+                               PATH jq). No default. This is the jq test-stub seam.
 EOF
 }
 
 main() {
 	# Dispatch on the first argument. No args or `report` runs the dry-run report;
-	# `--apply`/`apply` runs apply mode; `--help`/`-h`/`help` prints usage and exits 0;
+	# `--apply`/`apply` runs apply mode; `preserve`/`--preserve` stages the manifest's
+	# preserved_files[] findings onto the consolidation branch and takes no operand,
+	# reading its manifest path from CLEANUP_WT_MANIFEST_PATH; `--help`/`-h`/`help`
+	# prints usage and exits 0;
 	# anything else prints usage to stderr and exits 2 (usage-error parity with
 	# shell-qc.sh). Subcommand return codes are captured so an intermediate failure is
 	# never masked before the final exit.
@@ -164,6 +203,9 @@ main() {
 		;;
 	--apply | apply)
 		run_apply || exit_code=$?
+		;;
+	preserve | --preserve)
+		run_preserve || exit_code=$?
 		;;
 	--help | -h | help)
 		usage

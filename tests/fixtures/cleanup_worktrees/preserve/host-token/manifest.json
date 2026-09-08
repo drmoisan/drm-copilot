@@ -1,0 +1,22 @@
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "removals": [],
+  "preserved_files": [
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/host-token/wt",
+      "source_path": "agent-memory/atomic-executor/host-token-lesson.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "null",
+      "memory_index_line": null,
+      "line_ending": "absent",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/host-token fixture: the source bytes carry an absolute host path"
+    }
+  ]
+}

@@ -195,6 +195,12 @@
             '.claude/lib/mermaid/MermaidLineScanner.psm1'
             '.claude/lib/mermaid/MermaidMarkdownFences.psm1'
             '.claude/lib/mermaid/MermaidValidation.psm1'
+            # Issue #635 added the sanctioned-removal manifest module read by both worktree
+            # removal gate hooks. CodeCoverage.Path is an explicit per-file allow-list, so an
+            # unregistered production file would sit outside the coverage denominator, which
+            # the Coverage Exclusion Policy forbids. Registered here beside the other
+            # .claude/lib modules.
+            '.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1'
             # Issue #501 fixed the PreToolUse payload transport and shape across the whole
             # hook surface. CodeCoverage.Path is an explicit per-file allow-list, so the new
             # shared payload module, the six hooks that were changed but never registered,
@@ -242,6 +248,25 @@
             'scripts/dev-tools/Invoke-ReleaseReconciliation.ps1'
             # Issue #552 validates start-time routing attestation coverage for this hook.
             '.codex/hooks/record-subagent-routing-attestation.ps1'
+            # Issue #545 adds the shared command parser as two dot-sourced .ps1 siblings, one
+            # pair per runtime. CodeCoverage.Path is an explicit per-file allow-list, so each
+            # new production file is registered here; without it the file would sit outside
+            # the coverage denominator, which the Coverage Exclusion Policy forbids. Both
+            # files define functions only and are dot-sourced by their Pester suites, so line
+            # attribution is valid. No extensions/drm-copilot/resources/ path is added,
+            # because the list holds zero entries under that prefix and every bundle mirror is
+            # guarded by byte identity instead.
+            '.claude/hooks/hook-command-scanner.ps1'
+            '.claude/hooks/hook-command-invocation.ps1'
+            '.codex/hooks/hook-command-scanner.ps1'
+            '.codex/hooks/hook-command-invocation.ps1'
+            # Issue #545 also modifies four Codex canonical hooks that the [P0-T9] baseline
+            # recorded as absent from this list. They are registered here so the files this
+            # change edits are all inside the coverage denominator.
+            '.codex/hooks/enforce-promotion-mcp-only.ps1'
+            '.codex/hooks/enforce-epic-merge-gate.ps1'
+            '.codex/hooks/enforce-epic-worktree-removal-gate.ps1'
+            '.codex/hooks/validate-bash.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

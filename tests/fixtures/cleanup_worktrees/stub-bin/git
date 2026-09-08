@@ -18,6 +18,8 @@
 #   KEY (so refs/heads/x -> refs_heads_x, branch:path -> branch_path).
 #
 # KEY scheme by subcommand:
+#   add [--] <path>...                       -> add.<last non-flag operand>
+#   check-ignore [-q] [--] <path>...         -> check-ignore.<last non-flag operand>
 #   for-each-ref ... <pattern>               -> for-each-ref.<pattern>, falling back to
 #                                               for-each-ref ONLY when <pattern> is the
 #                                               literal refs/heads/. Any other pattern
@@ -68,6 +70,12 @@
 # such an arm would make the report-mode non-mutation assertion unable to fail. The
 # assertion in tests/shell/test_cleanup_worktrees_dirt_clear.bats searches this file's
 # argv log for those subcommand names; adding one here would defeat it.
+#
+# Polarity trap for check-ignore, stated because the default is the wrong answer:
+# `respond` defaults to exit 0 when no `.rc` file exists, while `git check-ignore -q`
+# exits 0 when the path IS ignored, so a scenario that supplies no fixture reports
+# every destination as ignored. Every happy-path scenario directory must therefore
+# carry a `check-ignore.<key>.rc` file containing `1`.
 set -uo pipefail
 
 # Echo the full invocation to stderr for argv assertions.
@@ -141,6 +149,27 @@ set -- "${rest[@]:-}"
 
 subcmd=${1:-}
 case "$subcmd" in
+add)
+	# git add [--] <path>...: KEY is add.<sanitized last non-flag operand>. Every
+	# dash-leading token, including the `--` end-of-options marker, is skipped so the
+	# KEY is derived from a path rather than from an option.
+	target=""
+	for a in "${@:2}"; do
+		[[ $a == -* ]] && continue
+		target=$a
+	done
+	respond "add.$(sanitize "$target")"
+	;;
+check-ignore)
+	# git check-ignore [-q] [--] <path>...: KEY is
+	# check-ignore.<sanitized last non-flag operand>, derived the same way as `add`.
+	target=""
+	for a in "${@:2}"; do
+		[[ $a == -* ]] && continue
+		target=$a
+	done
+	respond "check-ignore.$(sanitize "$target")"
+	;;
 for-each-ref)
 	# Key on the refspec pattern (the last argument) so a refs/remotes/-scoped read
 	# cannot replay a refs/heads/-shaped fixture. The bare `for-each-ref` key remains

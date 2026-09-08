@@ -244,11 +244,20 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 command exemption (is
 
     Context 'issue #539 residual whole-command-text behaviour (D3 and D8)' {
         It 'denies a message-body payload that merely contains the staging literal' {
-            # Arrange - a here-document body quoting the literal in prose. The trigger
-            # regex is applied to the whole command text and is deliberately NOT
-            # narrowed by this fix (D8), so the line still classifies as an
-            # implementation command; D3 keeps that outcome a deny because the prose
-            # does not parse as a complete recognized invocation.
+            # Arrange - a here-document body quoting the literal in prose.
+            #
+            # SUPERSEDED BY ISSUE #545. Issue #539 D8 deliberately declined to narrow
+            # the trigger, so this line classified as an implementation command and
+            # was denied. Issue #545 narrows WHAT TEXT the byte-unchanged trigger
+            # patterns are evaluated against: a heredoc body attached to a
+            # NON-wrapper segment is masked, because the shell consumes it as data
+            # and never executes it. `cat` is not a member of the wrapper carve-out
+            # set, so this body is a mention rather than an invocation and the
+            # expected decision reverses from deny to allow.
+            #
+            # This is the single intended assertion reversal on the Claude side. The
+            # deny direction is preserved wherever the heredoc feeds a wrapper; the
+            # sibling case below pins that.
             $command = @'
 cat <<'NOTE' > docs/features/epics/2026-08-24-sample-epic/notes.md
 Run git add docs/features/epics/2026-08-24-sample-epic/epic.md once the scaffold lands.
@@ -260,7 +269,27 @@ NOTE
 
             # Assert
             $decision.hookSpecificOutput.permissionDecision |
-                Should -Be 'deny' -Because 'prose containing the literal never parses as a well-formed invocation'
+                Should -Be 'allow' -Because 'issue #545 masks a heredoc body attached to a non-wrapper segment, so the prose is data'
+        }
+
+        It 'denies the same heredoc body when it feeds a shell wrapper instead of a file' {
+            # The paired deny case for the reversal above, and the reason the
+            # reversal is not a fail-open change. The body is identical; only its
+            # destination differs. `bash` IS a member of the wrapper carve-out set,
+            # so this segment scans raw, the body stays visible to the trigger, and
+            # the staging command it carries is genuinely executed.
+            $command = @'
+bash <<'NOTE'
+git add docs/features/epics/2026-08-24-sample-epic/epic.md
+NOTE
+'@
+
+            # Act
+            $decision = Get-ExemptionDecisionForCommand -Command $command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'a heredoc feeding a wrapper is executed, so the carve-out keeps it on raw text'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
         }
     }

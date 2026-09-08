@@ -1450,22 +1450,22 @@ denies against a not-ready checkpoint.
 
 ## Acceptance Criteria
 
-- [ ] A regression test demonstrating the **over-match** direction exists and is recorded as
+- [x] A regression test demonstrating the **over-match** direction exists and is recorded as
       failing against the unfixed hooks: a heredoc prose mention of a governed token in a
       non-wrapper segment is asserted to allow, with fail-before output recorded under
       `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/evidence/regression-testing/`.
-- [ ] A regression test demonstrating the **under-match** direction exists and is recorded as
+- [x] A regression test demonstrating the **under-match** direction exists and is recorded as
       failing against the unfixed hooks: `git -C ../x add .` against an explicitly not-ready
       checkpoint is asserted to deny, with fail-before output recorded under the same evidence
       path.
-- [ ] Both regression tests pass after the fix, on both the Claude and the Codex sides, with
+- [x] Both regression tests pass after the fix, on both the Claude and the Codex sides, with
       pass-after output recorded under the same evidence path.
-- [ ] The scanner produces, for each segment, the five properties named in D2 Piece 1 (`RawText`,
+- [x] The scanner produces, for each segment, the five properties named in D2 Piece 1 (`RawText`,
       `MaskedText`, `Tokens`, `HasLiveSubstitution`, `Unbalanced`), and a named Pester case exists
       for each heredoc rule in D2 Piece 1: `<<`, `<<-` with leading tabs, a quoted delimiter,
       multiple pending heredocs on one physical line, an unterminated body masking to end of text,
       `<<<` not treated as a heredoc, and a non-literal delimiter forcing a raw scan.
-- [ ] Scan-text selection follows the three ordered clauses of D2 Piece 2, and the wrapper
+- [x] Scan-text selection follows the three ordered clauses of D2 Piece 2, and the wrapper
       carve-out set is pinned by a named Pester case asserting its **exact** membership against the
       script-scope constant through the accessor `Get-CommandLineWrapperName`. The set contains the
       fourteen members listed in D2 Piece 2 unless the optional additions recorded in D11.4 are
@@ -1473,77 +1473,88 @@ denies against a not-ready checkpoint.
       specification and the constant state the same membership. The criterion is satisfied only when
       the asserted membership in the test, the constant in the code, and the list in D2 Piece 2 all
       agree.
-- [ ] The structural relocation classifier implements the six numbered steps of D2 Piece 3, with
+- [x] The structural relocation classifier implements the six numbered steps of D2 Piece 3, with
       named Pester cases asserting: `git -C <dir> add` classifies; `git --git-dir=<x> commit`
       classifies; `git --work-tree=<x> add` classifies; an unmodeled dash-leading token between
       `git` and the subcommand classifies; and `git log --grep add` does **not** classify.
-- [ ] The five trigger pattern strings in the preimplementation gate are **byte-unchanged**, and
-      the promotion hook's four forbidden-token literals, its two `gh` expressions, and the
-      pr-author hook's `gh pr create` / `gh pr edit` expressions are likewise byte-unchanged;
-      verified by diff inspection recorded in the scope-and-size evidence artifact.
-- [ ] Every row of the D3 fail-closed table has at least one named Pester case per applicable side
+- [x] The five trigger pattern strings in the preimplementation gate are **byte-unchanged**, and
+      so are the promotion hook's four forbidden-token literals, the promotion hook's
+      `gh issue create` / `issue new` expression string, the promotion hook's
+      `$ghApiIssuesPostPattern` declaration line, the six `validate-bash` denylist literals,
+      `$script:CdChainedReadCommandPattern`, and the two abandon token constants; verified by diff
+      inspection recorded in the scope-and-size evidence artifact. The pr-author hook's
+      `gh pr create` and `gh pr edit` expressions are **superseded** by the D12 call-site rewrite
+      table, which directs `enforce-pr-author-skill-helpers.ps1` lines 170–171 to
+      `Test-CommandLineInvocation` — a function taking no pattern operand — and by the acceptance
+      criterion covering `enforce-pr-author-skill.epic-base-branch.ps1` (at line 1620 before this
+      amendment, indexed AC-33 in the audit artifacts, whose numbered index records AC-31 as the
+      `validate-bash.ps1` matching-primitive criterion at line 1604), which requires
+      `Test-EpicBaseBranchOverride` to evaluate through that same function, so those three literals
+      are necessarily deleted and carry no byte-unchanged obligation. Supporting record:
+      `evidence/qa-gates/trigger-literals-byte-unchanged.2026-09-07T15-50.md` §4.
+- [x] Every row of the D3 fail-closed table has at least one named Pester case per applicable side
       asserting the stated post-fix decision, including all seven wrapper deny pins (`xargs`,
       `bash -c`, `sh -c`, `env`, `pwsh -Command`, heredoc-into-`bash`, and live substitution inside
       double quotes).
-- [ ] **No existing denial is weakened.** Both existing decision suites pass with no assertion
+- [x] **No existing denial is weakened.** Both existing decision suites pass with no assertion
       modified except the single reversed heredoc `It` on each side; the existing Claude gate suite
       denials (lines 112–149), the Codex `Test-ImplementationCommand` classification table
       (lines 348–358, including `git commit -m "wip"` returning `$true`), the #539 D4 rows 14a–14d
       chained relocating denials, the absolute-path suites, and the existing pr-author suites all
-      pass unmodified.
-- [ ] The issue #539 exemption layer is unchanged: `Test-ExemptOrchestrationStagingCommand` and
+      pass unmodified. Cycle 2 discharges this criterion through `evidence/qa-gates/deny-preservation-audit.2026-09-07T22-59.md` (`[P5-T9]`), which records each of the four R-2 regressing commands producing the same decision at head `06d166e0` as at the feature-wide anchor `6dff80ed`, and all forty paired-negative preservation rows named by `[P2-T8]`, `[P3-T9]`, and `[P4-T6]` passing.
+- [x] The issue #539 exemption layer is unchanged: `Test-ExemptOrchestrationStagingCommand` and
       `enforce-orchestration-preimplementation-gate-helpers.ps1` carry no functional edit, the
       exemption remains allow-side only, and it is consulted at the same point in the decision flow
       (D2 rule R5).
-- [ ] `enforce-promotion-mcp-only.ps1` is changed in all four copies so that its four-token
+- [x] `enforce-promotion-mcp-only.ps1` is changed in all four copies so that its four-token
       `IndexOf` scan and both `gh` expressions evaluate against per-segment scan text from
       `hook-command-scanner.ps1`, with named cases asserting that promotion tool names supplied as
       receipt *values* allow while a genuine promotion-script invocation, `gh issue create`,
       `gh issue new`, and a single-segment `gh api repos/<o>/<r>/issues -X POST` still deny.
-- [ ] `enforce-pr-author-skill-helpers.ps1` is changed in both Claude copies so that the
+- [x] `enforce-pr-author-skill-helpers.ps1` is changed in both Claude copies so that the
       `isPrCreate` / `isPrEdit` trigger decision evaluates against per-segment scan text and so that
       `gh --repo <o/r> pr create` and `gh -R <o/r> pr edit` classify; named cases assert that a
       quoted `--body-file` mention inside a JSON receipt value allows, and that every `PR_*` reason
       code and receipt check is unchanged for genuine invocations.
-- [ ] The shared parser ships as exactly two dot-sourced `.ps1` files named
+- [x] The shared parser ships as exactly two dot-sourced `.ps1` files named
       `hook-command-scanner.ps1` and `hook-command-invocation.ps1`, each existing at
       `.claude/hooks/`, `.codex/hooks/`, and both bundle locations (eight files total), each
       defining functions only, reading no stdin, containing no `$env:CLAUDE_` reference, and at or
       under 500 lines. Neither is a `.psm1`, and no file is added under `.claude/lib/` by this
       change.
-- [ ] The registration set from D9 as amended by D11.2 is complete: **fourteen entries across five
+- [x] The registration set from D9 as amended by D11.2 is complete: **fourteen entries across five
       registry files** — one entry per helper in each of the two pack manifests, one array member per
       helper in `$script:SharedModuleNames` in
       `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`, and two entries per helper
       (the `.claude/hooks/` and `.codex/hooks/` paths) in each of the two PoshQC coverage lists. The
       two coverage-list edits are **textually identical**, as
       `tests/scripts/dev_tools/test_poshqc_bundled_parity.py` requires.
-- [ ] **Both parity mechanisms are green in the same change:** the Codex byte-identity `It` in
+- [x] **Both parity mechanisms are green in the same change:** the Codex byte-identity `It` in
       `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` passes with every Codex
       canonical/bundle pair member byte-identical, and
       `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passes with the Claude
       pair content-equal; both pack-manifest assertions pass.
-- [ ] Recomputed pair-hash parity evidence (SHA-256 per pair member, line counts, and the method
+- [x] Recomputed pair-hash parity evidence (SHA-256 per pair member, line counts, and the method
       used) is recorded under
       `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/evidence/other/`,
       computed at the final commit rather than carried forward from an earlier batch.
-- [ ] Every production, test, and reusable script file touched or added by this change is at or
+- [x] Every production, test, and reusable script file touched or added by this change is at or
       under **500 lines**, verified by the Codex contract suite's line-cap check and by an explicit
       line-count artifact under `…-545/evidence/qa-gates/`.
-- [ ] Pester **line coverage is >= 85%** on every changed or added production PowerShell file, with
+- [x] Pester **line coverage is >= 85%** on every changed or added production PowerShell file, with
       `hook-command-scanner.ps1` inside the coverage denominator on both sides; coverage evidence is
       produced by invoking the self-hosted PoshQC module directly (the MCP runner reads the
       installed extension's settings and cannot see newly added coverage entries).
-- [ ] **No Python is introduced anywhere in the change**:
+- [x] **No Python is introduced anywhere in the change**:
       `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes with
       the new helper in its scan set, and no file added or modified by this change invokes a Python
       interpreter or adds a `.py` production file.
-- [ ] Issue #539's `spec.md` is annotated **additively** at all five locations listed in D8 (D4 rule
+- [x] Issue #539's `spec.md` is annotated **additively** at all five locations listed in D8 (D4 rule
       table row 14; deny-map rows at lines 150 and 153; design decision D8; and the Rollout &
       Follow-up deferral), each note citing issue #545, with **no existing sentence, table row, or
       decision text edited in place** — verified by reviewing the diff of that file for additions
       only.
-- [ ] **All nine in-scope hooks carry a diff, and each is delivered across its full copy set** (D11).
+- [x] **All nine in-scope hooks carry a diff, and each is delivered across its full copy set** (D11).
       `enforce-orchestration-preimplementation-gate.ps1`, `enforce-promotion-mcp-only.ps1`,
       `enforce-epic-merge-gate.ps1`, `enforce-epic-worktree-removal-gate.ps1`, and
       `validate-bash.ps1` are changed in all four locations each;
@@ -1555,14 +1566,14 @@ denies against a not-ready checkpoint.
       follow-up candidate is filed for the merge-gate, worktree-removal, abandon-gate, or
       `validate-bash` instances, because D11 delivers all of them here. The pull-request body states
       the supersession and names issue #591.
-- [ ] The PoshQC toolchain passes clean in a single pass over all changed and added PowerShell
+- [x] The PoshQC toolchain passes clean in a single pass over all changed and added PowerShell
       files: `mcp__drm-copilot__run_poshqc_format` → `mcp__drm-copilot__run_poshqc_analyze` →
       `mcp__drm-copilot__run_poshqc_test`, restarting from format on any failure or auto-fix, with
       final results recorded under `…-545/evidence/qa-gates/`.
-- [ ] Manual replay is recorded: the five 2026-08-24 over-match instances each proceed, and
+- [x] Manual replay is recorded: the five 2026-08-24 over-match instances each proceed, and
       `git -C <dir> add .` denies against a not-ready checkpoint, with results recorded under
       `…-545/evidence/qa-gates/`.
-- [ ] `enforce-promotion-mcp-only.ps1` in **all four copies** classifies a relocating `gh`
+- [x] `enforce-promotion-mcp-only.ps1` in **all four copies** classifies a relocating `gh`
       issue-creation spelling through the structural `gh` classifier of D2 Piece 3, per D10, so
       that `gh --repo drmoisan/drm-copilot issue create` and
       `gh -R drmoisan/drm-copilot issue new` are denied where they pass by non-match today; a named
@@ -1570,7 +1581,7 @@ denies against a not-ready checkpoint.
       `gh --repo drmoisan/drm-copilot issue list` still allows, asserted in the same file.
       (Concrete owner/repo values are used in place of the earlier angle-bracket placeholders so the
       asserted tokens are real literals.)
-- [ ] **AT-1, the mandatory latent-bypass case, denies.** A named Pester case drives
+- [x] **AT-1, the mandatory latent-bypass case, denies.** A named Pester case drives
       `Invoke-EpicWorktreeRemovalGateDecision` with the command text
       `git -C /repo/main worktree remove /repo/worktrees/item-a-101` against an epic checkpoint
       carrying no authorizing record, and asserts a deny decision whose reason begins with
@@ -1578,37 +1589,37 @@ denies against a not-ready checkpoint.
       unfixed hook, with fail-before output under
       `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/evidence/regression-testing/`,
       and passing after the fix in the same suite run.
-- [ ] **AT-2, the issue #591 operand mis-parse, is fixed.** A named Pester case drives
+- [x] **AT-2, the issue #591 operand mis-parse, is fixed.** A named Pester case drives
       `Get-EpicMergeGateCommandPrNumber` with the command text
       `cd C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-29T00-11 && gh pr merge --merge 688` and
       asserts the returned value is `688`, not `2026`. Two paired negatives pass in the same file:
       `gh pr merge --merge` with no number returns `$null`, and `gh pr merge 410 --merge` returns
       `410`.
-- [ ] **AT-4, the merge-gate over-match, allows.** A named Pester case drives
+- [x] **AT-4, the merge-gate over-match, allows.** A named Pester case drives
       `Invoke-EpicMergeGateDecision` with a `printf` command whose double-quoted text mentions the
       gated `gh pr merge --merge` phrase and asserts an allow decision. The case is recorded failing
       (as a deny with `EPIC_MERGE_GATE_BLOCKED`) against the unfixed hook.
-- [ ] **AT-6, the wrapper deny pin, still denies.** `Test-ImplementationCommand` returns `$true` for
+- [x] **AT-6, the wrapper deny pin, still denies.** `Test-ImplementationCommand` returns `$true` for
       `pwsh -NoProfile -Command "Invoke-Pester -Path tests/scripts/claude-hooks"`, asserted by a
       named case that runs in the **same suite** as AT-1 through AT-5 and AT-7 so a fail-open
       regression is visible in one place. The existing pin at
       `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Tests.ps1` line 140
       also passes unmodified.
-- [ ] **AT-7, the cross-runtime divergence, is closed.** Named Pester cases assert that
+- [x] **AT-7, the cross-runtime divergence, is closed.** Named Pester cases assert that
       `Get-ParallelWorktreeRemovalCommandPath` and `Get-EpicWorktreeRemovalCommandPath` both return
       `/repo/worktrees/item-a-101` for the command text
       `git worktree remove --force /repo/worktrees/item-a-101`, where both return the literal
       `--force` today. The existing flag-after-path case at
       `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1` line 78 passes
       unmodified.
-- [ ] **`validate-bash.ps1` matching-primitive change is delivered and pinned (D11.3).** Named
+- [x] **`validate-bash.ps1` matching-primitive change is delivered and pinned (D11.3).** Named
       Pester cases assert AT-8 (`git push --force-with-lease origin HEAD` allows), AT-9
       (`git -C ../wt push --force origin HEAD` denies), and AT-10 (a `git commit` whose quoted
       message mentions the recursive-remove literal allows). All six denylist literals returned by
       `Get-BlockedBashPattern` are **byte-unchanged**, verified by diff inspection recorded in the
       scope-and-size evidence artifact, and the six existing denylist pins plus the eight existing
       `cd`-chain pins in `tests/scripts/claude-hooks/validate-bash.Tests.ps1` pass unmodified.
-- [ ] **`enforce-parallel-abandon-gate.ps1` is fixed in both Claude copies and pinned.** Named Pester
+- [x] **`enforce-parallel-abandon-gate.ps1` is fixed in both Claude copies and pinned.** Named Pester
       cases assert AT-11 (a `grep` whose quoted search term is the abandon disposition token is out
       of scope) and AT-12 (the equals-joined spelling of the disposition option is in scope). Both
       token literals remain in their current single-assignment form at lines 41 and 42, and
@@ -1617,18 +1628,18 @@ denies against a not-ready checkpoint.
       including the order-independence case at line 62. **AT-12 may not be checked off until the
       equals-joined bypass is confirmed by an executed run**, per D11.6, because the finding is
       currently derived from `argparse` semantics rather than observed.
-- [ ] **`enforce-pr-author-skill.epic-base-branch.ps1` is fixed in both Claude copies.**
+- [x] **`enforce-pr-author-skill.epic-base-branch.ps1` is fixed in both Claude copies.**
       `Test-EpicBaseBranchOverride` evaluates its trigger through `Test-CommandLineInvocation`, and
       named Pester cases assert that a relocating `gh --repo drmoisan/drm-copilot pr create`
       spelling is classified in epic mode where it is skipped today, and that a quoted mention of
       the `gh pr create` phrase no longer produces `EPIC_BASE_BRANCH_MISMATCH`. The 113-line existing
       suite `tests/scripts/claude-hooks/enforce-pr-author-skill.epic-base-branch.Tests.ps1` passes
       unmodified.
-- [ ] **The Codex merge gate does not acquire the Claude copy's defect.** After the change,
+- [x] **The Codex merge gate does not acquire the Claude copy's defect.** After the change,
       `.codex/hooks/enforce-epic-merge-gate.ps1` still contains no unanchored whole-text digit scan;
       its PR-number resolution goes through `Get-CommandLineOperand` and `Get-CommandLineFlagValue`
       only. Verified by diff inspection recorded in the scope-and-size evidence artifact.
-- [ ] **The D12 parser contract is documented and honoured.** The public signatures of
+- [x] **The D12 parser contract is documented and honoured.** The public signatures of
       `Read-CommandLineSegment`, `Test-CommandLineInvocation`, `Get-CommandLineOperand`,
       `Get-CommandLineFlagValue`, `Test-CommandLineFlag`, and `Test-CommandLineMention` in the
       delivered code match the param blocks, types, and return shapes stated in D12, verified by a
@@ -1636,12 +1647,12 @@ denies against a not-ready checkpoint.
       The three constant accessors `Get-CommandLineWrapperName`,
       `Get-CommandLineTransparentWrapperName`, and `Get-CommandLineGlobalOption` exist and are
       pinned by membership cases.
-- [ ] **`Test-CommandLineFlag` exists and is exercised by all three presence-only call sites.** Named
+- [x] **`Test-CommandLineFlag` exists and is exercised by all three presence-only call sites.** Named
       Pester cases assert that it distinguishes an absent flag from a valueless present flag, and
       that `--body` does not match `--body-file`. A criterion asserting only
       `Get-CommandLineFlagValue` would leave the `--merge`, `--body`, and `--force` call sites
       unserved.
-- [ ] **The two deferred follow-ups from D11.6 are filed as separate potential entries, not folded
+- [x] **The two deferred follow-ups from D11.6 are filed as separate potential entries, not folded
       in**: the `$script:SharedModuleNames` registration gap for
       `.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1`, and runtime
       confirmation of the equals-joined disposition bypass in `enforce-parallel-abandon-gate.ps1`.

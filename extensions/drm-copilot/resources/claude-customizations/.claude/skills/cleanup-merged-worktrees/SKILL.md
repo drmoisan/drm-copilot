@@ -17,6 +17,7 @@ allowed-tools:
   - "Bash(git diff *)"
   - "Bash(git branch -r*)"
   - "Bash(git worktree list*)"
+  - "Bash(git worktree remove *)"
   - "Bash(gh issue view *)"
   - mcp__drm-copilot__new_potential_bug_entry
   - mcp__drm-copilot__potential_to_issue
@@ -121,6 +122,10 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
   a wrapping script. See the analogous apply-mode note in the End-to-End Workflow, where a
   blocked detached removal sets a non-zero exit status for the same reason.
 - `ACTION|<verb>|<target>|<result>` — apply-mode action results.
+- `PRESERVE|<worktree-path>|<source-path>|<verdict>` — a manifest `preserved_files[]`
+  finding staged onto the consolidation branch; `verdict` in `DEAD_ONE_OFF |
+  ALREADY_SOLVED_ELSEWHERE | STALE_OR_CONTRADICTED | GENUINELY_NEW | STILL_RELEVANT`. The
+  per-file outcome is reported by the companion `ACTION|preserve-stage|...` record.
 - `ORPHAN_DIR|<path>|<size>` — a directory under a worktree-tracking root that carries
   no `.git` pointer file and no `git worktree list` entry. `<size>` is best-effort and
   may be the literal `unknown`. The record is advisory: it reports the directory, and
@@ -169,8 +174,13 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
    (`artifacts/orchestration/orchestrator-state.json`) with `--require-pr-creation-ready`
    and record the `pr_author_preflight` result; delegation is prohibited when that
    validation fails. Then delegate PR creation to `Agent(pr-author)` per
-   `.claude/skills/pr-author/SKILL.md`, using `<N> = 396` for the body-file and receipt
-   contract. This skill never authors or creates the PR itself.
+   `.claude/skills/pr-author/SKILL.md`, which owns the body-file and receipt contract;
+   defer to that skill for it rather than restating any value from it here. For `<N>`,
+   use the GitHub issue number the run executes under when the run has one. When the run
+   has none, `<N>` is an arbitrary run-scoped identifier chosen by the pr-author agent.
+   It is not a pull-request number, and the only requirement on it is that the body-file
+   path, the receipt's `number` field, and the body bytes all agree. This skill never
+   authors or creates the PR itself.
 
 5. **Wait for merge and verify git-natively.** The consolidation PR's merge is
    **human-performed**: the operator merges it outside the agent session; this skill
@@ -322,13 +332,20 @@ specific files or commit SHAs, before step 9 acts on any finding.
    `mcp__drm-copilot__potential_to_issue` per
    `.claude/skills/feature-promotion-lifecycle/SKILL.md`. For a `SAFE_TO_DELETE`
    verdict, discard the content as a distinct, individually confirmed manual action —
-   clear the dirty working tree, or delete a disposable `NOT_MERGED`/
-   `HAS_UNIQUE_RESIDUALS` branch directly. This is never automated: the script's
-   classification ladder and apply-mode allowlist are never changed to accept these
-   states, so a `--apply` run never deletes them on its own, before or after triage. If
-   discarding the working-tree content changes the branch's classification (for example
-   to content-neutral against `main`), a follow-up report/apply pass then picks it up
-   through the normal deterministic path.
+   clear the dirty working tree, delete a disposable `NOT_MERGED`/`HAS_UNIQUE_RESIDUALS`
+   branch directly, or remove the worktree itself through a
+   manifest-authorized removal. A manifest-authorized removal is a single
+   `git worktree remove <path>` covering one worktree, issued as its own Bash tool call,
+   one call per worktree, and it is authorized only when the Sanctioned Removal Manifest
+   below carries a record for that exact path whose `removal_disposition` is
+   `SAFE_TO_DELETE` and whose `branch_state` is `NOT_MERGED` or `HAS_UNIQUE_RESIDUALS`.
+   Never pass a force flag to that command: a dirty worktree blocks deletion and is
+   reported for manual handling, and it is never force-removed. This is never automated:
+   the script's classification ladder and apply-mode allowlist are never changed to
+   accept these states, so a `--apply` run never deletes them on its own, before or
+   after triage. If discarding the working-tree content changes the branch's
+   classification (for example to content-neutral against `main`), a follow-up
+   report/apply pass then picks it up through the normal deterministic path.
 
    Distinguish two different discards. The sentence above governs the editorial discard
    of `UNIQUE` content — content a human judged safe to lose — and that discard stays
@@ -351,6 +368,133 @@ specific files or commit SHAs, before step 9 acts on any finding.
     confirmation — never delete an origin branch as an automatic consequence of local
     cleanup, and never rely on this skill's general `Bash(git push *)` allowance to
     perform it silently.
+
+## Sanctioned Removal Manifest
+
+**Write the manifest before step 9 of the Dirty Worktree Triage Procedure acts on any
+`SAFE_TO_DELETE` verdict.** The run records its triage verdicts in
+`artifacts/orchestration/cleanup-worktrees-manifest.json`. The two PreToolUse gates
+`.claude/hooks/enforce-epic-worktree-removal-gate.ps1` and
+`.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` read that document and admit a
+`git worktree remove <path>` command only when a record in it covers that exact path. A removal
+issued with no covering record is denied with each gate's existing, unchanged reason code.
+
+The document is UTF-8 JSON with `snake_case` keys. It carries six top-level fields. Its `removals`
+and `preserved_files` entries are sibling arrays and are never nested: removal records are keyed by
+worktree path, preserve records by the pair of worktree path and file path, and the gates must
+never traverse preserve data.
+
+### Top-level fields
+
+- `tool` — string, required, exactly `cleanup-merged-worktrees`. The self-identifying
+  discriminator. Absent, non-string, or any other value and no record authorizes anything.
+- `schema_version` — integer, required, exactly `1`. Absent, non-integer, or any other value fails
+  closed; a forward version is not accepted by silence.
+- `generated_at` — string, required, an ISO-8601 UTC timestamp recording when the run wrote the
+  document. Absent, unparseable, in the future, or older than the 24-hour freshness bound fails
+  closed.
+- `run_id` — string, required, non-empty. An opaque per-run identifier for audit correlation.
+- `removals` — array, required, of removal records. It may be empty; absent, non-array, or empty
+  authorizes no removal.
+- `preserved_files` — array, required, of preserve records. It may be empty. Neither gate ever
+  reads it, and its absence or malformation must not affect any gate decision.
+
+### `removals[]` record fields
+
+- `worktree_path` — string, required, non-empty. The absolute path of the worktree to remove. A
+  record with it absent or empty is skipped.
+- `branch` — string or `null`, key required. The worktree's branch, or `null` for a detached
+  worktree. An absent key means the record does not authorize; `null` is a valid, meaningful value.
+- `branch_state` — string, required. The classification the report emitted for that branch: one of
+  `MERGED_CLEAN`, `MERGED_CONTENT_NEUTRAL`, `MERGED_EQUIVALENT`, `NOT_MERGED`,
+  `HAS_UNIQUE_RESIDUALS`, or `PROTECTED_CURRENT`. Only `NOT_MERGED` and `HAS_UNIQUE_RESIDUALS`
+  authorize a removal; every other member, and any value outside the vocabulary, does not.
+- `removal_disposition` — string, required. The triage disposition that authorizes removal. The
+  allowed set is exactly the single member `SAFE_TO_DELETE`. This key is deliberately distinct from
+  the `merge_status` key the orchestration checkpoints carry.
+- `verdict` — string, required. The step-5 content classification that produced the disposition:
+  one of `DEAD_ONE_OFF`, `ALREADY_SOLVED_ELSEWHERE`, `STALE_OR_CONTRADICTED`, `GENUINELY_NEW`, or
+  `STILL_RELEVANT`. Absent, out of vocabulary, or preserve-implying and the record does not
+  authorize.
+- `evidence` — string, required, non-empty. The justification step 9 requires, citing specific
+  files or commit SHAs. Absent, empty, or whitespace-only and the record does not authorize.
+
+### `preserved_files[]` record fields
+
+These records serve the consolidation consumer and are never read by either gate.
+
+- `worktree_path` — string, required, non-empty. The worktree holding the file, and where the
+  consumer reads that worktree's `MEMORY.md`.
+- `source_path` — string, required, repo-relative within that worktree. The file to preserve.
+- `change_class` — string, required, either `untracked` or `modified`, recording whether staging
+  adds a new file or carries a working-tree modification.
+- `disposition` — string, required, exactly `PRESERVE`.
+- `verdict` — string, required, a member of the step-5 verdict vocabulary listed above.
+- `target_path` — string, required, repo-relative on the consolidation branch. Required because the
+  same relative path may already exist on `main` with different content and a lesson file may be
+  re-namespaced; the consumer must not guess it.
+- `memory_index_line` — string or `null`, key required. The source worktree's `MEMORY.md` index
+  line, or `null` when the file is not a memory entry.
+- `line_ending` — string, required, one of `crlf`, `lf`, or `absent`. Advisory only: it records the
+  target file's existing convention, and the consumer re-derives and compares rather than trusting
+  it.
+- `host_token_scan` — object, required, carrying a `result` member and a `pattern_set_id` member.
+  It records the scan outcome and the identifier of the pattern set used, never the patterns
+  themselves.
+- `evidence` — string, required, non-empty.
+
+### Example
+
+```json
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "generated_at": "2026-09-07T03:40:00Z",
+  "run_id": "cleanup-2026-09-07T03-40-00Z-a47a5e33",
+  "removals": [
+    {
+      "worktree_path": "C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-0f1c2d",
+      "branch": "drm-copilot-wt-2026-08-14T09-02",
+      "branch_state": "HAS_UNIQUE_RESIDUALS",
+      "removal_disposition": "SAFE_TO_DELETE",
+      "verdict": "ALREADY_SOLVED_ELSEWHERE",
+      "evidence": "Unique residual commit 3f9a1c2 records the cleanup-worktrees ancestry error; main already fixes it at scripts/bash/cleanup_worktrees_lib.sh:214-231 under issue #612."
+    }
+  ],
+  "preserved_files": [
+    {
+      "worktree_path": "C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-91ee43",
+      "source_path": ".claude/agent-memory/general-purpose/hook-payload-anomaly.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": ".claude/agent-memory/general-purpose/hook-payload-anomaly-envelope.md",
+      "memory_index_line": "- [Hook payload anomaly envelope](hook-payload-anomaly-envelope.md) - the deny path a malformed envelope takes",
+      "line_ending": "crlf",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "child-f-host-tokens-v1"
+      },
+      "evidence": "No equivalent file on main under .claude/agent-memory/**; grep for 'payload anomaly' returns only this worktree."
+    }
+  ]
+}
+```
+
+### Accepted residual
+
+Both gates read the command text of the `Bash` tool call they are given. A removal routed
+indirectly — for example by writing the command into a file and invoking that file with `bash
+<file>` — presents command text the gates do not match, so the manifest requirement does not reach
+it. This design does not close that indirection, and the requirement is recorded here as an
+accepted residual rather than left implicit.
+
+The manifest requirement is a policy-level integrity check, on the same terms
+`.claude/hooks/enforce-pr-author-skill.ps1` records for its own receipt mechanism: it prevents
+accidental bypass and requires a deliberate, documented act to circumvent. It is not a
+cryptographic or security boundary, and it must not be described as tamper-proof. Routing a
+removal through such an indirection in order to avoid the manifest requirement is a deliberate act
+and is prohibited by this skill, which is the term the residual rests on.
 
 ## Prohibited Shortcuts
 

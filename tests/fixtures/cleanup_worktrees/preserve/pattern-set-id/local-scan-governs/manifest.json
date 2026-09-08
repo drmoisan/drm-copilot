@@ -1,0 +1,22 @@
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "removals": [],
+  "preserved_files": [
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/pattern-set-id/local-scan-governs/wt",
+      "source_path": "agent-memory/atomic-executor/governed-lesson.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "null",
+      "memory_index_line": null,
+      "line_ending": "absent",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "child-f-host-tokens-v1"
+      },
+      "evidence": "preserve/pattern-set-id/local-scan-governs fixture: a superseded identifier with a source that carries a token"
+    }
+  ]
+}
