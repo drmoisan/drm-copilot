@@ -30,6 +30,9 @@ param()
 
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+# Sanctioned-removal manifest reader (issue #635), consumed by the manifest branch in
+# Invoke-ParallelWorktreeRemovalGateDecision. Same module the epic gate imports.
+Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -Force
 # Shared command-line parser (issue #545), consumed by the scope filter in
 # Invoke-ParallelWorktreeRemovalGateDecision and by Get-ParallelWorktreeRemovalCommandPath.
 # Both call sites are byte-for-byte the calls the epic gate makes, so the duplicated
@@ -38,6 +41,10 @@ Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -
 . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
 $script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json'
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
+# Sanctioned-removal manifest location. Recorded here beside the checkpoint path so
+# every hook-read document this gate consults is named in one place; the module owns
+# the read itself.
+$script:CleanupWorktreeManifestPath = 'artifacts/orchestration/cleanup-worktrees-manifest.json'
 
 function Get-ParallelWorktreeRemovalGateCheckpointContent {
     <#
@@ -254,6 +261,21 @@ function Invoke-ParallelWorktreeRemovalGateDecision {
 
     $itemRecord = Find-ParallelWorktreeItemRecord -Checkpoint $checkpoint -WorktreePath $worktreePath
     if (Test-ParallelWorktreeRemovalAllowed -ItemRecord $itemRecord) {
+        return Get-ParallelWorktreeGateAllowDecision
+    }
+
+    # Sanctioned-removal manifest branch (issue #635). It runs last, so a
+    # checkpoint-authorized removal still allows at the same decision point it does
+    # today and no transcript attribution changes.
+    #
+    # The coverage test is a PRESENCE test, deliberately not an authorization test. A
+    # target this checkpoint records at all is excluded from this branch regardless of
+    # that record's merge_status, so a removal the checkpoint does not authorize still
+    # reaches the unchanged deny below. This gate defines only the parallel checkpoint
+    # seam and has no epic-checkpoint seam, so its exclusion covers the items array
+    # only; the epic gate covers the features array with its own exclusion.
+    if (-not (Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'items' -WorktreePath $worktreePath) -and
+        (Test-CleanupWorktreeManifestAuthorizesRemoval -WorktreePath $worktreePath)) {
         return Get-ParallelWorktreeGateAllowDecision
     }
 

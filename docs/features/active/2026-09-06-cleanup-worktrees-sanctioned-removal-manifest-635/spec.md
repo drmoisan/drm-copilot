@@ -878,25 +878,25 @@ required names; the atomic planner may add cases but must not rename these.
 
 ### Fail-before regression
 
-- [ ] **AC-01** In `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Tests.ps1`, the
+- [x] **AC-01** In `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Tests.ps1`, the
       test `It 'allows removal when a fresh manifest record authorizes the target'` passes:
       `Invoke-EpicWorktreeRemovalGateDecision` returns `permissionDecision` `allow` for
       `git worktree remove <path>` when a manifest satisfying conditions 1-10 covers `<path>` and
       no checkpoint records it. Fail-before output against the unfixed hook is recorded under
       `evidence/regression-testing/`.
-- [ ] **AC-02** In `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1`,
+- [x] **AC-02** In `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1`,
       the test `It 'allows removal when a fresh manifest record authorizes the target'` passes for
       `Invoke-ParallelWorktreeRemovalGateDecision` under the same conditions. Fail-before output
       recorded under `evidence/regression-testing/`.
 
 ### Condition 10 — narrow-scope deny pins
 
-- [ ] **AC-03** `It 'denies a manifest-covered removal whose target an epic checkpoint records'`
+- [x] **AC-03** `It 'denies a manifest-covered removal whose target an epic checkpoint records'`
       passes: with a manifest record satisfying conditions 1-9 for `<path>` **and** an epic
       checkpoint `features[]` record for the same normalized `<path>` carrying a `merge_status`
       outside `{merged, worktree_removed}`, the epic gate returns `deny` with a reason beginning
       `EPIC_WORKTREE_REMOVAL_BLOCKED`.
-- [ ] **AC-04** `It 'denies a manifest-covered removal whose target a parallel checkpoint records'`
+- [x] **AC-04** `It 'denies a manifest-covered removal whose target a parallel checkpoint records'`
       passes: with a manifest record satisfying conditions 1-9 for `<path>` **and** a parallel
       checkpoint `items[]` record for the same normalized `<path>` carrying a `merge_status`
       outside `{merged, worktree_removed}`, the parallel gate returns `deny` with a reason
@@ -904,74 +904,74 @@ required names; the atomic planner may add cases but must not rename these.
 
 ### Non-regression of existing enforcement
 
-- [ ] **AC-05** The two deny reason strings are unchanged. A named test asserts the epic gate's
+- [x] **AC-05** The two deny reason strings are unchanged. A named test asserts the epic gate's
       block reason and the parallel gate's block reason are character-for-character equal to the
       strings recorded in this specification's Repro & Evidence section for the epic gate and in
       `enforce-parallel-worktree-removal-gate.ps1` today for the parallel gate.
-- [ ] **AC-06** Non-widening pin: every pre-existing `It` in both gate suites that exercises the
+- [x] **AC-06** Non-widening pin: every pre-existing `It` in both gate suites that exercises the
       epic gate's branch 1 or branch 2, or the parallel gate's single branch, passes unchanged with
       no assertion weakened and no fixture altered. The manifest branch adds allows and removes
       none.
-- [ ] **AC-07** `$script:AllowedMergeStatuses` in both hooks still equals exactly
+- [x] **AC-07** `$script:AllowedMergeStatuses` in both hooks still equals exactly
       `@('merged', 'worktree_removed')`, asserted by a named test. The `merge_status` allow-set is
       not widened by this change.
 
 ### Fail-closed matrix (conditions 1 through 9)
 
-- [ ] **AC-08** Condition 1: named tests cover manifest file absent, raw text null/whitespace, and
+- [x] **AC-08** Condition 1: named tests cover manifest file absent, raw text null/whitespace, and
       `ConvertFrom-Json` throwing. Each returns `deny` from both gates.
-- [ ] **AC-09** Condition 2: named tests cover `tool` absent, `tool` set to any other value,
+- [x] **AC-09** Condition 2: named tests cover `tool` absent, `tool` set to any other value,
       `schema_version` absent, `schema_version` non-integer, and `schema_version` equal to `2`.
       Each returns `deny` from both gates.
-- [ ] **AC-10** Condition 3: named tests, driven through the injected clock seam with no wall-clock
+- [x] **AC-10** Condition 3: named tests, driven through the injected clock seam with no wall-clock
       read, cover `generated_at` absent, unparseable, in the future, exactly at the 24-hour bound,
       and beyond the 24-hour bound. The out-of-bound, future, absent, and unparseable cases return
       `deny`; the at-bound case's decision is asserted explicitly.
-- [ ] **AC-11** Condition 4: named tests cover `removals` absent, `removals` non-array, and
+- [x] **AC-11** Condition 4: named tests cover `removals` absent, `removals` non-array, and
       `removals` empty. Each returns `deny` from both gates.
-- [ ] **AC-12** Condition 5: named tests assert that a trailing-slash target, a quoted target, and
+- [x] **AC-12** Condition 5: named tests assert that a trailing-slash target, a quoted target, and
       a Windows-separator target each compare equal to a recorded POSIX `worktree_path` and are
       allowed; and that a non-matching path returns `deny`. A record whose `worktree_path` key is
       absent is skipped and the scan continues to a later matching record.
-- [ ] **AC-13** Condition 6: named tests cover `removal_disposition` absent, set to `PRESERVE`, and
+- [x] **AC-13** Condition 6: named tests cover `removal_disposition` absent, set to `PRESERVE`, and
       set to any value outside the single-member allowed set. Each returns `deny`.
-- [ ] **AC-14** Condition 7: named tests cover `evidence` absent, empty string, and whitespace-only.
+- [x] **AC-14** Condition 7: named tests cover `evidence` absent, empty string, and whitespace-only.
       Each returns `deny`.
-- [ ] **AC-15** Condition 8: named tests cover `verdict` absent, out of vocabulary,
+- [x] **AC-15** Condition 8: named tests cover `verdict` absent, out of vocabulary,
       `GENUINELY_NEW`, and `STILL_RELEVANT`. Each returns `deny`.
-- [ ] **AC-16** Condition 9: named tests cover `branch_state` absent, `PROTECTED_CURRENT`, each of
+- [x] **AC-16** Condition 9: named tests cover `branch_state` absent, `PROTECTED_CURRENT`, each of
       `MERGED_CLEAN`, `MERGED_CONTENT_NEUTRAL`, and `MERGED_EQUIVALENT`, and a value outside the
       vocabulary. Each returns `deny`. Named tests also confirm `NOT_MERGED` and
       `HAS_UNIQUE_RESIDUALS` are allowed when conditions 1-8 and 10 hold.
 
 ### Contract and vocabulary pins
 
-- [ ] **AC-17** `It 'never reads preserved_files'` passes: a manifest whose `preserved_files` array
+- [x] **AC-17** `It 'never reads preserved_files'` passes: a manifest whose `preserved_files` array
       is malformed (non-array, or containing records missing every required field) produces exactly
       the same decision from both gates as the same manifest with `preserved_files` set to `[]`.
-- [ ] **AC-18** `It 'resolves duplicate worktree_path records on the first match'` passes: a
+- [x] **AC-18** `It 'resolves duplicate worktree_path records on the first match'` passes: a
       manifest with two `removals[]` records sharing a normalized `worktree_path`, the first
       non-authorizing and the second authorizing, returns `deny`; and with the order reversed,
       returns `allow`.
-- [ ] **AC-19** The allowed-disposition set is a script-scope constant in the new module whose
+- [x] **AC-19** The allowed-disposition set is a script-scope constant in the new module whose
       value is exactly the single member `SAFE_TO_DELETE`, asserted by a named test following the
       `$script:AllowedMergeStatuses` precedent.
-- [ ] **AC-20** The authorized-branch-state set is a script-scope constant in the new module whose
+- [x] **AC-20** The authorized-branch-state set is a script-scope constant in the new module whose
       value is exactly `NOT_MERGED` and `HAS_UNIQUE_RESIDUALS`, asserted by a named test.
 
 ### Delivery obligations
 
-- [ ] **AC-21** `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passes, with
+- [x] **AC-21** `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passes, with
       `.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1`, both changed hooks, and the
       changed `SKILL.md` present and text-equal in
       `extensions/drm-copilot/resources/claude-customizations/.claude/**`.
-- [ ] **AC-22** `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`
+- [x] **AC-22** `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`
       passes with the new module entry present in
       `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`.
-- [ ] **AC-23** `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`
+- [x] **AC-23** `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`
       passes and its allowlist is still empty, asserted by the suite's existing empty-allowlist
       test.
-- [ ] **AC-24** `.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1` appears in the
+- [x] **AC-24** `.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1` appears in the
       `CodeCoverage.Path` list of both `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`
       and `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`.
 - [ ] **AC-25** Line coverage is >= 85% for `CleanupWorktreeManifest.psm1`,
@@ -983,22 +983,22 @@ required names; the atomic planner may add cases but must not rename these.
       canonical set in `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` is
       `baseline/`, `regression-testing/`, `qa-gates/`, `issue-updates/`, `other/`, and
       `remediation-baseline/`, and coverage output belongs under `qa-gates/`.
-- [ ] **AC-26** `.claude/lib/hook-payload/HookPayload.psm1` carries no diff in this change.
-- [ ] **AC-27** No file changed or added by this work exceeds 500 lines, verified per file:
+- [x] **AC-26** `.claude/lib/hook-payload/HookPayload.psm1` carries no diff in this change.
+- [x] **AC-27** No file changed or added by this work exceeds 500 lines, verified per file:
       both gate hooks, the new module, both changed Pester suites, and the new Pester suite.
-- [ ] **AC-28** No test added by this work creates, writes, or reads a temporary file; the manifest
+- [x] **AC-28** No test added by this work creates, writes, or reads a temporary file; the manifest
       read boundary and the clock boundary are exercised exclusively through the module's
       injectable seams.
 
 ### Scope-boundary pins
 
-- [ ] **AC-29** `.codex/hooks/enforce-epic-worktree-removal-gate.ps1` carries no diff (D7).
-- [ ] **AC-30** `.claude/hooks/validate-bash.ps1`, `.claude/hooks/enforce-epic-merge-gate.ps1`,
+- [x] **AC-29** `.codex/hooks/enforce-epic-worktree-removal-gate.ps1` carries no diff (D7).
+- [x] **AC-30** `.claude/hooks/validate-bash.ps1`, `.claude/hooks/enforce-epic-merge-gate.ps1`,
       `scripts/bash/cleanup-worktrees.sh`, `scripts/bash/cleanup_worktrees_lib.sh`,
       `scripts/bash/cleanup_worktrees_actions_lib.sh`, and
       `scripts/bash/cleanup_worktrees_enumerate_lib.sh` all carry no diff (D10 and the epic's
       conflict-freedom constraint).
-- [ ] **AC-31** In both gate hooks, the extraction regex strings, their `.Trim('"''')` calls, the
+- [x] **AC-31** In both gate hooks, the extraction regex strings, their `.Trim('"''')` calls, the
       trigger guards, the bodies of `Get-EpicWorktreeRemovalCommandPath` and
       `Get-ParallelWorktreeRemovalCommandPath`, the decision constructors, the entry points, and
       the thin tails are unchanged (D6 must-not-touch list). Line numbers re-derived at execution
@@ -1006,30 +1006,30 @@ required names; the atomic planner may add cases but must not rename these.
 
 ### Skill-text changes
 
-- [ ] **AC-32** `.claude/skills/cleanup-merged-worktrees/SKILL.md` contains a manifest-write step
+- [x] **AC-32** `.claude/skills/cleanup-merged-worktrees/SKILL.md` contains a manifest-write step
       naming `artifacts/orchestration/cleanup-worktrees-manifest.json` and specifying the top-level
       fields, the `removals[]` fields, and the `preserved_files[]` fields defined in this
       specification.
-- [ ] **AC-33** `SKILL.md` step 9 of the Dirty Worktree Triage Procedure explicitly authorizes a
+- [x] **AC-33** `SKILL.md` step 9 of the Dirty Worktree Triage Procedure explicitly authorizes a
       per-worktree `git worktree remove <path>`, issued as its own Bash tool call, for a
       `SAFE_TO_DELETE` verdict on a `NOT_MERGED` or `HAS_UNIQUE_RESIDUALS` worktree the manifest
       covers.
-- [ ] **AC-34** `SKILL.md` `allowed-tools` contains `Bash(git worktree remove *)` with no force
+- [x] **AC-34** `SKILL.md` `allowed-tools` contains `Bash(git worktree remove *)` with no force
       spelling, and the force-flag prohibition is restated adjacent to the new step-9 action.
-- [ ] **AC-35** `SKILL.md` contains no occurrence of the literal `396`, and `SKILL.md:104`'s
+- [x] **AC-35** `SKILL.md` contains no occurrence of the literal `396`, and `SKILL.md:104`'s
       replacement text instructs use of the GitHub issue number the run executes under when one
       exists, deferring to `.claude/skills/pr-author/SKILL.md`, and states for the no-issue-number
       case that `<N>` is an arbitrary run-scoped identifier chosen by the pr-author agent, that it
       is not a PR number, and that the only requirement is agreement between the body-file path,
       the receipt's `number` field, and the body bytes.
-- [ ] **AC-36** `SKILL.md` records the `bash <file>` indirection as an accepted residual using the
+- [x] **AC-36** `SKILL.md` records the `bash <file>` indirection as an accepted residual using the
       `enforce-pr-author-skill.ps1:35-41` posture — a policy-level integrity check that prevents
       accidental bypass and requires a deliberate, documented act to circumvent, not a
       cryptographic or security boundary.
 
 ### Toolchain
 
-- [ ] **AC-37** A full PowerShell toolchain loop completes in a single clean pass:
+- [x] **AC-37** A full PowerShell toolchain loop completes in a single clean pass:
       `mcp__drm-copilot__run_poshqc_format` → `mcp__drm-copilot__run_poshqc_analyze` →
       `mcp__drm-copilot__run_poshqc_test`, with zero analyzer findings and no auto-fixed files on
       the final pass.

@@ -195,6 +195,12 @@
             '.claude/lib/mermaid/MermaidLineScanner.psm1'
             '.claude/lib/mermaid/MermaidMarkdownFences.psm1'
             '.claude/lib/mermaid/MermaidValidation.psm1'
+            # Issue #635 added the sanctioned-removal manifest module read by both worktree
+            # removal gate hooks. CodeCoverage.Path is an explicit per-file allow-list, so an
+            # unregistered production file would sit outside the coverage denominator, which
+            # the Coverage Exclusion Policy forbids. Registered here beside the other
+            # .claude/lib modules.
+            '.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1'
             # Issue #501 fixed the PreToolUse payload transport and shape across the whole
             # hook surface. CodeCoverage.Path is an explicit per-file allow-list, so the new
             # shared payload module, the six hooks that were changed but never registered,
