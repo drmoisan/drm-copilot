@@ -30,6 +30,11 @@ source "$SCRIPT_DIR/cleanup_worktrees_actions_lib.sh"
 # shellcheck source=scripts/bash/cleanup_worktrees_detached_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_detached_lib.sh"
+# The disposable-dirt classifier is called BY run_report and BY delete_candidate in the
+# libraries above; every function is resolved at call time, so it is sourced last.
+# shellcheck source=scripts/bash/cleanup_worktrees_dirt_lib.sh
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/cleanup_worktrees_dirt_lib.sh"
 
 usage() {
 	# Print the wrapper usage/help text.
@@ -47,13 +52,30 @@ Commands:
                        HAS_UNIQUE_RESIDUALS, or PROTECTED_CURRENT candidates.
   --help | -h | help   Print this help and exit 0.
 
+Flags:
+  --clear-disposable   Apply mode only, opt-in, and destructive. When a worktree removal
+                       is blocked because the worktree is dirty, and every per-file
+                       verdict for that worktree is disposable, the working tree is
+                       cleared with reset --hard and clean -fd and the SAME unforced
+                       removal is retried once after a fresh in-process re-verification.
+                       Refuses the clear for the whole worktree when any per-file verdict
+                       is UNIQUE, including the fail-closed UNIQUE assigned when a
+                       classification read errors. Ignored files are never cleared. This
+                       flag may be given before or after the apply argument; supplying it
+                       without apply mode is a usage error and exits 2.
+
 Report lines (pipe-delimited, LC_ALL=C ordered): BRANCH|<name>|<state>;
 COMMIT|<branch>|<sha>|<state>|<paths>|<author>|<date>;
 WORKTREE|<path>|<branch>|<flags> for a branch-backed worktree registration;
 WORKTREE|<path>|DETACHED|<state>|<flags> for a detached-HEAD worktree registration,
 which is classified on its own HEAD SHA and whose fifth field preserves the porcelain
 locked and prunable markers; WARN|main-divergence|<local>|<origin>;
-DIRTY|<path>|<status>; ACTION|<verb>|<target>|<result> (apply mode).
+DIRTY|<path>|<status>; ACTION|<verb>|<target>|<result> (apply mode);
+DIRTFILE|<worktree>|<verdict>|<detail>|<xy>|<path>, one per dirty entry in porcelain order;
+DIRTSUM|<worktree>|<aggregate>|<detail>, exactly one per dirty worktree. The verdicts are
+DISPOSABLE_BUILD_ARTIFACT, DISPOSABLE_SESSION_ARTIFACT, CONTENT_ON_MAIN, CONTENT_IN_HISTORY,
+STAGED_TREE_IS_COMMIT, and UNIQUE; the aggregate is ALL_DISPOSABLE or HAS_UNIQUE. Both are
+read-only records and neither unlocks a destructive action on its own.
 
 Advisory, read-only records (report and apply mode; none unlocks a destructive action):
 ORPHAN_DIR|<path>|<size> for a scanned directory with no .git pointer file and no
@@ -98,6 +120,43 @@ main() {
 	# shell-qc.sh). Subcommand return codes are captured so an intermediate failure is
 	# never masked before the final exit.
 	local exit_code=0
+	# --clear-disposable pre-pass, run before the dispatch below so the flag may be given
+	# on either side of the mode argument. The flag is stripped from the argument list and
+	# the remaining first argument must select apply mode: the flag is opt-in and
+	# destructive, so pairing it with report mode (or with no mode at all) is a usage error
+	# rather than a silently ignored flag. Every case arm below is unchanged.
+	local -a args=()
+	local clear_flag=0 arg
+	for arg in "$@"; do
+		if [[ $arg == "--clear-disposable" ]]; then
+			clear_flag=1
+			continue
+		fi
+		args+=("$arg")
+	done
+	if ((clear_flag == 1)); then
+		case "${args[0]:-}" in
+		--apply | apply) ;;
+		*)
+			usage >&2
+			return 2
+			;;
+		esac
+		# Read across a source boundary shellcheck does not follow:
+		# cleanup_worktrees_dirt_lib.sh gates clear_disposable_dirt on this variable and
+		# cleanup_worktrees_actions_lib.sh gates delete_candidate's clear-and-retry block
+		# on it, so SC2034 reports it unused here. The suppression below is line-scoped,
+		# not file-scoped, so SC2034 stays live for every other variable in this file.
+		# The assignment's effect is pinned end to end by the wrapper-driven test pair at
+		# the foot of tests/shell/test_cleanup_worktrees_dirt_clear.bats.
+		# shellcheck disable=SC2034
+		CLEANUP_WT_CLEAR_DISPOSABLE=1
+	fi
+	if ((${#args[@]} > 0)); then
+		set -- "${args[@]}"
+	else
+		set --
+	fi
 	local command=${1:-}
 	case "$command" in
 	"" | report)

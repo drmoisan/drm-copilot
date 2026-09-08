@@ -14,6 +14,7 @@ setup() {
     RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
     DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
+    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
@@ -29,7 +30,7 @@ apply() { # apply <scenario-dir>
     # than reading the real .claude/worktrees tree.
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
         CLEANUP_WT_STUB_SCENARIO="$1" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${RLIB}'; source '${ALIB}'; source '${DLIB}'; run_apply"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${RLIB}'; source '${ALIB}'; source '${DLIB}'; run_apply"
 }
 
 @test "a dirty worktree blocks removal, reports DIRTY lines, and never forces" {
@@ -44,7 +45,7 @@ apply() { # apply <scenario-dir>
 
 @test "a candidate whose re-verification flips is blocked before any branch delete" {
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/unmerged" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; delete_candidate feature-unmerged /repo-wt/x MERGED_CLEAN"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; delete_candidate feature-unmerged /repo-wt/x MERGED_CLEAN"
     [ "$status" -ne 0 ]
     [[ "$output" == *"ACTION|delete|feature-unmerged|BLOCKED-REVERIFY"* ]]
     [[ "$output" != *"branch -D feature-unmerged"* ]]
@@ -106,7 +107,7 @@ apply() { # apply <scenario-dir>
     # for each of the two rev-parse invocations the tip-equality pre-check makes, and
     # bats merges stderr into $output.
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${DEL}/consolidated_zero_commit" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; verify_consolidation_merged"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; verify_consolidation_merged"
     [ "$status" -eq 1 ]
     [[ "$output" == *"NOT_ANCESTOR"* ]]
     [[ "$output" != *"MERGED_CLEAN"* ]]
@@ -120,7 +121,7 @@ apply() { # apply <scenario-dir>
     # assertion below meaningful, and the same retention puts `stub-git: ` lines into
     # $output.
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/merged_no_worktree" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; verify_consolidation_merged"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; verify_consolidation_merged"
     [ "$status" -eq 2 ]
     [[ "$output" == *"ANCESTRY_ERROR"* ]]
     [[ "$output" != *"MERGED_CLEAN"* ]]

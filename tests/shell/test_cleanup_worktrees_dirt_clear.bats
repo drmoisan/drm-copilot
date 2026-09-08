@@ -6,6 +6,16 @@
 # verdict including the fail-closed one, re-verifies after clearing and before retrying
 # the removal, and that report mode issues no mutating command at all.
 #
+# TWO DRIVERS. Tests 1 through 8 invoke delete_candidate directly with the environment
+# variable already set; the final two tests invoke the WRAPPER with the command-line flag.
+# Both are required and neither substitutes for the other. The direct driver is the only
+# one whose call sequence is short enough for the ordinal assertions in tests 1, 5, and 8
+# to be written over a specific occurrence. The wrapper driver is the only one that
+# observes the flag pre-pass at scripts/bash/cleanup-worktrees.sh:145, which is the line
+# that sets CLEANUP_WT_CLEAR_DISPOSABLE in production: with the direct driver alone, a
+# wrapper that never set that variable would leave --clear-disposable permanently disarmed
+# and every test in this file would still pass.
+#
 # DRIVER, stated because the ordinal assertions in tests 1, 5, and 8 depend on it.
 # Tests 1 through 8 invoke delete_candidate DIRECTLY under CLEANUP_WT_CLEAR_DISPOSABLE,
 # in the form used at tests/shell/test_cleanup_worktrees_deletion.bats:47, and not
@@ -45,6 +55,7 @@ setup() {
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
     DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
     DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
+    WRAPPER="${REPO_ROOT}/scripts/bash/cleanup-worktrees.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
@@ -221,4 +232,52 @@ count_of() { # count_of <pattern>
     status_reads="$(printf '%s\n' "$log" | grep 'status --porcelain' || true)"
     [ -n "$status_reads" ]
     [ "$(printf '%s\n' "$status_reads" | grep -c -- '--no-optional-locks')" -eq "$(printf '%s\n' "$status_reads" | grep -c 'status --porcelain')" ]
+}
+
+# --- Wrapper-driven pair: the flag arrives on the command line ---
+#
+# These two tests are what make the flag pre-pass falsifiable. Every test above sets
+# CLEANUP_WT_CLEAR_DISPOSABLE in the environment itself, so a wrapper that never set it
+# would leave the feature permanently disarmed and every test above would still pass.
+
+wrapper_apply() { # wrapper_apply <scenario> [extra-flag...]
+    # The whole wrapper, end to end. `env -u` removes the variable from the child's
+    # environment so the only thing that can set it is the pre-pass in main; without that
+    # removal an ambient value would make the no-flag direction below unfalsifiable.
+    local scenario="$1"
+    shift
+    run env -u CLEANUP_WT_CLEAR_DISPOSABLE \
+        CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="${SCEN}/${scenario}" \
+        bash "${WRAPPER}" --apply "$@"
+}
+
+@test "dirt_clear_all_disposable through the wrapper: --apply --clear-disposable arms the clearing sequence" {
+    wrapper_apply dirt_clear_all_disposable --clear-disposable
+    [[ "$output" == *'ACTION|dirt-clear|/repo-wt/dirt|OK'* ]]
+    reset_pos="$(nth_line_of 1 'reset --hard')"
+    clean_pos="$(nth_line_of 1 'clean -fd')"
+    # The SECOND removal is the retry; the first is the attempt that failed and is what
+    # made the clearing hook reachable, exactly as in the direct-driver tests above.
+    retry_pos="$(nth_line_of 2 'worktree remove')"
+    [ -n "$reset_pos" ]
+    [ -n "$clean_pos" ]
+    [ -n "$retry_pos" ]
+    [ "$reset_pos" -lt "$clean_pos" ]
+    [ "$clean_pos" -lt "$retry_pos" ]
+}
+
+@test "dirt_clear_all_disposable through the wrapper: apply mode without the flag clears nothing" {
+    wrapper_apply dirt_clear_all_disposable
+    # Positive control, and the reason the absence assertions below are not vacuous: this
+    # run reached the removal and blocked on the very dirt the flagged run cleared. The
+    # two tests differ in the flag and in nothing else, so the clearing sequence being
+    # present in one and absent in the other is attributable to the flag alone.
+    [[ "$output" == *'ACTION|worktree-remove|/repo-wt/dirt|BLOCKED-DIRTY'* ]]
+    [[ "$output" != *'ACTION|dirt-clear|'* ]]
+    log="$(argv_log)"
+    ! printf '%s\n' "$log" | grep -qE '(^| )reset --hard( |$)'
+    ! printf '%s\n' "$log" | grep -qE '(^| )clean -fd( |$)'
+    # One removal only: the attempt that failed. No retry is issued without the flag.
+    [ "$(count_of 'worktree remove')" -eq 1 ]
 }

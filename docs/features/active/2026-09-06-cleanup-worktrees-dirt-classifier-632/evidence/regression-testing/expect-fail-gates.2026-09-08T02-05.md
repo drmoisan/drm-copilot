@@ -65,6 +65,23 @@ Remediation required before Phase 4 lands: add a positive control asserting that
 `DIRTFILE|` record with verdict `STAGED_TREE_IS_COMMIT` IS emitted for those paths, so the
 test fails both when the record is missing and when a lower-rung read is issued.
 
+### Remediation confirmed
+
+`atomic-executor` added the positive control in commit
+`9b8e226637633ab587ee507a4fba2fb6bd1f5c82`
+("test(cleanup-worktrees): add the missing positive control to dirt classify test 12").
+The gate was re-run at that commit, still before the classifier library exists:
+
+Command: `npx --yes bats tests/shell/test_cleanup_worktrees_dirt_classify.bats`
+Commit: `9b8e226637633ab587ee507a4fba2fb6bd1f5c82`
+EXIT_CODE: 1
+ExpectedExitCode: 1
+
+Output Summary: 0 `ok`, 19 `not ok`. Test 12 now fails alongside the other eighteen, which
+is the predicted expect-fail state. The test is now discriminating in both directions: it
+fails when the `STAGED_TREE_IS_COMMIT` record is absent, and it fails when a lower-rung read
+is issued.
+
 ## P3-T5 — clearing suite `[expect-fail]`
 
 Command: `npx --yes bats tests/shell/test_cleanup_worktrees_dirt_clear.bats`

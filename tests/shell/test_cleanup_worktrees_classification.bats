@@ -11,6 +11,7 @@ setup() {
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
     RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
     DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
+    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
@@ -22,7 +23,7 @@ cb() { # cb <scenario> <branch>  -> run classify_branch under that scenario
     # The git stub logs its argv to stderr; discard it so $output is the function's
     # stdout report lines only (bats `run` otherwise merges stderr into $output).
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${ELIB}' && source '${LIB}' && source '${DLIB}' && classify_branch '$2' 2>/dev/null"
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && source '${DLIB}' && classify_branch '$2' 2>/dev/null"
 }
 
 classify_all() { # classify_all <scenario> -> run the shared classification driver
@@ -34,7 +35,7 @@ classify_all() { # classify_all <scenario> -> run the shared classification driv
     # stderr into $output, and the tests read that merged log as positive proof that each
     # subject's own ladder ran.
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${ELIB}' && source '${LIB}' && source '${RLIB}' && classify_all_branches"
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && source '${RLIB}' && classify_all_branches"
 }
 
 report() { # report <scenario> -> run the full report driver under that scenario
@@ -45,7 +46,7 @@ report() { # report <scenario> -> run the full report driver under that scenario
     # reading the real .claude/worktrees tree.
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
         CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${ELIB}' && source '${LIB}' && source '${RLIB}' && source '${DLIB}' && run_report 2>/dev/null"
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && source '${RLIB}' && source '${DLIB}' && run_report 2>/dev/null"
 }
 
 @test "merged_no_worktree: MERGED_CLEAN and no worktree record for the branch" {

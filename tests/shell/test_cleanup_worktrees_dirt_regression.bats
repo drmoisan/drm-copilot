@@ -28,6 +28,7 @@ setup() {
     RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
     DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
+    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
@@ -42,7 +43,7 @@ report_identical() { # report_identical <scenario>
     local s="$1"
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
         CLEANUP_WT_STUB_SCENARIO="${SCEN}/${s}" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${RLIB}'; source '${DLIB}'; run_report 2>/dev/null"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${RLIB}'; source '${DLIB}'; run_report 2>/dev/null"
     [ "$output" = "$(cat "${EXP}/report.${s}.out")" ]
     [[ "$output" != *"DIRTFILE|"* ]]
     [[ "$output" != *"DIRTSUM|"* ]]
@@ -55,7 +56,7 @@ apply_identical() { # apply_identical <scenario>
     local s="$1"
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
         CLEANUP_WT_STUB_SCENARIO="${SCEN}/${s}" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${RLIB}'; source '${ALIB}'; source '${DLIB}'; run_apply 2>/dev/null"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${RLIB}'; source '${ALIB}'; source '${DLIB}'; run_apply 2>/dev/null"
     [ "$output" = "$(cat "${EXP}/apply.${s}.out")" ]
     [[ "$output" != *"DIRTFILE|"* ]]
     [[ "$output" != *"DIRTSUM|"* ]]
@@ -115,7 +116,7 @@ apply_identical() { # apply_identical <scenario>
     # the DIRTSUM| half of the zero-entry rule.
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
         CLEANUP_WT_STUB_SCENARIO="${SCEN}/merged_with_worktree" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${RLIB}'; source '${DLIB}'; run_report 2>/dev/null"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${RLIB}'; source '${DLIB}'; run_report 2>/dev/null"
     [ "$status" -eq 0 ]
     # Positive control: the candidate registration whose status read returned nothing is
     # present in the output, so the two negative assertions below are not vacuous.

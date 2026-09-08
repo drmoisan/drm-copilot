@@ -33,6 +33,15 @@
 # pick as rc=1), the CHERRY_PICK_HEAD and ref-exists probes, and
 # `vout=$(verify_consolidation_merged) || true` in run_apply (only the exact token
 # MERGED_CLEAN unlocks deletion).
+#
+# Opt-in disposable-dirt clearing hook: when CLEANUP_WT_CLEAR_DISPOSABLE is 1,
+# delete_candidate answers a BLOCKED-DIRTY removal by calling clear_disposable_dirt
+# (scripts/bash/cleanup_worktrees_dirt_lib.sh), then re-verifying delete eligibility in
+# process, then retrying the SAME unforced removal. remove_worktree_safe is unmodified
+# by that hook: it gains no force flag, no new argument, and no new call site, so the
+# never-force-remove invariant holds on every path. The hook is off by default, runs in
+# apply mode only, and refuses the clear when any per-file verdict for the worktree is
+# UNIQUE, including the fail-closed UNIQUE assigned when a classification read errors.
 
 CLEANUP_WT_CONSOLIDATION_BRANCH="documentationandmemories"
 
@@ -328,7 +337,18 @@ delete_candidate() {
 	local name="$1" wt_path="$2" state="$3"
 	reverify_delete_eligible "$name" "$state" || return 1
 	if [[ -n $wt_path ]]; then
-		remove_worktree_safe "$wt_path" || return 1
+		# Opt-in clear-and-retry, off unless CLEANUP_WT_CLEAR_DISPOSABLE is 1. A
+		# BLOCKED-DIRTY removal is retried once, and only after clear_disposable_dirt has
+		# emptied a worktree whose every per-file verdict is disposable and
+		# reverify_delete_eligible has re-confirmed eligibility in process. The retry calls
+		# the same unforced remove_worktree_safe, so no force flag and no new removal call
+		# site is introduced. Any step's failure stops the sequence and returns 1.
+		if ! remove_worktree_safe "$wt_path"; then
+			((CLEANUP_WT_CLEAR_DISPOSABLE == 1)) || return 1
+			clear_disposable_dirt "$wt_path" || return 1
+			reverify_delete_eligible "$name" "$state" || return 1
+			remove_worktree_safe "$wt_path" || return 1
+		fi
 	fi
 	delete_branch "$name"
 }

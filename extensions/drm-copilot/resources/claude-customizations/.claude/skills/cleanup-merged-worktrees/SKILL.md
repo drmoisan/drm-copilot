@@ -75,7 +75,29 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
 - `WARN|main-divergence|<local-sha>|<origin-sha>` — local `main` differs from
   `origin/main` (advisory; classification still runs).
 - `DIRTY|<worktree-path>|<status-porcelain-line>` — a dirty worktree that blocked
-  removal.
+  removal. This record is apply mode only, and its three-field shape is unchanged by the
+  dirt classifier: the classifier adds the two records below rather than altering or
+  replacing this one.
+- `DIRTFILE|<worktree-path>|<verdict>|<detail>|<xy>|<file-path>` — one record per
+  `git status --porcelain` entry in a dirty worktree, emitted by report mode in porcelain
+  order immediately after that worktree's `WORKTREE|` record. `verdict` is exactly one of
+  `DISPOSABLE_BUILD_ARTIFACT | DISPOSABLE_SESSION_ARTIFACT | CONTENT_ON_MAIN |
+  CONTENT_IN_HISTORY | STAGED_TREE_IS_COMMIT | UNIQUE`, and no other verdict token is ever
+  produced. `detail` carries the commit SHA that justifies the verdict for
+  `STAGED_TREE_IS_COMMIT` and `CONTENT_IN_HISTORY`, and is empty for the other four
+  verdicts. `xy` is the porcelain two-character status field, preserved verbatim including
+  its space. The file path is the last field, so a path containing a pipe character cannot
+  shift any later field. A classification read that fails maps its entry to `UNIQUE`: that
+  is the fail-closed direction, because an entry the tool could not classify is treated as
+  content that must be preserved.
+- `DIRTSUM|<worktree-path>|<aggregate>|<detail>` — exactly one record per dirty worktree,
+  emitted by report mode immediately after that worktree's `DIRTFILE|` records.
+  `aggregate` is `ALL_DISPOSABLE` if and only if the worktree has at least one status
+  entry and none of them is `UNIQUE`, and `HAS_UNIQUE` otherwise. `detail` carries the
+  first non-empty per-entry detail. A worktree with zero status entries emits neither this
+  record nor any `DIRTFILE|` record. Both records are read-only: an `ALL_DISPOSABLE`
+  aggregate unlocks nothing on its own, and clearing happens only when the operator
+  supplies `--clear-disposable` in apply mode.
 - `ACTION|<verb>|<target>|<result>` — apply-mode action results.
 - `ORPHAN_DIR|<path>|<size>` — a directory under a worktree-tracking root that carries
   no `.git` pointer file and no `git worktree list` entry. `<size>` is best-effort and
@@ -192,7 +214,12 @@ accompanying `DIRTY|<path>|<status-porcelain-line>` records), or a branch classi
 script correctly refuses to discard. That refusal is correct and this procedure never
 overrides it — a dirty worktree is never force-removed. This procedure is the systematic
 follow-up: deciding, per worktree, whether that content is disposable or must be
-preserved before the worktree can ever be deleted.
+preserved before the worktree can ever be deleted. Report mode now precedes this
+procedure with a machine-readable first pass: one `DIRTFILE|` record per status entry
+giving that entry's verdict, and one `DIRTSUM|` record per worktree giving the aggregate
+`ALL_DISPOSABLE` or `HAS_UNIQUE`. Steps 1-9 below apply to the worktrees carrying at
+least one `UNIQUE` verdict, which are exactly the ones the classifier could not establish
+as disposable and which therefore still require human editorial judgement.
 
 Steps 1-7 are read-only investigation. Run them per worktree, or fan out one
 `Agent(general-purpose)` investigation per worktree (or small batch) concurrently per
@@ -243,7 +270,12 @@ specific files or commit SHAs, before step 9 acts on any finding.
    build artifacts (a modified `.csproj`/`packages.config`/`app.config` from a build run
    in that worktree) rather than documentation. Diff a representative sample against
    `main` (`git diff main -- <path>`) to characterize the change before deciding it is
-   disposable.
+   disposable. The classifier scopes this class narrowly: it labels a project file
+   `DISPOSABLE_BUILD_ARTIFACT` only when every changed line in that entry's diff is an
+   analyzer `HintPath` rewrite. A project file whose diff touches anything else — a
+   `Compile Include` registration, a package reference, a target or property change — is
+   reported `UNIQUE` and is not disposable, so this step's manual characterization is
+   still required for it.
 
 7. **Recognize orphaned non-worktree directories.** A path can still exist on disk
    under a worktree-tracking folder after `git worktree remove` partially ran or
@@ -276,6 +308,18 @@ specific files or commit SHAs, before step 9 acts on any finding.
    to content-neutral against `main`), a follow-up report/apply pass then picks it up
    through the normal deterministic path.
 
+   Distinguish two different discards. The sentence above governs the editorial discard
+   of `UNIQUE` content — content a human judged safe to lose — and that discard stays
+   manual and individually confirmed. Separately, dirt the classifier established as
+   disposable, meaning a worktree whose `DIRTSUM|` aggregate is `ALL_DISPOSABLE`, can be
+   cleared by the tool itself under the opt-in `--clear-disposable` flag in apply mode.
+   That path never touches a `UNIQUE` verdict: one `UNIQUE` entry refuses the clear for
+   the whole worktree, and a classification read that errors produces a fail-closed
+   `UNIQUE` with the same effect. It is also not force-removal — it clears the working
+   tree and retries the same unforced `git worktree remove` after a fresh in-process
+   re-verification. The classification ladder and the apply-mode allowlist remain
+   unchanged by it.
+
 10. **After local branch deletion, check origin too.** This skill is local-only by
     design (see "When to Use This Skill"), which leaves stale branches on the remote for
     anything already merged. After `--apply` finishes, diff the deleted-local-branch
@@ -292,7 +336,15 @@ specific files or commit SHAs, before step 9 acts on any finding.
   authoring is `Agent(pr-author)`'s exclusive responsibility and is enforced by the
   `enforce-pr-author-skill.ps1` PreToolUse hook.
 - Never pass a force flag to `git worktree remove`. A dirty worktree blocks deletion and
-  is reported for manual handling; it is never force-removed.
+  is reported for manual handling; it is never force-removed. The `--clear-disposable`
+  flag is not an exception to this rule and is not force-removal: it clears the working
+  tree first and then retries the same unforced `git worktree remove`, so the removal it
+  retries is the identical unforced call that was blocked. It runs only when every
+  per-file verdict for that worktree is non-`UNIQUE`, only in apply mode, only when the
+  operator explicitly requests it, and only after a fresh in-process re-verification that
+  the branch is still delete-eligible. A single `UNIQUE` verdict refuses the clear for the
+  whole worktree, including the fail-closed `UNIQUE` assigned when a classification read
+  errors.
 - Never execute `git worktree prune`. Prunable registrations are report-only.
 - Never act on `NOT_MERGED`, `HAS_UNIQUE_RESIDUALS`, or `PROTECTED_CURRENT` candidates
   through the script or its apply-mode allowlist; `--apply` never mutates them, and the
@@ -312,6 +364,15 @@ specific files or commit SHAs, before step 9 acts on any finding.
   forecloses the specific evasion of writing an
   `artifacts/orchestration/orchestrator-state.json` whose `epic_mode` and `step9_status`
   fields the gate's child-feature accept shape would honour for any pull-request number.
+- Never widen the definition of disposable dirt. The session-artifact list is a fixed
+  in-script array of exactly three paths with no configuration override, no environment
+  variable, and no per-repository extension point; adding a path to it is a change to the
+  classifier, not a setting. The build-artifact rule requires both conditions together —
+  the `*.csproj` path pattern and the content confinement that every changed line in the
+  entry's diff is an analyzer `HintPath` rewrite — and a project file whose diff touches
+  anything else is `UNIQUE`. Ignored files are never cleared, because they are never
+  classified: `git status --porcelain` is read without `--ignored`, so an ignored file
+  never becomes an entry, and `git clean` is never given `-x`, `-X`, or `-ff`.
 
 ## Cross-References
 

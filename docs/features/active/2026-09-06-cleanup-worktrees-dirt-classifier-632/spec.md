@@ -613,127 +613,127 @@ wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/w
 
 ## Acceptance Criteria
 
-- [ ] `scripts/bash/cleanup_worktrees_dirt_lib.sh` exists, defines `classify_worktree_dirt`,
+- [x] `scripts/bash/cleanup_worktrees_dirt_lib.sh` exists, defines `classify_worktree_dirt`,
   `classify_dirt_entry`, the bounded staged-tree probe, and `clear_disposable_dirt`, runs nothing at
   source time, and is sourced by `scripts/bash/cleanup-worktrees.sh` and by every
   `tests/shell/test_cleanup_worktrees_*.bats` suite.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_build_artifact/` and a
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_build_artifact/` and a
   passing bats test assert a `DIRTFILE|` record whose verdict field is `DISPOSABLE_BUILD_ARTIFACT`
   for a tracked, modified `*.csproj` entry whose diff contains only `HintPath` lines.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_session_artifact/` and a
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_session_artifact/` and a
   passing bats test assert a `DIRTFILE|` record whose verdict field is
   `DISPOSABLE_SESSION_ARTIFACT` for `artifacts/pr_context.summary.txt`.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_content_on_main/` and a
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_content_on_main/` and a
   passing bats test assert a `DIRTFILE|` record whose verdict field is `CONTENT_ON_MAIN` for an
   untracked path whose `hash-object` blob equals `rev-parse main:<path>`.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_content_in_history/` and
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_content_in_history/` and
   a passing bats test assert a `DIRTFILE|` record whose verdict field is `CONTENT_IN_HISTORY` and
   whose detail field carries the SHA returned by `log --find-object`.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_tree_is_commit/`
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_tree_is_commit/`
   and a passing bats test assert a `DIRTFILE|` record whose verdict field is
   `STAGED_TREE_IS_COMMIT` and whose detail field carries the matching commit SHA, and assert that
   the `DIRTSUM|` detail field carries the same SHA.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_unique/` and a passing
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_unique/` and a passing
   bats test assert a `DIRTFILE|` record whose verdict field is `UNIQUE` and a `DIRTSUM|` record
   whose aggregate field is `HAS_UNIQUE`.
-- [ ] The verdict field of every emitted `DIRTFILE|` record is one of exactly the six tokens
+- [x] The verdict field of every emitted `DIRTFILE|` record is one of exactly the six tokens
   `DISPOSABLE_BUILD_ARTIFACT`, `DISPOSABLE_SESSION_ARTIFACT`, `CONTENT_ON_MAIN`,
   `CONTENT_IN_HISTORY`, `STAGED_TREE_IS_COMMIT`, `UNIQUE`, and no other verdict token is produced
   by any of the ten `dirt_*` scenarios.
-- [ ] In `dirt_staged_tree_is_commit`, the staged entries are labelled `STAGED_TREE_IS_COMMIT` and
+- [x] In `dirt_staged_tree_is_commit`, the staged entries are labelled `STAGED_TREE_IS_COMMIT` and
   the stub argv log contains no `hash-object`, no `diff --quiet main`, and no `log --find-object`
   invocation for those paths, proving rung 1 precedes rungs 2 through 5.
-- [ ] In `dirt_session_artifact`, the argv log contains no git invocation naming
+- [x] In `dirt_session_artifact`, the argv log contains no git invocation naming
   `artifacts/pr_context.summary.txt`, proving rung 2 is a pure string comparison evaluated before
   rungs 3 through 5.
-- [ ] In `dirt_build_artifact`, the entry is labelled `DISPOSABLE_BUILD_ARTIFACT` and the argv log
+- [x] In `dirt_build_artifact`, the entry is labelled `DISPOSABLE_BUILD_ARTIFACT` and the argv log
   contains no `log --find-object` invocation for that path, proving rung 3 precedes rungs 4 and 5.
-- [ ] In `dirt_content_on_main`, the entry is labelled `CONTENT_ON_MAIN` and the argv log contains
+- [x] In `dirt_content_on_main`, the entry is labelled `CONTENT_ON_MAIN` and the argv log contains
   no `log --find-object` invocation, proving rung 4 precedes rung 5.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_classifier_read_error/`
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_classifier_read_error/`
   and a passing bats test assert that a classifier git read exiting non-zero produces `UNIQUE` for
   that entry, `HAS_UNIQUE` for the worktree, and a refused clear.
-- [ ] A tracked, modified `*.csproj` entry whose diff contains at least one changed line that is not
+- [x] A tracked, modified `*.csproj` entry whose diff contains at least one changed line that is not
   a `HintPath` rewrite is classified `UNIQUE` rather than `DISPOSABLE_BUILD_ARTIFACT`, pinned by a
   dedicated bats test.
-- [ ] For each worktree with dirt, report mode emits exactly one `DIRTFILE|` record per
+- [x] For each worktree with dirt, report mode emits exactly one `DIRTFILE|` record per
   `git status --porcelain` entry, in porcelain order, immediately after that worktree's `WORKTREE|`
   record, followed by exactly one `DIRTSUM|` record; `dirt_mixed_unique_blocks` pins the two-entry
   case.
-- [ ] The `DIRTSUM|` aggregate field is `ALL_DISPOSABLE` if and only if the entry count is at least
+- [x] The `DIRTSUM|` aggregate field is `ALL_DISPOSABLE` if and only if the entry count is at least
   one and the `UNIQUE` count is zero, and is `HAS_UNIQUE` otherwise; a worktree with zero status
   entries emits neither a `DIRTFILE|` nor a `DIRTSUM|` record.
-- [ ] The `DIRTFILE|` detail field carries a commit SHA for `STAGED_TREE_IS_COMMIT` and
+- [x] The `DIRTFILE|` detail field carries a commit SHA for `STAGED_TREE_IS_COMMIT` and
   `CONTENT_IN_HISTORY` and is empty for the other four verdicts, and the file path is the last
   field of the record, pinned by a bats test using a fixture path containing a pipe character.
-- [ ] No existing record type changes: for `merged_with_worktree`, `merged_no_worktree`, `unmerged`,
+- [x] No existing record type changes: for `merged_with_worktree`, `merged_no_worktree`, `unmerged`,
   `content_neutral`, `residual_on_main`, `residual_unique_doc`, `current_exclusion`, and
   `main_divergence`, report-mode stdout is byte-identical to a checked-in expected-output file and
   contains no `DIRTFILE|` or `DIRTSUM|` line.
-- [ ] Apply-mode stdout without `--clear-disposable` is byte-identical to the pre-change output for
+- [x] Apply-mode stdout without `--clear-disposable` is byte-identical to the pre-change output for
   `dirty_worktree` and `dirty_worktree_status_error`, specifically retaining the three-field
   `DIRTY|` record and the `ACTION|worktree-remove|<path>|BLOCKED-DIRTY` record, and containing no
   `DIRTFILE|` or `DIRTSUM|` line.
-- [ ] `scripts/bash/cleanup_worktrees_actions_lib.sh` `remove_worktree_safe` is unchanged, and
+- [x] `scripts/bash/cleanup_worktrees_actions_lib.sh` `remove_worktree_safe` is unchanged, and
   `tests/shell/test_cleanup_worktrees_hard_failures.bats` and
   `tests/shell/test_cleanup_worktrees_deletion.bats` pass with no assertion edits, only the added
   `source` of the new library.
-- [ ] `bash scripts/bash/cleanup-worktrees.sh --clear-disposable` and
+- [x] `bash scripts/bash/cleanup-worktrees.sh --clear-disposable` and
   `bash scripts/bash/cleanup-worktrees.sh report --clear-disposable` each exit 2 and print usage to
   stderr, pinned by tests in `tests/shell/test_cleanup_worktrees_cli.bats`.
-- [ ] `--apply --clear-disposable` and `--clear-disposable --apply` both dispatch to apply mode,
+- [x] `--apply --clear-disposable` and `--clear-disposable --apply` both dispatch to apply mode,
   pinned by an argument-order-independence test in `tests/shell/test_cleanup_worktrees_cli.bats`.
-- [ ] A checked-in fixture
+- [x] A checked-in fixture
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_mixed_unique_blocks/` and a passing bats test
   assert that `--clear-disposable` on a worktree carrying at least one `UNIQUE` verdict emits
   `ACTION|dirt-clear|<path>|REFUSED-UNIQUE` and that the argv log contains no `reset --hard`, no
   `clean`, and no second `worktree remove`.
-- [ ] A checked-in fixture
+- [x] A checked-in fixture
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_clear_all_disposable/` and a passing bats test
   assert the argv order `reset --hard` → `clean -fd` → `worktree remove`, that
   `ACTION|dirt-clear|<path>|OK` is emitted, and that the argv log contains none of `--force`, `-x`,
   `-X`, or `-ff`.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_clear_reverify_order/`
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_clear_reverify_order/`
   and a passing bats test assert that a second `cherry main feature-dirt` invocation appears in the
   argv log after `reset --hard` and before the removal retry, and a direct bats test of
   `reverify_delete_eligible` against the existing `unmerged` fixture asserts it refuses a
   non-eligible branch.
-- [ ] `git worktree remove` is invoked from exactly the two existing call sites in
+- [x] `git worktree remove` is invoked from exactly the two existing call sites in
   `scripts/bash/cleanup_worktrees_actions_lib.sh` with no force flag; the clear-and-retry path
   routes through `remove_worktree_safe` and introduces no third call site.
-- [ ] Report mode is non-mutating: over `dirt_staged_tree_is_commit`, a bats test asserts the stub
+- [x] Report mode is non-mutating: over `dirt_staged_tree_is_commit`, a bats test asserts the stub
   argv and environment log contains no `write-tree`, no `stub-git-env: GIT_INDEX_FILE=`, no
   `/index`, no `reset`, no `clean`, no `worktree remove`, no `branch -D`, and no `hash-object -w`.
-- [ ] `tests/fixtures/cleanup_worktrees/stub-bin/git` logs `GIT_INDEX_FILE` to stderr when that
+- [x] `tests/fixtures/cleanup_worktrees/stub-bin/git` logs `GIT_INDEX_FILE` to stderr when that
   variable is set, so the non-mutation assertion above can fail when the property is violated.
-- [ ] Over `dirt_staged_tree_is_commit`, the argv log contains `diff-index --cached --quiet`, and
+- [x] Over `dirt_staged_tree_is_commit`, the argv log contains `diff-index --cached --quiet`, and
   every `status --porcelain` invocation issued by the new library carries `--no-optional-locks`.
-- [ ] The staged-tree probe never probes the first entry returned by `rev-list`, pinned in
+- [x] The staged-tree probe never probes the first entry returned by `rev-list`, pinned in
   `dirt_staged_tree_is_commit` by asserting no `diff-index` invocation names the HEAD SHA supplied
   in that fixture.
 - [ ] `wsl -d Ubuntu -- bash -lc '... bash scripts/bash/shell-qc.sh format'` and the same command
   with `check` and with `test` each complete with no error in a single consecutive pass.
 - [ ] `wsl -d Ubuntu -- bash -lc '... bash scripts/bash/shell-qc.sh test --coverage'` reports kcov
   line coverage of at least 85%; no branch-coverage gate applies to bash, and none is asserted.
-- [ ] Every shell file changed or added by this work is at or under 500 lines, measured at
+- [x] Every shell file changed or added by this work is at or under 500 lines, measured at
   integration time rather than assumed from the research projection.
-- [ ] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Report Line Contract documents `DIRTFILE|`
+- [x] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Report Line Contract documents `DIRTFILE|`
   and `DIRTSUM|` with their field lists and states that `DIRTY|` remains apply-mode-only with an
   unchanged three-field shape.
-- [ ] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Prohibited Shortcuts states that
+- [x] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Prohibited Shortcuts states that
   `--clear-disposable` is not an exception to the never-force-remove rule and is not force-removal,
   because it clears the working tree first and then retries the same unforced
   `git worktree remove`, and adds a bullet prohibiting any widening of the disposable-dirt
   definition.
-- [ ] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Dirty Worktree Triage Procedure states that
+- [x] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Dirty Worktree Triage Procedure states that
   report mode now precedes the procedure with `DIRTFILE|` and `DIRTSUM|` records, scopes step 6 to
   the `HintPath`-confined build-artifact case, and amends step 9 to distinguish the automated
   clearing of classified-disposable dirt from the never-automated editorial discard of `UNIQUE`
   content.
-- [ ] `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
+- [x] `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
   is byte-identical to the canonical file, and
   `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passes.
-- [ ] The report-line contract comment block in `scripts/bash/cleanup_worktrees_lib.sh` and the
+- [x] The report-line contract comment block in `scripts/bash/cleanup_worktrees_lib.sh` and the
   `usage` here-doc in `scripts/bash/cleanup-worktrees.sh` both document `DIRTFILE|`, `DIRTSUM|`, and
   `--clear-disposable`, and `bash scripts/bash/cleanup-worktrees.sh --help` output contains all
   three strings, pinned by a test in `tests/shell/test_cleanup_worktrees_cli.bats`.

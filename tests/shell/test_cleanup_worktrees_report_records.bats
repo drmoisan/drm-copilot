@@ -13,6 +13,7 @@ setup() {
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
     RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
     DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
+    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
@@ -37,7 +38,7 @@ report_raw() { # report_raw <scenario> -> run the full report driver, stderr RET
     # detached reporter, so LIB and DLIB must be sourced alongside ELIB and RLIB.
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
         CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${ELIB}' && source '${LIB}' && source '${RLIB}' && source '${DLIB}' && run_report"
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && source '${RLIB}' && source '${DLIB}' && run_report"
 }
 
 @test "scan_stale_refs emits STALE_REF for a remote-tracking ref with no configured remote" {
