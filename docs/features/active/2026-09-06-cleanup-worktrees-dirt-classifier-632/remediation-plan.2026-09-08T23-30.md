@@ -1205,7 +1205,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
 
 ### Phase 4 — Acceptance criteria, documentation, mirror, and the P2 correction
 
-- [ ] [P4-T1] Correct AC-8's count phrase in
+- [x] [P4-T1] Correct AC-8's count phrase in
   `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`. The
   phrase sits at `spec.md:714`, reading `by any of the twenty-eight \`dirt_*\` scenarios.`;
   the word `twenty-eight` becomes `twenty-nine`. The box stays checked; this is a text
@@ -1219,7 +1219,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   Acceptance: that command reports `1`, and the same unwrapped stream piped to
   `grep -cF 'twenty-eight `dirt_*` scenarios'` reports `0`.
 
-- [ ] [P4-T2] Edit AC-47 in place at `spec.md:856-891`, leaving its box checked. Three
+- [x] [P4-T2] Edit AC-47 in place at `spec.md:856-891`, leaving its box checked. Three
   groups of edit, all inside that criterion.
 
   *Group one — delete every clause describing the deleted kind.* The `EXEMPT` disjunct in
@@ -1273,7 +1273,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   `index-and-worktree-both-hold-content` — occur **zero** times in `spec.md` today,
   re-derived against the current tree in this pass, so each of them can fail.
 
-- [ ] [P4-T3] Append AC-48 to the `## Acceptance Criteria` section of `spec.md` as an
+- [x] [P4-T3] Append AC-48 to the `## Acceptance Criteria` section of `spec.md` as an
   **unchecked** box. Its text states, without claiming more than the delivery establishes:
   that when a status entry's X column and Y column both carry a content-bearing letter —
   `M`, `A`, `R`, `C`, `T` or `U` — the entry's content exists in the index and in the
@@ -1322,7 +1322,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   reports `1` — that literal occurs zero times in `spec.md` at the start of this cycle,
   re-derived against the current tree in this pass, so the assertion can fail.
 
-- [ ] [P4-T4] Append AC-49 to the same section as an **unchecked** box. Its text states:
+- [x] [P4-T4] Append AC-49 to the same section as an **unchecked** box. Its text states:
   that `tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv` admits exactly two row
   kinds, `SEPARATED` and `ARGV`, and that a row carrying any other kind fails the gate on a
   named invariant; that both admissible kinds require an observed difference between the
@@ -1347,7 +1347,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   reports `1` — that literal occurs zero times in `spec.md` at the start of this cycle,
   re-derived against the current tree in this pass, so the assertion can fail.
 
-- [ ] [P4-T5] Reconcile the criterion count. Run the section-scoped derivation fixed in
+- [x] [P4-T5] Reconcile the criterion count. Run the section-scoped derivation fixed in
   **Acceptance-criteria changes** for the total, and the same `awk` prefix piped to
   `grep -c '^- \[x\]'` and to `grep -c '^- \[ \]'` for the checked and unchecked counts.
   Record `evidence/other/ac-count-reconciliation.2026-09-09T02-00.md` with `Timestamp:`,
@@ -1357,7 +1357,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   artifact records a section-scoped total of `49`, a checked count of `47`, an unchecked
   count of `2`, and an unscoped figure of `57`.
 
-- [ ] [P4-T6] Add one sentence to the `DIRTFILE|` bullet of the Report Line Contract in
+- [x] [P4-T6] Add one sentence to the `DIRTFILE|` bullet of the Report Line Contract in
   `.claude/skills/cleanup-merged-worktrees/SKILL.md` — the bullet beginning at `:81` and
   ending at `:100` — stating that an entry whose porcelain status shows content in both the
   index and the working tree is reported `UNIQUE`, because the rungs that could otherwise
@@ -1373,7 +1373,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   Acceptance: that command reports `1`. A line-oriented search over the wrapped file would
   return `0` whenever the sentence happened to span two lines, whatever the executor wrote.
 
-- [ ] [P4-T7] Mirror the edited skill file to
+- [x] [P4-T7] Mirror the edited skill file to
   `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
   and verify byte identity with `md5sum` over both paths. Record
   `evidence/qa-gates/skill-mirror-parity.2026-09-09T02-00.md` with `Timestamp:`,
@@ -1381,7 +1381,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   identical, the artifact states so explicitly, and `diff` between the two paths produces
   no output, recorded verbatim as an empty block.
 
-- [ ] [P4-T8] Correct the P2 citation. In
+- [x] [P4-T8] Correct the P2 citation. In
   `evidence/other/phase0-blocked-gates.2026-09-08T22-00.md:78`, change `.gitignore:67` to
   `.gitignore:68`. The observed rule at `.gitignore:68` is `.claude/state/`; `.gitignore:67`
   is `.claude/agent-memory`, which does not match the path in question. Nothing else in

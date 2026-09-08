@@ -711,7 +711,7 @@ gh workflow run .github/workflows/_shell-coverage.yml --ref bug/cleanup-worktree
 - [x] The verdict field of every emitted `DIRTFILE|` record is one of exactly the six tokens
   `DISPOSABLE_BUILD_ARTIFACT`, `DISPOSABLE_SESSION_ARTIFACT`, `CONTENT_ON_MAIN`,
   `CONTENT_IN_HISTORY`, `STAGED_TREE_IS_COMMIT`, `UNIQUE`, and no other verdict token is produced
-  by any of the twenty-eight `dirt_*` scenarios.
+  by any of the twenty-nine `dirt_*` scenarios.
 - [x] In `dirt_staged_tree_is_commit`, the staged entries are labelled `STAGED_TREE_IS_COMMIT` and
   the stub argv log contains no `hash-object`, no `diff --quiet main`, and no `log --find-object`
   invocation for those paths, proving rung 1 precedes rungs 2 through 5.
@@ -855,40 +855,96 @@ gh workflow run .github/workflows/_shell-coverage.yml --ref bug/cleanup-worktree
   `main`.
 - [x] AC-47 — Every line in `scripts/bash/cleanup_worktrees_dirt_lib.sh` that carries an arithmetic
   comparison of a variable against a numeric literal carries a `# guard:` marker; the marked lines
-  plus the eight named non-arithmetic verdict guards — the diff-header skip, rung 1's Y-column
+  plus the nine named non-arithmetic verdict guards — the diff-header skip, rung 1's Y-column
   gate, the empty-blob fail-closed test, rung 4's untracked main-blob equality test, rung 5's
-  history-hit test, the ` -> ` payload split gate, the `UNIQUE` tally, and the clear's
-  `ALL_DISPOSABLE` precondition, which are the sites that produced findings R1, R2, and R5 — are
+  history-hit test, the ` -> ` payload split gate, the `UNIQUE` tally, the clear's
+  `ALL_DISPOSABLE` precondition, which are the sites that produced findings R1, R2, and R5, and
+  the two-content-bearing-columns fail-closed test registered as
+  `index-and-worktree-both-hold-content` — are
   together registered in `tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv` under
   (`id`, `mutation`) row identity. Every registered row's neutralization is a semantic one, being
-  either one of the eight non-arithmetic mutations the remediation plan fixes by literal or the
+  either one of the nine non-arithmetic mutations the remediation plan fixes by literal or the
   arithmetic guard's own comparison rewritten to a constant, so a mutation that edits only a
-  comment or only whitespace is rejected by the suite rather than recorded as an exempt guard.
+  comment or only whitespace is rejected by the suite.
   `tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats` neutralizes each registered row in
   an in-memory copy of the library and requires, for every row, that the named scenario directory
   exists under a name beginning `dirt_`, that the substitution changed exactly one line and that
   the changed line still differs once the marker comment is stripped and whitespace runs are
   collapsed, that the mutated source parses, and that the unmutated `classify_worktree_dirt` call
-  emitted at least one `DIRTFILE|` record. The three row kinds partition the outcome space of two
-  comparisons for an admissible (`mutation`, `scenario`) pair — one that survives the
-  sibling-constant requirement below — and each asserts both the difference and the identity it
-  names, so a `SEPARATED` row's record stream and exit status must differ, an `ARGV` row's record
-  stream must be identical while its argv log differs, and an `EXEMPT` row's record stream and
-  argv log must both be identical — under the sibling constant as well, for a row whose mutation
-  is an arithmetic constant — which makes `EXEMPT` an observed outcome rather than a verdict
-  written into the registry. `EXEMPT is scenario-scoped`, meaning that an `EXEMPT` row establishes
-  only that its guard is unobservable under its own named scenario in both admissible directions
-  and does **not** establish that no checked-in scenario separates that guard, while the eighteen
-  pinned registry rows carry the stronger property that a named checked-in scenario does separate
-  them. Eighteen registry rows over seventeen distinct ids are pinned by kind, the fourteen listed
-  as `SEPARATED` in the remediation plan's remediated-guard and thirteen-pinned-guards tables
-  being registered `SEPARATED`, and four rows — R1's Y-column gate, R2's payload-split gate, R5's
-  diff-header skip, and the empty-blob fail-closed test — being registered `SEPARATED` or `ARGV`.
+  emitted at least one `DIRTFILE|` record. A registry row's kind is `SEPARATED` or `ARGV`, and no
+  other kind is admissible. The two row kinds partition the outcome space of two
+  comparisons for a (`mutation`, `scenario`) pair, and each asserts both the difference and the
+  identity it
+  names, so a `SEPARATED` row's record stream and exit status must differ, and an `ARGV` row's
+  record stream must be identical while its argv log differs. Both kinds therefore require an
+  observed difference on one of the two channels, which is possible only if the guard executed,
+  so a scenario under which the ladder never reaches the guard makes a row fail rather than pass.
+  The pin floor over the marked ids is specified by AC-49.
   The three pins that fall on the two library lines carrying an arithmetic guard and a named
   non-arithmetic guard together are keyed to the pair (`id`, `mutation`) rather than to `id`,
   because a single marker on such a line backs two registry rows and an id-keyed pin on it is
   discharged by either one. An arithmetic guard-shaped line with no marker, a marker with no
   registry row, or a registry row naming an unmarked id fails the suite.
+- [ ] AC-48 — When a porcelain status entry's X column and Y column both carry a content-bearing
+  letter — `M`, `A`, `R`, `C`, `T` or `U` — the entry's content exists in the index and in the
+  working tree and the two differ, so rung 4's tracked half and rung 5, which compare only
+  working-tree content, do not resolve a disposable verdict for it and the entry falls through to
+  `UNIQUE`. `AD` and `MD` are unaffected, because a `D` in the Y column means the working tree
+  holds no content for that path and there is only one blob to account for. Rung 3 is unaffected,
+  because `dirt_is_build_artifact` reads the cached diff as well as the worktree diff. Both
+  directions are pinned by a single checked-in fixture, `dirt_index_and_worktree_delta`, carrying
+  an `MM` entry decided at rung 4, an `MM` entry decided at rung 5, a `UU` entry, and a control
+  entry that must still resolve `CONTENT_ON_MAIN`.
+  `tests/shell/test_cleanup_worktrees_dirt_content_locations.bats` additionally requires, for
+  every `DIRTFILE|` record whose verdict is neither `UNIQUE` nor `DISPOSABLE_SESSION_ARTIFACT`
+  across every checked-in `dirt_*` scenario, that the stub argv log carry a read of every location
+  holding that entry's content, and requires each of the eight status codes `??`, `M `, `A `,
+  `R `, ` M`, `AD`, `MM` and `UU` to appear in some checked-in scenario. The strength of the
+  letter pin is stated here rather than left to be read as a per-letter executed claim. Exactly
+  three of the letter decisions carry an executed direction: `M` in the both-columns position, by
+  the first two of the four `dirt_index_and_worktree_delta` fail-closed tests; `U`, by the third;
+  and the exclusion of the space, by the fourth, whose `M ` control must still resolve
+  `CONTENT_ON_MAIN` and would resolve `UNIQUE` if the space were admitted to the class. Every
+  other letter decision — the inclusion of `A`, `R`, `C` and `T`, and the exclusion of `D`, `?`
+  and `!` — is held only by the character class on the single guard line, which is asserted
+  literally by the registry's `index-and-worktree-both-hold-content` row and by the remediation
+  plan's library search over that line. The `D` case is the one worth stating explicitly, because
+  it is easy to assume `dirt_tracked_staged_only_blob` pins it and it does not: that scenario's
+  `AD` entry already resolves `UNIQUE` through the earlier `((erc == 0))` guard, since its
+  `rev-parse.verify.main_staged_only.md.rc` fixture holds `1` and the path is therefore absent
+  from `main`, so admitting `D` to the class would block a branch that entry never takes. No
+  behavioural assertion would move under such a change to the class. The class text is
+  nevertheless coupled to the registry literal: the `index-and-worktree-both-hold-content` row
+  quotes the character class verbatim inside its mutation, so a library-only edit to the class
+  makes that substitution inert, the registry suite's Obligation 2 records the mismatch, and that
+  suite goes red. An edit coordinated across the library line and the registry literal leaves
+  every test green. The two excluded verdicts are excluded for stated reasons: `UNIQUE` is the
+  fail-closed direction and asserts nothing about recoverability, and
+  `DISPOSABLE_SESSION_ARTIFACT` is an exact-path authorization that issues no git call and makes
+  no content inference, so there is no comparison for it to be missing. The coverage floor is
+  bounded: it covers the classes the classifier's own branching distinguishes — the untracked
+  test, rung 1's X-and-Y gate, the rename and copy payload split, and the
+  two-content-bearing-columns gate — and does not enumerate every pair porcelain can emit.
+- [ ] AC-49 — `tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv` admits exactly two row
+  kinds, `SEPARATED` and `ARGV`. A row carrying any other kind fails the gate on a named
+  invariant, reported as `INVARIANT-8 inadmissible kind:` by the registry suite's first test and,
+  for a row whose scenario directory exists, as `OBLIGATION-5 channel comparison failed:` by its
+  second. Both admissible kinds require an observed difference between the mutated and the
+  unmutated run — a `SEPARATED` row on the record channel, an `ARGV` row on the argv log — and an
+  observed difference is possible only if the guard executed, so naming a scenario under which
+  the ladder never reaches the guard makes the row fail rather than pass. Every marker id read
+  from `scripts/bash/cleanup_worktrees_dirt_lib.sh` must carry at least one `SEPARATED` registry
+  row, with a single exception: `history-scan-bounded-range` is pinned `ARGV` instead, because
+  the git stub keys `log --find-object` on the object id alone, so the bounded-range endpoint
+  changes the invocation without changing any record and no checked-in scenario can make that
+  guard separate on the record channel. The exception set is the hard-coded `ARGV_ONLY_IDS` array
+  in the registry suite and has exactly that one member. The two library lines that carry an
+  arithmetic guard and a named non-arithmetic guard together remain pinned by the pair
+  (`id`, `mutation`) rather than by `id`, because an id-keyed pin on either is discharged by
+  whichever of that id's two rows carries the demanded kind and leaves the other row
+  unconstrained. This criterion makes no claim that the gate detects a missing comparison between
+  a verdict and the locations holding an entry's content; that property is AC-48's, and the two
+  criteria are therefore not overlapping.
 
 ## Risks & Mitigations
 

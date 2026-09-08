@@ -75,7 +75,7 @@ silently resolved.
 exits 1 with `1 failed, 10 passed` against an acceptance of exit 0 and `11 passed`.
 
 The cause is established, not inferred: `git check-ignore -v .claude/state/current-session-id`
-reports `.gitignore:67`, so the path is gitignored, while the test's repo-side enumeration walks the
+reports `.gitignore:68`, so the path is gitignored, while the test's repo-side enumeration walks the
 filesystem and excludes only `settings.local.json` and `agent-memory/**`. This is the recorded
 bundle-parity defect, open as issue **#510**: it fails locally and is green in CI, because CI's
 checkout has no local session-state file.

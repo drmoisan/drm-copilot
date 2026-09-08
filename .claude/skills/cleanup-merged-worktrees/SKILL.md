@@ -91,7 +91,10 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
   is the fail-closed direction, because an entry the tool could not classify is treated as
   content that must be preserved. `CONTENT_ON_MAIN` is emitted for a tracked entry
   only when `main` contains the path, so an entry whose content exists only as a staged
-  blob is reported `UNIQUE` rather than as content that is already on `main`.
+  blob is reported `UNIQUE` rather than as content that is already on `main`. An entry
+  whose porcelain status shows content in both the index and the working tree is likewise
+  reported `UNIQUE`, because the rungs that could otherwise resolve it compare working-tree
+  content only and would leave the differing staged blob unaccounted for.
   `DISPOSABLE_SESSION_ARTIFACT` matches three fixed
   repository paths under `artifacts/`, is repository-agnostic, and cannot fire in a checkout
   that gitignores `artifacts/` — which drm-copilot does at `.gitignore:6` — because the
