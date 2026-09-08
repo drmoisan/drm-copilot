@@ -153,14 +153,14 @@ relying on the exit code.
 
 ### Phase 0 — Baseline capture
 
-- [ ] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
+- [x] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
   `.claude/rules/general-unit-test.md`, `.claude/rules/shell.md`,
   `.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md`, and write
   `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/evidence/remediation-baseline/phase0-instructions-read.2026-09-08T05-30.md`
   containing `Timestamp:`, `Policy Order:`, and an explicit list of the six files read.
   Acceptance: that file exists and its `Policy Order:` list names all six paths.
 
-- [ ] [P0-T2] Read `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`,
+- [x] [P0-T2] Read `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`,
   `issue.md`, `remediation-inputs.2026-09-08T05-00.md`, `code-review.2026-09-08T05-00.md`,
   `feature-audit.2026-09-08T05-00.md`, `policy-audit.2026-09-08T05-00.md`, and
   `evidence/qa-gates/shell-qc-test-coverage.2026-09-08T04-30.md`, and write
@@ -168,7 +168,7 @@ relying on the exit code.
   the seven paths read, the resolved work mode `full-bug`, and the AC source `spec.md`.
   Acceptance: that file exists and names all seven paths and the literal `full-bug`.
 
-- [ ] [P0-T3] Capture the pre-change tree digest, run the formatter, and capture the digest again.
+- [x] [P0-T3] Capture the pre-change tree digest, run the formatter, and capture the digest again.
   Commands, in order:
   `for r in tools scripts .claude/lib/bash; do [ -d "$r" ] && find "$r" -type f -print0; done | LC_ALL=C sort -z | xargs -0 sha256sum | sha256sum`
   then `bash scripts/bash/shell-qc.sh format` then the digest command again. Write
@@ -178,14 +178,14 @@ relying on the exit code.
   The digest equality is the failable observation; the exit code alone is identical on a clean run
   and on a repairing one.
 
-- [ ] [P0-T4] Run `bash scripts/bash/shell-qc.sh check` and write
+- [x] [P0-T4] Run `bash scripts/bash/shell-qc.sh check` and write
   `evidence/remediation-baseline/shell-qc-check.2026-09-08T05-30.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, and `Output Summary:` stating whether any `shfmt` diff hunk or
   `shellcheck` finding was emitted.
   Acceptance: `EXIT_CODE: 0` and the `Output Summary:` records zero shfmt hunks and zero shellcheck
   findings.
 
-- [ ] [P0-T5] Resolve the bats binary and capture the full-suite baseline. Run
+- [x] [P0-T5] Resolve the bats binary and capture the full-suite baseline. Run
   `npx --yes bats --version` and record the version and the absolute path of the executable it
   resolves; then run the stage as
   `env SHELL_QC_BATS_BIN=<that absolute path> bash scripts/bash/shell-qc.sh test`
@@ -207,7 +207,7 @@ relying on the exit code.
   the observed local total differs from `390`, record the difference in `Output Summary:` and
   continue.
 
-- [ ] [P0-T6] Observe the targeted-run command shape that later phases assert over. Run
+- [x] [P0-T6] Observe the targeted-run command shape that later phases assert over. Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_regression.bats` and
   write `evidence/remediation-baseline/bats-targeted-run-shape.2026-09-08T05-30.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, the verbatim first three output lines, and
@@ -219,7 +219,7 @@ relying on the exit code.
   observed form differs from `ok <n> <description>`, the later conditions are restated against the
   observed form before those tasks run.
 
-- [ ] [P0-T7] Record the coverage baseline from the last measured run without re-dispatching. Read
+- [x] [P0-T7] Record the coverage baseline from the last measured run without re-dispatching. Read
   `evidence/qa-gates/shell-qc-test-coverage.2026-09-08T04-30.md` and write
   `evidence/remediation-baseline/shell-qc-test-coverage.2026-09-08T05-30.md` with `Timestamp:`,
   `Command:` naming
@@ -231,7 +231,7 @@ relying on the exit code.
   Acceptance: that file exists and its `Output Summary:` contains the literals `92.9`, `82.63`,
   `138 / 167`, and the literal `415, 416` (the last two entries of the uncovered list).
 
-- [ ] [P0-T8] Run `wc -l` over `scripts/bash/cleanup_worktrees_dirt_lib.sh`,
+- [x] [P0-T8] Run `wc -l` over `scripts/bash/cleanup_worktrees_dirt_lib.sh`,
   `scripts/bash/cleanup_worktrees_lib.sh`, `scripts/bash/cleanup_worktrees_actions_lib.sh`,
   `scripts/bash/cleanup_worktrees_report_records_lib.sh`, `scripts/bash/cleanup-worktrees.sh`,
   `tests/fixtures/cleanup_worktrees/stub-bin/git`, and every file matching
@@ -241,7 +241,7 @@ relying on the exit code.
   Acceptance: `EXIT_CODE: 0` and the recorded maximum is `496` for
   `scripts/bash/cleanup_worktrees_lib.sh`.
 
-- [ ] [P0-T9] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q`
+- [x] [P0-T9] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q`
   and write `evidence/remediation-baseline/pytest-push-down-contract.2026-09-08T05-30.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, the summary line, and `Output Summary:`.
   Acceptance: `EXIT_CODE: 0` and the artifact records the literal `11 passed`.
@@ -252,7 +252,7 @@ relying on the exit code.
 
 Phase 1 changes only `spec.md` and writes two decision records. No code, test, or fixture changes.
 
-- [ ] [P1-T1] Write
+- [x] [P1-T1] Write
   `evidence/other/decision-report-mode-exit-code.2026-09-08T06-00.md` recording Decision A: the
   report-mode exit-code propagation is intended and retained. The record must contain `Timestamp:`,
   the two observed exit codes (`HEAD report-mode exit code = 128`,
@@ -266,7 +266,7 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   Acceptance: that file exists and contains the literals `128`, `SKILL.md:197-200`, and
   `Decision: RETAIN`.
 
-- [ ] [P1-T2] Write
+- [x] [P1-T2] Write
   `evidence/other/decision-session-artifact-reachability.2026-09-08T06-00.md` recording Decision B
   and the re-derivation of the 2026-09-06 observation. The record must contain `Timestamp:`, the
   verbatim `git check-ignore -v artifacts/pr_context.summary.txt artifacts/pr_context.appendix.txt artifacts/orchestration/orchestrator-state.json`
@@ -288,7 +288,7 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   a multi-word phrase because a phrase drawn from prose straddles a line break once the artifact
   wraps, and a line-oriented search then reports zero matches although the text is present.
 
-- [ ] [P1-T3] In `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`,
+- [x] [P1-T3] In `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`,
   replace AC-1 (the first item of `## Acceptance Criteria`) with an unchecked `- [ ]` item whose
   sourcing clause uses the exact single-word literal `self-sourcing` and reads: sourced by
   `scripts/bash/cleanup-worktrees.sh` and by every self-sourcing
@@ -308,14 +308,14 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   because a phrase straddles a line break once the criterion wraps and a line-oriented search then
   reports zero matches. The three filename literals are single-line tokens and are unaffected.
 
-- [ ] [P1-T4] In `spec.md`, change the AC-14 checkbox and the AC-15 checkbox from `- [x]` to
+- [x] [P1-T4] In `spec.md`, change the AC-14 checkbox and the AC-15 checkbox from `- [x]` to
   `- [ ]`. AC-14 is the criterion beginning "A tracked, modified `*.csproj` entry whose diff
   contains at least one changed line that is not a `HintPath` rewrite"; AC-15 is the criterion
   beginning "For each worktree with dirt, report mode emits exactly one `DIRTFILE|` record".
   Acceptance: both criteria begin `- [ ] ` in `spec.md`, and the count of `- [x]` items inside
   `## Acceptance Criteria` is `33`.
 
-- [ ] [P1-T5] In `spec.md`, replace the command text of AC-31 and AC-32 with the routes that exist.
+- [x] [P1-T5] In `spec.md`, replace the command text of AC-31 and AC-32 with the routes that exist.
   AC-31 must name `bash scripts/bash/shell-qc.sh format`, `bash scripts/bash/shell-qc.sh check`,
   and `bash scripts/bash/shell-qc.sh test` run in this worktree with the bats binary supplied
   through the documented `SHELL_QC_BATS_BIN` seam. AC-32 must name a dispatch of
@@ -329,7 +329,7 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   deferred to P1-T8, because the Test Strategy block and the Assumptions bullet still carry it
   when this task runs.
 
-- [ ] [P1-T6] In `spec.md` `## Acceptance Criteria`, append seven new unchecked criteria whose
+- [x] [P1-T6] In `spec.md` `## Acceptance Criteria`, append seven new unchecked criteria whose
   text begins with the explicit identifier prefixes `AC-39 —` through `AC-45 —` in document order.
   The existing criteria carry no identifier prefix; the seven new ones do, so this remediation
   cycle's additions are addressable from the audit documents. The subjects are:
@@ -359,7 +359,7 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   are `- [x]`, and the section contains each of the seven identifier literals `AC-39`, `AC-40`,
   `AC-41`, `AC-42`, `AC-43`, `AC-44`, and `AC-45`.
 
-- [ ] [P1-T7] In `spec.md` `## Test Strategy`, replace the four-line fenced command block (the
+- [x] [P1-T7] In `spec.md` `## Test Strategy`, replace the four-line fenced command block (the
   `wsl -d Ubuntu -- bash -lc '... agent-a3944b95a7d58e712 ...'` block) with the runnable routes:
   `bash scripts/bash/shell-qc.sh format`, `bash scripts/bash/shell-qc.sh check`,
   `env SHELL_QC_BATS_BIN=... bash scripts/bash/shell-qc.sh test`, and the
@@ -370,7 +370,7 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   the fenced block contains no occurrence of the literal `wsl -d Ubuntu`. The whole-file assertion
   is deferred to P1-T8.
 
-- [ ] [P1-T8] In `spec.md` `## Assumptions, Constraints, Dependencies`, replace the assumption
+- [x] [P1-T8] In `spec.md` `## Assumptions, Constraints, Dependencies`, replace the assumption
   bullet that states toolchain verification runs through the `wsl -d Ubuntu -- bash -lc '...'` form
   with a bullet stating the split: `shfmt`, `shellcheck`, and `bats` run natively in the agent
   worktree; `kcov` has no local route and coverage is measured by dispatching
@@ -391,14 +391,14 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   operator running the tool through WSL; neither is a command form, both survive this plan, and an
   assertion over the bare token would therefore be unsatisfiable.
 
-- [ ] [P1-T9] In `spec.md` `## Proposed Fix` (a level-two heading, at line 159 as the file stands
+- [x] [P1-T9] In `spec.md` `## Proposed Fix` (a level-two heading, at line 159 as the file stands
   before Phase 1 runs), append a subsection headed
   `**Decision 4 — report-mode exit code on a hard status read.**` reproducing Decision A: the
   propagation is intended, the operator consequence, the rejected `WARN|` alternative, and the
   cross-reference to `.claude/skills/cleanup-merged-worktrees/SKILL.md:197-200` as precedent.
   Acceptance: `spec.md` contains the literal `Decision 4 — report-mode exit code`.
 
-- [ ] [P1-T10] In `spec.md` `## Proposed Fix` (the same level-two heading P1-T9 appends to), append
+- [x] [P1-T10] In `spec.md` `## Proposed Fix` (the same level-two heading P1-T9 appends to), append
   a subsection headed
   `**Decision 5 — DISPOSABLE_SESSION_ARTIFACT is retained and inert in drm-copilot.**` reproducing
   Decision B: the re-derived provenance of the 2026-09-06 observation, the `.gitignore:6` fact, the
@@ -414,7 +414,7 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   the wrap reason stated in P1-T2; the heading literal is asserted as written because it is the
   opening run of a short bold heading line that carries no wrapping point before it.
 
-- [ ] [P1-T11] In `spec.md` `## Acceptance Criteria`, narrow AC-15 — the criterion beginning
+- [x] [P1-T11] In `spec.md` `## Acceptance Criteria`, narrow AC-15 — the criterion beginning
   "For each worktree with dirt, report mode emits exactly one `DIRTFILE|` record" — so its scope is
   the non-detached candidate registrations the report classifies, and append an exclusion clause
   naming detached, `main`, and `bare` registrations as never classified, citing the

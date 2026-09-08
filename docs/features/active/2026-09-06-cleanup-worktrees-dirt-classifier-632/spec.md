@@ -447,11 +447,70 @@ Report-mode exit code is unchanged: still the maximum `classify_branch` return.
   clearing. That asymmetry is documented in the function header so a future reader does not "fix"
   it by removing the bound.
 
+**Decision 4 — report-mode exit code on a hard status read.**
+
+The propagation is intended and is retained. `classify_worktree_dirt` returns the version-control
+tool's exit code on a hard `status --porcelain` failure
+(`scripts/bash/cleanup_worktrees_dirt_lib.sh:342-344`), `run_report` propagates it
+(`scripts/bash/cleanup_worktrees_lib.sh:485-487`), and the wrapper propagates it in turn. A
+checkout containing such a worktree therefore exits non-zero from report mode where it previously
+exited 0 and produced a complete report.
+
+The operator consequence is what makes the propagation correct. Report mode is the read-only
+diagnostic pass that feeds the Dirty Worktree Triage Procedure. A worktree whose status read failed
+produces no `DIRTFILE|` record and no `DIRTSUM|` record at all, so a report that also exited 0 would
+be indistinguishable from a report about a clean worktree, and an operator would make a deletion
+decision on silently incomplete data.
+
+The rejected alternative was to suppress the propagation and emit a `WARN|` record instead. That
+would require adding a record type to the published Report Line Contract, which every downstream
+consumer would then have to handle, and it would leave the exit code unable to signal the
+incompleteness at all to a wrapping script that reads only the exit status.
+
+The precedent is in the same document. `.claude/skills/cleanup-merged-worktrees/SKILL.md:197-200`
+already documents an analogous apply-mode exit-status change introduced by issue 631. This decision
+mirrors that treatment for report mode: a `SKILL.md` note with its byte-identical bundle mirror, a
+new acceptance criterion (AC-43), and a test pinning exit 128 for the `dirty_worktree_status_error`
+scenario. No code change is made.
+
+**Decision 5 — DISPOSABLE_SESSION_ARTIFACT is retained and inert in drm-copilot.**
+
+The verdict is retained. It is not dead code and is not removed. It is unreachable in drm-copilot
+only, because `.gitignore:6` is `/artifacts` and the status read deliberately omits `--ignored`
+(`scripts/bash/cleanup_worktrees_dirt_lib.sh:29-33`, `:341`).
+
+The provenance of the 2026-09-06 observation that named the three paths is the TaskMaster checkout,
+not drm-copilot: the environment line records it, and in that checkout the three paths were reported
+by `git status --porcelain` and are therefore not ignored there. The tool is repository-agnostic and
+targets consumer checkouts, and delivery to them is by the extension push-down of
+`claude-customizations` recorded in `## Rollout & Follow-up`, so the rung is live exactly where the
+tool is used.
+
+The reachability mechanism is the inspected checkout's own ignore state, with no change to the
+status read. Adding `--ignored` is prohibited: it would pull every ignored build output into the
+classified set and, for any entry matching a disposable rung, into the cleared set. That prohibition
+is already stated in the library header and is reinforced by a test asserting that no status read
+the library issues carries `--ignored`, with a positive control.
+
+Retaining the rung is coverage-neutral. `dirt_is_session_artifact` at
+`scripts/bash/cleanup_worktrees_dirt_lib.sh:126-129` and its emission site at `:244-245` are already
+exercised by the `dirt_session_artifact` scenario and are absent from the uncovered set. Lines 74-77
+are reported uncovered only because they are the interior of the multi-line
+`CLEANUP_WT_SESSION_ARTIFACT_PATHS=(` array assignment, whose statement kcov attributes to its
+closing line 78, which is not in the uncovered set. That is the kcov multi-line-statement
+attribution property — the same one that reports lines 95, 148, 151 and 305 uncovered while the
+statements they open do execute — and not a reachability property.
+
 ## Assumptions, Constraints, Dependencies
 
 - Assumptions (environment, data, access):
-  - The operator runs the tool through WSL Ubuntu against a Windows checkout, and all toolchain
-    verification runs through the `wsl -d Ubuntu -- bash -lc '...'` form recorded below.
+  - The operator runs the tool through WSL Ubuntu against a Windows checkout. Toolchain
+    verification is split across two hosts rather than run through a single wrapper form. `shfmt`,
+    `shellcheck`, and `bats` run natively in the agent worktree, reached through
+    `bash scripts/bash/shell-qc.sh` with the bats binary supplied through the documented
+    `SHELL_QC_BATS_BIN` seam. `kcov` has no local route there, so coverage is measured by
+    dispatching `.github/workflows/_shell-coverage.yml` against the pushed branch, and that
+    dispatch measures the pushed tree rather than the working tree.
   - `/artifacts` is gitignored in drm-copilot (`.gitignore:6`). `git status --porcelain` without
     `--ignored` therefore never lists the three session-artifact paths in a drm-copilot worktree, so
     `DISPOSABLE_SESSION_ARTIFACT` cannot fire in this repository at runtime. The verdict is still
@@ -596,11 +655,16 @@ Seeded from issue:
 - Toolchain commands to run (format → lint → test → coverage):
 
 ```
-wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3944b95a7d58e712 && bash scripts/bash/shell-qc.sh format'
-wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3944b95a7d58e712 && bash scripts/bash/shell-qc.sh check'
-wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3944b95a7d58e712 && bash scripts/bash/shell-qc.sh test'
-wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3944b95a7d58e712 && bash scripts/bash/shell-qc.sh test --coverage'
+bash scripts/bash/shell-qc.sh format
+bash scripts/bash/shell-qc.sh check
+env SHELL_QC_BATS_BIN=<absolute path to the bats executable> bash scripts/bash/shell-qc.sh test
+gh workflow run .github/workflows/_shell-coverage.yml --ref bug/cleanup-worktrees-dirt-classifier-632-r2
 ```
+
+  The first three commands run in the agent worktree. `kcov` has no local route there, so the
+  coverage stage is not a local command: the fourth line dispatches the CI workflow, which measures
+  the pushed tree rather than the working tree, and its merged Cobertura report is the coverage
+  measurement of record.
 
   The SKILL.md edits additionally require
   `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` to pass, which fails unless
@@ -613,10 +677,18 @@ wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/w
 
 ## Acceptance Criteria
 
-- [x] `scripts/bash/cleanup_worktrees_dirt_lib.sh` exists, defines `classify_worktree_dirt`,
+- [ ] `scripts/bash/cleanup_worktrees_dirt_lib.sh` exists, defines `classify_worktree_dirt`,
   `classify_dirt_entry`, the bounded staged-tree probe, and `clear_disposable_dirt`, runs nothing at
-  source time, and is sourced by `scripts/bash/cleanup-worktrees.sh` and by every
-  `tests/shell/test_cleanup_worktrees_*.bats` suite.
+  source time, and is sourced by `scripts/bash/cleanup-worktrees.sh` and by every self-sourcing
+  `tests/shell/test_cleanup_worktrees_*.bats` suite, meaning every suite that itself sources
+  `scripts/bash/cleanup_worktrees_lib.sh`. Three suites fall outside that set and are excluded:
+  `tests/shell/test_cleanup_worktrees_scan_helper.bats`, which sources no cleanup-worktrees
+  library at all; `tests/shell/test_cleanup_worktrees_scan_seam.bats`, which sources only
+  `scripts/bash/cleanup_worktrees_report_records_lib.sh`; and
+  `tests/shell/test_cleanup_worktrees_cli.bats`, which references
+  `scripts/bash/cleanup_worktrees_dirt_lib.sh` but not `scripts/bash/cleanup_worktrees_lib.sh`,
+  so it too shows zero in the `cleanup_worktrees_lib.sh` column tabulated by the sourcing-set
+  evidence artifact.
 - [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_build_artifact/` and a
   passing bats test assert a `DIRTFILE|` record whose verdict field is `DISPOSABLE_BUILD_ARTIFACT`
   for a tracked, modified `*.csproj` entry whose diff contains only `HintPath` lines.
@@ -653,13 +725,16 @@ wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/w
 - [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_classifier_read_error/`
   and a passing bats test assert that a classifier git read exiting non-zero produces `UNIQUE` for
   that entry, `HAS_UNIQUE` for the worktree, and a refused clear.
-- [x] A tracked, modified `*.csproj` entry whose diff contains at least one changed line that is not
+- [ ] A tracked, modified `*.csproj` entry whose diff contains at least one changed line that is not
   a `HintPath` rewrite is classified `UNIQUE` rather than `DISPOSABLE_BUILD_ARTIFACT`, pinned by a
   dedicated bats test.
-- [x] For each worktree with dirt, report mode emits exactly one `DIRTFILE|` record per
-  `git status --porcelain` entry, in porcelain order, immediately after that worktree's `WORKTREE|`
-  record, followed by exactly one `DIRTSUM|` record; `dirt_mixed_unique_blocks` pins the two-entry
-  case.
+- [ ] For each non-detached candidate registration with dirt that the report classifies, report mode
+  emits exactly one `DIRTFILE|` record per `git status --porcelain` entry, in porcelain order,
+  immediately after that worktree's `WORKTREE|` record, followed by exactly one `DIRTSUM|` record;
+  `dirt_mixed_unique_blocks` pins the two-entry case. Detached, `main`, and `bare` registrations are
+  never classified and therefore receive no dirt records: the `is_detached_candidate` guard in
+  `run_report` skips a detached registration before the classification call, and the adjacent
+  `main`/`bare` guard excludes those two registration kinds as well.
 - [x] The `DIRTSUM|` aggregate field is `ALL_DISPOSABLE` if and only if the entry count is at least
   one and the `UNIQUE` count is zero, and is `HAS_UNIQUE` otherwise; a worktree with zero status
   entries emits neither a `DIRTFILE|` nor a `DIRTSUM|` record.
@@ -711,10 +786,18 @@ wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/w
 - [x] The staged-tree probe never probes the first entry returned by `rev-list`, pinned in
   `dirt_staged_tree_is_commit` by asserting no `diff-index` invocation names the HEAD SHA supplied
   in that fixture.
-- [ ] `wsl -d Ubuntu -- bash -lc '... bash scripts/bash/shell-qc.sh format'` and the same command
-  with `check` and with `test` each complete with no error in a single consecutive pass.
-- [ ] `wsl -d Ubuntu -- bash -lc '... bash scripts/bash/shell-qc.sh test --coverage'` reports kcov
-  line coverage of at least 85%; no branch-coverage gate applies to bash, and none is asserted.
+- [ ] `bash scripts/bash/shell-qc.sh format`, `bash scripts/bash/shell-qc.sh check`, and
+  `bash scripts/bash/shell-qc.sh test` each complete with no error in a single consecutive pass,
+  run in the agent worktree with the bats binary supplied through the documented
+  `SHELL_QC_BATS_BIN` seam. The format stage is judged by a before-and-after tree digest over the
+  three discovery roots rather than by its exit code alone, because `shfmt` in write mode prints
+  nothing and exits 0 whether or not it rewrote a file.
+- [ ] A dispatch of `.github/workflows/_shell-coverage.yml` against the pushed branch reports kcov
+  line coverage of at least 85% repository-wide, and `scripts/bash/cleanup_worktrees_dirt_lib.sh`
+  itself reports line coverage of at least 85% in the merged Cobertura report of that run. `kcov`
+  has no local route in the agent worktree, so the CI dispatch is the measurement path and no
+  local coverage invocation substitutes for it. No branch-coverage gate applies to bash, and none
+  is asserted.
 - [x] Every shell file changed or added by this work is at or under 500 lines, measured at
   integration time rather than assumed from the research projection.
 - [x] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Report Line Contract documents `DIRTFILE|`
@@ -737,6 +820,33 @@ wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/w
   `usage` here-doc in `scripts/bash/cleanup-worktrees.sh` both document `DIRTFILE|`, `DIRTSUM|`, and
   `--clear-disposable`, and `bash scripts/bash/cleanup-worktrees.sh --help` output contains all
   three strings, pinned by a test in `tests/shell/test_cleanup_worktrees_cli.bats`.
+- [ ] AC-39 — Rung 1 resolves `STAGED_TREE_IS_COMMIT` only when the porcelain **Y** column is a
+  space. An `MM` entry falls through to the lower rungs, which compare working-tree content, and is
+  never labelled `STAGED_TREE_IS_COMMIT` on the strength of an index-only probe. This is pinned in
+  both directions by a single checked-in fixture carrying one `MM` entry and one `M ` entry, so the
+  same once-per-worktree probe result serves both directions.
+- [ ] AC-40 — The ` -> ` payload split is applied only when the porcelain **X** column is `R` or
+  `C`. A non-rename entry whose path contains the literal ` -> ` is classified and reported under
+  its full path rather than under a truncated suffix, and a genuine `R` entry is still split so its
+  destination path is the one classified. Both directions are pinned.
+- [ ] AC-41 — The diff header skip is anchored to the header forms the version-control tool emits,
+  so an added line whose content begins `+++ ` is counted as a changed content line and tested for
+  `HintPath`, while a `/dev/null` header is still skipped. Both directions are pinned.
+- [ ] AC-42 — `STAGED_TREE_IS_COMMIT` is pinned in five material directions, the two hard-failure
+  sites counted separately: probe match; probe no-match; probe hard read failure at the `rev-list`
+  site; probe hard read failure at the `diff-index` site; and a staged entry with a non-space Y
+  column.
+- [ ] AC-43 — Report mode returns the version-control tool's non-zero exit code when a candidate
+  worktree's `status --porcelain` read fails, emits no `DIRTFILE|` and no `DIRTSUM|` record for that
+  worktree, and the behaviour is documented in
+  `.claude/skills/cleanup-merged-worktrees/SKILL.md` and pinned by a test over the checked-in
+  `dirty_worktree_status_error` scenario.
+- [ ] AC-44 — `DISPOSABLE_SESSION_ARTIFACT` is retained as repository-agnostic behaviour and is
+  inert in drm-copilot because `.gitignore:6` ignores `/artifacts`. The status read never carries
+  `--ignored`, pinned by a test asserting its absence from the stub argv log with a positive
+  control.
+- [ ] AC-45 — `scripts/bash/cleanup_worktrees_dirt_lib.sh` reports kcov line coverage of at least
+  85% in the merged Cobertura report of the CI coverage run against the pushed branch.
 
 ## Risks & Mitigations
 
