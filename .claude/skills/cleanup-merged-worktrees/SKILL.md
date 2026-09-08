@@ -89,7 +89,10 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
   its space. The file path is the last field, so a path containing a pipe character cannot
   shift any later field. A classification read that fails maps its entry to `UNIQUE`: that
   is the fail-closed direction, because an entry the tool could not classify is treated as
-  content that must be preserved. `DISPOSABLE_SESSION_ARTIFACT` matches three fixed
+  content that must be preserved. `CONTENT_ON_MAIN` is emitted for a tracked entry
+  only when `main` contains the path, so an entry whose content exists only as a staged
+  blob is reported `UNIQUE` rather than as content that is already on `main`.
+  `DISPOSABLE_SESSION_ARTIFACT` matches three fixed
   repository paths under `artifacts/`, is repository-agnostic, and cannot fire in a checkout
   that gitignores `artifacts/` — which drm-copilot does at `.gitignore:6` — because the
   status read never carries `--ignored`; the verdict is retained for consumer checkouts

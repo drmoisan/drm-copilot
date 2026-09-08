@@ -2072,7 +2072,7 @@ Round-4 departures.
 
 ### Phase 4 — Acceptance criteria and documentation
 
-- [ ] [P4-T1] Correct the stale count in AC-8 of
+- [x] [P4-T1] Correct the stale count in AC-8 of
   `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`. AC-8 is
   the eighth checkbox of the `## Acceptance Criteria` section and its count phrase sits at
   `spec.md:714`, reading `by any of the ten \`dirt_*\` scenarios.`; the word `ten` becomes
@@ -2087,7 +2087,7 @@ Round-4 departures.
   Acceptance: that command reports `1`, and the same unwrapped stream piped to
   `grep -cF 'ten `dirt_*` scenarios'` reports `0`.
 
-- [ ] [P4-T2] Append AC-46 to the `## Acceptance Criteria` section of `spec.md` as an
+- [x] [P4-T2] Append AC-46 to the `## Acceptance Criteria` section of `spec.md` as an
   **unchecked** box: rung 4's tracked half resolves `CONTENT_ON_MAIN` only when the path
   is present in `main`; a `diff --quiet` exit 0 over a pathspec matching nothing in either
   tree advances the ladder rather than resolving a verdict, so an `AD` entry whose content
@@ -2097,7 +2097,7 @@ Round-4 departures.
   `grep -c '^- \[ \] AC-46 —' docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`
   reports `1`.
 
-- [ ] [P4-T3] Append AC-47 to the same section as an **unchecked** box. Its text must
+- [x] [P4-T3] Append AC-47 to the same section as an **unchecked** box. Its text must
   describe the set the gate actually enforces rather than a general property, in these
   terms: every line in `scripts/bash/cleanup_worktrees_dirt_lib.sh` that carries an
   arithmetic comparison of a variable against a numeric literal carries a `# guard:`
@@ -2164,7 +2164,7 @@ Round-4 departures.
 
   reports `1`.
 
-- [ ] [P4-T4] Reconcile the criterion count. The counts are **section-scoped** and the
+- [x] [P4-T4] Reconcile the criterion count. The counts are **section-scoped** and the
   derivation is fixed here so the task does not choose one: `spec.md` carries eight
   checkboxes outside the `## Acceptance Criteria` section, at `:24`, `:25`, `:26`, `:27`,
   `:84`, `:595`, `:597`, and `:599`, so an unscoped `grep -c '^- \['` reports 53 before this
@@ -2185,7 +2185,7 @@ Round-4 departures.
   artifact records a section-scoped total of `47`, a checked count of `45`, an unchecked
   count of `2`, and an unscoped figure of `55`.
 
-- [ ] [P4-T5] Add one sentence to the `DIRTFILE|` bullet of the Report Line Contract in
+- [x] [P4-T5] Add one sentence to the `DIRTFILE|` bullet of the Report Line Contract in
   `.claude/skills/cleanup-merged-worktrees/SKILL.md` — the bullet beginning at `:81` and
   ending at `:97` — stating that `CONTENT_ON_MAIN` is emitted for a tracked entry only when
   `main` contains the path, so an entry whose content exists only as a staged blob is
@@ -2200,7 +2200,7 @@ Round-4 departures.
   Acceptance: that command reports `1`. A line-oriented search over the wrapped file would
   return 0 whenever the sentence happened to span two lines, whatever the executor wrote.
 
-- [ ] [P4-T6] Mirror the edited skill file to
+- [x] [P4-T6] Mirror the edited skill file to
   `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
   and verify byte identity with `md5sum` over both paths. Record
   `evidence/qa-gates/skill-mirror-parity.2026-09-08T09-30.md` with `Timestamp:`,
