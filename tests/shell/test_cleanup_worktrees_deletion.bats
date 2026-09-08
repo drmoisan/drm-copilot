@@ -11,17 +11,25 @@ setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
     ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
+    RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
     DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
+    SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
     DEL="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/deletion"
     chmod +x "${STUB}" 2>/dev/null || true
+    chmod +x "${SCAN}" 2>/dev/null || true
 }
 
 apply() { # apply <scenario-dir>
-    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="$1" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; source '${DLIB}'; run_apply"
+    # run_apply now calls the shared classification driver, so the sibling library must
+    # be sourced here (bats subshells source the libraries directly and never run the CLI
+    # wrapper) and the filesystem scan must route through the checked-in scan stub rather
+    # than reading the real .claude/worktrees tree.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="$1" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${RLIB}'; source '${ALIB}'; source '${DLIB}'; run_apply"
 }
 
 @test "a dirty worktree blocks removal, reports DIRTY lines, and never forces" {
@@ -117,4 +125,28 @@ apply() { # apply <scenario-dir>
     [[ "$output" == *"ANCESTRY_ERROR"* ]]
     [[ "$output" != *"MERGED_CLEAN"* ]]
     [[ "$output" != *"branch -D documentationandmemories"* ]]
+}
+
+@test "apply mode emits no deletion for a NOT_MERGED branch carrying a CHILD_OF record" {
+    # Outcome preservation, property (b). Under this fixture feature-child resolves
+    # NOT_MERGED through its own full ladder, so the assertion below is no longer
+    # satisfied by an inherited verdict; the CHILD_OF record beside it is additive and
+    # informational. NOT_MERGED is not on the delete-eligible allowlist, so no deletion
+    # ACTION of any result is emitted for the branch.
+    apply "${SCEN}/child_of_not_merged"
+    [[ "$output" == *"BRANCH|feature-child|NOT_MERGED"* ]]
+    [[ "$output" == *"CHILD_OF|feature-child|feature-parent"* ]]
+    [[ "$output" != *"ACTION|delete|feature-child|"* ]]
+    [[ "$output" != *"branch -D feature-child"* ]]
+}
+
+@test "apply mode deletes a delete-eligible branch that is an ancestor of a NOT_MERGED branch" {
+    # The apply-mode expression of R-01's stated impact. feature-child is a git ancestor
+    # of the NOT_MERGED feature-parent, but its own rung-2 probe resolves it MERGED_CLEAN,
+    # which is on the delete-eligible allowlist. The pre-fix driver reported NOT_MERGED
+    # for this branch, so it was silently never deleted.
+    apply "${SCEN}/child_of_subject_merged_clean"
+    [[ "$output" == *"BRANCH|feature-child|MERGED_CLEAN"* ]]
+    [[ "$output" == *"ACTION|branch-delete|feature-child|OK"* ]]
+    [[ "$output" == *"BRANCH|feature-parent|NOT_MERGED"* ]]
 }
