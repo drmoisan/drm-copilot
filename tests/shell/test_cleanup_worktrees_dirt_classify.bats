@@ -173,6 +173,13 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
 @test "dirt_staged_tree_is_commit: no lower-rung read runs for the staged paths" {
     dirt_log dirt_staged_tree_is_commit
     log="$(argv_log)"
+    # Positive control, asserted over the merged $output because the records are on
+    # stdout while the argv log is on stderr. Both staged paths must reach a rung-1
+    # verdict. Without this the four absence assertions below hold in any tree where no
+    # classification runs at all, including one with the classifier deleted outright, so
+    # the test could not fail in the direction that matters.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|STAGED_TREE_IS_COMMIT|eeee7777|M |src/a.cs'* ]]
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|STAGED_TREE_IS_COMMIT|eeee7777|M |src/b.cs'* ]]
     # Rung 1 precedes rungs 2 through 5, so none of the lower rungs' reads is issued for
     # either staged path.
     [[ "$log" != *"hash-object"* ]]
