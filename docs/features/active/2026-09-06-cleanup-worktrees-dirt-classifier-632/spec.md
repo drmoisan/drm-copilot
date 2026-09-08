@@ -847,13 +847,13 @@ gh workflow run .github/workflows/_shell-coverage.yml --ref bug/cleanup-worktree
   control.
 - [x] AC-45 — `scripts/bash/cleanup_worktrees_dirt_lib.sh` reports kcov line coverage of at least
   85% in the merged Cobertura report of the CI coverage run against the pushed branch.
-- [ ] AC-46 — Rung 4's tracked half resolves `CONTENT_ON_MAIN` only when the path is present in
+- [x] AC-46 — Rung 4's tracked half resolves `CONTENT_ON_MAIN` only when the path is present in
   `main`; a `diff --quiet` exit 0 over a pathspec matching nothing in either tree advances the
   ladder rather than resolving a verdict, so an `AD` entry whose content exists only as a staged
   blob is `UNIQUE` and its worktree is `HAS_UNIQUE`; both directions are pinned by a single
   checked-in fixture carrying one `AD` entry and one tracked entry whose content is present in
   `main`.
-- [ ] AC-47 — Every line in `scripts/bash/cleanup_worktrees_dirt_lib.sh` that carries an arithmetic
+- [x] AC-47 — Every line in `scripts/bash/cleanup_worktrees_dirt_lib.sh` that carries an arithmetic
   comparison of a variable against a numeric literal carries a `# guard:` marker; the marked lines
   plus the eight named non-arithmetic verdict guards — the diff-header skip, rung 1's Y-column
   gate, the empty-blob fail-closed test, rung 4's untracked main-blob equality test, rung 5's

@@ -2312,7 +2312,7 @@ Round-4 departures.
   `dirt_tracked_staged_only_blob` as the fixture that executes the new guard in both
   directions.
 
-- [ ] [P5-T10] Check off AC-46 and AC-47 in `spec.md` and record
+- [x] [P5-T10] Check off AC-46 and AC-47 in `spec.md` and record
   `evidence/other/ac-checkoff.2026-09-08T10-00.md` with `Timestamp:`, the evidence artifact
   path supporting each of the two criteria, the total checkbox count inside the
   `## Acceptance Criteria` section, and the checked count. Both counts use the same
