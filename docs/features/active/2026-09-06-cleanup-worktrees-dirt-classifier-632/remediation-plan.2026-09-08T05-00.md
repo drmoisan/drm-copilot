@@ -1103,7 +1103,7 @@ gates staging and commit commands. The orchestrator-state checkpoint at
 `artifacts/orchestration/orchestrator-state.json` must permit implementation staging before P8-T5
 runs; that is an orchestration precondition, not an acceptance condition of this plan.
 
-- [ ] [P8-T1] Capture the tree digest, run `bash scripts/bash/shell-qc.sh format`, capture the
+- [x] [P8-T1] Capture the tree digest, run `bash scripts/bash/shell-qc.sh format`, capture the
   digest again, using the same digest command as P0-T3, and write
   `evidence/qa-gates/shell-qc-format.2026-09-08T07-00.md` with `Timestamp:`, `Command:`,
   `EXIT_CODE:`, both digests, and `Output Summary:`.
@@ -1111,13 +1111,13 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   If they differ, the formatter rewrote a file and the loop restarts at P8-T1 after the rewrite is
   committed to the working tree.
 
-- [ ] [P8-T2] Run `bash scripts/bash/shell-qc.sh check` and write
+- [x] [P8-T2] Run `bash scripts/bash/shell-qc.sh check` and write
   `evidence/qa-gates/shell-qc-check.2026-09-08T07-00.md` with `Timestamp:`, `Command:`,
   `EXIT_CODE:`, and `Output Summary:` recording the shfmt hunk count and the shellcheck finding
   count.
   Acceptance: `EXIT_CODE: 0` and the recorded counts are both `0`.
 
-- [ ] [P8-T3] Run the full bats stage with the bats path recorded in P0-T5 and write
+- [x] [P8-T3] Run the full bats stage with the bats path recorded in P0-T5 and write
   `evidence/qa-gates/shell-qc-test.2026-09-08T07-00.md` with `Timestamp:`, `Command:`,
   `EXIT_CODE:`, the TAP plan line, the `ok` count, the `not ok` count, the value of the
   `BaselineLocalTestTotal:` line recorded by P0-T5 reproduced verbatim, and the delta computed as
@@ -1130,7 +1130,7 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   cannot make this condition unsatisfiable. The artifact must not record the message
   `bats not installed; skipping shell tests.`
 
-- [ ] [P8-T4] Run `wc -l` over the same file set as P0-T8 plus
+- [x] [P8-T4] Run `wc -l` over the same file set as P0-T8 plus
   `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`, and write
   `evidence/qa-gates/file-size-limit.2026-09-08T07-00.md` with `Timestamp:`, `Command:`,
   `EXIT_CODE:`, the full table, and `Output Summary:` naming the maximum.
