@@ -1065,14 +1065,14 @@ Round-4 departures.
 
 ### Phase 0 — Baseline capture
 
-- [ ] [P0-T1] Read, in this order, `.github/copilot-instructions.md`,
+- [x] [P0-T1] Read, in this order, `.github/copilot-instructions.md`,
   `.github/instructions/general-code-change.instructions.md`,
   `.github/instructions/general-unit-test.instructions.md`, and `.claude/rules/shell.md`.
   Write `evidence/remediation-baseline/phase0-instructions-read.2026-09-08T07-30.md`
   carrying `Timestamp:`, `Policy Order:`, and the explicit list of the four files read.
   Acceptance: the artifact exists and lists all four paths.
 
-- [ ] [P0-T2] Read the four cycle-2 finding documents in the feature folder:
+- [x] [P0-T2] Read the four cycle-2 finding documents in the feature folder:
   `remediation-inputs.2026-09-08T06-51.md`, `code-review.2026-09-08T06-51.md`,
   `feature-audit.2026-09-08T06-51.md`, `policy-audit.2026-09-08T06-51.md`. Write
   `evidence/remediation-baseline/phase0-findings-read.2026-09-08T07-30.md` recording, for
@@ -1113,7 +1113,7 @@ Round-4 departures.
   the artifact lists each rewritten path and states, for each, whether that path is in this
   cycle's scope**.
 
-- [ ] [P0-T4] Run `bash scripts/bash/shell-qc.sh check` and record it in
+- [x] [P0-T4] Run `bash scripts/bash/shell-qc.sh check` and record it in
   `evidence/remediation-baseline/shell-qc-check.2026-09-08T07-30.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, and `Output Summary:` reproducing the command's combined
   stdout and stderr verbatim. No findings count is asserted, because `run_check`
@@ -1121,7 +1121,7 @@ Round-4 departures.
   line. Acceptance: `EXIT_CODE:` is `0` and `Output Summary:` records that the combined
   output was empty, quoting it verbatim (an empty block) rather than paraphrasing it.
 
-- [ ] [P0-T5] Resolve the bats binary with `npx --yes bats --version`, then run the full
+- [x] [P0-T5] Resolve the bats binary with `npx --yes bats --version`, then run the full
   local test stage as
   `env SHELL_QC_BATS_BIN=<resolved path> bash scripts/bash/shell-qc.sh test`. Record
   `evidence/remediation-baseline/shell-qc-test.2026-09-08T07-30.md` with `Timestamp:`,
@@ -1131,7 +1131,7 @@ Round-4 departures.
   `not ok` count is `0`, and `BaselineLocalTestTotal:` is a number the later delta task
   compares against.
 
-- [ ] [P0-T6] Record the coverage baseline from the last successful CI coverage run rather
+- [x] [P0-T6] Record the coverage baseline from the last successful CI coverage run rather
   than from any local invocation. Write
   `evidence/remediation-baseline/shell-coverage.2026-09-08T07-30.md` carrying
   `Timestamp:`, `Command:` naming the `gh` read used, `EXIT_CODE:`,
@@ -1147,7 +1147,7 @@ Round-4 departures.
   `kcov` has no local route in this worktree and that
   `bash scripts/bash/shell-qc.sh test --coverage` exits 127 here.
 
-- [ ] [P0-T7] Measure the guard inventory in the classifier library. Run
+- [x] [P0-T7] Measure the guard inventory in the classifier library. Run
   `grep -cE '\(\([A-Za-z_][A-Za-z0-9_]* (==|!=|>=|<=|>|<) [0-9]+\)\)' scripts/bash/cleanup_worktrees_dirt_lib.sh`
   for the arithmetic count, `grep -c '# guard:' scripts/bash/cleanup_worktrees_dirt_lib.sh`
   for the marked count, and
@@ -1163,7 +1163,7 @@ Round-4 departures.
   the derived end-state targets **31 arithmetic lines, 37 marker lines, 39 registry rows**
   with the arithmetic that produces each.
 
-- [ ] [P0-T8] Measure the current line count of every shell file this cycle may touch with
+- [x] [P0-T8] Measure the current line count of every shell file this cycle may touch with
   `wc -l scripts/bash/cleanup_worktrees_dirt_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup-worktrees.sh tests/shell/test_cleanup_worktrees_dirt_classify.bats tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`
   and record it in `evidence/remediation-baseline/file-size-limit.2026-09-08T07-30.md`.
   The same artifact also records `StubDigest:`, the `md5sum` of
@@ -1173,7 +1173,7 @@ Round-4 departures.
   `scripts/bash/cleanup_worktrees_lib.sh` as `496`, `StubDigest:` is present and
   non-empty, and the artifact states the remaining headroom to 500 for each file.
 
-- [ ] [P0-T9] Measure the current scenario and record counts. Run
+- [x] [P0-T9] Measure the current scenario and record counts. Run
   `find tests/fixtures/cleanup_worktrees/scenarios -maxdepth 1 -type d -name 'dirt_*' | wc -l`
   and read the two literals in
   `tests/shell/test_cleanup_worktrees_dirt_classify.bats`. Record
