@@ -319,6 +319,46 @@ Describe 'hook-command-scanner (issue #545 D2 Piece 1 and Piece 2)' {
         }
     }
 
+    # Every case below drives a pure predicate over a literal fixture: no disk I/O, no child
+    # process, no temporary file, no live executable, and no ambient state. Each fixture is
+    # resolved through the suite's Get-SegmentList helper, which calls Read-CommandLineSegment
+    # directly, so the only input to the assertion is the literal command text on the line.
+    Context 'R-2 raw-scan predicate' {
+        It 'R2-P1 reports true for a wrapper-led segment' {
+            # bash is a member of the fourteen-name wrapper carve-out set, so the scanner
+            # selects RawText for this segment and the predicate must report it.
+            $segment = (Get-SegmentList -Text 'bash -c "gh pr merge --merge 688"')[0]
+            (Test-CommandLineSegmentRawScan -Segment $segment) | Should -BeTrue
+        }
+
+        It 'R2-P2 reports true for a segment carrying a live substitution' {
+            # A dollar-paren inside a double-quoted span sets HasLiveSubstitution, which is
+            # the second of the three disjuncts.
+            $segment = (Get-SegmentList -Text 'echo "$(gh pr merge --merge 688)"')[0]
+            (Test-CommandLineSegmentRawScan -Segment $segment) | Should -BeTrue
+        }
+
+        It 'R2-P3 reports true for an unbalanced segment' {
+            # The quote never closes, so the scanner declares the segment unresolvable and
+            # selects RawText under the third disjunct.
+            $segment = (Get-SegmentList -Text 'echo "gh pr merge --merge 688')[0]
+            (Test-CommandLineSegmentRawScan -Segment $segment) | Should -BeTrue
+        }
+
+        It 'R2-P4 reports false for a masked quoted mention in a non-wrapper segment' {
+            # git is not a wrapper, the span is balanced, and it carries no substitution, so
+            # the scanner masks the quoted text. Reporting true here would re-open the
+            # over-match this feature exists to close.
+            $segment = (Get-SegmentList -Text 'git commit -m "gh pr merge --merge 688"')[0]
+            (Test-CommandLineSegmentRawScan -Segment $segment) | Should -BeFalse
+        }
+
+        It 'R2-P5 reports false for a null segment' {
+            # A caller that iterates an empty segment list must not be handed a true.
+            (Test-CommandLineSegmentRawScan -Segment $null) | Should -BeFalse
+        }
+    }
+
     Context 'D12 public parser contract' {
         BeforeAll {
             function Get-DeclaredParameterName {

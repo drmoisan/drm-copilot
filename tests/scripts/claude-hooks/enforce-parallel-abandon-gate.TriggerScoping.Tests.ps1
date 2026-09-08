@@ -66,4 +66,35 @@ Describe 'enforce-parallel-abandon-gate.ps1 trigger scoping (issue #545)' {
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_ABANDON_BLOCKED'
     }
+
+    Context 'R-2.b wrapper-led disposition' {
+        # Every case in this context drives Invoke-ParallelAbandonGateDecision through the
+        # file's ConvertTo-AbandonGateEnvelope helper with a literal fixture. No disk I/O,
+        # no child process, no temporary file, no live executable, no ambient state.
+        It 'R2b-C1 denies the space-separated disposition carried inside a bash -c argument' {
+            $envelope = ConvertTo-AbandonGateEnvelope -Command 'bash -c "python -m scripts.dev_tools.parallel_mutation_abandon_cli --item 545 --disposition abandon"'
+            $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $envelope
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_ABANDON_BLOCKED'
+        }
+
+        It 'R2b-C2 denies the equals-joined disposition carried inside a bash -c argument' {
+            $envelope = ConvertTo-AbandonGateEnvelope -Command 'bash -c "python -m scripts.dev_tools.parallel_mutation_abandon_cli --item 545 --disposition=abandon"'
+            $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $envelope
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_ABANDON_BLOCKED'
+        }
+
+        It 'R2b-C3 allows a wrapper-led abandon carrying the confirmation marker in the same segment' {
+            $envelope = ConvertTo-AbandonGateEnvelope -Command 'bash -c "python -m scripts.dev_tools.parallel_mutation_abandon_cli --item 545 --disposition abandon --confirm-abandon"'
+            $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $envelope
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'R2b-N1 still allows a commit message quoting the disposition token' {
+            $envelope = ConvertTo-AbandonGateEnvelope -Command 'git commit -m "note that --disposition abandon is gated"'
+            $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $envelope
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+    }
 }

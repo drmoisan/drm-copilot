@@ -393,8 +393,22 @@ function Invoke-EpicMergeGateDecision {
     # other Bash command is unaffected. Both legs are read structurally from the segment
     # that invokes the command, so a quoted mention of the phrase and a --merge token
     # belonging to some other segment no longer bring a command into scope.
+    #
+    # The flag leg needs a raw-scan fallback: a wrapper's quoted argument collapses into ONE
+    # token, so a flag inside it is never read as a token, and the token-only read took
+    # bash -c "gh pr merge --merge 688" out of scope. The fallback reads only the segments the
+    # scanner already scans raw, so a masked mention in a non-wrapper segment stays out.
     $isMergeInvocation = Test-CommandLineInvocation -CommandText $commandText -CommandWord 'gh' -SubcommandPath @('pr', 'merge')
     $hasMergeFlag = Test-CommandLineFlag -CommandText $commandText -CommandWord 'gh' -SubcommandPath @('pr', 'merge') -FlagName '--merge'
+    if (-not $hasMergeFlag) {
+        foreach ($segment in @(Read-CommandLineSegment -CommandText $commandText)) {
+            if ((Test-CommandLineSegmentRawScan -Segment $segment) -and
+                $segment.ScanText.IndexOf('--merge', [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                $hasMergeFlag = $true
+                break
+            }
+        }
+    }
     if (-not $isMergeInvocation -or -not $hasMergeFlag) {
         return Get-EpicMergeGateAllowDecision
     }
