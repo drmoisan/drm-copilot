@@ -1138,7 +1138,7 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   `scripts/bash/cleanup_worktrees_lib.sh` still at `496` — unchanged, because this plan does not
   modify it.
 
-- [ ] [P8-T5] Stage and commit every change this plan made, then push
+- [x] [P8-T5] Stage and commit every change this plan made, then push
   `bug/cleanup-worktrees-dirt-classifier-632-r2`. Write
   `evidence/other/remediation-commit-and-push.2026-09-08T07-00.md` with `Timestamp:`, a
   `git rev-parse HEAD` span taken immediately before the `git add` and recorded on its own line in
@@ -1168,7 +1168,7 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   report a newly created file until it is staged, and the porcelain span goes empty once the commit
   lands, so neither alone establishes the state.
 
-- [ ] [P8-T6] Dispatch the coverage workflow against the pushed branch with
+- [x] [P8-T6] Dispatch the coverage workflow against the pushed branch with
   `gh workflow run .github/workflows/_shell-coverage.yml --ref bug/cleanup-worktrees-dirt-classifier-632-r2`,
   wait for the run to complete, and write
   `evidence/qa-gates/shell-qc-test-coverage.2026-09-08T07-00.md` with `Timestamp:`, `Command:`,
@@ -1183,7 +1183,7 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   no local route in this worktree — `bash scripts/bash/shell-qc.sh test --coverage` exits 127 here
   — so this dispatch is the measurement path and no local coverage invocation substitutes for it.
 
-- [ ] [P8-T7] Download the `shell-coverage` artifact of the P8-T6 run with `gh run download`, read
+- [x] [P8-T7] Download the `shell-coverage` artifact of the P8-T6 run with `gh run download`, read
   `kcov-merged/cov.xml`, and write
   `evidence/qa-gates/dirt-lib-coverage.2026-09-08T07-00.md` with `Timestamp:`, `Command:`,
   `EXIT_CODE:`, the per-file table for all eight `scripts/bash/cleanup_worktrees*` files as covered
@@ -1196,7 +1196,7 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   `scripts/bash/cleanup_worktrees_dirt_lib.sh`; the artifact must record both counts so the
   percentage is re-derivable by a third party.
 
-- [ ] [P8-T8] Write `evidence/qa-gates/coverage-delta.2026-09-08T07-00.md` with `Timestamp:`,
+- [x] [P8-T8] Write `evidence/qa-gates/coverage-delta.2026-09-08T07-00.md` with `Timestamp:`,
   `Command:` naming the P8-T6 dispatch and the P0-T7 baseline artifact, `EXIT_CODE:`,
   `BaselineRepoLineCoverage:` `92.9`, `PostChangeRepoLineCoverage:` from P8-T6,
   `BaselineDirtLibLineCoverage:` `82.63`, `PostChangeDirtLibLineCoverage:` from P8-T7,
@@ -1206,13 +1206,13 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   summary records that no file listed in the P0-T7 baseline table fell below its baseline
   percentage.
 
-- [ ] [P8-T9] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q`
+- [x] [P8-T9] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q`
   and write `evidence/qa-gates/pytest-push-down-contract.2026-09-08T07-00.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, the summary line, and `Output Summary:`.
   Acceptance: `EXIT_CODE: 0` and the artifact records the literal `11 passed`, equal to the P0-T9
   baseline, so no test was skipped rather than passing.
 
-- [ ] [P8-T10] Check off the reconciled acceptance criteria in
+- [x] [P8-T10] Check off the reconciled acceptance criteria in
   `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`: AC-1, AC-14,
   AC-15, AC-31, AC-32, and AC-39 through AC-45, each from `- [ ]` to `- [x]`, and write
   `evidence/other/ac-checkoff.2026-09-08T07-00.md` naming, for each of the twelve, the evidence
@@ -1221,7 +1221,7 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   are `- [x]`, and the check-off artifact names a distinct evidence artifact path for each of the
   twelve criteria.
 
-- [ ] [P8-T11] Write `evidence/qa-gates/single-consecutive-pass.2026-09-08T07-00.md` declaring the
+- [x] [P8-T11] Write `evidence/qa-gates/single-consecutive-pass.2026-09-08T07-00.md` declaring the
   toolchain loop complete in a single consecutive pass, with `Timestamp:`, one row per stage
   (format, lint, test, coverage) naming that stage's artifact path and `EXIT_CODE:`, an explicit
   statement that no stage rewrote a tracked file and no stage was re-entered after the last
@@ -1230,7 +1230,7 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   P8-T6, records `EXIT_CODE: 0` for each, and states that the P8-T1 before and after digests were
   equal.
 
-- [ ] [P8-T12] Write `evidence/other/deferred-findings.2026-09-08T07-00.md` recording the
+- [x] [P8-T12] Write `evidence/other/deferred-findings.2026-09-08T07-00.md` recording the
   disposition of the eight advisory findings F7 through F14 from
   `code-review.2026-09-08T05-00.md`: for each, its title, why it does not block this remediation
   cycle, and the reason for deferral. F14 is the one finding of the eight that is split rather than
