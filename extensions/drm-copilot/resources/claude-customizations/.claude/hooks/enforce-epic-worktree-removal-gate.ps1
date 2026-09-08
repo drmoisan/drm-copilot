@@ -60,6 +60,10 @@ param()
 
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+# Shared command-line parser (issue #545), consumed by the scope filter in
+# Invoke-EpicWorktreeRemovalGateDecision and by Get-EpicWorktreeRemovalCommandPath.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
 $script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
 $script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json'
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
@@ -132,6 +136,19 @@ function Get-EpicWorktreeRemovalCommandPath {
     <#
     .SYNOPSIS
         Extract the target worktree path argument from a git worktree remove command.
+    .DESCRIPTION
+        The operand comes from the segment that structurally invokes git worktree remove,
+        so a 'cd <path> &&' segment chained before the removal contributes nothing and a
+        quoted mention of the phrase resolves to no operand at all. Quotes around the path
+        are already stripped by the tokenizer.
+
+        '--force' is a zero-argument flag, so it never contributes an operand and may be
+        written on either side of the target path. Its presence is read structurally through
+        Test-CommandLineFlag rather than by searching the raw text, so a '--force' spelling
+        that appears inside an unrelated quoted argument cannot change how the operand list
+        is read. When no operand resolves, a present '--force' is reported in its place, so
+        the checkpoint lookup fails closed on a value that matches no recorded worktree_path
+        - the same value the previous raw-text pattern returned for that input.
     .PARAMETER CommandText
         The Bash command text under evaluation.
     .OUTPUTS
@@ -144,8 +161,14 @@ function Get-EpicWorktreeRemovalCommandPath {
         [string] $CommandText
     )
 
-    if ($CommandText -match '(?i)\bgit\s+worktree\s+remove\s+(?<path>\S+)') {
-        return $Matches['path'].Trim('"''')
+    $hasForce = Test-CommandLineFlag -CommandText $CommandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove') -FlagName '--force'
+    $operands = @(Get-CommandLineOperand -CommandText $CommandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove'))
+
+    if ($operands.Count -gt 0) {
+        return $operands[0]
+    }
+    if ($hasForce) {
+        return '--force'
     }
     return $null
 }
@@ -344,7 +367,10 @@ function Invoke-EpicWorktreeRemovalGateDecision {
         return Get-EpicWorktreeGateAllowDecision
     }
 
-    if ($commandText -notmatch '(?i)\bgit\s+worktree\s+remove\b') {
+    # Scope filter. The test is structural, so a relocating spelling such as
+    # 'git -C <dir> worktree remove <path>' is now in scope and quoted prose that merely
+    # mentions the phrase is not (issue #545).
+    if (-not (Test-CommandLineInvocation -CommandText $commandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove'))) {
         return Get-EpicWorktreeGateAllowDecision
     }
 
