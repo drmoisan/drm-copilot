@@ -29,10 +29,16 @@
 # classify_worktree_dirt, that call's exit status, stdout of clear_disposable_dirt, that
 # call's exit status. The stub's `stub-git: <argv>` log travels on stderr and is captured
 # into a separate argv channel, tagged with an ARGV prefix this harness adds, so it can
-# never contaminate the record channel. A guard whose neutralization changes neither
-# channel is EXEMPT and must say so with a fixed reason token; a guard that changes only
-# the argv log is ARGV; anything else is SEPARATED. Each kind asserts the presence AND the
-# absence it names, so no kind is satisfiable by writing a verdict into the registry.
+# never contaminate the record channel. Exactly two kinds are admissible: a guard whose
+# neutralization changes only the argv log is ARGV, and one that changes the record
+# channel is SEPARATED. Both kinds require an observed difference between the mutated and
+# the unmutated run, and a difference is only possible if the guard executed, so a
+# scenario under which the ladder never reaches the guard is a way to fail rather than a
+# way to pass. The third kind earlier cycles admitted, for a guard whose neutralization
+# changed neither channel, was removed for that reason: it could be satisfied by naming a
+# scenario that never reached the guard, which parked a separable guard instead of pinning
+# it. Each kind asserts the presence AND the absence it names, so no kind is satisfiable
+# by writing a verdict into the registry.
 #
 # NO TEMPORARY FILES. The mutated source never reaches disk. Every scenario is checked in
 # under tests/fixtures/cleanup_worktrees/scenarios/. No scratch directory is used.
@@ -116,25 +122,6 @@ run_child() { # run_child <source> <scenario> -> sets CH_REC and CH_ARGV
     CH_ARGV="$(printf '%s\n' "$merged" | grep '^ARGV ' || true)"
 }
 
-sibling_mutation() { # sibling_mutation <id> <mutation> -> the other admissible constant
-    # Composed from the row's own marked line, never read from a registry column. Empty
-    # for a mutation that is one of the eight fixed literals, which have no sibling.
-    local e out=""
-    case "$2" in
-    's/(('*)
-        e="$(expr_for "$1")"
-        if [ -n "$e" ]; then
-            if [ "$2" = "s/(($e))/((0))/" ]; then
-                out="s/(($e))/((1))/"
-            elif [ "$2" = "s/(($e))/((1))/" ]; then
-                out="s/(($e))/((0))/"
-            fi
-        fi
-        ;;
-    esac
-    printf '%s' "$out"
-}
-
 pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> row count
     local want="$1" cls="$2" kinds="$3"
     local rid rkind rscen ragg rmut rreason n=0 mclass
@@ -155,7 +142,7 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
     # R1, R2 and R5, so a registry derived from the predicate alone would exclude the
     # shapes that carried the real defects. The ninth is the fail-closed test N3 adds: it
     # sets the flag that stops rungs 4 and 5 emitting a disposable verdict for an entry
-    # whose X and Y columns are both content-bearing. Like the other eight it is a
+    # whose X and Y columns are both content-bearing. Like the other named literals it is a
     # [[ ... ]] test rather than an arithmetic comparison, so GUARD_RE does not compel a
     # marker onto it and its id and mutation are listed below instead.
     local -a LIT_IDS=(
@@ -181,6 +168,7 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
         's%\[\[ $x == \[MARCTU\] && $y == \[MARCTU\] \]\]%[[ -n "" ]]%'
     )
     local unmarked="" idless="" unknown="" dupid="" duppair="" missingpair="" badmut=""
+    local badkind=""
     local line id kind scen agg mut reason marked_ids e a0 a1 ok i hit row
 
     # The marked id set is read from the library, never from a list written here.
@@ -201,7 +189,7 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
     # one", so that a line carrying an arithmetic guard and a named non-arithmetic guard
     # may back two rows under one marker.
     for id in "${MARKED[@]}"; do
-        if [ "$(pin_count "$id" any 'SEPARATED ARGV EXEMPT')" -eq 0 ]; then
+        if [ "$(pin_count "$id" any 'SEPARATED ARGV')" -eq 0 ]; then
             idless="$idless $id"
         fi
     done
@@ -223,7 +211,7 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
     # 5. no two registry rows share the same (id, mutation) pair.
     duppair="$(awk -F'\t' '!/^#/ {print $1"\t"$5}' "$REGISTRY" | sort | uniq -d || true)"
 
-    # 6. each of the eight named non-arithmetic (id, mutation) pairs is registered.
+    # 6. each of the nine named non-arithmetic (id, mutation) pairs is registered.
     for ((i = 0; i < ${#LIT_IDS[@]}; i++)); do
         hit=0
         for row in "${ROWS[@]}"; do
@@ -234,7 +222,7 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
         if [ "$hit" -eq 0 ]; then missingpair="$missingpair ${LIT_IDS[i]}"; fi
     done
 
-    # 7. every row's mutation is one of the eight literals, or is exactly
+    # 7. every row's mutation is one of the nine literals, or is exactly
     # s/((EXPR))/((0))/ or s/((EXPR))/((1))/ with EXPR derived HERE from the row's own
     # marked line in the unmutated library. A marked line carrying no arithmetic
     # comparison yields an empty EXPR, and only the literal disjunct applies to it.
@@ -254,6 +242,19 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
         if [ "$ok" -eq 0 ]; then badmut="$badmut [$id::$mut]"; fi
     done
 
+    # 8. every row's kind is SEPARATED or ARGV; no other kind is admissible. This is not
+    # redundant with the default arm of the second test's Obligation 5: that arm is
+    # evaluated only for rows that pass Obligation 1, so a row naming a nonexistent
+    # scenario is skipped there and would carry an inadmissible kind unreported.
+    for row in "${ROWS[@]}"; do
+        case "$row" in '#'* | '') continue ;; esac
+        IFS=$'\t' read -r id kind scen agg mut reason <<<"$row"
+        case "$kind" in
+        SEPARATED | ARGV) ;;
+        *) badkind="$badkind [$id::$kind]" ;;
+        esac
+    done
+
     if [ -n "$unmarked" ]; then echo "INVARIANT-1 unmarked guard lines:$unmarked" >&2; fi
     if [ -n "$idless" ]; then echo "INVARIANT-2 markers with no registry row:$idless" >&2; fi
     if [ -n "$unknown" ]; then echo "INVARIANT-3 rows naming an unmarked id:$unknown" >&2; fi
@@ -261,6 +262,7 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
     if [ -n "$duppair" ]; then echo "INVARIANT-5 duplicate (id,mutation): $duppair" >&2; fi
     if [ -n "$missingpair" ]; then echo "INVARIANT-6 missing literal pair:$missingpair" >&2; fi
     if [ -n "$badmut" ]; then echo "INVARIANT-7 inadmissible mutation:$badmut" >&2; fi
+    if [ -n "$badkind" ]; then echo "INVARIANT-8 inadmissible kind:$badkind" >&2; fi
 
     [ -z "$unmarked" ]
     [ -z "$idless" ]
@@ -269,12 +271,13 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
     [ -z "$duppair" ]
     [ -z "$missingpair" ]
     [ -z "$badmut" ]
+    [ -z "$badkind" ]
 }
 
 @test "every registered guard is observable under its own neutralization" {
-    local OB1="" OB2="" OB3="" OB4="" OB5="" EXEMPT_SIBLING_DIFFERED=""
+    local OB1="" OB2="" OB3="" OB4="" OB5=""
     local row id kind scen agg mut reason
-    local msrc ssrc sib ndiff uline mline i ok2
+    local msrc ndiff uline mline i ok2
     local unmut_src
     declare -A UREC UARGV
 
@@ -287,7 +290,7 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
         IFS=$'\t' read -r id kind scen agg mut reason <<<"$row"
 
         # Obligation 1. The named scenario directory exists and its name begins with
-        # dirt_. A row failing this is NOT evaluated against obligations 2 through 6: a
+        # dirt_. A row failing this is NOT evaluated against obligations 2 through 5: a
         # missing directory makes the two channels unobtainable rather than unequal, and
         # recording it in a channel accumulator would make the failure attribution false.
         if [ ! -d "${SCEN}/${scen}" ] || [ "${scen#dirt_}" = "$scen" ]; then
@@ -353,31 +356,10 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
                 OB5="$OB5 $id"
             fi
             ;;
-        EXEMPT)
-            if [ "$CH_REC" != "${UREC[$scen]}" ] ||
-                [ "$CH_ARGV" != "${UARGV[$scen]}" ] ||
-                ! printf '%s' "$reason" | grep -qE '^RECORDS-AND-ARGV-IDENTICAL: *[^ ]'; then
-                OB5="$OB5 $id"
-            fi
-            ;;
         *)
             OB5="$OB5 $id"
             ;;
         esac
-
-        # Obligation 6. The EXEMPT both-direction rule. A form-2 row is EXEMPT only when
-        # the guard is unobservable however it is forced, which is what removes the free
-        # choice of constant that lets a separable guard be parked at EXEMPT.
-        if [ "$kind" = "EXEMPT" ]; then
-            sib="$(sibling_mutation "$id" "$mut")"
-            if [ -n "$sib" ]; then
-                ssrc="$(mutate_lib "$id" "$sib")"
-                run_child "$ssrc" "$scen"
-                if [ "$CH_REC" != "${UREC[$scen]}" ] || [ "$CH_ARGV" != "${UARGV[$scen]}" ]; then
-                    EXEMPT_SIBLING_DIFFERED="$EXEMPT_SIBLING_DIFFERED $id"
-                fi
-            fi
-        fi
     done
 
     # Every accumulator is printed before any assertion is made, so one run names every
@@ -387,52 +369,49 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
     if [ -n "$OB3" ]; then echo "OBLIGATION-3 mutated source failed bash -n:$OB3" >&2; fi
     if [ -n "$OB4" ]; then echo "OBLIGATION-4 unmutated run emitted no DIRTFILE:$OB4" >&2; fi
     if [ -n "$OB5" ]; then echo "OBLIGATION-5 channel comparison failed:$OB5" >&2; fi
-    if [ -n "$EXEMPT_SIBLING_DIFFERED" ]; then
-        echo "OBLIGATION-6 EXEMPT_SIBLING_DIFFERED:$EXEMPT_SIBLING_DIFFERED" >&2
-    fi
 
     [ -z "$OB1" ]
     [ -z "$OB2" ]
     [ -z "$OB3" ]
     [ -z "$OB4" ]
     [ -z "$OB5" ]
-    [ -z "$EXEMPT_SIBLING_DIFFERED" ]
 }
 
-@test "the eighteen pinned guard rows carry the registry kinds this plan fixes" {
-    # Group A: twelve id-keyed SEPARATED pins. Each of these ids backs exactly one
-    # registry row, so the id key is unambiguous.
-    local -a GROUP_A=(
-        build-artifact-vacuous-confinement
-        rung4-tracked-path-in-main
-        rung4-tracked-hard-fail
-        find-object-hard-fail
-        status-read-hard-fail
-        clear-reset-hard-fail
-        clear-clean-hard-fail
-        clear-requires-all-disposable
-        unique-verdict-tally
-        history-hit-nonempty
-        rung4-tracked-gate
-        rung4-tracked-content-equal
+@test "every marker id is pinned by kind and the two dual-row lines are pinned by pair" {
+    # The floor: every marker id read from the library must carry at least one SEPARATED
+    # registry row. The id set is derived from the library's own markers with the same
+    # derivation the first test uses, never from a list written here, so a guard added
+    # without a pin fails this test rather than escaping it.
+    #
+    # ARGV_ONLY_IDS is the single exception, and it is hard-coded because the reason is a
+    # property of the stub rather than of the registry: the stub keys `log --find-object`
+    # on the object id alone (tests/fixtures/cleanup_worktrees/stub-bin/git), so changing
+    # the bounded-range endpoint changes the invocation without changing any record, and
+    # no scenario can make that guard separate on the record channel. Ids listed here must
+    # carry at least one ARGV row instead of a SEPARATED one.
+    local -a ARGV_ONLY_IDS=(
+        history-scan-bounded-range
     )
-    # Group B: three id-keyed SEPARATED-or-ARGV pins, held because cycle 1 proved each of
-    # R1's Y-column gate, R2's payload-split gate and R5's diff-header skip separable.
-    local -a GROUP_B=(
-        rung1-y-column-gate
-        rename-payload-split-gate
-        diff-header-skip
-    )
-    local missing="" id
+    local missing="" id i argvonly
+    local marked_ids
 
-    for id in "${GROUP_A[@]}"; do
-        if [ "$(pin_count "$id" any SEPARATED)" -eq 0 ]; then
-            missing="$missing A:$id"
-        fi
-    done
-    for id in "${GROUP_B[@]}"; do
-        if [ "$(pin_count "$id" any 'SEPARATED ARGV')" -eq 0 ]; then
-            missing="$missing B:$id"
+    marked_ids="$(grep -oE '# guard:[a-z0-9-]+$' "$DIRTLIB" | cut -d: -f2)"
+    mapfile -t MARKED <<<"$marked_ids"
+
+    for id in "${MARKED[@]}"; do
+        [ -n "$id" ] || continue
+        argvonly=0
+        for i in "${ARGV_ONLY_IDS[@]}"; do
+            if [ "$i" = "$id" ]; then argvonly=1; fi
+        done
+        if [ "$argvonly" -eq 1 ]; then
+            if [ "$(pin_count "$id" any ARGV)" -eq 0 ]; then
+                missing="$missing ARGV:$id"
+            fi
+        else
+            if [ "$(pin_count "$id" any SEPARATED)" -eq 0 ]; then
+                missing="$missing SEPARATED:$id"
+            fi
         fi
     done
 
@@ -441,7 +420,7 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
     # of that id's two rows happens to carry the demanded kind and leaves the other row
     # unconstrained, so each of these three is selected by id together with a plain string
     # test on whether the row's mutation begins with the four characters s/((. That test
-    # is exact: every arithmetic mutation begins s/(( and every one of the eight fixed
+    # is exact: every arithmetic mutation begins s/(( and every one of the nine fixed
     # literals begins s%.
     if [ "$(pin_count hash-object-hard-fail arith SEPARATED)" -eq 0 ]; then
         missing="$missing C1:hash-object-hard-fail-arithmetic"

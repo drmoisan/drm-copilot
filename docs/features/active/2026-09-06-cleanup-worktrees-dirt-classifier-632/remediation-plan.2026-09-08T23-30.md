@@ -1066,7 +1066,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
 
 ### Phase 3 — N4: the `EXEMPT` kind is removed and the pin floor is raised
 
-- [ ] [P3-T1] Apply edits 1, 1b and 2 of D4 to
+- [x] [P3-T1] Apply edits 1, 1b and 2 of D4 to
   `tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats`: delete the `EXEMPT)` arm
   of Obligation 5; narrow Invariant 2's kind list at `:198`, which reads
   `if [ "$(pin_count "$id" any 'SEPARATED ARGV EXEMPT')" -eq 0 ]; then`, by changing its
@@ -1091,7 +1091,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   reports `0`; and `grep -cF 'OBLIGATION-6' tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats`
   reports `0`.
 
-- [ ] [P3-T2] Apply edit 3 of D4: add Invariant 8 to the first test — a `badkind`
+- [x] [P3-T2] Apply edit 3 of D4: add Invariant 8 to the first test — a `badkind`
   accumulator recording every registry row whose `kind` is neither `SEPARATED` nor `ARGV`,
   printed to stderr as `INVARIANT-8 inadmissible kind:` followed by the offending ids, and
   asserted empty alongside the seven existing invariant assertions. The comment at its site
@@ -1103,7 +1103,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats`
   exits `0` with zero lines beginning `not ok`.
 
-- [ ] [P3-T3] Apply edits 4 and 5 of D4: replace Groups A and B of the third test with a
+- [x] [P3-T3] Apply edits 4 and 5 of D4: replace Groups A and B of the third test with a
   floor over every marker id, keep Group C unchanged, and change the test title to
   `every marker id is pinned by kind and the two dual-row lines are pinned by pair`. The
   floor reads the id set from the library's markers with the same
@@ -1138,7 +1138,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats`
   exits `0` with zero lines beginning `not ok` and a TAP plan line of `1..3`.
 
-- [ ] [P3-T4] `[expect-fail]` Demonstrate that the strengthened gate rejects the artefact
+- [x] [P3-T4] `[expect-fail]` Demonstrate that the strengthened gate rejects the artefact
   the reaudit built, rather than asserting that it would. The suite binds `REGISTRY` in
   `setup()` with no environment override
   (`tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats:47`), so the probe is run
@@ -1192,7 +1192,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   discrimination probe for N4's fix: without it the strengthened gate is only known to pass
   on a tree that already satisfies it.
 
-- [ ] [P3-T5] Record the end-state registry position. Run the two commands P0-T7 used and
+- [x] [P3-T5] Record the end-state registry position. Run the two commands P0-T7 used and
   write `evidence/qa-gates/registry-kind-distribution.2026-09-09T01-30.md` with
   `Timestamp:`, both `Command:` values, `EXIT_CODE:`, `Output Summary:` carrying both
   outputs verbatim, `IdsWithNoSeparatedRow:`, and a `MarkerIdCount:` field carrying
