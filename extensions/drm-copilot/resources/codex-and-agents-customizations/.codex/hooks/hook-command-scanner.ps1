@@ -162,6 +162,39 @@ function ConvertTo-CommandLineSegmentRecord {
     }
 }
 
+function Test-CommandLineSegmentRawScan {
+    <#
+    .SYNOPSIS
+        Report whether the scanner selected RawText as this segment's ScanText.
+    .DESCRIPTION
+        The three disjuncts below are the same three clauses ConvertTo-CommandLineSegmentRecord
+        applies when it selects ScanText, so a caller that guards a raw-text read with this
+        predicate reads raw on exactly the segments the scanner already scans raw, and on no
+        others.
+
+        It exists for one fail-open class the token readers cannot close by themselves.
+        ConvertTo-CommandLineToken collapses a balanced quoted span into ONE token, so a flag
+        carried inside a wrapper's quoted argument never appears as a token and every
+        token-based flag read reports it absent. A call site that reads flag absence as OUT OF
+        SCOPE therefore allows a command the pre-parser whole-text scan denied. A call site
+        that reads flag absence as MISSING AUTHORIZATION is already fail-closed and must not
+        use this predicate.
+    .PARAMETER Segment
+        One segment record produced by Read-CommandLineSegment.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][AllowNull()] $Segment)
+
+    if ($null -eq $Segment) {
+        return $false
+    }
+
+    return ([bool]$Segment.IsWrapperLed -or [bool]$Segment.HasLiveSubstitution -or [bool]$Segment.Unbalanced)
+}
+
 function Read-CommandLineHeredocHeader {
     <#
     .SYNOPSIS

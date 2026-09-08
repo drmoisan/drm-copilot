@@ -243,6 +243,13 @@ function Get-CdChainedReadCommandMatch {
         delimiters under spec D2 Piece 1, so no single segment ever contains both sides of
         the chain.
 
+        A second leg therefore runs first, before the walk: the retained regex constant is
+        evaluated against the ScanText of each segment the scanner already reads raw, which
+        is where a wrapper's quoted argument collapses a whole nested chain into one segment
+        the walk cannot decompose. The two legs are complementary and neither replaces the
+        other, so the ordering between them changes only which leg reports a chain that both
+        could see, never whether a chain is reported at all.
+
         Adjacency is deliberately NOT required. The retained pattern places a lazy '.*?'
         between the cd argument and the delimiter, so 'cd /x && npm test && grep foo bar.txt'
         is denied today; requiring the read segment to follow the cd segment immediately
@@ -272,6 +279,21 @@ function Get-CdChainedReadCommandMatch {
     }
 
     $segments = @(Read-CommandLineSegment -CommandText $Command)
+
+    # D12 call-site row for line 105: the retained pattern, evaluated per segment against
+    # ScanText. Complementary to the CommandWord walk below rather than a replacement for it.
+    # '&&' and ';' delimit segments, so an unquoted chain never puts both halves in one
+    # segment and only the walk can see it; a wrapper-led chain sits entirely inside one
+    # segment whose command word is the wrapper, and only this leg can see that. Restricting
+    # the leg to segments the scanner already scans raw preserves the intended narrowing:
+    # echo "cd /x && head f" is masked and still allows.
+    foreach ($segment in $segments) {
+        if ((Test-CommandLineSegmentRawScan -Segment $segment) -and
+            $segment.ScanText -match $script:CdChainedReadCommandPattern) {
+            return ($Matches[2] -replace '\s+', ' ')
+        }
+    }
+
     $seenCd = $false
 
     foreach ($segment in $segments) {

@@ -278,4 +278,50 @@ EOF
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_RECEIPT_STALE'
         }
     }
+
+    Context 'R-2.c wrapper-led body flags' {
+        # Every case in this context drives Invoke-PrAuthorSkillDecision through the file's
+        # ConvertTo-CommandEnvelope helper with a literal fixture and mocks
+        # Get-PrContextArtifactExistence, so no case reads the context artifact from disk.
+        It 'R2c-C1 denies a gh pr edit inline body carried inside a bash -c argument' {
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            $command = 'bash -c "gh pr edit 42 --body ''x''"'
+
+            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
+        }
+
+        It 'R2c-C2 routes a wrapper-led --body-file to the context check rather than the inline-body case' {
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $false }
+            $command = 'bash -c "gh pr edit 42 --body-file artifacts/pr_body_545.md"'
+
+            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_CONTEXT_MISSING'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -Match 'PR_AUTHOR_SKILL_BLOCKED'
+        }
+
+        It 'R2c-N1 still routes a non-wrapper --body-file edit to the context check' {
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $false }
+            $command = 'gh pr edit 42 --body-file artifacts/pr_body_545.md'
+
+            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PR_CONTEXT_MISSING'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -Match 'PR_AUTHOR_SKILL_BLOCKED'
+        }
+
+        It 'R2c-N2 still allows a quoted --body mention inside a JSON receipt value' {
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $false }
+            $command = 'echo ''{"cmd":"gh pr edit 42 --body x"}'' > artifacts/receipt.json'
+
+            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+    }
 }

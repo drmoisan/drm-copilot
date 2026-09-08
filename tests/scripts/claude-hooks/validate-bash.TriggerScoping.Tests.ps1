@@ -115,4 +115,33 @@ Describe 'validate-bash.ps1 trigger scoping (issue #545)' {
             Get-BlockedPatternMatch -Command 'echo "rm -rf /tmp/x' | Should -Be 'rm -rf'
         }
     }
+
+    Context 'R-2.d wrapper-led cd-chain' {
+        # Determinism: every case in this Context calls the pure function
+        # Get-CdChainedReadCommandMatch with a literal fixture. No disk I/O, no child
+        # process, no temporary file, no live executable, no ambient state.
+        #
+        # A wrapper's quoted argument is a nested command line that the tokenizer collapses
+        # into ONE token, so the CommandWord walk sees only the wrapper and never a 'cd'
+        # segment. The retained pattern, evaluated per segment against ScanText, is the leg
+        # that reads these three.
+        It 'R2d-C1 returns head for a cd-chained read inside a bash -c argument' {
+            Get-CdChainedReadCommandMatch -Command 'bash -c "cd /x && head f"' | Should -Be 'head'
+        }
+
+        It 'R2d-C2 returns grep for a semicolon-chained read inside an sh -c argument' {
+            Get-CdChainedReadCommandMatch -Command 'sh -c "cd /x; grep foo bar"' | Should -Be 'grep'
+        }
+
+        It 'R2d-C3 returns cat for a cd-chained read inside a pwsh -Command argument' {
+            Get-CdChainedReadCommandMatch -Command 'pwsh -NoProfile -Command "cd /x && cat f"' | Should -Be 'cat'
+        }
+
+        It 'R2d-N1 still returns null for an echo whose quoted text contains a cd-then-read phrase' {
+            # 'echo' is not a wrapper name, the quotes close, and there is no live
+            # substitution, so the segment is not one the scanner reads raw. The new leg is
+            # skipped and the masked text carries no cd segment. The narrowing holds.
+            Get-CdChainedReadCommandMatch -Command 'echo "cd /x && head f"' | Should -BeNullOrEmpty
+        }
+    }
 }

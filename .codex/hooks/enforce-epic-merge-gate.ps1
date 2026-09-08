@@ -126,9 +126,21 @@ function Invoke-CodexEpicMergeDecision {
     }
     $command = [string]$payload.tool_input.command
     # Both legs are read structurally from the segment that invokes the command, so a
-    # quoted mention of the phrase no longer brings a command into scope.
+    # quoted mention of the phrase no longer brings a command into scope. The flag leg needs
+    # a raw-scan fallback: a wrapper's quoted argument collapses into ONE token, so a flag
+    # inside it is never read as a token, and the token-only read took
+    # bash -c "gh pr merge --merge 688" out of scope.
     $isMergeInvocation = Test-CommandLineInvocation -CommandText $command -CommandWord 'gh' -SubcommandPath @('pr', 'merge')
     $hasMergeFlag = Test-CommandLineFlag -CommandText $command -CommandWord 'gh' -SubcommandPath @('pr', 'merge') -FlagName '--merge'
+    if (-not $hasMergeFlag) {
+        foreach ($segment in @(Read-CommandLineSegment -CommandText $command)) {
+            if ((Test-CommandLineSegmentRawScan -Segment $segment) -and
+                $segment.ScanText.IndexOf('--merge', [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                $hasMergeFlag = $true
+                break
+            }
+        }
+    }
     if (-not $isMergeInvocation -or -not $hasMergeFlag) {
         return $null
     }

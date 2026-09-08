@@ -189,6 +189,26 @@ function Get-PrAuthorBypassReason {
     $hasBodyFile = Test-CommandLineFlag -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath -FlagName '--body-file'
     $hasInlineBody = Test-CommandLineFlag -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath -FlagName '--body'
 
+    # Raw-scan fallback for a wrapper-led, live-substitution, or unbalanced segment. A
+    # wrapper's quoted argument collapses into ONE token, so both flags read absent there and
+    # the gh pr edit no-body branch below allowed bash -c "gh pr edit 42 --body 'x'". The
+    # --body-file test runs first and wins, so a --body-file carried inside a wrapper is never
+    # misread as an inline body. That ordering restores the pre-parser routing, in which one
+    # whole-text --body-file match set $hasBodyFile for exactly this input.
+    if (-not $hasBodyFile -and -not $hasInlineBody) {
+        $comparison = [System.StringComparison]::OrdinalIgnoreCase
+        foreach ($segment in @(Read-CommandLineSegment -CommandText $CommandText)) {
+            if (-not (Test-CommandLineSegmentRawScan -Segment $segment)) {
+                continue
+            }
+            if ($segment.ScanText.IndexOf('--body-file', $comparison) -ge 0) {
+                $hasBodyFile = $true
+            } elseif ($segment.ScanText.IndexOf('--body', $comparison) -ge 0) {
+                $hasInlineBody = $true
+            }
+        }
+    }
+
     # Case A: gh pr create OR gh pr edit with inline --body (not --body-file). Evaluated before the
     # gh pr edit no-body allow short-circuit so inline-body edits are blocked, not allowed.
     if (($isPrCreate -or $isPrEdit) -and $hasInlineBody -and -not $hasBodyFile) {

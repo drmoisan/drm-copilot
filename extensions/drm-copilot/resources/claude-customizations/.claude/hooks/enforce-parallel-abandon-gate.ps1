@@ -108,12 +108,17 @@ function Test-ParallelAbandonSegmentDisposition {
         therefore preserves the OrdinalIgnoreCase behaviour of the containment test it
         replaces. Because a quoted span is one token, a grep whose quoted search term is the
         disposition token no longer requests an abandon.
+
+        A raw-scan leg runs after the token loop, on the segments the scanner itself scans
+        raw, so a disposition carried inside a wrapper's quoted argument is still recognized.
+    .PARAMETER Segment
+        One segment record produced by Read-CommandLineSegment.
     .OUTPUTS
         System.Boolean
     #>
     [CmdletBinding()]
     [OutputType([bool])]
-    param([Parameter(Mandatory)][AllowEmptyCollection()][string[]] $Token)
+    param([Parameter(Mandatory)][AllowNull()] $Segment)
 
     $parts = @($script:AbandonDispositionToken -split '\s+' | Where-Object { $_ })
     if ($parts.Count -lt 2) {
@@ -123,18 +128,31 @@ function Test-ParallelAbandonSegmentDisposition {
     $optionValue = $parts[1]
     $joined = $optionName + '=' + $optionValue
 
-    for ($index = 0; $index -lt $Token.Count; $index++) {
-        if ($Token[$index] -eq $joined) {
+    $token = @($Segment.Tokens)
+
+    for ($index = 0; $index -lt $token.Count; $index++) {
+        if ($token[$index] -eq $joined) {
             return $true
         }
-        if ($Token[$index] -eq $optionName -and
-            $index + 1 -lt $Token.Count -and
-            $Token[$index + 1] -eq $optionValue) {
+        if ($token[$index] -eq $optionName -and
+            $index + 1 -lt $token.Count -and
+            $token[$index + 1] -eq $optionValue) {
             return $true
         }
     }
 
-    return $false
+    if (-not (Test-CommandLineSegmentRawScan -Segment $Segment)) {
+        return $false
+    }
+
+    # A wrapper's quoted argument is a nested command line and collapses into ONE token, so
+    # neither the adjacent pair nor the equals-joined token can form inside it. Both accepted
+    # spellings are reconstructed from the split constant rather than restated, so the
+    # single-source-of-truth seam test still finds each literal exactly once in this file.
+    $scanText = [string]$Segment.ScanText
+    $comparison = [System.StringComparison]::OrdinalIgnoreCase
+    return ($scanText.IndexOf($joined, $comparison) -ge 0 -or
+        $scanText.IndexOf(($optionName + ' ' + $optionValue), $comparison) -ge 0)
 }
 
 function Test-ParallelAbandonCommandInScope {
@@ -163,7 +181,7 @@ function Test-ParallelAbandonCommandInScope {
     }
 
     foreach ($segment in @(Read-CommandLineSegment -CommandText $NormalizedCommand)) {
-        if (Test-ParallelAbandonSegmentDisposition -Token @($segment.Tokens)) {
+        if (Test-ParallelAbandonSegmentDisposition -Segment $segment) {
             return $true
         }
     }
@@ -199,10 +217,14 @@ function Test-ParallelAbandonCommandConfirmed {
 
     foreach ($segment in @(Read-CommandLineSegment -CommandText $NormalizedCommand)) {
         $tokens = @($segment.Tokens)
-        if (-not (Test-ParallelAbandonSegmentDisposition -Token $tokens)) {
+        if (-not (Test-ParallelAbandonSegmentDisposition -Segment $segment)) {
             continue
         }
         if ($tokens -contains $script:AbandonConfirmToken) {
+            return $true
+        }
+        if ((Test-CommandLineSegmentRawScan -Segment $segment) -and
+            ([string]$segment.ScanText).IndexOf($script:AbandonConfirmToken, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
             return $true
         }
     }
