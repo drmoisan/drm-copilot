@@ -298,3 +298,30 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     [[ "$output" == *"WORKTREE|/repo/main|main|main"* ]]
     [ "$(printf '%s\n' "$output" | grep -c '^DIRTSUM|')" -eq 1 ]
 }
+
+@test "dirt_rename_split: an untracked path containing the rename literal is reported in full and is UNIQUE" {
+    dirt dirt_rename_split
+    [ "$status" -eq 0 ]
+    # Porcelain status uses the `OLD -> NEW` payload only for R and C entries. A space
+    # does not trigger C-quoting, so an ordinary untracked path may contain the literal.
+    # Splitting unconditionally truncated this path to `draft.md`, issued every probe
+    # against the wrong file, and emitted a record naming a file the operator does not
+    # have. The two fixture blobs differ, so the truncated read resolves CONTENT_ON_MAIN
+    # and the full read resolves UNIQUE.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||??|notes -> draft.md'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *'DIRTFILE|/repo-wt/dirt|CONTENT_ON_MAIN||??|draft.md'* ]]
+}
+
+@test "dirt_rename_split: a genuine R entry is still split and the destination path is classified" {
+    dirt_log dirt_rename_split
+    [ "$status" -eq 0 ]
+    # The other half of the pin. Restricting the split must not disable it: for a real
+    # rename the destination is the path that exists in the working tree and is therefore
+    # the one to classify.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|CONTENT_ON_MAIN||R |new.md'* ]]
+    log="$(argv_log)"
+    # The source path of a rename exists nowhere in the working tree, so no probe may name
+    # it. A split that kept the source instead of the destination would show up here.
+    [[ "$log" != *"old.md"* ]]
+}

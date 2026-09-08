@@ -559,7 +559,7 @@ other path reaches rung 6 and is `UNIQUE`.
 
 ### Phase 3 — R2: the ` -> ` split applies only to `R` and `C` entries
 
-- [ ] [P3-T1] Create the checked-in scenario directory
+- [x] [P3-T1] Create the checked-in scenario directory
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_rename_split/` with the standard scenario
   baseline and a `status._repo-wt_dirt.out` whose two lines are exactly `?? notes -> draft.md` and
   `R  old.md -> new.md`.
@@ -599,7 +599,7 @@ other path reaches rung 6 and is `UNIQUE`.
   `rev-list.HEAD.rc`. The two differing blobs are what makes the pin able to fail in both
   directions.
 
-- [ ] [P3-T2] Append two tests to `tests/shell/test_cleanup_worktrees_dirt_classify.bats` with
+- [x] [P3-T2] Append two tests to `tests/shell/test_cleanup_worktrees_dirt_classify.bats` with
   these descriptions, quoted verbatim here for the executor to create:
   `dirt_rename_split: an untracked path containing the rename literal is reported in full and is UNIQUE`
   and
@@ -613,7 +613,7 @@ other path reaches rung 6 and is `UNIQUE`.
   Acceptance: `tests/shell/test_cleanup_worktrees_dirt_classify.bats` contains both quoted
   descriptions verbatim and `wc -l` reports at most 500.
 
-- [ ] [P3-T3] [expect-fail] Run
+- [x] [P3-T3] [expect-fail] Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_classify.bats` against
   the unfixed split and write
   `evidence/regression-testing/fail-before-rename-split.2026-09-08T06-00.md` with `Timestamp:`,
@@ -624,7 +624,7 @@ other path reaches rung 6 and is `UNIQUE`.
   and contains an `ok` line for
   `dirt_rename_split: a genuine R entry is still split and the destination path is classified`.
 
-- [ ] [P3-T4] In `scripts/bash/cleanup_worktrees_dirt_lib.sh`, replace the line that currently
+- [x] [P3-T4] In `scripts/bash/cleanup_worktrees_dirt_lib.sh`, replace the line that currently
   reads `[[ $rel == *" -> "* ]] && rel="${rel#* -> }"` inside `classify_worktree_dirt` (line 367 as
   the file stands at `eac077a2`; the number has shifted by Phase 2's insertion, so the line content
   is the anchor) with the following three lines, whose spelling is required rather than
@@ -649,14 +649,14 @@ other path reaches rung 6 and is `UNIQUE`.
   distinguishing text, which the three-line replacement does not carry), and
   `bash -n scripts/bash/cleanup_worktrees_dirt_lib.sh` exits 0.
 
-- [ ] [P3-T5] Re-run
+- [x] [P3-T5] Re-run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_classify.bats` and write
   `evidence/regression-testing/pass-after-rename-split.2026-09-08T06-00.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, the plan line, the `ok`/`not ok` counts, and `Output Summary:`.
   Acceptance: `EXIT_CODE: 0`, the recorded `not ok` count is `0`, and the output contains an `ok`
   line for each of the two descriptions quoted in P3-T2.
 
-- [ ] [P3-T6] Re-run
+- [x] [P3-T6] Re-run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_clear.bats tests/shell/test_cleanup_worktrees_dirt_regression.bats tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`
   and write `evidence/regression-testing/sibling-check-phase3.2026-09-08T06-00.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` naming the sibling region checked:

@@ -379,8 +379,17 @@ classify_worktree_dirt() {
 		xy="${line:0:2}"
 		rel="${line:3}"
 		# A rename or copy entry's payload is `OLD -> NEW`; the destination is the path
-		# that exists in the working tree and is therefore the one classified.
-		[[ $rel == *" -> "* ]] && rel="${rel#* -> }"
+		# that exists in the working tree and is therefore the one classified. Porcelain
+		# status uses that payload form ONLY for the two codes R and C, and a space does
+		# not trigger C-quoting, so an ordinary path may contain the literal ` -> `.
+		# Splitting unconditionally truncated such a path, issued every probe against a
+		# file that does not exist, and emitted a record naming the wrong file. The X
+		# column is therefore the gate. The variable read here is `xy`, not the enclosing
+		# function's `x`: `x` holds the last value the any_staged pre-scan loop assigned,
+		# not this entry's X column.
+		if [[ ${xy:0:1} == R || ${xy:0:1} == C ]]; then
+			rel="${rel#* -> }"
+		fi
 		res=$(classify_dirt_entry "$wt" "$xy" "$rel" "$staged")
 		verdict="${res%%|*}"
 		detail="${res#*|}"
