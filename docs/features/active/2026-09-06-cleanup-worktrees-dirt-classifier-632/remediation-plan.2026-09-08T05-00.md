@@ -898,7 +898,7 @@ Phase 5, nine in Phase 6, one in Phase 7. That takes the file from 138/167 to 15
 against an 85% floor that requires 142/167. The floor is cleared by Phase 5 alone, so the margin
 does not depend on this phase landing every scenario.
 
-- [ ] [P6-T1] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_tracked_read_errors/` with a
+- [x] [P6-T1] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_tracked_read_errors/` with a
   `status._repo-wt_dirt.out` of exactly two lines, ` M src/Legacy/Legacy.csproj` and
   ` M docs/tracked.md`. Supply `diff._repo-wt_dirt.src_Legacy_Legacy.csproj.rc` of `128` so the
   rung-3 diff read hard-fails, and `diff-quiet..docs_tracked.md.rc` of `128` so the rung-4 tracked
@@ -906,7 +906,7 @@ does not depend on this phase landing every scenario.
   Acceptance: the directory exists, `status._repo-wt_dirt.out` has exactly two lines, and both
   named `.rc` files contain exactly `128`.
 
-- [ ] [P6-T2] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_history_read_error/` with a
+- [x] [P6-T2] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_history_read_error/` with a
   `status._repo-wt_dirt.out` of exactly one line `?? docs/old.md`, a `hash-object.docs_old.md.out`
   carrying a blob, a `rev-parse.main_docs_old.md.rc` of `128`, a `rev-parse.verify.main_1000.rc`
   of `1` so the range falls back to plain `main`, and a `log.find-object.<blob>.rc` of `128` keyed
@@ -915,7 +915,7 @@ does not depend on this phase landing every scenario.
   Acceptance: the directory exists and contains exactly one file whose name begins
   `log.find-object.` and whose extension is `.rc`, containing exactly `128`.
 
-- [ ] [P6-T3] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_clear_reset_failed/` as a
+- [x] [P6-T3] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_clear_reset_failed/` as a
   copy of `tests/fixtures/cleanup_worktrees/scenarios/dirt_clear_all_disposable/` with the single
   addition of `reset-hard.rc` containing `1`, so `clear_disposable_dirt` emits
   `ACTION|dirt-clear|/repo-wt/dirt|FAILED` from its reset-failure branch and issues no `clean` and
@@ -924,7 +924,7 @@ does not depend on this phase landing every scenario.
   `status._repo-wt_dirt.out` is byte-identical to
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_clear_all_disposable/status._repo-wt_dirt.out`.
 
-- [ ] [P6-T4] Append two tests to `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` with
+- [x] [P6-T4] Append two tests to `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` with
   these descriptions, quoted verbatim here for the executor to create:
   `dirt_tracked_read_errors: a rung-3 diff read failure and a rung-4 probe failure both map to UNIQUE`
   and
@@ -938,7 +938,7 @@ does not depend on this phase landing every scenario.
   `--find-object` invocation.
   Acceptance: the file contains both quoted descriptions verbatim and `wc -l` reports at most 500.
 
-- [ ] [P6-T5] Append one test to `tests/shell/test_cleanup_worktrees_dirt_clear.bats` with this
+- [x] [P6-T5] Append one test to `tests/shell/test_cleanup_worktrees_dirt_clear.bats` with this
   description, quoted verbatim here for the executor to create:
   `dirt_clear_reset_failed: a non-zero reset reports FAILED, runs no clean, and retries no removal`.
   It drives `clear_candidate dirt_clear_reset_failed`, asserts a non-zero status, asserts the
@@ -949,7 +949,7 @@ does not depend on this phase landing every scenario.
   Acceptance: `tests/shell/test_cleanup_worktrees_dirt_clear.bats` contains that description
   verbatim and `wc -l` reports at most 500.
 
-- [ ] [P6-T6] Extend the verdict-token membership test at
+- [x] [P6-T6] Extend the verdict-token membership test at
   `tests/shell/test_cleanup_worktrees_dirt_classify.bats:214` so its scenario list names every
   directory under `tests/fixtures/cleanup_worktrees/scenarios/` whose name begins `dirt_` — 25
   after this plan's ten additions — update the `seen` guard from `17` to the total number of
@@ -962,7 +962,7 @@ does not depend on this phase landing every scenario.
   verbatim, contains the literal `dirt_clear_reset_failed`, and no longer contains the literal
   `-eq 17`.
 
-- [ ] [P6-T7] Run
+- [x] [P6-T7] Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_classify.bats tests/shell/test_cleanup_worktrees_dirt_clear.bats tests/shell/test_cleanup_worktrees_dirt_failclosed.bats tests/shell/test_cleanup_worktrees_dirt_regression.bats`
   and write `evidence/regression-testing/pass-failclosed-scenarios.2026-09-08T06-00.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, the plan line, the `ok`/`not ok` counts, and
@@ -970,7 +970,7 @@ does not depend on this phase landing every scenario.
   Acceptance: `EXIT_CODE: 0`, the recorded `not ok` count is `0`, and the output contains an `ok`
   line for each of the three descriptions quoted in P6-T4, P6-T5, and P6-T6.
 
-- [ ] [P6-T8] Demonstrate the fail-closed pins can fail. Record
+- [x] [P6-T8] Demonstrate the fail-closed pins can fail. Record
   `sha256sum scripts/bash/cleanup_worktrees_dirt_lib.sh`; apply one temporary mutation replacing
   the rung-3 hard-failure emission in `classify_dirt_entry` — the `printf 'UNIQUE|\n'` guarded by
   `if ((brc > 1)); then` — with a `printf 'CONTENT_ON_MAIN|\n'`; record the sha256 again; re-run

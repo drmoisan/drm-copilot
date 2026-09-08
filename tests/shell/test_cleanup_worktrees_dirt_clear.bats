@@ -281,3 +281,22 @@ wrapper_apply() { # wrapper_apply <scenario> [extra-flag...]
     # One removal only: the attempt that failed. No retry is issued without the flag.
     [ "$(count_of 'worktree remove')" -eq 1 ]
 }
+
+@test "dirt_clear_reset_failed: a non-zero reset reports FAILED, runs no clean, and retries no removal" {
+    clear_candidate dirt_clear_reset_failed
+    [ "$status" -ne 0 ]
+    # The reset-failure branch, the earlier of the clearing sequence's two failure sites.
+    # The fixture is dirt_clear_all_disposable with one file added, so the classification
+    # reaches ALL_DISPOSABLE and the clear is authorised; only the reset itself fails.
+    [[ "$output" == *'ACTION|dirt-clear|/repo-wt/dirt|FAILED'* ]]
+    [[ "$output" != *'ACTION|dirt-clear|/repo-wt/dirt|OK'* ]]
+    log="$(argv_log)"
+    # Positive control: the reset was attempted, which is what failed. Without this the
+    # two absence assertions below would hold in a build where the clear never ran.
+    [[ "$log" == *"reset --hard"* ]]
+    # The sequence stops at the failure. A clean issued after a failed reset would run
+    # over a working tree whose state is not the one that was classified.
+    ! printf '%s\n' "$log" | grep -qE '(^| )clean( |$)'
+    # Only the original removal attempt; the retry is not reached.
+    [ "$(count_of 'worktree remove')" -eq 1 ]
+}

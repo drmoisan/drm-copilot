@@ -125,3 +125,34 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     # diff-index site and not the rev-list site.
     [[ "$log" == *"diff-index --cached --quiet eeee7777"* ]]
 }
+
+@test "dirt_tracked_read_errors: a rung-3 diff read failure and a rung-4 probe failure both map to UNIQUE" {
+    dirt dirt_tracked_read_errors
+    [ "$status" -eq 0 ]
+    # Two entries, two different fail-closed sites in one fixture. The csproj entry's
+    # rung-3 content read hard-fails, so dirt_is_build_artifact returns 2 and the entry
+    # must NOT be declared a build artifact on a diff nobody could read. The tracked
+    # markdown entry's rung-4 probe exits above 1, which carries no verdict about whether
+    # the contents match main, so it must not be declared CONTENT_ON_MAIN either.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE|| M|src/Legacy/Legacy.csproj'* ]]
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE|| M|docs/tracked.md'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"DISPOSABLE_BUILD_ARTIFACT"* ]]
+    [[ "$output" != *"CONTENT_ON_MAIN"* ]]
+}
+
+@test "dirt_history_read_error: a find-object read failure maps the untracked entry to UNIQUE" {
+    dirt_log dirt_history_read_error
+    [ "$status" -eq 0 ]
+    # The last read in the ladder. `log --find-object` exiting non-zero says nothing about
+    # whether the blob is in history, so the entry fails closed rather than advancing to a
+    # disposable verdict. The fixture also drives the depth fallback: rev-parse --verify
+    # on the bounded endpoint exits 1, so the scan uses the plain `main` ref.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||??|docs/old.md'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"CONTENT_IN_HISTORY"* ]]
+    log="$(argv_log)"
+    # Positive control: the history walk was actually attempted, so the absence of
+    # CONTENT_IN_HISTORY is the fail-closed branch rather than a ladder that stopped early.
+    [[ "$log" == *"--find-object"* ]]
+}
