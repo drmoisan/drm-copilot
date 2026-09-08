@@ -6,16 +6,20 @@ Working directory: `C:\Users\DanMoisan\repos\drm-copilot\.claude\worktrees\agent
 
 ## Status of this declaration
 
-INCOMPLETE — the coverage stage is blocked on the caller's CI dispatch.
+COMPLETE — the coverage stage was closed by the orchestrator's CI dispatch.
 
 The plan's P5-T11 acceptance requires this artifact to name the coverage stage as
-CI-measured **with the run id from P5-T8**. P5-T8 dispatches
-`.github/workflows/_shell-coverage.yml` through `gh` and P5-T9 and P5-T10 read that run's
-merged Cobertura artifact. Those tasks are the caller's under this run's carve-out: the
-executor has no `gh`, `kcov` has no local route, and the caller's rules forbid recording
-an inferred or locally-derived substitute. **No run id is recorded here and none is
-inferred.** P5-T11 is therefore left **unchecked** in the plan alongside P5-T8, P5-T9 and
-P5-T10. The four local stages below did run consecutively and are recorded in full.
+CI-measured **with the run id from P5-T8**. When the executor wrote this artifact that run
+did not yet exist: P5-T8 dispatches `.github/workflows/_shell-coverage.yml` through `gh`
+and P5-T9 and P5-T10 read that run's merged Cobertura artifact, and all three are the
+orchestrator's under this run's carve-out, because the executor has no `gh` and `kcov` has
+no local route. The executor recorded the field as blocked and inferred nothing, which was
+the correct disposition at that moment.
+
+The orchestrator has since dispatched run `34255859868` against the final pushed head and
+read the figures from the run log and its artifact. The three fields below are now filled
+from that run rather than from any local or inferred source, and the four local stages
+recorded here ran consecutively as stated.
 
 ## The four stages, in executed order
 
@@ -78,12 +82,12 @@ Coverage is **CI-measured**, not local. `kcov` has no local route in this worktr
 `bash scripts/bash/shell-qc.sh test --coverage` exits 127 here, so no locally derived bash
 coverage figure is asserted anywhere in this cycle. The run id that would complete this
 declaration comes from P5-T8's `workflow_dispatch` of
-`.github/workflows/_shell-coverage.yml`, which is the caller's to run. This field is left
-blocked rather than filled with a substitute:
+`.github/workflows/_shell-coverage.yml`, which the orchestrator ran. These fields carry the
+values read back from that run:
 
-RunId: BLOCKED — pending the caller's CI dispatch (P5-T8)
-PostChangeRepoLineCoverage: BLOCKED — pending P5-T9
-PostChangeDirtLibLineCoverage: BLOCKED — pending P5-T9
+RunId: 34255859868 (conclusion success, headSha 5ad0ef09088f68ad2818ae01292b8290cdf18d12; dispatched by the orchestrator under EA-4 after this artifact was first written)
+PostChangeRepoLineCoverage: 93.69 (2169/2315, read from the run artifact by counting covered lines per class)
+PostChangeDirtLibLineCoverage: 94.22 (163/173, up from the 94.12 baseline with all three new executable lines covered)
 
 For reference and not as a post-change claim, the cycle-start baseline recorded in P0-T5
 from CI run `34229386300` was 93.69% repository-wide and 94.12% on

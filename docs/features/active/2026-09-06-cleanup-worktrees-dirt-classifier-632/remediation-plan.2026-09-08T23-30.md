@@ -1472,7 +1472,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   `grep -c '^- \[ \] AC-4' docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`
   reports `0`.
 
-- [ ] [P5-T7] Stage the cycle-3 changes with `git add -A`, commit them, and push the branch.
+- [x] [P5-T7] Stage the cycle-3 changes with `git add -A`, commit them, and push the branch.
   Record `evidence/other/remediation-commit-and-push.2026-09-09T02-30.md` with
   `Timestamp:`, the commands, `EXIT_CODE:` for each, the branch name, the
   `git status --porcelain` output taken immediately after `git add -A` and before the
@@ -1486,7 +1486,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   `tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats`, and
   `tests/shell/test_cleanup_worktrees_dirt_content_locations.bats`.
 
-- [ ] [P5-T8] Obtain a coverage run against the pushed commit. The dispatch is
+- [x] [P5-T8] Obtain a coverage run against the pushed commit. The dispatch is
   `gh workflow run .github/workflows/_shell-coverage.yml --ref bug/cleanup-worktrees-dirt-classifier-632-r2`;
   the workflow accepts `workflow_dispatch` (`.github/workflows/_shell-coverage.yml:5`). If
   the caller runs the dispatch instead, the executor records the caller-supplied run id and
@@ -1499,7 +1499,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   the recorded head SHA equals the commit P5-T7 pushed, recorded as an observation of the
   two values side by side rather than asserted against any literal written into this plan.
 
-- [ ] [P5-T9] Download that run's merged Cobertura artifact and read the figures directly
+- [x] [P5-T9] Download that run's merged Cobertura artifact and read the figures directly
   from `kcov-merged/cov.xml`, counting `<line hits>` per `<class>` rather than reading the
   rounded `line-rate` attribute. Record
   `evidence/qa-gates/dirt-lib-coverage.2026-09-09T02-30.md` with `Timestamp:`, `Command:`,
@@ -1509,7 +1509,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   numbers, both are at or above `85.0`, and the artifact states that kcov measures no
   branch coverage so no branch gate applies to bash.
 
-- [ ] [P5-T10] Compare against the P0-T5 baseline and record
+- [x] [P5-T10] Compare against the P0-T5 baseline and record
   `evidence/qa-gates/coverage-delta.2026-09-09T02-30.md` with `Timestamp:`, `Command:`,
   `EXIT_CODE:`, `BaselineRepoLineCoverage:`, `PostChangeRepoLineCoverage:`,
   `BaselineDirtLibLineCoverage:`, `PostChangeDirtLibLineCoverage:`, a per-file table
@@ -1521,7 +1521,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   section names `dirt_index_and_worktree_delta` as the fixture that executes all three new
   guards and names the four `@test` titles from P1-T4 as the assertions that hold them.
 
-- [ ] [P5-T11] `[expect-fail]` Run
+- [x] [P5-T11] `[expect-fail]` Run
   `poetry run python -m pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q`
   **in this task**, after P5-T1 through P5-T3 have run, and record the
   single-consecutive-pass declaration in
@@ -1540,7 +1540,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   artifact names the coverage stage as CI-measured with the run id from P5-T8 rather than
   claiming a local run.
 
-- [ ] [P5-T12] Write the cycle-3 closing summary at
+- [x] [P5-T12] Write the cycle-3 closing summary at
   `evidence/other/cycle3-closure.2026-09-09T02-30.md`, stating for each of N3, N4, the
   missing-comparison gate, P2 and P4 the change made, the test that holds it, and the
   evidence artifact. Then stage and commit the documentation and evidence written after
