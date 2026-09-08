@@ -38,3 +38,6 @@ history-hit-nonempty	SEPARATED	dirt_content_in_history	ALL_DISPOSABLE	s%\[\[ -n 
 rename-payload-split-gate	SEPARATED	dirt_rename_split	HAS_UNIQUE	s%== C \]\]%== C || -n "x" \]\]%	
 unique-verdict-tally	SEPARATED	dirt_unique	HAS_UNIQUE	s%\[\[ $verdict == "UNIQUE" \]\]%[[ -n "" ]]%	
 clear-requires-all-disposable	SEPARATED	dirt_unique	HAS_UNIQUE	s%\[\[ $agg != "ALL_DISPOSABLE" \]\]%[[ -n "" ]]%	
+index-and-worktree-both-hold-content	SEPARATED	dirt_index_and_worktree_delta	HAS_UNIQUE	s%\[\[ $x == \[MARCTU\] && $y == \[MARCTU\] \]\]%[[ -n "" ]]%	
+rung4-index-blob-unaccounted	SEPARATED	dirt_index_and_worktree_delta	HAS_UNIQUE	s/((bothloc == 0))/((1))/	
+rung5-index-blob-unaccounted	SEPARATED	dirt_index_and_worktree_delta	HAS_UNIQUE	s/((bothloc == 0))/((1))/	

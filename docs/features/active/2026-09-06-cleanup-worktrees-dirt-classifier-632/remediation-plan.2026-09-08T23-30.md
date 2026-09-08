@@ -932,7 +932,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
 
 ### Phase 2 — The N3 library fix, its markers, and its registry rows
 
-- [ ] [P2-T1] Apply decision D1 to `scripts/bash/cleanup_worktrees_dirt_lib.sh`. Add
+- [x] [P2-T1] Apply decision D1 to `scripts/bash/cleanup_worktrees_dirt_lib.sh`. Add
   `bothloc=0` to the existing `local` declaration at `:241`; insert the three-line
   `bothloc` block of D1 part one immediately after the untracked test at `:287`, with its
   code line written exactly as quoted in D1; nest the rung-4 positive emission inside
@@ -962,7 +962,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   sufficient, because a punctuation-folding collation can place a non-prefix id between the
   two members of a prefix pair.
 
-- [ ] [P2-T2] Extend the library header with the `INDEX AND WORKING TREE ARE TWO LOCATIONS`
+- [x] [P2-T2] Extend the library header with the `INDEX AND WORKING TREE ARE TWO LOCATIONS`
   paragraph, placed after the `EMPTY PATHSPEC IS NOT A MATCH` paragraph that ends at `:56`,
   in the same register and layout as the existing `TWO-WAY CLASSIFICATION OF NON-ZERO EXITS`
   (`:40-46`) and `NO --ignored ON THE STATUS READ` (`:29-33`) paragraphs. Following the
@@ -988,7 +988,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   reports a value at or below `497`, with the artifact in P2-T7 recording the exact count
   and its delta from the `481` P0-T8 recorded.
 
-- [ ] [P2-T3] Re-run
+- [x] [P2-T3] Re-run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_failclosed.bats tests/shell/test_cleanup_worktrees_dirt_content_locations.bats`
   and record
   `evidence/regression-testing/pass-after-index-blob-unaccounted.2026-09-09T01-00.md` with
@@ -1004,7 +1004,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   and the recorded post-fix record stream contains the literal
   `DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|` and does not contain the literal `ALL_DISPOSABLE`.
 
-- [ ] [P2-T4] Append the three rows tabulated in D3 to
+- [x] [P2-T4] Append the three rows tabulated in D3 to
   `tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv`, tab-separated in the existing
   column order `id`, `kind`, `scenario`, `baseline_aggregate`, `mutation`, `reason`, with
   `reason` left empty for all three because all three are `SEPARATED`. The
@@ -1020,7 +1020,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   `awk -F'\t' '!/^#/ && NF && $3=="dirt_index_and_worktree_delta"' tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv | wc -l`
   reports `3`.
 
-- [ ] [P2-T5] Add `index-and-worktree-both-hold-content` to the `LIT_IDS` array and its
+- [x] [P2-T5] Add `index-and-worktree-both-hold-content` to the `LIT_IDS` array and its
   mutation to the `LIT_MUTS` array in
   `tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats:157-176`, at the **same
   index** in both arrays, taking each array from eight elements to nine. Invariant 6 pairs
@@ -1034,7 +1034,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   matches the source line character for character — Invariant 6 fails when it does not, and
   Obligation 2 fails when the substitution does not change the line.
 
-- [ ] [P2-T6] Run the six dirt suites together to establish that Phase 2 left the tree
+- [x] [P2-T6] Run the six dirt suites together to establish that Phase 2 left the tree
   consistent — `classify`, `failclosed`, `clear`, `regression`, `guard_registry` and the
   `content_locations` suite P1-T5 creates:
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_classify.bats tests/shell/test_cleanup_worktrees_dirt_failclosed.bats tests/shell/test_cleanup_worktrees_dirt_clear.bats tests/shell/test_cleanup_worktrees_dirt_regression.bats tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats tests/shell/test_cleanup_worktrees_dirt_content_locations.bats`.
@@ -1051,7 +1051,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   entry's verdict as `UNIQUE` both before and after; and it states explicitly that the
   scenario's argv log is unchanged.
 
-- [ ] [P2-T7] Record the file-size position after the library change. Run
+- [x] [P2-T7] Record the file-size position after the library change. Run
   `wc -l scripts/bash/cleanup_worktrees_dirt_lib.sh scripts/bash/cleanup_worktrees_lib.sh`
   and write `evidence/qa-gates/file-size-after-fix.2026-09-09T01-00.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, both counts, the delta of the classifier library from the `481`

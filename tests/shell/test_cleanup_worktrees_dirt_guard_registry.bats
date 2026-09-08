@@ -150,10 +150,14 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
 }
 
 @test "every guard-shaped line in the dirt library is marked and every registry row names a marked id" {
-    # The eight named non-arithmetic verdict guards. The arithmetic predicate alone does
+    # The nine named non-arithmetic verdict guards. The arithmetic predicate alone does
     # not match any of them, and three of them are the exact sites that produced cycle 1's
     # R1, R2 and R5, so a registry derived from the predicate alone would exclude the
-    # shapes that carried the real defects.
+    # shapes that carried the real defects. The ninth is the fail-closed test N3 adds: it
+    # sets the flag that stops rungs 4 and 5 emitting a disposable verdict for an entry
+    # whose X and Y columns are both content-bearing. Like the other eight it is a
+    # [[ ... ]] test rather than an arithmetic comparison, so GUARD_RE does not compel a
+    # marker onto it and its id and mutation are listed below instead.
     local -a LIT_IDS=(
         diff-header-skip
         rung1-y-column-gate
@@ -163,6 +167,7 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
         rename-payload-split-gate
         unique-verdict-tally
         clear-requires-all-disposable
+        index-and-worktree-both-hold-content
     )
     local -a LIT_MUTS=(
         's%continue ;;%;;%'
@@ -173,6 +178,7 @@ pin_count() { # pin_count <id> <any|arith|literal> <space-separated kinds> -> ro
         's%== C \]\]%== C || -n "x" \]\]%'
         's%\[\[ $verdict == "UNIQUE" \]\]%[[ -n "" ]]%'
         's%\[\[ $agg != "ALL_DISPOSABLE" \]\]%[[ -n "" ]]%'
+        's%\[\[ $x == \[MARCTU\] && $y == \[MARCTU\] \]\]%[[ -n "" ]]%'
     )
     local unmarked="" idless="" unknown="" dupid="" duppair="" missingpair="" badmut=""
     local line id kind scen agg mut reason marked_ids e a0 a1 ok i hit row

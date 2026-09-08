@@ -55,6 +55,12 @@
 # path to be equal to. A non-zero answer emits nothing and advances the ladder to the
 # hash-object guard. This is the vacuous confinement rung 3 already guards against.
 #
+# INDEX AND WORKING TREE ARE TWO LOCATIONS. M, A, R, C, T, U are content-bearing: each
+# says that side holds a blob (T is a typechange, U holds content at index stages 2 and
+# 3); a space, ?, ! or D does not. Two content-bearing columns mean TWO distinct blobs,
+# and rung 4's tracked half and rung 5 read only the working-tree one, so both fail
+# closed there. Rung 3 is not gated: dirt_is_build_artifact reads the cached diff too.
+#
 # Record contract (pipe-delimited, one record per line; the file path is LAST so a path
 # containing the delimiter is still recoverable):
 #   DIRTFILE|<worktree-path>|<verdict>|<detail>|<status-code>|<file-path>
@@ -238,7 +244,7 @@ classify_dirt_entry() {
 	# Echoes exactly one `<verdict>|<detail>` line and always returns 0.
 	local wt="$1" xy="$2" rel="$3" staged="$4"
 	local x="${xy:0:1}" y="${xy:1:1}" untracked=0 blob="" hrc=0 mrc=0 mainblob="" brc=0
-	local drc=0 erc=0 vrc=0 lrc=0 range found
+	local drc=0 erc=0 vrc=0 lrc=0 bothloc=0 range found
 
 	# A C-quoted payload is returned UNIQUE immediately with no unquoting attempt. One
 	# branch, deterministic, and failing in the safe direction; attempting to unquote
@@ -263,10 +269,11 @@ classify_dirt_entry() {
 	#
 	# An entry with a non-space Y column falls through to the rungs that compare
 	# WORKING-TREE content, which is the comparison its unstaged delta actually needs.
-	# An MM entry on a HintPath-confined project file can still reach
+	# See INDEX AND WORKING TREE ARE TWO LOCATIONS in the header: when the Y column is
+	# itself content-bearing that comparison alone is not enough and rungs 4 and 5 fail
+	# closed. An MM entry on a HintPath-confined project file can still reach
 	# DISPOSABLE_BUILD_ARTIFACT, because dirt_is_build_artifact reads both the worktree
-	# diff and the cached diff; an MM entry on any other path reaches rung 6 and is
-	# UNIQUE.
+	# diff and the cached diff; an MM entry on any other path reaches rung 6 and is UNIQUE.
 	if [[ $x != " " && $x != "?" && $x != "!" && $y == " " ]]; then # guard:rung1-y-column-gate
 		if [[ $staged == "ERROR" ]]; then
 			printf 'UNIQUE|\n'
@@ -285,6 +292,9 @@ classify_dirt_entry() {
 	fi
 
 	[[ $xy == "??" ]] && untracked=1
+	# See INDEX AND WORKING TREE ARE TWO LOCATIONS in the header: two content-bearing
+	# columns mean the index blob and the working-tree blob hold different content.
+	[[ $x == [MARCTU] && $y == [MARCTU] ]] && bothloc=1 # guard:index-and-worktree-both-hold-content
 
 	# Rung 3. Tracked, modified entries only; an untracked file has no diff to confine.
 	if ((untracked == 0)); then # guard:rung3-tracked-only-gate
@@ -311,9 +321,11 @@ classify_dirt_entry() {
 			# already suppresses git's own diagnostic on the negative answer.
 			cleanup_wt_git --no-optional-locks -C "$wt" rev-parse --verify --quiet \
 				"main:$rel" >/dev/null || erc=$?
-			if ((erc == 0)); then # guard:rung4-tracked-path-in-main
-				printf 'CONTENT_ON_MAIN|\n'
-				return 0
+			if ((erc == 0)); then      # guard:rung4-tracked-path-in-main
+				if ((bothloc == 0)); then # guard:rung4-index-blob-unaccounted
+					printf 'CONTENT_ON_MAIN|\n'
+					return 0
+				fi
 			fi
 		fi
 		if ((drc > 1)); then # guard:rung4-tracked-hard-fail
@@ -356,9 +368,11 @@ classify_dirt_entry() {
 		return 0
 	fi
 	found=${found%%$'\n'*}
-	if [[ -n $found ]]; then # guard:history-hit-nonempty
-		printf 'CONTENT_IN_HISTORY|%s\n' "$found"
-		return 0
+	if [[ -n $found ]]; then   # guard:history-hit-nonempty
+		if ((bothloc == 0)); then # guard:rung5-index-blob-unaccounted
+			printf 'CONTENT_IN_HISTORY|%s\n' "$found"
+			return 0
+		fi
 	fi
 
 	# Rung 6.
