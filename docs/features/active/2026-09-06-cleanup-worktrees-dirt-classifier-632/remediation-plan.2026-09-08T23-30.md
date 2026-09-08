@@ -648,14 +648,14 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
 
 ### Phase 0 — Baseline capture
 
-- [ ] [P0-T1] Read, in this order, `.github/copilot-instructions.md`,
+- [x] [P0-T1] Read, in this order, `.github/copilot-instructions.md`,
   `.github/instructions/general-code-change.instructions.md`,
   `.github/instructions/general-unit-test.instructions.md`, and `.claude/rules/shell.md`.
   Write `evidence/remediation-baseline/phase0-instructions-read.2026-09-09T00-00.md`
   carrying `Timestamp:`, `Policy Order:`, and the explicit list of the four files read.
   Acceptance: the artifact exists and its file list names all four paths above.
 
-- [ ] [P0-T2] Read the four cycle-3 finding documents in the feature folder:
+- [x] [P0-T2] Read the four cycle-3 finding documents in the feature folder:
   `remediation-inputs.2026-09-08T23-30.md`, `code-review.2026-09-08T23-30.md`,
   `feature-audit.2026-09-08T23-30.md`, `policy-audit.2026-09-08T23-30.md`. Write
   `evidence/remediation-baseline/phase0-findings-read.2026-09-09T00-00.md` recording, for
@@ -665,7 +665,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   `tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats` with the range `338-373`
   for N4.
 
-- [ ] [P0-T3] Run `bash scripts/bash/shell-qc.sh format`, then run
+- [x] [P0-T3] Run `bash scripts/bash/shell-qc.sh format`, then run
   `bash scripts/bash/shell-qc.sh check` in the same task. Record
   `evidence/remediation-baseline/shell-qc-format.2026-09-09T00-00.md` with `Timestamp:`,
   `Command:` for both commands, `EXIT_CODE:` for both, `Output Summary:` reproducing each
@@ -684,7 +684,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   that output is empty; and the artifact states explicitly whether `StatusAfter:` lists any
   path absent from `StatusBefore:`.
 
-- [ ] [P0-T4] Resolve the bats **executable path** and then run the full local test stage.
+- [x] [P0-T4] Resolve the bats **executable path** and then run the full local test stage.
   The resolution is specified as a path-emitting command rather than a version-printing one,
   because the seam consumes a path: `resolve_tool` at `scripts/bash/shell_qc_lib.sh:134-141`
   returns 1 when `SHELL_QC_BATS_BIN` names anything that is not an executable, and `run_test`
@@ -723,7 +723,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   acceptance conditions fails, the executor stops and reports rather than running the stage,
   because the alternative outcome is a gate that passes with zero tests executed.
 
-- [ ] [P0-T5] Record the coverage baseline from the last successful CI coverage run rather
+- [x] [P0-T5] Record the coverage baseline from the last successful CI coverage run rather
   than from any local invocation. Write
   `evidence/remediation-baseline/shell-coverage.2026-09-09T00-00.md` carrying `Timestamp:`,
   `Command:` naming the `gh` reads used, `EXIT_CODE:`, `BaselineRepoLineCoverage: 93.69`,
@@ -738,7 +738,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   artifact states explicitly that `kcov` has no local route in this worktree and that
   `bash scripts/bash/shell-qc.sh test --coverage` exits 127 here.
 
-- [ ] [P0-T6] Measure the guard inventory in the classifier library. Run
+- [x] [P0-T6] Measure the guard inventory in the classifier library. Run
   `grep -cE '\(\([A-Za-z_][A-Za-z0-9_]* (==|!=|>=|<=|>|<) [0-9]+\)\)' scripts/bash/cleanup_worktrees_dirt_lib.sh`
   for the arithmetic count, `grep -cE '# guard:[a-z0-9-]+$' scripts/bash/cleanup_worktrees_dirt_lib.sh`
   for the marked count, and
@@ -750,7 +750,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   the derived end-state targets **33 arithmetic lines, 40 marker lines, 42 registry rows,
   40 distinct ids** together with the arithmetic that produces each.
 
-- [ ] [P0-T7] Record the current registry kind distribution, which is what makes D4's
+- [x] [P0-T7] Record the current registry kind distribution, which is what makes D4's
   raised floor satisfiable. Run
   `awk -F'\t' '!/^#/ && NF {print $2}' tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv | sort | uniq -c`
   and
@@ -762,7 +762,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   `SEPARATED` and `2` `ARGV` and no third kind; and `IdsWithNoSeparatedRow:` names exactly
   one id, `history-scan-bounded-range`.
 
-- [ ] [P0-T8] Measure the current line count of every file this cycle may touch with
+- [x] [P0-T8] Measure the current line count of every file this cycle may touch with
   `wc -l scripts/bash/cleanup_worktrees_dirt_lib.sh scripts/bash/cleanup_worktrees_lib.sh tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats tests/shell/test_cleanup_worktrees_dirt_classify.bats tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`
   and record it in
   `evidence/remediation-baseline/file-size-limit.2026-09-09T00-00.md` with `Timestamp:`,
@@ -776,7 +776,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   present and non-empty, and the artifact states the remaining headroom to 500 for each
   file.
 
-- [ ] [P0-T9] Measure the current scenario, record and criterion counts. Run
+- [x] [P0-T9] Measure the current scenario, record and criterion counts. Run
   `find tests/fixtures/cleanup_worktrees/scenarios -maxdepth 1 -type d -name 'dirt_*' | wc -l`,
   read the literal at `tests/shell/test_cleanup_worktrees_dirt_classify.bats:253`, and run
   the section-scoped criterion derivation
@@ -796,7 +796,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   `SectionScopedCriterionTotal:` is `47`, `SectionScopedChecked:` is `47`,
   `SectionScopedUnchecked:` is `0`, and the unscoped figure is recorded as `55`.
 
-- [ ] [P0-T10] `[expect-fail]` Run
+- [x] [P0-T10] `[expect-fail]` Run
   `poetry run python -m pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q`
   and record `evidence/remediation-baseline/pytest-push-down-contract.2026-09-09T00-00.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:`
