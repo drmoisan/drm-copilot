@@ -788,7 +788,7 @@ The reviewer drove the no-match and hard-read-failure paths directly and reports
 correctly today, so these are pins of correct behaviour rather than fixes. Each therefore carries a
 mutation probe demonstrating that the new pin can fail.
 
-- [ ] [P5-T1] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_tree_no_match/` with a
+- [x] [P5-T1] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_tree_no_match/` with a
   `status._repo-wt_dirt.out` of exactly one line `M  src/a.cs`, a `rev-list.HEAD.out` whose first
   line is `dddd9999` and whose second is `eeee7777`, a `diff-index.eeee7777.rc` of `1`, and a
   `diff-quiet..src_a.cs.rc` of `1`. This scenario is the one of the three that reaches the lower
@@ -800,7 +800,7 @@ mutation probe demonstrating that the new pin can fail.
   Acceptance: the directory exists, `diff-index.eeee7777.rc` contains exactly `1`, and
   `diff-quiet..src_a.cs.rc` contains exactly `1`.
 
-- [ ] [P5-T2] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_probe_revlist_error/`
+- [x] [P5-T2] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_probe_revlist_error/`
   with a `status._repo-wt_dirt.out` of exactly one line `M  src/a.cs` and a `rev-list.HEAD.rc` of
   `128`, so `dirt_staged_tree_commit` returns 2 from
   `scripts/bash/cleanup_worktrees_dirt_lib.sh:97-99` and rung 1 takes the branch whose condition
@@ -817,7 +817,7 @@ mutation probe demonstrating that the new pin can fail.
   Acceptance: the directory exists, `rev-list.HEAD.rc` contains exactly `128`, and the directory
   contains neither `diff-quiet..src_a.cs.rc` nor `diff-quiet..src_a.cs.out`.
 
-- [ ] [P5-T3] Create
+- [x] [P5-T3] Create
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_probe_diffindex_error/` with a
   `status._repo-wt_dirt.out` of exactly one line `M  src/a.cs`, a `rev-list.HEAD.out` of
   `dddd9999` then `eeee7777`, and a `diff-index.eeee7777.rc` of `128`, so the probe returns 2 from
@@ -828,7 +828,7 @@ mutation probe demonstrating that the new pin can fail.
   Acceptance: the directory exists, `diff-index.eeee7777.rc` contains exactly `128`, and the
   directory contains neither `diff-quiet..src_a.cs.rc` nor `diff-quiet..src_a.cs.out`.
 
-- [ ] [P5-T4] Append three tests to `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` with
+- [x] [P5-T4] Append three tests to `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` with
   these descriptions, quoted verbatim here for the executor to create:
   `dirt_staged_tree_no_match: a staged index matching no ancestor tree is UNIQUE not STAGED_TREE_IS_COMMIT`,
   `dirt_staged_probe_revlist_error: a rev-list hard failure maps the staged entry to UNIQUE`, and
@@ -841,7 +841,7 @@ mutation probe demonstrating that the new pin can fail.
   Acceptance: the file contains all three quoted descriptions verbatim and `wc -l` reports at most
   500.
 
-- [ ] [P5-T5] Run
+- [x] [P5-T5] Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` and
   write `evidence/regression-testing/pass-staged-rung-directions.2026-09-08T06-00.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, the plan line, the `ok`/`not ok` counts, and
@@ -849,7 +849,7 @@ mutation probe demonstrating that the new pin can fail.
   Acceptance: `EXIT_CODE: 0`, the recorded `not ok` count is `0`, and the output contains an `ok`
   line for each of the three descriptions quoted in P5-T4 and for the two quoted in P2-T2.
 
-- [ ] [P5-T6] Demonstrate the three new pins can fail. Record
+- [x] [P5-T6] Demonstrate the three new pins can fail. Record
   `sha256sum scripts/bash/cleanup_worktrees_dirt_lib.sh`; apply one temporary mutation to
   `dirt_staged_tree_commit` that makes its no-match return and its two hard-failure returns
   indistinguishable from a match, by replacing each of `return 1` and the two `return 2`

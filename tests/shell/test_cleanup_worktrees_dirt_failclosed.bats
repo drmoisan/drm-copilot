@@ -79,3 +79,49 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     # directions. A fix that simply disabled rung 1 would fail here.
     [[ "$output" == *'DIRTFILE|/repo-wt/dirt|STAGED_TREE_IS_COMMIT|eeee7777|M |src/b.cs'* ]]
 }
+
+@test "dirt_staged_tree_no_match: a staged index matching no ancestor tree is UNIQUE not STAGED_TREE_IS_COMMIT" {
+    dirt dirt_staged_tree_no_match
+    [ "$status" -eq 0 ]
+    # The probe's ordinary negative answer. diff-index exits 1 for the one candidate the
+    # fixture offers, so no ancestor tree equals the index and rung 1 must decline. The
+    # entry then falls to rung 6 through the hash-object-empty fail-closed branch.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||M |src/a.cs'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"STAGED_TREE_IS_COMMIT"* ]]
+    [[ "$output" != *"ALL_DISPOSABLE"* ]]
+}
+
+@test "dirt_staged_probe_revlist_error: a rev-list hard failure maps the staged entry to UNIQUE" {
+    dirt_log dirt_staged_probe_revlist_error
+    [ "$status" -eq 0 ]
+    # The probe's FIRST hard-failure site. A rev-list exit above 0 carries no verdict
+    # about the index, so the probe returns 2, the caller sets the ERROR sentinel, and
+    # rung 1 emits UNIQUE. Reading the failure as a no-match would be indistinguishable
+    # from a real no-match; reading it as a match would be data loss.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||M |src/a.cs'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"STAGED_TREE_IS_COMMIT"* ]]
+    [[ "$output" != *"ALL_DISPOSABLE"* ]]
+    log="$(argv_log)"
+    # Positive control. Without it this test passes in any build where no classification
+    # ran at all, including one with the probe deleted outright.
+    [[ "$log" == *"rev-list --max-count=201 HEAD"* ]]
+}
+
+@test "dirt_staged_probe_diffindex_error: a diff-index exit above one maps the staged entry to UNIQUE" {
+    dirt_log dirt_staged_probe_diffindex_error
+    [ "$status" -eq 0 ]
+    # The probe's SECOND hard-failure site, counted separately because it is a different
+    # line reached through a different read. diff-index exits 1 to mean "this tree is not
+    # the index", which is its defined negative answer; an exit ABOVE 1 carries no verdict
+    # at all and must not be collapsed into the no-match case.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||M |src/a.cs'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"STAGED_TREE_IS_COMMIT"* ]]
+    [[ "$output" != *"ALL_DISPOSABLE"* ]]
+    log="$(argv_log)"
+    # Positive control: the probe reached its second read, so the failure observed is the
+    # diff-index site and not the rev-list site.
+    [[ "$log" == *"diff-index --cached --quiet eeee7777"* ]]
+}
