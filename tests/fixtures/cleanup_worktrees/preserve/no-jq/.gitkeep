@@ -1,0 +1,4 @@
+# Intentionally empty. This directory is used as a PATH value by the test
+# `an unresolvable jq returns 127 and stages nothing`, so it must contain no
+# executable named jq. The placeholder exists because git does not track an empty
+# directory and the fixture has to survive a fresh checkout.

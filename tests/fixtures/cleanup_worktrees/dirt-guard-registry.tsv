@@ -1,0 +1,43 @@
+# id	kind	scenario	baseline_aggregate	mutation	reason
+build-artifact-vacuous-confinement	SEPARATED	dirt_build_artifact_empty_diff	HAS_UNIQUE	s/((total == 0))/((0))/	
+rung4-tracked-path-in-main	SEPARATED	dirt_tracked_staged_only_blob	HAS_UNIQUE	s/((erc == 0))/((1))/	
+rung4-tracked-hard-fail	SEPARATED	dirt_tracked_probe_error_in_history	HAS_UNIQUE	s/((drc > 1))/((0))/	
+hash-object-hard-fail	SEPARATED	dirt_classifier_read_error	HAS_UNIQUE	s/((hrc != 0))/((0))/	
+find-object-hard-fail	SEPARATED	dirt_history_read_error	HAS_UNIQUE	s/((lrc != 0))/((0))/	
+staged-probe-revlist-hard-fail	SEPARATED	dirt_staged_probe_revlist_error	HAS_UNIQUE	s/((rc != 0))/((0))/	
+staged-probe-skip-head	SEPARATED	dirt_staged_tree_is_commit	ALL_DISPOSABLE	s/((first == 1))/((1))/	
+staged-probe-tree-match	SEPARATED	dirt_staged_tree_no_match	HAS_UNIQUE	s/((drc == 0))/((1))/	
+staged-probe-diffindex-hard-fail	SEPARATED	dirt_staged_probe_diffindex_error	HAS_UNIQUE	s/((drc > 1))/((0))/	
+hintpath-diff-read-hard-fail	SEPARATED	dirt_tracked_read_errors	HAS_UNIQUE	s/((rc != 0))/((0))/	
+build-artifact-worktree-diff-hard-fail	SEPARATED	dirt_tracked_read_errors	HAS_UNIQUE	s/((wrc == 2))/((0))/	
+build-artifact-worktree-diff-unconfined	SEPARATED	dirt_build_artifact_mixed	HAS_UNIQUE	s/((wrc == 1))/((0))/	
+build-artifact-cached-diff-hard-fail	SEPARATED	dirt_build_artifact	ALL_DISPOSABLE	s/((crc == 2))/((1))/	
+build-artifact-cached-diff-unconfined	SEPARATED	dirt_build_artifact	ALL_DISPOSABLE	s/((crc == 1))/((1))/	
+rung3-tracked-only-gate	SEPARATED	dirt_build_artifact	ALL_DISPOSABLE	s/((untracked == 0))/((0))/	
+rung3-build-artifact-match	SEPARATED	dirt_build_artifact	ALL_DISPOSABLE	s/((brc == 0))/((0))/	
+rung3-build-artifact-hard-fail	SEPARATED	dirt_tracked_read_errors	HAS_UNIQUE	s/((brc > 1))/((0))/	
+rung4-tracked-gate	SEPARATED	dirt_tracked_staged_only_blob	HAS_UNIQUE	s/((untracked == 0))/((0))/	
+rung4-tracked-content-equal	SEPARATED	dirt_tracked_staged_only_blob	HAS_UNIQUE	s/((drc == 0))/((0))/	
+rung4-untracked-gate	SEPARATED	dirt_content_on_main	ALL_DISPOSABLE	s/((untracked == 1))/((0))/	
+rung4-untracked-main-present	SEPARATED	dirt_content_on_main	ALL_DISPOSABLE	s/((mrc == 0))/((0))/	
+history-scan-bounded-range	ARGV	dirt_unique	HAS_UNIQUE	s/((vrc == 0))/((0))/	ARGV-ONLY: the bounded-range endpoint selects only the rev range handed to log --find-object, and the stub keys that read on the object id alone, so the verdict and every record are identical while the log invocation changes from main~1000..main to main.
+status-read-hard-fail	SEPARATED	dirt_unique	HAS_UNIQUE	s/((srrc != 0))/((1))/	
+staged-probe-issue-gate	SEPARATED	dirt_staged_tree_is_commit	ALL_DISPOSABLE	s/((any_staged == 1))/((0))/	
+staged-probe-no-match	SEPARATED	dirt_staged_tree_is_commit	ALL_DISPOSABLE	s/((prc == 1))/((1))/	
+staged-probe-error-map	SEPARATED	dirt_staged_tree_is_commit	ALL_DISPOSABLE	s/((prc > 1))/((1))/	
+aggregate-empty-entry-set	SEPARATED	dirt_unique	HAS_UNIQUE	s/((entry_count == 0))/((1))/	
+aggregate-all-disposable-gate	SEPARATED	dirt_unique	HAS_UNIQUE	s/((unique_count == 0))/((1))/	
+clear-classify-exit-gate	SEPARATED	dirt_clear_all_disposable	ALL_DISPOSABLE	s/((crc == 0))/((0))/	
+clear-reset-hard-fail	SEPARATED	dirt_clear_reset_failed	ALL_DISPOSABLE	s/((rrc != 0))/((0))/	
+clear-clean-hard-fail	SEPARATED	dirt_clear_clean_failed	ALL_DISPOSABLE	s/((clrc != 0))/((0))/	
+diff-header-skip	SEPARATED	dirt_build_artifact	ALL_DISPOSABLE	s%continue ;;%;;%	
+rung1-y-column-gate	SEPARATED	dirt_staged_tree_worktree_delta	HAS_UNIQUE	s% && $y == " "%%	
+hash-object-hard-fail	ARGV	dirt_staged_tree_worktree_delta	HAS_UNIQUE	s% || \[\[ -z $blob \]\]%%	ARGV-ONLY: removing the empty-blob half lets the ladder run past a failed content read carrying an empty object id; the entry is UNIQUE by rung 6 instead of by this guard, so the record channel is byte-identical and the argv log gains the rung-5 log --find-object= invocation with an empty argument.
+rung4-untracked-main-present	SEPARATED	dirt_rename_split	HAS_UNIQUE	s%\[\[ -n $mainblob && $mainblob == "$blob" \]\]%[[ -n "x" ]]%	
+history-hit-nonempty	SEPARATED	dirt_content_in_history	ALL_DISPOSABLE	s%\[\[ -n $found \]\]%[[ -n "" ]]%	
+rename-payload-split-gate	SEPARATED	dirt_rename_split	HAS_UNIQUE	s%== C \]\]%== C || -n "x" \]\]%	
+unique-verdict-tally	SEPARATED	dirt_unique	HAS_UNIQUE	s%\[\[ $verdict == "UNIQUE" \]\]%[[ -n "" ]]%	
+clear-requires-all-disposable	SEPARATED	dirt_unique	HAS_UNIQUE	s%\[\[ $agg != "ALL_DISPOSABLE" \]\]%[[ -n "" ]]%	
+index-and-worktree-both-hold-content	SEPARATED	dirt_index_and_worktree_delta	HAS_UNIQUE	s%\[\[ $x == \[MARCTU\] && $y == \[MARCTU\] \]\]%[[ -n "" ]]%	
+rung4-index-blob-unaccounted	SEPARATED	dirt_index_and_worktree_delta	HAS_UNIQUE	s/((bothloc == 0))/((1))/	
+rung5-index-blob-unaccounted	SEPARATED	dirt_index_and_worktree_delta	HAS_UNIQUE	s/((bothloc == 0))/((1))/	

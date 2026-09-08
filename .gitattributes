@@ -7,3 +7,8 @@ tests/fixtures/orchestration-handoff/taskmaster-469/codex-to-claude/plan.2026-08
 # 'preserves CRLF terminators' case pass on an uncommitted worktree and fail on
 # every fresh checkout, including CI, so the pair is exempted from conversion.
 tests/fixtures/project_file_merge/crlf-*.csproj -text
+
+# Issue #637: same reasoning for the preserve-file consolidation fixtures. The
+# consolidation must carry the target file's line endings unchanged, so the CRLF
+# fixture tree is exempted from conversion or the assertion cannot fail.
+tests/fixtures/cleanup_worktrees/preserve/eol-crlf/** -text

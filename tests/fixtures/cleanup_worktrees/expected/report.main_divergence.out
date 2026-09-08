@@ -1,0 +1,3 @@
+WARN|main-divergence|localsha111|originsha222
+WORKTREE|/repo/main|main|main
+BRANCH|main|PROTECTED_CURRENT

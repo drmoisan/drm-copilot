@@ -1,0 +1,22 @@
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "removals": [],
+  "preserved_files": [
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/index-append/wt",
+      "source_path": "agent-memory/atomic-executor/appended-lesson.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "agent-memory/atomic-executor/appended-lesson.md",
+      "memory_index_line": "- [Appended lesson](appended-lesson.md) \u2014 carried across verbatim, separator included",
+      "line_ending": "lf",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/index-append fixture: the destination index exists and is LF terminated"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+WORKTREE|/repo/main|main|main
+WORKTREE|/repo-wt/feat|feature-wt|
+BRANCH|feature-wt|MERGED_CLEAN
+BRANCH|main|PROTECTED_CURRENT

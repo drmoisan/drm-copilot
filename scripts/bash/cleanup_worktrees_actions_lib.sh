@@ -33,6 +33,15 @@
 # pick as rc=1), the CHERRY_PICK_HEAD and ref-exists probes, and
 # `vout=$(verify_consolidation_merged) || true` in run_apply (only the exact token
 # MERGED_CLEAN unlocks deletion).
+#
+# Opt-in disposable-dirt clearing hook: when CLEANUP_WT_CLEAR_DISPOSABLE is 1,
+# delete_candidate answers a BLOCKED-DIRTY removal by calling clear_disposable_dirt
+# (scripts/bash/cleanup_worktrees_dirt_lib.sh), then re-verifying delete eligibility in
+# process, then retrying the SAME unforced removal. remove_worktree_safe is unmodified
+# by that hook: it gains no force flag, no new argument, and no new call site, so the
+# never-force-remove invariant holds on every path. The hook is off by default, runs in
+# apply mode only, and refuses the clear when any per-file verdict for the worktree is
+# UNIQUE, including the fail-closed UNIQUE assigned when a classification read errors.
 
 CLEANUP_WT_CONSOLIDATION_BRANCH="documentationandmemories"
 
@@ -202,6 +211,26 @@ verify_consolidation_merged() {
 	# whose unique content was consolidated. Echoes MERGED_CLEAN / NOT_ANCESTOR /
 	# ANCESTRY_ERROR and returns 0 / 1 / 2 respectively.
 	local mrc=0
+	# Tip-equality pre-check, ahead of the best-effort fetch so no network call is made
+	# in the blocked case. A consolidation branch created at main and not yet committed
+	# to has a tip identical to main's; merge-base --is-ancestor answers 0 for that
+	# shape, which would wrongly present a zero-commit branch as delete-eligible. An
+	# empty or unresolvable tip on either side is a HARD FAILURE, never an equality
+	# match: two empty strings compare equal, so treating them as equality would block a
+	# genuinely merged branch. A commit-counting guard was rejected for this check: the
+	# count is also zero after the consolidation PR merges with a merge commit, which
+	# would permanently block the documented post-merge cleanup step.
+	local cons_tip main_tip ctrc=0 mtrc=0
+	cons_tip=$(cleanup_wt_git rev-parse "$CLEANUP_WT_CONSOLIDATION_BRANCH") || ctrc=$?
+	main_tip=$(cleanup_wt_git rev-parse main) || mtrc=$?
+	if ((ctrc != 0)) || ((mtrc != 0)) || [[ -z $cons_tip || -z $main_tip ]]; then
+		printf 'ANCESTRY_ERROR\n'
+		return 2
+	fi
+	if [[ $cons_tip == "$main_tip" ]]; then
+		printf 'NOT_ANCESTOR\n'
+		return 1
+	fi
 	cleanup_wt_git fetch origin main >/dev/null 2>&1 || true
 	cleanup_wt_git merge-base --is-ancestor "$CLEANUP_WT_CONSOLIDATION_BRANCH" main >/dev/null 2>&1 || mrc=$?
 	if ((mrc == 0)); then
@@ -308,7 +337,18 @@ delete_candidate() {
 	local name="$1" wt_path="$2" state="$3"
 	reverify_delete_eligible "$name" "$state" || return 1
 	if [[ -n $wt_path ]]; then
-		remove_worktree_safe "$wt_path" || return 1
+		# Opt-in clear-and-retry, off unless CLEANUP_WT_CLEAR_DISPOSABLE is 1. A
+		# BLOCKED-DIRTY removal is retried once, and only after clear_disposable_dirt has
+		# emptied a worktree whose every per-file verdict is disposable and
+		# reverify_delete_eligible has re-confirmed eligibility in process. The retry calls
+		# the same unforced remove_worktree_safe, so no force flag and no new removal call
+		# site is introduced. Any step's failure stops the sequence and returns 1.
+		if ! remove_worktree_safe "$wt_path"; then
+			((CLEANUP_WT_CLEAR_DISPOSABLE == 1)) || return 1
+			clear_disposable_dirt "$wt_path" || return 1
+			reverify_delete_eligible "$name" "$state" || return 1
+			remove_worktree_safe "$wt_path" || return 1
+		fi
 	fi
 	delete_branch "$name"
 }
@@ -343,9 +383,13 @@ run_apply() {
 	while IFS= read -r record; do
 		[[ -z $record ]] && continue
 		IFS='|' read -r wpath _ wbranch wflags <<<"$record"
+		# A detached registration is handled by apply_detached_worktrees instead: it
+		# emits that registration's single WORKTREE record and owns its removal decision.
+		is_detached_candidate "$wflags" && continue
 		printf 'WORKTREE|%s|%s|%s\n' "$wpath" "$wbranch" "$wflags"
 		[[ -n $wbranch && $wbranch != DETACHED ]] && wt_of[$wbranch]=$wpath
 	done <<<"$wlout"
+	apply_detached_worktrees "$wlout" || rc=1
 	# Consolidation merge gate: unlock the consolidation branch's own deletion only
 	# when documentationandmemories is merged into main.
 	local consolidation_ok=1 vout
@@ -354,23 +398,34 @@ run_apply() {
 		vout=$(verify_consolidation_merged) || true
 		[[ $vout == MERGED_CLEAN ]] && consolidation_ok=0
 	fi
-	local crc
+	# One shared classification pass for every branch, identical to the one report mode
+	# runs, so the two modes can never disagree about a branch's state. A non-zero driver
+	# return means at least one branch hard-failed; that propagates to rc here and the
+	# per-branch allowlist check below still gates every individual deletion.
+	local crc=0 all_out
+	all_out=$(classify_all_branches) || crc=$?
+	if ((crc != 0)); then
+		rc=1
+	fi
 	while read -r name _; do
 		[[ -z $name ]] && continue
 		if [[ $name == "$CLEANUP_WT_CONSOLIDATION_BRANCH" ]] && ((consolidation_ok != 0)); then
 			printf 'ACTION|delete|%s|BLOCKED-CONSOLIDATION-UNMERGED\n' "$name"
 			continue
 		fi
-		crc=0
-		cb_out=$(classify_branch "$name") || crc=$?
+		# Extract this branch's own lines from the shared driver's combined output. The
+		# name is the second pipe-delimited field of each of the three per-branch record
+		# types, so the filter is name-scoped and cannot pick up a sibling's records.
+		cb_out=$(printf '%s\n' "$all_out" | awk -F'|' -v n="$name" \
+			'($1 == "BRANCH" || $1 == "CHILD_OF" || $1 == "COMMIT") && $2 == n')
 		printf '%s\n' "$cb_out"
-		if ((crc != 0)); then
+		state=$(printf '%s\n' "$cb_out" | awk -F'|' '/^BRANCH\|/{print $3; exit}')
+		if [[ $state == "ANCESTRY_ERROR" ]]; then
 			# A branch classification hard failure never triggers deletion (its state is an
 			# error state, not on the allowlist) and propagates a non-zero driver rc.
 			rc=1
 			continue
 		fi
-		state=$(printf '%s\n' "$cb_out" | awk -F'|' '/^BRANCH\|/{print $3; exit}')
 		case "$state" in
 		MERGED_CLEAN | MERGED_CONTENT_NEUTRAL | MERGED_EQUIVALENT)
 			delete_candidate "$name" "${wt_of[$name]:-}" "$state" || rc=1

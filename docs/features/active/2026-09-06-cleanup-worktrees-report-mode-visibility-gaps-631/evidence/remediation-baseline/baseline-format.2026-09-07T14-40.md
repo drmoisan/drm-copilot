@@ -1,0 +1,4 @@
+Timestamp: 2026-09-07T19:40
+Command: bash scripts/bash/shell-qc.sh format (evidence reused from the pre-remediation-cycle state, commit fbb1e65b, since that is the tree this remediation cycle's changes are diffed against; see final-format.2026-09-06T23-03.md for the original run on that exact commit)
+EXIT_CODE: 0
+Output Summary: shfmt -w rewrote nothing on the pre-remediation-cycle tree (commit fbb1e65b), confirmed by the original final-format.2026-09-06T23-03.md run's empty `git status --porcelain -- scripts/bash tests/shell` observation. This is the correct remediation-cycle baseline: running `format` again after the remediation-cycle edits had already landed in this session's working tree (as atomic-executor's Phase 1-6 execution did) would observe a mixed state, not a true pre-remediation baseline, so this artifact cites the last verified clean state before this cycle's first edit instead.

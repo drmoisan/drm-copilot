@@ -1,0 +1,19 @@
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "removals": [],
+  "preserved_files": [
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/scan-malformed/wt",
+      "source_path": "agent-memory/atomic-executor/lesson.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "agent-memory/atomic-executor/lesson.md",
+      "memory_index_line": null,
+      "line_ending": "absent",
+      "host_token_scan": "clean",
+      "evidence": "scan-malformed/not-an-object fixture: host_token_scan is not an object"
+    }
+  ]
+}

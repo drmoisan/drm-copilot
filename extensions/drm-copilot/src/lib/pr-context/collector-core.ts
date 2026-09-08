@@ -329,6 +329,9 @@ export function collectPrContext(
       path.includes("AGENTS")
     ) {
       bucketDocs.push([path, stats]);
+    } else {
+      // Route every unmatched, non-renamed path into the docs/tooling bucket.
+      bucketDocs.push([path, stats]);
     }
   }
 
