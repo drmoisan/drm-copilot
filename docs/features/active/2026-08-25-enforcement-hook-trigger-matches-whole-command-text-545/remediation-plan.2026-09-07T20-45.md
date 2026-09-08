@@ -1101,12 +1101,23 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       list for a file this cycle creates; the porcelain span is required because it is the only view
       that survives if the change is committed before this task runs.
 
-- [ ] [P5-T5] Re-verify that no frozen literal was deleted anywhere in the feature. Run
+- [x] [P5-T5] Re-verify that no frozen literal was deleted anywhere in the feature. Run
       `git diff 6dff80ed4596bec088d548b23013e6077e32c484 -- .claude/hooks .codex/hooks extensions/drm-copilot/resources`
       and search the removed lines for each frozen literal named in standing constraint 2. Write
       `evidence/qa-gates/frozen-literals-unchanged.<capture-timestamp>.md`.
       **Acceptance:** the artifact carries one row per frozen-literal group, each recording the count
-      of `-` lines in the feature-wide diff that contain that literal, and every such count is `0`.
+      of `-` lines in the feature-wide diff that contain that literal **that are not paired, within
+      the same hunk, with a `+` line containing that identical literal**, and every such count is `0`.
+      Pairing is counted, not merely detected: for each hunk (delimited by the diff's `@@ ... @@`
+      header) and each literal, compute `unpaired = max(0, removed_count - added_count)`, where
+      `removed_count` and `added_count` are the number of `-` and `+` lines in that hunk containing
+      the literal; sum `unpaired` across all hunks for that literal to get the group's row value. A
+      `-` line with no equal-or-greater count of `+` lines carrying the same literal in the same hunk
+      remains counted and still fails the row — a genuinely deleted literal still blocks. This
+      exemption exists because standing constraint 2 permits the comparison operand to change in
+      place: the promotion hook's `$CommandText` becomes `$segment.ScanText` while the `gh` literal on
+      the following line is retyped unchanged, and a line-oriented diff renders that in-place operand
+      rewrite as a paired removed/added line carrying the identical literal, not as a deletion.
       It additionally records that
       `grep -F -c "\$script:CdChainedReadCommandPattern = " .claude/hooks/validate-bash.ps1` returns
       `1` and that
@@ -1123,7 +1134,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       unchanged from `[P0-T11]`. The artifact records each file's before and after count side by
       side, so a count that moved is visible rather than inferred.
 
-- [ ] [P5-T7] Consume the orchestrator-supplied per-file coverage figures. **The executor runs no
+- [x] [P5-T7] Consume the orchestrator-supplied per-file coverage figures. **The executor runs no
       coverage command.**
 
       **Precondition, discharged by the orchestrator before this task is dispatched.** The
@@ -1154,7 +1165,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       supplied all seven figures, this task is `BLOCKED`, not `SKIPPED`: record the blocked state and
       stop; do not substitute an MCP-produced figure and do not record a placeholder.
 
-- [ ] [P5-T8] Record the coverage delta. Using the `[P0-T9]` baselines and the `[P5-T7]`
+- [x] [P5-T8] Record the coverage delta. Using the `[P0-T9]` baselines and the `[P5-T7]`
       post-change values, write `evidence/qa-gates/final-coverage-delta.<capture-timestamp>.md`.
       **Acceptance:** the artifact carries a seven-row table, one row per canonical path, each with a
       baseline percentage, a post-change percentage, and their arithmetic difference. All seven rows
@@ -1173,7 +1184,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       counts recorded in `[P1-T7]`, `[P2-T8]`, `[P3-T9]`, and `[P4-T6]`; update every artifact whose
       count moved.
 
-- [ ] [P5-T9] Refresh the deny-preservation audit for AC-09. For each of the four regressing commands
+- [x] [P5-T9] Refresh the deny-preservation audit for AC-09. For each of the four regressing commands
       in the Scope table, and for each of the paired negatives named in `[P2-T8]`, `[P3-T9]`, and
       `[P4-T6]`, record the decision the head now produces and the named test that pins it. Write
       `evidence/qa-gates/deny-preservation-audit.<capture-timestamp>.md`.
@@ -1188,7 +1199,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       `.codex` runtime carries no `cd`-chain rule and therefore contributes no R-2.d row, and cites
       the `grep` result from the Scope section as the evidence for that.
 
-- [ ] [P5-T10] Re-check AC-09 in `spec.md`. Change the checkbox at line 1499 from `- [ ]` to `- [x]`
+- [x] [P5-T10] Re-check AC-09 in `spec.md`. Change the checkbox at line 1499 from `- [ ]` to `- [x]`
       and append to that criterion's body one sentence naming the cycle-2 evidence that discharges
       it. Change nothing else in `spec.md`.
       **Acceptance:** `sed -n '1499p' docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md`
@@ -1198,7 +1209,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       `[P5-T8]`, and `[P5-T9]` have all passed: AC-09 is the criterion those four discharge, and
       checking it earlier would record a claim the evidence does not yet support.
 
-- [ ] [P5-T11] Run the evidence-location validator:
+- [x] [P5-T11] Run the evidence-location validator:
       `python scripts/dev_tools/validate_evidence_locations.py --root .`. Write
       `evidence/qa-gates/evidence-locations.<capture-timestamp>.md`.
       **Acceptance:** `EXIT_CODE: 0`. A clean run of this validator prints no lines at all — it
@@ -1211,7 +1222,7 @@ use. `$script:CdChainedReadCommandPattern` at line 222 stays byte-unchanged, and
       `artifacts/qa-gates/`, `artifacts/evidence/`, `artifacts/coverage/`,
       `artifacts/regression-testing/`, or `artifacts/post-change/`.
 
-- [ ] [P5-T12] Reconcile against the cycle-2 exit condition and close the final batch with a budget
+- [x] [P5-T12] Reconcile against the cycle-2 exit condition and close the final batch with a budget
       reset, using the `[P1-T1]` procedure. Write
       `evidence/qa-gates/cycle-2-reconciliation.<capture-timestamp>.md`.
       **Acceptance:** the artifact carries one row per closure condition, each naming the task that

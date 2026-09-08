@@ -1496,12 +1496,12 @@ denies against a not-ready checkpoint.
       asserting the stated post-fix decision, including all seven wrapper deny pins (`xargs`,
       `bash -c`, `sh -c`, `env`, `pwsh -Command`, heredoc-into-`bash`, and live substitution inside
       double quotes).
-- [ ] **No existing denial is weakened.** Both existing decision suites pass with no assertion
+- [x] **No existing denial is weakened.** Both existing decision suites pass with no assertion
       modified except the single reversed heredoc `It` on each side; the existing Claude gate suite
       denials (lines 112–149), the Codex `Test-ImplementationCommand` classification table
       (lines 348–358, including `git commit -m "wip"` returning `$true`), the #539 D4 rows 14a–14d
       chained relocating denials, the absolute-path suites, and the existing pr-author suites all
-      pass unmodified.
+      pass unmodified. Cycle 2 discharges this criterion through `evidence/qa-gates/deny-preservation-audit.2026-09-07T22-59.md` (`[P5-T9]`), which records each of the four R-2 regressing commands producing the same decision at head `06d166e0` as at the feature-wide anchor `6dff80ed`, and all forty paired-negative preservation rows named by `[P2-T8]`, `[P3-T9]`, and `[P4-T6]` passing.
 - [x] The issue #539 exemption layer is unchanged: `Test-ExemptOrchestrationStagingCommand` and
       `enforce-orchestration-preimplementation-gate-helpers.ps1` carry no functional edit, the
       exemption remains allow-side only, and it is consulted at the same point in the decision flow
