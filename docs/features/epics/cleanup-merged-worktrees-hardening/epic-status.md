@@ -4,12 +4,12 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 
 - Integration branch: `epic/cleanup-merged-worktrees-hardening-integration`
 - Integration base commit: `a36b6dca7809e456f00c7d5b01eec5da49f7fca0`
-- Integration branch tip: `0edc15e030d9a79307e1399e9658e95b2cd6066d`
+- Integration branch tip: `800aaed3c153a1f23365c086a25c9e54ec916f53`
 - Planning commit: `73b451c09bf39a706bb71245a0dde5ae0fbc4660`
 - Max parallel features: 4
 - Current wave: 2
-- Next step: `await_632_and_637_then_open_integration_pr`
-- Last updated: 2026-09-08T09:45:00Z
+- Next step: `await_632_then_open_integration_pr_to_main`
+- Last updated: 2026-09-08T12:52:00Z
 
 ## Wave Schedule
 
@@ -30,20 +30,24 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 | 2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631 | 631 | 1 | merged | `bug/cleanup-worktrees-report-mode-visibility-gaps-631-r3` | https://github.com/drmoisan/drm-copilot/pull/650 | 4ffe680ebcebaabbba10faaa490e46a717686535 | 2026-09-07T13:05:00Z | 2026-09-08T00:30:00Z | 2026-09-08T00:37:39Z | - |
 | 2026-09-06-cleanup-worktrees-sanctioned-removal-manifest-635 | 635 | 1 | merged | `bug/cleanup-worktrees-sanctioned-removal-manifest-635-r2` | https://github.com/drmoisan/drm-copilot/pull/652 | 0edc15e030d9a79307e1399e9658e95b2cd6066d | 2026-09-08T03:52:00Z | 2026-09-08T09:15:00Z | 2026-09-08T09:25:21Z | - |
 | 2026-09-06-cleanup-worktrees-dirt-classifier-632 | 632 | 2 | worktree_created | `bug/cleanup-worktrees-dirt-classifier-632-r2` | - | - | 2026-09-08T00:50:00Z | - | - | - |
-| 2026-09-07-cleanup-worktrees-preserve-file-consolidation-637 | 637 | 2 | worktree_created | `bug/cleanup-worktrees-preserve-file-consolidation-637-r2` | - | - | 2026-09-08T09:35:00Z | - | - | - |
+| 2026-09-07-cleanup-worktrees-preserve-file-consolidation-637 | 637 | 2 | merged | `bug/cleanup-worktrees-preserve-file-consolidation-637-r2` | https://github.com/drmoisan/drm-copilot/pull/653 | 800aaed3c153a1f23365c086a25c9e54ec916f53 | 2026-09-08T09:35:00Z | 2026-09-08T12:35:00Z | 2026-09-08T12:47:26Z | - |
 
 ## In-Flight Children
 
-- **632** (`2026-09-06-cleanup-worktrees-dirt-classifier-632`), wave 2
-  - Branch `bug/cleanup-worktrees-dirt-classifier-632-r2` at `ad6bc946bbf0ad9e69756b2155eae19771a232d8`
-  - Dispatched `_shell-coverage.yml` run `34182198357` at that SHA concluded `success`.
-  - State: feature-review returned findings; child is in a remediation cycle.
-- **637** (`2026-09-07-cleanup-worktrees-preserve-file-consolidation-637`), wave 2
-  - Branch `bug/cleanup-worktrees-preserve-file-consolidation-637-r2`, branched from the
-    integration tip `0edc15e0`.
-  - State: starting atomic execution from `plan.2026-09-07T01-26.md`.
-  - Expect a real merge with 632: both touch `scripts/bash/cleanup_worktrees_lib.sh` and the
-    report surface concurrently.
+- **632** (`2026-09-06-cleanup-worktrees-dirt-classifier-632`), wave 2 — the only child still
+  running.
+  - Branch `bug/cleanup-worktrees-dirt-classifier-632-r2`; origin at `9ef2f892`, local worktree
+    HEAD at `e8fe310f` (one unpushed commit).
+  - Dispatched `_shell-coverage.yml` run `34182198357` at `ad6bc946` concluded `success`.
+  - State: alive and mid remediation cycle. It has produced no task-notification since launch,
+    and a notification fires each time an agent stops, so it has not stopped. Its checkpoint was
+    written at 2026-09-08T12:20:55Z, 29 minutes before the 12:49:51Z observation.
+  - Flagged for the completion spot-check: its unpushed commit `e8fe310f` ADDS acceptance
+    criteria (AC-46, AC-47) to `spec.md` during execution. The `acceptance-criteria-tracking`
+    skill forbids phantom criteria — AC items are authored by planning agents, not executors or
+    reviewers. This may be legitimate (a remediation-cycle `atomic-planner` amending a spec), but
+    it is the shape of a spec being bent to match what was built, so at completion the author and
+    the supporting evidence will be checked rather than the final count accepted.
 
 ## Integration PR
 
@@ -131,6 +135,7 @@ radio-button block whose unselected options are unchecked boxes that are not acc
 | 631 | spec.md | 11 | 10 | a point-in-time sequencing criterion, no longer verifiable retrospectively |
 | 545 | spec.md | 37 | 36 | closing #591 as superseded, an epic-level obligation the child could not satisfy |
 | 635 | spec.md | 37 | 37 | none |
+| 637 | spec.md | 43 | 43 | none |
 
 EA-2 verified satisfied on 545: `enforce-epic-merge-gate.TriggerScoping.Tests.ps1` carries
 `Context 'the false-allow direction of the whole-line PR-number defect'`, including a case denying
