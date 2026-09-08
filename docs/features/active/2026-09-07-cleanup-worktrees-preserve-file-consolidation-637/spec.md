@@ -963,11 +963,11 @@ an enumeration size, or a population.
       prints nothing, and `git status --porcelain -- .claude/hooks` prints nothing.
 - [x] **AC-38** Every file created or changed by this work is at or below 500 lines, verified per
       file with `wc -l` against the changed-file list. Markdown files are exempt.
-- [ ] **AC-39** A single pass of `bash scripts/bash/shell-qc.sh format`, then
+- [x] **AC-39** A single pass of `bash scripts/bash/shell-qc.sh format`, then
       `bash scripts/bash/shell-qc.sh check`, then `bash scripts/bash/shell-qc.sh test` completes
       with every stage exiting 0 and no file rewritten by the format stage. The transcript is
       recorded under `evidence/qa-gates/`.
-- [ ] **AC-40** `bash scripts/bash/shell-qc.sh test --coverage` prints the headline
+- [x] **AC-40** `bash scripts/bash/shell-qc.sh test --coverage` prints the headline
       `Bash coverage (lines): NN.N%` and the printed value is at least 85.0; the merged
       `artifacts/pester/kcov/cov.xml` is produced and its summary is recorded under
       `evidence/qa-gates/`.

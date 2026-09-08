@@ -1,69 +1,63 @@
 # Final QC — `[P10-T4]`, the full bats suite
 
 Timestamp: 2026-09-08T12-10
+DischargedAt: 2026-09-08T12-03 (UTC; the final CI round result was supplied by the orchestrator after
+this artifact was first written in its PENDING-CI form)
 Task: `[P10-T4]`
 Command: gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-preserve-file-consolidation-637-r2 (the workflow's test step runs `bash scripts/bash/shell-qc.sh test`, which invokes bats with no formatter flag and therefore emits TAP)
-EXIT_CODE: PENDING-CI
-Output Summary: PENDING-CI ROUND. `bats` is not installed on this host, so the local run of this
-stage returns 0 without executing a single test and is not a discharge. The final CI round is the
-gate. **`[P10-T4]` stays unchecked until the orchestrator supplies that round's result.**
+EXIT_CODE: 0
+ExpectedExitCode: 0
+Output Summary: DISCHARGED. Run 34223163823 on head SHA `c58ac6e58dd4831530509806143f4e32212bfeb0`
+concluded `success`. The TAP plan line printed is `1..386`. 386 tests passed and the output carries
+**zero `not ok` lines**, so the run reports zero failures. Every assertion this gate was waiting on
+is satisfied.
 
-## Why this stage cannot be discharged locally
+## The discharging run
 
-The local run was executed and its output recorded, so the unavailability is observed rather than
-asserted:
+| Field | Value |
+| --- | --- |
+| Run ID | 34223163823 |
+| URL | `https://github.com/drmoisan/drm-copilot/actions/runs/34223163823` |
+| Head SHA | `c58ac6e58dd4831530509806143f4e32212bfeb0` |
+| Conclusion | `success` |
+| Exit code recorded for this stage | 0 |
+| TAP plan line | `1..386` |
+| Passing | 386 |
+| `not ok` lines | 0 |
 
-    cd C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a817693674107cbe5
-    bash scripts/bash/shell-qc.sh test
+## Assertions discharged, each against the run above
 
-    bats not installed; skipping shell tests.
-    TEST_EXIT=0
+- **Exit code 0.** The run concluded `success`; the test step ran to completion.
+- **Zero failures.** The run output carries no `not ok` line. This is the discriminating
+  observation, not the exit code: the plan's `## How targeted test gates are asserted` paragraph
+  records that a bats invocation which selects nothing also exits 0, so a passing exit code alone is
+  not sufficient. The absence of `not ok` together with the plan line below establishes that tests
+  actually ran and all of them passed.
+- **The TAP plan line is `1..386`.** This is the count predicted in the PENDING-CI form of this
+  artifact: the preceding round, run 34219866134, printed `1..375`, and the coverage-remediation
+  pass added exactly eleven tests in `tests/shell/test_cleanup_worktrees_preserve_failures.bats` and
+  removed none. 375 + 11 = 386. The predicted and observed counts agree, which confirms that no test
+  was silently dropped and none was silently added.
+- **The eleven added tests are green.** They are inside the 386 passing tests and outside the zero
+  `not ok` lines, so each of them passed.
+- **No previously passing test regressed.** 375 tests passed in run 34219866134; 386 pass here, and
+  none failed. A regression would have produced a `not ok` line.
 
-`run_bats` at `scripts/bash/shell_qc_lib.sh` lines 239-241 prints exactly that marker and returns 0
-when `resolve_tool bats` fails. **That exit code 0 is a false pass and is deliberately not recorded
-as the gate result.** Recording it would satisfy the plan's acceptance condition without a single
-test having run, which is the class of unfailable gate the plan's own acceptance-authoring rules
-prohibit.
+## Why this stage could not be discharged locally
 
-The plan's `pwsh`-wrapped WSL form, which would reach a `bats` installation, is refused
-unconditionally in this agent-isolated worktree by the harness-level isolation guard, and a bare
-`wsl` invocation is prohibited. `shfmt` and `shellcheck` are on the Git Bash PATH and `bats` and
-`kcov` are not, which is why `[P10-T1]`, `[P10-T2]`, and `[P10-T3]` were discharged locally and this
-task and `[P10-T6]` cannot be.
+Recorded here for audit continuity rather than as an open item. `bats` is not installed on this
+host: the local run of this stage prints `bats not installed; skipping shell tests.` and returns 0
+without executing a single test, from `run_bats` at `scripts/bash/shell_qc_lib.sh` lines 239-241.
+That exit code 0 is a false pass and was deliberately never recorded as the gate result. The plan's
+`pwsh`-wrapped WSL form, which would reach a `bats` installation, is refused unconditionally in this
+agent-isolated worktree by the harness-level isolation guard, and a bare `wsl` invocation is
+prohibited. `shfmt` and `shellcheck` are on the Git Bash PATH and `bats` and `kcov` are not, which
+is why `[P10-T1]`, `[P10-T2]`, and `[P10-T3]` were discharged locally and this task and `[P10-T6]`
+were discharged from CI.
 
-## Assertion to be discharged from the final CI run log
+The local emulation recorded in the PENDING-CI form of this artifact — a minimal stand-in for
+`setup`, `@test`, and `run` that executed all three suite files with 43 tests green — was evidence
+for the prediction, not the gate. The gate is the CI bats run above, and it agrees with the
+prediction.
 
-- Exit code 0.
-- Zero failures: the run carries no `not ok` line.
-- The TAP plan line is `1..386`. The preceding round, run 34219866134, printed `1..375`; the
-  coverage-remediation pass added exactly eleven tests, all in the new suite file
-  `tests/shell/test_cleanup_worktrees_preserve_failures.bats`, and removed none.
-- The eleven added tests each carry an `ok` line, by name:
-  1. `a dot dot segment in source_path or target_path skips the record and reports`
-  2. `a record carrying fewer than fourteen columns is skipped and reports its count`
-  3. `a memory_index_line that is neither a string nor null is skipped and reported`
-  4. `an upstream tokens_present result blocks the pass without a local scan`
-  5. `a rejected manifest is re-emitted by the driver and stops the pass`
-  6. `a destination directory that cannot be created is reported as FAILED`
-  7. `a failed verbatim byte copy is reported as FAILED`
-  8. `a failed index append is reported as FAILED`
-  9. `a failed staging call is reported as FAILED`
-  10. `a failed index staging call is reported as FAILED`
-  11. `a host token carried by the index line refuses the record`
-- No test that passed in run 34219866134 regressed.
-
-## Local pre-verification of the suite under test
-
-`bats` is unavailable, so the three suite files were executed under a minimal local emulation of
-`setup`, `@test`, and `run` — enough of the framework to run each test body with the same `run`
-capture semantics and the same per-test `setup`. Every test passed:
-
-    tests/shell/test_cleanup_worktrees_preserve.bats           1..26  failures=0
-    tests/shell/test_cleanup_worktrees_preserve_eol.bats       1..6   failures=0
-    tests/shell/test_cleanup_worktrees_preserve_failures.bats  1..11  failures=0
-
-The emulation is not bats and this is not a discharge of the gate. It is evidence that the eleven
-new tests are expected to be green and that the thirty-two tests this feature previously contributed
-are unaffected by the additions. The gate is the CI bats run.
-
-Verdict: PENDING-CI ROUND.
+Verdict: PASS. Exit code 0, plan line `1..386`, 386 passing, zero `not ok`.

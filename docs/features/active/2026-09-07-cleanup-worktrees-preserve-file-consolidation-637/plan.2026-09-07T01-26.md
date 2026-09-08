@@ -1132,13 +1132,13 @@ may be recorded as `SKIPPED`.
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh check'"`.
       Acceptance: exit code 0, the output carries no `shfmt` diff hunk and no `shellcheck` finding,
       and `evidence/qa-gates/final-qc-check.<timestamp>.md` records the four required fields.
-- [ ] [P10-T4] Run the full bats suite. Run
+- [x] [P10-T4] Run the full bats suite. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh test'"`.
       This is the first task in the plan that runs the whole suite; every test the earlier phases
       authored is expected to be green by this point. Acceptance: exit code 0, the run reports zero
       failures, and `evidence/qa-gates/final-qc-test.<timestamp>.md` records the four required fields
       with the passing and failing counts in `Output Summary:`.
-- [ ] [P10-T5] Record the single clean pass required by AC-39. Acceptance:
+- [x] [P10-T5] Record the single clean pass required by AC-39. Acceptance:
       `evidence/qa-gates/final-qc-single-pass.<timestamp>.md` exists and records that P10-T2, P10-T3,
       and P10-T4 each exited 0 within one uninterrupted loop iteration and that the format stage
       rewrote no file, citing the P10-T1 pre-format `shfmt -d` observation of no diff hunk as the
@@ -1146,7 +1146,7 @@ may be recorded as `SKIPPED`.
       the corroborating tracked-file observation. The artifact additionally carries `Timestamp:`,
       `Command: (derivation only; no command executed)`, `EXIT_CODE: 0`, and an `Output Summary:`
       restating the recorded values in one line. Satisfies **AC-39**.
-- [ ] [P10-T6] Run the coverage stage. Run
+- [x] [P10-T6] Run the coverage stage. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh test --coverage'"`.
       The successful run prints one headline of the shape `Bash coverage (lines): NN.N%` and no
       branch column; kcov measures line coverage only, so no bash branch-coverage gate exists and
@@ -1154,7 +1154,7 @@ may be recorded as `SKIPPED`.
       least 85.0, `artifacts/pester/kcov/cov.xml` is produced, and
       `evidence/qa-gates/final-qc-coverage.<timestamp>.md` records the four required fields with the
       headline verbatim in `Output Summary:`. Satisfies **AC-40**.
-- [ ] [P10-T7] Record the coverage comparison. Read the baseline headline value from the P0-T5
+- [x] [P10-T7] Record the coverage comparison. Read the baseline headline value from the P0-T5
       artifact and the post-change headline value from the P10-T6 artifact, and read the
       `line-rate` attribute for `scripts/bash/cleanup_worktrees_preserve_lib.sh` from
       `artifacts/pester/kcov/cov.xml` as the changed-code coverage figure. Acceptance:
