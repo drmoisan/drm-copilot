@@ -104,23 +104,23 @@ dirt_staged_tree_commit() {
 	local wt="$1" out rc=0 first=1 sha drc
 	out=$(cleanup_wt_git --no-optional-locks -C "$wt" rev-list \
 		--max-count=$((CLEANUP_WT_STAGED_TREE_DEPTH + 1)) HEAD) || rc=$?
-	if ((rc != 0)); then
+	if ((rc != 0)); then # guard:staged-probe-revlist-hard-fail
 		return 2
 	fi
 	while IFS= read -r sha || [[ -n $sha ]]; do
 		[[ -z $sha ]] && continue
-		if ((first == 1)); then
+		if ((first == 1)); then # guard:staged-probe-skip-head
 			first=0
 			continue
 		fi
 		drc=0
 		cleanup_wt_git --no-optional-locks -C "$wt" diff-index --cached --quiet \
 			"$sha" -- >/dev/null || drc=$?
-		if ((drc == 0)); then
+		if ((drc == 0)); then # guard:staged-probe-tree-match
 			printf '%s\n' "$sha"
 			return 0
 		fi
-		if ((drc > 1)); then
+		if ((drc > 1)); then # guard:staged-probe-diffindex-hard-fail
 			return 2
 		fi
 	done <<<"$out"
@@ -174,12 +174,12 @@ dirt_diff_is_hintpath_confined() {
 		out=$(cleanup_wt_git --no-optional-locks -C "$wt" diff --no-color -U0 \
 			-- "$rel") || rc=$?
 	fi
-	if ((rc != 0)); then
+	if ((rc != 0)); then # guard:hintpath-diff-read-hard-fail
 		return 2
 	fi
 	while IFS= read -r line || [[ -n $line ]]; do
 		case "$line" in
-		"--- a/"* | "+++ b/"* | "--- /dev/null" | "+++ /dev/null") continue ;;
+		"--- a/"* | "+++ b/"* | "--- /dev/null" | "+++ /dev/null") continue ;; # guard:diff-header-skip
 		"+"* | "-"*) ;;
 		*) continue ;;
 		esac
@@ -214,13 +214,13 @@ dirt_is_build_artifact() {
 	*) return 1 ;;
 	esac
 	wout=$(dirt_diff_is_hintpath_confined "$wt" "$rel" "") || wrc=$?
-	((wrc == 2)) && return 2
-	((wrc == 1)) && return 1
+	((wrc == 2)) && return 2 # guard:build-artifact-worktree-diff-hard-fail
+	((wrc == 1)) && return 1 # guard:build-artifact-worktree-diff-unconfined
 	cout=$(dirt_diff_is_hintpath_confined "$wt" "$rel" "cached") || crc=$?
-	((crc == 2)) && return 2
-	((crc == 1)) && return 1
+	((crc == 2)) && return 2 # guard:build-artifact-cached-diff-hard-fail
+	((crc == 1)) && return 1 # guard:build-artifact-cached-diff-unconfined
 	total=$((wout + cout))
-	((total == 0)) && return 1
+	((total == 0)) && return 1 # guard:build-artifact-vacuous-confinement
 	return 0
 }
 
@@ -267,7 +267,7 @@ classify_dirt_entry() {
 	# DISPOSABLE_BUILD_ARTIFACT, because dirt_is_build_artifact reads both the worktree
 	# diff and the cached diff; an MM entry on any other path reaches rung 6 and is
 	# UNIQUE.
-	if [[ $x != " " && $x != "?" && $x != "!" && $y == " " ]]; then
+	if [[ $x != " " && $x != "?" && $x != "!" && $y == " " ]]; then # guard:rung1-y-column-gate
 		if [[ $staged == "ERROR" ]]; then
 			printf 'UNIQUE|\n'
 			return 0
@@ -287,13 +287,13 @@ classify_dirt_entry() {
 	[[ $xy == "??" ]] && untracked=1
 
 	# Rung 3. Tracked, modified entries only; an untracked file has no diff to confine.
-	if ((untracked == 0)); then
+	if ((untracked == 0)); then # guard:rung3-tracked-only-gate
 		dirt_is_build_artifact "$wt" "$rel" || brc=$?
-		if ((brc == 0)); then
+		if ((brc == 0)); then # guard:rung3-build-artifact-match
 			printf 'DISPOSABLE_BUILD_ARTIFACT|\n'
 			return 0
 		fi
-		if ((brc > 1)); then
+		if ((brc > 1)); then # guard:rung3-build-artifact-hard-fail
 			printf 'UNIQUE|\n'
 			return 0
 		fi
@@ -301,22 +301,22 @@ classify_dirt_entry() {
 
 	# Rung 4, tracked half. Exit 1 is this probe's defined negative answer (the contents
 	# differ) and advances the ladder; an exit above 1 carries no verdict.
-	if ((untracked == 0)); then
+	if ((untracked == 0)); then # guard:rung4-tracked-gate
 		cleanup_wt_git --no-optional-locks -C "$wt" diff --quiet main -- "$rel" \
 			>/dev/null || drc=$?
-		if ((drc == 0)); then
+		if ((drc == 0)); then # guard:rung4-tracked-content-equal
 			# See EMPTY PATHSPEC IS NOT A MATCH in the header. Only stdout is
 			# discarded: the stub logs its argv to stderr, and redirecting that
 			# stream too would hide this read from the argv assertions. --quiet
 			# already suppresses git's own diagnostic on the negative answer.
 			cleanup_wt_git --no-optional-locks -C "$wt" rev-parse --verify --quiet \
 				"main:$rel" >/dev/null || erc=$?
-			if ((erc == 0)); then
+			if ((erc == 0)); then # guard:rung4-tracked-path-in-main
 				printf 'CONTENT_ON_MAIN|\n'
 				return 0
 			fi
 		fi
-		if ((drc > 1)); then
+		if ((drc > 1)); then # guard:rung4-tracked-hard-fail
 			printf 'UNIQUE|\n'
 			return 0
 		fi
@@ -326,17 +326,17 @@ classify_dirt_entry() {
 	# hash-object failure carries no verdict, so it fails closed.
 	blob=$(cleanup_wt_git --no-optional-locks -C "$wt" hash-object -- "$rel") || hrc=$?
 	blob=${blob%%$'\n'*}
-	if ((hrc != 0)) || [[ -z $blob ]]; then
+	if ((hrc != 0)) || [[ -z $blob ]]; then # guard:hash-object-hard-fail
 		printf 'UNIQUE|\n'
 		return 0
 	fi
 
 	# Rung 4, untracked half. A rev-parse failure means the path is absent from main,
 	# which is this probe's defined negative answer, so the ladder continues.
-	if ((untracked == 1)); then
+	if ((untracked == 1)); then # guard:rung4-untracked-gate
 		mainblob=$(cleanup_wt_git --no-optional-locks -C "$wt" rev-parse "main:$rel") || mrc=$?
 		mainblob=${mainblob%%$'\n'*}
-		if ((mrc == 0)) && [[ -n $mainblob && $mainblob == "$blob" ]]; then
+		if ((mrc == 0)) && [[ -n $mainblob && $mainblob == "$blob" ]]; then # guard:rung4-untracked-main-present
 			printf 'CONTENT_ON_MAIN|\n'
 			return 0
 		fi
@@ -348,15 +348,15 @@ classify_dirt_entry() {
 	range="main"
 	cleanup_wt_git --no-optional-locks -C "$wt" rev-parse --verify --quiet \
 		"main~$CLEANUP_WT_HISTORY_SCAN_DEPTH" >/dev/null 2>&1 || vrc=$?
-	((vrc == 0)) && range="main~$CLEANUP_WT_HISTORY_SCAN_DEPTH..main"
+	((vrc == 0)) && range="main~$CLEANUP_WT_HISTORY_SCAN_DEPTH..main" # guard:history-scan-bounded-range
 	found=$(cleanup_wt_git --no-optional-locks -C "$wt" log "$range" \
 		--find-object="$blob" --format=%H --max-count=1) || lrc=$?
-	if ((lrc != 0)); then
+	if ((lrc != 0)); then # guard:find-object-hard-fail
 		printf 'UNIQUE|\n'
 		return 0
 	fi
 	found=${found%%$'\n'*}
-	if [[ -n $found ]]; then
+	if [[ -n $found ]]; then # guard:history-hit-nonempty
 		printf 'CONTENT_IN_HISTORY|%s\n' "$found"
 		return 0
 	fi
@@ -386,7 +386,7 @@ classify_worktree_dirt() {
 	local staged="" any_staged=0 prc=0 x
 	local entry_count=0 unique_count=0 agg_detail=""
 	out=$(cleanup_wt_git --no-optional-locks -C "$wt" status --porcelain) || srrc=$?
-	if ((srrc != 0)); then
+	if ((srrc != 0)); then # guard:status-read-hard-fail
 		return "$srrc"
 	fi
 	[[ -z $out ]] && return 0
@@ -400,10 +400,10 @@ classify_worktree_dirt() {
 			break
 		fi
 	done <<<"$out"
-	if ((any_staged == 1)); then
+	if ((any_staged == 1)); then # guard:staged-probe-issue-gate
 		staged=$(dirt_staged_tree_commit "$wt") || prc=$?
-		((prc == 1)) && staged=""
-		((prc > 1)) && staged="ERROR"
+		((prc == 1)) && staged=""     # guard:staged-probe-no-match
+		((prc > 1)) && staged="ERROR" # guard:staged-probe-error-map
 	fi
 	while IFS= read -r line || [[ -n $line ]]; do
 		[[ -z $line ]] && continue
@@ -418,19 +418,19 @@ classify_worktree_dirt() {
 		# column is therefore the gate. The variable read here is `xy`, not the enclosing
 		# function's `x`: `x` holds the last value the any_staged pre-scan loop assigned,
 		# not this entry's X column.
-		if [[ ${xy:0:1} == R || ${xy:0:1} == C ]]; then
+		if [[ ${xy:0:1} == R || ${xy:0:1} == C ]]; then # guard:rename-payload-split-gate
 			rel="${rel#* -> }"
 		fi
 		res=$(classify_dirt_entry "$wt" "$xy" "$rel" "$staged")
 		verdict="${res%%|*}"
 		detail="${res#*|}"
 		entry_count=$((entry_count + 1))
-		[[ $verdict == "UNIQUE" ]] && unique_count=$((unique_count + 1))
+		[[ $verdict == "UNIQUE" ]] && unique_count=$((unique_count + 1)) # guard:unique-verdict-tally
 		[[ -z $agg_detail && -n $detail ]] && agg_detail="$detail"
 		printf 'DIRTFILE|%s|%s|%s|%s|%s\n' "$wt" "$verdict" "$detail" "$xy" "$rel"
 	done <<<"$out"
-	((entry_count == 0)) && return 0
-	if ((unique_count == 0)); then
+	((entry_count == 0)) && return 0 # guard:aggregate-empty-entry-set
+	if ((unique_count == 0)); then   # guard:aggregate-all-disposable-gate
 		printf 'DIRTSUM|%s|ALL_DISPOSABLE|%s\n' "$wt" "$agg_detail"
 	else
 		printf 'DIRTSUM|%s|HAS_UNIQUE|\n' "$wt"
@@ -459,20 +459,20 @@ clear_disposable_dirt() {
 	# failure.
 	local wt="$1" cout crc=0 agg="" rrc=0 clrc=0
 	cout=$(classify_worktree_dirt "$wt") || crc=$?
-	if ((crc == 0)); then
+	if ((crc == 0)); then # guard:clear-classify-exit-gate
 		agg=$(printf '%s\n' "$cout" | awk -F'|' '/^DIRTSUM\|/{print $3; exit}')
 	fi
-	if [[ $agg != "ALL_DISPOSABLE" ]]; then
+	if [[ $agg != "ALL_DISPOSABLE" ]]; then # guard:clear-requires-all-disposable
 		printf 'ACTION|dirt-clear|%s|REFUSED-UNIQUE\n' "$wt"
 		return 1
 	fi
 	cleanup_wt_git -C "$wt" reset --hard >/dev/null || rrc=$?
-	if ((rrc != 0)); then
+	if ((rrc != 0)); then # guard:clear-reset-hard-fail
 		printf 'ACTION|dirt-clear|%s|FAILED\n' "$wt"
 		return 1
 	fi
 	cleanup_wt_git -C "$wt" clean -fd >/dev/null || clrc=$?
-	if ((clrc != 0)); then
+	if ((clrc != 0)); then # guard:clear-clean-hard-fail
 		printf 'ACTION|dirt-clear|%s|FAILED\n' "$wt"
 		return 1
 	fi

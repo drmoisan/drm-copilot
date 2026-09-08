@@ -1310,7 +1310,7 @@ Round-4 departures.
 
 ### Phase 2 — Guard enumeration, the registry, and the enforcement gate
 
-- [ ] [P2-T1] Append a `# guard:<id>` trailing comment to every guard-shaped line in
+- [x] [P2-T1] Append a `# guard:<id>` trailing comment to every guard-shaped line in
   `scripts/bash/cleanup_worktrees_dirt_lib.sh` — the 31 lines matching the arithmetic
   regex **and** the six non-arithmetic-only lines at cycle-start positions 172, 260, 341,
   403, 410, and 447. Lines 311 and 321 receive exactly one marker each, because each
@@ -1341,7 +1341,7 @@ Round-4 departures.
      `uniq -d` alone does not detect a prefix, and an unanchored `sed` address over a prefix
      id would mutate two guards under one row.
 
-- [ ] [P2-T2] Verify the marker pass changed no behaviour and survived the formatter's
+- [x] [P2-T2] Verify the marker pass changed no behaviour and survived the formatter's
   layout rules. Re-run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_classify.bats tests/shell/test_cleanup_worktrees_dirt_failclosed.bats tests/shell/test_cleanup_worktrees_dirt_clear.bats tests/shell/test_cleanup_worktrees_dirt_regression.bats`
   and then run `bash scripts/bash/shell-qc.sh check`. Record
@@ -1355,7 +1355,7 @@ Round-4 departures.
   relocated a trailing comment off the end of its line, which would silently break every
   `$`-anchored `sed` address in the registry.
 
-- [ ] [P2-T3] Create `tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv` with a
+- [x] [P2-T3] Create `tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv` with a
   single leading comment line documenting the columns and one tab-separated row per
   registry row, columns in this order: `id`, `kind`, `scenario`, `baseline_aggregate`,
   `mutation`, `reason`. The `mutation` column holds a complete `sed` substitute command
@@ -1368,7 +1368,7 @@ Round-4 departures.
   `rung4-tracked-path-in-main`, `rung4-tracked-hard-fail`, `hash-object-hard-fail`, and
   `find-object-hard-fail` appears exactly once in the file.
 
-- [ ] [P2-T4] Create `tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats` with a
+- [x] [P2-T4] Create `tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats` with a
   header stating its subject and mechanism, and with a helper that, given a registry row,
   composes the `sed` program as the `$`-anchored address `/# guard:<id>$/` immediately
   followed by the row's `mutation` value, applies it to the library with `sed` into a shell
@@ -1444,7 +1444,7 @@ Round-4 departures.
   lines removes that interference without weakening the check, because a comment line cannot
   create a file.
 
-- [ ] [P2-T5] Add the enumeration test titled
+- [x] [P2-T5] Add the enumeration test titled
   `every guard-shaped line in the dirt library is marked and every registry row names a marked id`
   to that suite. It derives the arithmetic-matched line set and the marked id set from
   `scripts/bash/cleanup_worktrees_dirt_lib.sh`, derives the row set from the registry, and
@@ -1502,7 +1502,7 @@ Round-4 departures.
   admissible forms are present in the test body rather than the invariant being described
   only in a comment.
 
-- [ ] [P2-T6] Add the separation test titled
+- [x] [P2-T6] Add the separation test titled
   `every registered guard is observable under its own neutralization` to that suite. For
   each registry row it runs the helper and asserts, in this order:
 
@@ -1566,7 +1566,7 @@ Round-4 departures.
   both-direction rule is implemented rather than only described, because a suite that
   merely documented the rule in a comment would carry the token at most once.
 
-- [ ] [P2-T7] Add the third test titled
+- [x] [P2-T7] Add the third test titled
   `the eighteen pinned guard rows carry the registry kinds this plan fixes`
   to that suite. It asserts eighteen pins over seventeen distinct ids, in three groups.
 
@@ -1703,7 +1703,7 @@ Round-4 departures.
   `@test` title verbatim, and the range terminates on the first column-0 `}`, which is the
   closing brace of this test.
 
-- [ ] [P2-T8] Complete the registry: add a row for each of the **34** guards not named in
+- [x] [P2-T8] Complete the registry: add a row for each of the **34** guards not named in
   this plan's remediated-guard table — the 26 remaining arithmetic guards and the eight
   named non-arithmetic guards — bringing the file to **39** rows. For each, run the harness
   against a checked-in `dirt_*` scenario that exercises it, observe whether the record
@@ -1825,7 +1825,7 @@ Round-4 departures.
       sibling. The three commands are registry-shape checks and are satisfiable here even
       though line 311's arithmetic row does not yet separate, for the reason command 9 gives.
 
-- [ ] [P2-T9] Record the classification evidence in
+- [x] [P2-T9] Record the classification evidence in
   `evidence/qa-gates/guard-registry-classification.2026-09-08T08-30.md`: a table of all
   **39** rows, one row per registry row, giving the `id`, the library line its marker sits
   on, the `mutation`, the `kind`, the `scenario`, and the observed difference or its
@@ -1854,7 +1854,7 @@ Round-4 departures.
   ids back the 39 rows, naming the two ids that back two rows each; and exactly four
   observation cells carry `PENDING-PHASE-3`, on the four rows named above and no others.
 
-- [ ] [P2-T10] `[expect-fail]` Run
+- [x] [P2-T10] `[expect-fail]` Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats`
   with the registry complete at 39 rows and the four N2 fixtures not yet present.
   Record `evidence/regression-testing/fail-before-guard-separation.2026-09-08T08-30.md`
@@ -1884,7 +1884,7 @@ Round-4 departures.
   failure observed is a separation and scenario-availability failure and not an enumeration
   or registry-shape failure.
 
-- [ ] [P2-T11] Record the harness design in
+- [x] [P2-T11] Record the harness design in
   `evidence/other/guard-registry-design.2026-09-08T08-30.md`, stating the arithmetic
   guard-shaped regular expression verbatim, the eight named non-arithmetic guard sites and
   why the regex alone is under-inclusive for the property the gate is sold as enforcing,
