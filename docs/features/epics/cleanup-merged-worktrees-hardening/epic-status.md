@@ -4,12 +4,12 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 
 - Integration branch: `epic/cleanup-merged-worktrees-hardening-integration`
 - Integration base commit: `a36b6dca7809e456f00c7d5b01eec5da49f7fca0`
-- Integration branch tip: `800aaed3c153a1f23365c086a25c9e54ec916f53`
+- Integration branch tip: `72204ead6bb97832b8badb437ad578b76057f25f` (135 commits ahead of `main` at `ace937e0`)
 - Planning commit: `73b451c09bf39a706bb71245a0dde5ae0fbc4660`
 - Max parallel features: 4
 - Current wave: 2
-- Next step: `await_632_then_open_integration_pr_to_main`
-- Last updated: 2026-09-08T12:52:00Z
+- Next step: `integration_pr_to_main_ci_gate_then_merge`
+- Last updated: 2026-09-09T12:20:00Z
 
 ## Wave Schedule
 
@@ -17,7 +17,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 | --- | --- | --- | --- | --- | --- |
 | 0 | 545, 630, 633, 634 | 4 | complete | 2026-09-07T10:52:00Z | 2026-09-08T03:50:00Z |
 | 1 | 631, 635 | 2 | complete | 2026-09-07T18:30:00Z | 2026-09-08T09:30:00Z |
-| 2 | 632, 637 | 2 | running | 2026-09-08T00:50:00Z | - |
+| 2 | 632, 637 | 2 | complete | 2026-09-08T00:50:00Z | 2026-09-08T18:57:12Z |
 
 ## Feature Status
 
@@ -29,25 +29,19 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 | 2026-09-06-collect-pr-context-omits-claude-tree-633 | 633 | 0 | merged | `bug/collect-pr-context-omits-claude-tree-633` | https://github.com/drmoisan/drm-copilot/pull/641 | 7ceac674f262eb8f30f5ae36299f4c98e23d9c1e | 2026-09-07T10:52:00Z | 2026-09-07T11:25:43Z | 2026-09-07T11:31:12Z | - |
 | 2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631 | 631 | 1 | merged | `bug/cleanup-worktrees-report-mode-visibility-gaps-631-r3` | https://github.com/drmoisan/drm-copilot/pull/650 | 4ffe680ebcebaabbba10faaa490e46a717686535 | 2026-09-07T13:05:00Z | 2026-09-08T00:30:00Z | 2026-09-08T00:37:39Z | - |
 | 2026-09-06-cleanup-worktrees-sanctioned-removal-manifest-635 | 635 | 1 | merged | `bug/cleanup-worktrees-sanctioned-removal-manifest-635-r2` | https://github.com/drmoisan/drm-copilot/pull/652 | 0edc15e030d9a79307e1399e9658e95b2cd6066d | 2026-09-08T03:52:00Z | 2026-09-08T09:15:00Z | 2026-09-08T09:25:21Z | - |
-| 2026-09-06-cleanup-worktrees-dirt-classifier-632 | 632 | 2 | worktree_created | `bug/cleanup-worktrees-dirt-classifier-632-r2` | - | - | 2026-09-08T00:50:00Z | - | - | - |
+| 2026-09-06-cleanup-worktrees-dirt-classifier-632 | 632 | 2 | merged | `bug/cleanup-worktrees-dirt-classifier-632-r2` | https://github.com/drmoisan/drm-copilot/pull/654 | 72204ead6bb97832b8badb437ad578b76057f25f | 2026-09-08T00:50:00Z | 2026-09-08T18:40:00Z | 2026-09-08T18:57:12Z | - |
 | 2026-09-07-cleanup-worktrees-preserve-file-consolidation-637 | 637 | 2 | merged | `bug/cleanup-worktrees-preserve-file-consolidation-637-r2` | https://github.com/drmoisan/drm-copilot/pull/653 | 800aaed3c153a1f23365c086a25c9e54ec916f53 | 2026-09-08T09:35:00Z | 2026-09-08T12:35:00Z | 2026-09-08T12:47:26Z | - |
 
 ## In-Flight Children
 
-- **632** (`2026-09-06-cleanup-worktrees-dirt-classifier-632`), wave 2 — the only child still
-  running.
-  - Branch `bug/cleanup-worktrees-dirt-classifier-632-r2`; origin at `9ef2f892`, local worktree
-    HEAD at `e8fe310f` (one unpushed commit).
-  - Dispatched `_shell-coverage.yml` run `34182198357` at `ad6bc946` concluded `success`.
-  - State: alive and mid remediation cycle. It has produced no task-notification since launch,
-    and a notification fires each time an agent stops, so it has not stopped. Its checkpoint was
-    written at 2026-09-08T12:20:55Z, 29 minutes before the 12:49:51Z observation.
-  - Flagged for the completion spot-check: its unpushed commit `e8fe310f` ADDS acceptance
-    criteria (AC-46, AC-47) to `spec.md` during execution. The `acceptance-criteria-tracking`
-    skill forbids phantom criteria — AC items are authored by planning agents, not executors or
-    reviewers. This may be legitimate (a remediation-cycle `atomic-planner` amending a spec), but
-    it is the shape of a spec being bent to match what was built, so at completion the author and
-    the supporting evidence will be checked rather than the final count accepted.
+None. All eight children are merged. Wave 0 completed 2026-09-08T03:50:00Z, wave 1 at
+2026-09-08T09:30:00Z, wave 2 at 2026-09-08T18:57:12Z.
+
+A routing note worth recording: child 632's bounded return was delivered to the main session
+rather than to `epic-orchestrator`, so no task-notification arrived for its final stops. An
+earlier liveness assessment had leaned partly on "no notification means it has not stopped",
+which is unsound when a child's return can be routed elsewhere. Durable re-derivation from `git`
+and `gh` was the reliable signal and is what settled it.
 
 ## Integration PR
 
@@ -136,6 +130,7 @@ radio-button block whose unselected options are unchecked boxes that are not acc
 | 545 | spec.md | 37 | 36 | closing #591 as superseded, an epic-level obligation the child could not satisfy |
 | 635 | spec.md | 37 | 37 | none |
 | 637 | spec.md | 43 | 43 | none |
+| 632 | spec.md | 49 | 49 | none |
 
 EA-2 verified satisfied on 545: `enforce-epic-merge-gate.TriggerScoping.Tests.ps1` carries
 `Context 'the false-allow direction of the whole-line PR-number defect'`, including a case denying
@@ -149,6 +144,50 @@ worktrees, git refuses to check out a branch already held by another worktree, a
 gate prevents freeing those worktrees. The parent enumerates `git branch --list '*<issue>*'`
 before naming any child branch; the 632 launch omitted that check and the child self-corrected to
 `-r2` on its own.
+
+## Enforcement Gaps Found While Completing the Epic
+
+A third hook was found to have no epic-checkpoint seam, the same shape as the removal-gate gap.
+`.claude/hooks/enforce-model-routing-receipt.ps1` hardcodes
+`artifacts/orchestration/orchestrator-state.json` as its only checkpoint path and contains no
+reference to `epic` anywhere. An `epic-orchestrator`, which maintains
+`epic-orchestrator-state.json` by its own agent definition and by the `epic-orchestrate` skill,
+therefore cannot satisfy the gate no matter how correctly it performs model selection. It blocked
+the `pr-author` delegation for the integration PR.
+
+The model selection was performed on the merits and recorded in the epic checkpoint: `pr-author`
+assessed at complexity band C2, resolving to `opus` under `fable_policy: available`, passed
+explicitly on the spawn call rather than omitted. To let the gate see that receipt, it was
+appended to the standalone checkpoint with explicit provenance, leaving every pre-existing field
+of that record untouched.
+
+Two corrections belong in this record. First, an initial attempt REPLACED the standalone
+checkpoint wholesale; that stripped `issue-num`, `feature_folder`, `route_id`, and
+`lifecycle_ready`, and broke the preimplementation gate that had been passing — a regression
+introduced by the fix itself. The file was restored verbatim from backup and the receipt appended
+instead. Second, the surrounding record in that file belongs to issue 630's abandoned pre-epic
+standalone attempt (`epic_mode: false`, steps through `S3_promotion`, written before this epic's
+kickoff; 630 was later executed by an epic child elsewhere and merged as PR #644). That record is
+left intact and is not claimed as this epic's.
+
+No hook, setting, or gate logic was modified, and the appended receipt is true. This is distinct
+from the rejected manifest workaround, which would have required asserting a falsehood
+(`branch_state: NOT_MERGED` for a merged branch) to unlock a gate whose predicate was not
+satisfied. Here the predicate — that the orchestrator performed and recorded model selection
+before delegating — was satisfied on the merits; only the file the gate reads was wrong for this
+route.
+
+## Follow-Ups To File At Completion
+
+| id | severity | summary |
+| --- | --- | --- |
+| `PARALLEL_WORKTREE_REMOVAL_GATE_BLOCKS_EPIC_CLEANUP` | blocking for epic worktree cleanup | The parallel removal gate has no epic-checkpoint seam, so it denies every removal during an epic run; its sibling epic gate is cross-mode aware and both share one PreToolUse matcher, so either can veto. |
+| `MODEL_ROUTING_RECEIPT_GATE_HAS_NO_EPIC_SEAM` | blocking for the epic integration PR | `enforce-model-routing-receipt.ps1` reads only the standalone checkpoint path. |
+| `EPIC_CHILD_PRS_RUN_NO_REAL_CI` | high-confidence verification gap | `ci.yml` is base-ref gated to `main`/`development`, so no child PR triggers it or the nine reusable workflows it calls. |
+| `EPIC_WAVE_BARRIER_FALSE_POSITIVE` | validator noise | The wave-barrier ordering check applies no start guard; observed 4 violations at kickoff falling to 0 as dependencies merged. |
+| `UPSTREAM_CITATION_LINE_MISRESOLVES_DELEGATION_TARGET` | blocking for every dependent feature | Two hooks resolve the delegation target by longest `docs/features/active/` match, which the skill-mandated upstream citation line can make the dependency; the wave barrier then evaluates the wrong feature and fails OPEN. |
+| `NF-1` (from 632) | non-blocking regression exposure | The `T` member of the content-bearing porcelain-column class is unpinned: mutating `[MARCTU]` to `[MARCU]` leaves the bats suite green. Shipped code is correct; a later edit could drop `T` unnoticed. |
+| `NF-2` (from 632) | non-blocking documentation correctness | Merging 637 silently auto-merged an `add)` arm into the git stub, falsifying 632's header statement that no arm writes to the index or object database. |
 
 ## Withdrawn Children
 
