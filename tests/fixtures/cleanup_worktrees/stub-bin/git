@@ -35,8 +35,11 @@
 #                                               key existed supplies only the bare form,
 #                                               so the fallback preserves their behavior.
 #   rev-list ... main..<branch>              -> rev-list.<branch>
+#   rev-list ... <rev>   (no .. range)       -> rev-list.<rev>
 #   diff --quiet main...<branch>             -> diff-quiet.<branch>
 #   diff --quiet main <branch> -- <path>     -> diff-quiet.<branch>.<path>
+#   diff (no --quiet) ... -- <path>          -> diff.<-C path>.<path>
+#   diff (no --quiet) --cached ... -- <path> -> diff-cached.<-C path>.<path>
 #   cherry main <branch>                     -> cherry.<branch>
 #   diff-tree ... <sha>                      -> diff-tree.<sha>
 #   ls-tree <ref> -- <path>                  -> ls-tree.<ref>_<path>
@@ -51,10 +54,35 @@
 #   branch -D <name>                         -> branch-D.<name>
 #   fetch ...                                -> fetch
 #   remote                                   -> remote
+#   hash-object ... -- <path>                -> hash-object.<path>
+#   log ... --find-object=<oid> ...          -> log.find-object.<oid>
+#   diff-index --cached --quiet <commit> --  -> diff-index.<commit>
+#   reset --hard                             -> reset-hard
+#   clean -fd                                -> clean
+#
+# Global options stripped before the subcommand: `-C <path>` (the last value is
+# retained for per-worktree keys), `-c <name>=<value>`, and `--no-optional-locks`.
+#
+# No arm is defined for any subcommand that writes to the index or the object database.
+# The dirt classifier must reach its staged-tree answer by reading only, so defining
+# such an arm would make the report-mode non-mutation assertion unable to fail. The
+# assertion in tests/shell/test_cleanup_worktrees_dirt_clear.bats searches this file's
+# argv log for those subcommand names; adding one here would defeat it.
 set -uo pipefail
 
 # Echo the full invocation to stderr for argv assertions.
 printf 'stub-git: %s\n' "$*" >&2
+
+# Echo GIT_INDEX_FILE to stderr when, and only when, it is set in the environment.
+# Redirecting the index to a scratch file is a mutation of state the report path must
+# never touch, and it is invisible in the argv log because it travels in the
+# environment rather than the argument vector. This sentinel is what the report-mode
+# non-mutation assertion reads. The guard is load-bearing in both directions: an
+# unguarded line would emit the token on every invocation and make the assertion
+# unable to fail, and a missing line would make it unable to fail the other way.
+if [[ -n ${GIT_INDEX_FILE+x} ]]; then
+	printf 'stub-git-env: GIT_INDEX_FILE=%s\n' "$GIT_INDEX_FILE" >&2
+fi
 
 scenario=${CLEANUP_WT_STUB_SCENARIO:-}
 
@@ -94,6 +122,13 @@ while ((i < ${#args[@]})); do
 		;;
 	-c)
 		i=$((i + 2))
+		;;
+	--no-optional-locks)
+		# A leading global option that takes no operand, so the index advances by one.
+		# Without this arm the option is read as the subcommand and every read the dirt
+		# classifier issues falls through to the default `*) exit 0` case, replaying no
+		# canned response at all.
+		i=$((i + 1))
 		;;
 	*)
 		break
@@ -148,28 +183,56 @@ merge-base)
 	exit 0
 	;;
 rev-list)
-	# Find the range argument (contains ..) and key on the branch after the dots.
+	# Prefer the range argument (contains ..) and key on the branch after the dots. A
+	# range-free invocation such as `rev-list --max-count=201 HEAD` keys on its trailing
+	# revision operand instead: keying it on the absent range would derive the single
+	# unusable key `rev-list.` for every range-free call, so no scenario could supply a
+	# per-revision response.
 	range=""
+	revarg=""
 	for a in "$@"; do
 		[[ $a == *".."* ]] && range=$a
+		[[ $a != -* && $a != "rev-list" ]] && revarg=$a
 	done
-	branch=${range##*..}
+	if [[ -n $range ]]; then
+		branch=${range##*..}
+	else
+		branch=$revarg
+	fi
 	respond "rev-list.$(sanitize "$branch")"
 	;;
 diff)
-	# diff --quiet main...<branch> [-- <path>]
+	# diff --quiet main...<branch> [-- <path>] keeps the historical diff-quiet. keys,
+	# whose answer is carried entirely by an exit code.
+	#
+	# A diff WITHOUT --quiet is a content read whose STDOUT must be replayable, so it
+	# keys separately and incorporates the retained -C worktree path:
+	#   diff --no-color -U0 -- <path>          -> diff.<-C path>.<path>
+	#   diff --no-color -U0 --cached -- <path> -> diff-cached.<-C path>.<path>
+	# The two forms are distinguished so one scenario can supply a worktree diff and a
+	# cached diff for the same file without one overwriting the other.
 	spec=""
 	path=""
+	quiet=0
+	cached=0
 	seen_dashdash=0
 	for a in "$@"; do
 		if ((seen_dashdash == 1)); then
 			path=$a
 			break
 		fi
+		[[ $a == "--quiet" ]] && quiet=1
+		[[ $a == "--cached" ]] && cached=1
 		[[ $a == "--" ]] && seen_dashdash=1
 		[[ $a == *"..."* ]] && spec=${a##*...}
 		[[ $a == *".."* && $a != *"..."* ]] && spec=${a##*..}
 	done
+	if ((quiet == 0)); then
+		if ((cached == 1)); then
+			respond "diff-cached.$(sanitize "$dash_c_path").$(sanitize "$path")"
+		fi
+		respond "diff.$(sanitize "$dash_c_path").$(sanitize "$path")"
+	fi
 	if [[ -n $path ]]; then
 		respond "diff-quiet.$(sanitize "$spec").$(sanitize "$path")"
 	fi
@@ -239,6 +302,59 @@ fetch)
 	;;
 remote)
 	respond "remote"
+	;;
+hash-object)
+	# hash-object [-t <type>] -- <path>: KEY is hash-object.<sanitized path after -->.
+	# This is a READ of a working-tree file's blob id. The stub defines no -w behavior
+	# because the dirt classifier never writes an object.
+	hopath=""
+	seen_dashdash=0
+	for a in "$@"; do
+		if ((seen_dashdash == 1)); then
+			hopath=$a
+			break
+		fi
+		[[ $a == "--" ]] && seen_dashdash=1
+	done
+	respond "hash-object.$(sanitize "$hopath")"
+	;;
+log)
+	# log <range> --find-object=<oid> ...: KEY is log.find-object.<sanitized oid>. The
+	# range operand is deliberately excluded from the key so the bounded-range form and
+	# the plain-main fallback form replay the same canned answer for the same blob; the
+	# range each form used is still observable in the argv log.
+	findobj=""
+	for a in "$@"; do
+		[[ $a == --find-object=* ]] && findobj=${a#--find-object=}
+	done
+	respond "log.find-object.$(sanitize "$findobj")"
+	;;
+diff-index)
+	# diff-index --cached --quiet <commit> --: KEY is diff-index.<sanitized commit>.
+	# The commit is the first non-option operand after the subcommand, so a scenario
+	# supplies one .rc file per candidate commit and can answer differently for each.
+	dicommit=""
+	diseen=0
+	for a in "$@"; do
+		if ((diseen == 0)); then
+			diseen=1
+			continue
+		fi
+		[[ $a == -* ]] && continue
+		dicommit=$a
+		break
+	done
+	respond "diff-index.$(sanitize "$dicommit")"
+	;;
+reset)
+	# reset --hard: KEY is the fixed reset-hard. The full argv, including the absence of
+	# any additional flag, remains observable in the argv log.
+	respond "reset-hard"
+	;;
+clean)
+	# clean -fd: KEY is the fixed clean. The full argv, including the absence of -x, -X,
+	# and -ff, remains observable in the argv log.
+	respond "clean"
 	;;
 *)
 	exit 0

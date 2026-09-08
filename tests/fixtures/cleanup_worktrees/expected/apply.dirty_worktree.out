@@ -1,0 +1,6 @@
+WORKTREE|/repo/main|main|main
+WORKTREE|/repo-wt/dirty|feature-dirty|
+BRANCH|feature-dirty|MERGED_CLEAN
+DIRTY|/repo-wt/dirty|?? untracked-artifact.txt
+ACTION|worktree-remove|/repo-wt/dirty|BLOCKED-DIRTY
+BRANCH|main|PROTECTED_CURRENT
