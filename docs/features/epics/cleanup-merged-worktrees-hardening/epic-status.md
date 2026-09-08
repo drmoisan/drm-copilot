@@ -9,7 +9,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 - Max parallel features: 4
 - Current wave: 2
 - Next step: `await_632_and_637_then_open_integration_pr`
-- Last updated: 2026-09-08T09:35:00Z
+- Last updated: 2026-09-08T09:45:00Z
 
 ## Wave Schedule
 
@@ -34,12 +34,16 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 
 ## In-Flight Children
 
-- **545** (`2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545`), wave 0
-  - Branch `bug/enforcement-hook-trigger-matches-whole-command-text-545-r3` at `459d245f893f3337d61496b2602830e381d1d7a3`
-  - Resume point: remediation cycle 2: R1 plan already committed; resume at R2 preflight
-- **631** (`2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631`), wave 1
-  - Branch `bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2` at `ebe50907d5ef61a01afd6d5c3324fb62ea9c02e0`
-  - Resume point: remediation cycle 1 closed at ebe50907; resume at R4 re-audit (feature-review)
+- **632** (`2026-09-06-cleanup-worktrees-dirt-classifier-632`), wave 2
+  - Branch `bug/cleanup-worktrees-dirt-classifier-632-r2` at `ad6bc946bbf0ad9e69756b2155eae19771a232d8`
+  - Dispatched `_shell-coverage.yml` run `34182198357` at that SHA concluded `success`.
+  - State: feature-review returned findings; child is in a remediation cycle.
+- **637** (`2026-09-07-cleanup-worktrees-preserve-file-consolidation-637`), wave 2
+  - Branch `bug/cleanup-worktrees-preserve-file-consolidation-637-r2`, branched from the
+    integration tip `0edc15e0`.
+  - State: starting atomic execution from `plan.2026-09-07T01-26.md`.
+  - Expect a real merge with 632: both touch `scripts/bash/cleanup_worktrees_lib.sh` and the
+    report surface concurrently.
 
 ## Integration PR
 
@@ -61,7 +65,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 - Observed at: 2026-09-07T23:52:00Z
 - Two successive epic-orchestrator forks and every live child agent were terminated by API rate limits (HTTP 429). The second fork executed no action. All child agents from those forks are dead; none is a stall.
 - Recovery: Third launch re-derived durable ground truth from git worktree list --porcelain, git rev-parse on each child branch, gh pr list, and gh run list before any action. No in-memory notification was trusted.
-- Correction for 545: No manual commit-and-push rescue was needed or performed. The child pushed its cycle-2 remediation plan before it died. R1 of cycle 2 is complete; the resume point is R2 preflight, not R1 planning.
+- Correction for 545: a manual rescue WAS required and WAS performed. At re-derivation, `origin/bug/...-545-r3` was at `85a3c344`, while the dead worktree held one unpushed commit `26dba295` plus an untracked `remediation-plan.2026-09-07T20-45.md`. `epic-orchestrator` committed that plan as `459d245f` and pushed `85a3c344..459d245f`. An earlier revision of this record claimed no rescue was needed; it was written after the push had landed and read the post-rescue tip as if it were the pre-rescue tip. Had the rescue not happened, an entire remediation-cycle planning step would have been lost with the worktree. R1 of cycle 2 was then complete and the resume point was R2 preflight.
 - Correction for 631: The _shell-coverage success at 9f0a3e6c (run 34162347134) remains valid coverage evidence for ebe50907's code content.
 
 ## Known Defects Observed During This Epic
@@ -73,7 +77,73 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 | EPIC_CHILD_PRS_RUN_NO_REAL_CI | high_confidence_verification_gap | - | to_be_filed_at_epic_completion |
 | UPSTREAM_CITATION_LINE_MISRESOLVES_DELEGATION_TARGET | blocking_for_every_dependent_feature | - | to_be_filed_at_epic_completion |
 
-The three current `EPIC_WAVE_BARRIER_VIOLATION` validator errors are the recorded `EPIC_WAVE_BARRIER_FALSE_POSITIVE` defect: the check has no start guard, so every unstarted feature with an unmerged dependency is reported. The count falls to zero as dependencies merge (4 at kickoff, 3 now).
+`EPIC_WAVE_BARRIER_FALSE_POSITIVE` is now fully cleared. The check has no start guard, so it reports every unstarted feature whose dependency is unmerged. The observed count fell one edge at a time exactly as the defect predicts: 4 at kickoff, 3 after 630 merged, 2 after 631 merged, and 0 once 545 and 635 merged. The checkpoint now validates clean, which confirms the earlier errors were validator noise and never a real barrier breach. No wave N+1 feature was ever launched before its dependency edge was durably confirmed merged via `gh pr view` and the integration tip.
+
+## Worktree-Removal Gate: What 635 Delivered and Why Cleanup Is Still Blocked
+
+635 delivered a genuine sanctioned-removal path: a manifest at
+`artifacts/orchestration/cleanup-worktrees-manifest.json`, read by the new
+`.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1`, which BOTH removal gates now import
+as a branch that runs after their existing checkpoint branch, so no existing allow changes. Its
+predicate evaluates nine conditions including a 24-hour freshness bound on an injectable clock,
+`removal_disposition` in `{SAFE_TO_DELETE}`, a non-empty evidence string, an authorized verdict,
+and `branch_state` in `{NOT_MERGED, HAS_UNIQUE_RESIDUALS}`. The allowed sets are named constants
+so widening one is a visible, test-pinned edit. This is an authorization decision, not an escape
+hatch.
+
+Merged epic child worktrees nonetheless remain blocked, and the defect is genuinely still open.
+The manifest's authorized `branch_state` set deliberately EXCLUDES the merged states, because the
+cleanup script's deterministic path owns them; every worktree this epic wants to remove has a
+merged branch and so falls outside the manifest by design. Independently, the parallel gate's own
+comment states it "has no epic-checkpoint seam", so it never consults the epic checkpoint's
+`features[]`. The correct fix remains the reciprocal epic-checkpoint fallback that
+`enforce-epic-worktree-removal-gate.ps1` already implements in the other direction. It is filed as
+a follow-up at epic completion and was NOT folded into 632 or 637, per the EA-3 precedent that
+adjacent gate work is deferred rather than absorbed by a running child.
+
+The two-gate behaviour was isolated by a controlled pair of attempts on one path. Before the epic
+checkpoint recorded the child as merged, the EPIC gate denied it. After recording
+`merge_status: "merged"`, the epic gate PASSED and the identical command was denied by the
+PARALLEL gate. Both hooks share one PreToolUse Bash matcher and a deny from either wins, so the
+correctly-written epic gate cannot rescue the removal.
+
+A workaround was available and was rejected. Authoring a manifest record declaring
+`branch_state: "NOT_MERGED"` for these worktrees would satisfy the predicate and unblock every
+removal. The branches are merged, so that would mean stating a falsehood in an evidence artifact
+in order to defeat a gate — materially worse than the accumulated worktrees, and corrosive to the
+credibility the whole mechanism depends on. The worktrees stay; `_validate_completion` accepts
+`merge_status: "merged"`, so they never block epic completion.
+
+Separately, enforcement hooks execute from the repository-root checkout, which is on `main`. A
+hook change living only on the integration branch cannot take effect during the run that produced
+it, so an epic that hardens its own gates stays governed by the pre-fix versions for its whole run.
+
+## Acceptance Criteria Spot-Checks
+
+Counts cover only checkbox lines under the `## Acceptance Criteria` heading, stopping at the next
+equal-or-shallower heading. A whole-file grep would be wrong: `spec.md` also carries a severity
+radio-button block whose unselected options are unchecked boxes that are not acceptance criteria.
+
+| issue | source | total | checked | outstanding |
+| --- | --- | --- | --- | --- |
+| 633 | spec.md | 8 | 8 | none |
+| 634 | spec.md | 15 | 14 | AC-15 requires a `docs-validation` success on the child PR, unsatisfiable by construction on this epic |
+| 631 | spec.md | 11 | 10 | a point-in-time sequencing criterion, no longer verifiable retrospectively |
+| 545 | spec.md | 37 | 36 | closing #591 as superseded, an epic-level obligation the child could not satisfy |
+| 635 | spec.md | 37 | 37 | none |
+
+EA-2 verified satisfied on 545: `enforce-epic-merge-gate.TriggerScoping.Tests.ps1` carries
+`Context 'the false-allow direction of the whole-line PR-number defect'`, including a case denying
+unauthorized PR 777 when authorized item 501 appears earlier on the line, plus its true-allow
+companion. Both directions are pinned, so the suite shows the gate is both safe and useful.
+
+## Child Branch Naming
+
+Child branches carry `-rN` suffixes because the canonical names are held by dead pre-epic
+worktrees, git refuses to check out a branch already held by another worktree, and the removal
+gate prevents freeing those worktrees. The parent enumerates `git branch --list '*<issue>*'`
+before naming any child branch; the 632 launch omitted that check and the child self-corrected to
+`-r2` on its own.
 
 ## Withdrawn Children
 
