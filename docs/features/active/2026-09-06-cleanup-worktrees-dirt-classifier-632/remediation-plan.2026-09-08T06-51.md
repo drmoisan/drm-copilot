@@ -2230,14 +2230,14 @@ Round-4 departures.
   lists each rewritten path. If the two digests differ, the toolchain loop restarts from
   this task after the rewrite is reviewed.
 
-- [ ] [P5-T2] Run `bash scripts/bash/shell-qc.sh check` and record
+- [x] [P5-T2] Run `bash scripts/bash/shell-qc.sh check` and record
   `evidence/qa-gates/shell-qc-check.2026-09-08T10-00.md` with `Timestamp:`, `Command:`,
   `EXIT_CODE:`, and `Output Summary:` reproducing the command's combined stdout and stderr
   verbatim. No findings count is asserted, for the reason stated in P0-T4. Acceptance:
   `EXIT_CODE:` is `0` and the artifact states that the combined output was empty, quoting
   it verbatim.
 
-- [ ] [P5-T3] Run the full local test stage as
+- [x] [P5-T3] Run the full local test stage as
   `env SHELL_QC_BATS_BIN=<resolved path> bash scripts/bash/shell-qc.sh test` and record
   `evidence/qa-gates/shell-qc-test.2026-09-08T10-00.md` with `Timestamp:`, `Command:`,
   `EXIT_CODE:`, the TAP plan line, the `ok` count, the `not ok` count, and a field
@@ -2247,7 +2247,7 @@ Round-4 departures.
   `BaselineLocalTestTotal:` from P0-T5 plus exactly `7`. The artifact enumerates the seven
   added `@test` titles so the delta is attributable rather than merely arithmetic.
 
-- [ ] [P5-T4] Confirm the file-size limit with
+- [x] [P5-T4] Confirm the file-size limit with
   `wc -l scripts/bash/cleanup_worktrees_dirt_lib.sh scripts/bash/cleanup_worktrees_lib.sh tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats tests/shell/test_cleanup_worktrees_dirt_classify.bats tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`
   and record `evidence/qa-gates/file-size-limit.2026-09-08T10-00.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, and the per-file counts with the headroom to 500 for each.
@@ -2255,7 +2255,7 @@ Round-4 departures.
   classifier library's count and the number of lines it grew relative to the `463`
   recorded in P0-T8.
 
-- [ ] [P5-T5] Confirm report mode is still non-mutating after the new probe was added.
+- [x] [P5-T5] Confirm report mode is still non-mutating after the new probe was added.
   Run `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_clear.bats`
   and record `evidence/qa-gates/report-mode-non-mutating.2026-09-08T10-00.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, the `ok`/`not ok` counts, an explicit statement
