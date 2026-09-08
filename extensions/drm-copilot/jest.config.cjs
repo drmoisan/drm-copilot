@@ -211,6 +211,13 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #643: the manifest vocabulary and classification split out of the
+    // derivation core. This map carries no `global` key, so a new production
+    // file without its own entry here would be completely ungated.
+    "./src/lib/push-down/claude-blast-radius-derive-manifests.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #596: the pure destination-gitignore merge. This map carries no
     // `global` key, so a new production file without its own entry would be
     // completely ungated.

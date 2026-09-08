@@ -1,0 +1,27 @@
+{
+  "provider": "codex",
+  "checkpoint_expression": "codex.orchestrator-state",
+  "route_id": "preparation",
+  "issue-num": "469",
+  "feature-folder": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469",
+  "work-mode": "full-bug",
+  "plan-path": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/plan.2026-08-29T12-22.md",
+  "completed_steps": ["S3_promotion", "S4_atomic_planning"],
+  "next_step": "atomic_execution",
+  "historical_receipts": [
+    {
+      "provider": "codex",
+      "kind": "topology",
+      "logical_agent": "orchestrator",
+      "deployment_agent": "orchestrator-c3",
+      "status": "complete"
+    },
+    {
+      "provider": "codex",
+      "kind": "model_routing",
+      "logical_complexity": "C3",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high"
+    }
+  ]
+}

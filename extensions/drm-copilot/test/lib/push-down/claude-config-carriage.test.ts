@@ -292,7 +292,7 @@ describe("issue #462 AC7: the routing write merges rather than overwrites", () =
 
 describe("issue #462 AC8: the published blast-radius default is generic", () => {
   it("publishes a document derived from the destination's own layout", () => {
-    // Arrange: a destination carrying one C# project. The layout is visible only
+    // Arrange: a destination carrying one Go module. The layout is visible only
     // through the injected lister, because the real-filesystem default lister
     // cannot see the in-memory destination tree.
     const seeded = seedTree();

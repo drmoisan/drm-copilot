@@ -82,6 +82,8 @@ export const SOURCE_ROUTING = `${JSON.stringify(
  * gate on whether the extractor accepts a separator-free token at all, so
  * without one no destination can detect two items rewriting the same root build
  * file. `mandate_reads` carries the ten-entry read-by-mandate exclusion set.
+ * `mergeable_paths` carries the five-entry mechanically-mergeable path class,
+ * whose overlap a merge step reconciles rather than re-delegating (issue #643).
  */
 export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
   {
@@ -107,6 +109,13 @@ export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
       ".claude/agent-memory/**",
       ".agents/skills/**",
       "scripts/vscode/**",
+    ],
+    mergeable_paths: [
+      "**/*.csproj",
+      "**/packages.config",
+      "**/app.config",
+      "**/*.vbproj",
+      "**/*.props",
     ],
     modules: {
       config: ["config/**"],
@@ -213,7 +222,7 @@ export function layoutLister(
 }
 
 /**
- * A destination layout carrying one C# project under `src/App`.
+ * A destination layout carrying one Go module under `src/App`.
  *
  * Used by the genericity and overwrite cases so the derived document differs
  * observably from both the seeded source constant and any pre-existing
@@ -224,5 +233,5 @@ export const SRC_APP_LAYOUT: Readonly<
 > = {
   [DEST]: [{ name: "src", isDir: true }],
   [`${DEST}/src`]: [{ name: "App", isDir: true }],
-  [`${DEST}/src/App`]: [{ name: "App.csproj", isDir: false }],
+  [`${DEST}/src/App`]: [{ name: "go.mod", isDir: false }],
 };

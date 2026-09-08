@@ -11,10 +11,12 @@
  *     the published document meaningful there.
  *
  * Responsibilities:
- *     Own steps 2 through 8 of the derivation algorithm: classify project
- *     directories, prune ancestors, name and glob them, apply the top-level
- *     fallback and the no-signal floor, assemble and serialize the document, and
- *     guard against re-emitting the location-bucket defect this item fixes.
+ *     Own steps 3 through 8 of the derivation algorithm: prune ancestors, name
+ *     and glob the module paths, apply the top-level fallback and the no-signal
+ *     floor, assemble and serialize the document, and guard against re-emitting
+ *     the location-bucket defect this item fixes. Step 2, classification, and
+ *     the manifest vocabulary it reads belong to
+ *     `claude-blast-radius-derive-manifests.ts` and are re-exported here.
  *     Collecting the observations (step 1, the destination scan) belongs to
  *     `claude-blast-radius-derive.ts`, which performs the I/O.
  *
@@ -24,6 +26,13 @@
  *       input.
  *     - Identical observations and identical source text produce a
  *       byte-identical output string.
+ *     - The emitted key order is `version`, `shared_surfaces`,
+ *       `shared_surface_globs`, `mandate_reads`, `mergeable_paths`, `modules`,
+ *       `over_breadth_fraction`, with the two optional keys omitted entirely
+ *       when the source document does not declare them.
+ *     - An observed .NET manifest suppresses the top-level-directory fallback
+ *       (issue #643): a destination that declared its layout with project files
+ *       has already stated its structure, so the weaker signal is not used.
  *     - The root directory is categorically excluded from classification. A
  *       root-level manifest would otherwise yield the universal glob `**`, which
  *       is the defect class being fixed.
@@ -34,6 +43,27 @@
  *     None.
  */
 
+import {
+  classifyProjectDirectories,
+  compareOrdinal,
+} from "./claude-blast-radius-derive-manifests";
+import type { DirectoryObservation } from "./claude-blast-radius-derive-manifests";
+
+export {
+  MANIFEST_FILENAMES,
+  MANIFEST_SUFFIXES,
+  MODULE_MANIFEST_SUFFIXES,
+  NON_MODULE_MANIFEST_SUFFIXES,
+  EXCLUDED_DIR_NAMES,
+  isExcludedDirectoryName,
+  isManifestFileName,
+  classifyProjectDirectories,
+} from "./claude-blast-radius-derive-manifests";
+export type {
+  DirectoryObservation,
+  ProjectDirectoryClassification,
+} from "./claude-blast-radius-derive-manifests";
+
 /** JSON value shape the bundled source document is parsed into. */
 type JsonValue =
   null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
@@ -41,76 +71,8 @@ type JsonValue =
 /** JSON object shape used for the parsed source document. */
 type JsonObject = { [key: string]: JsonValue };
 
-/**
- * One visited destination directory and its shallow file listing.
- *
- * The scanner supplies one observation per directory it visits, including the
- * destination root itself (recorded with an empty `relativePath`). Only file
- * names are carried: subdirectory structure is expressed by the presence of
- * further observations with deeper relative paths.
- */
-export interface DirectoryObservation {
-  /**
-   * Destination-relative POSIX path of the directory. The destination root is
-   * recorded as the empty string.
-   */
-  readonly relativePath: string;
-
-  /** Names of the files directly inside the directory, excluding directories. */
-  readonly fileNames: ReadonlyArray<string>;
-}
-
 /** Destination-relative path of the document this core derives. */
 export const BLAST_RADIUS_RELATIVE_PATH = "config/blast-radius.json";
-
-/** Exact file names whose presence marks a directory as a project directory. */
-export const MANIFEST_FILENAMES: ReadonlySet<string> = new Set([
-  "build.gradle",
-  "build.gradle.kts",
-  "Cargo.toml",
-  "go.mod",
-  "package.json",
-  "pom.xml",
-  "pyproject.toml",
-  "setup.py",
-]);
-
-/** File-name suffixes whose presence marks a directory as a project directory. */
-export const MANIFEST_SUFFIXES: ReadonlyArray<string> = [
-  ".csproj",
-  ".fsproj",
-  ".vbproj",
-  ".sln",
-  ".slnx",
-];
-
-/**
- * Directory names the destination scan never descends into.
- *
- * These are build output, dependency caches, and location buckets. A location
- * bucket admitted as a module would attach to nearly every work item and
- * re-create the contention defect this item fixes, so `doc`, `docs`, `test`, and
- * `tests` are pruned here rather than filtered later. Names beginning with `.`
- * are excluded as well; that rule is a predicate rather than a member of this
- * set, so it lives in {@link isExcludedDirectoryName}.
- */
-export const EXCLUDED_DIR_NAMES: ReadonlySet<string> = new Set([
-  "__pycache__",
-  "artifacts",
-  "bin",
-  "build",
-  "coverage",
-  "dist",
-  "doc",
-  "docs",
-  "node_modules",
-  "obj",
-  "out",
-  "target",
-  "test",
-  "tests",
-  "venv",
-]);
 
 /**
  * Maximum scan depth: the destination top level plus two nested levels.
@@ -162,9 +124,10 @@ export const FORBIDDEN_GLOBS: ReadonlyArray<string> = [
  *
  * The assembly literal indexes this array positionally, so a new key is
  * APPENDED rather than inserted: inserting mid-array would shift every existing
- * index. `mandate_reads` (issue #489) is optional in the source document, and
- * `JSON.stringify` drops an `undefined`-valued property, so an absent source key
- * emits no property without a conditional spread.
+ * index. `mandate_reads` (issue #489) and `mergeable_paths` (issue #643) are
+ * both optional in the source document, and `JSON.stringify` drops an
+ * `undefined`-valued property, so an absent source key emits no property
+ * without a conditional spread.
  */
 const CARRIED_KEYS = [
   "version",
@@ -172,6 +135,7 @@ const CARRIED_KEYS = [
   "shared_surface_globs",
   "over_breadth_fraction",
   "mandate_reads",
+  "mergeable_paths",
 ] as const;
 
 /**
@@ -230,70 +194,6 @@ export class BlastRadiusGuardError extends Error {
     this.glob = glob;
     this.moduleName = moduleName;
   }
-}
-
-/**
- * Compare two strings ordinally.
- *
- * Ordinal comparison is used rather than locale collation so the emitted order
- * is identical on every host, which is what makes the output byte-stable.
- *
- * @param left First string.
- * @param right Second string.
- * @returns Negative, zero, or positive per the standard comparator contract.
- */
-function compareOrdinal(left: string, right: string): number {
-  return left < right ? -1 : left > right ? 1 : 0;
-}
-
-/**
- * Report whether a directory name is excluded from the destination scan.
- *
- * @param name A single directory name, not a path.
- * @returns True when the name is a pruned bucket or begins with a dot.
- */
-export function isExcludedDirectoryName(name: string): boolean {
-  return name.startsWith(".") || EXCLUDED_DIR_NAMES.has(name);
-}
-
-/**
- * Report whether a file name marks its directory as a project directory.
- *
- * @param fileName A single file name, not a path.
- * @returns True when the name is an exact manifest name or carries a manifest
- *   suffix.
- */
-export function isManifestFileName(fileName: string): boolean {
-  if (MANIFEST_FILENAMES.has(fileName)) {
-    return true;
-  }
-  // Suffix matching covers the .NET project and solution families, whose file
-  // names vary with the project name and so cannot be listed exactly.
-  return MANIFEST_SUFFIXES.some((suffix) => fileName.endsWith(suffix));
-}
-
-/**
- * Select the observations that are project directories (algorithm step 2).
- *
- * @param observations Every visited directory, including the root.
- * @returns Destination-relative paths of the project directories, ordinally
- *   sorted.
- */
-function classifyProjectDirectories(
-  observations: ReadonlyArray<DirectoryObservation>,
-): string[] {
-  const projectPaths: string[] = [];
-  // The root is skipped categorically: a root-level manifest would name the
-  // whole destination and yield the universal glob `**`, the defect being fixed.
-  for (const observation of observations) {
-    if (observation.relativePath === "") {
-      continue;
-    }
-    if (observation.fileNames.some(isManifestFileName)) {
-      projectPaths.push(observation.relativePath);
-    }
-  }
-  return projectPaths.sort(compareOrdinal);
 }
 
 /**
@@ -429,9 +329,12 @@ function parseSourceDocument(text: string): JsonObject {
  * @param sourceDocumentText Text of the bundled `config/blast-radius.json`.
  * @returns The serialized destination document: 2-space indented with a
  *   trailing newline, keys in the order `version`, `shared_surfaces`,
- *   `shared_surface_globs`, `mandate_reads`, `modules`,
- *   `over_breadth_fraction`. `mandate_reads` is omitted entirely when the
- *   bundled source document does not declare it.
+ *   `shared_surface_globs`, `mandate_reads`, `mergeable_paths`, `modules`,
+ *   `over_breadth_fraction`. `mandate_reads` and `mergeable_paths` are each
+ *   omitted entirely when the bundled source document does not declare them.
+ *   An observed .NET manifest suppresses the top-level-directory fallback, so a
+ *   destination whose only structure is .NET project files derives no module
+ *   beyond the payload floor.
  * @throws BlastRadiusDeriveError When the bundled document is not parseable.
  * @throws BlastRadiusGuardError When an emitted glob is forbidden. The guard
  *   runs before the return, so a trip produces no output at all.
@@ -442,13 +345,21 @@ export function deriveDestinationModuleMap(
 ): string {
   const source = parseSourceDocument(sourceDocumentText);
 
-  // Project directories are the primary signal. When the destination declares
-  // none, its top-level directories are the next-best structural signal, and
-  // when it has neither the payload modules alone are the computed outcome for
-  // a structureless destination.
-  const projectPaths = pruneAncestors(classifyProjectDirectories(observations));
+  // Project directories are the primary signal. An observed .NET manifest is a
+  // structure signal that yields no module of its own, and it SUPPRESSES the
+  // top-level-directory fallback: a destination that declared its layout with
+  // project files has already said what it is, so falling back to its top-level
+  // directories would substitute a weaker signal for a stronger one (issue
+  // #643). When nothing at all was observed the payload modules alone are the
+  // computed outcome for a structureless destination.
+  const classification = classifyProjectDirectories(observations);
+  const modulePaths = pruneAncestors(classification.modulePaths);
   const derivedPaths =
-    projectPaths.length > 0 ? projectPaths : topLevelDirectories(observations);
+    modulePaths.length > 0
+      ? modulePaths
+      : classification.structureObserved
+        ? []
+        : topLevelDirectories(observations);
 
   const modules = assembleModules(derivedPaths);
   assertNoForbiddenGlob(modules);
@@ -460,6 +371,7 @@ export function deriveDestinationModuleMap(
     shared_surfaces: source[CARRIED_KEYS[1]],
     shared_surface_globs: source[CARRIED_KEYS[2]],
     mandate_reads: source[CARRIED_KEYS[4]],
+    mergeable_paths: source[CARRIED_KEYS[5]],
     modules,
     over_breadth_fraction: source[CARRIED_KEYS[3]],
   };

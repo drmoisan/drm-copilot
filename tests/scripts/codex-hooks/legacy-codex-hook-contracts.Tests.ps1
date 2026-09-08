@@ -6,7 +6,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:HookRoot = Join-Path $script:RepoRoot '.codex/hooks'
         $script:BundleHookRoot = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks'
-        $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+        $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
         $script:PreToolHookNames = @(
             'validate-bash.ps1',
             'enforce-promotion-mcp-only.ps1',

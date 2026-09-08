@@ -341,6 +341,45 @@ def test_recompute_conflicts_uses_the_real_relation_without_mocking() -> None:
     assert pairs == ((445, 446),)
 
 
+def test_recompute_conflicts_reports_no_pair_for_a_csproj_only_observed_overlap() -> (
+    None
+):
+    """Drift recomputation inherits the mechanically-mergeable exclusion.
+
+    The relation is not mocked here, so the pair is decided by the real
+    contention relation reading the supplied truth table. The two items share
+    only a project file, so the exclusion of issue #643 removes the sole
+    overlapping entry and no pair is reported.
+    """
+
+    pairs = recompute_conflicts_with_observed(
+        [
+            item(
+                446, ["QuickFiler.Test/QuickFiler.Test.csproj", "QuickFiler.Test/A.cs"]
+            ),
+            item(
+                445, ["QuickFiler.Test/QuickFiler.Test.csproj", "QuickFiler.Test/B.cs"]
+            ),
+        ],
+        446,
+        ["QuickFiler.Test/QuickFiler.Test.csproj", "QuickFiler.Test/A.cs"],
+        [],
+        {
+            **CONFIG,
+            "mergeable_paths": [
+                "**/*.csproj",
+                "**/packages.config",
+                "**/app.config",
+                "**/*.vbproj",
+                "**/*.props",
+            ],
+        },
+        computed_at="2026-08-08T10-00",
+    )
+
+    assert pairs == ()
+
+
 def test_recomputed_pair_feeds_halt_selection_and_yields_later_started_item() -> None:
     """Run the whole path: escape, recomputation, halt selection, requeue request.
 

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+<<<<<<< HEAD
+    <Compile Include="Ours/OursA.cs" />
+    <PropertyGroup>
+      <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+=======
+    <Compile Include="Theirs/TheirsA.cs" />
+>>>>>>> origin/main
+  </ItemGroup>
+</Project>

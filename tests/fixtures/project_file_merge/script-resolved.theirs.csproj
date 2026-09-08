@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <Compile Include="Shared/Base1.cs" />
+    <Compile Include="Theirs/TheirsA.cs" />
+    <Compile Include="Shared/Base2.cs" />
+  </ItemGroup>
+</Project>
