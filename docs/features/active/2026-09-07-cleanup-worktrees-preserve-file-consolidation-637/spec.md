@@ -920,7 +920,7 @@ an enumeration size, or a population.
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
 - [ ] **AC-20** The bats test `the crlf fixture still contains a carriage return in the working
       tree` in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-21** `.gitattributes` contains the single-line token
+- [x] **AC-21** `.gitattributes` contains the single-line token
       `tests/fixtures/cleanup_worktrees/preserve/eol-crlf/** -text`.
 - [ ] **AC-22** The bats test `a host token match aborts the pass before any staging` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes, asserting exit status 3 and that

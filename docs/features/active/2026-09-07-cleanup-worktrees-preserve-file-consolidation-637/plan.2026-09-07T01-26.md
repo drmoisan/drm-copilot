@@ -215,7 +215,7 @@ blanket waiver.
 
 ### Phase 0 — Baseline capture and policy reading
 
-- [ ] [P0-T1] Read, in this order, `CLAUDE.md`, `.github/copilot-instructions.md`,
+- [x] [P0-T1] Read, in this order, `CLAUDE.md`, `.github/copilot-instructions.md`,
       `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`,
       `.claude/rules/quality-tiers.md`, `.claude/rules/shell.md`, `.claude/rules/python.md`,
       `.claude/rules/plan-acceptance-gates.md`, and `.claude/rules/tonality.md`, and write
@@ -263,13 +263,13 @@ blanket waiver.
       applies to the route probe span only. A non-zero result from a Windows-side git span is not a
       route refusal and is recorded separately in `Output Summary:`. Do not substitute an unwrapped
       `wsl` form, and do not record any later gate as passing without an executed command.
-- [ ] [P0-T3] Capture the format-drift and lint baseline. Run
+- [x] [P0-T3] Capture the format-drift and lint baseline. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh check'"`.
       Acceptance: `evidence/baseline/baseline-shell-qc-check.<timestamp>.md` exists with
       `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` that states the exit code and
       records, separately, whether the `shfmt -d` stage printed any diff hunk and how many
       `shellcheck` findings were printed.
-- [ ] [P0-T4] Capture the bats baseline. Run
+- [x] [P0-T4] Capture the bats baseline. Run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'cd <WSLROOT> && bash scripts/bash/shell-qc.sh test'"`.
       Acceptance: `evidence/baseline/baseline-shell-qc-test.<timestamp>.md` exists with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, and an `Output Summary:` recording the passing and failing test
@@ -293,7 +293,7 @@ blanket waiver.
       `artifacts/pester/kcov/cov.xml` was unparseable, leave this task unchecked, and report to the
       orchestrator that the coverage baseline is unavailable. `[P10-T7]`'s baseline value is mandatory
       and no substitution is permitted for it.
-- [ ] [P0-T6] Capture the push-down parity baseline. Run
+- [x] [P0-T6] Capture the push-down parity baseline. Run
       `pwsh -NoProfile -Command "Set-Location -LiteralPath 'RESOLVED-WINDOWS-ROOT'; poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -q"`,
       substituting the `ResolvedWindowsRoot:` value that `[P0-T2]` recorded for the quoted
       `RESOLVED-WINDOWS-ROOT` token before running the span. The `Set-Location` span states the
@@ -306,7 +306,7 @@ blanket waiver.
       `Command:`, `EXIT_CODE:`, and an `Output Summary:` recording the summary line verbatim,
       including the passed count, and the failed count when the summary line prints one. A fully
       passing `-q` run prints no failed count; record `failed: 0 (not printed)` in that case.
-- [ ] [P0-T7] Record the format-stage baseline substitution. Write
+- [x] [P0-T7] Record the format-stage baseline substitution. Write
       `evidence/baseline/baseline-format-stage-note.<timestamp>.md` stating that
       `bash scripts/bash/shell-qc.sh format` is a write-mode command deliberately not executed at
       baseline, naming `shfmt -w` at `scripts/bash/shell_qc_lib.sh` line 222 as the writer, and
@@ -316,7 +316,7 @@ blanket waiver.
       `EXIT_CODE: 0`, `ExpectedExitCode: 0`, and an `Output Summary:` carrying the rationale
       sentence, the `shfmt -w` writer citation at `scripts/bash/shell_qc_lib.sh` line 222, and the
       drift observation copied from the `[P0-T3]` artifact.
-- [ ] [P0-T8] Confirm the staging precondition. `[P1-T5]` and `[P9-T3]` each issue a `git add` that
+- [x] [P0-T8] Confirm the staging precondition. `[P1-T5]` and `[P9-T3]` each issue a `git add` that
       is not a bookkeeping-exempt form under
       `.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1` lines 229-270, so both
       are governed by the preimplementation gate: `[P1-T5]`'s pathspec is under `tests/fixtures/`,
@@ -336,21 +336,21 @@ blanket waiver.
 
 ### Phase 1 — Test infrastructure: git stub cases, `.gitattributes` exception, fixtures, suite scaffold
 
-- [ ] [P1-T1] Add an `add` case to `tests/fixtures/cleanup_worktrees/stub-bin/git`. The file today
+- [x] [P1-T1] Add an `add` case to `tests/fixtures/cleanup_worktrees/stub-bin/git`. The file today
       has no `add` case and no `check-ignore` case; both fall to the default arm `*) exit 0 ;;` at
       lines 205-207, so a scenario cannot express a failed add or an ignored path. Add a case that
       derives the KEY `add.<sanitized path>` from the last non-flag operand and calls `respond`.
       Acceptance: the file contains an `add)` case arm and `wc -l` on the file reports 500 or fewer.
-- [ ] [P1-T2] Add a `check-ignore` case to `tests/fixtures/cleanup_worktrees/stub-bin/git` deriving
+- [x] [P1-T2] Add a `check-ignore` case to `tests/fixtures/cleanup_worktrees/stub-bin/git` deriving
       the KEY `check-ignore.<sanitized path>` from the last non-flag operand and calling `respond`.
       Acceptance: the file contains a `check-ignore)` case arm and `wc -l` reports 500 or fewer.
-- [ ] [P1-T3] Extend the stub's KEY-scheme header comment block (lines 20-41) with one line for
+- [x] [P1-T3] Extend the stub's KEY-scheme header comment block (lines 20-41) with one line for
       `add` and one line for `check-ignore`, and add a sentence recording the trap that `respond`
       defaults to exit 0 when no `.rc` file exists while `git check-ignore -q` exits 0 when the path
       **is** ignored, so every happy-path scenario directory must carry a
       `check-ignore.<key>.rc` file containing `1`. Acceptance: the header block names both new KEY
       forms and carries that sentence.
-- [ ] [P1-T4] Append one line to `.gitattributes`, which is today exactly one line reading
+- [x] [P1-T4] Append one line to `.gitattributes`, which is today exactly one line reading
       `* text=auto eol=lf`. The appended line is exactly:
       `tests/fixtures/cleanup_worktrees/preserve/eol-crlf/** -text`. Acceptance: run
       `pwsh -NoProfile -Command "wsl -d Ubuntu -- bash -lc 'grep -c -F -- -text <WSLROOT>/.gitattributes && grep -c -F -- preserve/eol-crlf <WSLROOT>/.gitattributes && tail -n 1 <WSLROOT>/.gitattributes'"`;
@@ -361,7 +361,7 @@ blanket waiver.
       `evidence/qa-gates/gate-ac21-gitattributes.<timestamp>.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:`, and an `Output Summary:` carrying both counts and the final line verbatim.
       Satisfies **AC-21**.
-- [ ] [P1-T5] Create the CRLF index fixture at
+- [x] [P1-T5] Create the CRLF index fixture at
       `tests/fixtures/cleanup_worktrees/preserve/eol-crlf/MEMORY.md`, every line terminated with a
       carriage return followed by a line feed. Acceptance: the file exists,
       `git status --porcelain -- tests/fixtures/cleanup_worktrees/preserve/eol-crlf`
@@ -383,13 +383,13 @@ blanket waiver.
       `EXIT_CODE:`, and an `Output Summary:` recording both object names. The artifact's `Command:`
       and `EXIT_CODE:` record the `hash-object` invocation; the exit codes of the `status`, `add`,
       and `rev-parse` invocations are recorded in `Output Summary:`.
-- [ ] [P1-T6] Create the `jq` stub at `tests/fixtures/cleanup_worktrees/preserve/stub-bin/jq`,
+- [x] [P1-T6] Create the `jq` stub at `tests/fixtures/cleanup_worktrees/preserve/stub-bin/jq`,
       wired through the new `CLEANUP_WT_JQ_BIN` seam. It replays canned tab-separated stdout and an
       exit code from the scenario directory named by `CLEANUP_WT_STUB_SCENARIO`, mirroring the
       existing git stub's `respond` contract, and echoes its argv to stderr as a `stub-jq: <argv>`
       line. No test invokes a real `jq`. Acceptance: the file exists, is executable, and `wc -l`
       reports 500 or fewer.
-- [ ] [P1-T7] Create `tests/shell/test_cleanup_worktrees_preserve.bats` with a `setup()` block that
+- [x] [P1-T7] Create `tests/shell/test_cleanup_worktrees_preserve.bats` with a `setup()` block that
       derives `REPO_ROOT` from `BATS_TEST_DIRNAME`, and defines `ELIB`, `LIB`, `ALIB`, `PLIB`
       (`scripts/bash/cleanup_worktrees_preserve_lib.sh`), `WRAP`
       (`scripts/bash/cleanup-worktrees.sh`), `STUB`, `JQSTUB`, and `PRES`
@@ -402,7 +402,7 @@ blanket waiver.
       fall through to a real `jq`. Acceptance: the file exists, begins with the bats shebang line,
       the setup block carries that `chmod +x` line naming both stubs, and `wc -l` reports 500 or
       fewer.
-- [ ] [P1-T8] Add the two stub-replay tests named by AC-32 to
+- [x] [P1-T8] Add the two stub-replay tests named by AC-32 to
       `tests/shell/test_cleanup_worktrees_preserve.bats`:
       `the git stub replays a scenario response for add` and
       `the git stub replays a scenario response for check-ignore`, each driving the stub directly
@@ -415,7 +415,7 @@ blanket waiver.
       `evidence/qa-gates/gate-ac32-stub-replays.<timestamp>.md` records `Timestamp:`, `Command:`,
       `EXIT_CODE:`, and an `Output Summary:` carrying the TAP plan line and the two `ok` lines.
       Satisfies **AC-32**.
-- [ ] [P1-T10] Add the test `the crlf fixture still contains a carriage return in the working tree`
+- [x] [P1-T10] Add the test `the crlf fixture still contains a carriage return in the working tree`
       to `tests/shell/test_cleanup_worktrees_preserve.bats`, asserting against
       `tests/fixtures/cleanup_worktrees/preserve/eol-crlf/MEMORY.md` that a carriage return byte is
       present in the checked-out file. Acceptance: the test name appears in the file.
@@ -427,7 +427,7 @@ blanket waiver.
 
 ### Phase 2 — Fail-before regression evidence
 
-- [ ] [P2-T1] Create the three fixture groups the fail-before tests drive:
+- [x] [P2-T1] Create the three fixture groups the fail-before tests drive:
       `tests/fixtures/cleanup_worktrees/preserve/untracked/`,
       `tests/fixtures/cleanup_worktrees/preserve/eol-stale/`, and
       `tests/fixtures/cleanup_worktrees/preserve/host-token/`. Each carries a fixture manifest whose
@@ -443,7 +443,7 @@ blanket waiver.
       index work lands; the `host-token/` fixture's value is immaterial, because the hard stop
       precedes every write. Acceptance: all three directories exist and each contains a fixture
       manifest file and a `check-ignore` response file.
-- [ ] [P2-T2] Add the three tests named by AC-08, AC-16, and AC-22 to
+- [x] [P2-T2] Add the three tests named by AC-08, AC-16, and AC-22 to
       `tests/shell/test_cleanup_worktrees_preserve.bats`:
       `an untracked preserve record is staged and reported`,
       `a stale advisory crlf value does not override an LF target`, and

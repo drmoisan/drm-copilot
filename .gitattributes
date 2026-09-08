@@ -1,1 +1,2 @@
 * text=auto eol=lf
+tests/fixtures/cleanup_worktrees/preserve/eol-crlf/** -text
