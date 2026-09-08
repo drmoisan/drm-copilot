@@ -390,3 +390,68 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
         }
     }
 }
+
+# Sanctioned-removal manifest branch (issue #635). A separate Describe so the
+# manifest module import and its two seam mocks do not alter the fixture set the
+# pre-existing Describe above pins.
+Describe 'enforce-parallel-worktree-removal-gate.ps1 manifest branch' {
+    BeforeAll {
+        . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-worktree-removal-gate.ps1").Path
+        Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1").Path -Force
+    }
+
+    BeforeEach {
+        # The checkpoint fixture does not record the removal target, so the existing
+        # positive predicate is false and condition 10 does not exclude the target.
+        Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith { '{"items":[]}' }
+        # Literal JSON through the module read seam and a constructed UTC value
+        # through its clock seam: no temporary file, no wall-clock read.
+        Mock -CommandName Get-CleanupWorktreeManifestContent -ModuleName 'CleanupWorktreeManifest' -MockWith {
+            '{"tool":"cleanup-merged-worktrees","schema_version":1,"generated_at":"2026-09-07T03:40:00Z","run_id":"cleanup-2026-09-07T03-40-00Z-a47a5e33","removals":[{"worktree_path":"/repo/worktrees/cleanup-target","branch":"drm-copilot-wt-2026-08-14T09-02","branch_state":"HAS_UNIQUE_RESIDUALS","removal_disposition":"SAFE_TO_DELETE","verdict":"ALREADY_SOLVED_ELSEWHERE","evidence":"Unique residual commit 3f9a1c2 is already fixed on main under issue #612."}],"preserved_files":[]}'
+        }
+        Mock -CommandName Get-CleanupWorktreeManifestUtcNow -ModuleName 'CleanupWorktreeManifest' -MockWith {
+            [datetime]::new(2026, 9, 7, 4, 0, 0, [System.DateTimeKind]::Utc)
+        }
+    }
+
+    It 'allows removal when a fresh manifest record authorizes the target' {
+        $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/cleanup-target"}}'
+        $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+    }
+
+    # Condition 10. The manifest record here satisfies conditions 1 through 9, so a
+    # deny can only come from the checkpoint-presence exclusion. The merge_status is
+    # outside the allow-set, so the existing branch does not authorize the removal
+    # either and the gate must still refuse.
+    It 'denies a manifest-covered removal whose target a parallel checkpoint records' {
+        Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith { '{"items":[{"worktree_path":"/repo/worktrees/cleanup-target","merge_status":"in_progress"}]}' }
+        $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/cleanup-target"}}'
+        $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PARALLEL_WORKTREE_REMOVAL_BLOCKED*'
+    }
+
+    # The literal below is the pre-change SOURCE text of the reason string, and the
+    # returned reason is its EXPANSION, so the same two substitutions the epic suite
+    # applies are applied here: $worktreePath becomes the supplied target and each
+    # doubled quote becomes one quote character. This reason carries no doubled quote,
+    # so the second substitution is a no-op on it and is kept for uniformity.
+    It 'emits the unchanged parallel block reason' {
+        $target = '/repo/worktrees/not-authorized'
+        $source = 'PARALLEL_WORKTREE_REMOVAL_BLOCKED: git worktree remove for ''$worktreePath'' requires a matching parallel checkpoint items[] record with merge_status in {merged, worktree_removed}. The checkpoint was unreadable, no matching record was found, or merge_status was not yet safe for removal.'
+        $expected = $source.Replace('$worktreePath', $target).Replace('""', '"')
+        $json = "{""tool_input"":{""command"":""git worktree remove $target""}}"
+        $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $json
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $expected
+    }
+
+    # The manifest introduces removal_disposition as a distinct key with a distinct
+    # value set; the merge_status allow-set must not be widened to carry that traffic.
+    It 'keeps the merge_status allow-set unchanged' {
+        $script:AllowedMergeStatuses | Should -HaveCount 2
+        $script:AllowedMergeStatuses[0] | Should -BeExactly 'merged'
+        $script:AllowedMergeStatuses[1] | Should -BeExactly 'worktree_removed'
+    }
+}

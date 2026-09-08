@@ -60,6 +60,9 @@ param()
 
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+# Sanctioned-removal manifest reader (issue #635), consumed by the manifest branch in
+# Invoke-EpicWorktreeRemovalGateDecision.
+Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -Force
 # Shared command-line parser (issue #545), consumed by the scope filter in
 # Invoke-EpicWorktreeRemovalGateDecision and by Get-EpicWorktreeRemovalCommandPath.
 . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
@@ -67,6 +70,10 @@ Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -
 $script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
 $script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json'
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
+# Sanctioned-removal manifest location. Recorded here beside the two checkpoint paths
+# so every hook-read document this gate consults is named in one place; the module
+# owns the read itself.
+$script:CleanupWorktreeManifestPath = 'artifacts/orchestration/cleanup-worktrees-manifest.json'
 
 function Get-EpicWorktreeGateCheckpointContent {
     <#
@@ -385,6 +392,22 @@ function Invoke-EpicWorktreeRemovalGateDecision {
 
     $parallelCheckpoint = ConvertFrom-EpicWorktreeGateJson -Raw (Get-EpicWorktreeGateParallelCheckpointContent)
     if (Test-ParallelCheckpointAllowsWorktreeRemoval -Checkpoint $parallelCheckpoint -WorktreePath $worktreePath) {
+        return Get-EpicWorktreeGateAllowDecision
+    }
+
+    # Sanctioned-removal manifest branch (issue #635). It runs last, so an
+    # epic-checkpoint-authorized or parallel-checkpoint-authorized removal still allows
+    # at the same decision point it does today and no transcript attribution changes.
+    #
+    # The two coverage tests are PRESENCE tests, deliberately not authorization tests.
+    # A target either checkpoint records at all is excluded from this branch regardless
+    # of that record's merge_status, so a removal no checkpoint authorizes still reaches
+    # the unchanged deny below. That exclusion is the only path by which the manifest
+    # could widen what the gates protect, which is why it is required rather than
+    # advisory, and why it is evaluated before the manifest predicate.
+    if (-not (Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'features' -WorktreePath $worktreePath) -and
+        -not (Test-CleanupManifestCheckpointCoversPath -Checkpoint $parallelCheckpoint -RecordArrayName 'items' -WorktreePath $worktreePath) -and
+        (Test-CleanupWorktreeManifestAuthorizesRemoval -WorktreePath $worktreePath)) {
         return Get-EpicWorktreeGateAllowDecision
     }
 
