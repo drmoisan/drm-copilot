@@ -885,7 +885,7 @@ gh workflow run .github/workflows/_shell-coverage.yml --ref bug/cleanup-worktree
   because a single marker on such a line backs two registry rows and an id-keyed pin on it is
   discharged by either one. An arithmetic guard-shaped line with no marker, a marker with no
   registry row, or a registry row naming an unmarked id fails the suite.
-- [ ] AC-48 — When a porcelain status entry's X column and Y column both carry a content-bearing
+- [x] AC-48 — When a porcelain status entry's X column and Y column both carry a content-bearing
   letter — `M`, `A`, `R`, `C`, `T` or `U` — the entry's content exists in the index and in the
   working tree and the two differ, so rung 4's tracked half and rung 5, which compare only
   working-tree content, do not resolve a disposable verdict for it and the entry falls through to
@@ -925,7 +925,7 @@ gh workflow run .github/workflows/_shell-coverage.yml --ref bug/cleanup-worktree
   bounded: it covers the classes the classifier's own branching distinguishes — the untracked
   test, rung 1's X-and-Y gate, the rename and copy payload split, and the
   two-content-bearing-columns gate — and does not enumerate every pair porcelain can emit.
-- [ ] AC-49 — `tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv` admits exactly two row
+- [x] AC-49 — `tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv` admits exactly two row
   kinds, `SEPARATED` and `ARGV`. A row carrying any other kind fails the gate on a named
   invariant, reported as `INVARIANT-8 inadmissible kind:` by the registry suite's first test and,
   for a row whose scenario directory exists, as `OBLIGATION-5 channel comparison failed:` by its

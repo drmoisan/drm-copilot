@@ -1395,7 +1395,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
 
 ### Phase 5 — Final QA loop, coverage, and reconciliation
 
-- [ ] [P5-T1] Run `bash scripts/bash/shell-qc.sh format`, then run
+- [x] [P5-T1] Run `bash scripts/bash/shell-qc.sh format`, then run
   `bash scripts/bash/shell-qc.sh check` in the same task, and record
   `evidence/qa-gates/shell-qc-format.2026-09-09T02-30.md` with the same field set and the
   same two-legged observation P0-T3 defines: `Timestamp:`, both `Command:` values, both
@@ -1410,7 +1410,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   each such path and whether it is in this cycle's scope. If the check leg returns non-zero
   the toolchain loop restarts at this task.
 
-- [ ] [P5-T2] Run `bash scripts/bash/shell-qc.sh check` a second time, after P5-T1, as the
+- [x] [P5-T2] Run `bash scripts/bash/shell-qc.sh check` a second time, after P5-T1, as the
   standalone lint stage, and record `evidence/qa-gates/shell-qc-check.2026-09-09T02-30.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` reproducing the
   command's combined stdout and stderr verbatim. No findings count is asserted, for the
@@ -1418,7 +1418,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   states that the combined output was empty, quoting it verbatim as an empty block rather
   than paraphrasing it.
 
-- [ ] [P5-T3] Run the full local test stage, repeating P0-T4's three-step path resolution
+- [x] [P5-T3] Run the full local test stage, repeating P0-T4's three-step path resolution
   in this task rather than citing P0-T4's recorded value, so the stage is driven by a path
   verified against the tree as it stands now. Run `npx --yes bats --version`, then
   `npm exec --yes --package=bats -- bash -c 'command -v bats'`, then `test -x` and
@@ -1444,7 +1444,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   reports rather than recording a stage result, because the skip path is indistinguishable
   from a clean pass on exit code alone.
 
-- [ ] [P5-T4] Confirm the file-size limit across every file this cycle touched with
+- [x] [P5-T4] Confirm the file-size limit across every file this cycle touched with
   `wc -l scripts/bash/cleanup_worktrees_dirt_lib.sh scripts/bash/cleanup_worktrees_lib.sh tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats tests/shell/test_cleanup_worktrees_dirt_classify.bats tests/shell/test_cleanup_worktrees_dirt_failclosed.bats tests/shell/test_cleanup_worktrees_dirt_content_locations.bats`
   and record `evidence/qa-gates/file-size-limit.2026-09-09T02-30.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, and the per-file counts with the headroom to 500 for each.
@@ -1452,7 +1452,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   at or below `497`; `scripts/bash/cleanup_worktrees_lib.sh` is recorded as `496`; and the
   artifact states the classifier library's growth relative to the `481` recorded in P0-T8.
 
-- [ ] [P5-T5] Confirm report mode is still non-mutating. Run
+- [x] [P5-T5] Confirm report mode is still non-mutating. Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_clear.bats` and
   record `evidence/qa-gates/report-mode-non-mutating.2026-09-09T02-30.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, the `ok`/`not ok` counts, an explicit statement
@@ -1463,7 +1463,7 @@ one-token edit and is made in Phase 4 rather than treated as a finding.
   `not ok` count is `0`, and the recomputed `StubDigest:` equals the value P0-T8 recorded,
   which is what shows this cycle added no arm to the stub.
 
-- [ ] [P5-T6] Check off AC-48 and AC-49 in `spec.md` and record
+- [x] [P5-T6] Check off AC-48 and AC-49 in `spec.md` and record
   `evidence/other/ac-checkoff.2026-09-09T02-30.md` with `Timestamp:`, the evidence artifact
   path supporting each of the two criteria, the total checkbox count inside the
   `## Acceptance Criteria` section, and the checked count, both using the section-scoped
