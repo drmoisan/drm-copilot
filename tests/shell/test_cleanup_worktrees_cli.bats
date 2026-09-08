@@ -9,8 +9,10 @@ setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
     WRAPPER="${REPO_ROOT}/scripts/bash/cleanup-worktrees.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
+    SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
     chmod +x "${STUB}" 2>/dev/null || true
+    chmod +x "${SCAN}" 2>/dev/null || true
 }
 
 @test "--help prints usage and exits 0" {
@@ -26,7 +28,11 @@ setup() {
 }
 
 @test "default report mode emits classification lines and performs no mutation" {
-    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/merged_with_worktree" \
+    # The scan seam is supplied here for the same reason the git seam is: without it the
+    # wrapper would read the real filesystem, making this test depend on the machine's
+    # worktree layout.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="${SCEN}/merged_with_worktree" \
         bash "${WRAPPER}"
     [ "$status" -eq 0 ]
     [[ "$output" == *"BRANCH|feature-wt|MERGED_CLEAN"* ]]
@@ -39,7 +45,8 @@ setup() {
 }
 
 @test "apply mode emits ACTION lines and destructive argv only for eligible states" {
-    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/merged_with_worktree" \
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="${SCEN}/merged_with_worktree" \
         bash "${WRAPPER}" --apply
     [ "$status" -eq 0 ]
     [[ "$output" == *"ACTION|worktree-remove|/repo-wt/feat|OK"* ]]

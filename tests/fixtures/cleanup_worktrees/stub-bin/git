@@ -18,11 +18,22 @@
 #   KEY (so refs/heads/x -> refs_heads_x, branch:path -> branch_path).
 #
 # KEY scheme by subcommand:
-#   for-each-ref ...                         -> for-each-ref
+#   for-each-ref ... <pattern>               -> for-each-ref.<pattern>, falling back to
+#                                               for-each-ref ONLY when <pattern> is the
+#                                               literal refs/heads/. Any other pattern
+#                                               with no specific fixture resolves to
+#                                               empty stdout and exit 0, so a
+#                                               refs/remotes/-scoped read can never pick
+#                                               up refs/heads/-shaped branch data.
 #   worktree list --porcelain                -> worktree-list
 #   worktree add ...                         -> worktree-add
 #   worktree remove <path>                   -> worktree-remove
-#   merge-base --is-ancestor <tip> <up>      -> merge-base.<tip>
+#   merge-base --is-ancestor <tip> <up>      -> merge-base.<tip>.<up>, falling back to
+#                                               merge-base.<tip> when the scenario
+#                                               supplies no target-aware fixture. Every
+#                                               scenario authored before the target-aware
+#                                               key existed supplies only the bare form,
+#                                               so the fallback preserves their behavior.
 #   rev-list ... main..<branch>              -> rev-list.<branch>
 #   diff --quiet main...<branch>             -> diff-quiet.<branch>
 #   diff --quiet main <branch> -- <path>     -> diff-quiet.<branch>.<path>
@@ -39,6 +50,7 @@
 #   cherry-pick --skip                       -> cherry-pick-skip
 #   branch -D <name>                         -> branch-D.<name>
 #   fetch ...                                -> fetch
+#   remote                                   -> remote
 set -uo pipefail
 
 # Echo the full invocation to stderr for argv assertions.
@@ -95,7 +107,20 @@ set -- "${rest[@]:-}"
 subcmd=${1:-}
 case "$subcmd" in
 for-each-ref)
-	respond "for-each-ref"
+	# Key on the refspec pattern (the last argument) so a refs/remotes/-scoped read
+	# cannot replay a refs/heads/-shaped fixture. The bare `for-each-ref` key remains
+	# the fallback for the sole historical call shape (pattern refs/heads/) only.
+	pattern=""
+	for a in "$@"; do pattern=$a; done
+	pattern_key="for-each-ref.$(sanitize "$pattern")"
+	if [[ -n $scenario ]] &&
+		{ [[ -f "$scenario/$pattern_key.out" ]] || [[ -f "$scenario/$pattern_key.rc" ]]; }; then
+		respond "$pattern_key"
+	fi
+	if [[ $pattern == "refs/heads/" ]]; then
+		respond "for-each-ref"
+	fi
+	respond "$pattern_key"
 	;;
 worktree)
 	case "${2:-}" in
@@ -106,9 +131,19 @@ worktree)
 	esac
 	;;
 merge-base)
-	# merge-base --is-ancestor <tip> <upstream>
+	# merge-base --is-ancestor <tip> <upstream>: prefer the target-aware key
+	# merge-base.<tip>.<up> when the scenario supplies one, so a scenario can give two
+	# different answers for the same tip probed against two different upstreams. Fall
+	# back to the historical bare merge-base.<tip> key otherwise.
 	if [[ ${2:-} == "--is-ancestor" ]]; then
-		respond "merge-base.$(sanitize "${3:-}")"
+		tip_key="$(sanitize "${3:-}")"
+		up_key="$(sanitize "${4:-}")"
+		pair_key="merge-base.${tip_key}.${up_key}"
+		if [[ -n $scenario ]] &&
+			{ [[ -f "$scenario/$pair_key.out" ]] || [[ -f "$scenario/$pair_key.rc" ]]; }; then
+			respond "$pair_key"
+		fi
+		respond "merge-base.${tip_key}"
 	fi
 	exit 0
 	;;
@@ -201,6 +236,9 @@ branch)
 	;;
 fetch)
 	respond "fetch"
+	;;
+remote)
+	respond "remote"
 	;;
 *)
 	exit 0

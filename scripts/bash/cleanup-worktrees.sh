@@ -16,6 +16,11 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=scripts/bash/cleanup_worktrees_enumerate_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_enumerate_lib.sh"
+# The report-record library depends on the enumeration library above and is called BY
+# run_report/run_apply in the two libraries sourced below, so it is sourced between them.
+# shellcheck source=scripts/bash/cleanup_worktrees_report_records_lib.sh
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/cleanup_worktrees_report_records_lib.sh"
 # shellcheck source=scripts/bash/cleanup_worktrees_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_lib.sh"
@@ -50,6 +55,15 @@ which is classified on its own HEAD SHA and whose fifth field preserves the porc
 locked and prunable markers; WARN|main-divergence|<local>|<origin>;
 DIRTY|<path>|<status>; ACTION|<verb>|<target>|<result> (apply mode).
 
+Advisory, read-only records (report and apply mode; none unlocks a destructive action):
+ORPHAN_DIR|<path>|<size> for a scanned directory with no .git pointer file and no
+worktree registration, where <size> is best-effort and may be the literal unknown;
+STALE_REF|<refname> for a refs/remotes/<name>/* ref whose <name> is not a configured
+remote, in full ref form; CHILD_OF|<branch>|<ancestor> emitted alongside a branch's own
+BRANCH| line when it is a git ancestor of a branch that resolved exactly NOT_MERGED;
+WARN|registration-lost|<path> for a worktree whose .git gitdir pointer no longer
+resolves. Deleting any of these is a manual, individually confirmed action.
+
 Branch and detached-worktree states: MERGED_CLEAN, MERGED_CONTENT_NEUTRAL,
 MERGED_EQUIVALENT, NOT_MERGED, HAS_UNIQUE_RESIDUALS, PROTECTED_CURRENT, and
 ANCESTRY_ERROR. The first three are the delete-eligible allowlist; ANCESTRY_ERROR is a
@@ -64,8 +78,14 @@ Environment overrides:
   CLEANUP_WT_GIT_BIN            Path to the git binary; an empty or nonexistent value
                                is treated as missing (falls back to PATH git). This is
                                the test-stub seam.
-  CLEANUP_WT_STUB_SCENARIO     Scenario directory consumed by the checked-in git stub
-                               (tests only).
+  CLEANUP_WT_SCAN_BIN          Path to the filesystem-scan helper; an empty or
+                               nonexistent value is treated as missing (falls back to
+                               the bundled cleanup_worktrees_scan_helper.sh). This is
+                               the filesystem-scan test-stub seam.
+  CLEANUP_WT_ORPHAN_ROOTS      Colon-separated override for the worktree-tracking roots
+                               scanned for ORPHAN_DIR and WARN|registration-lost.
+  CLEANUP_WT_STUB_SCENARIO     Scenario directory consumed by the checked-in git and
+                               scan stubs (tests only).
   CLEANUP_WT_CONSOLIDATION_PATH Override the derived consolidation worktree path
                                (<main-worktree-path>-wt/documentationandmemories).
 EOF
