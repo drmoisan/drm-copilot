@@ -1929,14 +1929,14 @@ Round-4 departures.
 
 ### Phase 3 — The four separating fixtures
 
-- [ ] [P3-T1] Add `log.find-object.cccc2222.out` containing `ffff8888` to
+- [x] [P3-T1] Add `log.find-object.cccc2222.out` containing `ffff8888` to
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_history_read_error/`. Acceptance: the
   file exists with that single line, and
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`
   still exits 0 with 0 lines beginning `not ok`, proving the existing
   `dirt_history_read_error` verdict is unchanged while the guard is present.
 
-- [ ] [P3-T2] Add `hash-object.notes.md.out` containing `bbbb6666` and
+- [x] [P3-T2] Add `hash-object.notes.md.out` containing `bbbb6666` and
   `rev-parse.main_notes.md.out` containing `bbbb6666` to
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_classifier_read_error/`. Both files are
   required: with only the first, the mutated run reaches rung 4's untracked half with no
@@ -1946,7 +1946,7 @@ Round-4 departures.
   exits 0 with 0 lines beginning `not ok`, proving the `UNIQUE` verdict and the refused
   clear are unchanged while the guard is present.
 
-- [ ] [P3-T3] Create
+- [x] [P3-T3] Create
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_tracked_probe_error_in_history/` with
   the six copied non-classifier files and the four classifier files tabulated in this
   plan's fixture section. Acceptance: `status._repo-wt_dirt.out` contains the single line
@@ -1954,7 +1954,7 @@ Round-4 departures.
   `hash-object.docs_tracked.md.out` contains `dddd4444`, and
   `log.find-object.dddd4444.out` contains `aaaa5555`.
 
-- [ ] [P3-T4] Create
+- [x] [P3-T4] Create
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_build_artifact_empty_diff/` with the
   six copied non-classifier files and the five classifier files tabulated in this plan's
   fixture section, including the two zero-byte diff payloads. Acceptance:
@@ -1963,7 +1963,7 @@ Round-4 departures.
   `diff-quiet..src_Legacy_Legacy.csproj.rc` contains `1`, and
   `hash-object.src_Legacy_Legacy.csproj.out` contains `bbbb3333`.
 
-- [ ] [P3-T5] Add two tests to `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`,
+- [x] [P3-T5] Add two tests to `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`,
   titled
   `dirt_tracked_probe_error_in_history: a rung-4 hard read failure is UNIQUE even when the blob is in history`
   and
@@ -1975,7 +1975,7 @@ Round-4 departures.
   Acceptance: both `@test` titles appear once in that file and the suite exits 0 with 0
   lines beginning `not ok`.
 
-- [ ] [P3-T6] Update the membership test in
+- [x] [P3-T6] Update the membership test in
   `tests/shell/test_cleanup_worktrees_dirt_classify.bats`: add
   `dirt_tracked_probe_error_in_history` and `dirt_build_artifact_empty_diff` to the
   explicit scenario list, change the asserted record literal from `32` to `34`, and update
@@ -1986,7 +1986,7 @@ Round-4 departures.
   `find tests/fixtures/cleanup_worktrees/scenarios -maxdepth 1 -type d -name 'dirt_*' | wc -l`
   reports `28`.
 
-- [ ] [P3-T7] Run
+- [x] [P3-T7] Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats`
   and record `evidence/regression-testing/pass-after-guard-separation.2026-09-08T09-00.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, the plan line, and the `ok`/`not ok` counts.
@@ -2034,7 +2034,7 @@ Round-4 departures.
   pass-after half of P2-T10 and the
   proof that all five remediated guards now change the record channel under neutralization.
 
-- [ ] [P3-T8] Record the per-guard separation evidence in
+- [x] [P3-T8] Record the per-guard separation evidence in
   `evidence/qa-gates/guard-separation-probe.2026-09-08T09-00.md`, giving for each of the
   **eighteen** pinned rows — the five remediated rows, the three R1/R2/R5 gate rows, the six
   added by the round-3 revision, and the four added by the round-4 revision — the scenario,

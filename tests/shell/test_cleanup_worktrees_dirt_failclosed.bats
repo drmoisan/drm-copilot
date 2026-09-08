@@ -184,3 +184,47 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     # stopped rung 4 emitting CONTENT_ON_MAIN would pass the AD test above and fail here.
     [[ "$output" == *'DIRTFILE|/repo-wt/dirt|CONTENT_ON_MAIN||M |docs/tracked.md'* ]]
 }
+
+@test "dirt_tracked_probe_error_in_history: a rung-4 hard read failure is UNIQUE even when the blob is in history" {
+    dirt_log dirt_tracked_probe_error_in_history
+    [ "$status" -eq 0 ]
+    # N2's first site. `diff --quiet main -- <path>` exits 128 here, and an exit above 1
+    # carries no verdict, so the entry maps to UNIQUE and the ladder stops at that guard.
+    # The scenario deliberately supplies BOTH a hash-object payload and a matching
+    # log --find-object payload for it, so a build in which the guard is removed reaches
+    # rung 5, finds the blob, and answers CONTENT_IN_HISTORY. That pairing is what makes
+    # the absence assertion below able to fail; without it the assertion would hold in a
+    # build with no guard at all.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE|| M|docs/tracked.md'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"CONTENT_IN_HISTORY"* ]]
+    log="$(argv_log)"
+    # Positive control for the absence assertion: the rung-4 probe whose failure produces
+    # the verdict was actually issued, so classification ran rather than stopping earlier.
+    [[ "$log" == *"diff --quiet main -- docs/tracked.md"* ]]
+    # The history walk is correctly NOT in the log, because the guard returns before the
+    # blob read. That the guard rather than a missing fixture is what stops it is proved
+    # by tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats, which neutralizes
+    # this guard and observes the record change to CONTENT_IN_HISTORY.
+    [[ "$log" != *"--find-object"* ]]
+}
+
+@test "dirt_build_artifact_empty_diff: a csproj whose diff pair is empty is UNIQUE not a build artifact" {
+    dirt_log dirt_build_artifact_empty_diff
+    [ "$status" -eq 0 ]
+    # N2's second site. Both halves of rung 3's diff pair are zero-byte payloads, so the
+    # confinement test sees no changed content line at all and answers "every changed line
+    # is a HintPath rewrite" over an empty set. Vacuous confinement is the fail-open
+    # direction: it would let a read that returned nothing resolve to a disposable verdict
+    # on a project file. The guard maps a zero-line diff pair to "not a build artifact",
+    # and the entry then falls to rung 6 and is UNIQUE.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE|| M|src/Legacy/Legacy.csproj'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"DISPOSABLE_BUILD_ARTIFACT"* ]]
+    log="$(argv_log)"
+    # Positive control for the absence assertion: both halves of the diff pair were read,
+    # so the entry reached the vacuous-confinement guard rather than being rejected by
+    # rung 3's path case before any git call.
+    [[ "$log" == *"diff --no-color -U0 -- src/Legacy/Legacy.csproj"* ]]
+    [[ "$log" == *"diff --no-color -U0 --cached -- src/Legacy/Legacy.csproj"* ]]
+}

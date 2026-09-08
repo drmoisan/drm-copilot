@@ -217,7 +217,8 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     # It is written out rather than globbed so that the file records which scenarios the
     # membership check covers; the on-disk count assertion below is what stops the list
     # silently falling behind the directory.
-    for s in dirt_build_artifact dirt_build_artifact_added_file dirt_build_artifact_mixed \
+    for s in dirt_build_artifact dirt_build_artifact_added_file \
+        dirt_build_artifact_empty_diff dirt_build_artifact_mixed \
         dirt_build_artifact_plus_content dirt_classifier_read_error \
         dirt_clear_all_disposable dirt_clear_clean_failed dirt_clear_reset_failed \
         dirt_clear_reverify_order dirt_content_in_history dirt_content_on_main \
@@ -225,7 +226,8 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
         dirt_pipe_path dirt_quoted_path dirt_rename_split dirt_session_artifact \
         dirt_staged_probe_diffindex_error dirt_staged_probe_revlist_error \
         dirt_staged_tree_is_commit dirt_staged_tree_no_match \
-        dirt_staged_tree_worktree_delta dirt_tracked_read_errors \
+        dirt_staged_tree_worktree_delta dirt_tracked_probe_error_in_history \
+        dirt_tracked_read_errors \
         dirt_tracked_staged_only_blob dirt_unique; do
         iterated=$((iterated + 1))
         out="$(env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/${s}" \
@@ -245,10 +247,10 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     # above, and its verdicts would never be checked for membership.
     on_disk="$(find "${SCEN}" -maxdepth 1 -type d -name 'dirt_*' | wc -l)"
     [ "$iterated" -eq "$on_disk" ]
-    # The union must be exactly the thirty-two records these scenarios produce:
-    # twenty-six scenarios, of which six carry two status entries each. Without this
+    # The union must be exactly the thirty-four records these scenarios produce:
+    # twenty-eight scenarios, of which six carry two status entries each. Without this
     # count the membership check would pass vacuously over an empty union.
-    [ "$seen" -eq 32 ]
+    [ "$seen" -eq 34 ]
     [ -z "$offenders" ]
 }
 
