@@ -124,3 +124,20 @@ apply_identical() { # apply_identical <scenario>
     [[ "$output" != *"DIRTFILE|"* ]]
     [[ "$output" != *"DIRTSUM|"* ]]
 }
+
+@test "report mode over dirty_worktree_status_error returns the status read exit code and emits no dirt record" {
+    # Decision A. classify_worktree_dirt returns the status read's exit code on a hard
+    # failure and run_report propagates it, so report mode exits non-zero here where the
+    # pre-classifier tree exited 0. That is deliberate: the worktree produces no dirt
+    # records at all, so a report that also exited 0 could not be told apart from a report
+    # about a clean worktree, and an operator would decide a deletion on incomplete data.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="${SCEN}/dirty_worktree_status_error" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${RLIB}'; source '${DLIB}'; run_report 2>/dev/null"
+    [ "$status" -eq 128 ]
+    # Positive control: the registration whose status read failed is present in the report,
+    # so the two absence assertions below are not passing merely because nothing ran.
+    [[ "$output" == *"WORKTREE|/repo-wt/dirty|feature-dirty|"* ]]
+    [[ "$output" != *"DIRTFILE|"* ]]
+    [[ "$output" != *"DIRTSUM|"* ]]
+}

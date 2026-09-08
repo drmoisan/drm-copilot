@@ -89,7 +89,12 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
   its space. The file path is the last field, so a path containing a pipe character cannot
   shift any later field. A classification read that fails maps its entry to `UNIQUE`: that
   is the fail-closed direction, because an entry the tool could not classify is treated as
-  content that must be preserved.
+  content that must be preserved. `DISPOSABLE_SESSION_ARTIFACT` matches three fixed
+  repository paths under `artifacts/`, is repository-agnostic, and cannot fire in a checkout
+  that gitignores `artifacts/` — which drm-copilot does at `.gitignore:6` — because the
+  status read never carries `--ignored`; the verdict is retained for consumer checkouts
+  where those paths are not ignored, and it must not be made reachable by adding
+  `--ignored`.
 - `DIRTSUM|<worktree-path>|<aggregate>|<detail>` — exactly one record per dirty worktree,
   emitted by report mode immediately after that worktree's `DIRTFILE|` records.
   `aggregate` is `ALL_DISPOSABLE` if and only if the worktree has at least one status
@@ -98,6 +103,17 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
   record nor any `DIRTFILE|` record. Both records are read-only: an `ALL_DISPOSABLE`
   aggregate unlocks nothing on its own, and clearing happens only when the operator
   supplies `--clear-disposable` in apply mode.
+
+  Report-mode exit status. When a candidate worktree's `git status --porcelain` read
+  fails, report mode emits no `DIRTFILE|` and no `DIRTSUM|` record for that worktree and
+  returns git's non-zero exit code. A checkout containing such a worktree therefore exits
+  non-zero from report mode where the same checkout previously exited 0 and produced a
+  complete report. This is deliberate. A worktree whose status read failed produces no dirt
+  records at all, so a report that also exited 0 would be indistinguishable from a report
+  about a clean worktree, and an operator would make a deletion decision on silently
+  incomplete data. The non-zero exit is the only channel that carries the incompleteness to
+  a wrapping script. See the analogous apply-mode note in the End-to-End Workflow, where a
+  blocked detached removal sets a non-zero exit status for the same reason.
 - `ACTION|<verb>|<target>|<result>` — apply-mode action results.
 - `ORPHAN_DIR|<path>|<size>` — a directory under a worktree-tracking root that carries
   no `.git` pointer file and no `git worktree list` entry. `<size>` is best-effort and

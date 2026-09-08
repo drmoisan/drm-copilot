@@ -361,3 +361,17 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     [[ "$output" == *'DIRTFILE|/repo-wt/dirt|DISPOSABLE_BUILD_ARTIFACT||A |src/Legacy/Legacy.csproj'* ]]
     [[ "$output" == *'DIRTSUM|/repo-wt/dirt|ALL_DISPOSABLE|'* ]]
 }
+
+@test "no status read the classifier issues carries --ignored" {
+    dirt_log dirt_session_artifact
+    log="$(argv_log)"
+    # Positive control: the classifier issued its one status read, so the absence
+    # assertion below is not passing merely because nothing ran.
+    [[ "$log" == *"status --porcelain"* ]]
+    # Decision B. Adding --ignored would make DISPOSABLE_SESSION_ARTIFACT reachable in a
+    # checkout that gitignores artifacts/, and would at the same time pull every ignored
+    # build output into the classified set and, for any entry matching a disposable rung,
+    # into the cleared set. The verdict stays repository-agnostic and inert here rather
+    # than being made reachable that way, and this assertion is what holds that decision.
+    [[ "$log" != *"--ignored"* ]]
+}

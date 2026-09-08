@@ -992,7 +992,7 @@ does not depend on this phase landing every scenario.
 `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
 must remain byte-identical. Every edit in this phase is applied to both files.
 
-- [ ] [P7-T1] In `.claude/skills/cleanup-merged-worktrees/SKILL.md` `## Report Line Contract`,
+- [x] [P7-T1] In `.claude/skills/cleanup-merged-worktrees/SKILL.md` `## Report Line Contract`,
   extend the `DIRTSUM|` bullet block with a paragraph stating the report-mode exit-status
   behaviour: when a candidate worktree's `git status --porcelain` read fails, report mode emits no
   `DIRTFILE|` and no `DIRTSUM|` record for that worktree and returns git's non-zero exit code, so a
@@ -1010,7 +1010,7 @@ must remain byte-identical. Every edit in this phase is applied to both files.
   occurrence of `indistinguishable` at `eac077a2`, so the count moves from `0` to `1` only if the
   executor writes the paragraph.
 
-- [ ] [P7-T2] In the same `## Report Line Contract` section, extend the `DIRTFILE|` bullet with a
+- [x] [P7-T2] In the same `## Report Line Contract` section, extend the `DIRTFILE|` bullet with a
   sentence recording Decision B: `DISPOSABLE_SESSION_ARTIFACT` matches three fixed repository paths
   under `artifacts/`, is repository-agnostic, and cannot fire in a checkout that gitignores
   `artifacts/` — which drm-copilot does at `.gitignore:6` — because the status read never carries
@@ -1027,14 +1027,14 @@ must remain byte-identical. Every edit in this phase is applied to both files.
   `## Prohibited Shortcuts` and is a different location; it carries no occurrence of
   `repository-agnostic`, so it does not satisfy this task and does not disturb the count.
 
-- [ ] [P7-T3] Copy `.claude/skills/cleanup-merged-worktrees/SKILL.md` over
+- [x] [P7-T3] Copy `.claude/skills/cleanup-merged-worktrees/SKILL.md` over
   `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
   and write `evidence/qa-gates/skill-mirror-parity.2026-09-08T06-00.md` with `Timestamp:`,
   `Command:` naming the `sha256sum` invocation over both paths, `EXIT_CODE:`, the two digests, and
   `Output Summary:`.
   Acceptance: `EXIT_CODE: 0` and the two recorded digests are equal.
 
-- [ ] [P7-T4] Append one test to `tests/shell/test_cleanup_worktrees_dirt_regression.bats` with
+- [x] [P7-T4] Append one test to `tests/shell/test_cleanup_worktrees_dirt_regression.bats` with
   this description, quoted verbatim here for the executor to create:
   `report mode over dirty_worktree_status_error returns the status read exit code and emits no dirt record`.
   It runs `run_report` under `CLEANUP_WT_STUB_SCENARIO` pointing at
@@ -1045,7 +1045,7 @@ must remain byte-identical. Every edit in this phase is applied to both files.
   Acceptance: `tests/shell/test_cleanup_worktrees_dirt_regression.bats` contains that description
   verbatim and `wc -l` reports at most 500.
 
-- [ ] [P7-T5] Append one test to `tests/shell/test_cleanup_worktrees_dirt_classify.bats` with this
+- [x] [P7-T5] Append one test to `tests/shell/test_cleanup_worktrees_dirt_classify.bats` with this
   description, quoted verbatim here for the executor to create:
   `no status read the classifier issues carries --ignored`. It drives `dirt_log dirt_session_artifact`,
   asserts the filtered argv log contains `status --porcelain` as the positive control, and asserts
@@ -1053,14 +1053,14 @@ must remain byte-identical. Every edit in this phase is applied to both files.
   Acceptance: `tests/shell/test_cleanup_worktrees_dirt_classify.bats` contains that description
   verbatim and `wc -l` reports at most 500.
 
-- [ ] [P7-T6] Run
+- [x] [P7-T6] Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_regression.bats tests/shell/test_cleanup_worktrees_dirt_classify.bats`
   and write `evidence/regression-testing/pass-decision-pins.2026-09-08T06-00.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, the plan line, the `ok`/`not ok` counts, and `Output Summary:`.
   Acceptance: `EXIT_CODE: 0`, the recorded `not ok` count is `0`, and the output contains an `ok`
   line for each of the two descriptions quoted in P7-T4 and P7-T5.
 
-- [ ] [P7-T7] Demonstrate the report-mode exit pin can fail. Record
+- [x] [P7-T7] Demonstrate the report-mode exit pin can fail. Record
   `sha256sum scripts/bash/cleanup_worktrees_dirt_lib.sh`; apply one temporary mutation replacing
   the `return "$srrc"` guarded by `if ((srrc != 0)); then` in `classify_worktree_dirt` with
   `return 0`; record the sha256 again; run
@@ -1075,7 +1075,7 @@ must remain byte-identical. Every edit in this phase is applied to both files.
   exit 0 for the reverted bats run; the first and third recorded sha256 values are equal; and the
   second differs from them.
 
-- [ ] [P7-T8] Add `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` to the AC-1 sourcing
+- [x] [P7-T8] Add `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` to the AC-1 sourcing
   set by confirming its `setup()` sources `scripts/bash/cleanup_worktrees_lib.sh` and
   `scripts/bash/cleanup_worktrees_dirt_lib.sh`, and write
   `evidence/qa-gates/dirt-lib-source-set.2026-09-08T06-00.md` recording, for every file matching
