@@ -6,7 +6,13 @@
   `spec.md` only. `user-story.md` is present but is not an acceptance-criteria source under this
   mode. The three unchecked boxes in `spec.md` `## Context` (lines 24-27) are the
   Blocker/High/Medium/Low severity radio block, not acceptance criteria.
-- Branch: `bug/cleanup-worktrees-dirt-classifier-632-r2` at `ad6bc946bbf0ad9e69756b2155eae19771a232d8`
+- Branch: `bug/cleanup-worktrees-dirt-classifier-632-r2` at `388e1a78bfd1aaf73853e58f31d963b1aaee5d48`
+  (re-derived from `.git/refs/heads/bug/cleanup-worktrees-dirt-classifier-632-r2` when this revision
+  was written). `ad6bc946bbf0ad9e69756b2155eae19771a232d8` is the commit the CI coverage run
+  `34182198357` measured and remains the anchor for the P0-T7 baseline only. `ad6bc946..388e1a78`
+  touches `docs/` alone, so every code citation in this plan holds at both commits; the head-SHA
+  assertion in P8-T5 anchors on `388e1a78`, because anchoring it on `ad6bc946` would let the
+  assertion pass without the executor committing anything.
 - Worktree: `C:\Users\DanMoisan\repos\drm-copilot\.claude\worktrees\agent-ac72d35e7980bc69d`
 - Base: `origin/epic/cleanup-merged-worktrees-hardening-integration` at `4ffe680ebcebaabbba10faaa490e46a717686535`
 
@@ -17,7 +23,7 @@
 | R1 | FAIL (data loss) | Rung 1 ignores the porcelain **Y** column; an `MM` entry is labelled `STAGED_TREE_IS_COMMIT` and `--clear-disposable` destroys the unstaged delta | 2 |
 | R2 | FAIL (data loss) | The ` -> ` split is unconditional instead of `R`/`C`-only; a non-rename path containing that literal is truncated, misclassified, and misreported | 3 |
 | R5 | blocking-PARTIAL | The diff header filter is content-blind and drops added content lines beginning `++ ` | 4 |
-| R4 | FAIL (pinning) | `STAGED_TREE_IS_COMMIT` is pinned in one of four material directions | 2, 5 |
+| R4 | FAIL (pinning) | `STAGED_TREE_IS_COMMIT` is pinned in one of five material directions | 2, 5 |
 | R3 | FAIL (coverage) | `scripts/bash/cleanup_worktrees_dirt_lib.sh` at 82.63% (138/167), below the uniform 85% line floor | 5, 6, 8 |
 | R6a | blocking-PARTIAL | Report-mode exit code changed 0 -> 128 under `dirty_worktree_status_error`; undocumented, unpinned | 1, 7 |
 | R6b | blocking-PARTIAL | `DISPOSABLE_SESSION_ARTIFACT` cannot fire against a real drm-copilot checkout | 1, 7 |
@@ -50,8 +56,10 @@ The verdict is not dead code and is not removed. It is unreachable **in drm-copi
 2026-09-06 observations that named the three paths were produced against the TaskMaster checkout
 (`issue.md:27`, `spec.md:21`, `spec.md:132-134`), where those paths were reported by
 `git status --porcelain` and are therefore not ignored. Delivery to that checkout is by the
-extension push-down of `claude-customizations` (`spec.md:839-840`), so the rung is live exactly
-where the tool is used.
+extension push-down of `claude-customizations`, recorded in the `## Rollout & Follow-up` step of
+`spec.md` that begins `Consumer checkouts pick the change up through the normal extension
+push-down of`, so the rung is live exactly where the tool is used. That step is cited by its
+content rather than by line number because Phase 1 of this plan appends to `spec.md` above it.
 
 **How it is reachable:** through the inspected checkout's own `.gitignore`, with no change to the
 status read. **What that costs elsewhere:** nothing, because `--ignored` is not added. Adding it
@@ -60,12 +68,16 @@ disposable rung, into the cleared set; that prohibition is already stated at
 `scripts/bash/cleanup_worktrees_dirt_lib.sh:29-33` and is reinforced by a new test in Phase 7 that
 asserts no status read the library issues carries `--ignored`.
 
-Consequence for coverage: lines 74-77 (the constant-array literal) are the only members of the
-current uncovered set this decision does not close by adding a scenario. The file clears the 85%
-line floor without them once Phases 2 through 6 land: of the 29 uncovered lines, the new scenarios
-reach at least 19, taking the file to roughly 94% against a floor of 85%. Retaining the rung
-therefore does not put the coverage gate at risk. Phase 8 records the residual uncovered set from
-the merged Cobertura report rather than predicting it.
+Consequence for coverage: retaining the rung costs no coverage. `dirt_is_session_artifact` and its
+emission site are already exercised by the `dirt_session_artifact` scenario — the matcher body at
+`scripts/bash/cleanup_worktrees_dirt_lib.sh:126-129` and the emission at `:244-245` are absent from
+the uncovered set. Lines 74-77 are reported uncovered because they are the interior of the
+multi-line `CLEANUP_WT_SESSION_ARTIFACT_PATHS=(` array assignment whose statement kcov attributes to
+its closing line 78, which is not in the uncovered set — the same instrumentation property that
+reports lines 95, 148, 151 and 305 uncovered while the statements they open do execute. That is
+unrelated to this decision. Of the 29 uncovered lines, the new scenarios close 19, taking the file
+from 138/167 to 157/167 (94.0%) against a floor of 85%. Phase 8 records the residual uncovered set
+from the merged Cobertura report rather than predicting it.
 
 ## Scope Boundary
 
@@ -171,10 +183,18 @@ relying on the exit code.
   `evidence/remediation-baseline/shell-qc-test.2026-09-08T05-30.md` with `Timestamp:`,
   both commands with the placeholder resolved to the concrete path, `EXIT_CODE:`, the resolved
   bats path and version, the TAP plan line, the count of lines beginning `ok`, the count of lines
-  beginning `not ok`, and `Output Summary:`.
-  Acceptance: `EXIT_CODE: 0`, the recorded `not ok` count is `0`, and the recorded plan line and
-  `ok` count are equal to `390`. If the artifact records the message
+  beginning `not ok`, and `Output Summary:`. Record the observed local total on its own line in the
+  exact form `BaselineLocalTestTotal: <n>`; that recorded value, not a literal carried from CI, is
+  what P8-T3 measures its delta against.
+  Acceptance: `EXIT_CODE: 0`, the recorded `not ok` count is `0`, the recorded `ok` count equals the
+  recorded plan-line upper bound, and the artifact contains a `BaselineLocalTestTotal:` line whose
+  value equals that `ok` count. If the artifact records the message
   `bats not installed; skipping shell tests.` the task is INCOMPLETE, not a pass.
+  The CI run at `ad6bc946` reported `1..390`; that figure is recorded here for comparison only and
+  is deliberately not asserted, because the local stage and the CI stage can enumerate different
+  suites and an assertion on `390` would fail this task for a difference that is not a defect. If
+  the observed local total differs from `390`, record the difference in `Output Summary:` and
+  continue.
 
 - [ ] [P0-T6] Observe the targeted-run command shape that later phases assert over. Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_regression.bats` and
@@ -244,20 +264,30 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   checkout, where the three paths were reported by `git status --porcelain`), an explicit statement
   that the TaskMaster checkout is not present in this worktree so the provenance rests on the
   issue's own run record rather than on a re-execution, the decision to retain the rung, the
-  explicit prohibition on `--ignored`, and the coverage consequence for lines 74-77.
-  Acceptance: that file exists and contains the literals `.gitignore:6`, `Decision: RETAIN`, and
-  `--ignored`.
+  explicit prohibition on `--ignored`, and the coverage consequence stated in the Decision B block
+  above: retaining the rung costs no coverage, because `dirt_is_session_artifact` at
+  `scripts/bash/cleanup_worktrees_dirt_lib.sh:126-129` and its emission site at `:244-245` are
+  already exercised by the `dirt_session_artifact` scenario and are absent from the uncovered set,
+  and lines 74-77 are reported uncovered only because they are the interior of a multi-line array
+  assignment whose statement kcov attributes to its closing line 78 — an instrumentation property
+  unrelated to this decision.
+  Acceptance: that file exists and contains the literals `.gitignore:6`, `Decision: RETAIN`,
+  `--ignored`, and `costs no coverage`.
 
 - [ ] [P1-T3] In `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/spec.md`,
   replace AC-1 (the first item of `## Acceptance Criteria`) with an unchecked `- [ ]` item whose
   sourcing clause reads: sourced by `scripts/bash/cleanup-worktrees.sh` and by every
   `tests/shell/test_cleanup_worktrees_*.bats` suite that itself sources
-  `scripts/bash/cleanup_worktrees_lib.sh`; and add the two-sentence exclusion note naming
-  `tests/shell/test_cleanup_worktrees_scan_helper.bats` (sources no cleanup-worktrees library) and
-  `tests/shell/test_cleanup_worktrees_scan_seam.bats` (sources only
-  `scripts/bash/cleanup_worktrees_report_records_lib.sh`).
+  `scripts/bash/cleanup_worktrees_lib.sh`; and add the exclusion note naming the three suites that
+  fall outside that set: `tests/shell/test_cleanup_worktrees_scan_helper.bats` (sources no
+  cleanup-worktrees library), `tests/shell/test_cleanup_worktrees_scan_seam.bats` (sources only
+  `scripts/bash/cleanup_worktrees_report_records_lib.sh`), and
+  `tests/shell/test_cleanup_worktrees_cli.bats` (references
+  `scripts/bash/cleanup_worktrees_dirt_lib.sh` but not `scripts/bash/cleanup_worktrees_lib.sh`, so
+  it too shows zero in the `cleanup_worktrees_lib.sh` column P7-T8 tabulates).
   Acceptance: `spec.md` AC-1 begins `- [ ] ` and contains the exact literal
-  `that itself sources` and the exact literal `test_cleanup_worktrees_scan_seam.bats`.
+  `that itself sources`, the exact literal `test_cleanup_worktrees_scan_seam.bats`, and the exact
+  literal `test_cleanup_worktrees_cli.bats`.
 
 - [ ] [P1-T4] In `spec.md`, change the AC-14 checkbox and the AC-15 checkbox from `- [x]` to
   `- [ ]`. AC-14 is the criterion beginning "A tracked, modified `*.csproj` entry whose diff
@@ -293,9 +323,9 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   AC-41 — the diff header skip is anchored to the header forms git emits, so an added line whose
   content begins `+++ ` is counted as a changed content line and tested for `HintPath`; pinned in
   both directions.
-  AC-42 — `STAGED_TREE_IS_COMMIT` is pinned in four material directions: probe match, probe
-  no-match, probe hard read failure at each of its two sites, and a staged entry with a non-space
-  Y column.
+  AC-42 — `STAGED_TREE_IS_COMMIT` is pinned in five material directions, the two hard-failure sites
+  counted separately: probe match; probe no-match; probe hard read failure at the `rev-list` site;
+  probe hard read failure at the `diff-index` site; and a staged entry with a non-space Y column.
   AC-43 — report mode returns git's non-zero exit code when a candidate worktree's
   `status --porcelain` read fails, emits no `DIRTFILE|` or `DIRTSUM|` record for that worktree, and
   the behaviour is documented in `.claude/skills/cleanup-merged-worktrees/SKILL.md` and pinned by a
@@ -331,18 +361,24 @@ Phase 1 changes only `spec.md` and writes two decision records. No code, test, o
   `agent-a3944b95a7d58e712`. This is the whole-file assertion deferred from P1-T5 and P1-T7; it is
   placed here because P1-T8 is the last of the three tasks that remove those literals.
 
-- [ ] [P1-T9] In `spec.md` `### Proposed Fix`, append a subsection headed
+- [ ] [P1-T9] In `spec.md` `## Proposed Fix` (a level-two heading, at line 159 as the file stands
+  before Phase 1 runs), append a subsection headed
   `**Decision 4 — report-mode exit code on a hard status read.**` reproducing Decision A: the
   propagation is intended, the operator consequence, the rejected `WARN|` alternative, and the
   cross-reference to `.claude/skills/cleanup-merged-worktrees/SKILL.md:197-200` as precedent.
   Acceptance: `spec.md` contains the literal `Decision 4 — report-mode exit code`.
 
-- [ ] [P1-T10] In `spec.md` `### Proposed Fix`, append a subsection headed
+- [ ] [P1-T10] In `spec.md` `## Proposed Fix` (the same level-two heading P1-T9 appends to), append
+  a subsection headed
   `**Decision 5 — DISPOSABLE_SESSION_ARTIFACT is retained and inert in drm-copilot.**` reproducing
   Decision B: the re-derived provenance of the 2026-09-06 observation, the `.gitignore:6` fact, the
   reachability mechanism (the inspected checkout's own ignore state, with no change to the status
-  read), the prohibition on `--ignored`, and the coverage consequence for lines 74-77.
-  Acceptance: `spec.md` contains the literal `Decision 5 — DISPOSABLE_SESSION_ARTIFACT`.
+  read), the prohibition on `--ignored`, and the coverage consequence exactly as the Decision B
+  block states it — retaining the rung costs no coverage, because the matcher and its emission site
+  are already exercised by `dirt_session_artifact`, and lines 74-77 are reported uncovered only as
+  the kcov multi-line-statement attribution property, not as a reachability property.
+  Acceptance: `spec.md` contains the literal `Decision 5 — DISPOSABLE_SESSION_ARTIFACT` and the
+  literal `costs no coverage`.
 
 ---
 
@@ -365,15 +401,24 @@ other path reaches rung 6 and is `UNIQUE`.
   `worktree-remove.rc`) copied in shape from
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_tree_is_commit/`, plus
   `status._repo-wt_dirt.out` whose two lines are exactly `MM src/a.cs` and `M  src/b.cs` (the
-  second line's Y column is a space), plus `rev-list.HEAD.out` and `diff-index.eeee7777.rc` set so
-  the probe matches commit `eeee7777` and never probes the HEAD sha `dddd9999`, plus the
-  lower-rung responses that resolve `src/a.cs` to `UNIQUE` once it falls through (per the stub key
-  scheme documented at `tests/fixtures/cleanup_worktrees/stub-bin/git:10-70`).
+  second line's Y column is a space), plus a `rev-list.HEAD.out` whose first line is `dddd9999` and
+  whose second is `eeee7777` and a `diff-index.eeee7777.rc` of `0`, so the probe drops the HEAD sha
+  `dddd9999` as its first line and matches `eeee7777`, plus a `diff-quiet..src_a.cs.rc` of `1`.
+  That last file is the only lower-rung response `src/a.cs` needs: once rung 1 declines, rung 3's
+  `case` takes its `*)` arm because the path is not a project file, and rung 4's tracked probe
+  reads `diff-quiet..src_a.cs.rc`. Without it the stub's default exit 0 resolves the entry
+  `CONTENT_ON_MAIN` and the P2-T2 assertion cannot pass. No `hash-object.src_a.cs.out` is supplied,
+  so the stub's default empty response takes the `hash-object`-empty fail-closed branch and the
+  entry resolves `UNIQUE`. Every key here follows the stub scheme documented at
+  `tests/fixtures/cleanup_worktrees/stub-bin/git:10-70`, under which `diff --quiet main -- <path>`
+  keys on an empty range spec and so carries two consecutive dots.
   Acceptance: the directory exists, `status._repo-wt_dirt.out` has exactly two lines, its first
-  line is exactly `MM src/a.cs`, and its second line is exactly `M  src/b.cs`.
+  line is exactly `MM src/a.cs`, its second line is exactly `M  src/b.cs`, `diff-index.eeee7777.rc`
+  contains exactly `0`, `diff-quiet..src_a.cs.rc` contains exactly `1`, and the directory contains
+  no file named `hash-object.src_a.cs.out`.
 
 - [ ] [P2-T2] Create `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` with a header
-  paragraph stating its subject (the staged-tree rung's four directions and the classifier's
+  paragraph stating its subject (the staged-tree rung's five directions and the classifier's
   fail-closed branches), a `setup()` sourcing
   `scripts/bash/cleanup_worktrees_enumerate_lib.sh`, `scripts/bash/cleanup_worktrees_lib.sh`, and
   `scripts/bash/cleanup_worktrees_dirt_lib.sh`, the `dirt`/`dirt_log`/`argv_log` helpers in the
@@ -417,10 +462,15 @@ other path reaches rung 6 and is `UNIQUE`.
   Both anchors are quoted verbatim above rather than referenced by line number alone, because
   later phases in this plan insert lines into this file and shift every number after their
   insertion point.
-  Acceptance: `scripts/bash/cleanup_worktrees_dirt_lib.sh` contains the literal `${xy:1:1}`,
-  contains zero occurrences of the literal `!= "!" ]]; then` (which the pre-change condition
-  carries and the gated condition does not, because the Y-column term follows it), and
-  `bash -n scripts/bash/cleanup_worktrees_dirt_lib.sh` exits 0.
+  Acceptance: `scripts/bash/cleanup_worktrees_dirt_lib.sh` contains the literal `${xy:1:1}`;
+  `grep -c -F '!= "!" ]]; then' scripts/bash/cleanup_worktrees_dirt_lib.sh` reports exactly `1`,
+  down from `2` before this task; and `bash -n scripts/bash/cleanup_worktrees_dirt_lib.sh` exits 0.
+  The surviving occurrence is the `any_staged` pre-scan inside `classify_worktree_dirt`
+  (line 351 as the file stands before this task), which decides only whether to issue the probe and
+  is deliberately not gated on the Y column: a worktree carrying only `MM` entries must still issue
+  the probe, because the probe's result is what rung 1 consumes for the entries that do have a
+  space Y column. The count drops from 2 to 1 because the rung-1 condition at line 231 gains the
+  Y-column term after the `!= "!"` clause, so that line no longer ends `!= "!" ]]; then`.
 
 - [ ] [P2-T5] Re-run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` and
@@ -445,19 +495,39 @@ other path reaches rung 6 and is `UNIQUE`.
 - [ ] [P3-T1] Create the checked-in scenario directory
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_rename_split/` with the standard scenario
   baseline and a `status._repo-wt_dirt.out` whose two lines are exactly `?? notes -> draft.md` and
-  `R  old.md -> new.md`. Supply the stub responses so that, **under the current unfixed code**, the
-  first entry resolves `CONTENT_ON_MAIN` (the truncated path `draft.md` hashes to a blob equal to
-  `rev-parse main:draft.md`) and, **under the fixed code**, the same entry resolves `UNIQUE` (the
-  full literal `notes -> draft.md` hashes to a different blob that is absent from `main` and from
-  `main`'s scanned history). Supply the second entry's responses so the split still occurs and
-  `new.md` resolves `CONTENT_ON_MAIN` through the tracked half of rung 4
-  (`diff --quiet main -- new.md` exits 0). Derive every stub key from the sanitize rule at
-  `tests/fixtures/cleanup_worktrees/stub-bin/git:89-93`, under which `-` is a retained character
-  so `notes -> draft.md` sanitizes to `notes_-_draft.md`.
-  Acceptance: the directory exists, `status._repo-wt_dirt.out` has exactly two lines, its first
-  line is exactly `?? notes -> draft.md`, and the directory contains both a
-  `hash-object.draft.md.out` and a `hash-object.notes_-_draft.md.out` whose contents differ. The
-  two differing blobs are what makes the pin able to fail in both directions.
+  `R  old.md -> new.md`.
+  Derive every stub key from the sanitize rule at
+  `tests/fixtures/cleanup_worktrees/stub-bin/git:89-93`, which is `${s//[^A-Za-z0-9._-]/_}`. Under
+  it `notes -> draft.md` sanitizes to **`notes_-__draft.md`**: the space becomes `_`, the `-` is
+  retained, the `>` becomes `_`, and the second space becomes `_`. A key one underscore short would
+  not raise a missing-file error — `respond`
+  (`tests/fixtures/cleanup_worktrees/stub-bin/git:95-109`) falls through to exit 0 with no stdout
+  for an unmatched key — so the entry would resolve `UNIQUE` through the `hash-object`-empty
+  fail-closed branch at `scripts/bash/cleanup_worktrees_dirt_lib.sh:282-285` and the P3-T2
+  assertion would pass for the wrong reason, indistinguishable from a hash-object read failure.
+  Under the unfixed split the first entry's payload truncates to `draft.md`, so the reads are
+  `hash-object.draft.md` and `rev-parse.main_draft.md`; supply both, with the `rev-parse` response
+  equal to the `hash-object` response, which resolves the entry `CONTENT_ON_MAIN`. Under the fixed
+  split the payload is the full `notes -> draft.md`, so the reads are
+  `hash-object.notes_-__draft.md` and `rev-parse.main_notes_-__draft.md`; supply only the first,
+  carrying a blob different from `hash-object.draft.md`. The `rev-parse` and `log.find-object`
+  responses for the full path are deliberately absent, so the stub's default (exit 0, no stdout)
+  makes rung 4's untracked half miss and rung 5 find nothing, and the entry reaches rung 6 as
+  `UNIQUE`.
+  Supply no response for the second entry, and copy no `rev-list.HEAD` file into this directory. The
+  `R ` entry sets the `any_staged` flag, so the probe is issued; with no `rev-list.HEAD` response
+  the stub's default empty output makes `dirt_staged_tree_commit` return 1, rung 1 declines, rung 3
+  takes its `*)` arm because `new.md` is not a project file, and rung 4's tracked probe reads the
+  stub default exit 0 for `diff-quiet..new.md`, so `new.md` resolves `CONTENT_ON_MAIN` under both
+  the unfixed and the fixed split. A `rev-list.HEAD.out` copied in from the source scenario would
+  instead resolve the entry `STAGED_TREE_IS_COMMIT` and the P3-T2 assertion could not pass.
+  Acceptance: the directory exists; `status._repo-wt_dirt.out` has exactly two lines and its first
+  line is exactly `?? notes -> draft.md`; the directory contains `hash-object.draft.md.out` and
+  `hash-object.notes_-__draft.md.out` whose contents differ; it contains
+  `rev-parse.main_draft.md.out` byte-identical to `hash-object.draft.md.out`; it contains no file
+  whose name begins `rev-parse.main_notes_`; and it contains neither `rev-list.HEAD.out` nor
+  `rev-list.HEAD.rc`. The two differing blobs are what makes the pin able to fail in both
+  directions.
 
 - [ ] [P3-T2] Append two tests to `tests/shell/test_cleanup_worktrees_dirt_classify.bats` with
   these descriptions, quoted verbatim here for the executor to create:
@@ -486,14 +556,27 @@ other path reaches rung 6 and is `UNIQUE`.
 
 - [ ] [P3-T4] In `scripts/bash/cleanup_worktrees_dirt_lib.sh`, replace the line that currently
   reads `[[ $rel == *" -> "* ]] && rel="${rel#* -> }"` inside `classify_worktree_dirt` (line 367 as
-  the file stood at `ad6bc946`; the number has shifted by Phase 2's insertion, so the line content
-  is the anchor) with a form that applies the split only when the porcelain X column is `R` or `C`,
-  and amend the two comment lines immediately above it to state that `git status --porcelain` uses
-  the `OLD -> NEW` payload only for those two codes and that a space does not trigger C-quoting,
-  so an ordinary path may contain the literal.
+  the file stood at `388e1a78`; the number has shifted by Phase 2's insertion, so the line content
+  is the anchor) with the following three lines, whose spelling is required rather than
+  illustrative, because `shfmt` will not normalise between a `case` form, a quoted `== "R"`, and
+  the unquoted form the acceptance condition searches for:
+
+  ```
+  	if [[ ${xy:0:1} == R || ${xy:0:1} == C ]]; then
+  		rel="${rel#* -> }"
+  	fi
+  ```
+
+  Indentation is a single tab for the `if` and `fi` and two tabs for the assignment, matching the
+  tab indentation `shfmt` default formatting produces in this file. The variable is `xy` and not
+  the enclosing function's `x`, because `x` holds the last value the `any_staged` pre-scan loop
+  assigned rather than the current entry's X column. Amend the two comment lines immediately above
+  the replaced line to state that `git status --porcelain` uses the `OLD -> NEW` payload only for
+  those two codes and that a space does not trigger C-quoting, so an ordinary path may contain the
+  literal.
   Acceptance: `scripts/bash/cleanup_worktrees_dirt_lib.sh` contains the literal `${xy:0:1} == R`,
   contains zero occurrences of the literal `$rel == *" -> "* ]] && rel=` (the unconditional split's
-  distinguishing text, which the gated form does not carry), and
+  distinguishing text, which the three-line replacement does not carry), and
   `bash -n scripts/bash/cleanup_worktrees_dirt_lib.sh` exits 0.
 
 - [ ] [P3-T5] Re-run
@@ -535,9 +618,14 @@ other path reaches rung 6 and is `UNIQUE`.
   exactly `--- /dev/null` and `+++ b/src/Legacy/Legacy.csproj` followed by a hunk header and one
   added `HintPath` line, so the entry resolves `DISPOSABLE_BUILD_ARTIFACT` only if the
   `/dev/null` header forms are skipped. Supply the rung-4 and rung-5 responses that would resolve
-  the entry to `UNIQUE` if rung 3 declined it, so the two outcomes are distinguishable.
-  Acceptance: the directory exists and
-  `diff-cached._repo-wt_dirt.src_Legacy_Legacy.csproj.out` contains the literal `--- /dev/null`.
+  the entry to `UNIQUE` if rung 3 declined it, so the two outcomes are distinguishable. Copy no
+  `rev-list.HEAD` file into this directory: the `A ` status code sets the `any_staged` flag, so the
+  probe is issued, and with no `rev-list.HEAD` response the stub's default empty output makes the
+  probe return 1 and rung 1 decline. A `rev-list.HEAD.out` copied in from a source scenario would
+  resolve the entry `STAGED_TREE_IS_COMMIT` at rung 1 and the entry would never reach rung 3.
+  Acceptance: the directory exists,
+  `diff-cached._repo-wt_dirt.src_Legacy_Legacy.csproj.out` contains the literal `--- /dev/null`,
+  and the directory contains neither `rev-list.HEAD.out` nor `rev-list.HEAD.rc`.
 
 - [ ] [P4-T3] Append two tests to `tests/shell/test_cleanup_worktrees_dirt_classify.bats` with
   these descriptions, quoted verbatim here for the executor to create:
@@ -562,8 +650,9 @@ other path reaches rung 6 and is `UNIQUE`.
 
 - [ ] [P4-T5] In `scripts/bash/cleanup_worktrees_dirt_lib.sh`, replace the header-skip pattern
   line that currently reads `"+++ "* | "--- "*) continue ;;` inside
-  `dirt_diff_is_hintpath_confined` (line 159 at `ad6bc946`; the line content is the anchor because
-  Phase 2 has already shifted the numbers below its insertion point) with one anchored to the four
+  `dirt_diff_is_hintpath_confined` (line 159 at `388e1a78`; Phase 2's and Phase 3's insertions are
+  both below this line and do not shift it, but the line content is used as the anchor for
+  consistency with the other two library edits) with one anchored to the four
   forms git emits — a `---` header prefixed `a/`, a `+++` header prefixed `b/`, and the two
   `/dev/null` forms — and amend the docstring paragraph that begins
   `# The \`---\` and \`+++\` file headers are excluded before the test` to state that the skip is
@@ -595,7 +684,15 @@ other path reaches rung 6 and is `UNIQUE`.
 
 ---
 
-### Phase 5 — R4: the three remaining staged-rung directions
+### Phase 5 — R4: the three staged-rung directions not already pinned by Phase 2
+
+R4 has **five** material directions, counting the probe's two hard-failure sites separately: probe
+match; probe no-match; `rev-list` hard failure; `diff-index` hard failure; and a staged entry with a
+non-space Y column. One is pinned today. Phase 2 adds two (P2-T2) and this phase adds the remaining
+three (P5-T4), for five pins in total. `remediation-inputs.2026-09-08T05-00.md` describes three
+remaining directions because it counts the two hard-failure sites as one; that is the same set
+counted differently, not a different set, and the five-direction wording is what AC-42 carries,
+because P8-T10 checks AC-42 off permanently and the wording outlives this cycle.
 
 The reviewer drove the no-match and hard-read-failure paths directly and reports they behave
 correctly today, so these are pins of correct behaviour rather than fixes. Each therefore carries a
@@ -603,21 +700,37 @@ mutation probe demonstrating that the new pin can fail.
 
 - [ ] [P5-T1] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_tree_no_match/` with a
   `status._repo-wt_dirt.out` of exactly one line `M  src/a.cs`, a `rev-list.HEAD.out` whose first
-  line is `dddd9999` and whose second is `eeee7777`, a `diff-index.eeee7777.rc` of `1`, and the
-  lower-rung responses that resolve `src/a.cs` to `UNIQUE`.
-  Acceptance: the directory exists and `diff-index.eeee7777.rc` contains exactly `1`.
+  line is `dddd9999` and whose second is `eeee7777`, a `diff-index.eeee7777.rc` of `1`, and a
+  `diff-quiet..src_a.cs.rc` of `1`. This scenario is the one of the three that reaches the lower
+  rungs: the probe returns 1, rung 1 declines, rung 3 takes its `*)` arm, and rung 4's tracked
+  probe reads `diff-quiet..src_a.cs.rc`. Without that file the stub's default exit 0 resolves the
+  entry `CONTENT_ON_MAIN` and the P5-T4 assertion cannot pass. Supply no
+  `hash-object.src_a.cs.out`, so the empty default takes the fail-closed branch and the entry
+  resolves `UNIQUE`.
+  Acceptance: the directory exists, `diff-index.eeee7777.rc` contains exactly `1`, and
+  `diff-quiet..src_a.cs.rc` contains exactly `1`.
 
 - [ ] [P5-T2] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_probe_revlist_error/`
   with a `status._repo-wt_dirt.out` of exactly one line `M  src/a.cs` and a `rev-list.HEAD.rc` of
-  `128`, so `dirt_staged_tree_commit` returns 2 and rung 1 takes its `staged == "ERROR"` branch.
-  Acceptance: the directory exists and `rev-list.HEAD.rc` contains exactly `128`.
+  `128`, so `dirt_staged_tree_commit` returns 2 from
+  `scripts/bash/cleanup_worktrees_dirt_lib.sh:97-99` and rung 1 takes its `staged == "ERROR"`
+  branch at `:232-234`. Supply **no** lower-rung response and no `diff-quiet..src_a.cs.rc`: the X
+  column is `M` and the Y column is a space, so rung 1's gate is entered and the `ERROR` branch
+  prints `UNIQUE` and returns before rung 2 is reached. Adding a lower-rung file here would create
+  a fixture entry no code path reads.
+  Acceptance: the directory exists, `rev-list.HEAD.rc` contains exactly `128`, and the directory
+  contains neither `diff-quiet..src_a.cs.rc` nor `diff-quiet..src_a.cs.out`.
 
 - [ ] [P5-T3] Create
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_probe_diffindex_error/` with a
   `status._repo-wt_dirt.out` of exactly one line `M  src/a.cs`, a `rev-list.HEAD.out` of
   `dddd9999` then `eeee7777`, and a `diff-index.eeee7777.rc` of `128`, so the probe returns 2 from
-  its second hard-failure site.
-  Acceptance: the directory exists and `diff-index.eeee7777.rc` contains exactly `128`.
+  its second hard-failure site at `scripts/bash/cleanup_worktrees_dirt_lib.sh:113-115`. As in
+  P5-T2, supply **no** lower-rung response and no `diff-quiet..src_a.cs.rc`: rung 1's `ERROR`
+  branch prints `UNIQUE` and returns before rung 2 is reached, so a lower-rung file here would be
+  a fixture entry no code path reads.
+  Acceptance: the directory exists, `diff-index.eeee7777.rc` contains exactly `128`, and the
+  directory contains neither `diff-quiet..src_a.cs.rc` nor `diff-quiet..src_a.cs.out`.
 
 - [ ] [P5-T4] Append three tests to `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` with
   these descriptions, quoted verbatim here for the executor to create:
@@ -653,9 +766,9 @@ mutation probe demonstrating that the new pin can fail.
   Acceptance: the artifact records a non-zero exit for the mutated bats run whose output carries a
   `not ok` line for each of the three P5-T4 descriptions; exit 0 for the reverted bats run; the
   first and third recorded sha256 values are equal; and the second differs from them. The sha256
-  triple is the failable revert check — an anchored `git diff` against the base branch is
-  non-empty here because the phase's own fixes are in the tree, so it cannot distinguish a
-  reverted mutation from an unreverted one.
+  triple is the failable revert check — a diff against the base branch is non-empty here because
+  the phase's own fixes are in the tree, so it cannot distinguish a reverted mutation from an
+  unreverted one.
 
 ---
 
@@ -663,18 +776,31 @@ mutation probe demonstrating that the new pin can fail.
 
 Targets, taken from the enumeration in
 `evidence/qa-gates/shell-qc-test-coverage.2026-09-08T04-30.md` rather than re-derived. This phase
-closes lines 155, 190, 191, 258, 259, 269, 270, 273, 274, 308, 309, 415, and 416. Lines 98, 113,
-114, 117, 233, and 234 are closed by Phase 5; line 343 is closed by Phase 7's report-mode exit
-test; lines 74-77 are the subject of Decision B.
+closes nine lines: 155, 258, 259, 273, 274, 308, 309, 415, and 416.
 
-Four entries in the enumeration are not closable by any scenario and no task here targets them.
-Lines 95, 148, 151, and 305 are the second physical lines of backslash-continued commands
-(`rev-list`, the cached `diff`, the worktree `diff`, and `log --find-object`) whose first lines are
-already executed by the existing fixtures; line 160 is the empty `case` arm `"+"* | "-"*) ;;`,
-already reached by every build-artifact fixture. Their reported status is an instrumentation
-property of kcov, not a missing test, so the gate for this finding is the file percentage recorded
-in P8-T7, not a per-line list. Closing thirteen lines here and six in Phase 5 takes the file from
-138/167 to at least 157/167.
+The rest of the closable set is closed earlier. Line 191, rung 3's `*) return 1 ;;` arm for a path
+that is not a project file, is first reached by [P2-T1]'s `MM src/a.cs` entry once [P2-T4] makes it
+fall through rung 1, and is reached again by [P3-T1]'s tracked `R` entry and by [P5-T1]. Lines 269
+and 270, the second `CONTENT_ON_MAIN` emission site, are closed by [P3-T1]'s tracked `R` entry
+through rung 4's tracked half. Lines 98, 113, 114, 117, 233 and 234 are closed by Phase 5; line 343
+by Phase 7's report-mode exit test.
+
+Ten entries in the enumeration are not closable by any scenario and no task here targets them.
+Lines 95, 148, 151 and 305 are the **first** physical lines of backslash-continued commands
+(`rev-list`, the cached `diff`, the worktree `diff`, and `log --find-object`); kcov attributes each
+statement to its continuation line — 96, 149, 152 and 306, none of which appears in the uncovered
+list — so the opening line can never be marked executed. Lines 160 (`"+"* | "-"*) ;;`) and 190
+(the `*.csproj | packages.config | */packages.config | app.config | */app.config) ;;` arm) are
+empty `case` arms carrying no statement to instrument; both are already taken by every
+build-artifact fixture and are reported uncovered regardless. Lines 74-77 are the interior of a
+multi-line array assignment whose statement kcov attributes to its closing line 78, the same
+property. The gate for this finding is therefore the file percentage recorded in P8-T7, not a
+per-line list.
+
+Arithmetic: 29 uncovered lines, 10 unclosable, 19 closed — one in Phase 2, two in Phase 3, six in
+Phase 5, nine in Phase 6, one in Phase 7. That takes the file from 138/167 to 157/167, or 94.0%,
+against an 85% floor that requires 142/167. The floor is cleared by Phase 5 alone, so the margin
+does not depend on this phase landing every scenario.
 
 - [ ] [P6-T1] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_tracked_read_errors/` with a
   `status._repo-wt_dirt.out` of exactly two lines, ` M src/Legacy/Legacy.csproj` and
@@ -848,10 +974,12 @@ must remain byte-identical. Every edit in this phase is applied to both files.
   Acceptance: `EXIT_CODE: 0`; the recorded table shows every suite whose
   `cleanup_worktrees_lib.sh` column is non-zero also has a non-zero
   `cleanup_worktrees_dirt_lib.sh` column; the table has exactly `11` such suites, being the ten
-  measured at `ad6bc946` plus `test_cleanup_worktrees_dirt_failclosed.bats`; and
-  `test_cleanup_worktrees_scan_helper.bats` and `test_cleanup_worktrees_scan_seam.bats` each show
-  zero in the `cleanup_worktrees_lib.sh` column, which is what places them outside the narrowed
-  AC-1 text written in P1-T3.
+  measured at `388e1a78` plus `test_cleanup_worktrees_dirt_failclosed.bats`; and
+  `test_cleanup_worktrees_scan_helper.bats`, `test_cleanup_worktrees_scan_seam.bats`, and
+  `test_cleanup_worktrees_cli.bats` each show zero in the `cleanup_worktrees_lib.sh` column, which
+  is what places all three outside the narrowed AC-1 text written in P1-T3.
+  `test_cleanup_worktrees_cli.bats` is the third exclusion and is easy to miss because its
+  `cleanup_worktrees_dirt_lib.sh` column is non-zero.
 
 ---
 
@@ -880,12 +1008,15 @@ runs; that is an orchestration precondition, not an acceptance condition of this
 
 - [ ] [P8-T3] Run the full bats stage with the bats path recorded in P0-T5 and write
   `evidence/qa-gates/shell-qc-test.2026-09-08T07-00.md` with `Timestamp:`, `Command:`,
-  `EXIT_CODE:`, the TAP plan line, the `ok` count, the `not ok` count, the delta against the
-  P0-T5 baseline of `390`, and `Output Summary:`.
+  `EXIT_CODE:`, the TAP plan line, the `ok` count, the `not ok` count, the value of the
+  `BaselineLocalTestTotal:` line recorded by P0-T5 reproduced verbatim, and the delta computed as
+  this run's `ok` count minus that recorded value, plus `Output Summary:`.
   Acceptance: `EXIT_CODE: 0`, the recorded `not ok` count is `0`, the recorded `ok` count equals
   the recorded plan-line upper bound, and the recorded delta is exactly `14` — the number of tests
   this plan adds, being 2 in P2-T2, 2 in P3-T2, 2 in P4-T3, 3 in P5-T4, 2 in P6-T4, 1 in P6-T5,
-  1 in P7-T4, and 1 in P7-T5. The artifact must not record the message
+  1 in P7-T4, and 1 in P7-T5. The delta is taken against the observed local baseline P0-T5
+  recorded, not against the CI figure `390`, so a local-versus-CI difference in suite enumeration
+  cannot make this condition unsatisfiable. The artifact must not record the message
   `bats not installed; skipping shell tests.`
 
 - [ ] [P8-T4] Run `wc -l` over the same file set as P0-T8 plus
@@ -896,8 +1027,7 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   `scripts/bash/cleanup_worktrees_lib.sh` still at `496` — unchanged, because this plan does not
   modify it.
 
-- [ ] [P8-T5] Stage and commit every change this plan made, including the previously untracked
-  `evidence/qa-gates/shell-qc-test-coverage.2026-09-08T04-30.md`, then push
+- [ ] [P8-T5] Stage and commit every change this plan made, then push
   `bug/cleanup-worktrees-dirt-classifier-632-r2`. Write
   `evidence/other/remediation-commit-and-push.2026-09-08T07-00.md` with `Timestamp:`, the
   `git add`, `git commit`, and `git push` commands, their `EXIT_CODE:` values, the resulting head
@@ -909,7 +1039,14 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats`,
   `.claude/skills/cleanup-merged-worktrees/SKILL.md`, and
   `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/evidence/qa-gates/shell-qc-test-coverage.2026-09-08T04-30.md`,
-  and the artifact records a head SHA different from `ad6bc946bbf0ad9e69756b2155eae19771a232d8`.
+  and the artifact records a head SHA different from `388e1a78bfd1aaf73853e58f31d963b1aaee5d48`.
+  The coverage-evidence file was committed in `388e1a78` and is therefore already tracked; it still
+  appears in the three-dot name-status span, because that span covers every commit on this branch
+  since the merge base with
+  `origin/epic/cleanup-merged-worktrees-hardening-integration`. The head-SHA comparison names
+  `388e1a78` rather than `ad6bc946` for a reason that decides whether the condition can fail: the
+  branch head was already `388e1a78` before this task ran, so a comparison against `ad6bc946` would
+  hold even if the executor committed nothing.
   The porcelain span and the anchored name-status span are both required: the anchored diff cannot
   report a newly created file until it is staged, and the porcelain span goes empty once the commit
   lands, so neither alone establishes the state.
@@ -982,9 +1119,15 @@ runs; that is an orchestration precondition, not an acceptance condition of this
   cycle, and the reason for deferral. Record explicitly that F7 and F9 target
   `scripts/bash/cleanup_worktrees_lib.sh`, which is at 496 of 500 lines and which this plan does
   not modify, so acting on them requires the `cleanup_worktrees_report_lib.sh` extraction
-  contingency recorded at `spec.md:772-776`.
+  contingency recorded in the `## Risks & Mitigations` bullet of `spec.md` that begins
+  ``Fan-in on `cleanup_worktrees_lib.sh` is mitigated by`` and carries the literal
+  ``extract `run_report` into a new `scripts/bash/cleanup_worktrees_report_lib.sh```. That bullet
+  is cited by its content rather than by line number because Phase 1 of this plan appends seven
+  acceptance criteria and two `Proposed Fix` subsections above it, all of which shift its line
+  numbers before this task runs.
   Acceptance: the artifact names all eight identifiers `F7` through `F14`, each with a one-line
-  disposition, and contains the literal `496`.
+  disposition, contains the literal `496`, and contains the literal
+  `cleanup_worktrees_report_lib.sh`.
 
 ---
 
@@ -995,7 +1138,7 @@ runs; that is an orchestration precondition, not an acceptance condition of this
 | R1 | P2-T4 | P2-T1 | P2-T2 (both tests, one fixture, two entries differing only in Y) | P2-T3, P2-T5, P2-T6 |
 | R2 | P3-T4 | P3-T1 | P3-T2 (untracked ` -> ` path plus genuine `R` entry) | P3-T3, P3-T5, P3-T6 |
 | R5 | P4-T5 | P4-T1, P4-T2 | P4-T3 plus the pre-existing `dirt_build_artifact` pin | P4-T4, P4-T6, P4-T7 |
-| R4 | none (pins only) | P5-T1, P5-T2, P5-T3 | P5-T4 with P2-T2 | P5-T5, P5-T6 |
+| R4 | none (pins only) | P5-T1, P5-T2, P5-T3 | P2-T2 (2 directions) plus P5-T4 (3), five in total | P5-T5, P5-T6 |
 | R3 | none (pins only) | P6-T1, P6-T2, P6-T3 | P6-T4, P6-T5, P6-T6 | P6-T7, P6-T8, P8-T7, P8-T8 |
 | R6a | none (documented) | none (existing scenario) | P7-T4 | P1-T1, P7-T1, P7-T6, P7-T7 |
 | R6b | none (retained) | none (existing scenario) | P7-T5 | P1-T2, P7-T2, P7-T3, P7-T6 |
