@@ -138,6 +138,19 @@ dirt_diff_is_hintpath_confined() {
 	# unconfined. Hunk headers and the `diff --git`/`index` lines are not changed lines
 	# and are ignored.
 	#
+	# The header skip is ANCHORED to the four forms the diff emits, not written as a
+	# bare `+++ `/`--- ` prefix test. A space does not end a diff line's content, so an
+	# ADDED line whose own text begins `+++ ` matches a bare prefix test and is dropped
+	# before it is counted and before it is tested for HintPath. A project file carrying
+	# one such hand edit then reads as confined and resolves DISPOSABLE_BUILD_ARTIFACT,
+	# which is the fail-open direction and makes the entry clearable.
+	#
+	# The `a/` and `b/` prefixes are assumed because this library issues
+	# `diff --no-color -U0` without `--no-prefix`, so the default prefixes are always
+	# present; the two `/dev/null` forms cover an added or a deleted file. A header form
+	# the pattern does not match is counted as a changed content line, which fails the
+	# HintPath test and resolves the entry UNIQUE — the safe direction.
+	#
 	# Args: $1 = worktree path, $2 = repo-relative path, $3 = "cached" for the staged
 	# diff or the empty string for the worktree diff.
 	# Echoes the number of changed content lines seen and returns 0 when every one of
@@ -156,7 +169,7 @@ dirt_diff_is_hintpath_confined() {
 	fi
 	while IFS= read -r line || [[ -n $line ]]; do
 		case "$line" in
-		"+++ "* | "--- "*) continue ;;
+		"--- a/"* | "+++ b/"* | "--- /dev/null" | "+++ /dev/null") continue ;;
 		"+"* | "-"*) ;;
 		*) continue ;;
 		esac

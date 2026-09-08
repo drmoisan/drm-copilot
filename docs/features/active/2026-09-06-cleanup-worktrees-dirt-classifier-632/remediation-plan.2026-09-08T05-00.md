@@ -669,7 +669,7 @@ other path reaches rung 6 and is `UNIQUE`.
 
 ### Phase 4 — R5: anchor the diff header skip to the forms git emits
 
-- [ ] [P4-T1] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_build_artifact_plus_content/`
+- [x] [P4-T1] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_build_artifact_plus_content/`
   modelled on `tests/fixtures/cleanup_worktrees/scenarios/dirt_build_artifact_mixed/`: a
   `status._repo-wt_dirt.out` of exactly one line ` M src/Legacy/Legacy.csproj`, a
   `diff._repo-wt_dirt.src_Legacy_Legacy.csproj.out` retaining the genuine
@@ -682,7 +682,7 @@ other path reaches rung 6 and is `UNIQUE`.
   `diff._repo-wt_dirt.src_Legacy_Legacy.csproj.out` contains both the literal `--- a/` and the
   literal `+++ this line is real added content`.
 
-- [ ] [P4-T2] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_build_artifact_added_file/`
+- [x] [P4-T2] Create `tests/fixtures/cleanup_worktrees/scenarios/dirt_build_artifact_added_file/`
   with a `status._repo-wt_dirt.out` of exactly one line `A  src/Legacy/Legacy.csproj`, no worktree
   diff fixture, and a `diff-cached._repo-wt_dirt.src_Legacy_Legacy.csproj.out` whose headers are
   exactly `--- /dev/null` and `+++ b/src/Legacy/Legacy.csproj` followed by a hunk header and one
@@ -697,7 +697,7 @@ other path reaches rung 6 and is `UNIQUE`.
   `diff-cached._repo-wt_dirt.src_Legacy_Legacy.csproj.out` contains the literal `--- /dev/null`,
   and the directory contains neither `rev-list.HEAD.out` nor `rev-list.HEAD.rc`.
 
-- [ ] [P4-T3] Append two tests to `tests/shell/test_cleanup_worktrees_dirt_classify.bats` with
+- [x] [P4-T3] Append two tests to `tests/shell/test_cleanup_worktrees_dirt_classify.bats` with
   these descriptions, quoted verbatim here for the executor to create:
   `dirt_build_artifact_plus_content: an added content line beginning with plus-plus-plus is counted and the entry is UNIQUE`
   and
@@ -709,7 +709,7 @@ other path reaches rung 6 and is `UNIQUE`.
   `DIRTSUM|/repo-wt/dirt|ALL_DISPOSABLE|`.
   Acceptance: the file contains both quoted descriptions verbatim and `wc -l` reports at most 500.
 
-- [ ] [P4-T4] [expect-fail] Run
+- [x] [P4-T4] [expect-fail] Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_classify.bats` against
   the unfixed filter and write
   `evidence/regression-testing/fail-before-diff-header-anchor.2026-09-08T06-00.md` with
@@ -726,7 +726,7 @@ other path reaches rung 6 and is `UNIQUE`.
   `DISPOSABLE_BUILD_ARTIFACT` before P4-T5 lands as well as after it. Without the `ok` half a
   fixture that produced no record at all would satisfy this task.
 
-- [ ] [P4-T5] In `scripts/bash/cleanup_worktrees_dirt_lib.sh`, replace the header-skip pattern
+- [x] [P4-T5] In `scripts/bash/cleanup_worktrees_dirt_lib.sh`, replace the header-skip pattern
   line that currently reads `"+++ "* | "--- "*) continue ;;` inside
   `dirt_diff_is_hintpath_confined` (line 159 at `eac077a2`; Phase 2's and Phase 3's insertions are
   both below this line and do not shift it, but the line content is used as the anchor for
@@ -742,7 +742,7 @@ other path reaches rung 6 and is `UNIQUE`.
   anchored replacement carries the `a/` and `b/` prefixes inside the quotes), and
   `bash -n scripts/bash/cleanup_worktrees_dirt_lib.sh` exits 0.
 
-- [ ] [P4-T6] Re-run the three suites that read the header-skip branch —
+- [x] [P4-T6] Re-run the three suites that read the header-skip branch —
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_classify.bats tests/shell/test_cleanup_worktrees_dirt_clear.bats tests/shell/test_cleanup_worktrees_dirt_regression.bats`
   — and write `evidence/regression-testing/pass-after-diff-header-anchor.2026-09-08T06-00.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, the plan line, the `ok`/`not ok` counts, and
@@ -762,7 +762,7 @@ other path reaches rung 6 and is `UNIQUE`.
   `dirt_clear_clean_failed: a non-zero clean reports FAILED and retries no removal`, the two
   pre-existing clear-mode tests that consume those genuine-header fixtures.
 
-- [ ] [P4-T7] Write `evidence/regression-testing/sibling-check-phase4.2026-09-08T06-00.md` with
+- [x] [P4-T7] Write `evidence/regression-testing/sibling-check-phase4.2026-09-08T06-00.md` with
   `Timestamp:`, `Command:` naming the P4-T6 run, `EXIT_CODE:`, and `Output Summary:` naming the
   sibling region: the two pre-existing pins that read the same header-skip branch —
   `dirt_build_artifact: a HintPath-only csproj modification is DISPOSABLE_BUILD_ARTIFACT`

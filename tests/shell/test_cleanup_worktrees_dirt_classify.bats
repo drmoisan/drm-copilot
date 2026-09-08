@@ -325,3 +325,26 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     # it. A split that kept the source instead of the destination would show up here.
     [[ "$log" != *"old.md"* ]]
 }
+
+@test "dirt_build_artifact_plus_content: an added content line beginning with plus-plus-plus is counted and the entry is UNIQUE" {
+    dirt dirt_build_artifact_plus_content
+    [ "$status" -eq 0 ]
+    # The header skip was written as an unanchored prefix test, so it also dropped an
+    # added line whose CONTENT begins with the marker. Such a line was neither counted
+    # toward `changed` nor tested for HintPath, so a project file carrying a real hand
+    # edit resolved DISPOSABLE_BUILD_ARTIFACT and became clearable. The skip is now
+    # anchored to the four header forms the diff actually emits.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE|| M|src/Legacy/Legacy.csproj'* ]]
+    [[ "$output" != *"DISPOSABLE_BUILD_ARTIFACT"* ]]
+}
+
+@test "dirt_build_artifact_added_file: a dev-null header is still skipped and the entry is DISPOSABLE_BUILD_ARTIFACT" {
+    dirt dirt_build_artifact_added_file
+    [ "$status" -eq 0 ]
+    # The other half of the pin. Anchoring must not stop the skip working: a newly added
+    # file's cached diff carries `--- /dev/null` and `+++ b/<path>`, and both are headers
+    # rather than content. An anchoring that missed either form would count them as
+    # changed lines, fail the HintPath test, and resolve the entry UNIQUE.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|DISPOSABLE_BUILD_ARTIFACT||A |src/Legacy/Legacy.csproj'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|ALL_DISPOSABLE|'* ]]
+}
