@@ -214,7 +214,7 @@ classify_dirt_entry() {
 	# match, or the literal ERROR on a hard probe failure.
 	# Echoes exactly one `<verdict>|<detail>` line and always returns 0.
 	local wt="$1" xy="$2" rel="$3" staged="$4"
-	local x="${xy:0:1}" untracked=0 blob="" hrc=0 mrc=0 mainblob="" brc=0
+	local x="${xy:0:1}" y="${xy:1:1}" untracked=0 blob="" hrc=0 mrc=0 mainblob="" brc=0
 	local drc=0 vrc=0 lrc=0 range found
 
 	# A C-quoted payload is returned UNIQUE immediately with no unquoting attempt. One
@@ -228,7 +228,23 @@ classify_dirt_entry() {
 
 	# Rung 1. Staged entries only: the X column is the index status, and a space,
 	# question mark, or exclamation mark there means the entry is not staged.
-	if [[ $x != " " && $x != "?" && $x != "!" ]]; then
+	#
+	# THE Y COLUMN GATE IS LOAD-BEARING. The X column answers a question about the
+	# INDEX, and the probe that answers rung 1 is `diff-index --cached --quiet`, which
+	# compares the index against a candidate commit and says nothing whatever about a
+	# non-space Y column. An MM entry has a staged change that matches an ancestor tree
+	# AND an unstaged working-tree modification on top of it; that unstaged delta exists
+	# in no commit and not in the index, so nothing recovers it once
+	# --clear-disposable runs reset --hard. Rung 1 therefore fires only when the Y
+	# column is a single space.
+	#
+	# An entry with a non-space Y column falls through to the rungs that compare
+	# WORKING-TREE content, which is the comparison its unstaged delta actually needs.
+	# An MM entry on a HintPath-confined project file can still reach
+	# DISPOSABLE_BUILD_ARTIFACT, because dirt_is_build_artifact reads both the worktree
+	# diff and the cached diff; an MM entry on any other path reaches rung 6 and is
+	# UNIQUE.
+	if [[ $x != " " && $x != "?" && $x != "!" && $y == " " ]]; then
 		if [[ $staged == "ERROR" ]]; then
 			printf 'UNIQUE|\n'
 			return 0

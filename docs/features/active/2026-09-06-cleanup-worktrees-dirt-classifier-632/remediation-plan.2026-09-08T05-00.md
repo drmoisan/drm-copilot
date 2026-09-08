@@ -461,7 +461,7 @@ Rationale for falling through rather than returning `UNIQUE` directly: the lower
 `dirt_is_build_artifact` reads both the worktree diff and the cached diff. An `MM` entry on any
 other path reaches rung 6 and is `UNIQUE`.
 
-- [ ] [P2-T1] Create the checked-in scenario directory
+- [x] [P2-T1] Create the checked-in scenario directory
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_tree_worktree_delta/` carrying the
   standard scenario baseline (`worktree-list.out`, `for-each-ref.out`,
   `rev-parse.abbrev-ref-HEAD.out`, `rev-parse.show-toplevel.out`, `merge-base.feature-dirt.rc`,
@@ -484,7 +484,7 @@ other path reaches rung 6 and is `UNIQUE`.
   contains exactly `0`, `diff-quiet..src_a.cs.rc` contains exactly `1`, and the directory contains
   no file named `hash-object.src_a.cs.out`.
 
-- [ ] [P2-T2] Create `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` with a header
+- [x] [P2-T2] Create `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` with a header
   paragraph stating its subject (the staged-tree rung's five directions and the classifier's
   fail-closed branches), a `setup()` sourcing
   `scripts/bash/cleanup_worktrees_enumerate_lib.sh`, `scripts/bash/cleanup_worktrees_lib.sh`, and
@@ -501,7 +501,7 @@ other path reaches rung 6 and is `UNIQUE`.
   Acceptance: the file exists, `wc -l` reports at most 500, and it contains both quoted test
   descriptions verbatim.
 
-- [ ] [P2-T3] [expect-fail] Run
+- [x] [P2-T3] [expect-fail] Run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` against
   the **unfixed** library and write
   `evidence/regression-testing/fail-before-staged-y-column.2026-09-08T06-00.md` with `Timestamp:`,
@@ -514,7 +514,7 @@ other path reaches rung 6 and is `UNIQUE`.
   `dirt_staged_tree_worktree_delta: the M-space entry in the same fixture is still STAGED_TREE_IS_COMMIT`.
   Both halves are required: the second proves the fixture is not simply broken.
 
-- [ ] [P2-T4] In `scripts/bash/cleanup_worktrees_dirt_lib.sh`, gate rung 1 on the Y column. Add
+- [x] [P2-T4] In `scripts/bash/cleanup_worktrees_dirt_lib.sh`, gate rung 1 on the Y column. Add
   `y="${xy:1:1}"` to the `classify_dirt_entry` local declaration that currently reads
   `local x="${xy:0:1}" untracked=0 blob="" hrc=0 mrc=0 mainblob="" brc=0` (line 217 as the file
   stands before this task), and change the rung-1 condition that currently reads
@@ -539,7 +539,7 @@ other path reaches rung 6 and is `UNIQUE`.
   space Y column. The count drops from 2 to 1 because the rung-1 condition at line 231 gains the
   Y-column term after the `!= "!"` clause, so that line no longer ends `!= "!" ]]; then`.
 
-- [ ] [P2-T5] Re-run
+- [x] [P2-T5] Re-run
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_failclosed.bats` and
   write `evidence/regression-testing/pass-after-staged-y-column.2026-09-08T06-00.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, the plan line, the `ok`/`not ok` counts, and
@@ -547,7 +547,7 @@ other path reaches rung 6 and is `UNIQUE`.
   Acceptance: `EXIT_CODE: 0`, the recorded `not ok` count is `0`, and the recorded output contains
   an `ok` line for each of the two test descriptions quoted in P2-T2.
 
-- [ ] [P2-T6] Re-run the three pre-existing dirt suites together —
+- [x] [P2-T6] Re-run the three pre-existing dirt suites together —
   `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_dirt_classify.bats tests/shell/test_cleanup_worktrees_dirt_clear.bats tests/shell/test_cleanup_worktrees_dirt_regression.bats`
   — and write `evidence/regression-testing/sibling-check-phase2.2026-09-08T06-00.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, the plan line, and `Output Summary:` naming the sibling
