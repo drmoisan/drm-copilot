@@ -21,6 +21,7 @@ setup() {
     RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
     DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
+    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
@@ -37,13 +38,13 @@ report() { # report <scenario-dir> -> run the report driver under that scenario
     # stub rather than reading the real .claude/worktrees tree.
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
         CLEANUP_WT_STUB_SCENARIO="$1" \
-        bash -c "source '${ELIB}' && source '${LIB}' && source '${RLIB}' && source '${ALIB}' && source '${DLIB}' && run_report"
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && source '${RLIB}' && source '${ALIB}' && source '${DLIB}' && run_report"
 }
 
 runin() { # runin <scenario-dir> <invocation> -> run an arbitrary invocation under it
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
         CLEANUP_WT_STUB_SCENARIO="$1" \
-        bash -c "source '${ELIB}' && source '${LIB}' && source '${RLIB}' && source '${ALIB}' && source '${DLIB}' && $2"
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && source '${RLIB}' && source '${ALIB}' && source '${DLIB}' && $2"
 }
 
 @test "report emits one detached record with MERGED_CLEAN" {

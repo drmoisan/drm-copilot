@@ -1,0 +1,9 @@
+diff --git a/src/Legacy/Legacy.csproj b/src/Legacy/Legacy.csproj
+index 1111aaaa..3333cccc 100644
+--- a/src/Legacy/Legacy.csproj
++++ b/src/Legacy/Legacy.csproj
+@@ -12 +12 @@
+-      <HintPath>..\..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll</HintPath>
++      <HintPath>..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll</HintPath>
+@@ -41,0 +42 @@
++    <Compile Include="Services\NewInvoiceService.cs" />

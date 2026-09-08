@@ -447,11 +447,70 @@ Report-mode exit code is unchanged: still the maximum `classify_branch` return.
   clearing. That asymmetry is documented in the function header so a future reader does not "fix"
   it by removing the bound.
 
+**Decision 4 — report-mode exit code on a hard status read.**
+
+The propagation is intended and is retained. `classify_worktree_dirt` returns the version-control
+tool's exit code on a hard `status --porcelain` failure
+(`scripts/bash/cleanup_worktrees_dirt_lib.sh:342-344`), `run_report` propagates it
+(`scripts/bash/cleanup_worktrees_lib.sh:485-487`), and the wrapper propagates it in turn. A
+checkout containing such a worktree therefore exits non-zero from report mode where it previously
+exited 0 and produced a complete report.
+
+The operator consequence is what makes the propagation correct. Report mode is the read-only
+diagnostic pass that feeds the Dirty Worktree Triage Procedure. A worktree whose status read failed
+produces no `DIRTFILE|` record and no `DIRTSUM|` record at all, so a report that also exited 0 would
+be indistinguishable from a report about a clean worktree, and an operator would make a deletion
+decision on silently incomplete data.
+
+The rejected alternative was to suppress the propagation and emit a `WARN|` record instead. That
+would require adding a record type to the published Report Line Contract, which every downstream
+consumer would then have to handle, and it would leave the exit code unable to signal the
+incompleteness at all to a wrapping script that reads only the exit status.
+
+The precedent is in the same document. `.claude/skills/cleanup-merged-worktrees/SKILL.md:197-200`
+already documents an analogous apply-mode exit-status change introduced by issue 631. This decision
+mirrors that treatment for report mode: a `SKILL.md` note with its byte-identical bundle mirror, a
+new acceptance criterion (AC-43), and a test pinning exit 128 for the `dirty_worktree_status_error`
+scenario. No code change is made.
+
+**Decision 5 — DISPOSABLE_SESSION_ARTIFACT is retained and inert in drm-copilot.**
+
+The verdict is retained. It is not dead code and is not removed. It is unreachable in drm-copilot
+only, because `.gitignore:6` is `/artifacts` and the status read deliberately omits `--ignored`
+(`scripts/bash/cleanup_worktrees_dirt_lib.sh:29-33`, `:341`).
+
+The provenance of the 2026-09-06 observation that named the three paths is the TaskMaster checkout,
+not drm-copilot: the environment line records it, and in that checkout the three paths were reported
+by `git status --porcelain` and are therefore not ignored there. The tool is repository-agnostic and
+targets consumer checkouts, and delivery to them is by the extension push-down of
+`claude-customizations` recorded in `## Rollout & Follow-up`, so the rung is live exactly where the
+tool is used.
+
+The reachability mechanism is the inspected checkout's own ignore state, with no change to the
+status read. Adding `--ignored` is prohibited: it would pull every ignored build output into the
+classified set and, for any entry matching a disposable rung, into the cleared set. That prohibition
+is already stated in the library header and is reinforced by a test asserting that no status read
+the library issues carries `--ignored`, with a positive control.
+
+Retaining the rung is coverage-neutral. `dirt_is_session_artifact` at
+`scripts/bash/cleanup_worktrees_dirt_lib.sh:126-129` and its emission site at `:244-245` are already
+exercised by the `dirt_session_artifact` scenario and are absent from the uncovered set. Lines 74-77
+are reported uncovered only because they are the interior of the multi-line
+`CLEANUP_WT_SESSION_ARTIFACT_PATHS=(` array assignment, whose statement kcov attributes to its
+closing line 78, which is not in the uncovered set. That is the kcov multi-line-statement
+attribution property — the same one that reports lines 95, 148, 151 and 305 uncovered while the
+statements they open do execute — and not a reachability property.
+
 ## Assumptions, Constraints, Dependencies
 
 - Assumptions (environment, data, access):
-  - The operator runs the tool through WSL Ubuntu against a Windows checkout, and all toolchain
-    verification runs through the `wsl -d Ubuntu -- bash -lc '...'` form recorded below.
+  - The operator runs the tool through WSL Ubuntu against a Windows checkout. Toolchain
+    verification is split across two hosts rather than run through a single wrapper form. `shfmt`,
+    `shellcheck`, and `bats` run natively in the agent worktree, reached through
+    `bash scripts/bash/shell-qc.sh` with the bats binary supplied through the documented
+    `SHELL_QC_BATS_BIN` seam. `kcov` has no local route there, so coverage is measured by
+    dispatching `.github/workflows/_shell-coverage.yml` against the pushed branch, and that
+    dispatch measures the pushed tree rather than the working tree.
   - `/artifacts` is gitignored in drm-copilot (`.gitignore:6`). `git status --porcelain` without
     `--ignored` therefore never lists the three session-artifact paths in a drm-copilot worktree, so
     `DISPOSABLE_SESSION_ARTIFACT` cannot fire in this repository at runtime. The verdict is still
@@ -596,11 +655,16 @@ Seeded from issue:
 - Toolchain commands to run (format → lint → test → coverage):
 
 ```
-wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3944b95a7d58e712 && bash scripts/bash/shell-qc.sh format'
-wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3944b95a7d58e712 && bash scripts/bash/shell-qc.sh check'
-wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3944b95a7d58e712 && bash scripts/bash/shell-qc.sh test'
-wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a3944b95a7d58e712 && bash scripts/bash/shell-qc.sh test --coverage'
+bash scripts/bash/shell-qc.sh format
+bash scripts/bash/shell-qc.sh check
+env SHELL_QC_BATS_BIN=<absolute path to the bats executable> bash scripts/bash/shell-qc.sh test
+gh workflow run .github/workflows/_shell-coverage.yml --ref bug/cleanup-worktrees-dirt-classifier-632-r2
 ```
+
+  The first three commands run in the agent worktree. `kcov` has no local route there, so the
+  coverage stage is not a local command: the fourth line dispatches the CI workflow, which measures
+  the pushed tree rather than the working tree, and its merged Cobertura report is the coverage
+  measurement of record.
 
   The SKILL.md edits additionally require
   `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` to pass, which fails unless
@@ -613,130 +677,274 @@ wsl -d Ubuntu -- bash -lc 'cd /mnt/c/Users/DanMoisan/repos/drm-copilot/.claude/w
 
 ## Acceptance Criteria
 
-- [ ] `scripts/bash/cleanup_worktrees_dirt_lib.sh` exists, defines `classify_worktree_dirt`,
+- [x] `scripts/bash/cleanup_worktrees_dirt_lib.sh` exists, defines `classify_worktree_dirt`,
   `classify_dirt_entry`, the bounded staged-tree probe, and `clear_disposable_dirt`, runs nothing at
-  source time, and is sourced by `scripts/bash/cleanup-worktrees.sh` and by every
-  `tests/shell/test_cleanup_worktrees_*.bats` suite.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_build_artifact/` and a
+  source time, and is sourced by `scripts/bash/cleanup-worktrees.sh` and by every self-sourcing
+  `tests/shell/test_cleanup_worktrees_*.bats` suite, meaning every suite that itself sources
+  `scripts/bash/cleanup_worktrees_lib.sh`. Three suites fall outside that set and are excluded:
+  `tests/shell/test_cleanup_worktrees_scan_helper.bats`, which sources no cleanup-worktrees
+  library at all; `tests/shell/test_cleanup_worktrees_scan_seam.bats`, which sources only
+  `scripts/bash/cleanup_worktrees_report_records_lib.sh`; and
+  `tests/shell/test_cleanup_worktrees_cli.bats`, which references
+  `scripts/bash/cleanup_worktrees_dirt_lib.sh` but not `scripts/bash/cleanup_worktrees_lib.sh`,
+  so it too shows zero in the `cleanup_worktrees_lib.sh` column tabulated by the sourcing-set
+  evidence artifact.
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_build_artifact/` and a
   passing bats test assert a `DIRTFILE|` record whose verdict field is `DISPOSABLE_BUILD_ARTIFACT`
   for a tracked, modified `*.csproj` entry whose diff contains only `HintPath` lines.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_session_artifact/` and a
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_session_artifact/` and a
   passing bats test assert a `DIRTFILE|` record whose verdict field is
   `DISPOSABLE_SESSION_ARTIFACT` for `artifacts/pr_context.summary.txt`.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_content_on_main/` and a
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_content_on_main/` and a
   passing bats test assert a `DIRTFILE|` record whose verdict field is `CONTENT_ON_MAIN` for an
   untracked path whose `hash-object` blob equals `rev-parse main:<path>`.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_content_in_history/` and
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_content_in_history/` and
   a passing bats test assert a `DIRTFILE|` record whose verdict field is `CONTENT_IN_HISTORY` and
   whose detail field carries the SHA returned by `log --find-object`.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_tree_is_commit/`
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_staged_tree_is_commit/`
   and a passing bats test assert a `DIRTFILE|` record whose verdict field is
   `STAGED_TREE_IS_COMMIT` and whose detail field carries the matching commit SHA, and assert that
   the `DIRTSUM|` detail field carries the same SHA.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_unique/` and a passing
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_unique/` and a passing
   bats test assert a `DIRTFILE|` record whose verdict field is `UNIQUE` and a `DIRTSUM|` record
   whose aggregate field is `HAS_UNIQUE`.
-- [ ] The verdict field of every emitted `DIRTFILE|` record is one of exactly the six tokens
+- [x] The verdict field of every emitted `DIRTFILE|` record is one of exactly the six tokens
   `DISPOSABLE_BUILD_ARTIFACT`, `DISPOSABLE_SESSION_ARTIFACT`, `CONTENT_ON_MAIN`,
   `CONTENT_IN_HISTORY`, `STAGED_TREE_IS_COMMIT`, `UNIQUE`, and no other verdict token is produced
-  by any of the ten `dirt_*` scenarios.
-- [ ] In `dirt_staged_tree_is_commit`, the staged entries are labelled `STAGED_TREE_IS_COMMIT` and
+  by any of the twenty-nine `dirt_*` scenarios.
+- [x] In `dirt_staged_tree_is_commit`, the staged entries are labelled `STAGED_TREE_IS_COMMIT` and
   the stub argv log contains no `hash-object`, no `diff --quiet main`, and no `log --find-object`
   invocation for those paths, proving rung 1 precedes rungs 2 through 5.
-- [ ] In `dirt_session_artifact`, the argv log contains no git invocation naming
+- [x] In `dirt_session_artifact`, the argv log contains no git invocation naming
   `artifacts/pr_context.summary.txt`, proving rung 2 is a pure string comparison evaluated before
   rungs 3 through 5.
-- [ ] In `dirt_build_artifact`, the entry is labelled `DISPOSABLE_BUILD_ARTIFACT` and the argv log
+- [x] In `dirt_build_artifact`, the entry is labelled `DISPOSABLE_BUILD_ARTIFACT` and the argv log
   contains no `log --find-object` invocation for that path, proving rung 3 precedes rungs 4 and 5.
-- [ ] In `dirt_content_on_main`, the entry is labelled `CONTENT_ON_MAIN` and the argv log contains
+- [x] In `dirt_content_on_main`, the entry is labelled `CONTENT_ON_MAIN` and the argv log contains
   no `log --find-object` invocation, proving rung 4 precedes rung 5.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_classifier_read_error/`
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_classifier_read_error/`
   and a passing bats test assert that a classifier git read exiting non-zero produces `UNIQUE` for
   that entry, `HAS_UNIQUE` for the worktree, and a refused clear.
-- [ ] A tracked, modified `*.csproj` entry whose diff contains at least one changed line that is not
+- [x] A tracked, modified `*.csproj` entry whose diff contains at least one changed line that is not
   a `HintPath` rewrite is classified `UNIQUE` rather than `DISPOSABLE_BUILD_ARTIFACT`, pinned by a
   dedicated bats test.
-- [ ] For each worktree with dirt, report mode emits exactly one `DIRTFILE|` record per
-  `git status --porcelain` entry, in porcelain order, immediately after that worktree's `WORKTREE|`
-  record, followed by exactly one `DIRTSUM|` record; `dirt_mixed_unique_blocks` pins the two-entry
-  case.
-- [ ] The `DIRTSUM|` aggregate field is `ALL_DISPOSABLE` if and only if the entry count is at least
+- [x] For each non-detached candidate registration with dirt that the report classifies, report mode
+  emits exactly one `DIRTFILE|` record per `git status --porcelain` entry, in porcelain order,
+  immediately after that worktree's `WORKTREE|` record, followed by exactly one `DIRTSUM|` record;
+  `dirt_mixed_unique_blocks` pins the two-entry case. Detached, `main`, and `bare` registrations are
+  never classified and therefore receive no dirt records: the `is_detached_candidate` guard in
+  `run_report` skips a detached registration before the classification call, and the adjacent
+  `main`/`bare` guard excludes those two registration kinds as well.
+- [x] The `DIRTSUM|` aggregate field is `ALL_DISPOSABLE` if and only if the entry count is at least
   one and the `UNIQUE` count is zero, and is `HAS_UNIQUE` otherwise; a worktree with zero status
   entries emits neither a `DIRTFILE|` nor a `DIRTSUM|` record.
-- [ ] The `DIRTFILE|` detail field carries a commit SHA for `STAGED_TREE_IS_COMMIT` and
+- [x] The `DIRTFILE|` detail field carries a commit SHA for `STAGED_TREE_IS_COMMIT` and
   `CONTENT_IN_HISTORY` and is empty for the other four verdicts, and the file path is the last
   field of the record, pinned by a bats test using a fixture path containing a pipe character.
-- [ ] No existing record type changes: for `merged_with_worktree`, `merged_no_worktree`, `unmerged`,
+- [x] No existing record type changes: for `merged_with_worktree`, `merged_no_worktree`, `unmerged`,
   `content_neutral`, `residual_on_main`, `residual_unique_doc`, `current_exclusion`, and
   `main_divergence`, report-mode stdout is byte-identical to a checked-in expected-output file and
   contains no `DIRTFILE|` or `DIRTSUM|` line.
-- [ ] Apply-mode stdout without `--clear-disposable` is byte-identical to the pre-change output for
+- [x] Apply-mode stdout without `--clear-disposable` is byte-identical to the pre-change output for
   `dirty_worktree` and `dirty_worktree_status_error`, specifically retaining the three-field
   `DIRTY|` record and the `ACTION|worktree-remove|<path>|BLOCKED-DIRTY` record, and containing no
   `DIRTFILE|` or `DIRTSUM|` line.
-- [ ] `scripts/bash/cleanup_worktrees_actions_lib.sh` `remove_worktree_safe` is unchanged, and
+- [x] `scripts/bash/cleanup_worktrees_actions_lib.sh` `remove_worktree_safe` is unchanged, and
   `tests/shell/test_cleanup_worktrees_hard_failures.bats` and
   `tests/shell/test_cleanup_worktrees_deletion.bats` pass with no assertion edits, only the added
   `source` of the new library.
-- [ ] `bash scripts/bash/cleanup-worktrees.sh --clear-disposable` and
+- [x] `bash scripts/bash/cleanup-worktrees.sh --clear-disposable` and
   `bash scripts/bash/cleanup-worktrees.sh report --clear-disposable` each exit 2 and print usage to
   stderr, pinned by tests in `tests/shell/test_cleanup_worktrees_cli.bats`.
-- [ ] `--apply --clear-disposable` and `--clear-disposable --apply` both dispatch to apply mode,
+- [x] `--apply --clear-disposable` and `--clear-disposable --apply` both dispatch to apply mode,
   pinned by an argument-order-independence test in `tests/shell/test_cleanup_worktrees_cli.bats`.
-- [ ] A checked-in fixture
+- [x] A checked-in fixture
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_mixed_unique_blocks/` and a passing bats test
   assert that `--clear-disposable` on a worktree carrying at least one `UNIQUE` verdict emits
   `ACTION|dirt-clear|<path>|REFUSED-UNIQUE` and that the argv log contains no `reset --hard`, no
   `clean`, and no second `worktree remove`.
-- [ ] A checked-in fixture
+- [x] A checked-in fixture
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_clear_all_disposable/` and a passing bats test
   assert the argv order `reset --hard` → `clean -fd` → `worktree remove`, that
   `ACTION|dirt-clear|<path>|OK` is emitted, and that the argv log contains none of `--force`, `-x`,
   `-X`, or `-ff`.
-- [ ] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_clear_reverify_order/`
+- [x] A checked-in fixture `tests/fixtures/cleanup_worktrees/scenarios/dirt_clear_reverify_order/`
   and a passing bats test assert that a second `cherry main feature-dirt` invocation appears in the
   argv log after `reset --hard` and before the removal retry, and a direct bats test of
   `reverify_delete_eligible` against the existing `unmerged` fixture asserts it refuses a
   non-eligible branch.
-- [ ] `git worktree remove` is invoked from exactly the two existing call sites in
+- [x] `git worktree remove` is invoked from exactly the two existing call sites in
   `scripts/bash/cleanup_worktrees_actions_lib.sh` with no force flag; the clear-and-retry path
   routes through `remove_worktree_safe` and introduces no third call site.
-- [ ] Report mode is non-mutating: over `dirt_staged_tree_is_commit`, a bats test asserts the stub
+- [x] Report mode is non-mutating: over `dirt_staged_tree_is_commit`, a bats test asserts the stub
   argv and environment log contains no `write-tree`, no `stub-git-env: GIT_INDEX_FILE=`, no
   `/index`, no `reset`, no `clean`, no `worktree remove`, no `branch -D`, and no `hash-object -w`.
-- [ ] `tests/fixtures/cleanup_worktrees/stub-bin/git` logs `GIT_INDEX_FILE` to stderr when that
+- [x] `tests/fixtures/cleanup_worktrees/stub-bin/git` logs `GIT_INDEX_FILE` to stderr when that
   variable is set, so the non-mutation assertion above can fail when the property is violated.
-- [ ] Over `dirt_staged_tree_is_commit`, the argv log contains `diff-index --cached --quiet`, and
+- [x] Over `dirt_staged_tree_is_commit`, the argv log contains `diff-index --cached --quiet`, and
   every `status --porcelain` invocation issued by the new library carries `--no-optional-locks`.
-- [ ] The staged-tree probe never probes the first entry returned by `rev-list`, pinned in
+- [x] The staged-tree probe never probes the first entry returned by `rev-list`, pinned in
   `dirt_staged_tree_is_commit` by asserting no `diff-index` invocation names the HEAD SHA supplied
   in that fixture.
-- [ ] `wsl -d Ubuntu -- bash -lc '... bash scripts/bash/shell-qc.sh format'` and the same command
-  with `check` and with `test` each complete with no error in a single consecutive pass.
-- [ ] `wsl -d Ubuntu -- bash -lc '... bash scripts/bash/shell-qc.sh test --coverage'` reports kcov
-  line coverage of at least 85%; no branch-coverage gate applies to bash, and none is asserted.
-- [ ] Every shell file changed or added by this work is at or under 500 lines, measured at
+- [x] `bash scripts/bash/shell-qc.sh format`, `bash scripts/bash/shell-qc.sh check`, and
+  `bash scripts/bash/shell-qc.sh test` each complete with no error in a single consecutive pass,
+  run in the agent worktree with the bats binary supplied through the documented
+  `SHELL_QC_BATS_BIN` seam. The format stage is judged by a before-and-after tree digest over the
+  three discovery roots rather than by its exit code alone, because `shfmt` in write mode prints
+  nothing and exits 0 whether or not it rewrote a file.
+- [x] A dispatch of `.github/workflows/_shell-coverage.yml` against the pushed branch reports kcov
+  line coverage of at least 85% repository-wide, and `scripts/bash/cleanup_worktrees_dirt_lib.sh`
+  itself reports line coverage of at least 85% in the merged Cobertura report of that run. `kcov`
+  has no local route in the agent worktree, so the CI dispatch is the measurement path and no
+  local coverage invocation substitutes for it. No branch-coverage gate applies to bash, and none
+  is asserted.
+- [x] Every shell file changed or added by this work is at or under 500 lines, measured at
   integration time rather than assumed from the research projection.
-- [ ] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Report Line Contract documents `DIRTFILE|`
+- [x] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Report Line Contract documents `DIRTFILE|`
   and `DIRTSUM|` with their field lists and states that `DIRTY|` remains apply-mode-only with an
   unchanged three-field shape.
-- [ ] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Prohibited Shortcuts states that
+- [x] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Prohibited Shortcuts states that
   `--clear-disposable` is not an exception to the never-force-remove rule and is not force-removal,
   because it clears the working tree first and then retries the same unforced
   `git worktree remove`, and adds a bullet prohibiting any widening of the disposable-dirt
   definition.
-- [ ] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Dirty Worktree Triage Procedure states that
+- [x] `.claude/skills/cleanup-merged-worktrees/SKILL.md` Dirty Worktree Triage Procedure states that
   report mode now precedes the procedure with `DIRTFILE|` and `DIRTSUM|` records, scopes step 6 to
   the `HintPath`-confined build-artifact case, and amends step 9 to distinguish the automated
   clearing of classified-disposable dirt from the never-automated editorial discard of `UNIQUE`
   content.
-- [ ] `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
+- [x] `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
   is byte-identical to the canonical file, and
   `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passes.
-- [ ] The report-line contract comment block in `scripts/bash/cleanup_worktrees_lib.sh` and the
+- [x] The report-line contract comment block in `scripts/bash/cleanup_worktrees_lib.sh` and the
   `usage` here-doc in `scripts/bash/cleanup-worktrees.sh` both document `DIRTFILE|`, `DIRTSUM|`, and
   `--clear-disposable`, and `bash scripts/bash/cleanup-worktrees.sh --help` output contains all
   three strings, pinned by a test in `tests/shell/test_cleanup_worktrees_cli.bats`.
+- [x] AC-39 — Rung 1 resolves `STAGED_TREE_IS_COMMIT` only when the porcelain **Y** column is a
+  space. An `MM` entry falls through to the lower rungs, which compare working-tree content, and is
+  never labelled `STAGED_TREE_IS_COMMIT` on the strength of an index-only probe. This is pinned in
+  both directions by a single checked-in fixture carrying one `MM` entry and one `M ` entry, so the
+  same once-per-worktree probe result serves both directions.
+- [x] AC-40 — The ` -> ` payload split is applied only when the porcelain **X** column is `R` or
+  `C`. A non-rename entry whose path contains the literal ` -> ` is classified and reported under
+  its full path rather than under a truncated suffix, and a genuine `R` entry is still split so its
+  destination path is the one classified. Both directions are pinned.
+- [x] AC-41 — The diff header skip is anchored to the header forms the version-control tool emits,
+  so an added line whose content begins `+++ ` is counted as a changed content line and tested for
+  `HintPath`, while a `/dev/null` header is still skipped. Both directions are pinned.
+- [x] AC-42 — `STAGED_TREE_IS_COMMIT` is pinned in five material directions, the two hard-failure
+  sites counted separately: probe match; probe no-match; probe hard read failure at the `rev-list`
+  site; probe hard read failure at the `diff-index` site; and a staged entry with a non-space Y
+  column.
+- [x] AC-43 — Report mode returns the version-control tool's non-zero exit code when a candidate
+  worktree's `status --porcelain` read fails, emits no `DIRTFILE|` and no `DIRTSUM|` record for that
+  worktree, and the behaviour is documented in
+  `.claude/skills/cleanup-merged-worktrees/SKILL.md` and pinned by a test over the checked-in
+  `dirty_worktree_status_error` scenario.
+- [x] AC-44 — `DISPOSABLE_SESSION_ARTIFACT` is retained as repository-agnostic behaviour and is
+  inert in drm-copilot because `.gitignore:6` ignores `/artifacts`. The status read never carries
+  `--ignored`, pinned by a test asserting its absence from the stub argv log with a positive
+  control.
+- [x] AC-45 — `scripts/bash/cleanup_worktrees_dirt_lib.sh` reports kcov line coverage of at least
+  85% in the merged Cobertura report of the CI coverage run against the pushed branch.
+- [x] AC-46 — Rung 4's tracked half resolves `CONTENT_ON_MAIN` only when the path is present in
+  `main`; a `diff --quiet` exit 0 over a pathspec matching nothing in either tree advances the
+  ladder rather than resolving a verdict, so an `AD` entry whose content exists only as a staged
+  blob is `UNIQUE` and its worktree is `HAS_UNIQUE`; both directions are pinned by a single
+  checked-in fixture carrying one `AD` entry and one tracked entry whose content is present in
+  `main`.
+- [x] AC-47 — Every line in `scripts/bash/cleanup_worktrees_dirt_lib.sh` that carries an arithmetic
+  comparison of a variable against a numeric literal carries a `# guard:` marker; the marked lines
+  plus the nine named non-arithmetic verdict guards — the diff-header skip, rung 1's Y-column
+  gate, the empty-blob fail-closed test, rung 4's untracked main-blob equality test, rung 5's
+  history-hit test, the ` -> ` payload split gate, the `UNIQUE` tally, the clear's
+  `ALL_DISPOSABLE` precondition, which are the sites that produced findings R1, R2, and R5, and
+  the two-content-bearing-columns fail-closed test registered as
+  `index-and-worktree-both-hold-content` — are
+  together registered in `tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv` under
+  (`id`, `mutation`) row identity. Every registered row's neutralization is a semantic one, being
+  either one of the nine non-arithmetic mutations the remediation plan fixes by literal or the
+  arithmetic guard's own comparison rewritten to a constant, so a mutation that edits only a
+  comment or only whitespace is rejected by the suite.
+  `tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats` neutralizes each registered row in
+  an in-memory copy of the library and requires, for every row, that the named scenario directory
+  exists under a name beginning `dirt_`, that the substitution changed exactly one line and that
+  the changed line still differs once the marker comment is stripped and whitespace runs are
+  collapsed, that the mutated source parses, and that the unmutated `classify_worktree_dirt` call
+  emitted at least one `DIRTFILE|` record. A registry row's kind is `SEPARATED` or `ARGV`, and no
+  other kind is admissible. The two row kinds partition the outcome space of two
+  comparisons for a (`mutation`, `scenario`) pair, and each asserts both the difference and the
+  identity it
+  names, so a `SEPARATED` row's record stream and exit status must differ, and an `ARGV` row's
+  record stream must be identical while its argv log differs. Both kinds therefore require an
+  observed difference on one of the two channels, which is possible only if the guard executed,
+  so a scenario under which the ladder never reaches the guard makes a row fail rather than pass.
+  The pin floor over the marked ids is specified by AC-49.
+  The three pins that fall on the two library lines carrying an arithmetic guard and a named
+  non-arithmetic guard together are keyed to the pair (`id`, `mutation`) rather than to `id`,
+  because a single marker on such a line backs two registry rows and an id-keyed pin on it is
+  discharged by either one. An arithmetic guard-shaped line with no marker, a marker with no
+  registry row, or a registry row naming an unmarked id fails the suite.
+- [x] AC-48 — When a porcelain status entry's X column and Y column both carry a content-bearing
+  letter — `M`, `A`, `R`, `C`, `T` or `U` — the entry's content exists in the index and in the
+  working tree and the two differ, so rung 4's tracked half and rung 5, which compare only
+  working-tree content, do not resolve a disposable verdict for it and the entry falls through to
+  `UNIQUE`. `AD` and `MD` are unaffected, because a `D` in the Y column means the working tree
+  holds no content for that path and there is only one blob to account for. Rung 3 is unaffected,
+  because `dirt_is_build_artifact` reads the cached diff as well as the worktree diff. Both
+  directions are pinned by a single checked-in fixture, `dirt_index_and_worktree_delta`, carrying
+  an `MM` entry decided at rung 4, an `MM` entry decided at rung 5, a `UU` entry, and a control
+  entry that must still resolve `CONTENT_ON_MAIN`.
+  `tests/shell/test_cleanup_worktrees_dirt_content_locations.bats` additionally requires, for
+  every `DIRTFILE|` record whose verdict is neither `UNIQUE` nor `DISPOSABLE_SESSION_ARTIFACT`
+  across every checked-in `dirt_*` scenario, that the stub argv log carry a read of every location
+  holding that entry's content, and requires each of the eight status codes `??`, `M `, `A `,
+  `R `, ` M`, `AD`, `MM` and `UU` to appear in some checked-in scenario. The strength of the
+  letter pin is stated here rather than left to be read as a per-letter executed claim. Exactly
+  three of the letter decisions carry an executed direction: `M` in the both-columns position, by
+  the first two of the four `dirt_index_and_worktree_delta` fail-closed tests; `U`, by the third;
+  and the exclusion of the space, by the fourth, whose `M ` control must still resolve
+  `CONTENT_ON_MAIN` and would resolve `UNIQUE` if the space were admitted to the class. Every
+  other letter decision — the inclusion of `A`, `R`, `C` and `T`, and the exclusion of `D`, `?`
+  and `!` — is held only by the character class on the single guard line, which is asserted
+  literally by the registry's `index-and-worktree-both-hold-content` row and by the remediation
+  plan's library search over that line. The `D` case is the one worth stating explicitly, because
+  it is easy to assume `dirt_tracked_staged_only_blob` pins it and it does not: that scenario's
+  `AD` entry already resolves `UNIQUE` through the earlier `((erc == 0))` guard, since its
+  `rev-parse.verify.main_staged_only.md.rc` fixture holds `1` and the path is therefore absent
+  from `main`, so admitting `D` to the class would block a branch that entry never takes. No
+  behavioural assertion would move under such a change to the class. The class text is
+  nevertheless coupled to the registry literal: the `index-and-worktree-both-hold-content` row
+  quotes the character class verbatim inside its mutation, so a library-only edit to the class
+  makes that substitution inert, the registry suite's Obligation 2 records the mismatch, and that
+  suite goes red. An edit coordinated across the library line and the registry literal leaves
+  every test green. The two excluded verdicts are excluded for stated reasons: `UNIQUE` is the
+  fail-closed direction and asserts nothing about recoverability, and
+  `DISPOSABLE_SESSION_ARTIFACT` is an exact-path authorization that issues no git call and makes
+  no content inference, so there is no comparison for it to be missing. The coverage floor is
+  bounded: it covers the classes the classifier's own branching distinguishes — the untracked
+  test, rung 1's X-and-Y gate, the rename and copy payload split, and the
+  two-content-bearing-columns gate — and does not enumerate every pair porcelain can emit.
+- [x] AC-49 — `tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv` admits exactly two row
+  kinds, `SEPARATED` and `ARGV`. A row carrying any other kind fails the gate on a named
+  invariant, reported as `INVARIANT-8 inadmissible kind:` by the registry suite's first test and,
+  for a row whose scenario directory exists, as `OBLIGATION-5 channel comparison failed:` by its
+  second. Both admissible kinds require an observed difference between the mutated and the
+  unmutated run — a `SEPARATED` row on the record channel, an `ARGV` row on the argv log — and an
+  observed difference is possible only if the guard executed, so naming a scenario under which
+  the ladder never reaches the guard makes the row fail rather than pass. Every marker id read
+  from `scripts/bash/cleanup_worktrees_dirt_lib.sh` must carry at least one `SEPARATED` registry
+  row, with a single exception: `history-scan-bounded-range` is pinned `ARGV` instead, because
+  the git stub keys `log --find-object` on the object id alone, so the bounded-range endpoint
+  changes the invocation without changing any record and no checked-in scenario can make that
+  guard separate on the record channel. The exception set is the hard-coded `ARGV_ONLY_IDS` array
+  in the registry suite and has exactly that one member. The two library lines that carry an
+  arithmetic guard and a named non-arithmetic guard together remain pinned by the pair
+  (`id`, `mutation`) rather than by `id`, because an id-keyed pin on either is discharged by
+  whichever of that id's two rows carries the demanded kind and leaves the other row
+  unconstrained. This criterion makes no claim that the gate detects a missing comparison between
+  a verdict and the locations holding an entry's content; that property is AC-48's, and the two
+  criteria are therefore not overlapping.
 
 ## Risks & Mitigations
 

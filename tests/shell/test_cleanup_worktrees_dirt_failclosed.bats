@@ -1,0 +1,283 @@
+#!/usr/bin/env bats
+# Staged-tree rung and fail-closed branch tests for the dirt classifier in
+# scripts/bash/cleanup_worktrees_dirt_lib.sh (issue #632).
+#
+# SUBJECT. Two things that the verdict suite in
+# tests/shell/test_cleanup_worktrees_dirt_classify.bats does not cover.
+#
+# First, the staged-tree rung in all five of its material directions, counting the
+# probe's two hard-failure sites separately: the probe matches an ancestor tree; the
+# probe matches nothing; the probe's rev-list read hard-fails; the probe's diff-index
+# read exits above 1; and a staged entry whose porcelain Y column is not a space. The
+# fourth and fifth are the dangerous ones. A rung that answered STAGED_TREE_IS_COMMIT
+# from an index-only probe would label an MM entry disposable, and --clear-disposable
+# would then run reset --hard over an unstaged delta that exists in no commit and not in
+# the index.
+#
+# Second, the classifier's fail-closed branches: the ladder's UNIQUE emissions that are
+# reached only when a classifier read failed, and the clear's FAILED record. Every one of
+# them is the branch that decides what happens when the tool could not read what it
+# needed. Fail-closed is the property that stops the tool from reporting "safe to delete"
+# about content that exists only in that worktree, so a branch of this kind that is never
+# executed is a branch whose direction nothing holds.
+#
+# Every negative assertion here is paired with a positive control, because an assertion
+# that only names what must be absent also passes in a build where no classification ran
+# at all.
+#
+# No temporary files; no scratch git repositories. Every fixture is checked in.
+
+setup() {
+    REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
+    ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
+    LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
+    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
+    STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
+    SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
+    WT="/repo-wt/dirt"
+    chmod +x "${STUB}" 2>/dev/null || true
+}
+
+dirt() { # dirt <scenario> -> classify_worktree_dirt with the stub argv log DISCARDED
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; classify_worktree_dirt '${WT}' 2>/dev/null"
+}
+
+dirt_log() { # dirt_log <scenario> -> the same run, KEEPING the stub argv log
+    # No 2>/dev/null here: the stub writes its `stub-git: <argv>` log to stderr and bats
+    # `run` merges stderr into $output, which is what the argv assertions read.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; classify_worktree_dirt '${WT}'"
+}
+
+argv_log() { # argv_log -> only the stub's argv lines from the merged $output
+    # Filtering to the `stub-git: ` lines matters: the emitted DIRTFILE records also
+    # carry file paths, so a search over the whole merged output would report a path as
+    # "named by a git invocation" when it appeared only in a record.
+    printf '%s\n' "$output" | grep '^stub-git: ' || true
+}
+
+@test "dirt_staged_tree_worktree_delta: the MM entry is not STAGED_TREE_IS_COMMIT and the worktree is not ALL_DISPOSABLE" {
+    dirt dirt_staged_tree_worktree_delta
+    [ "$status" -eq 0 ]
+    # The X column is M, so the index differs from HEAD and the probe matches eeee7777.
+    # But the Y column is also M, so the WORKING TREE differs from the index as well, and
+    # the probe answered a question about the index only. Labelling this entry disposable
+    # would let --clear-disposable run reset --hard over an unstaged modification that
+    # exists in no commit and not in the index.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||MM|src/a.cs'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *'DIRTFILE|/repo-wt/dirt|STAGED_TREE_IS_COMMIT|eeee7777|MM|src/a.cs'* ]]
+    [[ "$output" != *"ALL_DISPOSABLE"* ]]
+}
+
+@test "dirt_staged_tree_worktree_delta: the M-space entry in the same fixture is still STAGED_TREE_IS_COMMIT" {
+    dirt dirt_staged_tree_worktree_delta
+    [ "$status" -eq 0 ]
+    # The other half of the pin, and the reason the two entries live in ONE fixture: they
+    # differ only in the Y column, so the same once-per-worktree probe result serves both
+    # directions. A fix that simply disabled rung 1 would fail here.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|STAGED_TREE_IS_COMMIT|eeee7777|M |src/b.cs'* ]]
+}
+
+@test "dirt_staged_tree_no_match: a staged index matching no ancestor tree is UNIQUE not STAGED_TREE_IS_COMMIT" {
+    dirt dirt_staged_tree_no_match
+    [ "$status" -eq 0 ]
+    # The probe's ordinary negative answer. diff-index exits 1 for the one candidate the
+    # fixture offers, so no ancestor tree equals the index and rung 1 must decline. The
+    # entry then falls to rung 6 through the hash-object-empty fail-closed branch.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||M |src/a.cs'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"STAGED_TREE_IS_COMMIT"* ]]
+    [[ "$output" != *"ALL_DISPOSABLE"* ]]
+}
+
+@test "dirt_staged_probe_revlist_error: a rev-list hard failure maps the staged entry to UNIQUE" {
+    dirt_log dirt_staged_probe_revlist_error
+    [ "$status" -eq 0 ]
+    # The probe's FIRST hard-failure site. A rev-list exit above 0 carries no verdict
+    # about the index, so the probe returns 2, the caller sets the ERROR sentinel, and
+    # rung 1 emits UNIQUE. Reading the failure as a no-match would be indistinguishable
+    # from a real no-match; reading it as a match would be data loss.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||M |src/a.cs'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"STAGED_TREE_IS_COMMIT"* ]]
+    [[ "$output" != *"ALL_DISPOSABLE"* ]]
+    log="$(argv_log)"
+    # Positive control. Without it this test passes in any build where no classification
+    # ran at all, including one with the probe deleted outright.
+    [[ "$log" == *"rev-list --max-count=201 HEAD"* ]]
+}
+
+@test "dirt_staged_probe_diffindex_error: a diff-index exit above one maps the staged entry to UNIQUE" {
+    dirt_log dirt_staged_probe_diffindex_error
+    [ "$status" -eq 0 ]
+    # The probe's SECOND hard-failure site, counted separately because it is a different
+    # line reached through a different read. diff-index exits 1 to mean "this tree is not
+    # the index", which is its defined negative answer; an exit ABOVE 1 carries no verdict
+    # at all and must not be collapsed into the no-match case.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||M |src/a.cs'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"STAGED_TREE_IS_COMMIT"* ]]
+    [[ "$output" != *"ALL_DISPOSABLE"* ]]
+    log="$(argv_log)"
+    # Positive control: the probe reached its second read, so the failure observed is the
+    # diff-index site and not the rev-list site.
+    [[ "$log" == *"diff-index --cached --quiet eeee7777"* ]]
+}
+
+@test "dirt_tracked_read_errors: a rung-3 diff read failure and a rung-4 probe failure both map to UNIQUE" {
+    dirt dirt_tracked_read_errors
+    [ "$status" -eq 0 ]
+    # Two entries, two different fail-closed sites in one fixture. The csproj entry's
+    # rung-3 content read hard-fails, so dirt_is_build_artifact returns 2 and the entry
+    # must NOT be declared a build artifact on a diff nobody could read. The tracked
+    # markdown entry's rung-4 probe exits above 1, which carries no verdict about whether
+    # the contents match main, so it must not be declared CONTENT_ON_MAIN either.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE|| M|src/Legacy/Legacy.csproj'* ]]
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE|| M|docs/tracked.md'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"DISPOSABLE_BUILD_ARTIFACT"* ]]
+    [[ "$output" != *"CONTENT_ON_MAIN"* ]]
+}
+
+@test "dirt_history_read_error: a find-object read failure maps the untracked entry to UNIQUE" {
+    dirt_log dirt_history_read_error
+    [ "$status" -eq 0 ]
+    # The last read in the ladder. `log --find-object` exiting non-zero says nothing about
+    # whether the blob is in history, so the entry fails closed rather than advancing to a
+    # disposable verdict. The fixture also drives the depth fallback: rev-parse --verify
+    # on the bounded endpoint exits 1, so the scan uses the plain `main` ref.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||??|docs/old.md'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"CONTENT_IN_HISTORY"* ]]
+    log="$(argv_log)"
+    # Positive control: the history walk was actually attempted, so the absence of
+    # CONTENT_IN_HISTORY is the fail-closed branch rather than a ladder that stopped early.
+    [[ "$log" == *"--find-object"* ]]
+}
+
+@test "dirt_tracked_staged_only_blob: an AD entry whose content is only a staged blob is UNIQUE" {
+    dirt dirt_tracked_staged_only_blob
+    [ "$status" -eq 0 ]
+    # N1's negative direction. AD means the file was added to the index and then removed
+    # from the working tree, so its content exists ONLY as a staged blob: in no commit and
+    # not on disk. The rung-4 tracked probe exits 0 here, but it does so because the
+    # pathspec selected nothing, not because the content matches main's. Rung 4 must not
+    # read that exit as a match. It advances instead, and the blob read exits 128 because
+    # the file is absent from the worktree, so the entry fails closed to UNIQUE. Were it
+    # CONTENT_ON_MAIN the worktree would aggregate ALL_DISPOSABLE and the clear would
+    # discard the index entry, leaving the staged blob unreachable.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||AD|staged_only.md'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *'CONTENT_ON_MAIN||AD|'* ]]
+    [[ "$output" != *"ALL_DISPOSABLE"* ]]
+}
+
+@test "dirt_tracked_staged_only_blob: a tracked entry whose content is on main is still CONTENT_ON_MAIN" {
+    dirt dirt_tracked_staged_only_blob
+    [ "$status" -eq 0 ]
+    # The other half of the pin, and the reason both entries live in ONE fixture: the
+    # narrowing must reject the empty-pathspec case without disabling the rung. This entry
+    # is present in main and its content equals main's, so both of rung 4's tracked reads
+    # answer affirmatively and the disposable verdict still stands. A fix that simply
+    # stopped rung 4 emitting CONTENT_ON_MAIN would pass the AD test above and fail here.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|CONTENT_ON_MAIN||M |docs/tracked.md'* ]]
+}
+
+@test "dirt_tracked_probe_error_in_history: a rung-4 hard read failure is UNIQUE even when the blob is in history" {
+    dirt_log dirt_tracked_probe_error_in_history
+    [ "$status" -eq 0 ]
+    # N2's first site. `diff --quiet main -- <path>` exits 128 here, and an exit above 1
+    # carries no verdict, so the entry maps to UNIQUE and the ladder stops at that guard.
+    # The scenario deliberately supplies BOTH a hash-object payload and a matching
+    # log --find-object payload for it, so a build in which the guard is removed reaches
+    # rung 5, finds the blob, and answers CONTENT_IN_HISTORY. That pairing is what makes
+    # the absence assertion below able to fail; without it the assertion would hold in a
+    # build with no guard at all.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE|| M|docs/tracked.md'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"CONTENT_IN_HISTORY"* ]]
+    log="$(argv_log)"
+    # Positive control for the absence assertion: the rung-4 probe whose failure produces
+    # the verdict was actually issued, so classification ran rather than stopping earlier.
+    [[ "$log" == *"diff --quiet main -- docs/tracked.md"* ]]
+    # The history walk is correctly NOT in the log, because the guard returns before the
+    # blob read. That the guard rather than a missing fixture is what stops it is proved
+    # by tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats, which neutralizes
+    # this guard and observes the record change to CONTENT_IN_HISTORY.
+    [[ "$log" != *"--find-object"* ]]
+}
+
+@test "dirt_build_artifact_empty_diff: a csproj whose diff pair is empty is UNIQUE not a build artifact" {
+    dirt_log dirt_build_artifact_empty_diff
+    [ "$status" -eq 0 ]
+    # N2's second site. Both halves of rung 3's diff pair are zero-byte payloads, so the
+    # confinement test sees no changed content line at all and answers "every changed line
+    # is a HintPath rewrite" over an empty set. Vacuous confinement is the fail-open
+    # direction: it would let a read that returned nothing resolve to a disposable verdict
+    # on a project file. The guard maps a zero-line diff pair to "not a build artifact",
+    # and the entry then falls to rung 6 and is UNIQUE.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE|| M|src/Legacy/Legacy.csproj'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *"DISPOSABLE_BUILD_ARTIFACT"* ]]
+    log="$(argv_log)"
+    # Positive control for the absence assertion: both halves of the diff pair were read,
+    # so the entry reached the vacuous-confinement guard rather than being rejected by
+    # rung 3's path case before any git call.
+    [[ "$log" == *"diff --no-color -U0 -- src/Legacy/Legacy.csproj"* ]]
+    [[ "$log" == *"diff --no-color -U0 --cached -- src/Legacy/Legacy.csproj"* ]]
+}
+
+@test "dirt_index_and_worktree_delta: an MM entry whose working-tree content is on main is UNIQUE" {
+    dirt dirt_index_and_worktree_delta
+    [ "$status" -eq 0 ]
+    # N3's rung-4 direction. Both porcelain columns are content-bearing, so content exists
+    # in the index AND in the working tree as two distinct blobs. Rung 4's tracked half
+    # compares main to the WORKING TREE only: its probe exits 0 here and main holds content
+    # at the path, so the rung would answer CONTENT_ON_MAIN on the strength of a comparison
+    # that says nothing about the index blob. That blob is in no commit, so the worktree
+    # would aggregate ALL_DISPOSABLE and --clear-disposable would run reset --hard and drop
+    # it. The entry must fail closed instead.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||MM|src/a.cs'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    [[ "$output" != *'CONTENT_ON_MAIN||MM|src/a.cs'* ]]
+    [[ "$output" != *"ALL_DISPOSABLE"* ]]
+}
+
+@test "dirt_index_and_worktree_delta: an MM entry whose working-tree blob is in history is UNIQUE" {
+    dirt dirt_index_and_worktree_delta
+    [ "$status" -eq 0 ]
+    # N3's rung-5 direction, in the same fixture and reached by a different route: this
+    # entry's rung-4 probe exits 1, so it advances to rung 5, which hashes the WORKING-TREE
+    # file and finds that blob in history. Rung 5 reads the same single location rung 4
+    # does, so the same two-blob argument applies and the same disposable verdict would be
+    # wrong. The scenario supplies both a hash-object payload and a matching find-object
+    # payload, which is what makes the absence assertion below able to fail: without the
+    # new guard the ladder reaches rung 5, finds ffff3333, and answers CONTENT_IN_HISTORY.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||MM|src/b.cs'* ]]
+    [[ "$output" != *'CONTENT_IN_HISTORY|ffff3333|MM|src/b.cs'* ]]
+}
+
+@test "dirt_index_and_worktree_delta: a UU entry whose working-tree content is on main is UNIQUE" {
+    dirt dirt_index_and_worktree_delta
+    [ "$status" -eq 0 ]
+    # The unmerged shape of the same defect, and the reason the guard's character class is
+    # not narrowed to M A R C. An unmerged entry holds content at index stages 2 and 3, so
+    # a UU entry whose working-tree copy has been edited back to main's content reaches
+    # rung 4's positive answer by exactly the route the MM entry above does, while two
+    # index-side blobs that are in no commit sit behind it.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||UU|src/c.cs'* ]]
+    [[ "$output" != *'CONTENT_ON_MAIN||UU|src/c.cs'* ]]
+}
+
+@test "dirt_index_and_worktree_delta: the M-space control entry in the same fixture is still CONTENT_ON_MAIN" {
+    dirt dirt_index_and_worktree_delta
+    [ "$status" -eq 0 ]
+    # The positive direction, and the reason all four entries live in ONE fixture so that a
+    # single status read serves both directions. This entry's Y column is a space, so the
+    # index blob and the working-tree blob are the same blob and one probe accounts for
+    # both. Rung 4 must still answer CONTENT_ON_MAIN for it. A "fix" that simply disabled
+    # rungs 4 and 5 would pass the three tests above and fail here.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|CONTENT_ON_MAIN||M |docs/tracked.md'* ]]
+}

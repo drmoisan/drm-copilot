@@ -44,6 +44,8 @@
 #   WORKTREE|<path>|DETACHED|<state>|<flags>   (detached registration; replaces the above)
 #   WARN|main-divergence|<local-sha>|<origin-sha>
 #   DIRTY|<worktree-path>|<status-porcelain-line>
+#   DIRTFILE|<worktree-path>|<verdict>|<detail>|<status-code>|<file-path>
+#   DIRTSUM|<worktree-path>|<aggregate>|<detail>   (aggregate gates --clear-disposable)
 #   ACTION|<verb>|<target>|<result>   (apply mode only; emitted by the actions lib)
 #   ORPHAN_DIR|<path>|<size>          advisory, read-only records defined in
 #   STALE_REF|<refname>               cleanup_worktrees_report_records_lib.sh; none of
@@ -479,6 +481,10 @@ run_report() {
 		# A detached registration is emitted by report_detached_worktrees instead.
 		is_detached_candidate "$wflags" && continue
 		printf 'WORKTREE|%s|%s|%s\n' "$wpath" "$wbranch" "$wflags"
+		# Dirt verdicts for a candidate registration only; main and bare are never candidates.
+		if [[ ,$wflags, != *,main,* && ,$wflags, != *,bare,* ]]; then
+			classify_worktree_dirt "$wpath" || rc=$?
+		fi
 	done <<<"$wlout"
 	report_detached_worktrees "$wlout" || rc=$?
 	crc=0

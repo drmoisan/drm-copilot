@@ -16,6 +16,7 @@ setup() {
     RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
     DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
+    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
@@ -33,7 +34,7 @@ runin() { # runin <scenario> <function-invocation>
     # the function's stdout report lines only (bats `run` otherwise merges stderr).
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
         CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${RLIB}'; source '${ALIB}'; source '${DLIB}'; $2 2>/dev/null"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${RLIB}'; source '${ALIB}'; source '${DLIB}'; $2 2>/dev/null"
 }
 
 # --- Fail-before-red set (assert post-fix behavior; red before Phase 3 fixes) ---
