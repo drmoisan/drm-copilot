@@ -125,6 +125,12 @@ count_of() { # count_of <pattern>
 
 @test "dirt_mixed_unique_blocks: a refused clear runs no reset, no clean, and no second worktree remove" {
     clear_candidate dirt_mixed_unique_blocks
+    # Positive control, and the reason this test is not vacuous: the clearing hook must
+    # have been REACHED and have refused. Without this line the three negative
+    # assertions below would also hold for a build in which the hook never ran at all,
+    # which is the state that cannot be distinguished from a correct refusal by absence
+    # alone.
+    [[ "$output" == *'ACTION|dirt-clear|/repo-wt/dirt|REFUSED-UNIQUE'* ]]
     log="$(argv_log)"
     ! printf '%s\n' "$log" | grep -qE '(^| )reset( |$)'
     ! printf '%s\n' "$log" | grep -qE '(^| )clean( |$)'

@@ -99,6 +99,11 @@ setup() {
     run bash -c "CLEANUP_WT_GIT_BIN='${STUB}' CLEANUP_WT_SCAN_BIN='${SCAN}' CLEANUP_WT_STUB_SCENARIO='${SCEN}/merged_with_worktree' bash '${WRAPPER}' --clear-disposable 2>&1 1>/dev/null"
     [ "$status" -eq 2 ]
     [[ "$output" == *"Usage: cleanup-worktrees.sh"* ]]
+    # The usage text printed on this rejection must document the flag the operator just
+    # supplied. This also distinguishes a deliberate rejection by the flag pre-pass from
+    # the wrapper's pre-existing unknown-argument arm, which produces the same exit code
+    # and the same usage text for any unrecognised word.
+    [[ "$output" == *"--clear-disposable"* ]]
 }
 
 @test "report --clear-disposable prints usage to stderr and exits 2" {
@@ -113,6 +118,7 @@ setup() {
     run bash -c "CLEANUP_WT_GIT_BIN='${STUB}' CLEANUP_WT_SCAN_BIN='${SCAN}' CLEANUP_WT_STUB_SCENARIO='${SCEN}/merged_with_worktree' bash '${WRAPPER}' report --clear-disposable 2>&1 1>/dev/null"
     [ "$status" -eq 2 ]
     [[ "$output" == *"Usage: cleanup-worktrees.sh"* ]]
+    [[ "$output" == *"--clear-disposable"* ]]
     [[ "$output" != *"stub-git:"* ]]
 }
 
