@@ -30,6 +30,16 @@ source "$SCRIPT_DIR/cleanup_worktrees_actions_lib.sh"
 # shellcheck source=scripts/bash/cleanup_worktrees_detached_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_detached_lib.sh"
+# The line-ending and index group is sourced immediately before the preserve library,
+# whose read-only planning phase calls the functions it defines.
+# shellcheck source=scripts/bash/cleanup_worktrees_preserve_eol_lib.sh
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/cleanup_worktrees_preserve_eol_lib.sh"
+# The preserve library is sourced last because it calls cleanup_wt_git, defined in the
+# enumeration library, and consolidation_worktree_path, defined in the actions library.
+# shellcheck source=scripts/bash/cleanup_worktrees_preserve_lib.sh
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/cleanup_worktrees_preserve_lib.sh"
 
 usage() {
 	# Print the wrapper usage/help text.
@@ -45,6 +55,16 @@ Commands:
                        re-verification, removing worktrees without force and deleting
                        branches with -D. Never acts on NOT_MERGED,
                        HAS_UNIQUE_RESIDUALS, or PROTECTED_CURRENT candidates.
+  preserve | --preserve
+                       Stage the manifest's preserved_files[] findings onto the
+                       consolidation branch. Takes no operand; the manifest path comes
+                       from CLEANUP_WT_MANIFEST_PATH. Copies each named source file
+                       verbatim, carries its MEMORY.md index line across using the
+                       destination file's own re-derived line-ending convention, and
+                       refuses the whole pass when the incoming bytes carry a
+                       host-identifying token. Exit 0 clean, 1 something was skipped or
+                       an index was created, 3 host-token hard stop, 127 a required tool
+                       could not be resolved.
   --help | -h | help   Print this help and exit 0.
 
 Report lines (pipe-delimited, LC_ALL=C ordered): BRANCH|<name>|<state>;
@@ -53,7 +73,10 @@ WORKTREE|<path>|<branch>|<flags> for a branch-backed worktree registration;
 WORKTREE|<path>|DETACHED|<state>|<flags> for a detached-HEAD worktree registration,
 which is classified on its own HEAD SHA and whose fifth field preserves the porcelain
 locked and prunable markers; WARN|main-divergence|<local>|<origin>;
-DIRTY|<path>|<status>; ACTION|<verb>|<target>|<result> (apply mode).
+DIRTY|<path>|<status>; ACTION|<verb>|<target>|<result> (apply mode);
+PRESERVE|<worktree-path>|<source-path>|<verdict> (preserve mode), a manifest
+preserved_files[] finding staged onto the consolidation branch, whose per-file outcome is
+reported by the companion ACTION|preserve-stage|... record.
 
 Advisory, read-only records (report and apply mode; none unlocks a destructive action):
 ORPHAN_DIR|<path>|<size> for a scanned directory with no .git pointer file and no
@@ -88,12 +111,21 @@ Environment overrides:
                                scan stubs (tests only).
   CLEANUP_WT_CONSOLIDATION_PATH Override the derived consolidation worktree path
                                (<main-worktree-path>-wt/documentationandmemories).
+  CLEANUP_WT_MANIFEST_PATH     Path to the cleanup-worktrees manifest read by preserve
+                               mode. Defaults to
+                               artifacts/orchestration/cleanup-worktrees-manifest.json.
+  CLEANUP_WT_JQ_BIN            Path to the jq binary used to read that manifest; an empty
+                               or nonexistent value is treated as missing (falls back to
+                               PATH jq). No default. This is the jq test-stub seam.
 EOF
 }
 
 main() {
 	# Dispatch on the first argument. No args or `report` runs the dry-run report;
-	# `--apply`/`apply` runs apply mode; `--help`/`-h`/`help` prints usage and exits 0;
+	# `--apply`/`apply` runs apply mode; `preserve`/`--preserve` stages the manifest's
+	# preserved_files[] findings onto the consolidation branch and takes no operand,
+	# reading its manifest path from CLEANUP_WT_MANIFEST_PATH; `--help`/`-h`/`help`
+	# prints usage and exits 0;
 	# anything else prints usage to stderr and exits 2 (usage-error parity with
 	# shell-qc.sh). Subcommand return codes are captured so an intermediate failure is
 	# never masked before the final exit.
@@ -105,6 +137,9 @@ main() {
 		;;
 	--apply | apply)
 		run_apply || exit_code=$?
+		;;
+	preserve | --preserve)
+		run_preserve || exit_code=$?
 		;;
 	--help | -h | help)
 		usage

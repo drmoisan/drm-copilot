@@ -877,105 +877,105 @@ Each criterion has a stable ID. Criteria naming a bats test assert that the name
 named file and passes in a `bash scripts/bash/shell-qc.sh test` run. No criterion asserts a count,
 an enumeration size, or a population.
 
-- [ ] **AC-01** `scripts/bash/cleanup_worktrees_preserve_lib.sh` exists, and the bats test
+- [x] **AC-01** `scripts/bash/cleanup_worktrees_preserve_lib.sh` exists, and the bats test
       `preserve library defines functions only and runs no work at source time` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-02** The bats test `preserve subcommand dispatches to the preserve driver` in
+- [x] **AC-02** The bats test `preserve subcommand dispatches to the preserve driver` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-03** The bats test `an unknown subcommand still prints usage to stderr and returns 2` in
+- [x] **AC-03** The bats test `an unknown subcommand still prints usage to stderr and returns 2` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-04** `scripts/bash/cleanup-worktrees.sh` contains the single-line token
+- [x] **AC-04** `scripts/bash/cleanup-worktrees.sh` contains the single-line token
       `CLEANUP_WT_MANIFEST_PATH` in its usage heredoc, and the bats test
       `the manifest path is taken from CLEANUP_WT_MANIFEST_PATH` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-05** The bats test `an unresolvable jq returns 127 and stages nothing` in
+- [x] **AC-05** The bats test `an unresolvable jq returns 127 and stages nothing` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-06** The bats test `a manifest with a wrong tool or schema_version is rejected and stages
+- [x] **AC-06** The bats test `a manifest with a wrong tool or schema_version is rejected and stages
       nothing` in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-07** The bats test `a missing consolidation worktree reports MISSING-WORKTREE and stages
+- [x] **AC-07** The bats test `a missing consolidation worktree reports MISSING-WORKTREE and stages
       nothing` in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-08** The bats test `an untracked preserve record is staged and reported` in
+- [x] **AC-08** The bats test `an untracked preserve record is staged and reported` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-09** The bats test `a modified preserve record is staged and reported` in
+- [x] **AC-09** The bats test `a modified preserve record is staged and reported` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-10** The bats test `records are emitted in LC_ALL=C order regardless of manifest order`
+- [x] **AC-10** The bats test `records are emitted in LC_ALL=C order regardless of manifest order`
       in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-11** The bats test `the memory index line is appended verbatim to the destination index`
+- [x] **AC-11** The bats test `the memory index line is appended verbatim to the destination index`
       in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-12** The bats test `a null memory_index_line stages the file and touches no index` in
+- [x] **AC-12** The bats test `a null memory_index_line stages the file and touches no index` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-13** The bats test `an absent destination index is created and reported as CREATED` in
+- [x] **AC-13** The bats test `an absent destination index is created and reported as CREATED` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-14** The bats test `a duplicate index entry is skipped and does not change the exit code`
+- [x] **AC-14** The bats test `a duplicate index entry is skipped and does not change the exit code`
       in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-15** The bats test `an unterminated final line receives a terminator before the append`
+- [x] **AC-15** The bats test `an unterminated final line receives a terminator before the append`
       in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-16** The bats test `a stale advisory crlf value does not override an LF target` in
+- [x] **AC-16** The bats test `a stale advisory crlf value does not override an LF target` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-17** The bats test `an advisory line ending mismatch emits ADVISORY-MISMATCH` in
+- [x] **AC-17** The bats test `an advisory line ending mismatch emits ADVISORY-MISMATCH` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-18** The bats test `a crlf target receives a crlf terminated index line` in
+- [x] **AC-18** The bats test `a crlf target receives a crlf terminated index line` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-19** The bats test `a mixed line ending target is refused and reported as EOL-MIXED` in
+- [x] **AC-19** The bats test `a mixed line ending target is refused and reported as EOL-MIXED` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-20** The bats test `the crlf fixture still contains a carriage return in the working
+- [x] **AC-20** The bats test `the crlf fixture still contains a carriage return in the working
       tree` in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-21** `.gitattributes` contains the single-line token
+- [x] **AC-21** `.gitattributes` contains the single-line token
       `tests/fixtures/cleanup_worktrees/preserve/eol-crlf/** -text`.
-- [ ] **AC-22** The bats test `a host token match aborts the pass before any staging` in
+- [x] **AC-22** The bats test `a host token match aborts the pass before any staging` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes, asserting exit status 3 and that
       the output carries no `stub-git: add` line.
-- [ ] **AC-23** The bats test `each host token pattern is detected` in
+- [x] **AC-23** The bats test `each host token pattern is detected` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes, with one fixture per pattern
       identifier HT1 through HT6.
-- [ ] **AC-24** The bats test `HEAD~1 and other revision syntax do not match the short-name pattern`
+- [x] **AC-24** The bats test `HEAD~1 and other revision syntax do not match the short-name pattern`
       in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-25** The bats test `the host token scan reads only the named source file` in
+- [x] **AC-25** The bats test `the host token scan reads only the named source file` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes, using a manifest fixture and a
       destination index fixture that both contain host tokens and must not trigger a refusal.
-- [ ] **AC-26** The bats test `an absent or malformed host_token_scan refuses to stage the record`
+- [x] **AC-26** The bats test `an absent or malformed host_token_scan refuses to stage the record`
       in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-27** The bats test `a pattern set id mismatch is reported and the local scan governs` in
+- [x] **AC-27** The bats test `a pattern set id mismatch is reported and the local scan governs` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-28** The bats test `each missing or out of vocabulary field skips the record and reports`
+- [x] **AC-28** The bats test `each missing or out of vocabulary field skips the record and reports`
       in `tests/shell/test_cleanup_worktrees_preserve.bats` passes, with one case per field in the
       D4 table.
-- [ ] **AC-29** The bats test `a missing source file is reported as MISSING-SOURCE` in
+- [x] **AC-29** The bats test `a missing source file is reported as MISSING-SOURCE` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-30** The bats test `an ignored target path is refused without a force flag` in
+- [x] **AC-30** The bats test `an ignored target path is refused without a force flag` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` passes, asserting the output contains
       `IGNORED-TARGET` and contains no `--force`.
-- [ ] **AC-31** The bats test `the preserve exit codes distinguish clean, skipped, and blocked runs`
+- [x] **AC-31** The bats test `the preserve exit codes distinguish clean, skipped, and blocked runs`
       in `tests/shell/test_cleanup_worktrees_preserve.bats` passes.
-- [ ] **AC-32** The bats tests `the git stub replays a scenario response for add` and
+- [x] **AC-32** The bats tests `the git stub replays a scenario response for add` and
       `the git stub replays a scenario response for check-ignore` in
       `tests/shell/test_cleanup_worktrees_preserve.bats` pass.
-- [ ] **AC-33** `.claude/skills/cleanup-merged-worktrees/SKILL.md` contains the single-line token
+- [x] **AC-33** `.claude/skills/cleanup-merged-worktrees/SKILL.md` contains the single-line token
       `PRESERVE|` and that token appears in the `## Report Line Contract` bullet list.
-- [ ] **AC-34** `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
+- [x] **AC-34** `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
       is byte-identical to `.claude/skills/cleanup-merged-worktrees/SKILL.md`, verified with `cmp`.
-- [ ] **AC-35** `python -m pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`
+- [x] **AC-35** `python -m pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`
       exits 0.
-- [ ] **AC-36** `git diff --stat epic/cleanup-merged-worktrees-hardening-integration -- scripts/bash/cleanup_worktrees_lib.sh`
+- [x] **AC-36** `git diff --stat epic/cleanup-merged-worktrees-hardening-integration -- scripts/bash/cleanup_worktrees_lib.sh`
       prints nothing, and `git status --porcelain -- scripts/bash/cleanup_worktrees_lib.sh` prints
       nothing.
-- [ ] **AC-37** `git diff --stat epic/cleanup-merged-worktrees-hardening-integration -- .claude/hooks`
+- [x] **AC-37** `git diff --stat epic/cleanup-merged-worktrees-hardening-integration -- .claude/hooks`
       prints nothing, and `git status --porcelain -- .claude/hooks` prints nothing.
-- [ ] **AC-38** Every file created or changed by this work is at or below 500 lines, verified per
+- [x] **AC-38** Every file created or changed by this work is at or below 500 lines, verified per
       file with `wc -l` against the changed-file list. Markdown files are exempt.
-- [ ] **AC-39** A single pass of `bash scripts/bash/shell-qc.sh format`, then
+- [x] **AC-39** A single pass of `bash scripts/bash/shell-qc.sh format`, then
       `bash scripts/bash/shell-qc.sh check`, then `bash scripts/bash/shell-qc.sh test` completes
       with every stage exiting 0 and no file rewritten by the format stage. The transcript is
       recorded under `evidence/qa-gates/`.
-- [ ] **AC-40** `bash scripts/bash/shell-qc.sh test --coverage` prints the headline
+- [x] **AC-40** `bash scripts/bash/shell-qc.sh test --coverage` prints the headline
       `Bash coverage (lines): NN.N%` and the printed value is at least 85.0; the merged
       `artifacts/pester/kcov/cov.xml` is produced and its summary is recorded under
       `evidence/qa-gates/`.
-- [ ] **AC-41** No coverage configuration in the change adds an `exclude` entry matching any path
+- [x] **AC-41** No coverage configuration in the change adds an `exclude` entry matching any path
       under `scripts/`.
-- [ ] **AC-42** Fail-before evidence is recorded under `evidence/regression-testing/` showing the
+- [x] **AC-42** Fail-before evidence is recorded under `evidence/regression-testing/` showing the
       tests named in AC-08, AC-16, and AC-22 failing against the pre-change tree.
-- [ ] **AC-43** No test creates or reads a temporary file; the changed test files and fixtures
+- [x] **AC-43** No test creates or reads a temporary file; the changed test files and fixtures
       contain no `mktemp` and no `BATS_TEST_TMPDIR`.
 
 ## Open Questions
