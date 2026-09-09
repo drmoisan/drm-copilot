@@ -8,8 +8,8 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 - Planning commit: `73b451c09bf39a706bb71245a0dde5ae0fbc4660`
 - Max parallel features: 4
 - Current wave: 2
-- Next step: `blocked_integration_pr_preflight` — see "Integration PR Blocker" below
-- Last updated: 2026-09-09T12:50:00Z
+- Next step: `complete`
+- Last updated: 2026-09-09T15:00:00Z
 
 ## Wave Schedule
 
@@ -43,18 +43,63 @@ earlier liveness assessment had leaned partly on "no notification means it has n
 which is unsound when a child's return can be routed elsewhere. Durable re-derivation from `git`
 and `gh` was the reliable signal and is what settled it.
 
-## Integration PR
+## Integration PR — MERGED
 
 | field | value |
 | --- | --- |
-| pr_number | - |
-| pr_url | - |
+| pr_number | 656 |
+| pr_url | https://github.com/drmoisan/drm-copilot/pull/656 |
 | base_branch | main |
 | head_branch | epic/cleanup-merged-worktrees-hardening-integration |
-| ci_status | - |
-| merge_commit_sha | - |
-| opened_at | - |
-| merged_at | - |
+| head_sha | b6b9f28079bb7cbaf537cf201a689275c22ab3e0 |
+| ci_status | green — 11 of 11 required checks passed |
+| ci_run_id | 34271868131 |
+| merge_commit_sha | 06ca8a81cacba8551808b836aa1a355d1ff1b208 |
+| merged_at | 2026-09-08T20:03:50Z |
+
+`origin/main` is now at `06ca8a81` and contains both the merge commit and the epic head.
+
+### The real CI gate
+
+This was the first and only PR in the epic based on `main`, and therefore the first to receive a
+genuine `ci.yml` run. All eleven required checks passed at head `b6b9f280`:
+
+| check | result | duration |
+| --- | --- | --- |
+| build-check / Build Package | pass | 49s |
+| docs-validation / Documentation Validation | pass | 9s |
+| drm-copilot-extension-tests (ubuntu-latest) | pass | 32s |
+| drm-copilot-extension-tests (windows-latest) | pass | 1m3s |
+| poshqc / PowerShell QC | pass | 5m49s |
+| quality-checks7 / Code Quality & Tests (3.10) | pass | 2m49s |
+| quality-checks7 / Code Quality & Tests (3.11) | pass | 2m16s |
+| quality-checks7 / Code Quality & Tests (3.12) | pass | 2m36s |
+| quality-checks7 / Code Quality & Tests (3.13) | pass | 2m29s |
+| security-scan / Security Scanning | pass | 34s |
+| shell-coverage / Shell Coverage (Bats + kcov) | pass | 5m57s |
+
+Conclusions were read back with a second `gh pr checks` call rather than inferred from the watch
+exit code, and the head SHA was re-verified as unchanged afterwards so CI is known to have run
+against exactly the commit that merged.
+
+`docs-validation` passing here is worth noting on its own: that is precisely the check child 634's
+outstanding AC-15 required and could never obtain on a child PR, confirming that criterion was
+unsatisfiable by construction rather than neglected.
+
+### Issue closures
+
+Both #655 and #591 were auto-closed by the PR body's `Closes` references one second after the
+merge. `gh issue close` was therefore a no-op. GitHub recorded #591 with reason `COMPLETED`, which
+overstates it, so an explanatory comment was added recording the accurate characterisation:
+**superseded by #545**, not independently fixed. Branch
+`bug/epic-merge-gate-parses-pr-number-from-whole-command-line-591` was retained and deliberately
+not merged.
+
+545's outstanding acceptance criterion — that #591 be recorded as superseded and closed on merge —
+is now **satisfied in fact but left unchecked** in `spec.md`. The `acceptance-criteria-tracking`
+skill states that orchestrators verify and flag rather than check off, and that holds even where
+the orchestrator performed the action itself; self-certifying is the thing the rule exists to
+prevent. The file is on `main` for a reviewing agent to check off.
 
 ## Interruptions
 
