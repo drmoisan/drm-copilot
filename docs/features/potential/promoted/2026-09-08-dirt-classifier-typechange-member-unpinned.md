@@ -3,6 +3,7 @@
 - Date captured: 2026-09-08
 - Author: Dan Moisan
 - Status: Promoted -> docs/features/active/dirt-classifier-typechange-member-unpinned/ (Issue #660)
+- Consolidates: #661 (closed 2026-09-09). The GitHub issue body was rewritten on 2026-09-09 to cover both test-suite blind spots; the consolidated root cause and test-only blast radius are recorded there.
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 

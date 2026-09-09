@@ -3,6 +3,7 @@
 - Date captured: 2026-09-08
 - Author: Dan Moisan
 - Status: Promoted -> docs/features/active/pr-author-preflight-has-no-epic-integration-seam/ (Issue #663)
+- Consolidates: #657, #662, #664 (closed 2026-09-09). The GitHub issue body was rewritten on 2026-09-09 to cover all six gates that lack an epic-level checkpoint seam; the consolidated root cause and blast radius are recorded there.
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 

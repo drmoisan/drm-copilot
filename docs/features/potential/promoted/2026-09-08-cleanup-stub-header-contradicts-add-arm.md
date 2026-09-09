@@ -3,6 +3,7 @@
 - Date captured: 2026-09-08
 - Author: Dan Moisan
 - Status: Promoted -> docs/features/active/cleanup-stub-header-contradicts-add-arm/ (Issue #661)
+- Consolidated: closed 2026-09-09 as consolidated into #660 (cleanup-worktrees test-suite blind spots); this record is retained as the lifecycle trail and no active folder is created for it.
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
