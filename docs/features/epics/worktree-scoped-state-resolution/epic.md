@@ -14,35 +14,34 @@ intent:
     - No production file exceeds the 500-line cap.
     - Line coverage >= 85% and branch coverage >= 75% where the tooling measures it.
 features:
-  - issue_num: 1001
-    feature_folder: target-worktree-resolution-module
+  - issue_num: 669
+    feature_folder: 2026-09-13-target-worktree-resolution-module-669
     depends_on: []
-  - issue_num: 1002
-    feature_folder: preimplementation-gate-worktree-selector
+  - issue_num: 670
+    feature_folder: 2026-09-13-epic-merge-gate-authorization-record-670
     depends_on: []
-  - issue_num: 1003
-    feature_folder: epic-merge-gate-authorization-record
+  - issue_num: 671
+    feature_folder: 2026-09-13-preimplementation-gate-worktree-selector-671
     depends_on: []
-  - issue_num: 1006
-    feature_folder: collect-pr-context-explicit-target
+  - issue_num: 675
+    feature_folder: 2026-09-13-collect-pr-context-explicit-target-675
     depends_on: []
-  - issue_num: 1004
-    feature_folder: prd-feature-gate-target-resolution
-    depends_on: [1001]
-  - issue_num: 1005
-    feature_folder: false-approval-elimination-pr-author-model-routing
-    depends_on: [1001]
-  - issue_num: 1007
-    feature_folder: taskmaster-push-down-and-resume
-    depends_on: [1002, 1003, 1004, 1005, 1006]
+  - issue_num: 672
+    feature_folder: 2026-09-13-prd-feature-gate-target-resolution-672
+    depends_on: [669]
+  - issue_num: 673
+    feature_folder: 2026-09-13-false-approval-elimination-pr-author-model-routing-673
+    depends_on: [669]
+  - issue_num: 674
+    feature_folder: 2026-09-13-taskmaster-push-down-and-resume-674
+    depends_on: [670, 671, 672, 673, 675]
 ---
 
 # Epic: Worktree-Scoped State Resolution
 
-> **Placeholder issue numbers.** The `issue_num` values above (1001-1007) are placeholders
-> written at manifest-authoring time, before child promotion. Each is back-filled from its
-> child's promotion receipt during preparation fan-in. The manifest is committed in final,
-> resolved form before the kickoff artifact is written.
+> **Resolved manifest.** Issue numbers and feature folders below are the real, promoted values
+> (#669-#675), back-filled from each child's promotion receipt. The placeholder values 1001-1007
+> used during decomposition are retired and appear nowhere in this file.
 
 ## Goal
 
@@ -59,9 +58,9 @@ acted on, and the same code path produces two distinct failure modes:
 - **False approval** — a gate reads a sibling item's checkpoint, finds it satisfactory, and
   allows an action that was never validated against its own item's state.
 
-The false-approval mode is the more serious of the two. A gate that denies incorrectly stalls a
-run visibly. A gate that silently validates one item's action against a different item's state
-reports a green that means nothing, and the run proceeds on an unverified basis.
+The false-approval mode is the more serious. A gate that denies incorrectly stalls a run visibly.
+A gate that silently validates one item's action against a different item's state reports a green
+that means nothing, and the run proceeds on an unverified basis.
 
 ## Origin
 
@@ -76,297 +75,303 @@ diagnosed separately before the common cause was recognised.
 are pushed from `drm-copilot` into consumer repositories with zero templating. A fix made in a
 consumer repository is overwritten by the next push-down. That has already happened once: a local
 fix to `enforce-model-routing-receipt.ps1` in TaskMaster (commit `4389d95b`, 2026-09-02) was lost.
-Fixing the defect anywhere other than `drm-copilot` produces work that does not survive.
 
 ## Scope
 
-Seven defect sites, grouped by the required fix:
-
-| ref | site | failure mode | fix |
-| --- | --- | --- | --- |
-| 3.1 | `enforce-prd-feature-before-planner.ps1` | false denial | resolve against call target; accept absolute paths |
-| 3.2 | PR-creation readiness (`enforce-pr-author-skill*.ps1`) | **false approval** | never fall back to a sibling checkpoint |
-| 3.3 | `enforce-orchestration-preimplementation-gate*.ps1` | unreachable exemption | permit an explicit worktree selector |
-| 3.4 | `enforce-model-routing-receipt.ps1` | false approval | never fall back to a sibling checkpoint |
-| 3.5 | `mcp__drm-copilot__collect_pr_context` | vacuous context | explicit target; fail loudly on empty diff |
-| 3.6 | `enforce-epic-merge-gate.ps1` | unlandable fix | authorization record (RULING 1) |
-| — | push-down to TaskMaster | — | deliver and confirm resume |
+| ref | issue | site | failure mode | fix |
+| --- | --- | --- | --- | --- |
+| F4 | #672 | `enforce-prd-feature-before-planner.ps1` | false denial | resolve against call target; accept absolute paths |
+| F5 | #673 | `enforce-pr-author-skill*.ps1` | **false approval** | never fall back to a sibling checkpoint |
+| F2 | #671 | `enforce-orchestration-preimplementation-gate*.ps1` | unreachable exemption | permit an explicit worktree selector |
+| F5 | #673 | `enforce-model-routing-receipt.ps1` | false approval | never fall back to a sibling checkpoint |
+| F6 | #675 | `mcp__drm-copilot__collect_pr_context` | vacuous context | explicit target; fail loudly on empty diff |
+| F3 | #670 | `enforce-epic-merge-gate.ps1` | unlandable fix | authorization record (RULING 1) |
+| F7 | #674 | push-down to TaskMaster | — | deliver and confirm resume |
 
 ### The five required fixes
 
 1. **Resolve against the call's target, not the session's cwd.** Derive the target worktree from
-   the tool-call payload — the feature-folder path in the prompt, the item's branch, the file
-   being staged — and resolve state relative to that. Use the session root only when the call
-   genuinely has no target.
-2. **Accept absolute paths.** Normalise to repo-relative by locating the containing worktree,
-   instead of truncating to a fixed segment count. The four-segment truncation must not discard a
-   valid prefix.
+   the tool-call payload and resolve state relative to that. Use the session root only when the
+   call genuinely has no target.
+2. **Accept absolute paths.** Normalise to repo-relative by locating the containing worktree.
 3. **Never silently fall back to a sibling's checkpoint.** If the correct checkpoint cannot be
-   identified, deny with a distinct, greppable reason code naming the ambiguity. Applies to both
-   3.2 and 3.4.
-4. **Make the staging exemption reachable from a coordinating session.** Permit the
-   repo/worktree selector (`-C`, or an equivalent explicit target) while keeping every other
-   constraint intact — restricted pathspecs, `-m` only, single segment, no shell metacharacters.
-   The exemption's purpose is to bound *what* may be committed, not *from where*.
-5. **Make `collect_pr_context` take an explicit target branch/worktree** and fail loudly on an
-   empty diff rather than emitting a vacuous context.
+   identified, deny with a distinct, greppable reason code naming the ambiguity.
+4. **Make the staging exemption reachable from a coordinating session.** Permit the repo/worktree
+   selector while keeping every other constraint intact. The exemption's purpose is to bound
+   *what* may be committed, not *from where*.
+5. **Make `collect_pr_context` take an explicit target** and fail loudly on an empty diff.
 
 ## Non-Goals
 
-- Changing child-prompt construction. See the anti-pattern record below.
+- Changing child-prompt construction. Every child prompt in the originating run already named its
+  own feature folder; that hypothesis was tested and refuted.
 - Widening the epic-merge gate's `pr_number` matcher (RULING 1 forbids it explicitly).
 - Weakening the pre-implementation gate's pathspec, option, or metacharacter restrictions.
-- Porting any hook to Python. Enforcement hooks are PowerShell or bash only; a Python leg creates
-  a second implementation of the rule that drifts from the first.
-- Automatic epic decomposition, or any change to the wave-scheduling machinery itself.
+- Porting any hook to Python. Enforcement hooks are PowerShell or bash only.
+- Reverting prior fix **#518**. See correction 4 below.
 
 ## Must Not Regress
 
-These four constraints are carried verbatim into every child feature's acceptance criteria:
+Carried verbatim into every child's acceptance criteria:
 
 - Gates must still deny when a required document is genuinely absent.
 - Do not weaken the pre-implementation gate's pathspec, option, or metacharacter restrictions.
 - Do not widen the merge gate's matcher as a side effect of fixes 1-3.
 - Epic and standalone topologies must behave exactly as now when cwd and target coincide.
 
-## User Rulings (settled; not to be re-litigated)
+## User Rulings (settled)
 
 **RULING 1 — 3.6 epic-merge gate: RELAX WITH AUTHORIZATION RECORD.** Permit a standalone merge
 when an explicit, auditable authorization record is present in orchestrator state. Do **not**
-widen the `pr_number` matcher — that is a must-not-regress constraint. Both anti-patterns below
-remain closed.
+widen the `pr_number` matcher.
 
 **RULING 2 — Topology: EPIC, wave-layered.**
 
-## Rejected Workarounds (anti-patterns — recorded so they are not re-proposed)
+## Rejected Workarounds (anti-patterns)
 
-Both were considered during the `bugs-2026-09-11` run and correctly rejected.
-
-1. **Injecting a synthetic `items[]` record** to match the epic-merge gate's `pr_number` matcher.
-   Satisfying a matcher by corrupting the state it inspects is not compliance. Invariant 13 would
+1. **Injecting a synthetic `items[]` record** to match the merge gate's `pr_number` matcher.
+   Satisfying a matcher by corrupting the state it inspects is not compliance; invariant 13 would
    then demand a false cohort assignment, so the corruption propagates rather than staying local.
-2. **Switching to `--squash`** to evade the matcher entirely. This is disallowed repo-wide, and
-   evading a gate is not the same as satisfying it.
+2. **Switching to `--squash`** to evade the matcher. Disallowed as repository policy, and evading
+   a gate is not satisfying it. See correction 3: the merge gate does not currently *enforce* this.
+
+## Corrections to the Original Briefing
+
+Each was found during preparation and verified against the tree. They are recorded because
+several were propagated into child briefs before discovery, and because `epic-planner` has no
+`SendMessage` with which to retract a premise from a running child.
+
+**1. The preimplementation helpers file is 349 lines, not 495.** The 495 figure belongs to the
+*gate* file. The original conclusion that F2 "requires a helpers extraction" was false; the
+helpers file has ample headroom and F2 correctly dropped the extraction, removing six production
+files and four config edits from its change.
+
+**2. There are four mirror surfaces, not three.**
+`extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/` also carries the
+gate files and is hash-asserted by an existing Codex contract test, so a three-surface change
+fails at the last gate. F3 discovered this independently despite being briefed with three.
+
+**3. `--squash` is NOT denied by the merge gate today.** Both hooks scope to a structural
+`gh pr merge` carrying `--merge` (`enforce-epic-merge-gate.ps1` lines 402-412), so a `--squash`
+command never reaches any branch and is allowed, pinned by a passing test. The repository policy
+against `--squash` is real; this gate is not its enforcement point. Making `--squash` deny would
+widen the gate's trigger surface and is a separate change outside RULING 1.
+
+**4. The F4 defect site was misattributed, and "truncation is prohibited" was too broad.** The
+absolute-path prefix is discarded by the **unanchored regex at line 251**, which begins matching
+at the literal `docs`. The four-segment slice at 272-277 removes a *suffix*, came from prior fix
+**#518**, and must be preserved byte-unmodified. Line 265 — originally cited as the applied
+site — is a comment.
+
+**5. The PoshQC MCP tools return no captured script output.**
+`extensions/drm-copilot/src/repo-automation-service.ts:355-379` composes the `summary` before the
+child process runs and passes no `stdoutArtifactPattern`, unlike `newPotentialEntry` at lines
+225-236 which passes one. Any acceptance condition reading a count, percentage, per-file finding,
+or per-node result *out of* a PoshQC MCP result is unsatisfiable. See the audit section below.
+
+**6. Line counts differ by one between `wc -l` and PowerShell.** `wc -l` counts newline
+characters, so a file with no trailing newline reads one short of `(Get-Content).Count`, which is
+the counting the 500-line cap is judged by.
+
+**7. `.codex/hooks/enforce-codex-model-routing.ps1` is out of F5's scope on positive evidence.**
+It contains zero references to `orchestrator-state`, reads no checkpoint, and is a
+model/profile-drift gate. The question was open in F5's brief; it is now closed.
+
+**8. F5's root cause was incomplete — there are three cwd-relative binding sites, not one.** See
+the shared-design section below.
 
 ## Shared Design
 
-### The resolution contract (F1)
+### The resolution contract (F1, #669)
 
-F1 introduces the repository's first worktree/target resolution primitive. Verified: `.claude/lib/`
-holds eleven modules (`bash`, `blast-radius`, `cleanup-manifest`, `codex-routing`,
-`discovery-validation`, `hook-payload`, `mermaid`, `model-routing`, `orchestrator-state`,
-`project-file-merge`, `requirements`) and none of them resolves a worktree. `HookPayload.psm1` is
-the existing payload-parsing primitive and is the natural adjacent module.
+F1 introduces the repository's first worktree/target resolution primitive. `.claude/lib/` holds
+eleven modules and none resolves a worktree; `HookPayload.psm1` is the existing payload-parsing
+primitive and the natural adjacent module.
 
 The contract F4 and F5 consume has three parts:
 
 - **Target derivation** — given a tool-call payload, return the worktree the call pertains to, or
   an explicit "no target" result.
-- **Path normalisation** — given a path in either relative or absolute form, return its
-  repo-relative form by locating the containing worktree. Segment-count truncation is prohibited.
-- **Ambiguity reason code** — a single distinct, greppable code emitted when the correct target
-  cannot be identified, so a caller can deny with a specific reason instead of guessing.
+- **Path normalisation** — given a path in relative or absolute form, return its repo-relative
+  form by locating the containing worktree. The *prefix* must be preserved; see correction 4.
+- **Ambiguity reason code** — a distinct, greppable code emitted when the correct target cannot be
+  identified, so a caller denies with a specific reason instead of guessing.
 
-F4 and F5 cannot specify their deny paths until this contract's reason code and resolution
-semantics exist. That is a genuine upstream/downstream contract, not merely a shared file, and it
-is the dependency edge that makes this epic wave-layered rather than flat.
+**F1's Ruling C: the module includes a worktree enumerator.** Without one, a relative
+feature-folder token cannot be placed in a sibling worktree, and this epic's headline acceptance
+criterion is unreachable. It is derivable from the session root with no git subprocess, via the
+`gitdir:`/`commondir` indirection, behind a third injectable seam. This enlarges F1 beyond its
+original estimate and is why its main file carries a 480-line ceiling.
 
-### Bundled-payload mirroring (applies to every child that edits `.claude/**`)
+**Both wave-1 children bind the contract by role, not by literal.** Neither F4 nor F5 quotes an
+F1 identifier anywhere; both read from a Phase 0 binding artifact and halt fail-closed if the
+module or its exports are absent. F4 adds a second halt arm for the case where F1 cannot
+distinguish "no derivation input" from "explicit no-target", without which the three-way gate is
+not implementable.
 
-Verified 2026-09-13: `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`
-carries byte-identical copies of all five target hooks (`diff` reports no difference for
-`enforce-prd-feature-before-planner.ps1` and `enforce-epic-merge-gate.ps1`). The push-down serves
-the **installed extension's** payload, not the repository tree, so a repo-side-only edit is inert
-at the push-down surface.
+### The third binding site (F5, #673)
 
-Consequently every child that edits a file under `.claude/**` must also update the corresponding
-file under `extensions/drm-copilot/resources/claude-customizations/.claude/**`, or F7 publishes
-stale content and its acceptance criteria verify against the old hook.
+`enforce-pr-author-skill.epic-base-branch.ps1` takes `CheckpointPath` defaulting to the relative
+`artifacts/orchestration/orchestrator-state.json`, and its `Test-EpicBaseBranchOverride` is
+documented as a no-op when `epic_mode` is absent or false, or when the checkpoint is unreadable.
+That is **fail-open by design**. In a parallel or epic topology a sibling checkpoint lacking
+`epic_mode` silently skips the epic base-branch requirement and permits `gh pr create --base main`
+for a PR that should target the integration branch.
 
-A **new** module additionally requires registration: verified via
-`tests/scripts/claude-lib/model-routing/ModelRouting.Manifest.Tests.ps1`, each `.claude/lib/`
-module is asserted to appear exactly once in the `paths` array of
-`extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`. F1 must add its
-module path there and ship the matching `*.Manifest.Tests.ps1`, or push-down does not deliver the
-module at all under `--packs core`.
+**This is a live risk to this epic's own execution.** F5 fixes it, but F5 is in wave 1 and the
+wave-0 children execute first. `epic-orchestrator` must verify each wave-0 child's PR base branch
+explicitly rather than trusting the gate.
 
-### Codex mirror surface
+### Bundled-payload mirroring
 
-Verified: `.codex/hooks/` mirrors `enforce-orchestration-preimplementation-gate.ps1`,
-`-helpers.ps1`, and `-modes.ps1` (three files) and `enforce-epic-merge-gate.ps1`. F2 and F3
-therefore carry Codex parity work.
+`extensions/drm-copilot/resources/claude-customizations/.claude/hooks/` carries byte-identical
+copies of the target hooks. The push-down serves the **installed extension's** payload, not the
+repository tree, so a repo-side-only edit is inert at the push-down surface.
 
-`enforce-prd-feature-before-planner.ps1` and `enforce-pr-author-skill*.ps1` have **no** Codex
-mirror, so F4 has no Codex parity obligation. `enforce-model-routing-receipt.ps1` has no
-same-named mirror, but `.codex/hooks/enforce-codex-model-routing.ps1` exists as a differently
-named analogue; F5's research must determine whether it shares the defect.
+Every child editing `.claude/**` must also update the corresponding bundled path. A **new**
+module additionally requires registration: each `.claude/lib/` module is asserted to appear
+exactly once in the `paths` array of
+`extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, or push-down
+does not deliver it under `--packs core`.
 
 ### File-size pressure
 
-Three of the five target hooks sit near the repository's 500-line cap and cannot absorb new logic
-in place:
+Counts are `(Get-Content).Count`, the measure the 500-line cap is judged by. Files marked with a
+dagger have no trailing newline and read one lower under `wc -l`.
 
 | file | lines | headroom |
 | --- | --- | --- |
-| `enforce-orchestration-preimplementation-gate.ps1` | 495 | 5 |
-| `enforce-epic-merge-gate.ps1` | 486 | 14 |
-| `enforce-prd-feature-before-planner.ps1` | 448 | 52 |
-| `enforce-pr-author-skill.ps1` | 311 | 189 |
-| `enforce-model-routing-receipt.ps1` | 180 | 320 |
+| `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` | 500 | **0** |
+| `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` † | 496 | 4 |
+| `.claude/hooks/enforce-epic-merge-gate.ps1` † | 487 | 13 |
+| `.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` | 477 | 23 |
+| `.claude/hooks/enforce-prd-feature-before-planner.ps1` | 448 | 52 |
+| `.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1` | 349 | 151 |
+| `.claude/hooks/enforce-pr-author-skill.ps1` † | 312 | 188 |
+| `.codex/hooks/enforce-epic-merge-gate.ps1` | 186 | 314 |
+| `.claude/hooks/enforce-model-routing-receipt.ps1` | 180 | 320 |
 
-F2, F3, and F4 each require a helpers extraction as part of the change, not as optional cleanup.
-`enforce-orchestration-preimplementation-gate-helpers.ps1` (495 lines) already exists for F2's
-site, so F2's extraction targets a second helpers file or a redistribution across the existing
-three-file set.
+The Codex preimplementation gate's zero headroom is load-bearing for F2's design: worktree-set
+membership verification cannot be implemented there, cannot live in the helpers module (declared
+pure), and a subprocess would resolve from the hook process's own working directory —
+reintroducing the exact cwd-dependence this epic removes. F2 constrains the selector lexically
+instead and records a nested-subdirectory residual as an accepted widening with measured exposure
+(seven `.md` test fixtures the gate already treats as non-implementation), which F1 can close
+upstream later.
 
-## Decomposition Rationale
+## Waves
 
-Seven child features. The decomposition follows the fix boundaries rather than the file
-boundaries, because fixes 1-3 share the F1 contract while fixes 4 and 5 are independent.
+Computed by longest-path layering, verified against
+`scripts/dev_tools/epic_wave_computation.py`. Acyclic; every `depends_on` resolves.
 
-**Wave 0 — foundation and self-unblocking.** F2, F3, and F6 are dependency-free and each closes a
-blocker that the run hit. F2 and F3 are deliberately in wave 0 rather than later: F2 restores a
-coordinating session's ability to commit work stranded in a child worktree (during the run, a rate
-limit killed every agent mid-task and seven items' preparation output was unrecoverable from the
-parent session), and F3 makes a run-unblocking fix landable by the orchestration that discovered
-it. Both are self-unblocking capabilities, so they pay off inside this epic's own execution, not
-only after it.
-
-**Wave 1 — consumers of F1.** F4 and F5 both consume F1's resolution contract and reason code.
-
-**Wave 2 — delivery.** F7 depends on every content-changing child. Its edge set
-`[F2, F3, F4, F5, F6]` is minimal: F1 is reached transitively through F4 and F5, so declaring it
-would add an edge without adding an ordering constraint.
-
-### Wave assignment
-
-Computed by longest-path layering, `wave(f) = 0` when `depends_on(f)` is empty, otherwise
-`1 + max(wave(d))`. The graph is acyclic and every `depends_on` entry resolves.
-
-| wave | features |
+| wave | issues |
 | --- | --- |
-| 0 | F1, F2, F3, F6 |
-| 1 | F4, F5 |
-| 2 | F7 |
+| 0 | #669, #670, #671, #675 |
+| 1 | #672, #673 |
+| 2 | #674 |
 
-### Feature register
+F7's edge set is minimal: #669 is reached transitively through #672 and #673.
 
-| ref | issue_num | feature_folder | wave | complexity | depends_on | scope |
+## Feature Register
+
+| ref | issue | folder | wave | band | plan-path | preflight |
 | --- | --- | --- | --- | --- | --- | --- |
-| F1 | 1001 | `target-worktree-resolution-module` | 0 | C3 | — | new `.claude/lib/` resolution module; fixes 1-3 contract; `core.json` registration; Pester. No consumers. |
-| F2 | 1002 | `preimplementation-gate-worktree-selector` | 0 | C3 | — | 3.3 staging exemption (fix 4); Claude + 3 Codex mirrors; helpers extraction. |
-| F3 | 1003 | `epic-merge-gate-authorization-record` | 0 | C3 | — | 3.6 per RULING 1; Claude + Codex mirror; checkpoint schema addition. |
-| F6 | 1006 | `collect-pr-context-explicit-target` | 0 | C2 | — | 3.5 (fix 5); TypeScript + Jest. |
-| F4 | 1004 | `prd-feature-gate-target-resolution` | 1 | C3 | F1 | 3.1 (fixes 1-2); helpers extraction; no Codex mirror. |
-| F5 | 1005 | `false-approval-elimination-pr-author-model-routing` | 1 | C3 | F1 | 3.2 + 3.4 (fix 3). **3.2 is the priority case.** |
-| F7 | 1007 | `taskmaster-push-down-and-resume` | 2 | C2 | F2,F3,F4,F5,F6 | rebuild + reinstall extension, push down, confirm resume. |
+| F1 | #669 | `2026-09-13-target-worktree-resolution-module-669` | 0 | C3 | `plan.2026-09-13T20-45.md` | ALL CLEAR (5 rounds) |
+| F3 | #670 | `2026-09-13-epic-merge-gate-authorization-record-670` | 0 | C3 | `plan.2026-09-13T20-46.md` | ALL CLEAR (4 rounds) |
+| F2 | #671 | `2026-09-13-preimplementation-gate-worktree-selector-671` | 0 | C3 | `plan.2026-09-13T20-46.md` | ALL CLEAR (revised) |
+| F6 | #675 | `2026-09-13-collect-pr-context-explicit-target-675` | 0 | C2 | `plan.2026-09-13T20-49.md` | ALL CLEAR (3 rounds) |
+| F4 | #672 | `2026-09-13-prd-feature-gate-target-resolution-672` | 1 | C3 | `plan.2026-09-13T20-47.md` | ALL CLEAR (revised) |
+| F5 | #673 | `2026-09-13-false-approval-elimination-pr-author-model-routing-673` | 1 | C3 | `plan.2026-09-13T20-48.md` | ALL CLEAR (revised) |
+| F7 | #674 | `2026-09-13-taskmaster-push-down-and-resume-674` | 2 | C2 | `plan.2026-09-13T20-48.md` | ALL CLEAR (2 rounds) |
 
-### Complexity bands
+All plan paths are relative to the feature folder under `docs/features/active/`.
 
-Bands are assessed against the `model_policy` scale in `config/orchestration-routing.json`.
+## Unsatisfiable-Gate Audit
 
-- **C3 (F1, F2, F3, F4, F5)** — each modifies a fail-closed enforcement gate where an error
-  produces either a silent false approval or a total run stall. F1 additionally establishes a
-  contract two downstream features are specified against. F2 and F3 carry cross-surface (Claude +
-  Codex) parity. F4 and F5 must distinguish "target resolved, document genuinely absent" from
-  "target not resolvable" and deny differently in each case, which is the substance of fix 3.
-- **C2 (F6, F7)** — F6 is a bounded TypeScript signature and error-path change across a known file
-  set with existing Jest coverage. F7 is procedural delivery with no new logic, but carries two
-  human-interaction assessments (below).
+Four PowerShell plans were audited against correction 5. **All four had cleared
+`atomic-executor` preflight.** Three carried acceptance conditions no tree state could satisfy:
 
-## Verification Status
-
-Carried from the originating run and re-verified during planning where noted.
-
-**Verified by direct test during the run:** the 3.1 decision matrix, 3.3, and the 3.6 denial.
-
-**Reported by the run's orchestrator and its children; re-confirm during research:** 3.2, 3.4,
-3.5. F5's research must independently reproduce 3.2 and 3.4 before fixing them, because the
-false-approval mode leaves no denial in the log to inspect after the fact.
-
-**Re-verified during planning (2026-09-13), against this tree:**
-
-- `enforce-prd-feature-before-planner.ps1` is 448 lines; `Find-PrdFeatureFolderFromPrompt`
-  (line 219) truncates prompt tokens to a fixed segment count (documented at lines 16-18, applied
-  at line 265), and `Get-PrdFeatureCheckpointFolder` (line 189) is the fallback. `Test-Path
-  -LiteralPath` is used on relative candidates at lines 91, 108, and 201. No worktree resolution
-  exists anywhere in the file.
-- `.claude/lib/` holds eleven modules, none a worktree/target resolution primitive.
-- `.codex/hooks/` mirrors the preimplementation gate (3 files) and the epic-merge gate.
-- `Test-ExemptOrchestrationStagingCommand` is at
-  `enforce-orchestration-preimplementation-gate-helpers.ps1` line 296; it tokenises each segment
-  via `ConvertTo-OrchestrationCommandToken` and requires every segment to pass
-  `Test-ExemptOrchestrationSegmentToken`.
-- The epic-merge gate's three allow paths are documented at lines 8-19 of
-  `enforce-epic-merge-gate.ps1`; the parallel path requires `route_id == "parallel"` and an
-  `items[]` entry whose `merge_status == "ci_green"`.
-- F6's TypeScript surface: `extensions/drm-copilot/src/lib/pr-context/` (16 files, including
-  `pr-context-service-call.ts` and `git-client.ts`), `src/pr-context-branches.ts`,
-  `src/mcp-tool-definitions.ts`, `src/mcp-repo-automation-tool-definitions.ts`, and
-  `src/mcp-tools.ts`. Tests live under `extensions/drm-copilot/test/`, not `tests/` —
-  `test/lib/pr-context/pr-context-service-call.test.ts`,
-  `test/extension.collect-pr-context.test.ts`, and
-  `test/repo-automation-dispatch-pr-context-verification.test.ts`.
-- `push_down_claude_customizations` is wired at `src/mcp-tools.ts:198`,
-  `src/mcp-tool-definitions.ts:134`, `src/mcp-repo-automation-tool-definitions.ts:145`, and
-  `src/lib/push-down/push-down-service-call.ts:195`.
-
-## Required Test Matrix
-
-Every hook child (F2, F3, F4, F5) ships table-driven Pester tests asserting the decision for the
-cross product of: **cwd** = session root vs item worktree; **path form** = relative vs absolute;
-**target** = own item vs sibling item vs absent.
-
-| case | expected |
+| plan | result |
 | --- | --- |
-| own folder named, cwd = session root | allow (currently denies) |
-| own folder named, cwd = item worktree | allow (unchanged) |
-| absolute path to own folder | allow (currently denies) |
-| sibling's checkpoint is the only state present | deny, distinct reason (currently allows — 3.2) |
-| required doc genuinely missing | deny (unchanged) |
-| `git -C <worktree> add docs/features/active/...` | allow (currently denies) |
-| `git -C <worktree> add` with non-exempt pathspec | deny (unchanged) |
-| `git add` with `-A`, extra options, or `;` / `&&` / `\|` | deny (unchanged) |
+| #670 | clean — carried a governing derivation paragraph from the start |
+| #671 | 8 of 10 PoshQC tasks unsatisfiable — revised |
+| #673 | 12 unsatisfiable plus one route ambiguity — revised |
+| #672 | 5 unsatisfiable plus two ambiguities — revised |
 
-Currently-passing cases are included as regression guards, not omitted as redundant. Each child
-takes the rows applicable to its own site; F7 takes none.
+The single differentiator was whether a plan wrote a **governing derivation paragraph** naming a
+readable source and the tasks it governs. The readable sources are
+`artifacts/pester/pester-junit.xml` (`testsuites` attributes for counts, `testcase` elements for
+per-node results), `artifacts/pester/powershell-coverage.xml` (keyed on the parent `package`
+directory, not the bare leaf name), a direct `Invoke-ScriptAnalyzer … | @(…).Count`, and paired
+`git status --porcelain` or `Get-FileHash` captures for write-mode tools.
 
-## Epic Acceptance Criteria
+**Two traps inside the remedy itself**, both found by children after the audit:
 
-- A parallel orchestrator whose cwd is the session root can delegate `Agent(atomic-planner)` for
-  an item whose `spec.md` exists.
-- No gate returns allow on the basis of a checkpoint belonging to a different item; such cases
-  deny with a distinct, greppable reason code.
-- A coordinating session can stage and commit exempt pathspecs in a child worktree.
-- `collect_pr_context` either produces a real diff against an explicit target or fails loudly.
-- RULING 1 is implemented: standalone merge is permitted on an auditable authorization record, and
-  the `pr_number` matcher is unchanged.
-- Pester coverage for the matrix above, including regression guards.
-- The fixed customizations are pushed down to TaskMaster and run `bugs-2026-09-11` can resume its
-  remediation cycles.
+- `Invoke-PoshQCAnalyze` *throws* on a non-zero count and returns nothing, so a bare "count is 0"
+  assertion against it has no observable and is itself a gate that cannot fail. It must be
+  anchored to the zero-branch literal at `PoshQC.Analyzer.psm1:185`, which the line-183 throw
+  pre-empts.
+- Pester emits one `testcase` node per `-ForEach` row, so a "matches exactly one node" rule fails
+  against a *correct* implementation for any parameterised test. Expected node counts must be
+  fixed per identifier.
 
-## Human-Interaction Assessment (Autonomous-Execution Mandate)
+This class is invisible to both preflight and the plan validator, as
+`.claude/skills/atomic-plan-contract/SKILL.md` states: "Check that the task-ordering does not make
+the condition unsatisfiable. No rule covers this."
 
-Surfaced at planning time rather than at execution, per the mandate's requirement that
-unautomatable requirements be enumerated before kickoff wherever they are knowable up front. Both
-records belong to F7 and are carried into its `human_interaction.requirements[]`.
+## Human-Interaction Assessment
 
-**HI-1 — Confirm run `bugs-2026-09-11` resumes its remediation cycles.** This acts inside
-TaskMaster, a different repository that is not present in this checkout, and the confirmation is
-an observation of agent behaviour in that repository's orchestration session rather than a
-command whose exit code can be asserted. **Proposed response: `exception`,** with a human-exception
-runbook emitted by F7. `scope_change` was considered and not chosen: it would silently drop a
-user-stated acceptance criterion. The exception keeps the criterion visible and hands over a
-written procedure. The push-down itself is automatable via
-`mcp__drm-copilot__push_down_claude_customizations` and is **not** covered by this record.
+Both records belong to F7 (#674) and are resolved as runbook-backed `exception` with non-empty
+`runbook_path`.
 
-**HI-2 — Rebuild and reinstall the VS Code extension before the push-down.** The push-down serves
-the installed extension's bundled payload, so F7's verification measures stale content unless the
-extension is rebuilt and reinstalled first. Whether `vsce package` plus
-`code --install-extension` runs unattended in this environment is not yet established.
-**F7's research must record an explicit `## Automation Feasibility` assessment for this step** and
-resolve it as `scope_change`, `exception`, or `halt`. Do not defer it to execution.
+**HI-1 — confirm run `bugs-2026-09-11` resumes.** Acts inside TaskMaster, a different repository,
+and is an observation of agent behaviour rather than a command with an assertable exit code.
+`scope_change` was considered and rejected: it would silently drop a user-stated acceptance
+criterion. Runbook: `runbooks/confirm-taskmaster-run-resume.runbook.md`.
 
-F7's first verification action is a one-line grep for a changed literal under the installed
-extension's `resources/claude-customizations/.claude/hooks/` directory. If that grep finds the old
-content, the push-down verifies nothing and must not be reported as passing.
+**HI-2 — rebuild and reinstall the extension before push-down.** Resolved as `exception` on a
+stronger finding than anticipated: the rebuild, package, and install sub-steps *are* automatable
+via an existing non-interactive script, but `mcpDidChangeEmitter` is created and wired yet **never
+fired anywhere in `src/`**, so an install that exits 0 does not make the running window's MCP
+server serve the new payload, and no safe automated non-disruptive reload path exists. Runbook:
+`runbooks/reload-vscode-window-for-mcp-payload.runbook.md`.
+
+F7's first verification action is a grep for a changed literal under the *installed* extension's
+`resources/claude-customizations/.claude/hooks/`. A stale result means the push-down verified
+nothing and must not be reported as passing.
+
+## Execution-Time Warnings
+
+1. **Verify each wave-0 child's PR base branch explicitly.** The fail-open epic base-branch check
+   is not fixed until #673 merges in wave 1.
+2. **F5 (#673) has never reproduced its defects.** Its plan carries reproduction as its first
+   executable phase with a hard halt: if the predicted `allow` is not observed, no hook file may
+   be edited. Do not let that halt be bypassed.
+3. **F6 (#675) Phase 5 must run before Phase 6.** Five existing Jest suites pass today only
+   because the diff they compute is empty; Phase 5 repairs them before Phase 6 wires the guard.
+4. **TypeScript worktrees need `npm ci`** before their baseline; `node_modules` is absent in a
+   fresh worktree.
+5. **An epic-child PR into the integration branch receives no CI**, because `ci.yml` triggers only
+   on PRs into `main`/`development`. Dispatch `ci.yml` explicitly against the feature branch and
+   confirm the run's `headSha` equals the PR's `headRefOid`.
+
+## Known Gaps (not blocking; worth filing separately)
+
+- **`quality-tiers.yml` does not exist** at the repository root, though
+  `.claude/rules/quality-tiers.md` declares it the authoritative tier map and states that adding a
+  project without a tier classification fails CI.
+- **No automated test enforces the 500-line cap on `.claude/hooks/**`.** Two files sit within 13
+  lines of it and one Codex file is exactly at it.
+- **The epic owns no GitHub issue.** The integration-to-`main` PR is blocked by
+  `enforce-pr-author-skill.ps1` unless the epic has its own issue number; promote one with
+  `promotion_type: epic` before `epic-orchestrator` reaches that PR.
+- **Merged child worktrees cannot be removed by `epic-planner`.** `git worktree remove` returns
+  `PARALLEL_WORKTREE_REMOVAL_BLOCKED`, demanding a parallel-checkpoint `items[]` record that an
+  epic planner cannot legitimately produce. Writing a synthetic one is anti-pattern 1.
+- **F3's authorization record is not tamper-proof.** `.claude/settings.json` sets
+  `defaultPermissionMode: bypassPermissions` and its deny list does not cover `artifacts/**`. The
+  adopted design converts an untraceable bypass into a deliberate, attributable act via a
+  `session_id` cross-check; the stronger design — holding the record outside the gated agent's
+  write permissions, as the Codex authority store does — is blocked on substrate, not rejected,
+  and is filed as a follow-up. The spec discloses this in three places.
+- **F4's plan header still reads `Last Updated: 2026-09-13T23-08`.** No gate depends on it.
