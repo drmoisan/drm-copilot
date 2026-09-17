@@ -233,6 +233,8 @@ function Test-ExemptOrchestrationSelector {
         `..` segment (L5); no wildcard (L6); no colon other than the drive colon (L7); and a
         non-empty value (L8). Each rejection writes a diagnostic token through Write-Debug.
         The tokens are not contractual and change no decision.
+        L3 checks only that a non-option token follows the value; the caller
+        Test-ExemptOrchestrationSegmentToken rejects any subcommand other than add or commit.
     .OUTPUTS
         System.Boolean
     #>
@@ -293,7 +295,7 @@ function Test-ExemptOrchestrationSegmentToken {
     #>
     [CmdletBinding()]
     [OutputType([bool])]
-    param([Parameter(Mandatory)][AllowEmptyCollection()][string[]] $Token)
+    param([Parameter(Mandatory)][AllowEmptyCollection()][AllowEmptyString()][string[]] $Token)
 
     if ($Token.Count -lt 2) {
         return $false
@@ -423,11 +425,17 @@ function Test-ExemptOrchestrationStagingCommand {
         return $false
     }
 
-    foreach ($segment in $segments) {
-        $tokens = @(ConvertTo-OrchestrationCommandToken -Segment $segment)
-        if (-not (Test-ExemptOrchestrationSegmentToken -Token $tokens)) {
-            return $false
+    # Fail closed (issue #671): an error raised while classifying any segment is a parse
+    # ambiguity, so it answers false instead of letting the caller continue past it.
+    try {
+        foreach ($segment in $segments) {
+            $tokens = @(ConvertTo-OrchestrationCommandToken -Segment $segment)
+            if (-not (Test-ExemptOrchestrationSegmentToken -Token $tokens)) {
+                return $false
+            }
         }
+    } catch {
+        return $false
     }
     return $true
 }

@@ -330,8 +330,8 @@ NOTE
             @{ Label = 'issue #671 LACS L1a - attached selector spelling'; Command = 'git -CC:/repo/wt add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS L1b - config-injection selector'; Command = 'git -c core.worktree=C:/repo/wt add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS L2 - repeated selector'; Command = 'git -C C:/repo/wt -C C:/repo/other add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L3a - selector with no subcommand after the value'; Command = 'git -C C:/repo/wt' }
-            @{ Label = 'issue #671 LACS L3b - subcommand not immediately after the selector value'; Command = 'git -C C:/repo/wt -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L3a - selector with no subcommand after the value'; Command = 'git -C C:/repo/wt && git add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L3b - subcommand not immediately after the selector value'; Command = 'git -C C:/repo/wt --no-pager add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS L4a - bare relative selector'; Command = 'git -C subdir add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS L4b - UNC selector'; Command = 'git -C //server/share/wt add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS L5a - parent-directory segment in the selector'; Command = 'git -C C:/repo/wt/../other add -- docs/features/active/x/spec.md' }
@@ -339,6 +339,7 @@ NOTE
             @{ Label = 'issue #671 LACS L6 - wildcard in the selector'; Command = 'git -C C:/repo/wt-? add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS L7 - stray colon in the selector'; Command = 'git -C C:/repo/wt:branch add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS L8 - empty selector value'; Command = 'git -C "" add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 selector followed by an unmodelled subcommand'; Command = 'git -C C:/repo/wt status && git add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 selector with a non-exempt pathspec operand'; Command = 'git -C C:/repo/wt add -- scripts/powershell/Sample.ps1' }
             @{ Label = 'issue #671 selector with the tree-wide all flag'; Command = 'git -C C:/repo/wt add -A' }
             @{ Label = 'issue #671 selector with an absolute pathspec operand'; Command = 'git -C C:/repo/wt add -- C:/repo/wt/docs/features/active/x/spec.md' }
@@ -352,6 +353,86 @@ NOTE
             $decision.hookSpecificOutput.permissionDecision |
                 Should -Be 'deny' -Because 'LACS withholds the exemption from an undecidable selector or a non-exempt segment'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+        }
+    }
+
+    Context 'issue #671 empty-token fail-closed cases' {
+        # Remediation R1 (issue #671): an empty quoted token is an ordinary token to the
+        # classifier. It is never an exempt operand, and after -m it is the message value.
+        It 'allows <Label>' -ForEach @(
+            @{ Label = 'issue #671 empty commit message beside an exempt operand'; Command = 'git commit -m "" -- docs/features/active/x/spec.md' }
+        ) {
+            # Act
+            $decision = Get-CodexExemptionDecisionForCommand -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'an empty message value is not a pathspec and every operand is exempt'
+        }
+
+        It 'denies <Label>' -ForEach @(
+            @{ Label = 'issue #671 empty token beside a non-exempt operand'; Command = 'git add "" -- src/foo.ps1' }
+            @{ Label = 'issue #671 empty token after the separator beside a non-exempt operand'; Command = 'git add -- "" scripts/powershell/Sample.ps1' }
+            @{ Label = 'issue #671 trailing empty token after a non-exempt operand'; Command = 'git add -- src/foo.ts ""' }
+            @{ Label = 'issue #671 empty commit message beside a non-exempt operand'; Command = 'git commit -m "" -- src/foo.ts' }
+        ) {
+            # Act
+            $decision = Get-CodexExemptionDecisionForCommand -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'an empty token never makes a non-exempt operand exempt'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+        }
+    }
+
+    Context 'issue #671 selector predicate and fail-closed guard' {
+        # Direct calls to the helpers the gate dot-sources in BeforeAll. The predicate checks
+        # only that a non-option token follows the selector value; the caller rejects any
+        # subcommand other than add or commit, which accept 3 pins.
+        It 'accepts <Label>' -ForEach @(
+            @{ Label = 'issue #671 predicate accept 1 - drive-letter selector followed by add'; Token = @('git', '-C', 'C:/repo/wt', 'add', '--', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate accept 2 - rooted selector followed by commit'; Token = @('git', '-C', '/repo/wt', 'commit', '-m', 'msg', '--', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate accept 3 - non-option token after the value is left to the caller'; Token = @('git', '-C', 'C:/repo/wt', 'status') }
+        ) {
+            # Act
+            $result = Test-ExemptOrchestrationSelector -Token $Token
+
+            # Assert
+            $result | Should -BeTrue -Because 'the selector satisfies LACS L1 through L8'
+        }
+
+        It 'rejects <Label>' -ForEach @(
+            @{ Label = 'issue #671 predicate L1a - single token segment'; Token = @('git') }
+            @{ Label = 'issue #671 predicate L1b - option other than the selector at index 1'; Token = @('git', '-c', 'core.worktree=C:/repo/wt', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L2 - repeated selector'; Token = @('git', '-C', 'C:/repo/wt', '-C', 'C:/repo/other', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L3a - no token after the selector value'; Token = @('git', '-C', 'C:/repo/wt') }
+            @{ Label = 'issue #671 predicate L3b - option token after the selector value'; Token = @('git', '-C', 'C:/repo/wt', '--no-pager', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L4a - relative selector'; Token = @('git', '-C', 'subdir', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L4b - UNC selector'; Token = @('git', '-C', '//server/share/wt', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L5a - parent-directory segment'; Token = @('git', '-C', 'C:/repo/wt/../other', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L5b - current-directory segment'; Token = @('git', '-C', 'C:/repo/./wt', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L6 - wildcard'; Token = @('git', '-C', 'C:/repo/wt-?', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L7 - stray colon'; Token = @('git', '-C', 'C:/repo/wt:branch', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L8 - empty selector value'; Token = @('git', '-C', '', 'add', 'docs/features/active/x/spec.md') }
+        ) {
+            # Act
+            $result = Test-ExemptOrchestrationSelector -Token $Token
+
+            # Assert
+            $result | Should -BeFalse -Because 'the selector violates the LACS condition named in the label'
+        }
+
+        It 'returns false when segment classification raises an error' {
+            # Arrange
+            Mock Test-ExemptOrchestrationSegmentToken { throw 'simulated segment classification failure' }
+
+            # Act
+            $result = Test-ExemptOrchestrationStagingCommand -CommandText 'git add -- docs/features/active/x/spec.md'
+
+            # Assert
+            $result | Should -BeFalse -Because 'an error while classifying a segment is a parse ambiguity and answers false'
+            Should -Invoke Test-ExemptOrchestrationSegmentToken -Times 1 -Exactly
         }
     }
 }
