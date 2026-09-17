@@ -15,6 +15,7 @@
  */
 
 import {
+  type PrContextResult,
   type ScopingDocChange,
   section,
   splitLines,
@@ -284,6 +285,45 @@ export function bucketText(
       .map(([path, [adds, dels]]) => `- ${path} (+${adds}/-${dels})`),
   ];
   return lines.join("\n");
+}
+
+/**
+ * Build the `Base/Head` block's line sequence for the summary artifact.
+ *
+ * Extracted from `collector-output.ts` so that file stays under the 500-line
+ * cap. Behaviour is unchanged from the prior inline construction: the same
+ * five lines in the same order, followed by the stale-base WARNING when a
+ * requested local base did not resolve to an `origin/` ref.
+ *
+ * @param ctx The collected PR context result.
+ * @param head The `head` option this collection was run with, or `null`.
+ * @returns The `Base/Head` block's lines, in render order.
+ */
+export function buildBaseHeadSection(
+  ctx: PrContextResult,
+  head: string | null,
+): string[] {
+  const lines: string[] = [
+    section("Base/Head"),
+    `Base ref (requested): ${ctx.baseRef ?? "(default)"}`,
+    `Base ref (resolved): ${ctx.resolvedBase ?? "(unknown)"} @ ${ctx.baseSha ?? "(unknown)"}`,
+    `Head ref (resolved): ${ctx.headRef ?? head ?? "(unknown)"} @ ${ctx.headSha ?? "(unknown)"}`,
+    `Merge base: ${ctx.mergeBase ?? "(unknown)"}`,
+    `Range: ${ctx.revRange ?? "(unknown)"}`,
+  ];
+  // Emit the stale-base WARNING when a requested local base did not resolve to
+  // an origin/ ref.
+  if (
+    ctx.baseRef &&
+    ctx.resolvedBase &&
+    !ctx.resolvedBase.startsWith("origin/")
+  ) {
+    lines.push(
+      "WARNING: Requested base is local and may be stale; prefer " +
+        `origin/${ctx.baseRef}`,
+    );
+  }
+  return lines;
 }
 
 /**

@@ -76,6 +76,11 @@ export interface CollectPrContextServiceCallInput {
   readonly workspaceRoot: string;
   /** Base ref the PR context is computed against. */
   readonly base: string;
+  /**
+   * Optional explicit head ref naming the branch to collect PR context for.
+   * When omitted, the invoking session's HEAD is used as a fallback.
+   */
+  readonly targetRef?: string;
   /** Optional log sink wired to the service output channel. */
   readonly log?: (message: string) => void;
 }
@@ -86,6 +91,12 @@ export interface CollectPrContextServiceCallResult {
   readonly workspaceRoot: string;
   readonly summary: string;
   readonly artifacts: ReadonlyArray<string>;
+  /** `"explicit"` when `targetRef` was supplied, `"session-fallback"` otherwise. */
+  readonly targetResolution: "explicit" | "session-fallback";
+  /** The head ref the collector actually used, or `null` when unresolved. */
+  readonly resolvedHeadRef: string | null;
+  /** The head SHA the collector actually used, or `null` when unresolved. */
+  readonly resolvedHeadSha: string | null;
 }
 
 /**
@@ -127,16 +138,23 @@ export function collectPrContextServiceCall(
     includeUntracked: true,
     fs: input.fileSystem,
     runner: input.runner,
+    ...(input.targetRef === undefined ? {} : { head: input.targetRef }),
     ...(input.log === undefined ? {} : { log: input.log }),
   });
 
   verifyWrittenArtifact(input.fileSystem, summaryOut, rendered.summaryText);
   verifyWrittenArtifact(input.fileSystem, appendixOut, rendered.appendixText);
 
+  const targetResolution: "explicit" | "session-fallback" =
+    input.targetRef === undefined ? "session-fallback" : "explicit";
+
   return {
     tool: "collect_pr_context",
     workspaceRoot: input.workspaceRoot,
     summary: `Collected PR context against base '${input.base}'.`,
     artifacts: [summaryOut, appendixOut],
+    targetResolution,
+    resolvedHeadRef: rendered.resolvedHeadRef,
+    resolvedHeadSha: rendered.headSha,
   };
 }
