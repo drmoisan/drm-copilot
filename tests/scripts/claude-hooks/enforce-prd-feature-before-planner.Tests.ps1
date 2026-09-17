@@ -3,8 +3,14 @@
 
 Describe 'enforce-prd-feature-before-planner.ps1' {
     BeforeAll {
+        # Both files are dot-sourced explicitly, rather than relying on the parent's
+        # own dot-source line, so a later change to that line cannot silently
+        # redirect these assertions at a different helpers file.
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner.ps1").Path
+        $script:Helpers = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1").Path
         . $script:UnderTest
+        . $script:Helpers
+        Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'NoTarget' -SessionRoot '/synthetic-worktrees/session-root' -Detail 'modelled no-target for the delivered cases' }
     }
 
     Context 'tool input parsing' {
@@ -104,9 +110,18 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'feature folder'
         }
 
-        It 'falls back to orchestrator-state.json when prompt has no folder reference' {
+        It 'allows the session-root fallback when the derived target is the session root' {
+            # The call names no folder and has no target of its own, so the session's
+            # own checkpoint may stand in. The existence mock is keyed on the fully
+            # composed path, so the case cannot pass on a probe that always answers
+            # true regardless of where the gate looked.
             Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
-            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
+                $Path -in @(
+                    'docs/features/active/2026-05-10-bar-2/spec.md',
+                    'docs/features/active/2026-05-10-bar-2/user-story.md'
+                )
+            }
             Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { 'docs/features/active/2026-05-10-bar-2' }
             $json = (@{
                     tool_name  = 'Agent'

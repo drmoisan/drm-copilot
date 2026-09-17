@@ -1,0 +1,4 @@
+Timestamp: 2026-09-17T14:12Z
+Command: git diff 499e288a -- extensions/drm-copilot/src extensions/drm-copilot/test
+EXIT_CODE: 0
+Output Summary: The anchored diff contains no added line matching `setTimeout`, `Date.now(`, `mkdtemp`, or `tmpdir`. `git status --porcelain --untracked-files=all -- extensions/drm-copilot/src extensions/drm-copilot/test` produced zero lines, so no additional untracked path exists beyond the four files this change creates. `grep -nE "setTimeout|Date\.now\(|mkdtemp|tmpdir" extensions/drm-copilot/src/lib/pr-context/diff-emptiness.ts extensions/drm-copilot/test/lib/pr-context/diff-emptiness.test.ts extensions/drm-copilot/test/lib/pr-context/pr-context-service-call-target.test.ts extensions/drm-copilot/test/lib/pr-context/collector-output-head-source.test.ts` reported no match, exiting 1 (grep's no-match exit code, which is this check's success signal, recorded here rather than in `EXIT_CODE:`). No banned determinism construct was introduced.

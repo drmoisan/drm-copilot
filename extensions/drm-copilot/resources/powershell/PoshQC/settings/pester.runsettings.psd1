@@ -42,6 +42,8 @@
             # Issue #275 remediation cycle 1 (fix #3): measure the epic-orchestrate hook set and
             # its dot-sourced sibling module so no production hook is excluded from coverage.
             '.claude/hooks/enforce-epic-merge-gate.ps1'
+            # Issue #670: CodeCoverage.Path is an explicit per-file allow-list, so the dot-sourced helpers file is listed here.
+            '.claude/hooks/enforce-epic-merge-gate-authorization.ps1'
             '.claude/hooks/enforce-epic-wave-barrier.ps1'
             '.claude/hooks/enforce-epic-worktree-removal-gate.ps1'
             '.claude/hooks/enforce-pr-author-skill.ps1'
@@ -235,6 +237,10 @@
             '.claude/hooks/enforce-feature-folder-order.ps1'
             '.claude/hooks/enforce-checkpoint-monotonic.ps1'
             '.claude/hooks/enforce-prd-feature-before-planner.ps1'
+            # Issue #672 split the prd-feature gate's resolution logic into a dot-sourced
+            # sibling; registered so the new production file stays in the coverage
+            # denominator per the Coverage Exclusion Policy.
+            '.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1'
             '.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1'
             '.claude/hooks/enforce-pr-author-skill-helpers.ps1'
             # Issue #526 added this out-of-band release-verification module (Layer B of the
@@ -280,6 +286,13 @@
             '.codex/hooks/enforce-epic-merge-gate.ps1'
             '.codex/hooks/enforce-epic-worktree-removal-gate.ps1'
             '.codex/hooks/validate-bash.ps1'
+            # Issue #669 added the worktree-resolution module (target-worktree locator, path
+            # normaliser, and four-state call-target derivation). CodeCoverage.Path is an
+            # explicit per-file allow-list, so an unregistered production file would sit
+            # outside the coverage denominator, which the Coverage Exclusion Policy forbids.
+            # Registered here beside the other .claude/lib modules.
+            '.claude/lib/worktree-resolution/WorktreeResolution.psm1'
+            '.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

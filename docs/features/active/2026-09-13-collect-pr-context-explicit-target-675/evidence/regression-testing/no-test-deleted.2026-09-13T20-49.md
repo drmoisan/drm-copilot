@@ -1,0 +1,4 @@
+Timestamp: 2026-09-17T13:20Z
+Command: git diff 499e288a -- extensions/drm-copilot/test/lib/pr-context/pr-context-service-call.test.ts extensions/drm-copilot/test/extension.collect-pr-context.test.ts extensions/drm-copilot/test/extension.integration.test.ts extensions/drm-copilot/test/repo-automation-dispatch-pr-context-verification.test.ts extensions/drm-copilot/test/repo-automation-dispatch.test.ts
+EXIT_CODE: 0
+Output Summary: Zero removed lines matching `it(` and zero `deleted file mode` lines across all five suites that were repaired in Phase 5. All five files are tracked at `499e288a`, so a removed line or a whole-file deletion is visible to the anchored diff; no `git status --porcelain` companion is required for this observation because an untracked file cannot contain a pre-existing test this criterion protects. Each suite was extended with a scripted non-empty git diff (name-status/numstat) rather than having any test removed.

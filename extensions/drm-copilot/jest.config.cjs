@@ -274,5 +274,17 @@ module.exports = {
     // remains interface-only with no executable behavior, so it stays omitted
     // from the threshold gate for exactly the reason recorded against it above,
     // while remaining included in `collectCoverageFrom`.
+    // Issue #675: the pure diff-emptiness classifier backing the empty-diff
+    // guard. This map carries no `global` key, so a new production file
+    // without its own entry here would be completely ungated.
+    "./src/lib/pr-context/diff-emptiness.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // No entry for "./src/lib/pr-context/index.ts": it is a re-export barrel
+    // measured on 2026-09-13 at `LF:115` / `LH:0` in `coverage/lcov.info`,
+    // because no module under `src` or `test` imports the barrel path. It is
+    // omitted only from the per-file threshold gate for that reason and
+    // stays inside `collectCoverageFrom`, i.e. measured but not gated.
   },
 };
