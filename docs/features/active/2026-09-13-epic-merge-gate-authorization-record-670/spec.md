@@ -729,18 +729,18 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 
 ### Behaviour — the authorization record
 
-- [ ] With a valid authorization record naming PR 691 present in any one of the three orchestrator
+- [x] With a valid authorization record naming PR 691 present in any one of the three orchestrator
       checkpoints and a matching envelope `session_id`, `gh pr merge 691 --merge` is allowed, where it
       denies today. Pinned by a named case in
       `tests/scripts/claude-hooks/enforce-epic-merge-gate.Authorization.Tests.ps1`.
-- [ ] The allow in the preceding criterion holds when the record is carried in the per-feature
+- [x] The allow in the preceding criterion holds when the record is carried in the per-feature
       checkpoint, when it is carried in the epic checkpoint, and when it is carried in the parallel
       checkpoint. Three named cases, one per checkpoint.
-- [ ] A record naming a different PR denies with `STANDALONE_MERGE_AUTHORIZATION_PR_MISMATCH`, proved
+- [x] A record naming a different PR denies with `STANDALONE_MERGE_AUTHORIZATION_PR_MISMATCH`, proved
       by the four-property discriminator: record naming 501 only, command
       `cd /repo/worktrees/501 && gh pr merge --merge 777`, all three read seams mocked with only one
       populated, and a paired positive case merging 501 that allows.
-- [ ] With no `standalone_merge_authorizations` key on any of the three checkpoints, an in-scope
+- [x] With no `standalone_merge_authorizations` key on any of the three checkpoints, an in-scope
       command naming an explicit PR denies with `STANDALONE_MERGE_AUTHORIZATION_ABSENT`, and the deny
       message states that an authorized path exists and how to take it.
 - [x] Every non-PR-specific spelling denies with `STANDALONE_MERGE_AUTHORIZATION_NOT_PR_SPECIFIC`, with
@@ -752,13 +752,13 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       `STANDALONE_MERGE_AUTHORIZATION_MALFORMED` and a message naming the failing field, with one named
       case per field: `pr_url`, `issue_num`, `branch_name`, `authorized_by`, `authorized_at`, `basis`
       empty, `basis` below the stated minimum length, and `run_slug` present but empty.
-- [ ] A record whose `session_id` differs from the live envelope's denies with
+- [x] A record whose `session_id` differs from the live envelope's denies with
       `STANDALONE_MERGE_AUTHORIZATION_MALFORMED` naming `session_id`; an envelope carrying no
       `session_id` at all also denies, naming `session_id`. Two named cases.
-- [ ] A bare `gh pr merge --merge` carrying no explicit PR number denies with the **existing**
+- [x] A bare `gh pr merge --merge` carrying no explicit PR number denies with the **existing**
       line-433 `EPIC_MERGE_GATE_BLOCKED` reason text even when a valid authorization record is present.
       Pinned by a named case that asserts the existing text, not merely the token.
-- [ ] Branch 4 is evaluated after branches 1, 2 and 3. Pinned by a named case in which a parallel
+- [x] Branch 4 is evaluated after branches 1, 2 and 3. Pinned by a named case in which a parallel
       checkpoint authorizes item 501 at `ci_green` and a standalone record names 777 only: the command
       merging 501 is allowed via branch 3, and the case asserts the allow carries no
       standalone-authorization reason.
@@ -768,10 +768,10 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 
 ### Trigger scope
 
-- [ ] `gh pr merge 691 --squash` with a valid authorization record naming 691 present is **allowed**
+- [x] `gh pr merge 691 --squash` with a valid authorization record naming 691 present is **allowed**
       as out of trigger scope. New named case; this is the paired case proving the record does not
       widen trigger scope.
-- [ ] `tests/scripts/claude-hooks/enforce-epic-merge-gate.Tests.ps1:27`
+- [x] `tests/scripts/claude-hooks/enforce-epic-merge-gate.Tests.ps1:27`
       (`It 'allows gh pr merge without --merge (e.g., --squash)'`) is green and its text is unedited.
 - [ ] This spec contains no acceptance criterion asserting that `--squash` denies, and the corrected
       framing — that `--squash` is out of trigger scope and allowed today on both runtimes — is
@@ -779,7 +779,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 
 ### Must not regress (carried verbatim from the epic)
 
-- [ ] **The `pr_number` matcher is unchanged.** Verified two ways, both of which can fail.
+- [x] **The `pr_number` matcher is unchanged.** Verified two ways, both of which can fail.
       (a) A named Pester case asserts `Get-EpicMergeGateCommandPrNumber` returns 410 for the
       number-before-flag form, 410 for the flag-before-number form, 410 for the equals-joined form, 688
       for the cd-prefixed form, 777 for the false-allow form, and nothing for the bare form — the same
@@ -857,7 +857,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       auditable declaration and not a cryptographic or security control, that `authorized_by` is a
       declaration the hook does not verify, that the record is not tamper-proof against a same-session
       writer, and what the `session_id` cross-check does and does not stop.
-- [ ] The hook's header comment block no longer says the gate allows the merge when "one of three"
+- [x] The hook's header comment block no longer says the gate allows the merge when "one of three"
       conditions holds; it documents four conditions, and the standalone-exclusion paragraph at the
       current lines 23-27 is rewritten so the file's own documentation is not left false.
 - [ ] `.claude/rules/orchestrator-state.md` gains a `standalone_merge_authorizations` scope-and-
@@ -878,7 +878,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 
 ### Tests, toolchain, and coverage
 
-- [ ] Every currently-passing case in all four existing suites
+- [x] Every currently-passing case in all four existing suites
       (`enforce-epic-merge-gate.Tests.ps1`, `enforce-epic-merge-gate.TriggerScoping.Tests.ps1`,
       `enforce-epic-merge-gate-decision-surface.Tests.ps1`,
       `enforce-epic-merge-gate-trigger-scoping.Tests.ps1`) is green and its text is unedited, with the
