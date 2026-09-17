@@ -1,6 +1,6 @@
 # File 1 Physical Line Count
 
-Timestamp: 2026-09-17T08:18:30-04:00
+Timestamp: 2026-09-17T08:16:43-04:00 (file write time)
 Command: @(Get-Content -LiteralPath '.claude/lib/worktree-resolution/WorktreeResolution.psm1').Count
 EXIT_CODE: 0
 Output Summary: before count 521 (above the 480 plan ceiling and the 500 enforced cap); the sanctioned seam-help reduction and a further compaction pass were applied; final count 480, which is at the 480 plan ceiling and under 500. No third module file was created and Get-WorktreeResolutionAmbiguityReasonCode was not relocated. The File 1 suite still reports 48 passed, 0 failed after the reduction.

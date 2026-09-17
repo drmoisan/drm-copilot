@@ -1,6 +1,6 @@
 # MCP Runner CodeCoverage.Path Determination
 
-Timestamp: 2026-09-17T08:40:30-04:00
+Timestamp: 2026-09-17T08:40:55-04:00 (file write time)
 Command: [xml] parse of evidence/other/final-powershell-coverage.mcp.2026-09-13T22-00.xml using the [P0-T8] names: report/package where @name ends with 'worktree-resolution', then sourcefile where @name equals the bare module file name
 EXIT_CODE: 0
 Output Summary: INSTALLED-EXTENSION-SETTINGS — row count for WorktreeResolution.psm1 = 0; row count for WorktreeTargetResolution.psm1 = 0; packages whose name ends with worktree-resolution = 0.

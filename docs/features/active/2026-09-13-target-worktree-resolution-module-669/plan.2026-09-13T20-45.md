@@ -495,47 +495,47 @@ each criterion individually against named evidence before changing its checkbox,
 `.claude/skills/acceptance-criteria-tracking/SKILL.md`. Only `- [ ]` becomes `- [x]`; criterion text is
 never altered; an unverified criterion is left unchecked and its gap is recorded.
 
-- [ ] [P5-T1] Check off the ten `### Contract surface` criteria in `spec.md` and `user-story.md`
+- [x] [P5-T1] Check off the ten `### Contract surface` criteria in `spec.md` and `user-story.md`
   - Evidence: `evidence/regression-testing/convention-and-python-guard.2026-09-13T22-00.md`, `evidence/regression-testing/worktree-resolution-suite.2026-09-13T22-00.md`, `evidence/regression-testing/worktree-target-resolution-suite.2026-09-13T22-00.md`, and `evidence/qa-gates/scope-boundary.2026-09-13T22-00.md`.
   - Acceptance: in each of the two files, the ten lines between the heading `### Contract surface` and the next `###` heading all begin with `- [x] `, and `evidence/other/ac-checkoff-contract-surface.2026-09-13T22-00.md` records one line per criterion naming the test or artifact that verified it.
 
-- [ ] [P5-T2] Check off the ten `### Rulings A, B, and C` criteria in `spec.md` and `user-story.md`
+- [x] [P5-T2] Check off the ten `### Rulings A, B, and C` criteria in `spec.md` and `user-story.md`
   - Evidence: `evidence/regression-testing/worktree-resolution-suite.2026-09-13T22-00.md`, `evidence/regression-testing/worktree-target-resolution-suite.2026-09-13T22-00.md`, and `evidence/regression-testing/ruling-b-state-read-absence.2026-09-13T22-00.md`. The Ruling B criterion at `spec.md:674` is evidenced by the four `orchestrator-state` and `checkpoint` searches recorded in the last of those, covering both module files.
   - Acceptance: in each of the two files, the ten lines between the heading `### Rulings A, B, and C` and the next `###` heading all begin with `- [x] `, and `evidence/other/ac-checkoff-rulings.2026-09-13T22-00.md` records one line per criterion naming the test or artifact that verified it.
 
-- [ ] [P5-T3] Check off the six `### Path normalisation and composition` criteria in `spec.md` and `user-story.md`
+- [x] [P5-T3] Check off the six `### Path normalisation and composition` criteria in `spec.md` and `user-story.md`
   - Evidence: `evidence/regression-testing/worktree-resolution-suite.2026-09-13T22-00.md`, `evidence/regression-testing/worktree-target-resolution-suite.2026-09-13T22-00.md`, and `evidence/regression-testing/ruling-b-state-read-absence.2026-09-13T22-00.md`.
   - Acceptance: in each of the two files, the six lines between the heading `### Path normalisation and composition` and the next `###` heading all begin with `- [x] `, and `evidence/other/ac-checkoff-path-normalisation.2026-09-13T22-00.md` records one line per criterion naming the test or artifact that verified it.
 
-- [ ] [P5-T4] Check off the three `### Reason code` criteria in `spec.md` and `user-story.md`
+- [x] [P5-T4] Check off the three `### Reason code` criteria in `spec.md` and `user-story.md`
   - Evidence: `evidence/regression-testing/worktree-resolution-suite.2026-09-13T22-00.md` and `evidence/regression-testing/worktree-target-resolution-suite.2026-09-13T22-00.md`.
   - Acceptance: in each of the two files, the three lines between the heading `### Reason code` and the next `###` heading all begin with `- [x] `, and `evidence/other/ac-checkoff-reason-code.2026-09-13T22-00.md` records one line per criterion naming the test or artifact that verified it.
 
-- [ ] [P5-T5] Check off the four `### Seams and determinism` criteria in `spec.md` and `user-story.md`
+- [x] [P5-T5] Check off the four `### Seams and determinism` criteria in `spec.md` and `user-story.md`
   - Evidence: `evidence/regression-testing/worktree-resolution-suite.2026-09-13T22-00.md` for the seam-default-body tests added by `[P1-T6]`, `evidence/regression-testing/worktree-target-resolution-suite.2026-09-13T22-00.md` for the table-driven matrix added by `[P2-T6]`, `evidence/regression-testing/ruling-b-state-read-absence.2026-09-13T22-00.md` for the fourteen searches that verify `spec.md:701`, and the determinism-posture `.DESCRIPTION` block in each of the three suites.
   - Acceptance: in each of the two files, the four lines between the heading `### Seams and determinism` and the next `###` heading all begin with `- [x] `, and `evidence/other/ac-checkoff-seams.2026-09-13T22-00.md` records one line per criterion naming the test or artifact that verified it.
 
-- [ ] [P5-T6] Check off the nine `### Registration, mirroring, and coverage` criteria in `spec.md` and `user-story.md`
+- [x] [P5-T6] Check off the nine `### Registration, mirroring, and coverage` criteria in `spec.md` and `user-story.md`
   - Evidence: `evidence/regression-testing/poshqc-parity-pytest.2026-09-13T22-00.md`, `evidence/qa-gates/bundle-mirror-hashes.2026-09-13T22-00.md`, `evidence/regression-testing/manifest-suite.2026-09-13T22-00.md`, `evidence/qa-gates/coverage-path-exclusion-check.2026-09-13T22-00.md`, `evidence/qa-gates/bundle-mirror-hashes.post-format.2026-09-13T22-00.md`, and `evidence/qa-gates/final-poshqc-selfhosted-coverage.2026-09-13T22-00.md`. The two `core.json` exactly-once criteria are additionally evidenced by the manifest suite's exactly-once assertions recorded in `evidence/regression-testing/manifest-suite.2026-09-13T22-00.md`.
   - Acceptance: in each of the two files, the nine lines between the heading `### Registration, mirroring, and coverage` and the next `###` heading all begin with `- [x] `, and `evidence/other/ac-checkoff-registration.2026-09-13T22-00.md` records one line per criterion naming the test or artifact that verified it.
 
-- [ ] [P5-T7] Check off the five `### Policy compliance` criteria in `spec.md` and `user-story.md`
+- [x] [P5-T7] Check off the five `### Policy compliance` criteria in `spec.md` and `user-story.md`
   - Evidence: `evidence/regression-testing/convention-and-python-guard.2026-09-13T22-00.md`, `evidence/qa-gates/module-line-counts.file1.2026-09-13T22-00.md`, `evidence/qa-gates/module-line-counts.file2.2026-09-13T22-00.md`, `evidence/qa-gates/suite-line-counts.2026-09-13T22-00.md`, `evidence/qa-gates/toolchain-single-pass.2026-09-13T22-00.md`, `evidence/qa-gates/poshqc-observed-success-output.2026-09-13T22-00.md`, and `evidence/qa-gates/changed-file-inventory.2026-09-13T22-00.md` confirming no Python file changed.
   - Acceptance: in each of the two files, the five lines between the heading `### Policy compliance` and the next `###` heading all begin with `- [x] `, and `evidence/other/ac-checkoff-policy.2026-09-13T22-00.md` records one line per criterion naming the test or artifact that verified it.
 
-- [ ] [P5-T8] Check off the four `### Must not regress (carried verbatim from the epic)` criteria in `spec.md` and `user-story.md`
+- [x] [P5-T8] Check off the four `### Must not regress (carried verbatim from the epic)` criteria in `spec.md` and `user-story.md`
   - Evidence: `evidence/qa-gates/scope-boundary.2026-09-13T22-00.md` establishes that no gate file changed, which is what makes the first three criteria hold by construction for this feature; the fourth is evidenced by the cwd-equals-target regression-guard row recorded in `evidence/regression-testing/worktree-target-resolution-suite.2026-09-13T22-00.md`, which `[P2-T6]` writes into the suite and `[P2-T10]` persists.
   - Acceptance: in each of the two files, the four lines between the heading `### Must not regress (carried verbatim from the epic)` and the next heading all begin with `- [x] `, and `evidence/other/ac-checkoff-must-not-regress.2026-09-13T22-00.md` records one line per criterion naming the artifact that verified it.
 
-- [ ] [P5-T9] Record the acceptance-criteria status summary for both source files
+- [x] [P5-T9] Record the acceptance-criteria status summary for both source files
   - For `spec.md`, slice the lines strictly between `## Acceptance Criteria` and `## Definition of Done`; for `user-story.md`, slice strictly between `## Acceptance Criteria` and `## Non-Goals`. In each slice count lines satisfying `$_.StartsWith('- [x] ')` and lines satisfying `$_.StartsWith('- [ ] ')`.
   - Acceptance: `evidence/other/ac-status-summary.2026-09-13T22-00.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`, and records for each file a total of `51`, a checked count of `51`, and an unchecked count of `0`. Any criterion that could not be verified is left unchecked and named in the summary with its gap, in which case the checked count is recorded as it stands and the outcome is reported as remediation-required rather than complete.
 
-- [ ] [P5-T10] Check off the satisfied `## Definition of Done` items in `spec.md`
+- [x] [P5-T10] Check off the satisfied `## Definition of Done` items in `spec.md`
   - Verify and check off each of the thirteen items at `spec.md:734-746` that this plan's evidence supports, leaving any unsupported item unchecked with its gap recorded. No Definition-of-Done item directs evidence to a non-canonical sub-path, so no substitution is recorded.
   - Acceptance: `evidence/other/dod-checkoff.2026-09-13T22-00.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`, and records one line per Definition-of-Done item with its verdict and the artifact that supports it.
 
-- [ ] [P5-T11] Write the plan-completion evidence artifact
+- [x] [P5-T11] Write the plan-completion evidence artifact
   - Enumerate every task identifier in this plan with its completion state, every evidence artifact path this plan names with an existence check, and the three unverified items from the Unverified Items section with their closing state (`[P4-T6]` closes item 1; item 2 is recorded as already resolved in this plan's Unverified Items section, and `[P0-T9]` records the per-stage evidence consistent with that resolution; item 3 remains outside this feature's scope).
   - The `evidence/other/batch-budget-reset.unscheduled-N.2026-09-13T22-00.md` family is conditional: it exists only for unscheduled resets that were actually needed. Record the count of such files found, and record `not required` rather than a missing-artifact verdict when the count is `0`. Every other artifact path this plan names is unconditional and must exist.
   - Acceptance: `evidence/qa-gates/plan-completion.2026-09-13T22-00.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`, lists every task identifier in this plan from `[P0-T1]` through `[P5-T11]` inclusive, including this task, and records an existence verdict for every evidence artifact path this plan names.

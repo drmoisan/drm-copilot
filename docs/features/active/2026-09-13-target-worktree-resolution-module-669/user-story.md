@@ -163,78 +163,78 @@ line.
 
 ### Contract surface
 
-- [ ] A new module directory `.claude/lib/worktree-resolution/` exposes target derivation via `Resolve-WorktreeCallTarget`, path normalisation via `ConvertTo-WorktreeResolutionRepoRelativePath`, and the ambiguity reason code via `Get-WorktreeResolutionAmbiguityReasonCode`, and this feature rewires no hook, no MCP tool, and no other consumer.
-- [ ] `Resolve-WorktreeCallTarget` always returns a `[pscustomobject]` and never `$null`, carrying the fields `Status`, `WorktreeRoot`, `SessionRoot`, `Signal`, `SignalValue`, `Candidates`, `ReasonCode`, and `Detail`.
-- [ ] `Status` takes exactly one of the literal values `SessionRoot`, `OtherWorktree`, `NoTarget`, and `Ambiguous`, and a Pester test asserts that every one of those four values is produced by at least one documented input.
-- [ ] For every `Status`, the `SessionRoot` field is populated, the `Candidates` field is an array (possibly empty) rather than a scalar or `$null`, and the `Detail` field is a non-empty string.
-- [ ] `WorktreeRoot` is populated for `Status = 'SessionRoot'` and `Status = 'OtherWorktree'` and is `$null` for both `Status = 'NoTarget'` and `Status = 'Ambiguous'`, so a caller branching on `WorktreeRoot` alone cannot treat an unresolved call as a resolved one.
-- [ ] Regression guard: when the derived target's containing worktree is the worktree the invoking process is running in, `Status` is `SessionRoot`, `WorktreeRoot` equals `SessionRoot`, `ReasonCode` is `$null`, and `Candidates` holds exactly that one root.
-- [ ] A payload carrying no target signal at all returns `Status = 'NoTarget'` with `Signal = $null`, `SignalValue = $null`, `WorktreeRoot = $null`, `ReasonCode = $null`, and an empty `Candidates` array.
-- [ ] A payload carrying a target signal that cannot be placed in exactly one worktree returns `Status = 'Ambiguous'` with `ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS'`, `Signal` naming the signal kind that was present, and `SignalValue` carrying the raw token verbatim.
-- [ ] The `NoTarget` versus `Ambiguous` distinction is determinable from the returned result object alone, with no further filesystem read, state read, or heuristic required of the caller, and a Pester test asserts both results are distinguishable by `Status` and by `ReasonCode`.
-- [ ] Every documented `Ambiguous` sub-case is covered by a test: a repo-relative feature-folder token matching two or more candidate worktrees, a repo-relative token matching zero candidate worktrees, an absolute path whose upward walk reaches the filesystem root without finding a `.git` entry, a branch signal matching no worktree, a branch signal matching more than one worktree, and two present signals resolving to different worktree roots.
+- [x] A new module directory `.claude/lib/worktree-resolution/` exposes target derivation via `Resolve-WorktreeCallTarget`, path normalisation via `ConvertTo-WorktreeResolutionRepoRelativePath`, and the ambiguity reason code via `Get-WorktreeResolutionAmbiguityReasonCode`, and this feature rewires no hook, no MCP tool, and no other consumer.
+- [x] `Resolve-WorktreeCallTarget` always returns a `[pscustomobject]` and never `$null`, carrying the fields `Status`, `WorktreeRoot`, `SessionRoot`, `Signal`, `SignalValue`, `Candidates`, `ReasonCode`, and `Detail`.
+- [x] `Status` takes exactly one of the literal values `SessionRoot`, `OtherWorktree`, `NoTarget`, and `Ambiguous`, and a Pester test asserts that every one of those four values is produced by at least one documented input.
+- [x] For every `Status`, the `SessionRoot` field is populated, the `Candidates` field is an array (possibly empty) rather than a scalar or `$null`, and the `Detail` field is a non-empty string.
+- [x] `WorktreeRoot` is populated for `Status = 'SessionRoot'` and `Status = 'OtherWorktree'` and is `$null` for both `Status = 'NoTarget'` and `Status = 'Ambiguous'`, so a caller branching on `WorktreeRoot` alone cannot treat an unresolved call as a resolved one.
+- [x] Regression guard: when the derived target's containing worktree is the worktree the invoking process is running in, `Status` is `SessionRoot`, `WorktreeRoot` equals `SessionRoot`, `ReasonCode` is `$null`, and `Candidates` holds exactly that one root.
+- [x] A payload carrying no target signal at all returns `Status = 'NoTarget'` with `Signal = $null`, `SignalValue = $null`, `WorktreeRoot = $null`, `ReasonCode = $null`, and an empty `Candidates` array.
+- [x] A payload carrying a target signal that cannot be placed in exactly one worktree returns `Status = 'Ambiguous'` with `ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS'`, `Signal` naming the signal kind that was present, and `SignalValue` carrying the raw token verbatim.
+- [x] The `NoTarget` versus `Ambiguous` distinction is determinable from the returned result object alone, with no further filesystem read, state read, or heuristic required of the caller, and a Pester test asserts both results are distinguishable by `Status` and by `ReasonCode`.
+- [x] Every documented `Ambiguous` sub-case is covered by a test: a repo-relative feature-folder token matching two or more candidate worktrees, a repo-relative token matching zero candidate worktrees, an absolute path whose upward walk reaches the filesystem root without finding a `.git` entry, a branch signal matching no worktree, a branch signal matching more than one worktree, and two present signals resolving to different worktree roots.
 
 ### Rulings A, B, and C
 
-- [ ] Ruling A: `ConvertTo-WorktreeResolutionRepoRelativePath` given a relative input and no `-WorktreeRoot` returns `IsNormalized = $false`, `RepoRelativePath = $null`, `WorktreeRoot = $null`, and `ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS'`, and never returns the input unchanged as though it had been normalised.
-- [ ] Ruling A complement: `ConvertTo-WorktreeResolutionRepoRelativePath` given a relative input and an explicit `-WorktreeRoot` returns `IsNormalized = $true` with that root normalised into `WorktreeRoot` and the input normalised into `RepoRelativePath`.
-- [ ] Ruling B: no function in either module reads a checkpoint, an orchestrator-state file, or any other run artifact, and a repository-wide grep of the module sources for `orchestrator-state` and `checkpoint` returns no functional reference.
-- [ ] Ruling B: two present signals that resolve to different worktree roots return `Status = 'Ambiguous'`, and two present signals that resolve to the same root deduplicate to a single candidate and resolve normally to `SessionRoot` or `OtherWorktree`.
-- [ ] Ruling B: the documented signal precedence order `FeatureFolderPath`, then `FilePath`, then `Branch` determines only which signal kind is reported in `Signal` and `SignalValue` when the present signals agree on one worktree root, and a test asserts that precedence never suppresses a disagreement.
-- [ ] Ruling C: the candidate worktree set is derived from the session root with no git subprocess, by treating a `.git` directory as a main checkout and a `.git` file's `gitdir:` line plus that admin directory's `commondir` file as the route from a linked worktree back to the main `.git` directory.
-- [ ] Ruling C: the candidate worktree set includes the main checkout itself and not only the linked worktrees, and a test asserts the main checkout is returned when the session root is a linked worktree.
-- [ ] Ruling C: each `<main>/.git/worktrees/<name>/gitdir` file is read as the path to that worktree's own `.git` file, and the worktree root is taken as that file's parent directory.
-- [ ] Ruling C: containment resolves to exactly one worktree for the resolved states, and both the two-or-more case and the zero case return `Status = 'Ambiguous'`.
-- [ ] Containment is never tested by string-prefix comparison against a single known root, and a test covers a worktree that is a sibling of the main checkout rather than a descendant of it.
+- [x] Ruling A: `ConvertTo-WorktreeResolutionRepoRelativePath` given a relative input and no `-WorktreeRoot` returns `IsNormalized = $false`, `RepoRelativePath = $null`, `WorktreeRoot = $null`, and `ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS'`, and never returns the input unchanged as though it had been normalised.
+- [x] Ruling A complement: `ConvertTo-WorktreeResolutionRepoRelativePath` given a relative input and an explicit `-WorktreeRoot` returns `IsNormalized = $true` with that root normalised into `WorktreeRoot` and the input normalised into `RepoRelativePath`.
+- [x] Ruling B: no function in either module reads a checkpoint, an orchestrator-state file, or any other run artifact, and a repository-wide grep of the module sources for `orchestrator-state` and `checkpoint` returns no functional reference.
+- [x] Ruling B: two present signals that resolve to different worktree roots return `Status = 'Ambiguous'`, and two present signals that resolve to the same root deduplicate to a single candidate and resolve normally to `SessionRoot` or `OtherWorktree`.
+- [x] Ruling B: the documented signal precedence order `FeatureFolderPath`, then `FilePath`, then `Branch` determines only which signal kind is reported in `Signal` and `SignalValue` when the present signals agree on one worktree root, and a test asserts that precedence never suppresses a disagreement.
+- [x] Ruling C: the candidate worktree set is derived from the session root with no git subprocess, by treating a `.git` directory as a main checkout and a `.git` file's `gitdir:` line plus that admin directory's `commondir` file as the route from a linked worktree back to the main `.git` directory.
+- [x] Ruling C: the candidate worktree set includes the main checkout itself and not only the linked worktrees, and a test asserts the main checkout is returned when the session root is a linked worktree.
+- [x] Ruling C: each `<main>/.git/worktrees/<name>/gitdir` file is read as the path to that worktree's own `.git` file, and the worktree root is taken as that file's parent directory.
+- [x] Ruling C: containment resolves to exactly one worktree for the resolved states, and both the two-or-more case and the zero case return `Status = 'Ambiguous'`.
+- [x] Containment is never tested by string-prefix comparison against a single known root, and a test covers a worktree that is a sibling of the main checkout rather than a descendant of it.
 
 ### Path normalisation and composition
 
-- [ ] `ConvertTo-WorktreeResolutionRepoRelativePath` returns a `[pscustomobject]` carrying `IsNormalized`, `RepoRelativePath`, `WorktreeRoot`, `ReasonCode`, and `Detail`, with `ReasonCode` set to `TARGET_WORKTREE_AMBIGUOUS` exactly when `IsNormalized` is `$false` and `$null` otherwise.
-- [ ] An absolute path inside a locatable worktree normalises to the full repo-relative remainder below that worktree root with no path segment lost, and its absolute prefix is recovered into `WorktreeRoot` rather than discarded.
-- [ ] No fixed segment-count truncation of any path appears anywhere in either module, and a test asserts that a repo-relative remainder deeper than four segments survives normalisation intact.
-- [ ] Normalised paths use forward slashes regardless of input separator, carry no trailing slash, and carry no leading `./`.
-- [ ] `Find-WorktreeResolutionFeatureFolderSignal` preserves an absolute worktree prefix present in the scanned token rather than re-deriving a bare repo-relative token, which is the correction to the epic's characterisation of `enforce-prd-feature-before-planner.ps1`.
-- [ ] `Join-WorktreeResolutionPath -WorktreeRoot <root> -RepoRelativePath <rel>` returns an absolute forward-slash path, giving F4 and F5 a single composition for turning a resolved target into an absolute `artifacts/orchestration/orchestrator-state.json`.
+- [x] `ConvertTo-WorktreeResolutionRepoRelativePath` returns a `[pscustomobject]` carrying `IsNormalized`, `RepoRelativePath`, `WorktreeRoot`, `ReasonCode`, and `Detail`, with `ReasonCode` set to `TARGET_WORKTREE_AMBIGUOUS` exactly when `IsNormalized` is `$false` and `$null` otherwise.
+- [x] An absolute path inside a locatable worktree normalises to the full repo-relative remainder below that worktree root with no path segment lost, and its absolute prefix is recovered into `WorktreeRoot` rather than discarded.
+- [x] No fixed segment-count truncation of any path appears anywhere in either module, and a test asserts that a repo-relative remainder deeper than four segments survives normalisation intact.
+- [x] Normalised paths use forward slashes regardless of input separator, carry no trailing slash, and carry no leading `./`.
+- [x] `Find-WorktreeResolutionFeatureFolderSignal` preserves an absolute worktree prefix present in the scanned token rather than re-deriving a bare repo-relative token, which is the correction to the epic's characterisation of `enforce-prd-feature-before-planner.ps1`.
+- [x] `Join-WorktreeResolutionPath -WorktreeRoot <root> -RepoRelativePath <rel>` returns an absolute forward-slash path, giving F4 and F5 a single composition for turning a resolved target into an absolute `artifacts/orchestration/orchestrator-state.json`.
 
 ### Reason code
 
-- [ ] `Get-WorktreeResolutionAmbiguityReasonCode` returns the exact literal string `TARGET_WORKTREE_AMBIGUOUS`, and a Pester test pins that literal so a rename is a test failure rather than a silent contract break for F4 and F5.
-- [ ] The ambiguity reason code does not carry a `_BLOCKED` suffix, because F1 owns no gate and the suffix family is reserved for a hook's own leading decision token.
-- [ ] The `Detail` field of an ambiguous result is a prose clause safe to concatenate directly into a `permissionDecisionReason` after a gate's own `*_BLOCKED` token, and a test asserts the concatenated form contains both the gate token and `TARGET_WORKTREE_AMBIGUOUS`.
+- [x] `Get-WorktreeResolutionAmbiguityReasonCode` returns the exact literal string `TARGET_WORKTREE_AMBIGUOUS`, and a Pester test pins that literal so a rename is a test failure rather than a silent contract break for F4 and F5.
+- [x] The ambiguity reason code does not carry a `_BLOCKED` suffix, because F1 owns no gate and the suffix family is reserved for a hook's own leading decision token.
+- [x] The `Detail` field of an ambiguous result is a prose clause safe to concatenate directly into a `permissionDecisionReason` after a gate's own `*_BLOCKED` token, and a test asserts the concatenated form contains both the gate token and `TARGET_WORKTREE_AMBIGUOUS`.
 
 ### Seams and determinism
 
-- [ ] The module's only filesystem contact is three named, script-scoped, injectable seams — `Get-WorktreeResolutionGitEntryKind`, `Get-WorktreeResolutionGitFileText`, and `Get-WorktreeResolutionDirectoryChildName` — each mockable with `Mock -CommandName <seam> -ModuleName '<Module>'`.
-- [ ] No function in either module starts a subprocess, invokes git, reads a wall clock, accesses the network, or reads an environment variable.
-- [ ] No test in any of the three suites creates, writes, or reads a temporary file, reads a wall clock, spawns a process, or touches the network, and the suites' comment-based help states that determinism posture explicitly.
-- [ ] The full required matrix is covered by a table-driven Pester suite spanning the cross product of cwd (session root versus item worktree), path form (relative versus absolute), and target (own item versus sibling item versus absent), with currently-passing rows retained as regression guards.
+- [x] The module's only filesystem contact is three named, script-scoped, injectable seams — `Get-WorktreeResolutionGitEntryKind`, `Get-WorktreeResolutionGitFileText`, and `Get-WorktreeResolutionDirectoryChildName` — each mockable with `Mock -CommandName <seam> -ModuleName '<Module>'`.
+- [x] No function in either module starts a subprocess, invokes git, reads a wall clock, accesses the network, or reads an environment variable.
+- [x] No test in any of the three suites creates, writes, or reads a temporary file, reads a wall clock, spawns a process, or touches the network, and the suites' comment-based help states that determinism posture explicitly.
+- [x] The full required matrix is covered by a table-driven Pester suite spanning the cross product of cwd (session root versus item worktree), path form (relative versus absolute), and target (own item versus sibling item versus absent), with currently-passing rows retained as regression guards.
 
 ### Registration, mirroring, and coverage
 
-- [ ] `.claude/lib/worktree-resolution/WorktreeResolution.psm1` appears exactly once in the `paths` array of `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, asserted by an exact string-equality filter whose survivor count is compared to one.
-- [ ] `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1` appears exactly once in the `paths` array of `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, asserted by an exact string-equality filter whose survivor count is compared to one.
-- [ ] `tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1` follows the `DiscoveryValidation.Manifest.Tests.ps1` pattern, asserting `-Contain`, exactly-once registration, and that every on-disk `*.psm1` in the module folder is covered by the expected-path list.
-- [ ] The same manifest suite carries a separate `Describe` asserting SHA-256 byte identity of each repo-side module against its bundle mirror, including a `Test-Path -LiteralPath $bundleFile | Should -BeTrue` guard, following `DiscoveryValidation.Manifest.Tests.ps1` rather than the thinner `ModelRouting.Manifest.Tests.ps1`.
-- [ ] Both modules are mirrored at `extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/WorktreeResolution.psm1` and `.../WorktreeTargetResolution.psm1`, and the mirrored copies are byte-identical to the repo-side copies by SHA-256.
-- [ ] Both module paths are added to `CodeCoverage.Path` in `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
-- [ ] Both module paths are added to `CodeCoverage.Path` in `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`, and the two runsettings copies remain text-identical so `tests/scripts/dev_tools/test_poshqc_bundled_parity.py` passes.
-- [ ] No `extensions/drm-copilot/resources/` path is added to `CodeCoverage.Path` in either runsettings copy.
-- [ ] Line coverage for both new module files is at or above 85%, read per file from `artifacts/pester/powershell-coverage.xml` keyed on the enclosing `package` element rather than the bare `sourcefile` name, and not inferred from a passing run given `CoveragePercentTarget = 0`.
+- [x] `.claude/lib/worktree-resolution/WorktreeResolution.psm1` appears exactly once in the `paths` array of `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, asserted by an exact string-equality filter whose survivor count is compared to one.
+- [x] `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1` appears exactly once in the `paths` array of `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, asserted by an exact string-equality filter whose survivor count is compared to one.
+- [x] `tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1` follows the `DiscoveryValidation.Manifest.Tests.ps1` pattern, asserting `-Contain`, exactly-once registration, and that every on-disk `*.psm1` in the module folder is covered by the expected-path list.
+- [x] The same manifest suite carries a separate `Describe` asserting SHA-256 byte identity of each repo-side module against its bundle mirror, including a `Test-Path -LiteralPath $bundleFile | Should -BeTrue` guard, following `DiscoveryValidation.Manifest.Tests.ps1` rather than the thinner `ModelRouting.Manifest.Tests.ps1`.
+- [x] Both modules are mirrored at `extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/WorktreeResolution.psm1` and `.../WorktreeTargetResolution.psm1`, and the mirrored copies are byte-identical to the repo-side copies by SHA-256.
+- [x] Both module paths are added to `CodeCoverage.Path` in `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
+- [x] Both module paths are added to `CodeCoverage.Path` in `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`, and the two runsettings copies remain text-identical so `tests/scripts/dev_tools/test_poshqc_bundled_parity.py` passes.
+- [x] No `extensions/drm-copilot/resources/` path is added to `CodeCoverage.Path` in either runsettings copy.
+- [x] Line coverage for both new module files is at or above 85%, read per file from `artifacts/pester/powershell-coverage.xml` keyed on the enclosing `package` element rather than the bare `sourcefile` name, and not inferred from a passing run given `CoveragePercentTarget = 0`.
 
 ### Policy compliance
 
-- [ ] No Python file is added or edited by this feature, and `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes with the new module inside its scan scope.
-- [ ] No file created or edited by this feature exceeds 500 physical lines, as counted by the line-count assertion in `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`.
-- [ ] All Pester suites for this feature live under `tests/scripts/claude-lib/worktree-resolution/` and no test file is colocated with production source.
-- [ ] Both modules satisfy `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` in full, including the `imports its siblings with -ErrorAction Stop` help sentence before the strict-mode line, `Set-StrictMode -Version Latest` immediately followed by `$ErrorActionPreference = 'Stop'`, `-ErrorAction Stop` on every column-0 `Import-Module`, and an unchanged caller `$ErrorActionPreference` after import.
-- [ ] The PowerShell toolchain completes in a single pass in order — format, then analyze, then test — with no stage failing and no stage modifying a file, and the observed PoshQC success output is captured under this feature's `evidence/qa-gates/` rather than inferred.
+- [x] No Python file is added or edited by this feature, and `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes with the new module inside its scan scope.
+- [x] No file created or edited by this feature exceeds 500 physical lines, as counted by the line-count assertion in `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`.
+- [x] All Pester suites for this feature live under `tests/scripts/claude-lib/worktree-resolution/` and no test file is colocated with production source.
+- [x] Both modules satisfy `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` in full, including the `imports its siblings with -ErrorAction Stop` help sentence before the strict-mode line, `Set-StrictMode -Version Latest` immediately followed by `$ErrorActionPreference = 'Stop'`, `-ErrorAction Stop` on every column-0 `Import-Module`, and an unchanged caller `$ErrorActionPreference` after import.
+- [x] The PowerShell toolchain completes in a single pass in order — format, then analyze, then test — with no stage failing and no stage modifying a file, and the observed PoshQC success output is captured under this feature's `evidence/qa-gates/` rather than inferred.
 
 ### Must not regress (carried verbatim from the epic)
 
-- [ ] Gates must still deny when a required document is genuinely absent.
-- [ ] Do not weaken the pre-implementation gate's pathspec, option, or metacharacter restrictions.
-- [ ] Do not widen the merge gate's matcher as a side effect of fixes 1-3.
-- [ ] Epic and standalone topologies must behave exactly as now when cwd and target coincide.
+- [x] Gates must still deny when a required document is genuinely absent.
+- [x] Do not weaken the pre-implementation gate's pathspec, option, or metacharacter restrictions.
+- [x] Do not widen the merge gate's matcher as a side effect of fixes 1-3.
+- [x] Epic and standalone topologies must behave exactly as now when cwd and target coincide.
 
 ## Non-Goals
 

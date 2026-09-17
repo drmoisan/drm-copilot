@@ -1,6 +1,6 @@
 # Coverage Delta
 
-Timestamp: 2026-09-17T08:43:00-04:00
+Timestamp: 2026-09-17T08:42:51-04:00 (file write time)
 Command: comparison of evidence/baseline/baseline-poshqc-test-mcp.2026-09-13T22-00.md, evidence/qa-gates/final-poshqc-test-mcp.2026-09-13T22-00.md, and evidence/qa-gates/final-poshqc-selfhosted-coverage.2026-09-13T22-00.md (no new command executed)
 EXIT_CODE: 0
 Output Summary: Repository-wide line coverage baseline 95.48% (8914/9336) -> post-change 95.48% (8914/9336), signed delta +0.00 percentage points. New-code line coverage: WorktreeResolution.psm1 98.59% (140 covered / 2 missed), WorktreeTargetResolution.psm1 100.00% (101 / 0), combined 99.18% (241 covered / 2 missed). The new-code aggregate is at or above 85.00.

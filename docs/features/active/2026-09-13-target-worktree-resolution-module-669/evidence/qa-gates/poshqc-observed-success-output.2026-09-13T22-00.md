@@ -1,6 +1,6 @@
 # PoshQC Baseline Stage Records (consolidated)
 
-Timestamp: 2026-09-17T08:01:00-04:00
+Timestamp: 2026-09-17T08:01:34-04:00 (file write time)
 Command: consolidation of the records captured by [P0-T4], [P0-T5], [P0-T6], and [P0-T7] (no new command executed)
 EXIT_CODE: 0
 Output Summary: Four stage blocks copied verbatim from the Phase 0 baseline artifacts. Format and analyze MCP results are ok=true with the fixed template summary; the MCP test result is ok=false (exit 2, two pre-existing failures outside scope); the self-hosted test run printed "Tests Passed: 1384, Failed: 0, Skipped: 0, Inconclusive: 0, NotRun: 0".
