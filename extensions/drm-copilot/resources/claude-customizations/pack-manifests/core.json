@@ -164,6 +164,8 @@
     ".claude/lib/mermaid/MermaidLineScanner.psm1",
     ".claude/lib/mermaid/MermaidMarkdownFences.psm1",
     ".claude/lib/mermaid/MermaidValidation.psm1",
+    ".claude/lib/worktree-resolution/WorktreeResolution.psm1",
+    ".claude/lib/worktree-resolution/WorktreeTargetResolution.psm1",
     ".claude/skills/mermaid-diagram/references/flowchart.md",
     ".claude/skills/mermaid-diagram/references/sequence.md",
     ".claude/skills/mermaid-diagram/references/class.md",
