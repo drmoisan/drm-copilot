@@ -299,4 +299,59 @@ NOTE
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
         }
     }
+
+    Context 'issue #671 worktree selector allow cases' {
+        # LACS (issue #671): one lexically absolute `-C <value>` selector may sit between
+        # the command name and the subcommand. The selector is absent from D4 rows 1-13
+        # and 15-19, so every other constraint still applies to the operands. Labels are
+        # byte-identical to the Claude-side sibling suite.
+        It 'allows <Label>' -ForEach @(
+            @{ Label = 'issue #671 LACS allow 1 - drive-letter absolute selector on the add subcommand'; Command = 'git -C C:/repo/wt add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 2 - POSIX-rooted absolute selector on the add subcommand'; Command = 'git -C /repo/wt add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 3 - backslash-spelled absolute selector normalized before the rooting test'; Command = 'git -C C:\repo\wt add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 4 - absolute selector on the message-bearing commit form'; Command = 'git -C C:/repo/wt commit -m "epic scaffold" -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 5 - chained add and commit segments each carrying the same absolute selector'; Command = 'git -C C:/repo/wt add -- docs/features/active/x/spec.md && git -C C:/repo/wt commit -m "epic scaffold" -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 6 - absolute selector naming a sibling item worktree root'; Command = 'git -C C:/repo/wt-sibling add -- docs/features/active/y/spec.md' }
+            @{ Label = 'issue #671 LACS allow 7 - absolute selector naming a directory outside every worktree'; Command = 'git -C C:/elsewhere add -- docs/features/active/x/spec.md' }
+        ) {
+            # Act
+            $decision = Get-CodexExemptionDecisionForCommand -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'a lexically absolute selector with exempt operands is exempt under LACS'
+        }
+    }
+
+    Context 'issue #671 worktree selector deny cases' {
+        # One deny row per LACS condition L1 through L8, plus the must-not-regress rows.
+        # Only the decision is asserted; the Write-Debug diagnostic text is not contractual.
+        It 'denies <Label>' -ForEach @(
+            @{ Label = 'issue #671 LACS L1a - attached selector spelling'; Command = 'git -CC:/repo/wt add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L1b - config-injection selector'; Command = 'git -c core.worktree=C:/repo/wt add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L2 - repeated selector'; Command = 'git -C C:/repo/wt -C C:/repo/other add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L3a - selector with no subcommand after the value'; Command = 'git -C C:/repo/wt' }
+            @{ Label = 'issue #671 LACS L3b - subcommand not immediately after the selector value'; Command = 'git -C C:/repo/wt -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L4a - bare relative selector'; Command = 'git -C subdir add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L4b - UNC selector'; Command = 'git -C //server/share/wt add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L5a - parent-directory segment in the selector'; Command = 'git -C C:/repo/wt/../other add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L5b - current-directory segment in the selector'; Command = 'git -C C:/repo/./wt add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L6 - wildcard in the selector'; Command = 'git -C C:/repo/wt-? add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L7 - stray colon in the selector'; Command = 'git -C C:/repo/wt:branch add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L8 - empty selector value'; Command = 'git -C "" add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 selector with a non-exempt pathspec operand'; Command = 'git -C C:/repo/wt add -- scripts/powershell/Sample.ps1' }
+            @{ Label = 'issue #671 selector with the tree-wide all flag'; Command = 'git -C C:/repo/wt add -A' }
+            @{ Label = 'issue #671 selector with an absolute pathspec operand'; Command = 'git -C C:/repo/wt add -- C:/repo/wt/docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 selector with an output redirection'; Command = 'git -C C:/repo/wt add -- docs/features/active/x/spec.md > staged.txt' }
+            @{ Label = 'issue #671 cd chain into the target worktree'; Command = 'cd C:/repo/wt && git add -- docs/features/active/x/spec.md' }
+        ) {
+            # Act
+            $decision = Get-CodexExemptionDecisionForCommand -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'LACS withholds the exemption from an undecidable selector or a non-exempt segment'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+        }
+    }
 }
