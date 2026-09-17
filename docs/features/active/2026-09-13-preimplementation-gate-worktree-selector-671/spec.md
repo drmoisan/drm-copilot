@@ -3,9 +3,9 @@
 - **Issue:** #671
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-13T22-10
+- **Last Updated:** 2026-09-17T08-44
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 
 ## Context
 The issue #539 orchestration-bookkeeping staging exemption in
@@ -272,8 +272,11 @@ one new predicate and one new constant.
   table are neither edited nor consumed, so the epic-merge gate's matcher cannot be widened as a
   side effect.
 - **INV-6 — Chaining semantics unchanged.** The all-segments rule
-  (`Test-ExemptOrchestrationStagingCommand`, helpers lines 342–347) stays byte-unchanged. LACS is
-  evaluated per segment.
+  (`Test-ExemptOrchestrationStagingCommand`, pre-change helpers lines 342–347) keeps its
+  semantics. Remediation R1 wraps that per-segment loop, unchanged except for indentation, in a
+  fail-closed `try`/`catch` whose `catch` returns `$false`, so an error raised while classifying
+  any segment answers false instead of letting the caller reach `return $true`. LACS is evaluated
+  per segment.
 - **INV-7 — Surface parity.** All four `-helpers.ps1` copies stay byte-identical to one another
   after the change.
 
@@ -311,8 +314,9 @@ No other production or test file is edited. In particular: no gate file, no mode
 | --- | --- | --- | --- |
 | `$script:OrchestrationSelectorOptionName` plus a short comment block | `-helpers.ps1` | new constant | about 6 lines |
 | `Test-ExemptOrchestrationSelector` — the L1–L8 predicate, `[CmdletBinding()]`, `[OutputType([bool])]`, comment-based help citing D4 row 14 and this spec | `-helpers.ps1` | new advanced function | about 35 lines |
-| `Test-ExemptOrchestrationSegmentToken` — selector absorption in the prologue, between the current lines 232 and 233 | `-helpers.ps1` | modified | about 14 changed or added lines |
-| `Split-OrchestrationCommandLine`, `ConvertTo-OrchestrationCommandToken`, `Test-ExemptOrchestrationOperand`, `Test-ExemptOrchestrationStagingCommand` | `-helpers.ps1` | **unchanged** | 0 |
+| `Test-ExemptOrchestrationSegmentToken` — selector absorption in the prologue, between the pre-change lines 232 and 233, plus `[AllowEmptyString()]` on the `$Token` parameter declaration at pre-change line 221 (remediation R1) | `-helpers.ps1` | modified | about 15 changed or added lines |
+| `Test-ExemptOrchestrationStagingCommand` — per-segment loop wrapped in a fail-closed `try`/`catch` (remediation R1) | `-helpers.ps1` | modified | about 6 added lines |
+| `Split-OrchestrationCommandLine`, `ConvertTo-OrchestrationCommandToken`, `Test-ExemptOrchestrationOperand` | `-helpers.ps1` | **unchanged** | 0 |
 | `$script:OrchestrationBookkeepingTrees`, `$script:UnresolvableCommandCharacters`, `$script:PathspecWildcardCharacters` | `-helpers.ps1` | **unchanged** | 0 |
 | Everything in `-gate.ps1` and `-modes.ps1` | — | **unchanged** | 0 |
 
@@ -378,6 +382,11 @@ None. No new configuration key, no settings entry, no manifest entry, no runsett
 - **Every command line that is allowed today stays allowed.** LACS only adds an accepting path; it
   removes none. The eight existing allow fixtures in each command-exemption suite are unmodified
   and must still pass.
+- **Remediation R1 exception (narrowing only).** A command line whose segment carries an empty
+  quoted token was allowed before remediation R1 only because the token failed parameter binding
+  and the caller continued past the error. Such a line now allows only when every operand is
+  exempt, and denies otherwise; the fail-closed guard denies on any other classification error. No
+  command line that denied before remediation R1 allows after it.
 - **Every command line that is denied today stays denied, except the LACS-conforming `-C` form.**
   All 45 existing deny fixtures in each suite are unmodified and must still pass, including the
   three D4 row 14 fixtures: `git -C ../other add …` (relative selector), `git --git-dir=… commit …`,
@@ -473,7 +482,9 @@ on temporary files in tests and its determinism requirements.
 
 Added as two new `Context` blocks per suite, using the existing `-ForEach` table-driven shape
 (`It 'allows <Label>'` and `It 'denies <Label>'`). The label text is part of the contract, because
-the acceptance criteria key on the expanded node names. The same 24 rows are added to both suites.
+the acceptance criteria key on the expanded node names. The same 24 rows are added to both suites,
+and remediation R1 adds the same further 22 nodes to both suites (one row in the selector deny
+Context and the two Contexts described below it), for 46 new nodes per suite.
 
 Context `issue #671 worktree selector allow cases` — 7 rows, all NEW:
 
@@ -487,15 +498,15 @@ Context `issue #671 worktree selector allow cases` — 7 rows, all NEW:
 | `issue #671 LACS allow 6 - absolute selector naming a sibling item worktree root` | `git -C C:/repo/wt-sibling add -- docs/features/active/y/spec.md` | allow |
 | `issue #671 LACS allow 7 - absolute selector naming a directory outside every worktree` | `git -C C:/elsewhere add -- docs/features/active/x/spec.md` | allow |
 
-Context `issue #671 worktree selector deny cases` — 17 rows, all NEW:
+Context `issue #671 worktree selector deny cases` — 18 rows, all NEW (the row immediately after the L8 row was added by remediation R1):
 
 | Label | Command | Expected |
 | --- | --- | --- |
 | `issue #671 LACS L1a - attached selector spelling` | `git -CC:/repo/wt add -- docs/features/active/x/spec.md` | deny |
 | `issue #671 LACS L1b - config-injection selector` | `git -c core.worktree=C:/repo/wt add -- docs/features/active/x/spec.md` | deny |
 | `issue #671 LACS L2 - repeated selector` | `git -C C:/repo/wt -C C:/repo/other add -- docs/features/active/x/spec.md` | deny |
-| `issue #671 LACS L3a - selector with no subcommand after the value` | `git -C C:/repo/wt` | deny |
-| `issue #671 LACS L3b - subcommand not immediately after the selector value` | `git -C C:/repo/wt -- docs/features/active/x/spec.md` | deny |
+| `issue #671 LACS L3a - selector with no subcommand after the value` | `git -C C:/repo/wt && git add -- docs/features/active/x/spec.md` | deny |
+| `issue #671 LACS L3b - subcommand not immediately after the selector value` | `git -C C:/repo/wt --no-pager add -- docs/features/active/x/spec.md` | deny |
 | `issue #671 LACS L4a - bare relative selector` | `git -C subdir add -- docs/features/active/x/spec.md` | deny |
 | `issue #671 LACS L4b - UNC selector` | `git -C //server/share/wt add -- docs/features/active/x/spec.md` | deny |
 | `issue #671 LACS L5a - parent-directory segment in the selector` | `git -C C:/repo/wt/../other add -- docs/features/active/x/spec.md` | deny |
@@ -503,6 +514,7 @@ Context `issue #671 worktree selector deny cases` — 17 rows, all NEW:
 | `issue #671 LACS L6 - wildcard in the selector` | `git -C C:/repo/wt-? add -- docs/features/active/x/spec.md` | deny |
 | `issue #671 LACS L7 - stray colon in the selector` | `git -C C:/repo/wt:branch add -- docs/features/active/x/spec.md` | deny |
 | `issue #671 LACS L8 - empty selector value` | `git -C "" add -- docs/features/active/x/spec.md` | deny |
+| `issue #671 selector followed by an unmodelled subcommand` | `git -C C:/repo/wt status && git add -- docs/features/active/x/spec.md` | deny |
 | `issue #671 selector with a non-exempt pathspec operand` | `git -C C:/repo/wt add -- scripts/powershell/Sample.ps1` | deny |
 | `issue #671 selector with the tree-wide all flag` | `git -C C:/repo/wt add -A` | deny |
 | `issue #671 selector with an absolute pathspec operand` | `git -C C:/repo/wt add -- C:/repo/wt/docs/features/active/x/spec.md` | deny |
@@ -511,6 +523,53 @@ Context `issue #671 worktree selector deny cases` — 17 rows, all NEW:
 
 The wildcard row uses `?` rather than `*` deliberately: `*` is also a wildcard on the operand side
 and the row must isolate the selector axis.
+
+Every row in these tables must be classified by the gate's staging trigger, meaning it contains a
+`git add` or `git commit` invocation, or the gate allows it without consulting the exemption and
+the row cannot fail for the reason its label states. Remediation R1 replaced the original L3a and
+L3b commands for that reason: neither carried a subcommand the trigger recognizes.
+
+Context `issue #671 empty-token fail-closed cases` — 5 rows, all NEW (remediation R1):
+
+| Label | Command | Expected |
+| --- | --- | --- |
+| `issue #671 empty commit message beside an exempt operand` | `git commit -m "" -- docs/features/active/x/spec.md` | allow |
+| `issue #671 empty token beside a non-exempt operand` | `git add "" -- src/foo.ps1` | deny |
+| `issue #671 empty token after the separator beside a non-exempt operand` | `git add -- "" scripts/powershell/Sample.ps1` | deny |
+| `issue #671 trailing empty token after a non-exempt operand` | `git add -- src/foo.ts ""` | deny |
+| `issue #671 empty commit message beside a non-exempt operand` | `git commit -m "" -- src/foo.ts` | deny |
+
+Decision (remediation R1): an empty message value is consumed by `-m` and is not a pathspec, so
+`git commit -m "" -- <exempt operand>` allows. That command already allowed before remediation R1,
+through the empty-token fail-open, so its row pins an unchanged decision. The four deny rows pin
+decisions that remediation R1 changes from allow to deny.
+
+Context `issue #671 selector predicate and fail-closed guard` — 16 nodes, all NEW (remediation R1).
+The accept and reject rows call `Test-ExemptOrchestrationSelector -Token` directly through
+`It 'accepts <Label>'` and `It 'rejects <Label>'`. The guard node
+`It 'returns false when segment classification raises an error'` mocks
+`Test-ExemptOrchestrationSegmentToken` to throw and asserts that
+`Test-ExemptOrchestrationStagingCommand` returns false. The predicate checks only that a
+non-option token follows the selector value; the caller rejects any subcommand other than `add` or
+`commit`, and accept row 3 pins that division.
+
+| Label | Token array | Expected |
+| --- | --- | --- |
+| `issue #671 predicate accept 1 - drive-letter selector followed by add` | `git`, `-C`, `C:/repo/wt`, `add`, `--`, `docs/features/active/x/spec.md` | true |
+| `issue #671 predicate accept 2 - rooted selector followed by commit` | `git`, `-C`, `/repo/wt`, `commit`, `-m`, `msg`, `--`, `docs/features/active/x/spec.md` | true |
+| `issue #671 predicate accept 3 - non-option token after the value is left to the caller` | `git`, `-C`, `C:/repo/wt`, `status` | true |
+| `issue #671 predicate L1a - single token segment` | `git` | false |
+| `issue #671 predicate L1b - option other than the selector at index 1` | `git`, `-c`, `core.worktree=C:/repo/wt`, `add`, `docs/features/active/x/spec.md` | false |
+| `issue #671 predicate L2 - repeated selector` | `git`, `-C`, `C:/repo/wt`, `-C`, `C:/repo/other`, `add`, `docs/features/active/x/spec.md` | false |
+| `issue #671 predicate L3a - no token after the selector value` | `git`, `-C`, `C:/repo/wt` | false |
+| `issue #671 predicate L3b - option token after the selector value` | `git`, `-C`, `C:/repo/wt`, `--no-pager`, `add`, `docs/features/active/x/spec.md` | false |
+| `issue #671 predicate L4a - relative selector` | `git`, `-C`, `subdir`, `add`, `docs/features/active/x/spec.md` | false |
+| `issue #671 predicate L4b - UNC selector` | `git`, `-C`, `//server/share/wt`, `add`, `docs/features/active/x/spec.md` | false |
+| `issue #671 predicate L5a - parent-directory segment` | `git`, `-C`, `C:/repo/wt/../other`, `add`, `docs/features/active/x/spec.md` | false |
+| `issue #671 predicate L5b - current-directory segment` | `git`, `-C`, `C:/repo/./wt`, `add`, `docs/features/active/x/spec.md` | false |
+| `issue #671 predicate L6 - wildcard` | `git`, `-C`, `C:/repo/wt-?`, `add`, `docs/features/active/x/spec.md` | false |
+| `issue #671 predicate L7 - stray colon` | `git`, `-C`, `C:/repo/wt:branch`, `add`, `docs/features/active/x/spec.md` | false |
+| `issue #671 predicate L8 - empty selector value` | `git`, `-C`, (empty string), `add`, `docs/features/active/x/spec.md` | false |
 
 ### Matrix — existing rows retained as REGRESSION GUARDS
 
@@ -617,30 +676,32 @@ Phase 0 fail-before capture. No manual step substitutes for an executed capture.
 
 
 ## Acceptance Criteria
-- [ ] The seven `issue #671 LACS allow` rows all pass in `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1`, under `Context 'issue #671 worktree selector allow cases'`, verified by a Pester run listing node `allows issue #671 LACS allow 1 - drive-letter absolute selector on the add subcommand` as Passed.
-- [ ] The same seven allow rows, with identical label text, all pass in `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1`.
-- [ ] The chained-segment allow is pinned: node `allows issue #671 LACS allow 5 - chained add and commit segments each carrying the same absolute selector` passes in both command-exemption suites.
-- [ ] The `cd`-chain denial is pinned: node `denies issue #671 cd chain into the target worktree` passes in both command-exemption suites.
-- [ ] Each LACS condition L1 through L8 has at least one deny row in both suites, and all of them pass: `Select-String -SimpleMatch` for each of the tokens `LACS L1a`, `LACS L1b`, `LACS L2`, `LACS L3a`, `LACS L3b`, `LACS L4a`, `LACS L4b`, `LACS L5a`, `LACS L5b`, `LACS L6`, `LACS L7`, and `LACS L8` returns at least one line in each suite file, and the Pester run reports every matching node as Passed.
-- [ ] The pathspec, option, and metacharacter restrictions are not weakened (epic must-not-regress). Nodes `denies issue #671 selector with a non-exempt pathspec operand`, `denies issue #671 selector with the tree-wide all flag`, `denies issue #671 selector with an absolute pathspec operand`, and `denies issue #671 selector with an output redirection` pass in both suites.
-- [ ] No existing assertion is reversed. `git diff --merge-base main -- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1 tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1` contains no removed content line (a line beginning with a single `-` that is not the `---` file header), and all 45 pre-existing `D4 row` deny rows plus all eight pre-existing allow rows in each suite report Passed.
-- [ ] The four gate files are byte-unchanged: `git diff --merge-base main -- .claude/hooks/enforce-orchestration-preimplementation-gate.ps1 .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` produces empty output.
-- [ ] The four modes files are byte-unchanged: the same `git diff --merge-base main` command run against the four `enforce-orchestration-preimplementation-gate-modes.ps1` paths produces empty output.
-- [ ] The epic-merge gate's matcher is not widened (epic must-not-regress). `git diff --merge-base main -- .claude/hooks/hook-command-invocation.ps1 .codex/hooks/hook-command-invocation.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-invocation.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-invocation.ps1 .claude/hooks/enforce-epic-merge-gate.ps1` produces empty output, and `tests/scripts/claude-hooks/enforce-epic-merge-gate.Tests.ps1` and `tests/scripts/claude-hooks/enforce-epic-merge-gate.TriggerScoping.Tests.ps1` both pass.
-- [ ] The helpers diff is confined to one axis: in `git diff --merge-base main -- .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1`, every removed content line's text occurs within the pre-change lines 227–236 block, and no hunk removes or modifies a line inside `Split-OrchestrationCommandLine`, `ConvertTo-OrchestrationCommandToken`, `Test-ExemptOrchestrationOperand`, `Test-ExemptOrchestrationStagingCommand`, or the three pre-existing `$script:` constant blocks.
-- [ ] Gates still deny when a required document is genuinely absent (epic must-not-regress). Nodes `blocks implementation writes when route metadata and lifecycle readiness are absent (generalized message)` and `blocks an implementation write when the checkpoint omits the feature folder` in `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Tests.ps1` both pass.
-- [ ] Epic and standalone topologies behave exactly as now when cwd and target coincide (epic must-not-regress). Nodes `allows staging an epic document under the epics tree` and `allows a chained two-segment line whose every segment is independently exempt` pass unmodified in both command-exemption suites, and `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`, `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`, and `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-routing.Tests.ps1` all pass with zero failures.
-- [ ] Node `keeps all four surface copies of the helpers module byte-identical by SHA256 hash` in the new suite `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.Parity.Tests.ps1` passes, comparing `Get-FileHash` output across all four `-helpers.ps1` paths.
-- [ ] Bundled-payload mirroring is complete. `git diff --merge-base main --name-only` lists all four `enforce-orchestration-preimplementation-gate-helpers.ps1` paths (the two canonical and the two bundled), node `keeps the canonical hooks byte-identical to their bundled copies` in `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` passes, and `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes.
-- [ ] No file exceeds the 500-line cap. Node `keeps every surface copy of the helpers module under the 500-line cap` passes, the post-change line count of each of the four helpers copies is recorded in the QA-gate evidence artifact, and the existing Codex 500-line contract assertion in `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` passes.
-- [ ] An **executed** fail-before capture exists at `docs/features/active/2026-09-13-preimplementation-gate-worktree-selector-671/evidence/regression-testing/`, produced before any production edit, carrying `Timestamp:`, `Command:`, and `EXIT_CODE:` fields and the eight-row result table, with rows 2 and 3 recorded as `False`. A hand-trace does not satisfy this criterion.
-- [ ] An **executed** pass-after capture exists at the same canonical evidence location, with rows 2 and 3 recorded as `True` and rows 1, 4, 5, 6, 7, and 8 identical to the fail-before capture.
-- [ ] Line coverage is at or above 85% for the PowerShell coverage run, with the numeric percentage recorded in a QA-gate evidence artifact under `docs/features/active/2026-09-13-preimplementation-gate-worktree-selector-671/evidence/qa-gates/`, and coverage on the changed lines of the helpers file does not regress. Pester does not measure branch coverage, so no branch-coverage gate applies to PowerShell.
-- [ ] The full PowerShell toolchain passes in a single pass: `mcp__drm-copilot__run_poshqc_format` reports no file changed on a second invocation, `mcp__drm-copilot__run_poshqc_analyze` reports zero findings for the four edited helpers copies and the three test files, and `mcp__drm-copilot__run_poshqc_test` reports zero failed tests.
-- [ ] No Python leg is introduced: `git diff --merge-base main --name-only` contains no path ending in `.py`.
-- [ ] The change adds no new production file and no F1 dependency: `git diff --merge-base main --name-only` lists exactly four production `.ps1` paths, all of them `enforce-orchestration-preimplementation-gate-helpers.ps1`, and `Select-String -SimpleMatch 'Import-Module'` over those four files returns no line.
-- [ ] The helpers module's declared purity survives: `Select-String -SimpleMatch 'Pure string logic only: no disk, process, network, or environment access'` returns exactly one line in each of the four helpers copies, and `Select-String -SimpleMatch` for each of `git worktree`, `Test-Path`, `Start-Process`, `Resolve-Path`, `Invoke-Expression`, and `env:` returns no line in any of the four copies.
-- [ ] The nested-subdirectory widening is recorded in the helpers file: `Select-String -SimpleMatch 'Accepted widening'` returns at least one line in each of the four helpers copies, and the surrounding comment states the measured exposure (seven Markdown test fixtures under the `resolve_execute_plan_prompt` fixture tree) and notes that the epic's F1 resolution module composes upstream to close it later without a schema change.
+- [x] The seven `issue #671 LACS allow` rows all pass in `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1`, under `Context 'issue #671 worktree selector allow cases'`, verified by a Pester run listing node `allows issue #671 LACS allow 1 - drive-letter absolute selector on the add subcommand` as Passed.
+- [x] The same seven allow rows, with identical label text, all pass in `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1`.
+- [x] The chained-segment allow is pinned: node `allows issue #671 LACS allow 5 - chained add and commit segments each carrying the same absolute selector` passes in both command-exemption suites.
+- [x] The `cd`-chain denial is pinned: node `denies issue #671 cd chain into the target worktree` passes in both command-exemption suites.
+- [x] Each LACS condition L1 through L8 has at least one deny row in both suites, and all of them pass: `Select-String -SimpleMatch` for each of the tokens `LACS L1a`, `LACS L1b`, `LACS L2`, `LACS L3a`, `LACS L3b`, `LACS L4a`, `LACS L4b`, `LACS L5a`, `LACS L5b`, `LACS L6`, `LACS L7`, and `LACS L8` returns at least one line in each suite file, and the Pester run reports every matching node as Passed.
+- [x] The pathspec, option, and metacharacter restrictions are not weakened (epic must-not-regress). Nodes `denies issue #671 selector with a non-exempt pathspec operand`, `denies issue #671 selector with the tree-wide all flag`, `denies issue #671 selector with an absolute pathspec operand`, and `denies issue #671 selector with an output redirection` pass in both suites.
+- [x] No existing assertion is reversed. `git diff --merge-base main -- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1 tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1` contains no removed content line (a line beginning with a single `-` that is not the `---` file header), and all 45 pre-existing `D4 row` deny rows plus all eight pre-existing allow rows in each suite report Passed.
+- [x] The four gate files are byte-unchanged: `git diff --merge-base main -- .claude/hooks/enforce-orchestration-preimplementation-gate.ps1 .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` produces empty output.
+- [x] The four modes files are byte-unchanged: the same `git diff --merge-base main` command run against the four `enforce-orchestration-preimplementation-gate-modes.ps1` paths produces empty output.
+- [x] The epic-merge gate's matcher is not widened (epic must-not-regress). `git diff --merge-base main -- .claude/hooks/hook-command-invocation.ps1 .codex/hooks/hook-command-invocation.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-invocation.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-invocation.ps1 .claude/hooks/enforce-epic-merge-gate.ps1` produces empty output, and `tests/scripts/claude-hooks/enforce-epic-merge-gate.Tests.ps1` and `tests/scripts/claude-hooks/enforce-epic-merge-gate.TriggerScoping.Tests.ps1` both pass.
+- [x] The helpers diff is confined to one axis plus the remediation R1 fail-closed repair: in `git diff --merge-base main -- .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1`, every removed content line is one of (a) a line whose text occurs within the pre-change lines 227–236 block, (b) the pre-change line 221 `$Token` parameter declaration of `Test-ExemptOrchestrationSegmentToken`, re-added with `[AllowEmptyString()]` as its only change, or (c) a line of the pre-change per-segment loop at lines 342–347 of `Test-ExemptOrchestrationStagingCommand` whose whitespace-trimmed text equals the whitespace-trimmed text of a line added inside that function's fail-closed `try` block; and no other hunk removes or modifies a line inside `Split-OrchestrationCommandLine`, `ConvertTo-OrchestrationCommandToken`, `Test-ExemptOrchestrationOperand`, `Test-ExemptOrchestrationStagingCommand`, or the three pre-existing `$script:` constant blocks.
+- [x] Gates still deny when a required document is genuinely absent (epic must-not-regress). Nodes `blocks implementation writes when route metadata and lifecycle readiness are absent (generalized message)` and `blocks an implementation write when the checkpoint omits the feature folder` in `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Tests.ps1` both pass.
+- [x] Epic and standalone topologies behave exactly as now when cwd and target coincide (epic must-not-regress). Nodes `allows staging an epic document under the epics tree` and `allows a chained two-segment line whose every segment is independently exempt` pass unmodified in both command-exemption suites, and `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`, `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`, and `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-routing.Tests.ps1` all pass with zero failures.
+- [x] Node `keeps all four surface copies of the helpers module byte-identical by SHA256 hash` in the new suite `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.Parity.Tests.ps1` passes, comparing `Get-FileHash` output across all four `-helpers.ps1` paths.
+- [x] Bundled-payload mirroring is complete. `git diff --merge-base main --name-only` lists all four `enforce-orchestration-preimplementation-gate-helpers.ps1` paths (the two canonical and the two bundled), node `keeps the canonical hooks byte-identical to their bundled copies` in `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` passes, and `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes.
+- [x] No file exceeds the 500-line cap. Node `keeps every surface copy of the helpers module under the 500-line cap` passes, the post-change line count of each of the four helpers copies is recorded in the QA-gate evidence artifact, and the existing Codex 500-line contract assertion in `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` passes.
+- [x] An **executed** fail-before capture exists at `docs/features/active/2026-09-13-preimplementation-gate-worktree-selector-671/evidence/regression-testing/`, produced before any production edit, carrying `Timestamp:`, `Command:`, and `EXIT_CODE:` fields and the eight-row result table, with rows 2 and 3 recorded as `False`. A hand-trace does not satisfy this criterion.
+- [x] An **executed** pass-after capture exists at the same canonical evidence location, with rows 2 and 3 recorded as `True` and rows 1, 4, 5, 6, 7, and 8 identical to the fail-before capture.
+- [x] Line coverage is at or above 85% for the PowerShell coverage run, with the numeric percentage recorded in a QA-gate evidence artifact under `docs/features/active/2026-09-13-preimplementation-gate-worktree-selector-671/evidence/qa-gates/`; the per-file line coverage of the `.claude/hooks` copy of `enforce-orchestration-preimplementation-gate-helpers.ps1`, read from `artifacts/pester/powershell-coverage.xml`, is at or above its pre-change baseline of 94.92% (112 covered of 118); and every instrumented line of that file listed in the changed-line set of the helpers diff has a hit count above zero. Pester does not measure branch coverage, so no branch-coverage gate applies to PowerShell.
+- [x] The full PowerShell toolchain passes in a single pass: `mcp__drm-copilot__run_poshqc_format` leaves the SHA256 hash of each of the four helpers copies and the three test files unchanged, as recorded by paired `Get-FileHash` captures taken before and after the call; a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` reports zero findings for each of those seven files, alongside a `mcp__drm-copilot__run_poshqc_analyze` call that returns without error; and `mcp__drm-copilot__run_poshqc_test` writes an `artifacts/pester/pester-junit.xml` whose failing nodes are none, or only one or both of the two failures present at the pre-change baseline (`enforce-pr-author-skill.ps1.allowed commands.allows gh pr create --body-file artifacts/pr_body_12.md when context exists` and `Every registered Codex PreToolUse handler accepts every tool name its matcher admits.allows every registered handler for every tool name its own matcher admits`), with no failing node whose name contains `issue #671`.
+- [x] No Python leg is introduced: `git diff --merge-base main --name-only` contains no path ending in `.py`.
+- [x] The change adds no new production file and no F1 dependency: `git diff --merge-base main --name-only` lists exactly four production `.ps1` paths, all of them `enforce-orchestration-preimplementation-gate-helpers.ps1`, and `Select-String -SimpleMatch 'Import-Module'` over those four files returns no line.
+- [x] The helpers module's declared purity survives: `Select-String -SimpleMatch 'Pure string logic only: no disk, process, network, or environment access'` returns exactly one line in each of the four helpers copies, and `Select-String -SimpleMatch` for each of `git worktree`, `Test-Path`, `Start-Process`, `Resolve-Path`, `Invoke-Expression`, and `env:` returns no line in any of the four copies.
+- [x] The nested-subdirectory widening is recorded in the helpers file: `Select-String -SimpleMatch 'Accepted widening'` returns at least one line in each of the four helpers copies, and the surrounding comment states the measured exposure (seven Markdown test fixtures under the `resolve_execute_plan_prompt` fixture tree) and notes that the epic's F1 resolution module composes upstream to close it later without a schema change.
+- [x] The remediation R1 regression rows pass: nodes `denies issue #671 LACS L8 - empty selector value`, `denies issue #671 selector followed by an unmodelled subcommand`, `denies issue #671 empty token beside a non-exempt operand`, `denies issue #671 empty token after the separator beside a non-exempt operand`, `denies issue #671 trailing empty token after a non-exempt operand`, `denies issue #671 empty commit message beside a non-exempt operand`, and `allows issue #671 empty commit message beside an exempt operand` pass in both command-exemption suites, and an executed probe records `Test-ExemptOrchestrationStagingCommand` returning `False` with zero error records for `git add "" -- src/foo.ps1` and `git add -- "" scripts/powershell/Sample.ps1`.
+- [x] The selector predicate and the fail-closed guard are pinned at the unit level (remediation R1): in both command-exemption suites, under the Context `issue #671 selector predicate and fail-closed guard`, the three `accepts issue #671 predicate accept` nodes, the twelve `rejects issue #671 predicate` nodes, and node `returns false when segment classification raises an error` all pass.
 
 ## Risks & Mitigations
 - Technical or operational risks:
@@ -688,6 +749,26 @@ Phase 0 fail-before capture. No manual step substitutes for an executed capture.
   - **Rollback:** revert the single commit. There is no schema change, no configuration key, and no
     persisted state, so revert is complete and immediate. The pre-change behavior is the denial the
     issue reports.
+  - **Remediation R1 amendment (2026-09-17).** The first review
+    (`remediation-inputs.2026-09-17T08-40.md`) found three blocking defects. This amendment changes
+    criterion wording and fixture tables only; it adds no feature scope.
+    - The L3a and L3b fixtures carried no `add` or `commit` subcommand, so the gate never consulted
+      the exemption for them. They are replaced with commands the staging trigger classifies and
+      that reach the L3 rejection.
+    - A pre-existing empty-token fail-open let `Test-ExemptOrchestrationStagingCommand` answer true
+      after a parameter-binding error. The amendment permits exactly two further helpers edits:
+      `[AllowEmptyString()]` on the `$Token` parameter of `Test-ExemptOrchestrationSegmentToken`,
+      and a fail-closed `try`/`catch` around the per-segment loop of
+      `Test-ExemptOrchestrationStagingCommand`. The one-axis diff criterion is widened to exactly
+      those edits. The earlier statements that exactly one function body changes and that
+      `Test-ExemptOrchestrationStagingCommand` is unchanged are superseded to that extent.
+    - Direction: the amendment only narrows what the gate allows. Command lines that allowed only
+      through the fail-open now deny unless every operand is exempt. No command line that denied
+      before the amendment allows after it.
+    - Coverage: a deny row whose accepted selector is followed by a subcommand other than `add` or
+      `commit` restores coverage of the subcommand rejection in
+      `Test-ExemptOrchestrationSegmentToken`, and unit-level rows call
+      `Test-ExemptOrchestrationSelector` directly.
 
 ## Rollout & Follow-up
 - Release/rollout steps:
