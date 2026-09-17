@@ -799,7 +799,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       `$script:*CheckpointPath` assignments and the Codex repository-root anchoring are unchanged, and
       every branch-1, branch-2 and branch-3 allow and deny case in the existing suites is green and
       unedited.
-- [ ] **Gates still deny when the required evidence is genuinely absent.** All existing fail-closed
+- [x] **Gates still deny when the required evidence is genuinely absent.** All existing fail-closed
       cases stay green: both checkpoints absent; both checkpoints unreadable; parallel checkpoint
       absent; parallel checkpoint malformed; bare merge with a parallel checkpoint present; empty
       payload; unparseable payload; the end-to-end nested-envelope deny. A checkpoint carrying no
@@ -823,12 +823,12 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 
 ### Registration, configuration, and file size
 
-- [ ] Both bundled Claude mirrors are updated: the modified
+- [x] Both bundled Claude mirrors are updated: the modified
       `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate.ps1`
       and the new
       `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate-authorization.ps1`,
       with `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` green.
-- [ ] The bundled mirror of `.claude/rules/orchestrator-state.md` and of
+- [x] The bundled mirror of `.claude/rules/orchestrator-state.md` and of
       `.claude/skills/parallel-orchestrate/SKILL.md` are updated to match their repository-side files.
 - [x] `.claude/hooks/enforce-epic-merge-gate-authorization.ps1` is added to the `paths` array of
       `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, with
@@ -891,7 +891,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       reads no clock.
 - [x] No test in this change creates a temporary file, uses `Mock gh`, uses `Mock git`, uses
       `Start-Sleep`, or makes a network call, with the PowerShell test-purity check green.
-- [ ] No file under `.claude/hooks/**` added or modified by this change invokes Python by any route,
+- [x] No file under `.claude/hooks/**` added or modified by this change invokes Python by any route,
       with `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` green and
       its allowlist still empty.
 - [x] Line coverage is at least 85 percent for

@@ -22,7 +22,7 @@ Describe 'enforce-epic-merge-gate-authorization.ps1 predicates (issue #670)' {
 
         $script:SessionId = 'session-670-a1b2'
 
-        function New-ValidRecord {
+        function Get-ValidRecord {
             <#
             .SYNOPSIS
                 Return an ordered dictionary holding a well-formed record for PR 691.
@@ -91,7 +91,7 @@ Describe 'enforce-epic-merge-gate-authorization.ps1 predicates (issue #670)' {
             @{ Name = 'basis is shorter than twenty characters'; Field = 'basis'; Value = 'merge it, please' }
             @{ Name = 'run_slug is present but empty'; Field = 'run_slug'; Value = ' ' }
         ) {
-            $record = New-ValidRecord
+            $record = Get-ValidRecord
             $record[$Field] = $Value
             $failure = Test-StandaloneMergeAuthorizationRecord -Record (ConvertTo-ParsedJson -Value $record) -EnvelopeSessionId $script:SessionId
 
@@ -100,7 +100,7 @@ Describe 'enforce-epic-merge-gate-authorization.ps1 predicates (issue #670)' {
         }
 
         It 'names pr_url first when both pr_url and basis fail' {
-            $record = New-ValidRecord
+            $record = Get-ValidRecord
             $record['pr_url'] = 'https://github.com/drmoisan/drm-copilot/pull/777'
             $record['basis'] = 'short'
             $failure = Test-StandaloneMergeAuthorizationRecord -Record (ConvertTo-ParsedJson -Value $record) -EnvelopeSessionId $script:SessionId
@@ -113,26 +113,26 @@ Describe 'enforce-epic-merge-gate-authorization.ps1 predicates (issue #670)' {
 
     Context 'valid records and session binding' {
         It 'accepts a well-formed record whose session matches' {
-            $failure = Test-StandaloneMergeAuthorizationRecord -Record (ConvertTo-ParsedJson -Value (New-ValidRecord)) -EnvelopeSessionId $script:SessionId
+            $failure = Test-StandaloneMergeAuthorizationRecord -Record (ConvertTo-ParsedJson -Value (Get-ValidRecord)) -EnvelopeSessionId $script:SessionId
             $failure | Should -BeNullOrEmpty
         }
 
         It 'accepts a well-formed record that omits the optional run_slug' {
-            $record = New-ValidRecord
+            $record = Get-ValidRecord
             $record.Remove('run_slug')
             $failure = Test-StandaloneMergeAuthorizationRecord -Record (ConvertTo-ParsedJson -Value $record) -EnvelopeSessionId $script:SessionId
             $failure | Should -BeNullOrEmpty
         }
 
         It 'accepts an authorized_at value that is not an ISO date-time but still parses' {
-            $record = New-ValidRecord
+            $record = Get-ValidRecord
             $record['authorized_at'] = 'September 13, 2026 21:04'
             $failure = Test-StandaloneMergeAuthorizationRecord -Record (ConvertTo-ParsedJson -Value $record) -EnvelopeSessionId $script:SessionId
             $failure | Should -BeNullOrEmpty
         }
 
         It 'rejects a non-string authorized_at value' {
-            $record = New-ValidRecord
+            $record = Get-ValidRecord
             $record['authorized_at'] = 20260913
             $failure = Test-StandaloneMergeAuthorizationRecord -Record (ConvertTo-ParsedJson -Value $record) -EnvelopeSessionId $script:SessionId
             $failure.Message | Should -Match "'authorized_at'"
@@ -144,7 +144,7 @@ Describe 'enforce-epic-merge-gate-authorization.ps1 predicates (issue #670)' {
             @{ Name = 'the record session is blank'; Envelope = 'session-670-a1b2'; RecordSession = '  ' }
             @{ Name = 'the sessions differ only by case'; Envelope = 'SESSION-670-A1B2'; RecordSession = 'session-670-a1b2' }
         ) {
-            $record = New-ValidRecord
+            $record = Get-ValidRecord
             $record['session_id'] = $RecordSession
             $failure = Test-StandaloneMergeAuthorizationRecord -Record (ConvertTo-ParsedJson -Value $record) -EnvelopeSessionId $Envelope
 
@@ -169,11 +169,11 @@ Describe 'enforce-epic-merge-gate-authorization.ps1 predicates (issue #670)' {
             @{ Name = 'a blanket flag beside a valid record'; Slots = @('blanket', 'valid', 'none'); Expected = 'STANDALONE_MERGE_AUTHORIZATION_NOT_PR_SPECIFIC' }
             @{ Name = 'a matched record with a bad field'; Slots = @('none', 'none', 'bad'); Expected = 'STANDALONE_MERGE_AUTHORIZATION_MALFORMED' }
         ) {
-            $valid = New-ValidRecord
-            $other = New-ValidRecord
+            $valid = Get-ValidRecord
+            $other = Get-ValidRecord
             $other['pr_number'] = 777
             $other['pr_url'] = 'https://github.com/drmoisan/drm-copilot/pull/777'
-            $bad = New-ValidRecord
+            $bad = Get-ValidRecord
             $bad['issue_num'] = 0
             $shapes = @{
                 none    = $null
@@ -193,7 +193,7 @@ Describe 'enforce-epic-merge-gate-authorization.ps1 predicates (issue #670)' {
         }
 
         It 'allows a valid record held in any checkpoint slot' {
-            $parsed = ConvertTo-ParsedJson -Value @{ standalone_merge_authorizations = @(New-ValidRecord) }
+            $parsed = ConvertTo-ParsedJson -Value @{ standalone_merge_authorizations = @(Get-ValidRecord) }
             $verdict = Test-StandaloneCheckpointAllowsMerge -Checkpoints @($null, $null, $parsed) -CommandPrNumber 691 -EnvelopeSessionId $script:SessionId
 
             $verdict.Allowed | Should -BeTrue

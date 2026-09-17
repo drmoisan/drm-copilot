@@ -129,9 +129,10 @@ function Get-StandaloneRecordField {
     .SYNOPSIS
         Read a named field off a parsed record, returning $null when the field is absent.
     .OUTPUTS
-        System.Object or $null
+        System.Object, System.Object[], or $null
     #>
     [CmdletBinding()]
+    [OutputType([object], [object[]])]
     param(
         [Parameter(Mandatory)]
         $Record,
@@ -245,7 +246,7 @@ function Test-StandaloneAuthorizedAt {
         [ref] $parsed)
 }
 
-function New-StandaloneRecordFailure {
+function Get-StandaloneRecordFailure {
     <#
     .SYNOPSIS
         Build the malformed-record result naming the failing field.
@@ -299,31 +300,31 @@ function Test-StandaloneMergeAuthorizationRecord {
     $pullSuffix = '/pull/' + [string](Get-StandaloneRecordField -Record $Record -Name 'pr_number')
     if (-not (Test-StandaloneNonBlankString -Value $prUrl) -or
         -not $prUrl.EndsWith($pullSuffix, [System.StringComparison]::Ordinal)) {
-        return New-StandaloneRecordFailure -Field 'pr_url' -Rule "it must end with $pullSuffix."
+        return Get-StandaloneRecordFailure -Field 'pr_url' -Rule "it must end with $pullSuffix."
     }
     if (-not (Test-StandalonePositiveJsonInteger -Value (Get-StandaloneRecordField -Record $Record -Name 'issue_num'))) {
-        return New-StandaloneRecordFailure -Field 'issue_num' -Rule 'it must be a JSON integer greater than zero.'
+        return Get-StandaloneRecordFailure -Field 'issue_num' -Rule 'it must be a JSON integer greater than zero.'
     }
     foreach ($name in @('branch_name', 'authorized_by')) {
         if (-not (Test-StandaloneNonBlankString -Value (Get-StandaloneRecordField -Record $Record -Name $name))) {
-            return New-StandaloneRecordFailure -Field $name -Rule 'it must be a non-empty string.'
+            return Get-StandaloneRecordFailure -Field $name -Rule 'it must be a non-empty string.'
         }
     }
     if (-not (Test-StandaloneAuthorizedAt -Value (Get-StandaloneRecordField -Record $Record -Name 'authorized_at'))) {
-        return New-StandaloneRecordFailure -Field 'authorized_at' -Rule 'it must be a parseable date-time string.'
+        return Get-StandaloneRecordFailure -Field 'authorized_at' -Rule 'it must be a parseable date-time string.'
     }
     if (-not (Test-StandaloneNonBlankString -Value (Get-StandaloneRecordField -Record $Record -Name 'basis') -MinimumLength 20)) {
-        return New-StandaloneRecordFailure -Field 'basis' -Rule 'it must be at least 20 characters after trimming.'
+        return Get-StandaloneRecordFailure -Field 'basis' -Rule 'it must be at least 20 characters after trimming.'
     }
     if ($null -ne $Record.PSObject.Properties['run_slug'] -and
         -not (Test-StandaloneNonBlankString -Value (Get-StandaloneRecordField -Record $Record -Name 'run_slug'))) {
-        return New-StandaloneRecordFailure -Field 'run_slug' -Rule 'when present it must be a non-empty string.'
+        return Get-StandaloneRecordFailure -Field 'run_slug' -Rule 'when present it must be a non-empty string.'
     }
     $recordSessionId = Get-StandaloneRecordField -Record $Record -Name 'session_id'
     if (-not (Test-StandaloneNonBlankString -Value $recordSessionId) -or
         [string]::IsNullOrWhiteSpace($EnvelopeSessionId) -or
         -not [string]::Equals($recordSessionId, $EnvelopeSessionId, [System.StringComparison]::Ordinal)) {
-        return New-StandaloneRecordFailure -Field 'session_id' -Rule 'it must be non-empty and equal the session_id of the live hook envelope.'
+        return Get-StandaloneRecordFailure -Field 'session_id' -Rule 'it must be non-empty and equal the session_id of the live hook envelope.'
     }
 }
 

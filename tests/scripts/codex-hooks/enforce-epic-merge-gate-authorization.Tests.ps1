@@ -25,7 +25,7 @@ Describe 'Codex enforce-epic-merge-gate standalone authorization (issue #670)' {
 
         $script:SessionId = 'session-670-a1b2'
 
-        function New-CodexRecordJson {
+        function Get-CodexRecordJson {
             <#
             .SYNOPSIS
                 Build a checkpoint JSON text carrying one well-formed record for a PR.
@@ -44,8 +44,8 @@ Describe 'Codex enforce-epic-merge-gate standalone authorization (issue #670)' {
 
         $script:Fixtures = @{
             'none'         = ''
-            'record-691'   = (New-CodexRecordJson -PrNumber 691)
-            'record-777'   = (New-CodexRecordJson -PrNumber 777)
+            'record-691'   = (Get-CodexRecordJson -PrNumber 691)
+            'record-777'   = (Get-CodexRecordJson -PrNumber 777)
             'blanket-true' = '{"standalone_merge_authorizations":true}'
             'child-ready'  = '{"epic_mode":true,"step9_status":"passed"}'
             'epic-ready'   = '{"epic_merge_pr":{"pr_number":688,"ci_gate":{"conclusion":"success"}}}'
@@ -136,7 +136,7 @@ Describe 'Codex enforce-epic-merge-gate standalone authorization (issue #670)' {
                 [OutputType([string])]
                 param([Parameter(Mandatory)][string] $Field, [AllowEmptyString()][string] $Value)
 
-                $record = (New-CodexRecordJson -PrNumber 691 | ConvertFrom-Json).standalone_merge_authorizations[0]
+                $record = (Get-CodexRecordJson -PrNumber 691 | ConvertFrom-Json).standalone_merge_authorizations[0]
                 $record | Add-Member -NotePropertyName 'run_slug' -NotePropertyValue 'bugs-2026-09-11'
                 $record.$Field = $Value
                 return (@{ standalone_merge_authorizations = @($record) } | ConvertTo-Json -Depth 5 -Compress)

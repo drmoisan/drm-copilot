@@ -221,6 +221,7 @@ function Get-CodexStandaloneField {
         one-element array from unrolling into its scalar.
     #>
     [CmdletBinding()]
+    [OutputType([object], [object[]])]
     param([Parameter(Mandatory)] $Record, [Parameter(Mandatory)][string] $Name)
 
     $property = $Record.PSObject.Properties[$Name]

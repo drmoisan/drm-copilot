@@ -26,6 +26,10 @@ No automated test enforces the 500-line cap on `.claude/hooks/**`, so this enume
 | 15 | `tests/scripts/claude-hooks/enforce-epic-merge-gate.AuthorizationFields.Tests.ps1` | 203 | at most 500 |
 | 16 | `tests/scripts/codex-hooks/enforce-epic-merge-gate-authorization.Tests.ps1` | 194 | at most 500 (138 before the [P7-T2] coverage remediation added 56 lines) |
 
+## Addendum — recount after the Phase 8 pass-1 lint fixes (2026-09-17T08-56)
+
+Only rows 2, 3, 5 and 6 changed (one added `[OutputType(...)]` line each): `.claude/hooks/enforce-epic-merge-gate-authorization.ps1` 443, `.codex/hooks/enforce-epic-merge-gate.ps1` 379, and their bundled mirrors 443 and 379. The other twelve rows are unchanged. All `.ps1`, `.psd1` and `.json` rows remain at most 500.
+
 Output Summary:
 - Sixteen rows. Every `.ps1`, `.psd1` and `.json` row is at most 500 (largest: 483).
 - The four Markdown rows (159, 159, 1120, 1120) are exempt under the Markdown-documentation exception.

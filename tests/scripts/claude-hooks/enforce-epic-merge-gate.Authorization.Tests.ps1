@@ -28,7 +28,7 @@ Describe 'enforce-epic-merge-gate.ps1 standalone authorization (issue #670)' {
 
         $script:SessionId = 'session-670-a1b2'
 
-        function New-RecordJson {
+        function Get-RecordJson {
             <#
             .SYNOPSIS
                 Build a checkpoint JSON text carrying one well-formed record for a PR.
@@ -48,11 +48,11 @@ Describe 'enforce-epic-merge-gate.ps1 standalone authorization (issue #670)' {
 
         $script:Fixtures = @{
             'none'                     = $null
-            'record-691'               = (New-RecordJson -PrNumber 691)
-            'record-777'               = (New-RecordJson -PrNumber 777)
-            'record-501'               = (New-RecordJson -PrNumber 501)
+            'record-691'               = (Get-RecordJson -PrNumber 691)
+            'record-777'               = (Get-RecordJson -PrNumber 777)
+            'record-501'               = (Get-RecordJson -PrNumber 501)
             'blanket-true'             = '{"standalone_merge_authorizations":true}'
-            'green-501-and-record-777' = (New-RecordJson -PrNumber 777 -Prefix '"route_id":"parallel","items":[{"pr_number":501,"merge_status":"ci_green"}],')
+            'green-501-and-record-777' = (Get-RecordJson -PrNumber 777 -Prefix '"route_id":"parallel","items":[{"pr_number":501,"merge_status":"ci_green"}],')
         }
 
         function ConvertTo-AuthorizationEnvelope {

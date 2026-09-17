@@ -21,6 +21,14 @@ POSTING BLOCKED: this artifact is a local record. Nothing was posted to GitHub; 
 
 Verification of the checked count: `@(Select-String -LiteralPath 'docs/features/active/2026-09-13-epic-merge-gate-authorization-record-670/spec.md' -SimpleMatch -Pattern '- [x] ').Count` printed 38, which equals 2 + 36. The constant 2 covers the pre-existing non-AC checked boxes at `spec.md:83` and `spec.md:90`.
 
+## Final status after Phase 8 (2026-09-17T08-59)
+
+- Checked off (delivered): 40 of 42. AC-17 and AC-22, AC-23, AC-39 were checked off after [P8-T4], [P8-T3] and [P8-T6] verified them.
+- Remaining (unchecked): 2.
+  1. AC-35: the FU-1 through FU-4 deferral paragraph is recorded below but not yet in a pull-request description.
+  2. AC-42: the final loop's Pester step records 2 pre-existing environmental failures, so the loop did not complete in a single clean pass.
+- `@(Select-String ... -Pattern '- [x] ').Count` printed 42 = 2 + 40.
+
 ## Follow-ups
 
 - FU-1 — deferred. Reason: proposes a Claude-side permissions posture change (an authorization store outside the gated agent's write reach); this is a substrate decision outside #670's scope. `gh issue create` is denied by a PreToolUse hook in this environment, and the MCP promotion route writes repository files that would widen this feature's bounded change set.
