@@ -830,13 +830,13 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       with `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` green.
 - [ ] The bundled mirror of `.claude/rules/orchestrator-state.md` and of
       `.claude/skills/parallel-orchestrate/SKILL.md` are updated to match their repository-side files.
-- [ ] `.claude/hooks/enforce-epic-merge-gate-authorization.ps1` is added to the `paths` array of
+- [x] `.claude/hooks/enforce-epic-merge-gate-authorization.ps1` is added to the `paths` array of
       `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, with
       `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py` green.
 - [x] `.claude/hooks/enforce-epic-merge-gate-authorization.ps1` is added to `CodeCoverage.Path` in
       `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, and the coverage baseline was taken
       after that entry was added.
-- [ ] The Codex bundled mirror
+- [x] The Codex bundled mirror
       `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate.ps1`
       is byte-identical to `.codex/hooks/enforce-epic-merge-gate.ps1`, with the Codex runtime-contract
       suite green.
@@ -850,7 +850,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 
 ### Documentation and disclosure
 
-- [ ] The honest-disclosure text appears in all three required locations: the `.NOTES` block of
+- [x] The honest-disclosure text appears in all three required locations: the `.NOTES` block of
       `.claude/hooks/enforce-epic-merge-gate.ps1`, the header comment of
       `.claude/hooks/enforce-epic-merge-gate-authorization.ps1`, and the new section of
       `.claude/rules/orchestrator-state.md`. Each copy states that the record is a policy-level
@@ -860,12 +860,12 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 - [x] The hook's header comment block no longer says the gate allows the merge when "one of three"
       conditions holds; it documents four conditions, and the standalone-exclusion paragraph at the
       current lines 23-27 is rewritten so the file's own documentation is not left false.
-- [ ] `.claude/rules/orchestrator-state.md` gains a `standalone_merge_authorizations` scope-and-
+- [x] `.claude/rules/orchestrator-state.md` gains a `standalone_merge_authorizations` scope-and-
       backward-compatibility section stating the invariants are additive and key-gated, plus one
       Enforcement bullet. No JSON Schema file is authored, imported, or read for the block, and the
       Enforcement bullet states that the Python checkpoint validator does not currently validate this
       block.
-- [ ] `.claude/skills/parallel-orchestrate/SKILL.md` documents the writer procedure: which fields a
+- [x] `.claude/skills/parallel-orchestrate/SKILL.md` documents the writer procedure: which fields a
       coordinating session writes, into which checkpoint, and that a blanket flag is rejected. The
       existing `**Merge-gate authorization.**` paragraph is updated to name four allow conditions
       rather than describing only the parallel one.

@@ -27,6 +27,7 @@
     ".claude/hooks/enforce-discovery-artifact-gate.ps1",
     ".claude/hooks/enforce-epic-invocation-origin.ps1",
     ".claude/hooks/enforce-epic-merge-gate.ps1",
+    ".claude/hooks/enforce-epic-merge-gate-authorization.ps1",
     ".claude/hooks/enforce-epic-wave-barrier.ps1",
     ".claude/hooks/enforce-epic-worktree-removal-gate.ps1",
     ".claude/hooks/enforce-evidence-locations.ps1",
