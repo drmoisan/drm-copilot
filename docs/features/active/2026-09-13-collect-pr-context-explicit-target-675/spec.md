@@ -3,8 +3,8 @@
 - **Issue:** #675
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-13T23-05
-- **Status:** Ready for planning
+- **Last Updated:** 2026-09-17T20-49
+- **Status:** Delivered — all 65 plan tasks complete; 31 of 31 acceptance criteria checked off; final QC loop passed in one uninterrupted pass (see evidence/qa-gates/).
 - **Version:** 0.3 — verification-command corrections only (diff anchor moved from the moving ref `main` to the fixed commit `499e288a`; tracked-only diffs paired with `git status --porcelain` companions). No criterion was added, removed, split, merged, or rescoped.
 - **Epic:** `worktree-scoped-state-resolution`, feature F6 (wave 0, complexity C2), scope row 3.5
 - **Work Mode:** `full-bug` — `spec.md` is the sole acceptance-criteria source; `user-story.md` is not authored for this mode.
