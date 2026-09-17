@@ -8,9 +8,9 @@
     Placement decision. These cases live in a third companion suite rather than in
     either existing suite because both are close enough to the 500-line cap in
     .claude/rules/general-code-change.md to leave no room for the matrix plus its
-    regression guards: enforce-prd-feature-before-planner.Tests.ps1 measured 431
-    content lines and enforce-prd-feature-before-planner.FolderResolution.Tests.ps1
-    measured 419 before the Phase 1 BeforeAll amendment, and 436 and 424 after it.
+    regression guards: both sibling suites sit within sixty lines of the cap, and
+    their measured line counts are recorded in this feature's evidence ledger under
+    the stem remediation-file-size-ledger rather than restated here.
     The same convention is used by
     tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.Payload.Tests.ps1.
 
@@ -186,13 +186,26 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 0 -Exactly
         }
 
-        It 'derives nothing from a call that cites no absolutely-placed token' {
-            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { [pscustomobject]@{ Status = 'NoTarget' } }
+        It 'hands a repo-relative citation to the derivation' {
+            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { [pscustomobject]@{ Status = 'NoTarget'; SuppliedText = $Text } }
 
             $toolInput = [pscustomobject]@{ prompt = "Plan $($script:TargetFeatureFolder) now."; description = 'plan it' }
 
-            Get-PrdFeatureCallTarget -Envelope $null -ToolInput $toolInput | Should -BeNullOrEmpty
-            Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 0 -Exactly
+            $result = Get-PrdFeatureCallTarget -Envelope $null -ToolInput $toolInput
+            $result.Status | Should -Be 'NoTarget'
+            $result.SuppliedText | Should -BeLike "*$($script:TargetFeatureFolder)*"
+            Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 1 -Exactly
+        }
+
+        It 'hands a repo-relative citation carrying a branch signal to the derivation' {
+            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { [pscustomobject]@{ Status = 'OtherWorktree'; SuppliedText = $Text } }
+
+            $toolInput = [pscustomobject]@{ prompt = "Plan $($script:TargetFeatureFolder) now."; description = 'branch: feature/2026-09-13-x-672' }
+
+            $result = Get-PrdFeatureCallTarget -Envelope $null -ToolInput $toolInput
+            $result.SuppliedText | Should -BeLike "*$($script:TargetFeatureFolder)*"
+            $result.SuppliedText | Should -BeLike '*branch: feature/2026-09-13-x-672*'
+            Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 1 -Exactly
         }
 
         It 'supplies the session root from the envelope cwd when the runtime sets one' {
@@ -248,6 +261,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             # worktree itself, so the resolved root and the session root coincide and no
             # prefix is applied. This row is a retained regression guard: it passes
             # against the current hook as well as the fixed one.
+            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'SessionRoot' -SessionRoot $script:ItemWorktreeRoot -WorktreeRoot $script:ItemWorktreeRoot -Signal 'FeatureFolderPath' -SignalValue $script:TargetFeatureFolder -Candidate @($script:ItemWorktreeRoot) -Detail 'modelled session-root target' }
             Mock -CommandName Get-PrdFeatureIssueContent -MockWith {
                 if ($FeatureFolder -eq $script:TargetFeatureFolder) { "- Work Mode: full-bug`n" } else { $null }
             }
@@ -259,6 +273,33 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
 
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'allows a repo-relative citation placed in the item worktree' {
+            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot -WorktreeRoot $script:ItemWorktreeRoot -Signal 'FeatureFolderPath' -SignalValue $script:TargetFeatureFolder -Candidate @($script:ItemWorktreeRoot) -Detail 'modelled placement of a repo-relative citation' }
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { if ($FeatureFolder -eq $script:ComposedTargetFolder) { "- Work Mode: full-bug`n" } else { $null } }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $Path -eq "$($script:ComposedTargetFolder)/spec.md" }
+
+            $payload = New-PlannerPayload -Prompt "Plan $($script:TargetFeatureFolder) now."
+
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke -CommandName Get-PrdFeatureFileExistence -Times 1 -Exactly
+        }
+
+        It 'denies with the ambiguity reason when a repo-relative citation places in no worktree' {
+            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'Ambiguous' -SessionRoot $script:CoordinatingSessionRoot -Signal 'FeatureFolderPath' -SignalValue $script:TargetFeatureFolder -Candidate @() -Detail 'modelled zero-candidate placement' }
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { $null }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $Path -eq 'never-matched' }
+
+            $payload = New-PlannerPayload -Prompt "Plan $($script:TargetFeatureFolder) now."
+
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $reason = $decision.hookSpecificOutput.permissionDecisionReason
+            $reason | Should -BeLike "*$($script:AmbiguityCode)*"
+            $reason | Should -Not -BeLike '*work mode could not be determined*'
+            Should -Invoke -CommandName Get-PrdFeatureFileExistence -Times 0 -Exactly
         }
 
         It 'allows an absolute path to the target feature folder' -ForEach $AbsolutePathCases {
@@ -361,6 +402,9 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
         }
 
         It 'denies rather than selecting the earliest candidate on an unresolved tie' {
+            # A NoTarget result carries a null SignalValue, so the tie stays unresolved and
+            # the deny comes from the tie branch, not the derivation's own ambiguity branch.
+            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'NoTarget' -SessionRoot $script:CoordinatingSessionRoot -Detail 'modelled no-target' }
             Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { $null }
             Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-bug`n" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $Path -eq "$($script:TargetFeatureFolder)/spec.md" }
@@ -370,6 +414,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*$($script:AmbiguityCode)*"
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*cites 2 feature folders*'
         }
 
         It 'probes once on a full-bug allow row' {

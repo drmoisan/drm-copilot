@@ -10,6 +10,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         $script:Helpers = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1").Path
         . $script:UnderTest
         . $script:Helpers
+        Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'NoTarget' -SessionRoot '/synthetic-worktrees/session-root' -Detail 'modelled no-target for the delivered cases' }
     }
 
     Context 'tool input parsing' {
