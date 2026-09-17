@@ -743,12 +743,12 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 - [ ] With no `standalone_merge_authorizations` key on any of the three checkpoints, an in-scope
       command naming an explicit PR denies with `STANDALONE_MERGE_AUTHORIZATION_ABSENT`, and the deny
       message states that an authorized path exists and how to take it.
-- [ ] Every non-PR-specific spelling denies with `STANDALONE_MERGE_AUTHORIZATION_NOT_PR_SPECIFIC`, with
+- [x] Every non-PR-specific spelling denies with `STANDALONE_MERGE_AUTHORIZATION_NOT_PR_SPECIFIC`, with
       one named case for each of: block value `true`; block value a string; block value an object;
       empty array; entry not an object; `pr_number` absent; `pr_number` `null`; `pr_number` `0`;
       `pr_number` negative; `pr_number` a non-integer number; `pr_number` a digit-spelling string;
       `pr_number` the wildcard string `"*"`; `pr_number` an array.
-- [ ] Every field-shape failure on the matched entry denies with
+- [x] Every field-shape failure on the matched entry denies with
       `STANDALONE_MERGE_AUTHORIZATION_MALFORMED` and a message naming the failing field, with one named
       case per field: `pr_url`, `issue_num`, `branch_name`, `authorized_by`, `authorized_at`, `basis`
       empty, `basis` below the stated minimum length, and `run_slug` present but empty.
@@ -762,7 +762,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       checkpoint authorizes item 501 at `ci_green` and a standalone record names 777 only: the command
       merging 501 is allowed via branch 3, and the case asserts the allow carries no
       standalone-authorization reason.
-- [ ] The field-check evaluation order is fixed and the first failure wins, so a record failing two
+- [x] The field-check evaluation order is fixed and the first failure wins, so a record failing two
       field checks emits a deterministic message. Pinned by a named case supplying a record that
       violates both `pr_url` and `basis` and asserting the message names `pr_url`.
 
