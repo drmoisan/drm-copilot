@@ -280,6 +280,13 @@
             '.codex/hooks/enforce-epic-merge-gate.ps1'
             '.codex/hooks/enforce-epic-worktree-removal-gate.ps1'
             '.codex/hooks/validate-bash.ps1'
+            # Issue #669 added the worktree-resolution module (target-worktree locator, path
+            # normaliser, and four-state call-target derivation). CodeCoverage.Path is an
+            # explicit per-file allow-list, so an unregistered production file would sit
+            # outside the coverage denominator, which the Coverage Exclusion Policy forbids.
+            # Registered here beside the other .claude/lib modules.
+            '.claude/lib/worktree-resolution/WorktreeResolution.psm1'
+            '.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
