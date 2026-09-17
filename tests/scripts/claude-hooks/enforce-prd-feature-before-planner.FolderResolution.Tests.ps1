@@ -18,8 +18,13 @@
 
 Describe 'enforce-prd-feature-before-planner.ps1 folder resolution' {
     BeforeAll {
+        # Both files are dot-sourced explicitly, rather than relying on the parent's
+        # own dot-source line, so a later change to that line cannot silently
+        # redirect these assertions at a different helpers file.
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner.ps1").Path
+        $script:Helpers = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1").Path
         . $script:UnderTest
+        . $script:Helpers
     }
 
     Context 'folder resolution by four-segment truncation' {

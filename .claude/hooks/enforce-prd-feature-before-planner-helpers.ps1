@@ -15,6 +15,75 @@
     Compatible with PowerShell 7+. Read-only resolution logic.
 #>
 
+function Resolve-PrdFeatureWorkMode {
+    <#
+    .SYNOPSIS
+        Parses the persisted `- Work Mode: ...` marker out of issue.md content
+        and returns the canonical mode, or $null when the marker is absent,
+        unreadable, or unrecognized.
+    .DESCRIPTION
+        Recognizes minor-audit, full-feature, full-bug, and the legacy full
+        marker (normalized to full-feature), mirroring the regex convention
+        used by scripts/dev_tools/prompt_mode_contract.py so both runtimes
+        agree on what counts as a valid marker line.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [AllowNull()]
+        [string] $IssueContent
+    )
+
+    if ([string]::IsNullOrWhiteSpace($IssueContent)) {
+        return $null
+    }
+
+    $match = [regex]::Match($IssueContent, '(?im)^-\s*Work Mode:\s*(minor-audit|full-feature|full-bug|full)\s*$')
+    if (-not $match.Success) {
+        return $null
+    }
+
+    $rawMode = $match.Groups[1].Value
+    if ($rawMode -eq 'full') {
+        return 'full-feature'
+    }
+    return $rawMode
+}
+
+function Get-PrdFeatureRequiredFile {
+    <#
+    .SYNOPSIS
+        Maps a resolved work mode to the set of prd-feature output files the
+        target folder must contain before an atomic-planner delegation is
+        allowed.
+    .DESCRIPTION
+        full-feature requires spec.md and user-story.md; full-bug requires
+        spec.md only; minor-audit requires neither.
+
+        The default arm returns spec.md alone. It is not reached from the
+        decision path for an undeterminable mode, which denies on its own branch
+        without probing at all; the arm exists so a direct caller passing a $null
+        or unrecognized mode never receives a permissive empty set, and it must
+        not name user-story.md, because that document is required to be ABSENT
+        for full-bug and minor-audit work.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [AllowNull()]
+        [string] $WorkMode
+    )
+
+    # Route on the canonical mode; anything outside the three known values
+    # (including $null) falls through to the fail-closed default case.
+    switch ($WorkMode) {
+        'full-feature' { return [string[]]@('spec.md', 'user-story.md') }
+        'full-bug' { return [string[]]@('spec.md') }
+        'minor-audit' { return [string[]]@() }
+        default { return [string[]]@('spec.md') }
+    }
+}
+
 function Find-PrdFeatureFolderFromPrompt {
     <#
     .SYNOPSIS
@@ -104,4 +173,31 @@ function Find-PrdFeatureFolderFromPrompt {
     # among its delegation inputs and names it before citing artifacts inside it,
     # so a cross-reference to another feature appears later in the prompt.
     return $candidates[0]
+}
+
+function Get-PrdFeatureMissingFile {
+    <#
+    .SYNOPSIS
+        Returns the subset of $RequiredFile that is missing from the target
+        folder.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $FeatureFolder,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $RequiredFile
+    )
+
+    [System.Collections.Generic.List[string]] $missing = [System.Collections.Generic.List[string]]::new()
+    foreach ($name in $RequiredFile) {
+        $candidate = "$FeatureFolder/$name"
+        if (-not (Get-PrdFeatureFileExistence -Path $candidate)) {
+            $missing.Add($name)
+        }
+    }
+    return [string[]] $missing.ToArray()
 }
