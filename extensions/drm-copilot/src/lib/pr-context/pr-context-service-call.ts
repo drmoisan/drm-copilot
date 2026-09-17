@@ -25,6 +25,7 @@ import { type FileSystem } from "../file-system";
 import { type CommandRunner } from "../subprocess-runner";
 import { normalizeGeneratedPath } from "../../repo-automation-service-support";
 import { collectAndWrite } from "./collector-output";
+import { classifyPrContextDiffState } from "./diff-emptiness";
 
 /** Repo-relative summary artifact path written by the collector. */
 const SUMMARY_OUT = "artifacts/pr_context.summary.txt";
@@ -147,6 +148,19 @@ export function collectPrContextServiceCall(
 
   const targetResolution: "explicit" | "session-fallback" =
     input.targetRef === undefined ? "session-fallback" : "explicit";
+
+  const diffState = classifyPrContextDiffState({
+    mergeBase: rendered.mergeBase,
+    headSha: rendered.headSha,
+    resolvedHeadRef: rendered.resolvedHeadRef,
+    resolvedBase: rendered.resolvedBase,
+    changedFileCount: rendered.changedFileCount,
+    requestedBase: input.base,
+    attemptedHeadRef: input.targetRef ?? null,
+  });
+  if (diffState.kind !== "populated") {
+    throw new Error(diffState.message);
+  }
 
   return {
     tool: "collect_pr_context",

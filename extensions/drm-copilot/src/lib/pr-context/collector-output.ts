@@ -336,6 +336,8 @@ export interface CollectAndWriteResult {
   readonly headSha: string | null;
   /** The head ref the collector actually used, or `null` when unresolved. */
   readonly resolvedHeadRef: string | null;
+  /** The collected resolved base ref, or `null` when it could not be resolved. */
+  readonly resolvedBase: string | null;
   /** Count of changed files across the three collected buckets. */
   readonly changedFileCount: number;
 }
@@ -394,6 +396,7 @@ export function collectAndWrite(
     mergeBase: ctx.mergeBase,
     headSha: ctx.headSha,
     resolvedHeadRef: ctx.headRef ?? collected.head ?? null,
+    resolvedBase: ctx.resolvedBase,
     changedFileCount:
       collected.bucketCore.length +
       collected.bucketRenames.length +

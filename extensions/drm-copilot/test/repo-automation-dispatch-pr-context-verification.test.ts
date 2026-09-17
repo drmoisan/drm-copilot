@@ -145,4 +145,43 @@ describe("collect_pr_context tool-dispatch boundary", () => {
       [...writes.keys()].sort(),
     );
   });
+
+  it("returns ok false with the empty-diff failure text when the collected diff is empty", async () => {
+    // Arrange: writes succeed, but the scripted diff carries no changed file.
+    const { service } = buildService(false, "empty");
+
+    // Act
+    const result = await dispatchRepoAutomationTool(
+      "collect_pr_context",
+      { workspace_root: WORKSPACE_ROOT, base: "origin/main" },
+      service,
+    );
+
+    // Assert
+    expect(result.ok).toBe(false);
+    expect(result.tool).toBe("collect_pr_context");
+    expect(result.summary).toContain("PR context diff is empty");
+  });
+
+  it("projects target_resolution and the resolved head onto the dispatch result", async () => {
+    // Arrange
+    const { service } = buildService(false);
+
+    // Act
+    const result = await dispatchRepoAutomationTool(
+      "collect_pr_context",
+      {
+        workspace_root: WORKSPACE_ROOT,
+        base: "origin/main",
+        target_ref: "feature/explicit-target",
+      },
+      service,
+    );
+
+    // Assert
+    expect(result.ok).toBe(true);
+    expect(result.target_resolution).toBe("explicit");
+    expect(result.resolved_head_ref).toBe("feature/explicit-target");
+    expect(typeof result.resolved_head_sha).toBe("string");
+  });
 });
