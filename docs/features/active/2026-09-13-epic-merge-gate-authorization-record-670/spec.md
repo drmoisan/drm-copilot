@@ -901,7 +901,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       `docs/features/active/2026-09-13-epic-merge-gate-authorization-record-670/evidence/coverage/`.
       The baseline was taken after the new file was added to `CodeCoverage.Path`.
 - [x] Coverage for the changed lines does not decrease relative to the recorded baseline.
-- [ ] The full toolchain loop completed in a single clean pass: format, lint, architecture and
+- [x] The full toolchain loop completed in a single clean pass: format, lint, architecture and
       contract checks, unit tests, with no stage auto-fixing a file on the final pass. Type checking is
       not applicable to PowerShell.
 
