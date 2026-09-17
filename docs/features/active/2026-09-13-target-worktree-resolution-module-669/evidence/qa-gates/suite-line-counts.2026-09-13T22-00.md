@@ -17,3 +17,17 @@ reduction: PassedCount=48, FailedCount=0, SkippedCount=0.
 
 Split suite path:
 none
+
+## Post-QC addendum (2026-09-17T08:44:26-04:00)
+
+The [P4-T3] analyzer repair (helper renames and explicit topology passing) added a few lines to the two
+behavioural suites. Recounted with the same command:
+
+| Suite | Final count after [P4-T3] repair | Under 500 |
+| --- | --- | --- |
+| tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Tests.ps1 | 448 | yes |
+| tests/scripts/claude-lib/worktree-resolution/WorktreeTargetResolution.Tests.ps1 | 408 | yes |
+| tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1 | 88 | yes |
+
+All three remain at most 480. Module counts at the same time: WorktreeResolution.psm1 480,
+WorktreeTargetResolution.psm1 341.

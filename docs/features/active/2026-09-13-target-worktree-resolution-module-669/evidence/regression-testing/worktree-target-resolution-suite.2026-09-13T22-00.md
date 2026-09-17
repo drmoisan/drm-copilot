@@ -5,6 +5,11 @@ Command: $r = Invoke-Pester -Path 'tests/scripts/claude-lib/worktree-resolution/
 EXIT_CODE: 0
 Output Summary: PassedCount=51, FailedCount=0, SkippedCount=0. The passed set contains 1 name with "preserves the absolute prefix" ([P2-T5]), 6 names beginning "ambiguous sub-case" ([P2-T7]), 12 names beginning "required matrix row" ([P2-T6]; the four own-target rows are the cwd-equals-target regression guards), and 4 names with "join composes an absolute path" ([P2-T4]).
 
+## Post-QC re-run (2026-09-17T08:44:40-04:00)
+
+After the [P4-T3] analyzer repair (helper renames only; no `It` name changed), the same command reports
+PassedCount=51, FailedCount=0, SkippedCount=0, with the identical passed-test list below.
+
 ## Counts
 
 - PassedCount: 51

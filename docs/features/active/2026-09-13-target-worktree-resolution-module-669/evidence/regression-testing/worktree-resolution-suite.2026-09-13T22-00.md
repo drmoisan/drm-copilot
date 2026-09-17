@@ -5,6 +5,12 @@ Command: $r = Invoke-Pester -Path 'tests/scripts/claude-lib/worktree-resolution/
 EXIT_CODE: 0
 Output Summary: PassedCount=48, FailedCount=0, SkippedCount=0. The passed set contains one name with the phrase "sibling of the main checkout" ([P1-T8]), one with "deeper than four segments" ([P1-T9]), and one with "MaximumDepth guard" ([P1-T7]).
 
+## Post-QC re-run (2026-09-17T08:44:40-04:00)
+
+After the [P3-T9] comment reduction and the [P4-T3] analyzer repair (helper renames only; no `It` name
+changed), the same command reports PassedCount=48, FailedCount=0, SkippedCount=0, with the identical
+passed-test list below.
+
 ## Counts
 
 - PassedCount: 48

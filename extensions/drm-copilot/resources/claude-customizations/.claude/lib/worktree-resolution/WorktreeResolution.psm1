@@ -102,7 +102,7 @@ function Get-WorktreeResolutionDirectoryChildName {
         The absolute path of the directory to list.
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [object[]])]
     param(
         [Parameter(Mandatory = $true)]
         [string] $Path
@@ -344,7 +344,7 @@ function Get-WorktreeResolutionWorktreeRoot {
         Optional. Keep only candidates under which this repo-relative path exists.
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [object[]])]
     param(
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]

@@ -5,6 +5,11 @@ Command: $r = Invoke-Pester -Path 'tests/scripts/claude-lib/ClaudeLibModuleConve
 EXIT_CODE: 0
 Output Summary: PassedCount=33, FailedCount=0, SkippedCount=0. Both suites discover files from disk, so the two new modules under .claude/lib/worktree-resolution/ are inside their scan scope: all six ClaudeLibModuleConvention tests pass (fail-fast guard, sibling-import guard, convention sentence, caller preference, 500-line limit), and the Python guard's repository scan reports no invocation beyond its empty allowlist.
 
+## Post-QC re-run (2026-09-17T08:44:26-04:00)
+
+Re-run against the final module sources (after the [P4-T3] OutputType repair): PassedCount=33,
+FailedCount=0, SkippedCount=0.
+
 ## Counts
 
 - PassedCount: 33

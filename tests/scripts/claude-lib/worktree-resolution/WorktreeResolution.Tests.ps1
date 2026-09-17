@@ -24,7 +24,7 @@ BeforeAll {
     $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../../..").Path
     Import-Module (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/worktree-resolution/WorktreeResolution.psm1").Path -Force
 
-    function New-TestTopology {
+    function Get-TestTopology {
         # Build an in-memory administrative layout: a main checkout at C:/repo plus
         # the supplied linked worktrees, each with its own admin directory.
         param([hashtable[]] $Linked = @(), [string[]] $Directory = @())
@@ -48,20 +48,23 @@ BeforeAll {
         return $topology
     }
 
-    function Set-TopologyMock {
-        # Route the three seams to the $Topology variable of the calling test. The
-        # mock bodies resolve $Topology when the seam is called, inside the test.
+    function Register-TopologyMock {
+        # Route the three seams to the supplied topology for the calling test. The
+        # mock bodies read it from script scope when the seam is called.
+        param([hashtable] $Topology)
+
+        $script:ActiveTopology = $Topology
         Mock -CommandName Get-WorktreeResolutionGitEntryKind -ModuleName 'WorktreeResolution' -MockWith {
             param([string] $Path)
-            if ($Topology.Kind.ContainsKey($Path)) { $Topology.Kind[$Path] } else { 'None' }
+            if ($script:ActiveTopology.Kind.ContainsKey($Path)) { $script:ActiveTopology.Kind[$Path] } else { 'None' }
         }
         Mock -CommandName Get-WorktreeResolutionGitFileText -ModuleName 'WorktreeResolution' -MockWith {
             param([string] $Path)
-            $Topology.Text[$Path]
+            $script:ActiveTopology.Text[$Path]
         }
         Mock -CommandName Get-WorktreeResolutionDirectoryChildName -ModuleName 'WorktreeResolution' -MockWith {
             param([string] $Path)
-            if ($Topology.Children.ContainsKey($Path)) { , [string[]] $Topology.Children[$Path] } else { , [string[]] @() }
+            if ($script:ActiveTopology.Children.ContainsKey($Path)) { , [string[]] $script:ActiveTopology.Children[$Path] } else { , [string[]] @() }
         }
     }
 
@@ -189,16 +192,16 @@ Describe 'WorktreeResolution' {
     Context 'upward ascent' {
         It 'returns the input itself when it is a root (depth 0)' {
             # Purpose: the level holding the marker is returned unchanged.
-            $Topology = New-TestTopology
-            Set-TopologyMock
+            $Topology = Get-TestTopology
+            Register-TopologyMock -Topology $Topology
 
             Find-WorktreeResolutionRoot -Path 'C:\repo' | Should -BeExactly 'C:/repo'
         }
 
         It 'ascends several levels to the nearest root (depth greater than 0)' {
             # Purpose: the nearest marker wins, not the enclosing main checkout.
-            $Topology = New-TestTopology -Linked @($script:ItemWorktree)
-            Set-TopologyMock
+            $Topology = Get-TestTopology -Linked @($script:ItemWorktree)
+            Register-TopologyMock -Topology $Topology
 
             $actual = Find-WorktreeResolutionRoot -Path 'C:\repo\.claude\worktrees\item\docs\features\active'
 
@@ -223,8 +226,8 @@ Describe 'WorktreeResolution' {
 
         It 'stops at the MaximumDepth guard before reaching a distant root' {
             # Purpose: the guard bounds the walk exactly.
-            $Topology = New-TestTopology
-            Set-TopologyMock
+            $Topology = Get-TestTopology
+            Register-TopologyMock -Topology $Topology
 
             $tooShallow = Find-WorktreeResolutionRoot -Path 'C:/repo/a/b/c' -MaximumDepth 2
             $deepEnough = Find-WorktreeResolutionRoot -Path 'C:/repo/a/b/c' -MaximumDepth 3
@@ -245,8 +248,8 @@ Describe 'WorktreeResolution' {
     Context 'worktree enumeration' {
         It 'enumerates the main checkout and its linked worktrees from the main checkout' {
             # Purpose: the main checkout is first, followed by every linked worktree.
-            $Topology = New-TestTopology -Linked @($script:SessionWorktree, $script:ItemWorktree)
-            Set-TopologyMock
+            $Topology = Get-TestTopology -Linked @($script:SessionWorktree, $script:ItemWorktree)
+            Register-TopologyMock -Topology $Topology
 
             $actual = Get-WorktreeResolutionWorktreeRoot -SessionRoot 'C:\repo\'
 
@@ -256,8 +259,8 @@ Describe 'WorktreeResolution' {
 
         It 'includes the main checkout when the session root is a linked worktree' {
             # Purpose: the main checkout is a candidate, not only the linked worktrees.
-            $Topology = New-TestTopology -Linked @($script:SessionWorktree, $script:ItemWorktree)
-            Set-TopologyMock
+            $Topology = Get-TestTopology -Linked @($script:SessionWorktree, $script:ItemWorktree)
+            Register-TopologyMock -Topology $Topology
 
             $actual = Get-WorktreeResolutionWorktreeRoot -SessionRoot 'C:/repo-wt/session'
 
@@ -267,8 +270,8 @@ Describe 'WorktreeResolution' {
 
         It 'resolves a linked worktree that is a sibling of the main checkout without a prefix comparison' {
             # Purpose: the sibling is its own root, not folded into C:/repo.
-            $Topology = New-TestTopology -Linked @($script:SiblingWorktree)
-            Set-TopologyMock
+            $Topology = Get-TestTopology -Linked @($script:SiblingWorktree)
+            Register-TopologyMock -Topology $Topology
 
             $candidates = Get-WorktreeResolutionWorktreeRoot -SessionRoot 'C:/repo-wt/sibling'
             $located = Find-WorktreeResolutionRoot -Path 'C:/repo-wt/sibling/docs/features/active/x'
@@ -279,8 +282,8 @@ Describe 'WorktreeResolution' {
 
         It 'returns a single-element array when the admin directory holds no linked worktree' {
             # Purpose: still an array, holding only the main checkout.
-            $Topology = New-TestTopology
-            Set-TopologyMock
+            $Topology = Get-TestTopology
+            Register-TopologyMock -Topology $Topology
 
             $actual = Get-WorktreeResolutionWorktreeRoot -SessionRoot 'C:/repo'
 
@@ -296,10 +299,10 @@ Describe 'WorktreeResolution' {
             @{ Label = 'a .git file with no gitdir line'; SessionRoot = 'C:/repo-wt/session'; BreakPointer = $true }
         ) {
             # Purpose: an unreachable layout yields no candidate rather than a guess.
-            $Topology = New-TestTopology -Linked @($script:SessionWorktree)
+            $Topology = Get-TestTopology -Linked @($script:SessionWorktree)
             if ($DropCommonDir) { $Topology.Text.Remove('C:/repo/.git/worktrees/session/commondir') }
             if ($BreakPointer) { $Topology.Text['C:/repo-wt/session/.git'] = 'not a pointer' }
-            Set-TopologyMock
+            Register-TopologyMock -Topology $Topology
 
             $actual = Get-WorktreeResolutionWorktreeRoot -SessionRoot $SessionRoot
 
@@ -309,12 +312,12 @@ Describe 'WorktreeResolution' {
 
         It 'follows relative pointers, skips admin entries without a gitdir file, and deduplicates roots' {
             # Purpose: relative pointers resolve, the orphan is skipped, and case-only duplicates collapse.
-            $Topology = New-TestTopology -Linked @($script:ItemWorktree)
+            $Topology = Get-TestTopology -Linked @($script:ItemWorktree)
             $Topology.Text['C:/repo/.claude/worktrees/item/.git'] = 'gitdir: ../../../.git/worktrees/item'
             $Topology.Text['C:/repo/.git/worktrees/item/gitdir'] = '../../../.claude/worktrees/item/.git'
             $Topology.Text['C:/repo/.git/worktrees/copy/gitdir'] = 'C:/REPO/.claude/worktrees/item/.git'
             $Topology.Children['C:/repo/.git/worktrees'] = [string[]] @('item', 'orphan', 'copy')
-            Set-TopologyMock
+            Register-TopologyMock -Topology $Topology
 
             $actual = Get-WorktreeResolutionWorktreeRoot -SessionRoot 'C:/repo/.claude/worktrees/item'
 
@@ -323,11 +326,11 @@ Describe 'WorktreeResolution' {
 
         It 'omits the main checkout when the common directory is not a .git directory' {
             # Purpose: a bare repository has no checkout of its own to offer.
-            $Topology = New-TestTopology -Linked @($script:SessionWorktree)
+            $Topology = Get-TestTopology -Linked @($script:SessionWorktree)
             $Topology.Text['C:/repo/.git/worktrees/session/commondir'] = 'C:/bare/repo-bare'
             $Topology.Children['C:/bare/repo-bare/worktrees'] = [string[]] @('session')
             $Topology.Text['C:/bare/repo-bare/worktrees/session/gitdir'] = 'C:/repo-wt/session/.git'
-            Set-TopologyMock
+            Register-TopologyMock -Topology $Topology
 
             $actual = Get-WorktreeResolutionWorktreeRoot -SessionRoot 'C:/repo-wt/session'
 
@@ -340,9 +343,9 @@ Describe 'WorktreeResolution' {
             @{ Branch = 'feature/absent'; Expected = @() }
         ) {
             # Purpose: only a HEAD naming exactly that branch qualifies.
-            $Topology = New-TestTopology -Linked @($script:SessionWorktree, $script:ItemWorktree)
+            $Topology = Get-TestTopology -Linked @($script:SessionWorktree, $script:ItemWorktree)
             $Topology.Text['C:/repo/.git/worktrees/session/HEAD'] = '0123456789abcdef0123456789abcdef01234567'
-            Set-TopologyMock
+            Register-TopologyMock -Topology $Topology
 
             $actual = Get-WorktreeResolutionWorktreeRoot -SessionRoot 'C:/repo' -Branch $Branch
 
@@ -352,8 +355,8 @@ Describe 'WorktreeResolution' {
 
         It 'filters candidates to those containing a repo-relative path' {
             # Purpose: only the containing worktree survives.
-            $Topology = New-TestTopology -Linked @($script:SessionWorktree, $script:ItemWorktree) -Directory @('C:/repo/.claude/worktrees/item/docs/features/active/item-700')
-            Set-TopologyMock
+            $Topology = Get-TestTopology -Linked @($script:SessionWorktree, $script:ItemWorktree) -Directory @('C:/repo/.claude/worktrees/item/docs/features/active/item-700')
+            Register-TopologyMock -Topology $Topology
 
             $actual = Get-WorktreeResolutionWorktreeRoot -SessionRoot 'C:/repo-wt/session' -RepoRelativePath 'docs\features\active\item-700\'
 
@@ -364,8 +367,8 @@ Describe 'WorktreeResolution' {
     Context 'repo-relative normalisation' {
         It 'keeps a remainder deeper than four segments intact and recovers the absolute prefix' {
             # Purpose: no segment is lost and the prefix becomes WorktreeRoot.
-            $Topology = New-TestTopology -Linked @($script:SessionWorktree)
-            Set-TopologyMock
+            $Topology = Get-TestTopology -Linked @($script:SessionWorktree)
+            Register-TopologyMock -Topology $Topology
 
             $actual = ConvertTo-WorktreeResolutionRepoRelativePath -Path 'C:\repo-wt\session\docs\features\active\item-700\v1\spec.md'
 
@@ -415,8 +418,8 @@ Describe 'WorktreeResolution' {
 
         It 'returns an empty remainder for the worktree root itself' {
             # Purpose: the root is located and nothing below it is invented.
-            $Topology = New-TestTopology
-            Set-TopologyMock
+            $Topology = Get-TestTopology
+            Register-TopologyMock -Topology $Topology
 
             $actual = ConvertTo-WorktreeResolutionRepoRelativePath -Path 'C:/repo/'
 

@@ -42,5 +42,8 @@ Output Summary: All eighteen searches return 0 matches (twelve forbidden-token s
 
 Total searches returning zero: 18 of 18.
 
+Post-QC re-run (2026-09-17T08:44:26-04:00) against the final module sources (after the [P4-T3] OutputType
+repair): 18 of 18 searches return zero; both declaration searches return 1.
+
 The table escapes `|` as `\|` for Markdown only; the executed regular expression was
 `(^\s*|[&|;=(]\s*)git(\.exe)?\s`.

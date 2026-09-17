@@ -25,7 +25,7 @@ BeforeAll {
     Import-Module (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/worktree-resolution/WorktreeResolution.psm1").Path -Force
     Import-Module (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1").Path -Force
 
-    function New-TestTopology {
+    function Get-TestTopology {
         # A main checkout at C:/repo on branch main, three linked worktrees, and the
         # supplied feature folders. $Branch overrides a linked worktree's branch.
         param([string[]] $Directory = @(), [hashtable] $Branch = @{})
@@ -55,19 +55,23 @@ BeforeAll {
         return $topology
     }
 
-    function Set-TopologyMock {
-        # Route the three seams to the $Topology variable of the calling test.
+    function Register-TopologyMock {
+        # Route the three seams to the supplied topology for the calling test. The
+        # mock bodies read it from script scope when the seam is called.
+        param([hashtable] $Topology)
+
+        $script:ActiveTopology = $Topology
         Mock -CommandName Get-WorktreeResolutionGitEntryKind -ModuleName 'WorktreeResolution' -MockWith {
             param([string] $Path)
-            if ($Topology.Kind.ContainsKey($Path)) { $Topology.Kind[$Path] } else { 'None' }
+            if ($script:ActiveTopology.Kind.ContainsKey($Path)) { $script:ActiveTopology.Kind[$Path] } else { 'None' }
         }
         Mock -CommandName Get-WorktreeResolutionGitFileText -ModuleName 'WorktreeResolution' -MockWith {
             param([string] $Path)
-            $Topology.Text[$Path]
+            $script:ActiveTopology.Text[$Path]
         }
         Mock -CommandName Get-WorktreeResolutionDirectoryChildName -ModuleName 'WorktreeResolution' -MockWith {
             param([string] $Path)
-            if ($Topology.Children.ContainsKey($Path)) { , [string[]] $Topology.Children[$Path] } else { , [string[]] @() }
+            if ($script:ActiveTopology.Children.ContainsKey($Path)) { , [string[]] $script:ActiveTopology.Children[$Path] } else { , [string[]] @() }
         }
     }
 
@@ -135,8 +139,8 @@ Describe 'WorktreeTargetResolution' {
 
         It 'defaults SessionRoot to the worktree containing the current location' {
             # Arrange: the current location sits below the session worktree.
-            $Topology = New-TestTopology
-            Set-TopologyMock
+            $Topology = Get-TestTopology
+            Register-TopologyMock -Topology $Topology
             Mock -CommandName Get-Location -ModuleName 'WorktreeTargetResolution' -MockWith { [pscustomobject]@{ ProviderPath = 'C:\repo-wt\session\scripts' } }
 
             # Act: resolve without an explicit session root.
@@ -236,8 +240,8 @@ Describe 'WorktreeTargetResolution' {
             @{ Cwd = 'item'; Form = 'absolute'; Target = 'absent'; Session = 'C:/repo/.claude/worktrees/item'; Token = 'D:/elsewhere/docs/features/active/2026-09-13-absent-702'; ExpectedStatus = 'Ambiguous'; ExpectedRoot = $null }
         ) {
             # Arrange: the standard three-worktree topology with its feature folders.
-            $Topology = New-TestTopology -Directory $script:StandardFolders
-            Set-TopologyMock
+            $Topology = Get-TestTopology -Directory $script:StandardFolders
+            Register-TopologyMock -Topology $Topology
 
             # Act: derive the target of a prompt naming the row's token.
             $result = Resolve-WorktreeCallTarget -Text "Plan the work in $Token." -SessionRoot $Session
@@ -272,9 +276,9 @@ Describe 'WorktreeTargetResolution' {
         ) {
             # Arrange: the shared folder exists in two worktrees and two worktrees share a branch.
             $folders = $script:StandardFolders + @('C:/repo-wt/session/docs/features/active/2026-09-13-shared-703', 'C:/repo-wt/sibling/docs/features/active/2026-09-13-shared-703')
-            $Topology = New-TestTopology -Directory $folders -Branch @{ session = 'feature/shared'; item = 'feature/shared' }
-            if ($Branch -eq 'feature/sibling-701') { $Topology = New-TestTopology -Directory $folders }
-            Set-TopologyMock
+            $Topology = Get-TestTopology -Directory $folders -Branch @{ session = 'feature/shared'; item = 'feature/shared' }
+            if ($Branch -eq 'feature/sibling-701') { $Topology = Get-TestTopology -Directory $folders }
+            Register-TopologyMock -Topology $Topology
 
             # Act: derive the target from the row's signals.
             $result = Resolve-WorktreeCallTarget -Text $Text -Branch $Branch -SessionRoot 'C:/repo-wt/session'
@@ -324,8 +328,8 @@ Describe 'WorktreeTargetResolution' {
             @{ Text = 'push --head feature/item-700'; FilePath = 'C:\repo\.claude\worktrees\item\scripts\tool.ps1'; Expected = 'FilePath' }
         ) {
             # Arrange: every signal names the item worktree.
-            $Topology = New-TestTopology -Directory $script:StandardFolders
-            Set-TopologyMock
+            $Topology = Get-TestTopology -Directory $script:StandardFolders
+            Register-TopologyMock -Topology $Topology
 
             # Act: derive the target from the agreeing signals.
             $result = Resolve-WorktreeCallTarget -Text $Text -FilePath $FilePath -SessionRoot 'C:/repo-wt/session'
@@ -339,8 +343,8 @@ Describe 'WorktreeTargetResolution' {
 
         It 'never lets precedence suppress a disagreement between a relative file path and a branch' {
             # Arrange: a relative file path present only in the session worktree, a branch on the sibling.
-            $Topology = New-TestTopology -Directory @('C:/repo-wt/session/notes/todo.md')
-            Set-TopologyMock
+            $Topology = Get-TestTopology -Directory @('C:/repo-wt/session/notes/todo.md')
+            Register-TopologyMock -Topology $Topology
 
             # Act: FilePath outranks Branch, but the two name different worktrees.
             $result = Resolve-WorktreeCallTarget -FilePath 'notes\todo.md' -Branch 'feature/sibling-701' -SessionRoot 'C:/repo-wt/session'
@@ -366,8 +370,8 @@ Describe 'WorktreeTargetResolution' {
 
         It 'produces each of the four Status values from a documented input' {
             # Arrange: the standard topology.
-            $Topology = New-TestTopology -Directory $script:StandardFolders
-            Set-TopologyMock
+            $Topology = Get-TestTopology -Directory $script:StandardFolders
+            Register-TopologyMock -Topology $Topology
 
             # Act: one documented input per state.
             $statuses = @(
