@@ -873,7 +873,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       bundled mirrors. No other skill, agent, or rule file is edited to write or describe the record.
 - [x] The two closed anti-patterns (synthetic `items[]` injection; switching to `--squash`) are
       recorded as closed in this spec, and the implementation introduces neither.
-- [ ] Follow-ups FU-1 through FU-4 are filed as issues, or their deferral is explicitly recorded in the
+- [x] Follow-ups FU-1 through FU-4 are filed as issues, or their deferral is explicitly recorded in the
       pull-request description, before this feature is closed.
 
 ### Tests, toolchain, and coverage
