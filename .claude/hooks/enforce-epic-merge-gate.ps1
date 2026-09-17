@@ -44,6 +44,8 @@ Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -
 # Invoke-EpicMergeGateDecision and by Get-EpicMergeGateCommandPrNumber.
 . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
 . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+# Standalone-merge authorization predicates and the two decision-envelope factories (issue #670).
+. (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-authorization.ps1')
 
 $script:ChildCheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 $script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
@@ -322,36 +324,6 @@ function Test-ParallelCheckpointAllowsMerge {
     }
 
     return $false
-}
-
-function Get-EpicMergeGateAllowDecision {
-    [CmdletBinding()]
-    [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param()
-
-    return [ordered]@{
-        hookSpecificOutput = [ordered]@{
-            hookEventName      = 'PreToolUse'
-            permissionDecision = 'allow'
-        }
-    }
-}
-
-function Get-EpicMergeGateBlockDecision {
-    [CmdletBinding()]
-    [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param(
-        [Parameter(Mandatory)]
-        [string] $Reason
-    )
-
-    return [ordered]@{
-        hookSpecificOutput = [ordered]@{
-            hookEventName            = 'PreToolUse'
-            permissionDecision       = 'deny'
-            permissionDecisionReason = $Reason
-        }
-    }
 }
 
 function Invoke-EpicMergeGateDecision {

@@ -833,7 +833,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 - [ ] `.claude/hooks/enforce-epic-merge-gate-authorization.ps1` is added to the `paths` array of
       `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, with
       `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py` green.
-- [ ] `.claude/hooks/enforce-epic-merge-gate-authorization.ps1` is added to `CodeCoverage.Path` in
+- [x] `.claude/hooks/enforce-epic-merge-gate-authorization.ps1` is added to `CodeCoverage.Path` in
       `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, and the coverage baseline was taken
       after that entry was added.
 - [ ] The Codex bundled mirror
