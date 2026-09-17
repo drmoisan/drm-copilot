@@ -328,6 +328,13 @@ function Invoke-PrdFeatureBeforePlannerDecision {
         $folder = Get-PrdFeatureCheckpointFolder
     }
 
+    # The call names no folder and its target is another worktree. Validating it
+    # against this session's checkpoint would approve one item's work on the strength
+    # of a sibling item's record, so the gate reports the unresolved target instead.
+    if (-not $folder -and -not (Test-PrdFeatureSessionRootTarget -Target $target)) {
+        return (Get-PrdFeatureAmbiguityDecision -Detail ("the call names no feature folder and its derived target '$($target.WorktreeRoot)' is not the session root, so this session's checkpoint cannot stand in for it"))
+    }
+
     if (-not $folder) {
         return [ordered]@{
             hookSpecificOutput = [ordered]@{

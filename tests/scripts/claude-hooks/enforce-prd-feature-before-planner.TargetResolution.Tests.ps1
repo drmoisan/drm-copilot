@@ -341,17 +341,23 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
         }
 
         It 'denies rather than validating against a sibling session checkpoint' {
-            # Two distinct candidates and a checkpoint naming the coordinating session's
-            # own feature. The checkpoint must no longer decide the tie.
+            # A prompt naming no feature folder, issued from a session whose checkpoint
+            # describes a different item, with the call's own target in another
+            # worktree. The sibling item's checkpoint is the only state present, and it
+            # must not be allowed to stand in for the call's own target.
             Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { $script:OtherFeatureFolder }
             Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-bug`n" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $Path -eq "$($script:OtherFeatureFolder)/spec.md" }
 
-            $payload = New-PlannerPayload -Prompt "Plan $($script:TargetFeatureFolder) and cross-reference $($script:OtherFeatureFolder) now."
+            $target = New-ModelledTarget -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot `
+                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue "$($script:ItemWorktreeRoot)/some/file.ps1"
+            $payload = New-PlannerPayload -Prompt 'Continue planning the work already in flight.'
 
-            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*$($script:AmbiguityCode)*"
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -BeLike "*$($script:OtherFeatureFolder)*"
+            Should -Invoke -CommandName Get-PrdFeatureFileExistence -Times 0 -Exactly
         }
 
         It 'denies rather than selecting the earliest candidate on an unresolved tie' {
