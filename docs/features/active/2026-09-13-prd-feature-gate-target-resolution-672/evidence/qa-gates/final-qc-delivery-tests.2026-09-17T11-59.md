@@ -21,4 +21,6 @@ Pre-invocation `.claude/state` clearing (the **unfiltered** pipeline defined in 
 
 The removal is required rather than optional: `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` enumerates `.claude` with `rglob("*")` at lines 51-60 and excludes only `.claude/settings.local.json` and `.claude/agent-memory/**` at lines 130-134, so it does not honour the `.gitignore` entry for `.claude/state/` at line 68 and would report `Repo file missing from bundle:` for any file it found there. No production PowerShell write follows this removal.
 
-This is step 4 of pass 2 of the `[P6-T1]` through `[P6-T4]` loop, and it completed with no failure and no file change.
+## Repeated passes
+
+The loop ran three times. The values above are pass 2. Pass 3 (2026-09-17T12-09) repeated the same command after the `[P6-T7]` acceptance-criteria alignment and the bundled re-mirror, with the identical result: 17 passed, 0 failed, exit 0, and a `git status --porcelain` capture taken immediately afterwards that was empty. Pass 3 is the final pass and it completed with no failure and no file change.

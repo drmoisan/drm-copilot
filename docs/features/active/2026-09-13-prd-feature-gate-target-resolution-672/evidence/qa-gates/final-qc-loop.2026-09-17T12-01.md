@@ -15,12 +15,13 @@ Output Summary — the four steps in order, each with the artifact it produced:
 
 Type checking is not applicable to PowerShell and is deliberately absent from the loop (`.claude/rules/powershell.md` line 17).
 
-## Passes required: 2
+## Passes required: 3
 
 - **Pass 1** completed steps 1 and 2 cleanly, and step 3 reported the parent hook at 82.47 percent line coverage, below the 85 percent floor. Seven test cases were added for `Get-PrdFeatureCallTarget` and the non-null arm of `Test-PrdFeatureSessionRootTarget` (commit `e5b7a210`). That changed a tracked file, so the loop restarted at `[P6-T1]`.
 - **Pass 2** completed all four steps with zero file changes: the formatter's two porcelain captures were identical and both empty; the analyzer printed `PSScriptAnalyzer passed: no findings under ...` with all seven per-file counts at 0; the test run reported `tests` 4758, `errors` 0, and per-file coverage of 90.72 percent and 93.55 percent; the delivery tests reported 17 passed, 0 failed, exit 0.
+- **Pass 3** followed the `[P6-T7]` check-off, which found that `spec.md` acceptance criteria 4 and 13 require a call naming no feature folder whose derived target is another worktree to deny with the ambiguity code, where the implementation denied with the generic reason. The hook was aligned, its row re-specified, and the bundled mirror refreshed (commit `7eb33f6a`). That changed tracked files, so the loop restarted. Pass 3 completed all four steps with zero file changes: identical empty porcelain captures around the formatter; the zero-findings literal with all seven per-file counts at 0; `tests` 4758, `errors` 0, per-file coverage 90.91 percent and 93.55 percent; delivery tests 17 passed, 0 failed, exit 0. A `git status --porcelain` taken after step 4 was empty.
 
-The final pass completed with zero file changes and with no failure attributable to this change set.
+Pass 3 is the final pass. It completed with zero file changes and with no failure attributable to this change set.
 
 ## Standing deviation carried into this loop
 

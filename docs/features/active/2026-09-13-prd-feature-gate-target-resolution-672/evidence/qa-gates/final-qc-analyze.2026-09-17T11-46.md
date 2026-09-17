@@ -24,4 +24,8 @@ Output Summary:
   - 0 `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1`
   - 0 `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1`
 
-Neither an exit code nor an MCP result was accepted in place of the literal, because neither carries a finding count. No remediation was required and the loop does not restart.
+Neither an exit code nor an MCP result was accepted in place of the literal, because neither carries a finding count. No remediation was required at this step on any pass.
+
+## Repeated passes
+
+The loop ran three times. The values above are pass 1. Pass 2 (2026-09-17T11-54) and pass 3 (2026-09-17T12-04) repeated the same commands with the identical result: the zero-findings literal quoted verbatim from the captured output, a whole-tree count of 0, and all seven per-file counts at 0. Pass 3 is the final pass. The loop restarts were caused by the test step and by the acceptance-criteria check-off, not by this step.

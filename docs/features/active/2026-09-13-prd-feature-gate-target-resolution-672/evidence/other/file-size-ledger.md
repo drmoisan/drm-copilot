@@ -35,4 +35,24 @@ Command: `(Get-Content -LiteralPath '<path>').Count`, run from the worktree root
 
 All nine measured counts are at or under 500, covering every production and test file in the change set as `spec.md` line 653 requires. The two bundled hook copies are measured here at their batch-B values (262 and 203); batch E re-mirrors them to the post-change repository copies, and the delivery tests at `[P5-T4]` assert text identity after that.
 
+### Delivered-state remeasurement (final)
+
+Timestamp: 2026-09-17T12-10
+
+The Phase 6 loop added test cases and one decision branch after the Phase 4 block was written, so the same nine files were remeasured in their delivered state with the same command:
+
+| file | measured lines | cap |
+| --- | --- | --- |
+| `.claude/hooks/enforce-prd-feature-before-planner.ps1` | 431 | 500 |
+| `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1` | 314 | 500 |
+| `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1` | 454 | 500 |
+| `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.Tests.ps1` | 445 | 500 |
+| `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.FolderResolution.Tests.ps1` | 453 | 500 |
+| `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner.ps1` | 431 | 500 |
+| `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1` | 314 | 500 |
+| `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` | 306 | 500 |
+| `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1` | 306 | 500 |
+
+All nine delivered counts are at or under 500; the largest is the new companion suite at 454. The two bundled hook copies now match their repository counterparts exactly, which is the batch-E mirroring verified by `[P5-T2]`, `[P5-T3]`, and the delivery tests.
+
 Citation drift recorded rather than hidden: `[P4-T20]` states that both `pester.runsettings.psd1` copies are 293 lines and the bundled hook 448. The runsettings copies measured 302 before this feature's single-entry addition and 306 after it, because F1 (merged as PR #683) added coverage entries; the bundled hook measured 448 before the extraction. The plan's point stands either way — the entries each task adds cannot approach the cap.
