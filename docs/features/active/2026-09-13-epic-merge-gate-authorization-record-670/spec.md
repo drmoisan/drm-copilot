@@ -795,7 +795,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       modified by this change, verified by
       `git diff --name-only origin/epic/worktree-scoped-state-resolution-integration` listing none of
       them, and the gate's existing Pester suites are green and unedited.
-- [ ] **Epic and standalone topologies behave exactly as now when cwd and target coincide.** The three
+- [x] **Epic and standalone topologies behave exactly as now when cwd and target coincide.** The three
       `$script:*CheckpointPath` assignments and the Codex repository-root anchoring are unchanged, and
       every branch-1, branch-2 and branch-3 allow and deny case in the existing suites is green and
       unedited.
@@ -808,17 +808,17 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 
 ### Codex parity
 
-- [ ] `.codex/hooks/enforce-epic-merge-gate.ps1` gains the standalone branch in place, with the same
+- [x] `.codex/hooks/enforce-epic-merge-gate.ps1` gains the standalone branch in place, with the same
       activation condition as the Claude side (a well-formed record naming this PR, with a matching
       `session_id`), covered by named cases in
       `tests/scripts/codex-hooks/enforce-epic-merge-gate-authorization.Tests.ps1`.
-- [ ] All four reason-code tokens are spelled byte-identically on both runtimes, verified by a named
+- [x] All four reason-code tokens are spelled byte-identically on both runtimes, verified by a named
       assertion that compares the token literals extracted from the Claude helpers file and the Codex
       hook.
-- [ ] The Codex hook still has no parallel allow path: the tokens `route_id`, `items`, and `parallel`
+- [x] The Codex hook still has no parallel allow path: the tokens `route_id`, `items`, and `parallel`
       occur zero times in `.codex/hooks/enforce-epic-merge-gate.ps1` after the change, as they do
       before it.
-- [ ] The Codex allow representation stays `$null`, the `exit 2` throw channel is unchanged, the
+- [x] The Codex allow representation stays `$null`, the `exit 2` throw channel is unchanged, the
       `step9_status` accepted set is unchanged, and the `epic_mode` type test is unchanged.
 
 ### Registration, configuration, and file size
@@ -889,7 +889,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       table-driven, and carries a header determinism block stating that every case drives the pure
       decision seam, mocks every checkpoint read seam, writes nothing to disk, starts no process, and
       reads no clock.
-- [ ] No test in this change creates a temporary file, uses `Mock gh`, uses `Mock git`, uses
+- [x] No test in this change creates a temporary file, uses `Mock gh`, uses `Mock git`, uses
       `Start-Sleep`, or makes a network call, with the PowerShell test-purity check green.
 - [ ] No file under `.claude/hooks/**` added or modified by this change invokes Python by any route,
       with `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` green and
