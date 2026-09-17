@@ -70,6 +70,9 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly summary: string;
   readonly stderr_excerpt?: string;
   readonly target_repository?: string;
+  readonly target_resolution?: "explicit" | "session-fallback";
+  readonly resolved_head_ref?: string | null;
+  readonly resolved_head_sha?: string | null;
   readonly warnings?: ReadonlyArray<string>;
   readonly status?: "validated" | "materialized" | "blocked";
   readonly handoff_id?: string | null;
@@ -122,6 +125,15 @@ function toMcpToolResult(
     ...(result.targetRepository === undefined
       ? {}
       : { target_repository: result.targetRepository }),
+    ...(result.targetResolution === undefined
+      ? {}
+      : { target_resolution: result.targetResolution }),
+    ...(result.resolvedHeadRef === undefined
+      ? {}
+      : { resolved_head_ref: result.resolvedHeadRef }),
+    ...(result.resolvedHeadSha === undefined
+      ? {}
+      : { resolved_head_sha: result.resolvedHeadSha }),
     ...(result.warnings === undefined ? {} : { warnings: result.warnings }),
   };
 }

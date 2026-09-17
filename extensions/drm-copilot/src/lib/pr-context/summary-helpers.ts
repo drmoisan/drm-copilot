@@ -15,6 +15,7 @@
  */
 
 import {
+  type PrContextResult,
   type ScopingDocChange,
   section,
   splitLines,
@@ -284,6 +285,77 @@ export function bucketText(
       .map(([path, [adds, dels]]) => `- ${path} (+${adds}/-${dels})`),
   ];
   return lines.join("\n");
+}
+
+/**
+ * Build the `Base/Head` block's line sequence for the summary artifact.
+ *
+ * Extracted from `collector-output.ts` so that file stays under the 500-line
+ * cap. Behaviour is unchanged from the prior inline construction: the same
+ * five lines in the same order, followed by the stale-base WARNING when a
+ * requested local base did not resolve to an `origin/` ref.
+ *
+ * @param ctx The collected PR context result.
+ * @param head The `head` option this collection was run with, or `null`.
+ * @param workspaceRoot The workspace root the session fallback, if any, was
+ *   derived from.
+ * @returns The `Base/Head` block's lines, in render order.
+ */
+export function buildBaseHeadSection(
+  ctx: PrContextResult,
+  head: string | null,
+  workspaceRoot: string,
+): string[] {
+  const lines: string[] = [
+    section("Base/Head"),
+    `Base ref (requested): ${ctx.baseRef ?? "(default)"}`,
+    `Base ref (resolved): ${ctx.resolvedBase ?? "(unknown)"} @ ${ctx.baseSha ?? "(unknown)"}`,
+    `Head ref (resolved): ${ctx.headRef ?? head ?? "(unknown)"} @ ${ctx.headSha ?? "(unknown)"}`,
+    renderHeadRefSourceLine(head, workspaceRoot),
+    `Merge base: ${ctx.mergeBase ?? "(unknown)"}`,
+    `Range: ${ctx.revRange ?? "(unknown)"}`,
+  ];
+  // Emit the stale-base WARNING when a requested local base did not resolve to
+  // an origin/ ref.
+  if (
+    ctx.baseRef &&
+    ctx.resolvedBase &&
+    !ctx.resolvedBase.startsWith("origin/")
+  ) {
+    lines.push(
+      "WARNING: Requested base is local and may be stale; prefer " +
+        `origin/${ctx.baseRef}`,
+    );
+  }
+  return lines;
+}
+
+/**
+ * Render the `Head ref (source):` line for the summary artifact's `Base/Head`
+ * block.
+ *
+ * The fallback is mandatorily observable (Decision 3): this line is placed
+ * immediately after `Head ref (resolved):` so a caller cannot read the
+ * resolved head without also seeing whether it came from an explicit
+ * `target_ref` or from the invoking session's fallback.
+ *
+ * @param head The `head` option this collection was run with — non-null when
+ *   an explicit `target_ref` was supplied, `null` on the session fallback.
+ * @param workspaceRoot The workspace root the fallback, if any, was derived
+ *   from.
+ * @returns One line beginning with the literal `Head ref (source):`.
+ */
+export function renderHeadRefSourceLine(
+  head: string | null,
+  workspaceRoot: string,
+): string {
+  if (head !== null) {
+    return `Head ref (source): explicit target '${head}'`;
+  }
+  return (
+    "Head ref (source): session fallback " +
+    `(no target_ref supplied; derived from workspace root '${workspaceRoot}')`
+  );
 }
 
 /**

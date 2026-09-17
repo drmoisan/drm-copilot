@@ -50,6 +50,7 @@ import {
   renderSubagentTreeServiceCall,
 } from "./repo-automation-service-subagent-tree";
 import type {
+  CollectPrContextInput,
   PushDownClaudeCustomizationsInput,
   PushDownCodexAndAgentsCustomizationsInput,
   RepoAutomationExecutionResult,
@@ -155,15 +156,14 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     });
   }
   async collectPrContext(
-    input: WorkspaceExecutionInput & { readonly base: string },
+    input: CollectPrContextInput,
   ): Promise<RepoAutomationExecutionResult> {
-    // In-process TS port of the pr_context collector (F9): delegate to the
-    // extracted helper instead of spawning the bundled Python script.
     return collectPrContextServiceCall({
       runner: this.runner,
       fileSystem: this.fileSystem,
       workspaceRoot: input.workspaceRoot,
       base: input.base,
+      ...(input.targetRef === undefined ? {} : { targetRef: input.targetRef }),
       log: (message) => this.output.appendLine(message),
     });
   }

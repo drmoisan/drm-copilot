@@ -9,7 +9,6 @@ import {
   resolveNewPotentialEntryToolInput,
   resolvePolicyAuditTemplateAssetToolInput,
   resolvePotentialToIssueToolInput,
-  resolvePushDownCodexAndAgentsCustomizationsToolInput,
   resolvePushDownClaudeCustomizationsToolInput,
   resolvePushDownCopilotCustomizationsToolInput,
   resolveResolveExecuteHardLockPromptToolInput,
@@ -273,6 +272,53 @@ describe("resolveCollectPrContextToolInput", () => {
       resolveCollectPrContextToolInput({ workspace_root: "C:/ws" }),
     ).toThrow("Field 'base' must be a string.");
   });
+
+  it("resolves target_ref when supplied and omits it when absent", () => {
+    expect(
+      resolveCollectPrContextToolInput({
+        workspace_root: "C:/ws",
+        base: "main",
+        target_ref: "feature/docs",
+      }),
+    ).toEqual({
+      workspaceRoot: "C:/ws",
+      base: "main",
+      targetRef: "feature/docs",
+    });
+
+    expect(
+      resolveCollectPrContextToolInput({
+        workspace_root: "C:/ws",
+        base: "main",
+      }),
+    ).toEqual({ workspaceRoot: "C:/ws", base: "main" });
+  });
+
+  it("rejects an empty target_ref instead of treating it as absent", () => {
+    expect(() =>
+      resolveCollectPrContextToolInput({
+        workspace_root: "C:/ws",
+        base: "main",
+        target_ref: "",
+      }),
+    ).toThrow("Field 'target_ref' is required.");
+
+    expect(() =>
+      resolveCollectPrContextToolInput({
+        workspace_root: "C:/ws",
+        base: "main",
+        target_ref: "   ",
+      }),
+    ).toThrow("Field 'target_ref' is required.");
+
+    expect(() =>
+      resolveCollectPrContextToolInput({
+        workspace_root: "C:/ws",
+        base: "main",
+        target_ref: 42,
+      }),
+    ).toThrow("Field 'target_ref' must be a string.");
+  });
 });
 
 describe("resolvePushDownCopilotCustomizationsToolInput", () => {
@@ -282,53 +328,6 @@ describe("resolvePushDownCopilotCustomizationsToolInput", () => {
         workspace_root: "C:/ws",
       }),
     ).toEqual({ workspaceRoot: "C:/ws" });
-  });
-});
-
-describe("resolvePushDownCodexAndAgentsCustomizationsToolInput", () => {
-  it("returns workspaceRoot from explicit value", () => {
-    expect(
-      resolvePushDownCodexAndAgentsCustomizationsToolInput({
-        workspace_root: "C:/ws",
-      }),
-    ).toEqual({ workspaceRoot: "C:/ws" });
-  });
-
-  it("returns optional packs, csharp variant, and memory mode when provided", () => {
-    expect(
-      resolvePushDownCodexAndAgentsCustomizationsToolInput({
-        workspace_root: "C:/ws",
-        packs: ["typescript", "csharp"],
-        csharp_variant: "legacy",
-        memory_mode: "skip",
-      }),
-    ).toEqual({
-      workspaceRoot: "C:/ws",
-      packs: ["typescript", "csharp"],
-      csharpVariant: "legacy",
-      memoryMode: "skip",
-    });
-  });
-
-  it("rejects invalid Codex selection fields", () => {
-    expect(() =>
-      resolvePushDownCodexAndAgentsCustomizationsToolInput({
-        workspace_root: "C:/ws",
-        packs: "typescript",
-      }),
-    ).toThrow("Field 'packs' must be an array of strings when provided.");
-    expect(() =>
-      resolvePushDownCodexAndAgentsCustomizationsToolInput({
-        workspace_root: "C:/ws",
-        csharp_variant: "current",
-      }),
-    ).toThrow("Field 'csharp_variant' must be 'modern' or 'legacy'.");
-    expect(() =>
-      resolvePushDownCodexAndAgentsCustomizationsToolInput({
-        workspace_root: "C:/ws",
-        memory_mode: "replace",
-      }),
-    ).toThrow("Field 'memory_mode' must be 'overwrite', 'merge', or 'skip'.");
   });
 });
 
