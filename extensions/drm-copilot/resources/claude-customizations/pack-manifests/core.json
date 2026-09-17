@@ -45,6 +45,7 @@
     ".claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1",
     ".claude/hooks/enforce-pr-author-skill.ps1",
     ".claude/hooks/enforce-pr-author-skill-helpers.ps1",
+    ".claude/hooks/enforce-prd-feature-before-planner-helpers.ps1",
     ".claude/hooks/enforce-prd-feature-before-planner.ps1",
     ".claude/hooks/enforce-promotion-mcp-only.ps1",
     ".claude/hooks/hook-command-invocation.ps1",

@@ -18,8 +18,14 @@
 
 Describe 'enforce-prd-feature-before-planner.ps1 folder resolution' {
     BeforeAll {
+        # Both files are dot-sourced explicitly, rather than relying on the parent's
+        # own dot-source line, so a later change to that line cannot silently
+        # redirect these assertions at a different helpers file.
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner.ps1").Path
+        $script:Helpers = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1").Path
         . $script:UnderTest
+        . $script:Helpers
+        Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'NoTarget' -SessionRoot '/synthetic-worktrees/session-root' -Detail 'modelled no-target for the delivered cases' }
     }
 
     Context 'folder resolution by four-segment truncation' {
@@ -83,31 +89,60 @@ Describe 'enforce-prd-feature-before-planner.ps1 folder resolution' {
         # In every case below the expected winner carries the shorter slug of the
         # two candidates, so a length-ordered selection rule cannot agree with the
         # specified rule by coincidence. The first case additionally places the
-        # checkpoint folder later in the prompt than the other candidate, so
-        # checkpoint preference is distinguished from earliest occurrence.
+        # preferred folder later in the prompt than the other candidate, so target
+        # preference is distinguished from earliest occurrence.
 
-        It 'prefers the checkpoint folder when it occurs later in the prompt' {
-            Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { 'docs/features/active/2026-08-23-second-2' }
+        It 'prefers the derived target when it occurs later in the prompt' {
+            # The derived target, not the session's checkpoint, decides the tie. The
+            # modelled target is supplied as data; nothing here reads the filesystem.
+            $target = [pscustomobject]@{
+                Status       = 'SessionRoot'
+                SignalValue  = 'docs/features/active/2026-08-23-second-2'
+                WorktreeRoot = '/synthetic-worktrees/item-worktree'
+            }
             $prompt = 'Cross-reference docs/features/active/2026-08-23-first-long-candidate-1 and then ' +
             'work in docs/features/active/2026-08-23-second-2 today.'
-            Find-PrdFeatureFolderFromPrompt -Prompt $prompt |
+            Find-PrdFeatureFolderFromPrompt -Prompt $prompt -Target $target |
                 Should -Be 'docs/features/active/2026-08-23-second-2'
         }
 
-        It 'uses the earliest candidate when the checkpoint folder is absent' {
+        It 'denies when the checkpoint is absent and the tie cannot be resolved against the derived target' {
+            # Two candidates and no target to choose between them. The resolver now
+            # reports the tie as unresolved by returning $null, and the gate denies
+            # with the ambiguity code instead of taking the earliest candidate.
             Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { $null }
             $prompt = 'Primary docs/features/active/2026-08-23-alpha-1 and secondary ' +
             'docs/features/active/2026-08-23-beta-long-candidate-2 later.'
-            Find-PrdFeatureFolderFromPrompt -Prompt $prompt |
-                Should -Be 'docs/features/active/2026-08-23-alpha-1'
+
+            Find-PrdFeatureFolderFromPrompt -Prompt $prompt | Should -BeNullOrEmpty
+
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = $prompt }
+                } | ConvertTo-Json -Compress -Depth 5)
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -BeLike "*$(Get-WorktreeResolutionAmbiguityReasonCode)*"
         }
 
-        It 'uses the earliest candidate when the checkpoint folder is not a candidate' {
+        It 'denies when the checkpoint names a folder that is not a candidate' {
+            # The checkpoint names a third folder. It was never a candidate, and it no
+            # longer resolves the tie even when it is one.
             Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { 'docs/features/active/2026-08-23-unrelated-9' }
             $prompt = 'Primary docs/features/active/2026-08-23-alpha-1 and secondary ' +
             'docs/features/active/2026-08-23-beta-long-candidate-2 later.'
-            Find-PrdFeatureFolderFromPrompt -Prompt $prompt |
-                Should -Be 'docs/features/active/2026-08-23-alpha-1'
+
+            Find-PrdFeatureFolderFromPrompt -Prompt $prompt | Should -BeNullOrEmpty
+
+            $json = (@{
+                    tool_name  = 'Agent'
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = $prompt }
+                } | ConvertTo-Json -Compress -Depth 5)
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -BeLike "*$(Get-WorktreeResolutionAmbiguityReasonCode)*"
         }
     }
 

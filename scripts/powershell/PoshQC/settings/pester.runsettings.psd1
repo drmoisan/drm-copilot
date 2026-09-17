@@ -237,6 +237,10 @@
             '.claude/hooks/enforce-feature-folder-order.ps1'
             '.claude/hooks/enforce-checkpoint-monotonic.ps1'
             '.claude/hooks/enforce-prd-feature-before-planner.ps1'
+            # Issue #672 split the prd-feature gate's resolution logic into a dot-sourced
+            # sibling; registered so the new production file stays in the coverage
+            # denominator per the Coverage Exclusion Policy.
+            '.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1'
             '.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1'
             '.claude/hooks/enforce-pr-author-skill-helpers.ps1'
             # Issue #526 added this out-of-band release-verification module (Layer B of the

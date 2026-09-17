@@ -605,68 +605,68 @@ of the ambiguity code instead.
 
 **The three-way distinction**
 
-- [ ] **State 1 — target resolved, required document present -> ALLOW.** A Pester case supplies a payload whose prompt names the target feature folder while the modelled session root is a different worktree, mocks document existence to answer true only for the path composed against the target root, and asserts the decision is `allow`. The same case fails if the hook composes the probe against the session root.
-- [ ] **State 2 — target resolved, required document genuinely absent -> DENY with the existing reason.** A Pester case asserts the deny reason still leads with the resolved feature folder, then names the missing document list, the work mode, and the existing remedy, and retains the `PRD_FEATURE_BLOCKED:` prefix. The reason text is unchanged apart from the resolved-folder value.
-- [ ] **State 3 — target not resolvable -> DENY with the ambiguity reason code.** A Pester case asserts the deny reason embeds F1's ambiguity reason code inside a `PRD_FEATURE_BLOCKED:`-prefixed string, that the code is greppable as a single literal, and that the reason is distinct from both the missing-document reason and the indeterminate-work-mode reason. No silent fallback to the session-root checkpoint occurs on this path.
+- [x] **State 1 — target resolved, required document present -> ALLOW.** A Pester case supplies a payload whose prompt names the target feature folder while the modelled session root is a different worktree, mocks document existence to answer true only for the path composed against the target root, and asserts the decision is `allow`. The same case fails if the hook composes the probe against the session root.
+- [x] **State 2 — target resolved, required document genuinely absent -> DENY with the existing reason.** A Pester case asserts the deny reason still leads with the resolved feature folder, then names the missing document list, the work mode, and the existing remedy, and retains the `PRD_FEATURE_BLOCKED:` prefix. The reason text is unchanged apart from the resolved-folder value.
+- [x] **State 3 — target not resolvable -> DENY with the ambiguity reason code.** A Pester case asserts the deny reason embeds F1's ambiguity reason code inside a `PRD_FEATURE_BLOCKED:`-prefixed string, that the code is greppable as a single literal, and that the reason is distinct from both the missing-document reason and the indeterminate-work-mode reason. No silent fallback to the session-root checkpoint occurs on this path.
 
 **All three current conflation sites are addressed**
 
-- [ ] The unconditional post-prompt fallback to the session-root checkpoint is removed. The checkpoint is consulted only when the call genuinely has no target **and** the session root is the derived target. A Pester case asserts that a prompt naming no folder, issued from a session whose checkpoint describes a different item, denies with the ambiguity code rather than validating against that checkpoint.
-- [ ] The positional tie-break is removed. With more than one distinct candidate, the disambiguator is the derived target; when the tie cannot be resolved against it, the gate denies with the ambiguity code instead of selecting the earliest-occurring candidate. A Pester case asserts the denial rather than a silent selection.
-- [ ] The missing/malformed-marker branch is reached only when the feature folder **does** exist under the resolved target root and its `- Work Mode:` marker is unreadable. A Pester case asserts that a folder absent from the resolved target root produces the ambiguity or absence reason, not the marker-is-broken reason, so the gate no longer prescribes a remedy that would edit the wrong repository's `issue.md`.
+- [x] The unconditional post-prompt fallback to the session-root checkpoint is removed. The checkpoint is consulted only when the call genuinely has no target **and** the session root is the derived target. A Pester case asserts that a prompt naming no folder, issued from a session whose checkpoint describes a different item, denies with the ambiguity code rather than validating against that checkpoint.
+- [x] The positional tie-break is removed. With more than one distinct candidate, the disambiguator is the derived target; when the tie cannot be resolved against it, the gate denies with the ambiguity code instead of selecting the earliest-occurring candidate. A Pester case asserts the denial rather than a silent selection.
+- [x] The missing/malformed-marker branch is reached only when the feature folder **does** exist under the resolved target root and its `- Work Mode:` marker is unreadable. A Pester case asserts that a folder absent from the resolved target root produces the ambiguity or absence reason, not the marker-is-broken reason, so the gate no longer prescribes a remedy that would edit the wrong repository's `issue.md`.
 
 **False-approval guards (highest regression risk)**
 
-- [ ] The ambiguity branch returns its deny **before** any document probe runs, asserted with a zero-invocation count on `Get-PrdFeatureFileExistence`.
-- [ ] Allow rows assert an exact positive invocation count on `Get-PrdFeatureFileExistence` matching the required-document set for the row's work mode, so an implementation that returns `allow` without probing fails the suite.
-- [ ] Every matrix row uses the same resolved-target root and differs only in whether the existence mock answers true for that exact composed path. No row uses a blanket always-true existence mock.
+- [x] The ambiguity branch returns its deny **before** any document probe runs, asserted with a zero-invocation count on `Get-PrdFeatureFileExistence`.
+- [x] Allow rows assert an exact positive invocation count on `Get-PrdFeatureFileExistence` matching the required-document set for the row's work mode, so an implementation that returns `allow` without probing fails the suite.
+- [x] Every matrix row uses the same resolved-target root and differs only in whether the existence mock answers true for that exact composed path. No row uses a blanket always-true existence mock.
 
 **Mandatory test-matrix rows (regression guards retained, not dropped)**
 
-- [ ] Row — own folder named, cwd modelled as the session root: `allow`. This row currently denies and is the defect's direct proof.
-- [ ] Row — own folder named, cwd modelled as the item worktree: `allow`, unchanged. Retained as a regression guard.
-- [ ] Row — an absolute path to the own feature folder: `allow` when the required document is present under the containing worktree, for both modelled cwd values.
-- [ ] Row — a sibling item's checkpoint is the only state present: `deny` with the distinct ambiguity reason code. This row never returns `allow`.
-- [ ] Row — the required document is genuinely absent under the resolved target root: `deny`, with the existing missing-document reason, unchanged.
-- [ ] Rows — each work mode against its required document set, per existing semantics and unchanged: `full-feature` requires `spec.md` and `user-story.md`; `full-bug` requires `spec.md`; `minor-audit` requires neither; legacy `full` normalises to `full-feature`.
+- [x] Row — own folder named, cwd modelled as the session root: `allow`. This row currently denies and is the defect's direct proof.
+- [x] Row — own folder named, cwd modelled as the item worktree: `allow`, unchanged. Retained as a regression guard.
+- [x] Row — an absolute path to the own feature folder: `allow` when the required document is present under the containing worktree, for both modelled cwd values.
+- [x] Row — a sibling item's checkpoint is the only state present: `deny` with the distinct ambiguity reason code. This row never returns `allow`.
+- [x] Row — the required document is genuinely absent under the resolved target root: `deny`, with the existing missing-document reason, unchanged.
+- [x] Rows — each work mode against its required document set, per existing semantics and unchanged: `full-feature` requires `spec.md` and `user-story.md`; `full-bug` requires `spec.md`; `minor-audit` requires neither; legacy `full` normalises to `full-feature`.
 
 **Must not regress**
 
-- [ ] The gate still denies when a required document is genuinely absent.
-- [ ] The pre-implementation gate's pathspec, option, and metacharacter restrictions are not weakened. No file matching `enforce-orchestration-preimplementation-gate*` is modified by this change set, and its suites pass unmodified.
-- [ ] The epic merge gate's matcher is not widened. `enforce-epic-merge-gate.ps1` is not modified by this change set, and its suites pass unmodified.
-- [ ] Epic and standalone topologies behave exactly as now when cwd and target coincide. A Pester case asserts that when the derived target is the session root, the checkpoint fallback still applies and still allows; the existing checkpoint-fallback case is amended to this form rather than deleted.
-- [ ] The #518 depth-insensitivity fix survives: the depth-collapsing behaviour is retained while the prefix-discarding behaviour is replaced by F1's normalisation. The existing truncation `Context` block and the existing preserved-gate-behaviour `Context` block in `enforce-prd-feature-before-planner.FolderResolution.Tests.ps1` pass byte-unmodified, and the already-pinned prompt forms — folder alone; folder plus a `research/` artifact; folder plus an `evidence/` artifact; nested artifact alone — still produce the identical decision and the identical reason string.
-- [ ] The multi-candidate selection rule remains distinguishable from plain earliest-occurrence. The existing case in which the preferred folder occurs later in the prompt is re-specified against the new disambiguator, not deleted.
-- [ ] The work-mode marker semantics are preserved exactly as they are today: the accepting regex and its legacy `full` normalisation are unchanged; the required-document mapping is unchanged; the `default` arm of `Get-PrdFeatureRequiredFile` returns `spec.md` alone and never names `user-story.md`; and the indeterminate-marker branch remains a distinct decision path that runs no required-file probe. No fail-closed-to-`full-feature` behaviour is introduced into the gate.
-- [ ] The mock seam names and signatures — `Get-PrdFeatureFileExistence`, `Get-PrdFeatureIssueContent`, and `Get-PrdFeatureCheckpointFolder` — the entrypoint dot-source guard, and the PreToolUse allow and deny payload shapes are unchanged. `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` passes unedited.
+- [x] The gate still denies when a required document is genuinely absent.
+- [x] The pre-implementation gate's pathspec, option, and metacharacter restrictions are not weakened. No file matching `enforce-orchestration-preimplementation-gate*` is modified by this change set, and its suites pass unmodified.
+- [x] The epic merge gate's matcher is not widened. `enforce-epic-merge-gate.ps1` is not modified by this change set, and its suites pass unmodified.
+- [x] Epic and standalone topologies behave exactly as now when cwd and target coincide. A Pester case asserts that when the derived target is the session root, the checkpoint fallback still applies and still allows; the existing checkpoint-fallback case is amended to this form rather than deleted.
+- [x] The #518 depth-insensitivity fix survives: the depth-collapsing behaviour is retained while the prefix-discarding behaviour is replaced by F1's normalisation. The existing truncation `Context` block and the existing preserved-gate-behaviour `Context` block in `enforce-prd-feature-before-planner.FolderResolution.Tests.ps1` pass byte-unmodified, and the already-pinned prompt forms — folder alone; folder plus a `research/` artifact; folder plus an `evidence/` artifact; nested artifact alone — still produce the identical decision and the identical reason string.
+- [x] The multi-candidate selection rule remains distinguishable from plain earliest-occurrence. The existing case in which the preferred folder occurs later in the prompt is re-specified against the new disambiguator, not deleted.
+- [x] The work-mode marker semantics are preserved exactly as they are today: the accepting regex and its legacy `full` normalisation are unchanged; the required-document mapping is unchanged; the `default` arm of `Get-PrdFeatureRequiredFile` returns `spec.md` alone and never names `user-story.md`; and the indeterminate-marker branch remains a distinct decision path that runs no required-file probe. No fail-closed-to-`full-feature` behaviour is introduced into the gate.
+- [x] The mock seam names and signatures — `Get-PrdFeatureFileExistence`, `Get-PrdFeatureIssueContent`, and `Get-PrdFeatureCheckpointFolder` — the entrypoint dot-source guard, and the PreToolUse allow and deny payload shapes are unchanged. `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1` passes unedited.
 
 **F1 consumption**
 
-- [ ] Target derivation, path normalisation, and the ambiguity reason code are consumed from F1's `.claude/lib/` module through the established `Import-Module (Join-Path $PSScriptRoot '../lib/...') -Force` form. None of these capabilities is re-implemented in the hook or its helpers sibling: neither file contains worktree-discovery logic (`git worktree`, `Get-Location`, `$PWD`, or a `Resolve-Path`-derived root) and neither defines its own ambiguity code literal.
-- [ ] Every F1 symbol referenced by the delivered code resolves against F1's merged source on the integration branch. No guessed or placeholder identifier appears in the delivered code, and the module is imported so that an unresolvable dependency fails the gate closed rather than degrading to a permissive path.
+- [x] Target derivation, path normalisation, and the ambiguity reason code are consumed from F1's `.claude/lib/` module through the established `Import-Module (Join-Path $PSScriptRoot '../lib/...') -Force` form. None of these capabilities is re-implemented in the hook or its helpers sibling: neither file contains worktree-discovery logic (`git worktree`, `Get-Location`, `$PWD`, or a `Resolve-Path`-derived root) and neither defines its own ambiguity code literal.
+- [x] Every F1 symbol referenced by the delivered code resolves against F1's merged source on the integration branch. No guessed or placeholder identifier appears in the delivered code, and the module is imported so that an unresolvable dependency fails the gate closed rather than degrading to a permissive path.
 
 **Helpers extraction and the file-size cap**
 
-- [ ] `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1` exists and holds `Resolve-PrdFeatureWorkMode`, `Get-PrdFeatureRequiredFile`, `Find-PrdFeatureFolderFromPrompt`, and `Get-PrdFeatureMissingFile`. `Get-PrdFeatureFileExistence`, `Get-PrdFeatureIssueContent`, and `Get-PrdFeatureCheckpointFolder` remain in the parent hook. The sibling carries a comment-based-help block and contains no `param()` block, no `#Requires`, and no entrypoint; the parent dot-sources it at file scope.
-- [ ] `Resolve-PrdFeatureWorkMode` and `Get-PrdFeatureRequiredFile` are moved without any behavioural edit.
-- [ ] Every production and test file in the change set is at or under the 500-line cap required by `.claude/rules/general-code-change.md`, measured on the delivered files.
-- [ ] A smoke case proves that a Pester mock registered in the test scope is observed by a caller defined in the other dot-sourced file, and it is run before the remainder of the extraction is committed.
+- [x] `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1` exists and holds `Resolve-PrdFeatureWorkMode`, `Get-PrdFeatureRequiredFile`, `Find-PrdFeatureFolderFromPrompt`, and `Get-PrdFeatureMissingFile`. `Get-PrdFeatureFileExistence`, `Get-PrdFeatureIssueContent`, and `Get-PrdFeatureCheckpointFolder` remain in the parent hook. The sibling carries a comment-based-help block and contains no `param()` block, no `#Requires`, and no entrypoint; the parent dot-sources it at file scope.
+- [x] `Resolve-PrdFeatureWorkMode` and `Get-PrdFeatureRequiredFile` are moved without any behavioural edit.
+- [x] Every production and test file in the change set is at or under the 500-line cap required by `.claude/rules/general-code-change.md`, measured on the delivered files.
+- [x] A smoke case proves that a Pester mock registered in the test scope is observed by a caller defined in the other dot-sourced file, and it is run before the remainder of the extraction is committed.
 - [ ] The new suite creates no temporary file or directory, does not change the process working directory, and derives no absolute path from the environment, the current directory, the script file location, or a source-control query. Its synthetic roots are bare string literals and cwd is supplied as data through an injection parameter.
 
 **Bundled-payload mirroring and delivery registration**
 
-- [ ] Both `.claude/hooks/enforce-prd-feature-before-planner.ps1` and `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1` have text-identical counterparts under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`, and `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes.
-- [ ] The new helpers sibling's path appears exactly once in the `paths` array of `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, and `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py` passes.
-- [ ] The new helpers sibling is added to `CodeCoverage.Path` in both `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` and `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`, and `tests/scripts/dev_tools/test_poshqc_bundled_parity.py` passes.
-- [ ] No Codex mirror is added or expected. `.codex/hooks/` contains no mirror of this hook, so this feature carries no Codex parity work, and review does not look for one.
+- [x] Both `.claude/hooks/enforce-prd-feature-before-planner.ps1` and `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1` have text-identical counterparts under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`, and `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes.
+- [x] The new helpers sibling's path appears exactly once in the `paths` array of `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, and `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py` passes.
+- [x] The new helpers sibling is added to `CodeCoverage.Path` in both `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` and `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`, and `tests/scripts/dev_tools/test_poshqc_bundled_parity.py` passes.
+- [x] No Codex mirror is added or expected. `.codex/hooks/` contains no mirror of this hook, so this feature carries no Codex parity work, and review does not look for one.
 
 **Toolchain and coverage**
 
-- [ ] No Python is introduced into the enforcement path. The hook and its sibling are PowerShell only, and `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes.
-- [ ] Line coverage is at or above 85 percent for both `.claude/hooks/enforce-prd-feature-before-planner.ps1` and `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1`, read per file from the Pester coverage report, with neither file excluded from measurement.
+- [x] No Python is introduced into the enforcement path. The hook and its sibling are PowerShell only, and `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes.
+- [x] Line coverage is at or above 85 percent for both `.claude/hooks/enforce-prd-feature-before-planner.ps1` and `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1`, read per file from the Pester coverage report, with neither file excluded from measurement.
 - [ ] The PowerShell toolchain (`run_poshqc_format` -> `run_poshqc_analyze` -> `run_poshqc_test`) completes with zero format drift, zero analyzer findings, and zero test failures in a single pass, restarting from the first step after any failure or auto-fix.
-- [ ] The new suite is placed at `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1` and its header records the placement decision and the determinism statement.
+- [x] The new suite is placed at `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1` and its header records the placement decision and the determinism statement.
 
 ## Risks & Mitigations
 
