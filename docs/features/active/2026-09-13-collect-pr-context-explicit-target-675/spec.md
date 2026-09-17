@@ -455,8 +455,8 @@ Every criterion below is verified from `extensions/drm-copilot/` after `npm ci`,
 
 **Empty diff fails loudly**
 
-- [ ] The file `extensions/drm-copilot/src/lib/pr-context/diff-emptiness.ts` exists and exports the pure classifier. Verify: `grep -c "export function classifyPrContextDiffState" extensions/drm-copilot/src/lib/pr-context/diff-emptiness.ts` reports 1.
-- [ ] `extensions/drm-copilot/test/lib/pr-context/diff-emptiness.test.ts` exists and passes, with at least one test for each of: refs unresolved; refs resolved with the merge base equal to the head SHA and no changed file; refs resolved and unequal with no changed file; refs resolved with at least one changed file.
+- [x] The file `extensions/drm-copilot/src/lib/pr-context/diff-emptiness.ts` exists and exports the pure classifier. Verify: `grep -c "export function classifyPrContextDiffState" extensions/drm-copilot/src/lib/pr-context/diff-emptiness.ts` reports 1.
+- [x] `extensions/drm-copilot/test/lib/pr-context/diff-emptiness.test.ts` exists and passes, with at least one test for each of: refs unresolved; refs resolved with the merge base equal to the head SHA and no changed file; refs resolved and unequal with no changed file; refs resolved with at least one changed file.
 - [ ] The test `raises naming the resolved head ref, head sha, merge base and base when the refs resolve and no file changed` exists in `extensions/drm-copilot/test/lib/pr-context/pr-context-service-call-target.test.ts` and passes, asserting that the error message contains all four of those values.
 - [ ] The test `raises naming the requested base when the base or head could not be resolved` exists in `extensions/drm-copilot/test/lib/pr-context/pr-context-service-call-target.test.ts` and passes, and asserts that its message text differs from the empty-diff message text.
 - [ ] The test `writes both artifacts and then raises when the diff is empty` exists in `extensions/drm-copilot/test/lib/pr-context/pr-context-service-call-target.test.ts` and passes, asserting that the injected filesystem's `writtenPaths` contains both artifact paths after the raise.
@@ -481,7 +481,7 @@ Every criterion below is verified from `extensions/drm-copilot/` after `npm ci`,
 
 **Documented limitation**
 
-- [ ] The doc comment of `extensions/drm-copilot/src/lib/pr-context/diff-emptiness.ts` records that the guard cannot detect a wrong target whose branch has commits ahead of the base, and that the working-tree sections and the current-PR lookup remain scoped to `workspace_root` even when `target_ref` is supplied. Verified by inspection of the file.
+- [x] The doc comment of `extensions/drm-copilot/src/lib/pr-context/diff-emptiness.ts` records that the guard cannot detect a wrong target whose branch has commits ahead of the base, and that the working-tree sections and the current-PR lookup remain scoped to `workspace_root` even when `target_ref` is supplied. Verified by inspection of the file.
 
 ## Risks & Mitigations
 
