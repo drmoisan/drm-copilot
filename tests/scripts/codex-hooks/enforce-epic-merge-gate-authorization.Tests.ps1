@@ -125,6 +125,62 @@ Describe 'Codex enforce-epic-merge-gate standalone authorization (issue #670)' {
         }
     }
 
+    Context 'record shape counterparts' {
+        BeforeAll {
+            function ConvertTo-CodexShapedCheckpoint {
+                <#
+                .SYNOPSIS
+                    Build checkpoint text holding one 691 record with a single field overridden.
+                #>
+                [CmdletBinding()]
+                [OutputType([string])]
+                param([Parameter(Mandatory)][string] $Field, [AllowEmptyString()][string] $Value)
+
+                $record = (New-CodexRecordJson -PrNumber 691 | ConvertFrom-Json).standalone_merge_authorizations[0]
+                $record | Add-Member -NotePropertyName 'run_slug' -NotePropertyValue 'bugs-2026-09-11'
+                $record.$Field = $Value
+                return (@{ standalone_merge_authorizations = @($record) } | ConvertTo-Json -Depth 5 -Compress)
+            }
+        }
+
+        It 'denies a non-PR-specific block when <Name>' -ForEach @(
+            @{ Name = 'the array is empty'; Json = '{"standalone_merge_authorizations":[]}' }
+            @{ Name = 'an entry is not an object'; Json = '{"standalone_merge_authorizations":[691]}' }
+            @{ Name = 'an entry has no pr_number'; Json = '{"standalone_merge_authorizations":[{"issue_num":670}]}' }
+            @{ Name = 'pr_number spells digits as a string'; Json = '{"standalone_merge_authorizations":[{"pr_number":"691"}]}' }
+            @{ Name = 'pr_number is an array'; Json = '{"standalone_merge_authorizations":[{"pr_number":[691]}]}' }
+        ) {
+            $payload = ConvertTo-CodexPayload -Command 'gh pr merge 691 --merge' -Session $script:SessionId
+            $decision = Invoke-CodexEpicMergeDecision -PayloadRaw $payload -ChildCheckpointRaw $Json -EpicCheckpointRaw ''
+
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'EPIC_MERGE_GATE_BLOCKED: STANDALONE_MERGE_AUTHORIZATION_NOT_PR_SPECIFIC: *'
+        }
+
+        It 'denies a malformed record naming <Field> when <Name>' -ForEach @(
+            @{ Name = 'pr_url ends with a different pull number'; Field = 'pr_url'; Value = 'https://github.com/drmoisan/drm-copilot/pull/6910' }
+            @{ Name = 'issue_num is a string'; Field = 'issue_num'; Value = '670' }
+            @{ Name = 'branch_name is whitespace'; Field = 'branch_name'; Value = '   ' }
+            @{ Name = 'authorized_by is empty'; Field = 'authorized_by'; Value = '' }
+            @{ Name = 'authorized_at is unparseable'; Field = 'authorized_at'; Value = 'not-a-timestamp' }
+            @{ Name = 'basis is shorter than twenty characters'; Field = 'basis'; Value = 'merge it, please' }
+            @{ Name = 'run_slug is present but blank'; Field = 'run_slug'; Value = ' ' }
+        ) {
+            $payload = ConvertTo-CodexPayload -Command 'gh pr merge 691 --merge' -Session $script:SessionId
+            $checkpoint = ConvertTo-CodexShapedCheckpoint -Field $Field -Value $Value
+            $reason = [string](Invoke-CodexEpicMergeDecision -PayloadRaw $payload -ChildCheckpointRaw '' -EpicCheckpointRaw $checkpoint).hookSpecificOutput.permissionDecisionReason
+
+            $reason | Should -BeLike 'EPIC_MERGE_GATE_BLOCKED: STANDALONE_MERGE_AUTHORIZATION_MALFORMED: *'
+            $reason | Should -Match ([regex]::Escape("'$Field'"))
+        }
+
+        It 'allows a record whose authorized_at is a parseable non-ISO date-time' {
+            $payload = ConvertTo-CodexPayload -Command 'gh pr merge 691 --merge' -Session $script:SessionId
+            $checkpoint = ConvertTo-CodexShapedCheckpoint -Field 'authorized_at' -Value 'September 13, 2026 21:04'
+
+            Invoke-CodexEpicMergeDecision -PayloadRaw $payload -ChildCheckpointRaw $checkpoint -EpicCheckpointRaw '' | Should -BeNullOrEmpty
+        }
+    }
+
     Context 'reason-code spelling parity' {
         It 'spells the four reason codes identically in the Claude helpers file and the Codex hook' {
             $pattern = 'STANDALONE_MERGE_AUTHORIZATION_[A-Z_]+'

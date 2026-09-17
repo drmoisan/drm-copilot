@@ -34,3 +34,7 @@ Output Summary:
 - All twelve patterns count 0.
 - `Invoke-PowerShellTestPurityDecision` returned `$null` (no violation).
 - Test-name-uniqueness guard: FailedCount 0, PassedCount 5.
+
+## Addendum — re-run after the [P7-T2] coverage remediation (2026-09-17T08-33)
+
+The Codex suite gained a `record shape counterparts` context (see the addendum in `pass-after-codex-authorization.2026-09-13T20-46.md`). The same checks were re-run on the updated file: all twelve pattern counts 0; `$null -eq $d` True; name-uniqueness guard FailedCount 0, PassedCount 5; `route_id` count 0; line count 194 (at most 500).

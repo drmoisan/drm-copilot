@@ -773,7 +773,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       widen trigger scope.
 - [x] `tests/scripts/claude-hooks/enforce-epic-merge-gate.Tests.ps1:27`
       (`It 'allows gh pr merge without --merge (e.g., --squash)'`) is green and its text is unedited.
-- [ ] This spec contains no acceptance criterion asserting that `--squash` denies, and the corrected
+- [x] This spec contains no acceptance criterion asserting that `--squash` denies, and the corrected
       framing — that `--squash` is out of trigger scope and allowed today on both runtimes — is
       recorded in this spec and reflected in the hook's header comment.
 
@@ -790,7 +790,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       `git status --porcelain` showing the file as modified, so a diff that returns nothing because
       the change was never written or never staged is distinguishable from a diff that returns nothing
       because the function is untouched.
-- [ ] **The pre-implementation gate's restrictions are not weakened.** No file matching
+- [x] **The pre-implementation gate's restrictions are not weakened.** No file matching
       `.claude/hooks/enforce-orchestration-preimplementation-gate*.ps1` or its Codex mirrors is
       modified by this change, verified by
       `git diff --name-only origin/epic/worktree-scoped-state-resolution-integration` listing none of
@@ -840,13 +840,13 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate.ps1`
       is byte-identical to `.codex/hooks/enforce-epic-merge-gate.ps1`, with the Codex runtime-contract
       suite green.
-- [ ] Every file created or modified by this change is under 500 lines, verified by an enumerated
+- [x] Every file created or modified by this change is under 500 lines, verified by an enumerated
       per-file line count recorded in the evidence artifacts, because no automated test enforces the
       cap on `.claude/hooks/**`. The count explicitly includes
       `.claude/hooks/enforce-epic-merge-gate.ps1`,
       `.claude/hooks/enforce-epic-merge-gate-authorization.ps1`,
       `.codex/hooks/enforce-epic-merge-gate.ps1`, both new test suites, and all four bundled mirrors.
-- [ ] `.claude/settings.json` is unmodified.
+- [x] `.claude/settings.json` is unmodified.
 
 ### Documentation and disclosure
 
@@ -869,9 +869,9 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       coordinating session writes, into which checkpoint, and that a blanket flag is rejected. The
       existing `**Merge-gate authorization.**` paragraph is updated to name four allow conditions
       rather than describing only the parallel one.
-- [ ] The writer surface is bounded to exactly the two authored surfaces named above plus their
+- [x] The writer surface is bounded to exactly the two authored surfaces named above plus their
       bundled mirrors. No other skill, agent, or rule file is edited to write or describe the record.
-- [ ] The two closed anti-patterns (synthetic `items[]` injection; switching to `--squash`) are
+- [x] The two closed anti-patterns (synthetic `items[]` injection; switching to `--squash`) are
       recorded as closed in this spec, and the implementation introduces neither.
 - [ ] Follow-ups FU-1 through FU-4 are filed as issues, or their deferral is explicitly recorded in the
       pull-request description, before this feature is closed.
@@ -894,13 +894,13 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 - [ ] No file under `.claude/hooks/**` added or modified by this change invokes Python by any route,
       with `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` green and
       its allowlist still empty.
-- [ ] Line coverage is at least 85 percent for
+- [x] Line coverage is at least 85 percent for
       `.claude/hooks/enforce-epic-merge-gate-authorization.ps1`,
       `.claude/hooks/enforce-epic-merge-gate.ps1`, and `.codex/hooks/enforce-epic-merge-gate.ps1`, with
       baseline, post-change, and comparison artifacts stored under
       `docs/features/active/2026-09-13-epic-merge-gate-authorization-record-670/evidence/coverage/`.
       The baseline was taken after the new file was added to `CodeCoverage.Path`.
-- [ ] Coverage for the changed lines does not decrease relative to the recorded baseline.
+- [x] Coverage for the changed lines does not decrease relative to the recorded baseline.
 - [ ] The full toolchain loop completed in a single clean pass: format, lint, architecture and
       contract checks, unit tests, with no stage auto-fixing a file on the final pass. Type checking is
       not applicable to PowerShell.
