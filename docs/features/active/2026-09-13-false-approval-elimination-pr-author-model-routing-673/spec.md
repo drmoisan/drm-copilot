@@ -444,12 +444,12 @@ one condition — the same "second implementation that drifts" failure this epic
 
 | role | concrete identifier (fill in from F1 as merged) | source file:line in F1 |
 | --- | --- | --- |
-| module path | _unbound_ | |
-| module import statement | _unbound_ | |
-| `<TARGET_DERIVATION>` function name | _unbound_ | |
-| `<PATH_NORMALISATION>` function name | _unbound_ | |
-| `<AMBIGUITY_REASON_CODE>` accessor function name | _unbound_ | |
-| `<AMBIGUITY_REASON_CODE>` literal value returned by that accessor | _unbound_ | |
+| module path | `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1` carries the derivation role; its sibling `.claude/lib/worktree-resolution/WorktreeResolution.psm1` carries the normalisation and reason-code roles | `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1:335` and `.claude/lib/worktree-resolution/WorktreeResolution.psm1:471` |
+| module import statement | `Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTargetResolution.psm1') -Force` **and** `Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeResolution.psm1') -Force`; both are required because F1's own sibling import is module-scoped and re-exports nothing, verified by observation | `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1:27` |
+| `<TARGET_DERIVATION>` function name | `Resolve-WorktreeCallTarget` | `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1:227`, exported at `:340` |
+| `<PATH_NORMALISATION>` function name | `ConvertTo-WorktreeResolutionRepoRelativePath` | `.claude/lib/worktree-resolution/WorktreeResolution.psm1:417`, exported at `:479` |
+| `<AMBIGUITY_REASON_CODE>` accessor function name | `Get-WorktreeResolutionAmbiguityReasonCode` | `.claude/lib/worktree-resolution/WorktreeResolution.psm1:459`, exported at `:480` |
+| `<AMBIGUITY_REASON_CODE>` literal value returned by that accessor | `TARGET_WORKTREE_AMBIGUOUS` | `.claude/lib/worktree-resolution/WorktreeResolution.psm1:55`, returned at `:468` |
 
 The filled table, together with the F1 source lines it was read from, is archived under
 `evidence/other/` as the record that the binding was performed against merged source rather than
@@ -645,12 +645,12 @@ line-oriented search for a prose phrase is not an acceptable substitute.
 
 ### Reproduction before fix
 
-- [ ] AC-1 An evidence artifact under
+- [x] AC-1 An evidence artifact under
       `docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673/evidence/baseline/`
       records four executed runs — defect 3.2 and defect 3.4, each as a control pair (identical
       payload, cwd = session root and cwd = item worktree) — and for each run it records the verbatim
       decision JSON, the exit code, stdout, and stderr.
-- [ ] AC-2 For each defect, the archived control pair shows the session-root run returning
+- [x] AC-2 For each defect, the archived control pair shows the session-root run returning
       `permissionDecision: allow` and the item-worktree run returning a deny, establishing by
       observation that the verdict is a function of cwd and not of the payload. (If either predicted
       `allow` was not observed, execution halts, no hook file is edited, and this criterion stays
@@ -752,11 +752,11 @@ cwd-relative binding.
 
 ### F1 contract binding
 
-- [ ] AC-21 F1 is merged into `epic/worktree-scoped-state-resolution-integration`, its module path
+- [x] AC-21 F1 is merged into `epic/worktree-scoped-state-resolution-integration`, its module path
       appears exactly once in
       `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` `paths[]`,
       and its `*.Manifest.Tests.ps1` exists and passes. Confirmed before F5's first hook edit.
-- [ ] AC-22 The BINDING TABLE in this spec has every row filled with a concrete identifier and the
+- [x] AC-22 The BINDING TABLE in this spec has every row filled with a concrete identifier and the
       F1 `file:line` it was read from, and the filled table is archived under `evidence/other/`.
       No row remains `_unbound_`.
 - [ ] AC-23 F5 obtains the ambiguity reason code only by calling F1's exported accessor. A content
