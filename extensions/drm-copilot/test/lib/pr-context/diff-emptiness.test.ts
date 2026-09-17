@@ -110,10 +110,15 @@ describe("classifyPrContextDiffState", () => {
     });
 
     expect(unresolved.kind).not.toEqual(noChange.kind);
-    if (unresolved.kind === "refs-unresolved" && noChange.kind === "refs-resolved-no-change") {
+    if (
+      unresolved.kind === "refs-unresolved" &&
+      noChange.kind === "refs-resolved-no-change"
+    ) {
       expect(unresolved.message).not.toEqual(noChange.message);
     } else {
-      throw new Error("expected one refs-unresolved and one refs-resolved-no-change result");
+      throw new Error(
+        "expected one refs-unresolved and one refs-resolved-no-change result",
+      );
     }
   });
 });

@@ -62,6 +62,16 @@ class ScriptRunner implements CommandRunner {
     if (sub.startsWith("merge-base")) {
       return ok("base-sha");
     }
+    // Non-empty diff: a scripted name-status and numstat line, matching the
+    // pattern already established in collector-core.test.ts and
+    // collector-integration.test.ts. Without this, every test in this file
+    // would compute a zero-file diff and fail once the empty-diff guard lands.
+    if (sub.startsWith("diff --name-status")) {
+      return ok("M\tsrc/example.ts");
+    }
+    if (sub.startsWith("diff --numstat")) {
+      return ok("1\t0\tsrc/example.ts");
+    }
     return ok("");
   }
 }

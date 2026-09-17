@@ -147,6 +147,14 @@ function setGitBranchDiscoveryState(input: {
         };
       }
 
+      // Non-empty diff, matching the collector-core.test.ts pattern.
+      if (joined.startsWith("diff --name-status")) {
+        return { status: 0, stdout: "M\tsrc/example.ts", stderr: "" };
+      }
+      if (joined.startsWith("diff --numstat")) {
+        return { status: 0, stdout: "1\t0\tsrc/example.ts", stderr: "" };
+      }
+
       return {
         status: 0,
         stdout: "",

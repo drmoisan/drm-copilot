@@ -120,8 +120,8 @@ describe("Head ref (source) — Base/Head block", () => {
 
     // Distinguishability: the session-fallback line must differ from the
     // explicit-target line rendered for the same Base/Head block.
-    const explicitLine = baseHeadLines("feature/explicit-target").find(
-      (line) => line.startsWith("Head ref (source):"),
+    const explicitLine = baseHeadLines("feature/explicit-target").find((line) =>
+      line.startsWith("Head ref (source):"),
     );
     expect(lines[sourceIndex]).not.toEqual(explicitLine);
   });

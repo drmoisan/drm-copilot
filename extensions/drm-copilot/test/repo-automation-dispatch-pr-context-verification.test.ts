@@ -63,8 +63,20 @@ function buildFileSystem(discardWrites: boolean): WriteRecordingFileSystem {
   };
 }
 
-/** Build a service whose git resolves and whose gh reports unavailable. */
-function buildService(discardWrites: boolean): {
+/**
+ * Build a service whose git resolves and whose gh reports unavailable.
+ *
+ * @param discardWrites When true, writes are recorded as attempted but their
+ *   content is dropped, so read-back verification must fail.
+ * @param diffPayload `"populated"` scripts a non-empty name-status/numstat
+ *   diff (the default, matching every pre-existing test in this file);
+ *   `"empty"` scripts the blanket empty response the empty-diff guard is
+ *   built to catch.
+ */
+function buildService(
+  discardWrites: boolean,
+  diffPayload: "populated" | "empty" = "populated",
+): {
   readonly service: ReturnType<typeof createRepoAutomationService>;
   readonly writes: Map<string, string>;
 } {
@@ -78,6 +90,15 @@ function buildService(discardWrites: boolean): {
         // gh is unavailable in this hermetic test; git resolves.
         if (args[0] === "gh" || String(args[0]).endsWith("gh")) {
           return { stdout: "", stderr: "offline", code: 1 };
+        }
+        const sub = args.slice(1).join(" ");
+        if (diffPayload === "populated") {
+          if (sub.startsWith("diff --name-status")) {
+            return { stdout: "M\tsrc/example.ts", stderr: "", code: 0 };
+          }
+          if (sub.startsWith("diff --numstat")) {
+            return { stdout: "1\t0\tsrc/example.ts", stderr: "", code: 0 };
+          }
         }
         return { stdout: "", stderr: "", code: 0 };
       },
