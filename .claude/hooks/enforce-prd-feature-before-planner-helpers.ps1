@@ -10,7 +10,13 @@
     cap as target resolution grows.
 
     The file declares no file-scope parameter block, no requires directive, and no
-    entrypoint. It is loaded for its declarations only.
+    entrypoint. Apart from its function declarations,
+    its only file-scope statement is the resolution-module import
+    that follows this block, which brings in issue #669's path normalisation and
+    ambiguity reason code. That import is deliberately unguarded, for the same
+    reason the parent hook's is: a resolution module that cannot be loaded is
+    itself the target-not-resolvable state, so letting the failure surface fails
+    the gate closed rather than degrading it to a permissive path.
 .NOTES
     Compatible with PowerShell 7+. Read-only resolution logic.
 #>

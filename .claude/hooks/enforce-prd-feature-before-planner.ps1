@@ -12,7 +12,15 @@
     'atomic-planner'.
 
     Feature folder resolution order:
-      1. Scan the prompt text for any path matching
+      1. Derive the worktree this call pertains to from the assembled prompt and
+         description text. The derivation belongs to the worktree-resolution
+         module and is not re-implemented here. When it reports that the call
+         carries a placed signal it cannot narrow to one worktree -- because the
+         signal places in no worktree, or in several -- the gate denies at once
+         with that module's own ambiguity reason code, before any document probe
+         runs. A probe at that point would validate the call against whichever
+         root happened to be current.
+      2. Scan the prompt text for any path matching
          docs/features/active/<token>, accepting both forward-slash and
          backslash separators. Truncate every match to two segments past the
          docs/features/active/ prefix -- that is, to exactly four path segments:
@@ -22,16 +30,33 @@
          the same folder. A match that truncates to fewer than four segments is
          rejected. Candidates are deduplicated preserving first-occurrence
          order.
-      2. Select among the distinct candidates: one candidate is used directly;
-         otherwise the candidate equal to the checkpoint's feature-folder field
-         is preferred, because the checkpoint is the orchestrator's own record of
-         which feature is in flight; otherwise the earliest-occurring candidate
-         in the prompt wins, because the orchestrator names the active feature
-         folder before citing artifacts inside it.
-      3. If no candidate was found in the prompt, read the feature-folder field
-         from artifacts/orchestration/orchestrator-state.json.
-      4. If neither yields a folder, block with a reason instructing the caller
-         to reference a feature folder explicitly.
+      3. Choose among the distinct candidates by asking which one the derived
+         target names:
+         the derived call target is the only disambiguator
+         and neither prompt position nor the session's checkpoint takes that
+         role. A checkpoint belongs to the session that wrote it, so letting it
+         choose between two cited folders would validate this call against a
+         sibling session's record of its own work.
+      4. When more than one folder was cited and the derived target names none of
+         them, the tie is unresolved and the gate denies with the ambiguity
+         reason code rather than selecting any one of the candidates.
+      5. When the prompt named no folder at all, the session's own checkpoint may
+         supply one, but conditionally:
+         the checkpoint stands in only when the session root is the derived target
+         so a call whose target is another worktree is never validated against
+         this session's record; such a call denies with the ambiguity reason code
+         instead.
+      6. If no folder is resolved by any of the steps above, block with a reason
+         instructing the caller to reference a feature folder explicitly.
+      7. Once a folder is resolved, anchor every document probe to the derived
+         target root, and only when that root differs from the session root. When
+         the two coincide, and when the call had no target to derive from, the
+         bare repo-relative spelling is kept, because prefixing unconditionally
+         would break every call that legitimately resolves where it runs. A
+         folder that is absent under the resolved target root therefore denies on
+         the missing-document reason for that root. It never denies on the
+         marker-is-broken reason, which is reachable only when the folder does
+         exist under that root and its work-mode marker cannot be read.
 
     Known limitation: resolution stops at the feature-folder segment, so it does
     not descend into a version folder (v1/, v2/). No versioned folder exists
@@ -216,11 +241,16 @@ function Get-PrdFeatureCallTarget {
         envelope root and the nested tool_input, and supplies the session root from
         the envelope's own cwd field when the runtime sets one.
 
-        A call whose text carries no absolutely-placed token is NOT handed to the
-        derivation. A repo-relative citation names a path that exists in every
-        worktree by construction, so placing it would report an ambiguity that says
-        nothing about the call; such a call has no target information at all and is
-        resolved against the session root exactly as before.
+        The assembled text is handed to the derivation unconditionally. Which
+        citations are eligible to be placed is the derivation's decision and not
+        this hook's: it answers NoTarget for a call it cannot place at all, and
+        Ambiguous for a placed signal that resolves to no worktree or to several.
+        A repo-relative citation therefore has a real placement channel, because
+        the derivation keeps only the worktrees under which that repo-relative
+        path exists. The outcome the caller sees is fail-closed:
+        a call that places in no worktree, or in several, denies before any probe
+        runs, rather than being validated against whichever root happened to be
+        current.
     #>
     [CmdletBinding()]
     [OutputType([object])]
@@ -236,11 +266,6 @@ function Get-PrdFeatureCallTarget {
     $description = Get-ClaudeHookToolInputString -ToolInput $ToolInput -Name 'description'
     $text = (@($prompt, $description) | Where-Object { $_ }) -join ' '
     if (-not $text) {
-        return $null
-    }
-
-    # An absolutely-placed token is the only citation that identifies one worktree.
-    if ($text -notmatch '(?<![^\s"''`(])(?:[A-Za-z]:[\\/]|/)') {
         return $null
     }
 

@@ -64,3 +64,49 @@ the measured headroom is 54 and 46.
 The TargetResolution suite now has **1 line of headroom**. No task in Phase 2, 3, or 4 of this plan edits that
 file, so the headroom is not consumed further by this remediation. A future change to that suite will need to
 either reclaim lines or split the file.
+
+---
+
+## Phase 2 block — the two repository production files (batch R-B)
+
+Timestamp: 2026-09-17T13-56
+
+Task: `[P2-T7]`
+
+Command:
+`$lines = @(Get-Content -LiteralPath '<file>'); $lines.Count; $lines | Measure-Object -Line | Select-Object -ExpandProperty Lines`
+
+EXIT_CODE: 0
+
+| file | physical lines | non-blank lines | pre-remediation physical | delta | headroom to 500 | at or under cap |
+| --- | --- | --- | --- | --- | --- | --- |
+| `.claude/hooks/enforce-prd-feature-before-planner.ps1` | **456** | 403 | 431 | +25 | 44 | **yes** |
+| `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1` | **320** | 284 | 314 | +6 | 180 | **yes** |
+
+Both integers recorded. Both are at or under the 500-line cap. No overage arose, so the halt branch in
+`[P2-T7]` was not taken and no rationale comment was shortened to absorb one.
+
+### Reconciliation against the plan's stated headroom
+
+`[P2-T7]` states pre-remediation values of 431 and 314, carrying 69 and 186 lines of headroom. Both were
+confirmed by `[P0-T3]` against the current tree. The delivered change consumes 25 of the parent hook's 69
+lines and 6 of the helpers sibling's 186.
+
+### Attribution of the delta, per task
+
+**Parent hook, +25 lines:**
+
+- `[P2-T2]`, net **0**. The `.DESCRIPTION` paragraph replacement grew from 5 lines to 10, and the pre-filter
+  deletion removed 5 lines: the four-line `if ($text -notmatch ...)` block and its trailing blank separator.
+- `[P2-T3]`, net **+25**. The resolution-order block grew from 21 lines to 46, because the delivered branch
+  order has seven steps where the stale block documented four, and four of those steps describe behaviour the
+  stale block did not mention at all: the derivation's own ambiguity deny, the derived-target disambiguator,
+  the unresolved-tie deny, and the folder-absent-under-the-target-root deny.
+
+**Helpers sibling, +6 lines:**
+
+- `[P2-T5]`, net **+6**. The file-level `.DESCRIPTION` sentence `It is loaded for its declarations only.` was
+  replaced by a paragraph naming the one file-scope statement and stating why its import is unguarded.
+
+No executable line was added to either file by Phase 2. The parent hook's only executable change is a
+deletion.
