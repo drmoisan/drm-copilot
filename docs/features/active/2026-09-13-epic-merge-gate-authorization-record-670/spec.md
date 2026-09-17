@@ -885,7 +885,7 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       sole permitted exception being additions the matrix requires. Verified by
       `git diff origin/epic/worktree-scoped-state-resolution-integration` over those four files showing
       no deletion and no modification of an existing `It` block.
-- [ ] `tests/scripts/claude-hooks/enforce-epic-merge-gate.Authorization.Tests.ps1` exists, is
+- [x] `tests/scripts/claude-hooks/enforce-epic-merge-gate.Authorization.Tests.ps1` exists, is
       table-driven, and carries a header determinism block stating that every case drives the pure
       decision seam, mocks every checkpoint read seam, writes nothing to disk, starts no process, and
       reads no clock.
