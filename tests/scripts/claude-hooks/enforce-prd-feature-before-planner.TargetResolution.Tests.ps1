@@ -43,18 +43,54 @@ $OtherFeatureFolder = 'docs/features/active/2026-09-13-synthetic-other-999'
 # coincide and no prefix is applied.
 $AbsolutePathCases = @(
     @{
-        Case         = 'coordinating session cwd, target in another worktree'
-        ModelledCwd  = '/synthetic-worktrees/coordinating-session'
-        TargetRoot   = '/synthetic-worktrees/item-worktree'
-        Status       = 'OtherWorktree'
-        ProbeFolder  = '/synthetic-worktrees/item-worktree/docs/features/active/2026-09-13-synthetic-target-672'
+        Case        = 'coordinating session cwd, target in another worktree'
+        ModelledCwd = '/synthetic-worktrees/coordinating-session'
+        TargetRoot  = '/synthetic-worktrees/item-worktree'
+        Status      = 'OtherWorktree'
+        ProbeFolder = '/synthetic-worktrees/item-worktree/docs/features/active/2026-09-13-synthetic-target-672'
     }
     @{
-        Case         = 'item worktree cwd, target is the session root'
-        ModelledCwd  = '/synthetic-worktrees/item-worktree'
-        TargetRoot   = '/synthetic-worktrees/item-worktree'
-        Status       = 'SessionRoot'
-        ProbeFolder  = 'docs/features/active/2026-09-13-synthetic-target-672'
+        Case        = 'item worktree cwd, target is the session root'
+        ModelledCwd = '/synthetic-worktrees/item-worktree'
+        TargetRoot  = '/synthetic-worktrees/item-worktree'
+        Status      = 'SessionRoot'
+        ProbeFolder = 'docs/features/active/2026-09-13-synthetic-target-672'
+    }
+)
+
+# The four work modes, each exercised against the same resolved target root. The
+# document lists below are the fully composed paths the gate must probe, so a row
+# cannot pass on a probe that answers true for a path the gate never composed.
+$WorkModeCases = @(
+    @{
+        Case           = 'full-feature requires spec.md and user-story.md'
+        Marker         = 'full-feature'
+        Present        = @(
+            '/synthetic-worktrees/item-worktree/docs/features/active/2026-09-13-synthetic-target-672/spec.md',
+            '/synthetic-worktrees/item-worktree/docs/features/active/2026-09-13-synthetic-target-672/user-story.md'
+        )
+        ExpectedProbes = 2
+    }
+    @{
+        Case           = 'full-bug requires spec.md alone'
+        Marker         = 'full-bug'
+        Present        = @('/synthetic-worktrees/item-worktree/docs/features/active/2026-09-13-synthetic-target-672/spec.md')
+        ExpectedProbes = 1
+    }
+    @{
+        Case           = 'minor-audit requires neither'
+        Marker         = 'minor-audit'
+        Present        = @()
+        ExpectedProbes = 0
+    }
+    @{
+        Case           = 'the legacy full marker normalises to full-feature'
+        Marker         = 'full'
+        Present        = @(
+            '/synthetic-worktrees/item-worktree/docs/features/active/2026-09-13-synthetic-target-672/spec.md',
+            '/synthetic-worktrees/item-worktree/docs/features/active/2026-09-13-synthetic-target-672/user-story.md'
+        )
+        ExpectedProbes = 2
     }
 )
 
@@ -83,6 +119,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
         $script:AmbiguityCode = Get-WorktreeResolutionAmbiguityReasonCode
 
         function New-PlannerPayload {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory payload factory in a test file; it changes no system state.')]
             param([string] $Prompt)
 
             return (@{
@@ -92,6 +129,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
         }
 
         function New-ModelledTarget {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory factory over the shipped issue #669 constructor; it changes no system state.')]
             param(
                 [string] $Status,
                 [string] $SessionRoot,
@@ -264,6 +302,67 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*$($script:AmbiguityCode)*"
+        }
+
+        It 'probes once on a full-bug allow row' {
+            # The positive half of the zero-invocation guard: an implementation that
+            # returns allow without probing fails this row.
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith {
+                if ($FeatureFolder -eq $script:ComposedTargetFolder) { "- Work Mode: full-bug`n" } else { $null }
+            }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
+                $Path -eq "$($script:ComposedTargetFolder)/spec.md"
+            }
+
+            $target = New-ModelledTarget -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot `
+                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue $script:ComposedTargetFolder
+            $payload = New-PlannerPayload -Prompt "Plan $($script:ComposedTargetFolder) now."
+
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke -CommandName Get-PrdFeatureFileExistence -Times 1 -Exactly
+        }
+
+        It 'probes twice on a full-feature allow row' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith {
+                if ($FeatureFolder -eq $script:ComposedTargetFolder) { "- Work Mode: full-feature`n" } else { $null }
+            }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
+                $Path -in @(
+                    "$($script:ComposedTargetFolder)/spec.md",
+                    "$($script:ComposedTargetFolder)/user-story.md"
+                )
+            }
+
+            $target = New-ModelledTarget -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot `
+                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue $script:ComposedTargetFolder
+            $payload = New-PlannerPayload -Prompt "Plan $($script:ComposedTargetFolder) now."
+
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke -CommandName Get-PrdFeatureFileExistence -Times 2 -Exactly
+        }
+
+        It 'resolves the required document set for each work mode' -ForEach $WorkModeCases {
+            # Every row is exercised against the same resolved target root and differs
+            # only in the marker the target folder carries and the documents present
+            # under it.
+            $marker = $Marker
+            $present = $Present
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith {
+                if ($FeatureFolder -eq $script:ComposedTargetFolder) { "- Work Mode: $marker`n" } else { $null }
+            }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
+                $Path -in $present
+            }
+
+            $target = New-ModelledTarget -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot `
+                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue $script:ComposedTargetFolder
+            $payload = New-PlannerPayload -Prompt "Plan $($script:ComposedTargetFolder) now."
+
+            $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke -CommandName Get-PrdFeatureFileExistence -Times $ExpectedProbes -Exactly
         }
 
         It 'denies with the ambiguity reason when the folder is absent from the target root' {
