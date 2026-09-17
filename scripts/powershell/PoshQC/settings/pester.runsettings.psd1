@@ -42,6 +42,8 @@
             # Issue #275 remediation cycle 1 (fix #3): measure the epic-orchestrate hook set and
             # its dot-sourced sibling module so no production hook is excluded from coverage.
             '.claude/hooks/enforce-epic-merge-gate.ps1'
+            # Issue #670: CodeCoverage.Path is an explicit per-file allow-list, so the dot-sourced helpers file is listed here.
+            '.claude/hooks/enforce-epic-merge-gate-authorization.ps1'
             '.claude/hooks/enforce-epic-wave-barrier.ps1'
             '.claude/hooks/enforce-epic-worktree-removal-gate.ps1'
             '.claude/hooks/enforce-pr-author-skill.ps1'

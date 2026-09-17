@@ -729,57 +729,57 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 
 ### Behaviour — the authorization record
 
-- [ ] With a valid authorization record naming PR 691 present in any one of the three orchestrator
+- [x] With a valid authorization record naming PR 691 present in any one of the three orchestrator
       checkpoints and a matching envelope `session_id`, `gh pr merge 691 --merge` is allowed, where it
       denies today. Pinned by a named case in
       `tests/scripts/claude-hooks/enforce-epic-merge-gate.Authorization.Tests.ps1`.
-- [ ] The allow in the preceding criterion holds when the record is carried in the per-feature
+- [x] The allow in the preceding criterion holds when the record is carried in the per-feature
       checkpoint, when it is carried in the epic checkpoint, and when it is carried in the parallel
       checkpoint. Three named cases, one per checkpoint.
-- [ ] A record naming a different PR denies with `STANDALONE_MERGE_AUTHORIZATION_PR_MISMATCH`, proved
+- [x] A record naming a different PR denies with `STANDALONE_MERGE_AUTHORIZATION_PR_MISMATCH`, proved
       by the four-property discriminator: record naming 501 only, command
       `cd /repo/worktrees/501 && gh pr merge --merge 777`, all three read seams mocked with only one
       populated, and a paired positive case merging 501 that allows.
-- [ ] With no `standalone_merge_authorizations` key on any of the three checkpoints, an in-scope
+- [x] With no `standalone_merge_authorizations` key on any of the three checkpoints, an in-scope
       command naming an explicit PR denies with `STANDALONE_MERGE_AUTHORIZATION_ABSENT`, and the deny
       message states that an authorized path exists and how to take it.
-- [ ] Every non-PR-specific spelling denies with `STANDALONE_MERGE_AUTHORIZATION_NOT_PR_SPECIFIC`, with
+- [x] Every non-PR-specific spelling denies with `STANDALONE_MERGE_AUTHORIZATION_NOT_PR_SPECIFIC`, with
       one named case for each of: block value `true`; block value a string; block value an object;
       empty array; entry not an object; `pr_number` absent; `pr_number` `null`; `pr_number` `0`;
       `pr_number` negative; `pr_number` a non-integer number; `pr_number` a digit-spelling string;
       `pr_number` the wildcard string `"*"`; `pr_number` an array.
-- [ ] Every field-shape failure on the matched entry denies with
+- [x] Every field-shape failure on the matched entry denies with
       `STANDALONE_MERGE_AUTHORIZATION_MALFORMED` and a message naming the failing field, with one named
       case per field: `pr_url`, `issue_num`, `branch_name`, `authorized_by`, `authorized_at`, `basis`
       empty, `basis` below the stated minimum length, and `run_slug` present but empty.
-- [ ] A record whose `session_id` differs from the live envelope's denies with
+- [x] A record whose `session_id` differs from the live envelope's denies with
       `STANDALONE_MERGE_AUTHORIZATION_MALFORMED` naming `session_id`; an envelope carrying no
       `session_id` at all also denies, naming `session_id`. Two named cases.
-- [ ] A bare `gh pr merge --merge` carrying no explicit PR number denies with the **existing**
+- [x] A bare `gh pr merge --merge` carrying no explicit PR number denies with the **existing**
       line-433 `EPIC_MERGE_GATE_BLOCKED` reason text even when a valid authorization record is present.
       Pinned by a named case that asserts the existing text, not merely the token.
-- [ ] Branch 4 is evaluated after branches 1, 2 and 3. Pinned by a named case in which a parallel
+- [x] Branch 4 is evaluated after branches 1, 2 and 3. Pinned by a named case in which a parallel
       checkpoint authorizes item 501 at `ci_green` and a standalone record names 777 only: the command
       merging 501 is allowed via branch 3, and the case asserts the allow carries no
       standalone-authorization reason.
-- [ ] The field-check evaluation order is fixed and the first failure wins, so a record failing two
+- [x] The field-check evaluation order is fixed and the first failure wins, so a record failing two
       field checks emits a deterministic message. Pinned by a named case supplying a record that
       violates both `pr_url` and `basis` and asserting the message names `pr_url`.
 
 ### Trigger scope
 
-- [ ] `gh pr merge 691 --squash` with a valid authorization record naming 691 present is **allowed**
+- [x] `gh pr merge 691 --squash` with a valid authorization record naming 691 present is **allowed**
       as out of trigger scope. New named case; this is the paired case proving the record does not
       widen trigger scope.
-- [ ] `tests/scripts/claude-hooks/enforce-epic-merge-gate.Tests.ps1:27`
+- [x] `tests/scripts/claude-hooks/enforce-epic-merge-gate.Tests.ps1:27`
       (`It 'allows gh pr merge without --merge (e.g., --squash)'`) is green and its text is unedited.
-- [ ] This spec contains no acceptance criterion asserting that `--squash` denies, and the corrected
+- [x] This spec contains no acceptance criterion asserting that `--squash` denies, and the corrected
       framing — that `--squash` is out of trigger scope and allowed today on both runtimes — is
       recorded in this spec and reflected in the hook's header comment.
 
 ### Must not regress (carried verbatim from the epic)
 
-- [ ] **The `pr_number` matcher is unchanged.** Verified two ways, both of which can fail.
+- [x] **The `pr_number` matcher is unchanged.** Verified two ways, both of which can fail.
       (a) A named Pester case asserts `Get-EpicMergeGateCommandPrNumber` returns 410 for the
       number-before-flag form, 410 for the flag-before-number form, 410 for the equals-joined form, 688
       for the cd-prefixed form, 777 for the false-allow form, and nothing for the bare form — the same
@@ -790,16 +790,16 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
       `git status --porcelain` showing the file as modified, so a diff that returns nothing because
       the change was never written or never staged is distinguishable from a diff that returns nothing
       because the function is untouched.
-- [ ] **The pre-implementation gate's restrictions are not weakened.** No file matching
+- [x] **The pre-implementation gate's restrictions are not weakened.** No file matching
       `.claude/hooks/enforce-orchestration-preimplementation-gate*.ps1` or its Codex mirrors is
       modified by this change, verified by
       `git diff --name-only origin/epic/worktree-scoped-state-resolution-integration` listing none of
       them, and the gate's existing Pester suites are green and unedited.
-- [ ] **Epic and standalone topologies behave exactly as now when cwd and target coincide.** The three
+- [x] **Epic and standalone topologies behave exactly as now when cwd and target coincide.** The three
       `$script:*CheckpointPath` assignments and the Codex repository-root anchoring are unchanged, and
       every branch-1, branch-2 and branch-3 allow and deny case in the existing suites is green and
       unedited.
-- [ ] **Gates still deny when the required evidence is genuinely absent.** All existing fail-closed
+- [x] **Gates still deny when the required evidence is genuinely absent.** All existing fail-closed
       cases stay green: both checkpoints absent; both checkpoints unreadable; parallel checkpoint
       absent; parallel checkpoint malformed; bare merge with a parallel checkpoint present; empty
       payload; unparseable payload; the end-to-end nested-envelope deny. A checkpoint carrying no
@@ -808,100 +808,100 @@ new helpers file registered in `CodeCoverage.Path` **before** the baseline is ta
 
 ### Codex parity
 
-- [ ] `.codex/hooks/enforce-epic-merge-gate.ps1` gains the standalone branch in place, with the same
+- [x] `.codex/hooks/enforce-epic-merge-gate.ps1` gains the standalone branch in place, with the same
       activation condition as the Claude side (a well-formed record naming this PR, with a matching
       `session_id`), covered by named cases in
       `tests/scripts/codex-hooks/enforce-epic-merge-gate-authorization.Tests.ps1`.
-- [ ] All four reason-code tokens are spelled byte-identically on both runtimes, verified by a named
+- [x] All four reason-code tokens are spelled byte-identically on both runtimes, verified by a named
       assertion that compares the token literals extracted from the Claude helpers file and the Codex
       hook.
-- [ ] The Codex hook still has no parallel allow path: the tokens `route_id`, `items`, and `parallel`
+- [x] The Codex hook still has no parallel allow path: the tokens `route_id`, `items`, and `parallel`
       occur zero times in `.codex/hooks/enforce-epic-merge-gate.ps1` after the change, as they do
       before it.
-- [ ] The Codex allow representation stays `$null`, the `exit 2` throw channel is unchanged, the
+- [x] The Codex allow representation stays `$null`, the `exit 2` throw channel is unchanged, the
       `step9_status` accepted set is unchanged, and the `epic_mode` type test is unchanged.
 
 ### Registration, configuration, and file size
 
-- [ ] Both bundled Claude mirrors are updated: the modified
+- [x] Both bundled Claude mirrors are updated: the modified
       `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate.ps1`
       and the new
       `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate-authorization.ps1`,
       with `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` green.
-- [ ] The bundled mirror of `.claude/rules/orchestrator-state.md` and of
+- [x] The bundled mirror of `.claude/rules/orchestrator-state.md` and of
       `.claude/skills/parallel-orchestrate/SKILL.md` are updated to match their repository-side files.
-- [ ] `.claude/hooks/enforce-epic-merge-gate-authorization.ps1` is added to the `paths` array of
+- [x] `.claude/hooks/enforce-epic-merge-gate-authorization.ps1` is added to the `paths` array of
       `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, with
       `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py` green.
-- [ ] `.claude/hooks/enforce-epic-merge-gate-authorization.ps1` is added to `CodeCoverage.Path` in
+- [x] `.claude/hooks/enforce-epic-merge-gate-authorization.ps1` is added to `CodeCoverage.Path` in
       `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, and the coverage baseline was taken
       after that entry was added.
-- [ ] The Codex bundled mirror
+- [x] The Codex bundled mirror
       `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate.ps1`
       is byte-identical to `.codex/hooks/enforce-epic-merge-gate.ps1`, with the Codex runtime-contract
       suite green.
-- [ ] Every file created or modified by this change is under 500 lines, verified by an enumerated
+- [x] Every file created or modified by this change is under 500 lines, verified by an enumerated
       per-file line count recorded in the evidence artifacts, because no automated test enforces the
       cap on `.claude/hooks/**`. The count explicitly includes
       `.claude/hooks/enforce-epic-merge-gate.ps1`,
       `.claude/hooks/enforce-epic-merge-gate-authorization.ps1`,
       `.codex/hooks/enforce-epic-merge-gate.ps1`, both new test suites, and all four bundled mirrors.
-- [ ] `.claude/settings.json` is unmodified.
+- [x] `.claude/settings.json` is unmodified.
 
 ### Documentation and disclosure
 
-- [ ] The honest-disclosure text appears in all three required locations: the `.NOTES` block of
+- [x] The honest-disclosure text appears in all three required locations: the `.NOTES` block of
       `.claude/hooks/enforce-epic-merge-gate.ps1`, the header comment of
       `.claude/hooks/enforce-epic-merge-gate-authorization.ps1`, and the new section of
       `.claude/rules/orchestrator-state.md`. Each copy states that the record is a policy-level
       auditable declaration and not a cryptographic or security control, that `authorized_by` is a
       declaration the hook does not verify, that the record is not tamper-proof against a same-session
       writer, and what the `session_id` cross-check does and does not stop.
-- [ ] The hook's header comment block no longer says the gate allows the merge when "one of three"
+- [x] The hook's header comment block no longer says the gate allows the merge when "one of three"
       conditions holds; it documents four conditions, and the standalone-exclusion paragraph at the
       current lines 23-27 is rewritten so the file's own documentation is not left false.
-- [ ] `.claude/rules/orchestrator-state.md` gains a `standalone_merge_authorizations` scope-and-
+- [x] `.claude/rules/orchestrator-state.md` gains a `standalone_merge_authorizations` scope-and-
       backward-compatibility section stating the invariants are additive and key-gated, plus one
       Enforcement bullet. No JSON Schema file is authored, imported, or read for the block, and the
       Enforcement bullet states that the Python checkpoint validator does not currently validate this
       block.
-- [ ] `.claude/skills/parallel-orchestrate/SKILL.md` documents the writer procedure: which fields a
+- [x] `.claude/skills/parallel-orchestrate/SKILL.md` documents the writer procedure: which fields a
       coordinating session writes, into which checkpoint, and that a blanket flag is rejected. The
       existing `**Merge-gate authorization.**` paragraph is updated to name four allow conditions
       rather than describing only the parallel one.
-- [ ] The writer surface is bounded to exactly the two authored surfaces named above plus their
+- [x] The writer surface is bounded to exactly the two authored surfaces named above plus their
       bundled mirrors. No other skill, agent, or rule file is edited to write or describe the record.
-- [ ] The two closed anti-patterns (synthetic `items[]` injection; switching to `--squash`) are
+- [x] The two closed anti-patterns (synthetic `items[]` injection; switching to `--squash`) are
       recorded as closed in this spec, and the implementation introduces neither.
-- [ ] Follow-ups FU-1 through FU-4 are filed as issues, or their deferral is explicitly recorded in the
+- [x] Follow-ups FU-1 through FU-4 are filed as issues, or their deferral is explicitly recorded in the
       pull-request description, before this feature is closed.
 
 ### Tests, toolchain, and coverage
 
-- [ ] Every currently-passing case in all four existing suites
+- [x] Every currently-passing case in all four existing suites
       (`enforce-epic-merge-gate.Tests.ps1`, `enforce-epic-merge-gate.TriggerScoping.Tests.ps1`,
       `enforce-epic-merge-gate-decision-surface.Tests.ps1`,
       `enforce-epic-merge-gate-trigger-scoping.Tests.ps1`) is green and its text is unedited, with the
       sole permitted exception being additions the matrix requires. Verified by
       `git diff origin/epic/worktree-scoped-state-resolution-integration` over those four files showing
       no deletion and no modification of an existing `It` block.
-- [ ] `tests/scripts/claude-hooks/enforce-epic-merge-gate.Authorization.Tests.ps1` exists, is
+- [x] `tests/scripts/claude-hooks/enforce-epic-merge-gate.Authorization.Tests.ps1` exists, is
       table-driven, and carries a header determinism block stating that every case drives the pure
       decision seam, mocks every checkpoint read seam, writes nothing to disk, starts no process, and
       reads no clock.
-- [ ] No test in this change creates a temporary file, uses `Mock gh`, uses `Mock git`, uses
+- [x] No test in this change creates a temporary file, uses `Mock gh`, uses `Mock git`, uses
       `Start-Sleep`, or makes a network call, with the PowerShell test-purity check green.
-- [ ] No file under `.claude/hooks/**` added or modified by this change invokes Python by any route,
+- [x] No file under `.claude/hooks/**` added or modified by this change invokes Python by any route,
       with `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` green and
       its allowlist still empty.
-- [ ] Line coverage is at least 85 percent for
+- [x] Line coverage is at least 85 percent for
       `.claude/hooks/enforce-epic-merge-gate-authorization.ps1`,
       `.claude/hooks/enforce-epic-merge-gate.ps1`, and `.codex/hooks/enforce-epic-merge-gate.ps1`, with
       baseline, post-change, and comparison artifacts stored under
       `docs/features/active/2026-09-13-epic-merge-gate-authorization-record-670/evidence/coverage/`.
       The baseline was taken after the new file was added to `CodeCoverage.Path`.
-- [ ] Coverage for the changed lines does not decrease relative to the recorded baseline.
-- [ ] The full toolchain loop completed in a single clean pass: format, lint, architecture and
+- [x] Coverage for the changed lines does not decrease relative to the recorded baseline.
+- [x] The full toolchain loop completed in a single clean pass: format, lint, architecture and
       contract checks, unit tests, with no stage auto-fixing a file on the final pass. Type checking is
       not applicable to PowerShell.
 
