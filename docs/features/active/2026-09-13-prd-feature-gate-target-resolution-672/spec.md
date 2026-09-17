@@ -613,7 +613,7 @@ of the ambiguity code instead.
 
 - [x] The unconditional post-prompt fallback to the session-root checkpoint is removed. The checkpoint is consulted only when the call genuinely has no target **and** the session root is the derived target. A Pester case asserts that a prompt naming no folder, issued from a session whose checkpoint describes a different item, denies with the ambiguity code rather than validating against that checkpoint.
 - [x] The positional tie-break is removed. With more than one distinct candidate, the disambiguator is the derived target; when the tie cannot be resolved against it, the gate denies with the ambiguity code instead of selecting the earliest-occurring candidate. A Pester case asserts the denial rather than a silent selection.
-- [x] The missing/malformed-marker branch is reached only when the feature folder **does** exist under the resolved target root and its `- Work Mode:` marker is unreadable. A Pester case asserts that a folder absent from the resolved target root produces the ambiguity or absence reason, not the marker-is-broken reason, so the gate no longer prescribes a remedy that would edit the wrong repository's `issue.md`.
+- [ ] The missing/malformed-marker branch is reached only when the feature folder **does** exist under the resolved target root and its `- Work Mode:` marker is unreadable. A Pester case asserts that a folder absent from the resolved target root produces the ambiguity or absence reason, not the marker-is-broken reason, so the gate no longer prescribes a remedy that would edit the wrong repository's `issue.md`.
 
 **False-approval guards (highest regression risk)**
 
@@ -623,7 +623,7 @@ of the ambiguity code instead.
 
 **Mandatory test-matrix rows (regression guards retained, not dropped)**
 
-- [x] Row — own folder named, cwd modelled as the session root: `allow`. This row currently denies and is the defect's direct proof.
+- [ ] Row — own folder named, cwd modelled as the session root: `allow`. This row currently denies and is the defect's direct proof.
 - [x] Row — own folder named, cwd modelled as the item worktree: `allow`, unchanged. Retained as a regression guard.
 - [x] Row — an absolute path to the own feature folder: `allow` when the required document is present under the containing worktree, for both modelled cwd values.
 - [x] Row — a sibling item's checkpoint is the only state present: `deny` with the distinct ambiguity reason code. This row never returns `allow`.
