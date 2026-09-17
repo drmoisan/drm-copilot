@@ -652,7 +652,7 @@ of the ambiguity code instead.
 - [x] `Resolve-PrdFeatureWorkMode` and `Get-PrdFeatureRequiredFile` are moved without any behavioural edit.
 - [x] Every production and test file in the change set is at or under the 500-line cap required by `.claude/rules/general-code-change.md`, measured on the delivered files.
 - [x] A smoke case proves that a Pester mock registered in the test scope is observed by a caller defined in the other dot-sourced file, and it is run before the remainder of the extraction is committed.
-- [x] The new suite creates no temporary file or directory, does not change the process working directory, and derives no absolute path from the environment, the current directory, the script file location, or a source-control query. Its synthetic roots are bare string literals and cwd is supplied as data through an injection parameter.
+- [ ] The new suite creates no temporary file or directory, does not change the process working directory, and derives no absolute path from the environment, the current directory, the script file location, or a source-control query. Its synthetic roots are bare string literals and cwd is supplied as data through an injection parameter.
 
 **Bundled-payload mirroring and delivery registration**
 
