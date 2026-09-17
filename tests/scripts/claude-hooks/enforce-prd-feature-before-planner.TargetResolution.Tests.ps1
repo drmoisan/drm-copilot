@@ -161,6 +161,68 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
         }
     }
 
+    Context 'call-target derivation seam' {
+        # Direct cases for the two parent-side functions the decision path calls. The
+        # derivation itself is mocked, so no case here reads the filesystem.
+
+        It 'treats a call with no derived target as resolving at the session root' {
+            Test-PrdFeatureSessionRootTarget -Target $null | Should -BeTrue
+        }
+
+        It 'treats a NoTarget and a SessionRoot result as resolving at the session root' {
+            Test-PrdFeatureSessionRootTarget -Target ([pscustomobject]@{ Status = 'NoTarget' }) | Should -BeTrue
+            Test-PrdFeatureSessionRootTarget -Target ([pscustomobject]@{ Status = 'SessionRoot' }) | Should -BeTrue
+        }
+
+        It 'treats another worktree as not the session root' {
+            Test-PrdFeatureSessionRootTarget -Target ([pscustomobject]@{ Status = 'OtherWorktree' }) | Should -BeFalse
+        }
+
+        It 'derives nothing from a call whose text is empty' {
+            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { [pscustomobject]@{ Status = 'NoTarget' } }
+
+            Get-PrdFeatureCallTarget -Envelope $null -ToolInput ([pscustomobject]@{ subagent_type = 'atomic-planner' }) |
+                Should -BeNullOrEmpty
+            Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 0 -Exactly
+        }
+
+        It 'derives nothing from a call that cites no absolutely-placed token' {
+            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { [pscustomobject]@{ Status = 'NoTarget' } }
+
+            $toolInput = [pscustomobject]@{ prompt = "Plan $($script:TargetFeatureFolder) now."; description = 'plan it' }
+
+            Get-PrdFeatureCallTarget -Envelope $null -ToolInput $toolInput | Should -BeNullOrEmpty
+            Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 0 -Exactly
+        }
+
+        It 'supplies the session root from the envelope cwd when the runtime sets one' {
+            Mock -CommandName Resolve-WorktreeCallTarget -MockWith {
+                [pscustomobject]@{ Status = 'OtherWorktree'; SuppliedSessionRoot = $SessionRoot; SuppliedText = $Text }
+            }
+
+            $toolInput = [pscustomobject]@{ prompt = "Plan $($script:ComposedTargetFolder) now." }
+            $envelope = [pscustomobject]@{ cwd = $script:CoordinatingSessionRoot; tool_name = 'Agent' }
+
+            $result = Get-PrdFeatureCallTarget -Envelope $envelope -ToolInput $toolInput
+            $result.SuppliedSessionRoot | Should -Be $script:CoordinatingSessionRoot
+            $result.SuppliedText | Should -BeLike "*$($script:ComposedTargetFolder)*"
+            Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 1 -Exactly
+        }
+
+        It 'omits the session root when the envelope carries no cwd field' {
+            Mock -CommandName Resolve-WorktreeCallTarget -MockWith {
+                [pscustomobject]@{ Status = 'OtherWorktree'; SuppliedSessionRoot = $SessionRoot }
+            }
+
+            $toolInput = [pscustomobject]@{ description = "Plan $($script:ComposedTargetFolder) now." }
+            $envelope = [pscustomobject]@{ tool_name = 'Agent' }
+
+            $result = Get-PrdFeatureCallTarget -Envelope $envelope -ToolInput $toolInput
+            $result.SuppliedSessionRoot | Should -BeNullOrEmpty
+            Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 1 -Exactly
+        }
+    }
+
     Context 'target resolution matrix' {
         It 'allows when the target root holds the required document' {
             # State A with a differing root: the document exists only under the target
