@@ -113,6 +113,14 @@ describe("repo automation dispatch", () => {
           if (args[0] === "gh" || String(args[0]).endsWith("gh")) {
             return { stdout: "", stderr: "offline", code: 1 };
           }
+          const sub = args.slice(1).join(" ");
+          // Non-empty diff, matching the collector-core.test.ts pattern.
+          if (sub.startsWith("diff --name-status")) {
+            return { stdout: "M\tsrc/example.ts", stderr: "", code: 0 };
+          }
+          if (sub.startsWith("diff --numstat")) {
+            return { stdout: "1\t0\tsrc/example.ts", stderr: "", code: 0 };
+          }
           return { stdout: "", stderr: "", code: 0 };
         },
       },

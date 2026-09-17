@@ -47,6 +47,11 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
           description:
             "Explicit base branch or ref used for PR context collection.",
         },
+        target_ref: {
+          type: "string",
+          description:
+            "Optional explicit head ref naming the branch to collect PR context for. When omitted, the invoking session's current HEAD is used as a fallback, and the fallback is recorded on the returned result and in the summary artifact.",
+        },
       },
       required: ["workspace_root", "base"],
       additionalProperties: false,

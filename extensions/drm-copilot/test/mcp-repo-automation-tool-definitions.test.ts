@@ -48,6 +48,44 @@ describe("repo automation MCP tool definitions", () => {
     expect(definitionNames).toEqual(REPO_AUTOMATION_TOOLS);
   });
 
+  it("declares the same input-schema properties and required arrays on both tool-definition surfaces", () => {
+    const baseNames = new Set(
+      toolDefinitions.map((definition) => definition.name),
+    );
+    const repoNames = new Set(
+      REPO_AUTOMATION_TOOL_DEFINITIONS.map((definition) => definition.name),
+    );
+    const sharedNames = [...baseNames].filter((name) => repoNames.has(name));
+
+    expect(sharedNames.length).toBeGreaterThan(0);
+
+    for (const name of sharedNames) {
+      const baseDefinition = findBaseDefinition(name);
+      const repoDefinition = findRepoDefinition(name);
+      expect(baseDefinition).toBeDefined();
+      expect(repoDefinition).toBeDefined();
+      if (baseDefinition === undefined || repoDefinition === undefined) {
+        continue;
+      }
+
+      const basePropertyKeys = Object.keys(
+        baseDefinition.inputSchema.properties,
+      ).sort();
+      const repoPropertyKeys = Object.keys(
+        repoDefinition.inputSchema.properties,
+      ).sort();
+      expect(repoPropertyKeys).toEqual(basePropertyKeys);
+
+      const baseRequired = [...(baseDefinition.inputSchema.required ?? [])]
+        .slice()
+        .sort();
+      const repoRequired = [...(repoDefinition.inputSchema.required ?? [])]
+        .slice()
+        .sort();
+      expect(repoRequired).toEqual(baseRequired);
+    }
+  });
+
   it("keeps the policy-audit asset selector schema aligned with the bundled asset tool", () => {
     const repoAutomationDefinition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
       ({ name }) => name === "resolve_policy_audit_template_asset",

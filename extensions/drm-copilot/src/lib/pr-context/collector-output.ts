@@ -28,7 +28,11 @@ import {
   type CollectPrContextOptions,
   collectPrContext,
 } from "./collector-core";
-import { appendGenerationTimestamp, bucketText } from "./summary-helpers";
+import {
+  appendGenerationTimestamp,
+  buildBaseHeadSection,
+  bucketText,
+} from "./summary-helpers";
 import {
   issueAppendix,
   issueDigest,
@@ -166,25 +170,8 @@ export function buildSummaryText(
     section("GitHub CLI status"),
     ghStatusText,
     intentBlock,
-    section("Base/Head"),
-    `Base ref (requested): ${ctx.baseRef ?? "(default)"}`,
-    `Base ref (resolved): ${ctx.resolvedBase ?? "(unknown)"} @ ${ctx.baseSha ?? "(unknown)"}`,
-    `Head ref (resolved): ${ctx.headRef ?? collected.head ?? "(unknown)"} @ ${ctx.headSha ?? "(unknown)"}`,
-    `Merge base: ${ctx.mergeBase ?? "(unknown)"}`,
-    `Range: ${ctx.revRange ?? "(unknown)"}`,
+    ...buildBaseHeadSection(ctx, collected.head, collected.resolvedRoot),
   ];
-  // Emit the stale-base WARNING when a requested local base did not resolve to
-  // an origin/ ref.
-  if (
-    ctx.baseRef &&
-    ctx.resolvedBase &&
-    !ctx.resolvedBase.startsWith("origin/")
-  ) {
-    summarySections.push(
-      "WARNING: Requested base is local and may be stale; prefer " +
-        `origin/${ctx.baseRef}`,
-    );
-  }
 
   const issueDigests = collected.issueDetails
     .map((detail) => issueDigest(detail))
@@ -343,6 +330,16 @@ export interface CollectAndWriteResult {
   readonly summaryText: string;
   /** The exact appendix text this invocation wrote. */
   readonly appendixText: string;
+  /** The collected merge-base SHA, or `null` when it could not be resolved. */
+  readonly mergeBase: string | null;
+  /** The collected head SHA, or `null` when it could not be resolved. */
+  readonly headSha: string | null;
+  /** The head ref the collector actually used, or `null` when unresolved. */
+  readonly resolvedHeadRef: string | null;
+  /** The collected resolved base ref, or `null` when it could not be resolved. */
+  readonly resolvedBase: string | null;
+  /** Count of changed files across the three collected buckets. */
+  readonly changedFileCount: number;
 }
 
 /**
@@ -392,7 +389,19 @@ export function collectAndWrite(
   log(`Wrote context summary to: ${options.out}`);
   log(`Wrote context appendix to: ${options.appendixOut}`);
 
-  return { summaryText, appendixText };
+  const ctx = collected.contextResult;
+  return {
+    summaryText,
+    appendixText,
+    mergeBase: ctx.mergeBase,
+    headSha: ctx.headSha,
+    resolvedHeadRef: ctx.headRef ?? collected.head ?? null,
+    resolvedBase: ctx.resolvedBase,
+    changedFileCount:
+      collected.bucketCore.length +
+      collected.bucketRenames.length +
+      collected.bucketDocs.length,
+  };
 }
 
 /** Resolve the GitHub CLI status text shown in the summary. */

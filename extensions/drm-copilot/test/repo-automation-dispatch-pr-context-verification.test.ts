@@ -63,8 +63,20 @@ function buildFileSystem(discardWrites: boolean): WriteRecordingFileSystem {
   };
 }
 
-/** Build a service whose git resolves and whose gh reports unavailable. */
-function buildService(discardWrites: boolean): {
+/**
+ * Build a service whose git resolves and whose gh reports unavailable.
+ *
+ * @param discardWrites When true, writes are recorded as attempted but their
+ *   content is dropped, so read-back verification must fail.
+ * @param diffPayload `"populated"` scripts a non-empty name-status/numstat
+ *   diff (the default, matching every pre-existing test in this file);
+ *   `"empty"` scripts the blanket empty response the empty-diff guard is
+ *   built to catch.
+ */
+function buildService(
+  discardWrites: boolean,
+  diffPayload: "populated" | "empty" = "populated",
+): {
   readonly service: ReturnType<typeof createRepoAutomationService>;
   readonly writes: Map<string, string>;
 } {
@@ -78,6 +90,15 @@ function buildService(discardWrites: boolean): {
         // gh is unavailable in this hermetic test; git resolves.
         if (args[0] === "gh" || String(args[0]).endsWith("gh")) {
           return { stdout: "", stderr: "offline", code: 1 };
+        }
+        const sub = args.slice(1).join(" ");
+        if (diffPayload === "populated") {
+          if (sub.startsWith("diff --name-status")) {
+            return { stdout: "M\tsrc/example.ts", stderr: "", code: 0 };
+          }
+          if (sub.startsWith("diff --numstat")) {
+            return { stdout: "1\t0\tsrc/example.ts", stderr: "", code: 0 };
+          }
         }
         return { stdout: "", stderr: "", code: 0 };
       },
@@ -123,5 +144,44 @@ describe("collect_pr_context tool-dispatch boundary", () => {
     expect([...(result.artifacts ?? [])].sort()).toEqual(
       [...writes.keys()].sort(),
     );
+  });
+
+  it("returns ok false with the empty-diff failure text when the collected diff is empty", async () => {
+    // Arrange: writes succeed, but the scripted diff carries no changed file.
+    const { service } = buildService(false, "empty");
+
+    // Act
+    const result = await dispatchRepoAutomationTool(
+      "collect_pr_context",
+      { workspace_root: WORKSPACE_ROOT, base: "origin/main" },
+      service,
+    );
+
+    // Assert
+    expect(result.ok).toBe(false);
+    expect(result.tool).toBe("collect_pr_context");
+    expect(result.summary).toContain("PR context diff is empty");
+  });
+
+  it("projects target_resolution and the resolved head onto the dispatch result", async () => {
+    // Arrange
+    const { service } = buildService(false);
+
+    // Act
+    const result = await dispatchRepoAutomationTool(
+      "collect_pr_context",
+      {
+        workspace_root: WORKSPACE_ROOT,
+        base: "origin/main",
+        target_ref: "feature/explicit-target",
+      },
+      service,
+    );
+
+    // Assert
+    expect(result.ok).toBe(true);
+    expect(result.target_resolution).toBe("explicit");
+    expect(result.resolved_head_ref).toBe("feature/explicit-target");
+    expect(typeof result.resolved_head_sha).toBe("string");
   });
 });
