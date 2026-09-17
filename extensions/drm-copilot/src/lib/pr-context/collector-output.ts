@@ -170,7 +170,7 @@ export function buildSummaryText(
     section("GitHub CLI status"),
     ghStatusText,
     intentBlock,
-    ...buildBaseHeadSection(ctx, collected.head),
+    ...buildBaseHeadSection(ctx, collected.head, collected.resolvedRoot),
   ];
 
   const issueDigests = collected.issueDetails

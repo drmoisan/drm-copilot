@@ -450,7 +450,7 @@ Every criterion below is verified from `extensions/drm-copilot/` after `npm ci`,
 **Fallback is observable, not silent**
 
 - [ ] The test `reports target_resolution session-fallback when no target ref is supplied` exists in `extensions/drm-copilot/test/lib/pr-context/pr-context-service-call-target.test.ts` and passes, asserting the discriminant value and the presence of the resolved head ref and head SHA on the returned record.
-- [ ] The tests `renders Head ref (source) naming the explicit target in the Base/Head block` and `renders Head ref (source) naming the session fallback in the Base/Head block` exist in `extensions/drm-copilot/test/lib/pr-context/collector-output-head-source.test.ts` and pass. Each asserts that the rendered line begins with the literal `Head ref (source):`, that it appears after the `Head ref (resolved):` line, and that the two cases render distinguishable text.
+- [x] The tests `renders Head ref (source) naming the explicit target in the Base/Head block` and `renders Head ref (source) naming the session fallback in the Base/Head block` exist in `extensions/drm-copilot/test/lib/pr-context/collector-output-head-source.test.ts` and pass. Each asserts that the rendered line begins with the literal `Head ref (source):`, that it appears after the `Head ref (resolved):` line, and that the two cases render distinguishable text.
 - [ ] The test `projects target_resolution and the resolved head onto the dispatch result` exists in `extensions/drm-copilot/test/repo-automation-dispatch-pr-context-verification.test.ts` and passes, asserting the three snake_case fields on the result returned by `dispatchRepoAutomationTool`.
 
 **Empty diff fails loudly**
