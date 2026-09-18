@@ -105,6 +105,7 @@
     ".claude/skills/pr-author/SKILL.md",
     ".claude/skills/pr-base-branch-merge-base/SKILL.md",
     ".claude/skills/pr-context-artifacts/SKILL.md",
+    ".claude/skills/quota-throttling/SKILL.md",
     ".claude/skills/remediation-handoff-atomic-planner/SKILL.md",
     ".claude/skills/research-issue/SKILL.md",
     ".claude/skills/review-epic/SKILL.md",
