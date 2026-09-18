@@ -10,6 +10,15 @@ Describe 'enforce-pr-author-skill.ps1' {
         $script:HashOf0x41 = '559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd'
     }
 
+    # Issue #687 routes the checkpoint through a resolution seam. Defaulting it to the
+    # session root keeps these tests exercising receipt behaviour, and keeps them
+    # independent of whichever worktrees exist on the machine running them.
+    BeforeEach {
+        Mock -CommandName Resolve-PrAuthorWorktreeTarget -MockWith {
+            [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = (Get-Location).Path; ReasonCode = $null; Detail = 'session root' }
+        }
+    }
+
     Context 'tool input parsing' {
         It 'denies an empty payload as an envelope anomaly (fail closed)' {
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw ''

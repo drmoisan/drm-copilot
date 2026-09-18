@@ -46,6 +46,15 @@ Describe 'enforce-pr-author-skill trigger scoping (issue #545)' {
         }
     }
 
+    # Issue #687 routes the checkpoint through a resolution seam. Defaulting it to the
+    # session root keeps these tests exercising their own subject, and independent of
+    # whichever worktrees exist on the machine running them.
+    BeforeEach {
+        Mock -CommandName Resolve-PrAuthorWorktreeTarget -MockWith {
+            [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = (Get-Location).Path; ReasonCode = $null; Detail = 'session root' }
+        }
+    }
+
     Context 'over-match removal - a quoted mention is not an invocation' {
         BeforeEach {
             # Context absent, so anything this gate classifies denies PR_CONTEXT_MISSING.

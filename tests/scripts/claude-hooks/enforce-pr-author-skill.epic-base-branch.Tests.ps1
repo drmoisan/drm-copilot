@@ -19,6 +19,15 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride' {
         . $script:UnderTest
     }
 
+    # Issue #687 routes the checkpoint through a resolution seam. Defaulting it to the
+    # session root keeps these tests exercising their own subject, and independent of
+    # whichever worktrees exist on the machine running them.
+    BeforeEach {
+        Mock -CommandName Resolve-PrAuthorWorktreeTarget -MockWith {
+            [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = (Get-Location).Path; ReasonCode = $null; Detail = 'session root' }
+        }
+    }
+
     Context 'epic_mode is false or absent (no-op/allow)' {
         It 'allows when the checkpoint is absent (Get-PrAuthorCheckpointContent returns $null)' {
             Mock -CommandName Get-PrAuthorCheckpointContent -MockWith { $null }

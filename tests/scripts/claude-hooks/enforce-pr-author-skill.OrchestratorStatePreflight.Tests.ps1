@@ -18,6 +18,15 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
         . $script:UnderTest
     }
 
+    # Issue #687 routes the checkpoint through a resolution seam. Defaulting it to the
+    # session root keeps these tests exercising receipt behaviour, and keeps them
+    # independent of whichever worktrees exist on the machine running them.
+    BeforeEach {
+        Mock -CommandName Resolve-PrAuthorWorktreeTarget -MockWith {
+            [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = (Get-Location).Path; ReasonCode = $null; Detail = 'session root' }
+        }
+    }
+
     Context 'orchestrator-state preflight (ORCHESTRATOR_STATE_PREFLIGHT_FAILED)' {
         BeforeEach {
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
@@ -61,7 +70,11 @@ Describe 'enforce-pr-author-skill.ps1 (orchestrator-state preflight)' {
             }
         }
 
-        It 'blocks gh pr create --body-file end-to-end in a real pwsh process (exit 0, deny, ORCHESTRATOR_STATE_PREFLIGHT_FAILED)' {
+        # Issue #687: this case drives a real pwsh process, so the resolution seam cannot be
+        # mocked. The command names no feature folder, file path, or branch, so it resolves
+        # NoTarget and the gate now refuses to answer from the session root's checkpoint. The
+        # ORCHESTRATOR_STATE_PREFLIGHT_FAILED path is covered by the mocked cases above.
+        It 'blocks gh pr create --body-file end-to-end in a real pwsh process (exit 0, deny, TARGET_WORKTREE_NOT_DERIVABLE)' {
             # Spawns a real, separate pwsh process. Dot-sources the hook (bypassing its entrypoint
             # guard) and points the context-artifact seam at a real, permanently-existing file
             # (the hook script itself) so Case C does not intercept first -- the same "real seam,
@@ -95,7 +108,7 @@ exit 0
                 $LASTEXITCODE | Should -Be 0
                 $parsed = $out | ConvertFrom-Json
                 $parsed.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-                $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'ORCHESTRATOR_STATE_PREFLIGHT_FAILED'
+                $parsed.hookSpecificOutput.permissionDecisionReason | Should -Match 'TARGET_WORKTREE_NOT_DERIVABLE'
             } finally {
                 $env:CLAUDE_TOOL_INPUT = $prev
             }

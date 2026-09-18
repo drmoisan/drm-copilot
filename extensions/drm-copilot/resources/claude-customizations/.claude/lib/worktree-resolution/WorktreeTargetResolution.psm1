@@ -71,7 +71,9 @@ function New-WorktreeResolutionTargetResult {
         Enforces the field invariants: SessionRoot and Detail are always non-empty,
         Candidates is always an array, WorktreeRoot is populated only for the two
         resolved states, Signal and SignalValue are null for NoTarget, and
-        ReasonCode is the ambiguity code exactly when Status is Ambiguous.
+        ReasonCode is the ambiguity code when Status is Ambiguous and the no-target
+        code when Status is NoTarget (issue #687); it is null for the two resolved
+        states.
     .PARAMETER Status
         One of SessionRoot, OtherWorktree, NoTarget, or Ambiguous.
     .PARAMETER SessionRoot
@@ -123,7 +125,11 @@ function New-WorktreeResolutionTargetResult {
         Signal       = if ($hasSignal) { $Signal } else { $null }
         SignalValue  = if ($hasSignal) { $SignalValue } else { $null }
         Candidates   = $candidates
-        ReasonCode   = if ($Status -eq $script:StatusAmbiguous) { Get-WorktreeResolutionAmbiguityReasonCode } else { $null }
+        ReasonCode   = switch ($Status) {
+            $script:StatusAmbiguous { Get-WorktreeResolutionAmbiguityReasonCode; break }
+            $script:StatusNoTarget { Get-WorktreeResolutionNoTargetReasonCode; break }
+            default { $null }
+        }
         Detail       = $Detail
     }
 }
