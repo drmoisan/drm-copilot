@@ -106,7 +106,7 @@ Describe 'WorktreeTargetResolution' {
             $result.SessionRoot | Should -BeExactly 'C:/repo-wt/session'
             , $result.Candidates | Should -BeOfType [string[]]
             $result.Detail | Should -Not -BeNullOrEmpty
-            if ($Status -eq 'Ambiguous') { $result.ReasonCode | Should -BeExactly 'TARGET_WORKTREE_AMBIGUOUS' } else { $result.ReasonCode | Should -BeNullOrEmpty }
+            if ($Status -eq 'Ambiguous') { $result.ReasonCode | Should -BeExactly 'TARGET_WORKTREE_AMBIGUOUS' } elseif ($Status -eq 'NoTarget') { $result.ReasonCode | Should -BeExactly 'TARGET_WORKTREE_NOT_DERIVABLE' } else { $result.ReasonCode | Should -BeNullOrEmpty }
             if ($Resolved) { $result.WorktreeRoot | Should -Not -BeNullOrEmpty } else { $result.WorktreeRoot | Should -BeNullOrEmpty }
             if ($Status -eq 'NoTarget') {
                 $result.Signal | Should -BeNullOrEmpty
@@ -302,7 +302,9 @@ Describe 'WorktreeTargetResolution' {
             $result.Signal | Should -BeNullOrEmpty
             $result.SignalValue | Should -BeNullOrEmpty
             $result.WorktreeRoot | Should -BeNullOrEmpty
-            $result.ReasonCode | Should -BeNullOrEmpty
+            # Issue #687: NoTarget now carries its own code, so a gate can name the state
+            # instead of silently substituting the session root.
+            $result.ReasonCode | Should -BeExactly 'TARGET_WORKTREE_NOT_DERIVABLE'
             , $result.Candidates | Should -BeOfType [string[]]
             $result.Candidates.Count | Should -Be 0
             Should -Invoke -CommandName Get-WorktreeResolutionGitEntryKind -ModuleName 'WorktreeResolution' -Times 0 -Exactly
@@ -319,7 +321,9 @@ Describe 'WorktreeTargetResolution' {
             # Assert: both fields separate the two unresolved states.
             $noTarget.Status | Should -Not -Be $ambiguous.Status
             $noTarget.ReasonCode | Should -Not -Be $ambiguous.ReasonCode
-            (& $classify $noTarget) | Should -BeExactly 'fallback'
+            # Issue #687 changed this row: NoTarget is a deny state now, not a session-root fallback.
+            (& $classify $noTarget) | Should -BeExactly 'deny'
+            $noTarget.ReasonCode | Should -BeExactly 'TARGET_WORKTREE_NOT_DERIVABLE'
             (& $classify $ambiguous) | Should -BeExactly 'deny'
         }
 

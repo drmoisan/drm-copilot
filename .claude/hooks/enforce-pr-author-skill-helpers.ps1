@@ -30,6 +30,81 @@ param()
 # so this file keeps working when a test dot-sources it directly.
 . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
 . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+# Worktree target resolution (issue #687). The checkpoint this gate validates must belong to
+# the item the call is about. Reading a session-root-relative path made that the item whose
+# worktree happened to occupy the session root, so in a parallel or epic topology the gate
+# could return allow on the strength of a sibling item's state -- a false green, which is
+# worse than a false denial because it reports success for a lifecycle it never checked.
+Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeResolution.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTargetResolution.psm1') -Force -ErrorAction Stop
+
+function Resolve-PrAuthorWorktreeTarget {
+    <#
+    .SYNOPSIS
+        Resolve the call's target worktree. Tests mock this function (resolution seam).
+    .DESCRIPTION
+        A seam rather than a direct call because Resolve-WorktreeCallTarget reads real git
+        state: the worktree list, each registration's branch, and the filesystem. A test
+        that drove it directly would depend on the machine's live worktrees and would pass
+        or fail according to what other sessions happen to have checked out, which the
+        repository's determinism policy forbids. Mocking here lets a test state the
+        resolution outcome it is exercising and nothing else.
+    .OUTPUTS
+        The target result object from Resolve-WorktreeCallTarget.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string] $CommandText
+    )
+
+    return (Resolve-WorktreeCallTarget -Text $CommandText -SessionRoot (Get-Location).Path)
+}
+
+function Get-PrAuthorTargetCheckpointResolution {
+    <#
+    .SYNOPSIS
+        Resolve the checkpoint path this call must be validated against.
+    .DESCRIPTION
+        Derives the target worktree from the command text and maps the four resolution
+        states onto a checkpoint path or a deny reason:
+
+          SessionRoot   -> the session-root-relative path, exactly as before.
+          OtherWorktree -> that worktree's own checkpoint.
+          NoTarget      -> deny, naming TARGET_WORKTREE_NOT_DERIVABLE. pr-author passes
+                           --head on every gh pr create, so a call reaching here omitted
+                           the explicit target; the remedy is to supply it, never to fall
+                           back to whichever checkpoint occupies the session root.
+          Ambiguous     -> deny, naming TARGET_WORKTREE_AMBIGUOUS.
+
+        Returning a deny for the two unresolved states is what keeps the gate honest: it
+        refuses to answer rather than answering from unrelated state.
+    .OUTPUTS
+        System.Collections.Specialized.OrderedDictionary with CheckpointPath and Reason.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $CommandText
+    )
+
+    $target = Resolve-PrAuthorWorktreeTarget -CommandText $CommandText
+
+    switch ($target.Status) {
+        'SessionRoot' {
+            return [ordered]@{ CheckpointPath = $script:OrchestratorStateCheckpointPath; Reason = $null }
+        }
+        'OtherWorktree' {
+            $path = Join-WorktreeResolutionPath -WorktreeRoot $target.WorktreeRoot -RepoRelativePath $script:OrchestratorStateCheckpointPath
+            return [ordered]@{ CheckpointPath = $path; Reason = $null }
+        }
+        default {
+            $reason = "$($target.ReasonCode): $($target.Detail) The pr-author gate will not validate this call against the session root's checkpoint, because that checkpoint may belong to a different item. Pass --head <branch> on the gh pr create command so the call names its own target."
+            return [ordered]@{ CheckpointPath = $null; Reason = $reason }
+        }
+    }
+}
 
 function Test-PrAuthorReceiptVerification {
     <#
@@ -237,10 +312,15 @@ function Get-PrAuthorBypassReason {
     # Orchestrator-state preflight: runs inside this same PreToolUse hook (so it cannot be
     # bypassed by invoking gh pr create/edit directly) before receipt verification.
     if ($hasBodyFile -and $ContextExists) {
-        $preflightResult = Invoke-OrchestratorStatePreflight -CheckpointPath $script:OrchestratorStateCheckpointPath
+        $resolution = Get-PrAuthorTargetCheckpointResolution -CommandText $CommandText
+        if ($resolution.Reason) {
+            return $resolution.Reason
+        }
+        $checkpointPath = $resolution.CheckpointPath
+        $preflightResult = Invoke-OrchestratorStatePreflight -CheckpointPath $checkpointPath
         if ($preflightResult.HasErrors) {
             $preflightSummary = if ([string]::IsNullOrWhiteSpace($preflightResult.ErrorText)) {
-                "checkpoint missing at $script:OrchestratorStateCheckpointPath"
+                "checkpoint missing at $checkpointPath"
             } else {
                 $preflightResult.ErrorText
             }

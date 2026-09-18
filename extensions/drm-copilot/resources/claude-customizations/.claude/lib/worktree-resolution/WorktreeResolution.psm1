@@ -53,6 +53,10 @@ $script:MaximumAscentDepth = 64
 # The single cause code emitted when the correct target cannot be identified. It
 # carries no _BLOCKED suffix because this module owns no gate.
 $script:AmbiguityReasonCode = 'TARGET_WORKTREE_AMBIGUOUS'
+# The no-target reason code (issue #687). Without it a NoTarget result carried nothing a gate
+# could emit, leaving only wrong options: substitute the session root, which in a parallel or
+# epic topology is a sibling item's state, or deny without naming why.
+$script:NoTargetReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'
 
 function Get-WorktreeResolutionGitEntryKind {
     <#
@@ -468,6 +472,21 @@ function Get-WorktreeResolutionAmbiguityReasonCode {
     return $script:AmbiguityReasonCode
 }
 
+function Get-WorktreeResolutionNoTargetReasonCode {
+    <#
+    .SYNOPSIS
+        Return the no-target reason code, TARGET_WORKTREE_NOT_DERIVABLE, so callers never restate it.
+    .DESCRIPTION
+        Distinct from the ambiguity code: that means signals disagreed, this means the
+        payload carried no signal at all, and a gate reports a different remedy for each.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param()
+
+    return $script:NoTargetReasonCode
+}
+
 Export-ModuleMember -Function `
     Get-WorktreeResolutionGitEntryKind, `
     Get-WorktreeResolutionGitFileText, `
@@ -477,4 +496,5 @@ Export-ModuleMember -Function `
     Find-WorktreeResolutionRoot, `
     Get-WorktreeResolutionWorktreeRoot, `
     ConvertTo-WorktreeResolutionRepoRelativePath, `
-    Get-WorktreeResolutionAmbiguityReasonCode
+    Get-WorktreeResolutionAmbiguityReasonCode, `
+    Get-WorktreeResolutionNoTargetReasonCode
