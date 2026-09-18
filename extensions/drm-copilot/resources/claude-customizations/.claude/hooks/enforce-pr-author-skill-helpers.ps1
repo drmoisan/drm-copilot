@@ -83,6 +83,7 @@ function Get-PrAuthorTargetCheckpointResolution {
         System.Collections.Specialized.OrderedDictionary with CheckpointPath and Reason.
     #>
     [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [Parameter(Mandatory)]
         [string] $CommandText
