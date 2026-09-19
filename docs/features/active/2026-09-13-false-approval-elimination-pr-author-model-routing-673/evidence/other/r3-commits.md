@@ -136,3 +136,49 @@ Commit SHA: `8e41bcc1290d7f40e60a4a976fcbc7493938c8a7` — 15 files changed, 110
 - `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.IdentityResolution.Tests.ps1`
 
 Porcelain (post-commit, pre-append): empty — the command produced no output and therefore lists no path at all.
+
+---
+
+## Commit 6 — Phases 10 and 11 (`[P11-T10]`)
+
+Commands:
+
+```
+git add docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673 docs/features/active/2026-09-13-prd-feature-gate-target-resolution-672/spec.md
+git commit -F <SCRATCHPAD>/r3-msg-p10.txt
+git add <the six test files the pass-1 analyzer fixes changed>
+git commit --amend -F <SCRATCHPAD>/r3-msg-p10.txt
+git status --porcelain
+git rev-list --reverse b7c1161655b4b53b0358dc7890a26200207c4b91..HEAD
+git log --reverse --format=%H b7c1161655b4b53b0358dc7890a26200207c4b91..HEAD -- .claude/hooks
+```
+
+Gate response: none. Every command returned exit code 0 and no gate reason was emitted.
+
+Commit SHA: `c66d021866ec457e32a0dc77ca7f1ff68cd413ad` — 30 files changed, 1178 insertions, 72 deletions.
+
+The amend is recorded rather than hidden. The first commit staged only the two feature folders and so omitted the six test files the pass-1 analyzer fixes had changed: `WorktreeResolutionFixture.Helpers.ps1`, the three matrix and identity suites, the prd target-resolution suite, and the identity module's suite. `[P11-T10]` requires every file changed during Phases 10 and 11, so the six were staged and the commit amended rather than a seventh commit added, which keeps the phase to the one commit the plan describes. None of the six is mirrored, so the eleven hash pairs `[P11-T7]` recorded are unaffected; that gate ran after the fixes in any case.
+
+Porcelain (post-commit, pre-append): empty — the command produced no output and therefore lists no path at all.
+
+## Commit ordering for AC-3
+
+`git rev-list --reverse <F5_BASE_SHA>..HEAD`, positions 1 to 8:
+
+| Position | Commit |
+| --- | --- |
+| 1 | `59b08af5805abaed61f32b14f9f82f8ff58e0a13` |
+| 2 | `c50f82c2c45865f3de57ed49ec622b4c301d46b9` |
+| 3 | `2f712ce4427069e21a860ca302cc2dad350c946b` |
+| 4 | `38e74edcefa082a0244c3bbf9eebc23d75be1495` |
+| 5 | `1329b43ea0728846ebc533ef37a2d68bbee6eb41` |
+| 6 | `1cc18bec1d0b2c44e0441182b4b3f3003fe08f4b` |
+| 7 | `8e41bcc1290d7f40e60a4a976fcbc7493938c8a7` |
+| 8 | `c66d021866ec457e32a0dc77ca7f1ff68cd413ad` |
+
+`git log --reverse --format=%H <F5_BASE_SHA>..HEAD -- .claude/hooks` returns two commits: `1329b43ea0728846ebc533ef37a2d68bbee6eb41` and `8e41bcc1290d7f40e60a4a976fcbc7493938c8a7`. The **first** of them is at position **5**.
+
+`EVIDENCE_COMMIT` from `[P0-T4]` is `59b08af5805abaed61f32b14f9f82f8ff58e0a13`, at position **1**.
+
+**AC-3 holds: position 1 is lower than position 5.** The reproduction evidence was committed four commits before any hook file was touched, so the defect was recorded as observed before any code changed rather than reconstructed afterwards.
+
