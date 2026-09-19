@@ -27,6 +27,7 @@ BeforeAll {
     $script:ExpectedPaths = @(
         '.claude/lib/worktree-resolution/WorktreeResolution.psm1'
         '.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1'
+        '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
     )
 }
 
@@ -34,6 +35,7 @@ Describe 'WorktreeResolution core.json manifest membership' {
     It 'lists <_> in core.json paths' -ForEach @(
         '.claude/lib/worktree-resolution/WorktreeResolution.psm1'
         '.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1'
+        '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
     ) {
         # Arrange: the manifest paths array.
         $paths = @($script:Manifest.paths)
@@ -45,6 +47,7 @@ Describe 'WorktreeResolution core.json manifest membership' {
     It 'lists <_> exactly once' -ForEach @(
         '.claude/lib/worktree-resolution/WorktreeResolution.psm1'
         '.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1'
+        '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
     ) {
         # Arrange / Act: count exact string-equality survivors.
         $expected = $_
@@ -72,6 +75,7 @@ Describe 'WorktreeResolution bundle mirror byte identity' {
     It 'mirrors <_> byte-identically into the bundle' -ForEach @(
         '.claude/lib/worktree-resolution/WorktreeResolution.psm1'
         '.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1'
+        '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
     ) {
         # Arrange: the repo-side file and its bundle counterpart.
         $repoFile = Join-Path $script:RepoRoot $_

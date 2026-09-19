@@ -64,7 +64,9 @@ The residual consequence is bounded and is handed to `[P3-T1]`: writing a fixtur
 
 ## `[P3-T1]` interception record
 
-No interception has occurred yet; `[P3-T1]` has not run. This section is appended to by that task.
+Appended by `[P3-T1]` on 2026-09-19T18-14. **No PreToolUse interception occurred.** The eighteen fixture files were created by a `pwsh -NoProfile -File` process invoking `[System.IO.File]::WriteAllText`, not through a Write or Edit tool, so the checkpoint-monotonic gate — a PreToolUse hook on those tools — was never consulted. Nothing needed resolving.
+
+The gate's substantive safety was verified independently rather than left to the fact that it was bypassed: `[P3-T2]` ran `Invoke-OrchestratorStatePreflight` against every `pr-author/` checkpoint and confirmed the three that must pass do pass, which requires the `completed_steps` order this section predicted would satisfy the monotonic gate's two deny conditions.
 
 COLLISION_BLOCKS_FIXTURES: NO
 

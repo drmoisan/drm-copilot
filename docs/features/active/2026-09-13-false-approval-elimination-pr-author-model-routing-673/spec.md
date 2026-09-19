@@ -452,6 +452,7 @@ one condition — the same "second implementation that drifts" failure this epic
 | `<AMBIGUITY_REASON_CODE>` literal value returned by that accessor | `TARGET_WORKTREE_AMBIGUOUS` | `.claude/lib/worktree-resolution/WorktreeResolution.psm1:55`, returned at `:472` |
 | `<NO_TARGET_REASON_CODE>` accessor function name | `Get-WorktreeResolutionNoTargetReasonCode` | `.claude/lib/worktree-resolution/WorktreeResolution.psm1:475`, exported at `:500` |
 | `<NO_TARGET_REASON_CODE>` literal value returned by that accessor | `TARGET_WORKTREE_NOT_DERIVABLE` | `.claude/lib/worktree-resolution/WorktreeResolution.psm1:59`, returned at `:487` |
+| `<TARGET_DERIVATION>` identity form (Revision 0.5) | `Resolve-WorktreeItemTarget` | `.claude/lib/worktree-resolution/WorktreeItemResolution.psm1:337`, exported at `:392` |
 
 The filled table, together with the F1 source lines it was read from, is archived under
 `evidence/other/` as the record that the binding was performed against merged source rather than

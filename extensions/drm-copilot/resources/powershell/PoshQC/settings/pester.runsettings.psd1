@@ -293,6 +293,8 @@
             # Registered here beside the other .claude/lib modules.
             '.claude/lib/worktree-resolution/WorktreeResolution.psm1'
             '.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1'
+            # Issue #673 added the identity-resolution module, registered for the same reason.
+            '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

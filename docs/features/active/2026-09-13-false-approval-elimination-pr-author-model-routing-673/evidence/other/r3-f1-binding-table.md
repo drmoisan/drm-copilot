@@ -91,3 +91,18 @@ Five of the six pre-existing rows carried citations that #687 invalidated by mov
 The sibling-import citation `WorktreeTargetResolution.psm1:27` was already correct and is unchanged.
 
 Output Summary: The spec's binding table now carries eight rows, none containing `_unbound_`, and every citation resolves against the current tree. Sixteen source lines are quoted, one per citation, each containing the identifier its row names. Five of the six pre-existing rows had citations that #687 had invalidated; all five are corrected and the corrections are tabulated. Two rows are new in this revision and bind the no-target reason code that #687 added, which the pre-#687 spec had no row for. A ninth row is appended by `[P2-T7]` once `Resolve-WorktreeItemTarget` exists.
+
+---
+
+## Row 9 — `<TARGET_DERIVATION>` identity form (Revision 0.5): `Resolve-WorktreeItemTarget`
+
+Appended by `[P2-T7]` once the function existed. Timestamp: 2026-09-19T18-10. Command: `sed -n '337p;392p' .claude/lib/worktree-resolution/WorktreeItemResolution.psm1`. EXIT_CODE: 0.
+
+```
+.claude/lib/worktree-resolution/WorktreeItemResolution.psm1:337|function Resolve-WorktreeItemTarget {
+.claude/lib/worktree-resolution/WorktreeItemResolution.psm1:392|    Resolve-WorktreeItemTarget
+```
+
+Both quoted lines contain `Resolve-WorktreeItemTarget`, the identifier this row names: the first is its definition and the second its entry in the module's single `Export-ModuleMember -Function` statement. The spec's binding table now carries nine rows.
+
+This row does not replace row 3. Row 3 binds `Resolve-WorktreeCallTarget`, F1's path-signal derivation, which remains in the tree unmodified and, after Phase 9, is called by none of the four gates this plan touches, though its own suite still exercises it; row 9 binds the identity form this feature adds beside it. Recording both is what makes AC-24's claim checkable, that no hook file defines any derivation of its own.
