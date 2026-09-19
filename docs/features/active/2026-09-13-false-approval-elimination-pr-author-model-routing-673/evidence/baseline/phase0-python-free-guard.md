@@ -2,12 +2,12 @@
 
 Timestamp: 2026-09-17T10-38
 
-Command: sh "C:/Users/DanMoisan/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/p0t9.sh"
+Command: sh "<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/p0t9.sh"
 (route a-prime per `execution-route.md`). The PowerShell body:
 ```
-Set-Location -LiteralPath 'C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe'
+Set-Location -LiteralPath '<WORKTREE_ROOT>'
 Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force
-Invoke-PoshQCTest -Root 'C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe' -ScanFolders tests/scripts/claude-runtime -SettingsPath scripts/powershell/PoshQC/settings/pester.runsettings.psd1
+Invoke-PoshQCTest -Root '<WORKTREE_ROOT>' -ScanFolders tests/scripts/claude-runtime -SettingsPath scripts/powershell/PoshQC/settings/pester.runsettings.psd1
 ```
 
 EXIT_CODE: 0
@@ -26,7 +26,7 @@ Read from `artifacts/pester/pester-junit.xml` immediately after this task's own 
 - Report last-write time: 2026-09-17T10:39:04 (at or after this artifact's Timestamp)
 - Scoped run root totals: tests=64, failures=0, disabled=0 across 6 `testsuite` elements
 - `testsuite` whose `name` attribute ends with `enforcement-hooks-no-python-invocation.Tests.ps1`
-  (name: `C:\Users\DanMoisan\repos\drm-copilot\.claude\worktrees\agent-a4da10d770a658efe\tests\scripts\claude-runtime\enforcement-hooks-no-python-invocation.Tests.ps1`):
+  (name: `<WORKTREE_ROOT>\tests\scripts\claude-runtime\enforcement-hooks-no-python-invocation.Tests.ps1`):
   - `tests` = 27
   - `failures` = 0
   - `skipped` = 0

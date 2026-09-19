@@ -2,7 +2,7 @@
 
 Timestamp: 2026-09-17T11-48
 
-Command: `sh ".../scratchpad/f673-exec/p3gen.sh"` (route a-prime per `evidence/baseline/execution-route.md`), which runs `p3gen.ps1`. That script imports both F1 modules and calls `Resolve-WorktreeCallTarget -Text <decoded payload text> -SessionRoot "C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe"` once per sample.
+Command: `sh ".../scratchpad/f673-exec/p3gen.sh"` (route a-prime per `evidence/baseline/execution-route.md`), which runs `p3gen.ps1`. That script imports both F1 modules and calls `Resolve-WorktreeCallTarget -Text <decoded payload text> -SessionRoot "<WORKTREE_ROOT>"` once per sample.
 
 EXIT_CODE: 0
 
@@ -86,7 +86,7 @@ Output Summary: **0 of 62** samples derived a target. **62 of 62** did not. The 
 Every `NoTarget` row carries the same detail clause, quoted once here rather than 61 times:
 
 ```
-the call names no feature folder, file path, or branch, so it has no target and the session root 'C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe' applies
+the call names no feature folder, file path, or branch, so it has no target and the session root '<WORKTREE_ROOT>' applies
 ```
 
 - `A5-prd-feature` (**Ambiguous**): feature folder token 'docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673' matched 12 candidate worktrees; supply an absolute path inside exactly one worktree to disambiguate

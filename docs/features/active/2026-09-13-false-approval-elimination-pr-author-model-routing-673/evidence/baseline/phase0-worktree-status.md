@@ -2,7 +2,7 @@
 
 Timestamp: 2026-09-17T10-29
 
-Command: git -C C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe status --porcelain
+Command: git -C <WORKTREE_ROOT> status --porcelain
 
 EXIT_CODE: 0
 

@@ -2,13 +2,13 @@
 
 Timestamp: 2026-09-17T11-37
 
-Command: `sh "C:/Users/DanMoisan/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/p2t2.sh"`
+Command: `sh "<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/p2t2.sh"`
 (route a-prime per `evidence/baseline/execution-route.md`). The PowerShell body invoked by that script:
 
 ```
-Set-Location -LiteralPath 'C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe'
+Set-Location -LiteralPath '<WORKTREE_ROOT>'
 Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force
-Invoke-PoshQCTest -Root 'C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe' -ScanFolders 'tests/scripts/claude-lib' -SettingsPath 'scripts/powershell/PoshQC/settings/pester.runsettings.psd1'
+Invoke-PoshQCTest -Root '<WORKTREE_ROOT>' -ScanFolders 'tests/scripts/claude-lib' -SettingsPath 'scripts/powershell/PoshQC/settings/pester.runsettings.psd1'
 ```
 
 EXIT_CODE: 0
@@ -61,7 +61,7 @@ Surrounding `core.json` lines, confirming both entries sit inside the `paths` ar
 - Report last-write time: `2026-09-17T11:38:16`
 - Matching `testsuite` element count: 1
 - `testsuite` `name` attribute (absolute, backslash-separated container path):
-  `C:\Users\DanMoisan\repos\drm-copilot\.claude\worktrees\agent-a4da10d770a658efe\tests\scripts\claude-lib\worktree-resolution\WorktreeResolution.Manifest.Tests.ps1`
+  `<WORKTREE_ROOT>\tests\scripts\claude-lib\worktree-resolution\WorktreeResolution.Manifest.Tests.ps1`
 - `tests` = 7
 - `failures` = 0
 - `skipped` = 0

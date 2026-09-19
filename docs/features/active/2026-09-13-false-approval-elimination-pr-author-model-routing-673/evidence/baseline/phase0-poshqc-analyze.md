@@ -2,12 +2,12 @@
 
 Timestamp: 2026-09-17T10-31
 
-Command: sh "C:/Users/DanMoisan/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/p0t6.sh"
-(route a-prime per `execution-route.md`; the script sets the working directory to the workspace root and launches `"/c/Program Files/PowerShell/7/pwsh.exe" -NoProfile -File .../f673-exec/p0t6.ps1`). The PowerShell body, in order:
+Command: sh "<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/p0t6.sh"
+(route a-prime per `execution-route.md`; the script sets the working directory to the workspace root and launches `"<PROGRAM_FILES>/PowerShell/7/pwsh.exe" -NoProfile -File .../f673-exec/p0t6.ps1`). The PowerShell body, in order:
 ```
-Set-Location -LiteralPath 'C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe'
+Set-Location -LiteralPath '<WORKTREE_ROOT>'
 Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force
-$files = @(Get-PoshQCFileList -Root 'C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe' | Where-Object { $_.Extension -in '.ps1', '.psm1' })
+$files = @(Get-PoshQCFileList -Root '<WORKTREE_ROOT>' | Where-Object { $_.Extension -in '.ps1', '.psm1' })
 foreach ($file in $files) { $records += @(Invoke-ScriptAnalyzer -Path $file.FullName -Settings scripts/powershell/PoshQC/settings/pssa.settings.psd1 -Severity Error, Warning, Information -ErrorAction Stop) }
 # counts derived by grouping $records on Severity; per-file records matched on full ScriptPath
 ```
@@ -37,7 +37,7 @@ directory above it.
 
 Verbatim script output:
 ```
-Location: C:\Users\DanMoisan\repos\drm-copilot\.claude\worktrees\agent-a4da10d770a658efe
+Location: <WORKTREE_ROOT>
 PSScriptAnalyzerVersion: 1.25.0
 ScannedFileCount: 484
 TotalRecordCount: 0

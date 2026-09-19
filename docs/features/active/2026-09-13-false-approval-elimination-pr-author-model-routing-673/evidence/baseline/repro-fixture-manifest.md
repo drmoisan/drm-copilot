@@ -2,8 +2,8 @@
 
 Timestamp: 2026-09-17T10-40
 
-Command: sh "C:/Users/DanMoisan/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/p1t2.sh"
-(route a-prime; the script launches `"/c/Program Files/PowerShell/7/pwsh.exe" -NoProfile -File .../f673-exec/p1t2.ps1`)
+Command: sh "<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/p1t2.sh"
+(route a-prime; the script launches `"<PROGRAM_FILES>/PowerShell/7/pwsh.exe" -NoProfile -File .../f673-exec/p1t2.ps1`)
 
 EXIT_CODE: 0
 
@@ -14,8 +14,8 @@ directory is empty (entry count 0).
 
 ## Fixture roots (absolute paths)
 
-- Session root: `C:\Users\DanMoisan\AppData\Local\Temp\claude\C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30\edea1a9d-6671-4ea6-8e13-6405d6284a83\scratchpad\f673-exec\repro\session-root`
-- Item worktree: `C:\Users\DanMoisan\AppData\Local\Temp\claude\C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30\edea1a9d-6671-4ea6-8e13-6405d6284a83\scratchpad\f673-exec\repro\item-worktree`
+- Session root: `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30\edea1a9d-6671-4ea6-8e13-6405d6284a83\scratchpad\f673-exec\repro\session-root`
+- Item worktree: `<HOME>\AppData\Local\Temp\claude\C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30\edea1a9d-6671-4ea6-8e13-6405d6284a83\scratchpad\f673-exec\repro\item-worktree`
 
 ## Layout
 

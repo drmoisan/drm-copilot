@@ -3,9 +3,9 @@
 Timestamp: 2026-09-17T10-44
 
 Command: git add docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673/evidence
-then: git commit -F "C:/Users/DanMoisan/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/commitmsg.txt"
+then: git commit -F "<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/commitmsg.txt"
 then: git add docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673/evidence
-and:  git commit --amend -F "C:/Users/DanMoisan/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/commitmsg.txt"
+and:  git commit --amend -F "<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/commitmsg.txt"
 (the amend folds this artifact, which can only be written after the first commit's observations exist, into the same single commit so that no evidence path is left unstaged)
 
 EXIT_CODE: 0
@@ -20,7 +20,7 @@ under the feature's `evidence/` directory. No path under `.claude/hooks/` appear
 git add docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673/evidence
 ```
 
-Issued from the workspace root `C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe`.
+Issued from the workspace root `<WORKTREE_ROOT>`.
 The line carries a single repo-relative pathspec operand, no leading colon, no parent-directory segment, no
 rooted or drive-letter spelling, balanced quoting, and none of the four unresolvable characters listed at
 `.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1:33` (dollar sign, backtick,

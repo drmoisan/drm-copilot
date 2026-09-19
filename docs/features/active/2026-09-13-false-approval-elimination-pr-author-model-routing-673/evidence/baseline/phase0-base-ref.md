@@ -14,7 +14,7 @@ not the authoring agent's throwaway branch.
 
 F5_BASE_SHA: d039e89b2b2569151e9170e1bbefb9f974419f87
 F5_BRANCH: feature/2026-09-13-false-approval-elimination-pr-author-model-routing-673
-F5_WORKSPACE_ROOT: C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe
+F5_WORKSPACE_ROOT: <WORKTREE_ROOT>
 
 Per-command exit codes:
 - `git rev-parse HEAD` -> 0
@@ -22,7 +22,7 @@ Per-command exit codes:
 - `git diff --stat origin/epic/worktree-scoped-state-resolution-integration...HEAD -- ...` -> 0
 - `git rev-parse --show-toplevel` -> 0
 
-Plan file presence check: `C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe/docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673/plan.2026-09-13T20-48.md`
+Plan file presence check: `<WORKTREE_ROOT>/docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673/plan.2026-09-13T20-48.md`
 exists (read at task start; `git hash-object` of the unmodified file was 96e118d5f39c91c1ebd0907c41e5a64f7a8ef58c).
 
 Pre-Change Diff:

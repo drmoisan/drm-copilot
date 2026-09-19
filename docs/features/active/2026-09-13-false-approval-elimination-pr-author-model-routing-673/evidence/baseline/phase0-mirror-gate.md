@@ -3,7 +3,7 @@
 Timestamp: 2026-09-17T10-33
 
 Command: poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts -q
-(run from the workspace root C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe)
+(run from the workspace root <WORKTREE_ROOT>)
 
 EXIT_CODE: 0
 

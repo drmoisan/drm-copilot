@@ -2,13 +2,13 @@
 
 Timestamp: 2026-09-17T10-33
 
-Command: sh "C:/Users/DanMoisan/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/p0t7.sh"
+Command: sh "<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/p0t7.sh"
 (route a-prime per `execution-route.md`; working directory set to the workspace root, then
-`"/c/Program Files/PowerShell/7/pwsh.exe" -NoProfile -File .../f673-exec/p0t7.ps1`). The PowerShell body:
+`"<PROGRAM_FILES>/PowerShell/7/pwsh.exe" -NoProfile -File .../f673-exec/p0t7.ps1`). The PowerShell body:
 ```
-Set-Location -LiteralPath 'C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe'
+Set-Location -LiteralPath '<WORKTREE_ROOT>'
 Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force
-Invoke-PoshQCTest -Root 'C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe' -SettingsPath 'scripts/powershell/PoshQC/settings/pester.runsettings.psd1'
+Invoke-PoshQCTest -Root '<WORKTREE_ROOT>' -SettingsPath 'scripts/powershell/PoshQC/settings/pester.runsettings.psd1'
 ```
 
 EXIT_CODE: 2 (the runsettings sets `Run.Exit = $true`, so the child exits with the failed-test count; two
@@ -16,7 +16,7 @@ pre-existing failures are recorded below)
 
 ## Resolved settings file
 
-- Resolved path: `C:\Users\DanMoisan\repos\drm-copilot\.claude\worktrees\agent-a4da10d770a658efe\scripts\powershell\PoshQC\settings\pester.runsettings.psd1`
+- Resolved path: `<WORKTREE_ROOT>\scripts\powershell\PoshQC\settings\pester.runsettings.psd1`
 - Resolved settings file line count: **302** (`(Get-Content -LiteralPath ...).Count`)
 
 The plan's [P0-T7] acceptance condition requires this count to be 293. The measured value is 302, and the
@@ -50,7 +50,7 @@ Output Summary:
   - `.claude/hooks/enforce-model-routing-receipt.ps1`: covered 38, missed 3 -> **92.68%**
   The four `sourcefile` elements were matched by base filename inside the single `package` element whose
   `name` attribute ends with `.claude/hooks`
-  (`C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe/.claude/hooks`).
+  (`<WORKTREE_ROOT>/.claude/hooks`).
 
 ## Pre-existing failures at baseline (2)
 

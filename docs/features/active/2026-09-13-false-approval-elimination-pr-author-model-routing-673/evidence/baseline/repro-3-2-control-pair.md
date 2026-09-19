@@ -2,14 +2,14 @@
 
 Timestamp: 2026-09-17T10-41
 
-Command: sh "C:/Users/DanMoisan/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/p1t3.sh"
+Command: sh "<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/p1t3.sh"
 
 EXIT_CODE: 0 (both hook runs exited 0; the wrapper script completed without error)
 
 Execution route: **a-prime**, identical to the value recorded on the `ROUTE_SELECTED:` line of
 `execution-route.md`. The hook is launched by absolute script path with `-File`, not dot-sourced, so its
 entry point executes:
-`"/c/Program Files/PowerShell/7/pwsh.exe" -NoProfile -File "C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe/.claude/hooks/enforce-pr-author-skill.ps1"`.
+`"<PROGRAM_FILES>/PowerShell/7/pwsh.exe" -NoProfile -File "<WORKTREE_ROOT>/.claude/hooks/enforce-pr-author-skill.ps1"`.
 
 ## Transport
 
@@ -23,7 +23,7 @@ transports are empty and the variable is the source actually read.
 Verbatim variable assignment as issued:
 ```sh
 unset CLAUDE_HOOK_INPUT
-CLAUDE_TOOL_INPUT='{"tool_name":"Bash","tool_input":{"command":"cd C:/Users/DanMoisan/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/repro/item-worktree && gh pr create --title \"B\" --body-file artifacts/pr_body_1.md"}}'
+CLAUDE_TOOL_INPUT='{"tool_name":"Bash","tool_input":{"command":"cd <HOME>/AppData/Local/Temp/claude/C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/repro/item-worktree && gh pr create --title \"B\" --body-file artifacts/pr_body_1.md"}}'
 export CLAUDE_TOOL_INPUT
 ```
 
@@ -31,7 +31,7 @@ The identical payload was used for both runs; only the process working directory
 
 ## Run 1 — working directory = fixture session-root
 
-Working directory: `/c/Users/DanMoisan/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/repro/session-root`
+Working directory: `<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/repro/session-root`
 
 Decision JSON (verbatim stdout):
 ```
@@ -52,7 +52,7 @@ stderr (verbatim):
 
 ## Run 2 — working directory = fixture item-worktree
 
-Working directory: `/c/Users/DanMoisan/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/repro/item-worktree`
+Working directory: `<HOME>/AppData/Local/Temp/claude/C--Users-<USER>-repos-drm-copilot-wt-2026-09-13T08-30/edea1a9d-6671-4ea6-8e13-6405d6284a83/scratchpad/f673-exec/repro/item-worktree`
 
 Decision JSON (verbatim stdout):
 ```

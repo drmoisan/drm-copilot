@@ -23,7 +23,7 @@ Both searches use `grep -rnF`, a fixed-string search, not a regular expression. 
 | edit literal | **0** |
 
 Both invocations produced no output and exited 1 (no match). The invocations, with the workspace-root
-prefix `C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a4da10d770a658efe/` written as
+prefix `<WORKTREE_ROOT>/` written as
 `<ROOT>/` for readability:
 
 ```
