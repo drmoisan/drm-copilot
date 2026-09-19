@@ -298,6 +298,8 @@ Validate the checkpoint through the
 that same call at the completion gate. The validation is implemented in
 `scripts/dev_tools/validate_epic_orchestrator_state.py`.
 
+**Checkpoint hygiene (issue #673).** The coordinating session never holds a per-feature checkpoint at its own root. Before the first child delegation of a run it moves any `artifacts/orchestration/orchestrator-state.json` at its root to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and writes none there for the rest of the run, because each item's checkpoint lives in that item's worktree. A gated call the coordinator issues on an item's behalf is resolved by the item's issue number and branch, never by the coordinator root.
+
 ## Completion Requirements
 
 `epic-orchestrator` must not report completion until:

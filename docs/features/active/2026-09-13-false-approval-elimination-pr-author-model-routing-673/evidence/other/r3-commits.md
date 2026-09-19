@@ -59,3 +59,29 @@ Commit SHA: `38e74edcefa082a0244c3bbf9eebc23d75be1495` — 40 files changed, 291
 - Paths beginning `.claude/hooks/`: 0. No hook file is touched by this commit, which keeps the AC-3 ordering intact: the reproduction evidence still precedes every hook edit.
 
 Porcelain (post-commit, pre-append): empty — the command produced no output and therefore lists no path at all.
+
+---
+
+## Commit 3 — Phases 5 to 7 (`[P7-T8]`)
+
+Commands:
+
+```
+git add .claude/hooks/enforce-pr-author-skill.ps1 .claude/hooks/enforce-pr-author-skill-helpers.ps1 .claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1 .claude/hooks/enforce-model-routing-receipt.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill-helpers.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-model-routing-receipt.ps1 tests/scripts/claude-hooks/enforce-pr-author-skill.TargetResolution.Tests.ps1 tests/scripts/claude-hooks/enforce-pr-author-skill.epic-base-branch.Tests.ps1 tests/scripts/claude-hooks/enforce-pr-author-skill.epic-base-branch.TriggerScoping.Tests.ps1 tests/scripts/claude-hooks/enforce-model-routing-receipt.Tests.ps1 tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1 tests/scripts/claude-lib/orchestrator-state/OrchestratorState.ValueContract.Tests.ps1 tests/scripts/claude-runtime/enforcement-hooks-checkpoint-path-explicit.Tests.ps1 docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673
+git commit -F <SCRATCHPAD>/r3-msg-p7.txt
+git log -1 --name-only
+git status --porcelain
+```
+
+Gate response: none. Both commands returned exit code 0 and no gate reason was emitted. `git add` printed one advisory warning, that a line-ending normalisation will be applied to one evidence Markdown file on the next touch; that is the repository's `text=auto eol=lf` attribute acting on a file written by a shell heredoc, it is not a gate response, and the committed blob is LF either way.
+
+Commit SHA: `1329b43ea0728846ebc533ef37a2d68bbee6eb41` — 24 files changed, 1180 insertions, 165 deletions.
+
+`git log -1 --name-only` verification:
+
+- `.claude/hooks/enforce-model-routing-receipt.ps1` — listed
+- `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-model-routing-receipt.ps1` — listed
+
+This is the first commit on the branch to touch `.claude/hooks`. The AC-3 ordering therefore holds by construction: the reproduction-evidence commit `59b08af5805abaed61f32b14f9f82f8ff58e0a13` is three commits earlier, and `[P11-T10]` re-checks the ordering by commit position.
+
+Porcelain (post-commit, pre-append): empty — the command produced no output and therefore lists no path at all.

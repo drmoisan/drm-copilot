@@ -51,3 +51,11 @@ Batch contents: test `OrchestratorState.Tests.ps1` and `OrchestratorState.ValueC
 Timestamp: 2026-09-19T18-38. Deleted file names: `powershell-batch-budget.edea1a9d-6671-4ea6-8e13-6405d6284a83.json`. The glob matched one state file, carrying the two slots B4 consumed; the deletion returned exit code 0.
 
 Batch contents: production `enforce-model-routing-receipt.ps1`; test `enforce-model-routing-receipt.Tests.ps1` and `enforcement-hooks-checkpoint-path-explicit.Tests.ps1`. One production and two test files, within the cap.
+
+---
+
+## B6 — Phase 8 (skill contracts: checkpoint hygiene and delegation identity)
+
+Timestamp: 2026-09-19T18-47. Deleted file names: `powershell-batch-budget.edea1a9d-6671-4ea6-8e13-6405d6284a83.json`. The glob matched one state file, carrying the three slots B5 consumed; the deletion returned exit code 0.
+
+Batch contents: test `checkpoint-hygiene-skill-contract.Tests.ps1`. No production PowerShell file: the three skill files are Markdown and the frozen-surface pin is Python, so neither counts against the PowerShell batch budget. One test file, within the cap.

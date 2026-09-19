@@ -67,3 +67,25 @@ Copy-Item -LiteralPath '.claude/hooks/enforce-model-routing-receipt.ps1' -Destin
 ALL_PAIRS_EQUAL: True
 
 One equal pair. The source hash differs from its `[P0-T15]` baseline, which is the expected consequence of the binding-3 edit.
+
+---
+
+## `[P8-T7]` — the three orchestration skills
+
+Timestamp: 2026-09-19T18-54. Commands, with repository-relative paths:
+
+```
+Copy-Item -LiteralPath '.claude/skills/orchestrate/SKILL.md' -Destination 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md' -Force
+Copy-Item -LiteralPath '.claude/skills/parallel-orchestrate/SKILL.md' -Destination 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md' -Force
+Copy-Item -LiteralPath '.claude/skills/epic-orchestrate/SKILL.md' -Destination 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md' -Force
+```
+
+| Source | Source SHA-256 | Mirror SHA-256 | Verdict |
+| --- | --- | --- | --- |
+| `.claude/skills/orchestrate/SKILL.md` | `5ce19ab7c79a4523dc301bf57c70a42c3bdb9384b38a2b28f6934fd69526e7cb` | `5ce19ab7c79a4523dc301bf57c70a42c3bdb9384b38a2b28f6934fd69526e7cb` | equal |
+| `.claude/skills/parallel-orchestrate/SKILL.md` | `1e6551628efb623773fc826b46d0b3549814a0c7f9f454f3d1aef29a270861c5` | `1e6551628efb623773fc826b46d0b3549814a0c7f9f454f3d1aef29a270861c5` | equal |
+| `.claude/skills/epic-orchestrate/SKILL.md` | `cfbe83349e1712275400c4591ab784f966321c37d36982a131aea25736d86db7` | `cfbe83349e1712275400c4591ab784f966321c37d36982a131aea25736d86db7` | equal |
+
+ALL_PAIRS_EQUAL: True
+
+Three equal pairs. The epic skill's source hash is `cfbe83349e1712275400c4591ab784f966321c37d36982a131aea25736d86db7`, the same value `[P8-T5]` wrote into the frozen-surface pin, so the pin, the source, and the mirror all agree on one digest.
