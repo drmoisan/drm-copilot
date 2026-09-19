@@ -59,3 +59,19 @@ Batch contents: production `enforce-model-routing-receipt.ps1`; test `enforce-mo
 Timestamp: 2026-09-19T18-47. Deleted file names: `powershell-batch-budget.edea1a9d-6671-4ea6-8e13-6405d6284a83.json`. The glob matched one state file, carrying the three slots B5 consumed; the deletion returned exit code 0.
 
 Batch contents: test `checkpoint-hygiene-skill-contract.Tests.ps1`. No production PowerShell file: the three skill files are Markdown and the frozen-surface pin is Python, so neither counts against the PowerShell batch budget. One test file, within the cap.
+
+---
+
+## B7 — Phase 9 (prd-feature gate migration, production and the three existing suites)
+
+Timestamp: 2026-09-19T18-58. Deleted file names: `none present`. The glob matched no file, because `[P8-T8]` had already emptied `.claude/state/` while diagnosing the bundle-parity failure. The `rm -f` returned exit code 0.
+
+Batch contents: production `enforce-prd-feature-before-planner.ps1` and `enforce-prd-feature-before-planner-helpers.ps1`; test `enforce-prd-feature-before-planner.TargetResolution.Tests.ps1`, `enforce-prd-feature-before-planner.Tests.ps1`, and `enforce-prd-feature-before-planner.FolderResolution.Tests.ps1`. Two production and three test files, within the cap.
+
+---
+
+## B8 — Phase 9 (the new identity suite and the widened checkpoint-path guard)
+
+Timestamp: 2026-09-19T19-06. Deleted file names: `powershell-batch-budget.edea1a9d-6671-4ea6-8e13-6405d6284a83.json`. The glob matched one state file, carrying the five slots B7 consumed; the deletion returned exit code 0.
+
+Batch contents: test `enforce-prd-feature-before-planner.IdentityResolution.Tests.ps1` and `enforcement-hooks-checkpoint-path-explicit.Tests.ps1`. No production file. Two test files, within the cap.

@@ -89,3 +89,23 @@ Copy-Item -LiteralPath '.claude/skills/epic-orchestrate/SKILL.md' -Destination '
 ALL_PAIRS_EQUAL: True
 
 Three equal pairs. The epic skill's source hash is `cfbe83349e1712275400c4591ab784f966321c37d36982a131aea25736d86db7`, the same value `[P8-T5]` wrote into the frozen-surface pin, so the pin, the source, and the mirror all agree on one digest.
+
+---
+
+## `[P9-T11]` — the two prd-feature gate files
+
+Timestamp: 2026-09-19T19-14. Commands, with repository-relative paths:
+
+```
+Copy-Item -LiteralPath '.claude/hooks/enforce-prd-feature-before-planner.ps1' -Destination 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner.ps1' -Force
+Copy-Item -LiteralPath '.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1' -Destination 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1' -Force
+```
+
+| Source | Source SHA-256 | Mirror SHA-256 | Verdict |
+| --- | --- | --- | --- |
+| `.claude/hooks/enforce-prd-feature-before-planner.ps1` | `ccb550b7883caef0cc19b7d3993d5b8fc547acaa4fc17c7a80fed78a1bf1a6a9` | `ccb550b7883caef0cc19b7d3993d5b8fc547acaa4fc17c7a80fed78a1bf1a6a9` | equal |
+| `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1` | `37bb1308228a44ffdddcecfbc3e939389b04d3ed58b73af3631faa0faf069cf5` | `37bb1308228a44ffdddcecfbc3e939389b04d3ed58b73af3631faa0faf069cf5` | equal |
+
+ALL_PAIRS_EQUAL: True
+
+Two equal pairs. Both source hashes differ from their `[P0-T15]` baseline values, as the design-C migration requires; the mirrors carry the same bytes. These are the two mirrors issue #672's spec lists in its expected diff.

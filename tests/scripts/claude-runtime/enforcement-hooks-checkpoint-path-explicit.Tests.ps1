@@ -105,6 +105,15 @@ Describe 'enforcement hooks supply the checkpoint path explicitly' {
         @($calls | Where-Object { -not $_.HasCheckpointPath }) | Should -BeNullOrEmpty
     }
 
+    It 'every production call to Get-PrdFeatureCheckpointFolder supplies CheckpointPath explicitly' {
+        # Arrange / Act
+        $calls = @(Get-CheckpointCallSite -CommandName 'Get-PrdFeatureCheckpointFolder')
+
+        # Assert
+        $calls.Count | Should -BeGreaterThan 0
+        @($calls | Where-Object { -not $_.HasCheckpointPath }) | Should -BeNullOrEmpty
+    }
+
     It 'the in-scope hook files carry the checkpoint path literal in no string expression' {
         # Arrange: the in-scope hook files, as one array literal so the set can be widened
         # in a single line when another gate joins it.
@@ -113,6 +122,7 @@ Describe 'enforcement hooks supply the checkpoint path explicitly' {
             '.claude/hooks/enforce-pr-author-skill-helpers.ps1'
             '.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1'
             '.claude/hooks/enforce-model-routing-receipt.ps1'
+            '.claude/hooks/enforce-prd-feature-before-planner.ps1'
         )
         $literal = 'orchestrator-state.json'
 

@@ -85,3 +85,29 @@ Commit SHA: `1329b43ea0728846ebc533ef37a2d68bbee6eb41` — 24 files changed, 118
 This is the first commit on the branch to touch `.claude/hooks`. The AC-3 ordering therefore holds by construction: the reproduction-evidence commit `59b08af5805abaed61f32b14f9f82f8ff58e0a13` is three commits earlier, and `[P11-T10]` re-checks the ordering by commit position.
 
 Porcelain (post-commit, pre-append): empty — the command produced no output and therefore lists no path at all.
+
+---
+
+## Commit 4 — Phase 8 (`[P8-T9]`)
+
+Commands:
+
+```
+git add .claude/skills/orchestrate/SKILL.md .claude/skills/parallel-orchestrate/SKILL.md .claude/skills/epic-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1 docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673
+git commit -F <SCRATCHPAD>/r3-msg-p8.txt
+git log -1 --name-only
+git status --porcelain
+```
+
+Gate response: none. Both commands returned exit code 0 and no gate reason was emitted.
+
+Commit SHA: `1cc18bec1d0b2c44e0441182b4b3f3003fe08f4b` — 14 files changed, 348 insertions, 11 deletions.
+
+`git log -1 --name-only` verification:
+
+- `.claude/skills/epic-orchestrate/SKILL.md` — listed
+- `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` — listed
+
+Porcelain (post-commit, pre-append): empty — the command produced no output and therefore lists no path at all.
+
+Note on the untracked state directory: `[P8-T8]` removed two untracked, gitignored files from `.claude/state/` in order to make a pre-existing bundle-parity test measurable. Neither removal appears in this commit or in any porcelain output, because neither file was ever tracked. The directory is now empty and must be empty again when `[P11-T6]` and `[P11-T7]` run.
