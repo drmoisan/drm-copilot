@@ -93,6 +93,7 @@ function New-WorktreeResolutionFixtureTarget {
     .PARAMETER Candidate
         Optional. The candidate roots an ambiguous result carries.
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory wrapper over the shipped target-result constructor; it changes no system state.')]
     [CmdletBinding()]
     [OutputType([pscustomobject])]
     param(

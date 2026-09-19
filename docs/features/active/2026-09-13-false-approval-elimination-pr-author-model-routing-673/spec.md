@@ -818,7 +818,7 @@ line-oriented search for a prose phrase is not an acceptable substitute.
       observation that the verdict is a function of cwd and not of the payload. (If either predicted
       `allow` was not observed, execution halts, no hook file is edited, and this criterion stays
       unchecked with the observed result recorded in the baseline artifact.)
-- [ ] AC-3 The baseline artifact is committed before the first commit that modifies any file under
+- [x] AC-3 The baseline artifact is committed before the first commit that modifies any file under
       `.claude/hooks/`, verifiable from `git log` ordering on the feature branch.
 
 ### The three binding sites
@@ -828,69 +828,69 @@ scope, not deletion of the line. See **Required form of the line-49 change** und
 `#### Functions/classes/CLI commands impacted`. A `$null` initialisation is not a residual
 cwd-relative binding.
 
-- [ ] AC-4 `.claude/hooks/enforce-pr-author-skill.ps1` no longer assigns a relative checkpoint path
+- [x] AC-4 `.claude/hooks/enforce-pr-author-skill.ps1` no longer assigns a relative checkpoint path
       at line 49 or anywhere else; `$script:OrchestratorStateCheckpointPath` holds an absolute path
       produced by the resolution step, or the hook has already emitted the ambiguity deny.
-- [ ] AC-5 `.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1` no longer carries a relative
+- [x] AC-5 `.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1` no longer carries a relative
       default for `-CheckpointPath`; the parameter is mandatory, and the call site at line 78 passes
       the resolved path explicitly.
-- [ ] AC-6 `.claude/hooks/enforce-model-routing-receipt.ps1` no longer carries a relative default for
+- [x] AC-6 `.claude/hooks/enforce-model-routing-receipt.ps1` no longer carries a relative default for
       `-CheckpointPath`; the parameter is mandatory, and the call site at line 157 passes the
       resolved path explicitly.
-- [ ] AC-7 A content search for the token `artifacts/orchestration/orchestrator-state.json` across
+- [x] AC-7 A content search for the token `artifacts/orchestration/orchestrator-state.json` across
       the four in-scope hook files returns zero occurrences in executable code. Occurrences inside
       comment or doc-comment blocks are permitted and must be individually confirmed as such.
-- [ ] AC-8 No code path in the four in-scope hook files falls back to the process working directory
+- [x] AC-8 No code path in the four in-scope hook files falls back to the process working directory
       when the resolution step reports that the target cannot be identified. Verified by reading each
       branch of the resolution step and confirmed by the Pester rows in AC-13.
 
 ### The sibling-only deny (the defining behaviour of this feature)
 
-- [ ] AC-9 A named Pester test in
+- [x] AC-9 A named Pester test in
       `tests/scripts/claude-hooks/enforce-pr-author-skill.WorktreeResolution.Tests.ps1` exercises
       matrix row R2 for the pr-author family against committed fixture roots — sibling checkpoint
       present at the session root, gated item's own checkpoint absent — and asserts a deny carrying
       the ambiguity reason code. The test does not mock the checkpoint reader.
-- [ ] AC-10 A named Pester test in
+- [x] AC-10 A named Pester test in
       `tests/scripts/claude-hooks/enforce-model-routing-receipt.WorktreeResolution.Tests.ps1`
       exercises matrix row R2 for the model-routing family under the same conditions and asserts a
       deny carrying the ambiguity reason code. The test does not mock `Get-ModelRoutingCheckpoint`.
-- [ ] AC-11 A named Pester test per hook family covers matrix row R4 (own and sibling checkpoints
+- [x] AC-11 A named Pester test per hook family covers matrix row R4 (own and sibling checkpoints
       both present) and asserts the decision is derived from the **own** checkpoint. Both tests pass.
-- [ ] AC-12 A failing-before record for AC-9 and AC-10 exists under `evidence/regression-testing/`:
+- [x] AC-12 A failing-before record for AC-9 and AC-10 exists under `evidence/regression-testing/`:
       each test is observed failing against the unmodified hooks and passing against the fixed hooks.
 
 ### Genuine absence stays distinguishable from ambiguity
 
-- [ ] AC-13 Named Pester tests cover matrix rows R5, R8, and R9 (no resolvable target; target outside
+- [x] AC-13 Named Pester tests cover matrix rows R5, R8, and R9 (no resolvable target; target outside
       any worktree; a command naming two different worktrees) for both hook families and assert a
       deny carrying the ambiguity reason code. R9 asserts the ambiguity deny specifically, not a
       first-match resolution.
-- [ ] AC-14 Named Pester tests cover matrix rows R3 and R7 and assert the **existing** reason strings
+- [x] AC-14 Named Pester tests cover matrix rows R3 and R7 and assert the **existing** reason strings
       `ORCHESTRATOR_STATE_PREFLIGHT_FAILED` (pr-author) and `MODEL_ROUTING_RECEIPT_BLOCKED`
       (model-routing), not the ambiguity reason code, for a checkpoint that is present-but-not-ready,
       absent at the resolved target, or present but empty or unparseable.
-- [ ] AC-15 A named Pester test asserts that the ambiguity reason code does not appear in the
+- [x] AC-15 A named Pester test asserts that the ambiguity reason code does not appear in the
       decision output of any genuine-absence case, and that the existing reason strings do not appear
       in the decision output of any ambiguity case.
 
 ### Ordering
 
-- [ ] AC-16 A named Pester test covers matrix row R10 and asserts that a command which is not a gated
+- [x] AC-16 A named Pester test covers matrix row R10 and asserts that a command which is not a gated
       `gh pr` invocation, and a delegation whose `subagent_type` is outside the gated set, are both
       **allowed** even when the target is unresolvable — proving the ambiguity deny sits after the
       scope filter.
-- [ ] AC-17 A named Pester test asserts that an unresolvable target denies with the ambiguity reason
+- [x] AC-17 A named Pester test asserts that an unresolvable target denies with the ambiguity reason
       code without the orchestrator-state preflight (pr-author) or the checkpoint read
       (model-routing) being reached — proving the ambiguity deny sits before them.
 
 ### Standalone and epic topologies unchanged
 
-- [ ] AC-18 A named Pester test covers matrix rows R1 and R6 (cwd = item worktree, own checkpoint
+- [x] AC-18 A named Pester test covers matrix rows R1 and R6 (cwd = item worktree, own checkpoint
       present and satisfactory) and asserts `allow`. It is observed passing against the
       **unmodified** hooks before the fix, and that pre-fix run is archived under
       `evidence/baseline/`.
-- [ ] AC-19 The seven pre-existing regression rows listed under `## Test Strategy` remain present and
+- [x] AC-19 The seven pre-existing regression rows listed under `## Test Strategy` remain present and
       pass unmodified: `enforce-pr-author-skill.OrchestratorStatePreflight.Tests.ps1:26-37`,
       `:39-51`, `:64-102`; `enforce-model-routing-receipt.Tests.ps1:62-68`, `:71-92`, `:20-58`;
       `enforce-pr-author-skill.epic-base-branch.Tests.ps1:22-42`. Any edit to these files is limited
@@ -908,7 +908,7 @@ cwd-relative binding.
       `evidence/regression-testing/` quotes both the pre-edit pin and the post-edit pin verbatim, so
       a reviewer can confirm the substitution supplies the same absent path and is therefore
       equivalent.
-- [ ] AC-20 All six decision branches of `enforce-model-routing-receipt.ps1` enumerated under
+- [x] AC-20 All six decision branches of `enforce-model-routing-receipt.ps1` enumerated under
       `### Boundaries and invariants to preserve` retain their current semantics: the hook still
       performs presence-only gating and reads no `model` field. Verified by the existing
       `enforce-model-routing-receipt.Tests.ps1` suite passing with no assertion weakened or removed.
@@ -922,24 +922,24 @@ cwd-relative binding.
 - [x] AC-22 The BINDING TABLE in this spec has every row filled with a concrete identifier and the
       F1 `file:line` it was read from, and the filled table is archived under `evidence/other/`.
       No row remains `_unbound_`.
-- [ ] AC-23 F5 obtains the ambiguity reason code only by calling F1's exported accessor. A content
+- [x] AC-23 F5 obtains the ambiguity reason code only by calling F1's exported accessor. A content
       search across the whole repository for the literal value recorded in the binding table returns
       occurrences only inside F1's module and inside F1's own tests; it returns **zero** occurrences
       in any file added or modified by F5.
-- [ ] AC-24 F5 defines no target-derivation, path-normalisation, or ambiguity-reason-code
+- [x] AC-24 F5 defines no target-derivation, path-normalisation, or ambiguity-reason-code
       implementation of its own. Verified by reading the F5 change set: every use of the three roles
       is a call into F1's module.
-- [ ] AC-25 Each modified hook imports F1's module unconditionally at script scope using the
+- [x] AC-25 Each modified hook imports F1's module unconditionally at script scope using the
       `Join-Path $PSScriptRoot` idiom, with no `-ErrorAction SilentlyContinue` tolerance on the
       import or on any call in the decision path.
 
 ### Constraints and non-regression
 
-- [ ] AC-26 The mirroring gate
+- [x] AC-26 The mirroring gate
       `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
       passes, so every file modified under `.claude/**` has a content-identical counterpart under
       `extensions/drm-copilot/resources/claude-customizations/.claude/**`.
-- [ ] AC-27 No enforcement hook in the change set invokes Python. A content search across the four
+- [x] AC-27 No enforcement hook in the change set invokes Python. A content search across the four
       in-scope hook files for `python`, `poetry`, `py -3`, and `Start-Process` returns zero
       executable-code occurrences, and issue #475's structural guard test is located, named in the
       change record, and confirmed to cover these four files. That guard is
@@ -949,36 +949,36 @@ cwd-relative binding.
       in-scope files are already covered. Confirming that coverage satisfies this criterion; no
       extension is expected. If an additional assertion is ever required, it must be placed in a new
       sibling test file, because the guard file is measured at exactly 500 lines and has no headroom.
-- [ ] AC-28 `git diff --name-only` for the feature branch against the epic integration branch lists
+- [x] AC-28 `git diff --name-only` for the feature branch against the epic integration branch lists
       none of: `.claude/hooks/hook-command-scanner.ps1`,
       `.claude/hooks/hook-command-invocation.ps1`, `.claude/hooks/enforce-epic-merge-gate.ps1`,
       `.claude/lib/orchestrator-state/OrchestratorState.psm1`,
       `.codex/hooks/enforce-codex-model-routing.ps1`.
-- [ ] AC-29 `.claude/lib/orchestrator-state/OrchestratorState.psm1` is still 499 lines and the
+- [x] AC-29 `.claude/lib/orchestrator-state/OrchestratorState.psm1` is still 499 lines and the
       parameter default at line 427 is still unreached from both hook families; a named Pester test
       asserts that every production call into `Invoke-OrchestratorStatePreflight` supplies
       `-CheckpointPath` explicitly.
-- [ ] AC-30 No file added or modified by F5 exceeds 500 lines, including the new test files and the
+- [x] AC-30 No file added or modified by F5 exceeds 500 lines, including the new test files and the
       bundled mirror copies.
-- [ ] AC-31 Line coverage for the four in-scope hook files is >= 85%, measured through
+- [x] AC-31 Line coverage for the four in-scope hook files is >= 85%, measured through
       `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, with the coverage report archived
       under `evidence/qa-gates/`. No branch-coverage gate applies, because Pester measures no branch
       coverage.
-- [ ] AC-32 No test added by F5 creates a temporary file or directory; all fixture content is
+- [x] AC-32 No test added by F5 creates a temporary file or directory; all fixture content is
       committed under `tests/fixtures/`, and every cwd or environment mutation is restored in a
       `finally` block so the suite is order-independent.
-- [ ] AC-33 The full seven-stage toolchain loop completes with all stages passing in a single pass
+- [x] AC-33 The full seven-stage toolchain loop completes with all stages passing in a single pass
       (formatting, linting, type checking where applicable, architecture-boundary tests, unit tests,
       contract/schema checks, integration tests), with the run archived under `evidence/qa-gates/`.
 
 ### Identity resolution, checkpoint hygiene, prd-feature migration, and host data (Revision 0.5)
 
-- [ ] AC-34 `.claude/skills/orchestrate/SKILL.md` (`## Checkpoint Handling`), `.claude/skills/parallel-orchestrate/SKILL.md` (`## Per-Item Branch and Worktree Lifecycle`), and `.claude/skills/epic-orchestrate/SKILL.md` (`## Epic-Level Checkpoint`) each state the checkpoint-hygiene rule: a per-feature `artifacts/orchestration/orchestrator-state.json` that does not belong to the session's own item is moved to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and a coordinating session writes no per-feature checkpoint at its own root. Verified by the three hygiene tests in `tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1`.
-- [ ] AC-35 `## Issue Number Consistency` in `.claude/skills/orchestrate/SKILL.md` requires the canonical issue number line and a `branch:` label on every delegation to each receipt-gated subagent type returned by `Get-ModelRoutingGatedAgent`, and names both gates that identify the item from the delegation prompt. Verified by the four delegation-identity tests in the same file.
-- [ ] AC-36 The three bindings select the target worktree by portable identity only, through `Resolve-WorktreeItemTarget` in `.claude/lib/worktree-resolution/WorktreeItemResolution.psm1`: the canonical issue number, matched against the `issue-num` of each live worktree's checkpoint, and a branch signal (`--head`, `--branch`, `branch:`). A worktree is live when it is registered in the repository's worktree administrative layout and its root still carries a worktree marker. A feature-folder path or file path never selects the worktree. No identity, or an identity matching no live worktree, denies with the no-target code; several live matches or disagreeing identities deny with the ambiguity code; a branch signal breaks a tie among live worktrees recording the same issue. Verified by the named tests in `tests/scripts/claude-lib/worktree-resolution/WorktreeItemResolution.Tests.ps1`.
-- [ ] AC-37 The prd-feature gate (issue #672) selects the worktree by the same portable identity and uses the feature folder only to locate prerequisite documents. `.claude/hooks/enforce-prd-feature-before-planner.ps1` calls `Resolve-WorktreeItemTarget` through its own one-line seam, contains no occurrence of `Resolve-WorktreeCallTarget`, and declares no `Envelope` parameter and reads no `cwd` field from the hook envelope. No feature-folder path and no file path selects the worktree: the resolver receives the assembled prompt and description text unchanged and reads no path signal from it, deciding only on the canonical issue number and a branch signal. After identity resolves, the gate resolves the feature folder beneath the resolved worktree and probes its prerequisites there; when the prompt names no folder it reads the `feature-folder` field from the checkpoint of the resolved worktree, never from the calling session's root; when the prompt names more than one folder that checkpoint is the disambiguator. The work-mode contract is unchanged: `full-feature` requires `spec.md` and `user-story.md`, `full-bug` requires `spec.md`, `minor-audit` requires neither, and an absent or unrecognised marker denies on its own path naming no prerequisite set. A prerequisite document that is genuinely absent still denies with the gate's existing missing-document reason, which carries neither target-resolution code. A coordinating-session `atomic-planner` delegation for an item whose feature folder also exists in other worktrees resolves by identity and is allowed, where it previously denied with the ambiguity code. Expected in the diff for this criterion: `.claude/hooks/enforce-prd-feature-before-planner.ps1`, `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1`, their two counterparts under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`, `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.Tests.ps1`, `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.FolderResolution.Tests.ps1`, `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1`, `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.IdentityResolution.Tests.ps1`, and `docs/features/active/2026-09-13-prd-feature-gate-target-resolution-672/spec.md`. `.claude/lib/worktree-resolution/WorktreeResolution.psm1` and `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1` remain absent from the diff.
-- [ ] AC-38 No file added or modified by this change, other than `plan.2026-09-13T20-48.md`, `plan.2026-09-18T13-30.md`, and `plan.2026-09-18T16-00.md`, contains a drive-letter path, a user-profile path, or the executing user's account name. Feature-folder artifacts that carried such tokens are redacted to placeholders, with per-file counts logged under `evidence/other/`.
-- [ ] AC-39 The two acceptance criteria left unchecked in `docs/features/active/2026-09-13-prd-feature-gate-target-resolution-672/spec.md` — the test-hygiene criterion for the target-resolution suite and the PowerShell-toolchain single-pass criterion — are checked in that file, and a closure subsection in the same file cites the evidence artifact satisfying each.
+- [x] AC-34 `.claude/skills/orchestrate/SKILL.md` (`## Checkpoint Handling`), `.claude/skills/parallel-orchestrate/SKILL.md` (`## Per-Item Branch and Worktree Lifecycle`), and `.claude/skills/epic-orchestrate/SKILL.md` (`## Epic-Level Checkpoint`) each state the checkpoint-hygiene rule: a per-feature `artifacts/orchestration/orchestrator-state.json` that does not belong to the session's own item is moved to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and a coordinating session writes no per-feature checkpoint at its own root. Verified by the three hygiene tests in `tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1`.
+- [x] AC-35 `## Issue Number Consistency` in `.claude/skills/orchestrate/SKILL.md` requires the canonical issue number line and a `branch:` label on every delegation to each receipt-gated subagent type returned by `Get-ModelRoutingGatedAgent`, and names both gates that identify the item from the delegation prompt. Verified by the four delegation-identity tests in the same file.
+- [x] AC-36 The three bindings select the target worktree by portable identity only, through `Resolve-WorktreeItemTarget` in `.claude/lib/worktree-resolution/WorktreeItemResolution.psm1`: the canonical issue number, matched against the `issue-num` of each live worktree's checkpoint, and a branch signal (`--head`, `--branch`, `branch:`). A worktree is live when it is registered in the repository's worktree administrative layout and its root still carries a worktree marker. A feature-folder path or file path never selects the worktree. No identity, or an identity matching no live worktree, denies with the no-target code; several live matches or disagreeing identities deny with the ambiguity code; a branch signal breaks a tie among live worktrees recording the same issue. Verified by the named tests in `tests/scripts/claude-lib/worktree-resolution/WorktreeItemResolution.Tests.ps1`.
+- [x] AC-37 The prd-feature gate (issue #672) selects the worktree by the same portable identity and uses the feature folder only to locate prerequisite documents. `.claude/hooks/enforce-prd-feature-before-planner.ps1` calls `Resolve-WorktreeItemTarget` through its own one-line seam, contains no occurrence of `Resolve-WorktreeCallTarget`, and declares no `Envelope` parameter and reads no `cwd` field from the hook envelope. No feature-folder path and no file path selects the worktree: the resolver receives the assembled prompt and description text unchanged and reads no path signal from it, deciding only on the canonical issue number and a branch signal. After identity resolves, the gate resolves the feature folder beneath the resolved worktree and probes its prerequisites there; when the prompt names no folder it reads the `feature-folder` field from the checkpoint of the resolved worktree, never from the calling session's root; when the prompt names more than one folder that checkpoint is the disambiguator. The work-mode contract is unchanged: `full-feature` requires `spec.md` and `user-story.md`, `full-bug` requires `spec.md`, `minor-audit` requires neither, and an absent or unrecognised marker denies on its own path naming no prerequisite set. A prerequisite document that is genuinely absent still denies with the gate's existing missing-document reason, which carries neither target-resolution code. A coordinating-session `atomic-planner` delegation for an item whose feature folder also exists in other worktrees resolves by identity and is allowed, where it previously denied with the ambiguity code. Expected in the diff for this criterion: `.claude/hooks/enforce-prd-feature-before-planner.ps1`, `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1`, their two counterparts under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`, `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.Tests.ps1`, `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.FolderResolution.Tests.ps1`, `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1`, `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.IdentityResolution.Tests.ps1`, and `docs/features/active/2026-09-13-prd-feature-gate-target-resolution-672/spec.md`. `.claude/lib/worktree-resolution/WorktreeResolution.psm1` and `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1` remain absent from the diff.
+- [x] AC-38 No file added or modified by this change, other than `plan.2026-09-13T20-48.md`, `plan.2026-09-18T13-30.md`, and `plan.2026-09-18T16-00.md`, contains a drive-letter path, a user-profile path, or the executing user's account name. Feature-folder artifacts that carried such tokens are redacted to placeholders, with per-file counts logged under `evidence/other/`.
+- [x] AC-39 The two acceptance criteria left unchecked in `docs/features/active/2026-09-13-prd-feature-gate-target-resolution-672/spec.md` — the test-hygiene criterion for the target-resolution suite and the PowerShell-toolchain single-pass criterion — are checked in that file, and a closure subsection in the same file cites the evidence artifact satisfying each.
 
 ## Risks & Mitigations
 

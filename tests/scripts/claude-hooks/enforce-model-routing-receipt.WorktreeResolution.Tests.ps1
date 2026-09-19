@@ -65,6 +65,7 @@ BeforeAll {
 
     # Return an Agent PreToolUse payload for one subagent type and prompt.
     function New-AgentPayload {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory payload factory in a test file; it changes no system state.')]
         param(
             [Parameter(Mandatory)] [string] $Prompt,
             [string] $Subagent = 'atomic-planner'
@@ -76,11 +77,12 @@ BeforeAll {
     # Model worktree liveness for an identity row. The bodies close over local copies because
     # a module-scoped mock body cannot see this scope otherwise.
     function Set-LiveTopology {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
         param([string[]] $Live = @(), [string[]] $BranchRoot = @())
         $liveSet = $Live
         $branchSet = $BranchRoot
         Mock -CommandName Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution -MockWith {
-            param([string] $SessionRoot, [string] $Branch)
+            param([string] $Branch)
             if (-not [string]::IsNullOrWhiteSpace($Branch)) { return , [string[]] $branchSet }
             return , [string[]] $liveSet
         }.GetNewClosure()

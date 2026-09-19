@@ -59,6 +59,7 @@ BeforeAll {
 
     # Return an Agent payload for an atomic-planner delegation.
     function New-IdentityPayload {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory payload factory in a test file; it changes no system state.')]
         param([Parameter(Mandatory)] [string] $Prompt)
         return (@{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'atomic-planner'; prompt = $Prompt } } |
                 ConvertTo-Json -Depth 6 -Compress)
@@ -67,12 +68,13 @@ BeforeAll {
     # Model worktree liveness and checkpoint text for an identity row. The bodies close
     # over local copies because a module-scoped mock body cannot see this scope otherwise.
     function Set-IdentityTopology {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
         param([string[]] $Live = @(), [string[]] $BranchRoot = @(), [hashtable] $Checkpoint = @{})
         $liveSet = $Live
         $branchSet = $BranchRoot
         $textMap = $Checkpoint
         Mock -CommandName Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution -MockWith {
-            param([string] $SessionRoot, [string] $Branch)
+            param([string] $Branch)
             if (-not [string]::IsNullOrWhiteSpace($Branch)) { return , [string[]] $branchSet }
             return , [string[]] $liveSet
         }.GetNewClosure()

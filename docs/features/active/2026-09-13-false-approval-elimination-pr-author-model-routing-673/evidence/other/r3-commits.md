@@ -111,3 +111,28 @@ Commit SHA: `1cc18bec1d0b2c44e0441182b4b3f3003fe08f4b` — 14 files changed, 348
 Porcelain (post-commit, pre-append): empty — the command produced no output and therefore lists no path at all.
 
 Note on the untracked state directory: `[P8-T8]` removed two untracked, gitignored files from `.claude/state/` in order to make a pre-existing bundle-parity test measurable. Neither removal appears in this commit or in any porcelain output, because neither file was ever tracked. The directory is now empty and must be empty again when `[P11-T6]` and `[P11-T7]` run.
+
+---
+
+## Commit 5 — Phase 9 (`[P9-T13]`)
+
+Commands:
+
+```
+git add .claude/hooks/enforce-prd-feature-before-planner.ps1 .claude/hooks/enforce-prd-feature-before-planner-helpers.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1 tests/scripts/claude-hooks/enforce-prd-feature-before-planner.Tests.ps1 tests/scripts/claude-hooks/enforce-prd-feature-before-planner.FolderResolution.Tests.ps1 tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1 tests/scripts/claude-hooks/enforce-prd-feature-before-planner.IdentityResolution.Tests.ps1 tests/scripts/claude-runtime/enforcement-hooks-checkpoint-path-explicit.Tests.ps1 docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673
+git commit -F <SCRATCHPAD>/r4-msg-p9.txt
+git log -1 --name-only
+git status --porcelain
+```
+
+Gate response: none. Both commands returned exit code 0 and no gate reason was emitted. `git add` printed the same line-ending normalisation advisory as commit 3, on one evidence Markdown file written by a shell heredoc; it is not a gate response.
+
+Commit SHA: `8e41bcc1290d7f40e60a4a976fcbc7493938c8a7` — 15 files changed, 1102 insertions, 380 deletions.
+
+`git log -1 --name-only` verification — all three required paths listed:
+
+- `.claude/hooks/enforce-prd-feature-before-planner.ps1`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-prd-feature-before-planner.ps1`
+- `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.IdentityResolution.Tests.ps1`
+
+Porcelain (post-commit, pre-append): empty — the command produced no output and therefore lists no path at all.

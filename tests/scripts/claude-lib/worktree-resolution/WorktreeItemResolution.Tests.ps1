@@ -49,6 +49,7 @@ BeforeAll {
     # Return checkpoint text recording an issue number. IssueNumber is a raw JSON
     # fragment, so a test can supply a quoted string or a bare number.
     function New-CheckpointJson {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory checkpoint-text factory in a test file; it changes no system state.')]
         param([Parameter(Mandatory)] [AllowEmptyString()] [string] $IssueNumber)
         return ('{{"issue-num":{0}}}' -f $IssueNumber)
     }
@@ -59,6 +60,7 @@ BeforeAll {
     # worktree with no checkpoint. The bodies close over local copies, because a
     # re-bound mock body cannot see this scope otherwise.
     function Set-ItemTopology {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
         param(
             [string[]] $Live = @(),
             [string[]] $BranchRoot = @(),
@@ -68,7 +70,7 @@ BeforeAll {
         $branchSet = $BranchRoot
         $textMap = $Checkpoint
         Mock -CommandName Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution -MockWith {
-            param([string] $SessionRoot, [string] $Branch)
+            param([string] $Branch)
             if (-not [string]::IsNullOrWhiteSpace($Branch)) { return , [string[]] $branchSet }
             return , [string[]] $liveSet
         }.GetNewClosure()

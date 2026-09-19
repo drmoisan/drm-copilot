@@ -220,7 +220,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             # mock would miss it and the real resolver would enumerate live worktrees.
             $script:CapturedSessionRoot = $null
             Mock -CommandName Resolve-WorktreeItemTarget -MockWith {
-                param([string] $Text, [string] $SessionRoot)
+                param([string] $SessionRoot)
                 $script:CapturedSessionRoot = $SessionRoot
                 return ([pscustomobject]@{ Status = 'NoTarget' })
             }

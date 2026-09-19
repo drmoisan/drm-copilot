@@ -66,6 +66,7 @@ BeforeAll {
 
     # Return a Bash PreToolUse payload carrying one command string.
     function New-BashPayload {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory payload factory in a test file; it changes no system state.')]
         param([Parameter(Mandatory)] [string] $Command)
         return (@{ tool_input = @{ command = $Command } } | ConvertTo-Json -Depth 5 -Compress)
     }
@@ -74,11 +75,12 @@ BeforeAll {
     # a branch filter and Live what it reports without one; the bodies close over local
     # copies because a module-scoped mock body cannot see this scope otherwise.
     function Set-LiveTopology {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
         param([string[]] $Live = @(), [string[]] $BranchRoot = @())
         $liveSet = $Live
         $branchSet = $BranchRoot
         Mock -CommandName Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution -MockWith {
-            param([string] $SessionRoot, [string] $Branch)
+            param([string] $Branch)
             if (-not [string]::IsNullOrWhiteSpace($Branch)) { return , [string[]] $branchSet }
             return , [string[]] $liveSet
         }.GetNewClosure()
@@ -89,6 +91,7 @@ BeforeAll {
     # from inside the mock body: GetNewClosure re-binds the body to a synthetic module scope
     # that cannot resolve a function defined in this dot-sourced scope.
     function Set-ResolvedSeam {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers a Pester mock for one test only; it changes no system state.')]
         param([Parameter(Mandatory)] [string] $Status, [string] $WorktreeRoot, [string[]] $Candidate = @())
         $target = New-WorktreeResolutionFixtureTarget -Status $Status -WorktreeRoot $WorktreeRoot -Candidate $Candidate
         Mock -CommandName Resolve-PrAuthorWorktreeTarget -MockWith { return $target }.GetNewClosure()
