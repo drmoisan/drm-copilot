@@ -170,6 +170,13 @@ frontmatter default — `opus` for these workers — which suppresses a `fable` 
 MUST NOT hard-code `model=opus` in a way that overrides the resolved routing model, mirroring
 step 5 of `## Model Selection` in `.claude/skills/orchestrate/SKILL.md`.
 
+Every such spawn of `Agent(pr-author)` also carries the canonical issue number line and a
+`branch: <name>` label naming the branch checked out in the worktree the pull request is opened
+from, per `## Issue Number Consistency` in `.claude/skills/orchestrate/SKILL.md`.
+`enforce-model-routing-receipt.ps1` identifies the item from those two lines and denies a gated
+delegation it cannot identify, so a spawn that omits both is refused rather than validated against
+whichever checkpoint occupies the calling session's root.
+
 `route` is never an input to model selection; `route` remains file-count driven and governs only
 agents, skills, and MCP tools. A skill whose frontmatter `context` field holds the value `fork`
 inherits the parent model and ignores a model override, so model selection applies to agent
