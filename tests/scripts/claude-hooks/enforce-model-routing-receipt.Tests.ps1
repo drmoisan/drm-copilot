@@ -16,6 +16,15 @@ Describe 'enforce-model-routing-receipt.ps1' {
         }
     }
 
+    # Issue #673 routes the checkpoint through a resolution seam. Defaulting it to the
+    # session root keeps these rows exercising presence gating, and independent of
+    # whichever worktrees exist on the machine running them.
+    BeforeEach {
+        Mock -CommandName Resolve-ModelRoutingWorktreeTarget -MockWith {
+            [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = (Get-Location).Path; ReasonCode = $null; Detail = 'session root' }
+        }
+    }
+
     Context 'envelope anomalies fail closed; out-of-scope delegations allow' {
         It 'denies an empty payload as an envelope anomaly (fail closed)' {
             $decision = Invoke-ModelRoutingReceiptDecision -ToolInputRaw ''

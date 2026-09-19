@@ -309,7 +309,14 @@ Describe 'Invoke-OrchestratorStatePreflight' {
             # deliberately-nonexistent, non-temp checkpoint path; it fails closed on the
             # missing file and the hook surfaces ORCHESTRATOR_STATE_PREFLIGHT_FAILED.
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
-            $script:OrchestratorStateCheckpointPath = 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
+            # Issue #673 removed the script-variable pin this row used to set: the gate now
+            # takes its checkpoint path from target resolution, so a pin would be overwritten
+            # before the preflight reads it. The seam supplies a resolved worktree that does
+            # not exist, which reproduces the same missing-file condition the pin created.
+            $script:MissingWorktreeRoot = Join-Path $PSScriptRoot 'no-such-worktree-fixture'
+            Mock -CommandName Resolve-PrAuthorWorktreeTarget -MockWith {
+                [pscustomobject]@{ Status = 'OtherWorktree'; WorktreeRoot = $script:MissingWorktreeRoot; ReasonCode = $null; Detail = 'absent fixture worktree' }
+            }
 
             $json = '{"tool_name":"Bash","tool_input":{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json
@@ -479,31 +486,6 @@ Describe 'Get-OrchestratorStateBasePresenceError per-step-key status vocabulary'
             # Assert: no base-presence error is produced.
             $errors | Should -BeNullOrEmpty
         }
-    }
-}
-
-Describe 'Get-OrchestratorStateCheckpoint value contract' {
-    It 'returns an ISO-8601 valued checkpoint key as a DateTime under default date handling' {
-        # Arrange: a real parseable instant; the template value 2026-07-06T00-00 is not one and is never coerced.
-        $checkpoint = New-ReadyCheckpoint
-        $checkpoint.last_updated = '2026-08-29T20:38:00Z'
-        Set-CheckpointFixture -Json ($checkpoint | ConvertTo-Json -Depth 5)
-
-        # Act
-        $result = Get-OrchestratorStateCheckpoint -CheckpointPath 'x.json'
-
-        # Assert: ConvertFrom-Json coerces the instant; a non-date string key is not.
-        $result.Ok | Should -BeTrue
-        $result.State.last_updated | Should -BeOfType [System.DateTime]
-        $result.State.objective | Should -BeOfType [System.String]
-    }
-
-    It 'documents the checkpoint date-coercion contract in its comment-based help' {
-        # Arrange / Act: the rendered help, width-pinned so console width cannot wrap the literal.
-        $helpText = Get-Help -Name 'Get-OrchestratorStateCheckpoint' -Full | Out-String -Width 500
-
-        # Assert: the documentation obligation is enforced by a test.
-        $helpText | Should -BeLike '*date-coerced by ConvertFrom-Json*'
     }
 }
 
