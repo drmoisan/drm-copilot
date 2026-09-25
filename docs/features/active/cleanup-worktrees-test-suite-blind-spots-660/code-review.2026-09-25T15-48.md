@@ -102,11 +102,14 @@ contradicts the add arm" defect the issue describes.
   `git status --porcelain -- scripts/` both produced empty output. AC-6 holds.
 - Re-ran `sh scripts/bash/shell-qc.sh check` directly: exit 0, no output. Matches the
   recorded final-QC evidence.
-- The full `npx --yes bats tests/shell` re-run did not complete within this review's
-  session window (see `policy-audit.2026-09-25T15-48.md`, "Toolchain Verification"); the
-  branch's own recorded evidence (`final-shell-qc-test.2026-09-25T15-37.md`) documents
-  `EXIT_CODE: 0`, `1..463`, 463 `ok`, 0 `not ok`, and quotes all three new tests' exact `ok`
-  lines by TAP line number.
+- The full `npx --yes bats tests/shell` re-run was started as a background command and
+  completed after approximately 15+ minutes of wall time with no incremental output until
+  completion (see `policy-audit.2026-09-25T15-48.md`, "Toolchain Verification"): the process
+  exited with code 0, and the captured tail runs from `ok 381` through `ok 463` with zero
+  `not ok` lines and the same five `BW01` informational warnings the recorded evidence
+  describes. This independently confirms the branch's own recorded evidence
+  (`final-shell-qc-test.2026-09-25T15-37.md`, `EXIT_CODE: 0`, `1..463`, 463 `ok`, 0 `not ok`,
+  quoting all three new tests' exact `ok` lines by TAP line number).
 
 ## Best-Practice Observations (non-blocking)
 

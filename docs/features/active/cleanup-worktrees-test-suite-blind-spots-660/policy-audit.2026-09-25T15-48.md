@@ -102,26 +102,27 @@ one coverage-relevant language present (bash) has zero changed production lines 
 | Stage | Branch's recorded evidence | Independent re-run by this review | Verdict |
 |---|---|---|---|
 | Format/Lint (`sh scripts/bash/shell-qc.sh check`) | `final-shell-qc-check.2026-09-25T14-48.md`: EXIT 0, no diagnostics | Re-ran directly: exit 0, no stdout/stderr | **PASS** |
-| Test (`npx --yes bats tests/shell`) | `final-shell-qc-test.2026-09-25T15-37.md`: EXIT 0, `1..463`, 463 ok, 0 not ok | Attempted (`npx --yes bats tests/shell`, backgrounded); did not complete within this session's available wait window — see note below | **PASS** (by recorded artifact); independent execution **UNVERIFIED** |
+| Test (`npx --yes bats tests/shell`) | `final-shell-qc-test.2026-09-25T15-37.md`: EXIT 0, `1..463`, 463 ok, 0 not ok | Independent re-run completed (backgrounded, ~15+ minutes wall time): `[exited with code 0]`; the captured tail runs from `ok 381` through `ok 463` with zero `not ok` lines and five pre-existing `BW01` informational warnings matching the recorded evidence | **PASS** — confirmed by direct independent execution |
 | Production-file diff (`scripts/`) | `final-ac6-scripts-diff.2026-09-25T15-09.md`: empty diff, empty status | Re-ran directly: empty diff, empty status | **PASS** |
 
 Note on the test-stage re-run: this review started `npx --yes bats tests/shell` as a
-background command from the worktree root and it did not produce TAP output before this
-review's session budget required moving forward; no failure was observed, no error was
-observed — the process simply had not finished. `npx --yes bats --version` was confirmed to
-resolve and print `Bats 1.13.0` immediately in the same environment, so the bats toolchain
-itself is reachable; the full 463-test run (many of which fork `bash -c` subshells per
-assertion) not finishing in the available window is consistent with a slow environment, not
-with a broken command. In place of a completed independent full-suite run, this review
-substituted targeted manual verification of the specific behaviors the new/negative-control
-tests depend on (see `code-review` and `feature-audit` artifacts for the line-by-line trace),
-and relies on the branch's own recorded `final-shell-qc-test.2026-09-25T15-37.md` artifact,
-which documents `EXIT_CODE: 0` and explicitly quotes the three new tests' `ok` lines by name
-and TAP line number.
+background command from the worktree root. It produced no incremental output for
+approximately 15+ minutes of wall time (463 tests, many of which fork a `bash -c` subshell
+per assertion, on Windows git-bash) before completing — an environment/buffering
+characteristic, not a failure (recorded in agent memory as
+`project_bats_full_suite_slow_no_incremental_output.md`). On completion the process exited
+with code 0; the captured tail (last 100 lines) shows tests 381 through 463 all `ok`, with
+the same five `BW01` bats-linter informational warnings (stubbed-missing-tool exit-127
+scenarios in `test_cleanup_worktrees_preserve.bats` and `test_shell_qc_commands.bats`, none
+attributable to a test this plan added or modified) that the branch's own
+`final-shell-qc-test.2026-09-25T15-37.md` evidence describes. Because `bats` exits non-zero
+on any `not ok`, the exit code 0 independently confirms zero failures across the full
+463-test suite, corroborating the recorded artifact's `EXIT_CODE: 0` / `1..463` / 463-ok /
+0-not-ok claim rather than merely trusting it.
 
-**Verdict: PASS**, based on the recorded final-QC artifact plus this review's own successful
-re-run of the check stage and the AC-6 diff proof; the test-stage full-suite re-run is
-UNVERIFIED by direct execution in this session, not FAIL.
+**Verdict: PASS**, confirmed both by the recorded final-QC artifact and by this review's own
+completed independent re-run of the full test suite, the check stage, and the AC-6 diff
+proof.
 
 ## General Code Change Policy (`.claude/rules/general-code-change.md`)
 
@@ -185,7 +186,7 @@ No hyperbolic or joking language was found. **PASS.**
 | Coverage — bash changed-line regression | PASS |
 | Coverage — bash repo-wide kcov percentage | UNVERIFIED (no local artifact; disclosed scope decision; CI is confirming gate) |
 | Toolchain — format/lint | PASS |
-| Toolchain — bats test suite | PASS (by recorded artifact); independent re-run UNVERIFIED (did not finish in session window) |
+| Toolchain — bats test suite | PASS (recorded artifact and completed independent re-run agree: exit 0, 463 tests, 0 not ok) |
 | Toolchain — AC-6 production-file diff | PASS |
 | General code change policy | PASS |
 | General unit test policy | PASS |

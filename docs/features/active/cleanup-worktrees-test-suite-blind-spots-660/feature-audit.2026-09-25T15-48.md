@@ -21,7 +21,7 @@
 | AC-4 | Report-mode non-mutation assertion is an allowlist of read-only subcommands, or asserts `add`/`commit`/`write-tree`/`update-index` never appear | **PASS** | `test_cleanup_worktrees_dirt_clear.bats` lines 205-225 assert absence of `add`, `commit`, `update-index` (new) and `write-tree`, `hash-object -w`, `worktree remove`, `branch -D` (pre-existing); confirmed by direct read. Recorded `ok` (test 296) in final-QC evidence. |
 | AC-5 | A negative control (inject a scratch `git add` into report mode) proves AC-4 can fail; production files byte-identical to `origin/main` afterward | **PASS** — with a documented interim regression, corrected on the branch before this audit | See "AC-5 detail" below. |
 | AC-6 | Branch diff against `origin/main` changes no file under `scripts/` | **PASS** | Independently re-ran `git diff origin/main --name-status -- scripts/` and `git status --porcelain -- scripts/`: both empty. Matches `final-ac6-scripts-diff.2026-09-25T15-09.md`. |
-| AC-7 | `shell-qc.sh check` and `shell-qc.sh test` both exit 0, each recorded as final-QC evidence | **PASS** | Check stage independently re-run: exit 0, no output. Test stage: recorded final evidence (`final-shell-qc-test.2026-09-25T15-37.md`) shows `EXIT_CODE: 0`, `1..463`, 463 `ok`, 0 `not ok`. This review's own attempt to re-run the full 463-test suite did not complete inside the session window (no failure observed, no completion observed); see "Independent verification limits" below. |
+| AC-7 | `shell-qc.sh check` and `shell-qc.sh test` both exit 0, each recorded as final-QC evidence | **PASS** | Check stage independently re-run: exit 0, no output. Test stage: recorded final evidence (`final-shell-qc-test.2026-09-25T15-37.md`) shows `EXIT_CODE: 0`, `1..463`, 463 `ok`, 0 `not ok`. This review's own independent re-run of the full 463-test suite also completed with exit code 0 and zero `not ok` lines in its captured tail; see "Independent verification limits" below. |
 
 ### AC-5 detail
 
@@ -56,21 +56,23 @@ changed.
 ## Independent Verification Limits
 
 This audit independently re-executed the check-stage toolchain command
-(`sh scripts/bash/shell-qc.sh check`, exit 0, matching recorded evidence) and the AC-6
-diff/status commands (both empty, matching recorded evidence) directly, rather than relying
-solely on the branch's own recorded artifacts for those two gates.
+(`sh scripts/bash/shell-qc.sh check`, exit 0, matching recorded evidence), the AC-6
+diff/status commands (both empty, matching recorded evidence), and the full bats suite
+(`npx --yes bats tests/shell`, exit 0, matching recorded evidence) directly, rather than
+relying solely on the branch's own recorded artifacts for these gates.
 
-The full bats suite re-run (`npx --yes bats tests/shell`) was attempted as an independent
-check but did not complete within this session's available time budget (463 tests, many
-spawning per-assertion `bash -c` subshells, running under git-bash on Windows). No failure
-or error was observed from the attempt — it simply had not produced TAP output before this
-audit needed to conclude. `npx --yes bats --version` was confirmed to resolve immediately in
-the same environment, establishing the toolchain itself is reachable. In place of a completed
-independent full-suite run, this audit performed a targeted, line-by-line trace of every
+The full bats suite re-run took approximately 15+ minutes of wall time (463 tests, many
+spawning a `bash -c` subshell per assertion, under git-bash on Windows) and produced no
+incremental output until completion — an environment/buffering characteristic, not a
+failure. On completion the process exited with code 0; the captured tail (last 100 lines)
+runs from `ok 381` through `ok 463` with zero `not ok` lines and the same five `BW01`
+informational bats-linter warnings the recorded evidence describes. Because `bats` exits
+non-zero on any `not ok`, this independently confirms zero failures across the full
+463-test suite. This audit also performed a targeted, line-by-line trace of every
 new/modified test's logic against the production stub and library source (documented in
-`code-review.2026-09-25T15-48.md`) and relies on the branch's own `final-shell-qc-test.2026-09-25T15-37.md`
-artifact for the full-suite pass/fail count, which names all three new tests' exact
-description strings on `ok` lines.
+`code-review.2026-09-25T15-48.md`) as a second, independent form of verification, and cross-
+checked both against the branch's own `final-shell-qc-test.2026-09-25T15-37.md` artifact,
+which names all three new tests' exact description strings on `ok` lines.
 
 ## Acceptance Criteria Status
 
