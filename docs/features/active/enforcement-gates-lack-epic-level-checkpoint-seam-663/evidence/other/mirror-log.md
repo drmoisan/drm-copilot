@@ -91,3 +91,24 @@ Timestamp: 2026-09-25T19-41
   - extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1: 5988cba0f4a1700dda571f36652623d797d1dc1d5a4b12a462a483fc79f35eda
   - Pair: equal
 
+## B6 - epic skills and agents ([P6-T11])
+
+Timestamp: 2026-09-25T19-46
+
+- Command: `Copy-Item -LiteralPath .claude/skills/epic-plan/SKILL.md -Destination extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-plan/SKILL.md -Force`
+  - .claude/skills/epic-plan/SKILL.md: 61362a445de03fc4202881ce4f59b2292b5bd37a42c4553cdbd6147f993df595
+  - extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-plan/SKILL.md: 61362a445de03fc4202881ce4f59b2292b5bd37a42c4553cdbd6147f993df595
+  - Pair: equal
+- Command: `Copy-Item -LiteralPath .claude/skills/epic-orchestrate/SKILL.md -Destination extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md -Force`
+  - .claude/skills/epic-orchestrate/SKILL.md: 14d6bf2f76f64d8c6be9c7c675e828f474ebc20d52ed60096d612302a77f21a0
+  - extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md: 14d6bf2f76f64d8c6be9c7c675e828f474ebc20d52ed60096d612302a77f21a0
+  - Pair: equal
+- Command: `Copy-Item -LiteralPath .claude/agents/epic-planner.md -Destination extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-planner.md -Force`
+  - .claude/agents/epic-planner.md: 3ebf5ab00d651866900d45f5625046626b8a11052a64629081350eb7e0a7570c
+  - extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-planner.md: 3ebf5ab00d651866900d45f5625046626b8a11052a64629081350eb7e0a7570c
+  - Pair: equal
+- Command: `Copy-Item -LiteralPath .claude/agents/epic-orchestrator.md -Destination extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md -Force`
+  - .claude/agents/epic-orchestrator.md: 0d01e5484d63e418a6bc31f219aecaef7381cc439a4a796664006879f6a027ba
+  - extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md: 0d01e5484d63e418a6bc31f219aecaef7381cc439a4a796664006879f6a027ba
+  - Pair: equal
+

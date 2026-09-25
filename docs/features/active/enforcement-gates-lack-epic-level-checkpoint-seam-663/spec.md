@@ -244,9 +244,9 @@ Gate 3 — model-routing receipt
 
 Gate 4 — preimplementation gate, command and path legs
 
-- [ ] `enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1` allow case: in epic scope with a ready epic checkpoint and a mocked `MERGE_HEAD` present, `git add <production path>` is allowed.
-- [ ] `enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1` deny cases: in epic scope, `git add <production path>` is denied with `PREIMPLEMENTATION_GATE_BLOCKED` when no merge is in progress (D2), and when an epic-shape conjunct (`route_id`, `epic_feature_folder`, `epic_manifest_path`, `integration_branch`, or `features`) is missing; the reason names the epic checkpoint and the failed conjunct.
-- [ ] `enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1` path-leg case: an Edit or Write to a production path in epic scope follows the same readiness decision as the command leg.
+- [x] `enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1` allow case: in epic scope with a ready epic checkpoint and a mocked `MERGE_HEAD` present, `git add <production path>` is allowed.
+- [x] `enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1` deny cases: in epic scope, `git add <production path>` is denied with `PREIMPLEMENTATION_GATE_BLOCKED` when no merge is in progress (D2), and when an epic-shape conjunct (`route_id`, `epic_feature_folder`, `epic_manifest_path`, `integration_branch`, or `features`) is missing; the reason names the epic checkpoint and the failed conjunct.
+- [x] `enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1` path-leg case: an Edit or Write to a production path in epic scope follows the same readiness decision as the command leg.
 - [ ] `enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1` standalone case: with no epic checkpoint, the command and path legs return the single-feature decision and reason text unchanged, and the existing `enforce-orchestration-preimplementation-gate*.Tests.ps1` suites pass unmodified (including the delegation-leg mode-resolution suite from #554).
 
 Gate 4b — staging exemption
@@ -265,7 +265,7 @@ Gate 6 — non-regression
 
 Contracts — skills and agents
 
-- [ ] `.claude/skills/epic-plan/SKILL.md` and `.claude/agents/epic-planner.md` state that `epic-planner` promotes an epic-level issue at planning time through `mcp__drm-copilot__potential_to_issue` with `promotion_type: epic` and records the resulting number as `epic_issue_num` in the epic checkpoint; `epic-planner.md` frontmatter lists `mcp__drm-copilot__potential_to_issue`. Verified by new rows in `checkpoint-hygiene-skill-contract.Tests.ps1`.
+- [x] `.claude/skills/epic-plan/SKILL.md` and `.claude/agents/epic-planner.md` state that `epic-planner` promotes an epic-level issue at planning time through `mcp__drm-copilot__potential_to_issue` with `promotion_type: epic` and records the resulting number as `epic_issue_num` in the epic checkpoint; `epic-planner.md` frontmatter lists `mcp__drm-copilot__potential_to_issue`. Verified by new rows in `checkpoint-hygiene-skill-contract.Tests.ps1`.
 - [ ] `.claude/skills/epic-orchestrate/SKILL.md` states the integration-PR checkpoint shape (`route_id: epic`, `integration_branch`, `epic_issue_num`, all `features[]` merged or `worktree_removed`), that the integration PR and its `Agent(pr-author)` delegation are gated against `epic-orchestrator-state.json`, and that the `pr-author` receipt is recorded in that file's `model_routing_receipts[]`; `.claude/agents/epic-orchestrator.md` lists `epic_issue_num` and `model_routing_receipts` in its epic checkpoint field list. Verified by new rows in `checkpoint-hygiene-skill-contract.Tests.ps1`; the existing #673 hygiene rows pass unmodified.
 - [ ] `test_validate_epic_orchestrator_state.py` passes a new case proving `validate_epic_orchestrator_state` accepts an epic checkpoint carrying `epic_issue_num` and `model_routing_receipts`, and `test_parallel_planner_surface_contracts.py` passes unmodified.
 

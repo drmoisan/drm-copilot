@@ -52,3 +52,13 @@ EXIT_CODE: 0
 Commit: 3649f3a8a5d249b1a612a4dd3dd1229c329de2cc
 Non-evidence paths in `git log -1 --name-only` (3): .claude/hooks/enforce-model-routing-receipt.ps1, extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-model-routing-receipt.ps1, tests/scripts/claude-hooks/enforce-model-routing-receipt.EpicScope.Tests.ps1
 Porcelain (post-commit, pre-append): (empty)
+
+## B5 ([P5-T9])
+
+Timestamp: 2026-09-25T19-42
+Command: git commit -F <SCRATCHPAD>/i663/commit-b5.txt
+EXIT_CODE: 0
+Commit: da84e31b74f31b6edb2cc237b78ba2c90f6e719c
+Non-evidence paths in `git log -1 --name-only` (8): .claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1, .claude/hooks/enforce-orchestration-preimplementation-gate.ps1, extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1, extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate.ps1, extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json, extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1, scripts/powershell/PoshQC/settings/pester.runsettings.psd1, tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1
+The commit also carries the B4 commits.md entry, the plan check-offs, and the AC-7/AC-8 spec check-offs.
+Porcelain (post-commit, pre-append): (empty)
