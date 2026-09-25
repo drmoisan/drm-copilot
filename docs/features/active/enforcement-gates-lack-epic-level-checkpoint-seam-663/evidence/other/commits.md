@@ -16,3 +16,12 @@ EXIT_CODE: 0
 Commit: 3c842d1c061aab08abefe02e55d0834a7dfbd6c9
 Non-evidence paths in `git log -1 --name-only`: .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1, .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1, extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1, extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1, tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1, tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1
 Porcelain (post-commit, pre-append): (empty)
+
+## B2 ([P2-T10])
+
+Timestamp: 2026-09-25T19-21
+Command: git commit -F <SCRATCHPAD>/i663/commit-b2.txt
+EXIT_CODE: 0
+Commit: fd9e9c5090d23c44eaa80364c6fe7b2fa0e347b5
+Non-evidence paths in `git log -1 --name-only` (10): .claude/lib/worktree-resolution/EpicScopeReadiness.psm1, .claude/lib/worktree-resolution/EpicScopeResolution.psm1, extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeReadiness.psm1, extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeResolution.psm1, extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json, extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1, scripts/powershell/PoshQC/settings/pester.runsettings.psd1, tests/scripts/claude-lib/worktree-resolution/EpicScopeReadiness.Tests.ps1, tests/scripts/claude-lib/worktree-resolution/EpicScopeResolution.Tests.ps1, tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1
+Porcelain (post-commit, pre-append): (empty)

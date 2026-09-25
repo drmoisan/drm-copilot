@@ -43,3 +43,12 @@ Timestamp: 2026-09-25T19-19
   - extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1: c6b4629a349e49980f0f8d0e7db916a4193a2bc99ed8130d55c9bcf394cbe71b
   - Pair: equal
 
+## B2 remediation - analyzer findings (between [P2-T10] and [P3-T2])
+
+Timestamp: 2026-09-25T19-25
+
+- Command: `Copy-Item -LiteralPath .claude/lib/worktree-resolution/EpicScopeResolution.psm1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeResolution.psm1 -Force`
+  - .claude/lib/worktree-resolution/EpicScopeResolution.psm1: 7d5d603e61480732326c05bca7848f765c33e98e5a5265e917ec28f91cd80a61
+  - extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeResolution.psm1: 7d5d603e61480732326c05bca7848f765c33e98e5a5265e917ec28f91cd80a61
+  - Pair: equal
+

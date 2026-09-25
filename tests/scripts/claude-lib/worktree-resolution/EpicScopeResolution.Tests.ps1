@@ -32,20 +32,26 @@ BeforeAll {
             Registers the resolver-level seams: the worktree ascent echoes a synthetic
             path and maps anything else to the coordinator root, the checkpoint read
             returns the supplied text, and HEAD and MERGE_HEAD return the supplied values.
+            The bodies close over local copies because a module-scoped mock body cannot
+            see this scope otherwise.
         #>
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
         param(
             [AllowNull()] [string] $CheckpointText,
             [AllowNull()] [string] $HeadBranch,
             [bool] $MergeInProgress = $false
         )
 
+        $checkpointTextValue = $CheckpointText
+        $headBranchValue = $HeadBranch
+        $mergeInProgressValue = $MergeInProgress
         Mock Find-WorktreeResolutionRoot -ModuleName EpicScopeResolution {
             if ($Path -like '/synthetic-worktrees/*') { return $Path }
             return '/synthetic-worktrees/epic-coordinator'
         }
-        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $CheckpointText }.GetNewClosure()
-        Mock Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution { $HeadBranch }.GetNewClosure()
-        Mock Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution { $MergeInProgress }.GetNewClosure()
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $checkpointTextValue }.GetNewClosure()
+        Mock Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution { $headBranchValue }.GetNewClosure()
+        Mock Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution { $mergeInProgressValue }.GetNewClosure()
     }
 }
 

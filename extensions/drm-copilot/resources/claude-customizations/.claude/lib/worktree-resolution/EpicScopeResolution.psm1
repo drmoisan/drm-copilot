@@ -81,6 +81,7 @@ function Get-EpicScopeFirstLine {
 
 function New-EpicScopeResult {
     # Pure: the single constructor of the resolution result shape.
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory factory that changes no system state.')]
     [OutputType([pscustomobject])]
     param(
         [bool] $IsEpicScope,
@@ -175,9 +176,10 @@ function Get-EpicScopeWorktreeGitDirectory {
     .SYNOPSIS
         Return a worktree's git directory, or $null.
     .DESCRIPTION
-        A main checkout's .git is a directory and is returned as-is. A linked worktree's
-        .git is a file whose first line is `gitdir: <target>`; the target is returned,
-        joined to the worktree root when it is relative. Anything else returns $null.
+        For a main checkout the git entry is a directory and is returned as-is. For a
+        linked worktree the git entry is a file whose first line is a gitdir line; its
+        target is returned, joined to the worktree root when it is relative. Anything
+        else returns $null.
     .PARAMETER WorktreeRoot
         The absolute worktree root.
     #>
