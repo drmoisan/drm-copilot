@@ -200,6 +200,49 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     [[ "$output" != *"ALL_DISPOSABLE"* ]]
 }
 
+@test "dirt_typechange_delta: an MT entry whose working-tree content is on main is UNIQUE" {
+    dirt dirt_typechange_delta
+    [ "$status" -eq 0 ]
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|UNIQUE||MT|src/typechange.dat'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|HAS_UNIQUE|'* ]]
+    # Near-miss control: under the checked-in [MARCTU] class, T is content-bearing, so
+    # bothloc=1 suppresses CONTENT_ON_MAIN at rung 4 even though the working-tree blob
+    # equals main's blob at this path. The negative-control test below shows the
+    # mutation that removes this suppression.
+    [[ "$output" != *"CONTENT_ON_MAIN"* ]]
+    [[ "$output" != *"ALL_DISPOSABLE"* ]]
+}
+
+@test "dirt_typechange_delta: mutating [MARCTU] to [MARCU] changes the verdict away from UNIQUE (negative control)" {
+    local mutated
+    mutated="$(sed 's/\[MARCTU\]/[MARCU]/g' "${DIRTLIB}")"
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/dirt_typechange_delta" \
+        bash -c '
+            lib=$(cat)
+            source "$1"
+            source "$2"
+            eval "$lib"
+            classify_worktree_dirt "$3" 2>/dev/null
+        ' _ "${ELIB}" "${LIB}" "${WT}" <<<"$mutated"
+    [ "$status" -eq 0 ]
+    # Under the mutation, T no longer matches the content-bearing class, so bothloc is 0
+    # and rung 4 prints CONTENT_ON_MAIN instead of falling through to UNIQUE: the
+    # positive-direction assertions in the test above would fail against this mutated
+    # library.
+    [[ "$output" == *'DIRTFILE|/repo-wt/dirt|CONTENT_ON_MAIN||MT|src/typechange.dat'* ]]
+    [[ "$output" == *'DIRTSUM|/repo-wt/dirt|ALL_DISPOSABLE|'* ]]
+    [[ "$output" != *"UNIQUE"* ]]
+    [[ "$output" != *"HAS_UNIQUE"* ]]
+    # The mutated source was composed into a shell variable and evaluated in a child
+    # process; the production file on disk was never opened for writing.
+    run git -C "${REPO_ROOT}" diff origin/main -- "${DIRTLIB}"
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
+    run git -C "${REPO_ROOT}" status --porcelain -- "${DIRTLIB}"
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
+}
+
 @test "dirt_classifier_read_error: a non-zero classifier read yields UNIQUE and HAS_UNIQUE" {
     dirt dirt_classifier_read_error
     [ "$status" -eq 0 ]
@@ -229,7 +272,7 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
         dirt_staged_tree_is_commit dirt_staged_tree_no_match \
         dirt_staged_tree_worktree_delta dirt_tracked_probe_error_in_history \
         dirt_tracked_read_errors \
-        dirt_tracked_staged_only_blob dirt_unique; do
+        dirt_tracked_staged_only_blob dirt_typechange_delta dirt_unique; do
         iterated=$((iterated + 1))
         out="$(env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/${s}" \
             bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; classify_worktree_dirt '${WT}' 2>/dev/null")" || true
@@ -248,11 +291,11 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     # above, and its verdicts would never be checked for membership.
     on_disk="$(find "${SCEN}" -maxdepth 1 -type d -name 'dirt_*' | wc -l)"
     [ "$iterated" -eq "$on_disk" ]
-    # The union must be exactly the thirty-eight records these scenarios produce:
-    # twenty-nine scenarios, of which six carry two status entries each and one carries
+    # The union must be exactly the thirty-nine records these scenarios produce:
+    # thirty scenarios, of which six carry two status entries each and one carries
     # four. Without this count the membership check would pass vacuously over an empty
     # union.
-    [ "$seen" -eq 38 ]
+    [ "$seen" -eq 39 ]
     [ -z "$offenders" ]
 }
 

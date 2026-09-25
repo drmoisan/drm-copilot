@@ -114,7 +114,7 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
 
 ### Phase 1 — Constrained Small-Path Implementation
 
-- [ ] [P1-T1] Create the fixture scenario directory
+- [x] [P1-T1] Create the fixture scenario directory
   `tests/fixtures/cleanup_worktrees/scenarios/dirt_typechange_delta/` with exactly these 10
   files:
   - **Copy byte-for-byte** from
@@ -144,7 +144,7 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   prints exactly `MT src/typechange.dat`; a `diff` of each of the six copied files against
   its `dirt_index_and_worktree_delta` counterpart is empty.
 
-- [ ] [P1-T2] In `tests/shell/test_cleanup_worktrees_dirt_classify.bats`, insert one new
+- [x] [P1-T2] In `tests/shell/test_cleanup_worktrees_dirt_classify.bats`, insert one new
   `@test` block immediately after the existing `dirt_unique` test's closing `}` (the block
   ending `[[ "$output" != *"ALL_DISPOSABLE"* ]]\n}` at the current line 201) and before the
   `dirt_classifier_read_error` test (current line 203). Anchor `old_string` on:
@@ -176,7 +176,7 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   `dirt_typechange_delta: an MT entry whose working-tree content is on main is UNIQUE`
   on an `ok` line and on no `not ok` line. AC-1.
 
-- [ ] [P1-T3] In `tests/shell/test_cleanup_worktrees_dirt_classify.bats`, insert one further
+- [x] [P1-T3] In `tests/shell/test_cleanup_worktrees_dirt_classify.bats`, insert one further
   new `@test` immediately after the P1-T2 test's closing `}` (still before
   `dirt_classifier_read_error`). Insert this exact test:
   ```bash
@@ -219,7 +219,7 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   token `dirt_typechange_delta: mutating [MARCTU] to [MARCU] changes the verdict away from UNIQUE (negative control)`
   on an `ok` line. AC-2.
 
-- [ ] [P1-T4] In `tests/shell/test_cleanup_worktrees_dirt_classify.bats`, update the
+- [x] [P1-T4] In `tests/shell/test_cleanup_worktrees_dirt_classify.bats`, update the
   "every verdict emitted..." test's hardcoded scenario list and record count (current lines
   214-257) in two places:
   1. In the `for s in ...` token list, change the line reading
@@ -252,7 +252,7 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   and `grep -F '[ "$seen" -eq 39 ]' tests/shell/test_cleanup_worktrees_dirt_classify.bats`
   each return exactly one match. AC-1 (list-coupling correctness).
 
-- [ ] [P1-T5] In `tests/shell/test_cleanup_worktrees_dirt_clear.bats`, extend the existing
+- [x] [P1-T5] In `tests/shell/test_cleanup_worktrees_dirt_clear.bats`, extend the existing
   test `"dirt_staged_tree_is_commit: report mode issues no mutating git command and
   redirects no index"` (current lines 205-222). Anchor `old_string` on:
   ```
@@ -278,7 +278,7 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   and `grep -F '[[ "$log" != *"update-index"* ]]' tests/shell/test_cleanup_worktrees_dirt_clear.bats`
   each return exactly one match. AC-4.
 
-- [ ] [P1-T6] In `tests/shell/test_cleanup_worktrees_dirt_clear.bats`, insert one new
+- [x] [P1-T6] In `tests/shell/test_cleanup_worktrees_dirt_clear.bats`, insert one new
   `@test` immediately after the P1-T5-extended test's closing `}` and before the next test
   `"dirt_staged_tree_is_commit: the cached diff-index probe runs..."` (current line 224).
   Insert this exact test:
@@ -326,7 +326,7 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   `dirt_staged_tree_is_commit: injecting a git add call into run_report makes the widened non-mutation assertion fail (negative control)`
   on an `ok` line. AC-5.
 
-- [ ] [P1-T7] In `tests/fixtures/cleanup_worktrees/stub-bin/git`, replace the false
+- [x] [P1-T7] In `tests/fixtures/cleanup_worktrees/stub-bin/git`, replace the false
   "no writing arm is defined" paragraph (current lines 68-73) with an accurate table of
   every index/object-database-writing arm, its production call site(s), and the mode that
   reaches each. Anchor `old_string` on:
