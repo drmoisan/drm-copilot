@@ -170,6 +170,13 @@ frontmatter default — `opus` for these workers — which suppresses a `fable` 
 MUST NOT hard-code `model=opus` in a way that overrides the resolved routing model, mirroring
 step 5 of `## Model Selection` in `.claude/skills/orchestrate/SKILL.md`.
 
+Every such spawn of `Agent(pr-author)` also carries the canonical issue number line and a
+`branch: <name>` label naming the branch checked out in the worktree the pull request is opened
+from, per `## Issue Number Consistency` in `.claude/skills/orchestrate/SKILL.md`.
+`enforce-model-routing-receipt.ps1` identifies the item from those two lines and denies a gated
+delegation it cannot identify, so a spawn that omits both is refused rather than validated against
+whichever checkpoint occupies the calling session's root.
+
 `route` is never an input to model selection; `route` remains file-count driven and governs only
 agents, skills, and MCP tools. A skill whose frontmatter `context` field holds the value `fork`
 inherits the parent model and ignores a model override, so model selection applies to agent
@@ -297,6 +304,8 @@ Validate the checkpoint through the
 `artifact_type: "epic-orchestrator-state"`, supplying the `require_complete` argument on
 that same call at the completion gate. The validation is implemented in
 `scripts/dev_tools/validate_epic_orchestrator_state.py`.
+
+**Checkpoint hygiene (issue #673).** The coordinating session never holds a per-feature checkpoint at its own root. Before the first child delegation of a run it moves any `artifacts/orchestration/orchestrator-state.json` at its root to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and writes none there for the rest of the run, because each item's checkpoint lives in that item's worktree. A gated call the coordinator issues on an item's behalf is resolved by the item's issue number and branch, never by the coordinator root.
 
 ## Completion Requirements
 

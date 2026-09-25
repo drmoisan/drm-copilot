@@ -120,6 +120,13 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # it remains live as a guard: an unintended future edit to either file still
 # fails loudly. Re-baselining rather than deleting also keeps this control owned
 # by its original feature rather than silently dropped by an unrelated one.
+#
+# RE-BASELINED by issue #673. That change added a checkpoint-hygiene paragraph to
+# `## Epic-Level Checkpoint` in the epic skill, stating that a coordinating session
+# holds no per-feature checkpoint at its own root and archives any it finds to
+# `artifacts/orchestration/handoff/`. Only the skill digest moved; the pin stays live
+# for the entry whose path string is `.claude/agents/epic-orchestrator.md`, whose
+# digest is unchanged, so an unintended edit to the agent file still fails loudly.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -127,7 +134,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "42cd106c1dc6982cfe4fb15fb3439bdde4eb1bbbc6a1a2db26a8739587ab4ca7",
+        "75fb1667174481091a2437ab67160da9ec1d20232ae1ea77882c450be1d6e2b5",
     ),
 )
 

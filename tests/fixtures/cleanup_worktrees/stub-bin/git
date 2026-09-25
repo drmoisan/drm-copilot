@@ -65,11 +65,36 @@
 # Global options stripped before the subcommand: `-C <path>` (the last value is
 # retained for per-worktree keys), `-c <name>=<value>`, and `--no-optional-locks`.
 #
-# No arm is defined for any subcommand that writes to the index or the object database.
-# The dirt classifier must reach its staged-tree answer by reading only, so defining
-# such an arm would make the report-mode non-mutation assertion unable to fail. The
-# assertion in tests/shell/test_cleanup_worktrees_dirt_clear.bats searches this file's
-# argv log for those subcommand names; adding one here would defeat it.
+# Every arm below writes to the index or the object database. The dirt classifier
+# itself must reach its staged-tree answer by reading only, so run_report never calls
+# any of them; the report-mode non-mutation assertion in
+# tests/shell/test_cleanup_worktrees_dirt_clear.bats searches this file's argv log for
+# these subcommand names and depends on that read-only guarantee, not on their absence
+# from this stub.
+#
+# add             -> cleanup_worktrees_preserve_lib.sh:400,402 (preserve_commit_plan);
+#                    reached only by preserve / --preserve.
+# worktree add    -> cleanup_worktrees_actions_lib.sh:103 (create_consolidation_worktree);
+#                    not reachable from any wrapper dispatch arm (report/apply/preserve).
+# worktree remove -> cleanup_worktrees_actions_lib.sh:191 (cleanup_consolidation_on_abort,
+#                    not reachable, same as above) and
+#                    cleanup_worktrees_actions_lib.sh:292 (remove_worktree_safe, via
+#                    delete_candidate); reached by --apply / apply for the second site.
+# cherry-pick     -> cleanup_worktrees_actions_lib.sh:147,157,164
+#                    (cherry_pick_candidates); not reachable from any wrapper dispatch arm.
+# branch -D       -> cleanup_worktrees_actions_lib.sh:198 (consolidation teardown, not
+#                    reachable) and cleanup_worktrees_actions_lib.sh:317 (delete_branch,
+#                    via delete_candidate); reached by --apply / apply for the second site.
+# reset --hard    -> cleanup_worktrees_dirt_lib.sh:483 (clear_disposable_dirt); reached
+#                    only by --apply --clear-disposable.
+# clean -fd       -> cleanup_worktrees_dirt_lib.sh:488 (clear_disposable_dirt); reached
+#                    only by --apply --clear-disposable.
+#
+# "Not reachable from any wrapper dispatch arm" means create_consolidation_worktree,
+# cherry_pick_candidates, and cleanup_consolidation_on_abort have no caller under
+# run_report, run_apply, or run_preserve (cleanup-worktrees.sh's main() dispatch); they
+# are exercised only by tests/shell/test_cleanup_worktrees_consolidation.bats, which
+# calls them directly rather than through the wrapper.
 #
 # Polarity trap for check-ignore, stated because the default is the wrong answer:
 # `respond` defaults to exit 0 when no `.rc` file exists, while `git check-ignore -q`
