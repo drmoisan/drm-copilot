@@ -227,7 +227,7 @@ count_of() { # count_of <pattern>
 @test "dirt_staged_tree_is_commit: injecting a git add call into run_report makes the widened non-mutation assertion fail (negative control)" {
     local mutated
     mutated="$(sed '/^run_report() {$/a\
-	cleanup_wt_git add -- test-negative-control >/dev/null 2>&1 || true' "${LIB}")"
+	cleanup_wt_git add -- test-negative-control >/dev/null || true' "${LIB}")"
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
         CLEANUP_WT_STUB_SCENARIO="${SCEN}/dirt_staged_tree_is_commit" \
         bash -c '

@@ -3,9 +3,9 @@
 - **Issue:** #660
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-25T08-25
+- **Last Updated:** 2026-09-25T15-13
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 - **Work Mode:** minor-audit
 
 **Requirements source (sole AC source, minor-audit):** `issue.md`, section `## Acceptance
@@ -273,20 +273,47 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   ```
   `write-tree` is already present in this test (line 211) and is unchanged; only `add`,
   `commit`, and `update-index` are newly asserted absent, per AC-4's stated denylist.
-  Acceptance: `grep -F '[[ "$log" != *" add "* ]]' tests/shell/test_cleanup_worktrees_dirt_clear.bats`,
-  `grep -F '[[ "$log" != *" commit "* ]]' tests/shell/test_cleanup_worktrees_dirt_clear.bats`,
+  Acceptance: `grep -c -F '[[ "$log" != *" add "* ]]' tests/shell/test_cleanup_worktrees_dirt_clear.bats`
+  returns `2` (one is this task's own assertion; the second is P1-T6's mandated explanatory
+  comment, which quotes this same literal verbatim as a citation rather than adding a second
+  assertion — see P1-T6 below); `grep -F '[[ "$log" != *" commit "* ]]' tests/shell/test_cleanup_worktrees_dirt_clear.bats`
   and `grep -F '[[ "$log" != *"update-index"* ]]' tests/shell/test_cleanup_worktrees_dirt_clear.bats`
-  each return exactly one match. AC-4.
+  each return exactly one match (neither literal is quoted anywhere else in the file). AC-4.
 
-- [ ] [P1-T6] In `tests/shell/test_cleanup_worktrees_dirt_clear.bats`, insert one new
-  `@test` immediately after the P1-T5-extended test's closing `}` and before the next test
-  `"dirt_staged_tree_is_commit: the cached diff-index probe runs..."` (current line 224).
-  Insert this exact test:
+- [x] [P1-T6] In `tests/shell/test_cleanup_worktrees_dirt_clear.bats`, correct one line inside
+  the `@test` block already present on disk (a prior executor pass inserted it, but with a
+  defective redirect) immediately after the P1-T5-extended test's closing `}` (current lines
+  205-225) and before the next test `"dirt_staged_tree_is_commit: the cached diff-index probe
+  runs..."` (current line 258). Correct the existing inserted test in place; do not append a
+  second copy of it.
+
+  Root cause (re-derived directly against the current tree, not carried from the finding
+  document): the inserted test's injected `sed` line currently reads
+  `cleanup_wt_git add -- test-negative-control >/dev/null 2>&1 || true`, which redirects
+  both stdout and stderr of the injected call to `/dev/null`. `tests/fixtures/cleanup_worktrees/stub-bin/git`
+  reports every invocation by writing `stub-git: <argv>` to **stderr**
+  (`printf 'stub-git: %s\n' "$*" >&2`, confirmed at that file's line 107), and this test's own
+  observation line (`log="$(printf '%s\n' "$output" | grep '^stub-git' || true)"`) and
+  assertion (`[[ "$log" == *" add "* ]]`) both depend on that stderr line reaching `$output`.
+  The `2>&1` redirect discards it before it ever reaches the stream `run` captures, so the
+  assertion fails unconditionally, independent of the mutation's behavior.
+
+  Locate the exact line (current line 230):
+  ```bash
+  	cleanup_wt_git add -- test-negative-control >/dev/null 2>&1 || true' "${LIB}")"
+  ```
+  and replace it with:
+  ```bash
+  	cleanup_wt_git add -- test-negative-control >/dev/null || true' "${LIB}")"
+  ```
+  This still suppresses the injected call's stdout; its stderr — carrying the stub's argv-log
+  line — now reaches the combined `$output` that `run` captures. No other line in the test
+  changes. The corrected test body, for reference:
   ```bash
   @test "dirt_staged_tree_is_commit: injecting a git add call into run_report makes the widened non-mutation assertion fail (negative control)" {
       local mutated
       mutated="$(sed '/^run_report() {$/a\
-  	cleanup_wt_git add -- test-negative-control >/dev/null 2>&1 || true' "${LIB}")"
+  	cleanup_wt_git add -- test-negative-control >/dev/null || true' "${LIB}")"
       run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
           CLEANUP_WT_STUB_SCENARIO="${SCEN}/dirt_staged_tree_is_commit" \
           bash -c '
@@ -321,10 +348,12 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   with `LIB` eval'd instead of sourced from disk. `run_report()`'s definition (confirmed at
   `scripts/bash/cleanup_worktrees_lib.sh:452`) is the sole match for
   `/^run_report() {$/` in that file, so the `sed` address is unambiguous.
-  Acceptance (named test): after Phase 2's test run, the TAP output contains the single-line
-  token
+  Acceptance (two conditions, both required): (1) `grep -c -F 'test-negative-control >/dev/null || true' tests/shell/test_cleanup_worktrees_dirt_clear.bats`
+  returns `1` and `grep -c -F 'test-negative-control >/dev/null 2>&1 || true' tests/shell/test_cleanup_worktrees_dirt_clear.bats`
+  returns `0` (the corrected redirect is present and the defective one is gone); (2) after
+  Phase 2's test run, the TAP output contains the single-line token
   `dirt_staged_tree_is_commit: injecting a git add call into run_report makes the widened non-mutation assertion fail (negative control)`
-  on an `ok` line. AC-5.
+  on an `ok` line and on no `not ok` line. AC-5.
 
 - [x] [P1-T7] In `tests/fixtures/cleanup_worktrees/stub-bin/git`, replace the false
   "no writing arm is defined" paragraph (current lines 68-73) with an accurate table of
@@ -394,7 +423,7 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   discovery roots exclude `tests/`), so any diagnostic here is pre-existing and outside this
   plan's blast radius; do not edit an in-scope test/fixture file to silence it. AC-7.
 
-- [ ] [P2-T2] Run the final test-stage command `npx --yes bats tests/shell` (or
+- [x] [P2-T2] Run the final test-stage command `npx --yes bats tests/shell` (or
   `sh scripts/bash/shell-qc.sh test`; see "Command-route note"). Write
   `docs/features/active/cleanup-worktrees-test-suite-blind-spots-660/evidence/qa-gates/final-shell-qc-test.<ISO-8601 timestamp>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording: the TAP
