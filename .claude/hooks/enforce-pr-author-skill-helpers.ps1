@@ -15,10 +15,13 @@
     payload-reader migration (issue #501) added the module import, the envelope-anomaly
     mapping, and the entry-point seam. The split is a pure move with no behaviour change.
 
-    Both helpers read the script-scoped configuration variables the parent hook assigns
-    ($script:PrContextArtifactPath, $script:OrchestratorStateCheckpointPath) and call the
-    parent hook's injectable read seams, so this file is only ever dot-sourced from that
-    hook and never invoked on its own.
+    Both helpers read the script-scoped configuration the parent hook declares and call the
+    parent hook's injectable read seams, so this file is only ever dot-sourced from that hook
+    and never invoked on its own. $script:PrContextArtifactPath is a process-directory-relative
+    artifact path and stays one. $script:OrchestratorStateCheckpointPath is different after
+    issue #673: the parent declares it null, and Get-PrAuthorBypassReason assigns it the
+    absolute checkpoint path of the worktree identity resolution selected, so every later
+    reader receives one resolved path rather than deriving its own.
 
 .NOTES
     Compatible with PowerShell 7+. No external module dependencies.
@@ -37,20 +40,24 @@ param()
 # worse than a false denial because it reports success for a lifecycle it never checked.
 Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeResolution.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTargetResolution.psm1') -Force -ErrorAction Stop
+# Portable-identity resolution (issue #673). A path signal cannot select a worktree: a merged
+# feature folder exists in every checkout branched from main, so it places a call in many at
+# once. The item is identified by its canonical issue number and its branch instead.
+Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop
 
 function Resolve-PrAuthorWorktreeTarget {
     <#
     .SYNOPSIS
         Resolve the call's target worktree. Tests mock this function (resolution seam).
     .DESCRIPTION
-        A seam rather than a direct call because Resolve-WorktreeCallTarget reads real git
-        state: the worktree list, each registration's branch, and the filesystem. A test
-        that drove it directly would depend on the machine's live worktrees and would pass
-        or fail according to what other sessions happen to have checked out, which the
-        repository's determinism policy forbids. Mocking here lets a test state the
-        resolution outcome it is exercising and nothing else.
+        A seam rather than a direct call because the resolver reads real git state: the
+        worktree list, each registration's branch, and the filesystem. A test that drove it
+        directly would depend on the machine's live worktrees and would pass or fail
+        according to what other sessions happen to have checked out, which the repository's
+        determinism policy forbids. Mocking here lets a test state the resolution outcome it
+        is exercising and nothing else.
     .OUTPUTS
-        The target result object from Resolve-WorktreeCallTarget.
+        The target result object from Resolve-WorktreeItemTarget.
     #>
     [CmdletBinding()]
     param(
@@ -58,7 +65,7 @@ function Resolve-PrAuthorWorktreeTarget {
         [string] $CommandText
     )
 
-    return (Resolve-WorktreeCallTarget -Text $CommandText -SessionRoot (Get-Location).Path)
+    return (Resolve-WorktreeItemTarget -Text $CommandText -SessionRoot (Get-Location).Path)
 }
 
 function Get-PrAuthorTargetCheckpointResolution {
@@ -66,19 +73,27 @@ function Get-PrAuthorTargetCheckpointResolution {
     .SYNOPSIS
         Resolve the checkpoint path this call must be validated against.
     .DESCRIPTION
-        Derives the target worktree from the command text and maps the four resolution
-        states onto a checkpoint path or a deny reason:
+        Resolves the target worktree from the command text by portable identity and maps the
+        four resolution states onto a checkpoint path or a deny reason:
 
-          SessionRoot   -> the session-root-relative path, exactly as before.
-          OtherWorktree -> that worktree's own checkpoint.
-          NoTarget      -> deny, naming TARGET_WORKTREE_NOT_DERIVABLE. pr-author passes
-                           --head on every gh pr create, so a call reaching here omitted
-                           the explicit target; the remedy is to supply it, never to fall
-                           back to whichever checkpoint occupies the session root.
-          Ambiguous     -> deny, naming TARGET_WORKTREE_AMBIGUOUS.
+          SessionRoot   -> that worktree's own checkpoint, composed absolutely.
+          OtherWorktree -> that worktree's own checkpoint, composed the same way.
+          NoTarget      -> deny, carrying the code Get-WorktreeResolutionNoTargetReasonCode
+                           returns. pr-author passes --head on every gh pr create, so a call
+                           reaching here omitted the explicit target; the remedy is to supply
+                           it, never to fall back to whichever checkpoint occupies the
+                           session root.
+          Ambiguous     -> deny, carrying the code
+                           Get-WorktreeResolutionAmbiguityReasonCode returns.
+
+        The two resolved states share one branch because the path is now composed the same
+        way for both: identity selects the worktree, and the checkpoint is read beneath it.
+        A session-root result is not a special case, it is the case where identity happened
+        to select the worktree the process is already running in.
 
         Returning a deny for the two unresolved states is what keeps the gate honest: it
-        refuses to answer rather than answering from unrelated state.
+        refuses to answer rather than answering from unrelated state. Neither reason-code
+        literal appears in this file; both come from the accessors named above.
     .OUTPUTS
         System.Collections.Specialized.OrderedDictionary with CheckpointPath and Reason.
     #>
@@ -92,12 +107,8 @@ function Get-PrAuthorTargetCheckpointResolution {
     $target = Resolve-PrAuthorWorktreeTarget -CommandText $CommandText
 
     switch ($target.Status) {
-        'SessionRoot' {
-            return [ordered]@{ CheckpointPath = $script:OrchestratorStateCheckpointPath; Reason = $null }
-        }
-        'OtherWorktree' {
-            $path = Join-WorktreeResolutionPath -WorktreeRoot $target.WorktreeRoot -RepoRelativePath $script:OrchestratorStateCheckpointPath
-            return [ordered]@{ CheckpointPath = $path; Reason = $null }
+        { $_ -in @('SessionRoot', 'OtherWorktree') } {
+            return [ordered]@{ CheckpointPath = (Get-WorktreeItemCheckpointPath -WorktreeRoot $target.WorktreeRoot); Reason = $null }
         }
         default {
             $reason = "$($target.ReasonCode): $($target.Detail) The pr-author gate will not validate this call against the session root's checkpoint, because that checkpoint may belong to a different item. Pass --head <branch> on the gh pr create command so the call names its own target."
@@ -130,6 +141,9 @@ function Test-PrAuthorReceiptVerification {
         with Write access to artifacts/ can replace the body file and the receipt together.
     .PARAMETER CommandText
         The Bash command text containing the --body-file argument.
+    .PARAMETER CheckpointPath
+        The absolute checkpoint path identity resolution selected, passed through to check 6
+        so that check reads the resolved worktree's checkpoint rather than deriving its own.
     .OUTPUTS
         System.String or $null
     #>
@@ -137,7 +151,10 @@ function Test-PrAuthorReceiptVerification {
     [OutputType([string])]
     param(
         [Parameter(Mandatory)]
-        [string] $CommandText
+        [string] $CommandText,
+
+        [Parameter(Mandatory)]
+        [string] $CheckpointPath
     )
 
     # Check 1: the --body-file argument must match the canonical artifacts/pr_body_<N>.md pattern.
@@ -208,7 +225,7 @@ function Test-PrAuthorReceiptVerification {
     }
 
     # Check 6: under epic_mode, gh pr create must carry a matching --base override.
-    $epicBaseBranchReason = Test-EpicBaseBranchOverride -CommandText $CommandText
+    $epicBaseBranchReason = Test-EpicBaseBranchOverride -CommandText $CommandText -CheckpointPath $CheckpointPath
     if ($epicBaseBranchReason) {
         return $epicBaseBranchReason
     }
@@ -316,7 +333,10 @@ function Get-PrAuthorBypassReason {
         if ($resolution.Reason) {
             return $resolution.Reason
         }
-        $checkpointPath = $resolution.CheckpointPath
+        # Assigned once here and read by every later consumer, so the preflight, the receipt
+        # verifier, and the epic base-branch check cannot disagree about which item is gated.
+        $script:OrchestratorStateCheckpointPath = $resolution.CheckpointPath
+        $checkpointPath = $script:OrchestratorStateCheckpointPath
         $preflightResult = Invoke-OrchestratorStatePreflight -CheckpointPath $checkpointPath
         if ($preflightResult.HasErrors) {
             $preflightSummary = if ([string]::IsNullOrWhiteSpace($preflightResult.ErrorText)) {
@@ -330,7 +350,7 @@ function Get-PrAuthorBypassReason {
 
     # Receipt verification: extends, and does not replace, the previously-allowed path.
     if ($hasBodyFile -and $ContextExists) {
-        $receiptReason = Test-PrAuthorReceiptVerification -CommandText $CommandText
+        $receiptReason = Test-PrAuthorReceiptVerification -CommandText $CommandText -CheckpointPath $script:OrchestratorStateCheckpointPath
         if ($receiptReason) {
             return $receiptReason
         }

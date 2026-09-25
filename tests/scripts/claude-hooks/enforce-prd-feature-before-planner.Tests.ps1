@@ -10,7 +10,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         $script:Helpers = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1").Path
         . $script:UnderTest
         . $script:Helpers
-        Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'NoTarget' -SessionRoot '/synthetic-worktrees/session-root' -Detail 'modelled no-target for the delivered cases' }
+        Mock -CommandName Resolve-PrdFeatureWorktreeTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'SessionRoot' -SessionRoot '/synthetic-worktrees/session-root' -WorktreeRoot '/synthetic-worktrees/session-root' -Signal 'Branch' -SignalValue 'f5-fixture-own' -Candidate @('/synthetic-worktrees/session-root') -Detail 'modelled session-root target for the delivered cases' }
     }
 
     Context 'tool input parsing' {
@@ -201,11 +201,11 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'real Test-Path wrapper returns $false for a nonexistent path' {
-            (Get-PrdFeatureFileExistence -Path 'C:/__nonexistent_path_for_test__.md') | Should -BeFalse
+            (Get-PrdFeatureFileExistence -Path '/synthetic-worktrees/session-root/docs/features/active/2026-09-13-no-such-folder/spec.md') | Should -BeFalse
         }
 
         It 'Get-PrdFeatureCheckpointFolder returns $null when checkpoint is absent' {
-            (Get-PrdFeatureCheckpointFolder -CheckpointPath 'C:/__nonexistent_checkpoint_for_test__.json') | Should -BeNullOrEmpty
+            (Get-PrdFeatureCheckpointFolder -CheckpointPath '/synthetic-worktrees/session-root/artifacts/orchestration/no-such-checkpoint.json') | Should -BeNullOrEmpty
         }
     }
 
@@ -290,7 +290,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
 
     Context 'Get-PrdFeatureIssueContent' {
         It 'returns $null when issue.md does not exist' {
-            Get-PrdFeatureIssueContent -FeatureFolder 'C:/__nonexistent_feature_folder_for_test__' | Should -BeNullOrEmpty
+            Get-PrdFeatureIssueContent -FeatureFolder '/synthetic-worktrees/session-root/docs/features/active/2026-09-13-no-such-folder' | Should -BeNullOrEmpty
         }
 
         It 'returns $null when issue.md exists but Get-Content throws (unreadable)' {

@@ -31,13 +31,13 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride' {
     Context 'epic_mode is false or absent (no-op/allow)' {
         It 'allows when the checkpoint is absent (Get-PrAuthorCheckpointContent returns $null)' {
             Mock -CommandName Get-PrAuthorCheckpointContent -MockWith { $null }
-            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr create --title "x" --body-file artifacts/pr_body_1.md'
+            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr create --title "x" --body-file artifacts/pr_body_1.md' -CheckpointPath (Join-Path $PSScriptRoot 'no-such-checkpoint.json')
             $result | Should -BeNullOrEmpty
         }
 
         It 'allows when the checkpoint has epic_mode: false' {
             Mock -CommandName Get-PrAuthorCheckpointContent -MockWith { '{"epic_mode":false}' }
-            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr create --title "x" --body-file artifacts/pr_body_1.md'
+            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr create --title "x" --body-file artifacts/pr_body_1.md' -CheckpointPath (Join-Path $PSScriptRoot 'no-such-checkpoint.json')
             $result | Should -BeNullOrEmpty
         }
 
@@ -45,7 +45,7 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride' {
             Mock -CommandName Get-PrAuthorCheckpointContent -MockWith {
                 '{"epic_mode":true,"epic_context":{"integration_branch":"epic/foo-integration"}}'
             }
-            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr edit 5 --body-file artifacts/pr_body_5.md'
+            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr edit 5 --body-file artifacts/pr_body_5.md' -CheckpointPath (Join-Path $PSScriptRoot 'no-such-checkpoint.json')
             $result | Should -BeNullOrEmpty
         }
     }
@@ -55,7 +55,7 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride' {
             Mock -CommandName Get-PrAuthorCheckpointContent -MockWith {
                 '{"epic_mode":true,"epic_context":{"integration_branch":"epic/foo-integration"}}'
             }
-            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr create --title "x" --base epic/foo-integration --body-file artifacts/pr_body_1.md'
+            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr create --title "x" --base epic/foo-integration --body-file artifacts/pr_body_1.md' -CheckpointPath (Join-Path $PSScriptRoot 'no-such-checkpoint.json')
             $result | Should -BeNullOrEmpty
         }
     }
@@ -65,7 +65,7 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride' {
             Mock -CommandName Get-PrAuthorCheckpointContent -MockWith {
                 '{"epic_mode":true,"epic_context":{"integration_branch":"epic/foo-integration"}}'
             }
-            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr create --title "x" --body-file artifacts/pr_body_1.md'
+            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr create --title "x" --body-file artifacts/pr_body_1.md' -CheckpointPath (Join-Path $PSScriptRoot 'no-such-checkpoint.json')
             $result | Should -Match 'EPIC_BASE_BRANCH_MISMATCH'
         }
     }
@@ -75,13 +75,13 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride' {
             Mock -CommandName Get-PrAuthorCheckpointContent -MockWith {
                 '{"epic_mode":true,"epic_context":{"integration_branch":"epic/foo-integration"}}'
             }
-            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr create --title "x" --base main --body-file artifacts/pr_body_1.md'
+            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr create --title "x" --base main --body-file artifacts/pr_body_1.md' -CheckpointPath (Join-Path $PSScriptRoot 'no-such-checkpoint.json')
             $result | Should -Match 'EPIC_BASE_BRANCH_MISMATCH'
         }
 
         It 'denies when epic_mode is true but epic_context.integration_branch is missing' {
             Mock -CommandName Get-PrAuthorCheckpointContent -MockWith { '{"epic_mode":true}' }
-            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr create --title "x" --base main --body-file artifacts/pr_body_1.md'
+            $result = Test-EpicBaseBranchOverride -CommandText 'gh pr create --title "x" --base main --body-file artifacts/pr_body_1.md' -CheckpointPath (Join-Path $PSScriptRoot 'no-such-checkpoint.json')
             $result | Should -Match 'EPIC_BASE_BRANCH_MISMATCH'
         }
     }
