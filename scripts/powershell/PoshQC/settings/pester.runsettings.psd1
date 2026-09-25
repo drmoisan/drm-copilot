@@ -295,6 +295,9 @@
             '.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1'
             # Issue #673 added the identity-resolution module, registered for the same reason.
             '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
+            # Issue #663 added the epic-scope resolver and its pure readiness predicates.
+            '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'
+            '.claude/lib/worktree-resolution/EpicScopeReadiness.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

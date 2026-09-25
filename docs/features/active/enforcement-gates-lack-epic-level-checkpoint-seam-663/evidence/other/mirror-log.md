@@ -26,3 +26,20 @@ Four-copy set:
 - extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1: 28164c591831d1f3e62dc2a5dbecea0abebd1792d607a95aec191be943486c77
 - Set: identical
 
+## B2 - modules and runsettings ([P2-T8])
+
+Timestamp: 2026-09-25T19-19
+
+- Command: `Copy-Item -LiteralPath .claude/lib/worktree-resolution/EpicScopeResolution.psm1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeResolution.psm1 -Force`
+  - .claude/lib/worktree-resolution/EpicScopeResolution.psm1: 47cf0abb4d9cb752c8f8baf1c9f20ed5c57f81c8963475ec5a5e012075a3bf54
+  - extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeResolution.psm1: 47cf0abb4d9cb752c8f8baf1c9f20ed5c57f81c8963475ec5a5e012075a3bf54
+  - Pair: equal
+- Command: `Copy-Item -LiteralPath .claude/lib/worktree-resolution/EpicScopeReadiness.psm1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeReadiness.psm1 -Force`
+  - .claude/lib/worktree-resolution/EpicScopeReadiness.psm1: 30ba3d84926953536018e7d473238cf52bb4900555dc177c81cf518bd74d88b1
+  - extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeReadiness.psm1: 30ba3d84926953536018e7d473238cf52bb4900555dc177c81cf518bd74d88b1
+  - Pair: equal
+- Command: `Copy-Item -LiteralPath scripts/powershell/PoshQC/settings/pester.runsettings.psd1 -Destination extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1 -Force`
+  - scripts/powershell/PoshQC/settings/pester.runsettings.psd1: c6b4629a349e49980f0f8d0e7db916a4193a2bc99ed8130d55c9bcf394cbe71b
+  - extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1: c6b4629a349e49980f0f8d0e7db916a4193a2bc99ed8130d55c9bcf394cbe71b
+  - Pair: equal
+

@@ -223,7 +223,7 @@ Tests (new or extended):
 
 Resolver
 
-- [ ] `EpicScopeResolution.Tests.ps1` passes with cases proving: epic scope when the branch signal equals the epic checkpoint's `integration_branch`; epic scope for a command leg whose `-C` selector worktree HEAD, or session-root HEAD when no selector is present, equals `integration_branch`; not epic scope when the epic checkpoint is absent, unparseable, has `route_id` other than `epic`, or the branch does not match; the returned checkpoint path is absolute and is never taken from command or prompt text.
+- [x] `EpicScopeResolution.Tests.ps1` passes with cases proving: epic scope when the branch signal equals the epic checkpoint's `integration_branch`; epic scope for a command leg whose `-C` selector worktree HEAD, or session-root HEAD when no selector is present, equals `integration_branch`; not epic scope when the epic checkpoint is absent, unparseable, has `route_id` other than `epic`, or the branch does not match; the returned checkpoint path is absolute and is never taken from command or prompt text.
 
 Gate 1 — pr-author PR-creation preflight
 
