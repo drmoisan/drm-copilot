@@ -278,7 +278,7 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   and `grep -F '[[ "$log" != *"update-index"* ]]' tests/shell/test_cleanup_worktrees_dirt_clear.bats`
   each return exactly one match. AC-4.
 
-- [x] [P1-T6] In `tests/shell/test_cleanup_worktrees_dirt_clear.bats`, insert one new
+- [ ] [P1-T6] In `tests/shell/test_cleanup_worktrees_dirt_clear.bats`, insert one new
   `@test` immediately after the P1-T5-extended test's closing `}` and before the next test
   `"dirt_staged_tree_is_commit: the cached diff-index probe runs..."` (current line 224).
   Insert this exact test:
@@ -382,7 +382,7 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
 
 ### Phase 2 — Final QC (unconditional)
 
-- [ ] [P2-T1] Run the final check-stage command `sh scripts/bash/shell-qc.sh check` (or the
+- [x] [P2-T1] Run the final check-stage command `sh scripts/bash/shell-qc.sh check` (or the
   CI-confirming-gate fallback per "Command-route note" if locally blocked by permissions or
   by a missing `shfmt`/`shellcheck`). Write `docs/features/active/cleanup-worktrees-test-suite-blind-spots-660/evidence/qa-gates/final-shell-qc-check.<ISO-8601 timestamp>.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording whether
@@ -407,7 +407,7 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   `EXIT_CODE: SKIPPED` is not a valid outcome. If any stage changed a file or failed,
   restart the toolchain loop from formatting. AC-1, AC-2, AC-4, AC-5, AC-7.
 
-- [ ] [P2-T3] Run `git diff origin/main --name-status -- scripts/` followed by
+- [x] [P2-T3] Run `git diff origin/main --name-status -- scripts/` followed by
   `git status --porcelain -- scripts/`. Write
   `docs/features/active/cleanup-worktrees-test-suite-blind-spots-660/evidence/qa-gates/final-ac6-scripts-diff.<ISO-8601 timestamp>.md`
   with `Timestamp:`, `Command: git diff origin/main --name-status -- scripts/ (and) git
