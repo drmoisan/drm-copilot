@@ -1,6 +1,6 @@
 # PowerShell Format Baseline ([P0-T8])
 
-Timestamp: 2026-09-25T19-07
+Timestamp: 2026-09-25T19-00
 Command: git status --porcelain; sh <SCRATCHPAD>/i663/run.sh qc-format  (fresh process: Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1; Invoke-PoshQCFormat -Root $root; information-stream lines counted); git status --porcelain
 EXIT_CODE: 0
 Output Summary: Formatted: count 0; Already formatted: count 506; the tree was not modified (porcelain identical before and after).

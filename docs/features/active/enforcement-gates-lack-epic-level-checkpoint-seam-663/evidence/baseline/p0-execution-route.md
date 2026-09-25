@@ -1,6 +1,6 @@
 # Execution Route ([P0-T6])
 
-Timestamp: 2026-09-25T19-04
+Timestamp: 2026-09-25T18-59
 Command: sh <SCRATCHPAD>/i663/run.sh p0-probe  (run.sh launches the PowerShell 7 executable with -NoProfile -File "$(dirname "$0")/<name>.ps1"; p0-probe.ps1 sets Run.Path and dot-sources the R-SCOPED body rscoped-core.ps1)
 EXIT_CODE: 0
 Output Summary: Route `sh` accepted on first attempt. PassedCount: 2, FailedCount: 0, FailedBlocksCount: 0, FailedContainersCount: 0; both Parity test names printed on PASSED lines.

@@ -1,6 +1,6 @@
 # Current-Tree Facts ([P0-T5])
 
-Timestamp: 2026-09-25T19-02
+Timestamp: 2026-09-25T18-58
 Command: sh <SCRATCHPAD>/i663/run.sh p0-facts  (fresh PowerShell 7 process; `Get-Content` line indexing and `@(Get-Content).Count` over repository-relative paths)
 EXIT_CODE: 0
 Output Summary: 39 cited lines contain their tokens and 17 line counts equal their expected values; MISMATCH_COUNT: 0.

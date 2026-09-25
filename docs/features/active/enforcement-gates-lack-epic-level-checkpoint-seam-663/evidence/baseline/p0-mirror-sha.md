@@ -1,6 +1,6 @@
 # Mirror Baseline ([P0-T18])
 
-Timestamp: 2026-09-25T19-13
+Timestamp: 2026-09-25T19-08
 Command: sh <SCRATCHPAD>/i663/run.sh p0-mirror  (fresh process; Get-FileHash -Algorithm SHA256 over repository-relative paths)
 EXIT_CODE: 0
 Output Summary: Nine source/mirror pairs, one four-copy helpers set, and one runsettings pair recorded; marks listed below.

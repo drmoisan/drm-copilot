@@ -435,4 +435,39 @@ NOTE
             Should -Invoke Test-ExemptOrchestrationSegmentToken -Times 1 -Exactly
         }
     }
+
+    Context 'issue #663 quote-aware angle brackets' {
+        # D4 row 12 as narrowed by issue #663, against the byte-identical .codex/hooks helpers
+        # copy: `<` and `>` are redirections only outside a quoted span. `$` and backtick stay
+        # unresolvable in any quote state, the single-quoted `'\''` apostrophe idiom stays
+        # denied, and a pathless commit stays denied (D4 row 4).
+        It 'issue #663 exempts <Label>' -ForEach @(
+            @{ Label = 'a double-quoted message carrying a Co-Authored-By trailer and an apostrophe'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic-status.md && git commit -m "docs(epic): refresh status, it''s current. Co-Authored-By: Claude <noreply@anthropic.com>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a single-quoted message carrying angle brackets'; Command = 'git commit -m ''Co-Authored-By: Claude <noreply@anthropic.com>'' -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+        ) {
+            # Act
+            $decision = Get-CodexExemptionDecisionForCommand -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'angle brackets inside a quoted span are literal text, not redirections'
+        }
+
+        It 'issue #663 denies <Label>' -ForEach @(
+            @{ Label = 'the single-quoted apostrophe idiom'; Command = 'git commit -m ''it''\''''s done <noreply@anthropic.com>'' -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a command substitution inside a double-quoted message'; Command = 'git commit -m "status $(date) <a@b.c>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a variable expansion inside a double-quoted message'; Command = 'git commit -m "status $USER <a@b.c>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a backtick substitution inside a double-quoted message'; Command = 'git commit -m "status `whoami` <a@b.c>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a pathless commit whose message carries angle brackets'; Command = 'git commit -m "Co-Authored-By: Claude <noreply@anthropic.com>"' }
+            @{ Label = 'an unquoted output redirection after a quoted message carrying angle brackets'; Command = 'git commit -m ''Co-Authored-By: Claude <noreply@anthropic.com>'' -- docs/features/epics/2026-08-24-sample-epic/epic-status.md > out.txt' }
+        ) {
+            # Act
+            $decision = Get-CodexExemptionDecisionForCommand -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'interpolation, an unbalanced idiom, a pathless commit, or an unquoted redirection keeps the line unresolvable'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+        }
+    }
 }

@@ -251,9 +251,9 @@ Gate 4 — preimplementation gate, command and path legs
 
 Gate 4b — staging exemption
 
-- [ ] `enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1` passes new rows proving: `git add <exempt path> && git commit -m "<message with Co-Authored-By: Name <noreply@anthropic.com> and an apostrophe such as it's>"` is exempt; a single-quoted `-m` value containing `<` and `>` is exempt; the `'\''` apostrophe idiom is denied (D4); `$(`, `$VAR`, and backtick inside a double-quoted message are denied; and the existing unquoted `>` and `<` redirection rows still deny.
-- [ ] `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1` carries the same new rows and passes against the `.codex/hooks` helpers copy.
-- [ ] `enforce-orchestration-preimplementation-gate-helpers.Parity.Tests.ps1` passes, proving all four copies of `enforce-orchestration-preimplementation-gate-helpers.ps1` (`.claude/hooks`, `.codex/hooks`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks`) are SHA-256 identical after the change, and `legacy-codex-hook-contracts.Tests.ps1` passes.
+- [x] `enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1` passes new rows proving: `git add <exempt path> && git commit -m "<message with Co-Authored-By: Name <noreply@anthropic.com> and an apostrophe such as it's>"` is exempt; a single-quoted `-m` value containing `<` and `>` is exempt; the `'\''` apostrophe idiom is denied (D4); `$(`, `$VAR`, and backtick inside a double-quoted message are denied; and the existing unquoted `>` and `<` redirection rows still deny.
+- [x] `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1` carries the same new rows and passes against the `.codex/hooks` helpers copy.
+- [x] `enforce-orchestration-preimplementation-gate-helpers.Parity.Tests.ps1` passes, proving all four copies of `enforce-orchestration-preimplementation-gate-helpers.ps1` (`.claude/hooks`, `.codex/hooks`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks`) are SHA-256 identical after the change, and `legacy-codex-hook-contracts.Tests.ps1` passes.
 
 Gate 5 — completion-consistency (no code change, D3)
 
