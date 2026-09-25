@@ -227,13 +227,13 @@ Resolver
 
 Gate 1 — pr-author PR-creation preflight
 
-- [ ] `enforce-pr-author-skill.EpicScope.Tests.ps1` allow case: `gh pr create --head <integration_branch> --base main` is allowed when the epic checkpoint has `route_id: epic`, a matching `integration_branch`, and every `features[].merge_status` in `{merged, worktree_removed}`, with no per-feature checkpoint present.
-- [ ] `enforce-pr-author-skill.EpicScope.Tests.ps1` deny cases: the same command is denied when a feature has a non-terminal `merge_status`, when `features` is empty, and when the epic checkpoint is absent; each epic-scope denial reason names the epic checkpoint and the failed conjunct.
+- [x] `enforce-pr-author-skill.EpicScope.Tests.ps1` allow case: `gh pr create --head <integration_branch> --base main` is allowed when the epic checkpoint has `route_id: epic`, a matching `integration_branch`, and every `features[].merge_status` in `{merged, worktree_removed}`, with no per-feature checkpoint present.
+- [x] `enforce-pr-author-skill.EpicScope.Tests.ps1` deny cases: the same command is denied when a feature has a non-terminal `merge_status`, when `features` is empty, and when the epic checkpoint is absent; each epic-scope denial reason names the epic checkpoint and the failed conjunct.
 - [ ] `enforce-pr-author-skill.EpicScope.Tests.ps1` standalone case: a per-feature PR (`--head` not equal to any epic `integration_branch`) yields the same decision and reason text as before the change, and all existing `enforce-pr-author-skill*.Tests.ps1` suites pass unmodified.
 
 Gate 2 — epic base-branch check 6
 
-- [ ] `enforce-pr-author-skill.epic-base-branch.Tests.ps1` epic-scope cases: `--base main` is allowed and any other `--base` value is denied with `EPIC_BASE_BRANCH_MISMATCH`, using the scope result gate 1 resolved (a single resolution per call).
+- [x] `enforce-pr-author-skill.epic-base-branch.Tests.ps1` epic-scope cases: `--base main` is allowed and any other `--base` value is denied with `EPIC_BASE_BRANCH_MISMATCH`, using the scope result gate 1 resolved (a single resolution per call).
 - [ ] The existing per-feature `epic_mode: true` / `epic_mode: false` rows in `enforce-pr-author-skill.epic-base-branch.Tests.ps1` and `enforce-pr-author-skill.epic-base-branch.TriggerScoping.Tests.ps1` pass without modification.
 
 Gate 3 — model-routing receipt

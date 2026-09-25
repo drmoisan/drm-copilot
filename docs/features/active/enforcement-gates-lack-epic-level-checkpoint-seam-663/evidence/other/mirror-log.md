@@ -52,3 +52,16 @@ Timestamp: 2026-09-25T19-25
   - extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeResolution.psm1: 7d5d603e61480732326c05bca7848f765c33e98e5a5265e917ec28f91cd80a61
   - Pair: equal
 
+## B3 - pr-author hooks ([P3-T7])
+
+Timestamp: 2026-09-25T19-29
+
+- Command: `Copy-Item -LiteralPath .claude/hooks/enforce-pr-author-skill-helpers.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill-helpers.ps1 -Force`
+  - .claude/hooks/enforce-pr-author-skill-helpers.ps1: fae566112a3c4b394a9f11e4ef6f7db76ff1569b1ca1ce9eb90c2c5c64ab4e32
+  - extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill-helpers.ps1: fae566112a3c4b394a9f11e4ef6f7db76ff1569b1ca1ce9eb90c2c5c64ab4e32
+  - Pair: equal
+- Command: `Copy-Item -LiteralPath .claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1 -Force`
+  - .claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1: f47367ef0b7b360f5cf343d742c3086499365ea128e0a05ae363180e4c2ec266
+  - extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1: f47367ef0b7b360f5cf343d742c3086499365ea128e0a05ae363180e4c2ec266
+  - Pair: equal
+

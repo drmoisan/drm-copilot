@@ -25,3 +25,12 @@ EXIT_CODE: 0
 Commit: fd9e9c5090d23c44eaa80364c6fe7b2fa0e347b5
 Non-evidence paths in `git log -1 --name-only` (10): .claude/lib/worktree-resolution/EpicScopeReadiness.psm1, .claude/lib/worktree-resolution/EpicScopeResolution.psm1, extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeReadiness.psm1, extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeResolution.psm1, extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json, extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1, scripts/powershell/PoshQC/settings/pester.runsettings.psd1, tests/scripts/claude-lib/worktree-resolution/EpicScopeReadiness.Tests.ps1, tests/scripts/claude-lib/worktree-resolution/EpicScopeResolution.Tests.ps1, tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1
 Porcelain (post-commit, pre-append): (empty)
+
+## B2 remediation (between [P2-T10] and [P3-T2]; see evidence/qa-gates/b2-remediation-analyzer.md)
+
+Timestamp: 2026-09-25T19-26
+Command: git commit -F <SCRATCHPAD>/i663/commit-b2r.txt
+EXIT_CODE: 0
+Commit: ed7e80595673dd4fd7b477a46d5b2d2aaa7293e1
+Non-evidence paths: .claude/lib/worktree-resolution/EpicScopeResolution.psm1, extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeResolution.psm1, tests/scripts/claude-lib/worktree-resolution/EpicScopeReadiness.Tests.ps1, tests/scripts/claude-lib/worktree-resolution/EpicScopeResolution.Tests.ps1
+Porcelain (post-commit, pre-append): (empty)
