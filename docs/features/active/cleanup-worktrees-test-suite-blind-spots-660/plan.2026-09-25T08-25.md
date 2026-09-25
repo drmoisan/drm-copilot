@@ -72,25 +72,25 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
 
 ### Phase 0 — Context & Inputs
 
-- [ ] [P0-T1] Read `CLAUDE.md` in full (policy-compliance reading order, position 1).
+- [x] [P0-T1] Read `CLAUDE.md` in full (policy-compliance reading order, position 1).
   Acceptance: the file's "Policy Compliance Reading Order" and "Architecture" sections
   have been read; no file edit in this task.
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full (position 2). Acceptance:
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full (position 2). Acceptance:
   the file's "Mandatory Toolchain Loop" and "File Size Limit" sections have been read; no
   file edit in this task.
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full (position 3). Acceptance:
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full (position 3). Acceptance:
   the file's "Coverage Requirements," "External Dependencies" (temporary-file prohibition),
   and "Test File Location" sections have been read; no file edit in this task.
-- [ ] [P0-T4] Read `.claude/rules/shell.md` in full (language-specific, bash is the sole
+- [x] [P0-T4] Read `.claude/rules/shell.md` in full (language-specific, bash is the sole
   language in scope). Acceptance: the file's "Toolchain," "Discovery Contract," and
   "Coverage Expectations" sections have been read; no file edit in this task.
-- [ ] [P0-T5] Write `docs/features/active/cleanup-worktrees-test-suite-blind-spots-660/evidence/baseline/phase0-instructions-read.md`
+- [x] [P0-T5] Write `docs/features/active/cleanup-worktrees-test-suite-blind-spots-660/evidence/baseline/phase0-instructions-read.md`
   containing at minimum: `Timestamp: <ISO-8601, yyyy-MM-ddTHH-mm>`, `Policy Order: CLAUDE.md,
   .claude/rules/general-code-change.md, .claude/rules/general-unit-test.md,
   .claude/rules/shell.md`, and the explicit list of the four files read in P0-T1 through
   P0-T4. Acceptance: the file exists at this exact path and contains all four required
   fields/lines.
-- [ ] [P0-T6] Run the baseline check-stage command `sh scripts/bash/shell-qc.sh check`
+- [x] [P0-T6] Run the baseline check-stage command `sh scripts/bash/shell-qc.sh check`
   (see "Command-route note" above for the permission-blocked or tool-missing fallback). Write
   `docs/features/active/cleanup-worktrees-test-suite-blind-spots-660/evidence/baseline/baseline-shell-qc-check.<ISO-8601 timestamp>.md`
   with `Timestamp:`, `Command: sh scripts/bash/shell-qc.sh check`, `EXIT_CODE:`, and
@@ -100,7 +100,7 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   pre-existing condition unrelated to this feature's own changes, none of which sit under
   `scripts/`, `tools/`, or `.claude/lib/bash/`). Acceptance: the artifact exists with all
   four required fields.
-- [ ] [P0-T7] Run the baseline test-stage command `npx --yes bats tests/shell` (or
+- [x] [P0-T7] Run the baseline test-stage command `npx --yes bats tests/shell` (or
   `sh scripts/bash/shell-qc.sh test` if the executor's tool permissions allow it; see
   "Command-route note"). Write
   `docs/features/active/cleanup-worktrees-test-suite-blind-spots-660/evidence/baseline/baseline-shell-qc-test.<ISO-8601 timestamp>.md`
