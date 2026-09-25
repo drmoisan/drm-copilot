@@ -74,3 +74,20 @@ Timestamp: 2026-09-25T19-35
   - extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-model-routing-receipt.ps1: 59145ac5f0f44aa4ea1fa0a6e78bd3520446837406521cadf63fd1bdf500f586
   - Pair: equal
 
+## B5 - preimplementation gate, sibling, runsettings ([P5-T7])
+
+Timestamp: 2026-09-25T19-41
+
+- Command: `Copy-Item -LiteralPath .claude/hooks/enforce-orchestration-preimplementation-gate.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate.ps1 -Force`
+  - .claude/hooks/enforce-orchestration-preimplementation-gate.ps1: bb587d8e3eea0de900a2428a5ee155bf983ae869e697db6a94b2a2898d4da2b3
+  - extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate.ps1: bb587d8e3eea0de900a2428a5ee155bf983ae869e697db6a94b2a2898d4da2b3
+  - Pair: equal
+- Command: `Copy-Item -LiteralPath .claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 -Force`
+  - .claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1: 1bd743bbf35af67caa1e03525129e88ce67029695c81e9d85afcdc0ccf2fdc61
+  - extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1: 1bd743bbf35af67caa1e03525129e88ce67029695c81e9d85afcdc0ccf2fdc61
+  - Pair: equal
+- Command: `Copy-Item -LiteralPath scripts/powershell/PoshQC/settings/pester.runsettings.psd1 -Destination extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1 -Force`
+  - scripts/powershell/PoshQC/settings/pester.runsettings.psd1: 5988cba0f4a1700dda571f36652623d797d1dc1d5a4b12a462a483fc79f35eda
+  - extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1: 5988cba0f4a1700dda571f36652623d797d1dc1d5a4b12a462a483fc79f35eda
+  - Pair: equal
+

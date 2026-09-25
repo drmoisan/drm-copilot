@@ -238,8 +238,8 @@ Gate 2 — epic base-branch check 6
 
 Gate 3 — model-routing receipt
 
-- [ ] `enforce-model-routing-receipt.EpicScope.Tests.ps1` allow case: `Agent(pr-author)` with a `branch:` label equal to `integration_branch` is allowed when the epic checkpoint's `model_routing_receipts[]` contains a `pr-author` receipt.
-- [ ] `enforce-model-routing-receipt.EpicScope.Tests.ps1` deny case: the same delegation is denied with `MODEL_ROUTING_RECEIPT_BLOCKED` when the epic checkpoint has no `pr-author` receipt.
+- [x] `enforce-model-routing-receipt.EpicScope.Tests.ps1` allow case: `Agent(pr-author)` with a `branch:` label equal to `integration_branch` is allowed when the epic checkpoint's `model_routing_receipts[]` contains a `pr-author` receipt.
+- [x] `enforce-model-routing-receipt.EpicScope.Tests.ps1` deny case: the same delegation is denied with `MODEL_ROUTING_RECEIPT_BLOCKED` when the epic checkpoint has no `pr-author` receipt.
 - [ ] `enforce-model-routing-receipt.EpicScope.Tests.ps1` standalone case: a per-feature delegation resolves the per-feature checkpoint with unchanged decision and reason text, and the existing `enforce-model-routing-receipt*.Tests.ps1` suites pass unmodified.
 
 Gate 4 — preimplementation gate, command and path legs

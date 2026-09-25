@@ -233,6 +233,8 @@
             # table and the epic and parallel readiness predicates; registered so the new
             # production file stays in the coverage denominator per the Coverage Exclusion Policy.
             '.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1'
+            # Issue #663 added this dot-sourced sibling for the epic-scope command and path legs.
+            '.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1'
             '.claude/hooks/enforce-evidence-locations.ps1'
             '.claude/hooks/enforce-feature-folder-order.ps1'
             '.claude/hooks/enforce-checkpoint-monotonic.ps1'

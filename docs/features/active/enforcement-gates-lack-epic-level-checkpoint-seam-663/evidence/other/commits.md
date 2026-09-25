@@ -43,3 +43,12 @@ EXIT_CODE: 0
 Commit: 365a3960a84c317db56fa4aed0f40332c2314cc1
 Non-evidence paths in `git log -1 --name-only` (6): .claude/hooks/enforce-pr-author-skill-helpers.ps1, .claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1, extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill-helpers.ps1, extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1, tests/scripts/claude-hooks/enforce-pr-author-skill.EpicScope.Tests.ps1, tests/scripts/claude-hooks/enforce-pr-author-skill.epic-base-branch.Tests.ps1
 Porcelain (post-commit, pre-append): (empty)
+
+## B4 ([P4-T7])
+
+Timestamp: 2026-09-25T19-37
+Command: git commit -F <SCRATCHPAD>/i663/commit-b4.txt
+EXIT_CODE: 0
+Commit: 3649f3a8a5d249b1a612a4dd3dd1229c329de2cc
+Non-evidence paths in `git log -1 --name-only` (3): .claude/hooks/enforce-model-routing-receipt.ps1, extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-model-routing-receipt.ps1, tests/scripts/claude-hooks/enforce-model-routing-receipt.EpicScope.Tests.ps1
+Porcelain (post-commit, pre-append): (empty)
