@@ -65,3 +65,12 @@ Timestamp: 2026-09-25T19-29
   - extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1: f47367ef0b7b360f5cf343d742c3086499365ea128e0a05ae363180e4c2ec266
   - Pair: equal
 
+## B4 - model-routing receipt hook ([P4-T5])
+
+Timestamp: 2026-09-25T19-35
+
+- Command: `Copy-Item -LiteralPath .claude/hooks/enforce-model-routing-receipt.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-model-routing-receipt.ps1 -Force`
+  - .claude/hooks/enforce-model-routing-receipt.ps1: 59145ac5f0f44aa4ea1fa0a6e78bd3520446837406521cadf63fd1bdf500f586
+  - extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-model-routing-receipt.ps1: 59145ac5f0f44aa4ea1fa0a6e78bd3520446837406521cadf63fd1bdf500f586
+  - Pair: equal
+
