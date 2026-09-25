@@ -247,9 +247,6 @@ count_of() { # count_of <pattern>
     [[ "$log" == *" add "* ]]
     # The mutated source was composed into a shell variable and evaluated in a child
     # process; the production file on disk was never opened for writing.
-    run git -C "${REPO_ROOT}" diff origin/main -- "${LIB}"
-    [ "$status" -eq 0 ]
-    [ -z "$output" ]
     run git -C "${REPO_ROOT}" status --porcelain -- "${LIB}"
     [ "$status" -eq 0 ]
     [ -z "$output" ]

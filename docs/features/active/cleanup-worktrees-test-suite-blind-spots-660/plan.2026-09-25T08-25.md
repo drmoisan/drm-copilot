@@ -3,9 +3,9 @@
 - **Issue:** #660
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-25T15-13
+- **Last Updated:** 2026-09-25T18-00
 - **Status:** Draft
-- **Version:** 0.3
+- **Version:** 0.4
 - **Work Mode:** minor-audit
 
 **Requirements source (sole AC source, minor-audit):** `issue.md`, section `## Acceptance
@@ -176,9 +176,42 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   `dirt_typechange_delta: an MT entry whose working-tree content is on main is UNIQUE`
   on an `ok` line and on no `not ok` line. AC-1.
 
-- [x] [P1-T3] In `tests/shell/test_cleanup_worktrees_dirt_classify.bats`, insert one further
-  new `@test` immediately after the P1-T2 test's closing `}` (still before
-  `dirt_classifier_read_error`). Insert this exact test:
+- [x] [P1-T3] **Remediation correction (this round).** In
+  `tests/shell/test_cleanup_worktrees_dirt_classify.bats`, the `@test` block titled
+  `"dirt_typechange_delta: mutating [MARCTU] to [MARCU] changes the verdict away from
+  UNIQUE (negative control)"` (inserted by a prior execution of this task, currently at
+  lines 216-244) already carries the correct positive-direction assertions but additionally
+  carries a `git diff origin/main` triple that CI's shallow checkout cannot resolve. Remove
+  that triple; do not insert a new test and do not touch anything else in the file.
+
+  Root cause (re-derived directly against the current tree in this remediation pass, not
+  carried from an earlier round): `.github/workflows/_shell-coverage.yml` checks out with
+  `actions/checkout@v7` and no `fetch-depth` argument, so CI's default depth-1 checkout
+  never creates a local `origin/main` ref there, and `run git -C "${REPO_ROOT}" diff
+  origin/main -- "${DIRTLIB}"` fails with an unresolvable-revision, non-zero exit on CI even
+  though the file is byte-identical to `origin/main` — confirmed as CI's `not ok 275`
+  failure in `docs/features/active/cleanup-worktrees-test-suite-blind-spots-660/remediation-inputs.2026-09-25T17-00.md`.
+  The line locally resolves and passes only because a developer worktree already has
+  `origin/main` from prior fetch history. Do not add `fetch-depth` to any workflow file as
+  a workaround; that is out of scope for this remediation.
+
+  Locate the exact three-line block (current lines 238-240, immediately after the "The
+  mutated source was composed..." comment and immediately before the retained
+  `git status --porcelain` triple):
+  ```bash
+      run git -C "${REPO_ROOT}" diff origin/main -- "${DIRTLIB}"
+      [ "$status" -eq 0 ]
+      [ -z "$output" ]
+  ```
+  Delete these three lines. Leave the preceding comment (`# The mutated source was composed
+  into a shell variable and evaluated in a child process; the production file on disk was
+  never opened for writing.`) and the following `git status --porcelain` triple (current
+  lines 241-243) exactly as they are; the comment now sits directly above the retained
+  `status --porcelain` triple. The `status --porcelain` check alone proves the same property
+  the deleted triple asserted — the mutated source was evaluated in a child process and the
+  production file on disk was never written — because it compares the working tree against
+  the local index/HEAD, which exists at any checkout depth, unlike a remote-tracking ref.
+  The corrected test body, for reference:
   ```bash
   @test "dirt_typechange_delta: mutating [MARCTU] to [MARCU] changes the verdict away from UNIQUE (negative control)" {
       local mutated
@@ -202,22 +235,27 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
       [[ "$output" != *"HAS_UNIQUE"* ]]
       # The mutated source was composed into a shell variable and evaluated in a child
       # process; the production file on disk was never opened for writing.
-      run git -C "${REPO_ROOT}" diff origin/main -- "${DIRTLIB}"
-      [ "$status" -eq 0 ]
-      [ -z "$output" ]
       run git -C "${REPO_ROOT}" status --porcelain -- "${DIRTLIB}"
       [ "$status" -eq 0 ]
       [ -z "$output" ]
   }
   ```
   `DIRTLIB`, `ELIB`, `LIB`, `STUB`, `SCEN`, `WT`, and `REPO_ROOT` are all already defined by
-  this file's existing `setup()` (current lines 27-36); no setup change is required. The
-  single occurrence of the literal `[MARCTU]` in `scripts/bash/cleanup_worktrees_dirt_lib.sh`
-  (confirmed by direct search: line 297 only, no other match in the file) makes the
-  unanchored global `sed` substitution safe and unambiguous.
-  Acceptance (named test): after Phase 2's test run, the TAP output contains the single-line
-  token `dirt_typechange_delta: mutating [MARCTU] to [MARCU] changes the verdict away from UNIQUE (negative control)`
-  on an `ok` line. AC-2.
+  this file's existing `setup()` (current lines 27-36); no setup change is required.
+  Acceptance (three conditions, all required): (1) `grep -c -F 'diff origin/main' tests/shell/test_cleanup_worktrees_dirt_classify.bats`
+  returns `0` (the removed remote-ref triple is gone); (2) `grep -c -F 'status --porcelain -- "${DIRTLIB}"' tests/shell/test_cleanup_worktrees_dirt_classify.bats`
+  returns `1` (the retained triple is unchanged and still present); (3) after Phase 2's test
+  run, the TAP output contains the single-line token
+  `dirt_typechange_delta: mutating [MARCTU] to [MARCU] changes the verdict away from UNIQUE (negative control)`
+  on an `ok` line and on no `not ok` line. AC-2.
+
+  AC-2's and AC-5's "production file byte-identical to origin/main afterward" requirement is
+  unaffected by removing this triple: that requirement remains structurally guaranteed at
+  the branch level by AC-6, mechanically proven by Phase 2's P2-T3
+  (`git diff origin/main --name-status -- scripts/` plus `git status --porcelain --
+  scripts/`, both required to be empty), so the per-test remote-ref comparison deleted here
+  was a redundant, CI-environment-fragile restatement of a fact P2-T3 already proves
+  branch-wide — not a weakening of what AC-2 or AC-5 actually require.
 
 - [x] [P1-T4] In `tests/shell/test_cleanup_worktrees_dirt_classify.bats`, update the
   "every verdict emitted..." test's hardcoded scenario list and record count (current lines
@@ -280,35 +318,46 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   and `grep -F '[[ "$log" != *"update-index"* ]]' tests/shell/test_cleanup_worktrees_dirt_clear.bats`
   each return exactly one match (neither literal is quoted anywhere else in the file). AC-4.
 
-- [x] [P1-T6] In `tests/shell/test_cleanup_worktrees_dirt_clear.bats`, correct one line inside
-  the `@test` block already present on disk (a prior executor pass inserted it, but with a
-  defective redirect) immediately after the P1-T5-extended test's closing `}` (current lines
-  205-225) and before the next test `"dirt_staged_tree_is_commit: the cached diff-index probe
-  runs..."` (current line 258). Correct the existing inserted test in place; do not append a
-  second copy of it.
+- [x] [P1-T6] **Remediation correction (this round).** In
+  `tests/shell/test_cleanup_worktrees_dirt_clear.bats`, the `@test` block titled
+  `"dirt_staged_tree_is_commit: injecting a git add call into run_report makes the widened
+  non-mutation assertion fail (negative control)"` (current lines 227-256) was already
+  corrected once this cycle for a stderr-redirect defect (confirmed on the current tree: the
+  injected `sed` line already reads `cleanup_wt_git add -- test-negative-control >/dev/null
+  || true`, with no `2>&1`, and the stub's argv-log line therefore already reaches
+  `$output`). This round's correction is a second, independent edit to the same test:
+  remove the `git diff origin/main` triple near its end, which CI's shallow checkout cannot
+  resolve. Correct the existing test in place; do not append a second copy of it and do not
+  touch the already-corrected redirect line.
 
-  Root cause (re-derived directly against the current tree, not carried from the finding
-  document): the inserted test's injected `sed` line currently reads
-  `cleanup_wt_git add -- test-negative-control >/dev/null 2>&1 || true`, which redirects
-  both stdout and stderr of the injected call to `/dev/null`. `tests/fixtures/cleanup_worktrees/stub-bin/git`
-  reports every invocation by writing `stub-git: <argv>` to **stderr**
-  (`printf 'stub-git: %s\n' "$*" >&2`, confirmed at that file's line 107), and this test's own
-  observation line (`log="$(printf '%s\n' "$output" | grep '^stub-git' || true)"`) and
-  assertion (`[[ "$log" == *" add "* ]]`) both depend on that stderr line reaching `$output`.
-  The `2>&1` redirect discards it before it ever reaches the stream `run` captures, so the
-  assertion fails unconditionally, independent of the mutation's behavior.
+  Root cause (re-derived directly against the current tree in this remediation pass, not
+  carried from an earlier round): `.github/workflows/_shell-coverage.yml` checks out with
+  `actions/checkout@v7` and no `fetch-depth` argument, so CI's default depth-1 checkout
+  never creates a local `origin/main` ref there, and `run git -C "${REPO_ROOT}" diff
+  origin/main -- "${LIB}"` fails with an unresolvable-revision, non-zero exit on CI even
+  though the file is byte-identical to `origin/main` — confirmed as CI's `not ok 297`
+  failure in `docs/features/active/cleanup-worktrees-test-suite-blind-spots-660/remediation-inputs.2026-09-25T17-00.md`.
+  The line locally resolves and passes only because a developer worktree already has
+  `origin/main` from prior fetch history. Do not add `fetch-depth` to any workflow file as a
+  workaround; that is out of scope for this remediation.
 
-  Locate the exact line (current line 230):
+  Locate the exact three-line block (current lines 250-252, immediately after the "The
+  mutated source was composed..." comment and immediately before the retained
+  `git status --porcelain` triple):
   ```bash
-  	cleanup_wt_git add -- test-negative-control >/dev/null 2>&1 || true' "${LIB}")"
+      run git -C "${REPO_ROOT}" diff origin/main -- "${LIB}"
+      [ "$status" -eq 0 ]
+      [ -z "$output" ]
   ```
-  and replace it with:
-  ```bash
-  	cleanup_wt_git add -- test-negative-control >/dev/null || true' "${LIB}")"
-  ```
-  This still suppresses the injected call's stdout; its stderr — carrying the stub's argv-log
-  line — now reaches the combined `$output` that `run` captures. No other line in the test
-  changes. The corrected test body, for reference:
+  Delete these three lines. Leave the preceding comment (`# The mutated source was composed
+  into a shell variable and evaluated in a child process; the production file on disk was
+  never opened for writing.`) and the following `git status --porcelain` triple (current
+  lines 253-255) exactly as they are; the comment now sits directly above the retained
+  `status --porcelain` triple. The `status --porcelain` check alone proves the same property
+  the deleted triple asserted — the mutated source was evaluated in a child process and the
+  production file on disk was never written — because it compares the working tree against
+  the local index/HEAD, which exists at any checkout depth, unlike a remote-tracking ref.
+  The corrected test body, for reference:
   ```bash
   @test "dirt_staged_tree_is_commit: injecting a git add call into run_report makes the widened non-mutation assertion fail (negative control)" {
       local mutated
@@ -333,27 +382,27 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
       [[ "$log" == *" add "* ]]
       # The mutated source was composed into a shell variable and evaluated in a child
       # process; the production file on disk was never opened for writing.
-      run git -C "${REPO_ROOT}" diff origin/main -- "${LIB}"
-      [ "$status" -eq 0 ]
-      [ -z "$output" ]
       run git -C "${REPO_ROOT}" status --porcelain -- "${LIB}"
       [ "$status" -eq 0 ]
       [ -z "$output" ]
   }
   ```
   `ELIB`, `LIB`, `RLIB`, `DLIB`, `DIRTLIB`, `STUB`, `SCAN`, `SCEN`, and `REPO_ROOT` are all
-  already defined by this file's existing `setup()` (current lines 51-61); the sourcing
-  order (`ELIB`, then the mutated `LIB` text, then `RLIB`, `DLIB`, `DIRTLIB`, then
-  `run_report`) matches the existing `report_run()` helper's order (current lines 73-77)
-  with `LIB` eval'd instead of sourced from disk. `run_report()`'s definition (confirmed at
-  `scripts/bash/cleanup_worktrees_lib.sh:452`) is the sole match for
-  `/^run_report() {$/` in that file, so the `sed` address is unambiguous.
-  Acceptance (two conditions, both required): (1) `grep -c -F 'test-negative-control >/dev/null || true' tests/shell/test_cleanup_worktrees_dirt_clear.bats`
-  returns `1` and `grep -c -F 'test-negative-control >/dev/null 2>&1 || true' tests/shell/test_cleanup_worktrees_dirt_clear.bats`
-  returns `0` (the corrected redirect is present and the defective one is gone); (2) after
-  Phase 2's test run, the TAP output contains the single-line token
+  already defined by this file's existing `setup()` (current lines 51-61).
+  Acceptance (three conditions, all required): (1) `grep -c -F 'diff origin/main' tests/shell/test_cleanup_worktrees_dirt_clear.bats`
+  returns `0` (the removed remote-ref triple is gone); (2) `grep -c -F 'status --porcelain -- "${LIB}"' tests/shell/test_cleanup_worktrees_dirt_clear.bats`
+  returns `1` (the retained triple is unchanged and still present); (3) after Phase 2's test
+  run, the TAP output contains the single-line token
   `dirt_staged_tree_is_commit: injecting a git add call into run_report makes the widened non-mutation assertion fail (negative control)`
   on an `ok` line and on no `not ok` line. AC-5.
+
+  AC-2's and AC-5's "production file byte-identical to origin/main afterward" requirement is
+  unaffected by removing this triple: that requirement remains structurally guaranteed at
+  the branch level by AC-6, mechanically proven by Phase 2's P2-T3
+  (`git diff origin/main --name-status -- scripts/` plus `git status --porcelain --
+  scripts/`, both required to be empty), so the per-test remote-ref comparison deleted here
+  was a redundant, CI-environment-fragile restatement of a fact P2-T3 already proves
+  branch-wide — not a weakening of what AC-2 or AC-5 actually require.
 
 - [x] [P1-T7] In `tests/fixtures/cleanup_worktrees/stub-bin/git`, replace the false
   "no writing arm is defined" paragraph (current lines 68-73) with an accurate table of
@@ -410,6 +459,15 @@ ABSENT from the captured output, not merely `EXIT_CODE: 0`. `run_check()`
   returns `1`. AC-3.
 
 ### Phase 2 — Final QC (unconditional)
+
+**Re-execution note (this remediation round).** P1-T3 and P1-T6 edit tracked test files
+after the prior pass of this phase already ran and recorded evidence. Per
+`.claude/rules/general-code-change.md`'s "Mandatory Toolchain Loop" ("Restart from step 1
+if any stage fails or auto-fixes any files"), that prior evidence describes a superseded
+state of the tree and does not satisfy this phase for the corrected files. P2-T1, P2-T2,
+and P2-T3 below are therefore reset to unchecked and must produce fresh, newly timestamped
+artifacts against the post-remediation tree; the prior artifacts remain on disk as a record
+of the earlier pass but are not the evidence this round's checklist state relies on.
 
 - [x] [P2-T1] Run the final check-stage command `sh scripts/bash/shell-qc.sh check` (or the
   CI-confirming-gate fallback per "Command-route note" if locally blocked by permissions or

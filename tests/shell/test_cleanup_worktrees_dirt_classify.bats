@@ -235,9 +235,6 @@ argv_log() { # argv_log -> only the stub's argv lines from the merged $output
     [[ "$output" != *"HAS_UNIQUE"* ]]
     # The mutated source was composed into a shell variable and evaluated in a child
     # process; the production file on disk was never opened for writing.
-    run git -C "${REPO_ROOT}" diff origin/main -- "${DIRTLIB}"
-    [ "$status" -eq 0 ]
-    [ -z "$output" ]
     run git -C "${REPO_ROOT}" status --porcelain -- "${DIRTLIB}"
     [ "$status" -eq 0 ]
     [ -z "$output" ]
