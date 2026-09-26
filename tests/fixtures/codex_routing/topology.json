@@ -1,0 +1,197 @@
+[
+  {
+    "id": "topo-standalone-small",
+    "argv": [
+      "--language",
+      "python",
+      "--production-file-count",
+      "2",
+      "--test-file-count",
+      "3",
+      "--execution-context",
+      "standalone"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"languages\": [\n    \"python\"\n  ],\n  \"logical_agent\": \"python-typed-engineer\",\n  \"max_production_files\": 3,\n  \"max_test_files\": 3,\n  \"production_file_count\": 2,\n  \"root_persona\": null,\n  \"route\": \"small\",\n  \"routing_reason\": \"within_language_budget\",\n  \"test_file_count\": 3,\n  \"topology\": \"typed_engineer\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-powershell-budget-exceeded",
+    "argv": [
+      "--language",
+      "powershell",
+      "--production-file-count",
+      "3",
+      "--test-file-count",
+      "1",
+      "--execution-context",
+      "standalone"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"languages\": [\n    \"powershell\"\n  ],\n  \"logical_agent\": \"orchestrator\",\n  \"max_production_files\": 2,\n  \"max_test_files\": 3,\n  \"production_file_count\": 3,\n  \"root_persona\": null,\n  \"route\": \"large\",\n  \"routing_reason\": \"production_budget_exceeded\",\n  \"test_file_count\": 1,\n  \"topology\": \"orchestrator\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-epic-preparation-child",
+    "argv": [
+      "--language",
+      "python",
+      "--production-file-count",
+      "1",
+      "--test-file-count",
+      "1",
+      "--execution-context",
+      "epic_preparation_child"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"epic_preparation_child\",\n  \"languages\": [\n    \"python\"\n  ],\n  \"logical_agent\": \"orchestrator\",\n  \"max_production_files\": null,\n  \"max_test_files\": null,\n  \"production_file_count\": 1,\n  \"root_persona\": null,\n  \"route\": \"large\",\n  \"routing_reason\": \"epic_child_context\",\n  \"test_file_count\": 1,\n  \"topology\": \"orchestrator\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-epic-execution-child",
+    "argv": [
+      "--language",
+      "csharp",
+      "--production-file-count",
+      "1",
+      "--test-file-count",
+      "1",
+      "--execution-context",
+      "epic_execution_child"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"epic_execution_child\",\n  \"languages\": [\n    \"csharp\"\n  ],\n  \"logical_agent\": \"orchestrator\",\n  \"max_production_files\": null,\n  \"max_test_files\": null,\n  \"production_file_count\": 1,\n  \"root_persona\": null,\n  \"route\": \"large\",\n  \"routing_reason\": \"epic_child_context\",\n  \"test_file_count\": 1,\n  \"topology\": \"orchestrator\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-cross-cutting",
+    "argv": [
+      "--language",
+      "typescript",
+      "--production-file-count",
+      "1",
+      "--test-file-count",
+      "1",
+      "--execution-context",
+      "standalone",
+      "--cross-cutting"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": true,\n  \"execution_context\": \"standalone\",\n  \"languages\": [\n    \"typescript\"\n  ],\n  \"logical_agent\": \"orchestrator\",\n  \"max_production_files\": 0,\n  \"max_test_files\": 0,\n  \"production_file_count\": 1,\n  \"root_persona\": null,\n  \"route\": \"large\",\n  \"routing_reason\": \"cross_cutting\",\n  \"test_file_count\": 1,\n  \"topology\": \"orchestrator\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-root-persona-epic-planner",
+    "argv": [
+      "--execution-context",
+      "standalone",
+      "--root-persona",
+      "epic-planner"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"languages\": [],\n  \"logical_agent\": \"epic-planner\",\n  \"max_production_files\": null,\n  \"max_test_files\": null,\n  \"production_file_count\": 0,\n  \"root_persona\": \"epic-planner\",\n  \"route\": \"epic\",\n  \"routing_reason\": \"forced_root_persona\",\n  \"test_file_count\": 0,\n  \"topology\": \"epic_persona\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-root-persona-epic-orchestrator",
+    "argv": [
+      "--execution-context",
+      "standalone",
+      "--root-persona",
+      "epic-orchestrator"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"languages\": [],\n  \"logical_agent\": \"epic-orchestrator\",\n  \"max_production_files\": null,\n  \"max_test_files\": null,\n  \"production_file_count\": 0,\n  \"root_persona\": \"epic-orchestrator\",\n  \"route\": \"epic\",\n  \"routing_reason\": \"forced_root_persona\",\n  \"test_file_count\": 0,\n  \"topology\": \"epic_persona\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-repeated-language",
+    "argv": [
+      "--language",
+      "Python",
+      "--language",
+      "csharp",
+      "--production-file-count",
+      "2",
+      "--test-file-count",
+      "2",
+      "--execution-context",
+      "standalone"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"languages\": [\n    \"csharp\",\n    \"python\"\n  ],\n  \"logical_agent\": \"orchestrator\",\n  \"max_production_files\": null,\n  \"max_test_files\": null,\n  \"production_file_count\": 2,\n  \"root_persona\": null,\n  \"route\": \"large\",\n  \"routing_reason\": \"cross_language\",\n  \"test_file_count\": 2,\n  \"topology\": \"orchestrator\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-non-ascii-language",
+    "argv": [
+      "--language",
+      "\u00e9",
+      "--production-file-count",
+      "1",
+      "--test-file-count",
+      "0",
+      "--execution-context",
+      "standalone"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"cross_cutting\": false,\n  \"execution_context\": \"standalone\",\n  \"languages\": [\n    \"\\u00e9\"\n  ],\n  \"logical_agent\": \"orchestrator\",\n  \"max_production_files\": null,\n  \"max_test_files\": null,\n  \"production_file_count\": 1,\n  \"root_persona\": null,\n  \"route\": \"large\",\n  \"routing_reason\": \"unsupported_language\",\n  \"test_file_count\": 0,\n  \"topology\": \"orchestrator\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-missing-required",
+    "argv": [
+      "--language",
+      "python"
+    ],
+    "expected_exit": 2,
+    "expected_stdout": "",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-invalid-choice",
+    "argv": [
+      "--execution-context",
+      "production"
+    ],
+    "expected_exit": 2,
+    "expected_stdout": "",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-non-integer-count",
+    "argv": [
+      "--production-file-count",
+      "two",
+      "--execution-context",
+      "standalone"
+    ],
+    "expected_exit": 2,
+    "expected_stdout": "",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "topo-empty-language",
+    "argv": [
+      "--language",
+      "",
+      "--execution-context",
+      "standalone"
+    ],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "languages must contain non-empty strings."
+  },
+  {
+    "id": "topo-root-persona-non-standalone",
+    "argv": [
+      "--execution-context",
+      "epic_execution_child",
+      "--root-persona",
+      "epic-planner"
+    ],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "A forced root persona requires standalone context."
+  }
+]

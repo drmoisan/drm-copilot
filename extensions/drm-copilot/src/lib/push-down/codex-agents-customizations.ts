@@ -35,9 +35,46 @@ export const ARTIFACT_DIRECTORY = "artifacts/codex-and-agents-customizations";
 export const ROOT_FOLDERS: ReadonlyArray<string> = [".codex", ".agents"];
 export const PACK_MANIFEST_SUBDIR = "pack-manifests";
 export const ROUTING_CONFIG_RELATIVE_PATH = "config/orchestration-routing.json";
+
+/**
+ * Shared resources published at a destination-relative path.
+ *
+ * Each pair is `[destination-relative path, resource-relative path]`, where the
+ * resource path is resolved against the parent of the Codex bundle root (the
+ * extension `resources` directory). The codex-routing modules are stored once
+ * under `resources/lib/codex-routing` and published under `.codex/lib`, so the
+ * two paths of a pair may differ. Mirrors the Python `VIRTUAL_RESOURCE_PAIRS`.
+ */
+export const VIRTUAL_RESOURCE_PAIRS: ReadonlyArray<readonly [string, string]> =
+  [
+    [ROUTING_CONFIG_RELATIVE_PATH, ROUTING_CONFIG_RELATIVE_PATH],
+    [
+      "config/orchestration-handoff-registry.json",
+      "config/orchestration-handoff-registry.json",
+    ],
+    [
+      "config/orchestration-handoff.schema.json",
+      "config/orchestration-handoff.schema.json",
+    ],
+    [
+      ".codex/lib/codex-routing/CodexTopology.psm1",
+      "lib/codex-routing/CodexTopology.psm1",
+    ],
+    [
+      ".codex/lib/codex-routing/CodexDeployment.psm1",
+      "lib/codex-routing/CodexDeployment.psm1",
+    ],
+  ];
+
+/** Destination roots answered from {@link VIRTUAL_RESOURCE_PAIRS} only. */
+export const VIRTUAL_ROOT_FOLDERS: ReadonlyArray<string> = [
+  "config",
+  ".codex/lib/codex-routing",
+];
+
 const PUBLISHED_ROOT_FOLDERS: ReadonlyArray<string> = [
   ...ROOT_FOLDERS,
-  "config",
+  ...VIRTUAL_ROOT_FOLDERS,
 ];
 
 /**
@@ -174,31 +211,57 @@ class CodexFilteringFileSystem implements PushDownFileSystem {
   }
 }
 
+/**
+ * Exposes shared bundle resources at their destination-relative paths.
+ *
+ * A virtual root is listed from the pair map only, so a physical file beside a
+ * mapped path (for example `config/unrelated.json`) is never published, and
+ * only pairs whose resource file exists are listed. `isFile` and
+ * `readTextFile` are redirected for mapped paths; every other call delegates.
+ */
 class RoutingConfigFileSystem implements PushDownFileSystem {
-  private readonly virtualPath: string;
-  private readonly virtualRoot: string;
-  private readonly resourcePath: string;
+  private readonly virtualPaths: ReadonlyMap<string, string>;
+  private readonly virtualRoots: ReadonlySet<string>;
 
   constructor(
     private readonly inner: PushDownFileSystem,
     options: { readonly sourceRoot: string; readonly bundleRoot: string },
   ) {
-    this.virtualPath = joinPosix(
-      options.sourceRoot,
-      ROUTING_CONFIG_RELATIVE_PATH,
+    const resourceRoot = parentPosix(options.bundleRoot);
+    this.virtualPaths = new Map(
+      VIRTUAL_RESOURCE_PAIRS.map(
+        ([destination, resource]) =>
+          [
+            joinPosix(options.sourceRoot, destination),
+            joinPosix(resourceRoot, resource),
+          ] as const,
+      ),
     );
-    this.virtualRoot = joinPosix(options.sourceRoot, "config");
-    this.resourcePath = joinPosix(
-      parentPosix(options.bundleRoot),
-      ROUTING_CONFIG_RELATIVE_PATH,
+    this.virtualRoots = new Set(
+      VIRTUAL_ROOT_FOLDERS.map((root) => joinPosix(options.sourceRoot, root)),
     );
   }
 
+  private resolve(path: string): string {
+    return this.virtualPaths.get(normalizePosix(path)) ?? path;
+  }
+
   listFiles(root: string): string[] {
-    if (normalizePosix(root) === this.virtualRoot) {
-      return this.inner.isFile(this.resourcePath) ? [this.virtualPath] : [];
+    const normalizedRoot = normalizePosix(root);
+    if (!this.virtualRoots.has(normalizedRoot)) {
+      return this.inner.listFiles(root);
     }
-    return this.inner.listFiles(root);
+    // The engine orders each root itself, so map order is sufficient here.
+    const listed: string[] = [];
+    for (const [virtualPath, resourcePath] of this.virtualPaths) {
+      if (
+        parentPosix(virtualPath) === normalizedRoot &&
+        this.inner.isFile(resourcePath)
+      ) {
+        listed.push(virtualPath);
+      }
+    }
+    return listed;
   }
 
   isDir(path: string): boolean {
@@ -206,15 +269,11 @@ class RoutingConfigFileSystem implements PushDownFileSystem {
   }
 
   isFile(path: string): boolean {
-    return normalizePosix(path) === this.virtualPath
-      ? this.inner.isFile(this.resourcePath)
-      : this.inner.isFile(path);
+    return this.inner.isFile(this.resolve(path));
   }
 
   readTextFile(path: string): string {
-    return this.inner.readTextFile(
-      normalizePosix(path) === this.virtualPath ? this.resourcePath : path,
-    );
+    return this.inner.readTextFile(this.resolve(path));
   }
 
   writeTextFile(path: string, content: string): void {
