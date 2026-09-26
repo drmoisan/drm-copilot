@@ -29,3 +29,11 @@ Planned test Python writes for N588 (11):
 Scheduled resets: [P2-T4], [P3-T1], [P3-T5], [P6-T1], [P6-T5], [P6-T9].
 
 ## Reset records
+
+### Reset [P2-T4]
+
+Timestamp: 2026-09-26T19-51
+Deleted: .claude/state/python-batch-budget.worktree-agent-a7bc49b9acc700094-5142ae6c.json
+Files listed in the deleted record:
+- prodFiles: scripts/dev_tools/pr_context/models.py
+- testFiles: tests/scripts/dev_tools/pr_context/test_issue_reference_pattern.py, tests/scripts/dev_tools/pr_context/test_autoclose_collector.py, tests/scripts/dev_tools/test_collect_pr_context.py
