@@ -80,3 +80,12 @@ EXIT_CODE: 0
 Commit: b0c9bc8f20d8f2ae7d89e570633d6d3cc559d4f3
 Paths: the plan file and the ten `evidence/qa-gates/p7-*.md` artifacts (no path outside the feature folder).
 Porcelain (post-commit, pre-append): (empty)
+
+## Phase 8 (final QC loop; pass-1 remediation test rows)
+
+Timestamp: 2026-09-25T20-15
+Command: git commit -F <SCRATCHPAD>/i663/commit-p8.txt
+EXIT_CODE: 0
+Commit: c56ddd11a8d8c9c06f348f887071aac7d46ac120
+Non-evidence paths in `git log -1 --name-only` (1): tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1
+Porcelain (post-commit, pre-append): (empty)
