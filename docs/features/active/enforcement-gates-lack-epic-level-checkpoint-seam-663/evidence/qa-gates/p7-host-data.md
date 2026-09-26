@@ -36,3 +36,18 @@ PROCESS_EXIT_CODE: 0
 Files with a non-zero count: none
 
 Result: PASS
+
+## Addendum after the [P8-T7] pass-1 remediation (2026-09-25T20-15)
+
+Re-run after the remediation test edit and the Phase 8 artifacts:
+
+```
+EvidenceFilesScanned: 68
+PorcelainLineCount: 22
+AddedLinesScanned: 1328
+NewTestFileLinesScanned: 1061
+FilesWithMatches: none
+PROCESS_EXIT_CODE: 0
+```
+
+No file is listed.

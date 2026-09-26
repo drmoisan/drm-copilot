@@ -224,4 +224,87 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 epic scope (issue #66
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:SingleFeatureReason
     }
+
+    Context 'issue #663 relocated read seams and the no-leg guard of the epic-scope sibling' {
+        # The two per-mode read seams moved into the sibling keep their behaviour: the path
+        # comes from the fixed mode table, an absent file yields an empty string, and a
+        # present file yields its raw text. Test-Path and Get-Content are mocked, so no file
+        # is read or created.
+        BeforeEach {
+            $script:EpicSeamPath = '/synthetic-worktrees/epic-coordinator/artifacts/orchestration/epic-orchestrator-state.json'
+            $script:ParallelSeamPath = '/synthetic-worktrees/epic-coordinator/artifacts/orchestration/parallel-orchestrator-state.json'
+            # A plain body (no closure) so the -Mode argument Pester binds is visible to it.
+            Mock Get-OrchestrationDelegationCheckpointPath {
+                if ($Mode -eq 'epic') { return $script:EpicSeamPath }
+                return $script:ParallelSeamPath
+            }
+        }
+
+        It 'issue #663 the relocated epic read seam returns an empty string when the epic checkpoint file is absent' {
+            # Arrange
+            Mock Test-Path { $false }
+            Mock Get-Content { throw 'an absent checkpoint must not be read' }
+
+            # Act
+            $text = Get-EpicCheckpointContent
+
+            # Assert
+            $text | Should -BeExactly ''
+            Should -Invoke Test-Path -Times 1 -Exactly -ParameterFilter { $LiteralPath -eq $script:EpicSeamPath }
+            Should -Invoke Get-Content -Times 0 -Exactly
+        }
+
+        It 'issue #663 the relocated epic read seam returns the raw epic checkpoint text when the file exists' {
+            # Arrange
+            $raw = $script:ReadyEpicJson
+            Mock Test-Path { $true }
+            Mock Get-Content { $raw }.GetNewClosure()
+
+            # Act
+            $text = Get-EpicCheckpointContent
+
+            # Assert
+            $text | Should -BeExactly $script:ReadyEpicJson
+            Should -Invoke Get-Content -Times 1 -Exactly -ParameterFilter { $LiteralPath -eq $script:EpicSeamPath -and $Raw }
+        }
+
+        It 'issue #663 the relocated parallel read seam returns an empty string when the parallel checkpoint file is absent' {
+            # Arrange
+            Mock Test-Path { $false }
+            Mock Get-Content { throw 'an absent checkpoint must not be read' }
+
+            # Act
+            $text = Get-ParallelCheckpointContent
+
+            # Assert
+            $text | Should -BeExactly ''
+            Should -Invoke Test-Path -Times 1 -Exactly -ParameterFilter { $LiteralPath -eq $script:ParallelSeamPath }
+            Should -Invoke Get-Content -Times 0 -Exactly
+        }
+
+        It 'issue #663 the relocated parallel read seam returns the raw parallel checkpoint text when the file exists' {
+            # Arrange
+            Mock Test-Path { $true }
+            Mock Get-Content { '{"route_id":"parallel"}' }
+
+            # Act
+            $text = Get-ParallelCheckpointContent
+
+            # Assert
+            $text | Should -BeExactly '{"route_id":"parallel"}'
+            Should -Invoke Get-Content -Times 1 -Exactly -ParameterFilter { $LiteralPath -eq $script:ParallelSeamPath -and $Raw }
+        }
+
+        It 'issue #663 the epic-scope decision returns null without resolving when the call carries neither a command nor a path' {
+            # Arrange
+            Mock Resolve-EpicScopeCheckpoint { throw 'a call with no leg must not be resolved' }
+
+            # Act
+            $decision = Get-OrchestrationEpicScopeDecision -Command '' -FilePath ''
+
+            # Assert
+            $decision | Should -BeNullOrEmpty
+            Should -Invoke Resolve-EpicScopeCheckpoint -Times 0 -Exactly
+        }
+    }
 }

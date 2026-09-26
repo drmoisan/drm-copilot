@@ -37,3 +37,9 @@ Deleted: powershell-batch-budget.worktree-agent-ab2336a82c893606e-8abc3af3.json
 
 Timestamp: 2026-09-25T19-42
 Deleted: powershell-batch-budget.worktree-agent-ab2336a82c893606e-8abc3af3.json
+
+## P8 pass-1 remediation (final QC coverage fix)
+
+Timestamp: 2026-09-25T20-03
+Deleted: none present
+Scope: one test file (tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1); no production file and no mirror.

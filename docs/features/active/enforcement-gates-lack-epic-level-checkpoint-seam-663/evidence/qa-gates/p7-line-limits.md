@@ -42,3 +42,7 @@ d754f83f714b087e404577cb7a1b02f48d2023bb
 FileCount: 23
 MaxLines: 496
 Result: PASS (23 counts, all at most 500; origin/main unchanged)
+
+## Addendum after the [P8-T7] pass-1 remediation (2026-09-25T20-15)
+
+The pass-1 remediation added five rows to `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1`. A re-run of `sh <SCRATCHPAD>/i663/run.sh p7-lines` reports that file at 310 lines (was 227); FileCount 23 and MaxLines 496 are unchanged, so every count remains at most 500.
