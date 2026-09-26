@@ -219,6 +219,37 @@ count_of() { # count_of <pattern>
     [[ "$log" != *"worktree remove"* ]]
     [[ "$log" != *"branch -D"* ]]
     [[ "$log" != *"hash-object -w"* ]]
+    [[ "$log" != *" add "* ]]
+    [[ "$log" != *" commit "* ]]
+    [[ "$log" != *"update-index"* ]]
+}
+
+@test "dirt_staged_tree_is_commit: injecting a git add call into run_report makes the widened non-mutation assertion fail (negative control)" {
+    local mutated
+    mutated="$(sed '/^run_report() {$/a\
+	cleanup_wt_git add -- test-negative-control >/dev/null || true' "${LIB}")"
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="${SCEN}/dirt_staged_tree_is_commit" \
+        bash -c '
+            lib=$(cat)
+            source "$1"
+            eval "$lib"
+            source "$2"
+            source "$3"
+            source "$4"
+            run_report
+        ' _ "${ELIB}" "${RLIB}" "${DLIB}" "${DIRTLIB}" <<<"$mutated"
+    log="$(printf '%s\n' "$output" | grep '^stub-git' || true)"
+    # The injected call reaches the argv log, so the widened AC-4 assertion
+    # ([[ "$log" != *" add "* ]], asserted in the test above against the real library)
+    # would fail here: this line is that same assertion's negation, over the mutated
+    # library.
+    [[ "$log" == *" add "* ]]
+    # The mutated source was composed into a shell variable and evaluated in a child
+    # process; the production file on disk was never opened for writing.
+    run git -C "${REPO_ROOT}" status --porcelain -- "${LIB}"
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
 }
 
 @test "dirt_staged_tree_is_commit: the cached diff-index probe runs and every status read suppresses optional locks" {

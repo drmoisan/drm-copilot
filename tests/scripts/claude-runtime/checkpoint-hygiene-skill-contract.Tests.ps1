@@ -37,6 +37,10 @@ BeforeAll {
     $script:OrchestrateSkill = Join-Path $script:RepoRoot '.claude/skills/orchestrate/SKILL.md'
     $script:ParallelSkill = Join-Path $script:RepoRoot '.claude/skills/parallel-orchestrate/SKILL.md'
     $script:EpicSkill = Join-Path $script:RepoRoot '.claude/skills/epic-orchestrate/SKILL.md'
+    # Issue #663: the epic-level issue promotion and integration-PR checkpoint contracts.
+    $script:EpicPlanSkill = Join-Path $script:RepoRoot '.claude/skills/epic-plan/SKILL.md'
+    $script:EpicPlannerAgent = Join-Path $script:RepoRoot '.claude/agents/epic-planner.md'
+    $script:EpicOrchestratorAgent = Join-Path $script:RepoRoot '.claude/agents/epic-orchestrator.md'
 
     # The model-routing gate is dot-sourced so its gated-agent list is read from the gate
     # itself rather than restated here, which is what makes the drift row meaningful.
@@ -151,5 +155,54 @@ Describe 'checkpoint hygiene and delegation identity skill contract' {
         # migration an atomic-planner delegation is read for identity by both of them.
         $section | Should -BeLike '*enforce-model-routing-receipt.ps1*'
         $section | Should -BeLike '*enforce-prd-feature-before-planner.ps1*'
+    }
+
+    It 'epic-plan skill promotes an epic-level issue and records epic_issue_num (issue #663)' {
+        # Arrange / Act
+        $section = Get-SkillSection -Path $script:EpicPlanSkill -Heading '## Epic-Level Issue Promotion'
+
+        # Assert: the promotion route, its type, the recorded field, and the gated checkpoint.
+        $section | Should -Not -BeNullOrEmpty
+        $section | Should -BeLike '*mcp__drm-copilot__potential_to_issue*'
+        $section | Should -BeLike '*promotion_type: epic*'
+        $section | Should -BeLike '*epic_issue_num*'
+        $section | Should -BeLike '*epic-orchestrator-state.json*'
+    }
+
+    It 'epic-planner agent lists the promotion tool and records epic_issue_num (issue #663)' {
+        # Arrange: the frontmatter is every line before the second '---' delimiter.
+        $lines = @(Get-Content -LiteralPath $script:EpicPlannerAgent)
+        $delimiters = @(for ($index = 0; $index -lt $lines.Count; $index++) { if ($lines[$index] -eq '---') { $index } })
+        $frontmatter = ($lines[0..($delimiters[1] - 1)] -join "`n")
+        $section = Get-SkillSection -Path $script:EpicPlannerAgent -Heading '## Checkpoint Persistence'
+
+        # Assert: containment for the tool entries, because '*' in a wildcard pattern is not literal.
+        $frontmatter.Contains('"mcp__drm-copilot__potential_to_issue"') | Should -BeTrue
+        $frontmatter.Contains('"Write(docs/features/potential/**)"') | Should -BeTrue
+        $section | Should -BeLike '*epic_issue_num*'
+        $section | Should -BeLike '*promotion_type: epic*'
+    }
+
+    It 'epic-orchestrate skill states the integration-PR checkpoint shape and receipt location (issue #663)' {
+        # Arrange / Act
+        $section = Get-SkillSection -Path $script:EpicSkill -Heading '## Epic-Level Checkpoint'
+
+        # Assert
+        $section | Should -BeLike '*Integration-PR checkpoint shape (issue #663)*'
+        $section | Should -BeLike '*no per-feature checkpoint is written for them*'
+        $section | Should -BeLike '*epic_issue_num*'
+        $section | Should -BeLike '*worktree_removed*'
+        $section | Should -BeLike '*model_routing_receipts*'
+        $section | Should -BeLike '*pr-author*'
+        $section | Should -BeLike '*route_id: "epic"*'
+    }
+
+    It 'epic-orchestrator agent lists epic_issue_num and model_routing_receipts in its checkpoint fields (issue #663)' {
+        # Arrange / Act
+        $section = Get-SkillSection -Path $script:EpicOrchestratorAgent -Heading '## Checkpoint Persistence'
+
+        # Assert
+        $section | Should -BeLike '*epic_issue_num*'
+        $section | Should -BeLike '*model_routing_receipts*'
     }
 }

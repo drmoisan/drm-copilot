@@ -44,6 +44,9 @@ Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTarge
 # feature folder exists in every checkout branched from main, so it places a call in many at
 # once. The item is identified by its canonical issue number and its branch instead.
 Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop
+# Epic scope (issue #663): the epic integration pull request is gated against the epic checkpoint.
+Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeResolution.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeReadiness.psm1') -Force -ErrorAction Stop
 
 function Resolve-PrAuthorWorktreeTarget {
     <#
@@ -144,6 +147,9 @@ function Test-PrAuthorReceiptVerification {
     .PARAMETER CheckpointPath
         The absolute checkpoint path identity resolution selected, passed through to check 6
         so that check reads the resolved worktree's checkpoint rather than deriving its own.
+    .PARAMETER EpicScope
+        Optional. The epic-scope result Get-PrAuthorBypassReason resolved (issue #663), passed
+        through to check 6 so the call is resolved once; $null outside epic scope.
     .OUTPUTS
         System.String or $null
     #>
@@ -154,7 +160,10 @@ function Test-PrAuthorReceiptVerification {
         [string] $CommandText,
 
         [Parameter(Mandatory)]
-        [string] $CheckpointPath
+        [string] $CheckpointPath,
+
+        [AllowNull()]
+        [object] $EpicScope
     )
 
     # Check 1: the --body-file argument must match the canonical artifacts/pr_body_<N>.md pattern.
@@ -225,7 +234,7 @@ function Test-PrAuthorReceiptVerification {
     }
 
     # Check 6: under epic_mode, gh pr create must carry a matching --base override.
-    $epicBaseBranchReason = Test-EpicBaseBranchOverride -CommandText $CommandText -CheckpointPath $CheckpointPath
+    $epicBaseBranchReason = Test-EpicBaseBranchOverride -CommandText $CommandText -CheckpointPath $CheckpointPath -EpicScope $EpicScope
     if ($epicBaseBranchReason) {
         return $epicBaseBranchReason
     }
@@ -326,9 +335,24 @@ function Get-PrAuthorBypassReason {
         return "PR_CONTEXT_MISSING: ``$script:PrContextArtifactPath`` is absent. Run ``mcp__drm-copilot__collect_pr_context`` before creating or editing the PR body."
     }
 
+    # Epic scope (issue #663): when the call's --head equals the epic checkpoint's
+    # integration_branch, the integration pull request is gated by the epic PR-creation
+    # readiness predicate on artifacts/orchestration/epic-orchestrator-state.json, and no
+    # per-feature checkpoint is resolved or read. Resolved once; check 6 reuses the result.
+    $epicScope = $null
+    if ($hasBodyFile -and $ContextExists) {
+        $epicScope = Resolve-EpicScopeCheckpoint -Text $CommandText -SessionRoot (Get-Location).Path
+    }
+
     # Orchestrator-state preflight: runs inside this same PreToolUse hook (so it cannot be
     # bypassed by invoking gh pr create/edit directly) before receipt verification.
-    if ($hasBodyFile -and $ContextExists) {
+    if ($null -ne $epicScope -and $epicScope.IsEpicScope) {
+        $failure = Get-EpicPrCreationReadinessFailure -Checkpoint $epicScope.Checkpoint -HeadBranch $epicScope.Branch
+        if ($failure) {
+            return "ORCHESTRATOR_STATE_PREFLIGHT_FAILED: this epic-scope pull request was evaluated against $($epicScope.CheckpointPath), and the failed readiness predicate is '$failure'."
+        }
+        $script:OrchestratorStateCheckpointPath = $epicScope.CheckpointPath
+    } elseif ($hasBodyFile -and $ContextExists) {
         $resolution = Get-PrAuthorTargetCheckpointResolution -CommandText $CommandText
         if ($resolution.Reason) {
             return $resolution.Reason
@@ -350,7 +374,7 @@ function Get-PrAuthorBypassReason {
 
     # Receipt verification: extends, and does not replace, the previously-allowed path.
     if ($hasBodyFile -and $ContextExists) {
-        $receiptReason = Test-PrAuthorReceiptVerification -CommandText $CommandText -CheckpointPath $script:OrchestratorStateCheckpointPath
+        $receiptReason = Test-PrAuthorReceiptVerification -CommandText $CommandText -CheckpointPath $script:OrchestratorStateCheckpointPath -EpicScope $epicScope
         if ($receiptReason) {
             return $receiptReason
         }

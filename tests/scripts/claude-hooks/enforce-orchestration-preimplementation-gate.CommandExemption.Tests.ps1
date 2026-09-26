@@ -428,4 +428,60 @@ NOTE
             Should -Invoke Test-ExemptOrchestrationSegmentToken -Times 1 -Exactly
         }
     }
+
+    Context 'issue #663 quote-aware angle brackets' {
+        # D4 row 12 as narrowed by issue #663: `<` and `>` are redirections only outside a
+        # quoted span, so a quoted Co-Authored-By trailer no longer withholds the exemption.
+        # `$` and backtick stay unresolvable in any quote state, the single-quoted `'\''`
+        # apostrophe idiom stays denied, and a pathless commit stays denied (D4 row 4).
+        It 'issue #663 exempts <Label>' -ForEach @(
+            @{ Label = 'a double-quoted message carrying a Co-Authored-By trailer and an apostrophe'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic-status.md && git commit -m "docs(epic): refresh status, it''s current. Co-Authored-By: Claude <noreply@anthropic.com>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a single-quoted message carrying angle brackets'; Command = 'git commit -m ''Co-Authored-By: Claude <noreply@anthropic.com>'' -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+        ) {
+            # Act
+            $decision = Get-ExemptionDecisionForCommand -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'angle brackets inside a quoted span are literal text, not redirections'
+        }
+
+        It 'issue #663 denies <Label>' -ForEach @(
+            @{ Label = 'the single-quoted apostrophe idiom'; Command = 'git commit -m ''it''\''''s done <noreply@anthropic.com>'' -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a command substitution inside a double-quoted message'; Command = 'git commit -m "status $(date) <a@b.c>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a variable expansion inside a double-quoted message'; Command = 'git commit -m "status $USER <a@b.c>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a backtick substitution inside a double-quoted message'; Command = 'git commit -m "status `whoami` <a@b.c>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a pathless commit whose message carries angle brackets'; Command = 'git commit -m "Co-Authored-By: Claude <noreply@anthropic.com>"' }
+            @{ Label = 'an unquoted output redirection after a quoted message carrying angle brackets'; Command = 'git commit -m ''Co-Authored-By: Claude <noreply@anthropic.com>'' -- docs/features/epics/2026-08-24-sample-epic/epic-status.md > out.txt' }
+        ) {
+            # Act
+            $decision = Get-ExemptionDecisionForCommand -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'interpolation, an unbalanced idiom, a pathless commit, or an unquoted redirection keeps the line unresolvable'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+        }
+    }
+
+    Context 'issue #663 remediation escaped quotes (CR-1, CR-3)' {
+        # Backslash escapes are not modelled: a backslash before any quote character, or anywhere
+        # inside a double-quoted span, can move a span boundary the scan cannot see (fail closed).
+        It 'issue #663 remediation denies <Label>' -ForEach @(
+            @{ Label = 'an escaped double quote hiding an output redirection (CR-1)'; Command = 'git add docs/features/active/x/a.md && git commit -m "a\"" > src/prod.ts "\"" docs/features/active/x/a.md' }
+            @{ Label = 'an escaped double quote hiding an output redirection after a semicolon (CR-1)'; Command = 'git add docs/features/active/x/a.md ; git commit -m "a\"" > src/prod.ts "\"" docs/features/active/x/a.md' }
+            @{ Label = 'an escaped double quote hiding chain operators (CR-3)'; Command = 'git commit -m "x\"" ; touch src/prod.ts ; "\"" -- docs/features/active/x/a.md' }
+            @{ Label = 'an unquoted escaped double quote opening a scan-only span'; Command = 'git commit -m x\" > src/prod.ts \" -- docs/features/active/x/a.md' }
+            @{ Label = 'an unquoted escaped single quote opening a scan-only span'; Command = 'git commit -m x\'' > src/prod.ts \'' -- docs/features/active/x/a.md' }
+            @{ Label = 'a backslash inside a double-quoted message'; Command = 'git commit -m "path a\b" -- docs/features/active/x/a.md' }
+        ) {
+            # Act
+            $decision = Get-ExemptionDecisionForCommand -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'an unmodelled backslash escape makes the quoted-span boundaries unknown'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+        }
+    }
 }

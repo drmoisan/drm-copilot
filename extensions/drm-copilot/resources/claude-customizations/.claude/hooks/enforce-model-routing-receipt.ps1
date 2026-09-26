@@ -51,6 +51,8 @@ Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -
 # Portable-identity resolution (issue #673). Unguarded and fail-closed on purpose: a gate
 # that cannot load its resolver must not degrade into the cwd-relative read it replaces.
 Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop
+# Epic scope (issue #663): a delegation for the epic integration branch is gated against the epic checkpoint.
+Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeResolution.psm1') -Force -ErrorAction Stop
 function Get-ModelRoutingCheckpoint {
     <#
     .SYNOPSIS
@@ -238,6 +240,24 @@ function Invoke-ModelRoutingReceiptDecision {
     # unrelated state. An absent prompt is passed as an empty string, which resolves to no
     # identity and therefore to the same deny.
     $prompt = [string](Get-ClaudeHookToolInputString -ToolInput $envelope.Value -Name 'prompt')
+
+    # Decision: a prompt whose branch label equals the epic checkpoint's integration_branch is
+    # epic scope (issue #663), and the receipt is looked up in the epic checkpoint without
+    # running per-feature identity resolution. Any other prompt falls through unchanged.
+    $epicScope = Resolve-EpicScopeCheckpoint -Text $prompt -SessionRoot (Get-Location).Path
+    if ($epicScope.IsEpicScope) {
+        if (Test-ModelRoutingReceiptPresent -Checkpoint $epicScope.Checkpoint -Subagent $subagent) {
+            return $allow
+        }
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = "MODEL_ROUTING_RECEIPT_BLOCKED: cannot delegate to '$subagent' in epic scope before a model_routing_receipts entry for it is recorded in $($epicScope.CheckpointPath); the failed readiness predicate is 'model_routing_receipts'."
+            }
+        }
+    }
+
     $resolution = Get-ModelRoutingTargetCheckpointResolution -PromptText $prompt
     if ($resolution.Reason) {
         return [ordered]@{
