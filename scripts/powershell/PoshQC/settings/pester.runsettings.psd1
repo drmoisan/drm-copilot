@@ -233,6 +233,8 @@
             # table and the epic and parallel readiness predicates; registered so the new
             # production file stays in the coverage denominator per the Coverage Exclusion Policy.
             '.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1'
+            # Issue #663 added this dot-sourced sibling for the epic-scope command and path legs.
+            '.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1'
             '.claude/hooks/enforce-evidence-locations.ps1'
             '.claude/hooks/enforce-feature-folder-order.ps1'
             '.claude/hooks/enforce-checkpoint-monotonic.ps1'
@@ -295,6 +297,9 @@
             '.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1'
             # Issue #673 added the identity-resolution module, registered for the same reason.
             '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
+            # Issue #663 added the epic-scope resolver and its pure readiness predicates.
+            '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'
+            '.claude/lib/worktree-resolution/EpicScopeReadiness.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

@@ -65,6 +65,10 @@ function Test-EpicBaseBranchOverride {
     .PARAMETER CheckpointPath
         The absolute checkpoint path identity resolution selected, passed straight through to
         the read seam so this check and the orchestrator-state preflight read one file.
+    .PARAMETER EpicScope
+        Optional. The epic-scope result gate 1 resolved (issue #663). When it reports epic
+        scope, the integration pull request must pass --base main and the per-feature
+        checkpoint seam is not read; $null keeps the per-feature epic_mode rule unchanged.
     .OUTPUTS
         System.String or $null
     #>
@@ -75,7 +79,10 @@ function Test-EpicBaseBranchOverride {
         [string] $CommandText,
 
         [Parameter(Mandatory)]
-        [string] $CheckpointPath
+        [string] $CheckpointPath,
+
+        [AllowNull()]
+        [object] $EpicScope
     )
 
     # The epic-mode base-branch override only constrains gh pr create; gh pr edit does not
@@ -83,6 +90,17 @@ function Test-EpicBaseBranchOverride {
     # The test is structural, so a quoted mention of the phrase is out of scope and a
     # relocating spelling carrying a gh global option is in scope (issue #545).
     if (-not (Test-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'create'))) {
+        return $null
+    }
+
+    # Epic scope (issue #663): the epic's own integration pull request targets main. The
+    # scope object comes from gate 1, so the epic checkpoint is not read a second time and
+    # the per-feature checkpoint is not consulted.
+    if ($null -ne $EpicScope -and $EpicScope.IsEpicScope) {
+        $epicBaseValue = Get-CommandLineFlagValue -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'create') -FlagName '--base'
+        if ($null -eq $epicBaseValue -or $epicBaseValue -cne 'main') {
+            return "EPIC_BASE_BRANCH_MISMATCH: this epic-scope gh pr create was evaluated against $($EpicScope.CheckpointPath); the integration pull request must pass --base main."
+        }
         return $null
     }
 

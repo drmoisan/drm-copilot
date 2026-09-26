@@ -127,14 +127,21 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # `artifacts/orchestration/handoff/`. Only the skill digest moved; the pin stays live
 # for the entry whose path string is `.claude/agents/epic-orchestrator.md`, whose
 # digest is unchanged, so an unintended edit to the agent file still fails loudly.
+#
+# RE-BASELINED by issue #663. That change made the two AC-20 contract edits: in the
+# epic skill's `## Epic-Level Checkpoint` it added `epic_issue_num` and
+# `model_routing_receipts[]` to the field list and appended the integration-PR
+# checkpoint-shape paragraph; in the agent's `## Checkpoint Persistence` it added
+# `epic_issue_num` and `model_routing_receipts[]` to the field list. Both digests
+# moved, and the pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "5318b458a8ccfdf5270677a3b90ba130367a0857dea0acbcf4db1a8e68a97dec",
+        "0d01e5484d63e418a6bc31f219aecaef7381cc439a4a796664006879f6a027ba",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "75fb1667174481091a2437ab67160da9ec1d20232ae1ea77882c450be1d6e2b5",
+        "14d6bf2f76f64d8c6be9c7c675e828f474ebc20d52ed60096d612302a77f21a0",
     ),
 )
 
