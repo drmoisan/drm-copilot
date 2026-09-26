@@ -69,3 +69,23 @@ SectionUnchecked: 0
 Problems: 0
 PROCESS_EXIT_CODE: 0
 ```
+
+## Remediation cycle 1 - [P5-T1] to [P5-T11]
+
+Timestamp: 2026-09-25T21-37
+
+RFPC = `evidence/qa-gates/rem1-final-pester-coverage.md`. Each row: AC identifier, spec line, evidence paths, outcome. Every outcome below is `confirmed`, so no `spec.md` line was edited.
+
+| AC | spec.md line | Evidence | Outcome |
+| --- | --- | --- | --- |
+| AC-1 ([P5-T1]) | 226 | RFPC: `tests/scripts/claude-lib/worktree-resolution/EpicScopeResolution.Tests.ps1` testsuite tests=23 failures=0 errors=0 passed=23; H1 and H2 Passed. `evidence/regression-testing/rem1-fail-before-rb2.md`: H1 and H2 on `FAILED:` lines. | confirmed |
+| AC-10 ([P5-T2]) | 247 | RFPC: G4-1 `epic scope allows git add of a production path while a merge is in progress` Passed in the `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1` testsuite. | confirmed |
+| AC-11 ([P5-T3]) | 248 | RFPC: G4-2, the three expanded G4-3 names (`epic_feature_folder`, `epic_manifest_path`, `features`), and the two expanded G4-4 names (`route_id`, `integration_branch`) Passed in the gate EpicScope testsuite. | confirmed |
+| AC-12 ([P5-T4]) | 249 | RFPC: G4-6 (Edit allow) and G4-7 (Write deny) Passed in the gate EpicScope testsuite. | confirmed |
+| AC-13 ([P5-T5]) | 250 | RFPC: G4-8, G4-9, G4-10, and G4-11 Passed; the eight `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate*.Tests.ps1` testsuite rows (absolute-paths, classifier, helpers.Parity, mode-resolution, CommandExemption, EpicScope, the main suite, TriggerScoping) each show failures 0 and errors 0. | confirmed |
+| AC-14 ([P5-T6]) | 254 | RFPC: in the `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1` testsuite the eight expanded `issue #663` rows, the six expanded `issue #663 remediation denies` rows, and the D4 row 12c and 12d rows Passed. `evidence/regression-testing/rem1-fail-before-rb1.md` meets its acceptance (EXIT_CODE 1, FailedCount 12, the six E names twice each). | confirmed |
+| AC-15 ([P5-T7]) | 255 | RFPC: in the `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1` testsuite the eight expanded `issue #663` rows and the six expanded `issue #663 remediation denies` rows Passed. | confirmed |
+| AC-16 ([P5-T8]) | 256 | RFPC: `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.Parity.Tests.ps1` passed=2, `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` passed=43 equal to tests=43, both failures 0 and errors 0. `evidence/qa-gates/rem1-mirror-parity.md`: the four helpers copies are equal by SHA-256 and git hash-object. | confirmed |
+| AC-22 ([P5-T9]) | 274 | `evidence/qa-gates/rem1-final-pytest-contracts.md` meets its acceptance (27 passed, equal to [P0-T11]); `evidence/qa-gates/rem1-mirror-parity.md` shows both sets equal; RFPC: `tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1` passed=16 failures=0. | confirmed |
+| AC-24 ([P5-T10]) | 276 | `evidence/qa-gates/rem1-line-limits.md` (ten counts, maximum 497, module copies 369 within 400) and `evidence/qa-gates/rem1-unchanged-surfaces.md` (both diffs and the porcelain empty) meet their acceptance. | confirmed |
+| AC-25 ([P5-T11]) | 277 | `evidence/qa-gates/rem1-final-poshqc-format.md`, `evidence/qa-gates/rem1-final-poshqc-analyze.md`, RFPC, and `evidence/qa-gates/rem1-final-coverage-delta.md` meet their acceptance in pass 1 per `evidence/qa-gates/rem1-final-seven-stage-loop.md`. `EVIDENCE_LOCATION_OVERRIDE_REJECTED: docs/features/active/enforcement-gates-lack-epic-level-checkpoint-seam-663/evidence/coverage/ replaced with docs/features/active/enforcement-gates-lack-epic-level-checkpoint-seam-663/evidence/qa-gates/` (repeated from the main plan; AC-25 names `evidence/coverage/`, which is not a canonical evidence kind). | confirmed |

@@ -134,3 +134,12 @@ EXIT_CODE: 0
 Commit: 5e00d356097d2dc69e71b66fa9782c952509f93b (docs(bug): record the remediation-cycle-1 structural checks for #663)
 Paths: the five evidence/qa-gates/rem1-*.md artifacts of [P3-T1] to [P3-T5], evidence/other/commits.md, and the plan file (no path outside the feature folder).
 Porcelain (post-commit, pre-append): (empty)
+
+## Remediation cycle 1 - [P4-T8]
+
+Timestamp: 2026-09-25T21-37
+Command: git commit -F <SCRATCHPAD>/rem1-p4-commit.txt
+EXIT_CODE: 0
+Commit: 82076d6d5b64b43497a9ffc4a5b5591f51bcdf73 (docs(bug): record the remediation-cycle-1 final QC loop for #663)
+Paths: the seven evidence/qa-gates/rem1-final-*.md artifacts (no .passN files; pass 1 was clean), evidence/other/commits.md, and the plan file (no path outside the feature folder).
+Porcelain (post-commit, pre-append): (empty)
