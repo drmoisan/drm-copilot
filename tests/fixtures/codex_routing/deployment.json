@@ -1,0 +1,140 @@
+[
+  {
+    "id": "dep-c1-standalone",
+    "argv": [
+      "--logical-agent",
+      "atomic-executor",
+      "--complexity-band",
+      "C1",
+      "--execution-context",
+      "standalone",
+      "--orchestration-complexity-ceiling",
+      "C1"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C1\",\n  \"deployment_agent\": \"atomic-executor-c1\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"atomic-executor\",\n  \"model\": \"gpt-5.6-luna\",\n  \"model_reasoning_effort\": \"low\",\n  \"orchestration_complexity_ceiling\": \"C1\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-commit-steward",
+    "argv": [
+      "--logical-agent",
+      "commit-steward",
+      "--complexity-band",
+      "C2",
+      "--execution-context",
+      "standalone",
+      "--orchestration-complexity-ceiling",
+      "C3"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C2\",\n  \"deployment_agent\": \"commit-steward-c2\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"commit-steward\",\n  \"model\": \"gpt-5.6-terra\",\n  \"model_reasoning_effort\": \"medium\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-feature-review-alias-epic-preparation",
+    "argv": [
+      "--logical-agent",
+      "feature-review",
+      "--complexity-band",
+      "C3",
+      "--execution-context",
+      "epic_preparation_child",
+      "--orchestration-complexity-ceiling",
+      "C3"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": true,\n  \"c3_overlay_reason\": \"epic_context\",\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"feature-reviewer-c3-elevated\",\n  \"execution_context\": \"epic_preparation_child\",\n  \"logical_agent\": \"feature-review\",\n  \"model\": \"gpt-5.6-sol\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-c3-epic-execution-c4-ceiling",
+    "argv": [
+      "--logical-agent",
+      "python-typed-engineer",
+      "--complexity-band",
+      "C3",
+      "--execution-context",
+      "epic_execution_child",
+      "--orchestration-complexity-ceiling",
+      "C4"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": true,\n  \"c3_overlay_reason\": \"epic_context_and_c4_ceiling\",\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"python-typed-engineer-c3-elevated\",\n  \"execution_context\": \"epic_execution_child\",\n  \"logical_agent\": \"python-typed-engineer\",\n  \"model\": \"gpt-5.6-sol\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C4\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-forced-epic-planner",
+    "argv": [
+      "--logical-agent",
+      "epic-planner",
+      "--complexity-band",
+      "C4",
+      "--execution-context",
+      "standalone",
+      "--orchestration-complexity-ceiling",
+      "C4"
+    ],
+    "expected_exit": 0,
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C4\",\n  \"deployment_agent\": \"epic-planner\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"epic-planner\",\n  \"model\": \"gpt-5.6-sol\",\n  \"model_reasoning_effort\": \"ultra\",\n  \"orchestration_complexity_ceiling\": \"C4\"\n}",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-missing-required",
+    "argv": [
+      "--logical-agent",
+      "orchestrator"
+    ],
+    "expected_exit": 2,
+    "expected_stdout": "",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-invalid-choice",
+    "argv": [
+      "--logical-agent",
+      "orchestrator",
+      "--complexity-band",
+      "C5",
+      "--execution-context",
+      "standalone",
+      "--orchestration-complexity-ceiling",
+      "C4"
+    ],
+    "expected_exit": 2,
+    "expected_stdout": "",
+    "expected_stderr_contains": null
+  },
+  {
+    "id": "dep-ceiling-below-band",
+    "argv": [
+      "--logical-agent",
+      "orchestrator",
+      "--complexity-band",
+      "C3",
+      "--execution-context",
+      "standalone",
+      "--orchestration-complexity-ceiling",
+      "C2"
+    ],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "orchestration_complexity_ceiling must be greater than or equal to complexity_band, found C2 below C3."
+  },
+  {
+    "id": "dep-unsupported-agent",
+    "argv": [
+      "--logical-agent",
+      "nope",
+      "--complexity-band",
+      "C1",
+      "--execution-context",
+      "standalone",
+      "--orchestration-complexity-ceiling",
+      "C1"
+    ],
+    "expected_exit": 1,
+    "expected_stdout": "",
+    "expected_stderr_contains": "Unsupported Codex logical agent: 'nope'."
+  }
+]
