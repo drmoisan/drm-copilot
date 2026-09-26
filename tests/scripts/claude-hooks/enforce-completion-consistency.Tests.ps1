@@ -452,4 +452,40 @@ Describe 'enforce-completion-consistency.ps1' {
             Should -Invoke -CommandName ConvertFrom-CheckpointJson -Times 1
         }
     }
+
+    Context 'issue #663 epic checkpoint pinning (D3)' {
+        # Decision D3: gate 5 has no production change. These rows record current behavior.
+        It 'issue #663 does not intercept a completion-asserting Write to epic-orchestrator-state.json' {
+            # Arrange: completion is asserted and ci_gate is absent, which the per-feature
+            # checkpoint would deny; the epic checkpoint path is not the gated path.
+            $json = ConvertTo-CheckpointToolInput -FilePath 'artifacts/orchestration/epic-orchestrator-state.json' -Payload @{
+                next_step        = 'complete'
+                'issue-num'      = '663'
+                'feature-folder' = 'docs/features/epics/sample-epic'
+            }
+
+            # Act
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'issue #663 still denies a per-feature checkpoint whose feature-folder is under docs/features/epics/' {
+            # Arrange: full CI evidence, but the feature folder is outside docs/features/active/.
+            $json = ConvertTo-CheckpointToolInput -Payload @{
+                next_step        = 'complete'
+                'issue-num'      = '663'
+                'feature-folder' = 'docs/features/epics/sample-epic'
+                ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123def456' }
+            }
+
+            # Act
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck { param($p) $true }
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'COMPLETION_CONSISTENCY_BLOCKED*'
+        }
+    }
 }
