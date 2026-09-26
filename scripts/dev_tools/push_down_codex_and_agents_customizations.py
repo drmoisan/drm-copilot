@@ -65,15 +65,39 @@ PACK_MANIFEST_SUBDIR = "pack-manifests"
 MODULE_ENTRY_POINT = "scripts.dev_tools.push_down_codex_and_agents_customizations"
 ROOT_FOLDERS: tuple[Path, ...] = (Path(".codex"), Path(".agents"))
 ROUTING_CONFIG_RELATIVE_PATH = Path("config/orchestration-routing.json")
-SHARED_CONFIG_RELATIVE_PATHS: tuple[Path, ...] = (
-    ROUTING_CONFIG_RELATIVE_PATH,
-    Path("config/orchestration-handoff-registry.json"),
-    Path("config/orchestration-handoff.schema.json"),
+CODEX_ROUTING_LIB_RELATIVE_DIR = Path(".codex/lib/codex-routing")
+# Each pair maps a destination-relative path to the resource path read from the
+# bundle parent directory. The two paths differ for the codex-routing modules,
+# which are published under `.codex/lib` but stored once under `resources/lib`.
+VIRTUAL_RESOURCE_PAIRS: tuple[tuple[Path, Path], ...] = (
+    (ROUTING_CONFIG_RELATIVE_PATH, ROUTING_CONFIG_RELATIVE_PATH),
+    (
+        Path("config/orchestration-handoff-registry.json"),
+        Path("config/orchestration-handoff-registry.json"),
+    ),
+    (
+        Path("config/orchestration-handoff.schema.json"),
+        Path("config/orchestration-handoff.schema.json"),
+    ),
+    (
+        CODEX_ROUTING_LIB_RELATIVE_DIR / "CodexTopology.psm1",
+        Path("lib/codex-routing/CodexTopology.psm1"),
+    ),
+    (
+        CODEX_ROUTING_LIB_RELATIVE_DIR / "CodexDeployment.psm1",
+        Path("lib/codex-routing/CodexDeployment.psm1"),
+    ),
 )
-PUBLISHED_ROOT_FOLDERS: tuple[Path, ...] = (
-    *ROOT_FOLDERS,
+VIRTUAL_ROOT_FOLDERS: tuple[Path, ...] = (
     ROUTING_CONFIG_RELATIVE_PATH.parent,
+    CODEX_ROUTING_LIB_RELATIVE_DIR,
 )
+SHARED_CONFIG_RELATIVE_PATHS: tuple[Path, ...] = tuple(
+    destination
+    for destination, _resource in VIRTUAL_RESOURCE_PAIRS
+    if destination.parent == ROUTING_CONFIG_RELATIVE_PATH.parent
+)
+PUBLISHED_ROOT_FOLDERS: tuple[Path, ...] = (*ROOT_FOLDERS, *VIRTUAL_ROOT_FOLDERS)
 CSHARP_VARIANT_CHOICES: tuple[str, ...] = ("modern", "legacy")
 MEMORY_MODE_CHOICES: tuple[str, ...] = ("overwrite", "merge", "skip")
 
@@ -100,7 +124,31 @@ def _passthrough_rewrite(
 
 
 class _RoutingConfigFileSystem:
-    """Expose the shared routing config at its destination-relative path."""
+    """Expose shared bundle resources at their destination-relative paths.
+
+    Purpose:
+        Publish resources that are stored once under the extension resources
+        directory (the parent of the Codex bundle root) as if they lived in the
+        source tree, including resources whose destination path differs from
+        their stored path.
+
+    Responsibilities:
+        Redirects `is_file` and `read_text` for every mapped destination path
+        to its resource path, and answers `list_files` for a virtual root from
+        the pair map only. It does not rewrite content and delegates every
+        other operation unchanged.
+
+    Key invariants:
+        A virtual root never lists physical files, so an unmapped file under a
+        source `config/` directory is not published. Only pairs whose
+        resource file exists are listed.
+
+    Attributes:
+        _inner: Wrapped file system that performs all real I/O.
+        _virtual_paths: Map from source-rooted destination path to the
+            resource path under the bundle parent.
+        _virtual_roots: Source-rooted directories answered from the map.
+    """
 
     def __init__(
         self,
@@ -109,21 +157,44 @@ class _RoutingConfigFileSystem:
         source_root: Path,
         bundle_root: Path,
     ) -> None:
+        """Build the destination-to-resource map for one publish run.
+
+        Args:
+            inner: File system that performs the underlying I/O.
+            source_root: Source tree root the publisher walks.
+            bundle_root: Codex bundle root; its parent holds the resources.
+
+        Returns:
+            None.
+        """
         self._inner = inner
         self._virtual_paths = {
-            source_root / relative_path: bundle_root.parent / relative_path
-            for relative_path in SHARED_CONFIG_RELATIVE_PATHS
+            source_root / destination: bundle_root.parent / resource
+            for destination, resource in VIRTUAL_RESOURCE_PAIRS
         }
-        self._virtual_root = source_root / ROUTING_CONFIG_RELATIVE_PATH.parent
+        self._virtual_roots = frozenset(
+            source_root / root for root in VIRTUAL_ROOT_FOLDERS
+        )
 
     def list_files(self, root: Path) -> list[Path]:
-        """Return the virtual routing config only for the config root."""
+        """List a virtual root from the pair map, or delegate a physical root.
 
-        if root == self._virtual_root:
+        Args:
+            root: Source-rooted directory the publisher enumerates.
+
+        Returns:
+            list[Path]: Sorted mapped destination paths directly under a
+            virtual root whose resource exists, or the inner listing for any
+            other root.
+        """
+        # A virtual root is answered from the map alone so physical files that
+        # sit beside the mapped paths (for example `config/unrelated.json`)
+        # are never published.
+        if root in self._virtual_roots:
             return sorted(
                 virtual_path
                 for virtual_path, resource_path in self._virtual_paths.items()
-                if self._inner.is_file(resource_path)
+                if virtual_path.parent == root and self._inner.is_file(resource_path)
             )
         return self._inner.list_files(root)
 
