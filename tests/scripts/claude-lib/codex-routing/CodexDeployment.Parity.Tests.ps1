@@ -104,7 +104,7 @@ Describe 'Resolve-CodexDeployment agent family resolution' {
     It 'accepts every generated agent family' {
         $families = @(
             'orchestrator', 'atomic-planner', 'atomic-executor', 'feature-reviewer',
-            'task-researcher', 'prd-feature', 'pr-author', 'python-typed-engineer',
+            'task-researcher', 'prd-feature', 'pr-author', 'commit-steward', 'python-typed-engineer',
             'powershell-typed-engineer', 'csharp-typed-engineer', 'typescript-engineer'
         )
         foreach ($family in $families) {
@@ -112,6 +112,23 @@ Describe 'Resolve-CodexDeployment agent family resolution' {
                 -ExecutionContext 'standalone' -OrchestrationComplexityCeiling 'C1'
             $result['deployment_agent'] | Should -Be "$family-c1"
         }
+    }
+
+    It 'resolves commit-steward to the Python resolver receipt' {
+        # Issue #697: expected values are the receipt printed by
+        # scripts/dev_tools/resolve_codex_deployment.py for the same arguments.
+        $result = Resolve-CodexDeployment -LogicalAgent 'commit-steward' -ComplexityBand 'C2' `
+            -ExecutionContext 'standalone' -OrchestrationComplexityCeiling 'C3'
+        $result['c3_overlay_applied'] | Should -BeFalse
+        $result['c3_overlay_reason'] | Should -BeNullOrEmpty
+        $result['complexity_band'] | Should -Be 'C2'
+        $result['deployment_agent'] | Should -Be 'commit-steward-c2'
+        $result['execution_context'] | Should -Be 'standalone'
+        $result['logical_agent'] | Should -Be 'commit-steward'
+        $result['model'] | Should -Be 'gpt-5.6-terra'
+        $result['model_reasoning_effort'] | Should -Be 'medium'
+        $result['orchestration_complexity_ceiling'] | Should -Be 'C3'
+        @($result.Keys).Count | Should -Be 9
     }
 
     It 'rejects an agent outside the generated families and the alias map' {

@@ -107,6 +107,12 @@
             # interpreter; measured here so the new production modules are not excluded.
             '.claude/lib/codex-routing/CodexDeployment.psm1'
             '.claude/lib/codex-routing/CodexTopology.psm1'
+            # Issue #697 added the PowerShell routing CLI wrappers and their shared
+            # helper so destinations resolve routing without a Python interpreter;
+            # measured here so the new production scripts are not excluded.
+            '.codex/scripts/codex-routing-cli-common.ps1'
+            '.codex/scripts/Resolve-CodexDeployment.ps1'
+            '.codex/scripts/Resolve-CodexTopology.ps1'
             '.claude/lib/orchestrator-state/OrchestratorStateCodexModelReceipts.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateCodexTopologyReceipts.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateRoutingMatrix.psm1'

@@ -225,6 +225,13 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #697: the Codex/agents publisher gained the virtual resource-pair
+    // map. This map carries no `global` key, so the file is gated only by its
+    // own entry here.
+    "./src/lib/push-down/codex-agents-customizations.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/plan-gate-commands.ts": {
       lines: 85,
       branches: 75,
