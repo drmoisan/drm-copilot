@@ -280,37 +280,60 @@ Seeded from issue:
   freshly edited workspace files.
 
 ## Acceptance Criteria
-- [ ] AC-1: None of the three original raw-count tokens
+- [x] AC-1: None of the three original raw-count tokens
       (`@($script:CommittedConfig['modules'].Keys).Count`,
       `@($script:CommittedConfig['shared_surfaces']).Count`,
       `@($script:CommittedConfig['shared_surface_globs']).Count`) remain anywhere in
       `BlastRadius.TruthTable.Tests.ps1`; each of the three floors instead calls
       `Test-NonVacuousCollection -Value <expr> | Should -BeTrue`.
-- [ ] AC-2: `Test-NonVacuousCollection` is defined once, in the file's existing top-level
+      Evidence: `evidence/qa-gates/ac1-token-absence.2026-09-26T23-39.md` (P3-T4; all three
+      `TOKEN_COUNT=0`).
+- [x] AC-2: `Test-NonVacuousCollection` is defined once, in the file's existing top-level
       `BeforeAll` block, with an `[AllowNull()][object] $Value` parameter, and its body evaluates
       `@($Value | Where-Object { $null -ne $_ }).Count -gt 0`.
-- [ ] AC-3: A new `Context` block of in-memory negative-control `It` cases asserts that
+      Evidence: `evidence/qa-gates/ac2-helper-shape.2026-09-26T23-39.md` (P3-T5) and
+      `evidence/qa-gates/final-ac2-helper-shape.2026-09-26T23-39.md` (P6-T6); both record
+      `DEFINITION_COUNT=1 ALLOWNULL_COUNT=1`.
+- [x] AC-3: A new `Context` block of in-memory negative-control `It` cases asserts that
       `Test-NonVacuousCollection` returns `$false` for `-Value $null`, `-Value @()`, and
       `-Value @($null, $null)`, and returns `$true` for `-Value @('a')` and for a non-empty
       hashtable's `.Keys` property. None of these cases read from disk, the network, or any
       environment variable.
-- [ ] AC-4 (optional, retained if included): a negative-control `It` case demonstrates that the
+      Evidence: `evidence/regression-testing/pass-after-negative-control.2026-09-26T23-39.md`
+      (P2-T2; `TOTAL=23 PASSED=23 FAILED=0`, all 5 helper-calling controls pass).
+- [x] AC-4 (optional, retained if included): a negative-control `It` case demonstrates that the
       legacy expression `@($null).Count -gt 0` evaluates to `$true`, documenting the defect the
       helper closes.
-- [ ] AC-5: Running `Invoke-Pester -Path tests/scripts/claude-lib/blast-radius -Output Detailed`
+      Evidence: `evidence/regression-testing/fail-before-negative-control.2026-09-26T23-39.md`
+      (P1-T2; the legacy-expression `It` already passes with `FAILED=5`, not `6`) and
+      `evidence/regression-testing/pass-after-negative-control.2026-09-26T23-39.md` (P2-T2).
+- [x] AC-5: Running `Invoke-Pester -Path tests/scripts/claude-lib/blast-radius -Output Detailed`
       directly in `pwsh` (not through the MCP test runner) reports zero failed tests, and the
       file's `It` block count after the edit equals its `It` block count immediately before the
       edit plus exactly the number of newly added negative-control `It` cases (verified by
       comparing `grep -c '^\s*It '''` output taken before and after the edit).
-- [ ] AC-6: `Invoke-PoshQCFormat` and `Invoke-PoshQCAnalyze` (PSScriptAnalyzer) report zero new
+      Evidence: `evidence/regression-testing/full-directory-post-edit.2026-09-26T23-39.md` (P4-T1;
+      `PostEditFailedCount: 0`, `TotalCountDelta: 6`),
+      `evidence/regression-testing/it-count-delta-file.2026-09-26T23-39.md` (P4-T2; 23 - 17 = 6),
+      `evidence/regression-testing/it-count-delta-directory.2026-09-26T23-39.md` (P4-T3;
+      309 - 303 = 6, agrees with P4-T1), and
+      `evidence/qa-gates/final-pester-directory.2026-09-26T23-39.md` (P6-T4; `FinalFailedCount: 0`).
+- [x] AC-6: `Invoke-PoshQCFormat` and `Invoke-PoshQCAnalyze` (PSScriptAnalyzer) report zero new
       findings on `BlastRadius.TruthTable.Tests.ps1` relative to its pre-edit baseline, and the
       file's total line count remains under 500 lines after the edit.
-- [ ] AC-7: No test added or modified by this change creates or reads a temporary file, references
+      Evidence: `evidence/qa-gates/final-format-apply.2026-09-26T23-39.md` (P6-T1; no changes
+      needed), `evidence/qa-gates/final-analyze.2026-09-26T23-39.md` (P6-T2; 0 findings, matching
+      the P0-T16 baseline of 0), and `evidence/qa-gates/final-line-count.2026-09-26T23-39.md`
+      (P6-T3; 391 lines).
+- [x] AC-7: No test added or modified by this change creates or reads a temporary file, references
       a git remote ref (for example `origin/main`), reads gitignored state, or depends on a
       Windows-only path or drive root.
-- [ ] AC-8: `git diff --stat` against the pre-change base commit shows changes limited to
+      Evidence: `evidence/qa-gates/portability-check.2026-09-26T23-39.md` (P5-T1; count is `0`).
+- [x] AC-8: `git diff --stat` against the pre-change base commit shows changes limited to
       `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`; no production file
       is modified.
+      Evidence: `evidence/qa-gates/scope-diff.2026-09-26T23-39.md` (P7-T2; single-file scope
+      confirmed against anchor commit `ae8d2ce32c95cf03d55ffb544f2514d83ebfc620`).
 
 ## Risks & Mitigations
 - Technical or operational risks:
