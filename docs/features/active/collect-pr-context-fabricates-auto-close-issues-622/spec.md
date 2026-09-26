@@ -416,7 +416,7 @@
   - Baseline coverage evidence goes under `docs/features/active/collect-pr-context-fabricates-auto-close-issues-622/evidence/baseline/`; final and delta coverage evidence goes under `docs/features/active/collect-pr-context-fabricates-auto-close-issues-622/evidence/qa-gates/`. These are canonical evidence kinds; `evidence/coverage/` is not canonical and is matched by the `.gitignore` rule `coverage/`, so files written there would never be committed.
 - Toolchain commands to run (format → lint → type-check → test):
   - Python: `poetry run black .`, `poetry run ruff check .`, `poetry run pyright`, then the pytest command above.
-  - TypeScript (in `extensions/drm-copilot`): `npm run format`, `npm run lint`, `npm run typecheck`, the dependency-cruiser architecture check, then `npm run test:unit:coverage`.
+  - TypeScript (in `extensions/drm-copilot`): `npm run format`, `npm run lint`, `npm run typecheck`, the dependency-cruiser architecture check, then `node run-jest.cjs --coverage`.
 - Manual validation steps (if required): none required. The end-to-end collector tests replace manual bundle inspection.
 
 ## Acceptance Criteria
@@ -462,7 +462,7 @@
 - [ ] Coverage on every new or changed production module is at least 85% line and 75% branch in both runtimes, with no regression on changed lines. The evidence is the Python coverage JSON and the Jest coverage summary, both stored under `docs/features/active/collect-pr-context-fabricates-auto-close-issues-622/evidence/qa-gates/`.
 - [ ] The full toolchain passes in a single pass in both runtimes:
   - Python: `poetry run black .`, `poetry run ruff check .`, `poetry run pyright`, `poetry run pytest`.
-  - TypeScript (`extensions/drm-copilot`): `npm run format`, `npm run lint`, `npm run typecheck`, the dependency-cruiser check, `npm run test:unit:coverage`.
+  - TypeScript (`extensions/drm-copilot`): `npm run format`, `npm run lint`, `npm run typecheck`, the dependency-cruiser check, `node run-jest.cjs --coverage`.
 - [ ] Docstrings and TSDoc for every changed extractor and builder, including the comment at `feature-docs-parsers.ts:73`, describe bare-number-only extraction and the new builder parameters. Check: a grep for `ABC-123` and `[A-Z][A-Z0-9]+-` in those modules' comments returns no matches.
 
 ## Risks & Mitigations
