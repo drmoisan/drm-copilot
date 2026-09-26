@@ -411,9 +411,9 @@
   - `issue_details` is never called for a ref that did not classify as `"issue"`.
 - Coverage impact and targets for changed lines/modules:
   - At least 85% line and 75% branch on every new or changed production module in both runtimes, with no regression on changed lines.
-  - Python evidence: `poetry run pytest tests/scripts/dev_tools --cov=scripts.dev_tools.pr_context --cov-branch --cov-report=term-missing --cov-report=json:<FEATURE>/evidence/coverage/python-coverage.json`.
-  - TypeScript evidence: the per-file thresholds in `jest.config.cjs`, run with `npm run test:unit:coverage`.
-  - Evidence goes under `docs/features/active/collect-pr-context-fabricates-auto-close-issues-622/evidence/coverage/`.
+  - Python evidence: `poetry run pytest tests/scripts/dev_tools --cov=scripts.dev_tools.pr_context --cov-branch --cov-report=term-missing --cov-report=json:<FEATURE>/evidence/qa-gates/python-coverage-final.json`.
+  - TypeScript evidence: the per-file thresholds in `jest.config.cjs`, run with `node run-jest.cjs --coverage` from `extensions/drm-copilot` (the extension `package.json` defines no `test:unit:coverage` script).
+  - Baseline coverage evidence goes under `docs/features/active/collect-pr-context-fabricates-auto-close-issues-622/evidence/baseline/`; final and delta coverage evidence goes under `docs/features/active/collect-pr-context-fabricates-auto-close-issues-622/evidence/qa-gates/`. These are canonical evidence kinds; `evidence/coverage/` is not canonical and is matched by the `.gitignore` rule `coverage/`, so files written there would never be committed.
 - Toolchain commands to run (format → lint → type-check → test):
   - Python: `poetry run black .`, `poetry run ruff check .`, `poetry run pyright`, then the pytest command above.
   - TypeScript (in `extensions/drm-copilot`): `npm run format`, `npm run lint`, `npm run typecheck`, the dependency-cruiser architecture check, then `npm run test:unit:coverage`.
@@ -459,7 +459,7 @@
 - [ ] Every new and changed production and test file is at or below 500 lines. This includes `collector.py`, `collector-core.ts`, `collector-output.ts`, `render_pr_helpers.py`, `render-pr-helpers.ts`, `autoclose.py` and `autoclose.ts`. Check: a line count of each changed file.
 - [ ] Test code added by #622 uses no temporary files, remote refs, gitignored state, spawned processes or drive-root paths. Check: a grep over the added lines (`+` lines) of the branch diff against its merge base with `main`, restricted to files under `tests/` and `extensions/drm-copilot/test/`, for `tmp_path|tempfile|mkdtemp|mkdtempSync|os\.tmpdir|origin/|child_process|spawnSync|execSync|(?<![A-Za-z])[A-Za-z]:[\\/]` returns no matches. Pre-existing `origin/...` string literals inside in-process fakes in unchanged lines are outside this check.
 - [ ] `extensions/drm-copilot/jest.config.cjs` has a per-file `lines: 85, branches: 75` threshold entry for `./src/lib/pr-context/autoclose.ts` and for each other changed pr-context production file that lacks one. Entries already present (for example `collector-core.ts`, and #588's `render-pr-helpers.ts`) are not duplicated.
-- [ ] Coverage on every new or changed production module is at least 85% line and 75% branch in both runtimes, with no regression on changed lines. The evidence is the Python coverage JSON and the Jest coverage summary, both stored under `docs/features/active/collect-pr-context-fabricates-auto-close-issues-622/evidence/coverage/`.
+- [ ] Coverage on every new or changed production module is at least 85% line and 75% branch in both runtimes, with no regression on changed lines. The evidence is the Python coverage JSON and the Jest coverage summary, both stored under `docs/features/active/collect-pr-context-fabricates-auto-close-issues-622/evidence/qa-gates/`.
 - [ ] The full toolchain passes in a single pass in both runtimes:
   - Python: `poetry run black .`, `poetry run ruff check .`, `poetry run pyright`, `poetry run pytest`.
   - TypeScript (`extensions/drm-copilot`): `npm run format`, `npm run lint`, `npm run typecheck`, the dependency-cruiser check, `npm run test:unit:coverage`.
