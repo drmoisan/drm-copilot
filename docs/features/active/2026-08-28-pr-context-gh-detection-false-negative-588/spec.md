@@ -129,6 +129,10 @@ Observed first on issue #586 / PR #587 on 2026-08-28.
   - Option A (adopted): tests for a non-empty list with `gh` unavailable assert that the bulleted entries are present and that the empty-list unavailable body `None (GitHub CLI unavailable; closing issues not verified)` is absent. They do not assert the absence of the phrase `GitHub CLI unavailable`, because #622's annotation line contains that phrase. No #588 test asserts that non-empty autoclose rendering is byte-for-byte unchanged from any earlier tree.
   - Option B: keep the absence-of-phrase assertion and require #622 to edit it.
   - Rationale: B makes #588's test fail as soon as #622 is merged, which is the cross-item dependency D8 removes.
+- **D13 Ownership of tests for #622's annotation line (added 2026-09-26).** #622's spec (D14) anticipated that #588's H3 would assert #622's annotation line in the order where #588 merges first.
+  - Option A (adopted): #588 adds no assertion about the annotation line in either order. Tests for the annotation belong to #622, which adds or updates them in its own change set whichever order applies; #588's H3 and its Python twin follow D11 only.
+  - Option B: #588 asserts the annotation line when #622 has merged first.
+  - Rationale: under A neither item's tests reference behaviour the other item introduces, so both remain correct under either merge order. B would couple #588's test to #622's text. #622's spec D14 should be reconciled with this decision on #622's side.
 - **D12 Home of the composition-root test (added 2026-09-26; previously an in-execution amendment in the plan).**
   - Option A (adopted): place the test in a new sibling file `extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts`.
   - Option B: add it to `extensions/drm-copilot/test/extension.collect-pr-context.test.ts`.
