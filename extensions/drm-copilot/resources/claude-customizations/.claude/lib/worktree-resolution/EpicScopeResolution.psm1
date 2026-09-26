@@ -11,8 +11,9 @@
     A call is epic scope only when the session root's epic checkpoint parses, carries
     route_id "epic" and a non-empty integration_branch, and that branch equals either the
     call's branch signal (--head, --branch, or a branch: label) or, for a command or path
-    leg with no branch signal, the HEAD branch of the effective worktree (the -C selector
-    worktree when present, otherwise the session root). Anything else is not epic scope,
+    leg, the HEAD branch of the effective worktree (the -C selector worktree when present,
+    otherwise the session root). A command or path leg ignores any text branch signal, so
+    its merge probe inspects the worktree it operates on. Anything else is not epic scope,
     so the caller's existing per-feature resolution runs unchanged.
 
     The checkpoint path is always composed from the resolved session root and is never
@@ -288,8 +289,8 @@ function Resolve-EpicScopeCheckpoint {
     .PARAMETER WorktreeSelector
         The -C selector value of a command leg, when present.
     .PARAMETER MatchWorktreeHead
-        Match the effective worktree's HEAD branch when the text carries no branch signal,
-        and probe that worktree for a merge in progress.
+        Match the effective worktree's HEAD branch, ignoring any text branch signal, and
+        probe that worktree for a merge in progress.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -331,10 +332,12 @@ function Resolve-EpicScopeCheckpoint {
         return (New-EpicScopeResult -IsEpicScope $false -CheckpointPath $path -Reason 'integration_branch')
     }
 
-    # Decide the matched branch: an explicit branch signal decides on its own; otherwise
-    # the effective worktree's HEAD decides, the selector worktree taking precedence.
+    # Decide the matched branch. A command or path leg (-MatchWorktreeHead) matches the
+    # effective worktree's HEAD, the selector worktree taking precedence, and ignores any
+    # text branch signal so the merge probe inspects the worktree the call operates on
+    # (issue #663 remediation CR-2); otherwise the explicit branch signal decides.
     $effectiveRoot = $root
-    if ($null -ne $branch) {
+    if (-not $MatchWorktreeHead) {
         $candidate = $branch
     } else {
         if (-not [string]::IsNullOrWhiteSpace($WorktreeSelector)) {

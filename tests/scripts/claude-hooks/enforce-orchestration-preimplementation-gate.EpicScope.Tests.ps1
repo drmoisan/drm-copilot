@@ -225,6 +225,25 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 epic scope (issue #66
         $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:SingleFeatureReason
     }
 
+    It 'epic scope ignores a text branch label and decides the -C selector worktree by its own HEAD' {
+        # Arrange: only the session root has the integration branch checked out; the -C
+        # selector worktree does not, although the commit message names integration_branch.
+        Set-EpicScopeSeam -CheckpointText $script:ReadyEpicJson -MergeInProgress $true
+        Mock Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution {
+            if ($WorktreeRoot -eq '/synthetic-worktrees/epic-other') { return 'feature/standalone-item' }
+            return 'epic/sample-epic-integration'
+        }
+        $payload = ConvertTo-GateBashPayload -Command 'git -C /synthetic-worktrees/epic-other commit -m "branch: epic/sample-epic-integration" -- scripts/powershell/Sample.ps1'
+
+        # Act
+        $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $payload -CheckpointRaw $script:NotReadySingleFeature
+
+        # Assert: the selector worktree decides, so the call stays on the single-feature path.
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:SingleFeatureReason
+        Should -Invoke Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution -Times 0 -Exactly
+    }
+
     Context 'issue #663 relocated read seams and the no-leg guard of the epic-scope sibling' {
         # The two per-mode read seams moved into the sibling keep their behaviour: the path
         # comes from the fixed mode table, an absent file yields an empty string, and a

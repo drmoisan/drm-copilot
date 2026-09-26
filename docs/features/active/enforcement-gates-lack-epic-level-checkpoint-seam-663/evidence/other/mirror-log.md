@@ -137,3 +137,18 @@ Four-copy set (batch RB1):
 - Set: identical
 - Differs from the [P0-T12] helpers hash 28164c591831d1f3e62dc2a5dbecea0abebd1792d607a95aec191be943486c77: yes
 
+## Remediation cycle 1 - [P2-T6]
+
+Timestamp: 2026-09-25T21-26
+
+- Command: `Copy-Item -LiteralPath .claude/lib/worktree-resolution/EpicScopeResolution.psm1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeResolution.psm1 -Force`
+  - .claude/lib/worktree-resolution/EpicScopeResolution.psm1: 9ff75eeb9109be5a1525c858d70b5219e6ac20050615756b27c258f3993d61ec
+  - extensions/drm-copilot/resources/claude-customizations/.claude/lib/worktree-resolution/EpicScopeResolution.psm1: 9ff75eeb9109be5a1525c858d70b5219e6ac20050615756b27c258f3993d61ec
+  - Pair: equal
+
+Module pair (batch RB2):
+- Pair: identical
+- Differs from the [P0-T12] module hash 7d5d603e61480732326c05bca7848f765c33e98e5a5265e917ec28f91cd80a61: yes
+
+Note: a first run of this step at 2026-09-25T21-26 aborted before any copy of the module: the one-pair list was flattened by PowerShell array unrolling, so Copy-Item received single characters, created an empty untracked directory at the worktree root, and Get-FileHash then failed; nothing was appended to this log. The empty directory was removed and the step was rerun with the pair list kept nested (entry above).
+

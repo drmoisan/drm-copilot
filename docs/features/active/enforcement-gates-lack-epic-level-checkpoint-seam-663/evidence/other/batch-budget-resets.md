@@ -49,3 +49,9 @@ Scope: one test file (tests/scripts/claude-hooks/enforce-orchestration-preimplem
 Entry: RB1
 Timestamp: 2026-09-25T21-21
 Deleted: none present (.claude/state/ held no powershell-batch-budget.*.json file)
+
+## Remediation cycle 1 - [P2-T1]
+
+Entry: RB2
+Timestamp: 2026-09-25T21-24
+Deleted: powershell-batch-budget.worktree-agent-ab2336a82c893606e-8abc3af3.json

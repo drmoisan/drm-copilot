@@ -350,3 +350,34 @@ Describe 'EpicScopeResolution read seams' {
         Should -Invoke Get-WorktreeResolutionGitEntryKind -ModuleName EpicScopeResolution -Times 1 -Exactly -ParameterFilter { $Path -eq '/synthetic-worktrees/epic-integration/admin/MERGE_HEAD' }
     }
 }
+
+Describe 'Resolve-EpicScopeCheckpoint head matching ignores a text branch signal (issue #663 remediation CR-2)' {
+    It 'a head-matched command leg is not epic scope when the text names integration_branch but the selector HEAD differs' {
+        # Arrange: the commit message carries a branch: label equal to integration_branch.
+        Set-EpicScopeResolverMock -CheckpointText $script:ReadyEpicJson -HeadBranch 'feature/standalone-item' -MergeInProgress $true
+
+        # Act
+        $scope = Resolve-EpicScopeCheckpoint -Text 'git -C /synthetic-worktrees/epic-integration commit -m "branch: epic/sample-epic-integration" -- scripts/powershell/Sample.ps1' -SessionRoot $script:CoordinatorRoot -WorktreeSelector $script:IntegrationRoot -MatchWorktreeHead
+
+        # Assert
+        $scope.IsEpicScope | Should -BeFalse -Because 'the selector worktree HEAD, not the text label, decides a head-matched leg'
+        $scope.Reason | Should -Be 'branch-mismatch'
+        Should -Invoke Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution -Times 1 -Exactly -ParameterFilter { $WorktreeRoot -eq '/synthetic-worktrees/epic-integration' }
+        Should -Invoke Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution -Times 0 -Exactly
+    }
+
+    It 'a head-matched command leg probes MERGE_HEAD in the selector worktree when the text names another branch' {
+        # Arrange: the selector worktree has the integration branch checked out.
+        Set-EpicScopeResolverMock -CheckpointText $script:ReadyEpicJson -HeadBranch $script:IntegrationBranch -MergeInProgress $true
+
+        # Act
+        $scope = Resolve-EpicScopeCheckpoint -Text 'git -C /synthetic-worktrees/epic-integration commit -m "branch: feature/standalone-item" -- scripts/powershell/Sample.ps1' -SessionRoot $script:CoordinatorRoot -WorktreeSelector $script:IntegrationRoot -MatchWorktreeHead
+
+        # Assert
+        $scope.IsEpicScope | Should -BeTrue -Because 'the selector worktree HEAD equals integration_branch whatever the text names'
+        $scope.WorktreeRoot | Should -Be $script:IntegrationRoot
+        $scope.Branch | Should -Be $script:IntegrationBranch
+        $scope.MergeInProgress | Should -BeTrue
+        Should -Invoke Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution -Times 1 -Exactly -ParameterFilter { $WorktreeRoot -eq '/synthetic-worktrees/epic-integration' }
+    }
+}

@@ -107,3 +107,12 @@ EXIT_CODE: 0
 Commit: a4ecb55cff7183f91737666f3ffca5ef6ab4e0c7 (docs(bug): record the remediation-cycle-1 baseline for #663)
 Paths: the remediation plan file and the thirteen evidence/remediation-baseline/rem1-*.md artifacts (no path outside the feature folder).
 Porcelain (post-commit, pre-append): (empty)
+
+## Remediation cycle 1 - [P1-T8]
+
+Timestamp: 2026-09-25T21-24
+Command: git commit -F <SCRATCHPAD>/rem1-p1-commit.txt
+EXIT_CODE: 0
+Commit: b18a11efaabb94352cff57a11e2e4b10892d514a (fix(hooks): fail closed on backslash escapes in the staging exemption (#663))
+Paths outside the feature folder (6): the four enforce-orchestration-preimplementation-gate-helpers.ps1 copies (.claude/hooks, .codex/hooks, and the two extensions/drm-copilot/resources copies) and the two command-exemption suites.
+Porcelain (post-commit, pre-append): (empty)
