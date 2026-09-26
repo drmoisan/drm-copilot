@@ -116,3 +116,12 @@ EXIT_CODE: 0
 Commit: b18a11efaabb94352cff57a11e2e4b10892d514a (fix(hooks): fail closed on backslash escapes in the staging exemption (#663))
 Paths outside the feature folder (6): the four enforce-orchestration-preimplementation-gate-helpers.ps1 copies (.claude/hooks, .codex/hooks, and the two extensions/drm-copilot/resources copies) and the two command-exemption suites.
 Porcelain (post-commit, pre-append): (empty)
+
+## Remediation cycle 1 - [P2-T8]
+
+Timestamp: 2026-09-25T21-27
+Command: git commit -F <SCRATCHPAD>/rem1-p2-commit.txt
+EXIT_CODE: 0
+Commit: 50a7fc8863f96b39653568de57b995b53991991c (fix(worktree-resolution): decide head-matched epic scope from the effective worktree (#663))
+Paths outside the feature folder (4): the two EpicScopeResolution.psm1 copies (.claude/lib/worktree-resolution and the extensions/drm-copilot/resources/claude-customizations bundle copy), tests/scripts/claude-lib/worktree-resolution/EpicScopeResolution.Tests.ps1, and tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1.
+Porcelain (post-commit, pre-append): (empty)
