@@ -143,3 +143,14 @@ EXIT_CODE: 0
 Commit: 82076d6d5b64b43497a9ffc4a5b5591f51bcdf73 (docs(bug): record the remediation-cycle-1 final QC loop for #663)
 Paths: the seven evidence/qa-gates/rem1-final-*.md artifacts (no .passN files; pass 1 was clean), evidence/other/commits.md, and the plan file (no path outside the feature folder).
 Porcelain (post-commit, pre-append): (empty)
+
+## Remediation cycle 1 - [P5-T14]
+
+Timestamp: 2026-09-25T21-39
+Command: git commit -F <SCRATCHPAD>/rem1-p5-commit.txt
+EXIT_CODE: 0
+Commit: 784660fbc4e098b679bb163ea3fcfa5570d531ce (docs(bug): close remediation cycle 1 for #663)
+Paths: the plan file (checklist through [P5-T13]), evidence/other/ac-checkoff.md, evidence/other/ac-status-summary.md, evidence/other/commits.md, and evidence/other/follow-ups.md. spec.md was not changed by [P5-T1] to [P5-T11] and is not in the commit.
+Porcelain (post-commit, pre-append): (empty)
+
+This append is committed alone in a further commit (same trailer).
