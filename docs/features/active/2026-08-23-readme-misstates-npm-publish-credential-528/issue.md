@@ -83,6 +83,24 @@ this is edited — do not assume the documentation is simply wrong.
 - [ ] Consider whether the unused `NPM_TOKEN` secret should be removed, so its presence stops corroborating the incorrect documentation. Confirm no other consumer exists before deleting it.
 - [x] Manual verification notes: `.github/workflows/README.md` documents CI reusable-workflow dispatch and does not mention either publish workflow, so it needs no change; the inaccuracy is confined to the root `README.md` and the one runbook.
 
+## Scope Decisions
+
+- D1: `README.md` lines 401-402 are corrected to describe OIDC trusted publishing and add `--provenance` to the documented `npm publish` command.
+- D2: `docs/engineering/npm-token-rotation.runbook.md` gets a superseded notice at the top; its body is not rewritten. The byte-identical historical copy under `docs/features/completed/2026-07-03-npm-publish-404-and-vsce-bundling-warning-283/` is not modified. Alternative: rewrite or delete the runbook.
+- D3: The branch-protection runbook `docs/features/completed/separate-version-bump-from-publish-214/runbooks/release-pr-merge-approval.runbook.md` is edited to match the live ruleset (`required_approving_review_count: 0`; a pull request is still required). Alternative for the repository owner: change the ruleset to require a non-author approval and keep the runbook as-is; that is a GitHub settings change outside this fix.
+- D4: Deleting the unused `NPM_TOKEN` repository secret is out of scope for this fix (a credential-management action, not a file edit); recorded as a follow-up.
+
+## Acceptance Criteria
+
+- [ ] AC1. `README.md`'s npm publish release procedure documents the `--provenance` flag in the publish command. Check: `grep -n -- "--provenance" README.md` returns at least one match.
+- [ ] AC2. `README.md`'s npm publish release procedure describes the OIDC trusted-publishing mechanism using the literal token `id-token: write`. Check: `grep -n "id-token: write" README.md` returns at least one match.
+- [ ] AC3. `README.md` no longer claims that publication requires a repository secret; it contains zero occurrences of the literal token `NPM_TOKEN`. Check: `grep -c NPM_TOKEN README.md` returns `0`.
+- [ ] AC4. `docs/engineering/npm-token-rotation.runbook.md` begins with a superseded notice: the literal token `superseded` appears within the file's first 5 lines. Check: `head -n 5 docs/engineering/npm-token-rotation.runbook.md | grep -c superseded` returns `1` or more.
+- [ ] AC5. The historical copy `docs/features/completed/2026-07-03-npm-publish-404-and-vsce-bundling-warning-283/runbooks/npm-token-rotation.runbook.md` remains untouched by this change: it still contains zero occurrences of the literal token `superseded`. Check: `grep -c superseded docs/features/completed/2026-07-03-npm-publish-404-and-vsce-bundling-warning-283/runbooks/npm-token-rotation.runbook.md` returns `0`.
+- [ ] AC6. `docs/features/completed/separate-version-bump-from-publish-214/runbooks/release-pr-merge-approval.runbook.md` no longer describes the approval step as unautomatable: it contains zero occurrences of the literal token `cannot be automated`. Check: `grep -c "cannot be automated" docs/features/completed/separate-version-bump-from-publish-214/runbooks/release-pr-merge-approval.runbook.md` returns `0`.
+- [ ] AC7. The same runbook still documents that a pull request is required for the release merge: it contains at least one occurrence of the literal token `pull request`. Check: `grep -c "pull request" docs/features/completed/separate-version-bump-from-publish-214/runbooks/release-pr-merge-approval.runbook.md` returns `1` or more.
+- [ ] AC8. The existing docs-validation checks still hold: `README.md` and `LICENSE` are present and `README.md` is non-empty. Check: `test -f README.md && test -s README.md && test -f LICENSE` exits `0`.
+
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template)
