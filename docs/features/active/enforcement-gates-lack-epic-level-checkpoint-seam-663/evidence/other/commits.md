@@ -98,3 +98,12 @@ EXIT_CODE: 0
 Commit: af40fb0087776d72a5521331f8990c85de852744
 Paths: spec.md, the plan file (checklist through [P9-T27]), evidence/other/commits.md, evidence/other/ac-checkoff.md, evidence/other/ac-status-summary.md, evidence/other/follow-ups.md. spec.md, issue.md, and research/research.2026-09-25T08-35.md were already committed; issue.md and the research file were unchanged and therefore absent from the porcelain list.
 Porcelain (post-commit, pre-append): (empty)
+
+## Remediation cycle 1 - [P0-T14]
+
+Timestamp: 2026-09-25T21-20
+Command: git commit -F <SCRATCHPAD>/rem1-p0-commit.txt
+EXIT_CODE: 0
+Commit: a4ecb55cff7183f91737666f3ffca5ef6ab4e0c7 (docs(bug): record the remediation-cycle-1 baseline for #663)
+Paths: the remediation plan file and the thirteen evidence/remediation-baseline/rem1-*.md artifacts (no path outside the feature folder).
+Porcelain (post-commit, pre-append): (empty)

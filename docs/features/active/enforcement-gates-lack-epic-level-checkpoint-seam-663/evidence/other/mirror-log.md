@@ -112,3 +112,28 @@ Timestamp: 2026-09-25T19-46
   - extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md: 0d01e5484d63e418a6bc31f219aecaef7381cc439a4a796664006879f6a027ba
   - Pair: equal
 
+## Remediation cycle 1 - [P1-T6]
+
+Timestamp: 2026-09-25T21-23
+
+- Command: `Copy-Item -LiteralPath .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 -Destination .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 -Force`
+  - .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1: 5bb872e2de58734d6aaa7ce25343c5c9796839c3eeb8610562db365d17881d7f
+  - .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1: 5bb872e2de58734d6aaa7ce25343c5c9796839c3eeb8610562db365d17881d7f
+  - Pair: equal
+- Command: `Copy-Item -LiteralPath .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 -Force`
+  - .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1: 5bb872e2de58734d6aaa7ce25343c5c9796839c3eeb8610562db365d17881d7f
+  - extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1: 5bb872e2de58734d6aaa7ce25343c5c9796839c3eeb8610562db365d17881d7f
+  - Pair: equal
+- Command: `Copy-Item -LiteralPath .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 -Destination extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 -Force`
+  - .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1: 5bb872e2de58734d6aaa7ce25343c5c9796839c3eeb8610562db365d17881d7f
+  - extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1: 5bb872e2de58734d6aaa7ce25343c5c9796839c3eeb8610562db365d17881d7f
+  - Pair: equal
+
+Four-copy set (batch RB1):
+- .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1: 5bb872e2de58734d6aaa7ce25343c5c9796839c3eeb8610562db365d17881d7f
+- .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1: 5bb872e2de58734d6aaa7ce25343c5c9796839c3eeb8610562db365d17881d7f
+- extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1: 5bb872e2de58734d6aaa7ce25343c5c9796839c3eeb8610562db365d17881d7f
+- extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1: 5bb872e2de58734d6aaa7ce25343c5c9796839c3eeb8610562db365d17881d7f
+- Set: identical
+- Differs from the [P0-T12] helpers hash 28164c591831d1f3e62dc2a5dbecea0abebd1792d607a95aec191be943486c77: yes
+

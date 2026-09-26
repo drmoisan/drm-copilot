@@ -113,11 +113,11 @@ function Test-OrchestrationCommandTextUnresolvable {
         Reports whether a command line carries a statically unresolvable character.
     .DESCRIPTION
         Realizes D4 row 12 as narrowed by issue #663. Quote state is tracked with the same
-        state machine as Split-OrchestrationCommandLine: a quote character opens a span
-        outside quotes and the matching character closes it. An interpolation character
-        (`$` or backtick) answers true in any quote state; a redirection character (`<` or
-        `>`) answers true only outside a quoted span. Backslash escapes are not modelled, so
-        the single-quoted apostrophe idiom leaves its tail unquoted and still denies.
+        state machine as Split-OrchestrationCommandLine. An interpolation character (`$` or
+        backtick) answers true in any quote state; a redirection character (`<` or `>`)
+        answers true only outside a quoted span. Backslash escapes are not modelled, so a
+        backslash before any quote character, or anywhere inside a double-quoted span,
+        answers true: the shell may end the span where this scan does not (fail closed).
     .PARAMETER CommandText
         The full command line as the shell would receive it.
     .OUTPUTS
@@ -126,6 +126,11 @@ function Test-OrchestrationCommandTextUnresolvable {
     [CmdletBinding()]
     [OutputType([bool])]
     param([Parameter(Mandatory)][AllowEmptyString()][string] $CommandText)
+
+    # An escaped quote moves a span boundary the scan cannot model (issue #663 remediation CR-1).
+    if ($CommandText.Contains('\"') -or $CommandText.Contains("\'")) {
+        return $true
+    }
 
     $openQuote = [char]0
 
@@ -136,9 +141,13 @@ function Test-OrchestrationCommandTextUnresolvable {
             return $true
         }
 
-        # Decide by quote state: inside a span only the closing quote matters; outside a
-        # span a quote opens one and a redirection character is unresolvable.
+        # Decide by quote state: inside a span only the closing quote matters, and any
+        # backslash inside a double-quoted span is an unmodelled escape; outside a span a
+        # quote opens one and a redirection character is unresolvable.
         if ($openQuote -ne [char]0) {
+            if ($openQuote -eq '"' -and $character -eq '\') {
+                return $true
+            }
             if ($character -eq $openQuote) {
                 $openQuote = [char]0
             }
@@ -455,8 +464,8 @@ function Test-ExemptOrchestrationStagingCommand {
         return $false
     }
 
-    # Row 12: interpolation anywhere and redirection outside quotes are not statically
-    # resolvable, so the operand list cannot be trusted to describe what the line touches.
+    # Row 12: interpolation anywhere, redirection outside quotes, and unmodelled backslash
+    # escapes are not statically resolvable, so the operand list cannot be trusted.
     if (Test-OrchestrationCommandTextUnresolvable -CommandText $CommandText) {
         return $false
     }

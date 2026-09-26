@@ -463,4 +463,25 @@ NOTE
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
         }
     }
+
+    Context 'issue #663 remediation escaped quotes (CR-1, CR-3)' {
+        # Backslash escapes are not modelled: a backslash before any quote character, or anywhere
+        # inside a double-quoted span, can move a span boundary the scan cannot see (fail closed).
+        It 'issue #663 remediation denies <Label>' -ForEach @(
+            @{ Label = 'an escaped double quote hiding an output redirection (CR-1)'; Command = 'git add docs/features/active/x/a.md && git commit -m "a\"" > src/prod.ts "\"" docs/features/active/x/a.md' }
+            @{ Label = 'an escaped double quote hiding an output redirection after a semicolon (CR-1)'; Command = 'git add docs/features/active/x/a.md ; git commit -m "a\"" > src/prod.ts "\"" docs/features/active/x/a.md' }
+            @{ Label = 'an escaped double quote hiding chain operators (CR-3)'; Command = 'git commit -m "x\"" ; touch src/prod.ts ; "\"" -- docs/features/active/x/a.md' }
+            @{ Label = 'an unquoted escaped double quote opening a scan-only span'; Command = 'git commit -m x\" > src/prod.ts \" -- docs/features/active/x/a.md' }
+            @{ Label = 'an unquoted escaped single quote opening a scan-only span'; Command = 'git commit -m x\'' > src/prod.ts \'' -- docs/features/active/x/a.md' }
+            @{ Label = 'a backslash inside a double-quoted message'; Command = 'git commit -m "path a\b" -- docs/features/active/x/a.md' }
+        ) {
+            # Act
+            $decision = Get-ExemptionDecisionForCommand -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'an unmodelled backslash escape makes the quoted-span boundaries unknown'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
+        }
+    }
 }
