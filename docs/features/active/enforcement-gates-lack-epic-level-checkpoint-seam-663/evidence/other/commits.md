@@ -89,3 +89,12 @@ EXIT_CODE: 0
 Commit: c56ddd11a8d8c9c06f348f887071aac7d46ac120
 Non-evidence paths in `git log -1 --name-only` (1): tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1
 Porcelain (post-commit, pre-append): (empty)
+
+## Phase 9 close-out ([P9-T28])
+
+Timestamp: 2026-09-25T20-17
+Command: git commit -F <SCRATCHPAD>/i663/commit-p9.txt
+EXIT_CODE: 0
+Commit: af40fb0087776d72a5521331f8990c85de852744
+Paths: spec.md, the plan file (checklist through [P9-T27]), evidence/other/commits.md, evidence/other/ac-checkoff.md, evidence/other/ac-status-summary.md, evidence/other/follow-ups.md. spec.md, issue.md, and research/research.2026-09-25T08-35.md were already committed; issue.md and the research file were unchanged and therefore absent from the porcelain list.
+Porcelain (post-commit, pre-append): (empty)
