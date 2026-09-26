@@ -3,9 +3,9 @@
 - **Issue:** #622
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-25T23-55
+- **Last Updated:** 2026-09-26T00-00
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 
 ## Context
 - Summary of the bug and its impact (link to repro/playbook entry):
@@ -56,8 +56,9 @@
   - Rendering of `Issues to autoclose (verified or pending)` when validation is unavailable and the list is non-empty.
   - Python and TypeScript runtimes, kept at parity.
 - Out of scope / non-goals:
-  - The gh-availability false negative (`whichGh` default, executable resolution). Owned by #588.
-  - The empty-list gh-unavailable autoclose text `None (GitHub CLI unavailable; closing issues not verified)`. Owned and introduced by #588; #622 consumes it unchanged.
+  - The gh-availability false negative (`whichGh` default, executable resolution). Owned by #588; #622 does not implement it in either branch of D9.
+  - The empty-list gh-unavailable autoclose text `None (GitHub CLI unavailable; closing issues not verified)`. Owned and introduced by #588. #622 never writes this literal into production code; it renders only when #588's branch is present (D9, D10).
+  - #622 introduces (branch N588) or reuses (branch M588) only the builder parameter `gh_available` / `ghAvailable`, and uses it only for the non-empty annotation branch (D4, D10). It does not add #588's empty-list branch.
   - Edits to the `pr-author` consumer contract and its mirrors:
     - `.claude/skills/pr-author/SKILL.md`
     - `.agents/skills/pr-author/SKILL.md`
@@ -129,12 +130,12 @@
 - `Issues to autoclose (verified or pending)` ordering is unchanged: verified first, then pending, de-duplicated.
 - Section headers and existing fallback strings are unchanged. This covers `===== Issues to autoclose (verified or pending) =====`, `Close candidates`, `Auto-close issues (verified from GitHub PR metadata):`, `Auto-close issues (author asserted):`, `Referenced issues (detected):` and `Referenced issues (classified)` with its `NOTE: Unverified (GitHub unavailable)` suffix.
 - `verified` entries are trusted as GitHub's own closing references and are not state-checked.
-- #588's empty-list unavailable body `None (GitHub CLI unavailable; closing issues not verified)` and its precedence are unchanged.
+- Where #588's empty-list unavailable body `None (GitHub CLI unavailable; closing issues not verified)` is present (branch M588), it and its precedence are unchanged. Where it is absent (branch N588), the pre-existing PASS / non-PASS fallbacks for the empty list are unchanged.
 - The Python and TypeScript runtimes produce identical section text for identical inputs.
 - No production or test file exceeds 500 lines.
 
 ### Dependencies or blocked work:
-- #588 must be merged into the base tree before #622 executes. See Composition with #588.
+- No merge-order dependency. #622 executes to completion from `origin/main` whether or not #588 is merged. See Composition with #588 and D9.
 
 ### Implementation strategy (what changes, not sequencing):
 
@@ -142,22 +143,22 @@
 - Python:
   - `scripts/dev_tools/pr_context/models.py`: add `ISSUE_REFERENCE_PATTERN` (compiled `re.Pattern[str]` of `(?<!\w)#\d+(?!\w)` with `re.ASCII`), `AUTOCLOSE_UNVERIFIED_ANNOTATION` and `AUTOCLOSE_PENDING_NOT_OPEN_TEXT`.
   - `feature_docs.py`, `render_pr_helpers.py`, `render_feature_excerpts.py`: the extractors use `ISSUE_REFERENCE_PATTERN`, and docstrings describe bare-number extraction only.
-  - `render_pr_helpers.py`: `build_close_candidates_section` fix (D2), plus the `build_issues_to_autoclose_section` annotation and not-open fallback (D4, D5).
+  - `render_pr_helpers.py`: `build_close_candidates_section` fix (D2), plus the `build_issues_to_autoclose_section` annotation and not-open fallback (D4, D5). In branch N588 the keyword-only `gh_available: bool = True` parameter is also added here (D10).
   - `scripts/dev_tools/pr_context/autoclose.py` (new): the reference-classification function moved from `collector.py:194-221`, and pending-primary selection (D3, D5).
-  - `collector.py`: remove the author-asserted promotion; delegate classification and pending selection to `autoclose.py`; build the autoclose section after pending verification.
+  - `collector.py`: remove the author-asserted promotion; delegate classification and pending selection to `autoclose.py`; build the autoclose section after pending verification; pass the collector-local `gh_available` (set at `collector.py:144/149` on `origin/main`) to the builder at the call site (`collector.py:260` on `origin/main`), in both branches of D9.
 - TypeScript:
   - `models.ts`: `ISSUE_REFERENCE_PATTERN` regex literal `/(?<!\w)#\d+(?!\w)/u`, `AUTOCLOSE_UNVERIFIED_ANNOTATION` and `AUTOCLOSE_PENDING_NOT_OPEN_TEXT`.
   - `feature-docs-parsers.ts` (including the doc comment at line 73), `render-pr-helpers.ts`, `render-feature-excerpts.ts`: use the shared pattern.
-  - `render-pr-helpers.ts`: the same builder changes as Python.
+  - `render-pr-helpers.ts`: the same builder changes as Python, including the optional `ghAvailable` parameter (default `true`) in branch N588.
   - `extensions/drm-copilot/src/lib/pr-context/autoclose.ts` (new): `classifyReferences` / `classifyOne` / `formatRef` moved from `collector-core.ts:368-454`, plus pending-primary selection.
-  - `collector-core.ts`: the same collector changes as Python.
+  - `collector-core.ts`: the same collector changes as Python; the call site (`collector-core.ts:238` on `origin/main`) passes the collector-local `ghAvailable` (set at `collector-core.ts:133/138`).
   - `extensions/drm-copilot/jest.config.cjs`: per-file threshold entries (see AC).
 - Not changed: `render.py` / `render.ts`, which inherit the pattern fix; their commit-subject references remain mention-only. Also unchanged: `collector_documents.py`, `collector-output.ts` (except the imports D7 may require), `github.py`, `gh-client-*.ts`, and all `pr-author` consumer documents.
 
 #### Functions/classes/CLI commands impacted:
 - `extract_issue_references` / `extractIssueReferences` (all copies) and `_extract_issue_references`.
 - `build_close_candidates_section` / `buildCloseCandidatesSection`.
-- `build_issues_to_autoclose_section` / `buildIssuesToAutocloseSection`: new keyword-only `pending_primary_excluded: bool = False` / optional `pendingPrimaryExcluded?: boolean` (default `false`), alongside #588's `gh_available` / `ghAvailable`.
+- `build_issues_to_autoclose_section` / `buildIssuesToAutocloseSection`: new keyword-only `pending_primary_excluded: bool = False` / optional `pendingPrimaryExcluded?: boolean` (default `false`), alongside `gh_available` / `ghAvailable`. That parameter is introduced by #622 in branch N588, or by #588 in branch M588; the name, default and semantics are the same in both (D10).
 - New in `autoclose.py` / `autoclose.ts`:
   - a reference-classification function (the moved loop);
   - a pending-primary selection function returning the kept refs, an excluded flag, and the `IssueDetails` already fetched for kept refs.
@@ -176,7 +177,7 @@
   Each kept ref's details are reused in the issue digests, so no issue number is fetched more than once per run.
 - Pending primary, with gh unavailable: all pending refs are kept, and the D4 annotation is appended.
 - Autoclose body precedence, when the ordered list is empty:
-  1. gh unavailable: #588 text.
+  1. gh unavailable: #588 text. This step applies only when #588's empty-list branch is present (branch M588, or after #588 lands). Otherwise, with gh unavailable, steps 2-4 apply.
   2. `pending_primary_excluded`: `AUTOCLOSE_PENDING_NOT_OPEN_TEXT`.
   3. Readiness PASS: the existing "no deterministic pending issue" text.
   4. Otherwise: the existing "readiness not PASS" text.
@@ -187,7 +188,9 @@
 - No new logging is required. The exclusion is visible in the rendered section text.
 
 #### Rollback/feature-flag considerations (if applicable):
-- No feature flag. Rollback is a revert of the #622 merge commit. The #588 behavior is not affected by a revert, because #622 only adds parameters that default to #588's behavior.
+- No feature flag. Rollback is a revert of the #622 merge commit.
+  - #588 merged first (M588): the revert removes only #622's additions; `gh_available` / `ghAvailable` belong to #588 and remain.
+  - #622 merged first (N588, the expected order): the `gh_available` / `ghAvailable` parameter was introduced by #622, and #588 later relies on it. A revert in this order must keep the parameter and its call-site arguments, or #588's code must re-add them in the same change.
 
 ### Technical specifications (interfaces/contracts):
 
@@ -200,7 +203,7 @@
 - Neither new text literal contains `"` or `\`, so the parity test can match them as quoted literals.
 
 #### Required configuration keys and defaults:
-- `gh_available: bool = True` / `ghAvailable?: boolean` (default `true`), from #588.
+- `gh_available: bool = True` / `ghAvailable?: boolean` (default `true`): introduced by #622 in branch N588, or by #588 in branch M588; same name, default and semantics (D10).
 - `pending_primary_excluded: bool = False` / `pendingPrimaryExcluded?: boolean` (default `false`), new.
 
 #### Backward-compatibility expectations:
@@ -303,46 +306,139 @@
   - (B) Removes dead code but widens the diff into `render.*`.
 - **Adopted: (A).** The researcher listed both options as acceptable.
 
-## Composition with #588
-- **Base tree:** #622's implementation is based on a tree that contains #588's merge; the scheduler serializes the two items. If #588 is not merged when #622 executes, the executor must either:
-  - rebase onto `origin/main` after #588 merges; or
-  - implement #588's parameter exactly as #588 specifies: keyword-only `gh_available: bool = True` on `build_issues_to_autoclose_section`; optional `ghAvailable` (default `true`) on `buildIssuesToAutocloseSection`; the exact body `None (GitHub CLI unavailable; closing issues not verified)` when unavailable and the ordered list is empty, taking precedence over the PASS / non-PASS fallbacks; and call sites that pass availability.
+### D9: Merge-order independence
+- Context: the parallel run schedules items by blast-radius contention only, and no item may depend on another item's merge. The cohorts are `[[513, 528, 622], [588, 594]]` with conflict edge `588:622`, so #622 is expected to execute and merge before #588, and #588 starts only after #622 merges. The version 0.2 requirement that #588 merge first would deadlock that run.
+- Options considered:
+  - (A) A P0 detection step selects between two fully specified branches, neither of which stops execution.
+  - (B) Require #588 to merge first.
+  - (C) Re-implement #588 in full inside #622.
+- Trade-offs:
+  - (A) Lets #622 execute to completion from current `origin/main` without #588, and remain correct if #588 is already on `origin/main` at execution time. It adds one detection step and one conditional file set.
+  - (B) Deadlocks the per-edge barrier described above. Rejected.
+  - (C) Duplicates #588's gh-detection fix and its empty-list text, and creates two owners for the same behavior. Rejected.
+- **Adopted: (A).**
+  - Detection marker: the #588-owned literal `None (GitHub CLI unavailable; closing issues not verified)` in `scripts/dev_tools/pr_context/render_pr_helpers.py` of the execution base (`origin/main` at execution time).
+    - Present: branch **M588** ("#588 merged").
+    - Absent: branch **N588** ("#588 not merged").
+  - #622 never writes that literal into production code, so the marker is unambiguous in both branches.
+  - Only the executor's P0 step reads `origin/main`. No test reads a remote ref.
+  - The P0 step records the branch taken, the base commit it inspected, and the marker search result in a detection artifact under `docs/features/active/collect-pr-context-fabricates-auto-close-issues-622/evidence/baseline/` (file name chosen by the planner).
+  - The orchestrator verified on 2026-09-26 that `origin/main` at `ae8d2ce3` does not contain #588, so branch N588 applies at that base. The executor's P0 step re-checks at execution time; this spec author did not re-run the check.
 
-  With the second route, #588 rebases with a trivial conflict.
+### D10: Availability signal for the D4 annotation
+- Context (verified by the orchestrator on `origin/main` at `ae8d2ce3`): availability exists only as the collector-local boolean `gh_available` (`collector.py:144/149`) and `ghAvailable` (`collector-core.ts:133/138`). The builders `build_issues_to_autoclose_section` (`render_pr_helpers.py:228`) and `buildIssuesToAutocloseSection` (`render-pr-helpers.ts:352`) take no availability parameter; their call sites are `collector.py:260` and `collector-core.ts:238`.
+- Options considered:
+  - (A) Add keyword-only `gh_available: bool = True` / optional `ghAvailable?: boolean` (default `true`) to the builder, with the same name, default and meaning #588 uses, fed at the call sites from the collector-local value.
+    - N588: #622 introduces the parameter and uses it only for the non-empty annotation branch. The empty-list path keeps the pre-existing PASS / non-PASS fallbacks unchanged.
+    - M588: the parameter already exists and #622 reuses it.
+  - (B) A differently named flag such as `annotate_unverified`.
+  - (C) Derive availability inside the builder.
+- Trade-offs:
+  - (A) One parameter carries the fact in both merge orders; #588 layers its empty-list branch onto the same parameter afterwards.
+  - (B) Two parameters would carry the same fact, and #588 would have to wire both. Rejected.
+  - (C) The builder is pure and has no access to the environment. Rejected.
+- **Adopted: (A).** #622 does not implement #588's gh-detection fix (`whichGh`, executable resolution) and does not add #588's empty-list text in either branch.
+
+### D11: Test-file ownership
+- Options considered:
+  - (A) #622's builder tests live in new #622-owned files. Suggested names: Python `tests/scripts/dev_tools/pr_context/test_autoclose_builder.py`; TypeScript `extensions/drm-copilot/test/lib/pr-context/autoclose-builder.test.ts`. The planner chooses the final names, but both must be new files created by #622.
+  - (B) Add #622's builder tests to #588's `tests/scripts/dev_tools/pr_context/test_render_pr_helpers.py`.
+- Trade-offs:
+  - (A) Works in both branches and does not create a file that #588 will also create.
+  - (B) The file does not exist in N588; creating it would collide with #588. Rejected.
+- **Adopted: (A).**
+  - N588: no #588-only file is created or edited. This covers `tests/scripts/dev_tools/pr_context/test_render_pr_helpers.py`, `extensions/drm-copilot/src/lib/executable-resolver.ts`, `extensions/drm-copilot/src/lib/pr-context/pr-context-service-call.ts`, and #588's H1-H4 tests.
+  - M588 only: #622 updates #588's H3 assertions in both runtimes as described in "Required update to #588's H3 assertion" under Composition with #588. The targets are the Python `test_build_issues_to_autoclose_section_lists_pending_refs_when_gh_unavailable` and the TypeScript H3 `lists pending refs unchanged when gh is unavailable`, or whichever tests in `tests/scripts/dev_tools/pr_context/test_render_pr_helpers.py` and `extensions/drm-copilot/test/lib/pr-context/render-pr-helpers.test.ts` assert that a non-empty gh-unavailable autoclose output does not contain `GitHub CLI unavailable`. The plan specifies a fixed grep that locates them mechanically.
+
+### D12: Composed-behavior rows pinned by #622's tests
+- Options considered:
+  - (A) #622's precedence test covers only the rows whose output is identical in both merge orders: (available, non-empty); (available, empty, pending excluded); (available, empty, PASS); (available, empty, non-PASS); (unavailable, non-empty, rendering the list plus the annotation).
+  - (B) Also assert the (unavailable, empty) row.
+- Trade-offs:
+  - (A) Keeps #622's tests green whether #588 lands before or after #622.
+  - (B) The expected text of that row differs between M588 and N588, and belongs to #588. Rejected.
+- **Adopted: (A).** The (unavailable, empty) row is owned by #588 and is not asserted by any #622 test.
+
+### D13: Integrating `origin/main` at execution
+- Options considered:
+  - (A) `git merge --no-edit origin/main` into the item branch when it is behind, keeping every push a fast-forward.
+  - (B) Rebase onto `origin/main`.
+- Trade-offs:
+  - (A) Preserves history and needs no force push.
+  - (B) Requires a force push, which repository hooks block and the run forbids. Rejected.
+- **Adopted: (A).**
+
+### D14: Sibling coordination record
+- Sibling #588 is being revised in parallel to tolerate #622 landing first. Its revised plan:
+  - no longer assumes unchanged non-empty autoclose rendering;
+  - reuses the `gh_available` / `ghAvailable` builder parameter if #622 introduced it;
+  - adds its empty-list unavailable branch inside `buildIssuesToAutocloseSection` at its post-#622 location (`extensions/drm-copilot/src/lib/pr-context/autoclose.ts`, re-exported from `render-pr-helpers.ts`, if the D7 TypeScript contingency is taken);
+  - does not duplicate a `jest.config.cjs` threshold entry that #622 added.
+- #622 does not depend on any of these items. They are recorded for the reviewer.
+- **Adopted:** record only; no #622 work item follows from it.
+
+## Decisions summary
+- D1: (A) one bare-number pattern `(?<!\w)#\d+(?!\w)` per runtime, used by all six extractors.
+- D2: (A) prose and commit citations are mentions only; author auto-close lists `author_asserted` alone.
+- D3: (A) closing targets are verified refs plus an open pending primary; no commit-keyword or branch-suffix parsing.
+- D4: (C) with gh unavailable and a non-empty list, keep the list and append `AUTOCLOSE_UNVERIFIED_ANNOTATION`.
+- D5: (A) `pending_primary_excluded` flag renders `None (deterministic pending issue is not an open issue)`.
+- D6: (A) identical pattern text, Python compiled with `re.ASCII`.
+- D7: (A) new `autoclose.py` / `autoclose.ts` modules keep files under 500 lines.
+- D8: (A) keep defensive `#` prefixing.
+- D9: (A) P0 detection selects branch M588 or N588; no merge-order dependency.
+- D10: (A) builder parameter `gh_available` / `ghAvailable` with #588's name and default, introduced by #622 in N588 or reused in M588.
+- D11: (A) #622's builder tests live in new #622-owned files; #588's H3 is updated only in M588.
+- D12: (A) #622's precedence test pins five rows; the (unavailable, empty) row is left to #588.
+- D13: (A) integrate `origin/main` by merge, never by rebase and force push.
+- D14: record of #588's parallel revision; no #622 dependency.
+
+## Composition with #588
+- **Branches and detection (D9):** the P0 step inspects `scripts/dev_tools/pr_context/render_pr_helpers.py` on `origin/main` at execution time for the literal `None (GitHub CLI unavailable; closing issues not verified)`. Present selects M588; absent selects N588. Neither branch stops execution. There is no base-tree requirement; when the item branch is behind `origin/main`, it is integrated by merge (D13).
 - **Composed behavior of `Issues to autoclose (verified or pending)`:**
 
-  | gh | Ordered list | Body |
-  |---|---|---|
-  | available | non-empty | bulleted list (unchanged) |
-  | available | empty, pending excluded | `None (deterministic pending issue is not an open issue)` (#622) |
-  | available | empty, PASS | existing PASS fallback (unchanged) |
-  | available | empty, non-PASS | existing non-PASS fallback (unchanged) |
-  | unavailable | empty | `None (GitHub CLI unavailable; closing issues not verified)` (#588, unchanged) |
-  | unavailable | non-empty | bulleted list, then `AUTOCLOSE_UNVERIFIED_ANNOTATION` (#622) |
+  | gh | Ordered list | Body | Asserted by #622 |
+  |---|---|---|---|
+  | available | non-empty | bulleted list (unchanged) | yes |
+  | available | empty, pending excluded | `None (deterministic pending issue is not an open issue)` (#622) | yes |
+  | available | empty, PASS | existing PASS fallback (unchanged) | yes |
+  | available | empty, non-PASS | existing non-PASS fallback (unchanged) | yes |
+  | unavailable | empty | M588, or after #588 lands: `None (GitHub CLI unavailable; closing issues not verified)` (#588). N588 until #588 lands: the pre-existing PASS / non-PASS fallback. | no (owned by #588, D12) |
+  | unavailable | non-empty | bulleted list, then `AUTOCLOSE_UNVERIFIED_ANNOTATION` (#622) | yes |
 
-  #588's rule that non-empty rendering is unchanged holds for gh available. For gh unavailable, #622 deliberately extends it by one appended line (D4).
+  Every row except (unavailable, empty) is identical in both merge orders. #588's rule that non-empty rendering is unchanged holds for gh available. For gh unavailable, #622 extends it by one appended line (D4).
+- **Composition in each merge order:**
+  - **#622 first (expected under the current cohort table; branch N588):**
+    - #622 introduces `gh_available` / `ghAvailable` on the builder and passes the collector-local `gh_available` / `ghAvailable` at `collector.py:260` and `collector-core.ts:238`.
+    - #588, executing afterwards, reuses that parameter and call-site argument, adds its empty-list unavailable branch, and creates its own test files.
+    - #588's revised plan writes its H3 to match #622's annotation (D14). #622 edits no #588 test.
+  - **#588 first (if the cohort table is recolored; branch M588):**
+    - #588 introduces `gh_available` / `ghAvailable`, its call-site argument and its empty-list branch.
+    - #622 reuses the parameter, preserves #588's call-site argument when it moves the section build after pending verification, and updates #588's H3 in both runtimes (D11).
 - **File-by-file overlaps:**
-  - `scripts/dev_tools/pr_context/render_pr_helpers.py` and `extensions/drm-copilot/src/lib/pr-context/render-pr-helpers.ts`: both items edit `build_issues_to_autoclose_section` / `buildIssuesToAutocloseSection`. #588 adds `gh_available` / `ghAvailable` and the empty-unavailable branch. #622 adds `pending_primary_excluded` / `pendingPrimaryExcluded`, the annotation branch, and the not-open branch. #622 alone edits the close-candidates builder and the extractor.
-  - `scripts/dev_tools/pr_context/collector.py` (#588 edits the call site near lines 260-264) and `extensions/drm-copilot/src/lib/pr-context/collector-core.ts` (#588 edits near lines 238-242): #622 moves the section build after pending verification. The `gh_available` / `ghAvailable` argument #588 added must be preserved.
-  - `extensions/drm-copilot/test/lib/pr-context/render-pr-helpers.test.ts`: #588 adds H1-H4. #622 updates H3 (see below) and leaves H1, H2 and H4 unmodified.
-  - `tests/scripts/dev_tools/pr_context/test_render_pr_helpers.py` (a new file from #588, four tests): #622 updates `test_build_issues_to_autoclose_section_lists_pending_refs_when_gh_unavailable` and leaves the other three unmodified. #622's new builder tests may be added to this file while it stays at or below 500 lines.
-  - `extensions/drm-copilot/jest.config.cjs`: #588 adds a `render-pr-helpers.ts` threshold entry. #622 adds entries for its own changed files without duplicating it.
-  - #588's `executable-resolver.ts` and `pr-context-service-call.ts` are not touched by #622.
-- **Required update to #588's H3 assertion (both runtimes):**
-  - #588's H3 (`pendingPrimary: ["#7"]`, gh unavailable) and `test_build_issues_to_autoclose_section_lists_pending_refs_when_gh_unavailable` currently assert that the output contains `- #7` and does not contain `GitHub CLI unavailable`.
+  - `scripts/dev_tools/pr_context/render_pr_helpers.py` and `extensions/drm-copilot/src/lib/pr-context/render-pr-helpers.ts`: both items edit `build_issues_to_autoclose_section` / `buildIssuesToAutocloseSection`. The first item to merge adds `gh_available` / `ghAvailable`; #588 adds the empty-unavailable branch. #622 adds `pending_primary_excluded` / `pendingPrimaryExcluded`, the annotation branch and the not-open branch. #622 alone edits the close-candidates builder and the extractor.
+  - `scripts/dev_tools/pr_context/collector.py` (call site at line 260 on `origin/main`) and `extensions/drm-copilot/src/lib/pr-context/collector-core.ts` (call site at line 238): #622 moves the section build after pending verification and passes the availability argument. In M588 the argument #588 added is preserved.
+  - `extensions/drm-copilot/test/lib/pr-context/render-pr-helpers.test.ts`: exists on `origin/main` (262 lines) without #588's H1-H4. N588: #622 leaves H1-H4 absent and changes only the D2 test at line 193. M588: #622 also updates H3 and leaves H1, H2 and H4 unmodified.
+  - `tests/scripts/dev_tools/pr_context/test_render_pr_helpers.py` (created by #588): N588, not created or edited by #622. M588, #622 edits only the H3 test named in D11 and leaves the other three unmodified.
+  - #622's builder tests live in #622's own new files (D11) in both branches.
+  - `extensions/drm-copilot/jest.config.cjs`: #622 adds entries for its own changed files and does not duplicate an entry already present (in M588, #588's `render-pr-helpers.ts` entry).
+  - `extensions/drm-copilot/src/lib/executable-resolver.ts`, `extensions/drm-copilot/src/lib/pr-context/executable-resolver.ts` and `extensions/drm-copilot/src/lib/pr-context/pr-context-service-call.ts` are not created or touched by #622 in either branch.
+- **Required update to #588's H3 assertion (both runtimes; M588 only):**
+  - #588's H3 (`pendingPrimary: ["#7"]`, gh unavailable) and `test_build_issues_to_autoclose_section_lists_pending_refs_when_gh_unavailable` assert that the output contains `- #7` and does not contain `GitHub CLI unavailable`.
   - After #622 they must assert that the output contains `- #7`, that the line after `- #7` equals `AUTOCLOSE_UNVERIFIED_ANNOTATION`, and that the output does not contain `None (GitHub CLI unavailable; closing issues not verified)`.
   - The last assertion preserves H3's original intent: the #588 empty-list text is not used for a non-empty list.
+  - In N588 this update is not performed by #622; #588's revised plan carries it (D14).
 - **Line cap:** see D7. New logic goes in `scripts/dev_tools/pr_context/autoclose.py` and `extensions/drm-copilot/src/lib/pr-context/autoclose.ts`.
 
 ## Assumptions, Constraints, Dependencies
 - Assumptions (environment, data, access):
-  - #588's parameter names, default and literal are as quoted above. The orchestrator verified them from #588's `plan.2026-09-25T22-06.md` on `origin/bug/pr-context-gh-detection-false-negative-588`. This spec author did not re-read that plan.
+  - #588's parameter name `gh_available` / `ghAvailable`, its default `true`, and its literal `None (GitHub CLI unavailable; closing issues not verified)` are the coordination contract with #588, which is being revised in parallel (D14).
   - The collector normally runs before a PR exists, so `verified` is usually empty.
 - Constraints (budget, performance, compatibility):
   - Files stay at or below 500 lines.
   - `hypothesis` and `fast-check` are not dependencies, and none are added. Use parametrized boundary matrices instead.
   - The Python and TypeScript runtimes stay at parity.
-- External dependencies (services, libraries, releases): the #588 merge. No new libraries.
+- External dependencies (services, libraries, releases): none. There is no dependency on the #588 merge (D9). No new libraries.
 
 ## Data / API / Config Impact
 - User-facing or API changes: the section text changes listed under Backward-compatibility expectations. The MCP tool schema and CLI flags are unchanged.
@@ -388,13 +484,13 @@
     - `test_collector_keeps_open_pending_primary`
     - `test_collector_fetches_each_issue_once`
   - TypeScript, new `extensions/drm-copilot/test/lib/pr-context/collector-core-autoclose.test.ts`: the same six scenarios, one `it` each with matching descriptions.
-  - Builder tests, added to #588's `tests/scripts/dev_tools/pr_context/test_render_pr_helpers.py` and `extensions/drm-copilot/test/lib/pr-context/render-pr-helpers.test.ts`:
+  - Builder tests, in #622's own new files (D11; suggested `tests/scripts/dev_tools/pr_context/test_autoclose_builder.py` and `extensions/drm-copilot/test/lib/pr-context/autoclose-builder.test.ts`, final names chosen by the planner), never in `tests/scripts/dev_tools/pr_context/test_render_pr_helpers.py`:
     - `test_build_issues_to_autoclose_section_appends_unverified_annotation_when_gh_unavailable`
     - `test_build_issues_to_autoclose_section_omits_annotation_when_gh_available`
     - `test_build_issues_to_autoclose_section_renders_not_open_text_when_pending_excluded`
-    - `test_build_issues_to_autoclose_section_fallback_precedence`, parametrized over the composed-behavior table
+    - `test_build_issues_to_autoclose_section_fallback_precedence`, parametrized over the five D12 rows only
     - TypeScript equivalents with matching descriptions
-    - the H3 update described in Composition with #588
+  - M588 only: the H3 update described in Composition with #588, in #588's `test_render_pr_helpers.py` and `render-pr-helpers.test.ts`. In N588 no #588-only test file is created or edited.
   - Updated existing tests:
     - `test_collect_pr_context.py:375` becomes `test_build_close_candidates_section_lists_referenced_issues_as_detected_only`.
     - `render-pr-helpers.test.ts:193` becomes `keeps referenced issues out of author auto-close`.
@@ -441,12 +537,12 @@
   - the section body is `None (deterministic pending issue is not an open issue)` and contains no excluded number.
 - [ ] `test_collector_fetches_each_issue_once` and its TypeScript counterpart pass. For one collector run, the gh double records at most one `issue_details` call per issue number, and no `issue_details` call for a ref that did not classify as `"issue"`.
 - [ ] The pending-selection and classification unit tests in `tests/scripts/dev_tools/pr_context/test_autoclose.py` and `extensions/drm-copilot/test/lib/pr-context/autoclose.test.ts` pass, covering every row of the matrix listed in the Test Strategy.
-- [ ] `test_build_issues_to_autoclose_section_appends_unverified_annotation_when_gh_unavailable` and its TypeScript counterpart pass. With `pending_primary=["#7"]` / `pendingPrimary: ["#7"]` and gh unavailable, the line after `- #7` equals exactly `Unverified: the issues listed above come from feature metadata only and were not checked against GitHub (GitHub CLI unavailable).`, and that line does not start with `- `.
-- [ ] `test_build_issues_to_autoclose_section_omits_annotation_when_gh_available` and its TypeScript counterpart pass. A non-empty list with gh available renders byte-for-byte as before #622.
-- [ ] `test_build_issues_to_autoclose_section_fallback_precedence` and its TypeScript counterpart pass for every row of the composed-behavior table in Composition with #588. The gh-unavailable empty-list row renders exactly `None (GitHub CLI unavailable; closing issues not verified)`.
-- [ ] #588's H3 in `render-pr-helpers.test.ts` and `test_build_issues_to_autoclose_section_lists_pending_refs_when_gh_unavailable` in `tests/scripts/dev_tools/pr_context/test_render_pr_helpers.py` are updated as specified in Composition with #588 and pass. #588's other builder tests (H1, H2, H4 and the other three Python tests) pass unmodified.
-- [ ] The implementation base contains #588's changes. Check: `build_issues_to_autoclose_section` has keyword-only `gh_available: bool = True`, `buildIssuesToAutocloseSection` accepts `ghAvailable` defaulting to `true`, and the collector call sites pass availability.
-- [ ] No change is made outside the defined scope. Check: the branch diff against its merge base with `main` contains no change to any of the following:
+- [ ] `test_build_issues_to_autoclose_section_appends_unverified_annotation_when_gh_unavailable` and its TypeScript counterpart, in #622's own builder test files (D11), pass. With `pending_primary=["#7"]` / `pendingPrimary: ["#7"]` and gh unavailable, the line after `- #7` equals exactly `Unverified: the issues listed above come from feature metadata only and were not checked against GitHub (GitHub CLI unavailable).`, and that line does not start with `- `.
+- [ ] `test_build_issues_to_autoclose_section_omits_annotation_when_gh_available` and its TypeScript counterpart, in #622's own builder test files (D11), pass. A non-empty list with gh available renders byte-for-byte as before #622.
+- [ ] `test_build_issues_to_autoclose_section_fallback_precedence` and its TypeScript counterpart, in #622's own builder test files (D11), pass. Each is parametrized over exactly the five D12 rows: (available, non-empty), (available, empty, pending excluded), (available, empty, PASS), (available, empty, non-PASS), and (unavailable, non-empty), which renders the list followed by `AUTOCLOSE_UNVERIFIED_ANNOTATION`. No #622 test asserts the (unavailable, empty) row.
+- [ ] When the execution base contains #588 (M588), #588's H3 in both runtimes (`render-pr-helpers.test.ts` and `test_build_issues_to_autoclose_section_lists_pending_refs_when_gh_unavailable` in `tests/scripts/dev_tools/pr_context/test_render_pr_helpers.py`) is updated as specified in Composition with #588 and passes, and #588's other builder tests pass unmodified. When it does not (N588), no #588-only file is created or edited. Check: the P0 detection artifact records the branch taken, and the branch diff against its merge base with `main` shows the corresponding file set.
+- [ ] `build_issues_to_autoclose_section` has keyword-only `gh_available: bool = True` and `buildIssuesToAutocloseSection` accepts `ghAvailable` defaulting to `true` (introduced by #622 in N588, pre-existing in M588); both collector call sites pass the collector's availability value; and the builder's (gh unavailable, empty list) body equals `None (GitHub CLI unavailable; closing issues not verified)` in M588 and the pre-existing PASS / non-PASS fallback text in N588. Check: the P0 detection artifact and a grep of the builders.
+- [ ] No change is made outside the defined scope. Check: the branch diff against its merge base with `main` contains no change to any of the following, and in N588 neither `tests/scripts/dev_tools/pr_context/test_render_pr_helpers.py` nor `extensions/drm-copilot/src/lib/executable-resolver.ts` is created:
   - `scripts/dev_tools/pr_context/github.py`
   - `extensions/drm-copilot/src/lib/pr-context/gh-client-*.ts`
   - `extensions/drm-copilot/src/lib/pr-context/executable-resolver.ts`
@@ -458,7 +554,7 @@
   - any path under `extensions/drm-copilot/resources/`
 - [ ] Every new and changed production and test file is at or below 500 lines. This includes `collector.py`, `collector-core.ts`, `collector-output.ts`, `render_pr_helpers.py`, `render-pr-helpers.ts`, `autoclose.py` and `autoclose.ts`. Check: a line count of each changed file.
 - [ ] Test code added by #622 uses no temporary files, remote refs, gitignored state, spawned processes or drive-root paths. Check: a grep over the added lines (`+` lines) of the branch diff against its merge base with `main`, restricted to files under `tests/` and `extensions/drm-copilot/test/`, for `tmp_path|tempfile|mkdtemp|mkdtempSync|os\.tmpdir|origin/|child_process|spawnSync|execSync|(?<![A-Za-z])[A-Za-z]:[\\/]` returns no matches. Pre-existing `origin/...` string literals inside in-process fakes in unchanged lines are outside this check.
-- [ ] `extensions/drm-copilot/jest.config.cjs` has a per-file `lines: 85, branches: 75` threshold entry for `./src/lib/pr-context/autoclose.ts` and for each other changed pr-context production file that lacks one. Entries already present (for example `collector-core.ts`, and #588's `render-pr-helpers.ts`) are not duplicated.
+- [ ] `extensions/drm-copilot/jest.config.cjs` has a per-file `lines: 85, branches: 75` threshold entry for `./src/lib/pr-context/autoclose.ts` and for each other changed pr-context production file that lacks one. Entries already present (for example `collector-core.ts`, and in M588 #588's `render-pr-helpers.ts`) are not duplicated.
 - [ ] Coverage on every new or changed production module is at least 85% line and 75% branch in both runtimes, with no regression on changed lines. The evidence is the Python coverage JSON and the Jest coverage summary, both stored under `docs/features/active/collect-pr-context-fabricates-auto-close-issues-622/evidence/qa-gates/`.
 - [ ] The full toolchain passes in a single pass in both runtimes:
   - Python: `poetry run black .`, `poetry run ruff check .`, `poetry run pyright`, `poetry run pytest`.
@@ -471,15 +567,16 @@
   - Fail-closed exclusion of a pending primary when `classify_entity` returns `None` (for example, an unresolved repository) drops the item's own issue from the list.
   - Merge conflict with #588 in the builder and at the collector call sites.
   - The annotation line changes #588's H3 contract.
+  - In the #622-first order, a revert of #622 removes the `gh_available` / `ghAvailable` parameter that #588 later relies on.
 - Mitigations and rollbacks:
   - For the fail-closed exclusion, the section renders the distinct not-open text, so the omission is visible rather than silent.
-  - For the #588 conflict, serialized scheduling and a rebase on the #588 merge (see Composition with #588).
-  - For the H3 contract change, the H3 update is specified here in both runtimes.
-  - Rollback is a revert of the #622 merge.
+  - For the #588 conflict, the merge can occur in either order (D9). The shared parameter is textually identical in both items (D10), so a conflict there is resolved by the second item to merge, which integrates `origin/main` by merge (D13).
+  - For the H3 contract change, the H3 update is specified here for M588 and carried by #588's revised plan for N588 (D11, D14).
+  - Rollback is a revert of the #622 merge. In the #622-first order the revert must keep the `gh_available` / `ghAvailable` parameter and call-site arguments, or #588 must re-add them (see Rollback/feature-flag considerations).
 
 ## Rollout & Follow-up
 - Release/rollout steps:
-  - Merge after #588.
+  - Merge in either order relative to #588; the P0 detection step (D9) selects the applicable branch at execution time.
   - The MCP path serves the installed extension payload, so rebuild and reinstall the extension before relying on the TypeScript runtime locally.
 - Post-fix monitoring or clean-up tasks:
   - After #622 merges, confirm that `Auto-close issues (author asserted):` renders its "not asserted" reason in the next PR bundles.
