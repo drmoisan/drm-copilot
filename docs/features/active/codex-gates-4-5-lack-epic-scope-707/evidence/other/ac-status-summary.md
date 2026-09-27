@@ -5,9 +5,11 @@ Timestamp: 2026-09-27T07-45
 ### Acceptance Criteria Status
 - Source: docs/features/active/codex-gates-4-5-lack-epic-scope-707/spec.md (`## Acceptance Criteria`; Work Mode full-bug)
 - Total AC items: 26
-- Checked off (delivered): 25
-- Remaining (unchecked): 1
-- Items remaining: AC-16
+- Checked off (delivered): 26
+- Remaining (unchecked): 0
+- Items remaining: none
+
+Update 2026-09-27T12-20 (orchestrator): AC-16 checked off after the PR #725 CI Pester run on head b7aff51d passed all eight named suites; evidence `qa-gates/ci-pr-725-pester.md`. That run executes on `windows-latest` (the repository has no Linux Pester job); the discrepancy with the criterion's "(Linux runner)" wording is recorded in that artifact and in `follow-ups.md` item 5.
 
 ## Fresh-process count
 
@@ -43,7 +45,7 @@ UNCHECKED_ANY: 1
 | AC-13 | [P7-T13] | qa-gates/p5-existing-suites-diff.md (0/0 for mode-resolution and mode-routing); both rows failures 0, errors 0 |
 | AC-14 | [P7-T14] | qa-gates/p5-d10-mock-scope.md; five testsuite rows failures 0, errors 0 |
 | AC-15 | [P7-T15] | qa-gates/p5-hermeticity-scan.md (27 counts 0) |
-| AC-16 | [P7-T16] | not checked off (RS-6) |
+| AC-16 | [P7-T16] + orchestrator post-CI | qa-gates/ci-pr-725-pester.md (PR #725 CI Pester, 8 suites passed; runner windows-latest, discrepancy recorded) |
 | AC-17 | [P7-T17] | qa-gates/final-pester-coverage.md (S1 Passed); qa-gates/p5-design-parity.md |
 | AC-18 | [P7-T18] | qa-gates/final-pester-coverage.md (S2 x3 Passed; legacy row 43/0/0); qa-gates/p5-line-limits.md |
 | AC-19 | [P7-T19] | qa-gates/final-pester-coverage.md (S3 x3 Passed); qa-gates/p5-mirror-parity.md; qa-gates/final-pytest-guards.md |

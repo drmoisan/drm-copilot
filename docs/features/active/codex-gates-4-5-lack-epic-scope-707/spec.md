@@ -61,7 +61,7 @@
 
 ## Design Decisions
 
-Each decision states the options considered, the adopted option, and the rationale. D1-D11 carry over research section 5. D12-D15 are added to cover AC-2 reconciliation, the Codex-specific apply_patch leg, retained divergences, and the no-Python authority; D16 records the AC-25 wording amendment, and D17 records the AC-7 ready-fixture amendment.
+Each decision states the options considered, the adopted option, and the rationale. D1-D11 carry over research section 5. D12-D15 are added to cover AC-2 reconciliation, the Codex-specific apply_patch leg, retained divergences, and the no-Python authority; D16 records the AC-25 wording amendment, D17 records the AC-7 ready-fixture amendment, and D18 records the AC-16 runner-wording amendment.
 
 - **D1 — Resolver placement.**
   - Options: (A) a Codex-local, dot-sourced port in `.codex/hooks/`; (B) `Import-Module` of `.claude/lib/worktree-resolution/*.psm1` from `.codex/hooks`; (C) byte-identical copies of the four `.claude/lib/worktree-resolution` modules under a new `.codex/lib/`, loaded with `Import-Module`; (D) the codex-routing virtual-resource pattern (`VIRTUAL_RESOURCE_PAIRS` in the Python push-down script).
@@ -145,6 +145,11 @@ Each decision states the options considered, the adopted option, and the rationa
   - Options: (A) the Codex `Get-EpicCommandLegReadinessFailure` returns `$null` for the ready fixture, satisfying the original AC-7 literal; (B) the Codex port keeps `return ''`, matching `.claude/lib/worktree-resolution/EpicScopeReadiness.psm1:173`, and AC-7 is amended to expect an empty result.
   - Adopted: B. AC-7 states that the ready fixture yields an empty result (the empty string, as the #663 predicate does; asserted with `Should -BeNullOrEmpty`) and remains unchecked until its tests pass.
   - Rationale: D2 requires behaviour identical to #663, whose predicate returns the empty string when ready. The only caller tests the value with `-not $failure` (`.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1:123`, ported unchanged to the Codex epic-scope sibling), so `$null` and the empty string decide alike. Mirroring the precedent avoids an unrecorded divergence from #663. Decision recorded autonomously by the orchestrator after executor preflight round 2.
+
+- **D18 — AC-16 CI runner wording (spec deviation).**
+  - Options: (A) keep "(Linux runner)" and leave AC-16 permanently unchecked; (B) amend the runner wording to the repository's actual CI Pester job and check AC-16 off on that run.
+  - Adopted: B. AC-16's runner wording is amended from "(Linux runner)" to "(windows-latest, the repository's only CI Pester job)". AC-16 is checked off on PR #725 workflow run 36317849720, job 108615836563 (`poshqc / PowerShell QC`, head b7aff51d): 5416 passed, 0 failed, 9 skipped, with all eight named suites passing and no `artifacts/orchestration/*.json` present in the CI checkout.
+  - Rationale: the original wording assumed a Linux Pester job that does not exist; `.github/workflows/_poshqc.yml` declares `runs-on: windows-latest` and is the only CI Pester run. Linux execution of these suites is not verified; the local hermeticity scan is the supporting evidence for portability, and a Linux Pester leg is recorded as a follow-up. Decision directed by the parallel-run coordinator on 2026-09-27 and recorded by the orchestrator.
 
 ## Proposed Fix
 
@@ -275,7 +280,7 @@ Hermetic, Linux-CI tests (issue AC-4)
 
 - [x] AC-14: Each of `tests/scripts/codex-hooks/codex-preimplementation-gate-absolute-paths.Tests.ps1`, `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1`, `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1`, `tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1`, and `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` registers `Mock Get-EpicScopeCheckpointText { $null }` in a `BeforeAll` or `BeforeEach` that covers every in-process row calling `Invoke-OrchestrationPreimplementationGateDecision` on a command or path leg, and passes.
 - [x] AC-15: A case-insensitive search of `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope.Tests.ps1`, `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-resolution.Tests.ps1`, and `tests/scripts/codex-hooks/enforce-completion-consistency-epic-scope.Tests.ps1` for `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName`, `origin/main`, `orchestrator-state.json` read through `Get-Content`, `Set-Location`, `Push-Location`, and the regex `\b[A-Za-z]:[\\/]` returns no match, and every epic checkpoint, HEAD, root, and `MERGE_HEAD` read in those files is supplied through a Pester `Mock` of the named seam.
-- [ ] AC-16: The new suites listed in AC-15 and the D10-modified suites listed in AC-14 pass in the repository CI Pester run on the pull request (Linux runner), with no dependency on `artifacts/orchestration/*.json` being present or absent.
+- [x] AC-16: The new suites listed in AC-15 and the D10-modified suites listed in AC-14 pass in the repository CI Pester run on the pull request (windows-latest, the repository's only CI Pester job), with no dependency on `artifacts/orchestration/*.json` being present or absent.
 
 Design parity (issue AC-5)
 
