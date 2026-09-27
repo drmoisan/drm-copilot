@@ -222,33 +222,33 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 0 — Policy Reads, Baselines, #452 Detection Gate, and Historical BEFORE Re-derivation
 
-- [ ] [P0-T1] Read CLAUDE.md and the .github copilot-instructions file in full, in that order.
+- [x] [P0-T1] Read CLAUDE.md and the .github copilot-instructions file in full, in that order.
       Acceptance: both files read; recorded in P0-T10.
-- [ ] [P0-T2] Read, in order, the .github instruction files for general code change, general unit
+- [x] [P0-T2] Read, in order, the .github instruction files for general code change, general unit
       test, Python code change, Python unit test, PowerShell code change, PowerShell unit test,
       TypeScript code change, and TypeScript unit test. Acceptance: all eight read; recorded in P0-T10.
-- [ ] [P0-T3] Read, in order, the rule files general-code-change, general-unit-test, quality-tiers,
+- [x] [P0-T3] Read, in order, the rule files general-code-change, general-unit-test, quality-tiers,
       and tonality under the .claude rules directory. Acceptance: all four read; recorded in P0-T10.
-- [ ] [P0-T4] Read the rule files python, python-suppressions, and self-explanatory-code-commenting.
+- [x] [P0-T4] Read the rule files python, python-suppressions, and self-explanatory-code-commenting.
       Acceptance: all three read; recorded in P0-T10.
-- [ ] [P0-T5] Read the rule file powershell. Acceptance: read; recorded in P0-T10.
-- [ ] [P0-T6] Read the rule files typescript, typescript-suppressions, and architecture-boundaries.
+- [x] [P0-T5] Read the rule file powershell. Acceptance: read; recorded in P0-T10.
+- [x] [P0-T6] Read the rule files typescript, typescript-suppressions, and architecture-boundaries.
       Acceptance: all three read; recorded in P0-T10.
-- [ ] [P0-T7] Read the rule file plan-acceptance-gates and the evidence-and-timestamp-conventions
+- [x] [P0-T7] Read the rule file plan-acceptance-gates and the evidence-and-timestamp-conventions
       skill. Acceptance: both read; recorded in P0-T10.
-- [ ] [P0-T8] Read `.claude/rules/parallel-orchestration.md` in full, including the Read-by-mandate,
+- [x] [P0-T8] Read `.claude/rules/parallel-orchestration.md` in full, including the Read-by-mandate,
       Enum Ownership, and issue #500 sections this item amends. Acceptance: read; recorded in P0-T10.
-- [ ] [P0-T9] Read this feature's issue.md, spec.md, and the research note dated 2026-09-27T12-25 in
+- [x] [P0-T9] Read this feature's issue.md, spec.md, and the research note dated 2026-09-27T12-25 in
       FEATURE/research. Acceptance: all three read; recorded in P0-T10.
-- [ ] [P0-T10] Write FEATURE/evidence/baseline/phase0-instructions-read.md containing Timestamp:,
+- [x] [P0-T10] Write FEATURE/evidence/baseline/phase0-instructions-read.md containing Timestamp:,
       Policy Order: (the order of P0-T1 through P0-T9), and the explicit list of every file read.
       Acceptance: the artifact exists with the three fields and lists every file named in P0-T1
       through P0-T9.
-- [ ] [P0-T11] Record the baseline commit: run CMD-GIT-HEAD, CMD-GIT-FETCH-MAIN, CMD-GIT-MERGE-BASE,
+- [x] [P0-T11] Record the baseline commit: run CMD-GIT-HEAD, CMD-GIT-FETCH-MAIN, CMD-GIT-MERGE-BASE,
       and CMD-GIT-STATUS. The CMD-GIT-MERGE-BASE output is BASE_SHA. Write
       FEATURE/evidence/baseline/git-base.TS.md. Acceptance: every command exits 0; the artifact records
       the HEAD SHA, BASE_SHA (40 hexadecimal characters), and the porcelain status.
-- [ ] [P0-T12] Create the scratch scripts A1 through A12, B39, and B42 of Appendix A in SCRATCH with
+- [x] [P0-T12] Create the scratch scripts A1 through A12, B39, and B42 of Appendix A in SCRATCH with
       the exact bodies given (fourteen scripts), then smoke-test A3 by running CMD-PS-SCRIPT-SH with
       script pester-coverage and arguments
       -TestPath tests/scripts/claude-lib/blast-radius/BlastRadiusGlob.Tests.ps1
@@ -263,7 +263,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       beginning "CHANGED file=" that carries Found=True and an ExecutableLines value greater than 0.
       Stop condition: if no numeric LinePercent is printed, or B42 prints Found=False, stop and report
       that the Pester coverage reader or the JaCoCo matcher needs revision against the recorded XML.
-- [ ] [P0-T13] Record pre-change line counts with CMD-PS-SCRIPT script line-counts over these existing
+- [x] [P0-T13] Record pre-change line counts with CMD-PS-SCRIPT script line-counts over these existing
       files: `scripts/dev_tools/compute_blast_radius.py`, `scripts/dev_tools/_blast_radius_validation.py`,
       `scripts/dev_tools/parallel_drift_detection.py`, `.claude/lib/blast-radius/BlastRadius.psm1`,
       `.claude/lib/blast-radius/BlastRadiusValidation.psm1`,
@@ -276,62 +276,62 @@ the read-only check script A6 and a before-and-after hash comparison.
       FEATURE/evidence/baseline/line-counts.TS.md. Acceptance: exit 0 and one LineCount line per file.
       Planning-time values (re-derived by line count on 2026-09-27): 421, 464, 499, 438, 374, 380, 472,
       149, 237, 257, 271. Record the printed values; they, not the planning values, are the baseline.
-- [ ] [P0-T14] Record mirror-pair hashes with CMD-PS-SCRIPT script file-hashes for each primary file
+- [x] [P0-T14] Record mirror-pair hashes with CMD-PS-SCRIPT script file-hashes for each primary file
       and its bundled mirror: the BlastRadius and BlastRadiusValidation modules, the Pester
       runsettings pair (scripts tree and extension resources tree), the parallel-orchestration rule
       file, the parallel-plan skill, the parallel-add skill, and the parallel-planner agent. Write
       FEATURE/evidence/baseline/mirror-hashes.TS.md. Acceptance: exit 0; the artifact states for each
       of the seven pairs whether the two hashes are equal. The mirror rule in the Preamble applies per
       pair from this record.
-- [ ] [P0-T15] Python format baseline: run CMD-PY-BLACK-CHECK with the path ".". Write
+- [x] [P0-T15] Python format baseline: run CMD-PY-BLACK-CHECK with the path ".". Write
       FEATURE/evidence/baseline/python-black-check.TS.md. Acceptance: artifact records the exit code
       and the count of files that would be reformatted (baseline only; no value is required).
-- [ ] [P0-T16] Python lint baseline: run CMD-PY-RUFF with ".". Write
+- [x] [P0-T16] Python lint baseline: run CMD-PY-RUFF with ".". Write
       FEATURE/evidence/baseline/python-ruff.TS.md. Acceptance: artifact records the exit code and the
       finding count.
-- [ ] [P0-T17] Python type baseline: run CMD-PY-PYRIGHT with no path. Write
+- [x] [P0-T17] Python type baseline: run CMD-PY-PYRIGHT with no path. Write
       FEATURE/evidence/baseline/python-pyright.TS.md. Acceptance: artifact records the exit code and
       the printed error count.
-- [ ] [P0-T18] Python coverage baseline: run CMD-PY-COV with label baseline, then CMD-PY-SCRIPT with
+- [x] [P0-T18] Python coverage baseline: run CMD-PY-COV with label baseline, then CMD-PY-SCRIPT with
       script py-cov-files (A7) and arguments SCRATCH/coverage-722-baseline.json followed by the three
       existing Python production files named in P0-T13. Write
       FEATURE/evidence/baseline/python-pytest-coverage.TS.md. Acceptance: the Output Summary records
       the passed, failed, and skipped counts, the TOTAL line percentage printed by the terminal table,
       the complete list of FAILED node IDs (the baseline failure set, possibly empty), and one
       LinePercent and BranchPercent value for each of the three files.
-- [ ] [P0-T19] PowerShell format and lint baseline: run CMD-PS-SCRIPT with script ps-format-check (A6)
+- [x] [P0-T19] PowerShell format and lint baseline: run CMD-PS-SCRIPT with script ps-format-check (A6)
       over `.claude/lib/blast-radius/BlastRadius.psm1`, `.claude/lib/blast-radius/BlastRadiusValidation.psm1`,
       and `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, then call
       MCP-PS-ANALYZE over the same three paths. Write FEATURE/evidence/baseline/powershell-format-analyze.TS.md.
       Acceptance: the artifact records the FORMAT-SUMMARY ChangedCount value and whether the analyze
       call returned or raised (with any error text). No tracked file is modified by this task
       (CMD-GIT-STATUS output is unchanged from P0-T11).
-- [ ] [P0-T20] #452 detection gate, fixture detection (pre-authorized on this branch): run
+- [x] [P0-T20] #452 detection gate, fixture detection (pre-authorized on this branch): run
       CMD-GIT-452-BRANCH and CMD-GIT-452-MAIN. Write FEATURE/evidence/baseline/452-fixture-inventory.TS.md.
       Acceptance: both commands exit 0; the artifact lists the branch-tree fixtures, the origin/main
       fixtures, and the set difference (fixtures on origin/main that are not on this branch). The five
       fixtures found at planning time are conflict-directory-vs-glob, conflict-directory-vs-file,
       conflict-sibling-prefix-disjoint, derivation-root-surface-reached, and
       derivation-root-surface-not-configured; any additional fixture is recorded as sibling-added.
-- [ ] [P0-T21] #452 detection gate, Python driver (pre-authorized on this branch; runs the fixtures
+- [x] [P0-T21] #452 detection gate, Python driver (pre-authorized on this branch; runs the fixtures
       unmodified): run CMD-PY-TEST with exactly the ten node IDs of block B1 in Appendix B. Write
       FEATURE/evidence/baseline/452-gate-python.TS.md. Acceptance: exit 0 and ten PASSED lines, one per
       listed node ID. A sibling-added fixture recorded by P0-T20 exists only on origin/main, so it is
       not run here; it is run by P14-T3, found by P14-T2 after the main sync.
-- [ ] [P0-T22] #452 detection gate, PowerShell driver (pre-authorized on this branch; runs the
+- [x] [P0-T22] #452 detection gate, PowerShell driver (pre-authorized on this branch; runs the
       fixtures unmodified): run CMD-PS-SCRIPT with script pester-counts (A2) once per fixture name in
       P0-T20's branch list, with -Path tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1
       and -FullNameFilter set to the fixture name wrapped in asterisks. Write
       FEATURE/evidence/baseline/452-gate-powershell.TS.md. Acceptance: every run prints PassedCount=2
       and FailedCount=0 (two parity cases per fixture: verdict and reasons, or radius and findings).
-- [ ] [P0-T23] Historical-run fetch: for each slug of epic-655-followups, backlog-2026-09-26, and
+- [x] [P0-T23] Historical-run fetch: for each slug of epic-655-followups, backlog-2026-09-26, and
       followups-2026-09-27, run CMD-GIT-FETCH-RUN, CMD-GIT-MANIFEST-BLOB, and CMD-GIT-RUN-COMMIT. The
       CMD-GIT-RUN-COMMIT output is that run's plan-home commit. Write
       FEATURE/evidence/baseline/historical-refs.TS.md. Acceptance: all nine commands exit 0; the
       artifact records, per run, the ref name, the plan-home commit SHA (40 hexadecimal characters),
       and the manifest blob SHA. Stop condition: if a ref cannot be fetched, stop and report; no
       historical value may be assumed.
-- [ ] [P0-T24] Historical radii extraction: for each slug, run CMD-PY-SCRIPT with script
+- [x] [P0-T24] Historical radii extraction: for each slug, run CMD-PY-SCRIPT with script
       historical-extract (contract C1 in Appendix A), passing the run's plan-home commit recorded by
       P0-T23 (not the ref name), to read the manifest verbatim with git show and
       write the recorded radii, per-item complexity band, and band source into
@@ -339,17 +339,17 @@ the read-only check script A6 and a before-and-after hash comparison.
       FEATURE/evidence/baseline/historical-extract.TS.md containing the full script text, the three
       commands, and per run the item count and the band source of each item. Acceptance: exit 0 per
       run; each JSON file lists every manifest item with its radius copied without modification.
-- [ ] [P0-T25] Historical BEFORE edges, Python runtime: for each slug run CMD-PY-SCRIPT with script
+- [x] [P0-T25] Historical BEFORE edges, Python runtime: for each slug run CMD-PY-SCRIPT with script
       historical-edges (contract C2) in before mode over the radii JSON of P0-T24 and the current
       self-hosted config, writing FEATURE/evidence/other/historical-<slug>-before-python.TS.json.
       Acceptance: exit 0 per run; each output lists the edge member set with reasons, the edge count,
       the cohort partition from the Python cohort-coloring function, the cohort count, and the maximum
       cohort width.
-- [ ] [P0-T26] Historical BEFORE edges, PowerShell runtime: for each slug run CMD-PS-SCRIPT with script
+- [x] [P0-T26] Historical BEFORE edges, PowerShell runtime: for each slug run CMD-PS-SCRIPT with script
       historical-edges (contract C3) over the same radii JSON and config, writing
       FEATURE/evidence/other/historical-<slug>-before-powershell.TS.json. Acceptance: exit 0 per run;
       each output lists the edge member set with reasons and the edge count.
-- [ ] [P0-T27] Historical BEFORE comparison: for each slug run CMD-PY-SCRIPT with script
+- [x] [P0-T27] Historical BEFORE comparison: for each slug run CMD-PY-SCRIPT with script
       historical-compare (contract C4) over the two outputs of P0-T25 and P0-T26. Write
       FEATURE/evidence/baseline/historical-before-rederivation.TS.md containing the commit (HEAD and
       BASE_SHA), each run's plan-home commit from P0-T23, every command, the script texts of C2 through C4, both member sets per run, the
@@ -358,7 +358,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       partition is computed by applying the Python cohort-coloring function to the PowerShell edge set,
       and the artifact states this. Acceptance: every run prints MATCH. Stop condition: a MISMATCH
       stops the plan; no value is pinned into a fixture until both runtimes agree.
-- [ ] [P0-T28] Record path_roots and append_only_paths inputs: run CMD-GIT-TOPDIRS and
+- [x] [P0-T28] Record path_roots and append_only_paths inputs: run CMD-GIT-TOPDIRS and
       CMD-GIT-CHANGELOGS and confirm `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`
       is tracked with CMD-GIT-TRACKED. Write FEATURE/evidence/baseline/config-value-inputs.TS.md.
       Acceptance: all commands exit 0; the artifact records the ordinally sorted top-level directory
@@ -366,19 +366,19 @@ the read-only check script A6 and a before-and-after hash comparison.
       Decision recorded in the artifact: append_only_paths is exactly the two entries of block B2 in
       Appendix B (the double-star changelog glob and the pack manifest registry). The list is not empty
       because the repository tracks at least one changelog and one append-only registry.
-- [ ] [P0-T29] [expect-fail] Fail-before evidence for the zero-tolerance defect: run CMD-PY-SCRIPT with
+- [x] [P0-T29] [expect-fail] Fail-before evidence for the zero-tolerance defect: run CMD-PY-SCRIPT with
       script failbefore-demo (contract C5) in scheduling mode. Write
       FEATURE/evidence/regression-testing/failbefore-zero-tolerance.TS.md with ExpectedExitCode: 1.
       Acceptance: the script exits 1 and prints that the two append-only radii of block B3 in Appendix B
       are a conflict edge under the current hand rule, which the fix must tolerate at the committed
       tolerance.
-- [ ] [P0-T30] [expect-fail] Fail-before evidence for the over-reporting defect: run CMD-PY-SCRIPT with
+- [x] [P0-T30] [expect-fail] Fail-before evidence for the over-reporting defect: run CMD-PY-SCRIPT with
       script failbefore-demo in extraction mode. Write
       FEATURE/evidence/regression-testing/failbefore-over-reporting.TS.md with ExpectedExitCode: 1.
       Acceptance: the script exits 1 and prints that the current derivation of the plan text in block
       B4 of Appendix B returns the glob token, the command-span token, and the read-task token as
       radius paths.
-- [ ] [P0-T31] TypeScript baseline: run CMD-TS-CI, then CMD-TS-PRETTIER-CHECK over the four existing
+- [x] [P0-T31] TypeScript baseline: run CMD-TS-CI, then CMD-TS-PRETTIER-CHECK over the four existing
       TypeScript files named in P0-T13, then CMD-TS-LINT, CMD-TS-TYPECHECK, and CMD-TS-COV. Write one
       artifact per command: FEATURE/evidence/baseline/ts-npm-ci.TS.md, ts-prettier-check.TS.md,
       ts-eslint.TS.md, ts-typecheck.TS.md, and ts-jest-coverage.TS.md, all under
@@ -390,7 +390,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       TypeScript baseline failure set, possibly empty), and the % Lines and % Branch values of the
       claude-blast-radius-derive-core.ts row; the B42 run prints Found=True for the derivation core.
       Stop condition: B42 prints Found=False; stop and report that the lcov matcher needs revision.
-- [ ] [P0-T32] PowerShell test and coverage baseline: run CMD-PS-SCRIPT-SH with script
+- [x] [P0-T32] PowerShell test and coverage baseline: run CMD-PS-SCRIPT-SH with script
       pester-coverage, -TestPath tests/scripts/claude-lib/blast-radius, -CoveragePath set to the two
       existing modules named in P0-T19 as one comma-joined value, and -CoverageOutputPath
       SCRATCH/pester-baseline.xml; then run CMD-PS-SCRIPT-SH with script pester-counts and -Path set
@@ -402,7 +402,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       prints FailedCount=0. Stop condition: the convention run or the B47 run prints a FailedCount
       other than 0; stop and report, because P5-T11, P10-T11, and P16-T4 require FailedCount=0 for
       both tests.
-- [ ] [P0-T33] Inventory committed-config consumers: run CMD-GIT-INV-CONFIG and CMD-GIT-INV-CALLS and
+- [x] [P0-T33] Inventory committed-config consumers: run CMD-GIT-INV-CONFIG and CMD-GIT-INV-CALLS and
       take the intersection of the two file lists (the candidate set). For each candidate, record
       every test in it that reads either committed config copy and calls a derive, normalize, or
       validate function on it, with its expected outcome under the Part B config (write_intent_extraction
@@ -420,7 +420,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       the commands produce (and names any difference from the planning-time set); exactly the three
       tests named in the Preamble's scoped-test-update section are classified "requires helper
       update". Stop condition: any other test classified "requires helper update" stops the plan.
-- [ ] [P0-T34] Commit and push Phase 0 evidence: check off AC-02 per the Preamble check-off rule
+- [x] [P0-T34] Commit and push Phase 0 evidence: check off AC-02 per the Preamble check-off rule
       (writing FEATURE/evidence/other/ac-checkoff-p0.TS.md), stage the FEATURE evidence directory and
       FEATURE/spec.md with CMD-GIT-ADD, commit with message "chore(722): record phase 0 baselines and
       historical BEFORE evidence", and run CMD-GIT-PUSH. Acceptance: all three commands exit 0 and

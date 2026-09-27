@@ -567,7 +567,7 @@ reporting done.
   corpus tagged #452, plus any sibling-added fixture found at P0) runs unmodified through the Python
   and PowerShell detection drivers and passes; the list of fixtures found and the pass result are
   recorded in an evidence artifact under this feature folder's evidence tree.
-- [ ] P0 historical re-derivation: for each of epic-655-followups, backlog-2026-09-26, and
+- [x] P0 historical re-derivation: for each of epic-655-followups, backlog-2026-09-26, and
   followups-2026-09-27, the recorded radii are read verbatim with git show from the run's plan-home
   ref, and the BEFORE edge member set, edge count, cohort partition, cohort count, and maximum cohort
   width are computed independently by the Python and PowerShell runtimes; the two member sets are

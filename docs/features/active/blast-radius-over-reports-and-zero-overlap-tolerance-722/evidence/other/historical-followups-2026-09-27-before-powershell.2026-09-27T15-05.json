@@ -1,0 +1,412 @@
+{
+  "mode": "before",
+  "runtime": "powershell",
+  "slug": "followups-2026-09-27",
+  "config": "config/blast-radius.json at BASE_SHA beae3f021674e64fa6662097fe48a332d8da62b8",
+  "items": [
+    706,
+    707,
+    708,
+    709,
+    710,
+    711,
+    712,
+    713,
+    714,
+    715,
+    716
+  ],
+  "edges": [
+    {
+      "a": 706,
+      "b": 707,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 706,
+      "b": 708,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 706,
+      "b": 710,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 706,
+      "b": 711,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 706,
+      "b": 712,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 706,
+      "b": 713,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 706,
+      "b": 715,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 706,
+      "b": 716,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 707,
+      "b": 708,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap",
+        "module_overlap",
+        "shared_surface_overlap"
+      ]
+    },
+    {
+      "a": 707,
+      "b": 709,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap",
+        "module_overlap",
+        "shared_surface_overlap"
+      ]
+    },
+    {
+      "a": 707,
+      "b": 710,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap",
+        "module_overlap",
+        "shared_surface_overlap"
+      ]
+    },
+    {
+      "a": 707,
+      "b": 711,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 707,
+      "b": 712,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 707,
+      "b": 713,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap",
+        "module_overlap",
+        "shared_surface_overlap"
+      ]
+    },
+    {
+      "a": 707,
+      "b": 715,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 707,
+      "b": 716,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 708,
+      "b": 709,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap",
+        "module_overlap",
+        "shared_surface_overlap"
+      ]
+    },
+    {
+      "a": 708,
+      "b": 710,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap",
+        "module_overlap",
+        "shared_surface_overlap",
+        "contract_dependency"
+      ]
+    },
+    {
+      "a": 708,
+      "b": 711,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    },
+    {
+      "a": 708,
+      "b": 712,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 708,
+      "b": 713,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap",
+        "module_overlap",
+        "shared_surface_overlap"
+      ]
+    },
+    {
+      "a": 708,
+      "b": 715,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 708,
+      "b": 716,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 709,
+      "b": 710,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap",
+        "module_overlap",
+        "shared_surface_overlap"
+      ]
+    },
+    {
+      "a": 709,
+      "b": 711,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 709,
+      "b": 712,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 709,
+      "b": 713,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap",
+        "module_overlap",
+        "shared_surface_overlap"
+      ]
+    },
+    {
+      "a": 709,
+      "b": 715,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 709,
+      "b": 716,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 710,
+      "b": 711,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 710,
+      "b": 712,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 710,
+      "b": 713,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap",
+        "module_overlap",
+        "shared_surface_overlap"
+      ]
+    },
+    {
+      "a": 710,
+      "b": 714,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 710,
+      "b": 715,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 710,
+      "b": 716,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 711,
+      "b": 712,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 711,
+      "b": 713,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 711,
+      "b": 716,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 712,
+      "b": 713,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 712,
+      "b": 715,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 712,
+      "b": 716,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 713,
+      "b": 714,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 713,
+      "b": 715,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 713,
+      "b": 716,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 714,
+      "b": 716,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 715,
+      "b": 716,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    }
+  ],
+  "edge_count": 46
+}
