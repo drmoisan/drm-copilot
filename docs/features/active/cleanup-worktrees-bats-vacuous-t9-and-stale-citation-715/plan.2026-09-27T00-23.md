@@ -41,8 +41,9 @@ time, per `evidence-and-timestamp-conventions`.
 ### Phase 0 — Policy Reads & Baseline Capture
 
 - [ ] [P0-T1] Read `CLAUDE.md`, in particular the "Policy Compliance Reading Order" section,
-      and confirm it names `.claude/rules/general-code-change.md` and
-      `.claude/rules/general-unit-test.md` as the first two rule files in the order.
+      and confirm it lists `.github/copilot-instructions.md` first, followed by
+      `.github/instructions/general-code-change.instructions.md` and
+      `.github/instructions/general-unit-test.instructions.md` as the second and third entries.
       Acceptance: both file names are visible in the section text as read.
 - [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
       Acceptance: the "Mandatory Toolchain Loop" and "File Size Limit" sections are visible
@@ -240,55 +241,76 @@ time, per `evidence-and-timestamp-conventions`.
 
 ### Phase 4 — Final QC (CI-Observed Shell Toolchain Gate)
 
-- [ ] [P4-T1] Once the branch `bug/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715`
-      has an open PR and a triggered CI run, identify it by running
-      `gh run list --branch bug/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715 --workflow ci.yml --limit 1 --json databaseId,status,conclusion`
-      and, if `status` is not `completed`, re-run the same command until it is. Record the
-      final JSON output in
+- [ ] [P4-T1] Identify the CI run for this branch's current head commit by running
+      `gh run list --branch bug/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715 --workflow ci.yml --limit 1 --json databaseId,status,conclusion,headSha`.
+      `ci.yml` triggers only on PRs/pushes into `main` or `development`, and the PR for this
+      branch is opened by the executing lane outside this plan, so an empty result is an
+      expected interim state, not a failure. If the command returns an empty JSON array (`[]`),
+      no run exists yet: record the empty result in the artifact below and stop this task
+      without retrying; resume this task only after a PR has been opened for this branch. If
+      the command returns a non-empty array, run `git rev-parse HEAD` and confirm the returned
+      `headSha` equals that value; if it does not match (a stale run from an earlier commit),
+      treat the result as if no run exists yet and stop this task the same way, recording the
+      mismatch. If `headSha` matches and `status` is not `completed`, re-run the `gh run list`
+      command until `status` is `completed`. Record the final JSON output in
       `docs/features/active/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715/evidence/qa-gates/p4-t1.<timestamp>.md`
-      with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (state the `databaseId`
-      captured for use in P4-T2 through P4-T7).
-      Acceptance: `Output Summary:` records `status: completed` and the `databaseId`.
-- [ ] [P4-T2] Using the `databaseId` from P4-T1, run `gh run view DATABASE_ID --json jobs`
-      (substituting the actual numeric ID) and locate the job object whose `name` field equals
-      `Shell Coverage (Bats + kcov)`; record its `conclusion` field value. Record the result in
+      with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (state either `status:
+      completed` with the matching `headSha` and the `databaseId` captured for use in P4-T2
+      through P4-T7, or the empty-result/stale-run stop condition and that the task is pending
+      PR creation).
+      Acceptance: `Output Summary:` records `status: completed` with a `headSha` matching
+      `git rev-parse HEAD` and the `databaseId`, or records the empty-result/stale-run stop
+      condition.
+- [ ] [P4-T2] Execute this task only once P4-T1 has recorded a `databaseId` under its
+      completed-run outcome (not the empty-result/stale-run stop condition). Using that
+      `databaseId`, run `gh run view DATABASE_ID --json jobs` (substituting the actual numeric
+      ID) and locate the job object whose `name` field equals `Shell Coverage (Bats + kcov)`;
+      record its `conclusion` field value. Record the result in
       `docs/features/active/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715/evidence/qa-gates/p4-t2.<timestamp>.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
       Acceptance: `Output Summary:` records `conclusion: success` for the
       `Shell Coverage (Bats + kcov)` job (this is the AC6 job-pass gate).
-- [ ] [P4-T3] Using the same `databaseId`, run `gh run view DATABASE_ID --json jobs`
-      (substituting the actual numeric ID) and, within the `Shell Coverage (Bats + kcov)`
-      job's `steps` array, locate the step object whose `name` field equals
-      `Run shell-qc check (shfmt diff + shellcheck)`; record its `conclusion` field. Record
-      the result, together with an explicit note that per `scripts/bash/shell_qc_lib.sh`'s
-      `discover_shell_scripts()` this step does not lint or format the two `.bats` files
-      edited by this fix (they are outside its `tools/`, `scripts/`, `.claude/lib/bash/`
-      discovery roots) and is recorded for full-QA-loop completeness only, in
+- [ ] [P4-T3] Execute this task only once P4-T1 has recorded a `databaseId` under its
+      completed-run outcome (not the empty-result/stale-run stop condition). Using that same
+      `databaseId`, run `gh run view DATABASE_ID --json jobs` (substituting the actual numeric
+      ID) and, within the `Shell Coverage (Bats + kcov)` job's `steps` array, locate the step
+      object whose `name` field equals `Run shell-qc check (shfmt diff + shellcheck)`; record
+      its `conclusion` field. Record the result, together with an explicit note that per
+      `scripts/bash/shell_qc_lib.sh`'s `discover_shell_scripts()` this step does not lint or
+      format the two `.bats` files edited by this fix (they are outside its `tools/`,
+      `scripts/`, `.claude/lib/bash/` discovery roots) and is recorded for full-QA-loop
+      completeness only, in
       `docs/features/active/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715/evidence/qa-gates/p4-t3.<timestamp>.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
       Acceptance: the recorded `conclusion` field for this step equals `success`.
-- [ ] [P4-T4] Using the same `databaseId`, run `gh run view DATABASE_ID --log` (substituting
-      the actual numeric ID) and search the output for the literal line prefix
-      `Bash coverage (lines):` and record the full matched line and numeric percentage in
+- [ ] [P4-T4] Execute this task only once P4-T1 has recorded a `databaseId` under its
+      completed-run outcome (not the empty-result/stale-run stop condition). Using that same
+      `databaseId`, run `gh run view DATABASE_ID --log` (substituting the actual numeric ID)
+      and search the output for the literal line prefix `Bash coverage (lines):` and record
+      the full matched line and numeric percentage in
       `docs/features/active/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715/evidence/qa-gates/p4-t4.<timestamp>.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (state the post-change
       coverage percentage as a number, e.g. `Post-change: NN.N%`).
       Acceptance: `Output Summary:` records a numeric post-change coverage percentage.
-- [ ] [P4-T5] Compare the baseline coverage percentage recorded in P0-T10 against the
-      post-change coverage percentage recorded in P4-T4. Record the comparison in
+- [ ] [P4-T5] Execute this task only once P4-T4 has recorded a post-change coverage
+      percentage (which itself requires P4-T1's completed-run outcome). Compare the baseline
+      coverage percentage recorded in P0-T10 against the post-change coverage percentage
+      recorded in P4-T4. Record the comparison in
       `docs/features/active/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715/evidence/qa-gates/p4-t5.<timestamp>.md`
       with `Timestamp:`, `Baseline:`, `PostChange:`, `Delta:`, `Output Summary:`.
       Acceptance: `PostChange` is not lower than `Baseline` (no regression on the uniform bash
       line-coverage gate per `.claude/rules/quality-tiers.md`).
-- [ ] [P4-T6] From the `gh run view DATABASE_ID --log` output obtained in P4-T4, search for a
-      TAP result line containing both `ok` and the literal test title
+- [ ] [P4-T6] Execute this task only once P4-T4 has produced the `gh run view DATABASE_ID --log`
+      output (which itself requires P4-T1's completed-run outcome). From that output, search
+      for a TAP result line containing both `ok` and the literal test title
       `delete_candidate refuses the base branch before re-verification`, and confirm no `not ok`
       line contains the same title. Record the result in
       `docs/features/active/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715/evidence/regression-testing/p4-t6.<timestamp>.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
       Acceptance: an `ok` line is found for this title and no `not ok` line is found for it.
-- [ ] [P4-T7] From the same log output, search for a TAP result line containing both `ok` and
-      the literal test title
+- [ ] [P4-T7] Execute this task only once P4-T6 has completed its search of the same log
+      output (which itself requires P4-T1's completed-run outcome). From the same log output,
+      search for a TAP result line containing both `ok` and the literal test title
       `a candidate whose re-verification flips is blocked before any branch delete`, and
       confirm no `not ok` line contains the same title. Record the result in
       `docs/features/active/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715/evidence/regression-testing/p4-t7.<timestamp>.md`
@@ -314,8 +336,10 @@ time, per `evidence-and-timestamp-conventions`.
 - [ ] [P5-T5] After P2-T1 and P2-T2 pass, check off AC5 in the same `spec.md`: change the
       `- [ ] AC5: ...` line to `- [x] AC5: ...`, editing only the checkbox marker.
       Acceptance: the line reads `- [x] AC5: ...` and no other text on the line changed.
-- [ ] [P5-T6] After P4-T2, P4-T6, and P4-T7 all pass, check off AC6 in the same `spec.md`:
-      change the `- [ ] AC6: ...` line to `- [x] AC6: ...`, editing only the checkbox marker.
+- [ ] [P5-T6] After P4-T1 has recorded its completed-run outcome (not the
+      empty-result/stale-run stop condition) and P4-T2, P4-T6, and P4-T7 all pass, check off
+      AC6 in the same `spec.md`: change the `- [ ] AC6: ...` line to `- [x] AC6: ...`, editing
+      only the checkbox marker.
       Acceptance: the line reads `- [x] AC6: ...` and no other text on the line changed.
 - [ ] [P5-T7] After P1-T8 passes, check off AC7 in the same `spec.md`: change the
       `- [ ] AC7: ...` line to `- [x] AC7: ...`, editing only the checkbox marker.
