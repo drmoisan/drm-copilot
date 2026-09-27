@@ -640,7 +640,7 @@ reporting done.
   drift helper module; test_parallel_drift_scheduling shows a tolerated pair whose observed overlap
   stays within tolerance is not reported, a tolerated pair that becomes hard or exceeds tolerance is
   reported, and output at tolerance 0 equals the pre-change output.
-- [ ] The drift-detection module does not grow in line count, and every existing drift test passes
+- [x] The drift-detection module does not grow in line count, and every existing drift test passes
   unmodified.
 
 ### Write-intent extraction (design point 1)
@@ -695,7 +695,7 @@ reporting done.
   line coverage on every new or changed module.
 - [x] TypeScript toolchain passes in a single pass (prettier, eslint, tsc, jest) with >= 85% line and
   >= 75% branch coverage on the changed derivation core.
-- [ ] No new or changed file exceeds 500 lines, and each plan batch stays within 3 production and
+- [x] No new or changed file exceeds 500 lines, and each plan batch stays within 3 production and
   3 test files per language.
 - [ ] CI is green on the pull request, including the windows-latest Pester job (checked off by the
   execution child, which pushes the check-off before reporting done).

@@ -1260,10 +1260,10 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 18 — File Sizes, Batch Accounting, Acceptance-Criteria Check-off, and CI
 
-- [ ] [P18-T1] Run script line-counts over every file written by this plan. Write
+- [x] [P18-T1] Run script line-counts over every file written by this plan. Write
       FEATURE/evidence/qa-gates/final-line-counts.TS.md. Acceptance: every production and test file is at
       most 500 lines; the drift module is at most its P0-T13 value.
-- [ ] [P18-T2] Write FEATURE/evidence/qa-gates/batch-accounting.TS.md listing, per batch (Python and
+- [x] [P18-T2] Write FEATURE/evidence/qa-gates/batch-accounting.TS.md listing, per batch (Python and
       PowerShell: P1, P2, P3, P5 first half (opened by P5-T1), P5 second half (opened by P5-T11; one
       test file, `tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1`), P8, P9 first half,
       P9 second half, P10 first half, P10 second half (opened by P10-T8; the self-hosted runsettings
@@ -1271,12 +1271,12 @@ the read-only check script A6 and a before-and-after hash comparison.
       PowerShell; TypeScript: P4 batch one, P4 batch two, P11 batch one, P11 batch two), the authored
       production and test files and the reset or boundary artifact that opened the batch.
       Acceptance: no batch lists more than 3 production or 3 test files of one language.
-- [ ] [P18-T3] Scope check: run CMD-GIT-DIFF-NAMES with base FINAL_BASE and pathspec "." and
+- [x] [P18-T3] Scope check: run CMD-GIT-DIFF-NAMES with base FINAL_BASE and pathspec "." and
       CMD-GIT-STATUS. Write FEATURE/evidence/qa-gates/scope-check.TS.md. Acceptance: every listed path
       is either a path backticked in this plan or under FEATURE; no path under .claude/lib/bash, the
       rules directory other than the parallel-orchestration rule file, or the .github instructions
       directory is listed.
-- [ ] [P18-T4] Commit and push the Phase 18 check-off: check off AC-21 and AC-37 per the Preamble
+- [x] [P18-T4] Commit and push the Phase 18 check-off: check off AC-21 and AC-37 per the Preamble
       check-off rule; run CMD-GIT-STATUS and stage with CMD-GIT-ADD every listed path that is backticked
       in this plan or lies under FEATURE (FEATURE/spec.md included); commit with message "docs(722):
       check off locally verified acceptance criteria"; run CMD-GIT-PUSH. Acceptance: all git commands
