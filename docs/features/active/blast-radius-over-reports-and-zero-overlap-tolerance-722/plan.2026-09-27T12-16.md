@@ -1281,7 +1281,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       in this plan or lies under FEATURE (FEATURE/spec.md included); commit with message "docs(722):
       check off locally verified acceptance criteria"; run CMD-GIT-PUSH. Acceptance: all git commands
       exit 0 and a final CMD-GIT-STATUS prints nothing.
-- [ ] [P18-T5] Verify the check-off state: run CMD-GIT-COUNT-CHECKED and CMD-GIT-COUNT-OPEN over
+- [x] [P18-T5] Verify the check-off state: run CMD-GIT-COUNT-CHECKED and CMD-GIT-COUNT-OPEN over
       FEATURE/spec.md. Write FEATURE/evidence/qa-gates/ac-checkoff-verification.TS.md. Acceptance:
       CMD-GIT-COUNT-CHECKED prints a count of 37 and CMD-GIT-COUNT-OPEN prints a count of 1 (the spec
       carries exactly 38 checkbox lines, all inside its Acceptance Criteria section, so a file-wide
