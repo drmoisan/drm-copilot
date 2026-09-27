@@ -386,6 +386,10 @@ Part B (write-intent extraction, new keys, mandate amendment, AFTER pins, re-der
   - `tests/scripts/dev_tools/test_blast_radius_historical_runs.py` (AFTER pins)
   - `tests/scripts/dev_tools/test_blast_radius_config_tolerance_keys.py` (Part B keys)
   - `tests/scripts/dev_tools/blast_radius_parity_test_support.py` (Part B key classes)
+  - `tests/scripts/dev_tools/test_blast_radius_mandate_reads.py` (committed-config helper also
+    removes the two write-intent keys; see Backward-compatibility expectations)
+  - `tests/scripts/dev_tools/test_blast_radius_mergeable_paths.py` (committed-config helper also
+    removes the two write-intent keys; see Backward-compatibility expectations)
 - PowerShell tests:
   - `tests/scripts/claude-lib/blast-radius/BlastRadiusWriteIntent.Tests.ps1` (new)
   - `tests/scripts/claude-lib/blast-radius/BlastRadius.HistoricalRuns.Tests.ps1` (AFTER pins)
@@ -483,8 +487,19 @@ The committed values lean toward parallelism (design point 3); the absent-key de
 
 #### Backward-compatibility expectations
 
-- Every existing test and fixture passes unmodified, except tests that assert the exact key set or key
-  order of the truth tables, which are updated to include the new keys.
+- Every existing test and fixture passes unmodified, with two exceptions:
+  1. Tests that assert the exact key set or key order of the truth tables are updated to include the
+     new keys.
+  2. Tests whose committed-config helpers pin current-extraction semantics are updated so that those
+     helpers also remove the two new write-intent keys, write_intent_extraction and path_roots, from
+     the committed config. They then continue to exercise strict (current) extraction. P0 found three
+     such tests in two modules: test_derive_without_the_mandate_reads_key_includes_the_citations in
+     the mandate-reads test module, and test_derive_blast_radius_keeps_a_cited_csproj_in_paths and
+     test_validate_blast_radius_findings_are_identical_with_and_without_the_key in the
+     mergeable-paths test module. This is a scoped test update, not a behavior regression.
+- The plan's P0 inventories every test that consumes the committed config. Any existing-test failure
+  outside that inventory and outside exception 1 stops execution; it is not resolved by editing the
+  test.
 - Every recorded checkpoint remains valid.
 - A destination that has not received the new bundled truth table keeps current behavior.
 
@@ -724,3 +739,11 @@ reporting done.
 9. **Pester runsettings as a mandate read.** Not adopted. The research suggested it; the operator
    named only the Copilot instructions file, and write-intent extraction removes read citations of
    shared surfaces generally.
+10. **Current-extraction tests against the committed config.** Executor preflight found that committing
+    write_intent_extraction true and the self-hosted path_roots breaks three existing tests that check
+    current-extraction semantics against the committed config: in the mandate-reads test module, W3
+    drops the read-citation tokens once only mandate_reads is removed; in the mergeable-paths test
+    module, W4 drops a csproj path whose top-level directory is not tracked. Decision (orchestrator,
+    autonomous mode): those tests keep checking current-extraction semantics, and their committed-config
+    helpers also remove write_intent_extraction and path_roots. Write-intent behavior is covered by the
+    new write-intent tests and fixtures. The committed config values are unchanged by this decision.
