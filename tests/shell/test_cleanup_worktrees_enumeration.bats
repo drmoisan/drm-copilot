@@ -111,3 +111,32 @@ setup() {
     [ "$status" -ne 0 ]
     [[ "$output" != *"|"* ]]
 }
+
+@test "compute_protected emits protected-branch main when the primary worktree is on another branch" {
+    # The primary worktree is on chore-cleanup and main is checked out nowhere.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_not_checked_out" \
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && compute_protected 2>/dev/null"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"protected-branch|chore-cleanup"* ]]
+    [[ "$output" == *"protected-branch|main"* ]]
+}
+
+@test "compute_protected emits protected-branch main under current_exclusion" {
+    # The base record is additional to the existing current-branch and path records.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/current_exclusion" \
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && compute_protected 2>/dev/null"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"protected-branch|current-branch"* ]]
+    [[ "$output" == *"protected-path|/repo/main"* ]]
+    [[ "$output" == *"protected-path|/repo-wt/current"* ]]
+    [[ "$output" == *"protected-branch|main"* ]]
+}
+
+@test "compute_protected emits exactly one protected-branch main when the current branch is main" {
+    # The merged_no_worktree scenario's current branch is main.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/merged_no_worktree" \
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && compute_protected 2>/dev/null"
+    [ "$status" -eq 0 ]
+    count=$(printf '%s\n' "$output" | grep -c -x -F 'protected-branch|main' || true)
+    [ "$count" -eq 1 ]
+}

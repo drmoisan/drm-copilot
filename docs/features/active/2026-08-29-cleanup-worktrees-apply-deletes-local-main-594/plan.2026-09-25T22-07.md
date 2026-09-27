@@ -292,35 +292,35 @@ linked worktree `/repo-wt/base`). Neither directory carries a `rev-parse.origin_
 file, after its last existing test, so that the pre-existing test bodies and header comments
 are not modified.
 
-- [ ] [P1-T1] Create `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/worktree-list.out`
+- [x] [P1-T1] Create `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/worktree-list.out`
   with exactly four lines followed by a final newline: `worktree /repo/main`, `HEAD cccc0000`,
   `branch refs/heads/chore-cleanup`, and an empty line. Acceptance: file exists with that
   content.
-- [ ] [P1-T2] Create `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/for-each-ref.out`
+- [x] [P1-T2] Create `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/for-each-ref.out`
   with exactly four newline-terminated lines in this order: `chore-cleanup cccc0000`,
   `feature-merged bbbb1111`, `main aaaa0000`, `zeta-merged dddd3333`. Acceptance: file exists
   with that content (LC_ALL=C order; `zeta-merged` sorts after `main`).
-- [ ] [P1-T3] Create `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/rev-parse.abbrev-ref-HEAD.out`
+- [x] [P1-T3] Create `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/rev-parse.abbrev-ref-HEAD.out`
   containing the single newline-terminated line `chore-cleanup`. Acceptance: file exists
   with that content.
-- [ ] [P1-T4] Create `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/rev-parse.show-toplevel.out`
+- [x] [P1-T4] Create `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/rev-parse.show-toplevel.out`
   containing the single newline-terminated line `/repo/main`. Acceptance: file exists with
   that content.
-- [ ] [P1-T5] Create `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/worktree-list.out`
+- [x] [P1-T5] Create `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/worktree-list.out`
   with exactly eight lines followed by a final newline: `worktree /repo/main`,
   `HEAD cccc0000`, `branch refs/heads/chore-cleanup`, an empty line, `worktree /repo-wt/base`,
   `HEAD aaaa0000`, `branch refs/heads/main`, and an empty line. Acceptance: file exists with
   that content.
-- [ ] [P1-T6] Create `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/for-each-ref.out`
+- [x] [P1-T6] Create `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/for-each-ref.out`
   with the same four lines as P1-T2. Acceptance: file content is byte-identical to the P1-T2
   file (verified in P1-T9).
-- [ ] [P1-T7] Create `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/rev-parse.abbrev-ref-HEAD.out`
+- [x] [P1-T7] Create `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/rev-parse.abbrev-ref-HEAD.out`
   containing the single newline-terminated line `chore-cleanup`. Acceptance: file exists with
   that content.
-- [ ] [P1-T8] Create `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/rev-parse.show-toplevel.out`
+- [x] [P1-T8] Create `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/rev-parse.show-toplevel.out`
   containing the single newline-terminated line `/repo/main`. Acceptance: file exists with
   that content.
-- [ ] [P1-T9] Verify the fixtures in `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/`
+- [x] [P1-T9] Verify the fixtures in `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/`
   and `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/`: run
   `ls -1 tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree`,
   `grep -rlU $'\r' tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree`,
@@ -330,7 +330,7 @@ are not modified.
   `<FEATURE>/evidence/regression-testing/fixtures-crlf-check.<ts>.md` with `ExpectedExitCode: 1`.
   Acceptance: `ls` lists exactly the four names from P1-T1..T4 in each directory; the
   carriage-return search prints nothing and exits 1; `cmp` exits 0.
-- [ ] [P1-T10] Append test T1 to `tests/shell/test_cleanup_worktrees_enumeration.bats`, named
+- [x] [P1-T10] Append test T1 to `tests/shell/test_cleanup_worktrees_enumeration.bats`, named
   exactly `compute_protected emits protected-branch main when the primary worktree is on another branch`.
   Body: a one-line comment stating that the primary worktree is on `chore-cleanup` and `main`
   is checked out nowhere; `run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_not_checked_out" bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && compute_protected 2>/dev/null"`
@@ -338,7 +338,7 @@ are not modified.
   `[ "$status" -eq 0 ]`, `[[ "$output" == *"protected-branch|chore-cleanup"* ]]`, and
   `[[ "$output" == *"protected-branch|main"* ]]`. Acceptance: the test block is the file's
   last block and uses the file's 4-space indentation.
-- [ ] [P1-T11] Append test T2 to `tests/shell/test_cleanup_worktrees_enumeration.bats`, named
+- [x] [P1-T11] Append test T2 to `tests/shell/test_cleanup_worktrees_enumeration.bats`, named
   exactly `compute_protected emits protected-branch main under current_exclusion`. Body: a
   one-line comment stating that the base record is additional to the existing records; the
   same `run env ...` line as P1-T10 with scenario `${SCEN}/current_exclusion`; then, in this
@@ -346,30 +346,30 @@ are not modified.
   `[[ "$output" == *"protected-path|/repo/main"* ]]`,
   `[[ "$output" == *"protected-path|/repo-wt/current"* ]]`, and
   `[[ "$output" == *"protected-branch|main"* ]]`. Acceptance: block appended after T1.
-- [ ] [P1-T12] Append test T3 to `tests/shell/test_cleanup_worktrees_enumeration.bats`, named
+- [x] [P1-T12] Append test T3 to `tests/shell/test_cleanup_worktrees_enumeration.bats`, named
   exactly `compute_protected emits exactly one protected-branch main when the current branch is main`.
   Body: a one-line comment stating that the `merged_no_worktree` scenario's current branch is
   `main`; the same `run env ...` line with scenario `${SCEN}/merged_no_worktree`; then
   `[ "$status" -eq 0 ]`, `count=$(printf '%s\n' "$output" | grep -c -x -F 'protected-branch|main' || true)`,
   and `[ "$count" -eq 1 ]`. Acceptance: block appended after T2.
-- [ ] [P1-T13] Append test T4 to `tests/shell/test_cleanup_worktrees_classification.bats`, named
+- [x] [P1-T13] Append test T4 to `tests/shell/test_cleanup_worktrees_classification.bats`, named
   exactly `classify_branch main is PROTECTED_CURRENT when the primary worktree is on another branch`.
   Body: a one-line comment naming the reported topology; `cb base_not_checked_out main`;
   `[ "$status" -eq 0 ]`; `[ "$output" = "BRANCH|main|PROTECTED_CURRENT" ]`. Acceptance: the
   block is the file's last block and reuses the existing `cb` helper unchanged.
-- [ ] [P1-T14] Append test T5 to `tests/shell/test_cleanup_worktrees_classification.bats`, named
+- [x] [P1-T14] Append test T5 to `tests/shell/test_cleanup_worktrees_classification.bats`, named
   exactly `classify_branch main is PROTECTED_CURRENT when main is checked out in a linked worktree`.
   Body: a one-line comment stating that `/repo-wt/base` is neither the primary nor the invoking
   worktree; `cb base_in_linked_worktree main`; `[ "$status" -eq 0 ]`;
   `[ "$output" = "BRANCH|main|PROTECTED_CURRENT" ]`. Acceptance: block appended after T4.
-- [ ] [P1-T15] Append test T6 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
+- [x] [P1-T15] Append test T6 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
   exactly `run_report classifies main PROTECTED_CURRENT when the primary worktree is on another branch`.
   Body: `run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_not_checked_out" bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${RLIB}'; source '${DLIB}'; run_report 2>/dev/null"`
   (wrapped as in the existing tests); then `[ "$status" -eq 0 ]`,
   `[[ "$output" == *"BRANCH|main|PROTECTED_CURRENT"* ]]`, and
   `[[ "$output" != *"BRANCH|main|MERGED_CLEAN"* ]]`. Acceptance: the block is the file's last
   block.
-- [ ] [P1-T16] Append test T7 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
+- [x] [P1-T16] Append test T7 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
   exactly `run_apply does not delete main when the primary worktree is on another branch`.
   Body: `apply "${SCEN}/base_not_checked_out"`; then, in this order,
   `[[ "$output" == *"BRANCH|main|PROTECTED_CURRENT"* ]]`,
@@ -378,12 +378,12 @@ are not modified.
   controls, `[[ "$output" == *"ACTION|branch-delete|feature-merged|OK"* ]]`, and
   `[[ "$output" == *"ACTION|branch-delete|zeta-merged|OK"* ]]`. Acceptance: block appended
   after T6 and reuses the existing `apply` helper unchanged.
-- [ ] [P1-T17] Append test T8 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
+- [x] [P1-T17] Append test T8 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
   exactly `run_apply neither removes nor deletes main checked out in a linked worktree`. Body:
   `apply "${SCEN}/base_in_linked_worktree"`; then `[[ "$output" == *"BRANCH|main|PROTECTED_CURRENT"* ]]`,
   `[[ "$output" != *"worktree remove /repo-wt/base"* ]]`, `[[ "$output" != *"branch -D main"* ]]`,
   and `[[ "$output" != *"ACTION|branch-delete|main|"* ]]`. Acceptance: block appended after T7.
-- [ ] [P1-T18] Append test T9 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
+- [x] [P1-T18] Append test T9 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
   exactly `delete_candidate refuses the base branch before re-verification`. Body: a one-line
   comment stating that stderr is retained so the stub argv log is observable;
   `run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_not_checked_out" bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; delete_candidate main '' MERGED_CLEAN"`
@@ -391,13 +391,13 @@ are not modified.
   `[[ "$output" == *"ACTION|delete|main|BLOCKED-PROTECTED-BASE"* ]]`,
   `[[ "$output" != *"merge-base"* ]]`, `[[ "$output" != *"worktree remove"* ]]`, and
   `[[ "$output" != *"branch -D"* ]]`. Acceptance: block appended after T8.
-- [ ] [P1-T19] Append test T10 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
+- [x] [P1-T19] Append test T10 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
   exactly `delete_candidate refuses the base branch before removing its linked worktree`.
   Body: `run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_in_linked_worktree" bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; delete_candidate main /repo-wt/base MERGED_CLEAN"`
   (no stderr redirection); then `[ "$status" -eq 1 ]`,
   `[[ "$output" == *"ACTION|delete|main|BLOCKED-PROTECTED-BASE"* ]]`, and
   `[[ "$output" != *"worktree remove"* ]]`. Acceptance: block appended after T9.
-- [ ] [P1-T20] [expect-fail] Fail-before run into `<FEATURE>/evidence/regression-testing/fail-before.<ts>.md`:
+- [x] [P1-T20] [expect-fail] Fail-before run into `<FEATURE>/evidence/regression-testing/fail-before.<ts>.md`:
   run `npx --yes bats tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`
   against the unfixed libraries and record the artifact with `ExpectedExitCode: 1`.
   Acceptance: `EXIT_CODE: 1`; the TAP plan equals the P0-T10 per-file `@test` total plus 10
