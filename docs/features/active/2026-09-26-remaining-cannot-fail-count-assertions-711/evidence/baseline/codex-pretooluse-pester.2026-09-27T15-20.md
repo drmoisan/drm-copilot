@@ -1,0 +1,6 @@
+Timestamp: 2026-09-27T15-20
+Command: sh <scratchpad>/run-ps.sh <scratchpad>/pester-counts.ps1 -Path tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1
+EXIT_CODE: 0
+Output Summary: TotalCount=6, PassedCount=6, FailedCount=0. No FAILED: lines.
+
+Deviation note: the plan text states an expected `TotalCount=5` (per the 5 `It`-declaration lines found by research's static search) with one documented pre-existing `FailedCount=1` failure (`allows every registered handler for every tool name its own matcher admits`, attributed to issue #709's area). The actual freshly captured run instead discovered `TotalCount=6` with `FailedCount=0`. Per the plan's own instruction ("record whatever the run actually prints" / D9: numeric baselines are contextual, not hard-coded), this run's actual values (TotalCount=6, FailedCount=0) are recorded as this file's Phase 0 baseline of record and are what the Phase 4 baseline-relative gate (P4-T1) will compare against. The TotalCount discrepancy against the static 5-`It` count is consistent with a `-ForEach` parameterized `It` expanding into more than one discovered test case at runtime. The absence of the previously documented pre-existing failure means this worktree's environment-dependent condition (issue #709's area) is not currently reproducing; this is a baseline observation, not a defect introduced by this plan.

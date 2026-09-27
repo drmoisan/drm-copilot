@@ -130,7 +130,7 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
     It 'parses at least three matcher groups and every registered handler from config.toml' {
         # Guards the derivation itself: a silently empty parse would make the
         # matrix below vacuously green.
-        @($script:Registrations).Count | Should -BeGreaterThan 0
+        @($script:Registrations | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0
         @($script:Registrations | ForEach-Object { $_.Matcher } | Select-Object -Unique).Count | Should -BeGreaterOrEqual 3
         $script:RegisteredHookNames | Should -Contain 'check-python-test-purity.ps1'
         $script:RegisteredHookNames | Should -Contain 'enforce-completion-consistency.ps1'
@@ -199,5 +199,12 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
             Should -BeFalse -Because 'benign payloads must not create Python batch-budget state for the synthetic session'
         Test-Path -LiteralPath $syntheticPowerShellState |
             Should -BeFalse -Because 'benign payloads must not create PowerShell batch-budget state for the synthetic session'
+    }
+
+    Context 'Non-vacuity floor for the registration count' {
+        It 'documents that the legacy expression @($null).Count -gt 0 evaluates to $true while the filtered form is $false' {
+            (@($null).Count -gt 0) | Should -BeTrue
+            (@($null | Where-Object { $null -ne $_ }).Count -gt 0) | Should -BeFalse
+        }
     }
 }

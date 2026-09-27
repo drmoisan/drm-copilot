@@ -263,7 +263,7 @@ Describe 'Committed blast-radius truth table shape' {
 
             # Assert: an empty or blank-bearing list would exclude nothing or
             # throw at read time.
-            $entries.Count | Should -BeGreaterThan 0
+            Test-NonVacuousCollection -Value $entries | Should -BeTrue
             @($entries | Where-Object { [string]::IsNullOrWhiteSpace($_) }) |
                 Should -BeNullOrEmpty
         }
