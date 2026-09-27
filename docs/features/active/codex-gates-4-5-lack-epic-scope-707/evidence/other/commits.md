@@ -214,3 +214,46 @@ Phase 5 has no commit task; per the orchestrator directive the phase's evidence 
 Staged paths: the evidence directory `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence` (which carries this file, including the Phase 4 post-commit append) and the plan checklist `docs/features/active/codex-gates-4-5-lack-epic-scope-707/plan.2026-09-26T22-55.md` (including the [P4-T9] and [P5-T1] to [P5-T10] check-offs).
 
 Message: `docs(bug): record #707 structural and hermeticity verification evidence` with the two session attribution trailer lines.
+
+Commit SHA: 0b4e0c5d2032244558213386acfb29190175d849
+
+`git commit` reported 12 files changed: ten new Phase 5 evidence files, commits.md, and the plan file.
+
+Porcelain (post-commit, pre-append):
+
+```
+(empty)
+```
+
+Push: `git push origin bug/codex-gates-4-5-lack-epic-scope-707` (plain, not forced) reported `a76fc7e0..0b4e0c5d  bug/codex-gates-4-5-lack-epic-scope-707 -> bug/codex-gates-4-5-lack-epic-scope-707`.
+
+This post-commit entry is uncommitted after the append and is carried into the next phase commit.
+
+## Phase 6 commit (final QC loop, pass 1)
+
+Timestamp: 2026-09-27T07-41
+Command: git status --porcelain -uall -- docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence
+EXIT_CODE: 0
+Output Summary: One modified and ten untracked evidence paths listed; each is named by a task of Phase 5 or Phase 6 (commits.md by rule 9 and the Phase 5 commit entry; final-preloop-state.md by [P6-T1]; final-poshqc-format.md by [P6-T2]; final-poshqc-analyze.md by [P6-T3]; final-pester-coverage.md by [P6-T4]; final-coverage-delta.md by [P6-T5]; final-pytest-guards.md by [P6-T6]; final-pytest-full.md by [P6-T7]; final-python-scope.md by [P6-T8]; final-mcp-poshqc.md by [P6-T9]; final-seven-stage-loop.md by [P6-T10]). No other path is listed, so the commit may proceed.
+
+Porcelain (pre-staging):
+
+```
+ M docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/other/commits.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/final-coverage-delta.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/final-mcp-poshqc.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/final-pester-coverage.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/final-poshqc-analyze.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/final-poshqc-format.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/final-preloop-state.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/final-pytest-full.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/final-pytest-guards.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/final-python-scope.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/final-seven-stage-loop.md
+```
+
+Phase 6 has no commit task, and pass 1 required no fix, so no production or test file changed; per the orchestrator directive the phase's evidence and plan check-offs are committed in rule 9 form.
+
+Staged paths: the evidence directory `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence` (which carries this file, including the Phase 5 post-commit append) and the plan checklist `docs/features/active/codex-gates-4-5-lack-epic-scope-707/plan.2026-09-26T22-55.md` (including the [P6-T1] to [P6-T10] check-offs).
+
+Message: `docs(bug): record #707 final QA and coverage evidence` with the two session attribution trailer lines.
