@@ -17,6 +17,7 @@
  */
 
 import {
+  compareCodePoint,
   CONVENTIONAL_TYPES,
   ISSUE_REFERENCE_PATTERN,
   type IssueDetails,
@@ -382,17 +383,6 @@ function padName(name: string): string {
 /** Test whether a string is a non-empty run of ASCII digits (Python isdigit). */
 function isDigits(value: string): boolean {
   return value.length > 0 && /^\d+$/u.test(value);
-}
-
-/** Compare two strings by Unicode code point (Python `sorted` semantics). */
-function compareCodePoint(left: string, right: string): number {
-  if (left < right) {
-    return -1;
-  }
-  if (left > right) {
-    return 1;
-  }
-  return 0;
 }
 
 /**

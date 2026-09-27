@@ -23,6 +23,7 @@
  */
 
 import {
+  compareCodePoint,
   AUTOCLOSE_PENDING_NOT_OPEN_TEXT,
   AUTOCLOSE_UNVERIFIED_ANNOTATION,
   type IssueDetails,
@@ -290,15 +291,4 @@ export function buildIssuesToAutocloseSection(params: {
   return [section("Issues to autoclose (verified or pending)"), body].join(
     "\n",
   );
-}
-
-/** Compare two strings by Unicode code point (Python `sorted` semantics). */
-function compareCodePoint(left: string, right: string): number {
-  if (left < right) {
-    return -1;
-  }
-  if (left > right) {
-    return 1;
-  }
-  return 0;
 }

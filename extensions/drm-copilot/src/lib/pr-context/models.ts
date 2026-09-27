@@ -335,3 +335,14 @@ export function formatList(
   }
   return valuesList.map((item) => `- ${item}`).join("\n");
 }
+
+/** Compare two strings by Unicode code point (Python `sorted` semantics). */
+export function compareCodePoint(left: string, right: string): number {
+  if (left < right) {
+    return -1;
+  }
+  if (left > right) {
+    return 1;
+  }
+  return 0;
+}

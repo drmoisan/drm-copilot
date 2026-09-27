@@ -19,6 +19,7 @@
 import { type FileSystem } from "../file-system";
 import { type CommandRunner } from "../subprocess-runner";
 import {
+  compareCodePoint,
   type FeatureDocExcerpt,
   type IssueDetails,
   type PrContextResult,
@@ -382,15 +383,4 @@ function errorMessage(exc: unknown): string {
 /** Sort a deduplicated set of strings by Unicode code point. */
 function sortedSet(values: Iterable<string>): string[] {
   return [...new Set(values)].sort(compareCodePoint);
-}
-
-/** Compare two strings by Unicode code point (Python `sorted` semantics). */
-function compareCodePoint(left: string, right: string): number {
-  if (left < right) {
-    return -1;
-  }
-  if (left > right) {
-    return 1;
-  }
-  return 0;
 }

@@ -15,7 +15,11 @@
  */
 
 import { type FileSystem, toPosixPath } from "../file-system";
-import { ISSUE_REFERENCE_PATTERN, splitLines } from "./models";
+import {
+  ISSUE_REFERENCE_PATTERN,
+  compareCodePoint,
+  splitLines,
+} from "./models";
 
 /**
  * Extract markdown content under a top-level `##` heading.
@@ -299,17 +303,6 @@ export function relativeToPosix(root: string, path: string): string {
     return normalized.slice(normalizedRoot.length + 1);
   }
   return normalized.replace(/^\/+/u, "");
-}
-
-/** Compare two strings by Unicode code point (Python `sorted` semantics). */
-export function compareCodePoint(left: string, right: string): number {
-  if (left < right) {
-    return -1;
-  }
-  if (left > right) {
-    return 1;
-  }
-  return 0;
 }
 
 /**
