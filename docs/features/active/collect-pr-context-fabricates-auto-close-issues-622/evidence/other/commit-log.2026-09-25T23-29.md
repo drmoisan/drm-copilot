@@ -9,3 +9,4 @@ f61dfd9fa2916e6716bac2dbb9150e2e77827140 feat(pr-context): add shared issue-refe
 a79d30e08028cc93976624309cd780af79b23aea test(pr-context): cover autoclose selection and invert JIRA extraction tests (#622)
 67b71d217093b2a2ead1e6e0abc2f5f3ebf82e67 test(pr-context): cover TypeScript autoclose selection and builders (#622)
 f93b373313fc9c37e4094474e50e0fdaed56a1c9 docs(bug): record final QA evidence for #622
+57490e0c215cfca64fcb7794337c3487eaae6593 docs(bug): record scope and hermeticity evidence for #622
