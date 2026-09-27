@@ -8,6 +8,13 @@ The BEFORE tests re-derive those values with the unchanged contention relation
 and assert that strict scheduling (the conflict_tolerance key absent, or set to
 tolerance 0) reproduces the detected edge set and its cohort coloring exactly.
 
+Each fixture also carries an AFTER section: the committed truth table (with
+write-intent extraction and the committed conflict_tolerance) and the edges,
+tolerated overlaps, and cohorts derived by normalizing every recorded radius
+with that table and scheduling the run with the integration-cost edge rule. The
+AFTER tests re-derive those values and assert that the AFTER edges are a subset
+of the BEFORE edges.
+
 Every value is read from the committed fixtures; no test reads a remote ref, a
 generated build directory, or a temporary file, and no external process is
 started.
@@ -25,9 +32,13 @@ import pytest
 from scripts.dev_tools._blast_radius_conflicts import conflicts
 from scripts.dev_tools._blast_radius_scheduling import (
     SchedulingItem,
+    SchedulingResult,
     schedule_conflict_edges,
 )
-from scripts.dev_tools.compute_blast_radius import BlastRadius
+from scripts.dev_tools.compute_blast_radius import (
+    BlastRadius,
+    normalize_declared_radius,
+)
 from scripts.dev_tools.parallel_cohort_computation import compute_cohorts
 
 if TYPE_CHECKING:
@@ -100,6 +111,31 @@ def pinned_pairs(before: Mapping[str, object]) -> list[tuple[int, int]]:
         (cast("int", edge["a"]), cast("int", edge["b"]))
         for edge in records(before["edges"])
     ]
+
+
+def after_scheduling(fixture: Mapping[str, object]) -> SchedulingResult:
+    """Schedule the run as the AFTER section was derived.
+
+    Every recorded radius is normalized with the AFTER truth table, then the
+    run is scheduled with that same table, each item keeping its recorded band.
+
+    Args:
+        fixture (Mapping[str, object]): One committed historical-run fixture.
+
+    Returns:
+        SchedulingResult: The AFTER edges and tolerated overlaps.
+    """
+    config = cast("Mapping[str, object]", section(fixture, "after")["config"])
+    # Re-apply the committed extraction rules to each recorded radius first.
+    items = [
+        SchedulingItem(
+            key=item.key,
+            radius=normalize_declared_radius(item.radius, config),
+            band=item.band,
+        )
+        for item in scheduling_items(fixture)
+    ]
+    return schedule_conflict_edges(items, config)
 
 
 @pytest.mark.parametrize("run", RUNS)
@@ -177,3 +213,54 @@ def test_before_cohorts_match_pins(run: str) -> None:
     assert cohorts == before["cohorts"], run
     assert len(cohorts) == before["cohort_count"], run
     assert max(len(cohort) for cohort in cohorts) == before["max_cohort_width"], run
+
+
+@pytest.mark.parametrize("run", RUNS)
+def test_after_edges_match_pins(run: str) -> None:
+    """Normalizing and scheduling with the AFTER table reproduces the pinned edges."""
+    fixture = load_run(run)
+    after = section(fixture, "after")
+
+    result = after_scheduling(fixture)
+
+    assert [edge.to_dict() for edge in result.edges] == after["edges"], run
+    assert len(result.edges) == after["edge_count"], run
+
+
+@pytest.mark.parametrize("run", RUNS)
+def test_after_tolerated_overlaps_match_pins(run: str) -> None:
+    """The AFTER derivation reproduces the pinned tolerated overlaps exactly."""
+    fixture = load_run(run)
+    after = section(fixture, "after")
+
+    result = after_scheduling(fixture)
+
+    assert [overlap.to_dict() for overlap in result.tolerated_overlaps] == after[
+        "tolerated_overlaps"
+    ], run
+
+
+@pytest.mark.parametrize("run", RUNS)
+def test_after_cohorts_match_pins(run: str) -> None:
+    """Coloring the AFTER edge set reproduces the pinned partition and widths."""
+    fixture = load_run(run)
+    after = section(fixture, "after")
+    keys = [item.key for item in scheduling_items(fixture)]
+    edges = after_scheduling(fixture).edges
+
+    cohorts = compute_cohorts(keys, [(edge.a, edge.b) for edge in edges])
+
+    assert cohorts == after["cohorts"], run
+    assert len(cohorts) == after["cohort_count"], run
+    assert max(len(cohort) for cohort in cohorts) == after["max_cohort_width"], run
+
+
+@pytest.mark.parametrize("run", RUNS)
+def test_after_edges_are_subset_of_before_edges(run: str) -> None:
+    """Every AFTER edge pair is also a pinned BEFORE edge pair."""
+    fixture = load_run(run)
+    before_pairs = set(pinned_pairs(section(fixture, "before")))
+
+    after_pairs = {(edge.a, edge.b) for edge in after_scheduling(fixture).edges}
+
+    assert after_pairs <= before_pairs, f"{run}: {sorted(after_pairs - before_pairs)}"

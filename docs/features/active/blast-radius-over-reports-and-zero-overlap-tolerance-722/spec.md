@@ -580,11 +580,11 @@ reporting done.
   width are computed independently by the Python and PowerShell runtimes; the two member sets are
   compared explicitly; the artifact records the commit, the commands, both member sets, and the
   comparison. Values are pinned into fixtures only after the two runtimes agree.
-- [ ] The three historical-run fixtures exist under the blast-radius fixture corpus's historical-runs
+- [x] The three historical-run fixtures exist under the blast-radius fixture corpus's historical-runs
   directory, each containing the recorded radii, per-item complexity band (or a default_band marker),
   the pre-change config, pinned radius sizes, and BEFORE and AFTER edges, cohorts, cohort count, and
   maximum cohort width.
-- [ ] A final evidence artifact under this feature folder's evidence tree reports, for each of the
+- [x] A final evidence artifact under this feature folder's evidence tree reports, for each of the
   three runs, BEFORE and AFTER edge count, cohort count, and maximum cohort width, including the
   AFTER values for the line-context rules W2, W3, and W5 derived from plan text at a pinned commit.
 - [ ] The historical-run tests in Python (test_blast_radius_historical_runs) and PowerShell

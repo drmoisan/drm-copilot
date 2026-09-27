@@ -1,0 +1,47 @@
+{
+  "mode": "after",
+  "source": "plan-text",
+  "runtime": "powershell",
+  "slug": "epic-655-followups",
+  "plan_home_commit": "76ff7f4809106371bf972f8a3ca77d10fadbe14f",
+  "base_sha": "beae3f021674e64fa6662097fe48a332d8da62b8",
+  "config": "config/blast-radius.json at HEAD 6f81b876df5dfb2334cf84c58b2dd408dbba5335",
+  "items": [
+    660,
+    663
+  ],
+  "item_records": [
+    {
+      "issue_num": 660,
+      "feature_folder": "docs/features/active/cleanup-worktrees-test-suite-blind-spots-660",
+      "plan_path": "docs/features/active/cleanup-worktrees-test-suite-blind-spots-660/plan.2026-09-25T08-25.md",
+      "spec_path": "SPEC-ABSENT",
+      "work_mode_line": "- Work Mode: minor-audit",
+      "band": null,
+      "radius_sizes": {
+        "paths": 8,
+        "modules": 0,
+        "shared_surfaces": 1,
+        "contracts": 0
+      }
+    },
+    {
+      "issue_num": 663,
+      "feature_folder": "docs/features/active/enforcement-gates-lack-epic-level-checkpoint-seam-663",
+      "plan_path": "docs/features/active/enforcement-gates-lack-epic-level-checkpoint-seam-663/plan.2026-09-25T08-25.md",
+      "spec_path": "docs/features/active/enforcement-gates-lack-epic-level-checkpoint-seam-663/spec.md",
+      "work_mode_line": null,
+      "band": null,
+      "radius_sizes": {
+        "paths": 139,
+        "modules": 2,
+        "shared_surfaces": 2,
+        "contracts": 3
+      }
+    }
+  ],
+  "edges": [],
+  "tolerated_overlaps": [],
+  "edge_count": 0,
+  "tolerated_count": 0
+}

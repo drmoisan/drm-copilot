@@ -10,7 +10,10 @@
     the edges with the unchanged relation Test-BlastRadiusConflict and assert
     that strict scheduling (the conflict_tolerance key absent, or set to
     tolerance 0) through Get-BlastRadiusConflictEdge reproduces the pinned edge
-    set with no tolerated overlap.
+    set with no tolerated overlap. The AFTER test normalizes every recorded
+    radius with the fixture's AFTER truth table through
+    Get-NormalizedDeclaredRadius, schedules the run with that table, and asserts
+    the pinned AFTER edges (with hard, cost, and benefit) and tolerated overlaps.
 
     Cohort partitions are asserted by the Python module only, because the
     PowerShell library has no cohort-coloring function; this file asserts the
@@ -108,6 +111,30 @@ Describe 'Blast-radius historical runs' {
                     Should -Be (Get-PinnedEdge -Before $before) -Because $Run
                 @($result['tolerated_overlaps']).Count | Should -Be 0 -Because $Run
             }
+        }
+
+        It "reproduces the pinned AFTER edges and tolerated overlaps for $($case['Run'])" -ForEach @($case) {
+            # Arrange: the AFTER truth table, and one scheduling item per recorded
+            # radius, normalized with that table and carrying its recorded band.
+            $fixture = Read-HistoricalRun -Path $RunPath
+            $after = $fixture['after']
+            $item = @($fixture['items'] | ForEach-Object {
+                    $normalized = Get-NormalizedDeclaredRadius -Radius $_['radius'] -Config $after['config']
+                    @{ key = [int]$_['issue_num']; radius = $normalized; band = $_['complexity_band'] }
+                })
+
+            # Act
+            $result = Get-BlastRadiusConflictEdge -Item $item -Config $after['config']
+
+            # Assert: the edges with their tolerated extra fields, then the
+            # tolerated overlaps with their full reason lists, in pinned order.
+            $edgeFormat = '{0}-{1}|{2}|{3}|{4}|{5}'
+            @($result['edges'] | ForEach-Object { $edgeFormat -f $_['a'], $_['b'], $_['reason'], $_['hard'], $_['cost'], $_['benefit'] }) |
+                Should -Be @($after['edges'] | ForEach-Object { $edgeFormat -f $_['a'], $_['b'], $_['reason'], $_['hard'], $_['cost'], $_['benefit'] }) -Because $Run
+            @($result['edges']).Count | Should -Be $after['edge_count'] -Because $Run
+            $toleratedFormat = '{0}-{1}|{2}|{3}|{4}'
+            @($result['tolerated_overlaps'] | ForEach-Object { $toleratedFormat -f $_['a'], $_['b'], (@($_['reasons']) -join ','), $_['cost'], $_['benefit'] }) |
+                Should -Be @($after['tolerated_overlaps'] | ForEach-Object { $toleratedFormat -f $_['a'], $_['b'], (@($_['reasons']) -join ','), $_['cost'], $_['benefit'] }) -Because $Run
         }
     }
 }

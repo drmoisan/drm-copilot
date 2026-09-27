@@ -1035,14 +1035,14 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 12 — Part B: Historical AFTER Derivation, Pins, and Re-derivation Evidence
 
-- [ ] [P12-T1] Historical AFTER from recorded radii, both runtimes: for each slug run script
+- [x] [P12-T1] Historical AFTER from recorded radii, both runtimes: for each slug run script
       historical-edges in after mode (contracts C2 and C3) over the P0 radii JSON and the committed
       self-hosted config, then script historical-compare (C4). Write
       FEATURE/evidence/other/historical-<slug>-after-python.TS.json and the PowerShell counterpart, and
       FEATURE/evidence/qa-gates/historical-after-recorded-radii.TS.md. Acceptance: every run prints
       MATCH; the artifact records per run the AFTER edges, tolerated overlaps, edge count, cohort
       partition, cohort count, and maximum cohort width.
-- [ ] [P12-T2] Historical AFTER from plan text (line-context rules W2, W3, and W5), both runtimes: for
+- [x] [P12-T2] Historical AFTER from plan text (line-context rules W2, W3, and W5), both runtimes: for
       each slug run script historical-plan-after (contract C7) in Python and in PowerShell, reading the
       manifest at the plan-home commit recorded by P0-T23 and the plan and spec text at BASE_SHA, then
       historical-compare. Write FEATURE/evidence/qa-gates/historical-after-plan-text.TS.md containing
@@ -1051,32 +1051,32 @@ the read-only check script A6 and a before-and-after hash comparison.
       run prints MATCH; items 528 (backlog-2026-09-26) and 660 (epic-655-followups) are recorded as
       SPEC-ABSENT. Stop condition: C7 reports a missing feature folder or a count of plan files other
       than one for any item; stop and report the item (no substitute source is used).
-- [ ] [P12-T3] Write the final evidence artifact FEATURE/evidence/qa-gates/historical-before-after-summary.TS.md:
+- [x] [P12-T3] Write the final evidence artifact FEATURE/evidence/qa-gates/historical-before-after-summary.TS.md:
       one table row per run with BEFORE, AFTER (recorded radii), and AFTER (plan text) edge count,
       cohort count, and maximum cohort width, citing the P0-T27, P12-T1, and P12-T2 artifacts.
       Acceptance: three rows, nine numeric columns each, every value copied from a cited artifact.
-- [ ] [P12-T4] Add the AFTER section to
+- [x] [P12-T4] Add the AFTER section to
       `tests/fixtures/blast_radius/historical-runs/followups-2026-09-27.json`,
       `tests/fixtures/blast_radius/historical-runs/backlog-2026-09-26.json`, and
       `tests/fixtures/blast_radius/historical-runs/epic-655-followups.json` by running script
       historical-fixture (C6) in after mode. Acceptance: each file's AFTER values equal the P12-T1
       artifact values for the run, and its BEFORE section is byte-identical to the Phase 3 content.
-- [ ] [P12-T5] Reset the Python batch budget (A8, -Kind python), then edit
+- [x] [P12-T5] Reset the Python batch budget (A8, -Kind python), then edit
       `tests/scripts/dev_tools/test_blast_radius_historical_runs.py` to add the AFTER tests of block B18.
       Write FEATURE/evidence/other/batch-budget-reset-p12a.TS.md. Acceptance: the file is at most 500
       lines and contains none of origin/, artifacts/, or worktree.
-- [ ] [P12-T6] Reset the PowerShell batch budget (A8, -Kind powershell), then edit
+- [x] [P12-T6] Reset the PowerShell batch budget (A8, -Kind powershell), then edit
       `tests/scripts/claude-lib/blast-radius/BlastRadius.HistoricalRuns.Tests.ps1` to add the AFTER It
       blocks of block B24. Write FEATURE/evidence/other/batch-budget-reset-p12b.TS.md. Acceptance: the
       file is at most 500 lines and contains none of origin/, artifacts/, or worktree.
-- [ ] [P12-T7] Run CMD-PY-TEST over the P12-T5 file and script pester-counts over the P12-T6 file.
+- [x] [P12-T7] Run CMD-PY-TEST over the P12-T5 file and script pester-counts over the P12-T6 file.
       Write FEATURE/evidence/regression-testing/historical-after-tests.TS.md. Acceptance: pytest exits 0
       with PASSED lines for every B18 test for all three runs; Pester prints FailedCount=0 and a
       PassedCount equal to its TotalCount.
-- [ ] [P12-T8] Run CMD-PY-BLACK, CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT over the P12-T5
+- [x] [P12-T8] Run CMD-PY-BLACK, CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT over the P12-T5
       file, and the P5-T14 PowerShell format and lint sequence over the P12-T6 file. Write
       FEATURE/evidence/qa-gates/phase12-static.TS.md. Acceptance: as in P1-T14 and P5-T14.
-- [ ] [P12-T9] Commit and push Phase 12 (check off AC-03 and AC-04 per the Preamble check-off rule;
+- [x] [P12-T9] Commit and push Phase 12 (check off AC-03 and AC-04 per the Preamble check-off rule;
       stage the three fixtures, the two test files, the FEATURE evidence directory, and FEATURE/spec.md;
       message "test(722): pin historical AFTER values"). Acceptance: all three git commands exit 0.
 - [ ] [P12-T10] Confirm the historical tests read only committed fixtures: run CMD-GIT-TRACKED for each
