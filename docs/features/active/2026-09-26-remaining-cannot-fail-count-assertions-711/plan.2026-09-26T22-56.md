@@ -483,7 +483,7 @@ each path.
 
 ### Phase 3 — Formatting & Linting (toolchain steps 1–2)
 
-- [ ] [P3-T1] Format the four changed files via the MCP tool (no shell text is used for the format
+- [x] [P3-T1] Format the four changed files via the MCP tool (no shell text is used for the format
       call itself, per the Shell-execution route note above). First, capture pre-format content hashes:
       run `sh <scratchpad>/run-ps.sh <scratchpad>/file-hashes.ps1 tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1 tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1 tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1 tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1`
       and record the four `Hash=` lines. Then call `mcp__drm-copilot__run_poshqc_format` with
@@ -503,7 +503,7 @@ each path.
       this toolchain loop (P3-T1 → P3-T2 → Phase 4) from P3-T1 for that file before continuing. Write
       `.../evidence/qa-gates/format-4-files.<timestamp>.md` recording the pre-hashes, the call
       disposition, the post-hashes, and the restart decision.
-- [ ] [P3-T2] Analyze the same four files via the MCP tool: call
+- [x] [P3-T2] Analyze the same four files via the MCP tool: call
       `mcp__drm-copilot__run_poshqc_analyze` with the same `workspace_root` and `scan_folders` as
       P3-T1. `Invoke-PoshQCAnalyze` (the function this MCP tool wraps) is read-only — it does not
       rewrite tracked source — and throws `"PSScriptAnalyzer reported N issue(s)."` on any finding, or
