@@ -270,7 +270,7 @@ in: `gitdir: C:/fixture-repo/.git/worktrees/wt_drive`
 
 ### Phase 0 — Policy Reads, Base Anchor, Edit-Site Detection, and Baseline Capture
 
-- [ ] [P0-T1] Record the base anchor in `<FEATURE>/evidence/baseline/base-anchor.<ts>.md`: run
+- [x] [P0-T1] Record the base anchor in `<FEATURE>/evidence/baseline/base-anchor.<ts>.md`: run
   `git fetch origin main`, `git rev-parse HEAD`, `git merge-base HEAD origin/main`, and
   `git diff --exit-code --stat <MERGE_BASE> HEAD -- scripts/ tests/ .claude/skills/ extensions/`
   (the third command's printed SHA is `<MERGE_BASE>` for the rest of the plan). Acceptance: the
@@ -278,7 +278,7 @@ in: `gitdir: C:/fixture-repo/.git/worktrees/wt_drive`
   `EXIT_CODE: 0` and empty output (the branch carries no code, test, or skill change relative
   to the merge base; docs-only commits under `<FEATURE>/` are expected). Any other result
   stops the plan (BLOCKED, returned to the planner).
-- [ ] [P0-T2] Read policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md`:
+- [x] [P0-T2] Read policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md`:
   `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`,
   then the language rule `.claude/rules/shell.md`, then the supplementary rules
   `.claude/rules/quality-tiers.md`, `.claude/rules/self-explanatory-code-commenting.md`,
@@ -286,16 +286,16 @@ in: `gitdir: C:/fixture-repo/.git/worktrees/wt_drive`
   `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` and
   `.claude/skills/acceptance-criteria-tracking/SKILL.md`. Acceptance: all ten files read in
   that order; no file edited.
-- [ ] [P0-T3] Write `<FEATURE>/evidence/baseline/phase0-instructions-read.md` with `Timestamp:`,
+- [x] [P0-T3] Write `<FEATURE>/evidence/baseline/phase0-instructions-read.md` with `Timestamp:`,
   `Policy Order:` (the P0-T2 order), and the explicit list of the ten files read. Acceptance:
   the file exists with all three fields and ten listed paths.
-- [ ] [P0-T4] Record the quality-tier assumption in `<FEATURE>/evidence/baseline/quality-tier.<ts>.md`
+- [x] [P0-T4] Record the quality-tier assumption in `<FEATURE>/evidence/baseline/quality-tier.<ts>.md`
   with `ExpectedExitCode: 1`: run `test -e quality-tiers.yml`. Acceptance: `EXIT_CODE: 1` (the
   file is absent), and the artifact states `Tier: T4 (assumed per spec.md D5; dev tooling)` for
   `scripts/bash/cleanup_worktrees_scan_helper.sh`. If the command exits 0 (the file now exists),
   record the tier it assigns to `scripts/`; if that tier is T1 or T2, stop the plan (BLOCKED,
   returned to the planner, because property-test obligations would apply).
-- [ ] [P0-T5] Edit-site detection for `scripts/bash/cleanup_worktrees_scan_helper.sh` and
+- [x] [P0-T5] Edit-site detection for `scripts/bash/cleanup_worktrees_scan_helper.sh` and
   `tests/shell/test_cleanup_worktrees_scan_helper.bats` into
   `<FEATURE>/evidence/baseline/edit-site-detection.<ts>.md`. Run, each with its own
   `Command:`/`EXIT_CODE:` pair and in this order: first
@@ -320,7 +320,7 @@ in: `gitdir: C:/fixture-repo/.git/worktrees/wt_drive`
   `MAIN-SIDE-ANCHOR-CHANGED: <token>`; the branch-side edit proceeds and the conflict is
   resolved at rebase time by the orchestrator, with the anchors re-checked there. When any
   branch-side count is not `1`, stop the plan (BLOCKED, returned to the planner).
-- [ ] [P0-T6] Absence detection for the new names in `scripts/bash/cleanup_worktrees_scan_helper.sh`
+- [x] [P0-T6] Absence detection for the new names in `scripts/bash/cleanup_worktrees_scan_helper.sh`
   and `tests/shell/test_cleanup_worktrees_scan_helper.bats`, each command in its own artifact
   with `ExpectedExitCode: 1`:
   `grep -n -e 'scan_helper_is_absolute_path' -e 'scan_helper_target_present' scripts/bash/cleanup_worktrees_scan_helper.sh tests/shell/test_cleanup_worktrees_scan_helper.bats`
@@ -331,39 +331,39 @@ in: `gitdir: C:/fixture-repo/.git/worktrees/wt_drive`
   `<FEATURE>/evidence/baseline/fixture-root-absent.<ts>.md`. Acceptance: each command prints
   nothing and exits 1. Any other result means a sibling or earlier run already introduced
   these names; stop the plan (BLOCKED, returned to the planner).
-- [ ] [P0-T7] Record tool availability in `<FEATURE>/evidence/baseline/tool-versions.<ts>.md`:
+- [x] [P0-T7] Record tool availability in `<FEATURE>/evidence/baseline/tool-versions.<ts>.md`:
   run `shfmt --version`, `shellcheck --version`, `npx --yes bats --version`, and `gh version`
   (the subcommand form; the flag form is refused by a PreToolUse hook), each with its own
   `Command:`/`EXIT_CODE:` pair. Acceptance: each version string recorded;
   `npx --yes bats --version` prints a line beginning `Bats `. If bats cannot be resolved through
   npx, record the output verbatim; every later local bats step then uses the CI fallback
   stated in P1-T5.
-- [ ] [P0-T8] Baseline format step on `scripts/bash/cleanup_worktrees_scan_helper.sh`: run
+- [x] [P0-T8] Baseline format step on `scripts/bash/cleanup_worktrees_scan_helper.sh`: run
   `shfmt -d scripts/bash/cleanup_worktrees_scan_helper.sh` and write
   `<FEATURE>/evidence/baseline/shfmt-diff.<ts>.md`. Acceptance: the artifact records
   `EXIT_CODE:` and, in `Output Summary:`, either `no diff printed` or the verbatim diff (a
   pre-existing diff is recorded, not fixed, here).
-- [ ] [P0-T9] Baseline repo-wide check step via `scripts/bash/shell-qc.sh`: run
+- [x] [P0-T9] Baseline repo-wide check step via `scripts/bash/shell-qc.sh`: run
   `sh scripts/bash/shell-qc.sh check` and write `<FEATURE>/evidence/baseline/shell-qc-check.<ts>.md`.
   Acceptance: the artifact records `EXIT_CODE:` and every diagnostic line verbatim, and states
   `LOCAL-DRIFT: NONE` when the run prints nothing and exits 0, or
   `LOCAL-DRIFT: PRESENT` with the list of files named by any shfmt diff otherwise (local shfmt
   and shellcheck versions differ from CI; see P4-T1 for the consequence).
-- [ ] [P0-T10] Baseline syntax step (bash has no type checker; `.claude/rules/shell.md` step 3):
+- [x] [P0-T10] Baseline syntax step (bash has no type checker; `.claude/rules/shell.md` step 3):
   run `sh -n scripts/bash/cleanup_worktrees_scan_helper.sh` and write
   `<FEATURE>/evidence/baseline/syntax-check.<ts>.md`. Acceptance: `EXIT_CODE: 0`, no output.
-- [ ] [P0-T11] Baseline local test step for `tests/shell/test_cleanup_worktrees_scan_helper.bats`:
+- [x] [P0-T11] Baseline local test step for `tests/shell/test_cleanup_worktrees_scan_helper.bats`:
   run `npx --yes bats tests/shell/test_cleanup_worktrees_scan_helper.bats` and write
   `<FEATURE>/evidence/baseline/bats-scan-helper.<ts>.md`. Acceptance: the artifact records the
   full TAP output, including a `1..N` line and the line `ok <n> scan-dirs emits has_gitfile/target_exists/size for each candidate directory`;
   the number of `not ok` lines is recorded (the baseline failure set, expected empty).
-- [ ] [P0-T12] Baseline local test step for `tests/shell/test_cleanup_worktrees_report_records.bats`
+- [x] [P0-T12] Baseline local test step for `tests/shell/test_cleanup_worktrees_report_records.bats`
   and `tests/shell/test_cleanup_worktrees_scan_seam.bats`: run
   `npx --yes bats tests/shell/test_cleanup_worktrees_report_records.bats tests/shell/test_cleanup_worktrees_scan_seam.bats`
   and write `<FEATURE>/evidence/baseline/bats-report-records.<ts>.md`. Acceptance: the artifact
   records the full TAP output with a `1..N` line and the names of any `not ok` tests (the
   baseline failure set, expected empty).
-- [ ] [P0-T13] Baseline CI coverage via `.github/workflows/_shell-coverage.yml`: push the branch
+- [x] [P0-T13] Baseline CI coverage via `.github/workflows/_shell-coverage.yml`: push the branch
   at its current HEAD with `git push -u origin bug/cleanup-report-registration-lost-false-positive-706`
   (no force), record the pushed SHA and the dispatch time (UTC), dispatch
   `gh workflow run _shell-coverage.yml --ref bug/cleanup-report-registration-lost-false-positive-706`,
@@ -387,7 +387,7 @@ in: `gitdir: C:/fixture-repo/.git/worktrees/wt_drive`
   `gh run watch` pair, still record the CI baseline
   failure set, and mark the coverage baseline remediation-required (the plan outcome cannot be
   PASS without a numeric baseline).
-- [ ] [P0-T14] Baseline per-file coverage for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
+- [x] [P0-T14] Baseline per-file coverage for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
   `<FEATURE>/evidence/baseline/kcov-per-file.<ts>.md`: run
   `gh run download <RUN_ID> --name shell-coverage --dir <session-scratchpad>/kcov-baseline-706`
   (baseline `<RUN_ID>` from P0-T13), then, on the `cov.xml` at the root of that directory (or
@@ -404,7 +404,7 @@ in: `gitdir: C:/fixture-repo/.git/worktrees/wt_drive`
   has no such entry; no absolute path is copied into the artifact. When the P0-T13 run uploaded
   no `shell-coverage` artifact (the upload step runs only after a successful test step), record
   the `gh run download` output verbatim and mark the per-file baseline remediation-required.
-- [ ] [P0-T15] Baseline line counts for `scripts/bash/cleanup_worktrees_scan_helper.sh` and
+- [x] [P0-T15] Baseline line counts for `scripts/bash/cleanup_worktrees_scan_helper.sh` and
   `tests/shell/test_cleanup_worktrees_scan_helper.bats`: run
   `wc -l scripts/bash/cleanup_worktrees_scan_helper.sh tests/shell/test_cleanup_worktrees_scan_helper.bats`
   and write `<FEATURE>/evidence/baseline/line-counts.<ts>.md`. Acceptance: both counts recorded
