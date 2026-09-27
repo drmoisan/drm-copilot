@@ -45,8 +45,9 @@ class ScriptRunner implements CommandRunner {
   private dispatch(args: readonly string[]): CommandResult {
     const isGh = args[0] === GH_PATH || args[0] === "gh";
     if (isGh) {
-      // gh is unavailable in this hermetic test (auth fails); the collector
-      // gracefully degrades and still writes both artifacts.
+      // These tests inject a resolver returning GH_PATH, so gh is resolved and
+      // `auth status` fails: the not-authenticated degradation path. The
+      // collector still writes both artifacts.
       return fail("offline");
     }
     const sub = args.slice(1).join(" ");
@@ -167,6 +168,7 @@ describe("collectPrContextServiceCall", () => {
       fileSystem: fs,
       workspaceRoot: ROOT,
       base: "main",
+      whichGh: () => GH_PATH,
     });
 
     // Assert: preserved tool/workspaceRoot/summary.
@@ -191,6 +193,7 @@ describe("collectPrContextServiceCall", () => {
       fileSystem: fs,
       workspaceRoot: ROOT,
       base: "main",
+      whichGh: () => GH_PATH,
     });
 
     // Assert: both files were written at the workspace-joined absolute paths.
@@ -212,6 +215,7 @@ describe("collectPrContextServiceCall", () => {
       fileSystem: fs,
       workspaceRoot: ROOT,
       base: "main",
+      whichGh: () => GH_PATH,
     });
 
     // Assert: one equality between the written set and the reported set, so the
@@ -233,6 +237,7 @@ describe("collectPrContextServiceCall", () => {
         fileSystem: fs,
         workspaceRoot: ROOT,
         base: "main",
+        whichGh: () => GH_PATH,
       }),
     ).toThrow(/Failed to verify PR context artifact/u);
   });
@@ -260,6 +265,7 @@ describe("collectPrContextServiceCall", () => {
         fileSystem: fs,
         workspaceRoot: ROOT,
         base: "main",
+        whichGh: () => GH_PATH,
       }),
     ).toThrow(/Failed to verify PR context artifact/u);
   });
@@ -278,13 +284,14 @@ describe("collectPrContextServiceCall", () => {
         fileSystem: fs,
         workspaceRoot: ROOT,
         base: "main",
+        whichGh: () => GH_PATH,
       }),
     ).toThrow(appendixPath);
   });
 
   it("writes both artifacts and succeeds when the GitHub CLI is unavailable", () => {
-    // Arrange: the scripted runner already reports gh as failing, which is the
-    // GitHub-CLI-unavailable degradation path.
+    // Arrange: the injected resolver returns GH_PATH and the scripted runner
+    // fails `auth status`, which is the not-authenticated degradation path.
     const fs = seedWorkspace();
 
     // Act
@@ -293,6 +300,7 @@ describe("collectPrContextServiceCall", () => {
       fileSystem: fs,
       workspaceRoot: ROOT,
       base: "main",
+      whichGh: () => GH_PATH,
     });
 
     // Assert: degradation is not failure. Both artifacts are written and the
@@ -312,6 +320,7 @@ describe("collectPrContextServiceCall", () => {
       fileSystem: fs,
       workspaceRoot: ROOT,
       base: "main",
+      whichGh: () => GH_PATH,
       log: (message) => logs.push(message),
     });
     // The two collector log lines carry the absolute workspace-joined paths,
