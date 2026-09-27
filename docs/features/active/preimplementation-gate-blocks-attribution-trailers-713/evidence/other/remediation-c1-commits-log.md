@@ -9,6 +9,7 @@ Branch: `bug/preimplementation-gate-blocks-attribution-trailers-713`. HEAD_SHA r
 | 0 | a30f52f6bc8a500bdae2db0928ab372a8c820951 | docs(evidence): record remediation cycle 1 baseline for issue #713 | yes (819369cc..a30f52f6) |
 | 1 | 755ba4094f49844290e7ab79e75fa0f30ab54860 | test(hooks): add typographic-quote deny rows for issue #713 | yes (a30f52f6..755ba409) |
 | 2 | 9d4775e04fcfbb7426b4b9ed3d2b256241ee2ccf | fix(hooks): deny typographic quotes in the preimplementation gate exemption | yes (755ba409..9d4775e0) |
+| 3 | 3e006ccdaed48f18d57c684f80049125c674d050 | docs(skills): note typographic-quote denial for issue #713 | yes (9d4775e0..3e006ccd) |
 
 ## [P0-T11] hook denial (plan rule 10: BLOCKED)
 
@@ -84,6 +85,25 @@ Commit: `git commit -F <SCRATCHPAD>/c1-phase2-commit.txt` (exit 0). Push: `git p
 
 Command: `git rev-parse HEAD`
 Output: `9d4775e04fcfbb7426b4b9ed3d2b256241ee2ccf`
+
+Command: `git log -1 --format=%B` (deviation X4)
+Final two lines of the message body:
+
+```text
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01P1iNMUJbD7Uf29ACDCXuYg
+```
+
+TRAILERS_PRESENT: True
+
+### Phase 3 ([P3-T8])
+
+Timestamp: 2026-09-27T05-17
+
+Commit: `git commit -F <SCRATCHPAD>/c1-phase3-commit.txt` (exit 0). Push: `git push origin bug/preimplementation-gate-blocks-attribution-trailers-713` (exit 0, `9d4775e0..3e006ccd`).
+
+Command: `git rev-parse HEAD`
+Output: `3e006ccdaed48f18d57c684f80049125c674d050`
 
 Command: `git log -1 --format=%B` (deviation X4)
 Final two lines of the message body:
