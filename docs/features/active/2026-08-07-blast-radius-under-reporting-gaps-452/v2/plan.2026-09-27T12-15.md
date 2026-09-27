@@ -248,7 +248,7 @@ AC numbers follow the source order of the v2 spec's Acceptance Criteria section.
           {
             "id": "g1-plan-poetry-lock", "gap": 1, "kind": "plan_pair", "direction": "must-conflict",
             "paired_case_id": "g1-plan-different-surfaces", "config_ref": "self_hosted",
-            "input": {"plan_a": "- [ ] [P1-T1] Edit {BT}poetry.lock{BT}.", "plan_b": "- [ ] [P1-T1] Edit {BT}poetry.lock{BT}.",
+            "input": {"plan_a": "- [x] [P1-T1] Edit {BT}poetry.lock{BT}.", "plan_b": "- [ ] [P1-T1] Edit {BT}poetry.lock{BT}.",
                       "feature_folder_a": "2026-09-27-regression-452-left", "feature_folder_b": "2026-09-27-regression-452-right", "computed_at": "2026-09-27T12-15"}
           },
           {
@@ -546,7 +546,7 @@ AC numbers follow the source order of the v2 spec's Acceptance Criteria section.
       ```
       Run `poetry run python <scratchpad>/compare_verdicts.py <scratchpad>/phase0-python-output.txt <scratchpad>/phase0-powershell-output.txt`. Acceptance: EXIT_CODE 0; `CASES_COMPARED=17 PYTHON_CASES=17 POWERSHELL_CASES=17`; 17 `COMPARE` lines; and a final `BRANCH=AGREE` or `BRANCH=DIVERGENT` line, which P1-T1 consumes. Write baseline/phase0-three-way-comparison.<timestamp>.md containing the full output and, for each case, whether all three agree.
 - [x] [P0-T34] Record the bundled-configuration subsets (spec Phase 0 requirement 5) from the `ROOT_SURFACES_SELF_HOSTED=` and `ROOT_SURFACES_BUNDLED=` lines of the P0-T31 and P0-T32 outputs. Acceptance: all four lines are recorded verbatim, and the self-hosted and bundled values are equal within each runtime and across runtimes (expected value package-lock.json,poetry.lock,quality-tiers.yml per research claims N1 and N2). An inequality is recorded and routed to P1-T1 as DIVERGENT. Write baseline/phase0-bundled-root-surfaces.<timestamp>.md.
-- [ ] [P0-T35] Commit and push Phase 0. Write the commit message to `<scratchpad>`/commit-phase0.txt (summary line "test(452): record v2 phase 0 baselines and runtime verification"). Run `git add docs/features/active/2026-08-07-blast-radius-under-reporting-gaps-452/v2`, `git status --porcelain`, `git commit -F <scratchpad>/commit-phase0.txt`, and `git push -u origin HEAD`. Acceptance: every command exits 0; the porcelain capture before the commit lists only paths under the v2 folder; after the push `git rev-parse HEAD` equals `git rev-parse @{upstream}`. Record the four outputs and the pushed SHA in regression-testing/phase0-commit.<timestamp>.md, then include that artifact in the next phase's commit.
+- [x] [P0-T35] Commit and push Phase 0. Write the commit message to `<scratchpad>`/commit-phase0.txt (summary line "test(452): record v2 phase 0 baselines and runtime verification"). Run `git add docs/features/active/2026-08-07-blast-radius-under-reporting-gaps-452/v2`, `git status --porcelain`, `git commit -F <scratchpad>/commit-phase0.txt`, and `git push -u origin HEAD`. Acceptance: every command exits 0; the porcelain capture before the commit lists only paths under the v2 folder; after the push `git rev-parse HEAD` equals `git rev-parse @{upstream}`. Record the four outputs and the pushed SHA in regression-testing/phase0-commit.<timestamp>.md, then include that artifact in the next phase's commit.
 
 ### Phase 1 — Conditional Production Correction Resolution
 
