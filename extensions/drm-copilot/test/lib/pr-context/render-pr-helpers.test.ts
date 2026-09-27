@@ -190,7 +190,7 @@ describe("buildCloseCandidatesSection", () => {
     expect(result).toContain("#3");
   });
 
-  it("merges author-asserted and referenced into author auto-close", () => {
+  it("keeps referenced issues out of author auto-close", () => {
     const result = buildCloseCandidatesSection({
       verified: [],
       authorAsserted: ["#1"],
@@ -198,8 +198,11 @@ describe("buildCloseCandidatesSection", () => {
       verifiedReason: "(none)",
       authorReason: "(found)",
     });
-    expect(result).toContain("#1");
-    expect(result).toContain("#2");
+    const lines = result.split("\n");
+    const authorIndex = lines.indexOf("Auto-close issues (author asserted):");
+    const referencedIndex = lines.indexOf("Referenced issues (detected):");
+    expect(lines[authorIndex + 1]).toBe("- #1");
+    expect(lines[referencedIndex + 1]).toBe("- #2");
   });
 });
 
