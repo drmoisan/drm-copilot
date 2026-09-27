@@ -11,14 +11,15 @@
 # Both are required and neither substitutes for the other. The direct driver is the only
 # one whose call sequence is short enough for the ordinal assertions in tests 1, 5, and 8
 # to be written over a specific occurrence. The wrapper driver is the only one that
-# observes the flag pre-pass at scripts/bash/cleanup-worktrees.sh:145, which is the line
-# that sets CLEANUP_WT_CLEAR_DISPOSABLE in production: with the direct driver alone, a
+# observes the flag pre-pass in main() (the block that sets CLEANUP_WT_CLEAR_DISPOSABLE=1)
+# in scripts/bash/cleanup-worktrees.sh: with the direct driver alone, a
 # wrapper that never set that variable would leave --clear-disposable permanently disarmed
 # and every test in this file would still pass.
 #
 # DRIVER, stated because the ordinal assertions in tests 1, 5, and 8 depend on it.
 # Tests 1 through 8 invoke delete_candidate DIRECTLY under CLEANUP_WT_CLEAR_DISPOSABLE,
-# in the form used at tests/shell/test_cleanup_worktrees_deletion.bats:47, and not
+# in the form used in the @test "a candidate whose re-verification flips is blocked
+# before any branch delete" (test_cleanup_worktrees_deletion.bats), and not
 # run_apply. Driving run_apply would add a further classify_branch pass ahead of all of
 # these and make an ordinal assertion written for the direct-driver case read the wrong
 # line. The third argument is the RECORDED state, which reverify_delete_eligible takes
@@ -36,7 +37,8 @@
 # THE SECOND OCCURRENCE IS THE SUBJECT. remove_worktree_safe issues `git worktree
 # remove` BEFORE it reads status, so the first occurrence in the log precedes the
 # clearing sequence entirely. A first-match idiom such as the `grep -n ... | head -n1`
-# at tests/shell/test_cleanup_worktrees_deletion.bats:47 would compare against a line
+# at the @test "a candidate whose re-verification flips is blocked before any branch
+# delete" (test_cleanup_worktrees_deletion.bats) would compare against a line
 # that precedes `reset --hard` and fail regardless of whether the implementation is
 # correct.
 #
