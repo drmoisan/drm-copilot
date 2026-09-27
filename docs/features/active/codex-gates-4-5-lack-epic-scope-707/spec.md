@@ -61,7 +61,7 @@
 
 ## Design Decisions
 
-Each decision states the options considered, the adopted option, and the rationale. D1-D11 carry over research section 5. D12-D15 are added to cover AC-2 reconciliation, the Codex-specific apply_patch leg, retained divergences, and the no-Python authority; D16 records the AC-25 wording amendment.
+Each decision states the options considered, the adopted option, and the rationale. D1-D11 carry over research section 5. D12-D15 are added to cover AC-2 reconciliation, the Codex-specific apply_patch leg, retained divergences, and the no-Python authority; D16 records the AC-25 wording amendment, and D17 records the AC-7 ready-fixture amendment.
 
 - **D1 — Resolver placement.**
   - Options: (A) a Codex-local, dot-sourced port in `.codex/hooks/`; (B) `Import-Module` of `.claude/lib/worktree-resolution/*.psm1` from `.codex/hooks`; (C) byte-identical copies of the four `.claude/lib/worktree-resolution` modules under a new `.codex/lib/`, loaded with `Import-Module`; (D) the codex-routing virtual-resource pattern (`VIRTUAL_RESOURCE_PAIRS` in the Python push-down script).
@@ -140,6 +140,11 @@ Each decision states the options considered, the adopted option, and the rationa
   - Options: (A) keep the AC-25 literal wording (no `python` or `poetry` token in any AC-18 file) and leave AC-25 permanently unchecked; (B) amend AC-25 to state what is verified: the parser-based `Get-PythonInvocationFinding` detector reports no interpreter invocation in the three Codex gate-4 files and their bundle copies, and the two new sibling files contain neither token.
   - Adopted: B. AC-25 is reworded accordingly and remains unchecked until its tests pass; the token check stated in D15 applies to the two new siblings, and the gate file is covered by the invocation detector.
   - Rationale: `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1:152` already carries the literal `poetry` inside the `Test-ImplementationCommand` classifier regex, which recognises a Python toolchain command rather than invoking one. D13 forbids editing that function, so the literal condition could never pass, and it tests a classifier pattern rather than an invocation. Decision recorded autonomously by the orchestrator after executor preflight round 1.
+
+- **D17 — AC-7 ready-fixture return value.**
+  - Options: (A) the Codex `Get-EpicCommandLegReadinessFailure` returns `$null` for the ready fixture, satisfying the original AC-7 literal; (B) the Codex port keeps `return ''`, matching `.claude/lib/worktree-resolution/EpicScopeReadiness.psm1:173`, and AC-7 is amended to expect an empty result.
+  - Adopted: B. AC-7 states that the ready fixture yields an empty result (the empty string, as the #663 predicate does; asserted with `Should -BeNullOrEmpty`) and remains unchecked until its tests pass.
+  - Rationale: D2 requires behaviour identical to #663, whose predicate returns the empty string when ready. The only caller tests the value with `-not $failure` (`.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1:123`, ported unchanged to the Codex epic-scope sibling), so `$null` and the empty string decide alike. Mirroring the precedent avoids an unrecorded divergence from #663. Decision recorded autonomously by the orchestrator after executor preflight round 2.
 
 ## Proposed Fix
 
@@ -252,7 +257,7 @@ Gate 4 — epic-scope allow and deny (issue AC-1)
 - [ ] AC-4: The same suite proves that, in epic scope, removing or invalidating each conjunct `route_id`, `epic_feature_folder`, `epic_manifest_path`, `integration_branch`, and `features` yields a `PREIMPLEMENTATION_GATE_BLOCKED` deny whose reason names that conjunct and `epic-orchestrator-state.json`.
 - [ ] AC-5: The same suite proves that a command `git -C <selector path> add <production path>` is decided by the mocked HEAD of the selector worktree, not the session root: allow when the selector HEAD matches `integration_branch` (with the other AC-1 conditions), and the unchanged single-feature deny when only the session-root HEAD matches.
 - [ ] AC-6: `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-resolution.Tests.ps1` proves `Resolve-EpicScopeCheckpoint` (Codex) returns each reason code `session-root-unresolved`, `epic-checkpoint-absent-or-unparseable`, `route_id`, `integration_branch`, `selector-unresolved`, `branch-mismatch`, and `epic-scope` for its corresponding fixture; that an unparseable or array-shaped checkpoint yields `IsEpicScope = $false` without throwing; that `CheckpointPath` is absolute and composed from the resolved root; and that `.git` as a file (gitdir pointer) and as a directory, detached HEAD, and `MERGE_HEAD` present/absent are each decided through the mocked primitives. `no-branch-signal` is either returned for its fixture or, if unreachable under the fixed head-match contract (D3), its omission is recorded in the suite header.
-- [ ] AC-7: The same resolution suite proves `Get-EpicCommandLegReadinessFailure` (Codex) returns the conjuncts `checkpoint-absent`, `route_id`, `epic_feature_folder`, `epic_manifest_path`, `integration_branch`, `features`, `merge-in-progress` in that precedence order for the Claude EpicScope suite's fixture literals, and `$null` for the ready fixture with a merge in progress.
+- [ ] AC-7: The same resolution suite proves `Get-EpicCommandLegReadinessFailure` (Codex) returns the conjuncts `checkpoint-absent`, `route_id`, `epic_feature_folder`, `epic_manifest_path`, `integration_branch`, `features`, `merge-in-progress` in that precedence order for the Claude EpicScope suite's fixture literals, and an empty result (the empty string, as the #663 predicate does; asserted with `Should -BeNullOrEmpty`) for the ready fixture with a merge in progress.
 
 Gate 5 — epic checkpoint edits not intercepted (issue AC-2)
 
