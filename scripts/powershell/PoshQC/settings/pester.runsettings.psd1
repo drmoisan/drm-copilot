@@ -145,6 +145,9 @@
             # table and the epic and parallel readiness predicates; registered so the new
             # production file stays in the coverage denominator per the Coverage Exclusion Policy.
             '.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1'
+            # Issue #707 added these two dot-sourced siblings for the Codex epic-scope command and path legs.
+            '.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1'
+            '.codex/hooks/enforce-orchestration-preimplementation-gate-epic-resolution.ps1'
             # Issue #415 remediation cycle 2 (R-COV): the detached-HEAD null-guard fix changed
             # these two Codex PreToolUse hooks. Both were absent from this list, so the changed
             # production surface was outside the coverage denominator. Measured here so the
