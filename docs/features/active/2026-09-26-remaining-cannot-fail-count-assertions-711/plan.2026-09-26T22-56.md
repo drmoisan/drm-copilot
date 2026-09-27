@@ -347,7 +347,7 @@ each path.
 
 ### Phase 1 — Fail-Before Evidence (spec D3 / AC-8)
 
-- [ ] [P1-T1] Confirm AC-1's existing "Non-vacuity floor helper" negative controls
+- [x] [P1-T1] Confirm AC-1's existing "Non-vacuity floor helper" negative controls
       (`BlastRadius.TruthTable.Tests.ps1`, `Context 'Non-vacuity floor helper'`, six `It` blocks
       already merged by #513) already pass, establishing that `Test-NonVacuousCollection` correctly
       discriminates `$null`, `@()`, an all-`$null` array, and non-empty inputs before AC-1's
@@ -357,7 +357,7 @@ each path.
       already-merged Context is expected to always pass independent of the AC-6 baseline-relative
       treatment above, which concerns the whole-file/whole-directory runs only). Write
       `.../evidence/regression-testing/ac1-existing-negative-controls.<timestamp>.md`.
-- [ ] [P1-T2] Run the shared diagnostic for AC-2/AC-3/AC-4 (spec D3): evaluate the old form
+- [x] [P1-T2] Run the shared diagnostic for AC-2/AC-3/AC-4 (spec D3): evaluate the old form
       (`@($x).Count -gt 0`) and the new form (`@($x | Where-Object { $null -ne $_ }).Count -gt 0`)
       against `$null` and `@()` — the two inputs the three producers' `return , $collection.ToArray()`
       contract makes unreachable in practice, per spec Root Cause Analysis. Run
