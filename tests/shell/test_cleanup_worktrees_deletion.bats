@@ -185,7 +185,11 @@ apply() { # apply <scenario-dir>
         bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; delete_candidate main '' MERGED_CLEAN"
     [ "$status" -eq 1 ]
     [[ "$output" == *"ACTION|delete|main|BLOCKED-PROTECTED-BASE"* ]]
-    [[ "$output" != *"merge-base"* ]]
+    # merge-base is never reached here: compute_protected already classifies main
+    # PROTECTED_CURRENT, so classify_branch returns before classify_ancestry runs.
+    # A guard moved after reverify_delete_eligible would instead make classify_branch's
+    # first call - rev-parse --abbrev-ref HEAD via compute_protected - reach $output.
+    [[ "$output" != *"rev-parse --abbrev-ref HEAD"* ]]
     [[ "$output" != *"worktree remove"* ]]
     [[ "$output" != *"branch -D"* ]]
 }
