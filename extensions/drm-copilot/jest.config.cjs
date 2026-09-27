@@ -42,6 +42,28 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #622: pr-context modules changed by the autoclose derivation fix.
+    // Per-file entries only; the map has no `global` key.
+    "./src/lib/pr-context/autoclose.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/models.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/feature-docs-parsers.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/render-feature-excerpts.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/render-pr-helpers.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/orchestrator-state-core.ts": {
       lines: 85,
       branches: 75,
