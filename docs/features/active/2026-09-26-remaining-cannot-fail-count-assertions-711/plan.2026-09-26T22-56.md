@@ -518,7 +518,7 @@ each path.
 
 ### Phase 4 — Testing, Line-Count Invariant, and Scope Check (AC-6, AC-7, AC-9)
 
-- [ ] [P4-T1] Final per-file Pester run for AC-6, compared against each file's own Phase 0 baseline
+- [x] [P4-T1] Final per-file Pester run for AC-6, compared against each file's own Phase 0 baseline
       (baseline-relative, per the note above — not a hard-coded `FailedCount=0`). Run, once per file:
       `sh <scratchpad>/run-ps.sh <scratchpad>/pester-counts.ps1 -Path 'tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1'`;
       `sh <scratchpad>/run-ps.sh <scratchpad>/pester-counts.ps1 -Path 'tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1'`;
@@ -536,7 +536,7 @@ each path.
       subset of that file's baseline `FAILED:` name set — no new failure name may appear. Write
       `.../evidence/regression-testing/final-per-file-pester-and-ac6-comparison.<timestamp>.md`,
       explicitly recording each file's baseline vs. final `TotalCount`/`FailedCount`/`FAILED:` list.
-- [ ] [P4-T2] Final per-directory Pester sweep, matching AC-6's literal "for each of the four affected
+- [x] [P4-T2] Final per-directory Pester sweep, matching AC-6's literal "for each of the four affected
       suites" wording, compared against each directory's own Phase 0 baseline. Run, once per
       directory:
       `sh <scratchpad>/run-ps.sh <scratchpad>/pester-counts.ps1 -Path 'tests/scripts/claude-lib/blast-radius'`;
@@ -552,7 +552,7 @@ each path.
       directory's baseline `FAILED:` name set. Write
       `.../evidence/regression-testing/final-per-directory-pester.<timestamp>.md`, explicitly recording
       each directory's baseline vs. final counts and `FAILED:` lists.
-- [ ] [P4-T3] Line-count invariant (AC-7). Run
+- [x] [P4-T3] Line-count invariant (AC-7). Run
       `sh <scratchpad>/run-ps.sh <scratchpad>/line-counts.ps1 tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1 tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1 tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1 tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1`.
       Acceptance: EXIT_CODE 0; all four printed `LineCount` values are `<= 500`; the
       `BlastRadius.TruthTable.Tests.ps1` value equals the P0-T14 baseline exactly (net zero); the
@@ -561,7 +561,7 @@ each path.
       the P0-T20 baseline exactly (net zero, satisfying the 23-line-headroom constraint); the
       `codex-pretooluse-integration.Tests.ps1` value equals the P0-T23 baseline plus 7 exactly. Write
       `.../evidence/qa-gates/final-line-count-invariant.<timestamp>.md`.
-- [ ] [P4-T4] Scope check (AC-9): confirm no production file under `.claude/lib`, `.claude/hooks`, or
+- [x] [P4-T4] Scope check (AC-9): confirm no production file under `.claude/lib`, `.claude/hooks`, or
       `scripts` was modified. Run, anchored to the SHA recorded in P0-T12:
       `git diff --name-status <base-sha> -- .` followed by `git status --porcelain` (the second command
       is the required companion per the name-listing-diff rule, since the diff alone is blind to
