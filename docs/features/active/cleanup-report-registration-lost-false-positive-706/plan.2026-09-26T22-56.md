@@ -471,31 +471,31 @@ every existing test are not modified.
 
 ### Phase 2 — Minimal Fix and Pass-After Run
 
-- [ ] [P2-T1] In `scripts/bash/cleanup_worktrees_scan_helper.sh`, insert reference block R1
+- [x] [P2-T1] In `scripts/bash/cleanup_worktrees_scan_helper.sh`, insert reference block R1
   (functions `scan_helper_is_absolute_path` and `scan_helper_target_present`) immediately above
   the line `scan_helper_gitdir_target_exists() {`, with one blank line between the R1 block and
   that line. Acceptance: `grep -n -e '^scan_helper_is_absolute_path() {' -e '^scan_helper_target_present() {' -e '^scan_helper_gitdir_target_exists() {' scripts/bash/cleanup_worktrees_scan_helper.sh`
   prints three lines in that order.
-- [ ] [P2-T2] In `scripts/bash/cleanup_worktrees_scan_helper.sh` `scan_helper_gitdir_target_exists`,
+- [x] [P2-T2] In `scripts/bash/cleanup_worktrees_scan_helper.sh` `scan_helper_gitdir_target_exists`,
   replace the line `	if [[ $target != /* ]]; then` with
   `	if ! scan_helper_is_absolute_path "$target"; then` (reference block R2). Acceptance:
   `grep -c -F 'if ! scan_helper_is_absolute_path "$target"; then' scripts/bash/cleanup_worktrees_scan_helper.sh`
   prints `1`.
-- [ ] [P2-T3] In `scripts/bash/cleanup_worktrees_scan_helper.sh` `scan_helper_gitdir_target_exists`,
+- [x] [P2-T3] In `scripts/bash/cleanup_worktrees_scan_helper.sh` `scan_helper_gitdir_target_exists`,
   replace the line `	if [[ -e $target ]]; then` with
   `	if scan_helper_target_present "$target"; then` (reference block R2). Acceptance:
   `grep -c -F 'if scan_helper_target_present "$target"; then' scripts/bash/cleanup_worktrees_scan_helper.sh`
   prints `1`.
-- [ ] [P2-T4] In the header of `scripts/bash/cleanup_worktrees_scan_helper.sh`, replace the line
+- [x] [P2-T4] In the header of `scripts/bash/cleanup_worktrees_scan_helper.sh`, replace the line
   `#                        else 0.` with the two lines of reference block R3. Acceptance:
   `grep -c -F 'drive letter followed by' scripts/bash/cleanup_worktrees_scan_helper.sh` prints
   `2` (one header line from R3 and one comment line inside R1).
-- [ ] [P2-T5] Verify the removed literals are gone from `scripts/bash/cleanup_worktrees_scan_helper.sh`,
+- [x] [P2-T5] Verify the removed literals are gone from `scripts/bash/cleanup_worktrees_scan_helper.sh`,
   in its own artifact `<FEATURE>/evidence/regression-testing/old-literals-absent.<ts>.md` with
   `ExpectedExitCode: 1`: run
   `grep -n -F -e 'if [[ $target != /* ]]; then' -e 'if [[ -e $target ]]; then' scripts/bash/cleanup_worktrees_scan_helper.sh`.
   Acceptance: prints nothing and exits 1.
-- [ ] [P2-T6] Pass-after run into `<FEATURE>/evidence/regression-testing/pass-after.<ts>.md`: run
+- [x] [P2-T6] Pass-after run into `<FEATURE>/evidence/regression-testing/pass-after.<ts>.md`: run
   `npx --yes bats tests/shell/test_cleanup_worktrees_scan_helper.bats`. Acceptance:
   `EXIT_CODE: 0`; zero `not ok` lines; the lines for test 1, test 2, and
   `scan-dirs emits has_gitfile/target_exists/size for each candidate directory` each begin
