@@ -368,36 +368,46 @@ on small, already-in-memory collections (at most tens of elements per site).
 
 ## Acceptance Criteria
 
-- [ ] AC-1: The `mandate_reads` non-emptiness assertion in
+- [x] AC-1: The `mandate_reads` non-emptiness assertion in
       `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` (current text
       `$entries.Count | Should -BeGreaterThan 0`) is replaced, same line, with
       `Test-NonVacuousCollection -Value $entries | Should -BeTrue`, and the resulting assertion
       fails for `$entries = @($null)` (the empty/absent-key case) and for `$entries = @()`, while
-      continuing to pass for the suite's existing non-empty `mandate_reads` data.
-- [ ] AC-2: The non-emptiness assertion in
+      continuing to pass for the suite's existing non-empty `mandate_reads` data. (P2-T1;
+      `evidence/regression-testing/ac1-before-after-token-check.2026-09-27T16-00.md`,
+      `evidence/regression-testing/ac1-existing-negative-controls.2026-09-27T15-45.md`)
+- [x] AC-2: The non-emptiness assertion in
       `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` (issue-cited
       line 457; current text `@($files).Count | Should -BeGreaterThan 0`) is replaced, same line,
       with `@($files | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0`, which
-      evaluates to a failing count of `0` for both `$files = $null` and `$files = @()`.
-- [ ] AC-3: The non-emptiness assertion in
+      evaluates to a failing count of `0` for both `$files = $null` and `$files = @()`. (P2-T2;
+      `evidence/regression-testing/ac2-before-after-token-check.2026-09-27T16-00.md`,
+      `evidence/regression-testing/ac2-ac3-ac4-inline-old-vs-new-form.2026-09-27T15-45.md`)
+- [x] AC-3: The non-emptiness assertion in
       `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1` guarding
       `Get-DiscoveryProfileValidationError`'s result (issue-cited line 155; current text
       `@($errors).Count | Should -BeGreaterThan 0`) is replaced, same line, with
       `@($errors | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0`, which evaluates
-      to a failing count of `0` for both `$errors = $null` and `$errors = @()`.
-- [ ] AC-4: The non-emptiness assertion in the same file guarding
+      to a failing count of `0` for both `$errors = $null` and `$errors = @()`. (P2-T3;
+      `evidence/regression-testing/ac3-before-after-token-check.2026-09-27T16-00.md`,
+      `evidence/regression-testing/ac2-ac3-ac4-inline-old-vs-new-form.2026-09-27T15-45.md`)
+- [x] AC-4: The non-emptiness assertion in the same file guarding
       `Get-DiscoverySchemaArtifactValidationError`'s result (issue-cited line 333; current text
       `@($errors).Count | Should -BeGreaterThan 0`) is replaced, same line, with
       `@($errors | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0`, which evaluates
-      to a failing count of `0` for both `$errors = $null` and `$errors = @()`.
-- [ ] AC-5: The non-emptiness assertion in
+      to a failing count of `0` for both `$errors = $null` and `$errors = @()`. (P2-T4;
+      `evidence/regression-testing/ac4-before-after-token-check.2026-09-27T16-00.md`,
+      `evidence/regression-testing/ac2-ac3-ac4-inline-old-vs-new-form.2026-09-27T15-45.md`)
+- [x] AC-5: The non-emptiness assertion in
       `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1` (issue-cited line 133;
       current text `@($script:Registrations).Count | Should -BeGreaterThan 0`) is replaced, same
       line, with
       `@($script:Registrations | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0`,
       which evaluates to a failing count of `0` for both `$script:Registrations = $null` and
       `$script:Registrations = @()`; `Get-CodexPreToolUseRegistration` itself is not modified (D5).
-- [ ] AC-6: `Invoke-Pester` reports zero failed tests for each of the four affected suites
+      (P2-T5, P2-T6; `evidence/regression-testing/ac5-assertion-before-after-token-check.2026-09-27T16-05.md`,
+      `evidence/regression-testing/ac5-new-context-it-pair.2026-09-27T16-05.md`)
+- [x] AC-6: `Invoke-Pester` reports zero failed tests for each of the four affected suites
       (`tests/scripts/claude-lib/blast-radius`, `tests/scripts/claude-runtime`,
       `tests/scripts/claude-lib/discovery-validation`, `tests/scripts/codex-hooks`) after the
       change, and each file's post-edit `It`-block count is not less than its own
@@ -405,24 +415,30 @@ on small, already-in-memory collections (at most tens of elements per site).
       equivalent `It`-declaration count) run directly before and after the edit for each file. Per
       D9, the specific per-file totals recorded in `research/research.2026-09-27T03-00.md` (23 / 27
       / 40 / 5) are contextual only and are not adopted as the spec-level baseline of record; each
-      execution captures its own pre-edit baseline.
-- [ ] AC-7: Each of the four files named under Files/modules to change is at or under 500 lines
+      execution captures its own pre-edit baseline. (P4-T1, P4-T2;
+      `evidence/regression-testing/final-per-file-pester-and-ac6-comparison.2026-09-27T16-30.md`,
+      `evidence/regression-testing/final-per-directory-pester.2026-09-27T16-35.md`)
+- [x] AC-7: Each of the four files named under Files/modules to change is at or under 500 lines
       after all edits. `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`
       is documented in research as exactly 500 lines pre-edit with zero headroom, so its AC-2 edit
       must be strictly same-line with no net line delta; `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1`
       has 23 lines of headroom pre-edit, and its AC-3/AC-4 edits must likewise be same-line with no
-      net line delta.
-- [ ] AC-8: Fail-before evidence exists for each site per D3: AC-1's existing in-file "Non-vacuity
+      net line delta. (P4-T3; `evidence/qa-gates/final-line-count-invariant.2026-09-27T16-35.md`)
+- [x] AC-8: Fail-before evidence exists for each site per D3: AC-1's existing in-file "Non-vacuity
       floor helper" negative controls plus a before/after content-token check; AC-5's new in-file
       `Context`/`It` pair proving `@($null).Count -gt 0` is `$true` while
       `@($null | Where-Object { $null -ne $_ }).Count -gt 0` is `$false`; and, for AC-2/AC-3/AC-4, an
       inline `pwsh -NoProfile -Command` expression (no script file, no temporary file) evaluating the
       old and new forms against `$null` and `@()`, with its output recorded as an evidence artifact
       under `docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711/evidence/regression-testing/`.
-- [ ] AC-9: No production file under `.claude/lib`, `.claude/hooks`, or `scripts` is modified by this
+      (P1-T1, P1-T2, P2-T6; `evidence/regression-testing/ac1-existing-negative-controls.2026-09-27T15-45.md`,
+      `evidence/regression-testing/ac2-ac3-ac4-inline-old-vs-new-form.2026-09-27T15-45.md`,
+      `evidence/regression-testing/ac5-new-context-it-pair.2026-09-27T16-05.md`)
+- [x] AC-9: No production file under `.claude/lib`, `.claude/hooks`, or `scripts` is modified by this
       change; a scope check (for example `git diff --stat` against the pre-change base commit) shows
       changes limited to the four named test files plus documents and evidence under
-      `docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711/`.
+      `docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711/`. (P4-T4;
+      `evidence/qa-gates/ac9-scope-check.2026-09-27T16-40.md`)
 
 ## Risks & Mitigations
 

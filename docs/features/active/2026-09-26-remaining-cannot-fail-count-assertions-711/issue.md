@@ -51,12 +51,12 @@ These locations still use the vacuous form (line numbers as recorded in the issu
 
 ## Acceptance Criteria
 
-- [ ] AC-1: The `mandate_reads` non-emptiness assertion in `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` fails when the guarded collection is empty or null.
-- [ ] AC-2: The non-emptiness assertion in `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` (issue-cited line 457) fails when the guarded collection is empty or null.
-- [ ] AC-3: The non-emptiness assertion in `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1` (issue-cited line 155) fails when the guarded collection is empty or null.
-- [ ] AC-4: The non-emptiness assertion in `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1` (issue-cited line 333) fails when the guarded collection is empty or null.
-- [ ] AC-5: The non-emptiness assertion in `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1` (issue-cited line 133) fails when the guarded collection is empty or null.
-- [ ] AC-6: All four affected Pester suites pass after the change, with no reduction in test count.
+- [x] AC-1: The `mandate_reads` non-emptiness assertion in `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1` fails when the guarded collection is empty or null.
+- [x] AC-2: The non-emptiness assertion in `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` (issue-cited line 457) fails when the guarded collection is empty or null.
+- [x] AC-3: The non-emptiness assertion in `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1` (issue-cited line 155) fails when the guarded collection is empty or null.
+- [x] AC-4: The non-emptiness assertion in `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1` (issue-cited line 333) fails when the guarded collection is empty or null.
+- [x] AC-5: The non-emptiness assertion in `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1` (issue-cited line 133) fails when the guarded collection is empty or null.
+- [x] AC-6: All four affected Pester suites pass after the change, with no reduction in test count.
 
 ## Source
 

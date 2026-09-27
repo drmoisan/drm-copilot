@@ -576,19 +576,19 @@ each path.
 
 ### Phase 5 — Documentation & AC Check-off
 
-- [ ] [P5-T1] Update
+- [x] [P5-T1] Update
       `docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711/spec.md`'s
       Acceptance Criteria section: change each of the nine `- [ ] AC-N:` checkboxes (AC-1 through AC-9)
       to `- [x] AC-N:`, and append, in parentheses after each item's existing text, a pointer to the
       evidence artifact(s) that satisfy it (per the Planner Internal Review Record's `AC-MAPPING`
       entries below). Acceptance: `spec.md`'s Acceptance Criteria section contains nine lines, each
       beginning `- [x] AC-`.
-- [ ] [P5-T2] Update
+- [x] [P5-T2] Update
       `docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711/issue.md`'s
       Acceptance Criteria section: change each of the six `- [ ] AC-N:` checkboxes (AC-1 through AC-6)
       to `- [x] AC-N:`. Acceptance: `issue.md`'s Acceptance Criteria section contains six lines, each
       beginning `- [x] AC-`.
-- [ ] [P5-T3] Write the final AC-traceability summary artifact,
+- [x] [P5-T3] Write the final AC-traceability summary artifact,
       `.../evidence/other/ac-traceability-summary.<timestamp>.md`, mapping each of AC-1 through AC-9
       to its implementing task ID(s) and evidence artifact path(s), by re-reading the updated
       `spec.md` Acceptance Criteria section and cross-checking every reference against the artifacts
