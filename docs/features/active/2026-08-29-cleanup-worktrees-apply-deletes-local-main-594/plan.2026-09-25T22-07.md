@@ -512,21 +512,21 @@ are not modified.
 
 ### Phase 4 — Comment, Help-Text, and Skill Documentation Corrections
 
-- [ ] [P4-T1] In `scripts/bash/cleanup_worktrees_lib.sh` `classify_branch` docstring, replace
+- [x] [P4-T1] In `scripts/bash/cleanup_worktrees_lib.sh` `classify_branch` docstring, replace
   the two lines `#   1. PROTECTED_CURRENT exclusion (branch-name OR worktree-path match; main`
   and `#      worktree always protected).` (lines 319-320 at BASE_SHA) with exactly two lines:
   `#   1. PROTECTED_CURRENT exclusion (branch-name OR worktree-path match; main worktree`
   and `#      and base branch CLEANUP_WT_BASE_BRANCH always protected).` (tab-indented as the
   surrounding lines). Acceptance: `wc -l scripts/bash/cleanup_worktrees_lib.sh` prints `496`
   and `grep -c -F 'CLEANUP_WT_BASE_BRANCH' scripts/bash/cleanup_worktrees_lib.sh` prints `1`.
-- [ ] [P4-T2] In `scripts/bash/cleanup_worktrees_report_records_lib.sh` `classify_all_branches`,
+- [x] [P4-T2] In `scripts/bash/cleanup_worktrees_report_records_lib.sh` `classify_all_branches`,
   replace the four comment lines 391-394 (BASE_SHA) with four lines stating that restricting
   the probe to the NOT_MERGED set bounds its cost at k*(k-1) probes, and that the base branch
   `main` never enters the probe set because `compute_protected` protects it by name
   (`CLEANUP_WT_BASE_BRANCH`) in every checkout topology, so `classify_branch` resolves it
   `PROTECTED_CURRENT` at rung 1. Acceptance: `grep -c -F 'needs no special' scripts/bash/cleanup_worktrees_report_records_lib.sh`
   prints `0` and the file's line count is unchanged at 476.
-- [ ] [P4-T3] In `scripts/bash/cleanup_worktrees_report_records_lib.sh`, replace the three
+- [x] [P4-T3] In `scripts/bash/cleanup_worktrees_report_records_lib.sh`, replace the three
   comment lines 427-429 (BASE_SHA, the "Phase 2: pairwise ancestry" comment) with three lines
   stating that a branch resolving anything other than NOT_MERGED is neither subject nor target,
   so `main`, which is `PROTECTED_CURRENT` by the unconditional base-branch protection in
@@ -534,7 +534,7 @@ are not modified.
   `grep -c -F 'needs no separate protection' scripts/bash/cleanup_worktrees_report_records_lib.sh`
   prints `0`, `grep -c -F 'CLEANUP_WT_BASE_BRANCH' scripts/bash/cleanup_worktrees_report_records_lib.sh`
   prints at least `1`, and `wc -l scripts/bash/cleanup_worktrees_report_records_lib.sh` prints `476`.
-- [ ] [P4-T4] In `scripts/bash/cleanup-worktrees.sh` `usage()` heredoc, insert after the
+- [x] [P4-T4] In `scripts/bash/cleanup-worktrees.sh` `usage()` heredoc, insert after the
   paragraph ending "hard git failure and never unlocks a destructive action." (line 122 at
   BASE_SHA) one empty line followed by exactly these four lines, leaving lines 119-122
   unchanged:
@@ -546,7 +546,7 @@ are not modified.
   state-list lines as `git show 0658f6945aa833c6960dc5bf8a43635fc346991f:scripts/bash/cleanup-worktrees.sh`
   piped to `sed -n '119,122p'`, and `wc -l scripts/bash/cleanup-worktrees.sh` prints `234`
   (229 plus five).
-- [ ] [P4-T5] In `.claude/skills/cleanup-merged-worktrees/SKILL.md`, insert immediately after
+- [x] [P4-T5] In `.claude/skills/cleanup-merged-worktrees/SKILL.md`, insert immediately after
   line 527 (the line ending "and never for `PROTECTED_CURRENT`.") a new bullet consisting of
   exactly the six lines inside the fence below (the fence itself is not inserted):
 
@@ -563,10 +563,10 @@ are not modified.
   are indented by two spaces, matching the surrounding bullets. Acceptance: `grep -c -F 'BLOCKED-PROTECTED-BASE' .claude/skills/cleanup-merged-worktrees/SKILL.md`
   prints `1` and `grep -c -F 'Never delete the base branch' .claude/skills/cleanup-merged-worktrees/SKILL.md`
   prints `1`.
-- [ ] [P4-T6] Apply the P4-T5 insertion to `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
+- [x] [P4-T6] Apply the P4-T5 insertion to `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
   with the Edit tool (same old and new strings as P4-T5). Acceptance: the same two `grep -c -F` checks
   against the extension copy each print `1`.
-- [ ] [P4-T7] Commit the implementation (recorded in `<FEATURE>/evidence/other/commit-implementation.<ts>.md`)
+- [x] [P4-T7] Commit the implementation (recorded in `<FEATURE>/evidence/other/commit-implementation.<ts>.md`)
   before any verification or full-suite run, so the working tree is clean for
   `scripts/bash/cleanup_worktrees_lib.sh` (see Clean-tree precondition): write a commit message file in the session scratchpad (message per the
   commit-message skill, ending with the session's required trailer lines), then run
