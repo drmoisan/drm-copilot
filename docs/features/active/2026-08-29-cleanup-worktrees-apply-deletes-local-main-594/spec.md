@@ -318,7 +318,7 @@ After merge, running `--apply` in the live repository with a non-`main` branch c
 - [x] kcov line coverage is >= 85% for each of `scripts/bash/cleanup_worktrees_enumerate_lib.sh` and `scripts/bash/cleanup_worktrees_actions_lib.sh`, and every line added to `compute_protected` and `delete_candidate` is executed by at least one test (verified from the per-file `line-rate` and per-line hits in the merged kcov `cov.xml`, with the coverage evidence stored under `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/evidence/qa-gates/kcov/`).
 - [x] The new tests and scenario fixtures are independent of remote refs and CI checkout depth: they invoke git only through `CLEANUP_WT_GIT_BIN` pointing at `tests/fixtures/cleanup_worktrees/stub-bin/git`, and `rg -n 'origin/|/mnt/|[A-Za-z]:[\\/]|mktemp|artifacts/'` over the added test lines and the two new scenario directories returns no match.
 - [x] The new tests create no files outside the checked-in fixture tree and use no scratch git repository (verified by review of the added `@test` bodies containing no `git init`, `mktemp`, `BATS_TMPDIR`, `BATS_TEST_TMPDIR`, or output redirection to a file path).
-- [ ] The CI `_shell-coverage.yml` job for the pull request passes on `ubuntu-latest` with the default checkout depth.
+- [x] The CI `_shell-coverage.yml` job for the pull request passes on `ubuntu-latest` with the default checkout depth.
 
 ## Risks & Mitigations
 
