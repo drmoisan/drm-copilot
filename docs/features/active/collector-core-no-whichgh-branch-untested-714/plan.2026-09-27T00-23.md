@@ -3,42 +3,128 @@
 - **Issue:** #714
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-27T00-23
-- **Status:** Draft
-- **Version:** 0.1
+- **Last Updated:** 2026-09-27T02-15
+- **Status:** Ready for preflight
+- **Version:** 1.0
+- **Work mode:** full-bug (AC source: `spec.md` `## Acceptance Criteria` only; `user-story.md` not produced, per D6)
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+## Plan Conventions
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+- **Executor environment:** the executor's shell allowlist is `npx prettier *`, `npx eslint *`, `npx tsc *`, `npx jest *`, `git *`. It cannot run `npm run ...`, `node ...`, `pwsh`, `bash`, or `wsl`. Its cwd is the worktree root for every command below; every command is written to be run from that cwd. Non-shell tools (Read/Grep/Glob/Edit/Write) remain available for file inspection and evidence authoring and are not subject to the shell allowlist.
+- **No production file is written by this plan.** The only non-evidence file this plan creates is `extensions/drm-copilot/test/lib/pr-context/collector-core-default-resolver.test.ts` (Phase 1).
+- **Command forms (verified against the current tree; see the Planner Internal Review Record for citations):**
+  - Format (read-only check): `npx prettier --check "extensions/drm-copilot/src/**/*.ts" "extensions/drm-copilot/test/**/*.ts" "extensions/drm-copilot/*.json" "extensions/drm-copilot/*.cjs"`
+  - Lint: `npx eslint --no-error-on-unmatched-pattern --config extensions/drm-copilot/eslint.config.mjs extensions/drm-copilot/src extensions/drm-copilot/test`
+  - Type-check: `npx tsc -p extensions/drm-copilot/tsconfig.json --noEmit` (this tsconfig's `include` is `src/**/*.ts` only — pre-existing project scope, unchanged by this plan; `test/**/*.ts` is type-checked separately by `ts-jest` during the Jest run)
+  - Test with coverage: `npx jest --config extensions/drm-copilot/jest.config.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary` (equivalent to the extension's own `test:coverage` script, run from the repo root instead of `extensions/drm-copilot/`)
+  - Coverage artifact: `extensions/drm-copilot/coverage/lcov.info` (per `jest.config.cjs`'s `coverageDirectory: "<rootDir>/coverage"`, where `<rootDir>` resolves to the directory of the `--config` file)
+- **Anchor discipline:** every reference to the `whichGh === undefined` conditional locates it by that literal text at execution time (Phase 0, [P0-T7]), never by a fixed line number, per spec.md D5/Risk.
+- **Evidence paths:** all evidence this plan produces is written under `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/<kind>/`, per the canonical scheme. No `artifacts/baselines/`, `artifacts/qa/`, or similar non-canonical path is used anywhere in this plan.
+- **Restart rule:** if any Phase 3 step fails, or a step that runs in write mode changes a tracked file, restart the Final QC Loop at [P3-T1].
 
+---
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+### Phase 0 — Policy Reads and Baseline Capture
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+Language: TypeScript. No files are modified in this phase.
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#714-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+- [ ] [P0-T1] Read `CLAUDE.md` (repository root) in full. Acceptance: the Policy Compliance Reading Order and Architecture sections are confirmed present, informing the reading order used by [P0-T5].
+- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full. Acceptance: the Mandatory Toolchain Loop and File Size Limit sections are confirmed present.
+- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full. Acceptance: the Coverage Requirements, External Dependencies, and Test File Location sections are confirmed present.
+- [ ] [P0-T4] Read `.claude/rules/typescript.md` in full. Acceptance: the Toolchain and Testing Standards sections are confirmed present.
+- [ ] [P0-T5] Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/baseline/phase0-instructions-read.md` with `Timestamp:`, `Policy Order:` (a numbered list reproducing the four files read at [P0-T1]-[P0-T4], in that order), and an explicit bulleted list of the four file paths read. Acceptance: the artifact exists with all three required elements.
+- [ ] [P0-T6] Run `git status --porcelain` from the repo root. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/baseline/git-status-baseline.<ISO8601>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (empty output means a clean tree; otherwise list every reported path). Acceptance: the artifact exists; a non-empty result is recorded verbatim rather than treated as a blocker.
+- [ ] [P0-T7] Search `extensions/drm-copilot/src/lib/pr-context/collector-core.ts` for the single-line, non-interpolated literal `whichGh === undefined` and record the 1-based line number of the one match. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/baseline/anchor-line.<ISO8601>.md` with `Timestamp:`, the matched line's exact text, and its line number. Acceptance: exactly one match exists in the file; every later task in this plan that reads `BRDA:` entries for this conditional uses the line number recorded here, not a fixed line number.
+- [ ] [P0-T8] Run `npx prettier --check "extensions/drm-copilot/src/**/*.ts" "extensions/drm-copilot/test/**/*.ts" "extensions/drm-copilot/*.json" "extensions/drm-copilot/*.cjs"` from the repo root. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/baseline/typescript-prettier.<ISO8601>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: exit 0 recorded together with the literal `All matched files use Prettier code style!` (the previously observed success-case output for this exact check form in this repository's own evidence), or the count of unformatted files if the exit code is non-zero.
+- [ ] [P0-T9] Run `npx eslint --no-error-on-unmatched-pattern --config extensions/drm-copilot/eslint.config.mjs extensions/drm-copilot/src extensions/drm-copilot/test` from the repo root. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/baseline/typescript-lint.<ISO8601>.md` with the four required fields. Acceptance: exit 0 recorded together with no stdout/stderr output (the previously observed success-case output for this lint invocation form in this repository's own evidence), or the reported error/warning counts if non-zero.
+- [ ] [P0-T10] Run `npx tsc -p extensions/drm-copilot/tsconfig.json --noEmit` from the repo root. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/baseline/typescript-typecheck.<ISO8601>.md` with the four required fields. Acceptance: exit 0 recorded together with no diagnostic output and no `Found N errors` summary line (the previously observed success-case output for this exact invocation form in this repository's own evidence), or the diagnostic count if non-zero.
+- [ ] [P0-T11] Run `npx jest --config extensions/drm-copilot/jest.config.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary` from the repo root. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/baseline/typescript-test-coverage.<ISO8601>.md` with the four required fields, including the `Test Suites:`/`Tests:` summary line and the aggregate `Lines`/`Branches` percentages reported by the `text-summary` reporter. Acceptance: exit 0; numeric aggregate line and branch coverage percentages recorded (not placeholders).
+- [ ] [P0-T12] Read `extensions/drm-copilot/coverage/lcov.info` produced by [P0-T11]. Locate the `SF:` record ending in `src/lib/pr-context/collector-core.ts` and, within it, the two `BRDA:` entries whose line number matches [P0-T7]'s anchor line. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/baseline/collector-core-coverage-baseline.<ISO8601>.md` with `Timestamp:`, the file's `LF`/`LH` and `BRF`/`BRH` totals, the derived line-coverage and branch-coverage percentages, and the two raw `BRDA:` hit counts for the anchor line. Acceptance: exactly one of the two anchor-line `BRDA:` hit counts is `0`, confirming the issue's reported gap on this tree.
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+---
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+### Phase 1 — Regression Test Addition
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+Language: TypeScript. File budget: 1 new test file. No production file is modified.
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+- [ ] [P1-T1] Write the fail-before exception dossier `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/regression-testing/fail-before-exception.<ISO8601>.md` with `Timestamp:`, `WhyFailingRunImpossible:` (this is a coverage-only gap, not a behavioral defect: `collectPrContext`'s existing, unmodified production code already takes the correct branch when `whichGh` is omitted — `GhClient`'s own default resolver `() => undefined` already runs and `hydrateAvailability()` already reports the "not installed" message; there is no pre-existing incorrect behavior for a new test to fail against), and an alternative-proof section citing [P0-T12]'s artifact path and quoting its recorded `0` `BRDA:` hit count for the anchor line's untaken arm as the substitute evidence that the coverage gap is real. Acceptance: the artifact exists with all required fields; no fail-before test run is claimed anywhere in this plan.
+- [ ] [P1-T2] Create `extensions/drm-copilot/test/lib/pr-context/collector-core-default-resolver.test.ts` (new file). It must contain exactly one `describe("collectPrContext (whichGh option omitted)", ...)` block holding exactly one `it`, structured as Arrange-Act-Assert: **Arrange** — import `describe`, `expect`, `it` from `@jest/globals`; import `TreeFileSystem` from `./tree-file-system`; import `type CommandResult`, `type CommandRunner`, `type CommandRunOptions` from `../../../src/lib/subprocess-runner`; import `collectPrContext` from `../../../src/lib/pr-context/collector-core`; define `const ROOT = "/repo";`; define a local class implementing `CommandRunner` whose `run(args, options)` method appends the received `args` array to a `readonly calls: (readonly string[])[]` property and always returns `{ stdout: "", stderr: "", code: 0 }` regardless of `args`/`options`; construct `const fs = new TreeFileSystem();` and seed only `fs.addFile(\`${ROOT}/.git\`, "");`; construct the runner instance. **Act** — call `collectPrContext({ base: "main", head: "feature/x", repoRoot: ROOT, includeUntracked: false, fs, runner })`, with no `whichGh` property present anywhere in the object literal (never `whichGh: undefined`, which `exactOptionalPropertyTypes: true` rejects at compile time). **Assert** — `expect(result.ghAvailable).toBe(false);`; `expect(result.ghStatusOverride).toContain("GitHub CLI (gh) is not installed.");`; `expect(runner.calls.some((argv) => argv[0] === "gh")).toBe(false);`. No `jest.mock`, no `jest.spyOn`, no fake timers, and no `afterEach(() => { jest.resetAllMocks(); })` are used (only a hand-written fake class; no Jest mock APIs are invoked). The file is under 500 lines. Acceptance: the file exists at the exact path stated; it contains no `whichGh:` key anywhere inside the `collectPrContext(...)` call's argument object literal; it passes at [P2-T1].
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+---
+
+### Phase 2 — Verification
+
+Language: TypeScript. No files are modified in this phase.
+
+- [ ] [P2-T1] Run `npx jest --config extensions/drm-copilot/jest.config.cjs test/lib/pr-context/collector-core-default-resolver.test.ts` from the repo root, to run the new test in isolation. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/qa-gates/verify-new-test.<ISO8601>.md` with the four required fields. Acceptance: exit 0; `Output Summary:` records `Tests: 1 passed, 1 total` (the standard Jest summary line format, matching the form observed repeatedly in this repository's own evidence for this test runner).
+- [ ] [P2-T2] Run `npx jest --config extensions/drm-copilot/jest.config.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary` from the repo root (the full suite; identical command to [P0-T11]), to confirm the whole suite still passes with the new file added. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/qa-gates/verify-full-suite-coverage.<ISO8601>.md` with the four required fields, including the `Test Suites:`/`Tests:` summary line and the aggregate `Lines`/`Branches` percentages. Acceptance: exit 0; the recorded `Tests:` total is exactly one greater than the total recorded at [P0-T11].
+- [ ] [P2-T3] Read `extensions/drm-copilot/coverage/lcov.info` produced by [P2-T2]. Locate the same `SF:` record and anchor-line `BRDA:` entries identified at [P0-T12]. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/qa-gates/verify-collector-core-coverage.<ISO8601>.md` with `Timestamp:`, the file's updated `LF`/`LH`/`BRF`/`BRH`, the derived percentages, and the two anchor-line `BRDA:` hit counts. Acceptance: both anchor-line `BRDA:` hit counts are non-zero; the branch-coverage percentage is strictly greater than the [P0-T12] baseline; the line-coverage percentage is not less than the [P0-T12] baseline.
+
+---
+
+### Phase 3 — Final QC Loop
+
+Language: TypeScript. Full toolchain, one artifact per command step. Restart at [P3-T1] on any failure or tracked-file change.
+
+- [ ] [P3-T1] Run `npx prettier --check "extensions/drm-copilot/src/**/*.ts" "extensions/drm-copilot/test/**/*.ts" "extensions/drm-copilot/*.json" "extensions/drm-copilot/*.cjs"` from the repo root. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/qa-gates/final-typescript-prettier.<ISO8601>.md` with the four required fields. Acceptance: exit 0 together with the literal `All matched files use Prettier code style!`. If the exit code is non-zero: run `npx prettier --write` on the reported path(s), record `git status --porcelain -- extensions/drm-copilot/test/lib/pr-context/collector-core-default-resolver.test.ts` both immediately before and immediately after the write in the same artifact (the required before/after tree observation for this write-mode command), then restart this Final QC Loop at [P3-T1].
+- [ ] [P3-T2] Run `npx eslint --no-error-on-unmatched-pattern --config extensions/drm-copilot/eslint.config.mjs extensions/drm-copilot/src extensions/drm-copilot/test` from the repo root. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/qa-gates/final-typescript-lint.<ISO8601>.md` with the four required fields. Acceptance: exit 0 with no stdout/stderr output; on failure, restart this Final QC Loop at [P3-T1].
+- [ ] [P3-T3] Run `npx tsc -p extensions/drm-copilot/tsconfig.json --noEmit` from the repo root. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/qa-gates/final-typescript-typecheck.<ISO8601>.md` with the four required fields. Acceptance: exit 0 with no diagnostic output and no `Found N errors` summary line; on failure, restart this Final QC Loop at [P3-T1].
+- [ ] [P3-T4] Run `npx jest --config extensions/drm-copilot/jest.config.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary` from the repo root. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/qa-gates/final-typescript-test-coverage.<ISO8601>.md` with the four required fields, including the `Test Suites:`/`Tests:` summary line and the aggregate `Lines`/`Branches` percentages. Acceptance: exit 0; on failure, or if any prior step in this loop changed a tracked file, restart this Final QC Loop at [P3-T1].
+- [ ] [P3-T5] Read `extensions/drm-copilot/coverage/lcov.info` produced by [P3-T4]. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/qa-gates/final-collector-core-coverage.<ISO8601>.md` with `Timestamp:`, the file's `LF`/`LH`/`BRF`/`BRH`, the derived percentages, and the two anchor-line `BRDA:` hit counts. Acceptance: both anchor-line `BRDA:` hit counts are non-zero; the branch-coverage percentage is strictly greater than the [P0-T12] baseline; the line-coverage percentage is not less than the [P0-T12] baseline; both percentages meet or exceed the `jest.config.cjs` per-file `coverageThreshold` entry for `./src/lib/pr-context/collector-core.ts` (lines 85 / branches 75).
+
+---
+
+### Phase 4 — Coverage Delta, Acceptance Criteria Check-off, and Handoff
+
+- [ ] [P4-T1] Write the coverage-delta artifact `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/qa-gates/coverage-delta-collector-core.<ISO8601>.md` with `Timestamp:` and a table comparing [P0-T12] (baseline) against [P3-T5] (post-change) for `collector-core.ts`: `LF`/`LH`/line%, `BRF`/`BRH`/branch%, and both anchor-line `BRDA:` hit counts, for each of baseline and post-change. Acceptance: all six baseline values and all six post-change values are present as numbers (no placeholders); the narrative states the branch-coverage increase and confirms no line-coverage regression.
+- [ ] [P4-T2] Run `git add extensions/drm-copilot/test/lib/pr-context/collector-core-default-resolver.test.ts`, then run `git diff --cached HEAD -- extensions/drm-copilot/test/lib/pr-context/collector-core-default-resolver.test.ts --name-status` and `git status --porcelain`, all from the repo root. Write `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/other/change-footprint.<ISO8601>.md` with `Timestamp:`, all three commands, their outputs, and their `EXIT_CODE:` values. Acceptance: the `--name-status` output shows exactly one entry, `A`, for the new test file; `git status --porcelain` shows no other staged or unstaged tracked-file change; no path under `extensions/drm-copilot/src/` appears in either output.
+- [ ] [P4-T3] In `docs/features/active/collector-core-no-whichgh-branch-untested-714/spec.md`'s `## Acceptance Criteria` section, check off the first item (a new Jest test calls `collectPrContext` with no `whichGh` option) by changing `- [ ]` to `- [x]`, citing [P1-T2] and [P2-T1] as evidence in an adjacent note if the section supports one. Acceptance: the checkbox is changed only if both cited artifacts show the test exists and passes.
+- [ ] [P4-T4] In the same section, check off the second item (both `BRDA:` arms of the ternary report non-zero hits). Acceptance: the checkbox is changed only if [P2-T3] or [P3-T5] records both anchor-line hit counts as non-zero.
+- [ ] [P4-T5] In the same section, check off the third item (branch coverage rises above the Phase 0 baseline; line coverage does not regress). Acceptance: the checkbox is changed only if [P4-T1]'s coverage-delta artifact shows a strict branch-coverage increase and no line-coverage decrease.
+- [ ] [P4-T6] In the same section, check off the fourth item (the new test is deterministic: no real `gh` process, no real filesystem, no PATH/`origin/main`/gitignored-state dependency). Acceptance: the checkbox is changed only if [P1-T2]'s file contains no `jest.mock`, no real filesystem or process API, and no reference to `origin/main`, `process.env.PATH`, or any path under `artifacts/orchestration/`, confirmed by re-reading the committed file at check-off time.
+- [ ] [P4-T7] In the same section, check off the fifth item (the full TypeScript toolchain passes, with no production code changes). Acceptance: the checkbox is changed only if [P3-T1] through [P3-T4] all recorded exit 0 in the same Final QC Loop pass, and [P4-T2] confirms no path under `extensions/drm-copilot/src/` changed.
+- [ ] [P4-T8] Write the acceptance-criteria status summary `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/other/acceptance-criteria-status.<ISO8601>.md` with `Timestamp:`, `Source: spec.md`, `Total: 5`, the checked count, the remaining count, and the list of any remaining unchecked items. Acceptance: the artifact exists with all fields; the checked count matches the number of `- [x]` items actually present in `spec.md` at the time this artifact is written.
+- [ ] [P4-T9] Write the handoff record `docs/features/active/collector-core-no-whichgh-branch-untested-714/evidence/other/handoff.<ISO8601>.md` with `Timestamp:` stating: PR creation and CI monitoring for issue #714 are performed later by the parallel orchestrator; this plan's execution scope ends at a clean, fully-evidenced working tree containing exactly one new test file; no `gh pr create` or CI-monitoring step is part of this plan. Acceptance: the artifact exists with the statement.
+
+---
+
+## Planner internal review record
+
+This record is written into the plan artifact so it travels with the plan. The same record is emitted in the planner's handoff message. It is a planner-side declaration and is not a substitute for executor preflight clearance.
+
+PLANNER-INTERNAL-REVIEW: PASS
+CITATION-TO-TREE: PASS
+AC-TRACEABILITY: PASS
+SCOPE-BOUNDARY: PASS
+
+CITATION: extensions/drm-copilot/src/lib/pr-context/collector-core.ts | line 135 `...(whichGh === undefined ? {} : { whichGh }),` inside the `new GhClient({...})` construction at lines 131-136; line 124 `const whichGh = options.whichGh;`
+CITATION: extensions/drm-copilot/src/lib/pr-context/gh-client-core.ts | lines 81-89 constructor (`whichGh = options.whichGh ?? (() => undefined)`, `this.ghPath = options.ghPath ?? whichGh() ?? undefined`); lines 141-146 `hydrateAvailability`'s `if (!this.ghPath)` early return setting `availabilityError = "GitHub CLI (gh) is not installed. Install from https://cli.github.com/."`; line 129-134 `ensureAvailable` throwing that message
+CITATION: extensions/drm-copilot/src/lib/pr-context/collector-core.ts | lines 139-144 the `try { gh.ensureAvailable(); } catch (exc) { ghAvailable = false; ghStatusOverride = \`GitHub CLI unavailable: ${errorMessage(exc)}\`; }` block, confirming `ghStatusOverride` contains the gh-client-core.ts literal as a substring
+CITATION: extensions/drm-copilot/src/lib/pr-context/git-client.ts | lines 89-95 `resolveRoot()` checks `fileSystem.exists(\`${cwd}/.git\`)` before any runner call, so seeding only a `.git` marker file in `TreeFileSystem` avoids a `git rev-parse --show-toplevel` invocation
+CITATION: extensions/drm-copilot/src/lib/subprocess-runner.ts | lines 38-40 `CommandRunner` interface (`run(args, options?): CommandResult`); lines 12-16 `CommandResult` shape (`stdout`, `stderr`, `code`)
+CITATION: extensions/drm-copilot/test/lib/pr-context/tree-file-system.ts | line 16 `export class TreeFileSystem implements FileSystem`; line 36 `addFile(path, content)` registers ancestor directories; line 62-65 `exists(path)`
+CITATION: extensions/drm-copilot/test/lib/pr-context/collector-core.test.ts | lines 1-9 the existing import pattern this plan's new file mirrors; every one of the file's `collectPrContext` call sites (lines 180, 207, 225, 319, 370, 404, 437, 460) supplies an explicit `whichGh` key, confirmed by direct read of the full file
+CITATION: extensions/drm-copilot/jest.config.cjs | line 18 `coverageReporters: ["lcov", "text-summary"]`; line 19 `coverageDirectory: "<rootDir>/coverage"`; lines 33-36 the per-file `coverageThreshold` entry for `./src/lib/pr-context/collector-core.ts` (`lines: 85, branches: 75`)
+CITATION: extensions/drm-copilot/run-jest.cjs | lines 21-32 confirms `node run-jest.cjs <args>` is functionally `jest --config jest.config.cjs <args>` (minus a prohibited-flag guard and a `--testPathPattern` rewrite this plan does not use), supporting the `npx jest --config extensions/drm-copilot/jest.config.cjs ...` repo-root-invocation form
+CITATION: extensions/drm-copilot/tsconfig.json | line 8 `"rootDir": "src"`; line 23 `"include": ["src/**/*.ts"]` (does not include `test/`, a pre-existing project scope this plan does not change)
+CITATION: extensions/drm-copilot/eslint.config.mjs | line 8 `files: ["src/**/*.ts", "test/**/*.ts"]`, patterns resolved relative to this config file's own directory regardless of invocation cwd
+CITATION: extensions/drm-copilot/package.json | line 207 `"format": "prettier --write ..."`; line 208 `"lint": "eslint --no-error-on-unmatched-pattern src test"`; line 209 `"typecheck": "tsc -p ./ --noEmit"`; line 212 `"test:coverage": "node run-jest.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary"`
+CITATION: docs/features/completed/2026-08-21-pretooluse-hooks-parse-flat-payload-and-always-allow-501/evidence/qa-gates/2026-08-22T19-16-both-named-tests-final.md | line 6-8 confirms `npx jest --config extensions/drm-copilot/jest.config.cjs <test-path>` run from the repo root previously exited 0 and printed the standard `Test Suites:`/`Tests:` summary
+CITATION: docs/features/active/2026-08-29-batch-budget-state-portability-596/evidence/qa-gates/typescript-typecheck-final.2026-08-29T23-07.md | line 45 confirms `npx tsc -p ./ --noEmit`'s observed success-case output is exit 0 with no diagnostic line and no `Found` summary line
+CITATION: docs/features/active/2026-08-29-batch-budget-state-portability-596/evidence/qa-gates/typescript-lint-final.2026-08-29T23-07.md | line 40 confirms `npx eslint --no-error-on-unmatched-pattern src test`'s observed success-case output is exit 0 with no stdout/stderr
+CITATION: docs/features/completed/2026-08-21-blast-radius-bundled-config-stale-skeleton-500/evidence/qa-gates/reviewer-toolchain-rerun.2026-08-22T02-58.md | line 24 confirms `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"` in `extensions/drm-copilot`'s observed success-case output is exit 0 with the literal `All matched files use Prettier code style!`
+CITATION: docs/features/archive/2026-03-11-expose-placeholder-commands-92/evidence/qa-gates/typescript-test.2026-03-11T22-40.md | lines 19-20 confirms the literal `Test Suites: N passed, N total` / `Tests: N passed, N total` summary format this plan's [P2-T1] acceptance condition relies on
+CITATION: docs/features/active/collector-core-no-whichgh-branch-untested-714/spec.md | lines 123-128 the five `## Acceptance Criteria` items this plan's Phase 4 check-off tasks map to one-for-one; lines 65-77 the exact `CommandRunner`/`TreeFileSystem` design [P1-T2] implements verbatim
+CITATION: docs/features/active/collector-core-no-whichgh-branch-untested-714/research/research.2026-09-27T00-30.md | Section 1.2 (lines 43-49) confirms no runner/fs call occurs on the omitted-`whichGh` path; Section 1.3 (lines 51-67) confirms every existing `collectPrContext`/`collectAndWrite` call site supplies `whichGh` explicitly
+
+AC-INVENTORY: AC1, AC2, AC3, AC4, AC5
+
+AC-MAPPING: AC1 | IMPLEMENTATION: [P1-T2] | TESTS: `it` inside `describe("collectPrContext (whichGh option omitted)", ...)` via [P2-T1] | EVIDENCE: evidence/qa-gates/verify-new-test.md
+AC-MAPPING: AC2 | IMPLEMENTATION: [P1-T2] (no production change; the second arm was already covered) | TESTS: same `it` as AC1, read against `extensions/drm-copilot/coverage/lcov.info` | EVIDENCE: evidence/qa-gates/verify-collector-core-coverage.md and evidence/qa-gates/final-collector-core-coverage.md
+AC-MAPPING: AC3 | IMPLEMENTATION: [P1-T2] (test-only; no lines added to collector-core.ts) | TESTS: [P3-T4] full-suite coverage run | EVIDENCE: evidence/qa-gates/coverage-delta-collector-core.md
+AC-MAPPING: AC4 | IMPLEMENTATION: [P1-T2]'s hand-written `TreeFileSystem`/`CommandRunner` fakes (no real process, filesystem, PATH, `origin/main`, or gitignored state) | TESTS: same `it` as AC1 | EVIDENCE: evidence/other/change-footprint.md ([P4-T2]) and the file re-read at [P4-T6]
+AC-MAPPING: AC5 | IMPLEMENTATION: no production file changed (confirmed at [P4-T2]) | TESTS: [P3-T1] through [P3-T4] | EVIDENCE: evidence/qa-gates/final-typescript-prettier.md, evidence/qa-gates/final-typescript-lint.md, evidence/qa-gates/final-typescript-typecheck.md, evidence/qa-gates/final-typescript-test-coverage.md
+
+AC-INVENTORY key: AC1 through AC5 are the five `- [ ]` items in `docs/features/active/collector-core-no-whichgh-branch-untested-714/spec.md`'s `## Acceptance Criteria` section (lines 124-128), in file order. Evidence paths above are shown relative to `docs/features/active/collector-core-no-whichgh-branch-untested-714/` and carry the `<ISO8601>` element stated in the task that writes them.
+
+UNRESOLVED-GAPS: NONE
