@@ -3,8 +3,8 @@
 # ("apply mode") half of the cleanup-worktrees tool. Provides consolidation onto the
 # documentationandmemories branch (dedicated worktree creation, cherry-picking with
 # conflict/empty handling, abort cleanup), the post-merge verification gate, and the
-# deletion mechanics (same-process re-verification, no-force worktree removal,
-# branch deletion) plus the apply-mode driver.
+# deletion mechanics (base-branch refusal, same-process re-verification, no-force
+# worktree removal, branch deletion) plus the apply-mode driver.
 #
 # Sourcing contract: this library depends on functions defined in
 # scripts/bash/cleanup_worktrees_lib.sh (cleanup_wt_git, parse_worktree_list,
@@ -325,6 +325,11 @@ delete_branch() {
 
 delete_candidate() {
 	# Delete one candidate in the fixed order:
+	#   0. refuse the base branch CLEANUP_WT_BASE_BRANCH: emit
+	#      ACTION|delete|<name>|BLOCKED-PROTECTED-BASE and return 1 before any other
+	#      step runs. The constant is defined in
+	#      scripts/bash/cleanup_worktrees_enumerate_lib.sh, which every caller sources
+	#      first.
 	#   1. reverify_delete_eligible (same-process ancestry/equivalence re-check),
 	#   2. remove_worktree_safe (only when the candidate has a worktree),
 	#   3. delete_branch (git branch -D).
@@ -335,6 +340,13 @@ delete_candidate() {
 	#
 	# Args: $1 = branch name, $2 = worktree path (may be empty), $3 = recorded state.
 	local name="$1" wt_path="$2" state="$3"
+	# Refuse the base branch before re-verification, worktree removal, or branch
+	# deletion. run_apply never reaches this path for the base, because compute_protected
+	# already classifies it PROTECTED_CURRENT; this is the backstop for any other caller.
+	if [[ $name == "$CLEANUP_WT_BASE_BRANCH" ]]; then
+		printf 'ACTION|delete|%s|BLOCKED-PROTECTED-BASE\n' "$name"
+		return 1
+	fi
 	reverify_delete_eligible "$name" "$state" || return 1
 	if [[ -n $wt_path ]]; then
 		# Opt-in clear-and-retry, off unless CLEANUP_WT_CLEAR_DISPOSABLE is 1. A
@@ -358,8 +370,10 @@ run_apply() {
 	# and then performs deletion for delete-eligible states only. The eligible-state
 	# gate is a single explicit allowlist: MERGED_CLEAN | MERGED_CONTENT_NEUTRAL |
 	# MERGED_EQUIVALENT. NOT_MERGED, HAS_UNIQUE_RESIDUALS, PROTECTED_CURRENT, and
-	# ANCESTRY_ERROR never trigger a destructive action, and the main worktree is never
-	# a candidate (classify_branch marks it PROTECTED_CURRENT). Deletion of the
+	# ANCESTRY_ERROR never trigger a destructive action. The main worktree and the base
+	# branch CLEANUP_WT_BASE_BRANCH are never candidates: compute_protected protects the
+	# base by name in every checkout topology, so classify_branch resolves it to
+	# PROTECTED_CURRENT, and delete_candidate refuses it as a backstop. Deletion of the
 	# consolidation branch (whose unique content was consolidated) is gated on
 	# verify_consolidation_merged() returning MERGED_CLEAN. Returns non-zero if any
 	# candidate's deletion failed or was blocked, or when the worktree listing, branch

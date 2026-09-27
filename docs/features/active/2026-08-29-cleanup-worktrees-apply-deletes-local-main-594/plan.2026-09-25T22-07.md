@@ -463,7 +463,7 @@ are not modified.
 
 ### Phase 3 — delete_candidate Backstop and Actions-Library Documentation
 
-- [ ] [P3-T1] In `scripts/bash/cleanup_worktrees_actions_lib.sh` `delete_candidate`,
+- [x] [P3-T1] In `scripts/bash/cleanup_worktrees_actions_lib.sh` `delete_candidate`,
   immediately after the line `local name="$1" wt_path="$2" state="$3"` and before
   `reverify_delete_eligible "$name" "$state" || return 1`, insert a comment stating that the
   base branch is refused before re-verification, worktree removal, or branch deletion, and
@@ -474,14 +474,14 @@ are not modified.
   Acceptance: `grep -n -F 'BLOCKED-PROTECTED-BASE' scripts/bash/cleanup_worktrees_actions_lib.sh`
   shows the `printf` line, and its line number is lower than the line number of the first
   `reverify_delete_eligible "$name" "$state"` call inside `delete_candidate`.
-- [ ] [P3-T2] Update the `delete_candidate` docstring in `scripts/bash/cleanup_worktrees_actions_lib.sh`
+- [x] [P3-T2] Update the `delete_candidate` docstring in `scripts/bash/cleanup_worktrees_actions_lib.sh`
   to add a step 0 ahead of the existing three
   steps: refuse the base branch `CLEANUP_WT_BASE_BRANCH` by emitting
   `ACTION|delete|<name>|BLOCKED-PROTECTED-BASE` and returning 1 before any other step runs;
   note that the constant is defined in `scripts/bash/cleanup_worktrees_enumerate_lib.sh`,
   which every caller sources first. Acceptance: the docstring block contains both tokens
   `CLEANUP_WT_BASE_BRANCH` and `BLOCKED-PROTECTED-BASE`.
-- [ ] [P3-T3] Reword the `run_apply` docstring in `scripts/bash/cleanup_worktrees_actions_lib.sh`
+- [x] [P3-T3] Reword the `run_apply` docstring in `scripts/bash/cleanup_worktrees_actions_lib.sh`
   (lines 361-362 at BASE_SHA) so that it no longer attributes `main`'s protection to worktree
   position alone: the main worktree and the base branch `CLEANUP_WT_BASE_BRANCH` are never
   candidates, `compute_protected` protects the base by name in every checkout topology so
@@ -493,14 +493,14 @@ are not modified.
   rewording must leave the lines `run_apply() {` and
   `local rc=0 name record wpath wbranch wflags cb_out state` unchanged, because P5-T6 bounds
   the docstring by those two lines.
-- [ ] [P3-T4] Reword the header of `scripts/bash/cleanup_worktrees_actions_lib.sh` at lines 6-7
+- [x] [P3-T4] Reword the header of `scripts/bash/cleanup_worktrees_actions_lib.sh` at lines 6-7
   from "deletion mechanics (same-process re-verification, no-force worktree removal, branch
   deletion) plus the apply-mode driver." to a two-line form that also names the base-branch
   refusal, for example `# deletion mechanics (base-branch refusal, same-process re-verification, no-force`
   and `# worktree removal, branch deletion) plus the apply-mode driver.`; zero net lines.
   Acceptance: `grep -c -F 'base-branch refusal' scripts/bash/cleanup_worktrees_actions_lib.sh`
   prints `1`, and the P5-T10 anchor comparison shows lines 19 and 35 unchanged.
-- [ ] [P3-T5] Lint the cross-file constant reference in `scripts/bash/cleanup_worktrees_actions_lib.sh`:
+- [x] [P3-T5] Lint the cross-file constant reference in `scripts/bash/cleanup_worktrees_actions_lib.sh`:
   run `shellcheck -f gcc scripts/bash/cleanup_worktrees_actions_lib.sh`. Acceptance: no finding
   refers to a line added in P3-T1 to P3-T4. Explicit remediation branch: if shellcheck reports
   `SC2154` for `CLEANUP_WT_BASE_BRANCH` on the P3-T1 `if` line, add
