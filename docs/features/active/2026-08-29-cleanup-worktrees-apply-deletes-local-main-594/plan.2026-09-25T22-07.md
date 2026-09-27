@@ -684,7 +684,7 @@ reported, re-commits with the P4-T7 pathspec-bearing `git add --`/`git commit -F
 commands before the suite runs. A commit does not change file content, so the P6-T7 pre-pass
 and post-P6-T6 hash listings are unaffected by it.
 
-- [ ] [P6-T1] QC step 1 (format) on `scripts/bash/` production files. Before running shfmt,
+- [x] [P6-T1] QC step 1 (format) on `scripts/bash/` production files. Before running shfmt,
   run the P6-T7 `sha256sum` command (eight files) and record its output in this task's
   artifact as the pre-pass listing; repeat this at every loop restart. Then run
   `shfmt -d scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh`;
@@ -692,26 +692,26 @@ and post-P6-T6 hash listings are unaffected by it.
   holds eight hash lines, and the shfmt run exits 0 with no diff
   printed (a clean shfmt `-d` run prints nothing). On a diff, run `shfmt -w` on the named files,
   record the rewrite, and restart the loop.
-- [ ] [P6-T2] QC step 2a (lint) on `scripts/bash/` production files: run
+- [x] [P6-T2] QC step 2a (lint) on `scripts/bash/` production files: run
   `shellcheck -f gcc scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh`;
   write `<FEATURE>/evidence/qa-gates/qc-step2a-shellcheck-production.<ts>.md`. Acceptance: the
   finding lines are exactly the P0-T6 baseline set (normally empty, exit 0); any new finding
   fails the step.
-- [ ] [P6-T3] QC step 2b (lint) on the three edited `tests/shell/` suites: run
+- [x] [P6-T3] QC step 2b (lint) on the three edited `tests/shell/` suites: run
   `shellcheck -f gcc tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`;
   write `<FEATURE>/evidence/qa-gates/qc-step2b-shellcheck-bats.<ts>.md`. Acceptance: the total
   finding count and the per-code multiset equal the P0-T8 baseline (no finding introduced by
   the added tests).
-- [ ] [P6-T4] QC step 2c (repo-wide check): run `sh scripts/bash/shell-qc.sh check`; write
+- [x] [P6-T4] QC step 2c (repo-wide check): run `sh scripts/bash/shell-qc.sh check`; write
   `<FEATURE>/evidence/qa-gates/qc-step2c-shell-qc-check.<ts>.md`. Acceptance: every diagnostic
   line printed is present in the P0-T7 baseline record (no diagnostic absent from baseline);
   when the baseline was clean, the run prints nothing and exits 0.
-- [ ] [P6-T5] QC step 3 (syntax; bash has no type checker) on `scripts/bash/` production files:
+- [x] [P6-T5] QC step 3 (syntax; bash has no type checker) on `scripts/bash/` production files:
   run `sh -n` on each of `scripts/bash/cleanup_worktrees_enumerate_lib.sh`, `scripts/bash/cleanup_worktrees_actions_lib.sh`,
   `scripts/bash/cleanup_worktrees_lib.sh`, `scripts/bash/cleanup_worktrees_report_records_lib.sh`,
   and `scripts/bash/cleanup-worktrees.sh`; write `<FEATURE>/evidence/qa-gates/qc-step3-syntax.<ts>.md`.
   Acceptance: five `EXIT_CODE: 0` values, no output.
-- [ ] [P6-T6] QC step 4 (tests, local) into `<FEATURE>/evidence/qa-gates/qc-step4-bats-cleanup-suites.<ts>.md`.
+- [x] [P6-T6] QC step 4 (tests, local) into `<FEATURE>/evidence/qa-gates/qc-step4-bats-cleanup-suites.<ts>.md`.
   Precondition, run first: `git status --porcelain -- scripts/ tests/ .claude/skills/cleanup-merged-worktrees/ extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/`.
   If it prints anything, run the P4-T7 `git add --` and `git commit -F <message file> --`
   commands with the same twelve IMPL_PATHS entries (new message file; refusal by the gate
@@ -725,7 +725,7 @@ and post-P6-T6 hash listings are unaffected by it.
   file; the TAP plan equals the P0-T10 plan plus 10; no test that reported `ok` in P0-T10
   reports `not ok`; T1 through T10 each report `ok`; the `not ok` set is a subset of the P0-T10
   baseline failure set (when that set is empty, `EXIT_CODE: 0`).
-- [ ] [P6-T7] Record the clean loop pass in `<FEATURE>/evidence/qa-gates/qc-loop-pass.<ts>.md`:
+- [x] [P6-T7] Record the clean loop pass in `<FEATURE>/evidence/qa-gates/qc-loop-pass.<ts>.md`:
   the pass number, the six artifact paths from P6-T1 through P6-T6 of that pass, and the output
   of `sha256sum scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`
   recorded as the pre-pass listing in the P6-T1 artifact of that pass and again immediately
@@ -734,7 +734,7 @@ and post-P6-T6 hash listings are unaffected by it.
   porcelain status without proving the files were unchanged within the pass; a commit does not
   change file content, so the hashes still compare the same bytes). Acceptance: all six steps
   passed in the same pass and the two hash listings are identical.
-- [ ] [P6-T8] Commit `<FEATURE>/evidence/` as written so far, together with any implementation
+- [x] [P6-T8] Commit `<FEATURE>/evidence/` as written so far, together with any implementation
   change not yet committed, as the head that CI will test: write a new commit message file in the session
   scratchpad (message per the commit-message skill, ending with the session's required
   trailer lines), then run `git add --` naming the twelve IMPL_PATHS entries from P4-T7 plus
@@ -745,11 +745,11 @@ and post-P6-T6 hash listings are unaffected by it.
   Acceptance: `git status --porcelain -- scripts/ tests/ .claude/skills/cleanup-merged-worktrees/ extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/`
   prints nothing after the commit (the scope check against HEAD is P6-T17). If the
   preimplementation gate refuses the commit, record the refusal text and stop (BLOCKED).
-- [ ] [P6-T9] Push the commit with `git push origin bug/cleanup-worktrees-apply-deletes-local-main-594`
+- [x] [P6-T9] Push the commit with `git push origin bug/cleanup-worktrees-apply-deletes-local-main-594`
   (no force); append the result to `<FEATURE>/evidence/other/commit-push.<ts>.md`. Acceptance:
   exit 0 and the remote branch head equals the P6-T8 commit SHA
   (`git ls-remote origin refs/heads/bug/cleanup-worktrees-apply-deletes-local-main-594`).
-- [ ] [P6-T10] Dispatch the authoritative `.github/workflows/_shell-coverage.yml` run:
+- [x] [P6-T10] Dispatch the authoritative `.github/workflows/_shell-coverage.yml` run:
   `gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-apply-deletes-local-main-594`,
   and record the dispatch time (UTC). Then repeat the P0-T11 `gh run list` command until it
   returns a run whose `createdAt` is later than the recorded dispatch time; that run's
@@ -759,7 +759,7 @@ and post-P6-T6 hash listings are unaffected by it.
   of each `gh run list` poll in `<FEATURE>/evidence/qa-gates/ci-shell-coverage.<ts>.md`; do not
   write the `gh run watch` pair in this task (P6-T11 writes it last). Acceptance: the run's
   `headSha` equals the P6-T8 commit SHA and its `createdAt` is later than the dispatch time.
-- [ ] [P6-T11] Complete `<FEATURE>/evidence/qa-gates/ci-shell-coverage.<ts>.md` after the
+- [x] [P6-T11] Complete `<FEATURE>/evidence/qa-gates/ci-shell-coverage.<ts>.md` after the
   P6-T10 background `gh run watch <RUN_ID> --exit-status` has finished: append the
   `gh run view <RUN_ID> --log` pair and the extracted values, then append the
   `gh run watch <RUN_ID> --exit-status` pair LAST (the pass/fail command; the PR-context
@@ -770,14 +770,14 @@ and post-P6-T6 hash listings are unaffected by it.
   `tests/bash` does not exist and only `tests/shell` runs) and equals the P0-T11 plan plus 10; the numeric
   `Bash coverage (lines): NN.N%` headline is recorded; the run conclusion is `success`. On any
   failure, restart the loop at P6-T1.
-- [ ] [P6-T12] Per-file coverage into `<FEATURE>/evidence/qa-gates/kcov/coverage-summary.<ts>.md`:
+- [x] [P6-T12] Per-file coverage into `<FEATURE>/evidence/qa-gates/kcov/coverage-summary.<ts>.md`:
   download the P6-T10 run's artifact with `gh run download <RUN_ID> --name shell-coverage --dir <session-scratchpad>/kcov-final` and
   extract, by the P0-T12 rule, the `line-rate` for the same five files. Write
   `<FEATURE>/evidence/qa-gates/kcov/coverage-summary.<ts>.md` with the run ID, the overall
   headline from P6-T11, and the five per-file values. Acceptance: five numeric values recorded;
   `scripts/bash/cleanup_worktrees_enumerate_lib.sh` and `scripts/bash/cleanup_worktrees_actions_lib.sh`
   are each at least 0.85.
-- [ ] [P6-T13] Added-line execution for `scripts/bash/cleanup_worktrees_enumerate_lib.sh` and
+- [x] [P6-T13] Added-line execution for `scripts/bash/cleanup_worktrees_enumerate_lib.sh` and
   `scripts/bash/cleanup_worktrees_actions_lib.sh`: derive the added line numbers from the hunk
   headers of `git diff -U0 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh`,
   keep those that are neither blank nor comment-only, and look each up in the matching
@@ -788,96 +788,96 @@ and post-P6-T6 hash listings are unaffected by it.
   `printf 'ACTION|delete|%s|BLOCKED-PROTECTED-BASE\n' "$name"`, and the `return 1` inside the
   P3-T1 guard; every other added executable line either has `hits` of at least 1 or is absent
   from the element (not instrumented by kcov, for example `fi`), and each absent line is named.
-- [ ] [P6-T14] Coverage delta: write `<FEATURE>/evidence/qa-gates/coverage-delta.<ts>.md` with,
+- [x] [P6-T14] Coverage delta: write `<FEATURE>/evidence/qa-gates/coverage-delta.<ts>.md` with,
   for each of the five files, the P0-T12 baseline line-rate, the P6-T12 post-change line-rate,
   and the difference, plus the P0-T11 and P6-T11 overall headlines and the P6-T13 added-line
   result as the new-code coverage. Acceptance: every post-change value is at least 0.85 or at
   least its baseline value; any file below both is recorded as remediation-required and the
   plan outcome is not PASS.
-- [ ] [P6-T15] AC-12 scope check in `<FEATURE>/evidence/qa-gates/ac12-tests-added-only.<ts>.md`:
+- [x] [P6-T15] AC-12 scope check in `<FEATURE>/evidence/qa-gates/ac12-tests-added-only.<ts>.md`:
   run `git diff --numstat 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- tests/shell/` and
   `git status --porcelain -- tests/shell/`. Acceptance: the numstat output has exactly three
   rows, for `tests/shell/test_cleanup_worktrees_enumeration.bats`,
   `tests/shell/test_cleanup_worktrees_classification.bats`, and
   `tests/shell/test_cleanup_worktrees_deletion.bats`, each with a deleted-line count of `0`; the
   porcelain status prints nothing; P6-T11 recorded zero failures in CI.
-- [ ] [P6-T16] AC-13 golden check in `<FEATURE>/evidence/qa-gates/ac13-goldens-unchanged.<ts>.md`:
+- [x] [P6-T16] AC-13 golden check in `<FEATURE>/evidence/qa-gates/ac13-goldens-unchanged.<ts>.md`:
   run `git diff --exit-code 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- tests/fixtures/cleanup_worktrees/expected/`
   and `git status --porcelain -- tests/fixtures/cleanup_worktrees/expected/`. Acceptance: the
   diff exits 0 with empty output, the porcelain status prints nothing, and the P6-T11 CI run
   contains `ok` lines for every test in `tests/shell/test_cleanup_worktrees_dirt_regression.bats`.
-- [ ] [P6-T17] Non-goal boundary check in `<FEATURE>/evidence/qa-gates/untouched-files.<ts>.md`:
+- [x] [P6-T17] Non-goal boundary check in `<FEATURE>/evidence/qa-gates/untouched-files.<ts>.md`:
   run `git diff --exit-code --stat 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- tests/fixtures/cleanup_worktrees/stub-bin/ scripts/bash/cleanup_worktrees_detached_lib.sh scripts/bash/cleanup_worktrees_dirt_lib.sh .github/workflows/ .claude/lib/cleanup-manifest/ tests/scripts/claude-lib/cleanup-manifest/`
   and `git diff --numstat 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- scripts/ tests/ .claude/skills/ extensions/`.
   Acceptance: the first exits 0 with empty output; the second lists exactly the 5 production
   files, 3 test suites, 8 fixture files, and 2 `SKILL.md` copies named in P6-T8 (18 rows) and
   no other path.
-- [ ] [P6-T18] Check off AC-01 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (the `CLEANUP_WT_BASE_BRANCH="main"`
+- [x] [P6-T18] Check off AC-01 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (the `CLEANUP_WT_BASE_BRANCH="main"`
   constant item) only if `<FEATURE>/evidence/qa-gates/ac01-base-constant.<ts>.md` and
   `<FEATURE>/evidence/qa-gates/ac01-no-default-expansion.<ts>.md` meet their acceptance.
   Acceptance: that item reads `- [x]`.
-- [ ] [P6-T19] Check off AC-02 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T1) only if
+- [x] [P6-T19] Check off AC-02 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T1) only if
   `<FEATURE>/evidence/regression-testing/pass-after.<ts>.md` and the P6-T11 CI record show T1 `ok`.
   Acceptance: that item reads `- [x]`.
-- [ ] [P6-T20] Check off AC-03 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T2) only if the P5-T1 and P6-T11
+- [x] [P6-T20] Check off AC-03 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T2) only if the P5-T1 and P6-T11
   records under `<FEATURE>/evidence/` show T2 `ok`. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T21] Check off AC-04 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T3) only if the P5-T1 and P6-T11
+- [x] [P6-T21] Check off AC-04 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T3) only if the P5-T1 and P6-T11
   records under `<FEATURE>/evidence/` show T3 `ok`. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T22] Check off AC-05 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T4) only if the P5-T1 and P6-T11
+- [x] [P6-T22] Check off AC-05 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T4) only if the P5-T1 and P6-T11
   records under `<FEATURE>/evidence/` show T4 `ok`. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T23] Check off AC-06 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T5) only if the P5-T1 and P6-T11
+- [x] [P6-T23] Check off AC-06 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T5) only if the P5-T1 and P6-T11
   records under `<FEATURE>/evidence/` show T5 `ok`. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T24] Check off AC-07 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T6) only if the P5-T1 and P6-T11
+- [x] [P6-T24] Check off AC-07 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T6) only if the P5-T1 and P6-T11
   records under `<FEATURE>/evidence/` show T6 `ok`. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T25] Check off AC-08 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T7) only if the P5-T1 and P6-T11
+- [x] [P6-T25] Check off AC-08 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T7) only if the P5-T1 and P6-T11
   records under `<FEATURE>/evidence/` show T7 `ok`. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T26] Check off AC-09 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T8) only if the P5-T1 and P6-T11
+- [x] [P6-T26] Check off AC-09 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T8) only if the P5-T1 and P6-T11
   records under `<FEATURE>/evidence/` show T8 `ok`. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T27] Check off AC-10 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T9) only if the P5-T1 and P6-T11
+- [x] [P6-T27] Check off AC-10 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T9) only if the P5-T1 and P6-T11
   records under `<FEATURE>/evidence/` show T9 `ok`. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T28] Check off AC-11 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T10) only if the P5-T1 and P6-T11
+- [x] [P6-T28] Check off AC-11 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T10) only if the P5-T1 and P6-T11
   records under `<FEATURE>/evidence/` show T10 `ok`. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T29] Check off AC-12 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (existing suites pass unmodified) only if
+- [x] [P6-T29] Check off AC-12 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (existing suites pass unmodified) only if
   `<FEATURE>/evidence/qa-gates/ac12-tests-added-only.<ts>.md` meets its acceptance. Acceptance:
   that item reads `- [x]`.
-- [ ] [P6-T30] Check off AC-13 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (goldens unchanged) only if
+- [x] [P6-T30] Check off AC-13 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (goldens unchanged) only if
   `<FEATURE>/evidence/qa-gates/ac13-goldens-unchanged.<ts>.md` meets its acceptance. Acceptance:
   that item reads `- [x]`.
-- [ ] [P6-T31] Check off AC-14 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (no new state name) only if
+- [x] [P6-T31] Check off AC-14 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (no new state name) only if
   `<FEATURE>/evidence/qa-gates/ac14-no-new-state.<ts>.md`,
   `<FEATURE>/evidence/qa-gates/ac14-no-protected-base.<ts>.md`, and the P4-T4 help-line check
   meet their acceptance. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T32] Check off AC-15 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (comments corrected) only if
+- [x] [P6-T32] Check off AC-15 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (comments corrected) only if
   `<FEATURE>/evidence/qa-gates/ac15-comments.<ts>.md`, the three
   `<FEATURE>/evidence/qa-gates/ac15-phrase-1.<ts>.md`, `ac15-phrase-2.<ts>.md`, and
   `ac15-phrase-3.<ts>.md` artifacts, `<FEATURE>/evidence/qa-gates/ac15-run-apply-search.<ts>.md`,
   and `<FEATURE>/evidence/qa-gates/ac15-run-apply-docstring.<ts>.md` meet their acceptance.
   Acceptance: that item reads `- [x]`.
-- [ ] [P6-T33] Check off AC-16 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (help text) only if
+- [x] [P6-T33] Check off AC-16 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (help text) only if
   `<FEATURE>/evidence/qa-gates/ac16-help-text.<ts>.md` meets its acceptance. Acceptance: that
   item reads `- [x]`.
-- [ ] [P6-T34] Check off AC-17 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (skill copies) only if
+- [x] [P6-T34] Check off AC-17 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (skill copies) only if
   `<FEATURE>/evidence/qa-gates/ac17-skill-parity.<ts>.md` meets its acceptance and both P4-T5 and
   P4-T6 token counts were `1`. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T35] Check off AC-18 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (500-line limit) only if
+- [x] [P6-T35] Check off AC-18 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (500-line limit) only if
   `<FEATURE>/evidence/qa-gates/ac18-line-counts-and-anchors.<ts>.md` meets its acceptance.
   Acceptance: that item reads `- [x]`.
-- [ ] [P6-T36] Check off AC-19 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (shfmt and shellcheck) only if the
+- [x] [P6-T36] Check off AC-19 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (shfmt and shellcheck) only if the
   P6-T1 through P6-T4 artifacts under `<FEATURE>/evidence/qa-gates/` meet their acceptance and
   P6-T11 records the CI check step as successful. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T37] Check off AC-20 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (kcov coverage) only if
+- [x] [P6-T37] Check off AC-20 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (kcov coverage) only if
   `<FEATURE>/evidence/qa-gates/kcov/coverage-summary.<ts>.md` and
   `<FEATURE>/evidence/qa-gates/kcov/added-line-hits.<ts>.md` meet their acceptance. Acceptance:
   that item reads `- [x]`.
-- [ ] [P6-T38] Check off AC-21 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (remote-ref and depth independence) only
+- [x] [P6-T38] Check off AC-21 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (remote-ref and depth independence) only
   if `<FEATURE>/evidence/qa-gates/ac21-portability.<ts>.md`,
   `<FEATURE>/evidence/qa-gates/ac21-pattern-tests.<ts>.md`, and
   `<FEATURE>/evidence/qa-gates/ac21-pattern-fixtures.<ts>.md` meet their acceptance and P6-T11
   shows the new tests passing on ubuntu-latest. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T39] Check off AC-22 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (no temporary files or scratch
+- [x] [P6-T39] Check off AC-22 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (no temporary files or scratch
   repositories) only if `<FEATURE>/evidence/qa-gates/ac22-no-temp-files.<ts>.md` and
   `<FEATURE>/evidence/qa-gates/ac22-no-redirection.<ts>.md` meet their acceptance. Acceptance: that item reads `- [x]`.
-- [ ] [P6-T40] AC-23 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (CI `_shell-coverage.yml` job for the pull request):
+- [x] [P6-T40] AC-23 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (CI `_shell-coverage.yml` job for the pull request):
   run `gh pr checks bug/cleanup-worktrees-apply-deletes-local-main-594` and record the output
   verbatim with its exit code in `<FEATURE>/evidence/qa-gates/ac23-pr-ci.<ts>.md`. Exactly one
   of three explicit branches applies:
@@ -892,7 +892,7 @@ and post-P6-T6 hash listings are unaffected by it.
   expectation field; leave the item unchecked and record `AC-23: DEFERRED TO PR CI GATE`.
   In branches (b) and (c), hand the item to the orchestrator's CI gate. Acceptance: the
   artifact names the branch taken, and the item state matches that branch.
-- [ ] [P6-T41] Verify check-off state in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md`: run
+- [x] [P6-T41] Verify check-off state in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md`: run
   `grep -c -e '^- \[x\] ' docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md`
   and `grep -c -e '^- \[ \] ' docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md`.
   Record the checked-count command alone in `<FEATURE>/evidence/qa-gates/ac-checkoff-count.<ts>.md`
