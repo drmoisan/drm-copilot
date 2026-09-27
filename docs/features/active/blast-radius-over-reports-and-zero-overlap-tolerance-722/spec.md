@@ -598,8 +598,8 @@ reporting done.
   detection module appears in the diff with a behavioral change.
 - [x] Strict identity (tolerance 0): a Python test and a Pester test assert that the scheduling edge
   pair set equals the detected-conflict pair set for every existing conflict fixture and for the BEFORE
-  section of every historical-run fixture, and that cohort coloring of that set equals the pinned
-  BEFORE partition.
+  section of every historical-run fixture, and a Python test asserts that cohort coloring of that set
+  equals the pinned BEFORE partition (decision 13).
 - [x] Absent-key identity: the scheduling-absent-key-strict fixture passes in both runtimes, showing
   that a truth table without conflict_tolerance yields the same edges as tolerance 0.
 - [x] #452 shared-surface case: the scheduling-452-shared-surface-hard fixture is a hard edge at
@@ -777,3 +777,10 @@ reporting done.
     14. The count case is renamed to a count-neutral name. Each edit runs in its own PowerShell
     batch so the three-test-file budget is kept. Evidence:
     evidence/regression-testing/pester-directory-p5.2026-09-27T15-55.md.
+13. **Strict-identity cohort clause (AC-07 clarification, recorded 2026-09-27 during execution).**
+    Cohort coloring has no PowerShell implementation; the bash cohort entry point colors an edge list
+    (decision 8), and Python holds the reference coloring. AC-07 is therefore satisfied by a Python
+    test and a Pester test that each assert the scheduling edge pair set equals the detected-conflict
+    pair set, plus the Python test test_before_cohorts_match_pins that asserts cohort coloring of
+    that set equals the pinned BEFORE partition. AC-07's wording is amended to state this split; the
+    properties it requires are unchanged. Evidence: evidence/other/ac-checkoff-p7.
