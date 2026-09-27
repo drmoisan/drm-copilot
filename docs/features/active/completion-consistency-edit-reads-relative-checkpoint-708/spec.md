@@ -200,20 +200,20 @@ Evidence: run the new file against the unmodified hook and record the failures, 
 
 ## Acceptance Criteria
 
-- [ ] For an Edit call whose `tool_input.file_path` matches the checkpoint pattern, `Invoke-CompletionConsistencyDecision` passes the raw `tool_input.file_path` string, unchanged, to the `CheckpointReader`; the literal `'artifacts/orchestration/orchestrator-state.json'` is no longer passed to the reader by `Resolve-EditedCheckpointContent`.
-- [ ] `Resolve-EditedCheckpointContent` declares a mandatory `-CheckpointPath` parameter, and its only caller in `.claude/hooks/enforce-completion-consistency.ps1` supplies it from `tool_input.file_path`.
-- [ ] With an absolute POSIX-style `file_path` and an injected reader that returns checkpoint content only for that path, an Edit whose patch asserts completion without the required evidence returns `deny` with a `COMPLETION_CONSISTENCY_BLOCKED` reason; the same test returns `allow` against the pre-fix hook.
-- [ ] When the injected reader returns different content for the targeted `file_path` and for the relative literal, the allow/deny decision is derived from the targeted `file_path`'s content.
-- [ ] A relative `file_path` (`artifacts/orchestration/orchestrator-state.json`) reaches the reader unchanged and yields the same decisions as before the fix; an absolute `file_path` and a backslash-spelled `file_path` reach the reader unchanged.
-- [ ] The Edit-path fail semantics in D6 are unchanged: an envelope anomaly returns `deny` with the payload-anomaly reason; a missing or empty targeted file, a missing `old_string`, or an `old_string` absent from the targeted file's text returns `allow`; and the existing tests covering these branches pass without modification.
-- [ ] Write-path behavior is unchanged: the existing `enforce-completion-consistency.Tests.ps1`, `enforce-completion-consistency.Payload.Tests.ps1`, and `PreToolUseSchema.Contract.Tests.ps1` suites pass without modification.
-- [ ] The script `.DESCRIPTION` and the `Resolve-EditedCheckpointContent` help describe reading the Edit's targeted `file_path` and no longer state that Edit calls are allowed without validation.
+- [x] For an Edit call whose `tool_input.file_path` matches the checkpoint pattern, `Invoke-CompletionConsistencyDecision` passes the raw `tool_input.file_path` string, unchanged, to the `CheckpointReader`; the literal `'artifacts/orchestration/orchestrator-state.json'` is no longer passed to the reader by `Resolve-EditedCheckpointContent`.
+- [x] `Resolve-EditedCheckpointContent` declares a mandatory `-CheckpointPath` parameter, and its only caller in `.claude/hooks/enforce-completion-consistency.ps1` supplies it from `tool_input.file_path`.
+- [x] With an absolute POSIX-style `file_path` and an injected reader that returns checkpoint content only for that path, an Edit whose patch asserts completion without the required evidence returns `deny` with a `COMPLETION_CONSISTENCY_BLOCKED` reason; the same test returns `allow` against the pre-fix hook.
+- [x] When the injected reader returns different content for the targeted `file_path` and for the relative literal, the allow/deny decision is derived from the targeted `file_path`'s content.
+- [x] A relative `file_path` (`artifacts/orchestration/orchestrator-state.json`) reaches the reader unchanged and yields the same decisions as before the fix; an absolute `file_path` and a backslash-spelled `file_path` reach the reader unchanged.
+- [x] The Edit-path fail semantics in D6 are unchanged: an envelope anomaly returns `deny` with the payload-anomaly reason; a missing or empty targeted file, a missing `old_string`, or an `old_string` absent from the targeted file's text returns `allow`; and the existing tests covering these branches pass without modification.
+- [x] Write-path behavior is unchanged: the existing `enforce-completion-consistency.Tests.ps1`, `enforce-completion-consistency.Payload.Tests.ps1`, and `PreToolUseSchema.Contract.Tests.ps1` suites pass without modification.
+- [x] The script `.DESCRIPTION` and the `Resolve-EditedCheckpointContent` help describe reading the Edit's targeted `file_path` and no longer state that Edit calls are allowed without validation.
 - [ ] `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-consistency.ps1` is byte-identical to `.claude/hooks/enforce-completion-consistency.ps1` (matching SHA-256 recorded in evidence), and `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passes in CI (and locally, with the #510 handling recorded per D9).
-- [ ] Regression tests in `tests/scripts/claude-hooks/enforce-completion-consistency.EditTarget.Tests.ps1` fail against the pre-fix hook and pass after the fix, with both runs recorded under `evidence/regression-testing/`.
-- [ ] The new tests use an injected reader only, and do not create temporary files, call `Set-Location`, read gitignored state, depend on `origin/main`, or use Windows-only paths.
-- [ ] PoshQC format and analyze report no findings on the changed PowerShell files, PoshQC test passes, and line coverage for `.claude/hooks/enforce-completion-consistency.ps1` is at least 85% with no regression on changed lines.
-- [ ] No production or test file written by this change exceeds 500 lines.
-- [ ] No `.codex` file is modified, and the out-of-scope observations in D11 are recorded in `evidence/other/follow-ups.md`.
+- [x] Regression tests in `tests/scripts/claude-hooks/enforce-completion-consistency.EditTarget.Tests.ps1` fail against the pre-fix hook and pass after the fix, with both runs recorded under `evidence/regression-testing/`.
+- [x] The new tests use an injected reader only, and do not create temporary files, call `Set-Location`, read gitignored state, depend on `origin/main`, or use Windows-only paths.
+- [x] PoshQC format and analyze report no findings on the changed PowerShell files, PoshQC test passes, and line coverage for `.claude/hooks/enforce-completion-consistency.ps1` is at least 85% with no regression on changed lines.
+- [x] No production or test file written by this change exceeds 500 lines.
+- [x] No `.codex` file is modified, and the out-of-scope observations in D11 are recorded in `evidence/other/follow-ups.md`.
 
 ## Risks & Mitigations
 

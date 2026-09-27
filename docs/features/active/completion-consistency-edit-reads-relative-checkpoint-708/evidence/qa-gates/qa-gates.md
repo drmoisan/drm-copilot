@@ -151,3 +151,29 @@ Output Summary: union of both listings:
 - `docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/issue.md`, `plan.2026-09-26T22-56.md`, `research/research.2026-09-27T03-00.md`, `spec.md` (feature documents committed by the preparation run)
 - porcelain: `docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/evidence/other/follow-ups.md` (untracked until the Phase 5 commit)
 - No path outside the allowed set.
+
+## P6-T9
+
+Timestamp: 2026-09-27T09-05
+AC9_PENDING: CI result for tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py
+Local evidence already recorded: P2-T6 and P4-T8 hash equality (SHA256=F9CA16BFBD90E0A2223AB2222C0B7B8F0629DC4D835FF18AD319E407F39F07A5 for both files) and P4-T7 (D9_OPTION: a, `14 passed`). Spec acceptance criterion 9 remains unchecked until the CI result is recorded; the feature-review step performs the check-off.
+
+## P6-T15
+
+Timestamp: 2026-09-27T09-05
+Command: grep -c -F -e "- [x]" docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/spec.md; grep -c -F -e "- [ ]" docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/spec.md
+EXIT_CODE: 0
+Output Summary: the first command prints `13` and the second prints `1`; the one unchecked item is criterion 9, held open by P6-T9.
+
+### Acceptance Criteria Status
+- Source: `docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/spec.md` (section `## Acceptance Criteria`)
+- Total AC items: 14
+- Checked off (delivered): 13
+- Remaining (unchecked): 1
+- Items remaining: criterion 9 — "`extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-consistency.ps1` is byte-identical to `.claude/hooks/enforce-completion-consistency.ps1` (matching SHA-256 recorded in evidence), and `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passes in CI (and locally, with the #510 handling recorded per D9)." Outstanding pending the CI result.
+
+## P6-T16
+
+Timestamp: 2026-09-27T09-05
+MergeBase: 74b2ca0a2bdf8a0bf9a032433fef20831707b574
+All verification in this plan used the MergeBase above (recorded in P0-T3) as the `git diff` anchor. The pre-PR rebase and re-run of the verification set (spec "Merge-Order Independence", measure 4: P3-T1, P3-T2, and P4-T1 through P4-T8) is owned by the orchestration step that opens the pull request.
