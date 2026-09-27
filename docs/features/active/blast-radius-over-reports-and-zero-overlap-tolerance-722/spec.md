@@ -691,7 +691,7 @@ reporting done.
 
 - [x] Python toolchain passes in a single pass (black, ruff, pyright, pytest) with >= 85% line and
   >= 75% branch coverage on every new or changed Python file and no regression on changed lines.
-- [ ] PowerShell toolchain passes in a single pass (formatter, PSScriptAnalyzer, Pester) with >= 85%
+- [x] PowerShell toolchain passes in a single pass (formatter, PSScriptAnalyzer, Pester) with >= 85%
   line coverage on every new or changed module.
 - [ ] TypeScript toolchain passes in a single pass (prettier, eslint, tsc, jest) with >= 85% line and
   >= 75% branch coverage on the changed derivation core.

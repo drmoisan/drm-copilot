@@ -1194,21 +1194,21 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 16 — Final QA: PowerShell
 
-- [ ] [P16-T1] Record hashes of every PowerShell file written by this plan (block B40), call
+- [x] [P16-T1] Record hashes of every PowerShell file written by this plan (block B40), call
       MCP-PS-FORMAT over them, and record hashes again. Write FEATURE/evidence/qa-gates/final-powershell-format.TS.md.
       Acceptance: the call returns without raising; after any re-copy, the new mirrors-final artifact
       shows every pair equal. If any hash changed, re-copy each affected mirror by running script
       copy-file (A10) through CMD-PS-SCRIPT-SH, re-run P14-T6 (writing a new mirrors-final artifact),
       and restart Phase 16.
-- [ ] [P16-T2] Run script ps-format-check over the B40 files. Write
+- [x] [P16-T2] Run script ps-format-check over the B40 files. Write
       FEATURE/evidence/qa-gates/final-powershell-format-check.TS.md. Acceptance: FORMAT-SUMMARY
       ChangedCount=0.
-- [ ] [P16-T3] Call MCP-PS-ANALYZE over the B40 files. Write
+- [x] [P16-T3] Call MCP-PS-ANALYZE over the B40 files. Write
       FEATURE/evidence/qa-gates/final-powershell-analyze.TS.md. Acceptance: the call returns without
       raising. On a raised finding, fix it, re-copy each affected mirror by running script copy-file
       (A10) through CMD-PS-SCRIPT-SH, re-run P14-T6 (writing a new mirrors-final artifact), and restart
       Phase 16.
-- [ ] [P16-T4] Run script pester-coverage with -TestPath tests/scripts/claude-lib/blast-radius,
+- [x] [P16-T4] Run script pester-coverage with -TestPath tests/scripts/claude-lib/blast-radius,
       -CoveragePath set to the four PowerShell modules of block B41 as one comma-joined value, and
       -CoverageOutputPath SCRATCH/pester-final.xml; then run script pester-counts with -Path set to
       the convention test path of block B46, then run script pester-counts with -Path set to the
@@ -1217,7 +1217,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       is in the P0-T32 baseline failure set; every B23, B24, and B34 It passes; each B41 module prints
       LinePercent of at least 85; the convention run prints FailedCount=0; the B47 run prints
       FailedCount=0.
-- [ ] [P16-T5] PowerShell coverage delta: run CMD-PY-SCRIPT with script changed-lines-cov (B42) and
+- [x] [P16-T5] PowerShell coverage delta: run CMD-PY-SCRIPT with script changed-lines-cov (B42) and
       arguments jacoco SCRATCH/pester-final.xml FINAL_BASE followed by
       `.claude/lib/blast-radius/BlastRadius.psm1` and `.claude/lib/blast-radius/BlastRadiusValidation.psm1`.
       Write FEATURE/evidence/qa-gates/powershell-coverage-delta.TS.md recording the P0-T32 and P16-T4
@@ -1225,7 +1225,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       the B42 output. Acceptance: the facade and validation values are each at least their baseline
       and at least 85; the two new module values are at least 85; B42 prints Found=True and a
       ChangedLinePercent of at least 85 for the facade and for the validation module.
-- [ ] [P16-T6] Commit and push Phase 16 evidence: check off AC-35 per the Preamble check-off rule;
+- [x] [P16-T6] Commit and push Phase 16 evidence: check off AC-35 per the Preamble check-off rule;
       run CMD-GIT-STATUS and stage with CMD-GIT-ADD every listed path that is backticked in this plan
       or lies under FEATURE (FEATURE/spec.md included); commit with message "test(722): record final
       PowerShell QA"; run CMD-GIT-PUSH. Acceptance: all git commands exit 0 and a final CMD-GIT-STATUS
