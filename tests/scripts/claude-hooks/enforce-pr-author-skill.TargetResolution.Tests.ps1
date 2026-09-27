@@ -22,6 +22,8 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-pr-author-skill.ps1").Path
         . $script:UnderTest
+        Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution/EpicScopeResolution.psm1").Path
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
 
         # The accessors resolve through the helpers the hook dot-sources, whose own module
         # import lands in this session state.
