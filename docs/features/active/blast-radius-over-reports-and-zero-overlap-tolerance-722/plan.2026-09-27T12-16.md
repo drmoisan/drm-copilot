@@ -1007,29 +1007,29 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 11 — Part B: TypeScript Carriage of write_intent_extraction and path_roots
 
-- [ ] [P11-T1] Edit `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts`:
+- [x] [P11-T1] Edit `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts`:
       append write_intent_extraction and path_roots to the carried-key list and emit them after
       conflict_tolerance, before modules. Acceptance: the file is at most 500 lines.
-- [ ] [P11-T2] Edit `extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts` so its
+- [x] [P11-T2] Edit `extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts` so its
       source truth-table constant equals the P9-T4 bundled file. Acceptance: at most 500 lines.
-- [ ] [P11-T3] Edit `extensions/drm-copilot/test/lib/push-down/blast-radius-derive.test.ts` and
+- [x] [P11-T3] Edit `extensions/drm-copilot/test/lib/push-down/blast-radius-derive.test.ts` and
       `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-mergeable.test.ts`: update the
       key-order expectations to the Part B form of block B20. Acceptance: both files at most 500 lines.
-- [ ] [P11-T4] Record the TypeScript batch boundary: write
+- [x] [P11-T4] Record the TypeScript batch boundary: write
       FEATURE/evidence/other/batch-boundary-ts-p11b.TS.md listing batch one (P11-T1 through P11-T3:
       one production file and three test files, counting the test helper as a test file) and stating
       that P11-T5 forms batch two. No state file is reset (no TypeScript batch-budget hook exists).
       Acceptance: the artifact exists and lists one production and three test files for batch one.
-- [ ] [P11-T5] Edit `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-tolerance-keys.test.ts`:
+- [x] [P11-T5] Edit `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-tolerance-keys.test.ts`:
       add the write_intent_extraction and path_roots cases of block B21. Acceptance: at most 500 lines.
-- [ ] [P11-T6] Run CMD-TS-TEST over the three test files of P11-T3 and P11-T5 and over
+- [x] [P11-T6] Run CMD-TS-TEST over the three test files of P11-T3 and P11-T5 and over
       claude-config-carriage.test.ts under test/lib/push-down (which consumes the helper edited in
       P11-T2). Write FEATURE/evidence/regression-testing/ts-part-b-tests.TS.md. Acceptance: exit 0, and
       the Tests summary line contains "passed" and does not contain "failed".
-- [ ] [P11-T7] Run CMD-TS-FORMAT, CMD-TS-PRETTIER-CHECK over the five TypeScript files of this phase,
+- [x] [P11-T7] Run CMD-TS-FORMAT, CMD-TS-PRETTIER-CHECK over the five TypeScript files of this phase,
       CMD-TS-LINT, and CMD-TS-TYPECHECK. Write FEATURE/evidence/qa-gates/phase11-ts-static.TS.md.
       Acceptance: as in P4-T9; if the format run changed any file, re-run P11-T6.
-- [ ] [P11-T8] Commit and push Phase 11 (check off AC-30 per the Preamble check-off rule; stage the
+- [x] [P11-T8] Commit and push Phase 11 (check off AC-30 per the Preamble check-off rule; stage the
       five files, the FEATURE evidence directory, and FEATURE/spec.md; message "feat(722): carry
       write-intent keys through the push-down"). Acceptance: all three git commands exit 0.
 

@@ -86,6 +86,8 @@ export const SOURCE_ROUTING = `${JSON.stringify(
  * whose overlap a merge step reconciles rather than re-delegating (issue #643).
  * `conflict_tolerance` carries the integration-cost scheduling policy (issue
  * #722), which describes the runtime rather than a repository layout.
+ * `write_intent_extraction` is true, and `path_roots` is empty because the
+ * bundle cannot know a destination's top-level directories (issue #722).
  */
 export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
   {
@@ -111,6 +113,7 @@ export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
       ".claude/agent-memory/**",
       ".agents/skills/**",
       "scripts/vscode/**",
+      ".github/copilot-instructions.md",
     ],
     mergeable_paths: [
       "**/*.csproj",
@@ -129,6 +132,8 @@ export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
         "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json",
       ],
     },
+    write_intent_extraction: true,
+    path_roots: [],
     modules: {
       config: ["config/**"],
     },

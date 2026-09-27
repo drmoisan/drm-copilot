@@ -669,7 +669,7 @@ reporting done.
   write_intent_extraction as byte-equal in the Python support module and the PowerShell partition
   test; path_roots in the Class 2 registry with a consuming test asserting the bundled value is empty;
   the existing exhaustiveness test passes with every key present in both copies.
-- [ ] The TypeScript derivation core carries conflict_tolerance, write_intent_extraction, and
+- [x] The TypeScript derivation core carries conflict_tolerance, write_intent_extraction, and
   path_roots verbatim; blast-radius-derive-tolerance-keys.test confirms each reaches the destination
   document; the key-order assertions and the source-document helper are updated and pass.
 - [ ] Every new or changed PowerShell module has a content-identical bundled mirror, is registered in

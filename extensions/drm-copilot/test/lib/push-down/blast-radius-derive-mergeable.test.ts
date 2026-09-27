@@ -64,6 +64,8 @@ const SOURCE_DOCUMENT_WITH_MERGEABLE_PATHS = `${JSON.stringify(
     mandate_reads: MANDATE_READS,
     mergeable_paths: MERGEABLE_PATHS,
     conflict_tolerance: { tolerance_percent: 100 },
+    write_intent_extraction: true,
+    path_roots: [],
     modules: {
       config: ["config/**"],
     },
@@ -130,6 +132,8 @@ describe("issue #643: mergeable_paths carriage", () => {
       "mandate_reads",
       "mergeable_paths",
       "conflict_tolerance",
+      "write_intent_extraction",
+      "path_roots",
       "modules",
       "over_breadth_fraction",
     ]);

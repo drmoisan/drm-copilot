@@ -14,10 +14,11 @@ import {
  * Carriage of the optional scheduling-policy keys (issue #722).
  *
  * Purpose:
- *     Pin that the push-down derivation carries the `conflict_tolerance` key of
- *     the bundled source document into the destination document verbatim, and
- *     omits it entirely when the source document does not declare it. The key
- *     describes the scheduling runtime rather than a repository layout, so the
+ *     Pin that the push-down derivation carries the `conflict_tolerance`,
+ *     `write_intent_extraction`, and `path_roots` keys of the bundled source
+ *     document into the destination document verbatim, and omits each entirely
+ *     when the source document does not declare it. The keys describe the
+ *     scheduling and extraction runtime rather than a repository layout, so the
  *     destination receives the source value unchanged.
  *
  * Scope note:
@@ -41,23 +42,25 @@ const CONFLICT_TOLERANCE = {
   ],
 };
 
+/** A self-hosted-style `path_roots` value, so carriage is observable. */
+const PATH_ROOTS: ReadonlyArray<string> = [".claude", "config", "scripts"];
+
 /**
- * Serialize a bundled source document, optionally declaring the policy key.
+ * Serialize a bundled source document, declaring only the given policy keys.
  *
- * @param conflictTolerance The `conflict_tolerance` value to declare, or
- *   `undefined` to leave the key out of the source document.
+ * @param policyKeys The optional scheduling-policy keys to declare, in
+ *   emission order. A key absent from this object is left out of the source
+ *   document entirely.
  * @returns The serialized source document with a trailing newline.
  */
-function sourceDocument(conflictTolerance: unknown): string {
+function sourceDocument(policyKeys: Record<string, unknown>): string {
   const document: Record<string, unknown> = {
     version: 1,
     shared_surfaces: [".claude/settings.json", "config/blast-radius.json"],
     shared_surface_globs: [],
     mergeable_paths: ["**/*.csproj"],
+    ...policyKeys,
   };
-  if (conflictTolerance !== undefined) {
-    document["conflict_tolerance"] = conflictTolerance;
-  }
   document["modules"] = { config: ["config/**"] };
   document["over_breadth_fraction"] = 0.25;
   return `${JSON.stringify(document, null, 2)}\n`;
@@ -97,7 +100,7 @@ describe("issue #722: conflict_tolerance carriage", () => {
   it("carries conflict_tolerance into the destination document verbatim", () => {
     // Arrange: a destination with no project structure, so the carried key is
     // the whole point of the assertion.
-    const source = sourceDocument(CONFLICT_TOLERANCE);
+    const source = sourceDocument({ conflict_tolerance: CONFLICT_TOLERANCE });
 
     // Act
     const document = deriveDocument(source);
@@ -108,12 +111,61 @@ describe("issue #722: conflict_tolerance carriage", () => {
 
   it("omits conflict_tolerance when the source document declares none", () => {
     // Arrange: the pre-#722 bundled document shape.
-    const source = sourceDocument(undefined);
+    const source = sourceDocument({});
 
     // Act
     const document = deriveDocument(source);
 
     // Assert: an absent optional key emits no property at all.
     expect(document).not.toHaveProperty("conflict_tolerance");
+  });
+});
+
+describe("issue #722: write_intent_extraction carriage", () => {
+  it("carries write_intent_extraction into the destination document verbatim", () => {
+    // Arrange: the flag is declared false so a defaulting implementation that
+    // emitted true would be observable.
+    const source = sourceDocument({ write_intent_extraction: false });
+
+    // Act
+    const document = deriveDocument(source);
+
+    // Assert: the boolean survives derivation unchanged.
+    expect(document["write_intent_extraction"]).toBe(false);
+  });
+
+  it("omits write_intent_extraction when the source document declares none", () => {
+    // Arrange: a source document without the flag.
+    const source = sourceDocument({ conflict_tolerance: CONFLICT_TOLERANCE });
+
+    // Act
+    const document = deriveDocument(source);
+
+    // Assert: an absent optional key emits no property at all.
+    expect(document).not.toHaveProperty("write_intent_extraction");
+  });
+});
+
+describe("issue #722: path_roots carriage", () => {
+  it("carries path_roots into the destination document verbatim", () => {
+    // Arrange: a non-empty list, so element-for-element carriage is observable.
+    const source = sourceDocument({ path_roots: PATH_ROOTS });
+
+    // Act
+    const document = deriveDocument(source);
+
+    // Assert: the array survives derivation element for element.
+    expect(document["path_roots"]).toEqual(PATH_ROOTS);
+  });
+
+  it("omits path_roots when the source document declares none", () => {
+    // Arrange: a source document without the key.
+    const source = sourceDocument({ write_intent_extraction: true });
+
+    // Act
+    const document = deriveDocument(source);
+
+    // Assert: an absent optional key emits no property at all.
+    expect(document).not.toHaveProperty("path_roots");
   });
 });

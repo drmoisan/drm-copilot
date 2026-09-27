@@ -123,6 +123,8 @@ const SOURCE_DOCUMENT_WITH_MANDATE_READS = `${JSON.stringify(
     mandate_reads: MANDATE_READS,
     mergeable_paths: ["**/*.csproj"],
     conflict_tolerance: { tolerance_percent: 100 },
+    write_intent_extraction: true,
+    path_roots: [],
     modules: {
       config: ["config/**"],
     },
@@ -458,6 +460,8 @@ describe("issue #489: mandate_reads carriage", () => {
       "mandate_reads",
       "mergeable_paths",
       "conflict_tolerance",
+      "write_intent_extraction",
+      "path_roots",
       "modules",
       "over_breadth_fraction",
     ]);
