@@ -298,7 +298,7 @@ open `cleanup-worktrees` branch; the file set edited here (`test_cleanup_worktre
       reaches `$output` under the current guard ordering in `delete_candidate`, and (ii)
       that such a call would reach `$output`, unredirected, if the protected-base guard in
       `delete_candidate` were moved to after `reverify_delete_eligible`.
-- [ ] AC6: The CI shell-coverage job (`.github/workflows/_shell-coverage.yml`, invoked from
+- [x] AC6: The CI shell-coverage job (`.github/workflows/_shell-coverage.yml`, invoked from
       `.github/workflows/ci.yml`) passes for the branch head, with every test in
       `tests/shell/test_cleanup_worktrees_deletion.bats` and
       `tests/shell/test_cleanup_worktrees_dirt_clear.bats` passing.
