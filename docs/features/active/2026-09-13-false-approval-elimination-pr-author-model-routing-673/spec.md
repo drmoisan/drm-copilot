@@ -3,9 +3,9 @@
 - **Issue:** #673
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-13T23-40
+- **Last Updated:** 2026-09-19T09-00
 - **Status:** Draft
-- **Version:** 0.3
+- **Version:** 0.5
 - **Epic:** `worktree-scoped-state-resolution`, feature **F5**, wave 1, `depends_on: [F1]`
 - **Work Mode:** `full-bug` — this file is the sole acceptance-criteria source. No `user-story.md` exists for this feature.
 - **Primary research record:** `research/2026-09-13T22-10-false-approval-elimination-research.md`
@@ -444,12 +444,15 @@ one condition — the same "second implementation that drifts" failure this epic
 
 | role | concrete identifier (fill in from F1 as merged) | source file:line in F1 |
 | --- | --- | --- |
-| module path | _unbound_ | |
-| module import statement | _unbound_ | |
-| `<TARGET_DERIVATION>` function name | _unbound_ | |
-| `<PATH_NORMALISATION>` function name | _unbound_ | |
-| `<AMBIGUITY_REASON_CODE>` accessor function name | _unbound_ | |
-| `<AMBIGUITY_REASON_CODE>` literal value returned by that accessor | _unbound_ | |
+| module path | `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1` carries the derivation role; its sibling `.claude/lib/worktree-resolution/WorktreeResolution.psm1` carries the normalisation and reason-code roles | registered at `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json:169` and `:170` |
+| module import statement | `Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTargetResolution.psm1') -Force` **and** `Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeResolution.psm1') -Force`; both are required because F1's own sibling import is module-scoped and re-exports nothing, verified by observation | `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1:27`, consumed in that two-statement form at `.claude/hooks/enforce-pr-author-skill-helpers.ps1:39` |
+| `<TARGET_DERIVATION>` function name | `Resolve-WorktreeCallTarget` | `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1:233`, exported at `:346` |
+| `<PATH_NORMALISATION>` function name | `ConvertTo-WorktreeResolutionRepoRelativePath` | `.claude/lib/worktree-resolution/WorktreeResolution.psm1:421`, exported at `:498` |
+| `<AMBIGUITY_REASON_CODE>` accessor function name | `Get-WorktreeResolutionAmbiguityReasonCode` | `.claude/lib/worktree-resolution/WorktreeResolution.psm1:463`, exported at `:499` |
+| `<AMBIGUITY_REASON_CODE>` literal value returned by that accessor | `TARGET_WORKTREE_AMBIGUOUS` | `.claude/lib/worktree-resolution/WorktreeResolution.psm1:55`, returned at `:472` |
+| `<NO_TARGET_REASON_CODE>` accessor function name | `Get-WorktreeResolutionNoTargetReasonCode` | `.claude/lib/worktree-resolution/WorktreeResolution.psm1:475`, exported at `:500` |
+| `<NO_TARGET_REASON_CODE>` literal value returned by that accessor | `TARGET_WORKTREE_NOT_DERIVABLE` | `.claude/lib/worktree-resolution/WorktreeResolution.psm1:59`, returned at `:487` |
+| `<TARGET_DERIVATION>` identity form (Revision 0.5) | `Resolve-WorktreeItemTarget` | `.claude/lib/worktree-resolution/WorktreeItemResolution.psm1:337`, exported at `:392` |
 
 The filled table, together with the F1 source lines it was read from, is archived under
 `evidence/other/` as the record that the binding was performed against merged source rather than
@@ -637,6 +640,166 @@ Two mechanical traps:
   archived under `evidence/baseline/`.
 
 
+## Revision 0.5 — Identity-Based Target Resolution
+
+### 1.1 Established facts (empirical probe, 2026-09-18; treated as established)
+
+1. A PreToolUse hook runs in the directory of the process that made the call. A call made from inside an item's own worktree already reads that worktree's checkpoint through the relative path.
+2. An isolated subagent (`Agent` with `isolation: worktree`) gets a worktree built from `origin/main`'s tip, and its hooks run inside that worktree using `main`'s copy of the hook scripts. A hook change on this branch therefore cannot be exercised end to end by isolated subagents before merge. **All pre-merge verification in this plan is in-process or child-process Pester and the Python suite. No task delegates to an isolated subagent to verify behaviour.**
+3. The hook payload's `cwd` field is, for the calls that produce false approvals, the coordinator's directory, not the item's. It is never used to identify the item.
+4. False approvals arise only from calls made by a process whose directory is not the item's worktree: a coordinator delegating gated work on an item's behalf, or a process acting on an item through `cd` or `git -C`. The incident was green because a stale per-feature checkpoint for issue 838 sat at the coordinator's root.
+5. `Resolve-WorktreeCallTarget` reads signals in the order FeatureFolderPath, FilePath, Branch (`.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1:276-280`) and treats any signal with other than exactly one candidate as `Ambiguous` (`:289-293`). A feature folder merged to `main` exists in every checkout branched from `main`, so a relative folder token is almost always `Ambiguous`, and it overrides a branch signal that is unique. Verified: `branch: <item branch>` alone resolves uniquely; the same text plus the relative folder path resolves `Ambiguous`. The folder identifies what the work is, not where it lives.
+6. Verified 2026-09-18: a coordinating session delegating `atomic-planner` for an item whose feature folder has merged, and therefore also exists in other checkouts, matched twelve candidate worktrees and was denied `TARGET_WORKTREE_AMBIGUOUS` by `.claude/hooks/enforce-prd-feature-before-planner.ps1`. That is the ordinary state of a folder after merge, so the gate denies the ordinary case. §2.7.5 makes it a regression case.
+
+### 2.1 Identity resolution module (design B)
+
+New module `.claude/lib/worktree-resolution/WorktreeItemResolution.psm1`, beside F1's two modules. It imports `WorktreeResolution.psm1` and `WorktreeTargetResolution.psm1` with `-ErrorAction Stop` and re-uses F1's enumeration, marker test, ascent, branch reader, path normaliser, path join, result constructor, and reason-code accessors. It re-implements none of them. `WorktreeResolution.psm1` (500 lines) and `WorktreeTargetResolution.psm1` are **not modified**, so no extraction is needed; the coupling guard in [P10-T5] asserts both are absent from the diff.
+
+Exported functions (all `[CmdletBinding()]`, each with `[OutputType()]` declared to match what it returns, including `[string[]], [object[]]` where it returns `, [string[]]`):
+
+| Function | Contract |
+| --- | --- |
+| `Get-WorktreeItemCheckpointRelativePath` | Returns the one definition of the literal `artifacts/orchestration/orchestrator-state.json`. |
+| `Get-WorktreeItemCheckpointPath -WorktreeRoot` | Returns `Join-WorktreeResolutionPath -WorktreeRoot <root> -RepoRelativePath (Get-WorktreeItemCheckpointRelativePath)`, an absolute forward-slash path. |
+| `Find-WorktreeItemIssueSignal -Text` | Returns, as `, [string[]]`, the distinct normalised issue numbers named by lines matching `Canonical issue number for this feature is <digits>` (case-sensitive, optional `#` before the digits), in order of first appearance. |
+| `ConvertTo-WorktreeItemIssueNumber -Value` | Pure. Returns the positive-integer issue number as a digit string without leading zeros for an integer value or a string of the form optional `#` plus digits (whitespace trimmed); `$null` for anything else, including zero, `none`, and an empty value. |
+| `Get-WorktreeItemCheckpointText -Path` | The module's only filesystem read (seam): raw text of a file, or `$null` when absent or unreadable. |
+| `Get-WorktreeItemCheckpointIssue -WorktreeRoot` | Reads the checkpoint at `Get-WorktreeItemCheckpointPath` through the seam, parses it with `ConvertFrom-Json` inside `try`, and returns `ConvertTo-WorktreeItemIssueNumber` of its `issue-num` property; `$null` when the file is absent, empty, unparseable, not a JSON object, or lacks the key. |
+| `Get-WorktreeItemLiveRoot -SessionRoot [-Branch]` | Seam. Ascends from `SessionRoot` with `Find-WorktreeResolutionRoot`; when no worktree root is found returns an empty array. Otherwise returns `Get-WorktreeResolutionWorktreeRoot -SessionRoot <ascended root> [-Branch <b>]` filtered to roots for which `Test-WorktreeResolutionRootMarker` is true. |
+| `Resolve-WorktreeItemTarget -Text [-SessionRoot]` | Always returns an object built by `New-WorktreeResolutionTargetResult`. Algorithm in §2.2. `SessionRoot` defaults to `(Get-Location).ProviderPath`. |
+
+**Definition of live.** A worktree root `W` is live when (L1) it is registered in the administrative layout of the repository containing the calling process's directory, which is the main checkout plus every `worktrees/<name>/gitdir` registration (`Get-WorktreeResolutionWorktreeRoot`), and (L2) `Test-WorktreeResolutionRootMarker -Path W` is true, meaning the directory exists and its `.git` entry is a directory or a well-formed `gitdir:` file. A registration whose directory was deleted (git's "prunable" state) fails L2 and is excluded. A worktree records issue `N` when `Get-WorktreeItemCheckpointIssue -WorktreeRoot W` equals `N`. Only the canonical checkpoint path is read, so a checkpoint archived under `artifacts/orchestration/handoff/` is never matched.
+
+**Stale attempts at the same issue.** A worktree from an earlier attempt is excluded when its directory is gone (L2) or its checkpoint was archived or removed. When it is still live and still records issue `N`, the issue alone places the call in two worktrees, which is `Ambiguous`. The only tie-breaker is a branch signal in the same call: git checks a branch out in at most one worktree, so the branch names exactly one of them. No timestamp, `last_updated`, lifecycle step, or path proximity is ever read to break the tie, because a stale checkpoint carries those values too; choosing by them is the defect class this feature removes. The ambiguity detail names the remedy: archive the stale checkpoint (design A) or add a `branch:` label.
+
+### 2.2 Resolution algorithm (`Resolve-WorktreeItemTarget`)
+
+Let `I` be the issue numbers from `Find-WorktreeItemIssueSignal`, `B` the branch from `Find-WorktreeResolutionBranchSignal` (first match, F1's reader unchanged), and `S` the normalised session path. Decided in this order:
+
+| # | Condition | Status | Detail (no absolute path is ever included) |
+| --- | --- | --- | --- |
+| 1 | `I` has more than one member | Ambiguous | `the call names <k> different issue numbers (<list>), and an item has exactly one` |
+| 2 | `I` empty and `B` absent | NoTarget, returned before any enumeration or file read | `the call carries neither a canonical issue number line nor a branch signal (--head, --branch, or branch:), so the item it acts on cannot be identified` |
+| 3 | `B` present: `MB = Get-WorktreeItemLiveRoot -SessionRoot S -Branch B` has 0 members | NoTarget | `branch '<B>' is checked out in no live worktree` |
+| 4 | `B` present: `MB` has more than one member | Ambiguous | `branch '<B>' is checked out in <k> live worktrees` |
+| 5 | `B` present, `MB = {W}`, `I` empty | resolved `W` | `branch '<B>' resolves to the live worktree that has it checked out` |
+| 6 | `B` present, `MB = {W}`, `I = {N}`, `W` records `N` | resolved `W` (this breaks a stale-attempt tie) | `branch '<B>' and issue <N> resolve to the same live worktree` |
+| 7 | `B` present, `MB = {W}`, `I = {N}`, `W` records a different issue `M` | Ambiguous | `branch '<B>' places the call in a worktree whose checkpoint records issue <M>, not issue <N>` |
+| 8 | `B` present, `MB = {W}`, `I = {N}`, `W`'s issue unknown, and some other live worktree records `N` | Ambiguous | `branch '<B>' and issue <N> place the call in different worktrees` |
+| 9 | `B` present, `MB = {W}`, `I = {N}`, `W`'s issue unknown, no live worktree records `N` | resolved `W` | as row 5 |
+| 10 | `B` absent, `I = {N}`: `MI` = live worktrees recording `N` has 0 members | NoTarget | `issue <N> is recorded in the orchestrator checkpoint of no live worktree` |
+| 11 | `B` absent, `MI = {W}` | resolved `W` | `issue <N> resolves to the live worktree recording it` |
+| 12 | `B` absent, `MI` has more than one member | Ambiguous | `issue <N> is recorded in the orchestrator checkpoints of <k> live worktrees; move the stale checkpoint to artifacts/orchestration/handoff/ or add a branch: label naming the item's branch` |
+
+A resolved result has `Status` `SessionRoot` when `W` equals `S` or equals `Find-WorktreeResolutionRoot -Path S` (the latter evaluated only when the former is false), and `OtherWorktree` otherwise; `Signal` is `Branch` with `SignalValue` `B` when a branch was used, and empty otherwise; `Candidate` is `@(W)`. Ambiguous results carry the candidate roots in `Candidates` (an object field, never rendered into a reason). `ReasonCode` is supplied by F1's constructor: `NoTarget` carries the no-target code and `Ambiguous` the ambiguity code (user mapping, 2026-09-18: zero live matches or no identity deny with the no-target code; several, or disagreeing signals, deny with the ambiguity code).
+
+The calling process's directory is used for exactly two things: to find the repository whose worktrees are enumerated, and to label a resolved result `SessionRoot`. It is never the checkpoint location unless identity resolution selects it. The payload `cwd` field is not read.
+
+### 2.3 Signal precedence decision (point 5)
+
+**Decision: a feature folder is used only to find documents and never to choose the worktree.** `Resolve-WorktreeItemTarget` reads no path signal at all: an absolute or relative feature-folder path, and an absolute file path, are ignored for worktree selection. Ranking unique signals above location-ambiguous ones was rejected, because an absolute path is still host-dependent, and a ranked resolver would keep a path as a fallback selector.
+
+The rule applies to all four gates this plan touches. The three bindings of §2.6 locate no documents at all, so they read no folder. The prd-feature gate does locate documents, and §2.7 gives it the folder in exactly that role: identity picks the worktree, then the folder names which documents to check beneath it.
+
+### 2.4 Checkpoint hygiene (design A) and where it is enforced
+
+**Rule.** A coordinating session never holds a per-feature `artifacts/orchestration/orchestrator-state.json` at its own root when it hands work off. It moves such a file to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, following the existing convention (`artifacts/orchestration/handoff/` already holds `orchestrator-state.epic-678-integration-pr-686.2026-09-18T10-37.json` in this worktree).
+
+**Enforcement decision.**
+
+1. **Skill contract (normative).** [P8-T2] to [P8-T4] add the rule to `.claude/skills/orchestrate/SKILL.md` `## Checkpoint Handling` (archive a checkpoint belonging to a different issue instead of overwriting or leaving it; archive on handing an item to another session or worktree), `.claude/skills/parallel-orchestrate/SKILL.md` `## Per-Item Branch and Worktree Lifecycle`, and `.claude/skills/epic-orchestrate/SKILL.md` `## Epic-Level Checkpoint`. A Pester contract test ([P8-T6]) asserts each statement is present, so the rule cannot be removed silently.
+2. **Mechanical check inside the four gates.** Under identity resolution a stale root checkpoint can affect a verdict only when it records the same issue as the call. In that case the root is a second live worktree recording the issue, and §2.2 row 12 denies `Ambiguous` with the archive remedy in the reason. A stale checkpoint for a different issue is never read by these gates. The gates therefore enforce hygiene exactly where it could change their verdict, with no new deny path.
+3. **No separate hook or validator check is added.** A check that denied on the mere presence of a foreign checkpoint would add a deny path to gates for a condition that is not itself a gated action, and a Python validator check would require a TypeScript parity port. Neither is needed for the correctness of the four gates. The gates that still read cwd-relative checkpoints are listed in §8 as the places where hygiene continues to matter; they are tracked under issue #690 and are out of scope here.
+
+**Delegation identity (skill contract).** `.claude/skills/orchestrate/SKILL.md:258` currently requires the canonical issue line only on delegations to `atomic-planner`, `atomic-executor`, and `feature-review`. [P8-T2] extends it to all six receipt-gated types (`atomic-planner`, `atomic-executor`, `feature-review`, `task-researcher`, `prd-feature`, `pr-author`, matching `Get-ModelRoutingGatedAgent` at `.claude/hooks/enforce-model-routing-receipt.ps1:73-80`) and adds a `branch:` label naming the item's branch, written as the first `branch:` occurrence in the prompt. Before promotion assigns an issue number, the branch label alone is required. The same paragraph names both identity-resolving gates, `enforce-model-routing-receipt.ps1` and `enforce-prd-feature-before-planner.ps1`, because after Phase 9 an `atomic-planner` delegation is read for identity by both. The contract test pins the skill's agent list to the gate's list.
+
+### 2.5 Hook outcomes (all four gates)
+
+| Resolution state | Action | Reason text begins with |
+| --- | --- | --- |
+| `SessionRoot` or `OtherWorktree` | proceed against the resolved worktree root; all existing decision logic runs unchanged | existing reasons only |
+| resolved; checkpoint or document state is genuinely bad | existing deny, unchanged | `ORCHESTRATOR_STATE_PREFLIGHT_FAILED` (pr-author), `MODEL_ROUTING_RECEIPT_BLOCKED` (model-routing), `PRD_FEATURE_BLOCKED: resolved feature folder ... is missing:` or the work-mode reason (prd-feature) |
+| `NoTarget` | deny | `$target.ReasonCode` (the no-target code) |
+| `Ambiguous` | deny | `$target.ReasonCode` (the ambiguity code) |
+
+There is no working-directory fallback on any branch. A target-resolution deny never contains a document-family or checkpoint-family reason, and a document-family or checkpoint-family deny never contains either target-resolution code. §2.7.4 states the one place where the prd gate emits a resolution code on a non-identity path and why it belongs to the resolution family.
+
+### 2.6 Hook changes (bindings 1, 2, and 3)
+
+- **DD-1 — pr-author seam body.** `Resolve-PrAuthorWorktreeTarget` keeps its name and `-CommandText` parameter; its body becomes `Resolve-WorktreeItemTarget -Text $CommandText -SessionRoot (Get-Location).Path`. `Get-PrAuthorTargetCheckpointResolution` merges `SessionRoot` and `OtherWorktree` into one branch returning `Get-WorktreeItemCheckpointPath -WorktreeRoot $target.WorktreeRoot`; its deny branch and reason text are unchanged (#687 behaviour, including the `--head` remedy). `enforce-pr-author-skill-helpers.ps1` adds `Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop` after its two F1 imports (`:38-39`), which stay.
+- **DD-2 — resolve once, pass explicitly (bindings 1 and 2).** `enforce-pr-author-skill.ps1:49` becomes `$script:OrchestratorStateCheckpointPath = $null` (the spec's required form). In `Get-PrAuthorBypassReason`, after the deny check, `$script:OrchestratorStateCheckpointPath` is assigned the resolved absolute path and passed to `Invoke-OrchestratorStatePreflight -CheckpointPath`, to `Test-PrAuthorReceiptVerification -CheckpointPath` (new mandatory parameter), and on to `Test-EpicBaseBranchOverride -CheckpointPath` (new mandatory parameter), which passes it to `Get-PrAuthorCheckpointContent -CheckpointPath` (now mandatory, default removed).
+- **DD-3 — model-routing (binding 3).** `enforce-model-routing-receipt.ps1` imports `WorktreeItemResolution.psm1` at script scope with `-Force -ErrorAction Stop` after the `HookPayload.psm1` import at `:36`. New seam `Resolve-ModelRoutingWorktreeTarget -PromptText` calls `Resolve-WorktreeItemTarget -Text $PromptText -SessionRoot (Get-Location).Path`. New `Get-ModelRoutingTargetCheckpointResolution -PromptText` maps §2.5 and returns an ordered dictionary with `CheckpointPath` and `Reason`. The reason for an unresolved target is `"$($target.ReasonCode): $($target.Detail) The model-routing gate will not check this delegation against a checkpoint that may belong to a different item. Put the line 'Canonical issue number for this feature is <N>.' and a 'branch: <item branch>' label in the delegation prompt so the gate can identify the item."`. The deny sits between the scope filter (`:153-155`) and the checkpoint read (`:157`), which becomes `Get-ModelRoutingCheckpoint -CheckpointPath $resolution.CheckpointPath`; `Get-ModelRoutingCheckpoint`'s parameter becomes mandatory with no default. Only the `prompt` field is scanned.
+
+### 2.7 prd-feature gate migration (design C, issue #672)
+
+The gate's job is unchanged: block an `atomic-planner` delegation whose feature folder does not yet hold the prerequisite documents its persisted work mode requires. What changes is how it decides *where* to look.
+
+#### 2.7.1 Identity picks the worktree
+
+- **DD-4 — derivation seam.** `Get-PrdFeatureCallTarget` loses its `-Envelope` parameter and keeps `-ToolInput`. It assembles the prompt and description text exactly as today (`.claude/hooks/enforce-prd-feature-before-planner.ps1:265-267`) and returns `Resolve-PrdFeatureWorktreeTarget -Text $text`. That new one-line seam calls `Resolve-WorktreeItemTarget -Text $Text -SessionRoot (Get-Location).Path`. The envelope `cwd` read at `:272-275` is deleted with the parameter, so the gate has no syntactic route to it. The file's `Import-Module` of `WorktreeTargetResolution.psm1` (`:108`) **stays**, and an import of `WorktreeItemResolution.psm1` is added immediately after it, unguarded for the same stated reason — the two-import form of `.claude/hooks/enforce-pr-author-skill-helpers.ps1:38-39`.
+
+  **Why both imports, not a swap (orchestrator ruling, 2026-09-19).** `Join-WorktreeResolutionPath`, which the probe composition at `:381` calls, is defined at `WorktreeTargetResolution.psm1:311` and appears only in that file's explicit `Export-ModuleMember -Function` list at `:341-347`. `WorktreeResolution.psm1`'s list at `:490-500` does not carry it. A module that imports a sibling does not re-export the sibling's functions to its own importer when its exports are pinned by an explicit list, so importing `WorktreeItemResolution.psm1` alone would not put `Join-WorktreeResolutionPath` in the gate's scope. Swapping the import would therefore make `:381` an unresolvable command on every `OtherWorktree` result — the coordinator case this feature exists to fix — and [P9-T9] row 1 could not pass. Keeping both imports is the minimal change, follows the precedent already in the tree for this exact reason, leaves the new module's export surface at the eight functions §2.1 specifies, and keeps DD-8's claim that `:379-382` is unchanged.
+
+  **Scope sweep (recorded so it is not re-derived).** The same rule was checked against every other consumer in this plan and no second instance exists. `enforce-pr-author-skill-helpers.ps1` already imports both F1 modules explicitly and DD-1 adds the third. `enforce-model-routing-receipt.ps1` calls no F1 function — it reads `ReasonCode` and `Detail` as properties — so DD-3's single import suffices. `WorktreeItemResolution.psm1` imports both F1 modules itself and calls them from inside its own session state. The prd gate reaches `Get-WorktreeResolutionAmbiguityReasonCode` and the no-target accessor through the dot-sourced helpers' import of `WorktreeResolution.psm1` (`helpers:27`), because an `Import-Module` inside a dot-sourced file lands in the caller's session state; that is why the helpers' import is load-bearing for the parent and must not be removed. Every suite this plan authors imports all three modules explicitly per §4; the four pre-existing suites it edits import none or two and resolve through the hook and helpers they dot-source, which §4 records as sound and which no task changes.
+- `Invoke-PrdFeatureBeforePlannerDecision` keeps its `-ResolvedTarget` injection seam and its `$PSBoundParameters.ContainsKey` binding rule unchanged.
+- **DD-5 — unresolved identity denies first.** The Ambiguous-only check at `:337-339` becomes a check for `NoTarget`, for `Ambiguous`, and for a `$null` target from either source. It denies through `Get-PrdFeatureTargetDecision -ReasonCode <code> -Detail <detail>`, which replaces `Get-PrdFeatureAmbiguityDecision` (`:203-231`) and takes the code as a parameter instead of calling one accessor. `$null` has two origins and both mean the same thing: the `-ResolvedTarget` seam explicitly bound to `$null`, and `Get-PrdFeatureCallTarget`'s existing early return for empty text (`:268-270`), which DD-4 keeps so that a call carrying no text still performs no enumeration and no file read. For either, the code is `Get-WorktreeResolutionNoTargetReasonCode` and the detail is `the call target was not resolved`. The early return is load-bearing for a pinned assertion: `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1:186` asserts the resolver is invoked zero times for an empty-text call. The reason keeps the `PRD_FEATURE_BLOCKED: <code> - <detail>. ` prefix shape and replaces the remedy sentence, which currently instructs the caller to cite an absolute path (`:227-228`) and after this change would name an action that no longer selects anything. The new remedy is: `Put the line 'Canonical issue number for this feature is <N>.' and a 'branch: <item branch>' label in the delegation prompt so the gate can identify the item.` The deny still runs before any document probe.
+
+#### 2.7.2 The folder locates documents beneath the resolved worktree
+
+- **DD-6 — checkpoint fallback anchored to the resolved worktree.** `Get-PrdFeatureCheckpointFolder`'s `-CheckpointPath` parameter becomes `[Parameter(Mandatory)]` with no default (`:160`). The single production call site passes `Get-WorktreeItemCheckpointPath -WorktreeRoot $target.WorktreeRoot`. The calling session's checkpoint is therefore never read unless identity resolved to the calling session's own worktree.
+- **DD-7 — folder selection.** The parent computes `$candidates = @(Find-PrdFeatureFolderCandidate -Prompt $prompt)` as today (`:341`) and reads the checkpoint only when it needs it:
+  - exactly one candidate: that candidate is the folder, and no checkpoint read occurs;
+  - zero or more than one candidate: the checkpoint folder is read once, through DD-6.
+
+  `Find-PrdFeatureFolderFromPrompt` replaces its `-Target` parameter with an optional `-CheckpointFolder`, and `Select-PrdFeatureFolderByTarget` (`helpers:211-244`) becomes `Select-PrdFeatureFolderByCheckpoint -Candidate -CheckpointFolder`, which normalises the checkpoint value through `ConvertTo-PrdFeatureFolderToken` and returns it when it is one of the candidates. The disambiguator is still not prompt position and is still not a foreign session's record: the checkpoint now consulted belongs to the worktree identity selected, which is the item's own. When it names none of the candidates the tie is unresolved and the gate denies with the ambiguity code, as today (`:346-348`), with the detail changed to name the checkpoint rather than a derived target. The replacement detail must retain the clause `cites $($candidates.Count) feature folders ($($candidates -join ', '))` verbatim, because `TargetResolution.Tests.ps1:417` asserts `*cites 2 feature folders*` and [P9-T5] step 5 keeps that assertion while [P9-T12] gates on the row.
+  - When the prompt named no folder and the checkpoint supplied none, the decision logic of the existing `must reference a feature folder` deny at `:363-371` is unchanged. Its reason string at `:368` is reworded by [P9-T4], which is required rather than optional: that string is the file's second occurrence of the checkpoint filename literal, and three acceptance conditions require the literal to be gone from the file.
+- **DD-8 — probe anchoring unchanged.** The probe folder is composed with `Join-WorktreeResolutionPath -WorktreeRoot $target.WorktreeRoot -RepoRelativePath $folderNormalized` when the resolved status is `OtherWorktree`, and is the bare repo-relative spelling when it is `SessionRoot` (`:379-382`, unchanged, including the call at `:381`). That call resolves only because DD-4 keeps the `WorktreeTargetResolution.psm1` import alongside the new one; the reasoning is recorded under DD-4 and is the single condition on which this bullet's "unchanged" claim depends. The `SessionRoot` case is correct because the gate is then executing inside the resolved worktree. The residual case — a process whose directory is a subdirectory of the resolved worktree — is recorded in §8; it is pre-existing, it can only produce a false denial, and closing it would rewrite the probe-path assertions of two suites that sit within fifty lines of the 500-line cap.
+- **DD-8a — the folder-absent guard keeps its `$probeFolder -ne $folderNormalized` conjunct (`:393`).** Revision 4 proposed dropping it on the reasoning that composition is always absolute; DD-8 makes that false for a `SessionRoot` result, and dropping it would make `if ($null -eq $issueContent)` fire ahead of the work-mode branch on every session-root call whose `issue.md` is unreadable. `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.FolderResolution.Tests.ps1:338-349` (`It 'denies with the indeterminate-marker reason when issue.md is unreadable'`) pins exactly that case and is a row [P9-T7] forbids editing. The conjunct is therefore kept byte-unchanged, which is also what §2.7.3 and §2.7.4 require.
+- **DD-9 — dead branch removal.** `Test-PrdFeatureSessionRootTarget` (`:181-201`) and the deny at `:359-361` are deleted. Both exist to stop a session's own checkpoint standing in for another worktree's call; after DD-6 the checkpoint read is anchored by construction, so the guard is unreachable and would be uncovered code.
+
+#### 2.7.3 Work-mode contract preserved exactly
+
+`Resolve-PrdFeatureWorkMode`'s regex, its legacy `full` normalisation, and `Get-PrdFeatureRequiredFile`'s mapping and `default` arm (`helpers:52`, `:58-61`, `:90-95`) are not edited. `full-feature` requires `spec.md` and `user-story.md`; `full-bug` requires `spec.md`; `minor-audit` requires neither; an absent or unrecognised marker denies on its own branch (`:406-418`), naming no prerequisite set and running no required-file probe.
+
+#### 2.7.4 Genuine denies preserved
+
+A prerequisite document that is truly absent under the resolved folder still denies with the existing reason `PRD_FEATURE_BLOCKED: resolved feature folder '<folder>' is missing: <list> (work mode: <mode>). ...` (`:434-436`), which contains neither resolution code. The work-mode deny likewise contains neither.
+
+One non-identity path keeps a resolution code: the resolved folder does not exist beneath a resolved worktree that is not the session root (`:393-395`, guarded by the DD-8a conjunct). That is a resolution failure and not a document failure — the gate cannot confirm it is looking at the item it resolved — so it stays in the resolution family and keeps the ambiguity code. What changes at that site is the decision helper and one phrase of the detail: the `return` on `:394` moves from the deleted `Get-PrdFeatureAmbiguityDecision` to `Get-PrdFeatureTargetDecision` with the ambiguity accessor passed explicitly, so the emitted code is identical and the detail differs only in reading `resolved target worktree` where it read `derived target worktree`. `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1:481-497` (`It 'denies with the ambiguity reason when the folder is absent from the target root'`, asserting the code at `:495`) is a surviving row that requires exactly this, and it is not among [P9-T5]'s edits. When the resolved worktree is the session root the conjunct is false and an unreadable `issue.md` falls through to the work-mode branch, exactly as it does today. The gate therefore emits a resolution code on exactly three paths: unresolved identity, unresolved multi-candidate tie, and folder-absent-under-another-worktree. A named test asserts the two families never intersect.
+
+#### 2.7.5 Regression case
+
+A coordinating session delegates `atomic-planner` for an item whose feature folder also exists in other worktrees, which is the normal state once a folder has merged. Before this change the gate resolves folder-first, matches several worktrees, and denies `TARGET_WORKTREE_AMBIGUOUS` — observed 2026-09-18 with twelve candidate worktrees. After this change the prompt's canonical issue line resolves to the one live worktree whose checkpoint records that issue, the prerequisites are probed beneath it, and the call is allowed. [P9-T2] records the pre-change verdict deterministically and [P9-T9] row 1 asserts the post-change verdict.
+
+#### 2.7.6 Files expected in the diff for #672
+
+`.claude/hooks/enforce-prd-feature-before-planner.ps1`, `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1`, their two mirrors under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`, the three existing suites `enforce-prd-feature-before-planner.Tests.ps1`, `enforce-prd-feature-before-planner.FolderResolution.Tests.ps1`, `enforce-prd-feature-before-planner.TargetResolution.Tests.ps1`, the new suite `enforce-prd-feature-before-planner.IdentityResolution.Tests.ps1`, and `docs/features/active/2026-09-13-prd-feature-gate-target-resolution-672/spec.md`. `.claude/lib/worktree-resolution/WorktreeResolution.psm1` and `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1` stay absent from the diff. No manifest edit is needed for #672: the two gate files are already registered in `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` at `:48-49`, and the two F1 module paths at `:169-170`, which is the pair RS-9 cites and after which [P2-T4] inserts the new module.
+
+## 3. Reconciliation record (every restated acceptance criterion)
+
+| ID | AC | Original wording assumed | Restatement |
+| --- | --- | --- | --- |
+| RS-1 | AC-9, AC-10, AC-13, AC-15, AC-17 | one "ambiguity reason code" | Two target-resolution codes exist: the no-target code (no identity, or an identity that places in no live worktree) and the ambiguity code (several live worktrees, or disagreeing identities). Tests obtain both only from `Get-WorktreeResolutionNoTargetReasonCode` and `Get-WorktreeResolutionAmbiguityReasonCode`. AC-15 treats "the ambiguity reason code" as the set of both. AC-17 asserts one case per unresolved state. |
+| RS-2 | AC-13 rows R8, R9 | R8 "target resolves outside any worktree"; R9 "a command naming two worktrees" | Paths no longer place a call. R8 becomes "an identity that places in no live worktree" (no-target code). R9 becomes "identities that place in different worktrees": two issue numbers, an issue and a branch that disagree, or an issue recorded by two live worktrees (ambiguity code); never first-match. |
+| RS-3 | AC-9, AC-10 row R2 | the sibling-only case denies with the ambiguity code | R2's payload carries no identity, so it denies with the no-target code. A second model-routing R2 row uses the verbatim prompt of `evidence/baseline/repro-3-4-control-pair.md:28`, whose only path token is a repository-relative file path beneath a feature folder, and also denies with the no-target code, because neither a folder nor a file path is an identity. |
+| RS-4 | AC-11 row R4 | own and sibling both present, verdict from own (mechanism unstated) | Proven through identity: the prompt or command names the own item by issue or branch, both fixture checkpoints are live, and the verdict comes from the own checkpoint. A further row proves a branch label breaks a stale-attempt tie. |
+| RS-5 | AC-12 | fail-before observable for both families | pr-author R2 already denies on this tree (#687). Satisfied by the archived pre-#687 `allow` (`evidence/baseline/repro-3-2-control-pair.md`, AC-1, AC-2), the dossier `evidence/regression-testing/fail-before-exception.2026-09-19T09-00.md`, and the substitute binding-2 row `pr-author R4 takes the epic base-branch verdict from the own checkpoint when own and sibling checkpoints are both present`, which allows before the fix and denies after it. The model-routing half is observed directly. |
+| RS-6 | AC-14 row R7 | empty or unparseable checkpoint at a resolved target | Asserted on targets resolved by branch (§2.2 row 9) or by the hook seam. Under issue-only identity an unreadable checkpoint cannot be matched to its issue, so that call denies with the no-target code; that is still a deny and is stated, not hidden. |
+| RS-7 | AC-8 | no fallback to the process working directory | The working directory only locates the repository and labels `SessionRoot` (§2.2). It is never the checkpoint location unless identity resolution selects that worktree. For the prd gate the one remaining use of the process directory is DD-8's `SessionRoot` probe spelling, which names the resolved worktree itself. |
+| RS-8 | AC-19 | protected rows at spec line numbers, edit forms (a) and (b) | #687 moved rows and renamed the end-to-end row (audited by [P0-T6]). This plan edits: form (a) at `enforce-pr-author-skill.epic-base-branch.Tests.ps1:34` and `:40`, which are the two calls inside AC-19's protected span `:22-42`, plus `:48`, `:58`, `:68`, `:78`, `:84`, which are outside it, and `enforce-pr-author-skill.epic-base-branch.TriggerScoping.Tests.ps1:38`, `:52`; form (c), one Describe-level `BeforeEach` in `enforce-model-routing-receipt.Tests.ps1` mocking `Resolve-ModelRoutingWorktreeTarget` to `SessionRoot` at `(Get-Location).Path`, the form #687 used on `main`; no edit to `enforce-pr-author-skill.OrchestratorStatePreflight.Tests.ps1` (its end-to-end row resolves NoTarget before the pin at `:97` is read). |
+| RS-9 | AC-21, AC-22 | F1 merged into an epic integration branch | F1 (#669) is on `main`. AC-21: both F1 module paths appear once in `core.json` `paths[]` (`:169-170`), `WorktreeResolution.Manifest.Tests.ps1` passes, and the commit adding `WorktreeTargetResolution.psm1` is an ancestor of `origin/main`. AC-22: the binding table is refreshed to current lines and gains the no-target rows and the identity-derivation row. |
+| RS-10 | AC-23 | search the whole repository | Evaluated over files added or modified outside the feature folder, for both literals. Two #687 files carrying the literals are edited and cleaned: the doc comment at `helpers:74` and `:78`, and `enforce-pr-author-skill.TargetResolution.Tests.ps1`. Skill edits and every file Phase 9 touches must not carry either literal; the prd suites already obtain the code from the accessor. |
+| RS-11 | AC-24 | F5 defines no target derivation; every use calls F1 | The identity derivation is a new resolution mode placed in the worktree-resolution library beside F1, re-using F1's enumeration, marker test, ascent, branch reader, join, constructor, and accessors. No hook file defines any derivation, normalisation, or reason code. |
+| RS-12 | AC-25 | each hook imports F1's module | Each entry hook imports the library module it calls (`WorktreeItemResolution.psm1`) unconditionally at script scope, in the form its own file already uses: the pr-author helpers and the model-routing gate use `-Force -ErrorAction Stop`, and the prd-feature gate keeps the bare `-Force` form of `.claude/hooks/enforce-prd-feature-before-planner.ps1:108`, whose unguarded import is already documented as the fail-closed choice at `:104-107`. Both forms are unguarded, which is what AC-25 requires; neither is wrapped in `try` or softened with `SilentlyContinue`. That module imports F1's two modules with `-ErrorAction Stop`. `enforce-pr-author-skill.epic-base-branch.ps1` calls no library function (it receives the path) and gains no import. `enforce-prd-feature-before-planner.ps1` keeps its `WorktreeTargetResolution.psm1` import at `:108` and gains a second import of `WorktreeItemResolution.psm1`, because `Join-WorktreeResolutionPath` is exported only by the former (DD-4's scope note); `enforce-prd-feature-before-planner-helpers.ps1` keeps its `WorktreeResolution.psm1` import, which supplies both the normalisation `ConvertTo-PrdFeatureFolderToken` calls and, through the dot-source, the two reason-code accessors the parent calls. |
+| RS-13 | AC-28 | diff against the epic integration branch | Diff against `F5_BASE_SHA`. |
+| RS-14 | AC-30 | no file exceeds 500 lines | `tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1` is 509 lines on `main`; [P6-T2] moves its value-contract block into a sibling file. The prd files are 456, 320, 499, 454, and 446 lines before Phase 9; DD-9's deletions give the gate file headroom, and the new identity rows go into a new suite rather than into the 499-line file. |
+| RS-15 | AC-31 | four hooks | Coverage floor also applies to `WorktreeItemResolution.psm1` and to the two prd gate files. |
+| RS-16 | AC-32, spec test construction | out-of-process fixture spawns | Fixture rows run in process with both `Set-Location` and `[Environment]::CurrentDirectory` set and restored in `finally` (spec trap 1 permits this), so their lines are coverage-instrumented. The prd suites are exempt from this mechanism entirely: they change no directory and touch no file (RS-19). |
+| RS-17 | AC-1, AC-2 | verbatim decision JSON | [P1-T5] replaces host tokens in the archived runs with placeholders under the binding host-data rule; permission decisions and reason codes are unchanged, and a redaction log records per-file counts. |
+| RS-18 | AC-33 | seven-stage loop for PowerShell | A Python test file changes ([P8-T5]), so format, lint, and type stages also run for it. |
+| RS-19 | issue #672 spec, "The new suite creates no temporary file or directory..." | asserted of `enforce-prd-feature-before-planner.TargetResolution.Tests.ps1` as delivered | Re-asserted over that suite as Phase 9 leaves it and over the new `enforce-prd-feature-before-planner.IdentityResolution.Tests.ps1`. Both keep bare-literal synthetic roots, supply the modelled directory as data on an injected result, create nothing, and change no directory. [P10-T7] is the checking task and [P11-T9] records the closure. |
+| RS-20 | issue #672 spec, multi-candidate disambiguator | "re-specified against the new disambiguator, not deleted" | Re-specified a second time, against DD-7's resolved-worktree checkpoint. The row is edited, never deleted, and it still proves selection is not earliest-occurrence. |
+
 ## Acceptance Criteria
 
 Each criterion is checkable by a third party without re-deriving the reasoning in this document.
@@ -645,17 +808,17 @@ line-oriented search for a prose phrase is not an acceptable substitute.
 
 ### Reproduction before fix
 
-- [ ] AC-1 An evidence artifact under
+- [x] AC-1 An evidence artifact under
       `docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673/evidence/baseline/`
       records four executed runs — defect 3.2 and defect 3.4, each as a control pair (identical
       payload, cwd = session root and cwd = item worktree) — and for each run it records the verbatim
       decision JSON, the exit code, stdout, and stderr.
-- [ ] AC-2 For each defect, the archived control pair shows the session-root run returning
+- [x] AC-2 For each defect, the archived control pair shows the session-root run returning
       `permissionDecision: allow` and the item-worktree run returning a deny, establishing by
       observation that the verdict is a function of cwd and not of the payload. (If either predicted
       `allow` was not observed, execution halts, no hook file is edited, and this criterion stays
       unchecked with the observed result recorded in the baseline artifact.)
-- [ ] AC-3 The baseline artifact is committed before the first commit that modifies any file under
+- [x] AC-3 The baseline artifact is committed before the first commit that modifies any file under
       `.claude/hooks/`, verifiable from `git log` ordering on the feature branch.
 
 ### The three binding sites
@@ -665,69 +828,69 @@ scope, not deletion of the line. See **Required form of the line-49 change** und
 `#### Functions/classes/CLI commands impacted`. A `$null` initialisation is not a residual
 cwd-relative binding.
 
-- [ ] AC-4 `.claude/hooks/enforce-pr-author-skill.ps1` no longer assigns a relative checkpoint path
+- [x] AC-4 `.claude/hooks/enforce-pr-author-skill.ps1` no longer assigns a relative checkpoint path
       at line 49 or anywhere else; `$script:OrchestratorStateCheckpointPath` holds an absolute path
       produced by the resolution step, or the hook has already emitted the ambiguity deny.
-- [ ] AC-5 `.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1` no longer carries a relative
+- [x] AC-5 `.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1` no longer carries a relative
       default for `-CheckpointPath`; the parameter is mandatory, and the call site at line 78 passes
       the resolved path explicitly.
-- [ ] AC-6 `.claude/hooks/enforce-model-routing-receipt.ps1` no longer carries a relative default for
+- [x] AC-6 `.claude/hooks/enforce-model-routing-receipt.ps1` no longer carries a relative default for
       `-CheckpointPath`; the parameter is mandatory, and the call site at line 157 passes the
       resolved path explicitly.
-- [ ] AC-7 A content search for the token `artifacts/orchestration/orchestrator-state.json` across
+- [x] AC-7 A content search for the token `artifacts/orchestration/orchestrator-state.json` across
       the four in-scope hook files returns zero occurrences in executable code. Occurrences inside
       comment or doc-comment blocks are permitted and must be individually confirmed as such.
-- [ ] AC-8 No code path in the four in-scope hook files falls back to the process working directory
+- [x] AC-8 No code path in the four in-scope hook files falls back to the process working directory
       when the resolution step reports that the target cannot be identified. Verified by reading each
       branch of the resolution step and confirmed by the Pester rows in AC-13.
 
 ### The sibling-only deny (the defining behaviour of this feature)
 
-- [ ] AC-9 A named Pester test in
+- [x] AC-9 A named Pester test in
       `tests/scripts/claude-hooks/enforce-pr-author-skill.WorktreeResolution.Tests.ps1` exercises
       matrix row R2 for the pr-author family against committed fixture roots — sibling checkpoint
       present at the session root, gated item's own checkpoint absent — and asserts a deny carrying
       the ambiguity reason code. The test does not mock the checkpoint reader.
-- [ ] AC-10 A named Pester test in
+- [x] AC-10 A named Pester test in
       `tests/scripts/claude-hooks/enforce-model-routing-receipt.WorktreeResolution.Tests.ps1`
       exercises matrix row R2 for the model-routing family under the same conditions and asserts a
       deny carrying the ambiguity reason code. The test does not mock `Get-ModelRoutingCheckpoint`.
-- [ ] AC-11 A named Pester test per hook family covers matrix row R4 (own and sibling checkpoints
+- [x] AC-11 A named Pester test per hook family covers matrix row R4 (own and sibling checkpoints
       both present) and asserts the decision is derived from the **own** checkpoint. Both tests pass.
-- [ ] AC-12 A failing-before record for AC-9 and AC-10 exists under `evidence/regression-testing/`:
+- [x] AC-12 A failing-before record for AC-9 and AC-10 exists under `evidence/regression-testing/`:
       each test is observed failing against the unmodified hooks and passing against the fixed hooks.
 
 ### Genuine absence stays distinguishable from ambiguity
 
-- [ ] AC-13 Named Pester tests cover matrix rows R5, R8, and R9 (no resolvable target; target outside
+- [x] AC-13 Named Pester tests cover matrix rows R5, R8, and R9 (no resolvable target; target outside
       any worktree; a command naming two different worktrees) for both hook families and assert a
       deny carrying the ambiguity reason code. R9 asserts the ambiguity deny specifically, not a
       first-match resolution.
-- [ ] AC-14 Named Pester tests cover matrix rows R3 and R7 and assert the **existing** reason strings
+- [x] AC-14 Named Pester tests cover matrix rows R3 and R7 and assert the **existing** reason strings
       `ORCHESTRATOR_STATE_PREFLIGHT_FAILED` (pr-author) and `MODEL_ROUTING_RECEIPT_BLOCKED`
       (model-routing), not the ambiguity reason code, for a checkpoint that is present-but-not-ready,
       absent at the resolved target, or present but empty or unparseable.
-- [ ] AC-15 A named Pester test asserts that the ambiguity reason code does not appear in the
+- [x] AC-15 A named Pester test asserts that the ambiguity reason code does not appear in the
       decision output of any genuine-absence case, and that the existing reason strings do not appear
       in the decision output of any ambiguity case.
 
 ### Ordering
 
-- [ ] AC-16 A named Pester test covers matrix row R10 and asserts that a command which is not a gated
+- [x] AC-16 A named Pester test covers matrix row R10 and asserts that a command which is not a gated
       `gh pr` invocation, and a delegation whose `subagent_type` is outside the gated set, are both
       **allowed** even when the target is unresolvable — proving the ambiguity deny sits after the
       scope filter.
-- [ ] AC-17 A named Pester test asserts that an unresolvable target denies with the ambiguity reason
+- [x] AC-17 A named Pester test asserts that an unresolvable target denies with the ambiguity reason
       code without the orchestrator-state preflight (pr-author) or the checkpoint read
       (model-routing) being reached — proving the ambiguity deny sits before them.
 
 ### Standalone and epic topologies unchanged
 
-- [ ] AC-18 A named Pester test covers matrix rows R1 and R6 (cwd = item worktree, own checkpoint
+- [x] AC-18 A named Pester test covers matrix rows R1 and R6 (cwd = item worktree, own checkpoint
       present and satisfactory) and asserts `allow`. It is observed passing against the
       **unmodified** hooks before the fix, and that pre-fix run is archived under
       `evidence/baseline/`.
-- [ ] AC-19 The seven pre-existing regression rows listed under `## Test Strategy` remain present and
+- [x] AC-19 The seven pre-existing regression rows listed under `## Test Strategy` remain present and
       pass unmodified: `enforce-pr-author-skill.OrchestratorStatePreflight.Tests.ps1:26-37`,
       `:39-51`, `:64-102`; `enforce-model-routing-receipt.Tests.ps1:62-68`, `:71-92`, `:20-58`;
       `enforce-pr-author-skill.epic-base-branch.Tests.ps1:22-42`. Any edit to these files is limited
@@ -745,38 +908,38 @@ cwd-relative binding.
       `evidence/regression-testing/` quotes both the pre-edit pin and the post-edit pin verbatim, so
       a reviewer can confirm the substitution supplies the same absent path and is therefore
       equivalent.
-- [ ] AC-20 All six decision branches of `enforce-model-routing-receipt.ps1` enumerated under
+- [x] AC-20 All six decision branches of `enforce-model-routing-receipt.ps1` enumerated under
       `### Boundaries and invariants to preserve` retain their current semantics: the hook still
       performs presence-only gating and reads no `model` field. Verified by the existing
       `enforce-model-routing-receipt.Tests.ps1` suite passing with no assertion weakened or removed.
 
 ### F1 contract binding
 
-- [ ] AC-21 F1 is merged into `epic/worktree-scoped-state-resolution-integration`, its module path
+- [x] AC-21 F1 is merged into `epic/worktree-scoped-state-resolution-integration`, its module path
       appears exactly once in
       `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` `paths[]`,
       and its `*.Manifest.Tests.ps1` exists and passes. Confirmed before F5's first hook edit.
-- [ ] AC-22 The BINDING TABLE in this spec has every row filled with a concrete identifier and the
+- [x] AC-22 The BINDING TABLE in this spec has every row filled with a concrete identifier and the
       F1 `file:line` it was read from, and the filled table is archived under `evidence/other/`.
       No row remains `_unbound_`.
-- [ ] AC-23 F5 obtains the ambiguity reason code only by calling F1's exported accessor. A content
+- [x] AC-23 F5 obtains the ambiguity reason code only by calling F1's exported accessor. A content
       search across the whole repository for the literal value recorded in the binding table returns
       occurrences only inside F1's module and inside F1's own tests; it returns **zero** occurrences
       in any file added or modified by F5.
-- [ ] AC-24 F5 defines no target-derivation, path-normalisation, or ambiguity-reason-code
+- [x] AC-24 F5 defines no target-derivation, path-normalisation, or ambiguity-reason-code
       implementation of its own. Verified by reading the F5 change set: every use of the three roles
       is a call into F1's module.
-- [ ] AC-25 Each modified hook imports F1's module unconditionally at script scope using the
+- [x] AC-25 Each modified hook imports F1's module unconditionally at script scope using the
       `Join-Path $PSScriptRoot` idiom, with no `-ErrorAction SilentlyContinue` tolerance on the
       import or on any call in the decision path.
 
 ### Constraints and non-regression
 
-- [ ] AC-26 The mirroring gate
+- [x] AC-26 The mirroring gate
       `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
       passes, so every file modified under `.claude/**` has a content-identical counterpart under
       `extensions/drm-copilot/resources/claude-customizations/.claude/**`.
-- [ ] AC-27 No enforcement hook in the change set invokes Python. A content search across the four
+- [x] AC-27 No enforcement hook in the change set invokes Python. A content search across the four
       in-scope hook files for `python`, `poetry`, `py -3`, and `Start-Process` returns zero
       executable-code occurrences, and issue #475's structural guard test is located, named in the
       change record, and confirmed to cover these four files. That guard is
@@ -786,27 +949,36 @@ cwd-relative binding.
       in-scope files are already covered. Confirming that coverage satisfies this criterion; no
       extension is expected. If an additional assertion is ever required, it must be placed in a new
       sibling test file, because the guard file is measured at exactly 500 lines and has no headroom.
-- [ ] AC-28 `git diff --name-only` for the feature branch against the epic integration branch lists
+- [x] AC-28 `git diff --name-only` for the feature branch against the epic integration branch lists
       none of: `.claude/hooks/hook-command-scanner.ps1`,
       `.claude/hooks/hook-command-invocation.ps1`, `.claude/hooks/enforce-epic-merge-gate.ps1`,
       `.claude/lib/orchestrator-state/OrchestratorState.psm1`,
       `.codex/hooks/enforce-codex-model-routing.ps1`.
-- [ ] AC-29 `.claude/lib/orchestrator-state/OrchestratorState.psm1` is still 499 lines and the
+- [x] AC-29 `.claude/lib/orchestrator-state/OrchestratorState.psm1` is still 499 lines and the
       parameter default at line 427 is still unreached from both hook families; a named Pester test
       asserts that every production call into `Invoke-OrchestratorStatePreflight` supplies
       `-CheckpointPath` explicitly.
-- [ ] AC-30 No file added or modified by F5 exceeds 500 lines, including the new test files and the
+- [x] AC-30 No file added or modified by F5 exceeds 500 lines, including the new test files and the
       bundled mirror copies.
-- [ ] AC-31 Line coverage for the four in-scope hook files is >= 85%, measured through
+- [x] AC-31 Line coverage for the four in-scope hook files is >= 85%, measured through
       `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, with the coverage report archived
       under `evidence/qa-gates/`. No branch-coverage gate applies, because Pester measures no branch
       coverage.
-- [ ] AC-32 No test added by F5 creates a temporary file or directory; all fixture content is
+- [x] AC-32 No test added by F5 creates a temporary file or directory; all fixture content is
       committed under `tests/fixtures/`, and every cwd or environment mutation is restored in a
       `finally` block so the suite is order-independent.
-- [ ] AC-33 The full seven-stage toolchain loop completes with all stages passing in a single pass
+- [x] AC-33 The full seven-stage toolchain loop completes with all stages passing in a single pass
       (formatting, linting, type checking where applicable, architecture-boundary tests, unit tests,
       contract/schema checks, integration tests), with the run archived under `evidence/qa-gates/`.
+
+### Identity resolution, checkpoint hygiene, prd-feature migration, and host data (Revision 0.5)
+
+- [x] AC-34 `.claude/skills/orchestrate/SKILL.md` (`## Checkpoint Handling`), `.claude/skills/parallel-orchestrate/SKILL.md` (`## Per-Item Branch and Worktree Lifecycle`), and `.claude/skills/epic-orchestrate/SKILL.md` (`## Epic-Level Checkpoint`) each state the checkpoint-hygiene rule: a per-feature `artifacts/orchestration/orchestrator-state.json` that does not belong to the session's own item is moved to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and a coordinating session writes no per-feature checkpoint at its own root. Verified by the three hygiene tests in `tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1`.
+- [x] AC-35 `## Issue Number Consistency` in `.claude/skills/orchestrate/SKILL.md` requires the canonical issue number line and a `branch:` label on every delegation to each receipt-gated subagent type returned by `Get-ModelRoutingGatedAgent`, and names both gates that identify the item from the delegation prompt. Verified by the four delegation-identity tests in the same file.
+- [x] AC-36 The three bindings select the target worktree by portable identity only, through `Resolve-WorktreeItemTarget` in `.claude/lib/worktree-resolution/WorktreeItemResolution.psm1`: the canonical issue number, matched against the `issue-num` of each live worktree's checkpoint, and a branch signal (`--head`, `--branch`, `branch:`). A worktree is live when it is registered in the repository's worktree administrative layout and its root still carries a worktree marker. A feature-folder path or file path never selects the worktree. No identity, or an identity matching no live worktree, denies with the no-target code; several live matches or disagreeing identities deny with the ambiguity code; a branch signal breaks a tie among live worktrees recording the same issue. Verified by the named tests in `tests/scripts/claude-lib/worktree-resolution/WorktreeItemResolution.Tests.ps1`.
+- [x] AC-37 The prd-feature gate (issue #672) selects the worktree by the same portable identity and uses the feature folder only to locate prerequisite documents. `.claude/hooks/enforce-prd-feature-before-planner.ps1` calls `Resolve-WorktreeItemTarget` through its own one-line seam, contains no occurrence of `Resolve-WorktreeCallTarget`, and declares no `Envelope` parameter and reads no `cwd` field from the hook envelope. No feature-folder path and no file path selects the worktree: the resolver receives the assembled prompt and description text unchanged and reads no path signal from it, deciding only on the canonical issue number and a branch signal. After identity resolves, the gate resolves the feature folder beneath the resolved worktree and probes its prerequisites there; when the prompt names no folder it reads the `feature-folder` field from the checkpoint of the resolved worktree, never from the calling session's root; when the prompt names more than one folder that checkpoint is the disambiguator. The work-mode contract is unchanged: `full-feature` requires `spec.md` and `user-story.md`, `full-bug` requires `spec.md`, `minor-audit` requires neither, and an absent or unrecognised marker denies on its own path naming no prerequisite set. A prerequisite document that is genuinely absent still denies with the gate's existing missing-document reason, which carries neither target-resolution code. A coordinating-session `atomic-planner` delegation for an item whose feature folder also exists in other worktrees resolves by identity and is allowed, where it previously denied with the ambiguity code. Expected in the diff for this criterion: `.claude/hooks/enforce-prd-feature-before-planner.ps1`, `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1`, their two counterparts under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`, `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.Tests.ps1`, `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.FolderResolution.Tests.ps1`, `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1`, `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.IdentityResolution.Tests.ps1`, and `docs/features/active/2026-09-13-prd-feature-gate-target-resolution-672/spec.md`. `.claude/lib/worktree-resolution/WorktreeResolution.psm1` and `.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1` remain absent from the diff.
+- [x] AC-38 No file added or modified by this change, other than `plan.2026-09-13T20-48.md`, `plan.2026-09-18T13-30.md`, and `plan.2026-09-18T16-00.md`, contains a drive-letter path, a user-profile path, or the executing user's account name. Feature-folder artifacts that carried such tokens are redacted to placeholders, with per-file counts logged under `evidence/other/`.
+- [x] AC-39 The two acceptance criteria left unchecked in `docs/features/active/2026-09-13-prd-feature-gate-target-resolution-672/spec.md` — the test-hygiene criterion for the target-resolution suite and the PowerShell-toolchain single-pass criterion — are checked in that file, and a closure subsection in the same file cites the evidence artifact satisfying each.
 
 ## Risks & Mitigations
 

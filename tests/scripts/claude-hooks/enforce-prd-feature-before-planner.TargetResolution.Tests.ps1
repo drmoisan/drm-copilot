@@ -8,21 +8,21 @@
     Placement decision. These cases live in a third companion suite rather than in
     either existing suite because both are close enough to the 500-line cap in
     .claude/rules/general-code-change.md to leave no room for the matrix plus its
-    regression guards: both sibling suites sit within sixty lines of the cap, and
-    their measured line counts are recorded in this feature's evidence ledger under
-    the stem remediation-file-size-ledger rather than restated here.
-    The same convention is used by
+    regression guards: both sibling suites sit within sixty lines of the cap, and their
+    measured line counts are recorded in this feature's evidence ledger under the stem
+    remediation-file-size-ledger. The same convention is used by
     tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.Payload.Tests.ps1.
 
-    Determinism statement. No case in this suite creates a temporary file or a
-    temporary directory, no case changes the process working directory, and no
-    absolute path here is derived from the runtime environment, the current
-    directory, the script file location, or a source-control query. Every absolute
-    path is a bare string literal declared below. The current directory is modelled
-    as data: it is carried on the SessionRoot member of an injected target result,
-    never read from the process. Rows that need more than one modelled directory
-    are bound with -ForEach over a discovery-time array, because a value assigned
-    inside an It body is not visible from Pester's discovery phase.
+    Determinism statement. No case in this suite creates a temporary file or directory,
+    no case changes the process working directory, and no absolute path here is derived
+    from the runtime environment, the current directory, the script file location, or a
+    source-control query. Every absolute path is a bare string literal declared below.
+    The current directory is modelled as data, carried on the SessionRoot member of an
+    injected target result and never read from the process. Rows needing more than one
+    modelled directory bind with -ForEach over a discovery-time array, because a value
+    assigned inside an It body is invisible to Pester's discovery phase. Issue #673
+    leaves every one of those properties in place: the mocked seam is now the identity
+    resolver, but it is still mocked.
 #>
 
 # --- Synthetic worktree roots ----------------------------------------------------
@@ -117,6 +117,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
         $script:OtherFeatureFolder = 'docs/features/active/2026-09-13-synthetic-other-999'
         $script:ComposedTargetFolder = '/synthetic-worktrees/item-worktree/docs/features/active/2026-09-13-synthetic-target-672'
         $script:AmbiguityCode = Get-WorktreeResolutionAmbiguityReasonCode
+        $script:NoTargetCode = Get-WorktreeResolutionNoTargetReasonCode
 
         function New-PlannerPayload {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory payload factory in a test file; it changes no system state.')]
@@ -139,12 +140,12 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
 
             if ($Status -eq 'Ambiguous') {
                 return (New-WorktreeResolutionTargetResult -Status 'Ambiguous' -SessionRoot $SessionRoot `
-                        -Signal 'FeatureFolderPath' -SignalValue $SignalValue -Candidate @() `
+                        -Signal 'Branch' -SignalValue $SignalValue -Candidate @() `
                         -Detail 'modelled ambiguity: the call names more than one worktree')
             }
 
             return (New-WorktreeResolutionTargetResult -Status $Status -SessionRoot $SessionRoot `
-                    -WorktreeRoot $WorktreeRoot -Signal 'FeatureFolderPath' -SignalValue $SignalValue `
+                    -WorktreeRoot $WorktreeRoot -Signal 'Branch' -SignalValue $SignalValue `
                     -Candidate @($WorktreeRoot) -Detail "modelled target '$WorktreeRoot'")
         }
     }
@@ -161,78 +162,73 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
         }
     }
 
-    Context 'call-target derivation seam' {
-        # Direct cases for the two parent-side functions the decision path calls. The
-        # derivation itself is mocked, so no case here reads the filesystem.
+    Context 'call-target resolution seam' {
+        # Direct cases for the parent-side function the decision path calls; the
+        # resolution is mocked, so no case here reads the filesystem.
 
-        It 'treats a call with no derived target as resolving at the session root' {
-            Test-PrdFeatureSessionRootTarget -Target $null | Should -BeTrue
-        }
 
-        It 'treats a NoTarget and a SessionRoot result as resolving at the session root' {
-            Test-PrdFeatureSessionRootTarget -Target ([pscustomobject]@{ Status = 'NoTarget' }) | Should -BeTrue
-            Test-PrdFeatureSessionRootTarget -Target ([pscustomobject]@{ Status = 'SessionRoot' }) | Should -BeTrue
-        }
+        It 'resolves no target from a call whose text is empty' {
+            Mock -CommandName Resolve-PrdFeatureWorktreeTarget -MockWith { [pscustomobject]@{ Status = 'NoTarget' } }
 
-        It 'treats another worktree as not the session root' {
-            Test-PrdFeatureSessionRootTarget -Target ([pscustomobject]@{ Status = 'OtherWorktree' }) | Should -BeFalse
-        }
-
-        It 'derives nothing from a call whose text is empty' {
-            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { [pscustomobject]@{ Status = 'NoTarget' } }
-
-            Get-PrdFeatureCallTarget -Envelope $null -ToolInput ([pscustomobject]@{ subagent_type = 'atomic-planner' }) |
+            Get-PrdFeatureCallTarget -ToolInput ([pscustomobject]@{ subagent_type = 'atomic-planner' }) |
                 Should -BeNullOrEmpty
-            Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 0 -Exactly
+            Should -Invoke -CommandName Resolve-PrdFeatureWorktreeTarget -Times 0 -Exactly
         }
 
-        It 'hands a repo-relative citation to the derivation' {
-            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { [pscustomobject]@{ Status = 'NoTarget'; SuppliedText = $Text } }
+        It 'hands the assembled prompt and description text to the identity resolver' {
+            Mock -CommandName Resolve-PrdFeatureWorktreeTarget -MockWith { [pscustomobject]@{ Status = 'NoTarget'; SuppliedText = $Text } }
 
             $toolInput = [pscustomobject]@{ prompt = "Plan $($script:TargetFeatureFolder) now."; description = 'plan it' }
 
-            $result = Get-PrdFeatureCallTarget -Envelope $null -ToolInput $toolInput
+            $result = Get-PrdFeatureCallTarget -ToolInput $toolInput
             $result.Status | Should -Be 'NoTarget'
             $result.SuppliedText | Should -BeLike "*$($script:TargetFeatureFolder)*"
-            Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 1 -Exactly
+            Should -Invoke -CommandName Resolve-PrdFeatureWorktreeTarget -Times 1 -Exactly
         }
 
-        It 'hands a repo-relative citation carrying a branch signal to the derivation' {
-            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { [pscustomobject]@{ Status = 'OtherWorktree'; SuppliedText = $Text } }
+        It 'hands a branch label to the identity resolver' {
+            Mock -CommandName Resolve-PrdFeatureWorktreeTarget -MockWith { [pscustomobject]@{ Status = 'OtherWorktree'; SuppliedText = $Text } }
 
             $toolInput = [pscustomobject]@{ prompt = "Plan $($script:TargetFeatureFolder) now."; description = 'branch: feature/2026-09-13-x-672' }
 
-            $result = Get-PrdFeatureCallTarget -Envelope $null -ToolInput $toolInput
+            $result = Get-PrdFeatureCallTarget -ToolInput $toolInput
             $result.SuppliedText | Should -BeLike "*$($script:TargetFeatureFolder)*"
             $result.SuppliedText | Should -BeLike '*branch: feature/2026-09-13-x-672*'
-            Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 1 -Exactly
+            Should -Invoke -CommandName Resolve-PrdFeatureWorktreeTarget -Times 1 -Exactly
         }
 
-        It 'supplies the session root from the envelope cwd when the runtime sets one' {
-            Mock -CommandName Resolve-WorktreeCallTarget -MockWith {
-                [pscustomobject]@{ Status = 'OtherWorktree'; SuppliedSessionRoot = $SessionRoot; SuppliedText = $Text }
+        It 'supplies the process location as the session root and reads no envelope cwd' {
+            # Neither assertion reads a location: mocking the seam to capture a
+            # -SessionRoot would capture nothing, because the seam supplies it, and
+            # comparing against a live read would derive a path from the current directory.
+            # Structural: the resolver takes a SessionRoot, the assembler has no Envelope.
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:UnderTest, [ref] $null, [ref] $null)
+            $calls = @($ast.FindAll({ $args[0] -is [System.Management.Automation.Language.CommandAst] -and
+                        $args[0].GetCommandName() -eq 'Resolve-WorktreeItemTarget' }, $true))
+            $calls.Count | Should -BeGreaterThan 0
+            foreach ($call in $calls) {
+                @($call.CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.CommandParameterAst] -and
+                        $_.ParameterName -eq 'SessionRoot' }).Count | Should -BeGreaterThan 0
+            }
+            $assembler = @($ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+                        $args[0].Name -eq 'Get-PrdFeatureCallTarget' }, $true))[0]
+            @($assembler.Body.ParamBlock.Parameters |
+                    Where-Object { $_.Name.VariablePath.UserPath -eq 'Envelope' }) | Should -BeNullOrEmpty
+
+            # Behavioural: the captured value is a rooted path. The mock has no -ModuleName
+            # because the intercepted call sits in the dot-sourced seam; a module-scoped
+            # mock would miss it and the real resolver would enumerate live worktrees.
+            $script:CapturedSessionRoot = $null
+            Mock -CommandName Resolve-WorktreeItemTarget -MockWith {
+                param([string] $SessionRoot)
+                $script:CapturedSessionRoot = $SessionRoot
+                return ([pscustomobject]@{ Status = 'NoTarget' })
             }
 
-            $toolInput = [pscustomobject]@{ prompt = "Plan $($script:ComposedTargetFolder) now." }
-            $envelope = [pscustomobject]@{ cwd = $script:CoordinatingSessionRoot; tool_name = 'Agent' }
+            $null = Get-PrdFeatureCallTarget -ToolInput ([pscustomobject]@{ prompt = 'Plan the work.' })
 
-            $result = Get-PrdFeatureCallTarget -Envelope $envelope -ToolInput $toolInput
-            $result.SuppliedSessionRoot | Should -Be $script:CoordinatingSessionRoot
-            $result.SuppliedText | Should -BeLike "*$($script:ComposedTargetFolder)*"
-            Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 1 -Exactly
-        }
-
-        It 'omits the session root when the envelope carries no cwd field' {
-            Mock -CommandName Resolve-WorktreeCallTarget -MockWith {
-                [pscustomobject]@{ Status = 'OtherWorktree'; SuppliedSessionRoot = $SessionRoot }
-            }
-
-            $toolInput = [pscustomobject]@{ description = "Plan $($script:ComposedTargetFolder) now." }
-            $envelope = [pscustomobject]@{ tool_name = 'Agent' }
-
-            $result = Get-PrdFeatureCallTarget -Envelope $envelope -ToolInput $toolInput
-            $result.SuppliedSessionRoot | Should -BeNullOrEmpty
-            Should -Invoke -CommandName Resolve-WorktreeCallTarget -Times 1 -Exactly
+            $script:CapturedSessionRoot | Should -Not -BeNullOrEmpty
+            [System.IO.Path]::IsPathRooted($script:CapturedSessionRoot) | Should -BeTrue
         }
     }
 
@@ -248,7 +244,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             }
 
             $target = New-ModelledTarget -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot `
-                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue $script:ComposedTargetFolder
+                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue 'f5-fixture-own'
             $payload = New-PlannerPayload -Prompt "Plan $($script:ComposedTargetFolder) now."
 
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target
@@ -261,7 +257,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             # worktree itself, so the resolved root and the session root coincide and no
             # prefix is applied. This row is a retained regression guard: it passes
             # against the current hook as well as the fixed one.
-            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'SessionRoot' -SessionRoot $script:ItemWorktreeRoot -WorktreeRoot $script:ItemWorktreeRoot -Signal 'FeatureFolderPath' -SignalValue $script:TargetFeatureFolder -Candidate @($script:ItemWorktreeRoot) -Detail 'modelled session-root target' }
+            Mock -CommandName Resolve-PrdFeatureWorktreeTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'SessionRoot' -SessionRoot $script:ItemWorktreeRoot -WorktreeRoot $script:ItemWorktreeRoot -Signal 'Branch' -SignalValue 'f5-fixture-own' -Candidate @($script:ItemWorktreeRoot) -Detail 'modelled session-root target' }
             Mock -CommandName Get-PrdFeatureIssueContent -MockWith {
                 if ($FeatureFolder -eq $script:TargetFeatureFolder) { "- Work Mode: full-bug`n" } else { $null }
             }
@@ -276,7 +272,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
         }
 
         It 'allows a repo-relative citation placed in the item worktree' {
-            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot -WorktreeRoot $script:ItemWorktreeRoot -Signal 'FeatureFolderPath' -SignalValue $script:TargetFeatureFolder -Candidate @($script:ItemWorktreeRoot) -Detail 'modelled placement of a repo-relative citation' }
+            Mock -CommandName Resolve-PrdFeatureWorktreeTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot -WorktreeRoot $script:ItemWorktreeRoot -Signal 'Branch' -SignalValue 'f5-fixture-own' -Candidate @($script:ItemWorktreeRoot) -Detail 'modelled placement by identity' }
             Mock -CommandName Get-PrdFeatureIssueContent -MockWith { if ($FeatureFolder -eq $script:ComposedTargetFolder) { "- Work Mode: full-bug`n" } else { $null } }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $Path -eq "$($script:ComposedTargetFolder)/spec.md" }
 
@@ -287,8 +283,9 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             Should -Invoke -CommandName Get-PrdFeatureFileExistence -Times 1 -Exactly
         }
 
-        It 'denies with the ambiguity reason when a repo-relative citation places in no worktree' {
-            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'Ambiguous' -SessionRoot $script:CoordinatingSessionRoot -Signal 'FeatureFolderPath' -SignalValue $script:TargetFeatureFolder -Candidate @() -Detail 'modelled zero-candidate placement' }
+        It 'denies with the no-target code when the identity places in no live worktree' {
+            # No identity is the no-target state, not an ambiguity: nothing to choose between.
+            Mock -CommandName Resolve-PrdFeatureWorktreeTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'NoTarget' -SessionRoot $script:CoordinatingSessionRoot -Detail 'modelled identity placing in no live worktree' }
             Mock -CommandName Get-PrdFeatureIssueContent -MockWith { $null }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $Path -eq 'never-matched' }
 
@@ -297,7 +294,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $reason = $decision.hookSpecificOutput.permissionDecisionReason
-            $reason | Should -BeLike "*$($script:AmbiguityCode)*"
+            $reason | Should -BeLike "*$($script:NoTargetCode)*"
             $reason | Should -Not -BeLike '*work mode could not be determined*'
             Should -Invoke -CommandName Get-PrdFeatureFileExistence -Times 0 -Exactly
         }
@@ -314,7 +311,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             }
 
             $target = New-ModelledTarget -Status $Status -SessionRoot $ModelledCwd `
-                -WorktreeRoot $TargetRoot -SignalValue "$TargetRoot/$($script:TargetFeatureFolder)"
+                -WorktreeRoot $TargetRoot -SignalValue 'f5-fixture-own'
             $payload = New-PlannerPayload -Prompt "Plan $TargetRoot/$($script:TargetFeatureFolder) now."
 
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target
@@ -330,7 +327,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             }
 
             $target = New-ModelledTarget -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot `
-                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue $script:ComposedTargetFolder
+                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue 'f5-fixture-own'
             $payload = New-PlannerPayload -Prompt "Plan $($script:ComposedTargetFolder) now."
 
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target
@@ -344,7 +341,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
 
         It 'denies with the ambiguity code when the target cannot be resolved' {
             $target = New-ModelledTarget -Status 'Ambiguous' -SessionRoot $script:CoordinatingSessionRoot `
-                -SignalValue $script:TargetFeatureFolder
+                -SignalValue 'f5-fixture-own'
             $payload = New-PlannerPayload -Prompt "Plan $($script:TargetFeatureFolder) now."
 
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target
@@ -356,7 +353,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
 
         It 'emits an ambiguity code distinct from the missing-document and marker reasons' {
             $target = New-ModelledTarget -Status 'Ambiguous' -SessionRoot $script:CoordinatingSessionRoot `
-                -SignalValue $script:TargetFeatureFolder
+                -SignalValue 'f5-fixture-own'
             $payload = New-PlannerPayload -Prompt "Plan $($script:TargetFeatureFolder) now."
 
             $reason = (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target).hookSpecificOutput.permissionDecisionReason
@@ -373,7 +370,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $Path -eq 'never-matched' }
 
             $target = New-ModelledTarget -Status 'Ambiguous' -SessionRoot $script:CoordinatingSessionRoot `
-                -SignalValue $script:TargetFeatureFolder
+                -SignalValue 'f5-fixture-own'
             $payload = New-PlannerPayload -Prompt "Plan $($script:TargetFeatureFolder) now."
 
             $null = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target
@@ -381,30 +378,33 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             Should -Invoke -CommandName Get-PrdFeatureFileExistence -Times 0 -Exactly
         }
 
-        It 'denies rather than validating against a sibling session checkpoint' {
-            # A prompt naming no feature folder, issued from a session whose checkpoint
-            # describes a different item, with the call's own target in another
-            # worktree. The sibling item's checkpoint is the only state present, and it
-            # must not be allowed to stand in for the call's own target.
-            Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { $script:OtherFeatureFolder }
+        It 'reads the checkpoint of the resolved worktree rather than the session root''s' {
+            # A prompt naming no feature folder, with the target in another worktree. The
+            # captured checkpoint path is asserted, not just the verdict. Before this
+            # migration the same call denied rather than consulting any checkpoint.
+            $script:CapturedCheckpointPath = $null
+            Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith {
+                param([string] $CheckpointPath)
+                $script:CapturedCheckpointPath = $CheckpointPath
+                return $script:TargetFeatureFolder
+            }
             Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-bug`n" }
-            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $Path -eq "$($script:OtherFeatureFolder)/spec.md" }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $Path -eq "$($script:ComposedTargetFolder)/spec.md" }
 
             $target = New-ModelledTarget -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot `
-                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue "$($script:ItemWorktreeRoot)/some/file.ps1"
+                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue 'f5-fixture-own'
             $payload = New-PlannerPayload -Prompt 'Continue planning the work already in flight.'
 
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*$($script:AmbiguityCode)*"
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -BeLike "*$($script:OtherFeatureFolder)*"
-            Should -Invoke -CommandName Get-PrdFeatureFileExistence -Times 0 -Exactly
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $script:CapturedCheckpointPath | Should -BeLike "$($script:ItemWorktreeRoot)/*"
+            Should -Invoke -CommandName Get-PrdFeatureFileExistence -Times 1 -Exactly
         }
 
         It 'denies rather than selecting the earliest candidate on an unresolved tie' {
-            # A NoTarget result carries a null SignalValue, so the tie stays unresolved and
-            # the deny comes from the tie branch, not the derivation's own ambiguity branch.
-            Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'NoTarget' -SessionRoot $script:CoordinatingSessionRoot -Detail 'modelled no-target' }
+            # The injected status must be resolved, not NoTarget: an unresolved identity
+            # denies before the candidate scan, which would make the tie branch unreachable.
+            Mock -CommandName Resolve-PrdFeatureWorktreeTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'SessionRoot' -SessionRoot '/synthetic-worktrees/session-root' -WorktreeRoot '/synthetic-worktrees/session-root' -Signal 'Branch' -SignalValue 'f5-fixture-own' -Candidate @('/synthetic-worktrees/session-root') -Detail 'modelled resolved target for the tie row' }
             Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { $null }
             Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-bug`n" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $Path -eq "$($script:TargetFeatureFolder)/spec.md" }
@@ -428,7 +428,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             }
 
             $target = New-ModelledTarget -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot `
-                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue $script:ComposedTargetFolder
+                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue 'f5-fixture-own'
             $payload = New-PlannerPayload -Prompt "Plan $($script:ComposedTargetFolder) now."
 
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target
@@ -448,7 +448,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             }
 
             $target = New-ModelledTarget -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot `
-                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue $script:ComposedTargetFolder
+                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue 'f5-fixture-own'
             $payload = New-PlannerPayload -Prompt "Plan $($script:ComposedTargetFolder) now."
 
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target
@@ -470,7 +470,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
             }
 
             $target = New-ModelledTarget -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot `
-                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue $script:ComposedTargetFolder
+                -WorktreeRoot $script:ItemWorktreeRoot -SignalValue 'f5-fixture-own'
             $payload = New-PlannerPayload -Prompt "Plan $($script:ComposedTargetFolder) now."
 
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload -ResolvedTarget $target

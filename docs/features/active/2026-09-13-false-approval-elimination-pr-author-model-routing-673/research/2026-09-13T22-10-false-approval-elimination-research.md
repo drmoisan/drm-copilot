@@ -3,7 +3,7 @@
 - Feature: `docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673/`
 - Issue: #673 (epic `worktree-scoped-state-resolution`, feature F5, wave 1, depends_on F1)
 - Researched: 2026-09-13
-- Workspace: `C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-ac200a44665297faa`
+- Workspace: `<WORKTREE_ROOT>`
 - Branch: `worktree-agent-ac200a44665297faa` (fast-forwarded to `origin/epic/worktree-scoped-state-resolution-integration`)
 
 ---
@@ -16,7 +16,7 @@ gate returning `allow`. Neither defect has yet been reproduced by direct test.**
 ### What was attempted
 
 The delegation required constructing a two-checkpoint fixture under
-`C:/Users/DANMOI~1/AppData/Local/Temp/claude/`, invoking each hook with `pwsh` from a "session root"
+`<HOST_PATH>`, invoking each hook with `pwsh` from a "session root"
 cwd with a payload pertaining to a different "item worktree", and recording the decision, exit code,
 stdout, and stderr.
 

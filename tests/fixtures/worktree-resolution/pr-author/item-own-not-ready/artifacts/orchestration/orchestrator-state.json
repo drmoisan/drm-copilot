@@ -1,0 +1,48 @@
+{
+  "objective": "Sibling item A: unrelated single-feature run left at the session root.",
+  "change_budget_estimate": {
+    "production_files": 1,
+    "test_files": 1,
+    "rationale": "Sibling item A fixture."
+  },
+  "path_selected": "small",
+  "route_id": "small",
+  "promotion-type": "bug",
+  "short-name": "sibling-item-a",
+  "relativeFile": "docs/features/potential/promoted/sibling-item-a.md",
+  "long-name": "sibling-item-a",
+  "issue-num": "901",
+  "feature-folder": "docs/features/active/sibling-item-a-838",
+  "work-mode": "full-bug",
+  "plan-path": "docs/features/active/sibling-item-a-838/plan.md",
+  "completed_steps": [
+    "S1_scope",
+    "S2_research",
+    "S3_promotion",
+    "S4_atomic_planning",
+    "S5_atomic_execution"
+  ],
+  "next_step": "S8_create_pr",
+  "last_updated": "2026-09-17T12:00:00Z",
+  "step5_status": "pending",
+  "step6_status": "completed",
+  "step7_status": "completed",
+  "step8_status": "in_progress",
+  "step9_status": "not_started",
+  "step10_status": "not_started",
+  "delegation_receipts": [],
+  "model_routing_receipts": [
+    {
+      "agent": "atomic-planner",
+      "phase": "S4_atomic_planning",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    }
+  ],
+  "local_execution_overrides": [],
+  "delegation_bypasses": [],
+  "blocked_reason": "none"
+}

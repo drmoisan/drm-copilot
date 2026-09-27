@@ -99,11 +99,13 @@ function ghHandler(options: {
         : failResult("no pull request");
     }
     if (sub.startsWith("api")) {
-      // classify_entity / issue/pr detail: a numeric ref classifies as issue.
+      // Numeric refs classify as open issues so D3 keeps the PASS-readiness primary.
       const apiPath = args[args.indexOf("api") + 1] ?? "";
       if (/issues\/\d+$/u.test(apiPath)) {
         const number = apiPath.split("/").pop() ?? "0";
-        return okResult(JSON.stringify({ number: Number(number) }));
+        return okResult(
+          JSON.stringify({ number: Number(number), state: "open" }),
+        );
       }
       return okResult("{}");
     }
@@ -413,5 +415,62 @@ describe("collectPrContext diff selection", () => {
     // diff is used and the changed file still lands in the docs bucket.
     expect(result.contextResult.mergeBase).toBeNull();
     expect(result.bucketDocs.map(([path]) => path)).toContain(CHANGED);
+  });
+});
+
+describe("collectPrContext autoclose body availability", () => {
+  /** Seed a repo with no feature folder, so the autoclose list is empty. */
+  function seedEmptyTree(): TreeFileSystem {
+    const fs = new TreeFileSystem();
+    fs.addFile(`${ROOT}/.git`, "");
+    fs.addDir(`${ROOT}/docs/features/active`);
+    fs.addDir(`${ROOT}/docs/features/potential/promoted`);
+    return fs;
+  }
+
+  it("renders the unavailable autoclose body when gh is not resolved", () => {
+    // Arrange: no gh is resolved, so availability is false.
+    const fs = seedEmptyTree();
+    const runner = buildRunner({ ghAvailable: false });
+
+    // Act
+    const result = collectPrContext({
+      base: "main",
+      head: "feature/docs",
+      repoRoot: ROOT,
+      includeUntracked: false,
+      fs,
+      runner,
+      whichGh: () => undefined,
+    });
+
+    // Assert
+    expect(result.ghAvailable).toBe(false);
+    expect(result.issuesToAutocloseSection).toContain(
+      "None (GitHub CLI unavailable; closing issues not verified)",
+    );
+  });
+
+  it("keeps the readiness-not-PASS autoclose body when gh is available and nothing is listed", () => {
+    // Arrange: gh resolves and authenticates; no feature docs, no readiness.
+    const fs = seedEmptyTree();
+    const runner = buildRunner({ ghAvailable: true });
+
+    // Act
+    const result = collectPrContext({
+      base: "main",
+      head: "feature/docs",
+      repoRoot: ROOT,
+      includeUntracked: false,
+      fs,
+      runner,
+      whichGh: () => GH_PATH,
+    });
+
+    // Assert
+    expect(result.ghAvailable).toBe(true);
+    expect(result.issuesToAutocloseSection).toContain(
+      "None (no verified closing issues and readiness not PASS)",
+    );
   });
 });

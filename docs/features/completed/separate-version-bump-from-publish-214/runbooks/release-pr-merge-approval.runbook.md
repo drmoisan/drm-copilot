@@ -4,7 +4,7 @@ Issue: #214
 
 ## Cue
 
-Act when the orchestrator has recorded an `exception` for the `branch-protection-merge-approval` requirement — that is, when the release version-bump task has opened a pull request against `main` that patch-bumps `extensions/drm-copilot/package.json` and `packages/mcp-server/package.json`, and that PR is waiting for review. Branch protection on `main` requires an approving review from a write-access reviewer who is not the PR author, so this step cannot be automated and is a permitted human gate.
+Act when the release version-bump task has opened a pull request against `main` that patch-bumps `extensions/drm-copilot/package.json` and `packages/mcp-server/package.json`. The `protect-main` ruleset requires a pull request and passing status checks but sets `required_approving_review_count: 0`, so merging this pull request requires no approving review.
 
 ## Prerequisites
 

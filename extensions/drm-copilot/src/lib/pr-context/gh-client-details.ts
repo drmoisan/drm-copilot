@@ -15,7 +15,7 @@
  *       fallback string verbatim.
  */
 
-import { findUserStoryLink } from "./models";
+import { compareCodePoint, findUserStoryLink } from "./models";
 import { type IssueDetails, type PullRequestDetails } from "./models";
 import {
   type GhClient,
@@ -122,17 +122,6 @@ function extractClosingNumbers(raw: unknown): string[] {
  */
 function sortedSet(values: string[]): string[] {
   return [...new Set(values)].sort(compareCodePoint);
-}
-
-/** Compare two strings by Unicode code point (Python `sorted` semantics). */
-export function compareCodePoint(left: string, right: string): number {
-  if (left < right) {
-    return -1;
-  }
-  if (left > right) {
-    return 1;
-  }
-  return 0;
 }
 
 /**

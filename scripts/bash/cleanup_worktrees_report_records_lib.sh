@@ -389,9 +389,9 @@ classify_all_branches() {
 	#      BRANCH|<name>|ANCESTRY_ERROR.
 	#
 	# Restricting the probe to the NOT_MERGED set bounds its cost at k*(k-1) probes for k
-	# such branches rather than n*(n-1) for n branches, and `main` needs no special
-	# handling: classify_branch resolves it PROTECTED_CURRENT at rung 1, which is not
-	# NOT_MERGED, so it never enters the probe set.
+	# such branches rather than n*(n-1) for n branches. The base branch `main` never
+	# enters the probe set: compute_protected protects it by name (CLEANUP_WT_BASE_BRANCH)
+	# in every checkout topology, so classify_branch resolves it PROTECTED_CURRENT at rung 1.
 	#
 	# Output order is enumerate_branches' original LC_ALL=C order, regardless of the
 	# order in which the phases above resolved each branch, so the report is
@@ -425,8 +425,8 @@ classify_all_branches() {
 		fi
 	done
 	# Phase 2: pairwise ancestry, over the NOT_MERGED set only. A branch that resolved
-	# anything else is neither a subject nor a target, so `main` (PROTECTED_CURRENT) is
-	# excluded by its own verdict and needs no separate protection lookup.
+	# anything else is neither a subject nor a target, so `main`, PROTECTED_CURRENT by the
+	# unconditional base-branch protection in compute_protected, is excluded by its verdict.
 	local -a not_merged=()
 	for x in "${order[@]}"; do
 		if [[ ${branch_state[$x]:-} == "NOT_MERGED" ]]; then

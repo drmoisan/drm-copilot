@@ -107,6 +107,12 @@
             # interpreter; measured here so the new production modules are not excluded.
             '.claude/lib/codex-routing/CodexDeployment.psm1'
             '.claude/lib/codex-routing/CodexTopology.psm1'
+            # Issue #697 added the PowerShell routing CLI wrappers and their shared
+            # helper so destinations resolve routing without a Python interpreter;
+            # measured here so the new production scripts are not excluded.
+            '.codex/scripts/codex-routing-cli-common.ps1'
+            '.codex/scripts/Resolve-CodexDeployment.ps1'
+            '.codex/scripts/Resolve-CodexTopology.ps1'
             '.claude/lib/orchestrator-state/OrchestratorStateCodexModelReceipts.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateCodexTopologyReceipts.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateRoutingMatrix.psm1'
@@ -139,6 +145,9 @@
             # table and the epic and parallel readiness predicates; registered so the new
             # production file stays in the coverage denominator per the Coverage Exclusion Policy.
             '.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1'
+            # Issue #707 added these two dot-sourced siblings for the Codex epic-scope command and path legs.
+            '.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1'
+            '.codex/hooks/enforce-orchestration-preimplementation-gate-epic-resolution.ps1'
             # Issue #415 remediation cycle 2 (R-COV): the detached-HEAD null-guard fix changed
             # these two Codex PreToolUse hooks. Both were absent from this list, so the changed
             # production surface was outside the coverage denominator. Measured here so the
@@ -233,6 +242,8 @@
             # table and the epic and parallel readiness predicates; registered so the new
             # production file stays in the coverage denominator per the Coverage Exclusion Policy.
             '.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1'
+            # Issue #663 added this dot-sourced sibling for the epic-scope command and path legs.
+            '.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1'
             '.claude/hooks/enforce-evidence-locations.ps1'
             '.claude/hooks/enforce-feature-folder-order.ps1'
             '.claude/hooks/enforce-checkpoint-monotonic.ps1'
@@ -293,6 +304,11 @@
             # Registered here beside the other .claude/lib modules.
             '.claude/lib/worktree-resolution/WorktreeResolution.psm1'
             '.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1'
+            # Issue #673 added the identity-resolution module, registered for the same reason.
+            '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
+            # Issue #663 added the epic-scope resolver and its pure readiness predicates.
+            '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'
+            '.claude/lib/worktree-resolution/EpicScopeReadiness.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

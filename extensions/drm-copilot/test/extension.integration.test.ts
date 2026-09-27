@@ -84,6 +84,16 @@ jest.mock("node:fs", () => ({
   mkdirSync: jest.fn(),
 }));
 
+// This file does not set process.env.PATH, and its existsSync mock returns true
+// for any path containing "python", so the default gh resolver's outcome would
+// depend on the host PATH. The resolver is pinned to "not found".
+jest.mock("../src/lib/executable-resolver", () => ({
+  ...jest.requireActual<Record<string, unknown>>(
+    "../src/lib/executable-resolver",
+  ),
+  defaultWhichGh: () => undefined,
+}));
+
 jest.mock("node:child_process", () => ({
   spawn: jest.fn(),
   spawnSync: jest.fn(),

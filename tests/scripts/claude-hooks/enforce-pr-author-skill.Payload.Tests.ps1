@@ -20,6 +20,15 @@ Describe 'enforce-pr-author-skill.ps1 payload envelope' {
         . $script:UnderTest
     }
 
+    # Issue #687 routes the checkpoint through a resolution seam. Defaulting it to the
+    # session root keeps these tests exercising receipt behaviour, and keeps them
+    # independent of whichever worktrees exist on the machine running them.
+    BeforeEach {
+        Mock -CommandName Resolve-PrAuthorWorktreeTarget -MockWith {
+            [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = (Get-Location).Path; ReasonCode = $null; Detail = 'session root' }
+        }
+    }
+
     Context 'entry-point exit code and emitted decision (AC-4, no child process)' {
         It 'returns exit code 0 and emits a deny when every transport is empty' {
             $emptyReader = {

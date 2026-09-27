@@ -652,7 +652,7 @@ of the ambiguity code instead.
 - [x] `Resolve-PrdFeatureWorkMode` and `Get-PrdFeatureRequiredFile` are moved without any behavioural edit.
 - [x] Every production and test file in the change set is at or under the 500-line cap required by `.claude/rules/general-code-change.md`, measured on the delivered files.
 - [x] A smoke case proves that a Pester mock registered in the test scope is observed by a caller defined in the other dot-sourced file, and it is run before the remainder of the extraction is committed.
-- [ ] The new suite creates no temporary file or directory, does not change the process working directory, and derives no absolute path from the environment, the current directory, the script file location, or a source-control query. Its synthetic roots are bare string literals and cwd is supplied as data through an injection parameter.
+- [x] The new suite creates no temporary file or directory, does not change the process working directory, and derives no absolute path from the environment, the current directory, the script file location, or a source-control query. Its synthetic roots are bare string literals and cwd is supplied as data through an injection parameter.
 
 **Bundled-payload mirroring and delivery registration**
 
@@ -665,7 +665,7 @@ of the ambiguity code instead.
 
 - [x] No Python is introduced into the enforcement path. The hook and its sibling are PowerShell only, and `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes.
 - [x] Line coverage is at or above 85 percent for both `.claude/hooks/enforce-prd-feature-before-planner.ps1` and `.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1`, read per file from the Pester coverage report, with neither file excluded from measurement.
-- [ ] The PowerShell toolchain (`run_poshqc_format` -> `run_poshqc_analyze` -> `run_poshqc_test`) completes with zero format drift, zero analyzer findings, and zero test failures in a single pass, restarting from the first step after any failure or auto-fix.
+- [x] The PowerShell toolchain (`run_poshqc_format` -> `run_poshqc_analyze` -> `run_poshqc_test`) completes with zero format drift, zero analyzer findings, and zero test failures in a single pass, restarting from the first step after any failure or auto-fix.
 - [x] The new suite is placed at `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1` and its header records the placement decision and the determinism statement.
 
 ## Risks & Mitigations
@@ -747,3 +747,33 @@ of the ambiguity code instead.
   - Epic manifest: `docs/features/epics/worktree-scoped-state-resolution/epic.md`
   - Research record: `docs/features/active/2026-09-13-prd-feature-gate-target-resolution-672/research/2026-09-13T21-05-prd-feature-gate-target-resolution-research.md`
   - Prior art: `docs/features/active/2026-08-23-prd-feature-gate-resolves-nested-artifact-as-feature-folder-518/`
+
+### Closure of the two outstanding criteria (issue #673 change set, 2026-09-19)
+
+Both criteria left unchecked in this spec are closed by the issue #673 change set, which
+migrated this gate to portable-identity target resolution. Each is named by its opening
+clause and paired with the evidence that satisfies it.
+
+**"The new suite creates no temporary file or directory ..."** — closed by
+`docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673/evidence/other/r3-no-temp-files.md`,
+written by task `[P10-T7]`, which records zero `Set-Location`, zero `CurrentDirectory`,
+zero environment-derived or script-location-derived `Resolve-Path`, and zero source-control
+invocations in both prd-feature suites: the target-resolution suite as the migration leaves
+it, and the new identity-resolution suite. It also records zero matches for
+`New-TemporaryFile`, `GetTempPath`, `GetTempFileName`, the Pester scratch drive, and
+`$env:TEMP` across all seventeen test files the change set touched. Both suites keep
+bare-literal synthetic roots and supply the modelled directory as data on an injected
+result. The suites' own passing status is recorded in
+`.../evidence/qa-gates/r4-p9-scoped-pester.md`, written by task `[P9-T12]`, in which all
+117 rows across the four prd testsuites and the widened runtime guard pass.
+
+**"The PowerShell toolchain ... completes with zero format drift, zero analyzer findings,
+and zero test failures in a single pass ..."** — closed by
+`.../evidence/qa-gates/r3-final-poshqc-format.md` (zero files reformatted, 506 already
+formatted, porcelain identical), `.../evidence/qa-gates/r3-final-poshqc-analyze.md` (zero
+PSScriptAnalyzer findings at Error, Warning, and Information severity), and
+`.../evidence/qa-gates/r3-final-pester-coverage.md` (4954 passed, zero failures, zero
+errors, with both prd gate files above the coverage floor). The single-pass requirement is
+recorded explicitly in `.../evidence/qa-gates/r3-seven-stage-loop.md` under its
+`Single-Pass Statement:` section, which names pass 2 as the clean pass and records what
+pass 1 found and how it was fixed.

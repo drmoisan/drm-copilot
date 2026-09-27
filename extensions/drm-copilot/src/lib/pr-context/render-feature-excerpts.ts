@@ -17,7 +17,9 @@
 
 import { type FileSystem, toPosixPath } from "../file-system";
 import {
+  compareCodePoint,
   type FeatureDocExcerpt,
+  ISSUE_REFERENCE_PATTERN,
   section,
   splitLines,
   truncate,
@@ -59,9 +61,11 @@ export function parseSection(markdown: string, heading: string): string {
 }
 
 /**
- * Extract normalized issue reference tokens from freeform text.
+ * Extract bare-number issue references (for example #123) from freeform text.
  *
- * Mirrors Python `_extract_issue_references`.
+ * Only `#` followed by ASCII digits, not preceded or followed by a word
+ * character, is returned (issue #622, D1). Mirrors Python
+ * `_extract_issue_references`.
  *
  * @param text Source text.
  * @returns Ordered, deduplicated reference tokens.
@@ -70,9 +74,10 @@ export function extractIssueReferences(text: string): string[] {
   if (!text) {
     return [];
   }
-  const matches = text.match(/(?<!\w)#\d+|\b[A-Z][A-Z0-9]+-\d+\b/gu) ?? [];
+  const matches = text.match(new RegExp(ISSUE_REFERENCE_PATTERN, "gu")) ?? [];
   const seen = new Set<string>();
   const ordered: string[] = [];
+  // Preserve first-encounter order while removing duplicates.
   for (const item of matches) {
     if (!seen.has(item)) {
       seen.add(item);
@@ -429,17 +434,6 @@ function relativeToPosix(root: string, path: string): string {
     return normalized.slice(root.length + 1);
   }
   return normalized.replace(/^\/+/u, "");
-}
-
-/** Compare two strings by Unicode code point (Python `sorted` semantics). */
-function compareCodePoint(left: string, right: string): number {
-  if (left < right) {
-    return -1;
-  }
-  if (left > right) {
-    return 1;
-  }
-  return 0;
 }
 
 /** Escape regex metacharacters for a dynamic heading pattern. */

@@ -6,17 +6,20 @@
  *     rendering and extraction helpers used to build the PR comparison and
  *     summary sections: base selection, diff-path normalization, numstat
  *     conversion, extension summary, issue/PR reference extraction, conventional
- *     commit summary, issue/PR detail rendering, close-candidate and autoclose
- *     sections, and changed-path extraction.
+ *     commit summary, issue/PR detail rendering, and changed-path extraction.
  *
  * Responsibilities:
  *     - Replicate every regex, format string, and ordering exactly so the
  *       rendered output matches the Python source.
  *     - `selectDefaultBase` accepts an injected {@link GitClient}.
+ *     - Re-export the close-candidate and autoclose section builders, which
+ *       live in `autoclose.ts` since issue #622 (D7).
  */
 
 import {
+  compareCodePoint,
   CONVENTIONAL_TYPES,
+  ISSUE_REFERENCE_PATTERN,
   type IssueDetails,
   type PullRequestDetails,
   formatList,
@@ -152,9 +155,11 @@ export function extensionSummary(files: Iterable<string>): string {
 }
 
 /**
- * Extract issue tokens like `#123` and `ABC-123` in encounter order.
+ * Extract bare-number issue references (for example #123) in encounter order.
  *
- * Mirrors Python `extract_issue_references`.
+ * Only `#` followed by ASCII digits, not preceded or followed by a word
+ * character, is returned (issue #622, D1). Mirrors Python
+ * `extract_issue_references`.
  *
  * @param text Source text.
  * @returns Ordered, deduplicated reference tokens.
@@ -163,9 +168,10 @@ export function extractIssueReferences(text: string): string[] {
   if (!text) {
     return [];
   }
-  const matches = text.match(/(?<!\w)#\d+|\b[A-Z][A-Z0-9]+-\d+\b/gu) ?? [];
+  const matches = text.match(new RegExp(ISSUE_REFERENCE_PATTERN, "gu")) ?? [];
   const seen = new Set<string>();
   const ordered: string[] = [];
+  // Preserve first-encounter order while removing duplicates.
   for (const item of matches) {
     if (!seen.has(item)) {
       seen.add(item);
@@ -302,81 +308,12 @@ export function formatPrDetails(pr: PullRequestDetails): string {
   ].join("\n");
 }
 
-/**
- * Render the close-candidate section grouped by verification source.
- *
- * Mirrors Python `build_close_candidates_section`.
- *
- * @param params Verified/author-asserted/referenced refs and reason strings.
- * @returns The formatted close-candidates section.
- */
-export function buildCloseCandidatesSection(params: {
-  verified: string[];
-  authorAsserted: string[];
-  referenced: string[];
-  verifiedReason: string;
-  authorReason: string;
-}): string {
-  const { verified, authorAsserted, referenced, verifiedReason, authorReason } =
-    params;
-  const allAutoClose = new Set([...verified, ...authorAsserted, ...referenced]);
-  const authorAutoClose = [...allAutoClose].sort(compareCodePoint);
-  const referencedOnly = referenced
-    .filter((ref) => !allAutoClose.has(ref))
-    .filter((ref, index, arr) => arr.indexOf(ref) === index)
-    .sort(compareCodePoint);
-
-  return [
-    section("Close candidates"),
-    "Auto-close issues (verified from GitHub PR metadata):",
-    formatList(verified, verifiedReason),
-    "",
-    "Auto-close issues (author asserted):",
-    formatList(authorAutoClose, authorReason),
-    "",
-    "Referenced issues (detected):",
-    formatList(referencedOnly, "(none)"),
-  ].join("\n");
-}
-
-/**
- * Render the approved autoclose section from verified and pending refs.
- *
- * Mirrors Python `build_issues_to_autoclose_section`: verified first, then
- * pending deterministic refs not already verified; when none, the PASS vs
- * non-PASS conservative fallback text.
- *
- * @param params Verified/pending refs and observed readiness signals.
- * @returns The formatted autoclose section.
- */
-export function buildIssuesToAutocloseSection(params: {
-  verified: string[];
-  pendingPrimary: string[];
-  readinessSignals: string[];
-}): string {
-  const { verified, pendingPrimary, readinessSignals } = params;
-  // Verified issues first, then pending deterministic issues not yet verified.
-  const ordered: string[] = [];
-  for (const issue of [...verified, ...pendingPrimary]) {
-    if (issue && !ordered.includes(issue)) {
-      ordered.push(issue);
-    }
-  }
-
-  let body: string;
-  if (ordered.length > 0) {
-    body = formatList(ordered, "(none)");
-  } else if (readinessSignals.some((signal) => signal === "PASS")) {
-    body =
-      "None (no verified closing issues and no deterministic pending issue)";
-  } else {
-    body = "None (no verified closing issues and readiness not PASS)";
-  }
-
-  return [section("Issues to autoclose (verified or pending)"), body].join(
-    "\n",
-  );
-}
+// The close-candidate and autoclose section builders moved to `autoclose.ts`
+// under issue #622 (D7). This re-export keeps every existing import path valid.
+export {
+  buildCloseCandidatesSection,
+  buildIssuesToAutocloseSection,
+} from "./autoclose";
 
 /**
  * Extract changed file paths from the 'Changed files' section text.
@@ -446,17 +383,6 @@ function padName(name: string): string {
 /** Test whether a string is a non-empty run of ASCII digits (Python isdigit). */
 function isDigits(value: string): boolean {
   return value.length > 0 && /^\d+$/u.test(value);
-}
-
-/** Compare two strings by Unicode code point (Python `sorted` semantics). */
-function compareCodePoint(left: string, right: string): number {
-  if (left < right) {
-    return -1;
-  }
-  if (left > right) {
-    return 1;
-  }
-  return 0;
 }
 
 /**

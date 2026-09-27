@@ -485,3 +485,12 @@ def test_validate_rejects_non_string_element_in_nfrs() -> None:
     )
 
     assert "Epic checkpoint intent.nfrs must be a list of strings." in errors
+
+
+def test_validate_accepts_epic_issue_num_and_model_routing_receipts() -> None:
+    """Accept an epic checkpoint carrying epic_issue_num and model_routing_receipts."""
+
+    state = build_valid_epic_state()
+    state["epic_issue_num"] = 663
+    state["model_routing_receipts"] = [{"agent": "pr-author", "phase": "pr"}]
+    assert validate_epic_orchestrator_state_text(json.dumps(state)) == []

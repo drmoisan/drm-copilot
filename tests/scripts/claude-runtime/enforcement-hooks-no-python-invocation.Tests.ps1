@@ -454,7 +454,7 @@ $script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-help
             $files = Get-GuardedPowerShellFile
 
             # Assert: non-empty, rooted, bash excluded, mirror excluded.
-            @($files).Count | Should -BeGreaterThan 0
+            @($files | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0
 
             $outsideRoots = @($files | Where-Object {
                     $_.Relative -notlike '.claude/hooks/*' -and $_.Relative -notlike '.claude/lib/*'

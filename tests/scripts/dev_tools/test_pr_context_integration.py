@@ -296,6 +296,17 @@ def test_collect_and_write_end_to_end_scenarios(
         assert "Feature doc excerpts" in summary_text
         assert "(none)" in summary_text or "Context files" in summary_text
 
+    # Empty autoclose list (issue #588): an unavailable gh cannot verify closing
+    # issues, so the body says so; an available gh keeps the readiness fallback.
+    if gh_client_cls is OfflineGh:
+        assert (
+            "None (GitHub CLI unavailable; closing issues not verified)" in summary_text
+        )
+    elif not expect_autoclose:
+        assert (
+            "None (no verified closing issues and readiness not PASS)" in summary_text
+        )
+
 
 def test_generate_pr_prompt_alignment() -> None:
     prompt_path = (

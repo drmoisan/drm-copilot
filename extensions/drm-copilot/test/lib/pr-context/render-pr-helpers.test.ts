@@ -190,7 +190,7 @@ describe("buildCloseCandidatesSection", () => {
     expect(result).toContain("#3");
   });
 
-  it("merges author-asserted and referenced into author auto-close", () => {
+  it("keeps referenced issues out of author auto-close", () => {
     const result = buildCloseCandidatesSection({
       verified: [],
       authorAsserted: ["#1"],
@@ -198,12 +198,17 @@ describe("buildCloseCandidatesSection", () => {
       verifiedReason: "(none)",
       authorReason: "(found)",
     });
-    expect(result).toContain("#1");
-    expect(result).toContain("#2");
+    const lines = result.split("\n");
+    const authorIndex = lines.indexOf("Auto-close issues (author asserted):");
+    const referencedIndex = lines.indexOf("Referenced issues (detected):");
+    expect(lines[authorIndex + 1]).toBe("- #1");
+    expect(lines[referencedIndex + 1]).toBe("- #2");
   });
 });
 
 describe("buildIssuesToAutocloseSection", () => {
+  const UNAVAILABLE_BODY =
+    "None (GitHub CLI unavailable; closing issues not verified)";
   it("lists verified then pending refs without duplicates", () => {
     const result = buildIssuesToAutocloseSection({
       verified: ["#1"],
@@ -235,6 +240,62 @@ describe("buildIssuesToAutocloseSection", () => {
       readinessSignals: ["NEEDS REVISION"],
     });
     expect(result).toContain(
+      "None (no verified closing issues and readiness not PASS)",
+    );
+  });
+
+  it("reports GitHub CLI unavailable when gh is unavailable and nothing is listed", () => {
+    const result = buildIssuesToAutocloseSection({
+      verified: [],
+      pendingPrimary: [],
+      readinessSignals: ["NEEDS REVISION"],
+      ghAvailable: false,
+    });
+    expect(result).toContain(UNAVAILABLE_BODY);
+    expect(result).not.toContain("None (no verified closing issues");
+    expect(result.split("\n").pop()).toBe(UNAVAILABLE_BODY);
+  });
+
+  it("prefers the unavailable text over the PASS fallback when gh is unavailable", () => {
+    const result = buildIssuesToAutocloseSection({
+      verified: [],
+      pendingPrimary: [],
+      readinessSignals: ["PASS"],
+      ghAvailable: false,
+    });
+    expect(result).toContain(UNAVAILABLE_BODY);
+    expect(result).not.toContain("None (no verified closing issues");
+    expect(result.split("\n").pop()).toBe(UNAVAILABLE_BODY);
+  });
+
+  it("lists pending refs and omits the empty-list unavailable body when gh is unavailable", () => {
+    const result = buildIssuesToAutocloseSection({
+      verified: [],
+      pendingPrimary: ["#7"],
+      readinessSignals: ["PASS"],
+      ghAvailable: false,
+    });
+    expect(result).toContain("- #7");
+    expect(result).not.toContain(UNAVAILABLE_BODY);
+  });
+
+  it("keeps both available fallback texts when ghAvailable is true", () => {
+    const pass = buildIssuesToAutocloseSection({
+      verified: [],
+      pendingPrimary: [],
+      readinessSignals: ["PASS"],
+      ghAvailable: true,
+    });
+    const notPass = buildIssuesToAutocloseSection({
+      verified: [],
+      pendingPrimary: [],
+      readinessSignals: ["NEEDS REVISION"],
+      ghAvailable: true,
+    });
+    expect(pass).toContain(
+      "None (no verified closing issues and no deterministic pending issue)",
+    );
+    expect(notPass).toContain(
       "None (no verified closing issues and readiness not PASS)",
     );
   });

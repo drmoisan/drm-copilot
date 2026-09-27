@@ -11,14 +11,15 @@
 # Both are required and neither substitutes for the other. The direct driver is the only
 # one whose call sequence is short enough for the ordinal assertions in tests 1, 5, and 8
 # to be written over a specific occurrence. The wrapper driver is the only one that
-# observes the flag pre-pass at scripts/bash/cleanup-worktrees.sh:145, which is the line
-# that sets CLEANUP_WT_CLEAR_DISPOSABLE in production: with the direct driver alone, a
+# observes the flag pre-pass in main() (the block that sets CLEANUP_WT_CLEAR_DISPOSABLE=1)
+# in scripts/bash/cleanup-worktrees.sh: with the direct driver alone, a
 # wrapper that never set that variable would leave --clear-disposable permanently disarmed
 # and every test in this file would still pass.
 #
 # DRIVER, stated because the ordinal assertions in tests 1, 5, and 8 depend on it.
 # Tests 1 through 8 invoke delete_candidate DIRECTLY under CLEANUP_WT_CLEAR_DISPOSABLE,
-# in the form used at tests/shell/test_cleanup_worktrees_deletion.bats:47, and not
+# in the form used in the @test "a candidate whose re-verification flips is blocked
+# before any branch delete" (test_cleanup_worktrees_deletion.bats), and not
 # run_apply. Driving run_apply would add a further classify_branch pass ahead of all of
 # these and make an ordinal assertion written for the direct-driver case read the wrong
 # line. The third argument is the RECORDED state, which reverify_delete_eligible takes
@@ -36,7 +37,8 @@
 # THE SECOND OCCURRENCE IS THE SUBJECT. remove_worktree_safe issues `git worktree
 # remove` BEFORE it reads status, so the first occurrence in the log precedes the
 # clearing sequence entirely. A first-match idiom such as the `grep -n ... | head -n1`
-# at tests/shell/test_cleanup_worktrees_deletion.bats:47 would compare against a line
+# at the @test "a candidate whose re-verification flips is blocked before any branch
+# delete" (test_cleanup_worktrees_deletion.bats) would compare against a line
 # that precedes `reset --hard` and fail regardless of whether the implementation is
 # correct.
 #
@@ -219,6 +221,37 @@ count_of() { # count_of <pattern>
     [[ "$log" != *"worktree remove"* ]]
     [[ "$log" != *"branch -D"* ]]
     [[ "$log" != *"hash-object -w"* ]]
+    [[ "$log" != *" add "* ]]
+    [[ "$log" != *" commit "* ]]
+    [[ "$log" != *"update-index"* ]]
+}
+
+@test "dirt_staged_tree_is_commit: injecting a git add call into run_report makes the widened non-mutation assertion fail (negative control)" {
+    local mutated
+    mutated="$(sed '/^run_report() {$/a\
+	cleanup_wt_git add -- test-negative-control >/dev/null || true' "${LIB}")"
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="${SCEN}/dirt_staged_tree_is_commit" \
+        bash -c '
+            lib=$(cat)
+            source "$1"
+            eval "$lib"
+            source "$2"
+            source "$3"
+            source "$4"
+            run_report
+        ' _ "${ELIB}" "${RLIB}" "${DLIB}" "${DIRTLIB}" <<<"$mutated"
+    log="$(printf '%s\n' "$output" | grep '^stub-git' || true)"
+    # The injected call reaches the argv log, so the widened AC-4 assertion
+    # ([[ "$log" != *" add "* ]], asserted in the test above against the real library)
+    # would fail here: this line is that same assertion's negation, over the mutated
+    # library.
+    [[ "$log" == *" add "* ]]
+    # The mutated source was composed into a shell variable and evaluated in a child
+    # process; the production file on disk was never opened for writing.
+    run git -C "${REPO_ROOT}" status --porcelain -- "${LIB}"
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
 }
 
 @test "dirt_staged_tree_is_commit: the cached diff-index probe runs and every status read suppresses optional locks" {

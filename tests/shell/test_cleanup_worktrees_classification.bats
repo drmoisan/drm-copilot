@@ -257,3 +257,17 @@ report() { # report <scenario> -> run the full report driver under that scenario
     cb child_of_subject_merged_equivalent feature-child
     [ "$output" = "BRANCH|feature-child|MERGED_EQUIVALENT" ]
 }
+
+@test "classify_branch main is PROTECTED_CURRENT when the primary worktree is on another branch" {
+    # Reported topology: the primary worktree is on chore-cleanup and main is checked out nowhere.
+    cb base_not_checked_out main
+    [ "$status" -eq 0 ]
+    [ "$output" = "BRANCH|main|PROTECTED_CURRENT" ]
+}
+
+@test "classify_branch main is PROTECTED_CURRENT when main is checked out in a linked worktree" {
+    # /repo-wt/base holds main and is neither the primary nor the invoking worktree.
+    cb base_in_linked_worktree main
+    [ "$status" -eq 0 ]
+    [ "$output" = "BRANCH|main|PROTECTED_CURRENT" ]
+}

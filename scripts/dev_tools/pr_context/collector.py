@@ -6,6 +6,7 @@ import argparse
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from .autoclose import classify_references, select_pending_primary
 from .collector_documents import (
     APPENDIX_CHAR_BUDGET as APPENDIX_CHAR_BUDGET,
 )
@@ -191,34 +192,16 @@ def collect_and_write(
     invalid_refs_set = set(context_result.invalid_references)
     branch_refs = extract_issue_references(git.branch_name())
     path_refs = extract_issue_references("\n".join(changed_paths))
-    if gh_available:
-        for ref in feature_issue_refs:
-            formatted = ref if ref.startswith("#") else f"#{ref}"
-            entity = gh.classify_entity(ref.lstrip("#"))
-            if entity == "issue":
-                referenced_issues_set.add(formatted)
-            elif entity == "pull":
-                referenced_prs_set.add(formatted)
-            else:
-                invalid_refs_set.add(formatted)
-        for ref in branch_refs + path_refs:
-            formatted = ref if ref.startswith("#") else f"#{ref}"
-            entity = gh.classify_entity(ref.lstrip("#"))
-            if entity == "issue":
-                referenced_issues_set.add(formatted)
-            elif entity == "pull":
-                referenced_prs_set.add(formatted)
-            else:
-                invalid_refs_set.add(formatted)
-    else:
-        referenced_issues_set.update(
-            formatted if formatted.startswith("#") else f"#{formatted}"
-            for formatted in feature_issue_refs
-        )
-        referenced_issues_set.update(
-            formatted if formatted.startswith("#") else f"#{formatted}"
-            for formatted in branch_refs + path_refs
-        )
+    classify_references(
+        gh=gh,
+        gh_available=gh_available,
+        feature_issue_refs=feature_issue_refs,
+        branch_refs=branch_refs,
+        path_refs=path_refs,
+        referenced_issues=referenced_issues_set,
+        referenced_prs=referenced_prs_set,
+        invalid_refs=invalid_refs_set,
+    )
 
     referenced_issues = sorted(referenced_issues_set)
     referenced_prs = sorted(referenced_prs_set)
@@ -235,10 +218,6 @@ def collect_and_write(
         verified_reason = "None (closingIssuesReferences empty)"
     else:
         verified_reason = "(verified from GitHub PR metadata)"
-
-    if referenced_issues:
-        author_asserted = sorted(set(author_asserted + referenced_issues))
-        author_reason = "Detected issue references (classified)"
 
     # Derive deterministic pending autoclose targets from explicit metadata only
     # when feature readiness is PASS.
@@ -257,17 +236,25 @@ def collect_and_write(
             if feature_doc.readiness_signal
         }
     )
+    selection = select_pending_primary(
+        gh=gh, gh_available=gh_available, pending_primary=pending_primary
+    )
     issues_to_autoclose_section = build_issues_to_autoclose_section(
         verified=verified,
-        pending_primary=pending_primary,
+        pending_primary=selection.kept,
         readiness_signals=readiness_signals,
+        gh_available=gh_available,
+        pending_primary_excluded=selection.excluded,
     )
 
-    issues_to_fetch = sorted(set(verified + author_asserted + referenced_issues))
+    issues_to_fetch = sorted(set(verified + referenced_issues + selection.kept))
     issue_details: list[IssueDetails] = []
     if gh_available:
+        # Reuse details fetched during pending selection so each issue number is
+        # fetched at most once per run.
         for ref in issues_to_fetch:
-            issue_details.append(gh.issue_details(ref.lstrip("#")))
+            cached = selection.fetched_details.get(ref)
+            issue_details.append(cached or gh.issue_details(ref.lstrip("#")))
 
     pr_details_list: list[PullRequestDetails] = []
     if gh_available:

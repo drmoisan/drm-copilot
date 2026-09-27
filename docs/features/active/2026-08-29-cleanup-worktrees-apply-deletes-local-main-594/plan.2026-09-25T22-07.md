@@ -1,0 +1,927 @@
+# 2026-08-29-cleanup-worktrees-apply-deletes-local-main (Plan)
+
+- **Issue:** #594
+- **Parent (optional):** none
+- **Owner:** drmoisan
+- **Branch:** `bug/cleanup-worktrees-apply-deletes-local-main-594`
+- **Last Updated:** 2026-09-25T23-55
+- **Status:** Draft
+- **Version:** 1.0
+- **Work Mode:** full-bug
+
+**Requirements source (sole AC source, full-bug):** `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md`,
+section `## Acceptance Criteria` (23 items, referenced below as AC-01 through AC-23 in document
+order). `user-story.md` is not produced for full-bug work and its absence is not a blocker.
+Supporting inputs: `issue.md` and `research/research.2026-09-25T22-10.md` in the same folder.
+
+**Notation.** `<FEATURE>` denotes `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594`.
+`<ts>` denotes the artifact creation time in `yyyy-MM-ddTHH-mm` form. Every evidence artifact
+is written under `<FEATURE>/evidence/<kind>/`; no artifact is written under `artifacts/`.
+
+**Base commit (BASE_SHA).** `0658f6945aa833c6960dc5bf8a43635fc346991f`, the head of
+`bug/cleanup-worktrees-apply-deletes-local-main-594` when this plan was authored (read from the
+branch ref file). Every scope diff in this plan is anchored to that literal SHA. No task
+references `origin/main` or any other remote ref: the CI checkout is depth 1 and sibling issue
+#660 failed CI on exactly that dependency. P0-T1 proves that no code path changed between
+BASE_SHA and the execution start, so the literal stays a valid anchor if docs-only commits
+(for example this plan) land on the branch before execution.
+
+**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact
+tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage.
+If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the
+audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+
+**Evidence accounting rule:** Record the expected artifact path in each evidence-producing
+task. Do not mark evidence-backed work complete without the artifact. Every command-step
+artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`; an artifact
+whose passing outcome is a non-zero exit also carries `ExpectedExitCode: <int>`.
+
+**One exit expectation per artifact file.** The PR-context parser
+(`scripts/dev_tools/pr_context/verification_evidence.py`, lines 122-130) reads the last
+`EXIT_CODE:` line and the first `ExpectedExitCode:` line in a file. Every command whose passing
+exit code is not 0 is therefore recorded in its own artifact file carrying
+`ExpectedExitCode: <int>`. The other commands of the same task stay in the task's main
+artifact, which carries no expectation field and whose commands all pass with exit 0.
+
+**Command route (agent worktree).** The executor runs commands with the Bash tool (Git Bash;
+its `sh` is GNU bash). The worktree isolation guard refuses command text that contains the
+words `bash`, `pwsh`, or `wsl`, and refuses heredocs. Therefore:
+- shell scripts run as `sh <script>` (for example `sh scripts/bash/shell-qc.sh check`);
+- bats runs as `npx --yes bats <files>` (bats-core 1.13.0 from npm, no repository change);
+- `shfmt` and `shellcheck` run directly from the Windows PATH;
+- when the guard refuses a command's text, the executor writes the identical command into a
+  `.sh` file in its session scratchpad (outside the repository) and runs `sh <that file>`;
+  the artifact's `Command:` field records the command itself, not the scratch file path.
+
+**`shell-qc.sh test` is not used locally.** `run_test` in `scripts/bash/shell_qc_lib.sh`
+resolves `bats` with `command -v`; bats is not on the Windows PATH, so the wrapper prints
+`bats not installed; skipping shell tests.` and exits 0 having run nothing. Local test evidence
+therefore comes from `npx --yes bats` only, and every local test artifact must show a TAP
+`1..N` plan line.
+
+**kcov has no local route.** Coverage is measured only by `.github/workflows/_shell-coverage.yml`
+(ubuntu-latest, `actions/checkout@v7` default depth, shfmt 3.8.0, kcov v43), dispatched with
+`gh workflow run` against this branch. CI is the authoritative bats and kcov run; when local
+and CI results disagree, CI governs (`.claude/rules/shell.md`, CI-vs-Local Version Drift). The
+CI artifact `shell-coverage` is downloaded into the executor's session scratchpad (outside the
+repository); only extracted values are written to `<FEATURE>/evidence/`, never the raw kcov tree
+and never an absolute host path.
+
+**Formatter scope.** `shell-qc.sh check` discovers `.sh` files and bash/sh shebang files under
+`tools/`, `scripts/`, and `.claude/lib/bash/` only; `.bats` files are outside discovery and the
+three edited suites use 4-space indentation that shfmt defaults would rewrite. shfmt therefore
+applies to the five changed production `.sh` files; the three edited `.bats` files are held to
+shellcheck with no finding absent from baseline (P0-T8, P6-T3), and the new test blocks follow
+each file's existing 4-space style.
+
+**Line-number citation invariant.** `tests/fixtures/cleanup_worktrees/stub-bin/git:75-91` cites
+`scripts/bash/cleanup_worktrees_actions_lib.sh` lines 103, 147, 157, 164, 191, 198, 292, and 317;
+`scripts/bash/cleanup_worktrees_detached_lib.sh:23` cites `actions_lib.sh:19-35` and `:46` cites
+`scripts/bash/cleanup_worktrees_enumerate_lib.sh:115-116`. Every insertion in those two
+libraries is placed below line 317 (actions) or below line 116 (enumerate); header edits above
+those lines are zero-net-line rewordings. P0-T13 captures the cited lines and P5-T10 proves
+them unchanged. One further citation is known and is not corrected by this plan:
+`tests/shell/test_cleanup_worktrees_dirt_clear.bats:14` cites `scripts/bash/cleanup-worktrees.sh:145`
+for the flag pre-pass that sets `CLEANUP_WT_CLEAR_DISPOSABLE`. That citation is already stale at
+BASE_SHA (the assignment is at line 192) and becomes line 197 after the five-line P4-T4
+insertion at line 122. Correcting it would modify a fourth test file, which AC-12 excludes, so
+it is out of scope; the executor records it as a follow-up item in the completion report.
+
+**Batch-budget hooks.** The per-session batch-budget hooks cover PowerShell and Python only;
+this plan edits no file of either kind.
+
+**Commit route.** `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` blocks
+Write and Edit on implementation paths and blocks `git add`/`git commit` unless
+`artifacts/orchestration/orchestrator-state.json` carries a valid issue number, feature folder,
+route, and `lifecycle_ready`. In the current tree the Write/Edit leg classifies a path as an
+implementation path by extension (`Test-ImplementationPath`, line 123: `.py`, `.ps1`, `.psm1`,
+`.ts`, `.tsx`, `.js`, `.jsx`, `.cs`, `.json`, `.yml`, `.yaml`, excluding
+`docs/features/active/` and the checkpoint files), so none of this plan's edited files (`.sh`,
+`.bats`, `.md`, fixture `.out`) is gated on the Write/Edit leg; the `git add`/`git commit` leg
+(line 137) applies to every commit task. P0-T1 reads that checkpoint before any edit and stops
+the plan (BLOCKED) when a required field is missing or names another issue, so the
+precondition is established at the start rather than first observed at the first commit.
+The commit tasks are P4-T7 (implementation), the P6-T6 re-commit precondition, P6-T8
+(implementation state and evidence before CI), and P6-T42 (check-offs and remaining evidence).
+Every commit is pathspec-bearing: `git add --` and `git commit -F <message file> --` each name
+explicit paths, and no task runs a pathless commit. The implementation pathspec (IMPL_PATHS)
+is exactly these twelve entries, covering the 18 changed files:
+`scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/ tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/ .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`.
+Every task that uses IMPL_PATHS writes the twelve entries out literally in its commands.
+If the gate refuses any Write, Edit, or commit after P0-T1, the refusing task records the
+refusal text and the plan stops at that task (BLOCKED).
+
+**Clean-tree precondition for the full suite.** `tests/shell/test_cleanup_worktrees_dirt_clear.bats`
+lines 250-252 (test `dirt_staged_tree_is_commit: injecting a git add call into run_report makes
+the widened non-mutation assertion fail (negative control)`) run
+`git -C "${REPO_ROOT}" status --porcelain -- "${LIB}"`, with `LIB` set to
+`scripts/bash/cleanup_worktrees_lib.sh` (line 53), and assert empty output. P4-T1 edits that
+file, so a full-suite run over an uncommitted edit fails that test. The plan therefore commits
+the implementation at P4-T7, before any full-suite run, and P6-T6 re-commits any uncommitted
+change under IMPL_PATHS (from Phase 5 remediation or from a QC-loop restart) before it runs the
+suite. The sibling check in `tests/shell/test_cleanup_worktrees_dirt_classify.bats:238` targets
+`scripts/bash/cleanup_worktrees_dirt_lib.sh`, which this plan does not edit (P6-T17).
+The P1-T20 and P5-T1 bats runs cover only the three edited suites and include neither
+`test_cleanup_worktrees_dirt_clear.bats` nor `test_cleanup_worktrees_dirt_classify.bats`.
+Scope diffs remain valid after the intermediate commits: P6-T13, P6-T15, P6-T16, and P6-T17
+compare BASE_SHA with HEAD (every change is committed by P6-T8), P6-T15 and P6-T16 pair that
+diff with a porcelain status, and P5-T8/P5-T9 compare BASE_SHA with the working tree, which
+includes both committed and uncommitted changes.
+
+**Execution context.** Execution is performed later by the parallel orchestrator on this same
+branch. The branch may carry docs-only commits (for example this plan and its preflight
+revisions) on top of BASE_SHA; P0-T1 accepts those commits when every path they change lies
+under `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/`.
+
+**Spec reconciliation (verification form only; no requirement is dropped).**
+1. AC-12 and AC-13 name `git diff origin/main` as the reviewer check. This plan anchors those
+   diffs on BASE_SHA instead (P6-T15, P6-T16), for the CI-depth reason stated above.
+2. AC-15 names the search `needs no special handling`. At BASE_SHA that phrase wraps across
+   `scripts/bash/cleanup_worktrees_report_records_lib.sh` lines 392-393, so a line-oriented search
+   returns zero matches before any edit and cannot fail. The plan asserts single-line tokens
+   instead: `needs no special` (line 392), `needs no separate protection` (line 429), and
+   `classify_branch marks it PROTECTED_CURRENT` (`cleanup_worktrees_actions_lib.sh:362`), each of
+   which matches exactly one line at BASE_SHA and must match none after the change (P5-T4).
+3. The spec lists a header note for `BLOCKED-PROTECTED-BASE` in `cleanup_worktrees_actions_lib.sh`.
+   A header insertion would shift the lines that `stub-bin/git` cites, which conflicts with the
+   spec's own line-citation invariant. The plan therefore records the token in the
+   `delete_candidate` docstring (below line 317) and makes the header change a zero-net-line
+   reword (P3-T2, P3-T4).
+4. AC-19 covers "changed shell and bats files". shfmt applies to the `.sh` files only (see
+   Formatter scope); the `.bats` files are covered by shellcheck and by the CI check step, which
+   the AC names as its alternative.
+5. AC-23 concerns the pull-request CI run, which may not exist while this plan executes. P6-T40
+   carries three explicit branches (pass, no pull request, pending or failed); the last two
+   defer the item to the orchestrator's CI gate.
+
+---
+
+### Phase 0 — Policy Reads and Baseline Capture
+
+- [x] [P0-T1] Record BASE_SHA in `<FEATURE>/evidence/baseline/base-sha.<ts>.md`. Run
+  `git rev-parse HEAD`, `git merge-base --is-ancestor 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD`,
+  and `git diff --exit-code --stat 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- scripts/ tests/ .claude/skills/cleanup-merged-worktrees/ extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/ .github/workflows/`.
+  Also run `git diff --stat=400 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD` to list every
+  path changed since BASE_SHA. Also read `artifacts/orchestration/orchestrator-state.json` and
+  record whether it names `issue-num` 594, `feature-folder`
+  `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594` (a trailing
+  slash is accepted), a route
+  (`route_id`, or `path_selected` when `route_id` is absent), and `lifecycle_ready` true, which
+  are the fields the commit gate used by P4-T7, P6-T6, P6-T8, and P6-T42
+  (`.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`) requires.
+  Acceptance: the artifact records the printed HEAD SHA, the ancestry check `EXIT_CODE: 0`,
+  the scoped diff `EXIT_CODE: 0` with empty output (no code, test, skill, or workflow path
+  changed since BASE_SHA), and the full `--stat` listing, in which every path begins with
+  `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/` (docs-only
+  commits under this feature folder, such as the plan itself, are tolerated; an empty listing
+  is also acceptable); and the four checkpoint fields are present with those values. Any other
+  result stops the plan: when a checkpoint field is missing or names another issue, record
+  BLOCKED at P0-T1 and return to the orchestrator before any edit; for any other failure,
+  record BLOCKED and return to the planner.
+- [x] [P0-T2] Read policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md`:
+  `CLAUDE.md`, `.github/copilot-instructions.md`,
+  `.github/instructions/general-code-change.instructions.md`,
+  `.github/instructions/general-unit-test.instructions.md`, `.claude/rules/general-code-change.md`,
+  `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/shell.md`,
+  `.claude/rules/self-explanatory-code-commenting.md`, `.claude/rules/tonality.md`, and
+  `.claude/rules/plan-acceptance-gates.md`. Acceptance: all eleven files read in that order;
+  no file edited.
+- [x] [P0-T3] Write `<FEATURE>/evidence/baseline/phase0-instructions-read.md` with
+  `Timestamp:`, `Policy Order:` (the P0-T2 order), and the explicit list of the eleven files
+  read. Acceptance: the file exists with all three fields and eleven listed paths.
+- [x] [P0-T4] Record tool availability in `<FEATURE>/evidence/baseline/tool-versions.<ts>.md`
+  by running `shfmt --version`, `shellcheck --version`, `npx --yes bats --version`, and
+  `gh version` (each command with its own `Command:`/`EXIT_CODE:` pair). The `gh version`
+  subcommand form is used because the flag form (gh with a `--version` flag) is refused by the
+  `.claude/hooks/enforce-pr-author-skill.ps1` PreToolUse hook (a false positive observed in
+  preflight round 1). Acceptance: the
+  artifact records each version string; `npx --yes bats --version` prints a line beginning
+  `Bats `. If `bats` cannot be resolved through npx, record that result verbatim and use the
+  CI fallback stated in P1-T20 for every local bats step.
+- [x] [P0-T5] Baseline format step for `scripts/bash/` production files: run
+  `shfmt -d scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh`
+  and write `<FEATURE>/evidence/baseline/shfmt-diff.<ts>.md`. Acceptance: the artifact records
+  `EXIT_CODE:` and, in `Output Summary:`, either "no diff printed" or the verbatim diff hunks
+  (a pre-existing diff is recorded, not fixed, in this task).
+- [x] [P0-T6] Baseline lint step for `scripts/bash/` production files: run
+  `shellcheck -f gcc scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh`
+  and write `<FEATURE>/evidence/baseline/shellcheck-production.<ts>.md`. Acceptance: the
+  artifact records `EXIT_CODE:` and the finding count (number of output lines) plus every
+  finding line verbatim.
+- [x] [P0-T7] Baseline repo-wide check step: run `sh scripts/bash/shell-qc.sh check` and write
+  `<FEATURE>/evidence/baseline/shell-qc-check.<ts>.md`. Acceptance: the artifact records
+  `EXIT_CODE:` and every diagnostic line verbatim (a clean run prints nothing and exits 0; a
+  non-zero exit from local shfmt 3.12 or shellcheck 0.11 version drift is recorded as a
+  pre-existing condition).
+- [x] [P0-T8] Baseline lint step for the three `tests/shell/` suites being edited: run
+  `shellcheck -f gcc tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`
+  and write `<FEATURE>/evidence/baseline/shellcheck-bats.<ts>.md`. Acceptance: the artifact
+  records `EXIT_CODE:`, the total finding count, and the per-code multiset (each distinct
+  `[SCnnnn]` code with its count), which P6-T3 compares against.
+- [x] [P0-T9] Baseline syntax step (bash has no type checker; `.claude/rules/shell.md` step 3):
+  run `sh -n scripts/bash/cleanup_worktrees_enumerate_lib.sh`, and the same for
+  `scripts/bash/cleanup_worktrees_actions_lib.sh`, `scripts/bash/cleanup_worktrees_lib.sh`,
+  `scripts/bash/cleanup_worktrees_report_records_lib.sh`, and `scripts/bash/cleanup-worktrees.sh`;
+  write `<FEATURE>/evidence/baseline/syntax-check.<ts>.md`. Acceptance: five `EXIT_CODE:`
+  values recorded; a clean file prints nothing and exits 0.
+- [x] [P0-T10] Baseline local test step into `<FEATURE>/evidence/baseline/bats-cleanup-suites.<ts>.md`:
+  first run
+  `grep -c -e '^@test ' tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`
+  and write its `Command:`/`EXIT_CODE:` pair and the three per-file counts to the artifact;
+  then run `npx --yes bats tests/shell/test_cleanup_worktrees_*.bats` (19 files; run in the
+  background, expected duration tens of minutes) and write its `Command:`/`EXIT_CODE:` pair
+  LAST in the artifact, because the PR-context parser reads the last `EXIT_CODE:` line as the
+  gate result. Acceptance: the bats pair is the final `Command:`/`EXIT_CODE:` pair in the file;
+  the artifact records the TAP `1..N` value, the `ok` and `not ok` counts, the name of every
+  `not ok` test (the baseline failure set, possibly empty), and the three per-file `@test`
+  counts.
+- [x] [P0-T11] Baseline CI coverage step via `.github/workflows/_shell-coverage.yml`: push the
+  branch at its current HEAD (the P0-T1 HEAD SHA; its code paths equal BASE_SHA per P0-T1) with
+  `git push -u origin bug/cleanup-worktrees-apply-deletes-local-main-594` (no force), dispatch
+  `gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-apply-deletes-local-main-594`,
+  and record the dispatch time (UTC). Then repeat
+  `gh run list --workflow=_shell-coverage.yml --branch bug/cleanup-worktrees-apply-deletes-local-main-594 --event workflow_dispatch --limit 1 --json databaseId,headSha,status,conclusion,createdAt`
+  until it returns a run whose `createdAt` is later than the recorded dispatch time; that run's
+  `databaseId` is RUN_ID. Run `gh run watch <RUN_ID> --exit-status` in the background (the
+  prior comparable run took 7 min 18 s, close to the 600000 ms foreground tool limit), and
+  after it completes read `gh run view <RUN_ID> --log`.
+  Write `<FEATURE>/evidence/baseline/ci-shell-coverage.<ts>.md` with the `Command:`/`EXIT_CODE:`
+  pairs in this order: `git push`, `gh workflow run`, each `gh run list` poll, and
+  `gh run view <RUN_ID> --log`, then the `gh run watch <RUN_ID> --exit-status` pair LAST (the
+  pass/fail command; the PR-context parser reads the last `EXIT_CODE:` line). Acceptance: the
+  `gh run watch` pair is the final pair in the file, and the artifact records the run ID, `headSha` equal to the P0-T1 HEAD SHA, the conclusion, every TAP `1..N`
+  line, the count of `not ok` lines, and the numeric `Bash coverage (lines): NN.N%` headline
+  copied from the log. If push, dispatch, or the run fails to produce the headline, record
+  the observed failure verbatim and mark the coverage baseline remediation-required (the
+  plan outcome cannot be PASS without a numeric baseline).
+- [x] [P0-T12] Baseline per-file coverage into `<FEATURE>/evidence/baseline/kcov-per-file.<ts>.md`: run
+  `gh run download <RUN_ID> --name shell-coverage --dir <session-scratchpad>/kcov-baseline`
+  (RUN_ID from P0-T11; the scratchpad is outside the repository), then, from the `cov.xml` at
+  the root of the downloaded directory (or `kcov-merged/cov.xml` when the root copy is
+  absent), record for each of `scripts/bash/cleanup_worktrees_enumerate_lib.sh`,
+  `scripts/bash/cleanup_worktrees_actions_lib.sh`, `scripts/bash/cleanup_worktrees_lib.sh`,
+  `scripts/bash/cleanup_worktrees_report_records_lib.sh`, and `scripts/bash/cleanup-worktrees.sh`
+  the `line-rate` value of the `<class>` element whose `filename` attribute ends with that
+  file's basename. Write `<FEATURE>/evidence/baseline/kcov-per-file.<ts>.md`. Acceptance: five
+  numeric line-rate values recorded with the run ID; no absolute path is copied into the
+  artifact.
+- [x] [P0-T13] Baseline line counts and citation anchors for `scripts/bash/` and `tests/shell/`: run
+  `wc -l scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`,
+  `sed -n '19p;35p;103p;147p;157p;164p;191p;198p;292p;317p' scripts/bash/cleanup_worktrees_actions_lib.sh`,
+  `sed -n '34p;115,116p' scripts/bash/cleanup_worktrees_enumerate_lib.sh`, and
+  `sed -n '54,55p' scripts/bash/cleanup_worktrees_lib.sh`; write
+  `<FEATURE>/evidence/baseline/line-counts-and-anchors.<ts>.md`. Acceptance: the eight line
+  counts are recorded (expected at authoring: 236, 437, 496, 476, 229, 113, 259, 153) and the
+  printed anchor lines are recorded verbatim for comparison in P5-T10.
+- [x] [P0-T14] Baseline parity of the two `cleanup-merged-worktrees/SKILL.md` copies: run
+  `git diff --no-index --exit-code .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
+  and write `<FEATURE>/evidence/baseline/skill-parity.<ts>.md`. Acceptance: `EXIT_CODE: 0`
+  (the two copies are byte-identical before any edit). A non-zero exit is recorded verbatim
+  and P4-T6 must then apply its edit to each copy independently without overwriting
+  mirror-only content.
+
+### Phase 1 — Regression Fixtures and Fail-Before Tests
+
+All fixture files are written with the Write tool using LF line endings and no byte-order
+mark. The two new scenario directories are
+`tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/` (reported topology: primary
+worktree on `chore-cleanup`, `main` checked out nowhere) and
+`tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/` (`main` checked out in the
+linked worktree `/repo-wt/base`). Neither directory carries a `rev-parse.origin_main.*` file, so
+`check_main_freshness` emits nothing. New `@test` blocks are appended at the end of each suite
+file, after its last existing test, so that the pre-existing test bodies and header comments
+are not modified.
+
+- [x] [P1-T1] Create `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/worktree-list.out`
+  with exactly four lines followed by a final newline: `worktree /repo/main`, `HEAD cccc0000`,
+  `branch refs/heads/chore-cleanup`, and an empty line. Acceptance: file exists with that
+  content.
+- [x] [P1-T2] Create `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/for-each-ref.out`
+  with exactly four newline-terminated lines in this order: `chore-cleanup cccc0000`,
+  `feature-merged bbbb1111`, `main aaaa0000`, `zeta-merged dddd3333`. Acceptance: file exists
+  with that content (LC_ALL=C order; `zeta-merged` sorts after `main`).
+- [x] [P1-T3] Create `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/rev-parse.abbrev-ref-HEAD.out`
+  containing the single newline-terminated line `chore-cleanup`. Acceptance: file exists
+  with that content.
+- [x] [P1-T4] Create `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/rev-parse.show-toplevel.out`
+  containing the single newline-terminated line `/repo/main`. Acceptance: file exists with
+  that content.
+- [x] [P1-T5] Create `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/worktree-list.out`
+  with exactly eight lines followed by a final newline: `worktree /repo/main`,
+  `HEAD cccc0000`, `branch refs/heads/chore-cleanup`, an empty line, `worktree /repo-wt/base`,
+  `HEAD aaaa0000`, `branch refs/heads/main`, and an empty line. Acceptance: file exists with
+  that content.
+- [x] [P1-T6] Create `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/for-each-ref.out`
+  with the same four lines as P1-T2. Acceptance: file content is byte-identical to the P1-T2
+  file (verified in P1-T9).
+- [x] [P1-T7] Create `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/rev-parse.abbrev-ref-HEAD.out`
+  containing the single newline-terminated line `chore-cleanup`. Acceptance: file exists with
+  that content.
+- [x] [P1-T8] Create `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/rev-parse.show-toplevel.out`
+  containing the single newline-terminated line `/repo/main`. Acceptance: file exists with
+  that content.
+- [x] [P1-T9] Verify the fixtures in `tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/`
+  and `tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/`: run
+  `ls -1 tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree`,
+  `grep -rlU $'\r' tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree`,
+  and `cmp tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/for-each-ref.out tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/for-each-ref.out`;
+  write the `ls` and `cmp` results to `<FEATURE>/evidence/regression-testing/fixtures-check.<ts>.md`
+  (no expectation field) and the carriage-return search result to
+  `<FEATURE>/evidence/regression-testing/fixtures-crlf-check.<ts>.md` with `ExpectedExitCode: 1`.
+  Acceptance: `ls` lists exactly the four names from P1-T1..T4 in each directory; the
+  carriage-return search prints nothing and exits 1; `cmp` exits 0.
+- [x] [P1-T10] Append test T1 to `tests/shell/test_cleanup_worktrees_enumeration.bats`, named
+  exactly `compute_protected emits protected-branch main when the primary worktree is on another branch`.
+  Body: a one-line comment stating that the primary worktree is on `chore-cleanup` and `main`
+  is checked out nowhere; `run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_not_checked_out" bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && compute_protected 2>/dev/null"`
+  (wrapped with a trailing backslash as in the existing tests); then, in this order,
+  `[ "$status" -eq 0 ]`, `[[ "$output" == *"protected-branch|chore-cleanup"* ]]`, and
+  `[[ "$output" == *"protected-branch|main"* ]]`. Acceptance: the test block is the file's
+  last block and uses the file's 4-space indentation.
+- [x] [P1-T11] Append test T2 to `tests/shell/test_cleanup_worktrees_enumeration.bats`, named
+  exactly `compute_protected emits protected-branch main under current_exclusion`. Body: a
+  one-line comment stating that the base record is additional to the existing records; the
+  same `run env ...` line as P1-T10 with scenario `${SCEN}/current_exclusion`; then, in this
+  order, `[ "$status" -eq 0 ]`, `[[ "$output" == *"protected-branch|current-branch"* ]]`,
+  `[[ "$output" == *"protected-path|/repo/main"* ]]`,
+  `[[ "$output" == *"protected-path|/repo-wt/current"* ]]`, and
+  `[[ "$output" == *"protected-branch|main"* ]]`. Acceptance: block appended after T1.
+- [x] [P1-T12] Append test T3 to `tests/shell/test_cleanup_worktrees_enumeration.bats`, named
+  exactly `compute_protected emits exactly one protected-branch main when the current branch is main`.
+  Body: a one-line comment stating that the `merged_no_worktree` scenario's current branch is
+  `main`; the same `run env ...` line with scenario `${SCEN}/merged_no_worktree`; then
+  `[ "$status" -eq 0 ]`, `count=$(printf '%s\n' "$output" | grep -c -x -F 'protected-branch|main' || true)`,
+  and `[ "$count" -eq 1 ]`. Acceptance: block appended after T2.
+- [x] [P1-T13] Append test T4 to `tests/shell/test_cleanup_worktrees_classification.bats`, named
+  exactly `classify_branch main is PROTECTED_CURRENT when the primary worktree is on another branch`.
+  Body: a one-line comment naming the reported topology; `cb base_not_checked_out main`;
+  `[ "$status" -eq 0 ]`; `[ "$output" = "BRANCH|main|PROTECTED_CURRENT" ]`. Acceptance: the
+  block is the file's last block and reuses the existing `cb` helper unchanged.
+- [x] [P1-T14] Append test T5 to `tests/shell/test_cleanup_worktrees_classification.bats`, named
+  exactly `classify_branch main is PROTECTED_CURRENT when main is checked out in a linked worktree`.
+  Body: a one-line comment stating that `/repo-wt/base` is neither the primary nor the invoking
+  worktree; `cb base_in_linked_worktree main`; `[ "$status" -eq 0 ]`;
+  `[ "$output" = "BRANCH|main|PROTECTED_CURRENT" ]`. Acceptance: block appended after T4.
+- [x] [P1-T15] Append test T6 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
+  exactly `run_report classifies main PROTECTED_CURRENT when the primary worktree is on another branch`.
+  Body: `run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_not_checked_out" bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${RLIB}'; source '${DLIB}'; run_report 2>/dev/null"`
+  (wrapped as in the existing tests); then `[ "$status" -eq 0 ]`,
+  `[[ "$output" == *"BRANCH|main|PROTECTED_CURRENT"* ]]`, and
+  `[[ "$output" != *"BRANCH|main|MERGED_CLEAN"* ]]`. Acceptance: the block is the file's last
+  block.
+- [x] [P1-T16] Append test T7 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
+  exactly `run_apply does not delete main when the primary worktree is on another branch`.
+  Body: `apply "${SCEN}/base_not_checked_out"`; then, in this order,
+  `[[ "$output" == *"BRANCH|main|PROTECTED_CURRENT"* ]]`,
+  `[[ "$output" != *"BRANCH|main|MERGED_CLEAN"* ]]`, `[[ "$output" != *"branch -D main"* ]]`,
+  `[[ "$output" != *"ACTION|branch-delete|main|"* ]]`, a one-line comment naming the positive
+  controls, `[[ "$output" == *"ACTION|branch-delete|feature-merged|OK"* ]]`, and
+  `[[ "$output" == *"ACTION|branch-delete|zeta-merged|OK"* ]]`. Acceptance: block appended
+  after T6 and reuses the existing `apply` helper unchanged.
+- [x] [P1-T17] Append test T8 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
+  exactly `run_apply neither removes nor deletes main checked out in a linked worktree`. Body:
+  `apply "${SCEN}/base_in_linked_worktree"`; then `[[ "$output" == *"BRANCH|main|PROTECTED_CURRENT"* ]]`,
+  `[[ "$output" != *"worktree remove /repo-wt/base"* ]]`, `[[ "$output" != *"branch -D main"* ]]`,
+  and `[[ "$output" != *"ACTION|branch-delete|main|"* ]]`. Acceptance: block appended after T7.
+- [x] [P1-T18] Append test T9 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
+  exactly `delete_candidate refuses the base branch before re-verification`. Body: a one-line
+  comment stating that stderr is retained so the stub argv log is observable;
+  `run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_not_checked_out" bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; delete_candidate main '' MERGED_CLEAN"`
+  (no stderr redirection); then `[ "$status" -eq 1 ]`,
+  `[[ "$output" == *"ACTION|delete|main|BLOCKED-PROTECTED-BASE"* ]]`,
+  `[[ "$output" != *"merge-base"* ]]`, `[[ "$output" != *"worktree remove"* ]]`, and
+  `[[ "$output" != *"branch -D"* ]]`. Acceptance: block appended after T8.
+- [x] [P1-T19] Append test T10 to `tests/shell/test_cleanup_worktrees_deletion.bats`, named
+  exactly `delete_candidate refuses the base branch before removing its linked worktree`.
+  Body: `run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_in_linked_worktree" bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; delete_candidate main /repo-wt/base MERGED_CLEAN"`
+  (no stderr redirection); then `[ "$status" -eq 1 ]`,
+  `[[ "$output" == *"ACTION|delete|main|BLOCKED-PROTECTED-BASE"* ]]`, and
+  `[[ "$output" != *"worktree remove"* ]]`. Acceptance: block appended after T9.
+- [x] [P1-T20] [expect-fail] Fail-before run into `<FEATURE>/evidence/regression-testing/fail-before.<ts>.md`:
+  run `npx --yes bats tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`
+  against the unfixed libraries and record the artifact with `ExpectedExitCode: 1`.
+  Acceptance: `EXIT_CODE: 1`; the TAP plan equals the P0-T10 per-file `@test` total plus 10
+  (12 + 19 + 11 + 10 = 52 at authoring); exactly nine `not ok` lines, naming T1, T2, T4, T5, T6, T7, T8, T9, and
+  T10; T3 reports `ok` (it pins the no-duplicate property and passes before the fix); every
+  pre-existing test reports `ok`. For each of the nine failures the artifact records the
+  first failed assertion line that bats prints, and that line must be an assertion about
+  `main` (a line containing `protected-branch|main`, `BRANCH|main|PROTECTED_CURRENT`, or, for
+  T9 and T10, `[ "$status" -eq 1 ]`); a failure on any other line (for example a missing
+  fixture or a syntax error) fails this task. CI fallback, used only when P0-T4 recorded that
+  npx cannot resolve bats: commit the Phase 1 files alone with a pathspec-bearing commit
+  (`git add --` and `git commit -F <message file> --`, each naming the three edited suites
+  under `tests/shell/` and the two new fixture directories), push, and dispatch
+  `_shell-coverage.yml` as in P0-T11; the same acceptance applies to the TAP lines read from
+  `gh run view <RUN_ID> --log`.
+
+### Phase 2 — Base-Branch Constant and compute_protected Protection
+
+- [x] [P2-T1] In `scripts/bash/cleanup_worktrees_enumerate_lib.sh`, insert immediately above
+  the line `compute_protected() {` (line 166 at BASE_SHA; below line 116) a three-line comment
+  followed by the plain assignment `CLEANUP_WT_BASE_BRANCH="main"` and one blank line. The
+  comment states that the constant names the ladder's fixed comparison base, that
+  `compute_protected` protects it by name in every checkout topology and `delete_candidate`
+  refuses it, and that it is deliberately not read from the environment (issue #594).
+  Acceptance: `grep -n -F 'CLEANUP_WT_BASE_BRANCH="main"' scripts/bash/cleanup_worktrees_enumerate_lib.sh`
+  prints exactly one line whose number is greater than 116.
+- [x] [P2-T2] In `scripts/bash/cleanup_worktrees_enumerate_lib.sh` `compute_protected`,
+  immediately after the existing block that prints `protected-branch|<current branch>` (the
+  `fi` at line 198 at BASE_SHA, which follows both `rev-parse` hard-failure guards), insert a
+  comment stating that base protection is unconditional, is emitted only after both guards
+  pass, and is skipped when the current branch already equals the base; then insert
+  `if [[ $current_branch != "$CLEANUP_WT_BASE_BRANCH" ]]; then`,
+  `printf 'protected-branch|%s\n' "$CLEANUP_WT_BASE_BRANCH"`, and `fi` (tab-indented per
+  shfmt defaults). Acceptance: `grep -n -F '"$CLEANUP_WT_BASE_BRANCH"' scripts/bash/cleanup_worktrees_enumerate_lib.sh`
+  prints exactly two lines (the new `if` line and the new `printf` line), and both line numbers
+  are greater than the line number of the `ctrc` guard's `return "$ctrc"`.
+- [x] [P2-T3] Update the docstring of `compute_protected` in `scripts/bash/cleanup_worktrees_enumerate_lib.sh`
+  (the comment block under `compute_protected() {`) to state that the base branch `CLEANUP_WT_BASE_BRANCH` is always
+  protected by name, that its `protected-branch|` record is emitted after both `rev-parse`
+  guards pass (the fail-closed contract is unchanged), and that it is omitted only when the
+  current branch already equals the base (no duplicate record). Acceptance: the docstring
+  block contains the token `CLEANUP_WT_BASE_BRANCH`.
+- [x] [P2-T4] Reword the file header of `scripts/bash/cleanup_worktrees_enumerate_lib.sh`
+  (lines 1-32) so that the description of `compute_protected` names the base branch (for
+  example "current-worktree/branch and base-branch protection set") and the lines 29-32
+  paragraph states that the base-branch record is emitted only after both `rev-parse` guards;
+  and reword the two-line sourcing contract (lines 12-13 at BASE_SHA, currently "this library
+  defines functions only; it never runs work at source time") so that it states the library
+  defines functions and the single constant `CLEANUP_WT_BASE_BRANCH` and runs no other work at
+  source time, for example
+  `# Sourcing contract: defines functions and the single constant CLEANUP_WT_BASE_BRANCH`
+  and `# and runs no other work at source time, so wrapper and bats suites source it safely.`
+  (P2-T1 adds that top-level assignment, so the BASE_SHA wording would be false after the
+  change). The whole header rewording must be zero net lines. Acceptance:
+  `sed -n '1,32p' scripts/bash/cleanup_worktrees_enumerate_lib.sh` piped to
+  `grep -c -F 'base-branch'` prints at least `1`;
+  `sed -n '1,32p' scripts/bash/cleanup_worktrees_enumerate_lib.sh` piped to
+  `grep -c -F 'CLEANUP_WT_BASE_BRANCH'` prints at least `1`;
+  `sed -n '/^# Sourcing contract:/,/^#$/p' scripts/bash/cleanup_worktrees_enumerate_lib.sh`
+  piped to `grep -c -F 'CLEANUP_WT_BASE_BRANCH'` prints at least `1` (the token is in the
+  sourcing-contract paragraph itself, not only in the `compute_protected` description); and
+  `sed -n '34p' scripts/bash/cleanup_worktrees_enumerate_lib.sh` still prints `cleanup_wt_git() {`.
+
+### Phase 3 — delete_candidate Backstop and Actions-Library Documentation
+
+- [x] [P3-T1] In `scripts/bash/cleanup_worktrees_actions_lib.sh` `delete_candidate`,
+  immediately after the line `local name="$1" wt_path="$2" state="$3"` and before
+  `reverify_delete_eligible "$name" "$state" || return 1`, insert a comment stating that the
+  base branch is refused before re-verification, worktree removal, or branch deletion, and
+  that `run_apply` never reaches this path for the base because `compute_protected` already
+  classifies it `PROTECTED_CURRENT`; then insert
+  `if [[ $name == "$CLEANUP_WT_BASE_BRANCH" ]]; then`,
+  `printf 'ACTION|delete|%s|BLOCKED-PROTECTED-BASE\n' "$name"`, `return 1`, and `fi`.
+  Acceptance: `grep -n -F 'BLOCKED-PROTECTED-BASE' scripts/bash/cleanup_worktrees_actions_lib.sh`
+  shows the `printf` line, and its line number is lower than the line number of the first
+  `reverify_delete_eligible "$name" "$state"` call inside `delete_candidate`.
+- [x] [P3-T2] Update the `delete_candidate` docstring in `scripts/bash/cleanup_worktrees_actions_lib.sh`
+  to add a step 0 ahead of the existing three
+  steps: refuse the base branch `CLEANUP_WT_BASE_BRANCH` by emitting
+  `ACTION|delete|<name>|BLOCKED-PROTECTED-BASE` and returning 1 before any other step runs;
+  note that the constant is defined in `scripts/bash/cleanup_worktrees_enumerate_lib.sh`,
+  which every caller sources first. Acceptance: the docstring block contains both tokens
+  `CLEANUP_WT_BASE_BRANCH` and `BLOCKED-PROTECTED-BASE`.
+- [x] [P3-T3] Reword the `run_apply` docstring in `scripts/bash/cleanup_worktrees_actions_lib.sh`
+  (lines 361-362 at BASE_SHA) so that it no longer attributes `main`'s protection to worktree
+  position alone: the main worktree and the base branch `CLEANUP_WT_BASE_BRANCH` are never
+  candidates, `compute_protected` protects the base by name in every checkout topology so
+  classify_branch resolves it to PROTECTED_CURRENT, and `delete_candidate` refuses it as a
+  backstop. The reworded docstring must not contain the literal
+  `classify_branch marks it PROTECTED_CURRENT` on any line. Acceptance: `grep -c -F 'classify_branch marks it PROTECTED_CURRENT' scripts/bash/cleanup_worktrees_actions_lib.sh`
+  prints `0` (`ExpectedExitCode: 1` in `<FEATURE>/evidence/qa-gates/ac15-run-apply-search.<ts>.md`,
+  P5-T6) and the `run_apply` docstring contains the token `CLEANUP_WT_BASE_BRANCH`. The
+  rewording must leave the lines `run_apply() {` and
+  `local rc=0 name record wpath wbranch wflags cb_out state` unchanged, because P5-T6 bounds
+  the docstring by those two lines.
+- [x] [P3-T4] Reword the header of `scripts/bash/cleanup_worktrees_actions_lib.sh` at lines 6-7
+  from "deletion mechanics (same-process re-verification, no-force worktree removal, branch
+  deletion) plus the apply-mode driver." to a two-line form that also names the base-branch
+  refusal, for example `# deletion mechanics (base-branch refusal, same-process re-verification, no-force`
+  and `# worktree removal, branch deletion) plus the apply-mode driver.`; zero net lines.
+  Acceptance: `grep -c -F 'base-branch refusal' scripts/bash/cleanup_worktrees_actions_lib.sh`
+  prints `1`, and the P5-T10 anchor comparison shows lines 19 and 35 unchanged.
+- [x] [P3-T5] Lint the cross-file constant reference in `scripts/bash/cleanup_worktrees_actions_lib.sh`:
+  run `shellcheck -f gcc scripts/bash/cleanup_worktrees_actions_lib.sh`. Acceptance: no finding
+  refers to a line added in P3-T1 to P3-T4. Explicit remediation branch: if shellcheck reports
+  `SC2154` for `CLEANUP_WT_BASE_BRANCH` on the P3-T1 `if` line, add
+  `# shellcheck disable=SC2154` on the line immediately above it, preceded by a comment stating
+  that the constant is assigned in `scripts/bash/cleanup_worktrees_enumerate_lib.sh`, which the
+  wrapper and every bats harness source first, and re-run the command until no finding
+  refers to an added line. Record the result in
+  `<FEATURE>/evidence/other/actions-lib-sc2154-check.<ts>.md`.
+
+### Phase 4 — Comment, Help-Text, and Skill Documentation Corrections
+
+- [x] [P4-T1] In `scripts/bash/cleanup_worktrees_lib.sh` `classify_branch` docstring, replace
+  the two lines `#   1. PROTECTED_CURRENT exclusion (branch-name OR worktree-path match; main`
+  and `#      worktree always protected).` (lines 319-320 at BASE_SHA) with exactly two lines:
+  `#   1. PROTECTED_CURRENT exclusion (branch-name OR worktree-path match; main worktree`
+  and `#      and base branch CLEANUP_WT_BASE_BRANCH always protected).` (tab-indented as the
+  surrounding lines). Acceptance: `wc -l scripts/bash/cleanup_worktrees_lib.sh` prints `496`
+  and `grep -c -F 'CLEANUP_WT_BASE_BRANCH' scripts/bash/cleanup_worktrees_lib.sh` prints `1`.
+- [x] [P4-T2] In `scripts/bash/cleanup_worktrees_report_records_lib.sh` `classify_all_branches`,
+  replace the four comment lines 391-394 (BASE_SHA) with four lines stating that restricting
+  the probe to the NOT_MERGED set bounds its cost at k*(k-1) probes, and that the base branch
+  `main` never enters the probe set because `compute_protected` protects it by name
+  (`CLEANUP_WT_BASE_BRANCH`) in every checkout topology, so `classify_branch` resolves it
+  `PROTECTED_CURRENT` at rung 1. Acceptance: `grep -c -F 'needs no special' scripts/bash/cleanup_worktrees_report_records_lib.sh`
+  prints `0` and the file's line count is unchanged at 476.
+- [x] [P4-T3] In `scripts/bash/cleanup_worktrees_report_records_lib.sh`, replace the three
+  comment lines 427-429 (BASE_SHA, the "Phase 2: pairwise ancestry" comment) with three lines
+  stating that a branch resolving anything other than NOT_MERGED is neither subject nor target,
+  so `main`, which is `PROTECTED_CURRENT` by the unconditional base-branch protection in
+  `compute_protected`, is excluded by its verdict. Acceptance:
+  `grep -c -F 'needs no separate protection' scripts/bash/cleanup_worktrees_report_records_lib.sh`
+  prints `0`, `grep -c -F 'CLEANUP_WT_BASE_BRANCH' scripts/bash/cleanup_worktrees_report_records_lib.sh`
+  prints at least `1`, and `wc -l scripts/bash/cleanup_worktrees_report_records_lib.sh` prints `476`.
+- [x] [P4-T4] In `scripts/bash/cleanup-worktrees.sh` `usage()` heredoc, insert after the
+  paragraph ending "hard git failure and never unlocks a destructive action." (line 122 at
+  BASE_SHA) one empty line followed by exactly these four lines, leaving lines 119-122
+  unchanged:
+  `PROTECTED_CURRENT also covers the base branch main, which is protected by name in every`
+  `checkout topology: main is never deleted and a worktree checked out on main is never`
+  `removed. As a second guard, apply mode refuses a deletion request for main with the`
+  `action result BLOCKED-PROTECTED-BASE.`
+  Acceptance: `sed -n '119,122p' scripts/bash/cleanup-worktrees.sh` prints the same four
+  state-list lines as `git show 0658f6945aa833c6960dc5bf8a43635fc346991f:scripts/bash/cleanup-worktrees.sh`
+  piped to `sed -n '119,122p'`, and `wc -l scripts/bash/cleanup-worktrees.sh` prints `234`
+  (229 plus five).
+- [x] [P4-T5] In `.claude/skills/cleanup-merged-worktrees/SKILL.md`, insert immediately after
+  line 527 (the line ending "and never for `PROTECTED_CURRENT`.") a new bullet consisting of
+  exactly the six lines inside the fence below (the fence itself is not inserted):
+
+  ```text
+  - Never delete the base branch `main` and never remove a worktree checked out on it.
+    `compute_protected` protects `main` by name in every checkout topology, so it
+    classifies `PROTECTED_CURRENT` even when no protected worktree has it checked out, and
+    `delete_candidate` refuses a deletion request for it with
+    `ACTION|delete|main|BLOCKED-PROTECTED-BASE` before any re-verification, worktree
+    removal, or branch deletion runs.
+  ```
+
+  In the file, the first line starts at column 1 with `- ` and the five continuation lines
+  are indented by two spaces, matching the surrounding bullets. Acceptance: `grep -c -F 'BLOCKED-PROTECTED-BASE' .claude/skills/cleanup-merged-worktrees/SKILL.md`
+  prints `1` and `grep -c -F 'Never delete the base branch' .claude/skills/cleanup-merged-worktrees/SKILL.md`
+  prints `1`.
+- [x] [P4-T6] Apply the P4-T5 insertion to `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
+  with the Edit tool (same old and new strings as P4-T5). Acceptance: the same two `grep -c -F` checks
+  against the extension copy each print `1`.
+- [x] [P4-T7] Commit the implementation (recorded in `<FEATURE>/evidence/other/commit-implementation.<ts>.md`)
+  before any verification or full-suite run, so the working tree is clean for
+  `scripts/bash/cleanup_worktrees_lib.sh` (see Clean-tree precondition): write a commit message file in the session scratchpad (message per the
+  commit-message skill, ending with the session's required trailer lines), then run
+  `git add -- scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/ tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/ .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`,
+  then `git commit -F <message file> -- scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out/ tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree/ .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`,
+  then `git rev-parse HEAD`,
+  `git status --porcelain -- scripts/ tests/ .claude/skills/cleanup-merged-worktrees/ extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/`,
+  and `git diff --numstat 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- scripts/ tests/ .claude/skills/ extensions/`.
+  Record every command with its `Command:`/`EXIT_CODE:` pair and the commit SHA (IMPL_SHA) in
+  `<FEATURE>/evidence/other/commit-implementation.<ts>.md`. Acceptance: every command exits 0;
+  the porcelain status prints nothing; the numstat output lists exactly the 18 files named in
+  P6-T17 (5 production files, 3 test suites, 8 fixture files, 2 `SKILL.md` copies) and no
+  other path. If the gate refuses the `git add` or `git commit`, record the refusal text and
+  stop (BLOCKED).
+
+### Phase 5 — Pass-After and Targeted Acceptance Verification
+
+- [x] [P5-T1] Pass-after run into `<FEATURE>/evidence/regression-testing/pass-after.<ts>.md`:
+  run `npx --yes bats tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`. Acceptance: `EXIT_CODE: 0`,
+  zero `not ok` lines, the TAP plan equals the P1-T20 plan, and the artifact lists the `ok`
+  line for each of T1 through T10 by its exact name.
+- [x] [P5-T2] AC-01 check in `<FEATURE>/evidence/qa-gates/ac01-base-constant.<ts>.md`: run
+  `grep -rn -F 'CLEANUP_WT_BASE_BRANCH=' scripts/bash/` and
+  `grep -rn -F 'CLEANUP_WT_BASE_BRANCH:-' scripts/bash/`, recording the second search in its
+  own artifact `<FEATURE>/evidence/qa-gates/ac01-no-default-expansion.<ts>.md` with
+  `ExpectedExitCode: 1`. Acceptance: the first prints exactly one line, in
+  `scripts/bash/cleanup_worktrees_enumerate_lib.sh`, whose text after the line number is
+  `CLEANUP_WT_BASE_BRANCH="main"`; the second prints nothing and exits 1.
+- [x] [P5-T3] AC-14 check in `<FEATURE>/evidence/qa-gates/ac14-no-new-state.<ts>.md`: run
+  `grep -rnE 'PROTECTED_BASE\b' scripts/bash/` and `sed -n '54,55p' scripts/bash/cleanup_worktrees_lib.sh`,
+  recording the search in its own artifact `<FEATURE>/evidence/qa-gates/ac14-no-protected-base.<ts>.md`
+  with `ExpectedExitCode: 1` (the `sed` output stays in `ac14-no-new-state.<ts>.md`).
+  Acceptance: the search prints nothing and exits 1 (the only new token uses hyphens,
+  `BLOCKED-PROTECTED-BASE`); the two header state-list lines are identical to those recorded in
+  P0-T13; the P4-T4 acceptance already proved help lines 119-122 unchanged.
+- [x] [P5-T4] AC-15 check in `<FEATURE>/evidence/qa-gates/ac15-comments.<ts>.md`: run
+  `grep -rn -F 'needs no special' scripts/bash/`,
+  `grep -rn -F 'needs no separate protection' scripts/bash/`,
+  `grep -rn -F 'classify_branch marks it PROTECTED_CURRENT' scripts/bash/`, and
+  `grep -c -F 'CLEANUP_WT_BASE_BRANCH' scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh`.
+  Each of the three phrase searches is recorded in its own artifact, in the order listed:
+  `<FEATURE>/evidence/qa-gates/ac15-phrase-1.<ts>.md`, `ac15-phrase-2.<ts>.md`, and
+  `ac15-phrase-3.<ts>.md` (same folder), each with `ExpectedExitCode: 1`; `ac15-comments.<ts>.md`
+  keeps the `grep -c` counts and the quoted passages.
+  Acceptance: the three phrase searches each print nothing and exit 1 (each phrase is on a
+  single line at BASE_SHA: `report_records_lib.sh:392`, `:429`, `actions_lib.sh:362`); each of
+  the three per-file counts is at least 1; the artifact quotes the three reworded docstring
+  passages (`classify_all_branches` lines 391-394 and 427-429, `run_apply`, `classify_branch`
+  step 1) for reviewer inspection.
+- [x] [P5-T5] AC-16 check in `<FEATURE>/evidence/qa-gates/ac16-help-text.<ts>.md`: run
+  `sh scripts/bash/cleanup-worktrees.sh --help` and record its exit code, then run
+  `sh scripts/bash/cleanup-worktrees.sh --help | grep -c -F 'covers the base branch main'` and
+  `sh scripts/bash/cleanup-worktrees.sh --help | grep -c -F 'BLOCKED-PROTECTED-BASE'`, each with
+  its own `Command:`/`EXIT_CODE:` pair. Acceptance: `--help` exits 0; each count is at least 1
+  and each pipeline exits 0.
+- [x] [P5-T6] P3-T3 negative search and docstring capture for `scripts/bash/cleanup_worktrees_actions_lib.sh`: run
+  `grep -n -F 'classify_branch marks it PROTECTED_CURRENT' scripts/bash/cleanup_worktrees_actions_lib.sh`
+  and record it in `<FEATURE>/evidence/qa-gates/ac15-run-apply-search.<ts>.md` with
+  `ExpectedExitCode: 1`; then run
+  `sed -n '/^run_apply() {/,/local rc=0 name record/p' scripts/bash/cleanup_worktrees_actions_lib.sh`
+  and record it in `<FEATURE>/evidence/qa-gates/ac15-run-apply-docstring.<ts>.md`. The
+  address range is pattern-based because P3-T1 and P3-T2 insert lines into `delete_candidate`
+  above `run_apply`, so fixed line numbers taken at BASE_SHA no longer bound the docstring.
+  Acceptance: the search prints nothing and exits 1; the printed block starts with the line
+  `run_apply() {`, ends with the `local rc=0 name record` line, and contains
+  `CLEANUP_WT_BASE_BRANCH`.
+- [x] [P5-T7] AC-17 check in `<FEATURE>/evidence/qa-gates/ac17-skill-parity.<ts>.md`: run
+  `git diff --no-index --exit-code .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`.
+  Acceptance: `EXIT_CODE: 0` with empty output (the two copies are byte-identical after the
+  edit).
+- [x] [P5-T8] AC-21 check in `<FEATURE>/evidence/qa-gates/ac21-portability.<ts>.md`: run
+  `git diff -U0 0658f6945aa833c6960dc5bf8a43635fc346991f -- tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`
+  and filter its added lines (lines beginning `+` but not `+++`) with
+  `grep -nE 'origin/|/mnt/|[A-Za-z]:[\\/]|mktemp|artifacts/'`, then run
+  `grep -rnE 'origin/|/mnt/|[A-Za-z]:[\\/]|mktemp|artifacts/' tests/fixtures/cleanup_worktrees/scenarios/base_not_checked_out tests/fixtures/cleanup_worktrees/scenarios/base_in_linked_worktree`,
+  and, over the same added lines, `grep -c -F 'run env CLEANUP_WT_GIT_BIN="${STUB}"'` and
+  `grep -c -F 'run env'`. The added-line pattern search is recorded in
+  `<FEATURE>/evidence/qa-gates/ac21-pattern-tests.<ts>.md` and the fixture pattern search in
+  `<FEATURE>/evidence/qa-gates/ac21-pattern-fixtures.<ts>.md`, each with `ExpectedExitCode: 1`;
+  the diff and the two counts stay in `ac21-portability.<ts>.md`.
+  Acceptance: both pattern searches print nothing and exit 1; the two
+  counts are equal and each is `6` (T1, T2, T3, T6, T9, T10 each add one `run env` line that
+  routes git through the stub; T4, T5, T7, and T8 use the existing `cb`/`apply` helpers, which
+  already do so).
+- [x] [P5-T9] AC-22 check in `<FEATURE>/evidence/qa-gates/ac22-no-temp-files.<ts>.md` and
+  `<FEATURE>/evidence/qa-gates/ac22-no-redirection.<ts>.md`: over
+  the added lines of the same anchored diff as P5-T8 on `tests/shell/test_cleanup_worktrees_deletion.bats`,
+  `tests/shell/test_cleanup_worktrees_enumeration.bats`, and
+  `tests/shell/test_cleanup_worktrees_classification.bats`, run
+  `grep -nE 'git init|mktemp|BATS_TMPDIR|BATS_TEST_TMPDIR'` (recorded in
+  `ac22-no-temp-files.<ts>.md`) and `grep -n '>' | grep -v -F '2>/dev/null'` (recorded in
+  `ac22-no-redirection.<ts>.md`), each artifact carrying its own full pipeline in `Command:`
+  and `ExpectedExitCode: 1`. Acceptance: both print nothing and exit 1 (the only
+  redirection in the added test bodies is `2>/dev/null`, which targets a device, not a file).
+- [x] [P5-T10] AC-18 and citation-invariant check in `<FEATURE>/evidence/qa-gates/ac18-line-counts-and-anchors.<ts>.md`:
+  re-run the three `sed -n`
+  commands and the `wc -l` command from P0-T13 verbatim. Acceptance: every printed anchor line
+  is byte-identical to the P0-T13 record (actions 19, 35, 103, 147, 157, 164, 191, 198, 292,
+  317; enumerate 34, 115, 116; lib 54-55); every line count is at most 500;
+  `scripts/bash/cleanup_worktrees_lib.sh` is exactly 496.
+
+### Phase 6 — Final QC Loop, CI Coverage, Scope Verification, and Acceptance Check-off
+
+Loop rule: P6-T1 through P6-T6 are one pass of the shell toolchain loop (format, lint, syntax,
+test). If any step fails, or if remediation changes any file, fix the cause and restart at
+P6-T1; artifacts from an abandoned pass are kept and the new pass writes new timestamped
+artifacts. P6-T7 records the clean pass. If the CI run in P6-T11 fails, fix the cause, restart
+at P6-T1, and re-run P6-T8 through P6-T11.
+
+Re-commit rule: a loop restart that changed any file under IMPL_PATHS (a `shfmt -w` rewrite or
+any remediation edit) leaves that change uncommitted, and the full suite at P6-T6 would then
+fail the `dirt_clear` negative control on `scripts/bash/cleanup_worktrees_lib.sh`. P6-T6
+therefore checks porcelain status over IMPL_PATHS before running bats and, when anything is
+reported, re-commits with the P4-T7 pathspec-bearing `git add --`/`git commit -F <message file> --`
+commands before the suite runs. A commit does not change file content, so the P6-T7 pre-pass
+and post-P6-T6 hash listings are unaffected by it.
+
+- [x] [P6-T1] QC step 1 (format) on `scripts/bash/` production files. Before running shfmt,
+  run the P6-T7 `sha256sum` command (eight files) and record its output in this task's
+  artifact as the pre-pass listing; repeat this at every loop restart. Then run
+  `shfmt -d scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh`;
+  write `<FEATURE>/evidence/qa-gates/qc-step1-shfmt.<ts>.md`. Acceptance: the pre-pass listing
+  holds eight hash lines, and the shfmt run exits 0 with no diff
+  printed (a clean shfmt `-d` run prints nothing). On a diff, run `shfmt -w` on the named files,
+  record the rewrite, and restart the loop.
+- [x] [P6-T2] QC step 2a (lint) on `scripts/bash/` production files: run
+  `shellcheck -f gcc scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh`;
+  write `<FEATURE>/evidence/qa-gates/qc-step2a-shellcheck-production.<ts>.md`. Acceptance: the
+  finding lines are exactly the P0-T6 baseline set (normally empty, exit 0); any new finding
+  fails the step.
+- [x] [P6-T3] QC step 2b (lint) on the three edited `tests/shell/` suites: run
+  `shellcheck -f gcc tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`;
+  write `<FEATURE>/evidence/qa-gates/qc-step2b-shellcheck-bats.<ts>.md`. Acceptance: the total
+  finding count and the per-code multiset equal the P0-T8 baseline (no finding introduced by
+  the added tests).
+- [x] [P6-T4] QC step 2c (repo-wide check): run `sh scripts/bash/shell-qc.sh check`; write
+  `<FEATURE>/evidence/qa-gates/qc-step2c-shell-qc-check.<ts>.md`. Acceptance: every diagnostic
+  line printed is present in the P0-T7 baseline record (no diagnostic absent from baseline);
+  when the baseline was clean, the run prints nothing and exits 0.
+- [x] [P6-T5] QC step 3 (syntax; bash has no type checker) on `scripts/bash/` production files:
+  run `sh -n` on each of `scripts/bash/cleanup_worktrees_enumerate_lib.sh`, `scripts/bash/cleanup_worktrees_actions_lib.sh`,
+  `scripts/bash/cleanup_worktrees_lib.sh`, `scripts/bash/cleanup_worktrees_report_records_lib.sh`,
+  and `scripts/bash/cleanup-worktrees.sh`; write `<FEATURE>/evidence/qa-gates/qc-step3-syntax.<ts>.md`.
+  Acceptance: five `EXIT_CODE: 0` values, no output.
+- [x] [P6-T6] QC step 4 (tests, local) into `<FEATURE>/evidence/qa-gates/qc-step4-bats-cleanup-suites.<ts>.md`.
+  Precondition, run first: `git status --porcelain -- scripts/ tests/ .claude/skills/cleanup-merged-worktrees/ extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/`.
+  If it prints anything, run the P4-T7 `git add --` and `git commit -F <message file> --`
+  commands with the same twelve IMPL_PATHS entries (new message file; refusal by the gate
+  stops the plan, BLOCKED), then run the same porcelain status again. Then run
+  `npx --yes bats tests/shell/test_cleanup_worktrees_*.bats` (background). Write every
+  precondition command's `Command:`/`EXIT_CODE:` pair first and the bats pair LAST, because the
+  PR-context parser reads the last `EXIT_CODE:` line as the gate result; record any re-commit
+  SHA. Acceptance: the final porcelain status before bats prints nothing (the `dirt_clear`
+  negative control at `tests/shell/test_cleanup_worktrees_dirt_clear.bats:250-252` requires
+  `scripts/bash/cleanup_worktrees_lib.sh` to be clean); the bats pair is the final pair in the
+  file; the TAP plan equals the P0-T10 plan plus 10; no test that reported `ok` in P0-T10
+  reports `not ok`; T1 through T10 each report `ok`; the `not ok` set is a subset of the P0-T10
+  baseline failure set (when that set is empty, `EXIT_CODE: 0`).
+- [x] [P6-T7] Record the clean loop pass in `<FEATURE>/evidence/qa-gates/qc-loop-pass.<ts>.md`:
+  the pass number, the six artifact paths from P6-T1 through P6-T6 of that pass, and the output
+  of `sha256sum scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`
+  recorded as the pre-pass listing in the P6-T1 artifact of that pass and again immediately
+  after P6-T6 of that pass (a per-file hash
+  pair is used because P6-T6 may re-commit remediation made before the pass, which empties
+  porcelain status without proving the files were unchanged within the pass; a commit does not
+  change file content, so the hashes still compare the same bytes). Acceptance: all six steps
+  passed in the same pass and the two hash listings are identical.
+- [x] [P6-T8] Commit `<FEATURE>/evidence/` as written so far, together with any implementation
+  change not yet committed, as the head that CI will test: write a new commit message file in the session
+  scratchpad (message per the commit-message skill, ending with the session's required
+  trailer lines), then run `git add --` naming the twelve IMPL_PATHS entries from P4-T7 plus
+  `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/evidence/`,
+  then `git commit -F <message file> --` naming the same thirteen paths (never a pathless
+  commit; the evidence folder always holds new artifacts at this point, so the commit is never
+  empty). Record the commit SHA (CI_SHA) in `<FEATURE>/evidence/other/commit-push.<ts>.md`.
+  Acceptance: `git status --porcelain -- scripts/ tests/ .claude/skills/cleanup-merged-worktrees/ extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/`
+  prints nothing after the commit (the scope check against HEAD is P6-T17). If the
+  preimplementation gate refuses the commit, record the refusal text and stop (BLOCKED).
+- [x] [P6-T9] Push the commit with `git push origin bug/cleanup-worktrees-apply-deletes-local-main-594`
+  (no force); append the result to `<FEATURE>/evidence/other/commit-push.<ts>.md`. Acceptance:
+  exit 0 and the remote branch head equals the P6-T8 commit SHA
+  (`git ls-remote origin refs/heads/bug/cleanup-worktrees-apply-deletes-local-main-594`).
+- [x] [P6-T10] Dispatch the authoritative `.github/workflows/_shell-coverage.yml` run:
+  `gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-apply-deletes-local-main-594`,
+  and record the dispatch time (UTC). Then repeat the P0-T11 `gh run list` command until it
+  returns a run whose `createdAt` is later than the recorded dispatch time; that run's
+  `databaseId` is RUN_ID. Run `gh run watch <RUN_ID> --exit-status` in the background (the
+  prior comparable run took 7 min 18 s, close to the 600000 ms foreground tool limit). Record
+  the dispatch time, the run ID, and the `Command:`/`EXIT_CODE:` pairs of `gh workflow run` and
+  of each `gh run list` poll in `<FEATURE>/evidence/qa-gates/ci-shell-coverage.<ts>.md`; do not
+  write the `gh run watch` pair in this task (P6-T11 writes it last). Acceptance: the run's
+  `headSha` equals the P6-T8 commit SHA and its `createdAt` is later than the dispatch time.
+- [x] [P6-T11] Complete `<FEATURE>/evidence/qa-gates/ci-shell-coverage.<ts>.md` after the
+  P6-T10 background `gh run watch <RUN_ID> --exit-status` has finished: append the
+  `gh run view <RUN_ID> --log` pair and the extracted values, then append the
+  `gh run watch <RUN_ID> --exit-status` pair LAST (the pass/fail command; the PR-context
+  parser reads the last `EXIT_CODE:` line). Acceptance: the `gh run watch` pair is the final
+  `Command:`/`EXIT_CODE:` pair in the file and shows `EXIT_CODE: 0`; the `Run shell-qc check`
+  step succeeded (CI shfmt 3.8.0 diff and shellcheck clean); the `Run shell-qc test with coverage`
+  step succeeded with zero `not ok` lines; the TAP `1..N` line is recorded (one plan, because
+  `tests/bash` does not exist and only `tests/shell` runs) and equals the P0-T11 plan plus 10; the numeric
+  `Bash coverage (lines): NN.N%` headline is recorded; the run conclusion is `success`. On any
+  failure, restart the loop at P6-T1.
+- [x] [P6-T12] Per-file coverage into `<FEATURE>/evidence/qa-gates/kcov/coverage-summary.<ts>.md`:
+  download the P6-T10 run's artifact with `gh run download <RUN_ID> --name shell-coverage --dir <session-scratchpad>/kcov-final` and
+  extract, by the P0-T12 rule, the `line-rate` for the same five files. Write
+  `<FEATURE>/evidence/qa-gates/kcov/coverage-summary.<ts>.md` with the run ID, the overall
+  headline from P6-T11, and the five per-file values. Acceptance: five numeric values recorded;
+  `scripts/bash/cleanup_worktrees_enumerate_lib.sh` and `scripts/bash/cleanup_worktrees_actions_lib.sh`
+  are each at least 0.85.
+- [x] [P6-T13] Added-line execution for `scripts/bash/cleanup_worktrees_enumerate_lib.sh` and
+  `scripts/bash/cleanup_worktrees_actions_lib.sh`: derive the added line numbers from the hunk
+  headers of `git diff -U0 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh`,
+  keep those that are neither blank nor comment-only, and look each up in the matching
+  `<class>` element's `<line number="N" hits="H"/>` entries of the P6-T12 `cov.xml`. Write
+  `<FEATURE>/evidence/qa-gates/kcov/added-line-hits.<ts>.md`. Acceptance: these four added lines
+  are listed with `hits` of at least 1: `CLEANUP_WT_BASE_BRANCH="main"`,
+  `printf 'protected-branch|%s\n' "$CLEANUP_WT_BASE_BRANCH"`,
+  `printf 'ACTION|delete|%s|BLOCKED-PROTECTED-BASE\n' "$name"`, and the `return 1` inside the
+  P3-T1 guard; every other added executable line either has `hits` of at least 1 or is absent
+  from the element (not instrumented by kcov, for example `fi`), and each absent line is named.
+- [x] [P6-T14] Coverage delta: write `<FEATURE>/evidence/qa-gates/coverage-delta.<ts>.md` with,
+  for each of the five files, the P0-T12 baseline line-rate, the P6-T12 post-change line-rate,
+  and the difference, plus the P0-T11 and P6-T11 overall headlines and the P6-T13 added-line
+  result as the new-code coverage. Acceptance: every post-change value is at least 0.85 or at
+  least its baseline value; any file below both is recorded as remediation-required and the
+  plan outcome is not PASS.
+- [x] [P6-T15] AC-12 scope check in `<FEATURE>/evidence/qa-gates/ac12-tests-added-only.<ts>.md`:
+  run `git diff --numstat 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- tests/shell/` and
+  `git status --porcelain -- tests/shell/`. Acceptance: the numstat output has exactly three
+  rows, for `tests/shell/test_cleanup_worktrees_enumeration.bats`,
+  `tests/shell/test_cleanup_worktrees_classification.bats`, and
+  `tests/shell/test_cleanup_worktrees_deletion.bats`, each with a deleted-line count of `0`; the
+  porcelain status prints nothing; P6-T11 recorded zero failures in CI.
+- [x] [P6-T16] AC-13 golden check in `<FEATURE>/evidence/qa-gates/ac13-goldens-unchanged.<ts>.md`:
+  run `git diff --exit-code 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- tests/fixtures/cleanup_worktrees/expected/`
+  and `git status --porcelain -- tests/fixtures/cleanup_worktrees/expected/`. Acceptance: the
+  diff exits 0 with empty output, the porcelain status prints nothing, and the P6-T11 CI run
+  contains `ok` lines for every test in `tests/shell/test_cleanup_worktrees_dirt_regression.bats`.
+- [x] [P6-T17] Non-goal boundary check in `<FEATURE>/evidence/qa-gates/untouched-files.<ts>.md`:
+  run `git diff --exit-code --stat 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- tests/fixtures/cleanup_worktrees/stub-bin/ scripts/bash/cleanup_worktrees_detached_lib.sh scripts/bash/cleanup_worktrees_dirt_lib.sh .github/workflows/ .claude/lib/cleanup-manifest/ tests/scripts/claude-lib/cleanup-manifest/`
+  and `git diff --numstat 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- scripts/ tests/ .claude/skills/ extensions/`.
+  Acceptance: the first exits 0 with empty output; the second lists exactly the 5 production
+  files, 3 test suites, 8 fixture files, and 2 `SKILL.md` copies named in P6-T8 (18 rows) and
+  no other path.
+- [x] [P6-T18] Check off AC-01 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (the `CLEANUP_WT_BASE_BRANCH="main"`
+  constant item) only if `<FEATURE>/evidence/qa-gates/ac01-base-constant.<ts>.md` and
+  `<FEATURE>/evidence/qa-gates/ac01-no-default-expansion.<ts>.md` meet their acceptance.
+  Acceptance: that item reads `- [x]`.
+- [x] [P6-T19] Check off AC-02 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T1) only if
+  `<FEATURE>/evidence/regression-testing/pass-after.<ts>.md` and the P6-T11 CI record show T1 `ok`.
+  Acceptance: that item reads `- [x]`.
+- [x] [P6-T20] Check off AC-03 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T2) only if the P5-T1 and P6-T11
+  records under `<FEATURE>/evidence/` show T2 `ok`. Acceptance: that item reads `- [x]`.
+- [x] [P6-T21] Check off AC-04 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T3) only if the P5-T1 and P6-T11
+  records under `<FEATURE>/evidence/` show T3 `ok`. Acceptance: that item reads `- [x]`.
+- [x] [P6-T22] Check off AC-05 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T4) only if the P5-T1 and P6-T11
+  records under `<FEATURE>/evidence/` show T4 `ok`. Acceptance: that item reads `- [x]`.
+- [x] [P6-T23] Check off AC-06 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T5) only if the P5-T1 and P6-T11
+  records under `<FEATURE>/evidence/` show T5 `ok`. Acceptance: that item reads `- [x]`.
+- [x] [P6-T24] Check off AC-07 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T6) only if the P5-T1 and P6-T11
+  records under `<FEATURE>/evidence/` show T6 `ok`. Acceptance: that item reads `- [x]`.
+- [x] [P6-T25] Check off AC-08 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T7) only if the P5-T1 and P6-T11
+  records under `<FEATURE>/evidence/` show T7 `ok`. Acceptance: that item reads `- [x]`.
+- [x] [P6-T26] Check off AC-09 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T8) only if the P5-T1 and P6-T11
+  records under `<FEATURE>/evidence/` show T8 `ok`. Acceptance: that item reads `- [x]`.
+- [x] [P6-T27] Check off AC-10 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T9) only if the P5-T1 and P6-T11
+  records under `<FEATURE>/evidence/` show T9 `ok`. Acceptance: that item reads `- [x]`.
+- [x] [P6-T28] Check off AC-11 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (test T10) only if the P5-T1 and P6-T11
+  records under `<FEATURE>/evidence/` show T10 `ok`. Acceptance: that item reads `- [x]`.
+- [x] [P6-T29] Check off AC-12 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (existing suites pass unmodified) only if
+  `<FEATURE>/evidence/qa-gates/ac12-tests-added-only.<ts>.md` meets its acceptance. Acceptance:
+  that item reads `- [x]`.
+- [x] [P6-T30] Check off AC-13 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (goldens unchanged) only if
+  `<FEATURE>/evidence/qa-gates/ac13-goldens-unchanged.<ts>.md` meets its acceptance. Acceptance:
+  that item reads `- [x]`.
+- [x] [P6-T31] Check off AC-14 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (no new state name) only if
+  `<FEATURE>/evidence/qa-gates/ac14-no-new-state.<ts>.md`,
+  `<FEATURE>/evidence/qa-gates/ac14-no-protected-base.<ts>.md`, and the P4-T4 help-line check
+  meet their acceptance. Acceptance: that item reads `- [x]`.
+- [x] [P6-T32] Check off AC-15 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (comments corrected) only if
+  `<FEATURE>/evidence/qa-gates/ac15-comments.<ts>.md`, the three
+  `<FEATURE>/evidence/qa-gates/ac15-phrase-1.<ts>.md`, `ac15-phrase-2.<ts>.md`, and
+  `ac15-phrase-3.<ts>.md` artifacts, `<FEATURE>/evidence/qa-gates/ac15-run-apply-search.<ts>.md`,
+  and `<FEATURE>/evidence/qa-gates/ac15-run-apply-docstring.<ts>.md` meet their acceptance.
+  Acceptance: that item reads `- [x]`.
+- [x] [P6-T33] Check off AC-16 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (help text) only if
+  `<FEATURE>/evidence/qa-gates/ac16-help-text.<ts>.md` meets its acceptance. Acceptance: that
+  item reads `- [x]`.
+- [x] [P6-T34] Check off AC-17 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (skill copies) only if
+  `<FEATURE>/evidence/qa-gates/ac17-skill-parity.<ts>.md` meets its acceptance and both P4-T5 and
+  P4-T6 token counts were `1`. Acceptance: that item reads `- [x]`.
+- [x] [P6-T35] Check off AC-18 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (500-line limit) only if
+  `<FEATURE>/evidence/qa-gates/ac18-line-counts-and-anchors.<ts>.md` meets its acceptance.
+  Acceptance: that item reads `- [x]`.
+- [x] [P6-T36] Check off AC-19 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (shfmt and shellcheck) only if the
+  P6-T1 through P6-T4 artifacts under `<FEATURE>/evidence/qa-gates/` meet their acceptance and
+  P6-T11 records the CI check step as successful. Acceptance: that item reads `- [x]`.
+- [x] [P6-T37] Check off AC-20 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (kcov coverage) only if
+  `<FEATURE>/evidence/qa-gates/kcov/coverage-summary.<ts>.md` and
+  `<FEATURE>/evidence/qa-gates/kcov/added-line-hits.<ts>.md` meet their acceptance. Acceptance:
+  that item reads `- [x]`.
+- [x] [P6-T38] Check off AC-21 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (remote-ref and depth independence) only
+  if `<FEATURE>/evidence/qa-gates/ac21-portability.<ts>.md`,
+  `<FEATURE>/evidence/qa-gates/ac21-pattern-tests.<ts>.md`, and
+  `<FEATURE>/evidence/qa-gates/ac21-pattern-fixtures.<ts>.md` meet their acceptance and P6-T11
+  shows the new tests passing on ubuntu-latest. Acceptance: that item reads `- [x]`.
+- [x] [P6-T39] Check off AC-22 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (no temporary files or scratch
+  repositories) only if `<FEATURE>/evidence/qa-gates/ac22-no-temp-files.<ts>.md` and
+  `<FEATURE>/evidence/qa-gates/ac22-no-redirection.<ts>.md` meet their acceptance. Acceptance: that item reads `- [x]`.
+- [x] [P6-T40] AC-23 in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` (CI `_shell-coverage.yml` job for the pull request):
+  run `gh pr checks bug/cleanup-worktrees-apply-deletes-local-main-594` and record the output
+  verbatim with its exit code in `<FEATURE>/evidence/qa-gates/ac23-pr-ci.<ts>.md`. Exactly one
+  of three explicit branches applies:
+  (a) a pull request exists, `gh pr checks` exits 0, and its `Shell Coverage (Bats + kcov)` row
+  reads `pass`: the artifact carries no expectation field; check the item off.
+  (b) no pull request exists (`gh pr checks` exits 1 and prints `no pull requests found`): the
+  artifact carries `ExpectedExitCode: 1`; leave the item unchecked and record
+  `AC-23: DEFERRED TO PR CI GATE` with the P6-T11 dispatch result (same workflow, same
+  default-depth checkout) as supporting evidence.
+  (c) a pull request exists but the check is pending (`gh pr checks` exits 8) or any check
+  failed (non-zero exit other than case (b)): the artifact records the output verbatim with no
+  expectation field; leave the item unchecked and record `AC-23: DEFERRED TO PR CI GATE`.
+  In branches (b) and (c), hand the item to the orchestrator's CI gate. Acceptance: the
+  artifact names the branch taken, and the item state matches that branch.
+- [x] [P6-T41] Verify check-off state in `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md`: run
+  `grep -c -e '^- \[x\] ' docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md`
+  and `grep -c -e '^- \[ \] ' docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md`.
+  Record the checked-count command alone in `<FEATURE>/evidence/qa-gates/ac-checkoff-count.<ts>.md`
+  (no expectation field; it prints at least 22 and exits 0). Record the unchecked-count command
+  alone in its own artifact `<FEATURE>/evidence/qa-gates/ac-unchecked-count.<ts>.md`, because
+  `grep -c` prints `0` and exits 1 when no line matches: when the printed count is `0`, that
+  artifact carries `ExpectedExitCode: 1`; when the printed count is `1`, it carries no
+  expectation field (exit 0). Acceptance: the checked count is 23 and the unchecked count is 0,
+  or 22 and 1 when P6-T40 recorded the deferral branch; each artifact's expectation field
+  matches its printed count as stated; every checked item has its evidence artifact present on
+  disk.
+- [x] [P6-T42] Commit the `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` check-offs and remaining evidence: write a new commit message file
+  in the session scratchpad (message per the commit-message skill, ending with the session's
+  required trailer lines), then run
+  `git add -- docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/`
+  and `git commit -F <message file> -- docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/`
+  (pathspec-bearing; the folder holds `spec.md`, this plan, and `evidence/`). Then run
+  `git status --porcelain -- scripts/ tests/ .claude/skills/cleanup-merged-worktrees/ extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/`
+  and `git diff --exit-code --stat CI_SHA HEAD -- scripts/ tests/ .claude/skills/ extensions/`
+  with CI_SHA replaced by the literal P6-T8 commit SHA. Record the commit SHA (FINAL_SHA) and
+  every command's `Command:`/`EXIT_CODE:` pair in
+  `<FEATURE>/evidence/other/commit-final.<ts>.md`. Acceptance: every command exits 0; the
+  porcelain status prints nothing; the `--stat` diff prints nothing (no code, test, or skill
+  path changed after the commit CI tested); `git show --stat --format= HEAD`, also run and
+  recorded in the same artifact, lists only paths under the feature folder. The artifact `commit-final.<ts>.md` itself and the P6-T42/P6-T43
+  plan check marks are written after this commit and are left for the orchestrator's
+  completion commit. If the gate refuses the commit, record the refusal text and stop
+  (BLOCKED).
+- [x] [P6-T43] Push the P6-T42 commit, recording into `<FEATURE>/evidence/other/commit-final.<ts>.md`, with `git push origin bug/cleanup-worktrees-apply-deletes-local-main-594`
+  (no force), then run `git ls-remote origin refs/heads/bug/cleanup-worktrees-apply-deletes-local-main-594`;
+  append both pairs to `<FEATURE>/evidence/other/commit-final.<ts>.md`. Acceptance: both exit 0
+  and the remote branch head equals FINAL_SHA.

@@ -208,16 +208,26 @@ function Find-PrdFeatureFolderCandidate {
     return [string[]] $candidates.ToArray()
 }
 
-function Select-PrdFeatureFolderByTarget {
+function Select-PrdFeatureFolderByCheckpoint {
     <#
     .SYNOPSIS
-        Returns the candidate the derived target names, or $null when the target
-        names none of them.
+        Returns the candidate the resolved worktree's checkpoint names, or $null when
+        the checkpoint names none of them.
     .DESCRIPTION
-        The disambiguator is the derived call target, not the session's own
-        checkpoint: a checkpoint belongs to the session that wrote it, so using it
-        to choose between two cited folders validates the call against a sibling
-        session's record of its own work.
+        The disambiguator is the orchestrator checkpoint of the worktree identity
+        resolution selected, which is the item's own. Neither prompt position nor a
+        foreign session's record takes that role: position would make selection an
+        accident of wording, and a checkpoint belonging to some other session would
+        choose between two cited folders on the strength of that session's record of
+        its own unrelated work.
+
+        Before issue #673 this function read a signal value off a call target the gate
+        had derived from a path token. That is gone: a path no longer selects a
+        worktree, so there is no derived signal to read.
+    .PARAMETER Candidate
+        The distinct feature folders cited in the prompt.
+    .PARAMETER CheckpointFolder
+        The feature-folder value read from the resolved worktree's checkpoint.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -227,15 +237,10 @@ function Select-PrdFeatureFolderByTarget {
         [string[]] $Candidate,
 
         [AllowNull()]
-        [object] $Target
+        [string] $CheckpointFolder
     )
 
-    if ($null -eq $Target) {
-        return $null
-    }
-
-    $signal = [string] $Target.SignalValue
-    $folder = ConvertTo-PrdFeatureFolderToken -Path $signal
+    $folder = ConvertTo-PrdFeatureFolderToken -Path $CheckpointFolder
     if ($folder -and ($Candidate -contains $folder)) {
         return $folder
     }
@@ -249,20 +254,27 @@ function Find-PrdFeatureFolderFromPrompt {
         Scans a prompt string for docs/features/active/<...> path tokens,
         truncates each to exactly four path segments, and returns the selected
         feature folder. Returns $null when no token truncates to four segments
-        and when a multi-candidate tie cannot be resolved against the derived
-        target.
+        and when a multi-candidate tie cannot be resolved against the resolved
+        worktree's checkpoint.
     .DESCRIPTION
         Truncation to four segments -- docs, features, active, and the
         feature-folder name -- is two segments past the docs/features/active/
         prefix, so the depth at which an artifact is cited cannot change which
         folder is resolved. Candidates are deduplicated preserving
         first-occurrence order; selection among two or more distinct candidates
-        is made against the derived call target, and an unresolved tie returns
-        $null so the caller can deny with the ambiguity code rather than guess.
+        is made against the checkpoint of the worktree identity resolution
+        selected, which is the item's own, and an unresolved tie returns $null so
+        the caller can deny with the ambiguity code rather than guess.
 
         The return value is a repo-relative path normalized to forward slashes,
         or $null. The function reads no file except through issue #669's
-        normalisation, and it is deterministic for a given prompt and target.
+        normalisation, and it is deterministic for a given prompt and checkpoint
+        value.
+    .PARAMETER Prompt
+        The delegation prompt to scan.
+    .PARAMETER CheckpointFolder
+        Optional. The feature-folder value read from the resolved worktree's
+        checkpoint, used only to break a multi-candidate tie.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -272,7 +284,7 @@ function Find-PrdFeatureFolderFromPrompt {
         [string] $Prompt,
 
         [AllowNull()]
-        [object] $Target
+        [string] $CheckpointFolder
     )
 
     $candidates = @(Find-PrdFeatureFolderCandidate -Prompt $Prompt)
@@ -281,15 +293,15 @@ function Find-PrdFeatureFolderFromPrompt {
     }
 
     # One distinct candidate is used directly, so the common case never consults
-    # the derived target.
+    # the checkpoint at all.
     if ($candidates.Count -eq 1) {
         return $candidates[0]
     }
 
-    # More than one distinct feature folder was cited. The derived target is the
-    # only disambiguator; an unresolved tie is ambiguous and is reported as such
-    # by returning $null, rather than resolved positionally.
-    return (Select-PrdFeatureFolderByTarget -Candidate $candidates -Target $Target)
+    # More than one distinct feature folder was cited. The resolved worktree's own
+    # checkpoint is the only disambiguator; an unresolved tie is ambiguous and is
+    # reported as such by returning $null, rather than resolved positionally.
+    return (Select-PrdFeatureFolderByCheckpoint -Candidate $candidates -CheckpointFolder $CheckpointFolder)
 }
 
 function Get-PrdFeatureMissingFile {

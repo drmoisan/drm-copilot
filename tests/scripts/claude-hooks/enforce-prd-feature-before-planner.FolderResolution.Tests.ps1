@@ -25,7 +25,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 folder resolution' {
         $script:Helpers = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1").Path
         . $script:UnderTest
         . $script:Helpers
-        Mock -CommandName Resolve-WorktreeCallTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'NoTarget' -SessionRoot '/synthetic-worktrees/session-root' -Detail 'modelled no-target for the delivered cases' }
+        Mock -CommandName Resolve-PrdFeatureWorktreeTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'SessionRoot' -SessionRoot '/synthetic-worktrees/session-root' -WorktreeRoot '/synthetic-worktrees/session-root' -Signal 'Branch' -SignalValue 'f5-fixture-own' -Candidate @('/synthetic-worktrees/session-root') -Detail 'modelled session-root target for the delivered cases' }
     }
 
     Context 'folder resolution by four-segment truncation' {
@@ -93,16 +93,15 @@ Describe 'enforce-prd-feature-before-planner.ps1 folder resolution' {
         # preference is distinguished from earliest occurrence.
 
         It 'prefers the derived target when it occurs later in the prompt' {
-            # The derived target, not the session's checkpoint, decides the tie. The
-            # modelled target is supplied as data; nothing here reads the filesystem.
-            $target = [pscustomobject]@{
-                Status       = 'SessionRoot'
-                SignalValue  = 'docs/features/active/2026-08-23-second-2'
-                WorktreeRoot = '/synthetic-worktrees/item-worktree'
-            }
+            # The disambiguator is now the resolved worktree's own checkpoint, not prompt
+            # position: the preferred folder occurs second, so selecting the earliest
+            # candidate would return the other one. The checkpoint value is supplied as
+            # data; nothing here reads the filesystem. The unused modelled target that
+            # used to stand in for the derivation is gone, because an assigned-and-never-
+            # read variable is an analyzer finding at Information severity.
             $prompt = 'Cross-reference docs/features/active/2026-08-23-first-long-candidate-1 and then ' +
             'work in docs/features/active/2026-08-23-second-2 today.'
-            Find-PrdFeatureFolderFromPrompt -Prompt $prompt -Target $target |
+            Find-PrdFeatureFolderFromPrompt -Prompt $prompt -CheckpointFolder 'docs/features/active/2026-08-23-second-2' |
                 Should -Be 'docs/features/active/2026-08-23-second-2'
         }
 

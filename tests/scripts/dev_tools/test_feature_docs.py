@@ -72,15 +72,15 @@ class TestExtractIssueReferences:
         result = extract_issue_references(text)
         assert result == ["#123", "#456"]
 
-    def test_extract_issue_references_jira(self) -> None:
+    def test_extract_issue_references_ignores_jira(self) -> None:
         text = "See ABC-123 and XYZ-456"
         result = extract_issue_references(text)
-        assert result == ["ABC-123", "XYZ-456"]
+        assert result == []
 
     def test_extract_issue_references_mixed(self) -> None:
         text = "Fix #42 for PROJECT-100"
         result = extract_issue_references(text)
-        assert result == ["#42", "PROJECT-100"]
+        assert result == ["#42"]
 
     def test_extract_issue_references_deduplication(self) -> None:
         text = "#10 again #10 and #10"
@@ -190,7 +190,7 @@ class TestGatherFeatureExcerpts:
 
         assert len(excerpts) == 1
         assert "#123" in excerpts[0].issue_refs
-        assert "ABC-456" in excerpts[0].issue_refs
+        assert "ABC-456" not in excerpts[0].issue_refs
 
     def test_gather_feature_excerpts_multiple_features(self, mem_fs_path: Path) -> None:
         for name in ["feature-a", "feature-b"]:

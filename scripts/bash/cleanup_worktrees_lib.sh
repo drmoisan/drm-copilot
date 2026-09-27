@@ -316,8 +316,8 @@ classify_branch() {
 	# Orchestrate the full classification ladder for one branch and emit its pinned
 	# report lines (BRANCH first, then COMMIT records for unique residuals oldest-first).
 	# No commit-message text is ever consulted. Ladder order (spec):
-	#   1. PROTECTED_CURRENT exclusion (branch-name OR worktree-path match; main
-	#      worktree always protected).
+	#   1. PROTECTED_CURRENT exclusion (branch-name OR worktree-path match; main worktree
+	#      and base branch CLEANUP_WT_BASE_BRANCH always protected).
 	#   2. ancestry -> MERGED_CLEAN, or ANCESTRY_ERROR (hard fail).
 	#   3. content-neutral short-circuit -> MERGED_CONTENT_NEUTRAL.
 	#   4. cherry patch-id equivalence -> MERGED_EQUIVALENT when all residuals equiv.

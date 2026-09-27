@@ -234,6 +234,8 @@ There is no final integration pull request and no fan-in path: the epic surface'
 integration-branch lifecycle has no counterpart on this surface, and its absence is structural
 rather than an omission.
 
+**Checkpoint hygiene (issue #673).** The coordinating session never holds a per-feature checkpoint at its own root. Before the first item delegation of a run it moves any `artifacts/orchestration/orchestrator-state.json` at its root to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and writes none there for the rest of the run, because each item's checkpoint lives in that item's worktree. A gated call the coordinator issues on an item's behalf is resolved by the item's issue number and branch, never by the coordinator root.
+
 ## Parallel-Mode Kickoff Parameter
 
 When `parallel-orchestrator` delegates an item to `Agent(orchestrator)`, the delegation prompt

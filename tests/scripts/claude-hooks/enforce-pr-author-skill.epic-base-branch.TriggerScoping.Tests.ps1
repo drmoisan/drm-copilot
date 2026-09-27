@@ -35,7 +35,7 @@ Describe 'Test-EpicBaseBranchOverride trigger scoping (issue #545)' {
                 '{"epic_mode":true,"epic_context":{"integration_branch":"epic/foo-integration"}}'
             }
 
-            $result = Test-EpicBaseBranchOverride -CommandText 'gh --repo drmoisan/drm-copilot pr create --base epic/x --body-file artifacts/pr_body_545.md'
+            $result = Test-EpicBaseBranchOverride -CommandText 'gh --repo drmoisan/drm-copilot pr create --base epic/x --body-file artifacts/pr_body_545.md' -CheckpointPath (Join-Path $PSScriptRoot 'no-such-checkpoint.json')
 
             $result | Should -Match 'EPIC_BASE_BRANCH_MISMATCH'
         }
@@ -49,7 +49,7 @@ Describe 'Test-EpicBaseBranchOverride trigger scoping (issue #545)' {
                 '{"epic_mode":true,"epic_context":{"integration_branch":"epic/foo-integration"}}'
             }
 
-            $result = Test-EpicBaseBranchOverride -CommandText 'echo "gh pr create --base main"'
+            $result = Test-EpicBaseBranchOverride -CommandText 'echo "gh pr create --base main"' -CheckpointPath (Join-Path $PSScriptRoot 'no-such-checkpoint.json')
 
             $result | Should -BeNullOrEmpty
         }

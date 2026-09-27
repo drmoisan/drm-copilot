@@ -42,6 +42,34 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #622: pr-context modules changed by the autoclose derivation fix.
+    // Per-file entries only; the map has no `global` key.
+    "./src/lib/pr-context/autoclose.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/models.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/feature-docs-parsers.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/render-feature-excerpts.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/render-pr-helpers.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #588: the new PATH executable resolver. Per-file entry only; the
+    // map has no `global` key.
+    "./src/lib/executable-resolver.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/orchestrator-state-core.ts": {
       lines: 85,
       branches: 75,
@@ -222,6 +250,13 @@ module.exports = {
     // `global` key, so a new production file without its own entry would be
     // completely ungated.
     "./src/lib/push-down/claude-gitignore-merge.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #697: the Codex/agents publisher gained the virtual resource-pair
+    // map. This map carries no `global` key, so the file is gated only by its
+    // own entry here.
+    "./src/lib/push-down/codex-agents-customizations.ts": {
       lines: 85,
       branches: 75,
     },

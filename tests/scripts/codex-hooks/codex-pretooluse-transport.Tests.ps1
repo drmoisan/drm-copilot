@@ -6,6 +6,9 @@ Describe 'Codex PreToolUse hooks honour the native stdin transport contract' {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:HookRoot = Join-Path $script:RepoRoot '.codex/hooks'
         $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
+        # Issue #707 (D10): load the gate so its epic-scope read is mocked for every in-process row.
+        . (Join-Path $script:HookRoot 'enforce-orchestration-preimplementation-gate.ps1')
+        Mock Get-EpicScopeCheckpointText { $null }
 
         # The eight handlers registered under the ^(apply_patch|Edit|Write)$ matcher.
         $script:GroupHookNames = @(

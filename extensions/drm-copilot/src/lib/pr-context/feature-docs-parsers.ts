@@ -15,7 +15,11 @@
  */
 
 import { type FileSystem, toPosixPath } from "../file-system";
-import { splitLines } from "./models";
+import {
+  ISSUE_REFERENCE_PATTERN,
+  compareCodePoint,
+  splitLines,
+} from "./models";
 
 /**
  * Extract markdown content under a top-level `##` heading.
@@ -67,10 +71,11 @@ export function completedPlanTasks(markdown: string, limit = 10): string[] {
 }
 
 /**
- * Extract issue tokens like `#123` and `ABC-123` in encounter order.
+ * Extract bare-number issue references (for example #123) in encounter order.
  *
- * Mirrors Python `extract_issue_references`: ordered dedup over the combined
- * `#\d+` / `[A-Z][A-Z0-9]+-\d+` matches.
+ * Only `#` followed by ASCII digits, not preceded or followed by a word
+ * character, is returned (issue #622, D1). Mirrors Python
+ * `extract_issue_references`.
  *
  * @param text Source text.
  * @returns Ordered, deduplicated reference tokens.
@@ -79,7 +84,7 @@ export function extractIssueReferences(text: string): string[] {
   if (!text) {
     return [];
   }
-  const matches = text.match(/(?<!\w)#\d+|\b[A-Z][A-Z0-9]+-\d+\b/gu) ?? [];
+  const matches = text.match(new RegExp(ISSUE_REFERENCE_PATTERN, "gu")) ?? [];
   const seen = new Set<string>();
   const ordered: string[] = [];
   // Preserve first-encounter order while removing duplicates.
@@ -298,17 +303,6 @@ export function relativeToPosix(root: string, path: string): string {
     return normalized.slice(normalizedRoot.length + 1);
   }
   return normalized.replace(/^\/+/u, "");
-}
-
-/** Compare two strings by Unicode code point (Python `sorted` semantics). */
-export function compareCodePoint(left: string, right: string): number {
-  if (left < right) {
-    return -1;
-  }
-  if (left > right) {
-    return 1;
-  }
-  return 0;
 }
 
 /**

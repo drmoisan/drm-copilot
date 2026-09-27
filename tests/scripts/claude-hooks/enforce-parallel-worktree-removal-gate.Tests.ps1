@@ -21,6 +21,13 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
         . $script:UnderTest
     }
 
+    # Issue #688 added a second read seam. Defaulting it to absent keeps every pre-existing
+    # test independent of live orchestration state, which is the determinism guarantee this
+    # file's header states; the epic context below overrides this mock per test.
+    BeforeEach {
+        Mock -CommandName Get-ParallelWorktreeRemovalGateEpicCheckpointContent -MockWith { $null }
+    }
+
     Context 'commands outside scope are allowed unconditionally' {
         It 'denies an empty payload as an envelope anomaly (fail closed)' {
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw ''

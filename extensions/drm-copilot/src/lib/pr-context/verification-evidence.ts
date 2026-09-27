@@ -19,6 +19,7 @@
  */
 
 import { type FileSystem, toPosixPath } from "../file-system";
+import { compareCodePoint } from "./models";
 
 /** Required schema fields parsed from an evidence markdown file. */
 export const REQUIRED_FIELDS = ["Timestamp", "Command", "EXIT_CODE"] as const;
@@ -268,17 +269,6 @@ function relativeToPosix(root: string, absolute: string): string {
     return normalized.slice(root.length + 1);
   }
   return normalized.replace(/^\/+/u, "");
-}
-
-/** Compare two strings by Unicode code point (Python `sorted` semantics). */
-function compareCodePoint(left: string, right: string): number {
-  if (left < right) {
-    return -1;
-  }
-  if (left > right) {
-    return 1;
-  }
-  return 0;
 }
 
 /**

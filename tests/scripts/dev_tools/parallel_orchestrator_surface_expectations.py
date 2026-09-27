@@ -120,14 +120,28 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # it remains live as a guard: an unintended future edit to either file still
 # fails loudly. Re-baselining rather than deleting also keeps this control owned
 # by its original feature rather than silently dropped by an unrelated one.
+#
+# RE-BASELINED by issue #673. That change added a checkpoint-hygiene paragraph to
+# `## Epic-Level Checkpoint` in the epic skill, stating that a coordinating session
+# holds no per-feature checkpoint at its own root and archives any it finds to
+# `artifacts/orchestration/handoff/`. Only the skill digest moved; the pin stays live
+# for the entry whose path string is `.claude/agents/epic-orchestrator.md`, whose
+# digest is unchanged, so an unintended edit to the agent file still fails loudly.
+#
+# RE-BASELINED by issue #663. That change made the two AC-20 contract edits: in the
+# epic skill's `## Epic-Level Checkpoint` it added `epic_issue_num` and
+# `model_routing_receipts[]` to the field list and appended the integration-PR
+# checkpoint-shape paragraph; in the agent's `## Checkpoint Persistence` it added
+# `epic_issue_num` and `model_routing_receipts[]` to the field list. Both digests
+# moved, and the pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "5318b458a8ccfdf5270677a3b90ba130367a0857dea0acbcf4db1a8e68a97dec",
+        "0d01e5484d63e418a6bc31f219aecaef7381cc439a4a796664006879f6a027ba",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "42cd106c1dc6982cfe4fb15fb3439bdde4eb1bbbc6a1a2db26a8739587ab4ca7",
+        "14d6bf2f76f64d8c6be9c7c675e828f474ebc20d52ed60096d612302a77f21a0",
     ),
 )
 
