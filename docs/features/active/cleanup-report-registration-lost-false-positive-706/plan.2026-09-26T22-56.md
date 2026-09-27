@@ -570,7 +570,7 @@ prefix that `gh run view` prepends to every log line, because the timestamp diff
 runs. Record `PRE-EXISTING-CI-CHECK-FAILURE: <lines>` in the P4-T10 artifact, leave AC-4
 unchecked, and continue; the plan outcome is not PASS.
 
-- [ ] [P4-T1] QC step 1 (format) for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
+- [x] [P4-T1] QC step 1 (format) for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
   `<FEATURE>/evidence/qa-gates/qc-step1-format.<ts>.md`. Before formatting, run
   `git status --porcelain -- scripts/ tools/ .claude/lib/bash/` and
   `sha256sum scripts/bash/cleanup_worktrees_scan_helper.sh` and record both as the pre-pass
@@ -583,21 +583,21 @@ unchecked, and continue; the plan outcome is not PASS.
   the post-pass porcelain listing is identical to the pre-pass listing, and the post-pass
   hash equals the pre-pass hash. A changed hash or listing means the formatter rewrote a file:
   record the rewrite and restart the loop.
-- [ ] [P4-T2] QC step 2 (lint) via `scripts/bash/shell-qc.sh`: run
+- [x] [P4-T2] QC step 2 (lint) via `scripts/bash/shell-qc.sh`: run
   `sh scripts/bash/shell-qc.sh check` and write `<FEATURE>/evidence/qa-gates/qc-step2-check.<ts>.md`.
   Acceptance: no printed diagnostic line names `scripts/bash/cleanup_worktrees_scan_helper.sh`,
   and every printed diagnostic line is present in the P0-T9 baseline record; when P0-T9
   recorded `LOCAL-DRIFT: NONE`, the run prints nothing and exits 0. When P0-T9 recorded
   `LOCAL-DRIFT: PRESENT`, the artifact carries `ExpectedExitCode:` equal to the P0-T9
   `EXIT_CODE:` value, and the observed `EXIT_CODE:` equals that value.
-- [ ] [P4-T3] QC step 2b (targeted lint) on `scripts/bash/cleanup_worktrees_scan_helper.sh`: run
+- [x] [P4-T3] QC step 2b (targeted lint) on `scripts/bash/cleanup_worktrees_scan_helper.sh`: run
   `shellcheck -f gcc scripts/bash/cleanup_worktrees_scan_helper.sh` and write
   `<FEATURE>/evidence/qa-gates/qc-step2b-shellcheck.<ts>.md`. Acceptance: `EXIT_CODE: 0` and no
   output (zero findings). No suppression comment is added; a finding is fixed in the code.
-- [ ] [P4-T4] QC step 3 (syntax; bash has no type checker) on `scripts/bash/cleanup_worktrees_scan_helper.sh`:
+- [x] [P4-T4] QC step 3 (syntax; bash has no type checker) on `scripts/bash/cleanup_worktrees_scan_helper.sh`:
   run `sh -n scripts/bash/cleanup_worktrees_scan_helper.sh` and write
   `<FEATURE>/evidence/qa-gates/qc-step3-syntax.<ts>.md`. Acceptance: `EXIT_CODE: 0`, no output.
-- [ ] [P4-T5] QC step 4 (tests, local) on `tests/shell/test_cleanup_worktrees_scan_helper.bats`,
+- [x] [P4-T5] QC step 4 (tests, local) on `tests/shell/test_cleanup_worktrees_scan_helper.bats`,
   `tests/shell/test_cleanup_worktrees_report_records.bats`, and
   `tests/shell/test_cleanup_worktrees_scan_seam.bats`: run
   `npx --yes bats tests/shell/test_cleanup_worktrees_scan_helper.bats tests/shell/test_cleanup_worktrees_report_records.bats tests/shell/test_cleanup_worktrees_scan_seam.bats`
@@ -605,12 +605,12 @@ unchecked, and continue; the plan outcome is not PASS.
   tests 1 through 4 and for `scan-dirs emits has_gitfile/target_exists/size for each candidate directory`
   each begin `ok `; the `not ok` set is a subset of the P0-T11 and P0-T12 baseline failure sets
   (when both are empty, `EXIT_CODE: 0` and zero `not ok` lines).
-- [ ] [P4-T6] Record the clean loop pass in `<FEATURE>/evidence/qa-gates/qc-loop-pass.<ts>.md`:
+- [x] [P4-T6] Record the clean loop pass in `<FEATURE>/evidence/qa-gates/qc-loop-pass.<ts>.md`:
   the pass number, the five artifact paths of P4-T1 through P4-T5 of that pass, and the output
   of `sha256sum scripts/bash/cleanup_worktrees_scan_helper.sh tests/shell/test_cleanup_worktrees_scan_helper.bats tests/fixtures/cleanup_worktrees/scan_roots/drive_letter/wt_drive/dotgit`
   run immediately after P4-T5. Acceptance: all five steps passed in the same pass without
   changing a file, and the helper hash equals the P4-T1 post-pass hash of that pass.
-- [ ] [P4-T7] Commit the implementation and evidence for `scripts/bash/cleanup_worktrees_scan_helper.sh`
+- [x] [P4-T7] Commit the implementation and evidence for `scripts/bash/cleanup_worktrees_scan_helper.sh`
   and its tests: run `git add -- scripts/bash/cleanup_worktrees_scan_helper.sh tests/shell/test_cleanup_worktrees_scan_helper.bats tests/fixtures/cleanup_worktrees/scan_roots/drive_letter/ docs/features/active/cleanup-report-registration-lost-false-positive-706/evidence/`
   and `git commit -F <message file> -- scripts/bash/cleanup_worktrees_scan_helper.sh tests/shell/test_cleanup_worktrees_scan_helper.bats tests/fixtures/cleanup_worktrees/scan_roots/drive_letter/ docs/features/active/cleanup-report-registration-lost-false-positive-706/evidence/`,
   then run `git rev-parse HEAD` (CI_SHA) and
@@ -618,12 +618,12 @@ unchecked, and continue; the plan outcome is not PASS.
   `<FEATURE>/evidence/other/commit-push.<ts>.md`. Acceptance: both git commands exit 0; the
   porcelain status prints nothing. If the preimplementation gate refuses either command,
   record the refusal text and stop (BLOCKED).
-- [ ] [P4-T8] Push CI_SHA of `bug/cleanup-report-registration-lost-false-positive-706`: run
+- [x] [P4-T8] Push CI_SHA of `bug/cleanup-report-registration-lost-false-positive-706`: run
   `git push origin bug/cleanup-report-registration-lost-false-positive-706` (no force) and
   `git ls-remote origin refs/heads/bug/cleanup-report-registration-lost-false-positive-706`;
   append both pairs to `<FEATURE>/evidence/other/commit-push.<ts>.md`. Acceptance: both exit 0
   and the remote head equals CI_SHA.
-- [ ] [P4-T9] Dispatch the authoritative `.github/workflows/_shell-coverage.yml` run: record the
+- [x] [P4-T9] Dispatch the authoritative `.github/workflows/_shell-coverage.yml` run: record the
   dispatch time (UTC), run
   `gh workflow run _shell-coverage.yml --ref bug/cleanup-report-registration-lost-false-positive-706`,
   then repeat the P0-T13 `gh run list` command until it returns a run created after the
@@ -631,7 +631,7 @@ unchecked, and continue; the plan outcome is not PASS.
   `gh run watch <RUN_ID> --exit-status` in the background. Record the dispatch time, the run
   ID, and the dispatch and poll pairs in `<FEATURE>/evidence/qa-gates/ci-shell-coverage.<ts>.md`
   (the watch pair is written by P4-T10). Acceptance: the run's `headSha` equals CI_SHA.
-- [ ] [P4-T10] Complete `<FEATURE>/evidence/qa-gates/ci-shell-coverage.<ts>.md` for the P4-T9
+- [x] [P4-T10] Complete `<FEATURE>/evidence/qa-gates/ci-shell-coverage.<ts>.md` for the P4-T9
   run of `.github/workflows/_shell-coverage.yml` after the background watch finishes: run
   `gh run view <RUN_ID> --log` filtered by
   `grep -F -e 'scan-dirs reports target_exists' -e 'scan_helper_is_absolute_path returns' -e 'scan-dirs emits has_gitfile' -e 'Bash coverage (lines):'`,
@@ -649,13 +649,13 @@ unchecked, and continue; the plan outcome is not PASS.
   of the Phase 4 loop rule: the pre-existing CI failure exception, evaluated against those
   recorded names, and the second exception, evaluated against the recorded `--log-failed`
   output.
-- [ ] [P4-T11] CI failure count for the P4-T9 run of `.github/workflows/_shell-coverage.yml`, in
+- [x] [P4-T11] CI failure count for the P4-T9 run of `.github/workflows/_shell-coverage.yml`, in
   its own artifact `<FEATURE>/evidence/qa-gates/ci-not-ok-count.<ts>.md` with
   `ExpectedExitCode: 1`: run `gh run view <RUN_ID> --log` piped to
   `grep -c -E ' not ok [0-9]+ '`. Acceptance: prints `0` and exits 1 (no failing test anywhere
   in the CI suite, which includes `tests/shell/test_cleanup_worktrees_report_records.bats`
   unmodified).
-- [ ] [P4-T12] Post-change per-file coverage for `scripts/bash/cleanup_worktrees_scan_helper.sh`
+- [x] [P4-T12] Post-change per-file coverage for `scripts/bash/cleanup_worktrees_scan_helper.sh`
   into `<FEATURE>/evidence/qa-gates/kcov-per-file.<ts>.md`: run
   `gh run download <RUN_ID> --name shell-coverage --dir <session-scratchpad>/kcov-final-706`
   (final `<RUN_ID>`), then apply the P0-T14 `sed -n` extraction and `grep -c` counts to that
@@ -663,7 +663,7 @@ unchecked, and continue; the plan outcome is not PASS.
   zero-hit counts and the covered/total fraction are recorded with the run ID. When the run
   uploaded no `shell-coverage` artifact, record the `gh run download` output verbatim and mark
   the artifact remediation-required.
-- [ ] [P4-T13] New-line hit verification for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
+- [x] [P4-T13] New-line hit verification for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
   `<FEATURE>/evidence/qa-gates/kcov-new-line-hits.<ts>.md`: at CI_SHA, locate each of these
   lines with `grep -n -F` on the helper, then read the matching `<line number="N" hits="H"/>`
   entry from the P4-T12 class block: `local path=${1:-}`,
@@ -683,14 +683,14 @@ unchecked, and continue; the plan outcome is not PASS.
   `ATTRIBUTION-GAP: <line>`, record the class-block excerpt, mark the artifact
   remediation-required, leave AC-4 unchecked (P4-T21), and continue to P4-T14; do not restart
   the loop for this cause.
-- [ ] [P4-T14] Coverage delta for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
+- [x] [P4-T14] Coverage delta for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
   `<FEATURE>/evidence/qa-gates/coverage-delta.<ts>.md`: record the P0-T13 and P4-T10 overall
   headlines, the P0-T14 and P4-T12 per-file `line-rate` values and covered/total fractions,
   their differences, and the P4-T13 result as the new-code coverage. Acceptance: the
   post-change overall headline is at least `85.0`, the post-change per-file `line-rate` is at
   least `0.85`, and every instrumented new or modified line has non-zero hits; otherwise the
   artifact states remediation-required and the plan outcome is not PASS.
-- [ ] [P4-T15] Scope verification into `<FEATURE>/evidence/qa-gates/scope-check.<ts>.md`, anchored
+- [x] [P4-T15] Scope verification into `<FEATURE>/evidence/qa-gates/scope-check.<ts>.md`, anchored
   to `<MERGE_BASE>`, over `scripts/`, `tests/`, and the skill copies: run
   `git diff --name-status <MERGE_BASE> HEAD -- scripts/ tests/ .claude/skills/ extensions/`,
   `git status --porcelain -- scripts/ tests/ .claude/skills/ extensions/`,
@@ -704,7 +704,7 @@ unchecked, and continue; the plan outcome is not PASS.
   the numstat deleted-line column is `3` for the helper (the R2 and R3 replaced lines) and
   `0` for the bats file (append-only; the existing test is unchanged); the final diff exits 0
   with empty output (D3 and D4 files untouched).
-- [ ] [P4-T16] Test-portability check on the added lines of `tests/shell/test_cleanup_worktrees_scan_helper.bats`,
+- [x] [P4-T16] Test-portability check on the added lines of `tests/shell/test_cleanup_worktrees_scan_helper.bats`,
   in its own artifact `<FEATURE>/evidence/qa-gates/test-portability.<ts>.md` with
   `ExpectedExitCode: 1`: run
   `git diff -U0 <MERGE_BASE> HEAD -- tests/shell/test_cleanup_worktrees_scan_helper.bats tests/fixtures/cleanup_worktrees/scan_roots/drive_letter/`
@@ -712,24 +712,24 @@ unchecked, and continue; the plan outcome is not PASS.
   `grep -n -E 'mktemp|BATS_TMPDIR|BATS_TEST_TMPDIR|BATS_FILE_TMPDIR|origin/|artifacts/|git init|/mnt/'`.
   Acceptance: prints nothing and exits 1 (no temporary file, no remote ref, no gitignored
   state, no scratch repository, and no host path in the added test lines or fixture).
-- [ ] [P4-T17] Line-count limit for `scripts/bash/cleanup_worktrees_scan_helper.sh` and
+- [x] [P4-T17] Line-count limit for `scripts/bash/cleanup_worktrees_scan_helper.sh` and
   `tests/shell/test_cleanup_worktrees_scan_helper.bats`: run
   `wc -l scripts/bash/cleanup_worktrees_scan_helper.sh tests/shell/test_cleanup_worktrees_scan_helper.bats`
   and write `<FEATURE>/evidence/qa-gates/line-counts.<ts>.md`. Acceptance: each count is below
   500.
-- [ ] [P4-T18] Check off AC-1 in `docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md`
+- [x] [P4-T18] Check off AC-1 in `docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md`
   (change `- [ ] AC-1:` to `- [x] AC-1:` only, text preserved) only if
   `<FEATURE>/evidence/regression-testing/scan-helper-all-tests.<ts>.md`, P4-T5, and P4-T10 show
   `ok` for test 1, test 3, and
   `scan-dirs emits has_gitfile/target_exists/size for each candidate directory`, and P4-T15
   shows the bats file append-only. Acceptance: that item reads `- [x] AC-1:`.
-- [ ] [P4-T19] Check off AC-2 in `docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md`
+- [x] [P4-T19] Check off AC-2 in `docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md`
   only if P3-T3, P4-T5, and P4-T10 show `ok` for test 2 and test 4, P4-T11 records zero CI
   failures (which covers the existing `broken_wt|1|0|` assertion and
   `tests/shell/test_cleanup_worktrees_report_records.bats`), and P4-T15 shows
   `tests/shell/test_cleanup_worktrees_report_records.bats` unmodified. Acceptance: that item
   reads `- [x] AC-2:`.
-- [ ] [P4-T20] Check off AC-3 in `docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md`
+- [x] [P4-T20] Check off AC-3 in `docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md`
   only if `<FEATURE>/evidence/regression-testing/fail-before.<ts>.md` (P1-T5) and
   `<FEATURE>/evidence/regression-testing/pass-after.<ts>.md` (P2-T6) meet their acceptance and
   `grep -c -F 'Confirmed root cause:' docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md`
@@ -737,12 +737,12 @@ unchecked, and continue; the plan outcome is not PASS.
   file and line citations is present). Record the
   grep pair in `<FEATURE>/evidence/qa-gates/ac3-root-cause.<ts>.md`. Acceptance: that item
   reads `- [x] AC-3:`.
-- [ ] [P4-T21] Check off AC-4 in `docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md`
+- [x] [P4-T21] Check off AC-4 in `docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md`
   only if P4-T1 through P4-T6 (clean local loop), P4-T10 and P4-T11 (CI check and
   test-with-coverage passed, headline at least 85.0), P4-T12 (per-file line-rate at least
   0.85), P4-T13 (non-zero hits on every instrumented new or modified line), and P4-T14 meet
   their acceptance. Acceptance: that item reads `- [x] AC-4:`.
-- [ ] [P4-T22] Verify check-off state in `docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md`:
+- [x] [P4-T22] Verify check-off state in `docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md`:
   run `grep -c -e '^- \[x\] AC-[1-4]:' docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md`
   into `<FEATURE>/evidence/qa-gates/ac-checked-count.<ts>.md`, and, in its own artifact
   `<FEATURE>/evidence/qa-gates/ac-unchecked-count.<ts>.md` with `ExpectedExitCode: 1`, run
