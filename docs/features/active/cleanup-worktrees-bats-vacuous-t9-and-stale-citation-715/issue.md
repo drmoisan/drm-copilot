@@ -40,7 +40,7 @@ T9's merge-base check is vacuous. The guard ordering is still pinned indirectly,
 
 ## Acceptance Criteria
 
-- [ ] T9 in `tests/shell/test_cleanup_worktrees_deletion.bats` asserts the absence of a `merge-base` call through a channel that records the call when it occurs, so the assertion fails if the protected-base guard is moved after re-verification.
+- [ ] T9 in `tests/shell/test_cleanup_worktrees_deletion.bats` replaces the vacuous `merge-base` negative assertion with a negative assertion over a re-verification call that reaches the stub's observable argv output when it occurs, so the assertion fails if the protected-base guard is moved after re-verification.
 - [ ] The citation of `scripts/bash/cleanup-worktrees.sh:145` in `tests/shell/test_cleanup_worktrees_dirt_clear.bats` is replaced by a stable, non-line-number anchor that identifies the flag pre-pass.
 - [ ] The full bats suite under `tests/shell` passes in CI with no production-code change required.
 
