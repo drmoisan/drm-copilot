@@ -1079,7 +1079,7 @@ the read-only check script A6 and a before-and-after hash comparison.
 - [x] [P12-T9] Commit and push Phase 12 (check off AC-03 and AC-04 per the Preamble check-off rule;
       stage the three fixtures, the two test files, the FEATURE evidence directory, and FEATURE/spec.md;
       message "test(722): pin historical AFTER values"). Acceptance: all three git commands exit 0.
-- [ ] [P12-T10] Confirm the historical tests read only committed fixtures: run CMD-GIT-TRACKED for each
+- [x] [P12-T10] Confirm the historical tests read only committed fixtures: run CMD-GIT-TRACKED for each
       of the two historical test files, then CMD-GIT-GREP-FORBID over both. Write
       FEATURE/evidence/qa-gates/historical-tests-no-forbidden-refs.TS.md with ExpectedExitCode: 1.
       The artifact's EXIT_CODE and ExpectedExitCode refer to the CMD-GIT-GREP-FORBID run; the
@@ -1087,7 +1087,7 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 13 — Part B: Documentation (Write-Intent Sections)
 
-- [ ] [P13-T1] Edit `.claude/rules/parallel-orchestration.md`: add a "Write-intent extraction"
+- [x] [P13-T1] Edit `.claude/rules/parallel-orchestration.md`: add a "Write-intent extraction"
       subsection with rules W1 through W6, the flag and path_roots semantics, the rule that derivation
       and validation select the same extractor, the known false-negative list of the spec under a
       heading whose text is exactly Known false negatives, and the three mitigations; add the Copilot
@@ -1095,7 +1095,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       list and name path_roots as a Class 2 key whose bundled value is empty. Acceptance: for every
       Part B token of block B26, the P13-T2 token counts show a worktree count greater than the
       BASE_SHA count.
-- [ ] [P13-T2] Run script copy-file (A10) through CMD-PS-SCRIPT-SH to copy the P13-T1 file to
+- [x] [P13-T2] Run script copy-file (A10) through CMD-PS-SCRIPT-SH to copy the P13-T1 file to
       `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`;
       then run script file-hashes (A5) through CMD-PS-SCRIPT-SH over the P13-T1 rule file and that
       mirror; then run CMD-PY-TEST over the first B27 node ID, CMD-PY-TEST over the Python files of
@@ -1112,7 +1112,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       run is in the P0-T31 baseline failure set; every Part B token's worktree count is greater than
       its BASE_SHA count (a BASE_SHA run that exits 1 with no output is a count of zero); the second B27 node satisfies KL-510 and the bundle-payload artifact contains
       the line "KL-510: PASSED" or the line "KL-510: STATE-ONLY".
-- [ ] [P13-T3] Commit and push Phase 13 (check off AC-05 per the Preamble check-off rule; stage the two
+- [x] [P13-T3] Commit and push Phase 13 (check off AC-05 per the Preamble check-off rule; stage the two
       Markdown files, the FEATURE evidence directory, and FEATURE/spec.md; message "docs(722):
       document write-intent extraction"). Acceptance: all three git commands exit 0.
 

@@ -587,7 +587,7 @@ reporting done.
 - [x] A final evidence artifact under this feature folder's evidence tree reports, for each of the
   three runs, BEFORE and AFTER edge count, cohort count, and maximum cohort width, including the
   AFTER values for the line-context rules W2, W3, and W5 derived from plan text at a pinned commit.
-- [ ] The historical-run tests in Python (test_blast_radius_historical_runs) and PowerShell
+- [x] The historical-run tests in Python (test_blast_radius_historical_runs) and PowerShell
   (BlastRadius.HistoricalRuns.Tests) assert the pinned BEFORE and AFTER values, read only the committed
   fixtures, and contain no reference to origin refs, the artifacts directory, or the main checkout.
 

@@ -243,6 +243,11 @@ plan-side extraction so V1 and V2 stay self-consistent against a radius derived 
 The key is optional and fail-closed: a truth table that omits it excludes nothing and reproduces
 pre-change behaviour exactly.
 
+The Copilot instructions file `.github/copilot-instructions.md` is a mandate read as well (issue
+#722): the policy reading order begins with it, so a plan that cites copilot-instructions.md is
+reporting that it read the tone and communication policy. Both committed copies of
+`config/blast-radius.json` list it in `mandate_reads`.
+
 Three constraints bound the mandate-read exclusion:
 
 1. **The planner remains obliged to enumerate a genuine write explicitly.** An exclusion describes
@@ -459,6 +464,78 @@ stays within tolerance halts neither item; one whose observed overlap exceeds to
 hard, is reported. An unevaluable peer radius still counts as an edge (fail closed). At
 tolerance_percent 0 the drift output equals strict drift output.
 
+### Write-intent extraction (issue #722)
+
+The extractor harvests every inline-code token of a plan and spec, so a path an item only reads,
+mentions as a glob, or quotes inside a command becomes a radius path and can create a false edge.
+Write-intent extraction keeps only tokens that state a write. It is the second sanctioned mechanism,
+beside `conflict_tolerance`, for relaxing contention; like it, it is an operator-directed configured
+policy change, and planners still never hand-narrow a radius.
+
+**Configuration.** `config/blast-radius.json` carries two optional keys. `write_intent_extraction`
+is a boolean; when it is true, rules W1 through W6 below apply. `path_roots` is a list of non-empty
+first path segments that enables rule W4. Both readers fail fast with an error naming the key for any
+other shape. An absent or false `write_intent_extraction` reproduces pre-change extraction exactly
+(fail closed), and an empty or absent `path_roots` disables W4. The self-hosted copy sets
+`path_roots` to this repository's tracked top-level directories. The implementations are
+`scripts/dev_tools/_blast_radius_write_intent.py` and
+`.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1`.
+
+**Rules.** Each rule is a pure, statically decidable function of the text and the truth table.
+
+- **W1 glob mention.** Drop any harvested token containing a wildcard character. The feature-folder
+  glob is added after filtering and is never dropped.
+- **W2 command span.** Drop every token of an inline span whose whitespace split yields more than
+  one word.
+- **W3 read task.** Drop the tokens of a task attribution window (a task line plus the following
+  non-task lines up to the next ATX heading, as defined in `.claude/rules/plan-acceptance-gates.md`)
+  whose title's first word, after an optional bold label, is in the read-verb set (Read, Verify,
+  Confirm, Inspect, Review, Baseline) and whose title contains no member of the write-verb set (Fix,
+  Write, Update, Edit, Add, Create, Delete, Remove, Rename, Author, Append, Replace). A write verb
+  anywhere in the title overrides the read verb.
+- **W4 root anchoring.** Drop a concrete token whose first segment, after stripping a leading `./`,
+  is not in `path_roots` and is not a configured root surface.
+- **W5 spec paths.** The spec contributes contracts only, not paths. Contract harvesting from the
+  spec applies W1 and W2.
+- **W6 placeholder stem.** Drop a concrete token whose final-component stem is in the placeholder
+  set (the single ASCII letters, and foo, bar, baz, example, sample, placeholder), compared
+  case-insensitively.
+
+The read-verb, write-verb, and placeholder-stem sets are code constants pinned equal across Python
+and PowerShell by a parity test. Shared surfaces are still resolved from the surviving concrete
+paths, so a shared surface cited only in a read task, a command span, or the spec produces no hard
+edge, while a shared surface an item writes in a write task survives and stays hard.
+
+**One extractor for derivation and validation.** W1, W4, and W6 are token-level and also apply when
+`normalize_declared_radius` and Get-NormalizedDeclaredRadius re-filter a recorded radius; an entry
+that starts with `docs/features/`, ends with `/**`, and carries no other wildcard (the feature-folder
+glob) is always kept. W2, W3, and W5 need line context and apply only to derivation and to the
+plan-side extraction of validation. `derive_blast_radius` and `validate_blast_radius` (and their
+PowerShell ports) select the same extractor from the same flag, so a derived radius still passes V1
+and V2 against its own plan in both modes.
+
+#### Known false negatives
+
+Write-intent extraction can drop a genuine write in these cases:
+
+1. a genuine write stated only as a glob (W1);
+2. a genuine write stated only inside a command span (W2);
+3. a write named only in spec prose (W5);
+4. a read-verb task that also writes without a write verb in its title (W3);
+5. a new top-level directory not yet in `path_roots` (W4);
+6. a genuine file whose stem is in the placeholder set (W6).
+
+Three mitigations bound these cases:
+
+1. **The planner remains obliged to enumerate a genuine write explicitly.** When an item's plan will
+   write a path that one of the rules drops, the planner appends that exact path to the declared
+   radius after normalization, as for the mandate-read exclusion.
+2. **Execution-time escaped-path detection.** `detect_escaped_paths` compares the declared radius
+   against the paths a diff actually touched, so a dropped write is caught against observed evidence
+   rather than against prose.
+3. **The fail-closed absent key.** A truth table without `write_intent_extraction`, or with it set
+   to false, reproduces pre-change extraction exactly, so an operator can disable the rules at once.
+
 ### The published truth table is not a copy of this one (issue #500)
 
 The push-down publishes a second truth table into a destination workspace at
@@ -499,7 +576,10 @@ subset, not a copy of the self-hosted sets.** They were authored narrow when the
 created and were never a copy that fell behind, so the correct gate is portable-set equality against
 a declared constant plus a subset relation against the self-hosted list — never byte-equality with
 the self-hosted file. Only `version`, `over_breadth_fraction`, `mandate_reads`, `mergeable_paths`,
-and `conflict_tolerance` are byte-equal across the two copies.
+`conflict_tolerance`, and `write_intent_extraction` are byte-equal across the two copies.
+`path_roots` is a Class 2 key: its self-hosted value is this repository's tracked top-level
+directory list, and its bundled value is an empty list, because the bundle cannot know a
+destination's top-level directories and an empty list disables root anchoring there.
 
 The reason the two key groups take different relations is an asymmetry between surfaces and modules.
 An over-matching MODULE glob costs concurrency on every pair of items it touches, because a module
