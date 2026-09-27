@@ -233,6 +233,8 @@ export function buildCloseCandidatesSection(params: {
  * followed by the unverified annotation when gh is unavailable (D4). An empty
  * list renders the not-open text when a pending primary was excluded (D5),
  * otherwise the PASS vs non-PASS conservative fallback text.
+ * When gh is unavailable, an empty list renders the GitHub-CLI-unavailable
+ * text ahead of every empty-list fallback (issue #588).
  *
  * @param params Verified/pending refs and observed readiness signals, plus
  *     `ghAvailable` (optional, default `true`; when `false` a non-empty list
@@ -272,6 +274,10 @@ export function buildIssuesToAutocloseSection(params: {
     if (!ghAvailable) {
       body = `${body}\n${AUTOCLOSE_UNVERIFIED_ANNOTATION}`;
     }
+  } else if (!ghAvailable) {
+    // Unavailable text takes precedence: the absence claims below are only
+    // meaningful when verification ran (issue #588).
+    body = "None (GitHub CLI unavailable; closing issues not verified)";
   } else if (pendingPrimaryExcluded) {
     body = AUTOCLOSE_PENDING_NOT_OPEN_TEXT;
   } else if (readinessSignals.some((signal) => signal === "PASS")) {

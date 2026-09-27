@@ -64,6 +64,12 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #588: the new PATH executable resolver. Per-file entry only; the
+    // map has no `global` key.
+    "./src/lib/executable-resolver.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/orchestrator-state-core.ts": {
       lines: 85,
       branches: 75,

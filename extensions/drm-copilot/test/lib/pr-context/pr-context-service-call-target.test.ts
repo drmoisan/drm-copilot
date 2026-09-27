@@ -117,6 +117,7 @@ describe("collectPrContextServiceCall — target_ref cross-product", () => {
       fileSystem: seedWorkspace(),
       workspaceRoot: ROOT,
       base: REQUESTED_BASE,
+      whichGh: () => "/usr/bin/gh",
       targetRef: EXPLICIT_TARGET,
     });
 
@@ -145,6 +146,7 @@ describe("collectPrContextServiceCall — target_ref cross-product", () => {
       fileSystem: seedWorkspace(),
       workspaceRoot: ROOT,
       base: REQUESTED_BASE,
+      whichGh: () => "/usr/bin/gh",
       targetRef: EXPLICIT_TARGET,
     });
 
@@ -161,6 +163,7 @@ describe("collectPrContextServiceCall — target_ref cross-product", () => {
       fileSystem: seedWorkspace(),
       workspaceRoot: ROOT,
       base: REQUESTED_BASE,
+      whichGh: () => "/usr/bin/gh",
     });
 
     expect(result.targetResolution).toBe("session-fallback");
@@ -177,6 +180,7 @@ describe("collectPrContextServiceCall — target_ref cross-product", () => {
         fileSystem: seedWorkspace(),
         workspaceRoot: ROOT,
         base: REQUESTED_BASE,
+        whichGh: () => "/usr/bin/gh",
         targetRef: EXPLICIT_TARGET,
       }),
     ).toThrow(
@@ -195,6 +199,7 @@ describe("collectPrContextServiceCall — target_ref cross-product", () => {
         fileSystem: seedWorkspace(),
         workspaceRoot: ROOT,
         base: REQUESTED_BASE,
+        whichGh: () => "/usr/bin/gh",
         targetRef: EXPLICIT_TARGET,
       });
     } catch (error) {
@@ -213,6 +218,7 @@ describe("collectPrContextServiceCall — target_ref cross-product", () => {
           fileSystem: seedWorkspace(),
           workspaceRoot: ROOT,
           base: REQUESTED_BASE,
+          whichGh: () => "/usr/bin/gh",
           targetRef: EXPLICIT_TARGET,
         });
       } catch (error) {
@@ -235,6 +241,7 @@ describe("collectPrContextServiceCall — target_ref cross-product", () => {
         fileSystem: fs,
         workspaceRoot: ROOT,
         base: REQUESTED_BASE,
+        whichGh: () => "/usr/bin/gh",
         targetRef: EXPLICIT_TARGET,
       }),
     ).toThrow();
