@@ -101,35 +101,35 @@ each path.
 
 ### Phase 0 — Policy Reads & Baseline Capture
 
-- [ ] [P0-T1] Read `CLAUDE.md` in full.
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
-- [ ] [P0-T4] Read `.claude/rules/quality-tiers.md` in full (referenced by
+- [x] [P0-T1] Read `CLAUDE.md` in full.
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
+- [x] [P0-T4] Read `.claude/rules/quality-tiers.md` in full (referenced by
       `general-code-change.md`'s Module Rigor Tiers section).
-- [ ] [P0-T5] Read `.claude/rules/tonality.md` in full (the tone policy `CLAUDE.md` designates as
+- [x] [P0-T5] Read `.claude/rules/tonality.md` in full (the tone policy `CLAUDE.md` designates as
       authoritative).
-- [ ] [P0-T6] Read `.claude/rules/powershell.md` in full (the only language-specific rule file in
+- [x] [P0-T6] Read `.claude/rules/powershell.md` in full (the only language-specific rule file in
       scope; all four target files are `*.ps1`).
-- [ ] [P0-T7] Read `.claude/rules/plan-acceptance-gates.md` in full (governs every acceptance
+- [x] [P0-T7] Read `.claude/rules/plan-acceptance-gates.md` in full (governs every acceptance
       condition authored in this plan; G1–G9).
-- [ ] [P0-T8] Read
+- [x] [P0-T8] Read
       `docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711/issue.md` in full.
-- [ ] [P0-T9] Read
+- [x] [P0-T9] Read
       `docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711/spec.md` in full.
-- [ ] [P0-T10] Read
+- [x] [P0-T10] Read
       `docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711/research/research.2026-09-27T03-00.md`
       in full.
-- [ ] [P0-T11] Write the Phase 0 policy-read evidence artifact to
+- [x] [P0-T11] Write the Phase 0 policy-read evidence artifact to
       `docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711/evidence/baseline/phase0-instructions-read.<timestamp>.md`
       containing `Timestamp:`, `Policy Order:` (the exact P0-T1..P0-T7 order above), and an explicit
       list of all ten files read in P0-T1..P0-T10.
-- [ ] [P0-T12] Record the pre-implementation commit SHA as the scope-diff baseline for AC-9: run
+- [x] [P0-T12] Record the pre-implementation commit SHA as the scope-diff baseline for AC-9: run
       `git rev-parse HEAD` from the repository root. Acceptance: command exits 0 and prints a
       40-character hex SHA. Write
       `docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711/evidence/baseline/scope-diff-base-sha.<timestamp>.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (the SHA itself). This SHA is
       the `<base-sha>` referenced in P4-T4.
-- [ ] [P0-T13] Write the shell-execution helper scripts into `<scratchpad>` (the executor's own
+- [x] [P0-T13] Write the shell-execution helper scripts into `<scratchpad>` (the executor's own
       session scratchpad directory — outside the repository tree; never committed) and smoke-test the
       route, per the Shell-execution route note above. Write exactly these six files, each with the
       body given verbatim so a third party can recreate them byte-for-byte:
@@ -247,61 +247,61 @@ each path.
       `.../evidence/baseline/scratchpad-helper-scripts-setup.<timestamp>.md` recording all six file
       paths (using the literal `<scratchpad>` token, not an absolute host path), the smoke-test command,
       and its output.
-- [ ] [P0-T14] Baseline line count for
+- [x] [P0-T14] Baseline line count for
       `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`: run
       `(Get-Content -Path 'tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1').Count`.
       Acceptance: EXIT_CODE 0 and a printed integer (expected 391, per independent re-derivation
       during planning; record whatever value is actually printed, per spec D7/D9). Write
       `.../evidence/baseline/blast-radius-truthtable-linecount.<timestamp>.md`.
-- [ ] [P0-T15] Baseline Pester run for the same file. Run
+- [x] [P0-T15] Baseline Pester run for the same file. Run
       `sh <scratchpad>/run-ps.sh <scratchpad>/pester-counts.ps1 -Path 'tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1'`.
       Acceptance: EXIT_CODE 0 and three printed `TotalCount=`/`PassedCount=`/`FailedCount=` lines,
       plus one `FAILED:` line per failed test if any (expected `TotalCount=23`, per re-derivation;
       record the actual values and the actual `FAILED:` list, which may be empty). This is a baseline
       capture, not a gate: no specific `FailedCount` value is required here. Write
       `.../evidence/baseline/blast-radius-truthtable-pester.<timestamp>.md` with the full output.
-- [ ] [P0-T16] Baseline Pester run for the containing directory,
+- [x] [P0-T16] Baseline Pester run for the containing directory,
       `tests/scripts/claude-lib/blast-radius`. Run
       `sh <scratchpad>/run-ps.sh <scratchpad>/pester-counts.ps1 -Path 'tests/scripts/claude-lib/blast-radius'`
       (a single directory path, not an array — `-File` does not split a comma-separated array
       argument). Acceptance: EXIT_CODE 0 and the three counts plus any `FAILED:` lines are recorded
       as this directory's baseline. Write
       `.../evidence/baseline/blast-radius-directory-pester.<timestamp>.md`.
-- [ ] [P0-T17] Baseline line count for
+- [x] [P0-T17] Baseline line count for
       `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`: run
       `(Get-Content -Path 'tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1').Count`.
       Acceptance: EXIT_CODE 0 and a printed integer (expected 500). Write
       `.../evidence/baseline/enforcement-hooks-linecount.<timestamp>.md`.
-- [ ] [P0-T18] Baseline Pester run for the same file. Run
+- [x] [P0-T18] Baseline Pester run for the same file. Run
       `sh <scratchpad>/run-ps.sh <scratchpad>/pester-counts.ps1 -Path 'tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1'`.
       Acceptance: EXIT_CODE 0 and the three counts plus any `FAILED:` lines recorded as baseline
       (expected `TotalCount=27`, per re-derivation; record the actual values). Write
       `.../evidence/baseline/enforcement-hooks-pester.<timestamp>.md`.
-- [ ] [P0-T19] Baseline Pester run for the containing directory, `tests/scripts/claude-runtime`. Run
+- [x] [P0-T19] Baseline Pester run for the containing directory, `tests/scripts/claude-runtime`. Run
       `sh <scratchpad>/run-ps.sh <scratchpad>/pester-counts.ps1 -Path 'tests/scripts/claude-runtime'`.
       Acceptance: EXIT_CODE 0 and the three counts plus any `FAILED:` lines recorded as baseline.
       Write `.../evidence/baseline/claude-runtime-directory-pester.<timestamp>.md`.
-- [ ] [P0-T20] Baseline line count for
+- [x] [P0-T20] Baseline line count for
       `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1`: run
       `(Get-Content -Path 'tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1').Count`.
       Acceptance: EXIT_CODE 0 and a printed integer (expected 476). Write
       `.../evidence/baseline/discovery-validation-linecount.<timestamp>.md`.
-- [ ] [P0-T21] Baseline Pester run for the same file. Run
+- [x] [P0-T21] Baseline Pester run for the same file. Run
       `sh <scratchpad>/run-ps.sh <scratchpad>/pester-counts.ps1 -Path 'tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1'`.
       Acceptance: EXIT_CODE 0 and the three counts plus any `FAILED:` lines recorded as baseline
       (expected `TotalCount=40`, per re-derivation; record the actual values). Write
       `.../evidence/baseline/discovery-validation-pester.<timestamp>.md`.
-- [ ] [P0-T22] Baseline Pester run for the containing directory,
+- [x] [P0-T22] Baseline Pester run for the containing directory,
       `tests/scripts/claude-lib/discovery-validation`. Run
       `sh <scratchpad>/run-ps.sh <scratchpad>/pester-counts.ps1 -Path 'tests/scripts/claude-lib/discovery-validation'`.
       Acceptance: EXIT_CODE 0 and the three counts plus any `FAILED:` lines recorded as baseline.
       Write `.../evidence/baseline/discovery-validation-directory-pester.<timestamp>.md`.
-- [ ] [P0-T23] Baseline line count for
+- [x] [P0-T23] Baseline line count for
       `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1`: run
       `(Get-Content -Path 'tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1').Count`.
       Acceptance: EXIT_CODE 0 and a printed integer (expected 203). Write
       `.../evidence/baseline/codex-pretooluse-linecount.<timestamp>.md`.
-- [ ] [P0-T24] Baseline Pester run for the same file. Run
+- [x] [P0-T24] Baseline Pester run for the same file. Run
       `sh <scratchpad>/run-ps.sh <scratchpad>/pester-counts.ps1 -Path 'tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1'`.
       Acceptance: EXIT_CODE 0 and the three counts plus any `FAILED:` lines recorded as baseline
       (expected `TotalCount=5`; this file is documented above to carry one known pre-existing failure
@@ -309,13 +309,13 @@ each path.
       `allows every registered handler for every tool name its own matcher admits` test is an expected,
       acceptable baseline outcome here — record whatever the run actually prints). Write
       `.../evidence/baseline/codex-pretooluse-pester.<timestamp>.md`.
-- [ ] [P0-T25] Baseline Pester run for the containing directory, `tests/scripts/codex-hooks`. Run
+- [x] [P0-T25] Baseline Pester run for the containing directory, `tests/scripts/codex-hooks`. Run
       `sh <scratchpad>/run-ps.sh <scratchpad>/pester-counts.ps1 -Path 'tests/scripts/codex-hooks'`.
       Acceptance: EXIT_CODE 0 and the three counts plus any `FAILED:` lines recorded as baseline (this
       directory contains 35 other `*.Tests.ps1` files beyond the one this change edits, so its
       baseline `FailedCount` and `FAILED:` list are captured as-is, whatever they are). Write
       `.../evidence/baseline/codex-hooks-directory-pester.<timestamp>.md`.
-- [ ] [P0-T26] Confirm merge-order-safe uniqueness of all five edit-site content anchors (spec D7)
+- [x] [P0-T26] Confirm merge-order-safe uniqueness of all five edit-site content anchors (spec D7)
       before any edit is made. Run the following five checks and record all five results in one
       evidence artifact:
       1. AC-1: `(Select-String -Path 'tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1' -Pattern '$entries.Count | Should -BeGreaterThan 0' -SimpleMatch).Count`
