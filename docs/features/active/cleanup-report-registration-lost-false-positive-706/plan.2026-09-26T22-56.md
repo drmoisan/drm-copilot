@@ -750,7 +750,7 @@ unchecked, and continue; the plan outcome is not PASS.
   Acceptance: the checked count prints `4` and exits 0; the unchecked count prints `0` and
   exits 1; every checked item's evidence artifact exists on disk. If any item was left
   unchecked, record the gap and the counts as observed, and the plan outcome is not PASS.
-- [ ] [P4-T23] Commit and push the `docs/features/active/cleanup-report-registration-lost-false-positive-706/`
+- [x] [P4-T23] Commit and push the `docs/features/active/cleanup-report-registration-lost-false-positive-706/`
   check-offs and remaining evidence: run
   `git add -- docs/features/active/cleanup-report-registration-lost-false-positive-706/` and
   `git commit -F <message file> -- docs/features/active/cleanup-report-registration-lost-false-positive-706/`,
