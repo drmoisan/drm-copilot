@@ -47,6 +47,8 @@ BeforeAll {
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeItemResolution.psm1')
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeResolution.psm1')
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeTargetResolution.psm1')
+    Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/EpicScopeResolution.psm1')
+    Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
     . (Join-Path $PSScriptRoot 'WorktreeResolutionFixture.Helpers.ps1')
 
     $script:NoTargetCode = Get-WorktreeResolutionNoTargetReasonCode
