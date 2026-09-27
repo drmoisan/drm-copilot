@@ -626,7 +626,7 @@ reporting done.
   error naming the key, in both runtimes, each rejection covered by a test.
 - [x] Both config copies carry conflict_tolerance with the committed values in this spec, byte-equal
   between the copies.
-- [ ] The parallel-plan and parallel-add skills and the parallel-planner agent (and their bundled
+- [x] The parallel-plan and parallel-add skills and the parallel-planner agent (and their bundled
   mirrors) call the scheduling function instead of a hand pair loop, record tolerated overlaps, and
   state that the later-merging item of a tolerated pair syncs with main and re-passes CI.
 - [x] Edges keep only the four existing reason members; the tolerated extra fields (hard, cost,

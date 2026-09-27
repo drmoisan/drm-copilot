@@ -720,7 +720,7 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 6 — Part A: Documentation (Scheduling Sections)
 
-- [ ] [P6-T1] Edit `.claude/rules/parallel-orchestration.md`: add an "Integration-cost scheduling"
+- [x] [P6-T1] Edit `.claude/rules/parallel-orchestration.md`: add an "Integration-cost scheduling"
       subsection under the contention doctrine with the edge rule, the cost terms and append-only
       precedence, the pairwise benefit, the strict-identity proof (every weight and band duration is an
       integer of at least 1, so tolerance 0 reproduces the detected-conflict set and every edge implies
@@ -732,11 +732,11 @@ the read-only check script A6 and a before-and-after hash comparison.
       tolerated_overlaps list are tolerated-not-validated fields. In the issue #500 section add
       conflict_tolerance to the byte-equal key list. Acceptance: for every Part A token of block B26,
       the P6-T9 token counts show a worktree count greater than the BASE_SHA count.
-- [ ] [P6-T2] Run script copy-file (A10) through CMD-PS-SCRIPT-SH to copy the P6-T1 file to
+- [x] [P6-T2] Run script copy-file (A10) through CMD-PS-SCRIPT-SH to copy the P6-T1 file to
       `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`,
       then run script file-hashes (A5) through CMD-PS-SCRIPT-SH over the source and the mirror.
       Acceptance: A10 prints its COPIED line and the two A5 Hash values are equal.
-- [ ] [P6-T3] Edit `.claude/skills/parallel-plan/SKILL.md`: replace the hand pair loop in the conflict
+- [x] [P6-T3] Edit `.claude/skills/parallel-plan/SKILL.md`: replace the hand pair loop in the conflict
       edge step with a call to the scheduling entry point (Python) or Get-BlastRadiusConflictEdge
       (PowerShell), record the returned tolerated overlaps in a tolerated_overlaps list on the planner
       checkpoint, and state the soft-overlap merge rule of P6-T1. Preserve every literal the
@@ -749,28 +749,28 @@ the read-only check script A6 and a before-and-after hash comparison.
       with every other existing literal the contract tests assert. Acceptance: the file contains the
       token Get-BlastRadiusConflictEdge and the token tolerated_overlaps; the literals are verified by
       the B43 Python run of P6-T9.
-- [ ] [P6-T4] Run script copy-file (A10) through CMD-PS-SCRIPT-SH to copy the P6-T3 file to
+- [x] [P6-T4] Run script copy-file (A10) through CMD-PS-SCRIPT-SH to copy the P6-T3 file to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md`,
       then run script file-hashes (A5) through CMD-PS-SCRIPT-SH over the source and the mirror.
       Acceptance: A10 prints its COPIED line and the two A5 Hash values are equal.
-- [ ] [P6-T5] Edit `.claude/skills/parallel-add/SKILL.md` the same way for admission, and amend its
+- [x] [P6-T5] Edit `.claude/skills/parallel-add/SKILL.md` the same way for admission, and amend its
       statement that no field is added to conflict_edges so that it names the three tolerated extra
       fields and states that no reason member is added. Preserve the existing literals the contract
       tests assert. Acceptance: the file contains the tokens Get-BlastRadiusConflictEdge and
       tolerated_overlaps.
-- [ ] [P6-T6] Run script copy-file (A10) through CMD-PS-SCRIPT-SH to copy the P6-T5 file to
+- [x] [P6-T6] Run script copy-file (A10) through CMD-PS-SCRIPT-SH to copy the P6-T5 file to
       `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md`,
       then run script file-hashes (A5) through CMD-PS-SCRIPT-SH over the source and the mirror.
       Acceptance: A10 prints its COPIED line and the two A5 Hash values are equal.
-- [ ] [P6-T7] Edit `.claude/agents/parallel-planner.md` to name Get-BlastRadiusConflictEdge alongside
+- [x] [P6-T7] Edit `.claude/agents/parallel-planner.md` to name Get-BlastRadiusConflictEdge alongside
       the existing library functions and to require recording tolerated overlaps. Preserve the
       existing literals the contract tests assert. Acceptance: the file contains the token
       Get-BlastRadiusConflictEdge.
-- [ ] [P6-T8] Run script copy-file (A10) through CMD-PS-SCRIPT-SH to copy the P6-T7 file to
+- [x] [P6-T8] Run script copy-file (A10) through CMD-PS-SCRIPT-SH to copy the P6-T7 file to
       `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md`,
       then run script file-hashes (A5) through CMD-PS-SCRIPT-SH over the source and the mirror.
       Acceptance: A10 prints its COPIED line and the two A5 Hash values are equal.
-- [ ] [P6-T9] Mirror-consumer contracts and rule-file tokens: run CMD-PY-TEST over the first node ID
+- [x] [P6-T9] Mirror-consumer contracts and rule-file tokens: run CMD-PY-TEST over the first node ID
       of block B27; run CMD-PY-TEST over the Python files of block B43; run CMD-TS-TEST over the
       TypeScript files of block B43; and, for each Part A token of block B26, run CMD-GIT-GREP-COUNT
       and CMD-GIT-GREP-COUNT-BASE against `.claude/rules/parallel-orchestration.md`. Write
@@ -790,7 +790,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       the second B27 node satisfies KL-510 and the bundle-payload artifact contains the line
       "KL-510: PASSED" or the line "KL-510: STATE-ONLY"; each of the four A5 pairs prints two equal
       Hash values.
-- [ ] [P6-T10] Commit and push Phase 6 (check off AC-18 per the Preamble check-off rule; stage the
+- [x] [P6-T10] Commit and push Phase 6 (check off AC-18 per the Preamble check-off rule; stage the
       eight Markdown files, the FEATURE evidence directory, and FEATURE/spec.md; message "docs(722):
       document integration-cost scheduling"). Acceptance: all three git commands exit 0.
 

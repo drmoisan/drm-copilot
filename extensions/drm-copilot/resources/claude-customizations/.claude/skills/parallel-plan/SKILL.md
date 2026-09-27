@@ -312,16 +312,24 @@ The library returns the partition; the planner supplies the record fields.
 ### Seeding procedure
 
 1. Invoke `compute-cohorts.sh` exactly once per plan run, over the full conflict graph, after every
-   item is `prepared` and radius-validated. Derive the conflict edge set by applying
-   `Test-BlastRadiusConflict` to every unordered pair of `declared` radii, then pass the pairs as
+   item is `prepared` and radius-validated. Derive the conflict edge set with one call to the
+   scheduling entry point over every item's `declared` radius and complexity band: Get-BlastRadiusConflictEdge
+   (`Get-BlastRadiusConflictEdge -Item <records carrying key, radius, band> -Config <parsed truth table>`)
+   in PowerShell, or `schedule_conflict_edges(items, config)` (re-exported from
+   `compute_blast_radius.py`, taking `SchedulingItem` records) in Python. Do not apply the
+   detection relation to each pair by hand: the entry point applies it to every unordered pair and
+   then applies the integration-cost edge rule of `.claude/rules/parallel-orchestration.md`
+   (hard classes, integer cost, pairwise benefit, and the configured `conflict_tolerance`). It
+   returns `edges` and `tolerated_overlaps`. Pass the returned `edges` pairs as
    `--edges "<a>:<b> ..."` and the item keys as `--keys "<k1> <k2> ..."`.
-   Read the verdict from the conflict key of the returned hashtable.
-   `Test-BlastRadiusConflict` contributes no `path_overlap` edge for a path matching the truth
-   table's optional `mergeable_paths` list, and the path stays in the declared radius.
-   The hashtable itself is always truthy, so a bare boolean test on the result treats every pair as
-   conflicting and serializes the whole run. This is the sibling hazard to the `@(...)` warning
-   above for `Test-BlastRadius`: that function writes an `IList`-shaped pipeline result whose
-   emptiness is falsy, while this one returns a hashtable whose emptiness is not expressible at all.
+   The detection relation inside the entry point contributes no `path_overlap` edge for a path
+   matching the truth table's optional `mergeable_paths` list, and the path stays in the declared
+   radius. When `Test-BlastRadiusConflict` is called directly (for example, while investigating a
+   single pair), read the verdict from the conflict key of the returned hashtable: the hashtable
+   itself is always truthy, so a bare boolean test on the result treats every pair as conflicting.
+   This is the sibling hazard to the `@(...)` warning above for `Test-BlastRadius`: that function
+   writes an `IList`-shaped pipeline result whose emptiness is falsy, while this one returns a
+   hashtable whose emptiness is not expressible at all.
 2. Immediately after the conflict-edge set is derived and before anything consumes it, run the
    lane-assertion diagnostic:
    `bash .claude/lib/bash/report-lane-assertion.sh --manifest docs/features/parallel/<slug>/parallel.md --edges "<a>:<b> ..."`
@@ -341,7 +349,16 @@ The library returns the partition; the planner supplies the record fields.
    Recording the diagnostic's result in the planner checkpoint is a tolerated extra field, not a
    validated one; no validator changes for it.
 3. Record `cohorts[]` at `generation: 0`, each cohort's `item_keys[]` sorted ascending.
-4. Record `conflict_edges[]` as `{a, b, reason}` entries for auditability.
+4. Record `conflict_edges[]` as `{a, b, reason}` entries for auditability; each entry may also carry
+   the tolerated extra fields `hard`, `cost`, and `benefit` returned by the entry point. Record the
+   returned tolerated overlaps in a `tolerated_overlaps` list on the planner checkpoint, one
+   `{a, b, reasons, cost, benefit}` entry per detected, non-hard pair within tolerance. No reason
+   member is added and no validator reads these fields.
+   **Soft-overlap merge rule.** A tolerated pair is not an edge: its two items run in the same or
+   adjacent cohorts without a barrier. The later-merging item of a tolerated pair merges
+   `origin/main` under the existing per-item merge-conflict handling and re-passes CI before it
+   merges. This is the operator-directed configured policy of issue #722; it never licenses
+   hand-narrowing a radius.
 5. Record `recolor_generation: 0` and `current_cohort: 0`.
 6. Record `max_concurrency` — default 4, bounded 1 through 32 by the F3 schema — without enforcing
    it. Enforcement is F5's, through

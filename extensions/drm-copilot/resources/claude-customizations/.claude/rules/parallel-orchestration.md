@@ -209,6 +209,8 @@ All nine enums of the parallel surface are owned by the schema-and-validator fea
 
 The wave-4 features — F6 (mutation protocol), F7 (enforcement hooks), and F8 (drift detection) — CONSUME these member sets and NEVER extend them. A wave-4 feature that needs a new member must amend this rule file and the validators at spec review, not add the member at implementation time. This constraint exists because the wave-4 features are prepared concurrently and would otherwise add fields to the same files at the same time.
 
+Integration-cost scheduling (issue #722) adds no `conflict_edges[].reason` member; the four members above are unchanged. The scheduling data travels in tolerated-not-validated fields: an edge may carry the extra fields `hard`, `cost`, and `benefit`, and the planner and orchestrator checkpoints may carry a `tolerated_overlaps` list. No validator reads these fields, and the Python validators and the TypeScript validator port accept them with zero errors.
+
 ## F7 Seam
 
 The retrospective cohort-ordering invariant `PARALLEL_COHORT_BARRIER_VIOLATION` (design section 9, Layer 2) is F7's explicitly assigned addition to the orchestrator validator. It is NOT implemented here. The entry point of `scripts/dev_tools/validate_parallel_orchestrator_state.py` contains a clearly delimited, appendable helper-invocation block, marked with explicit begin and end comments that name F7 and the invariant token, so that F7's edit is one appended helper call with no reflow of existing code. The TypeScript core `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-core.ts` carries the matching comment-delimited seam. Existing helper calls sit outside the block.
@@ -391,6 +393,72 @@ weakens the relation below the path level: two items editing the same file still
 A candidate module belongs in the map when it names a subsystem an item could plausibly not touch.
 A candidate that matches the majority of work items belongs nowhere.
 
+### Integration-cost scheduling (issue #722)
+
+Detection and scheduling are separate steps. The detection relation (`conflicts` in Python,
+`Test-BlastRadiusConflict` in PowerShell) is unchanged and still answers one question: do two radii
+contend? Scheduling decides whether a detected contention must serialize the two items. The entry
+points are `schedule_conflict_edges` in `scripts/dev_tools/_blast_radius_scheduling.py` and
+Get-BlastRadiusConflictEdge in `.claude/lib/blast-radius/BlastRadiusScheduling.psm1`; both return
+the edges and the tolerated overlaps of a set of items. Planners call the entry point instead of
+applying the detection relation to every pair by hand.
+
+This is an operator-directed configured policy change (issue #722, 2026-09-27), not ad hoc
+narrowing. The only sanctioned mechanisms for relaxing contention are the configured
+`conflict_tolerance` key and configured write-intent extraction. Planners still never hand-narrow a
+radius: editing a declared radius to suppress an edge remains prohibited.
+
+**Configuration.** `config/blast-radius.json` carries an optional `conflict_tolerance` object with
+tolerance_percent (integer, at least 0), `weights` (same_file, possible_overlap, append_only, and
+module, each an integer of at least 1), `band_durations` (C1 through C4, each an integer of at least
+1), `default_band` (one of C1 through C4), and append_only_paths (a list of exact entries and `**`
+globs). The reader fails fast with an error naming the key for any other shape; booleans are
+rejected wherever an integer is required. An absent key means strict scheduling, identical to
+tolerance_percent 0.
+
+**Edge rule.** For each unordered pair of items:
+
+1. Run the unchanged detection relation. No conflict means no edge and no tolerated overlap.
+2. **Hard classes.** A reason list containing `shared_surface_overlap` or `contract_dependency`
+   makes the pair an edge at every tolerance.
+3. **Cost** (integer, computed only for a detected conflict). Re-enumerate the overlapping entry
+   pairs with the same mergeable-path exclusion and the same entry-overlap primitive the relation
+   uses, then sum the append_only weight for a concrete overlapping path that matches an
+   append_only_paths entry, the same_file weight for two equal concrete entries, the
+   possible_overlap weight for a glob or directory-prefix overlap, and the module weight times the
+   number of shared modules. The append_only_paths check runs before the same_file check (append-only
+   precedence), so an append-only file stays low cost even when both items name it. Mergeable paths
+   contribute 0 because they are excluded before enumeration.
+4. **Benefit** (integer, pairwise). The smaller of the two items' band durations; a missing band uses
+   `default_band`. Running the pair concurrently saves at most one cohort step of the shorter item.
+5. **Rule.** The pair is an edge if and only if it conflicts and either it is hard or
+   `cost * 100 > benefit * tolerance_percent`.
+6. **Recorded reason.** The first member of the relation's reason list in canonical kind order.
+
+**Strict-identity proof.** Every weight and every band duration is validated as an integer of at
+least 1. A detected conflict that is not hard therefore has a cost of at least 1, so at
+tolerance_percent 0 the inequality `cost * 100 > 0` always holds and the edge set equals the
+detected-conflict set exactly; cohort coloring of that set is identical to strict scheduling. At
+every tolerance an edge requires a conflict, so every edge implies a conflict and the edge set is
+always a subset of the detected-conflict set. Raising tolerance_percent never adds an edge, and the
+decision for (a, b) equals the decision for (b, a).
+
+**Soft-overlap handling.** A detected, non-hard pair within tolerance is a tolerated overlap, not an
+edge. The planner records it in a tolerated_overlaps list on the planner checkpoint (and the
+orchestrator carries it), each entry holding `a`, `b`, `reasons`, `cost`, and `benefit`. Tolerated
+pairs run in the same or adjacent cohorts without a barrier. The later-merging item of a tolerated
+pair merges `origin/main` under the existing per-item merge-conflict handling and re-passes CI before
+it merges.
+
+**Drift behaviour.** When an item's observed radius replaces its declared radius, drift detection
+evaluates each in-flight peer pair through the same edge rule, using the items' complexity bands from
+the checkpoint (`default_band` when absent), through the helper module
+`scripts/dev_tools/_parallel_drift_scheduling.py`. A pair is newly conflicting only when the rule
+yields an edge and the pair is not already a recorded edge. A tolerated pair whose observed overlap
+stays within tolerance halts neither item; one whose observed overlap exceeds tolerance, or becomes
+hard, is reported. An unevaluable peer radius still counts as an edge (fail closed). At
+tolerance_percent 0 the drift output equals strict drift output.
+
 ### The published truth table is not a copy of this one (issue #500)
 
 The push-down publishes a second truth table into a destination workspace at
@@ -430,8 +498,8 @@ non-vacuous input.
 subset, not a copy of the self-hosted sets.** They were authored narrow when the bundled copy was
 created and were never a copy that fell behind, so the correct gate is portable-set equality against
 a declared constant plus a subset relation against the self-hosted list — never byte-equality with
-the self-hosted file. Only `version`, `over_breadth_fraction`, `mandate_reads`, and `mergeable_paths`
-are byte-equal across the two copies.
+the self-hosted file. Only `version`, `over_breadth_fraction`, `mandate_reads`, `mergeable_paths`,
+and `conflict_tolerance` are byte-equal across the two copies.
 
 The reason the two key groups take different relations is an asymmetry between surfaces and modules.
 An over-matching MODULE glob costs concurrency on every pair of items it touches, because a module
