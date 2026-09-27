@@ -102,3 +102,52 @@ Output Summary:
 - `.claude/hooks/enforce-completion-consistency.ps1` SHA256=F9CA16BFBD90E0A2223AB2222C0B7B8F0629DC4D835FF18AD319E407F39F07A5
 - `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-consistency.ps1` SHA256=F9CA16BFBD90E0A2223AB2222C0B7B8F0629DC4D835FF18AD319E407F39F07A5
 - The two values are equal.
+
+## P5-T1
+
+Timestamp: 2026-09-27T09-01
+Command: wc -l .claude/hooks/enforce-completion-consistency.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-consistency.ps1 tests/scripts/claude-hooks/enforce-completion-consistency.EditTarget.Tests.ps1
+EXIT_CODE: 0
+Output Summary:
+- 423 `.claude/hooks/enforce-completion-consistency.ps1`
+- 423 `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-consistency.ps1`
+- 227 `tests/scripts/claude-hooks/enforce-completion-consistency.EditTarget.Tests.ps1`
+- Each count is at most 500.
+
+## P5-T2
+
+Timestamp: 2026-09-27T09-01
+Command: grep -c -E "TestDrive|New-TemporaryFile|Set-Location|Push-Location|GetTempPath|Set-Content|Out-File|New-Item|Get-Content|Test-Path|Get-ChildItem|origin/main" tests/scripts/claude-hooks/enforce-completion-consistency.EditTarget.Tests.ps1; grep -c -E "[A-Za-z]:[\\\\/]" tests/scripts/claude-hooks/enforce-completion-consistency.EditTarget.Tests.ps1
+EXIT_CODE: 1
+Output Summary: both commands print `0` (grep exits 1 on a zero count; the printed `0` is the gate value). No forbidden API token and no drive-letter path is present.
+
+## P5-T3
+
+Timestamp: 2026-09-27T09-01
+Command: git diff --exit-code 74b2ca0a2bdf8a0bf9a032433fef20831707b574 -- tests/scripts/claude-hooks/enforce-completion-consistency.Tests.ps1 tests/scripts/claude-hooks/enforce-completion-consistency.Payload.Tests.ps1 tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1; git status --porcelain -- tests/scripts/claude-hooks/enforce-completion-consistency.Tests.ps1 tests/scripts/claude-hooks/enforce-completion-consistency.Payload.Tests.ps1 tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1
+EXIT_CODE: 0
+Output Summary: the diff exits 0 (empty) and the porcelain listing is empty; the three existing suites are unmodified.
+
+## P5-T4
+
+Timestamp: 2026-09-27T09-01
+Command: git diff --name-only 74b2ca0a2bdf8a0bf9a032433fef20831707b574 -- .codex extensions/drm-copilot/resources/codex-and-agents-customizations; git status --porcelain --untracked-files=all -- .codex extensions/drm-copilot/resources/codex-and-agents-customizations
+EXIT_CODE: 0
+Output Summary: both outputs are empty; no `.codex` path or Codex bundle path is changed.
+
+## P5-T5
+
+Timestamp: 2026-09-27T09-02
+Command: git diff --name-only 74b2ca0a2bdf8a0bf9a032433fef20831707b574; git status --porcelain --untracked-files=all
+EXIT_CODE: 0
+Output Summary: union of both listings:
+- `.claude/hooks/enforce-completion-consistency.ps1`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-consistency.ps1`
+- `tests/scripts/claude-hooks/enforce-completion-consistency.EditTarget.Tests.ps1`
+- `docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/evidence/baseline/baseline.md`
+- `docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/evidence/qa-gates/qa-gates.md`
+- `docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/evidence/regression-testing/edit-target-fail-before.md`
+- `docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/evidence/regression-testing/edit-target-pass-after.md`
+- `docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/issue.md`, `plan.2026-09-26T22-56.md`, `research/research.2026-09-27T03-00.md`, `spec.md` (feature documents committed by the preparation run)
+- porcelain: `docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/evidence/other/follow-ups.md` (untracked until the Phase 5 commit)
+- No path outside the allowed set.
