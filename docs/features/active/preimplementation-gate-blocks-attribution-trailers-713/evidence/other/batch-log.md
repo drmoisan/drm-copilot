@@ -24,3 +24,13 @@ Paths (plan rule 9, batch 2; section 2 items 3, 4, 6, 7, 8, 9):
 4. `.claude/skills/epic-plan/SKILL.md` (Markdown Edit, [P3-T4])
 5. `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md` (R-MIRROR, [P3-T5])
 6. `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-plan/SKILL.md` (R-MIRROR, [P3-T5])
+
+## Remediation cycle 1 - Batch C1-1
+
+Timestamp: 2026-09-27T05-02
+
+Plan: `remediation-plan.2026-09-27T05-05.md` rule 5, batch C1-1 (Phases 1 and 2):
+
+1. `.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1` (Edit, [P2-T2])
+2. `.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1` (R-MIRROR, [P2-T4])
+3. `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.AttributionTrailer.Tests.ps1` (Edit, [P1-T2])

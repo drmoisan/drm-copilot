@@ -87,6 +87,9 @@ Describe 'preimplementation gate attribution trailers (<Runtime>)' -ForEach @(
         @{ Label = 'a mid-word hash in an exempt operand'; Command = 'git add docs/features/active/x#y/a.md' }
         @{ Label = 'an unbalanced single quote around a dollar sign'; Command = 'git commit -m ''costs $5 -- docs/features/active/x/plan.md' }
         @{ Label = 'an escaped single quote near a dollar sign'; Command = 'git commit -m ''it\''s $5'' -- docs/features/active/x/plan.md' }
+        @{ Label = 'a typographic single-quoted command substitution'; Command = ('git commit -m ''a' + [char]0x2019 + ' $(x) ' + [char]0x2018 + 'b'' -- docs/features/active/x/plan.md') }
+        @{ Label = 'a typographic double-quoted command substitution'; Command = ('git commit -m ''a' + [char]0x2019 + ' ' + [char]0x201C + '$(x)' + [char]0x201D + ' ' + [char]0x2018 + 'b'' -- docs/features/active/x/plan.md') }
+        @{ Label = 'a typographic single quote around a non-exempt pathspec'; Command = ('git commit -m ''a' + [char]0x2019 + ' src/prod.ts ' + [char]0x2018 + 'b'' -- docs/features/active/x/plan.md') }
     ) {
         # Act
         $isExempt = Test-ExemptOrchestrationStagingCommand -CommandText $Command

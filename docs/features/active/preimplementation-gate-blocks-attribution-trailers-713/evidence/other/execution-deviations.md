@@ -25,3 +25,9 @@ Orchestrator-approved. In [P0-T8] the primary command `git --version` is replace
 Timestamp: 2026-09-27T03-38
 
 Several artifact timestamps written during Phases 0 to 2 of this run were entered ahead of the wall clock. They were corrected to times calibrated against the phase-boundary commit times (Phase 0 at 03-31, Phase 1 at 03-34), and the fail-before exception dossier was renamed from `fail-before-exception.2026-09-27T03-46.md` to `fail-before-exception.2026-09-27T03-34.md` with `git mv` so that its file name matches its write time. No artifact content other than the `Timestamp:` line and that file name changed.
+
+## X4 - Trailer check command (remediation cycle 1)
+
+Timestamp: 2026-09-27T05-01
+
+Orchestrator-approved. Plan: `docs/features/active/preimplementation-gate-blocks-attribution-trailers-713/remediation-plan.2026-09-27T05-05.md`. In [P0-T11], [P1-T5], [P2-T7], [P3-T8], and [P4-T17], the command `git log -1 --format=%H%n%(trailers:only,unfold)` is replaced by two plain commands, each in its own Bash call: `git rev-parse HEAD` and `git log -1 --format=%B`. The worktree-isolation PreToolUse guard refused the original spelling as too complex to verify (denial text recorded in `evidence/other/remediation-c1-commits-log.md`). Acceptance is unchanged: the message body printed by the second command ends with the `Co-Authored-By:` and `Claude-Session:` lines of plan rule 3. Each affected artifact cites X4. No other spelling was tried.
