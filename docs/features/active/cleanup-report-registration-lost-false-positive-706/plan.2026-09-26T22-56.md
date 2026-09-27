@@ -15,9 +15,11 @@
 section `## Acceptance Criteria`, items AC-1 through AC-4. `user-story.md` is not produced for
 full-bug work and its absence is not a blocker. Supporting inputs: `issue.md` and
 `research/2026-09-26-registration-lost-false-positive-research.md` in the same folder. Design
-decisions D1 through D7 of `spec.md` are binding; this plan implements D1 (pure predicate), D2
+decisions D1 through D10 of `spec.md` are binding; this plan implements D1 (pure predicate), D2
 (one-line existence seam redefined by bats), D3 (append-only tests, new fixture root), D4 (no
-SKILL.md edit), and D5 (tier T4).
+SKILL.md edit), D5 (tier T4), D8 (test 2 in script-invocation form, R6), D9 (tests 3 and 4
+appended after the fix; P3-T4 mutation check), and D10 (sibling change on `origin/main`
+recorded and resolved at rebase, P0-T5).
 
 **Notation.** `<FEATURE>` denotes `docs/features/active/cleanup-report-registration-lost-false-positive-706`.
 `<ts>` denotes the artifact creation time in `yyyy-MM-ddTHH-mm` form. `<MERGE_BASE>` denotes the
@@ -37,9 +39,10 @@ the last `EXIT_CODE:` line and the first `ExpectedExitCode:` line of a file.
 **Command route (agent-isolated worktree).** The worktree isolation guard refuses command text
 containing the words `bash`, `pwsh`, or `wsl`, and refuses heredocs. Therefore:
 shell scripts run as `sh <script>` (Git Bash `sh` is GNU bash), for example
-`sh scripts/bash/shell-qc.sh check`; bats runs as `npx --yes bats <single .bats file>`
-(bats-core from npm, no repository change; single files only, because the recursive suite takes
-about 35 minutes locally); `shfmt` and `shellcheck` run from the Windows PATH. If the guard
+`sh scripts/bash/shell-qc.sh check`; bats runs as `npx --yes bats <one or more named .bats files>`
+(bats-core from npm, no repository change; named files only, never the `tests/shell`
+directory, because the recursive suite takes about 35 minutes locally); `shfmt` and
+`shellcheck` run from the Windows PATH. If the guard
 refuses a command's text, the executor writes the identical command into a `.sh` file in
 `<session-scratchpad>` and runs `sh <that file>`; the artifact's `Command:` field records the
 command itself, not the scratch file path.
@@ -70,8 +73,8 @@ runs the helper as a script (`bash "${HELPER}" scan-dirs ...`), which is the for
 test already uses and which produced the 2026-09-08 per-file figure of 46/53. The existing test
 drives the relative-target path (predicate returns non-zero, directory prefixed, real seam
 called for `good_wt` and `broken_wt`); new test 2 drives the drive-letter path (predicate
-returns 0, no prefix, real seam called). P4-T13 verifies non-zero hits per line and carries the
-remedy branch.
+returns 0, no prefix, real seam called). P4-T13 verifies non-zero hits per line; a gap is
+recorded as remediation-required and leaves AC-4 unchecked.
 
 **Formatter scope.** `shell-qc.sh` discovers `.sh` files and bash/sh-shebang files under
 `tools/`, `scripts/`, and `.claude/lib/bash/`. `tests/shell/test_cleanup_worktrees_scan_helper.bats`
@@ -89,7 +92,8 @@ line number. New `@test` blocks are appended at the end of
 `tests/shell/test_cleanup_worktrees_scan_helper.bats` after whatever test is last at execution
 time; the existing test is not edited. No task asserts a total test count or a TAP plan value
 for any bats file; tests are asserted by name. P0-T5 detects whether a sibling has changed an
-edit site, on the branch and on `origin/main`, and stops the plan when an anchor is missing.
+edit site, on the branch and on `origin/main`; it stops the plan when an anchor is missing on
+the branch, and records a main-side change for resolution at rebase (D10).
 
 **Commit route.** `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` gates
 `git add` and `git commit` on the orchestration checkpoint. Every commit is pathspec-bearing:
@@ -112,12 +116,14 @@ copies, and `tests/fixtures/cleanup_worktrees/scan_roots/basic/`.
 1. AC-4 names `bash scripts/bash/shell-qc.sh format` and `check`. Locally these run as
    `sh scripts/bash/shell-qc.sh format` and `check` (same script, Git Bash GNU bash); the CI
    `check` step runs the `bash` form with shfmt 3.8.0 and is authoritative.
-2. The spec's Test Strategy lists tests 3 and 4 alongside tests 1 and 2. Tests 3 and 4 call a
-   function that does not exist before the fix, so they are added after the fix (Phase 3); the
-   fail-before obligation of AC-3 attaches to test 1 only.
-3. The spec describes test 2 as running "the same fixture without redefinition". This plan runs
-   it in the script-invocation form (see Coverage attribution design); that form performs no
-   redefinition.
+2. Test placement and invocation form follow spec D8 and D9; no reconciliation is required.
+3. AC-4 requires the shell-qc format step to make no changes. When P4-T1 takes the scoped
+   `shfmt -w` branch (`LOCAL-DRIFT: PRESENT`), this is verified by the CI shell-qc check step,
+   whose `shfmt -d` under shfmt 3.8.0 exits 0 only when formatting would change nothing
+   (P4-T10).
+4. `.claude/rules/shell.md` directs the Windows toolchain to run under WSL. The worktree
+   isolation guard refuses command text containing that word, so local steps use Git Bash `sh`;
+   CI results govern per that rule's CI-vs-Local Version Drift section.
 
 ## Reference Text
 
@@ -288,20 +294,24 @@ in: `gitdir: C:/fixture-repo/.git/worktrees/wt_drive`
 - [ ] [P0-T5] Edit-site detection for `scripts/bash/cleanup_worktrees_scan_helper.sh` and
   `tests/shell/test_cleanup_worktrees_scan_helper.bats` into
   `<FEATURE>/evidence/baseline/edit-site-detection.<ts>.md`. Run, each with its own
-  `Command:`/`EXIT_CODE:` pair:
+  `Command:`/`EXIT_CODE:` pair and in this order: first
   `git diff --stat <MERGE_BASE> origin/main -- scripts/bash/cleanup_worktrees_scan_helper.sh tests/shell/test_cleanup_worktrees_scan_helper.bats tests/fixtures/cleanup_worktrees/scan_roots/`
   (reports whether a sibling change to these paths has merged to main since the merge base);
+  second, the six main-side counts, each formed from one of the six branch-side commands below
+  by replacing its file operand with process input from `git show origin/main:<same path>` (for
+  example
+  `git show origin/main:scripts/bash/cleanup_worktrees_scan_helper.sh | grep -c -F 'if [[ $target != /* ]]; then'`);
+  third and last, the six branch-side counts:
   `grep -c -F 'scan_helper_gitdir_target_exists() {' scripts/bash/cleanup_worktrees_scan_helper.sh`;
   `grep -c -F 'if [[ $target != /* ]]; then' scripts/bash/cleanup_worktrees_scan_helper.sh`;
   `grep -c -F 'target="$dir/$target"' scripts/bash/cleanup_worktrees_scan_helper.sh`;
   `grep -c -F 'if [[ -e $target ]]; then' scripts/bash/cleanup_worktrees_scan_helper.sh`;
   `grep -c -F '#                        else 0.' scripts/bash/cleanup_worktrees_scan_helper.sh`; and
   `grep -c -F '@test "scan-dirs emits has_gitfile/target_exists/size for each candidate directory"' tests/shell/test_cleanup_worktrees_scan_helper.bats`.
-  Then run the same six `grep -c -F` commands against the main-side content by replacing each
-  file operand with process input from `git show origin/main:<same path>` (for example
-  `git show origin/main:scripts/bash/cleanup_worktrees_scan_helper.sh | grep -c -F 'if [[ $target != /* ]]; then'`).
-  Acceptance: each of the six branch-side counts prints `1`; the stat output is recorded
-  verbatim (empty means no sibling change has merged; non-empty is recorded as
+  The branch-side pairs are written last so that the artifact's final `EXIT_CODE:` is a
+  branch-side `0` (a main-side count of `0` exits 1, and the PR-context parser reads the last
+  `EXIT_CODE:` line). Acceptance: each of the six branch-side counts prints `1`; the stat
+  output is recorded verbatim (empty means no sibling change has merged; non-empty is recorded as
   `SIBLING-MERGED: <paths>`). When a main-side count is not `1`, record
   `MAIN-SIDE-ANCHOR-CHANGED: <token>`; the branch-side edit proceeds and the conflict is
   resolved at rebase time by the orchestrator, with the anchors re-checked there. When any
@@ -357,24 +367,37 @@ in: `gitdir: C:/fixture-repo/.git/worktrees/wt_drive`
   `gh run list --workflow=_shell-coverage.yml --branch bug/cleanup-report-registration-lost-false-positive-706 --event workflow_dispatch --limit 1 --json databaseId,headSha,status,conclusion,createdAt`
   until it returns a run created after the dispatch time; that run's `databaseId` is the
   baseline `<RUN_ID>`. Run `gh run watch <RUN_ID> --exit-status` in the background (runs have
-  taken from 6 to over 30 minutes), then run `gh run view <RUN_ID> --log` and filter it with
-  `grep -F 'Bash coverage (lines):'` and `grep -c -E ' not ok [0-9]+ '`. Write
+  taken from 6 to over 30 minutes); only after that watch has finished, run
+  `gh run view <RUN_ID> --log` (run logs are unavailable while the run is in progress) and
+  filter it three ways: `grep -F 'Bash coverage (lines):'`, `grep -c -E ' not ok [0-9]+ '`, and
+  `grep -E ' not ok [0-9]+ '`. Write
   `<FEATURE>/evidence/baseline/ci-shell-coverage.<ts>.md` with the pairs in the order push,
-  dispatch, each poll, log filters, and the `gh run watch` pair LAST. Acceptance: the
-  `gh run watch` pair is the final pair and exits 0; `headSha` equals the pushed SHA; the
-  numeric `Bash coverage (lines): NN.N%` headline and the `not ok` count are recorded. If the
-  run fails or prints no headline, record the failure verbatim and mark the coverage baseline
-  remediation-required (the plan outcome cannot be PASS without a numeric baseline).
+  dispatch, each poll, log filters, and the `gh run watch` pair LAST (written last although it
+  was started before the log filters). Acceptance: the `gh run watch` pair is the final pair
+  and exits 0; `headSha` equals the pushed SHA; the numeric `Bash coverage (lines): NN.N%`
+  headline and the `not ok` count are recorded; and the test names on every line printed by
+  the `grep -E ' not ok [0-9]+ '` filter are recorded under the heading
+  `CI baseline failure set:` (the word `none` when that filter prints nothing). If the run
+  fails or prints no headline, record the failure verbatim, still record the CI baseline
+  failure set, and mark the coverage baseline remediation-required (the plan outcome cannot be
+  PASS without a numeric baseline).
 - [ ] [P0-T14] Baseline per-file coverage for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
   `<FEATURE>/evidence/baseline/kcov-per-file.<ts>.md`: run
   `gh run download <RUN_ID> --name shell-coverage --dir <session-scratchpad>/kcov-baseline-706`
   (baseline `<RUN_ID>` from P0-T13), then, on the `cov.xml` at the root of that directory (or
   `kcov-merged/cov.xml` when the root copy is absent), run
   `sed -n '/cleanup_worktrees_scan_helper\.sh"/,/<\/class>/p' <session-scratchpad>/kcov-baseline-706/cov.xml`
-  and count its `<line ` entries and its `hits="0"` entries with `grep -c`. Acceptance: the
-  artifact records the class element's `line-rate`, the total instrumented line count, the
-  zero-hit count, the derived covered/total fraction (the 2026-09-08 figure was 46/53), and
-  the run ID; no absolute path is copied into the artifact.
+  and count its `<line ` entries and its `hits="0"` entries with `grep -c`. Then run
+  `git show <MERGE_BASE>:scripts/bash/cleanup_worktrees_scan_helper.sh | grep -n -F -e 'if [[ $target != /* ]]; then' -e 'target="$dir/$target"' -e 'if [[ -e $target ]]; then'`
+  and record its three printed `N:` prefixes as the pre-change line numbers of those three
+  lines (91, 92, and 94 at authoring; the recorded values govern). Acceptance: the artifact
+  records the class element's `line-rate`, the total instrumented line count, the zero-hit
+  count, the derived covered/total fraction (the 2026-09-08 figure was 46/53), the run ID, the
+  three pre-change line numbers, and, for each of them, the `hits` value of the matching
+  `<line number="N" .../>` entry in the class block or `NOT-INSTRUMENTED` when the class block
+  has no such entry; no absolute path is copied into the artifact. When the P0-T13 run uploaded
+  no `shell-coverage` artifact (the upload step runs only after a successful test step), record
+  the `gh run download` output verbatim and mark the per-file baseline remediation-required.
 - [ ] [P0-T15] Baseline line counts for `scripts/bash/cleanup_worktrees_scan_helper.sh` and
   `tests/shell/test_cleanup_worktrees_scan_helper.bats`: run
   `wc -l scripts/bash/cleanup_worktrees_scan_helper.sh tests/shell/test_cleanup_worktrees_scan_helper.bats`
@@ -404,13 +427,23 @@ every existing test are not modified.
 - [ ] [P1-T3] [expect-fail] Append test 1 to `tests/shell/test_cleanup_worktrees_scan_helper.bats`,
   exactly as reference block R5, named
   `scan-dirs reports target_exists 1 for an existing drive-letter gitdir target without prefixing the worktree directory`.
-  Acceptance: the block is the file's last block, uses 4-space indentation, and the existing
-  test block is byte-unchanged (verified by the numstat check in P4-T15). This test is
-  expected to fail against the unfixed helper (P1-T5).
+  Verify with
+  `git diff --numstat <MERGE_BASE> -- tests/shell/test_cleanup_worktrees_scan_helper.bats`
+  (the deleted-line column is `0`) and
+  `grep -n -F '@test "' tests/shell/test_cleanup_worktrees_scan_helper.bats` (the last printed
+  line names this task's test). Acceptance: the block is the file's last block, uses 4-space
+  indentation, and the existing test block is byte-unchanged (the numstat check above; P4-T15
+  re-verifies). This test is expected to fail against the unfixed helper; its
+  `[expect-fail]` evidence artifact is
+  `<FEATURE>/evidence/regression-testing/fail-before.<ts>.md` (P1-T5).
 - [ ] [P1-T4] Append test 2 to `tests/shell/test_cleanup_worktrees_scan_helper.bats`, exactly as
   reference block R6, named
   `scan-dirs reports target_exists 0 for a drive-letter gitdir target that does not exist`.
-  Acceptance: the block is appended after test 1 and is the file's last block.
+  Acceptance: the block is appended after test 1 and is the file's last block. Verify with
+  `git diff --numstat <MERGE_BASE> -- tests/shell/test_cleanup_worktrees_scan_helper.bats`
+  (the deleted-line column is `0`) and
+  `grep -n -F '@test "' tests/shell/test_cleanup_worktrees_scan_helper.bats` (the last printed
+  line names this task's test).
 - [ ] [P1-T5] [expect-fail] Fail-before run into `<FEATURE>/evidence/regression-testing/fail-before.<ts>.md`
   with `ExpectedExitCode: 1`: with `scripts/bash/cleanup_worktrees_scan_helper.sh` still
   unmodified, run
@@ -468,11 +501,19 @@ every existing test are not modified.
 - [ ] [P3-T1] Append test 3 to `tests/shell/test_cleanup_worktrees_scan_helper.bats`, exactly as
   reference block R7, named
   `scan_helper_is_absolute_path returns 0 for slash-leading and drive-letter paths`.
-  Acceptance: the block is appended after test 2 and is the file's last block.
+  Acceptance: the block is appended after test 2 and is the file's last block. Verify with
+  `git diff --numstat <MERGE_BASE> -- tests/shell/test_cleanup_worktrees_scan_helper.bats`
+  (the deleted-line column is `0`) and
+  `grep -n -F '@test "' tests/shell/test_cleanup_worktrees_scan_helper.bats` (the last printed
+  line names this task's test).
 - [ ] [P3-T2] Append test 4 to `tests/shell/test_cleanup_worktrees_scan_helper.bats`, exactly as
   reference block R8, named
   `scan_helper_is_absolute_path returns non-zero for relative, drive-relative, and empty paths`.
-  Acceptance: the block is appended after test 3 and is the file's last block.
+  Acceptance: the block is appended after test 3 and is the file's last block. Verify with
+  `git diff --numstat <MERGE_BASE> -- tests/shell/test_cleanup_worktrees_scan_helper.bats`
+  (the deleted-line column is `0`) and
+  `grep -n -F '@test "' tests/shell/test_cleanup_worktrees_scan_helper.bats` (the last printed
+  line names this task's test).
 - [ ] [P3-T3] Run `tests/shell/test_cleanup_worktrees_scan_helper.bats` into
   `<FEATURE>/evidence/regression-testing/scan-helper-all-tests.<ts>.md`:
   `npx --yes bats tests/shell/test_cleanup_worktrees_scan_helper.bats`. Acceptance:
@@ -480,15 +521,22 @@ every existing test are not modified.
   `scan-dirs emits has_gitfile/target_exists/size for each candidate directory` each begin `ok `.
 - [ ] [P3-T4] Negative control for test 3 in `tests/shell/test_cleanup_worktrees_scan_helper.bats`,
   proving it can fail, recorded in `<FEATURE>/evidence/regression-testing/predicate-negative-control.<ts>.md`
-  with `ExpectedExitCode: 1`: run
+  with `ExpectedExitCode: 1`: first, before any edit, run
+  `sha256sum scripts/bash/cleanup_worktrees_scan_helper.sh` and record it as the pre-mutation
+  hash in `<FEATURE>/evidence/regression-testing/predicate-restored.<ts>.md`; then temporarily
+  replace, in `scripts/bash/cleanup_worktrees_scan_helper.sh`, the R1 line
+  `	[[ $path == /* || $path == [A-Za-z]:[/\\]* ]]` with `	[[ $path == /* ]]` (the pre-fix
+  rule); run
   `npx --yes bats --print-output-on-failure --filter 'scan_helper_is_absolute_path returns 0 for slash-leading' tests/shell/test_cleanup_worktrees_scan_helper.bats`
-  after temporarily replacing, in `scripts/bash/cleanup_worktrees_scan_helper.sh`, the R1
-  line `	[[ $path == /* || $path == [A-Za-z]:[/\\]* ]]` with `	[[ $path == /* ]]`
-  (the pre-fix rule); then restore the R1 line exactly. Acceptance: the filtered run exits 1
-  with one `not ok` line naming test 3 and output containing `classified relative: [C:/x]`;
-  after restoring, `grep -c -F '[[ $path == /* || $path == [A-Za-z]:[/\\]* ]]' scripts/bash/cleanup_worktrees_scan_helper.sh`
-  prints `1` and `shfmt -d scripts/bash/cleanup_worktrees_scan_helper.sh` prints nothing
-  (both recorded in `<FEATURE>/evidence/regression-testing/predicate-restored.<ts>.md`).
+  into the negative-control artifact; then restore the R1 line exactly. Acceptance: the
+  filtered run exits 1 with one `not ok` line naming test 3 and output containing
+  `classified relative: [C:/x]`; after restoring,
+  `grep -c -F '[[ $path == /* || $path == [A-Za-z]:[/\\]* ]]' scripts/bash/cleanup_worktrees_scan_helper.sh`
+  prints `1`, `shfmt -d scripts/bash/cleanup_worktrees_scan_helper.sh` prints nothing, and
+  `sha256sum scripts/bash/cleanup_worktrees_scan_helper.sh` prints the same hash as the
+  pre-mutation hash (all three post-restore pairs appended to
+  `<FEATURE>/evidence/regression-testing/predicate-restored.<ts>.md` after the pre-mutation
+  pair, so the file is byte-identical to its pre-mutation state and the mutated line is gone).
 - [ ] [P3-T5] Unmodified-consumer run for `tests/shell/test_cleanup_worktrees_report_records.bats`
   and `tests/shell/test_cleanup_worktrees_scan_seam.bats` into
   `<FEATURE>/evidence/regression-testing/report-records-unmodified.<ts>.md`: run
@@ -501,8 +549,13 @@ every existing test are not modified.
 Loop rule: P4-T1 through P4-T5 are one pass of the shell toolchain loop (format, lint, syntax,
 test). If any step fails, or if any step or remediation changes a file, fix the cause and
 restart at P4-T1; artifacts from an abandoned pass are kept and the new pass writes new
-timestamped artifacts. If the CI run (P4-T10) fails, or P4-T13 takes its remedy branch, fix the
-cause, restart at P4-T1, and re-run P4-T7 through P4-T14.
+timestamped artifacts. If the CI run (P4-T10) fails, fix the cause, restart at P4-T1, and
+re-run P4-T7 through P4-T14. Exception: when every `not ok` test in the P4-T10 log is in the
+P0-T13 CI baseline failure set, do not restart. The exception applies only when the P4-T10 log
+contains at least one `not ok` line and the `Run shell-qc check` step succeeded, so a failure
+with no failing test (for example a CI shfmt diff) still restarts the loop. Record
+`PRE-EXISTING-CI-FAILURE: <names>` in the P4-T10 artifact, leave AC-4 unchecked, and
+continue; the plan outcome is not PASS.
 
 - [ ] [P4-T1] QC step 1 (format) for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
   `<FEATURE>/evidence/qa-gates/qc-step1-format.<ts>.md`. Before formatting, run
@@ -521,7 +574,9 @@ cause, restart at P4-T1, and re-run P4-T7 through P4-T14.
   `sh scripts/bash/shell-qc.sh check` and write `<FEATURE>/evidence/qa-gates/qc-step2-check.<ts>.md`.
   Acceptance: no printed diagnostic line names `scripts/bash/cleanup_worktrees_scan_helper.sh`,
   and every printed diagnostic line is present in the P0-T9 baseline record; when P0-T9
-  recorded `LOCAL-DRIFT: NONE`, the run prints nothing and exits 0.
+  recorded `LOCAL-DRIFT: NONE`, the run prints nothing and exits 0. When P0-T9 recorded
+  `LOCAL-DRIFT: PRESENT`, the artifact carries `ExpectedExitCode:` equal to the P0-T9
+  `EXIT_CODE:` value, and the observed `EXIT_CODE:` equals that value.
 - [ ] [P4-T3] QC step 2b (targeted lint) on `scripts/bash/cleanup_worktrees_scan_helper.sh`: run
   `shellcheck -f gcc scripts/bash/cleanup_worktrees_scan_helper.sh` and write
   `<FEATURE>/evidence/qa-gates/qc-step2b-shellcheck.<ts>.md`. Acceptance: `EXIT_CODE: 0` and no
@@ -573,8 +628,11 @@ cause, restart at P4-T1, and re-run P4-T7 through P4-T14.
   step succeeded, and CI shfmt 3.8.0 printed no diff); the filtered log shows an `ok` TAP line
   for each of tests 1 through 4 and for
   `scan-dirs emits has_gitfile/target_exists/size for each candidate directory`; the numeric
-  `Bash coverage (lines): NN.N%` headline is recorded and is at least `85.0`. On any failure,
-  restart the loop at P4-T1.
+  `Bash coverage (lines): NN.N%` headline is recorded and is at least `85.0`. Also run
+  `gh run view <RUN_ID> --log` filtered by `grep -E ' not ok [0-9]+ '` and record the test
+  names it prints (before the watch pair). On any failure, restart the loop at P4-T1, except
+  under the pre-existing CI failure exception of the Phase 4 loop rule, which is evaluated
+  against those recorded names.
 - [ ] [P4-T11] CI failure count for the P4-T9 run of `.github/workflows/_shell-coverage.yml`, in
   its own artifact `<FEATURE>/evidence/qa-gates/ci-not-ok-count.<ts>.md` with
   `ExpectedExitCode: 1`: run `gh run view <RUN_ID> --log` piped to
@@ -586,7 +644,9 @@ cause, restart at P4-T1, and re-run P4-T7 through P4-T14.
   `gh run download <RUN_ID> --name shell-coverage --dir <session-scratchpad>/kcov-final-706`
   (final `<RUN_ID>`), then apply the P0-T14 `sed -n` extraction and `grep -c` counts to that
   directory's `cov.xml`. Acceptance: the class `line-rate` is at least `0.85`; the total and
-  zero-hit counts and the covered/total fraction are recorded with the run ID.
+  zero-hit counts and the covered/total fraction are recorded with the run ID. When the run
+  uploaded no `shell-coverage` artifact, record the `gh run download` output verbatim and mark
+  the artifact remediation-required.
 - [ ] [P4-T13] New-line hit verification for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
   `<FEATURE>/evidence/qa-gates/kcov-new-line-hits.<ts>.md`: at CI_SHA, locate each of these
   lines with `grep -n -F` on the helper, then read the matching `<line number="N" hits="H"/>`
@@ -600,15 +660,13 @@ cause, restart at P4-T1, and re-run P4-T7 through P4-T14.
   with its line number and `hits`, and each line present in the class block has `hits` of at
   least 1. A line absent from the class block is recorded as `NOT-INSTRUMENTED: <line>`; this
   is accepted only for the three lines inside `scan_helper_gitdir_target_exists` and only when
-  the P0-T14 baseline block also omits the corresponding pre-change line (original lines 91,
-  92, and 94), and otherwise is treated as a gap. Remedy branch, for any gap or any
-  `hits="0"` line: record `ATTRIBUTION-GAP: <line>`; append to
-  `tests/shell/test_cleanup_worktrees_scan_helper.bats` one `@test` named
-  `scan-dirs classifies drive-letter and relative gitdir targets in one script-form run` whose
-  body runs `run env CLEANUP_WT_SCAN_GITFILE_NAME=dotgit bash "${HELPER}" scan-dirs "${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scan_roots/drive_letter" "${ROOTS}"`
-  and asserts `[ "$status" -eq 0 ]`, `[[ "$output" == *"/wt_drive|1|0|"?* ]]`, and
-  `[[ "$output" == *"/good_wt|1|1|"?* ]]`; then restart the loop at P4-T1. If the gap persists
-  on the rerun, stop the plan (BLOCKED, returned to the planner with the class-block excerpt).
+  the P0-T14 baseline block also omits the corresponding pre-change line (the three
+  pre-change line numbers that P0-T14 recorded from the `git show <MERGE_BASE>:` grep for
+  `if [[ $target != /* ]]; then`, `target="$dir/$target"`, and `if [[ -e $target ]]; then`),
+  and otherwise is treated as a gap. For any gap or any `hits="0"` line: record
+  `ATTRIBUTION-GAP: <line>`, record the class-block excerpt, mark the artifact
+  remediation-required, leave AC-4 unchecked (P4-T21), and continue to P4-T14; do not restart
+  the loop for this cause.
 - [ ] [P4-T14] Coverage delta for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
   `<FEATURE>/evidence/qa-gates/coverage-delta.<ts>.md`: record the P0-T13 and P4-T10 overall
   headlines, the P0-T14 and P4-T12 per-file `line-rate` values and covered/total fractions,
