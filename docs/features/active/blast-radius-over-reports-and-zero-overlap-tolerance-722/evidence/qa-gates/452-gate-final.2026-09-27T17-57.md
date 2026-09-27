@@ -1,6 +1,6 @@
 # #452 Re-gate, Final (P14-T3)
 
-Timestamp: 2026-09-27T17-58
+Timestamp: 2026-09-27T17-57
 Command: poetry run pytest -v <the ten B1 node IDs> ; sh SCRATCH/run-ps.sh SCRATCH/pester-counts.ps1 -Path tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1
 EXIT_CODE: 0
 Output Summary: PASS. Run on the merged tree (HEAD 4dc5d488945ff59fb3ebbc67312b7bb87491072f, FINAL_BASE beae3f021674e64fa6662097fe48a332d8da62b8), fixtures unmodified. P14-T2 recorded no gate fixture outside the five B1 fixtures, so the P0-T21 command is extended by zero node IDs (added node IDs: none) and runs as the ten B1 node IDs; it exited 0 with "10 passed" and one PASSED line per node. The #452 Pester gate form of the Terms (one unfiltered pester-counts run over the parity file, substituting for the per-fixture filter of P0-T22, which selects 0 tests under Pester 5.6.1) printed TotalCount=80, PassedCount=80, FailedCount=0, zero result lines beginning "[-]" after ANSI colour codes were removed, and exactly two "[+]" result lines ending " for F" for each of the five gate fixtures recorded by P14-T2. Both commands exited 0.

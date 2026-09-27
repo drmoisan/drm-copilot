@@ -1,6 +1,6 @@
 # PowerShell Coverage Delta (P16-T5)
 
-Timestamp: 2026-09-27T18-24
+Timestamp: 2026-09-27T18-10
 Command: poetry run python SCRATCH/changed-lines-cov.py jacoco SCRATCH/pester-final.xml beae3f021674e64fa6662097fe48a332d8da62b8 .claude/lib/blast-radius/BlastRadius.psm1 .claude/lib/blast-radius/BlastRadiusValidation.psm1
 EXIT_CODE: 0
 Output Summary: PASS. Facade BlastRadius.psm1: baseline 100 (P0-T32), final 100 (P16-T4), delta 0. Validation module BlastRadiusValidation.psm1: baseline 97, final 97.03, delta +0.03. Both are at least their baseline and at least 85. New modules (no baseline): BlastRadiusScheduling.psm1 100 and BlastRadiusWriteIntent.psm1 100, both >= 85. Script changed-lines-cov (B42), anchored to FINAL_BASE beae3f021674e64fa6662097fe48a332d8da62b8, printed Found=True and ChangedLinePercent=100.00 for the facade (15 of 15 changed executable lines covered) and for the validation module (2 of 2).

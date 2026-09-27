@@ -1,6 +1,6 @@
 # Acceptance-criteria Check-off, Phase 15 (P15-T6)
 
-Timestamp: 2026-09-27T18-14
+Timestamp: 2026-09-27T18-04
 Command: edit of FEATURE/spec.md (the AC-34 checkbox changed from unchecked to a lowercase x; criterion text unchanged)
 EXIT_CODE: 0
 Output Summary: One criterion checked off in FEATURE/spec.md: AC-34 (spec line 692, the 34th checkbox line of the Acceptance Criteria section, confirmed by counting checkbox lines in document order). Its traceability row cites evidence/qa-gates/final-python-pytest-coverage.
@@ -9,7 +9,7 @@ Output Summary: One criterion checked off in FEATURE/spec.md: AC-34 (spec line 6
 
 | ID | Spec criterion (abbreviated) | Evidence cited by the traceability row | Evidence file |
 | --- | --- | --- | --- |
-| AC-34 | Python toolchain and coverage | evidence/qa-gates/final-python-pytest-coverage | FEATURE/evidence/qa-gates/final-python-pytest-coverage.2026-09-27T18-12.md; FEATURE/evidence/qa-gates/final-python-black.2026-09-27T18-06.md; FEATURE/evidence/qa-gates/final-python-ruff.2026-09-27T18-07.md; FEATURE/evidence/qa-gates/final-python-pyright.2026-09-27T18-08.md; FEATURE/evidence/qa-gates/python-coverage-delta.2026-09-27T18-13.md |
+| AC-34 | Python toolchain and coverage | evidence/qa-gates/final-python-pytest-coverage | FEATURE/evidence/qa-gates/final-python-pytest-coverage.2026-09-27T18-03.md; FEATURE/evidence/qa-gates/final-python-black.2026-09-27T18-00.md; FEATURE/evidence/qa-gates/final-python-ruff.2026-09-27T18-00.md; FEATURE/evidence/qa-gates/final-python-pyright.2026-09-27T18-01.md; FEATURE/evidence/qa-gates/python-coverage-delta.2026-09-27T18-03.md |
 
 ## Verification against the criterion text
 

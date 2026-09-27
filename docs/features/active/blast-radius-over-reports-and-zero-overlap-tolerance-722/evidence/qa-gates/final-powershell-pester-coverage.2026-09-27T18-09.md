@@ -1,6 +1,6 @@
 # Final PowerShell Tests and Coverage (P16-T4)
 
-Timestamp: 2026-09-27T18-23
+Timestamp: 2026-09-27T18-09
 Command: sh SCRATCH/run-ps.sh SCRATCH/pester-coverage.ps1 -TestPath tests/scripts/claude-lib/blast-radius -CoveragePath .claude/lib/blast-radius/BlastRadiusScheduling.psm1,.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1,.claude/lib/blast-radius/BlastRadius.psm1,.claude/lib/blast-radius/BlastRadiusValidation.psm1 -CoverageOutputPath SCRATCH/pester-final.xml ; sh SCRATCH/run-ps.sh SCRATCH/pester-counts.ps1 -Path tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1 ; sh SCRATCH/run-ps.sh SCRATCH/pester-counts.ps1 -Path tests/scripts/claude-runtime/test-name-uniqueness.Tests.ps1
 EXIT_CODE: 0
 Output Summary: PASS. Blast-radius Pester suite: TotalCount=534, PassedCount=534, FailedCount=0, no FAILED line, zero "[-]" result lines (the P0-T32 baseline failure set is empty, so there is no failure to compare). Every It in the three files carrying the B23, B24, and B34 blocks passed: BlastRadiusScheduling.Tests.ps1 50 passed / 0 failed, BlastRadius.HistoricalRuns.Tests.ps1 9 / 0, BlastRadiusWriteIntent.Tests.ps1 28 / 0. LinePercent per B41 module: BlastRadiusScheduling.psm1 100 (122/122), BlastRadiusWriteIntent.psm1 100 (102/102), BlastRadius.psm1 100 (107/107), BlastRadiusValidation.psm1 97.03 (98/101); all >= 85. Convention test (B46): TotalCount=6, PassedCount=6, FailedCount=0. Uniqueness guard (B47): TotalCount=5, PassedCount=5, FailedCount=0. All three runs exited 0.

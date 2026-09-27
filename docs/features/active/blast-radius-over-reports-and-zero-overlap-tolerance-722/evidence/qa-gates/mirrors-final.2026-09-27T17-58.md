@@ -1,6 +1,6 @@
 # Mirror Identity, Final (P14-T6)
 
-Timestamp: 2026-09-27T18-02
+Timestamp: 2026-09-27T17-58
 Command: sh SCRATCH/run-ps.sh SCRATCH/file-hashes.ps1 <the nine block B37 primary and mirror paths, eighteen paths>
 EXIT_CODE: 0
 Output Summary: PASS. Script file-hashes (A5) exited 0 and printed two equal SHA256 Hash values for each of the nine block B37 mirror pairs: the BlastRadius, BlastRadiusScheduling, BlastRadiusWriteIntent, and BlastRadiusValidation modules; the Pester runsettings pair; the parallel-orchestration rule file; the parallel-plan and parallel-add skills; and the parallel-planner agent. Every pair is equal.

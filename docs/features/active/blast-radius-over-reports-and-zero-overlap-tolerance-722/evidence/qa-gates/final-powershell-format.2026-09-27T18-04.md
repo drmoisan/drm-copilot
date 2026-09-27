@@ -1,9 +1,9 @@
 # Final PowerShell Format (P16-T1)
 
-Timestamp: 2026-09-27T18-17
+Timestamp: 2026-09-27T18-04
 Command: sh SCRATCH/run-ps.sh SCRATCH/file-hashes.ps1 <the ten B40 files> ; mcp__drm-copilot__run_poshqc_format (workspace_root = repository root, scan_folders = the ten B40 files) ; sh SCRATCH/run-ps.sh SCRATCH/file-hashes.ps1 <the ten B40 files>
 EXIT_CODE: 0
-Output Summary: PASS. Both file-hashes runs exited 0. The MCP format call returned without raising ({"ok":true, ..., "summary":"Ran bundled PoshQC format ... with 10 selected scan folder(s)."}). All ten SHA256 hashes are identical before and after the call, and git status --porcelain printed nothing afterwards, so the formatter changed no file. No mirror re-copy was required and Phase 16 does not restart; the mirrors-final artifact of P14-T6 (FEATURE/evidence/qa-gates/mirrors-final.2026-09-27T18-02.md, every pair equal) remains current.
+Output Summary: PASS. Both file-hashes runs exited 0. The MCP format call returned without raising ({"ok":true, ..., "summary":"Ran bundled PoshQC format ... with 10 selected scan folder(s)."}). All ten SHA256 hashes are identical before and after the call, and git status --porcelain printed nothing afterwards, so the formatter changed no file. No mirror re-copy was required and Phase 16 does not restart; the mirrors-final artifact of P14-T6 (FEATURE/evidence/qa-gates/mirrors-final.2026-09-27T17-58.md, every pair equal) remains current.
 
 ## Hashes before and after
 

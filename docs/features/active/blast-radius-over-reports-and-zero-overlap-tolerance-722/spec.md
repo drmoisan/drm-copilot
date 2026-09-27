@@ -672,7 +672,7 @@ reporting done.
 - [x] The TypeScript derivation core carries conflict_tolerance, write_intent_extraction, and
   path_roots verbatim; blast-radius-derive-tolerance-keys.test confirms each reaches the destination
   document; the key-order assertions and the source-document helper are updated and pass.
-- [ ] Every new or changed PowerShell module has a content-identical bundled mirror, is registered in
+- [x] Every new or changed PowerShell module has a content-identical bundled mirror, is registered in
   both Pester runsettings copies, and is listed in the Claude pack manifest; the push-down
   resource-contract and pack-manifest completeness tests pass.
 - [x] No file in the bash library directory is changed.
@@ -693,7 +693,7 @@ reporting done.
   >= 75% branch coverage on every new or changed Python file and no regression on changed lines.
 - [x] PowerShell toolchain passes in a single pass (formatter, PSScriptAnalyzer, Pester) with >= 85%
   line coverage on every new or changed module.
-- [ ] TypeScript toolchain passes in a single pass (prettier, eslint, tsc, jest) with >= 85% line and
+- [x] TypeScript toolchain passes in a single pass (prettier, eslint, tsc, jest) with >= 85% line and
   >= 75% branch coverage on the changed derivation core.
 - [ ] No new or changed file exceeds 500 lines, and each plan batch stays within 3 production and
   3 test files per language.

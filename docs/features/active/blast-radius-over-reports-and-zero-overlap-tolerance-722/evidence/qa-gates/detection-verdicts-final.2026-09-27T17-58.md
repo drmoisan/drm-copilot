@@ -1,6 +1,6 @@
 # Detection Verdicts Unchanged, Final (P14-T5)
 
-Timestamp: 2026-09-27T18-01
+Timestamp: 2026-09-27T17-58
 Command: poetry run pytest -v tests/scripts/dev_tools -k conflict_fixture_reproduces ; sh SCRATCH/run-ps.sh SCRATCH/pester-counts.ps1 -Path tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1 -FullNameFilter "*Blast-radius contention parity*"
 EXIT_CODE: 0
 Output Summary: PASS. Run on the merged tree (HEAD 4dc5d488945ff59fb3ebbc67312b7bb87491072f). The block B36 Python selection (CMD-PY-TEST-K with expression conflict_fixture_reproduces) collected 30 of 5190 nodes (15 verdict and 15 reasons nodes over the 15 top-level conflict fixtures) and printed "30 passed, 5160 deselected", exit 0. The Pester parity file filtered with the B36 filter *Blast-radius contention parity* (a Describe-level name, which the FullName filter matches without template expansion) printed TotalCount=80, PassedCount=30, FailedCount=0, exit 0. PassedCount is at least 1, so the filter selected tests.

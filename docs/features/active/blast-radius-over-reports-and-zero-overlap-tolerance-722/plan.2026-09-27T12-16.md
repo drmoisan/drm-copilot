@@ -1233,26 +1233,26 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 17 — Final QA: TypeScript
 
-- [ ] [P17-T1] Run CMD-TS-FORMAT, recording CMD-GIT-STATUS-PATH over extensions/drm-copilot before and
+- [x] [P17-T1] Run CMD-TS-FORMAT, recording CMD-GIT-STATUS-PATH over extensions/drm-copilot before and
       after it; then run CMD-TS-PRETTIER-CHECK over every TypeScript file written by this plan. Write
       FEATURE/evidence/qa-gates/final-ts-prettier.TS.md. Acceptance: the check exits 0 and prints "All
       matched files use Prettier code style!". If the status changed, restart Phase 17.
-- [ ] [P17-T2] Run CMD-TS-LINT. Write FEATURE/evidence/qa-gates/final-ts-eslint.TS.md. Acceptance:
+- [x] [P17-T2] Run CMD-TS-LINT. Write FEATURE/evidence/qa-gates/final-ts-eslint.TS.md. Acceptance:
       exit 0.
-- [ ] [P17-T3] Run CMD-TS-TYPECHECK. Write FEATURE/evidence/qa-gates/final-ts-typecheck.TS.md.
+- [x] [P17-T3] Run CMD-TS-TYPECHECK. Write FEATURE/evidence/qa-gates/final-ts-typecheck.TS.md.
       Acceptance: exit 0.
-- [ ] [P17-T4] Run CMD-TS-COV. Write FEATURE/evidence/qa-gates/final-ts-jest-coverage.TS.md.
+- [x] [P17-T4] Run CMD-TS-COV. Write FEATURE/evidence/qa-gates/final-ts-jest-coverage.TS.md.
       Acceptance: exit 0 (the jest configuration already carries an 85 line and 75 branch threshold for
       the derivation core, so a lower value fails the run); the artifact records the Tests summary line
       and the % Lines and % Branch of the derivation core row; the pack-manifest completeness test
       passes.
-- [ ] [P17-T5] TypeScript coverage delta: run CMD-PY-SCRIPT with script changed-lines-cov (B42) and
+- [x] [P17-T5] TypeScript coverage delta: run CMD-PY-SCRIPT with script changed-lines-cov (B42) and
       arguments lcov extensions/drm-copilot/coverage/lcov.info FINAL_BASE
       `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts` (the lcov file
       written by P17-T4). Write FEATURE/evidence/qa-gates/ts-coverage-delta.TS.md with the P0-T31 and
       P17-T4 derivation-core values and the B42 output. Acceptance: the final % Lines and % Branch are
       each at least their baseline; B42 prints Found=True and a ChangedLinePercent of at least 85.
-- [ ] [P17-T6] Commit and push Phase 17 evidence: check off AC-31 and AC-36 per the Preamble check-off
+- [x] [P17-T6] Commit and push Phase 17 evidence: check off AC-31 and AC-36 per the Preamble check-off
       rule; run CMD-GIT-STATUS and stage with CMD-GIT-ADD every listed path that is backticked in this
       plan or lies under FEATURE (FEATURE/spec.md included); commit with message "test(722): record
       final TypeScript QA"; run CMD-GIT-PUSH. Acceptance: all git commands exit 0 and a final

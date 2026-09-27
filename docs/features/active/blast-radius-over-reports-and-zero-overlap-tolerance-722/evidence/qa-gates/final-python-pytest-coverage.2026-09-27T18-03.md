@@ -1,6 +1,6 @@
 # Final Python Tests and Coverage (P15-T4)
 
-Timestamp: 2026-09-27T18-12
+Timestamp: 2026-09-27T18-03
 Command: poetry run pytest --cov --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/coverage-722-final.json ; poetry run python SCRATCH/py-cov-files.py SCRATCH/coverage-722-final.json <the six block B38 files>
 EXIT_CODE: 1
 ExpectedExitCode: 1
