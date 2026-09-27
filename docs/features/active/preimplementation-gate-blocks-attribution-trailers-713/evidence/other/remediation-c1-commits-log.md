@@ -7,6 +7,7 @@ Branch: `bug/preimplementation-gate-blocks-attribution-trailers-713`. HEAD_SHA r
 | Phase | Commit SHA | Subject | Pushed |
 | --- | --- | --- | --- |
 | 0 | a30f52f6bc8a500bdae2db0928ab372a8c820951 | docs(evidence): record remediation cycle 1 baseline for issue #713 | yes (819369cc..a30f52f6) |
+| 1 | 755ba4094f49844290e7ab79e75fa0f30ab54860 | test(hooks): add typographic-quote deny rows for issue #713 | yes (a30f52f6..755ba409) |
 
 ## [P0-T11] hook denial (plan rule 10: BLOCKED)
 
@@ -54,3 +55,22 @@ Output:
 ```
 
 Porcelain note: `execution-deviations.md` is modified only by the orchestrator-mandated X4 append; it is staged in the Phase 1 commit together with this file.
+
+### Phase 1 ([P1-T5])
+
+Timestamp: 2026-09-27T05-04
+
+Commit: `git commit -F <SCRATCHPAD>/c1-phase1-commit.txt` (exit 0). Push: `git push origin bug/preimplementation-gate-blocks-attribution-trailers-713` (exit 0, `a30f52f6..755ba409`). The staging list added `evidence/other/execution-deviations.md` (X4 append) to the plan-named paths.
+
+Command: `git rev-parse HEAD`
+Output: `755ba4094f49844290e7ab79e75fa0f30ab54860`
+
+Command: `git log -1 --format=%B`
+Final two lines of the message body:
+
+```text
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01P1iNMUJbD7Uf29ACDCXuYg
+```
+
+TRAILERS_PRESENT: True

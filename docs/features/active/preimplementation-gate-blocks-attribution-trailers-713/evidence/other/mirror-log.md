@@ -45,3 +45,12 @@ Source SHA256: 69655FDE8CE7BE4C9A82F41CB35DAD7F2590BE02E9E309C678AF92144FA13A65
 Destination SHA256: 69655FDE8CE7BE4C9A82F41CB35DAD7F2590BE02E9E309C678AF92144FA13A65
 Equal: True
 
+## .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1
+
+Timestamp: 2026-09-27T05-06
+Source: .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1
+Destination: .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1
+Source SHA256: DC4E7DA545D2A8DADF9C11CDD0F1B08A5485ECAE2EE3AE2C1E090835035B0D65
+Destination SHA256: DC4E7DA545D2A8DADF9C11CDD0F1B08A5485ECAE2EE3AE2C1E090835035B0D65
+Equal: True
+
