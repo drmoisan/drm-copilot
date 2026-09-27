@@ -4,13 +4,13 @@
 # every file within the 500-line cap. Provides the git-binary test seam
 # (cleanup_wt_git), branch/worktree enumeration (enumerate_branches,
 # parse_worktree_list), path normalization (normalize_wt_path), the
-# current-worktree/branch protection set (compute_protected), and the main-freshness
-# warning (check_main_freshness). The classification ladder, consolidation, deletion,
-# and the CLI live in sibling files (cleanup_worktrees_lib.sh,
+# current-worktree/branch and base-branch protection set (compute_protected), and
+# the main-freshness warning (check_main_freshness). The classification ladder,
+# consolidation, deletion, and the CLI live in sibling files (cleanup_worktrees_lib.sh,
 # cleanup_worktrees_actions_lib.sh, cleanup-worktrees.sh).
 #
-# Sourcing contract: this library defines functions only; it never runs work at
-# source time, so the wrapper and the bats suites can source it without side effects.
+# Sourcing contract: defines functions and the single constant CLEANUP_WT_BASE_BRANCH
+# and runs no other work at source time, so wrapper and bats suites source it safely.
 # It MUST be sourced before cleanup_worktrees_lib.sh, whose classification functions
 # call cleanup_wt_git, parse_worktree_list, compute_protected, and normalize_wt_path
 # defined here.
@@ -27,9 +27,9 @@
 # (`out=$(...) || rc=$?`) BEFORE sorting, so a for-each-ref hard failure is observed
 # even when the caller lacks pipefail; it returns git's exit code with no stdout rather
 # than an empty branch list. compute_protected captures `git rev-parse --abbrev-ref
-# HEAD` and `git rev-parse --show-toplevel`; a hard failure of either is fatal (returns
-# git's exit code), never a weakened protection fallback. The detached-HEAD case
-# (rev-parse succeeds printing HEAD) is unaffected.
+# HEAD` and `git rev-parse --show-toplevel`; a hard failure of either is fatal (git's
+# exit code, no weakened fallback), and the base-branch record is emitted only after
+# both guards pass. The detached-HEAD case (rev-parse prints HEAD) is unaffected.
 
 cleanup_wt_git() {
 	# Resolve the git binary honoring the CLEANUP_WT_GIT_BIN override seam, then
@@ -163,6 +163,11 @@ normalize_wt_path() {
 	printf '%s\n' "$p"
 }
 
+# The ladder's fixed comparison base. compute_protected protects it by name in every
+# checkout topology and delete_candidate refuses it. It is deliberately not read from
+# the environment, so no override can unprotect the base branch (issue #594).
+CLEANUP_WT_BASE_BRANCH="main"
+
 compute_protected() {
 	# Compute the protected branch and protected worktree paths (PROTECTED_CURRENT).
 	#
@@ -174,6 +179,12 @@ compute_protected() {
 	# The main worktree (first porcelain stanza) is always protected regardless of the
 	# above. Emits `protected-branch|<name>` (omitted when detached) and one
 	# `protected-path|<normalized-path>` line per protected worktree.
+	#
+	# The base branch CLEANUP_WT_BASE_BRANCH is always protected by name, whichever
+	# worktree (if any) has it checked out. Its `protected-branch|` record is emitted
+	# only after both rev-parse guards pass, so the fail-closed contract below is
+	# unchanged, and it is omitted when the current branch already equals the base, so
+	# no duplicate record is emitted.
 	#
 	# Returns 0 on success. A parse_worktree_list hard failure propagates as its
 	# non-zero return; the caller must treat that as fatal, not as an empty (weakened)
@@ -195,6 +206,11 @@ compute_protected() {
 	norm_cur=$(normalize_wt_path "$current_top")
 	if [[ -n $current_branch && $current_branch != HEAD ]]; then
 		printf 'protected-branch|%s\n' "$current_branch"
+	fi
+	# Base-branch protection is unconditional and emitted only after both rev-parse
+	# guards pass; it is skipped when the current branch already equals the base.
+	if [[ $current_branch != "$CLEANUP_WT_BASE_BRANCH" ]]; then
+		printf 'protected-branch|%s\n' "$CLEANUP_WT_BASE_BRANCH"
 	fi
 	local first=1 record path norm pout prc=0
 	# Guarded parent-shell capture: a parse_worktree_list hard failure must abort here,

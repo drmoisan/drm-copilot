@@ -416,7 +416,7 @@ are not modified.
 
 ### Phase 2 — Base-Branch Constant and compute_protected Protection
 
-- [ ] [P2-T1] In `scripts/bash/cleanup_worktrees_enumerate_lib.sh`, insert immediately above
+- [x] [P2-T1] In `scripts/bash/cleanup_worktrees_enumerate_lib.sh`, insert immediately above
   the line `compute_protected() {` (line 166 at BASE_SHA; below line 116) a three-line comment
   followed by the plain assignment `CLEANUP_WT_BASE_BRANCH="main"` and one blank line. The
   comment states that the constant names the ladder's fixed comparison base, that
@@ -424,7 +424,7 @@ are not modified.
   refuses it, and that it is deliberately not read from the environment (issue #594).
   Acceptance: `grep -n -F 'CLEANUP_WT_BASE_BRANCH="main"' scripts/bash/cleanup_worktrees_enumerate_lib.sh`
   prints exactly one line whose number is greater than 116.
-- [ ] [P2-T2] In `scripts/bash/cleanup_worktrees_enumerate_lib.sh` `compute_protected`,
+- [x] [P2-T2] In `scripts/bash/cleanup_worktrees_enumerate_lib.sh` `compute_protected`,
   immediately after the existing block that prints `protected-branch|<current branch>` (the
   `fi` at line 198 at BASE_SHA, which follows both `rev-parse` hard-failure guards), insert a
   comment stating that base protection is unconditional, is emitted only after both guards
@@ -434,13 +434,13 @@ are not modified.
   shfmt defaults). Acceptance: `grep -n -F '"$CLEANUP_WT_BASE_BRANCH"' scripts/bash/cleanup_worktrees_enumerate_lib.sh`
   prints exactly two lines (the new `if` line and the new `printf` line), and both line numbers
   are greater than the line number of the `ctrc` guard's `return "$ctrc"`.
-- [ ] [P2-T3] Update the docstring of `compute_protected` in `scripts/bash/cleanup_worktrees_enumerate_lib.sh`
+- [x] [P2-T3] Update the docstring of `compute_protected` in `scripts/bash/cleanup_worktrees_enumerate_lib.sh`
   (the comment block under `compute_protected() {`) to state that the base branch `CLEANUP_WT_BASE_BRANCH` is always
   protected by name, that its `protected-branch|` record is emitted after both `rev-parse`
   guards pass (the fail-closed contract is unchanged), and that it is omitted only when the
   current branch already equals the base (no duplicate record). Acceptance: the docstring
   block contains the token `CLEANUP_WT_BASE_BRANCH`.
-- [ ] [P2-T4] Reword the file header of `scripts/bash/cleanup_worktrees_enumerate_lib.sh`
+- [x] [P2-T4] Reword the file header of `scripts/bash/cleanup_worktrees_enumerate_lib.sh`
   (lines 1-32) so that the description of `compute_protected` names the base branch (for
   example "current-worktree/branch and base-branch protection set") and the lines 29-32
   paragraph states that the base-branch record is emitted only after both `rev-parse` guards;
