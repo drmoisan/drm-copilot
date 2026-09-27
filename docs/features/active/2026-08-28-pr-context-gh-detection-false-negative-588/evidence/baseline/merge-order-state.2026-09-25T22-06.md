@@ -77,3 +77,5 @@ REQUIRED_JEST_KEYS: ./src/lib/executable-resolver.ts, ./src/lib/pr-context/rende
 TITLE_COLLISIONS: none (every final name equals its planned name)
 
 Consistency: no parameter is present without its default; neither builder state is `PARTIAL`; both call sites are `PRESENT` with builder state `PARAM-ONLY`, which is consistent. All ranges have start <= end.
+
+FAIL_BEFORE_EXCEPTION: NOT-REQUIRED

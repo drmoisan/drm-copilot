@@ -76,6 +76,44 @@ class ScriptRunner implements CommandRunner {
   }
 }
 
+/**
+ * Runner whose `gh` at GH_PATH is installed and authenticated. Records every
+ * argv; non-gh argv is delegated to {@link ScriptRunner}.
+ */
+class AuthenticatedGhRunner implements CommandRunner {
+  readonly calls: string[][] = [];
+
+  run(args: readonly string[], options?: CommandRunOptions): CommandResult {
+    this.calls.push([...args]);
+    if (args[0] !== GH_PATH) {
+      return new ScriptRunner().run(args, options);
+    }
+    const result = this.dispatchGh(args.slice(1));
+    if (!(options?.allowError ?? false) && result.code !== 0) {
+      throw new Error(`${args.join(" ")} failed (${result.code})`);
+    }
+    return result;
+  }
+
+  private dispatchGh(sub: readonly string[]): CommandResult {
+    const joined = sub.join(" ");
+    if (joined === "auth status") {
+      return ok("Logged in");
+    }
+    if (joined === "repo view --json nameWithOwner") {
+      return ok('{"nameWithOwner": "owner/repo"}');
+    }
+    if (sub.includes("pr") && sub.includes("view")) {
+      return fail("no pull request");
+    }
+    if (sub[0] === "run" && sub[1] === "list") {
+      return ok("[]");
+    }
+    // `api ...` and every other gh call answer an empty JSON object.
+    return ok("{}");
+  }
+}
+
 /** Seed a minimal repo with a `.git` marker so resolveRoot returns ROOT. */
 function seedWorkspace(): TreeFileSystem {
   const fs = new TreeFileSystem();
@@ -282,5 +320,28 @@ describe("collectPrContextServiceCall", () => {
       `Wrote context summary to: ${ROOT}/artifacts/pr_context.summary.txt`,
       `Wrote context appendix to: ${ROOT}/artifacts/pr_context.appendix.txt`,
     ]);
+  });
+
+  it("invokes the resolved gh with auth status and reports the authenticated repository", () => {
+    // Arrange: an injected resolver returns GH_PATH, and gh is authenticated.
+    const fs = seedWorkspace();
+    const runner = new AuthenticatedGhRunner();
+    const input = {
+      runner,
+      fileSystem: fs,
+      workspaceRoot: ROOT,
+      base: "main",
+      whichGh: () => GH_PATH,
+    };
+
+    // Act
+    collectPrContextServiceCall(input);
+
+    // Assert: the resolved gh was asked for auth status, and the summary
+    // reports the authenticated repository.
+    expect(runner.calls).toContainEqual([GH_PATH, "auth", "status"]);
+    expect(
+      fs.readTextFile(`${ROOT}/artifacts/pr_context.summary.txt`),
+    ).toContain("GitHub CLI authenticated for owner/repo");
   });
 });
