@@ -290,3 +290,15 @@ Porcelain (pre-staging):
 Staged paths: `docs/features/active/codex-gates-4-5-lack-epic-scope-707/spec.md` (25 AC check-offs; AC-16 unchecked per RS-6), `docs/features/active/codex-gates-4-5-lack-epic-scope-707/plan.2026-09-26T22-55.md` ([P7-T1] to [P7-T28] check-offs), and the evidence directory `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence` (which carries this file, including the Phase 6 post-commit append).
 
 Message: `docs(bug): check off #707 acceptance criteria and record status` with the two session attribution trailer lines.
+
+Commit SHA: 955c1728f989378f6a5244b5bbf3ab111b50af64
+
+`git commit` reported 5 files changed: spec.md, the plan file, commits.md, and the new ac-status-summary.md and follow-ups.md.
+
+Porcelain (post-commit, pre-append):
+
+```
+(empty)
+```
+
+This post-commit entry is committed on its own with `git commit -F <SCRATCHPAD>/final-append.txt -- docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/other/commits.md` (message `docs(bug): record #707 phase 7 commit log`). The [P7-T29] plan check-off is the only change the plan leaves uncommitted.
