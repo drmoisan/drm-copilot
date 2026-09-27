@@ -824,9 +824,9 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 8 — Part B: Python Write-Intent Module and Flag Branches
 
-- [ ] [P8-T1] Reset the Python batch budget (A8, -Kind python). Write
+- [x] [P8-T1] Reset the Python batch budget (A8, -Kind python). Write
       FEATURE/evidence/other/batch-budget-reset-p8.TS.md. Acceptance: exit 0.
-- [ ] [P8-T2] Create the eight write-intent fixtures exactly as specified in block B31 of Appendix B:
+- [x] [P8-T2] Create the eight write-intent fixtures exactly as specified in block B31 of Appendix B:
       `tests/fixtures/blast_radius/write-intent/write-intent-glob-mention.json`,
       `tests/fixtures/blast_radius/write-intent/write-intent-command-span.json`,
       `tests/fixtures/blast_radius/write-intent/write-intent-read-task.json`,
@@ -836,34 +836,34 @@ the read-only check script A6 and a before-and-after hash comparison.
       `tests/fixtures/blast_radius/write-intent/write-intent-shared-surface-read-citation.json`, and
       `tests/fixtures/blast_radius/write-intent/write-intent-flag-absent-matches-current.json`.
       Acceptance: all eight parse as JSON and carry the inputs and expected values of B31.
-- [ ] [P8-T3] Write `tests/scripts/dev_tools/test_blast_radius_write_intent.py` with exactly the tests
+- [x] [P8-T3] Write `tests/scripts/dev_tools/test_blast_radius_write_intent.py` with exactly the tests
       of block B32. Acceptance: the file exists and is at most 500 lines.
-- [ ] [P8-T4] [expect-fail] Run CMD-PY-TEST over the P8-T3 file before the module exists. Write
+- [x] [P8-T4] [expect-fail] Run CMD-PY-TEST over the P8-T3 file before the module exists. Write
       FEATURE/evidence/regression-testing/write-intent-tests-fail-before.TS.md with ExpectedExitCode: 2.
       Acceptance: pytest exits 2 with a collection error naming the missing write-intent module.
-- [ ] [P8-T5] Create `scripts/dev_tools/_blast_radius_write_intent.py` implementing block B33: rules W1
+- [x] [P8-T5] Create `scripts/dev_tools/_blast_radius_write_intent.py` implementing block B33: rules W1
       through W6, the read-verb, write-verb, and placeholder-stem constants, the strict readers for
       write_intent_extraction and path_roots, the token-level entry filter, and the single extractor
       selector used by derivation and validation. Acceptance: the file exists and is at most 500 lines.
-- [ ] [P8-T6] Edit `scripts/dev_tools/compute_blast_radius.py`: in derivation, when the flag is true,
+- [x] [P8-T6] Edit `scripts/dev_tools/compute_blast_radius.py`: in derivation, when the flag is true,
       take plan paths from the selector, take no paths from the spec, and take contracts from the
       write-intent spec-contract function; in normalization, when the flag is true, apply the token-level
       entry filter before the mandate-read filter. When the flag is absent or false, both functions
       execute exactly the current statements. Acceptance: the file is at most 500 lines. Stop
       condition: if the edit would exceed 500 lines, move the branch logic into the P8-T5 module and
       record the relocation in the P8-T8 artifact.
-- [ ] [P8-T7] Edit `scripts/dev_tools/_blast_radius_validation.py`: replace the plan-side extraction
+- [x] [P8-T7] Edit `scripts/dev_tools/_blast_radius_validation.py`: replace the plan-side extraction
       call used by V1 and V2 with the selector of P8-T5. Acceptance: the file is at most 500 lines. Stop
       condition: if the edit would exceed 500 lines, move the remaining selection logic into the P8-T5
       module instead and record the relocation in the P8-T8 artifact.
-- [ ] [P8-T8] Run CMD-PY-TEST over the P8-T3 file, then CMD-PY-TEST-K with expression blast_radius.
+- [x] [P8-T8] Run CMD-PY-TEST over the P8-T3 file, then CMD-PY-TEST-K with expression blast_radius.
       Write FEATURE/evidence/regression-testing/write-intent-python.TS.md. Acceptance: the first run
       exits 0 with a PASSED line for every B32 test; every FAILED node of the second run is in the P0-T18
       baseline failure set.
-- [ ] [P8-T9] Run CMD-PY-BLACK, CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT over the four Python
+- [x] [P8-T9] Run CMD-PY-BLACK, CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT over the four Python
       files of this phase. Write FEATURE/evidence/qa-gates/phase8-python-static.TS.md. Acceptance: as in
       P1-T14.
-- [ ] [P8-T10] Commit and push Phase 8 (the eight fixtures, the four Python files, and the FEATURE
+- [x] [P8-T10] Commit and push Phase 8 (the eight fixtures, the four Python files, and the FEATURE
       evidence directory; message "feat(722): add write-intent extraction (Python)"). Acceptance: all
       three git commands exit 0.
 

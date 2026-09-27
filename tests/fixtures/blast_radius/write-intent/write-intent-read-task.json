@@ -1,0 +1,39 @@
+{
+  "description": "Issue #722 write-intent rule W3 (read task). T1 is a read task whose attribution window includes its continuation line; T2 starts with a read verb but its title carries the write verb fix; T3 is a write task; T4 is a read task behind a bold label. Only the T2 and T3 tokens survive.",
+  "tags": ["#722"],
+  "config": {
+    "version": 1,
+    "shared_surfaces": ["poetry.lock", "config/blast-radius.json"],
+    "shared_surface_globs": [],
+    "mandate_reads": [".claude/rules/**", ".github/copilot-instructions.md"],
+    "mergeable_paths": [],
+    "write_intent_extraction": true,
+    "path_roots": ["src", "config", "docs", "tests", ".claude"],
+    "modules": { "config": ["config/**"] },
+    "over_breadth_fraction": 0.25
+  },
+  "items": [
+    {
+      "key": 1,
+      "feature_folder": "demo-feature-1",
+      "plan_text": "- [ ] [P1-T1] Read `src/policy.py` in full.\n      Also cite `src/policy_detail.py`.\n- [ ] [P1-T2] Verify and fix `src/fixme.py`.\n- [ ] [P1-T3] Update `src/app.py`.\n- [ ] [P1-T4] **Baseline:** Read `src/base.py`.\n",
+      "spec_text": ""
+    }
+  ],
+  "cases": [
+    {
+      "name": "write-intent",
+      "config_overrides": {},
+      "remove_keys": [],
+      "expected_radii": [
+        {
+          "key": 1,
+          "paths": ["docs/features/active/demo-feature-1/**", "src/app.py", "src/fixme.py"],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": []
+        }
+      ]
+    }
+  ]
+}

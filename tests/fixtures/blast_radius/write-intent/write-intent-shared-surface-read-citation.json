@@ -1,0 +1,93 @@
+{
+  "description": "Issue #722 shared-surface read citation. Item 1 (A) cites the shared surface only in a read task and item 4 (D) only in a command span, so neither records the surface; items 2 (B) and 3 (C) name it in write tasks, keep it as a shared surface, and form a hard edge at tolerance 100. No pair with A or D is an edge or a tolerated overlap.",
+  "tags": ["#722"],
+  "config": {
+    "version": 1,
+    "shared_surfaces": ["poetry.lock", "config/blast-radius.json"],
+    "shared_surface_globs": [],
+    "mandate_reads": [".claude/rules/**", ".github/copilot-instructions.md"],
+    "mergeable_paths": [],
+    "write_intent_extraction": true,
+    "path_roots": ["src", "config", "docs", "tests", ".claude"],
+    "modules": { "config": ["config/**"] },
+    "over_breadth_fraction": 0.25
+  },
+  "items": [
+    {
+      "key": 1,
+      "feature_folder": "demo-feature-a",
+      "plan_text": "- [ ] [P1-T1] Read `config/blast-radius.json` in full.\n- [ ] [P1-T2] Update `src/a_module.py`.\n",
+      "spec_text": ""
+    },
+    {
+      "key": 2,
+      "feature_folder": "demo-feature-b",
+      "plan_text": "- [ ] [P1-T1] Update `config/blast-radius.json` to add the key.\n- [ ] [P1-T2] Update `src/b_module.py`.\n",
+      "spec_text": ""
+    },
+    {
+      "key": 3,
+      "feature_folder": "demo-feature-c",
+      "plan_text": "- [ ] [P1-T1] Update `config/blast-radius.json` with a second key.\n",
+      "spec_text": ""
+    },
+    {
+      "key": 4,
+      "feature_folder": "demo-feature-d",
+      "plan_text": "- [ ] [P1-T1] Update `src/d_module.py`; run `git diff config/blast-radius.json`.\n",
+      "spec_text": ""
+    }
+  ],
+  "cases": [
+    {
+      "name": "tolerance-100",
+      "config_overrides": {
+        "conflict_tolerance": {
+          "tolerance_percent": 100,
+          "weights": { "same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2 },
+          "band_durations": { "C1": 1, "C2": 2, "C3": 4, "C4": 8 },
+          "default_band": "C1",
+          "append_only_paths": [
+            "**/CHANGELOG.md",
+            "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+          ]
+        }
+      },
+      "remove_keys": [],
+      "expected_radii": [
+        {
+          "key": 1,
+          "paths": ["docs/features/active/demo-feature-a/**", "src/a_module.py"],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": []
+        },
+        {
+          "key": 2,
+          "paths": ["config/blast-radius.json", "docs/features/active/demo-feature-b/**", "src/b_module.py"],
+          "modules": ["config"],
+          "shared_surfaces": ["config/blast-radius.json"],
+          "contracts": []
+        },
+        {
+          "key": 3,
+          "paths": ["config/blast-radius.json", "docs/features/active/demo-feature-c/**"],
+          "modules": ["config"],
+          "shared_surfaces": ["config/blast-radius.json"],
+          "contracts": []
+        },
+        {
+          "key": 4,
+          "paths": ["docs/features/active/demo-feature-d/**", "src/d_module.py"],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": []
+        }
+      ],
+      "expected_edges": [
+        { "a": 2, "b": 3, "reason": "path_overlap", "hard": true, "cost": 10, "benefit": 1 }
+      ],
+      "expected_tolerated": []
+    }
+  ]
+}
