@@ -457,8 +457,12 @@ each path.
           }
       }
       ```
-      with the same block plus, before the final `}`, a new sibling `Context`:
+      with the same block plus, before the final `}`, exactly one blank line inserted immediately after
+      the closing brace of the existing `It 'leaves no Codex batch-budget state behind'` block (matching
+      this file's own existing blank-line convention between sibling `Context`/`It` blocks, per current
+      lines 128-130, 143-145, 166-168, 179-181, and 190-192), followed by a new sibling `Context`:
       ```
+
           Context 'Non-vacuity floor for the registration count' {
               It 'documents that the legacy expression @($null).Count -gt 0 evaluates to $true while the filtered form is $false' {
                   (@($null).Count -gt 0) | Should -BeTrue
