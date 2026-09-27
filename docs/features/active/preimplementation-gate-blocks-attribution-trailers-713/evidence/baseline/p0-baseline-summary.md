@@ -1,6 +1,6 @@
 # P0-T14 Baseline Gate Summary
 
-Timestamp: 2026-09-27T03-34
+Timestamp: 2026-09-27T03-31
 
 Source artifacts: `evidence/baseline/p0-poshqc-format.md`, `evidence/baseline/p0-poshqc-analyze.md`, `evidence/baseline/p0-scoped-coverage.md`, `evidence/baseline/p0-pester-full.md`, `evidence/baseline/p0-pytest-push-down.md`.
 

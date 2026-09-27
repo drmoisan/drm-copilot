@@ -28,12 +28,12 @@ $script:OrchestrationBookkeepingTrees = @(
 )
 
 # Characters that make a command line statically unresolvable (D4 row 12, as narrowed by
-# issue #663). Interpolation characters are unresolvable in every quote state, because a
-# double-quoted span still expands them. Redirection characters are unresolvable only
-# outside a quoted span: inside single or double quotes the shell treats `<` and `>` as
-# literal text, so a quoted Co-Authored-By trailer is not a redirection.
+# issues #663 and #713). Interpolation characters are unresolvable outside quotes and in a
+# double-quoted span, which still expands them; a single-quoted span keeps them literal.
+# Outside-quote characters (`<`, `>`, and the `#` comment introducer) are unresolvable only
+# outside a quoted span, so a quoted Co-Authored-By trailer or a quoted `#` is literal text.
 $script:InterpolationCommandCharacters = [char[]]@('$', '`')
-$script:RedirectionCommandCharacters = [char[]]@('>', '<')
+$script:OutsideQuoteCommandCharacters = [char[]]@('>', '<', '#')
 
 # Wildcards that make an operand a glob (D4 row 15). Only the literal prefix before the
 # first of these is prefix-tested.
@@ -112,10 +112,10 @@ function Test-OrchestrationCommandTextUnresolvable {
     .SYNOPSIS
         Reports whether a command line carries a statically unresolvable character.
     .DESCRIPTION
-        Realizes D4 row 12 as narrowed by issue #663. Quote state is tracked with the same
-        state machine as Split-OrchestrationCommandLine. An interpolation character (`$` or
-        backtick) answers true in any quote state; a redirection character (`<` or `>`)
-        answers true only outside a quoted span. Backslash escapes are not modelled, so a
+        Realizes D4 row 12 as narrowed by issues #663 and #713, with quote state tracked as in
+        Split-OrchestrationCommandLine. `$` or backtick answers true outside quotes or inside
+        double quotes (single quotes keep it literal); `<`, `>`, or a `#` comment answers true
+        only outside a quoted span. Backslash escapes are not modelled, so a
         backslash before any quote character, or anywhere inside a double-quoted span,
         answers true: the shell may end the span where this scan does not (fail closed).
     .PARAMETER CommandText
@@ -135,9 +135,9 @@ function Test-OrchestrationCommandTextUnresolvable {
     $openQuote = [char]0
 
     # Scan every character once, tracking whether it sits inside a quoted span so that
-    # redirection characters are judged only where the shell would honour them.
+    # outside-quote characters are judged only where the shell would honour them.
     foreach ($character in $CommandText.ToCharArray()) {
-        if ($script:InterpolationCommandCharacters -contains $character) {
+        if ($openQuote -ne "'" -and $script:InterpolationCommandCharacters -contains $character) {
             return $true
         }
 
@@ -153,7 +153,7 @@ function Test-OrchestrationCommandTextUnresolvable {
             }
         } elseif ($character -eq '"' -or $character -eq "'") {
             $openQuote = $character
-        } elseif ($script:RedirectionCommandCharacters -contains $character) {
+        } elseif ($script:OutsideQuoteCommandCharacters -contains $character) {
             return $true
         }
     }
@@ -393,21 +393,21 @@ function Test-ExemptOrchestrationSegmentToken {
             }
 
             if ($candidate.StartsWith('-')) {
-                # The message option is the only modelled option on either subcommand. Rows
+                # Only the message and trailer options of commit are modelled (issue #713). Rows
                 # 2, 5, 6, 8, and 10 all land here and deny, including a dash-leading
                 # operand supplied without a preceding separator.
                 if ($subcommand -cne 'commit') {
                     return $false
                 }
-                if ($candidate -ceq '-m' -or $candidate -ceq '--message') {
-                    # The message value is the following token and is not a pathspec.
+                if ($candidate -ceq '-m' -or $candidate -ceq '--message' -or $candidate -ceq '--trailer') {
+                    # The message or trailer value is the following token and is not a pathspec.
                     $index += 2
                     if ($index -gt $Token.Count) {
                         return $false
                     }
                     continue
                 }
-                if ($candidate.StartsWith('--message=') -or
+                if ($candidate.StartsWith('--message=') -or $candidate.StartsWith('--trailer=') -or
                     ($candidate.Length -gt 2 -and $candidate.StartsWith('-m'))) {
                     $index++
                     continue

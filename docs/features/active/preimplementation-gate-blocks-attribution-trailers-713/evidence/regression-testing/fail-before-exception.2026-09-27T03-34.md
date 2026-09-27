@@ -1,6 +1,6 @@
 # Fail-Before Exception Dossier (D13)
 
-Timestamp: 2026-09-27T03-46
+Timestamp: 2026-09-27T03-34
 Case: admits an inline angle-bracket attribution in a double-quoted subject
 WhyFailingRunImpossible: issue #663 (PR #700) already rejects < and > only outside quotes, so the unmodified helpers admit a quoted Co-Authored-By: Name <email> text and no failing run exists on this base.
 

@@ -1,6 +1,6 @@
 # P1-T4 Portability and Structure Inspection (AC11)
 
-Timestamp: 2026-09-27T03-43
+Timestamp: 2026-09-27T03-33
 Command: sh <SCRATCHPAD>/x713-port.sh (R-PORT on tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.AttributionTrailer.Tests.ps1)
 EXIT_CODE: 0
 Output Summary: All eleven hygiene tokens and the drive-letter regex report matches=0; both git-invocation regexes report matches=0. Join-Path 2, $PSScriptRoot 1, the decision seam 1. `Get-AttributionTrailerDecision` appears on line 21 (its `function Get-AttributionTrailerDecision {` definition) and line 62, which lies between the `It 'admits` line 42 and the `It 'denies` line 67, so the deny rows never call the decision seam. `Test-ImplementationCommand` is on line 93, after the `It 'denies` line.

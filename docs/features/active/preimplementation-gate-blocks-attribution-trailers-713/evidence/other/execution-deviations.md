@@ -19,3 +19,9 @@ In P0-T3 use `git merge-base HEAD origin/main` instead of `git merge-base HEAD m
 Timestamp: 2026-09-27T03-20
 
 Orchestrator-approved. In [P0-T8] the primary command `git --version` is replaced by `git version`, which prints the same `git version x.y.z` line. The PreToolUse hook `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` denied `git --version` (PARALLEL_WORKTREE_REMOVAL_BLOCKED, empty worktree path); that is recorded as a hook false positive and as a follow-up entry in `evidence/other/follow-ups.md`. `GIT_VERSION` is recorded from `git version`; the original denial text is kept in `evidence/baseline/p0-git-trailer-support.md` as history. No other spelling was tried.
+
+## Note - timestamp correction (not a plan deviation)
+
+Timestamp: 2026-09-27T03-38
+
+Several artifact timestamps written during Phases 0 to 2 of this run were entered ahead of the wall clock. They were corrected to times calibrated against the phase-boundary commit times (Phase 0 at 03-31, Phase 1 at 03-34), and the fail-before exception dossier was renamed from `fail-before-exception.2026-09-27T03-46.md` to `fail-before-exception.2026-09-27T03-34.md` with `git mv` so that its file name matches its write time. No artifact content other than the `Timestamp:` line and that file name changed.
