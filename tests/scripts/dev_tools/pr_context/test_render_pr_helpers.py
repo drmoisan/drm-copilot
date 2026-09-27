@@ -30,12 +30,12 @@ def test_build_issues_to_autoclose_section_reports_gh_unavailable_when_empty() -
     assert result.splitlines()[-1] == UNAVAILABLE_BODY
 
 
-def test_build_issues_to_autoclose_section_prefers_unavailable_text_over_pass_readiness() -> (
-    None
-):
+@pytest.mark.parametrize("readiness", [["PASS"]])
+def test_build_issues_to_autoclose_section_prefers_unavailable_text_over_pass_readiness(
+    readiness: list[str],
+) -> None:
     """The unavailable body takes precedence over the PASS-readiness fallback."""
-    # Arrange
-    readiness = ["PASS"]
+    # Arrange: readiness is PASS, which would otherwise select the PASS fallback.
 
     # Act
     result = build_issues_to_autoclose_section(

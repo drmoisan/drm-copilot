@@ -303,7 +303,9 @@ def test_collect_and_write_end_to_end_scenarios(
             "None (GitHub CLI unavailable; closing issues not verified)" in summary_text
         )
     elif not expect_autoclose:
-        assert "None (no verified closing issues and readiness not PASS)" in summary_text
+        assert (
+            "None (no verified closing issues and readiness not PASS)" in summary_text
+        )
 
 
 def test_generate_pr_prompt_alignment() -> None:

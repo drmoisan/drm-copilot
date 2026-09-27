@@ -9,7 +9,8 @@ EXIT_CODE: 0
 Output Summary:
 - Result line: `5 passed in 0.07s` (0 FAILED; 5 #588 cases).
 - `PASSED ...::test_build_issues_to_autoclose_section_reports_gh_unavailable_when_empty` (asserts `result.splitlines()[-1] == UNAVAILABLE_BODY`)
-- `PASSED ...::test_build_issues_to_autoclose_section_prefers_unavailable_text_over_pass_readiness` (asserts `result.splitlines()[-1] == UNAVAILABLE_BODY`)
+- `PASSED ...::test_build_issues_to_autoclose_section_prefers_unavailable_text_over_pass_readiness[readiness0]` (asserts `result.splitlines()[-1] == UNAVAILABLE_BODY`)
+- Re-run 2026-09-26T22-25 after the [P8-T1] loop moved this test's readiness input into a single-case `pytest.mark.parametrize` (E501 fix, name unchanged): same command, `EXIT_CODE: 0`, `5 passed in 0.10s`; the node ID above carries the `[readiness0]` suffix from that change.
 - `PASSED ...::test_build_issues_to_autoclose_section_lists_pending_refs_when_gh_unavailable`
 - `PASSED ...::test_build_issues_to_autoclose_section_keeps_available_fallback_texts[readiness0-None (no verified closing issues and no deterministic pending issue)]`
 - `PASSED ...::test_build_issues_to_autoclose_section_keeps_available_fallback_texts[readiness1-None (no verified closing issues and readiness not PASS)]`
