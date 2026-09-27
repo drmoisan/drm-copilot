@@ -659,7 +659,7 @@ reporting done.
 - [ ] A derived radius passes V1 and V2 against its own plan in write-intent mode, in both runtimes.
 - [ ] The read-verb, write-verb, and placeholder-stem sets are pinned equal across Python and
   PowerShell by a parity test.
-- [ ] Both config copies add the Copilot instructions file under .github to mandate_reads, set
+- [x] Both config copies add the Copilot instructions file under .github to mandate_reads, set
   write_intent_extraction to true, and carry path_roots (self-hosted: the P0-derived top-level
   directory list; bundled: an empty list).
 

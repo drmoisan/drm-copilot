@@ -28,7 +28,8 @@
     ".claude/skills/policy-compliance-order/SKILL.md",
     ".claude/agent-memory/**",
     ".agents/skills/**",
-    "scripts/vscode/**"
+    "scripts/vscode/**",
+    ".github/copilot-instructions.md"
   ],
   "mergeable_paths": [
     "**/*.csproj",
@@ -47,6 +48,26 @@
       "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
     ]
   },
+  "write_intent_extraction": true,
+  "path_roots": [
+    ".agents",
+    ".cache",
+    ".claude",
+    ".codex",
+    ".devcontainer",
+    ".github",
+    ".vscode",
+    "config",
+    "docs",
+    "examples",
+    "extensions",
+    "packages",
+    "schemas",
+    "scripts",
+    "src",
+    "tests",
+    "virtual"
+  ],
   "modules": {
     "powershell-dev-tools": ["scripts/dev-tools/**"],
     "poshqc": ["scripts/powershell/**"],

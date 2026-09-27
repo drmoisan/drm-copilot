@@ -869,54 +869,54 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 9 — Part B: Configuration Keys, Mandate Amendment, Python Key Partition
 
-- [ ] [P9-T1] Reset the Python batch budget (A8, -Kind python). Write
+- [x] [P9-T1] Reset the Python batch budget (A8, -Kind python). Write
       FEATURE/evidence/other/batch-budget-reset-p9.TS.md. Acceptance: exit 0.
-- [ ] [P9-T2] Edit `config/blast-radius.json`: append the Copilot instructions file under .github to
+- [x] [P9-T2] Edit `config/blast-radius.json`: append the Copilot instructions file under .github to
       mandate_reads, and insert write_intent_extraction with value true followed by path_roots
       immediately after conflict_tolerance. Acceptance: the file parses as JSON.
-- [ ] [P9-T3] In the same file, set path_roots to the ordinally sorted directory list recorded by
+- [x] [P9-T3] In the same file, set path_roots to the ordinally sorted directory list recorded by
       P0-T28. Acceptance: the value equals the P0-T28 list exactly.
-- [ ] [P9-T4] Edit `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json`:
+- [x] [P9-T4] Edit `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json`:
       the same mandate_reads amendment, write_intent_extraction true, and path_roots as an empty list.
       Acceptance: mandate_reads and write_intent_extraction are equal between the two copies; the
       bundled path_roots is an empty list.
-- [ ] [P9-T5] Edit `tests/scripts/dev_tools/blast_radius_parity_test_support.py`: append
+- [x] [P9-T5] Edit `tests/scripts/dev_tools/blast_radius_parity_test_support.py`: append
       write_intent_extraction to the byte-equal key tuple; add a separate Class 2 registry named
       CLASS_TWO_TOLERANCE_KEY_ASSERTIONS mapping path_roots to the test name
       test_class_two_bundled_path_roots_are_empty; include that registry's keys in the declared
       top-level key set. The existing Class 2 registry is not changed, so the registry-consumption test
       in the config-parity module is unaffected. Acceptance: the file is at most 500 lines.
-- [ ] [P9-T6] Edit `tests/scripts/dev_tools/test_blast_radius_config_tolerance_keys.py`: add the Part B
+- [x] [P9-T6] Edit `tests/scripts/dev_tools/test_blast_radius_config_tolerance_keys.py`: add the Part B
       tests of block B16, including test_class_two_bundled_path_roots_are_empty and a consumption check
       of the new registry against this module's own namespace. Acceptance: the file is at most 500 lines.
-- [ ] [P9-T7] Reset the Python batch budget (A8, -Kind python). Write
+- [x] [P9-T7] Reset the Python batch budget (A8, -Kind python). Write
       FEATURE/evidence/other/batch-budget-reset-p9b.TS.md. Acceptance: exit 0.
-- [ ] [P9-T8] Edit `tests/scripts/dev_tools/test_blast_radius_mandate_reads.py`: make its
+- [x] [P9-T8] Edit `tests/scripts/dev_tools/test_blast_radius_mandate_reads.py`: make its
       committed-config helper (committed_config) also remove the write_intent_extraction and
       path_roots keys when present, and update its docstring to state that the helper pins current
       extraction. No test body or assertion is changed. Acceptance: the file is at most 500 lines.
-- [ ] [P9-T9] Edit `tests/scripts/dev_tools/test_blast_radius_mergeable_paths.py`: make its
+- [x] [P9-T9] Edit `tests/scripts/dev_tools/test_blast_radius_mergeable_paths.py`: make its
       committed-config helper (load_config) also remove the write_intent_extraction and path_roots
       keys when present, and update its docstring the same way. No test body or assertion is changed.
       Acceptance: the file is at most 500 lines.
-- [ ] [P9-T10] Write FEATURE/evidence/other/spec-deviation-committed-config-tests.TS.md recording the
+- [x] [P9-T10] Write FEATURE/evidence/other/spec-deviation-committed-config-tests.TS.md recording the
       two edited test paths, the three affected test names, the helper change, the spec
       Backward-compatibility exception 2 that authorizes it, and the P0-T33 inventory artifact it is
       checked against. Acceptance: the artifact exists and carries those five items.
-- [ ] [P9-T11] Run CMD-PY-TEST over the P9-T6 file, over all three node IDs of block B19 (the third is
+- [x] [P9-T11] Run CMD-PY-TEST over the P9-T6 file, over all three node IDs of block B19 (the third is
       the Part B byte-equal case), and over the three node IDs of block B44. Write
       FEATURE/evidence/regression-testing/config-part-b.TS.md. Acceptance: exit 0 and a PASSED line
       for every listed test.
-- [ ] [P9-T12] Run CMD-PY-COV with label p9. Write FEATURE/evidence/regression-testing/python-full-p9.TS.md.
+- [x] [P9-T12] Run CMD-PY-COV with label p9. Write FEATURE/evidence/regression-testing/python-full-p9.TS.md.
       Acceptance: every FAILED node ID is in the P0-T18 baseline failure set, except that the KL-510
       node may fail when its failure satisfies KL-510 case (b), recorded as the Terms require. Stop
       condition: any other failure outside the P0 inventory stops the plan; record the node ID and
       report it.
-- [ ] [P9-T13] Run CMD-PY-BLACK, CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT over the four
+- [x] [P9-T13] Run CMD-PY-BLACK, CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT over the four
       Python files of this phase (P9-T5, P9-T6, P9-T8, P9-T9). Write
       FEATURE/evidence/qa-gates/phase9-python-static.TS.md. Acceptance: as in P1-T14; if the write-mode
       black run reformatted a file, re-run P9-T11 before continuing.
-- [ ] [P9-T14] Commit and push Phase 9 (check off AC-28 per the Preamble check-off rule; stage both
+- [x] [P9-T14] Commit and push Phase 9 (check off AC-28 per the Preamble check-off rule; stage both
       config copies, the four Python files, the FEATURE evidence directory, and FEATURE/spec.md;
       message "feat(722): enable write-intent extraction and path_roots"). Acceptance: all three git
       commands exit 0.
