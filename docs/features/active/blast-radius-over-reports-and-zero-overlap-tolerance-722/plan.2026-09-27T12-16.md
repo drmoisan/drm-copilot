@@ -1093,7 +1093,9 @@ the read-only check script A6 and a before-and-after hash comparison.
       ChangedCount=0.
 - [ ] [P16-T3] Call MCP-PS-ANALYZE over the B40 files. Write
       FEATURE/evidence/qa-gates/final-powershell-analyze.TS.md. Acceptance: the call returns without
-      raising. On a raised finding, fix and restart Phase 16.
+      raising. On a raised finding, fix it, re-copy each affected mirror by running script copy-file
+      (A10) through CMD-PS-SCRIPT-SH, re-run P14-T6 (writing a new mirrors-final artifact), and restart
+      Phase 16.
 - [ ] [P16-T4] Run script pester-coverage with -TestPath tests/scripts/claude-lib/blast-radius,
       -CoveragePath set to the four PowerShell modules of block B41 as one comma-joined value, and
       -CoverageOutputPath SCRATCH/pester-final.xml; then run script pester-counts with -Path set to
@@ -2002,6 +2004,28 @@ P18-T5 verifies that 37 criteria are checked after P18-T4; P18-T7 checks AC-38 a
 ## Planner Adversarial Self-Review
 
 SELF-REVIEW: RE-DERIVED THIS PASS
+
+Revision round 4 (1 preflight defect, applied). Edited region: the P16-T3 acceptance, which now
+re-copies each affected mirror with script A10 through CMD-PS-SCRIPT-SH and re-runs P14-T6 before the
+Phase 16 restart, in the same form as P16-T1. Citations re-derived in this pass:
+
+- This plan, block B37: the mirror pairs are the four blast-radius modules, the Pester runsettings
+  pair, the parallel-orchestration rule file, the parallel-plan and parallel-add skills, and the
+  parallel-planner agent. Block B40 includes the modules and the self-hosted runsettings file, so a
+  P16-T3 fix can edit a mirrored primary.
+- This plan, P5-T8: the mirrors live under extensions/drm-copilot/resources.
+- extensions/drm-copilot/package.json line 207: the format script writes only src and test
+  TypeScript files and root-level json and cjs files, so the P17-T1 restart clause cannot edit a
+  mirrored file or a mirror.
+- Sibling check over Phases 16 and 17: P16-T1 already carries the re-copy form; P16-T2, P16-T4,
+  P16-T5, and P17-T2 through P17-T5 carry no fix-and-restart clause. No other clause needed the edit.
+
+Revision round 3 (4 preflight deltas, applied; confirmed by the executor in round 4). No separate
+round-3 record was written; the edited regions, identified from the current text, are the FINAL_BASE
+term of the Preamble together with the P14-T4 use of FINAL_BASE as the -BaseSha argument of script
+A9; the Preamble term that routes every PowerShell scratch script through CMD-PS-SCRIPT-SH; the
+Preamble re-run clause for P10-T12 (re-copy with A10 and A5, then re-run P10-T10); and the P16-T1
+re-copy and P14-T6 re-run clause.
 
 Revision round 2 (10 preflight defects, all applied; none rejected). Citations re-derived against the
 current tree in this pass, for every region the revision edited and its siblings:
