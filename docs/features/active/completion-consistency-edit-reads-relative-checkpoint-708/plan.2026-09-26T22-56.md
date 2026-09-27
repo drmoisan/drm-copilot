@@ -3,8 +3,8 @@
 - **Issue:** #708
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-27T06-00
-- **Status:** Draft (revision round 2 applied; awaiting executor preflight)
+- **Last Updated:** 2026-09-27T07-00
+- **Status:** Draft (revision round 3 applied; awaiting executor preflight)
 - **Version:** 1.0
 - **Work Mode:** full-bug (acceptance-criteria source: `docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/spec.md`, section `## Acceptance Criteria`, 14 items)
 - **Branch:** `bug/completion-consistency-edit-reads-relative-checkpoint-708`
@@ -12,7 +12,7 @@
 
 **Fail-closed evidence rule:** Every evidence-producing task names its artifact path. If a required baseline, regression, QA-gate, or coverage value is missing, the outcome is BLOCKED or INCOMPLETE, never PASS. A task whose artifact is absent or incomplete stays unchecked.
 
-**Evidence accounting rule:** Evidence is written only to the five files listed under "Files written by this plan". Each evidence file is organized as one `## <task-id>` section per command step, and every command-step section carries `Timestamp:` (format `yyyy-MM-ddTHH-mm`), `Command:`, `EXIT_CODE:`, and `Output Summary:`. Sections that run no command (`## P0-T1` and the `follow-ups.md` entries) carry `Timestamp:` and the fields their task names. Sections appear in execution order, with one exception: in `edit-target-fail-before.md`, `[P1-T2]` writes its Pester section, headed `## P1-T2`, first and its `## P1-T2 hook-unmodified` section second, although the hook-unmodified check runs first. An evidence collector reads the first `Command:`/`EXIT_CODE:` pair in each file. Evidence records repository-relative paths only; any absolute host path printed by a tool is replaced with `<repo>` before it is recorded.
+**Evidence accounting rule:** Evidence is written only to the five files listed under "Files written by this plan". Each evidence file is organized as one `## <task-id>` section per command step, and every command-step section carries `Timestamp:` (format `yyyy-MM-ddTHH-mm`), `Command:`, `EXIT_CODE:`, and `Output Summary:`. Sections that run no command (`## P0-T1`, `## P6-T9`, `## P6-T16`, and the `follow-ups.md` entries) carry `Timestamp:` and the fields their task names. Sections appear in execution order, with one exception: in `edit-target-fail-before.md`, `[P1-T2]` writes its Pester section, headed `## P1-T2`, first and its `## P1-T2 hook-unmodified` section second, although the hook-unmodified check runs first. An evidence collector reads the first `Command:`/`EXIT_CODE:` pair in each file. Evidence records repository-relative paths only; any absolute host path printed by a tool is replaced with `<repo>` before it is recorded.
 
 ## Files written by this plan
 
@@ -35,7 +35,7 @@ Feature documents and evidence:
 9. `docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/evidence/other/follow-ups.md`
 10. This plan file (task check-off only).
 
-Files that are read and never written include `.codex/hooks/enforce-completion-consistency.ps1`, `.claude/hooks/enforce-completion-helpers.ps1`, `.claude/lib/hook-payload/HookPayload.psm1`, `tests/scripts/claude-hooks/enforce-completion-consistency.Tests.ps1`, `tests/scripts/claude-hooks/enforce-completion-consistency.Payload.Tests.ps1`, `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1`, `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, and `issue.md`. Tool runs also write gitignored run outputs under `artifacts/pester/` (`pester-junit.xml`, `powershell-coverage.xml`); those are read as measurement sources and are not evidence.
+Files that are read and never written include `.codex/hooks/enforce-completion-consistency.ps1`, `.claude/hooks/enforce-completion-helpers.ps1`, `.claude/lib/hook-payload/HookPayload.psm1`, `tests/scripts/claude-hooks/enforce-completion-consistency.Tests.ps1`, `tests/scripts/claude-hooks/enforce-completion-consistency.Payload.Tests.ps1`, `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1`, `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, and `issue.md`. Tool runs also write gitignored run outputs under `artifacts/pester/` (`pester-junit.xml` and `powershell-coverage.xml`, which are read as measurement sources, and the derived copy `powershell-coverage.koverage.xml` that `Invoke-PoshQCTest` writes beside the coverage file, which is not read); none of them is evidence.
 
 ## Execution conventions
 
