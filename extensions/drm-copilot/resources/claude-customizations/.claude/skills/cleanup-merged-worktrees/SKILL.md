@@ -525,6 +525,12 @@ and is prohibited by this skill, which is the term the residual rests on.
   only a distinct, individually confirmed manual action outside that automated path for
   `NOT_MERGED`/`HAS_UNIQUE_RESIDUALS` — never a change to the classification ladder
   itself, and never for `PROTECTED_CURRENT`.
+- Never delete the base branch `main` and never remove a worktree checked out on it.
+  `compute_protected` protects `main` by name in every checkout topology, so it
+  classifies `PROTECTED_CURRENT` even when no protected worktree has it checked out, and
+  `delete_candidate` refuses a deletion request for it with
+  `ACTION|delete|main|BLOCKED-PROTECTED-BASE` before any re-verification, worktree
+  removal, or branch deletion runs.
 - Never use commit-message text matching as a classification input, and never
   auto-resolve cherry-pick conflicts.
 - Never delete an origin branch, or run plain filesystem removal on an orphaned

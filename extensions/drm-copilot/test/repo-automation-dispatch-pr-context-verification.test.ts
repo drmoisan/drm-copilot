@@ -2,6 +2,15 @@ import { describe, expect, it, jest } from "@jest/globals";
 
 jest.mock("vscode", () => ({}), { virtual: true });
 
+// The service composition root supplies no gh resolver, so the default one
+// would read the host PATH and filesystem; this keeps the path hermetic.
+jest.mock("../src/lib/executable-resolver", () => ({
+  ...jest.requireActual<Record<string, unknown>>(
+    "../src/lib/executable-resolver",
+  ),
+  defaultWhichGh: () => undefined,
+}));
+
 import { dispatchRepoAutomationTool } from "../src/mcp-tools";
 import { createRepoAutomationService } from "../src/repo-automation-service";
 

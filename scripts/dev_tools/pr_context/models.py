@@ -22,6 +22,17 @@ CONVENTIONAL_TYPES = (
     "ci",
     "style",
 )
+# Issue #622 (D1): an issue reference is a bare GitHub issue number only.
+ISSUE_REFERENCE_PATTERN: re.Pattern[str] = re.compile(r"(?<!\w)#\d+(?!\w)", re.ASCII)
+# Issue #622 (D4): annotation shown when autoclose entries were not checked on GitHub.
+AUTOCLOSE_UNVERIFIED_ANNOTATION = (
+    "Unverified: the issues listed above come from feature metadata only and were "
+    "not checked against GitHub (GitHub CLI unavailable)."
+)
+# Issue #622 (D5): body shown when the pending primary issue is not an open issue.
+AUTOCLOSE_PENDING_NOT_OPEN_TEXT = (
+    "None (deterministic pending issue is not an open issue)"
+)
 
 
 @dataclass

@@ -21,11 +21,13 @@
 
 import { join } from "node:path";
 
+import { defaultWhichGh } from "../executable-resolver";
 import { type FileSystem } from "../file-system";
 import { type CommandRunner } from "../subprocess-runner";
 import { normalizeGeneratedPath } from "../../repo-automation-service-support";
 import { collectAndWrite } from "./collector-output";
 import { classifyPrContextDiffState } from "./diff-emptiness";
+import { type WhichGh } from "./gh-client-core";
 
 /** Repo-relative summary artifact path written by the collector. */
 const SUMMARY_OUT = "artifacts/pr_context.summary.txt";
@@ -84,6 +86,12 @@ export interface CollectPrContextServiceCallInput {
   readonly targetRef?: string;
   /** Optional log sink wired to the service output channel. */
   readonly log?: (message: string) => void;
+  /**
+   * Optional `gh` resolver. Resolution order: an explicit `ghPath` inside the
+   * collector, then this injected resolver, then {@link defaultWhichGh}
+   * (the process PATH).
+   */
+  readonly whichGh?: WhichGh;
 }
 
 /** Preserved result of the collect-pr-context service call. */
@@ -105,9 +113,11 @@ export interface CollectPrContextServiceCallResult {
  *
  * Calls {@link collectAndWrite} with the workspace root as the repo root, the
  * two default artifact paths, overwrite mode, untracked files included, and the
- * default real clock. Returns the result record matching the prior
- * Python-spawn shape: `tool`, `workspaceRoot`, the exact summary string, and
- * both normalized artifact paths joined to the workspace root.
+ * default real clock. `gh` is resolved through `input.whichGh` when supplied,
+ * otherwise through the default PATH resolver. Returns the result record
+ * matching the prior Python-spawn shape: `tool`, `workspaceRoot`, the exact
+ * summary string, and both normalized artifact paths joined to the workspace
+ * root.
  *
  * @param input Runner, filesystem, workspace root, base ref, and optional log.
  * @returns The preserved result record with both artifact paths.
@@ -139,6 +149,7 @@ export function collectPrContextServiceCall(
     includeUntracked: true,
     fs: input.fileSystem,
     runner: input.runner,
+    whichGh: input.whichGh ?? defaultWhichGh,
     ...(input.targetRef === undefined ? {} : { head: input.targetRef }),
     ...(input.log === undefined ? {} : { log: input.log }),
   });

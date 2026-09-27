@@ -87,22 +87,9 @@ PRE_EXISTING_UNRELATED_AGENT_EXCEPTIONS: frozenset[str] = frozenset(
     }
 )
 
-PRE_EXISTING_UNRELATED_HOOK_EXCEPTIONS: frozenset[str] = frozenset(
-    {
-        ".codex/hooks/check-powershell-test-purity.ps1",
-        ".codex/hooks/check-python-test-purity.ps1",
-        ".codex/hooks/enforce-checkpoint-monotonic.ps1",
-        ".codex/hooks/enforce-completion-consistency.ps1",
-        ".codex/hooks/enforce-completion-helpers.ps1",
-        ".codex/hooks/enforce-evidence-locations.ps1",
-        ".codex/hooks/enforce-orchestration-preimplementation-gate.ps1",
-        ".codex/hooks/enforce-powershell-batch-budget.ps1",
-        ".codex/hooks/enforce-promotion-mcp-only.ps1",
-        ".codex/hooks/enforce-python-batch-budget.ps1",
-        ".codex/hooks/validate-bash.ps1",
-        ".codex/hooks/validate-feature-review-coverage.ps1",
-    }
-)
+# Issue #697 registered the twelve previously excepted hooks in `core.json`, so
+# no hook remains a pre-existing exception.
+PRE_EXISTING_UNRELATED_HOOK_EXCEPTIONS: frozenset[str] = frozenset()
 
 PRE_EXISTING_UNRELATED_SKILL_EXCEPTIONS: frozenset[str] = frozenset(
     {

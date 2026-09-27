@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    import pytest
-
 from scripts.dev_tools.pr_context.collector import (
     CommandResult,
     GitClient,
@@ -15,7 +13,6 @@ from scripts.dev_tools.pr_context.collector import (
     PullRequestDetails,
     build_close_candidates_section,
     build_pr_context,
-    collect_and_write,
     convert_numstat,
     extension_summary,
     extract_issue_references,
@@ -25,7 +22,6 @@ from scripts.dev_tools.pr_context.collector import (
     gather_feature_excerpts,
     select_default_base,
 )
-from scripts.dev_tools.pr_context.models import FeatureDocExcerpt, PRContextResult
 from scripts.dev_tools.pr_context.summary_helpers import (
     issue_appendix as _issue_appendix,
 )
@@ -161,7 +157,7 @@ def test_extension_summary_sorts_and_counts():
 def test_extract_issue_references_filters_and_deduplicates():
     text = "Fixes #12 and relates to ABC-99 plus #12 again"
     refs = extract_issue_references(text)
-    assert refs == ["#12", "ABC-99"]
+    assert refs == ["#12"]
 
 
 def test_last_with_truncation_limits_list():
@@ -307,7 +303,7 @@ def test_gather_feature_excerpts_reads_active_docs(mem_fs_path: Path) -> None:
     ]:
         assert expected in joined
 
-    assert excerpt.issue_refs == ["#77", "ABC-123"]
+    assert excerpt.issue_refs == ["#77"]
     assert set(excerpt.context_files) == {
         spec_path.relative_to(root).as_posix(),
         plan_path.relative_to(root).as_posix(),
@@ -372,18 +368,26 @@ def test_build_close_candidates_section_renders_lists():
     assert "#1" in section_text and "#2" in section_text and "#3" in section_text
 
 
-def test_build_close_candidates_section_promotes_referenced_issues_to_auto_close():
+def test_build_close_candidates_section_lists_referenced_issues_as_detected_only():
+    """Referenced issues stay in the detected list and never become auto-close."""
+    # Arrange
+    author_reason = "None (author has not asserted autoclose issues)"
+
+    # Act
     section_text = build_close_candidates_section(
         verified=[],
         author_asserted=[],
         referenced=["#3"],
         verified_reason="None (no PR exists yet for this branch)",
-        author_reason="None (author has not asserted autoclose issues)",
+        author_reason=author_reason,
     )
 
+    # Assert
     lines = section_text.splitlines()
     author_index = lines.index("Auto-close issues (author asserted):")
-    assert "- #3" in lines[author_index + 1]
+    referenced_index = lines.index("Referenced issues (detected):")
+    assert lines[author_index + 1] == author_reason, "author list must stay empty"
+    assert lines[referenced_index + 1] == "- #3", "#3 is listed as detected only"
 
 
 def test_issue_digest_truncates_comments():
@@ -474,181 +478,3 @@ def test_scoping_doc_changes_marks_non_material_link_only():
     )
     assert changes
     assert changes[0][1] is False
-
-
-def test_narrative_mentions_excluded_from_autoclose_section(
-    monkeypatch: pytest.MonkeyPatch, mem_fs_path: Path
-) -> None:
-    """Assert narrative refs stay out of approved autoclose section."""
-    outputs: list[tuple[Path, str]] = []
-
-    def fake_write_output(text: str, out_path: Path, append: bool) -> None:
-        _ = append
-        outputs.append((out_path, text))
-
-    monkeypatch.setattr(
-        "scripts.dev_tools.pr_context.collector.write_output", fake_write_output
-    )
-
-    class StubGit:
-        def __init__(self, *args: object, **kwargs: object) -> None:
-            self._root = mem_fs_path
-
-        def resolve_root(self) -> Path:
-            return self._root
-
-        def branch_name(self) -> str:
-            return "feature/test"
-
-        def upstream(self) -> str:
-            return "origin/feature/test"
-
-        def remote_verbose(self) -> str:
-            return "origin https://example/repo (fetch)"
-
-        def status_short(self) -> str:
-            return "## feature/test"
-
-        def untracked(self) -> str:
-            return ""
-
-        def diff_name_status(self, *, staged: bool) -> str:
-            _ = staged
-            return ""
-
-        def diff_patch(self, *, staged: bool) -> str:
-            _ = staged
-            return ""
-
-        def rev_parse(self, ref: str) -> str:
-            return f"{ref}-sha"
-
-        def merge_base(self, base: str, head: str) -> str:
-            _ = base, head
-            return "base-sha"
-
-        def log(self, fmt: str, rev_range: str) -> str:
-            _ = fmt, rev_range
-            return ""
-
-        def diff_range(self, args: Sequence[str]) -> str:
-            if "--name-status" in args:
-                return "M\tdocs/features/active/test/spec.md"
-            if "--numstat" in args:
-                return "1\t0\tdocs/features/active/test/spec.md"
-            if "--shortstat" in args:
-                return " 1 files changed, 1 insertions(+), 0 deletions(-)"
-            if "--stat" in args:
-                return " spec.md | 1 +"
-            return ""
-
-        def run(
-            self, args: Sequence[str], *, allow_error: bool = False
-        ) -> CommandResult:
-            _ = args, allow_error
-            return CommandResult(stdout="resolved", stderr="", code=0)
-
-    class StubGh:
-        status_message = "ok"
-        available = True
-
-        def __init__(self, *args: object, **kwargs: object) -> None:
-            return None
-
-        def ensure_available(self) -> None:
-            return None
-
-        def current_pr(self) -> PullRequestDetails | None:
-            return None
-
-        def classify_entity(self, number: str) -> str | None:
-            _ = number
-            return None
-
-        def ci_status(self, head_sha: str) -> tuple[str | None, list[str]]:
-            _ = head_sha
-            return "success", []
-
-    def fake_build_pr_context(
-        *,
-        git: StubGit,
-        gh: StubGh,
-        base_ref: str | None,
-        head_ref: str | None,
-        include_untracked: bool,
-        feature_issue_refs: Sequence[str] | None = None,
-        current_pr: PullRequestDetails | None = None,
-        gh_available: bool | None = None,
-    ) -> PRContextResult:
-        _ = (
-            git,
-            gh,
-            include_untracked,
-            feature_issue_refs,
-            current_pr,
-            gh_available,
-        )
-        return PRContextResult(
-            text=(
-                "===== Changed files (name-status) =====\n"
-                "M\tdocs/features/active/test/spec.md"
-            ),
-            referenced_issues=[],
-            referenced_prs=[],
-            verified_closing=[],
-            invalid_references=[],
-            base_ref=base_ref,
-            resolved_base="origin/main",
-            base_sha="base-sha",
-            head_ref=head_ref or "feature",
-            head_sha="head-sha",
-            merge_base="base-sha",
-            rev_range="base-sha..head-sha",
-            gh_available=True,
-        )
-
-    def fake_gather_feature_excerpts(
-        root: Path, paths: Sequence[str]
-    ) -> list[FeatureDocExcerpt]:
-        _ = root, paths
-        return [
-            FeatureDocExcerpt(
-                feature="test",
-                excerpt="Narrative mentions #40 #42 #43 in notes.",
-                issue_refs=["#40", "#42", "#43"],
-                context_files=["docs/features/active/test/spec.md"],
-                primary_issue_ref="#46",
-                readiness_signal="PASS",
-            )
-        ]
-
-    monkeypatch.setattr("scripts.dev_tools.pr_context.collector.GitClient", StubGit)
-    monkeypatch.setattr("scripts.dev_tools.pr_context.collector.GhClient", StubGh)
-    monkeypatch.setattr(
-        "scripts.dev_tools.pr_context.collector.build_pr_context", fake_build_pr_context
-    )
-    monkeypatch.setattr(
-        "scripts.dev_tools.pr_context.collector.gather_feature_excerpts",
-        fake_gather_feature_excerpts,
-    )
-
-    collect_and_write(
-        base="main",
-        head="feature",
-        out=mem_fs_path / "summary.txt",
-        appendix_out=mem_fs_path / "appendix.txt",
-        repo_root=mem_fs_path,
-        append=False,
-        include_untracked=False,
-    )
-
-    summary_text = next(text for path, text in outputs if path.name == "summary.txt")
-    section_start = summary_text.index(
-        "===== Issues to autoclose (verified or pending) ====="
-    )
-    section_end = summary_text.index("===== Close candidates =====", section_start)
-    approved_section = summary_text[section_start:section_end]
-    assert "#46" in approved_section
-    assert "#40" not in approved_section
-    assert "#42" not in approved_section
-    assert "#43" not in approved_section

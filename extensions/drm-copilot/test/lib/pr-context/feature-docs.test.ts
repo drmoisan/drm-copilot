@@ -80,11 +80,8 @@ describe("extractIssueReferences", () => {
     ]);
   });
 
-  it("extracts JIRA-style references", () => {
-    expect(extractIssueReferences("See ABC-123 and XYZ-456")).toEqual([
-      "ABC-123",
-      "XYZ-456",
-    ]);
+  it("ignores JIRA-style references", () => {
+    expect(extractIssueReferences("See ABC-123 and XYZ-456")).toEqual([]);
   });
 
   it("deduplicates while preserving order", () => {
@@ -229,7 +226,7 @@ describe("gatherFeatureExcerpts", () => {
       "docs/features/active/test/user-story.md",
     ]);
     expect(excerpts[0]!.issueRefs).toContain("#123");
-    expect(excerpts[0]!.issueRefs).toContain("ABC-456");
+    expect(excerpts[0]!.issueRefs).not.toContain("ABC-456");
   });
 
   it("surfaces multiple features sorted by name", () => {

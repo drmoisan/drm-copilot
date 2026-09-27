@@ -23,33 +23,39 @@ const DESTINATION_DIR = path.join(__dirname, "resources");
 /**
  * Decide whether a source path should be copied into the packaged resources.
  *
- * Excludes any Python file and any entry under a `scripts/` path segment so no
- * Python ships with the MCP server. Every other path is copied, preserving the
- * PowerShell and customization-data payloads.
+ * Excludes any Python file at any depth, and the resources-root `scripts/`
+ * subtree (the removed bundled Python tree). The exclusion is anchored at the
+ * resources root, so nested `scripts` directories such as the Codex bundle's
+ * `.codex/scripts` PowerShell wrappers are still copied. Every other path is
+ * copied, preserving the PowerShell and customization-data payloads.
  *
  * @param {string} source Absolute source path being considered by cpSync.
  * @returns {boolean} True to copy the path; false to skip it.
  */
 function shouldCopy(source) {
-  // Normalize to forward slashes so segment matching is OS-neutral.
-  const normalized = source.replace(/\\/g, "/");
-
   // Skip Python source files regardless of where they appear in the tree.
-  if (normalized.endsWith(".py")) {
+  if (source.replace(/\\/g, "/").endsWith(".py")) {
     return false;
   }
 
-  // Skip the bundled scripts subtree (the directory and anything beneath it).
-  // Match a `/scripts` segment at the resources root or a nested `/scripts/`.
-  if (/(^|\/)scripts(\/|$)/.test(normalized)) {
+  // Skip only the resources-root scripts subtree (the directory itself and
+  // anything beneath it), comparing the root-relative path in POSIX form.
+  const relative = path.relative(SOURCE_DIR, source).replace(/\\/g, "/");
+  if (relative === "scripts" || relative.startsWith("scripts/")) {
     return false;
   }
 
   return true;
 }
 
-cpSync(SOURCE_DIR, DESTINATION_DIR, {
-  recursive: true,
-  force: true,
-  filter: shouldCopy,
-});
+module.exports = { SOURCE_DIR, shouldCopy };
+
+// Copy only when run as `node prepack.cjs` (the package prepack script), so a
+// test can require this module without copying anything.
+if (require.main === module) {
+  cpSync(SOURCE_DIR, DESTINATION_DIR, {
+    recursive: true,
+    force: true,
+    filter: shouldCopy,
+  });
+}
