@@ -105,11 +105,15 @@ PAYLOAD_MODULE_NAMES = frozenset({"config"})
 # class because it describes the runtime too: it names the mechanically
 # mergeable path class of issue #643, whose members are project-file shapes a
 # merge step can reconcile, not paths of any one repository's layout.
+# ``conflict_tolerance`` (issue #722) joins it for the same reason: its weights,
+# band durations, tolerance, and append-only patterns configure how the runtime
+# schedules contention, not a repository layout.
 BYTE_EQUAL_KEYS = (
     "version",
     "over_breadth_fraction",
     "mandate_reads",
     "mergeable_paths",
+    "conflict_tolerance",
 )
 
 # Class 2 key-to-assertion registry: each portable shared-surface key mapped to

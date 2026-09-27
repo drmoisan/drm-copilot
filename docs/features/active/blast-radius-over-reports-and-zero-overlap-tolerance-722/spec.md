@@ -617,7 +617,7 @@ reporting done.
   in tolerance_percent; symmetry.
 - [ ] The conflict_tolerance reader rejects every invalid shape listed under Error handling with an
   error naming the key, in both runtimes, each rejection covered by a test.
-- [ ] Both config copies carry conflict_tolerance with the committed values in this spec, byte-equal
+- [x] Both config copies carry conflict_tolerance with the committed values in this spec, byte-equal
   between the copies.
 - [ ] The parallel-plan and parallel-add skills and the parallel-planner agent (and their bundled
   mirrors) call the scheduling function instead of a hand pair loop, record tolerated overlaps, and

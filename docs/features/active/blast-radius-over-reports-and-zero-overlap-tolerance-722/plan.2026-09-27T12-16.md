@@ -528,38 +528,38 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 3 — Part A: conflict_tolerance Configuration, Python Key Partition, Historical BEFORE Pins
 
-- [ ] [P3-T1] Reset the Python batch budget (A8, -Kind python). Write
+- [x] [P3-T1] Reset the Python batch budget (A8, -Kind python). Write
       FEATURE/evidence/other/batch-budget-reset-p3.TS.md. Acceptance: exit 0.
-- [ ] [P3-T2] Edit `config/blast-radius.json`: insert the conflict_tolerance member of block B2 in
+- [x] [P3-T2] Edit `config/blast-radius.json`: insert the conflict_tolerance member of block B2 in
       Appendix B immediately after mergeable_paths. Acceptance: the file parses as JSON and the member
       equals B2.
-- [ ] [P3-T3] Edit `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json`:
+- [x] [P3-T3] Edit `extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json`:
       insert the identical member at the same position. Acceptance: the member value is equal to the
       value in `config/blast-radius.json`.
-- [ ] [P3-T4] Edit `tests/scripts/dev_tools/blast_radius_parity_test_support.py`: append the key name
+- [x] [P3-T4] Edit `tests/scripts/dev_tools/blast_radius_parity_test_support.py`: append the key name
       conflict_tolerance to the byte-equal key tuple and extend its comment with the reason (the key
       describes the runtime, not a repository layout). Acceptance: the file is at most 500 lines.
-- [ ] [P3-T5] Write `tests/scripts/dev_tools/test_blast_radius_config_tolerance_keys.py` with the Part A
+- [x] [P3-T5] Write `tests/scripts/dev_tools/test_blast_radius_config_tolerance_keys.py` with the Part A
       tests of block B16. Acceptance: the file exists and is at most 500 lines.
-- [ ] [P3-T6] Create `tests/fixtures/blast_radius/historical-runs/followups-2026-09-27.json` by running
+- [x] [P3-T6] Create `tests/fixtures/blast_radius/historical-runs/followups-2026-09-27.json` by running
       CMD-PY-SCRIPT with script historical-fixture (contract C6) in before mode over the committed P0
       evidence JSON for that run. Acceptance: the file carries the fields of block B17 with the BEFORE
       section only, and its BEFORE values equal the P0-T27 artifact values for the run.
-- [ ] [P3-T7] Create `tests/fixtures/blast_radius/historical-runs/backlog-2026-09-26.json` the same way.
+- [x] [P3-T7] Create `tests/fixtures/blast_radius/historical-runs/backlog-2026-09-26.json` the same way.
       Acceptance: as in P3-T6 for that run.
-- [ ] [P3-T8] Create `tests/fixtures/blast_radius/historical-runs/epic-655-followups.json` the same way.
+- [x] [P3-T8] Create `tests/fixtures/blast_radius/historical-runs/epic-655-followups.json` the same way.
       Acceptance: as in P3-T6 for that run.
-- [ ] [P3-T9] Write `tests/scripts/dev_tools/test_blast_radius_historical_runs.py` with the BEFORE tests
+- [x] [P3-T9] Write `tests/scripts/dev_tools/test_blast_radius_historical_runs.py` with the BEFORE tests
       of block B18. The file must not contain the substrings origin/, artifacts/, or worktree.
       Acceptance: the file exists and is at most 500 lines.
-- [ ] [P3-T10] Run CMD-PY-TEST over the P3-T5 and P3-T9 files and over the first two node IDs of block
+- [x] [P3-T10] Run CMD-PY-TEST over the P3-T5 and P3-T9 files and over the first two node IDs of block
       B19. Write FEATURE/evidence/regression-testing/config-and-historical-before.TS.md. Acceptance:
       exit 0; PASSED lines for every B16 Part A test, every B18 BEFORE test for all three runs, and the
       two B19 nodes (the byte-equal case for conflict_tolerance and the exhaustiveness case).
-- [ ] [P3-T11] Run CMD-PY-BLACK, CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT over the three
+- [x] [P3-T11] Run CMD-PY-BLACK, CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT over the three
       Python files of this phase. Write FEATURE/evidence/qa-gates/phase3-python-static.TS.md.
       Acceptance: as in P1-T14.
-- [ ] [P3-T12] Commit and push Phase 3 (check off AC-17 per the Preamble check-off rule; stage both
+- [x] [P3-T12] Commit and push Phase 3 (check off AC-17 per the Preamble check-off rule; stage both
       config copies, the three Python files, the three fixture files, the FEATURE evidence directory,
       and FEATURE/spec.md; message "feat(722): add conflict_tolerance and pin historical BEFORE
       values"). Acceptance: all three git commands exit 0. The TypeScript carriage
