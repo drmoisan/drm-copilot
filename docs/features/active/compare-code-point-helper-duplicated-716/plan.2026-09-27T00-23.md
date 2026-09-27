@@ -115,7 +115,7 @@
 
 ### Phase 3 — Unit and Property-Based Tests (`models.test.ts`)
 
-- [ ] [P3-T1] In `extensions/drm-copilot/test/lib/pr-context/models.test.ts`: (a) add `compareCodePoint,` as a new first line inside the top import block (currently `findUserStoryLink,` / `formatList,` / `normalizeReference,` / `section,` / `truncate,` / `truncateLines,` from `"../../../src/lib/pr-context/models"`), and (b) append this block after the file's existing final `describe("formatList", ...)` block:
+- [x] [P3-T1] In `extensions/drm-copilot/test/lib/pr-context/models.test.ts`: (a) add `compareCodePoint,` as a new first line inside the top import block (currently `findUserStoryLink,` / `formatList,` / `normalizeReference,` / `section,` / `truncate,` / `truncateLines,` from `"../../../src/lib/pr-context/models"`), and (b) append this block after the file's existing final `describe("formatList", ...)` block:
   ```ts
   describe("compareCodePoint", () => {
     it("returns 0 for identical strings", () => {
@@ -145,7 +145,7 @@
   ```
   - Acceptance: run `node run-jest.cjs test/lib/pr-context/models.test.ts --testNamePattern "^compareCodePoint [a-z]"` from `extensions/drm-copilot`; the printed `Tests:` line reads `20 skipped, 6 passed, 26 total` and exit code is `0`. (The pattern requires a lowercase letter immediately after `compareCodePoint ` so it cannot also match the `compareCodePoint - enumerative properties ...` describe title added by P3-T2, whose text continues with a hyphen at that position. Jest reports every test excluded by `--testNamePattern` as skipped rather than omitting it, so the 20 pre-existing tests in this file are counted as skipped, not absent.)
 
-- [ ] [P3-T2] In the same file, append this second block directly after the block added by P3-T1:
+- [x] [P3-T2] In the same file, append this second block directly after the block added by P3-T1:
   ```ts
   describe("compareCodePoint - enumerative properties over a fixed domain", () => {
     const DOMAIN = ["", "a", "A", "aa", "ab", "b", "ba", "é", "😀"];
