@@ -20,7 +20,8 @@
 #   gitdir_target_exists NA when has_gitfile is 0 (there is no pointer to resolve);
 #                        otherwise 1 when the `gitdir: <target>` line's target exists
 #                        (resolved relative to <path> when the target is not absolute),
-#                        else 0.
+#                        else 0. A target is absolute when it begins with `/` or with a
+#                        drive letter followed by `/` or `\` (for example `C:/repo`).
 #   size                 best-effort `du -sh` size of <path>, or the literal `unknown`
 #                        when du fails or prints nothing. Size is advisory only, so a
 #                        du failure never fails the scan.
@@ -69,6 +70,30 @@ scan_helper_gitfile_name() {
 	printf '%s\n' ".git"
 }
 
+scan_helper_is_absolute_path() {
+	# Return 0 when <path> is absolute, else 1. Pure: no filesystem access.
+	#
+	# Absolute forms are a leading `/` (POSIX paths, MSYS `/c/...` paths, and `//server`
+	# UNC paths) and a drive letter followed by `/` or `\` (`C:/...`, `c:/...`,
+	# `C:\...`), which is the form Git for Windows writes into a worktree's `.git`
+	# pointer file (issue #706). A drive letter with no separator (`C:rel`) is
+	# drive-relative and is not absolute; an empty path is not absolute.
+	#
+	# Args: $1 = path. Returns 0 (absolute) or 1 (not absolute).
+	local path=${1:-}
+	[[ $path == /* || $path == [A-Za-z]:[/\\]* ]]
+}
+
+scan_helper_target_present() {
+	# Return 0 when <path> exists, else non-zero. This is the helper's single
+	# filesystem existence check, kept in its own function as a test seam: bats tests
+	# redefine this function after sourcing the helper so that a drive-letter target
+	# can be reported present on a runner that has no such drive (issue #706).
+	#
+	# Args: $1 = path.
+	[[ -e ${1:-} ]]
+}
+
 scan_helper_gitdir_target_exists() {
 	# Echo 1 when the worktree pointer file in <dir> names an existing gitdir target,
 	# else 0. A missing, unreadable, or malformed pointer file yields 0 (the pointer
@@ -88,10 +113,10 @@ scan_helper_gitdir_target_exists() {
 		printf '0\n'
 		return 0
 	fi
-	if [[ $target != /* ]]; then
+	if ! scan_helper_is_absolute_path "$target"; then
 		target="$dir/$target"
 	fi
-	if [[ -e $target ]]; then
+	if scan_helper_target_present "$target"; then
 		printf '1\n'
 	else
 		printf '0\n'
