@@ -64,3 +64,40 @@ Porcelain (pre-staging):
 Staged paths: the eight non-evidence paths named by [P1-T12], the evidence directory `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence` (which carries this file and the Phase 0 post-commit append), and the plan checklist `docs/features/active/codex-gates-4-5-lack-epic-scope-707/plan.2026-09-26T22-55.md`.
 
 Message: `fix(codex-hooks): add Codex epic-scope resolution and command-leg siblings for #707` with the two session attribution trailer lines.
+
+Commit SHA: 9c1c0066d660277da1557cf7e08df43a79628999
+
+`git log -1 --name-only` lists the eight non-evidence paths named by [P1-T12], seven evidence paths, and the plan file (16 files).
+
+Porcelain (post-commit, pre-append):
+
+```
+(empty)
+```
+
+Push: `git push origin bug/codex-gates-4-5-lack-epic-scope-707` (plain, not forced) reported `11b80cdd..9c1c0066  bug/codex-gates-4-5-lack-epic-scope-707 -> bug/codex-gates-4-5-lack-epic-scope-707`.
+
+This post-commit entry and the [P1-T12] check-off in the plan are uncommitted after the append and are carried into the next phase commit.
+
+## Phase 2 commit (batch B2)
+
+Timestamp: 2026-09-27T07-05
+Command: git status --porcelain -uall -- docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence
+EXIT_CODE: 0
+Output Summary: Three modified and four untracked evidence paths listed; each is named by a task of Phase 1 or Phase 2 (commits.md by rule 9; batch-budget-resets.md by [P2-T1]; mirror-log.md by [P2-T4] and [P2-T7]; fail-before-b2-gate.md by [P2-T5]; b2-scoped-pester.md by [P2-T8]; b2-pytest-guards.md by [P2-T9]; b2-poshqc.md by [P2-T10]). No other path is listed, so the commit may proceed.
+
+Porcelain (pre-staging):
+
+```
+ M docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/other/batch-budget-resets.md
+ M docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/other/commits.md
+ M docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/other/mirror-log.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/b2-poshqc.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/b2-pytest-guards.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/b2-scoped-pester.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/regression-testing/fail-before-b2-gate.md
+```
+
+Staged paths: the three non-evidence paths named by [P2-T11], the evidence directory `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence` (which carries this file, including the Phase 1 post-commit append), and the plan checklist `docs/features/active/codex-gates-4-5-lack-epic-scope-707/plan.2026-09-26T22-55.md` (including the [P1-T12] check-off).
+
+Message: `fix(codex-hooks): route Codex gate 4 command and path legs through epic scope for #707` with the two session attribution trailer lines.

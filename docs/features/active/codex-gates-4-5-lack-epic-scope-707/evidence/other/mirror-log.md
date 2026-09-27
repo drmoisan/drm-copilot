@@ -39,3 +39,37 @@ Copy-Item -LiteralPath .codex/hooks/enforce-orchestration-preimplementation-gate
 | --- | --- | --- | --- | --- |
 | .codex/hooks/enforce-orchestration-preimplementation-gate-epic-resolution.ps1 | 89BB099CC73E800603C34DADE4F80E73D1D9CCD4561E8454551F05EAB174B6B5 | extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-epic-resolution.ps1 | 89BB099CC73E800603C34DADE4F80E73D1D9CCD4561E8454551F05EAB174B6B5 | equal |
 | .codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 | A064ED683C3798FB6D02792FEEED5FE72CBA46DE81F4539FE4CCD12883BBD9F7 | extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 | A064ED683C3798FB6D02792FEEED5FE72CBA46DE81F4539FE4CCD12883BBD9F7 | equal |
+
+## B2 pre-insertion ([P2-T4])
+
+Timestamp: 2026-09-27T07-00
+Command: sh <SCRATCHPAD>/x707p1-run.sh x707p2-mirror-gate
+EXIT_CODE: 0
+Output Summary: One byte copy of the gate after edits (a), (b), and (c) and before edit (d); the SHA-256 pair is equal.
+
+Copy commands:
+
+```
+Copy-Item -LiteralPath .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 -Destination extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1 -Force
+```
+
+| Source | Source SHA-256 | Mirror | Mirror SHA-256 | Mark |
+| --- | --- | --- | --- | --- |
+| .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 | F156023D6CCFC8D6EE3DD2CCB109A331F1B0119B217F3D1339AE5809E0745AC9 | extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1 | F156023D6CCFC8D6EE3DD2CCB109A331F1B0119B217F3D1339AE5809E0745AC9 | equal |
+
+## B2 final ([P2-T7])
+
+Timestamp: 2026-09-27T07-01
+Command: sh <SCRATCHPAD>/x707p1-run.sh x707p2-mirror-gate
+EXIT_CODE: 0
+Output Summary: One byte copy of the gate after edit (d); the SHA-256 pair is equal.
+
+Copy commands:
+
+```
+Copy-Item -LiteralPath .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 -Destination extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1 -Force
+```
+
+| Source | Source SHA-256 | Mirror | Mirror SHA-256 | Mark |
+| --- | --- | --- | --- | --- |
+| .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 | 150F3F8466B607AAC12D16F668152DF6E9C6B0BF00E43EF3D86EA2C2F4D7B0D1 | extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1 | 150F3F8466B607AAC12D16F668152DF6E9C6B0BF00E43EF3D86EA2C2F4D7B0D1 | equal |
