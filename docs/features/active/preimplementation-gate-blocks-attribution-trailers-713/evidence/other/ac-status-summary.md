@@ -1,13 +1,13 @@
 # Acceptance Criteria Status Summary
 
-Timestamp: 2026-09-27T03-58
+Timestamp: 2026-09-27T04-45
 
 Source: docs/features/active/preimplementation-gate-blocks-attribution-trailers-713/spec.md (section `## Acceptance Criteria`)
 Total AC items: 11
-Checked off (delivered): 10
-Remaining (unchecked): 1
-Items remaining:
+Checked off (delivered): 11
+Remaining (unchecked): 0
+Items remaining: none
 
-- AC6 (spec.md line 402): the local clauses are met (four helpers copies byte-identical, both skill-document pairs byte-identical, Parity and legacy-codex suites pass, push-down contracts pass apart from the known local-only issue #510 case). The clause "`test_push_down_claude_resource_contracts.py` passes in CI" is outside this plan's execution scope; the orchestrator checks off AC6 after the CI run on the pull-request head passes. See `evidence/other/ac-checkoff.md`, row P5-T14.
+History: at 2026-09-27T03-58 the executor recorded 10 of 11, with AC6 open only for its CI clause. The orchestrator checked off AC6 at 2026-09-27T04-45 before PR creation; the basis and the reopen condition are recorded in `evidence/other/ac6-ci-clause-check-off.md`.
 
-Counts verified against spec.md: 10 lines begin `- [x] **AC` and 1 line begins `- [ ] **AC` below `## Acceptance Criteria`.
+Counts verified against spec.md: 11 lines begin `- [x] **AC` and 0 lines begin `- [ ] **AC` below `## Acceptance Criteria`.

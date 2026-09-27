@@ -11,3 +11,4 @@ Branch: `bug/preimplementation-gate-blocks-attribution-trailers-713`. HEAD_SHA r
 | 2 | eef16acbe160e1a04c30c1af22df5f3e94c6e885 | fix(hooks): admit attribution trailers in the preimplementation gate | yes (911359bc..eef16acb) |
 | 3 | a3d02f874c1b1b396921442ccc41f3fa4744decb | docs(skills): document attribution-trailer commit forms for issue #713 | yes (eef16acb..a3d02f87) |
 | 4 | f402491990bd0e2ee9c545022d66cac74f2f331a | docs(evidence): record scope boundary and follow-ups for issue #713 | yes (a3d02f87..f4024919) |
+| 5 | 586e9037255b17d75c01d9c5f3e7b87b42aa4333 | docs(evidence): record final QC loop and AC check-offs for issue #713 | yes (f4024919..586e9037); this row is uncommitted because it records the final commit itself |
