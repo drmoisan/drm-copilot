@@ -257,3 +257,36 @@ Phase 6 has no commit task, and pass 1 required no fix, so no production or test
 Staged paths: the evidence directory `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence` (which carries this file, including the Phase 5 post-commit append) and the plan checklist `docs/features/active/codex-gates-4-5-lack-epic-scope-707/plan.2026-09-26T22-55.md` (including the [P6-T1] to [P6-T10] check-offs).
 
 Message: `docs(bug): record #707 final QA and coverage evidence` with the two session attribution trailer lines.
+
+Commit SHA: d66be87707df1336123ca46782f7f2665499186a
+
+`git commit` reported 12 files changed: ten new Phase 6 evidence files, commits.md, and the plan file.
+
+Porcelain (post-commit, pre-append):
+
+```
+(empty)
+```
+
+Push: `git push origin bug/codex-gates-4-5-lack-epic-scope-707` (plain, not forced) reported `0b4e0c5d..d66be877  bug/codex-gates-4-5-lack-epic-scope-707 -> bug/codex-gates-4-5-lack-epic-scope-707`.
+
+This post-commit entry is uncommitted after the append and is carried into the next phase commit.
+
+## Phase 7 commit (acceptance-criteria check-off, [P7-T29])
+
+Timestamp: 2026-09-27T07-47
+Command: git status --porcelain -- docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence
+EXIT_CODE: 0
+Output Summary: One modified and two untracked evidence paths listed; each is named by a task of the current or an earlier phase (commits.md by rule 9 and the Phase 6 commit entry; ac-status-summary.md by [P7-T16] and [P7-T27]; follow-ups.md by [P7-T28]). No other path is listed, so the commit may proceed.
+
+Porcelain (pre-staging):
+
+```
+ M docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/other/commits.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/other/ac-status-summary.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/other/follow-ups.md
+```
+
+Staged paths: `docs/features/active/codex-gates-4-5-lack-epic-scope-707/spec.md` (25 AC check-offs; AC-16 unchecked per RS-6), `docs/features/active/codex-gates-4-5-lack-epic-scope-707/plan.2026-09-26T22-55.md` ([P7-T1] to [P7-T28] check-offs), and the evidence directory `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence` (which carries this file, including the Phase 6 post-commit append).
+
+Message: `docs(bug): check off #707 acceptance criteria and record status` with the two session attribution trailer lines.
