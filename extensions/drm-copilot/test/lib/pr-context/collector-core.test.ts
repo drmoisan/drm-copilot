@@ -99,11 +99,13 @@ function ghHandler(options: {
         : failResult("no pull request");
     }
     if (sub.startsWith("api")) {
-      // classify_entity / issue/pr detail: a numeric ref classifies as issue.
+      // Numeric refs classify as open issues so D3 keeps the PASS-readiness primary.
       const apiPath = args[args.indexOf("api") + 1] ?? "";
       if (/issues\/\d+$/u.test(apiPath)) {
         const number = apiPath.split("/").pop() ?? "0";
-        return okResult(JSON.stringify({ number: Number(number) }));
+        return okResult(
+          JSON.stringify({ number: Number(number), state: "open" }),
+        );
       }
       return okResult("{}");
     }

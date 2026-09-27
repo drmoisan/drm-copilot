@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from .models import FeatureDocExcerpt, section, truncate
+from .models import ISSUE_REFERENCE_PATTERN, FeatureDocExcerpt, section, truncate
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -23,12 +23,17 @@ def parse_section(markdown: str, heading: str) -> str:
 
 
 def _extract_issue_references(text: str) -> list[str]:
-    """Extract normalized issue reference tokens from freeform text."""
+    """Extract bare-number issue references (for example #123) from freeform text.
+
+    Only ``#`` followed by ASCII digits, not preceded or followed by a word
+    character, is returned (issue #622, D1).
+    """
     if not text:
         return []
-    matches = re.findall(r"(?<!\w)#\d+|\b[A-Z][A-Z0-9]+-\d+\b", text)
+    matches = ISSUE_REFERENCE_PATTERN.findall(text)
     seen: set[str] = set()
     ordered: list[str] = []
+    # Keep the first occurrence of each reference so output order is stable.
     for item in matches:
         if item not in seen:
             seen.add(item)

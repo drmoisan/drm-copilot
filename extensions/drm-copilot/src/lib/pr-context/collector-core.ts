@@ -30,8 +30,10 @@ import { GhClient, type WhichGh } from "./gh-client-core";
 import { buildPrContext } from "./render";
 import {
   buildIssuesToAutocloseSection,
-  extractChangedPaths,
-} from "./render-pr-helpers";
+  classifyReferences,
+  selectPendingPrimary,
+} from "./autoclose";
+import { extractChangedPaths } from "./render-pr-helpers";
 import { gatherFeatureExcerpts } from "./feature-docs";
 import { extractIssueReferences } from "./feature-docs-parsers";
 import {
@@ -105,9 +107,11 @@ export interface CollectPrContextOptions {
  * client, build the gh client and gate availability (with the override
  * message), fetch the current PR, run the first and (when feature refs exist)
  * second `buildPrContext`, gather feature docs, classify references across
- * feature/branch/path refs, derive verified/author reasons and pending-primary
- * autoclose targets, fetch issue/PR details, compute the diff selection,
- * scoping changes, CI status, and the core/renames/docs buckets.
+ * feature/branch/path refs, derive verified/author reasons, keep the
+ * pending-primary autoclose targets that GitHub reports as open issues (issue
+ * #622; prose references are never promoted to author auto-close), fetch
+ * issue/PR details once per number, compute the diff selection, scoping
+ * changes, CI status, and the core/renames/docs buckets.
  *
  * @param options Base/head/root, flags, and injected fs/runner/clock.
  * @returns The typed intermediate record for the output builder.
@@ -196,8 +200,10 @@ export function collectPrContext(
   const referencedPrs = [...referencedPrsSet].sort(compareCodePoint);
   const invalidRefs = [...invalidRefsSet].sort(compareCodePoint);
 
-  let authorAsserted: string[] = [];
-  const authorReasonInitial = "None (author has not asserted autoclose issues)";
+  // D2 (issue #622): prose citations are mentions only, so nothing is
+  // promoted into author-asserted autoclose.
+  const authorAsserted: string[] = [];
+  const authorReason = "None (author has not asserted autoclose issues)";
   const verified = ghAvailable ? contextResult.verifiedClosing : [];
   let verifiedReason: string;
   if (!ghAvailable) {
@@ -208,12 +214,6 @@ export function collectPrContext(
     verifiedReason = "None (closingIssuesReferences empty)";
   } else {
     verifiedReason = "(verified from GitHub PR metadata)";
-  }
-
-  let authorReason = authorReasonInitial;
-  if (referencedIssues.length > 0) {
-    authorAsserted = sortedSet([...authorAsserted, ...referencedIssues]);
-    authorReason = "Detected issue references (classified)";
   }
 
   // Derive deterministic pending autoclose targets from explicit metadata only
@@ -235,21 +235,30 @@ export function collectPrContext(
       .map((doc) => doc.readinessSignal)
       .filter((signal): signal is string => Boolean(signal)),
   );
+  // D3/D5: keep a pending primary only when GitHub reports an open issue.
+  const selection = selectPendingPrimary({ gh, ghAvailable, pendingPrimary });
   const issuesToAutocloseSection = buildIssuesToAutocloseSection({
     verified,
-    pendingPrimary,
+    pendingPrimary: selection.kept,
     readinessSignals,
+    ghAvailable,
+    pendingPrimaryExcluded: selection.excluded,
   });
 
   const issuesToFetch = sortedSet([
     ...verified,
-    ...authorAsserted,
     ...referencedIssues,
+    ...selection.kept,
   ]);
   const issueDetails: IssueDetails[] = [];
   if (ghAvailable) {
+    // Reuse details fetched during pending selection so each issue number is
+    // fetched at most once per run.
     for (const ref of issuesToFetch) {
-      issueDetails.push(gh.issueDetails(ref.replace(/^#+/u, "")));
+      issueDetails.push(
+        selection.fetchedDetails.get(ref) ??
+          gh.issueDetails(ref.replace(/^#+/u, "")),
+      );
     }
   }
 
@@ -363,94 +372,6 @@ export function collectPrContext(
     ghStatusMessage: gh.statusMessage,
     head,
   };
-}
-
-/** Options for the reference-classification loop. */
-interface ClassifyReferencesOptions {
-  gh: GhClient;
-  ghAvailable: boolean;
-  featureIssueRefs: string[];
-  branchRefs: string[];
-  pathRefs: string[];
-  referencedIssuesSet: Set<string>;
-  referencedPrsSet: Set<string>;
-  invalidRefsSet: Set<string>;
-}
-
-/**
- * Classify feature/branch/path references into the issue/PR/invalid sets.
- *
- * Mirrors the Python classification loop: when gh is available, classify each
- * feature ref and each branch/path ref via `classify_entity`; otherwise add all
- * feature, branch, and path refs to the issue set.
- *
- * @param options Classification inputs and the mutable target sets.
- */
-function classifyReferences(options: ClassifyReferencesOptions): void {
-  const {
-    gh,
-    ghAvailable,
-    featureIssueRefs,
-    branchRefs,
-    pathRefs,
-    referencedIssuesSet,
-    referencedPrsSet,
-    invalidRefsSet,
-  } = options;
-
-  if (ghAvailable) {
-    // Classify the feature refs first, then the combined branch/path refs.
-    for (const ref of featureIssueRefs) {
-      classifyOne(
-        gh,
-        ref,
-        referencedIssuesSet,
-        referencedPrsSet,
-        invalidRefsSet,
-      );
-    }
-    for (const ref of [...branchRefs, ...pathRefs]) {
-      classifyOne(
-        gh,
-        ref,
-        referencedIssuesSet,
-        referencedPrsSet,
-        invalidRefsSet,
-      );
-    }
-  } else {
-    // gh unavailable: every ref is treated as an (unverified) issue.
-    for (const ref of featureIssueRefs) {
-      referencedIssuesSet.add(formatRef(ref));
-    }
-    for (const ref of [...branchRefs, ...pathRefs]) {
-      referencedIssuesSet.add(formatRef(ref));
-    }
-  }
-}
-
-/** Classify a single reference into the appropriate set. */
-function classifyOne(
-  gh: GhClient,
-  ref: string,
-  issuesSet: Set<string>,
-  prsSet: Set<string>,
-  invalidSet: Set<string>,
-): void {
-  const formatted = formatRef(ref);
-  const entity = gh.classifyEntity(ref.replace(/^#+/u, ""));
-  if (entity === "issue") {
-    issuesSet.add(formatted);
-  } else if (entity === "pull") {
-    prsSet.add(formatted);
-  } else {
-    invalidSet.add(formatted);
-  }
-}
-
-/** Prefix a reference with `#` when not already present. */
-function formatRef(ref: string): string {
-  return ref.startsWith("#") ? ref : `#${ref}`;
 }
 
 /** Extract a message from a thrown value, matching Python `str(exc)`. */
