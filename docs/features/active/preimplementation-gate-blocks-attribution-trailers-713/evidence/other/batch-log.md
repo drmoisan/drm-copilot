@@ -11,3 +11,16 @@ Paths (plan rule 9, batch 1):
 3. `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.AttributionTrailer.Tests.ps1` (Write, [P1-T2])
 
 BATCH_BUDGET_RESET: none required (one production and one test Write/Edit slot used by this plan)
+
+## Batch 2
+
+Timestamp: 2026-09-27T03-38
+
+Paths (plan rule 9, batch 2; section 2 items 3, 4, 6, 7, 8, 9):
+
+1. `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1` (R-MIRROR, [P3-T2])
+2. `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1` (R-MIRROR, [P3-T2])
+3. `.claude/skills/parallel-plan/SKILL.md` (Markdown Edit, [P3-T3])
+4. `.claude/skills/epic-plan/SKILL.md` (Markdown Edit, [P3-T4])
+5. `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md` (R-MIRROR, [P3-T5])
+6. `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-plan/SKILL.md` (R-MIRROR, [P3-T5])
