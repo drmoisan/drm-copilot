@@ -25,6 +25,10 @@
       - Get-BlastRadiusConflictEdge       port of schedule_conflict_edges
       - Get-BlastRadiusPairDecision       port of decide_pair
 
+    It also re-exports the six functions of BlastRadiusWriteIntent.psm1 (issue
+    #722); Get-BlastRadius and Get-NormalizedDeclaredRadius delegate their
+    write_intent_extraction flag branch to that module.
+
     The Python modules remain the authoritative reference implementation. This
     module is one half of a two-language mirror; it never imports validator
     logic. Every function is pure: no filesystem, subprocess, network, or
@@ -68,6 +72,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusNormalizatio
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusValidation.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConflict.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusScheduling.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusWriteIntent.psm1') -Force -ErrorAction Stop
 
 # Feature-folder handling. Every radius contains its own feature folder, and a
 # caller may pass either a bare folder name or an already-qualified path.
@@ -177,10 +182,19 @@ function Get-BlastRadius {
     # derived radius always passes V1 and V2 against its own plan (issue #452).
     $rootSurface = [string[]]@(Get-ConfigRootSurface -Config $Config)
 
-    $specLine = [string[]]@(ConvertTo-NormalizedLine -Text $SpecText)
+    # Write-intent mode (issue #722) delegates to BlastRadiusWriteIntent.psm1:
+    # plan paths come from the selector Test-BlastRadius also uses and the spec
+    # contributes contracts only.
     $entry = [System.Collections.Generic.List[string]]::new()
-    $entry.AddRange([string[]]@(Get-PlanPaths -PlanText $PlanText -RootSurface $rootSurface))
-    $entry.AddRange([string[]]@(Get-PathFromLine -Line $specLine -RootSurface $rootSurface))
+    if (Test-WriteIntentExtractionEnabled -Config $Config) {
+        $entry.AddRange([string[]]@(Get-PlanPathForConfig -PlanText $PlanText -Config $Config -RootSurface $rootSurface))
+        $contract = @(Get-WriteIntentSpecContract -SpecText $SpecText)
+    } else {
+        $specLine = [string[]]@(ConvertTo-NormalizedLine -Text $SpecText)
+        $entry.AddRange([string[]]@(Get-PlanPaths -PlanText $PlanText -RootSurface $rootSurface))
+        $entry.AddRange([string[]]@(Get-PathFromLine -Line $specLine -RootSurface $rootSurface))
+        $contract = @(Get-ContractIdentifier -SpecText $SpecText)
+    }
 
     # Read-by-mandate citations are dropped before the feature folder is added: a
     # plan cites the policy rules because its author was told to read them, not
@@ -201,7 +215,7 @@ function Get-BlastRadius {
         paths           = $paths
         modules         = @(Resolve-BlastRadiusModule -PathEntry $paths -Config $Config)
         shared_surfaces = @(Resolve-BlastRadiusSharedSurface -ConcretePath $concrete -Config $Config)
-        contracts       = @(Get-ContractIdentifier -SpecText $SpecText)
+        contracts       = $contract
         source          = $Source
         computed_at     = $ComputedAt
     }
@@ -272,7 +286,14 @@ function Get-NormalizedDeclaredRadius {
         }
     }
 
-    $paths = [string[]]@(Get-NonMandateReadEntry -Entry $accepted.ToArray() `
+    # Write-intent mode (issue #722) applies the token-level rules W1, W4, and W6
+    # before the mandate-read filter; the feature-folder glob is kept.
+    $acceptedEntry = [string[]]$accepted.ToArray()
+    if (Test-WriteIntentExtractionEnabled -Config $Config) {
+        $acceptedEntry = [string[]]@(Select-WriteIntentPathEntry -Entry $acceptedEntry -RootSurface $rootSurface `
+                -PathRoot ([string[]]@(Get-ConfigPathRoot -Config $Config)))
+    }
+    $paths = [string[]]@(Get-NonMandateReadEntry -Entry $acceptedEntry `
             -MandateRead ([string[]]@(Get-ConfigMandateRead -Config $Config)))
     $concrete = [string[]]@(Get-ConcreteEntry -Entry $paths)
 
@@ -445,4 +466,10 @@ Export-ModuleMember -Function `
     Test-BlastRadius, `
     Test-BlastRadiusConflict, `
     Get-BlastRadiusConflictEdge, `
-    Get-BlastRadiusPairDecision
+    Get-BlastRadiusPairDecision, `
+    Test-WriteIntentExtractionEnabled, `
+    Get-ConfigPathRoot, `
+    Get-WriteIntentPlanPath, `
+    Get-WriteIntentSpecContract, `
+    Select-WriteIntentPathEntry, `
+    Get-PlanPathForConfig

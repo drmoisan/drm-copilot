@@ -188,6 +188,9 @@
             # explicit per-file allow-list, so the new module is named here to keep
             # it in the coverage denominator.
             '.claude/lib/blast-radius/BlastRadiusScheduling.psm1'
+            # Issue #722 also added the tenth file below, the write-intent
+            # extraction layer the facade and validation module delegate to.
+            '.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1'
             # Issue #643 also added the merge library below: the line grammar, the
             # keyed-union merge, and the entry script. The entry script is measured
             # like the two modules because its Pester suite dot-sources it behind a

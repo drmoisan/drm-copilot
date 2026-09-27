@@ -469,12 +469,14 @@ Describe 'Exported facade surface' {
         It 'exports <_>' -ForEach @(
             'Get-PlanPaths', 'Get-BlastRadius', 'Get-BlastRadiusFromObservedPaths',
             'Get-NormalizedDeclaredRadius', 'Test-BlastRadius', 'Test-BlastRadiusConflict',
-            'Get-BlastRadiusConflictEdge', 'Get-BlastRadiusPairDecision'
+            'Get-BlastRadiusConflictEdge', 'Get-BlastRadiusPairDecision',
+            'Test-WriteIntentExtractionEnabled', 'Get-ConfigPathRoot', 'Get-WriteIntentPlanPath',
+            'Get-WriteIntentSpecContract', 'Select-WriteIntentPathEntry', 'Get-PlanPathForConfig'
         ) {
             # Arrange: the module's exported command table.
             $exported = (Get-Module BlastRadius).ExportedFunctions.Keys
 
-            # Act / Assert: the eight spec-fixed names are all exported.
+            # Act / Assert: the fourteen spec-fixed names are all exported.
             # Get-NormalizedDeclaredRadius joined the contract with issue #489.
             $exported | Should -Contain $_
         }
@@ -484,7 +486,7 @@ Describe 'Exported facade surface' {
             $exported = @((Get-Module BlastRadius).ExportedFunctions.Keys)
 
             # Assert: the facade surface is exactly the documented contract.
-            $exported.Count | Should -Be 8
+            $exported.Count | Should -Be 14
         }
     }
 }

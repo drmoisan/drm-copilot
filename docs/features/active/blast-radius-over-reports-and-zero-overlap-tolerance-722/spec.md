@@ -645,19 +645,19 @@ reporting done.
 
 ### Write-intent extraction (design point 1)
 
-- [ ] Rules W1-W6 are implemented in the Python write-intent module and the PowerShell write-intent
+- [x] Rules W1-W6 are implemented in the Python write-intent module and the PowerShell write-intent
   module, active only when write_intent_extraction is true, each covered by its write-intent fixture
   and a named unit test in both runtimes.
-- [ ] The write-intent-shared-surface-read-citation fixture shows a shared surface cited only in a read
+- [x] The write-intent-shared-surface-read-citation fixture shows a shared surface cited only in a read
   task or command span produces no shared surface and no hard edge, while the same surface named in a
   write task is retained and is hard.
-- [ ] The write-intent-spec-contracts-only fixture shows the spec contributes no paths and that
+- [x] The write-intent-spec-contracts-only fixture shows the spec contributes no paths and that
   wildcard tokens and multi-word spans contribute no contracts in write-intent mode.
-- [ ] The write-intent-flag-absent-matches-current fixture shows derivation, normalization, and
+- [x] The write-intent-flag-absent-matches-current fixture shows derivation, normalization, and
   validation are identical to current behavior when write_intent_extraction is absent or false, in
   both runtimes.
-- [ ] A derived radius passes V1 and V2 against its own plan in write-intent mode, in both runtimes.
-- [ ] The read-verb, write-verb, and placeholder-stem sets are pinned equal across Python and
+- [x] A derived radius passes V1 and V2 against its own plan in write-intent mode, in both runtimes.
+- [x] The read-verb, write-verb, and placeholder-stem sets are pinned equal across Python and
   PowerShell by a parity test.
 - [x] Both config copies add the Copilot instructions file under .github to mandate_reads, set
   write_intent_extraction to true, and carry path_roots (self-hosted: the P0-derived top-level
@@ -665,7 +665,7 @@ reporting done.
 
 ### Parity and configuration partition (design point 6)
 
-- [ ] The key-partition tests classify every new top-level key: conflict_tolerance and
+- [x] The key-partition tests classify every new top-level key: conflict_tolerance and
   write_intent_extraction as byte-equal in the Python support module and the PowerShell partition
   test; path_roots in the Class 2 registry with a consuming test asserting the bundled value is empty;
   the existing exhaustiveness test passes with every key present in both copies.

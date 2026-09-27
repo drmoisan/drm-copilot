@@ -923,24 +923,24 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 10 — Part B: PowerShell Write-Intent Module, Flag Branches, Registration
 
-- [ ] [P10-T1] Reset the PowerShell batch budget (A8, -Kind powershell). Write
+- [x] [P10-T1] Reset the PowerShell batch budget (A8, -Kind powershell). Write
       FEATURE/evidence/other/batch-budget-reset-p10a.TS.md. Acceptance: exit 0.
-- [ ] [P10-T2] Write `tests/scripts/claude-lib/blast-radius/BlastRadiusWriteIntent.Tests.ps1` with the
+- [x] [P10-T2] Write `tests/scripts/claude-lib/blast-radius/BlastRadiusWriteIntent.Tests.ps1` with the
       It blocks of block B34, driving the P8-T2 fixtures. Acceptance: the file exists and is at most 500
       lines.
-- [ ] [P10-T3] Edit `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`: add
+- [x] [P10-T3] Edit `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`: add
       write_intent_extraction to the Class 1 list, add path_roots to the Class 2 consumer registry mapped
       to this file's own name, and add It 'declares an empty bundled path_roots list', whose assertion
       reads the value with the literal indexer $script:BundledConfig['path_roots'] (the form the
       registry-consumption check searches for). Acceptance: the file is at most 500 lines and contains
       that literal indexer.
-- [ ] [P10-T4] Create `.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1` implementing block B35,
+- [x] [P10-T4] Create `.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1` implementing block B35,
       the PowerShell port of B33 with the same constants in the same order. The module carries the
       .claude/lib convention: the help-block phrase "imports its siblings with -ErrorAction Stop",
       Set-StrictMode -Version Latest immediately followed by $ErrorActionPreference = 'Stop', and
       -ErrorAction Stop on every column-0 Import-Module line. Acceptance: the file exists and is at
       most 500 lines; the convention is verified by P10-T12.
-- [ ] [P10-T5] Edit `.claude/lib/blast-radius/BlastRadius.psm1`: import the write-intent module (in the
+- [x] [P10-T5] Edit `.claude/lib/blast-radius/BlastRadius.psm1`: import the write-intent module (in the
       sibling import form ending in -Force -ErrorAction Stop); in
       Get-BlastRadius and Get-NormalizedDeclaredRadius add the flag branch as a delegation to the
       write-intent module (all logic stays in that module); append exactly the six write-intent
@@ -951,12 +951,12 @@ the read-only check script A6 and a before-and-after hash comparison.
       file is at most 500 lines. The export-count test is updated by P10-T10. Stop condition: if the
       edit would exceed 500 lines, move the branch logic into the P10-T4 module and record the
       relocation in the P10-T7 artifact.
-- [ ] [P10-T6] Edit `.claude/lib/blast-radius/BlastRadiusValidation.psm1`: import the write-intent
+- [x] [P10-T6] Edit `.claude/lib/blast-radius/BlastRadiusValidation.psm1`: import the write-intent
       module (in the sibling import form ending in -Force -ErrorAction Stop) and replace the plan-side Get-PlanPaths call used by V1 and V2 with the write-intent
       selector. Acceptance: the file is at most 500 lines. Stop condition: if the edit would exceed
       500 lines, move the remaining selection logic into the P10-T4 module instead and record the
       relocation in the P10-T7 artifact.
-- [ ] [P10-T7] Produce the mirrors for P10-T4, P10-T5, and P10-T6 per the Preamble rule by running
+- [x] [P10-T7] Produce the mirrors for P10-T4, P10-T5, and P10-T6 per the Preamble rule by running
       script copy-file (A10) through CMD-PS-SCRIPT-SH once per pair, with destinations
       `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1`,
       `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadius.psm1`,
@@ -964,9 +964,9 @@ the read-only check script A6 and a before-and-after hash comparison.
       then run script file-hashes (A5) through CMD-PS-SCRIPT-SH over the three source-and-mirror pairs.
       Write FEATURE/evidence/qa-gates/mirrors-p10.TS.md. Acceptance: each A10 run prints its COPIED
       line and, for each of the three pairs, the two A5 Hash values are equal.
-- [ ] [P10-T8] Reset the PowerShell batch budget (A8, -Kind powershell). Write
+- [x] [P10-T8] Reset the PowerShell batch budget (A8, -Kind powershell). Write
       FEATURE/evidence/other/batch-budget-reset-p10b.TS.md. Acceptance: exit 0.
-- [ ] [P10-T9] Edit `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` to add the write-intent
+- [x] [P10-T9] Edit `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` to add the write-intent
       module to the blast-radius coverage paths, run script copy-file (A10) through CMD-PS-SCRIPT-SH to
       copy it to `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`,
       and edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` to
@@ -974,7 +974,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       file and script file-hashes (A5) over the runsettings pair, each through CMD-PS-SCRIPT-SH.
       Acceptance: A11 prints PSD1-OK for the self-hosted runsettings file; the two A5 Hash values are
       equal; core.json parses as JSON.
-- [ ] [P10-T10] In the batch opened by P10-T8 (spec decision 12; this batch then holds one production
+- [x] [P10-T10] In the batch opened by P10-T8 (spec decision 12; this batch then holds one production
       and one test file), edit `tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1`, Describe
       'Exported facade surface' only: append the six write-intent names of P10-T5 to the -ForEach list
       of It 'exports <_>' (keeping the eight Part A names), change the comment that says eight names
@@ -985,21 +985,21 @@ the read-only check script A6 and a before-and-after hash comparison.
       lines; the run prints FailedCount=0 and a PassedCount equal to its TotalCount; its detailed
       output contains a passing line for "exports Get-PlanPathForConfig" and a passing line for
       "exports no function beyond the spec-fixed names".
-- [ ] [P10-T11] Run script pester-coverage over the P10-T2 file and the P10-T3 file (one run each) with
+- [x] [P10-T11] Run script pester-coverage over the P10-T2 file and the P10-T3 file (one run each) with
       -CoveragePath set to the write-intent module, the facade, and the validation module as one
       comma-joined value, and -CoverageOutputPath SCRATCH/pester-p10.xml. Write
       FEATURE/evidence/regression-testing/pester-part-b.TS.md. Acceptance: every run prints
       FailedCount=0; every B34 It name appears as passed.
-- [ ] [P10-T12] Run script pester-counts over the whole blast-radius Pester directory; then run script
+- [x] [P10-T12] Run script pester-counts over the whole blast-radius Pester directory; then run script
       pester-counts with -Path set to the convention test path of block B46, then run script
       pester-counts with -Path set to the guard path of block B47. Write
       FEATURE/evidence/regression-testing/pester-directory-p10.TS.md. Acceptance: every FAILED name of
       the directory run is in the P0-T32 baseline failure set; the convention run prints
       FailedCount=0; the B47 run prints FailedCount=0.
-- [ ] [P10-T13] Format and lint the seven primary PowerShell files of this phase (the files of P10-T2
+- [x] [P10-T13] Format and lint the seven primary PowerShell files of this phase (the files of P10-T2
       through P10-T6, the self-hosted runsettings file of P10-T9, and the P10-T10 file) as in P5-T14.
       Write FEATURE/evidence/qa-gates/phase10-powershell-static.TS.md. Acceptance: as in P5-T14.
-- [ ] [P10-T14] Commit and push Phase 10 (check off AC-22, AC-23, AC-24, AC-25, AC-26, AC-27, and
+- [x] [P10-T14] Commit and push Phase 10 (check off AC-22, AC-23, AC-24, AC-25, AC-26, AC-27, and
       AC-29 per the Preamble check-off rule; stage the seven primary files of P10-T13, the four
       mirrors, the pack manifest, the FEATURE evidence directory, and FEATURE/spec.md; message
       "feat(722): add write-intent extraction (PowerShell)"). Acceptance: all three git commands exit
