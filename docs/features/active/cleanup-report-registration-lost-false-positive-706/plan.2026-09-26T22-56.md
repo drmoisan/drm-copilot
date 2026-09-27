@@ -504,7 +504,7 @@ every existing test are not modified.
 
 ### Phase 3 — Predicate Tests and Unmodified-Consumer Tests
 
-- [ ] [P3-T1] Append test 3 to `tests/shell/test_cleanup_worktrees_scan_helper.bats`, exactly as
+- [x] [P3-T1] Append test 3 to `tests/shell/test_cleanup_worktrees_scan_helper.bats`, exactly as
   reference block R7, named
   `scan_helper_is_absolute_path returns 0 for slash-leading and drive-letter paths`.
   Acceptance: the block is appended after test 2 and is the file's last block. Verify with
@@ -512,7 +512,7 @@ every existing test are not modified.
   (the deleted-line column is `0`) and
   `grep -n -F '@test "' tests/shell/test_cleanup_worktrees_scan_helper.bats` (the last printed
   line names this task's test).
-- [ ] [P3-T2] Append test 4 to `tests/shell/test_cleanup_worktrees_scan_helper.bats`, exactly as
+- [x] [P3-T2] Append test 4 to `tests/shell/test_cleanup_worktrees_scan_helper.bats`, exactly as
   reference block R8, named
   `scan_helper_is_absolute_path returns non-zero for relative, drive-relative, and empty paths`.
   Acceptance: the block is appended after test 3 and is the file's last block. Verify with
@@ -520,12 +520,12 @@ every existing test are not modified.
   (the deleted-line column is `0`) and
   `grep -n -F '@test "' tests/shell/test_cleanup_worktrees_scan_helper.bats` (the last printed
   line names this task's test).
-- [ ] [P3-T3] Run `tests/shell/test_cleanup_worktrees_scan_helper.bats` into
+- [x] [P3-T3] Run `tests/shell/test_cleanup_worktrees_scan_helper.bats` into
   `<FEATURE>/evidence/regression-testing/scan-helper-all-tests.<ts>.md`:
   `npx --yes bats tests/shell/test_cleanup_worktrees_scan_helper.bats`. Acceptance:
   `EXIT_CODE: 0`; zero `not ok` lines; the lines for tests 1 through 4 and for
   `scan-dirs emits has_gitfile/target_exists/size for each candidate directory` each begin `ok `.
-- [ ] [P3-T4] Negative control for test 3 in `tests/shell/test_cleanup_worktrees_scan_helper.bats`,
+- [x] [P3-T4] Negative control for test 3 in `tests/shell/test_cleanup_worktrees_scan_helper.bats`,
   proving it can fail, recorded in `<FEATURE>/evidence/regression-testing/predicate-negative-control.<ts>.md`
   with `ExpectedExitCode: 1`: first, before any edit, run
   `sha256sum scripts/bash/cleanup_worktrees_scan_helper.sh` and record it as the pre-mutation
@@ -543,7 +543,7 @@ every existing test are not modified.
   pre-mutation hash (all three post-restore pairs appended to
   `<FEATURE>/evidence/regression-testing/predicate-restored.<ts>.md` after the pre-mutation
   pair, so the file is byte-identical to its pre-mutation state and the mutated line is gone).
-- [ ] [P3-T5] Unmodified-consumer run for `tests/shell/test_cleanup_worktrees_report_records.bats`
+- [x] [P3-T5] Unmodified-consumer run for `tests/shell/test_cleanup_worktrees_report_records.bats`
   and `tests/shell/test_cleanup_worktrees_scan_seam.bats` into
   `<FEATURE>/evidence/regression-testing/report-records-unmodified.<ts>.md`: run
   `npx --yes bats tests/shell/test_cleanup_worktrees_report_records.bats tests/shell/test_cleanup_worktrees_scan_seam.bats`.

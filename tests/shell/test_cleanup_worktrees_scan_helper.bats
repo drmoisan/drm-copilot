@@ -61,3 +61,33 @@ setup() {
     [ "$status" -eq 0 ]
     [[ "$output" == *"/wt_drive|1|0|"?* ]]
 }
+
+@test "scan_helper_is_absolute_path returns 0 for slash-leading and drive-letter paths" {
+    # Issue #706: slash-leading paths and drive letters followed by / or \ are absolute.
+    # Each candidate that is classified relative is printed, so a failure names it.
+    run bash -c '
+        source "$1"
+        shift
+        for candidate in "$@"; do
+            scan_helper_is_absolute_path "$candidate" || printf "classified relative: [%s]\n" "$candidate"
+        done
+    ' _ "${HELPER}" "/abs" "C:/x" "c:/x" 'C:\x'
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+}
+
+@test "scan_helper_is_absolute_path returns non-zero for relative, drive-relative, and empty paths" {
+    # Issue #706: relative paths, a drive letter with no separator, and the empty string
+    # are not absolute. Each candidate that is classified absolute is printed.
+    run bash -c '
+        source "$1"
+        shift
+        for candidate in "$@"; do
+            if scan_helper_is_absolute_path "$candidate"; then
+                printf "classified absolute: [%s]\n" "$candidate"
+            fi
+        done
+    ' _ "${HELPER}" "../rel" "rel" "C:rel" ""
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+}
