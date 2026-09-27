@@ -158,7 +158,7 @@ under `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-mai
 
 ### Phase 0 — Policy Reads and Baseline Capture
 
-- [ ] [P0-T1] Record BASE_SHA in `<FEATURE>/evidence/baseline/base-sha.<ts>.md`. Run
+- [x] [P0-T1] Record BASE_SHA in `<FEATURE>/evidence/baseline/base-sha.<ts>.md`. Run
   `git rev-parse HEAD`, `git merge-base --is-ancestor 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD`,
   and `git diff --exit-code --stat 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD -- scripts/ tests/ .claude/skills/cleanup-merged-worktrees/ extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/ .github/workflows/`.
   Also run `git diff --stat=400 0658f6945aa833c6960dc5bf8a43635fc346991f HEAD` to list every
@@ -178,7 +178,7 @@ under `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-mai
   result stops the plan: when a checkpoint field is missing or names another issue, record
   BLOCKED at P0-T1 and return to the orchestrator before any edit; for any other failure,
   record BLOCKED and return to the planner.
-- [ ] [P0-T2] Read policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md`:
+- [x] [P0-T2] Read policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md`:
   `CLAUDE.md`, `.github/copilot-instructions.md`,
   `.github/instructions/general-code-change.instructions.md`,
   `.github/instructions/general-unit-test.instructions.md`, `.claude/rules/general-code-change.md`,
@@ -186,10 +186,10 @@ under `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-mai
   `.claude/rules/self-explanatory-code-commenting.md`, `.claude/rules/tonality.md`, and
   `.claude/rules/plan-acceptance-gates.md`. Acceptance: all eleven files read in that order;
   no file edited.
-- [ ] [P0-T3] Write `<FEATURE>/evidence/baseline/phase0-instructions-read.md` with
+- [x] [P0-T3] Write `<FEATURE>/evidence/baseline/phase0-instructions-read.md` with
   `Timestamp:`, `Policy Order:` (the P0-T2 order), and the explicit list of the eleven files
   read. Acceptance: the file exists with all three fields and eleven listed paths.
-- [ ] [P0-T4] Record tool availability in `<FEATURE>/evidence/baseline/tool-versions.<ts>.md`
+- [x] [P0-T4] Record tool availability in `<FEATURE>/evidence/baseline/tool-versions.<ts>.md`
   by running `shfmt --version`, `shellcheck --version`, `npx --yes bats --version`, and
   `gh version` (each command with its own `Command:`/`EXIT_CODE:` pair). The `gh version`
   subcommand form is used because the flag form (gh with a `--version` flag) is refused by the
@@ -198,33 +198,33 @@ under `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-mai
   artifact records each version string; `npx --yes bats --version` prints a line beginning
   `Bats `. If `bats` cannot be resolved through npx, record that result verbatim and use the
   CI fallback stated in P1-T20 for every local bats step.
-- [ ] [P0-T5] Baseline format step for `scripts/bash/` production files: run
+- [x] [P0-T5] Baseline format step for `scripts/bash/` production files: run
   `shfmt -d scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh`
   and write `<FEATURE>/evidence/baseline/shfmt-diff.<ts>.md`. Acceptance: the artifact records
   `EXIT_CODE:` and, in `Output Summary:`, either "no diff printed" or the verbatim diff hunks
   (a pre-existing diff is recorded, not fixed, in this task).
-- [ ] [P0-T6] Baseline lint step for `scripts/bash/` production files: run
+- [x] [P0-T6] Baseline lint step for `scripts/bash/` production files: run
   `shellcheck -f gcc scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh`
   and write `<FEATURE>/evidence/baseline/shellcheck-production.<ts>.md`. Acceptance: the
   artifact records `EXIT_CODE:` and the finding count (number of output lines) plus every
   finding line verbatim.
-- [ ] [P0-T7] Baseline repo-wide check step: run `sh scripts/bash/shell-qc.sh check` and write
+- [x] [P0-T7] Baseline repo-wide check step: run `sh scripts/bash/shell-qc.sh check` and write
   `<FEATURE>/evidence/baseline/shell-qc-check.<ts>.md`. Acceptance: the artifact records
   `EXIT_CODE:` and every diagnostic line verbatim (a clean run prints nothing and exits 0; a
   non-zero exit from local shfmt 3.12 or shellcheck 0.11 version drift is recorded as a
   pre-existing condition).
-- [ ] [P0-T8] Baseline lint step for the three `tests/shell/` suites being edited: run
+- [x] [P0-T8] Baseline lint step for the three `tests/shell/` suites being edited: run
   `shellcheck -f gcc tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`
   and write `<FEATURE>/evidence/baseline/shellcheck-bats.<ts>.md`. Acceptance: the artifact
   records `EXIT_CODE:`, the total finding count, and the per-code multiset (each distinct
   `[SCnnnn]` code with its count), which P6-T3 compares against.
-- [ ] [P0-T9] Baseline syntax step (bash has no type checker; `.claude/rules/shell.md` step 3):
+- [x] [P0-T9] Baseline syntax step (bash has no type checker; `.claude/rules/shell.md` step 3):
   run `sh -n scripts/bash/cleanup_worktrees_enumerate_lib.sh`, and the same for
   `scripts/bash/cleanup_worktrees_actions_lib.sh`, `scripts/bash/cleanup_worktrees_lib.sh`,
   `scripts/bash/cleanup_worktrees_report_records_lib.sh`, and `scripts/bash/cleanup-worktrees.sh`;
   write `<FEATURE>/evidence/baseline/syntax-check.<ts>.md`. Acceptance: five `EXIT_CODE:`
   values recorded; a clean file prints nothing and exits 0.
-- [ ] [P0-T10] Baseline local test step into `<FEATURE>/evidence/baseline/bats-cleanup-suites.<ts>.md`:
+- [x] [P0-T10] Baseline local test step into `<FEATURE>/evidence/baseline/bats-cleanup-suites.<ts>.md`:
   first run
   `grep -c -e '^@test ' tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`
   and write its `Command:`/`EXIT_CODE:` pair and the three per-file counts to the artifact;
@@ -235,7 +235,7 @@ under `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-mai
   the artifact records the TAP `1..N` value, the `ok` and `not ok` counts, the name of every
   `not ok` test (the baseline failure set, possibly empty), and the three per-file `@test`
   counts.
-- [ ] [P0-T11] Baseline CI coverage step via `.github/workflows/_shell-coverage.yml`: push the
+- [x] [P0-T11] Baseline CI coverage step via `.github/workflows/_shell-coverage.yml`: push the
   branch at its current HEAD (the P0-T1 HEAD SHA; its code paths equal BASE_SHA per P0-T1) with
   `git push -u origin bug/cleanup-worktrees-apply-deletes-local-main-594` (no force), dispatch
   `gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-apply-deletes-local-main-594`,
@@ -254,7 +254,7 @@ under `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-mai
   copied from the log. If push, dispatch, or the run fails to produce the headline, record
   the observed failure verbatim and mark the coverage baseline remediation-required (the
   plan outcome cannot be PASS without a numeric baseline).
-- [ ] [P0-T12] Baseline per-file coverage into `<FEATURE>/evidence/baseline/kcov-per-file.<ts>.md`: run
+- [x] [P0-T12] Baseline per-file coverage into `<FEATURE>/evidence/baseline/kcov-per-file.<ts>.md`: run
   `gh run download <RUN_ID> --name shell-coverage --dir <session-scratchpad>/kcov-baseline`
   (RUN_ID from P0-T11; the scratchpad is outside the repository), then, from the `cov.xml` at
   the root of the downloaded directory (or `kcov-merged/cov.xml` when the root copy is
@@ -265,7 +265,7 @@ under `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-mai
   file's basename. Write `<FEATURE>/evidence/baseline/kcov-per-file.<ts>.md`. Acceptance: five
   numeric line-rate values recorded with the run ID; no absolute path is copied into the
   artifact.
-- [ ] [P0-T13] Baseline line counts and citation anchors for `scripts/bash/` and `tests/shell/`: run
+- [x] [P0-T13] Baseline line counts and citation anchors for `scripts/bash/` and `tests/shell/`: run
   `wc -l scripts/bash/cleanup_worktrees_enumerate_lib.sh scripts/bash/cleanup_worktrees_actions_lib.sh scripts/bash/cleanup_worktrees_lib.sh scripts/bash/cleanup_worktrees_report_records_lib.sh scripts/bash/cleanup-worktrees.sh tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`,
   `sed -n '19p;35p;103p;147p;157p;164p;191p;198p;292p;317p' scripts/bash/cleanup_worktrees_actions_lib.sh`,
   `sed -n '34p;115,116p' scripts/bash/cleanup_worktrees_enumerate_lib.sh`, and
@@ -273,7 +273,7 @@ under `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-mai
   `<FEATURE>/evidence/baseline/line-counts-and-anchors.<ts>.md`. Acceptance: the eight line
   counts are recorded (expected at authoring: 236, 437, 496, 476, 229, 113, 259, 153) and the
   printed anchor lines are recorded verbatim for comparison in P5-T10.
-- [ ] [P0-T14] Baseline parity of the two `cleanup-merged-worktrees/SKILL.md` copies: run
+- [x] [P0-T14] Baseline parity of the two `cleanup-merged-worktrees/SKILL.md` copies: run
   `git diff --no-index --exit-code .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`
   and write `<FEATURE>/evidence/baseline/skill-parity.<ts>.md`. Acceptance: `EXIT_CODE: 0`
   (the two copies are byte-identical before any edit). A non-zero exit is recorded verbatim
