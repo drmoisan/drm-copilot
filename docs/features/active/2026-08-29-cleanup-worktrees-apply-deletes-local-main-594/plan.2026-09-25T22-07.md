@@ -904,7 +904,7 @@ and post-P6-T6 hash listings are unaffected by it.
   or 22 and 1 when P6-T40 recorded the deferral branch; each artifact's expectation field
   matches its printed count as stated; every checked item has its evidence artifact present on
   disk.
-- [ ] [P6-T42] Commit the `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` check-offs and remaining evidence: write a new commit message file
+- [x] [P6-T42] Commit the `docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/spec.md` check-offs and remaining evidence: write a new commit message file
   in the session scratchpad (message per the commit-message skill, ending with the session's
   required trailer lines), then run
   `git add -- docs/features/active/2026-08-29-cleanup-worktrees-apply-deletes-local-main-594/`
@@ -921,7 +921,7 @@ and post-P6-T6 hash listings are unaffected by it.
   plan check marks are written after this commit and are left for the orchestrator's
   completion commit. If the gate refuses the commit, record the refusal text and stop
   (BLOCKED).
-- [ ] [P6-T43] Push the P6-T42 commit, recording into `<FEATURE>/evidence/other/commit-final.<ts>.md`, with `git push origin bug/cleanup-worktrees-apply-deletes-local-main-594`
+- [x] [P6-T43] Push the P6-T42 commit, recording into `<FEATURE>/evidence/other/commit-final.<ts>.md`, with `git push origin bug/cleanup-worktrees-apply-deletes-local-main-594`
   (no force), then run `git ls-remote origin refs/heads/bug/cleanup-worktrees-apply-deletes-local-main-594`;
   append both pairs to `<FEATURE>/evidence/other/commit-final.<ts>.md`. Acceptance: both exit 0
   and the remote branch head equals FINAL_SHA.
