@@ -38,7 +38,7 @@ The scan splits on it. The mismatch fails toward deny: the gate sees extra segme
 - [ ] An unquoted backslash-escaped `;`, `&` or `|` (`\;`, `\&`, `\|`) is treated as a literal character by the command-chain scanner and does not split the command into additional segments.
 - [ ] Unescaped chain operators (`;`, `&&`, `||`, `|`, `&`) continue to split the command exactly as before, and an escaped backslash followed by an operator (`\\;`) still splits, so the fix introduces no bypass.
 - [ ] The fix is applied identically to all four byte-identical copies of `enforce-orchestration-preimplementation-gate-helpers.ps1` (`.claude/hooks`, `.codex/hooks`, and the two extension resource mirrors), and the existing parity test continues to pass.
-- [ ] Regression tests covering the escaped and unescaped cases are added and pass under Pester on both Windows and Linux CI.
+- [ ] Regression tests covering the escaped and unescaped cases are added and pass under Pester locally and in the CI PoshQC Pester job, and they depend on no gitignored state, no `origin/main` ref, and no Windows-only path.
 
 ## Source
 From: docs/features/potential/2026-09-26-preimplementation-helpers-backslash-chain-operator.md (GitHub issue #710)
