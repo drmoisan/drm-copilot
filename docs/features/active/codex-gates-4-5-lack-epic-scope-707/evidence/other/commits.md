@@ -171,3 +171,46 @@ Porcelain (pre-staging):
 Staged paths: the three non-evidence paths named by [P4-T9], the evidence directory `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence` (which carries this file, including the Phase 3 post-commit append), and the plan checklist `docs/features/active/codex-gates-4-5-lack-epic-scope-707/plan.2026-09-26T22-55.md` (including the [P3-T7] check-off).
 
 Message: `test(codex-hooks): pin Codex gate 5 epic-checkpoint behaviour and mock epic-scope read for #707` with the two session attribution trailer lines.
+
+Commit SHA: a76fc7e03e862fca76f30a0964cd27fec2194c01
+
+`git log -1 --name-only` lists the three non-evidence paths named by [P4-T9], six evidence paths, and the plan file (10 files).
+
+Porcelain (post-commit, pre-append):
+
+```
+(empty)
+```
+
+Push: `git push origin bug/codex-gates-4-5-lack-epic-scope-707` (plain, not forced) reported `fa33b6c0..a76fc7e0  bug/codex-gates-4-5-lack-epic-scope-707 -> bug/codex-gates-4-5-lack-epic-scope-707`.
+
+This post-commit entry and the [P4-T9] check-off in the plan are uncommitted after the append and are carried into the next phase commit.
+
+## Phase 5 commit (structural and hermeticity verification)
+
+Timestamp: 2026-09-27T07-25
+Command: git status --porcelain -uall -- docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence
+EXIT_CODE: 0
+Output Summary: One modified and ten untracked evidence paths listed; each is named by a task of Phase 4 or Phase 5 (commits.md by rule 9 and [P4-T9]; p5-line-limits.md by [P5-T1]; p5-untouched-files.md by [P5-T2]; p5-existing-suites-diff.md by [P5-T3]; p5-d10-mock-scope.md by [P5-T4]; p5-hermeticity-scan.md by [P5-T5]; p5-registration.md by [P5-T6]; p5-mirror-parity.md by [P5-T7]; p5-design-parity.md by [P5-T8]; p5-scope.md by [P5-T9]; p5-host-data.md by [P5-T10]). No other path is listed, so the commit may proceed.
+
+Porcelain (pre-staging):
+
+```
+ M docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/other/commits.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/p5-d10-mock-scope.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/p5-design-parity.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/p5-existing-suites-diff.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/p5-hermeticity-scan.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/p5-host-data.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/p5-line-limits.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/p5-mirror-parity.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/p5-registration.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/p5-scope.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/p5-untouched-files.md
+```
+
+Phase 5 has no commit task; per the orchestrator directive the phase's evidence and plan check-offs are committed in rule 9 form.
+
+Staged paths: the evidence directory `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence` (which carries this file, including the Phase 4 post-commit append) and the plan checklist `docs/features/active/codex-gates-4-5-lack-epic-scope-707/plan.2026-09-26T22-55.md` (including the [P4-T9] and [P5-T1] to [P5-T10] check-offs).
+
+Message: `docs(bug): record #707 structural and hermeticity verification evidence` with the two session attribution trailer lines.
