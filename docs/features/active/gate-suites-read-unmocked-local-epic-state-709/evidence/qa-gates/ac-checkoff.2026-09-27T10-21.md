@@ -71,4 +71,8 @@ Result: checked off (spec.md line 257).
 
 ## AC4
 
-Pending: AC4 requires the P5-T8 hermeticity scan (docs/features/active/gate-suites-read-unmocked-local-epic-state-709/evidence/qa-gates/hermeticity-scan.2026-09-27T10-20.md, HERMETICITY-MATCH-COUNT: 0) and a CI run of the windows-latest PoshQC job on the pull-request head (P5-T19). No pull request or CI run exists yet, so AC4 remains unchecked.
+Timestamp: 2026-09-27T10-47
+Evidence:
+- docs/features/active/gate-suites-read-unmocked-local-epic-state-709/evidence/qa-gates/hermeticity-scan.2026-09-27T10-20.md (HERMETICITY-MATCH-COUNT: 0, with the code-review notes)
+- docs/features/active/gate-suites-read-unmocked-local-epic-state-709/evidence/qa-gates/ci-poshqc.2026-09-27T10-46.md (CI run 36326672278 on head 8d26d3f8686f628fa7d75471ad2aa75a77e5579b, job "poshqc / PowerShell QC" conclusion success; testsuite enforce-gate-suites.EpicStateIsolation.Tests.ps1 tests="24" failures="0" errors="0" skipped="0")
+Result: checked off (spec.md line 252).
