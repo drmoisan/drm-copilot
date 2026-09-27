@@ -256,6 +256,9 @@ def build_issues_to_autoclose_section(
         gh_available: Whether the GitHub CLI was available for verification.
             When false and the list is non-empty, the unverified annotation
             line is appended after the list (issue #622, D4, D10).
+            When false and the list is empty, the body is the
+            GitHub-CLI-unavailable text, ahead of every empty-list fallback
+            (issue #588).
         pending_primary_excluded: Whether a pending primary ref was dropped
             because it is not an open issue; selects the not-open fallback text
             when the list is empty (issue #622, D5).
@@ -282,6 +285,10 @@ def build_issues_to_autoclose_section(
         body = format_list(ordered, "(none)")
         if not gh_available:
             body = body + "\n" + AUTOCLOSE_UNVERIFIED_ANNOTATION
+    elif not gh_available:
+        # Unavailable text takes precedence: the absence claims below are only
+        # meaningful when verification ran (issue #588).
+        body = "None (GitHub CLI unavailable; closing issues not verified)"
     elif pending_primary_excluded:
         body = AUTOCLOSE_PENDING_NOT_OPEN_TEXT
     else:
