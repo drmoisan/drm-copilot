@@ -584,25 +584,25 @@ are not modified.
 
 ### Phase 5 — Pass-After and Targeted Acceptance Verification
 
-- [ ] [P5-T1] Pass-after run into `<FEATURE>/evidence/regression-testing/pass-after.<ts>.md`:
+- [x] [P5-T1] Pass-after run into `<FEATURE>/evidence/regression-testing/pass-after.<ts>.md`:
   run `npx --yes bats tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`. Acceptance: `EXIT_CODE: 0`,
   zero `not ok` lines, the TAP plan equals the P1-T20 plan, and the artifact lists the `ok`
   line for each of T1 through T10 by its exact name.
-- [ ] [P5-T2] AC-01 check in `<FEATURE>/evidence/qa-gates/ac01-base-constant.<ts>.md`: run
+- [x] [P5-T2] AC-01 check in `<FEATURE>/evidence/qa-gates/ac01-base-constant.<ts>.md`: run
   `grep -rn -F 'CLEANUP_WT_BASE_BRANCH=' scripts/bash/` and
   `grep -rn -F 'CLEANUP_WT_BASE_BRANCH:-' scripts/bash/`, recording the second search in its
   own artifact `<FEATURE>/evidence/qa-gates/ac01-no-default-expansion.<ts>.md` with
   `ExpectedExitCode: 1`. Acceptance: the first prints exactly one line, in
   `scripts/bash/cleanup_worktrees_enumerate_lib.sh`, whose text after the line number is
   `CLEANUP_WT_BASE_BRANCH="main"`; the second prints nothing and exits 1.
-- [ ] [P5-T3] AC-14 check in `<FEATURE>/evidence/qa-gates/ac14-no-new-state.<ts>.md`: run
+- [x] [P5-T3] AC-14 check in `<FEATURE>/evidence/qa-gates/ac14-no-new-state.<ts>.md`: run
   `grep -rnE 'PROTECTED_BASE\b' scripts/bash/` and `sed -n '54,55p' scripts/bash/cleanup_worktrees_lib.sh`,
   recording the search in its own artifact `<FEATURE>/evidence/qa-gates/ac14-no-protected-base.<ts>.md`
   with `ExpectedExitCode: 1` (the `sed` output stays in `ac14-no-new-state.<ts>.md`).
   Acceptance: the search prints nothing and exits 1 (the only new token uses hyphens,
   `BLOCKED-PROTECTED-BASE`); the two header state-list lines are identical to those recorded in
   P0-T13; the P4-T4 acceptance already proved help lines 119-122 unchanged.
-- [ ] [P5-T4] AC-15 check in `<FEATURE>/evidence/qa-gates/ac15-comments.<ts>.md`: run
+- [x] [P5-T4] AC-15 check in `<FEATURE>/evidence/qa-gates/ac15-comments.<ts>.md`: run
   `grep -rn -F 'needs no special' scripts/bash/`,
   `grep -rn -F 'needs no separate protection' scripts/bash/`,
   `grep -rn -F 'classify_branch marks it PROTECTED_CURRENT' scripts/bash/`, and
@@ -616,13 +616,13 @@ are not modified.
   the three per-file counts is at least 1; the artifact quotes the three reworded docstring
   passages (`classify_all_branches` lines 391-394 and 427-429, `run_apply`, `classify_branch`
   step 1) for reviewer inspection.
-- [ ] [P5-T5] AC-16 check in `<FEATURE>/evidence/qa-gates/ac16-help-text.<ts>.md`: run
+- [x] [P5-T5] AC-16 check in `<FEATURE>/evidence/qa-gates/ac16-help-text.<ts>.md`: run
   `sh scripts/bash/cleanup-worktrees.sh --help` and record its exit code, then run
   `sh scripts/bash/cleanup-worktrees.sh --help | grep -c -F 'covers the base branch main'` and
   `sh scripts/bash/cleanup-worktrees.sh --help | grep -c -F 'BLOCKED-PROTECTED-BASE'`, each with
   its own `Command:`/`EXIT_CODE:` pair. Acceptance: `--help` exits 0; each count is at least 1
   and each pipeline exits 0.
-- [ ] [P5-T6] P3-T3 negative search and docstring capture for `scripts/bash/cleanup_worktrees_actions_lib.sh`: run
+- [x] [P5-T6] P3-T3 negative search and docstring capture for `scripts/bash/cleanup_worktrees_actions_lib.sh`: run
   `grep -n -F 'classify_branch marks it PROTECTED_CURRENT' scripts/bash/cleanup_worktrees_actions_lib.sh`
   and record it in `<FEATURE>/evidence/qa-gates/ac15-run-apply-search.<ts>.md` with
   `ExpectedExitCode: 1`; then run
@@ -633,11 +633,11 @@ are not modified.
   Acceptance: the search prints nothing and exits 1; the printed block starts with the line
   `run_apply() {`, ends with the `local rc=0 name record` line, and contains
   `CLEANUP_WT_BASE_BRANCH`.
-- [ ] [P5-T7] AC-17 check in `<FEATURE>/evidence/qa-gates/ac17-skill-parity.<ts>.md`: run
+- [x] [P5-T7] AC-17 check in `<FEATURE>/evidence/qa-gates/ac17-skill-parity.<ts>.md`: run
   `git diff --no-index --exit-code .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`.
   Acceptance: `EXIT_CODE: 0` with empty output (the two copies are byte-identical after the
   edit).
-- [ ] [P5-T8] AC-21 check in `<FEATURE>/evidence/qa-gates/ac21-portability.<ts>.md`: run
+- [x] [P5-T8] AC-21 check in `<FEATURE>/evidence/qa-gates/ac21-portability.<ts>.md`: run
   `git diff -U0 0658f6945aa833c6960dc5bf8a43635fc346991f -- tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_classification.bats tests/shell/test_cleanup_worktrees_deletion.bats`
   and filter its added lines (lines beginning `+` but not `+++`) with
   `grep -nE 'origin/|/mnt/|[A-Za-z]:[\\/]|mktemp|artifacts/'`, then run
@@ -651,7 +651,7 @@ are not modified.
   counts are equal and each is `6` (T1, T2, T3, T6, T9, T10 each add one `run env` line that
   routes git through the stub; T4, T5, T7, and T8 use the existing `cb`/`apply` helpers, which
   already do so).
-- [ ] [P5-T9] AC-22 check in `<FEATURE>/evidence/qa-gates/ac22-no-temp-files.<ts>.md` and
+- [x] [P5-T9] AC-22 check in `<FEATURE>/evidence/qa-gates/ac22-no-temp-files.<ts>.md` and
   `<FEATURE>/evidence/qa-gates/ac22-no-redirection.<ts>.md`: over
   the added lines of the same anchored diff as P5-T8 on `tests/shell/test_cleanup_worktrees_deletion.bats`,
   `tests/shell/test_cleanup_worktrees_enumeration.bats`, and
@@ -661,7 +661,7 @@ are not modified.
   `ac22-no-redirection.<ts>.md`), each artifact carrying its own full pipeline in `Command:`
   and `ExpectedExitCode: 1`. Acceptance: both print nothing and exit 1 (the only
   redirection in the added test bodies is `2>/dev/null`, which targets a device, not a file).
-- [ ] [P5-T10] AC-18 and citation-invariant check in `<FEATURE>/evidence/qa-gates/ac18-line-counts-and-anchors.<ts>.md`:
+- [x] [P5-T10] AC-18 and citation-invariant check in `<FEATURE>/evidence/qa-gates/ac18-line-counts-and-anchors.<ts>.md`:
   re-run the three `sed -n`
   commands and the `wc -l` command from P0-T13 verbatim. Acceptance: every printed anchor line
   is byte-identical to the P0-T13 record (actions 19, 35, 103, 147, 157, 164, 191, 198, 292,
