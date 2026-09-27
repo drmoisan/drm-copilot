@@ -3,7 +3,7 @@
 - **Issue:** #722
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-27T12-45
+- **Last Updated:** 2026-09-27T19-30
 - **Status:** Draft
 - **Version:** 0.2
 - **Work Mode:** full-bug (acceptance criteria live in this file only; no user story)
@@ -341,6 +341,8 @@ Part A (scheduling layer, strict identity, drift handling, historical BEFORE pin
   - `tests/scripts/claude-lib/blast-radius/BlastRadiusScheduling.Tests.ps1` (new)
   - `tests/scripts/claude-lib/blast-radius/BlastRadius.HistoricalRuns.Tests.ps1` (new)
   - `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`
+  - `tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1` (facade export-surface case lists
+    the eight Part A exports; see decision 12)
 - Fixtures (new):
   - `tests/fixtures/blast_radius/scheduling/scheduling-452-shared-surface-hard.json`
   - `tests/fixtures/blast_radius/scheduling/scheduling-452-directory-prefix-weighted.json`
@@ -394,6 +396,8 @@ Part B (write-intent extraction, new keys, mandate amendment, AFTER pins, re-der
   - `tests/scripts/claude-lib/blast-radius/BlastRadiusWriteIntent.Tests.ps1` (new)
   - `tests/scripts/claude-lib/blast-radius/BlastRadius.HistoricalRuns.Tests.ps1` (AFTER pins)
   - `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1` (Part B key classes)
+  - `tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1` (facade export-surface case lists
+    the fourteen Part B exports; see decision 12)
 - Fixtures (new):
   - `tests/fixtures/blast_radius/write-intent/write-intent-glob-mention.json`
   - `tests/fixtures/blast_radius/write-intent/write-intent-command-span.json`
@@ -487,7 +491,7 @@ The committed values lean toward parallelism (design point 3); the absent-key de
 
 #### Backward-compatibility expectations
 
-- Every existing test and fixture passes unmodified, with two exceptions:
+- Every existing test and fixture passes unmodified, with three exceptions:
   1. Tests that assert the exact key set or key order of the truth tables are updated to include the
      new keys.
   2. Tests whose committed-config helpers pin current-extraction semantics are updated so that those
@@ -497,8 +501,10 @@ The committed values lean toward parallelism (design point 3); the absent-key de
      the mandate-reads test module, and test_derive_blast_radius_keeps_a_cited_csproj_in_paths and
      test_validate_blast_radius_findings_are_identical_with_and_without_the_key in the
      mergeable-paths test module. This is a scoped test update, not a behavior regression.
+  3. The facade export-surface test, which asserts the exact set and count of functions the
+     PowerShell facade exports, is updated to list the new exports (decision 12).
 - The plan's P0 inventories every test that consumes the committed config. Any existing-test failure
-  outside that inventory and outside exception 1 stops execution; it is not resolved by editing the
+  outside that inventory and outside exceptions 1 and 3 stops execution; it is not resolved by editing the
   test.
 - Every recorded checkpoint remains valid.
 - A destination that has not received the new bundled truth table keeps current behavior.
@@ -758,3 +764,16 @@ reporting done.
     vacuously. Exhaustive enumeration checks every input in that domain, whereas sampling checks only
     a subset. AC-15's wording is amended accordingly; the properties it names are unchanged. Evidence:
     evidence/other/property-test-framework-deviation.2026-09-27T15-17.md.
+12. **Facade export-surface test (recorded 2026-09-27 during execution).** The spec requires the new
+    PowerShell scheduling and write-intent functions to be exported through the facade. The existing
+    facade test module, in its Exported facade surface block, lists the six previously fixed export
+    names and asserts an export count of exactly 6; the executor observed "Expected 6, but got 8."
+    once Part A added Get-BlastRadiusConflictEdge and Get-BlastRadiusPairDecision. That module was
+    missing from the files-to-change list. Decision (orchestrator, autonomous mode): the module is
+    added to the files-to-change list for both parts, and only its export-surface block changes. In
+    Part A it lists eight names and asserts 8. In Part B it adds the six write-intent functions
+    Test-WriteIntentExtractionEnabled, Get-ConfigPathRoot, Get-WriteIntentPlanPath,
+    Get-WriteIntentSpecContract, Select-WriteIntentPathEntry, and Get-PlanPathForConfig, and asserts
+    14. The count case is renamed to a count-neutral name. Each edit runs in its own PowerShell
+    batch so the three-test-file budget is kept. Evidence:
+    evidence/regression-testing/pester-directory-p5.2026-09-27T15-55.md.

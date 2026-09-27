@@ -3,9 +3,9 @@
 - **Issue:** #722
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-27T18-10
-- **Status:** Draft (preflight revision round 2 applied; pending executor preflight)
-- **Version:** 1.2
+- **Last Updated:** 2026-09-27T19-30
+- **Status:** In execution (revision round 8: preflight delta D3 (P14-T3 F defined as the gate fixture's file stem, the parity parametrize ID and Pester FixtureName) applied; round 7 applied D1 (P14-T3 per-fixture node IDs), D2 (mixed-exit artifact header semantics in P6-T9, P13-T2, P12-T10), and the P10-T6 stop condition; pending executor preflight)
+- **Version:** 1.3
 - **Work Mode:** full-bug (the feature spec is the sole acceptance-criteria source; no user story)
 - **Parallel run:** blast-radius-tolerance-2026-09-27 (preparation mode)
 - **Branch:** bug/blast-radius-over-reports-and-zero-overlap-tolerance-722
@@ -39,9 +39,35 @@ plain words because they are feature-relative and carry a timestamp placeholder.
 - Acceptance-criteria identifiers AC-01 through AC-38 are assigned to the 38 checklist entries of the
   spec's Acceptance Criteria section in document order. The mapping is in the Acceptance Criteria
   Traceability section at the end of this plan.
-- When an acceptance reads "as in P1-T14" or "as in P5-T12", its re-run clause refers to the current
+- When an acceptance reads "as in P1-T14" or "as in P5-T14", its re-run clause refers to the current
   phase: re-run P2-T7 for P2-T9, P3-T10 for P3-T11, P8-T8 for P8-T9, and P12-T7 for P12-T8. For
-  P10-T12, re-copy the affected mirror with A10 and A5 as in P10-T7 or P10-T9 and re-run P10-T10.
+  P10-T13, re-copy the affected mirror with A10 and A5 as in P10-T7 or P10-T9 and re-run P10-T11
+  and P10-T12.
+- KL-510 is the known local failure of issue #510. The node
+  test_bundled_claude_payload_contains_all_repo_runtime_contracts (second entry of block B27)
+  compares every file under the repository's .claude directory with the bundle. The batch-budget
+  hooks write gitignored state files under the .claude state directory during execution; CI has no
+  such files. A run of that node satisfies KL-510 in exactly two cases. Case (a): the node prints
+  PASSED. Case (b): the node fails, its assertion message is the literal "Repo file missing from
+  bundle:" followed by a path whose first two components are .claude and state (printed as
+  .claude\state\ on Windows), and no output line contains the literal "Bundle content differs from
+  repo for:". The test walks the .claude files in sorted order and stops at its first failed
+  assertion, and the state directory sorts after every other directory under .claude, so case (b)
+  also shows that every other .claude file was present and identical in the bundle. An artifact
+  that records case (a) contains the line KL-510: PASSED; one that records case (b) contains the
+  line KL-510: STATE-ONLY, quotes the assertion message verbatim, and carries ExpectedExitCode: 1.
+  Any other outcome of that node does not satisfy KL-510 and stops the task.
+- The #452 Pester gate form (substitute recorded by revision round 5 for the per-fixture filter of
+  P0-T22) is one run of script pester-counts (A2) with -Path set to the parity Pester file
+  tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1 and no -FullNameFilter.
+  Pester 5.6.1 applies the FullName filter to the unexpanded It name, which carries the
+  FixtureName template, so a per-fixture filter selects 0 tests. The form passes when the run prints
+  FailedCount=0, prints no result line whose first non-whitespace text, after any ANSI colour codes
+  are removed, is "[-]", and, for each #452-tagged fixture F named in the task, prints exactly two
+  result lines whose first non-whitespace text, after any ANSI colour codes are removed, is "[+]"
+  and whose test name ends with " for F"
+  (ignoring any duration Pester appends): verdict and reasons for a conflict fixture, radius and
+  findings for a derivation fixture.
 
 ### Structure (split decision recorded in the spec)
 
@@ -324,6 +350,12 @@ the read-only check script A6 and a before-and-after hash comparison.
       and -FullNameFilter set to the fixture name wrapped in asterisks. Write
       FEATURE/evidence/baseline/452-gate-powershell.TS.md. Acceptance: every run prints PassedCount=2
       and FailedCount=0 (two parity cases per fixture: verdict and reasons, or radius and findings).
+      Note (revision round 5): the per-fixture filter selects 0 tests under Pester 5.6.1, because the
+      filter is matched against the It name before fixture-name substitution. The recorded evidence
+      substitutes the #452 Pester gate form defined in the Terms (one unfiltered run of the same
+      script over the same file: FailedCount=0 and exactly two passing cases attributed to each of the
+      five fixtures). That substitute is the accepted P0-T22 outcome, and P7-T4 and P14-T3 use the
+      same form.
 - [x] [P0-T23] Historical-run fetch: for each slug of epic-655-followups, backlog-2026-09-26, and
       followups-2026-09-27, run CMD-GIT-FETCH-RUN, CMD-GIT-MANIFEST-BLOB, and CMD-GIT-RUN-COMMIT. The
       CMD-GIT-RUN-COMMIT output is that run's plan-home commit. Write
@@ -400,7 +432,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       TotalCount, PassedCount, FailedCount, every FAILED line (the baseline failure set), and one
       numeric LinePercent per module; it records the convention run's counts separately; the B47 run
       prints FailedCount=0. Stop condition: the convention run or the B47 run prints a FailedCount
-      other than 0; stop and report, because P5-T11, P10-T11, and P16-T4 require FailedCount=0 for
+      other than 0; stop and report, because P5-T13, P10-T12, and P16-T4 require FailedCount=0 for
       both tests.
 - [x] [P0-T33] Inventory committed-config consumers: run CMD-GIT-INV-CONFIG and CMD-GIT-INV-CALLS and
       take the intersection of the two file lists (the candidate set). For each candidate, record
@@ -624,7 +656,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       convention: the help-block phrase "imports its siblings with -ErrorAction Stop",
       Set-StrictMode -Version Latest immediately followed by $ErrorActionPreference = 'Stop', and
       -ErrorAction Stop on every column-0 Import-Module line. Acceptance: the file is at most 500
-      lines; the convention is verified by P5-T11.
+      lines; the convention is verified by P5-T13.
 - [x] [P5-T6] Edit `.claude/lib/blast-radius/BlastRadius.psm1`: import the scheduling module next to
       the other sibling imports, in the same column-0 form ending in -Force -ErrorAction Stop, and add Get-BlastRadiusConflictEdge and Get-BlastRadiusPairDecision to
       the exported function list. The Test-BlastRadiusConflict function body is not edited. Acceptance:
@@ -649,23 +681,42 @@ the read-only check script A6 and a before-and-after hash comparison.
       -CoverageOutputPath SCRATCH/pester-p5.xml. Write FEATURE/evidence/regression-testing/pester-part-a.TS.md.
       Acceptance: every run prints FailedCount=0; the P5-T2 run prints a PassedCount equal to its
       TotalCount and one It name per B23 entry; the COVERAGE line for the scheduling module is recorded.
-- [ ] [P5-T11] Run the existing blast-radius Pester directory with script pester-counts (A2) and -Path
+- [ ] [P5-T11] Open the second PowerShell batch of Phase 5 (spec decision 12): reset the PowerShell
+      batch budget (A8, -Kind powershell) through CMD-PS-SCRIPT-SH. Write
+      FEATURE/evidence/other/batch-budget-reset-p5b.TS.md recording the A8 output. Acceptance: exit 0,
+      and the artifact contains the A8 line beginning "RESET removed=" (the first batch's state file
+      is listed as removed when it exists).
+- [ ] [P5-T12] Edit `tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1`, Describe 'Exported
+      facade surface' only: append Get-BlastRadiusConflictEdge and Get-BlastRadiusPairDecision to the
+      -ForEach list of It 'exports <_>' (keeping the six existing names), change the comment that
+      says six names to say eight, rename It 'exports no function beyond the six spec-fixed names' to
+      the count-neutral name 'exports no function beyond the spec-fixed names', and change its
+      assertion to the literal "$exported.Count | Should -Be 8". No other test in the file changes.
+      Then run script pester-counts (A2) through CMD-PS-SCRIPT-SH with -Path set to that file. Write
+      FEATURE/evidence/regression-testing/facade-exports-p5.TS.md. Acceptance: the file is at most
+      500 lines; the run prints FailedCount=0 and a PassedCount equal to its TotalCount; its detailed
+      output contains a passing line for "exports Get-BlastRadiusPairDecision" and a passing line for
+      "exports no function beyond the spec-fixed names". The fail-before evidence is the STOPPED
+      artifact pester-directory-p5 under FEATURE/evidence/regression-testing, which records "Expected
+      6, but got 8." for the same case.
+- [ ] [P5-T13] Run the existing blast-radius Pester directory with script pester-counts (A2) and -Path
       tests/scripts/claude-lib/blast-radius; then run script pester-counts with -Path set to the
       convention test path of block B46, then run script pester-counts with -Path set to the guard
-      path of block B47. Write
-      FEATURE/evidence/regression-testing/pester-directory-p5.TS.md. Acceptance: every FAILED name of
-      the directory run is in the P0-T32 baseline failure set; the convention run prints FailedCount=0;
-      the B47 run prints FailedCount=0.
-- [ ] [P5-T12] Format and lint: record hashes of the six PowerShell files of this phase (A5), call
-      MCP-PS-FORMAT over them, record hashes again, run script ps-format-check (A6) over them, and call
-      MCP-PS-ANALYZE over them. Write FEATURE/evidence/qa-gates/phase5-powershell-static.TS.md.
-      Acceptance: the format call returns without raising; A6 prints FORMAT-SUMMARY ChangedCount=0; the
-      analyze call returns without raising. If any hash changed, re-copy the affected mirror with A10
-      as in P5-T8 and re-run P5-T10 before continuing.
-- [ ] [P5-T13] Commit and push Phase 5 (check off AC-13 and AC-16 per the Preamble check-off rule;
-      stage the six primary PowerShell files, the three mirrors, the pack manifest, the FEATURE
-      evidence directory, and FEATURE/spec.md; message "feat(722): add PowerShell scheduling layer").
-      Acceptance: all three git commands exit 0.
+      path of block B47. Write a new
+      FEATURE/evidence/regression-testing/pester-directory-p5.TS.md (the earlier STOPPED artifact is
+      kept). Acceptance: every FAILED name of the directory run is in the P0-T32 baseline failure set;
+      the convention run prints FailedCount=0; the B47 run prints FailedCount=0.
+- [ ] [P5-T14] Format and lint: record hashes of the seven PowerShell files of this phase (the six
+      files of P5-T2 through P5-T7 and the P5-T12 file) with A5, call MCP-PS-FORMAT over them, record
+      hashes again, run script ps-format-check (A6) over them, and call MCP-PS-ANALYZE over them.
+      Write FEATURE/evidence/qa-gates/phase5-powershell-static.TS.md. Acceptance: the format call
+      returns without raising; A6 prints FORMAT-SUMMARY ChangedCount=0; the analyze call returns
+      without raising. If any hash changed, re-copy the affected mirror with A10 as in P5-T8 and
+      re-run P5-T10 and P5-T13 before continuing.
+- [ ] [P5-T15] Commit and push Phase 5 (check off AC-13 and AC-16 per the Preamble check-off rule;
+      stage the seven primary PowerShell files of P5-T14, the three mirrors, the pack manifest, the
+      FEATURE evidence directory, and FEATURE/spec.md; message "feat(722): add PowerShell scheduling
+      layer"). Acceptance: all three git commands exit 0.
 
 ### Phase 6 — Part A: Documentation (Scheduling Sections)
 
@@ -719,16 +770,26 @@ the read-only check script A6 and a before-and-after hash comparison.
       `extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md`,
       then run script file-hashes (A5) through CMD-PS-SCRIPT-SH over the source and the mirror.
       Acceptance: A10 prints its COPIED line and the two A5 Hash values are equal.
-- [ ] [P6-T9] Mirror-consumer contracts and rule-file tokens: run CMD-PY-TEST over the two node IDs of
-      block B27; run CMD-PY-TEST over the Python files of block B43; run CMD-TS-TEST over the
+- [ ] [P6-T9] Mirror-consumer contracts and rule-file tokens: run CMD-PY-TEST over the first node ID
+      of block B27; run CMD-PY-TEST over the Python files of block B43; run CMD-TS-TEST over the
       TypeScript files of block B43; and, for each Part A token of block B26, run CMD-GIT-GREP-COUNT
       and CMD-GIT-GREP-COUNT-BASE against `.claude/rules/parallel-orchestration.md`. Write
       FEATURE/evidence/regression-testing/mirror-contract-p6.TS.md recording every command, its exit
-      code, and every token's two counts. Acceptance: the B27 run exits 0 with two PASSED lines; every
-      FAILED node of the B43 Python run is in the P0-T18 baseline failure set; every line beginning
-      "FAIL " of the B43 TypeScript run is in the P0-T31 baseline failure set; every Part A token's
-      worktree count is greater than its BASE_SHA count (a BASE_SHA run that exits 1 with no output is
-      a count of zero).
+      code, and every token's two counts. The artifact's EXIT_CODE refers to the first B27 node run;
+      the exit code of every other command, including each CMD-GIT-GREP-COUNT-BASE run that exits 1
+      for a zero count, is recorded in the body. Then, as separate commands, run CMD-PY-TEST over the second
+      node ID of block B27 alone, and run script file-hashes (A5) through CMD-PS-SCRIPT-SH over the
+      four Phase 6 mirror pairs (the P6-T1, P6-T3, P6-T5, and P6-T7 primaries and the P6-T2, P6-T4,
+      P6-T6, and P6-T8 mirrors). Write the second B27 node output to
+      FEATURE/evidence/regression-testing/bundle-payload-p6.TS.md under the KL-510 rule of the Terms,
+      and the A5 output to FEATURE/evidence/regression-testing/mirror-hashes-p6.TS.md.
+      Acceptance: the first B27 node run exits 0 with one PASSED line; every FAILED node of the B43
+      Python run is in the P0-T18 baseline failure set; every line beginning "FAIL " of the B43
+      TypeScript run is in the P0-T31 baseline failure set; every Part A token's worktree count is
+      greater than its BASE_SHA count (a BASE_SHA run that exits 1 with no output is a count of zero);
+      the second B27 node satisfies KL-510 and the bundle-payload artifact contains the line
+      "KL-510: PASSED" or the line "KL-510: STATE-ONLY"; each of the four A5 pairs prints two equal
+      Hash values.
 - [ ] [P6-T10] Commit and push Phase 6 (check off AC-18 per the Preamble check-off rule; stage the
       eight Markdown files, the FEATURE evidence directory, and FEATURE/spec.md; message "docs(722):
       document integration-cost scheduling"). Acceptance: all three git commands exit 0.
@@ -747,11 +808,14 @@ the read-only check script A6 and a before-and-after hash comparison.
       (A9) for Test-BlastRadiusConflict in the facade against BASE_SHA. Write
       FEATURE/evidence/qa-gates/detection-unchanged-part-a.TS.md. Acceptance: both git commands print
       nothing; A9 prints BODY-EQUAL=True.
-- [ ] [P7-T4] Re-run the #452 gate commands of P0-T21 and P0-T22 unmodified. Write
-      FEATURE/evidence/qa-gates/452-gate-part-a.TS.md. Acceptance: the same pass counts as P0-T21 and
-      P0-T22.
+- [ ] [P7-T4] Re-run the #452 gate: run the P0-T21 command unmodified, then run the #452 Pester gate
+      form of the Terms over the five fixtures of P0-T20's branch list. Write
+      FEATURE/evidence/qa-gates/452-gate-part-a.TS.md. Acceptance: pytest exits 0 with ten PASSED
+      lines, one per B1 node ID; the Pester run satisfies the #452 Pester gate form for all five
+      fixtures (FailedCount=0 and exactly two passing cases attributed to each).
 - [ ] [P7-T5] Line counts: run script line-counts over every Python, PowerShell, and TypeScript file
-      written in Phases 1 through 5. Write FEATURE/evidence/qa-gates/line-counts-part-a.TS.md.
+      written in Phases 1 through 5, including `tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1`
+      (edited by P5-T12). Write FEATURE/evidence/qa-gates/line-counts-part-a.TS.md.
       Acceptance: every value is at most 500 and the drift module value is at most its P0-T13 value.
 - [ ] [P7-T6] Commit and push Phase 7 evidence (check off AC-07, AC-08, AC-09, AC-10, AC-11, AC-12,
       and AC-14 per the Preamble check-off rule; stage the FEATURE evidence directory and
@@ -785,7 +849,9 @@ the read-only check script A6 and a before-and-after hash comparison.
       take plan paths from the selector, take no paths from the spec, and take contracts from the
       write-intent spec-contract function; in normalization, when the flag is true, apply the token-level
       entry filter before the mandate-read filter. When the flag is absent or false, both functions
-      execute exactly the current statements. Acceptance: the file is at most 500 lines.
+      execute exactly the current statements. Acceptance: the file is at most 500 lines. Stop
+      condition: if the edit would exceed 500 lines, move the branch logic into the P8-T5 module and
+      record the relocation in the P8-T8 artifact.
 - [ ] [P8-T7] Edit `scripts/dev_tools/_blast_radius_validation.py`: replace the plan-side extraction
       call used by V1 and V2 with the selector of P8-T5. Acceptance: the file is at most 500 lines. Stop
       condition: if the edit would exceed 500 lines, move the remaining selection logic into the P8-T5
@@ -842,8 +908,10 @@ the read-only check script A6 and a before-and-after hash comparison.
       FEATURE/evidence/regression-testing/config-part-b.TS.md. Acceptance: exit 0 and a PASSED line
       for every listed test.
 - [ ] [P9-T12] Run CMD-PY-COV with label p9. Write FEATURE/evidence/regression-testing/python-full-p9.TS.md.
-      Acceptance: every FAILED node ID is in the P0-T18 baseline failure set. Stop condition: any
-      failure outside the P0 inventory stops the plan; record the node ID and report it.
+      Acceptance: every FAILED node ID is in the P0-T18 baseline failure set, except that the KL-510
+      node may fail when its failure satisfies KL-510 case (b), recorded as the Terms require. Stop
+      condition: any other failure outside the P0 inventory stops the plan; record the node ID and
+      report it.
 - [ ] [P9-T13] Run CMD-PY-BLACK, CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT over the four
       Python files of this phase (P9-T5, P9-T6, P9-T8, P9-T9). Write
       FEATURE/evidence/qa-gates/phase9-python-static.TS.md. Acceptance: as in P1-T14; if the write-mode
@@ -871,15 +939,23 @@ the read-only check script A6 and a before-and-after hash comparison.
       .claude/lib convention: the help-block phrase "imports its siblings with -ErrorAction Stop",
       Set-StrictMode -Version Latest immediately followed by $ErrorActionPreference = 'Stop', and
       -ErrorAction Stop on every column-0 Import-Module line. Acceptance: the file exists and is at
-      most 500 lines; the convention is verified by P10-T11.
+      most 500 lines; the convention is verified by P10-T12.
 - [ ] [P10-T5] Edit `.claude/lib/blast-radius/BlastRadius.psm1`: import the write-intent module (in the
       sibling import form ending in -Force -ErrorAction Stop); in
       Get-BlastRadius and Get-NormalizedDeclaredRadius add the flag branch as a delegation to the
-      write-intent module (all logic stays in that module); export the write-intent functions named in
-      B35. Test-BlastRadiusConflict is not edited. Acceptance: the file is at most 500 lines.
+      write-intent module (all logic stays in that module); append exactly the six write-intent
+      functions named in B35 (Test-WriteIntentExtractionEnabled, Get-ConfigPathRoot,
+      Get-WriteIntentPlanPath, Get-WriteIntentSpecContract, Select-WriteIntentPathEntry, and
+      Get-PlanPathForConfig) to the exported function list, so the facade exports fourteen functions
+      (the eight of Part A plus these six). Test-BlastRadiusConflict is not edited. Acceptance: the
+      file is at most 500 lines. The export-count test is updated by P10-T10. Stop condition: if the
+      edit would exceed 500 lines, move the branch logic into the P10-T4 module and record the
+      relocation in the P10-T7 artifact.
 - [ ] [P10-T6] Edit `.claude/lib/blast-radius/BlastRadiusValidation.psm1`: import the write-intent
       module (in the sibling import form ending in -Force -ErrorAction Stop) and replace the plan-side Get-PlanPaths call used by V1 and V2 with the write-intent
-      selector. Acceptance: the file is at most 500 lines.
+      selector. Acceptance: the file is at most 500 lines. Stop condition: if the edit would exceed
+      500 lines, move the remaining selection logic into the P10-T4 module instead and record the
+      relocation in the P10-T7 artifact.
 - [ ] [P10-T7] Produce the mirrors for P10-T4, P10-T5, and P10-T6 per the Preamble rule by running
       script copy-file (A10) through CMD-PS-SCRIPT-SH once per pair, with destinations
       `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1`,
@@ -898,24 +974,36 @@ the read-only check script A6 and a before-and-after hash comparison.
       file and script file-hashes (A5) over the runsettings pair, each through CMD-PS-SCRIPT-SH.
       Acceptance: A11 prints PSD1-OK for the self-hosted runsettings file; the two A5 Hash values are
       equal; core.json parses as JSON.
-- [ ] [P10-T10] Run script pester-coverage over the P10-T2 file and the P10-T3 file (one run each) with
+- [ ] [P10-T10] In the batch opened by P10-T8 (spec decision 12; this batch then holds one production
+      and one test file), edit `tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1`, Describe
+      'Exported facade surface' only: append the six write-intent names of P10-T5 to the -ForEach list
+      of It 'exports <_>' (keeping the eight Part A names), change the comment that says eight names
+      to say fourteen, and change the assertion of It 'exports no function beyond the spec-fixed
+      names' to the literal "$exported.Count | Should -Be 14". No other test in the file changes. Then
+      run script pester-counts (A2) through CMD-PS-SCRIPT-SH with -Path set to that file. Write
+      FEATURE/evidence/regression-testing/facade-exports-p10.TS.md. Acceptance: the file is at most 500
+      lines; the run prints FailedCount=0 and a PassedCount equal to its TotalCount; its detailed
+      output contains a passing line for "exports Get-PlanPathForConfig" and a passing line for
+      "exports no function beyond the spec-fixed names".
+- [ ] [P10-T11] Run script pester-coverage over the P10-T2 file and the P10-T3 file (one run each) with
       -CoveragePath set to the write-intent module, the facade, and the validation module as one
       comma-joined value, and -CoverageOutputPath SCRATCH/pester-p10.xml. Write
       FEATURE/evidence/regression-testing/pester-part-b.TS.md. Acceptance: every run prints
       FailedCount=0; every B34 It name appears as passed.
-- [ ] [P10-T11] Run script pester-counts over the whole blast-radius Pester directory; then run script
+- [ ] [P10-T12] Run script pester-counts over the whole blast-radius Pester directory; then run script
       pester-counts with -Path set to the convention test path of block B46, then run script
       pester-counts with -Path set to the guard path of block B47. Write
       FEATURE/evidence/regression-testing/pester-directory-p10.TS.md. Acceptance: every FAILED name of
       the directory run is in the P0-T32 baseline failure set; the convention run prints
       FailedCount=0; the B47 run prints FailedCount=0.
-- [ ] [P10-T12] Format and lint the six primary PowerShell files of this phase as in P5-T12. Write
-      FEATURE/evidence/qa-gates/phase10-powershell-static.TS.md. Acceptance: as in P5-T12.
-- [ ] [P10-T13] Commit and push Phase 10 (check off AC-22, AC-23, AC-24, AC-25, AC-26, AC-27, and
-      AC-29 per the Preamble check-off rule; stage the six primary files of P10-T2 through P10-T6 and
-      P10-T9, the four mirrors, the pack manifest, the FEATURE evidence directory, and FEATURE/spec.md;
-      message "feat(722): add write-intent extraction (PowerShell)"). Acceptance: all three git
-      commands exit 0.
+- [ ] [P10-T13] Format and lint the seven primary PowerShell files of this phase (the files of P10-T2
+      through P10-T6, the self-hosted runsettings file of P10-T9, and the P10-T10 file) as in P5-T14.
+      Write FEATURE/evidence/qa-gates/phase10-powershell-static.TS.md. Acceptance: as in P5-T14.
+- [ ] [P10-T14] Commit and push Phase 10 (check off AC-22, AC-23, AC-24, AC-25, AC-26, AC-27, and
+      AC-29 per the Preamble check-off rule; stage the seven primary files of P10-T13, the four
+      mirrors, the pack manifest, the FEATURE evidence directory, and FEATURE/spec.md; message
+      "feat(722): add write-intent extraction (PowerShell)"). Acceptance: all three git commands exit
+      0.
 
 ### Phase 11 — Part B: TypeScript Carriage of write_intent_extraction and path_roots
 
@@ -986,15 +1074,16 @@ the read-only check script A6 and a before-and-after hash comparison.
       with PASSED lines for every B18 test for all three runs; Pester prints FailedCount=0 and a
       PassedCount equal to its TotalCount.
 - [ ] [P12-T8] Run CMD-PY-BLACK, CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT over the P12-T5
-      file, and the P5-T12 PowerShell format and lint sequence over the P12-T6 file. Write
-      FEATURE/evidence/qa-gates/phase12-static.TS.md. Acceptance: as in P1-T14 and P5-T12.
+      file, and the P5-T14 PowerShell format and lint sequence over the P12-T6 file. Write
+      FEATURE/evidence/qa-gates/phase12-static.TS.md. Acceptance: as in P1-T14 and P5-T14.
 - [ ] [P12-T9] Commit and push Phase 12 (check off AC-03 and AC-04 per the Preamble check-off rule;
       stage the three fixtures, the two test files, the FEATURE evidence directory, and FEATURE/spec.md;
       message "test(722): pin historical AFTER values"). Acceptance: all three git commands exit 0.
 - [ ] [P12-T10] Confirm the historical tests read only committed fixtures: run CMD-GIT-TRACKED for each
       of the two historical test files, then CMD-GIT-GREP-FORBID over both. Write
       FEATURE/evidence/qa-gates/historical-tests-no-forbidden-refs.TS.md with ExpectedExitCode: 1.
-      Acceptance: both CMD-GIT-TRACKED runs exit 0; CMD-GIT-GREP-FORBID exits 1 and prints nothing.
+      The artifact's EXIT_CODE and ExpectedExitCode refer to the CMD-GIT-GREP-FORBID run; the
+      CMD-GIT-TRACKED exit codes are recorded in the body. Acceptance: both CMD-GIT-TRACKED runs exit 0; CMD-GIT-GREP-FORBID exits 1 and prints nothing.
 
 ### Phase 13 — Part B: Documentation (Write-Intent Sections)
 
@@ -1009,15 +1098,20 @@ the read-only check script A6 and a before-and-after hash comparison.
 - [ ] [P13-T2] Run script copy-file (A10) through CMD-PS-SCRIPT-SH to copy the P13-T1 file to
       `extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`;
       then run script file-hashes (A5) through CMD-PS-SCRIPT-SH over the P13-T1 rule file and that
-      mirror; then run CMD-PY-TEST over the B27 node IDs, CMD-PY-TEST over the Python files of block B43,
-      CMD-TS-TEST over the TypeScript files of block B43, and, for each Part B token of block B26,
-      CMD-GIT-GREP-COUNT and CMD-GIT-GREP-COUNT-BASE against `.claude/rules/parallel-orchestration.md`.
+      mirror; then run CMD-PY-TEST over the first B27 node ID, CMD-PY-TEST over the Python files of
+      block B43, CMD-TS-TEST over the TypeScript files of block B43, and, for each Part B token of block
+      B26, CMD-GIT-GREP-COUNT and CMD-GIT-GREP-COUNT-BASE against `.claude/rules/parallel-orchestration.md`.
       Write FEATURE/evidence/regression-testing/mirror-contract-p13.TS.md recording every command, its
-      exit code, and every token's two counts. Acceptance: A10 prints its COPIED line and the two A5
-      Hash values are equal; the B27 run exits 0 with two PASSED lines; every FAILED node of the B43 Python run is
-      in the P0-T18 baseline failure set; every line beginning "FAIL " of the B43 TypeScript run is in
-      the P0-T31 baseline failure set; every Part B token's worktree count is greater than its
-      BASE_SHA count.
+      exit code, and every token's two counts. The artifact's EXIT_CODE refers to the first B27 node
+      run; the exit code of every other command, including each CMD-GIT-GREP-COUNT-BASE run that exits
+      1 for a zero count, is recorded in the body. Then run CMD-PY-TEST over the second B27 node ID alone
+      and write its output to FEATURE/evidence/regression-testing/bundle-payload-p13.TS.md under the
+      KL-510 rule of the Terms. Acceptance: A10 prints its COPIED line and the two A5 Hash values are
+      equal; the first B27 node run exits 0 with one PASSED line; every FAILED node of the B43 Python
+      run is in the P0-T18 baseline failure set; every line beginning "FAIL " of the B43 TypeScript
+      run is in the P0-T31 baseline failure set; every Part B token's worktree count is greater than
+      its BASE_SHA count (a BASE_SHA run that exits 1 with no output is a count of zero); the second B27 node satisfies KL-510 and the bundle-payload artifact contains
+      the line "KL-510: PASSED" or the line "KL-510: STATE-ONLY".
 - [ ] [P13-T3] Commit and push Phase 13 (check off AC-05 per the Preamble check-off rule; stage the two
       Markdown files, the FEATURE evidence directory, and FEATURE/spec.md; message "docs(722):
       document write-intent extraction"). Acceptance: all three git commands exit 0.
@@ -1031,18 +1125,33 @@ the read-only check script A6 and a before-and-after hash comparison.
       merge-conflict handling, record every conflicted path and its resolution, and re-run the phase
       gates of every phase whose files were conflicted before running CMD-GIT-MERGE-BASE.
 - [ ] [P14-T2] Re-run P0-T20 on the merged tree. Write FEATURE/evidence/qa-gates/452-inventory-final.TS.md.
-      Acceptance: the artifact lists every #452-tagged fixture now on the branch.
-- [ ] [P14-T3] #452 re-gate (pre-authorized on this branch; fixtures unmodified): run the P0-T21 and
-      P0-T22 commands, extended with the node IDs and filters of every fixture listed by P14-T2. Write
-      FEATURE/evidence/qa-gates/452-gate-final.TS.md. Acceptance: pytest exits 0 with a PASSED line for
-      every listed node; every Pester run prints FailedCount=0.
+      Acceptance: the artifact lists every #452-tagged fixture now on the branch. The artifact
+      separates the listed paths into gate fixtures (files directly in tests/fixtures/blast_radius)
+      and excluded paths (files in a subdirectory, including the three scheduling-452 fixtures of
+      P1-T2 through P1-T4, which P7-T1 and P7-T2 verify).
+- [ ] [P14-T3] #452 re-gate (pre-authorized on this branch; fixtures unmodified): run the P0-T21
+      command extended, for each gate fixture recorded by P14-T2 that is not among the five B1
+      fixtures, with F set to that fixture's file stem (its file name without the directory and
+      without the .json suffix, which is the parity module's parametrize ID and the Pester
+      FixtureName), with two node IDs: test_conflict_fixture_reproduces_the_expected_verdict[F] and
+      test_conflict_fixture_reproduces_the_expected_reasons[F] when F's input carries radius_a (the
+      parity module's conflict marker), otherwise test_derivation_fixture_reproduces_the_expected_radius[F]
+      and test_derivation_fixture_reproduces_the_expected_findings[F]; then run the #452 Pester gate
+      form of the Terms (one unfiltered run over the parity Pester file; this replaces the per-fixture
+      filter of P0-T22, which selects 0 tests under Pester 5.6.1). Write
+      FEATURE/evidence/qa-gates/452-gate-final.TS.md recording the substitute and every added node ID.
+      Acceptance: pytest exits 0 with a PASSED line for every listed node; the Pester run satisfies
+      the #452 Pester gate form of the Terms with F ranging over the file stems of every gate fixture recorded by P14-T2
+      (FailedCount=0, no "[-]" result line, and, for each such F, exactly two "[+]" result lines whose
+      test name ends with " for F").
 - [ ] [P14-T4] Detection relation unchanged (final): repeat P7-T3 on the merged tree with FINAL_BASE in
       place of BASE_SHA, both as the CMD-GIT-DIFF-NAMES base and as the -BaseSha argument of script A9.
       Write FEATURE/evidence/qa-gates/detection-unchanged-final.TS.md. Acceptance: as in P7-T3.
 - [ ] [P14-T5] Detection verdicts unchanged (final): run CMD-PY-TEST over the verdict and reasons
       parity tests of block B36 and script pester-counts over the parity Pester file. Write
       FEATURE/evidence/qa-gates/detection-verdicts-final.TS.md. Acceptance: pytest exits 0; Pester
-      prints FailedCount=0.
+      prints FailedCount=0 and a PassedCount of at least 1 (a filter that selects no test fails this
+      gate).
 - [ ] [P14-T6] Mirror identity (final): run script file-hashes over every mirror pair written by this
       plan (block B37). Write FEATURE/evidence/qa-gates/mirrors-final.TS.md. Acceptance: every pair is
       equal.
@@ -1066,9 +1175,12 @@ the read-only check script A6 and a before-and-after hash comparison.
       Acceptance: exit 0 and "0 errors". On failure, fix and restart Phase 15.
 - [ ] [P15-T4] Run CMD-PY-COV with label final, then script py-cov-files over the six Python
       production files of block B38. Write FEATURE/evidence/qa-gates/final-python-pytest-coverage.TS.md.
-      Acceptance: every FAILED node ID is in the P0-T18 baseline failure set; every new test named in
-      B10, B11, B13, B14, B16, B18, and B32 passes; each B38 file prints LinePercent of at least 85 and
-      BranchPercent of at least 75. On failure, fix and restart Phase 15.
+      Acceptance: every FAILED node ID is in the P0-T18 baseline failure set, except that the KL-510
+      node may fail when its failure satisfies KL-510 case (b), recorded as the Terms require; every
+      new test named in B10, B11, B13, B14, B16, B18, and B32 passes; each B38 file prints LinePercent of at least 85 and
+      BranchPercent of at least 75. On failure, fix and restart Phase 15. The artifact's EXIT_CODE and
+      any ExpectedExitCode refer to the CMD-PY-COV run; the py-cov-files exit code is recorded in the
+      body.
 - [ ] [P15-T5] Python coverage delta: run script changed-lines (A7 companion, block B39) with
       SCRATCH/coverage-722-final.json, FINAL_BASE, and the three pre-existing files of P0-T18. Write
       FEATURE/evidence/qa-gates/python-coverage-delta.TS.md recording baseline percent (P0-T18), final
@@ -1152,9 +1264,12 @@ the read-only check script A6 and a before-and-after hash comparison.
       FEATURE/evidence/qa-gates/final-line-counts.TS.md. Acceptance: every production and test file is at
       most 500 lines; the drift module is at most its P0-T13 value.
 - [ ] [P18-T2] Write FEATURE/evidence/qa-gates/batch-accounting.TS.md listing, per batch (Python and
-      PowerShell: P1, P2, P3, P5, P8, P9 first half, P9 second half, P10 first half, P10 second half,
-      P12 Python, P12 PowerShell; TypeScript: P4 batch one, P4 batch two, P11 batch one, P11 batch two),
-      the authored production and test files and the reset or boundary artifact that opened the batch.
+      PowerShell: P1, P2, P3, P5 first half (opened by P5-T1), P5 second half (opened by P5-T11; one
+      test file, `tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1`), P8, P9 first half,
+      P9 second half, P10 first half, P10 second half (opened by P10-T8; the self-hosted runsettings
+      file and `tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1`), P12 Python, P12
+      PowerShell; TypeScript: P4 batch one, P4 batch two, P11 batch one, P11 batch two), the authored
+      production and test files and the reset or boundary artifact that opened the batch.
       Acceptance: no batch lists more than 3 production or 3 test files of one language.
 - [ ] [P18-T3] Scope check: run CMD-GIT-DIFF-NAMES with base FINAL_BASE and pathspec "." and
       CMD-GIT-STATUS. Write FEATURE/evidence/qa-gates/scope-check.TS.md. Acceptance: every listed path
@@ -1899,8 +2014,16 @@ B38 — Python production files for final coverage: `scripts/dev_tools/_blast_ra
 `scripts/dev_tools/compute_blast_radius.py`, `scripts/dev_tools/_blast_radius_validation.py`,
 and `scripts/dev_tools/parallel_drift_detection.py` (six files).
 
-B40 — PowerShell files for final QA: the three new or changed modules of Phases 5 and 10 plus the
-validation module, the four Pester files written by this plan, and the self-hosted runsettings file.
+B40 — PowerShell files for final QA (ten files): the four modules
+`.claude/lib/blast-radius/BlastRadiusScheduling.psm1`, `.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1`,
+`.claude/lib/blast-radius/BlastRadius.psm1`, and `.claude/lib/blast-radius/BlastRadiusValidation.psm1`;
+the five Pester files written by this plan,
+`tests/scripts/claude-lib/blast-radius/BlastRadiusScheduling.Tests.ps1`,
+`tests/scripts/claude-lib/blast-radius/BlastRadius.HistoricalRuns.Tests.ps1`,
+`tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`,
+`tests/scripts/claude-lib/blast-radius/BlastRadiusWriteIntent.Tests.ps1`, and
+`tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1` (edited by P5-T12 and P10-T10); and the
+self-hosted runsettings file `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
 
 B41 — PowerShell modules for final coverage: `.claude/lib/blast-radius/BlastRadiusScheduling.psm1`,
 `.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1`, `.claude/lib/blast-radius/BlastRadius.psm1`,
@@ -1941,14 +2064,14 @@ the drift module's conflicts attribute, which is why P2-T6 keeps that name as th
 poetry run pytest -v tests/scripts/dev_tools/test_parallel_drift_detection_conflicts.py
 ```
 
-B46 — the .claude/lib module-convention Pester test, run by P0-T32, P5-T11, P10-T11, and P16-T4
+B46 — the .claude/lib module-convention Pester test, run by P0-T32, P5-T13, P10-T12, and P16-T4
 with script pester-counts (read-only; it discovers every module under the .claude/lib tree):
 
 ```text
 tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1
 ```
 
-B47 — the repository-wide Pester test-name uniqueness guard, run by P0-T32, P5-T11, P10-T11, and
+B47 — the repository-wide Pester test-name uniqueness guard, run by P0-T32, P5-T13, P10-T12, and
 P16-T4 with script pester-counts (read-only; it scans every Pester file under the tests tree for
 sibling-name collisions):
 
@@ -1972,23 +2095,23 @@ tests/scripts/claude-runtime/test-name-uniqueness.Tests.ps1
 | AC-10 | #452 directory-prefix case weighted, edge at 0 | P1-T3 | P7-T1, P7-T2 | evidence/qa-gates/part-a-strict-identity-python | P7-T6 |
 | AC-11 | #452 negative controls edge-free | P1-T4 | P7-T1, P7-T2 | evidence/qa-gates/part-a-strict-identity-powershell | P7-T6 |
 | AC-12 | #452 fixtures embed radii | P1-T2..P1-T4 | P7-T1 | evidence/qa-gates/part-a-strict-identity-python | P7-T6 |
-| AC-13 | edge rule implemented, each term tested | P1-T10, P5-T5 | P1-T12, P5-T10 | evidence/regression-testing/scheduling-tests-pass, pester-part-a | P5-T13 |
+| AC-13 | edge rule implemented, each term tested | P1-T10, P5-T5 | P1-T12, P5-T10 | evidence/regression-testing/scheduling-tests-pass, pester-part-a | P5-T15 |
 | AC-14 | soft-pair tolerated fixture | P1-T5 | P7-T1, P7-T2 | evidence/qa-gates/part-a-strict-identity-python | P7-T6 |
 | AC-15 | hypothesis property tests | P1-T8 | P1-T12 | evidence/regression-testing/scheduling-tests-pass | P1-T15 |
-| AC-16 | conflict_tolerance reader rejections, both runtimes | P1-T10, P5-T5 | P1-T12, P5-T10 | evidence/regression-testing/pester-part-a | P5-T13 |
+| AC-16 | conflict_tolerance reader rejections, both runtimes | P1-T10, P5-T5 | P1-T12, P5-T10 | evidence/regression-testing/pester-part-a | P5-T15 |
 | AC-17 | both config copies carry committed values | P3-T2, P3-T3 | P3-T10 | evidence/regression-testing/config-and-historical-before | P3-T12 |
 | AC-18 | skills and agent call scheduling function | P6-T3..P6-T8 | P6-T9 | evidence/regression-testing/mirror-contract-p6 | P6-T10 |
 | AC-19 | enum unchanged; tolerated fields accepted | P2-T3, P4-T7 | P2-T7, P4-T8 | evidence/regression-testing/drift-and-validator-tests, ts-part-a-tests | P4-T10 |
 | AC-20 | drift via helper module | P2-T5, P2-T6 | P2-T7 | evidence/regression-testing/drift-and-validator-tests | P2-T10 |
 | AC-21 | drift module not grown; drift tests unmodified | P2-T6 | P2-T7, P2-T8, P18-T1 | evidence/qa-gates/drift-tests-unmodified | P18-T4 |
-| AC-22 | W1-W6 in both runtimes | P8-T5, P10-T4 | P8-T8, P10-T10 | evidence/regression-testing/write-intent-python, pester-part-b | P10-T13 |
-| AC-23 | shared-surface read-citation fixture | P8-T2 | P8-T8, P10-T10 | evidence/regression-testing/write-intent-python | P10-T13 |
-| AC-24 | spec-contracts-only fixture | P8-T2 | P8-T8, P10-T10 | evidence/regression-testing/write-intent-python | P10-T13 |
-| AC-25 | flag-absent identity fixture, both runtimes | P8-T6, P10-T5 | P8-T8, P10-T10 | evidence/regression-testing/pester-part-b | P10-T13 |
-| AC-26 | derived radius passes V1 and V2 in write-intent mode | P8-T7, P10-T6 | P8-T8, P10-T10 | evidence/regression-testing/write-intent-python | P10-T13 |
-| AC-27 | vocabularies pinned by parity test | P8-T5, P10-T4 | P8-T8, P10-T10 | evidence/regression-testing/pester-part-b | P10-T13 |
+| AC-22 | W1-W6 in both runtimes | P8-T5, P10-T4 | P8-T8, P10-T11 | evidence/regression-testing/write-intent-python, pester-part-b | P10-T14 |
+| AC-23 | shared-surface read-citation fixture | P8-T2 | P8-T8, P10-T11 | evidence/regression-testing/write-intent-python | P10-T14 |
+| AC-24 | spec-contracts-only fixture | P8-T2 | P8-T8, P10-T11 | evidence/regression-testing/write-intent-python | P10-T14 |
+| AC-25 | flag-absent identity fixture, both runtimes | P8-T6, P10-T5 | P8-T8, P10-T11 | evidence/regression-testing/pester-part-b | P10-T14 |
+| AC-26 | derived radius passes V1 and V2 in write-intent mode | P8-T7, P10-T6 | P8-T8, P10-T11 | evidence/regression-testing/write-intent-python | P10-T14 |
+| AC-27 | vocabularies pinned by parity test | P8-T5, P10-T4 | P8-T8, P10-T11 | evidence/regression-testing/pester-part-b | P10-T14 |
 | AC-28 | config copies: mandate amendment, flag, path_roots | P9-T2..P9-T4 | P9-T11 | evidence/regression-testing/config-part-b | P9-T14 |
-| AC-29 | key-partition tests classify new keys | P3-T4, P9-T5, P9-T6, P5-T4, P10-T3 | P9-T11, P10-T10 | evidence/regression-testing/config-part-b | P10-T13 |
+| AC-29 | key-partition tests classify new keys | P3-T4, P9-T5, P9-T6, P5-T4, P10-T3 | P9-T11, P10-T11 | evidence/regression-testing/config-part-b | P10-T14 |
 | AC-30 | TypeScript carries three keys; tests pass | P4-T1..P4-T4, P4-T6, P11-T1..P11-T3, P11-T5 | P4-T8, P11-T6 | evidence/regression-testing/ts-part-b-tests | P11-T8 |
 | AC-31 | mirrors, runsettings, pack manifest | P5-T7..P5-T9, P10-T7, P10-T9 | P14-T6, P17-T4, P13-T2 | evidence/qa-gates/mirrors-final | P17-T6 |
 | AC-32 | no bash file changed | none | P14-T7 | evidence/qa-gates/bash-untouched | P14-T8 |
@@ -2004,6 +2127,59 @@ P18-T5 verifies that 37 criteria are checked after P18-T4; P18-T7 checks AC-38 a
 ## Planner Adversarial Self-Review
 
 SELF-REVIEW: RE-DERIVED THIS PASS
+
+Revision round 5 (execution-time delta; Phases 0-4 and P5-T1 through P5-T10 complete and unchanged
+except for cross-reference renumbering and one note on P0-T22). Task renumbering in this round:
+P5-T11, P5-T12, and P5-T13 became P5-T13, P5-T14, and P5-T15 (new P5-T11 and P5-T12 inserted);
+P10-T10, P10-T11, P10-T12, and P10-T13 became P10-T11, P10-T12, P10-T13, and P10-T14 (new P10-T10
+inserted). Task IDs quoted inside the round 1 to round 4 records below use the numbering in force
+when those records were written. Citations re-derived against the current tree in this pass:
+
+- tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1: Describe 'Exported facade surface' at
+  lines 467-489; the -ForEach list of six names at lines 469-472; the comment naming six names at
+  line 476; It 'exports no function beyond the six spec-fixed names' at line 481 asserting a count
+  of 6 at line 486. The file ends at line 489, so adding two names (P5-T12) and six more (P10-T10)
+  keeps it under 500 lines. Drives P5-T12, P10-T10, B40, P7-T5, and P18-T2.
+- .claude/lib/blast-radius/BlastRadius.psm1: sibling imports at lines 64-70, the scheduling import at
+  line 70; Test-BlastRadiusConflict at line 350; the export list at lines 440-448 names eight
+  functions, including Get-BlastRadiusConflictEdge and Get-BlastRadiusPairDecision; 448 lines. Drives
+  the Part A count 8 and the Part B count 14 (P10-T5 adds the six B35 names).
+- FEATURE/evidence/regression-testing/pester-directory-p5.2026-09-27T15-55.md: the directory run
+  printed FailedCount=1 with "Expected 6, but got 8." for the count case; the convention and guard
+  runs printed FailedCount=0; A6 reported Changed=True for the scheduling Pester file (handled by
+  the MCP format call of P5-T14).
+- FEATURE/evidence/baseline/452-gate-powershell.2026-09-27T14-55.md: the five filtered runs selected
+  0 of 80 tests; the unfiltered run printed TotalCount=80, PassedCount=80, FailedCount=0 and two
+  passing lines per fixture. Drives the #452 Pester gate form term, the P0-T22 note, P7-T4, and
+  P14-T3.
+- tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1: the parametrized It names at
+  lines 239, 254, 275, and 290 end with "for <FixtureName>" (drives the " for F" attribution); the
+  corpus-count case at lines 209-223 compares two counts of the top-level fixture directory taken
+  without recursion, so the plan's fixtures in subdirectories do not change it (sibling check).
+- tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py: list_scoped_files at lines
+  51-60 returns sorted paths under .claude; the all-repo node at lines 118-143 excludes only
+  settings.local.json and agent-memory, and asserts "Repo file missing from bundle:" (lines 137-139)
+  before "Bundle content differs from repo for:" (lines 140-143), stopping at the first failure.
+  The .claude directory of this worktree holds batch-budget state files under its state
+  subdirectory, and no directory sorting after state. Drives KL-510, P6-T9, P13-T2, P9-T12, and
+  P15-T4.
+- pyproject.toml line 115: addopts is "-ra" plus an LCOV reporter, so the default traceback prints
+  the assertion message that KL-510 case (b) reads.
+- FEATURE/evidence/baseline/python-pytest-coverage.2026-09-27T14-46.md: the P0-T18 baseline failure
+  set is empty (5149 passed), so without KL-510 the state-file failure would stop P9-T12 and P15-T4.
+- docs/features/active/blast-radius-over-reports-and-zero-overlap-tolerance-722/spec.md: files-to-
+  change entries for the facade test at lines 344 and 399; Backward-compatibility exception 3 at
+  line 504; decision 12 at line 767; 38 checkbox lines, now at lines 573-700 (P18-T5 counts are
+  unchanged because the edit adds no checkbox).
+- Sibling scan for other pinned counts, key lists, or inventories changed by this plan: the only
+  export-count assertions under the tests tree are the facade test above and the extraction-module
+  test in BlastRadiusTokenShape.Tests.ps1 at line 190 (a membership check on a module this plan does
+  not edit); no test reads a __all__ list of a module this plan edits; the module-convention test
+  asserts only a discovered count greater than 0 (line 50); the runsettings pair is compared for
+  equality by test_poshqc_bundled_parity.py, which the A10 copies satisfy; the key lists and key
+  order are already covered by P3-T4, P4-T2 to P4-T4, P5-T4, P9-T5, P10-T3, and P11-T2 to P11-T3.
+  P14-T5 now also requires a PassedCount of at least 1, so its Describe-level filter cannot pass
+  with zero selected tests.
 
 Revision round 4 (1 preflight defect, applied). Edited region: the P16-T3 acceptance, which now
 re-copies each affected mirror with script A10 through CMD-PS-SCRIPT-SH and re-runs P14-T6 before the
@@ -2199,7 +2375,12 @@ CITATION: scripts/dev_tools/compute_blast_radius.py | 421 lines; line 223 derive
 CITATION: scripts/dev_tools/_blast_radius_extraction.py | lines 61-63 PLAN_TASK_RE; line 243 classify_path_token; line 416 extract_contract_identifiers
 CITATION: scripts/dev_tools/parallel_drift_detection.py | 499 lines; line 271 recompute_conflicts_with_observed; lines 447 and 473 private helpers
 CITATION: scripts/dev_tools/_blast_radius_validation.py | 464 lines; line 296 validate_blast_radius
-CITATION: .claude/lib/blast-radius/BlastRadius.psm1 | 438 lines; lines 57-62 imports; lines 342-430 Test-BlastRadiusConflict; lines 432-438 exports
+CITATION: .claude/lib/blast-radius/BlastRadius.psm1 | 448 lines after P5-T6; lines 64-70 imports; line 350 Test-BlastRadiusConflict; lines 440-448 exports (eight names)
+CITATION: tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1 | lines 467-489 Exported facade surface; line 486 count assertion of 6
+CITATION: tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1 | lines 239, 254, 275, 290 It names ending "for <FixtureName>"; lines 209-223 top-level corpus count
+CITATION: tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py | lines 51-60 sorted scoped files; lines 118-143 all-repo node assertion messages
+CITATION: docs/features/active/blast-radius-over-reports-and-zero-overlap-tolerance-722/evidence/baseline/452-gate-powershell.2026-09-27T14-55.md | filtered runs selected 0 of 80; unfiltered run two passing lines per fixture
+CITATION: docs/features/active/blast-radius-over-reports-and-zero-overlap-tolerance-722/evidence/regression-testing/pester-directory-p5.2026-09-27T15-55.md | Expected 6, but got 8
 CITATION: .claude/lib/blast-radius/BlastRadiusValidation.psm1 | 374 lines; lines 39-42 imports; line 360 Get-PlanPaths call
 CITATION: scripts/powershell/PoshQC/settings/pester.runsettings.psd1 | lines 174-185 blast-radius coverage paths
 CITATION: extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json | lines 136-144 blast-radius module entries
@@ -2208,13 +2389,13 @@ CITATION: extensions/drm-copilot/test/lib/push-down/blast-radius-derive.test.ts 
 CITATION: extensions/drm-copilot/jest.config.cjs | lines 238-240 derivation-core coverage threshold
 CITATION: tests/scripts/dev_tools/blast_radius_parity_test_support.py | lines 108-113 BYTE_EQUAL_KEYS; lines 120-123 Class 2 registry; lines 143-145 declared keys
 CITATION: tests/scripts/dev_tools/test_blast_radius_config_parity.py | lines 182-183 byte-equal test; line 205 exhaustiveness test; lines 372-374 registry consumption
-CITATION: tests/scripts/dev_tools/test_blast_radius_parity.py | lines 174-177 fixture stems; lines 364-444 parametrized tests
+CITATION: tests/scripts/dev_tools/test_blast_radius_parity.py | lines 174-177 fixture stems; lines 364-444 parametrized tests; line 64 CONFLICT_MARKER_KEY = "radius_a"; defs at 365, 386, 417, 444 (drive P14-T3)
 CITATION: tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1 | line 33 ClassOneKeys; lines 40-43 Class 2 consumer registry
 CITATION: tests/fixtures/blast_radius/conflict-directory-vs-glob.json | input radii paths
 CITATION: config/blast-radius.json | full file; mandate_reads lines 20-32
 CITATION: pyproject.toml | line 115 addopts LCOV-only reporter
 CITATION: .claude/hooks/enforce-powershell-batch-budget.ps1 | lines 7 and 34 PowerShell source extensions
-CITATION: docs/features/active/blast-radius-over-reports-and-zero-overlap-tolerance-722/spec.md | 38 checkbox lines 566-693; exception 2 lines 493-499; files-to-change lines 389-392
+CITATION: docs/features/active/blast-radius-over-reports-and-zero-overlap-tolerance-722/spec.md | 38 checkbox lines 573-700; exception 2 lines 497-503; exception 3 line 504; files-to-change facade test lines 344 and 399; decision 12 line 767
 CITATION: tests/scripts/dev_tools/test_blast_radius_mandate_reads.py | lines 59-66 committed_config; line 151 affected test
 CITATION: tests/scripts/dev_tools/test_blast_radius_mergeable_paths.py | lines 103-113 load_config; lines 340 and 374 affected tests
 CITATION: tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1 | lines 246-263 literal indexer consumption check
@@ -2252,14 +2433,14 @@ AC-MAPPING: AC-18 | IMPLEMENTATION: P6-T3..P6-T8 | TESTS: P6-T9 | EVIDENCE: evid
 AC-MAPPING: AC-19 | IMPLEMENTATION: P2-T3, P4-T7 | TESTS: P2-T7, P4-T8 | EVIDENCE: evidence/regression-testing/drift-and-validator-tests
 AC-MAPPING: AC-20 | IMPLEMENTATION: P2-T5, P2-T6 | TESTS: P2-T7 | EVIDENCE: evidence/regression-testing/drift-and-validator-tests
 AC-MAPPING: AC-21 | IMPLEMENTATION: P2-T6 | TESTS: P2-T7, P2-T8, P18-T1 | EVIDENCE: evidence/qa-gates/drift-tests-unmodified
-AC-MAPPING: AC-22 | IMPLEMENTATION: P8-T5, P10-T4 | TESTS: P8-T8, P10-T10 | EVIDENCE: evidence/regression-testing/write-intent-python
-AC-MAPPING: AC-23 | IMPLEMENTATION: P8-T2 | TESTS: P8-T8, P10-T10 | EVIDENCE: evidence/regression-testing/write-intent-python
-AC-MAPPING: AC-24 | IMPLEMENTATION: P8-T2 | TESTS: P8-T8, P10-T10 | EVIDENCE: evidence/regression-testing/write-intent-python
-AC-MAPPING: AC-25 | IMPLEMENTATION: P8-T6, P10-T5 | TESTS: P8-T8, P10-T10 | EVIDENCE: evidence/regression-testing/pester-part-b
-AC-MAPPING: AC-26 | IMPLEMENTATION: P8-T7, P10-T6 | TESTS: P8-T8, P10-T10 | EVIDENCE: evidence/regression-testing/write-intent-python
-AC-MAPPING: AC-27 | IMPLEMENTATION: P8-T5, P10-T4 | TESTS: P8-T8, P10-T10 | EVIDENCE: evidence/regression-testing/pester-part-b
+AC-MAPPING: AC-22 | IMPLEMENTATION: P8-T5, P10-T4 | TESTS: P8-T8, P10-T11 | EVIDENCE: evidence/regression-testing/write-intent-python
+AC-MAPPING: AC-23 | IMPLEMENTATION: P8-T2 | TESTS: P8-T8, P10-T11 | EVIDENCE: evidence/regression-testing/write-intent-python
+AC-MAPPING: AC-24 | IMPLEMENTATION: P8-T2 | TESTS: P8-T8, P10-T11 | EVIDENCE: evidence/regression-testing/write-intent-python
+AC-MAPPING: AC-25 | IMPLEMENTATION: P8-T6, P10-T5 | TESTS: P8-T8, P10-T11 | EVIDENCE: evidence/regression-testing/pester-part-b
+AC-MAPPING: AC-26 | IMPLEMENTATION: P8-T7, P10-T6 | TESTS: P8-T8, P10-T11 | EVIDENCE: evidence/regression-testing/write-intent-python
+AC-MAPPING: AC-27 | IMPLEMENTATION: P8-T5, P10-T4 | TESTS: P8-T8, P10-T11 | EVIDENCE: evidence/regression-testing/pester-part-b
 AC-MAPPING: AC-28 | IMPLEMENTATION: P9-T2..P9-T4 | TESTS: P9-T11 | EVIDENCE: evidence/regression-testing/config-part-b
-AC-MAPPING: AC-29 | IMPLEMENTATION: P3-T4, P9-T5, P9-T6, P5-T4, P10-T3 | TESTS: P9-T11, P10-T10 | EVIDENCE: evidence/regression-testing/config-part-b
+AC-MAPPING: AC-29 | IMPLEMENTATION: P3-T4, P9-T5, P9-T6, P5-T4, P10-T3 | TESTS: P9-T11, P10-T11 | EVIDENCE: evidence/regression-testing/config-part-b
 AC-MAPPING: AC-30 | IMPLEMENTATION: P4-T1..P4-T4, P4-T6, P11-T1..P11-T3, P11-T5 | TESTS: P4-T8, P11-T6 | EVIDENCE: evidence/regression-testing/ts-part-b-tests
 AC-MAPPING: AC-31 | IMPLEMENTATION: P5-T7..P5-T9, P10-T7, P10-T9 | TESTS: P14-T6, P17-T4, P13-T2 | EVIDENCE: evidence/qa-gates/mirrors-final
 AC-MAPPING: AC-32 | IMPLEMENTATION: no bash edit | TESTS: P14-T7 | EVIDENCE: evidence/qa-gates/bash-untouched
