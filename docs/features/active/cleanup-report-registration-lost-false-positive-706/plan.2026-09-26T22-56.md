@@ -34,7 +34,11 @@ kind `baseline`, `regression-testing`, `qa-gates`, or `other`; nothing is writte
 `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`, one artifact per command unless a
 task states otherwise. An artifact whose passing outcome is a non-zero exit carries
 `ExpectedExitCode: <int>` and holds that one command only, because the PR-context parser reads
-the last `EXIT_CODE:` line and the first `ExpectedExitCode:` line of a file.
+the last `EXIT_CODE:` line and the first `ExpectedExitCode:` line of a file. Local command
+output that contains the absolute path of the worktree (for example the `# (in test file ...)`
+line and the printed `$output` of a failing bats test in P1-T5 and P3-T4) is recorded with that
+path prefix replaced by the literal `<REPO_ROOT>`. Where a task says verbatim, it means verbatim
+after this one substitution; no other text is altered.
 
 **Command route (agent-isolated worktree).** The worktree isolation guard refuses command text
 containing the words `bash`, `pwsh`, or `wsl`, and refuses heredocs. Therefore:
@@ -378,7 +382,9 @@ in: `gitdir: C:/fixture-repo/.git/worktrees/wt_drive`
   headline and the `not ok` count are recorded; and the test names on every line printed by
   the `grep -E ' not ok [0-9]+ '` filter are recorded under the heading
   `CI baseline failure set:` (the word `none` when that filter prints nothing). If the run
-  fails or prints no headline, record the failure verbatim, still record the CI baseline
+  fails or prints no headline, run `gh run view <RUN_ID> --log-failed` and record its output
+  (the name of the failed step and its diagnostic lines) as a pair written before the
+  `gh run watch` pair, still record the CI baseline
   failure set, and mark the coverage baseline remediation-required (the plan outcome cannot be
   PASS without a numeric baseline).
 - [ ] [P0-T14] Baseline per-file coverage for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
@@ -555,7 +561,14 @@ P0-T13 CI baseline failure set, do not restart. The exception applies only when 
 contains at least one `not ok` line and the `Run shell-qc check` step succeeded, so a failure
 with no failing test (for example a CI shfmt diff) still restarts the loop. Record
 `PRE-EXISTING-CI-FAILURE: <names>` in the P4-T10 artifact, leave AC-4 unchecked, and
-continue; the plan outcome is not PASS.
+continue; the plan outcome is not PASS. Second exception: when the `Run shell-qc check` step
+failed in both the P0-T13 run and the P4-T10 run, every diagnostic line that
+`gh run view <RUN_ID> --log-failed` prints for the P4-T10 check step is present in the P0-T13
+`--log-failed` record, and none of those lines names `scripts/bash/cleanup_worktrees_scan_helper.sh`,
+do not restart. Lines are compared after removing the job-name, step-name, and timestamp
+prefix that `gh run view` prepends to every log line, because the timestamp differs between
+runs. Record `PRE-EXISTING-CI-CHECK-FAILURE: <lines>` in the P4-T10 artifact, leave AC-4
+unchecked, and continue; the plan outcome is not PASS.
 
 - [ ] [P4-T1] QC step 1 (format) for `scripts/bash/cleanup_worktrees_scan_helper.sh` into
   `<FEATURE>/evidence/qa-gates/qc-step1-format.<ts>.md`. Before formatting, run
@@ -630,9 +643,12 @@ continue; the plan outcome is not PASS.
   `scan-dirs emits has_gitfile/target_exists/size for each candidate directory`; the numeric
   `Bash coverage (lines): NN.N%` headline is recorded and is at least `85.0`. Also run
   `gh run view <RUN_ID> --log` filtered by `grep -E ' not ok [0-9]+ '` and record the test
-  names it prints (before the watch pair). On any failure, restart the loop at P4-T1, except
-  under the pre-existing CI failure exception of the Phase 4 loop rule, which is evaluated
-  against those recorded names.
+  names it prints (before the watch pair). When the run failed with no `not ok` line, also run
+  `gh run view <RUN_ID> --log-failed` and record its output for the second exception (before
+  the watch pair). On any failure, restart the loop at P4-T1, except under the two exceptions
+  of the Phase 4 loop rule: the pre-existing CI failure exception, evaluated against those
+  recorded names, and the second exception, evaluated against the recorded `--log-failed`
+  output.
 - [ ] [P4-T11] CI failure count for the P4-T9 run of `.github/workflows/_shell-coverage.yml`, in
   its own artifact `<FEATURE>/evidence/qa-gates/ci-not-ok-count.<ts>.md` with
   `ExpectedExitCode: 1`: run `gh run view <RUN_ID> --log` piped to
