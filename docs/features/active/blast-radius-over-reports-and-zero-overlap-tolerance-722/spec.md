@@ -596,19 +596,19 @@ reporting done.
 - [ ] The detection relation is unchanged: every existing conflict fixture and every #452-tagged
   fixture yields the same verdict and the same reason list in Python and PowerShell as on main, and no
   detection module appears in the diff with a behavioral change.
-- [ ] Strict identity (tolerance 0): a Python test and a Pester test assert that the scheduling edge
+- [x] Strict identity (tolerance 0): a Python test and a Pester test assert that the scheduling edge
   pair set equals the detected-conflict pair set for every existing conflict fixture and for the BEFORE
   section of every historical-run fixture, and that cohort coloring of that set equals the pinned
   BEFORE partition.
-- [ ] Absent-key identity: the scheduling-absent-key-strict fixture passes in both runtimes, showing
+- [x] Absent-key identity: the scheduling-absent-key-strict fixture passes in both runtimes, showing
   that a truth table without conflict_tolerance yields the same edges as tolerance 0.
-- [ ] #452 shared-surface case: the scheduling-452-shared-surface-hard fixture is a hard edge at
+- [x] #452 shared-surface case: the scheduling-452-shared-surface-hard fixture is a hard edge at
   tolerance 0, at the committed tolerance, and at a very large tolerance, in both runtimes.
-- [ ] #452 directory-prefix case: the scheduling-452-directory-prefix-weighted fixture is detected,
+- [x] #452 directory-prefix case: the scheduling-452-directory-prefix-weighted fixture is detected,
   carries the possible_overlap cost, and is an edge at tolerance 0, in both runtimes.
-- [ ] #452 negative controls: the scheduling-452-negative-controls fixture yields no edge and no
+- [x] #452 negative controls: the scheduling-452-negative-controls fixture yields no edge and no
   tolerated overlap at every tested tolerance, in both runtimes.
-- [ ] Each #452 scheduling fixture embeds its radii rather than referencing a #452 fixture file, so the
+- [x] Each #452 scheduling fixture embeds its radii rather than referencing a #452 fixture file, so the
   item's tests pass regardless of merge order.
 
 ### Scheduling layer (design points 2, 3, 4)
@@ -617,7 +617,7 @@ reporting done.
   rule exactly as specified (hard classes, integer cost terms with mergeable zero and append-only
   precedence, pairwise benefit with default_band, the integer inequality, first-kind reason selection),
   each term covered by a named unit test in both runtimes.
-- [ ] The scheduling-soft-pair-tolerated fixture shows a detected, non-hard pair recorded as a
+- [x] The scheduling-soft-pair-tolerated fixture shows a detected, non-hard pair recorded as a
   tolerated overlap (not an edge) at the committed tolerance and as an edge at tolerance 0, in both
   runtimes.
 - [x] Property tests (exhaustive enumeration over a fixed finite domain; see decision 11) cover: edge

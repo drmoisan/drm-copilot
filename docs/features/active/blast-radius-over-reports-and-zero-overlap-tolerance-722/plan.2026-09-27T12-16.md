@@ -796,28 +796,28 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 7 — Part A: Verification Gate
 
-- [ ] [P7-T1] Strict identity and #452 cases, Python: run CMD-PY-TEST over the node IDs of block B28.
+- [x] [P7-T1] Strict identity and #452 cases, Python: run CMD-PY-TEST over the node IDs of block B28.
       Write FEATURE/evidence/qa-gates/part-a-strict-identity-python.TS.md. Acceptance: exit 0 and a
       PASSED line for every listed node.
-- [ ] [P7-T2] Strict identity and #452 cases, PowerShell: run script pester-counts over the P5-T2 file
+- [x] [P7-T2] Strict identity and #452 cases, PowerShell: run script pester-counts over the P5-T2 file
       with -FullNameFilter values from block B29, one run each. Write
       FEATURE/evidence/qa-gates/part-a-strict-identity-powershell.TS.md. Acceptance: every run prints
       FailedCount=0 and a PassedCount of at least 1.
-- [ ] [P7-T3] Detection relation unchanged: run CMD-GIT-DIFF-NAMES with base BASE_SHA and the
+- [x] [P7-T3] Detection relation unchanged: run CMD-GIT-DIFF-NAMES with base BASE_SHA and the
       detection-module pathspec of block B30 and CMD-GIT-STATUS-PATH with the same pathspec, then run script function-body-equal
       (A9) for Test-BlastRadiusConflict in the facade against BASE_SHA. Write
       FEATURE/evidence/qa-gates/detection-unchanged-part-a.TS.md. Acceptance: both git commands print
       nothing; A9 prints BODY-EQUAL=True.
-- [ ] [P7-T4] Re-run the #452 gate: run the P0-T21 command unmodified, then run the #452 Pester gate
+- [x] [P7-T4] Re-run the #452 gate: run the P0-T21 command unmodified, then run the #452 Pester gate
       form of the Terms over the five fixtures of P0-T20's branch list. Write
       FEATURE/evidence/qa-gates/452-gate-part-a.TS.md. Acceptance: pytest exits 0 with ten PASSED
       lines, one per B1 node ID; the Pester run satisfies the #452 Pester gate form for all five
       fixtures (FailedCount=0 and exactly two passing cases attributed to each).
-- [ ] [P7-T5] Line counts: run script line-counts over every Python, PowerShell, and TypeScript file
+- [x] [P7-T5] Line counts: run script line-counts over every Python, PowerShell, and TypeScript file
       written in Phases 1 through 5, including `tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1`
       (edited by P5-T12). Write FEATURE/evidence/qa-gates/line-counts-part-a.TS.md.
       Acceptance: every value is at most 500 and the drift module value is at most its P0-T13 value.
-- [ ] [P7-T6] Commit and push Phase 7 evidence (check off AC-07, AC-08, AC-09, AC-10, AC-11, AC-12,
+- [x] [P7-T6] Commit and push Phase 7 evidence (check off AC-07, AC-08, AC-09, AC-10, AC-11, AC-12,
       and AC-14 per the Preamble check-off rule; stage the FEATURE evidence directory and
       FEATURE/spec.md; message "test(722): record Part A verification gate"). Acceptance: all three
       git commands exit 0.
