@@ -3,9 +3,9 @@
 - **Issue:** #707
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-26T23-30
+- **Last Updated:** 2026-09-27T01-30
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 - **Work Mode:** full-bug (the acceptance-criteria source is this file only; no `user-story.md` is produced)
 - **Branch:** `bug/codex-gates-4-5-lack-epic-scope-707`
 - **Research:** `docs/features/active/codex-gates-4-5-lack-epic-scope-707/research/research.2026-09-26T23-00.md`
@@ -61,7 +61,7 @@
 
 ## Design Decisions
 
-Each decision states the options considered, the adopted option, and the rationale. D1-D11 carry over research section 5. D12-D15 are added to cover AC-2 reconciliation, the Codex-specific apply_patch leg, retained divergences, and the no-Python authority.
+Each decision states the options considered, the adopted option, and the rationale. D1-D11 carry over research section 5. D12-D15 are added to cover AC-2 reconciliation, the Codex-specific apply_patch leg, retained divergences, and the no-Python authority; D16 records the AC-25 wording amendment.
 
 - **D1 — Resolver placement.**
   - Options: (A) a Codex-local, dot-sourced port in `.codex/hooks/`; (B) `Import-Module` of `.claude/lib/worktree-resolution/*.psm1` from `.codex/hooks`; (C) byte-identical copies of the four `.claude/lib/worktree-resolution` modules under a new `.codex/lib/`, loaded with `Import-Module`; (D) the codex-routing virtual-resource pattern (`VIRTUAL_RESOURCE_PAIRS` in the Python push-down script).
@@ -135,6 +135,11 @@ Each decision states the options considered, the adopted option, and the rationa
   - Options: rely on `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`; add a Codex-specific check.
   - Adopted: the new sibling headers declare the epic readiness predicate PowerShell-authoritative (#663 D5), and the new gate-4 suite asserts that the three new or changed gate-4 files contain no `python` or `poetry` token.
   - Rationale: the existing no-Python guard scans only `.claude/hooks` and `.claude/lib` (its `$script:ScanRoot`), so it does not cover `.codex/hooks`.
+
+- **D16 — AC-25 wording for the unchanged gate classifier.**
+  - Options: (A) keep the AC-25 literal wording (no `python` or `poetry` token in any AC-18 file) and leave AC-25 permanently unchecked; (B) amend AC-25 to state what is verified: the parser-based `Get-PythonInvocationFinding` detector reports no interpreter invocation in the three Codex gate-4 files and their bundle copies, and the two new sibling files contain neither token.
+  - Adopted: B. AC-25 is reworded accordingly and remains unchecked until its tests pass; the token check stated in D15 applies to the two new siblings, and the gate file is covered by the invocation detector.
+  - Rationale: `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1:152` already carries the literal `poetry` inside the `Test-ImplementationCommand` classifier regex, which recognises a Python toolchain command rather than invoking one. D13 forbids editing that function, so the literal condition could never pass, and it tests a classifier pattern rather than an invocation. Decision recorded autonomously by the orchestrator after executor preflight round 1.
 
 ## Proposed Fix
 
@@ -280,7 +285,7 @@ Structure, bundle, manifest, and coverage
 - [ ] AC-22: Both `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` and `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1` list the two new `.codex/hooks` files in `CodeCoverage.Path`; `tests/scripts/dev_tools/test_poshqc_bundled_parity.py` passes; and the coverage evidence under `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/coverage/` reports line coverage >= 85% for `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`, `.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`, and `.codex/hooks/enforce-orchestration-preimplementation-gate-epic-resolution.ps1`, taken from `artifacts/pester/powershell-coverage.xml` of a direct self-hosted PoshQC run.
 - [ ] AC-23: `git diff --name-only <base> HEAD -- .claude` produces no output.
 - [ ] AC-24: `git diff --name-only <base> HEAD -- .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 .codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1 scripts/dev_tools/push_down_codex_and_agents_customizations.py` produces no output, and `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.Parity.Tests.ps1` passes.
-- [ ] AC-25: The new gate-4 suite asserts that each `.codex/hooks` file listed in AC-18 contains no `python` or `poetry` token (case-insensitive), and each new sibling's comment header declares the epic readiness predicate PowerShell-authoritative (D15).
+- [ ] AC-25: The new gate-4 suite asserts that the repository's parser-based Python-invocation detector (`Get-PythonInvocationFinding` in `tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1`) reports no interpreter invocation in each of the three `.codex/hooks` files listed in AC-18 and in its bundle copy; that the two new sibling files contain neither the `python` nor the `poetry` token (case-insensitive); and that each new sibling's comment header declares the epic readiness predicate PowerShell-authoritative (D15, D16). The pre-existing `poetry` token in the unchanged `Test-ImplementationCommand` classifier regex of `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` is a classifier pattern, not an invocation, and is outside this token check.
 - [ ] AC-26: The PowerShell toolchain passes in a single pass (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test` with `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`) and the Python guard tests named in the `poetry run pytest` command in `## Test Strategy` pass, with results recorded under `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/`.
 
 ## Files
