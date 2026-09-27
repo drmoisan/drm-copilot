@@ -142,6 +142,7 @@
     ".claude/lib/blast-radius/BlastRadiusTokenShape.psm1",
     ".claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1",
     ".claude/lib/blast-radius/BlastRadiusConflict.psm1",
+    ".claude/lib/blast-radius/BlastRadiusScheduling.psm1",
     ".claude/lib/project-file-merge/ProjectFileMergeGrammar.psm1",
     ".claude/lib/project-file-merge/ProjectFileMerge.psm1",
     ".claude/lib/project-file-merge/Resolve-MergeableConflict.ps1",

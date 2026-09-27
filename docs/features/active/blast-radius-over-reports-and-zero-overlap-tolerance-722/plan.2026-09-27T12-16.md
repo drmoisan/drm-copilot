@@ -606,17 +606,17 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 5 — Part A: PowerShell Scheduling Module, Registration, and Pester Tests
 
-- [ ] [P5-T1] Reset the PowerShell batch budget (A8, -Kind powershell). Write
+- [x] [P5-T1] Reset the PowerShell batch budget (A8, -Kind powershell). Write
       FEATURE/evidence/other/batch-budget-reset-p5.TS.md. Acceptance: exit 0.
-- [ ] [P5-T2] Write `tests/scripts/claude-lib/blast-radius/BlastRadiusScheduling.Tests.ps1` with the
+- [x] [P5-T2] Write `tests/scripts/claude-lib/blast-radius/BlastRadiusScheduling.Tests.ps1` with the
       Describe, Context, and It blocks of block B23, driving the P1 fixtures. Acceptance: the file
       exists and is at most 500 lines.
-- [ ] [P5-T3] Write `tests/scripts/claude-lib/blast-radius/BlastRadius.HistoricalRuns.Tests.ps1` with
+- [x] [P5-T3] Write `tests/scripts/claude-lib/blast-radius/BlastRadius.HistoricalRuns.Tests.ps1` with
       the BEFORE It blocks of block B24. The file must not contain the substrings origin/, artifacts/,
       or worktree. Acceptance: the file exists and is at most 500 lines.
-- [ ] [P5-T4] Edit `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`: add
+- [x] [P5-T4] Edit `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`: add
       conflict_tolerance to the Class 1 key list. Acceptance: the file is at most 500 lines.
-- [ ] [P5-T5] Create `.claude/lib/blast-radius/BlastRadiusScheduling.psm1` implementing block B25: the
+- [x] [P5-T5] Create `.claude/lib/blast-radius/BlastRadiusScheduling.psm1` implementing block B25: the
       strict config reader, the per-pair decision helper, and Get-BlastRadiusConflictEdge, with
       comment-based help. It imports its own dependencies as the sibling modules do and resolves
       Test-BlastRadiusConflict at call time through Get-Command, failing fast with an error that names
@@ -625,14 +625,14 @@ the read-only check script A6 and a before-and-after hash comparison.
       Set-StrictMode -Version Latest immediately followed by $ErrorActionPreference = 'Stop', and
       -ErrorAction Stop on every column-0 Import-Module line. Acceptance: the file is at most 500
       lines; the convention is verified by P5-T11.
-- [ ] [P5-T6] Edit `.claude/lib/blast-radius/BlastRadius.psm1`: import the scheduling module next to
+- [x] [P5-T6] Edit `.claude/lib/blast-radius/BlastRadius.psm1`: import the scheduling module next to
       the other sibling imports, in the same column-0 form ending in -Force -ErrorAction Stop, and add Get-BlastRadiusConflictEdge and Get-BlastRadiusPairDecision to
       the exported function list. The Test-BlastRadiusConflict function body is not edited. Acceptance:
       the file is at most 500 lines.
-- [ ] [P5-T7] Edit `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`: add the scheduling
+- [x] [P5-T7] Edit `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`: add the scheduling
       module to the blast-radius coverage path group. Acceptance: script psd1-parse (A11) run through
       CMD-PS-SCRIPT-SH over the file exits 0 and prints its PSD1-OK line.
-- [ ] [P5-T8] Produce the mirrors per the Preamble rule: run script copy-file (A10) through
+- [x] [P5-T8] Produce the mirrors per the Preamble rule: run script copy-file (A10) through
       CMD-PS-SCRIPT-SH three times, copying the P5-T5 module to
       `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusScheduling.psm1`,
       the P5-T6 facade to
@@ -641,10 +641,10 @@ the read-only check script A6 and a before-and-after hash comparison.
       `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`. Then run
       script file-hashes over the three pairs. Write FEATURE/evidence/qa-gates/mirrors-p5.TS.md.
       Acceptance: each A10 run prints its COPIED line; each pair's two hashes are equal.
-- [ ] [P5-T9] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`:
+- [x] [P5-T9] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`:
       list the scheduling module next to the other blast-radius module entries. Acceptance: the file
       parses as JSON.
-- [ ] [P5-T10] Run CMD-PS-SCRIPT-SH with script pester-coverage, -TestPath set to the P5-T2 file, the
+- [x] [P5-T10] Run CMD-PS-SCRIPT-SH with script pester-coverage, -TestPath set to the P5-T2 file, the
       P5-T3 file, and the P5-T4 file (one run per file), -CoveragePath set to the P5-T5 module, and
       -CoverageOutputPath SCRATCH/pester-p5.xml. Write FEATURE/evidence/regression-testing/pester-part-a.TS.md.
       Acceptance: every run prints FailedCount=0; the P5-T2 run prints a PassedCount equal to its

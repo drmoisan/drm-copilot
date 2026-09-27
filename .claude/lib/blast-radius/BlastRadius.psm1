@@ -18,6 +18,13 @@
       - Test-BlastRadius                  port of validate_blast_radius
       - Test-BlastRadiusConflict          port of conflicts
 
+    It also re-exports two scheduling functions of BlastRadiusScheduling.psm1
+    (issue #722), which resolves Test-BlastRadiusConflict from this facade at
+    call time:
+
+      - Get-BlastRadiusConflictEdge       port of schedule_conflict_edges
+      - Get-BlastRadiusPairDecision       port of decide_pair
+
     The Python modules remain the authoritative reference implementation. This
     module is one half of a two-language mirror; it never imports validator
     logic. Every function is pure: no filesystem, subprocess, network, or
@@ -60,6 +67,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConfig.psm1'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusNormalization.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusValidation.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConflict.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusScheduling.psm1') -Force -ErrorAction Stop
 
 # Feature-folder handling. Every radius contains its own feature folder, and a
 # caller may pass either a bare folder name or an already-qualified path.
@@ -435,4 +443,6 @@ Export-ModuleMember -Function `
     Get-NormalizedDeclaredRadius, `
     Get-BlastRadiusFromObservedPaths, `
     Test-BlastRadius, `
-    Test-BlastRadiusConflict
+    Test-BlastRadiusConflict, `
+    Get-BlastRadiusConflictEdge, `
+    Get-BlastRadiusPairDecision

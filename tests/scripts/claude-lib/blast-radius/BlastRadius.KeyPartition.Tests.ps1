@@ -30,7 +30,9 @@ BeforeAll {
     # 'mergeable_paths' (issue #643) describes the runtime rather than a
     # repository layout: it names project-file shapes a merge step can
     # reconcile, so both committed copies must carry identical values.
-    $script:ClassOneKeys = @('version', 'over_breadth_fraction', 'mandate_reads', 'mergeable_paths')
+    # 'conflict_tolerance' (issue #722) is the integration-cost scheduling
+    # policy, which likewise describes the runtime, not a repository layout.
+    $script:ClassOneKeys = @('version', 'over_breadth_fraction', 'mandate_reads', 'mergeable_paths', 'conflict_tolerance')
 
     # Class 2 key-to-consumer-file registry (issue #500, cycle 4 R1). Both keys
     # are indexed by name in BlastRadius.TruthTable.Tests.ps1, not in this
