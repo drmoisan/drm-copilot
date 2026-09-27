@@ -1118,18 +1118,18 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 14 — Main Sync, #452 Re-gate, and Scope Checks
 
-- [ ] [P14-T1] Run CMD-GIT-FETCH-MAIN, then CMD-GIT-MERGE-MAIN, then CMD-GIT-MERGE-BASE; the
+- [x] [P14-T1] Run CMD-GIT-FETCH-MAIN, then CMD-GIT-MERGE-MAIN, then CMD-GIT-MERGE-BASE; the
       CMD-GIT-MERGE-BASE output is FINAL_BASE. Write FEATURE/evidence/qa-gates/main-sync.TS.md
       recording FINAL_BASE. Acceptance: the merge exits 0 and the artifact records FINAL_BASE as 40
       hexadecimal characters. If the merge reports conflicts, resolve them under the existing per-item
       merge-conflict handling, record every conflicted path and its resolution, and re-run the phase
       gates of every phase whose files were conflicted before running CMD-GIT-MERGE-BASE.
-- [ ] [P14-T2] Re-run P0-T20 on the merged tree. Write FEATURE/evidence/qa-gates/452-inventory-final.TS.md.
+- [x] [P14-T2] Re-run P0-T20 on the merged tree. Write FEATURE/evidence/qa-gates/452-inventory-final.TS.md.
       Acceptance: the artifact lists every #452-tagged fixture now on the branch. The artifact
       separates the listed paths into gate fixtures (files directly in tests/fixtures/blast_radius)
       and excluded paths (files in a subdirectory, including the three scheduling-452 fixtures of
       P1-T2 through P1-T4, which P7-T1 and P7-T2 verify).
-- [ ] [P14-T3] #452 re-gate (pre-authorized on this branch; fixtures unmodified): run the P0-T21
+- [x] [P14-T3] #452 re-gate (pre-authorized on this branch; fixtures unmodified): run the P0-T21
       command extended, for each gate fixture recorded by P14-T2 that is not among the five B1
       fixtures, with F set to that fixture's file stem (its file name without the directory and
       without the .json suffix, which is the parity module's parametrize ID and the Pester
@@ -1144,21 +1144,21 @@ the read-only check script A6 and a before-and-after hash comparison.
       the #452 Pester gate form of the Terms with F ranging over the file stems of every gate fixture recorded by P14-T2
       (FailedCount=0, no "[-]" result line, and, for each such F, exactly two "[+]" result lines whose
       test name ends with " for F").
-- [ ] [P14-T4] Detection relation unchanged (final): repeat P7-T3 on the merged tree with FINAL_BASE in
+- [x] [P14-T4] Detection relation unchanged (final): repeat P7-T3 on the merged tree with FINAL_BASE in
       place of BASE_SHA, both as the CMD-GIT-DIFF-NAMES base and as the -BaseSha argument of script A9.
       Write FEATURE/evidence/qa-gates/detection-unchanged-final.TS.md. Acceptance: as in P7-T3.
-- [ ] [P14-T5] Detection verdicts unchanged (final): run CMD-PY-TEST over the verdict and reasons
+- [x] [P14-T5] Detection verdicts unchanged (final): run CMD-PY-TEST over the verdict and reasons
       parity tests of block B36 and script pester-counts over the parity Pester file. Write
       FEATURE/evidence/qa-gates/detection-verdicts-final.TS.md. Acceptance: pytest exits 0; Pester
       prints FailedCount=0 and a PassedCount of at least 1 (a filter that selects no test fails this
       gate).
-- [ ] [P14-T6] Mirror identity (final): run script file-hashes over every mirror pair written by this
+- [x] [P14-T6] Mirror identity (final): run script file-hashes over every mirror pair written by this
       plan (block B37). Write FEATURE/evidence/qa-gates/mirrors-final.TS.md. Acceptance: every pair is
       equal.
-- [ ] [P14-T7] Bash untouched: run CMD-GIT-DIFF-NAMES with base FINAL_BASE and CMD-GIT-STATUS-PATH,
+- [x] [P14-T7] Bash untouched: run CMD-GIT-DIFF-NAMES with base FINAL_BASE and CMD-GIT-STATUS-PATH,
       each with pathspec .claude/lib/bash. Write FEATURE/evidence/qa-gates/bash-untouched.TS.md.
       Acceptance: both print nothing.
-- [ ] [P14-T8] Commit and push Phase 14 (check off AC-01, AC-06, AC-32, and AC-33 per the Preamble
+- [x] [P14-T8] Commit and push Phase 14 (check off AC-01, AC-06, AC-32, and AC-33 per the Preamble
       check-off rule; stage the merge result, if any, the FEATURE evidence directory, and
       FEATURE/spec.md; message "chore(722): sync with main and re-run #452 gate"). Acceptance: all
       three git commands exit 0.

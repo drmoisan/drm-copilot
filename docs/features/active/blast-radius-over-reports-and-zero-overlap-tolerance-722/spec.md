@@ -570,7 +570,7 @@ reporting done.
 
 ### P0 gates and historical evidence (design point 7)
 
-- [ ] P0 detection gate: the #452 shared fixture corpus (every fixture in the blast-radius fixture
+- [x] P0 detection gate: the #452 shared fixture corpus (every fixture in the blast-radius fixture
   corpus tagged #452, plus any sibling-added fixture found at P0) runs unmodified through the Python
   and PowerShell detection drivers and passes; the list of fixtures found and the pass result are
   recorded in an evidence artifact under this feature folder's evidence tree.
@@ -593,7 +593,7 @@ reporting done.
 
 ### Strict identity and #452 non-regression
 
-- [ ] The detection relation is unchanged: every existing conflict fixture and every #452-tagged
+- [x] The detection relation is unchanged: every existing conflict fixture and every #452-tagged
   fixture yields the same verdict and the same reason list in Python and PowerShell as on main, and no
   detection module appears in the diff with a behavioral change.
 - [x] Strict identity (tolerance 0): a Python test and a Pester test assert that the scheduling edge
@@ -675,11 +675,11 @@ reporting done.
 - [ ] Every new or changed PowerShell module has a content-identical bundled mirror, is registered in
   both Pester runsettings copies, and is listed in the Claude pack manifest; the push-down
   resource-contract and pack-manifest completeness tests pass.
-- [ ] No file in the bash library directory is changed.
+- [x] No file in the bash library directory is changed.
 
 ### Rule-file amendment (design point 5)
 
-- [ ] `.claude/rules/parallel-orchestration.md` and its bundled mirror are amended, content-identical,
+- [x] `.claude/rules/parallel-orchestration.md` and its bundled mirror are amended, content-identical,
   to record: the write-intent rules and their false-negative list; the mandate-read amendment; an
   integration-cost scheduling subsection with the edge rule, the strict-identity proof, and the hard
   classes; the statement that this is an operator-directed configured policy change and that planners
