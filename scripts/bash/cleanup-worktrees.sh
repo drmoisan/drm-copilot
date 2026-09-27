@@ -121,6 +121,11 @@ MERGED_EQUIVALENT, NOT_MERGED, HAS_UNIQUE_RESIDUALS, PROTECTED_CURRENT, and
 ANCESTRY_ERROR. The first three are the delete-eligible allowlist; ANCESTRY_ERROR is a
 hard git failure and never unlocks a destructive action.
 
+PROTECTED_CURRENT also covers the base branch main, which is protected by name in every
+checkout topology: main is never deleted and a worktree checked out on main is never
+removed. As a second guard, apply mode refuses a deletion request for main with the
+action result BLOCKED-PROTECTED-BASE.
+
 In apply mode a blocked detached removal sets a non-zero exit status. The blocked results
 are BLOCKED-DIRTY, BLOCKED-LOCKED, and BLOCKED-REVERIFY. A checkout holding dirty or
 locked detached worktrees therefore exits non-zero from --apply where it previously
