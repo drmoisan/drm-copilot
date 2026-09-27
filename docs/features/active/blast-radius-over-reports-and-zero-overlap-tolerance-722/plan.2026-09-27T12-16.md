@@ -39,6 +39,9 @@ plain words because they are feature-relative and carry a timestamp placeholder.
 - Acceptance-criteria identifiers AC-01 through AC-38 are assigned to the 38 checklist entries of the
   spec's Acceptance Criteria section in document order. The mapping is in the Acceptance Criteria
   Traceability section at the end of this plan.
+- When an acceptance reads "as in P1-T14" or "as in P5-T12", its re-run clause refers to the current
+  phase: re-run P2-T7 for P2-T9, P3-T10 for P3-T11, P8-T8 for P8-T9, and P12-T7 for P12-T8. For
+  P10-T12, re-copy the affected mirror with A10 and A5 as in P10-T7 or P10-T9 and re-run P10-T10.
 
 ### Structure (split decision recorded in the spec)
 
@@ -391,12 +394,14 @@ the read-only check script A6 and a before-and-after hash comparison.
       pester-coverage, -TestPath tests/scripts/claude-lib/blast-radius, -CoveragePath set to the two
       existing modules named in P0-T19 as one comma-joined value, and -CoverageOutputPath
       SCRATCH/pester-baseline.xml; then run CMD-PS-SCRIPT-SH with script pester-counts and -Path set
-      to the convention test path of block B46. Write
+      to the convention test path of block B46, then run script pester-counts with -Path set to the
+      guard path of block B47. Write
       FEATURE/evidence/baseline/powershell-pester-coverage.TS.md. Acceptance: the artifact records
       TotalCount, PassedCount, FailedCount, every FAILED line (the baseline failure set), and one
-      numeric LinePercent per module; it records the convention run's counts separately. Stop
-      condition: the convention run prints a FailedCount other than 0; stop and report, because P5-T11,
-      P10-T11, and P16-T4 require FailedCount=0 for that test.
+      numeric LinePercent per module; it records the convention run's counts separately; the B47 run
+      prints FailedCount=0. Stop condition: the convention run or the B47 run prints a FailedCount
+      other than 0; stop and report, because P5-T11, P10-T11, and P16-T4 require FailedCount=0 for
+      both tests.
 - [ ] [P0-T33] Inventory committed-config consumers: run CMD-GIT-INV-CONFIG and CMD-GIT-INV-CALLS and
       take the intersection of the two file lists (the candidate set). For each candidate, record
       every test in it that reads either committed config copy and calls a derive, normalize, or
@@ -646,9 +651,11 @@ the read-only check script A6 and a before-and-after hash comparison.
       TotalCount and one It name per B23 entry; the COVERAGE line for the scheduling module is recorded.
 - [ ] [P5-T11] Run the existing blast-radius Pester directory with script pester-counts (A2) and -Path
       tests/scripts/claude-lib/blast-radius; then run script pester-counts with -Path set to the
-      convention test path of block B46. Write
+      convention test path of block B46, then run script pester-counts with -Path set to the guard
+      path of block B47. Write
       FEATURE/evidence/regression-testing/pester-directory-p5.TS.md. Acceptance: every FAILED name of
-      the directory run is in the P0-T32 baseline failure set; the convention run prints FailedCount=0.
+      the directory run is in the P0-T32 baseline failure set; the convention run prints FailedCount=0;
+      the B47 run prints FailedCount=0.
 - [ ] [P5-T12] Format and lint: record hashes of the six PowerShell files of this phase (A5), call
       MCP-PS-FORMAT over them, record hashes again, run script ps-format-check (A6) over them, and call
       MCP-PS-ANALYZE over them. Write FEATURE/evidence/qa-gates/phase5-powershell-static.TS.md.
@@ -877,9 +884,10 @@ the read-only check script A6 and a before-and-after hash comparison.
       script copy-file (A10) through CMD-PS-SCRIPT-SH once per pair, with destinations
       `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1`,
       `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadius.psm1`,
-      and `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusValidation.psm1`.
+      and `extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusValidation.psm1`,
+      then run script file-hashes (A5) through CMD-PS-SCRIPT-SH over the three source-and-mirror pairs.
       Write FEATURE/evidence/qa-gates/mirrors-p10.TS.md. Acceptance: each A10 run prints its COPIED
-      line and each pair's hashes are equal.
+      line and, for each of the three pairs, the two A5 Hash values are equal.
 - [ ] [P10-T8] Reset the PowerShell batch budget (A8, -Kind powershell). Write
       FEATURE/evidence/other/batch-budget-reset-p10b.TS.md. Acceptance: exit 0.
 - [ ] [P10-T9] Edit `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` to add the write-intent
@@ -896,10 +904,11 @@ the read-only check script A6 and a before-and-after hash comparison.
       FEATURE/evidence/regression-testing/pester-part-b.TS.md. Acceptance: every run prints
       FailedCount=0; every B34 It name appears as passed.
 - [ ] [P10-T11] Run script pester-counts over the whole blast-radius Pester directory; then run script
-      pester-counts with -Path set to the convention test path of block B46. Write
+      pester-counts with -Path set to the convention test path of block B46, then run script
+      pester-counts with -Path set to the guard path of block B47. Write
       FEATURE/evidence/regression-testing/pester-directory-p10.TS.md. Acceptance: every FAILED name of
       the directory run is in the P0-T32 baseline failure set; the convention run prints
-      FailedCount=0.
+      FailedCount=0; the B47 run prints FailedCount=0.
 - [ ] [P10-T12] Format and lint the six primary PowerShell files of this phase as in P5-T12. Write
       FEATURE/evidence/qa-gates/phase10-powershell-static.TS.md. Acceptance: as in P5-T12.
 - [ ] [P10-T13] Commit and push Phase 10 (check off AC-22, AC-23, AC-24, AC-25, AC-26, AC-27, and
@@ -1075,8 +1084,10 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 - [ ] [P16-T1] Record hashes of every PowerShell file written by this plan (block B40), call
       MCP-PS-FORMAT over them, and record hashes again. Write FEATURE/evidence/qa-gates/final-powershell-format.TS.md.
-      Acceptance: the call returns without raising. If any hash changed, re-copy each affected mirror
-      by running script copy-file (A10) through CMD-PS-SCRIPT-SH and restart Phase 16.
+      Acceptance: the call returns without raising; after any re-copy, the new mirrors-final artifact
+      shows every pair equal. If any hash changed, re-copy each affected mirror by running script
+      copy-file (A10) through CMD-PS-SCRIPT-SH, re-run P14-T6 (writing a new mirrors-final artifact),
+      and restart Phase 16.
 - [ ] [P16-T2] Run script ps-format-check over the B40 files. Write
       FEATURE/evidence/qa-gates/final-powershell-format-check.TS.md. Acceptance: FORMAT-SUMMARY
       ChangedCount=0.
@@ -1086,10 +1097,12 @@ the read-only check script A6 and a before-and-after hash comparison.
 - [ ] [P16-T4] Run script pester-coverage with -TestPath tests/scripts/claude-lib/blast-radius,
       -CoveragePath set to the four PowerShell modules of block B41 as one comma-joined value, and
       -CoverageOutputPath SCRATCH/pester-final.xml; then run script pester-counts with -Path set to
-      the convention test path of block B46. Write
+      the convention test path of block B46, then run script pester-counts with -Path set to the
+      guard path of block B47. Write
       FEATURE/evidence/qa-gates/final-powershell-pester-coverage.TS.md. Acceptance: every FAILED name
       is in the P0-T32 baseline failure set; every B23, B24, and B34 It passes; each B41 module prints
-      LinePercent of at least 85; the convention run prints FailedCount=0.
+      LinePercent of at least 85; the convention run prints FailedCount=0; the B47 run prints
+      FailedCount=0.
 - [ ] [P16-T5] PowerShell coverage delta: run CMD-PY-SCRIPT with script changed-lines-cov (B42) and
       arguments jacoco SCRATCH/pester-final.xml FINAL_BASE followed by
       `.claude/lib/blast-radius/BlastRadius.psm1` and `.claude/lib/blast-radius/BlastRadiusValidation.psm1`.
@@ -1931,6 +1944,14 @@ with script pester-counts (read-only; it discovers every module under the .claud
 
 ```text
 tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1
+```
+
+B47 — the repository-wide Pester test-name uniqueness guard, run by P0-T32, P5-T11, P10-T11, and
+P16-T4 with script pester-counts (read-only; it scans every Pester file under the tests tree for
+sibling-name collisions):
+
+```text
+tests/scripts/claude-runtime/test-name-uniqueness.Tests.ps1
 ```
 
 ## Acceptance Criteria Traceability
