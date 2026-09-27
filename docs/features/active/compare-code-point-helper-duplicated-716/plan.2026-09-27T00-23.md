@@ -217,67 +217,67 @@
 
 ### Phase 4 — Final QA Loop, Verification, and Acceptance Criteria Checkoff
 
-- [ ] [P4-T1] Run `npx prettier --check src/lib/pr-context/models.ts src/lib/pr-context/collector-core.ts src/lib/pr-context/autoclose.ts src/lib/pr-context/feature-docs-parsers.ts src/lib/pr-context/gh-client-details.ts src/lib/pr-context/render.ts src/lib/pr-context/render-pr-helpers.ts src/lib/pr-context/render-feature-excerpts.ts src/lib/pr-context/verification-evidence.ts src/lib/pr-context/feature-docs.ts test/lib/pr-context/models.test.ts` from `extensions/drm-copilot`. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/prettier-check.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. If drift is reported, restart the loop from this task after running `npx prettier --write` on the same file list; a file it actually rewrote is printed without the `(unchanged)` suffix (an unchanged file prints `<path> <N>ms (unchanged)`); record which files, if any, lost the suffix, then re-verify with `--check`.
+- [x] [P4-T1] Run `npx prettier --check src/lib/pr-context/models.ts src/lib/pr-context/collector-core.ts src/lib/pr-context/autoclose.ts src/lib/pr-context/feature-docs-parsers.ts src/lib/pr-context/gh-client-details.ts src/lib/pr-context/render.ts src/lib/pr-context/render-pr-helpers.ts src/lib/pr-context/render-feature-excerpts.ts src/lib/pr-context/verification-evidence.ts src/lib/pr-context/feature-docs.ts test/lib/pr-context/models.test.ts` from `extensions/drm-copilot`. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/prettier-check.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. If drift is reported, restart the loop from this task after running `npx prettier --write` on the same file list; a file it actually rewrote is printed without the `(unchanged)` suffix (an unchanged file prints `<path> <N>ms (unchanged)`); record which files, if any, lost the suffix, then re-verify with `--check`.
   - Acceptance: `EXIT_CODE: 0` and `Output Summary:` records the literal line `All matched files use Prettier code style!`.
 
-- [ ] [P4-T2] Run `npx eslint --no-error-on-unmatched-pattern src test` from `extensions/drm-copilot`. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/eslint-check.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
+- [x] [P4-T2] Run `npx eslint --no-error-on-unmatched-pattern src test` from `extensions/drm-copilot`. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/eslint-check.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: `EXIT_CODE: 0` and `Output Summary:` records "no problems reported" (empty stdout).
 
-- [ ] [P4-T3] Run `npx tsc -p ./ --noEmit` from `extensions/drm-copilot`. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/tsc-typecheck.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
+- [x] [P4-T3] Run `npx tsc -p ./ --noEmit` from `extensions/drm-copilot`. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/tsc-typecheck.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: `EXIT_CODE: 0` and `Output Summary:` records "no diagnostics" (empty stdout).
 
-- [ ] [P4-T4] Run `git grep -c "function compareCodePoint" -- extensions/drm-copilot/src/lib/pr-context` from the repository root. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/structural-uniqueness.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
+- [x] [P4-T4] Run `git grep -c "function compareCodePoint" -- extensions/drm-copilot/src/lib/pr-context` from the repository root. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/structural-uniqueness.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: exactly one output line, `extensions/drm-copilot/src/lib/pr-context/models.ts:1`, and no other file listed. Backs spec.md AC1 and AC2.
 
-- [ ] [P4-T5] Run `node run-jest.cjs test/lib/pr-context` from `extensions/drm-copilot`. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/pr-context-regression.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` containing the printed `Test Suites:` and `Tests:` lines.
+- [x] [P4-T5] Run `node run-jest.cjs test/lib/pr-context` from `extensions/drm-copilot`. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/pr-context-regression.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` containing the printed `Test Suites:` and `Tests:` lines.
   - Acceptance: `EXIT_CODE: 0`, `Test Suites:` line shows `0 failed`, `Tests:` line shows `0 failed`. Backs spec.md AC5 (no changes to expected output in the pre-existing suites).
 
-- [ ] [P4-T6] Run `node run-jest.cjs test/lib/pr-context/models.test.ts` from `extensions/drm-copilot`. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/models-test-count.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
+- [x] [P4-T6] Run `node run-jest.cjs test/lib/pr-context/models.test.ts` from `extensions/drm-copilot`. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/models-test-count.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: `EXIT_CODE: 0` and the printed `Tests:` line reads `32 passed, 32 total` (20 pre-existing + 6 from P3-T1 + 6 from P3-T2). Backs spec.md AC3 and AC4.
 
-- [ ] [P4-T7] Run `node run-jest.cjs --coverage --coverageReporters=text --coverageReporters=lcov` from `extensions/drm-copilot`. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/jest-coverage-final.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` containing the printed per-file coverage row for `models.ts` (the row under the `src/lib/pr-context` group heading; the table lists three files named `models.ts`), specifically its `% Lines` and `% Branch` values.
+- [x] [P4-T7] Run `node run-jest.cjs --coverage --coverageReporters=text --coverageReporters=lcov` from `extensions/drm-copilot`. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/jest-coverage-final.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` containing the printed per-file coverage row for `models.ts` (the row under the `src/lib/pr-context` group heading; the table lists three files named `models.ts`), specifically its `% Lines` and `% Branch` values.
   - Acceptance: `EXIT_CODE: 0` (confirms every per-file `coverageThreshold` entry in `jest.config.cjs`, including `models.ts` at `lines: 85, branches: 75`, passes) and the `models.ts` row's Lines/Branch values are recorded.
 
-- [ ] [P4-T8] Compare the `models.ts` Lines/Branch values recorded in P0-T6 (baseline) against those recorded in P4-T7 (final). Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/coverage-delta.<timestamp>.md` with `Timestamp:`, the two numeric pairs, and a explicit statement of whether final >= baseline for both Lines and Branch.
+- [x] [P4-T8] Compare the `models.ts` Lines/Branch values recorded in P0-T6 (baseline) against those recorded in P4-T7 (final). Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/coverage-delta.<timestamp>.md` with `Timestamp:`, the two numeric pairs, and a explicit statement of whether final >= baseline for both Lines and Branch.
   - Acceptance: final `% Lines` >= baseline `% Lines`, final `% Branch` >= baseline `% Branch`, and both final values are `>= 85` / `>= 75` respectively. Backs spec.md AC9 (no coverage regression on changed lines).
 
-- [ ] [P4-T9] Run `git merge-base HEAD origin/main` from the repository root. Record the resulting commit SHA to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/merge-base-sha.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (the printed 40-character SHA).
+- [x] [P4-T9] Run `git merge-base HEAD origin/main` from the repository root. Record the resulting commit SHA to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/merge-base-sha.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (the printed 40-character SHA).
   - Acceptance: `EXIT_CODE: 0` and a 40-character SHA is recorded.
 
-- [ ] [P4-T10] Run `git diff --exit-code <merge-base-sha-from-P4-T9> -- extensions/drm-copilot/package.json extensions/drm-copilot/package-lock.json` from the repository root, substituting the literal SHA recorded in P4-T9. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/dependency-diff-check.<timestamp>.md` with `Timestamp:`, `Command:` (with the substituted SHA), `EXIT_CODE:`, `Output Summary:`.
+- [x] [P4-T10] Run `git diff --exit-code <merge-base-sha-from-P4-T9> -- extensions/drm-copilot/package.json extensions/drm-copilot/package-lock.json` from the repository root, substituting the literal SHA recorded in P4-T9. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/dependency-diff-check.<timestamp>.md` with `Timestamp:`, `Command:` (with the substituted SHA), `EXIT_CODE:`, `Output Summary:`.
   - Acceptance: `EXIT_CODE: 0` (no diff output), confirming `package.json` and `package-lock.json` are unchanged relative to the branch point. Backs spec.md AC10. This is a local-execution verification, not a test; it is exempt from the depth-1 CI parity constraint because it runs against a merge-base SHA computed at execution time, not a checked-in test asserting `origin/main`.
 
-- [ ] [P4-T11] Run `wc -l extensions/drm-copilot/src/lib/pr-context/models.ts extensions/drm-copilot/src/lib/pr-context/collector-core.ts extensions/drm-copilot/src/lib/pr-context/autoclose.ts extensions/drm-copilot/src/lib/pr-context/feature-docs-parsers.ts extensions/drm-copilot/src/lib/pr-context/gh-client-details.ts extensions/drm-copilot/src/lib/pr-context/render.ts extensions/drm-copilot/src/lib/pr-context/render-pr-helpers.ts extensions/drm-copilot/src/lib/pr-context/render-feature-excerpts.ts extensions/drm-copilot/src/lib/pr-context/verification-evidence.ts extensions/drm-copilot/src/lib/pr-context/feature-docs.ts extensions/drm-copilot/test/lib/pr-context/models.test.ts` from the repository root. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/file-size-check.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (each file's line count).
+- [x] [P4-T11] Run `wc -l extensions/drm-copilot/src/lib/pr-context/models.ts extensions/drm-copilot/src/lib/pr-context/collector-core.ts extensions/drm-copilot/src/lib/pr-context/autoclose.ts extensions/drm-copilot/src/lib/pr-context/feature-docs-parsers.ts extensions/drm-copilot/src/lib/pr-context/gh-client-details.ts extensions/drm-copilot/src/lib/pr-context/render.ts extensions/drm-copilot/src/lib/pr-context/render-pr-helpers.ts extensions/drm-copilot/src/lib/pr-context/render-feature-excerpts.ts extensions/drm-copilot/src/lib/pr-context/verification-evidence.ts extensions/drm-copilot/src/lib/pr-context/feature-docs.ts extensions/drm-copilot/test/lib/pr-context/models.test.ts` from the repository root. Record to `docs/features/active/compare-code-point-helper-duplicated-716/evidence/qa-gates/file-size-check.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (each file's line count).
   - Acceptance: every printed per-file line count is `<= 500`.
 
-- [ ] [P4-T12] In `docs/features/active/compare-code-point-helper-duplicated-716/spec.md`, change the AC1 line `- [ ] A search for \`function compareCodePoint\` under \`extensions/drm-copilot/src/lib/pr-context/\` returns exactly one match, in \`extensions/drm-copilot/src/lib/pr-context/models.ts\`, and it is exported.` to `- [x] ...` (same text), citing P4-T4's evidence artifact.
+- [x] [P4-T12] In `docs/features/active/compare-code-point-helper-duplicated-716/spec.md`, change the AC1 line `- [ ] A search for \`function compareCodePoint\` under \`extensions/drm-copilot/src/lib/pr-context/\` returns exactly one match, in \`extensions/drm-copilot/src/lib/pr-context/models.ts\`, and it is exported.` to `- [x] ...` (same text), citing P4-T4's evidence artifact.
   - Acceptance: the line now begins `- [x]` and the artifact path from P4-T4 is referenced inline or in a trailing note.
 
-- [ ] [P4-T13] In `spec.md`, change the AC2 line (`- [ ] Every module under ... imports it from \`./models\`; no private copy or independent \`export\` of \`compareCodePoint\` remains outside \`models.ts\`.`) to `- [x] ...`, citing P1-T1 and P4-T4's evidence artifacts.
+- [x] [P4-T13] In `spec.md`, change the AC2 line (`- [ ] Every module under ... imports it from \`./models\`; no private copy or independent \`export\` of \`compareCodePoint\` remains outside \`models.ts\`.`) to `- [x] ...`, citing P1-T1 and P4-T4's evidence artifacts.
   - Acceptance: the line now begins `- [x]` with the citations noted.
 
-- [ ] [P4-T14] In `spec.md`, change the AC3 line (`- [ ] The shared helper's body is byte-identical to the pre-existing implementation ...`) to `- [x] ...`, citing P2-T1 (the inserted body matches research section 1.2 verbatim).
+- [x] [P4-T14] In `spec.md`, change the AC3 line (`- [ ] The shared helper's body is byte-identical to the pre-existing implementation ...`) to `- [x] ...`, citing P2-T1 (the inserted body matches research section 1.2 verbatim).
   - Acceptance: the line now begins `- [x]` with the citation noted.
 
-- [ ] [P4-T15] In `spec.md`, change the AC4 line (`- [ ] \`compareCodePoint\` is covered by a unit test in ... including a deterministic enumerative property test ...`) to `- [x] ...`, citing P3-T1, P3-T2, and P4-T6.
+- [x] [P4-T15] In `spec.md`, change the AC4 line (`- [ ] \`compareCodePoint\` is covered by a unit test in ... including a deterministic enumerative property test ...`) to `- [x] ...`, citing P3-T1, P3-T2, and P4-T6.
   - Acceptance: the line now begins `- [x]` with the citations noted.
 
-- [ ] [P4-T16] In `spec.md`, change the AC5 line (`- [ ] The existing \`extensions/drm-copilot/test/lib/pr-context/\` Jest test suites pass unmodified ...`) to `- [x] ...`, citing P4-T5.
+- [x] [P4-T16] In `spec.md`, change the AC5 line (`- [ ] The existing \`extensions/drm-copilot/test/lib/pr-context/\` Jest test suites pass unmodified ...`) to `- [x] ...`, citing P4-T5.
   - Acceptance: the line now begins `- [x]` with the citation noted.
 
-- [ ] [P4-T17] In `spec.md`, change the AC6 line (`- [ ] \`tsc\` (TypeScript type-check) passes with zero errors.`) to `- [x] ...`, citing P4-T3.
+- [x] [P4-T17] In `spec.md`, change the AC6 line (`- [ ] \`tsc\` (TypeScript type-check) passes with zero errors.`) to `- [x] ...`, citing P4-T3.
   - Acceptance: the line now begins `- [x]` with the citation noted.
 
-- [ ] [P4-T18] In `spec.md`, change the AC7 line (`- [ ] ESLint passes with zero errors.`) to `- [x] ...`, citing P4-T2.
+- [x] [P4-T18] In `spec.md`, change the AC7 line (`- [ ] ESLint passes with zero errors.`) to `- [x] ...`, citing P4-T2.
   - Acceptance: the line now begins `- [x]` with the citation noted.
 
-- [ ] [P4-T19] In `spec.md`, change the AC8 line (`- [ ] Prettier formatting check passes with no reformatting required.`) to `- [x] ...`, citing P4-T1.
+- [x] [P4-T19] In `spec.md`, change the AC8 line (`- [ ] Prettier formatting check passes with no reformatting required.`) to `- [x] ...`, citing P4-T1.
   - Acceptance: the line now begins `- [x]` with the citation noted.
 
-- [ ] [P4-T20] In `spec.md`, change the AC9 line (`- [ ] Jest coverage for \`models.ts\` meets its configured per-file threshold ... with no coverage regression on changed lines ...`) to `- [x] ...`, citing P4-T7 and P4-T8.
+- [x] [P4-T20] In `spec.md`, change the AC9 line (`- [ ] Jest coverage for \`models.ts\` meets its configured per-file threshold ... with no coverage regression on changed lines ...`) to `- [x] ...`, citing P4-T7 and P4-T8.
   - Acceptance: the line now begins `- [x]` with the citations noted.
 
-- [ ] [P4-T21] In `spec.md`, change the AC10 line (`- [ ] \`extensions/drm-copilot/package.json\` and \`extensions/drm-copilot/package-lock.json\` are unchanged by this fix ...`) to `- [x] ...`, citing P4-T9 and P4-T10.
+- [x] [P4-T21] In `spec.md`, change the AC10 line (`- [ ] \`extensions/drm-copilot/package.json\` and \`extensions/drm-copilot/package-lock.json\` are unchanged by this fix ...`) to `- [x] ...`, citing P4-T9 and P4-T10.
   - Acceptance: the line now begins `- [x]` with the citations noted.
 
 ---
