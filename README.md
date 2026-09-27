@@ -398,8 +398,8 @@ The repository uses the following GitHub Actions workflows under [.github/workfl
 
 - Trigger: push a git tag matching `mcp-server-v*` such as `mcp-server-v0.0.1`.
 - Gate: the workflow runs the extension test matrix on Ubuntu and Windows before publish.
-- Publish steps: install `packages/mcp-server` dependencies, run `prepack`, build `out/mcp-server.js`, then `npm publish --access public`.
-- Credential: publication requires the repository secret `NPM_TOKEN`.
+- Publish steps: install `packages/mcp-server` dependencies, run `prepack`, build `out/mcp-server.js`, then `npm publish --provenance --access public`.
+- Credential: publication uses npm trusted publishing over OIDC (workflow permission `id-token: write`); no npm token secret is used.
 - Release prerequisite: keep `packages/mcp-server/package.json` and `extensions/drm-copilot/package.json` version values aligned before tagging.
 
 ### VS Code extension release procedure
