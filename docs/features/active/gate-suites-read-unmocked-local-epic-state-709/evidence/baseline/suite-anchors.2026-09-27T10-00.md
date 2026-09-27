@@ -1,6 +1,6 @@
 # P0-T7 Anchor and Idempotence Survey (CR-ANCHOR)
 
-Timestamp: 2026-09-27T10-04
+Timestamp: 2026-09-27T10-00
 Command: Route C (scratchpad cr-anchor.ps1 = CR-ANCHOR with <ROWS> = the seven EP-table rows, single quotes doubled in the S2 and S3 anchors, ending `exit $code`; run by `pwsh -NoProfile -File` via `sh` from the worktree root)
 EXIT_CODE: 0
 Output Summary:

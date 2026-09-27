@@ -1,6 +1,6 @@
 # P0-T8 Baseline Format Check (CR-FORMAT-CHECK, LIST-SEVEN)
 
-Timestamp: 2026-09-27T10-04
+Timestamp: 2026-09-27T10-00
 Command: Route C (scratchpad cr-format-seven.ps1 = CR-FORMAT-CHECK with <LIST> = LIST-SEVEN, ending `exit $code`; run by `pwsh -NoProfile -File` via `sh` from the worktree root). Read-only; writes no file.
 EXIT_CODE: 0
 Output Summary:

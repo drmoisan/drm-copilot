@@ -1,6 +1,6 @@
 # P0-T9 Baseline Analyzer (CR-PSSA, LIST-SEVEN)
 
-Timestamp: 2026-09-27T10-04
+Timestamp: 2026-09-27T10-00
 Command: Route C (scratchpad cr-pssa-seven.ps1 = CR-PSSA with <LIST> = LIST-SEVEN, ending `exit $code`; run by `pwsh -NoProfile -File` via `sh` from the worktree root)
 EXIT_CODE: 0
 Output Summary:

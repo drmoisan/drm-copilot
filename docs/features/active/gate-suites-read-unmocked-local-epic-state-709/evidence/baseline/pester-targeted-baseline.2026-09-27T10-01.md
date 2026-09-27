@@ -1,6 +1,6 @@
 # P0-T10 Baseline Targeted Pester (CR-PESTER-LIST, LIST-BASE)
 
-Timestamp: 2026-09-27T10-07
+Timestamp: 2026-09-27T10-01
 Command: Route C (scratchpad cr-pester-list.ps1 = CR-PESTER-LIST with <LIST> = LIST-BASE selected by a -ListName argument, ending `exit $code`; run by `pwsh -NoProfile -File` via `sh` from the worktree root; combined output captured to a scratchpad log)
 EXIT_CODE: 0
 Output Summary:

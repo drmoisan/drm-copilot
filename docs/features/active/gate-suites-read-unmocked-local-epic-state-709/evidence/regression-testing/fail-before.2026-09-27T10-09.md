@@ -1,6 +1,6 @@
 # P1-T4 Fail-Before Run [expect-fail] (CR-PESTER-LIST, LIST-NEW)
 
-Timestamp: 2026-09-27T10-31
+Timestamp: 2026-09-27T10-09
 Command: Route C (scratchpad cr-pester-list.ps1 = CR-PESTER-LIST with <LIST> = LIST-NEW selected by -ListName, ending `exit $code`; run by `pwsh -NoProfile -File` via `sh` from the worktree root). Run before any suite edit: `git status --porcelain --untracked-files=all -- tests` listed only `?? tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1`.
 EXIT_CODE: 1
 ExpectedExitCode: 1
@@ -19,7 +19,7 @@ FAILED: gate suites isolate the epic checkpoint read (structural guard).tests/sc
 
 ## Evaluation against P1-T4
 
-- Failed = 7 = ABSENT-COUNT from P0-T7 (evidence/baseline/suite-anchors.2026-09-27T10-04.md).
+- Failed = 7 = ABSENT-COUNT from P0-T7 (evidence/baseline/suite-anchors.2026-09-27T10-00.md).
 - Passed = 17 = 24 - ABSENT-COUNT.
 - Each FAILED line is a structural-guard path row naming one MOCK-ABSENT suite and carrying "missing from outermost BeforeAll".
 - No predicate row (9), control row (4), or treatment row (4) failed: the seam-sufficiency Describe passed before any suite edit.

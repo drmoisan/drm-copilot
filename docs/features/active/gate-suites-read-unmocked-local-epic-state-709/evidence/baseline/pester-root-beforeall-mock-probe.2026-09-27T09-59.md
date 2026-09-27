@@ -1,6 +1,6 @@
 # P0-T6 Root-BeforeAll Module-Scoped Mock Probe (D2)
 
-Timestamp: 2026-09-27T10-02
+Timestamp: 2026-09-27T09-59
 Command: Route C (scratchpad p0t6.ps1 = the plan's P0-T6 in-memory probe followed by `exit $code`, run by `pwsh -NoProfile -File` via `sh` from the worktree root). The probe uses New-PesterContainer -ScriptBlock and creates no file.
 EXIT_CODE: 0
 Output Summary:

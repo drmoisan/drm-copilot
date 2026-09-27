@@ -2,7 +2,7 @@
 
 ## P1-T1
 
-Timestamp: 2026-09-27T10-20
+Timestamp: 2026-09-27T10-07
 Command: Route C (scratchpad parse-n1.ps1: Parser::ParseFile on tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1, line count, static It count, and a count of each of the seven quoted suite paths; run by `pwsh -NoProfile -File` via `sh` from the worktree root)
 EXIT_CODE: 0
 Output Summary:
@@ -14,7 +14,7 @@ Batch budget: no denial on the write of N1 (batch B1).
 
 ## P1-T2
 
-Timestamp: 2026-09-27T10-24
+Timestamp: 2026-09-27T10-08
 Command: Route C parse-n1.ps1 (as above) after adding Context 'guard predicate discrimination'
 EXIT_CODE: 0
 Output Summary:
@@ -24,7 +24,7 @@ STATIC-IT-BLOCKS: 4 (structural path It, compliant-form It with 2 rows, non-comp
 
 ## P1-T3
 
-Timestamp: 2026-09-27T10-31
+Timestamp: 2026-09-27T10-09
 Command: Route C parse-n1.ps1; Route C cr-format.ps1 and cr-pssa.ps1 with -ListName LIST-NEW (construction-time checks); Route C cr-pester-list.ps1 -ListName LIST-NEW (It-expansion count)
 EXIT_CODE: 0
 Output Summary:
