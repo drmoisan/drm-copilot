@@ -151,3 +151,49 @@ apply() { # apply <scenario-dir>
     [[ "$output" == *"ACTION|branch-delete|feature-child|OK"* ]]
     [[ "$output" == *"BRANCH|feature-parent|NOT_MERGED"* ]]
 }
+
+@test "run_report classifies main PROTECTED_CURRENT when the primary worktree is on another branch" {
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_not_checked_out" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${RLIB}'; source '${DLIB}'; run_report 2>/dev/null"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"BRANCH|main|PROTECTED_CURRENT"* ]]
+    [[ "$output" != *"BRANCH|main|MERGED_CLEAN"* ]]
+}
+
+@test "run_apply does not delete main when the primary worktree is on another branch" {
+    apply "${SCEN}/base_not_checked_out"
+    [[ "$output" == *"BRANCH|main|PROTECTED_CURRENT"* ]]
+    [[ "$output" != *"BRANCH|main|MERGED_CLEAN"* ]]
+    [[ "$output" != *"branch -D main"* ]]
+    [[ "$output" != *"ACTION|branch-delete|main|"* ]]
+    # Positive controls: the two genuinely merged branches are still deleted.
+    [[ "$output" == *"ACTION|branch-delete|feature-merged|OK"* ]]
+    [[ "$output" == *"ACTION|branch-delete|zeta-merged|OK"* ]]
+}
+
+@test "run_apply neither removes nor deletes main checked out in a linked worktree" {
+    apply "${SCEN}/base_in_linked_worktree"
+    [[ "$output" == *"BRANCH|main|PROTECTED_CURRENT"* ]]
+    [[ "$output" != *"worktree remove /repo-wt/base"* ]]
+    [[ "$output" != *"branch -D main"* ]]
+    [[ "$output" != *"ACTION|branch-delete|main|"* ]]
+}
+
+@test "delete_candidate refuses the base branch before re-verification" {
+    # stderr is retained so the stub argv log is observable in $output.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_not_checked_out" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; delete_candidate main '' MERGED_CLEAN"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"ACTION|delete|main|BLOCKED-PROTECTED-BASE"* ]]
+    [[ "$output" != *"merge-base"* ]]
+    [[ "$output" != *"worktree remove"* ]]
+    [[ "$output" != *"branch -D"* ]]
+}
+
+@test "delete_candidate refuses the base branch before removing its linked worktree" {
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_in_linked_worktree" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; delete_candidate main /repo-wt/base MERGED_CLEAN"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"ACTION|delete|main|BLOCKED-PROTECTED-BASE"* ]]
+    [[ "$output" != *"worktree remove"* ]]
+}
