@@ -623,7 +623,7 @@ reporting done.
 - [ ] The parallel-plan and parallel-add skills and the parallel-planner agent (and their bundled
   mirrors) call the scheduling function instead of a hand pair loop, record tolerated overlaps, and
   state that the later-merging item of a tolerated pair syncs with main and re-passes CI.
-- [ ] Edges keep only the four existing reason members; the tolerated extra fields (hard, cost,
+- [x] Edges keep only the four existing reason members; the tolerated extra fields (hard, cost,
   benefit) and the tolerated_overlaps list are accepted with zero errors by the Python validators
   (test_validate_parallel_state_tolerated_edge_fields) and the TypeScript validator port
   (parallel-state-tolerated-edge-fields.test).

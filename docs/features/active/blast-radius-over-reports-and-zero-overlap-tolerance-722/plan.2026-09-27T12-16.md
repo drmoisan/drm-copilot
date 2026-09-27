@@ -568,39 +568,39 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 4 — Part A: TypeScript Carriage of conflict_tolerance and Validator Tolerance Tests
 
-- [ ] [P4-T1] Edit `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts`:
+- [x] [P4-T1] Edit `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts`:
       append conflict_tolerance to the carried-key list and add it to the emitted document literal
       after mergeable_paths and before modules; update the emission-order documentation comment.
       Acceptance: the file is at most 500 lines.
-- [ ] [P4-T2] Edit `extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts` so its
+- [x] [P4-T2] Edit `extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts` so its
       source truth-table constant equals the bundled config file of P3-T3. Acceptance: the file is at
       most 500 lines.
-- [ ] [P4-T3] Edit `extensions/drm-copilot/test/lib/push-down/blast-radius-derive.test.ts`: update the
+- [x] [P4-T3] Edit `extensions/drm-copilot/test/lib/push-down/blast-radius-derive.test.ts`: update the
       emitted key-order expectation to the order of block B20 (Part A form). Acceptance: the file is at
       most 500 lines.
-- [ ] [P4-T4] Edit `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-mergeable.test.ts`:
+- [x] [P4-T4] Edit `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-mergeable.test.ts`:
       update its key-order expectations the same way. Acceptance: the file is at most 500 lines.
-- [ ] [P4-T5] Record the TypeScript batch boundary: write
+- [x] [P4-T5] Record the TypeScript batch boundary: write
       FEATURE/evidence/other/batch-boundary-ts-p4b.TS.md listing batch one (P4-T1 through P4-T4: one
       production file and three test files, counting the test helper as a test file) and stating that
       P4-T6 and P4-T7 form batch two. No TypeScript batch-budget hook exists (the hooks directory
       carries only the Python and PowerShell budget hooks), so no state file is reset. Acceptance: the
       artifact exists and lists one production and three test files for batch one.
-- [ ] [P4-T6] Create `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-tolerance-keys.test.ts`
+- [x] [P4-T6] Create `extensions/drm-copilot/test/lib/push-down/blast-radius-derive-tolerance-keys.test.ts`
       with the conflict_tolerance cases of block B21. Acceptance: the file exists and is at most 500
       lines.
-- [ ] [P4-T7] Create `extensions/drm-copilot/test/lib/validate/parallel-state-tolerated-edge-fields.test.ts`
+- [x] [P4-T7] Create `extensions/drm-copilot/test/lib/validate/parallel-state-tolerated-edge-fields.test.ts`
       with the cases of block B22. Acceptance: the file exists and is at most 500 lines.
-- [ ] [P4-T8] Run CMD-TS-TEST with the four test files of P4-T3, P4-T4, P4-T6, and P4-T7 and the
+- [x] [P4-T8] Run CMD-TS-TEST with the four test files of P4-T3, P4-T4, P4-T6, and P4-T7 and the
       carriage test claude-config-carriage.test.ts under test/lib/push-down (which consumes the helper
       edited in P4-T2). Write FEATURE/evidence/regression-testing/ts-part-a-tests.TS.md. Acceptance:
       exit 0, and the Tests summary line contains "passed" and does not contain "failed".
-- [ ] [P4-T9] Run CMD-TS-FORMAT, then CMD-TS-PRETTIER-CHECK over the six TypeScript files of this
+- [x] [P4-T9] Run CMD-TS-FORMAT, then CMD-TS-PRETTIER-CHECK over the six TypeScript files of this
       phase, then CMD-TS-LINT and CMD-TS-TYPECHECK. Write FEATURE/evidence/qa-gates/phase4-ts-static.TS.md.
       Acceptance: the Prettier check exits 0 and prints "All matched files use Prettier code style!";
       lint and typecheck exit 0. If the format run changed any file (compare CMD-GIT-STATUS-PATH over
       extensions/drm-copilot before and after the format run), re-run P4-T8.
-- [ ] [P4-T10] Commit and push Phase 4 (check off AC-19 per the Preamble check-off rule; stage the six
+- [x] [P4-T10] Commit and push Phase 4 (check off AC-19 per the Preamble check-off rule; stage the six
       TypeScript files, the FEATURE evidence directory, and FEATURE/spec.md; message "feat(722): carry
       conflict_tolerance through the push-down"). Acceptance: all three git commands exit 0.
 
