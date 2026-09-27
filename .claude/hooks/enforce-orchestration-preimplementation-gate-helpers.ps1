@@ -60,10 +60,9 @@ function Split-OrchestrationCommandLine {
     .SYNOPSIS
         Splits a command line into segments on chain operators outside quotes.
     .DESCRIPTION
-        Realizes D4 row 13. Quote state is tracked while scanning so a chain operator
-        inside a quoted span does not split. The returned `Balanced` flag reports whether
-        the scan ended outside every quote; unbalanced text is not splittable and the
-        caller denies (D4 rows 11 and 13). Empty and whitespace-only segments are dropped.
+        Realizes D4 row 13. Quote state and POSIX backslash escapes (issue #710) are tracked, so a quoted or
+        escaped chain operator does not split. `Balanced` reports whether the scan ended outside every quote;
+        the caller denies unbalanced text (D4 rows 11 and 13). Empty and whitespace-only segments are dropped.
     .OUTPUTS
         System.Collections.Hashtable with keys `Balanced` (bool) and `Segments` (string[]).
     #>
@@ -74,8 +73,9 @@ function Split-OrchestrationCommandLine {
     $segments = [System.Collections.Generic.List[string]]::new()
     $current = [System.Text.StringBuilder]::new()
     $openQuote = [char]0
-
+    $escaped = $false
     foreach ($character in $CommandText.ToCharArray()) {
+        if ($escaped -or ($character -eq '\' -and $openQuote -ne "'")) { $escaped = -not $escaped; [void]$current.Append($character); continue }
         if ($openQuote -ne [char]0) {
             if ($character -eq $openQuote) {
                 $openQuote = [char]0
