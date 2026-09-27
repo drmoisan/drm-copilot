@@ -158,6 +158,14 @@ Timestamp: 2026-09-27T09-05
 AC9_PENDING: CI result for tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py
 Local evidence already recorded: P2-T6 and P4-T8 hash equality (SHA256=F9CA16BFBD90E0A2223AB2222C0B7B8F0629DC4D835FF18AD319E407F39F07A5 for both files) and P4-T7 (D9_OPTION: a, `14 passed`). Spec acceptance criterion 9 remains unchecked until the CI result is recorded; the feature-review step performs the check-off.
 
+## P6-T9 CI result
+
+Timestamp: 2026-09-27T13-10
+AC9_CI_RESULT: PASS
+PR: #726, head c7dcbb1cf156233ebc2f6f1b86ebe6dd439142cc; 19 of 19 checks pass, mergeStateStatus CLEAN.
+CI job: `quality-checks7 / Code Quality & Tests (3.12)`, run 36320574333, job 108623494970. Log line: `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py ....` followed by `5132 passed, 5 skipped`.
+Result: spec acceptance criterion 9 checked off by the orchestrator (the feature-review step completed before the CI run existed, so the check-off it would have performed is recorded here).
+
 ## P6-T15
 
 Timestamp: 2026-09-27T09-05
