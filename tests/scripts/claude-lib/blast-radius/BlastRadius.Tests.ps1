@@ -468,22 +468,23 @@ Describe 'Exported facade surface' {
     Context 'Spec PowerShell surface' {
         It 'exports <_>' -ForEach @(
             'Get-PlanPaths', 'Get-BlastRadius', 'Get-BlastRadiusFromObservedPaths',
-            'Get-NormalizedDeclaredRadius', 'Test-BlastRadius', 'Test-BlastRadiusConflict'
+            'Get-NormalizedDeclaredRadius', 'Test-BlastRadius', 'Test-BlastRadiusConflict',
+            'Get-BlastRadiusConflictEdge', 'Get-BlastRadiusPairDecision'
         ) {
             # Arrange: the module's exported command table.
             $exported = (Get-Module BlastRadius).ExportedFunctions.Keys
 
-            # Act / Assert: the six spec-fixed names are all exported.
+            # Act / Assert: the eight spec-fixed names are all exported.
             # Get-NormalizedDeclaredRadius joined the contract with issue #489.
             $exported | Should -Contain $_
         }
 
-        It 'exports no function beyond the six spec-fixed names' {
+        It 'exports no function beyond the spec-fixed names' {
             # Arrange: the module's exported command table.
             $exported = @((Get-Module BlastRadius).ExportedFunctions.Keys)
 
             # Assert: the facade surface is exactly the documented contract.
-            $exported.Count | Should -Be 6
+            $exported.Count | Should -Be 8
         }
     }
 }

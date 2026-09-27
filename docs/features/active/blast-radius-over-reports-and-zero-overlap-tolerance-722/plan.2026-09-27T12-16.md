@@ -681,12 +681,12 @@ the read-only check script A6 and a before-and-after hash comparison.
       -CoverageOutputPath SCRATCH/pester-p5.xml. Write FEATURE/evidence/regression-testing/pester-part-a.TS.md.
       Acceptance: every run prints FailedCount=0; the P5-T2 run prints a PassedCount equal to its
       TotalCount and one It name per B23 entry; the COVERAGE line for the scheduling module is recorded.
-- [ ] [P5-T11] Open the second PowerShell batch of Phase 5 (spec decision 12): reset the PowerShell
+- [x] [P5-T11] Open the second PowerShell batch of Phase 5 (spec decision 12): reset the PowerShell
       batch budget (A8, -Kind powershell) through CMD-PS-SCRIPT-SH. Write
       FEATURE/evidence/other/batch-budget-reset-p5b.TS.md recording the A8 output. Acceptance: exit 0,
       and the artifact contains the A8 line beginning "RESET removed=" (the first batch's state file
       is listed as removed when it exists).
-- [ ] [P5-T12] Edit `tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1`, Describe 'Exported
+- [x] [P5-T12] Edit `tests/scripts/claude-lib/blast-radius/BlastRadius.Tests.ps1`, Describe 'Exported
       facade surface' only: append Get-BlastRadiusConflictEdge and Get-BlastRadiusPairDecision to the
       -ForEach list of It 'exports <_>' (keeping the six existing names), change the comment that
       says six names to say eight, rename It 'exports no function beyond the six spec-fixed names' to
@@ -699,21 +699,21 @@ the read-only check script A6 and a before-and-after hash comparison.
       "exports no function beyond the spec-fixed names". The fail-before evidence is the STOPPED
       artifact pester-directory-p5 under FEATURE/evidence/regression-testing, which records "Expected
       6, but got 8." for the same case.
-- [ ] [P5-T13] Run the existing blast-radius Pester directory with script pester-counts (A2) and -Path
+- [x] [P5-T13] Run the existing blast-radius Pester directory with script pester-counts (A2) and -Path
       tests/scripts/claude-lib/blast-radius; then run script pester-counts with -Path set to the
       convention test path of block B46, then run script pester-counts with -Path set to the guard
       path of block B47. Write a new
       FEATURE/evidence/regression-testing/pester-directory-p5.TS.md (the earlier STOPPED artifact is
       kept). Acceptance: every FAILED name of the directory run is in the P0-T32 baseline failure set;
       the convention run prints FailedCount=0; the B47 run prints FailedCount=0.
-- [ ] [P5-T14] Format and lint: record hashes of the seven PowerShell files of this phase (the six
+- [x] [P5-T14] Format and lint: record hashes of the seven PowerShell files of this phase (the six
       files of P5-T2 through P5-T7 and the P5-T12 file) with A5, call MCP-PS-FORMAT over them, record
       hashes again, run script ps-format-check (A6) over them, and call MCP-PS-ANALYZE over them.
       Write FEATURE/evidence/qa-gates/phase5-powershell-static.TS.md. Acceptance: the format call
       returns without raising; A6 prints FORMAT-SUMMARY ChangedCount=0; the analyze call returns
       without raising. If any hash changed, re-copy the affected mirror with A10 as in P5-T8 and
       re-run P5-T10 and P5-T13 before continuing.
-- [ ] [P5-T15] Commit and push Phase 5 (check off AC-13 and AC-16 per the Preamble check-off rule;
+- [x] [P5-T15] Commit and push Phase 5 (check off AC-13 and AC-16 per the Preamble check-off rule;
       stage the seven primary PowerShell files of P5-T14, the three mirrors, the pack manifest, the
       FEATURE evidence directory, and FEATURE/spec.md; message "feat(722): add PowerShell scheduling
       layer"). Acceptance: all three git commands exit 0.

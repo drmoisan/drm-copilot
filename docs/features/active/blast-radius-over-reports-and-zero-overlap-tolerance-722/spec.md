@@ -613,7 +613,7 @@ reporting done.
 
 ### Scheduling layer (design points 2, 3, 4)
 
-- [ ] The Python scheduling module and the PowerShell Get-BlastRadiusConflictEdge implement the edge
+- [x] The Python scheduling module and the PowerShell Get-BlastRadiusConflictEdge implement the edge
   rule exactly as specified (hard classes, integer cost terms with mergeable zero and append-only
   precedence, pairwise benefit with default_band, the integer inequality, first-kind reason selection),
   each term covered by a named unit test in both runtimes.
@@ -622,7 +622,7 @@ reporting done.
   runtimes.
 - [x] Property tests (exhaustive enumeration over a fixed finite domain; see decision 11) cover: edge
   implies conflict; tolerance 0 equals conflict; monotonicity in tolerance_percent; symmetry.
-- [ ] The conflict_tolerance reader rejects every invalid shape listed under Error handling with an
+- [x] The conflict_tolerance reader rejects every invalid shape listed under Error handling with an
   error naming the key, in both runtimes, each rejection covered by a test.
 - [x] Both config copies carry conflict_tolerance with the committed values in this spec, byte-equal
   between the copies.

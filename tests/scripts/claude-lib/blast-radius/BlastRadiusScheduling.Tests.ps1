@@ -71,12 +71,12 @@ BeforeAll {
         $member = Get-CommittedToleranceMember
         foreach ($key in $Override.Keys) { $member[$key] = $Override[$key] }
         return @{
-            version              = 1
-            shared_surfaces      = @()
-            shared_surface_globs = @()
-            mergeable_paths      = @('**/*.csproj')
-            conflict_tolerance   = $member
-            modules              = @{ config = @('config/**') }
+            version               = 1
+            shared_surfaces       = @()
+            shared_surface_globs  = @()
+            mergeable_paths       = @('**/*.csproj')
+            conflict_tolerance    = $member
+            modules               = @{ config = @('config/**') }
             over_breadth_fraction = 0.25
         }
     }
