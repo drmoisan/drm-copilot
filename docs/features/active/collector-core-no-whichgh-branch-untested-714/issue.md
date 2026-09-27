@@ -33,7 +33,7 @@ The service-call tests that used to omit `whichGh` now inject it, so the default
 ## Acceptance Criteria
 - [ ] A Jest test calls `collectPrContext` with no `whichGh` option, so the `whichGh === undefined` arm of the `GhClient` construction in `extensions/drm-copilot/src/lib/pr-context/collector-core.ts` is executed.
 - [ ] Both arms of the `whichGh === undefined ? {} : { whichGh }` conditional are reported covered in the Jest coverage output for `collector-core.ts`.
-- [ ] Branch coverage of `collector-core.ts` is restored to at least the pre-#588 value of 91.22%, and line coverage does not regress.
+- [ ] Branch coverage of `collector-core.ts` rises above the Phase 0 baseline measured on the same tree (the issue reports 91.22% before #588 and 89.28% after; the target is expressed relative to the baseline because sibling issue #716 may change the file's branch count), and line coverage does not regress.
 - [ ] The new test is deterministic: it spawns no real `gh` process, touches no real filesystem, and does not depend on the host PATH, on origin/main, or on gitignored state.
 - [ ] The full TypeScript toolchain (format, lint, type-check, test with coverage) passes.
 
