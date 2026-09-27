@@ -113,8 +113,8 @@ export function resolveExecutableOnPath(
 export function defaultWhichGh(): string | undefined {
   return resolveExecutableOnPath({
     name: "gh",
-    pathValue: process.env.PATH,
-    pathExtValue: process.env.PATHEXT,
+    pathValue: process.env["PATH"],
+    pathExtValue: process.env["PATHEXT"],
     platform: process.platform,
     exists: existsSync,
   });
