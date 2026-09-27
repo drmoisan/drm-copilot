@@ -291,7 +291,7 @@ Phase 0 of the v2 plan runs before any corpus or test file is authored and recor
 - [x] The full Python toolchain passes in a single pass: poetry run black, poetry run ruff check, poetry run pyright, and poetry run pytest with coverage and branch coverage, with line coverage at or above 85% and branch coverage at or above 75%, no coverage exclusion added, and no new suppression.
 - [x] The full PowerShell toolchain passes in a single pass: the PoshQC MCP format, analyze, and test tools with the repository Pester runsettings, with zero PSScriptAnalyzer findings and line coverage at or above 85%.
 - [ ] All required CI checks are green on the pull request head commit, including the pytest job and the windows-latest Pester job.
-- [ ] The pull request body contains the literal text `Fixes #452`.
+- [x] The pull request body contains the literal text `Fixes #452`.
 
 ## Risks & Mitigations
 
