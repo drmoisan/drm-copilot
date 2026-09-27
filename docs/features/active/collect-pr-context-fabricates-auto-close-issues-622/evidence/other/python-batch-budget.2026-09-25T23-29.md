@@ -37,3 +37,19 @@ Deleted: .claude/state/python-batch-budget.worktree-agent-a7bc49b9acc700094-5142
 Files listed in the deleted record:
 - prodFiles: scripts/dev_tools/pr_context/models.py
 - testFiles: tests/scripts/dev_tools/pr_context/test_issue_reference_pattern.py, tests/scripts/dev_tools/pr_context/test_autoclose_collector.py, tests/scripts/dev_tools/test_collect_pr_context.py
+
+### Reset [P3-T1]
+
+Timestamp: 2026-09-26T20-00
+Deleted: .claude/state/python-batch-budget.worktree-agent-a7bc49b9acc700094-5142ae6c.json
+Files listed in the deleted record:
+- prodFiles: (none)
+- testFiles: tests/scripts/dev_tools/test_collect_pr_context_part5.py
+
+### Reset [P3-T5]
+
+Timestamp: 2026-09-26T20-01
+Deleted: .claude/state/python-batch-budget.worktree-agent-a7bc49b9acc700094-5142ae6c.json
+Files listed in the deleted record:
+- prodFiles: scripts/dev_tools/pr_context/feature_docs.py, scripts/dev_tools/pr_context/render_feature_excerpts.py, scripts/dev_tools/pr_context/render_pr_helpers.py
+- testFiles: (none)
