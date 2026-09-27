@@ -152,7 +152,7 @@ Describe 'DiscoveryValidation' {
             $errors = Get-DiscoveryProfileValidationError -Text $text
 
             # Assert: rejected, never silently accepted.
-            @($errors).Count | Should -BeGreaterThan 0
+            @($errors | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0
             $errors[0] | Should -Be 'Profile document root must be a mapping.'
         }
 
@@ -330,7 +330,7 @@ Describe 'DiscoveryValidation' {
             $errors = Get-DiscoverySchemaArtifactValidationError -Text $text
 
             # Assert
-            @($errors).Count | Should -BeGreaterThan 0
+            @($errors | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0
             ($errors -join "`n") | Should -Match 'not valid with the schema'
         }
 

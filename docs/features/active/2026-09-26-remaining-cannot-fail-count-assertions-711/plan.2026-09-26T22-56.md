@@ -372,7 +372,7 @@ each path.
 
 ### Phase 2 — Implementation (same-line edits + one new documentation `It` pair)
 
-- [ ] [P2-T1] In `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`, replace the
+- [x] [P2-T1] In `tests/scripts/claude-lib/blast-radius/BlastRadius.TruthTable.Tests.ps1`, replace the
       exact line `            $entries.Count | Should -BeGreaterThan 0` with
       `            Test-NonVacuousCollection -Value $entries | Should -BeTrue` (same indentation, same
       line position). Do not alter the adjacent `$entries = @($script:CommittedConfig['mandate_reads'])`
@@ -386,7 +386,7 @@ each path.
       equals the value recorded in P0-T14 (net-zero line delta). Write
       `.../evidence/regression-testing/ac1-before-after-token-check.<timestamp>.md` recording all four
       counts.
-- [ ] [P2-T2] In `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`,
+- [x] [P2-T2] In `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`,
       replace the exact line `            @($files).Count | Should -BeGreaterThan 0` with
       `            @($files | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0` (same
       indentation, same line position; this is the file at the 500-line ceiling, per spec D2 — the
@@ -396,7 +396,7 @@ each path.
       `(Select-String -Path 'tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1' -Pattern '@($files | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0' -SimpleMatch).Count` =
       `1`; and the file's line count (per `(Get-Content -Path <file>).Count`) equals the value recorded
       in P0-T17 exactly. Write `.../evidence/regression-testing/ac2-before-after-token-check.<timestamp>.md`.
-- [ ] [P2-T3] In `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1`, replace
+- [x] [P2-T3] In `tests/scripts/claude-lib/discovery-validation/DiscoveryValidation.Tests.ps1`, replace
       the exact block
       ```
                   $errors = Get-DiscoveryProfileValidationError -Text $text
@@ -416,7 +416,7 @@ each path.
       normalized to LF on both the file content and the block before matching); and the file's line
       count equals the value recorded in P0-T20 exactly. Write
       `.../evidence/regression-testing/ac3-before-after-token-check.<timestamp>.md`.
-- [ ] [P2-T4] In the same file, replace the exact block
+- [x] [P2-T4] In the same file, replace the exact block
       ```
                   $errors = Get-DiscoverySchemaArtifactValidationError -Text $text
 
@@ -433,7 +433,7 @@ each path.
       `-Anchor 'AC4-new'` and confirm it prints `Anchor=AC4-new Count=1`; file line count equals the
       value recorded in P0-T20 exactly (unchanged again, since P2-T3 and P2-T4 are each individually
       net-zero). Write `.../evidence/regression-testing/ac4-before-after-token-check.<timestamp>.md`.
-- [ ] [P2-T5] In `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1`, replace the exact
+- [x] [P2-T5] In `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1`, replace the exact
       line `        @($script:Registrations).Count | Should -BeGreaterThan 0` with
       `        @($script:Registrations | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0`
       (same indentation, same line position; `Get-CodexPreToolUseRegistration` itself is not modified,
@@ -441,7 +441,7 @@ each path.
       `(Select-String -Path 'tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1' -Pattern '@($script:Registrations).Count | Should -BeGreaterThan 0' -SimpleMatch).Count` =
       `0` and the corresponding new-literal count = `1`. Write
       `.../evidence/regression-testing/ac5-assertion-before-after-token-check.<timestamp>.md`.
-- [ ] [P2-T6] In the same file, add the new fail-before documentation `Context`/`It` pair for AC-5
+- [x] [P2-T6] In the same file, add the new fail-before documentation `Context`/`It` pair for AC-5
       (spec D3/AC-8): replace the exact trailing block
       ```
           It 'leaves no Codex batch-budget state behind' {
