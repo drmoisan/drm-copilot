@@ -629,7 +629,7 @@ reporting done.
 
 ### Drift detection
 
-- [ ] Drift recomputation evaluates each in-flight peer pair through the scheduling rule via the new
+- [x] Drift recomputation evaluates each in-flight peer pair through the scheduling rule via the new
   drift helper module; test_parallel_drift_scheduling shows a tolerated pair whose observed overlap
   stays within tolerance is not reported, a tolerated pair that becomes hard or exceeds tolerance is
   reported, and output at tolerance 0 equals the pre-change output.

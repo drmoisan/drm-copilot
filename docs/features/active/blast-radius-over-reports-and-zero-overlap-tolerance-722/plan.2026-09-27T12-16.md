@@ -484,22 +484,22 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 2 — Part A: Drift Helper and Tolerated-Field Validator Tests
 
-- [ ] [P2-T1] Reset the Python batch budget (A8, -Kind python). Write
+- [x] [P2-T1] Reset the Python batch budget (A8, -Kind python). Write
       FEATURE/evidence/other/batch-budget-reset-p2.TS.md. Acceptance: exit 0.
-- [ ] [P2-T2] Write `tests/scripts/dev_tools/test_parallel_drift_scheduling.py` with exactly the tests
+- [x] [P2-T2] Write `tests/scripts/dev_tools/test_parallel_drift_scheduling.py` with exactly the tests
       of block B13 in Appendix B. Acceptance: the file exists and is at most 500 lines.
-- [ ] [P2-T3] Write `tests/scripts/dev_tools/test_validate_parallel_state_tolerated_edge_fields.py`
+- [x] [P2-T3] Write `tests/scripts/dev_tools/test_validate_parallel_state_tolerated_edge_fields.py`
       with exactly the tests of block B14. Acceptance: the file exists and is at most 500 lines.
-- [ ] [P2-T4] [expect-fail] Run CMD-PY-TEST over the P2-T2 file before the helper module exists. Write
+- [x] [P2-T4] [expect-fail] Run CMD-PY-TEST over the P2-T2 file before the helper module exists. Write
       FEATURE/evidence/regression-testing/drift-tests-fail-before.TS.md with ExpectedExitCode: 2.
       Acceptance: pytest exits 2 with a collection error naming the missing drift helper module.
-- [ ] [P2-T5] Create `scripts/dev_tools/_parallel_drift_scheduling.py` per block B15: relocate the
+- [x] [P2-T5] Create `scripts/dev_tools/_parallel_drift_scheduling.py` per block B15: relocate the
       existing-edge-pair collection and the observed-versus-peer decision out of the drift module, and
       make the decision call the P1-T10 per-pair decision with the drifting item's and the peer's
       complexity bands (default_band when absent), forwarding its keyword-only relation argument. The
       fail-closed rule is preserved: an unevaluable peer radius counts as an edge and the relation is
       not called for it. Acceptance: the file exists and is at most 500 lines.
-- [ ] [P2-T6] Edit `scripts/dev_tools/parallel_drift_detection.py`: delete the two relocated private
+- [x] [P2-T6] Edit `scripts/dev_tools/parallel_drift_detection.py`: delete the two relocated private
       helpers, import their replacements from the P2-T5 module, and pass the items collection so bands
       can be read. Keep the existing import of the conflicts function from the compute_blast_radius
       module, and inside the body of recompute_conflicts_with_observed pass that module-level name to
@@ -508,21 +508,21 @@ the read-only check script A6 and a before-and-after hash comparison.
       monkeypatch of the drift module's conflicts attribute still governs the decision. The public
       signature of recompute_conflicts_with_observed is unchanged. Acceptance: its line count,
       measured with script line-counts, is less than or equal to the P0-T13 value.
-- [ ] [P2-T7] Run CMD-PY-TEST over the P2-T2 and P2-T3 files; then run the command of block B45 (the
+- [x] [P2-T7] Run CMD-PY-TEST over the P2-T2 and P2-T3 files; then run the command of block B45 (the
       existing drift conflicts test module, unmodified); then CMD-PY-TEST-K with expression drift.
       Write FEATURE/evidence/regression-testing/drift-and-validator-tests.TS.md. Acceptance: the first
       run exits 0 with a PASSED line for every B13 and B14 test; the B45 run exits 0 with a PASSED line
       for every test the module collects and no FAILED or ERROR line; every FAILED node of the third
       run is in the P0-T18 baseline failure set.
-- [ ] [P2-T8] Confirm the existing drift tests are unmodified: run CMD-GIT-DIFF-NAMES with base
+- [x] [P2-T8] Confirm the existing drift tests are unmodified: run CMD-GIT-DIFF-NAMES with base
       BASE_SHA and pathspec tests/scripts/dev_tools, and CMD-GIT-STATUS-PATH with the same pathspec.
       Write FEATURE/evidence/qa-gates/drift-tests-unmodified.TS.md. Acceptance: the only listed path
       (across both outputs) that contains the text drift is
       `tests/scripts/dev_tools/test_parallel_drift_scheduling.py`.
-- [ ] [P2-T9] Run CMD-PY-BLACK, CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT over the four
+- [x] [P2-T9] Run CMD-PY-BLACK, CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT over the four
       Python files of this phase. Write FEATURE/evidence/qa-gates/phase2-python-static.TS.md.
       Acceptance: as in P1-T14.
-- [ ] [P2-T10] Commit and push Phase 2 (check off AC-20 per the Preamble check-off rule; stage the
+- [x] [P2-T10] Commit and push Phase 2 (check off AC-20 per the Preamble check-off rule; stage the
       four files, the FEATURE evidence directory, and FEATURE/spec.md; message "feat(722): evaluate
       drift pairs through the scheduling rule"). Acceptance: all three git commands exit 0.
 

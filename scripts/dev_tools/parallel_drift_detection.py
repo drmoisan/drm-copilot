@@ -38,9 +38,13 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING, cast
 
 from scripts.dev_tools._blast_radius_glob import is_path_subsumed
+from scripts.dev_tools._parallel_drift_scheduling import (
+    existing_edge_pairs,
+    item_band,
+    observed_pair_is_edge,
+)
 from scripts.dev_tools._parallel_drift_shape import (
     ParallelDriftInputError,
-    as_item_key,
     canonical_pair,
     is_later_canonical_timestamp,
     record_paths,
@@ -56,7 +60,6 @@ from scripts.dev_tools._parallel_state_common import (
 )
 from scripts.dev_tools.compute_blast_radius import (
     RADIUS_SOURCE_OBSERVED,
-    BlastRadius,
     conflicts,
 )
 from scripts.dev_tools.parallel_drift_halt import (
@@ -280,8 +283,11 @@ def recompute_conflicts_with_observed(
     """Return the pairs that newly conflict once the observed radius is used.
 
     Design section 7 step 4: substitute the drifting item's observed radius for
-    its declared one and re-evaluate F1's contention relation against every
-    concurrently in-flight peer. The observed radius comes from
+    its declared one and re-evaluate every concurrently in-flight peer through
+    the integration-cost scheduling rule over F1's contention relation, using
+    each item's ``complexity_band`` (issue #722). At tolerance 0, or with the
+    conflict_tolerance key absent, the result equals the conflict-only result.
+    The observed radius comes from
     ``build_observed_radius``. ``conflict_edges[]`` is read only, for edge identity
     alone, and gains no field. Identity is the canonical ``(a, b)`` pair with
     ``a < b`` (F3 invariant 15), normalized before comparison so an edge recorded
@@ -320,7 +326,8 @@ def recompute_conflicts_with_observed(
     observed_radius = build_observed_radius(
         observed_paths, config, computed_at=computed_at
     )
-    existing = _existing_edge_pairs(conflict_edges)
+    existing = existing_edge_pairs(conflict_edges)
+    observed_band = item_band(items, drifting)
 
     # Evaluate the observed radius against every concurrently in-flight peer,
     # skipping the drifting item and any pair the checkpoint already records, so
@@ -333,7 +340,16 @@ def recompute_conflicts_with_observed(
         pair = canonical_pair(drifting, item_key)
         if pair in existing:
             continue
-        if _observed_contends(observed_radius, item.get("blast_radius"), config):
+        # The module-level relation name is read here, at call time, so a
+        # patched relation still governs the scheduling-rule decision.
+        if observed_pair_is_edge(
+            observed_radius,
+            item.get("blast_radius"),
+            config,
+            observed_band=observed_band,
+            peer_band=item_band(items, item_key),
+            relation=conflicts,
+        ):
             newly_conflicting.add(pair)
     return tuple(sorted(newly_conflicting))
 
@@ -442,58 +458,3 @@ def _is_drift_resolved(
     return radius.get("source") == RADIUS_SOURCE_OBSERVED and (
         is_later_canonical_timestamp(radius.get("computed_at"), at)
     )
-
-
-def _existing_edge_pairs(
-    conflict_edges: Sequence[Mapping[str, object]],
-) -> frozenset[tuple[int, int]]:
-    """Collect the canonical pairs already recorded as conflict edges.
-
-    Args:
-        conflict_edges (Sequence[Mapping[str, object]]): ``conflict_edges[]``,
-            read only; no field is added or changed.
-
-    Returns:
-        frozenset[tuple[int, int]]: Canonical ``(a, b)`` pairs with ``a < b``, so
-        an edge recorded in either order matches. An edge with unreadable or
-        identical endpoints is omitted, leaving a conflict over that pair
-        reportable as new (fail closed).
-    """
-    # Normalize before collecting so a reversed pair is never misread as new.
-    pairs: set[tuple[int, int]] = set()
-    for edge in conflict_edges:
-        first = as_item_key(edge.get("a"))
-        second = as_item_key(edge.get("b"))
-        if first is None or second is None or first == second:
-            continue
-        pairs.add(canonical_pair(first, second))
-    return frozenset(pairs)
-
-
-def _observed_contends(
-    observed_radius: BlastRadius,
-    raw_radius: object,
-    config: Mapping[str, object],
-) -> bool:
-    """Evaluate F1's contention relation between an observed and a peer radius.
-
-    Args:
-        observed_radius (BlastRadius): The drifting item's observed radius.
-        raw_radius (object): The peer's recorded ``blast_radius`` block.
-        config (Mapping[str, object]): Parsed ``config/blast-radius.json``.
-
-    Returns:
-        bool: The relation's verdict, or ``True`` when the peer radius cannot be
-        evaluated. Failing closed matters because the relation reports no conflict
-        for an empty radius, so an unevaluable peer would otherwise look safe.
-
-    Raises:
-        TypeError: If ``config`` is not a mapping, raised by the library.
-    """
-    if not isinstance(raw_radius, Mapping):
-        return True
-    try:
-        peer = BlastRadius.from_dict(cast("Mapping[str, object]", raw_radius))
-    except (TypeError, ValueError):
-        return True
-    return conflicts(observed_radius, peer, config).conflict
