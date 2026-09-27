@@ -242,7 +242,7 @@ def test_collect_and_write_uses_feature_refs_and_scoping(
             return None
 
         def classify_entity(self, number: str) -> str | None:
-            return "issue" if number in {"1", "ABC-10"} else "pull"
+            return "issue" if number in {"1"} else "pull"
 
         def issue_details(self, number: str) -> IssueDetails:
             return IssueDetails(

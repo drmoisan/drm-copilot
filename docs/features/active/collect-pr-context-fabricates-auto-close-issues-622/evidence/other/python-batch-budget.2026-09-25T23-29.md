@@ -53,3 +53,28 @@ Deleted: .claude/state/python-batch-budget.worktree-agent-a7bc49b9acc700094-5142
 Files listed in the deleted record:
 - prodFiles: scripts/dev_tools/pr_context/feature_docs.py, scripts/dev_tools/pr_context/render_feature_excerpts.py, scripts/dev_tools/pr_context/render_pr_helpers.py
 - testFiles: (none)
+
+### Reset [P6-T1]
+
+Timestamp: 2026-09-26T20-11
+Deleted: .claude/state/python-batch-budget.worktree-agent-a7bc49b9acc700094-5142ae6c.json
+Files listed in the deleted record:
+- prodFiles: scripts/dev_tools/pr_context/autoclose.py, scripts/dev_tools/pr_context/collector.py
+- testFiles: (none)
+
+### Reset [P6-T5]
+
+Timestamp: 2026-09-26T20-15
+Deleted: .claude/state/python-batch-budget.worktree-agent-a7bc49b9acc700094-5142ae6c.json
+Files listed in the deleted record:
+- prodFiles: (none)
+- testFiles: tests/scripts/dev_tools/pr_context/test_autoclose.py, tests/scripts/dev_tools/pr_context/test_autoclose_builder.py, tests/scripts/dev_tools/test_collect_pr_context.py
+
+### Reset [P6-T9]
+
+Timestamp: 2026-09-26T20-17
+Deleted: .claude/state/python-batch-budget.worktree-agent-a7bc49b9acc700094-5142ae6c.json
+Files listed in the deleted record:
+- prodFiles: (none)
+- testFiles: tests/scripts/dev_tools/test_render.py, tests/scripts/dev_tools/test_feature_docs.py
+Note: tests/scripts/dev_tools/test_render_resolve_feature_dir.py was created in the same batch by a shell redirection, which the budget hook does not record; the batch therefore held three test files, within the cap.

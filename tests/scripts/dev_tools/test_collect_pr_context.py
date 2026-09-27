@@ -157,7 +157,7 @@ def test_extension_summary_sorts_and_counts():
 def test_extract_issue_references_filters_and_deduplicates():
     text = "Fixes #12 and relates to ABC-99 plus #12 again"
     refs = extract_issue_references(text)
-    assert refs == ["#12", "ABC-99"]
+    assert refs == ["#12"]
 
 
 def test_last_with_truncation_limits_list():
@@ -303,7 +303,7 @@ def test_gather_feature_excerpts_reads_active_docs(mem_fs_path: Path) -> None:
     ]:
         assert expected in joined
 
-    assert excerpt.issue_refs == ["#77", "ABC-123"]
+    assert excerpt.issue_refs == ["#77"]
     assert set(excerpt.context_files) == {
         spec_path.relative_to(root).as_posix(),
         plan_path.relative_to(root).as_posix(),
@@ -368,18 +368,26 @@ def test_build_close_candidates_section_renders_lists():
     assert "#1" in section_text and "#2" in section_text and "#3" in section_text
 
 
-def test_build_close_candidates_section_promotes_referenced_issues_to_auto_close():
+def test_build_close_candidates_section_lists_referenced_issues_as_detected_only():
+    """Referenced issues stay in the detected list and never become auto-close."""
+    # Arrange
+    author_reason = "None (author has not asserted autoclose issues)"
+
+    # Act
     section_text = build_close_candidates_section(
         verified=[],
         author_asserted=[],
         referenced=["#3"],
         verified_reason="None (no PR exists yet for this branch)",
-        author_reason="None (author has not asserted autoclose issues)",
+        author_reason=author_reason,
     )
 
+    # Assert
     lines = section_text.splitlines()
     author_index = lines.index("Auto-close issues (author asserted):")
-    assert "- #3" in lines[author_index + 1]
+    referenced_index = lines.index("Referenced issues (detected):")
+    assert lines[author_index + 1] == author_reason, "author list must stay empty"
+    assert lines[referenced_index + 1] == "- #3", "#3 is listed as detected only"
 
 
 def test_issue_digest_truncates_comments():
