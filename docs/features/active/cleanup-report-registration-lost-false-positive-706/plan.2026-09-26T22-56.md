@@ -416,11 +416,11 @@ New `@test` blocks are appended at the end of `tests/shell/test_cleanup_worktree
 after its last existing test, each preceded by one blank line. The file header, `setup()`, and
 every existing test are not modified.
 
-- [ ] [P1-T1] Create `tests/fixtures/cleanup_worktrees/scan_roots/drive_letter/wt_drive/dotgit`
+- [x] [P1-T1] Create `tests/fixtures/cleanup_worktrees/scan_roots/drive_letter/wt_drive/dotgit`
   with the Write tool, content exactly as reference block R4 (one line, LF-terminated).
   Acceptance: the file exists; no other file is created under
   `tests/fixtures/cleanup_worktrees/scan_roots/drive_letter/`.
-- [ ] [P1-T2] Verify the fixture `tests/fixtures/cleanup_worktrees/scan_roots/drive_letter/wt_drive/dotgit`
+- [x] [P1-T2] Verify the fixture `tests/fixtures/cleanup_worktrees/scan_roots/drive_letter/wt_drive/dotgit`
   into `<FEATURE>/evidence/regression-testing/fixture-check.<ts>.md`: run
   `wc -c tests/fixtures/cleanup_worktrees/scan_roots/drive_letter/wt_drive/dotgit`,
   `grep -c -x -F 'gitdir: C:/fixture-repo/.git/worktrees/wt_drive' tests/fixtures/cleanup_worktrees/scan_roots/drive_letter/wt_drive/dotgit`,
@@ -430,7 +430,7 @@ every existing test are not modified.
   `git check-attr` prints `text: auto` and `eol: lf` (the repository rule `* text=auto eol=lf`
   in `.gitattributes` covers the path and no `-text` exemption matches it, so
   `.gitattributes` is not edited); `find` lists exactly the one `dotgit` path.
-- [ ] [P1-T3] [expect-fail] Append test 1 to `tests/shell/test_cleanup_worktrees_scan_helper.bats`,
+- [x] [P1-T3] [expect-fail] Append test 1 to `tests/shell/test_cleanup_worktrees_scan_helper.bats`,
   exactly as reference block R5, named
   `scan-dirs reports target_exists 1 for an existing drive-letter gitdir target without prefixing the worktree directory`.
   Verify with
@@ -442,7 +442,7 @@ every existing test are not modified.
   re-verifies). This test is expected to fail against the unfixed helper; its
   `[expect-fail]` evidence artifact is
   `<FEATURE>/evidence/regression-testing/fail-before.<ts>.md` (P1-T5).
-- [ ] [P1-T4] Append test 2 to `tests/shell/test_cleanup_worktrees_scan_helper.bats`, exactly as
+- [x] [P1-T4] Append test 2 to `tests/shell/test_cleanup_worktrees_scan_helper.bats`, exactly as
   reference block R6, named
   `scan-dirs reports target_exists 0 for a drive-letter gitdir target that does not exist`.
   Acceptance: the block is appended after test 1 and is the file's last block. Verify with
@@ -450,7 +450,7 @@ every existing test are not modified.
   (the deleted-line column is `0`) and
   `grep -n -F '@test "' tests/shell/test_cleanup_worktrees_scan_helper.bats` (the last printed
   line names this task's test).
-- [ ] [P1-T5] [expect-fail] Fail-before run into `<FEATURE>/evidence/regression-testing/fail-before.<ts>.md`
+- [x] [P1-T5] [expect-fail] Fail-before run into `<FEATURE>/evidence/regression-testing/fail-before.<ts>.md`
   with `ExpectedExitCode: 1`: with `scripts/bash/cleanup_worktrees_scan_helper.sh` still
   unmodified, run
   `npx --yes bats --print-output-on-failure tests/shell/test_cleanup_worktrees_scan_helper.bats`

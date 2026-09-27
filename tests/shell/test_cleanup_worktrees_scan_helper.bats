@@ -32,3 +32,32 @@ setup() {
     # A pointer file whose gitdir target is missing: has_gitfile 1, target_exists 0.
     [[ "$output" == *"/broken_wt|1|0|"?* ]]
 }
+
+@test "scan-dirs reports target_exists 1 for an existing drive-letter gitdir target without prefixing the worktree directory" {
+    # Regression for issue #706. The fixture pointer names the drive-letter target
+    # C:/fixture-repo/.git/worktrees/wt_drive. The helper is sourced in a child shell and
+    # its single existence check, scan_helper_target_present, is redefined after sourcing
+    # (a function-override test seam) to succeed only for that exact, unprefixed string.
+    # A helper that prefixes the worktree directory never matches it and reports 0.
+    local drive_root="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scan_roots/drive_letter"
+    run env CLEANUP_WT_SCAN_GITFILE_NAME=dotgit \
+        bash -c '
+            source "$1"
+            scan_helper_target_present() { [[ $1 == "C:/fixture-repo/.git/worktrees/wt_drive" ]]; }
+            scan_helper_scan_dirs "$2"
+        ' _ "${HELPER}" "${drive_root}"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"/wt_drive|1|1|"?* ]]
+}
+
+@test "scan-dirs reports target_exists 0 for a drive-letter gitdir target that does not exist" {
+    # Issue #706: a drive-letter target is resolved as given, with no worktree prefix.
+    # No C:/fixture-repo path exists on the test host, so the real existence check
+    # reports the target missing and a genuine registration loss is still reported.
+    # The helper runs as a script, the same form as the first test in this file.
+    local drive_root="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scan_roots/drive_letter"
+    run env CLEANUP_WT_SCAN_GITFILE_NAME=dotgit \
+        bash "${HELPER}" scan-dirs "${drive_root}"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"/wt_drive|1|0|"?* ]]
+}
