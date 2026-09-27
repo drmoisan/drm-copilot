@@ -101,3 +101,37 @@ Porcelain (pre-staging):
 Staged paths: the three non-evidence paths named by [P2-T11], the evidence directory `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence` (which carries this file, including the Phase 1 post-commit append), and the plan checklist `docs/features/active/codex-gates-4-5-lack-epic-scope-707/plan.2026-09-26T22-55.md` (including the [P1-T12] check-off).
 
 Message: `fix(codex-hooks): route Codex gate 4 command and path legs through epic scope for #707` with the two session attribution trailer lines.
+
+Commit SHA: e1295df91272fec87ba715124d8cadaf4dda76c4
+
+`git log -1 --name-only` lists the three non-evidence paths named by [P2-T11], seven evidence paths, and the plan file (11 files).
+
+Porcelain (post-commit, pre-append):
+
+```
+(empty)
+```
+
+Push: `git push origin bug/codex-gates-4-5-lack-epic-scope-707` (plain, not forced) reported `9c1c0066..e1295df9  bug/codex-gates-4-5-lack-epic-scope-707 -> bug/codex-gates-4-5-lack-epic-scope-707`.
+
+This post-commit entry and the [P2-T11] check-off in the plan are uncommitted after the append and are carried into the next phase commit.
+
+## Phase 3 commit (batch B3)
+
+Timestamp: 2026-09-27T07-10
+Command: git status --porcelain -uall -- docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence
+EXIT_CODE: 0
+Output Summary: Two modified and two untracked evidence paths listed; each is named by a task of Phase 2 or Phase 3 (commits.md by rule 9 and [P2-T11]; batch-budget-resets.md by [P3-T1]; b3-scoped-pester.md by [P3-T5]; b3-poshqc.md by [P3-T6]). No other path is listed, so the commit may proceed.
+
+Porcelain (pre-staging):
+
+```
+ M docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/other/batch-budget-resets.md
+ M docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/other/commits.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/b3-poshqc.md
+?? docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence/qa-gates/b3-scoped-pester.md
+```
+
+Staged paths: the three non-evidence paths named by [P3-T7], the evidence directory `docs/features/active/codex-gates-4-5-lack-epic-scope-707/evidence` (which carries this file, including the Phase 2 post-commit append), and the plan checklist `docs/features/active/codex-gates-4-5-lack-epic-scope-707/plan.2026-09-26T22-55.md` (including the [P2-T11] check-off).
+
+Message: `test(codex-hooks): mock epic-scope read in existing Codex gate suites for #707` with the two session attribution trailer lines.

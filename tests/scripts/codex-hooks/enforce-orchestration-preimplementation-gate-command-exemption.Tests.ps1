@@ -23,6 +23,8 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:UnderTest = Join-Path $script:RepoRoot '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'
         . $script:UnderTest
+        # Issue #707 (D10): the epic-scope read is mocked so local epic state cannot change a decision.
+        Mock Get-EpicScopeCheckpointText { $null }
 
         function ConvertTo-CodexExemptionToolInput {
             <#
