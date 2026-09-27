@@ -17,6 +17,7 @@
 
 import { type FileSystem, toPosixPath } from "../file-system";
 import {
+  compareCodePoint,
   type FeatureDocExcerpt,
   ISSUE_REFERENCE_PATTERN,
   section,
@@ -433,17 +434,6 @@ function relativeToPosix(root: string, path: string): string {
     return normalized.slice(root.length + 1);
   }
   return normalized.replace(/^\/+/u, "");
-}
-
-/** Compare two strings by Unicode code point (Python `sorted` semantics). */
-function compareCodePoint(left: string, right: string): number {
-  if (left < right) {
-    return -1;
-  }
-  if (left > right) {
-    return 1;
-  }
-  return 0;
 }
 
 /** Escape regex metacharacters for a dynamic heading pattern. */
