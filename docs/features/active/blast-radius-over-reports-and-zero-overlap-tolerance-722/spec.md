@@ -3,8 +3,8 @@
 - **Issue:** #722
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-27T19-30
-- **Status:** Draft
+- **Last Updated:** 2026-09-27T18-36
+- **Status:** Implemented (pending CI; AC-38 open)
 - **Version:** 0.2
 - **Work Mode:** full-bug (acceptance criteria live in this file only; no user story)
 - **Parallel run:** blast-radius-tolerance-2026-09-27 (preparation mode)
