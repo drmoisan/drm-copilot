@@ -689,7 +689,7 @@ reporting done.
 
 ### Toolchain and CI
 
-- [ ] Python toolchain passes in a single pass (black, ruff, pyright, pytest) with >= 85% line and
+- [x] Python toolchain passes in a single pass (black, ruff, pyright, pytest) with >= 85% line and
   >= 75% branch coverage on every new or changed Python file and no regression on changed lines.
 - [ ] PowerShell toolchain passes in a single pass (formatter, PSScriptAnalyzer, Pester) with >= 85%
   line coverage on every new or changed module.

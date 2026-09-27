@@ -1165,15 +1165,15 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 15 — Final QA: Python
 
-- [ ] [P15-T1] Run CMD-PY-BLACK with ".". Then run CMD-PY-BLACK-CHECK with ".". Write
+- [x] [P15-T1] Run CMD-PY-BLACK with ".". Then run CMD-PY-BLACK-CHECK with ".". Write
       FEATURE/evidence/qa-gates/final-python-black.TS.md. Acceptance: the check run exits 0 and prints a
       line ending "would be left unchanged.". If the write run reformatted any file, restart Phase 15.
-- [ ] [P15-T2] Run CMD-PY-RUFF with ".". Write FEATURE/evidence/qa-gates/final-python-ruff.TS.md.
+- [x] [P15-T2] Run CMD-PY-RUFF with ".". Write FEATURE/evidence/qa-gates/final-python-ruff.TS.md.
       Acceptance: exit 0 and "All checks passed!". No new noqa suppression exists in the changed files.
       On failure, fix and restart Phase 15.
-- [ ] [P15-T3] Run CMD-PY-PYRIGHT. Write FEATURE/evidence/qa-gates/final-python-pyright.TS.md.
+- [x] [P15-T3] Run CMD-PY-PYRIGHT. Write FEATURE/evidence/qa-gates/final-python-pyright.TS.md.
       Acceptance: exit 0 and "0 errors". On failure, fix and restart Phase 15.
-- [ ] [P15-T4] Run CMD-PY-COV with label final, then script py-cov-files over the six Python
+- [x] [P15-T4] Run CMD-PY-COV with label final, then script py-cov-files over the six Python
       production files of block B38. Write FEATURE/evidence/qa-gates/final-python-pytest-coverage.TS.md.
       Acceptance: every FAILED node ID is in the P0-T18 baseline failure set, except that the KL-510
       node may fail when its failure satisfies KL-510 case (b), recorded as the Terms require; every
@@ -1181,12 +1181,12 @@ the read-only check script A6 and a before-and-after hash comparison.
       BranchPercent of at least 75. On failure, fix and restart Phase 15. The artifact's EXIT_CODE and
       any ExpectedExitCode refer to the CMD-PY-COV run; the py-cov-files exit code is recorded in the
       body.
-- [ ] [P15-T5] Python coverage delta: run script changed-lines (A7 companion, block B39) with
+- [x] [P15-T5] Python coverage delta: run script changed-lines (A7 companion, block B39) with
       SCRATCH/coverage-722-final.json, FINAL_BASE, and the three pre-existing files of P0-T18. Write
       FEATURE/evidence/qa-gates/python-coverage-delta.TS.md recording baseline percent (P0-T18), final
       percent (P15-T4), and changed-line percent per file. Acceptance: final percent is at least the
       baseline percent for each file and every changed-line percent is at least 85.
-- [ ] [P15-T6] Commit and push Phase 15 evidence: check off AC-34 per the Preamble check-off rule;
+- [x] [P15-T6] Commit and push Phase 15 evidence: check off AC-34 per the Preamble check-off rule;
       run CMD-GIT-STATUS and stage with CMD-GIT-ADD every listed path that is backticked in this plan
       or lies under FEATURE (FEATURE/spec.md included); commit with message "test(722): record final
       Python QA"; run CMD-GIT-PUSH. Acceptance: all git commands exit 0 and a final CMD-GIT-STATUS
