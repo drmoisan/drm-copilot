@@ -28,12 +28,12 @@ $script:OrchestrationBookkeepingTrees = @(
 )
 
 # Characters that make a command line statically unresolvable (D4 row 12, as narrowed by
-# issues #663 and #713). Interpolation characters are unresolvable outside quotes and in a
-# double-quoted span, which still expands them; a single-quoted span keeps them literal.
-# Outside-quote characters (`<`, `>`, and the `#` comment introducer) are unresolvable only
-# outside a quoted span, so a quoted Co-Authored-By trailer or a quoted `#` is literal text.
+# issues #663 and #713): interpolation characters outside single quotes; outside-quote
+# characters (`<`, `>`, and the `#` comment introducer) outside any quote; and typographic
+# quotes (U+2018 to U+201E) anywhere, because a PowerShell host reads them as quotes.
 $script:InterpolationCommandCharacters = [char[]]@('$', '`')
 $script:OutsideQuoteCommandCharacters = [char[]]@('>', '<', '#')
+$script:TypographicQuoteCharacters = [char[]]@(0x2018, 0x2019, 0x201A, 0x201B, 0x201C, 0x201D, 0x201E)
 
 # Wildcards that make an operand a glob (D4 row 15). Only the literal prefix before the
 # first of these is prefix-tested.
@@ -115,9 +115,9 @@ function Test-OrchestrationCommandTextUnresolvable {
         Realizes D4 row 12 as narrowed by issues #663 and #713, with quote state tracked as in
         Split-OrchestrationCommandLine. `$` or backtick answers true outside quotes or inside
         double quotes (single quotes keep it literal); `<`, `>`, or a `#` comment answers true
-        only outside a quoted span. Backslash escapes are not modelled, so a
-        backslash before any quote character, or anywhere inside a double-quoted span,
-        answers true: the shell may end the span where this scan does not (fail closed).
+        only outside a quoted span. A typographic quote (U+2018 to U+201E), a backslash before
+        any quote character, or a backslash inside a double-quoted span answers true anywhere:
+        a shell may end the span where this scan does not (fail closed).
     .PARAMETER CommandText
         The full command line as the shell would receive it.
     .OUTPUTS
@@ -127,8 +127,8 @@ function Test-OrchestrationCommandTextUnresolvable {
     [OutputType([bool])]
     param([Parameter(Mandatory)][AllowEmptyString()][string] $CommandText)
 
-    # An escaped quote moves a span boundary the scan cannot model (issue #663 remediation CR-1).
-    if ($CommandText.Contains('\"') -or $CommandText.Contains("\'")) {
+    # An escaped or typographic quote moves a span boundary the scan cannot model (#663, #713).
+    if ($CommandText.Contains('\"') -or $CommandText.Contains("\'") -or $CommandText.IndexOfAny($script:TypographicQuoteCharacters) -ge 0) {
         return $true
     }
 
@@ -464,8 +464,8 @@ function Test-ExemptOrchestrationStagingCommand {
         return $false
     }
 
-    # Row 12: interpolation anywhere, redirection outside quotes, and unmodelled backslash
-    # escapes are not statically resolvable, so the operand list cannot be trusted.
+    # Row 12: `$` or backtick outside single quotes, `<`, `>`, or `#` outside quotes, any
+    # typographic quote, and unmodelled backslash escapes make the operand list untrustworthy.
     if (Test-OrchestrationCommandTextUnresolvable -CommandText $CommandText) {
         return $false
     }
