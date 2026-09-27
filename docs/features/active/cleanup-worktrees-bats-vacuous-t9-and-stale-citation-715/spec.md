@@ -278,21 +278,21 @@ open `cleanup-worktrees` branch; the file set edited here (`test_cleanup_worktre
 
 ## Acceptance Criteria
 
-- [ ] AC1: In `tests/shell/test_cleanup_worktrees_deletion.bats`, the `@test`
+- [x] AC1: In `tests/shell/test_cleanup_worktrees_deletion.bats`, the `@test`
       `"delete_candidate refuses the base branch before re-verification"` replaces the
       assertion `[[ "$output" != *"merge-base"* ]]` with a negative assertion asserting the
       absence of `"rev-parse --abbrev-ref HEAD"` in `$output`.
-- [ ] AC2: In the same `@test`, the assertion
+- [x] AC2: In the same `@test`, the assertion
       `[[ "$output" == *"ACTION|delete|main|BLOCKED-PROTECTED-BASE"* ]]` and the assertions
       forbidding `"worktree remove"` and `"branch -D"` in `$output` remain present and
       unchanged.
-- [ ] AC3: No citation of the form `scripts/bash/cleanup-worktrees.sh:<line-number>` remains
+- [x] AC3: No citation of the form `scripts/bash/cleanup-worktrees.sh:<line-number>` remains
       anywhere in `tests/shell/test_cleanup_worktrees_dirt_clear.bats`; the replacement text
       names `main()` and the literal assignment `CLEANUP_WT_CLEAR_DISPOSABLE=1`.
-- [ ] AC4: No citation of the form
+- [x] AC4: No citation of the form
       `tests/shell/test_cleanup_worktrees_deletion.bats:47` remains anywhere in
       `tests/shell/test_cleanup_worktrees_dirt_clear.bats`.
-- [ ] AC5: A falsifiability trace artifact exists at
+- [x] AC5: A falsifiability trace artifact exists at
       `docs/features/active/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715/evidence/other/<timestamp>-falsifiability-trace.md`,
       showing by source-line citation both (i) that no `rev-parse --abbrev-ref HEAD` call
       reaches `$output` under the current guard ordering in `delete_candidate`, and (ii)
@@ -302,7 +302,7 @@ open `cleanup-worktrees` branch; the file set edited here (`test_cleanup_worktre
       `.github/workflows/ci.yml`) passes for the branch head, with every test in
       `tests/shell/test_cleanup_worktrees_deletion.bats` and
       `tests/shell/test_cleanup_worktrees_dirt_clear.bats` passing.
-- [ ] AC7: No file under `scripts/` is changed by this branch.
+- [x] AC7: No file under `scripts/` is changed by this branch.
 
 ## Risks & Mitigations
 
