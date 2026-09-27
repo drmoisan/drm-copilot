@@ -10,6 +10,7 @@ Branch: `bug/preimplementation-gate-blocks-attribution-trailers-713`. HEAD_SHA r
 | 1 | 755ba4094f49844290e7ab79e75fa0f30ab54860 | test(hooks): add typographic-quote deny rows for issue #713 | yes (a30f52f6..755ba409) |
 | 2 | 9d4775e04fcfbb7426b4b9ed3d2b256241ee2ccf | fix(hooks): deny typographic quotes in the preimplementation gate exemption | yes (755ba409..9d4775e0) |
 | 3 | 3e006ccdaed48f18d57c684f80049125c674d050 | docs(skills): note typographic-quote denial for issue #713 | yes (9d4775e0..3e006ccd) |
+| 4 | 19d0a7046825f5c96fb6deaad518b35a60486421 | docs(evidence): record remediation cycle 1 final QC for issue #713 | yes (3e006ccd..19d0a704) |
 
 ## [P0-T11] hook denial (plan rule 10: BLOCKED)
 
@@ -114,3 +115,24 @@ Claude-Session: https://claude.ai/code/session_01P1iNMUJbD7Uf29ACDCXuYg
 ```
 
 TRAILERS_PRESENT: True
+
+### Phase 4 ([P4-T17])
+
+Timestamp: 2026-09-27T05-31
+
+Pre-staging `git status --porcelain --untracked-files=all` listed only paths under `docs/features/active/preimplementation-gate-blocks-attribution-trailers-713/` (no section 2 item 1 to 9 path). Commit: `git commit -F <SCRATCHPAD>/c1-phase4-commit.txt` (exit 0). Push: `git push origin bug/preimplementation-gate-blocks-attribution-trailers-713` (exit 0, `3e006ccd..19d0a704`).
+
+Command: `git rev-parse HEAD`
+Output: `19d0a7046825f5c96fb6deaad518b35a60486421`
+
+Command: `git log -1 --format=%B` (deviation X4)
+Final two lines of the message body:
+
+```text
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01P1iNMUJbD7Uf29ACDCXuYg
+```
+
+TRAILERS_PRESENT: True
+
+This Phase 4 row and the plan file [P4-T17] check-off are the two uncommitted paths reported to the orchestrator (X1 precedent).
