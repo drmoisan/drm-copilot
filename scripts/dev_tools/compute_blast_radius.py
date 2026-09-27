@@ -48,6 +48,22 @@ from scripts.dev_tools._blast_radius_extraction import (
 from scripts.dev_tools._blast_radius_glob import concrete_entries
 from scripts.dev_tools._blast_radius_mergeable import config_mergeable_paths
 from scripts.dev_tools._blast_radius_normalization import exclude_mandate_reads
+from scripts.dev_tools._blast_radius_scheduling import (
+    CONFIG_CONFLICT_TOLERANCE,
+    HARD_REASON_KINDS,
+    STRICT_CONFLICT_TOLERANCE,
+    ConflictEdge,
+    ConflictTolerance,
+    PairDecision,
+    SchedulingItem,
+    SchedulingResult,
+    ToleratedOverlap,
+    config_conflict_tolerance,
+    decide_pair,
+    pair_benefit,
+    pair_cost,
+    schedule_conflict_edges,
+)
 from scripts.dev_tools._blast_radius_validation import (
     RadiusFinding,
     config_mandate_reads,
@@ -63,16 +79,30 @@ if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
 __all__ = [
+    "CONFIG_CONFLICT_TOLERANCE",
+    "HARD_REASON_KINDS",
+    "STRICT_CONFLICT_TOLERANCE",
     "BlastRadius",
+    "ConflictEdge",
     "ConflictReason",
     "ConflictResult",
+    "ConflictTolerance",
+    "PairDecision",
     "RadiusFinding",
+    "SchedulingItem",
+    "SchedulingResult",
+    "ToleratedOverlap",
+    "config_conflict_tolerance",
     "config_mergeable_paths",
     "conflicts",
+    "decide_pair",
     "derive_blast_radius",
     "extract_plan_paths",
     "normalize_declared_radius",
+    "pair_benefit",
+    "pair_cost",
     "radius_from_observed_paths",
+    "schedule_conflict_edges",
     "validate_blast_radius",
 ]
 

@@ -613,7 +613,7 @@ reporting done.
 - [ ] The scheduling-soft-pair-tolerated fixture shows a detected, non-hard pair recorded as a
   tolerated overlap (not an edge) at the committed tolerance and as an edge at tolerance 0, in both
   runtimes.
-- [ ] Hypothesis property tests cover: edge implies conflict; tolerance 0 equals conflict; monotonicity
+- [x] Hypothesis property tests cover: edge implies conflict; tolerance 0 equals conflict; monotonicity
   in tolerance_percent; symmetry.
 - [ ] The conflict_tolerance reader rejects every invalid shape listed under Error handling with an
   error naming the key, in both runtimes, each rejection covered by a test.

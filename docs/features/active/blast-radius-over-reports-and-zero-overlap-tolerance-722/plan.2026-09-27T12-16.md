@@ -428,55 +428,55 @@ the read-only check script A6 and a before-and-after hash comparison.
 
 ### Phase 1 — Part A: Python Scheduling Module and Scheduling Fixtures
 
-- [ ] [P1-T1] Reset the Python batch budget: run CMD-PS-SCRIPT with script reset-batch-budget (A8)
+- [x] [P1-T1] Reset the Python batch budget: run CMD-PS-SCRIPT with script reset-batch-budget (A8)
       and argument -Kind python. Write FEATURE/evidence/other/batch-budget-reset-p1.TS.md. Acceptance:
       exit 0; the artifact lists the removed state files (possibly none).
-- [ ] [P1-T2] Create `tests/fixtures/blast_radius/scheduling/scheduling-452-shared-surface-hard.json`
+- [x] [P1-T2] Create `tests/fixtures/blast_radius/scheduling/scheduling-452-shared-surface-hard.json`
       exactly as specified in block B5 of Appendix B. Acceptance: the file parses as JSON and carries
       the items, embedded radii, and three cases of B5.
-- [ ] [P1-T3] Create `tests/fixtures/blast_radius/scheduling/scheduling-452-directory-prefix-weighted.json`
+- [x] [P1-T3] Create `tests/fixtures/blast_radius/scheduling/scheduling-452-directory-prefix-weighted.json`
       as specified in block B6. Acceptance: parses as JSON; three items, three cases.
-- [ ] [P1-T4] Create `tests/fixtures/blast_radius/scheduling/scheduling-452-negative-controls.json`
+- [x] [P1-T4] Create `tests/fixtures/blast_radius/scheduling/scheduling-452-negative-controls.json`
       as specified in block B7. Acceptance: parses as JSON; four items, three cases, no expected edge
       and no expected tolerated overlap in any case.
-- [ ] [P1-T5] Create `tests/fixtures/blast_radius/scheduling/scheduling-soft-pair-tolerated.json` as
+- [x] [P1-T5] Create `tests/fixtures/blast_radius/scheduling/scheduling-soft-pair-tolerated.json` as
       specified in block B8. Acceptance: parses as JSON; four items, three cases.
-- [ ] [P1-T6] Create `tests/fixtures/blast_radius/scheduling/scheduling-absent-key-strict.json` as
+- [x] [P1-T6] Create `tests/fixtures/blast_radius/scheduling/scheduling-absent-key-strict.json` as
       specified in block B9. Acceptance: parses as JSON; the embedded config has no conflict_tolerance
       key.
-- [ ] [P1-T7] Write `tests/scripts/dev_tools/test_blast_radius_scheduling.py` containing exactly the
+- [x] [P1-T7] Write `tests/scripts/dev_tools/test_blast_radius_scheduling.py` containing exactly the
       test functions of block B10 in Appendix B, following Arrange-Act-Assert, with docstrings, reading
       only the fixture files of P1-T2 through P1-T6 and the top-level conflict fixtures of the existing
       corpus. Acceptance: the file exists and is at most 500 lines.
-- [ ] [P1-T8] Write `tests/scripts/dev_tools/test_blast_radius_scheduling_properties.py` containing the
+- [x] [P1-T8] Write `tests/scripts/dev_tools/test_blast_radius_scheduling_properties.py` containing the
       four hypothesis properties of block B11. Acceptance: the file exists and is at most 500 lines.
-- [ ] [P1-T9] [expect-fail] Run CMD-PY-TEST over the two test files of P1-T7 and P1-T8 before the
+- [x] [P1-T9] [expect-fail] Run CMD-PY-TEST over the two test files of P1-T7 and P1-T8 before the
       production module exists. Write FEATURE/evidence/regression-testing/scheduling-tests-fail-before.TS.md
       with ExpectedExitCode: 2. Acceptance: pytest exits 2 with a collection error naming the missing
       scheduling module.
-- [ ] [P1-T10] Create `scripts/dev_tools/_blast_radius_scheduling.py` implementing block B12 of
+- [x] [P1-T10] Create `scripts/dev_tools/_blast_radius_scheduling.py` implementing block B12 of
       Appendix B: the ConflictTolerance value object, the strict conflict_tolerance reader, the
       per-pair decision, the cost and benefit helpers, and the scheduling entry point, with the
       mandatory docstrings and intent comments. The module calls the unchanged conflicts function and
       reuses the entry-overlap primitive, the mergeable exclusion, and the mergeable matcher; it defines
       no new overlap semantics. Acceptance: the file exists, is at most 500 lines, and imports no
       module that imports it.
-- [ ] [P1-T11] Edit `scripts/dev_tools/compute_blast_radius.py` to import and re-export the public
+- [x] [P1-T11] Edit `scripts/dev_tools/compute_blast_radius.py` to import and re-export the public
       names of block B12 (added to the module's public name list). No other change. Acceptance: the
       file is at most 500 lines and its conflicts re-export is unchanged.
-- [ ] [P1-T12] Run CMD-PY-TEST over the two test files of P1-T7 and P1-T8. Write
+- [x] [P1-T12] Run CMD-PY-TEST over the two test files of P1-T7 and P1-T8. Write
       FEATURE/evidence/regression-testing/scheduling-tests-pass.TS.md. Acceptance: exit 0; the verbose
       output shows a PASSED line for every test name of B10 and B11 (parametrized cases included) and
       no FAILED or ERROR line.
-- [ ] [P1-T13] Run CMD-PY-TEST-K with expression blast_radius to run the existing blast-radius Python
+- [x] [P1-T13] Run CMD-PY-TEST-K with expression blast_radius to run the existing blast-radius Python
       tests. Write FEATURE/evidence/regression-testing/blast-radius-python-regression-p1.TS.md.
       Acceptance: every FAILED node ID printed is a member of the P0-T18 baseline failure set.
-- [ ] [P1-T14] Run CMD-PY-BLACK, then CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT, each over the
+- [x] [P1-T14] Run CMD-PY-BLACK, then CMD-PY-BLACK-CHECK, CMD-PY-RUFF, and CMD-PY-PYRIGHT, each over the
       four Python files written in this phase. Write FEATURE/evidence/qa-gates/phase1-python-static.TS.md.
       Acceptance: black check mode exits 0 and prints a line ending "would be left unchanged."; ruff
       exits 0 with "All checks passed!"; pyright exits 0 with "0 errors". If the write-mode black run
       reformatted a file, re-run P1-T12 before continuing.
-- [ ] [P1-T15] Commit and push Phase 1: check off AC-15 per the Preamble check-off rule; CMD-GIT-ADD
+- [x] [P1-T15] Commit and push Phase 1: check off AC-15 per the Preamble check-off rule; CMD-GIT-ADD
       with the five fixture files, the two test files, the two production files of this phase, the
       FEATURE evidence directory, and FEATURE/spec.md; CMD-GIT-COMMIT with
       message "feat(722): add integration-cost scheduling layer (Python)"; CMD-GIT-PUSH. Acceptance: all
