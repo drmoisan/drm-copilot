@@ -516,7 +516,8 @@ The committed values lean toward parallelism (design point 3); the absent-key de
   kickoff tables where available; otherwise default_band applies and the fixture records that.
 - **Constraints.** 500-line file limit; 3 production plus 3 test files per batch per language; every
   PowerShell module edit has a bundled mirror; T2 property-test density for the new pure functions.
-- **External dependencies.** None new. hypothesis (Python) is already approved.
+- **External dependencies.** None new. (Amended by decision 11: hypothesis is not installed in this
+  repository; the property tests use exhaustive enumeration instead.)
 
 ## Data / API / Config Impact
 
@@ -540,7 +541,7 @@ The committed values lean toward parallelism (design point 3); the absent-key de
 - **Unit tests.** One or more per write-intent rule W1-W6; cost terms (same_file, append_only,
   possible_overlap, module, mergeable zero); benefit (band lookup, default_band); hard classification;
   reason selection; every config-reader rejection; the flag-absent identity path; the drift helper.
-- **Property tests (hypothesis).** edge implies conflict; tolerance 0 equals conflict; monotonicity in
+- **Property tests (exhaustive enumeration; decision 11).** edge implies conflict; tolerance 0 equals conflict; monotonicity in
   tolerance_percent; symmetry; W-rules never add a token.
 - **Parity.** Python and PowerShell produce identical results for every scheduling, write-intent, and
   historical fixture; the read-verb, write-verb, and placeholder-stem sets are pinned equal.
@@ -613,8 +614,8 @@ reporting done.
 - [ ] The scheduling-soft-pair-tolerated fixture shows a detected, non-hard pair recorded as a
   tolerated overlap (not an edge) at the committed tolerance and as an edge at tolerance 0, in both
   runtimes.
-- [x] Hypothesis property tests cover: edge implies conflict; tolerance 0 equals conflict; monotonicity
-  in tolerance_percent; symmetry.
+- [x] Property tests (exhaustive enumeration over a fixed finite domain; see decision 11) cover: edge
+  implies conflict; tolerance 0 equals conflict; monotonicity in tolerance_percent; symmetry.
 - [ ] The conflict_tolerance reader rejects every invalid shape listed under Error handling with an
   error naming the key, in both runtimes, each rejection covered by a test.
 - [x] Both config copies carry conflict_tolerance with the committed values in this spec, byte-equal
@@ -747,3 +748,13 @@ reporting done.
     autonomous mode): those tests keep checking current-extraction semantics, and their committed-config
     helpers also remove write_intent_extraction and path_roots. Write-intent behavior is covered by the
     new write-intent tests and fixtures. The committed config values are unchanged by this decision.
+11. **Property-test mechanism (AC-15 amendment, recorded 2026-09-27 during execution).** The spec
+    stated that hypothesis was already approved. It is not: it is absent from pyproject.toml and the
+    lockfile, and existing suites state that it stays absent. Adding it would be an unplanned
+    dependency change, and a seeded-random substitute triggers ruff S311, whose only remedy is an
+    unplanned per-file ignore. Decision (orchestrator, autonomous mode): the four properties are
+    verified by exhaustive enumeration over a fixed finite domain (13,689 decisions per truth table)
+    that produces conflicts, edges, tolerated overlaps, and hard pairs, so no property holds
+    vacuously. Exhaustive enumeration checks every input in that domain, whereas sampling checks only
+    a subset. AC-15's wording is amended accordingly; the properties it names are unchanged. Evidence:
+    evidence/other/property-test-framework-deviation.2026-09-27T15-17.md.
