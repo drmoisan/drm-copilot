@@ -19,8 +19,8 @@
       - Test-BlastRadiusConflict          port of conflicts
 
     It also re-exports two scheduling functions of BlastRadiusScheduling.psm1
-    (issue #722), which resolves Test-BlastRadiusConflict from this facade at
-    call time:
+    (issue #722); each takes the relation as -Relation, so a caller passes
+    ${function:Test-BlastRadiusConflict} from this facade:
 
       - Get-BlastRadiusConflictEdge       port of schedule_conflict_edges
       - Get-BlastRadiusPairDecision       port of decide_pair

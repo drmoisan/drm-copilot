@@ -35,6 +35,9 @@ BeforeAll {
     # tests -> repo root, then into .claude/lib/blast-radius.
     $facadePath = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/blast-radius/BlastRadius.psm1").Path
     Import-Module $facadePath -Force
+    # The relation is passed explicitly to every scheduling call, so no call
+    # depends on command resolution inside the scheduling module.
+    $script:ConflictRelation = ${function:Test-BlastRadiusConflict}
 
     # The second strict configuration: tolerance 0 with the committed weights.
     function Get-ZeroToleranceMember {
@@ -104,7 +107,7 @@ Describe 'Blast-radius historical runs' {
 
             foreach ($config in @($absent, $zero)) {
                 # Act
-                $result = Get-BlastRadiusConflictEdge -Item $item -Config $config
+                $result = Get-BlastRadiusConflictEdge -Item $item -Config $config -Relation $script:ConflictRelation
 
                 # Assert: the pinned edges with their reasons, and no tolerated pair.
                 @($result['edges'] | ForEach-Object { '{0}-{1}|{2}' -f $_['a'], $_['b'], $_['reason'] }) |
@@ -124,7 +127,7 @@ Describe 'Blast-radius historical runs' {
                 })
 
             # Act
-            $result = Get-BlastRadiusConflictEdge -Item $item -Config $after['config']
+            $result = Get-BlastRadiusConflictEdge -Item $item -Config $after['config'] -Relation $script:ConflictRelation
 
             # Assert: the edges with their tolerated extra fields, then the
             # tolerated overlaps with their full reason lists, in pinned order.

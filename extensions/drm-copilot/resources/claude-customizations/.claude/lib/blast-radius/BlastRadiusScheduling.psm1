@@ -24,8 +24,8 @@
       - An absent (or null) conflict_tolerance key reads as tolerance 0 with unit
         weights and durations, so the edge set equals the detected-conflict set.
       - Test-BlastRadiusConflict lives in the facade BlastRadius.psm1, which
-        imports this module, so it is resolved at call time with Get-Command
-        rather than imported; a missing command fails fast naming the facade.
+        imports this module, so the caller supplies it as the [scriptblock]
+        -Relation; an omitted relation fails fast naming the facade.
       - Every function is pure: no filesystem, subprocess, network, or clock
         access, and no input is mutated.
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
@@ -53,9 +53,8 @@ $script:BandName = @('C1', 'C2', 'C3', 'C4')
 # or a contract dependency cannot be reconciled by a merge step.
 $script:HardReasonKind = @('shared_surface_overlap', 'contract_dependency')
 
-# The relation lives in the facade that imports this module.
-$script:RelationCommand = 'Test-BlastRadiusConflict'
-$script:FacadeModule = 'BlastRadius.psm1'
+# The fail-fast message for an omitted relation; the facade defines the relation.
+$script:RelationRequired = '-Relation is required: pass ${function:Test-BlastRadiusConflict} from the facade module BlastRadius.psm1.'
 
 # tolerance_percent is a percentage of the benefit.
 $script:Percent = 100
@@ -317,19 +316,6 @@ function Get-BlastRadiusPairBenefit {
     return [long]([System.Math]::Min($duration[0], $duration[1]))
 }
 
-# Resolve the relation at call time; the facade that defines it imports this
-# module, so importing it here would be circular.
-function Get-ConflictRelationCommand {
-    [CmdletBinding()]
-    param()
-
-    $command = Get-Command -Name $script:RelationCommand -CommandType Function -ErrorAction SilentlyContinue
-    if ($null -eq $command) {
-        throw "$script:RelationCommand is not available; import the facade module $script:FacadeModule before scheduling."
-    }
-    return $command
-}
-
 function Get-BlastRadiusPairDecision {
     <#
     .SYNOPSIS
@@ -337,7 +323,7 @@ function Get-BlastRadiusPairDecision {
 
     .DESCRIPTION
         Port of decide_pair. Reads the tolerance first (so a malformed key fails
-        before the relation runs), calls Test-BlastRadiusConflict exactly once
+        before the relation runs), calls the supplied -Relation exactly once
         with RadiusA first, and applies the edge rule. At tolerance 0 the edge
         flag equals the conflict verdict; cost and benefit are still reported.
 
@@ -355,6 +341,9 @@ function Get-BlastRadiusPairDecision {
 
     .PARAMETER BandB
         Second item's complexity band, or null for default_band.
+
+    .PARAMETER Relation
+        The detection relation; pass ${function:Test-BlastRadiusConflict}.
 
     .OUTPUTS
         System.Collections.Hashtable. Keys conflict, edge, hard, cost, benefit,
@@ -376,12 +365,13 @@ function Get-BlastRadiusPairDecision {
         [AllowNull()]
         [object] $BandA,
         [AllowNull()]
-        [object] $BandB
+        [object] $BandB,
+        [scriptblock] $Relation
     )
 
+    if ($null -eq $Relation) { throw $script:RelationRequired }
     $tolerance = Get-ConfigConflictTolerance -Config $Config
-    $relation = Get-ConflictRelationCommand
-    $result = & $relation -RadiusA $RadiusA -RadiusB $RadiusB -Config $Config
+    $result = & $Relation -RadiusA $RadiusA -RadiusB $RadiusB -Config $Config
     if (-not $result['conflict']) {
         return @{ conflict = $false; edge = $false; hard = $false; cost = [long]0; benefit = [long]0; reason = $null; reasons = [string[]]@() }
     }
@@ -445,6 +435,10 @@ function Get-BlastRadiusConflictEdge {
     .PARAMETER Config
         Parsed truth table.
 
+    .PARAMETER Relation
+        The detection relation passed to every pair decision; pass
+        ${function:Test-BlastRadiusConflict}.
+
     .OUTPUTS
         System.Collections.Hashtable. Keys edges (ordered records a, b, reason,
         hard, cost, benefit) and tolerated_overlaps (ordered records a, b,
@@ -458,9 +452,11 @@ function Get-BlastRadiusConflictEdge {
         [object[]] $Item,
         [Parameter(Mandatory = $true)]
         [AllowNull()]
-        [object] $Config
+        [object] $Config,
+        [scriptblock] $Relation
     )
 
+    if ($null -eq $Relation) { throw $script:RelationRequired }
     [void](Get-ConfigConflictTolerance -Config $Config)
     $ordered = @(Get-OrderedSchedulingItem -Item $Item)
 
@@ -470,7 +466,7 @@ function Get-BlastRadiusConflictEdge {
         for ($second = $first + 1; $second -lt $ordered.Count; $second++) {
             $a = $ordered[$first]
             $b = $ordered[$second]
-            $decision = Get-BlastRadiusPairDecision -RadiusA $a['radius'] -RadiusB $b['radius'] -Config $Config -BandA $a['band'] -BandB $b['band']
+            $decision = Get-BlastRadiusPairDecision -RadiusA $a['radius'] -RadiusB $b['radius'] -Config $Config -BandA $a['band'] -BandB $b['band'] -Relation $Relation
             if ($decision['edge']) {
                 $edge.Add([ordered]@{ a = $a['key']; b = $b['key']; reason = $decision['reason']; hard = $decision['hard']; cost = $decision['cost']; benefit = $decision['benefit'] })
             } elseif ($decision['conflict']) {

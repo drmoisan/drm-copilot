@@ -64,11 +64,12 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    interpreter (the default PowerShell 5.1 execution policy blocks `Import-Module` of a `.psm1`
    file, so `pwsh` is mandatory: run as `$repoRoot = git rev-parse --show-toplevel; Import-Module
    (Join-Path $repoRoot '.claude/lib/blast-radius/BlastRadius.psm1') -Force -ErrorAction Stop`).
-   Call it once, as `Get-BlastRadiusConflictEdge -Item <items> -Config <config>`, where each item
+   Call it once, as `Get-BlastRadiusConflictEdge -Item <items> -Config <config> -Relation ${function:Test-BlastRadiusConflict}`, where each item
    record carries `key` (the `items[].issue_num` value), `radius` (the item's radius hashtable, not
    a string), and the optional complexity `band`, and `-Config` is the required parsed
    `config/blast-radius.json` mapping, which push-down publishes into the destination workspace.
-   The entry point applies the contention relation `Test-BlastRadiusConflict` to every unordered
+   The -Relation argument is required and carries the facade's detection relation; an omitted
+   relation fails fast. The entry point applies the contention relation `Test-BlastRadiusConflict` to every unordered
    pair and then the integration-cost edge rule of `.claude/rules/parallel-orchestration.md`
    (hard classes, integer cost, pairwise benefit, and the configured `conflict_tolerance`); the
    relation still reads the mapping's optional `mergeable_paths` list and contributes no

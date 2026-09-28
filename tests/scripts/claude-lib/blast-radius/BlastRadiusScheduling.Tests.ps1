@@ -52,6 +52,9 @@ BeforeAll {
     $schedulingPath = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/blast-radius/BlastRadiusScheduling.psm1").Path
     Import-Module $facadePath -Force
     Import-Module $schedulingPath -Force
+    # The relation is passed explicitly to every scheduling call, so no call
+    # depends on command resolution inside the scheduling module.
+    $script:ConflictRelation = ${function:Test-BlastRadiusConflict}
 
     # The committed conflict_tolerance member (plan block B2), returned fresh so
     # a test may mutate its copy.
@@ -154,7 +157,7 @@ Describe 'BlastRadiusScheduling' {
             $a = Get-TestRadius -Paths 'src/a.py' -SharedSurfaces 'poetry.lock'
             $b = Get-TestRadius -Paths 'src/b.py' -SharedSurfaces 'poetry.lock'
             foreach ($tolerance in @(0, 100, 1000000)) {
-                $decision = Get-BlastRadiusPairDecision -RadiusA $a -RadiusB $b -Config (Get-TestConfig -Override @{ tolerance_percent = $tolerance })
+                $decision = Get-BlastRadiusPairDecision -RadiusA $a -RadiusB $b -Config (Get-TestConfig -Override @{ tolerance_percent = $tolerance }) -Relation $script:ConflictRelation
                 $decision['hard'] | Should -BeTrue -Because "tolerance $tolerance keeps a shared surface hard"
                 $decision['edge'] | Should -BeTrue -Because "tolerance $tolerance keeps a hard pair an edge"
             }
@@ -163,7 +166,7 @@ Describe 'BlastRadiusScheduling' {
         It 'treats a contract dependency as hard' {
             $a = Get-TestRadius -Paths 'src/a.py' -Contracts 'computeWidget'
             $b = Get-TestRadius -Paths 'src/b.py' -Contracts 'computeWidget'
-            $decision = Get-BlastRadiusPairDecision -RadiusA $a -RadiusB $b -Config (Get-TestConfig -Override @{ tolerance_percent = 1000000 })
+            $decision = Get-BlastRadiusPairDecision -RadiusA $a -RadiusB $b -Config (Get-TestConfig -Override @{ tolerance_percent = 1000000 }) -Relation $script:ConflictRelation
             $decision['hard'] | Should -BeTrue
             $decision['edge'] | Should -BeTrue
             $decision['cost'] | Should -Be 0 -Because 'a contract dependency carries no cost term'
@@ -226,8 +229,8 @@ Describe 'BlastRadiusScheduling' {
         It 'applies the integer inequality strictly at its boundary' {
             $a = Get-TestRadius -Paths 'scripts/dev_tools'
             $b = Get-TestRadius -Paths 'scripts/dev_tools/x.py'
-            $below = Get-BlastRadiusPairDecision -RadiusA $a -RadiusB $b -Config (Get-TestConfig -Override @{ tolerance_percent = 199 })
-            $at = Get-BlastRadiusPairDecision -RadiusA $a -RadiusB $b -Config (Get-TestConfig -Override @{ tolerance_percent = 200 })
+            $below = Get-BlastRadiusPairDecision -RadiusA $a -RadiusB $b -Config (Get-TestConfig -Override @{ tolerance_percent = 199 }) -Relation $script:ConflictRelation
+            $at = Get-BlastRadiusPairDecision -RadiusA $a -RadiusB $b -Config (Get-TestConfig -Override @{ tolerance_percent = 200 }) -Relation $script:ConflictRelation
             @($below['cost'], $below['benefit']) | Should -Be @(2, 1)
             $below['edge'] | Should -BeTrue -Because '200 > 199 yields an edge'
             $at['edge'] | Should -BeFalse -Because '200 > 200 is false, so the pair is tolerated'
@@ -237,8 +240,8 @@ Describe 'BlastRadiusScheduling' {
 
         It 'records the first canonical reason kind' {
             $config = Get-TestConfig
-            $first = Get-BlastRadiusPairDecision -RadiusA (Get-TestRadius -Paths 'src/app.py' -Modules 'core') -RadiusB (Get-TestRadius -Paths 'src/app.py' -Modules 'core') -Config $config
-            $second = Get-BlastRadiusPairDecision -RadiusA (Get-TestRadius -Modules 'core' -SharedSurfaces 'poetry.lock') -RadiusB (Get-TestRadius -Modules 'core' -SharedSurfaces 'poetry.lock') -Config $config
+            $first = Get-BlastRadiusPairDecision -RadiusA (Get-TestRadius -Paths 'src/app.py' -Modules 'core') -RadiusB (Get-TestRadius -Paths 'src/app.py' -Modules 'core') -Config $config -Relation $script:ConflictRelation
+            $second = Get-BlastRadiusPairDecision -RadiusA (Get-TestRadius -Modules 'core' -SharedSurfaces 'poetry.lock') -RadiusB (Get-TestRadius -Modules 'core' -SharedSurfaces 'poetry.lock') -Config $config -Relation $script:ConflictRelation
             @($first['reasons']) | Should -Be @('path_overlap', 'module_overlap')
             $first['reason'] | Should -BeExactly 'path_overlap'
             @($second['reasons']) | Should -Be @('module_overlap', 'shared_surface_overlap')
@@ -274,7 +277,7 @@ Describe 'BlastRadiusScheduling' {
                 $item = @($fixture['items'] | ForEach-Object { @{ key = $_['key']; radius = $_['radius']; band = $_['band'] } })
                 $index = 0
                 foreach ($fixtureCase in $fixture['cases']) {
-                    $result = Get-BlastRadiusConflictEdge -Item $item -Config (Get-ConfigForCase -Config $fixture['config'] -TolerancePercent $fixtureCase['tolerance_percent'])
+                    $result = Get-BlastRadiusConflictEdge -Item $item -Config (Get-ConfigForCase -Config $fixture['config'] -TolerancePercent $fixtureCase['tolerance_percent']) -Relation $script:ConflictRelation
                     Format-TestEdge -Edge @($result['edges']) | Should -Be (Format-TestEdge -Edge @($fixtureCase['expected_edges'])) -Because "$FixtureName case $index edges"
                     Format-TestTolerated -Overlap @($result['tolerated_overlaps']) | Should -Be (Format-TestTolerated -Overlap @($fixtureCase['expected_tolerated'])) -Because "$FixtureName case $index tolerated overlaps"
                     $index++
@@ -310,7 +313,7 @@ Describe 'BlastRadiusScheduling' {
                 $detected = (Test-BlastRadiusConflict -RadiusA $fixtureInput['radius_a'] -RadiusB $fixtureInput['radius_b'] -Config $absent)['conflict']
                 $expected = if ($detected) { @('1-2') } else { @() }
                 foreach ($config in @($absent, $zero)) {
-                    $result = Get-BlastRadiusConflictEdge -Item $item -Config $config
+                    $result = Get-BlastRadiusConflictEdge -Item $item -Config $config -Relation $script:ConflictRelation
                     @($result['edges'] | ForEach-Object { '{0}-{1}' -f $_['a'], $_['b'] }) | Should -Be $expected -Because $FixtureName
                     @($result['tolerated_overlaps']).Count | Should -Be 0 -Because $FixtureName
                 }
@@ -328,11 +331,11 @@ Describe 'BlastRadiusScheduling' {
                 @{ key = 1; radius = (Get-TestRadius -Paths 'CHANGELOG.md'); band = 'C4' },
                 @{ key = 7; radius = (Get-TestRadius -Paths $shared); band = 'C4' }
             )
-            $result = Get-BlastRadiusConflictEdge -Item $item -Config (Get-TestConfig -Override @{ tolerance_percent = 50 })
+            $result = Get-BlastRadiusConflictEdge -Item $item -Config (Get-TestConfig -Override @{ tolerance_percent = 50 }) -Relation $script:ConflictRelation
             @($result['edges'] | ForEach-Object { '{0}-{1}' -f $_['a'], $_['b'] }) | Should -Be @('3-7', '3-9', '7-9')
             @($result['tolerated_overlaps'] | ForEach-Object { '{0}-{1}' -f $_['a'], $_['b'] }) | Should -Be @('1-5')
-            { Get-BlastRadiusConflictEdge -Item @($item[0], $item[0]) -Config (Get-TestConfig) } | Should -Throw -ExpectedMessage '*distinct*'
-            { Get-BlastRadiusConflictEdge -Item @(@{ key = $true; radius = (Get-TestRadius) }) -Config (Get-TestConfig) } | Should -Throw -ExpectedMessage '*key*'
+            { Get-BlastRadiusConflictEdge -Item @($item[0], $item[0]) -Config (Get-TestConfig) -Relation $script:ConflictRelation } | Should -Throw -ExpectedMessage '*distinct*'
+            { Get-BlastRadiusConflictEdge -Item @(@{ key = $true; radius = (Get-TestRadius) }) -Config (Get-TestConfig) -Relation $script:ConflictRelation } | Should -Throw -ExpectedMessage '*key*'
         }
 
         It 'decides (b, a) the same as (a, b)' {
@@ -342,8 +345,8 @@ Describe 'BlastRadiusScheduling' {
                 $fixtureInput = (Read-TestFixture -Path $file.FullName)['input']
                 $config = Copy-TestValue -Value $fixtureInput['config']
                 $config['conflict_tolerance'] = Get-CommittedToleranceMember
-                $forward = Get-BlastRadiusPairDecision -RadiusA $fixtureInput['radius_a'] -RadiusB $fixtureInput['radius_b'] -Config $config -BandA 'C2' -BandB 'C4'
-                $reverse = Get-BlastRadiusPairDecision -RadiusA $fixtureInput['radius_b'] -RadiusB $fixtureInput['radius_a'] -Config $config -BandA 'C4' -BandB 'C2'
+                $forward = Get-BlastRadiusPairDecision -RadiusA $fixtureInput['radius_a'] -RadiusB $fixtureInput['radius_b'] -Config $config -BandA 'C2' -BandB 'C4' -Relation $script:ConflictRelation
+                $reverse = Get-BlastRadiusPairDecision -RadiusA $fixtureInput['radius_b'] -RadiusB $fixtureInput['radius_a'] -Config $config -BandA 'C4' -BandB 'C2' -Relation $script:ConflictRelation
                 foreach ($field in @('conflict', 'edge', 'hard', 'cost', 'benefit', 'reason')) {
                     $reverse[$field] | Should -Be $forward[$field] -Because "$($file.BaseName) field $field"
                 }
@@ -351,9 +354,19 @@ Describe 'BlastRadiusScheduling' {
             }
         }
 
-        It 'fails fast naming the facade when Test-BlastRadiusConflict is unavailable' {
-            Mock -ModuleName BlastRadiusScheduling Get-Command { $null } -ParameterFilter { $Name -eq 'Test-BlastRadiusConflict' }
-            { Get-BlastRadiusPairDecision -RadiusA (Get-TestRadius) -RadiusB (Get-TestRadius) -Config (Get-TestConfig) } | Should -Throw -ExpectedMessage '*BlastRadius.psm1*'
+        It 'fails fast naming -Relation when the relation is omitted' {
+            { Get-BlastRadiusPairDecision -RadiusA (Get-TestRadius) -RadiusB (Get-TestRadius) -Config (Get-TestConfig) } | Should -Throw -ExpectedMessage '*-Relation is required*BlastRadius.psm1*'
+            { Get-BlastRadiusConflictEdge -Item @() -Config (Get-TestConfig) } | Should -Throw -ExpectedMessage '*-Relation is required*BlastRadius.psm1*'
+        }
+
+        It 'invokes the supplied relation rather than resolving a command' {
+            # Two empty radii never conflict under Test-BlastRadiusConflict, so a
+            # conflict here can only come from the supplied stub.
+            $stub = { @{ conflict = $true; reasons = @(@{ kind = 'contract_dependency'; detail = 'stub' }) } }
+            $decision = Get-BlastRadiusPairDecision -RadiusA (Get-TestRadius) -RadiusB (Get-TestRadius) -Config (Get-TestConfig) -Relation $stub
+            $decision['conflict'] | Should -BeTrue
+            $decision['hard'] | Should -BeTrue
+            $decision['reason'] | Should -BeExactly 'contract_dependency'
         }
     }
 }

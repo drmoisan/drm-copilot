@@ -167,8 +167,10 @@ The facade exports `Get-PlanPaths`, `Get-BlastRadius`, `Get-BlastRadiusFromObser
 The facade also exports the scheduling entry point Get-BlastRadiusConflictEdge (with its per-pair
 helper `Get-BlastRadiusPairDecision`), the PowerShell port of `schedule_conflict_edges` in
 `scripts/dev_tools/_blast_radius_scheduling.py`. Build the conflict edges with one call,
-`Get-BlastRadiusConflictEdge -Item <records carrying key, radius, band> -Config <parsed truth table>`,
-rather than applying `Test-BlastRadiusConflict` to each pair by hand. It applies the detection
+`Get-BlastRadiusConflictEdge -Item <records carrying key, radius, band> -Config <parsed truth table> -Relation ${function:Test-BlastRadiusConflict}`,
+rather than applying `Test-BlastRadiusConflict` to each pair by hand. The -Relation argument is
+required: the scheduling module does not resolve the relation itself, and an omitted relation fails
+fast. It applies the detection
 relation to every unordered pair and then the integration-cost edge rule of
 `.claude/rules/parallel-orchestration.md` under the table's configured `conflict_tolerance`, and
 returns `edges` and `tolerated_overlaps`. Record the edges in `conflict_edges[]` (each entry may

@@ -314,13 +314,14 @@ The library returns the partition; the planner supplies the record fields.
 1. Invoke `compute-cohorts.sh` exactly once per plan run, over the full conflict graph, after every
    item is `prepared` and radius-validated. Derive the conflict edge set with one call to the
    scheduling entry point over every item's `declared` radius and complexity band: Get-BlastRadiusConflictEdge
-   (`Get-BlastRadiusConflictEdge -Item <records carrying key, radius, band> -Config <parsed truth table>`)
+   (`Get-BlastRadiusConflictEdge -Item <records carrying key, radius, band> -Config <parsed truth table> -Relation ${function:Test-BlastRadiusConflict}`)
    in PowerShell, or `schedule_conflict_edges(items, config)` (re-exported from
    `compute_blast_radius.py`, taking `SchedulingItem` records) in Python. Do not apply the
    detection relation to each pair by hand: the entry point applies it to every unordered pair and
    then applies the integration-cost edge rule of `.claude/rules/parallel-orchestration.md`
    (hard classes, integer cost, pairwise benefit, and the configured `conflict_tolerance`). It
-   returns `edges` and `tolerated_overlaps`. Pass the returned `edges` pairs as
+   returns `edges` and `tolerated_overlaps`. The -Relation argument is required; pass the facade's
+   Test-BlastRadiusConflict function object as shown. Pass the returned `edges` pairs as
    `--edges "<a>:<b> ..."` and the item keys as `--keys "<k1> <k2> ..."`.
    The detection relation inside the entry point contributes no `path_overlap` edge for a path
    matching the truth table's optional `mergeable_paths` list, and the path stays in the declared

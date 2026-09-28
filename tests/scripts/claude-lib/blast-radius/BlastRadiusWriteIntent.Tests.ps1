@@ -38,6 +38,9 @@ $readerCase = @(
 BeforeAll {
     $libraryDirectory = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/blast-radius").Path
     Import-Module (Join-Path $libraryDirectory 'BlastRadius.psm1') -Force
+    # The relation is passed explicitly to every scheduling call, so no call
+    # depends on command resolution inside the scheduling module.
+    $script:ConflictRelation = ${function:Test-BlastRadiusConflict}
     # A second, direct import exposes the module scope that holds the constants.
     $script:WriteIntentModule = Import-Module (Join-Path $libraryDirectory 'BlastRadiusWriteIntent.psm1') -Force -PassThru
     $script:PythonModulePath = (Resolve-Path "$PSScriptRoot/../../../../scripts/dev_tools/_blast_radius_write_intent.py").Path
@@ -187,8 +190,8 @@ Describe 'BlastRadiusWriteIntent' {
             $second = Get-TestDerivedRadius -PlanText (Format-TestTask 'Update `config/blast-radius.json` again.') -Config $config -Folder 'demo-second'
             @($reader['shared_surfaces']).Count | Should -Be 0
             @($reader['paths']) | Should -Contain 'src/alpha.py'
-            (Get-BlastRadiusPairDecision -RadiusA $reader -RadiusB $writer -Config $config)['conflict'] | Should -BeFalse
-            (Get-BlastRadiusPairDecision -RadiusA $writer -RadiusB $second -Config $config)['hard'] | Should -BeTrue
+            (Get-BlastRadiusPairDecision -RadiusA $reader -RadiusB $writer -Config $config -Relation $script:ConflictRelation)['conflict'] | Should -BeFalse
+            (Get-BlastRadiusPairDecision -RadiusA $writer -RadiusB $second -Config $config -Relation $script:ConflictRelation)['hard'] | Should -BeTrue
         }
 
         It 'matches current behavior when the flag is absent' {
@@ -295,7 +298,7 @@ Describe 'BlastRadiusWriteIntent' {
                     }
                 }
                 if ($case.ContainsKey('expected_edges')) {
-                    $result = Get-BlastRadiusConflictEdge -Item $derived.ToArray() -Config $config
+                    $result = Get-BlastRadiusConflictEdge -Item $derived.ToArray() -Config $config -Relation $script:ConflictRelation
                     $edges = @($result['edges'] | ForEach-Object { '{0}-{1}|{2}|{3}|{4}|{5}' -f $_['a'], $_['b'], $_['reason'], $_['hard'], $_['cost'], $_['benefit'] })
                     $expectedEdges = @($case['expected_edges'] | ForEach-Object { '{0}-{1}|{2}|{3}|{4}|{5}' -f $_['a'], $_['b'], $_['reason'], $_['hard'], $_['cost'], $_['benefit'] })
                     Join-TestValue $edges | Should -BeExactly (Join-TestValue $expectedEdges)
