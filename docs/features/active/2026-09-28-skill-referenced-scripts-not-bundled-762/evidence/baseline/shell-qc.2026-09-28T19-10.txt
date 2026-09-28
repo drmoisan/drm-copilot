@@ -1,0 +1,42 @@
+CHECK_EXIT=0
+      (from function `run' in file /usr/lib/bats-core/test_functions.bash, line 420,
+       in test file tests/shell/test_shell_qc_commands.bats, line 106)
+BW01: `run`'s command `env SHELL_QC_BATS_BIN=/mnt/c/Users/DanMoisan/repos/drm-copilot-wt-skill-bundled-scripts/tests/fixtures/shell_qc/stub-bin/bats SHELL_QC_KCOV_BIN=/nonexistent/definitely-not-a-tool bash -c cd '/mnt/c/Users/DanMoisan/repos/drm-copilot-wt-skill-bundled-scripts/tests/fixtures/shell_qc' && bash '/mnt/c/Users/DanMoisan/repos/drm-copilot-wt-skill-bundled-scripts/scripts/bash/shell-qc.sh' test --coverage` exited with code 127, indicating 'Command not found'. Use run's return code checks, e.g. `run -127`, to fix this message.
+      (from function `run' in file /usr/lib/bats-core/test_functions.bash, line 420,
+       in test file tests/shell/test_shell_qc_commands.bats, line 113)
+es drm-copilot
+ok 444 coverage_demo.sh runs successfully with default argument
+ok 445 coverage_demo.sh accepts a custom name argument
+ok 446 coverage_lib.sh greet_user function outputs greeting
+ok 447 check prints the no-scripts skip message and exits 0
+ok 448 check exits 127 with the five-line block when shfmt is missing
+ok 449 check exits 127 with the block when shellcheck is missing
+ok 450 check returns the shfmt exit code when only shfmt fails
+ok 451 check returns the shellcheck exit code when only shellcheck fails
+ok 452 check returns the maximum exit code when both tools fail
+ok 453 check invokes shfmt once over the full list and shellcheck once per file
+ok 454 format passes -w to shfmt
+ok 455 test prints the exact no-test-directory skip marker and exits 0
+ok 456 test prints the exact bats-missing skip marker and exits 0
+ok 457 test --coverage exits 127 with the coverage message when bats is missing
+ok 458 test --coverage exits 127 with message and block when kcov is missing
+ok 459 test --coverage builds the kcov argv and merges the runs
+ok 460 extract_cobertura_line_rate reads the fixture line-rate
+ok 461 print_coverage_summary formats the fixture line-rate to one decimal percent
+ok 462 --help prints usage and exits 0
+ok 463 help subcommand prints usage and exits 0
+ok 464 an unknown subcommand prints usage and exits 2
+ok 465 an unknown test flag exits 2
+ok 466 extract_shebang_command reads extensionless env bash shebang
+ok 467 extract_shebang_command handles env -S flags form
+ok 468 extract_shebang_command lowercases an uppercase shebang
+ok 469 extract_shebang_command handles a plain sh shebang
+ok 470 is_shell_script accepts a .sh suffix
+ok 471 is_shell_script rejects a non-shell text file
+ok 472 is_shell_script rejects a pwsh shebang
+ok 473 discover_shell_scripts finds .sh suffix and every bash/sh shebang form
+ok 474 discover_shell_scripts finds a .sh file under the .claude/lib/bash root
+ok 475 discover_shell_scripts prunes the excluded node_modules directory
+ok 476 discover_shell_scripts ignores non-shell files (txt and ps1)
+ok 477 discover_shell_scripts output is sorted and de-duplicated
+TEST_EXIT=1
