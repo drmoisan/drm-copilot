@@ -1,0 +1,87 @@
+{
+  "description": "Issue #722 scheduling case derived from the issue #452 directory-prefix class. Three items name a listed directory, a glob rooted at that directory, and a file inside it; the radii are copied from the #452 directory fixtures and embedded here, not referenced. Every pair is detected as path_overlap with the possible_overlap cost 2 and, with no band recorded, the default_band benefit 1. The pairs are edges at tolerance 0 and 100 and are tolerated overlaps at a very large tolerance.",
+  "tags": ["#722", "#452-case"],
+  "config": {
+    "version": 1,
+    "shared_surfaces": [],
+    "shared_surface_globs": [],
+    "mandate_reads": [],
+    "mergeable_paths": [],
+    "conflict_tolerance": {
+      "tolerance_percent": 100,
+      "weights": { "same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2 },
+      "band_durations": { "C1": 1, "C2": 2, "C3": 4, "C4": 8 },
+      "default_band": "C1",
+      "append_only_paths": ["CHANGELOG.md"]
+    },
+    "modules": { "config": ["config/**"] },
+    "over_breadth_fraction": 0.25
+  },
+  "items": [
+    {
+      "key": 1,
+      "band": null,
+      "radius": {
+        "paths": ["scripts/dev_tools"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    },
+    {
+      "key": 2,
+      "band": null,
+      "radius": {
+        "paths": ["scripts/dev_tools/**"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    },
+    {
+      "key": 3,
+      "band": null,
+      "radius": {
+        "paths": ["scripts/dev_tools/compute_blast_radius.py"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "tolerance_percent": 0,
+      "expected_edges": [
+        { "a": 1, "b": 2, "reason": "path_overlap", "hard": false, "cost": 2, "benefit": 1 },
+        { "a": 1, "b": 3, "reason": "path_overlap", "hard": false, "cost": 2, "benefit": 1 },
+        { "a": 2, "b": 3, "reason": "path_overlap", "hard": false, "cost": 2, "benefit": 1 }
+      ],
+      "expected_tolerated": []
+    },
+    {
+      "tolerance_percent": 100,
+      "expected_edges": [
+        { "a": 1, "b": 2, "reason": "path_overlap", "hard": false, "cost": 2, "benefit": 1 },
+        { "a": 1, "b": 3, "reason": "path_overlap", "hard": false, "cost": 2, "benefit": 1 },
+        { "a": 2, "b": 3, "reason": "path_overlap", "hard": false, "cost": 2, "benefit": 1 }
+      ],
+      "expected_tolerated": []
+    },
+    {
+      "tolerance_percent": 1000000,
+      "expected_edges": [],
+      "expected_tolerated": [
+        { "a": 1, "b": 2, "reasons": ["path_overlap"], "cost": 2, "benefit": 1 },
+        { "a": 1, "b": 3, "reasons": ["path_overlap"], "cost": 2, "benefit": 1 },
+        { "a": 2, "b": 3, "reasons": ["path_overlap"], "cost": 2, "benefit": 1 }
+      ]
+    }
+  ]
+}

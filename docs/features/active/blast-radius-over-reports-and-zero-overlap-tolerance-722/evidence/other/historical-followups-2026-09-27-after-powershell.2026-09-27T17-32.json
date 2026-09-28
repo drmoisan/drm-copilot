@@ -1,0 +1,170 @@
+{
+  "mode": "after",
+  "runtime": "powershell",
+  "slug": "followups-2026-09-27",
+  "config": "config/blast-radius.json at HEAD 6f81b876df5dfb2334cf84c58b2dd408dbba5335",
+  "items": [
+    706,
+    707,
+    708,
+    709,
+    710,
+    711,
+    712,
+    713,
+    714,
+    715,
+    716
+  ],
+  "edges": [
+    {
+      "a": 706,
+      "b": 707,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 16,
+      "benefit": 4
+    },
+    {
+      "a": 706,
+      "b": 708,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 16,
+      "benefit": 4
+    },
+    {
+      "a": 706,
+      "b": 710,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 16,
+      "benefit": 4
+    },
+    {
+      "a": 706,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 16,
+      "benefit": 4
+    },
+    {
+      "a": 706,
+      "b": 715,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 48,
+      "benefit": 2
+    },
+    {
+      "a": 707,
+      "b": 708,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 100,
+      "benefit": 4
+    },
+    {
+      "a": 707,
+      "b": 709,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 50,
+      "benefit": 4
+    },
+    {
+      "a": 707,
+      "b": 710,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 132,
+      "benefit": 4
+    },
+    {
+      "a": 707,
+      "b": 711,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 8,
+      "benefit": 2
+    },
+    {
+      "a": 707,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 148,
+      "benefit": 4
+    },
+    {
+      "a": 708,
+      "b": 709,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 34,
+      "benefit": 4
+    },
+    {
+      "a": 708,
+      "b": 710,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 52,
+      "benefit": 4
+    },
+    {
+      "a": 708,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 76,
+      "benefit": 4
+    },
+    {
+      "a": 709,
+      "b": 710,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 66,
+      "benefit": 4
+    },
+    {
+      "a": 709,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 82,
+      "benefit": 4
+    },
+    {
+      "a": 710,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 196,
+      "benefit": 4
+    },
+    {
+      "a": 714,
+      "b": 716,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 16,
+      "benefit": 2
+    }
+  ],
+  "edge_count": 17,
+  "tolerated_overlaps": [
+    {
+      "a": 708,
+      "b": 711,
+      "reasons": [
+        "module_overlap"
+      ],
+      "cost": 2,
+      "benefit": 2
+    }
+  ],
+  "tolerated_count": 1
+}

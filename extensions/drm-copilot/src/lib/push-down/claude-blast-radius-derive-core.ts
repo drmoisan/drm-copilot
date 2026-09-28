@@ -27,9 +27,10 @@
  *     - Identical observations and identical source text produce a
  *       byte-identical output string.
  *     - The emitted key order is `version`, `shared_surfaces`,
- *       `shared_surface_globs`, `mandate_reads`, `mergeable_paths`, `modules`,
- *       `over_breadth_fraction`, with the two optional keys omitted entirely
- *       when the source document does not declare them.
+ *       `shared_surface_globs`, `mandate_reads`, `mergeable_paths`,
+ *       `conflict_tolerance`, `write_intent_extraction`, `path_roots`,
+ *       `modules`, `over_breadth_fraction`, with the five optional keys
+ *       omitted entirely when the source document does not declare them.
  *     - An observed .NET manifest suppresses the top-level-directory fallback
  *       (issue #643): a destination that declared its layout with project files
  *       has already stated its structure, so the weaker signal is not used.
@@ -124,10 +125,15 @@ export const FORBIDDEN_GLOBS: ReadonlyArray<string> = [
  *
  * The assembly literal indexes this array positionally, so a new key is
  * APPENDED rather than inserted: inserting mid-array would shift every existing
- * index. `mandate_reads` (issue #489) and `mergeable_paths` (issue #643) are
- * both optional in the source document, and `JSON.stringify` drops an
- * `undefined`-valued property, so an absent source key emits no property
- * without a conditional spread.
+ * index. `mandate_reads` (issue #489), `mergeable_paths` (issue #643), and
+ * `conflict_tolerance` (issue #722) are optional in the source document, and
+ * `JSON.stringify` drops an `undefined`-valued property, so an absent source
+ * key emits no property without a conditional spread. `conflict_tolerance`
+ * describes the scheduling runtime rather than a repository layout, so it is
+ * carried verbatim like the other runtime keys. `write_intent_extraction` and
+ * `path_roots` (issue #722) are optional too; the bundled `path_roots` is an
+ * empty list because the bundle cannot know a destination's top-level
+ * directories, and an empty list disables root anchoring there.
  */
 const CARRIED_KEYS = [
   "version",
@@ -136,6 +142,9 @@ const CARRIED_KEYS = [
   "over_breadth_fraction",
   "mandate_reads",
   "mergeable_paths",
+  "conflict_tolerance",
+  "write_intent_extraction",
+  "path_roots",
 ] as const;
 
 /**
@@ -329,8 +338,10 @@ function parseSourceDocument(text: string): JsonObject {
  * @param sourceDocumentText Text of the bundled `config/blast-radius.json`.
  * @returns The serialized destination document: 2-space indented with a
  *   trailing newline, keys in the order `version`, `shared_surfaces`,
- *   `shared_surface_globs`, `mandate_reads`, `mergeable_paths`, `modules`,
- *   `over_breadth_fraction`. `mandate_reads` and `mergeable_paths` are each
+ *   `shared_surface_globs`, `mandate_reads`, `mergeable_paths`,
+ *   `conflict_tolerance`, `write_intent_extraction`, `path_roots`, `modules`,
+ *   `over_breadth_fraction`. `mandate_reads`, `mergeable_paths`,
+ *   `conflict_tolerance`, `write_intent_extraction`, and `path_roots` are each
  *   omitted entirely when the bundled source document does not declare them.
  *   An observed .NET manifest suppresses the top-level-directory fallback, so a
  *   destination whose only structure is .NET project files derives no module
@@ -372,6 +383,9 @@ export function deriveDestinationModuleMap(
     shared_surface_globs: source[CARRIED_KEYS[2]],
     mandate_reads: source[CARRIED_KEYS[4]],
     mergeable_paths: source[CARRIED_KEYS[5]],
+    conflict_tolerance: source[CARRIED_KEYS[6]],
+    write_intent_extraction: source[CARRIED_KEYS[7]],
+    path_roots: source[CARRIED_KEYS[8]],
     modules,
     over_breadth_fraction: source[CARRIED_KEYS[3]],
   };

@@ -48,6 +48,22 @@ from scripts.dev_tools._blast_radius_extraction import (
 from scripts.dev_tools._blast_radius_glob import concrete_entries
 from scripts.dev_tools._blast_radius_mergeable import config_mergeable_paths
 from scripts.dev_tools._blast_radius_normalization import exclude_mandate_reads
+from scripts.dev_tools._blast_radius_scheduling import (
+    CONFIG_CONFLICT_TOLERANCE,
+    HARD_REASON_KINDS,
+    STRICT_CONFLICT_TOLERANCE,
+    ConflictEdge,
+    ConflictTolerance,
+    PairDecision,
+    SchedulingItem,
+    SchedulingResult,
+    ToleratedOverlap,
+    config_conflict_tolerance,
+    decide_pair,
+    pair_benefit,
+    pair_cost,
+    schedule_conflict_edges,
+)
 from scripts.dev_tools._blast_radius_validation import (
     RadiusFinding,
     config_mandate_reads,
@@ -58,21 +74,42 @@ from scripts.dev_tools._blast_radius_validation import (
     resolve_shared_surfaces,
     validate_blast_radius,
 )
+from scripts.dev_tools._blast_radius_write_intent import (
+    config_path_roots,
+    config_write_intent_extraction,
+    extract_write_intent_contracts,
+    select_plan_paths,
+    select_write_intent_path_entries,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
 __all__ = [
+    "CONFIG_CONFLICT_TOLERANCE",
+    "HARD_REASON_KINDS",
+    "STRICT_CONFLICT_TOLERANCE",
     "BlastRadius",
+    "ConflictEdge",
     "ConflictReason",
     "ConflictResult",
+    "ConflictTolerance",
+    "PairDecision",
     "RadiusFinding",
+    "SchedulingItem",
+    "SchedulingResult",
+    "ToleratedOverlap",
+    "config_conflict_tolerance",
     "config_mergeable_paths",
     "conflicts",
+    "decide_pair",
     "derive_blast_radius",
     "extract_plan_paths",
     "normalize_declared_radius",
+    "pair_benefit",
+    "pair_cost",
     "radius_from_observed_paths",
+    "schedule_conflict_edges",
     "validate_blast_radius",
 ]
 
@@ -261,15 +298,24 @@ def derive_blast_radius(
     root_surfaces = config_root_surfaces(config)
     mandate_reads = config_mandate_reads(config)
 
-    # Plan task bodies are the primary signal, the spec contributes the paths it
-    # cites in inline code, and the feature folder is always present because
-    # every item writes its own documents and evidence.
-    entries: set[str] = set(extract_plan_paths(plan_text, root_surfaces=root_surfaces))
-    entries.update(
-        extract_paths_from_lines(
-            normalize_lines(spec_text), root_surfaces=root_surfaces
+    # Write-intent mode (issue #722) takes plan paths from the selector shared
+    # with validation and lets the spec contribute contracts only. Otherwise
+    # plan task bodies are the primary signal, the spec contributes the paths it
+    # cites in inline code, and contracts come from its interface sections. The
+    # feature folder is always present because every item writes its own
+    # documents and evidence.
+    entries: set[str]
+    if config_write_intent_extraction(config):
+        entries = set(select_plan_paths(plan_text, config, root_surfaces=root_surfaces))
+        contracts = extract_write_intent_contracts(spec_text)
+    else:
+        entries = set(extract_plan_paths(plan_text, root_surfaces=root_surfaces))
+        entries.update(
+            extract_paths_from_lines(
+                normalize_lines(spec_text), root_surfaces=root_surfaces
+            )
         )
-    )
+        contracts = extract_contract_identifiers(spec_text)
 
     # Read-by-mandate citations are dropped before the feature folder is added:
     # a plan cites the policy rules because its author was told to read them,
@@ -285,7 +331,7 @@ def derive_blast_radius(
         paths=paths,
         modules=resolve_modules(paths, config),
         shared_surfaces=resolve_shared_surfaces(concrete_entries(paths), config),
-        contracts=extract_contract_identifiers(spec_text),
+        contracts=contracts,
         source=source,
         computed_at=computed_at,
     )
@@ -345,6 +391,12 @@ def normalize_declared_radius(
         for entry in radius.paths
         if classify_path_token(entry, root_surfaces=root_surfaces) is not None
     )
+    # Write-intent mode (issue #722) applies the token-level rules W1, W4, and
+    # W6 before the mandate-read filter; the feature-folder glob is kept.
+    if config_write_intent_extraction(config):
+        accepted = select_write_intent_path_entries(
+            accepted, root_surfaces=root_surfaces, path_roots=config_path_roots(config)
+        )
     paths = exclude_mandate_reads(accepted, config_mandate_reads(config))
 
     contracts = tuple(

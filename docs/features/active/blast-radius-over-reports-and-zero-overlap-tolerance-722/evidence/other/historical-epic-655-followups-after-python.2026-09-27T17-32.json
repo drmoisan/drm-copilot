@@ -1,0 +1,49 @@
+{
+  "mode": "after",
+  "runtime": "python",
+  "slug": "epic-655-followups",
+  "config": "config/blast-radius.json at HEAD 6f81b876df5dfb2334cf84c58b2dd408dbba5335",
+  "items": [
+    660,
+    663
+  ],
+  "edges": [
+    {
+      "a": 660,
+      "b": 663,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 8,
+      "benefit": 1
+    }
+  ],
+  "edge_count": 1,
+  "cohorts": [
+    [
+      660
+    ],
+    [
+      663
+    ]
+  ],
+  "cohort_count": 2,
+  "max_cohort_width": 1,
+  "tolerated_overlaps": [],
+  "tolerated_count": 0,
+  "normalized_radius_sizes": [
+    {
+      "issue_num": 660,
+      "paths": 10,
+      "modules": 0,
+      "shared_surfaces": 1,
+      "contracts": 0
+    },
+    {
+      "issue_num": 663,
+      "paths": 166,
+      "modules": 2,
+      "shared_surfaces": 3,
+      "contracts": 3
+    }
+  ]
+}

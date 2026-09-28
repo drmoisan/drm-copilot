@@ -15,7 +15,8 @@ import {
  *
  * Purpose:
  *     Pin the presence case of the second optional carried key: verbatim
- *     carriage, its position between `mandate_reads` and `modules`, and omission
+ *     carriage, its position between `mandate_reads` and `conflict_tolerance`
+ *     in the complete emission order, and omission
  *     when the source declares none. The absence case is in the core suite.
  *
  * Scope note:
@@ -54,7 +55,7 @@ const SOURCE_DOCUMENT = `${JSON.stringify(
   2,
 )}\n`;
 
-/** Bundled source document declaring both optional keys. */
+/** Bundled source document declaring every optional carried key. */
 const SOURCE_DOCUMENT_WITH_MERGEABLE_PATHS = `${JSON.stringify(
   {
     version: 1,
@@ -62,6 +63,9 @@ const SOURCE_DOCUMENT_WITH_MERGEABLE_PATHS = `${JSON.stringify(
     shared_surface_globs: [],
     mandate_reads: MANDATE_READS,
     mergeable_paths: MERGEABLE_PATHS,
+    conflict_tolerance: { tolerance_percent: 100 },
+    write_intent_extraction: true,
+    path_roots: [],
     modules: {
       config: ["config/**"],
     },
@@ -111,7 +115,7 @@ describe("issue #643: mergeable_paths carriage", () => {
     expect(document["mergeable_paths"]).toEqual(MERGEABLE_PATHS);
   });
 
-  it("emits mergeable_paths between mandate_reads and modules", () => {
+  it("emits mergeable_paths between mandate_reads and conflict_tolerance", () => {
     // Arrange
     const seeded = buildInMemoryFileSystem({}, [DEST]);
     const decorated = decorate(seeded, fakeLister({}));
@@ -127,6 +131,9 @@ describe("issue #643: mergeable_paths carriage", () => {
       "shared_surface_globs",
       "mandate_reads",
       "mergeable_paths",
+      "conflict_tolerance",
+      "write_intent_extraction",
+      "path_roots",
       "modules",
       "over_breadth_fraction",
     ]);
