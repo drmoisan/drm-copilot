@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-27T18-36
-- **Status:** Implemented (pending CI; AC-38 open)
+- **Status:** Implemented; CI green on 74ae7b5e (PR #748; AC-38 checked)
 - **Version:** 0.2
 - **Work Mode:** full-bug (acceptance criteria live in this file only; no user story)
 - **Parallel run:** blast-radius-tolerance-2026-09-27 (preparation mode)
@@ -697,8 +697,9 @@ reporting done.
   >= 75% branch coverage on the changed derivation core.
 - [x] No new or changed file exceeds 500 lines, and each plan batch stays within 3 production and
   3 test files per language.
-- [ ] CI is green on the pull request, including the windows-latest Pester job (checked off by the
-  execution child, which pushes the check-off before reporting done).
+- [x] CI is green on the pull request, including the windows-latest Pester job (checked off by the
+  execution child, which pushes the check-off before reporting done). Evidence:
+  evidence/qa-gates/ci-status.2026-09-27T22-01.md.
 
 ## Risks & Mitigations
 
