@@ -37,7 +37,7 @@ Either the test tree type-checks cleanly and a CI gate enforces it (the reposito
 ## Logs / Screenshots
 
 - [x] Attached minimal logs or screenshot
-- Snippet: recorded in `docs/features/active/2026-08-31-portable-prepared-orchestration-handoff-614/evidence/remediation-baseline/typescript-test-tree-typecheck.2026-09-07T03-16.md` (full diagnostic list at head fca8c045) and in `policy-audit.2026-09-07T08-00.md`, out-of-scope observation 3.
+- Snippet: recorded in `docs/features/completed/2026-08-31-portable-prepared-orchestration-handoff-614/evidence/remediation-baseline/typescript-test-tree-typecheck.2026-09-07T03-16.md` (full diagnostic list at head fca8c045) and in `policy-audit.2026-09-07T08-00.md`, out-of-scope observation 3.
 
 ## Impact / Severity
 

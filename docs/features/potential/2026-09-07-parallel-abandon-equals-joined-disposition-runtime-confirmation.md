@@ -4,7 +4,7 @@
 - Author: drmoisan
 - Status: Draft
 - Source: issue #545 specification, design decision D11.6, follow-up 2 of 2
-- Specification: `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md`
+- Specification: `docs/features/completed/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md`
 
 ## Problem / Why
 
@@ -21,7 +21,7 @@ an observed return value.
 That runtime confirmation has now been performed under issue #545, task [P10-T12], and is recorded
 at:
 
-`docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/evidence/regression-testing/at12-runtime-confirmation.2026-09-07T15-25.md`
+`docs/features/completed/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/evidence/regression-testing/at12-runtime-confirmation.2026-09-07T15-25.md`
 
 That artifact records an executed run against the unfixed hook in which
 `Test-ParallelAbandonCommandInScope` returned `$false` for the equals-joined spelling and `$true` for

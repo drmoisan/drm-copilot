@@ -22,7 +22,7 @@ The final #631 code review (`code-review.2026-09-07T20-15.md`, findings CR-R4-01
 
 ## Steps to Reproduce
 
-1. Read `docs/features/active/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/spec.md` lines 202-212, then lines 280-281 and 410-412.
+1. Read `docs/features/completed/2026-09-06-cleanup-worktrees-report-mode-visibility-gaps-631/spec.md` lines 202-212, then lines 280-281 and 410-412.
 2. Observe that lines 280 and 411 state a pairwise `merge-base --is-ancestor` hard failure maps to `ANCESTRY_ERROR`, while the invariant section and the delivered code do not map that failure onto the branch verdict.
 3. Run the bats suite under kcov and inspect coverage for `scripts/bash/cleanup_worktrees_report_records_lib.sh`: the pairwise-probe `rc=2` path and the `run_report_scans` scan-failure / rc-maximization block are never executed.
 

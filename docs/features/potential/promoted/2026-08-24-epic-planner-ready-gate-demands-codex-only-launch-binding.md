@@ -82,4 +82,4 @@ Separately, decide whether `require_generated_orchestrator=True` should remain u
 - [x] Promote to GitHub issue (bug-report template)
 - [ ] Move to active fix folder / branch
 
-Related: issue #524, feature folder `docs/features/active/2026-08-23-epic-require-complete-demands-launch-binding-no-agent-ever-writes-524/`. That folder's `plan.2026-08-23T23-24.md` declares this defect explicitly out of scope in its "Explicitly out of scope" section and mandates this filing in task P5-T4.
+Related: issue #524, feature folder `docs/features/completed/2026-08-23-epic-require-complete-demands-launch-binding-no-agent-ever-writes-524/`. That folder's `plan.2026-08-23T23-24.md` declares this defect explicitly out of scope in its "Explicitly out of scope" section and mandates this filing in task P5-T4.

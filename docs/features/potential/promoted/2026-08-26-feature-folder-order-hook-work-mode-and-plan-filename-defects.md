@@ -63,7 +63,7 @@ enforces nothing.
 
 - [x] Attached minimal logs or screenshot
 - Snippet: recorded under issue #518 at
-  `docs/features/active/2026-08-23-prd-feature-gate-resolves-nested-artifact-as-feature-folder-518/spec.md`,
+  `docs/features/completed/2026-08-23-prd-feature-gate-resolves-nested-artifact-as-feature-folder-518/spec.md`,
   section "Scope & Non-Goals", subsection "Explicitly excluded systems, integrations, or datasets".
 
 ## Impact / Severity

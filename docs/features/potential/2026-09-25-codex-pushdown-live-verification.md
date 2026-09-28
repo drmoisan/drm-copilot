@@ -3,7 +3,7 @@
 - Date captured: 2026-09-25
 - Author: Dan Moisan
 - Status: Draft
-- Source: issue #697 (`docs/features/active/2026-09-25-codex-pushdown-self-sufficiency-697/spec.md`, AC-2.5)
+- Source: issue #697 (`docs/features/completed/2026-09-25-codex-pushdown-self-sufficiency-697/spec.md`, AC-2.5)
 
 ## Problem / Why
 
