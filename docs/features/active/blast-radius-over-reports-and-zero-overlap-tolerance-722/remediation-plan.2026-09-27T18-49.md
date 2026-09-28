@@ -465,18 +465,18 @@ No task in this phase writes an evidence artifact: every result is reported to t
 tree stays clean after each push. Every Phase 0 through Phase 2 task is ticked in this plan file
 before P3-T1 runs; P3-T1 and P3-T2 are ticked by P3-T3.
 
-- [ ] [P3-T1] Implementation commit and push: run CMD-GIT-STATUS, then CMD-GIT-ADD with exactly the
+- [x] [P3-T1] Implementation commit and push: run CMD-GIT-STATUS, then CMD-GIT-ADD with exactly the
       thirteen paths of "Files written by this cycle", FEATURE/remediation-inputs.2026-09-27T18-49.md,
       FEATURE/remediation-plan.2026-09-27T18-49.md, and FEATURE/evidence; then CMD-GIT-COMMIT with the
       message "fix(722): pass the conflict relation to the scheduling layer explicitly" (one commit,
       both trailers as the catalogue gives them); then CMD-GIT-PUSH; then CMD-GIT-STATUS again.
       Report the commit SHA and the command results to the caller. Acceptance: add, commit, and push
       exit 0; the final CMD-GIT-STATUS prints nothing.
-- [ ] [P3-T2] AC-38 remains open: run CMD-GIT-COUNT-OPEN over FEATURE/spec.md, then
+- [x] [P3-T2] AC-38 remains open: run CMD-GIT-COUNT-OPEN over FEATURE/spec.md, then
       CMD-GIT-DIFF-NAMES with base R_HEAD and pathspec FEATURE/spec.md, then CMD-GIT-STATUS-PATH with
       the same pathspec. Report the outputs to the caller. Acceptance: CMD-GIT-COUNT-OPEN prints the
       count 1; the diff and the status each print nothing. AC-38 stays unchecked.
-- [ ] [P3-T3] Completion commit and push: tick P3-T1, P3-T2, and this task's own checkbox in
+- [x] [P3-T3] Completion commit and push: tick P3-T1, P3-T2, and this task's own checkbox in
       FEATURE/remediation-plan.2026-09-27T18-49.md and change nothing else in any file; then run
       CMD-GIT-ADD with only FEATURE/remediation-plan.2026-09-27T18-49.md; then CMD-GIT-COMMIT with the
       message "docs(722): record remediation cycle 1 completion"; then CMD-GIT-PUSH; then
