@@ -205,7 +205,7 @@ policy is not confirmed in this repository and must be re-checked against npm's 
 before that option is evaluated.
 
 The full decision procedure, including the confirmation steps for each option, is in
-`docs/features/active/2026-08-23-tag-push-can-silently-skip-npm-publish-526/runbooks/burned-version-disposition.runbook.md`.
+`docs/features/completed/2026-08-23-tag-push-can-silently-skip-npm-publish-526/runbooks/burned-version-disposition.runbook.md`.
 
 ## Retroactive detection
 

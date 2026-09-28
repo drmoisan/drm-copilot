@@ -2,7 +2,7 @@
 
 - Date captured: 2026-09-07
 - Source: feature review of issue #545 (`enforcement-hook-trigger-matches-whole-command-text`), child E of the `cleanup-merged-worktrees-hardening` epic
-- Audit artifacts: `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/` — `code-review.2026-09-07T17-44.md`, `policy-audit.2026-09-07T17-44.md`, `feature-audit.2026-09-07T17-44.md`, `remediation-inputs.2026-09-07T17-44.md`
+- Audit artifacts: `docs/features/completed/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/` — `code-review.2026-09-07T17-44.md`, `policy-audit.2026-09-07T17-44.md`, `feature-audit.2026-09-07T17-44.md`, `remediation-inputs.2026-09-07T17-44.md`
 - Status: filed, not fixed. Each entry below is independently promotable; they are grouped here because they were surfaced by one review pass, not because they must be delivered together.
 
 This entry discharges exit condition 7 of the issue #545 remediation cycle: "F-1 through F-7 are filed as

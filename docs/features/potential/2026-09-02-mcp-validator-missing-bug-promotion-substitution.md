@@ -62,7 +62,7 @@ Workaround used: treat the Python CLI as authoritative per the existing document
 ## Proposed Fix / Validation Ideas
 
 - [x] Unit coverage areas: a TypeScript unit test constructing a bug-type checkpoint (mirroring the existing Python test fixtures for `_resolve_promotion_entry_tools`) and asserting the MCP/TS surface accepts it under `require_complete`.
-- [x] Integration scenario to retest: re-run `mcp__drm-copilot__validate_orchestration_artifacts` against the checkpoint that produced this report (issue #620's `artifacts/orchestration/orchestrator-state.json`, feature folder `docs/features/active/2026-09-01-blast-radius-mandate-reads-scripts-vscode-620/`) once fixed, and confirm it now passes.
+- [x] Integration scenario to retest: re-run `mcp__drm-copilot__validate_orchestration_artifacts` against the checkpoint that produced this report (issue #620's `artifacts/orchestration/orchestrator-state.json`, feature folder `docs/features/completed/2026-09-01-blast-radius-mandate-reads-scripts-vscode-620/`) once fixed, and confirm it now passes.
 - [ ] Manual verification notes
 
 ## Second confirmed instance (2026-09-03, issue #627)

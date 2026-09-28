@@ -37,7 +37,7 @@ The selection rule `Sort-Object -Property Length -Descending` at line 150 return
 ## Logs / Screenshots
 
 - [x] Attached minimal logs or screenshot
-- Snippet: see the reproduction and root-cause analysis recorded under issue #518 at `docs/features/active/2026-08-23-prd-feature-gate-resolves-nested-artifact-as-feature-folder-518/spec.md`, sections "Repro & Evidence" and "Root Cause Analysis", and the research artifact in that folder's `research/` subtree, section 4, which enumerates all four affected hooks.
+- Snippet: see the reproduction and root-cause analysis recorded under issue #518 at `docs/features/completed/2026-08-23-prd-feature-gate-resolves-nested-artifact-as-feature-folder-518/spec.md`, sections "Repro & Evidence" and "Root Cause Analysis", and the research artifact in that folder's `research/` subtree, section 4, which enumerates all four affected hooks.
 
 ## Impact / Severity
 

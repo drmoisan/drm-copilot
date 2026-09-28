@@ -9,7 +9,7 @@
 - Last Updated: 2026-09-07
 ## Problem / Why
 
-The portable prepared-orchestration handoff (#614, PR #638) merged with zero blocking review findings, but the final review cycle (`docs/features/active/2026-08-31-portable-prepared-orchestration-handoff-614/remediation-inputs.2026-09-07T08-00.md`) recorded five non-blocking items, three Major and two Minor, that were deferred by orchestrator decision so the PR could land. They are durability and diagnosability gaps in the shipped surface, not behavioral defects:
+The portable prepared-orchestration handoff (#614, PR #638) merged with zero blocking review findings, but the final review cycle (`docs/features/completed/2026-08-31-portable-prepared-orchestration-handoff-614/remediation-inputs.2026-09-07T08-00.md`) recorded five non-blocking items, three Major and two Minor, that were deferred by orchestrator decision so the PR could land. They are durability and diagnosability gaps in the shipped surface, not behavioral defects:
 
 - R16 (Major): the four `throw` statements in `Get-EpicPlanningRegisteredMcpTool` (`.codex/hooks/enforce-epic-planning-only.ps1` lines 58, 67, 72, 77) form the hook's entire rejection contract and none is executed by any test. Changed-line coverage for the file is 83.33%, below the 85% floor as applied to changed lines, while file-level (91.82%) and repository-level (94.77%) coverage pass.
 - R17 (Major): `extensions/drm-copilot/jest.config.cjs` registers none of the 14 new production modules (`orchestration-handoff-*`, `semantic-mcp-identity.ts`, `orchestration-handoff-handlers.ts`, `mcp-repo-automation-tool-definitions-handoff.ts`) in its per-file `coverageThreshold` map, so their 99.19% line / 93.68% branch coverage is measured but not enforced.

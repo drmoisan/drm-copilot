@@ -4,7 +4,7 @@
 - Author: drmoisan
 - Status: Draft
 - Source: issue #545 specification, design decision D11.6, follow-up 1 of 2
-- Specification: `docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md`
+- Specification: `docs/features/completed/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md`
 
 ## Problem / Why
 
