@@ -1287,7 +1287,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       carries exactly 38 checkbox lines, all inside its Acceptance Criteria section, so a file-wide
       count equals the section count). Stop condition: any other count stops the plan; report which
       criteria remain unchecked.
-- [ ] [P18-T6] CI gate, owned by the execution child: run CMD-GH-PR-VIEW to obtain the pull request
+- [x] [P18-T6] CI gate, owned by the execution child: run CMD-GH-PR-VIEW to obtain the pull request
       number and head SHA; then run CMD-CI-WAIT (script A12) in the background with that head SHA and
       number, and wait for its completion notification. Script A12 polls the workflow runs for the head
       SHA until every run has completed, then prints every run with its conclusion and the output of
@@ -1297,7 +1297,7 @@ the read-only check script A6 and a before-and-after hash comparison.
       required check. If CMD-GH-PR-VIEW reports that no pull request exists, record AWAITING-PR in the
       artifact, push it, and report that state to the parent as not done; on resume, continue from
       P18-T6. If A12 exits 3 (CI-WAIT-TIMEOUT), record the timeout and report it as not done.
-- [ ] [P18-T7] After P18-T6 passes, check off AC-38 in FEATURE/spec.md and write
+- [x] [P18-T7] After P18-T6 passes, check off AC-38 in FEATURE/spec.md and write
       FEATURE/evidence/other/ac-checkoff-p18-ci.TS.md recording AC-38 and the P18-T6 artifact; then
       run CMD-GIT-ADD with exactly FEATURE/spec.md, the P18-T6 ci-status artifact, and the
       ac-checkoff-p18-ci artifact; run CMD-GIT-COMMIT with message "docs(722): check off CI
