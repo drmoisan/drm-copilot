@@ -1,5 +1,7 @@
 # Human-Exception Runbook — Rotate the `NPM_TOKEN` GitHub Actions Secret for `@danmoisan/drm-copilot-mcp`
 
+> **Note:** This runbook is superseded; `.github/workflows/publish-mcp-npm.yml` now publishes via npm trusted publishing over OIDC (`id-token: write`) and does not read the `NPM_TOKEN` secret. Rotating `NPM_TOKEN` will not resolve an `npm publish` failure. Retained for historical reference only. The unused `NPM_TOKEN` repository secret is being removed under issue #712.
+
 Contract-conformant per `.claude/skills/human-exception-runbook/SKILL.md`.
 
 ## Cue

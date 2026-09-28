@@ -3,6 +3,22 @@
 <#
 .SYNOPSIS
     Pester tests for the enforce-epic-worktree-removal-gate.ps1 PreToolUse hook.
+
+.DESCRIPTION
+    Determinism rule for this suite: the hook reads two checkpoints through two
+    named read seams, Get-EpicWorktreeGateCheckpointContent for the epic checkpoint
+    and Get-EpicWorktreeGateParallelCheckpointContent for the parallel-orchestrator
+    checkpoint. Every checkpoint fixture is a literal JSON string injected through
+    one of those mocked seams. No test reads the real gitignored
+    artifacts/orchestration/epic-orchestrator-state.json or
+    artifacts/orchestration/parallel-orchestrator-state.json, and no test writes a
+    temporary file, so the suite is deterministic regardless of live orchestration
+    state on the machine.
+
+    Every deny-expecting test MUST mock BOTH seams. A deny test that leaves the
+    parallel seam unmocked would read live local state and pass or fail depending on
+    whether a parallel run happens to be in flight. A contributor adding a deny test
+    inherits this rule.
 #>
 
 Describe 'enforce-epic-worktree-removal-gate.ps1' {
@@ -13,6 +29,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
 
     Context 'commands outside scope' {
         It 'denies an empty payload as an envelope anomaly (fail closed)' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw ''
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WORKTREE_REMOVAL_BLOCKED'
@@ -29,6 +46,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
         }
 
         It 'denies unparseable JSON instead of throwing (exit 1 is non-blocking)' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw '{not-json'
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'not parseable JSON'
@@ -60,6 +78,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
     Context 'deny on unreadable checkpoint' {
         It 'denies EPIC_WORKTREE_REMOVAL_BLOCKED when the checkpoint file is absent' {
             Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
             $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/child-a"}}'
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -68,6 +87,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
 
         It 'denies EPIC_WORKTREE_REMOVAL_BLOCKED when the checkpoint content is malformed JSON' {
             Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith { '{ broken json' }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
             $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/child-a"}}'
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -80,6 +100,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
             Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith {
                 '{"features":[{"worktree_path":"/repo/worktrees/child-b","merge_status":"merged"}]}'
             }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
             $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/child-a"}}'
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -92,6 +113,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
             Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith {
                 '{"features":[{"worktree_path":"/repo/worktrees/child-a","merge_status":"pr_open"}]}'
             }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
             $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/child-a"}}'
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -164,6 +186,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
     Context 'entry-point exit code and emitted decision (AC-4, no child process)' {
         BeforeEach {
             Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
         }
 
 
@@ -232,5 +255,241 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
             $emitted[-1] | Should -Be 0
             ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
+    }
+
+    Context 'parallel branch allow (AC-1, AC-2, AC-3)' {
+        BeforeEach {
+            # Branch 1 must deny so that only the parallel branch can authorize.
+            Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith { $null }
+        }
+
+        It 'allows when the matching parallel items[] record has merge_status merged' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith {
+                '{"route_id":"parallel","items":[{"worktree_path":"/repo/worktrees/item-a","merge_status":"merged"}]}'
+            }
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a"}}'
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'allows when the matching parallel items[] record has merge_status worktree_removed' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith {
+                '{"route_id":"parallel","items":[{"worktree_path":"/repo/worktrees/item-a","merge_status":"worktree_removed"}]}'
+            }
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a"}}'
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'matches a parallel worktree_path across backslash/forward-slash separator differences' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith {
+                '{"route_id":"parallel","items":[{"worktree_path":"C:\\repo\\worktrees\\item-a","merge_status":"merged"}]}'
+            }
+            $json = '{"tool_input":{"command":"git worktree remove C:/repo/worktrees/item-a"}}'
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+    }
+
+    Context 'parallel branch fail-closed deny (AC-4)' {
+        BeforeEach {
+            Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith { $null }
+            $script:RemoveItemA = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a"}}'
+        }
+
+        It 'denies when both checkpoint seams return $null' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $script:RemoveItemA
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'denies when the parallel checkpoint body is malformed JSON' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { '{ broken json' }
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $script:RemoveItemA
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'denies when route_id is absent even though a merged matching item is present' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith {
+                '{"items":[{"worktree_path":"/repo/worktrees/item-a","merge_status":"merged"}]}'
+            }
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $script:RemoveItemA
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'denies when route_id is present but is not parallel even though a merged matching item is present' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith {
+                '{"route_id":"epic","items":[{"worktree_path":"/repo/worktrees/item-a","merge_status":"merged"}]}'
+            }
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $script:RemoveItemA
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'denies when route_id is parallel but no items key exists' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { '{"route_id":"parallel"}' }
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $script:RemoveItemA
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'denies when no items[] entry matches the target worktree path' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith {
+                '{"route_id":"parallel","items":[{"worktree_path":"/repo/worktrees/item-b","merge_status":"merged"}]}'
+            }
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $script:RemoveItemA
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'denies when the matched parallel item has merge_status pr_open' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith {
+                '{"route_id":"parallel","items":[{"worktree_path":"/repo/worktrees/item-a","merge_status":"pr_open"}]}'
+            }
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $script:RemoveItemA
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'denies when the matched parallel item carries no merge_status key' {
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith {
+                '{"route_id":"parallel","items":[{"worktree_path":"/repo/worktrees/item-a"}]}'
+            }
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $script:RemoveItemA
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+    }
+
+    Context 'branch precedence and check ordering (AC-5, AC-7)' {
+        It 'allows when the epic checkpoint authorizes while the parallel checkpoint does not (branches are ORed)' {
+            Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith {
+                '{"features":[{"worktree_path":"/repo/worktrees/item-a","merge_status":"merged"}]}'
+            }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith {
+                '{"route_id":"parallel","items":[{"worktree_path":"/repo/worktrees/item-a","merge_status":"pr_open"}]}'
+            }
+            $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/item-a"}}'
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'emits the envelope-anomaly deny before reading either checkpoint' {
+            Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw ''
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WORKTREE_REMOVAL_BLOCKED'
+            Should -Invoke -CommandName Get-EpicWorktreeGateCheckpointContent -Times 0 -Exactly
+            Should -Invoke -CommandName Get-EpicWorktreeGateParallelCheckpointContent -Times 0 -Exactly
+        }
+    }
+
+    Context 'Test-ParallelCheckpointAllowsWorktreeRemoval direct branch coverage (AC-8)' {
+        It 'returns $false when Checkpoint is $null' {
+            Test-ParallelCheckpointAllowsWorktreeRemoval -Checkpoint $null -WorktreePath '/repo/worktrees/item-a' |
+                Should -BeFalse
+        }
+
+        It 'returns $false when the route_id key is absent' {
+            $checkpoint = '{"items":[{"worktree_path":"/repo/worktrees/item-a","merge_status":"merged"}]}' | ConvertFrom-Json
+            Test-ParallelCheckpointAllowsWorktreeRemoval -Checkpoint $checkpoint -WorktreePath '/repo/worktrees/item-a' |
+                Should -BeFalse
+        }
+
+        It 'returns $false when the items key is absent' {
+            $checkpoint = '{"route_id":"parallel"}' | ConvertFrom-Json
+            Test-ParallelCheckpointAllowsWorktreeRemoval -Checkpoint $checkpoint -WorktreePath '/repo/worktrees/item-a' |
+                Should -BeFalse
+        }
+
+        It 'skips an items[] entry that carries no worktree_path key' {
+            $checkpoint = '{"route_id":"parallel","items":[{"feature_folder":"a","merge_status":"merged"}]}' | ConvertFrom-Json
+            Test-ParallelCheckpointAllowsWorktreeRemoval -Checkpoint $checkpoint -WorktreePath '/repo/worktrees/item-a' |
+                Should -BeFalse
+        }
+    }
+
+    Context 'real Test-Path parallel read seam (AC-9)' {
+        It 'Get-EpicWorktreeGateParallelCheckpointContent returns $null when the checkpoint file does not exist' {
+            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
+            Get-EpicWorktreeGateParallelCheckpointContent | Should -BeNullOrEmpty
+        }
+
+        It 'Get-EpicWorktreeGateParallelCheckpointContent reads real content when the file exists' {
+            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
+            Mock -CommandName Get-Content -MockWith { '{"route_id":"parallel","items":[]}' } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
+            Get-EpicWorktreeGateParallelCheckpointContent | Should -Be '{"route_id":"parallel","items":[]}'
+        }
+    }
+}
+
+# Sanctioned-removal manifest branch (issue #635). A separate Describe so the
+# manifest module import and its two seam mocks do not alter the fixture set the
+# pre-existing Describe above pins. Both checkpoint seams are mocked on every test
+# here, as the suite rule requires of any test that can reach a deny.
+Describe 'enforce-epic-worktree-removal-gate.ps1 manifest branch' {
+    BeforeAll {
+        . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-worktree-removal-gate.ps1").Path
+        Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1").Path -Force
+    }
+
+    BeforeEach {
+        # Neither checkpoint fixture records the removal target, so both existing
+        # positive predicates are false and condition 10 does not exclude the target.
+        Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith { '{"features":[]}' }
+        Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { '{"route_id":"parallel","items":[]}' }
+        # Literal JSON through the module read seam and a constructed UTC value
+        # through its clock seam: no temporary file, no wall-clock read.
+        Mock -CommandName Get-CleanupWorktreeManifestContent -ModuleName 'CleanupWorktreeManifest' -MockWith {
+            '{"tool":"cleanup-merged-worktrees","schema_version":1,"generated_at":"2026-09-07T03:40:00Z","run_id":"cleanup-2026-09-07T03-40-00Z-a47a5e33","removals":[{"worktree_path":"/repo/worktrees/cleanup-target","branch":"drm-copilot-wt-2026-08-14T09-02","branch_state":"HAS_UNIQUE_RESIDUALS","removal_disposition":"SAFE_TO_DELETE","verdict":"ALREADY_SOLVED_ELSEWHERE","evidence":"Unique residual commit 3f9a1c2 is already fixed on main under issue #612."}],"preserved_files":[]}'
+        }
+        Mock -CommandName Get-CleanupWorktreeManifestUtcNow -ModuleName 'CleanupWorktreeManifest' -MockWith {
+            [datetime]::new(2026, 9, 7, 4, 0, 0, [System.DateTimeKind]::Utc)
+        }
+    }
+
+    It 'allows removal when a fresh manifest record authorizes the target' {
+        $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/cleanup-target"}}'
+        $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+    }
+
+    # Condition 10. The manifest record here satisfies conditions 1 through 9, so a
+    # deny can only come from the checkpoint-presence exclusion. A merge_status outside
+    # the allow-set makes the point sharper: the existing branch does not authorize the
+    # removal either, and the gate must still refuse rather than fall through to the
+    # manifest.
+    It 'denies a manifest-covered removal whose target an epic checkpoint records' {
+        Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith { '{"features":[{"worktree_path":"/repo/worktrees/cleanup-target","merge_status":"in_progress"}]}' }
+        $json = '{"tool_input":{"command":"git worktree remove /repo/worktrees/cleanup-target"}}'
+        $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'EPIC_WORKTREE_REMOVAL_BLOCKED*'
+    }
+
+    # The literal below is the pre-change SOURCE text of the reason string, and the
+    # returned reason is its EXPANSION, so the two substitutions the double-quoted
+    # string performs at run time are applied before comparing: $worktreePath becomes
+    # the supplied target and each doubled quote becomes one quote character.
+    It 'emits the unchanged epic block reason' {
+        $target = '/repo/worktrees/not-authorized'
+        $source = 'EPIC_WORKTREE_REMOVAL_BLOCKED: git worktree remove for ''$worktreePath'' requires either an epic checkpoint features[] record with merge_status in {merged, worktree_removed}, or a parallel-orchestrator checkpoint with route_id == ""parallel"" whose matching items[] record (matched by worktree_path) has merge_status in {merged, worktree_removed}. No checkpoint authorized this removal.'
+        $expected = $source.Replace('$worktreePath', $target).Replace('""', '"')
+        $json = "{""tool_input"":{""command"":""git worktree remove $target""}}"
+        $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $expected
+    }
+
+    # The manifest introduces removal_disposition as a distinct key with a distinct
+    # value set; the merge_status allow-set must not be widened to carry that traffic.
+    It 'keeps the merge_status allow-set unchanged' {
+        $script:AllowedMergeStatuses | Should -HaveCount 2
+        $script:AllowedMergeStatuses[0] | Should -BeExactly 'merged'
+        $script:AllowedMergeStatuses[1] | Should -BeExactly 'worktree_removed'
     }
 }

@@ -1,0 +1,97 @@
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "removals": [],
+  "preserved_files": [
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/ht-patterns/wt",
+      "source_path": "agent-memory/atomic-executor/ht1-windows-user-profile.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "null",
+      "memory_index_line": null,
+      "line_ending": "absent",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/ht-patterns fixture for pattern HT1"
+    },
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/ht-patterns/wt",
+      "source_path": "agent-memory/atomic-executor/ht2-wsl-mount.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "null",
+      "memory_index_line": null,
+      "line_ending": "absent",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/ht-patterns fixture for pattern HT2"
+    },
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/ht-patterns/wt",
+      "source_path": "agent-memory/atomic-executor/ht3-posix-home.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "null",
+      "memory_index_line": null,
+      "line_ending": "absent",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/ht-patterns fixture for pattern HT3"
+    },
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/ht-patterns/wt",
+      "source_path": "agent-memory/atomic-executor/ht4-short-name.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "null",
+      "memory_index_line": null,
+      "line_ending": "absent",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/ht-patterns fixture for pattern HT4"
+    },
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/ht-patterns/wt",
+      "source_path": "agent-memory/atomic-executor/ht5-email.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "null",
+      "memory_index_line": null,
+      "line_ending": "absent",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/ht-patterns fixture for pattern HT5"
+    },
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/ht-patterns/wt",
+      "source_path": "agent-memory/atomic-executor/ht6-environment-variable.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "null",
+      "memory_index_line": null,
+      "line_ending": "absent",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/ht-patterns fixture for pattern HT6"
+    }
+  ]
+}

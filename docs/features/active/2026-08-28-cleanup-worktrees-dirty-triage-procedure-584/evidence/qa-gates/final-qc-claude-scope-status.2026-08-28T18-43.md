@@ -1,0 +1,4 @@
+Timestamp: 2026-08-28T18-43 (re-verified against the revised plan's corrected acceptance text)
+Command: git status --porcelain -- .claude
+EXIT_CODE: 0
+Output Summary: empty (zero lines). Matches the revised plan's corrected expected output exactly: because `[P1-T1]`'s `git cherry-pick -x` created a commit directly, the change to `.claude/skills/cleanup-merged-worktrees/SKILL.md` is already committed by the time this Phase 2 check runs, so `git status --porcelain -- .claude` correctly reports no modified-tracked-file line for it. `[P2-T4]`'s ref-anchored `git diff --stat main...HEAD -- .claude/skills/cleanup-merged-worktrees/SKILL.md` (`1 file changed, 136 insertions(+), 4 deletions(-)`) is the task that confirms the change actually landed in commit history. No line under `.claude` (e.g. an uncommitted stray modification) is present. PASS.

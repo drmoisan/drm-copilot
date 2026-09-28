@@ -11,16 +11,26 @@ setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
     ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
+    RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
+    DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
+    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
+    SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
     DEL="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/deletion"
     chmod +x "${STUB}" 2>/dev/null || true
+    chmod +x "${SCAN}" 2>/dev/null || true
 }
 
 apply() { # apply <scenario-dir>
-    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="$1" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; run_apply"
+    # run_apply now calls the shared classification driver, so the sibling library must
+    # be sourced here (bats subshells source the libraries directly and never run the CLI
+    # wrapper) and the filesystem scan must route through the checked-in scan stub rather
+    # than reading the real .claude/worktrees tree.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="$1" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${RLIB}'; source '${ALIB}'; source '${DLIB}'; run_apply"
 }
 
 @test "a dirty worktree blocks removal, reports DIRTY lines, and never forces" {
@@ -35,7 +45,7 @@ apply() { # apply <scenario-dir>
 
 @test "a candidate whose re-verification flips is blocked before any branch delete" {
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/unmerged" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; delete_candidate feature-unmerged /repo-wt/x MERGED_CLEAN"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; delete_candidate feature-unmerged /repo-wt/x MERGED_CLEAN"
     [ "$status" -ne 0 ]
     [[ "$output" == *"ACTION|delete|feature-unmerged|BLOCKED-REVERIFY"* ]]
     [[ "$output" != *"branch -D feature-unmerged"* ]]
@@ -80,4 +90,114 @@ apply() { # apply <scenario-dir>
     apply "${DEL}/consolidated_merged"
     [[ "$output" == *"branch -D documentationandmemories"* ]]
     [[ "$output" == *"ACTION|branch-delete|documentationandmemories|OK"* ]]
+}
+
+@test "a zero-commit consolidation branch is never deleted" {
+    # The branch was created at main and has no commit of its own, so its tip equals
+    # main's tip. merge-base --is-ancestor answers 0 for that shape, which is why the
+    # tip-equality pre-check has to win before the ancestry rung is consulted.
+    apply "${DEL}/consolidated_zero_commit"
+    [[ "$output" == *"ACTION|delete|documentationandmemories|BLOCKED-CONSOLIDATION-UNMERGED"* ]]
+    [[ "$output" != *"branch -D documentationandmemories"* ]]
+    [[ "$output" != *"worktree remove /repo-wt/dm"* ]]
+}
+
+@test "verify_consolidation_merged returns NOT_ANCESTOR on tip equality" {
+    # Substring form, not equality: the stub writes one `stub-git: ` argv line to stderr
+    # for each of the two rev-parse invocations the tip-equality pre-check makes, and
+    # bats merges stderr into $output.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${DEL}/consolidated_zero_commit" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; verify_consolidation_merged"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"NOT_ANCESTOR"* ]]
+    [[ "$output" != *"MERGED_CLEAN"* ]]
+}
+
+@test "verify_consolidation_merged fails closed on an empty rev-parse" {
+    # merged_no_worktree supplies neither rev-parse.main.out nor
+    # rev-parse.documentationandmemories.out, so both tip captures resolve to the empty
+    # string under the stub. An unresolvable tip is a hard failure, not equality.
+    # Substring form, not equality: retaining stderr is what makes the negative argv
+    # assertion below meaningful, and the same retention puts `stub-git: ` lines into
+    # $output.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/merged_no_worktree" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; verify_consolidation_merged"
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"ANCESTRY_ERROR"* ]]
+    [[ "$output" != *"MERGED_CLEAN"* ]]
+    [[ "$output" != *"branch -D documentationandmemories"* ]]
+}
+
+@test "apply mode emits no deletion for a NOT_MERGED branch carrying a CHILD_OF record" {
+    # Outcome preservation, property (b). Under this fixture feature-child resolves
+    # NOT_MERGED through its own full ladder, so the assertion below is no longer
+    # satisfied by an inherited verdict; the CHILD_OF record beside it is additive and
+    # informational. NOT_MERGED is not on the delete-eligible allowlist, so no deletion
+    # ACTION of any result is emitted for the branch.
+    apply "${SCEN}/child_of_not_merged"
+    [[ "$output" == *"BRANCH|feature-child|NOT_MERGED"* ]]
+    [[ "$output" == *"CHILD_OF|feature-child|feature-parent"* ]]
+    [[ "$output" != *"ACTION|delete|feature-child|"* ]]
+    [[ "$output" != *"branch -D feature-child"* ]]
+}
+
+@test "apply mode deletes a delete-eligible branch that is an ancestor of a NOT_MERGED branch" {
+    # The apply-mode expression of R-01's stated impact. feature-child is a git ancestor
+    # of the NOT_MERGED feature-parent, but its own rung-2 probe resolves it MERGED_CLEAN,
+    # which is on the delete-eligible allowlist. The pre-fix driver reported NOT_MERGED
+    # for this branch, so it was silently never deleted.
+    apply "${SCEN}/child_of_subject_merged_clean"
+    [[ "$output" == *"BRANCH|feature-child|MERGED_CLEAN"* ]]
+    [[ "$output" == *"ACTION|branch-delete|feature-child|OK"* ]]
+    [[ "$output" == *"BRANCH|feature-parent|NOT_MERGED"* ]]
+}
+
+@test "run_report classifies main PROTECTED_CURRENT when the primary worktree is on another branch" {
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_not_checked_out" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${RLIB}'; source '${DLIB}'; run_report 2>/dev/null"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"BRANCH|main|PROTECTED_CURRENT"* ]]
+    [[ "$output" != *"BRANCH|main|MERGED_CLEAN"* ]]
+}
+
+@test "run_apply does not delete main when the primary worktree is on another branch" {
+    apply "${SCEN}/base_not_checked_out"
+    [[ "$output" == *"BRANCH|main|PROTECTED_CURRENT"* ]]
+    [[ "$output" != *"BRANCH|main|MERGED_CLEAN"* ]]
+    [[ "$output" != *"branch -D main"* ]]
+    [[ "$output" != *"ACTION|branch-delete|main|"* ]]
+    # Positive controls: the two genuinely merged branches are still deleted.
+    [[ "$output" == *"ACTION|branch-delete|feature-merged|OK"* ]]
+    [[ "$output" == *"ACTION|branch-delete|zeta-merged|OK"* ]]
+}
+
+@test "run_apply neither removes nor deletes main checked out in a linked worktree" {
+    apply "${SCEN}/base_in_linked_worktree"
+    [[ "$output" == *"BRANCH|main|PROTECTED_CURRENT"* ]]
+    [[ "$output" != *"worktree remove /repo-wt/base"* ]]
+    [[ "$output" != *"branch -D main"* ]]
+    [[ "$output" != *"ACTION|branch-delete|main|"* ]]
+}
+
+@test "delete_candidate refuses the base branch before re-verification" {
+    # stderr is retained so the stub argv log is observable in $output.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_not_checked_out" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; delete_candidate main '' MERGED_CLEAN"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"ACTION|delete|main|BLOCKED-PROTECTED-BASE"* ]]
+    # merge-base is never reached here: compute_protected already classifies main
+    # PROTECTED_CURRENT, so classify_branch returns before classify_ancestry runs.
+    # A guard moved after reverify_delete_eligible would instead make classify_branch's
+    # first call - rev-parse --abbrev-ref HEAD via compute_protected - reach $output.
+    [[ "$output" != *"rev-parse --abbrev-ref HEAD"* ]]
+    [[ "$output" != *"worktree remove"* ]]
+    [[ "$output" != *"branch -D"* ]]
+}
+
+@test "delete_candidate refuses the base branch before removing its linked worktree" {
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/base_in_linked_worktree" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; delete_candidate main /repo-wt/base MERGED_CLEAN"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"ACTION|delete|main|BLOCKED-PROTECTED-BASE"* ]]
+    [[ "$output" != *"worktree remove"* ]]
 }

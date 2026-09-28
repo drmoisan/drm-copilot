@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <Content Include="Shared/Base1.html" />
+    <Content Include="Ours/OursA.html">
+      <DependentUpon>Base1.html</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Ours/OursB.html">
+      <DependentUpon>Base1.html</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Theirs/TheirsA.html">
+      <DependentUpon>Base1.html</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Theirs/TheirsB.html">
+      <DependentUpon>Base1.html</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Shared/Base2.html" />
+  </ItemGroup>
+</Project>

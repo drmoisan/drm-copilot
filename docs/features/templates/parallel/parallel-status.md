@@ -76,3 +76,12 @@ rather than omitting it.
 | item_key | declared | observed | escaped_paths | action | at |
 | --- | --- | --- | --- | --- | --- |
 | _(populated from `drift_events[]`; empty until a drift event is recorded)_ | | | | | |
+
+## Mergeable Conflicts Resolved
+
+Projection of `items[].mergeable_conflicts_resolved`, written by `parallel-orchestrator` after a
+parent-side project-file resolution and rendered empty when no item carries the field.
+
+| issue_num | path | resolved_at | merged_against | merge_commit_sha | entries_added_from_ours | entries_added_from_theirs | version_resolutions |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| _(populated from `items[].mergeable_conflicts_resolved`; empty until a project-file conflict is resolved by the parent)_ | | | | | | | |

@@ -1,3 +1,24 @@
+---
+paths:
+  - "artifacts/orchestration/parallel-*"
+  - "docs/features/parallel/**"
+  - "scripts/dev_tools/*parallel*"
+  - "extensions/drm-copilot/src/lib/validate/parallel-*"
+  - "scripts/dev_tools/*blast_radius*"
+  - "config/blast-radius.json"
+  - "**/config/blast-radius.json"
+  - "extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts"
+  - ".claude/lib/blast-radius/**"
+  - ".claude/lib/bash/parallel-yaml-scan.sh"
+  - "scripts/dev_tools/validate_orchestration_artifacts.py"
+  - "extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts"
+  - ".claude/hooks/enforce-epic-merge-gate.ps1"
+  - ".claude/agents/parallel-orchestrator.md"
+  - ".claude/agents/parallel-planner.md"
+  - ".claude/skills/parallel-*/SKILL.md"
+description: Artifact invariants and blast-radius contention doctrine for the parallel orchestration surface.
+---
+
 # Parallel Orchestration Artifact Invariants
 
 This rule governs the three artifacts of the `parallel` orchestration surface: the parallel-run manifest at `docs/features/parallel/<slug>/parallel.md`, the parallel-orchestrator checkpoint at `artifacts/orchestration/parallel-orchestrator-state.json`, and the parallel-planner checkpoint at `artifacts/orchestration/parallel-planner-state.json`. It records the invariants those artifacts must satisfy as numbered prose so that downstream features consume a fixed schema and add behavior only.
@@ -188,6 +209,8 @@ All nine enums of the parallel surface are owned by the schema-and-validator fea
 
 The wave-4 features — F6 (mutation protocol), F7 (enforcement hooks), and F8 (drift detection) — CONSUME these member sets and NEVER extend them. A wave-4 feature that needs a new member must amend this rule file and the validators at spec review, not add the member at implementation time. This constraint exists because the wave-4 features are prepared concurrently and would otherwise add fields to the same files at the same time.
 
+Integration-cost scheduling (issue #722) adds no `conflict_edges[].reason` member; the four members above are unchanged. The scheduling data travels in tolerated-not-validated fields: an edge may carry the extra fields `hard`, `cost`, and `benefit`, and the planner and orchestrator checkpoints may carry a `tolerated_overlaps` list. No validator reads these fields, and the Python validators and the TypeScript validator port accept them with zero errors.
+
 ## F7 Seam
 
 The retrospective cohort-ordering invariant `PARALLEL_COHORT_BARRIER_VIOLATION` (design section 9, Layer 2) is F7's explicitly assigned addition to the orchestrator validator. It is NOT implemented here. The entry point of `scripts/dev_tools/validate_parallel_orchestrator_state.py` contains a clearly delimited, appendable helper-invocation block, marked with explicit begin and end comments that name F7 and the invariant token, so that F7's edit is one appended helper call with no reflow of existing code. The TypeScript core `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-core.ts` carries the matching comment-delimited seam. Existing helper calls sit outside the block.
@@ -220,6 +243,11 @@ plan-side extraction so V1 and V2 stay self-consistent against a radius derived 
 The key is optional and fail-closed: a truth table that omits it excludes nothing and reproduces
 pre-change behaviour exactly.
 
+The Copilot instructions file `.github/copilot-instructions.md` is a mandate read as well (issue
+#722): the policy reading order begins with it, so a plan that cites copilot-instructions.md is
+reporting that it read the tone and communication policy. Both committed copies of
+`config/blast-radius.json` list it in `mandate_reads`.
+
 Three constraints bound the mandate-read exclusion:
 
 1. **The planner remains obliged to enumerate a genuine write explicitly.** An exclusion describes
@@ -238,6 +266,61 @@ token whose final component names a directory rather than a file, a `docs/featur
 wildcard occupies or truncates the feature-folder segment, a contract token carrying no ASCII
 letter, and a token containing a placeholder or interpolation marker. `artifacts/` is not a known
 top-level segment, so a bare `artifacts/**` subtree claim no longer satisfies the shape rules.
+
+### Mechanically-mergeable path class (issue #643)
+
+Some contended paths are not a design collision. A `.csproj` item list, a `packages.config` package
+list, and an `app.config` binding-redirect list are additive registries: two items that each append a
+distinct entry produce a textual conflict that a deterministic union resolves without judgement.
+Serializing those items buys nothing.
+
+`config/blast-radius.json` carries an optional `mergeable_paths` list of exact entries and `**`
+globs. That list is the mechanically-mergeable path class. Its published default is the five-entry
+list `**/*.csproj`, `**/packages.config`, `**/app.config`, `**/*.vbproj`, `**/*.props`.
+
+A matching path **stays in the declared `paths`**. The exclusion is applied at exactly one place per
+runtime — inside `conflicts` (`scripts/dev_tools/_blast_radius_conflicts.py`) and inside
+`Test-BlastRadiusConflict` (`.claude/lib/blast-radius/BlastRadius.psm1`), on both radii's `paths`
+immediately before the smallest-path-overlap computation. Derivation, normalization,
+observed-radius construction, V1, V2, V3, and `detect_escaped_paths` are therefore unchanged: the
+class narrows one comparison and nothing else. The key is optional and fail-closed: a truth table
+that omits it excludes nothing and reproduces pre-change behaviour exactly.
+
+The matcher is local to this comparison and does not extend the glob engine. A declared path matches
+the class when, against some configured entry, any of the following holds: the two strings are
+ordinally equal; or the declared path is concrete (carries no wildcard) and the configured entry is
+a glob that contains it; or the declared path is concrete and, for a configured entry beginning with
+`**/`, the same two-step test succeeds against the entry with that prefix removed, which is what
+makes a root-level `Directory.Build.props` match `**/*.props`. A declared path that is itself a glob
+is mergeable only when it equals a configured entry verbatim, because a glob can expand over
+non-mergeable files. `_glob_to_regex_text` (`scripts/dev_tools/_blast_radius_glob.py`) and its
+PowerShell mirror `BlastRadiusGlob.psm1` are unchanged by this class; if either is ever changed, both
+it and this matcher must be re-examined together, since the containment step depends on the glob
+engine's semantics.
+
+Three constraints bound the mergeable-path class:
+
+1. **The planner remains obliged to enumerate a genuine write explicitly.** The class describes how a
+   contention is scored, not what an item may touch. An item that will write a `.csproj` still
+   declares that exact path in its radius.
+2. **The path stays in the declared radius, so the audits still see it.** Nothing is removed from any
+   stored record. Over-breadth, shared-surface, and manifest audits read the same `paths` they read
+   before; only the pairwise overlap set is narrowed.
+3. **`detect_escaped_paths` remains the backstop at execution time.** A mergeable classification is a
+   scheduling decision taken from declared text; `detect_escaped_paths` still compares the declared
+   radius against the paths a diff actually touched, so an item that wrote outside its radius is
+   caught against observed evidence regardless of this class.
+
+An item record of the parallel-orchestrator checkpoint MAY carry an optional
+`mergeable_conflicts_resolved` list recording the mergeable conflicts an item resolved mechanically.
+The field is additive and tolerated-not-validated: no validator in Python, TypeScript, or bash reads
+it, and it follows the `expected_conflict_components` diagnostic precedent — a record written for a
+human reader and for post-hoc audit, never a scheduling input. Each entry carries `path`,
+`resolved_at`, `merged_against`, `merge_commit_sha`, `entries_added_from_ours`,
+`entries_added_from_theirs`, and `version_resolutions`. Entry keys inside those three lists use
+`<ItemType>:<Include>` for MSBuild items, `package:<id>` for `packages.config` packages, and
+`bindingRedirect:<name>` for `app.config` binding redirects. Invariant 9 (the six `blast_radius`
+keys) and invariant 15 (the four edge reasons) are unchanged by this field.
 
 ### Placeholder-shape rejection (issue #502)
 
@@ -315,6 +398,144 @@ weakens the relation below the path level: two items editing the same file still
 A candidate module belongs in the map when it names a subsystem an item could plausibly not touch.
 A candidate that matches the majority of work items belongs nowhere.
 
+### Integration-cost scheduling (issue #722)
+
+Detection and scheduling are separate steps. The detection relation (`conflicts` in Python,
+`Test-BlastRadiusConflict` in PowerShell) is unchanged and still answers one question: do two radii
+contend? Scheduling decides whether a detected contention must serialize the two items. The entry
+points are `schedule_conflict_edges` in `scripts/dev_tools/_blast_radius_scheduling.py` and
+Get-BlastRadiusConflictEdge in `.claude/lib/blast-radius/BlastRadiusScheduling.psm1`; both return
+the edges and the tolerated overlaps of a set of items. Planners call the entry point instead of
+applying the detection relation to every pair by hand.
+
+This is an operator-directed configured policy change (issue #722, 2026-09-27), not ad hoc
+narrowing. The only sanctioned mechanisms for relaxing contention are the configured
+`conflict_tolerance` key and configured write-intent extraction. Planners still never hand-narrow a
+radius: editing a declared radius to suppress an edge remains prohibited.
+
+**Configuration.** `config/blast-radius.json` carries an optional `conflict_tolerance` object with
+tolerance_percent (integer, at least 0), `weights` (same_file, possible_overlap, append_only, and
+module, each an integer of at least 1), `band_durations` (C1 through C4, each an integer of at least
+1), `default_band` (one of C1 through C4), and append_only_paths (a list of exact entries and `**`
+globs). The reader fails fast with an error naming the key for any other shape; booleans are
+rejected wherever an integer is required. An absent key means strict scheduling, identical to
+tolerance_percent 0.
+
+**Edge rule.** For each unordered pair of items:
+
+1. Run the unchanged detection relation. No conflict means no edge and no tolerated overlap.
+2. **Hard classes.** A reason list containing `shared_surface_overlap` or `contract_dependency`
+   makes the pair an edge at every tolerance.
+3. **Cost** (integer, computed only for a detected conflict). Re-enumerate the overlapping entry
+   pairs with the same mergeable-path exclusion and the same entry-overlap primitive the relation
+   uses, then sum the append_only weight for a concrete overlapping path that matches an
+   append_only_paths entry, the same_file weight for two equal concrete entries, the
+   possible_overlap weight for a glob or directory-prefix overlap, and the module weight times the
+   number of shared modules. The append_only_paths check runs before the same_file check (append-only
+   precedence), so an append-only file stays low cost even when both items name it. Mergeable paths
+   contribute 0 because they are excluded before enumeration.
+4. **Benefit** (integer, pairwise). The smaller of the two items' band durations; a missing band uses
+   `default_band`. Running the pair concurrently saves at most one cohort step of the shorter item.
+5. **Rule.** The pair is an edge if and only if it conflicts and either it is hard or
+   `cost * 100 > benefit * tolerance_percent`.
+6. **Recorded reason.** The first member of the relation's reason list in canonical kind order.
+
+**Strict-identity proof.** Every weight and every band duration is validated as an integer of at
+least 1. A detected conflict that is not hard therefore has a cost of at least 1, so at
+tolerance_percent 0 the inequality `cost * 100 > 0` always holds and the edge set equals the
+detected-conflict set exactly; cohort coloring of that set is identical to strict scheduling. At
+every tolerance an edge requires a conflict, so every edge implies a conflict and the edge set is
+always a subset of the detected-conflict set. Raising tolerance_percent never adds an edge, and the
+decision for (a, b) equals the decision for (b, a).
+
+**Soft-overlap handling.** A detected, non-hard pair within tolerance is a tolerated overlap, not an
+edge. The planner records it in a tolerated_overlaps list on the planner checkpoint (and the
+orchestrator carries it), each entry holding `a`, `b`, `reasons`, `cost`, and `benefit`. Tolerated
+pairs run in the same or adjacent cohorts without a barrier. The later-merging item of a tolerated
+pair merges `origin/main` under the existing per-item merge-conflict handling and re-passes CI before
+it merges.
+
+**Drift behaviour.** When an item's observed radius replaces its declared radius, drift detection
+evaluates each in-flight peer pair through the same edge rule, using the items' complexity bands from
+the checkpoint (`default_band` when absent), through the helper module
+`scripts/dev_tools/_parallel_drift_scheduling.py`. A pair is newly conflicting only when the rule
+yields an edge and the pair is not already a recorded edge. A tolerated pair whose observed overlap
+stays within tolerance halts neither item; one whose observed overlap exceeds tolerance, or becomes
+hard, is reported. An unevaluable peer radius still counts as an edge (fail closed). At
+tolerance_percent 0 the drift output equals strict drift output.
+
+### Write-intent extraction (issue #722)
+
+The extractor harvests every inline-code token of a plan and spec, so a path an item only reads,
+mentions as a glob, or quotes inside a command becomes a radius path and can create a false edge.
+Write-intent extraction keeps only tokens that state a write. It is the second sanctioned mechanism,
+beside `conflict_tolerance`, for relaxing contention; like it, it is an operator-directed configured
+policy change, and planners still never hand-narrow a radius.
+
+**Configuration.** `config/blast-radius.json` carries two optional keys. `write_intent_extraction`
+is a boolean; when it is true, rules W1 through W6 below apply. `path_roots` is a list of non-empty
+first path segments that enables rule W4. Both readers fail fast with an error naming the key for any
+other shape. An absent or false `write_intent_extraction` reproduces pre-change extraction exactly
+(fail closed), and an empty or absent `path_roots` disables W4. The self-hosted copy sets
+`path_roots` to this repository's tracked top-level directories. The implementations are
+`scripts/dev_tools/_blast_radius_write_intent.py` and
+`.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1`.
+
+**Rules.** Each rule is a pure, statically decidable function of the text and the truth table.
+
+- **W1 glob mention.** Drop any harvested token containing a wildcard character. The feature-folder
+  glob is added after filtering and is never dropped.
+- **W2 command span.** Drop every token of an inline span whose whitespace split yields more than
+  one word.
+- **W3 read task.** Drop the tokens of a task attribution window (a task line plus the following
+  non-task lines up to the next ATX heading, as defined in `.claude/rules/plan-acceptance-gates.md`)
+  whose title's first word, after an optional bold label, is in the read-verb set (Read, Verify,
+  Confirm, Inspect, Review, Baseline) and whose title contains no member of the write-verb set (Fix,
+  Write, Update, Edit, Add, Create, Delete, Remove, Rename, Author, Append, Replace). A write verb
+  anywhere in the title overrides the read verb.
+- **W4 root anchoring.** Drop a concrete token whose first segment, after stripping a leading `./`,
+  is not in `path_roots` and is not a configured root surface.
+- **W5 spec paths.** The spec contributes contracts only, not paths. Contract harvesting from the
+  spec applies W1 and W2.
+- **W6 placeholder stem.** Drop a concrete token whose final-component stem is in the placeholder
+  set (the single ASCII letters, and foo, bar, baz, example, sample, placeholder), compared
+  case-insensitively.
+
+The read-verb, write-verb, and placeholder-stem sets are code constants pinned equal across Python
+and PowerShell by a parity test. Shared surfaces are still resolved from the surviving concrete
+paths, so a shared surface cited only in a read task, a command span, or the spec produces no hard
+edge, while a shared surface an item writes in a write task survives and stays hard.
+
+**One extractor for derivation and validation.** W1, W4, and W6 are token-level and also apply when
+`normalize_declared_radius` and Get-NormalizedDeclaredRadius re-filter a recorded radius; an entry
+that starts with `docs/features/`, ends with `/**`, and carries no other wildcard (the feature-folder
+glob) is always kept. W2, W3, and W5 need line context and apply only to derivation and to the
+plan-side extraction of validation. `derive_blast_radius` and `validate_blast_radius` (and their
+PowerShell ports) select the same extractor from the same flag, so a derived radius still passes V1
+and V2 against its own plan in both modes.
+
+#### Known false negatives
+
+Write-intent extraction can drop a genuine write in these cases:
+
+1. a genuine write stated only as a glob (W1);
+2. a genuine write stated only inside a command span (W2);
+3. a write named only in spec prose (W5);
+4. a read-verb task that also writes without a write verb in its title (W3);
+5. a new top-level directory not yet in `path_roots` (W4);
+6. a genuine file whose stem is in the placeholder set (W6).
+
+Three mitigations bound these cases:
+
+1. **The planner remains obliged to enumerate a genuine write explicitly.** When an item's plan will
+   write a path that one of the rules drops, the planner appends that exact path to the declared
+   radius after normalization, as for the mandate-read exclusion.
+2. **Execution-time escaped-path detection.** `detect_escaped_paths` compares the declared radius
+   against the paths a diff actually touched, so a dropped write is caught against observed evidence
+   rather than against prose.
+3. **The fail-closed absent key.** A truth table without `write_intent_extraction`, or with it set
+   to false, reproduces pre-change extraction exactly, so an operator can disable the rules at once.
+
 ### The published truth table is not a copy of this one (issue #500)
 
 The push-down publishes a second truth table into a destination workspace at
@@ -332,6 +553,15 @@ reading the file is not told something false, and because
 `tests/scripts/dev_tools/test_blast_radius_config.py` calls `load_module_globs` on it and that
 helper raises on an absent key. Nothing schedules on it.
 
+**The .NET manifest family is a structure signal, not a module source (issue #643).** `.csproj`,
+`.fsproj`, `.vbproj`, `.sln`, and `.slnx` are classified in
+`extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-manifests.ts` as
+structure-observing manifests: each one marks a project root and suppresses the
+top-level-directory fallback, and none of them contributes a module. A .NET solution layout
+therefore derives exactly `{ "config": ["config/**"] }` from `PAYLOAD_MODULES` alone. The reason is
+the granularity criterion: a per-assembly module would fire for the majority of work items in that
+solution, so it discriminates nothing and belongs in neither the module map nor the surface list.
+
 **`PAYLOAD_MODULES` carries `config` only.** `claude-runtime` was removed from it by the same
 granularity criterion that removed it from this repository's own map. The criterion transfers
 without modification: every agent in the runtime is instructed to read the policy rules and process
@@ -345,8 +575,11 @@ non-vacuous input.
 subset, not a copy of the self-hosted sets.** They were authored narrow when the bundled copy was
 created and were never a copy that fell behind, so the correct gate is portable-set equality against
 a declared constant plus a subset relation against the self-hosted list — never byte-equality with
-the self-hosted file. Only `version`, `over_breadth_fraction`, and `mandate_reads` are byte-equal
-across the two copies.
+the self-hosted file. Only `version`, `over_breadth_fraction`, `mandate_reads`, `mergeable_paths`,
+`conflict_tolerance`, and `write_intent_extraction` are byte-equal across the two copies.
+`path_roots` is a Class 2 key: its self-hosted value is this repository's tracked top-level
+directory list, and its bundled value is an empty list, because the bundle cannot know a
+destination's top-level directories and an empty list disables root anchoring there.
 
 The reason the two key groups take different relations is an asymmetry between surfaces and modules.
 An over-matching MODULE glob costs concurrency on every pair of items it touches, because a module
@@ -388,3 +621,4 @@ an unclassified key or a key present in only one copy fails loudly and names its
 - Enforcement is therefore Python validator logic, plus the TypeScript parity port, plus this prose file. It is NEVER an imported JSON Schema. No schema file is read at validation time.
 - The `parallel` route entry lives in `config/orchestration-routing.json` with `requires_pr_gate: false` (there is no run-level pull request to gate; each child's own route checkpoint enforces its per-item pull-request gate) and is mirrored byte-for-byte in `extensions/drm-copilot/resources/config/orchestration-routing.json`.
 - The `PreToolUse` merge gate `.claude/hooks/enforce-epic-merge-gate.ps1` carries a parallel allow-branch that authorizes a per-item `gh pr merge --merge` from the parallel-orchestrator checkpoint when `route_id == "parallel"`, the target item's `merge_status == "ci_green"`, and the command's PR number matches that item's `pr_number`; any other case fails closed with `EPIC_MERGE_GATE_BLOCKED`.
+- The `PreToolUse` worktree-removal gate `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` likewise carries a parallel allow-branch that authorizes a per-item worktree removal from the parallel-orchestrator checkpoint when `route_id == "parallel"` and the `items[]` entry whose `worktree_path` matches the normalized removal target has `merge_status` in `{merged, worktree_removed}`; any other case — neither checkpoint present, either checkpoint unparseable, `route_id` absent or not `"parallel"`, no matching `worktree_path`, or a matched entry whose `merge_status` is outside that set or absent — fails closed with `EPIC_WORKTREE_REMOVAL_BLOCKED`. Removal is keyed on the worktree path rather than on `pr_number`, because the command names a path. This gate and the sibling gate `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1`, which owns `PARALLEL_WORKTREE_REMOVAL_BLOCKED`, both fire on the same command, and `PreToolUse` denials are conjunctive, so both must allow for a removal to proceed.

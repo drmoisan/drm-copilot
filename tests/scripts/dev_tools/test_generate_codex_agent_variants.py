@@ -11,6 +11,7 @@ import pytest
 from scripts.dev_tools import generate_codex_agent_variants as generator
 from scripts.dev_tools.generate_codex_agent_variants import (
     BUNDLE_ROOT,
+    CORE_FAMILIES,
     PACK_FAMILIES,
     PACK_ROOT,
     PROFILES,
@@ -95,6 +96,24 @@ def test_checked_in_variants_match_generator_output_in_both_surfaces() -> None:
         expected_bytes = expected_text.encode("utf-8")
         assert (REPO_ROOT / relative_path).read_bytes() == expected_bytes
         assert (BUNDLE_ROOT / relative_path).read_bytes() == expected_bytes
+
+
+def test_commit_steward_is_a_core_family_with_complete_generated_profiles() -> None:
+    """Keep commit-steward aliases, profiles, and core manifest synchronized."""
+
+    assert "commit-steward" in CORE_FAMILIES
+    expected = expected_variant_files()
+    base_path = Path(".codex") / "agents" / "commit-steward.toml"
+    assert (REPO_ROOT / base_path).read_bytes() == (
+        BUNDLE_ROOT / base_path
+    ).read_bytes()
+    manifest = (PACK_ROOT / "core.json").read_text(encoding="utf-8")
+    assert str(base_path).replace("\\", "/") in manifest
+    for profile in PROFILES:
+        path = generator.generated_agent_relative_path("commit-steward", profile)
+        assert (REPO_ROOT / path).read_bytes() == expected[path].encode("utf-8")
+        assert (BUNDLE_ROOT / path).read_bytes() == expected[path].encode("utf-8")
+        assert str(path).replace("\\", "/") in manifest
 
 
 def test_affected_pack_manifests_include_each_generated_profile() -> None:

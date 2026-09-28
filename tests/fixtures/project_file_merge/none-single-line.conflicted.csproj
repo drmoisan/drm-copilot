@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <None Include="Shared/Base1.txt" />
+<<<<<<< HEAD
+    <None Include="Ours/OursA.txt" />
+    <None Include="Ours/OursB.txt" />
+=======
+    <None Include="Theirs/TheirsA.txt" />
+    <None Include="Theirs/TheirsB.txt" />
+>>>>>>> origin/main
+    <None Include="Shared/Base2.txt" />
+  </ItemGroup>
+</Project>

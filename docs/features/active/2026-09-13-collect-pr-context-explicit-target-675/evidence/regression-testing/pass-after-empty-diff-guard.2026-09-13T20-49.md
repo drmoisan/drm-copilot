@@ -1,0 +1,4 @@
+Timestamp: 2026-09-17T13:42Z
+Command: node run-jest.cjs test/lib/pr-context/pr-context-service-call-target.test.ts (from extensions/drm-copilot/, run after the empty-diff guard was wired into pr-context-service-call.ts)
+EXIT_CODE: 0
+Output Summary: 6 passed, 6 total, zero failed. The three tests that failed at P6-T2 — `raises naming the resolved head ref, head sha, merge base and base when the refs resolve and no file changed`, `raises naming the requested base when the base or head could not be resolved`, and `writes both artifacts and then raises when the diff is empty` — now pass, along with the three that already passed pre-guard (`passes the explicit target ref to git rather than the session HEAD`, `reports target_resolution explicit and the resolved head ref and sha when a target ref is supplied`, `reports target_resolution session-fallback when no target ref is supplied`).

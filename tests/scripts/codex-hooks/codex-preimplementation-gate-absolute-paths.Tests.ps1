@@ -131,6 +131,8 @@ Describe 'codex enforce-orchestration-preimplementation-gate.ps1 absolute-path c
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/enforce-orchestration-preimplementation-gate.ps1").Path
         . $script:UnderTest
+        # Issue #707 (D10): the epic-scope read is mocked so local epic state cannot change a decision.
+        Mock Get-EpicScopeCheckpointText { $null }
 
         function ConvertTo-NotReadyCheckpointRaw {
             <#

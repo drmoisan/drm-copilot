@@ -115,12 +115,13 @@ describe("issue #472: manifest classification", () => {
     expect(modules["service"]).toEqual(["service/**"]);
   });
 
-  it("promotes a directory holding a suffix-matched manifest to a module", () => {
-    // Arrange
+  it("treats a suffix-matched .NET manifest as structure rather than a module", () => {
+    // Arrange: a .csproj is a structure signal, not a module (issue #643). It
+    // suppresses the top-level fallback, so only the payload floor remains.
     const observations = [observe(""), observe("Widget", "Widget.csproj")];
 
     // Act / Assert
-    expect(deriveModules(observations)["Widget"]).toEqual(["Widget/**"]);
+    expect(Object.keys(deriveModules(observations))).toEqual(["config"]);
   });
 });
 
@@ -190,12 +191,12 @@ describe("issue #472: ancestor pruning and layout outcomes", () => {
     expect(modules["packages"]).toEqual(["packages/**"]);
   });
 
-  it("derives both projects of a C# layout", () => {
+  it("derives both projects of a two-module Go layout", () => {
     // Arrange
     const observations = [
       observe(""),
-      observe("Foo", "Foo.csproj"),
-      observe("Foo.Tests", "Foo.Tests.csproj"),
+      observe("Foo", "go.mod"),
+      observe("Foo.Tests", "go.mod"),
     ];
 
     // Act
@@ -281,6 +282,9 @@ describe("issue #472: the no-signal floor", () => {
     // Assert: `mandate_reads` is absent from this source document, so the
     // carried property is `undefined` and `JSON.stringify` drops it entirely
     // (issue #489). Its presence case is pinned in blast-radius-derive.test.ts.
+    // `mergeable_paths` (issue #643) is a second optional key that is likewise
+    // absent from SOURCE_DOCUMENT and therefore dropped; its presence case is
+    // pinned in blast-radius-derive-mergeable.test.ts.
     expect(Object.keys(parsed as Record<string, unknown>)).toEqual([
       "version",
       "shared_surfaces",

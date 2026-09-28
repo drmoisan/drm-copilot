@@ -152,6 +152,69 @@ Describe "validate-bash.ps1" {
         }
     }
 
+    Context "Get-CdChainedReadCommandMatch detects cd-chained read commands" {
+        # Claude Code's Bash permission engine resolves grep/cat/head/tail/less/
+        # more/sed -n/awk against Read() rules and cannot statically resolve the
+        # working directory once a preceding 'cd' has run in the same command
+        # line, so it always requires manual approval regardless of any allow
+        # rule. This forbidden-pattern check lets the agent self-correct instead
+        # of stalling on a human approval prompt.
+        It "matches every read-command family chained after cd via '&&' or ';'" {
+            $cases = @(
+                @{ Command = 'cd /tmp/x && grep -n test file.txt'; Op = 'grep' },
+                @{ Command = 'cd /tmp/x && cat file.txt'; Op = 'cat' },
+                @{ Command = 'cd /tmp/x; tail -f log.txt'; Op = 'tail' },
+                @{ Command = 'cd /tmp/x && head -20 file.txt'; Op = 'head' },
+                @{ Command = 'cd /tmp/x && less file.txt'; Op = 'less' },
+                @{ Command = 'cd /tmp/x && more file.txt'; Op = 'more' },
+                @{ Command = 'cd /tmp/x && awk "{print}" file.txt'; Op = 'awk' },
+                @{ Command = 'cd /tmp/x && sed -n 1,5p file.txt'; Op = 'sed -n' }
+            )
+
+            foreach ($case in $cases) {
+                $matched = Get-CdChainedReadCommandMatch -Command $case.Command
+                $matched | Should -Be $case.Op
+            }
+        }
+
+        It "matches even when the chained command's own path argument is absolute" {
+            Get-CdChainedReadCommandMatch -Command 'cd /tmp/x && grep -n test /tmp/x/file.txt' | Should -Be 'grep'
+        }
+
+        It "returns `$null for a bare read command with no preceding cd" {
+            Get-CdChainedReadCommandMatch -Command 'grep -n pattern /abs/path/file' | Should -BeNullOrEmpty
+        }
+
+        It "returns `$null for a cd chained with a non-read-command (no false positive on common toolchain invocations)" {
+            Get-CdChainedReadCommandMatch -Command 'cd extensions/drm-copilot && npm test' | Should -BeNullOrEmpty
+            Get-CdChainedReadCommandMatch -Command 'cd extensions/drm-copilot && npm ci' | Should -BeNullOrEmpty
+            Get-CdChainedReadCommandMatch -Command 'cd extensions/drm-copilot && npx jest' | Should -BeNullOrEmpty
+        }
+
+        It "returns `$null for empty or null input" {
+            Get-CdChainedReadCommandMatch -Command '' | Should -BeNullOrEmpty
+            Get-CdChainedReadCommandMatch -Command $null | Should -BeNullOrEmpty
+        }
+
+        It "produces a deny reason via Get-BashBlockReason naming the matched read command" {
+            $reason = Get-BashBlockReason -Command 'cd /tmp/x && grep -n test file.txt'
+            $reason | Should -BeLike "*cd ... && grep*"
+            $reason | Should -BeLike "*Read()*"
+        }
+
+        It "the dangerous-pattern denylist takes precedence when a command matches both" {
+            $reason = Get-BashBlockReason -Command 'cd /tmp/x && rm -rf /tmp/x/file.txt'
+            $reason | Should -BeLike "*Blocked dangerous command pattern*"
+        }
+
+        It "denies through Invoke-ValidateBashDecision for a cd-chained read command in the nested tool_input" {
+            $nested = '{"tool_name":"Bash","tool_input":{"command":"cd /tmp/x && grep -n test file.txt"}}'
+            $decision = Invoke-ValidateBashDecision -ToolInputRaw $nested
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*cd ... && grep*"
+        }
+    }
+
     Context "Hook source contains no deny-path exit 1" {
         It "does not use an 'exit 1' statement anywhere in the hook source" {
             # Match an exit-1 statement (optional leading whitespace then 'exit 1'),

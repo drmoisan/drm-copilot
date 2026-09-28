@@ -8,7 +8,20 @@ import {
 import { POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS } from "./workflow-command-arguments";
 import { DISCOVERY_TOOL_DEFINITIONS } from "./mcp-discovery-tool-definitions";
 import { POSHQC_TOOL_DEFINITIONS } from "./mcp-repo-automation-tool-definitions-poshqc";
+import { HANDOFF_TOOL_DEFINITIONS } from "./mcp-repo-automation-tool-definitions-handoff";
 export { POSHQC_TOOL_DEFINITIONS } from "./mcp-repo-automation-tool-definitions-poshqc";
+export {
+  HANDOFF_TOOL_DEFINITIONS,
+  type PortableHandoffAuthorityResult,
+  type PortableHandoffMode,
+  type PortableHandoffProvider,
+  type PortableHandoffReferenceRequest,
+  type PortableHandoffStatus,
+  type ResolveOrchestrationTopologyRequest,
+  type ResolveProviderRoutingRequest,
+  type TransitionPreparedOrchestrationRequest,
+  type TransitionPreparedOrchestrationResult,
+} from "./mcp-repo-automation-tool-definitions-handoff";
 export interface ToolDefinition {
   readonly name: RepoAutomationToolName;
   readonly description: string;
@@ -46,6 +59,11 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
           type: "string",
           description:
             "Explicit base branch or ref used for PR context collection.",
+        },
+        target_ref: {
+          type: "string",
+          description:
+            "Optional explicit head ref naming the branch to collect PR context for. When omitted, the invoking session's current HEAD is used as a fallback, and the fallback is recorded on the returned result and in the summary artifact.",
         },
       },
       required: ["workspace_root", "base"],
@@ -345,6 +363,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
             "parallel-orchestrator-state",
             "parallel-planner-state",
             "parallel-kickoff",
+            "portable-orchestration-handoff",
           ],
           description: "The type of orchestration artifact to validate.",
         },
@@ -383,6 +402,7 @@ export const REPO_AUTOMATION_TOOL_DEFINITIONS: ReadonlyArray<ToolDefinition> = [
       additionalProperties: false,
     },
   },
+  ...HANDOFF_TOOL_DEFINITIONS,
   {
     name: "render_subagent_tree",
     description:

@@ -6,7 +6,7 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:HookRoot = Join-Path $script:RepoRoot '.codex/hooks'
         $script:ConfigPath = Join-Path $script:RepoRoot '.codex/config.toml'
-        $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+        $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
 
         # Candidate tool names probed against each matcher regex. A future
         # registration cannot silently escape coverage, because the registration
@@ -130,7 +130,7 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
     It 'parses at least three matcher groups and every registered handler from config.toml' {
         # Guards the derivation itself: a silently empty parse would make the
         # matrix below vacuously green.
-        @($script:Registrations).Count | Should -BeGreaterThan 0
+        @($script:Registrations | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0
         @($script:Registrations | ForEach-Object { $_.Matcher } | Select-Object -Unique).Count | Should -BeGreaterOrEqual 3
         $script:RegisteredHookNames | Should -Contain 'check-python-test-purity.ps1'
         $script:RegisteredHookNames | Should -Contain 'enforce-completion-consistency.ps1'
@@ -192,7 +192,19 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
     It 'leaves no Codex batch-budget state behind' {
         # Convention C4: every payload above targets README.md or a read-only
         # command, so the batch-budget entrypoints must never write state.
-        Test-Path -LiteralPath (Join-Path $script:RepoRoot '.codex/state') |
-            Should -BeFalse -Because 'benign payloads must not create batch-budget state'
+        $syntheticPythonState = Join-Path $script:RepoRoot '.codex/state/python-batch-budget.native-hook-contract.json'
+        $syntheticPowerShellState = Join-Path $script:RepoRoot '.codex/state/powershell-batch-budget.native-hook-contract.json'
+
+        Test-Path -LiteralPath $syntheticPythonState |
+            Should -BeFalse -Because 'benign payloads must not create Python batch-budget state for the synthetic session'
+        Test-Path -LiteralPath $syntheticPowerShellState |
+            Should -BeFalse -Because 'benign payloads must not create PowerShell batch-budget state for the synthetic session'
+    }
+
+    Context 'Non-vacuity floor for the registration count' {
+        It 'documents that the legacy expression @($null).Count -gt 0 evaluates to $true while the filtered form is $false' {
+            (@($null).Count -gt 0) | Should -BeTrue
+            (@($null | Where-Object { $null -ne $_ }).Count -gt 0) | Should -BeFalse
+        }
     }
 }

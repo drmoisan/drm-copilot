@@ -1,0 +1,4 @@
+WORKTREE|/repo/main|main|main
+WORKTREE|/repo-wt/current|current-branch|
+BRANCH|current-branch|PROTECTED_CURRENT
+BRANCH|main|PROTECTED_CURRENT

@@ -6,7 +6,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:HookRoot = Join-Path $script:RepoRoot '.codex/hooks'
         $script:BundleHookRoot = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks'
-        $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+        $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
         $script:PreToolHookNames = @(
             'validate-bash.ps1',
             'enforce-promotion-mcp-only.ps1',
@@ -27,9 +27,12 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         # excluded from the stdin-read assertion and from every process-level
         # invocation loop, because they define functions only and are never
         # executed as a hook process.
-        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1', 'enforce-orchestration-preimplementation-gate-helpers.ps1')
+        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1', 'enforce-orchestration-preimplementation-gate-helpers.ps1', 'hook-command-scanner.ps1', 'hook-command-invocation.ps1')
         $script:StaticCheckNames = @($script:AllHookNames) + @($script:SharedModuleNames)
         $script:CorePackManifestPath = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json'
+        # Issue #707 (D10): load the gate so its epic-scope read is mocked for every in-process row.
+        . (Join-Path $script:HookRoot 'enforce-orchestration-preimplementation-gate.ps1')
+        Mock Get-EpicScopeCheckpointText { $null }
 
         function ConvertTo-CodexPreToolPayload {
             param(

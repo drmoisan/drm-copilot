@@ -1,0 +1,6 @@
+Timestamp: 2026-09-17T13:05Z
+Command: node run-jest.cjs --coverage --coverageReporters=text-summary --coverageReporters=lcov (from extensions/drm-copilot/)
+EXIT_CODE: 1
+Output Summary: Test Suites: 219 passed, 219 total. Tests: 3003 passed, 3003 total (zero failed). Coverage summary: Statements 96.85% (48102/49664), Branches 90.44% (6865/7590), Functions 90.57% (1432/1581), Lines 96.85% (48102/49664). The run reported one per-file coverage-threshold failure: "Coverage for branches (72.72%) does not meet ./src/lib/pr-context/pr-context-service-call.ts threshold (75%)" — this is the expected, plan-documented state at P4-T5, because pr-context-service-call.ts gained explicit-target branches in Phase 2 whose non-undefined side is not driven by a test until P6-T1 and P6-T5. No line of the output names diff-emptiness as failing a threshold.
+
+In coverage/lcov.info, the record for `SF:src\lib\pr-context\diff-emptiness.ts` reports LF:96 LH:96 (100% lines, >= 85% required) and BRF:11 BRH:9 (81.8% branches, >= 75% required). The new module's threshold entry is satisfied. The run's overall exit code (1) is recorded but is not the gate at this point per the plan's own P4-T5 text; it is expected to resolve once P6-T1/P6-T5 land tests that exercise pr-context-service-call.ts's explicit-target branches, which is verified unconditionally at P8-T4.

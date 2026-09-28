@@ -1,0 +1,22 @@
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "removals": [],
+  "preserved_files": [
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/scan-scope/wt",
+      "source_path": "agent-memory/atomic-executor/scope-lesson.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "agent-memory/atomic-executor/scope-lesson.md",
+      "memory_index_line": "- [Scope lesson](scope-lesson.md) - a clean index line",
+      "line_ending": "lf",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/scan-scope fixture: this evidence string deliberately carries the token C:/Users/exampleaccount/repos so that a pass which scanned the manifest would refuse it"
+    }
+  ]
+}

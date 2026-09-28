@@ -1,0 +1,4 @@
+Timestamp: 2026-09-07T17:46
+Command: bash scripts/bash/shell-qc.sh test --coverage (dispatched via `gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-report-mode-visibility-gaps-631-r2`, run https://github.com/drmoisan/drm-copilot/actions/runs/34148603116, on the pre-change tree; local run impossible per EA-4 preference order 2 — see baseline-test.2026-09-06T23-03.md for the identical-run rationale)
+EXIT_CODE: 0
+Output Summary: 321 bats tests passed, 0 failed (see baseline-test.2026-09-06T23-03.md for the pass/fail tally derivation). The run log prints the literal line `Bash coverage (lines): 94.2%` as the pre-change baseline line coverage. This is the numeric baseline against which the post-change final-QC coverage run must show no regression, per general-unit-test.md's 85% line-coverage floor (bash is exempt from the branch-coverage gate only).

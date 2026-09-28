@@ -19,13 +19,14 @@ def _plan(*lines: str) -> str:
 
 
 def test_extract_plan_commands_returns_exact_record_fields() -> None:
-    """The extractor reports exactly the five declared record fields."""
+    """The extractor reports exactly the six declared record fields."""
 
     # Arrange
+    acceptance = "  - Acceptance: `grep -F -n 'MIT License' LICENSE` reports one match."
     text = _plan(
         "### Phase 1 — Work",
         _TASK_LINE,
-        "  - Acceptance: `grep -F -n 'MIT License' LICENSE` reports one match.",
+        acceptance,
     )
 
     # Act
@@ -38,6 +39,7 @@ def test_extract_plan_commands_returns_exact_record_fields() -> None:
         "raw_span",
         "source_line",
         "task_id",
+        "task_text",
     ]
     assert len(commands) == 1
     command = commands[0]
@@ -46,6 +48,66 @@ def test_extract_plan_commands_returns_exact_record_fields() -> None:
     assert command.raw_span == "grep -F -n 'MIT License' LICENSE"
     assert command.argv == ("grep", "-F", "-n", "MIT License", "LICENSE")
     assert command.kind == "grep"
+    assert command.task_text == "\n".join([_TASK_LINE, acceptance])
+
+
+def test_extract_plan_commands_populates_task_text_from_the_owning_task() -> None:
+    """Task text is the whole window, not just the line the span sits on."""
+
+    # Arrange
+    text = _plan(
+        "### Phase 1 — Work",
+        "- [ ] [P1-T1] First task",
+        "  - Acceptance: `poetry run pytest -q` reports 0 failed,",
+        "    and the summary line is recorded.",
+        "- [ ] [P1-T2] Second task",
+        "  - Acceptance: `poetry run ruff check scripts` reports 0 findings.",
+    )
+
+    # Act
+    commands = extract_plan_commands(text)
+
+    # Assert
+    assert len(commands) == 2
+    first, second = commands
+    assert first.task_text == "\n".join(
+        [
+            "- [ ] [P1-T1] First task",
+            "  - Acceptance: `poetry run pytest -q` reports 0 failed,",
+            "    and the summary line is recorded.",
+        ]
+    )
+    assert "Second task" not in first.task_text
+    assert second.task_text == "\n".join(
+        [
+            "- [ ] [P1-T2] Second task",
+            "  - Acceptance: `poetry run ruff check scripts` reports 0 findings.",
+        ]
+    )
+
+
+def test_extract_plan_commands_leaves_task_text_empty_outside_any_window() -> None:
+    """A span outside every window is dropped, so no record carries its text."""
+
+    # Arrange
+    text = _plan(
+        "# Plan",
+        "",
+        "Run `poetry run pytest -q` before starting.",
+        "",
+        "### Phase 1 — Work",
+        "",
+        "This phase ends with `poetry run ruff check scripts`.",
+        "",
+        _TASK_LINE,
+    )
+
+    # Act
+    commands = extract_plan_commands(text)
+
+    # Assert
+    assert commands == []
+    assert PlanCommand.__dataclass_fields__["task_text"].default == ""
 
 
 def test_extract_plan_commands_classifies_kind_grep_pytest_cov_and_other() -> None:

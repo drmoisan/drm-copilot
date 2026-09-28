@@ -21,6 +21,10 @@ Invariants, constraints, and side effects:
     result is symmetric in its two arguments, verdict and reasons alike. The
     PowerShell mirror reproduces these semantics; this module is the
     authoritative reference. Every function is pure and mutates no input.
+    Before the path level is compared, both radii are filtered through the
+    mechanically-mergeable exclusion of
+    ``scripts/dev_tools/_blast_radius_mergeable.py`` (issue #643); the filter is
+    applied to copies only, so every recorded radius stays byte-identical.
 """
 
 from __future__ import annotations
@@ -29,6 +33,10 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from scripts.dev_tools._blast_radius_glob import _entries_overlap
+from scripts.dev_tools._blast_radius_mergeable import (
+    config_mergeable_paths,
+    exclude_mergeable_paths,
+)
 from scripts.dev_tools._blast_radius_validation import (
     require_mapping,
     require_text,
@@ -133,6 +141,21 @@ class ConflictResult:
                 f"conflict reasons must follow the order {CONFLICT_KINDS}."
             )
 
+    def __bool__(self) -> bool:
+        """Project the verdict so a boolean test agrees with ``conflict``.
+
+        Without this method ``bool`` falls through to ``object.__bool__``, which
+        is unconditionally ``True``, so the natural ``if conflicts(a, b, cfg):``
+        form treats every pair as contending. ``__len__`` is deliberately not
+        defined: ``__bool__`` takes precedence over it, and a length would make
+        this record look sized, which it is not.
+
+        Returns:
+            bool: The ``conflict`` field, so the projection is total and agrees
+                with the already-validated verdict the instance carries.
+        """
+        return self.conflict
+
 
 def conflicts(
     a: BlastRadius, b: BlastRadius, config: Mapping[str, object]
@@ -143,7 +166,8 @@ def conflicts(
         a (BlastRadius): First radius.
         b (BlastRadius): Second radius.
         config (Mapping[str, object]): Parsed ``config/blast-radius.json``. The
-            relation reads no key from it today; it is validated and kept in the
+            relation reads exactly one key, ``mergeable_paths``, and is
+            otherwise unchanged; the mapping is validated and kept in the
             signature because the contract is frozen for downstream consumers.
 
     Returns:
@@ -157,7 +181,14 @@ def conflicts(
     require_mapping(config, "config")
 
     reasons: list[ConflictReason] = []
-    path_detail = _smallest_path_overlap(a.paths, b.paths)
+    # The mergeable exclusion lives only here, immediately before the path
+    # comparison, so every recorded radius stays byte-identical: the filter
+    # returns new tuples and neither radius object is rewritten.
+    mergeable = config_mergeable_paths(config)
+    path_detail = _smallest_path_overlap(
+        exclude_mergeable_paths(a.paths, mergeable),
+        exclude_mergeable_paths(b.paths, mergeable),
+    )
     if path_detail is not None:
         reasons.append(ConflictReason(kind=CONFLICT_PATH_OVERLAP, detail=path_detail))
 

@@ -38,6 +38,7 @@ CORE_FAMILIES = (
     "task-researcher",
     "prd-feature",
     "pr-author",
+    "commit-steward",
 )
 PACK_FAMILIES: dict[str, tuple[str, ...]] = {
     "core.json": CORE_FAMILIES,

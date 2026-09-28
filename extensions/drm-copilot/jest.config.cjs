@@ -23,6 +23,53 @@ module.exports = {
   // unrelated legacy coverage. Zero-branch definition modules report 100% branch
   // by convention and therefore satisfy the branch gate.
   coverageThreshold: {
+    // Issue #574: the three pr-context modules changed by the collect-pr-context
+    // path-identity and freshness fix. The map carried no entry for any
+    // src/lib/pr-context/ file before this change.
+    "./src/lib/pr-context/pr-context-service-call.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/collector-core.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/collector-output.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/summary-helpers.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #622: pr-context modules changed by the autoclose derivation fix.
+    // Per-file entries only; the map has no `global` key.
+    "./src/lib/pr-context/autoclose.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/models.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/feature-docs-parsers.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/render-feature-excerpts.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/render-pr-helpers.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #588: the new PATH executable resolver. Per-file entry only; the
+    // map has no `global` key.
+    "./src/lib/executable-resolver.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/orchestrator-state-core.ts": {
       lines: 85,
       branches: 75,
@@ -192,6 +239,27 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #643: the manifest vocabulary and classification split out of the
+    // derivation core. This map carries no `global` key, so a new production
+    // file without its own entry here would be completely ungated.
+    "./src/lib/push-down/claude-blast-radius-derive-manifests.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #596: the pure destination-gitignore merge. This map carries no
+    // `global` key, so a new production file without its own entry would be
+    // completely ungated.
+    "./src/lib/push-down/claude-gitignore-merge.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #697: the Codex/agents publisher gained the virtual resource-pair
+    // map. This map carries no `global` key, so the file is gated only by its
+    // own entry here.
+    "./src/lib/push-down/codex-agents-customizations.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/plan-gate-commands.ts": {
       lines: 85,
       branches: 75,
@@ -206,6 +274,15 @@ module.exports = {
       branches: 75,
     },
     "./src/lib/validate/plan-gate-discrimination.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // `plan-gate-observability.ts` carries the G7, G8, G8b, and G9 rule group
+    // added by issue #519. It is a new production file under `src/`, and the
+    // coverage-exclusion policy in `.claude/rules/general-unit-test.md` forbids
+    // leaving such a file behind no gate, so it sits behind the same per-file
+    // threshold as the plan-gate modules it was added alongside.
+    "./src/lib/validate/plan-gate-observability.ts": {
       lines: 85,
       branches: 75,
     },
@@ -232,5 +309,17 @@ module.exports = {
     // remains interface-only with no executable behavior, so it stays omitted
     // from the threshold gate for exactly the reason recorded against it above,
     // while remaining included in `collectCoverageFrom`.
+    // Issue #675: the pure diff-emptiness classifier backing the empty-diff
+    // guard. This map carries no `global` key, so a new production file
+    // without its own entry here would be completely ungated.
+    "./src/lib/pr-context/diff-emptiness.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // No entry for "./src/lib/pr-context/index.ts": it is a re-export barrel
+    // measured on 2026-09-13 at `LF:115` / `LH:0` in `coverage/lcov.info`,
+    // because no module under `src` or `test` imports the barrel path. It is
+    // omitted only from the per-file threshold gate for that reason and
+    // stays inside `collectCoverageFrom`, i.e. measured but not gated.
   },
 };

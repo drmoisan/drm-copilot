@@ -17,6 +17,14 @@ export class TreeFileSystem implements FileSystem {
   readonly files = new Map<string, string>();
   readonly dirs = new Set<string>();
   readonly ensuredDirs: string[] = [];
+  /**
+   * Every `path` argument passed to {@link writeTextFile}, in call order.
+   *
+   * Recorded so a test can assert set equality between the paths a call
+   * actually wrote and the paths that call reported, rather than asserting two
+   * independent literals that can drift apart.
+   */
+  readonly writtenPaths: string[] = [];
 
   /** Register a directory (and its ancestors). */
   addDir(path: string): void {
@@ -87,6 +95,7 @@ export class TreeFileSystem implements FileSystem {
   }
 
   writeTextFile(path: string, content: string): void {
+    this.writtenPaths.push(path);
     this.addFile(path, content);
   }
 

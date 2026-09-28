@@ -33,6 +33,7 @@ import {
   validateCodeReviewText,
   validateFeatureAuditText,
 } from "./review-artifacts";
+import { validateHandoffEnvelopeText } from "./orchestration-handoff-contract";
 
 /**
  * Orchestration-artifact dispatcher and canonical-plan validator.
@@ -352,6 +353,10 @@ function dispatchValidatorErrors(input: ValidateArtifactInput): string[] {
     }
     case "parallel-kickoff":
       return validateParallelKickoffText(input.text);
+    case "portable-orchestration-handoff": {
+      const failure = validateHandoffEnvelopeText(input.text);
+      return failure === null ? [] : [failure];
+    }
     default:
       return [`Unsupported artifact type: ${input.artifactType}`];
   }

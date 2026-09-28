@@ -8,10 +8,7 @@ description: Standing instructions for Claude Code sessions in this repository.
 
 Use a strictly professional, factual, and neutral tone in all responses.
 
-- Be concise, direct, and literal.
-- Do not use jokes, humor, metaphors, playful analogies, banter, emojis, GIF references, sarcasm, or conversational filler.
-- Do not use motivational hype, celebratory phrasing, or grandiose narration.
-- If a sentence could read as casual, playful, or informal, rewrite it in neutral business language.
+The specific tone rules are stated once in `.claude/rules/tonality.md`, which the runtime loads as a mirror of the authoritative source defined below; they are not restated here.
 
 The full tone policy is defined in `.github/copilot-instructions.md` and `.github/instructions/tonality.instructions.md`. Those files are authoritative.
 

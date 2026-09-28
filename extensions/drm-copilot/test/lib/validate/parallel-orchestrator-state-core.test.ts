@@ -415,3 +415,41 @@ describe("invariant 19 optional receipt arrays", () => {
     expect(validateState(state)).toEqual([]);
   });
 });
+
+describe("optional mergeable_conflicts_resolved item field", () => {
+  // Issue #643 declares this item field in
+  // `.claude/rules/parallel-orchestration.md` as additive and
+  // tolerated-not-validated, so neither runtime reads it.
+  const mergeableConflictRecord = {
+    path: "TaskMaster.Test/TaskMaster.Test.csproj",
+    resolved_at: "2026-09-07T10-15",
+    merged_against: "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678",
+    merge_commit_sha: "0fedcba987654321fedcba9876543210fedcba98",
+    entries_added_from_ours: ["Compile:Foo.cs"],
+    entries_added_from_theirs: ["Compile:Bar.cs"],
+    version_resolutions: [
+      {
+        key: "package:Newtonsoft.Json",
+        ours: "13.0.1",
+        theirs: "13.0.3",
+        chosen: "13.0.3",
+      },
+    ],
+  };
+
+  it("accepts an item carrying mergeable_conflicts_resolved in the documented shape", () => {
+    const state = buildValidParallelState();
+    itemAt(state, 0)["mergeable_conflicts_resolved"] = [
+      mergeableConflictRecord,
+    ];
+
+    expect(validateState(state)).toEqual([]);
+  });
+
+  it("accepts an item omitting mergeable_conflicts_resolved", () => {
+    const state = buildValidParallelState();
+
+    expect("mergeable_conflicts_resolved" in itemAt(state, 0)).toBe(false);
+    expect(validateState(state)).toEqual([]);
+  });
+});

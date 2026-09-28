@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <None Include="Shared/Base1.txt" />
+<<<<<<< HEAD
+    <None Include="Ours/OursA.txt">
+      <DependentUpon>Base1.txt</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Ours/OursB.txt">
+      <DependentUpon>Base1.txt</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+=======
+    <None Include="Theirs/TheirsA.txt">
+      <DependentUpon>Base1.txt</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Theirs/TheirsB.txt">
+      <DependentUpon>Base1.txt</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+>>>>>>> origin/main
+    <None Include="Shared/Base2.txt" />
+  </ItemGroup>
+</Project>

@@ -42,6 +42,8 @@
             # Issue #275 remediation cycle 1 (fix #3): measure the epic-orchestrate hook set and
             # its dot-sourced sibling module so no production hook is excluded from coverage.
             '.claude/hooks/enforce-epic-merge-gate.ps1'
+            # Issue #670: CodeCoverage.Path is an explicit per-file allow-list, so the dot-sourced helpers file is listed here.
+            '.claude/hooks/enforce-epic-merge-gate-authorization.ps1'
             '.claude/hooks/enforce-epic-wave-barrier.ps1'
             '.claude/hooks/enforce-epic-worktree-removal-gate.ps1'
             '.claude/hooks/enforce-pr-author-skill.ps1'
@@ -105,6 +107,12 @@
             # interpreter; measured here so the new production modules are not excluded.
             '.claude/lib/codex-routing/CodexDeployment.psm1'
             '.claude/lib/codex-routing/CodexTopology.psm1'
+            # Issue #697 added the PowerShell routing CLI wrappers and their shared
+            # helper so destinations resolve routing without a Python interpreter;
+            # measured here so the new production scripts are not excluded.
+            '.codex/scripts/codex-routing-cli-common.ps1'
+            '.codex/scripts/Resolve-CodexDeployment.ps1'
+            '.codex/scripts/Resolve-CodexTopology.ps1'
             '.claude/lib/orchestrator-state/OrchestratorStateCodexModelReceipts.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateCodexTopologyReceipts.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateRoutingMatrix.psm1'
@@ -133,6 +141,13 @@
             # dot-sourced sibling for headroom; registered so the new production file stays
             # in the coverage denominator per the Coverage Exclusion Policy.
             '.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1'
+            # Issue #554 added this pure dot-sourced modes sibling, holding the mode dispatch
+            # table and the epic and parallel readiness predicates; registered so the new
+            # production file stays in the coverage denominator per the Coverage Exclusion Policy.
+            '.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1'
+            # Issue #707 added these two dot-sourced siblings for the Codex epic-scope command and path legs.
+            '.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1'
+            '.codex/hooks/enforce-orchestration-preimplementation-gate-epic-resolution.ps1'
             # Issue #415 remediation cycle 2 (R-COV): the detached-HEAD null-guard fix changed
             # these two Codex PreToolUse hooks. Both were absent from this list, so the changed
             # production surface was outside the coverage denominator. Measured here so the
@@ -163,6 +178,27 @@
             '.claude/lib/blast-radius/BlastRadius.psm1'
             '.claude/lib/blast-radius/BlastRadiusNormalization.psm1'
             '.claude/lib/blast-radius/BlastRadiusTokenShape.psm1'
+            # Issue #643 added the eighth file below. It holds the mechanically-mergeable
+            # path exclusion plus the two overlap helpers relocated out of
+            # BlastRadius.psm1. CodeCoverage.Path is an explicit per-file allow-list, so
+            # the new module must be named here to be measured.
+            '.claude/lib/blast-radius/BlastRadiusConflict.psm1'
+            # Issue #722 added the ninth file below, the integration-cost scheduling
+            # layer over the unchanged contention relation. CodeCoverage.Path is an
+            # explicit per-file allow-list, so the new module is named here to keep
+            # it in the coverage denominator.
+            '.claude/lib/blast-radius/BlastRadiusScheduling.psm1'
+            # Issue #722 also added the tenth file below, the write-intent
+            # extraction layer the facade and validation module delegate to.
+            '.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1'
+            # Issue #643 also added the merge library below: the line grammar, the
+            # keyed-union merge, and the entry script. The entry script is measured
+            # like the two modules because its Pester suite dot-sources it behind a
+            # guarded entry-point body, so every line it attributes was executed by a
+            # test rather than by a run of the step itself.
+            '.claude/lib/project-file-merge/ProjectFileMergeGrammar.psm1'
+            '.claude/lib/project-file-merge/ProjectFileMerge.psm1'
+            '.claude/lib/project-file-merge/Resolve-MergeableConflict.ps1'
             # Issue #440 added the two parallel enforcement hooks (the Layer 1 cohort
             # barrier and the worktree removal gate) and extended the invocation-origin
             # hook with the parallel-agent family; measured here so no new or changed
@@ -191,6 +227,12 @@
             '.claude/lib/mermaid/MermaidLineScanner.psm1'
             '.claude/lib/mermaid/MermaidMarkdownFences.psm1'
             '.claude/lib/mermaid/MermaidValidation.psm1'
+            # Issue #635 added the sanctioned-removal manifest module read by both worktree
+            # removal gate hooks. CodeCoverage.Path is an explicit per-file allow-list, so an
+            # unregistered production file would sit outside the coverage denominator, which
+            # the Coverage Exclusion Policy forbids. Registered here beside the other
+            # .claude/lib modules.
+            '.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1'
             # Issue #501 fixed the PreToolUse payload transport and shape across the whole
             # hook surface. CodeCoverage.Path is an explicit per-file allow-list, so the new
             # shared payload module, the six hooks that were changed but never registered,
@@ -204,19 +246,82 @@
             # dot-sourced sibling for headroom; registered so the new production file stays
             # in the coverage denominator per the Coverage Exclusion Policy.
             '.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1'
+            # Issue #554 added this pure dot-sourced modes sibling, holding the mode dispatch
+            # table and the epic and parallel readiness predicates; registered so the new
+            # production file stays in the coverage denominator per the Coverage Exclusion Policy.
+            '.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1'
+            # Issue #663 added this dot-sourced sibling for the epic-scope command and path legs.
+            '.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1'
             '.claude/hooks/enforce-evidence-locations.ps1'
             '.claude/hooks/enforce-feature-folder-order.ps1'
             '.claude/hooks/enforce-checkpoint-monotonic.ps1'
             '.claude/hooks/enforce-prd-feature-before-planner.ps1'
+            # Issue #672 split the prd-feature gate's resolution logic into a dot-sourced
+            # sibling; registered so the new production file stays in the coverage
+            # denominator per the Coverage Exclusion Policy.
+            '.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1'
             '.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1'
             '.claude/hooks/enforce-pr-author-skill-helpers.ps1'
+            # Issue #526 added this out-of-band release-verification module (Layer B of the
+            # missed-npm-publish defence). CodeCoverage.Path is an explicit per-file
+            # allow-list, so the new production file is registered here; without it the file
+            # would sit outside the coverage denominator, which the Coverage Exclusion Policy
+            # forbids. Its Pester suite dot-sources the file (guarded entry-point body), so
+            # line attribution is valid.
+            'scripts/dev-tools/Invoke-ReleaseVerification.ps1'
+            # Issue #526 split the pure helpers of the verification module into this sibling
+            # file, because the parent stood one line under the 500-line cap. CodeCoverage.Path
+            # is an explicit per-file allow-list, so the new production file must be registered
+            # here to stay inside the coverage denominator; without it the relocated lines would
+            # leave the denominator entirely, which the Coverage Exclusion Policy forbids. Its
+            # Pester suite dot-sources the file, and the file declares no entry-point block, so
+            # line attribution is valid.
+            'scripts/dev-tools/Invoke-ReleaseVerificationHelpers.ps1'
+            # Issue #526 added this release-reconciliation module (Layer C of the
+            # missed-npm-publish defence). CodeCoverage.Path is an explicit per-file
+            # allow-list, so the new production file is registered here; without it the file
+            # would sit outside the coverage denominator, which the Coverage Exclusion Policy
+            # forbids. Its Pester suite dot-sources the file (guarded entry-point body), so
+            # line attribution is valid.
+            'scripts/dev-tools/Invoke-ReleaseReconciliation.ps1'
+            # Issue #552 validates start-time routing attestation coverage for this hook.
+            '.codex/hooks/record-subagent-routing-attestation.ps1'
+            # Issue #545 adds the shared command parser as two dot-sourced .ps1 siblings, one
+            # pair per runtime. CodeCoverage.Path is an explicit per-file allow-list, so each
+            # new production file is registered here; without it the file would sit outside
+            # the coverage denominator, which the Coverage Exclusion Policy forbids. Both
+            # files define functions only and are dot-sourced by their Pester suites, so line
+            # attribution is valid. No extensions/drm-copilot/resources/ path is added,
+            # because the list holds zero entries under that prefix and every bundle mirror is
+            # guarded by byte identity instead.
+            '.claude/hooks/hook-command-scanner.ps1'
+            '.claude/hooks/hook-command-invocation.ps1'
+            '.codex/hooks/hook-command-scanner.ps1'
+            '.codex/hooks/hook-command-invocation.ps1'
+            # Issue #545 also modifies four Codex canonical hooks that the [P0-T9] baseline
+            # recorded as absent from this list. They are registered here so the files this
+            # change edits are all inside the coverage denominator.
+            '.codex/hooks/enforce-promotion-mcp-only.ps1'
+            '.codex/hooks/enforce-epic-merge-gate.ps1'
+            '.codex/hooks/enforce-epic-worktree-removal-gate.ps1'
+            '.codex/hooks/validate-bash.ps1'
+            # Issue #669 added the worktree-resolution module (target-worktree locator, path
+            # normaliser, and four-state call-target derivation). CodeCoverage.Path is an
+            # explicit per-file allow-list, so an unregistered production file would sit
+            # outside the coverage denominator, which the Coverage Exclusion Policy forbids.
+            # Registered here beside the other .claude/lib modules.
+            '.claude/lib/worktree-resolution/WorktreeResolution.psm1'
+            '.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1'
+            # Issue #673 added the identity-resolution module, registered for the same reason.
+            '.claude/lib/worktree-resolution/WorktreeItemResolution.psm1'
+            # Issue #663 added the epic-scope resolver and its pure readiness predicates.
+            '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'
+            '.claude/lib/worktree-resolution/EpicScopeReadiness.psm1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
     }
 }
-
-
 
 
 

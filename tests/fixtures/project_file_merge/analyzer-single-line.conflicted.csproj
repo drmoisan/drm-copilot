@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <Analyzer Include="Shared/Base1.dll" />
+<<<<<<< HEAD
+    <Analyzer Include="Ours/OursA.dll" />
+    <Analyzer Include="Ours/OursB.dll" />
+=======
+    <Analyzer Include="Theirs/TheirsA.dll" />
+    <Analyzer Include="Theirs/TheirsB.dll" />
+>>>>>>> origin/main
+    <Analyzer Include="Shared/Base2.dll" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,74 @@
+[
+  {
+    "operation": "validate_orchestration_artifacts",
+    "rejection_code": null,
+    "semantic_id": "drm-copilot.validate_orchestration_artifacts",
+    "transport_id": "mcp__drm-copilot__validate_orchestration_artifacts"
+  },
+  {
+    "operation": "validate_orchestration_artifacts",
+    "rejection_code": null,
+    "semantic_id": "drm-copilot.validate_orchestration_artifacts",
+    "transport_id": "mcp__drm_copilot__validate_orchestration_artifacts"
+  },
+  {
+    "operation": "resolve_orchestration_topology",
+    "rejection_code": null,
+    "semantic_id": "drm-copilot.resolve_orchestration_topology",
+    "transport_id": "mcp__drm-copilot__resolve_orchestration_topology"
+  },
+  {
+    "operation": "resolve_orchestration_topology",
+    "rejection_code": null,
+    "semantic_id": "drm-copilot.resolve_orchestration_topology",
+    "transport_id": "mcp__drm_copilot__resolve_orchestration_topology"
+  },
+  {
+    "operation": "resolve_provider_routing",
+    "rejection_code": null,
+    "semantic_id": "drm-copilot.resolve_provider_routing",
+    "transport_id": "mcp__drm-copilot__resolve_provider_routing"
+  },
+  {
+    "operation": "resolve_provider_routing",
+    "rejection_code": null,
+    "semantic_id": "drm-copilot.resolve_provider_routing",
+    "transport_id": "mcp__drm_copilot__resolve_provider_routing"
+  },
+  {
+    "operation": "transition_prepared_orchestration",
+    "rejection_code": null,
+    "semantic_id": "drm-copilot.transition_prepared_orchestration",
+    "transport_id": "mcp__drm-copilot__transition_prepared_orchestration"
+  },
+  {
+    "operation": "transition_prepared_orchestration",
+    "rejection_code": null,
+    "semantic_id": "drm-copilot.transition_prepared_orchestration",
+    "transport_id": "mcp__drm_copilot__transition_prepared_orchestration"
+  },
+  {
+    "operation": null,
+    "rejection_code": "SEMANTIC_MCP_IDENTITY_REJECTED",
+    "semantic_id": null,
+    "transport_id": "mcp__drm-copilot"
+  },
+  {
+    "operation": null,
+    "rejection_code": "SEMANTIC_MCP_IDENTITY_REJECTED",
+    "semantic_id": null,
+    "transport_id": "mcp__other__validate_orchestration_artifacts"
+  },
+  {
+    "operation": null,
+    "rejection_code": "SEMANTIC_MCP_IDENTITY_REJECTED",
+    "semantic_id": null,
+    "transport_id": "mcp__drm-copilot__validate_orchestration_artifact"
+  },
+  {
+    "operation": null,
+    "rejection_code": "SEMANTIC_MCP_IDENTITY_REJECTED",
+    "semantic_id": null,
+    "transport_id": "mcp__drm-copilot__collect_commit_context"
+  }
+]

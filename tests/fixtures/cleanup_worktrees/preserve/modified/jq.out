@@ -1,0 +1,1 @@
+tests/fixtures/cleanup_worktrees/preserve/modified/wt	agent-memory/atomic-executor/modified-lesson.md	modified	PRESERVE	STILL_RELEVANT	null	true	true		absent	object	clean	cleanup-wt-host-tokens-v1	preserve/modified fixture: a modified lesson staged by the same path as an untracked one

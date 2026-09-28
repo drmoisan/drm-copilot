@@ -32,6 +32,8 @@ Before proceeding, `parallel-planner` must:
 
 ## Item Intake
 
+Initial intake must provide the complete item set in one `/parallel-plan <slug> <item> [<item> ...]` invocation before waves are calculated. `/parallel-add` is not an initial-intake path.
+
 Invocation shape: `/parallel-plan <slug> <item> [<item> ...]`, where each `<item>` is either a
 GitHub issue number (already-promoted work) or a potential-entry path (unpromoted work). This is
 the same intake domain as `/parallel-add`, so initial intake here and F6's add operation accept
@@ -180,8 +182,12 @@ PowerShell port** under `.claude/lib/blast-radius/`, which is published by push-
 Python interpreter:
 
 ```powershell
-Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force
+$repoRoot = git rev-parse --show-toplevel
+Import-Module (Join-Path $repoRoot '.claude/lib/blast-radius/BlastRadius.psm1') -Force -ErrorAction Stop
 ```
+
+The default PowerShell 5.1 execution policy blocks `Import-Module` of a `.psm1` file, so `pwsh` is
+mandatory here.
 
 The facade re-exports the five functions this skill needs: `Get-PlanPaths` (port of
 `extract_plan_paths`), `Get-BlastRadius` (port of `derive_blast_radius`),
@@ -189,6 +195,10 @@ The facade re-exports the five functions this skill needs: `Get-PlanPaths` (port
 (port of `validate_blast_radius`), and `Test-BlastRadiusConflict` (port of `conflicts`). Wrap a
 call to `Test-BlastRadius` in `@(...)`: it writes its findings to the pipeline, so a zero-element
 result writes nothing and a one-element result writes a single object.
+
+`Test-BlastRadiusConflict` reads the optional `mergeable_paths` list from that truth table and
+contributes no `path_overlap` edge for a path matching it, while the path itself stays in the
+declared radius and is still read by every audit.
 
 The truth table the port reads is `config/blast-radius.json`, which push-down publishes into the
 destination workspace alongside `.claude`.
@@ -214,7 +224,9 @@ as-is and never reimplemented here:
   `compute_blast_radius.py`. The signature takes three arguments; the third is the parsed
   `config/blast-radius.json`. Reasons come from the fixed vocabulary
   `{path_overlap, module_overlap, shared_surface_overlap, contract_dependency}`, and the relation
-  fails closed.
+  fails closed. Read the verdict from the conflict field of the returned ConflictResult.
+  The result's boolean projection now agrees with that field, so `if conflicts(a, b, config):`
+  yields the verdict rather than the unconditional truth a bare object test gave before issue #576.
 
 **The F1a corrections (issue #452, merged PR #453) are load-bearing.** Derivation now reaches
 separator-free repository-root shared surfaces from plan and spec text, admitting such a token only
@@ -300,13 +312,30 @@ The library returns the partition; the planner supplies the record fields.
 ### Seeding procedure
 
 1. Invoke `compute-cohorts.sh` exactly once per plan run, over the full conflict graph, after every
-   item is `prepared` and radius-validated. Derive the conflict edge set by applying
-   `Test-BlastRadiusConflict` to every unordered pair of `declared` radii, then pass the pairs as
+   item is `prepared` and radius-validated. Derive the conflict edge set with one call to the
+   scheduling entry point over every item's `declared` radius and complexity band: Get-BlastRadiusConflictEdge
+   (`Get-BlastRadiusConflictEdge -Item <records carrying key, radius, band> -Config <parsed truth table> -Relation ${function:Test-BlastRadiusConflict}`)
+   in PowerShell, or `schedule_conflict_edges(items, config)` (re-exported from
+   `compute_blast_radius.py`, taking `SchedulingItem` records) in Python. Do not apply the
+   detection relation to each pair by hand: the entry point applies it to every unordered pair and
+   then applies the integration-cost edge rule of `.claude/rules/parallel-orchestration.md`
+   (hard classes, integer cost, pairwise benefit, and the configured `conflict_tolerance`). It
+   returns `edges` and `tolerated_overlaps`. The -Relation argument is required; pass the facade's
+   Test-BlastRadiusConflict function object as shown. Pass the returned `edges` pairs as
    `--edges "<a>:<b> ..."` and the item keys as `--keys "<k1> <k2> ..."`.
+   The detection relation inside the entry point contributes no `path_overlap` edge for a path
+   matching the truth table's optional `mergeable_paths` list, and the path stays in the declared
+   radius. When `Test-BlastRadiusConflict` is called directly (for example, while investigating a
+   single pair), read the verdict from the conflict key of the returned hashtable: the hashtable
+   itself is always truthy, so a bare boolean test on the result treats every pair as conflicting.
+   This is the sibling hazard to the `@(...)` warning above for `Test-BlastRadius`: that function
+   writes an `IList`-shaped pipeline result whose emptiness is falsy, while this one returns a
+   hashtable whose emptiness is not expressible at all.
 2. Immediately after the conflict-edge set is derived and before anything consumes it, run the
    lane-assertion diagnostic:
-   `poetry run python -m scripts.dev_tools.parallel_lane_assertion --manifest docs/features/parallel/<slug>/parallel.md --edges "<a>:<b> ..."`
-   (covered by the planner's existing `Bash(poetry run *)` grant). It compares the manifest's
+   `bash .claude/lib/bash/report-lane-assertion.sh --manifest docs/features/parallel/<slug>/parallel.md --edges "<a>:<b> ..."`
+   (a bash invocation against the published payload; it requires no Python interpreter at the
+   destination runtime). It compares the manifest's
    optional `expected_conflict_components` assertion (invariant M8) against the connected
    components of the DERIVED conflict graph and prints one `ADVISORY` line per finding in four
    classes: expected-together-but-derived-apart, expected-apart-but-derived-together, a member
@@ -321,7 +350,16 @@ The library returns the partition; the planner supplies the record fields.
    Recording the diagnostic's result in the planner checkpoint is a tolerated extra field, not a
    validated one; no validator changes for it.
 3. Record `cohorts[]` at `generation: 0`, each cohort's `item_keys[]` sorted ascending.
-4. Record `conflict_edges[]` as `{a, b, reason}` entries for auditability.
+4. Record `conflict_edges[]` as `{a, b, reason}` entries for auditability; each entry may also carry
+   the tolerated extra fields `hard`, `cost`, and `benefit` returned by the entry point. Record the
+   returned tolerated overlaps in a `tolerated_overlaps` list on the planner checkpoint, one
+   `{a, b, reasons, cost, benefit}` entry per detected, non-hard pair within tolerance. No reason
+   member is added and no validator reads these fields.
+   **Soft-overlap merge rule.** A tolerated pair is not an edge: its two items run in the same or
+   adjacent cohorts without a barrier. The later-merging item of a tolerated pair merges
+   `origin/main` under the existing per-item merge-conflict handling and re-passes CI before it
+   merges. This is the operator-directed configured policy of issue #722; it never licenses
+   hand-narrowing a radius.
 5. Record `recolor_generation: 0` and `current_cohort: 0`.
 6. Record `max_concurrency` — default 4, bounded 1 through 32 by the F3 schema — without enforcing
    it. Enforcement is F5's, through
@@ -549,6 +587,17 @@ as are whole-tree operands, tree-wide flags, pathspec-from-file options, history
 content-widening options, and any operand that resolves outside the five exempt trees. Mixing one
 exempt operand with one production operand denies the whole invocation. Name each exempt path
 explicitly; the exemption is allow-side only and every parse ambiguity denies.
+
+#### Attribution trailers (issue #713)
+
+With no ready feature checkpoint, the exemption admits two attribution-trailer forms on a pathspec-bearing `git commit`, each followed by the double-dash separator and the exempt path operands:
+
+- The trailer option: `git commit -m 'docs: plan' --trailer 'Co-Authored-By: Name <email>' --trailer 'Claude-Session: <url>' -- <exempt paths>`. The separate-value form and the `--trailer=<value>` form are both admitted, any number of times, on `git commit` only; `git add --trailer` and a trailer option with no value are denied. Git writes every trailer value into one trailer block.
+- The one-paragraph multi-message form: the subject in the first `-m` and every trailer in one single-quoted second `-m` value, separated by a literal newline. Each `-m` value becomes its own paragraph and git parses only the last paragraph as the trailer block, so trailers split across separate `-m` values do not form one trailer block.
+
+Quoting rules: `$` and backtick are literal and admitted inside single quotes, and denied outside quotes and inside double quotes, where the shell expands them. `<` and `>` are admitted inside single or double quotes and denied outside quotes. An unquoted `#` is denied anywhere, because it starts a shell comment that the exemption does not model; a `#` inside quotes is admitted. A typographic quote character (U+2018 to U+201E) anywhere in the command line is denied, because a PowerShell host reads it as a quote.
+
+Not admitted: heredoc-fed messages, including `git commit -m "$(cat <<'EOF' ... EOF)"` and `git commit -F - <<'EOF'`, and message files supplied through `-F <file>` or `--file=<file>`. Use one of the two forms above instead.
 
 ## Completion Report
 

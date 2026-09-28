@@ -30,6 +30,13 @@ import { type FileSystem, RealFileSystem } from "./lib/file-system";
 import { type CommandRunner, SubprocessRunner } from "./lib/subprocess-runner";
 import { validateOrchestrationServiceCall } from "./lib/validate/validate-orchestration-service-call";
 import { buildValidateOrchestrationServiceCallInput } from "./lib/validate/build-validate-orchestration-service-call-input";
+import { resolvePortableHandoffAuthority } from "./lib/validate/orchestration-handoff-authority-service";
+import {
+  createGitCheckoutContext,
+  type HandoffCheckoutContext,
+} from "./lib/validate/orchestration-handoff-checkout-context";
+import { type OrchestrationHandoffMaterializer } from "./lib/validate/orchestration-handoff-materializer";
+import { createProductionHandoffMaterializer } from "./lib/validate/orchestration-handoff-materializer-production";
 import { newPotentialBugEntryServiceCall } from "./lib/new-potential-bug-entry-service-call";
 import { collectPrContextServiceCall } from "./lib/pr-context/pr-context-service-call";
 import { potentialToIssueServiceCall } from "./lib/potential-to-issue/potential-to-issue-service-call";
@@ -43,12 +50,20 @@ import {
   renderSubagentTreeServiceCall,
 } from "./repo-automation-service-subagent-tree";
 import type {
+  CollectPrContextInput,
   PushDownClaudeCustomizationsInput,
   PushDownCodexAndAgentsCustomizationsInput,
   RepoAutomationExecutionResult,
   RepoAutomationService,
   WorkspaceExecutionInput,
 } from "./repo-automation-service-contract";
+import type {
+  PortableHandoffAuthorityResult,
+  ResolveOrchestrationTopologyRequest,
+  ResolveProviderRoutingRequest,
+  TransitionPreparedOrchestrationRequest,
+  TransitionPreparedOrchestrationResult,
+} from "./mcp-repo-automation-tool-definitions-handoff";
 import {
   runDiscoveryDotnetAnalyzer,
   runDiscoveryInit,
@@ -83,6 +98,11 @@ export interface RepoAutomationServiceOptions {
   readonly fileSystem?: FileSystem;
   /** Command-runner for the in-process `collectCommitContext` git calls; defaults to {@link SubprocessRunner}, faked in tests. */
   readonly runner?: CommandRunner;
+  /** Optional prepared-orchestration transition injection for hermetic tests. */
+  readonly handoffMaterializer?: Pick<
+    OrchestrationHandoffMaterializer,
+    "transition"
+  >;
   /** Optional push-down filesystem (distinct from {@link FileSystem}); tests inject an in-memory fake, production defaults to {@link RealPushDownFileSystem}. */
   readonly pushDownFileSystem?: PushDownFileSystem;
 }
@@ -93,6 +113,11 @@ class DefaultRepoAutomationService implements RepoAutomationService {
   private readonly templateRoot: string;
   private readonly fileSystem: FileSystem;
   private readonly runner: CommandRunner;
+  private readonly handoffMaterializer: Pick<
+    OrchestrationHandoffMaterializer,
+    "transition"
+  >;
+  private readonly checkoutContext: HandoffCheckoutContext;
   private readonly resolvePromptDeps: ResolvePromptServiceDeps;
   private readonly pushDownDeps: PushDownServiceDeps;
 
@@ -102,6 +127,11 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     this.templateRoot = buildTemplateRoot(this.extensionRoot);
     this.fileSystem = options.fileSystem ?? new RealFileSystem();
     this.runner = options.runner ?? new SubprocessRunner();
+    this.handoffMaterializer =
+      options.handoffMaterializer ??
+      createProductionHandoffMaterializer(this.fileSystem, this.runner);
+    // Read-only checkout authority over the same injected local Git runner.
+    this.checkoutContext = createGitCheckoutContext(this.runner);
     this.resolvePromptDeps = {
       fileSystem: this.fileSystem,
       extensionRoot: this.extensionRoot,
@@ -126,15 +156,14 @@ class DefaultRepoAutomationService implements RepoAutomationService {
     });
   }
   async collectPrContext(
-    input: WorkspaceExecutionInput & { readonly base: string },
+    input: CollectPrContextInput,
   ): Promise<RepoAutomationExecutionResult> {
-    // In-process TS port of the pr_context collector (F9): delegate to the
-    // extracted helper instead of spawning the bundled Python script.
     return collectPrContextServiceCall({
       runner: this.runner,
       fileSystem: this.fileSystem,
       workspaceRoot: input.workspaceRoot,
       base: input.base,
+      ...(input.targetRef === undefined ? {} : { targetRef: input.targetRef }),
       log: (message) => this.output.appendLine(message),
     });
   }
@@ -370,6 +399,36 @@ class DefaultRepoAutomationService implements RepoAutomationService {
         this.runner,
       ),
     );
+  }
+
+  async resolveOrchestrationTopology(
+    input: ResolveOrchestrationTopologyRequest,
+  ): Promise<PortableHandoffAuthorityResult> {
+    return resolvePortableHandoffAuthority(
+      this.fileSystem,
+      input,
+      "topology",
+      undefined,
+      this.checkoutContext,
+    );
+  }
+
+  async resolveProviderRouting(
+    input: ResolveProviderRoutingRequest,
+  ): Promise<PortableHandoffAuthorityResult> {
+    return resolvePortableHandoffAuthority(
+      this.fileSystem,
+      input,
+      "provider_routing",
+      undefined,
+      this.checkoutContext,
+    );
+  }
+
+  async transitionPreparedOrchestration(
+    input: TransitionPreparedOrchestrationRequest,
+  ): Promise<TransitionPreparedOrchestrationResult> {
+    return this.handoffMaterializer.transition(input);
   }
 
   async renderSubagentTree(

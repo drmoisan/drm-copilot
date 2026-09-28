@@ -5,7 +5,7 @@
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on the "Bash" matcher before any Bash
     command runs. Regex-matches gh pr merge with a --merge flag against
-    the envelope's tool_input.command and, when matched, allows the merge only when one of three
+    the envelope's tool_input.command and, when matched, allows the merge only when one of four
     checkpoint-only conditions holds:
 
       1. Child-feature path: artifacts/orchestration/orchestrator-state.json exists,
@@ -19,12 +19,19 @@
          entry whose merge_status == "ci_green". A parallel run always names an explicit PR
          number (each item merges from its own isolated worktree), so a bare command with no
          PR number cannot satisfy this branch.
+      4. Standalone path (issue #670), evaluated last: the command names an explicit PR
+         number and one of the three checkpoints above carries a
+         standalone_merge_authorizations record whose pr_number equals it, whose fields are
+         well formed, and whose session_id equals the live envelope's session_id. The
+         dot-sourced helpers file implements this branch.
 
-    Otherwise the command is denied with reason EPIC_MERGE_GATE_BLOCKED. A missing or
-    unreadable checkpoint in any branch fails closed (denies); standalone (non-epic,
-    non-parallel) orchestration never sets epic_mode, populates epic_merge_pr, or writes a
-    parallel checkpoint with route_id == "parallel", so it is structurally prevented from
-    invoking gh pr merge --merge at all.
+    Otherwise the command is denied with reason EPIC_MERGE_GATE_BLOCKED; a denial from
+    condition 4 also carries a standalone reason code after that token. A missing or
+    unreadable checkpoint in any branch fails closed (denies). A standalone (non-epic,
+    non-parallel) run never satisfies conditions 1-3, so its only route to a merge is an
+    explicit, PR-specific, session-bound record under condition 4; a bare command with no
+    PR number never satisfies condition 4, and a blanket flag is rejected rather than read.
+    Trigger scope: --squash is out of scope for this gate and is allowed on both runtimes.
 
     Design decision: this gate trusts the on-disk checkpoint rather than shelling out live
     to gh pr view for a real-time head-SHA check, matching the same non-adversarial,
@@ -35,11 +42,23 @@
     Compatible with PowerShell 7+. No external module dependencies. Filesystem reads go
     through injectable wrapper functions so tests can mock the boundary without writing
     temporary files.
+
+    Honest disclosure: the standalone-merge authorization record is a policy-level,
+    auditable declaration and is not a cryptographic or security control. authorized_by is
+    a declaration the hook does not verify. The record is not tamper-proof against a writer
+    inside the authorizing session. The session_id cross-check rejects stale or copied
+    records from other sessions; it does not stop same-session forgery.
 #>
 [CmdletBinding()]
 param()
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+# Shared command-line parser (issue #545), consumed by the scope filter in
+# Invoke-EpicMergeGateDecision and by Get-EpicMergeGateCommandPrNumber.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+# Standalone-merge authorization predicates and the two decision-envelope factories (issue #670).
+. (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-authorization.ps1')
 
 $script:ChildCheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 $script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
@@ -128,6 +147,22 @@ function Get-EpicMergeGateCommandPrNumber {
     <#
     .SYNOPSIS
         Extract an explicit PR number argument from a gh pr merge command, or $null.
+    .DESCRIPTION
+        Both spellings are read from the segment that structurally invokes gh pr merge,
+        never from the whole command line. The positional form ("gh pr merge 410 --merge")
+        resolves through Get-CommandLineOperand and takes the first all-digit operand; the
+        flag-led forms ("gh pr merge --merge 410" and "gh pr merge --merge=410") resolve
+        through Get-CommandLineFlagValue. A bare "gh pr merge --merge" yields $null, which
+        the parallel branch treats as fail-closed.
+
+        The deleted unanchored branch scanned the WHOLE command text for the first run of
+        digits once "gh pr merge" appeared anywhere in it, and that failed in both
+        directions. Fail-closed: a leading "cd <path>" whose path carries a timestamp
+        component supplied a digit run that was not a pull request number, so an authorized
+        merge was blocked. False-allow: with authorized item 501 and unauthorized item 777,
+        "cd /repo/worktrees/501 && gh pr merge --merge 777" extracted 501, matched the
+        authorized item, and permitted the merge of PR 777. Taking the number from the
+        matched segment's own operand or flag value closes both directions.
     .PARAMETER CommandText
         The Bash command text under evaluation.
     .OUTPUTS
@@ -140,20 +175,17 @@ function Get-EpicMergeGateCommandPrNumber {
         [string] $CommandText
     )
 
-    # Original form: the PR number appears immediately after "merge"
-    # (e.g. "gh pr merge 410 --merge"). Preserved verbatim so epic-path outcomes
-    # for the forms the epic path uses are unchanged.
-    if ($CommandText -match '(?i)\bgh\s+pr\s+merge\s+(\d+)\b') {
-        return [int]$Matches[1]
+    foreach ($operand in @(Get-CommandLineOperand -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'merge'))) {
+        if ($operand -match '^\d+$') {
+            return [int]$operand
+        }
     }
-    # Broadened, additive form: the parallel command places the flag before the
-    # number (e.g. "gh pr merge --merge 410"). Once "gh pr merge" is confirmed,
-    # capture the first standalone run of digits that is not preceded by "-" or a
-    # word character, so a flag token such as "--merge" is not treated as a number
-    # and a bare "gh pr merge --merge" still yields $null.
-    if ($CommandText -match '(?i)\bgh\s+pr\s+merge\b' -and $CommandText -match '(?<![-\w])(\d+)\b') {
-        return [int]$Matches[1]
+
+    $flagValue = Get-CommandLineFlagValue -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'merge') -FlagName '--merge'
+    if ($null -ne $flagValue -and $flagValue -match '^\d+$') {
+        return [int]$flagValue
     }
+
     return $null
 }
 
@@ -307,36 +339,6 @@ function Test-ParallelCheckpointAllowsMerge {
     return $false
 }
 
-function Get-EpicMergeGateAllowDecision {
-    [CmdletBinding()]
-    [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param()
-
-    return [ordered]@{
-        hookSpecificOutput = [ordered]@{
-            hookEventName      = 'PreToolUse'
-            permissionDecision = 'allow'
-        }
-    }
-}
-
-function Get-EpicMergeGateBlockDecision {
-    [CmdletBinding()]
-    [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param(
-        [Parameter(Mandatory)]
-        [string] $Reason
-    )
-
-    return [ordered]@{
-        hookSpecificOutput = [ordered]@{
-            hookEventName            = 'PreToolUse'
-            permissionDecision       = 'deny'
-            permissionDecisionReason = $Reason
-        }
-    }
-}
-
 function Invoke-EpicMergeGateDecision {
     <#
     .SYNOPSIS
@@ -373,8 +375,26 @@ function Invoke-EpicMergeGateDecision {
     }
 
     # Only a gh pr merge invocation carrying --merge is in scope for this gate; every
-    # other Bash command is unaffected.
-    if ($commandText -notmatch '(?i)\bgh\s+pr\s+merge\b' -or $commandText -notmatch '--merge\b') {
+    # other Bash command is unaffected. Both legs are read structurally from the segment
+    # that invokes the command, so a quoted mention of the phrase and a --merge token
+    # belonging to some other segment no longer bring a command into scope.
+    #
+    # The flag leg needs a raw-scan fallback: a wrapper's quoted argument collapses into ONE
+    # token, so a flag inside it is never read as a token, and the token-only read took
+    # bash -c "gh pr merge --merge 688" out of scope. The fallback reads only the segments the
+    # scanner already scans raw, so a masked mention in a non-wrapper segment stays out.
+    $isMergeInvocation = Test-CommandLineInvocation -CommandText $commandText -CommandWord 'gh' -SubcommandPath @('pr', 'merge')
+    $hasMergeFlag = Test-CommandLineFlag -CommandText $commandText -CommandWord 'gh' -SubcommandPath @('pr', 'merge') -FlagName '--merge'
+    if (-not $hasMergeFlag) {
+        foreach ($segment in @(Read-CommandLineSegment -CommandText $commandText)) {
+            if ((Test-CommandLineSegmentRawScan -Segment $segment) -and
+                $segment.ScanText.IndexOf('--merge', [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                $hasMergeFlag = $true
+                break
+            }
+        }
+    }
+    if (-not $isMergeInvocation -or -not $hasMergeFlag) {
         return Get-EpicMergeGateAllowDecision
     }
 
@@ -393,6 +413,17 @@ function Invoke-EpicMergeGateDecision {
     $parallelCheckpoint = ConvertFrom-EpicMergeGateJson -Raw (Get-ParallelOrchestratorCheckpointContent)
     if (Test-ParallelCheckpointAllowsMerge -Checkpoint $parallelCheckpoint -CommandPrNumber $commandPrNumber) {
         return Get-EpicMergeGateAllowDecision
+    }
+
+    # Branch 4, evaluated last and only for an explicit PR number: a PR-specific standalone
+    # authorization record bound to the live session. Its deny keeps the gate token first.
+    if ($null -ne $commandPrNumber) {
+        $envelopeSessionId = [string](Get-ClaudeHookEnvelopeValue -Envelope $payload.Envelope -Name 'session_id')
+        $standalone = Test-StandaloneCheckpointAllowsMerge -Checkpoints @($childCheckpoint, $epicCheckpoint, $parallelCheckpoint) -CommandPrNumber $commandPrNumber -EnvelopeSessionId $envelopeSessionId
+        if ($standalone.Allowed) {
+            return Get-EpicMergeGateAllowDecision
+        }
+        return Get-EpicMergeGateBlockDecision -Reason ('EPIC_MERGE_GATE_BLOCKED: ' + $standalone.ReasonCode + ': ' + $standalone.Message)
     }
 
     return Get-EpicMergeGateBlockDecision -Reason 'EPIC_MERGE_GATE_BLOCKED: gh pr merge --merge requires either a per-feature checkpoint with epic_mode == true and step9_status == "passed", an epic checkpoint with epic_merge_pr.ci_gate.conclusion == "success" and a matching pr_number, or a parallel-orchestrator checkpoint with route_id == "parallel" whose target item (matched by pr_number) has merge_status == "ci_green". No checkpoint satisfied this gate.'

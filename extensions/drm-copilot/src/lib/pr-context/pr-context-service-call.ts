@@ -21,15 +21,53 @@
 
 import { join } from "node:path";
 
+import { defaultWhichGh } from "../executable-resolver";
 import { type FileSystem } from "../file-system";
 import { type CommandRunner } from "../subprocess-runner";
 import { normalizeGeneratedPath } from "../../repo-automation-service-support";
 import { collectAndWrite } from "./collector-output";
+import { classifyPrContextDiffState } from "./diff-emptiness";
+import { type WhichGh } from "./gh-client-core";
 
 /** Repo-relative summary artifact path written by the collector. */
 const SUMMARY_OUT = "artifacts/pr_context.summary.txt";
 /** Repo-relative appendix artifact path written by the collector. */
 const APPENDIX_OUT = "artifacts/pr_context.appendix.txt";
+
+/**
+ * Verify one artifact write by reading the file back and comparing content.
+ *
+ * This is a read-back comparison against the exact text this invocation
+ * rendered, not an existence check. An existence check is satisfied by a file
+ * left behind by a prior invocation, which is the hazard under repair: a stale
+ * pair at the expected paths passes existence and misdescribes the branch.
+ *
+ * @param fileSystem Filesystem the write was performed through.
+ * @param artifactPath Absolute path this invocation wrote.
+ * @param expected The exact text this invocation rendered for that path.
+ * @throws Error naming `artifactPath` when the read fails or content differs.
+ */
+function verifyWrittenArtifact(
+  fileSystem: FileSystem,
+  artifactPath: string,
+  expected: string,
+): void {
+  let actual: string;
+  try {
+    actual = fileSystem.readTextFile(artifactPath);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Failed to verify PR context artifact '${artifactPath}': the file could not be read back after writing (${detail}).`,
+      { cause: error },
+    );
+  }
+  if (actual !== expected) {
+    throw new Error(
+      `Failed to verify PR context artifact '${artifactPath}': the content read back is not the content this invocation rendered (expected ${String(expected.length)} characters, read back ${String(actual.length)}).`,
+    );
+  }
+}
 
 /** Input for {@link collectPrContextServiceCall}. */
 export interface CollectPrContextServiceCallInput {
@@ -41,8 +79,19 @@ export interface CollectPrContextServiceCallInput {
   readonly workspaceRoot: string;
   /** Base ref the PR context is computed against. */
   readonly base: string;
+  /**
+   * Optional explicit head ref naming the branch to collect PR context for.
+   * When omitted, the invoking session's HEAD is used as a fallback.
+   */
+  readonly targetRef?: string;
   /** Optional log sink wired to the service output channel. */
   readonly log?: (message: string) => void;
+  /**
+   * Optional `gh` resolver. Resolution order: an explicit `ghPath` inside the
+   * collector, then this injected resolver, then {@link defaultWhichGh}
+   * (the process PATH).
+   */
+  readonly whichGh?: WhichGh;
 }
 
 /** Preserved result of the collect-pr-context service call. */
@@ -51,6 +100,12 @@ export interface CollectPrContextServiceCallResult {
   readonly workspaceRoot: string;
   readonly summary: string;
   readonly artifacts: ReadonlyArray<string>;
+  /** `"explicit"` when `targetRef` was supplied, `"session-fallback"` otherwise. */
+  readonly targetResolution: "explicit" | "session-fallback";
+  /** The head ref the collector actually used, or `null` when unresolved. */
+  readonly resolvedHeadRef: string | null;
+  /** The head SHA the collector actually used, or `null` when unresolved. */
+  readonly resolvedHeadSha: string | null;
 }
 
 /**
@@ -58,9 +113,11 @@ export interface CollectPrContextServiceCallResult {
  *
  * Calls {@link collectAndWrite} with the workspace root as the repo root, the
  * two default artifact paths, overwrite mode, untracked files included, and the
- * default real clock. Returns the result record matching the prior
- * Python-spawn shape: `tool`, `workspaceRoot`, the exact summary string, and
- * both normalized artifact paths joined to the workspace root.
+ * default real clock. `gh` is resolved through `input.whichGh` when supplied,
+ * otherwise through the default PATH resolver. Returns the result record
+ * matching the prior Python-spawn shape: `tool`, `workspaceRoot`, the exact
+ * summary string, and both normalized artifact paths joined to the workspace
+ * root.
  *
  * @param input Runner, filesystem, workspace root, base ref, and optional log.
  * @returns The preserved result record with both artifact paths.
@@ -68,25 +125,61 @@ export interface CollectPrContextServiceCallResult {
 export function collectPrContextServiceCall(
   input: CollectPrContextServiceCallInput,
 ): CollectPrContextServiceCallResult {
-  collectAndWrite({
+  // Each absolute output path is evaluated exactly once, here. The same
+  // variable is the write target, the verification read target, the log-line
+  // value, and the reported artifact entry, so the written set and the reported
+  // set cannot drift apart. Normalizing before the write rather than after it is
+  // required: `join` emits backslash separators on Windows, so a write using the
+  // raw joined value while the report used the normalized value would remain two
+  // different strings. Node accepts forward-slash separators on Windows, so the
+  // write is unaffected.
+  const summaryOut = normalizeGeneratedPath(
+    join(input.workspaceRoot, SUMMARY_OUT),
+  );
+  const appendixOut = normalizeGeneratedPath(
+    join(input.workspaceRoot, APPENDIX_OUT),
+  );
+
+  const rendered = collectAndWrite({
     base: input.base,
     repoRoot: input.workspaceRoot,
-    out: SUMMARY_OUT,
-    appendixOut: APPENDIX_OUT,
+    out: summaryOut,
+    appendixOut,
     append: false,
     includeUntracked: true,
     fs: input.fileSystem,
     runner: input.runner,
+    whichGh: input.whichGh ?? defaultWhichGh,
+    ...(input.targetRef === undefined ? {} : { head: input.targetRef }),
     ...(input.log === undefined ? {} : { log: input.log }),
   });
+
+  verifyWrittenArtifact(input.fileSystem, summaryOut, rendered.summaryText);
+  verifyWrittenArtifact(input.fileSystem, appendixOut, rendered.appendixText);
+
+  const targetResolution: "explicit" | "session-fallback" =
+    input.targetRef === undefined ? "session-fallback" : "explicit";
+
+  const diffState = classifyPrContextDiffState({
+    mergeBase: rendered.mergeBase,
+    headSha: rendered.headSha,
+    resolvedHeadRef: rendered.resolvedHeadRef,
+    resolvedBase: rendered.resolvedBase,
+    changedFileCount: rendered.changedFileCount,
+    requestedBase: input.base,
+    attemptedHeadRef: input.targetRef ?? null,
+  });
+  if (diffState.kind !== "populated") {
+    throw new Error(diffState.message);
+  }
 
   return {
     tool: "collect_pr_context",
     workspaceRoot: input.workspaceRoot,
     summary: `Collected PR context against base '${input.base}'.`,
-    artifacts: [
-      normalizeGeneratedPath(join(input.workspaceRoot, SUMMARY_OUT)),
-      normalizeGeneratedPath(join(input.workspaceRoot, APPENDIX_OUT)),
-    ],
+    artifacts: [summaryOut, appendixOut],
+    targetResolution,
+    resolvedHeadRef: rendered.resolvedHeadRef,
+    resolvedHeadSha: rendered.headSha,
   };
 }

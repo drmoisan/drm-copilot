@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <EmbeddedResource Include="Shared/Base1.resx" />
+    <EmbeddedResource Include="Ours/OursA.resx" />
+    <EmbeddedResource Include="Ours/OursB.resx" />
+    <EmbeddedResource Include="Theirs/TheirsA.resx" />
+    <EmbeddedResource Include="Theirs/TheirsB.resx" />
+    <EmbeddedResource Include="Shared/Base2.resx" />
+  </ItemGroup>
+</Project>

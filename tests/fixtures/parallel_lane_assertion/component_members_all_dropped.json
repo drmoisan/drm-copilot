@@ -1,0 +1,9 @@
+{
+  "name": "component_members_all_dropped",
+  "notes": "A lane whose members are all dropped can be neither split nor merged, so only the informational class is reported.",
+  "manifest_path": "tests/fixtures/parallel_lane_assertion/manifests/component-members-all-dropped.md",
+  "manifest_text": "---\nparallel: lane-assertion-component-members-all-dropped\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-29T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n  - issue_num: 202\n    feature_folder: docs/features/active/beta-202\n    kind: bug\n    state: admitted\nexpected_conflict_components:\n  - name: lane-all-dropped\n    members:\n      - 0\n      - false\n---\n\n# Parallel Run — lane-assertion-component-members-all-dropped\n\nShared parity-corpus manifest for the lane-assertion diagnostic. Every member of\nits asserted lane is dropped when the lane is read, leaving a lane with an empty\nmember list. An empty lane can be neither split nor merged, so both declared\nitems are reported as covered by no expected component and the header names zero\ndisagreements.\n",
+  "edges": "",
+  "expected_stdout": "Lane assertion: 2 derived conflict component(s); 0 disagreement(s).\nADVISORY [item_covered_by_no_component] manifest item 101 is covered by no expected component.\nADVISORY [item_covered_by_no_component] manifest item 202 is covered by no expected component.\nAdvisory only: this diagnostic never blocks, never modifies a derived edge, never feeds compute_cohorts, and never influences scheduling.",
+  "expected_status": 0
+}

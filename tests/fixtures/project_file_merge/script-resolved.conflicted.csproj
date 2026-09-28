@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <Compile Include="Shared/Base1.cs" />
+<<<<<<< HEAD
+    <Compile Include="Ours/OursA.cs" />
+=======
+    <Compile Include="Theirs/TheirsA.cs" />
+>>>>>>> origin/main
+    <Compile Include="Shared/Base2.cs" />
+  </ItemGroup>
+</Project>

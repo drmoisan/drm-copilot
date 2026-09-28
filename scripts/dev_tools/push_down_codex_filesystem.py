@@ -64,6 +64,12 @@ class ExcludingFileSystem:
             return True
         return relative in self._published_paths
 
+    def _is_publishable_source_path(self, path: Path) -> bool:
+        """Return whether a source-relative path may enter a published payload."""
+
+        relative = self._source_relative_posix(path)
+        return relative is None or not relative.startswith(".codex/state/")
+
     def _resolve_read_source(self, path: Path) -> Path:
         """Return the actual path to read for variant-routed files."""
 
@@ -77,7 +83,11 @@ class ExcludingFileSystem:
     def list_files(self, root: Path) -> list[Path]:
         """Return filtered source files."""
 
-        return [p for p in self._inner.list_files(root) if self._is_pack_included(p)]
+        return [
+            path
+            for path in self._inner.list_files(root)
+            if self._is_publishable_source_path(path) and self._is_pack_included(path)
+        ]
 
     def is_dir(self, path: Path) -> bool:
         """Delegate directory checks."""

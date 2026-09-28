@@ -10,6 +10,34 @@ import { buildInMemoryFileSystem, fixedClock } from "./push-down.test-helpers";
 
 const CLOCK = fixedClock("2026-06-26T00:15:00.000Z");
 
+/** Extension resources directory: the parent of the bundle root below. */
+const RESOURCES = "C:/extension/resources";
+const BUNDLE_ROOT = `${RESOURCES}/codex-and-agents-customizations`;
+
+/** Destination path to distinct resource content, one entry per virtual pair. */
+const VIRTUAL_CONTENT: Readonly<Record<string, string>> = {
+  "config/orchestration-routing.json": '{"version":1}\n',
+  "config/orchestration-handoff-registry.json": '{"registry":1}\n',
+  "config/orchestration-handoff.schema.json": '{"schema":1}\n',
+  ".codex/lib/codex-routing/CodexTopology.psm1": "# topology module\n",
+  ".codex/lib/codex-routing/CodexDeployment.psm1": "# deployment module\n",
+};
+
+/**
+ * Build resource-seed entries for every virtual pair under a resources root.
+ *
+ * @param resourcesRoot Directory holding `config/` and `lib/codex-routing/`.
+ * @returns File seeds keyed by resource path.
+ */
+function seedVirtualResources(resourcesRoot: string): Record<string, string> {
+  const seeds: Record<string, string> = {};
+  for (const [destination, content] of Object.entries(VIRTUAL_CONTENT)) {
+    const resource = destination.replace(/^\.codex\//, "");
+    seeds[`${resourcesRoot}/${resource}`] = content;
+  }
+  return seeds;
+}
+
 describe("passthroughRewrite", () => {
   it("returns the text unchanged with zero counts and no unmatched refs", () => {
     // Arrange
@@ -31,8 +59,7 @@ describe("pushDownCustomizations (codex/agents)", () => {
     // Arrange
     const fs = buildInMemoryFileSystem(
       {
-        "C:/extension/resources/config/orchestration-routing.json":
-          '{"version":1}\n',
+        ...seedVirtualResources(RESOURCES),
         "/src/.agents/z.md": "agents z",
         "/src/.agents/a.md": "agents a",
         "/src/.codex/config.md": "codex config",
@@ -47,20 +74,117 @@ describe("pushDownCustomizations (codex/agents)", () => {
       fs,
       sourceRoot: "/src",
       artifactRoot: "/dest",
-      bundleRoot: "C:/extension/resources/codex-and-agents-customizations",
+      bundleRoot: BUNDLE_ROOT,
       clock: CLOCK,
     });
 
-    // Assert: .codex root enumerated before .agents; .agents sorted a,z.
+    // Assert: roots in declaration order; each root sorted by code unit.
     expect(summary.files.map((f) => f.relativePath)).toEqual([
       ".codex/config.md",
       ".agents/a.md",
       ".agents/z.md",
+      "config/orchestration-handoff-registry.json",
+      "config/orchestration-handoff.schema.json",
       "config/orchestration-routing.json",
+      ".codex/lib/codex-routing/CodexDeployment.psm1",
+      ".codex/lib/codex-routing/CodexTopology.psm1",
     ]);
     expect(fs.readTextFile("/dest/config/orchestration-routing.json")).toBe(
       '{"version":1}\n',
     );
+  });
+
+  it("publishes every virtual resource pair in full-tree mode", () => {
+    // Arrange
+    const fs = buildInMemoryFileSystem(
+      { ...seedVirtualResources(RESOURCES), "/src/.codex/config.md": "body" },
+      ["/dest"],
+    );
+
+    // Act
+    pushDownCustomizations({
+      repoRoot: "/src",
+      destinationRoot: "/dest",
+      fs,
+      sourceRoot: "/src",
+      artifactRoot: "/dest",
+      bundleRoot: BUNDLE_ROOT,
+      clock: CLOCK,
+    });
+
+    // Assert: each destination carries its own resource bytes.
+    for (const [destination, content] of Object.entries(VIRTUAL_CONTENT)) {
+      expect(fs.readTextFile(`/dest/${destination}`)).toBe(content);
+    }
+  });
+
+  it("publishes every virtual resource pair in pack mode", () => {
+    // Arrange: the bundle root sits two levels below `/` so its parent
+    // (`/repo`) keeps resource paths absolute.
+    const fs = buildInMemoryFileSystem(
+      {
+        ...seedVirtualResources("/repo"),
+        "/repo/bundle/.codex/config.toml": "core",
+        "/repo/bundle/pack-manifests/core.json": JSON.stringify({
+          name: "core",
+          paths: [".codex/config.toml"],
+        }),
+        "/repo/bundle/pack-manifests/typescript.json": JSON.stringify({
+          name: "typescript",
+          paths: [".codex/config.toml"],
+        }),
+      },
+      ["/dest"],
+    );
+
+    // Act
+    pushDownCustomizations({
+      repoRoot: "/repo/bundle",
+      destinationRoot: "/dest",
+      fs,
+      sourceRoot: "/repo/bundle",
+      artifactRoot: "/dest",
+      bundleRoot: "/repo/bundle",
+      packs: new Set(["core", "typescript"]),
+      clock: CLOCK,
+    });
+
+    // Assert
+    expect(fs.isFile("/dest/.codex/config.toml")).toBe(true);
+    for (const [destination, content] of Object.entries(VIRTUAL_CONTENT)) {
+      expect(fs.readTextFile(`/dest/${destination}`)).toBe(content);
+    }
+  });
+
+  it("does not publish an unmapped file under a virtual root or resource directory", () => {
+    // Arrange
+    const fs = buildInMemoryFileSystem(
+      {
+        ...seedVirtualResources(RESOURCES),
+        "/src/.codex/config.md": "body",
+        "/src/config/unrelated.json": "{}\n",
+        [`${RESOURCES}/lib/codex-routing/Extra.psm1`]: "# extra\n",
+      },
+      ["/dest"],
+    );
+
+    // Act
+    const summary = pushDownCustomizations({
+      repoRoot: "/src",
+      destinationRoot: "/dest",
+      fs,
+      sourceRoot: "/src",
+      artifactRoot: "/dest",
+      bundleRoot: BUNDLE_ROOT,
+      clock: CLOCK,
+    });
+
+    // Assert
+    const published = summary.files.map((f) => f.relativePath);
+    expect(published).not.toContain("config/unrelated.json");
+    expect(published).not.toContain(".codex/lib/codex-routing/Extra.psm1");
+    expect(fs.isFile("/dest/config/unrelated.json")).toBe(false);
+    expect(fs.isFile("/dest/.codex/lib/codex-routing/Extra.psm1")).toBe(false);
   });
 
   it("leaves content byte-identical and yields zero rewrite counts", () => {

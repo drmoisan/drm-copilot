@@ -6,16 +6,28 @@
     Destination-runtime PowerShell facade for the blast-radius library, porting
     scripts/dev_tools/compute_blast_radius.py (derive_blast_radius,
     radius_from_observed_paths, _feature_folder_glob) and
-    scripts/dev_tools/_blast_radius_conflicts.py (conflicts,
-    _smallest_path_overlap, _smallest_common). It imports the extraction, glob,
-    truth-table, and validation modules that sit beside it and re-exports the
-    five functions the spec PowerShell surface fixes:
+    scripts/dev_tools/_blast_radius_conflicts.py (conflicts). The ports of
+    _smallest_path_overlap and _smallest_common, and the mechanically-mergeable
+    path exclusion, live in BlastRadiusConflict.psm1. It imports the extraction,
+    glob, truth-table, conflict, and validation modules that sit beside it and
+    re-exports the five functions the spec PowerShell surface fixes:
 
       - Get-PlanPaths                     port of extract_plan_paths
       - Get-BlastRadius                   port of derive_blast_radius
       - Get-BlastRadiusFromObservedPaths  port of radius_from_observed_paths
       - Test-BlastRadius                  port of validate_blast_radius
       - Test-BlastRadiusConflict          port of conflicts
+
+    It also re-exports two scheduling functions of BlastRadiusScheduling.psm1
+    (issue #722); each takes the relation as -Relation, so a caller passes
+    ${function:Test-BlastRadiusConflict} from this facade:
+
+      - Get-BlastRadiusConflictEdge       port of schedule_conflict_edges
+      - Get-BlastRadiusPairDecision       port of decide_pair
+
+    It also re-exports the six functions of BlastRadiusWriteIntent.psm1 (issue
+    #722); Get-BlastRadius and Get-NormalizedDeclaredRadius delegate their
+    write_intent_extraction flag branch to that module.
 
     The Python modules remain the authoritative reference implementation. This
     module is one half of a two-language mirror; it never imports validator
@@ -47,15 +59,20 @@
       - Two empty radii, and an empty radius against a non-empty one, do not
         conflict. Under-reporting via emptiness is V1's problem at plan time, not
         the relation's.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusExtraction.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConfig.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusNormalization.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusValidation.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusExtraction.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConfig.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusNormalization.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusValidation.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConflict.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusScheduling.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusWriteIntent.psm1') -Force -ErrorAction Stop
 
 # Feature-folder handling. Every radius contains its own feature folder, and a
 # caller may pass either a bare folder name or an already-qualified path.
@@ -78,10 +95,6 @@ $script:ConflictPathOverlap = 'path_overlap'
 $script:ConflictModuleOverlap = 'module_overlap'
 $script:ConflictSharedSurfaceOverlap = 'shared_surface_overlap'
 $script:ConflictContractDependency = 'contract_dependency'
-
-# Separator used in an overlapping-pair detail string. The pair is ordered
-# ordinally before formatting so the detail is identical in both argument orders.
-$script:PairDetailSeparator = ' ~ '
 
 
 # Port of _feature_folder_glob. Accepting an already-qualified path avoids
@@ -169,10 +182,19 @@ function Get-BlastRadius {
     # derived radius always passes V1 and V2 against its own plan (issue #452).
     $rootSurface = [string[]]@(Get-ConfigRootSurface -Config $Config)
 
-    $specLine = [string[]]@(ConvertTo-NormalizedLine -Text $SpecText)
+    # Write-intent mode (issue #722) delegates to BlastRadiusWriteIntent.psm1:
+    # plan paths come from the selector Test-BlastRadius also uses and the spec
+    # contributes contracts only.
     $entry = [System.Collections.Generic.List[string]]::new()
-    $entry.AddRange([string[]]@(Get-PlanPaths -PlanText $PlanText -RootSurface $rootSurface))
-    $entry.AddRange([string[]]@(Get-PathFromLine -Line $specLine -RootSurface $rootSurface))
+    if (Test-WriteIntentExtractionEnabled -Config $Config) {
+        $entry.AddRange([string[]]@(Get-PlanPathForConfig -PlanText $PlanText -Config $Config -RootSurface $rootSurface))
+        $contract = @(Get-WriteIntentSpecContract -SpecText $SpecText)
+    } else {
+        $specLine = [string[]]@(ConvertTo-NormalizedLine -Text $SpecText)
+        $entry.AddRange([string[]]@(Get-PlanPaths -PlanText $PlanText -RootSurface $rootSurface))
+        $entry.AddRange([string[]]@(Get-PathFromLine -Line $specLine -RootSurface $rootSurface))
+        $contract = @(Get-ContractIdentifier -SpecText $SpecText)
+    }
 
     # Read-by-mandate citations are dropped before the feature folder is added: a
     # plan cites the policy rules because its author was told to read them, not
@@ -193,7 +215,7 @@ function Get-BlastRadius {
         paths           = $paths
         modules         = @(Resolve-BlastRadiusModule -PathEntry $paths -Config $Config)
         shared_surfaces = @(Resolve-BlastRadiusSharedSurface -ConcretePath $concrete -Config $Config)
-        contracts       = @(Get-ContractIdentifier -SpecText $SpecText)
+        contracts       = $contract
         source          = $Source
         computed_at     = $ComputedAt
     }
@@ -264,7 +286,14 @@ function Get-NormalizedDeclaredRadius {
         }
     }
 
-    $paths = [string[]]@(Get-NonMandateReadEntry -Entry $accepted.ToArray() `
+    # Write-intent mode (issue #722) applies the token-level rules W1, W4, and W6
+    # before the mandate-read filter; the feature-folder glob is kept.
+    $acceptedEntry = [string[]]$accepted.ToArray()
+    if (Test-WriteIntentExtractionEnabled -Config $Config) {
+        $acceptedEntry = [string[]]@(Select-WriteIntentPathEntry -Entry $acceptedEntry -RootSurface $rootSurface `
+                -PathRoot ([string[]]@(Get-ConfigPathRoot -Config $Config)))
+    }
+    $paths = [string[]]@(Get-NonMandateReadEntry -Entry $acceptedEntry `
             -MandateRead ([string[]]@(Get-ConfigMandateRead -Config $Config)))
     $concrete = [string[]]@(Get-ConcreteEntry -Entry $paths)
 
@@ -339,68 +368,6 @@ function Get-BlastRadiusFromObservedPaths {
     }
 }
 
-# Port of _smallest_path_overlap. Each overlapping pair is ordered before it is
-# recorded, so the minimum is taken over a set that does not depend on argument
-# order; that is what makes the reported detail symmetric.
-function Get-SmallestPathOverlap {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()]
-        [AllowEmptyString()]
-        [string[]] $PathA,
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()]
-        [AllowEmptyString()]
-        [string[]] $PathB
-    )
-
-    $detail = [System.Collections.Generic.List[string]]::new()
-    foreach ($entryA in $PathA) {
-        foreach ($entryB in $PathB) {
-            if (-not (Test-EntryOverlap -EntryA $entryA -EntryB $entryB)) {
-                continue
-            }
-            $ordered = if ([string]::CompareOrdinal($entryA, $entryB) -le 0) {
-                @($entryA, $entryB)
-            } else {
-                @($entryB, $entryA)
-            }
-            $detail.Add($ordered -join $script:PairDetailSeparator)
-        }
-    }
-
-    return (Get-OrdinalSmallestEntry -Entry $detail.ToArray())
-}
-
-# Port of _smallest_common. Two empty collections share nothing, so the result is
-# $null and the level contributes no reason.
-function Get-SmallestCommonEntry {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()]
-        [AllowEmptyString()]
-        [string[]] $Left,
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()]
-        [AllowEmptyString()]
-        [string[]] $Right
-    )
-
-    $rightSet = [System.Collections.Generic.HashSet[string]]::new($Right, [StringComparer]::Ordinal)
-    $common = [System.Collections.Generic.List[string]]::new()
-    foreach ($entry in $Left) {
-        if ($rightSet.Contains($entry)) {
-            $common.Add($entry)
-        }
-    }
-
-    return (Get-OrdinalSmallestEntry -Entry $common.ToArray())
-}
-
 function Test-BlastRadiusConflict {
     <#
     .SYNOPSIS
@@ -421,13 +388,25 @@ function Test-BlastRadiusConflict {
         Second radius record.
 
     .PARAMETER Config
-        Parsed config/blast-radius.json. The relation reads no key from it today;
-        it is validated and kept in the signature because the contract is frozen
-        for downstream consumers.
+        Parsed config/blast-radius.json. The relation reads exactly one key from
+        it, mergeable_paths, whose entries are dropped from both radii before the
+        path comparison; the mapping is otherwise validated and kept in the
+        signature because the contract is frozen for downstream consumers.
 
     .OUTPUTS
         System.Collections.Hashtable. Keys conflict (a boolean) and reasons (an
         array of hashtables with keys kind and detail).
+
+        Read the verdict from the conflict key of the returned hashtable.
+        Do not test the returned object itself: the hashtable is
+        unconditionally truthy under PowerShell boolean coercion, so
+        'if ($result)' treats every pair as contending.
+        System.Collections.Hashtable implements IDictionary and ICollection but
+        not IList, and the count-based truthiness rule applies only to IList
+        implementations, so a hashtable falls under the rule for any other
+        non-collection type and is always $true. The Python port agrees with its
+        own verdict; this mirror provably cannot, because PowerShell exposes no
+        hook by which a type can decline or change the conversion.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -448,8 +427,14 @@ function Test-BlastRadiusConflict {
     $right = ConvertTo-NormalizedBlastRadius -Radius $RadiusB
 
     $reason = [System.Collections.Generic.List[hashtable]]::new()
-    $pathDetail = Get-SmallestPathOverlap -PathA ([string[]]@($left['paths'])) `
-        -PathB ([string[]]@($right['paths']))
+    # The mechanically-mergeable exclusion lives only here: it filters the two
+    # collections this comparison reads and rewrites no radius record, so a
+    # derived, declared, or observed radius still lists every project file it
+    # cited (issue #643).
+    $mergeable = [string[]]@(Get-ConfigMergeablePath -Config $Config)
+    $pathDetail = Get-SmallestPathOverlap `
+        -PathA ([string[]]@(Get-NonMergeablePathEntry -Entry ([string[]]@($left['paths'])) -MergeablePath $mergeable)) `
+        -PathB ([string[]]@(Get-NonMergeablePathEntry -Entry ([string[]]@($right['paths'])) -MergeablePath $mergeable))
     if ($null -ne $pathDetail) {
         $reason.Add(@{ kind = $script:ConflictPathOverlap; detail = $pathDetail })
     }
@@ -479,4 +464,12 @@ Export-ModuleMember -Function `
     Get-NormalizedDeclaredRadius, `
     Get-BlastRadiusFromObservedPaths, `
     Test-BlastRadius, `
-    Test-BlastRadiusConflict
+    Test-BlastRadiusConflict, `
+    Get-BlastRadiusConflictEdge, `
+    Get-BlastRadiusPairDecision, `
+    Test-WriteIntentExtractionEnabled, `
+    Get-ConfigPathRoot, `
+    Get-WriteIntentPlanPath, `
+    Get-WriteIntentSpecContract, `
+    Select-WriteIntentPathEntry, `
+    Get-PlanPathForConfig

@@ -1,0 +1,1 @@
+tests/fixtures/cleanup_worktrees/preserve/missing-source/wt	agent-memory/atomic-executor/never-written.md	untracked	PRESERVE	GENUINELY_NEW	null	true	true		absent	object	clean	cleanup-wt-host-tokens-v1	preserve/missing-source fixture: the named source file is absent by design

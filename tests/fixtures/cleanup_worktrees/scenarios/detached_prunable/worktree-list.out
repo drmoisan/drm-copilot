@@ -1,0 +1,9 @@
+worktree /repo/main
+HEAD aaaa0000
+branch refs/heads/main
+
+worktree /repo-wt/det
+HEAD det00007
+detached
+prunable gitdir file points to a non-existent location
+

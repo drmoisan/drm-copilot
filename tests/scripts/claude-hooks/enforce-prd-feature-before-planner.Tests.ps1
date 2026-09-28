@@ -3,8 +3,14 @@
 
 Describe 'enforce-prd-feature-before-planner.ps1' {
     BeforeAll {
+        # Both files are dot-sourced explicitly, rather than relying on the parent's
+        # own dot-source line, so a later change to that line cannot silently
+        # redirect these assertions at a different helpers file.
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner.ps1").Path
+        $script:Helpers = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1").Path
         . $script:UnderTest
+        . $script:Helpers
+        Mock -CommandName Resolve-PrdFeatureWorktreeTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'SessionRoot' -SessionRoot '/synthetic-worktrees/session-root' -WorktreeRoot '/synthetic-worktrees/session-root' -Signal 'Branch' -SignalValue 'f5-fixture-own' -Candidate @('/synthetic-worktrees/session-root') -Detail 'modelled session-root target for the delivered cases' }
     }
 
     Context 'tool input parsing' {
@@ -45,7 +51,14 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
     }
 
     Context 'atomic-planner delegation' {
+        # Every case in this context supplies the work-mode marker its assertions
+        # were written against. Without it the folder's issue.md is unreadable on
+        # disk, the work mode is indeterminate, and the decision is taken by the
+        # indeterminate-marker path rather than by the prerequisite probe these
+        # cases exercise. full-feature is the mode whose prerequisite set is the
+        # spec.md/user-story.md pair the cases assert against.
         It 'allows when both spec.md and user-story.md exist in the target folder (prompt path)' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
             $json = (@{
                     tool_name  = 'Agent'
@@ -55,6 +68,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'blocks when spec.md is missing' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
                 param([string]$Path)
                 return -not ($Path -match '/spec\.md$')
@@ -70,6 +84,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'blocks when user-story.md is missing' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
                 param([string]$Path)
                 return -not ($Path -match '/user-story\.md$')
@@ -95,8 +110,18 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'feature folder'
         }
 
-        It 'falls back to orchestrator-state.json when prompt has no folder reference' {
-            Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
+        It 'allows the session-root fallback when the derived target is the session root' {
+            # The call names no folder and has no target of its own, so the session's
+            # own checkpoint may stand in. The existence mock is keyed on the fully
+            # composed path, so the case cannot pass on a probe that always answers
+            # true regardless of where the gate looked.
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
+            Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
+                $Path -in @(
+                    'docs/features/active/2026-05-10-bar-2/spec.md',
+                    'docs/features/active/2026-05-10-bar-2/user-story.md'
+                )
+            }
             Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { 'docs/features/active/2026-05-10-bar-2' }
             $json = (@{
                     tool_name  = 'Agent'
@@ -106,6 +131,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'prefers the prompt-derived folder over the checkpoint folder' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             $script:capturedPaths = @()
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
                 param([string]$Path)
@@ -123,6 +149,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'treats a path ending in .md as a file and uses its parent directory' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             $script:capturedPaths = @()
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
                 param([string]$Path)
@@ -142,6 +169,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'accepts backslash separators inside the prompt path' {
+            Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
             $json = (@{
                     tool_name  = 'Agent'
@@ -173,11 +201,11 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         }
 
         It 'real Test-Path wrapper returns $false for a nonexistent path' {
-            (Get-PrdFeatureFileExistence -Path 'C:/__nonexistent_path_for_test__.md') | Should -BeFalse
+            (Get-PrdFeatureFileExistence -Path '/synthetic-worktrees/session-root/docs/features/active/2026-09-13-no-such-folder/spec.md') | Should -BeFalse
         }
 
         It 'Get-PrdFeatureCheckpointFolder returns $null when checkpoint is absent' {
-            (Get-PrdFeatureCheckpointFolder -CheckpointPath 'C:/__nonexistent_checkpoint_for_test__.json') | Should -BeNullOrEmpty
+            (Get-PrdFeatureCheckpointFolder -CheckpointPath '/synthetic-worktrees/session-root/artifacts/orchestration/no-such-checkpoint.json') | Should -BeNullOrEmpty
         }
     }
 
@@ -247,18 +275,22 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             @(Get-PrdFeatureRequiredFile -WorkMode 'minor-audit').Count | Should -Be 0
         }
 
-        It 'fails closed to the strictest set when the mode is $null' {
-            (Get-PrdFeatureRequiredFile -WorkMode $null) | Should -Be @('spec.md', 'user-story.md')
+        # The default arm no longer returns user-story.md. An indeterminate mode
+        # is denied by its own decision path without a required-file probe, so no
+        # reachable path can demand a document the lifecycle contract requires to
+        # be absent for full-bug and minor-audit work.
+        It 'returns spec.md alone for a $null mode so no reachable path can demand user-story.md' {
+            (Get-PrdFeatureRequiredFile -WorkMode $null) | Should -Be @('spec.md')
         }
 
-        It 'fails closed to the strictest set for an unrecognized mode string' {
-            (Get-PrdFeatureRequiredFile -WorkMode 'bogus') | Should -Be @('spec.md', 'user-story.md')
+        It 'returns spec.md alone for an unrecognized mode string so no reachable path can demand user-story.md' {
+            (Get-PrdFeatureRequiredFile -WorkMode 'bogus') | Should -Be @('spec.md')
         }
     }
 
     Context 'Get-PrdFeatureIssueContent' {
         It 'returns $null when issue.md does not exist' {
-            Get-PrdFeatureIssueContent -FeatureFolder 'C:/__nonexistent_feature_folder_for_test__' | Should -BeNullOrEmpty
+            Get-PrdFeatureIssueContent -FeatureFolder '/synthetic-worktrees/session-root/docs/features/active/2026-09-13-no-such-folder' | Should -BeNullOrEmpty
         }
 
         It 'returns $null when issue.md exists but Get-Content throws (unreadable)' {
@@ -350,11 +382,12 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
     Context 'fail-closed prerequisite resolution (AC: unable to determine work mode)' {
         # These four scenarios (marker absent, unreadable issue.md, unrecognized
         # marker value, missing issue.md) all collapse to an undeterminable work
-        # mode. The gate MUST fail closed to the strictest prerequisite set
-        # (spec.md and user-story.md) in every case. Treating an undeterminable
-        # mode as satisfying every mode's requirement (i.e. failing open) would
-        # reintroduce the exact defect class issue #501 corrected: a PreToolUse
-        # gate that appears to enforce a prerequisite but always allows.
+        # mode. An undeterminable mode denies on its own distinct decision path,
+        # which names no prerequisite document and runs no required-file probe,
+        # because no prerequisite set is knowable when the mode is unknown. The
+        # decision is still deny, so the fail-open defect class issue #501
+        # corrected (a PreToolUse gate that appears to enforce a prerequisite
+        # but always allows) remains locked.
         It 'fails closed when the work-mode marker line is absent from issue.md' {
             Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "## Overview`nNo marker line here." }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }
@@ -365,8 +398,13 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'could not be determined'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'spec\.md'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'user-story\.md'
+            # The reason is the distinct indeterminate-marker reason: it names the
+            # resolved folder and the issue.md path it probed, and it names neither
+            # prerequisite document, because no prerequisite set is knowable when
+            # the mode is unknown.
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -BeLike '*docs/features/active/2026-08-22-marker-absent/issue.md*'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -Match 'user-story\.md'
         }
 
         It 'fails closed when issue.md exists but is unreadable' {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
 
 import {
+  compareCodePoint,
   findUserStoryLink,
   formatList,
   normalizeReference,
@@ -143,5 +144,94 @@ describe("formatList", () => {
 
   it("returns the empty text when every value is falsy", () => {
     expect(formatList(["", ""], "(empty)")).toBe("(empty)");
+  });
+});
+
+describe("compareCodePoint", () => {
+  it("returns 0 for identical strings", () => {
+    expect(compareCodePoint("abc", "abc")).toBe(0);
+  });
+
+  it("returns -1 when left sorts before right", () => {
+    expect(compareCodePoint("a", "b")).toBe(-1);
+  });
+
+  it("returns 1 when left sorts after right", () => {
+    expect(compareCodePoint("b", "a")).toBe(1);
+  });
+
+  it("treats the empty string as less than a non-empty string", () => {
+    expect(compareCodePoint("", "a")).toBe(-1);
+  });
+
+  it("is case-sensitive, sorting uppercase before lowercase", () => {
+    expect(compareCodePoint("A", "a")).toBe(-1);
+  });
+
+  it("orders a prefix before its longer extension", () => {
+    expect(compareCodePoint("a", "ab")).toBe(-1);
+  });
+});
+
+describe("compareCodePoint - enumerative properties over a fixed domain", () => {
+  const DOMAIN = ["", "a", "A", "aa", "ab", "b", "ba", "é", "😀"];
+
+  it("is reflexive for every value in the domain", () => {
+    for (const value of DOMAIN) {
+      expect(compareCodePoint(value, value)).toBe(0);
+    }
+  });
+
+  it("is antisymmetric for every ordered pair in the domain", () => {
+    for (const left of DOMAIN) {
+      for (const right of DOMAIN) {
+        const forward = compareCodePoint(left, right);
+        const backward = compareCodePoint(right, left);
+        expect(forward === -backward).toBe(true);
+      }
+    }
+  });
+
+  it("is transitive for every ordered triple in the domain", () => {
+    for (const a of DOMAIN) {
+      for (const b of DOMAIN) {
+        for (const c of DOMAIN) {
+          if (compareCodePoint(a, b) <= 0 && compareCodePoint(b, c) <= 0) {
+            expect(compareCodePoint(a, c)).toBeLessThanOrEqual(0);
+          }
+        }
+      }
+    }
+  });
+
+  it("returns only -1, 0, or 1 for every ordered pair in the domain", () => {
+    for (const left of DOMAIN) {
+      for (const right of DOMAIN) {
+        expect([-1, 0, 1]).toContain(compareCodePoint(left, right));
+      }
+    }
+  });
+
+  it("agrees with the native < and > operators for every ordered pair in the domain", () => {
+    for (const left of DOMAIN) {
+      for (const right of DOMAIN) {
+        const result = compareCodePoint(left, right);
+        if (left < right) {
+          expect(result).toBe(-1);
+        } else if (left > right) {
+          expect(result).toBe(1);
+        } else {
+          expect(result).toBe(0);
+        }
+      }
+    }
+  });
+
+  it("produces the same order as native comparison via Array.prototype.sort, including an astral surrogate-pair string", () => {
+    const sample = ["b", "😀", "a", "é", "", "A", "ab"];
+    const expected = [...sample].sort((left, right) =>
+      left < right ? -1 : left > right ? 1 : 0,
+    );
+    expect([...sample].sort(compareCodePoint)).toEqual(expected);
   });
 });

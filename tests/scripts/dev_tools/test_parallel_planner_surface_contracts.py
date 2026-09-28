@@ -153,6 +153,15 @@ def test_parallel_planner_surface_files_exist() -> None:
     ).is_file(), "missing .claude/skills/parallel-plan/SKILL.md"
 
 
+def test_parallel_intake_requires_consolidation_before_execution() -> None:
+    """Reject pending adds and retain the execution-started admission boundary."""
+    plan = read_repo_text(PARALLEL_PLAN_SKILL_RELATIVE)
+    add = read_repo_text(Path(".claude/skills/parallel-add/SKILL.md"))
+    assert "/parallel-plan <slug> <item> [<item> ...]" in plan
+    assert "pending or not-started" in add
+    assert "execution has started" in add
+
+
 def test_agent_frontmatter_declares_required_tool_allowlist() -> None:
     """Require the persona frontmatter to grant exactly the needed capabilities.
 

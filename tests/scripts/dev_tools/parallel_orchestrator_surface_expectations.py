@@ -102,17 +102,46 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
     "## Mutation Protocol (F6)",
 )
 
-# Baseline SHA-256 digests of the frozen epic surface, captured before any Phase
-# 1 edit. This feature must modify neither file, so the digests are pinned as
-# constants and compared without any git dependency in-test.
+# SHA-256 digests of the frozen epic surface, pinned as constants and compared
+# without any git dependency in-test.
+#
+# RE-BASELINED by issue #559. The original values were captured before any Phase
+# 1 edit of the parallel-orchestrator-surface feature, which had to modify
+# neither file. Issue #559 legitimately changed both: it removed the two
+# `## Startup Protocol` read steps and the `## Prerequisites` block that ordered
+# reads the Claude Code runtime already satisfies via `CLAUDE.md` and the
+# path-scoped `.claude/rules/` files, trimmed the agent's `skills:` preloads from
+# six to three, replaced three unqualified `spec.md` section citations with
+# resolvable authorities, and added the bounded child return contract. Those
+# edits are the point of that change, so the pin was re-baselined rather than
+# left failing.
+#
+# The pin was RE-BASELINED, NOT REMOVED, and its consuming test is retained, so
+# it remains live as a guard: an unintended future edit to either file still
+# fails loudly. Re-baselining rather than deleting also keeps this control owned
+# by its original feature rather than silently dropped by an unrelated one.
+#
+# RE-BASELINED by issue #673. That change added a checkpoint-hygiene paragraph to
+# `## Epic-Level Checkpoint` in the epic skill, stating that a coordinating session
+# holds no per-feature checkpoint at its own root and archives any it finds to
+# `artifacts/orchestration/handoff/`. Only the skill digest moved; the pin stays live
+# for the entry whose path string is `.claude/agents/epic-orchestrator.md`, whose
+# digest is unchanged, so an unintended edit to the agent file still fails loudly.
+#
+# RE-BASELINED by issue #663. That change made the two AC-20 contract edits: in the
+# epic skill's `## Epic-Level Checkpoint` it added `epic_issue_num` and
+# `model_routing_receipts[]` to the field list and appended the integration-PR
+# checkpoint-shape paragraph; in the agent's `## Checkpoint Persistence` it added
+# `epic_issue_num` and `model_routing_receipts[]` to the field list. Both digests
+# moved, and the pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "f4e3589ab53e6a61791f2d31e7506e7e6003ec63fe651f3cec323023d923f250",
+        "0d01e5484d63e418a6bc31f219aecaef7381cc439a4a796664006879f6a027ba",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "3c2e38bd5bdc5e2b7312437d47dc27aa282f2ff24fbaf01590b51e853e788d68",
+        "14d6bf2f76f64d8c6be9c7c675e828f474ebc20d52ed60096d612302a77f21a0",
     ),
 )
 

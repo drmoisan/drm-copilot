@@ -1,0 +1,22 @@
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "removals": [],
+  "preserved_files": [
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/eol-stale/wt",
+      "source_path": "agent-memory/atomic-executor/stale-eol-lesson.md",
+      "change_class": "modified",
+      "disposition": "PRESERVE",
+      "verdict": "STILL_RELEVANT",
+      "target_path": "agent-memory/atomic-executor/stale-eol-lesson.md",
+      "memory_index_line": "- [Stale EOL lesson](stale-eol-lesson.md) - carried verbatim from the source worktree",
+      "line_ending": "crlf",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/eol-stale fixture: the advisory line_ending says crlf while the target index is LF"
+    }
+  ]
+}

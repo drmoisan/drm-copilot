@@ -101,8 +101,22 @@ UMBRELLA_MODULE_NAMES = (
 PAYLOAD_MODULE_NAMES = frozenset({"config"})
 
 # Keys that describe the runtime rather than a repository layout, so both
-# committed copies must carry identical values.
-BYTE_EQUAL_KEYS = ("version", "over_breadth_fraction", "mandate_reads")
+# committed copies must carry identical values. ``mergeable_paths`` joins this
+# class because it describes the runtime too: it names the mechanically
+# mergeable path class of issue #643, whose members are project-file shapes a
+# merge step can reconcile, not paths of any one repository's layout.
+# ``conflict_tolerance`` (issue #722) joins it for the same reason: its weights,
+# band durations, tolerance, and append-only patterns configure how the runtime
+# schedules contention, not a repository layout. ``write_intent_extraction``
+# (issue #722) joins it too: the flag selects the runtime's extractor.
+BYTE_EQUAL_KEYS = (
+    "version",
+    "over_breadth_fraction",
+    "mandate_reads",
+    "mergeable_paths",
+    "conflict_tolerance",
+    "write_intent_extraction",
+)
 
 # Class 2 key-to-assertion registry: each portable shared-surface key mapped to
 # the name of the test function that is supposed to consume it. Registering the
@@ -112,6 +126,16 @@ BYTE_EQUAL_KEYS = ("version", "over_breadth_fraction", "mandate_reads")
 CLASS_TWO_KEY_ASSERTIONS = {
     "shared_surfaces": "test_class_two_bundled_shared_surfaces_are_the_portable_set",
     "shared_surface_globs": "test_class_two_bundled_shared_surface_globs_are_empty",
+}
+
+# Separate Class 2 registry for ``path_roots`` (issue #722). The self-hosted
+# copy lists this repository's top-level directories and the bundled copy is
+# empty, because a destination's layout is unknown. It is kept apart from
+# ``CLASS_TWO_KEY_ASSERTIONS`` so the config-parity registry-consumption test,
+# which reads that registry, is unaffected; its consumer is the tolerance-keys
+# test module.
+CLASS_TWO_TOLERANCE_KEY_ASSERTIONS = {
+    "path_roots": "test_class_two_bundled_path_roots_are_empty",
 }
 
 # Class 3 key-to-assertion registry: the payload module-map key mapped to the
@@ -130,10 +154,14 @@ CLASS_THREE_KEYS = tuple(CLASS_THREE_KEY_ASSERTIONS)
 
 # The exhaustive set of top-level keys the truth-table schema declares,
 # derived from the three declared classes rather than hardcoded: the
-# byte-equal keys plus the Class 2 and Class 3 key names. A key present in
-# either committed copy but absent from this set is unclassified.
+# byte-equal keys plus the Class 2 (both registries) and Class 3 key names. A
+# key present in either committed copy but absent from this set is
+# unclassified.
 DECLARED_TOP_LEVEL_KEYS = (
-    frozenset(BYTE_EQUAL_KEYS) | frozenset(CLASS_TWO_KEYS) | frozenset(CLASS_THREE_KEYS)
+    frozenset(BYTE_EQUAL_KEYS)
+    | frozenset(CLASS_TWO_KEYS)
+    | frozenset(CLASS_TWO_TOLERANCE_KEY_ASSERTIONS)
+    | frozenset(CLASS_THREE_KEYS)
 )
 
 

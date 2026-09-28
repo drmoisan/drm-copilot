@@ -54,6 +54,7 @@ import {
   handleValidateOrchestrationArtifacts,
 } from "./mcp-handlers/template-validation-handlers";
 import { normalizeWorkspaceRoot } from "./workflow-command-arguments";
+import { handlePortableHandoffTool } from "./mcp-handlers/orchestration-handoff-handlers";
 
 export { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "./mcp-handlers/resolve-execute-hard-lock-prompt-handler";
 
@@ -69,7 +70,22 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly summary: string;
   readonly stderr_excerpt?: string;
   readonly target_repository?: string;
+  readonly target_resolution?: "explicit" | "session-fallback";
+  readonly resolved_head_ref?: string | null;
+  readonly resolved_head_sha?: string | null;
   readonly warnings?: ReadonlyArray<string>;
+  readonly status?: "validated" | "materialized" | "blocked";
+  readonly handoff_id?: string | null;
+  readonly source_checkpoint_sha256?: string;
+  readonly handoff_envelope_sha256?: string;
+  readonly handoff_history_sha256?: string | null;
+  readonly requested_transition?: string | null;
+  readonly destination_checkpoint_path?: string | null;
+  readonly destination_checkpoint_sha256?: string | null;
+  readonly primary_failure_code?: string | null;
+  readonly affected_paths?: ReadonlyArray<string>;
+  readonly unsupported_capabilities?: ReadonlyArray<string>;
+  readonly resolution?: Readonly<Record<string, unknown>> | null;
 }
 
 function inferWorkspaceRoot(rawInput: unknown): string {
@@ -109,6 +125,15 @@ function toMcpToolResult(
     ...(result.targetRepository === undefined
       ? {}
       : { target_repository: result.targetRepository }),
+    ...(result.targetResolution === undefined
+      ? {}
+      : { target_resolution: result.targetResolution }),
+    ...(result.resolvedHeadRef === undefined
+      ? {}
+      : { resolved_head_ref: result.resolvedHeadRef }),
+    ...(result.resolvedHeadSha === undefined
+      ? {}
+      : { resolved_head_sha: result.resolvedHeadSha }),
     ...(result.warnings === undefined ? {} : { warnings: result.warnings }),
   };
 }
@@ -258,6 +283,17 @@ export async function dispatchRepoAutomationTool(
         return toMcpToolResult(
           await handleValidateOrchestrationArtifacts(rawInput, service),
         );
+      }
+
+      case "resolve_orchestration_topology":
+      case "resolve_provider_routing":
+      case "transition_prepared_orchestration": {
+        const result = await handlePortableHandoffTool(
+          toolName,
+          rawInput,
+          service,
+        );
+        return result;
       }
 
       case "render_subagent_tree": {

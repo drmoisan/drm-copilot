@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import re
 import shlex
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 PLAN_GATE_TASK_RE = re.compile(
     r"^- \[(?P<state>[ xX])\] \[P(?P<phase>\d+)-T(?P<task>\d+)\] (?P<title>.+)$"
@@ -53,6 +53,11 @@ class PlanCommand:
         raw_span (str): Verbatim span text, before shell-word splitting.
         argv (tuple[str, ...]): Shell words the span splits into.
         kind (str): One of `grep`, `pytest_cov`, or `other`.
+        task_text (str): Newline-joined text of the command's whole attribution
+            window — the owning task line plus every following line up to, but
+            not including, the line that closes the window. Empty for a record
+            built outside any window. The field is trailing and defaulted, so
+            every existing construction of this record keeps working.
     """
 
     task_id: str
@@ -60,6 +65,7 @@ class PlanCommand:
     raw_span: str
     argv: tuple[str, ...]
     kind: str
+    task_text: str = ""
 
 
 def is_cov_flag_token(token: str) -> bool:
@@ -247,6 +253,42 @@ def _append_command(
     )
 
 
+def _close_window(
+    commands: list[PlanCommand], window_start: int, window_lines: list[str]
+) -> None:
+    """Assign the closing window's whole text to every record it produced.
+
+    Purpose:
+        Apply the whole-window definition of attributed task text at the single
+        moment the window closes, so the extractor still walks the document
+        exactly once and no second implementation of the window invariant is
+        created.
+
+    Args:
+        commands (list[PlanCommand]): Accumulator holding every record so far.
+        window_start (int): Index of the first record the closing window
+            produced; records before it belong to an earlier window.
+        window_lines (list[str]): Verbatim lines of the closing window, in
+            source order.
+
+    Returns:
+        None.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Replaces the closing window's records in the supplied accumulator with
+        copies carrying the window text.
+    """
+
+    if window_start >= len(commands):
+        return
+    task_text = "\n".join(window_lines)
+    for index in range(window_start, len(commands)):
+        commands[index] = replace(commands[index], task_text=task_text)
+
+
 def extract_plan_commands(text: str) -> list[PlanCommand]:
     """Extract every task-attributed command candidate from plan text.
 
@@ -272,35 +314,52 @@ def extract_plan_commands(text: str) -> list[PlanCommand]:
     commands: list[PlanCommand] = []
     current_task: str | None = None
     in_fence = False
+    window_lines: list[str] = []
+    window_start = 0
 
     # Walk the plan in source order, maintaining the attribution window so each
     # span is reported against the task whose acceptance condition states it.
     for line_number, line in enumerate(text.splitlines(), start=1):
         if _FENCE_RE.match(line):
             in_fence = not in_fence
+            if current_task is not None:
+                window_lines.append(line)
             continue
 
         # Inside a fence every non-blank line is a whole-line command candidate.
         if in_fence:
+            if current_task is None:
+                continue
+            window_lines.append(line)
             fenced = line.strip()
-            if current_task is not None and fenced:
+            if fenced:
                 _append_command(commands, current_task, line_number, fenced)
             continue
 
         # A heading closes the current attribution window.
         if PLAN_GATE_HEADING_RE.match(line):
+            _close_window(commands, window_start, window_lines)
+            window_start = len(commands)
+            window_lines = []
             current_task = None
             continue
 
         task_match = PLAN_GATE_TASK_RE.match(line)
         if task_match is not None:
+            # A task line closes the preceding window and opens the next one.
+            _close_window(commands, window_start, window_lines)
+            window_start = len(commands)
+            window_lines = []
             current_task = _task_identifier(task_match)
 
         if current_task is None:
             continue
 
+        window_lines.append(line)
         # A single line may carry several backticked spans; each is a candidate.
         for span in _INLINE_SPAN_RE.findall(line):
             _append_command(commands, current_task, line_number, span)
 
+    # The end of the document closes the final window.
+    _close_window(commands, window_start, window_lines)
     return commands

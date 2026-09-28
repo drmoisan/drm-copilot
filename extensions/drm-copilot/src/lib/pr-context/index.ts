@@ -107,9 +107,17 @@ export {
 } from "./collector-core";
 export {
   type CollectAndWriteOptions,
+  type CollectAndWriteResult,
   buildAppendixText,
   buildSummaryText,
   collectAndWrite,
   renderVerificationEvidenceSection,
   writeOutput,
 } from "./collector-output";
+
+// Diff-emptiness classifier.
+export {
+  type ClassifyPrContextDiffStateInput,
+  type PrContextDiffState,
+  classifyPrContextDiffState,
+} from "./diff-emptiness";

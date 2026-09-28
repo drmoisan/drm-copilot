@@ -26,8 +26,10 @@ BeforeAll {
     $modulePath = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/blast-radius/BlastRadius.psm1").Path
     Import-Module $modulePath -Force
 
-    # The relation reads no truth-table key today, so a minimal mapping suffices;
-    # it is still validated because the signature is frozen for consumers.
+    # The relation reads only mergeable_paths from the truth table. This minimal
+    # mapping omits that key deliberately, so every It below exercises the
+    # fail-closed absent-key path; the present-key cases live in the
+    # mechanically-mergeable Context further down.
     $script:TestConfig = @{ version = 1; over_breadth_fraction = 0.25 }
 
     # Build a radius record from the levels a test cares about, defaulting the
@@ -82,6 +84,39 @@ Describe 'Test-BlastRadiusConflict result shape' {
             # Arrange / Act / Assert: the frozen signature is still validated.
             { Test-BlastRadiusConflict -RadiusA (Get-TestRadius) -RadiusB (Get-TestRadius) `
                     -Config 'not-a-mapping' } | Should -Throw '*must be a mapping*'
+        }
+
+        It 'is unconditionally truthy even when its conflict key is false' {
+            # Pins the behavioral divergence from the Python port, which returns a
+            # ConflictResult whose __bool__ agrees with its conflict field. The
+            # cause is PowerShell's boolean-conversion rule: the count-based rule
+            # applies only to IList implementations, and System.Collections.Hashtable
+            # implements IDictionary and ICollection but not IList, so the result
+            # falls under the rule for any other non-collection type and is always
+            # $true. Both halves are asserted in one It deliberately: a test
+            # asserting only one half would keep passing while the other drifted.
+
+            # Arrange: two provably disjoint radii naming distinct concrete paths.
+            $left = Get-TestRadius -Paths @('scripts/a.py')
+            $right = Get-TestRadius -Paths @('tests/b.py')
+
+            # Act: evaluate the relation and coerce the whole result to a boolean.
+            $result = Test-BlastRadiusConflict -RadiusA $left -RadiusB $right -Config $script:TestConfig
+            $coerced = [bool]$result
+
+            # Assert: the verdict is false while the object itself is true.
+            $result['conflict'] | Should -BeFalse
+            $coerced | Should -BeTrue
+        }
+
+        It 'documents the truthiness divergence in its comment-based help' {
+            # Arrange: read the help through Get-Help so the assertion covers the
+            # rendered help a caller actually sees. Out-String is width-pinned so
+            # the host console width cannot wrap the literal across two lines.
+            $helpText = Get-Help -Name 'Test-BlastRadiusConflict' -Full | Out-String -Width 500
+
+            # Act / Assert: the documentation obligation is enforced by a test.
+            $helpText | Should -BeLike '*the conflict key of the returned hashtable*'
         }
     }
 }
@@ -179,6 +214,59 @@ Describe 'Test-BlastRadiusConflict disjuncts in isolation' {
 
             # Assert: the smallest element keeps the detail argument-order stable.
             $result['reasons'][0]['detail'] | Should -Be 'alpha'
+        }
+    }
+
+    Context 'Mechanically-mergeable paths (issue #643)' {
+        BeforeAll {
+            # The five default patterns, so these tests exercise the present-key
+            # path the minimal mapping above omits.
+            $script:MergeableConfig = @{
+                version               = 1
+                over_breadth_fraction = 0.25
+                mergeable_paths       = @('**/*.csproj', '**/packages.config',
+                    '**/app.config', '**/*.vbproj', '**/*.props')
+            }
+        }
+
+        It 'reports no conflict for a csproj-only overlap' {
+            # Arrange / Act: two radii whose sole common entry is a project file.
+            $left = Get-TestRadius -Paths @('QuickFiler.Test/QuickFiler.Test.csproj', 'QuickFiler.Test/A.cs')
+            $right = Get-TestRadius -Paths @('QuickFiler.Test/QuickFiler.Test.csproj', 'QuickFiler.Test/B.cs')
+            $result = Test-BlastRadiusConflict -RadiusA $left -RadiusB $right -Config $script:MergeableConfig
+
+            # Assert: a merge step reconciles the project file, so the pair is
+            # not in genuine contention and no reason is reported.
+            $result['conflict'] | Should -BeFalse
+            $result['reasons'].Count | Should -Be 0
+        }
+
+        It 'still reports path overlap for a declared glob entry' {
+            # Arrange: two glob entries, neither equal to a configured pattern.
+            $left = Get-TestRadius -Paths @('Proj/**')
+            $right = Get-TestRadius -Paths @('Proj/*.csproj')
+
+            # Act: evaluate the relation.
+            $result = Test-BlastRadiusConflict -RadiusA $left -RadiusB $right -Config $script:MergeableConfig
+
+            # Assert: pattern subsumption is unsupported, so a glob is never
+            # mergeable and the genuine claim survives.
+            $result['conflict'] | Should -BeTrue
+            $result['reasons'].Count | Should -Be 1
+            $result['reasons'][0]['detail'] | Should -Be 'Proj/** ~ Proj/*.csproj'
+        }
+
+        It 'keeps the csproj in both radii paths' {
+            # Arrange / Act: the same csproj-only overlap as the first case,
+            # evaluated so the inputs can be re-read afterwards.
+            $left = Get-TestRadius -Paths @('QuickFiler.Test/QuickFiler.Test.csproj', 'QuickFiler.Test/A.cs')
+            $right = Get-TestRadius -Paths @('QuickFiler.Test/QuickFiler.Test.csproj', 'QuickFiler.Test/B.cs')
+            [void](Test-BlastRadiusConflict -RadiusA $left -RadiusB $right -Config $script:MergeableConfig)
+
+            # Assert: the exclusion filters the comparison only. A radius record is
+            # never rewritten, so drift detection still sees every cited file.
+            $left['paths'] | Should -Contain 'QuickFiler.Test/QuickFiler.Test.csproj'
+            $right['paths'] | Should -Contain 'QuickFiler.Test/QuickFiler.Test.csproj'
         }
     }
 }

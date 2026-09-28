@@ -43,6 +43,18 @@ BeforeAll {
         )
         return @($Reason | ForEach-Object { $_['kind'] } | Sort-Object)
     }
+
+    # Null-safe non-vacuity check reused by the three collection floors below and
+    # exercised directly by the 'Non-vacuity floor helper' negative controls.
+    function Test-NonVacuousCollection {
+        [CmdletBinding()]
+        [OutputType([bool])]
+        param(
+            [AllowNull()]
+            [object] $Value
+        )
+        return @($Value | Where-Object { $null -ne $_ }).Count -gt 0
+    }
 }
 
 Describe 'Committed blast-radius truth table shape' {
@@ -69,7 +81,8 @@ Describe 'Committed blast-radius truth table shape' {
     Context 'Module map' {
         It 'populates the module map' {
             # Assert: an empty map would make the per-module check vacuous.
-            @($script:CommittedConfig['modules'].Keys).Count | Should -BeGreaterThan 0
+            Test-NonVacuousCollection -Value $script:CommittedConfig['modules'].Keys |
+                Should -BeTrue
         }
 
         It 'retains exactly the seven ratified subsystem modules' {
@@ -168,8 +181,10 @@ Describe 'Committed blast-radius truth table shape' {
     Context 'Shared surfaces' {
         It 'populates the shared-surface truth table and its membership globs' {
             # Assert: either list being empty would make the checks below vacuous.
-            @($script:CommittedConfig['shared_surfaces']).Count | Should -BeGreaterThan 0
-            @($script:CommittedConfig['shared_surface_globs']).Count | Should -BeGreaterThan 0
+            Test-NonVacuousCollection -Value $script:CommittedConfig['shared_surfaces'] |
+                Should -BeTrue
+            Test-NonVacuousCollection -Value $script:CommittedConfig['shared_surface_globs'] |
+                Should -BeTrue
         }
 
         It 'lists every shared surface as a repo-relative path' {
@@ -248,9 +263,33 @@ Describe 'Committed blast-radius truth table shape' {
 
             # Assert: an empty or blank-bearing list would exclude nothing or
             # throw at read time.
-            $entries.Count | Should -BeGreaterThan 0
+            Test-NonVacuousCollection -Value $entries | Should -BeTrue
             @($entries | Where-Object { [string]::IsNullOrWhiteSpace($_) }) |
                 Should -BeNullOrEmpty
+        }
+        It 'declares mergeable_paths as a list of non-empty strings' {
+            # Arrange: the mechanically-mergeable path class of issue #643 is a
+            # runtime-describing key, so both committed copies must declare the
+            # same five entries in the same order. Checking both copies here
+            # makes a drift between them visible at this level too.
+            $expected = @(
+                '**/*.csproj', '**/packages.config', '**/app.config',
+                '**/*.vbproj', '**/*.props'
+            )
+
+            # Assert: shape first, then position-by-position equality, so a
+            # reordering names the index that moved. A blank entry would throw
+            # at read time; a reordered list would defeat the byte-equality
+            # relation that holds the two copies together.
+            foreach ($config in @($script:CommittedConfig, $script:BundledConfig)) {
+                $entries = @($config['mergeable_paths'])
+                $entries.Count | Should -Be 5
+                @($entries | Where-Object { [string]::IsNullOrWhiteSpace($_) }) |
+                    Should -BeNullOrEmpty
+                for ($index = 0; $index -lt $expected.Count; $index++) {
+                    $entries[$index] | Should -BeExactly $expected[$index]
+                }
+            }
         }
 
         It 'lists quality-tiers.yml as both a shared surface and a mandate read' {
@@ -258,6 +297,33 @@ Describe 'Committed blast-radius truth table shape' {
             # writes it, and a mandate read when an item merely cites it.
             $script:CommittedConfig['shared_surfaces'] | Should -Contain 'quality-tiers.yml'
             $script:CommittedConfig['mandate_reads'] | Should -Contain 'quality-tiers.yml'
+        }
+    }
+
+    Context 'Non-vacuity floor helper' {
+        It 'returns false for a null value' {
+            Test-NonVacuousCollection -Value $null | Should -BeFalse
+        }
+
+        It 'returns false for an empty array' {
+            Test-NonVacuousCollection -Value @() | Should -BeFalse
+        }
+
+        It 'returns false for an array of only null elements' {
+            Test-NonVacuousCollection -Value @($null, $null) | Should -BeFalse
+        }
+
+        It 'returns true for a non-empty array' {
+            Test-NonVacuousCollection -Value @('a') | Should -BeTrue
+        }
+
+        It 'returns true for a non-empty hashtable Keys property' {
+            $sample = @{ a = 1; b = 2 }
+            Test-NonVacuousCollection -Value $sample.Keys | Should -BeTrue
+        }
+
+        It 'documents that the legacy expression @($null).Count -gt 0 evaluates to $true' {
+            (@($null).Count -gt 0) | Should -BeTrue
         }
     }
 

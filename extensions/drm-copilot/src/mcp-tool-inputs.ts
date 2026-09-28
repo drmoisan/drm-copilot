@@ -35,6 +35,7 @@ export type {
 
 export interface CollectPrContextToolInput extends WorkspaceToolInput {
   readonly base: string;
+  readonly targetRef?: string;
 }
 
 export interface RunCodexNativeConverterToolInput extends WorkspaceToolInput {
@@ -142,12 +143,14 @@ export function resolveCollectPrContextToolInput(
   fallbackWorkspaceRoot?: string,
 ): CollectPrContextToolInput {
   const args = asToolArgumentObject(rawInput);
+  const targetRef = normalizeOptionalText(args["target_ref"], "target_ref");
   return {
     workspaceRoot: normalizeWorkspaceRoot(
       args["workspace_root"],
       fallbackWorkspaceRoot,
     ),
     base: normalizeRequiredText(args["base"], "base"),
+    ...(targetRef === undefined ? {} : { targetRef }),
   };
 }
 

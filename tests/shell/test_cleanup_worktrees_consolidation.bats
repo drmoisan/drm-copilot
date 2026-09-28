@@ -11,6 +11,7 @@ setup() {
     ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
+    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
     CONS="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/consolidation"
@@ -19,7 +20,7 @@ setup() {
 
 @test "pre-existing documentationandmemories branch stops the run with a report" {
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/preexisting_consolidation_branch" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; create_consolidation_worktree"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; create_consolidation_worktree"
     [ "$status" -ne 0 ]
     [[ "$output" == *"refs/heads/documentationandmemories already exists"* ]]
     # No worktree add is attempted when the branch already exists.
@@ -28,7 +29,7 @@ setup() {
 
 @test "fresh run creates the consolidation worktree off main via worktree add" {
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${CONS}/ok" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; create_consolidation_worktree"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; create_consolidation_worktree"
     [ "$status" -eq 0 ]
     [[ "$output" == *"worktree add /repo/main-wt/documentationandmemories -b documentationandmemories main"* ]]
     [[ "$output" == *"ACTION|worktree-add|/repo/main-wt/documentationandmemories|OK"* ]]
@@ -36,7 +37,7 @@ setup() {
 
 @test "candidates are cherry-picked in fed order with -x on every commit" {
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${CONS}/ok" \
-        bash -c "printf 'COMMIT|branch-a|sha-a1|UNIQUE|d|A|d\nCOMMIT|branch-a|sha-a2|UNIQUE|d|A|d\nCOMMIT|branch-b|sha-b1|UNIQUE|d|A|d\n' | { source '${ELIB}'; source '${LIB}'; source '${ALIB}'; cherry_pick_candidates /repo-wt/dm; }"
+        bash -c "printf 'COMMIT|branch-a|sha-a1|UNIQUE|d|A|d\nCOMMIT|branch-a|sha-a2|UNIQUE|d|A|d\nCOMMIT|branch-b|sha-b1|UNIQUE|d|A|d\n' | { source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; cherry_pick_candidates /repo-wt/dm; }"
     [ "$status" -eq 0 ]
     # -x present on every cherry-pick argv, in oldest-first / LC_ALL=C-fed order.
     [[ "$output" == *"cherry-pick -x sha-a1"* ]]
@@ -49,7 +50,7 @@ setup() {
 
 @test "a conflicting pick aborts, records CONFLICT, and skips the rest of its branch" {
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${CONS}/conflict" \
-        bash -c "printf 'COMMIT|branch-a|sha-a1|UNIQUE|d|A|d\nCOMMIT|branch-a|sha-a2|UNIQUE|d|A|d\nCOMMIT|branch-b|sha-b1|UNIQUE|d|A|d\n' | { source '${ELIB}'; source '${LIB}'; source '${ALIB}'; cherry_pick_candidates /repo-wt/dm; }"
+        bash -c "printf 'COMMIT|branch-a|sha-a1|UNIQUE|d|A|d\nCOMMIT|branch-a|sha-a2|UNIQUE|d|A|d\nCOMMIT|branch-b|sha-b1|UNIQUE|d|A|d\n' | { source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; cherry_pick_candidates /repo-wt/dm; }"
     [ "$status" -ne 0 ]
     [[ "$output" == *"cherry-pick --abort"* ]]
     [[ "$output" == *"COMMIT|branch-a|sha-a1|CONFLICT|"* ]]
@@ -60,7 +61,7 @@ setup() {
 
 @test "an empty pick is skipped and the commit is reclassified as content-on-main" {
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${CONS}/empty" \
-        bash -c "printf 'COMMIT|branch-c|sha-c1|UNIQUE|d|A|d\n' | { source '${ELIB}'; source '${LIB}'; source '${ALIB}'; cherry_pick_candidates /repo-wt/dm; }"
+        bash -c "printf 'COMMIT|branch-c|sha-c1|UNIQUE|d|A|d\n' | { source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; cherry_pick_candidates /repo-wt/dm; }"
     [ "$status" -eq 0 ]
     [[ "$output" == *"cherry-pick --skip"* ]]
     [[ "$output" == *"COMMIT|branch-c|sha-c1|CONTENT_ON_MAIN|reclassified-empty"* ]]
@@ -69,7 +70,7 @@ setup() {
 
 @test "abort cleanup removes the consolidation worktree and branch" {
     run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${CONS}/ok" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; cleanup_consolidation_on_abort"
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${ALIB}'; cleanup_consolidation_on_abort"
     [ "$status" -eq 0 ]
     [[ "$output" == *"worktree remove /repo/main-wt/documentationandmemories"* ]]
     [[ "$output" == *"branch -D documentationandmemories"* ]]

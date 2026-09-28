@@ -13,18 +13,28 @@ setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
     ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
+    RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
     ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
+    DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
+    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
+    SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
     chmod +x "${STUB}" 2>/dev/null || true
+    chmod +x "${SCAN}" 2>/dev/null || true
 }
 
 runin() { # runin <scenario> <function-invocation>
-    # Source the three libraries in dependency order and run the given invocation under
-    # the named scenario. The stub logs argv to stderr; discard it so $output is the
-    # function's stdout report lines only (bats `run` otherwise merges stderr).
-    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
-        bash -c "source '${ELIB}'; source '${LIB}'; source '${ALIB}'; $2 2>/dev/null"
+    # Source the libraries in dependency order and run the given invocation under the
+    # named scenario. run_report/run_apply call the report-record functions and the
+    # shared classification driver, so the sibling library must be sourced here (bats
+    # subshells source the libraries directly and never run the CLI wrapper) and the
+    # filesystem scan must route through the checked-in scan stub rather than reading the
+    # real .claude/worktrees tree. The stub logs argv to stderr; discard it so $output is
+    # the function's stdout report lines only (bats `run` otherwise merges stderr).
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
+        bash -c "source '${ELIB}'; source '${LIB}'; source '${DIRTLIB}'; source '${RLIB}'; source '${ALIB}'; source '${DLIB}'; $2 2>/dev/null"
 }
 
 # --- Fail-before-red set (assert post-fix behavior; red before Phase 3 fixes) ---

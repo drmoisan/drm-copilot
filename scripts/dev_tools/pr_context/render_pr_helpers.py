@@ -7,7 +7,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from .models import (
+    AUTOCLOSE_PENDING_NOT_OPEN_TEXT,
+    AUTOCLOSE_UNVERIFIED_ANNOTATION,
     CONVENTIONAL_TYPES,
+    ISSUE_REFERENCE_PATTERN,
     IssueDetails,
     PullRequestDetails,
     format_list,
@@ -98,12 +101,17 @@ def extension_summary(files: Iterable[str]) -> str:
 
 
 def extract_issue_references(text: str) -> list[str]:
-    """Extract issue tokens like #123 and ABC-123 in encounter order."""
+    """Extract bare-number issue references (for example #123) in encounter order.
+
+    Only ``#`` followed by ASCII digits, not preceded or followed by a word
+    character, is returned (issue #622, D1).
+    """
     if not text:
         return []
-    matches = re.findall(r"(?<!\w)#\d+|\b[A-Z][A-Z0-9]+-\d+\b", text)
+    matches = ISSUE_REFERENCE_PATTERN.findall(text)
     seen: set[str] = set()
     ordered: list[str] = []
+    # Keep the first occurrence of each reference so output order is stable.
     for item in matches:
         if item not in seen:
             seen.add(item)
@@ -206,9 +214,10 @@ def build_close_candidates_section(
     author_reason: str,
 ) -> str:
     """Render close-candidate section grouped by verification source."""
-    all_auto_close = set(verified + author_asserted + referenced)
-    author_auto_close = sorted(all_auto_close)
-    referenced_only = sorted(set(referenced) - all_auto_close)
+    # D2 (issue #622): prose citations are mentions only, so author auto-close
+    # lists the author's own assertions and referenced issues stay detected-only.
+    author_auto_close = sorted(set(author_asserted))
+    referenced_only = sorted(set(referenced) - set(verified) - set(author_asserted))
 
     return "\n".join(
         [
@@ -230,6 +239,8 @@ def build_issues_to_autoclose_section(
     verified: list[str],
     pending_primary: list[str],
     readiness_signals: list[str],
+    gh_available: bool = True,
+    pending_primary_excluded: bool = False,
 ) -> str:
     """Render approved autoclose section from verified and deterministic pending refs.
 
@@ -242,6 +253,15 @@ def build_issues_to_autoclose_section(
         pending_primary: Deterministic primary issue refs eligible when
             readiness is PASS.
         readiness_signals: Normalized readiness states observed in feature docs.
+        gh_available: Whether the GitHub CLI was available for verification.
+            When false and the list is non-empty, the unverified annotation
+            line is appended after the list (issue #622, D4, D10).
+            When false and the list is empty, the body is the
+            GitHub-CLI-unavailable text, ahead of every empty-list fallback
+            (issue #588).
+        pending_primary_excluded: Whether a pending primary ref was dropped
+            because it is not an open issue; selects the not-open fallback text
+            when the list is empty (issue #622, D5).
 
     Returns:
         A formatted section with header
@@ -258,8 +278,19 @@ def build_issues_to_autoclose_section(
         if issue and issue not in ordered:
             ordered.append(issue)
 
+    # Precedence: a non-empty list always renders (annotated when unverified);
+    # an empty list reports an excluded pending primary first, because that is
+    # the most specific reason, then the readiness-based fallbacks.
     if ordered:
         body = format_list(ordered, "(none)")
+        if not gh_available:
+            body = body + "\n" + AUTOCLOSE_UNVERIFIED_ANNOTATION
+    elif not gh_available:
+        # Unavailable text takes precedence: the absence claims below are only
+        # meaningful when verification ran (issue #588).
+        body = "None (GitHub CLI unavailable; closing issues not verified)"
+    elif pending_primary_excluded:
+        body = AUTOCLOSE_PENDING_NOT_OPEN_TEXT
     else:
         # Use explicit conservative wording when readiness is missing/non-PASS.
         if any(signal == "PASS" for signal in readiness_signals):

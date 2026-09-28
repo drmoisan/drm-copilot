@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <Analyzer Include="Shared/Base1.dll" />
+    <Analyzer Include="Ours/OursA.dll">
+      <DependentUpon>Base1.dll</DependentUpon>
+      <SubType>Designer</SubType>
+    </Analyzer>
+    <Analyzer Include="Ours/OursB.dll">
+      <DependentUpon>Base1.dll</DependentUpon>
+      <SubType>Designer</SubType>
+    </Analyzer>
+    <Analyzer Include="Theirs/TheirsA.dll">
+      <DependentUpon>Base1.dll</DependentUpon>
+      <SubType>Designer</SubType>
+    </Analyzer>
+    <Analyzer Include="Theirs/TheirsB.dll">
+      <DependentUpon>Base1.dll</DependentUpon>
+      <SubType>Designer</SubType>
+    </Analyzer>
+    <Analyzer Include="Shared/Base2.dll" />
+  </ItemGroup>
+</Project>

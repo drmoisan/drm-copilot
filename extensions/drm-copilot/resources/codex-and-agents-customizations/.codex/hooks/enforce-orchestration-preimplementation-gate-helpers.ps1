@@ -27,24 +27,42 @@ $script:OrchestrationBookkeepingTrees = @(
     'artifacts/orchestration/'
 )
 
-# Characters that make a command line statically unresolvable: shell interpolation and
-# redirection (D4 row 12). Tested across the whole line rather than per operand, because a
-# redirection anywhere in the line moves content the operand list cannot describe.
-$script:UnresolvableCommandCharacters = [char[]]@('$', '`', '>', '<')
+# Characters that make a command line statically unresolvable (D4 row 12, as narrowed by
+# issues #663 and #713): interpolation characters outside single quotes; outside-quote
+# characters (`<`, `>`, and the `#` comment introducer) outside any quote; and typographic
+# quotes (U+2018 to U+201E) anywhere, because a PowerShell host reads them as quotes.
+$script:InterpolationCommandCharacters = [char[]]@('$', '`')
+$script:OutsideQuoteCommandCharacters = [char[]]@('>', '<', '#')
+$script:TypographicQuoteCharacters = [char[]]@(0x2018, 0x2019, 0x201A, 0x201B, 0x201C, 0x201D, 0x201E)
 
 # Wildcards that make an operand a glob (D4 row 15). Only the literal prefix before the
 # first of these is prefix-tested.
 $script:PathspecWildcardCharacters = [char[]]@('*', '?', '[')
+
+# The single repository selector modelled between the command name and the subcommand: D4
+# row 14 as narrowed by issue #671, the Lexical Absolute-Canonical Selector (LACS) rule in
+# docs/features/active/2026-09-13-preimplementation-gate-worktree-selector-671/spec.md.
+# Compared case-sensitively; no other relocating spelling is modelled.
+$script:OrchestrationSelectorOptionName = '-C'
+
+# Accepted widening (issue #671): a selector naming a nested subdirectory of a worktree
+# passes L1 through L8 lexically yet relocates what a relative operand denotes, so
+# `docs/features/active/X` under `-C <root>/tests/fixtures/resolve_execute_plan_prompt`
+# stages `tests/fixtures/resolve_execute_plan_prompt/docs/features/active/X`. Measured
+# exposure in this repository is seven Markdown test fixtures under the
+# resolve_execute_plan_prompt fixture tree, all of which the gate's file_path leg already
+# classifies as non-implementation. This module stays pure string logic; the epic's F1
+# resolution module composes upstream to close the escape later without a schema change,
+# the same posture D4 row 16 takes toward issue #516.
 
 function Split-OrchestrationCommandLine {
     <#
     .SYNOPSIS
         Splits a command line into segments on chain operators outside quotes.
     .DESCRIPTION
-        Realizes D4 row 13. Quote state is tracked while scanning so a chain operator
-        inside a quoted span does not split. The returned `Balanced` flag reports whether
-        the scan ended outside every quote; unbalanced text is not splittable and the
-        caller denies (D4 rows 11 and 13). Empty and whitespace-only segments are dropped.
+        Realizes D4 row 13. Quote state and POSIX backslash escapes (issue #710) are tracked, so a quoted or
+        escaped chain operator does not split. `Balanced` reports whether the scan ended outside every quote;
+        the caller denies unbalanced text (D4 rows 11 and 13). Empty and whitespace-only segments are dropped.
     .OUTPUTS
         System.Collections.Hashtable with keys `Balanced` (bool) and `Segments` (string[]).
     #>
@@ -55,8 +73,9 @@ function Split-OrchestrationCommandLine {
     $segments = [System.Collections.Generic.List[string]]::new()
     $current = [System.Text.StringBuilder]::new()
     $openQuote = [char]0
-
+    $escaped = $false
     foreach ($character in $CommandText.ToCharArray()) {
+        if ($escaped -or ($character -eq '\' -and $openQuote -ne "'")) { $escaped = -not $escaped; [void]$current.Append($character); continue }
         if ($openQuote -ne [char]0) {
             if ($character -eq $openQuote) {
                 $openQuote = [char]0
@@ -86,6 +105,59 @@ function Split-OrchestrationCommandLine {
         Balanced = ($openQuote -eq [char]0)
         Segments = @($segments | Where-Object { $_.Trim() })
     }
+}
+
+function Test-OrchestrationCommandTextUnresolvable {
+    <#
+    .SYNOPSIS
+        Reports whether a command line carries a statically unresolvable character.
+    .DESCRIPTION
+        Realizes D4 row 12 as narrowed by issues #663 and #713, with quote state tracked as in
+        Split-OrchestrationCommandLine. `$` or backtick answers true outside quotes or inside
+        double quotes (single quotes keep it literal); `<`, `>`, or a `#` comment answers true
+        only outside a quoted span. A typographic quote (U+2018 to U+201E), a backslash before
+        any quote character, or a backslash inside a double-quoted span answers true anywhere:
+        a shell may end the span where this scan does not (fail closed).
+    .PARAMETER CommandText
+        The full command line as the shell would receive it.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $CommandText)
+
+    # An escaped or typographic quote moves a span boundary the scan cannot model (#663, #713).
+    if ($CommandText.Contains('\"') -or $CommandText.Contains("\'") -or $CommandText.IndexOfAny($script:TypographicQuoteCharacters) -ge 0) {
+        return $true
+    }
+
+    $openQuote = [char]0
+
+    # Scan every character once, tracking whether it sits inside a quoted span so that
+    # outside-quote characters are judged only where the shell would honour them.
+    foreach ($character in $CommandText.ToCharArray()) {
+        if ($openQuote -ne "'" -and $script:InterpolationCommandCharacters -contains $character) {
+            return $true
+        }
+
+        # Decide by quote state: inside a span only the closing quote matters, and any
+        # backslash inside a double-quoted span is an unmodelled escape; outside a span a
+        # quote opens one and a redirection character is unresolvable.
+        if ($openQuote -ne [char]0) {
+            if ($openQuote -eq '"' -and $character -eq '\') {
+                return $true
+            }
+            if ($character -eq $openQuote) {
+                $openQuote = [char]0
+            }
+        } elseif ($character -eq '"' -or $character -eq "'") {
+            $openQuote = $character
+        } elseif ($script:OutsideQuoteCommandCharacters -contains $character) {
+            return $true
+        }
+    }
+    return $false
 }
 
 function ConvertTo-OrchestrationCommandToken {
@@ -203,6 +275,67 @@ function Test-ExemptOrchestrationOperand {
     return $false
 }
 
+function Test-ExemptOrchestrationSelector {
+    <#
+    .SYNOPSIS
+        Tests the repository selector of one tokenized segment against LACS L1 through L8.
+    .DESCRIPTION
+        Realizes D4 row 14 as narrowed by issue #671 (the Lexical Absolute-Canonical Selector
+        rule in docs/features/active/2026-09-13-preimplementation-gate-worktree-selector-671/spec.md).
+        Returns true only when the segment reads `git -C <value> <subcommand> ...` and the
+        value is decidable from the command text alone: exactly one case-sensitive `-C`, at
+        index 1 (L1, L2); a value at index 2 and the subcommand at index 3 (L3); a
+        drive-lettered or rooted, non-UNC value after separator normalization (L4); no `.` or
+        `..` segment (L5); no wildcard (L6); no colon other than the drive colon (L7); and a
+        non-empty value (L8). Each rejection writes a diagnostic token through Write-Debug.
+        The tokens are not contractual and change no decision.
+        L3 checks only that a non-option token follows the value; the caller
+        Test-ExemptOrchestrationSegmentToken rejects any subcommand other than add or commit.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][AllowEmptyCollection()][AllowEmptyString()][string[]] $Token)
+
+    $selector = $script:OrchestrationSelectorOptionName
+    if ($Token.Count -lt 2 -or $Token[1] -cne $selector) {
+        Write-Debug 'PREIMPL_SELECTOR_UNMODELLED_OPTION: the token after the command name is not the -C selector.'
+        return $false
+    }
+    if (@($Token | Where-Object { $_ -ceq $selector }).Count -gt 1) {
+        Write-Debug 'PREIMPL_SELECTOR_REPEATED: the segment carries more than one -C selector.'
+        return $false
+    }
+    if ($Token.Count -lt 4 -or $Token[3].StartsWith('-')) {
+        Write-Debug 'PREIMPL_SELECTOR_MALFORMED: no subcommand immediately follows the selector value.'
+        return $false
+    }
+    $value = $Token[2]
+    if (-not $value) {
+        Write-Debug 'PREIMPL_SELECTOR_MALFORMED: the selector value is empty.'
+        return $false
+    }
+
+    $normalized = $value -replace '\\', '/'
+    $isDriveRooted = $normalized -match '^[A-Za-z]:/'
+    if ($normalized.StartsWith('//') -or -not ($isDriveRooted -or $normalized.StartsWith('/'))) {
+        Write-Debug 'PREIMPL_SELECTOR_NOT_ROOTED: the selector value is relative or UNC.'
+        return $false
+    }
+    $segments = $normalized -split '/'
+    if ($segments -contains '..' -or $segments -contains '.') {
+        Write-Debug 'PREIMPL_SELECTOR_TRAVERSAL: the selector value carries a dot segment.'
+        return $false
+    }
+    $afterDrive = if ($isDriveRooted) { $normalized.Substring(2) } else { $normalized }
+    if ($normalized.IndexOfAny($script:PathspecWildcardCharacters) -ge 0 -or $afterDrive.Contains(':')) {
+        Write-Debug 'PREIMPL_SELECTOR_NOT_LITERAL: the selector value carries a wildcard or a stray colon.'
+        return $false
+    }
+    return $true
+}
+
 function Test-ExemptOrchestrationSegmentToken {
     <#
     .SYNOPSIS
@@ -218,17 +351,26 @@ function Test-ExemptOrchestrationSegmentToken {
     #>
     [CmdletBinding()]
     [OutputType([bool])]
-    param([Parameter(Mandatory)][AllowEmptyCollection()][string[]] $Token)
+    param([Parameter(Mandatory)][AllowEmptyCollection()][AllowEmptyString()][string[]] $Token)
 
     if ($Token.Count -lt 2) {
         return $false
     }
 
-    # Row 14: the command name leads and the subcommand follows immediately. Anything in
-    # between - a relocating option or an env-style prefix - moves the pathspec base and is
-    # rejected here rather than modelled.
+    # Row 14, narrowed by issue #671: the command name leads and the subcommand follows it,
+    # either immediately or after one lexically absolute `-C <value>` selector (LACS L1-L8).
+    # Anything else in between - an unmodelled or unresolvable relocating option, or an
+    # env-style prefix - moves the pathspec base undecidably and is rejected here.
     if ($Token[0] -cne 'git') {
         return $false
+    }
+    if ($Token[1] -cne 'add' -and $Token[1] -cne 'commit') {
+        if (-not (Test-ExemptOrchestrationSelector -Token $Token)) {
+            return $false
+        }
+        # Drop the accepted selector and its value so the subcommand is again at index 1
+        # and operand collection below starts at index 2 exactly as before.
+        $Token = @($Token[0]) + @($Token[3..($Token.Count - 1)])
     }
     $subcommand = $Token[1]
     if ($subcommand -cne 'add' -and $subcommand -cne 'commit') {
@@ -251,21 +393,21 @@ function Test-ExemptOrchestrationSegmentToken {
             }
 
             if ($candidate.StartsWith('-')) {
-                # The message option is the only modelled option on either subcommand. Rows
+                # Only the message and trailer options of commit are modelled (issue #713). Rows
                 # 2, 5, 6, 8, and 10 all land here and deny, including a dash-leading
                 # operand supplied without a preceding separator.
                 if ($subcommand -cne 'commit') {
                     return $false
                 }
-                if ($candidate -ceq '-m' -or $candidate -ceq '--message') {
-                    # The message value is the following token and is not a pathspec.
+                if ($candidate -ceq '-m' -or $candidate -ceq '--message' -or $candidate -ceq '--trailer') {
+                    # The message or trailer value is the following token and is not a pathspec.
                     $index += 2
                     if ($index -gt $Token.Count) {
                         return $false
                     }
                     continue
                 }
-                if ($candidate.StartsWith('--message=') -or
+                if ($candidate.StartsWith('--message=') -or $candidate.StartsWith('--trailer=') -or
                     ($candidate.Length -gt 2 -and $candidate.StartsWith('-m'))) {
                     $index++
                     continue
@@ -322,9 +464,9 @@ function Test-ExemptOrchestrationStagingCommand {
         return $false
     }
 
-    # Row 12: interpolation and redirection are not statically resolvable, so the operand
-    # list cannot be trusted to describe what the line actually touches.
-    if ($CommandText.IndexOfAny($script:UnresolvableCommandCharacters) -ge 0) {
+    # Row 12: `$` or backtick outside single quotes, `<`, `>`, or `#` outside quotes, any
+    # typographic quote, and unmodelled backslash escapes make the operand list untrustworthy.
+    if (Test-OrchestrationCommandTextUnresolvable -CommandText $CommandText) {
         return $false
     }
 
@@ -339,11 +481,17 @@ function Test-ExemptOrchestrationStagingCommand {
         return $false
     }
 
-    foreach ($segment in $segments) {
-        $tokens = @(ConvertTo-OrchestrationCommandToken -Segment $segment)
-        if (-not (Test-ExemptOrchestrationSegmentToken -Token $tokens)) {
-            return $false
+    # Fail closed (issue #671): an error raised while classifying any segment is a parse
+    # ambiguity, so it answers false instead of letting the caller continue past it.
+    try {
+        foreach ($segment in $segments) {
+            $tokens = @(ConvertTo-OrchestrationCommandToken -Segment $segment)
+            if (-not (Test-ExemptOrchestrationSegmentToken -Token $tokens)) {
+                return $false
+            }
         }
+    } catch {
+        return $false
     }
     return $true
 }

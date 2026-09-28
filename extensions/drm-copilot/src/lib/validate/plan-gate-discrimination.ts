@@ -1,5 +1,6 @@
 import type { CommandRunner } from "../subprocess-runner";
 import { extractPlanCommands, type PlanCommand } from "./plan-gate-commands";
+import { evaluateObservabilityGates } from "./plan-gate-observability";
 import {
   BLOCKING_CHANNEL,
   covValues,
@@ -56,6 +57,16 @@ export type {
   PlanGateGitRepository,
   PlanGateReport,
 } from "./plan-gate-rules";
+export {
+  evaluateObservabilityGates,
+  G7_SEVERITY,
+  G8_SEVERITY,
+  G8B_SEVERITY,
+  G9_SEVERITY,
+  projectAddopts,
+  WRITE_MODE_REGISTER,
+} from "./plan-gate-observability";
+export type { WriteModeEntry, WriteModeShape } from "./plan-gate-observability";
 
 /**
  * G5's severity channel, mirroring the Python constant exactly.
@@ -260,6 +271,10 @@ export function evaluatePlanGates(
       evaluateCovValue(report, command, cov, context);
     }
   }
+
+  // The observability group runs G7, G8, and G8b unconditionally and G9 only
+  // when a context is supplied, absorbing any repository-seam failure itself.
+  evaluateObservabilityGates(report, commands, context);
 
   if (context !== undefined) {
     evaluateLiteralRules(report, text, commands, context);

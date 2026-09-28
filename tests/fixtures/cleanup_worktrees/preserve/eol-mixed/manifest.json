@@ -1,0 +1,22 @@
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "removals": [],
+  "preserved_files": [
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/eol-mixed/wt",
+      "source_path": "agent-memory/atomic-executor/mixed-lesson.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "agent-memory/atomic-executor/mixed-lesson.md",
+      "memory_index_line": "- [Mixed lesson](mixed-lesson.md) - never appended, the target is refused",
+      "line_ending": "lf",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/eol-mixed fixture: the destination index mixes CRLF and LF terminated lines. Its index target lives under preserve/eol-crlf/mixed-index/ so the existing -text exception preserves the carriage returns through checkout"
+    }
+  ]
+}

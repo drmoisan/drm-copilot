@@ -1,0 +1,21 @@
+{
+  "name": "cohorts_mergeable_only_overlaps",
+  "notes": "Four items whose only path overlaps are .csproj files acquire no edge under mergeable_paths and therefore share cohort 0 (issue #643).",
+  "input": {
+    "item_keys": [
+      796,
+      797,
+      798,
+      799
+    ],
+    "conflict_edges": []
+  },
+  "expected_cohorts": [
+    [
+      796,
+      797,
+      798,
+      799
+    ]
+  ]
+}

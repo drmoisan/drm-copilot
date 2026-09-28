@@ -1,0 +1,4 @@
+--- /dev/null
++++ b/src/Legacy/Legacy.csproj
+@@ -0,0 +1 @@
++      <HintPath>..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll</HintPath>

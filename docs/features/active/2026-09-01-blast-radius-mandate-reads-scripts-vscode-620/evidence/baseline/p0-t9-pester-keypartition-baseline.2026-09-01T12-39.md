@@ -1,0 +1,4 @@
+Timestamp: 2026-09-01T12-39
+Command: mcp__drm-copilot__run_poshqc_test with workspace_root="C:\Users\DanMoisan\repos\drm-copilot-wt\2026-09-01T08-20" and scan_folders=["tests/scripts/claude-lib/blast-radius"]
+EXIT_CODE: 0
+Output Summary: Tool returned `"ok":true`. The JUnit report at artifacts/pester/pester-junit.xml recorded a total of 411 tests, 0 errors, 0 failures across the blast-radius scan folder. The `BlastRadius.KeyPartition.Tests.ps1` suite (id="1") reports 5 tests, 0 errors, 0 failures, including a Passed status for "Committed blast-radius truth table cross-copy key partition.Cross-copy key partition.declares equal values for the runtime-describing keys in both copies".

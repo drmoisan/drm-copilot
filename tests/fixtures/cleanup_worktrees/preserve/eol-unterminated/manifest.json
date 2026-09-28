@@ -1,0 +1,22 @@
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "removals": [],
+  "preserved_files": [
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/eol-unterminated/wt",
+      "source_path": "agent-memory/atomic-executor/unterminated-lesson.md",
+      "change_class": "untracked",
+      "disposition": "PRESERVE",
+      "verdict": "GENUINELY_NEW",
+      "target_path": "agent-memory/atomic-executor/unterminated-lesson.md",
+      "memory_index_line": "- [Unterminated lesson](unterminated-lesson.md) - appended after a supplied terminator",
+      "line_ending": "lf",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/eol-unterminated fixture: the destination index's final line carries no terminator"
+    }
+  ]
+}

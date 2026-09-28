@@ -1,0 +1,34 @@
+{
+  "mode": "after",
+  "runtime": "powershell",
+  "slug": "backlog-2026-09-26",
+  "config": "config/blast-radius.json at HEAD 6f81b876df5dfb2334cf84c58b2dd408dbba5335",
+  "items": [
+    513,
+    528,
+    588,
+    594,
+    622
+  ],
+  "edges": [
+    {
+      "a": 528,
+      "b": 588,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 8,
+      "benefit": 2
+    },
+    {
+      "a": 588,
+      "b": 622,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 152,
+      "benefit": 4
+    }
+  ],
+  "edge_count": 2,
+  "tolerated_overlaps": [],
+  "tolerated_count": 0
+}

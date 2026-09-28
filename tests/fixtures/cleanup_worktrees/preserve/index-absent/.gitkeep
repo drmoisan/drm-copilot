@@ -1,0 +1,4 @@
+# The index-absent scenario is defined by the ABSENCE of a consolidation index. The
+# test points CLEANUP_WT_CONSOLIDATION_PATH at /dev, so the derived index path is
+# /dev/MEMORY.md, which does not exist and is never created: the read-only phase
+# reports CREATED as a decision and the writing phase is not entered by that test.

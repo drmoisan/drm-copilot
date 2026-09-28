@@ -17,11 +17,9 @@ function plan(...lines: readonly string[]): string {
 describe("extractPlanCommands", () => {
   it("returns the exact record field set", () => {
     // Arrange
-    const text = plan(
-      "### Phase 1 — Work",
-      TASK_LINE,
-      "  - Acceptance: `grep -F -n 'MIT License' LICENSE` reports one match.",
-    );
+    const acceptance =
+      "  - Acceptance: `grep -F -n 'MIT License' LICENSE` reports one match.";
+    const text = plan("### Phase 1 — Work", TASK_LINE, acceptance);
 
     // Act
     const commands = extractPlanCommands(text);
@@ -36,6 +34,7 @@ describe("extractPlanCommands", () => {
       "rawSpan",
       "sourceLine",
       "taskId",
+      "taskText",
     ]);
     expect(command?.taskId).toBe("P1-T1");
     expect(command?.sourceLine).toBe(3);
@@ -48,6 +47,60 @@ describe("extractPlanCommands", () => {
       "LICENSE",
     ]);
     expect(command?.kind).toBe("grep");
+    expect(command?.taskText).toBe([TASK_LINE, acceptance].join("\n"));
+  });
+
+  it("populates task text from the owning task", () => {
+    // Arrange
+    const text = plan(
+      "### Phase 1 — Work",
+      "- [ ] [P1-T1] First task",
+      "  - Acceptance: `npm run typecheck` exits 0,",
+      "    and the summary line is recorded.",
+      "- [ ] [P1-T2] Second task",
+      "  - Acceptance: `npm run lint` reports 0 findings.",
+    );
+
+    // Act
+    const commands = extractPlanCommands(text);
+
+    // Assert
+    expect(commands).toHaveLength(2);
+    expect(commands[0]?.taskText).toBe(
+      [
+        "- [ ] [P1-T1] First task",
+        "  - Acceptance: `npm run typecheck` exits 0,",
+        "    and the summary line is recorded.",
+      ].join("\n"),
+    );
+    expect(commands[0]?.taskText).not.toContain("Second task");
+    expect(commands[1]?.taskText).toBe(
+      [
+        "- [ ] [P1-T2] Second task",
+        "  - Acceptance: `npm run lint` reports 0 findings.",
+      ].join("\n"),
+    );
+  });
+
+  it("leaves task text empty outside any window", () => {
+    // Arrange
+    const text = plan(
+      "# Plan",
+      "",
+      "Run `npm run typecheck` before starting.",
+      "",
+      "### Phase 1 — Work",
+      "",
+      "This phase ends with `npm run lint`.",
+      "",
+      TASK_LINE,
+    );
+
+    // Act
+    const commands = extractPlanCommands(text);
+
+    // Assert
+    expect(commands).toEqual([]);
   });
 
   it("classifies grep, pytest_cov, and other kinds", () => {

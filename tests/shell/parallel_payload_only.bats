@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 # Payload-only destination-portability proof (issue #462, AC16 bats half).
 #
-# Invokes the three published bash entry points from the bundle root
+# Invokes the four published bash entry points from the bundle root
 # extensions/drm-copilot/resources/claude-customizations/ -- the directory that
 # contains only what a destination workspace receives -- with a restricted PATH
 # that contains no python, python3, or poetry. A passing run demonstrates that
@@ -42,11 +42,12 @@ run_payload() {
         "$BASH_BIN" "${PAYLOAD_LIB}/${script}" "$@"
 }
 
-@test "the payload directory carries the three entry points" {
+@test "the payload directory carries the four entry points" {
     [ -d "$PAYLOAD_ROOT" ]
     [ -f "${PAYLOAD_LIB}/compute-cohorts.sh" ]
     [ -f "${PAYLOAD_LIB}/compute-concurrency-batches.sh" ]
     [ -f "${PAYLOAD_LIB}/validate-parallel-manifest.sh" ]
+    [ -f "${PAYLOAD_LIB}/report-lane-assertion.sh" ]
 }
 
 @test "the payload directory carries the config tree and the parallel rule" {
@@ -110,4 +111,10 @@ run_payload() {
     [ "$status" -eq 1 ]
     [ "${lines[0]}" = "Parallel manifest parallel must be a non-empty string." ]
     [ "${lines[1]}" = "Parallel manifest created_at must be a non-empty string." ]
+}
+
+@test "the payload runs the lane-assertion diagnostic without Python on PATH" {
+    run_payload report-lane-assertion.sh --manifest "$FIXTURE_MANIFEST"
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "Lane assertion: 2 derived conflict component(s); 0 disagreement(s)." ]
 }

@@ -15,6 +15,18 @@ param()
 # the headroom-split precedent already used on this side by enforce-completion-helpers.ps1.
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-helpers.ps1')
 
+# Pure mode dispatch and per-mode readiness predicates for issue #554. A new sibling
+# rather than an addition to the helpers file above, whose header declares a different
+# normative contract and which lacks headroom; leaving that file byte-untouched is the
+# proof the issue #539 exemption is behaviourally unchanged.
+. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-modes.ps1')
+# Epic-scope command and path legs (issue #707, porting issue #663 decision D2), plus the
+# two per-mode read seams relocated from this file to keep it inside the 500-line cap.
+. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1')
+# Shared command-line parser (issue #545): per-segment scan text and structural matching.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+
 # The readiness checkpoint this gate reads and names in its block message.
 $script:CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 
@@ -145,9 +157,11 @@ function Test-ImplementationCommand {
         '(^|\s)npx\s+(prettier|eslint|tsc|jest)\b',
         '(^|\s)pwsh\s+.*(Invoke-Pester|tests/scripts/)'
     )
+    $scanText = @(Read-CommandLineSegment -CommandText $normalizedCommand).ScanText
+    $isStaging = @('add', 'commit').Where({ Test-CommandLineInvocation -CommandText $normalizedCommand -CommandWord 'git' -SubcommandPath @($_) }).Count -gt 0
 
     for ($index = 0; $index -lt $implementationCommandPatterns.Count; $index++) {
-        if ($normalizedCommand -notmatch $implementationCommandPatterns[$index]) {
+        if (-not (($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }) -or ($index -eq 0 -and $isStaging))) {
             continue
         }
         # Allow-side only (issue #539). Index 0 is the git staging trigger, whose pattern
@@ -200,6 +214,19 @@ function Test-PreparationModeDelegation {
     return $true
 }
 
+# Classifies an Agent delegation as implementation by STRUCTURE (issue #554). Both
+# reads are field-scoped through this file's own Get-StringProperty, and the
+# whole-payload serialization scan this function used to perform is removed: it let any
+# field, and two ordinary English words, decide the outcome, so marker text planted
+# outside 'prompt' changed the classification and rewording a prompt changed the
+# decision. Neither can happen now. An allow-listed subagent_type is implementation
+# whatever the prompt says; any other non-orchestrator subagent_type is not; an
+# orchestrator whose resolved mode is preparation is not, and every other one is.
+#
+# Get-StringProperty TRIMS where the Claude-side reader does not. Every marker test
+# introduced here is a containment test over the prompt, which is insensitive to
+# leading and trailing whitespace, so that pre-existing divergence between the two
+# surfaces cannot change any decision this change introduces.
 function Test-ImplementationDelegation {
     [CmdletBinding()]
     [OutputType([bool])]
@@ -209,19 +236,16 @@ function Test-ImplementationDelegation {
         return $false
     }
 
-    try {
-        if (Test-PreparationModeDelegation -ToolInput $ToolInput) {
-            return $false
-        }
-    } catch {
-        # An envelope the field reader cannot probe falls through to the unchanged
-        # whole-payload regex below. An extraction failure must never become an
-        # exemption, so the gate stays closed on the stricter classifier.
-        Write-Debug "Preparation-mode probe failed: $($_.Exception.Message)"
+    $subagentType = Get-StringProperty -Value $ToolInput -Name 'subagent_type'
+    if (Test-OrchestrationImplementationAgent -SubagentType $subagentType) {
+        return $true
+    }
+    if ($subagentType -ne 'orchestrator') {
+        return $false
     }
 
-    $payloadText = ($ToolInput | ConvertTo-Json -Depth 20 -Compress)
-    return $payloadText -match '(python-typed-engineer|powershell-typed-engineer|typescript-engineer|csharp-typed-engineer|atomic-executor|implementation|execute)'
+    $prompt = Get-StringProperty -Value $ToolInput -Name 'prompt'
+    return ((Resolve-OrchestrationDelegationMode -Prompt $prompt) -ne 'preparation')
 }
 
 function Test-OrchestrationReady {
@@ -295,12 +319,43 @@ function Get-OrchestrationPreimplementationGateBlockDecision {
     }
 }
 
+# Builds a mode-specific deny reason naming the checkpoint actually consulted and the
+# predicate that failed, behind the unchanged PREIMPLEMENTATION_GATE_BLOCKED prefix
+# that downstream reason-matching reads.
+function Get-OrchestrationModeDenyReason {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $Mode,
+        [Parameter(Mandatory)][string] $Failure
+    )
+
+    $path = Get-OrchestrationDelegationCheckpointPath -Mode $Mode
+    return ("PREIMPLEMENTATION_GATE_BLOCKED: this $Mode-mode delegation was evaluated against " +
+        "$path, and the failed readiness predicate is '$Failure'. Implementation operations " +
+        'require that checkpoint to satisfy every readiness predicate before implementation begins.')
+}
+
 function Invoke-OrchestrationPreimplementationGateDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [string] $ToolInputRaw,
-        [string] $CheckpointRaw
+        [string] $CheckpointRaw,
+
+        # The two per-mode injection parameters (issue #554, decision D2). Each
+        # overrides its read seam whenever the caller BINDS it, decided with
+        # ContainsKey and never with a truthiness test, so an explicitly supplied
+        # empty string suppresses the seam instead of falling through to disk. The
+        # two parameters above keep their existing names, positions, attributes,
+        # and truthiness-based fall-through exactly.
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $EpicCheckpointRaw,
+
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $ParallelCheckpointRaw
     )
 
     if (-not $ToolInputRaw) {
@@ -313,6 +368,13 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     }
 
     $requiresReadyCheckpoint = $false
+    # The path and command legs are single-feature by construction; only the
+    # delegation leg carries a mode marker, so only it can move the mode off the
+    # default. Both other legs therefore keep the default readiness source and the
+    # default wording they have today.
+    $mode = $script:OrchestrationDelegationDefaultMode
+    $prompt = ''
+    $command = ''
     $filePath = Get-StringProperty -Value $toolInput -Name 'file_path'
     if ($filePath) {
         $normalized = ([string]$filePath) -replace '\\', '/'
@@ -323,11 +385,54 @@ function Invoke-OrchestrationPreimplementationGateDecision {
             $requiresReadyCheckpoint = Test-ImplementationCommand -Command $command
         } else {
             $requiresReadyCheckpoint = Test-ImplementationDelegation -ToolInput $toolInput
+            if ($requiresReadyCheckpoint) {
+                $prompt = Get-StringProperty -Value $toolInput -Name 'prompt'
+                $mode = Resolve-OrchestrationDelegationMode -Prompt $prompt
+            }
         }
     }
 
     if (-not $requiresReadyCheckpoint) {
         return Get-OrchestrationPreimplementationGateAllowDecision
+    }
+
+    # A prompt-declared checkpoint path is a cross-check operand only and never
+    # selects a source: a delegation that named its own readiness file would choose
+    # its own gate. Disagreement with the mode's canonical path is a deny.
+    if (-not (Test-OrchestrationDelegationDeclaredCheckpointPath -Prompt $prompt -Mode $mode)) {
+        return Get-OrchestrationPreimplementationGateBlockDecision -Reason (
+            Get-OrchestrationModeDenyReason -Mode $mode -Failure 'declared-checkpoint-path')
+    }
+
+    # The command, apply_patch, and path legs consult the epic checkpoint first (issue #707,
+    # porting issue #663). A call that is not epic scope yields $null and continues to the
+    # unchanged single-feature path.
+    if ($filePath -or $command) {
+        $epicDecision = Get-OrchestrationEpicScopeDecision -Command $command -FilePath $filePath
+        if ($null -ne $epicDecision) {
+            return $epicDecision
+        }
+    }
+
+    if ($mode -eq 'epic' -or $mode -eq 'parallel') {
+        $isEpic = ($mode -eq 'epic')
+        $injected = if ($isEpic) { 'EpicCheckpointRaw' } else { 'ParallelCheckpointRaw' }
+        $modeRaw = if ($PSBoundParameters.ContainsKey($injected)) {
+            [string]$PSBoundParameters[$injected]
+        } elseif ($isEpic) { Get-EpicCheckpointContent } else { Get-ParallelCheckpointContent }
+        try {
+            $modeCheckpoint = ConvertFrom-CheckpointJson -Json ([string]$modeRaw)
+        } catch { $modeCheckpoint = $null }
+        $folder = Find-OrchestrationDelegationTargetFolder -Prompt $prompt
+        $issue = Find-OrchestrationDelegationIssueNumber -Prompt $prompt
+        $failure = if ($isEpic) {
+            Get-EpicOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue
+        } else {
+            Get-ParallelOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue
+        }
+        if (-not $failure) { return Get-OrchestrationPreimplementationGateAllowDecision }
+        return Get-OrchestrationPreimplementationGateBlockDecision -Reason (
+            Get-OrchestrationModeDenyReason -Mode $mode -Failure $failure)
     }
 
     if (-not $CheckpointRaw) {

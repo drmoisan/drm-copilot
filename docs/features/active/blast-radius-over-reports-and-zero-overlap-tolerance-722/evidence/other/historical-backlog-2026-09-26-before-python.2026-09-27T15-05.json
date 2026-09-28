@@ -1,0 +1,61 @@
+{
+  "mode": "before",
+  "runtime": "python",
+  "slug": "backlog-2026-09-26",
+  "config": "config/blast-radius.json at BASE_SHA beae3f021674e64fa6662097fe48a332d8da62b8",
+  "items": [
+    513,
+    528,
+    588,
+    594,
+    622
+  ],
+  "edges": [
+    {
+      "a": 528,
+      "b": 588,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 528,
+      "b": 594,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 588,
+      "b": 622,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    },
+    {
+      "a": 594,
+      "b": 622,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap"
+      ]
+    }
+  ],
+  "edge_count": 4,
+  "cohorts": [
+    [
+      513,
+      528,
+      622
+    ],
+    [
+      588,
+      594
+    ]
+  ],
+  "cohort_count": 2,
+  "max_cohort_width": 3
+}

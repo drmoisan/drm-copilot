@@ -59,6 +59,64 @@ def test_elevates_standalone_c3_when_orchestration_ceiling_is_c4() -> None:
     assert receipt["c3_overlay_reason"] == "c4_orchestration_ceiling"
 
 
+@pytest.mark.parametrize(
+    (
+        "execution_context",
+        "ceiling",
+        "expected_deployment_agent",
+        "expected_model",
+        "expected_overlay_applied",
+        "expected_overlay_reason",
+    ),
+    [
+        (
+            "standalone",
+            "C3",
+            "task-researcher-c3",
+            "gpt-5.6-terra",
+            False,
+            None,
+        ),
+        (
+            "epic_execution_child",
+            "C3",
+            "task-researcher-c3-elevated",
+            "gpt-5.6-sol",
+            True,
+            "epic_context",
+        ),
+        (
+            "standalone",
+            "C4",
+            "task-researcher-c3-elevated",
+            "gpt-5.6-sol",
+            True,
+            "c4_orchestration_ceiling",
+        ),
+    ],
+)
+def test_resolves_task_researcher_c3_selection_by_context_and_ceiling(
+    execution_context: str,
+    ceiling: str,
+    expected_deployment_agent: str,
+    expected_model: str,
+    expected_overlay_applied: bool,
+    expected_overlay_reason: str | None,
+) -> None:
+    """Route task-researcher C3 by its exact context and orchestration ceiling."""
+
+    receipt = resolve_codex_deployment(
+        "task-researcher", "C3", execution_context, ceiling
+    )
+
+    assert receipt["logical_agent"] == "task-researcher"
+    assert receipt["deployment_agent"] == expected_deployment_agent
+    assert receipt["model"] == expected_model
+    assert receipt["model_reasoning_effort"] == "high"
+    assert receipt["c3_overlay_applied"] is expected_overlay_applied
+    assert receipt["c3_overlay_reason"] == expected_overlay_reason
+
+
 def test_records_combined_c3_overlay_reason() -> None:
     """Record both deterministic triggers when epic context also has C4 scope."""
 
@@ -101,6 +159,24 @@ def test_maps_route_feature_review_name_to_codex_reviewer_family() -> None:
 
     assert receipt["logical_agent"] == "feature-review"
     assert receipt["deployment_agent"] == "feature-reviewer-c2"
+
+
+def test_resolves_commit_steward_standalone_c3_without_overlay() -> None:
+    """Route commit-steward standalone C3 to its exact Terra/high profile."""
+
+    receipt = resolve_codex_deployment("commit-steward", "C3", "standalone", "C3")
+
+    assert receipt == {
+        "logical_agent": "commit-steward",
+        "deployment_agent": "commit-steward-c3",
+        "complexity_band": "C3",
+        "execution_context": "standalone",
+        "orchestration_complexity_ceiling": "C3",
+        "c3_overlay_applied": False,
+        "c3_overlay_reason": None,
+        "model": "gpt-5.6-terra",
+        "model_reasoning_effort": "high",
+    }
 
 
 @pytest.mark.parametrize(

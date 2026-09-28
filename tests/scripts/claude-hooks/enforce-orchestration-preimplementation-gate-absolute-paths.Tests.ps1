@@ -140,6 +140,8 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 absolute-path classif
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-orchestration-preimplementation-gate.ps1").Path
         . $script:UnderTest
+        Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution/EpicScopeResolution.psm1").Path
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
 
         function ConvertTo-NotReadyCheckpointRaw {
             <#

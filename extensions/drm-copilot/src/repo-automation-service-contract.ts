@@ -13,6 +13,13 @@ import {
   type RunDiscoveryScenarioGenerationInput,
   type ValidateDiscoveryArtifactsInput,
 } from "./repo-automation-execute-discovery";
+import type {
+  PortableHandoffAuthorityResult,
+  ResolveOrchestrationTopologyRequest,
+  ResolveProviderRoutingRequest,
+  TransitionPreparedOrchestrationRequest,
+  TransitionPreparedOrchestrationResult,
+} from "./mcp-repo-automation-tool-definitions-handoff";
 
 /**
  * Service contract declarations for {@link RepoAutomationService}.
@@ -38,11 +45,26 @@ export interface RepoAutomationExecutionResult {
    * perform no repository-scoped GitHub operation.
    */
   readonly targetRepository?: string;
+  /**
+   * `"explicit"` when the caller supplied `targetRef`, `"session-fallback"`
+   * when the invoking session's HEAD was used instead. Present only on
+   * `collectPrContext` results.
+   */
+  readonly targetResolution?: "explicit" | "session-fallback";
+  /** The head ref the collector actually used, or `null` when unresolved. */
+  readonly resolvedHeadRef?: string | null;
+  /** The head SHA the collector actually used, or `null` when unresolved. */
+  readonly resolvedHeadSha?: string | null;
 }
 
 export interface WorkspaceExecutionInput {
   readonly workspaceRoot: string;
   readonly invocationId?: string;
+}
+
+export interface CollectPrContextInput extends WorkspaceExecutionInput {
+  readonly base: string;
+  readonly targetRef?: string;
 }
 
 export interface PushDownClaudeCustomizationsInput extends WorkspaceExecutionInput {
@@ -62,7 +84,7 @@ export interface RepoAutomationService {
     input: WorkspaceExecutionInput,
   ): Promise<RepoAutomationExecutionResult>;
   collectPrContext(
-    input: WorkspaceExecutionInput & { readonly base: string },
+    input: CollectPrContextInput,
   ): Promise<RepoAutomationExecutionResult>;
   runCodexNativeConverter(
     input: RunCodexNativeConverterInput,
@@ -155,6 +177,15 @@ export interface RepoAutomationService {
       readonly requireReadyForExecution?: boolean;
     },
   ): Promise<RepoAutomationExecutionResult>;
+  resolveOrchestrationTopology?(
+    input: ResolveOrchestrationTopologyRequest,
+  ): Promise<PortableHandoffAuthorityResult>;
+  resolveProviderRouting?(
+    input: ResolveProviderRoutingRequest,
+  ): Promise<PortableHandoffAuthorityResult>;
+  transitionPreparedOrchestration?(
+    input: TransitionPreparedOrchestrationRequest,
+  ): Promise<TransitionPreparedOrchestrationResult>;
   renderSubagentTree(
     input: RenderSubagentTreeServiceInput,
   ): Promise<RepoAutomationExecutionResult>;

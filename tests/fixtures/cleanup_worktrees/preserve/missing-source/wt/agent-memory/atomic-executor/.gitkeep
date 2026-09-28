@@ -1,0 +1,2 @@
+# The worktree directory exists; the file the manifest names deliberately does
+# not. The placeholder is required because git does not track an empty directory.

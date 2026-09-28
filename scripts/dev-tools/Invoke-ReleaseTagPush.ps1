@@ -40,6 +40,13 @@ param(
     [string]$ConfirmToken
 )
 
+# Layer B of the missed-npm-publish defence (issue #526). Dot-sourced rather than
+# invoked so Test-NpmVersionResolved, Invoke-TagPublishVerification and
+# Get-CodexPinnedMcpVersion resolve inside Invoke-ReleaseTagPushGuarded and stay
+# mockable from Pester. The sibling module's own entry-point block is skipped
+# because it is dot-sourced here.
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Invoke-ReleaseVerification.ps1')
+
 function Write-StderrLine {
     [CmdletBinding()]
     param(
@@ -184,10 +191,44 @@ function Invoke-ReleaseTagPushGuarded {
     $extTag = Get-ExtensionTagName -Version $extVersion
     $mcpTag = Get-McpServerTagName -Version $mcpVersion
 
-    # Step 4: create and push both tags.
+    # Step 4: pre-push inverted registry check. A target version that ALREADY
+    # resolves was consumed by some other run, so pushing this tag could never
+    # publish it and the release would appear to succeed while shipping nothing.
+    # Abort before any tag is created; nothing is created and nothing is pushed.
+    if (Test-NpmVersionResolved -Version $mcpVersion) {
+        Write-StderrLine -Message "VERSION_CONSUMED_ELSEWHERE: mcp-server version '$mcpVersion' already resolves on the registry. No tag was created and none was pushed; bump the version again and re-run the release."
+        return 1
+    }
+
+    # Step 5: create, push and verify each tag in dependency order. The
+    # mcp-server dependency is first and the extension consumer second: the loop
+    # returns on the first verification that does not resolve, so if the mcp
+    # publish fails the extension tag is never created and no artifact pinning an
+    # unpublished version can reach a user.
     foreach ($entry in @(
-            @{ Tag = $extTag; Message = "Release $extTag" },
-            @{ Tag = $mcpTag; Message = "mcp-server $mcpVersion" }
+            @{
+                Tag              = $mcpTag
+                Message          = "mcp-server $mcpVersion"
+                WorkflowFileName = 'publish-mcp-npm.yml'
+                JobName          = 'Publish to npm'
+                StepName         = 'Publish to npm'
+                Version          = $mcpVersion
+                SkipRegistry     = $false
+                RequiresCodexPin = $true
+            },
+            @{
+                Tag              = $extTag
+                Message          = "Release $extTag"
+                WorkflowFileName = 'publish-extension.yml'
+                JobName          = 'Publish to Marketplace'
+                StepName         = 'Publish to Marketplace'
+                Version          = $extVersion
+                # The extension publishes to the VS Code Marketplace, not to the
+                # npm registry, so there is no npm version for check (c) to
+                # resolve and check (c) is omitted for this entry.
+                SkipRegistry     = $true
+                RequiresCodexPin = $false
+            }
         )) {
         $create = Invoke-GitExe -GitArgs @('tag', '-a', $entry.Tag, '-m', $entry.Message)
         if ($create.ExitCode -ne 0) {
@@ -198,6 +239,31 @@ function Invoke-ReleaseTagPushGuarded {
         if ($push.ExitCode -ne 0) {
             Write-StderrLine -Message "Failed to push git tag '$($entry.Tag)' (git exit code $($push.ExitCode))."
             return 1
+        }
+
+        $verification = Invoke-TagPublishVerification `
+            -TagName $entry.Tag `
+            -WorkflowFileName $entry.WorkflowFileName `
+            -JobName $entry.JobName `
+            -StepName $entry.StepName `
+            -Version $entry.Version `
+            -SkipRegistryResolutionCheck:$entry.SkipRegistry
+        if ($verification.State -ne 'RESOLVED') {
+            Write-StderrLine -Message "Publish verification for tag '$($entry.Tag)' returned '$($verification.State)'. $($verification.Instruction)"
+            return 1
+        }
+
+        if ($entry.RequiresCodexPin) {
+            # The Codex pin is what the runtime actually installs, so the pinned
+            # string itself must resolve before the extension tag is created.
+            # An unreadable config yields an empty string, which the guard below
+            # reports explicitly rather than passing over.
+            $codexContent = [string](Get-Content -LiteralPath (Join-Path -Path $RepoRoot -ChildPath '.codex/config.toml') -Raw -ErrorAction SilentlyContinue)
+            $pinnedVersion = Get-CodexPinnedMcpVersion -ConfigContent $codexContent
+            if ((-not $pinnedVersion) -or (-not (Test-NpmVersionResolved -Version $pinnedVersion))) {
+                Write-StderrLine -Message "The mcp-server version pinned by .codex/config.toml ('$pinnedVersion') does not resolve on the registry. The extension tag was not created."
+                return 1
+            }
         }
     }
 

@@ -139,7 +139,25 @@ For command-bearing tasks in approved plans (especially Phase 2 final-QC tasks):
 
 Any regression test task expected to fail must be tagged with `[expect-fail]` and include an auditable evidence artifact per `evidence-and-timestamp-conventions`.
 
+## Planner Adversarial Self-Review (Mandatory)
+
+Before any plan handoff, `atomic-planner` MUST complete one explicit adversarial self-review pass over every fact, assumption, and line or file citation the plan relies on. The pass is required on initial authoring and on every revision-delta round. A revision round is not exempt because it changed only part of the plan: the citations the revision touched describe the tree as it stands after the revision, and no earlier pass observed that state.
+
+Rules:
+
+- **Re-derive every citation in this pass.** Any line, file, test, or assertion that the planner's own edit touched, added, or removed in the current authoring or revision pass MUST be re-derived directly against current repository state in that same pass. The prohibited source is a citation carried forward from an earlier round, including one the planner itself verified in a prior round: that earlier verification observed the tree before the intervening edits, so it is evidence about a superseded state rather than about the state the plan now asserts.
+- **Re-check the sibling region.** The self-review MUST re-check the sibling lines, tests, and assertions that sit in the same file or region as any edited citation. The failure mechanism is sibling invalidation: a fix to one line can invalidate an assumption baked into a sibling line or test that a prior round's citation did not cover, so a pass that verifies only the edited line leaves the invalidated sibling unreported and it surfaces as a defect on a later round.
+
+Declaration requirement. Every plan handoff MUST carry exactly one of these two signal lines, written in the directive-line form already used elsewhere in this contract:
+
+- `SELF-REVIEW: RE-DERIVED THIS PASS` — the adversarial self-review pass completed in this pass. This signal MUST be followed by an enumeration of the citations re-derived in that pass, one entry per citation, each naming the file and the line, test, or identifier that was re-derived. A signal carrying no enumeration is not a completed declaration.
+- `SELF-REVIEW: BLOCKED` — the pass could not be completed. This signal halts the handoff. It does not permit a self-approved plan: the planner reports the blocking reason and waits for the caller rather than proceeding to hand off an unverified plan.
+
 ## Preflight Validation (Planner ↔ Executor)
+
+### Planner Internal Review Record
+
+Before executor preflight, the planner must emit exactly one bounded record between `PLANNER-INTERNAL-REVIEW: PASS` and the existing `PREFLIGHT:` signal. The record requires exactly one passing declaration each for `CITATION-TO-TREE`, `AC-TRACEABILITY`, and `SCOPE-BOUNDARY`; one or more `CITATION: <repository-relative path> | <nonblank locator>` entries; exactly one `AC-INVENTORY:` declaration containing unique nonblank IDs; one `AC-MAPPING: <ID> | IMPLEMENTATION: <nonblank> | TESTS: <nonblank> | EVIDENCE: <nonblank>` for every and only inventory ID; and exactly one `UNRESOLVED-GAPS: NONE`. Missing, blank, duplicate, non-passing, out-of-bounds, or inventory/mapping-disagreeing declarations block handoff. If review cannot pass, emit `SELF-REVIEW: BLOCKED` and do not hand the plan to preflight. `SELF-REVIEW: RE-DERIVED THIS PASS` remains distinct and does not replace executor clearance.
 
 When validating or handing off plans for execution:
 - Use the directive line: `DIRECTIVE: PREFLIGHT VALIDATION ONLY`.
@@ -148,6 +166,20 @@ When validating or handing off plans for execution:
 	- `PREFLIGHT: REVISIONS REQUIRED`
 - If revisions are required, provide a precise plan delta and repeat validation until all clear.
 - If the required planner ↔ executor handoff cannot be started or completed, stop and report blocked state; do not self-approve the plan.
+
+Review depth and reporting rules:
+
+- **Review the entire plan in one pass.** Under `DIRECTIVE: PREFLIGHT VALIDATION ONLY`, `atomic-executor` MUST continue checking every remaining phase, task, and prose region after finding an initial defect. Stopping at the first defect is prohibited: the unchecked remainder holds defects that the same pass could have reported, and each one that is left unreported becomes an additional round.
+- **Enumerate every defect found.** `PREFLIGHT: REVISIONS REQUIRED` output MUST list every defect found in that pass, not only the first. The failure mechanism is round inflation: a single-defect report causes the next round to rediscover a defect the same pass could have reported, so the round count rises without the review having covered more of the plan.
+- **Check the delta against its own rule.** Before returning either signal, `atomic-executor` MUST check its proposed fix or delta text against every rule the plan enforces, including that delta's own prose against the same violation class it is remediating. Worked example: the delta prose of a tonality-compliance fix must not itself contain the hyperbole or humor that `.claude/rules/tonality.md` prohibits, because a delta that violates the rule it is written to enforce reintroduces the finding it closes.
+- **Two-round target.** The quality bar is a target of at most two preflight rounds per plan. Exhaustive first-pass review is the mechanism that holds the round count to that target: a pass that reports every defect it can find leaves at most a revision round and a confirming round, whereas a pass that reports one defect at a time cannot reach the target however correct each individual report is.
+
+Convergence signal. Every preflight return, whether it carries `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`, MUST additionally carry exactly one of these two forward-looking lines:
+
+- `CONVERGENCE: NO FURTHER ROUNDS EXPECTED` — the reviewer expects the plan to clear without a further round.
+- `CONVERGENCE: FURTHER ROUNDS LIKELY` — the reviewer expects at least one further round, and states why.
+
+The convergence line is a required signal rather than free prose. It is a second required line accompanying the preflight signal, not a third value of the signal set that the `Require one of the exact signals:` bullet above enumerates: that bullet's two-value set is unchanged, and every return carries one value from it together with one convergence line.
 
 ## Validator Gate (Mandatory)
 
@@ -158,6 +190,8 @@ Before a plan can be treated as approved:
 - do not treat human-readable summaries as a substitute for validator success.
 
 The same validator call also applies the acceptance-gate rules G1 through G6 defined in `.claude/rules/plan-acceptance-gates.md`. Those rules report acceptance conditions that cannot fail — a coverage argument that collects no data, or a search for a literal that returns zero matches whatever the executor does. They run automatically on the existing `plan` route with no additional flag. Blocking findings appear in the validator's error output and fail the gate; Warnings are surfaced without failing it, prefixed with `PLAN GATE WARNING: ` on the CLI and carried on the optional `warnings` field of the MCP result. Read that rule file before authoring acceptance conditions.
+
+The same call additionally applies the rules G7, G8, G8b, and G9, which report a write-mode command observed only by its exit code, an unanchored `git diff`, a name-listing diff with no companion span, and a coverage command that prints no table. All four ship in the Warning channel, so they surface without failing the gate. The complete shipped set is therefore G1 through G9.
 
 ## Wrap-Tolerant Assertion Authoring (Mandatory)
 
@@ -171,6 +205,13 @@ Rules:
 - **Dotted coverage-argument form.** Coverage assertions must name an importable dotted module, for example `--cov=scripts.dev_tools.plan_gate_discrimination`. The filesystem-path spellings `--cov=scripts/dev_tools/module.py` and `--cov=scripts/dev_tools/module` collect no data, so a coverage threshold asserted against them cannot fail. Rules G1 through G3 report those spellings.
 - **Use the `=` form, not the space-separated form.** `--cov <value>` can bind the following positional argument. Rule G4 reports it.
 - **Quote what the task will create.** When an asserted literal does not yet exist in the tree, quote the exact literal in the plan prose outside the command span. The gate reads that quotation as the executor's instruction and exonerates the assertion; a paraphrase does not.
+- **Record an observation beyond the exit code for a write-mode command.** A formatter or a fixing linter rewrites tracked source and still exits 0 after rewriting, so its exit code is identical on a clean run and on a repairing one. State, in the task text, the literal its success-case output prints — for example the summary line a formatter prints when it changed nothing — or state a before-and-after tree observation. Rule G7 in `.claude/rules/plan-acceptance-gates.md` reports a write-mode command whose task text carries neither.
+- **Anchor every `git diff` to a ref.** A `git diff` with no ref operand and no `--cached` compares the worktree against the index, which is ambient state: it passes vacuously once the change is committed, so the assertion cannot fail for the executor who commits before running it. Supply an explicit ref operand, usually the base branch. Rule G8 reports the unanchored form.
+- **Pair a name-listing diff with a staging or porcelain-status companion.** An anchored `git diff --name-only` or `--name-status` enumerates tracked changes only, so it can never report a file the task creates, and an assertion that it lists newly created files always sees an empty list. Add a `git add` span or a `git status --porcelain` span in the same task. Rule G8b reports a name-listing diff with neither companion. The two mechanisms are complementary and each alone is wrong in one state: the anchored diff is blind to untracked files, and porcelain status goes empty once the change is committed.
+- **Pass a terminal reporter to every coverage command.** The project `addopts` value supplies an LCOV reporter only, so a coverage command that does not pass `--cov-report=term-missing` prints no coverage table at all, and a numeric percentage the acceptance condition demands can never be read from it. Rule G9 reports a coverage command that supplies no terminal reporter and no `--cov-fail-under` threshold.
+- **Observe a command's success-case output before asserting over that output (mandatory).** Run the command, or read a recorded run of it, and confirm the value you intend to assert is actually printed on a *successful* run. Do not infer it from the tool's documentation, from the plan, or from what the tool prints on failure. This requirement exists because the class of defect it prevents is not detectable by reading: an assertion on a line the tool prints only when it changed something is unsatisfiable on a clean run; a demand for a zero-diagnostic count from a tool that returns only an ok flag names a value with no source; a demand for separate line and branch percentages from a coverage run that prints one combined column reads two numbers that are never printed. G7 and G9 cover two decidable slices of this class. The remainder is covered by this requirement and by nothing else, so a reviewer cannot rely on the gate to catch it.
+- **Fix the evidence in the plan; never leave the executor to select it.** An executor free to choose the evidence it is judged against cannot fail. Do not write an acceptance condition that asks the executor to identify "the known-genuine pair", to choose a survivor list, or to pick any suitable instance. Name the instances, or state the mechanical derivation that produces them, so a third party re-running it obtains the same set. This is authoring guidance and not a rule: a validator rule that scanned acceptance text for selection vocabulary was proposed and rejected, because that vocabulary is ordinary plan prose used in roles carrying no selection semantics and a keyword scan over prose is not statically decidable for the property it would claim to detect. The judgment is the author's, and it is not automated. `.claude/rules/plan-acceptance-gates.md` records the rejection and the reason for it.
+- **Check that the task-ordering does not make the condition unsatisfiable.** No rule covers this. A gate that runs a test path containing deliberately-failing cases added by an earlier task, before the later task that makes them pass, cannot exit 0. A baseline captured after a write-mode formatter has already repaired pre-existing drift becomes either a blanket waiver or makes a later gate unsatisfiable. Read each acceptance condition against the state the plan will actually be in when its task runs.
 
 ## Plan-Path Continuity Contract (Mandatory)
 

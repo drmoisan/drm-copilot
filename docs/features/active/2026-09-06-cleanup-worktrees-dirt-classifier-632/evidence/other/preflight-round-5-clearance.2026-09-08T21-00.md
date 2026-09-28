@@ -1,0 +1,47 @@
+# Remediation cycle 2 — preflight round 5 clearance
+
+- Plan: `docs/features/active/2026-09-06-cleanup-worktrees-dirt-classifier-632/remediation-plan.2026-09-08T06-51.md`
+- Reviewer: `atomic-executor` (preflight mode), full-pass validation against the tree
+- Signal: **PREFLIGHT: ALL CLEAR**
+- Convergence: NO FURTHER ROUNDS EXPECTED
+- Counts: 0 blocking, 4 non-blocking corrections plus 1 observation
+
+No blocking defect. The plan is executable, every acceptance condition traced can fail, and all 18 pins are satisfiable under their named witnesses. The four corrections below are prose-accuracy items in derivation and justification sections plus one over-tight acceptance count; none changes a numeral, a task id, a phase boundary, or the satisfiability of any acceptance condition, so the reviewer states they can be folded in as in-place edits without a further preflight round.
+
+## Adjudications
+
+**The planner's three-pin pair-keying disagreement: SUSTAINED.** Both `:311` and `:321` carry an arithmetic guard and a named non-arithmetic guard on one physical line and both match the arithmetic enumeration regex, so `rung4-untracked-main-present` backs two rows exactly as `hash-object-hard-fail` does. The `:321` arithmetic row separates under `dirt_content_on_main`, so an id-keyed pin would be discharged by the arithmetic sibling and leave the fail-open `[[ -n $mainblob && ... ]]` verdict guard unconstrained. The mirror-image exposure on `hash-object-hard-fail` is real for the same reason.
+
+**The `index($5,"s/((")` partition: SUSTAINED, verified row by row over all 39.** All 31 arithmetic mutations begin `s/((` because invariant 7 admits only the two derived forms, and every matched `EXPR` is `identifier SPACE op SPACE digits`, so no `EXPR` contains `/` and the delimiter is safe. All eight literal mutations begin `s%` and none contains the substring `s/((`. The partition is enforced rather than merely observed, because invariant 7 matches the eight literals as whole strings and fails the suite on anything else.
+
+**Both corrections to the orchestrator's round-4 delta: SUSTAINED.** 18 pinned rows over 17 distinct ids, since `hash-object-hard-fail` occurs twice. And the `:311` witness's argv log gains exactly one line, because the rung-5 bounded probe at `:330-332` is redirected `>/dev/null 2>&1` and the stub writes its argv line to stderr, while the `log --find-object=` call at `:334-335` carries no redirect.
+
+**The deliberate non-pin on `:321`'s arithmetic row: SUSTAINED as scoped.** Under `dirt_rename_split` the `?? notes -> draft.md` entry has no `rev-parse.main_notes_-__draft.md` fixture, so `mrc` is 0 and the second half is false; `((0))` short-circuits an already-false condition and `((1))` leaves it false. A `SEPARATED` pin there would be unsatisfiable.
+
+## Cheapest passing artifact under the current text
+
+The free population is exactly the 21 arithmetic rows on lines 97, 102, 109, 113, 167, 207, 208, 210, 211, 280, 282, 286, 318, 321 (arithmetic), 333, 385, 387, 388, 414, 415, 444. The both-direction rule forces three off `EXEMPT`: `:414`, because no `dirt_*` scenario has zero entries so `((1))` always separates; `:415`, because one constant separates under every scenario; and `:385`, which reaches `ARGV` under `dirt_unique`. The remaining **18** rows can be parked `EXEMPT` under a scenario that never reaches the marked line, with all six obligations honestly satisfied and the mutated library actually executed.
+
+That is down from 22 under the round-4 text and falls inside D3's stated bound of 21 free-scenario rows. 21 of 39 rows carry a non-editable, observed obligation. The gate is not vacuous.
+
+## Verification summary
+
+All 18 pins hand-traced and separating, including the four added in round 4. Every numeral re-derived from the tree rather than from the plan, with no stale instance found: 30 arithmetic lines going to 31, 37 marker lines, 39 rows, 18 fixed pairs as 5 + 8 + 5, 21 free as 31 − 10, a 12-entry group A id list, 10 P2-T8 acceptance commands, and the 25/30/5 scenario figures. Prefix-freeness re-derived over all 17 ids under byte order. `set -euo pipefail` occurs at exactly two sites, neither sourced by the harness.
+
+AC arithmetic confirmed: 45/45/0 section-scoped today, 53 unscoped with the eight outside boxes at the stated lines, 47/45/2 after Phase 4 and 47/47 after P5-T10. All three Phase 4 searches can fail, and AC-47 now states its own bound, closing round 4's BD-B.
+
+Task ordering holds at every task, including the two forward-referencing registry rows, the group-C witnesses, P2-T10's four-id prediction, and both classify-membership red windows. The plan file being uncommitted invalidates nothing, and P5-T6's `git add -A` stages the untracked delta files before P5-T12's clean-status observation.
+
+No wrap-tolerant-assertion violation was found.
+
+## Non-blocking corrections
+
+**NBD-1 — D3's `:109` example is wrong about which kind it lands in.** D3 calls it a second instance of a guard the widened channel moves out of `EXEMPT` and closes with "An aggregate-only channel would therefore have exempted this guard too." Traced under `dirt_staged_tree_worktree_delta`: unmutated, `M  src/b.cs` resolves `STAGED_TREE_IS_COMMIT` at `:266` and issues no further git call; mutated, it falls through rung 1 and issues `diff --quiet main -- src/b.cs` plus, after P1-T6, `rev-parse --verify --quiet main:src/b.cs`. The argv log therefore differs too, so under an aggregate-only record channel the row lands in `ARGV`, not `EXEMPT`. The round-4 delta's NB-2 made the same error and the plan adopted it. Lower-churn remedy: delete the final sentence and change "is a second instance" to "is a further row the widening promotes from `ARGV` to `SEPARATED`, because its argv log differs as well". The `:457` case is correct as written and already carries the "at least one" wording.
+
+**NBD-2 — the `294` and `297` pin derivation names the wrong return site in rung 3.** The bullet reads that rung 3 reads an absent worktree diff and an absent cached diff so `total` is 0, `:213` fires, and `dirt_is_build_artifact` returns 1. In fact `docs/tracked.md` fails the path `case` at `:202-205` and returns 1 at `:204` with no git call; `:213` is never reached. The conclusion is correct and no pin depends on the mechanism. Remedy, one clause: "rung 3's path `case` at `:202-205` rejects `docs/tracked.md`, so `dirt_is_build_artifact` returns 1 at `:204` with no git call and `:213` is never reached." The adjacent `dirt_build_artifact_added_file` derivation in D1 is correct as written.
+
+**NBD-3 — D3's bounding sentence is still one notch too wide.** It claims the 18 pinned rows cover every guard site named by a cycle-1 or cycle-2 finding. Cycle-1 finding R4 (`remediation-inputs.2026-09-08T05-00.md:75-88`) additionally names a rung-1 hard-read failure mapping to `UNIQUE`, which is the `[[ $staged == "ERROR" ]]` gate at the current `:261` and its sibling `[[ -n $staged ]]` at `:265`. Neither is arithmetic nor one of the eight named non-arithmetic guards, so neither is in the registry. There is a reasonable counter-reading — R4 names a behaviour and a missing pin rather than a guard site — which is why this is non-blocking, and both guards are held by the checked-in `dirt_staged_probe_diffindex_error`, `dirt_staged_probe_revlist_error` and `dirt_staged_tree_no_match` scenarios, with R4 recorded closed. Lower-churn remedy, no numeral change: scope the clause to "every guard site named by a cycle-1 or a cycle-2 finding that falls inside the registry's enumerated set (the 31 arithmetic lines plus the eight named non-arithmetic verdict guards)", and add one sentence recording that R4's two rung-1 gates lie outside that set and are held by those three scenarios instead.
+
+**NBD-4 — P2-T7's `s/((` count of at least 2 can fail on a correct implementation.** The third range-scoped search demands `grep -cF 's/(('` report at least `2` inside P2-T7's own test body, on the reasoning that one occurrence means only one of the three group-C pins was implemented. An implementation that factors the discriminator into a single shared helper carries the token once and fails the gate despite implementing the pair-keying exactly as specified. Lower-churn remedy: relax the count to at least `1`, since the pair-keying is independently enforced by P2-T8 acceptance command 10's three `index($5,"s/((")` checks, each of which can fail. Alternative, if stronger evidence is wanted: keep `2` and state in the task text that the discriminator must be written inline at each of the three pin sites.
+
+**NBD-5 — observation only, no change recommended.** The justification for leaving `:321`'s arithmetic row unpinned is true as scoped to `dirt_rename_split` but reads as general. That row is pinnable under `dirt_content_on_main`, whose `hash-object.docs_copy.md.out` and `rev-parse.main_docs_copy.md.out` both contain `bbbb1111`, so `s/((mrc == 0))/((0))/` flips `CONTENT_ON_MAIN` to `UNIQUE` and the aggregate to `HAS_UNIQUE`. The reviewer recommends not taking that pin, because it would propagate a count change through roughly ten sites for a guard whose fail-open direction is already inert behind `[[ -n $mainblob ]]` and whose load-bearing sibling on the same line is pinned. If the sentence is touched at all, add only a clause recording that it is pinnable under `dirt_content_on_main` and is left unpinned for that reason — a zero-numeral edit.

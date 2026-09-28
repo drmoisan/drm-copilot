@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+<<<<<<< HEAD
+    <Compile Include="Shared/Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+=======
+    <Compile Include="Shared/Form1.Designer.cs">
+      <DependentUpon>Form1.resx</DependentUpon>
+    </Compile>
+>>>>>>> origin/main
+  </ItemGroup>
+</Project>

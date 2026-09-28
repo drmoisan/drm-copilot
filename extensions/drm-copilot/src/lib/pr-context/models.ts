@@ -16,6 +16,8 @@
  *     - Provide the `SECTION_LINE` template, `CONVENTIONAL_TYPES` tuple, and the
  *       pure helpers `section`, `truncate`, `truncateLines`, `normalizeReference`,
  *       `findUserStoryLink`, and `formatList`.
+ *     - Provide the issue #622 shared literals `ISSUE_REFERENCE_PATTERN`,
+ *       `AUTOCLOSE_UNVERIFIED_ANNOTATION`, and `AUTOCLOSE_PENDING_NOT_OPEN_TEXT`.
  */
 
 import { type CommandResult } from "../subprocess-runner";
@@ -42,6 +44,29 @@ export const CONVENTIONAL_TYPES = [
 
 /** Conventional-commit type literal union derived from {@link CONVENTIONAL_TYPES}. */
 export type ConventionalType = (typeof CONVENTIONAL_TYPES)[number];
+
+/**
+ * Issue-reference pattern (issue #622, D1): a bare GitHub issue number only.
+ *
+ * Mirrors Python `ISSUE_REFERENCE_PATTERN`. This literal carries no global
+ * flag. Callers that scan for every match must build a fresh global copy with
+ * `new RegExp(ISSUE_REFERENCE_PATTERN, "gu")` and must not rely on `lastIndex`.
+ */
+export const ISSUE_REFERENCE_PATTERN = /(?<!\w)#\d+(?!\w)/u;
+
+/**
+ * Annotation appended below autoclose entries that were not checked against
+ * GitHub (issue #622, D4). Mirrors Python `AUTOCLOSE_UNVERIFIED_ANNOTATION`.
+ */
+export const AUTOCLOSE_UNVERIFIED_ANNOTATION =
+  "Unverified: the issues listed above come from feature metadata only and were not checked against GitHub (GitHub CLI unavailable).";
+
+/**
+ * Autoclose body used when the deterministic pending issue is not an open issue
+ * (issue #622, D5). Mirrors Python `AUTOCLOSE_PENDING_NOT_OPEN_TEXT`.
+ */
+export const AUTOCLOSE_PENDING_NOT_OPEN_TEXT =
+  "None (deterministic pending issue is not an open issue)";
 
 /** Issue metadata, body, comments, and optional user-story content. */
 export interface IssueDetails {
@@ -309,4 +334,15 @@ export function formatList(
     return emptyText;
   }
   return valuesList.map((item) => `- ${item}`).join("\n");
+}
+
+/** Compare two strings by Unicode code point (Python `sorted` semantics). */
+export function compareCodePoint(left: string, right: string): number {
+  if (left < right) {
+    return -1;
+  }
+  if (left > right) {
+    return 1;
+  }
+  return 0;
 }

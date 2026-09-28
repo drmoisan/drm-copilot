@@ -1,0 +1,46 @@
+{
+  "description": "A glob entry is never mechanically mergeable (issue #643). Proj/** and Proj/*.csproj are both glob entries, and neither equals a configured pattern character for character, so the exclusion leaves both in place and the pair still contends on path overlap. Pattern subsumption is not a comparison this glob vocabulary supports, so guessing that Proj/*.csproj falls inside the mergeable class would silently drop a genuine claim.",
+  "input": {
+    "radius_a": {
+      "paths": ["Proj/**"],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-09-07T09-00"
+    },
+    "radius_b": {
+      "paths": ["Proj/*.csproj"],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "declared",
+      "computed_at": "2026-09-07T09-00"
+    },
+    "config": {
+      "version": 1,
+      "shared_surfaces": [],
+      "shared_surface_globs": [],
+      "mergeable_paths": [
+        "**/*.csproj",
+        "**/packages.config",
+        "**/app.config",
+        "**/*.vbproj",
+        "**/*.props"
+      ],
+      "modules": {
+        "config": ["config/**"]
+      },
+      "over_breadth_fraction": 0.25
+    }
+  },
+  "expected": {
+    "conflict": true,
+    "reasons": [
+      {
+        "kind": "path_overlap",
+        "detail": "Proj/** ~ Proj/*.csproj"
+      }
+    ]
+  }
+}

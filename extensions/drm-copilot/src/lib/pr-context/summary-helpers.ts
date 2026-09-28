@@ -15,6 +15,7 @@
  */
 
 import {
+  type PrContextResult,
   type ScopingDocChange,
   section,
   splitLines,
@@ -287,6 +288,77 @@ export function bucketText(
 }
 
 /**
+ * Build the `Base/Head` block's line sequence for the summary artifact.
+ *
+ * Extracted from `collector-output.ts` so that file stays under the 500-line
+ * cap. Behaviour is unchanged from the prior inline construction: the same
+ * five lines in the same order, followed by the stale-base WARNING when a
+ * requested local base did not resolve to an `origin/` ref.
+ *
+ * @param ctx The collected PR context result.
+ * @param head The `head` option this collection was run with, or `null`.
+ * @param workspaceRoot The workspace root the session fallback, if any, was
+ *   derived from.
+ * @returns The `Base/Head` block's lines, in render order.
+ */
+export function buildBaseHeadSection(
+  ctx: PrContextResult,
+  head: string | null,
+  workspaceRoot: string,
+): string[] {
+  const lines: string[] = [
+    section("Base/Head"),
+    `Base ref (requested): ${ctx.baseRef ?? "(default)"}`,
+    `Base ref (resolved): ${ctx.resolvedBase ?? "(unknown)"} @ ${ctx.baseSha ?? "(unknown)"}`,
+    `Head ref (resolved): ${ctx.headRef ?? head ?? "(unknown)"} @ ${ctx.headSha ?? "(unknown)"}`,
+    renderHeadRefSourceLine(head, workspaceRoot),
+    `Merge base: ${ctx.mergeBase ?? "(unknown)"}`,
+    `Range: ${ctx.revRange ?? "(unknown)"}`,
+  ];
+  // Emit the stale-base WARNING when a requested local base did not resolve to
+  // an origin/ ref.
+  if (
+    ctx.baseRef &&
+    ctx.resolvedBase &&
+    !ctx.resolvedBase.startsWith("origin/")
+  ) {
+    lines.push(
+      "WARNING: Requested base is local and may be stale; prefer " +
+        `origin/${ctx.baseRef}`,
+    );
+  }
+  return lines;
+}
+
+/**
+ * Render the `Head ref (source):` line for the summary artifact's `Base/Head`
+ * block.
+ *
+ * The fallback is mandatorily observable (Decision 3): this line is placed
+ * immediately after `Head ref (resolved):` so a caller cannot read the
+ * resolved head without also seeing whether it came from an explicit
+ * `target_ref` or from the invoking session's fallback.
+ *
+ * @param head The `head` option this collection was run with — non-null when
+ *   an explicit `target_ref` was supplied, `null` on the session fallback.
+ * @param workspaceRoot The workspace root the fallback, if any, was derived
+ *   from.
+ * @returns One line beginning with the literal `Head ref (source):`.
+ */
+export function renderHeadRefSourceLine(
+  head: string | null,
+  workspaceRoot: string,
+): string {
+  if (head !== null) {
+    return `Head ref (source): explicit target '${head}'`;
+  }
+  return (
+    "Head ref (source): session fallback " +
+    `(no target_ref supplied; derived from workspace root '${workspaceRoot}')`
+  );
+}
+
+/**
  * Extract markdown content under a top-level `##` heading.
  *
  * Mirrors Python `parse_section` (summary_helpers copy).
@@ -321,23 +393,49 @@ export function formatDiffPath(pathText: string | null): string {
   return pathText !== null ? renderFormatDiffPath(pathText) : "";
 }
 
+/** Section title of the generated-context freshness header, both runtimes. */
+export const GENERATED_CONTEXT_SECTION_TITLE = "Context generated";
+/** Prefix of the head-SHA line in the freshness header, both runtimes. */
+export const HEAD_SHA_LABEL = "Head SHA:";
+/** Rendered in place of the SHA when the collected context carries none. */
+export const UNKNOWN_HEAD_SHA_PLACEHOLDER = "(unknown)";
+
 /**
- * Generate a timestamp section showing when context was collected.
+ * Generate the freshness header showing when context was collected and which
+ * head it describes.
  *
  * Mirrors Python `append_generation_timestamp`: format the current UTC time as
- * `%Y-%m-%d %H:%M:%S %Z` (with `%Z` rendered as `UTC`). The clock is injected
- * (`() => Date`, defaulting to the real clock) so wall-clock reads do not occur
- * directly, per the TypeScript determinism rule.
+ * `%Y-%m-%d %H:%M:%S %Z` (with `%Z` rendered as `UTC`), then emit the head-SHA
+ * line beneath it. The clock is injected (`() => Date`, defaulting to the real
+ * clock) so wall-clock reads do not occur directly, per the TypeScript
+ * determinism rule. The Python helper takes no clock parameter; that divergence
+ * is pre-existing and deliberate and is not corrected in either direction.
+ *
+ * The head-SHA parameter is optional so existing call sites compile unchanged.
+ * When no head SHA is available the line renders
+ * {@link UNKNOWN_HEAD_SHA_PLACEHOLDER}, matching the unknown-value convention used
+ * elsewhere in the summary.
  *
  * @param clock Clock returning the current `Date` (defaults to `() => new Date()`).
- * @returns The formatted timestamp section.
+ * @param headSha Head SHA of the branch the context describes, when known.
+ * @returns The formatted freshness header section.
  */
 export function appendGenerationTimestamp(
   clock: () => Date = () => new Date(),
+  headSha: string | null = null,
 ): string {
   const now = clock();
   const timestamp = formatUtcTimestamp(now);
-  return section("Context generated") + "\n" + timestamp + "\n";
+  const shaText =
+    headSha !== null && headSha !== "" ? headSha : UNKNOWN_HEAD_SHA_PLACEHOLDER;
+  return (
+    section(GENERATED_CONTEXT_SECTION_TITLE) +
+    "\n" +
+    timestamp +
+    "\n" +
+    `${HEAD_SHA_LABEL} ${shaText}` +
+    "\n"
+  );
 }
 
 /** Format a Date as `YYYY-MM-DD HH:MM:SS UTC` (Python `%Y-%m-%d %H:%M:%S %Z`). */

@@ -271,11 +271,24 @@ describe("prAppendix", () => {
 });
 
 describe("appendGenerationTimestamp", () => {
+  /** Concrete forty-character fixture SHA supplied by the test. */
+  const FIXTURE_HEAD_SHA = "0123456789abcdef0123456789abcdef01234567";
+
   it("formats the injected clock as a UTC timestamp deterministically", () => {
-    // Arrange: a fixed UTC instant.
+    // Arrange: a fixed UTC instant and a fixed head SHA.
     const fixed = new Date(Date.UTC(2026, 5, 26, 10, 2, 3));
-    const result = appendGenerationTimestamp(() => fixed);
+    // Act
+    const result = appendGenerationTimestamp(() => fixed, FIXTURE_HEAD_SHA);
+    // Assert
     expect(result).toContain("===== Context generated =====");
     expect(result).toContain("2026-06-26 10:02:03 UTC");
+    expect(FIXTURE_HEAD_SHA).toHaveLength(40);
+    expect(result).toContain(`Head SHA: ${FIXTURE_HEAD_SHA}`);
+  });
+
+  it("renders the unknown token when no head SHA is supplied", () => {
+    const fixed = new Date(Date.UTC(2026, 5, 26, 10, 2, 3));
+    const result = appendGenerationTimestamp(() => fixed);
+    expect(result).toContain("Head SHA: (unknown)");
   });
 });

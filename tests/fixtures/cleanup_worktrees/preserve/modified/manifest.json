@@ -1,0 +1,22 @@
+{
+  "tool": "cleanup-merged-worktrees",
+  "schema_version": 1,
+  "removals": [],
+  "preserved_files": [
+    {
+      "worktree_path": "tests/fixtures/cleanup_worktrees/preserve/modified/wt",
+      "source_path": "agent-memory/atomic-executor/modified-lesson.md",
+      "change_class": "modified",
+      "disposition": "PRESERVE",
+      "verdict": "STILL_RELEVANT",
+      "target_path": "null",
+      "memory_index_line": null,
+      "line_ending": "absent",
+      "host_token_scan": {
+        "result": "clean",
+        "pattern_set_id": "cleanup-wt-host-tokens-v1"
+      },
+      "evidence": "preserve/modified fixture: a modified lesson staged by the same path as an untracked one"
+    }
+  ]
+}

@@ -96,7 +96,46 @@ Describe 'persist-session-id.ps1' {
             $script:appendCalls.Count | Should -Be 1
             $script:appendCalls[0].Path | Should -Be '/env/file'
             $script:appendCalls[0].Line | Should -Be 'CLAUDE_SESSION_ID=ef8e8029-7c73-4346-80c7-5b0ad94b33fe'
-            $script:stateCalls.Count | Should -Be 0
+            $script:stateCalls.Count | Should -Be 1
+            $script:stateCalls[0].Path | Should -Be '/repo/.claude/state/current-session-id'
+            $script:stateCalls[0].Content | Should -Be 'ef8e8029-7c73-4346-80c7-5b0ad94b33fe'
+        }
+
+        It 'writes the session id through the WriteStateFile seam when CLAUDE_ENV_FILE is set' {
+            $payload = ConvertTo-SessionPayload -SessionId 'ef8e8029-7c73-4346-80c7-5b0ad94b33fe'
+
+            $decision = Invoke-PersistSessionIdHook `
+                -RawPayload $payload `
+                -EnvFilePath '/env/file' `
+                -StateFilePath '/repo/.claude/state/current-session-id' `
+                -AppendLine $script:AppendRecorder `
+                -WriteStateFile $script:StateRecorder `
+                -EnsureDirectory $script:EnsureRecorder
+
+            $expectedStateDir = Split-Path -Path '/repo/.claude/state/current-session-id' -Parent
+
+            $decision.action | Should -Be 'env-file'
+            $script:stateCalls.Count | Should -Be 1
+            $script:stateCalls[0].Path | Should -Be '/repo/.claude/state/current-session-id'
+            $script:stateCalls[0].Content | Should -Be 'ef8e8029-7c73-4346-80c7-5b0ad94b33fe'
+            $script:ensureCalls | Should -Contain $expectedStateDir
+        }
+
+        It 'still appends the session line through the AppendLine seam when CLAUDE_ENV_FILE is set' {
+            $payload = ConvertTo-SessionPayload -SessionId 'ef8e8029-7c73-4346-80c7-5b0ad94b33fe'
+
+            $decision = Invoke-PersistSessionIdHook `
+                -RawPayload $payload `
+                -EnvFilePath '/env/file' `
+                -StateFilePath '/repo/.claude/state/current-session-id' `
+                -AppendLine $script:AppendRecorder `
+                -WriteStateFile $script:StateRecorder `
+                -EnsureDirectory $script:EnsureRecorder
+
+            $decision.action | Should -Be 'env-file'
+            $script:appendCalls.Count | Should -Be 1
+            $script:appendCalls[0].Path | Should -Be '/env/file'
+            $script:appendCalls[0].Line | Should -Be 'CLAUDE_SESSION_ID=ef8e8029-7c73-4346-80c7-5b0ad94b33fe'
         }
 
         It 'writes the id to the state file (ensuring its directory) when CLAUDE_ENV_FILE is unset' {
@@ -173,13 +212,16 @@ Describe 'persist-session-id.ps1' {
         It 'appends the session line via Add-Content by default when CLAUDE_ENV_FILE is set' {
             Mock Add-Content { }
             Mock Set-Content { }
+            Mock New-Item { }
+            Mock Test-Path { $false }
             $payload = ConvertTo-SessionPayload -SessionId 'ef8e8029-7c73-4346-80c7-5b0ad94b33fe'
 
             $decision = Invoke-PersistSessionIdHook -RawPayload $payload -EnvFilePath '/env/file' -StateFilePath '/repo/.claude/state/current-session-id'
 
             $decision.action | Should -Be 'env-file'
             Should -Invoke Add-Content -Times 1 -Exactly
-            Should -Invoke Set-Content -Times 0 -Exactly
+            Should -Invoke Set-Content -Times 1 -Exactly
+            Should -Invoke New-Item -Times 1 -Exactly
         }
 
         It 'writes via Set-Content and creates the directory via New-Item by default when CLAUDE_ENV_FILE is unset' {

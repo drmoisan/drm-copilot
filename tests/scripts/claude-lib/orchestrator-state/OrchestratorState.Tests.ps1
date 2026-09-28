@@ -294,12 +294,29 @@ Describe 'Invoke-OrchestratorStatePreflight' {
             . $script:HookPath
         }
 
+        # Issue #687 routes the checkpoint through a resolution seam, and these tests reach the
+        # gate end-to-end. Defaulting the seam to the session root keeps them exercising the
+        # preflight's own default-invoker behaviour rather than target resolution, and keeps
+        # them independent of whichever worktrees exist on the machine running them.
+        BeforeEach {
+            Mock -CommandName Resolve-PrAuthorWorktreeTarget -MockWith {
+                [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = (Get-Location).Path; ReasonCode = $null; Detail = 'session root' }
+            }
+        }
+
         It 'blocks a not-ready checkpoint with ORCHESTRATOR_STATE_PREFLIGHT_FAILED through the default path' {
             # The default invoker runs the real portable validation (unmocked) against a
             # deliberately-nonexistent, non-temp checkpoint path; it fails closed on the
             # missing file and the hook surfaces ORCHESTRATOR_STATE_PREFLIGHT_FAILED.
             Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
-            $script:OrchestratorStateCheckpointPath = 'artifacts/orchestration/orchestrator-state.nonexistent-fixture.json'
+            # Issue #673 removed the script-variable pin this row used to set: the gate now
+            # takes its checkpoint path from target resolution, so a pin would be overwritten
+            # before the preflight reads it. The seam supplies a resolved worktree that does
+            # not exist, which reproduces the same missing-file condition the pin created.
+            $script:MissingWorktreeRoot = Join-Path $PSScriptRoot 'no-such-worktree-fixture'
+            Mock -CommandName Resolve-PrAuthorWorktreeTarget -MockWith {
+                [pscustomobject]@{ Status = 'OtherWorktree'; WorktreeRoot = $script:MissingWorktreeRoot; ReasonCode = $null; Detail = 'absent fixture worktree' }
+            }
 
             $json = '{"tool_name":"Bash","tool_input":{"command":"gh pr create --title \"foo\" --body-file artifacts/pr_body_1.md"}}'
             $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $json

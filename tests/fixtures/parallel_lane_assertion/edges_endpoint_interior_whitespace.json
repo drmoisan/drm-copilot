@@ -1,0 +1,10 @@
+{
+  "name": "edges_endpoint_interior_whitespace",
+  "notes": "Both implementations split the edges value on whitespace before partitioning a token on its first colon, so interior whitespace inside an endpoint is unreachable in each and the two converge on it. This is a convergence record, not a divergence-class-3 member: its report is byte-identical to the one edges_empty pins for the same manifest.",
+  "manifest_path": "tests/fixtures/parallel_lane_assertion/manifests/two-items-no-assertion.md",
+  "manifest_text": "---\nparallel: lane-assertion-two-items\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-29T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n  - issue_num: 202\n    feature_folder: docs/features/active/beta-202\n    kind: bug\n    state: admitted\n---\n\n# Parallel Run — lane-assertion-two-items\n\nShared parity-corpus manifest for the lane-assertion diagnostic. It declares\nexactly the item keys 101 and 202 and carries no `expected_conflict_components`\nkey, so every finding a record built on it reports comes from the derived graph\nalone. The two keys are pinned because several corpus records name this manifest\nand supply a determinate `--edges` value against those keys.\n",
+  "edges": "101 : 202",
+  "expected_stdout": "Lane assertion: 2 derived conflict component(s); 0 disagreement(s).\nADVISORY [item_covered_by_no_component] manifest item 101 is covered by no expected component.\nADVISORY [item_covered_by_no_component] manifest item 202 is covered by no expected component.\nAdvisory only: this diagnostic never blocks, never modifies a derived edge, never feeds compute_cohorts, and never influences scheduling.",
+  "expected_status": 0,
+  "divergence": null
+}

@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from .models import FeatureDocExcerpt, section, truncate
+from .models import ISSUE_REFERENCE_PATTERN, FeatureDocExcerpt, section, truncate
 from .verification_evidence import discover_canonical_evidence_files
 
 if TYPE_CHECKING:
@@ -32,11 +32,18 @@ def completed_plan_tasks(markdown: str, *, limit: int = 10) -> list[str]:
 
 
 def extract_issue_references(text: str) -> list[str]:
+    """Extract bare-number issue references (for example #123) in encounter order.
+
+    Only ``#`` followed by ASCII digits, not preceded or followed by a word
+    character, is returned (issue #622, D1). Returns the distinct references
+    in first-occurrence order, or an empty list for empty ``text``.
+    """
     if not text:
         return []
-    matches = re.findall(r"(?<!\w)#\d+|\b[A-Z][A-Z0-9]+-\d+\b", text)
+    matches = ISSUE_REFERENCE_PATTERN.findall(text)
     seen: set[str] = set()
     ordered: list[str] = []
+    # Keep the first occurrence of each reference so output order is stable.
     for item in matches:
         if item not in seen:
             seen.add(item)

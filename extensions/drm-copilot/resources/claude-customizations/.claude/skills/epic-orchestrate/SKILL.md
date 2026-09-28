@@ -19,14 +19,6 @@ checkpoint handling, wave computation, integration-branch lifecycle, wave barrie
 merge-conflict handling, worktree cleanup, and documentation-maintenance procedures so the
 procedure is not re-derived ad hoc on each epic run.
 
-## Prerequisites
-
-Before proceeding, `epic-orchestrator` must:
-
-1. Read `CLAUDE.md` for repository tone policy and architectural context.
-2. Read applicable `.claude/rules/` files for the languages in scope.
-3. Read the policy files listed in the compliance reading order section of `CLAUDE.md`.
-
 ## Epic Dependency Manifest
 
 The epic manifest is the YAML frontmatter of the single epic home
@@ -123,13 +115,38 @@ function of the DAG.
 When `epic-orchestrator` delegates a child feature to `Agent(orchestrator)`, the prompt includes
 the literal epic-mode kickoff line:
 
-> `Epic mode: true. epic_feature_folder: <epic-slug>. integration_branch: epic/<epic-slug>-integration. epic_checkpoint_path: artifacts/orchestration/epic-orchestrator-state.json. PR base branch MUST be <integration_branch>, not main; pass --base <integration_branch> to gh pr create.`
+> `Epic mode: true. epic_feature_folder: <epic-slug>. integration_branch: epic/<epic-slug>-integration. epic_checkpoint_path: artifacts/orchestration/epic-orchestrator-state.json. PR base branch MUST be <integration_branch>, not main; pass --base <integration_branch> to gh pr create. Your final report MUST be exactly the bounded return shape (issue_num, feature_folder, merge_status, pr_number, merge_commit_sha, blocked_reason, branch_name, worktree_path) and nothing else; any additional narrative is discarded because the parent re-derives authoritative state regardless.`
 
 The child's own `orchestrator`, on reading this line, records `epic_mode: true` and
 `epic_context: { epic_feature_folder, integration_branch, epic_checkpoint_path }` at its first
 checkpoint write, and on CI-green (S9 step 6) merges its own PR into the integration branch,
 recording `epic_merge: { merge_commit_sha, target_branch, merged_at }`. Standalone (non-epic)
 orchestration is unchanged: `epic_mode` absent or `false` makes S9 step 6 a no-op.
+
+## Bounded Child Return Contract
+
+A child `orchestrator`'s final report is consumed as a fixed eight-field shape and nothing else:
+
+- `issue_num` — the child's GitHub issue number.
+- `feature_folder` — the child's feature-folder path.
+- `merge_status` — the child's terminal merge-status enum value.
+- `pr_number` — the child's pull-request number, or null when none was opened.
+- `merge_commit_sha` — the merge commit, or null when the child did not merge.
+- `blocked_reason` — a short reason string when the child is blocked, otherwise null.
+- `branch_name` — the child's feature branch.
+- `worktree_path` — the child's isolated worktree path.
+
+Content beyond these eight fields is **discarded**. A child that returns a longer narrative is not
+in error; the excess is simply not read into the parent's context, which is what keeps the parent's
+footprint flat as the child count grows.
+
+Discarding is safe because the parent re-derives authoritative state regardless, from
+`git worktree list --porcelain`, `git branch`, and
+`gh pr view --json state,mergedAt,headRefOid`. `branch_name` and `worktree_path` are carried in the
+shape only to spare the parent a re-parse of porcelain output per child before
+`git worktree remove`; they are not authoritative and are re-derived like every other field. The
+governing argument is the cache doctrine already recorded in
+`.claude/rules/parallel-orchestration.md`, which is cited here rather than restated.
 
 ## Model Selection
 
@@ -152,6 +169,13 @@ the spawn call. It MUST NOT omit `model` (an omitted `model` falls back to the d
 frontmatter default — `opus` for these workers — which suppresses a `fable` resolution) and
 MUST NOT hard-code `model=opus` in a way that overrides the resolved routing model, mirroring
 step 5 of `## Model Selection` in `.claude/skills/orchestrate/SKILL.md`.
+
+Every such spawn of `Agent(pr-author)` also carries the canonical issue number line and a
+`branch: <name>` label naming the branch checked out in the worktree the pull request is opened
+from, per `## Issue Number Consistency` in `.claude/skills/orchestrate/SKILL.md`.
+`enforce-model-routing-receipt.ps1` identifies the item from those two lines and denies a gated
+delegation it cannot identify, so a spawn that omits both is refused rather than validated against
+whichever checkpoint occupies the calling session's root.
 
 `route` is never an input to model selection; `route` remains file-count driven and governs only
 agents, skills, and MCP tools. A skill whose frontmatter `context` field holds the value `fork`
@@ -264,8 +288,10 @@ checkpoint JSON remains the durable, machine-authoritative source.
 `epic_feature_folder`, `epic_manifest_path` (which points at
 `docs/features/epics/<epic-slug>/epic.md`), `epic_status_doc_path`, `integration_branch`,
 `completed_steps`, `next_step`, `last_updated`, `current_wave`, `waves[]`, `features[]`,
-`epic_merge_pr`, and the three receipt arrays (`delegation_receipts[]`, `skill_receipts[]`,
-`mcp_call_receipts[]`) — the full schema is defined in `spec.md` §6 of this feature. The
+`epic_merge_pr`, `epic_issue_num` (the epic-level issue `epic-planner` promoted),
+`model_routing_receipts[]` (the routing receipt for each delegation `epic-orchestrator` itself
+spawns), and the three receipt arrays (`delegation_receipts[]`, `skill_receipts[]`,
+`mcp_call_receipts[]`). The
 `merge_status` enum is: `not_started`, `worktree_created`, `pr_open`, `ci_green`,
 `merge_conflict`, `blocked_conflict_loop_limit`, `merged`, `worktree_removed`. The optional
 `intent` object (projection of the `epic.md` intent block) is validated presence-gated.
@@ -275,11 +301,15 @@ Every field needed to re-derive state durably on resume (`worktree_path`, `branc
 and `gh pr view --json state,mergedAt,headRefOid` — the checkpoint is a cache of that durable
 state, not the source of truth.
 
-Validate the checkpoint via
-`python -m scripts.dev_tools.validate_orchestration_artifacts epic-orchestrator-state <path> --require-complete`
-(or the equivalent `mcp__drm-copilot__validate_orchestration_artifacts` call with
-`artifact_type: "epic-orchestrator-state"`), implemented in
+Validate the checkpoint through the
+`mcp__drm-copilot__validate_orchestration_artifacts` call with
+`artifact_type: "epic-orchestrator-state"`, supplying the `require_complete` argument on
+that same call at the completion gate. The validation is implemented in
 `scripts/dev_tools/validate_epic_orchestrator_state.py`.
+
+**Checkpoint hygiene (issue #673).** The coordinating session never holds a per-feature checkpoint at its own root. Before the first child delegation of a run it moves any `artifacts/orchestration/orchestrator-state.json` at its root to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and writes none there for the rest of the run, because each item's checkpoint lives in that item's worktree. A gated call the coordinator issues on an item's behalf is resolved by the item's issue number and branch, never by the coordinator root.
+
+**Integration-PR checkpoint shape (issue #663).** The integration-to-`main` pull request and its `Agent(pr-author)` delegation are gated against `artifacts/orchestration/epic-orchestrator-state.json`, and no per-feature checkpoint is written for them. Before `epic-orchestrator` opens that pull request, the epic checkpoint carries `route_id: "epic"`, `integration_branch`, `epic_issue_num`, and a `features[]` array in which every entry's `merge_status` is `merged` or `worktree_removed`. Before the `Agent(pr-author)` delegation, `epic-orchestrator` records the `pr-author` routing receipt in that file's `model_routing_receipts[]`. The pr-author gate, the epic base-branch check, the model-routing gate, and the preimplementation gate treat a call as epic scope when its branch signal (or, for a staging command or file edit, the worktree HEAD) equals `integration_branch`; the pull request base must then be `main`.
 
 ## Completion Requirements
 

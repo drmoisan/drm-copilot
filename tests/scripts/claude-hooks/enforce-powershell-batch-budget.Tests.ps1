@@ -19,6 +19,14 @@ Describe 'enforce-powershell-batch-budget.ps1' {
                     tool_input = [ordered]@{ file_path = $FilePath; content = 'body' }
                 } | ConvertTo-Json -Compress -Depth 5)
         }
+
+        # Fixed synthetic out-of-root constants. They are defined by this suite
+        # rather than read from the environment so the containment and rehydrate
+        # tests carry no dependence on transient local state. Neither path is
+        # ever created, opened, or otherwise touched on disk.
+        $script:OutOfRootFixture = 'C:/synthetic-out-of-root/scratchpad/out_of_root_fixture.py'
+        $script:OutOfRootPowerShellFixture = 'C:/synthetic-out-of-root/scratchpad/out_of_root_fixture.ps1'
+        $script:ContainmentStateFile = '/repo/.claude/state/powershell-batch-budget.s.json'
     }
 
     AfterEach {
@@ -242,6 +250,205 @@ Describe 'enforce-powershell-batch-budget.ps1' {
 
         $hookText | Should -BeLike '*HookPayload.psm1*'
         $hookText | Should -BeLike '*Read-ClaudeHookRawPayload*'
+    }
+
+    Context 'session identity, containment, and rehydrate filter' {
+        It 'composes the state-file name from CLAUDE_SESSION_ID when the environment supplies it' {
+            $env:CLAUDE_SESSION_ID = 'env-session-42'
+            $script:writtenStateFile = $null
+
+            $result = Invoke-PowerShellBatchBudgetHook `
+                -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
+                -Root '/repo' `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            (Split-Path -Path $script:writtenStateFile -Leaf) | Should -Be 'powershell-batch-budget.env-session-42.json'
+        }
+
+        It 'composes the state-file name from the session-id state file when the environment is empty' {
+            $env:CLAUDE_SESSION_ID = ''
+            $script:writtenStateFile = $null
+            $script:sessionIdFileRequested = $null
+
+            $result = Invoke-PowerShellBatchBudgetHook `
+                -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
+                -Root '/repo' `
+                -ReadSessionIdFile { param([string] $Path) $script:sessionIdFileRequested = $Path; return "  file-session-7  " } `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            (Split-Path -Path $script:writtenStateFile -Leaf) | Should -Be 'powershell-batch-budget.file-session-7.json'
+            ($script:sessionIdFileRequested -replace '\\', '/') | Should -Be '/repo/.claude/state/current-session-id'
+        }
+
+        It 'composes a worktree-derived state-file name when both sources are empty' {
+            $env:CLAUDE_SESSION_ID = ''
+            $script:writtenStateFile = $null
+
+            $result = Invoke-PowerShellBatchBudgetHook `
+                -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
+                -Root '/repo' `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            (Split-Path -Path $script:writtenStateFile -Leaf) | Should -Match '^powershell-batch-budget\.worktree-repo-[0-9a-f]{8}\.json$'
+        }
+
+        It 'composes pairwise different state-file names across the three session sources' {
+            $script:composedNames = [System.Collections.ArrayList]::new()
+
+            $env:CLAUDE_SESSION_ID = 'env-session-42'
+            $script:writtenStateFile = $null
+            $null = Invoke-PowerShellBatchBudgetHook `
+                -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
+                -Root '/repo' `
+                -ReadSessionIdFile { param([string] $Path) [void] $Path; return 'file-session-7' } `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+            [void]$script:composedNames.Add((Split-Path -Path $script:writtenStateFile -Leaf))
+
+            $env:CLAUDE_SESSION_ID = ''
+            $script:writtenStateFile = $null
+            $null = Invoke-PowerShellBatchBudgetHook `
+                -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
+                -Root '/repo' `
+                -ReadSessionIdFile { param([string] $Path) [void] $Path; return 'file-session-7' } `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+            [void]$script:composedNames.Add((Split-Path -Path $script:writtenStateFile -Leaf))
+
+            $env:CLAUDE_SESSION_ID = ''
+            $script:writtenStateFile = $null
+            $null = Invoke-PowerShellBatchBudgetHook `
+                -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
+                -Root '/repo' `
+                -ReadSessionIdFile { param([string] $Path) [void] $Path; return '' } `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+            [void]$script:composedNames.Add((Split-Path -Path $script:writtenStateFile -Leaf))
+
+            $script:composedNames | Should -HaveCount 3
+            (@($script:composedNames) | Select-Object -Unique) | Should -HaveCount 3
+        }
+
+        It 'sanitizes a hostile session id into the state-file name pattern' {
+            $script:writtenStateFile = $null
+
+            $result = Invoke-PowerShellBatchBudgetHook `
+                -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
+                -SessionId '../../etc/passwd' `
+                -Root '/repo' `
+                -TestPathExists { param([string] $Path) [void] $Path; return $false } `
+                -EnsureDirectory { param([string] $Path) [void] $Path } `
+                -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
+
+            $leaf = Split-Path -Path $script:writtenStateFile -Leaf
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $leaf | Should -Match '^powershell-batch-budget\.[A-Za-z0-9._-]+\.json$'
+            $leaf | Should -Be 'powershell-batch-budget..._.._etc_passwd.json'
+        }
+
+        It 'records a relative candidate path' {
+            $state = Get-PowerShellBatchBudgetState -ProdCap 3 -TestCap 3
+
+            $result = Invoke-PowerShellBatchBudgetDecision -FilePath 'scripts/tool.ps1' -State $state -StateFile $script:ContainmentStateFile -Root '/repo'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.shouldWriteState | Should -BeTrue
+            $result.state.prodFiles | Should -Contain 'scripts/tool.ps1'
+        }
+
+        It 'records an absolute candidate path under the resolved root' {
+            $state = Get-PowerShellBatchBudgetState -ProdCap 3 -TestCap 3
+
+            $result = Invoke-PowerShellBatchBudgetDecision -FilePath '/repo/scripts/tool.ps1' -State $state -StateFile $script:ContainmentStateFile -Root '/repo'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.shouldWriteState | Should -BeTrue
+            $result.state.prodFiles | Should -Contain '/repo/scripts/tool.ps1'
+        }
+
+        It 'discards an absolute candidate path outside the resolved root' {
+            $state = Get-PowerShellBatchBudgetState -ProdCap 3 -TestCap 3
+
+            $result = Invoke-PowerShellBatchBudgetDecision -FilePath $script:OutOfRootPowerShellFixture -State $state -StateFile $script:ContainmentStateFile -Root '/repo'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.shouldWriteState | Should -BeFalse
+            $result.state.prodFiles | Should -BeNullOrEmpty
+            $result.state.testFiles | Should -BeNullOrEmpty
+        }
+
+        It 'records an in-root absolute path that differs from the root only in letter case' {
+            $state = Get-PowerShellBatchBudgetState -ProdCap 3 -TestCap 3
+
+            $result = Invoke-PowerShellBatchBudgetDecision -FilePath '/REPO/scripts/tool.ps1' -State $state -StateFile $script:ContainmentStateFile -Root '/repo'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.shouldWriteState | Should -BeTrue
+            $result.state.prodFiles | Should -Contain '/REPO/scripts/tool.ps1'
+        }
+
+        It 'admits three in-root production files when the persisted state already holds an out-of-root entry' {
+            $script:persistedState = ([ordered]@{
+                    prodCap   = 3
+                    testCap   = 3
+                    prodFiles = @($script:OutOfRootFixture)
+                    testFiles = @()
+                } | ConvertTo-Json -Compress -Depth 5)
+            $script:budgetDecisions = [System.Collections.ArrayList]::new()
+
+            foreach ($candidate in @('scripts/one.ps1', 'scripts/two.ps1', 'scripts/three.ps1')) {
+                $decision = Invoke-PowerShellBatchBudgetHook `
+                    -ToolInputRaw (Get-PowerShellToolInput -FilePath $candidate) `
+                    -SessionId 'session-a' `
+                    -Root '/repo' `
+                    -TestPathExists { param([string] $Path) [void] $Path; return $true } `
+                    -EnsureDirectory { param([string] $Path) [void] $Path } `
+                    -ReadState { param([string] $Path) [void] $Path; return $script:persistedState } `
+                    -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $Path; $script:persistedState = ($State | ConvertTo-Json -Compress -Depth 5) }
+                [void]$script:budgetDecisions.Add($decision)
+            }
+
+            $script:budgetDecisions[0].hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $script:budgetDecisions[1].hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $script:budgetDecisions[2].hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $script:budgetDecisions[2].state.prodFiles | Should -Not -Contain $script:OutOfRootFixture
+            $script:budgetDecisions[2].state.prodFiles | Should -Contain 'scripts/three.ps1'
+        }
+
+        It 'discards an absolute candidate path in a sibling directory whose name extends the root' {
+            $state = Get-PowerShellBatchBudgetState -ProdCap 3 -TestCap 3
+
+            $result = Invoke-PowerShellBatchBudgetDecision -FilePath '/repo-sibling/scripts/tool.ps1' -State $state -StateFile $script:ContainmentStateFile -Root '/repo'
+
+            $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $result.shouldWriteState | Should -BeFalse
+            $result.state.prodFiles | Should -BeNullOrEmpty
+            $result.state.testFiles | Should -BeNullOrEmpty
+        }
+
+        It 'admits a candidate path that is exactly the resolved root' {
+            (Test-PowerShellBatchBudgetPathInRoot -Path '/repo' -Root '/repo') | Should -BeTrue
+        }
+
+        It 'falls through to the worktree-derived id when the session-id file is unreadable' {
+            $env:CLAUDE_SESSION_ID = ''
+            $resolved = Get-PowerShellBatchBudgetSessionId -SessionId '' -Root '/repo' -SessionIdFilePath '/repo/.claude/state/current-session-id' -ReadSessionIdFile { param([string] $Path) [void] $Path; throw 'unreadable session-id file' }
+
+            $resolved | Should -Match '^worktree-repo-[0-9a-f]{8}$'
+        }
     }
 
     Context 'entry-point dispatch' {

@@ -27,6 +27,10 @@ import {
   type DirectoryLister,
 } from "./claude-blast-radius-derive";
 import {
+  CLAUDE_GITIGNORE_RELATIVE_PATH,
+  mergeClaudeGitignore,
+} from "./claude-gitignore-merge";
+import {
   assertSingleCsharpToolchain,
   computePublishedPaths,
   type CSharpVariant,
@@ -301,7 +305,7 @@ export function pushDownCustomizations(
     },
   );
 
-  return enginePushDown({
+  const summary = enginePushDown({
     repoRoot,
     destinationRoot,
     fs: excludingFs,
@@ -312,4 +316,46 @@ export function pushDownCustomizations(
     rewriteReferences: passthroughRewrite,
     ...(clock === undefined ? {} : { clock }),
   });
+
+  deliverDestinationGitignore(fs, destinationRoot);
+  return summary;
+}
+
+/**
+ * Merge the managed ignore entries into the destination workspace `.gitignore`.
+ *
+ * The pushed-down hooks write runtime state under `.claude/state/` and
+ * `.codex/state/`; a destination that does not ignore those paths reports them
+ * as untracked churn after every publish. The merge itself lives in the pure
+ * {@link mergeClaudeGitignore}; this function owns only the read and the
+ * conditional write.
+ *
+ * The raw injected adapter is used rather than any of the composed decorators,
+ * because none of them applies here: the filtering wrapper governs the copied
+ * source set, the merging decorator governs the routing document, and the
+ * deriving decorator governs the blast-radius map. This write is post-copy and
+ * has no source file behind it.
+ *
+ * A missing destination `.gitignore` is a valid input, not an error. The write
+ * is skipped when the merged text equals the current text, so a second publish
+ * performs no write at all and the delivery is idempotent.
+ *
+ * @param fs Adapter used to read and write the destination file.
+ * @param destinationRoot Absolute destination workspace root.
+ */
+function deliverDestinationGitignore(
+  fs: PushDownFileSystem,
+  destinationRoot: string,
+): void {
+  const destinationPath = joinPosix(
+    destinationRoot,
+    CLAUDE_GITIGNORE_RELATIVE_PATH,
+  );
+  const currentText = fs.isFile(destinationPath)
+    ? fs.readTextFile(destinationPath)
+    : "";
+  const mergedText = mergeClaudeGitignore(currentText);
+  if (mergedText !== currentText) {
+    fs.writeTextFile(destinationPath, mergedText);
+  }
 }

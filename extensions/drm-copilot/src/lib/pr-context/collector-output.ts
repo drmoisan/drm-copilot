@@ -28,7 +28,11 @@ import {
   type CollectPrContextOptions,
   collectPrContext,
 } from "./collector-core";
-import { appendGenerationTimestamp, bucketText } from "./summary-helpers";
+import {
+  appendGenerationTimestamp,
+  buildBaseHeadSection,
+  bucketText,
+} from "./summary-helpers";
 import {
   issueAppendix,
   issueDigest,
@@ -148,6 +152,7 @@ export function buildSummaryText(
   collected: CollectedPrContext,
   fs: FileSystem,
   appendixPath: string,
+  generatedSection: string,
 ): string {
   const ctx = collected.contextResult;
   const ghStatusText = resolveGhStatusText(collected);
@@ -161,28 +166,12 @@ export function buildSummaryText(
   ].join("\n");
 
   const summarySections: string[] = [
+    generatedSection,
     section("GitHub CLI status"),
     ghStatusText,
     intentBlock,
-    section("Base/Head"),
-    `Base ref (requested): ${ctx.baseRef ?? "(default)"}`,
-    `Base ref (resolved): ${ctx.resolvedBase ?? "(unknown)"} @ ${ctx.baseSha ?? "(unknown)"}`,
-    `Head ref (resolved): ${ctx.headRef ?? collected.head ?? "(unknown)"} @ ${ctx.headSha ?? "(unknown)"}`,
-    `Merge base: ${ctx.mergeBase ?? "(unknown)"}`,
-    `Range: ${ctx.revRange ?? "(unknown)"}`,
+    ...buildBaseHeadSection(ctx, collected.head, collected.resolvedRoot),
   ];
-  // Emit the stale-base WARNING when a requested local base did not resolve to
-  // an origin/ ref.
-  if (
-    ctx.baseRef &&
-    ctx.resolvedBase &&
-    !ctx.resolvedBase.startsWith("origin/")
-  ) {
-    summarySections.push(
-      "WARNING: Requested base is local and may be stale; prefer " +
-        `origin/${ctx.baseRef}`,
-    );
-  }
 
   const issueDigests = collected.issueDetails
     .map((detail) => issueDigest(detail))
@@ -270,7 +259,7 @@ export function buildSummaryText(
  */
 export function buildAppendixText(
   collected: CollectedPrContext,
-  clock: () => Date,
+  generatedSection: string,
 ): string {
   const featureBlock = collected.featureDocs
     .map((doc) => doc.excerpt)
@@ -283,7 +272,7 @@ export function buildAppendixText(
     prAppendix(detail),
   );
   const appendixParts: string[] = [
-    appendGenerationTimestamp(clock),
+    generatedSection,
     collected.contextResult.text,
     "",
     section("Issue details"),
@@ -335,6 +324,24 @@ export function writeOutput(
   }
 }
 
+/** The two documents one {@link collectAndWrite} invocation rendered. */
+export interface CollectAndWriteResult {
+  /** The exact summary text this invocation wrote. */
+  readonly summaryText: string;
+  /** The exact appendix text this invocation wrote. */
+  readonly appendixText: string;
+  /** The collected merge-base SHA, or `null` when it could not be resolved. */
+  readonly mergeBase: string | null;
+  /** The collected head SHA, or `null` when it could not be resolved. */
+  readonly headSha: string | null;
+  /** The head ref the collector actually used, or `null` when unresolved. */
+  readonly resolvedHeadRef: string | null;
+  /** The collected resolved base ref, or `null` when it could not be resolved. */
+  readonly resolvedBase: string | null;
+  /** Count of changed files across the three collected buckets. */
+  readonly changedFileCount: number;
+}
+
 /**
  * Run the collector and write both output files.
  *
@@ -343,18 +350,37 @@ export function writeOutput(
  * `Wrote context ...` log lines through the injected sink (matching the Python
  * `print` statements).
  *
+ * Returns the two rendered strings so a caller can verify each write by reading
+ * the file back and comparing against the exact text this invocation rendered,
+ * without re-rendering. No root-joining logic is introduced here: the output
+ * paths are used exactly as supplied, preserving the Python `write_output`
+ * contract.
+ *
  * @param options Collector options plus output paths, append flag, and log sink.
+ * @returns The rendered summary and appendix text.
  */
-export function collectAndWrite(options: CollectAndWriteOptions): void {
+export function collectAndWrite(
+  options: CollectAndWriteOptions,
+): CollectAndWriteResult {
   const clock = options.clock ?? (() => new Date());
   const collected = collectPrContext(options);
+
+  // Render the freshness header exactly once per invocation and hand the same
+  // string to both builders, so the two documents cannot disagree on the
+  // timestamp. The head SHA is already on the collected record, so no
+  // additional git call is made.
+  const generatedSection = appendGenerationTimestamp(
+    clock,
+    collected.contextResult.headSha,
+  );
 
   const summaryText = buildSummaryText(
     collected,
     options.fs,
     options.appendixOut,
+    generatedSection,
   );
-  const appendixText = buildAppendixText(collected, clock);
+  const appendixText = buildAppendixText(collected, generatedSection);
 
   writeOutput(options.fs, summaryText, options.out, options.append);
   writeOutput(options.fs, appendixText, options.appendixOut, options.append);
@@ -362,6 +388,20 @@ export function collectAndWrite(options: CollectAndWriteOptions): void {
   const log = options.log ?? (() => undefined);
   log(`Wrote context summary to: ${options.out}`);
   log(`Wrote context appendix to: ${options.appendixOut}`);
+
+  const ctx = collected.contextResult;
+  return {
+    summaryText,
+    appendixText,
+    mergeBase: ctx.mergeBase,
+    headSha: ctx.headSha,
+    resolvedHeadRef: ctx.headRef ?? collected.head ?? null,
+    resolvedBase: ctx.resolvedBase,
+    changedFileCount:
+      collected.bucketCore.length +
+      collected.bucketRenames.length +
+      collected.bucketDocs.length,
+  };
 }
 
 /** Resolve the GitHub CLI status text shown in the summary. */

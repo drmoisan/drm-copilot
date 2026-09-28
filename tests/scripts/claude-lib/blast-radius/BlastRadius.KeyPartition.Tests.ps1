@@ -27,16 +27,25 @@ BeforeAll {
 
     # Class 1 key names (issue #500, cycle 3 CR-3). Read by the 'declares equal
     # values for the runtime-describing keys in both copies' case.
-    $script:ClassOneKeys = @('version', 'over_breadth_fraction', 'mandate_reads')
+    # 'mergeable_paths' (issue #643) describes the runtime rather than a
+    # repository layout: it names project-file shapes a merge step can
+    # reconcile, so both committed copies must carry identical values.
+    # 'conflict_tolerance' (issue #722) is the integration-cost scheduling
+    # policy, which likewise describes the runtime, not a repository layout.
+    # 'write_intent_extraction' (issue #722) selects the runtime's extractor.
+    $script:ClassOneKeys = @('version', 'over_breadth_fraction', 'mandate_reads', 'mergeable_paths', 'conflict_tolerance', 'write_intent_extraction')
 
     # Class 2 key-to-consumer-file registry (issue #500, cycle 4 R1). Both keys
     # are indexed by name in BlastRadius.TruthTable.Tests.ps1, not in this
     # file, so the registry maps each key to the file that actually consumes
     # it -- closing the CR-3 residual, in which a key added to a bare
     # membership tuple passed silently with no consuming assertion.
+    # 'path_roots' (issue #722) lists this repository's top-level directories
+    # self-hosted and is empty bundled; this file consumes it.
     $script:ClassTwoKeyConsumerFile = @{
         'shared_surfaces'      = 'BlastRadius.TruthTable.Tests.ps1'
         'shared_surface_globs' = 'BlastRadius.TruthTable.Tests.ps1'
+        'path_roots'           = 'BlastRadius.KeyPartition.Tests.ps1'
     }
 
     # Class 3 key-to-consumer-file registry, same rationale.
@@ -263,6 +272,20 @@ Describe 'Committed blast-radius truth table cross-copy key partition' {
             # Assert: every registered key must be indexed by name in its
             # registered consumer file.
             $unresolved.ToArray() | Should -BeNullOrEmpty
+        }
+
+        It 'declares an empty bundled path_roots list' {
+            # Arrange: path_roots is Class 2 (issue #722). A destination's layout
+            # is unknown, so the bundled copy disables root anchoring.
+            $hasKey = $script:BundledConfig.ContainsKey('path_roots')
+
+            # Act: read the bundled value through the registered indexer.
+            $value = $script:BundledConfig['path_roots']
+
+            # Assert: present, a list, and empty.
+            $hasKey | Should -BeTrue
+            , $value | Should -BeOfType [System.Array]
+            @($value).Count | Should -Be 0
         }
     }
 }

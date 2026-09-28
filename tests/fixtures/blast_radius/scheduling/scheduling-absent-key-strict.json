@@ -1,0 +1,85 @@
+{
+  "description": "Issue #722 absent-key identity case. The embedded truth table carries no conflict_tolerance key, so the strict absent-key semantics apply: tolerance_percent 0, every weight 1, every band duration 1, default_band C1, and no append-only paths. The scheduling edge pair set therefore equals the detected-conflict pair set: the listed directory against its glob, and the two items naming CHANGELOG.md. The documentation item conflicts with nothing.",
+  "tags": ["#722"],
+  "config": {
+    "version": 1,
+    "shared_surfaces": [],
+    "shared_surface_globs": [],
+    "mandate_reads": [],
+    "mergeable_paths": [],
+    "modules": { "config": ["config/**"] },
+    "over_breadth_fraction": 0.25
+  },
+  "items": [
+    {
+      "key": 1,
+      "band": null,
+      "radius": {
+        "paths": ["scripts/dev_tools"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    },
+    {
+      "key": 2,
+      "band": null,
+      "radius": {
+        "paths": ["scripts/dev_tools/**"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    },
+    {
+      "key": 3,
+      "band": null,
+      "radius": {
+        "paths": ["CHANGELOG.md"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    },
+    {
+      "key": 4,
+      "band": null,
+      "radius": {
+        "paths": ["CHANGELOG.md"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    },
+    {
+      "key": 5,
+      "band": null,
+      "radius": {
+        "paths": ["docs/guide.md"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "tolerance_percent": null,
+      "expected_edges": [
+        { "a": 1, "b": 2, "reason": "path_overlap", "hard": false, "cost": 1, "benefit": 1 },
+        { "a": 3, "b": 4, "reason": "path_overlap", "hard": false, "cost": 1, "benefit": 1 }
+      ],
+      "expected_tolerated": []
+    }
+  ]
+}

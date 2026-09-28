@@ -1,0 +1,4 @@
+WORKTREE|/repo/main|main|main
+BRANCH|feature-doc|HAS_UNIQUE_RESIDUALS
+COMMIT|feature-doc|doc000002|UNIQUE|.claude/agent-memory/notes.md|Dan Moisan|2026-07-21T11:00:00-07:00
+BRANCH|main|PROTECTED_CURRENT

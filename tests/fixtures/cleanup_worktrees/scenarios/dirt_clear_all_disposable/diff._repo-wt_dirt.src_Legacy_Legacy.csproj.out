@@ -1,0 +1,10 @@
+diff --git a/src/Legacy/Legacy.csproj b/src/Legacy/Legacy.csproj
+index 1111aaaa..2222bbbb 100644
+--- a/src/Legacy/Legacy.csproj
++++ b/src/Legacy/Legacy.csproj
+@@ -12 +12 @@
+-      <HintPath>..\..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll</HintPath>
++      <HintPath>..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll</HintPath>
+@@ -18 +18 @@
+-      <HintPath>..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.4\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll</HintPath>
++      <HintPath>..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.4\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll</HintPath>

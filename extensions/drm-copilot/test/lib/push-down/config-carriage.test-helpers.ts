@@ -82,6 +82,12 @@ export const SOURCE_ROUTING = `${JSON.stringify(
  * gate on whether the extractor accepts a separator-free token at all, so
  * without one no destination can detect two items rewriting the same root build
  * file. `mandate_reads` carries the ten-entry read-by-mandate exclusion set.
+ * `mergeable_paths` carries the five-entry mechanically-mergeable path class,
+ * whose overlap a merge step reconciles rather than re-delegating (issue #643).
+ * `conflict_tolerance` carries the integration-cost scheduling policy (issue
+ * #722), which describes the runtime rather than a repository layout.
+ * `write_intent_extraction` is true, and `path_roots` is empty because the
+ * bundle cannot know a destination's top-level directories (issue #722).
  */
 export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
   {
@@ -106,7 +112,28 @@ export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
       ".claude/skills/policy-compliance-order/SKILL.md",
       ".claude/agent-memory/**",
       ".agents/skills/**",
+      "scripts/vscode/**",
+      ".github/copilot-instructions.md",
     ],
+    mergeable_paths: [
+      "**/*.csproj",
+      "**/packages.config",
+      "**/app.config",
+      "**/*.vbproj",
+      "**/*.props",
+    ],
+    conflict_tolerance: {
+      tolerance_percent: 100,
+      weights: { same_file: 8, possible_overlap: 2, append_only: 1, module: 2 },
+      band_durations: { C1: 1, C2: 2, C3: 4, C4: 8 },
+      default_band: "C1",
+      append_only_paths: [
+        "**/CHANGELOG.md",
+        "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json",
+      ],
+    },
+    write_intent_extraction: true,
+    path_roots: [],
     modules: {
       config: ["config/**"],
     },
@@ -146,6 +173,8 @@ export function seedTree(
         "#!/usr/bin/env bash\n",
       [`${SRC}/.claude/lib/bash/validate-parallel-manifest.sh`]:
         "#!/usr/bin/env bash\n",
+      [`${SRC}/.claude/lib/bash/report-lane-assertion.sh`]:
+        "#!/usr/bin/env bash\n",
       [`${SRC}/config/orchestration-routing.json`]: SOURCE_ROUTING,
       [`${SRC}/config/blast-radius.json`]: SOURCE_BLAST_RADIUS,
       [`${MANIFEST_DIR}/core.json`]: manifestJson({
@@ -158,6 +187,7 @@ export function seedTree(
           ".claude/lib/bash/compute-cohorts.sh",
           ".claude/lib/bash/compute-concurrency-batches.sh",
           ".claude/lib/bash/validate-parallel-manifest.sh",
+          ".claude/lib/bash/report-lane-assertion.sh",
           "config/orchestration-routing.json",
           "config/blast-radius.json",
         ],
@@ -209,7 +239,7 @@ export function layoutLister(
 }
 
 /**
- * A destination layout carrying one C# project under `src/App`.
+ * A destination layout carrying one Go module under `src/App`.
  *
  * Used by the genericity and overwrite cases so the derived document differs
  * observably from both the seeded source constant and any pre-existing
@@ -220,5 +250,5 @@ export const SRC_APP_LAYOUT: Readonly<
 > = {
   [DEST]: [{ name: "src", isDir: true }],
   [`${DEST}/src`]: [{ name: "App", isDir: true }],
-  [`${DEST}/src/App`]: [{ name: "App.csproj", isDir: false }],
+  [`${DEST}/src/App`]: [{ name: "go.mod", isDir: false }],
 };

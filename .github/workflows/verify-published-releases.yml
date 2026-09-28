@@ -1,0 +1,95 @@
+name: Verify Published Releases
+
+on:
+  schedule:
+    # Layer C of the missed-npm-publish defence (issue #526). Layers A and B only
+    # look at a release while someone is running one. This retroactive sweep is the
+    # only layer that surfaces a tag whose version was never published when nobody
+    # ran a release to look for it.
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+  # Validate the reconciliation logic on PRs that touch this workflow or the script
+  # it invokes. The registry sweep itself is gated off pull_request runs, so a PR run
+  # performs no network query and cannot fail on a pre-existing divergence; this
+  # provides the green branch-head run required by the modified-workflow-needs-green-run
+  # rule for a scheduled workflow that cannot be dispatched before it lands.
+  pull_request:
+    paths:
+      - ".github/workflows/verify-published-releases.yml"
+      - "scripts/dev-tools/Invoke-ReleaseReconciliation.ps1"
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    name: Reconcile release tags against the npm registry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # Runs on every trigger, pull_request included. Offline by construction: it
+      # dot-sources the script and exercises the pure comparison against in-memory
+      # literals, so it issues no network query and cannot fail on a pre-existing
+      # divergence. This is what makes a PR run of this workflow green.
+      - name: Validate the reconciliation comparison offline
+        shell: pwsh
+        run: |
+          . ./scripts/dev-tools/Invoke-ReleaseReconciliation.ps1
+          $divergence = @(Get-UnpublishedTagVersion -TagVersion @('9.9.8', '9.9.9') -PublishedVersion @('9.9.8'))
+          if ($divergence.Count -ne 1 -or $divergence[0] -ne '9.9.9') {
+            Write-Host "::error::Get-UnpublishedTagVersion did not report the expected divergence."
+            exit 1
+          }
+          Write-Output 'Reconciliation comparison behaved as expected.'
+          exit 0
+
+      # Schedule-only from here down: the sweep queries the registry and can report a
+      # pre-existing divergence, which must not fail a pull-request run.
+      - name: Set up Node.js
+        if: github.event_name != 'pull_request'
+        uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+
+      - name: Reconcile pushed tags against published versions
+        if: github.event_name != 'pull_request'
+        shell: pwsh
+        run: |
+          $tagVersions = @(
+            git ls-remote --tags origin 'refs/tags/mcp-server-v*' |
+              ForEach-Object { ($_ -split '\s+')[-1] } |
+              Where-Object { $_ -notmatch '\^\{\}$' } |
+              ForEach-Object { $_ -replace '^refs/tags/mcp-server-v', '' }
+          )
+          # A repository with no matching release tag makes this listing exit non-zero.
+          # That is an expected outcome of the sweep, not a failure of it, so the
+          # residual exit code is reset here rather than leaked to the runner, per
+          # .claude/rules/ci-workflows.md.
+          $LASTEXITCODE = 0
+
+          $publishedJson = (npm view '@danmoisan/drm-copilot-mcp' versions --json 2>$null | Out-String)
+          # An unpublished or renamed package makes this query exit non-zero. The sweep
+          # must still report the divergence rather than abort on it, so the residual
+          # exit code is reset here too.
+          $LASTEXITCODE = 0
+
+          $publishedVersions = @()
+          if (-not [string]::IsNullOrWhiteSpace($publishedJson)) {
+            $publishedVersions = @($publishedJson | ConvertFrom-Json)
+          }
+
+          Write-Output "Release tag versions found: $($tagVersions.Count)"
+          Write-Output "Published versions found:   $($publishedVersions.Count)"
+
+          & ./scripts/dev-tools/Invoke-ReleaseReconciliation.ps1 -TagVersionList $tagVersions -PublishedVersionList $publishedVersions
+          $reconciliationExitCode = $LASTEXITCODE
+
+          if ($reconciliationExitCode -ne 0) {
+            Write-Host "::error::A pushed release tag has no published npm version. See the UNPUBLISHED_TAG_VERSIONS line above."
+            exit 1
+          }
+
+          Write-Output 'Every pushed release tag has a published npm version.'
+          exit 0

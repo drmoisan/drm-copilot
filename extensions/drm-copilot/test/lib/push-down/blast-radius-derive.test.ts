@@ -110,13 +110,21 @@ const MANDATE_READS = [
   "quality-tiers.yml",
 ];
 
-/** Bundled source document carrying the optional `mandate_reads` key. */
+/**
+ * Bundled source document carrying the optional `mandate_reads` key together
+ * with the other optional carried keys, so the key-order case observes the
+ * complete emission order.
+ */
 const SOURCE_DOCUMENT_WITH_MANDATE_READS = `${JSON.stringify(
   {
     version: 1,
     shared_surfaces: [".claude/settings.json", "config/blast-radius.json"],
     shared_surface_globs: [],
     mandate_reads: MANDATE_READS,
+    mergeable_paths: ["**/*.csproj"],
+    conflict_tolerance: { tolerance_percent: 100 },
+    write_intent_extraction: true,
+    path_roots: [],
     modules: {
       config: ["config/**"],
     },
@@ -185,12 +193,12 @@ describe("issue #472: destination scan", () => {
 
 describe("issue #472: interception and passthrough", () => {
   it("writes the derived document rather than the bundled bytes", () => {
-    // Arrange: a destination whose layout declares one project directory.
+    // Arrange: a destination whose layout declares one Go module.
     const seeded = buildInMemoryFileSystem({}, [DEST]);
     const lister = fakeLister({
       [DEST]: [entry("src", true)],
       [`${DEST}/src`]: [entry("App", true)],
-      [`${DEST}/src/App`]: [entry("App.csproj", false)],
+      [`${DEST}/src/App`]: [entry("go.mod", false)],
     });
 
     // Act
@@ -388,14 +396,14 @@ describe("issue #472: unreadable-directory tolerance", () => {
 
 describe("issue #472: idempotency", () => {
   it("writes a byte-identical document on a second push", () => {
-    // Arrange: the second push sees the trees the first push created. `.claude`
-    // is dot-prefixed and skipped; `config` derives to the same glob the payload
-    // module already carries.
+    // Arrange: the second push sees the trees the first push created, with one
+    // Go module beneath src. `.claude` is dot-prefixed and skipped; `config`
+    // derives to the same glob the payload module already carries.
     const seeded = buildInMemoryFileSystem({}, [DEST]);
     const layout: Record<string, ReadonlyArray<DirectoryEntry>> = {
       [DEST]: [entry("src", true)],
       [`${DEST}/src`]: [entry("App", true)],
-      [`${DEST}/src/App`]: [entry("App.csproj", false)],
+      [`${DEST}/src/App`]: [entry("go.mod", false)],
     };
     const decorated = decorate(seeded, fakeLister(layout));
 
@@ -450,6 +458,10 @@ describe("issue #489: mandate_reads carriage", () => {
       "shared_surfaces",
       "shared_surface_globs",
       "mandate_reads",
+      "mergeable_paths",
+      "conflict_tolerance",
+      "write_intent_extraction",
+      "path_roots",
       "modules",
       "over_breadth_fraction",
     ]);

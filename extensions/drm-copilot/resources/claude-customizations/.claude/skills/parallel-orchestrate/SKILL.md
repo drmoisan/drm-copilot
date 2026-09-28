@@ -234,6 +234,8 @@ There is no final integration pull request and no fan-in path: the epic surface'
 integration-branch lifecycle has no counterpart on this surface, and its absence is structural
 rather than an omission.
 
+**Checkpoint hygiene (issue #673).** The coordinating session never holds a per-feature checkpoint at its own root. Before the first item delegation of a run it moves any `artifacts/orchestration/orchestrator-state.json` at its root to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and writes none there for the rest of the run, because each item's checkpoint lives in that item's worktree. A gated call the coordinator issues on an item's behalf is resolved by the item's issue number and branch, never by the coordinator root.
+
 ## Parallel-Mode Kickoff Parameter
 
 When `parallel-orchestrator` delegates an item to `Agent(orchestrator)`, the delegation prompt
@@ -326,12 +328,43 @@ Procedure, per item:
 
 **Merge-gate authorization.** `.claude/hooks/enforce-epic-merge-gate.ps1` is a project-wide
 `PreToolUse` Bash-matcher hook that denies any `gh pr merge --merge` unless a checkpoint satisfies
-one of its allow conditions; its block reason is `EPIC_MERGE_GATE_BLOCKED`. The gate now authorizes
-a parallel per-item merge when the parallel-orchestrator checkpoint has `route_id == "parallel"`,
-the target item's `merge_status == "ci_green"`, and, when a PR number is named, it matches the
-item's `pr_number`. Step 3 above is therefore permitted for a legitimate parallel merge; a missing,
-unreadable, or invalid parallel checkpoint, a target item whose `merge_status` is not `ci_green`, or
-a PR number that matches no item still fails closed with `EPIC_MERGE_GATE_BLOCKED`.
+one of its allow conditions; its block reason is `EPIC_MERGE_GATE_BLOCKED`. The gate has
+four allow conditions
+which it evaluates in this order: a per-feature checkpoint with `epic_mode == true` and
+`step9_status == "passed"`; an epic checkpoint whose `epic_merge_pr.ci_gate.conclusion` is
+`success` with a matching `pr_number`; the parallel condition described next; and a standalone
+merge authorization record, described after it. The parallel condition authorizes a per-item merge
+when the parallel-orchestrator checkpoint has `route_id == "parallel"`, the target item's
+`merge_status == "ci_green"`, and, when a PR number is named, it matches the item's `pr_number`.
+Step 3 above is therefore permitted for a legitimate parallel merge; a missing, unreadable, or
+invalid parallel checkpoint, a target item whose `merge_status` is not `ci_green`, or a PR number
+that matches no item still fails closed with `EPIC_MERGE_GATE_BLOCKED`.
+
+The standalone condition (issue #670) is the only route for merging a pull request that is not a
+parallel item, such as a standalone fix that unblocks the run. It is evaluated last and never
+overrides the other three. Writer procedure for the coordinating session:
+
+1. Write the record into a top-level `standalone_merge_authorizations` array in the
+   parallel-orchestrator checkpoint (`artifacts/orchestration/parallel-orchestrator-state.json`);
+   the gate also reads the key from the per-feature and epic checkpoints.
+2. Write one entry per authorized pull request, with these fields: `pr_number` (JSON integer),
+   `pr_url` (ending in `/pull/<pr_number>`), `issue_num` (JSON integer), `branch_name`,
+   `authorized_by`, `authorized_at` (ISO 8601 date-time), `session_id`, `basis` (at least 20
+   characters), and optionally `run_slug`.
+3. Set `session_id` to the session id of the coordinating session that will run the merge
+   command. The gate compares it with the live hook envelope and denies on any difference, so a
+   record written by another session or a previous run authorizes nothing.
+4. Name the pull request explicitly in the merge command (`gh pr merge <PR> --merge`); a bare
+   command never satisfies the standalone condition.
+
+A blanket flag is actively rejected: a `standalone_merge_authorizations` value that names no
+specific pull request (for example `true`) denies with
+`STANDALONE_MERGE_AUTHORIZATION_NOT_PR_SPECIFIC`. Other denials carry
+`STANDALONE_MERGE_AUTHORIZATION_ABSENT`, `STANDALONE_MERGE_AUTHORIZATION_PR_MISMATCH`, or
+`STANDALONE_MERGE_AUTHORIZATION_MALFORMED` (naming the failing field) after the
+`EPIC_MERGE_GATE_BLOCKED` token. The record is a policy-level, auditable declaration, not a
+security control; see the Standalone-Merge-Authorization section of
+`.claude/rules/orchestrator-state.md` for the full field rules and the disclosure.
 
 Branch protection on `main` affects only the pacing of step 3, not its ownership: if `main`
 requires branches to be up to date, an automated `gh pr update-branch` plus re-green cycle is
@@ -343,6 +376,29 @@ unattended.
 Remediation is child-owned and parent-initiated. The conflict is always between one item's own
 branch and `origin/main`; there is no integration branch and therefore no fan-in conflict path on
 this surface.
+
+Project-file conflicts are resolved by the parent first (issue #643); the numbered steps below are
+the escalation path.
+
+- (a) On a conflicted `gh pr merge --merge`, the parent runs the two commands
+  `git -C <worktree_path> fetch origin main` and
+  `git -C <worktree_path> merge --no-commit origin/main`.
+- (b) The parent then runs
+  `pwsh -NoProfile -File .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1 -Worktree <worktree_path>`
+  and parses its single JSON object. A `result` of `escalate` makes the parent run
+  `git -C <worktree_path> merge --abort`
+  and continue with step 1 below, including `escalate_paths` in the Blocking finding.
+- (c) On `resolved` the parent stages and commits the resolved paths with a message body listing
+  every entry added from each side and every version choice, then runs the three commands
+  `dotnet tool restore --tool-manifest <worktree_path>/.config/dotnet-tools.json`,
+  `dotnet csharpier check <worktree_path>`, and
+  `dotnet build <worktree_path>/<solution>`, each with path arguments rather than `cd`.
+  A failing check reverts with
+  `git -C <worktree_path> reset --hard HEAD~1`
+  and escalates with the tool output as the finding.
+- (d) On success the parent pushes the item branch, records `mergeable_conflicts_resolved` on the
+  item, sets `merge_status: pr_open`, regenerates `parallel-status.md`, and re-enters
+  `## Per-Item Merge to Main (Merge-on-Green)` at the durable `gh pr checks` confirmation step.
 
 1. On a conflicted `gh pr merge --merge`, the parent detects the failure and re-delegates that item's
    child orchestration, passing the conflict signal and the instruction to resolve against
@@ -387,15 +443,21 @@ checkout, never from inside a child worktree — issues `git worktree remove <wo
 success it records `merge_status: worktree_removed` and `worktree_removed_at`, then regenerates
 `docs/features/parallel/<slug>/parallel-status.md`.
 
-Mechanical gating of this command for parallel worktrees is F7 scope.
-`.claude/hooks/enforce-epic-worktree-removal-gate.ps1` is a project-wide `PreToolUse` Bash-matcher
-hook that denies any `git worktree remove` unless the epic checkpoint carries a matching
-`features[]` record whose `merge_status` is `merged` or `worktree_removed`; an unreadable checkpoint
-or an absent record also denies. Its block reason is `EPIC_WORKTREE_REMOVAL_BLOCKED`. A parallel run
-has no epic checkpoint record for its worktrees, so removal is denied until F7 both delivers
-`enforce-parallel-worktree-removal-gate.ps1` and coordinates the epic gate's allow conditions:
-`PreToolUse` denials are conjunctive, so a new allow-hook alone cannot override the existing deny.
-This feature ships no hook file and makes no `.claude/settings.json` change.
+Mechanical gating of this command for parallel worktrees is delivered. Both halves have landed.
+`.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` exists and is registered in
+`.claude/settings.json` on the `Bash` matcher; it authorizes a removal from the
+parallel-orchestrator checkpoint and owns the block reason
+`PARALLEL_WORKTREE_REMOVAL_BLOCKED`. `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` is a
+project-wide `PreToolUse` Bash-matcher hook registered alongside it whose block reason is
+`EPIC_WORKTREE_REMOVAL_BLOCKED`; it now carries a second, parallel allow-branch, so it authorizes a
+removal either from a matching epic checkpoint `features[]` record or from a parallel-orchestrator
+checkpoint whose `route_id` is `parallel` and whose matching `items[].worktree_path` record has
+`merge_status` in `{merged, worktree_removed}`. An unreadable checkpoint, an absent record, or a
+non-authorizing `merge_status` still denies on both branches. The coordination matters because
+`PreToolUse` denials are conjunctive: a new allow-hook alone could not have overridden the epic
+gate's independent deny, which is why the epic gate itself had to gain the parallel branch.
+The parallel-orchestrator-surface feature (F7) shipped no hook file and made no
+`.claude/settings.json` change of its own.
 
 ## Documentation Maintenance Boundaries
 
@@ -421,6 +483,14 @@ whose rows appear only once F6 populates that array; section `## Drift Events` p
 `drift_events[]`, which only F8 populates. An empty array renders an empty section rather than an
 omitted one.
 
+The projection's `## Mergeable Conflicts Resolved` heading renders
+`items[].mergeable_conflicts_resolved`: for each entry the path, the `resolved_at` stamp, the
+`merged_against` ref, the `merge_commit_sha`, the entries added from each side, and the version
+resolutions. The same resolution is cited in three further places: the body of the resolution
+commit message, the pull-request body, and an evidence artifact at
+`docs/features/parallel/<slug>/evidence/other/mergeable-conflicts.<yyyy-MM-ddTHH-mm>.md` carrying
+`Timestamp`, `Command`, `EXIT_CODE`, and the script's JSON output verbatim.
+
 Regeneration boundaries — regenerate at each of the following, not only at final completion:
 
 - Run kickoff, seeding the initial projection from the manifest and the seeded cohorts.
@@ -429,6 +499,7 @@ Regeneration boundaries — regenerate at each of the following, not only at fin
 - Every `recolor_generation` increment.
 - Every append to `mutations[]`.
 - Every append to `drift_events[]`.
+- Every append to an item's `mergeable_conflicts_resolved`.
 - Run completion in `closed` mode, or run close in `open` mode.
 
 Defining the `mutations[]` and `drift_events[]` appends as regeneration boundaries here means F6 and
@@ -438,8 +509,10 @@ F8 need no amendment to these projection rules.
 
 This section is consumption documentation only. The checkpoint schema is owned by F3, defined once
 as prose invariants in `.claude/rules/parallel-orchestration.md`, and enforced by
-`scripts/dev_tools/validate_parallel_orchestrator_state.py`. Consume that schema; add no field to it
-and extend no enum in it.
+`scripts/dev_tools/validate_parallel_orchestrator_state.py`. Consume that schema;
+add no field to it that `.claude/rules/parallel-orchestration.md` does not declare,
+and extend no enum in it. `mergeable_conflicts_resolved` is the one declared optional item
+field.
 
 Fields `parallel-orchestrator` writes to `artifacts/orchestration/parallel-orchestrator-state.json`:
 `objective`, `route_id: "parallel"`, `parallel_slug`, `parallel_manifest_path`,
@@ -472,9 +545,9 @@ pull-request state, merge time, and merge commit. Where the checkpoint disagrees
 commands, the commands win and the checkpoint is rewritten from them.
 
 Validate through `mcp__drm-copilot__validate_orchestration_artifacts` with
-`artifact_type: "parallel-orchestrator-state"`, or the equivalent CLI invocation
-`poetry run python -m scripts.dev_tools.validate_orchestration_artifacts parallel-orchestrator-state <path>`,
-adding `--require-complete` at the completion gate.
+`artifact_type: "parallel-orchestrator-state"`. At the completion gate, pass the
+`require_complete` argument on that same MCP call; no repository-local Python
+interpreter is required at a destination runtime.
 
 ## Completion Requirements
 
@@ -736,6 +809,9 @@ against `items[].worktree_path`. Removal is allowed only when that item's `merge
 or `worktree_removed`; anything else — including an unreadable checkpoint or no matching record —
 denies with a reason prefixed `PARALLEL_WORKTREE_REMOVAL_BLOCKED`. Commands that are not
 `git worktree remove` always allow. This is the mechanical counterpart to `## Worktree Cleanup`.
+`.claude/hooks/enforce-epic-worktree-removal-gate.ps1` fires on the same command and now carries a
+matching parallel allow-branch keyed on the same checkpoint, so both gates must allow for a removal
+to proceed.
 
 **Invocation-origin extension.** `.claude/hooks/enforce-epic-invocation-origin.ps1` was extended
 additively so `$script:GatedSubagentTypes` lists `epic-planner`, `epic-orchestrator`,

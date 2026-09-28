@@ -1,0 +1,22 @@
+{
+  "mode": "before",
+  "runtime": "powershell",
+  "slug": "epic-655-followups",
+  "config": "config/blast-radius.json at BASE_SHA beae3f021674e64fa6662097fe48a332d8da62b8",
+  "items": [
+    660,
+    663
+  ],
+  "edges": [
+    {
+      "a": 660,
+      "b": 663,
+      "reason": "path_overlap",
+      "reasons": [
+        "path_overlap",
+        "shared_surface_overlap"
+      ]
+    }
+  ],
+  "edge_count": 1
+}

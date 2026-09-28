@@ -16,7 +16,7 @@ agent profile.
 2. Run the canonical topology resolver before choosing a logical agent:
 
    ```powershell
-   poetry run python -m scripts.dev_tools.resolve_codex_topology `
+   pwsh -NoProfile -File .codex/scripts/Resolve-CodexTopology.ps1 `
      --language <python|powershell|csharp|typescript> `
      --production-file-count <count> `
      --test-file-count <count> `
@@ -53,7 +53,7 @@ epic root personas are forced independently of file count.
 5. Run the canonical resolver:
 
    ```powershell
-   poetry run python -m scripts.dev_tools.resolve_codex_deployment `
+   pwsh -NoProfile -File .codex/scripts/Resolve-CodexDeployment.ps1 `
      --logical-agent <agent> `
      --complexity-band <C1|C2|C3|C4> `
      --execution-context <context> `
@@ -64,6 +64,16 @@ epic root personas are forced independently of file count.
    non-empty `phase` before spawning the returned `deployment_agent`.
 7. Spawn the generated agent profile. Do not spawn the base alias and claim that
    a different model was selected.
+
+## Normal routed-delegation launch binding
+
+Before every normal nested `spawn_agent` call, resolve independently for that delegation. Validate the generated profile name, model, reasoning effort, path, and SHA-256 against the resolver result and the generated profile on disk. Add
+the exact validated receipt to `codex_model_routing_receipts[]`, including its non-empty `phase` and delegation identifier, in the selected checkpoint that `SubagentStart` reads. Durably flush the selected checkpoint before launch, then launch only the resolver-returned `deployment_agent`.
+
+Reject the launch when the receipt is late, a generic alias is supplied, the
+checkpoint is ambiguous, profile validation fails, persistence or durable flush
+fails, or start attestation returns `routing_valid: false`. Do not accept child output or child mutations after `routing_valid: false`; retain downstream
+recorder, authority-store, mutation-gate, and stop-gate enforcement.
 
 The route name `feature-review` resolves to the native
 `feature-reviewer-<profile>` agent family; retain `feature-review` as the
@@ -86,15 +96,14 @@ incomplete, and request a policy change. Do not silently fall back.
 ## Validation
 
 Before accepting delegated results or reporting completion, validate the
-checkpoint with the Codex routing gate:
+checkpoint with the Codex routing gate by calling the MCP tool
+`validate_orchestration_artifacts` with these arguments:
 
-```powershell
-poetry run python -m scripts.dev_tools.validate_orchestration_artifacts `
-  orchestrator-state artifacts/orchestration/orchestrator-state.json `
-  --require-codex-topology `
-  --require-codex-model-routing
-```
+- `artifact_type`: `orchestrator-state` (use `epic-orchestrator-state` for epic
+  execution)
+- `artifact_path`: `artifacts/orchestration/orchestrator-state.json`
+- `workspace_root`: the repository root
+- `require_codex_topology`: `true`
+- `require_codex_model_routing`: `true`
 
-For epic execution use `epic-orchestrator-state` with the same flag. The MCP
-`validate_orchestration_artifacts` surface is the authoritative completion gate
-when available.
+The MCP tool is the authoritative completion gate and needs no Python toolchain.
