@@ -1,0 +1,39 @@
+{
+  "description": "Issue #722 write-intent rule W2 (command span). The task names one concrete path and a multi-word command span; in write-intent mode every token of the command span is dropped.",
+  "tags": ["#722"],
+  "config": {
+    "version": 1,
+    "shared_surfaces": ["poetry.lock", "config/blast-radius.json"],
+    "shared_surface_globs": [],
+    "mandate_reads": [".claude/rules/**", ".github/copilot-instructions.md"],
+    "mergeable_paths": [],
+    "write_intent_extraction": true,
+    "path_roots": ["src", "config", "docs", "tests", ".claude"],
+    "modules": { "config": ["config/**"] },
+    "over_breadth_fraction": 0.25
+  },
+  "items": [
+    {
+      "key": 1,
+      "feature_folder": "demo-feature-1",
+      "plan_text": "- [ ] [P1-T1] Update `src/app.py`, then run `git add src/other.py`.\n",
+      "spec_text": ""
+    }
+  ],
+  "cases": [
+    {
+      "name": "write-intent",
+      "config_overrides": {},
+      "remove_keys": [],
+      "expected_radii": [
+        {
+          "key": 1,
+          "paths": ["docs/features/active/demo-feature-1/**", "src/app.py"],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": []
+        }
+      ]
+    }
+  ]
+}

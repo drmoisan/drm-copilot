@@ -1,0 +1,69 @@
+{
+  "description": "Issue #722 scheduling case derived from the issue #452 shared-surface class. Two C4 items both name poetry.lock as a path and as a declared shared surface. The detection relation reports path_overlap and shared_surface_overlap; shared_surface_overlap is a hard reason, so the pair is an edge at tolerance 0, at the committed tolerance 100, and at a very large tolerance. The radii are embedded here rather than referenced from a #452 fixture file, so the case is independent of merge order.",
+  "tags": ["#722", "#452-case"],
+  "config": {
+    "version": 1,
+    "shared_surfaces": [],
+    "shared_surface_globs": [],
+    "mandate_reads": [],
+    "mergeable_paths": [],
+    "conflict_tolerance": {
+      "tolerance_percent": 100,
+      "weights": { "same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2 },
+      "band_durations": { "C1": 1, "C2": 2, "C3": 4, "C4": 8 },
+      "default_band": "C1",
+      "append_only_paths": ["CHANGELOG.md"]
+    },
+    "modules": { "config": ["config/**"] },
+    "over_breadth_fraction": 0.25
+  },
+  "items": [
+    {
+      "key": 1,
+      "band": "C4",
+      "radius": {
+        "paths": ["poetry.lock"],
+        "modules": [],
+        "shared_surfaces": ["poetry.lock"],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    },
+    {
+      "key": 2,
+      "band": "C4",
+      "radius": {
+        "paths": ["poetry.lock"],
+        "modules": [],
+        "shared_surfaces": ["poetry.lock"],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "tolerance_percent": 0,
+      "expected_edges": [
+        { "a": 1, "b": 2, "reason": "path_overlap", "hard": true, "cost": 8, "benefit": 8 }
+      ],
+      "expected_tolerated": []
+    },
+    {
+      "tolerance_percent": 100,
+      "expected_edges": [
+        { "a": 1, "b": 2, "reason": "path_overlap", "hard": true, "cost": 8, "benefit": 8 }
+      ],
+      "expected_tolerated": []
+    },
+    {
+      "tolerance_percent": 1000000,
+      "expected_edges": [
+        { "a": 1, "b": 2, "reason": "path_overlap", "hard": true, "cost": 8, "benefit": 8 }
+      ],
+      "expected_tolerated": []
+    }
+  ]
+}

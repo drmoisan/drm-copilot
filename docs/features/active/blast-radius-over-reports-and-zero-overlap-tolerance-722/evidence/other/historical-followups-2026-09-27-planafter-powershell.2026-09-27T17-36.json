@@ -1,0 +1,303 @@
+{
+  "mode": "after",
+  "source": "plan-text",
+  "runtime": "powershell",
+  "slug": "followups-2026-09-27",
+  "plan_home_commit": "ed9b595935e811be5e6405def9c962c8b901bc8b",
+  "base_sha": "beae3f021674e64fa6662097fe48a332d8da62b8",
+  "config": "config/blast-radius.json at HEAD 6f81b876df5dfb2334cf84c58b2dd408dbba5335",
+  "items": [
+    706,
+    707,
+    708,
+    709,
+    710,
+    711,
+    712,
+    713,
+    714,
+    715,
+    716
+  ],
+  "item_records": [
+    {
+      "issue_num": 706,
+      "feature_folder": "docs/features/active/cleanup-report-registration-lost-false-positive-706",
+      "plan_path": "docs/features/active/cleanup-report-registration-lost-false-positive-706/plan.2026-09-26T22-56.md",
+      "spec_path": "docs/features/active/cleanup-report-registration-lost-false-positive-706/spec.md",
+      "work_mode_line": null,
+      "band": "C3",
+      "radius_sizes": {
+        "paths": 8,
+        "modules": 0,
+        "shared_surfaces": 0,
+        "contracts": 1
+      }
+    },
+    {
+      "issue_num": 707,
+      "feature_folder": "docs/features/active/codex-gates-4-5-lack-epic-scope-707",
+      "plan_path": "docs/features/active/codex-gates-4-5-lack-epic-scope-707/plan.2026-09-26T22-55.md",
+      "spec_path": "docs/features/active/codex-gates-4-5-lack-epic-scope-707/spec.md",
+      "work_mode_line": null,
+      "band": "C3",
+      "radius_sizes": {
+        "paths": 114,
+        "modules": 2,
+        "shared_surfaces": 1,
+        "contracts": 0
+      }
+    },
+    {
+      "issue_num": 708,
+      "feature_folder": "docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708",
+      "plan_path": "docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/plan.2026-09-26T22-56.md",
+      "spec_path": "docs/features/active/completion-consistency-edit-reads-relative-checkpoint-708/spec.md",
+      "work_mode_line": null,
+      "band": "C3",
+      "radius_sizes": {
+        "paths": 24,
+        "modules": 2,
+        "shared_surfaces": 1,
+        "contracts": 6
+      }
+    },
+    {
+      "issue_num": 709,
+      "feature_folder": "docs/features/active/gate-suites-read-unmocked-local-epic-state-709",
+      "plan_path": "docs/features/active/gate-suites-read-unmocked-local-epic-state-709/plan.2026-09-26T22-55.md",
+      "spec_path": "docs/features/active/gate-suites-read-unmocked-local-epic-state-709/spec.md",
+      "work_mode_line": null,
+      "band": "C3",
+      "radius_sizes": {
+        "paths": 22,
+        "modules": 1,
+        "shared_surfaces": 1,
+        "contracts": 1
+      }
+    },
+    {
+      "issue_num": 710,
+      "feature_folder": "docs/features/active/preimplementation-helpers-backslash-chain-operator-710",
+      "plan_path": "docs/features/active/preimplementation-helpers-backslash-chain-operator-710/plan.2026-09-26T22-56.md",
+      "spec_path": "docs/features/active/preimplementation-helpers-backslash-chain-operator-710/spec.md",
+      "work_mode_line": null,
+      "band": "C3",
+      "radius_sizes": {
+        "paths": 64,
+        "modules": 2,
+        "shared_surfaces": 1,
+        "contracts": 2
+      }
+    },
+    {
+      "issue_num": 711,
+      "feature_folder": "docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711",
+      "plan_path": "docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711/plan.2026-09-26T22-56.md",
+      "spec_path": "docs/features/active/2026-09-26-remaining-cannot-fail-count-assertions-711/spec.md",
+      "work_mode_line": null,
+      "band": "C2",
+      "radius_sizes": {
+        "paths": 7,
+        "modules": 0,
+        "shared_surfaces": 0,
+        "contracts": 0
+      }
+    },
+    {
+      "issue_num": 712,
+      "feature_folder": "docs/features/active/unused-npm-token-secret-712",
+      "plan_path": "docs/features/active/unused-npm-token-secret-712/plan.2026-09-27T00-23.md",
+      "spec_path": "docs/features/active/unused-npm-token-secret-712/spec.md",
+      "work_mode_line": null,
+      "band": "C3",
+      "radius_sizes": {
+        "paths": 11,
+        "modules": 0,
+        "shared_surfaces": 0,
+        "contracts": 0
+      }
+    },
+    {
+      "issue_num": 713,
+      "feature_folder": "docs/features/active/preimplementation-gate-blocks-attribution-trailers-713",
+      "plan_path": "docs/features/active/preimplementation-gate-blocks-attribution-trailers-713/plan.2026-09-27T00-23.md",
+      "spec_path": "docs/features/active/preimplementation-gate-blocks-attribution-trailers-713/spec.md",
+      "work_mode_line": null,
+      "band": "C3",
+      "radius_sizes": {
+        "paths": 79,
+        "modules": 2,
+        "shared_surfaces": 1,
+        "contracts": 0
+      }
+    },
+    {
+      "issue_num": 714,
+      "feature_folder": "docs/features/active/collector-core-no-whichgh-branch-untested-714",
+      "plan_path": "docs/features/active/collector-core-no-whichgh-branch-untested-714/plan.2026-09-27T00-23.md",
+      "spec_path": "docs/features/active/collector-core-no-whichgh-branch-untested-714/spec.md",
+      "work_mode_line": null,
+      "band": "C2",
+      "radius_sizes": {
+        "paths": 8,
+        "modules": 0,
+        "shared_surfaces": 0,
+        "contracts": 0
+      }
+    },
+    {
+      "issue_num": 715,
+      "feature_folder": "docs/features/active/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715",
+      "plan_path": "docs/features/active/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715/plan.2026-09-27T00-23.md",
+      "spec_path": "docs/features/active/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715/spec.md",
+      "work_mode_line": null,
+      "band": "C2",
+      "radius_sizes": {
+        "paths": 9,
+        "modules": 0,
+        "shared_surfaces": 0,
+        "contracts": 0
+      }
+    },
+    {
+      "issue_num": 716,
+      "feature_folder": "docs/features/active/compare-code-point-helper-duplicated-716",
+      "plan_path": "docs/features/active/compare-code-point-helper-duplicated-716/plan.2026-09-27T00-23.md",
+      "spec_path": "docs/features/active/compare-code-point-helper-duplicated-716/spec.md",
+      "work_mode_line": null,
+      "band": "C2",
+      "radius_sizes": {
+        "paths": 21,
+        "modules": 0,
+        "shared_surfaces": 2,
+        "contracts": 4
+      }
+    }
+  ],
+  "edges": [
+    {
+      "a": 706,
+      "b": 710,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 8,
+      "benefit": 4
+    },
+    {
+      "a": 706,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 8,
+      "benefit": 4
+    },
+    {
+      "a": 706,
+      "b": 715,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 16,
+      "benefit": 2
+    },
+    {
+      "a": 707,
+      "b": 708,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 36,
+      "benefit": 4
+    },
+    {
+      "a": 707,
+      "b": 709,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 34,
+      "benefit": 4
+    },
+    {
+      "a": 707,
+      "b": 710,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 132,
+      "benefit": 4
+    },
+    {
+      "a": 707,
+      "b": 711,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 8,
+      "benefit": 2
+    },
+    {
+      "a": 707,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 140,
+      "benefit": 4
+    },
+    {
+      "a": 708,
+      "b": 709,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 26,
+      "benefit": 4
+    },
+    {
+      "a": 708,
+      "b": 710,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 20,
+      "benefit": 4
+    },
+    {
+      "a": 708,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 36,
+      "benefit": 4
+    },
+    {
+      "a": 709,
+      "b": 710,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 58,
+      "benefit": 4
+    },
+    {
+      "a": 709,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 58,
+      "benefit": 4
+    },
+    {
+      "a": 710,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 180,
+      "benefit": 4
+    },
+    {
+      "a": 714,
+      "b": 716,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 8,
+      "benefit": 2
+    }
+  ],
+  "tolerated_overlaps": [],
+  "edge_count": 15,
+  "tolerated_count": 0
+}

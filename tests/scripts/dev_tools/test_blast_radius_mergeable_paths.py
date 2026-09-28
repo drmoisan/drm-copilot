@@ -101,15 +101,22 @@ def radius(paths: tuple[str, ...]) -> BlastRadius:
 
 
 def load_config(path: Path) -> dict[str, object]:
-    """Load a committed truth table from disk.
+    """Load a committed truth table from disk, pinned to current extraction.
+
+    The helper removes ``write_intent_extraction`` and ``path_roots`` when
+    present, so every test in this module keeps exercising current extraction
+    against the committed values of the other keys. Write-intent behavior is
+    covered by the write-intent test module (issue #722, spec decision 10).
 
     Args:
         path (Path): Absolute path to a ``blast-radius.json`` copy.
 
     Returns:
-        dict[str, object]: The parsed mapping.
+        dict[str, object]: The parsed mapping without the two write-intent keys.
     """
     parsed: dict[str, object] = json.loads(path.read_text(encoding="utf-8"))
+    parsed.pop("write_intent_extraction", None)
+    parsed.pop("path_roots", None)
     return parsed
 
 

@@ -27,7 +27,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
-from scripts.dev_tools._blast_radius_extraction import extract_plan_paths
 from scripts.dev_tools._blast_radius_glob import (
     concrete_entries,
     is_path_subsumed,
@@ -44,6 +43,7 @@ from scripts.dev_tools._blast_radius_guards import (
 )
 from scripts.dev_tools._blast_radius_normalization import exclude_mandate_reads
 from scripts.dev_tools._blast_radius_thresholds import config_over_breadth_fraction
+from scripts.dev_tools._blast_radius_write_intent import select_plan_paths
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -326,10 +326,14 @@ def validate_blast_radius(
     # radius passing V1 and V2 against its own plan (issue #452). The
     # mandate-read exclusion is applied here for the same reason: the derivation
     # harvest drops those citations, so V1 and V2 must not then demand that the
-    # radius cover them (issue #489).
+    # radius cover them (issue #489). The plan-side extractor is chosen by the
+    # selector derivation also uses, so write-intent mode stays self-consistent
+    # (issue #722).
     plan_concrete = concrete_entries(
         exclude_mandate_reads(
-            extract_plan_paths(plan_text, root_surfaces=config_root_surfaces(config)),
+            select_plan_paths(
+                plan_text, config, root_surfaces=config_root_surfaces(config)
+            ),
             config_mandate_reads(config),
         )
     )

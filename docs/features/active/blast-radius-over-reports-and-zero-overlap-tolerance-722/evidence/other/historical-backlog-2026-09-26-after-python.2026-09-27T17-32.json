@@ -1,0 +1,84 @@
+{
+  "mode": "after",
+  "runtime": "python",
+  "slug": "backlog-2026-09-26",
+  "config": "config/blast-radius.json at HEAD 6f81b876df5dfb2334cf84c58b2dd408dbba5335",
+  "items": [
+    513,
+    528,
+    588,
+    594,
+    622
+  ],
+  "edges": [
+    {
+      "a": 528,
+      "b": 588,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 8,
+      "benefit": 2
+    },
+    {
+      "a": 588,
+      "b": 622,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 152,
+      "benefit": 4
+    }
+  ],
+  "edge_count": 2,
+  "cohorts": [
+    [
+      513,
+      588,
+      594
+    ],
+    [
+      528,
+      622
+    ]
+  ],
+  "cohort_count": 2,
+  "max_cohort_width": 3,
+  "tolerated_overlaps": [],
+  "tolerated_count": 0,
+  "normalized_radius_sizes": [
+    {
+      "issue_num": 513,
+      "paths": 11,
+      "modules": 1,
+      "shared_surfaces": 1,
+      "contracts": 0
+    },
+    {
+      "issue_num": 528,
+      "paths": 36,
+      "modules": 1,
+      "shared_surfaces": 0,
+      "contracts": 0
+    },
+    {
+      "issue_num": 588,
+      "paths": 91,
+      "modules": 0,
+      "shared_surfaces": 0,
+      "contracts": 2
+    },
+    {
+      "issue_num": 594,
+      "paths": 22,
+      "modules": 0,
+      "shared_surfaces": 0,
+      "contracts": 5
+    },
+    {
+      "issue_num": 622,
+      "paths": 126,
+      "modules": 0,
+      "shared_surfaces": 0,
+      "contracts": 0
+    }
+  ]
+}

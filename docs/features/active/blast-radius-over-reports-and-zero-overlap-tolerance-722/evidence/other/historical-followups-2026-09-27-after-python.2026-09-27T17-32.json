@@ -1,0 +1,274 @@
+{
+  "mode": "after",
+  "runtime": "python",
+  "slug": "followups-2026-09-27",
+  "config": "config/blast-radius.json at HEAD 6f81b876df5dfb2334cf84c58b2dd408dbba5335",
+  "items": [
+    706,
+    707,
+    708,
+    709,
+    710,
+    711,
+    712,
+    713,
+    714,
+    715,
+    716
+  ],
+  "edges": [
+    {
+      "a": 706,
+      "b": 707,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 16,
+      "benefit": 4
+    },
+    {
+      "a": 706,
+      "b": 708,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 16,
+      "benefit": 4
+    },
+    {
+      "a": 706,
+      "b": 710,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 16,
+      "benefit": 4
+    },
+    {
+      "a": 706,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 16,
+      "benefit": 4
+    },
+    {
+      "a": 706,
+      "b": 715,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 48,
+      "benefit": 2
+    },
+    {
+      "a": 707,
+      "b": 708,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 100,
+      "benefit": 4
+    },
+    {
+      "a": 707,
+      "b": 709,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 50,
+      "benefit": 4
+    },
+    {
+      "a": 707,
+      "b": 710,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 132,
+      "benefit": 4
+    },
+    {
+      "a": 707,
+      "b": 711,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 8,
+      "benefit": 2
+    },
+    {
+      "a": 707,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 148,
+      "benefit": 4
+    },
+    {
+      "a": 708,
+      "b": 709,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 34,
+      "benefit": 4
+    },
+    {
+      "a": 708,
+      "b": 710,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 52,
+      "benefit": 4
+    },
+    {
+      "a": 708,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 76,
+      "benefit": 4
+    },
+    {
+      "a": 709,
+      "b": 710,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 66,
+      "benefit": 4
+    },
+    {
+      "a": 709,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 82,
+      "benefit": 4
+    },
+    {
+      "a": 710,
+      "b": 713,
+      "reason": "path_overlap",
+      "hard": true,
+      "cost": 196,
+      "benefit": 4
+    },
+    {
+      "a": 714,
+      "b": 716,
+      "reason": "path_overlap",
+      "hard": false,
+      "cost": 16,
+      "benefit": 2
+    }
+  ],
+  "edge_count": 17,
+  "cohorts": [
+    [
+      707,
+      712,
+      714,
+      715
+    ],
+    [
+      706,
+      709,
+      711,
+      716
+    ],
+    [
+      708
+    ],
+    [
+      710
+    ],
+    [
+      713
+    ]
+  ],
+  "cohort_count": 5,
+  "max_cohort_width": 4,
+  "tolerated_overlaps": [
+    {
+      "a": 708,
+      "b": 711,
+      "reasons": [
+        "module_overlap"
+      ],
+      "cost": 2,
+      "benefit": 2
+    }
+  ],
+  "tolerated_count": 1,
+  "normalized_radius_sizes": [
+    {
+      "issue_num": 706,
+      "paths": 15,
+      "modules": 0,
+      "shared_surfaces": 0,
+      "contracts": 2
+    },
+    {
+      "issue_num": 707,
+      "paths": 128,
+      "modules": 2,
+      "shared_surfaces": 1,
+      "contracts": 0
+    },
+    {
+      "issue_num": 708,
+      "paths": 32,
+      "modules": 3,
+      "shared_surfaces": 1,
+      "contracts": 11
+    },
+    {
+      "issue_num": 709,
+      "paths": 31,
+      "modules": 1,
+      "shared_surfaces": 1,
+      "contracts": 1
+    },
+    {
+      "issue_num": 710,
+      "paths": 67,
+      "modules": 2,
+      "shared_surfaces": 1,
+      "contracts": 2
+    },
+    {
+      "issue_num": 711,
+      "paths": 11,
+      "modules": 1,
+      "shared_surfaces": 1,
+      "contracts": 0
+    },
+    {
+      "issue_num": 712,
+      "paths": 15,
+      "modules": 0,
+      "shared_surfaces": 0,
+      "contracts": 0
+    },
+    {
+      "issue_num": 713,
+      "paths": 88,
+      "modules": 2,
+      "shared_surfaces": 2,
+      "contracts": 0
+    },
+    {
+      "issue_num": 714,
+      "paths": 14,
+      "modules": 0,
+      "shared_surfaces": 0,
+      "contracts": 0
+    },
+    {
+      "issue_num": 715,
+      "paths": 14,
+      "modules": 0,
+      "shared_surfaces": 0,
+      "contracts": 0
+    },
+    {
+      "issue_num": 716,
+      "paths": 33,
+      "modules": 0,
+      "shared_surfaces": 2,
+      "contracts": 4
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "description": "Issue #722 scheduling negative controls matched to the issue #452 directory cases. A sibling directory whose name only extends the listed directory's name, the listed directory itself, a documentation file, and a source file outside both. No pair is detected as a conflict, so no tolerance produces an edge or a tolerated overlap. The radii are embedded here rather than referenced from a #452 fixture file.",
+  "tags": ["#722", "#452-case"],
+  "config": {
+    "version": 1,
+    "shared_surfaces": [],
+    "shared_surface_globs": [],
+    "mandate_reads": [],
+    "mergeable_paths": [],
+    "conflict_tolerance": {
+      "tolerance_percent": 100,
+      "weights": { "same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2 },
+      "band_durations": { "C1": 1, "C2": 2, "C3": 4, "C4": 8 },
+      "default_band": "C1",
+      "append_only_paths": ["CHANGELOG.md"]
+    },
+    "modules": { "config": ["config/**"] },
+    "over_breadth_fraction": 0.25
+  },
+  "items": [
+    {
+      "key": 1,
+      "band": null,
+      "radius": {
+        "paths": ["scripts/dev_toolsX/a.py"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    },
+    {
+      "key": 2,
+      "band": null,
+      "radius": {
+        "paths": ["scripts/dev_tools"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    },
+    {
+      "key": 3,
+      "band": null,
+      "radius": {
+        "paths": ["docs/guide.md"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    },
+    {
+      "key": 4,
+      "band": null,
+      "radius": {
+        "paths": ["src/index.ts"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-09-27T00-00"
+      }
+    }
+  ],
+  "cases": [
+    { "tolerance_percent": 0, "expected_edges": [], "expected_tolerated": [] },
+    { "tolerance_percent": 100, "expected_edges": [], "expected_tolerated": [] },
+    { "tolerance_percent": 1000000, "expected_edges": [], "expected_tolerated": [] }
+  ]
+}

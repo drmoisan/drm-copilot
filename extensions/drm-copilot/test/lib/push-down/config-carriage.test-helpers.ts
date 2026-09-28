@@ -84,6 +84,10 @@ export const SOURCE_ROUTING = `${JSON.stringify(
  * file. `mandate_reads` carries the ten-entry read-by-mandate exclusion set.
  * `mergeable_paths` carries the five-entry mechanically-mergeable path class,
  * whose overlap a merge step reconciles rather than re-delegating (issue #643).
+ * `conflict_tolerance` carries the integration-cost scheduling policy (issue
+ * #722), which describes the runtime rather than a repository layout.
+ * `write_intent_extraction` is true, and `path_roots` is empty because the
+ * bundle cannot know a destination's top-level directories (issue #722).
  */
 export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
   {
@@ -109,6 +113,7 @@ export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
       ".claude/agent-memory/**",
       ".agents/skills/**",
       "scripts/vscode/**",
+      ".github/copilot-instructions.md",
     ],
     mergeable_paths: [
       "**/*.csproj",
@@ -117,6 +122,18 @@ export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
       "**/*.vbproj",
       "**/*.props",
     ],
+    conflict_tolerance: {
+      tolerance_percent: 100,
+      weights: { same_file: 8, possible_overlap: 2, append_only: 1, module: 2 },
+      band_durations: { C1: 1, C2: 2, C3: 4, C4: 8 },
+      default_band: "C1",
+      append_only_paths: [
+        "**/CHANGELOG.md",
+        "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json",
+      ],
+    },
+    write_intent_extraction: true,
+    path_roots: [],
     modules: {
       config: ["config/**"],
     },

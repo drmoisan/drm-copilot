@@ -1,0 +1,605 @@
+{
+  "schema_version": 1,
+  "issue": 452,
+  "description": "Shared two-direction regression corpus for issue #452. It pins the separator-free root-surface correction (gap 1) and the listed-directory prefix correction (gap 2) at the detection level for the Python authority and the PowerShell port.",
+  "cases": [
+    {
+      "id": "g1-plan-poetry-lock",
+      "gap": 1,
+      "kind": "plan_pair",
+      "direction": "must-conflict",
+      "paired_case_id": "g1-plan-different-surfaces",
+      "config_ref": "self_hosted",
+      "input": {
+        "plan_a": "- [ ] [P1-T1] Edit `poetry.lock`.",
+        "plan_b": "- [ ] [P1-T1] Edit `poetry.lock`.",
+        "feature_folder_a": "2026-09-27-regression-452-left",
+        "feature_folder_b": "2026-09-27-regression-452-right",
+        "computed_at": "2026-09-27T12-15"
+      },
+      "expected": {
+        "conflict": true,
+        "reasons": [
+          {
+            "kind": "path_overlap",
+            "detail": "poetry.lock ~ poetry.lock"
+          },
+          {
+            "kind": "shared_surface_overlap",
+            "detail": "poetry.lock"
+          }
+        ]
+      }
+    },
+    {
+      "id": "g1-plan-package-lock",
+      "gap": 1,
+      "kind": "plan_pair",
+      "direction": "must-conflict",
+      "paired_case_id": "g1-plan-unconfigured-root-file",
+      "config_ref": "self_hosted",
+      "input": {
+        "plan_a": "- [ ] [P1-T1] Edit `package-lock.json`.",
+        "plan_b": "- [ ] [P1-T1] Edit `package-lock.json`.",
+        "feature_folder_a": "2026-09-27-regression-452-left",
+        "feature_folder_b": "2026-09-27-regression-452-right",
+        "computed_at": "2026-09-27T12-15"
+      },
+      "expected": {
+        "conflict": true,
+        "reasons": [
+          {
+            "kind": "path_overlap",
+            "detail": "package-lock.json ~ package-lock.json"
+          },
+          {
+            "kind": "shared_surface_overlap",
+            "detail": "package-lock.json"
+          }
+        ]
+      }
+    },
+    {
+      "id": "g1-plan-different-surfaces",
+      "gap": 1,
+      "kind": "plan_pair",
+      "direction": "must-not-conflict",
+      "paired_case_id": "g1-plan-poetry-lock",
+      "config_ref": "self_hosted",
+      "input": {
+        "plan_a": "- [ ] [P1-T1] Edit `poetry.lock`.",
+        "plan_b": "- [ ] [P1-T1] Edit `package-lock.json`.",
+        "feature_folder_a": "2026-09-27-regression-452-left",
+        "feature_folder_b": "2026-09-27-regression-452-right",
+        "computed_at": "2026-09-27T12-15"
+      },
+      "expected": {
+        "conflict": false,
+        "reasons": []
+      }
+    },
+    {
+      "id": "g1-plan-unconfigured-root-file",
+      "gap": 1,
+      "kind": "plan_pair",
+      "direction": "must-not-conflict",
+      "paired_case_id": "g1-plan-package-lock",
+      "config_ref": "self_hosted",
+      "input": {
+        "plan_a": "- [ ] [P1-T1] Edit `pyproject.toml`.",
+        "plan_b": "- [ ] [P1-T1] Edit `pyproject.toml`.",
+        "feature_folder_a": "2026-09-27-regression-452-left",
+        "feature_folder_b": "2026-09-27-regression-452-right",
+        "computed_at": "2026-09-27T12-15"
+      },
+      "expected": {
+        "conflict": false,
+        "reasons": []
+      }
+    },
+    {
+      "id": "g1-plan-quality-tiers-mandate-read",
+      "gap": 1,
+      "kind": "plan_pair",
+      "direction": "must-not-conflict",
+      "doctrine_pin": true,
+      "paired_case_id": "g1-radius-quality-tiers",
+      "config_ref": "self_hosted",
+      "input": {
+        "plan_a": "- [ ] [P1-T1] Read `quality-tiers.yml`.",
+        "plan_b": "- [ ] [P1-T1] Read `quality-tiers.yml`.",
+        "feature_folder_a": "2026-09-27-regression-452-left",
+        "feature_folder_b": "2026-09-27-regression-452-right",
+        "computed_at": "2026-09-27T12-15"
+      },
+      "expected": {
+        "conflict": false,
+        "reasons": []
+      }
+    },
+    {
+      "id": "g1-radius-quality-tiers",
+      "gap": 1,
+      "kind": "radius_pair",
+      "direction": "must-conflict",
+      "paired_case_id": "g1-radius-quality-tiers-vs-poetry-lock",
+      "config": {
+        "version": 1
+      },
+      "input": {
+        "radius_a": {
+          "paths": [
+            "quality-tiers.yml"
+          ],
+          "modules": [],
+          "shared_surfaces": [
+            "quality-tiers.yml"
+          ],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        },
+        "radius_b": {
+          "paths": [
+            "quality-tiers.yml"
+          ],
+          "modules": [],
+          "shared_surfaces": [
+            "quality-tiers.yml"
+          ],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        }
+      },
+      "expected": {
+        "conflict": true,
+        "reasons": [
+          {
+            "kind": "path_overlap",
+            "detail": "quality-tiers.yml ~ quality-tiers.yml"
+          },
+          {
+            "kind": "shared_surface_overlap",
+            "detail": "quality-tiers.yml"
+          }
+        ]
+      }
+    },
+    {
+      "id": "g1-radius-quality-tiers-vs-poetry-lock",
+      "gap": 1,
+      "kind": "radius_pair",
+      "direction": "must-not-conflict",
+      "paired_case_id": "g1-radius-quality-tiers",
+      "config": {
+        "version": 1
+      },
+      "input": {
+        "radius_a": {
+          "paths": [
+            "quality-tiers.yml"
+          ],
+          "modules": [],
+          "shared_surfaces": [
+            "quality-tiers.yml"
+          ],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        },
+        "radius_b": {
+          "paths": [
+            "poetry.lock"
+          ],
+          "modules": [],
+          "shared_surfaces": [
+            "poetry.lock"
+          ],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        }
+      },
+      "expected": {
+        "conflict": false,
+        "reasons": []
+      }
+    },
+    {
+      "id": "g2-dir-vs-glob",
+      "gap": 2,
+      "kind": "radius_pair",
+      "direction": "must-conflict",
+      "paired_case_id": "g2-dir-vs-sibling-glob",
+      "config": {
+        "version": 1
+      },
+      "input": {
+        "radius_a": {
+          "paths": [
+            "scripts/dev_tools"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        },
+        "radius_b": {
+          "paths": [
+            "scripts/dev_tools/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        }
+      },
+      "expected": {
+        "conflict": true,
+        "reasons": [
+          {
+            "kind": "path_overlap",
+            "detail": "scripts/dev_tools ~ scripts/dev_tools/**"
+          }
+        ]
+      }
+    },
+    {
+      "id": "g2-glob-vs-dir",
+      "gap": 2,
+      "kind": "radius_pair",
+      "direction": "must-conflict",
+      "paired_case_id": "g2-sibling-glob-vs-dir",
+      "config": {
+        "version": 1
+      },
+      "input": {
+        "radius_a": {
+          "paths": [
+            "scripts/dev_tools/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        },
+        "radius_b": {
+          "paths": [
+            "scripts/dev_tools"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        }
+      },
+      "expected": {
+        "conflict": true,
+        "reasons": [
+          {
+            "kind": "path_overlap",
+            "detail": "scripts/dev_tools ~ scripts/dev_tools/**"
+          }
+        ]
+      }
+    },
+    {
+      "id": "g2-dir-vs-sibling-glob",
+      "gap": 2,
+      "kind": "radius_pair",
+      "direction": "must-not-conflict",
+      "paired_case_id": "g2-dir-vs-glob",
+      "config": {
+        "version": 1
+      },
+      "input": {
+        "radius_a": {
+          "paths": [
+            "scripts/dev_tools"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        },
+        "radius_b": {
+          "paths": [
+            "scripts/dev_tools_extra/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        }
+      },
+      "expected": {
+        "conflict": false,
+        "reasons": []
+      }
+    },
+    {
+      "id": "g2-sibling-glob-vs-dir",
+      "gap": 2,
+      "kind": "radius_pair",
+      "direction": "must-not-conflict",
+      "paired_case_id": "g2-glob-vs-dir",
+      "config": {
+        "version": 1
+      },
+      "input": {
+        "radius_a": {
+          "paths": [
+            "scripts/dev_tools_extra/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        },
+        "radius_b": {
+          "paths": [
+            "scripts/dev_tools"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        }
+      },
+      "expected": {
+        "conflict": false,
+        "reasons": []
+      }
+    },
+    {
+      "id": "g2-artifacts-dir-vs-glob",
+      "gap": 2,
+      "kind": "radius_pair",
+      "direction": "must-conflict",
+      "paired_case_id": "g2-artifacts-dir-vs-sibling-glob",
+      "config": {
+        "version": 1
+      },
+      "input": {
+        "radius_a": {
+          "paths": [
+            "artifacts/orchestration"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        },
+        "radius_b": {
+          "paths": [
+            "artifacts/orchestration/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        }
+      },
+      "expected": {
+        "conflict": true,
+        "reasons": [
+          {
+            "kind": "path_overlap",
+            "detail": "artifacts/orchestration ~ artifacts/orchestration/**"
+          }
+        ]
+      }
+    },
+    {
+      "id": "g2-artifacts-glob-vs-dir",
+      "gap": 2,
+      "kind": "radius_pair",
+      "direction": "must-conflict",
+      "paired_case_id": "g2-artifacts-sibling-glob-vs-dir",
+      "config": {
+        "version": 1
+      },
+      "input": {
+        "radius_a": {
+          "paths": [
+            "artifacts/orchestration/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        },
+        "radius_b": {
+          "paths": [
+            "artifacts/orchestration"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        }
+      },
+      "expected": {
+        "conflict": true,
+        "reasons": [
+          {
+            "kind": "path_overlap",
+            "detail": "artifacts/orchestration ~ artifacts/orchestration/**"
+          }
+        ]
+      }
+    },
+    {
+      "id": "g2-artifacts-dir-vs-sibling-glob",
+      "gap": 2,
+      "kind": "radius_pair",
+      "direction": "must-not-conflict",
+      "paired_case_id": "g2-artifacts-dir-vs-glob",
+      "config": {
+        "version": 1
+      },
+      "input": {
+        "radius_a": {
+          "paths": [
+            "artifacts/orchestration"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        },
+        "radius_b": {
+          "paths": [
+            "artifacts/orchestration-archive/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        }
+      },
+      "expected": {
+        "conflict": false,
+        "reasons": []
+      }
+    },
+    {
+      "id": "g2-artifacts-sibling-glob-vs-dir",
+      "gap": 2,
+      "kind": "radius_pair",
+      "direction": "must-not-conflict",
+      "paired_case_id": "g2-artifacts-glob-vs-dir",
+      "config": {
+        "version": 1
+      },
+      "input": {
+        "radius_a": {
+          "paths": [
+            "artifacts/orchestration-archive/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        },
+        "radius_b": {
+          "paths": [
+            "artifacts/orchestration"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        }
+      },
+      "expected": {
+        "conflict": false,
+        "reasons": []
+      }
+    },
+    {
+      "id": "g2-empty-modules-dir-vs-glob",
+      "gap": 2,
+      "kind": "radius_pair",
+      "direction": "must-conflict",
+      "paired_case_id": "g2-empty-modules-dir-vs-sibling-glob",
+      "config": {
+        "version": 1,
+        "modules": {
+          "poshqc": [
+            "scripts/powershell/**"
+          ]
+        }
+      },
+      "input": {
+        "radius_a": {
+          "paths": [
+            "scripts/powershell/PoshQC"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        },
+        "radius_b": {
+          "paths": [
+            "scripts/powershell/PoshQC/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        }
+      },
+      "expected": {
+        "conflict": true,
+        "reasons": [
+          {
+            "kind": "path_overlap",
+            "detail": "scripts/powershell/PoshQC ~ scripts/powershell/PoshQC/**"
+          }
+        ]
+      }
+    },
+    {
+      "id": "g2-empty-modules-dir-vs-sibling-glob",
+      "gap": 2,
+      "kind": "radius_pair",
+      "direction": "must-not-conflict",
+      "paired_case_id": "g2-empty-modules-dir-vs-glob",
+      "config": {
+        "version": 1,
+        "modules": {
+          "poshqc": [
+            "scripts/powershell/**"
+          ]
+        }
+      },
+      "input": {
+        "radius_a": {
+          "paths": [
+            "scripts/powershell/PoshQC"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        },
+        "radius_b": {
+          "paths": [
+            "scripts/powershell/PoshQCExtra/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-09-27T12-15"
+        }
+      },
+      "expected": {
+        "conflict": false,
+        "reasons": []
+      }
+    }
+  ]
+}

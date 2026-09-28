@@ -57,12 +57,20 @@ TRACKED_FILE_COUNT = 5000
 
 
 def committed_config() -> dict[str, object]:
-    """Load the committed truth table.
+    """Load the committed truth table, pinned to current extraction.
+
+    The helper removes ``write_intent_extraction`` and ``path_roots`` when
+    present, so every test in this module keeps exercising current extraction
+    against the committed values of the other keys. Write-intent behavior is
+    covered by the write-intent test module (issue #722, spec decision 10).
 
     Returns:
-        dict[str, object]: The parsed ``config/blast-radius.json`` mapping.
+        dict[str, object]: The parsed ``config/blast-radius.json`` mapping
+        without the two write-intent keys.
     """
     parsed: dict[str, object] = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    parsed.pop("write_intent_extraction", None)
+    parsed.pop("path_roots", None)
     return parsed
 
 
