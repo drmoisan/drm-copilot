@@ -1,5 +1,9 @@
 # taskmaster-push-down-and-resume (Issue #674)
 
+> **Withdrawn 2026-09-28; issue #674 closed as not planned.** This scope is operational delivery
+> into the TaskMaster consumer repository, not development of drm-copilot. It is archived for
+> reference only. See the F7 note in `docs/features/epics/worktree-scoped-state-resolution/epic.md`.
+
 - Date captured: 2026-09-13
 - Author: Dan Moisan
 - Status: Promoted -> docs/features/active/taskmaster-push-down-and-resume/ (Issue #674)
