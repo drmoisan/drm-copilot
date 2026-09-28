@@ -86,7 +86,16 @@ fix to `enforce-model-routing-receipt.ps1` in TaskMaster (commit `4389d95b`, 202
 | F5 | #673 | `enforce-model-routing-receipt.ps1` | false approval | never fall back to a sibling checkpoint |
 | F6 | #675 | `mcp__drm-copilot__collect_pr_context` | vacuous context | explicit target; fail loudly on empty diff |
 | F3 | #670 | `enforce-epic-merge-gate.ps1` | unlandable fix | authorization record (RULING 1) |
-| F7 | #674 | push-down to TaskMaster | — | deliver and confirm resume |
+| F7 | #674 | push-down to TaskMaster | — | **withdrawn** (see below) |
+
+> **F7 withdrawn (2026-09-28).** #674 was closed as not planned. Its scope was operational delivery
+> into a consumer repository: rebuild and reinstall the extension, push customizations down to
+> TaskMaster, and confirm TaskMaster run `bugs-2026-09-11` resumes. That is not development of
+> drm-copilot, and drm-copilot is not the repository in which to track work on a destination
+> repository. Any push-down to TaskMaster is an operational step for a TaskMaster session. The
+> epic's development scope is complete: F1-F6 (#669-#673, #675) are delivered, and the epic issue
+> #678 is closed. The F7 folder is retained for reference under
+> `docs/features/archive/2026-09-13-taskmaster-push-down-and-resume-674/`.
 
 ### The five required fixes
 
