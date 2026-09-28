@@ -144,7 +144,7 @@ def test_plan_directory_rediscovery_blocks_before_write(
     deny_write_boundaries: None,
 ) -> None:
     with pytest.raises(HandoffContractError):
-        resolve_pinned_plan_path(ROOT, "docs/features/active")
+        resolve_pinned_plan_path(ROOT, FIXTURES.relative_to(ROOT).as_posix())
 
 
 def test_shared_traversal_fixture_blocks_before_write(
