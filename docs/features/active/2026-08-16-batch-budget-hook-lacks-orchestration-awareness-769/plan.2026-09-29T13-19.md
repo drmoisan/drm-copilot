@@ -294,30 +294,30 @@ The negative and positive searches in this plan use these fixed strings, quoted 
 
 Each check-off task changes the AC line from `- [ ] AC-n:` to `- [x] AC-n:` in both `FEATURE/spec.md` and `FEATURE/issue.md` (the issue list mirrors the spec list) and records the check-off, with the cited artifacts, in FEATURE/evidence/other/ac-checkoff.TS.md. Its acceptance is the CMD-GIT-COUNT of the literal `- [x] AC-n:` (passed through `-e`) printing one line for each of the two files, plus the cited artifacts existing with passing acceptance. An AC whose cited artifacts do not all pass stays unchecked, and the plan outcome is remediation-required.
 
-- [ ] [P12-T1] Check off AC-1 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P1-T2 (fail-before), P2-T9.
-- [ ] [P12-T2] Check off AC-2 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P4-T2 (fail-before), P5-T5.
-- [ ] [P12-T3] Check off AC-3 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9 and P5-T5 (case D4 in each suite).
-- [ ] [P12-T4] Check off AC-4 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9, P5-T5 (large-path cases), P2-T12 and P9-T11 (live session state).
-- [ ] [P12-T5] Check off AC-5 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9, P5-T5 (route rows 9 through 13, case L3).
-- [ ] [P12-T6] Check off AC-6 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9, P5-T5 (route rows 4 through 8 and 14 through 21, cases D6, S1, S3).
-- [ ] [P12-T7] Check off AC-7 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9, P5-T5 (cases P1, P2), P2-T10.
-- [ ] [P12-T8] Check off AC-8 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9, P5-T5 (override cases), P2-T1 (no `CLAUDE_POWERSHELL_BUDGET` in CHOOK).
-- [ ] [P12-T9] Check off AC-9 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T10, P2-T11, P5-T6, P5-T8 (the Codex hook has no containment filter, per research Section 1.2, so the out-of-root clause applies to the Claude hook).
-- [ ] [P12-T10] Check off AC-10 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P5-T8.
-- [ ] [P12-T11] Check off AC-11 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P9-T12 and the seam cases of P2-T9 and P5-T5.
-- [ ] [P12-T12] Check off AC-12 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9, P2-T10, P5-T5, P5-T6.
-- [ ] [P12-T13] Check off AC-13 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T22 (non-vacuity), P7-T9.
-- [ ] [P12-T14] Check off AC-14 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T23 (non-vacuity), P6-T11.
-- [ ] [P12-T15] Check off AC-15 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T24 (non-vacuity), P6-T12.
-- [ ] [P12-T16] Check off AC-16 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P6-T13.
-- [ ] [P12-T17] Check off AC-17 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P7-T5, P7-T6, P7-T7.
-- [ ] [P12-T18] Check off AC-18 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P5-T8, P6-T14, P7-T7, P10-T1, P11-T3.
-- [ ] [P12-T19] Check off AC-19 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P11-T1.
-- [ ] [P12-T20] Check off AC-20 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T13, P5-T9, P9-T10, P5-T8.
-- [ ] [P12-T21] Check off AC-21 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P9-T1, P9-T2, P9-T4, P9-T5, P9-T6, P11-T4 (`Disposition: PASS`).
-- [ ] [P12-T22] Check off AC-22 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P11-T2.
-- [ ] [P12-T23] Check off AC-23 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P8-T4.
-- [ ] [P12-T24] Verify and commit the check-off in `FEATURE/spec.md` and `FEATURE/issue.md`. Commands: `git grep -c -F -e "- [x] AC-" -- docs/features/active/2026-08-16-batch-budget-hook-lacks-orchestration-awareness-769/spec.md docs/features/active/2026-08-16-batch-budget-hook-lacks-orchestration-awareness-769/issue.md`, then `git grep -c -F -e "- [ ] AC-" -- <the same two files>`; then CMD-GIT-ADD with FEATURE, CMD-GIT-COMMIT with message "docs(769): check off acceptance criteria", CMD-GIT-PUSH. Acceptance: the first search prints `spec.md:23` and `issue.md:23` (with their full paths); the second exits 1 with no output; CMD-GIT-STATUS prints nothing after the push.
+- [x] [P12-T1] Check off AC-1 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P1-T2 (fail-before), P2-T9.
+- [x] [P12-T2] Check off AC-2 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P4-T2 (fail-before), P5-T5.
+- [x] [P12-T3] Check off AC-3 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9 and P5-T5 (case D4 in each suite).
+- [x] [P12-T4] Check off AC-4 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9, P5-T5 (large-path cases), P2-T12 and P9-T11 (live session state).
+- [x] [P12-T5] Check off AC-5 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9, P5-T5 (route rows 9 through 13, case L3).
+- [x] [P12-T6] Check off AC-6 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9, P5-T5 (route rows 4 through 8 and 14 through 21, cases D6, S1, S3).
+- [x] [P12-T7] Check off AC-7 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9, P5-T5 (cases P1, P2), P2-T10.
+- [x] [P12-T8] Check off AC-8 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9, P5-T5 (override cases), P2-T1 (no `CLAUDE_POWERSHELL_BUDGET` in CHOOK).
+- [x] [P12-T9] Check off AC-9 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T10, P2-T11, P5-T6, P5-T8 (the Codex hook has no containment filter, per research Section 1.2, so the out-of-root clause applies to the Claude hook).
+- [x] [P12-T10] Check off AC-10 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P5-T8.
+- [x] [P12-T11] Check off AC-11 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P9-T12 and the seam cases of P2-T9 and P5-T5.
+- [x] [P12-T12] Check off AC-12 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T9, P2-T10, P5-T5, P5-T6.
+- [x] [P12-T13] Check off AC-13 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T22 (non-vacuity), P7-T9.
+- [x] [P12-T14] Check off AC-14 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T23 (non-vacuity), P6-T11.
+- [x] [P12-T15] Check off AC-15 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T24 (non-vacuity), P6-T12.
+- [x] [P12-T16] Check off AC-16 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P6-T13.
+- [x] [P12-T17] Check off AC-17 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P7-T5, P7-T6, P7-T7.
+- [x] [P12-T18] Check off AC-18 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P5-T8, P6-T14, P7-T7, P10-T1, P11-T3.
+- [x] [P12-T19] Check off AC-19 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P11-T1.
+- [x] [P12-T20] Check off AC-20 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T13, P5-T9, P9-T10, P5-T8.
+- [x] [P12-T21] Check off AC-21 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P9-T1, P9-T2, P9-T4, P9-T5, P9-T6, P11-T4 (`Disposition: PASS`).
+- [x] [P12-T22] Check off AC-22 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P11-T2.
+- [x] [P12-T23] Check off AC-23 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P8-T4.
+- [x] [P12-T24] Verify and commit the check-off in `FEATURE/spec.md` and `FEATURE/issue.md`. Commands: `git grep -c -F -e "- [x] AC-" -- docs/features/active/2026-08-16-batch-budget-hook-lacks-orchestration-awareness-769/spec.md docs/features/active/2026-08-16-batch-budget-hook-lacks-orchestration-awareness-769/issue.md`, then `git grep -c -F -e "- [ ] AC-" -- <the same two files>`; then CMD-GIT-ADD with FEATURE, CMD-GIT-COMMIT with message "docs(769): check off acceptance criteria", CMD-GIT-PUSH. Acceptance: the first search prints `spec.md:23` and `issue.md:23` (with their full paths); the second exits 1 with no output; CMD-GIT-STATUS prints nothing after the push.
 
 ---
 
