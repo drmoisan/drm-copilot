@@ -20,7 +20,7 @@ Diff anchor: BASE_SHA per DV2.
 
 ## Full name-only list (BASE_SHA..HEAD)
 
-Non-FEATURE paths (54):
+Non-FEATURE paths (67):
 .claude/agents/parallel-orchestrator.md
 .claude/hooks/enforce-parallel-abandon-gate.ps1
 .claude/lib/bash/abandon-parallel-item.sh

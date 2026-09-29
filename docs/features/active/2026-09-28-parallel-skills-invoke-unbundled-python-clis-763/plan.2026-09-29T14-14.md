@@ -989,7 +989,7 @@ Each item was observed in this repository's recorded runs or read from source, n
 
 ### Phase 11 — CI Shell Coverage and Coverage Comparison
 
-- [ ] [P11-T1] Commit and push the final state, record FINAL_SHA, and repeat the AC17 scope check against BASE_SHA in FEATURE/evidence/qa-gates/final-commit.TS.md.
+- [x] [P11-T1] Commit and push the final state, record FINAL_SHA, and repeat the AC17 scope check against BASE_SHA in FEATURE/evidence/qa-gates/final-commit.TS.md.
       Commands: `git status --porcelain`; CMD-GIT-ADD with `docs/features/active/2026-09-28-parallel-skills-invoke-unbundled-python-clis-763`
       plus every path that status listed (fixes made by Phase 7-10 loop restarts). Before CMD-GIT-ADD,
       every path the first status lists, other than paths under FEATURE, must be a member of C4, C5,
@@ -1001,13 +1001,13 @@ Each item was observed in this repository's recorded runs or read from source, n
       `git diff --name-only BASE_SHA HEAD` and `git status --porcelain`. Acceptance: the push exits 0;
       the HEAD value is recorded as FINAL_SHA; the final porcelain status prints nothing; the name-only
       list contains none of the six P6-T8 forbidden paths.
-- [ ] [P11-T2] Dispatch `.github/workflows/_shell-coverage.yml` on BRANCH at FINAL_SHA and wait for it.
+- [x] [P11-T2] Dispatch `.github/workflows/_shell-coverage.yml` on BRANCH at FINAL_SHA and wait for it.
       Commands: CMD-GH-DISPATCH, CMD-GH-LATEST (repeat until it lists a run whose `headSha` equals
       FINAL_SHA), CMD-CI-WAIT with that run id. Run CMD-CI-WAIT in the background, or re-invoke it
       after a tool timeout; the recorded result is that of the invocation that exits. Append to
       FEATURE/evidence/qa-gates/final-commit.TS.md. Acceptance: CMD-CI-WAIT exits 0 and reports `status` `completed`, `conclusion` `success`, and
       job `Shell Coverage (Bats + kcov)` with conclusion `success`.
-- [ ] [P11-T3] Bash suite results and coverage headline from the P11-T2 run of `.github/workflows/_shell-coverage.yml`, written to FEATURE/evidence/qa-gates/shell-coverage-ci.TS.md.
+- [x] [P11-T3] Bash suite results and coverage headline from the P11-T2 run of `.github/workflows/_shell-coverage.yml`, written to FEATURE/evidence/qa-gates/shell-coverage-ci.TS.md.
       Command: CMD-CI-LOG with the P11-T2 run id. Acceptance: `NOT-OK-COUNT=0`; exactly one line
       containing `Bash coverage (lines): <n>%` with n at least 85.0; the artifact records the P0-T21
       value and the difference as information only (the changed-line gate for bash is the per-file
@@ -1018,12 +1018,12 @@ Each item was observed in this repository's recorded runs or read from source, n
       printed suite lines include `ok` lines for the three `tests/shell/parallel_abandon_parity.bats`
       tests, the three B29 tests, and "the five CLI entry points are present in both trees". This task
       is the authoritative bash parity result (AC5) and payload-only result (AC6).
-- [ ] [P11-T4] Bash per-file coverage for `.claude/lib/bash/abandon-parallel-item.sh` from the P11-T2 artifact, written to FEATURE/evidence/qa-gates/shell-coverage-files.TS.md.
+- [x] [P11-T4] Bash per-file coverage for `.claude/lib/bash/abandon-parallel-item.sh` from the P11-T2 artifact, written to FEATURE/evidence/qa-gates/shell-coverage-files.TS.md.
       Commands: CMD-GH-DOWNLOAD with the P11-T2 run id into `SCRATCH/shell-cov-final`, then CMD-PY-SCRIPT
       with script cobertura-files (A16) and arguments `SCRATCH/shell-cov-final/cov.xml abandon-parallel-item.sh compute-cohorts.sh`.
       Acceptance: no `MISSING` line; every `COBERTURA file=` line whose path ends with
       `abandon-parallel-item.sh` shows `line-rate=` at least 0.85; the artifact records `COBERTURA-TOTAL`.
-- [ ] [P11-T5] Coverage comparison for bash, PowerShell, Python, and TypeScript, written to FEATURE/evidence/qa-gates/coverage-comparison.TS.md from the artifacts of P0-T15, P0-T19, P0-T21, P0-T22, P8-T5, P9-T5, P11-T3, and P11-T4.
+- [x] [P11-T5] Coverage comparison for bash, PowerShell, Python, and TypeScript, written to FEATURE/evidence/qa-gates/coverage-comparison.TS.md from the artifacts of P0-T15, P0-T19, P0-T21, P0-T22, P8-T5, P9-T5, P11-T3, and P11-T4.
       Acceptance: for each of bash, PowerShell, and Python the artifact carries `Baseline Coverage:`,
       `Post-Change Coverage:`, `New/Changed-code Coverage:`, and `Disposition:` with numeric values
       (bash: CI headline before and after and the abandon script's line-rate; PowerShell: the hook's
@@ -1035,28 +1035,28 @@ Each item was observed in this repository's recorded runs or read from source, n
 
 ### Phase 12 — Final QA Confirmation and Acceptance-Criteria Check-Off
 
-- [ ] [P12-T1] Check off AC1 in FEATURE/spec.md (the AC box becomes lowercase x). Acceptance: the P3-T14, P3-T20, P3-T22, P6-T5, and P8-T5 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T2] Check off AC2 in FEATURE/spec.md. Acceptance: the P3-T3, P3-T6, and P3-T20 artifacts exist with passing acceptance (both lanes' floor tests PASSED); cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T3] Check off AC3 in FEATURE/spec.md. Acceptance: the P3-T18 (fail-before), P3-T20, and P3-T21 artifacts exist with passing acceptance and every B19 It name is PASSED; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T4] Check off AC4 in FEATURE/spec.md. Acceptance: the P2-T6 (fail-before), P2-T8, and P7-T3 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T5] Check off AC5 in FEATURE/spec.md. Acceptance: the P2-T13 and P11-T3 artifacts exist with passing acceptance (the Python lane and the CI bash parity lane); cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T6] Check off AC6 in FEATURE/spec.md. Acceptance: the P5-T10 and P11-T3 artifacts exist with passing acceptance for the three B29 tests; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T7] Check off AC7 in FEATURE/spec.md. Acceptance: the P4-T13 artifact exists with every B26 test PASSED; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T8] Check off AC8 in FEATURE/spec.md. Acceptance: the P6-T5 and P6-T6 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md with the DV2 anchor note.
-- [ ] [P12-T9] Check off AC9 in FEATURE/spec.md. Acceptance: the P4-T14, P5-T3, and P6-T3 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T10] Check off AC10 in FEATURE/spec.md. Acceptance: the P4-T15 artifact exists with passing acceptance and the P9-T6 named set shows `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py` PASSED; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T11] Check off AC11 in FEATURE/spec.md. Acceptance: the P4-T7 and P6-T7 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md with the DV2 anchor note.
-- [ ] [P12-T12] Check off AC12 in FEATURE/spec.md. Acceptance: the P5-T1 through P5-T4, P5-T10, P5-T11, P5-T12, and P5-T13 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T13] Check off AC13 in FEATURE/spec.md. Acceptance: the P1-T6, P1-T7 (fail-before), P1-T8 (fail-before), P4-T13 (`test_bundle_guard_extracts_the_skill_invocation` PASSED), P6-T1, P6-T2, and P9-T5 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T14] Check off AC14 in FEATURE/spec.md. Acceptance: the P5-T6, P5-T7, P5-T12 (`test_poshqc_bundled_parity.py` PASSED), and P8-T5 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T15] Check off AC15 in FEATURE/spec.md. Acceptance: the P9-T5 and P11-T4 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T16] Check off AC16 in FEATURE/spec.md. Acceptance: the P6-T4 artifact exists with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
-- [ ] [P12-T17] Check off AC17 in FEATURE/spec.md. Acceptance: the P6-T8, P6-T9, and P11-T1 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md with the DV2 anchor note.
-- [ ] [P12-T18] Check off AC18 in FEATURE/spec.md. Acceptance: every Phase 7 through 11 artifact exists with passing acceptance and the P11-T5 overall `Disposition:` is `PASS`; cited in FEATURE/evidence/other/ac-checkoff.TS.md. If the disposition is `BLOCKED`, AC18 stays unchecked and the plan outcome is remediation-required.
-- [ ] [P12-T19] Count the acceptance-criteria checkboxes in FEATURE/spec.md directly.
+- [x] [P12-T1] Check off AC1 in FEATURE/spec.md (the AC box becomes lowercase x). Acceptance: the P3-T14, P3-T20, P3-T22, P6-T5, and P8-T5 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T2] Check off AC2 in FEATURE/spec.md. Acceptance: the P3-T3, P3-T6, and P3-T20 artifacts exist with passing acceptance (both lanes' floor tests PASSED); cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T3] Check off AC3 in FEATURE/spec.md. Acceptance: the P3-T18 (fail-before), P3-T20, and P3-T21 artifacts exist with passing acceptance and every B19 It name is PASSED; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T4] Check off AC4 in FEATURE/spec.md. Acceptance: the P2-T6 (fail-before), P2-T8, and P7-T3 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T5] Check off AC5 in FEATURE/spec.md. Acceptance: the P2-T13 and P11-T3 artifacts exist with passing acceptance (the Python lane and the CI bash parity lane); cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T6] Check off AC6 in FEATURE/spec.md. Acceptance: the P5-T10 and P11-T3 artifacts exist with passing acceptance for the three B29 tests; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T7] Check off AC7 in FEATURE/spec.md. Acceptance: the P4-T13 artifact exists with every B26 test PASSED; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T8] Check off AC8 in FEATURE/spec.md. Acceptance: the P6-T5 and P6-T6 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md with the DV2 anchor note.
+- [x] [P12-T9] Check off AC9 in FEATURE/spec.md. Acceptance: the P4-T14, P5-T3, and P6-T3 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T10] Check off AC10 in FEATURE/spec.md. Acceptance: the P4-T15 artifact exists with passing acceptance and the P9-T6 named set shows `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py` PASSED; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T11] Check off AC11 in FEATURE/spec.md. Acceptance: the P4-T7 and P6-T7 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md with the DV2 anchor note.
+- [x] [P12-T12] Check off AC12 in FEATURE/spec.md. Acceptance: the P5-T1 through P5-T4, P5-T10, P5-T11, P5-T12, and P5-T13 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T13] Check off AC13 in FEATURE/spec.md. Acceptance: the P1-T6, P1-T7 (fail-before), P1-T8 (fail-before), P4-T13 (`test_bundle_guard_extracts_the_skill_invocation` PASSED), P6-T1, P6-T2, and P9-T5 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T14] Check off AC14 in FEATURE/spec.md. Acceptance: the P5-T6, P5-T7, P5-T12 (`test_poshqc_bundled_parity.py` PASSED), and P8-T5 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T15] Check off AC15 in FEATURE/spec.md. Acceptance: the P9-T5 and P11-T4 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T16] Check off AC16 in FEATURE/spec.md. Acceptance: the P6-T4 artifact exists with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md.
+- [x] [P12-T17] Check off AC17 in FEATURE/spec.md. Acceptance: the P6-T8, P6-T9, and P11-T1 artifacts exist with passing acceptance; cited in FEATURE/evidence/other/ac-checkoff.TS.md with the DV2 anchor note.
+- [x] [P12-T18] Check off AC18 in FEATURE/spec.md. Acceptance: every Phase 7 through 11 artifact exists with passing acceptance and the P11-T5 overall `Disposition:` is `PASS`; cited in FEATURE/evidence/other/ac-checkoff.TS.md. If the disposition is `BLOCKED`, AC18 stays unchecked and the plan outcome is remediation-required.
+- [x] [P12-T19] Count the acceptance-criteria checkboxes in FEATURE/spec.md directly.
       Command: CMD-SH with script ac-count (A21) and argument `FEATURE/spec.md`. Append to
       FEATURE/evidence/other/ac-checkoff.TS.md. Acceptance: exit 0 and `AC-CHECKED=18 AC-UNCHECKED=0`.
-- [ ] [P12-T20] Commit and push the check-off in `docs/features/active/2026-09-28-parallel-skills-invoke-unbundled-python-clis-763/spec.md`.
+- [x] [P12-T20] Commit and push the check-off in `docs/features/active/2026-09-28-parallel-skills-invoke-unbundled-python-clis-763/spec.md`.
       Commands: CMD-GIT-ADD with `docs/features/active/2026-09-28-parallel-skills-invoke-unbundled-python-clis-763`,
       CMD-GIT-COMMIT with message "docs(763): check off acceptance criteria", CMD-GIT-PUSH, then
       `git status --porcelain`. Acceptance: the push exits 0 and the porcelain status prints nothing.
