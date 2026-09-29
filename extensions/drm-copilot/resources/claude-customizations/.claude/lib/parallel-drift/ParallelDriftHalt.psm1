@@ -15,6 +15,9 @@
     and no input is mutated. A guard failure throws with a message naming the
     offending field. Booleans are never accepted where an integer is required,
     matching the Python reference, which rejects bool although it subclasses int.
+    A function that returns an array uses the unary comma so a one-element or
+    empty array is not unrolled; it declares both the array type and
+    System.Object[] as output types.
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
@@ -72,7 +75,7 @@ function ConvertTo-ParallelDriftSortedDistinct {
         System.String[]. Always an array, including when empty.
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [System.Object[]])]
     param([Parameter(Mandatory = $true)][AllowEmptyCollection()][string[]] $Entry)
 
     $unique = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
@@ -155,7 +158,7 @@ function Assert-ParallelDriftPathList {
         System.String[]. The entries deduplicated and ordinally sorted.
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [System.Object[]])]
     param(
         [Parameter(Mandatory = $true)][AllowNull()][AllowEmptyCollection()][object] $Value,
         [Parameter(Mandatory = $true)][string] $FieldName,
@@ -247,7 +250,7 @@ function Get-ParallelDriftCanonicalPair {
         System.Int64[]. The two keys in ascending order.
     #>
     [CmdletBinding()]
-    [OutputType([long[]])]
+    [OutputType([long[]], [System.Object[]])]
     param([Parameter(Mandatory = $true)][long] $First, [Parameter(Mandatory = $true)][long] $Second)
 
     if ($First -lt $Second) { return , [long[]]@($First, $Second) }
@@ -342,7 +345,7 @@ function Get-ParallelDriftHaltedItemKey {
         System.Int64[]. The halted keys, deduplicated and ascending; always an array.
     #>
     [CmdletBinding()]
-    [OutputType([long[]])]
+    [OutputType([long[]], [System.Object[]])]
     param(
         [Parameter(Mandatory = $true)][AllowEmptyCollection()][object[]] $Item,
         [Parameter(Mandatory = $true)][AllowEmptyCollection()][object[]] $Pair,

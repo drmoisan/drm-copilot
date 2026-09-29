@@ -31,9 +31,11 @@
 #>
 
 BeforeDiscovery {
-    # Enumerate the committed corpus at discovery time so each fixture becomes one test.
+    # Enumerate the committed corpus at discovery time so each fixture becomes one
+    # test. The list is script-scoped because the It block that consumes it runs in
+    # a child scope.
     $corpusDirectory = (Resolve-Path "$PSScriptRoot/../../../fixtures/parallel_drift").Path
-    $fixtureCase = @(Get-ChildItem -Path $corpusDirectory -Filter '*.json' -File | Sort-Object -Property Name |
+    $script:FixtureCase = @(Get-ChildItem -Path $corpusDirectory -Filter '*.json' -File | Sort-Object -Property Name |
             ForEach-Object { @{ name = $_.BaseName; path = $_.FullName } })
 }
 
@@ -104,7 +106,7 @@ Describe 'Parallel drift parity corpus' {
         @($script:RequiredCase | Where-Object { $name -cnotcontains $_ }) | Should -BeNullOrEmpty
     }
 
-    It 'reproduces drift fixture <name>' -ForEach $fixtureCase {
+    It 'reproduces drift fixture <name>' -ForEach $script:FixtureCase {
         # Arrange: split the fixture into the inline documents the mocked seam returns.
         $document = [System.Text.Json.JsonDocument]::Parse((Get-Content -LiteralPath $path -Raw))
         try {

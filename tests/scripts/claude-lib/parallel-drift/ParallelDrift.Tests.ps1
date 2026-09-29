@@ -19,8 +19,12 @@ BeforeAll {
     $script:ModulePath = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/parallel-drift/ParallelDrift.psm1").Path
     Import-Module $script:ModulePath -Force -ErrorAction Stop
 
-    # Build an ordinal (case-sensitive) hashtable from alternating keys and values.
-    function New-OrdinalTable {
+    # Build an ordinal (case-sensitive) hashtable from alternating keys and values,
+    # the shape the entry script's JSON reader produces. The @{} literal is
+    # case-insensitive, so the rule below, which flags every case-sensitive
+    # hashtable construction, is suppressed for this one helper.
+    function Get-OrdinalTable {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseLiteralInitializerForHashtable', '', Justification = 'Test records mirror the case-sensitive JSON object keys the production reader builds (issue #763, D1).')]
         param([object[]] $Pair)
         $table = [hashtable]::new([System.StringComparer]::Ordinal)
         for ($index = 0; $index -lt $Pair.Count; $index += 2) { $table[[string]$Pair[$index]] = $Pair[$index + 1] }
@@ -28,32 +32,32 @@ BeforeAll {
     }
 
     # The C1 base truth table: one shared surface and two module globs.
-    function New-TestConfig {
-        $modules = New-OrdinalTable -Pair @('python-dev-tools', @('scripts/dev_tools/**'), 'mcp-server', @('packages/mcp-server/**'))
-        return New-OrdinalTable -Pair @('shared_surfaces', @('.claude/settings.json'), 'shared_surface_globs', @(), 'modules', $modules)
+    function Get-TestConfig {
+        $modules = Get-OrdinalTable -Pair @('python-dev-tools', @('scripts/dev_tools/**'), 'mcp-server', @('packages/mcp-server/**'))
+        return Get-OrdinalTable -Pair @('shared_surfaces', @('.claude/settings.json'), 'shared_surface_globs', @(), 'modules', $modules)
     }
 
     # A declared radius over the given paths, in the six-key invariant-9 shape.
-    function New-TestRadius {
+    function Get-TestRadius {
         param([string[]] $Path, [string] $ComputedAt = '2026-08-08T09-00')
-        return New-OrdinalTable -Pair @('paths', @($Path), 'modules', @(), 'shared_surfaces', @(), 'contracts', @(),
+        return Get-OrdinalTable -Pair @('paths', @($Path), 'modules', @(), 'shared_surfaces', @(), 'contracts', @(),
             'source', 'declared', 'computed_at', $ComputedAt)
     }
 
     # One in-flight item record; the radius may be replaced by any value.
-    function New-TestItem {
+    function Get-TestItem {
         param([long] $ItemKey, [object] $Radius, [string] $State = 'in_flight')
-        return New-OrdinalTable -Pair @('issue_num', $ItemKey, 'state', $State, 'blast_radius', $Radius)
+        return Get-OrdinalTable -Pair @('issue_num', $ItemKey, 'state', $State, 'blast_radius', $Radius)
     }
 
     # A checkpoint holding the given items and edges.
-    function New-TestState {
+    function Get-TestState {
         param([object[]] $Item, [object[]] $Edge = @())
-        return New-OrdinalTable -Pair @('items', $Item, 'conflict_edges', $Edge)
+        return Get-OrdinalTable -Pair @('items', $Item, 'conflict_edges', $Edge)
     }
 
-    $script:Config = New-TestConfig
-    $script:Drifter = New-TestItem -ItemKey 446 -Radius (New-TestRadius -Path @('scripts/dev_tools/**'))
+    $script:Config = Get-TestConfig
+    $script:Drifter = Get-TestItem -ItemKey 446 -Radius (Get-TestRadius -Path @('scripts/dev_tools/**'))
 }
 
 Describe 'ParallelDrift.psm1' {
@@ -87,34 +91,34 @@ Describe 'ParallelDrift.psm1' {
     }
 
     It 'Get-ParallelDriftCheckpointItem rejects a non-list items collection' {
-        $state = New-OrdinalTable -Pair @('items', (New-OrdinalTable -Pair @('446', @{})), 'conflict_edges', @())
+        $state = Get-OrdinalTable -Pair @('items', (Get-OrdinalTable -Pair @('446', @{})), 'conflict_edges', @())
 
         { Get-ParallelDriftCheckpointItem -State $state } | Should -Throw '*items must be a list*'
     }
 
     It 'Get-ParallelDriftCheckpointItem rejects a non-object items entry' {
-        $state = New-TestState -Item @(5)
+        $state = Get-TestState -Item @(5)
 
         { Get-ParallelDriftCheckpointItem -State $state } | Should -Throw '*items`[`] entries must be objects*'
     }
 
     It 'Get-ParallelDriftCheckpointItem returns every object entry in order' {
-        $items = Get-ParallelDriftCheckpointItem -State (New-TestState -Item @($script:Drifter))
+        $items = Get-ParallelDriftCheckpointItem -State (Get-TestState -Item @($script:Drifter))
 
         $items.Count | Should -Be 1
         $items[0]['issue_num'] | Should -Be 446
     }
 
     It 'Get-ParallelDriftCheckpointEdge rejects a non-list conflict_edges collection' {
-        $state = New-OrdinalTable -Pair @('items', @(), 'conflict_edges', 'none')
+        $state = Get-OrdinalTable -Pair @('items', @(), 'conflict_edges', 'none')
 
         { Get-ParallelDriftCheckpointEdge -State $state } | Should -Throw '*conflict_edges must be a list*'
     }
 
     It 'Get-ParallelDriftCheckpointEdge omits a non-object edge' {
-        $edge = New-OrdinalTable -Pair @('a', [long]445, 'b', [long]446)
+        $edge = Get-OrdinalTable -Pair @('a', [long]445, 'b', [long]446)
 
-        $edges = Get-ParallelDriftCheckpointEdge -State (New-TestState -Item @() -Edge @('445-446', $edge))
+        $edges = Get-ParallelDriftCheckpointEdge -State (Get-TestState -Item @() -Edge @('445-446', $edge))
 
         $edges.Count | Should -Be 1
         $edges[0]['a'] | Should -Be 445
@@ -126,14 +130,14 @@ Describe 'ParallelDrift.psm1' {
     }
 
     It 'Get-ParallelDriftDeclaredPath rejects a non-object blast_radius' {
-        { Get-ParallelDriftDeclaredPath -Item (New-TestItem -ItemKey 446 -Radius 1) } |
+        { Get-ParallelDriftDeclaredPath -Item (Get-TestItem -ItemKey 446 -Radius 1) } |
             Should -Throw '*blast_radius must be an object*'
     }
 
     It 'Get-ParallelDriftDeclaredPath rejects a non-list paths value' {
-        $radius = New-OrdinalTable -Pair @('paths', 'src/app.py')
+        $radius = Get-OrdinalTable -Pair @('paths', 'src/app.py')
 
-        { Get-ParallelDriftDeclaredPath -Item (New-TestItem -ItemKey 446 -Radius $radius) } |
+        { Get-ParallelDriftDeclaredPath -Item (Get-TestItem -ItemKey 446 -Radius $radius) } |
             Should -Throw '*blast_radius.paths must be a list*'
     }
 
@@ -168,7 +172,7 @@ Describe 'ParallelDrift.psm1' {
     }
 
     It 'Get-ParallelDriftExistingEdgePair canonicalizes a reversed edge' {
-        $edge = New-OrdinalTable -Pair @('a', [long]446, 'b', [long]445)
+        $edge = Get-OrdinalTable -Pair @('a', [long]446, 'b', [long]445)
 
         $pairs = Get-ParallelDriftExistingEdgePair -Edge @($edge)
 
@@ -177,8 +181,8 @@ Describe 'ParallelDrift.psm1' {
     }
 
     It 'Get-ParallelDriftExistingEdgePair omits an edge with identical endpoints' {
-        $same = New-OrdinalTable -Pair @('a', [long]445, 'b', [long]445)
-        $unreadable = New-OrdinalTable -Pair @('a', 'x', 'b', [long]445)
+        $same = Get-OrdinalTable -Pair @('a', [long]445, 'b', [long]445)
+        $unreadable = Get-OrdinalTable -Pair @('a', 'x', 'b', [long]445)
 
         $pairs = Get-ParallelDriftExistingEdgePair -Edge @($same, $unreadable)
 
@@ -187,9 +191,9 @@ Describe 'ParallelDrift.psm1' {
 
     It 'Get-ParallelDriftItemBand returns null for an unreadable band' {
         # Arrange
-        $banded = New-TestItem -ItemKey 445 -Radius $null
+        $banded = Get-TestItem -ItemKey 445 -Radius $null
         $banded['complexity_band'] = 'C2'
-        $unreadable = New-TestItem -ItemKey 447 -Radius $null
+        $unreadable = Get-TestItem -ItemKey 447 -Radius $null
         $unreadable['complexity_band'] = 'C9'
 
         # Act / Assert
@@ -206,7 +210,7 @@ Describe 'ParallelDrift.psm1' {
 
     It 'Test-ParallelDriftObservedPairEdge fails closed for an unparseable peer radius' {
         $observed = Get-ParallelDriftObservedRadius -ObservedPath @('docs/notes.md') -Config $script:Config -ComputedAt '2026-08-08T10-05'
-        $peer = New-OrdinalTable -Pair @('paths', @('src/app.py'))
+        $peer = Get-OrdinalTable -Pair @('paths', @('src/app.py'))
 
         Test-ParallelDriftObservedPairEdge -ObservedRadius $observed -PeerRadius $peer -Config $script:Config | Should -BeTrue
     }
@@ -214,12 +218,12 @@ Describe 'ParallelDrift.psm1' {
     It 'Test-ParallelDriftObservedPairEdge reports no edge for a disjoint peer radius' {
         $observed = Get-ParallelDriftObservedRadius -ObservedPath @('docs/notes.md') -Config $script:Config -ComputedAt '2026-08-08T10-05'
 
-        Test-ParallelDriftObservedPairEdge -ObservedRadius $observed -PeerRadius (New-TestRadius -Path @('src/app.py')) -Config $script:Config |
+        Test-ParallelDriftObservedPairEdge -ObservedRadius $observed -PeerRadius (Get-TestRadius -Path @('src/app.py')) -Config $script:Config |
             Should -BeFalse
     }
 
     It 'Get-ParallelDriftNewConflictPair skips a peer that is not in flight' {
-        $peer = New-TestItem -ItemKey 445 -Radius (New-TestRadius -Path @('src/app.py')) -State 'withdrawn'
+        $peer = Get-TestItem -ItemKey 445 -Radius (Get-TestRadius -Path @('src/app.py')) -State 'withdrawn'
 
         $pairs = Get-ParallelDriftNewConflictPair -Item @($script:Drifter, $peer) -DriftingItemKey 446 -ObservedPath @('src/app.py') `
             -Edge @() -Config $script:Config -ComputedAt '2026-08-08T10-05'
@@ -228,8 +232,8 @@ Describe 'ParallelDrift.psm1' {
     }
 
     It 'Get-ParallelDriftNewConflictPair skips a pair already recorded as an edge' {
-        $peer = New-TestItem -ItemKey 445 -Radius (New-TestRadius -Path @('src/app.py'))
-        $edge = New-OrdinalTable -Pair @('a', [long]445, 'b', [long]446)
+        $peer = Get-TestItem -ItemKey 445 -Radius (Get-TestRadius -Path @('src/app.py'))
+        $edge = Get-OrdinalTable -Pair @('a', [long]445, 'b', [long]446)
 
         $pairs = Get-ParallelDriftNewConflictPair -Item @($script:Drifter, $peer) -DriftingItemKey 446 -ObservedPath @('src/app.py') `
             -Edge @($edge) -Config $script:Config -ComputedAt '2026-08-08T10-05'
@@ -238,8 +242,8 @@ Describe 'ParallelDrift.psm1' {
     }
 
     It 'Get-ParallelDriftNewConflictPair returns canonical pairs in ascending order' {
-        $low = New-TestItem -ItemKey 445 -Radius (New-TestRadius -Path @('src/app.py'))
-        $high = New-TestItem -ItemKey 447 -Radius (New-TestRadius -Path @('src/app.py'))
+        $low = Get-TestItem -ItemKey 445 -Radius (Get-TestRadius -Path @('src/app.py'))
+        $high = Get-TestItem -ItemKey 447 -Radius (Get-TestRadius -Path @('src/app.py'))
 
         $pairs = Get-ParallelDriftNewConflictPair -Item @($script:Drifter, $high, $low) -DriftingItemKey 446 -ObservedPath @('src/app.py') `
             -Edge @() -Config $script:Config -ComputedAt '2026-08-08T10-05'
@@ -251,7 +255,7 @@ Describe 'ParallelDrift.psm1' {
 
     It 'Get-ParallelDriftResult returns no_escape with null drift_event and observed_radius' {
         # Act
-        $result = Get-ParallelDriftResult -State (New-TestState -Item @($script:Drifter)) -Config $script:Config -ItemKey 446 `
+        $result = Get-ParallelDriftResult -State (Get-TestState -Item @($script:Drifter)) -Config $script:Config -ItemKey 446 `
             -ChangedPath @('scripts/dev_tools/a.py') -At '2026-08-08T10-00' -ComputedAt '2026-08-08T10-05'
 
         # Assert
@@ -263,9 +267,9 @@ Describe 'ParallelDrift.psm1' {
     }
 
     It 'Get-ParallelDriftResult returns no_new_conflict with a raised_blocking_finding event' {
-        $peer = New-TestItem -ItemKey 445 -Radius (New-TestRadius -Path @('src/other.py'))
+        $peer = Get-TestItem -ItemKey 445 -Radius (Get-TestRadius -Path @('src/other.py'))
 
-        $result = Get-ParallelDriftResult -State (New-TestState -Item @($script:Drifter, $peer)) -Config $script:Config -ItemKey 446 `
+        $result = Get-ParallelDriftResult -State (Get-TestState -Item @($script:Drifter, $peer)) -Config $script:Config -ItemKey 446 `
             -ChangedPath @('docs/notes.md') -At '2026-08-08T10-00' -ComputedAt '2026-08-08T10-05'
 
         $result['result'] | Should -BeExactly 'no_new_conflict'
@@ -275,9 +279,9 @@ Describe 'ParallelDrift.psm1' {
     }
 
     It 'Get-ParallelDriftResult returns halt_required with a halted_later_started_item event' {
-        $peer = New-TestItem -ItemKey 445 -Radius (New-TestRadius -Path @('src/app.py'))
+        $peer = Get-TestItem -ItemKey 445 -Radius (Get-TestRadius -Path @('src/app.py'))
 
-        $result = Get-ParallelDriftResult -State (New-TestState -Item @($script:Drifter, $peer)) -Config $script:Config -ItemKey 446 `
+        $result = Get-ParallelDriftResult -State (Get-TestState -Item @($script:Drifter, $peer)) -Config $script:Config -ItemKey 446 `
             -ChangedPath @('src/app.py') -At '2026-08-08T10-00' -ComputedAt '2026-08-08T10-05'
 
         $result['result'] | Should -BeExactly 'halt_required'

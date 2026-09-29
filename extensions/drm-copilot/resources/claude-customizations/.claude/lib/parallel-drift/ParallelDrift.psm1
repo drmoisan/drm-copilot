@@ -180,7 +180,7 @@ function Get-ParallelDriftEscapedPath {
         The declared blast_radius.paths; may be empty, which covers nothing.
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [System.Object[]])]
     param(
         [Parameter(Mandatory = $true)][AllowNull()][AllowEmptyCollection()][object] $ChangedPath,
         [Parameter(Mandatory = $true)][AllowNull()][AllowEmptyCollection()][object] $DeclaredPath

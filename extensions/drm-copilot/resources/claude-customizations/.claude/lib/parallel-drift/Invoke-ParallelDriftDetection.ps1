@@ -109,8 +109,12 @@ function ConvertFrom-ParallelDriftJsonElement {
         arrays, integral numbers become Int64, other numbers Double, and strings
         stay strings unchanged.
     #>
+    # The @{} literal is case-insensitive, and JSON object keys are case-sensitive,
+    # so an object is built as a hashtable with the ordinal comparer. The rule
+    # below flags every case-sensitive hashtable construction.
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseLiteralInitializerForHashtable', '', Justification = 'JSON object keys are case-sensitive; the @{} literal is case-insensitive, so an ordinal-comparer hashtable is required (issue #763, D1).')]
     [CmdletBinding()]
-    [OutputType([object])]
+    [OutputType([hashtable], [System.Object[]], [string], [long], [double], [bool])]
     param([System.Text.Json.JsonElement] $Element)
 
     # Route by JSON kind; the literal kinds (true, false, null) fall through last.
@@ -145,9 +149,11 @@ function ConvertFrom-ParallelDriftJson {
     <#
     .SYNOPSIS
         Parse JSON text with System.Text.Json into PowerShell values.
+    .DESCRIPTION
+        An array root is returned with the unary comma so it is not unrolled.
     #>
     [CmdletBinding()]
-    [OutputType([object])]
+    [OutputType([hashtable], [System.Object[]], [object])]
     param([string] $Text)
 
     $document = [System.Text.Json.JsonDocument]::Parse($Text)

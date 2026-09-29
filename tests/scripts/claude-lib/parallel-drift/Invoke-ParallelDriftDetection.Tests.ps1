@@ -208,14 +208,9 @@ Describe 'Invoke-ParallelDriftDetection.ps1' {
 
     Context 'JSON conversion' {
         It 'sorts object keys ordinally in the emitted JSON' {
-            # Arrange: an ordinal table whose keys differ only by case and order.
-            $inner = [hashtable]::new([System.StringComparer]::Ordinal)
-            $inner['z'] = 1
-            $inner['Y'] = 2
-            $table = [hashtable]::new([System.StringComparer]::Ordinal)
-            $table['b'] = $inner
-            $table['A'] = 2
-            $table['a'] = @('x')
+            # Arrange: an ordinal table, built by the script's own reader, whose keys
+            # differ only by case and order.
+            $table = ConvertFrom-ParallelDriftJson -Text '{"b": {"z": 1, "Y": 2}, "A": 2, "a": ["x"]}'
 
             # Act
             $root = ConvertFrom-EmittedJson -Text (ConvertTo-ParallelDriftJson -Value $table)
@@ -253,10 +248,7 @@ Describe 'Invoke-ParallelDriftDetection.ps1' {
         }
 
         It 'emits floats, booleans, and nulls as JSON values' {
-            $table = [hashtable]::new([System.StringComparer]::Ordinal)
-            $table['f'] = 1.5
-            $table['t'] = $true
-            $table['n'] = $null
+            $table = @{ f = 1.5; t = $true; n = $null }
 
             $root = ConvertFrom-EmittedJson -Text (ConvertTo-ParallelDriftJson -Value $table)
 

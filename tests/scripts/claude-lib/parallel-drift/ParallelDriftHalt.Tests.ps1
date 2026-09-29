@@ -18,16 +18,16 @@ BeforeAll {
     Import-Module $modulePath -Force -ErrorAction Stop
 
     # Build one start marker in the shape the selection functions read.
-    function New-TestStart {
+    function Get-TestStart {
         param([long] $ItemKey, [AllowNull()][object] $WorktreeCreatedAt)
         return @{ ItemKey = $ItemKey; WorktreeCreatedAt = $WorktreeCreatedAt }
     }
 
-    # Build one checkpoint item record carrying an optional start timestamp.
-    function New-TestItem {
+    # Build one checkpoint item record carrying an optional start timestamp. The
+    # keys are fixed lowercase names, so the literal's case-insensitivity is inert.
+    function Get-TestItem {
         param([long] $ItemKey, [AllowNull()][object] $WorktreeCreatedAt)
-        $record = [hashtable]::new([System.StringComparer]::Ordinal)
-        $record['issue_num'] = $ItemKey
+        $record = @{ issue_num = $ItemKey }
         if ($null -ne $WorktreeCreatedAt) { $record['worktree_created_at'] = $WorktreeCreatedAt }
         return $record
     }
@@ -124,8 +124,8 @@ Describe 'ParallelDriftHalt.psm1' {
 
     It 'Get-ParallelDriftStartRank ranks an unknown start above a timestamped start' {
         # Act
-        $known = Get-ParallelDriftStartRank -Start (New-TestStart -ItemKey 445 -WorktreeCreatedAt '2026-08-08T08-00')
-        $unknown = Get-ParallelDriftStartRank -Start (New-TestStart -ItemKey 446 -WorktreeCreatedAt $null)
+        $known = Get-ParallelDriftStartRank -Start (Get-TestStart -ItemKey 445 -WorktreeCreatedAt '2026-08-08T08-00')
+        $unknown = Get-ParallelDriftStartRank -Start (Get-TestStart -ItemKey 446 -WorktreeCreatedAt $null)
 
         # Assert
         $known.Unknown | Should -Be 0
@@ -134,14 +134,14 @@ Describe 'ParallelDriftHalt.psm1' {
     }
 
     It 'Get-ParallelDriftStartRank rejects a non-string start timestamp' {
-        { Get-ParallelDriftStartRank -Start (New-TestStart -ItemKey 445 -WorktreeCreatedAt 5) } |
+        { Get-ParallelDriftStartRank -Start (Get-TestStart -ItemKey 445 -WorktreeCreatedAt 5) } |
             Should -Throw '*worktree_created_at must be a string or None*'
     }
 
     It 'Select-ParallelDriftHaltedItem halts the later timestamp' {
         # Arrange
-        $earlier = New-TestStart -ItemKey 447 -WorktreeCreatedAt '2026-08-08T08-00'
-        $later = New-TestStart -ItemKey 445 -WorktreeCreatedAt '2026-08-08T09-00'
+        $earlier = Get-TestStart -ItemKey 447 -WorktreeCreatedAt '2026-08-08T08-00'
+        $later = Get-TestStart -ItemKey 445 -WorktreeCreatedAt '2026-08-08T09-00'
 
         # Act / Assert: argument order does not change the verdict.
         Select-ParallelDriftHaltedItem -First $earlier -Second $later | Should -Be 445
@@ -149,35 +149,35 @@ Describe 'ParallelDriftHalt.psm1' {
     }
 
     It 'Select-ParallelDriftHaltedItem halts the larger key on equal timestamps' {
-        $first = New-TestStart -ItemKey 445 -WorktreeCreatedAt '2026-08-08T08-00'
-        $second = New-TestStart -ItemKey 447 -WorktreeCreatedAt '2026-08-08T08-00'
+        $first = Get-TestStart -ItemKey 445 -WorktreeCreatedAt '2026-08-08T08-00'
+        $second = Get-TestStart -ItemKey 447 -WorktreeCreatedAt '2026-08-08T08-00'
 
         Select-ParallelDriftHaltedItem -First $first -Second $second | Should -Be 447
     }
 
     It 'Select-ParallelDriftHaltedItem halts the item whose start is unknown' {
-        $known = New-TestStart -ItemKey 447 -WorktreeCreatedAt '2026-08-08T09-00'
-        $unknown = New-TestStart -ItemKey 445 -WorktreeCreatedAt '  '
+        $known = Get-TestStart -ItemKey 447 -WorktreeCreatedAt '2026-08-08T09-00'
+        $unknown = Get-TestStart -ItemKey 445 -WorktreeCreatedAt '  '
 
         Select-ParallelDriftHaltedItem -First $known -Second $unknown | Should -Be 445
     }
 
     It 'Select-ParallelDriftHaltedItem halts the larger key when both starts are unknown' {
-        $first = New-TestStart -ItemKey 447 -WorktreeCreatedAt $null
-        $second = New-TestStart -ItemKey 445 -WorktreeCreatedAt $null
+        $first = Get-TestStart -ItemKey 447 -WorktreeCreatedAt $null
+        $second = Get-TestStart -ItemKey 445 -WorktreeCreatedAt $null
 
         Select-ParallelDriftHaltedItem -First $first -Second $second | Should -Be 447
     }
 
     It 'Select-ParallelDriftHaltedItem rejects a pair that names one item twice' {
-        $start = New-TestStart -ItemKey 445 -WorktreeCreatedAt $null
+        $start = Get-TestStart -ItemKey 445 -WorktreeCreatedAt $null
 
         { Select-ParallelDriftHaltedItem -First $start -Second $start } | Should -Throw '*names one item twice*'
     }
 
     It 'Get-ParallelDriftHaltedItemKey never returns the drifting key' {
         # Arrange: the drifter started later than its peer.
-        $items = @((New-TestItem -ItemKey 446 -WorktreeCreatedAt '2026-08-08T09-30'), (New-TestItem -ItemKey 445 -WorktreeCreatedAt '2026-08-08T08-00'))
+        $items = @((Get-TestItem -ItemKey 446 -WorktreeCreatedAt '2026-08-08T09-30'), (Get-TestItem -ItemKey 445 -WorktreeCreatedAt '2026-08-08T08-00'))
 
         # Act
         $halted = Get-ParallelDriftHaltedItemKey -Item $items -Pair @(, [long[]]@(445, 446)) -DriftingItemKey 446
@@ -189,7 +189,7 @@ Describe 'ParallelDriftHalt.psm1' {
 
     It 'Get-ParallelDriftHaltedItemKey returns deduplicated ascending keys' {
         # Arrange: item 447 is the halted member of two pairs.
-        $items = @((New-TestItem -ItemKey 446 -WorktreeCreatedAt $null), (New-TestItem -ItemKey 447 -WorktreeCreatedAt $null), (New-TestItem -ItemKey 445 -WorktreeCreatedAt $null))
+        $items = @((Get-TestItem -ItemKey 446 -WorktreeCreatedAt $null), (Get-TestItem -ItemKey 447 -WorktreeCreatedAt $null), (Get-TestItem -ItemKey 445 -WorktreeCreatedAt $null))
         $pairs = @([long[]]@(446, 447), [long[]]@(445, 447), [long[]]@(445, 446))
 
         # Act
@@ -211,7 +211,7 @@ Describe 'ParallelDriftHalt.psm1' {
 
     It 'Get-ParallelDriftHaltedItemKey applies the comparator when the drifting key is in neither member' {
         # Arrange
-        $items = @((New-TestItem -ItemKey 445 -WorktreeCreatedAt '2026-08-08T09-00'), (New-TestItem -ItemKey 447 -WorktreeCreatedAt '2026-08-08T08-00'))
+        $items = @((Get-TestItem -ItemKey 445 -WorktreeCreatedAt '2026-08-08T09-00'), (Get-TestItem -ItemKey 447 -WorktreeCreatedAt '2026-08-08T08-00'))
 
         # Act
         $halted = Get-ParallelDriftHaltedItemKey -Item $items -Pair @(, [long[]]@(445, 447)) -DriftingItemKey 446
