@@ -23,7 +23,7 @@ features:
     feature_folder: 2026-09-29-validate-orchestrator-state-cli-entry-point-464
     depends_on: []
   - issue_num: 509
-    feature_folder: 2026-09-29-promotion-gate-lacks-preexisting-issue-branch-509
+    feature_folder: 2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509
     depends_on: [405]
   - issue_num: 523
     feature_folder: 2026-09-29-blocked-reason-premise-falsified-halt-523
