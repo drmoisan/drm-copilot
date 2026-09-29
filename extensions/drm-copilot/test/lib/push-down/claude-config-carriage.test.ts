@@ -18,6 +18,7 @@ import {
   CLOCK,
   DEST,
   layoutLister,
+  OVERLAY_TEXT,
   publish,
   REPO_ROOT,
   seedTree,
@@ -457,5 +458,29 @@ describe("issue #462 AC16: a payload-only publish clears all four blockers", () 
     ]) {
       expect(seeded.isFile(`${DEST}/${relative}`)).toBe(true);
     }
+  });
+});
+
+describe("issue #508 AC08 AC12 the destination overlay survives two pushes", () => {
+  it("writes byte-identical output on two pushes and never writes the overlay", () => {
+    // Arrange: the overlay is destination-owned and absent from the source.
+    const overlayPath = `${DEST}/config/blast-radius.local.json`;
+    const seeded = seedTree({ [overlayPath]: OVERLAY_TEXT });
+    const target = `${DEST}/config/blast-radius.json`;
+
+    // Act
+    publish(seeded, null, layoutLister(SRC_APP_LAYOUT));
+    const first = seeded.readTextFile(target);
+    publish(seeded, null, layoutLister(SRC_APP_LAYOUT));
+    const second = seeded.readTextFile(target);
+
+    // Assert
+    expect(second).toBe(first);
+    for (const text of [first, second]) {
+      expect(text).toContain('"Directory.Build.props"');
+      expect(text).toContain('"destination-app"');
+    }
+    expect(seeded.readTextFile(overlayPath)).toBe(OVERLAY_TEXT);
+    expect(seeded.writtenPaths).not.toContain(overlayPath);
   });
 });
