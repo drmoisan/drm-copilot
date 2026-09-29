@@ -58,7 +58,7 @@
 
 .EXAMPLE
     gh pr checks --required --json bucket,name,state,link,workflow |
-        ./scripts/orchestration/Invoke-CiGateParser.ps1 -HeadSha $sha
+        ./.claude/lib/ci-gate/Invoke-CiGateParser.ps1 -HeadSha $sha
 
 .OUTPUTS
     A PSCustomObject (or JSON string when -AsJson is set) with properties

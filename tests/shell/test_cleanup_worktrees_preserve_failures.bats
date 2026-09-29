@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 # Failure-path unit tests for the preserve-file consolidation function group defined by
-# scripts/bash/cleanup_worktrees_preserve_lib.sh.
+# .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh.
 #
 # Why a third suite file. tests/shell/test_cleanup_worktrees_preserve.bats stands at 471
 # of the 500-line cap and tests/shell/test_cleanup_worktrees_preserve_eol.bats carries the
@@ -22,11 +22,11 @@
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
-    ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
-    LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
-    ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
-    EOLLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_preserve_eol_lib.sh"
-    PLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_preserve_lib.sh"
+    ELIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
+    LIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh"
+    ALIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh"
+    EOLLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_eol_lib.sh"
+    PLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     JQSTUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/preserve/stub-bin/jq"
     PRES="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/preserve"

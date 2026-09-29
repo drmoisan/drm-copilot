@@ -39,7 +39,7 @@
 # bats suites can stub the scan deterministically via CLEANUP_WT_SCAN_BIN, mirroring
 # the CLEANUP_WT_GIT_BIN seam in cleanup_worktrees_enumerate_lib.sh. Unlike that seam,
 # the fallback target is the bundled real implementation
-# scripts/bash/cleanup_worktrees_scan_helper.sh rather than a PATH lookup, because no
+# .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh rather than a PATH lookup, because no
 # single standard system binary emits the combined
 # `path|has_gitfile|gitdir_target_exists|size` tuple these records need.
 

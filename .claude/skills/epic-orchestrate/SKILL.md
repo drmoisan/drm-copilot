@@ -106,7 +106,7 @@ function of the DAG.
    `epic-orchestrator` drives a final PR merging `epic/<epic-slug>-integration` into `main`,
    delegating PR authoring to `Agent(pr-author)` and refreshing context via
    `mcp__drm-copilot__collect_pr_context`. `epic-orchestrator` runs the same S9 CI-green
-   procedure (`scripts/orchestration/Invoke-CiGateParser.ps1`) directly against this PR, records
+   procedure (`pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1`) directly against this PR, records
    the result under the epic checkpoint's `epic_merge_pr` object, then executes
    `gh pr merge --merge` once green, gated by `enforce-epic-merge-gate.ps1`.
 

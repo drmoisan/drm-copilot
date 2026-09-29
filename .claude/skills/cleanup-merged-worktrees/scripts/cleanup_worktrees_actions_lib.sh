@@ -7,9 +7,9 @@
 # worktree removal, branch deletion) plus the apply-mode driver.
 #
 # Sourcing contract: this library depends on functions defined in
-# scripts/bash/cleanup_worktrees_lib.sh (cleanup_wt_git, parse_worktree_list,
+# .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh (cleanup_wt_git, parse_worktree_list,
 # classify_ancestry, classify_branch, run_report). The wrapper
-# scripts/bash/cleanup-worktrees.sh sources that library first; the bats suites do
+# .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh sources that library first; the bats suites do
 # the same. This file defines functions only and runs nothing at source time.
 # git commands that legitimately return non-zero (cherry-pick on conflict, worktree
 # remove on a dirty tree, merge-base --is-ancestor) are captured with `|| rc=$?` so
@@ -36,7 +36,7 @@
 #
 # Opt-in disposable-dirt clearing hook: when CLEANUP_WT_CLEAR_DISPOSABLE is 1,
 # delete_candidate answers a BLOCKED-DIRTY removal by calling clear_disposable_dirt
-# (scripts/bash/cleanup_worktrees_dirt_lib.sh), then re-verifying delete eligibility in
+# (.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh), then re-verifying delete eligibility in
 # process, then retrying the SAME unforced removal. remove_worktree_safe is unmodified
 # by that hook: it gains no force flag, no new argument, and no new call site, so the
 # never-force-remove invariant holds on every path. The hook is off by default, runs in
@@ -328,7 +328,7 @@ delete_candidate() {
 	#   0. refuse the base branch CLEANUP_WT_BASE_BRANCH: emit
 	#      ACTION|delete|<name>|BLOCKED-PROTECTED-BASE and return 1 before any other
 	#      step runs. The constant is defined in
-	#      scripts/bash/cleanup_worktrees_enumerate_lib.sh, which every caller sources
+	#      .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh, which every caller sources
 	#      first.
 	#   1. reverify_delete_eligible (same-process ancestry/equivalence re-check),
 	#   2. remove_worktree_safe (only when the candidate has a worktree),

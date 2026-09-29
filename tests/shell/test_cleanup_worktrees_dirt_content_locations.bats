@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 # Content-location accounting gate for the dirt classifier in
-# scripts/bash/cleanup_worktrees_dirt_lib.sh (issue #632).
+# .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh (issue #632).
 #
 # SUBJECT. The missing-comparison defect family: R1, N1 and N3. All three are the same
 # defect in different places — a rung resolves a disposable verdict from a probe that
@@ -50,9 +50,9 @@
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
-    ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
-    LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
-    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
+    ELIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
+    LIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh"
+    DIRTLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
     WT="/repo-wt/dirt"

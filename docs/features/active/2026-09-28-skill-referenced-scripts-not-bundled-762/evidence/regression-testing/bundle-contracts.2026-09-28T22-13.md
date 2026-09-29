@@ -1,0 +1,30 @@
+# Bundle Contract Tests (P4-T8)
+
+Timestamp: 2026-09-28T22-13
+Command: poetry run pytest -v tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_poshqc_bundled_parity.py
+EXIT_CODE: 1
+ExpectedExitCode: 1
+Output Summary: `1 failed, 16 passed in 0.22s`. Every node other than `test_bundled_claude_payload_contains_all_repo_runtime_contracts` PASSED, including the pack-manifest completeness nodes and the PoshQC bundled parity node (runsettings mirror).
+KL-510: STATE-ONLY
+- Assertion message (verbatim): `AssertionError: Repo file missing from bundle: .claude\state\current-session-id`
+- The path's first two components are `.claude` and `state`; no output line contains "Bundle content differs from repo for:".
+
+```text
+test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_required_runtime_files PASSED
+test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts FAILED
+test_push_down_claude_resource_contracts.py::test_planner_review_resources_exist_and_are_byte_identical PASSED
+test_push_down_claude_resource_contracts.py::test_handoff_runtime_has_bundle_pack_and_effective_install_parity PASSED
+test_push_down_claude_resource_contracts.py::test_pack_manifests_are_outside_the_parity_scope PASSED
+test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_excludes_settings_local_json PASSED
+test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_excludes_variant_subtree_from_parity PASSED
+test_push_down_claude_resource_contracts.py::test_variant_subtree_is_bundle_only_and_non_colliding PASSED
+test_push_down_claude_resource_contracts.py::test_bundled_agent_memory_scopes_are_well_formed PASSED
+test_push_down_claude_resource_contracts.py::test_claude_legacy_variant_files_contain_corrected_gate_commands PASSED
+test_push_down_claude_resource_contracts.py::test_claude_legacy_variant_files_exclude_stale_gate_commands PASSED
+test_push_down_claude_resource_contracts.py::test_claude_modern_csharp_profile_retains_modern_gate_commands PASSED
+test_push_down_claude_resource_contracts.py::test_claude_consumer_uses_published_typescript_handoff_authority PASSED
+test_push_down_claude_resource_contracts.py::test_claude_orchestrate_requires_independent_expected_context PASSED
+test_push_down_claude_pack_manifest_completeness.py::test_bundled_claude_files_are_listed_in_some_pack_manifest PASSED
+test_push_down_claude_pack_manifest_completeness.py::test_documented_exceptions_remain_absent_from_every_manifest PASSED
+test_poshqc_bundled_parity.py::test_poshqc_bundled_module_files_match_repo_root_sources PASSED
+```

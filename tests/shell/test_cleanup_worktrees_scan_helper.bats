@@ -1,5 +1,5 @@
 #!/usr/bin/env bats
-# Filesystem-scan unit tests for scripts/bash/cleanup_worktrees_scan_helper.sh, the
+# Filesystem-scan unit tests for .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh, the
 # bundled real implementation behind the CLEANUP_WT_SCAN_BIN seam. The helper is driven
 # against the checked-in fixture tree under
 # tests/fixtures/cleanup_worktrees/scan_roots/basic/, which carries one directory per
@@ -14,7 +14,7 @@
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
-    HELPER="${REPO_ROOT}/scripts/bash/cleanup_worktrees_scan_helper.sh"
+    HELPER="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh"
     ROOTS="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scan_roots/basic"
     # Checked-in scripts may lose the executable bit on some platforms; make runnable.
     chmod +x "${HELPER}" 2>/dev/null || true

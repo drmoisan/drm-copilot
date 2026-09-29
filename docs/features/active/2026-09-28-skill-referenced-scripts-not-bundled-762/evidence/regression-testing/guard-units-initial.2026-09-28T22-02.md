@@ -1,0 +1,43 @@
+# Guard Unit Tests, Initial Run (P1-T5)
+
+Timestamp: 2026-09-28T22-02
+Command: poetry run pytest -v tests/scripts/dev_tools/test_skill_bundle_contract.py tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py
+EXIT_CODE: 0
+Output Summary: `33 passed in 0.11s`; no FAILED line. All 18 B2 test names (21 nodes with parametrization) and all 12 B3 test names PASSED.
+
+```text
+test_skill_bundle_contract.py::test_parse_allowed_tools_returns_list_entries PASSED
+test_skill_bundle_contract.py::test_parse_allowed_tools_returns_empty_without_frontmatter PASSED
+test_skill_bundle_contract.py::test_parse_allowed_tools_raises_on_unterminated_frontmatter PASSED
+test_skill_bundle_contract.py::test_parse_allowed_tools_ignores_unparseable_description PASSED
+test_skill_bundle_contract.py::test_parse_allowed_tools_splits_scalar_string_value PASSED
+test_skill_bundle_contract.py::test_extract_reads_bash_allowed_tools_pattern PASSED
+test_skill_bundle_contract.py::test_extract_reads_bash_sh_and_source_forms[bash] PASSED
+test_skill_bundle_contract.py::test_extract_reads_bash_sh_and_source_forms[sh] PASSED
+test_skill_bundle_contract.py::test_extract_reads_bash_sh_and_source_forms[source] PASSED
+test_skill_bundle_contract.py::test_extract_reads_pwsh_file_form PASSED
+test_skill_bundle_contract.py::test_extract_reads_call_operator_and_dot_source_forms[&] PASSED
+test_skill_bundle_contract.py::test_extract_reads_call_operator_and_dot_source_forms[.] PASSED
+test_skill_bundle_contract.py::test_extract_reads_import_module_path_form PASSED
+test_skill_bundle_contract.py::test_extract_reads_import_module_join_path_form PASSED
+test_skill_bundle_contract.py::test_extract_reads_python_path_form PASSED
+test_skill_bundle_contract.py::test_extract_resolves_python_module_form PASSED
+test_skill_bundle_contract.py::test_extract_normalizes_leading_dot_slash PASSED
+test_skill_bundle_contract.py::test_extract_ignores_placeholder_paths PASSED
+test_skill_bundle_contract.py::test_extract_ignores_glob_paths PASSED
+test_skill_bundle_contract.py::test_extract_ignores_backticked_citation_without_invocation PASSED
+test_skill_bundle_contract.py::test_extract_deduplicates_and_sorts_references PASSED
+test_skill_bundle_contract_evaluation.py::test_evaluate_reports_missing_file PASSED
+test_skill_bundle_contract_evaluation.py::test_evaluate_reports_not_in_bundle_for_unpublished_root PASSED
+test_skill_bundle_contract_evaluation.py::test_evaluate_reports_not_in_bundle_when_bundle_lacks_file PASSED
+test_skill_bundle_contract_evaluation.py::test_evaluate_reports_not_in_skill_pack_for_pack_specific_skill PASSED
+test_skill_bundle_contract_evaluation.py::test_evaluate_accepts_reference_listed_in_core PASSED
+test_skill_bundle_contract_evaluation.py::test_evaluate_accepts_reference_listed_in_every_skill_pack PASSED
+test_skill_bundle_contract_evaluation.py::test_evaluate_accepts_script_outside_skill_folder_when_bundled PASSED
+test_skill_bundle_contract_evaluation.py::test_evaluate_reports_skill_folder_file_missing_from_packs PASSED
+test_skill_bundle_contract_evaluation.py::test_find_violations_suppresses_known_exceptions PASSED
+test_skill_bundle_contract_evaluation.py::test_find_stale_exceptions_reports_unmatched_exception PASSED
+test_skill_bundle_contract_evaluation.py::test_find_stale_exceptions_returns_empty_when_all_match PASSED
+test_skill_bundle_contract_evaluation.py::test_known_unbundled_references_cite_issue_763 PASSED
+============================= 33 passed in 0.11s ==============================
+```

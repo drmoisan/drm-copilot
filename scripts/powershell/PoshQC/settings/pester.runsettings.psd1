@@ -317,6 +317,11 @@
             # Issue #663 added the epic-scope resolver and its pure readiness predicates.
             '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'
             '.claude/lib/worktree-resolution/EpicScopeReadiness.psm1'
+            # Issue #762 relocated the CI gate parser into the bundled .claude/lib tree so
+            # push-down carries it with the orchestrate and epic-orchestrate skills.
+            # CodeCoverage.Path is an explicit per-file allow-list, so the relocated production
+            # file is registered here to stay in the coverage denominator.
+            '.claude/lib/ci-gate/Invoke-CiGateParser.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

@@ -2,7 +2,7 @@
 # Line-ending unit tests for the preserve-file consolidation function group, split out of
 # tests/shell/test_cleanup_worktrees_preserve.bats to keep every file within the 500-line
 # cap. The split is pre-authorized by the specification's placement decision. This file
-# holds the tests for scripts/bash/cleanup_worktrees_preserve_eol_lib.sh: line-ending
+# holds the tests for .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_eol_lib.sh: line-ending
 # re-derivation, the index append terminator, the unterminated final line, the mixed
 # ending refusal, and the advisory mismatch signal.
 #
@@ -13,12 +13,12 @@
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
-    ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
-    LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
-    ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
-    EOLLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_preserve_eol_lib.sh"
-    PLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_preserve_lib.sh"
-    WRAP="${REPO_ROOT}/scripts/bash/cleanup-worktrees.sh"
+    ELIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
+    LIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh"
+    ALIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh"
+    EOLLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_eol_lib.sh"
+    PLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh"
+    WRAP="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     JQSTUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/preserve/stub-bin/jq"
     PRES="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/preserve"
