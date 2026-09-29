@@ -33,9 +33,10 @@ features:
 
 Epic issue: #770.
 
-> **Manifest status.** The child issue numbers are the existing GitHub issues. The
-> `feature_folder` values are the target basenames given to each preparation child and are
-> back-filled from each child's `new_active_feature_folder` receipt as preparation completes.
+> **Manifest status.** Resolved. The child issue numbers are the existing GitHub issues. The
+> `feature_folder` values were back-filled on 2026-09-29 from each prepared child's active folder
+> at fan-in. #507 and #508 reuse folders dated 2026-08-22, and #763 reuses a folder dated
+> 2026-09-28.
 
 ## Goal
 
