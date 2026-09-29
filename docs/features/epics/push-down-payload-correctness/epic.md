@@ -19,7 +19,7 @@ features:
     feature_folder: 2026-08-22-push-down-root-folders-divergence-507
     depends_on: []
   - issue_num: 763
-    feature_folder: 2026-09-29-parallel-skills-invoke-unbundled-python-clis-763
+    feature_folder: 2026-09-28-parallel-skills-invoke-unbundled-python-clis-763
     depends_on: []
   - issue_num: 508
     feature_folder: 2026-09-29-blast-radius-config-has-no-merge-decorator-508
