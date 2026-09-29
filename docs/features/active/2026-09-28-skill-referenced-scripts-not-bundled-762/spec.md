@@ -104,13 +104,13 @@ Guard runs in well under one second.
 - Toolchain: shell (shfmt -> shellcheck -> bats+kcov), PowerShell (PoshQC format -> analyze -> test), Python (black -> ruff -> pyright -> pytest with coverage).
 
 ## Acceptance Criteria
-- [ ] AC1: The audit table covering every skill is recorded in the research artifact.
-- [ ] AC2: `cleanup-merged-worktrees` invokes only scripts that are in its bundle (relocated under `.claude/skills/cleanup-merged-worktrees/scripts/`, mirrored, listed in `core.json`), and the skill text and `allowed-tools` name the bundled paths.
-- [ ] AC3: `orchestrate` and `epic-orchestrate` reference `.claude/lib/ci-gate/Invoke-CiGateParser.ps1`, which is mirrored and listed in `core.json`.
-- [ ] AC4: No remaining caller in the repository (skills, hooks, tests, CI, config, rules) points at the old script paths, excluding historical feature records.
-- [ ] AC5: Shell QC discovers, lints, tests, and measures coverage for bash scripts under `.claude/skills/`.
-- [ ] AC6: A CI-run guard fails when a skill references a script not in its bundle, does not fail because a script lives outside the skill folder, and checks every file in a skill folder is carried by the skill's packs.
-- [ ] AC7: The two unfixable Python CLI references are registered as issue-linked exceptions (#763) and the guard fails if an exception becomes stale.
+- [x] AC1: The audit table covering every skill is recorded in the research artifact.
+- [x] AC2: `cleanup-merged-worktrees` invokes only scripts that are in its bundle (relocated under `.claude/skills/cleanup-merged-worktrees/scripts/`, mirrored, listed in `core.json`), and the skill text and `allowed-tools` name the bundled paths.
+- [x] AC3: `orchestrate` and `epic-orchestrate` reference `.claude/lib/ci-gate/Invoke-CiGateParser.ps1`, which is mirrored and listed in `core.json`.
+- [x] AC4: No remaining caller in the repository (skills, hooks, tests, CI, config, rules) points at the old script paths, excluding historical feature records.
+- [x] AC5: Shell QC discovers, lints, tests, and measures coverage for bash scripts under `.claude/skills/`.
+- [x] AC6: A CI-run guard fails when a skill references a script not in its bundle, does not fail because a script lives outside the skill folder, and checks every file in a skill folder is carried by the skill's packs.
+- [x] AC7: The two unfixable Python CLI references are registered as issue-linked exceptions (#763) and the guard fails if an exception becomes stale.
 - [ ] AC8: Full toolchain passes for bash, PowerShell, and Python with coverage thresholds met.
 
 ## Risks & Mitigations

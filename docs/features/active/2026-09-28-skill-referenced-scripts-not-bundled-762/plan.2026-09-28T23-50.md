@@ -619,7 +619,7 @@ script A6 and a before-and-after hash comparison (A5).
       Write FEATURE/evidence/regression-testing/bundle-contracts.TS.md. Acceptance: every node other than
       `test_bundled_claude_payload_contains_all_repo_runtime_contracts` is PASSED, and that node satisfies
       KL-510 (the artifact carries the KL-510 line and, for case (b), `ExpectedExitCode: 1`).
-- [ ] [P4-T9] Commit and push Phase 4 (`extensions/drm-copilot/resources/claude-customizations`).
+- [x] [P4-T9] Commit and push Phase 4 (`extensions/drm-copilot/resources/claude-customizations`).
       Commands: CMD-GIT-ADD with `extensions/drm-copilot/resources/claude-customizations FEATURE/evidence FEATURE/plan.2026-09-28T23-50.md`,
       CMD-GIT-COMMIT with message "fix(762): mirror relocated scripts into the Claude bundle and core manifest",
       CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing after the commit, and the push exits 0.
@@ -766,7 +766,7 @@ script A6 and a before-and-after hash comparison (A5).
       Write FEATURE/evidence/qa-gates/ts-push-down-jest.TS.md. Acceptance: every `FAIL ` line is a member
       of the P0-T20 baseline failure set and the "Tests:" line records no more failed tests than the
       baseline.
-- [ ] [P10-T2] Commit and push any remaining changes: CMD-GIT-STATUS, then CMD-GIT-ADD with
+- [x] [P10-T2] Commit and push any remaining changes: CMD-GIT-STATUS, then CMD-GIT-ADD with
       `FEATURE/evidence FEATURE/plan.2026-09-28T23-50.md` plus every path that CMD-GIT-STATUS listed
       (fixes made by Phase 7-9 loop restarts), CMD-GIT-COMMIT with message
       "docs(762): record final QA evidence", CMD-GIT-PUSH; then CMD-GIT-HEAD. Acceptance:
@@ -776,23 +776,23 @@ script A6 and a before-and-after hash comparison (A5).
       CMD-CI-WAIT with FINAL_SHA (run in the background), then CMD-GH-RUNS-FOR-SHA with FINAL_SHA. Append
       to FEATURE/evidence/qa-gates/ci-dispatch.TS.md. Acceptance: exactly one run with event
       `workflow_dispatch` exists for FINAL_SHA, its status is `completed`, and its conclusion is `success`.
-- [ ] [P10-T4] Record the CI jobs from `.github/workflows/_shell-coverage.yml`, `.github/workflows/_poshqc.yml`, and `.github/workflows/_quality-checks.yml`.
+- [x] [P10-T4] Record the CI jobs from `.github/workflows/_shell-coverage.yml`, `.github/workflows/_poshqc.yml`, and `.github/workflows/_quality-checks.yml`.
       Command: CMD-GH-JOBS with the P10-T3 run id. Write FEATURE/evidence/qa-gates/ci-jobs.TS.md.
       Acceptance: the jobs named "Shell Coverage (Bats + kcov)" and "PowerShell QC", and the job defined by
       `_quality-checks.yml` (which runs pytest over `tests/`, including the guard), each have conclusion
       `success`.
-- [ ] [P10-T5] Bash coverage from CI (`.github/workflows/_shell-coverage.yml`), written to FEATURE/evidence/qa-gates/shell-coverage-ci.TS.md.
+- [x] [P10-T5] Bash coverage from CI (`.github/workflows/_shell-coverage.yml`), written to FEATURE/evidence/qa-gates/shell-coverage-ci.TS.md.
       Command: CMD-CI-SHELL-COV with the P10-T3 run id. Acceptance: the output contains exactly one line
       of the form `Bash coverage (lines): <n>%`, and n is at least 85.0 and at least the P0-T19 baseline
       value.
-- [ ] [P10-T6] Bash per-file coverage from CI for `.claude/skills/cleanup-merged-worktrees/scripts`, written to FEATURE/evidence/qa-gates/shell-coverage-files.TS.md.
+- [x] [P10-T6] Bash per-file coverage from CI for `.claude/skills/cleanup-merged-worktrees/scripts`, written to FEATURE/evidence/qa-gates/shell-coverage-files.TS.md.
       Commands: CMD-GH-DOWNLOAD with the P10-T3 run id into `SCRATCH/shell-cov-final`, then CMD-PY-SCRIPT
       with script cobertura-files (A17) and arguments `SCRATCH/shell-cov-final/cov.xml` SHELLLIB followed
       by the ten `.claude/skills/cleanup-merged-worktrees/scripts/` paths. Acceptance: no `MISSING` line
       (each of the ten skill scripts is measured under its new path, which is the AC5 coverage
       observation), and each file's `line-rate` is not lower than its P0-T19 baseline `line-rate` at the
       old path.
-- [ ] [P10-T7] Coverage comparison: write FEATURE/evidence/qa-gates/coverage-comparison.TS.md from the
+- [x] [P10-T7] Coverage comparison: write FEATURE/evidence/qa-gates/coverage-comparison.TS.md from the
       artifacts of P0-T14, P0-T17, P0-T19, P8-T3, P9-T4, P9-T5, P10-T5, and P10-T6. Acceptance: the
       artifact carries, for bash, PowerShell, and Python, the fields `Baseline Coverage:`,
       `Post-Change Coverage:`, `New/Changed-code Coverage:`, and `Disposition:` with numeric values
@@ -804,25 +804,25 @@ script A6 and a before-and-after hash comparison (A5).
 
 ### Phase 11 — Final QA Confirmation and Acceptance-Criteria Check-Off
 
-- [ ] [P11-T1] Re-run the guard tests in `tests/scripts/dev_tools/test_skill_bundle_contract*.py` as the closing test gate.
+- [x] [P11-T1] Re-run the guard tests in `tests/scripts/dev_tools/test_skill_bundle_contract*.py` as the closing test gate.
       Command: CMD-PY-TEST over `tests/scripts/dev_tools/test_skill_bundle_contract.py tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py tests/scripts/dev_tools/test_skill_bundle_contract_cli.py tests/scripts/dev_tools/test_skill_bundle_contract_repo.py`.
       Write FEATURE/evidence/qa-gates/guard-final.TS.md. Acceptance: exit 0 and no FAILED line.
-- [ ] [P11-T2] Check off AC1 in `FEATURE/spec.md` (the box becomes lowercase x). Acceptance: the
+- [x] [P11-T2] Check off AC1 in `FEATURE/spec.md` (the box becomes lowercase x). Acceptance: the
       P6-T5 artifact exists with `AUDIT skills=56 missing=0`; the check-off is recorded in
       FEATURE/evidence/other/ac-checkoff.TS.md with that artifact cited.
-- [ ] [P11-T3] Check off AC2 in `FEATURE/spec.md`. Acceptance: the P1-T11 (fail-before), P2-T13, P4-T1,
+- [x] [P11-T3] Check off AC2 in `FEATURE/spec.md`. Acceptance: the P1-T11 (fail-before), P2-T13, P4-T1,
       P4-T2, P4-T5, and P6-T1 artifacts exist with passing acceptance; cited in the ac-checkoff artifact.
-- [ ] [P11-T4] Check off AC3 in `FEATURE/spec.md`. Acceptance: the P1-T11 (fail-before), P1-T19
+- [x] [P11-T4] Check off AC3 in `FEATURE/spec.md`. Acceptance: the P1-T11 (fail-before), P1-T19
       (fail-before), P3-T10, P4-T4, P4-T7, and P6-T1 artifacts exist with passing acceptance; cited in the
       ac-checkoff artifact.
-- [ ] [P11-T5] Check off AC4 in `FEATURE/spec.md`. Acceptance: the P6-T3 and P6-T4 artifacts exist with
+- [x] [P11-T5] Check off AC4 in `FEATURE/spec.md`. Acceptance: the P6-T3 and P6-T4 artifacts exist with
       passing acceptance; cited in the ac-checkoff artifact.
-- [ ] [P11-T6] Check off AC5 in `FEATURE/spec.md`. Acceptance: the P1-T16 (fail-before), P5-T3, P5-T4,
+- [x] [P11-T6] Check off AC5 in `FEATURE/spec.md`. Acceptance: the P1-T16 (fail-before), P5-T3, P5-T4,
       P7-T2, and P10-T6 artifacts exist with passing acceptance; cited in the ac-checkoff artifact.
-- [ ] [P11-T7] Check off AC6 in `FEATURE/spec.md`. Acceptance: the P1-T5, P1-T11 (fail-before), P6-T1,
+- [x] [P11-T7] Check off AC6 in `FEATURE/spec.md`. Acceptance: the P1-T5, P1-T11 (fail-before), P6-T1,
       and P10-T4 artifacts exist with passing acceptance (P10-T4 shows the guard runs in the CI Python
       stage); cited in the ac-checkoff artifact.
-- [ ] [P11-T8] Check off AC7 in `FEATURE/spec.md`. Acceptance: the P1-T5 artifact shows
+- [x] [P11-T8] Check off AC7 in `FEATURE/spec.md`. Acceptance: the P1-T5 artifact shows
       `test_find_stale_exceptions_reports_unmatched_exception` and
       `test_known_unbundled_references_cite_issue_763` PASSED, and the P6-T1 artifact shows
       `test_known_unbundled_references_are_not_stale` PASSED; cited in the ac-checkoff artifact.
@@ -830,7 +830,7 @@ script A6 and a before-and-after hash comparison (A5).
       exists with passing acceptance and the P10-T7 `Disposition:` is `PASS`; cited in the ac-checkoff
       artifact. If the disposition is `BLOCKED`, AC8 stays unchecked and the plan outcome is
       remediation-required.
-- [ ] [P11-T10] Commit and push the check-off in `FEATURE/spec.md`: CMD-GIT-ADD with `FEATURE/spec.md FEATURE/evidence FEATURE/plan.2026-09-28T23-50.md`,
+- [x] [P11-T10] Commit and push the check-off in `FEATURE/spec.md`: CMD-GIT-ADD with `FEATURE/spec.md FEATURE/evidence FEATURE/plan.2026-09-28T23-50.md`,
       CMD-GIT-COMMIT with message "docs(762): check off acceptance criteria", CMD-GIT-PUSH. Acceptance:
       CMD-GIT-STATUS prints nothing and the push exits 0.
 
