@@ -162,10 +162,59 @@ items:
       contracts: []
       source: "declared"
       computed_at: "2026-09-29T19:30:16Z"
+  - issue_num: 527
+    feature_folder: "docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/hooks/check-powershell-test-purity.ps1"
+        - ".claude/hooks/enforce-powershell-batch-budget.ps1"
+        - ".claude/settings.json"
+        - "config/poshqc-coverage.json"
+        - "config/poshqc-scan.json"
+        - "docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527/**"
+        - "docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527/plan.2026-09-29T15-32.md"
+        - "docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527/spec.md"
+        - "docs/features/completed/2026-06-16-bump-and-publish-task-191/evidence/baseline/poshqc-test.md"
+        - "docs/features/epics/worktree-scoped-state-resolution/epic.md"
+        - "docs/features/potential/2026-08-19-mcp-poshqc-test-ignores-repo-runsettings-coverage.md"
+        - "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Coverage.psm1"
+        - "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1"
+        - "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psd1"
+        - "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psm1"
+        - "extensions/drm-copilot/resources/powershell/PoshQC/README.md"
+        - "extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1"
+        - "extensions/drm-copilot/src/poshqc-scan-config.ts"
+        - "scripts/powershell/PoshQC/PoshQC.Coverage.psm1"
+        - "scripts/powershell/PoshQC/PoshQC.Testing.psm1"
+        - "scripts/powershell/PoshQC/PoshQC.Testing.psm1,scripts/powershell/PoshQC/PoshQC.psm1,tests/scripts/powershell/PoshQC/PoshQC.Comprehensive.Tests.ps1,tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1,tests/scripts/powershell/PoshQC/PoshQC.ScanFolders.Tests.ps1,tests/scripts/powershell/PoshQC/PoshQC.TestingInvokeSummary.Tests.ps1"
+        - "scripts/powershell/PoshQC/PoshQC.psd1"
+        - "scripts/powershell/PoshQC/PoshQC.psm1"
+        - "scripts/powershell/PoshQC/README.md"
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+        - "tests/fixtures/poshqc-consumer/.claude/hooks/validate-bash.ps1"
+        - "tests/fixtures/poshqc-consumer/artifacts/pester/powershell-coverage.xml"
+        - "tests/fixtures/poshqc-consumer/tests/scripts/Sample.Tests.ps1"
+        - "tests/scripts/dev_tools/test_poshqc_bundled_parity.py"
+        - "tests/scripts/powershell/PoshQC/PoshQC.Comprehensive.Tests.ps1"
+        - "tests/scripts/powershell/PoshQC/PoshQC.Coverage.Tests.ps1"
+        - "tests/scripts/powershell/PoshQC/PoshQC.CoverageConfig.Tests.ps1"
+        - "tests/scripts/powershell/PoshQC/PoshQC.TestingInvokeSummary.Tests.ps1"
+      modules:
+        - "config"
+        - "poshqc"
+      shared_surfaces:
+        - ".claude/settings.json"
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+      contracts:
+        - "CodeCoverage.Path"
+      source: "declared"
+      computed_at: "2026-09-29T21:13:40Z"
 ---
 
 # Parallel Run: bug-burndown-2026-09-29
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 4 of 22. Pending: 527, 532, 543, 609, 623, 645, 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
+Prepared: 5 of 22. Pending: 532, 543, 609, 623, 645, 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
