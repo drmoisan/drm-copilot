@@ -253,6 +253,11 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #508: the blast-radius overlay; the map has no `global` key.
+    "./src/lib/push-down/claude-blast-radius-overlay.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #697: the Codex/agents publisher gained the virtual resource-pair
     // map. This map carries no `global` key, so the file is gated only by its
     // own entry here.

@@ -248,7 +248,7 @@ The repository can publish each scoped customization tree into another workspace
 |---|---|---|---|
 | Copilot (`.github`) | `poetry run python -m scripts.dev_tools.push_down_copilot_customizations --destination <root>` | `pushDownCopilotCustomizations` | `push_down_copilot_customizations` |
 | Codex + agents (`.codex`, `.agents`) | `poetry run python -m scripts.dev_tools.push_down_codex_and_agents_customizations --destination <root>` | `pushDownCodexAndAgentsCustomizations` | `push_down_codex_and_agents_customizations` |
-| Claude Code (`.claude`, `CLAUDE.md`) | bundled publisher | `pushDownClaudeCustomizations` | `push_down_claude_customizations` |
+| Claude Code (`.claude`, `config/`, `CLAUDE.md`) | bundled publisher | `pushDownClaudeCustomizations` | `push_down_claude_customizations` |
 
 During Copilot publication, supported script references are rewritten to stable live VS Code command references contributed by the extension. The Claude push-down tool accepts optional `packs` (language pack selection; `core` is always included), a `csharp_variant` (`modern` default or `legacy`), and a `memory_mode` (`overwrite` default, `merge`, or `skip`).
 
