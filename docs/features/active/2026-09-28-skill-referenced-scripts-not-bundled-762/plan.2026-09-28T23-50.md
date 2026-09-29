@@ -581,40 +581,40 @@ script A6 and a before-and-after hash comparison (A5).
       Command: CMD-PS-SCRIPT with script pester-counts (A2) and that path. Write
       FEATURE/evidence/regression-testing/ci-gate-parser-after-move.TS.md. Acceptance: `PassedCount=15`
       and `FailedCount=0`.
-- [ ] [P3-T11] Commit and push Phase 3 (`.claude/lib/ci-gate` and the files below).
+- [x] [P3-T11] Commit and push Phase 3 (`.claude/lib/ci-gate` and the files below).
       Commands: CMD-GIT-ADD with `.claude/lib/ci-gate scripts/orchestration tests/scripts/orchestration tests/scripts/claude-lib/ci-gate scripts/powershell/PoshQC/settings/pester.runsettings.psd1 extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1 .claude/skills/orchestrate/SKILL.md .claude/skills/epic-orchestrate/SKILL.md FEATURE/evidence FEATURE/plan.2026-09-28T23-50.md`,
       CMD-GIT-COMMIT with message "fix(762): relocate the CI gate parser into the bundled .claude/lib tree",
       CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing after the commit, and the push exits 0.
 
 ### Phase 4 — Bundle Mirror and Core Manifest (AC2, AC3)
 
-- [ ] [P4-T1] Mirror the ten scripts: `mkdir -p extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts`,
+- [x] [P4-T1] Mirror the ten scripts: `mkdir -p extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts`,
       then `cp .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_detached_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_eol_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/`.
       Acceptance: CMD-PS-SCRIPT with script file-hashes over the ten primaries and the ten mirrors prints
       ten equal pairs.
-- [ ] [P4-T2] Mirror `.claude/skills/cleanup-merged-worktrees/SKILL.md` into BUNDLE.
+- [x] [P4-T2] Mirror `.claude/skills/cleanup-merged-worktrees/SKILL.md` into BUNDLE.
       Command: `cp .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`.
       Acceptance: CMD-PS-SCRIPT with script file-hashes over the pair prints equal hashes.
-- [ ] [P4-T3] Mirror the two orchestration skill texts: `cp .claude/skills/orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md`
+- [x] [P4-T3] Mirror the two orchestration skill texts: `cp .claude/skills/orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md`
       and `cp .claude/skills/epic-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md`.
       Acceptance: CMD-PS-SCRIPT with script file-hashes over the two pairs prints two equal pairs.
-- [ ] [P4-T4] Mirror the parser: `mkdir -p extensions/drm-copilot/resources/claude-customizations/.claude/lib/ci-gate`,
+- [x] [P4-T4] Mirror the parser: `mkdir -p extensions/drm-copilot/resources/claude-customizations/.claude/lib/ci-gate`,
       then `cp .claude/lib/ci-gate/Invoke-CiGateParser.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/lib/ci-gate/Invoke-CiGateParser.ps1`.
       Acceptance: CMD-PS-SCRIPT with script file-hashes over the pair prints equal hashes.
-- [ ] [P4-T5] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`:
+- [x] [P4-T5] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`:
       insert the ten lines of Appendix B14 immediately after line 76 (the cleanup skill's `SKILL.md`
       entry). Acceptance: CMD-GIT-COUNT with literal `.claude/skills/cleanup-merged-worktrees/scripts/`
       over that file prints a count of 10.
-- [ ] [P4-T6] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`:
+- [x] [P4-T6] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`:
       insert the line `    ".claude/lib/ci-gate/Invoke-CiGateParser.ps1",` immediately after the
       `Resolve-MergeableConflict.ps1` entry (line 149 before P4-T5; line 159 after it). Acceptance:
       CMD-GIT-COUNT with literal `.claude/lib/ci-gate/Invoke-CiGateParser.ps1` over that file prints a
       count of 1, and CMD-PS-SCRIPT with script json-parse (A16) over the file prints `JSON-OK`.
-- [ ] [P4-T7] Run `tests/scripts/claude-lib/ci-gate/CiGate.Manifest.Tests.ps1` after the fix.
+- [x] [P4-T7] Run `tests/scripts/claude-lib/ci-gate/CiGate.Manifest.Tests.ps1` after the fix.
       Command: CMD-PS-SCRIPT with script pester-counts (A2) and that path. Write
       FEATURE/evidence/regression-testing/ci-gate-manifest-after-fix.TS.md. Acceptance: `TotalCount=2`,
       `PassedCount=2`, `FailedCount=0`.
-- [ ] [P4-T8] Run the bundle contract tests in `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` and two siblings.
+- [x] [P4-T8] Run the bundle contract tests in `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` and two siblings.
       Command: CMD-PY-TEST over `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_poshqc_bundled_parity.py`.
       Write FEATURE/evidence/regression-testing/bundle-contracts.TS.md. Acceptance: every node other than
       `test_bundled_claude_payload_contains_all_repo_runtime_contracts` is PASSED, and that node satisfies

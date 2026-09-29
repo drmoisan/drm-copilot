@@ -6,7 +6,7 @@ allowed-tools:
   - Grep
   - Glob
   - Agent
-  - "Bash(bash scripts/bash/cleanup-worktrees.sh *)"
+  - "Bash(bash .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh *)"
   - "Bash(git fetch *)"
   - "Bash(git merge-base *)"
   - "Bash(git push *)"
@@ -27,9 +27,9 @@ allowed-tools:
 
 Drive the end-to-end cleanup of stale git worktrees and branches after their work has
 merged into `main`. The deterministic classification, consolidation staging, and
-deletion mechanics live in `scripts/bash/cleanup-worktrees.sh` (wrapping
-`scripts/bash/cleanup_worktrees_lib.sh` and
-`scripts/bash/cleanup_worktrees_actions_lib.sh`). This skill owns the editorial and
+deletion mechanics live in `.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh` (wrapping
+`.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh` and
+`.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh`). This skill owns the editorial and
 orchestration layer: deciding whether flagged unique content is genuinely
 documentation/memory material, driving consolidation onto a single
 `documentationandmemories` branch, delegating PR creation to `Agent(pr-author)`, and
@@ -145,7 +145,7 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
 
 ## End-to-End Workflow
 
-1. **Detect and report (dry run).** Run `bash scripts/bash/cleanup-worktrees.sh`
+1. **Detect and report (dry run).** Run `bash .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`
    (report mode is the default and mutates nothing). It verifies local `main` against
    `origin/main` (emitting `WARN|main-divergence` on drift), enumerates branches and
    worktrees, and prints one `BRANCH|` line per branch plus `COMMIT|...|UNIQUE|...`
@@ -203,7 +203,7 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
    consolidated commit is now reachable from `main`; that is the only state that unlocks
    deletion of branches whose unique content was consolidated.
 
-6. **Run the apply-mode deletion.** Run `bash scripts/bash/cleanup-worktrees.sh --apply`.
+6. **Run the apply-mode deletion.** Run `bash .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh --apply`.
    It re-verifies each candidate's ancestry/equivalence in-process, removes worktrees
    (without force; a dirty worktree is reported via `DIRTY|` lines and skipped), then
    deletes branches with `git branch -D`. The now-merged `documentationandmemories`
@@ -241,7 +241,7 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
 
 When report mode classifies every candidate as `MERGED_CLEAN` or `MERGED_EQUIVALENT`
 with an empty cherry-pick-candidate list, skip steps 3-5 entirely: proceed directly from
-the report to `bash scripts/bash/cleanup-worktrees.sh --apply`. Cleanup completes in a
+the report to `bash .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh --apply`. Cleanup completes in a
 single session with no PR.
 
 ## Dirty Worktree Triage Procedure
@@ -464,7 +464,7 @@ These records serve the consolidation consumer and are never read by either gate
       "branch_state": "HAS_UNIQUE_RESIDUALS",
       "removal_disposition": "SAFE_TO_DELETE",
       "verdict": "ALREADY_SOLVED_ELSEWHERE",
-      "evidence": "Unique residual commit 3f9a1c2 records the cleanup-worktrees ancestry error; main already fixes it at scripts/bash/cleanup_worktrees_lib.sh:214-231 under issue #612."
+      "evidence": "Unique residual commit 3f9a1c2 records the cleanup-worktrees ancestry error; main already fixes it at .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh:214-231 under issue #612."
     }
   ],
   "preserved_files": [
