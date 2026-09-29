@@ -7,6 +7,7 @@ layout is described by an injected lister; no test touches the real filesystem.
 from __future__ import annotations
 
 import ast
+import importlib
 import json
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -37,9 +38,16 @@ from tests.scripts.dev_tools.push_down_customizations_test_support import (
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from scripts.dev_tools.push_down_claude_blast_radius_derive import DirectoryEntry
+    from scripts.dev_tools.push_down_claude_blast_radius_derive import (
+        DirectoryEntry,
+        DirectoryLister,
+    )
+    from scripts.dev_tools.push_down_copilot_customizations_filesystem import (
+        PushDownFileSystem,
+    )
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+CUSTOMIZATIONS_SOURCE = "scripts/dev_tools/push_down_claude_customizations.py"
 WRITES_SOURCE = REPO_ROOT / "scripts/dev_tools/push_down_claude_destination_writes.py"
 DEST = Path("/dest")
 ROUTING = DEST / "config" / "orchestration-routing.json"
@@ -348,3 +356,52 @@ def test_module_docstring_names_downstream_seams() -> None:
         "or duplicate them.",
     ):
         assert sentence in normalized, sentence
+
+
+def test_push_down_customizations_obtains_decorators_only_through_stack(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The entry point assembles its write decorators only through the stack."""
+
+    customizations = importlib.import_module(
+        "scripts.dev_tools.push_down_claude_customizations"
+    )
+    calls: list[Path] = []
+
+    def recording_stack(
+        inner: PushDownFileSystem,
+        *,
+        destination_root: Path,
+        lister: DirectoryLister,
+    ) -> PushDownFileSystem:
+        calls.append(destination_root)
+        return build_destination_write_stack(
+            inner, destination_root=destination_root, lister=lister
+        )
+
+    monkeypatch.setattr(
+        customizations, "build_destination_write_stack", recording_stack
+    )
+    fs = RecordingFileSystem(
+        files={Path("/repo/.claude/settings.json"): MemoryFile("{}\n")}
+    )
+    fs.directories.update({Path("/repo"), DEST})
+
+    customizations.push_down_customizations(
+        repo_root=Path("/repo"),
+        destination_root=DEST,
+        fs=fs,
+        source_root=Path("/repo"),
+        artifact_root=DEST,
+        list_entries=_empty_lister,
+    )
+
+    source = (REPO_ROOT / CUSTOMIZATIONS_SOURCE).read_text(encoding="utf-8")
+    names = {
+        node.id if isinstance(node, ast.Name) else node.name
+        for node in ast.walk(ast.parse(source))
+        if isinstance(node, (ast.Name, ast.alias))
+    }
+    assert calls == [DEST]
+    assert "DestinationMergeFileSystem" not in names
+    assert "BlastRadiusDeriveFileSystem" not in names
