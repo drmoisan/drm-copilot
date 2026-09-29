@@ -261,7 +261,7 @@ Seeded from issue (resolution):
 - [x] AC22: The full toolchain passes in a single pass: `poetry run black --check .`, `poetry run ruff check .`, `poetry run pyright`, `poetry run pytest`, and, for the new Jest case, Prettier check, ESLint, `tsc --noEmit`, and Jest in `extensions/drm-copilot`, with results recorded under `evidence/qa-gates/` in the feature folder.
 - [x] AC23: `README.md` (near line 251) describes the Claude payload as including `config/`, and the module docstrings and CLI help in `push_down_claude_customizations.py` no longer describe the payload as the `.claude` tree only, verified by `rg -n "config" README.md scripts/dev_tools/push_down_claude_customizations.py`.
 - [x] AC24: The Rollout & Follow-up section of this spec records two follow-up candidates, each with a problem statement and an evidence citation: (a) the Python `.gitignore` managed-block merge and (b) the Python CLI publishing gitignored `.claude` subtrees from a main checkout. Filing them as issues is performed by the epic orchestration session through the MCP promotion path and is not an execution task of this plan.
-- [ ] AC25: The PR description references #507 and #764 (part 2) and states that #764 part 1 is out of scope.
+- [x] AC25: The PR description references #507 and #764 (part 2) and states that #764 part 1 is out of scope.
 
 ## Risks & Mitigations
 

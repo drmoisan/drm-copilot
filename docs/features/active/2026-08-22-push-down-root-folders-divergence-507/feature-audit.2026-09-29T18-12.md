@@ -78,3 +78,22 @@
 - Checked off (delivered): 24
 - Remaining (unchecked): 1
 - Items remaining: AC25 - The PR description references #507 and #764 (part 2) and states that #764 part 1 is out of scope.
+
+## Addendum 2026-09-29: AC25 Verification (PR #777)
+
+- AC25 verdict: **PASS**.
+- Evidence source: PR #777 (head `bug/push-down-root-folders-divergence-exec-507`), body at `artifacts/pr_body_507.md` (receipt `artifacts/pr_body_507.receipt.json`). The live PR body was read with `gh pr view 777 --json body` and matched the `#764 part 1` and `Refs #507` text.
+- Relevant body lines:
+  - "This PR delivers #764 part 2 (Python/TypeScript push-down `ROOT_FOLDERS` parity, including `config/`), which was consolidated into #507. #764 part 1 (the missing `scripts/feature-review/Test-ModifiedWorkflowNeedsGreenRun.ps1` cited by the feature-review skill) is out of scope for this PR and remains tracked by #764."
+  - "Refs #507"
+  - "Refs #764"
+  - "#764 part 1 (the missing `Test-ModifiedWorkflowNeedsGreenRun.ps1`) remains open under #764."
+- Criterion mapping: references #507 (yes); references #764 part 2 (yes); states #764 part 1 is out of scope (yes).
+- Check-off: AC25 changed from `- [ ]` to `- [x]` in `spec.md`.
+
+### Acceptance Criteria Status (updated)
+
+- Source: `docs/features/active/2026-08-22-push-down-root-folders-divergence-507/spec.md`
+- Total AC items: 25
+- Checked off (delivered): 25
+- Remaining (unchecked): 0
