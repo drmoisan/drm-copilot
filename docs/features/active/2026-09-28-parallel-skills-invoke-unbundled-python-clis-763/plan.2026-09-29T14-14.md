@@ -545,7 +545,7 @@ Each item was observed in this repository's recorded runs or read from source, n
       harness interpreter could not be started or could not open a fixture path, record the line
       `LOCAL-PARITY: ENVIRONMENT-BLOCKED` with the verbatim error output; the authoritative bash parity
       result is then P11-T3. Any other combination of `not ok` lines stops the task.
-- [ ] [P2-T16] Commit and push Phase 2 (`.claude/lib/bash/abandon-parallel-item.sh` and the files below).
+- [x] [P2-T16] Commit and push Phase 2 (`.claude/lib/bash/abandon-parallel-item.sh` and the files below).
       Commands: CMD-GIT-ADD with `BASHLIB/abandon-parallel-item.sh tests/fixtures/parallel_abandon tests/fixtures/parallel_abandon_path tests/fixtures/parallel_abandon_path_git_only tests/shell/parallel_abandon.bats tests/shell/parallel_abandon_parity.bats tests/scripts/dev_tools/test_parallel_abandon_bash_parity.py docs/features/active/2026-09-28-parallel-skills-invoke-unbundled-python-clis-763`,
       CMD-GIT-LS-EOL over `BASHLIB/abandon-parallel-item.sh tests/shell/parallel_abandon.bats tests/shell/parallel_abandon_parity.bats tests/fixtures/parallel_abandon`,
       CMD-GIT-COMMIT with message "fix(763): port the parallel abandon disposition to a bundled shell entry point",
@@ -556,14 +556,14 @@ Each item was observed in this repository's recorded runs or read from source, n
 
 ### Phase 3 — Drift Detection PowerShell Port (AC1, AC2, AC3)
 
-- [ ] [P3-T1] Write the committed real-seam fixtures `tests/fixtures/parallel_drift_cli/checkpoint.json` and `tests/fixtures/parallel_drift_cli/config.json` per Appendix B11.
+- [x] [P3-T1] Write the committed real-seam fixtures `tests/fixtures/parallel_drift_cli/checkpoint.json` and `tests/fixtures/parallel_drift_cli/config.json` per Appendix B11.
       Command: CMD-PY-SCRIPT with script json-parse (A11) and arguments
       `tests/fixtures/parallel_drift_cli/checkpoint.json tests/fixtures/parallel_drift_cli/config.json`.
       Acceptance: exit 0 and two `JSON-OK file=` lines.
-- [ ] [P3-T2] Write the 18 drift corpus fixture inputs `tests/fixtures/parallel_drift/*.json` per Appendix C1 (schema in B12; success fixtures carry no `expected` key yet).
+- [x] [P3-T2] Write the 18 drift corpus fixture inputs `tests/fixtures/parallel_drift/*.json` per Appendix C1 (schema in B12; success fixtures carry no `expected` key yet).
       Command: CMD-PY-SCRIPT with script json-parse (A11) and argument `tests/fixtures/parallel_drift/*.json`.
       Acceptance: exit 0 and exactly 18 `JSON-OK file=` lines, one per C1 name.
-- [ ] [P3-T3] Fill the expected payloads of `tests/fixtures/parallel_drift/*.json` from the Python reference.
+- [x] [P3-T3] Fill the expected payloads of `tests/fixtures/parallel_drift/*.json` from the Python reference.
       Command: CMD-PY-SCRIPT with script drift-expected (A18). Write
       FEATURE/evidence/other/drift-corpus-generation.TS.md. Acceptance: exit 0; 15 `GENERATED name=`
       lines and 3 `ERROR-FIXTURE name=` lines, one per C1 name; no `MISMATCH` and no `MISSING-FIXTURE`
@@ -572,29 +572,29 @@ Each item was observed in this repository's recorded runs or read from source, n
       and with the invariants of spec "Boundaries and invariants to preserve", and writes a fixture only
       when all of them hold, so the committed expectations are pinned by the plan and not by the
       reference alone.
-- [ ] [P3-T4] Reset the Python batch budget before writing `tests/scripts/dev_tools/test_parallel_drift_parity.py`: CMD-PS with script reset-batch-budget (A8) and `-Kind python`.
+- [x] [P3-T4] Reset the Python batch budget before writing `tests/scripts/dev_tools/test_parallel_drift_parity.py`: CMD-PS with script reset-batch-budget (A8) and `-Kind python`.
       Write FEATURE/evidence/other/batch-budget-reset-p3a.TS.md. Acceptance: exit 0 and a
       `RESET removed=` line.
-- [ ] [P3-T5] Write `tests/scripts/dev_tools/test_parallel_drift_parity.py` per Appendix B13 (Python reference lane).
+- [x] [P3-T5] Write `tests/scripts/dev_tools/test_parallel_drift_parity.py` per Appendix B13 (Python reference lane).
       Acceptance: CMD-GREP-COUNT with literal `def test_reference_matches_fixture_payload` over that
       file prints 1.
-- [ ] [P3-T6] Run the Python drift lane `tests/scripts/dev_tools/test_parallel_drift_parity.py`.
+- [x] [P3-T6] Run the Python drift lane `tests/scripts/dev_tools/test_parallel_drift_parity.py`.
       Command: CMD-PY-TEST over that file. Write
       FEATURE/evidence/regression-testing/drift-python-lane.TS.md. Acceptance: exit 0, no FAILED line,
       `test_drift_corpus_meets_floor` and `test_drift_corpus_covers_every_named_case` PASSED, 15
       `test_reference_matches_fixture_payload[...]` nodes and 3 `test_reference_reports_fixture_error[...]`
       nodes PASSED, one per C1 name.
-- [ ] [P3-T7] Reset the PowerShell batch budget before writing tests under `tests/scripts/claude-lib/parallel-drift`: CMD-PS with script reset-batch-budget (A8) and `-Kind powershell`.
+- [x] [P3-T7] Reset the PowerShell batch budget before writing tests under `tests/scripts/claude-lib/parallel-drift`: CMD-PS with script reset-batch-budget (A8) and `-Kind powershell`.
       Write FEATURE/evidence/other/batch-budget-reset-p3b.TS.md. Acceptance: exit 0 and a
       `RESET removed=` line.
-- [ ] [P3-T8] Write `tests/scripts/claude-lib/parallel-drift/ParallelDriftHalt.Tests.ps1` per Appendix B14.
+- [x] [P3-T8] Write `tests/scripts/claude-lib/parallel-drift/ParallelDriftHalt.Tests.ps1` per Appendix B14.
       Acceptance: CMD-GREP-COUNT with literal `Describe 'ParallelDriftHalt.psm1'` over that file prints 1.
-- [ ] [P3-T9] Write `tests/scripts/claude-lib/parallel-drift/ParallelDrift.Tests.ps1` per Appendix B15.
+- [x] [P3-T9] Write `tests/scripts/claude-lib/parallel-drift/ParallelDrift.Tests.ps1` per Appendix B15.
       Acceptance: CMD-GREP-COUNT with literal `Describe 'ParallelDrift.psm1'` over that file prints 1.
-- [ ] [P3-T10] Write `tests/scripts/claude-lib/parallel-drift/ParallelDrift.Manifest.Tests.ps1` per Appendix B16.
+- [x] [P3-T10] Write `tests/scripts/claude-lib/parallel-drift/ParallelDrift.Manifest.Tests.ps1` per Appendix B16.
       Acceptance: CMD-GREP-COUNT with literal `Describe 'Parallel-drift core.json manifest membership'`
       over that file prints 1.
-- [ ] [P3-T11] [expect-fail] Run the three suites in `tests/scripts/claude-lib/parallel-drift` before the modules exist.
+- [x] [P3-T11] [expect-fail] Run the three suites in `tests/scripts/claude-lib/parallel-drift` before the modules exist.
       Commands: CMD-PESTER with `tests/scripts/claude-lib/parallel-drift`, then CMD-JUNIT with suffixes
       `parallel-drift/ParallelDriftHalt.Tests.ps1`, `parallel-drift/ParallelDrift.Tests.ps1`, and
       `parallel-drift/ParallelDrift.Manifest.Tests.ps1`. Write
@@ -602,15 +602,15 @@ Each item was observed in this repository's recorded runs or read from source, n
       is not 0; each of the three `JUNIT file=` lines shows `Total=` at least 1 and `Passed=0` (no
       `MISSING` line). The artifact carries `ExpectedExitCode:` set to the observed non-zero EXIT_CODE
       once this JUnit pattern is confirmed; an EXIT_CODE of 0 stops the task.
-- [ ] [P3-T12] Write `.claude/lib/parallel-drift/ParallelDriftHalt.psm1` per Appendix B17.
+- [x] [P3-T12] Write `.claude/lib/parallel-drift/ParallelDriftHalt.psm1` per Appendix B17.
       Acceptance: CMD-GREP-COUNT with literal `function Get-ParallelDriftHaltedItemKey` over that file
       prints 1, and CMD-GREP-COUNT with literal `imports its siblings with -ErrorAction Stop` over that
       file prints 1.
-- [ ] [P3-T13] Write `.claude/lib/parallel-drift/ParallelDrift.psm1` per Appendix B18.
+- [x] [P3-T13] Write `.claude/lib/parallel-drift/ParallelDrift.psm1` per Appendix B18.
       Acceptance: CMD-GREP-COUNT with literal `function Get-ParallelDriftResult` over that file prints 1,
       CMD-GREP-COUNT with literal `../blast-radius/BlastRadius.psm1` prints at least 1, and
       CMD-GREP-COUNT with literal `imports its siblings with -ErrorAction Stop` over that file prints 1.
-- [ ] [P3-T14] Run the three suites in `tests/scripts/claude-lib/parallel-drift` with the two modules present.
+- [x] [P3-T14] Run the three suites in `tests/scripts/claude-lib/parallel-drift` with the two modules present.
       Commands: CMD-PESTER with `tests/scripts/claude-lib/parallel-drift`, then CMD-JUNIT with the three
       P3-T11 suffixes. Write FEATURE/evidence/regression-testing/drift-modules-after.TS.md. Acceptance:
       the Halt and Drift suites each show `Failed=0` and every It name listed in B14 and B15 appears on a
@@ -618,27 +618,27 @@ Each item was observed in this repository's recorded runs or read from source, n
       discovery test passes, because the manifest entries and bundle copies land in Phase 5). The
       artifact carries `ExpectedExitCode:` set to the observed non-zero EXIT_CODE once the Manifest
       suite shows `Passed=1` and `Failed=4` and every other suite shows `Failed=0`.
-- [ ] [P3-T15] Reset the PowerShell batch budget before writing `.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1` and its tests: CMD-PS with script reset-batch-budget (A8) and `-Kind powershell`.
+- [x] [P3-T15] Reset the PowerShell batch budget before writing `.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1` and its tests: CMD-PS with script reset-batch-budget (A8) and `-Kind powershell`.
       Write FEATURE/evidence/other/batch-budget-reset-p3c.TS.md. Acceptance: exit 0 and a
       `RESET removed=` line.
-- [ ] [P3-T16] Write `tests/scripts/claude-lib/parallel-drift/Invoke-ParallelDriftDetection.Tests.ps1` per Appendix B19.
+- [x] [P3-T16] Write `tests/scripts/claude-lib/parallel-drift/Invoke-ParallelDriftDetection.Tests.ps1` per Appendix B19.
       Acceptance: CMD-GREP-COUNT with literal `Describe 'Invoke-ParallelDriftDetection.ps1'` over that file prints 1.
-- [ ] [P3-T17] Write `tests/scripts/claude-lib/parallel-drift/ParallelDrift.Parity.Tests.ps1` per Appendix B20.
+- [x] [P3-T17] Write `tests/scripts/claude-lib/parallel-drift/ParallelDrift.Parity.Tests.ps1` per Appendix B20.
       Acceptance: CMD-GREP-COUNT with literal `Describe 'Parallel drift parity corpus'` over that file prints 1.
-- [ ] [P3-T18] [expect-fail] Run the entry-script and parity suites in `tests/scripts/claude-lib/parallel-drift` before the entry script exists.
+- [x] [P3-T18] [expect-fail] Run the entry-script and parity suites in `tests/scripts/claude-lib/parallel-drift` before the entry script exists.
       Commands: CMD-PESTER with `tests/scripts/claude-lib/parallel-drift`, then CMD-JUNIT with suffixes
       `parallel-drift/Invoke-ParallelDriftDetection.Tests.ps1` and `parallel-drift/ParallelDrift.Parity.Tests.ps1`.
       Write FEATURE/evidence/regression-testing/drift-entry-before.TS.md. Acceptance: the Pester
       EXIT_CODE is not 0; both `JUNIT file=` lines show `Total=` at least 1 and `Passed=0`. The artifact
       carries `ExpectedExitCode:` set to the observed non-zero EXIT_CODE once this pattern is confirmed.
-- [ ] [P3-T19] Write `.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1` per Appendix B21.
+- [x] [P3-T19] Write `.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1` per Appendix B21.
       Acceptance: CMD-GREP-COUNT with literal `function Invoke-ParallelDriftCli` over that file prints 1,
       and CMD-GREP-COUNT with literal `[CmdletBinding(PositionalBinding = $false)]` over it prints 1.
       The absence of `Mandatory` parameters is asserted by the B19 test 'declares no Mandatory
       parameter' in P3-T20 (an AST check, so comment text cannot satisfy or defeat it), and positional
       binding to ChangedPath only is asserted by the B19 test 'binds positional arguments only to
       ChangedPath' in P3-T20 and by command (g) of P3-T21.
-- [ ] [P3-T20] Run the five suites in `tests/scripts/claude-lib/parallel-drift` with the entry script present.
+- [x] [P3-T20] Run the five suites in `tests/scripts/claude-lib/parallel-drift` with the entry script present.
       Commands: CMD-PESTER with `tests/scripts/claude-lib/parallel-drift`, then CMD-JUNIT with the five
       suffixes of P3-T11 and P3-T18. Write FEATURE/evidence/regression-testing/drift-entry-after.TS.md.
       Acceptance: the Halt, Drift, Invoke, and Parity suites each show `Failed=0`; every It name listed
@@ -646,7 +646,7 @@ Each item was observed in this repository's recorded runs or read from source, n
       `reproduces drift fixture <name>` cases, one per C1 name; the Manifest suite shows `Passed=1` and
       `Failed=4`. The artifact carries `ExpectedExitCode:` set to the observed non-zero EXIT_CODE once
       the Manifest suite shows `Passed=1` and `Failed=4` and every other suite shows `Failed=0`.
-- [ ] [P3-T21] Observe the process-level contract of `.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1` and of the Python CLI on the committed fixtures, written to FEATURE/evidence/regression-testing/drift-process-smoke.TS.md.
+- [x] [P3-T21] Observe the process-level contract of `.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1` and of the Python CLI on the committed fixtures, written to FEATURE/evidence/regression-testing/drift-process-smoke.TS.md.
       Commands (each recorded with its exit code, stdout, and stderr):
       (a) `sh SCRATCH/run-ps.sh .claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1`;
       (b) `sh SCRATCH/run-ps.sh .claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1 -ItemKey 446 -Bogus value`;
@@ -669,7 +669,7 @@ Each item was observed in this repository's recorded runs or read from source, n
       `escaped_paths` is `[]`, and whose `drift_event` is `null`; command (h) passes no changed path,
       so it observes the B21 normalization of an omitted ChangedPath (which `pwsh -File` leaves
       `$null`) to an empty list at the process level.
-- [ ] [P3-T22] Check the 500-line limit for `.claude/lib/parallel-drift` and `tests/scripts/claude-lib/parallel-drift`, written to FEATURE/evidence/qa-gates/drift-line-counts.TS.md.
+- [x] [P3-T22] Check the 500-line limit for `.claude/lib/parallel-drift` and `tests/scripts/claude-lib/parallel-drift`, written to FEATURE/evidence/qa-gates/drift-line-counts.TS.md.
       Command: CMD-SH with script line-counts (A22) over `.claude/lib/parallel-drift/*` and
       `tests/scripts/claude-lib/parallel-drift/*`. Acceptance: eight `LineCount=` lines, each at most 500.
 - [ ] [P3-T23] Commit and push Phase 3 (`.claude/lib/parallel-drift` and the files below).
