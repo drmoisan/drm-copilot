@@ -180,21 +180,22 @@ items:
         - "docs/features/epics/worktree-scoped-state-resolution/epic.md"
         - "docs/features/potential/2026-08-19-mcp-poshqc-test-ignores-repo-runsettings-coverage.md"
         - "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Coverage.psm1"
-        - "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1"
         - "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psd1"
         - "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psm1"
+        - "extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1"
         - "extensions/drm-copilot/resources/powershell/PoshQC/README.md"
         - "extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1"
         - "extensions/drm-copilot/src/poshqc-scan-config.ts"
         - "scripts/powershell/PoshQC/PoshQC.Coverage.psm1"
-        - "scripts/powershell/PoshQC/PoshQC.Testing.psm1"
-        - "scripts/powershell/PoshQC/PoshQC.Testing.psm1,scripts/powershell/PoshQC/PoshQC.psm1,tests/scripts/powershell/PoshQC/PoshQC.Comprehensive.Tests.ps1,tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1,tests/scripts/powershell/PoshQC/PoshQC.ScanFolders.Tests.ps1,tests/scripts/powershell/PoshQC/PoshQC.TestingInvokeSummary.Tests.ps1"
         - "scripts/powershell/PoshQC/PoshQC.psd1"
         - "scripts/powershell/PoshQC/PoshQC.psm1"
+        - "scripts/powershell/PoshQC/PoshQC.Testing.psm1"
+        - "scripts/powershell/PoshQC/PoshQC.Testing.psm1,scripts/powershell/PoshQC/PoshQC.psm1,tests/scripts/powershell/PoshQC/PoshQC.Comprehensive.Tests.ps1,tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1,tests/scripts/powershell/PoshQC/PoshQC.ScanFolders.Tests.ps1,tests/scripts/powershell/PoshQC/PoshQC.TestingInvokeSummary.Tests.ps1"
         - "scripts/powershell/PoshQC/README.md"
         - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
         - "tests/fixtures/poshqc-consumer/.claude/hooks/validate-bash.ps1"
         - "tests/fixtures/poshqc-consumer/artifacts/pester/powershell-coverage.xml"
+        - "tests/fixtures/poshqc-consumer/scripts/Sample.psm1"
         - "tests/fixtures/poshqc-consumer/tests/scripts/Sample.Tests.ps1"
         - "tests/scripts/dev_tools/test_poshqc_bundled_parity.py"
         - "tests/scripts/powershell/PoshQC/PoshQC.Comprehensive.Tests.ps1"
@@ -210,7 +211,7 @@ items:
       contracts:
         - "CodeCoverage.Path"
       source: "declared"
-      computed_at: "2026-09-29T21:13:40Z"
+      computed_at: "2026-09-29T23:05:05Z"
   - issue_num: 532
     feature_folder: "docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532"
     kind: "bug"
@@ -229,6 +230,7 @@ items:
         - "docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/research/research.2026-09-29T19-50.md"
         - "docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md"
         - "extensions/drm-copilot/coverage/coverage-summary.json"
+        - "extensions/drm-copilot/jest.config.cjs"
         - "extensions/drm-copilot/package.json"
         - "extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md"
         - "extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md"
@@ -260,7 +262,7 @@ items:
         - "scripts/dev_tools/validate_parallel_planner_state.py"
       contracts: []
       source: "declared"
-      computed_at: "2026-09-29T21:15:07Z"
+      computed_at: "2026-09-29T23:05:08Z"
   - issue_num: 543
     feature_folder: "docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543"
     kind: "bug"
@@ -268,6 +270,8 @@ items:
     blast_radius:
       paths:
         - "./src/lib/validate/orchestration-artifacts.ts"
+        - ".agents/skills/epic-plan/SKILL.md"
+        - ".agents/skills/epic-run/SKILL.md"
         - ".claude/hooks/enforce-python-batch-budget.ps1"
         - ".codex/agents/epic-orchestrator.toml"
         - "docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/**"
@@ -305,8 +309,8 @@ items:
         - "tests/scripts/dev_tools/test_epic_planner_readiness.py"
         - "tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py"
         - "tests/scripts/dev_tools/test_validate_epic_orchestrator_state_launch_binding.py"
-        - "tests/scripts/dev_tools/test_validate_epic_planner_state.py"
         - "tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py"
+        - "tests/scripts/dev_tools/test_validate_epic_planner_state.py"
       modules:
         - "codex-runtime"
       shared_surfaces:
@@ -317,11 +321,75 @@ items:
         - "ValidateEpicPlannerStateOptions"
         - "epic-planner-state"
       source: "declared"
-      computed_at: "2026-09-29T21:22:25Z"
+      computed_at: "2026-09-29T23:05:10Z"
+  - issue_num: 609
+    feature_folder: "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/lib/bash/compute-cohorts.sh"
+        - ".claude/lib/bash/parallel-cohorts.sh"
+        - ".claude/lib/bash/parallel-lane-assertion.sh"
+        - ".claude/lib/bash/report-lane-assertion.sh"
+        - ".github/workflows/_shell-coverage.yml"
+        - ".github/workflows/ci.yml"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/**"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/baseline/baseline-pytest.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/baseline/baseline-shell-check.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/baseline/baseline-shell-coverage.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/baseline/baseline-shell-test.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/baseline/baseline-size-and-mirror.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/baseline/preconditions.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/baseline/tool-availability.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/other/ac-gaps.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/other/ac-status-summary.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/other/follow-ups.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/qa-gates/coverage-comparison.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/qa-gates/final-pytest.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/qa-gates/final-shell-check.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/qa-gates/final-shell-coverage.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/qa-gates/final-shell-format.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/qa-gates/final-shell-syntax.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/qa-gates/final-shell-test.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/qa-gates/write-set-check.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/authority-derivation.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/bats-cases-added.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/bats-membership-after.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/bats-parity-after.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/bats-parity-before.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/bats-unit-after.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/bats-unit-before.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/fail-before-exception.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/fix-applied.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/fixture-created.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/mirror-updated.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/pytest-after.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/python-parity-control.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/repro-bash-after.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/repro-bash-before.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/regression-testing/repro-python.2026-09-29T18-45.md"
+        - "docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/spec.md"
+        - "docs/features/completed/2026-08-29-remove-remaining-python-invocations-599/spec.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-lane-assertion.sh"
+        - "scripts/bash/shell_qc_lib.sh"
+        - "scripts/dev_tools/parallel_lane_assertion.py"
+        - "tests/fixtures/parallel_lane_assertion/edges_endpoint_interior_whitespace.json"
+        - "tests/fixtures/parallel_lane_assertion/edges_newline_separated.json"
+        - "tests/fixtures/parallel_lane_assertion/manifests/two-items-no-assertion.md"
+        - "tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py"
+        - "tests/shell/parallel_lane_assertion.bats"
+      modules: []
+      shared_surfaces: []
+      contracts:
+        - "--edges"
+      source: "declared"
+      computed_at: "2026-09-29T23:04:16Z"
 ---
 
 # Parallel Run: bug-burndown-2026-09-29
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 7 of 22. Pending: 609, 623, 645, 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
+Prepared: 8 of 22. Pending: 623, 645, 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
