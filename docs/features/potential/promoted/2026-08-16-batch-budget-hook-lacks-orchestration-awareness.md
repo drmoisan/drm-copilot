@@ -1,11 +1,14 @@
-# batch-budget-hook-lacks-orchestration-awareness (Potential Bug)
+# batch-budget-hook-lacks-orchestration-awareness (Issue #769)
 
 - Date captured: 2026-08-16
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/batch-budget-hook-lacks-orchestration-awareness/ (Issue #769)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #769
+- Issue URL: https://github.com/drmoisan/drm-copilot/issues/769
+- Last Updated: 2026-09-29
 ## Summary
 
 `enforce-powershell-batch-budget.ps1` enforces a direct-mode routing cap against every session, including sessions that are already running the orchestrated large path. The cap exists to route over-budget work to an orchestrator; once that routing has happened, continuing to enforce the cap denies the very path the policy prescribes.
@@ -58,11 +61,14 @@ The same question likely applies to `enforce-python-batch-budget.ps1`, which fol
 
 ## Proposed Fix / Validation Ideas
 
-- [ ] Make the hook orchestration-aware: when the session is executing an orchestrated plan, the routing requirement is already met and the cap should not deny. A checkpoint at `artifacts/orchestration/orchestrator-state.json` with a large-path `route_id` is one available signal.
-- [ ] Alternatively, scope the batch to the plan phase rather than the session, so phase boundaries reset the counter without any state deletion.
-- [ ] If neither is adopted, amend the deny message so an orchestrated run is told what the correct action is, rather than being offered three remedies of which only one applies.
-- [ ] Unit coverage areas: a direct-mode session is still denied at the 4th production file; an orchestrated session is not.
-- [ ] Review `enforce-python-batch-budget.ps1` for the same defect.
+Direction confirmed by the repository owner on 2026-09-29: the hook exists to signal that a change touching more than 3 production PowerShell files belongs on the large-path orchestrator. The large path has no cap on the number of files it may touch. Any instruction to split work into batches contradicts that purpose and must be removed.
+
+- [ ] Make the hook orchestration-aware: when the session is executing on the orchestrated large path, the hook does not deny on file count. A checkpoint at `artifacts/orchestration/orchestrator-state.json` with a large-path route (`path_selected`/`route_id`) is one available signal; research must confirm the signal is readable from the hook's execution context, including isolated subagent worktrees.
+- [ ] Replace the deny message: outside the large path, the 4th distinct production file is denied with a routing instruction (route the change to the orchestrator via `/orchestrate`), not a batching instruction. Remove "Split the work into a new batch" and the state-file-deletion remedy from the message.
+- [ ] Remove the "per-batch cap in all modes" / "split the work into smaller batches" guidance from PowerShell policy surfaces (`.claude/rules/powershell.md`, `.claude/agents/powershell-typed-engineer.md`, `.github/agents/powershell-typed-engineer.agent.md`, `.claude/skills/invoke-powershell-engineer/SKILL.md`, `powershell-change-budget-router`) and replace it with the routing rule.
+- [ ] Apply the same change to the Codex mirror (`.codex/hooks/enforce-powershell-batch-budget.ps1`) and the bundled extension resource copies so parity tests hold.
+- [ ] Unit coverage: a direct-mode session is still denied at the 4th production file with the routing message; a large-path orchestrated session is not denied at any file count.
+- [ ] Out of scope for this item: `enforce-python-batch-budget.ps1` and the C# budget text, which follow the same pattern; record a follow-up.
 
 ## Next Step
 
