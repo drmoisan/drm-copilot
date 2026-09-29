@@ -8,9 +8,15 @@ from typing import cast
 
 import pytest
 
+from scripts.dev_tools.push_down_claude_destination_writes import (
+    DestinationMergeFileSystem,
+)
 from scripts.dev_tools.push_down_claude_routing_merge import (
     RoutingMergeError,
     merge_routing_documents,
+)
+from tests.scripts.dev_tools.push_down_customizations_test_support import (
+    RecordingFileSystem,
 )
 
 DEST_PATH = Path("/dest/config/orchestration-routing.json")
@@ -236,3 +242,18 @@ def test_routing_merge_error_is_value_error_with_path_and_message() -> None:
     assert isinstance(error, ValueError)
     assert error.path == DEST_PATH
     assert str(error) == ERROR_PREFIX + "detail text)"
+
+
+def test_destination_absent_writes_source_bytes_unchanged() -> None:
+    """With no destination file the source text is written byte-for-byte."""
+
+    source = (
+        '{\n    "routes": {\n        "parallel": {\n'
+        '            "agent": "p"\n        }\n    }\n}\n'
+    )
+    fs = RecordingFileSystem()
+    merging = DestinationMergeFileSystem(fs, destination_root=Path("/dest"))
+
+    merging.write_text(DEST_PATH, source)
+
+    assert fs.read_text(DEST_PATH) == source
