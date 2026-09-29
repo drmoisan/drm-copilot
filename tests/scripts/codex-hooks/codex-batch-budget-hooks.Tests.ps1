@@ -6,9 +6,11 @@
     .codex/hooks/enforce-python-batch-budget.ps1 and
     .codex/hooks/enforce-powershell-batch-budget.ps1 (issue #415 remediation cycle 1, R1).
 
-    The two hooks are structurally identical apart from their language-specific path
-    patterns and function-name prefix, so the cases are written once and applied to
-    both through a Context-level -ForEach, dispatching by function name.
+    The language-neutral cases are written once and applied to both hooks through a
+    Context-level -ForEach, dispatching by function name. The PowerShell row injects
+    an empty orchestrator checkpoint through ExtraSeams, so it never reads a host
+    checkpoint. The Python cap cases run in a Python-only Context; the PowerShell
+    routing and cap cases live in codex-powershell-batch-budget-routing.Tests.ps1.
 
     Every filesystem seam is injected with an in-memory fake, so no case creates,
     reads, or mutates any on-disk .codex/state batch-budget file. No temporary file
@@ -68,22 +70,24 @@ Describe 'Codex per-batch budget PreToolUse hooks' {
 
     Context 'the <Language> batch-budget hook' -ForEach @(
         @{
-            Language = 'Python'
-            HookFile = 'enforce-python-batch-budget.ps1'
-            HookName = 'enforce-python-batch-budget'
-            ProdPath = 'scripts/dev_tools/tool.py'
-            TestPath = 'tests/test_a.py'
-            AltProd  = 'scripts/dev_tools/other.py'
-            OtherExt = 'docs/notes.md'
+            Language   = 'Python'
+            HookFile   = 'enforce-python-batch-budget.ps1'
+            HookName   = 'enforce-python-batch-budget'
+            ProdPath   = 'scripts/dev_tools/tool.py'
+            TestPath   = 'tests/test_a.py'
+            AltProd    = 'scripts/dev_tools/other.py'
+            OtherExt   = 'docs/notes.md'
+            ExtraSeams = @{}
         }
         @{
-            Language = 'PowerShell'
-            HookFile = 'enforce-powershell-batch-budget.ps1'
-            HookName = 'enforce-powershell-batch-budget'
-            ProdPath = 'scripts/dev-tools/tool.ps1'
-            TestPath = 'tests/scripts/a.Tests.ps1'
-            AltProd  = 'scripts/dev-tools/other.psm1'
-            OtherExt = 'docs/notes.md'
+            Language   = 'PowerShell'
+            HookFile   = 'enforce-powershell-batch-budget.ps1'
+            HookName   = 'enforce-powershell-batch-budget'
+            ProdPath   = 'scripts/dev-tools/tool.ps1'
+            TestPath   = 'tests/scripts/a.Tests.ps1'
+            AltProd    = 'scripts/dev-tools/other.psm1'
+            OtherExt   = 'docs/notes.md'
+            ExtraSeams = @{ ReadCheckpoint = { param([string] $Path) [void] $Path; '' } }
         }
     ) {
         BeforeAll {
@@ -98,35 +102,6 @@ Describe 'Codex per-batch budget PreToolUse hooks' {
                 ReadState       = { param([string] $Path) if ($Path) { '{}' } }
                 WriteState      = { param([string] $Path, [System.Collections.IDictionary] $State) if ($Path -and $State) { } }
             }
-        }
-
-        It 'creates a fresh state carrying the supplied caps and empty file lists' {
-            $state = & $script:NewState -ProdCap 3 -TestCap 3
-
-            $state.prodCap | Should -Be 3
-            $state.testCap | Should -Be 3
-            @($state.prodFiles).Count | Should -Be 0
-            @($state.testFiles).Count | Should -Be 0
-        }
-
-        It 'overlays a persisted state onto the default caps and lists' {
-            $loaded = '{"prodCap":5,"testCap":4,"prodFiles":["a.x"],"testFiles":["b.x"]}' | ConvertFrom-Json
-
-            $state = & $script:ConvertState -InputObject $loaded -ProdCap 3 -TestCap 3
-
-            $state.prodCap | Should -Be 5
-            $state.testCap | Should -Be 4
-            @($state.prodFiles) | Should -Contain 'a.x'
-            @($state.testFiles) | Should -Contain 'b.x'
-        }
-
-        It 'keeps the default caps when the persisted state supplies none' {
-            $loaded = '{}' | ConvertFrom-Json
-
-            $state = & $script:ConvertState -InputObject $loaded -ProdCap 3 -TestCap 3
-
-            $state.prodCap | Should -Be 3
-            @($state.testFiles).Count | Should -Be 0
         }
 
         It 'builds a deny decision without state when no state is supplied' {
@@ -162,36 +137,6 @@ Describe 'Codex per-batch budget PreToolUse hooks' {
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
             $decision.shouldWriteState | Should -BeFalse
-        }
-
-        It 'denies a new production file once the production cap is full' {
-            $state = & $script:NewState -ProdCap 1 -TestCap 3
-            $state.prodFiles = @($AltProd)
-
-            $decision = & $script:DecisionFn -FilePath $ProdPath -State $state -StateFile 'state.json'
-
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'production file cap is 1'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'state.json'
-        }
-
-        It 'denies a new test file once the test cap is full' {
-            $state = & $script:NewState -ProdCap 3 -TestCap 0
-
-            $decision = & $script:DecisionFn -FilePath $TestPath -State $state -StateFile 'state.json'
-
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'test file cap is 0'
-        }
-
-        It 'consumes a test slot for a new test file' {
-            $state = & $script:NewState -ProdCap 3 -TestCap 3
-
-            $decision = & $script:DecisionFn -FilePath $TestPath -State $state -StateFile 'state.json'
-
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
-            $decision.shouldWriteState | Should -BeTrue
-            @($decision.state.testFiles) | Should -Contain $TestPath
         }
 
         It 'consumes a production slot for a new production file' {
@@ -235,7 +180,7 @@ Describe 'Codex per-batch budget PreToolUse hooks' {
             # Test-Path seam runs; it is read-only and creates nothing.
             $raw = @{ file_path = $ProdPath } | ConvertTo-Json -Compress
 
-            $decision = & $script:HookFn -ToolInputRaw $raw -SessionId 'probe' @script:NoopSeams
+            $decision = & $script:HookFn -ToolInputRaw $raw -SessionId 'probe' @script:NoopSeams @ExtraSeams
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -256,28 +201,12 @@ Describe 'Codex per-batch budget PreToolUse hooks' {
                 }
             }
 
-            $decision = & $script:HookFn -ToolInputRaw $raw -SessionId 'fresh' -Root $script:RepoRoot @seams
+            $decision = & $script:HookFn -ToolInputRaw $raw -SessionId 'fresh' -Root $script:RepoRoot @seams @ExtraSeams
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
             $script:EnsuredPath | Should -Match '\.codex[\\/]state$'
             $script:WrittenStatePath | Should -Match 'batch-budget\.fresh\.json$'
             @($script:WrittenState.prodFiles) | Should -Contain $ProdPath
-        }
-
-        It 'loads an existing state file and honours its recorded cap' {
-            $raw = @{ file_path = $ProdPath } | ConvertTo-Json -Compress
-            $persisted = @{ prodCap = 1; testCap = 3; prodFiles = @($AltProd); testFiles = @() } | ConvertTo-Json -Compress
-            $seams = @{
-                TestPathExists  = { param([string] $Path) if ($Path) { $true } }
-                EnsureDirectory = { param([string] $Path) if ($Path) { } }
-                ReadState       = { param([string] $Path) if ($Path) { $persisted } }
-                WriteState      = { param([string] $Path, [System.Collections.IDictionary] $State) if ($Path -and $State) { } }
-            }
-
-            $decision = & $script:HookFn -ToolInputRaw $raw -SessionId 'loaded' -Root $script:RepoRoot @seams
-
-            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'production file cap is 1'
         }
 
         It 'ignores an unreadable state file and starts from the default caps' {
@@ -289,7 +218,7 @@ Describe 'Codex per-batch budget PreToolUse hooks' {
                 WriteState      = { param([string] $Path, [System.Collections.IDictionary] $State) if ($Path -and $State) { } }
             }
 
-            $decision = & $script:HookFn -ToolInputRaw $raw -SessionId 'unreadable' -Root $script:RepoRoot @seams
+            $decision = & $script:HookFn -ToolInputRaw $raw -SessionId 'unreadable' -Root $script:RepoRoot @seams @ExtraSeams
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -303,7 +232,7 @@ Describe 'Codex per-batch budget PreToolUse hooks' {
                 WriteState      = { param([string] $Path, [System.Collections.IDictionary] $State) throw "unwritable $Path for $($State.Count) keys" }
             }
 
-            $decision = & $script:HookFn -ToolInputRaw $raw -SessionId 'unwritable' -Root $script:RepoRoot @seams
+            $decision = & $script:HookFn -ToolInputRaw $raw -SessionId 'unwritable' -Root $script:RepoRoot @seams @ExtraSeams
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -341,6 +270,102 @@ Describe 'Codex per-batch budget PreToolUse hooks' {
 
             $result.ExitCode | Should -Be 2
             $result.Stderr | Should -Match "$HookName hook input is missing session_id"
+        }
+    }
+
+    Context 'the Python batch-budget hook cap contract' -ForEach @(
+        @{
+            Language   = 'Python'
+            HookFile   = 'enforce-python-batch-budget.ps1'
+            HookName   = 'enforce-python-batch-budget'
+            ProdPath   = 'scripts/dev_tools/tool.py'
+            TestPath   = 'tests/test_a.py'
+            AltProd    = 'scripts/dev_tools/other.py'
+            OtherExt   = 'docs/notes.md'
+            ExtraSeams = @{}
+        }
+    ) {
+        BeforeAll {
+            $script:HookPath = Join-Path $script:HookRoot $HookFile
+            $script:NewState = "Get-${Language}BatchBudgetState"
+            $script:ConvertState = "ConvertTo-${Language}BatchBudgetState"
+            $script:DecisionFn = "Invoke-${Language}BatchBudgetDecision"
+            $script:HookFn = "Invoke-${Language}BatchBudgetHook"
+        }
+
+        It 'creates a fresh state carrying the supplied caps and empty file lists' {
+            $state = & $script:NewState -ProdCap 3 -TestCap 3
+
+            $state.prodCap | Should -Be 3
+            $state.testCap | Should -Be 3
+            @($state.prodFiles).Count | Should -Be 0
+            @($state.testFiles).Count | Should -Be 0
+        }
+
+        It 'overlays a persisted state onto the default caps and lists' {
+            $loaded = '{"prodCap":5,"testCap":4,"prodFiles":["a.x"],"testFiles":["b.x"]}' | ConvertFrom-Json
+
+            $state = & $script:ConvertState -InputObject $loaded -ProdCap 3 -TestCap 3
+
+            $state.prodCap | Should -Be 5
+            $state.testCap | Should -Be 4
+            @($state.prodFiles) | Should -Contain 'a.x'
+            @($state.testFiles) | Should -Contain 'b.x'
+        }
+
+        It 'keeps the default caps when the persisted state supplies none' {
+            $loaded = '{}' | ConvertFrom-Json
+
+            $state = & $script:ConvertState -InputObject $loaded -ProdCap 3 -TestCap 3
+
+            $state.prodCap | Should -Be 3
+            @($state.testFiles).Count | Should -Be 0
+        }
+
+        It 'denies a new production file once the production cap is full' {
+            $state = & $script:NewState -ProdCap 1 -TestCap 3
+            $state.prodFiles = @($AltProd)
+
+            $decision = & $script:DecisionFn -FilePath $ProdPath -State $state -StateFile 'state.json'
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'production file cap is 1'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'state.json'
+        }
+
+        It 'denies a new test file once the test cap is full' {
+            $state = & $script:NewState -ProdCap 3 -TestCap 0
+
+            $decision = & $script:DecisionFn -FilePath $TestPath -State $state -StateFile 'state.json'
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'test file cap is 0'
+        }
+
+        It 'consumes a test slot for a new test file' {
+            $state = & $script:NewState -ProdCap 3 -TestCap 3
+
+            $decision = & $script:DecisionFn -FilePath $TestPath -State $state -StateFile 'state.json'
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.shouldWriteState | Should -BeTrue
+            @($decision.state.testFiles) | Should -Contain $TestPath
+        }
+
+        It 'loads an existing state file and honours its recorded cap' {
+            $raw = @{ file_path = $ProdPath } | ConvertTo-Json -Compress
+            $persisted = @{ prodCap = 1; testCap = 3; prodFiles = @($AltProd); testFiles = @() } | ConvertTo-Json -Compress
+            $seams = @{
+                TestPathExists  = { param([string] $Path) if ($Path) { $true } }
+                EnsureDirectory = { param([string] $Path) if ($Path) { } }
+                ReadState       = { param([string] $Path) if ($Path) { $persisted } }
+                WriteState      = { param([string] $Path, [System.Collections.IDictionary] $State) if ($Path -and $State) { } }
+            }
+
+            $decision = & $script:HookFn -ToolInputRaw $raw -SessionId 'loaded' -Root $script:RepoRoot @seams @ExtraSeams
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'production file cap is 1'
         }
     }
 }

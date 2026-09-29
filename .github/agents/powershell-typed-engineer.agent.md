@@ -49,8 +49,8 @@ Use these reusable skills to avoid duplicating shared operations:
 
 - **Direct mode (default)**
   - Trigger: no directive line present.
-  - Intended scope: up to 2 production PowerShell files (+ corresponding tests).
-  - If estimated scope is >2 production files: stop and instruct caller to use `powershell-orchestrator` (or `.github/prompts/orchestrate-powershell-work.prompt.md`).
+  - Intended scope: 1-3 production PowerShell files (+ corresponding tests).
+  - If estimated scope is more than 3 production files: stop and instruct caller to use `powershell-orchestrator` (or `.github/prompts/orchestrate-powershell-work.prompt.md`).
 
 - **Orchestrator handoff mode**
   - Trigger: request includes exact line `DIRECTIVE: ORCHESTRATOR HANDOFF MODE`.
@@ -115,9 +115,9 @@ Blocking rules in orchestrator mode:
 
 ## 1) Scope control (NO scope creep)
 
-- **Direct mode** default scope is one small feature/bug slice (typically **1–2 production PowerShell files**) plus corresponding test file(s).
-- In **Direct mode**, if estimated scope exceeds **2 production PowerShell files**, do not continue implementation; instruct the user to invoke `powershell-orchestrator` (or `.github/prompts/orchestrate-powershell-work.prompt.md`) and stop.
-- In **Orchestrator handoff mode**, overall scope may exceed 2 production files when supported by provided context package and approved plan artifacts.
+- **Direct mode** default scope is one small feature/bug slice (typically **1-3 production PowerShell files**) plus corresponding test file(s).
+- In **Direct mode**, if estimated scope exceeds **3 production PowerShell files**, do not continue implementation; instruct the user to invoke `powershell-orchestrator` (or `.github/prompts/orchestrate-powershell-work.prompt.md`) and stop.
+- In **Orchestrator handoff mode**, overall scope may exceed 3 production files when supported by provided context package and approved plan artifacts.
 - In all modes, avoid unrelated files and preserve minimal, targeted changes.
 - If scope expansion is required, STOP and provide:
   - a one-paragraph justification,
@@ -127,11 +127,9 @@ Blocking rules in orchestrator mode:
 
 ## 2) Change budget (hard gate)
 
-- **Direct mode** overall budget: up to **2 production PowerShell files** (+ corresponding tests).
+- **Direct mode** overall budget: **1-3 production PowerShell files** (+ corresponding tests).
 - **Orchestrator handoff mode**: no strict overall production-file budget, provided required documentation package is present.
-- In all modes, per-batch budget remains: at most **3 production files** and **3 test files** unless explicit override is approved.
-- If no override is provided, the 3/3 per-batch limit applies.
-- If a batch would exceed budget, split it into smaller batches.
+- Test files are not counted toward the routing threshold in any mode, and the large path has no production-file cap.
 
 ## 3) Deterministic unit tests only (no external dependency coupling)
 
@@ -195,7 +193,7 @@ If tools cannot run in the environment, STOP implementation and provide plan + p
   - if `DIRECTIVE: ORCHESTRATOR HANDOFF MODE` is present, use orchestrator handoff mode and validate full context package.
   - otherwise use direct mode.
 4) Enforce budget routing:
-  - in direct mode, if estimated scope is >2 production PowerShell files, STOP and instruct user to invoke `powershell-orchestrator` for orchestration.
+  - in direct mode, if estimated scope is more than 3 production PowerShell files, STOP and instruct user to invoke `powershell-orchestrator` for orchestration.
 5) Summarize root cause/design constraint in one paragraph.
 
 ## Phase B — Design + plan (no edits)
