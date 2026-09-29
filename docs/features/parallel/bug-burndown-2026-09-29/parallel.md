@@ -261,10 +261,67 @@ items:
       contracts: []
       source: "declared"
       computed_at: "2026-09-29T21:15:07Z"
+  - issue_num: 543
+    feature_folder: "docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - "./src/lib/validate/orchestration-artifacts.ts"
+        - ".claude/hooks/enforce-python-batch-budget.ps1"
+        - ".codex/agents/epic-orchestrator.toml"
+        - "docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/**"
+        - "docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/issue.md"
+        - "docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/research/research.2026-09-29T16-10.md"
+        - "docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/spec.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-plan/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json"
+        - "extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-launch-binding.ts"
+        - "extensions/drm-copilot/src/lib/validate/epic-planner-launch-evidence.ts"
+        - "extensions/drm-copilot/src/lib/validate/epic-planner-readiness-integrity.ts"
+        - "extensions/drm-copilot/src/lib/validate/epic-planner-state-core.ts"
+        - "extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts"
+        - "extensions/drm-copilot/src/mcp-repo-automation-tool-definitions.ts"
+        - "extensions/drm-copilot/src/mcp-tool-definitions.ts"
+        - "extensions/drm-copilot/src/mcp-tool-inputs.ts"
+        - "extensions/drm-copilot/test/lib/validate/epic-planner-launch-evidence.test.ts"
+        - "extensions/drm-copilot/test/lib/validate/epic-planner-readiness-integrity.test.ts"
+        - "extensions/drm-copilot/test/lib/validate/epic-planner-state-launch-binding.test.ts"
+        - "extensions/drm-copilot/test/lib/validate/orchestration-artifacts.test.ts"
+        - "extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts"
+        - "scripts/dev_tools/_epic_orchestrator_state_launch_binding.py"
+        - "scripts/dev_tools/epic_planner_launch_evidence.py"
+        - "scripts/dev_tools/epic_planner_readiness.py"
+        - "scripts/dev_tools/epic_planner_readiness.py:354"
+        - "scripts/dev_tools/validate_epic_planner_state.py"
+        - "scripts/dev_tools/validate_epic_planner_state.py:331"
+        - "scripts/dev_tools/validate_orchestration_artifacts.py"
+        - "tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1"
+        - "tests/scripts/dev_tools/epic_planner_launch_evidence_test_support.py"
+        - "tests/scripts/dev_tools/test_epic_planner_launch_evidence.py"
+        - "tests/scripts/dev_tools/test_epic_planner_readiness.py"
+        - "tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py"
+        - "tests/scripts/dev_tools/test_validate_epic_orchestrator_state_launch_binding.py"
+        - "tests/scripts/dev_tools/test_validate_epic_planner_state.py"
+        - "tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py"
+      modules:
+        - "codex-runtime"
+      shared_surfaces:
+        - "scripts/dev_tools/_epic_orchestrator_state_launch_binding.py"
+        - "scripts/dev_tools/validate_epic_planner_state.py"
+        - "scripts/dev_tools/validate_orchestration_artifacts.py"
+      contracts:
+        - "ValidateEpicPlannerStateOptions"
+        - "epic-planner-state"
+      source: "declared"
+      computed_at: "2026-09-29T21:22:25Z"
 ---
 
 # Parallel Run: bug-burndown-2026-09-29
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 6 of 22. Pending: 543, 609, 623, 645, 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
+Prepared: 7 of 22. Pending: 609, 623, 645, 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
