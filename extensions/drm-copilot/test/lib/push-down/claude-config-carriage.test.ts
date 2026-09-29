@@ -354,11 +354,11 @@ describe("issue #462 AC8: the published blast-radius default is generic", () => 
     expect(Object.keys(published.modules)).not.toContain("claude-runtime");
   });
 
-  it("overwrites the destination blast-radius rather than merging it", () => {
-    // Arrange: only the routing path is merged; blast-radius is replaced. The
-    // layout-bearing lister makes the derived document differ observably from
-    // both the seeded source constant and the pre-existing destination bytes,
-    // so the assertion has discriminating force.
+  it("issue #508 AC09 regenerates the main file; destination-local content is carried by the overlay", () => {
+    // Arrange: the main file is regenerated; destination-local entries are
+    // carried only by the overlay. The layout-bearing lister makes the derived
+    // document differ observably from both the seeded source constant and the
+    // pre-existing destination bytes, so the assertion has discriminating force.
     const preExisting = `${JSON.stringify(
       { version: 99, modules: { "destination-local": ["local/**"] } },
       null,
@@ -366,6 +366,7 @@ describe("issue #462 AC8: the published blast-radius default is generic", () => 
     )}\n`;
     const seeded = seedTree({
       [`${DEST}/config/blast-radius.json`]: preExisting,
+      [`${DEST}/config/blast-radius.local.json`]: OVERLAY_TEXT,
     });
 
     // Act
@@ -377,6 +378,7 @@ describe("issue #462 AC8: the published blast-radius default is generic", () => 
     expect(published).not.toContain("destination-local");
     expect(published).not.toContain('"version": 99');
     expect(published).toContain('"src/App/**"');
+    expect(published).toContain('"destination-app"');
     expect(published).not.toBe(SOURCE_BLAST_RADIUS);
   });
 });
