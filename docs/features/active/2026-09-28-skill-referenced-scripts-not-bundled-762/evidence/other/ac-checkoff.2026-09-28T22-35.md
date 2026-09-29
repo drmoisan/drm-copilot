@@ -47,3 +47,12 @@ Evidence paths are relative to `FEATURE/evidence/`.
 - Phases 7, 8, and 9 artifacts pass. `qa-gates/coverage-comparison.2026-09-28T22-35.md` records `Disposition: PASS` for all three languages. P10-T1, P10-T2, P10-T4, P10-T5, and P10-T6 pass.
 - `qa-gates/ci-dispatch.2026-09-28T22-17.md` (P10-T3) does not pass: run 36513322997 concluded `failure`, because the three `NPM Audit Gate` jobs failed on the newly published `ip-address` advisories GHSA-rpw4-54j3-4h4q and GHSA-2vr4-cq9g-pvrc. These are unrelated to this change, which touches no npm manifest.
 - P11-T9 requires every Phase 10 artifact to pass, so AC8 stays unchecked and the plan outcome is remediation-required. Remediation (orchestrator decision): update `ip-address` in the three npm workspaces, or wait for main to take that fix, then re-dispatch CI and re-run P10-T3.
+
+## AC8 — checked (P11-T9, after the rebase)
+
+Timestamp: 2026-09-28T22-55
+- The orchestrator rebased the branch onto origin/main 42e95e27, which carries the ip-address override fix 3310fda7, and pushed the new head 7d8234ed778cb95488931f315dc1e65d65f556b5 (FINAL_SHA).
+- `qa-gates/ci-dispatch.2026-09-28T22-17.md` (P10-T3): run 36514443218 on FINAL_SHA, event workflow_dispatch, completed, conclusion `success`, all 16 jobs success.
+- Phase 7 (`shell-format`, `shell-lint`, `shell-test`), Phase 8 (`powershell-format`, `powershell-analyze`, `powershell-test-coverage`, `powershell-claude-lib`), Phase 9 (`python-format`, `python-lint`, `python-typecheck`, `python-test-coverage-new`, `python-test-coverage-total`, `line-counts-final`), and Phase 10 (`ts-push-down-jest`, `ci-dispatch`, `ci-jobs`, `shell-coverage-ci.2026-09-28T22-35`, `shell-coverage-files`) all pass. The rebased-head re-verification of the P10-T4/T5/T6 figures is recorded in `ci-dispatch`.
+- `qa-gates/coverage-comparison.2026-09-28T22-35.md`: `Disposition: PASS` for bash, PowerShell, and Python.
+- The earlier "AC8 — NOT checked" section above is superseded; it records the pre-rebase state for audit purposes.

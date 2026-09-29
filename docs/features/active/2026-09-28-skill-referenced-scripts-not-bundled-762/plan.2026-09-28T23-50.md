@@ -772,7 +772,7 @@ script A6 and a before-and-after hash comparison (A5).
       "docs(762): record final QA evidence", CMD-GIT-PUSH; then CMD-GIT-HEAD. Acceptance:
       CMD-GIT-STATUS prints nothing, the push exits 0, and the HEAD value is recorded as FINAL_SHA in
       FEATURE/evidence/qa-gates/ci-dispatch.TS.md.
-- [ ] [P10-T3] Dispatch CI on the branch: CMD-GH-DISPATCH (workflow `.github/workflows/ci.yml`), then
+- [x] [P10-T3] Dispatch CI on the branch: CMD-GH-DISPATCH (workflow `.github/workflows/ci.yml`), then
       CMD-CI-WAIT with FINAL_SHA (run in the background), then CMD-GH-RUNS-FOR-SHA with FINAL_SHA. Append
       to FEATURE/evidence/qa-gates/ci-dispatch.TS.md. Acceptance: exactly one run with event
       `workflow_dispatch` exists for FINAL_SHA, its status is `completed`, and its conclusion is `success`.
@@ -826,7 +826,7 @@ script A6 and a before-and-after hash comparison (A5).
       `test_find_stale_exceptions_reports_unmatched_exception` and
       `test_known_unbundled_references_cite_issue_763` PASSED, and the P6-T1 artifact shows
       `test_known_unbundled_references_are_not_stale` PASSED; cited in the ac-checkoff artifact.
-- [ ] [P11-T9] Check off AC8 in `FEATURE/spec.md`. Acceptance: every Phase 7, 8, 9, and 10 artifact
+- [x] [P11-T9] Check off AC8 in `FEATURE/spec.md`. Acceptance: every Phase 7, 8, 9, and 10 artifact
       exists with passing acceptance and the P10-T7 `Disposition:` is `PASS`; cited in the ac-checkoff
       artifact. If the disposition is `BLOCKED`, AC8 stays unchecked and the plan outcome is
       remediation-required.

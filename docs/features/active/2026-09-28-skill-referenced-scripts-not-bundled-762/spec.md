@@ -111,7 +111,7 @@ Guard runs in well under one second.
 - [x] AC5: Shell QC discovers, lints, tests, and measures coverage for bash scripts under `.claude/skills/`.
 - [x] AC6: A CI-run guard fails when a skill references a script not in its bundle, does not fail because a script lives outside the skill folder, and checks every file in a skill folder is carried by the skill's packs.
 - [x] AC7: The two unfixable Python CLI references are registered as issue-linked exceptions (#763) and the guard fails if an exception becomes stale.
-- [ ] AC8: Full toolchain passes for bash, PowerShell, and Python with coverage thresholds met.
+- [x] AC8: Full toolchain passes for bash, PowerShell, and Python with coverage thresholds met.
 
 ## Risks & Mitigations
 - Consumer muscle memory for the old path: the skill text is the only documented entry point and is updated.
