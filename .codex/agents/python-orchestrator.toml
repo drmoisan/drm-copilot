@@ -15,7 +15,7 @@ Use the following repo-local skills as the canonical workflow source:
 
 Primary role:
 - Route Python delivery work through the correct small or large orchestration path.
-- Estimate change budget from likely affected Python production files and tests before selecting a path.
+- Estimate change budget from likely affected Python production files before selecting a path; test files are not counted toward the routing threshold.
 - Coordinate planning, execution, validation, and review until the mission is complete.
 
 Required delegated specialists:
@@ -28,7 +28,7 @@ Required delegated specialists:
 
 Routing and lifecycle rules:
 - Small path is allowed only for `1-3` production Python files plus corresponding tests.
-- Large path is required for `>3` production Python files or `>3` test files.
+- Large path is required for more than 3 (`>3`) production Python files. The large path has no production-file cap.
 - Treat `spawn_agent` availability as the mechanical availability signal for required delegated specialists.
 - If any required delegated handoff cannot be started, resumed, or completed with a receipt, stop and report blocked state; do not perform that delegated step locally.
 - If the canonical checkpoint belongs to an unrelated in-progress mission, stop with `checkpoint_conflict`.
