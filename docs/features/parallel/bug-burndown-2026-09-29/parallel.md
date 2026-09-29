@@ -211,10 +211,60 @@ items:
         - "CodeCoverage.Path"
       source: "declared"
       computed_at: "2026-09-29T21:13:40Z"
+  - issue_num: 532
+    feature_folder: "docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/agents/parallel-orchestrator.md"
+        - ".claude/agents/parallel-planner.md"
+        - ".claude/lib/model-routing/ModelRouting.psm1"
+        - ".claude/rules/parallel-orchestration.md"
+        - ".claude/skills/parallel-add/SKILL.md"
+        - ".claude/skills/parallel-orchestrate/SKILL.md"
+        - ".claude/skills/parallel-plan/SKILL.md"
+        - "config/orchestration-routing.json"
+        - "docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/**"
+        - "docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/research/research.2026-09-29T19-50.md"
+        - "docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md"
+        - "extensions/drm-copilot/coverage/coverage-summary.json"
+        - "extensions/drm-copilot/package.json"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-planner.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md"
+        - "extensions/drm-copilot/src/lib/pr-context/verification-evidence.ts"
+        - "extensions/drm-copilot/src/lib/validate/parallel-planner-state-core.ts"
+        - "extensions/drm-copilot/src/lib/validate/parallel-planner-state-routing.ts"
+        - "extensions/drm-copilot/test/lib/validate/parallel-planner-state-core.test.ts"
+        - "extensions/drm-copilot/test/lib/validate/parallel-planner-state-routing.test.ts"
+        - "extensions/drm-copilot/test/lib/validate/parallel-state-test-support.ts"
+        - "extensions/drm-copilot/test/lib/validate/parallel-state-tolerated-edge-fields.test.ts"
+        - "scripts/dev_tools/_parallel_planner_state_routing.py"
+        - "scripts/dev_tools/pr_context/verification_evidence.py"
+        - "scripts/dev_tools/validate_parallel_planner_state.py"
+        - "src/lib/validate/parallel-planner-state-core.ts"
+        - "src/lib/validate/parallel-planner-state-routing.ts"
+        - "tests/scripts/dev_tools/parallel_planner_state_builders.py"
+        - "tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py"
+        - "tests/scripts/dev_tools/test_validate_orchestration_artifacts_parallel_dispatch.py"
+        - "tests/scripts/dev_tools/test_validate_parallel_planner_state_routing.py"
+        - "tests/scripts/dev_tools/test_validate_parallel_planner_state.py"
+      modules:
+        - "config"
+      shared_surfaces:
+        - "config/orchestration-routing.json"
+        - "scripts/dev_tools/validate_parallel_planner_state.py"
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-29T21:15:07Z"
 ---
 
 # Parallel Run: bug-burndown-2026-09-29
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 5 of 22. Pending: 532, 543, 609, 623, 645, 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
+Prepared: 6 of 22. Pending: 543, 609, 623, 645, 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
