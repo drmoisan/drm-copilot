@@ -744,7 +744,7 @@ Each item was observed in this repository's recorded runs or read from source, n
       Command: CMD-PY-TEST over that file. Write FEATURE/evidence/regression-testing/surface-contracts.TS.md.
       Acceptance: exit 0, no FAILED line, and
       `test_orchestrate_skill_first_thirteen_headings_match_required_layout` PASSED.
-- [ ] [P4-T16] Commit and push Phase 4 (`.claude/skills/parallel-orchestrate/SKILL.md` and the files below).
+- [x] [P4-T16] Commit and push Phase 4 (`.claude/skills/parallel-orchestrate/SKILL.md` and the files below).
       Commands: CMD-GIT-ADD with `.claude/skills/parallel-orchestrate/SKILL.md .claude/skills/parallel-remove/SKILL.md .claude/agents/parallel-orchestrator.md .claude/hooks/enforce-parallel-abandon-gate.ps1 tests/scripts/dev_tools/test_parallel_abandon_token_seam.py docs/features/active/2026-09-28-parallel-skills-invoke-unbundled-python-clis-763`,
       CMD-GIT-COMMIT with message "fix(763): invoke the bundled drift and abandon entry points from the parallel skills",
       CMD-GIT-PUSH, then `git status --porcelain`. Acceptance: the push exits 0 and the porcelain status
@@ -752,15 +752,15 @@ Each item was observed in this repository's recorded runs or read from source, n
 
 ### Phase 5 — Bundle Mirrors, Pack Manifest, Coverage Registration, and Payload Tests (AC6, AC12, AC14)
 
-- [ ] [P5-T1] Mirror the three drift files of `.claude/lib/parallel-drift` into BUNDLE.
+- [x] [P5-T1] Mirror the three drift files of `.claude/lib/parallel-drift` into BUNDLE.
       Commands: `mkdir -p extensions/drm-copilot/resources/claude-customizations/.claude/lib/parallel-drift`, then
       `cp .claude/lib/parallel-drift/ParallelDriftHalt.psm1 .claude/lib/parallel-drift/ParallelDrift.psm1 .claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/lib/parallel-drift/`.
       Acceptance: CMD-SH with script mirror-check (A5) over the three primaries prints
       `MIRROR-SUMMARY same=3 diff=0 missing=0`.
-- [ ] [P5-T2] Mirror `.claude/lib/bash/abandon-parallel-item.sh` into BUNDLE.
+- [x] [P5-T2] Mirror `.claude/lib/bash/abandon-parallel-item.sh` into BUNDLE.
       Command: `cp BASHLIB/abandon-parallel-item.sh BUNDLEBASHLIB/`. Acceptance: CMD-SH with script
       mirror-check (A5) over `BASHLIB/abandon-parallel-item.sh` prints `MIRROR-SUMMARY same=1 diff=0 missing=0`.
-- [ ] [P5-T3] Mirror the four edited surface files (`.claude/skills/parallel-orchestrate/SKILL.md`, `.claude/skills/parallel-remove/SKILL.md`, `.claude/agents/parallel-orchestrator.md`, `.claude/hooks/enforce-parallel-abandon-gate.ps1`) into BUNDLE.
+- [x] [P5-T3] Mirror the four edited surface files (`.claude/skills/parallel-orchestrate/SKILL.md`, `.claude/skills/parallel-remove/SKILL.md`, `.claude/agents/parallel-orchestrator.md`, `.claude/hooks/enforce-parallel-abandon-gate.ps1`) into BUNDLE.
       Commands: `cp .claude/skills/parallel-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md`,
       `cp .claude/skills/parallel-remove/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-remove/SKILL.md`,
       `cp .claude/agents/parallel-orchestrator.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md`,
@@ -768,43 +768,43 @@ Each item was observed in this repository's recorded runs or read from source, n
       Acceptance: CMD-SH with script mirror-check (A5) over the four primaries prints
       `MIRROR-SUMMARY same=4 diff=0 missing=0`, and CMD-SH with script surface-token-count (A20) prints
       every bundle `COUNT` line with the same value as its repo line in P4-T14.
-- [ ] [P5-T4] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` per Appendix B27 (three drift entries after the CI gate parser entry; the abandon entry after the `.claude/rules/shell.md` entry).
+- [x] [P5-T4] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` per Appendix B27 (three drift entries after the CI gate parser entry; the abandon entry after the `.claude/rules/shell.md` entry).
       Acceptance: CMD-PY-SCRIPT with script json-parse (A11) over the file prints one `JSON-OK` line;
       CMD-GIT-COUNT with literal `.claude/lib/parallel-drift/` over it prints a count of 3; CMD-GIT-COUNT
       with literal `abandon-parallel-item.sh` over it prints a count of 1.
-- [ ] [P5-T5] Reset the PowerShell batch budget before editing `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`: CMD-PS with script reset-batch-budget (A8) and `-Kind powershell`.
+- [x] [P5-T5] Reset the PowerShell batch budget before editing `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`: CMD-PS with script reset-batch-budget (A8) and `-Kind powershell`.
       Write FEATURE/evidence/other/batch-budget-reset-p5.TS.md. Acceptance: exit 0 and a
       `RESET removed=` line.
-- [ ] [P5-T6] Edit `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`: insert the six lines of Appendix B28 after line 324 (inside `CodeCoverage.Path`, before the closing parenthesis on line 325).
+- [x] [P5-T6] Edit `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`: insert the six lines of Appendix B28 after line 324 (inside `CodeCoverage.Path`, before the closing parenthesis on line 325).
       Acceptance: CMD-PS with script psd1-parse (A10) over the file prints `PSD1-OK`, and CMD-GIT-COUNT
       with literal `.claude/lib/parallel-drift/` over it prints a count of 3 (the three registered
       paths; the B28 comment names the directory without a trailing slash).
-- [ ] [P5-T7] Mirror `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` into PSBUNDLE.
+- [x] [P5-T7] Mirror `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` into PSBUNDLE.
       Command: `cp scripts/powershell/PoshQC/settings/pester.runsettings.psd1 extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`.
       Acceptance: CMD-SH with script mirror-check (A5) over the primary prints
       `MIRROR-SUMMARY same=1 diff=0 missing=0`.
-- [ ] [P5-T8] Edit `tests/shell/parallel_payload_only.bats` per Appendix B29 (abandon payload case with a separate shim PATH).
+- [x] [P5-T8] Edit `tests/shell/parallel_payload_only.bats` per Appendix B29 (abandon payload case with a separate shim PATH).
       Acceptance: CMD-GIT-COUNT with literal `parallel_abandon_path` over that file prints
       `tests/shell/parallel_payload_only.bats:2` (the header paragraph and the setup assignment), and
       CMD-GIT-COUNT with literal `@test "` prints `tests/shell/parallel_payload_only.bats:14` (11 existing
       tests plus the three of B29).
-- [ ] [P5-T9] Edit `tests/shell/parallel_bash_manifest_membership.bats` per Appendix B30 (five entry points).
+- [x] [P5-T9] Edit `tests/shell/parallel_bash_manifest_membership.bats` per Appendix B30 (five entry points).
       Acceptance: CMD-GIT-COUNT with literal `abandon-parallel-item.sh` over that file prints a count of 1.
-- [ ] [P5-T10] Run the local bats suites `tests/shell/parallel_abandon.bats`, `tests/shell/parallel_payload_only.bats`, and `tests/shell/parallel_bash_manifest_membership.bats`.
+- [x] [P5-T10] Run the local bats suites `tests/shell/parallel_abandon.bats`, `tests/shell/parallel_payload_only.bats`, and `tests/shell/parallel_bash_manifest_membership.bats`.
       Command: CMD-BATS over the three files. Write FEATURE/evidence/regression-testing/bats-after-bundle.TS.md.
       Acceptance: the TAP plan line is recorded; no `not ok` line names a test in
       `tests/shell/parallel_abandon.bats` or a test added by B29 or edited by B30; every other `not ok`
       line is a member of the P0-T20 local baseline failure set.
-- [ ] [P5-T11] Run the five suites in `tests/scripts/claude-lib/parallel-drift` after the manifest and bundle updates.
+- [x] [P5-T11] Run the five suites in `tests/scripts/claude-lib/parallel-drift` after the manifest and bundle updates.
       Commands: CMD-PESTER with `tests/scripts/claude-lib/parallel-drift`, then CMD-JUNIT with the five
       suffixes of P3-T20. Write FEATURE/evidence/regression-testing/drift-suites-after-bundle.TS.md.
       Acceptance: all five `JUNIT file=` lines show `Failed=0`, and the Manifest suite shows `Passed=5`.
-- [ ] [P5-T12] Run the Python bundle contract tests in `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`, and `tests/scripts/dev_tools/test_poshqc_bundled_parity.py`.
+- [x] [P5-T12] Run the Python bundle contract tests in `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`, and `tests/scripts/dev_tools/test_poshqc_bundled_parity.py`.
       Command: CMD-PY-TEST over the three files. Write FEATURE/evidence/regression-testing/bundle-contracts.TS.md.
       Acceptance: every node other than `test_bundled_claude_payload_contains_all_repo_runtime_contracts`
       is PASSED, and that node satisfies KL-510 (the artifact carries the KL-510 line and, for case (b),
       `ExpectedExitCode: 1`).
-- [ ] [P5-T13] Run the Jest pack-manifest completeness suite `extensions/drm-copilot/test/lib/push-down/claude-pack-manifest-completeness.test.ts`.
+- [x] [P5-T13] Run the Jest pack-manifest completeness suite `extensions/drm-copilot/test/lib/push-down/claude-pack-manifest-completeness.test.ts`.
       Command: `npm --prefix extensions/drm-copilot run test -- test/lib/push-down/claude-pack-manifest-completeness.test.ts`.
       Write FEATURE/evidence/regression-testing/jest-pack-manifest.TS.md. Acceptance: exit 0 and the
       "Tests:" line reports 0 failed.
