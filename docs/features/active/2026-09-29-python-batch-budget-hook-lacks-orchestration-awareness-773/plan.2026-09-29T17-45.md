@@ -346,41 +346,41 @@ Searches in this plan use these fixed strings, quoted here so each is an explici
 
 - [x] [P13-T1] Final mirror check across the 24 pairs of Appendix E2. Command: A13 over the 24 pairs. Write FEATURE/evidence/qa-gates/mirror-hashes-final.TS.md. Acceptance: `PAIR-SUMMARY pairs=24 unequal=0` (AC-24).
 - [x] [P13-T2] Coverage comparison: write FEATURE/evidence/qa-gates/coverage-comparison.TS.md from the P0-T15 through P0-T18 and P11-T4 through P11-T9 artifacts. Acceptance: the artifact carries, for PowerShell, `Baseline Coverage:` (CPY_BASE_PCT, XPY_BASE_PCT, CPS_BASE_PCT, XPS_BASE_PCT, ROUTE_BASE_PCT for CROUTE_OLD), `Post-Change Coverage:` (the P11-T4 through P11-T8 values for CPYHOOK, CPSHOOK, CROUTE, XPYHOOK, XPSHOOK, XROUTE), `New/Changed-code Coverage:` (the six P11-T9 `ChangedPercent=` values), and `Disposition:`, all numeric. `Disposition:` is `PASS` only when every post-change value and every changed-code value is at least 85; otherwise `BLOCKED`. The artifact states that no Python or TypeScript source file changed (P10-T10) and that PowerShell has no branch-coverage gate.
-- [ ] [P13-T3] Commit and push the final QA evidence. Commands: CMD-GIT-STATUS, then CMD-GIT-ADD with FEATURE plus every path CMD-GIT-STATUS listed outside FEATURE (fixes made by Phase 11 loop restarts), CMD-GIT-COMMIT with message "docs(773): record final QA evidence", CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS-PATH over `.claude .codex .agents .github tests scripts extensions` prints nothing and the push exits 0.
+- [x] [P13-T3] Commit and push the final QA evidence. Commands: CMD-GIT-STATUS, then CMD-GIT-ADD with FEATURE plus every path CMD-GIT-STATUS listed outside FEATURE (fixes made by Phase 11 loop restarts), CMD-GIT-COMMIT with message "docs(773): record final QA evidence", CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS-PATH over `.claude .codex .agents .github tests scripts extensions` prints nothing and the push exits 0.
 
 ### Phase 14 — Acceptance-Criteria Check-Off
 
 Each check-off task changes the AC line from `- [ ] AC-n:` to `- [x] AC-n:` in both `FEATURE/spec.md` and `FEATURE/issue.md` (the issue list mirrors the spec list) and records the check-off, with the cited artifacts, in FEATURE/evidence/other/ac-checkoff.TS.md. Its acceptance is the cited artifacts existing with passing acceptance; P14-T30 verifies the line state of both files. An AC whose cited artifacts do not all pass stays unchecked, and the plan outcome is remediation-required.
 
-- [ ] [P14-T1] Check off AC-1 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T2 (fail-before), P3-T5.
-- [ ] [P14-T2] Check off AC-2 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P5-T2 (fail-before), P6-T5.
-- [ ] [P14-T3] Check off AC-3 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5 and P6-T5 (direct-mode case D3 in each suite).
-- [ ] [P14-T4] Check off AC-4 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P6-T5 (large-path cases L1 through L3), P6-T6.
-- [ ] [P14-T5] Check off AC-5 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P6-T5 (fallback rows 4 and 5, case L3), P4-T11.
-- [ ] [P14-T6] Check off AC-6 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P6-T5 (fallback rows 1 through 9, case S3), P4-T11.
-- [ ] [P14-T7] Check off AC-7 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P6-T5 (cases P1 through P3), P3-T6.
-- [ ] [P14-T8] Check off AC-8 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P6-T5 (override cases), P0-T28 (non-vacuity), P10-T12.
-- [ ] [P14-T9] Check off AC-9 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P3-T6, P3-T7, P6-T5, P6-T8.
-- [ ] [P14-T10] Check off AC-10 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P6-T1, P6-T5 (entry-point cases), P6-T8.
-- [ ] [P14-T11] Check off AC-11 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P10-T13 and the seam cases of P3-T5 and P6-T5.
-- [ ] [P14-T12] Check off AC-12 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P1-T1, P4-T3, P10-T8.
-- [ ] [P14-T13] Check off AC-13 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T27 (non-vacuity), P10-T6.
-- [ ] [P14-T14] Check off AC-14 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P4-T2 (fail-before), P4-T11, P11-T8.
-- [ ] [P14-T15] Check off AC-15 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P1-T15, P10-T7, P4-T15.
-- [ ] [P14-T16] Check off AC-16 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P1-T12, P1-T13, P4-T12, P4-T13, P6-T6, P10-T9, P11-T14.
-- [ ] [P14-T17] Check off AC-17 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P3-T6, P6-T5, P6-T6, P6-T8.
-- [ ] [P14-T18] Check off AC-18 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T25 (non-vacuity), P10-T1.
-- [ ] [P14-T19] Check off AC-19 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P10-T2.
-- [ ] [P14-T20] Check off AC-20 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T26 (non-vacuity), P10-T3.
-- [ ] [P14-T21] Check off AC-21 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P10-T4.
-- [ ] [P14-T22] Check off AC-22 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T28 (non-vacuity), P10-T5.
-- [ ] [P14-T23] Check off AC-23 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P8-T7, P8-T8, P8-T9.
-- [ ] [P14-T24] Check off AC-24 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P12-T1, P12-T3, P6-T8, P13-T1.
-- [ ] [P14-T25] Check off AC-25 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P10-T10.
-- [ ] [P14-T26] Check off AC-26 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P11-T13, P11-T11, P6-T8.
-- [ ] [P14-T27] Check off AC-27 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P11-T1, P11-T2, P11-T4 through P11-T9, P13-T2 (`Disposition: PASS`).
-- [ ] [P14-T28] Check off AC-28 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P10-T11.
-- [ ] [P14-T29] Check off AC-29 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P9-T3.
+- [x] [P14-T1] Check off AC-1 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P2-T2 (fail-before), P3-T5.
+- [x] [P14-T2] Check off AC-2 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P5-T2 (fail-before), P6-T5.
+- [x] [P14-T3] Check off AC-3 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5 and P6-T5 (direct-mode case D3 in each suite).
+- [x] [P14-T4] Check off AC-4 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P6-T5 (large-path cases L1 through L3), P6-T6.
+- [x] [P14-T5] Check off AC-5 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P6-T5 (fallback rows 4 and 5, case L3), P4-T11.
+- [x] [P14-T6] Check off AC-6 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P6-T5 (fallback rows 1 through 9, case S3), P4-T11.
+- [x] [P14-T7] Check off AC-7 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P6-T5 (cases P1 through P3), P3-T6.
+- [x] [P14-T8] Check off AC-8 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P6-T5 (override cases), P0-T28 (non-vacuity), P10-T12.
+- [x] [P14-T9] Check off AC-9 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P3-T6, P3-T7, P6-T5, P6-T8.
+- [x] [P14-T10] Check off AC-10 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P6-T1, P6-T5 (entry-point cases), P6-T8.
+- [x] [P14-T11] Check off AC-11 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P10-T13 and the seam cases of P3-T5 and P6-T5.
+- [x] [P14-T12] Check off AC-12 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P1-T1, P4-T3, P10-T8.
+- [x] [P14-T13] Check off AC-13 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T27 (non-vacuity), P10-T6.
+- [x] [P14-T14] Check off AC-14 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P4-T2 (fail-before), P4-T11, P11-T8.
+- [x] [P14-T15] Check off AC-15 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P1-T15, P10-T7, P4-T15.
+- [x] [P14-T16] Check off AC-16 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P1-T12, P1-T13, P4-T12, P4-T13, P6-T6, P10-T9, P11-T14.
+- [x] [P14-T17] Check off AC-17 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P3-T5, P3-T6, P6-T5, P6-T6, P6-T8.
+- [x] [P14-T18] Check off AC-18 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T25 (non-vacuity), P10-T1.
+- [x] [P14-T19] Check off AC-19 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P10-T2.
+- [x] [P14-T20] Check off AC-20 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T26 (non-vacuity), P10-T3.
+- [x] [P14-T21] Check off AC-21 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P10-T4.
+- [x] [P14-T22] Check off AC-22 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P0-T28 (non-vacuity), P10-T5.
+- [x] [P14-T23] Check off AC-23 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P8-T7, P8-T8, P8-T9.
+- [x] [P14-T24] Check off AC-24 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P12-T1, P12-T3, P6-T8, P13-T1.
+- [x] [P14-T25] Check off AC-25 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P10-T10.
+- [x] [P14-T26] Check off AC-26 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P11-T13, P11-T11, P6-T8.
+- [x] [P14-T27] Check off AC-27 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P11-T1, P11-T2, P11-T4 through P11-T9, P13-T2 (`Disposition: PASS`).
+- [x] [P14-T28] Check off AC-28 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P10-T11.
+- [x] [P14-T29] Check off AC-29 in `FEATURE/spec.md` and `FEATURE/issue.md`. Evidence: P9-T3.
 - [ ] [P14-T30] Verify and commit the check-off in `FEATURE/spec.md` and `FEATURE/issue.md`. Commands: CMD-GIT-ADD with FEATURE and CMD-GIT-COMMIT with message "docs(773): check off acceptance criteria"; then CMD-GIT-COUNT with literal `- [x] AC-` over `docs/features/active/2026-09-29-python-batch-budget-hook-lacks-orchestration-awareness-773/spec.md docs/features/active/2026-09-29-python-batch-budget-hook-lacks-orchestration-awareness-773/issue.md`, then CMD-GIT-COUNT with literal `- [ ] AC-` over the same two files; then CMD-GIT-PUSH. Acceptance: the first search prints `spec.md:29` and `issue.md:29` (with their full paths); the second exits 1 with no output; CMD-GIT-STATUS-PATH over `docs/features/active/2026-09-29-python-batch-budget-hook-lacks-orchestration-awareness-773/spec.md docs/features/active/2026-09-29-python-batch-budget-hook-lacks-orchestration-awareness-773/issue.md` prints nothing after the push.
 
 ---
