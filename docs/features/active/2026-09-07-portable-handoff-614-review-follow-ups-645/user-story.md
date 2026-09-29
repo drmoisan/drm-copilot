@@ -3,51 +3,65 @@
 - Issue: #645
 - Owner: drmoisan
 - Status: Draft
-- Last Updated: 2026-09-29T19-29
+- Last Updated: 2026-09-29T23-55
+- Spec: `spec.md` (this folder). The spec's acceptance criteria govern where the two documents differ.
 
 ## Story Statement
 
-- As a ..., I want ..., so that ...
-- As a ..., I want ..., so that ...
+- As an orchestration operator, I want each blocked portable-handoff result to state a redacted cause next to its `HANDOFF_*` code, so that I can tell an absent file, a permission denial, and a corrupt read apart without reproducing the failure.
+- As a repository maintainer, I want the 14 handoff production modules to have enforced per-file coverage floors, so that a future change cannot silently lower their coverage.
+- As a hook maintainer, I want every untested rejection path of the epic planning-only hook's registry loader to be executed by a test that asserts the exact message, so that a change to the rejection contract fails CI.
+- As a Python maintainer, I want `raw_file_sha256` to have a real call site, so that the public API carries no dead surface and the fixture-hash test uses the shared helper.
 
 ## Problem / Why
 
-The portable prepared-orchestration handoff (#614, PR #638) merged with zero blocking review findings, but the final review cycle (`docs/features/completed/2026-08-31-portable-prepared-orchestration-handoff-614/remediation-inputs.2026-09-07T08-00.md`) recorded five non-blocking items, three Major and two Minor, that were deferred by orchestrator decision so the PR could land. They are durability and diagnosability gaps in the shipped surface, not behavioral defects:
+The portable prepared-orchestration handoff (#614, PR #638) shipped with non-blocking review findings deferred. The 2026-09-29 consolidation comment on #645 limits this feature to four of them:
 
-- R16 (Major): the four `throw` statements in `Get-EpicPlanningRegisteredMcpTool` (`.codex/hooks/enforce-epic-planning-only.ps1` lines 58, 67, 72, 77) form the hook's entire rejection contract and none is executed by any test. Changed-line coverage for the file is 83.33%, below the 85% floor as applied to changed lines, while file-level (91.82%) and repository-level (94.77%) coverage pass.
-- R17 (Major): `extensions/drm-copilot/jest.config.cjs` registers none of the 14 new production modules (`orchestration-handoff-*`, `semantic-mcp-identity.ts`, `orchestration-handoff-handlers.ts`, `mcp-repo-automation-tool-definitions-handoff.ts`) in its per-file `coverageThreshold` map, so their 99.19% line / 93.68% branch coverage is measured but not enforced.
-- R18 (Major): fifteen bare `} catch {` sites across `orchestration-handoff-materializer.ts`, `-authority-service.ts`, `-path-boundary.ts`, and `-materializer-production.ts` discard the caught value before returning a generic structured code, so an operator cannot distinguish an absent file, a permission denial, and a corrupt read behind `HANDOFF_VALIDATOR_UNAVAILABLE`.
-- R19 (Minor): `raw_file_sha256` in `scripts/dev_tools/orchestration_handoff_contract_support.py` is exported as public API (re-exported at `orchestration_handoff_contract.py:20`) with no production caller and no test; `test_orchestration_handoff_taskmaster_469.py` recomputes the same digests inline.
-- R20 (Minor): the `TransitionPreparedOrchestrationRequest` literal at `orchestration-handoff-materializer-path-boundary.test.ts` lines 182-190 omits the ten independent expected-context fields (TS2740 under `tsconfig.jest.json`), invisible at run time because ts-jest transpiles with `isolatedModules: true`.
+- **R16.** The throws at lines 58, 72, and 77 of `Get-EpicPlanningRegisteredMcpTool` (`.codex/hooks/enforce-epic-planning-only.ps1`) are not executed by any test. The throw at line 67 is already covered.
+- **R17.** `extensions/drm-copilot/jest.config.cjs` measures, but does not enforce, coverage for the 14 handoff production modules.
+- **R18.** 15 bare `} catch {` sites in four handoff modules discard the caught error. The returned code alone does not identify the cause.
+- **R19.** `raw_file_sha256` is exported with no caller, and a test recomputes the same digests inline.
 
+R20 (`INDEPENDENT_CONTEXT` / TS2740 in `orchestration-handoff-materializer-path-boundary.test.ts`) is out of scope because issue #647 resolves it.
 
 ## Personas & Scenarios
 
-- Persona: ...
-  - who the user is
-  - what they care about
-  - their constraints
-  - their goals and frustrations
-  - their context and motivations
-- Scenario: ...
-  - A concrete, step-by-step narrative that describes how a user accomplishes a goal in a real-world context using the system.
-  - who is acting?
-  - what triggered the action?
-  - what steps do they take?
-  - what obstacles or decisions occur?
-  - what outcome do they expect?
-
+- **Persona: orchestration operator.**
+  - Runs the prepared-orchestration transition and authority MCP tools across checkouts.
+  - Cares about acting on a blocked result without reading source code.
+  - Constraint: the result must not leak host paths or environment values beyond what `affectedPaths` already exposes.
+- **Persona: repository maintainer / reviewer.**
+  - Relies on CI gates, not on manual inspection, to keep coverage at 85% line / 75% branch per file.
+- **Scenario: permission denial during materialization.**
+  1. The operator invokes the transition tool.
+  2. The source checkpoint cannot be read because of a permission error.
+  3. Before this change, the result shows only `HANDOFF_VALIDATOR_UNAVAILABLE`.
+  4. After this change, the same code is returned, together with `failure_cause: "checkpoint-read: EACCES"`.
+  5. The operator fixes the file permission instead of investigating the validator.
+- **Scenario: unresolvable workspace root.**
+  1. The path boundary cannot resolve the workspace root.
+  2. The result keeps `HANDOFF_PLAN_PATH_INVALID` and adds `failure_cause: "workspace-root: unresolved"`.
+  3. The operator knows which path stage failed.
+  4. The underlying errno is not surfaced for this stage, because the public `HandoffPathBoundary` interface is unchanged (spec Decision D1).
+- **Scenario: registry drift in the hook.**
+  1. A maintainer edits the registry loader's validation.
+  2. A Pester case asserting an exact `EPIC_PLANNING_ONLY_BLOCKED:` message fails.
+  3. The contract change is caught before merge.
 
 ## Acceptance Criteria
 
-- [ ] All four `throw` statements at `.codex/hooks/enforce-epic-planning-only.ps1` lines 58, 67, 72, 77 show as covered in `artifacts/pester/powershell-coverage.xml`; the file's missed-line set reduces to the nine pre-existing lines; repository PowerShell line coverage stays at or above 94.77%.
-- [ ] `npm --prefix extensions/drm-copilot run test:coverage` exits 0 with 14 new per-file `coverageThreshold` entries at `lines: 85, branches: 75` and no `global` key.
-- [ ] Zero bare `} catch {` remain in the four handoff modules; each site returns a cause alongside its code; `test_failure_precedence_matches_the_shared_registry` and every existing code-selection test pass unchanged; per-module coverage does not fall below its current figure.
-- [ ] `raw_file_sha256` is referenced by at least one non-defining production or test call site, or is absent from both files; Python repository coverage stays at or above 92.89% line and 85.51% branch.
-- [ ] `npx tsc -p extensions/drm-copilot/tsconfig.jest.json --noEmit` no longer reports TS2740 at `orchestration-handoff-materializer-path-boundary.test.ts:182`; the suite's assertions are unchanged and pass.
-- [ ] No `HANDOFF_*` failure-code assignment, precedence order, fixture byte, or schema changes; Python, TypeScript, and PowerShell toolchains pass in one clean loop.
-
+- [ ] US-1 (operator diagnosability): Every blocked handoff result that follows a caught error or a path-resolution sentinel failure carries a `failureCause` (and, in MCP output, `failure_cause`) in the form `<stage>: <token>`. This is verified by the named cases in `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause.test.ts` and `extensions/drm-copilot/test/mcp-handlers/orchestration-handoff-handlers.test.ts` (spec AC-8, AC-9, AC-11).
+- [ ] US-2 (redaction): Cause strings contain only `error.code` / `error.name` class tokens or fixed literals. They contain no absolute path, file content, or environment value. This is verified by the table-driven helper tests (spec AC-10).
+- [ ] US-3 (no contract change): For every input, `status`, `primaryFailureCode`, `affectedPaths`, `unsupportedCapabilities`, `handoffId`, and `handoffHistorySha256` are unchanged. `HANDOFF_*` assignment and precedence, existing fixtures, the envelope schema, MCP input schemas, and the public `HandoffPathBoundary` interface are unchanged. Validated and materialized results carry no cause (spec AC-9, AC-11, AC-12, AC-13).
+- [ ] US-4 (zero bare catch): A Grep for `catch\s*\{` over the four R18 handoff modules, and over every handoff or semantic-mcp source file, returns zero matches (spec AC-7).
+- [ ] US-5 (enforced coverage floors): `extensions/drm-copilot/jest.config.cjs` has 14 per-file `coverageThreshold` entries at `{ lines: 85, branches: 75 }`, with no `global` key and no `coveragePathIgnorePatterns`. `npm --prefix extensions/drm-copilot run test:coverage` exits 0 (spec AC-5, AC-6, AC-17).
+- [ ] US-6 (tested hook rejection contract): Pester cases assert the exact messages of the throws at lines 58, 72, and 77 using committed fixtures only. The PowerShell coverage report shows those lines as covered. The hook source and its published copy are byte-identical and unchanged (spec AC-1, AC-2, AC-3, AC-4).
+- [ ] US-7 (no dead public API): `raw_file_sha256` is called by `test_taskmaster_469_fixture_hashes_and_source_history_are_pinned`, which passes. The inline `hashlib` recomputation is removed, and the production Python files are unchanged (spec AC-15).
+- [ ] US-8 (no regression): Python, PowerShell, and per-module TypeScript coverage are at or above the Phase 0 baseline. Every touched file is at or under 500 lines. `mcp-server-prepack.test.ts` passes. The full toolchain loop passes in one pass with no new `tsconfig.jest.json` diagnostic (spec AC-16 through AC-20).
+- [ ] US-9 (scope boundary): `orchestration-handoff-materializer-path-boundary.test.ts` is not modified, and no dependency is added (spec AC-14, AC-21).
 
 ## Non-Goals
 
-Call out what is explicitly excluded from this feature.
+- R20 (`INDEPENDENT_CONTEXT` / TS2740), which is resolved by #647.
+- Surfacing the path-boundary errno. This is a candidate follow-up that requires a `HandoffPathBoundary` interface change.
+- Changing the hook source, `HANDOFF_*` codes, precedence, or any schema.
