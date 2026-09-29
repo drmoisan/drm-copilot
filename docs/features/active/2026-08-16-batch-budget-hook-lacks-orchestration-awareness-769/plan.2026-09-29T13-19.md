@@ -252,13 +252,13 @@ The negative and positive searches in this plan use these fixed strings, quoted 
 - [x] [P7-T6] Verify the regenerated variants. Command: CMD-PY-GEN-CHECK (`poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check`). Write FEATURE/evidence/qa-gates/codex-variants-check.TS.md. Acceptance: exit 0 and no stderr line.
 - [x] [P7-T7] Run `tests/scripts/dev_tools/test_generate_codex_agent_variants.py` and `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`. Command: CMD-PY-TEST over those two files. Write FEATURE/evidence/regression-testing/codex-surface-contracts.TS.md. Acceptance: exit 0 and no FAILED line.
 - [x] [P7-T8] Commit and push Phase 7 (`.agents`, `.codex/agents`, XB). Commands: CMD-GIT-ADD with `.agents/skills/powershell/SKILL.md .agents/skills/invoke-powershell-engineer/SKILL.md .codex/agents extensions/drm-copilot/resources/codex-and-agents-customizations docs/features/active/2026-08-16-batch-budget-hook-lacks-orchestration-awareness-769`, CMD-GIT-COMMIT with message "docs(769): remove per-batch text from Codex and .agents PowerShell surfaces", CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing and the push exits 0.
-- [ ] [P7-T9] AC-13 per-batch sweep over the PowerShell-path surfaces and mirrors of Appendix G (all targets are tracked and committed at this point). Command: the AC-13 search command of Appendix G. Write FEATURE/evidence/qa-gates/ac13-sweep.TS.md with `ExpectedExitCode: 1`. Acceptance: exit 1 and no output.
+- [x] [P7-T9] AC-13 per-batch sweep over the PowerShell-path surfaces and mirrors of Appendix G (all targets are tracked and committed at this point). Command: the AC-13 search command of Appendix G. Write FEATURE/evidence/qa-gates/ac13-sweep.TS.md with `ExpectedExitCode: 1`. Acceptance: exit 1 and no output.
 
 ### Phase 8 — Follow-up Potential Entries
 
-- [ ] [P8-T1] Write `docs/features/potential/2026-09-29-python-batch-budget-hook-lacks-orchestration-awareness.md` per Appendix D1. Acceptance: the Write succeeds without a hook denial; content is verified after commit by P8-T4.
-- [ ] [P8-T2] Write `docs/features/potential/2026-09-29-csharp-budget-text-per-batch-cap.md` per Appendix D2. Acceptance: as P8-T1.
-- [ ] [P8-T3] Write `docs/features/potential/2026-09-29-codex-routing-resolver-powershell-budget-two.md` per Appendix D3. Acceptance: as P8-T1.
+- [x] [P8-T1] Write `docs/features/potential/2026-09-29-python-batch-budget-hook-lacks-orchestration-awareness.md` per Appendix D1. Acceptance: the Write succeeds without a hook denial; content is verified after commit by P8-T4.
+- [x] [P8-T2] Write `docs/features/potential/2026-09-29-csharp-budget-text-per-batch-cap.md` per Appendix D2. Acceptance: as P8-T1.
+- [x] [P8-T3] Write `docs/features/potential/2026-09-29-codex-routing-resolver-powershell-budget-two.md` per Appendix D3. Acceptance: as P8-T1.
 - [ ] [P8-T4] Commit, push, and verify the three entries under `docs/features/potential/`. Commands: CMD-GIT-ADD with the three paths of P8-T1 through P8-T3 and FEATURE, CMD-GIT-COMMIT with message "docs(769): record batch-budget follow-up potential entries", CMD-GIT-PUSH; then CMD-GIT-LS over the three paths, CMD-GIT-COUNT with literal `#769` over them, and CMD-GIT-COUNT with literal `## Acceptance Criteria (early draft)` over them. Write FEATURE/evidence/other/follow-up-entries.TS.md. Acceptance: CMD-GIT-LS prints exactly the three paths; each CMD-GIT-COUNT prints three `path:count` lines; no `gh` command is run.
 
 ### Phase 9 — Final QA Loop: PowerShell (PoshQC and Pester)
