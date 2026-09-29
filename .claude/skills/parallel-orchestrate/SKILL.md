@@ -940,7 +940,7 @@ escaped paths is not a drift event. `observed_radius` is the serialized observed
 parent writes back in step 7 of `#### Seven-Step Procedure`: it carries the six invariant-9 keys with
 `source: observed`, is built by F1's library rather than by hand, and is `null` exactly when `result`
 is `no_escape`, on the same precondition as `drift_event`. Exit status is `0` on success, `1` on
-missing or malformed input (one stderr line prefixed `parallel drift detection failed: `), and `2`
+missing or malformed input (one stderr line prefixed "parallel drift detection failed: "), and `2`
 on a usage error, such as a missing or non-integer `-ItemKey` or an unrecognized parameter.
 
 #### Synthetic Blocking Finding
