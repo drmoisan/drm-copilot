@@ -349,12 +349,12 @@ Each item was observed in this repository's recorded runs or read from source, n
       `d06ba5d657b75de52cad7859dda307bf9d420046`); every path printed by the name-only diff and by the
       porcelain status lies under FEATURE. Any other path stops the plan, because the code baseline
       would then differ from BASE_SHA.
-- [ ] [P0-T9] Commit and push the feature documents under FEATURE (FEATURE/issue.md, FEATURE/spec.md, FEATURE/research, this plan, and FEATURE/evidence) so CI can be dispatched on BRANCH.
+- [x] [P0-T9] Commit and push the feature documents under FEATURE (FEATURE/issue.md, FEATURE/spec.md, FEATURE/research, this plan, and FEATURE/evidence) so CI can be dispatched on BRANCH.
       Commands: CMD-GIT-ADD with `docs/features/active/2026-09-28-parallel-skills-invoke-unbundled-python-clis-763`,
       CMD-GIT-COMMIT with message "docs(763): add spec, research, plan, and phase 0 evidence",
       CMD-GIT-PUSH, then `git status --porcelain`. Acceptance: the push exits 0 and the porcelain status
       prints nothing.
-- [ ] [P0-T10] Record pre-change line counts in FEATURE/evidence/baseline/line-counts.TS.md.
+- [x] [P0-T10] Record pre-change line counts in FEATURE/evidence/baseline/line-counts.TS.md.
       Command: CMD-SH with script line-counts (A22) over `scripts/dev_tools/skill_bundle_contract.py`,
       `scripts/dev_tools/skill_bundle_contract_cli.py`,
       `tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py`,
@@ -364,40 +364,40 @@ Each item was observed in this repository's recorded runs or read from source, n
       `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, `tests/shell/parallel_payload_only.bats`,
       and `tests/shell/parallel_bash_manifest_membership.bats`. Acceptance: exit 0 and nine
       `LineCount=` lines with numeric values; later tasks compare against these values.
-- [ ] [P0-T11] Record mirror identity at baseline in FEATURE/evidence/baseline/mirror-state.TS.md.
+- [x] [P0-T11] Record mirror identity at baseline in FEATURE/evidence/baseline/mirror-state.TS.md.
       Command: CMD-SH with script mirror-check (A5) over `.claude/skills/parallel-orchestrate/SKILL.md`,
       `.claude/skills/parallel-remove/SKILL.md`, `.claude/agents/parallel-orchestrator.md`,
       `.claude/hooks/enforce-parallel-abandon-gate.ps1`, and
       `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`. Acceptance: exit 0 and
       `MIRROR-SUMMARY same=5 diff=0 missing=0`; any DIFF or MISSING stops the plan.
-- [ ] [P0-T12] Python format baseline for `scripts/dev_tools/skill_bundle_contract.py` and the four other P0-T10 Python files, written to FEATURE/evidence/baseline/python-format.TS.md.
+- [x] [P0-T12] Python format baseline for `scripts/dev_tools/skill_bundle_contract.py` and the four other P0-T10 Python files, written to FEATURE/evidence/baseline/python-format.TS.md.
       Command: CMD-PY-BLACK-CHECK over the five Python files named in P0-T10. Acceptance: the artifact
       records the exit code and the summary line verbatim.
-- [ ] [P0-T13] Python lint baseline for the P0-T12 files (`scripts/dev_tools/skill_bundle_contract.py` and four others), written to FEATURE/evidence/baseline/python-lint.TS.md.
+- [x] [P0-T13] Python lint baseline for the P0-T12 files (`scripts/dev_tools/skill_bundle_contract.py` and four others), written to FEATURE/evidence/baseline/python-lint.TS.md.
       Command: CMD-PY-RUFF over the same five files. Acceptance: the artifact records the exit code
       and the summary line verbatim.
-- [ ] [P0-T14] Python type-check baseline for the P0-T12 files (`scripts/dev_tools/skill_bundle_contract.py` and four others), written to FEATURE/evidence/baseline/python-typecheck.TS.md.
+- [x] [P0-T14] Python type-check baseline for the P0-T12 files (`scripts/dev_tools/skill_bundle_contract.py` and four others), written to FEATURE/evidence/baseline/python-typecheck.TS.md.
       Command: CMD-PY-PYRIGHT over the same five files. Acceptance: the artifact records the exit code
       and the error, warning, and information counts from the summary line.
-- [ ] [P0-T15] Python coverage baseline for `scripts/dev_tools/skill_bundle_contract.py` and `scripts/dev_tools/skill_bundle_contract_cli.py`, written to FEATURE/evidence/baseline/python-coverage.TS.md.
+- [x] [P0-T15] Python coverage baseline for `scripts/dev_tools/skill_bundle_contract.py` and `scripts/dev_tools/skill_bundle_contract_cli.py`, written to FEATURE/evidence/baseline/python-coverage.TS.md.
       Commands: `poetry run pytest -v tests/scripts/dev_tools/test_skill_bundle_contract.py tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py tests/scripts/dev_tools/test_skill_bundle_contract_cli.py tests/scripts/dev_tools/test_skill_bundle_contract_repo.py --cov=scripts.dev_tools.skill_bundle_contract --cov=scripts.dev_tools.skill_bundle_contract_cli --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/cov-763-baseline.json`,
       then CMD-PY-SCRIPT with script py-cov-files (A7) and arguments
       `SCRATCH/cov-763-baseline.json scripts/dev_tools/skill_bundle_contract.py scripts/dev_tools/skill_bundle_contract_cli.py`.
       Acceptance: pytest exits 0 with no FAILED line; the artifact records the pytest summary line,
       the two term-missing rows, and two A7 lines of the form
       `COVERAGE file=<path> LinePercent=<n> BranchPercent=<n>` with numeric values.
-- [ ] [P0-T16] Python regression baseline over `tests/scripts/dev_tools`, written to FEATURE/evidence/baseline/python-regression.TS.md.
+- [x] [P0-T16] Python regression baseline over `tests/scripts/dev_tools`, written to FEATURE/evidence/baseline/python-regression.TS.md.
       Commands: `poetry run pytest tests/scripts/dev_tools -q`, then CMD-PY-TEST over the named set of
       Appendix C3. Acceptance: the artifact records both summary lines verbatim and every `FAILED`
       line of the full run (the baseline failure set); every node of the named set is PASSED except
       KL-510, which is recorded with its KL-510 line.
-- [ ] [P0-T17] PowerShell analyzer baseline for `.claude/hooks/enforce-parallel-abandon-gate.ps1`, written to FEATURE/evidence/baseline/powershell-analyze.TS.md.
+- [x] [P0-T17] PowerShell analyzer baseline for `.claude/hooks/enforce-parallel-abandon-gate.ps1`, written to FEATURE/evidence/baseline/powershell-analyze.TS.md.
       Command: CMD-PS with script pssa-count (A9) over `.claude/hooks/enforce-parallel-abandon-gate.ps1`.
       Acceptance: exit 0 and the line `PSSA-SUMMARY DiagnosticCount=<n>` is recorded with its value.
-- [ ] [P0-T18] PowerShell format baseline for `.claude/hooks/enforce-parallel-abandon-gate.ps1` and `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, written to FEATURE/evidence/baseline/powershell-format.TS.md.
+- [x] [P0-T18] PowerShell format baseline for `.claude/hooks/enforce-parallel-abandon-gate.ps1` and `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, written to FEATURE/evidence/baseline/powershell-format.TS.md.
       Command: CMD-PS with script ps-format-check (A6) over the two files. Acceptance: exit 0 and the
       line `FORMAT-SUMMARY ChangedCount=<n>` is recorded with its value.
-- [ ] [P0-T19] PowerShell test and coverage baseline for `tests/scripts/claude-lib`, `tests/scripts/claude-hooks`, and `tests/scripts/claude-runtime`, written to FEATURE/evidence/baseline/powershell-tests.TS.md.
+- [x] [P0-T19] PowerShell test and coverage baseline for `tests/scripts/claude-lib`, `tests/scripts/claude-hooks`, and `tests/scripts/claude-runtime`, written to FEATURE/evidence/baseline/powershell-tests.TS.md.
       Commands: CMD-PESTER with `tests/scripts/claude-lib tests/scripts/claude-hooks tests/scripts/claude-runtime`;
       CMD-JUNIT with suffixes `tests/scripts/claude-hooks/enforce-parallel-abandon-gate.Tests.ps1`,
       `tests/scripts/claude-hooks/enforce-parallel-abandon-gate.TriggerScoping.Tests.ps1`, and
@@ -408,12 +408,12 @@ Each item was observed in this repository's recorded runs or read from source, n
       stops the task), and the `JACOCO file=.claude/hooks/enforce-parallel-abandon-gate.ps1` line with a
       numeric `LinePercent=`. The three new PowerShell production files have no baseline (absent at
       BASE_SHA); the artifact states that.
-- [ ] [P0-T20] Bash local baseline for `tests/shell/parallel_payload_only.bats` and `tests/shell/parallel_bash_manifest_membership.bats`, written to FEATURE/evidence/baseline/shell-local.TS.md.
+- [x] [P0-T20] Bash local baseline for `tests/shell/parallel_payload_only.bats` and `tests/shell/parallel_bash_manifest_membership.bats`, written to FEATURE/evidence/baseline/shell-local.TS.md.
       Commands: `shfmt --version`, `shellcheck --version`, `npx --yes bats --version`, then CMD-BATS
       over the two suites. Acceptance: the three version commands exit 0 and their versions are
       recorded; the artifact records the TAP plan line and every `not ok` line (the local bats baseline
       failure set, possibly empty).
-- [ ] [P0-T21] Bash CI coverage baseline from `.github/workflows/_shell-coverage.yml` on BRANCH, written to FEATURE/evidence/baseline/shell-coverage-ci.TS.md.
+- [x] [P0-T21] Bash CI coverage baseline from `.github/workflows/_shell-coverage.yml` on BRANCH, written to FEATURE/evidence/baseline/shell-coverage-ci.TS.md.
       Commands: CMD-GIT-HEAD, CMD-GH-DISPATCH, CMD-GH-LATEST (repeat until it lists a run whose
       `headSha` equals the HEAD value), CMD-CI-WAIT with that run id, CMD-CI-LOG with that run id.
       CMD-CI-WAIT polls for up to 90 minutes, which exceeds the 10-minute foreground tool limit: run
@@ -423,47 +423,47 @@ Each item was observed in this repository's recorded runs or read from source, n
       `Bash coverage (lines): <n>%` and `NOT-OK-COUNT=0`; the artifact records the run id, headSha, the
       headline value, `NOT-OK-COUNT=`, and `OK-COUNT=`. A non-success conclusion stops the plan (the
       bash coverage baseline would be unavailable and the comparison BLOCKED).
-- [ ] [P0-T22] Bash per-file coverage baseline from the P0-T21 artifact, written to FEATURE/evidence/baseline/shell-coverage-files.TS.md.
+- [x] [P0-T22] Bash per-file coverage baseline from the P0-T21 artifact, written to FEATURE/evidence/baseline/shell-coverage-files.TS.md.
       Commands: CMD-GH-DOWNLOAD with the P0-T21 run id into `SCRATCH/shell-cov-baseline`, then
       CMD-PY-SCRIPT with script cobertura-files (A16) and arguments `SCRATCH/shell-cov-baseline/cov.xml`
       `compute-cohorts.sh`. Acceptance: the artifact records the `COBERTURA-TOTAL line-rate=` value and
       one `COBERTURA file=` line for `compute-cohorts.sh` (the control that per-file entries exist for
       the `.claude/lib/bash` tree).
-- [ ] [P0-T23] TypeScript push-down regression baseline for `extensions/drm-copilot/test/lib/push-down`, written to FEATURE/evidence/baseline/ts-push-down-jest.TS.md.
+- [x] [P0-T23] TypeScript push-down regression baseline for `extensions/drm-copilot/test/lib/push-down`, written to FEATURE/evidence/baseline/ts-push-down-jest.TS.md.
       No TypeScript source or test is edited by this plan; the bundle resources these tests read are.
       Commands: CMD-TS-CI, then CMD-TS-TEST. Acceptance: the artifact records the "Tests:" summary line
       verbatim and every line beginning `FAIL ` (the Jest baseline failure set, possibly empty).
-- [ ] [P0-T24] Record the spec.md acceptance-criteria checkbox baseline in FEATURE/evidence/baseline/ac-checkbox-state.TS.md.
+- [x] [P0-T24] Record the spec.md acceptance-criteria checkbox baseline in FEATURE/evidence/baseline/ac-checkbox-state.TS.md.
       Command: CMD-SH with script ac-count (A21) and argument `FEATURE/spec.md`. Acceptance: exit 0 and
       `AC-CHECKED=0 AC-UNCHECKED=18`.
 
 ### Phase 1 — Guard Registry Removal and Fail-Before Reproduction (AC13)
 
-- [ ] [P1-T1] Reset the Python batch budget before editing `scripts/dev_tools/skill_bundle_contract.py`: CMD-PS with script reset-batch-budget (A8) and `-Kind python`.
+- [x] [P1-T1] Reset the Python batch budget before editing `scripts/dev_tools/skill_bundle_contract.py`: CMD-PS with script reset-batch-budget (A8) and `-Kind python`.
       Write FEATURE/evidence/other/batch-budget-reset-p1.TS.md. Acceptance: exit 0 and a
       `RESET removed=` line.
-- [ ] [P1-T2] Edit `scripts/dev_tools/skill_bundle_contract.py` per Appendix B1 (lines 132-145 become the empty registry).
+- [x] [P1-T2] Edit `scripts/dev_tools/skill_bundle_contract.py` per Appendix B1 (lines 132-145 become the empty registry).
       Acceptance: CMD-GIT-COUNT with literal `KNOWN_UNBUNDLED_REFERENCES: tuple[KnownUnbundledReference, ...] = ()`
       over that file prints a count of 1, and CMD-GIT-COUNT with literal `"#763",` over it exits 1
       with no output.
-- [ ] [P1-T3] Edit `scripts/dev_tools/skill_bundle_contract_cli.py` per Appendix B2 (keyword-only `exceptions` parameter on `main`, forwarded to both finders).
+- [x] [P1-T3] Edit `scripts/dev_tools/skill_bundle_contract_cli.py` per Appendix B2 (keyword-only `exceptions` parameter on `main`, forwarded to both finders).
       Acceptance: CMD-GIT-COUNT with literal `find_violations(inputs, exceptions=registered)` over that
       file prints a count of 1 and CMD-GIT-COUNT with literal
       `find_stale_exceptions(inputs, exceptions=registered)` prints a count of 1.
-- [ ] [P1-T4] Edit `tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py` per Appendix B3 (the registry test asserts the empty registry).
+- [x] [P1-T4] Edit `tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py` per Appendix B3 (the registry test asserts the empty registry).
       Acceptance: CMD-GIT-COUNT with literal `def test_known_unbundled_references_registry_is_empty`
       over that file prints a count of 1 and CMD-GIT-COUNT with literal
       `test_known_unbundled_references_cite_issue_763` exits 1 with no output.
-- [ ] [P1-T5] Edit `tests/scripts/dev_tools/test_skill_bundle_contract_cli.py` per Appendix B4 (no default-registry dependency; stale and suppression cases through the injected registry).
+- [x] [P1-T5] Edit `tests/scripts/dev_tools/test_skill_bundle_contract_cli.py` per Appendix B4 (no default-registry dependency; stale and suppression cases through the injected registry).
       Acceptance: CMD-GIT-COUNT with literal `def test_main_suppresses_a_registered_exception` over
       that file prints a count of 1 and CMD-GIT-COUNT with literal `parallel_drift_detection_cli` exits
       1 with no output.
-- [ ] [P1-T6] Run the guard unit tests in `tests/scripts/dev_tools/test_skill_bundle_contract.py`, `tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py`, and `tests/scripts/dev_tools/test_skill_bundle_contract_cli.py`.
+- [x] [P1-T6] Run the guard unit tests in `tests/scripts/dev_tools/test_skill_bundle_contract.py`, `tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py`, and `tests/scripts/dev_tools/test_skill_bundle_contract_cli.py`.
       Command: CMD-PY-TEST over the three files. Write
       FEATURE/evidence/regression-testing/guard-units-after-registry.TS.md. Acceptance: exit 0, no FAILED
       line, and the five B4 test names and `test_known_unbundled_references_registry_is_empty` each
       appear on a PASSED line.
-- [ ] [P1-T7] [expect-fail] Run the repository guard `tests/scripts/dev_tools/test_skill_bundle_contract_repo.py` with the empty registry and the unported skills.
+- [x] [P1-T7] [expect-fail] Run the repository guard `tests/scripts/dev_tools/test_skill_bundle_contract_repo.py` with the empty registry and the unported skills.
       Command: CMD-PY-TEST over that file. Write
       FEATURE/evidence/regression-testing/guard-repo-before-port.TS.md with `ExpectedExitCode: 1`.
       Acceptance: exit 1; exactly one line begins `FAILED `, naming
@@ -473,7 +473,7 @@ Each item was observed in this repository's recorded runs or read from source, n
       four other tests (including `test_known_unbundled_references_are_not_stale`) are PASSED. This is
       the defect reproduction: with no exception registered, the guard reports both unbundled CLIs.
       Any other failure set stops the plan for a design review.
-- [ ] [P1-T8] [expect-fail] Run the guard CLI `scripts/dev_tools/skill_bundle_contract_cli.py` before the port.
+- [x] [P1-T8] [expect-fail] Run the guard CLI `scripts/dev_tools/skill_bundle_contract_cli.py` before the port.
       Command: CMD-PY-GUARD-CLI. Write FEATURE/evidence/regression-testing/guard-cli-before-port.TS.md with
       `ExpectedExitCode: 1`. Acceptance: exit 1 and stderr carries exactly two lines, in this order:
       `skill-bundle violation: parallel-orchestrate | scripts/dev_tools/parallel_drift_detection_cli.py | not-in-bundle`

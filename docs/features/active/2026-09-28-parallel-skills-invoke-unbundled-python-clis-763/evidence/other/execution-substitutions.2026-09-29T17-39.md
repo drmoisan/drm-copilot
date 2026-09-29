@@ -19,6 +19,10 @@ The plan's task text is not altered. The following substitutions apply at execut
 3. Commit trailers. Every CMD-GIT-COMMIT carries exactly two trailers:
    `--trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"` and
    `--trailer "Claude-Session: https://claude.ai/code/session_01Pij9yfzq7FBzpYvqjejUYn"`.
+   Amendment (recorded after commit `b9fc1594`, which carries both trailers): the session's
+   harness attribution instruction was replaced mid-session and now specifies only the
+   `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` line, and directs that no attribution
+   line it leaves out be added. Commits after `b9fc1594` therefore carry that one trailer only.
 4. Push cadence. Commit and push at every phase boundary the plan specifies, with
    `git push -u origin bug/parallel-skills-invoke-unbundled-python-clis-exec-763`.
 
