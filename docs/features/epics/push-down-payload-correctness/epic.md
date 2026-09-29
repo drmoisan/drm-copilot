@@ -16,7 +16,7 @@ intent:
     - Line coverage >= 85% and branch coverage >= 75% where the tooling measures it.
 features:
   - issue_num: 507
-    feature_folder: 2026-09-29-push-down-root-folders-divergence-507
+    feature_folder: 2026-08-22-push-down-root-folders-divergence-507
     depends_on: []
   - issue_num: 763
     feature_folder: 2026-09-29-parallel-skills-invoke-unbundled-python-clis-763
