@@ -538,46 +538,46 @@ script A6 and a before-and-after hash comparison (A5).
       FEATURE/evidence/regression-testing/cleanup-bats-after-move.TS.md. Acceptance: the TAP plan line is
       recorded, and every `not ok` line (if any) names a KL-SHELL-2 member; the artifact carries
       `ExpectedExitCode: 1` when a KL-SHELL-2 member fails and no `ExpectedExitCode:` line otherwise.
-- [ ] [P2-T14] Commit and push Phase 2 (`.claude/skills/cleanup-merged-worktrees` and `tests/shell`).
+- [x] [P2-T14] Commit and push Phase 2 (`.claude/skills/cleanup-merged-worktrees` and `tests/shell`).
       Commands: CMD-GIT-ADD with `.claude/skills/cleanup-merged-worktrees tests/shell FEATURE/evidence FEATURE/plan.2026-09-28T23-50.md`,
       CMD-GIT-COMMIT with message "fix(762): bundle cleanup-worktrees scripts with the cleanup-merged-worktrees skill",
       CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing after the commit, and the push exits 0.
 
 ### Phase 3 — Relocate the CI Gate Parser (AC3, AC4)
 
-- [ ] [P3-T1] Reset the PowerShell batch budget for `.claude/lib/ci-gate/Invoke-CiGateParser.ps1` and
+- [x] [P3-T1] Reset the PowerShell batch budget for `.claude/lib/ci-gate/Invoke-CiGateParser.ps1` and
       its tests: CMD-PS-SCRIPT with script reset-batch-budget (A8) and `-Kind powershell`. Write
       FEATURE/evidence/other/batch-budget-reset-p3.TS.md. Acceptance: exit 0 and a `RESET removed=` line.
-- [ ] [P3-T2] Move the parser: `mkdir -p .claude/lib/ci-gate`, then
+- [x] [P3-T2] Move the parser: `mkdir -p .claude/lib/ci-gate`, then
       `git mv scripts/orchestration/Invoke-CiGateParser.ps1 .claude/lib/ci-gate/Invoke-CiGateParser.ps1`.
       Acceptance: CMD-GIT-LS over `.claude/lib/ci-gate` prints `.claude/lib/ci-gate/Invoke-CiGateParser.ps1`
       and CMD-GIT-LS over `scripts/orchestration` prints nothing.
-- [ ] [P3-T3] Move the Pester suite to `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1`.
+- [x] [P3-T3] Move the Pester suite to `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1`.
       Command: `git mv tests/scripts/orchestration/Invoke-CiGateParser.Tests.ps1 tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1`.
       Acceptance: CMD-GIT-LS over `tests/scripts/orchestration` prints nothing and CMD-GIT-LS over
       `tests/scripts/claude-lib/ci-gate` lists the moved suite and `CiGate.Manifest.Tests.ps1`.
-- [ ] [P3-T4] Edit `.claude/lib/ci-gate/Invoke-CiGateParser.ps1` line 61 (the `.EXAMPLE` block) so the
+- [x] [P3-T4] Edit `.claude/lib/ci-gate/Invoke-CiGateParser.ps1` line 61 (the `.EXAMPLE` block) so the
       path reads `./.claude/lib/ci-gate/Invoke-CiGateParser.ps1 -HeadSha $sha`. Acceptance: CMD-GIT-COUNT
       with literal `./.claude/lib/ci-gate/Invoke-CiGateParser.ps1` over that file prints a count of 1.
-- [ ] [P3-T5] Edit `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1` line 11 so the
+- [x] [P3-T5] Edit `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1` line 11 so the
       relative path argument reads `"../../../../.claude/lib/ci-gate/Invoke-CiGateParser.ps1"`.
       Acceptance: CMD-GIT-COUNT with literal `../../../../.claude/lib/ci-gate/Invoke-CiGateParser.ps1`
       over that file prints a count of 1.
-- [ ] [P3-T6] Edit `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`: insert the five lines of
+- [x] [P3-T6] Edit `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`: insert the five lines of
       Appendix B11 after line 319 (inside `CodeCoverage.Path`, before the closing parenthesis). Acceptance:
       CMD-PS-SCRIPT with script psd1-parse (A10) over the file prints `PSD1-OK`, and CMD-GIT-COUNT with
       literal `'.claude/lib/ci-gate/Invoke-CiGateParser.ps1'` over it prints a count of 1.
-- [ ] [P3-T7] Mirror `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` into the PoshQC bundle.
+- [x] [P3-T7] Mirror `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` into the PoshQC bundle.
       Command: `cp scripts/powershell/PoshQC/settings/pester.runsettings.psd1 extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`.
       Acceptance: CMD-PS-SCRIPT with script file-hashes over the two paths prints equal hashes.
-- [ ] [P3-T8] Edit `.claude/skills/orchestrate/SKILL.md` line 275 to the exact text of Appendix B12
+- [x] [P3-T8] Edit `.claude/skills/orchestrate/SKILL.md` line 275 to the exact text of Appendix B12
       (an explicit `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1` invocation).
       Acceptance: CMD-GIT-COUNT with literal `-File .claude/lib/ci-gate/Invoke-CiGateParser.ps1` (passed
       through `-e`) over that file prints a count of 1.
-- [ ] [P3-T9] Edit `.claude/skills/epic-orchestrate/SKILL.md` line 109 to the exact text of Appendix
+- [x] [P3-T9] Edit `.claude/skills/epic-orchestrate/SKILL.md` line 109 to the exact text of Appendix
       B13. Acceptance: CMD-GIT-COUNT with literal `-File .claude/lib/ci-gate/Invoke-CiGateParser.ps1`
       (passed through `-e`) over that file prints a count of 1.
-- [ ] [P3-T10] Run the moved suite `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1`.
+- [x] [P3-T10] Run the moved suite `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1`.
       Command: CMD-PS-SCRIPT with script pester-counts (A2) and that path. Write
       FEATURE/evidence/regression-testing/ci-gate-parser-after-move.TS.md. Acceptance: `PassedCount=15`
       and `FailedCount=0`.

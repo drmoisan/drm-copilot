@@ -8,7 +8,7 @@ Describe "Invoke-CiGateParser.ps1" {
         # the param block without prompting; the entry-point body is skipped
         # because $MyInvocation.InvocationName -eq '.' when dot-sourced. No live
         # gh, no network, and no temp files are involved.
-        $script:scriptPath = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/orchestration/Invoke-CiGateParser.ps1")).Path
+        $script:scriptPath = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "../../../../.claude/lib/ci-gate/Invoke-CiGateParser.ps1")).Path
         . $script:scriptPath -ChecksJson '[]' -HeadSha 'bootstrap-sha'
 
         # A fixed clock delegate used wherever a deterministic verified_at is
