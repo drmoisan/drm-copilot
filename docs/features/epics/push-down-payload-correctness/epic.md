@@ -22,7 +22,7 @@ features:
     feature_folder: 2026-09-28-parallel-skills-invoke-unbundled-python-clis-763
     depends_on: []
   - issue_num: 508
-    feature_folder: 2026-09-29-blast-radius-config-has-no-merge-decorator-508
+    feature_folder: 2026-08-22-blast-radius-config-has-no-merge-decorator-508
     depends_on: [507]
   - issue_num: 621
     feature_folder: 2026-09-29-push-down-destination-exclusion-manifest-621
