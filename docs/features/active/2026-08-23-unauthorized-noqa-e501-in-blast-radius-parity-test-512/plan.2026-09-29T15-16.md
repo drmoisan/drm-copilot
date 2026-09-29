@@ -5,40 +5,126 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-29T15-16
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 0.2
+- **Work Mode:** full-bug
+- **Requirements source:** `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md` (sole acceptance-criteria source), with `issue.md` and `research/2026-09-29T19-20-noqa-e501-rename.research.md` as context.
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+Complexity band: C1
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+Complexity rationale: one test function is renamed and one suppression comment is removed, both in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`. No production file, configuration file, or policy file is changed.
 
+**Fail-closed evidence rule:** Every baseline, fail-before, final-QC, and coverage-comparison step has its own artifact under `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/<kind>/`. If any required artifact is missing or lacks its required fields, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+**Evidence accounting rule:** Each evidence-producing task names its artifact path. A task is not checked off until that artifact exists. Every command artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. An artifact whose gate is expected to exit non-zero also carries `ExpectedExitCode: <int>` and records only that one gate.
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+**Evidence location:** All evidence lives under `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/`, `.../evidence/regression-testing/`, or `.../evidence/qa-gates/`. No path under `artifacts/` other than `artifacts/orchestration/` is used for evidence.
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#512-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+**Fixed names used below:**
+- Target file: `tests/scripts/dev_tools/test_blast_radius_config_parity.py`
+- Old name (80 characters): `test_every_class_two_and_class_three_key_is_consumed_by_its_registered_assertion`
+- New name (74 characters): `test_every_class_two_and_three_key_is_consumed_by_its_registered_assertion`
+- Suppression text removed: ` # noqa: E501` at the end of line 358 (the two leading spaces are removed with it).
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+**Observed facts the plan relies on (re-derived against the tree in this authoring pass):**
+- Line 358 of the target file is `def test_every_class_two_and_class_three_key_is_consumed_by_its_registered_assertion() -> (  # noqa: E501`, followed by `    None` on line 359 and `):` on line 360.
+- The string `noqa` occurs exactly once in the target file (line 358), and the old-name fragment `class_two_and_class_three_key` occurs exactly once under `tests/` (the same line).
+- The file has 13 `def test_` functions, three of which carry `pytest.mark.parametrize` (lines 182, 381, and 480), so the collected count is larger than 13. The baseline collected count is observed in P0-T8, not assumed.
+- `pyproject.toml` sets `addopts = "-ra --cov-report=lcov:artifacts/python/lcov.info"` (no terminal coverage reporter) and `[tool.coverage.run] source = ["src", "scripts/dev_tools"]`. The target file imports `scripts.dev_tools.compute_blast_radius`, so the coverage module is `scripts.dev_tools.compute_blast_radius`.
+- The `--cov-report=term-missing` table prints one combined `Cover` column plus `Stmts`, `Miss`, `Branch`, and `BrPart` columns when `--cov-branch` is passed. Separate line and branch percentages are not printed; they are derived from those columns.
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+### Phase 0 — Baseline Capture
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+- [ ] [P0-T1] Read `CLAUDE.md` (repository root) and note the policy compliance reading order; no file is written by this task. Acceptance: the file was read in full before any later task.
+- [ ] [P0-T2] Read `.claude/rules/general-code-change.md`. Acceptance: read in full; the 500-line file limit and the mandatory toolchain loop are noted.
+- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md`. Acceptance: read in full; the coverage requirements (line >= 85%, branch >= 75%, no regression on changed lines) are noted.
+- [ ] [P0-T4] Read `.claude/rules/python.md`. Acceptance: read in full; the Black, Ruff, Pyright, and Pytest command forms are noted.
+- [ ] [P0-T5] Read `.claude/rules/python-suppressions.md`. Acceptance: read in full; confirm `E501` is not a pre-authorized suppression pattern.
+- [ ] [P0-T6] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/phase0-instructions-read.md` containing `Timestamp:`, `Policy Order:` (the five files in the order read in P0-T1 through P0-T5), and the explicit list of files read. Acceptance: the artifact exists and lists all five files.
+- [ ] [P0-T7] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/branch-commit-baseline.2026-09-29T15-16.md` recording the output of `git rev-parse HEAD` and `git branch --show-current`. Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:` with the commit hash, and the branch name `bug/unauthorized-noqa-e501-in-blast-radius-parity-test-512`.
+- [ ] [P0-T8] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/pytest-collect-baseline.2026-09-29T15-16.md` from `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py --collect-only -q`. The success-case output ends with a summary line of the form `N tests collected`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` records the numeric collected count N, and lists the node ID containing the old name.
+- [ ] [P0-T9] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/pytest-pass-baseline.2026-09-29T15-16.md` from `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py -q`. The success-case output ends with a summary line of the form `N passed`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` records the numeric passed count N with zero failures; N equals the collected count from P0-T8.
+- [ ] [P0-T10] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/pytest-coverage-baseline.2026-09-29T15-16.md` from `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py --cov=scripts.dev_tools.compute_blast_radius --cov-branch --cov-report=term-missing`. The output prints a coverage table with the columns `Stmts`, `Miss`, `Branch`, `BrPart`, `Cover` and a `TOTAL` row. Acceptance: `EXIT_CODE: 0` and `Output Summary:` records the numeric `Stmts`, `Miss`, `Branch`, `BrPart`, and `Cover` values of the `scripts/dev_tools/compute_blast_radius.py` row and of the `TOTAL` row, plus the derived line percentage `(Stmts - Miss) / Stmts` and derived branch percentage `(Branch - BrPart) / Branch` for the module row. This is the numeric baseline for the no-regression comparison; the repository-wide 85% line and 75% branch thresholds are not altered by this change and a single-file slice is not expected to meet them.
+- [ ] [P0-T11] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/black-check-baseline.2026-09-29T15-16.md` from `poetry run black --check tests/scripts/dev_tools/test_blast_radius_config_parity.py`. The success-case output states `1 file would be left unchanged.` Acceptance: `EXIT_CODE: 0` and `Output Summary:` quotes that line.
+- [ ] [P0-T12] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/ruff-file-baseline.2026-09-29T15-16.md` from `poetry run ruff check tests/scripts/dev_tools/test_blast_radius_config_parity.py`. The success-case output is `All checks passed!` Acceptance: `EXIT_CODE: 0` and `Output Summary:` quotes that line.
+- [ ] [P0-T13] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/ruff-repo-baseline.2026-09-29T15-16.md` from `poetry run ruff check .`. Acceptance: the artifact records the observed `EXIT_CODE:` and an `Output Summary:` with the last output line; if the exit code is non-zero, the summary lists the count of findings and whether any finding names `test_blast_radius_config_parity.py`.
+- [ ] [P0-T14] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/pyright-file-baseline.2026-09-29T15-16.md` from `poetry run pyright tests/scripts/dev_tools/test_blast_radius_config_parity.py`. The success-case output ends with `0 errors, 0 warnings, 0 informations`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` quotes that line.
+- [ ] [P0-T15] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/file-line-count-baseline.2026-09-29T15-16.md` from `grep -c "" tests/scripts/dev_tools/test_blast_radius_config_parity.py`, which prints the numeric line count. Acceptance: `EXIT_CODE: 0` and `Output Summary:` records the count, which is expected to be 499 and must be at or below 500.
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+### Phase 1 — Fail-Before Evidence
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+- [ ] [P1-T1] Edit `tests/scripts/dev_tools/test_blast_radius_config_parity.py` line 358: remove only the text ` # noqa: E501` (including the two spaces before `#`), leaving the line ending `() -> (`. Do not rename the function in this task. Acceptance: line 358 is `def test_every_class_two_and_class_three_key_is_consumed_by_its_registered_assertion() -> (` and no other line differs from the baseline.
+- [ ] [P1-T2] [expect-fail] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/ruff-e501-fail-before.2026-09-29T15-16.md` from `poetry run ruff check tests/scripts/dev_tools/test_blast_radius_config_parity.py`, run while the old name is still in place. Acceptance: the artifact records `EXIT_CODE: 1`, `ExpectedExitCode: 1`, and an `Output Summary:` that quotes the diagnostic line for line 358 containing `E501` and the measured length `91 > 88`. This artifact records this one gate only.
+- [ ] [P1-T3] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/fail-before-delta-check.2026-09-29T15-16.md` from `git diff --numstat origin/main -- tests/scripts/dev_tools/test_blast_radius_config_parity.py`. The success-case output is one tab-separated line `1`, `1`, and the file path. Acceptance: `EXIT_CODE: 0` and `Output Summary:` records `1	1` for the file, confirming that one line changed relative to `origin/main`.
+
+### Phase 2 — Rename and Verify
+
+- [ ] [P2-T1] Edit `tests/scripts/dev_tools/test_blast_radius_config_parity.py` line 358: rename `test_every_class_two_and_class_three_key_is_consumed_by_its_registered_assertion` to `test_every_class_two_and_three_key_is_consumed_by_its_registered_assertion`. Leave the wrapped `-> (` / `None` / `):` structure, the docstring, and the body unchanged. Acceptance: line 358 is `def test_every_class_two_and_three_key_is_consumed_by_its_registered_assertion() -> (`.
+- [ ] [P2-T2] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/ruff-e501-pass-after.2026-09-29T15-16.md` from `poetry run ruff check tests/scripts/dev_tools/test_blast_radius_config_parity.py`. The success-case output is `All checks passed!` Acceptance: `EXIT_CODE: 0` and `Output Summary:` quotes that line, with no E501 diagnostic.
+- [ ] [P2-T3] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/black-check-after-rename.2026-09-29T15-16.md` from `poetry run black --check tests/scripts/dev_tools/test_blast_radius_config_parity.py`. The success-case output states `1 file would be left unchanged.` Acceptance: `EXIT_CODE: 0` and `Output Summary:` quotes that line, showing Black accepts the renamed def without a suppression.
+- [ ] [P2-T4] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/noqa-absence.2026-09-29T15-16.md` from `grep -n -F "noqa" tests/scripts/dev_tools/test_blast_radius_config_parity.py`. The literal `noqa` is quoted here as the asserted token. Acceptance: `EXIT_CODE: 1` (no match), `ExpectedExitCode: 1`, and `Output Summary:` states no line contains the token. This artifact records this one gate only.
+- [ ] [P2-T5] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/old-name-absence.2026-09-29T15-16.md` from `grep -rn -F --include=*.py "test_every_class_two_and_class_three_key_is_consumed_by_its_registered_assertion" tests/`. The `--include=*.py` filter excludes compiled `.pyc` files that can still hold the old name. Acceptance: `EXIT_CODE: 1` (no match), `ExpectedExitCode: 1`, and `Output Summary:` states no Python file under `tests/` contains the old name. This artifact records this one gate only.
+- [ ] [P2-T6] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/new-name-single-definition.2026-09-29T15-16.md` from `grep -rn -F --include=*.py "test_every_class_two_and_three_key_is_consumed_by_its_registered_assertion" tests/`. Acceptance: `EXIT_CODE: 0` and the output has exactly one line, located in `tests/scripts/dev_tools/test_blast_radius_config_parity.py` at line 358; `Output Summary:` records the single line.
+- [ ] [P2-T7] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/rename-delta-check.2026-09-29T15-16.md` from `git diff --numstat origin/main -- tests/scripts/dev_tools/test_blast_radius_config_parity.py`. The success-case output is one line `1`, `1`, and the file path: one removed line (the old def with the suppression) and one added line (the new def). Acceptance: `EXIT_CODE: 0` and `Output Summary:` records `1	1`, confirming the test body, docstring, and assertions are unchanged.
+- [ ] [P2-T8] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/file-line-count-after.2026-09-29T15-16.md` from `grep -c "" tests/scripts/dev_tools/test_blast_radius_config_parity.py`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` records a count equal to the P0-T15 baseline count and at or below 500.
+- [ ] [P2-T9] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/renamed-test-node-pass.2026-09-29T15-16.md` from `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py::test_every_class_two_and_three_key_is_consumed_by_its_registered_assertion -q`. The success-case output ends with `1 passed`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` quotes `1 passed`.
+- [ ] [P2-T10] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/pytest-collect-after.2026-09-29T15-16.md` from `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py --collect-only -q`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` records the collected count N, which equals the count recorded in P0-T8, and lists the node ID containing the new name in place of the old one.
+
+### Phase 3 — Final QC Loop (Python)
+
+Run P3-T1 through P3-T7 in order as one pass. If any step exits non-zero or changes any file, fix the cause, then restart from P3-T1 and overwrite every P3 artifact from that restart. The loop is complete only when P3-T1 through P3-T6 all succeed in a single pass with Black reporting no change.
+
+- [ ] [P3-T1] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-black.2026-09-29T15-16.md` from `poetry run black tests/scripts/dev_tools/test_blast_radius_config_parity.py`. Black rewrites files and exits 0 after rewriting, so the exit code alone is insufficient. The success-case output states `1 file left unchanged.` and the artifact also records `git status --porcelain` output before and after the command. Acceptance: `EXIT_CODE: 0`, `Output Summary:` quotes `1 file left unchanged.`, and the before and after porcelain outputs are identical.
+- [ ] [P3-T2] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-ruff-file.2026-09-29T15-16.md` from `poetry run ruff check tests/scripts/dev_tools/test_blast_radius_config_parity.py`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` quotes `All checks passed!`. Ruff runs here without a fix flag, so it does not rewrite files.
+- [ ] [P3-T3] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-ruff-repo.2026-09-29T15-16.md` from `poetry run ruff check .`. Acceptance: the observed `EXIT_CODE:` equals the exit code recorded in P0-T13 and `Output Summary:` states that no finding names `test_blast_radius_config_parity.py`; when the P0-T13 exit code was 0, this task also requires `EXIT_CODE: 0`.
+- [ ] [P3-T4] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-pyright.2026-09-29T15-16.md` from `poetry run pyright tests/scripts/dev_tools/test_blast_radius_config_parity.py`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` quotes `0 errors, 0 warnings, 0 informations`.
+- [ ] [P3-T5] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-pytest-coverage.2026-09-29T15-16.md` from `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py --cov=scripts.dev_tools.compute_blast_radius --cov-branch --cov-report=term-missing`. Acceptance: `EXIT_CODE: 0`, the `N passed` count equals the passed count recorded in P0-T9 with zero failures, and `Output Summary:` records numeric `Stmts`, `Miss`, `Branch`, `BrPart`, and `Cover` values for the `scripts/dev_tools/compute_blast_radius.py` row and the `TOTAL` row, plus the derived line and branch percentages.
+- [ ] [P3-T6] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/coverage-comparison.2026-09-29T15-16.md` comparing the P0-T10 and P3-T5 artifacts. Acceptance: the artifact carries `Timestamp:`, `Command:` (naming the two artifacts compared), `EXIT_CODE: 0`, and `Output Summary:` listing baseline coverage, post-change coverage, and changed-code coverage; post-change `Miss` and `BrPart` for the module row are less than or equal to baseline, the derived line percentage is not lower than baseline, the derived branch percentage is not lower than baseline, and changed-code coverage is stated as not applicable because the changed line is a test-function definition excluded from measurement by `omit = ["tests/*", ...]`.
+- [ ] [P3-T7] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-qc-loop-pass.2026-09-29T15-16.md` recording that P3-T1 through P3-T6 completed in one uninterrupted pass with no file changes and no restart, or the number of restarts and the cause of each. Acceptance: the artifact carries `Timestamp:`, `Command:` (the sequence P3-T1 to P3-T6), `EXIT_CODE: 0`, and `Output Summary:` stating the pass count and that Black reported `1 file left unchanged.` on the final pass.
+
+### Phase 4 — Scope Verification and Acceptance-Criteria Check-Off
+
+- [ ] [P4-T1] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/scope-check.2026-09-29T15-16.md` from `git diff --name-only origin/main` together with `git status --porcelain`. The anchored diff lists tracked changes only and cannot list newly created evidence files, so the porcelain output is the companion that shows untracked files. Acceptance: `EXIT_CODE: 0`; the tracked diff lists `tests/scripts/dev_tools/test_blast_radius_config_parity.py` and no other tracked path outside `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/`; the porcelain output lists no path under `scripts/`, `src/`, `.claude/rules/`, `.github/`, `docs/features/completed/`, or `docs/features/potential/promoted/`, and does not list `pyproject.toml`.
+- [ ] [P4-T2] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/followups-recorded.2026-09-29T15-16.md` from `grep -c -F "Follow-up (a)" docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md`. The literal `Follow-up (a)` is quoted here as the asserted token. Acceptance: `EXIT_CODE: 0` and `Output Summary:` records a count of at least 1, and states that `Follow-up (b)` and `Follow-up (c)` appear in the same file by the same check.
+- [ ] [P4-T3] Edit `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md`: change the first acceptance criterion (no `noqa` comment and no `# noqa: E501` string) from `- [ ]` to `- [x]` only after `evidence/regression-testing/noqa-absence.2026-09-29T15-16.md` shows `EXIT_CODE: 1` with `ExpectedExitCode: 1`. Acceptance: the artifact exists and the box is checked.
+- [ ] [P4-T4] Edit `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md`: check the second acceptance criterion (new name defined, old name absent under `tests/`) only after `evidence/regression-testing/new-name-single-definition.2026-09-29T15-16.md` and `evidence/regression-testing/old-name-absence.2026-09-29T15-16.md` both show their expected exit codes. Acceptance: both artifacts exist and the box is checked.
+- [ ] [P4-T5] Edit `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md`: check the third acceptance criterion (fail-before evidence) only after `evidence/regression-testing/ruff-e501-fail-before.2026-09-29T15-16.md` records `EXIT_CODE: 1` and `E501`. Acceptance: the artifact exists and the box is checked.
+- [ ] [P4-T6] Edit `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md`: check the fourth acceptance criterion (ruff exits 0 after the rename; black accepts the def) only after `evidence/regression-testing/ruff-e501-pass-after.2026-09-29T15-16.md` and `evidence/regression-testing/black-check-after-rename.2026-09-29T15-16.md` both record `EXIT_CODE: 0`. Acceptance: both artifacts exist and the box is checked.
+- [ ] [P4-T7] Edit `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md`: check the fifth acceptance criterion (pytest passes; collected and passed counts equal the pre-change counts) only after `evidence/regression-testing/pytest-collect-after.2026-09-29T15-16.md` and `evidence/qa-gates/final-pytest-coverage.2026-09-29T15-16.md` record counts equal to P0-T8 and P0-T9. Acceptance: the artifacts exist and the box is checked.
+- [ ] [P4-T8] Edit `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md`: check the sixth acceptance criterion (body, docstring, and assertions unchanged; file at or under 500 lines) only after `evidence/regression-testing/rename-delta-check.2026-09-29T15-16.md` records `1	1` and `evidence/regression-testing/file-line-count-after.2026-09-29T15-16.md` records a count at or below 500. Acceptance: both artifacts exist and the box is checked.
+- [ ] [P4-T9] Edit `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md`: check the seventh acceptance criterion (no file changed other than the feature folder and the target file) only after `evidence/qa-gates/scope-check.2026-09-29T15-16.md` meets its acceptance. Acceptance: the artifact exists and the box is checked.
+- [ ] [P4-T10] Edit `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md`: check the eighth acceptance criterion (full Python toolchain clean in one pass, coverage not regressed) only after `evidence/qa-gates/final-qc-loop-pass.2026-09-29T15-16.md` and `evidence/qa-gates/coverage-comparison.2026-09-29T15-16.md` meet their acceptance. Acceptance: both artifacts exist and the box is checked.
+- [ ] [P4-T11] Edit `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md`: check the ninth acceptance criterion (follow-ups (a), (b), (c) recorded; completed #500 plan and historical documents unedited) only after `evidence/qa-gates/followups-recorded.2026-09-29T15-16.md` and `evidence/qa-gates/scope-check.2026-09-29T15-16.md` meet their acceptance. Acceptance: both artifacts exist and the box is checked.
+- [ ] [P4-T12] Edit `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/plan.2026-09-29T15-16.md`: change each executed task from `- [ ]` to `- [x]` only when its artifact exists with its required fields, and record any deviation beside the affected task. Acceptance: no task is checked without its artifact, and any unmet acceptance condition carries a recorded deviation.
+
+## Planner Self-Review Record
+
+SELF-REVIEW: RE-DERIVED THIS PASS
+
+Citations re-derived in this pass against the current tree:
+- `tests/scripts/dev_tools/test_blast_radius_config_parity.py` line 358 (def line with `# noqa: E501`), lines 359-360 (`None` / `):`), and sibling lines 356-380 (preceding test end at 355 and the docstring and body of the renamed test).
+- `tests/scripts/dev_tools/test_blast_radius_config_parity.py`: the `noqa` string occurs only at line 358; imports at lines 41-42 and 62 (`scripts.dev_tools.compute_blast_radius`); the `def test_` and `pytest.mark.parametrize` inventory at lines 114 through 481.
+- `tests/`: the old-name fragment `class_two_and_class_three_key` occurs once (the target file).
+- `pyproject.toml`: `line-length = 88` (lines 85 and 89), `addopts` (line 115), `[tool.coverage.run] source` (line 119).
+- `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md`: the nine acceptance criteria (lines 215-223) and follow-up wording.
+- `.claude/rules/plan-acceptance-gates.md`: G1 through G9 rule table.
+
+PLANNER-INTERNAL-REVIEW: PASS
+CITATION-TO-TREE: PASS
+CITATION: tests/scripts/dev_tools/test_blast_radius_config_parity.py | line 358 def with noqa E501, lines 359-360
+CITATION: tests/scripts/dev_tools/test_blast_radius_config_parity.py | imports lines 41-42, 62
+CITATION: pyproject.toml | addopts line 115, coverage source line 119
+CITATION: docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md | Acceptance Criteria lines 215-223
+CITATION: .claude/rules/plan-acceptance-gates.md | Rule Table G1 through G9
+AC-TRACEABILITY: PASS
+SCOPE-BOUNDARY: PASS
+AC-INVENTORY: AC1, AC2, AC3, AC4, AC5, AC6, AC7, AC8, AC9
+AC-MAPPING: AC1 | IMPLEMENTATION: P1-T1 | TESTS: P2-T4 | EVIDENCE: evidence/regression-testing/noqa-absence.2026-09-29T15-16.md
+AC-MAPPING: AC2 | IMPLEMENTATION: P2-T1 | TESTS: P2-T5, P2-T6 | EVIDENCE: evidence/regression-testing/old-name-absence.2026-09-29T15-16.md
+AC-MAPPING: AC3 | IMPLEMENTATION: P1-T1 | TESTS: P1-T2 | EVIDENCE: evidence/regression-testing/ruff-e501-fail-before.2026-09-29T15-16.md
+AC-MAPPING: AC4 | IMPLEMENTATION: P2-T1 | TESTS: P2-T2, P2-T3 | EVIDENCE: evidence/regression-testing/ruff-e501-pass-after.2026-09-29T15-16.md
+AC-MAPPING: AC5 | IMPLEMENTATION: P2-T1 | TESTS: P2-T9, P2-T10, P3-T5 | EVIDENCE: evidence/qa-gates/final-pytest-coverage.2026-09-29T15-16.md
+AC-MAPPING: AC6 | IMPLEMENTATION: P2-T1 | TESTS: P2-T7, P2-T8 | EVIDENCE: evidence/regression-testing/rename-delta-check.2026-09-29T15-16.md
+AC-MAPPING: AC7 | IMPLEMENTATION: P4-T1 | TESTS: P4-T1 | EVIDENCE: evidence/qa-gates/scope-check.2026-09-29T15-16.md
+AC-MAPPING: AC8 | IMPLEMENTATION: P3-T1 | TESTS: P3-T2, P3-T4, P3-T5, P3-T6 | EVIDENCE: evidence/qa-gates/final-qc-loop-pass.2026-09-29T15-16.md
+AC-MAPPING: AC9 | IMPLEMENTATION: P4-T2 | TESTS: P4-T1, P4-T2 | EVIDENCE: evidence/qa-gates/followups-recorded.2026-09-29T15-16.md
+UNRESOLVED-GAPS: NONE
