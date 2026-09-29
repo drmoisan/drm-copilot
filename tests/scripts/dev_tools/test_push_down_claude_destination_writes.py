@@ -25,6 +25,7 @@ from scripts.dev_tools.push_down_claude_destination_writes import (
     BundleConfigFileSystem,
     DestinationMergeFileSystem,
     build_destination_write_stack,
+    merge_blast_radius_overlay,
 )
 from scripts.dev_tools.push_down_claude_routing_merge import (
     RoutingMergeError,
@@ -87,7 +88,8 @@ def test_merged_relative_paths_initial_registry_is_routing_only() -> None:
     ]
 
     assert dict(MERGED_RELATIVE_PATHS) == {
-        "config/orchestration-routing.json": merge_routing_documents
+        "config/orchestration-routing.json": merge_routing_documents,
+        "config/blast-radius.json": merge_blast_radius_overlay,
     }
     assert len(values) == 1
     registry = values[0]

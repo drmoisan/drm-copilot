@@ -196,24 +196,24 @@ These pin the spec rules 1 to 13 (spec `## Proposed Fix`) to one algorithm so th
 
 ### Phase 5 — Python Tests, Parity Extension, and Pass-After
 
-- [ ] [P5-T1] Reset the Python batch budget (reset R2) and record `<FEATURE>/evidence/other/python-batch-budget-reset-2.<ts>.md` using the P0-T20 commands against `.claude/state/python-batch-budget.*.json`.
+- [x] [P5-T1] Reset the Python batch budget (reset R2) and record `<FEATURE>/evidence/other/python-batch-budget-reset-2.<ts>.md` using the P0-T20 commands against `.claude/state/python-batch-budget.*.json`.
   - Acceptance: the final `ls` from the P0-T20 commands exits 2.
-- [ ] [P5-T2] Add the unit cases for AC01 to AC07 to `tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py` (worker: python-typed-engineer).
+- [x] [P5-T2] Add the unit cases for AC01 to AC07 to `tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py` (worker: python-typed-engineer).
   - Test functions named with prefixes `test_ac01_` to `test_ac07_`, mirroring the P3-T1 case list one for one, using `pytest.mark.parametrize` to stay under 500 lines. Byte-retention cases drive `MERGE_DECORATOR` over `WriteRecordingFileSystem` and assert the destination `config/blast-radius.json` content is unchanged and not in `written_paths` after the error.
-- [ ] [P5-T3] Add the property tests to `tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py` (worker: python-typed-engineer).
+- [x] [P5-T3] Add the property tests to `tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py` (worker: python-typed-engineer).
   - Functions prefixed `test_ac18_`, enumerating the same 3 by 8 domain as P3-T2 (identity, idempotence, superset, overlay inclusion, determinism, `version` preservation) via `itertools.product`. No `hypothesis` import and no random generator.
-- [ ] [P5-T4] Add the registry and never-written cases to `tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py` (worker: python-typed-engineer).
+- [x] [P5-T4] Add the registry and never-written cases to `tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py` (worker: python-typed-engineer).
   - `test_ac14_merged_paths_registry_shape`: the set of `relative_path` values in `MERGED_PATHS` is exactly `{"config/orchestration-routing.json", "config/blast-radius.json"}`; the blast-radius entry's `input_relative_path` is `"config/blast-radius.local.json"`; every entry has `relative_path`, `input_relative_path`, and `merge`.
   - `test_ac12_push_never_writes_destination_overlay`: after a push against a destination holding an overlay, the overlay bytes are unchanged and `written_paths` does not contain the overlay path.
   - Acceptance: `wc -l tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py` reports 500 or fewer.
-- [ ] [P5-T5] Extend the #507 parity test in `PARITY_TARGET` (recorded in P0-T9; a file under `tests/scripts/dev_tools/`) without removing any #507 case (worker: python-typed-engineer).
+- [x] [P5-T5] Extend the #507 parity test in `PARITY_TARGET` (recorded in P0-T9; a file under `tests/scripts/dev_tools/`) without removing any #507 case (worker: python-typed-engineer).
   - Update, in place, exactly the node IDs listed as failing in `<FEATURE>/evidence/other/507-tests-after-registry.<ts>.md`. Change only the expected value (the merged-path set, the registry key set, or the member count) so it names both merged paths or the count 2, and keep each case's name and structure; a node ID in a file other than `PARITY_TARGET` is updated in its own file under the same rule. Apply the unscheduled budget-reset rule before touching a fourth test file. An expected-value dict that maps paths to callables names `merge_blast_radius_overlay`, imported from `REGISTRY_MODULE_DOTTED`.
   - `test_ac16_merged_path_sets_match`: read `extensions/drm-copilot/src/lib/push-down/claude-customizations.ts`, extract the string literals between `export const MERGED_RELATIVE_PATHS` and the next `];`, and assert their set equals the Python `MERGED_PATHS` `relative_path` set. Reuse the #507 TypeScript-reading helper when R6 recorded one.
   - `test_ac16_overlay_constants_match`: extract the `BLAST_RADIUS_OVERLAY_RELATIVE_PATH` literal from `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-overlay.ts` and assert it equals the Python constant.
   - `test_ac11_overlay_excluded_in_both_implementations`: `config/blast-radius.local.json` is in the TypeScript `EXCLUDED_RELATIVE_PATHS` literal and in the Python `EXCLUDED_RELATIVE_PATHS`.
   - `test_ac16_corpus_composition_matches_expected`: discover `tests/fixtures/blast_radius_overlay/*.json`, assert at least 6 files, and for each assert `compose_blast_radius_overlay(base_text, overlay_text, "config/blast-radius.local.json") == expected_text`.
   - Acceptance: `wc -l <PARITY_TARGET>` reports 500 or fewer; every name in `PARITY_TEST_NAMES` is still defined: `grep -c -E "^[[:space:]]*def test_" <PARITY_TEST_FILE>` is at least the recorded count, and each recorded name matches `grep -n -E "def <name>\("`.
-- [ ] [P5-T6] Run the Python pass-after and record `<FEATURE>/evidence/regression-testing/py-pass-after.<ts>.md` by running `poetry run pytest -rA tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py tests/scripts/dev_tools/test_push_down_claude_customizations.py <PARITY_TARGET> <PARITY_TEST_FILE>` (when `PARITY_TARGET` equals `PARITY_TEST_FILE` the path is passed once).
+- [x] [P5-T6] Run the Python pass-after and record `<FEATURE>/evidence/regression-testing/py-pass-after.<ts>.md` by running `poetry run pytest -rA tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py tests/scripts/dev_tools/test_push_down_claude_customizations.py <PARITY_TARGET> <PARITY_TEST_FILE>` (when `PARITY_TARGET` equals `PARITY_TEST_FILE` the path is passed once).
   - Acceptance: exit 0; the result line shows 0 failed; the short summary contains a `PASSED` line for `test_ac08_push_carries_destination_overlay_entries_across_two_pushes` and for `test_ac11_source_side_overlay_is_not_published`.
 
 ### Phase 6 — Rule-Doc Migration Note and Bundle Mirror
