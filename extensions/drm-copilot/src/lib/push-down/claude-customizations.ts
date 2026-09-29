@@ -23,9 +23,11 @@ import {
 import { ExcludingFileSystem } from "./claude-filesystem-adapter";
 import { RoutingMergeFileSystem } from "./claude-routing-merge";
 import {
+  BLAST_RADIUS_RELATIVE_PATH,
   BlastRadiusDeriveFileSystem,
   type DirectoryLister,
 } from "./claude-blast-radius-derive";
+import { BlastRadiusOverlayFileSystem } from "./claude-blast-radius-overlay";
 import {
   CLAUDE_GITIGNORE_RELATIVE_PATH,
   mergeClaudeGitignore,
@@ -54,24 +56,87 @@ export const ARTIFACT_DIRECTORY = "artifacts/claude-customizations";
 export const ROOT_FOLDERS: ReadonlyArray<string> = [".claude", "config"];
 
 /**
- * Destination-relative path whose write is merged rather than overwritten.
+ * Destination-relative path of the routing document merged on every push.
  *
- * A destination workspace may already carry its own routing document with
- * locally added routes. Overwriting it would silently discard them, so this one
- * path is merged by {@link RoutingMergeFileSystem}.
- *
- * Two destination-relative paths receive special handling. This one is merged;
- * `config/blast-radius.json` is intercepted by
- * {@link BlastRadiusDeriveFileSystem}, which replaces the bundled bytes with a
- * module map derived from the destination's own layout (the bundled map
- * describes drm-copilot and names none of an unrelated destination's modules).
- * Every other published file is a plain overwrite.
+ * Destination-side writes are shaped by the {@link DESTINATION_WRITE_DECORATORS}
+ * registry, and {@link MERGED_RELATIVE_PATHS} lists the two paths it handles.
+ * `config/orchestration-routing.json` (this path) is merged by
+ * {@link RoutingMergeFileSystem} so locally added routes survive a push.
+ * `config/blast-radius.json` is derived by {@link BlastRadiusDeriveFileSystem}
+ * from the destination's own layout and then composed by
+ * {@link BlastRadiusOverlayFileSystem} with the destination-owned overlay
+ * `config/blast-radius.local.json` (issue #508). The overlay is only read: it is
+ * excluded from publication and never written. Every other published file is a
+ * plain overwrite.
  */
 export const ROUTING_MERGE_RELATIVE_PATH = "config/orchestration-routing.json";
 
 /** Repo-relative host-specific paths excluded from push-down. */
 export const EXCLUDED_RELATIVE_PATHS: ReadonlyArray<string> = [
   ".claude/settings.local.json",
+  "config/blast-radius.local.json",
+];
+
+/** One destination-side write decorator registered for a relative path. */
+export interface DestinationWriteDecorator {
+  /** Destination-relative path whose write the decorator shapes. */
+  readonly relativePath: string;
+
+  /**
+   * Wrap an adapter with this decorator.
+   *
+   * @param inner Adapter the decorator delegates to.
+   * @param destinationRoot Destination workspace root.
+   * @param options Optional destination-layout lister for the derivation.
+   * @returns The decorated adapter.
+   */
+  wrap(
+    inner: PushDownFileSystem,
+    destinationRoot: string,
+    options: { readonly listEntries?: DirectoryLister },
+  ): PushDownFileSystem;
+}
+
+/**
+ * Destination-side write decorators, innermost first (issue #508).
+ *
+ * The chain is built by folding this array over the real adapter, so the last
+ * entry is outermost: the derivation runs first, the overlay composes onto the
+ * derived document, and the routing merge sits closest to the adapter.
+ */
+export const DESTINATION_WRITE_DECORATORS: ReadonlyArray<DestinationWriteDecorator> =
+  [
+    {
+      relativePath: ROUTING_MERGE_RELATIVE_PATH,
+      wrap: (inner, destinationRoot) =>
+        new RoutingMergeFileSystem(
+          inner,
+          destinationRoot,
+          ROUTING_MERGE_RELATIVE_PATH,
+        ),
+    },
+    {
+      relativePath: BLAST_RADIUS_RELATIVE_PATH,
+      wrap: (inner, destinationRoot) =>
+        new BlastRadiusOverlayFileSystem(inner, destinationRoot),
+    },
+    {
+      relativePath: BLAST_RADIUS_RELATIVE_PATH,
+      wrap: (inner, destinationRoot, { listEntries }) =>
+        listEntries === undefined
+          ? new BlastRadiusDeriveFileSystem(inner, destinationRoot)
+          : new BlastRadiusDeriveFileSystem(
+              inner,
+              destinationRoot,
+              listEntries,
+            ),
+    },
+  ];
+
+/** Destination-relative paths shaped by the decorator registry. */
+export const MERGED_RELATIVE_PATHS: ReadonlyArray<string> = [
+  "config/orchestration-routing.json",
+  "config/blast-radius.json",
 ];
 
 /** Repo-relative location of the bundle root that holds manifests/variants. */
@@ -105,6 +170,12 @@ export {
   BlastRadiusGuardError,
   type DirectoryLister,
 } from "./claude-blast-radius-derive";
+export {
+  BLAST_RADIUS_OVERLAY_RELATIVE_PATH,
+  BlastRadiusOverlayError,
+  BlastRadiusOverlayFileSystem,
+  composeBlastRadiusOverlay,
+} from "./claude-blast-radius-overlay";
 export { type PushDownSummary, type CSharpVariant, type MemoryMode };
 
 /**
@@ -268,31 +339,18 @@ export function pushDownCustomizations(
     fs,
   );
 
-  // Merge, rather than overwrite, the one destination path that a workspace may
-  // legitimately have extended locally. The decorator sits closest to the real
-  // adapter so the filtering wrapper above it is unaffected.
-  const mergingFs = new RoutingMergeFileSystem(
+  // Build the destination-side write chain from the registry, innermost first,
+  // below the filtering wrapper so enumeration is unaffected.
+  const decoratorOptions = listEntries === undefined ? {} : { listEntries };
+  const decoratedFs = DESTINATION_WRITE_DECORATORS.reduce<PushDownFileSystem>(
+    (inner, decorator) =>
+      decorator.wrap(inner, destinationRoot, decoratorOptions),
     fs,
-    destinationRoot,
-    ROUTING_MERGE_RELATIVE_PATH,
   );
-
-  // Derive, rather than copy, the blast-radius module map. The two decorators
-  // intercept disjoint paths, so their relative order is immaterial; this one is
-  // layered above the merging decorator purely to keep both adjacent and close
-  // to the real adapter, below the filtering wrapper.
-  const derivingFs =
-    listEntries === undefined
-      ? new BlastRadiusDeriveFileSystem(mergingFs, destinationRoot)
-      : new BlastRadiusDeriveFileSystem(
-          mergingFs,
-          destinationRoot,
-          listEntries,
-        );
 
   // Wrap the adapter so enumeration omits excluded paths and honors selections.
   const excludingFs = new ExcludingFileSystem(
-    derivingFs,
+    decoratedFs,
     repoRoot,
     EXCLUDED_RELATIVE_PATHS,
     {
@@ -332,9 +390,9 @@ export function pushDownCustomizations(
  *
  * The raw injected adapter is used rather than any of the composed decorators,
  * because none of them applies here: the filtering wrapper governs the copied
- * source set, the merging decorator governs the routing document, and the
- * deriving decorator governs the blast-radius map. This write is post-copy and
- * has no source file behind it.
+ * source set, and the {@link DESTINATION_WRITE_DECORATORS} registry governs the
+ * routing document and the derived, overlay-composed blast-radius map. This
+ * write is post-copy and has no source file behind it.
  *
  * A missing destination `.gitignore` is a valid input, not an error. The write
  * is skipped when the merged text equals the current text, so a second publish
