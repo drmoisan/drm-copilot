@@ -478,7 +478,7 @@ Each item was observed in this repository's recorded runs or read from source, n
       `ExpectedExitCode: 1`. Acceptance: exit 1 and stderr carries exactly two lines, in this order:
       `skill-bundle violation: parallel-orchestrate | scripts/dev_tools/parallel_drift_detection_cli.py | not-in-bundle`
       and `skill-bundle violation: parallel-remove | scripts/dev_tools/parallel_mutation_abandon_cli.py | not-in-bundle`.
-- [ ] [P1-T9] Commit and push Phase 1 (`scripts/dev_tools/skill_bundle_contract.py` and the files below).
+- [x] [P1-T9] Commit and push Phase 1 (`scripts/dev_tools/skill_bundle_contract.py` and the files below).
       Commands: CMD-GIT-ADD with `scripts/dev_tools/skill_bundle_contract.py scripts/dev_tools/skill_bundle_contract_cli.py tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py tests/scripts/dev_tools/test_skill_bundle_contract_cli.py docs/features/active/2026-09-28-parallel-skills-invoke-unbundled-python-clis-763`,
       CMD-GIT-COMMIT with message "fix(763): empty the unbundled-reference registry and reproduce the guard failure",
       CMD-GIT-PUSH, then `git status --porcelain`. Acceptance: the push exits 0 and the porcelain status
@@ -486,57 +486,57 @@ Each item was observed in this repository's recorded runs or read from source, n
 
 ### Phase 2 — Abandon Disposition Bash Port (AC4, AC5)
 
-- [ ] [P2-T1] Create the shim `tests/fixtures/parallel_abandon_path/gh` with exactly the text of Appendix B5 (gh variant).
+- [x] [P2-T1] Create the shim `tests/fixtures/parallel_abandon_path/gh` with exactly the text of Appendix B5 (gh variant).
       Acceptance: CMD-GREP-COUNT with literal `ABANDON_SHIM_GH_EXIT` over that file prints 2 (the
       header comment line and the `exit` line of B5).
-- [ ] [P2-T2] Create the shim `tests/fixtures/parallel_abandon_path/git` with exactly the text of Appendix B5 (git variant).
+- [x] [P2-T2] Create the shim `tests/fixtures/parallel_abandon_path/git` with exactly the text of Appendix B5 (git variant).
       Acceptance: CMD-GREP-COUNT with literal `ABANDON_SHIM_GIT_EXIT` over that file prints 2, and
       CMD-GREP-COUNT with literal `ABANDON_SHIM_GH_EXIT` over it exits 1 and prints 0.
-- [ ] [P2-T3] Create `tests/fixtures/parallel_abandon_path_git_only/git` as a byte copy of the git shim.
+- [x] [P2-T3] Create `tests/fixtures/parallel_abandon_path_git_only/git` as a byte copy of the git shim.
       Commands: `mkdir -p tests/fixtures/parallel_abandon_path_git_only`, then
       `cp tests/fixtures/parallel_abandon_path/git tests/fixtures/parallel_abandon_path_git_only/git`,
       then `cmp tests/fixtures/parallel_abandon_path/git tests/fixtures/parallel_abandon_path_git_only/git`.
       Acceptance: `cmp` exits 0 with no output.
-- [ ] [P2-T4] Stage the three shims under `tests/fixtures/parallel_abandon_path` and `tests/fixtures/parallel_abandon_path_git_only` as executable LF files.
+- [x] [P2-T4] Stage the three shims under `tests/fixtures/parallel_abandon_path` and `tests/fixtures/parallel_abandon_path_git_only` as executable LF files.
       Commands: CMD-GIT-ADD with `tests/fixtures/parallel_abandon_path tests/fixtures/parallel_abandon_path_git_only`,
       CMD-GIT-CHMOD with `tests/fixtures/parallel_abandon_path/gh tests/fixtures/parallel_abandon_path/git tests/fixtures/parallel_abandon_path_git_only/git`,
       CMD-GIT-LS-MODE and CMD-GIT-LS-EOL over the same three paths, and `git status --porcelain -- tests/fixtures`.
       Write FEATURE/evidence/other/abandon-shims-staged.TS.md. Acceptance: CMD-GIT-LS-MODE prints three
       lines each beginning `100755`; CMD-GIT-LS-EOL prints three lines each containing both `i/lf` and
       `w/lf`.
-- [ ] [P2-T5] Write `tests/shell/parallel_abandon.bats` per Appendix B6 (14 named tests, shim-only PATH, no temporary files).
+- [x] [P2-T5] Write `tests/shell/parallel_abandon.bats` per Appendix B6 (14 named tests, shim-only PATH, no temporary files).
       Acceptance: CMD-GREP-COUNT with literal `@test "` over that file prints 14.
-- [ ] [P2-T6] [expect-fail] Run `tests/shell/parallel_abandon.bats` before the script exists.
+- [x] [P2-T6] [expect-fail] Run `tests/shell/parallel_abandon.bats` before the script exists.
       Command: CMD-BATS over that file. Write
       FEATURE/evidence/regression-testing/abandon-bats-before-script.TS.md with `ExpectedExitCode: 1`.
       Acceptance: exit 1, TAP plan `1..14`, and exactly 14 `not ok` lines (every B6 test depends on
       the script file).
-- [ ] [P2-T7] Write `.claude/lib/bash/abandon-parallel-item.sh` per Appendix B7.
+- [x] [P2-T7] Write `.claude/lib/bash/abandon-parallel-item.sh` per Appendix B7.
       Acceptance: CMD-SH with script line-counts (A22) over `BASHLIB/abandon-parallel-item.sh` prints a
       `LineCount=` value of at most 500.
-- [ ] [P2-T8] Run `tests/shell/parallel_abandon.bats` after the script exists.
+- [x] [P2-T8] Run `tests/shell/parallel_abandon.bats` after the script exists.
       Command: CMD-BATS over that file. Write FEATURE/evidence/regression-testing/abandon-bats-after-script.TS.md.
       Acceptance: exit 0, TAP plan `1..14`, 14 `ok` lines, and no `not ok` line.
-- [ ] [P2-T9] Early lint of `.claude/lib/bash/abandon-parallel-item.sh` and the three shims under `tests/fixtures/parallel_abandon_path`.
+- [x] [P2-T9] Early lint of `.claude/lib/bash/abandon-parallel-item.sh` and the three shims under `tests/fixtures/parallel_abandon_path`.
       Command: CMD-SH with script shell-lint (A12). Write FEATURE/evidence/other/abandon-early-lint.TS.md.
       Acceptance: exit 0, `SHFMT-DIFF-EXIT=0`, and `SHELLCHECK-EXIT=0`.
-- [ ] [P2-T10] Write the nine abandon corpus fixtures `tests/fixtures/parallel_abandon/*.json` per Appendix C2 (schema in B8).
+- [x] [P2-T10] Write the nine abandon corpus fixtures `tests/fixtures/parallel_abandon/*.json` per Appendix C2 (schema in B8).
       Command: CMD-PY-SCRIPT with script json-parse (A11) and argument `tests/fixtures/parallel_abandon/*.json`.
       Acceptance: exit 0 and exactly nine `JSON-OK file=` lines, one per C2 name.
-- [ ] [P2-T11] Reset the Python batch budget before writing `tests/scripts/dev_tools/test_parallel_abandon_bash_parity.py`: CMD-PS with script reset-batch-budget (A8) and `-Kind python`.
+- [x] [P2-T11] Reset the Python batch budget before writing `tests/scripts/dev_tools/test_parallel_abandon_bash_parity.py`: CMD-PS with script reset-batch-budget (A8) and `-Kind python`.
       Write FEATURE/evidence/other/batch-budget-reset-p2.TS.md. Acceptance: exit 0 and a
       `RESET removed=` line.
-- [ ] [P2-T12] Write `tests/scripts/dev_tools/test_parallel_abandon_bash_parity.py` per Appendix B9 (Python reference lane with an injected runner).
+- [x] [P2-T12] Write `tests/scripts/dev_tools/test_parallel_abandon_bash_parity.py` per Appendix B9 (Python reference lane with an injected runner).
       Acceptance: CMD-GREP-COUNT with literal `def test_reference_matches_abandon_fixture` over that
       file prints 1.
-- [ ] [P2-T13] Run the Python abandon lane `tests/scripts/dev_tools/test_parallel_abandon_bash_parity.py`.
+- [x] [P2-T13] Run the Python abandon lane `tests/scripts/dev_tools/test_parallel_abandon_bash_parity.py`.
       Command: CMD-PY-TEST over that file. Write
       FEATURE/evidence/regression-testing/abandon-python-lane.TS.md. Acceptance: exit 0, no FAILED line,
       `test_abandon_corpus_meets_floor` and `test_abandon_corpus_covers_every_named_case` PASSED, and
       nine `test_reference_matches_abandon_fixture[...]` nodes PASSED, one per C2 name.
-- [ ] [P2-T14] Write `tests/shell/parallel_abandon_parity.bats` per Appendix B10 (bash lane over the same corpus).
+- [x] [P2-T14] Write `tests/shell/parallel_abandon_parity.bats` per Appendix B10 (bash lane over the same corpus).
       Acceptance: CMD-GREP-COUNT with literal `@test "` over that file prints 3.
-- [ ] [P2-T15] Run the bash parity lane `tests/shell/parallel_abandon_parity.bats` locally.
+- [x] [P2-T15] Run the bash parity lane `tests/shell/parallel_abandon_parity.bats` locally.
       Command: CMD-SH with script bats-parity-local (A23). Write
       FEATURE/evidence/regression-testing/abandon-bats-parity-local.TS.md. Acceptance: the output
       contains `BATS-PARITY-EXIT=0`, TAP plan `1..3`, and three `ok` lines. Authorized environment

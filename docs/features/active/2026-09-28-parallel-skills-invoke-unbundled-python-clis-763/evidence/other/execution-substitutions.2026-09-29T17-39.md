@@ -31,5 +31,18 @@ The plan's task text is not altered. The following substitutions apply at execut
 - The Bash tool's PreToolUse hook refuses a `cd ... &&` chain and refuses sed programs composed
   inside loops. Commands therefore run from the default working directory (the worktree root) with
   repository-relative paths, one plain command per call, as the plan's Shell route requires.
+- The worktree isolation guard counts every command word whose final path component is `git` as
+  a git invocation and refuses a command that names git more than once, with the text: "this
+  command names git more than once in a single command, which cannot be verified to stay inside
+  the worktree. Refusing to run it ... Use one git invocation per command". Commands over the shim
+  file `tests/fixtures/parallel_abandon_path/git` and its copy therefore follow the guard's own
+  rule (git named at most once), with the same effect as the plan's command:
+  - P2-T3: `cp tests/fixtures/parallel_abandon_path/git tests/fixtures/parallel_abandon_path_git_only/`
+    (destination named as the directory), and
+    `diff -r -x gh tests/fixtures/parallel_abandon_path tests/fixtures/parallel_abandon_path_git_only`
+    in place of `cmp` (exit 0 and no output mean the one shared file `git` is byte-identical).
+  - Git commands over the shim paths name the shim directories as pathspecs instead of the
+    individual `.../git` files; each substitution is recorded in the artifact of the task that
+    uses it.
 - SCRATCH resolves to the session scratchpad directory outside the repository; artifacts record it
   as the literal token SCRATCH.
