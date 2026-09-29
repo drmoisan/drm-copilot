@@ -252,21 +252,21 @@ Loop rule for this phase: tasks P7-T1 to P7-T7 run in order. If any task fails, 
 
 Loop rule for this phase: tasks P8-T2 to P8-T8 run in order. If any task fails, run a budget reset first when a fix would touch a Python file not already counted (repeat the P8-T1 procedure with the next reset number), fix the cause (worker: python-typed-engineer), then restart at P8-T2 and write a new artifact set with an `-iter<N>` suffix. The phase is complete only when P8-T2 to P8-T8 all pass in one uninterrupted iteration. If a Phase 8 fix changes any file under `tests/fixtures/blast_radius_overlay/` or any TypeScript file, Phase 7 is re-run from P7-T1 as a new `-iter<N>` set after Phase 8 completes. P10-T24 cites the latest clean iteration of both phases.
 
-- [ ] [P8-T1] Reset the Python batch budget (reset R3) and record `<FEATURE>/evidence/other/python-batch-budget-reset-3.<ts>.md` using the P0-T20 commands against `.claude/state/python-batch-budget.*.json`.
+- [x] [P8-T1] Reset the Python batch budget (reset R3) and record `<FEATURE>/evidence/other/python-batch-budget-reset-3.<ts>.md` using the P0-T20 commands against `.claude/state/python-batch-budget.*.json`.
   - Acceptance: the final `ls` from the P0-T20 commands exits 2.
-- [ ] [P8-T2] Run the format check and record `<FEATURE>/evidence/qa-gates/py-black.<ts>.md` by running `poetry run black --check scripts/dev_tools tests/scripts/dev_tools`.
+- [x] [P8-T2] Run the format check and record `<FEATURE>/evidence/qa-gates/py-black.<ts>.md` by running `poetry run black --check scripts/dev_tools tests/scripts/dev_tools`.
   - Acceptance: exit 0; no `would reformat` line.
-- [ ] [P8-T3] Run the lint check and record `<FEATURE>/evidence/qa-gates/py-ruff.<ts>.md` by running `poetry run ruff check scripts/dev_tools tests/scripts/dev_tools`.
+- [x] [P8-T3] Run the lint check and record `<FEATURE>/evidence/qa-gates/py-ruff.<ts>.md` by running `poetry run ruff check scripts/dev_tools tests/scripts/dev_tools`.
   - Acceptance: exit 0 and the output contains `All checks passed!`.
-- [ ] [P8-T4] Run the type check and record `<FEATURE>/evidence/qa-gates/py-pyright.<ts>.md` by running `poetry run pyright`.
+- [x] [P8-T4] Run the type check and record `<FEATURE>/evidence/qa-gates/py-pyright.<ts>.md` by running `poetry run pyright`.
   - Acceptance: exit 0 and the summary reports `0 errors`.
-- [ ] [P8-T5] Run the full test suite with coverage and record `<FEATURE>/evidence/qa-gates/py-pytest-coverage.<ts>.md` by running `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --cov-report=json:artifacts/python/coverage-508-final.json`.
+- [x] [P8-T5] Run the full test suite with coverage and record `<FEATURE>/evidence/qa-gates/py-pytest-coverage.<ts>.md` by running `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --cov-report=json:artifacts/python/coverage-508-final.json`.
   - Acceptance: exit 0, or failures limited to node IDs recorded verbatim in the P0-T18 baseline that touch no file this plan changed, or the single issue #510 condition described in P6-T4. `Output Summary:` records `totals.percent_statements_covered` and `totals.percent_branches_covered` from `artifacts/python/coverage-508-final.json`, and per-file `summary.percent_statements_covered` and `summary.percent_branches_covered` for the keys ending in `push_down_claude_blast_radius_overlay.py`, `push_down_claude_customizations.py`, and the `REGISTRY_MODULE` file name. The overlay module shows statements at least 85 and branches at least 75.
-- [ ] [P8-T6] Run the architecture-stage observation and record `<FEATURE>/evidence/qa-gates/py-architecture.<ts>.md` by running `test -e .importlinter` and `grep -n "importlinter" pyproject.toml` in Bash from the repository root.
+- [x] [P8-T6] Run the architecture-stage observation and record `<FEATURE>/evidence/qa-gates/py-architecture.<ts>.md` by running `test -e .importlinter` and `grep -n "importlinter" pyproject.toml` in Bash from the repository root.
   - Acceptance: both commands exit 1 (absent and no match), matching P0-T19, which records that no Python architecture tool is configured. Exit 0 for either means the configured tool is run instead and must report 0 violations.
-- [ ] [P8-T7] Run the contract stage and record `<FEATURE>/evidence/qa-gates/py-contract.<ts>.md` by running `poetry run pytest <PARITY_TARGET> tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py -k "ac16 or ac11 or ac14"`.
+- [x] [P8-T7] Run the contract stage and record `<FEATURE>/evidence/qa-gates/py-contract.<ts>.md` by running `poetry run pytest <PARITY_TARGET> tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py -k "ac16 or ac11 or ac14"`.
   - Acceptance: exit 0; at least 5 tests passed and 0 failed.
-- [ ] [P8-T8] Run the integration stage and record `<FEATURE>/evidence/qa-gates/py-integration.<ts>.md` by running `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_customizations.py tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py -k "ac08 or ac11 or ac12 or push_down"`.
+- [x] [P8-T8] Run the integration stage and record `<FEATURE>/evidence/qa-gates/py-integration.<ts>.md` by running `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_customizations.py tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py -k "ac08 or ac11 or ac12 or push_down"`.
   - Acceptance: exit 0; 0 failed; at least 4 passed.
 
 ### Phase 9 — Scope, Coverage-Delta, and Invariant Verification
