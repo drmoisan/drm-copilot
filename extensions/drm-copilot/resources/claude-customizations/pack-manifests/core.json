@@ -185,6 +185,7 @@
     ".claude/lib/worktree-resolution/WorktreeItemResolution.psm1",
     ".claude/lib/worktree-resolution/EpicScopeResolution.psm1",
     ".claude/lib/worktree-resolution/EpicScopeReadiness.psm1",
+    ".claude/lib/worktree-resolution/WorktreeRunResolution.psm1",
     ".claude/skills/mermaid-diagram/references/flowchart.md",
     ".claude/skills/mermaid-diagram/references/sequence.md",
     ".claude/skills/mermaid-diagram/references/class.md",
