@@ -307,13 +307,13 @@ Each item was observed in this repository's recorded runs or read from source, n
 
 ### Phase 0 — Policy Reads, Scratch Scripts, and Baselines
 
-- [ ] [P0-T1] Read `CLAUDE.md`, `.github/copilot-instructions.md`, and `.github/instructions/tonality.instructions.md` in full, in that order.
+- [x] [P0-T1] Read `CLAUDE.md`, `.github/copilot-instructions.md`, and `.github/instructions/tonality.instructions.md` in full, in that order.
       Acceptance: all three read; recorded in P0-T6.
-- [ ] [P0-T2] Read, in order, `.github/instructions/general-code-change.instructions.md`,
+- [x] [P0-T2] Read, in order, `.github/instructions/general-code-change.instructions.md`,
       `.github/instructions/general-unit-test.instructions.md`, and
       `.github/instructions/self-explanatory-code-commenting.instructions.md`. Acceptance: all three
       read; recorded in P0-T6.
-- [ ] [P0-T3] Read, in order, `.github/instructions/python-code-change.instructions.md`,
+- [x] [P0-T3] Read, in order, `.github/instructions/python-code-change.instructions.md`,
       `.github/instructions/python-unit-test.instructions.md`,
       `.github/instructions/python-suppressions.instructions.md`,
       `.github/instructions/powershell-code-change.instructions.md`,
@@ -322,26 +322,26 @@ Each item was observed in this repository's recorded runs or read from source, n
       `.github/instructions/typescript-unit-test.instructions.md`, and
       `.github/instructions/typescript-suppressions.instructions.md`. Acceptance: all eight read;
       recorded in P0-T6.
-- [ ] [P0-T4] Read, in order, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`,
+- [x] [P0-T4] Read, in order, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`,
       `.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md`,
       `.claude/rules/plan-acceptance-gates.md`, and `.claude/rules/self-explanatory-code-commenting.md`.
       Acceptance: all six read; recorded in P0-T6.
-- [ ] [P0-T5] Read, in order, `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`,
+- [x] [P0-T5] Read, in order, `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`,
       `.claude/rules/powershell.md`, `.claude/rules/shell.md`, `.claude/rules/typescript.md`,
       `.claude/rules/typescript-suppressions.md`, and `.claude/rules/parallel-orchestration.md`.
       Acceptance: all seven read; recorded in P0-T6.
-- [ ] [P0-T6] Write the policy-read record FEATURE/evidence/baseline/phase0-instructions-read.TS.md.
+- [x] [P0-T6] Write the policy-read record FEATURE/evidence/baseline/phase0-instructions-read.TS.md.
       Acceptance: the artifact contains `Timestamp:`, `Policy Order:` (CLAUDE.md, general code-change,
       general unit-test, then language rules for Python, PowerShell, shell, TypeScript), and the
       explicit list of the 27 files read in P0-T1 through P0-T5 in reading order.
-- [ ] [P0-T7] Create the 25 scratch scripts of Appendix A (A1 through A23 plus A5b and A19b) verbatim under SCRATCH (for example SCRATCH/run-ps.sh), then smoke-test three of them.
+- [x] [P0-T7] Create the 25 scratch scripts of Appendix A (A1 through A23 plus A5b and A19b) verbatim under SCRATCH (for example SCRATCH/run-ps.sh), then smoke-test three of them.
       Commands: `sh SCRATCH/run-ps.sh SCRATCH/psd1-parse.ps1 scripts/powershell/PoshQC/settings/pester.runsettings.psd1`;
       `sh SCRATCH/ac-count.sh FEATURE/spec.md`; `sh SCRATCH/mirror-check.sh .claude/skills/parallel-orchestrate/SKILL.md`.
       Write FEATURE/evidence/other/scratch-smoke.TS.md. Acceptance: the first run exits 0 and prints
       one line beginning `PSD1-OK file=`; the second exits 0 and prints `AC-CHECKED=0 AC-UNCHECKED=18`;
       the third exits 0 and prints `MIRROR SAME .claude/skills/parallel-orchestrate/SKILL.md` and
       `MIRROR-SUMMARY same=1 diff=0 missing=0`. The artifact lists the 25 scratch script names.
-- [ ] [P0-T8] Record branch state in FEATURE/evidence/baseline/branch-state.TS.md.
+- [x] [P0-T8] Record branch state in FEATURE/evidence/baseline/branch-state.TS.md.
       Commands: CMD-GIT-BRANCH, CMD-GIT-FETCH-INT, CMD-GIT-HEAD, CMD-GIT-MERGE-BASE, CMD-GIT-STATUS, and
       `git diff --name-only BASE_SHA HEAD` together with `git status --porcelain`. Acceptance: the branch is
       `bug/parallel-skills-invoke-unbundled-python-clis-763`; the merge-base is 40 hexadecimal
