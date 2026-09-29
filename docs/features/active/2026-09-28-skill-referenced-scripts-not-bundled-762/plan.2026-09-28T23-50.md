@@ -626,29 +626,29 @@ script A6 and a before-and-after hash comparison (A5).
 
 ### Phase 5 — Shell QC Discovery of .claude/skills (AC5)
 
-- [ ] [P5-T1] Edit `scripts/bash/shell_qc_lib.sh` lines 76-77 and 85 per Appendix B15 (comment names the
+- [x] [P5-T1] Edit `scripts/bash/shell_qc_lib.sh` lines 76-77 and 85 per Appendix B15 (comment names the
       `.claude/skills/` root; the root loop becomes `for root in tools scripts .claude/lib/bash .claude/skills; do`).
       Acceptance: CMD-GIT-COUNT with literal `.claude/skills; do` over SHELLLIB prints a count of 1.
-- [ ] [P5-T2] Edit `scripts/bash/shell_qc_lib.sh` lines 333-335 per Appendix B15 (comment and the
+- [x] [P5-T2] Edit `scripts/bash/shell_qc_lib.sh` lines 333-335 per Appendix B15 (comment and the
       include pattern gains a fourth root). Acceptance: CMD-GIT-COUNT with literal
       `/.claude/skills"` over SHELLLIB prints a count of 1.
-- [ ] [P5-T3] Run `tests/shell/test_shell_qc_discovery.bats` and `tests/shell/test_shell_qc_commands.bats` after the library change.
+- [x] [P5-T3] Run `tests/shell/test_shell_qc_discovery.bats` and `tests/shell/test_shell_qc_commands.bats` after the library change.
       Command: CMD-SH-BATS over those two files. Write
       FEATURE/evidence/regression-testing/shell-qc-discovery-after-fix.TS.md. Acceptance: exit 0, no
       `not ok` line, and the four tests named in P1-T16 appear on `ok` lines.
-- [ ] [P5-T4] Observe real discovery of the SKILLDIR scripts (`.claude/skills/cleanup-merged-worktrees/scripts`).
+- [x] [P5-T4] Observe real discovery of the SKILLDIR scripts (`.claude/skills/cleanup-merged-worktrees/scripts`).
       Command: CMD-SH-DISCOVER (script A13 sources the shell QC library and runs
       `discover_shell_scripts` from the repository root). Write
       FEATURE/evidence/regression-testing/discovery-skill-scripts.TS.md. Acceptance: exit 0 and the output
       contains exactly ten lines beginning `.claude/skills/cleanup-merged-worktrees/scripts/`, one per
       inventory basename.
-- [ ] [P5-T5] Edit `.claude/rules/shell.md` (operator-directed, see Operator-directed policy change):
+- [x] [P5-T5] Edit `.claude/rules/shell.md` (operator-directed, see Operator-directed policy change):
       replace the first Discovery Contract bullet and the second Coverage Expectations bullet with the
       exact text of Appendix B16; change nothing else. Acceptance: CMD-GIT-COUNT with literal
       `.claude/skills/` over that file prints a count of 3 (the file carries none before the edit), and
       CMD-PY-TEST over `tests/scripts/dev_tools/test_claude_rules_frontmatter.py` exits 0 with no FAILED
       line.
-- [ ] [P5-T6] Mirror `.claude/rules/shell.md` into BUNDLE.
+- [x] [P5-T6] Mirror `.claude/rules/shell.md` into BUNDLE.
       Command: `cp .claude/rules/shell.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md`.
       Acceptance: CMD-PS-SCRIPT with script file-hashes over the pair prints equal hashes.
 - [ ] [P5-T7] Commit and push Phase 5 (`.claude/rules/shell.md`, its mirror, and the shell QC library).
