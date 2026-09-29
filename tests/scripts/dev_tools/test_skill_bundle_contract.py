@@ -34,7 +34,9 @@ def test_parse_allowed_tools_returns_list_entries() -> None:
     """A YAML list value is returned entry by entry, in order."""
 
     # Arrange
-    text = _skill('name: demo\nallowed-tools:\n  - Read\n  - "Bash(git log *)"', "Body.")
+    text = _skill(
+        'name: demo\nallowed-tools:\n  - Read\n  - "Bash(git log *)"', "Body."
+    )
 
     # Act
     tools = parse_allowed_tools(text)
@@ -72,7 +74,8 @@ def test_parse_allowed_tools_ignores_unparseable_description() -> None:
 
     # Arrange
     text = _skill(
-        "name: demo\ndescription: Routes work: by budget\nallowed-tools:\n  - Read\n  - Grep",
+        "name: demo\ndescription: Routes work: by budget\n"
+        "allowed-tools:\n  - Read\n  - Grep",
         "Body.",
     )
 

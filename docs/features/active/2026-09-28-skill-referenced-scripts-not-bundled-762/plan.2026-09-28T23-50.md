@@ -651,46 +651,46 @@ script A6 and a before-and-after hash comparison (A5).
 - [x] [P5-T6] Mirror `.claude/rules/shell.md` into BUNDLE.
       Command: `cp .claude/rules/shell.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md`.
       Acceptance: CMD-PS-SCRIPT with script file-hashes over the pair prints equal hashes.
-- [ ] [P5-T7] Commit and push Phase 5 (`.claude/rules/shell.md`, its mirror, and the shell QC library).
+- [x] [P5-T7] Commit and push Phase 5 (`.claude/rules/shell.md`, its mirror, and the shell QC library).
       Commands: CMD-GIT-ADD with SHELLLIB `.claude/rules/shell.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md FEATURE/evidence FEATURE/plan.2026-09-28T23-50.md`,
       CMD-GIT-COMMIT with message "fix(762): discover and cover bash scripts bundled under .claude/skills",
       CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing after the commit, and the push exits 0.
 
 ### Phase 6 — Guard Pass-After, Old-Path Sweep, and Audit Coverage (AC1, AC4, AC6, AC7)
 
-- [ ] [P6-T1] Run the repository guard `tests/scripts/dev_tools/test_skill_bundle_contract_repo.py` after the fix.
+- [x] [P6-T1] Run the repository guard `tests/scripts/dev_tools/test_skill_bundle_contract_repo.py` after the fix.
       Command: CMD-PY-TEST over that file. Write
       FEATURE/evidence/regression-testing/guard-after-fix.TS.md. Acceptance: exit 0 and all five B6 test
       names on PASSED lines (including `test_known_unbundled_references_are_not_stale` and
       `test_every_skill_folder_file_is_carried_by_skill_packs`).
-- [ ] [P6-T2] Run the guard CLI `scripts/dev_tools/skill_bundle_contract_cli.py` after the fix.
+- [x] [P6-T2] Run the guard CLI `scripts/dev_tools/skill_bundle_contract_cli.py` after the fix.
       Command: CMD-PY-CLI. Write FEATURE/evidence/regression-testing/guard-cli-after-fix.TS.md.
       Acceptance: exit 0 and no stderr line beginning `skill-bundle `.
-- [ ] [P6-T3] Full old-path sweep, written to FEATURE/evidence/qa-gates/old-path-sweep.TS.md.
+- [x] [P6-T3] Full old-path sweep, written to FEATURE/evidence/qa-gates/old-path-sweep.TS.md.
       Command: CMD-SH-SWEEP with pathspecs `. ':(exclude)docs/features' ':(exclude)tests/fixtures/blast_radius/historical-runs'`.
       Acceptance: exit 0, no match line, and the final line is `SWEEP-EXIT=1`. The sweep searches tracked
       and untracked non-ignored files for the three literals `scripts/bash/cleanup`,
       `scripts/orchestration/Invoke-CiGateParser`, and `tests/scripts/orchestration/`.
-- [ ] [P6-T4] Confirm `scripts/orchestration` and `tests/scripts/orchestration` are empty in the index.
+- [x] [P6-T4] Confirm `scripts/orchestration` and `tests/scripts/orchestration` are empty in the index.
       Command: CMD-GIT-LS over `scripts/orchestration tests/scripts/orchestration`. Write
       FEATURE/evidence/qa-gates/old-dirs-empty.TS.md. Acceptance: exit 0 and no output.
-- [ ] [P6-T5] AC1 audit coverage: run `sh SCRATCH/skill-audit-coverage.sh` (script A18) against
+- [x] [P6-T5] AC1 audit coverage: run `sh SCRATCH/skill-audit-coverage.sh` (script A18) against
       `FEATURE/research/2026-09-28T19-15-skill-bundle-audit-research.md`. Write
       FEATURE/evidence/qa-gates/ac1-audit-coverage.TS.md. Acceptance: exit 0, no `MISSING` line, and the
       final line is `AUDIT skills=56 missing=0`.
 
 ### Phase 7 — Final QA Loop: Bash (shell-qc via WSL)
 
-- [ ] [P7-T1] Format all discovered shell scripts (including `.claude/skills/cleanup-merged-worktrees/scripts`).
+- [x] [P7-T1] Format all discovered shell scripts (including `.claude/skills/cleanup-merged-worktrees/scripts`).
       Commands: CMD-GIT-STATUS (before), CMD-SH-QC with subcommand `format`, CMD-GIT-STATUS (after).
       Write FEATURE/evidence/qa-gates/shell-format.TS.md. Acceptance: the format run exits 0 and the two
       status outputs are identical; a difference means shfmt rewrote a file, which restarts
       this loop after the rewrite is committed.
-- [ ] [P7-T2] Lint all discovered shell scripts (including `.claude/skills/cleanup-merged-worktrees/scripts`).
+- [x] [P7-T2] Lint all discovered shell scripts (including `.claude/skills/cleanup-merged-worktrees/scripts`).
       Command: CMD-SH-QC with subcommand `check` (shfmt diff mode, then shellcheck once per discovered
       file). Write FEATURE/evidence/qa-gates/shell-lint.TS.md. Acceptance: exit 0 and no diagnostic
       output.
-- [ ] [P7-T3] Test: CMD-SH-QC with subcommand `test` (runs the bats suites under `tests/shell`).
+- [x] [P7-T3] Test: CMD-SH-QC with subcommand `test` (runs the bats suites under `tests/shell`).
       Write FEATURE/evidence/qa-gates/shell-test.TS.md. Acceptance: the TAP plan line is `1..478` (the 477
       baseline tests plus the one test added by P1-T14), every `not ok` line names a KL-SHELL-2 member,
       and the artifact carries `ExpectedExitCode: 1` when a KL-SHELL-2 member fails. Local numeric bash
@@ -700,55 +700,55 @@ script A6 and a before-and-after hash comparison (A5).
 
 ### Phase 8 — Final QA Loop: PowerShell (PoshQC and Pester)
 
-- [ ] [P8-T1] Format: CMD-PS-SCRIPT with script file-hashes over `.claude/lib/ci-gate/Invoke-CiGateParser.ps1 tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1 tests/scripts/claude-lib/ci-gate/CiGate.Manifest.Tests.ps1 scripts/powershell/PoshQC/settings/pester.runsettings.psd1`
+- [x] [P8-T1] Format: CMD-PS-SCRIPT with script file-hashes over `.claude/lib/ci-gate/Invoke-CiGateParser.ps1 tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1 tests/scripts/claude-lib/ci-gate/CiGate.Manifest.Tests.ps1 scripts/powershell/PoshQC/settings/pester.runsettings.psd1`
       (before); MCP-PS-FORMAT with scan_folders `.claude/lib/ci-gate`, `tests/scripts/claude-lib/ci-gate`,
       `scripts/powershell/PoshQC/settings`; the same file-hashes run (after); CMD-PS-SCRIPT with script
       ps-format-check (A6) over the same four files. Write FEATURE/evidence/qa-gates/powershell-format.TS.md.
       Acceptance: the MCP call returns without raising, the before and after hashes are identical for all
       four files, and A6 prints `FORMAT-SUMMARY ChangedCount=0`.
-- [ ] [P8-T2] Analyze `.claude/lib/ci-gate/Invoke-CiGateParser.ps1` and the three other P8-T1 files.
+- [x] [P8-T2] Analyze `.claude/lib/ci-gate/Invoke-CiGateParser.ps1` and the three other P8-T1 files.
       Commands: MCP-PS-ANALYZE with the P8-T1 scan_folders, then CMD-PS-SCRIPT with script pssa-count
       (A9) over the four P8-T1 files. Write FEATURE/evidence/qa-gates/powershell-analyze.TS.md.
       Acceptance: the MCP call returns without raising and A9 prints `PSSA-SUMMARY DiagnosticCount=0`.
-- [ ] [P8-T3] Test with coverage for `.claude/lib/ci-gate/Invoke-CiGateParser.ps1`, written to FEATURE/evidence/qa-gates/powershell-test-coverage.TS.md.
+- [x] [P8-T3] Test with coverage for `.claude/lib/ci-gate/Invoke-CiGateParser.ps1`, written to FEATURE/evidence/qa-gates/powershell-test-coverage.TS.md.
       Command: CMD-PS-SCRIPT with script pester-coverage (A3), `-TestPath tests/scripts/claude-lib/ci-gate`,
       `-CoveragePath .claude/lib/ci-gate/Invoke-CiGateParser.ps1`, `-CoverageOutputPath SCRATCH/ci-gate-final.xml`.
       Acceptance: `PassedCount=17`, `FailedCount=0`, and the
       `COVERAGE file=.claude/lib/ci-gate/Invoke-CiGateParser.ps1` line's `LinePercent=` is at least 85
       and at least the P0-T17 baseline value.
-- [ ] [P8-T4] Regression over `tests/scripts/claude-lib`, written to FEATURE/evidence/qa-gates/powershell-claude-lib.TS.md.
+- [x] [P8-T4] Regression over `tests/scripts/claude-lib`, written to FEATURE/evidence/qa-gates/powershell-claude-lib.TS.md.
       Command: CMD-PS-SCRIPT with script pester-counts (A2) and `-Path tests/scripts/claude-lib`.
       Acceptance: `TotalCount=` equals the P0-T18 value plus 17 (15 moved-in parser tests and 2 manifest
       tests), and every `FAILED:` line is a member of the P0-T18 baseline failure set.
 
 ### Phase 9 — Final QA Loop: Python (black, ruff, pyright, pytest with coverage)
 
-- [ ] [P9-T1] Format: CMD-GIT-STATUS (before), CMD-PY-BLACK over `scripts/dev_tools/skill_bundle_contract.py scripts/dev_tools/skill_bundle_contract_cli.py tests/scripts/dev_tools/test_skill_bundle_contract.py tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py tests/scripts/dev_tools/test_skill_bundle_contract_cli.py tests/scripts/dev_tools/test_skill_bundle_contract_repo.py`,
+- [x] [P9-T1] Format: CMD-GIT-STATUS (before), CMD-PY-BLACK over `scripts/dev_tools/skill_bundle_contract.py scripts/dev_tools/skill_bundle_contract_cli.py tests/scripts/dev_tools/test_skill_bundle_contract.py tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py tests/scripts/dev_tools/test_skill_bundle_contract_cli.py tests/scripts/dev_tools/test_skill_bundle_contract_repo.py`,
       CMD-GIT-STATUS (after). Write FEATURE/evidence/qa-gates/python-format.TS.md. Acceptance: black exits 0
       and prints "6 files left unchanged." with no "reformatted" line, and the two status outputs are
       identical.
-- [ ] [P9-T2] Lint: CMD-PY-RUFF over the six files of P9-T1 (`scripts/dev_tools/skill_bundle_contract.py`
+- [x] [P9-T2] Lint: CMD-PY-RUFF over the six files of P9-T1 (`scripts/dev_tools/skill_bundle_contract.py`
       and the other five). Write FEATURE/evidence/qa-gates/python-lint.TS.md. Acceptance: exit 0 and
       "All checks passed!".
-- [ ] [P9-T3] Type-check the six P9-T1 files and `scripts/dev_tools tests/scripts/dev_tools`.
+- [x] [P9-T3] Type-check the six P9-T1 files and `scripts/dev_tools tests/scripts/dev_tools`.
       Commands: CMD-PY-PYRIGHT over the six files, then CMD-PY-PYRIGHT over
       `scripts/dev_tools tests/scripts/dev_tools`. Write FEATURE/evidence/qa-gates/python-typecheck.TS.md.
       Acceptance: the first run exits 0 with a summary line beginning "0 errors"; the second run's error
       count is not greater than the P0-T13 baseline count.
-- [ ] [P9-T4] Test with coverage for `scripts/dev_tools/skill_bundle_contract.py` and `scripts/dev_tools/skill_bundle_contract_cli.py`.
+- [x] [P9-T4] Test with coverage for `scripts/dev_tools/skill_bundle_contract.py` and `scripts/dev_tools/skill_bundle_contract_cli.py`.
       Commands: `poetry run pytest -v tests/scripts/dev_tools/test_skill_bundle_contract.py tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py tests/scripts/dev_tools/test_skill_bundle_contract_cli.py tests/scripts/dev_tools/test_skill_bundle_contract_repo.py --cov=scripts.dev_tools.skill_bundle_contract --cov=scripts.dev_tools.skill_bundle_contract_cli --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/cov-762-new.json`,
       then CMD-PY-SCRIPT with script py-cov-files (A7) and arguments
       `SCRATCH/cov-762-new.json scripts/dev_tools/skill_bundle_contract.py scripts/dev_tools/skill_bundle_contract_cli.py`.
       Write FEATURE/evidence/qa-gates/python-test-coverage-new.TS.md. Acceptance: pytest exits 0 with no
       FAILED line and the artifact records the collected node count; for each of the two modules A7 prints
       `LinePercent=` at least 85 and `BranchPercent=` at least 75.
-- [ ] [P9-T5] Test with coverage for the whole `tests/scripts/dev_tools` tree, written to FEATURE/evidence/qa-gates/python-test-coverage-total.TS.md.
+- [x] [P9-T5] Test with coverage for the whole `tests/scripts/dev_tools` tree, written to FEATURE/evidence/qa-gates/python-test-coverage-total.TS.md.
       Commands: `poetry run pytest tests/scripts/dev_tools --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/cov-762-final.json`,
       then CMD-PY-SCRIPT with script py-cov-files (A7) and arguments `SCRATCH/cov-762-final.json TOTAL`.
       Acceptance: the only failing node, if any, satisfies KL-510 case (b); the collected total (passed
       plus failed plus skipped) equals the P0-T14 collected total plus the P9-T4 node count; A7 prints
       `LinePercent=` at least 85 and `BranchPercent=` at least 75.
-- [ ] [P9-T6] File-size limit check, written to FEATURE/evidence/qa-gates/line-counts-final.TS.md.
+- [x] [P9-T6] File-size limit check, written to FEATURE/evidence/qa-gates/line-counts-final.TS.md.
       Command: CMD-PS-SCRIPT with script line-counts over the six P9-T1 Python files,
       `.claude/skills/cleanup-merged-worktrees/scripts/*.sh`, SHELLLIB, `tests/shell/test_shell_qc_discovery.bats`,
       `tests/shell/test_shell_qc_commands.bats`, `tests/shell/test_cleanup_worktrees_*.bats`,
@@ -762,7 +762,7 @@ script A6 and a before-and-after hash comparison (A5).
 
 ### Phase 10 — CI Verification and Coverage Comparison
 
-- [ ] [P10-T1] TypeScript push-down regression for `extensions/drm-copilot/test/lib/push-down`: CMD-TS-TEST.
+- [x] [P10-T1] TypeScript push-down regression for `extensions/drm-copilot/test/lib/push-down`: CMD-TS-TEST.
       Write FEATURE/evidence/qa-gates/ts-push-down-jest.TS.md. Acceptance: every `FAIL ` line is a member
       of the P0-T20 baseline failure set and the "Tests:" line records no more failed tests than the
       baseline.

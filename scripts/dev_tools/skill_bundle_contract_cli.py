@@ -59,7 +59,9 @@ def _files_under(folder: Path, relative_to: Path) -> frozenset[str]:
         return frozenset()
     # Walk the tree and keep regular files only.
     return frozenset(
-        entry.relative_to(relative_to).as_posix() for entry in folder.rglob("*") if entry.is_file()
+        entry.relative_to(relative_to).as_posix()
+        for entry in folder.rglob("*")
+        if entry.is_file()
     )
 
 
@@ -82,12 +84,18 @@ def _load_pack_paths(manifest_folder: Path) -> dict[str, frozenset[str]]:
     pack_paths: dict[str, frozenset[str]] = {}
     # Each manifest file contributes one pack keyed by its file stem.
     for manifest in sorted(manifest_folder.glob("*.json")):
-        document = json.loads(manifest.read_text(encoding="utf-8"))
-        paths = document.get("paths") if isinstance(document, dict) else None
+        document: object = json.loads(manifest.read_text(encoding="utf-8"))
+        paths: object = (
+            cast("dict[str, object]", document).get("paths")
+            if isinstance(document, dict)
+            else None
+        )
         if not isinstance(paths, list) or not all(
             isinstance(entry, str) for entry in cast("list[object]", paths)
         ):
-            raise ValueError(f"Pack manifest has no 'paths' list of strings: {manifest.name}")
+            raise ValueError(
+                f"Pack manifest has no 'paths' list of strings: {manifest.name}"
+            )
         pack_paths[manifest.stem] = frozenset(cast("list[str]", paths))
     return pack_paths
 
@@ -123,7 +131,9 @@ def load_repository_inputs(repo_root: Path) -> SkillBundleInputs:
     skill_texts: dict[str, str] = {}
     skill_folder_files: dict[str, frozenset[str]] = {}
     # Read each skill folder: its SKILL.md text and the files it contains.
-    for skill_folder in sorted(entry for entry in skills_root.iterdir() if entry.is_dir()):
+    for skill_folder in sorted(
+        entry for entry in skills_root.iterdir() if entry.is_dir()
+    ):
         skill_text_file = skill_folder / "SKILL.md"
         if skill_text_file.is_file():
             skill_texts[skill_folder.name] = skill_text_file.read_text(encoding="utf-8")
@@ -188,13 +198,15 @@ def main(
 
     # Render one report line per unregistered violation.
     report = [
-        f"skill-bundle violation: {violation.skill} | {violation.path} | {violation.reason}"
+        "skill-bundle violation: "
+        f"{violation.skill} | {violation.path} | {violation.reason}"
         for violation in find_violations(inputs)
     ]
     # Stale exceptions are reported alongside violations so a fixed exception
     # cannot stay in the registry unnoticed.
     report.extend(
-        f"skill-bundle stale exception: {exception.skill} | {exception.path} | {exception.issue}"
+        "skill-bundle stale exception: "
+        f"{exception.skill} | {exception.path} | {exception.issue}"
         for exception in find_stale_exceptions(inputs)
     )
     # Emit each report line on stderr.

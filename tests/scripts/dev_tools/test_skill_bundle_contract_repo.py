@@ -37,7 +37,8 @@ def test_every_skill_script_reference_is_bundled() -> None:
 
     # Assert: render one "<skill> | <path> | <reason>" line per violation.
     report = "\n".join(
-        f"{violation.skill} | {violation.path} | {violation.reason}" for violation in violations
+        f"{violation.skill} | {violation.path} | {violation.reason}"
+        for violation in violations
     )
     assert not violations, f"Unbundled skill script references:\n{report}"
 
@@ -51,14 +52,18 @@ def test_ci_gate_parser_skills_invoke_bundled_parser() -> None:
     # Act: extract each skill's script references from its SKILL.md.
     references = {
         name: extract_script_references(
-            (_REPO_ROOT / ".claude/skills" / name / "SKILL.md").read_text(encoding="utf-8")
+            (_REPO_ROOT / ".claude/skills" / name / "SKILL.md").read_text(
+                encoding="utf-8"
+            )
         )
         for name in skill_names
     }
 
     # Assert: collect the skills whose references lack the bundled parser.
     missing = [name for name in skill_names if _CI_GATE_PARSER not in references[name]]
-    assert not missing, f"Skills not invoking {_CI_GATE_PARSER}: {missing}; got {references}"
+    assert (
+        not missing
+    ), f"Skills not invoking {_CI_GATE_PARSER}: {missing}; got {references}"
 
 
 def test_every_skill_folder_file_is_carried_by_skill_packs() -> None:
@@ -76,7 +81,8 @@ def test_every_skill_folder_file_is_carried_by_skill_packs() -> None:
 
     # Assert: render one "<skill> | <path> | <reason>" line per violation.
     report = "\n".join(
-        f"{violation.skill} | {violation.path} | {violation.reason}" for violation in violations
+        f"{violation.skill} | {violation.path} | {violation.reason}"
+        for violation in violations
     )
     assert not violations, f"Skill-folder files not carried:\n{report}"
 
@@ -106,6 +112,6 @@ def test_published_root_folders_match_typescript_root_folders() -> None:
     typescript_folders = tuple(re.findall(r"\"([^\"]*)\"", declaration.group(1)))
 
     # Assert
-    assert typescript_folders == PUBLISHED_ROOT_FOLDERS, (
-        f"TypeScript {typescript_folders} != Python {PUBLISHED_ROOT_FOLDERS}"
-    )
+    assert (
+        typescript_folders == PUBLISHED_ROOT_FOLDERS
+    ), f"TypeScript {typescript_folders} != Python {PUBLISHED_ROOT_FOLDERS}"

@@ -86,7 +86,9 @@ def test_main_returns_zero_when_clean() -> None:
     assert exit_code == 0, f"Expected 0, got {exit_code}"
 
 
-def test_main_returns_one_and_prints_violation_lines(capsys: pytest.CaptureFixture[str]) -> None:
+def test_main_returns_one_and_prints_violation_lines(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """An unbundled reference exits 1 and prints one violation line."""
 
     # Arrange
@@ -103,7 +105,9 @@ def test_main_returns_one_and_prints_violation_lines(capsys: pytest.CaptureFixtu
     ], captured.err
 
 
-def test_main_returns_one_for_stale_exception(capsys: pytest.CaptureFixture[str]) -> None:
+def test_main_returns_one_for_stale_exception(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """An exception whose violation disappeared exits 1 and is reported."""
 
     # Arrange
@@ -111,7 +115,9 @@ def test_main_returns_one_for_stale_exception(capsys: pytest.CaptureFixture[str]
     # Drop the parallel-remove skill so its registered exception matches nothing.
     stale_inputs = SkillBundleInputs(
         skill_texts={
-            name: text for name, text in clean.skill_texts.items() if name != "parallel-remove"
+            name: text
+            for name, text in clean.skill_texts.items()
+            if name != "parallel-remove"
         },
         skill_folder_files=clean.skill_folder_files,
         repository_files=clean.repository_files,
@@ -130,7 +136,9 @@ def test_main_returns_one_for_stale_exception(capsys: pytest.CaptureFixture[str]
     ], captured.err
 
 
-def test_main_prints_nothing_to_stderr_when_clean(capsys: pytest.CaptureFixture[str]) -> None:
+def test_main_prints_nothing_to_stderr_when_clean(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """A clean snapshot writes nothing to stderr."""
 
     # Arrange

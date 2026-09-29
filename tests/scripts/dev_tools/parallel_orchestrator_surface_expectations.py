@@ -134,6 +134,12 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # checkpoint-shape paragraph; in the agent's `## Checkpoint Persistence` it added
 # `epic_issue_num` and `model_routing_receipts[]` to the field list. Both digests
 # moved, and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #762. That change relocated the CI gate parser into the
+# bundled `.claude/lib/ci-gate/` tree and rewrote the epic skill's S9 CI-green
+# citation to the explicit `pwsh -NoProfile -File .claude/lib/ci-gate/...` form, so
+# push-down carries the parser the skill invokes. Only the skill digest moved; the
+# agent digest is unchanged and the pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -141,7 +147,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "14d6bf2f76f64d8c6be9c7c675e828f474ebc20d52ed60096d612302a77f21a0",
+        "620183f57a337dedf6158d61264b2257d012762454a9af0b3b6f059ff79ab00b",
     ),
 )
 

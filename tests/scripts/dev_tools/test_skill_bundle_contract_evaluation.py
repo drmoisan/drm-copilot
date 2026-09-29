@@ -51,9 +51,11 @@ def _inputs(
         skill_folder_files=skill_folder_files or {},
         repository_files=repository_files,
         bundle_files=bundle_files,
-        pack_paths=pack_paths
-        if pack_paths is not None
-        else {"core": frozenset({_SKILL_TEXT_PATH, _SCRIPT})},
+        pack_paths=(
+            pack_paths
+            if pack_paths is not None
+            else {"core": frozenset({_SKILL_TEXT_PATH, _SCRIPT})}
+        ),
     )
 
 
@@ -67,7 +69,9 @@ def test_evaluate_reports_missing_file() -> None:
     violations = evaluate_skill_bundle(_SKILL, [_SCRIPT], inputs)
 
     # Assert
-    assert violations == (SkillBundleViolation(_SKILL, _SCRIPT, "missing-file"),), violations
+    assert violations == (
+        SkillBundleViolation(_SKILL, _SCRIPT, "missing-file"),
+    ), violations
 
 
 def test_evaluate_reports_not_in_bundle_for_unpublished_root() -> None:
@@ -81,7 +85,9 @@ def test_evaluate_reports_not_in_bundle_for_unpublished_root() -> None:
     violations = evaluate_skill_bundle(_SKILL, [path], inputs)
 
     # Assert
-    assert violations == (SkillBundleViolation(_SKILL, path, "not-in-bundle"),), violations
+    assert violations == (
+        SkillBundleViolation(_SKILL, path, "not-in-bundle"),
+    ), violations
 
 
 def test_evaluate_reports_not_in_bundle_when_bundle_lacks_file() -> None:
@@ -94,7 +100,9 @@ def test_evaluate_reports_not_in_bundle_when_bundle_lacks_file() -> None:
     violations = evaluate_skill_bundle(_SKILL, [_SCRIPT], inputs)
 
     # Assert
-    assert violations == (SkillBundleViolation(_SKILL, _SCRIPT, "not-in-bundle"),), violations
+    assert violations == (
+        SkillBundleViolation(_SKILL, _SCRIPT, "not-in-bundle"),
+    ), violations
 
 
 def test_evaluate_reports_not_in_skill_pack_for_pack_specific_skill() -> None:
@@ -132,7 +140,9 @@ def test_evaluate_accepts_reference_listed_in_every_skill_pack() -> None:
 
     # Arrange
     listed = frozenset({_SKILL_TEXT_PATH, _SCRIPT})
-    inputs = _inputs(pack_paths={"core": frozenset(), "python": listed, "powershell": listed})
+    inputs = _inputs(
+        pack_paths={"core": frozenset(), "python": listed, "powershell": listed}
+    )
 
     # Act
     violations = evaluate_skill_bundle(_SKILL, [_SCRIPT], inputs)
@@ -185,7 +195,10 @@ def test_find_violations_suppresses_known_exceptions() -> None:
     # Arrange
     path = "scripts/tools/example_cli.py"
     inputs = _inputs(
-        skill_texts={_SKILL: f"Run `python {path}`.", "other-skill": f"Run `python {path}`."},
+        skill_texts={
+            _SKILL: f"Run `python {path}`.",
+            "other-skill": f"Run `python {path}`.",
+        },
         repository_files=frozenset({path}),
     )
     exception = KnownUnbundledReference(_SKILL, path, "#1")
@@ -237,10 +250,14 @@ def test_known_unbundled_references_cite_issue_763() -> None:
     # Arrange
     expected = (
         KnownUnbundledReference(
-            "parallel-orchestrate", "scripts/dev_tools/parallel_drift_detection_cli.py", "#763"
+            "parallel-orchestrate",
+            "scripts/dev_tools/parallel_drift_detection_cli.py",
+            "#763",
         ),
         KnownUnbundledReference(
-            "parallel-remove", "scripts/dev_tools/parallel_mutation_abandon_cli.py", "#763"
+            "parallel-remove",
+            "scripts/dev_tools/parallel_mutation_abandon_cli.py",
+            "#763",
         ),
     )
 

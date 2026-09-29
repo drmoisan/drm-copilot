@@ -1,39 +1,24 @@
 """Check that every script a skill invokes is published with that skill.
 
 Purpose:
-    A skill under ``.claude/skills/<name>/`` is pushed down into a destination
-    workspace through the Claude customization bundle. A skill whose text
-    invokes a script that the bundle does not carry fails in the destination,
-    because the script path resolves to nothing there (issue #762). This module
-    extracts the script references a skill makes and decides, from a snapshot
-    of the repository, the bundle, and the pack manifests, whether each one is
+    A skill is pushed down through the Claude customization bundle; a skill that
+    invokes a script the bundle does not carry fails in the destination (issue
+    #762). This module extracts a skill's script references and decides, from a
+    snapshot of the repository, bundle, and pack manifests, whether each one is
     published with the skill.
 
-Responsibilities and boundaries:
-    The module is pure. It performs no filesystem, network, or subprocess
-    access; every input arrives in a ``SkillBundleInputs`` snapshot that the
-    I/O boundary in ``scripts/dev_tools/skill_bundle_contract_cli.py`` builds.
-    It reports violations and stale exceptions and never edits anything.
+Responsibilities and flow:
+    Pure logic only; the I/O boundary is ``skill_bundle_contract_cli.py``.
+    ``extract_script_references`` reads invocation forms from a skill text,
+    ``evaluate_skill_bundle`` classifies references and skill-folder files,
+    ``find_violations`` applies that to every skill minus registered exceptions,
+    and ``find_stale_exceptions`` reports exceptions that match no violation.
 
-Flow:
-    ``extract_script_references`` reads the invocation forms out of one skill
-    text. ``evaluate_skill_bundle`` classifies each reference, and each file of
-    the skill folder, against the snapshot. ``find_violations`` runs that for
-    every skill and drops the registered exceptions. ``find_stale_exceptions``
-    reports exceptions that no longer match any violation, so a fixed
-    exception cannot linger in the registry.
-
-Key invariants:
-    A violation reason is exactly one of ``missing-file``, ``not-in-bundle``,
-    or ``not-in-skill-pack``. Folder location is never a reason: a script that
-    lives outside the skill folder is acceptable when it is bundled and carried
-    by the skill's packs.
-
-Raises and side effects (module-wide contract):
-    No function performs I/O or mutates its arguments. ``parse_allowed_tools``
-    and ``extract_script_references`` raise ``ValueError`` for an unterminated
-    or unparseable frontmatter block, and ``SkillBundleViolation`` raises
-    ``ValueError`` for an unknown reason.
+Key invariants, raises, and side effects:
+    A reason is exactly ``missing-file``, ``not-in-bundle``, or
+    ``not-in-skill-pack``; folder location is never a reason. No function
+    performs I/O or mutates its arguments. Unterminated or unparseable
+    frontmatter raises ``ValueError``, as does an unknown violation reason.
 """
 
 from __future__ import annotations
@@ -74,9 +59,7 @@ _INVOCATION_PATTERNS: tuple[re.Pattern[str], ...] = (
     # Import-Module <path>.
     re.compile(r"Import-Module\s+" + _CANDIDATE),
     # Import-Module (Join-Path <expr> '<path>') with single or double quotes.
-    re.compile(
-        r"Import-Module\s+\(Join-Path\s+[^'\"\n]*['\"](?P<path>[^'\"\n]+)['\"]"
-    ),
+    re.compile(r"Import-Module\s+\(Join-Path\s+[^'\"\n]*['\"](?P<path>[^'\"\n]+)['\"]"),
 )
 _PYTHON_PATH_PATTERN = re.compile(r"(?<![A-Za-z0-9_-])python3?\s+" + _CANDIDATE)
 _PYTHON_MODULE_PATTERN = re.compile(
@@ -356,7 +339,9 @@ def extract_script_references(skill_text: str) -> tuple[str, ...]:
     return tuple(sorted(references))
 
 
-def _skill_packs(skill: str, pack_paths: Mapping[str, frozenset[str]]) -> tuple[str, ...]:
+def _skill_packs(
+    skill: str, pack_paths: Mapping[str, frozenset[str]]
+) -> tuple[str, ...]:
     """Return the packs that install a skill, identified by its ``SKILL.md``.
 
     Args:
@@ -369,7 +354,9 @@ def _skill_packs(skill: str, pack_paths: Mapping[str, frozenset[str]]) -> tuple[
 
     skill_text_path = f".claude/skills/{skill}/SKILL.md"
     # Keep only the packs whose manifest lists this skill's SKILL.md.
-    return tuple(sorted(name for name, paths in pack_paths.items() if skill_text_path in paths))
+    return tuple(
+        sorted(name for name, paths in pack_paths.items() if skill_text_path in paths)
+    )
 
 
 def _publication_reason(
@@ -389,7 +376,10 @@ def _publication_reason(
 
     # Bundle membership is decided first: a path outside the published roots
     # can never be carried, whatever the manifests list.
-    if path.split("/", 1)[0] not in PUBLISHED_ROOT_FOLDERS or path not in inputs.bundle_files:
+    if (
+        path.split("/", 1)[0] not in PUBLISHED_ROOT_FOLDERS
+        or path not in inputs.bundle_files
+    ):
         return "not-in-bundle"
     # Carried through core (always installed) or through every pack that
     # installs the skill; a skill listed by no pack is carried only via core.
@@ -494,8 +484,12 @@ def find_stale_exceptions(
         does not occur among the violations computed with no exceptions.
     """
 
-    present = {(violation.skill, violation.path) for violation in _all_violations(inputs)}
+    present = {
+        (violation.skill, violation.path) for violation in _all_violations(inputs)
+    }
     # Keep the exceptions whose target violation has disappeared.
     return tuple(
-        exception for exception in exceptions if (exception.skill, exception.path) not in present
+        exception
+        for exception in exceptions
+        if (exception.skill, exception.path) not in present
     )
