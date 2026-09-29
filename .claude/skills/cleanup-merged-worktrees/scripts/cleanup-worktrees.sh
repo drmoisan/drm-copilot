@@ -13,21 +13,21 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 # enumeration/protection library is sourced first because cleanup_worktrees_lib.sh's
 # classification functions call cleanup_wt_git, parse_worktree_list, compute_protected,
 # and normalize_wt_path defined there.
-# shellcheck source=scripts/bash/cleanup_worktrees_enumerate_lib.sh
+# shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_enumerate_lib.sh"
 # The report-record library depends on the enumeration library above and is called BY
 # run_report/run_apply in the two libraries sourced below, so it is sourced between them.
-# shellcheck source=scripts/bash/cleanup_worktrees_report_records_lib.sh
+# shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_report_records_lib.sh"
-# shellcheck source=scripts/bash/cleanup_worktrees_lib.sh
+# shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_lib.sh"
-# shellcheck source=scripts/bash/cleanup_worktrees_actions_lib.sh
+# shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_actions_lib.sh"
-# shellcheck source=scripts/bash/cleanup_worktrees_detached_lib.sh
+# shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_detached_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_detached_lib.sh"
 # Neither of the three libraries below requires being sourced last, and neither claims to
@@ -40,15 +40,15 @@ source "$SCRIPT_DIR/cleanup_worktrees_detached_lib.sh"
 # libraries above, and the preserve library calls cleanup_wt_git from the enumeration
 # library and consolidation_worktree_path from the actions library. The order here is
 # therefore grouping for readability only.
-# shellcheck source=scripts/bash/cleanup_worktrees_dirt_lib.sh
+# shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_dirt_lib.sh"
 # The line-ending and index group is placed immediately before the preserve library, whose
 # read-only planning phase calls the functions it defines.
-# shellcheck source=scripts/bash/cleanup_worktrees_preserve_eol_lib.sh
+# shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_eol_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_preserve_eol_lib.sh"
-# shellcheck source=scripts/bash/cleanup_worktrees_preserve_lib.sh
+# shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_preserve_lib.sh"
 

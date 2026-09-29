@@ -16,11 +16,11 @@
 # classification ladder rungs (classify_ancestry, classify_content_neutral,
 # classify_cherry_equivalent, classify_residual_commit), and remove_worktree_safe. Bash
 # resolves function names at call time, so run_report and run_apply may call into this
-# file even though scripts/bash/cleanup-worktrees.sh sources it last.
+# file even though .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh sources it last.
 #
 # Git exit-code capture rule: every git-backed read is captured in the PARENT shell with
 # `|| rc=$?` and fails closed, matching the invariant documented at
-# scripts/bash/cleanup_worktrees_actions_lib.sh:19-35. A hard git failure always maps to
+# .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh:19-35. A hard git failure always maps to
 # the ANCESTRY_ERROR state and a non-zero return, never to a MERGED_* verdict and never
 # to a removal.
 #
@@ -43,7 +43,7 @@ is_detached_candidate() {
 	#
 	# The predicate is the porcelain FLAG, not the branch field: emit_record writes the
 	# literal DETACHED into the branch field whenever the branch accumulator is empty
-	# (scripts/bash/cleanup_worktrees_enumerate_lib.sh:115-116), which is also true of a
+	# (.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh:115-116), which is also true of a
 	# bare-repository stanza, and a local branch literally named DETACHED would produce
 	# the same branch field with no `detached` flag.
 	#

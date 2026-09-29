@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 # Preserve-file consolidation unit tests for
-# scripts/bash/cleanup_worktrees_preserve_lib.sh. Sources the enumerate, classification,
+# .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh. Sources the enumerate, classification,
 # actions, and preserve libraries and drives the preserve functions through the
 # checked-in git and jq stubs. Fixtures live under
 # tests/fixtures/cleanup_worktrees/preserve/. No temporary files; no scratch git
@@ -12,12 +12,12 @@
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
-    ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
-    LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
-    ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
-    EOLLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_preserve_eol_lib.sh"
-    PLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_preserve_lib.sh"
-    WRAP="${REPO_ROOT}/scripts/bash/cleanup-worktrees.sh"
+    ELIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
+    LIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh"
+    ALIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh"
+    EOLLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_eol_lib.sh"
+    PLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh"
+    WRAP="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     JQSTUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/preserve/stub-bin/jq"
     PRES="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/preserve"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bats
-# Classification-ladder unit tests for scripts/bash/cleanup_worktrees_lib.sh.
+# Classification-ladder unit tests for .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh.
 # Drives classify_branch and run_report against the checked-in git stub and the
 # scenario fixtures under tests/fixtures/cleanup_worktrees/scenarios/, covering the
 # six AC8 scenarios plus the ancestry-error and content-neutral rungs. No temporary
@@ -7,11 +7,11 @@
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
-    ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
-    LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
-    RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
-    DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
-    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
+    ELIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
+    LIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh"
+    RLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh"
+    DLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_detached_lib.sh"
+    DIRTLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bats
-# End-to-end CLI tests for scripts/bash/cleanup-worktrees.sh. Runs the wrapper through
+# End-to-end CLI tests for .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh. Runs the wrapper through
 # the checked-in git stub, asserting the usage/exit-code contract, the no-mutation
 # guarantee of the default report mode, destructive actions only in apply mode for
 # delete-eligible states, and the source-guard. No temporary files; no scratch git
@@ -7,8 +7,8 @@
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
-    WRAPPER="${REPO_ROOT}/scripts/bash/cleanup-worktrees.sh"
-    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
+    WRAPPER="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh"
+    DIRTLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"

@@ -1,13 +1,13 @@
 #!/usr/bin/env bats
 # Seam unit tests for cleanup_wt_scan_bin in
-# scripts/bash/cleanup_worktrees_report_records_lib.sh. The resolver mirrors the
+# .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh. The resolver mirrors the
 # CLEANUP_WT_GIT_BIN seam's override shape but falls back to the bundled real
 # implementation cleanup_worktrees_scan_helper.sh rather than a PATH lookup, so both
 # branches are pinned here. No temporary files; no scratch git repositories.
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
-    RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
+    RLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh"
     SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     # Checked-in stubs may lose the executable bit on some platforms; make runnable.
     chmod +x "${SCAN}" 2>/dev/null || true

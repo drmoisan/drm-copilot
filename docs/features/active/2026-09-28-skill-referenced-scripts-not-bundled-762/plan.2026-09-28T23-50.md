@@ -470,41 +470,41 @@ script A6 and a before-and-after hash comparison (A5).
       FEATURE/evidence/regression-testing/ci-gate-manifest-before-fix.TS.md with `ExpectedExitCode: 0`
       (A2 reports test failures in its output, not its exit code). Acceptance: exit 0 and output
       contains `TotalCount=2`, `PassedCount=0`, and `FailedCount=2`; a non-zero exit stops the task.
-- [ ] [P1-T20] Commit and push Phase 1 (`scripts/dev_tools/skill_bundle_contract.py` and the files below).
+- [x] [P1-T20] Commit and push Phase 1 (`scripts/dev_tools/skill_bundle_contract.py` and the files below).
       Commands: CMD-GIT-ADD with `scripts/dev_tools/skill_bundle_contract.py scripts/dev_tools/skill_bundle_contract_cli.py tests/scripts/dev_tools/test_skill_bundle_contract.py tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py tests/scripts/dev_tools/test_skill_bundle_contract_cli.py tests/scripts/dev_tools/test_skill_bundle_contract_repo.py tests/fixtures/shell_qc/.claude/skills tests/shell/test_shell_qc_discovery.bats tests/shell/test_shell_qc_commands.bats tests/scripts/claude-lib/ci-gate FEATURE/evidence FEATURE/plan.2026-09-28T23-50.md`,
       CMD-GIT-COMMIT with message "test(762): add skill bundle guard and fail-before regression tests",
       CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing after the commit, and the push exits 0.
 
 ### Phase 2 — Relocate the cleanup-worktrees Scripts (AC2, AC4)
 
-- [ ] [P2-T1] Move the ten scripts into SKILLDIR (`.claude/skills/cleanup-merged-worktrees/scripts`).
+- [x] [P2-T1] Move the ten scripts into SKILLDIR (`.claude/skills/cleanup-merged-worktrees/scripts`).
       Command: `sh SCRATCH/move-cleanup-scripts.sh` (script A15). Write
       FEATURE/evidence/other/cleanup-move.TS.md. Acceptance: exit 0 and ten `MOVED` lines; CMD-GIT-LS over
       `.claude/skills/cleanup-merged-worktrees/scripts` prints exactly the ten inventory basenames under
       that directory; CMD-GIT-STATUS-PATH over `scripts .claude/skills/cleanup-merged-worktrees/scripts`
       prints exactly ten lines, each beginning `R`.
-- [ ] [P2-T2] Edit `.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`: replace
+- [x] [P2-T2] Edit `.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`: replace
       OLD_PATH_LITERAL with NEW_PATH_LITERAL on lines 16, 21, 24, 27, 30, 43, 48, and 51 (the shellcheck
       `source=` directives). Acceptance: CMD-GIT-COUNT with NEW_PATH_LITERAL over that file prints
       `.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh:8`.
-- [ ] [P2-T3] Edit `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_detached_lib.sh`:
+- [x] [P2-T3] Edit `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_detached_lib.sh`:
       replace OLD_PATH_LITERAL with NEW_PATH_LITERAL on lines 19, 23, and 46 (comments). Acceptance:
       CMD-GIT-COUNT with NEW_PATH_LITERAL over that file prints a count of 3.
-- [ ] [P2-T4] Edit `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh`:
+- [x] [P2-T4] Edit `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh`:
       replace OLD_PATH_LITERAL with NEW_PATH_LITERAL on lines 10, 12, 39, and 331 (comments).
       Acceptance: CMD-GIT-COUNT with NEW_PATH_LITERAL over that file prints a count of 4.
-- [ ] [P2-T5] Edit `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh`:
+- [x] [P2-T5] Edit `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh`:
       replace OLD_PATH_LITERAL with NEW_PATH_LITERAL on line 42 (comment). Acceptance: CMD-GIT-COUNT with
       NEW_PATH_LITERAL over that file prints a count of 1.
-- [ ] [P2-T6] Sweep the moved scripts: CMD-SH-SWEEP with pathspec `.claude/skills/cleanup-merged-worktrees/scripts`.
+- [x] [P2-T6] Sweep the moved scripts: CMD-SH-SWEEP with pathspec `.claude/skills/cleanup-merged-worktrees/scripts`.
       Write FEATURE/evidence/regression-testing/sweep-moved-scripts.TS.md. Acceptance: exit 0, no match
       line, and the final line is `SWEEP-EXIT=1`.
-- [ ] [P2-T7] Edit `.claude/skills/cleanup-merged-worktrees/SKILL.md`: replace OLD_PATH_LITERAL with
+- [x] [P2-T7] Edit `.claude/skills/cleanup-merged-worktrees/SKILL.md`: replace OLD_PATH_LITERAL with
       NEW_PATH_LITERAL on lines 9, 30, 31, 32, 148, 206, 244, and 467; line 9 becomes
       `  - "Bash(bash .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh *)"`.
       Acceptance: CMD-GIT-COUNT with NEW_PATH_LITERAL over that file prints a count of 8, and CMD-SH-SWEEP
       with that file as pathspec prints `SWEEP-EXIT=1`.
-- [ ] [P2-T8] Edit the dirt group under `tests/shell/` (six files named in the inventory): replace
+- [x] [P2-T8] Edit the dirt group under `tests/shell/` (six files named in the inventory): replace
       every OLD_PATH_LITERAL with NEW_PATH_LITERAL. Acceptance: CMD-GIT-COUNT with NEW_PATH_LITERAL over
       the six files prints exactly `tests/shell/test_cleanup_worktrees_dirt_classify.bats:6`,
       `tests/shell/test_cleanup_worktrees_dirt_clear.bats:8`,
@@ -512,28 +512,28 @@ script A6 and a before-and-after hash comparison (A5).
       `tests/shell/test_cleanup_worktrees_dirt_failclosed.bats:4`,
       `tests/shell/test_cleanup_worktrees_dirt_guard_registry.bats:4`, and
       `tests/shell/test_cleanup_worktrees_dirt_regression.bats:6`.
-- [ ] [P2-T9] Edit the preserve group under `tests/shell/` (three files named in the inventory): replace
+- [x] [P2-T9] Edit the preserve group under `tests/shell/` (three files named in the inventory): replace
       every OLD_PATH_LITERAL with NEW_PATH_LITERAL. Acceptance: CMD-GIT-COUNT with NEW_PATH_LITERAL over
       the three files prints exactly `tests/shell/test_cleanup_worktrees_preserve.bats:7`,
       `tests/shell/test_cleanup_worktrees_preserve_eol.bats:7`, and
       `tests/shell/test_cleanup_worktrees_preserve_failures.bats:6`.
-- [ ] [P2-T10] Edit the scan and report group under `tests/shell/` (three files named in the
+- [x] [P2-T10] Edit the scan and report group under `tests/shell/` (three files named in the
       inventory): replace every OLD_PATH_LITERAL with NEW_PATH_LITERAL. Acceptance: CMD-GIT-COUNT with
       NEW_PATH_LITERAL over the three files prints exactly
       `tests/shell/test_cleanup_worktrees_report_records.bats:6`,
       `tests/shell/test_cleanup_worktrees_scan_helper.bats:2`, and
       `tests/shell/test_cleanup_worktrees_scan_seam.bats:2`.
-- [ ] [P2-T11] Edit the core group under `tests/shell/` (seven files named in the inventory): replace
+- [x] [P2-T11] Edit the core group under `tests/shell/` (seven files named in the inventory): replace
       every OLD_PATH_LITERAL with NEW_PATH_LITERAL. Acceptance: CMD-GIT-COUNT with NEW_PATH_LITERAL over
       the seven files prints exactly `tests/shell/test_cleanup_worktrees_classification.bats:6`,
       `tests/shell/test_cleanup_worktrees_cli.bats:3`, `tests/shell/test_cleanup_worktrees_consolidation.bats:5`,
       `tests/shell/test_cleanup_worktrees_deletion.bats:7`, `tests/shell/test_cleanup_worktrees_detached.bats:7`,
       `tests/shell/test_cleanup_worktrees_enumeration.bats:4`, and
       `tests/shell/test_cleanup_worktrees_hard_failures.bats:7`.
-- [ ] [P2-T12] Sweep the test tree: CMD-SH-SWEEP with pathspecs `tests/shell tests/fixtures/cleanup_worktrees`.
+- [x] [P2-T12] Sweep the test tree: CMD-SH-SWEEP with pathspecs `tests/shell tests/fixtures/cleanup_worktrees`.
       Write FEATURE/evidence/regression-testing/sweep-cleanup-tests.TS.md. Acceptance: exit 0, no match
       line, and the final line is `SWEEP-EXIT=1`.
-- [ ] [P2-T13] Run the 19 suites `tests/shell/test_cleanup_worktrees_*.bats` from the new script path.
+- [x] [P2-T13] Run the 19 suites `tests/shell/test_cleanup_worktrees_*.bats` from the new script path.
       Command: CMD-SH-BATS over that glob. Write
       FEATURE/evidence/regression-testing/cleanup-bats-after-move.TS.md. Acceptance: the TAP plan line is
       recorded, and every `not ok` line (if any) names a KL-SHELL-2 member; the artifact carries

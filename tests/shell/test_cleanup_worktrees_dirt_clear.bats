@@ -12,7 +12,7 @@
 # one whose call sequence is short enough for the ordinal assertions in tests 1, 5, and 8
 # to be written over a specific occurrence. The wrapper driver is the only one that
 # observes the flag pre-pass in main() (the block that sets CLEANUP_WT_CLEAR_DISPOSABLE=1)
-# in scripts/bash/cleanup-worktrees.sh: with the direct driver alone, a
+# in .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh: with the direct driver alone, a
 # wrapper that never set that variable would leave --clear-disposable permanently disarmed
 # and every test in this file would still pass.
 #
@@ -51,13 +51,13 @@
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
-    ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
-    LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
-    RLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_report_records_lib.sh"
-    ALIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_actions_lib.sh"
-    DLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_detached_lib.sh"
-    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
-    WRAPPER="${REPO_ROOT}/scripts/bash/cleanup-worktrees.sh"
+    ELIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
+    LIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh"
+    RLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh"
+    ALIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh"
+    DLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_detached_lib.sh"
+    DIRTLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh"
+    WRAPPER="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCAN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/scan"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bats
-# Guard-registry enforcement gate for scripts/bash/cleanup_worktrees_dirt_lib.sh
+# Guard-registry enforcement gate for .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh
 # (issue #632, remediation cycle 2).
 #
 # SUBJECT. Two consecutive cycles shipped a guard whose removal left every checked-in
@@ -45,9 +45,9 @@
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
-    ELIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_enumerate_lib.sh"
-    LIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_lib.sh"
-    DIRTLIB="${REPO_ROOT}/scripts/bash/cleanup_worktrees_dirt_lib.sh"
+    ELIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
+    LIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh"
+    DIRTLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
     SCEN="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scenarios"
     REGISTRY="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/dirt-guard-registry.tsv"
