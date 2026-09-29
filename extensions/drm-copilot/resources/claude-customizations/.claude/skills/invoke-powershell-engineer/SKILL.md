@@ -1,6 +1,6 @@
 ---
 name: invoke-powershell-engineer
-description: Invoke the powershell-typed-engineer worker to design, implement, and verify PowerShell changes within typed repository boundaries. Applies PoshQC format -> analyze -> test toolchain, the 1-2 production-file direct-mode budget, the 3-production + 3-test per-batch cap, and zero-regression quality gates.
+description: Invoke the powershell-typed-engineer worker to design, implement, and verify PowerShell changes within typed repository boundaries. Applies PoshQC format -> analyze -> test toolchain, the 1-3 production-file direct-mode budget with routing to the orchestrated large path above it, and zero-regression quality gates.
 ---
 
 # Implement PowerShell Skill
@@ -12,10 +12,10 @@ This direct-use wrapper delegates PowerShell implementation work to the `powersh
 Use this skill when:
 
 - The user requests a PowerShell code change, bug fix, refactor, or test addition.
-- Estimated scope fits the direct-mode path (1-2 production PowerShell files plus corresponding tests).
+- Estimated scope fits the direct-mode path (1-3 production PowerShell files plus corresponding tests).
 - The toolchain (PoshQC format, PSScriptAnalyzer, Pester with coverage where enforced) can be run in the current environment, or the user has explicitly authorized an unverified plan-only response.
 
-If the estimated scope exceeds the direct-mode budget, this skill defers to the orchestrated flow via `powershell-change-budget-router` instead of proceeding directly.
+If the estimated scope exceeds the direct-mode budget, this skill defers to the orchestrated large path (`/orchestrate`) via `powershell-change-budget-router` instead of proceeding directly.
 
 ## Inputs
 
@@ -23,7 +23,6 @@ If the estimated scope exceeds the direct-mode budget, this skill defers to the 
 - Files or entrypoints in scope (exact script or module paths and corresponding `*.Tests.ps1` paths).
 - Constraints, including public function or module contracts that must be preserved.
 - Optional approved plan. If none is supplied, the worker delegates plan authoring to `atomic_planner` before any edits.
-- Optional budget override in the form `budget: prod=<N>, test=<M>` subject to repo policy compliance.
 
 ## Output Paths
 
