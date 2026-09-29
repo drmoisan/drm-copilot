@@ -4,41 +4,466 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-29T16-06
-- **Status:** Draft
-- **Version:** 0.1
+- **Status:** Ready for preflight
+- **Version:** 1.0
+- **Work Mode:** full-bug
+- **Complexity band:** C3
+- **Branch:** `bug/epic-planner-ready-gate-demands-codex-only-launch-binding-543`
+- **Requirements source:** `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/spec.md`, section `## Acceptance Criteria` (20 items). `user-story.md` is intentionally absent for this bug and must not be created.
+- **Design source:** `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/research/research.2026-09-29T16-10.md` (Approach A).
+- **Defect report:** `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/issue.md`
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+**Fail-closed evidence rule:** Every baseline task, final-QA task, and coverage-comparison task in this plan produces a named artifact. If any required artifact is missing, or carries a placeholder in place of a numeric value, the verdict is BLOCKED or INCOMPLETE, never PASS.
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+**Evidence accounting rule:** Each evidence-producing task names its artifact path. Do not mark an evidence-backed task complete without the artifact on disk. `<ts>` in an artifact name is the execution timestamp in `yyyy-MM-ddTHH-mm` form.
 
+**Evidence location:** All evidence resolves under `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/<kind>/`, with `<kind>` drawn from `baseline`, `regression-testing`, `qa-gates`, and `other`, per `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`.
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+`EVIDENCE_LOCATION_OVERRIDE_REJECTED: evidence/regression/ replaced with docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/` (spec acceptance criterion 1 names the non-canonical `evidence/regression/` folder; this plan writes the fail-before and pass-after artifacts to the canonical folder, and the check-off task in Phase 10 cites the canonical path).
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+**Artifact-only tool output:** `artifacts/python/coverage-543-baseline.json` and `artifacts/python/coverage-543-final.json` are gitignored intermediate tool outputs read by coverage tasks. They are not evidence artifacts; the evidence is the Markdown artifact under `evidence/` that records the values read from them.
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#543-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+---
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+## The change, already decided
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+Under `require_ready_for_execution=True`, the epic-planner ready gate calls two Codex-only launch-evidence validators unconditionally: the launch-binding validator (`scripts/dev_tools/validate_epic_planner_state.py:331`) and, through the readiness-integrity validator, the launch-evidence validator (`scripts/dev_tools/epic_planner_readiness.py:354`). The TypeScript twins carry the same shape. The correction, which this plan encodes and does not re-litigate:
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+1. The ready gate computes one activation value per runtime. Python: `key_gated = not (require_codex_model_routing or require_codex_topology)`. TypeScript: `requireLaunchPaths = options.requireCodexModelRouting !== true && options.requireCodexTopology !== true`.
+2. That value is passed to both launch validators as `require_launch_paths` / `requireLaunchPaths`. When it is true, a feature that carries neither `launch_receipt_path` nor `launch_status_path` (judged by key membership) is skipped inside the existing per-feature loop, so error indices are preserved.
+3. `require_generated_orchestrator=True` / `requireGeneratedOrchestrator: true` stays unchanged for every validated feature.
+4. No error string is added, removed, or reworded in either runtime.
+5. The MCP `epic-planner-state` dispatch forwards both Codex flags. The Python CLI is not changed (`scripts/dev_tools/validate_orchestration_artifacts.py` is 495 lines; recorded deviation in spec Non-goals).
+6. The three Codex guidance callers and their bundle mirrors pass both Codex flags, so Codex enforcement stays unconditional.
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+## Files the diff will WRITE
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+Production, Python (4):
+
+- `scripts/dev_tools/_epic_orchestrator_state_launch_binding.py`
+- `scripts/dev_tools/epic_planner_launch_evidence.py`
+- `scripts/dev_tools/epic_planner_readiness.py`
+- `scripts/dev_tools/validate_epic_planner_state.py`
+
+Production, TypeScript (5):
+
+- `extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-launch-binding.ts`
+- `extensions/drm-copilot/src/lib/validate/epic-planner-launch-evidence.ts`
+- `extensions/drm-copilot/src/lib/validate/epic-planner-readiness-integrity.ts`
+- `extensions/drm-copilot/src/lib/validate/epic-planner-state-core.ts`
+- `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts`
+
+Codex guidance, byte-identical root and bundle pairs (6):
+
+- `.agents/skills/epic-plan/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-plan/SKILL.md`
+- `.agents/skills/epic-run/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md`
+- `.codex/agents/epic-orchestrator.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml`
+
+Tests, Python (3):
+
+- `tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py`
+- `tests/scripts/dev_tools/test_epic_planner_launch_evidence.py`
+- `tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py`
+
+Tests, TypeScript (3):
+
+- `extensions/drm-copilot/test/lib/validate/epic-planner-state-launch-binding.test.ts`
+- `extensions/drm-copilot/test/lib/validate/epic-planner-launch-evidence.test.ts`
+- `extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts`
+
+No file is created by the code diff; every file above exists at planning time. Feature-process artifacts written outside the code diff: this plan file, the `## Acceptance Criteria` checkboxes in `spec.md`, and the evidence artifacts under this feature folder's `evidence/` tree.
+
+The guidance-flag assertion (spec acceptance criterion 13) is carried by a new test function in the existing file `tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py` (416 lines at planning time) rather than by a new file. This keeps the Python test write set at three files, which is the per-session test cap of `.claude/hooks/enforce-python-batch-budget.ps1`, and it adds no PowerShell file, so no PowerShell production or test file is written and the PowerShell toolchain loop is not part of this plan. The existing Pester suite `tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1` is executed (not modified) as verification.
+
+## Read-only policy citations (NOT written by this diff)
+
+- `CLAUDE.md`
+- `.claude/rules/general-code-change.md`
+- `.claude/rules/general-unit-test.md`
+- `.claude/rules/python.md`
+- `.claude/rules/python-suppressions.md`
+- `.claude/rules/typescript.md`
+- `.claude/rules/typescript-suppressions.md`
+- `.claude/rules/quality-tiers.md`
+- `.claude/rules/tonality.md`
+- `.claude/rules/plan-acceptance-gates.md`
+- `.claude/rules/orchestrator-state.md` (read for the #524 activation-scope precedent only)
+- `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`
+
+No file under `.claude/rules/` or `.github/instructions/` is modified by this plan.
+
+## Explicitly out of scope
+
+- `scripts/dev_tools/validate_orchestration_artifacts.py` (Python CLI flags deferred; 495 lines).
+- `tests/scripts/dev_tools/test_validate_epic_planner_state.py` (its CLI stub stays valid while the CLI is unchanged; it is run, not edited).
+- `tests/scripts/dev_tools/test_epic_planner_readiness.py` (491 lines), `extensions/drm-copilot/test/lib/validate/epic-planner-readiness-integrity.test.ts` (495 lines), `extensions/drm-copilot/test/lib/validate/orchestration-artifacts.test.ts` (508 lines): no test is added to any of them.
+- MCP tool definitions `extensions/drm-copilot/src/mcp-tool-definitions.ts`, `extensions/drm-copilot/src/mcp-repo-automation-tool-definitions.ts`, and `extensions/drm-copilot/src/mcp-tool-inputs.ts`.
+- `extensions/drm-copilot/jest.config.cjs` and `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`.
+- `.claude/**` and `.github/**`.
+- The remaining Codex-only receipts in the ready gate (per-feature `model_routing_receipt` / `topology_receipt` and the top-level forced planner `topology_receipt`). Spec Rollout records these as a follow-up issue to be filed separately; filing it is not an acceptance criterion of this plan and is left to the orchestrator's closeout.
+
+## Named tests and literals introduced by this plan
+
+Quoted verbatim so a search or a `-k` / `-t` selector for them is a real assertion.
+
+Python, in `tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py`:
+
+- `test_ready_gate_skips_launch_binding_for_feature_without_launch_paths` (new; fail-before regression test)
+- `test_ready_gate_rejects_partial_launch_binding` (new)
+- `test_codex_flag_keeps_launch_binding_unconditional` (new; parametrized over `require_codex_model_routing` and `require_codex_topology`)
+- `test_launch_evidence_is_required_only_for_execution_readiness` (existing; rewritten)
+- `test_ready_gate_preserves_feature_index_when_earlier_feature_is_skipped` (new)
+- `test_ready_gate_validates_feature_with_empty_launch_path_value` (new; parametrized over `""` and `None`)
+
+Python, in `tests/scripts/dev_tools/test_epic_planner_launch_evidence.py`:
+
+- `test_require_launch_paths_skips_feature_without_launch_keys` (new)
+- `test_require_launch_paths_still_rejects_partial_launch_keys` (new)
+
+Python, in `tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py`:
+
+- `test_consumer_authority_is_typescript_only_and_scope_owners_are_unchanged` (existing; assertion and docstring updated)
+- `test_epic_planner_ready_gate_guidance_passes_both_codex_flags` (new)
+
+TypeScript, in `extensions/drm-copilot/test/lib/validate/epic-planner-state-launch-binding.test.ts`:
+
+- `skips launch binding for a feature without launch paths` (new; fail-before regression twin)
+- `rejects a partial launch binding` (new)
+- `keeps launch binding unconditional under a Codex flag` (new)
+- `preserves the feature index when an earlier feature is skipped` (new)
+- `validates a feature with an empty launch path value` (new)
+- `activates only for execution readiness` (existing; rewritten)
+
+TypeScript, in `extensions/drm-copilot/test/lib/validate/epic-planner-launch-evidence.test.ts`:
+
+- `skips a feature without launch keys when requireLaunchPaths is set` (new)
+- `still rejects a partial launch key when requireLaunchPaths is set` (new)
+
+TypeScript, in `extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts`:
+
+- `threads the Codex flags into epic-planner-state` (new)
+
+Byte-identical partial-binding error string asserted in both runtimes: `Epic planner checkpoint features[0] launch binding.launch_status_path must be under artifacts/orchestration/epic-child-launches/.`
+
+Index-preservation error string asserted in both runtimes: `Epic planner checkpoint features[1] launch binding.launch_status_path must be under artifacts/orchestration/epic-child-launches/.`
+
+New Python identifiers: `feature_carries_launch_path`, `key_gated`, and the keyword `require_launch_paths` on `validate_epic_planner_child_launch_bindings`, `validate_epic_planner_launch_evidence`, and `validate_epic_readiness_integrity`. New TypeScript identifiers: exported `featureCarriesLaunchPath`, exported interface `LaunchPathGateOptions`, and the option `requireLaunchPaths`.
+
+New ready-gate call text in `scripts/dev_tools/validate_epic_planner_state.py` (Black-formatted form, so every line below is a single-line token): `validate_epic_planner_child_launch_bindings(` followed on its own line by `features, require_launch_paths=key_gated`.
+
+New docstring of `test_consumer_authority_is_typescript_only_and_scope_owners_are_unchanged`: `Installed authority avoids Python and pins the #543 ready-gate key gate.`
+
+New guidance phrase, identical in all six guidance files once whitespace runs are collapsed to single spaces: `` `epic-planner-state` with `require_ready_for_execution: true`, `require_codex_topology: true`, `require_codex_model_routing: true`, and the explicit workspace root ``
+
+## Execution notes
+
+- **Shell.** Commands are PowerShell 7 unless stated. Run every command from the worktree root unless the task names `extensions/drm-copilot/` as the working directory.
+- **Pester exit semantics.** `Invoke-Pester` returns process exit 0 on a failing suite unless `-EnableExit` is passed. This plan therefore runs it in-session with `-PassThru` and records `EXIT_CODE:` as the returned object's `FailedCount`, together with `PassedCount`. Do not assert a Pester exit code from a bare invocation, and do not use the PoshQC MCP test tool for any numeric claim (its results carry no output detail).
+- **Line counts.** Use `@(Get-Content -LiteralPath <path>).Count`, which counts physical lines. Do not use `Measure-Object -Line`, which skips blank lines.
+- **Python branch coverage.** The `term-missing` `Cover` column is a combined statement-plus-branch figure. Per-file line and branch percentages are read from `coverage json` output (`files[<key>].summary.covered_lines / num_statements` and `covered_branches / num_branches`), never derived from the terminal row.
+- **Known local-only failure (#510).** `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` enumerates the on-disk `.claude` tree, and the Python batch-budget hook writes gitignored `.claude/state/python-batch-budget.<session_id>.json`, so the node fails locally regardless of this change. Every full-suite Python run in this plan (baseline and final) passes the identical `--deselect` for that node, so baseline and final use the same selection. This diff does not touch the `.claude` tree the node protects; CI runs the node on a fresh checkout.
+- **Python batch budget.** The plan writes four Python production files and three Python test files; the hook caps a session at three of each. Phase 2 contains one scheduled reset before the fourth production file. If any other Python Write or Edit is denied by the hook, delete every `.claude/state/python-batch-budget.*.json` file in this worktree, append a reset record to the batch-budget artifact, and retry the same write.
+- **Guidance mirrors.** Bundle copies are produced with `Copy-Item -LiteralPath <root> -Destination <bundle> -Force`, never by editing the bundle file, so the pair is byte-identical by construction.
+- **Scope anchor.** Every `git diff` in this plan is anchored to `(git merge-base origin/main HEAD)`, the merge base with `origin/main`, which stays a fixed ancestor if `origin/main` advances during execution. Run `git fetch origin main` once in Phase 0 before the first use.
+
+---
+
+### Phase 0 — Policy reads, environment, and baseline capture
+
+- [ ] [P0-T1] Read the policy files in the order defined by `policy-compliance-order` and write the Phase 0 read record to `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/phase0-instructions-read.md`.
+  - Files, in order: `CLAUDE.md`; `.claude/rules/general-code-change.md`; `.claude/rules/general-unit-test.md`; `.claude/rules/python.md`; `.claude/rules/python-suppressions.md`; `.claude/rules/typescript.md`; `.claude/rules/typescript-suppressions.md`; `.claude/rules/quality-tiers.md`; `.claude/rules/tonality.md`; `.claude/rules/plan-acceptance-gates.md`; `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`.
+  - Acceptance: the artifact exists and contains `Timestamp:`, `Policy Order: CLAUDE.md -> general-code-change -> general-unit-test -> Python rules -> TypeScript rules`, and `Files Read:` listing the eleven files above in that order. No Phase 1 task begins before this artifact exists.
+
+- [ ] [P0-T2] Read `spec.md`, `issue.md`, and the research artifact in this feature folder and write `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/scope-confirmation.<ts>.md`.
+  - Acceptance: the artifact contains `Timestamp:`, the 21 write-set paths from "Files the diff will WRITE", the out-of-scope path list from "Explicitly out of scope", and the line `EVIDENCE_LOCATION_OVERRIDE_REJECTED: evidence/regression/ replaced with docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/`.
+
+- [ ] [P0-T3] Record the scope anchor by running `git fetch origin main` followed by `git merge-base origin/main HEAD` and `git status --porcelain`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/scope-anchor.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and `Output Summary:` recording the 40-character merge-base SHA and the porcelain output. The porcelain output lists no path outside `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/`; if it lists any other path, stop and report to the orchestrator before Phase 1.
+
+- [ ] [P0-T4] Confirm the toolchains are available: run `poetry run python --version`; from `extensions/drm-copilot/` run `Test-Path node_modules/jest/package.json` and `Test-Path node_modules/prettier/package.json`, and if either prints `False`, run `npm ci` in `extensions/drm-copilot/` and repeat both checks; run `Get-Module -ListAvailable Pester | Select-Object -First 1 -ExpandProperty Version`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/toolchain-availability.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording the Python version line, `True` for both `Test-Path` checks (after `npm ci` when it was needed, with its `added ... packages` line recorded), and a Pester version whose major component is 5. Any other result stops the plan before Phase 1.
+
+- [ ] [P0-T5] Write the Python batch-budget plan to `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/other/python-batch-budget.<ts>.md`.
+  - Acceptance: the artifact exists with `Timestamp:`, the cap (3 production, 3 test, from `.claude/hooks/enforce-python-batch-budget.ps1` lines 9-10), batch 1 production files (`scripts/dev_tools/_epic_orchestrator_state_launch_binding.py`, `scripts/dev_tools/epic_planner_launch_evidence.py`, `scripts/dev_tools/epic_planner_readiness.py`), batch 2 production file (`scripts/dev_tools/validate_epic_planner_state.py`), the three test files from "Files the diff will WRITE", and `Resets scheduled: 1 (P2-T4)`.
+
+- [ ] [P0-T6] Record baseline physical line counts for all 21 write-set files by running `@(Get-Content -LiteralPath <path>).Count` once per path listed in "Files the diff will WRITE".
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/line-counts.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and `Output Summary:` listing one count per path. The planning-time counts are: `validate_epic_planner_state.py` 354, `_epic_orchestrator_state_launch_binding.py` 298, `epic_planner_launch_evidence.py` 345, `epic_planner_readiness.py` 371, `epic-planner-state-core.ts` 460, `epic-orchestrator-state-launch-binding.ts` 325, `epic-planner-launch-evidence.ts` 455, `epic-planner-readiness-integrity.ts` 364, `orchestration-artifacts.ts` 363, `test_validate_epic_planner_state_launch_binding.py` 224, `test_epic_planner_launch_evidence.py` 271, `test_push_down_codex_and_agents_customizations.py` 416, `epic-planner-state-launch-binding.test.ts` 220, `epic-planner-launch-evidence.test.ts` 223, `validate-orchestration-service-call.test.ts` 166. Any recorded count that differs from its planning-time value is listed explicitly in the summary.
+
+- [ ] [P0-T7] Capture the Python formatting baseline by running `poetry run black --check scripts/dev_tools/_epic_orchestrator_state_launch_binding.py scripts/dev_tools/epic_planner_launch_evidence.py scripts/dev_tools/epic_planner_readiness.py scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py tests/scripts/dev_tools/test_epic_planner_launch_evidence.py tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py`.
+  - Check mode only; no source is written.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/baseline-python-format.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording the Black summary line (on a clean set it reads `7 files would be left unchanged.`). Stop condition: a non-zero exit stops the plan before Phase 1, because the matching final gate requires exit 0 over these files.
+
+- [ ] [P0-T8] Capture the Python lint baseline by running `poetry run ruff check scripts/dev_tools/_epic_orchestrator_state_launch_binding.py scripts/dev_tools/epic_planner_launch_evidence.py scripts/dev_tools/epic_planner_readiness.py scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py tests/scripts/dev_tools/test_epic_planner_launch_evidence.py tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/baseline-python-lint.<ts>.md` exists with the four fields and an `Output Summary:` recording `All checks passed!` or the numeric finding count. Stop condition: a non-zero exit stops the plan before Phase 1.
+
+- [ ] [P0-T9] Capture the Python type-check baseline by running `poetry run pyright scripts/dev_tools/_epic_orchestrator_state_launch_binding.py scripts/dev_tools/epic_planner_launch_evidence.py scripts/dev_tools/epic_planner_readiness.py scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py tests/scripts/dev_tools/test_epic_planner_launch_evidence.py tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/baseline-python-typecheck.<ts>.md` exists with the four fields and an `Output Summary:` recording the Pyright summary line with numeric error, warning, and information counts. Stop condition: a non-zero exit stops the plan before Phase 1.
+
+- [ ] [P0-T10] Capture the Python test and coverage baseline by running `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --deselect tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` from the worktree root (full suite).
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/baseline-python-test-coverage.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` recording the pytest result line (passed, failed, skipped, deselected counts; deselected must be 1, citing #510), the `TOTAL` row verbatim, and the `term-missing` rows for the four Python production files in the write set. Stop condition: if any test fails, stop and report the failing node IDs to the orchestrator before Phase 1.
+
+- [ ] [P0-T11] Capture the Python per-file baseline coverage by running `poetry run coverage json --data-file=artifacts/.coverage --include="*validate_epic_planner_state.py,*_epic_orchestrator_state_launch_binding.py,*epic_planner_launch_evidence.py,*epic_planner_readiness.py" --pretty-print -o artifacts/python/coverage-543-baseline.json` immediately after P0-T10 and reading the JSON.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/baseline-python-per-file-coverage.<ts>.md` exists with the four fields and an `Output Summary:` recording, for each of the four production files, `covered_lines`/`num_statements`, `covered_branches`/`num_branches`, and the two derived percentages to two decimals, read from `files[<key>].summary`. No placeholders.
+
+- [ ] [P0-T12] Capture the TypeScript formatting baseline by running `npx prettier --check src/lib/validate/epic-orchestrator-state-launch-binding.ts src/lib/validate/epic-planner-launch-evidence.ts src/lib/validate/epic-planner-readiness-integrity.ts src/lib/validate/epic-planner-state-core.ts src/lib/validate/orchestration-artifacts.ts test/lib/validate/epic-planner-state-launch-binding.test.ts test/lib/validate/epic-planner-launch-evidence.test.ts test/lib/validate/validate-orchestration-service-call.test.ts` in `extensions/drm-copilot/`.
+  - Check mode only; no source is written.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/baseline-typescript-format.<ts>.md` exists with the four fields and an `Output Summary:` recording `All matched files use Prettier code style!` or the list of files reported. Stop condition: a non-zero exit stops the plan before Phase 1.
+
+- [ ] [P0-T13] Capture the TypeScript lint baseline by running `npm run lint` in `extensions/drm-copilot/`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/baseline-typescript-lint.<ts>.md` exists with the four fields and an `Output Summary:` recording numeric error and warning counts (0 and 0 when ESLint prints no problem lines). Stop condition: a non-zero exit stops the plan before Phase 1.
+
+- [ ] [P0-T14] Capture the TypeScript type-check baseline by running `npm run typecheck` in `extensions/drm-copilot/`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/baseline-typescript-typecheck.<ts>.md` exists with the four fields and an `Output Summary:` recording the count of `error TS` lines. Stop condition: a non-zero exit stops the plan before Phase 1.
+
+- [ ] [P0-T15] Capture the architecture-boundary baseline for both languages by running `git ls-files -- "*.dependency-cruiser*" "*importlinter*" ".importlinter"` from the worktree root and `Select-String -LiteralPath pyproject.toml -Pattern 'importlinter' -SimpleMatch`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/baseline-architecture.<ts>.md` exists with the four fields and an `Output Summary:` that states either `no architecture-boundary tool configured for TypeScript or Python; stage recorded as a presence check` (both outputs empty) or lists each configuration found. If a `.dependency-cruiser*` or import-linter configuration is listed, the summary records the command that runs it and its violation count, and that command becomes the architecture stage in Phases 8 and 9.
+
+- [ ] [P0-T16] Capture the TypeScript test and coverage baseline by running `node run-jest.cjs --coverage --coverageReporters=text --coverageReporters=text-summary` in `extensions/drm-copilot/`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/baseline-typescript-test-coverage.<ts>.md` exists with the four fields and an `Output Summary:` recording the `Test Suites:` and `Tests:` lines verbatim, the text-summary `Lines` and `Branches` totals, and the `text` table rows (`% Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s`) for the five TypeScript production files in the write set. No placeholders. Stop condition: a non-zero exit or any failed test stops the plan before Phase 1.
+
+- [ ] [P0-T17] Capture the Pester guidance-contract baseline by running `$r = Invoke-Pester -Path tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1 -Output Detailed -PassThru` in a PowerShell 7 session and printing `$r.PassedCount` and `$r.FailedCount`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/baseline-pester-guidance-contracts.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:` equal to `$r.FailedCount`, and an `Output Summary:` recording both counts and the `[+]` line for `keeps root and tracked bundle runtime copies byte-identical`. Stop condition: a `FailedCount` other than 0 stops the plan before Phase 1.
+
+- [ ] [P0-T18] Record the baseline acceptance-criteria checkbox state of `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/spec.md` by running `@(Select-String -LiteralPath docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/spec.md -Pattern '^- \[ \] ').Count` and the same command with the pattern `'^- \[x\] '`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/baseline/baseline-spec-checkboxes.<ts>.md` exists with the four fields and an `Output Summary:` recording 23 unchecked and 1 checked (20 acceptance criteria plus three unchecked and one checked Impact/Severity box at planning time).
+
+### Phase 1 — Fail-before regression tests
+
+- [ ] [P1-T1] Add the Python test `test_ready_gate_skips_launch_binding_for_feature_without_launch_paths` to `tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py`.
+  - Add a module-level constant `_LAUNCH_BINDING_KEYS = ("branch_name", "worktree_path", "delegation_receipt", "launch_receipt_path", "launch_status_path")` and a helper `_strip_launch_binding(feature: dict[str, Any]) -> None` that pops each of those keys. Import `launch_evidence_fixture` from `tests.scripts.dev_tools.epic_planner_launch_evidence_test_support`.
+  - Body (Arrange-Act-Assert): build `state = _state()`, apply `_strip_launch_binding` to `state["features"][0]` only, obtain the readiness context as the second element of `launch_evidence_fixture()`, call `validate_epic_planner_state_text(json.dumps(state), require_ready_for_execution=True, readiness_context=context)`, assert the returned list is non-empty (readiness integrity ran), then build one list `offending` of every returned error that contains `" launch binding"` or `"must identify a launch artifact"` and make a single assertion `assert offending == []` whose failure output prints that list, so the pre-fix failure shows both error families. No Codex flag is passed.
+  - Acceptance: the test function exists with exactly that name and a one-line docstring, uses no temporary file, clock, or network, and the file compiles under `poetry run python -m py_compile tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py` with exit 0.
+
+- [ ] [P1-T2] [expect-fail] Run `poetry run pytest "tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py::test_ready_gate_skips_launch_binding_for_feature_without_launch_paths" -v` on pre-fix production code.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/fail-before-python.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 1`, `ExpectedExitCode: 1`, and an `Output Summary:` showing `1 failed` and 0 passed for that node, with the assertion output listing at least one error containing `features[0] launch binding` and at least one containing `must identify a launch artifact`. A failure for any other reason (import error, fixture error) does not satisfy this task; fix the test and re-run.
+
+- [ ] [P1-T3] Add the Jest test `skips launch binding for a feature without launch paths` inside the `epic planner child launch binding` describe block of `extensions/drm-copilot/test/lib/validate/epic-planner-state-launch-binding.test.ts`.
+  - Add a module-level `LAUNCH_BINDING_KEYS` array with the same five keys as P1-T1 and a helper `stripLaunchBinding(item: Record<string, unknown>): void` that deletes each key. Import `launchEvidenceFixture` from `./epic-planner-launch-evidence-test-support`.
+  - Body: the direct twin of P1-T1: `state()`, strip `features[0]` only, call `validateEpicPlannerStateText(JSON.stringify(value), { requireReadyForExecution: true, readinessContext: launchEvidenceFixture().context })`, assert the result has length greater than 0, and assert that no error includes `" launch binding"` and no error includes `"must identify a launch artifact"`.
+  - Acceptance: the test exists with exactly that name; it uses only options that exist on pre-fix `ValidateEpicPlannerStateOptions`, so it fails behaviourally rather than at compile time.
+
+- [ ] [P1-T4] [expect-fail] Run `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts -t "skips launch binding for a feature without launch paths"` in `extensions/drm-copilot/` on pre-fix production code.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/fail-before-typescript.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 1`, `ExpectedExitCode: 1`, and an `Output Summary:` showing `1 failed` for that test title, zero `error TS` lines, and the Jest failure output naming the launch-binding assertion.
+
+### Phase 2 — Python production fix
+
+- [ ] [P2-T1] Update `scripts/dev_tools/_epic_orchestrator_state_launch_binding.py`: replace the private predicate `_carries_launch_path` (planning-time lines 202-205) with the public function `feature_carries_launch_path(feature: Mapping[str, object]) -> bool` (importing `Mapping` from `collections.abc`), keep its key-membership body `"launch_receipt_path" in feature or "launch_status_path" in feature` and a one-line docstring, update its single caller at planning-time line 228, and add the keyword-only parameter `require_launch_paths: bool = False` to `validate_epic_planner_child_launch_bindings`, forwarding it as `require_launch_paths=require_launch_paths` while keeping `require_generated_orchestrator=True` and `skip_not_started=False` unchanged.
+  - Acceptance: `poetry run pytest tests/scripts/dev_tools/test_validate_epic_orchestrator_state_launch_binding.py` exits 0 with 0 failed; the regular-expression search `Select-String -LiteralPath scripts/dev_tools/_epic_orchestrator_state_launch_binding.py -Pattern '\b_carries_launch_path'` returns no match (the word boundary excludes the substring inside `feature_carries_launch_path`; at planning time it matches lines 202 and 228) and `@(Select-String -LiteralPath scripts/dev_tools/_epic_orchestrator_state_launch_binding.py -Pattern 'def feature_carries_launch_path' -SimpleMatch).Count` prints `1`; no error string in the file is added, removed, or reworded.
+
+- [ ] [P2-T2] Update `scripts/dev_tools/epic_planner_launch_evidence.py`: import `feature_carries_launch_path` from `scripts.dev_tools._epic_orchestrator_state_launch_binding`, add the keyword-only parameter `require_launch_paths: bool = False` to `validate_epic_planner_launch_evidence` (planning-time lines 298-300), and immediately after the `_is_record(item)` check (planning-time lines 310-311) add `if require_launch_paths and not feature_carries_launch_path(item): continue`, with a one-line comment stating that a keyless feature contributes neither errors nor a shared status path. Update the docstring to describe the parameter.
+  - Acceptance: `poetry run pytest tests/scripts/dev_tools/test_epic_planner_launch_evidence.py` exits 0 with 0 failed (the default `False` leaves every existing test unchanged); the file stays at or below 500 lines.
+
+- [ ] [P2-T3] Update `scripts/dev_tools/epic_planner_readiness.py`: add the keyword-only parameter `require_launch_paths: bool = False` to `validate_epic_readiness_integrity` (planning-time lines 286-288) and forward it at planning-time line 354 as `validate_epic_planner_launch_evidence(state, context, require_launch_paths=require_launch_paths)`. Update the docstring to describe the parameter.
+  - Acceptance: `poetry run pytest tests/scripts/dev_tools/test_epic_planner_readiness.py` exits 0 with 0 failed; the file stays at or below 500 lines.
+
+- [ ] [P2-T4] Reset the Python batch budget before the fourth production file: delete every `.claude/state/python-batch-budget.*.json` file in this worktree (`Get-ChildItem -Path .claude/state -Filter 'python-batch-budget.*.json' -ErrorAction SilentlyContinue | Remove-Item`).
+  - Acceptance: an entry appended to `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/other/python-batch-budget.<ts>.md` records `Timestamp:`, the deleted file names, and the production and test files listed in each before deletion; `@(Get-ChildItem -Path .claude/state -Filter 'python-batch-budget.*.json' -ErrorAction SilentlyContinue).Count` prints `0` immediately after the deletion.
+
+- [ ] [P2-T5] Update `scripts/dev_tools/validate_epic_planner_state.py`: add keyword-only parameters `require_codex_model_routing: bool = False` and `require_codex_topology: bool = False` to `validate_epic_planner_state_text` (planning-time lines 279-284); as the first statement inside `if require_ready_for_execution:` (planning-time line 320) compute `key_gated = not (require_codex_model_routing or require_codex_topology)` with a one-line comment that launch evidence is key-gated per feature unless a Codex enforcement flag is asserted; replace the call at planning-time line 331 with `validate_epic_planner_child_launch_bindings(features, require_launch_paths=key_gated)`; and pass `require_launch_paths=key_gated` to `validate_epic_readiness_integrity` at planning-time line 346. Update the docstring to describe both new parameters. Leave line 332 (`_validate_planner_topology_receipt`) and `_validate_ready_features` unchanged.
+  - Acceptance: `poetry run pytest "tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py::test_ready_gate_skips_launch_binding_for_feature_without_launch_paths" tests/scripts/dev_tools/test_validate_epic_planner_state.py tests/scripts/dev_tools/test_epic_planner_readiness.py` exits 0 with 0 failed; the file stays at or below 500 lines; no error string is added, removed, or reworded. This task does not run the whole launch-binding test file, because `test_launch_evidence_is_required_only_for_execution_readiness` pins the defect until P4-T1 rewrites it.
+
+- [ ] [P2-T6] Record the Python pass-after run by running `poetry run pytest "tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py::test_ready_gate_skips_launch_binding_for_feature_without_launch_paths" -v`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/pass-after-python.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` showing `1 passed` for that node and citing the P1-T2 artifact as the paired fail-before run.
+
+### Phase 3 — TypeScript production fix
+
+- [ ] [P3-T1] Update `extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-launch-binding.ts`: export `featureCarriesLaunchPath` (planning-time lines 234-237) unchanged in body; add and export `interface LaunchPathGateOptions { readonly requireLaunchPaths?: boolean; }` with a doc comment; and change `validateEpicPlannerChildLaunchBindings` (planning-time lines 288-298) to accept `options: LaunchPathGateOptions = {}` and pass `requireLaunchPaths: options.requireLaunchPaths === true`, keeping `requireGeneratedOrchestrator: true` and `skipNotStarted: false` unchanged.
+  - Acceptance: `node run-jest.cjs test/lib/validate/epic-orchestrator-state-launch-binding.test.ts` in `extensions/drm-copilot/` exits 0 with 0 failed; no error string in the file is added, removed, or reworded.
+
+- [ ] [P3-T2] Update `extensions/drm-copilot/src/lib/validate/epic-planner-launch-evidence.ts`: import `featureCarriesLaunchPath` and `type LaunchPathGateOptions` from `./epic-orchestrator-state-launch-binding`; add a third parameter `options: LaunchPathGateOptions = {}` to `validateEpicPlannerLaunchEvidence` (planning-time lines 393-396); and immediately after the `isRecord(item)` return (planning-time lines 405-407) add `if (options.requireLaunchPaths === true && !featureCarriesLaunchPath(item)) { return; }` with a one-line comment matching P2-T2. Update the doc comment.
+  - Acceptance: `node run-jest.cjs test/lib/validate/epic-planner-launch-evidence.test.ts` in `extensions/drm-copilot/` exits 0 with 0 failed; `@(Get-Content -LiteralPath extensions/drm-copilot/src/lib/validate/epic-planner-launch-evidence.ts).Count` prints a value at or below 500.
+
+- [ ] [P3-T3] Update `extensions/drm-copilot/src/lib/validate/epic-planner-readiness-integrity.ts`: import `type LaunchPathGateOptions` from `./epic-orchestrator-state-launch-binding`; add a fourth parameter `options: LaunchPathGateOptions = {}` to `validateEpicReadinessIntegrity` (planning-time lines 265-269); and forward it at planning-time line 341 as `validateEpicPlannerLaunchEvidence(state, context, options)`. Update the doc comment.
+  - Acceptance: `node run-jest.cjs test/lib/validate/epic-planner-readiness-integrity.test.ts` in `extensions/drm-copilot/` exits 0 with 0 failed.
+
+- [ ] [P3-T4] Update `extensions/drm-copilot/src/lib/validate/epic-planner-state-core.ts`: add `readonly requireCodexModelRouting?: boolean;` and `readonly requireCodexTopology?: boolean;`, each with a doc comment, to `ValidateEpicPlannerStateOptions` (planning-time lines 51-56); as the first statement inside `if (options.requireReadyForExecution === true)` (planning-time line 418) compute `const requireLaunchPaths = options.requireCodexModelRouting !== true && options.requireCodexTopology !== true;` with a one-line comment matching P2-T5; pass `{ requireLaunchPaths }` as the second argument of `validateEpicPlannerChildLaunchBindings` (planning-time lines 430-432) and as the fourth argument of `validateEpicReadinessIntegrity` (planning-time lines 450-454).
+  - Acceptance: `node run-jest.cjs test/lib/validate/epic-planner-state-core.test.ts` exits 0 with 0 failed, and `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts -t "skips launch binding for a feature without launch paths"` exits 0 with 1 passed, both in `extensions/drm-copilot/`; `@(Get-Content -LiteralPath extensions/drm-copilot/src/lib/validate/epic-planner-state-core.ts).Count` prints a value at or below 500. This task does not run the whole launch-binding test file, because `activates only for execution readiness` pins the defect until P5-T1 rewrites it.
+
+- [ ] [P3-T5] Update `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts`: in the `epic-planner-state` case of `dispatchValidatorErrors` (planning-time lines 315-335), add `requireCodexModelRouting` and `requireCodexTopology` to the `ValidateEpicPlannerStateOptions` object using the same conditional-spread pattern as the adjacent `epic-orchestrator-state` case (planning-time lines 306-311).
+  - Acceptance: `node run-jest.cjs test/lib/validate/orchestration-artifacts.test.ts test/lib/validate/validate-orchestration-service-call.test.ts` in `extensions/drm-copilot/` exits 0 with 0 failed; `npm run typecheck` in `extensions/drm-copilot/` exits 0.
+
+- [ ] [P3-T6] Record the TypeScript pass-after run by running `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts -t "skips launch binding for a feature without launch paths"` in `extensions/drm-copilot/`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/pass-after-typescript.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` showing 1 passed for that title and citing the P1-T4 artifact as the paired fail-before run.
+
+### Phase 4 — Python test alignment and new tests
+
+- [ ] [P4-T1] Update `tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py`: give `_ready_errors` (planning-time lines 77-82) keyword-only parameters `require_codex_model_routing: bool = False` and `require_codex_topology: bool = False` forwarded to the validator; add the helper `_launch_binding_errors(errors: list[str]) -> list[str]` returning the errors that contain `" launch binding"`; and rewrite `test_launch_evidence_is_required_only_for_execution_readiness` (planning-time lines 93-113) so it strips `features[0]` with `_strip_launch_binding`, keeps `assert validate_epic_planner_state_text(json.dumps(state)) == []`, and runs its existing `features[0] launch binding.branch_name` and `features[0] launch binding.delegation_receipt must be an object` assertions against `_ready_errors(state, require_codex_topology=True)`. Update its docstring to state that launch evidence is unconditional under a Codex flag.
+  - Acceptance: `poetry run pytest "tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py::test_launch_evidence_is_required_only_for_execution_readiness"` exits 0 with 1 passed.
+
+- [ ] [P4-T2] Add `test_ready_gate_rejects_partial_launch_binding` to `tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py`: pop only `launch_status_path` from `features[0]` of `_state()`, call `_ready_errors(state)` with no Codex flag, and assert `_launch_binding_errors(errors) == ["Epic planner checkpoint features[0] launch binding.launch_status_path must be under artifacts/orchestration/epic-child-launches/."]`.
+  - Acceptance: `poetry run pytest "tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py::test_ready_gate_rejects_partial_launch_binding"` exits 0 with 1 passed.
+
+- [ ] [P4-T3] Add `test_codex_flag_keeps_launch_binding_unconditional` to `tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py`, parametrized with `pytest.mark.parametrize("flag", ["require_codex_model_routing", "require_codex_topology"])`: strip `features[0]`, call `_ready_errors(state, **{flag: True})`, and assert that at least one error contains `features[0] launch binding.branch_name` and at least one contains `features[0] launch binding.delegation_receipt must be an object`.
+  - Acceptance: `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py -k test_codex_flag_keeps_launch_binding_unconditional -v` exits 0 with 2 passed.
+
+- [ ] [P4-T4] Add `test_ready_gate_preserves_feature_index_when_earlier_feature_is_skipped` to `tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py`: strip `features[0]`, pop only `launch_status_path` from `features[1]`, call `_ready_errors(state)` with no Codex flag, and assert `_launch_binding_errors(errors) == ["Epic planner checkpoint features[1] launch binding.launch_status_path must be under artifacts/orchestration/epic-child-launches/."]`.
+  - Acceptance: `poetry run pytest "tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py::test_ready_gate_preserves_feature_index_when_earlier_feature_is_skipped"` exits 0 with 1 passed.
+
+- [ ] [P4-T5] Add `test_ready_gate_validates_feature_with_empty_launch_path_value` to `tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py`, parametrized with `pytest.mark.parametrize("value", ["", None])`: set `features[0]["launch_status_path"] = value`, call `_ready_errors(state)` with no Codex flag, and assert `_launch_binding_errors(errors) == ["Epic planner checkpoint features[0] launch binding.launch_status_path must be under artifacts/orchestration/epic-child-launches/."]`.
+  - Acceptance: `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py -k test_ready_gate_validates_feature_with_empty_launch_path_value -v` exits 0 with 2 passed.
+
+- [ ] [P4-T6] Run the whole Python launch-binding test file: `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py -v`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/python-launch-binding-suite.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording 0 failed and listing as `PASSED` each of the six named tests from "Named tests and literals introduced by this plan" for this file, plus the unchanged tests `test_complete_launch_evidence_reaches_repository_context_gate`, `test_rejects_invalid_branch_or_launch_path`, `test_rejects_invalid_delegation_binding`, `test_rejects_invalid_model_receipt_binding`, and `test_requires_unique_branch_and_delegation_identifiers`. The summary states that the bodies of those five unchanged tests were not edited.
+
+- [ ] [P4-T7] Add `test_require_launch_paths_skips_feature_without_launch_keys` to `tests/scripts/dev_tools/test_epic_planner_launch_evidence.py`: from `_fixture()`, delete `launch_receipt_path` and `launch_status_path` from `_feature(state, 0)`, and assert `validate_epic_planner_launch_evidence(state, context, require_launch_paths=True) == []`.
+  - Acceptance: `poetry run pytest "tests/scripts/dev_tools/test_epic_planner_launch_evidence.py::test_require_launch_paths_skips_feature_without_launch_keys"` exits 0 with 1 passed.
+
+- [ ] [P4-T8] Add `test_require_launch_paths_still_rejects_partial_launch_keys` to `tests/scripts/dev_tools/test_epic_planner_launch_evidence.py`: from `_fixture()`, delete only `launch_status_path` from `_feature(state, 0)`, call `validate_epic_planner_launch_evidence(state, context, require_launch_paths=True)`, and assert that at least one error contains `launch status path must identify a launch artifact in this repository.`
+  - Acceptance: `poetry run pytest "tests/scripts/dev_tools/test_epic_planner_launch_evidence.py::test_require_launch_paths_still_rejects_partial_launch_keys"` exits 0 with 1 passed.
+
+- [ ] [P4-T9] Run the whole Python launch-evidence test file: `poetry run pytest tests/scripts/dev_tools/test_epic_planner_launch_evidence.py -v`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/python-launch-evidence-suite.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording 0 failed and both new test names as `PASSED`.
+
+- [ ] [P4-T10] Update `tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py`: in `test_consumer_authority_is_typescript_only_and_scope_owners_are_unchanged` (planning-time lines 368-403), replace the docstring with `Installed authority avoids Python and pins the #543 ready-gate key gate.` and replace the assertion at planning-time line 403 with two assertions: `"validate_epic_planner_child_launch_bindings(" in ready_gate` and `"require_launch_paths=key_gated" in ready_gate`.
+  - Acceptance: `poetry run pytest "tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py::test_consumer_authority_is_typescript_only_and_scope_owners_are_unchanged"` exits 0 with 1 passed; `Select-String -LiteralPath tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py -Pattern 'validate_epic_planner_child_launch_bindings(features)' -SimpleMatch` returns no match; `Select-String -LiteralPath tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py -Pattern '#467/#543 behavior unchanged' -SimpleMatch` returns no match.
+
+### Phase 5 — TypeScript test alignment and new tests
+
+- [ ] [P5-T1] Update `extensions/drm-copilot/test/lib/validate/epic-planner-state-launch-binding.test.ts`: give `readyErrors` (planning-time lines 80-84) a second parameter `options: Pick<ValidateEpicPlannerStateOptions, "requireCodexModelRouting" | "requireCodexTopology"> = {}` spread into the validator options (importing `type ValidateEpicPlannerStateOptions` from `../../../src/lib/validate/epic-planner-state-core`); add the helper `launchBindingErrors(errors: string[]): string[]` returning the errors that include `" launch binding"`; and rewrite `activates only for execution readiness` (planning-time lines 93-120) so it strips `features[0]` with `stripLaunchBinding`, keeps `expect(validateEpicPlannerStateText(JSON.stringify(value))).toEqual([])`, and runs its two existing assertions against `readyErrors(value, { requireCodexTopology: true })`.
+  - Acceptance: `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts -t "activates only for execution readiness"` in `extensions/drm-copilot/` exits 0 with 1 passed.
+
+- [ ] [P5-T2] Add `rejects a partial launch binding` to `extensions/drm-copilot/test/lib/validate/epic-planner-state-launch-binding.test.ts`: delete only `launch_status_path` from `features[0]`, and assert `launchBindingErrors(readyErrors(value))` equals `["Epic planner checkpoint features[0] launch binding.launch_status_path must be under artifacts/orchestration/epic-child-launches/."]`.
+  - Acceptance: `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts -t "rejects a partial launch binding"` in `extensions/drm-copilot/` exits 0 with 1 passed; the asserted string is character-for-character the string asserted in P4-T2.
+
+- [ ] [P5-T3] Add `keeps launch binding unconditional under a Codex flag` to `extensions/drm-copilot/test/lib/validate/epic-planner-state-launch-binding.test.ts`: in one test, iterate over `[{ requireCodexModelRouting: true }, { requireCodexTopology: true }]`; for each, strip `features[0]` of a fresh `state()`, call `readyErrors(value, flags)`, and assert that some error includes `features[0] launch binding.branch_name` and some error includes `features[0] launch binding.delegation_receipt must be an object`.
+  - Acceptance: `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts -t "keeps launch binding unconditional under a Codex flag"` in `extensions/drm-copilot/` exits 0 with 1 passed.
+
+- [ ] [P5-T4] Add `preserves the feature index when an earlier feature is skipped` to `extensions/drm-copilot/test/lib/validate/epic-planner-state-launch-binding.test.ts`: strip `features[0]`, delete only `launch_status_path` from `features[1]`, and assert `launchBindingErrors(readyErrors(value))` equals `["Epic planner checkpoint features[1] launch binding.launch_status_path must be under artifacts/orchestration/epic-child-launches/."]`.
+  - Acceptance: `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts -t "preserves the feature index when an earlier feature is skipped"` in `extensions/drm-copilot/` exits 0 with 1 passed; the asserted string is character-for-character the string asserted in P4-T4.
+
+- [ ] [P5-T5] Add `validates a feature with an empty launch path value` to `extensions/drm-copilot/test/lib/validate/epic-planner-state-launch-binding.test.ts`: in one test, iterate over `["", null]`; for each, set `features[0]["launch_status_path"]` of a fresh `state()` to the value and assert `launchBindingErrors(readyErrors(value))` equals `["Epic planner checkpoint features[0] launch binding.launch_status_path must be under artifacts/orchestration/epic-child-launches/."]`.
+  - Acceptance: `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts -t "validates a feature with an empty launch path value"` in `extensions/drm-copilot/` exits 0 with 1 passed.
+
+- [ ] [P5-T6] Run the whole TypeScript launch-binding test file: `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts --verbose` in `extensions/drm-copilot/`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/typescript-launch-binding-suite.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording the `Tests:` line with 0 failed and listing as passed each of the six named TypeScript titles for this file plus `rejects delegation agent_name mismatch`.
+
+- [ ] [P5-T7] Add `skips a feature without launch keys when requireLaunchPaths is set` to `extensions/drm-copilot/test/lib/validate/epic-planner-launch-evidence.test.ts`: from `launchEvidenceFixture()`, delete `launch_receipt_path` and `launch_status_path` from `features(value)[0]`, and assert `validateEpicPlannerLaunchEvidence(value.state, value.context, { requireLaunchPaths: true })` equals `[]`.
+  - Acceptance: `node run-jest.cjs test/lib/validate/epic-planner-launch-evidence.test.ts -t "skips a feature without launch keys when requireLaunchPaths is set"` in `extensions/drm-copilot/` exits 0 with 1 passed.
+
+- [ ] [P5-T8] Add `still rejects a partial launch key when requireLaunchPaths is set` to `extensions/drm-copilot/test/lib/validate/epic-planner-launch-evidence.test.ts`: from `launchEvidenceFixture()`, delete only `launch_status_path` from `features(value)[0]`, call `validateEpicPlannerLaunchEvidence(value.state, value.context, { requireLaunchPaths: true })`, and assert that some error includes `launch status path must identify a launch artifact in this repository.`
+  - Acceptance: `node run-jest.cjs test/lib/validate/epic-planner-launch-evidence.test.ts -t "still rejects a partial launch key when requireLaunchPaths is set"` in `extensions/drm-copilot/` exits 0 with 1 passed; the asserted substring is character-for-character the substring asserted in P4-T8.
+
+- [ ] [P5-T9] Add `threads the Codex flags into epic-planner-state` to `extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts`.
+  - Arrange: a `VirtualFileSystem` whose `C:/workspace/artifacts/orchestration/epic-planner-state.json` is `JSON.stringify({ features: [feature] })`, where `feature` carries `issue_num: 101`, `feature_folder: "docs/features/active/feature-101"`, `depends_on: []`, `wave: 0`, `complexity_band: "C3"`, `preparation_status: "prepared"`, `research_path: "artifacts/research/feature-101.md"`, `plan_path: "docs/features/active/feature-101/plan.md"`, and `preflight_status: "PREFLIGHT: ALL CLEAR"`, and no launch-binding key.
+  - Act and assert: calling `validateOrchestrationServiceCall` for `epic-planner-state` with `requireReadyForExecution: true` and `requireCodexModelRouting: true` throws an error whose message includes `features[0] launch binding.branch_name`; the same call with `requireCodexTopology: true` instead throws an error whose message includes the same substring; the same call with neither Codex flag throws an error whose message does not include `" launch binding"` (capture the thrown error and assert on its `message`).
+  - Acceptance: `node run-jest.cjs test/lib/validate/validate-orchestration-service-call.test.ts -t "threads the Codex flags into epic-planner-state"` in `extensions/drm-copilot/` exits 0 with 1 passed.
+
+- [ ] [P5-T10] Run the TypeScript launch-evidence and service-call test files: `node run-jest.cjs test/lib/validate/epic-planner-launch-evidence.test.ts test/lib/validate/validate-orchestration-service-call.test.ts --verbose` in `extensions/drm-copilot/`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/typescript-evidence-and-dispatch-suites.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording the `Tests:` line with 0 failed and the three new titles as passed.
+
+### Phase 6 — Codex guidance callers and mirrors
+
+- [ ] [P6-T1] Add `test_epic_planner_ready_gate_guidance_passes_both_codex_flags` to `tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py`.
+  - Body: for each relative path in `(".agents/skills/epic-plan/SKILL.md", ".agents/skills/epic-run/SKILL.md", ".codex/agents/epic-orchestrator.toml")` and for each root in `(REPO_ROOT, CODEX_BUNDLE_ROOT)`, read the file as UTF-8, collapse whitespace with `" ".join(text.split())`, and assert that the result contains the phrase quoted under "New guidance phrase" in "Named tests and literals introduced by this plan", with an assertion message naming the root and relative path.
+  - Acceptance: the function exists with exactly that name and a one-line docstring; `@(Get-Content -LiteralPath tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py).Count` prints a value at or below 500.
+
+- [ ] [P6-T2] [expect-fail] Run `poetry run pytest "tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py::test_epic_planner_ready_gate_guidance_passes_both_codex_flags" -v` before any guidance edit.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/fail-before-guidance.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 1`, `ExpectedExitCode: 1`, and an `Output Summary:` showing 1 failed with the assertion message naming `.agents/skills/epic-plan/SKILL.md`.
+
+- [ ] [P6-T3] Edit `.agents/skills/epic-plan/SKILL.md` (planning-time lines 183-185) so the invocation reads, with the line breaks shown: `` Invoke `validate_orchestration_artifacts` for `epic-planner-state` with `` / `` `require_ready_for_execution: true`, `require_codex_topology: true`, `` / `` `require_codex_model_routing: true`, and the explicit workspace root. Do not write or delegate the `` / `kickoff until this canonical gate succeeds.`
+  - Acceptance: `@(Select-String -LiteralPath .agents/skills/epic-plan/SKILL.md -Pattern 'require_codex_model_routing: true' -SimpleMatch).Count` prints `1` and `@(Select-String -LiteralPath .agents/skills/epic-plan/SKILL.md -Pattern 'require_codex_topology: true' -SimpleMatch).Count` prints `1` (both are 0 at planning time); no other line of the file changes. The full-phrase assertion is carried by the P6-T9 named test.
+
+- [ ] [P6-T4] Update the bundle copy `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-plan/SKILL.md` by running `Copy-Item -LiteralPath .agents/skills/epic-plan/SKILL.md -Destination extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-plan/SKILL.md -Force`.
+  - Acceptance: `(Get-FileHash -LiteralPath .agents/skills/epic-plan/SKILL.md -Algorithm SHA256).Hash` equals `(Get-FileHash -LiteralPath extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-plan/SKILL.md -Algorithm SHA256).Hash`.
+
+- [ ] [P6-T5] Edit `.agents/skills/epic-run/SKILL.md` (planning-time lines 24-26, a numbered-list item indented three spaces) so the invocation reads, with the line breaks and three-space indentation shown: `` Invoke `validate_orchestration_artifacts` for `epic-planner-state` with `` / `` `require_ready_for_execution: true`, `require_codex_topology: true`, `` / `` `require_codex_model_routing: true`, and the explicit workspace root. Do not delegate until `` / `that canonical repository-aware gate succeeds.`
+  - Acceptance: `@(Select-String -LiteralPath .agents/skills/epic-run/SKILL.md -Pattern 'require_codex_model_routing: true' -SimpleMatch).Count` prints `1` and `@(Select-String -LiteralPath .agents/skills/epic-run/SKILL.md -Pattern 'require_codex_topology: true' -SimpleMatch).Count` prints `1` (both are 0 at planning time); no other line of the file changes. The full-phrase assertion is carried by the P6-T9 named test.
+
+- [ ] [P6-T6] Update the bundle copy `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md` by running `Copy-Item -LiteralPath .agents/skills/epic-run/SKILL.md -Destination extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md -Force`.
+  - Acceptance: the SHA-256 hashes of the root and bundle files are equal, compared as in P6-T4.
+
+- [ ] [P6-T7] Edit `.codex/agents/epic-orchestrator.toml` (planning-time lines 42-44) so the instruction reads, with the line breaks shown: `` Require `validate_orchestration_artifacts` to pass `epic-planner-state` with `` / `` `require_ready_for_execution: true`, `require_codex_topology: true`, `` / `` `require_codex_model_routing: true`, and the explicit workspace root before execution. Copy its `` / `` validated `max_parallel_features` into this agent's checkpoint. `` Leave planning-time lines 81-82 (the `epic-orchestrator-state` completion gate) unchanged.
+  - Acceptance: `@(Select-String -LiteralPath .codex/agents/epic-orchestrator.toml -Pattern 'require_codex_topology: true' -SimpleMatch).Count` prints `2` (the new planner-gate line and the existing line 81) and `@(Select-String -LiteralPath .codex/agents/epic-orchestrator.toml -Pattern 'require_codex_model_routing: true' -SimpleMatch).Count` prints `2` (the new planner-gate line and the existing line 82); both are 1 at planning time; the file stays at or below 500 lines. The full-phrase assertion is carried by the P6-T9 named test.
+
+- [ ] [P6-T8] Update the bundle copy `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml` by running `Copy-Item -LiteralPath .codex/agents/epic-orchestrator.toml -Destination extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml -Force`.
+  - Acceptance: the SHA-256 hashes of the root and bundle files are equal, compared as in P6-T4.
+
+- [ ] [P6-T9] Record the guidance pass-after run: `poetry run pytest "tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py::test_epic_planner_ready_gate_guidance_passes_both_codex_flags" -v`, then `$r = Invoke-Pester -Path tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1 -Output Detailed -PassThru` in a PowerShell 7 session, printing `$r.PassedCount` and `$r.FailedCount`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/pass-after-guidance.<ts>.md` exists with `Timestamp:`, `Command:` (both commands), `EXIT_CODE: 0` for the pytest run, and an `Output Summary:` recording `1 passed` for the pytest node, the Pester `FailedCount` of 0, a `PassedCount` equal to the P0-T17 baseline value, and the `[+]` line for `keeps root and tracked bundle runtime copies byte-identical`.
+
+### Phase 7 — Targeted and preserved-behaviour verification
+
+- [ ] [P7-T1] Run the spec's targeted Python command: `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py tests/scripts/dev_tools/test_epic_planner_launch_evidence.py tests/scripts/dev_tools/test_validate_epic_planner_state.py tests/scripts/dev_tools/test_epic_planner_readiness.py tests/scripts/dev_tools/test_validate_epic_orchestrator_state_launch_binding.py tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py --cov=scripts.dev_tools.validate_epic_planner_state --cov=scripts.dev_tools._epic_orchestrator_state_launch_binding --cov=scripts.dev_tools.epic_planner_launch_evidence --cov=scripts.dev_tools.epic_planner_readiness --cov-branch --cov-report=term-missing`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/targeted-python.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording the result line with 0 failed, the `term-missing` rows for the four modules, and a statement that `tests/scripts/dev_tools/test_validate_epic_planner_state.py`, `tests/scripts/dev_tools/test_epic_planner_readiness.py`, and `tests/scripts/dev_tools/test_validate_epic_orchestrator_state_launch_binding.py` were not edited (confirmed by `git diff (git merge-base origin/main HEAD) --stat -- tests/scripts/dev_tools/test_validate_epic_planner_state.py tests/scripts/dev_tools/test_epic_planner_readiness.py tests/scripts/dev_tools/test_validate_epic_orchestrator_state_launch_binding.py` printing nothing and `git status --porcelain -- tests/scripts/dev_tools/test_validate_epic_planner_state.py tests/scripts/dev_tools/test_epic_planner_readiness.py tests/scripts/dev_tools/test_validate_epic_orchestrator_state_launch_binding.py` printing nothing).
+
+- [ ] [P7-T2] Run the spec's targeted Jest command in `extensions/drm-copilot/`: `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts test/lib/validate/epic-planner-launch-evidence.test.ts test/lib/validate/epic-planner-state-core.test.ts test/lib/validate/epic-planner-readiness-integrity.test.ts test/lib/validate/epic-orchestrator-state-launch-binding.test.ts test/lib/validate/validate-orchestration-service-call.test.ts test/lib/validate/orchestration-artifacts.test.ts` (no `--coverage`, because per-file `coverageThreshold` entries fail a subset coverage run).
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/targeted-typescript.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording the `Test Suites:` line (7 passed) and the `Tests:` line with 0 failed, and a statement that `epic-planner-state-core.test.ts`, `epic-planner-readiness-integrity.test.ts`, `epic-orchestrator-state-launch-binding.test.ts`, and `orchestration-artifacts.test.ts` were not edited (confirmed by `git diff (git merge-base origin/main HEAD) --stat -- extensions/drm-copilot/test/lib/validate/epic-planner-state-core.test.ts extensions/drm-copilot/test/lib/validate/epic-planner-readiness-integrity.test.ts extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-launch-binding.test.ts extensions/drm-copilot/test/lib/validate/orchestration-artifacts.test.ts` printing nothing and the matching `git status --porcelain --` over the same four paths printing nothing).
+
+- [ ] [P7-T3] Verify the generated-orchestrator invariant (spec acceptance criterion 11) by running `Select-String -LiteralPath scripts/dev_tools/_epic_orchestrator_state_launch_binding.py -Pattern 'require_generated_orchestrator=True' -SimpleMatch`, `Select-String -LiteralPath extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-launch-binding.ts -Pattern 'requireGeneratedOrchestrator: true' -SimpleMatch`, `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py -k "test_rejects_invalid_delegation_binding and agent_name" -v`, and `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts -t "rejects delegation agent_name mismatch"` in `extensions/drm-copilot/`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/generated-orchestrator-invariant.<ts>.md` exists with `Timestamp:`, `Command:` (all four), `EXIT_CODE: 0` for both test runs, and an `Output Summary:` recording that each `Select-String` returned exactly one match located inside the body of `validate_epic_planner_child_launch_bindings` / `validateEpicPlannerChildLaunchBindings` (line number recorded and checked against the function's line span), 1 passed for the pytest selection, and 1 passed for the Jest title.
+
+### Phase 8 — Python final QA loop (seven stages)
+
+Loop rule: run P8-T1 through P8-T8 in order. If any stage fails or changes any file, fix the cause, record the restart in `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/loop-restarts.<ts>.md`, and restart at P8-T1, incrementing `Loop iteration:` in every Phase 8 artifact. Every task below is unconditional; `SKIPPED` is not a valid outcome.
+
+- [ ] [P8-T1] Python stage 1, formatting: run `poetry run black --check scripts/dev_tools/_epic_orchestrator_state_launch_binding.py scripts/dev_tools/epic_planner_launch_evidence.py scripts/dev_tools/epic_planner_readiness.py scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py tests/scripts/dev_tools/test_epic_planner_launch_evidence.py tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-python-format.<ts>.md` exists with the four fields and `Loop iteration:`; `EXIT_CODE: 0` and the output contains `7 files would be left unchanged.` with no `would reformat` line. If the check fails, run `poetry run black` over the same seven paths, record its `reformatted <path>` lines and its closing summary (`N file(s) reformatted, M file(s) left unchanged`), and restart the loop.
+
+- [ ] [P8-T2] Python stage 2, linting: run `poetry run ruff check scripts/dev_tools/_epic_orchestrator_state_launch_binding.py scripts/dev_tools/epic_planner_launch_evidence.py scripts/dev_tools/epic_planner_readiness.py scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py tests/scripts/dev_tools/test_epic_planner_launch_evidence.py tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-python-lint.<ts>.md` exists with the four fields; `EXIT_CODE: 0` and the output is `All checks passed!`. Any suppression must match `.claude/rules/python-suppressions.md`.
+
+- [ ] [P8-T3] Python stage 3, type checking: run `poetry run pyright scripts/dev_tools/_epic_orchestrator_state_launch_binding.py scripts/dev_tools/epic_planner_launch_evidence.py scripts/dev_tools/epic_planner_readiness.py scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py tests/scripts/dev_tools/test_epic_planner_launch_evidence.py tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-python-typecheck.<ts>.md` exists with the four fields; `EXIT_CODE: 0` and the summary line `0 errors, 0 warnings, 0 informations`.
+
+- [ ] [P8-T4] Python stage 4, architecture boundaries: re-run the P0-T15 commands.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-python-architecture.<ts>.md` exists with the four fields and an `Output Summary:` identical in substance to P0-T15. When P0-T15 found a configured tool, this task runs it and requires zero violations.
+
+- [ ] [P8-T5] Python stage 5, unit tests with coverage: run `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --deselect tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` from the worktree root (full suite; same selection as P0-T10).
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-python-test-coverage.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording the result line (0 failed, 1 deselected, citing #510), the `TOTAL` row verbatim, and the `term-missing` rows (including the `Missing` column) for the four Python production files.
+
+- [ ] [P8-T6] Python per-file coverage: immediately after P8-T5, run `poetry run coverage json --data-file=artifacts/.coverage --include="*validate_epic_planner_state.py,*_epic_orchestrator_state_launch_binding.py,*epic_planner_launch_evidence.py,*epic_planner_readiness.py" --pretty-print -o artifacts/python/coverage-543-final.json` and read the JSON.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-python-per-file-coverage.<ts>.md` exists with the four fields and an `Output Summary:` recording, for each of the four production files, `covered_lines`/`num_statements` and `covered_branches`/`num_branches` from `files[<key>].summary` with two-decimal percentages; each file shows at least 85.00% line coverage and at least 75.00% branch coverage. A file below either floor requires added tests in its mirrored test file and a loop restart at P8-T1.
+
+- [ ] [P8-T7] Python stage 6, contract/schema compatibility: run `git diff (git merge-base origin/main HEAD) --stat -- scripts/dev_tools/validate_orchestration_artifacts.py` and `git status --porcelain -- scripts/dev_tools/validate_orchestration_artifacts.py`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-python-contract.<ts>.md` exists with the four fields; both commands print nothing, confirming the Python CLI surface (the `epic-planner-state` subparser and dispatch) is unchanged, and the summary records that every new Python parameter is keyword-only with a default equal to the pre-fix behaviour.
+
+- [ ] [P8-T8] Python stage 7, integration: re-run the P7-T1 command.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-python-integration.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording the result line with 0 failed.
+
+### Phase 9 — TypeScript final QA loop (seven stages)
+
+Loop rule: run P9-T1 through P9-T7 in order. If any stage fails or changes any file, fix the cause, record the restart in `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/loop-restarts.<ts>.md`, and restart at P9-T1, incrementing `Loop iteration:` in every Phase 9 artifact. A TypeScript fix that touches no Python file does not restart Phase 8. Every task below is unconditional; `SKIPPED` is not a valid outcome.
+
+- [ ] [P9-T1] TypeScript stage 1, formatting: run `npx prettier --check src/lib/validate/epic-orchestrator-state-launch-binding.ts src/lib/validate/epic-planner-launch-evidence.ts src/lib/validate/epic-planner-readiness-integrity.ts src/lib/validate/epic-planner-state-core.ts src/lib/validate/orchestration-artifacts.ts test/lib/validate/epic-planner-state-launch-binding.test.ts test/lib/validate/epic-planner-launch-evidence.test.ts test/lib/validate/validate-orchestration-service-call.test.ts` in `extensions/drm-copilot/`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-typescript-format.<ts>.md` exists with the four fields and `Loop iteration:`; `EXIT_CODE: 0` and the output contains `All matched files use Prettier code style!`. If the check fails, run `npx prettier --write` over the same eight paths (not `npm run format`, which rewrites files outside the write set), record each output line (a line ending in `(unchanged)` names a file left as-is; every other file line names a rewritten file), and restart the loop.
+
+- [ ] [P9-T2] TypeScript stage 2, linting: run `npm run lint` in `extensions/drm-copilot/`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-typescript-lint.<ts>.md` exists with the four fields; `EXIT_CODE: 0` and zero problem lines. Any suppression must match `.claude/rules/typescript-suppressions.md`.
+
+- [ ] [P9-T3] TypeScript stage 3, type checking: run `npm run typecheck` in `extensions/drm-copilot/`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-typescript-typecheck.<ts>.md` exists with the four fields; `EXIT_CODE: 0` and zero `error TS` lines.
+
+- [ ] [P9-T4] TypeScript stage 4, architecture boundaries: re-run the P0-T15 commands.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-typescript-architecture.<ts>.md` exists with the four fields and an `Output Summary:` identical in substance to P0-T15. When P0-T15 found a `.dependency-cruiser*` configuration, this task runs it and requires zero violations.
+
+- [ ] [P9-T5] TypeScript stage 5, unit tests with coverage: run `node run-jest.cjs --coverage --coverageReporters=text --coverageReporters=text-summary` in `extensions/drm-copilot/`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-typescript-test-coverage.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0` (which also proves every `coverageThreshold` entry, including `./src/lib/validate/orchestration-artifacts.ts`, is met), and an `Output Summary:` recording the `Test Suites:` and `Tests:` lines with 0 failed, the text-summary `Lines` and `Branches` totals, and the `text` rows for the five TypeScript production files, each showing `% Lines` at or above 85 and `% Branch` at or above 75 with its `Uncovered Line #s` cell. A row below either floor requires added tests in its mirrored test file and a loop restart at P9-T1.
+
+- [ ] [P9-T6] TypeScript stage 6, contract/schema compatibility: run `git diff (git merge-base origin/main HEAD) --stat -- extensions/drm-copilot/src/mcp-tool-definitions.ts extensions/drm-copilot/src/mcp-repo-automation-tool-definitions.ts extensions/drm-copilot/src/mcp-tool-inputs.ts` and `git status --porcelain -- extensions/drm-copilot/src/mcp-tool-definitions.ts extensions/drm-copilot/src/mcp-repo-automation-tool-definitions.ts extensions/drm-copilot/src/mcp-tool-inputs.ts`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-typescript-contract.<ts>.md` exists with the four fields; both commands print nothing, confirming the MCP `validate_orchestration_artifacts` input schema is unchanged, and the summary records that every new TypeScript option is optional and defaults to the pre-fix behaviour.
+
+- [ ] [P9-T7] TypeScript stage 7, integration: re-run the P7-T2 command in `extensions/drm-copilot/`, then `$r = Invoke-Pester -Path tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1 -Output Detailed -PassThru` from the worktree root in a PowerShell 7 session, printing `$r.PassedCount` and `$r.FailedCount`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-typescript-integration.<ts>.md` exists with `Timestamp:`, `Command:` (both), `EXIT_CODE: 0` for the Jest run, and an `Output Summary:` recording the Jest `Tests:` line with 0 failed, the Pester `FailedCount` of 0, and a `PassedCount` equal to the P0-T17 baseline value.
+
+### Phase 10 — Coverage delta, scope, size, and acceptance check-off
+
+- [ ] [P10-T1] Write the coverage-delta verification to `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/coverage-delta-verification.<ts>.md`, running `git diff -U0 (git merge-base origin/main HEAD) -- scripts/dev_tools/_epic_orchestrator_state_launch_binding.py scripts/dev_tools/epic_planner_launch_evidence.py scripts/dev_tools/epic_planner_readiness.py scripts/dev_tools/validate_epic_planner_state.py extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-launch-binding.ts extensions/drm-copilot/src/lib/validate/epic-planner-launch-evidence.ts extensions/drm-copilot/src/lib/validate/epic-planner-readiness-integrity.ts extensions/drm-copilot/src/lib/validate/epic-planner-state-core.ts extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` to enumerate added line numbers.
+  - Acceptance: the artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` reporting, per language, three numeric groups: baseline coverage (P0-T10, P0-T11, P0-T16), post-change coverage (P8-T5, P8-T6, P9-T5), and new/changed-code coverage, computed as the count of added executable lines (from the `+` side of the hunks) that appear in the Python `files[<key>].missing_lines` list of `artifacts/python/coverage-543-final.json` or in the Jest `Uncovered Line #s` cell for that file. Required results: every per-file line percentage at or above 85% and branch percentage at or above 75% for the nine production files; no per-file percentage lower than its baseline by more than 0.50 points; zero added executable lines uncovered. A missing numeric value makes the verdict INCOMPLETE, not PASS.
+
+- [ ] [P10-T2] Write the single-clean-pass record to `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/final-qa-clean-pass.<ts>.md`.
+  - Acceptance: the artifact contains `Timestamp:` and a stage-by-stage table for Python (P8-T1 through P8-T8) and TypeScript (P9-T1 through P9-T7) recording each stage's artifact path, `EXIT_CODE`, and `Loop iteration:` from the final iteration, plus the total number of loop restarts and the reason for each, copied from `loop-restarts.<ts>.md` (or `Restarts: 0`). Every stage in the final iteration shows exit 0 and no file change.
+
+- [ ] [P10-T3] Verify the excluded-path invariant (spec acceptance criterion 16) by running `git diff (git merge-base origin/main HEAD) -- scripts/dev_tools/validate_orchestration_artifacts.py .claude .github` and `git status --porcelain -- scripts/dev_tools/validate_orchestration_artifacts.py .claude .github`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/scope-exclusions.<ts>.md` exists with the four fields; both commands print nothing. The summary notes that the diff is anchored to the merge base with `origin/main` rather than to local `main`, which is the anchored form of the spec's `git diff main` command.
+
+- [ ] [P10-T4] Verify the write set by running `git diff (git merge-base origin/main HEAD) --name-only` and `git status --porcelain` from the worktree root.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/scope-verification.<ts>.md` exists with the four fields and an `Output Summary:` showing that the union of changed paths outside `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/` is exactly the 21 paths in "Files the diff will WRITE", and that every path under "Explicitly out of scope" is absent from both outputs.
+
+- [ ] [P10-T5] Verify the 500-line limit (spec acceptance criterion 17) by running `@(Get-Content -LiteralPath <path>).Count` for each of the 21 write-set paths and for `tests/scripts/dev_tools/test_epic_planner_readiness.py`, `extensions/drm-copilot/test/lib/validate/epic-planner-readiness-integrity.test.ts`, and `extensions/drm-copilot/test/lib/validate/orchestration-artifacts.test.ts`.
+  - Acceptance: `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/line-counts-final.<ts>.md` exists with the four fields and an `Output Summary:` listing every count; each of the 21 write-set counts is at or below 500; the three excluded test files show counts equal to their P0 values (491, 495, 508 at planning time), confirming no test was added to them.
+
+- [ ] [P10-T6] Update the `## Acceptance Criteria` section of `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/spec.md`: tick each satisfied criterion and append the artifact path or test node that satisfies it. For criterion 1, cite `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/regression-testing/fail-before-python.<ts>.md` and `pass-after-python.<ts>.md` and note the canonical-folder substitution. For criterion 18, note the `--deselect` of the #510 node. For criterion 16, note the merge-base anchor. Do not change any other section of the file.
+  - Acceptance: `@(Select-String -LiteralPath docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/spec.md -Pattern '^- \[x\] ').Count` prints `21` and the same command with the pattern `'^- \[ \] '` prints `3` (the three unticked Impact/Severity boxes), and every ticked acceptance criterion line carries a citation. If any criterion cannot be ticked, it is left unticked with a one-line statement of what remains, the counts are recorded as found, and the plan outcome is INCOMPLETE, not PASS. Record both counts in `docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543/evidence/qa-gates/acceptance-checkoff.<ts>.md` with the four fields.
