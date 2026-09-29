@@ -52,4 +52,4 @@ Record in the agent response or logs:
 
 - estimated production file count,
 - chosen path (`small` or `large`),
-- rationale summary (1-3 bullets),
+- rationale summary (1-3 bullets).
