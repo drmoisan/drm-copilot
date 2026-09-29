@@ -8,7 +8,7 @@ ExpectedExitCode: 2
 Output Summary:
 - Exit code 2 (pre-existing errors; no change has been made yet).
 - Count of `error TS` lines: 353
-- Erroring file count: 72
+- Erroring file count: 71 (corrected from a transcription error of 72 recorded at capture time; the list below has 71 entries)
 - Erroring files (sorted, unique):
   src/lib/codex-native-converter/index.ts
   src/lib/codex-native-converter/models.ts
