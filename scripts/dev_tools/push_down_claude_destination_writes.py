@@ -22,6 +22,10 @@ Extension seams (binding contract for downstream children):
     extends ``test_push_down_claude_parity.py`` in the same change.
 
 #508 extends `MERGED_RELATIVE_PATHS` by registering `config/blast-radius.json`.
+Its merge composes the destination-owned overlay
+`config/blast-radius.local.json` (named in `INPUT_RELATIVE_PATHS`) onto the
+derived document. `MERGED_PATHS` is a read-only `DestinationMerge` view of the
+same registry.
 #621 inserts its destination exclusion filter in `build_destination_write_stack()`
 as the outermost layer.
 Downstream children extend these seams; they do not replace, bypass, or duplicate them.
@@ -36,6 +40,7 @@ Invariants / Constraints:
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 try:
@@ -46,6 +51,10 @@ try:
     from scripts.dev_tools.push_down_claude_blast_radius_derive_core import (
         BLAST_RADIUS_RELATIVE_PATH,
         derive_destination_module_map,
+    )
+    from scripts.dev_tools.push_down_claude_blast_radius_overlay import (
+        BLAST_RADIUS_OVERLAY_RELATIVE_PATH,
+        compose_blast_radius_overlay,
     )
     from scripts.dev_tools.push_down_claude_routing_merge import (
         merge_routing_documents,
@@ -61,6 +70,10 @@ except ModuleNotFoundError as error:  # pragma: no cover - bundled import fallba
         BLAST_RADIUS_RELATIVE_PATH,
         derive_destination_module_map,
     )
+    from dev_tools.push_down_claude_blast_radius_overlay import (
+        BLAST_RADIUS_OVERLAY_RELATIVE_PATH,
+        compose_blast_radius_overlay,
+    )
     from dev_tools.push_down_claude_routing_merge import merge_routing_documents
 
 if TYPE_CHECKING:
@@ -71,21 +84,82 @@ if TYPE_CHECKING:
     )
 
 __all__ = [
+    "INPUT_RELATIVE_PATHS",
+    "MERGED_PATHS",
     "MERGED_RELATIVE_PATHS",
     "BlastRadiusDeriveFileSystem",
     "BundleConfigFileSystem",
+    "DestinationMerge",
     "DestinationMergeFileSystem",
     "DirectoryLister",
     "MergeFunction",
     "build_destination_write_stack",
+    "merge_blast_radius_overlay",
 ]
 
 # Merge seam signature: (destination_text, source_text, path) -> merged text.
 MergeFunction = Callable[[str, str, "Path"], str]
 
+
+def merge_blast_radius_overlay(
+    destination_text: str, source_text: str, path: Path
+) -> str:
+    """Compose the destination overlay onto the derived blast-radius document.
+
+    Args:
+        destination_text (str): Destination overlay text, read from
+            ``INPUT_RELATIVE_PATHS["config/blast-radius.json"]``.
+        source_text (str): Derived ``config/blast-radius.json`` being published.
+        path (Path): Destination target path; unused because overlay errors
+            name the overlay path.
+
+    Returns:
+        str: The composed blast-radius document.
+    """
+
+    del path
+    return compose_blast_radius_overlay(
+        source_text, destination_text, BLAST_RADIUS_OVERLAY_RELATIVE_PATH
+    )
+
+
 MERGED_RELATIVE_PATHS: Mapping[str, MergeFunction] = {
     "config/orchestration-routing.json": merge_routing_documents,
+    "config/blast-radius.json": merge_blast_radius_overlay,
 }
+
+# Registered paths whose merge reads a different destination file than the
+# one it writes; an unlisted path reads its own destination file.
+INPUT_RELATIVE_PATHS: Mapping[str, str] = {
+    "config/blast-radius.json": "config/blast-radius.local.json",
+}
+
+
+@dataclass(frozen=True)
+class DestinationMerge:
+    """One registered destination merge, viewed from ``MERGED_RELATIVE_PATHS``.
+
+    Attributes:
+        relative_path (str): Destination-relative path that is written.
+        input_relative_path (str): Destination-relative path that is read.
+        merge (MergeFunction): Merge taking ``(destination_text, source_text,
+            path)``.
+    """
+
+    relative_path: str
+    input_relative_path: str
+    merge: MergeFunction
+
+
+# Read-only view of the registry above; not a second registry.
+MERGED_PATHS: tuple[DestinationMerge, ...] = tuple(
+    DestinationMerge(
+        relative_path=key,
+        input_relative_path=INPUT_RELATIVE_PATHS.get(key, key),
+        merge=merge,
+    )
+    for key, merge in MERGED_RELATIVE_PATHS.items()
+)
 
 # Name of the published configuration tree under both roots.
 _CONFIG_DIR = "config"
@@ -179,7 +253,11 @@ class DestinationMergeFileSystem(_DelegatingFileSystem):
         self._merges = merges
 
     def write_text(self, path: Path, content: str) -> None:
-        """Write ``content``, merging it when the path is registered and exists.
+        """Write ``content``, merging it when the path is registered.
+
+        A registered path reads its merge input from
+        ``INPUT_RELATIVE_PATHS.get(relative, relative)`` and merges only when
+        that input file exists. The input file is only read, never written.
 
         Raises:
             ValueError: Propagated from the merge function (for example
@@ -188,10 +266,17 @@ class DestinationMergeFileSystem(_DelegatingFileSystem):
 
         relative = _relative_posix(path, self._destination_root)
         merge = self._merges.get(relative) if relative is not None else None
-        # An absent destination file has nothing to preserve, so the source
-        # text is written unchanged and the next push merges against it.
-        if merge is not None and self._inner.is_file(path):
-            content = merge(self._inner.read_text(path), content, path)
+        if merge is not None and relative is not None:
+            input_relative = INPUT_RELATIVE_PATHS.get(relative, relative)
+            input_path = (
+                path
+                if input_relative == relative
+                else self._destination_root / input_relative
+            )
+            # An absent input file has nothing to preserve or compose, so the
+            # source text is written unchanged.
+            if self._inner.is_file(input_path):
+                content = merge(self._inner.read_text(input_path), content, path)
         self._inner.write_text(path, content)
 
 

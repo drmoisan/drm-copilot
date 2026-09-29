@@ -113,7 +113,10 @@ except ModuleNotFoundError as error:
 ARTIFACT_DIRECTORY = "artifacts/claude-customizations"
 MODULE_ENTRY_POINT = "scripts.dev_tools.push_down_claude_customizations"
 ROOT_FOLDERS: tuple[Path, ...] = (Path(".claude"), Path("config"))
-EXCLUDED_RELATIVE_PATHS: tuple[Path, ...] = (Path(".claude/settings.local.json"),)
+EXCLUDED_RELATIVE_PATHS: tuple[Path, ...] = (
+    Path(".claude/settings.local.json"),
+    Path("config/blast-radius.local.json"),
+)
 
 __all__ = [
     "AGENT_MEMORY_RELATIVE_ROOT",
