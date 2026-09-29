@@ -78,7 +78,7 @@ teardown() {
     shfmt_calls="$(printf '%s\n' "$output" | grep -c '^shfmt -d ' || true)"
     shellcheck_calls="$(printf '%s\n' "$output" | grep -c '^shellcheck ' || true)"
     [ "$shfmt_calls" -eq 1 ]
-    [ "$shellcheck_calls" -eq 6 ]
+    [ "$shellcheck_calls" -eq 7 ]
     [[ "$output" == *"shfmt -d "*"tools/format_me.sh"* ]]
 }
 
@@ -127,6 +127,7 @@ teardown() {
     [[ "$output" != *"--cobertura-only"* ]]
     [[ "$output" == *"kcov --include-pattern="* ]]
     [[ "$output" == *"--include-pattern="*"/tools,"*"/scripts"* ]]
+    [[ "$output" == *"--include-pattern="*"/.claude/skills"* ]]
     [[ "$output" == *"--exclude-pattern="*"/tests"* ]]
     [[ "$output" == *"tests/shell"* ]]
     [[ "$output" == *"kcov --merge ${KCOV_OUT}"* ]]
