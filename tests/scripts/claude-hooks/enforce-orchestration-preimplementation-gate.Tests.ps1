@@ -53,6 +53,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
                 lifecycle_ready  = $LifecycleReady
             } | ConvertTo-Json -Compress
         }
+        Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     Context 'implementation writes before orchestration readiness' {

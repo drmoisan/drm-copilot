@@ -60,6 +60,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 command exemption (is
                 -ToolInputRaw (ConvertTo-ExemptionCommandPayload -Command $Command) `
                 -CheckpointRaw (ConvertTo-NotReadyCheckpointRaw)
         }
+        Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     Context 'issue #539 orchestration-tree staging exemption allow cases' {

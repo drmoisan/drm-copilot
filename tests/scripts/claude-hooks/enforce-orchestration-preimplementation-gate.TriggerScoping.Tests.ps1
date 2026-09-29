@@ -89,6 +89,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 trigger scoping (issu
                 -ToolInputRaw (ConvertTo-TriggerScopingCommandPayload -Command $Command) `
                 -CheckpointRaw (ConvertTo-TriggerScopingNotReadyCheckpointRaw)
         }
+        Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     Context 'over-match allow cases - a mention is not an invocation' {

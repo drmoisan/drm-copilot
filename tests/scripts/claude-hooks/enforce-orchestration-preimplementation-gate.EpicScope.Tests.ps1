@@ -77,6 +77,7 @@ BeforeAll {
         Mock Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution { $head }.GetNewClosure()
         Mock Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution { $merge }.GetNewClosure()
     }
+    Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
 }
 
 Describe 'enforce-orchestration-preimplementation-gate.ps1 epic scope (issue #663)' {
@@ -265,7 +266,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 epic scope (issue #66
             Mock Get-Content { throw 'an absent checkpoint must not be read' }
 
             # Act
-            $text = Get-EpicCheckpointContent
+            $text = Get-EpicCheckpointContent -Path $script:EpicSeamPath
 
             # Assert
             $text | Should -BeExactly ''
@@ -280,7 +281,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 epic scope (issue #66
             Mock Get-Content { $raw }.GetNewClosure()
 
             # Act
-            $text = Get-EpicCheckpointContent
+            $text = Get-EpicCheckpointContent -Path $script:EpicSeamPath
 
             # Assert
             $text | Should -BeExactly $script:ReadyEpicJson
@@ -293,7 +294,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 epic scope (issue #66
             Mock Get-Content { throw 'an absent checkpoint must not be read' }
 
             # Act
-            $text = Get-ParallelCheckpointContent
+            $text = Get-ParallelCheckpointContent -Path $script:ParallelSeamPath
 
             # Assert
             $text | Should -BeExactly ''
@@ -307,7 +308,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 epic scope (issue #66
             Mock Get-Content { '{"route_id":"parallel"}' }
 
             # Act
-            $text = Get-ParallelCheckpointContent
+            $text = Get-ParallelCheckpointContent -Path $script:ParallelSeamPath
 
             # Assert
             $text | Should -BeExactly '{"route_id":"parallel"}'

@@ -176,6 +176,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 absolute-path classif
                 -ToolInputRaw (ConvertTo-WriteToolInput -FilePath $FilePath) `
                 -CheckpointRaw (ConvertTo-NotReadyCheckpointRaw)
         }
+        Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     Context 'checkpoint exemption holds in every spelling' {
