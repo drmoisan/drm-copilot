@@ -117,10 +117,55 @@ items:
       contracts: []
       source: "declared"
       computed_at: "2026-09-29T18:35:18Z"
+  - issue_num: 512
+    feature_folder: "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/**"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/black-check-baseline.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/branch-commit-baseline.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/file-line-count-baseline.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/pyright-file-baseline.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/pytest-collect-baseline.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/pytest-coverage-baseline.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/pytest-pass-baseline.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/ruff-file-baseline.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/ruff-repo-baseline.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/coverage-comparison.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-black.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-pyright.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-pytest-coverage.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-qc-loop-pass.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-ruff-file.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-ruff-repo.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/followups-recorded.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/scope-check.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/black-check-after-rename.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/fail-before-delta-check.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/file-line-count-after.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/new-name-single-definition.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/noqa-absence.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/old-name-absence.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/pytest-collect-after.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/rename-delta-check.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/renamed-test-node-pass.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/ruff-e501-fail-before.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/regression-testing/ruff-e501-pass-after.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/plan.2026-09-29T15-16.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md"
+        - "tests/scripts/dev_tools/test_blast_radius_config_parity.py"
+      modules: []
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-29T19:30:16Z"
 ---
 
 # Parallel Run: bug-burndown-2026-09-29
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 3 of 22. Pending: 512, 527, 532, 543, 609, 623, 645, 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
+Prepared: 4 of 22. Pending: 527, 532, 543, 609, 623, 645, 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
