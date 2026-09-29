@@ -29,8 +29,8 @@ BeforeAll {
     $script:LibraryPath = @(
         Get-ChildItem -Path $libraryRoot -File -ErrorAction Stop |
             Where-Object { $_.Extension -in @('.psm1', '.ps1') } |
-            Sort-Object -Property Name |
-            ForEach-Object { ".claude/lib/parallel-drift/$($_.Name)" }
+                Sort-Object -Property Name |
+                    ForEach-Object { ".claude/lib/parallel-drift/$($_.Name)" }
     )
 }
 
