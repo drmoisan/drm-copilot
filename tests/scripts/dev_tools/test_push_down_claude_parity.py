@@ -276,8 +276,8 @@ def test_merged_relative_paths_match_typescript() -> None:
     )
 
     _assert_same(ts_paths, py_paths, TS_CUSTOMIZATIONS, PY_DESTINATION_WRITES)
-    assert len(ts_paths) == 1, f"{TS_CUSTOMIZATIONS} merged paths: {ts_paths!r}"
-    assert len(py_paths) == 1, f"{PY_DESTINATION_WRITES} merged paths: {py_paths!r}"
+    assert len(ts_paths) == 2, f"{TS_CUSTOMIZATIONS} merged paths: {ts_paths!r}"
+    assert len(py_paths) == 2, f"{PY_DESTINATION_WRITES} merged paths: {py_paths!r}"
 
 
 def test_derived_relative_paths_match_typescript() -> None:
