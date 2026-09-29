@@ -808,7 +808,7 @@ Each item was observed in this repository's recorded runs or read from source, n
       Command: `npm --prefix extensions/drm-copilot run test -- test/lib/push-down/claude-pack-manifest-completeness.test.ts`.
       Write FEATURE/evidence/regression-testing/jest-pack-manifest.TS.md. Acceptance: exit 0 and the
       "Tests:" line reports 0 failed.
-- [ ] [P5-T14] Commit and push Phase 5 (`extensions/drm-copilot/resources/claude-customizations` and the files below).
+- [x] [P5-T14] Commit and push Phase 5 (`extensions/drm-copilot/resources/claude-customizations` and the files below).
       Commands: CMD-GIT-ADD with `extensions/drm-copilot/resources/claude-customizations scripts/powershell/PoshQC/settings/pester.runsettings.psd1 extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1 tests/shell/parallel_payload_only.bats tests/shell/parallel_bash_manifest_membership.bats docs/features/active/2026-09-28-parallel-skills-invoke-unbundled-python-clis-763`,
       CMD-GIT-COMMIT with message "fix(763): bundle the drift and abandon entry points and register their coverage",
       CMD-GIT-PUSH, then `git status --porcelain`. Acceptance: the push exits 0 and the porcelain status
@@ -816,14 +816,14 @@ Each item was observed in this repository's recorded runs or read from source, n
 
 ### Phase 6 — Pass-After Verification and Scope Checks (AC1, AC8, AC9, AC11, AC13, AC16, AC17)
 
-- [ ] [P6-T1] Run the repository guard `tests/scripts/dev_tools/test_skill_bundle_contract_repo.py` after the port.
+- [x] [P6-T1] Run the repository guard `tests/scripts/dev_tools/test_skill_bundle_contract_repo.py` after the port.
       Command: CMD-PY-TEST over that file. Write FEATURE/evidence/regression-testing/guard-repo-after-port.TS.md.
       Acceptance: exit 0 and all five tests PASSED, including `test_every_skill_script_reference_is_bundled`
       and `test_known_unbundled_references_are_not_stale`.
-- [ ] [P6-T2] Run the guard CLI `scripts/dev_tools/skill_bundle_contract_cli.py` after the port.
+- [x] [P6-T2] Run the guard CLI `scripts/dev_tools/skill_bundle_contract_cli.py` after the port.
       Command: CMD-PY-GUARD-CLI. Write FEATURE/evidence/regression-testing/guard-cli-after-port.TS.md.
       Acceptance: exit 0 and no stderr line beginning `skill-bundle `.
-- [ ] [P6-T3] AC9 invocation sweep over `.claude` and `extensions/drm-copilot/resources/claude-customizations/.claude`, written to FEATURE/evidence/qa-gates/ac9-invocation-sweep.TS.md.
+- [x] [P6-T3] AC9 invocation sweep over `.claude` and `extensions/drm-copilot/resources/claude-customizations/.claude`, written to FEATURE/evidence/qa-gates/ac9-invocation-sweep.TS.md.
       Commands: `git grep -n -E 'python3?[[:space:]]+(-m[[:space:]]+)?scripts[./]dev_tools[./]parallel_(drift_detection|mutation_abandon)_cli' -- .claude extensions/drm-copilot/resources/claude-customizations/.claude`,
       then the negative control `git grep -n -E 'python3?[[:space:]]+(-m[[:space:]]+)?scripts[./]dev_tools[./]parallel_(drift_detection|mutation_abandon)_cli' BASE_SHA -- .claude extensions/drm-copilot/resources/claude-customizations/.claude`,
       then `git status --porcelain -- .claude extensions/drm-copilot/resources/claude-customizations/.claude`.
@@ -832,12 +832,12 @@ Each item was observed in this repository's recorded runs or read from source, n
       bundle tree at BASE_SHA), which proves the pattern matches the pre-change invocations; the
       porcelain status prints nothing, so the tracked-file search saw every file. This is the tracked
       equivalent of the spec's ripgrep command.
-- [ ] [P6-T4] AC16 retained Python reference: confirm `scripts/dev_tools/parallel_drift_detection_cli.py`, `scripts/dev_tools/parallel_mutation_abandon_cli.py`, and their modules remain, and run their suites.
+- [x] [P6-T4] AC16 retained Python reference: confirm `scripts/dev_tools/parallel_drift_detection_cli.py`, `scripts/dev_tools/parallel_mutation_abandon_cli.py`, and their modules remain, and run their suites.
       Commands: CMD-GIT-LS over `scripts/dev_tools/parallel_drift_detection_cli.py scripts/dev_tools/parallel_mutation_abandon_cli.py scripts/dev_tools/parallel_drift_detection.py scripts/dev_tools/parallel_drift_halt.py scripts/dev_tools/parallel_drift_resolution.py scripts/dev_tools/_parallel_drift_cli_io.py scripts/dev_tools/_parallel_drift_scheduling.py scripts/dev_tools/_parallel_drift_shape.py scripts/dev_tools/_parallel_state_common.py`,
       then CMD-PY-TEST over `tests/scripts/dev_tools/test_parallel_drift_detection_cli.py tests/scripts/dev_tools/test_parallel_drift_detection_cli_halt.py tests/scripts/dev_tools/test_parallel_mutation_abandon_cli.py tests/scripts/dev_tools/test_parallel_mutation_protocol.py`.
       Write FEATURE/evidence/qa-gates/ac16-python-reference.TS.md. Acceptance: CMD-GIT-LS prints all nine
       paths; pytest exits 0 with no FAILED line.
-- [ ] [P6-T5] AC1 and AC8 PowerShell gates for `tests/scripts/claude-hooks` and `tests/scripts/claude-runtime`, written to FEATURE/evidence/qa-gates/ac1-ac8-pester.TS.md.
+- [x] [P6-T5] AC1 and AC8 PowerShell gates for `tests/scripts/claude-hooks` and `tests/scripts/claude-runtime`, written to FEATURE/evidence/qa-gates/ac1-ac8-pester.TS.md.
       Commands: CMD-PESTER with `tests/scripts/claude-hooks tests/scripts/claude-runtime`, then CMD-JUNIT
       with suffixes `tests/scripts/claude-hooks/enforce-parallel-abandon-gate.Tests.ps1`,
       `tests/scripts/claude-hooks/enforce-parallel-abandon-gate.TriggerScoping.Tests.ps1`, and
@@ -847,21 +847,21 @@ Each item was observed in this repository's recorded runs or read from source, n
       `enumerates only the two guarded roots and never the bundled mirror` appear with
       `status=Passed` (the scan now includes the three `.claude/lib/parallel-drift` files); every
       `JUNIT-FAILED` line is a member of the P0-T19 baseline failure set.
-- [ ] [P6-T6] AC8 comment-only diff of `.claude/hooks/enforce-parallel-abandon-gate.ps1`, written to FEATURE/evidence/qa-gates/ac8-hook-diff.TS.md.
+- [x] [P6-T6] AC8 comment-only diff of `.claude/hooks/enforce-parallel-abandon-gate.ps1`, written to FEATURE/evidence/qa-gates/ac8-hook-diff.TS.md.
       Command: `git diff -U0 BASE_SHA -- .claude/hooks/enforce-parallel-abandon-gate.ps1`. Acceptance:
       exactly one hunk, whose header begins `@@ -28,4 +28,4 @@`; every removed and added line lies inside the
       `<# ... #>` comment block that ends on line 32; no removed or added line contains `$script:`.
       Together with the P4-T13 seam results (each token literal stated exactly once in the hook, the
       hook pair equal to the CLI pair), this shows the `$script:AbandonDispositionToken` and
       `$script:AbandonConfirmToken` assignment lines (41 and 42) are unchanged.
-- [ ] [P6-T7] AC11 agent diff of `.claude/agents/parallel-orchestrator.md`, written to FEATURE/evidence/qa-gates/ac11-agent-diff.TS.md.
+- [x] [P6-T7] AC11 agent diff of `.claude/agents/parallel-orchestrator.md`, written to FEATURE/evidence/qa-gates/ac11-agent-diff.TS.md.
       Commands: `git diff -U0 BASE_SHA -- .claude/agents/parallel-orchestrator.md`, then CMD-SH with
       script surface-token-count (A20). Acceptance: no removed line contains `Bash(poetry run python -m *)`;
       among the added lines, those beginning `  - "Bash(` are exactly the two entries at Appendix B24a
       positions 8 and 10, and no removed line begins `  - "Bash(`; A20 prints
       `COUNT T3 .claude/agents/parallel-orchestrator.md 1`, `COUNT T4 .claude/agents/parallel-orchestrator.md 1`,
       and `COUNT T5 .claude/agents/parallel-orchestrator.md 1`.
-- [ ] [P6-T8] AC17 scope check against BASE_SHA over the tree, including `.claude/settings.json`, written to FEATURE/evidence/qa-gates/ac17-scope.TS.md.
+- [x] [P6-T8] AC17 scope check against BASE_SHA over the tree, including `.claude/settings.json`, written to FEATURE/evidence/qa-gates/ac17-scope.TS.md.
       Commands: `git diff --name-only BASE_SHA HEAD`, then `git status --porcelain`. Acceptance: the
       name-only list contains none of `.claude/hooks/enforce-powershell-batch-budget.ps1`,
       `tests/scripts/claude-hooks/enforce-powershell-batch-budget.Tests.ps1`,
@@ -871,7 +871,7 @@ Each item was observed in this repository's recorded runs or read from source, n
       status lists only paths under FEATURE (this phase's uncommitted evidence under FEATURE/evidence
       and the checklist file FEATURE/plan.2026-09-29T14-14.md). The artifact records the full name-only
       list.
-- [ ] [P6-T9] AC17 temporary-file sweep over every new or changed test file and shim (`tests/shell/parallel_abandon.bats` and the others listed), written to FEATURE/evidence/qa-gates/ac17-no-temp.TS.md.
+- [x] [P6-T9] AC17 temporary-file sweep over every new or changed test file and shim (`tests/shell/parallel_abandon.bats` and the others listed), written to FEATURE/evidence/qa-gates/ac17-no-temp.TS.md.
       Commands: CMD-SH with script no-temp-sweep (A17) over `tests/shell/parallel_abandon.bats tests/shell/parallel_abandon_parity.bats tests/shell/parallel_payload_only.bats tests/shell/parallel_bash_manifest_membership.bats tests/scripts/dev_tools/test_parallel_drift_parity.py tests/scripts/dev_tools/test_parallel_abandon_bash_parity.py tests/scripts/dev_tools/test_parallel_abandon_token_seam.py tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py tests/scripts/dev_tools/test_skill_bundle_contract_cli.py tests/scripts/claude-lib/parallel-drift/ParallelDriftHalt.Tests.ps1 tests/scripts/claude-lib/parallel-drift/ParallelDrift.Tests.ps1 tests/scripts/claude-lib/parallel-drift/ParallelDrift.Manifest.Tests.ps1 tests/scripts/claude-lib/parallel-drift/Invoke-ParallelDriftDetection.Tests.ps1 tests/scripts/claude-lib/parallel-drift/ParallelDrift.Parity.Tests.ps1 tests/fixtures/parallel_abandon_path/gh tests/fixtures/parallel_abandon_path/git`,
       then the negative control: the same script over `FEATURE/plan.2026-09-29T14-14.md`. Acceptance: the
       first run prints no match line and ends with `SWEEP-EXIT=1`; the control prints at least one match
@@ -880,7 +880,7 @@ Each item was observed in this repository's recorded runs or read from source, n
 
 ### Phase 7 — Final QA Loop: Bash (shfmt, shellcheck, bats)
 
-- [ ] [P7-T1] Format `.claude/lib/bash/abandon-parallel-item.sh` and the three shims under `tests/fixtures/parallel_abandon_path`.
+- [x] [P7-T1] Format `.claude/lib/bash/abandon-parallel-item.sh` and the three shims under `tests/fixtures/parallel_abandon_path`.
       Commands: `git status --porcelain` (before), CMD-SH with script shell-format (A13),
       `git status --porcelain` (after), CMD-SH with script shell-lint (A12). Write
       FEATURE/evidence/qa-gates/shell-format.TS.md. Acceptance: A13 prints `SHFMT-WRITE-EXIT=0`; the two
@@ -890,10 +890,10 @@ Each item was observed in this repository's recorded runs or read from source, n
       `cp BASHLIB/abandon-parallel-item.sh BUNDLEBASHLIB/` and confirm with script mirror-check (A5)
       over `BASHLIB/abandon-parallel-item.sh` that it prints `diff=0`; commit the rewrite together with
       that mirror and restart this loop.
-- [ ] [P7-T2] Lint `.claude/lib/bash/abandon-parallel-item.sh` and the three shims with shellcheck.
+- [x] [P7-T2] Lint `.claude/lib/bash/abandon-parallel-item.sh` and the three shims with shellcheck.
       Command: CMD-SH with script shell-lint (A12). Write FEATURE/evidence/qa-gates/shell-lint.TS.md.
       Acceptance: exit 0 and `SHELLCHECK-EXIT=0` with no diagnostic line.
-- [ ] [P7-T3] Test the four bats suites locally: `tests/shell/parallel_abandon.bats`, `tests/shell/parallel_payload_only.bats`, `tests/shell/parallel_bash_manifest_membership.bats`, then the parity suite.
+- [x] [P7-T3] Test the four bats suites locally: `tests/shell/parallel_abandon.bats`, `tests/shell/parallel_payload_only.bats`, `tests/shell/parallel_bash_manifest_membership.bats`, then the parity suite.
       Commands: CMD-BATS over the first three files, then CMD-SH with script bats-parity-local (A23).
       Write FEATURE/evidence/qa-gates/shell-test-local.TS.md. Acceptance: the first run satisfies the
       P5-T10 rule; the parity run satisfies the P2-T15 rule (including its authorized environment
@@ -902,10 +902,10 @@ Each item was observed in this repository's recorded runs or read from source, n
 
 ### Phase 8 — Final QA Loop: PowerShell (PoshQC, PSScriptAnalyzer, Pester)
 
-- [ ] [P8-T1] Reset the PowerShell batch budget before any QA-loop fix under `.claude/lib/parallel-drift`: CMD-PS with script reset-batch-budget (A8) and `-Kind powershell`.
+- [x] [P8-T1] Reset the PowerShell batch budget before any QA-loop fix under `.claude/lib/parallel-drift`: CMD-PS with script reset-batch-budget (A8) and `-Kind powershell`.
       Write FEATURE/evidence/other/batch-budget-reset-p8.TS.md. Acceptance: exit 0 and a
       `RESET removed=` line.
-- [ ] [P8-T2] Format the PowerShell files of Appendix C4 (starting with `.claude/lib/parallel-drift/ParallelDrift.psm1`).
+- [x] [P8-T2] Format the PowerShell files of Appendix C4 (starting with `.claude/lib/parallel-drift/ParallelDrift.psm1`).
       Commands: CMD-SH with script file-hashes (A5b) over the C4 files (before); `git status --porcelain`
       (before); MCP-PS-FORMAT with scan_folders `.claude/lib/parallel-drift`,
       `tests/scripts/claude-lib/parallel-drift`, `.claude/hooks`, `scripts/powershell/PoshQC/settings`
@@ -920,16 +920,16 @@ Each item was observed in this repository's recorded runs or read from source, n
       path is a C4 member, the formatter rewrote an in-scope file: copy each rewritten file that has a
       BUNDLE or PSBUNDLE mirror to that mirror with `cp`, confirm with script mirror-check (A5) that it
       prints `diff=0`, commit the rewrite together with those mirrors, and restart this loop.
-- [ ] [P8-T3] Analyze the Appendix C4 PowerShell files (starting with `.claude/lib/parallel-drift/ParallelDrift.psm1`).
+- [x] [P8-T3] Analyze the Appendix C4 PowerShell files (starting with `.claude/lib/parallel-drift/ParallelDrift.psm1`).
       Commands: MCP-PS-ANALYZE with the P8-T2 scan_folders (route-compliance step), then CMD-PS with
       script pssa-count (A9) over the C4 files. Write FEATURE/evidence/qa-gates/powershell-analyze.TS.md.
       Acceptance: the MCP call returns without raising and A9 prints `PSSA-SUMMARY DiagnosticCount=0`.
-- [ ] [P8-T4] Route-compliance run of the MCP Pester tool over `tests/scripts/claude-lib/parallel-drift`.
+- [x] [P8-T4] Route-compliance run of the MCP Pester tool over `tests/scripts/claude-lib/parallel-drift`.
       Command: MCP-PS-TEST with scan_folders `tests/scripts/claude-lib/parallel-drift`. Write
       FEATURE/evidence/qa-gates/powershell-mcp-test-route.TS.md. Acceptance: the call returns without
       raising and the artifact quotes its summary string. No count, coverage, or pass value is read from
       it (the MCP tool reads the installed extension's runsettings); P8-T5 overwrites its XML outputs.
-- [ ] [P8-T5] Test with coverage for `.claude/lib/parallel-drift` and regression over `tests/scripts/claude-lib`, `tests/scripts/claude-hooks`, and `tests/scripts/claude-runtime`, written to FEATURE/evidence/qa-gates/powershell-test-coverage.TS.md.
+- [x] [P8-T5] Test with coverage for `.claude/lib/parallel-drift` and regression over `tests/scripts/claude-lib`, `tests/scripts/claude-hooks`, and `tests/scripts/claude-runtime`, written to FEATURE/evidence/qa-gates/powershell-test-coverage.TS.md.
       Commands: CMD-PESTER with `tests/scripts/claude-lib tests/scripts/claude-hooks tests/scripts/claude-runtime`;
       CMD-JUNIT with the five parallel-drift suffixes of P3-T20, the three suffixes of P6-T5, and
       `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` (the module convention suite that
@@ -942,20 +942,20 @@ Each item was observed in this repository's recorded runs or read from source, n
 
 ### Phase 9 — Final QA Loop: Python (black, ruff, pyright, pytest with coverage)
 
-- [ ] [P9-T1] Reset the Python batch budget before any QA-loop fix under `scripts/dev_tools`: CMD-PS with script reset-batch-budget (A8) and `-Kind python`.
+- [x] [P9-T1] Reset the Python batch budget before any QA-loop fix under `scripts/dev_tools`: CMD-PS with script reset-batch-budget (A8) and `-Kind python`.
       Write FEATURE/evidence/other/batch-budget-reset-p9.TS.md. Acceptance: exit 0 and a
       `RESET removed=` line.
-- [ ] [P9-T2] Format the seven Python files of Appendix C5 (starting with `scripts/dev_tools/skill_bundle_contract.py`).
+- [x] [P9-T2] Format the seven Python files of Appendix C5 (starting with `scripts/dev_tools/skill_bundle_contract.py`).
       Commands: `git status --porcelain` (before), CMD-PY-BLACK over the C5 files, `git status --porcelain`
       (after). Write FEATURE/evidence/qa-gates/python-format.TS.md. Acceptance: black exits 0 and prints
       "7 files left unchanged." with no "reformatted" line, and the two porcelain outputs are identical.
-- [ ] [P9-T3] Lint the seven C5 Python files (starting with `scripts/dev_tools/skill_bundle_contract.py`).
+- [x] [P9-T3] Lint the seven C5 Python files (starting with `scripts/dev_tools/skill_bundle_contract.py`).
       Command: CMD-PY-RUFF over the C5 files. Write FEATURE/evidence/qa-gates/python-lint.TS.md.
       Acceptance: exit 0 and "All checks passed!".
-- [ ] [P9-T4] Type-check the seven C5 Python files (starting with `scripts/dev_tools/skill_bundle_contract.py`).
+- [x] [P9-T4] Type-check the seven C5 Python files (starting with `scripts/dev_tools/skill_bundle_contract.py`).
       Command: CMD-PY-PYRIGHT over the C5 files. Write FEATURE/evidence/qa-gates/python-typecheck.TS.md.
       Acceptance: exit 0 and a summary line beginning "0 errors".
-- [ ] [P9-T5] Test with coverage for `scripts/dev_tools/skill_bundle_contract.py` and `scripts/dev_tools/skill_bundle_contract_cli.py`, written to FEATURE/evidence/qa-gates/python-test-coverage.TS.md.
+- [x] [P9-T5] Test with coverage for `scripts/dev_tools/skill_bundle_contract.py` and `scripts/dev_tools/skill_bundle_contract_cli.py`, written to FEATURE/evidence/qa-gates/python-test-coverage.TS.md.
       Commands: `poetry run pytest -v tests/scripts/dev_tools/test_skill_bundle_contract.py tests/scripts/dev_tools/test_skill_bundle_contract_evaluation.py tests/scripts/dev_tools/test_skill_bundle_contract_cli.py tests/scripts/dev_tools/test_skill_bundle_contract_repo.py --cov=scripts.dev_tools.skill_bundle_contract --cov=scripts.dev_tools.skill_bundle_contract_cli --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/cov-763-final.json`,
       then CMD-PY-SCRIPT with script py-cov-files (A7) and arguments
       `SCRATCH/cov-763-final.json scripts/dev_tools/skill_bundle_contract.py scripts/dev_tools/skill_bundle_contract_cli.py`,
@@ -965,13 +965,13 @@ Each item was observed in this repository's recorded runs or read from source, n
       PASSED (the stale-exception branch is executed); A7 prints `LinePercent=` at least 85 and
       `BranchPercent=` at least 75 for each module, each line percent at least its P0-T15 value; A19
       prints `UncoveredChangedLines=0` for both modules.
-- [ ] [P9-T6] Python regression over `tests/scripts/dev_tools`, written to FEATURE/evidence/qa-gates/python-regression.TS.md.
+- [x] [P9-T6] Python regression over `tests/scripts/dev_tools`, written to FEATURE/evidence/qa-gates/python-regression.TS.md.
       Commands: CMD-PY-TEST over the named set of Appendix C3 plus `tests/scripts/dev_tools/test_parallel_drift_parity.py`
       and `tests/scripts/dev_tools/test_parallel_abandon_bash_parity.py`, then
       `poetry run pytest tests/scripts/dev_tools -q`. Acceptance: every named-set node is PASSED except
       KL-510, recorded with its KL-510 line; every `FAILED` line of the full run is a member of the
       P0-T16 baseline failure set or is the KL-510 node in case (b).
-- [ ] [P9-T7] File-size limit check for every new or changed code, test, script, and fixture-harness file (starting with `.claude/lib/parallel-drift/ParallelDrift.psm1`), written to FEATURE/evidence/qa-gates/line-counts-final.TS.md.
+- [x] [P9-T7] File-size limit check for every new or changed code, test, script, and fixture-harness file (starting with `.claude/lib/parallel-drift/ParallelDrift.psm1`), written to FEATURE/evidence/qa-gates/line-counts-final.TS.md.
       Command: CMD-SH with script line-counts (A22) over the C5 files, the C4 files,
       `BASHLIB/abandon-parallel-item.sh`, `tests/shell/parallel_abandon.bats`,
       `tests/shell/parallel_abandon_parity.bats`, `tests/shell/parallel_payload_only.bats`, and
@@ -981,7 +981,7 @@ Each item was observed in this repository's recorded runs or read from source, n
 
 ### Phase 10 — Final QA Loop: TypeScript (Jest regression)
 
-- [ ] [P10-T1] TypeScript push-down regression for `extensions/drm-copilot/test/lib/push-down` (no TypeScript source or test file is changed; format, lint, and type-check have no changed input).
+- [x] [P10-T1] TypeScript push-down regression for `extensions/drm-copilot/test/lib/push-down` (no TypeScript source or test file is changed; format, lint, and type-check have no changed input).
       Command: CMD-TS-TEST. Write FEATURE/evidence/qa-gates/ts-push-down-jest.TS.md. Acceptance: every
       `FAIL ` line is a member of the P0-T23 baseline failure set; no `FAIL ` line names
       `claude-pack-manifest-completeness.test.ts`; the "Tests:" line records no more failed tests than
