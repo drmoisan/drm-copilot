@@ -198,8 +198,8 @@ def bash_token_pair() -> tuple[str, str]:
         declarations.
 
     Raises:
-        AssertionError: If any of the three named declarations is absent, which means the
-            script no longer declares its tokens where this seam can read them.
+        AssertionError: If any of the three named declarations is absent, which means
+            the script no longer declares its tokens where this seam can read them.
     """
 
     text = read_text(BASH_SCRIPT_PATH)
@@ -360,7 +360,7 @@ def test_bash_script_declares_a_non_empty_token_pair() -> None:
 
 
 def test_bash_token_pair_equals_the_cli_pair() -> None:
-    """The bundled entry point must declare exactly the tokens the Python CLI produces."""
+    """The bundled entry point must declare exactly the Python CLI's tokens."""
 
     assert bash_token_pair() == cli_token_pair(), (
         "the bash entry point's token pair must equal the Python reference's; a "
@@ -387,7 +387,7 @@ def test_skill_invocation_line_names_the_bash_script() -> None:
 
 
 def test_all_four_extractions_agree() -> None:
-    """The single binding assertion: CLI, bash script, hook, and SKILL carry one pair."""
+    """The single binding assertion: CLI, script, hook, and SKILL carry one pair."""
 
     cli_pair = cli_token_pair()
     hook_pair = hook_token_pair()
