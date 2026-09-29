@@ -133,7 +133,7 @@ Describe 'Codex enforce-powershell-batch-budget.ps1 large-path routing' {
             @{ Name = 'empty text'; Text = ''; Expected = $false }
             @{ Name = 'whitespace text'; Text = '   '; Expected = $false }
         ) {
-            Test-PowerShellBatchBudgetLargePathRoute -CheckpointText $Text | Should -Be $Expected
+            Test-BatchBudgetLargePathRoute -CheckpointText $Text | Should -Be $Expected
         }
     }
 
@@ -144,7 +144,7 @@ Describe 'Codex enforce-powershell-batch-budget.ps1 large-path routing' {
             @{ Text = '{"path_selected":"remediation"}'; Expected = 'remediation' }
             @{ Text = '{not-json'; Expected = '' }
         ) {
-            Get-PowerShellBatchBudgetSelectedRoute -CheckpointText $Text | Should -Be $Expected
+            Get-BatchBudgetSelectedRoute -CheckpointText $Text | Should -Be $Expected
         }
     }
 

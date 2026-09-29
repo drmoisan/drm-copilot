@@ -135,6 +135,7 @@
             '.codex/hooks/check-powershell-test-purity.ps1'
             '.codex/hooks/enforce-python-batch-budget.ps1'
             '.codex/hooks/enforce-powershell-batch-budget.ps1'
+            '.codex/hooks/enforce-batch-budget-route.ps1'
             '.codex/hooks/enforce-evidence-locations.ps1'
             '.codex/hooks/enforce-checkpoint-monotonic.ps1'
             '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'
