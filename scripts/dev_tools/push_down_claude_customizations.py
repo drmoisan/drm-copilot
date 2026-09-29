@@ -1,4 +1,4 @@
-"""Publish bundled `.claude` content into a destination workspace.
+"""Publish bundled `.claude` and `config/` content into a destination workspace.
 
 Purpose:
     Provide a dedicated public entry point for the Claude customization push-down
@@ -21,6 +21,14 @@ import argparse
 from pathlib import Path
 
 try:
+    from scripts.dev_tools.push_down_claude_blast_radius_derive import (
+        real_directory_lister,
+    )
+    from scripts.dev_tools.push_down_claude_destination_writes import (
+        BundleConfigFileSystem,
+        DirectoryLister,
+        build_destination_write_stack,
+    )
     from scripts.dev_tools.push_down_claude_filesystem import (
         AGENT_MEMORY_RELATIVE_ROOT,
         GENERAL_MEMORY_SCOPE,
@@ -41,6 +49,12 @@ try:
 except ModuleNotFoundError as error:  # pragma: no cover - bundled import fallback
     if error.name is None or not error.name.startswith("scripts"):
         raise
+    from dev_tools.push_down_claude_blast_radius_derive import real_directory_lister
+    from dev_tools.push_down_claude_destination_writes import (
+        BundleConfigFileSystem,
+        DirectoryLister,
+        build_destination_write_stack,
+    )
     from dev_tools.push_down_claude_filesystem import (
         AGENT_MEMORY_RELATIVE_ROOT,
         GENERAL_MEMORY_SCOPE,
@@ -98,7 +112,7 @@ except ModuleNotFoundError as error:
 
 ARTIFACT_DIRECTORY = "artifacts/claude-customizations"
 MODULE_ENTRY_POINT = "scripts.dev_tools.push_down_claude_customizations"
-ROOT_FOLDERS: tuple[Path, ...] = (Path(".claude"),)
+ROOT_FOLDERS: tuple[Path, ...] = (Path(".claude"), Path("config"))
 EXCLUDED_RELATIVE_PATHS: tuple[Path, ...] = (Path(".claude/settings.local.json"),)
 
 __all__ = [
@@ -196,14 +210,21 @@ def push_down_customizations(
     csharp_variant: CSharpVariant = "modern",
     memory_mode: MemoryMode = "overwrite",
     bundle_root: Path | None = None,
+    list_entries: DirectoryLister | None = None,
 ) -> PushDownSummary:
-    """Copy the `.claude` tree into the destination workspace.
+    """Copy the `.claude` and `config` trees into the destination workspace.
 
     Purpose:
         Publish the bundled `.claude` customizations into a destination
         workspace, optionally filtered to a set of language packs, optionally
         sourcing the C# toolchain from the legacy variant, and applying the
         selected agent-memory mode.
+
+        The `config/` tree is read from the bundle (``bundle_root / "config"``),
+        not from the source root, so repo-only configuration is never published.
+        `config/orchestration-routing.json` is merged into an existing
+        destination file and `config/blast-radius.json` is derived from the
+        destination layout, matching the TypeScript push-down.
 
     Args:
         repo_root (Path): Source repository root.
@@ -226,6 +247,9 @@ def push_down_customizations(
             ``source_root / BUNDLE_ROOT_RELATIVE_DIR`` (the repository CLI
             layout). The bundled template passes its ``claude-customizations``
             directory directly because its source root already is that bundle.
+        list_entries (DirectoryLister | None): Shallow directory lister used to
+            scan the destination for the blast-radius derivation. Defaults to
+            ``real_directory_lister``; tests inject an in-memory layout.
 
     Returns:
         PushDownSummary: The shared engine's run summary.
@@ -233,6 +257,11 @@ def push_down_customizations(
     Raises:
         ManifestError: When a selected manifest is missing/malformed or both C#
             variants are selected.
+        RoutingMergeError: When the destination or bundled routing document is
+            not a JSON object; the destination bytes are left unchanged.
+        BlastRadiusDeriveError: When the bundled blast-radius document is not
+            a JSON object.
+        BlastRadiusGuardError: When the derivation would emit a forbidden glob.
 
     Side Effects:
         Reads source files and writes destination files and the summary artifact
@@ -256,10 +285,19 @@ def push_down_customizations(
         fs=fs,
     )
 
-    # Wrap the caller-supplied adapter so enumeration omits excluded paths and
-    # honors the pack, variant, and memory-mode selections.
-    excluding_fs = ExcludingFileSystem(
+    # Destination writes pass through derive then merge (the single assembly
+    # point); source `config/` reads are answered from the bundle; enumeration
+    # then omits excluded paths and honors the pack, variant, and memory-mode
+    # selections on source-rooted paths.
+    write_stack = build_destination_write_stack(
         fs,
+        destination_root=destination_root,
+        lister=list_entries if list_entries is not None else real_directory_lister,
+    )
+    excluding_fs = ExcludingFileSystem(
+        BundleConfigFileSystem(
+            write_stack, source_root=effective_source, bundle_root=effective_bundle
+        ),
         repo_root,
         EXCLUDED_RELATIVE_PATHS,
         source_root=effective_source,
@@ -313,7 +351,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--destination",
         required=True,
-        help=("Destination workspace root that will receive the copied .claude tree."),
+        help=(
+            "Destination workspace root that will receive the copied .claude and "
+            "config trees."
+        ),
     )
     parser.add_argument(
         "--packs",
