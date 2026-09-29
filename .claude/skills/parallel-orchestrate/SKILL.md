@@ -277,6 +277,8 @@ Negative obligations on the prompt:
 Excluded from the prompt as parent-side concerns: the item's declared blast radius,
 `max_concurrency`, and `mode`. Keeping the prompt minimal preserves the child contract unchanged.
 
+The run gates `enforce-orchestration-preimplementation-gate.ps1`, `enforce-parallel-cohort-barrier.ps1`, and `enforce-parallel-drift-gate.ps1` locate the parallel checkpoint by the `parallel_slug:` value of the marker line. They select the single live worktree whose `artifacts/orchestration/parallel-orchestrator-state.json` records `route_id` `parallel` and that slug, and deny the delegation with `TARGET_WORKTREE_NOT_DERIVABLE` or `TARGET_WORKTREE_AMBIGUOUS` when none or more than one matches. The child run's own delegations to implementation agents carry the canonical issue-number line and `branch:` label defined in `.claude/skills/orchestrate/SKILL.md` `## Issue Number Consistency`.
+
 ## Model Selection
 
 When `parallel-orchestrator` delegates an item to `Agent(orchestrator)`, the prompt appends the
