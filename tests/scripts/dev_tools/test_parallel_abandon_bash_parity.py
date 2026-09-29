@@ -116,7 +116,9 @@ class _RecordingRunner:
         calls (list[list[str]]): The recorded argument vectors, in call order.
     """
 
-    def __init__(self, shim_exit: dict[str, int], missing_executable: str | None) -> None:
+    def __init__(
+        self, shim_exit: dict[str, int], missing_executable: str | None
+    ) -> None:
         """Store the per-executable exit codes and the unresolvable executable.
 
         Args:
