@@ -1,22 +1,24 @@
 """Cross-artifact seam test binding the parallel abandon token pair.
 
 Why this test exists:
-    The abandon token pair is PRODUCED by the abandon CLI module
-    ``scripts/dev_tools/parallel_mutation_abandon_cli.py`` and by the documented
-    invocation line in ``.claude/skills/parallel-remove/SKILL.md``, and CONSUMED by
-    ``.claude/hooks/enforce-parallel-abandon-gate.ps1``. Per-side
-    coverage is blind to divergence between them: every side can reach 100% coverage
-    while tested against its own copy of the token, so a rename on one side alone would
-    ship a silently dead gate that never matches the command it is meant to guard.
+    The abandon token pair is PRODUCED by the bundled entry point
+    ``.claude/lib/bash/abandon-parallel-item.sh`` (issue #763), by the Python CLI it
+    ports, ``scripts/dev_tools/parallel_mutation_abandon_cli.py`` (the retained parity
+    reference), and by the documented invocation line in
+    ``.claude/skills/parallel-remove/SKILL.md``, and CONSUMED by
+    ``.claude/hooks/enforce-parallel-abandon-gate.ps1``. Per-side coverage is blind to
+    divergence between them: every side can reach 100% coverage while tested against
+    its own copy of the token, so a rename on one side alone would ship a silently dead
+    gate that never matches the command it is meant to guard.
 
 How it binds them:
-    Three independent extractions PARSE the counterpart artifacts at run time instead of
-    restating their content. The CLI's own constants are the single producer-side source
-    of truth; the hook's values are read out of its two named ``$script:`` assignments;
-    the SKILL's values are read out of its one documented invocation line. No token
-    value is hardcoded here as an expected value, so a rename in one artifact
-    without the identical rename in the other two fails this test rather than
-    passing vacuously.
+    Four independent extractions PARSE the counterpart artifacts at run time instead of
+    restating their content. The Python CLI's constants are read from the module; the
+    bash entry point's values are read out of its three named ``readonly`` lines; the
+    hook's values are read out of its two named ``$script:`` assignments; the SKILL's
+    values are read out of its one documented invocation line. No token value is
+    hardcoded here as an expected value, so a rename in one artifact without the
+    identical rename in the others fails this test rather than passing vacuously.
 
     Each extraction is asserted non-empty before it is compared, so a parse that
     silently matched nothing fails loudly instead of satisfying a subset assertion.
@@ -35,18 +37,32 @@ from pathlib import Path
 import pytest
 
 from scripts.dev_tools import parallel_mutation_abandon_cli as cli
+from scripts.dev_tools.skill_bundle_contract import extract_script_references
 
 # Repo root, resolved from this module: tests/scripts/dev_tools/<file> is three
 # levels below it.
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
-# The two counterpart artifacts parsed as text. Path anchors are permitted literals.
+# The three counterpart artifacts parsed as text. Path anchors are permitted literals.
 HOOK_PATH = REPO_ROOT / ".claude" / "hooks" / "enforce-parallel-abandon-gate.ps1"
 SKILL_PATH = REPO_ROOT / ".claude" / "skills" / "parallel-remove" / "SKILL.md"
+BASH_SCRIPT_PATH = REPO_ROOT / ".claude" / "lib" / "bash" / "abandon-parallel-item.sh"
 
 # The anchor that locates the SKILL's documented invocation line. This is a file-name
 # anchor, not a token value.
-INVOCATION_ANCHOR = "parallel_mutation_abandon_cli.py"
+INVOCATION_ANCHOR = "abandon-parallel-item.sh"
+
+# The three named readonly declarations the bash entry point states its tokens in.
+# Only the CONSTANT NAMES appear here; the values are whatever the script holds.
+BASH_DISPOSITION_OPTION = re.compile(
+    r"^readonly ABANDON_DISPOSITION_OPTION='(?P<value>[^']+)'$", re.MULTILINE
+)
+BASH_DISPOSITION_VALUE = re.compile(
+    r"^readonly ABANDON_DISPOSITION_VALUE='(?P<value>[^']+)'$", re.MULTILINE
+)
+BASH_CONFIRM_OPTION = re.compile(
+    r"^readonly ABANDON_CONFIRM_OPTION='(?P<value>[^']+)'$", re.MULTILINE
+)
 
 # The two named script-scope assignments the hook declares its tokens in. Only the
 # CONSTANT NAMES appear here; the values are whatever the hook currently holds.
@@ -172,20 +188,44 @@ def hook_token_pair() -> tuple[str, str]:
     return (disposition.group("value"), confirm.group("value"))
 
 
+def bash_token_pair() -> tuple[str, str]:
+    """Extract the pushed-down producer's token pair from the bash entry point.
+
+    Returns:
+        tuple[str, str]: The disposition token, composed from the disposition option and
+        value constants exactly as the command line spells it, and the confirmation
+        token, taken from the right-hand side of the script's three named ``readonly``
+        declarations.
+
+    Raises:
+        AssertionError: If any of the three named declarations is absent, which means the
+            script no longer declares its tokens where this seam can read them.
+    """
+
+    text = read_text(BASH_SCRIPT_PATH)
+    option = BASH_DISPOSITION_OPTION.search(text)
+    value = BASH_DISPOSITION_VALUE.search(text)
+    confirm = BASH_CONFIRM_OPTION.search(text)
+    assert option is not None, "the script must declare ABANDON_DISPOSITION_OPTION"
+    assert value is not None, "the script must declare ABANDON_DISPOSITION_VALUE"
+    assert confirm is not None, "the script must declare ABANDON_CONFIRM_OPTION"
+    return (f"{option.group('value')} {value.group('value')}", confirm.group("value"))
+
+
 def skill_invocation_line() -> str:
     """Return the SKILL's single documented abandon invocation line.
 
     Returns:
-        str: The one line carrying the CLI file-name anchor together with at least one
-        option token. A line naming the CLI in prose carries no option token and is
-        therefore not selected.
+        str: The one line carrying the entry-point file-name anchor together with at
+        least one option token. A line naming the entry point in prose carries no option
+        token and is therefore not selected.
 
     Raises:
         AssertionError: If the SKILL carries no such line, or more than one, since
             either case makes the invocation impossible to parse deterministically.
     """
 
-    # Select by anchor AND option token: the SKILL mentions the module path in prose
+    # Select by anchor AND option token: the SKILL mentions the entry point in prose
     # too, and only the executable invocation carries option tokens.
     candidates = [
         line
@@ -310,7 +350,34 @@ def test_skill_documents_the_cli_token_pair() -> None:
     )
 
 
-def test_skill_invocation_line_names_the_cli_module() -> None:
+def test_bash_script_declares_a_non_empty_token_pair() -> None:
+    """The pushed-down producer's declarations must both carry a value."""
+
+    disposition, confirm = bash_token_pair()
+
+    assert disposition.strip(), "the script's disposition token must not be empty"
+    assert confirm.strip(), "the script's confirmation token must not be empty"
+
+
+def test_bash_token_pair_equals_the_cli_pair() -> None:
+    """The bundled entry point must declare exactly the tokens the Python CLI produces."""
+
+    assert bash_token_pair() == cli_token_pair(), (
+        "the bash entry point's token pair must equal the Python reference's; a "
+        "divergence means the port and its parity reference disagree on the command"
+    )
+
+
+def test_bash_token_pair_equals_the_hook_pair() -> None:
+    """The gate must match on exactly the tokens the bundled entry point accepts."""
+
+    assert bash_token_pair() == hook_token_pair(), (
+        "the bash entry point's token pair must equal the hook's; a divergence here "
+        "means the gate cannot match the invocation it is meant to guard"
+    )
+
+
+def test_skill_invocation_line_names_the_bash_script() -> None:
     """The parsed line must be the invocation, not an arbitrary option-bearing line."""
 
     line = skill_invocation_line()
@@ -319,12 +386,29 @@ def test_skill_invocation_line_names_the_cli_module() -> None:
     assert line.strip(), "the documented invocation line must not be blank"
 
 
-def test_all_three_extractions_agree() -> None:
-    """The single binding assertion: CLI, hook, and SKILL carry one token pair."""
+def test_all_four_extractions_agree() -> None:
+    """The single binding assertion: CLI, bash script, hook, and SKILL carry one pair."""
 
     cli_pair = cli_token_pair()
     hook_pair = hook_token_pair()
+    bash_pair = bash_token_pair()
     documented = skill_option_tokens()
 
-    assert cli_pair == hook_pair
+    assert cli_pair == hook_pair == bash_pair
     assert set(cli_pair) <= documented
+
+
+def test_bundle_guard_extracts_the_skill_invocation() -> None:
+    """The skill-bundle guard must see the invocation it is meant to check (DV9)."""
+
+    # Arrange
+    expected = ".claude/lib/bash/" + INVOCATION_ANCHOR
+
+    # Act
+    references = extract_script_references(read_text(SKILL_PATH))
+
+    # Assert
+    assert expected in references, (
+        f"extract_script_references must return {expected!r} for {SKILL_PATH.name}; "
+        f"it returned {references}"
+    )

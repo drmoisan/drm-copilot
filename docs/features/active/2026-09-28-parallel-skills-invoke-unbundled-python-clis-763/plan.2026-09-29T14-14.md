@@ -672,7 +672,7 @@ Each item was observed in this repository's recorded runs or read from source, n
 - [x] [P3-T22] Check the 500-line limit for `.claude/lib/parallel-drift` and `tests/scripts/claude-lib/parallel-drift`, written to FEATURE/evidence/qa-gates/drift-line-counts.TS.md.
       Command: CMD-SH with script line-counts (A22) over `.claude/lib/parallel-drift/*` and
       `tests/scripts/claude-lib/parallel-drift/*`. Acceptance: eight `LineCount=` lines, each at most 500.
-- [ ] [P3-T23] Commit and push Phase 3 (`.claude/lib/parallel-drift` and the files below).
+- [x] [P3-T23] Commit and push Phase 3 (`.claude/lib/parallel-drift` and the files below).
       Commands: CMD-GIT-ADD with `.claude/lib/parallel-drift tests/scripts/claude-lib/parallel-drift tests/fixtures/parallel_drift tests/fixtures/parallel_drift_cli tests/scripts/dev_tools/test_parallel_drift_parity.py docs/features/active/2026-09-28-parallel-skills-invoke-unbundled-python-clis-763`,
       CMD-GIT-LS-EOL over `.claude/lib/parallel-drift tests/scripts/claude-lib/parallel-drift tests/fixtures/parallel_drift tests/fixtures/parallel_drift_cli`,
       CMD-GIT-COMMIT with message "fix(763): port parallel drift detection to a bundled PowerShell entry point",
@@ -681,58 +681,58 @@ Each item was observed in this repository's recorded runs or read from source, n
 
 ### Phase 4 — Skill, Agent, Hook, and Token-Seam Surface Updates (AC7, AC8, AC9, AC10, AC11)
 
-- [ ] [P4-T1] Edit `.claude/skills/parallel-orchestrate/SKILL.md` lines 732-733 to the text of Appendix B22a (abandon citation).
+- [x] [P4-T1] Edit `.claude/skills/parallel-orchestrate/SKILL.md` lines 732-733 to the text of Appendix B22a (abandon citation).
       Acceptance: CMD-GIT-COUNT with literal `scripts/dev_tools/parallel_mutation_abandon_cli.py` over
       that file exits 1 with no output.
-- [ ] [P4-T2] Edit `.claude/skills/parallel-orchestrate/SKILL.md` lines 878-896 to the text of Appendix B22b (drift CLI invocation and argument surface).
+- [x] [P4-T2] Edit `.claude/skills/parallel-orchestrate/SKILL.md` lines 878-896 to the text of Appendix B22b (drift CLI invocation and argument surface).
       Acceptance: CMD-GIT-COUNT with literal `poetry run` over that file exits 1 with no output, and
       CMD-GIT-COUNT with literal `.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1` prints a
       count of 2.
-- [ ] [P4-T3] Edit `.claude/skills/parallel-orchestrate/SKILL.md` line 943 to the text of Appendix B22c (exit-status sentence).
+- [x] [P4-T3] Edit `.claude/skills/parallel-orchestrate/SKILL.md` line 943 to the text of Appendix B22c (exit-status sentence).
       Line 943 is the state after P4-T2 (line 933 at BASE_SHA; P4-T2 replaces 19 lines with 29); it is
       the line beginning "missing or malformed input, and argparse's". Anchor on that line-start text
       rather than on the number alone. Acceptance: CMD-GIT-COUNT with literal `argparse` over that file exits 1 with no output.
-- [ ] [P4-T4] Edit `.claude/skills/parallel-orchestrate/SKILL.md` line 972 to the text of Appendix B22d (halt-exclusion citation).
+- [x] [P4-T4] Edit `.claude/skills/parallel-orchestrate/SKILL.md` line 972 to the text of Appendix B22d (halt-exclusion citation).
       Line 972 is the state after P4-T2 and P4-T3 (line 961 at BASE_SHA; P4-T2 adds 10 lines and P4-T3
       adds 1); it is the line beginning "`halted_item_keys` in". Anchor on that line-start text rather
       than on the number alone. Acceptance: CMD-GIT-COUNT with literal `Get-ParallelDriftHaltedItemKey` over that file prints a
       count of 1.
-- [ ] [P4-T5] Edit `.claude/skills/parallel-remove/SKILL.md` lines 111-112 to the text of Appendix B23a (fence info string `shell` and the abandon invocation).
+- [x] [P4-T5] Edit `.claude/skills/parallel-remove/SKILL.md` lines 111-112 to the text of Appendix B23a (fence info string `shell` and the abandon invocation).
       Line 111 is the fence line beginning three spaces and three backticks followed by `bash`; line 112
       is the invocation line beginning "   poetry run python"; line 113 (the closing fence) is
       unchanged, and the line count of the file is unchanged. Acceptance: CMD-GIT-COUNT with literal
       `poetry run` over that file exits 1 with no output. That the guard extracts the new invocation is
       asserted by the B26 test `test_bundle_guard_extracts_the_skill_invocation` in P4-T13.
-- [ ] [P4-T6] Edit `.claude/skills/parallel-remove/SKILL.md` lines 149-156 to the text of Appendix B23b (token-seam prose).
+- [x] [P4-T6] Edit `.claude/skills/parallel-remove/SKILL.md` lines 149-156 to the text of Appendix B23b (token-seam prose).
       Acceptance: CMD-GIT-COUNT with literal `parses all four artifacts` over that file prints a count of 1.
-- [ ] [P4-T7] Edit the `tools` list of `.claude/agents/parallel-orchestrator.md` (lines 14-21) to the list of Appendix B24a.
+- [x] [P4-T7] Edit the `tools` list of `.claude/agents/parallel-orchestrator.md` (lines 14-21) to the list of Appendix B24a.
       Acceptance: CMD-SH with script surface-token-count (A20) prints `COUNT T3 .claude/agents/parallel-orchestrator.md 1`
       and `COUNT T4 .claude/agents/parallel-orchestrator.md 1` and `COUNT T5 .claude/agents/parallel-orchestrator.md 1`.
-- [ ] [P4-T8] Edit the prose of `.claude/agents/parallel-orchestrator.md` lines 98-104 to the text of Appendix B24b.
+- [x] [P4-T8] Edit the prose of `.claude/agents/parallel-orchestrator.md` lines 98-104 to the text of Appendix B24b.
       Lines 98-104 are the state after P4-T7 inserts two `tools` entries (lines 96-102 at BASE_SHA); the
       block is the paragraph beginning "The `poetry run` grants remain" and ending with the line
       "`.claude/agents/parallel-planner.md` records the same destination-runtime posture.". Acceptance: CMD-GIT-COUNT with literal `exactly one named consumer is left` over that file exits 1
       with no output, and CMD-GIT-COUNT with literal `no skill step names a` prints a count of 1.
-- [ ] [P4-T9] Reset the PowerShell batch budget before editing `.claude/hooks/enforce-parallel-abandon-gate.ps1`: CMD-PS with script reset-batch-budget (A8) and `-Kind powershell`.
+- [x] [P4-T9] Reset the PowerShell batch budget before editing `.claude/hooks/enforce-parallel-abandon-gate.ps1`: CMD-PS with script reset-batch-budget (A8) and `-Kind powershell`.
       Write FEATURE/evidence/other/batch-budget-reset-p4a.TS.md. Acceptance: exit 0 and a
       `RESET removed=` line.
-- [ ] [P4-T10] Edit the `.NOTES` comment of `.claude/hooks/enforce-parallel-abandon-gate.ps1` lines 28-31 to the text of Appendix B25 (comment only; line count unchanged).
+- [x] [P4-T10] Edit the `.NOTES` comment of `.claude/hooks/enforce-parallel-abandon-gate.ps1` lines 28-31 to the text of Appendix B25 (comment only; line count unchanged).
       Acceptance: CMD-GIT-COUNT with literal `abandon-parallel-item.sh` over that file prints a count of
       1, and CMD-SH with script line-counts (A22) over the file prints the same `LineCount=` value as
       P0-T10.
-- [ ] [P4-T11] Reset the Python batch budget before editing `tests/scripts/dev_tools/test_parallel_abandon_token_seam.py`: CMD-PS with script reset-batch-budget (A8) and `-Kind python`.
+- [x] [P4-T11] Reset the Python batch budget before editing `tests/scripts/dev_tools/test_parallel_abandon_token_seam.py`: CMD-PS with script reset-batch-budget (A8) and `-Kind python`.
       Write FEATURE/evidence/other/batch-budget-reset-p4b.TS.md. Acceptance: exit 0 and a
       `RESET removed=` line.
-- [ ] [P4-T12] Edit `tests/scripts/dev_tools/test_parallel_abandon_token_seam.py` per Appendix B26 (anchor `abandon-parallel-item.sh`, bash-constant producer side).
+- [x] [P4-T12] Edit `tests/scripts/dev_tools/test_parallel_abandon_token_seam.py` per Appendix B26 (anchor `abandon-parallel-item.sh`, bash-constant producer side).
       Acceptance: CMD-GIT-COUNT with literal `INVOCATION_ANCHOR = "abandon-parallel-item.sh"` over that
       file prints a count of 1.
-- [ ] [P4-T13] Run the seam test `tests/scripts/dev_tools/test_parallel_abandon_token_seam.py`.
+- [x] [P4-T13] Run the seam test `tests/scripts/dev_tools/test_parallel_abandon_token_seam.py`.
       Command: CMD-PY-TEST over that file. Write FEATURE/evidence/regression-testing/abandon-token-seam.TS.md.
       Acceptance: exit 0, no FAILED line, and every B26 test name appears on a PASSED line (including
       both `test_hook_states_each_token_exactly_once[...]` nodes, `test_bash_token_pair_equals_the_cli_pair`,
       `test_bash_token_pair_equals_the_hook_pair`, `test_skill_invocation_line_names_the_bash_script`,
       `test_all_four_extractions_agree`, and `test_bundle_guard_extracts_the_skill_invocation`).
-- [ ] [P4-T14] Count the new surface tokens in `.claude/skills/parallel-orchestrate/SKILL.md`, `.claude/skills/parallel-remove/SKILL.md`, and `.claude/agents/parallel-orchestrator.md`.
+- [x] [P4-T14] Count the new surface tokens in `.claude/skills/parallel-orchestrate/SKILL.md`, `.claude/skills/parallel-remove/SKILL.md`, and `.claude/agents/parallel-orchestrator.md`.
       Command: CMD-SH with script surface-token-count (A20). Write
       FEATURE/evidence/regression-testing/surface-tokens.TS.md. Acceptance: exit 0 and the five repo
       lines `COUNT T1 .claude/skills/parallel-orchestrate/SKILL.md 1`,
@@ -740,7 +740,7 @@ Each item was observed in this repository's recorded runs or read from source, n
       `COUNT T4 .claude/agents/parallel-orchestrator.md 1`, `COUNT T5 .claude/agents/parallel-orchestrator.md 1`,
       and `COUNT T6 .claude/skills/parallel-orchestrate/SKILL.md 0` and
       `COUNT T6 .claude/skills/parallel-remove/SKILL.md 0` (bundle lines are checked after P5-T3).
-- [ ] [P4-T15] Run the surface contract suite `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py` (pinned sixteen `##` headings).
+- [x] [P4-T15] Run the surface contract suite `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py` (pinned sixteen `##` headings).
       Command: CMD-PY-TEST over that file. Write FEATURE/evidence/regression-testing/surface-contracts.TS.md.
       Acceptance: exit 0, no FAILED line, and
       `test_orchestrate_skill_first_thirteen_headings_match_required_layout` PASSED.
