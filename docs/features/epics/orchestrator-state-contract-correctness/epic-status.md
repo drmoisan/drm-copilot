@@ -6,7 +6,7 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 - Integration branch: `epic/orchestrator-state-contract-correctness-integration`
 - Current wave: 0
 - HOLD (quota, from 12:27Z): no new launches until RESUME; running children continue.
-- Next step: #405 PR #800 blocked by repo-wide NPM Audit Gate failure (new brace-expansion and fast-uri advisories); awaiting decision. #464 executing. Wave 1 waits on wave-0 merges.
+- Next step: PRs #800 (#405) and #801 (#464) parked awaiting the main-branch npm override fix (coordinator decision 12:50Z). After the fix: merge origin/main into the integration branch and each child, re-dispatch ci.yml, merge on green. Wave 1 waits on wave-0 merges.
 - Last updated: 2026-09-30T11:10:59Z
 
 ## Features
