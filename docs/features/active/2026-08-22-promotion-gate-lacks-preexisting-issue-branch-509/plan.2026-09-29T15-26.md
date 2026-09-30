@@ -402,127 +402,127 @@ Batch B2 (python-typed-engineer) starts here. The regression file imports only `
 
 Each fixture follows "Parity corpus construction rule". Checkpoint `route_id` is `large` unless stated.
 
-- [ ] [P4-T1] Create `tests/fixtures/orchestrator_state_issue_adoption/valid-large-waives-potential-to-issue.json`.
+- [x] [P4-T1] Create `tests/fixtures/orchestrator_state_issue_adoption/valid-large-waives-potential-to-issue.json`.
   - Case: adoption `A`; receipts lack `potential_to_issue`. `expected_errors`: `[]`.
   - Acceptance: the file parses as JSON, carries the four keys, and `name` equals its stem; P4-T31 confirms `expected_errors`.
 
-- [ ] [P4-T2] Create `tests/fixtures/orchestrator_state_issue_adoption/valid-large-waives-feature-entry-tool-with-record.json`.
+- [x] [P4-T2] Create `tests/fixtures/orchestrator_state_issue_adoption/valid-large-waives-feature-entry-tool-with-record.json`.
   - Case: `waived_tools` `["potential_to_issue","new_potential_entry"]` plus the valid record; receipts lack both. `expected_errors`: `[]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T3] Create `tests/fixtures/orchestrator_state_issue_adoption/valid-bug-large-waives-bug-entry-tool-with-record.json`.
+- [x] [P4-T3] Create `tests/fixtures/orchestrator_state_issue_adoption/valid-bug-large-waives-bug-entry-tool-with-record.json`.
   - Case: `promotion-type` `"bug"`, declared bug tools, `waived_tools` `["potential_to_issue","new_potential_bug_entry"]` plus the valid record; receipts lack both. `expected_errors`: `[]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T4] Create `tests/fixtures/orchestrator_state_issue_adoption/valid-preparation-waives-potential-to-issue.json`.
+- [x] [P4-T4] Create `tests/fixtures/orchestrator_state_issue_adoption/valid-preparation-waives-potential-to-issue.json`.
   - Case: route `preparation`, adoption `A`; receipts lack `potential_to_issue`. `expected_errors`: `[]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T5] Create `tests/fixtures/orchestrator_state_issue_adoption/absent-key-large-missing-receipt.json`.
+- [x] [P4-T5] Create `tests/fixtures/orchestrator_state_issue_adoption/absent-key-large-missing-receipt.json`.
   - Case: no `issue_adoption` key; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue)]`.
   - Acceptance: as P4-T1, and the checkpoint has no `issue_adoption` key.
 
-- [ ] [P4-T6] Create `tests/fixtures/orchestrator_state_issue_adoption/null-adoption.json`.
+- [x] [P4-T6] Create `tests/fixtures/orchestrator_state_issue_adoption/null-adoption.json`.
   - Case: `issue_adoption` is JSON `null`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E1]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T7] Create `tests/fixtures/orchestrator_state_issue_adoption/non-object-adoption-string.json`.
+- [x] [P4-T7] Create `tests/fixtures/orchestrator_state_issue_adoption/non-object-adoption-string.json`.
   - Case: `issue_adoption` is the string `"adopted"`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E1]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T8] Create `tests/fixtures/orchestrator_state_issue_adoption/integer-issue-num.json`.
+- [x] [P4-T8] Create `tests/fixtures/orchestrator_state_issue_adoption/integer-issue-num.json`.
   - Case: `A` with `issue_num` the JSON integer `509`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E2a, E3]`.
   - Acceptance: as P4-T1, and `issue_num` is a JSON number.
 
-- [ ] [P4-T9] Create `tests/fixtures/orchestrator_state_issue_adoption/leading-zero-issue-num.json`.
+- [x] [P4-T9] Create `tests/fixtures/orchestrator_state_issue_adoption/leading-zero-issue-num.json`.
   - Case: `A` with `issue_num` `"0509"` and `issue_url` ending `/issues/0509`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E2a, E3]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T10] Create `tests/fixtures/orchestrator_state_issue_adoption/issue-num-mismatch.json`.
+- [x] [P4-T10] Create `tests/fixtures/orchestrator_state_issue_adoption/issue-num-mismatch.json`.
   - Case: `A` with `issue_num` `"510"` and `issue_url` ending `/issues/510`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E2b]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T11] Create `tests/fixtures/orchestrator_state_issue_adoption/issue-url-mismatch.json`.
+- [x] [P4-T11] Create `tests/fixtures/orchestrator_state_issue_adoption/issue-url-mismatch.json`.
   - Case: `A` with `issue_url` `"https://github.com/drmoisan/drm-copilot/issues/510"`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E3]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T12] Create `tests/fixtures/orchestrator_state_issue_adoption/unknown-origin.json`.
+- [x] [P4-T12] Create `tests/fixtures/orchestrator_state_issue_adoption/unknown-origin.json`.
   - Case: `A` with `origin` `"imported"`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E4]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T13] Create `tests/fixtures/orchestrator_state_issue_adoption/unknown-verified-via.json`.
+- [x] [P4-T13] Create `tests/fixtures/orchestrator_state_issue_adoption/unknown-verified-via.json`.
   - Case: `A` with `verified_via` `"curl"`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E5]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T14] Create `tests/fixtures/orchestrator_state_issue_adoption/blank-verified-at.json`.
+- [x] [P4-T14] Create `tests/fixtures/orchestrator_state_issue_adoption/blank-verified-at.json`.
   - Case: `A` with `verified_at` `"   "` (three spaces); receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E6]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T15] Create `tests/fixtures/orchestrator_state_issue_adoption/blank-evidence.json`.
+- [x] [P4-T15] Create `tests/fixtures/orchestrator_state_issue_adoption/blank-evidence.json`.
   - Case: `A` with `evidence` `""`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E7]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T16] Create `tests/fixtures/orchestrator_state_issue_adoption/empty-waived-tools.json`.
+- [x] [P4-T16] Create `tests/fixtures/orchestrator_state_issue_adoption/empty-waived-tools.json`.
   - Case: `A` with `waived_tools` `[]`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E8a]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T17] Create `tests/fixtures/orchestrator_state_issue_adoption/non-list-waived-tools.json`.
+- [x] [P4-T17] Create `tests/fixtures/orchestrator_state_issue_adoption/non-list-waived-tools.json`.
   - Case: `A` with `waived_tools` the string `"potential_to_issue"`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E8a]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T18] Create `tests/fixtures/orchestrator_state_issue_adoption/duplicate-waived-tool.json`.
+- [x] [P4-T18] Create `tests/fixtures/orchestrator_state_issue_adoption/duplicate-waived-tool.json`.
   - Case: `A` with `waived_tools` `["potential_to_issue","potential_to_issue"]`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E8dup(potential_to_issue)]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T19] Create `tests/fixtures/orchestrator_state_issue_adoption/waives-new-active-feature-folder.json`.
+- [x] [P4-T19] Create `tests/fixtures/orchestrator_state_issue_adoption/waives-new-active-feature-folder.json`.
   - Case: `A` with `waived_tools` `["potential_to_issue","new_active_feature_folder"]`; receipts lack `potential_to_issue` only. `expected_errors`: `[R(potential_to_issue), E8cannot(new_active_feature_folder)]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T20] Create `tests/fixtures/orchestrator_state_issue_adoption/waives-validate-orchestration-artifacts.json`.
+- [x] [P4-T20] Create `tests/fixtures/orchestrator_state_issue_adoption/waives-validate-orchestration-artifacts.json`.
   - Case: `A` with `waived_tools` `["potential_to_issue","validate_orchestration_artifacts"]`; receipts lack `potential_to_issue` only. `expected_errors`: `[R(potential_to_issue), E8cannot(validate_orchestration_artifacts)]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T21] Create `tests/fixtures/orchestrator_state_issue_adoption/bug-waives-feature-entry-tool.json`.
+- [x] [P4-T21] Create `tests/fixtures/orchestrator_state_issue_adoption/bug-waives-feature-entry-tool.json`.
   - Case: `promotion-type` `"bug"`, declared bug tools, `A` with `waived_tools` `["potential_to_issue","new_potential_entry"]` plus the valid record; receipts lack `potential_to_issue` only. `expected_errors`: `[R(potential_to_issue), E8notreq(large, new_potential_entry)]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T22] Create `tests/fixtures/orchestrator_state_issue_adoption/waives-tool-with-successful-receipt.json`.
+- [x] [P4-T22] Create `tests/fixtures/orchestrator_state_issue_adoption/waives-tool-with-successful-receipt.json`.
   - Case: adoption `A`; receipts cover every tool. `expected_errors`: `[E8receipt(potential_to_issue)]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T23] Create `tests/fixtures/orchestrator_state_issue_adoption/remediation-route-adoption.json`.
+- [x] [P4-T23] Create `tests/fixtures/orchestrator_state_issue_adoption/remediation-route-adoption.json`.
   - Case: route `remediation` with its lists, adoption `A`; receipts cover both remediation tools. `expected_errors`: `[E8notreq(remediation, potential_to_issue)]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T24] Create `tests/fixtures/orchestrator_state_issue_adoption/waived-tools-omits-potential-to-issue.json`.
+- [x] [P4-T24] Create `tests/fixtures/orchestrator_state_issue_adoption/waived-tools-omits-potential-to-issue.json`.
   - Case: `A` with `waived_tools` `["new_potential_entry"]` plus the valid record; receipts lack `new_potential_entry` only. `expected_errors`: `[R(new_potential_entry), E8include]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T25] Create `tests/fixtures/orchestrator_state_issue_adoption/invalid-potential-record.json`.
+- [x] [P4-T25] Create `tests/fixtures/orchestrator_state_issue_adoption/invalid-potential-record.json`.
   - Case: `A` with `waived_tools` `["potential_to_issue","new_potential_entry"]` and `potential_record` `"notes/record.txt"`; receipts lack both. `expected_errors`: `[R(new_potential_entry), R(potential_to_issue), E9(new_potential_entry)]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T26] Create `tests/fixtures/orchestrator_state_issue_adoption/declared-list-omits-potential-to-issue.json`.
+- [x] [P4-T26] Create `tests/fixtures/orchestrator_state_issue_adoption/declared-list-omits-potential-to-issue.json`.
   - Case: adoption `A`; declared `required_mcp_tools` is the `large` list without `potential_to_issue`; receipts lack `potential_to_issue`. `expected_errors`: `[EQ(large)]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T27] Create `tests/fixtures/orchestrator_state_issue_adoption/adoption-error-precedes-local-execution-overrides.json`.
+- [x] [P4-T27] Create `tests/fixtures/orchestrator_state_issue_adoption/adoption-error-precedes-local-execution-overrides.json`.
   - Case: `A` with `origin` `"imported"`; `local_execution_overrides` `["manual-step"]`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E4, LEO]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T28] Create `tests/fixtures/orchestrator_state_issue_adoption/case-variant-tool-name.json`.
+- [x] [P4-T28] Create `tests/fixtures/orchestrator_state_issue_adoption/case-variant-tool-name.json`.
   - Case: `A` with `waived_tools` `["Potential_To_Issue"]`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E8cannot(Potential_To_Issue), E8include]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T29] Create `tests/fixtures/orchestrator_state_issue_adoption/multiple-field-errors-in-rule-order.json`.
+- [x] [P4-T29] Create `tests/fixtures/orchestrator_state_issue_adoption/multiple-field-errors-in-rule-order.json`.
   - Case: `A` with `origin` `"imported"`, `verified_via` `"curl"`, and `evidence` `""`; receipts lack `potential_to_issue`. `expected_errors`: `[R(potential_to_issue), E4, E5, E7]`.
   - Acceptance: as P4-T1.
 
-- [ ] [P4-T30] Create the Python corpus reader `tests/scripts/dev_tools/test_orchestrator_state_issue_adoption_parity.py`.
+- [x] [P4-T30] Create the Python corpus reader `tests/scripts/dev_tools/test_orchestrator_state_issue_adoption_parity.py`.
   - Follow `tests/scripts/dev_tools/test_parallel_cohort_barrier_parity.py` (repository root from `Path(__file__).resolve().parents[3]`, guarded load, `name` equal to stem, sorted glob). Import only `validate_routing_contract` from `scripts.dev_tools._orchestrator_state_routing` and call `validate_routing_contract(checkpoint)`. Define `MINIMUM_CORPUS_COUNT = 29`. Tests: `test_corpus_meets_the_documented_minimum_size`, `test_discovered_corpus_count_equals_the_json_file_count`, `test_corpus_exercises_both_verdicts`, and `test_corpus_document_reproduces_the_expected_routing_errors` parametrized per file with ordered list equality. Reads committed files only; no temporary file; under 500 lines.
   - Acceptance: the file exists and P4-T31 reports 32 tests passing.
 
-- [ ] [P4-T31] Run `tests/scripts/dev_tools/test_orchestrator_state_issue_adoption_parity.py` against the Python authority.
+- [x] [P4-T31] Run `tests/scripts/dev_tools/test_orchestrator_state_issue_adoption_parity.py` against the Python authority.
   - Run `poetry run pytest tests/scripts/dev_tools/test_orchestrator_state_issue_adoption_parity.py`, then `ls tests/fixtures/orchestrator_state_issue_adoption`.
   - Acceptance: `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/regression-testing/py-parity-pass.TIMESTAMP.md` records both commands with `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and `Output Summary:`; the summary line reads `32 passed`; the listing shows the 29 file names of P4-T1 to P4-T29. A failing case is resolved against "Resolver semantics": the side that disagrees with the spec rule (fixture or `_orchestrator_state_issue_adoption.py`) is corrected, the decision is recorded in the artifact, and P3-T5 is re-run when the module changes.
 
