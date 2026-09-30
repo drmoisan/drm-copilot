@@ -102,6 +102,55 @@ describe("dispatchRepoAutomationTool push_down_claude_customizations", () => {
       memoryMode: "skip",
     });
   });
+
+  it("surfaces service warnings on the MCP result", async () => {
+    // Arrange: the two pinned lines of plan-corpus case unmatched-stale-entry.
+    const warnings = [
+      "push-down exclusion conflict: destination file present, not overwritten: .claude/rules/quality-tiers.md (entry .claude/rules/quality-tiers.md, line 2)",
+      "push-down exclusion: entry matched no payload path: .claude/agent-memory/** (line 4)",
+    ];
+    const mockService = createMockService();
+    mockService.pushDownClaudeCustomizations.mockResolvedValue({
+      tool: "push_down_claude_customizations",
+      workspaceRoot: "/dest",
+      artifacts: [],
+      summary: "Pushed bundled Claude Code customizations.",
+      warnings,
+    });
+
+    // Act
+    const result = await dispatchRepoAutomationTool(
+      "push_down_claude_customizations",
+      { workspace_root: "/dest" },
+      mockService,
+    );
+
+    // Assert
+    expect(result.ok).toBe(true);
+    expect(result.warnings).toEqual(warnings);
+  });
+
+  it("omits the warnings field when the service result carries none", async () => {
+    // Arrange
+    const mockService = createMockService();
+    mockService.pushDownClaudeCustomizations.mockResolvedValue({
+      tool: "push_down_claude_customizations",
+      workspaceRoot: "/dest",
+      artifacts: [],
+      summary: "Pushed bundled Claude Code customizations.",
+    });
+
+    // Act
+    const result = await dispatchRepoAutomationTool(
+      "push_down_claude_customizations",
+      { workspace_root: "/dest" },
+      mockService,
+    );
+
+    // Assert
+    expect(result.ok).toBe(true);
+    expect("warnings" in result).toBe(false);
+  });
 });
 
 describe("dispatchRepoAutomationTool push_down_codex_and_agents_customizations", () => {
