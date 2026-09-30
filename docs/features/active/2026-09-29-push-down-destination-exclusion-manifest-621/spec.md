@@ -258,10 +258,10 @@ Rollout: no feature flag. The behavior activates only when a destination places 
 - [x] AC-21 The VS Code push-down command shows a warning notification when `conflict_count > 0` and shows none when `conflict_count == 0`, including when a manifest was read with only skips or unmatched entries. Verified by the command-registration tests with a stubbed `window.showWarningMessage`.
 - [x] AC-22 The Python CLI prints one line per skipped path, conflict, and unmatched entry after the artifact line, using the pinned text, and exits 0. Verified by a captured-stdout test in `test_push_down_claude_exclusion_filter.py`.
 - [x] AC-23 The `ExclusionFilterFileSystem` is composed outermost, wrapping `ExcludingFileSystem`, in both entry points, so that an entry matching only paths removed by pack selection or memory mode is reported as unmatched. Verified by a filter test in each language.
-- [ ] AC-24 No file in `.claude/hooks/`, `.claude/lib/`, or the #769 file set is modified, `scripts/dev_tools/push_down_copilot_customizations.py` is unchanged, and no new dependency appears in `pyproject.toml`, `package.json`, or `package-lock.json`. Verified by `git diff --stat main` on the feature branch.
-- [ ] AC-25 No new or modified production, test, or script file exceeds 500 lines. Verified by a line count over the changed files.
-- [ ] AC-26 Line coverage >= 85% and branch coverage >= 75% for the new and changed TypeScript modules (per-file `coverageThreshold` entries in `jest.config.cjs`) and for `scripts/dev_tools` under the pytest coverage configuration. Verified by the coverage reports of both suites.
-- [ ] AC-27 The full toolchain (Black, Ruff, Pyright, Pytest; Prettier, ESLint, TSC, Jest) and the existing bundle-contract tests pass in a single pass on the feature branch.
+- [x] AC-24 No file in `.claude/hooks/`, `.claude/lib/`, or the #769 file set is modified, `scripts/dev_tools/push_down_copilot_customizations.py` is unchanged, and no new dependency appears in `pyproject.toml`, `package.json`, or `package-lock.json`. Verified by `git diff --stat main` on the feature branch.
+- [x] AC-25 No new or modified production, test, or script file exceeds 500 lines. Verified by a line count over the changed files.
+- [x] AC-26 Line coverage >= 85% and branch coverage >= 75% for the new and changed TypeScript modules (per-file `coverageThreshold` entries in `jest.config.cjs`) and for `scripts/dev_tools` under the pytest coverage configuration. Verified by the coverage reports of both suites.
+- [x] AC-27 The full toolchain (Black, Ruff, Pyright, Pytest; Prettier, ESLint, TSC, Jest) and the existing bundle-contract tests pass in a single pass on the feature branch.
 
 ## Definition of Done
 
