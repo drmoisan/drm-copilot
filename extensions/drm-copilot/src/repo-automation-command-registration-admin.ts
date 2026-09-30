@@ -5,6 +5,7 @@ import {
   promptForChoice,
   resolveWorkflowInvocation,
 } from "./extension-command-helpers";
+import { EXCLUSION_CONFLICT_LINE_PREFIX } from "./lib/push-down/claude-exclusion-filter";
 import { translateSelectedPackNames } from "./lib/push-down/claude-pack-name-translation";
 import { listRepoAutomationTools } from "./mcp-tools";
 import {
@@ -12,6 +13,7 @@ import {
   pickPrBaseBranch,
 } from "./pr-context-branches";
 import type { RepoAutomationCommandRegistrationOptions } from "./repo-automation-command-registration-types";
+import type { RepoAutomationExecutionResult } from "./repo-automation-service-contract";
 import { resolveCollectPrContextInvocation } from "./workflow-command-arguments";
 
 function registerCollectCommitContextCommand(
@@ -243,8 +245,9 @@ function registerPushDownClaudeCustomizationsCommand(
       // (`csharp-modern` / `csharp-legacy`). Non-C# names are unchanged.
       const translatedPacks = translateSelectedPackNames(packs, csharpVariant);
 
+      let result: RepoAutomationExecutionResult;
       try {
-        await options.service.pushDownClaudeCustomizations({
+        result = await options.service.pushDownClaudeCustomizations({
           workspaceRoot: getWorkspaceRoot(),
           invocationId: commandId,
           packs: translatedPacks,
@@ -257,6 +260,17 @@ function registerPushDownClaudeCustomizationsCommand(
           `[${commandId}] push-down failure: ${message}`,
         );
         throw error;
+      }
+
+      // Step 5: a destination file left in place by the exclusion manifest is
+      // a conflict the user should see; skips and unmatched entries are not.
+      const conflictCount = (result.warnings ?? []).filter((line) =>
+        line.startsWith(EXCLUSION_CONFLICT_LINE_PREFIX),
+      ).length;
+      if (conflictCount > 0) {
+        await vscode.window.showWarningMessage(
+          `Push-down exclusion conflicts: ${String(conflictCount)}. See the drm-copilot output channel for the affected paths.`,
+        );
       }
     },
   );

@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 from scripts.dev_tools.skill_bundle_contract import (
+    KNOWN_UNBUNDLED_REFERENCES,
     PUBLISHED_ROOT_FOLDERS,
     SkillBundleInputs,
     extract_script_references,
@@ -34,7 +35,9 @@ from scripts.dev_tools.skill_bundle_contract import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Iterable, Sequence
+
+    from scripts.dev_tools.skill_bundle_contract import KnownUnbundledReference
 
 BUNDLE_ROOT = Path("extensions/drm-copilot/resources/claude-customizations")
 _SKILLS_ROOT = Path(".claude/skills")
@@ -169,6 +172,7 @@ def main(
     argv: Sequence[str] | None = None,
     *,
     loader: Callable[[Path], SkillBundleInputs] = load_repository_inputs,
+    exceptions: Iterable[KnownUnbundledReference] = KNOWN_UNBUNDLED_REFERENCES,
 ) -> int:
     """Run the guard and report violations and stale exceptions on stderr.
 
@@ -176,6 +180,9 @@ def main(
         argv (Sequence[str] | None): Arguments; ``None`` reads ``sys.argv``.
         loader (Callable[[Path], SkillBundleInputs]): Snapshot builder;
             injectable so tests supply inline inputs.
+        exceptions (Iterable[KnownUnbundledReference]): Registered exceptions;
+            injectable so tests exercise the suppression and staleness branches
+            with an empty default registry.
 
     Returns:
         int: 1 when any line was reported, else 0.
@@ -195,19 +202,22 @@ def main(
     )
     arguments = parser.parse_args(argv)
     inputs = loader(cast("Path", arguments.repo_root))
+    # Materialize the registry once so both finders read the same entries even
+    # when the caller passes a one-shot iterable.
+    registered = tuple(exceptions)
 
     # Render one report line per unregistered violation.
     report = [
         "skill-bundle violation: "
         f"{violation.skill} | {violation.path} | {violation.reason}"
-        for violation in find_violations(inputs)
+        for violation in find_violations(inputs, exceptions=registered)
     ]
     # Stale exceptions are reported alongside violations so a fixed exception
     # cannot stay in the registry unnoticed.
     report.extend(
         "skill-bundle stale exception: "
         f"{exception.skill} | {exception.path} | {exception.issue}"
-        for exception in find_stale_exceptions(inputs)
+        for exception in find_stale_exceptions(inputs, exceptions=registered)
     )
     # Emit each report line on stderr.
     for line in report:

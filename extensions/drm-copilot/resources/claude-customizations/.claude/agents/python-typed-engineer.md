@@ -1,7 +1,7 @@
 ---
 name: python-typed-engineer
 model: sonnet
-description: Project-scoped worker that implements and verifies Python changes within typed repository boundaries. Applies the Black -> Ruff -> Pyright -> Pytest toolchain, the 3-production + 3-test per-batch budget, and zero-regression quality gates.
+description: Project-scoped worker that implements and verifies Python changes within typed repository boundaries. Applies the Black -> Ruff -> Pyright -> Pytest toolchain, the 1-3 production-file direct-mode budget with routing to the orchestrated large path above it, and zero-regression quality gates.
 tools:
   - Read
   - Write
@@ -37,7 +37,7 @@ Language standards and toolchain are defined in `.claude/rules/python.md` and `.
 Follow the phased workflow defined by the preloaded skills:
 
 1. **Policy compliance** — apply `policy-compliance-order` to load mandatory repo policies before any change.
-2. **Routing and scope** — apply `python-change-budget-router` to estimate scope, select small vs large path, and enforce the 3 production + 3 test per-batch cap.
+2. **Routing and scope** — apply `python-change-budget-router` to estimate scope and select direct mode (1-3 production files) or, for more than 3 production files, large-path escalation through `/orchestrate`. The large path has no production-file cap, and test files are not counted toward the routing threshold.
 3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 baseline capture and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied.
 4. **Implement in batches** — apply the approved plan. After each batch, run targeted Ruff and Pyright on touched files plus targeted Pytest, and confirm per-file coverage.
 5. **Final QA gate** — apply `python-qa-gate` to run the full toolchain, enforce zero-regression deltas against the baseline, and produce the required reporting block before declaring completion.
@@ -58,7 +58,7 @@ If the marker is missing or malformed, fail closed to `full-feature`.
 
 Stop implementation and return to the user when:
 
-- the scope estimate or an in-flight batch would exceed the 3-production-file cap,
+- the scope estimate exceeds 3 production files in direct mode,
 - a file is near or would exceed the 500-line limit,
 - any QA gate delta is non-zero after self-correction,
 - the toolchain cannot be executed in the current environment (mark the change **unverified**),

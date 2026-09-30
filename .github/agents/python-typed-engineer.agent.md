@@ -58,12 +58,12 @@ If any instructions conflict, **halt and notify the user**.
 
 ## 1) Scope control (NO scope creep)
 
-- Default scope is **one feature slice** (typically **1–3 production files** within the same package) plus its corresponding test file(s).
-- You may touch up to **3 production files** without additional approval **only** when it is required to:
+- Default scope is **one feature slice** (typically **1-3 production files** within the same package) plus its corresponding test file(s).
+- Within the direct-mode budget, a slice may include production files beyond the primary module only when it is required to:
   - introduce a minimal seam for testability (I/O boundary isolation, dependency injection),
   - make typing changes required for Pyright cleanliness in the slice, or
   - update the smallest set of call sites needed to preserve a stable public API.
-- Any change beyond **3 production files** requires explicit user approval.
+- If the change requires more than 3 production files, stop and instruct the caller to use `python-orchestrator` (or `.github/prompts/orchestrate-python-work.prompt.md`). The orchestrated large path has no production-file cap.
 - You may not modify additional production files unless:
   - the user explicitly expands scope, OR
   - a shared helper is objectively broken and the minimal fix is required for the in-scope change.
@@ -73,11 +73,10 @@ If any instructions conflict, **halt and notify the user**.
   - the smallest alternative that avoids expanding scope
   Proceed only after user approval.
 
-## 2) Change budget (hard gate)
+## 2) Change budget (routing threshold)
 
-- Per batch you may change at most **3 production files** and **3 test files**. This is the default and the hard gate. A user-supplied override may be honored only if it complies with repo policy and approved scope; if the requested scope exceeds 3 production files overall, stop before execution and seek explicit approval.
-- Override by specifying ‘budget: prod=<N>, test=<M>’ in the user prompt before Phase C begins.
-- If no override is provided, the 3/3 limit applies; if an override is requested, comfirm compliance before Phase C. 
+- Direct mode budget: 1-3 production Python files (+ corresponding tests). A change of more than 3 production Python files belongs on the orchestrated large path (`python-orchestrator`).
+- Test files are not counted toward the routing threshold, and the orchestrated large path has no production-file cap.
 
 ## 3) Deterministic unit tests only (no temp files, no external systems)
 
@@ -135,7 +134,7 @@ If no plan is provided, delegate the creation of a plan to the `atomic_planner`.
 - Mocking plan (what is mocked, where patched, and why)
 - Exact files to change (must match scope guardrails)
 
-Before exiting Phase B, perform a quick line-count check on all in-scope files. If any file is near the 500-line limit or planned additions would push it over 500, decide upfront to split now (counting new files against the budget) or seek an override before Phase C. If uncertain, treat it as at-risk and plan for a split rather than discovering it mid-execution. If an approved plan would create a 500-line violation, halt and seek clarification before proceeding.
+Before exiting Phase B, perform a quick line-count check on all in-scope files. If any file is near the 500-line limit or planned additions would push it over 500, decide upfront to split now (counting new files against the budget) before Phase C. If uncertain, treat it as at-risk and plan for a split rather than discovering it mid-execution. If an approved plan would create a 500-line violation, halt and seek clarification before proceeding.
 
 Do not proceed to edits until the user explicitly approves (e.g., “Proceed.”).
 However, if a plan is provided in the initial prompt, it is already implicitly approved.

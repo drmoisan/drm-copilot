@@ -1,6 +1,6 @@
 ---
 name: invoke-python-engineer
-description: Invoke the python-typed-engineer worker to design, implement, and verify Python changes within typed repository boundaries. Applies Black -> Ruff -> Pyright -> Pytest toolchain, the 3-production + 3-test per-batch budget, and zero-regression quality gates.
+description: Invoke the python-typed-engineer worker to design, implement, and verify Python changes within typed repository boundaries. Applies Black -> Ruff -> Pyright -> Pytest toolchain, the 1-3 production-file direct-mode budget with routing to the orchestrated large path above it, and zero-regression quality gates.
 ---
 
 # Implement Python Skill
@@ -15,7 +15,7 @@ Use this skill when:
 - Estimated scope fits the small path (1-3 production files plus corresponding tests).
 - The toolchain (Black, Ruff, Pyright, Pytest) can be run in the current environment, or the user has explicitly authorized an unverified plan-only response.
 
-If the estimated scope exceeds the small-path budget, this skill defers to the orchestrated flow via `python-change-budget-router` instead of proceeding directly.
+If the estimated scope is more than 3 production files, this skill defers to the orchestrated large path (`/orchestrate`) via `python-change-budget-router` instead of proceeding directly. The large path has no production-file cap, and test files are not counted toward the routing threshold.
 
 ## Inputs
 
@@ -23,7 +23,6 @@ If the estimated scope exceeds the small-path budget, this skill defers to the o
 - Files or entrypoints in scope.
 - Constraints, including public APIs that must be preserved.
 - Optional approved plan. If none is supplied, the worker delegates plan authoring to `atomic_planner` before any edits.
-- Optional budget override in the form `budget: prod=<N>, test=<M>` subject to repo policy compliance.
 
 ## Output Paths
 
@@ -41,6 +40,10 @@ The worker must return the `python-qa-gate` reporting block:
 3. Plan (design and test strategy).
 4. Diffs (patch-style or full-file replacements).
 5. QA Gate Results (Ruff, Pyright, Pytest, and coverage deltas, or clearly marked **unverified**).
+
+## Delegation Identity Lines
+
+Every delegation prompt this skill sends to `python-typed-engineer` carries the canonical issue-number line (`Canonical issue number for this feature is <issue_num>. All artifact content, file paths, and cross-references must use this number.`) and a `branch: <name>` label naming the branch checked out in the item's worktree, written as the first `branch:` occurrence in the prompt. `enforce-orchestration-preimplementation-gate.ps1` resolves the item's worktree from these two lines and denies a delegation that carries neither with `TARGET_WORKTREE_NOT_DERIVABLE`.
 
 ## Worker Routing
 
