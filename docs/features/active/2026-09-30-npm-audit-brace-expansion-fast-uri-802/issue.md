@@ -75,7 +75,7 @@ Every PR into `main` and into epic integration branches fails required CI. This 
 
 - [x] AC-1: In all three manifests (`package.json`, `extensions/drm-copilot/package.json`, `packages/mcp-server/package.json`), `overrides` contains `"fast-uri": "^3.1.8"` and `"brace-expansion": "^5.0.12"`, and each `package-lock.json` is regenerated to match. Evidence: evidence/qa-gates/lock-*.md, scope-check.*.md.
 - [x] AC-2: `npm audit --audit-level=moderate` exits 0 in all three packages, and `npm ls brace-expansion fast-uri` shows only patched versions (brace-expansion >= 5.0.12, fast-uri >= 3.1.8). Evidence: evidence/qa-gates/audit-*.md, final-audit-*.md.
-- [ ] AC-3: The root and extension TypeScript toolchains (format check, lint, type check, tests) pass with coverage not below baseline, except the pre-existing root `format:check` failure on `tests/fixtures/**` JSON, which is identical at baseline and tracked separately. The mcp-server build passes, and PR CI is green.
+- [x] AC-3: The root and extension TypeScript toolchains (format check, lint, type check, tests) pass with coverage not below baseline, except the pre-existing root `format:check` failure on `tests/fixtures/**` JSON, which is identical at baseline and tracked separately. The mcp-server build passes, and PR CI is green.
 
 Change Log:
 - 2026-09-30: AC-3 narrowed by orchestrator decision to exclude the pre-existing root `format:check` failure (byte-identical output at baseline 6e6ccd62 and at the branch head; none of the six changed files is reported). That failure will be filed as a separate issue.
