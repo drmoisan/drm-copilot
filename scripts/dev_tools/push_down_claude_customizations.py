@@ -29,6 +29,16 @@ try:
         DirectoryLister,
         build_destination_write_stack,
     )
+    from scripts.dev_tools.push_down_claude_exclusion_filter import (
+        ClaudePushDownSummary,
+        ExclusionFilterFileSystem,
+        ExclusionViolationError,
+        append_exclusions_to_artifact,
+        build_exclusion_report,
+        extend_summary,
+        read_exclusion_manifest,
+        render_exclusion_lines,
+    )
     from scripts.dev_tools.push_down_claude_filesystem import (
         AGENT_MEMORY_RELATIVE_ROOT,
         GENERAL_MEMORY_SCOPE,
@@ -46,6 +56,11 @@ try:
         compute_published_paths,
         load_pack_manifests,
     )
+    from scripts.dev_tools.push_down_exclusion_manifest import (
+        EXCLUSION_MANIFEST_RELATIVE_PATH,
+        ExclusionManifestError,
+        assert_manifest_path_is_root_level,
+    )
 except ModuleNotFoundError as error:  # pragma: no cover - bundled import fallback
     if error.name is None or not error.name.startswith("scripts"):
         raise
@@ -54,6 +69,16 @@ except ModuleNotFoundError as error:  # pragma: no cover - bundled import fallba
         BundleConfigFileSystem,
         DirectoryLister,
         build_destination_write_stack,
+    )
+    from dev_tools.push_down_claude_exclusion_filter import (
+        ClaudePushDownSummary,
+        ExclusionFilterFileSystem,
+        ExclusionViolationError,
+        append_exclusions_to_artifact,
+        build_exclusion_report,
+        extend_summary,
+        read_exclusion_manifest,
+        render_exclusion_lines,
     )
     from dev_tools.push_down_claude_filesystem import (
         AGENT_MEMORY_RELATIVE_ROOT,
@@ -71,6 +96,11 @@ except ModuleNotFoundError as error:  # pragma: no cover - bundled import fallba
         assert_single_csharp_toolchain,
         compute_published_paths,
         load_pack_manifests,
+    )
+    from dev_tools.push_down_exclusion_manifest import (
+        EXCLUSION_MANIFEST_RELATIVE_PATH,
+        ExclusionManifestError,
+        assert_manifest_path_is_root_level,
     )
 
 # Repo-relative location of the bundle root that holds the pack manifests and
@@ -113,6 +143,9 @@ except ModuleNotFoundError as error:
 ARTIFACT_DIRECTORY = "artifacts/claude-customizations"
 MODULE_ENTRY_POINT = "scripts.dev_tools.push_down_claude_customizations"
 ROOT_FOLDERS: tuple[Path, ...] = (Path(".claude"), Path("config"))
+assert_manifest_path_is_root_level(  # the manifest is never a payload path
+    EXCLUSION_MANIFEST_RELATIVE_PATH, tuple(str(root) for root in ROOT_FOLDERS)
+)
 EXCLUDED_RELATIVE_PATHS: tuple[Path, ...] = (
     Path(".claude/settings.local.json"),
     Path("config/blast-radius.local.json"),
@@ -122,7 +155,11 @@ __all__ = [
     "AGENT_MEMORY_RELATIVE_ROOT",
     "ARTIFACT_DIRECTORY",
     "CSHARP_VARIANT_CHOICES",
+    "ClaudePushDownSummary",
     "EXCLUDED_RELATIVE_PATHS",
+    "EXCLUSION_MANIFEST_RELATIVE_PATH",
+    "ExclusionManifestError",
+    "ExclusionViolationError",
     "GENERAL_MEMORY_SCOPE",
     "BUNDLE_ROOT_RELATIVE_DIR",
     "MEMORY_MODE_CHOICES",
@@ -214,7 +251,7 @@ def push_down_customizations(
     memory_mode: MemoryMode = "overwrite",
     bundle_root: Path | None = None,
     list_entries: DirectoryLister | None = None,
-) -> PushDownSummary:
+) -> ClaudePushDownSummary:
     """Copy the `.claude` and `config` trees into the destination workspace.
 
     Purpose:
@@ -255,9 +292,10 @@ def push_down_customizations(
             ``real_directory_lister``; tests inject an in-memory layout.
 
     Returns:
-        PushDownSummary: The shared engine's run summary.
+        ClaudePushDownSummary: Engine summary plus ``exclusions`` (or ``None``).
 
     Raises:
+        ExclusionManifestError: When the destination manifest is malformed.
         ManifestError: When a selected manifest is missing/malformed or both C#
             variants are selected.
         RoutingMergeError: When the destination or bundled routing document is
@@ -280,6 +318,7 @@ def push_down_customizations(
         if bundle_root is not None
         else effective_source / BUNDLE_ROOT_RELATIVE_DIR
     )
+    manifest = read_exclusion_manifest(fs, destination_root)  # before any write
     # Resolve the published-path set only when a pack selection is supplied so
     # the no-argument path performs no manifest I/O and stays byte-equivalent.
     published_paths = _resolve_published_paths(
@@ -310,16 +349,26 @@ def push_down_customizations(
         memory_mode=memory_mode,
         variant_root=effective_bundle,
     )
-    return push_down_scoped_customizations(
+    engine_fs: PushDownFileSystem = excluding_fs
+    if manifest is not None:  # outermost, so a skipped path is never merged
+        engine_fs = ExclusionFilterFileSystem(
+            excluding_fs, effective_source, destination_root, manifest
+        )
+    summary = push_down_scoped_customizations(
         repo_root=repo_root,
         destination_root=destination_root,
-        fs=excluding_fs,
+        fs=engine_fs,
         source_root=source_root,
         artifact_root=artifact_root,
         root_folders=ROOT_FOLDERS,
         artifact_directory=ARTIFACT_DIRECTORY,
         rewrite_references=_passthrough_rewrite,
     )
+    if manifest is None or not isinstance(engine_fs, ExclusionFilterFileSystem):
+        return extend_summary(summary, None)
+    report = build_exclusion_report(manifest, engine_fs.skipped)
+    append_exclusions_to_artifact(fs, Path(summary.artifact_path), report)
+    return extend_summary(summary, report)
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -440,6 +489,9 @@ def main(
         memory_mode=args.memory_mode,
     )
     print(f"Wrote push-down summary artifact to: {summary.artifact_path}")
+    if summary.exclusions is not None:
+        for line in render_exclusion_lines(summary.exclusions):
+            print(line)
     return 0
 
 
