@@ -215,19 +215,19 @@ Seeded from issue:
 
 
 ## Acceptance Criteria
-- [ ] `python -m scripts.dev_tools.validate_orchestrator_state <path>` runs an argparse-based `main()` reached through a `__main__` guard; the guard test in `tests/scripts/dev_tools/test_validate_orchestrator_state_cli.py` passes.
-- [ ] The CLI accepts `--require-complete`, `--require-model-routing`, and `--require-pr-creation-ready` (and, for dispatcher parity, `--require-codex-model-routing` and `--require-codex-topology`) and forwards each to `validate_orchestrator_state_text` unchanged; tests with a recording validator prove `True` when present and `False` when absent.
-- [ ] The CLI prints each returned validation error to stderr, one per line in returned order, and exits 1 when the error list is non-empty.
-- [ ] For a missing, unreadable, or non-UTF-8 checkpoint path the CLI exits 2 and writes a single stderr diagnostic naming the path, with no traceback; only `OSError` and `UnicodeDecodeError` are handled.
-- [ ] For a valid checkpoint the CLI exits 0, writes `orchestrator-state validation passed: <path>` to stdout, and writes nothing to stderr.
-- [ ] Executed reproduction evidence: the issue's reproduction command exits non-zero with a diagnostic for a nonexistent path after the change, and the before-change exit 0 is recorded for comparison.
-- [ ] `scripts/dev_tools/validate_orchestrator_state.py` does not exceed the repository 500-line limit, no new production or test file exceeds that limit, and the measured post-change line count of the validator is recorded in the evidence with headroom for #523.
-- [ ] The remediation-loop block is moved verbatim to `scripts/dev_tools/_orchestrator_state_remediation_loop.py`; `tests/scripts/dev_tools/test_validate_orchestrator_state_remediation_loop.py` and the rest of the existing validator test suite pass unchanged.
-- [ ] Existing validator behavior and existing checkpoints are unchanged (byte-identical error lists); no hook, PowerShell, TypeScript, dispatcher, or #523 `blocked_reason` change is included.
-- [ ] Line coverage >= 85% and branch coverage >= 75% for `scripts.dev_tools.validate_orchestrator_state_cli` and `scripts.dev_tools._orchestrator_state_remediation_loop`, measured with dotted `--cov=` module names and `--cov-report=term-missing`.
-- [ ] Documentation in `.claude/rules/orchestrator-state.md` and `.claude/skills/orchestrate/SKILL.md` names both the dispatcher CLI and the bare-module CLI where it previously said only "the local CLI" or described the flags; the same edits are byte-identical in the bundled mirrors under `extensions/drm-copilot/resources/claude-customizations/.claude/`; no `.claude/skills/*/SKILL.md` contains a `python -m scripts.dev_tools...` or `scripts/...` invocation form; the `.agents` copies are edited only if they carry the same text.
-- [ ] `test_skill_bundle_contract_repo.py` and `test_push_down_claude_resource_contracts.py` pass after the documentation edits.
-- [ ] Full toolchain pass completed (format → lint → type-check → test), with no failing stage in a single pass.
+- [x] `python -m scripts.dev_tools.validate_orchestrator_state <path>` runs an argparse-based `main()` reached through a `__main__` guard; the guard test in `tests/scripts/dev_tools/test_validate_orchestrator_state_cli.py` passes.
+- [x] The CLI accepts `--require-complete`, `--require-model-routing`, and `--require-pr-creation-ready` (and, for dispatcher parity, `--require-codex-model-routing` and `--require-codex-topology`) and forwards each to `validate_orchestrator_state_text` unchanged; tests with a recording validator prove `True` when present and `False` when absent.
+- [x] The CLI prints each returned validation error to stderr, one per line in returned order, and exits 1 when the error list is non-empty.
+- [x] For a missing, unreadable, or non-UTF-8 checkpoint path the CLI exits 2 and writes a single stderr diagnostic naming the path, with no traceback; only `OSError` and `UnicodeDecodeError` are handled.
+- [x] For a valid checkpoint the CLI exits 0, writes `orchestrator-state validation passed: <path>` to stdout, and writes nothing to stderr.
+- [x] Executed reproduction evidence: the issue's reproduction command exits non-zero with a diagnostic for a nonexistent path after the change, and the before-change exit 0 is recorded for comparison.
+- [x] `scripts/dev_tools/validate_orchestrator_state.py` does not exceed the repository 500-line limit, no new production or test file exceeds that limit, and the measured post-change line count of the validator is recorded in the evidence with headroom for #523.
+- [x] The remediation-loop block is moved verbatim to `scripts/dev_tools/_orchestrator_state_remediation_loop.py`; `tests/scripts/dev_tools/test_validate_orchestrator_state_remediation_loop.py` and the rest of the existing validator test suite pass unchanged.
+- [x] Existing validator behavior and existing checkpoints are unchanged (byte-identical error lists); no hook, PowerShell, TypeScript, dispatcher, or #523 `blocked_reason` change is included.
+- [x] Line coverage >= 85% and branch coverage >= 75% for `scripts.dev_tools.validate_orchestrator_state_cli` and `scripts.dev_tools._orchestrator_state_remediation_loop`, measured with dotted `--cov=` module names and `--cov-report=term-missing`.
+- [x] Documentation in `.claude/rules/orchestrator-state.md` and `.claude/skills/orchestrate/SKILL.md` names both the dispatcher CLI and the bare-module CLI where it previously said only "the local CLI" or described the flags; the same edits are byte-identical in the bundled mirrors under `extensions/drm-copilot/resources/claude-customizations/.claude/`; no `.claude/skills/*/SKILL.md` contains a `python -m scripts.dev_tools...` or `scripts/...` invocation form; the `.agents` copies are edited only if they carry the same text.
+- [x] `test_skill_bundle_contract_repo.py` and `test_push_down_claude_resource_contracts.py` pass after the documentation edits.
+- [x] Full toolchain pass completed (format → lint → type-check → test), with no failing stage in a single pass.
 
 ## Risks & Mitigations
 - Technical or operational risks:

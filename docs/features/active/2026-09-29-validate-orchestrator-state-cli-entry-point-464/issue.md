@@ -60,14 +60,14 @@ The module was written as an import-only library. `.claude/hooks/validate-orches
 
 ## Acceptance Criteria
 
-- [ ] `python -m scripts.dev_tools.validate_orchestrator_state <path>` runs an argparse-based `main()` reached through a `__main__` guard.
-- [ ] The CLI accepts the `--require-complete`, `--require-model-routing`, and `--require-pr-creation-ready` flags and passes each to `validate_orchestrator_state_text` unchanged.
-- [ ] The CLI prints each returned validation error and exits non-zero when the error list is non-empty.
-- [ ] The CLI exits non-zero and prints a diagnostic when the checkpoint path does not exist.
-- [ ] The CLI exits 0 and prints nothing to stderr for a valid checkpoint.
-- [ ] `scripts/dev_tools/validate_orchestrator_state.py` stays under 500 lines and no new production or test file exceeds 500 lines.
-- [ ] Documentation of the CLI in `.claude/rules/orchestrator-state.md` and `.claude/skills/orchestrate/SKILL.md`, and their bundled mirrors, is consistent with the implemented behavior.
-- [ ] Existing validator behavior and existing checkpoints are unchanged (byte-identical error lists).
+- [x] `python -m scripts.dev_tools.validate_orchestrator_state <path>` runs an argparse-based `main()` reached through a `__main__` guard.
+- [x] The CLI accepts the `--require-complete`, `--require-model-routing`, and `--require-pr-creation-ready` flags and passes each to `validate_orchestrator_state_text` unchanged.
+- [x] The CLI prints each returned validation error and exits non-zero when the error list is non-empty.
+- [x] The CLI exits non-zero and prints a diagnostic when the checkpoint path does not exist.
+- [x] The CLI exits 0 and prints nothing to stderr for a valid checkpoint.
+- [x] `scripts/dev_tools/validate_orchestrator_state.py` stays under 500 lines and no new production or test file exceeds 500 lines.
+- [x] Documentation of the CLI in `.claude/rules/orchestrator-state.md` and `.claude/skills/orchestrate/SKILL.md`, and their bundled mirrors, is consistent with the implemented behavior.
+- [x] Existing validator behavior and existing checkpoints are unchanged (byte-identical error lists).
 
 ## Next Step
 
