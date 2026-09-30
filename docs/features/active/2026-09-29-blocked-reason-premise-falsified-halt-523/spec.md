@@ -334,7 +334,7 @@ Seeded from issue:
 
 The first four items are the issue acceptance criteria (AC-1 through AC-4), carried verbatim.
 
-- [ ] `blocked_reason` can express a halt where all delegations and validators succeeded but the premise was falsified (for example a `premise_falsified` member, or an orthogonal `blocked_class` field).
+- [x] `blocked_reason` can express a halt where all delegations and validators succeeded but the premise was falsified (for example a `premise_falsified` member, or an orthogonal `blocked_class` field).
 - [ ] The validator accepts the new value and continues to reject values outside the enum.
 - [ ] The distinction between "not blocked" and "blocked for a non-mechanical reason" is recoverable from the structured fields alone, without reading free-form text.
 - [ ] Existing checkpoints that omit the field, or set it to an existing member, validate byte-identically.
