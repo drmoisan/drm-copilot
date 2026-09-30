@@ -48,6 +48,7 @@
     ".codex/hooks/validate-codex-subagent-routing.ps1",
     ".codex/hooks/check-powershell-test-purity.ps1",
     ".codex/hooks/check-python-test-purity.ps1",
+    ".codex/hooks/enforce-batch-budget-route.ps1",
     ".codex/hooks/enforce-checkpoint-monotonic.ps1",
     ".codex/hooks/enforce-completion-consistency.ps1",
     ".codex/hooks/enforce-completion-helpers.ps1",

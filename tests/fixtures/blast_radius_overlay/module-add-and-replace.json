@@ -1,0 +1,5 @@
+{
+  "base_text": "{\n  \"version\": 1,\n  \"modules\": {\n    \"config\": [\n      \"config/**\"\n    ],\n    \"src/App\": [\n      \"src/App/**\"\n    ]\n  }\n}\n",
+  "overlay_text": "{\"modules\": {\"src/App\": [\"src/App/lib/**\"], \"Zeta\": [\"zeta/**\"], \"app\": [\"app/**\"]}}\n",
+  "expected_text": "{\n  \"version\": 1,\n  \"modules\": {\n    \"Zeta\": [\n      \"zeta/**\"\n    ],\n    \"app\": [\n      \"app/**\"\n    ],\n    \"config\": [\n      \"config/**\"\n    ],\n    \"src/App\": [\n      \"src/App/lib/**\"\n    ]\n  }\n}\n"
+}

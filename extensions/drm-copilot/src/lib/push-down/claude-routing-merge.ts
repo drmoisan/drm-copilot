@@ -5,10 +5,11 @@
  *     Special-case the single destination-relative path
  *     `config/orchestration-routing.json` so publishing it into a workspace that
  *     already carries its own routing document adds the source's routes without
- *     discarding the destination's. One further path,
- *     `config/blast-radius.json`, is intercepted by the blast-radius derive
- *     decorator composed alongside this one
- *     (`claude-blast-radius-derive.ts`); every remaining path passes straight
+ *     discarding the destination's. This decorator is one entry of the
+ *     `DESTINATION_WRITE_DECORATORS` registry in `claude-customizations.ts`.
+ *     The other registered path, `config/blast-radius.json`, is handled by the
+ *     overlay and derive decorators (`claude-blast-radius-overlay.ts` and
+ *     `claude-blast-radius-derive.ts`); every remaining path passes straight
  *     through to the wrapped adapter.
  *
  * Why a decorator rather than engine logic:

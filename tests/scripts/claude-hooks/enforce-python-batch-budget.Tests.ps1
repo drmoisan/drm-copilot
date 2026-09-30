@@ -29,6 +29,9 @@ Describe 'enforce-python-batch-budget.ps1' {
         # containment assertion would hold identically before and after the fix.
         $script:OutOfRootFixture = 'C:/synthetic-out-of-root/scratchpad/out_of_root_fixture.py'
         $script:ContainmentStateFile = '/repo/.claude/state/python-batch-budget.s.json'
+
+        # Hook calls read an empty checkpoint unless a case supplies its own reader; the stored value returns the reader because PowerShell evaluates a scriptblock default before binding it.
+        $PSDefaultParameterValues['Invoke-PythonBatchBudgetHook:ReadCheckpoint'] = { { param([string] $Path) [void] $Path; '' } }
     }
 
     AfterEach {
@@ -36,6 +39,10 @@ Describe 'enforce-python-batch-budget.ps1' {
         $env:CLAUDE_SESSION_ID = $null
         $env:CLAUDE_PYTHON_BUDGET_PROD = $null
         $env:CLAUDE_PYTHON_BUDGET_TEST = $null
+    }
+
+    AfterAll {
+        $null = $PSDefaultParameterValues.Remove('Invoke-PythonBatchBudgetHook:ReadCheckpoint')
     }
 
     It 'allows a new production file under the production cap and records it' {
@@ -50,14 +57,14 @@ Describe 'enforce-python-batch-budget.ps1' {
         $result.state.testFiles | Should -BeNullOrEmpty
     }
 
-    It 'allows a new test file under the test cap and records it' {
+    It 'allows a new test file without recording it' {
         $state = Get-PythonBatchBudgetState -ProdCap 2 -TestCap 2
 
         $result = Invoke-PythonBatchBudgetDecision -FilePath 'tests/unit/test_app.py' -State $state -StateFile '/repo/.claude/state/python-batch-budget.s.json'
 
         $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
-        $result.shouldWriteState | Should -BeTrue
-        $result.state.testFiles | Should -Contain 'tests/unit/test_app.py'
+        $result.shouldWriteState | Should -BeFalse
+        $result.state.Contains('testFiles') | Should -BeFalse
         $result.state.prodFiles | Should -BeNullOrEmpty
     }
 
@@ -80,20 +87,9 @@ Describe 'enforce-python-batch-budget.ps1' {
 
         $result.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*production file cap is 1*'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PYTHON_LARGE_PATH_REQUIRED:*'
         $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*src/second.py*'
         $result.state | Should -Not -BeNullOrEmpty
-    }
-
-    It 'denies a new test file when the test cap is full' {
-        $state = Get-PythonBatchBudgetState -ProdCap 1 -TestCap 1
-        $state.testFiles = @('tests/unit/test_first.py')
-
-        $result = Invoke-PythonBatchBudgetDecision -FilePath 'tests/unit/test_second.py' -State $state -StateFile '/repo/.claude/state/python-batch-budget.s.json'
-
-        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*test file cap is 1*'
-        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*tests/unit/test_second.py*'
     }
 
     It 'serializes the deny decision into the PreToolUse hookSpecificOutput envelope' {
@@ -133,7 +129,7 @@ Describe 'enforce-python-batch-budget.ps1' {
         $result.state.prodFiles | Should -HaveCount 2
         $result.state.prodFiles | Should -Contain 'src/first.py'
         $result.state.prodFiles | Should -Contain 'src/second.py'
-        $result.state.testFiles | Should -Contain 'tests/unit/test_first.py'
+        $result.state.Contains('testFiles') | Should -BeFalse
     }
 
     It 'denies malformed tool-input JSON with a diagnostic before touching state' {
