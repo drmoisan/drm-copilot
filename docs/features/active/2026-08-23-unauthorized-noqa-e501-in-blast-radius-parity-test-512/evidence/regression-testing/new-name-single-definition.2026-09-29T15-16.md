@@ -1,5 +1,5 @@
 ---
-Timestamp: 2026-09-30T14-23
+Timestamp: 2026-09-30T11-27
 Command: grep -rn -F --include=*.py "test_every_class_two_and_three_key_is_consumed_by_its_registered_assertion" tests/
 EXIT_CODE: 0
 Output Summary: Exactly one match at line 358 in test_blast_radius_config_parity.py
