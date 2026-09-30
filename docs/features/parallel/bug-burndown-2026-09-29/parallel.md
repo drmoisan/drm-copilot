@@ -808,10 +808,35 @@ items:
       contracts: []
       source: "declared"
       computed_at: "2026-09-30T02:23:49Z"
+  - issue_num: 740
+    feature_folder: "docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - "docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/**"
+        - "docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md"
+        - "extensions/drm-copilot/jest.config.cjs"
+        - "extensions/drm-copilot/src/lib/pr-context/collector-core.ts"
+        - "extensions/drm-copilot/src/lib/pr-context/feature-docs-parsers.ts"
+        - "extensions/drm-copilot/src/lib/pr-context/gh-client-details.ts"
+        - "extensions/drm-copilot/src/lib/pr-context/models.ts"
+        - "extensions/drm-copilot/src/lib/pr-context/render-feature-excerpts.ts"
+        - "extensions/drm-copilot/src/lib/pr-context/render-pr-helpers.ts"
+        - "extensions/drm-copilot/src/lib/pr-context/render.ts"
+        - "extensions/drm-copilot/src/lib/pr-context/verification-evidence.ts"
+        - "extensions/drm-copilot/test/lib/pr-context/feature-docs.test.ts"
+        - "extensions/drm-copilot/test/lib/pr-context/models.test.ts"
+      modules: []
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-30T03:07:10Z"
 ---
 
 # Parallel Run: bug-burndown-2026-09-29
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 16 of 22. Pending: 740, 741, 743, 744, 756, 764.
+Prepared: 17 of 22. Pending: 741, 743, 744, 756, 764.
