@@ -63,10 +63,10 @@ Impact: policy/maintainability debt only; no behavior defect. Both files pass th
 
 ## Acceptance Criteria
 
-- [ ] `scripts/dev_tools/potential_to_issue.py` is decomposed to <= 500 lines per file, preserving public behavior.
-- [ ] `tests/scripts/dev_tools/test_potential_to_issue.py` is decomposed to <= 500 lines per file, preserving test coverage.
-- [ ] TS/Python config-parity test continues to pass (no behavioral drift introduced by the split).
-- [ ] Full Python toolchain (Black → Ruff → Pyright → Pytest) passes with no coverage regression.
+- [x] `scripts/dev_tools/potential_to_issue.py` is decomposed to <= 500 lines per file, preserving public behavior.
+- [x] `tests/scripts/dev_tools/test_potential_to_issue.py` is decomposed to <= 500 lines per file, preserving test coverage.
+- [x] TS/Python config-parity test continues to pass (no behavioral drift introduced by the split).
+- [x] Full Python toolchain (Black → Ruff → Pyright → Pytest) passes with no coverage regression.
 
 ## Next Step
 
