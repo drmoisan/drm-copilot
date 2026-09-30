@@ -513,10 +513,43 @@ items:
         - "workspace-root"
       source: "declared"
       computed_at: "2026-09-30T00:38:45Z"
+  - issue_num: 658
+    feature_folder: "docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/lib/ci-gate/Invoke-CiGateParser.ps1"
+        - ".claude/skills/epic-orchestrate/SKILL.md"
+        - ".claude/skills/orchestrate/SKILL.md"
+        - ".github/workflows/README.md"
+        - ".github/workflows/ci.yml"
+        - ".github/workflows/npm-audit-gate.yml"
+        - "docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658/**"
+        - "docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658/issue.md"
+        - "docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658/plan.2026-09-29T20-45.md"
+        - "docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658/research/2026-09-29T20-50-epic-child-prs-ci-trigger-research.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md"
+        - "scripts/dev-tools/run-actionlint.ps1:128"
+        - "scripts/powershell/PoshQC/PoshQC.psd1"
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1:329"
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1:4"
+        - "tests/scripts/workflows/CiWorkflow.Tests.ps1"
+        - "tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1"
+      modules:
+        - "poshqc"
+        - "powershell-dev-tools"
+      shared_surfaces:
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-30T01:19:27Z"
 ---
 
 # Parallel Run: bug-burndown-2026-09-29
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 10 of 22. Pending: 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
+Prepared: 11 of 22. Pending: 647, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
