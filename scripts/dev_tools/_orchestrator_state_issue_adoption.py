@@ -30,14 +30,16 @@ Side Effects:
 from __future__ import annotations
 
 import re
-from collections.abc import Collection, Sequence
 from dataclasses import dataclass
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from scripts.dev_tools._orchestrator_state_promotion_tools import (
     BUG_PROMOTION_ENTRY_TOOL,
     FEATURE_PROMOTION_ENTRY_TOOL,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Collection, Sequence
 
 __all__ = [
     "ISSUE_ADOPTION_KEY",
@@ -169,7 +171,9 @@ def _provenance_errors(adoption: dict[str, Any]) -> list[str]:
 
     # Presence-only: any non-null value other than a blank string passes.
     verified_at = adoption.get("verified_at")
-    if verified_at is None or (isinstance(verified_at, str) and not verified_at.strip()):
+    if verified_at is None or (
+        isinstance(verified_at, str) and not verified_at.strip()
+    ):
         errors.append(ERROR_VERIFIED_AT)
 
     if not _is_non_blank_string(adoption.get("evidence")):

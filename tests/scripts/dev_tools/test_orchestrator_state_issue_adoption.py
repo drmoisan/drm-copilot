@@ -10,6 +10,7 @@ waivable-tool set, the fail-closed invariant, and presence gating.
 from __future__ import annotations
 
 import itertools
+from typing import cast
 
 import pytest
 
@@ -45,7 +46,11 @@ REMEDIATION_TOOLS: tuple[str, ...] = (
 # Tools that hold a successful receipt in a typical adopted checkpoint: every
 # required tool except the ones an adopted issue never exercises.
 NON_WAIVABLE_SUCCESSFUL: frozenset[str] = frozenset(
-    {"new_active_feature_folder", "collect_pr_context", "validate_orchestration_artifacts"}
+    {
+        "new_active_feature_folder",
+        "collect_pr_context",
+        "validate_orchestration_artifacts",
+    }
 )
 VALID_RECORD = (
     "docs/features/potential/promoted/"
@@ -76,7 +81,9 @@ E8INCLUDE = "Checkpoint issue_adoption.waived_tools must include potential_to_is
 def e8dup(tool: str) -> str:
     """Return the duplicate-waived-tool error for a tool."""
 
-    return f"Checkpoint issue_adoption.waived_tools lists a tool more than once: {tool}."
+    return (
+        f"Checkpoint issue_adoption.waived_tools lists a tool more than once: {tool}."
+    )
 
 
 def e8cannot(tool: str) -> str:
@@ -191,7 +198,9 @@ def test_feature_checkpoint_waiving_feature_entry_tool_with_record_has_no_errors
 
     # Assert
     assert result.errors == (), f"unexpected errors: {result.errors}"
-    assert result.waived_tools == frozenset({"potential_to_issue", "new_potential_entry"})
+    assert result.waived_tools == frozenset(
+        {"potential_to_issue", "new_potential_entry"}
+    )
 
 
 def test_bug_checkpoint_waiving_bug_entry_tool_with_record_has_no_errors() -> None:
@@ -521,7 +530,9 @@ def test_waiving_new_active_feature_folder_is_rejected() -> None:
     """new_active_feature_folder is outside the waivable set."""
 
     # Arrange
-    adoption = _adoption(waived_tools=["potential_to_issue", "new_active_feature_folder"])
+    adoption = _adoption(
+        waived_tools=["potential_to_issue", "new_active_feature_folder"]
+    )
 
     # Act
     result = _resolve(_state(adoption))
@@ -685,12 +696,15 @@ def test_errors_always_imply_empty_waived_tools_on_fixed_grid() -> None:
         else:
             observed_valid += 1
             assert isinstance(waived, list)
+            waived_names = cast("list[object]", waived)
             assert result.waived_tools == frozenset(
-                str(tool) for tool in waived
+                str(tool) for tool in waived_names
             ), f"waived set mismatch for {combination}"
 
     assert len(grid) == 96, f"grid size changed: {len(grid)}"
-    assert observed_valid == 2, f"expected two fully valid combinations, got {observed_valid}"
+    assert (
+        observed_valid == 2
+    ), f"expected two fully valid combinations, got {observed_valid}"
 
 
 # --- AC-11: presence gating --------------------------------------------------

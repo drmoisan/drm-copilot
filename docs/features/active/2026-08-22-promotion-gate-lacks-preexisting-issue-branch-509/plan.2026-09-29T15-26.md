@@ -660,45 +660,45 @@ Each source edit is additive and limited to the named location; each mirror copy
 
 Each language loop runs format, lint, type-check, test in that order. If a step fails, or a formatter changes a scope file, fix the cause and restart that language's loop at its format task until one uninterrupted pass is clean; record the clean pass. A formatter rewrite of a file outside the Scope-of-the-diff enumeration that was recorded as drift in Phase 0 is reverted with `git checkout --` and does not restart the loop.
 
-- [ ] [P8-T1] Run the TypeScript formatter in `extensions/drm-copilot` with a before-and-after tree observation at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/ts-format.TIMESTAMP.md`.
+- [x] [P8-T1] Run the TypeScript formatter in `extensions/drm-copilot` with a before-and-after tree observation at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/ts-format.TIMESTAMP.md`.
   - Run `git status --porcelain`, then `npm run format`, then `git status --porcelain`.
   - Acceptance: the artifact records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` with both listings verbatim; on the recorded clean pass the listings are identical and every printed Prettier file line ends in `(unchanged)`.
 
-- [ ] [P8-T2] Run the TypeScript linter for `extensions/drm-copilot/src` and `extensions/drm-copilot/test` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/ts-lint.TIMESTAMP.md`.
+- [x] [P8-T2] Run the TypeScript linter for `extensions/drm-copilot/src` and `extensions/drm-copilot/test` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/ts-lint.TIMESTAMP.md`.
   - Run `npm run lint`.
   - Acceptance: the artifact records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` with 0 errors and 0 warnings (empty problem output), or the verbatim output otherwise.
 
-- [ ] [P8-T3] Run the TypeScript type check for `extensions/drm-copilot/tsconfig.json` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/ts-typecheck.TIMESTAMP.md`.
+- [x] [P8-T3] Run the TypeScript type check for `extensions/drm-copilot/tsconfig.json` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/ts-typecheck.TIMESTAMP.md`.
   - Run `npm run typecheck`.
   - Acceptance: the artifact records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` with the diagnostic count 0.
 
-- [ ] [P8-T4] Run the full TypeScript suite in coverage mode at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/ts-coverage.TIMESTAMP.md`.
+- [x] [P8-T4] Run the full TypeScript suite in coverage mode at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/ts-coverage.TIMESTAMP.md`.
   - Run `npm run test:coverage -- --coverageReporters=text`.
   - Acceptance: the artifact records `Timestamp:`, `Command:`, `EXIT_CODE:` 0 when the P0-T11 failed set is empty. When it is non-empty, a non-zero `EXIT_CODE:` is accepted only when the failed-test set equals the P0-T11 set and no output line contains the token `coverage threshold`. Jest prints that token for every per-file threshold failure, so its absence shows every threshold entry passed. The artifact also records an `Output Summary:` with the passed, failed, and total counts, a failed-test set equal to the P0-T11 set, the overall `text-summary` percentages, and the four cells of the `orchestrator-state-issue-adoption.ts` and `orchestrator-state-routing.ts` rows; each row has `% Lines` at least 85 and `% Branch` at least 75.
 
-- [ ] [P8-T5] Run Black in write mode on the eight changed Python files in `scripts/dev_tools/` and `tests/scripts/dev_tools/` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/py-black.TIMESTAMP.md`.
+- [x] [P8-T5] Run Black in write mode on the eight changed Python files in `scripts/dev_tools/` and `tests/scripts/dev_tools/` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/py-black.TIMESTAMP.md`.
   - Run `poetry run black scripts/dev_tools/_orchestrator_state_routing.py scripts/dev_tools/_orchestrator_state_route_gates.py scripts/dev_tools/_orchestrator_state_promotion_tools.py scripts/dev_tools/_orchestrator_state_issue_adoption.py tests/scripts/dev_tools/test_orchestrator_state_routing_split.py tests/scripts/dev_tools/test_validate_orchestrator_state_issue_adoption.py tests/scripts/dev_tools/test_orchestrator_state_issue_adoption.py tests/scripts/dev_tools/test_orchestrator_state_issue_adoption_parity.py`.
   - Acceptance: the artifact records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` quoting the summary line; the recorded clean pass reads `8 files left unchanged.` and prints no `reformatted` line.
 
-- [ ] [P8-T6] Run Ruff on the eight changed Python files in `scripts/dev_tools/` and `tests/scripts/dev_tools/` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/py-ruff.TIMESTAMP.md`.
+- [x] [P8-T6] Run Ruff on the eight changed Python files in `scripts/dev_tools/` and `tests/scripts/dev_tools/` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/py-ruff.TIMESTAMP.md`.
   - Run `poetry run ruff check` with the same eight paths as P8-T5.
   - Acceptance: the artifact records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` quoting `All checks passed!`.
 
-- [ ] [P8-T7] Run Pyright strict for the repository configuration in `pyproject.toml` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/py-pyright.TIMESTAMP.md`.
+- [x] [P8-T7] Run Pyright strict for the repository configuration in `pyproject.toml` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/py-pyright.TIMESTAMP.md`.
   - Run `poetry run pyright`.
   - Acceptance: the artifact records `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` with the error, warning, and information counts. The error count is 0, or, if `PYRIGHT_BASELINE_ERRORS` was non-zero, at most that value with no diagnostic in any of the eight P8-T5 paths (the artifact lists every reported path).
 
-- [ ] [P8-T8] Run the spec's dotted-module Python coverage command for the four modules in `scripts/dev_tools/` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/py-module-coverage.TIMESTAMP.md`.
+- [x] [P8-T8] Run the spec's dotted-module Python coverage command for the four modules in `scripts/dev_tools/` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/py-module-coverage.TIMESTAMP.md`.
   - Run `poetry run pytest tests/scripts/dev_tools --cov=scripts.dev_tools._orchestrator_state_routing --cov=scripts.dev_tools._orchestrator_state_route_gates --cov=scripts.dev_tools._orchestrator_state_promotion_tools --cov=scripts.dev_tools._orchestrator_state_issue_adoption --cov-branch --cov-report=term-missing --cov-report=json:docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/py-module-coverage.json`.
   - Precede the run with the Issue #510 rule's state step.
   - Acceptance: the artifact records `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` with the state-step outputs, the passed and failed counts (failed node IDs only from the P0-T16 set or the Issue #510 condition, each named), the four printed `term-missing` rows verbatim, and for each module the line and branch percentages from its JSON `summary` object as in P0-T15; each line percentage is at least 85.0 and each branch percentage is at least 75.0.
 
-- [ ] [P8-T9] Run the full Python suite in coverage mode for `scripts/dev_tools` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/py-pytest-coverage.TIMESTAMP.md`.
+- [x] [P8-T9] Run the full Python suite in coverage mode for `scripts/dev_tools` at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/py-pytest-coverage.TIMESTAMP.md`.
   - Run `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --cov-report=json:docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/py-full-coverage.json`.
   - Precede the run with the Issue #510 rule's state step.
   - Acceptance: the artifact records `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` with the state-step outputs, the failed-node-ID set, which must equal the P0-T16 set exactly once any Issue #510 condition is set aside in both runs (a #510 failure present in only one of the two runs is recorded and is not a difference), the passed count, which must equal `PY_BASELINE_PASSED` plus 33 plus 4 plus `PY_UNIT_PASSED` plus 32, plus the number of #510-condition tests that failed in P0-T16 and passed in P8-T9, minus the number that passed in P0-T16 and failed in P8-T9, with the arithmetic and each such node ID named, and the repository-wide line and branch percentages from the JSON `totals` object.
 
-- [ ] [P8-T10] Run the PowerShell formatter with a before-and-after tree observation at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/ps-format.TIMESTAMP.md`.
+- [x] [P8-T10] Run the PowerShell formatter with a before-and-after tree observation at `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/qa-gates/ps-format.TIMESTAMP.md`.
   - Run `git status --porcelain`, then the MCP tool `mcp__drm-copilot__run_poshqc_format` with `workspace_root` set to the worktree root, then `git status --porcelain`.
   - Acceptance: the artifact records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, a separate `MCP-Status: success` line, and an `Output Summary:` with both listings and the completion time of this task in UTC, from `date -u +%Y-%m-%dT%H:%M:%SZ` (the H1 freshness reference); on the recorded clean pass they are identical. A rewrite of a PowerShell source file restarts the PowerShell loop and repeats P5-T4 or P5-T6 for its bundle copy. After the recorded clean pass, stop and return `HANDOFF: POWERSHELL SOURCE A (H1)` (see "Planned handoffs"); execution resumes at P8-T11. A later loop restart repeats this task and re-issues H1.
 
