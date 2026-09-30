@@ -344,11 +344,11 @@ This phase moves code verbatim and changes no behavior. It is batch B1 (python-t
 
 Batch B2 (python-typed-engineer) starts here. The regression file imports only `scripts.dev_tools.validate_orchestrator_state` and `scripts.dev_tools._orchestrator_state_routing`, both of which exist, so each failure is an assertion failure that reproduces the defect, not an import error.
 
-- [ ] [P2-T1] Record the Python batch-budget reset point for batch B2 under `.claude/state/` in `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/other/batch-reset-b2.TIMESTAMP.md`.
+- [x] [P2-T1] Record the Python batch-budget reset point for batch B2 under `.claude/state/` in `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/other/batch-reset-b2.TIMESTAMP.md`.
   - Repeat the P1-T1 procedure.
   - Acceptance: the artifact records both listings with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`; the second listing contains no `python-batch-budget.` file.
 
-- [ ] [P2-T2] [expect-fail] Create the regression test `tests/scripts/dev_tools/test_validate_orchestrator_state_issue_adoption.py`.
+- [x] [P2-T2] [expect-fail] Create the regression test `tests/scripts/dev_tools/test_validate_orchestrator_state_issue_adoption.py`.
   - Build an in-file completion-safe `large` checkpoint in the shape of `_build_complete_large_state` in `tests/scripts/dev_tools/test_validate_orchestrator_state_routing_contract.py` (lines 23-102; `issue-num` `"1"`), then remove the `potential_to_issue` entry from `mcp_call_receipts` and from `lifecycle_operations`. The valid adoption object is object `A` with `issue_num` `"1"` and `issue_url` `"https://github.com/drmoisan/drm-copilot/issues/1"`. Four tests, named exactly:
     - `test_large_checkpoint_with_valid_issue_adoption_completes_without_potential_to_issue_receipt`: adds the valid adoption and asserts `validate_orchestrator_state_text(json.dumps(state), require_complete=True) == []` (AC-5).
     - `test_adoption_error_fails_closed_and_orders_errors_before_local_execution_overrides`: adds the adoption with `origin` `"imported"` and sets `local_execution_overrides` to `["manual-step"]`; asserts `validate_routing_contract(state)` equals exactly `[R(potential_to_issue), E4, LEO]` (AC-9).
@@ -357,7 +357,7 @@ Batch B2 (python-typed-engineer) starts here. The regression file imports only `
   - Full type annotations, no temporary file, under 500 lines.
   - Acceptance: the file exists and P2-T3 records its expected failure.
 
-- [ ] [P2-T3] [expect-fail] Run `tests/scripts/dev_tools/test_validate_orchestrator_state_issue_adoption.py` before the fix and confirm it fails on exactly three tests.
+- [x] [P2-T3] [expect-fail] Run `tests/scripts/dev_tools/test_validate_orchestrator_state_issue_adoption.py` before the fix and confirm it fails on exactly three tests.
   - Run `poetry run pytest tests/scripts/dev_tools/test_validate_orchestrator_state_issue_adoption.py`.
   - Acceptance: `docs/features/active/2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509/evidence/regression-testing/py-regression-expect-fail.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 1, `ExpectedExitCode: 1`, and an `Output Summary:` with the summary line reading `3 failed, 1 passed` and the three failed names: the completes-without-receipt test (observed errors `[R(potential_to_issue)]`), the fail-closed ordering test, and the equality test. The absent-key test passes. Any other outcome is not the repro: record it and escalate.
 
