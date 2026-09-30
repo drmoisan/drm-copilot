@@ -1,6 +1,6 @@
 # Jest Per-File Coverage Final QA (P9-T6)
 
-Timestamp: 2026-09-30T15-16
+Timestamp: 2026-09-30T15-08
 Command: poetry run python -c "t=open('extensions/drm-copilot/coverage/lcov.info', encoding='utf-8').read(); b=[r for r in t.split('end_of_record') if any(l.startswith('SF:') and l.replace(chr(92), '/').endswith(('/validate/orchestrator-state-core.ts', '/validate/orchestrator-state-blocked-reason.ts')) for l in r.splitlines())]; print(len(b)); [print([l for l in r.splitlines() if l.startswith(('SF:','LF:','LH:','BRF:','BRH:'))]) for r in b]"
 EXIT_CODE: 0
 Output Summary: First printed line `2`; exactly two records follow.
