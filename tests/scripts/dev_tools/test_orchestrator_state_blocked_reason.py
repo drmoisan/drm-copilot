@@ -167,3 +167,136 @@ def test_classify_rejects_invalid_values(value: object) -> None:
     # Act / Assert
     with pytest.raises(ValueError, match=r"^invalid blocked_reason: "):
         blocked_reason.classify_blocked_reason(value)
+
+
+_WORKFLOW_SKILL = (
+    _REPO_ROOT / ".agents" / "skills" / "orchestrator-workflow" / "SKILL.md"
+)
+_RULES_DOCUMENT = _REPO_ROOT / ".claude" / "rules" / "orchestrator-state.md"
+_RULES_SECTION_HEADING = "## Blocked-Reason Vocabulary"
+_DOCUMENTATION_ONLY_MEMBERS = (
+    "checkpoint_conflict",
+    "lifecycle_preconditions_missing",
+    "review_status_missing",
+    "commit_context_missing",
+    "no_staged_changes",
+    "pre_implementation_gate_violation",
+)
+
+
+def _read_lines(path: Path) -> list[str]:
+    """Return the lines of a repository document read in place."""
+
+    return path.read_text(encoding="utf-8").splitlines()
+
+
+def _workflow_enumeration_block() -> str:
+    """Return the ``Blocked-reason enum:`` list from the orchestrator-workflow skill.
+
+    The block is the lines after the first line containing ``MUST be one of:``
+    that follows the ``Blocked-reason enum:`` line, up to the first blank line.
+    An empty string is returned when either anchor is absent.
+    """
+
+    lines = _read_lines(_WORKFLOW_SKILL)
+    anchor = next(
+        (i for i, line in enumerate(lines) if line.strip() == "Blocked-reason enum:"),
+        None,
+    )
+    if anchor is None:
+        return ""
+    start = next(
+        (i for i in range(anchor + 1, len(lines)) if "MUST be one of:" in lines[i]),
+        None,
+    )
+    if start is None:
+        return ""
+    block: list[str] = []
+    for line in lines[start + 1 :]:
+        if not line.strip():
+            break
+        block.append(line)
+    return "\n".join(block)
+
+
+def _rules_vocabulary_section() -> str:
+    """Return the rules-document text from the vocabulary heading to the next ``## ``.
+
+    An empty string is returned when the heading is absent.
+    """
+
+    lines = _read_lines(_RULES_DOCUMENT)
+    start = next(
+        (i for i, line in enumerate(lines) if line.strip() == _RULES_SECTION_HEADING),
+        None,
+    )
+    if start is None:
+        return ""
+    section = [lines[start]]
+    for line in lines[start + 1 :]:
+        if line.startswith("## "):
+            break
+        section.append(line)
+    return "\n".join(section)
+
+
+@pytest.mark.parametrize("member", sorted(blocked_reason.VALID_BLOCKED_REASONS))
+def test_docs_enumeration_lists_every_vocabulary_member(member: str) -> None:
+    """Every validator-enforced member appears backticked in the skill enumeration."""
+
+    # Act
+    block = _workflow_enumeration_block()
+
+    # Assert
+    assert f"`{member}`" in block, f"`{member}` missing from the Blocked-reason enum"
+
+
+@pytest.mark.parametrize("member", _DOCUMENTATION_ONLY_MEMBERS)
+def test_docs_enumeration_keeps_documentation_only_members(member: str) -> None:
+    """The six documentation-only members remain in the skill enumeration."""
+
+    # Act
+    block = _workflow_enumeration_block()
+
+    # Assert
+    assert f"`{member}`" in block, f"documentation-only member `{member}` was removed"
+
+
+@pytest.mark.parametrize("member", sorted(blocked_reason.VALID_BLOCKED_REASONS))
+def test_docs_rules_section_lists_every_vocabulary_member(member: str) -> None:
+    """Every validator-enforced member appears backticked in the rules section."""
+
+    # Act
+    section = _rules_vocabulary_section()
+
+    # Assert
+    assert section, f"{_RULES_SECTION_HEADING} section missing from rules document"
+    assert f"`{member}`" in section, f"`{member}` missing from the rules section"
+
+
+def test_docs_rules_section_declares_extension_point_for_484() -> None:
+    """The rules section names the #484 extension point on one line."""
+
+    # Act
+    section_lines = _rules_vocabulary_section().splitlines()
+
+    # Assert
+    matching = [
+        line
+        for line in section_lines
+        if "Extension point for #484:" in line and "separate contract change" in line
+    ]
+    assert len(matching) == 1, f"expected one #484 extension line, found {matching}"
+
+
+def test_docs_workflow_skill_carries_partition_paragraph() -> None:
+    """The workflow skill carries the ``Blocked-reason partition:`` paragraph."""
+
+    # Act
+    lines = _read_lines(_WORKFLOW_SKILL)
+
+    # Assert
+    matching = [line for line in lines if line.startswith("Blocked-reason partition:")]
+    assert (
+        len(matching) == 1
+    ), f"expected one partition paragraph, found {len(matching)}"

@@ -128,6 +128,11 @@ route.
   `not-applicable`, and `blocked_reason: "none"`.
 - Do not edit production code, execute the plan, author or edit a PR, run feature review, monitor
   CI, set `next_step: "complete"`, record `S12_complete`, or claim feature completion.
+- Premise-falsified halt: use `blocked_reason: "premise_falsified"` when every delegation and
+  validator succeeded but evidence gathered during execution falsified the plan's premise. Still
+  record the evidence path in free-form checkpoint keys; `blocked_reason` carries only the
+  classification. The preparation terminal checkpoint above still sets `blocked_reason: "none"`.
+  The full `blocked_reason` vocabulary and its partition are in `.claude/rules/orchestrator-state.md`.
 
 Only the literal JSON Boolean `false` in the route configuration disables the CI requirement.
 Missing, malformed, string-valued, or unknown route data fails closed. The preparation mutation
