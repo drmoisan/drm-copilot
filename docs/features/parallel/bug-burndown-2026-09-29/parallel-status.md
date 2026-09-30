@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-09-30T13:24:40Z
+- `last_updated`: 2026-09-30T13:33:38Z
 
 **Items**
 
@@ -25,7 +25,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 338 | docs/features/active/2026-07-09-potential-entry-ide-launcher-audit-gaps-338 | 4 | scheduled | not_started |  |  |  |  |  |
 | 406 | docs/features/active/2026-07-24-potential-to-issue-python-files-oversized-406 | 1 | scheduled | not_started |  |  |  |  |  |
 | 510 | docs/features/active/2026-08-19-claude-resource-parity-enumerates-gitignored-state-510 | 3 | scheduled | not_started |  |  |  |  |  |
-| 512 | docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512 | 0 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/799 |  | 2026-09-30T11:19:00Z |  |  |
+| 512 | docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/799 | 021b37e600afab00b191276cda803f87419a4a87 | 2026-09-30T11:19:00Z | 2026-09-30T13:33:38Z |  |
 | 527 | docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527 | 2 | scheduled | not_started |  |  |  |  |  |
 | 532 | docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532 | 2 | scheduled | not_started |  |  |  |  |  |
 | 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | scheduled | not_started |  |  |  |  |  |
