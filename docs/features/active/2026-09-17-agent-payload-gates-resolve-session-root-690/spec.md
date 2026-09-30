@@ -483,7 +483,7 @@ legs use operand ascent, not enumeration. No subprocess is started.
 
 ### Registration, mirrors, and guard test
 
-- [ ] Each `.claude` file created or changed by this work has a byte-identical mirror under `extensions/drm-copilot/resources/claude-customizations/.claude/`, and `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes.
+- [x] Each `.claude` file created or changed by this work has a byte-identical mirror under `extensions/drm-copilot/resources/claude-customizations/.claude/`, and `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes.
 - [x] `.claude/lib/worktree-resolution/WorktreeRunResolution.psm1` appears once in the `paths` array of `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, and any new dot-sourced hook sibling created by this work is also listed there.
 - [x] `tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1` lists `WorktreeRunResolution.psm1` in each of its module lists and passes, including the on-disk registration row and the SHA-256 mirror row.
 - [x] `WorktreeRunResolution.psm1` is added to `CodeCoverage.Path` in both `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` and `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`, and the two copies remain text-identical.
