@@ -117,8 +117,8 @@ If P5-T1 through P5-T5 fails or changes a tracked file, fix the cause (a live-fi
 
 ### Phase 6 — Final Commit, Push, and Clean-Tree Check
 
-- [ ] [P6-T1] Verify the follow-up entry and push. Commands: `git grep -c -F -e "#690" -- docs/features/potential/2026-09-30-worktree-run-resolution-review-nits.md`; `git status --porcelain`; only when that status is non-empty, CMD-GIT-ADD with RPLAN, the FEATURE evidence directory, and every path the status listed, then CMD-GIT-COMMIT with message "docs(690): record remediation R1 check-off state"; CMD-GIT-PUSH. Acceptance: the count prints a count of at least 1; the push exits 0.
-- [ ] [P6-T2] Clean-tree check. Commands: `git status --porcelain`; `git rev-parse HEAD`; `git rev-parse origin/bug/agent-payload-gates-resolve-session-root-690`. Write nothing (the result is reported to the orchestrator, because writing an artifact would dirty the tree). Acceptance: the status prints nothing and the two SHAs are equal.
+- [x] [P6-T1] Verify the follow-up entry and push. Commands: `git grep -c -F -e "#690" -- docs/features/potential/2026-09-30-worktree-run-resolution-review-nits.md`; `git status --porcelain`; only when that status is non-empty, CMD-GIT-ADD with RPLAN, the FEATURE evidence directory, and every path the status listed, then CMD-GIT-COMMIT with message "docs(690): record remediation R1 check-off state"; CMD-GIT-PUSH. Acceptance: the count prints a count of at least 1; the push exits 0.
+- [x] [P6-T2] Clean-tree check. Commands: `git status --porcelain`; `git rev-parse HEAD`; `git rev-parse origin/bug/agent-payload-gates-resolve-session-root-690`. Write nothing (the result is reported to the orchestrator, because writing an artifact would dirty the tree). Acceptance: the status prints nothing and the two SHAs are equal.
 
 ---
 
