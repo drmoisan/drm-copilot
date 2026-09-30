@@ -184,67 +184,67 @@ Baseline capture precedes every source edit. Each write-mode formatter task in t
 
 This phase adds the twelve fixtures and the Python and Pester readers. Python and PowerShell already implement the exact-match resolution (`scripts/dev_tools/_orchestrator_state_routing.py` lines 357-406 and `.claude/lib/orchestrator-state/OrchestratorStateRoutingContract.psm1` lines 105-144), so both readers are expected to pass in this phase. That pass is what proves each fixture's `expected_errors` matches the two authority runtimes before the TypeScript side is compared against it. These runs are pass-now baselines of the authorities, not `[expect-fail]` tasks. Each fixture follows the "Parity corpus construction rule" above.
 
-- [ ] [P1-T1] Create `tests/fixtures/orchestrator_state_promotion_type/bug-large-bug-tool-declared-and-recorded.json`.
+- [x] [P1-T1] Create `tests/fixtures/orchestrator_state_promotion_type/bug-large-bug-tool-declared-and-recorded.json`.
   - Case: route `large`, `promotion-type` `"bug"`, declared `required_mcp_tools` is the bug tools, `mcp_call_receipts` cover the bug tools. `expected_errors`: `[]`.
   - Acceptance: the file exists, parses as JSON, carries the four keys, and its `name` equals `bug-large-bug-tool-declared-and-recorded`.
 
-- [ ] [P1-T2] Create `tests/fixtures/orchestrator_state_promotion_type/feature-large-feature-tool-declared-and-recorded.json`.
+- [x] [P1-T2] Create `tests/fixtures/orchestrator_state_promotion_type/feature-large-feature-tool-declared-and-recorded.json`.
   - Case: route `large`, `promotion-type` `"feature"`, declared tools are the raw tools, receipts cover the raw tools. `expected_errors`: `[]`.
   - Acceptance: the file exists, parses, carries the four keys, and its `name` equals `feature-large-feature-tool-declared-and-recorded`.
 
-- [ ] [P1-T3] Create `tests/fixtures/orchestrator_state_promotion_type/bug-large-feature-tool-only.json`.
+- [x] [P1-T3] Create `tests/fixtures/orchestrator_state_promotion_type/bug-large-feature-tool-only.json`.
   - Case: route `large`, `promotion-type` `"bug"`, declared tools are the raw tools, receipts cover the raw tools. `expected_errors`, in this order: `Checkpoint required_mcp_tools must match routing matrix for route large.` then `Checkpoint missing successful MCP receipt: new_potential_bug_entry.`
   - Acceptance: the file exists, parses, carries the four keys, its `name` equals `bug-large-feature-tool-only`, and `expected_errors` holds exactly those two strings in that order.
 
-- [ ] [P1-T4] Create `tests/fixtures/orchestrator_state_promotion_type/absent-promotion-type-large-feature-tool.json`.
+- [x] [P1-T4] Create `tests/fixtures/orchestrator_state_promotion_type/absent-promotion-type-large-feature-tool.json`.
   - Case: route `large`, no `promotion-type` key, declared tools are the raw tools, receipts cover the raw tools. `expected_errors`: `[]`.
   - Acceptance: the file exists, parses, carries the four keys, its `name` equals `absent-promotion-type-large-feature-tool`, and its `checkpoint` has no `promotion-type` key.
 
-- [ ] [P1-T5] Create `tests/fixtures/orchestrator_state_promotion_type/capitalized-bug-large-feature-tool.json`.
+- [x] [P1-T5] Create `tests/fixtures/orchestrator_state_promotion_type/capitalized-bug-large-feature-tool.json`.
   - Case: route `large`, `promotion-type` `"Bug"` (capital B), declared tools are the raw tools, receipts cover the raw tools. `expected_errors`: `[]`, because only the exact string `"bug"` substitutes.
   - Acceptance: the file exists, parses, carries the four keys, and its `name` equals `capitalized-bug-large-feature-tool`.
 
-- [ ] [P1-T6] Create `tests/fixtures/orchestrator_state_promotion_type/leading-space-bug-large-feature-tool.json`.
+- [x] [P1-T6] Create `tests/fixtures/orchestrator_state_promotion_type/leading-space-bug-large-feature-tool.json`.
   - Case: route `large`, `promotion-type` `" bug"` (one leading space), declared tools are the raw tools, receipts cover the raw tools. `expected_errors`: `[]`.
   - Acceptance: the file exists, parses, carries the four keys, and its `name` equals `leading-space-bug-large-feature-tool`.
 
-- [ ] [P1-T7] Create `tests/fixtures/orchestrator_state_promotion_type/non-string-true-large-feature-tool.json`.
+- [x] [P1-T7] Create `tests/fixtures/orchestrator_state_promotion_type/non-string-true-large-feature-tool.json`.
   - Case: route `large`, `promotion-type` the JSON boolean `true`, declared tools are the raw tools, receipts cover the raw tools. `expected_errors`: `[]`.
   - Acceptance: the file exists, parses, carries the four keys, its `name` equals `non-string-true-large-feature-tool`, and the `promotion-type` value is the JSON boolean true and not a string.
 
-- [ ] [P1-T8] Create `tests/fixtures/orchestrator_state_promotion_type/null-promotion-type-large-feature-tool.json`.
+- [x] [P1-T8] Create `tests/fixtures/orchestrator_state_promotion_type/null-promotion-type-large-feature-tool.json`.
   - Case: route `large`, `promotion-type` the JSON `null`, declared tools are the raw tools, receipts cover the raw tools. `expected_errors`: `[]`.
   - Acceptance: the file exists, parses, carries the four keys, its `name` equals `null-promotion-type-large-feature-tool`, and the `promotion-type` key is present with the value null.
 
-- [ ] [P1-T9] Create `tests/fixtures/orchestrator_state_promotion_type/bug-small-bug-tool-declared-and-recorded.json`.
+- [x] [P1-T9] Create `tests/fixtures/orchestrator_state_promotion_type/bug-small-bug-tool-declared-and-recorded.json`.
   - Case: route `small`, `promotion-type` `"bug"`, declared tools are the bug tools, receipts cover the bug tools. `expected_errors`: `[]`.
   - Acceptance: the file exists, parses, carries the four keys, and its `name` equals `bug-small-bug-tool-declared-and-recorded`.
 
-- [ ] [P1-T10] Create `tests/fixtures/orchestrator_state_promotion_type/bug-preparation-bug-tool-declared-and-recorded.json`.
+- [x] [P1-T10] Create `tests/fixtures/orchestrator_state_promotion_type/bug-preparation-bug-tool-declared-and-recorded.json`.
   - Case: route `preparation`, `promotion-type` `"bug"`, declared tools are the bug tools, receipts cover the bug tools. `expected_errors`: `[]`.
   - Acceptance: the file exists, parses, carries the four keys, and its `name` equals `bug-preparation-bug-tool-declared-and-recorded`.
 
-- [ ] [P1-T11] Create `tests/fixtures/orchestrator_state_promotion_type/bug-remediation-no-op.json`.
+- [x] [P1-T11] Create `tests/fixtures/orchestrator_state_promotion_type/bug-remediation-no-op.json`.
   - Case: route `remediation`, `promotion-type` `"bug"`, declared tools are the raw tools (the list has no promotion-entry tool), receipts cover the raw tools. `expected_errors`: `[]`. The case proves the substitution is a no-op on a route whose list lacks `new_potential_entry`.
   - Acceptance: the file exists, parses, carries the four keys, and its `name` equals `bug-remediation-no-op`.
 
-- [ ] [P1-T12] Create `tests/fixtures/orchestrator_state_promotion_type/bug-epic-no-op.json`.
+- [x] [P1-T12] Create `tests/fixtures/orchestrator_state_promotion_type/bug-epic-no-op.json`.
   - Case: route `epic`, `promotion-type` `"bug"`, declared tools are the raw tools, receipts cover the raw tools. `expected_errors`: `[]`.
   - Acceptance: the file exists, parses, carries the four keys, and its `name` equals `bug-epic-no-op`.
 
-- [ ] [P1-T13] Create the Python corpus reader `tests/scripts/dev_tools/test_orchestrator_state_promotion_type_parity.py`.
+- [x] [P1-T13] Create the Python corpus reader `tests/scripts/dev_tools/test_orchestrator_state_promotion_type_parity.py`.
   - Follow the design of `tests/scripts/dev_tools/test_parallel_cohort_barrier_parity.py` (repository root resolved from `Path(__file__).resolve().parents[3]`; guarded load of each corpus file with `name` equal to the file stem; sorted glob). Import only `validate_routing_contract` from `scripts.dev_tools._orchestrator_state_routing` and call it as `validate_routing_contract(checkpoint)`, which loads the real `config/orchestration-routing.json` matrix. Define `MINIMUM_CORPUS_COUNT = 12`. Tests: `test_corpus_meets_the_documented_minimum_size`, `test_discovered_corpus_count_equals_the_json_file_count`, `test_corpus_exercises_both_verdicts`, and one parametrized `test_corpus_document_reproduces_the_expected_routing_errors` case per file, asserting ordered list equality with `expected_errors`. No temporary file, no external process, no wall-clock read, full type annotations, under 500 lines.
   - Acceptance: the file exists at that path, defines the four test names above, and `wc -l tests/scripts/dev_tools/test_orchestrator_state_promotion_type_parity.py` prints an integer below 500, recorded in the P1-T14 artifact.
 
-- [ ] [P1-T14] Run `tests/scripts/dev_tools/test_orchestrator_state_promotion_type_parity.py` against the unchanged Python authority and record the pass.
+- [x] [P1-T14] Run `tests/scripts/dev_tools/test_orchestrator_state_promotion_type_parity.py` against the unchanged Python authority and record the pass.
   - Run `poetry run pytest tests/scripts/dev_tools/test_orchestrator_state_promotion_type_parity.py`.
   - Acceptance: `docs/features/active/2026-09-29-ts-validator-promotion-type-parity-gap-405/evidence/regression-testing/py-parity-authority-pass.TIMESTAMP.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` 0, and an `Output Summary:` carrying the pytest summary line, which must read `15 passed` (three guard tests plus twelve parametrized cases) with zero failed, plus the line count from P1-T13. A failure here means a fixture's `expected_errors` disagrees with the Python authority: correct the fixture, never the assertion.
 
-- [ ] [P1-T15] Create the Pester corpus reader `tests/scripts/claude-lib/orchestrator-state/OrchestratorStatePromotionType.Parity.Tests.ps1`.
+- [x] [P1-T15] Create the Pester corpus reader `tests/scripts/claude-lib/orchestrator-state/OrchestratorStatePromotionType.Parity.Tests.ps1`.
   - Follow `tests/scripts/claude-lib/blast-radius/BlastRadius.Parity.Tests.ps1` (discovery-time `Get-ChildItem` enumeration into a `-ForEach` case list) and the header, `#Requires`, and module import of `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateRoutingContract.Tests.ps1` lines 1-39. Resolve the corpus with `(Resolve-Path "$PSScriptRoot/../../../../tests/fixtures/orchestrator_state_promotion_type").Path`. Import `.claude/lib/orchestrator-state/OrchestratorStateRoutingContract.psm1`. Convert each file with `Get-Content -Raw | ConvertFrom-Json` (no `-AsHashtable`, so `checkpoint` binds to the `[psobject] $State` parameter) and call `Get-OrchestratorStateRoutingContractError -State` with the fixture checkpoint. Compare the ordered error list to `expected_errors` as one joined string with `-BeExactly`, so empty and single-element lists are unambiguous. Set `$minimumFixtureCount = 12`. `It` blocks: three discovery guards (minimum size, count equals files on disk, both an empty and a non-empty `expected_errors`) plus one `-ForEach` case per file. No temporary file, no external process, under 500 lines.
   - Acceptance: the file exists at that path and `wc -l tests/scripts/claude-lib/orchestrator-state/OrchestratorStatePromotionType.Parity.Tests.ps1` prints an integer below 500, recorded in the P1-T16 artifact.
 
-- [ ] [P1-T16] Run `tests/scripts/claude-lib/orchestrator-state/OrchestratorStatePromotionType.Parity.Tests.ps1` against the unchanged PowerShell authority and record the pass.
+- [x] [P1-T16] Run `tests/scripts/claude-lib/orchestrator-state/OrchestratorStatePromotionType.Parity.Tests.ps1` against the unchanged PowerShell authority and record the pass.
   - Run the MCP tool `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the worktree root and `scan_folders` set to `["tests/scripts/claude-lib/orchestrator-state"]`.
   - Acceptance: `docs/features/active/2026-09-29-ts-validator-promotion-type-parity-gap-405/evidence/regression-testing/ps-parity-authority-pass.TIMESTAMP.md` records `Timestamp:`, `Command:` (tool name and arguments), `EXIT_CODE:` (integer, which must be 0), a separate `MCP-Status: success` line, and an `Output Summary:` carrying, read with the Read tool from `artifacts/pester/pester-junit.xml`, the root `tests` and `failures` attributes (failures must be 0) and the `tests` and `failures` attributes of the `testsuite` element for `OrchestratorStatePromotionType.Parity.Tests.ps1`, which must read 15 and 0 (three guards plus twelve cases). If the junit layout does not use one `testsuite` per test file, the artifact quotes the observed elements verbatim and counts the `testcase` elements of that file with no `failure` child; the count must be 15. It also carries the line count from P1-T15. If no `testsuite` or `testcase` for that file appears, the task fails: the folder scope did not run the new file. A failure here means a fixture disagrees with the PowerShell authority: correct the fixture, never the assertion.
 
