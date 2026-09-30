@@ -38,6 +38,31 @@ The documentation matches the ordering contract, the property tests assert a fix
 
 As above.
 
+## Acceptance Criteria
+
+Source: issue body (Steps to Reproduce 1-5, Expected Behavior) and `research/research.2026-09-29T22-25.md` section 8. Paths are relative to `extensions/drm-copilot/`.
+
+- [ ] AC-1: `compareCodePoint` in `src/lib/pr-context/models.ts` orders strings by Unicode code point (matching Python `str` comparison), and its JSDoc states that contract. New fixed-order tests in `test/lib/pr-context/models.test.ts` fail against the pre-fix UTF-16 code-unit implementation and pass after the fix.
+- [ ] AC-2: `test/lib/pr-context/models.test.ts` asserts literal expected results for the non-BMP disagreement pairs `"￿"` vs `"\u{1F600}"`, `""` vs `"\u{10000}"`, and a shared-prefix pair, plus agreement pairs for lead-surrogate and trail-surrogate differences.
+- [ ] AC-3: `test/lib/pr-context/models.test.ts` contains a fixed-order sort test whose expected array is a literal (`["", "A", "a", "ab", "b", "é", "", "￿", "\u{1F600}"]`) and is not derived from the `<` or `>` operators.
+- [ ] AC-4: The two vacuous tests ("agrees with the native < and > operators..." and "produces the same order as native comparison via Array.prototype.sort...") are removed, and no test in `test/lib/pr-context/models.test.ts` derives its expected value from the string `<` or `>` operators.
+- [ ] AC-5: The antisymmetry and transitivity tests report the offending pair(s) on failure (violations array or `it.each` titles), and the enumerative domain includes `""` and `"￿"`.
+- [ ] AC-6: Each of `sortedSet`, `relativeToPosix`, `escapeRegExp`, and `splitLines` is defined exactly once under `src/lib/pr-context/`: `sortedSet`, `escapeRegExp`, and `splitLines` exported from `models.ts`, and `relativeToPosix` exported from `feature-docs-parsers.ts`. All former private copies are removed and their callers import the canonical definition.
+- [ ] AC-7: `test/lib/pr-context/models.test.ts` has direct tests for `sortedSet`, `escapeRegExp`, and `splitLines`; `test/lib/pr-context/feature-docs.test.ts` has direct tests for `relativeToPosix`, including a Windows-style root and a path outside the root.
+- [ ] AC-8: The `splitLines` JSDoc states the supported terminators (`\r\n`, `\r`, `\n`) and that they are a subset of the Python `str.splitlines()` boundaries.
+- [ ] AC-9: The `models.ts` header comment lists `splitLines`, `compareCodePoint`, `sortedSet`, and `escapeRegExp`.
+- [ ] AC-10: `src/lib/pr-context/gh-client-details.ts` imports from `./models` in a single statement.
+- [ ] AC-11: All pre-existing tests under `test/lib/pr-context/` pass without changes to their expected outputs, demonstrating unchanged PR-context output for existing inputs.
+- [ ] AC-12: Prettier check, ESLint (`npm run lint`), and TypeScript (`npm run typecheck`) exit 0 from `extensions/drm-copilot/`.
+- [ ] AC-13: `npm run test:coverage` exits 0; every changed production file meets 85% line and 75% branch coverage, and `jest.config.cjs` carries a per-file threshold entry for each changed production file.
+- [ ] AC-14: No changed file exceeds 500 lines, and no file under `src/lib/codex-native-converter/`, `src/lib/push-down/`, or `src/lib/subagent-tree/` is modified.
+
+## Out of Scope
+
+- Consolidating comparators in `codex-native-converter/`, `push-down/`, and `subagent-tree/` into a neutral `src/lib/` module (research section 7.1); deferred to a follow-up issue.
+- Python parity port changes (research section 7.2).
+- `splitLines` terminator-set behavior parity with Python, and larger pr-context duplications (research section 7.3).
+
 ## Logs / Screenshots
 
 - [ ] Attached minimal logs or screenshot
