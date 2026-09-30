@@ -448,71 +448,71 @@ If any Phase 12 step fails or changes a tracked file, fix the cause, re-mirror a
 
 Each check-off task edits one line of FEATURE/spec.md, changing its leading `- [ ] ` to `- [x] ` (the line numbers are those of Appendix I and do not move, because no earlier task edits spec.md), and records the check-off with the cited evidence in FEATURE/evidence/other/ac-checkoff.TS.md. A criterion whose cited evidence does not all pass stays unchecked and the plan outcome is remediation-required.
 
-- [ ] [P14-T1] Check off AC-01 (spec line 410). Evidence: P3-T13 (G1A row R1).
-- [ ] [P14-T2] Check off AC-02 (line 411). Evidence: P4-T10 (G2 row W1).
-- [ ] [P14-T3] Check off AC-03 (line 412). Evidence: P3-T13 (G1A R2), P4-T10 (G2 W2).
-- [ ] [P14-T4] Check off AC-04 (line 416). Evidence: P1-T12 (T-REC X1).
-- [ ] [P14-T5] Check off AC-05 (line 417). Evidence: P1-T12 (T-REC C1 rows).
-- [ ] [P14-T6] Check off AC-06 (line 418). Evidence: P1-T12 (T-SIG S1-S9).
-- [ ] [P14-T7] Check off AC-07 (line 419). Evidence: P1-T12 (T-RUN E1-E6).
-- [ ] [P14-T8] Check off AC-08 (line 420). Evidence: P1-T12 (T-RUN E7-E9).
-- [ ] [P14-T9] Check off AC-09 (line 421). Evidence: P1-T12 (T-RUN E10-E15, R4-R7).
-- [ ] [P14-T10] Check off AC-10 (line 422). Evidence: P1-T12 (T-RUN R1-R3).
-- [ ] [P14-T11] Check off AC-11 (line 423). Evidence: P1-T12 (T-REC B1-B12).
-- [ ] [P14-T12] Check off AC-12 (line 424). Evidence: P1-T12 (T-REC U1-U3).
-- [ ] [P14-T13] Check off AC-13 (line 425). Evidence: P1-T2, P1-T12 (T-REC X2, C2).
-- [ ] [P14-T14] Check off AC-14 (line 429). Evidence: P3-T13 (G1A R1-R3).
-- [ ] [P14-T15] Check off AC-15 (line 430). Evidence: P3-T13 (G1A R4-R6).
-- [ ] [P14-T16] Check off AC-16 (line 431). Evidence: P3-T13 (G1A R7-R10).
-- [ ] [P14-T17] Check off AC-17 (line 432). Evidence: P3-T13 (G1B O1-O3).
-- [ ] [P14-T18] Check off AC-18 (line 433). Evidence: P3-T13 (G1B O4-O5).
-- [ ] [P14-T19] Check off AC-19 (line 434). Evidence: P3-T13 (G1B O10).
-- [ ] [P14-T20] Check off AC-20 (line 435). Evidence: P3-T13 (G1A R13-R15), P3-T14.
-- [ ] [P14-T21] Check off AC-21 (line 439). Evidence: P10-T14 (T-ESR N1).
-- [ ] [P14-T22] Check off AC-22 (line 440). Evidence: P10-T14 (T-ESR N2, N3).
-- [ ] [P14-T23] Check off AC-23 (line 441). Evidence: P10-T15, P10-T17.
-- [ ] [P14-T24] Check off AC-24 (line 445). Evidence: P4-T10, P4-T11.
-- [ ] [P14-T25] Check off AC-25 (line 446). Evidence: P5-T10, P5-T11.
-- [ ] [P14-T26] Check off AC-26 (line 447). Evidence: P4-T12, P13-T7.
-- [ ] [P14-T27] Check off AC-27 (line 451). Evidence: P6-T12 (G4 M1).
-- [ ] [P14-T28] Check off AC-28 (line 452). Evidence: P6-T12 (G4 M2).
-- [ ] [P14-T29] Check off AC-29 (line 453). Evidence: P6-T12 (G4 M3-M5).
-- [ ] [P14-T30] Check off AC-30 (line 454). Evidence: P6-T12 (G4 M6).
-- [ ] [P14-T31] Check off AC-31 (line 455). Evidence: P6-T12 (G4 M7-M9).
-- [ ] [P14-T32] Check off AC-32 (line 459). Evidence: P7-T12, P7-T13.
-- [ ] [P14-T33] Check off AC-33 (line 460). Evidence: P8-T10, P8-T11.
-- [ ] [P14-T34] Check off AC-34 (line 464). Evidence: P9-T10, P9-T11.
-- [ ] [P14-T35] Check off AC-35 (line 468). Evidence: import-failure rows G1B O7-O8, G2 W7, G3 C5, G4 M10, G5 V6, G6 Y6, G7 D6 (P3-T13, P4-T10, P5-T10, P6-T12, P7-T12, P8-T10, P9-T10).
-- [ ] [P14-T36] Check off AC-36 (line 469). Evidence: P11-T4 (E1).
-- [ ] [P14-T37] Check off AC-37 (line 473). Evidence: P3-T13 (G1B O5, O6).
-- [ ] [P14-T38] Check off AC-38 (line 474). Evidence: P3-T13 (G1A R11), P4-T10 (G2 W5), P5-T10 (G3 C4).
-- [ ] [P14-T39] Check off AC-39 (line 475). Evidence: P1-T12 (T-RUN E7), P3-T13 (G1A R12), P4-T10 (G2 W6).
-- [ ] [P14-T40] Check off AC-40 (line 479). Evidence: P2-T8, P2-T9.
-- [ ] [P14-T41] Check off AC-41 (line 480). Evidence: P2-T8 (epic-orchestrate and parallel-orchestrate counts), P2-T3 negative marker search.
-- [ ] [P14-T42] Check off AC-42 (line 481). Evidence: P2-T8 (three invoke-skill counts).
-- [ ] [P14-T43] Check off AC-43 (line 482). Evidence: P13-T10.
-- [ ] [P14-T44] Check off AC-44 (line 486) only when the P13-T1 artifact records `KL-510: PASSED`. Evidence: P13-T1, P13-T8. When P13-T1 records `KL-510: STATE-ONLY`, leave AC-44 unchecked and record the gap in the ac-checkoff artifact; the pull request's CI run closes it.
-- [ ] [P14-T45] Check off AC-45 (line 487). Evidence: P1-T7, P6-T8, P7-T8, P13-T9.
-- [ ] [P14-T46] Check off AC-46 (line 488). Evidence: P1-T6, P1-T13.
-- [ ] [P14-T47] Check off AC-47 (line 489). Evidence: P1-T8, P13-T9.
-- [ ] [P14-T48] Check off AC-48 (line 490). Evidence: P10-T9, P10-T14, P10-T15.
-- [ ] [P14-T49] Check off AC-49 (line 494). Evidence: G1A, G1B, G2-G7 rows listed in Appendix C per gate (P3-T13, P4-T10, P5-T10, P6-T12, P7-T12, P8-T10, P9-T10).
-- [ ] [P14-T50] Check off AC-50 (line 495). Evidence: P12-T18, P12-T19.
-- [ ] [P14-T51] Check off AC-51 (line 496). Evidence: P3-T9, P4-T6, P5-T6, P6-T7, P7-T7, P8-T6, P9-T6, P12-T13.
-- [ ] [P14-T52] Check off AC-52 (line 497). Evidence: P12-T4, P12-T12, P13-T11 (`Disposition: PASS`).
-- [ ] [P14-T53] Check off AC-53 (line 498). Evidence: P1-T13, P12-T14, P12-T15.
-- [ ] [P14-T54] Check off AC-54 (line 502). Evidence: P3-T15, P13-T6.
-- [ ] [P14-T55] Check off AC-55 (line 503). Evidence: P12-T17.
-- [ ] [P14-T56] Check off AC-56 (line 504). Evidence: P3-T15, P3-T16.
-- [ ] [P14-T57] Check off AC-57 (line 508). Evidence: P1-T16, P13-T10.
-- [ ] [P14-T58] Check off AC-58 (line 509). Evidence: WLOG entries from P1-T2, P3-T6, P4-T4, P5-T4, P6-T5, P7-T5, P8-T4, P9-T4, P10-T4 and the suite results appended by P3-T13 through P10-T15.
-- [ ] [P14-T59] Check off AC-59 (line 510). Evidence: P3-T2.
-- [ ] [P14-T60] Check off AC-60 (line 511). Evidence: P13-T10.
-- [ ] [P14-T61] Check off AC-61 (line 515). Evidence: P12-T1, P12-T2, P12-T4 through P12-T16.
-- [ ] [P14-T62] Check off AC-62 (line 516). Evidence: P13-T4, P13-T5, P13-T6, P13-T7.
-- [ ] [P14-T63] Check off AC-63 (line 517). Evidence: P11-T4 (E2, E3).
-- [ ] [P14-T64] Check off the four early-draft items of FEATURE/issue.md `## Acceptance Criteria (early draft)` (lines 62-68), each superseded by spec criteria: item 1 by AC-01/AC-16, item 2 by AC-17, item 3 by AC-14 through AC-16, item 4 by AC-49/AC-51. Acceptance: the four lines begin `- [x] ` and the ac-checkoff artifact records the mapping.
-- [ ] [P14-T65] Verify and commit the check-off. Commands: `git grep -c -F -e "- [x] " -- docs/features/active/2026-09-17-agent-payload-gates-resolve-session-root-690/spec.md docs/features/active/2026-09-17-agent-payload-gates-resolve-session-root-690/issue.md`, then `git grep -c -F -e "- [ ] " -- docs/features/active/2026-09-17-agent-payload-gates-resolve-session-root-690/spec.md docs/features/active/2026-09-17-agent-payload-gates-resolve-session-root-690/issue.md`; then CMD-GIT-ADD with FEATURE/spec.md, FEATURE/issue.md, the FEATURE evidence directory, and PLAN, CMD-GIT-COMMIT with message "docs(690): check off acceptance criteria", CMD-GIT-PUSH. Acceptance: when AC-44 is checked, the first search prints `spec.md:64` (63 criteria plus the pre-existing `- [x] High`) and the second prints `spec.md:3` (the three Impact/Severity boxes); when AC-44 is left unchecked by P14-T44, the first prints `spec.md:63` and the second prints `spec.md:4`. In both cases the first search prints `issue.md:5` (four criteria plus the pre-existing promotion box) and the second prints no `issue.md` line, each path printed in full; CMD-GIT-STATUS prints nothing after the push.
+- [x] [P14-T1] Check off AC-01 (spec line 410). Evidence: P3-T13 (G1A row R1).
+- [x] [P14-T2] Check off AC-02 (line 411). Evidence: P4-T10 (G2 row W1).
+- [x] [P14-T3] Check off AC-03 (line 412). Evidence: P3-T13 (G1A R2), P4-T10 (G2 W2).
+- [x] [P14-T4] Check off AC-04 (line 416). Evidence: P1-T12 (T-REC X1).
+- [x] [P14-T5] Check off AC-05 (line 417). Evidence: P1-T12 (T-REC C1 rows).
+- [x] [P14-T6] Check off AC-06 (line 418). Evidence: P1-T12 (T-SIG S1-S9).
+- [x] [P14-T7] Check off AC-07 (line 419). Evidence: P1-T12 (T-RUN E1-E6).
+- [x] [P14-T8] Check off AC-08 (line 420). Evidence: P1-T12 (T-RUN E7-E9).
+- [x] [P14-T9] Check off AC-09 (line 421). Evidence: P1-T12 (T-RUN E10-E15, R4-R7).
+- [x] [P14-T10] Check off AC-10 (line 422). Evidence: P1-T12 (T-RUN R1-R3).
+- [x] [P14-T11] Check off AC-11 (line 423). Evidence: P1-T12 (T-REC B1-B12).
+- [x] [P14-T12] Check off AC-12 (line 424). Evidence: P1-T12 (T-REC U1-U3).
+- [x] [P14-T13] Check off AC-13 (line 425). Evidence: P1-T2, P1-T12 (T-REC X2, C2).
+- [x] [P14-T14] Check off AC-14 (line 429). Evidence: P3-T13 (G1A R1-R3).
+- [x] [P14-T15] Check off AC-15 (line 430). Evidence: P3-T13 (G1A R4-R6).
+- [x] [P14-T16] Check off AC-16 (line 431). Evidence: P3-T13 (G1A R7-R10).
+- [x] [P14-T17] Check off AC-17 (line 432). Evidence: P3-T13 (G1B O1-O3).
+- [x] [P14-T18] Check off AC-18 (line 433). Evidence: P3-T13 (G1B O4-O5).
+- [x] [P14-T19] Check off AC-19 (line 434). Evidence: P3-T13 (G1B O10).
+- [x] [P14-T20] Check off AC-20 (line 435). Evidence: P3-T13 (G1A R13-R15), P3-T14.
+- [x] [P14-T21] Check off AC-21 (line 439). Evidence: P10-T14 (T-ESR N1).
+- [x] [P14-T22] Check off AC-22 (line 440). Evidence: P10-T14 (T-ESR N2, N3).
+- [x] [P14-T23] Check off AC-23 (line 441). Evidence: P10-T15, P10-T17.
+- [x] [P14-T24] Check off AC-24 (line 445). Evidence: P4-T10, P4-T11.
+- [x] [P14-T25] Check off AC-25 (line 446). Evidence: P5-T10, P5-T11.
+- [x] [P14-T26] Check off AC-26 (line 447). Evidence: P4-T12, P13-T7.
+- [x] [P14-T27] Check off AC-27 (line 451). Evidence: P6-T12 (G4 M1).
+- [x] [P14-T28] Check off AC-28 (line 452). Evidence: P6-T12 (G4 M2).
+- [x] [P14-T29] Check off AC-29 (line 453). Evidence: P6-T12 (G4 M3-M5).
+- [x] [P14-T30] Check off AC-30 (line 454). Evidence: P6-T12 (G4 M6).
+- [x] [P14-T31] Check off AC-31 (line 455). Evidence: P6-T12 (G4 M7-M9).
+- [x] [P14-T32] Check off AC-32 (line 459). Evidence: P7-T12, P7-T13.
+- [x] [P14-T33] Check off AC-33 (line 460). Evidence: P8-T10, P8-T11.
+- [x] [P14-T34] Check off AC-34 (line 464). Evidence: P9-T10, P9-T11.
+- [x] [P14-T35] Check off AC-35 (line 468). Evidence: import-failure rows G1B O7-O8, G2 W7, G3 C5, G4 M10, G5 V6, G6 Y6, G7 D6 (P3-T13, P4-T10, P5-T10, P6-T12, P7-T12, P8-T10, P9-T10).
+- [x] [P14-T36] Check off AC-36 (line 469). Evidence: P11-T4 (E1).
+- [x] [P14-T37] Check off AC-37 (line 473). Evidence: P3-T13 (G1B O5, O6).
+- [x] [P14-T38] Check off AC-38 (line 474). Evidence: P3-T13 (G1A R11), P4-T10 (G2 W5), P5-T10 (G3 C4).
+- [x] [P14-T39] Check off AC-39 (line 475). Evidence: P1-T12 (T-RUN E7), P3-T13 (G1A R12), P4-T10 (G2 W6).
+- [x] [P14-T40] Check off AC-40 (line 479). Evidence: P2-T8, P2-T9.
+- [x] [P14-T41] Check off AC-41 (line 480). Evidence: P2-T8 (epic-orchestrate and parallel-orchestrate counts), P2-T3 negative marker search.
+- [x] [P14-T42] Check off AC-42 (line 481). Evidence: P2-T8 (three invoke-skill counts).
+- [x] [P14-T43] Check off AC-43 (line 482). Evidence: P13-T10.
+- [x] [P14-T44] Check off AC-44 (line 486) only when the P13-T1 artifact records `KL-510: PASSED`. Evidence: P13-T1, P13-T8. When P13-T1 records `KL-510: STATE-ONLY`, leave AC-44 unchecked and record the gap in the ac-checkoff artifact; the pull request's CI run closes it.
+- [x] [P14-T45] Check off AC-45 (line 487). Evidence: P1-T7, P6-T8, P7-T8, P13-T9.
+- [x] [P14-T46] Check off AC-46 (line 488). Evidence: P1-T6, P1-T13.
+- [x] [P14-T47] Check off AC-47 (line 489). Evidence: P1-T8, P13-T9.
+- [x] [P14-T48] Check off AC-48 (line 490). Evidence: P10-T9, P10-T14, P10-T15.
+- [x] [P14-T49] Check off AC-49 (line 494). Evidence: G1A, G1B, G2-G7 rows listed in Appendix C per gate (P3-T13, P4-T10, P5-T10, P6-T12, P7-T12, P8-T10, P9-T10).
+- [x] [P14-T50] Check off AC-50 (line 495). Evidence: P12-T18, P12-T19.
+- [x] [P14-T51] Check off AC-51 (line 496). Evidence: P3-T9, P4-T6, P5-T6, P6-T7, P7-T7, P8-T6, P9-T6, P12-T13.
+- [x] [P14-T52] Check off AC-52 (line 497). Evidence: P12-T4, P12-T12, P13-T11 (`Disposition: PASS`).
+- [x] [P14-T53] Check off AC-53 (line 498). Evidence: P1-T13, P12-T14, P12-T15.
+- [x] [P14-T54] Check off AC-54 (line 502). Evidence: P3-T15, P13-T6.
+- [x] [P14-T55] Check off AC-55 (line 503). Evidence: P12-T17.
+- [x] [P14-T56] Check off AC-56 (line 504). Evidence: P3-T15, P3-T16.
+- [x] [P14-T57] Check off AC-57 (line 508). Evidence: P1-T16, P13-T10.
+- [x] [P14-T58] Check off AC-58 (line 509). Evidence: WLOG entries from P1-T2, P3-T6, P4-T4, P5-T4, P6-T5, P7-T5, P8-T4, P9-T4, P10-T4 and the suite results appended by P3-T13 through P10-T15.
+- [x] [P14-T59] Check off AC-59 (line 510). Evidence: P3-T2.
+- [x] [P14-T60] Check off AC-60 (line 511). Evidence: P13-T10.
+- [x] [P14-T61] Check off AC-61 (line 515). Evidence: P12-T1, P12-T2, P12-T4 through P12-T16.
+- [x] [P14-T62] Check off AC-62 (line 516). Evidence: P13-T4, P13-T5, P13-T6, P13-T7.
+- [x] [P14-T63] Check off AC-63 (line 517). Evidence: P11-T4 (E2, E3).
+- [x] [P14-T64] Check off the four early-draft items of FEATURE/issue.md `## Acceptance Criteria (early draft)` (lines 62-68), each superseded by spec criteria: item 1 by AC-01/AC-16, item 2 by AC-17, item 3 by AC-14 through AC-16, item 4 by AC-49/AC-51. Acceptance: the four lines begin `- [x] ` and the ac-checkoff artifact records the mapping.
+- [x] [P14-T65] Verify and commit the check-off. Commands: `git grep -c -F -e "- [x] " -- docs/features/active/2026-09-17-agent-payload-gates-resolve-session-root-690/spec.md docs/features/active/2026-09-17-agent-payload-gates-resolve-session-root-690/issue.md`, then `git grep -c -F -e "- [ ] " -- docs/features/active/2026-09-17-agent-payload-gates-resolve-session-root-690/spec.md docs/features/active/2026-09-17-agent-payload-gates-resolve-session-root-690/issue.md`; then CMD-GIT-ADD with FEATURE/spec.md, FEATURE/issue.md, the FEATURE evidence directory, and PLAN, CMD-GIT-COMMIT with message "docs(690): check off acceptance criteria", CMD-GIT-PUSH. Acceptance: when AC-44 is checked, the first search prints `spec.md:64` (63 criteria plus the pre-existing `- [x] High`) and the second prints `spec.md:3` (the three Impact/Severity boxes); when AC-44 is left unchecked by P14-T44, the first prints `spec.md:63` and the second prints `spec.md:4`. In both cases the first search prints `issue.md:5` (four criteria plus the pre-existing promotion box) and the second prints no `issue.md` line, each path printed in full; CMD-GIT-STATUS prints nothing after the push.
 
 ---
 

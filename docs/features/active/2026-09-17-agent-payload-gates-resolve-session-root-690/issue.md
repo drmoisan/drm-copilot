@@ -59,12 +59,12 @@ the session root's checkpoint is the sole active checkpoint in the repository?
 
 ## Acceptance Criteria (early draft)
 
-- [ ] A delegation whose prompt names a feature folder in another worktree is validated against
+- [x] A delegation whose prompt names a feature folder in another worktree is validated against
       that worktree's checkpoint.
-- [ ] An `Edit`/`Write` to a path inside another worktree is validated against that worktree's
+- [x] An `Edit`/`Write` to a path inside another worktree is validated against that worktree's
       checkpoint.
-- [ ] The settled `NoTarget` policy is implemented identically in both gates.
-- [ ] Pester coverage for the resolution matrix in both gates, with existing cases as regression
+- [x] The settled `NoTarget` policy is implemented identically in both gates.
+- [x] Pester coverage for the resolution matrix in both gates, with existing cases as regression
       guards.
 
 ## Constraints & Risks

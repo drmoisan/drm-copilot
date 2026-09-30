@@ -407,114 +407,114 @@ legs use operand ascent, not enumeration. No subprocess is started.
 
 ### Reproduction
 
-- [ ] Reproduction, admitted: a Pester test models a session root `W_session` holding no epic checkpoint and a separate live worktree `W_epic` holding a ready `epic-orchestrator-state.json` (`route_id: "epic"`, `integration_branch: epic/repro-integration`); an `Agent(orchestrator)` payload carrying the epic kickoff line `Epic mode: true. epic_feature_folder: repro. integration_branch: epic/repro-integration. ...` is allowed by `enforce-orchestration-preimplementation-gate.ps1`, and the readiness read is asserted to target the path under `W_epic`.
-- [ ] Reproduction, admitted at the barrier: the same payload and topology is allowed by `enforce-epic-wave-barrier.ps1` when the checkpoint's wave state permits the delegation, with the read asserted to target the path under `W_epic`.
-- [ ] Reproduction, denied: the same payload with no live worktree holding an epic checkpoint is denied by `enforce-orchestration-preimplementation-gate.ps1` with a reason containing `PREIMPLEMENTATION_GATE_BLOCKED` and `TARGET_WORKTREE_NOT_DERIVABLE`, and by `enforce-epic-wave-barrier.ps1` with a reason containing `EPIC_WAVE_BARRIER_BLOCKED` and `TARGET_WORKTREE_NOT_DERIVABLE`.
+- [x] Reproduction, admitted: a Pester test models a session root `W_session` holding no epic checkpoint and a separate live worktree `W_epic` holding a ready `epic-orchestrator-state.json` (`route_id: "epic"`, `integration_branch: epic/repro-integration`); an `Agent(orchestrator)` payload carrying the epic kickoff line `Epic mode: true. epic_feature_folder: repro. integration_branch: epic/repro-integration. ...` is allowed by `enforce-orchestration-preimplementation-gate.ps1`, and the readiness read is asserted to target the path under `W_epic`.
+- [x] Reproduction, admitted at the barrier: the same payload and topology is allowed by `enforce-epic-wave-barrier.ps1` when the checkpoint's wave state permits the delegation, with the read asserted to target the path under `W_epic`.
+- [x] Reproduction, denied: the same payload with no live worktree holding an epic checkpoint is denied by `enforce-orchestration-preimplementation-gate.ps1` with a reason containing `PREIMPLEMENTATION_GATE_BLOCKED` and `TARGET_WORKTREE_NOT_DERIVABLE`, and by `enforce-epic-wave-barrier.ps1` with a reason containing `EPIC_WAVE_BARRIER_BLOCKED` and `TARGET_WORKTREE_NOT_DERIVABLE`.
 
 ### Run-resolution module
 
-- [ ] `.claude/lib/worktree-resolution/WorktreeRunResolution.psm1` exists and exports `Find-WorktreeRunIdentitySignal`, `Get-WorktreeRunCheckpointText`, `Resolve-WorktreeEpicTarget`, `Resolve-WorktreeParallelTarget`, and `Resolve-WorktreeRunTargetByRecord`.
-- [ ] Every resolver in the module returns an object with `Status` (one of `SessionRoot`, `OtherWorktree`, `NoTarget`, `Ambiguous`), `WorktreeRoot`, `SessionRoot`, `Signal`, `SignalValue`, `Candidates`, `ReasonCode`, and `Detail`, built through `New-WorktreeResolutionTargetResult`, with `ReasonCode` equal to `TARGET_WORKTREE_NOT_DERIVABLE` for `NoTarget` and `TARGET_WORKTREE_AMBIGUOUS` for `Ambiguous`, obtained from the existing accessors.
-- [ ] `Find-WorktreeRunIdentitySignal` returns the integration branch from the literal `integration_branch: <name>` inside the epic kickoff sentence (including when followed by `.`), the slug from `epic_feature_folder: <slug>`, and the slug from `parallel_slug: <slug>`, matched case-sensitively, and returns `$null` fields when a literal is absent.
-- [ ] `Resolve-WorktreeEpicTarget` returns `NoTarget` for an empty branch and for zero matching live roots, resolves a single match, and returns `Ambiguous` when a supplied `-EpicSlug` disagrees with a match's `epic_feature_folder`.
-- [ ] Tie-break: with matching epic checkpoints at the session root and at a second live worktree, `Resolve-WorktreeEpicTarget` resolves `OtherWorktree` to the worktree that has the integration branch checked out; when no match or more than one match has the branch checked out, it returns `Ambiguous` with a `Detail` that names `artifacts/orchestration/handoff/` as the remedy.
-- [ ] A live root whose checkpoint text is absent, empty, unparseable, a JSON array, has a `route_id` other than the expected run kind, or has a different `integration_branch`/`parallel_slug` is never counted as a match.
-- [ ] `Resolve-WorktreeParallelTarget` resolves exactly one matching live root by `route_id -ceq 'parallel'` and `parallel_slug`, and returns `Ambiguous` when more than one live root matches.
-- [ ] `Resolve-WorktreeRunTargetByRecord` resolves epic checkpoints by `epic_merge_pr.pr_number` or `features[].pr_number`, epic checkpoints by `features[].worktree_path`, and parallel checkpoints by `items[].pr_number` or `items[].worktree_path`, with the same zero/one/many rule; `worktree_path` comparison is insensitive to separator style and trailing slashes.
-- [ ] `Get-WorktreeRunCheckpointText` is the module's only filesystem read, and no function in the module starts a subprocess, reads the payload `cwd`, reads a wall clock, reads an environment variable, or accesses the network.
-- [ ] `ConvertTo-WorktreeItemResolvedResult` is exported from `WorktreeItemResolution.psm1`, and `WorktreeRunResolution.psm1` uses it for `SessionRoot`/`OtherWorktree` labelling rather than a second implementation.
+- [x] `.claude/lib/worktree-resolution/WorktreeRunResolution.psm1` exists and exports `Find-WorktreeRunIdentitySignal`, `Get-WorktreeRunCheckpointText`, `Resolve-WorktreeEpicTarget`, `Resolve-WorktreeParallelTarget`, and `Resolve-WorktreeRunTargetByRecord`.
+- [x] Every resolver in the module returns an object with `Status` (one of `SessionRoot`, `OtherWorktree`, `NoTarget`, `Ambiguous`), `WorktreeRoot`, `SessionRoot`, `Signal`, `SignalValue`, `Candidates`, `ReasonCode`, and `Detail`, built through `New-WorktreeResolutionTargetResult`, with `ReasonCode` equal to `TARGET_WORKTREE_NOT_DERIVABLE` for `NoTarget` and `TARGET_WORKTREE_AMBIGUOUS` for `Ambiguous`, obtained from the existing accessors.
+- [x] `Find-WorktreeRunIdentitySignal` returns the integration branch from the literal `integration_branch: <name>` inside the epic kickoff sentence (including when followed by `.`), the slug from `epic_feature_folder: <slug>`, and the slug from `parallel_slug: <slug>`, matched case-sensitively, and returns `$null` fields when a literal is absent.
+- [x] `Resolve-WorktreeEpicTarget` returns `NoTarget` for an empty branch and for zero matching live roots, resolves a single match, and returns `Ambiguous` when a supplied `-EpicSlug` disagrees with a match's `epic_feature_folder`.
+- [x] Tie-break: with matching epic checkpoints at the session root and at a second live worktree, `Resolve-WorktreeEpicTarget` resolves `OtherWorktree` to the worktree that has the integration branch checked out; when no match or more than one match has the branch checked out, it returns `Ambiguous` with a `Detail` that names `artifacts/orchestration/handoff/` as the remedy.
+- [x] A live root whose checkpoint text is absent, empty, unparseable, a JSON array, has a `route_id` other than the expected run kind, or has a different `integration_branch`/`parallel_slug` is never counted as a match.
+- [x] `Resolve-WorktreeParallelTarget` resolves exactly one matching live root by `route_id -ceq 'parallel'` and `parallel_slug`, and returns `Ambiguous` when more than one live root matches.
+- [x] `Resolve-WorktreeRunTargetByRecord` resolves epic checkpoints by `epic_merge_pr.pr_number` or `features[].pr_number`, epic checkpoints by `features[].worktree_path`, and parallel checkpoints by `items[].pr_number` or `items[].worktree_path`, with the same zero/one/many rule; `worktree_path` comparison is insensitive to separator style and trailing slashes.
+- [x] `Get-WorktreeRunCheckpointText` is the module's only filesystem read, and no function in the module starts a subprocess, reads the payload `cwd`, reads a wall clock, reads an environment variable, or accesses the network.
+- [x] `ConvertTo-WorktreeItemResolvedResult` is exported from `WorktreeItemResolution.psm1`, and `WorktreeRunResolution.psm1` uses it for `SessionRoot`/`OtherWorktree` labelling rather than a second implementation.
 
 ### Preimplementation gate
 
-- [ ] Epic-mode delegations resolve through `Resolve-WorktreeEpicTarget` keyed on the payload's `integration_branch:` value, after the existing declared-path cross-check, and read `epic-orchestrator-state.json` beneath the resolved root.
-- [ ] Parallel-mode delegations resolve through `Resolve-WorktreeParallelTarget` keyed on `parallel_slug:`, and read `parallel-orchestrator-state.json` beneath the resolved root.
-- [ ] Single-feature `Agent` delegations to an allow-listed implementation agent, and non-mode `Agent(orchestrator)` delegations, resolve through `Resolve-WorktreeItemTarget` and read `orchestrator-state.json` beneath the resolved root; `NoTarget` and `Ambiguous` deny with `PREIMPLEMENTATION_GATE_BLOCKED:` and the accessor reason code.
-- [ ] A `Write`/`Edit` whose absolute `file_path` lies inside a worktree other than the session root is evaluated against that worktree's `orchestrator-state.json`, and is allowed when that checkpoint is ready and denied when it is absent or not ready.
-- [ ] A Bash command leg with a `git -C <dir>` selector inside another worktree is evaluated against that worktree's checkpoint; a command with no selector is evaluated against the session root.
-- [ ] `Get-CheckpointContent`, `Get-EpicCheckpointContent`, and `Get-ParallelCheckpointContent` take a mandatory absolute path, and no relative checkpoint literal is passed to `Test-Path` or `Get-Content` by the gate or its dot-sourced siblings.
-- [ ] Bound `-CheckpointRaw`, `-EpicCheckpointRaw`, and `-ParallelCheckpointRaw` values bypass resolution, and the existing preimplementation suites pass unchanged in their assertions.
+- [x] Epic-mode delegations resolve through `Resolve-WorktreeEpicTarget` keyed on the payload's `integration_branch:` value, after the existing declared-path cross-check, and read `epic-orchestrator-state.json` beneath the resolved root.
+- [x] Parallel-mode delegations resolve through `Resolve-WorktreeParallelTarget` keyed on `parallel_slug:`, and read `parallel-orchestrator-state.json` beneath the resolved root.
+- [x] Single-feature `Agent` delegations to an allow-listed implementation agent, and non-mode `Agent(orchestrator)` delegations, resolve through `Resolve-WorktreeItemTarget` and read `orchestrator-state.json` beneath the resolved root; `NoTarget` and `Ambiguous` deny with `PREIMPLEMENTATION_GATE_BLOCKED:` and the accessor reason code.
+- [x] A `Write`/`Edit` whose absolute `file_path` lies inside a worktree other than the session root is evaluated against that worktree's `orchestrator-state.json`, and is allowed when that checkpoint is ready and denied when it is absent or not ready.
+- [x] A Bash command leg with a `git -C <dir>` selector inside another worktree is evaluated against that worktree's checkpoint; a command with no selector is evaluated against the session root.
+- [x] `Get-CheckpointContent`, `Get-EpicCheckpointContent`, and `Get-ParallelCheckpointContent` take a mandatory absolute path, and no relative checkpoint literal is passed to `Test-Path` or `Get-Content` by the gate or its dot-sourced siblings.
+- [x] Bound `-CheckpointRaw`, `-EpicCheckpointRaw`, and `-ParallelCheckpointRaw` values bypass resolution, and the existing preimplementation suites pass unchanged in their assertions.
 
 ### Epic-scope resolution (`Resolve-EpicScopeCheckpoint`)
 
-- [ ] `Resolve-EpicScopeCheckpoint` composes its checkpoint path from the root returned by `Resolve-WorktreeEpicTarget` for the matched branch, not from the session root, and a test shows an epic-scope command leg on the integration branch resolving the checkpoint held by a different live worktree.
-- [ ] When no live worktree holds a matching epic checkpoint, `Resolve-EpicScopeCheckpoint` returns `IsEpicScope = $false` with reason `epic-checkpoint-absent-or-unparseable`; when resolution is ambiguous, it returns `IsEpicScope = $false` with reason `target-worktree-ambiguous`; in both cases callers fall through to their existing per-feature resolution.
-- [ ] The epic-scope suites for `enforce-model-routing-receipt.ps1` and `enforce-pr-author-skill.ps1` pass, and neither hook file is edited.
+- [x] `Resolve-EpicScopeCheckpoint` composes its checkpoint path from the root returned by `Resolve-WorktreeEpicTarget` for the matched branch, not from the session root, and a test shows an epic-scope command leg on the integration branch resolving the checkpoint held by a different live worktree.
+- [x] When no live worktree holds a matching epic checkpoint, `Resolve-EpicScopeCheckpoint` returns `IsEpicScope = $false` with reason `epic-checkpoint-absent-or-unparseable`; when resolution is ambiguous, it returns `IsEpicScope = $false` with reason `target-worktree-ambiguous`; in both cases callers fall through to their existing per-feature resolution.
+- [x] The epic-scope suites for `enforce-model-routing-receipt.ps1` and `enforce-pr-author-skill.ps1` pass, and neither hook file is edited.
 
 ### Epic wave barrier and parallel cohort barrier
 
-- [ ] `enforce-epic-wave-barrier.ps1` resolves its epic checkpoint through `Resolve-WorktreeEpicTarget` keyed on `integration_branch:`, reads it beneath the resolved root through its existing read seam, and denies `NoTarget`/`Ambiguous` with `EPIC_WAVE_BARRIER_BLOCKED:` and the accessor reason code.
-- [ ] `enforce-parallel-cohort-barrier.ps1` resolves its parallel checkpoint through `Resolve-WorktreeParallelTarget` keyed on `parallel_slug:`, reads it beneath the resolved root through its existing read seam, and denies `NoTarget`/`Ambiguous` with its existing leading token and the accessor reason code.
-- [ ] `Find-EpicWaveBarrierFeatureFolderFromPrompt` is unchanged (issue #565 scope).
+- [x] `enforce-epic-wave-barrier.ps1` resolves its epic checkpoint through `Resolve-WorktreeEpicTarget` keyed on `integration_branch:`, reads it beneath the resolved root through its existing read seam, and denies `NoTarget`/`Ambiguous` with `EPIC_WAVE_BARRIER_BLOCKED:` and the accessor reason code.
+- [x] `enforce-parallel-cohort-barrier.ps1` resolves its parallel checkpoint through `Resolve-WorktreeParallelTarget` keyed on `parallel_slug:`, reads it beneath the resolved root through its existing read seam, and denies `NoTarget`/`Ambiguous` with its existing leading token and the accessor reason code.
+- [x] `Find-EpicWaveBarrierFeatureFolderFromPrompt` is unchanged (issue #565 scope).
 
 ### Merge gate
 
-- [ ] Epic branch: `gh pr merge --merge <PR>` with an explicit PR number resolves the epic checkpoint through `Resolve-WorktreeRunTargetByRecord -Kind epic -RecordField pr_number`, and a test shows the merge allowed when the matching ready epic checkpoint is only in a worktree other than the session root.
-- [ ] Parallel branch: `gh pr merge --merge <PR>` with an explicit PR number resolves the parallel checkpoint through `Resolve-WorktreeRunTargetByRecord -Kind parallel -RecordField pr_number`, and a test shows the merge allowed when the matching checkpoint is only in a worktree other than the session root.
-- [ ] Child branch: when the session-root per-feature checkpoint records `pr_gate.pr_number` and it differs from the command's PR number, the child branch declines; when they are equal, the existing child-branch decision is unchanged.
-- [ ] A bare `gh pr merge --merge` with no PR number is evaluated against the session root exactly as before.
-- [ ] When the epic and parallel branches resolve `NoTarget` or `Ambiguous` and no other allow condition applies (including standalone-merge authorization), the gate denies with its existing leading token and the accessor reason code.
+- [x] Epic branch: `gh pr merge --merge <PR>` with an explicit PR number resolves the epic checkpoint through `Resolve-WorktreeRunTargetByRecord -Kind epic -RecordField pr_number`, and a test shows the merge allowed when the matching ready epic checkpoint is only in a worktree other than the session root.
+- [x] Parallel branch: `gh pr merge --merge <PR>` with an explicit PR number resolves the parallel checkpoint through `Resolve-WorktreeRunTargetByRecord -Kind parallel -RecordField pr_number`, and a test shows the merge allowed when the matching checkpoint is only in a worktree other than the session root.
+- [x] Child branch: when the session-root per-feature checkpoint records `pr_gate.pr_number` and it differs from the command's PR number, the child branch declines; when they are equal, the existing child-branch decision is unchanged.
+- [x] A bare `gh pr merge --merge` with no PR number is evaluated against the session root exactly as before.
+- [x] When the epic and parallel branches resolve `NoTarget` or `Ambiguous` and no other allow condition applies (including standalone-merge authorization), the gate denies with its existing leading token and the accessor reason code.
 
 ### Worktree-removal gates
 
-- [ ] `enforce-epic-worktree-removal-gate.ps1` resolves the run checkpoint for `git worktree remove <path>` through `Resolve-WorktreeRunTargetByRecord -RecordField worktree_path`, allows the removal when the resolved checkpoint (in a worktree other than the session root) authorizes it, and denies `NoTarget`/`Ambiguous` with its existing leading token and the accessor reason code.
-- [ ] `enforce-parallel-worktree-removal-gate.ps1` resolves the run checkpoint through `Resolve-WorktreeRunTargetByRecord -RecordField worktree_path` with the same allow and deny behaviour.
+- [x] `enforce-epic-worktree-removal-gate.ps1` resolves the run checkpoint for `git worktree remove <path>` through `Resolve-WorktreeRunTargetByRecord -RecordField worktree_path`, allows the removal when the resolved checkpoint (in a worktree other than the session root) authorizes it, and denies `NoTarget`/`Ambiguous` with its existing leading token and the accessor reason code.
+- [x] `enforce-parallel-worktree-removal-gate.ps1` resolves the run checkpoint through `Resolve-WorktreeRunTargetByRecord -RecordField worktree_path` with the same allow and deny behaviour.
 
 ### Parallel drift gate
 
-- [ ] `enforce-parallel-drift-gate.ps1`, for a payload inside its existing scope filter, resolves the parallel checkpoint through `Resolve-WorktreeParallelTarget` keyed on `parallel_slug:`, reads it beneath the resolved root, and denies `NoTarget`/`Ambiguous` with its existing leading token and the accessor reason code.
+- [x] `enforce-parallel-drift-gate.ps1`, for a payload inside its existing scope filter, resolves the parallel checkpoint through `Resolve-WorktreeParallelTarget` keyed on `parallel_slug:`, reads it beneath the resolved root, and denies `NoTarget`/`Ambiguous` with its existing leading token and the accessor reason code.
 
 ### Import failure (fail-closed)
 
-- [ ] In each converted gate, a failure to import `WorktreeRunResolution.psm1` or `WorktreeItemResolution.psm1` produces a deny decision that names the module, the entry point emits the decision JSON and exits 0, and a Pester test per converted gate simulates the failure through the recorded-failure state without deleting or renaming any file.
-- [ ] Fail-closed handling of pre-existing imports and dot-sources, and of hooks this change does not convert, is out of scope; a potential entry recording it exists under `docs/features/potential/`.
+- [x] In each converted gate, a failure to import `WorktreeRunResolution.psm1` or `WorktreeItemResolution.psm1` produces a deny decision that names the module, the entry point emits the decision JSON and exits 0, and a Pester test per converted gate simulates the failure through the recorded-failure state without deleting or renaming any file.
+- [x] Fail-closed handling of pre-existing imports and dot-sources, and of hooks this change does not convert, is out of scope; a potential entry recording it exists under `docs/features/potential/`.
 
 ### Plain single-worktree regression guards
 
-- [ ] A `Write`/`Edit` to a path inside the session worktree, and a Bash command with no `-C` selector, are evaluated against the session root's `orchestrator-state.json` with the same decision as before this change.
-- [ ] An epic or parallel kickoff whose only matching checkpoint is at the session root resolves `SessionRoot` and yields the same decision as before this change in the preimplementation gate, the wave barrier, and the cohort barrier.
-- [ ] A stale matching epic checkpoint at the session root does not win over the worktree that has the integration branch checked out (no session-root-first fast path).
+- [x] A `Write`/`Edit` to a path inside the session worktree, and a Bash command with no `-C` selector, are evaluated against the session root's `orchestrator-state.json` with the same decision as before this change.
+- [x] An epic or parallel kickoff whose only matching checkpoint is at the session root resolves `SessionRoot` and yields the same decision as before this change in the preimplementation gate, the wave barrier, and the cohort barrier.
+- [x] A stale matching epic checkpoint at the session root does not win over the worktree that has the integration branch checked out (no session-root-first fast path).
 
 ### Identity contract (documented callers)
 
-- [ ] `.claude/skills/orchestrate/SKILL.md` `## Issue Number Consistency` requires the canonical issue-number line and a `branch: <name>` label on delegations to `python-typed-engineer`, `powershell-typed-engineer`, `typescript-engineer`, `csharp-typed-engineer`, and on non-mode `Agent(orchestrator)` delegations, and names `enforce-orchestration-preimplementation-gate.ps1` among the gates that identify the item from those lines.
-- [ ] `.claude/skills/epic-orchestrate/SKILL.md` and `.claude/skills/parallel-orchestrate/SKILL.md` state that the typed-engineer identity lines apply to their child runs, and that the gates key epic runs on `integration_branch:` and parallel runs on `parallel_slug:`.
-- [ ] Each `.claude/skills/invoke-*-engineer/SKILL.md` that delegates to an allow-listed implementation agent documents the canonical issue-number line and `branch:` label in its delegation prompt.
-- [ ] The contract text changes land no later than the commit that wires the preimplementation gate.
+- [x] `.claude/skills/orchestrate/SKILL.md` `## Issue Number Consistency` requires the canonical issue-number line and a `branch: <name>` label on delegations to `python-typed-engineer`, `powershell-typed-engineer`, `typescript-engineer`, `csharp-typed-engineer`, and on non-mode `Agent(orchestrator)` delegations, and names `enforce-orchestration-preimplementation-gate.ps1` among the gates that identify the item from those lines.
+- [x] `.claude/skills/epic-orchestrate/SKILL.md` and `.claude/skills/parallel-orchestrate/SKILL.md` state that the typed-engineer identity lines apply to their child runs, and that the gates key epic runs on `integration_branch:` and parallel runs on `parallel_slug:`.
+- [x] Each `.claude/skills/invoke-*-engineer/SKILL.md` that delegates to an allow-listed implementation agent documents the canonical issue-number line and `branch:` label in its delegation prompt.
+- [x] The contract text changes land no later than the commit that wires the preimplementation gate.
 
 ### Registration, mirrors, and guard test
 
 - [ ] Each `.claude` file created or changed by this work has a byte-identical mirror under `extensions/drm-copilot/resources/claude-customizations/.claude/`, and `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes.
-- [ ] `.claude/lib/worktree-resolution/WorktreeRunResolution.psm1` appears once in the `paths` array of `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, and any new dot-sourced hook sibling created by this work is also listed there.
-- [ ] `tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1` lists `WorktreeRunResolution.psm1` in each of its module lists and passes, including the on-disk registration row and the SHA-256 mirror row.
-- [ ] `WorktreeRunResolution.psm1` is added to `CodeCoverage.Path` in both `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` and `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`, and the two copies remain text-identical.
-- [ ] `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1` guards `Get-WorktreeRunCheckpointText` as well as `Get-EpicScopeCheckpointText`, its pinned read-count assertion matches the new `Resolve-EpicScopeCheckpoint` contract, each suite it guards that reaches the new seam mocks it `$null`, and the suite passes.
+- [x] `.claude/lib/worktree-resolution/WorktreeRunResolution.psm1` appears once in the `paths` array of `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, and any new dot-sourced hook sibling created by this work is also listed there.
+- [x] `tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1` lists `WorktreeRunResolution.psm1` in each of its module lists and passes, including the on-disk registration row and the SHA-256 mirror row.
+- [x] `WorktreeRunResolution.psm1` is added to `CodeCoverage.Path` in both `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` and `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`, and the two copies remain text-identical.
+- [x] `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1` guards `Get-WorktreeRunCheckpointText` as well as `Get-EpicScopeCheckpointText`, its pinned read-count assertion matches the new `Resolve-EpicScopeCheckpoint` contract, each suite it guards that reaches the new seam mocks it `$null`, and the suite passes.
 
 ### Tests and determinism
 
-- [ ] Each converted gate has Pester rows for (a) a checkpoint present only in a synthetic target worktree that differs from the session root, allowed or evaluated against that checkpoint, (b) a target with no checkpoint anywhere, denied with `TARGET_WORKTREE_NOT_DERIVABLE`, and (c) an ambiguous target, denied with `TARGET_WORKTREE_AMBIGUOUS`.
-- [ ] Gate and library tests use the PR #695 seam (a mocked live-root enumeration with committed fixtures, or a mocked single text-read function); no test creates, writes, or deletes a file, and no test uses `TestDrive:`.
-- [ ] Every existing suite for a converted gate mocks the new resolution seam in `BeforeAll` so that no existing row enumerates live worktrees on the host, and every existing row passes.
-- [ ] Line coverage for `WorktreeRunResolution.psm1` is at or above 85%, read per file from the Pester coverage report, and changed lines in converted files show no coverage regression against the baseline recorded under `evidence/baseline/`.
-- [ ] `WorktreeRunResolution.psm1` satisfies `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`, and `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes with the new module in its scan scope.
+- [x] Each converted gate has Pester rows for (a) a checkpoint present only in a synthetic target worktree that differs from the session root, allowed or evaluated against that checkpoint, (b) a target with no checkpoint anywhere, denied with `TARGET_WORKTREE_NOT_DERIVABLE`, and (c) an ambiguous target, denied with `TARGET_WORKTREE_AMBIGUOUS`.
+- [x] Gate and library tests use the PR #695 seam (a mocked live-root enumeration with committed fixtures, or a mocked single text-read function); no test creates, writes, or deletes a file, and no test uses `TestDrive:`.
+- [x] Every existing suite for a converted gate mocks the new resolution seam in `BeforeAll` so that no existing row enumerates live worktrees on the host, and every existing row passes.
+- [x] Line coverage for `WorktreeRunResolution.psm1` is at or above 85%, read per file from the Pester coverage report, and changed lines in converted files show no coverage regression against the baseline recorded under `evidence/baseline/`.
+- [x] `WorktreeRunResolution.psm1` satisfies `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1`, and `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes with the new module in its scan scope.
 
 ### File size
 
-- [ ] `WorktreeResolution.psm1` and `enforce-orchestration-preimplementation-gate-helpers.ps1` are byte-unchanged.
-- [ ] `enforce-orchestration-preimplementation-gate.ps1`, `enforce-epic-merge-gate.ps1`, `enforce-orchestration-preimplementation-gate-modes.ps1`, `enforce-epic-merge-gate-authorization.ps1`, `enforce-orchestration-preimplementation-gate-epic-scope.ps1`, `WorktreeRunResolution.psm1`, and every other production or test file created or edited by this work are at or below 500 lines.
-- [ ] `enforce-orchestration-preimplementation-gate-modes.ps1` gains no identity-parsing logic, and the preimplementation gate's resolution glue and `Get-CheckpointContent` live in `enforce-orchestration-preimplementation-gate-epic-scope.ps1`.
+- [x] `WorktreeResolution.psm1` and `enforce-orchestration-preimplementation-gate-helpers.ps1` are byte-unchanged.
+- [x] `enforce-orchestration-preimplementation-gate.ps1`, `enforce-epic-merge-gate.ps1`, `enforce-orchestration-preimplementation-gate-modes.ps1`, `enforce-epic-merge-gate-authorization.ps1`, `enforce-orchestration-preimplementation-gate-epic-scope.ps1`, `WorktreeRunResolution.psm1`, and every other production or test file created or edited by this work are at or below 500 lines.
+- [x] `enforce-orchestration-preimplementation-gate-modes.ps1` gains no identity-parsing logic, and the preimplementation gate's resolution glue and `Get-CheckpointContent` live in `enforce-orchestration-preimplementation-gate-epic-scope.ps1`.
 
 ### Rollout safety
 
-- [ ] The commit that adds `WorktreeRunResolution.psm1` (with its export change, mirror, `core.json` entry, manifest test, runsettings entries, and library tests) changes no hook file, and no hook imports the module at that commit.
-- [ ] Each gate is wired by a single complete `Write` of each hook file it changes (no sequence of partial `Edit` calls on a live hook), followed by that gate's Pester suites before the next gate is wired; the order of writes and each suite result is recorded under `evidence/qa-gates/` in this feature folder.
-- [ ] Before the preimplementation gate commit, the executor confirms and records under `evidence/qa-gates/` that the session's own pending implementation delegations carry the canonical issue-number line and `branch:` label.
-- [ ] Each gate is committed together with its dot-sourced siblings and mirrors, so no commit leaves a hook importing a function that is absent at that commit.
+- [x] The commit that adds `WorktreeRunResolution.psm1` (with its export change, mirror, `core.json` entry, manifest test, runsettings entries, and library tests) changes no hook file, and no hook imports the module at that commit.
+- [x] Each gate is wired by a single complete `Write` of each hook file it changes (no sequence of partial `Edit` calls on a live hook), followed by that gate's Pester suites before the next gate is wired; the order of writes and each suite result is recorded under `evidence/qa-gates/` in this feature folder.
+- [x] Before the preimplementation gate commit, the executor confirms and records under `evidence/qa-gates/` that the session's own pending implementation delegations carry the canonical issue-number line and `branch:` label.
+- [x] Each gate is committed together with its dot-sourced siblings and mirrors, so no commit leaves a hook importing a function that is absent at that commit.
 
 ### Toolchain and follow-ups
 
-- [ ] The PowerShell toolchain (PoshQC format, then analyze, then test) completes in a single pass with no failure and no modified file, and the observed output is recorded under `evidence/qa-gates/`.
-- [ ] No file under `.codex/` is changed, no Python file is changed except the frozen-surface digest pin in `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` (re-baselined for the intended AC-41 edit to `.claude/skills/epic-orchestrate/SKILL.md`), and neither `validate-orchestrator-output.ps1` nor `Find-EpicWaveBarrierFeatureFolderFromPrompt` is changed.
-- [ ] Potential entries under `docs/features/potential/` record the session-relative read in `validate-orchestrator-output.ps1` (SubagentStop) and the merge-gate child-branch residual for routes without `pr_gate.pr_number`.
+- [x] The PowerShell toolchain (PoshQC format, then analyze, then test) completes in a single pass with no failure and no modified file, and the observed output is recorded under `evidence/qa-gates/`.
+- [x] No file under `.codex/` is changed, no Python file is changed except the frozen-surface digest pin in `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` (re-baselined for the intended AC-41 edit to `.claude/skills/epic-orchestrate/SKILL.md`), and neither `validate-orchestrator-output.ps1` nor `Find-EpicWaveBarrierFeatureFolderFromPrompt` is changed.
+- [x] Potential entries under `docs/features/potential/` record the session-relative read in `validate-orchestrator-output.ps1` (SubagentStop) and the merge-gate child-branch residual for routes without `pr_gate.pr_number`.
 
 ## Risks & Mitigations
 
