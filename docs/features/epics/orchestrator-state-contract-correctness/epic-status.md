@@ -5,7 +5,7 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 - Epic issue: #771
 - Integration branch: `epic/orchestrator-state-contract-correctness-integration`
 - Current wave: 0
-- Next step: E3_await_405_phase0_then_launch_wave0_464
+- Next step: HOLD (quota, from 11:16Z): no new launches until RESUME; #464 launch deferred
 - Last updated: 2026-09-30T11:10:59Z
 
 ## Features
