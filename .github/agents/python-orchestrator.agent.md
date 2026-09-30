@@ -97,7 +97,7 @@ Use these reusable skills to avoid duplicating shared operations:
 3) **Single source of routing truth = change budget**
 - First action is always to estimate rough change budget by identifying likely affected production Python files.
 - If estimate is `1-3` production Python files (+ corresponding tests), use **small path**.
-- If estimate is `>3` production Python files or `>3` test Python files, use **large path**.
+- If estimate is more than 3 (`>3`) production Python files, use **large path**. The large path has no production-file cap. Test files are not counted toward the routing threshold.
 
 4) **Deterministic variable handling**
 - Persist and reuse these variables exactly as names:
@@ -117,7 +117,7 @@ Use these reusable skills to avoid duplicating shared operations:
 
 ## Phase 0 — Intake and budget estimate (mandatory)
 
-1. Read user request and infer likely touched production Python files and/or test Python files.
+1. Read user request and infer likely touched production Python files.
 2. Estimate rough change budget.
 3. Write/update orchestration checkpoint.
 4. Route to one of two paths:
@@ -126,7 +126,7 @@ Use these reusable skills to avoid duplicating shared operations:
 
 ---
 
-## Small path (budget 1-3 production Python files and 1-3 test Python files)
+## Small path (budget 1-3 production Python files)
 
 Follow this exact sequence.
 
@@ -243,7 +243,7 @@ Hard enforcement for S8:
 
 ---
 
-## Large path (budget >3 production Python files or >3 test Python files)
+## Large path (budget >3 production Python files)
 
 Follow this exact sequence.
 

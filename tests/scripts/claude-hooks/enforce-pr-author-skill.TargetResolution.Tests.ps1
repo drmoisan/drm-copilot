@@ -34,6 +34,8 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
         $script:ItemRoot = "$($script:SeamRoot)/item-701"
         $script:SessionRootPath = "$($script:SeamRoot)/session"
         $script:CheckpointRelative = 'artifacts/orchestration/orchestrator-state.json'
+        Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1").Path
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     }
 
     Context 'the checkpoint is taken from the resolved target, not the session root' {

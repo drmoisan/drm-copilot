@@ -2,10 +2,19 @@ import { describe, expect, it } from "@jest/globals";
 
 import {
   ARTIFACT_DIRECTORY,
+  BlastRadiusDeriveError,
+  BlastRadiusDeriveFileSystem,
+  BlastRadiusGuardError,
+  DESTINATION_WRITE_DECORATORS,
+  EXCLUDED_RELATIVE_PATHS,
   ManifestError,
+  MERGED_RELATIVE_PATHS,
   parsePacksArgument,
   pushDownCustomizations,
   ROOT_FOLDERS,
+  ROUTING_MERGE_RELATIVE_PATH,
+  RoutingMergeError,
+  RoutingMergeFileSystem,
 } from "../../../src/lib/push-down/claude-customizations";
 import { buildInMemoryFileSystem, fixedClock } from "./push-down.test-helpers";
 
@@ -284,5 +293,43 @@ describe("pushDownCustomizations (claude)", () => {
     );
     expect(ARTIFACT_DIRECTORY).toBe("artifacts/claude-customizations");
     expect(ROOT_FOLDERS).toEqual([".claude", "config"]);
+  });
+});
+
+describe("issue #508 AC13 AC17 merged-path registry and preserved exports", () => {
+  it("lists exactly the two merged paths", () => {
+    expect(MERGED_RELATIVE_PATHS).toEqual([
+      "config/orchestration-routing.json",
+      "config/blast-radius.json",
+    ]);
+  });
+
+  it("matches the distinct decorator paths in first-seen order", () => {
+    const distinct = [
+      ...new Set(
+        DESTINATION_WRITE_DECORATORS.map((entry) => entry.relativePath),
+      ),
+    ];
+    expect(DESTINATION_WRITE_DECORATORS).toHaveLength(3);
+    expect(MERGED_RELATIVE_PATHS).toEqual(distinct);
+  });
+
+  it("excludes the destination overlay from publication", () => {
+    expect(EXCLUDED_RELATIVE_PATHS).toContain("config/blast-radius.local.json");
+  });
+
+  it("keeps the AC17 routing and derive exports", () => {
+    for (const exported of [
+      RoutingMergeFileSystem,
+      RoutingMergeError,
+      BlastRadiusDeriveFileSystem,
+      BlastRadiusDeriveError,
+      BlastRadiusGuardError,
+    ]) {
+      expect(typeof exported).toBe("function");
+    }
+    expect(ROUTING_MERGE_RELATIVE_PATH).toBe(
+      "config/orchestration-routing.json",
+    );
   });
 });

@@ -123,6 +123,8 @@ checkpoint write, and on CI-green (S9 step 6) merges its own PR into the integra
 recording `epic_merge: { merge_commit_sha, target_branch, merged_at }`. Standalone (non-epic)
 orchestration is unchanged: `epic_mode` absent or `false` makes S9 step 6 a no-op.
 
+The run gates `enforce-orchestration-preimplementation-gate.ps1` and `enforce-epic-wave-barrier.ps1` locate the epic checkpoint by the `integration_branch:` value of this line. They select the live worktree whose `artifacts/orchestration/epic-orchestrator-state.json` records `route_id` `epic` and that integration branch, prefer the worktree that has the branch checked out when more than one records it, and deny the delegation with `TARGET_WORKTREE_NOT_DERIVABLE` or `TARGET_WORKTREE_AMBIGUOUS` when none or more than one remains. A stale copy of the epic checkpoint is moved to `artifacts/orchestration/handoff/` rather than left at a worktree root. The child run's own delegations to implementation agents carry the canonical issue-number line and `branch:` label defined in `.claude/skills/orchestrate/SKILL.md` `## Issue Number Consistency`.
+
 ## Bounded Child Return Contract
 
 A child `orchestrator`'s final report is consumed as a fixed eight-field shape and nothing else:

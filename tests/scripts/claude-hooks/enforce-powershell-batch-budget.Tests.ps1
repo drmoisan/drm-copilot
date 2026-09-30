@@ -27,13 +27,12 @@ Describe 'enforce-powershell-batch-budget.ps1' {
         $script:OutOfRootFixture = 'C:/synthetic-out-of-root/scratchpad/out_of_root_fixture.py'
         $script:OutOfRootPowerShellFixture = 'C:/synthetic-out-of-root/scratchpad/out_of_root_fixture.ps1'
         $script:ContainmentStateFile = '/repo/.claude/state/powershell-batch-budget.s.json'
+        $script:NoCheckpoint = { param([string] $Path) [void] $Path; '' }
     }
 
     AfterEach {
         $env:CLAUDE_TOOL_INPUT = $null
         $env:CLAUDE_SESSION_ID = $null
-        $env:CLAUDE_POWERSHELL_BUDGET_PROD = $null
-        $env:CLAUDE_POWERSHELL_BUDGET_TEST = $null
     }
 
     It 'allows a new production file under the production cap and records it' {
@@ -60,14 +59,13 @@ Describe 'enforce-powershell-batch-budget.ps1' {
         $dataResult.state.prodFiles | Should -Contain 'scripts/config.psd1'
     }
 
-    It 'allows a new Pester test file under the test cap and records it' {
-        $state = Get-PowerShellBatchBudgetState -ProdCap 2 -TestCap 2
+    It 'allows a Pester test file without recording it' {
+        $state = Get-PowerShellBatchBudgetState -ProdCap 2
 
         $result = Invoke-PowerShellBatchBudgetDecision -FilePath 'tests/scripts/example.Tests.ps1' -State $state -StateFile '/repo/.claude/state/powershell-batch-budget.s.json'
 
         $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
-        $result.shouldWriteState | Should -BeTrue
-        $result.state.testFiles | Should -Contain 'tests/scripts/example.Tests.ps1'
+        $result.shouldWriteState | Should -BeFalse
         $result.state.prodFiles | Should -BeNullOrEmpty
     }
 
@@ -90,20 +88,19 @@ Describe 'enforce-powershell-batch-budget.ps1' {
 
         $result.hookSpecificOutput.hookEventName | Should -Be 'PreToolUse'
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*production file cap is 1*'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'POWERSHELL_LARGE_PATH_REQUIRED:*'
         $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*scripts/second.ps1*'
         $result.state | Should -Not -BeNullOrEmpty
     }
 
-    It 'denies a new test file when the test cap is full' {
-        $state = Get-PowerShellBatchBudgetState -ProdCap 1 -TestCap 1
-        $state.testFiles = @('tests/scripts/first.Tests.ps1')
+    It 'does not count a test file toward the production threshold' {
+        $state = Get-PowerShellBatchBudgetState -ProdCap 1
+        $state.prodFiles = @('scripts/first.ps1')
 
         $result = Invoke-PowerShellBatchBudgetDecision -FilePath 'tests/scripts/second.Tests.ps1' -State $state -StateFile '/repo/.claude/state/powershell-batch-budget.s.json'
 
-        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*test file cap is 1*'
-        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*tests/scripts/second.Tests.ps1*'
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        $result.shouldWriteState | Should -BeFalse
     }
 
     It 'serializes the deny decision into the PreToolUse hookSpecificOutput envelope' {
@@ -143,7 +140,7 @@ Describe 'enforce-powershell-batch-budget.ps1' {
         $result.state.prodFiles | Should -HaveCount 2
         $result.state.prodFiles | Should -Contain 'scripts/first.ps1'
         $result.state.prodFiles | Should -Contain 'scripts/second.ps1'
-        $result.state.testFiles | Should -Contain 'tests/scripts/first.Tests.ps1'
+        $result.state.Contains('testFiles') | Should -BeFalse
     }
 
     It 'denies an empty payload as an envelope anomaly (fail closed)' {
@@ -188,7 +185,7 @@ Describe 'enforce-powershell-batch-budget.ps1' {
         $result = Invoke-PowerShellBatchBudgetHook `
             -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
             -SessionId 'session-a' `
-            -Root '/repo' `
+            -Root '/repo' -ReadCheckpoint $script:NoCheckpoint `
             -TestPathExists { param([string] $Path) [void] $Path; return $false } `
             -EnsureDirectory { param([string] $Path) $script:createdStateDir = $Path } `
             -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) $script:writtenStateFile = $Path; $script:writtenState = $State }
@@ -211,7 +208,7 @@ Describe 'enforce-powershell-batch-budget.ps1' {
         $result = Invoke-PowerShellBatchBudgetHook `
             -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/second.ps1') `
             -SessionId 'session-a' `
-            -Root '/repo' `
+            -Root '/repo' -ReadCheckpoint $script:NoCheckpoint `
             -TestPathExists { param([string] $Path) return ($Path -like '*powershell-batch-budget.session-a.json') } `
             -EnsureDirectory { param([string] $Path) [void] $Path } `
             -ReadState { param([string] $Path) [void] $Path; return $stateJson } `
@@ -226,7 +223,7 @@ Describe 'enforce-powershell-batch-budget.ps1' {
         $result = Invoke-PowerShellBatchBudgetHook `
             -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
             -SessionId 'session-a' `
-            -Root '/repo' `
+            -Root '/repo' -ReadCheckpoint $script:NoCheckpoint `
             -TestPathExists { param([string] $Path) [void] $Path; return $true } `
             -ReadState { param([string] $Path) [void] $Path; return '{not-json' } `
             -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $Path; [void] $State; throw 'write failed' }
@@ -259,7 +256,7 @@ Describe 'enforce-powershell-batch-budget.ps1' {
 
             $result = Invoke-PowerShellBatchBudgetHook `
                 -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
-                -Root '/repo' `
+                -Root '/repo' -ReadCheckpoint $script:NoCheckpoint `
                 -TestPathExists { param([string] $Path) [void] $Path; return $false } `
                 -EnsureDirectory { param([string] $Path) [void] $Path } `
                 -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
@@ -275,7 +272,7 @@ Describe 'enforce-powershell-batch-budget.ps1' {
 
             $result = Invoke-PowerShellBatchBudgetHook `
                 -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
-                -Root '/repo' `
+                -Root '/repo' -ReadCheckpoint $script:NoCheckpoint `
                 -ReadSessionIdFile { param([string] $Path) $script:sessionIdFileRequested = $Path; return "  file-session-7  " } `
                 -TestPathExists { param([string] $Path) [void] $Path; return $false } `
                 -EnsureDirectory { param([string] $Path) [void] $Path } `
@@ -292,7 +289,7 @@ Describe 'enforce-powershell-batch-budget.ps1' {
 
             $result = Invoke-PowerShellBatchBudgetHook `
                 -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
-                -Root '/repo' `
+                -Root '/repo' -ReadCheckpoint $script:NoCheckpoint `
                 -TestPathExists { param([string] $Path) [void] $Path; return $false } `
                 -EnsureDirectory { param([string] $Path) [void] $Path } `
                 -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
@@ -308,7 +305,7 @@ Describe 'enforce-powershell-batch-budget.ps1' {
             $script:writtenStateFile = $null
             $null = Invoke-PowerShellBatchBudgetHook `
                 -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
-                -Root '/repo' `
+                -Root '/repo' -ReadCheckpoint $script:NoCheckpoint `
                 -ReadSessionIdFile { param([string] $Path) [void] $Path; return 'file-session-7' } `
                 -TestPathExists { param([string] $Path) [void] $Path; return $false } `
                 -EnsureDirectory { param([string] $Path) [void] $Path } `
@@ -319,7 +316,7 @@ Describe 'enforce-powershell-batch-budget.ps1' {
             $script:writtenStateFile = $null
             $null = Invoke-PowerShellBatchBudgetHook `
                 -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
-                -Root '/repo' `
+                -Root '/repo' -ReadCheckpoint $script:NoCheckpoint `
                 -ReadSessionIdFile { param([string] $Path) [void] $Path; return 'file-session-7' } `
                 -TestPathExists { param([string] $Path) [void] $Path; return $false } `
                 -EnsureDirectory { param([string] $Path) [void] $Path } `
@@ -330,7 +327,7 @@ Describe 'enforce-powershell-batch-budget.ps1' {
             $script:writtenStateFile = $null
             $null = Invoke-PowerShellBatchBudgetHook `
                 -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
-                -Root '/repo' `
+                -Root '/repo' -ReadCheckpoint $script:NoCheckpoint `
                 -ReadSessionIdFile { param([string] $Path) [void] $Path; return '' } `
                 -TestPathExists { param([string] $Path) [void] $Path; return $false } `
                 -EnsureDirectory { param([string] $Path) [void] $Path } `
@@ -347,7 +344,7 @@ Describe 'enforce-powershell-batch-budget.ps1' {
             $result = Invoke-PowerShellBatchBudgetHook `
                 -ToolInputRaw (Get-PowerShellToolInput -FilePath 'scripts/tool.ps1') `
                 -SessionId '../../etc/passwd' `
-                -Root '/repo' `
+                -Root '/repo' -ReadCheckpoint $script:NoCheckpoint `
                 -TestPathExists { param([string] $Path) [void] $Path; return $false } `
                 -EnsureDirectory { param([string] $Path) [void] $Path } `
                 -WriteState { param([string] $Path, [System.Collections.IDictionary] $State) [void] $State; $script:writtenStateFile = $Path }
@@ -413,7 +410,7 @@ Describe 'enforce-powershell-batch-budget.ps1' {
                 $decision = Invoke-PowerShellBatchBudgetHook `
                     -ToolInputRaw (Get-PowerShellToolInput -FilePath $candidate) `
                     -SessionId 'session-a' `
-                    -Root '/repo' `
+                    -Root '/repo' -ReadCheckpoint $script:NoCheckpoint `
                     -TestPathExists { param([string] $Path) [void] $Path; return $true } `
                     -EnsureDirectory { param([string] $Path) [void] $Path } `
                     -ReadState { param([string] $Path) [void] $Path; return $script:persistedState } `
@@ -481,10 +478,8 @@ Describe 'enforce-powershell-batch-budget.ps1' {
             ($stdout | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
-        It 'returns exit code 0 for malformed JSON with non-default session and cap environment variables set' {
+        It 'returns exit code 0 for malformed JSON with a non-default session variable set' {
             $env:CLAUDE_SESSION_ID = 'entrypoint-session'
-            $env:CLAUDE_POWERSHELL_BUDGET_PROD = '5'
-            $env:CLAUDE_POWERSHELL_BUDGET_TEST = '5'
 
             $emitted = @(Invoke-PowerShellBatchBudgetEntryPoint -ToolInputRaw '{not-json')
             $code = $emitted[-1]

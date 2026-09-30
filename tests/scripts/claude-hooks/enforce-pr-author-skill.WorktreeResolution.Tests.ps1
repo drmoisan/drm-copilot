@@ -98,6 +98,8 @@ BeforeAll {
         $target = New-WorktreeResolutionFixtureTarget -Status $Status -WorktreeRoot $WorktreeRoot -Candidate $Candidate
         Mock -CommandName Resolve-PrAuthorWorktreeTarget -MockWith { return $target }.GetNewClosure()
     }
+    Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeRunResolution.psm1')
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 }
 
 Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
