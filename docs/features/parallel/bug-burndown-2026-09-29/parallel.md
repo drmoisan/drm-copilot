@@ -386,10 +386,54 @@ items:
         - "--edges"
       source: "declared"
       computed_at: "2026-09-29T23:04:16Z"
+  - issue_num: 623
+    feature_folder: "docs/features/active/promotion-receipt-destination-unverified-623"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/hooks/check-python-test-purity.ps1"
+        - ".claude/hooks/enforce-promotion-mcp-only.ps1"
+        - ".claude/hooks/enforce-python-batch-budget.ps1"
+        - ".claude/hooks/hook-command-scanner.ps1"
+        - ".claude/settings.json"
+        - "docs/features/active/promotion-receipt-destination-unverified-623/**"
+        - "docs/features/active/promotion-receipt-destination-unverified-623/spec.md"
+        - "docs/features/completed/2026-06-13-claude-memory-scope-and-hardening-181/evidence/qa-gates/final-black.md"
+        - "docs/features/completed/2026-08-31-portable-prepared-orchestration-handoff-614/evidence/qa-gates/typescript-format.2026-09-07T03-16.md"
+        - "extensions/drm-copilot/jest.config.cjs"
+        - "extensions/drm-copilot/node_modules/@eslint/js/package.json"
+        - "extensions/drm-copilot/package-lock.json"
+        - "extensions/drm-copilot/package.json"
+        - "extensions/drm-copilot/src/lib/potential-to-issue/potential-to-issue-service-call.ts"
+        - "extensions/drm-copilot/src/lib/potential-to-issue/promotion.ts"
+        - "extensions/drm-copilot/test/lib/potential-to-issue/potential-to-issue-service-call-test-support.ts"
+        - "extensions/drm-copilot/test/lib/potential-to-issue/potential-to-issue-service-call.test.ts"
+        - "extensions/drm-copilot/test/lib/potential-to-issue/promotion-test-support.ts"
+        - "extensions/drm-copilot/test/lib/potential-to-issue/promotion.matrix.test.ts"
+        - "extensions/drm-copilot/test/lib/potential-to-issue/promotion.move-verification.test.ts"
+        - "extensions/drm-copilot/test/lib/potential-to-issue/promotion.test.ts"
+        - "extensions/drm-copilot/test/lib/promotion-lifecycle-sequence.test.ts"
+        - "extensions/drm-copilot/tsconfig.json"
+        - "scripts/dev_tools/potential_to_issue_filesystem.py"
+        - "scripts/dev_tools/potential_to_issue.py"
+        - "tests/scripts/dev_tools/discovery/test_init_models.py"
+        - "tests/scripts/dev_tools/test_potential_to_issue_branches.py"
+        - "tests/scripts/dev_tools/test_potential_to_issue_filesystem.py"
+        - "tests/scripts/dev_tools/test_potential_to_issue_missing_label_regression.py"
+        - "tests/scripts/dev_tools/test_potential_to_issue_move_verification.py"
+        - "tests/scripts/dev_tools/test_potential_to_issue.py"
+      modules: []
+      shared_surfaces:
+        - ".claude/settings.json"
+        - "extensions/drm-copilot/package-lock.json"
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-30T00:08:39Z"
 ---
 
 # Parallel Run: bug-burndown-2026-09-29
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 8 of 22. Pending: 623, 645, 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
+Prepared: 9 of 22. Pending: 645, 647, 658, 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
