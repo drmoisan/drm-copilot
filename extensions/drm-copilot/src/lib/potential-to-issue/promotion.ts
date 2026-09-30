@@ -85,7 +85,7 @@ export class PromotionError extends Error {
 /**
  * Outcome of a promotion run.
  *
- * - `exitCode`: 0 on success; the gh create exit code on failure.
+ * - `exitCode`: 0 on success; the gh create exit code when issue creation fails; 1 when the promoted file is missing after the move.
  * - `messages`: every emitted line, in order, for the service summary/return.
  * - `destination`: the promoted file path on success; absent on failure.
  */
@@ -437,6 +437,13 @@ export function promotePotential(
   filesystem.ensureDir(promotedDir);
   const destPath = posixJoin(promotedDir, posixBasename(resolved));
   filesystem.move(resolved, destPath);
+  // Verify the move produced the destination before reporting success. A
+  // missing destination is a non-zero outcome (not a thrown error) so the
+  // caller still receives every emitted line, including the created issue URL.
+  if (!filesystem.exists(destPath)) {
+    emitLine(`Promoted file missing after move: ${destPath}`);
+    return { exitCode: 1, messages };
+  }
   emitLine(`Moved potential file to promoted folder: ${destPath}`);
 
   return { exitCode: 0, messages, destination: destPath };
