@@ -202,3 +202,34 @@ def test_move_creates_parent_then_moves(monkeypatch: pytest.MonkeyPatch) -> None
         ("mkdir", str(dest.parent), "parents=True,exist_ok=True"),
         ("move", str(src), str(dest)),
     ]
+
+
+def test_file_system_protocol_members_declare_no_behavior() -> None:
+    """Each `FileSystem` protocol member is a declaration whose body returns None.
+
+    The protocol only fixes the signatures that `RealFileSystem` and the test
+    doubles implement. Calling a member through the protocol class runs its
+    placeholder body, which performs no IO and returns None.
+    """
+    # Arrange
+    receiver = filesystem_mod.RealFileSystem()
+    path = Path("/workspace/docs/sample.md")
+    arguments: dict[str, tuple[object, ...]] = {
+        "resolve_path": ("~/docs/sample.md",),
+        "exists": (path,),
+        "read_text": (path,),
+        "write_text": (path, "body"),
+        "write_lines": (path, ["a"]),
+        "ensure_dir": (path,),
+        "move": (path, path),
+    }
+
+    # Act: call every protocol member through the protocol class itself, so the
+    # declaration body runs instead of the RealFileSystem override.
+    results = {
+        name: getattr(filesystem_mod.FileSystem, name)(receiver, *args)
+        for name, args in arguments.items()
+    }
+
+    # Assert
+    assert results == dict.fromkeys(arguments)
