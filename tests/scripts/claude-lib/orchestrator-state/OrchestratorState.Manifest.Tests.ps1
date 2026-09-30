@@ -36,6 +36,7 @@ BeforeAll {
         '.claude/lib/orchestrator-state/OrchestratorStateRoutingMatrix.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateRoutingContract.psm1',
+        '.claude/lib/orchestrator-state/OrchestratorStateIssueAdoption.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateUnconditional.psm1'
     )
 }
