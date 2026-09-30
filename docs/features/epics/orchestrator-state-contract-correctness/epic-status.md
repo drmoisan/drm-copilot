@@ -5,8 +5,8 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 - Epic issue: #771
 - Integration branch: `epic/orchestrator-state-contract-correctness-integration`
 - Current wave: 1
-- Next step: #509 executing (wave 1); launch #523 after #509 completes Phase 0 and its baseline.
-- Last updated: 2026-09-30T13:40:30Z
+- Next step: #509 and #523 executing (wave 1); launch #484 (wave 2) after #523 merges.
+- Last updated: 2026-09-30T14:10:18Z
 
 ## Features
 
@@ -15,7 +15,7 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 | 2026-09-29-ts-validator-promotion-type-parity-gap-405 | 405 | 0 | merged | [#800](https://github.com/drmoisan/drm-copilot/pull/800) | 3f7c709cc8c9ae2c5bdee43ce25f695786058f94 | 2026-09-30T11:10:59Z | 2026-09-30T12:08:14Z | 2026-09-30T13:39:16Z | - |
 | 2026-09-29-validate-orchestrator-state-cli-entry-point-464 | 464 | 0 | merged | [#801](https://github.com/drmoisan/drm-copilot/pull/801) | 815a962f0575ad10919c8014185e444727991eb5 | 2026-09-30T12:12:12Z | 2026-09-30T12:47:09Z | 2026-09-30T13:39:23Z | - |
 | 2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509 | 509 | 1 | worktree_created | - | - | 2026-09-30T13:40:30Z | - | - | - |
-| 2026-09-29-blocked-reason-premise-falsified-halt-523 | 523 | 1 | not_started | - | - | - | - | - | - |
+| 2026-09-29-blocked-reason-premise-falsified-halt-523 | 523 | 1 | worktree_created | - | - | 2026-09-30T14:10:18Z | - | - | - |
 | 2026-09-29-orchestrator-remediation-loop-control-484 | 484 | 2 | not_started | - | - | - | - | - | - |
 
 ## Integration-to-main PR
