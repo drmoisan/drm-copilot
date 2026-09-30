@@ -399,10 +399,10 @@ The searches in this plan use these fixed strings, quoted here so each is an exp
 
 ### Phase 11 — Follow-Up Potential Entries
 
-- [ ] [P11-T1] Write `docs/features/potential/2026-09-29-hook-preexisting-imports-fail-open.md` per Appendix E1 (AC-36). Acceptance: the Write succeeds without a hook denial; content is verified after commit by P11-T4.
-- [ ] [P11-T2] Write `docs/features/potential/2026-09-29-validate-orchestrator-output-session-relative-read.md` per Appendix E2 (AC-63). Acceptance: as P11-T1.
-- [ ] [P11-T3] Write `docs/features/potential/2026-09-29-merge-gate-child-branch-without-pr-gate.md` per Appendix E3 (AC-63). Acceptance: as P11-T1.
-- [ ] [P11-T4] Verify, commit, and push the three entries, in this order: CMD-GIT-ADD with the three entry paths; CMD-GIT-COUNT with literal `#690` over the three paths; write FEATURE/evidence/other/follow-up-entries.TS.md; CMD-GIT-ADD with the FEATURE evidence directory and PLAN; CMD-GIT-COMMIT with message "docs(690): record follow-up potential entries"; CMD-GIT-PUSH. Acceptance: the count prints three `path:count` lines; no `gh` command is run; CMD-GIT-STATUS prints nothing after the push and the push exits 0.
+- [x] [P11-T1] Write `docs/features/potential/2026-09-29-hook-preexisting-imports-fail-open.md` per Appendix E1 (AC-36). Acceptance: the Write succeeds without a hook denial; content is verified after commit by P11-T4.
+- [x] [P11-T2] Write `docs/features/potential/2026-09-29-validate-orchestrator-output-session-relative-read.md` per Appendix E2 (AC-63). Acceptance: as P11-T1.
+- [x] [P11-T3] Write `docs/features/potential/2026-09-29-merge-gate-child-branch-without-pr-gate.md` per Appendix E3 (AC-63). Acceptance: as P11-T1.
+- [x] [P11-T4] Verify, commit, and push the three entries, in this order: CMD-GIT-ADD with the three entry paths; CMD-GIT-COUNT with literal `#690` over the three paths; write FEATURE/evidence/other/follow-up-entries.TS.md; CMD-GIT-ADD with the FEATURE evidence directory and PLAN; CMD-GIT-COMMIT with message "docs(690): record follow-up potential entries"; CMD-GIT-PUSH. Acceptance: the count prints three `path:count` lines; no `gh` command is run; CMD-GIT-STATUS prints nothing after the push and the push exits 0.
 
 ### Phase 12 — Final QA Loop: PowerShell (PoshQC and Pester)
 
