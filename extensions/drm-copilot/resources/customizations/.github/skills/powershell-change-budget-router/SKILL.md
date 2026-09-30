@@ -18,8 +18,8 @@ Use this skill when:
 
 1) Estimate rough change budget first based on likely **production PowerShell files** touched.
 2) Route:
-- `1-2` production files (+ corresponding tests) → **small path** (`powershell-typed-engineer` direct mode).
-- `>2` production files → **large path** (`powershell-orchestrator`).
+- `1-3` production files (+ corresponding tests) → **small path** (`powershell-typed-engineer` direct mode).
+- More than 3 production files → **large path** (`powershell-orchestrator`). The large path has no production-file cap.
 
 ## Orchestrated Small-Path Requirements
 
@@ -36,7 +36,7 @@ Direct invocation of `powershell-typed-engineer` remains implementation-focused 
 
 ## Direct-Mode Rejection Rule
 
-If `powershell-typed-engineer` is invoked directly and estimated scope is `>2` production files:
+If `powershell-typed-engineer` is invoked directly and estimated scope is more than 3 production files:
 - Stop before implementation.
 - Return explicit routing instruction to invoke `powershell-orchestrator` (or `.github/prompts/orchestrate-powershell-work.prompt.md`).
 

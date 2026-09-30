@@ -20,10 +20,10 @@ Coordinate the user request from intake to completion using the correct path bas
 
 ## Required orchestration behavior
 
-1. Estimate rough change budget first (production Python files and test Python files).
-2. If budget is **1–3 production Python files** (+ corresponding tests):
+1. Estimate rough change budget first (production Python files; test files are not counted toward the routing threshold).
+2. If budget is **1-3 production Python files** (+ corresponding tests):
    - Delegate directly to `python-typed-engineer` for plan + implementation + QA closure.
-3. If budget is **>3 production Python files** or **>3 test Python files**:
+3. If budget is **more than 3 production Python files**:
    - Execute full large-path lifecycle:
      1) Scope and create potential entry (`feature` vs `bug`, short-name creation)
      2) Promote to GitHub issue and capture issue metadata

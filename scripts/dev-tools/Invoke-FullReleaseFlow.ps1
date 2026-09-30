@@ -211,7 +211,7 @@ function Wait-ForPullRequestChecks {
         [int]$RegistrationIntervalSeconds = 5,
 
         [Parameter()]
-        [int]$CompletionMaxAttempts = 60,
+        [int]$CompletionMaxAttempts = 120,
 
         [Parameter()]
         [int]$CompletionIntervalSeconds = 10
