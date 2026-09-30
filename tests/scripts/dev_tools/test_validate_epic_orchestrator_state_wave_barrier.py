@@ -116,7 +116,9 @@ def test_start_guard_matrix_case(case: dict[str, Any]) -> None:
             True,
             id="empty-string-timestamp",
         ),
-        pytest.param({"merge_status": "not_started"}, False, id="not-started-no-timestamp"),
+        pytest.param(
+            {"merge_status": "not_started"}, False, id="not-started-no-timestamp"
+        ),
         pytest.param(
             {"worktree_created_at": None, "merge_status": "not_started"},
             False,
@@ -168,8 +170,10 @@ def test_validate_wave_barrier_ordering_reports_unhashable_dependency_status() -
     ], f"unexpected barrier errors: {actual!r}"
 
 
-def test_validate_wave_barrier_ordering_skips_malformed_and_unresolved_entries() -> None:
-    """Non-string folders, non-list depends_on, and unresolved references are skipped."""
+def test_validate_wave_barrier_ordering_skips_malformed_and_unresolved_entries() -> (
+    None
+):
+    """Non-string folders, non-list depends_on, and unresolved refs are skipped."""
     # Arrange
     features: list[dict[str, Any]] = [
         {"feature_folder": 5, "depends_on": ["x"]},
