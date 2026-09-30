@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import Any, cast
 
+from scripts.dev_tools._orchestrator_state_issue_adoption import (
+    resolve_issue_adoption,
+)
 from scripts.dev_tools._orchestrator_state_promotion_tools import (
     BUG_PROMOTION_ENTRY_TOOL,
     FEATURE_PROMOTION_ENTRY_TOOL,
@@ -241,9 +244,20 @@ def validate_routing_contract(
             errors.append(f"Checkpoint missing required skill receipt: {skill}.")
 
     actual_tools = _mcp_tools(state)
+    # A valid issue_adoption record waives receipts that an adopted pre-existing
+    # issue never exercises; any adoption error waives nothing (fail-closed).
+    adoption = resolve_issue_adoption(
+        state,
+        route_id=route_id,
+        required_mcp_tools=required_mcp_tools,
+        successful_tools=actual_tools,
+    )
     for tool in required_mcp_tools:
+        if tool in adoption.waived_tools:
+            continue
         if tool not in actual_tools:
             errors.append(f"Checkpoint missing successful MCP receipt: {tool}.")
+    errors.extend(adoption.errors)
 
     errors.extend(_validate_empty_list_field(state, "local_execution_overrides"))
     errors.extend(_validate_empty_list_field(state, "delegation_bypasses"))
