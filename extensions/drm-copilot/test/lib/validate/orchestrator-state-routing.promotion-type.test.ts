@@ -38,7 +38,9 @@ const ROUTING_MATRIX_PATH = path.resolve(
 );
 
 /** Parsed real routing matrix. */
-const ROUTING_MATRIX: unknown = JSON.parse(fs.readFileSync(ROUTING_MATRIX_PATH, "utf8"));
+const ROUTING_MATRIX: unknown = JSON.parse(
+  fs.readFileSync(ROUTING_MATRIX_PATH, "utf8"),
+);
 
 /** The three declared lists of the real `large` route. */
 interface LargeRoute {
@@ -54,7 +56,9 @@ interface LargeRoute {
  * @throws Error when the matrix does not have the expected shape.
  */
 function readLargeRoute(): LargeRoute {
-  const root = ROUTING_MATRIX as { routes?: Record<string, Record<string, unknown>> };
+  const root = ROUTING_MATRIX as {
+    routes?: Record<string, Record<string, unknown>>;
+  };
   const route = root.routes?.["large"];
   if (route === undefined) {
     throw new Error("routing matrix has no large route.");
@@ -73,7 +77,10 @@ function readLargeRoute(): LargeRoute {
  * @param tools Tool list used for both `required_mcp_tools` and the receipts.
  * @returns A checkpoint that satisfies every routing-contract row.
  */
-function buildLargeState(promotionType: string, tools: string[]): Record<string, unknown> {
+function buildLargeState(
+  promotionType: string,
+  tools: string[],
+): Record<string, unknown> {
   const route = readLargeRoute();
   return {
     route_id: "large",
@@ -104,7 +111,9 @@ function buildLargeState(promotionType: string, tools: string[]): Record<string,
  * @returns The bug-type tool list.
  */
 function bugTools(): string[] {
-  return readLargeRoute().tools.map((tool) => (tool === FEATURE_TOOL ? BUG_TOOL : tool));
+  return readLargeRoute().tools.map((tool) =>
+    tool === FEATURE_TOOL ? BUG_TOOL : tool,
+  );
 }
 
 describe("validateRoutingContract promotion-type resolution", () => {
@@ -113,7 +122,9 @@ describe("validateRoutingContract promotion-type resolution", () => {
     const state = buildLargeState("bug", bugTools());
 
     // Act: run the routing-contract validator against the real matrix.
-    const errors = validateRoutingContract(state, { routingMatrix: ROUTING_MATRIX });
+    const errors = validateRoutingContract(state, {
+      routingMatrix: ROUTING_MATRIX,
+    });
 
     // Assert: the bug-type promotion validates cleanly.
     expect(errors).toEqual([]);
@@ -124,7 +135,9 @@ describe("validateRoutingContract promotion-type resolution", () => {
     const state = buildLargeState("feature", readLargeRoute().tools);
 
     // Act: run the routing-contract validator against the real matrix.
-    const errors = validateRoutingContract(state, { routingMatrix: ROUTING_MATRIX });
+    const errors = validateRoutingContract(state, {
+      routingMatrix: ROUTING_MATRIX,
+    });
 
     // Assert: feature-type behavior is unchanged.
     expect(errors).toEqual([]);
@@ -145,7 +158,9 @@ describe("validateRoutingContract promotion-type resolution", () => {
     const state = buildLargeState("bug", readLargeRoute().tools);
 
     // Act: run the routing-contract validator against the real matrix.
-    const errors = validateRoutingContract(state, { routingMatrix: ROUTING_MATRIX });
+    const errors = validateRoutingContract(state, {
+      routingMatrix: ROUTING_MATRIX,
+    });
 
     // Assert: the bug-tool mismatch and missing bug-tool receipt are reported,
     // and the feature-tool receipt is not demanded.

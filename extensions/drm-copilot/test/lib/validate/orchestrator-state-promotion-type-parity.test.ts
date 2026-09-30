@@ -39,7 +39,11 @@ const CORPUS_DIR = path.join(
 );
 
 /** Real routing matrix, the same file the Python runtime loads. */
-const ROUTING_MATRIX_PATH = path.join(REPO_ROOT, "config", "orchestration-routing.json");
+const ROUTING_MATRIX_PATH = path.join(
+  REPO_ROOT,
+  "config",
+  "orchestration-routing.json",
+);
 
 /** Corpus file extension, used by both the discovery filter and the count guard. */
 const CORPUS_SUFFIX = ".json";
@@ -125,7 +129,9 @@ function requireErrorList(value: unknown, label: string): string[] {
     throw new Error(`${label} must be a JSON array.`);
   }
   const entries: unknown[] = value;
-  return entries.map((entry, index) => requireText(entry, `${label}[${String(index)}]`));
+  return entries.map((entry, index) =>
+    requireText(entry, `${label}[${String(index)}]`),
+  );
 }
 
 /**
@@ -155,7 +161,10 @@ function loadCase(fileName: string): CorpusCase {
   return {
     name,
     checkpoint: requireObject(fixture["checkpoint"], `${fileName}.checkpoint`),
-    expected: requireErrorList(fixture["expected_errors"], `${fileName}.expected_errors`),
+    expected: requireErrorList(
+      fixture["expected_errors"],
+      `${fileName}.expected_errors`,
+    ),
   };
 }
 
@@ -169,7 +178,9 @@ const CORPUS_FILES: readonly string[] = fs
 const CORPUS_CASES: readonly CorpusCase[] = CORPUS_FILES.map(loadCase);
 
 /** The real routing matrix, parsed once. */
-const ROUTING_MATRIX: unknown = JSON.parse(fs.readFileSync(ROUTING_MATRIX_PATH, "utf8"));
+const ROUTING_MATRIX: unknown = JSON.parse(
+  fs.readFileSync(ROUTING_MATRIX_PATH, "utf8"),
+);
 
 describe("orchestrator-state promotion-type parity corpus", () => {
   it("meets the documented minimum corpus size", () => {
@@ -184,7 +195,9 @@ describe("orchestrator-state promotion-type parity corpus", () => {
     // Arrange: enumerate the directory again, counting only files.
     const onDisk = fs
       .readdirSync(CORPUS_DIR, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && path.extname(entry.name) === CORPUS_SUFFIX);
+      .filter(
+        (entry) => entry.isFile() && path.extname(entry.name) === CORPUS_SUFFIX,
+      );
 
     // Act / Assert: the two counts must agree.
     expect(CORPUS_CASES).toHaveLength(onDisk.length);
@@ -193,7 +206,9 @@ describe("orchestrator-state promotion-type parity corpus", () => {
   it("exercises both an accepted and a rejected checkpoint", () => {
     // Arrange / Act: partition the cases by expectation length.
     const rejected = CORPUS_CASES.filter((entry) => entry.expected.length > 0);
-    const accepted = CORPUS_CASES.filter((entry) => entry.expected.length === 0);
+    const accepted = CORPUS_CASES.filter(
+      (entry) => entry.expected.length === 0,
+    );
 
     // Assert: a one-sided corpus never exercises both verdict paths.
     expect(rejected.length).toBeGreaterThan(0);

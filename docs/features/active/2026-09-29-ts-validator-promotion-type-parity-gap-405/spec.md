@@ -150,22 +150,22 @@ None. The function is a linear map over a list of fewer than ten elements.
 
 Note: the text of issue #405 was not retrievable in this session (`gh` and Bash were unavailable). Items 1 through 3 are taken from the "Proposed Fix / Validation Ideas" and "Expected Behavior" sections of the promoted record from which the issue body was generated. The implementer should confirm them against the issue body when `gh` is available.
 
-- [ ] A `promotion-type: "bug"` checkpoint on the `large` route that declares `new_potential_bug_entry` in `required_mcp_tools` and records a successful `new_potential_bug_entry` receipt (and no `new_potential_entry` receipt) produces no routing-contract error from the TypeScript validator, matching the Python CLI and the MCP tool result.
-- [ ] TypeScript unit tests mirror the four PR #402 Python tests: bug-type pass, feature-type no-regression, dead-skill-name absence (if still applicable; it is, per research), and bug-type-with-only-feature-tool rejection.
-- [ ] The same fixture checkpoint run through the Python validator and the TypeScript validator yields identical results, verified by a shared parity test.
-- [ ] `extensions/drm-copilot/src/lib/validate/orchestrator-state-promotion-tools.ts` exists and exports pure `resolvePromotionEntryTools(tools, state)` with exact-match semantics: substitution only when `state["promotion-type"] === "bug"`, with no trimming, no case folding, and only the hyphenated key; absent, non-string, and other values leave the list unchanged; order is preserved and the input is not mutated.
-- [ ] `validateRoutingContract` computes the resolved tool list once and uses it for both the `required_mcp_tools` equality check and the receipt-presence loop.
-- [ ] Unit tests for `resolvePromotionEntryTools` cover bug substitution, order preservation, feature, absent, `null`, non-string, `"Bug"`, and `" bug"` inputs, non-mutation of the input, and a list that does not contain the feature tool.
-- [ ] A parity corpus exists at `tests/fixtures/orchestrator_state_promotion_type/*.json`, each file shaped `{name, notes, checkpoint, expected_errors}`, covering: bug with bug tool, feature, bug with only feature tool, absent key, `"Bug"`, `" bug"`, non-string value, and bug on each of `small`, `preparation`, `remediation`, and `epic`.
-- [ ] A Python test reads the corpus and asserts each `expected_errors` list equals the validator's ordered error list, with a minimum-corpus-size guard that fails on an empty or short corpus.
-- [ ] A TypeScript test reads the same corpus and asserts identical ordered error lists using the real `config/orchestration-routing.json` matrix, with a minimum-corpus-size guard.
-- [ ] A Pester test reads the same corpus and asserts identical ordered error lists through `Get-OrchestratorStateRoutingContractError` (which accepts a parsed state object), with a minimum-corpus-size guard. Decision: the Pester reader is included because research confirms the function is callable from Pester with a state object; it remains within the 500-line rule.
-- [ ] TypeScript tests load the real `config/orchestration-routing.json` matrix and do not rely on the stale in-file matrix of `orchestrator-state-routing.test.ts`.
-- [ ] `extensions/drm-copilot/jest.config.cjs` has a per-file coverage threshold entry of 85% lines and 75% branches for `src/lib/validate/orchestrator-state-promotion-tools.ts`, and the threshold passes.
-- [ ] Existing checkpoints with no `promotion-type` or a non-`"bug"` value validate byte-identically to the pre-change output.
-- [ ] No production or test file changed or added by this work exceeds 500 lines.
-- [ ] No production change is made to the PowerShell or Python validators or to the bundled PowerShell mirror, and no work is done on #343, #509, files in issue #769, or Python legs in enforcement hooks.
-- [ ] Full toolchain pass completed (format, lint, type-check, architecture-boundary tests, unit tests, contract checks, integration tests) with line coverage at or above 85% and branch coverage at or above 75% where measured.
+- [x] A `promotion-type: "bug"` checkpoint on the `large` route that declares `new_potential_bug_entry` in `required_mcp_tools` and records a successful `new_potential_bug_entry` receipt (and no `new_potential_entry` receipt) produces no routing-contract error from the TypeScript validator, matching the Python CLI and the MCP tool result.
+- [x] TypeScript unit tests mirror the four PR #402 Python tests: bug-type pass, feature-type no-regression, dead-skill-name absence (if still applicable; it is, per research), and bug-type-with-only-feature-tool rejection.
+- [x] The same fixture checkpoint run through the Python validator and the TypeScript validator yields identical results, verified by a shared parity test.
+- [x] `extensions/drm-copilot/src/lib/validate/orchestrator-state-promotion-tools.ts` exists and exports pure `resolvePromotionEntryTools(tools, state)` with exact-match semantics: substitution only when `state["promotion-type"] === "bug"`, with no trimming, no case folding, and only the hyphenated key; absent, non-string, and other values leave the list unchanged; order is preserved and the input is not mutated.
+- [x] `validateRoutingContract` computes the resolved tool list once and uses it for both the `required_mcp_tools` equality check and the receipt-presence loop.
+- [x] Unit tests for `resolvePromotionEntryTools` cover bug substitution, order preservation, feature, absent, `null`, non-string, `"Bug"`, and `" bug"` inputs, non-mutation of the input, and a list that does not contain the feature tool.
+- [x] A parity corpus exists at `tests/fixtures/orchestrator_state_promotion_type/*.json`, each file shaped `{name, notes, checkpoint, expected_errors}`, covering: bug with bug tool, feature, bug with only feature tool, absent key, `"Bug"`, `" bug"`, non-string value, and bug on each of `small`, `preparation`, `remediation`, and `epic`.
+- [x] A Python test reads the corpus and asserts each `expected_errors` list equals the validator's ordered error list, with a minimum-corpus-size guard that fails on an empty or short corpus.
+- [x] A TypeScript test reads the same corpus and asserts identical ordered error lists using the real `config/orchestration-routing.json` matrix, with a minimum-corpus-size guard.
+- [x] A Pester test reads the same corpus and asserts identical ordered error lists through `Get-OrchestratorStateRoutingContractError` (which accepts a parsed state object), with a minimum-corpus-size guard. Decision: the Pester reader is included because research confirms the function is callable from Pester with a state object; it remains within the 500-line rule.
+- [x] TypeScript tests load the real `config/orchestration-routing.json` matrix and do not rely on the stale in-file matrix of `orchestrator-state-routing.test.ts`.
+- [x] `extensions/drm-copilot/jest.config.cjs` has a per-file coverage threshold entry of 85% lines and 75% branches for `src/lib/validate/orchestrator-state-promotion-tools.ts`, and the threshold passes.
+- [x] Existing checkpoints with no `promotion-type` or a non-`"bug"` value validate byte-identically to the pre-change output.
+- [x] No production or test file changed or added by this work exceeds 500 lines.
+- [x] No production change is made to the PowerShell or Python validators or to the bundled PowerShell mirror, and no work is done on #343, #509, files in issue #769, or Python legs in enforcement hooks.
+- [x] Full toolchain pass completed (format, lint, type-check, architecture-boundary tests, unit tests, contract checks, integration tests) with line coverage at or above 85% and branch coverage at or above 75% where measured.
 
 ## Risks & Mitigations
 

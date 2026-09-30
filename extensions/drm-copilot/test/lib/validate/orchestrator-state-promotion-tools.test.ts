@@ -37,7 +37,10 @@ describe("constants", () => {
 
 describe("resolvePromotionEntryTools bug substitution", () => {
   it("substitutes the feature tool with the bug tool for a bug checkpoint", () => {
-    const resolved = resolvePromotionEntryTools(["new_potential_entry"], bugState());
+    const resolved = resolvePromotionEntryTools(
+      ["new_potential_entry"],
+      bugState(),
+    );
 
     expect(resolved).toEqual(["new_potential_bug_entry"]);
   });

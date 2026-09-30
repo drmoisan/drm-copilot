@@ -189,9 +189,7 @@ def test_corpus_exercises_both_verdicts() -> None:
     accepted = [
         name
         for name, fixture in CORPUS_CASES
-        if not require_error_list(
-            fixture["expected_errors"], f"{name}.expected_errors"
-        )
+        if not require_error_list(fixture["expected_errors"], f"{name}.expected_errors")
     ]
 
     # Assert: an all-accepted corpus never exercises the message-emitting path.
