@@ -5,8 +5,8 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 - Epic issue: #770
 - Integration branch: `epic/push-down-payload-correctness-integration`
 - Current wave: 2
-- Next step: E12_integration_pr
-- Last updated: 2026-09-30T01:26:06Z
+- Next step: DONE (deferred: removal of four harness-locked child worktrees)
+- Last updated: 2026-09-30T01:41:23Z
 
 ## Features
 
@@ -19,5 +19,5 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 
 ## Integration-to-main PR
 
-- PR: not opened
-- Merge commit: -
+- PR: #783
+- Merge commit: 72d7ebbfda7dc6f1d6c5c321c1d01c00b8e4f8b4
