@@ -261,15 +261,12 @@ function Get-BlastRadiusPairCost {
     $pathsA = @(Get-NonMergeablePathEntry -Entry ([string[]]@($left['paths'])) -MergeablePath $mergeable)
     $pathsB = @(Get-NonMergeablePathEntry -Entry ([string[]]@($right['paths'])) -MergeablePath $mergeable)
 
-    # Enumerate the overlapping pairs with the relation's own primitive, so the
-    # cost covers exactly the pairs the relation could report.
+    # Enumerate the overlapping pairs with the relation's own indexed enumeration
+    # (the Test-EntryOverlap pairs, issue #776), so the cost covers exactly the
+    # pairs the relation could report.
     [long]$cost = 0
-    foreach ($entryA in $pathsA) {
-        foreach ($entryB in $pathsB) {
-            if (Test-EntryOverlap -EntryA $entryA -EntryB $entryB) {
-                $cost += Get-PathPairWeight -EntryA $entryA -EntryB $entryB -Tolerance $Tolerance
-            }
-        }
+    foreach ($pair in @(Get-OverlappingPathPair -PathA $pathsA -PathB $pathsB)) {
+        $cost += Get-PathPairWeight -EntryA $pair['EntryA'] -EntryB $pair['EntryB'] -Tolerance $Tolerance
     }
     $sharedModule = @(@($left['modules']) | Where-Object { @($right['modules']) -ccontains $_ })
     return $cost + ([long]$Tolerance['weights']['module'] * $sharedModule.Count)
