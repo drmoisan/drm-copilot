@@ -513,7 +513,7 @@ legs use operand ascent, not enumeration. No subprocess is started.
 ### Toolchain and follow-ups
 
 - [ ] The PowerShell toolchain (PoshQC format, then analyze, then test) completes in a single pass with no failure and no modified file, and the observed output is recorded under `evidence/qa-gates/`.
-- [ ] No file under `.codex/`, no Python file, and neither `validate-orchestrator-output.ps1` nor `Find-EpicWaveBarrierFeatureFolderFromPrompt` is changed.
+- [ ] No file under `.codex/` is changed, no Python file is changed except the frozen-surface digest pin in `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` (re-baselined for the intended AC-41 edit to `.claude/skills/epic-orchestrate/SKILL.md`), and neither `validate-orchestrator-output.ps1` nor `Find-EpicWaveBarrierFeatureFolderFromPrompt` is changed.
 - [ ] Potential entries under `docs/features/potential/` record the session-relative read in `validate-orchestrator-output.ps1` (SubagentStop) and the merge-gate child-branch residual for routes without `pr_gate.pr_number`.
 
 ## Risks & Mitigations
@@ -549,3 +549,7 @@ legs use operand ascent, not enumeration. No subprocess is started.
   preimplementation gate and wave barrier; `validate-orchestrator-output.ps1` may still block
   epic-orchestrator termination in that topology until its follow-up lands.
 - Links: issue #690; epic #678; #669, #671, #687, PR #695, PR #726; related #565, #736, #737.
+
+## Change Log
+
+- 2026-09-30: AC-62 amended by orchestrator decision to exempt the frozen-surface digest pin re-baseline required by the AC-41 skill edit; the criterion's intent (PowerShell-only fix, no Python hook legs) is unchanged.

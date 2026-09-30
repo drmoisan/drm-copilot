@@ -3,9 +3,9 @@
 - **Issue:** #690
 - **Parent (optional):** epic #678 defect class (worktree-scoped state resolution)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-29T23-10
-- **Status:** Draft (revision 1.2: executor preflight round 1 revisions applied; 1.1 changed D13 to a copy-drift halt; pending re-validation and preflight round 2)
-- **Version:** 1.2
+- **Last Updated:** 2026-09-30T02-00
+- **Status:** In execution (revision 1.4: P13-T2 also amends spec AC-62 per orchestrator decision option (b); P13-T4 pin-line indentation and P13-T10 commit list corrected; revision 1.3: P13-T2 re-baselines the frozen epic-surface digest pin after the halt at the former P13-T2, HEAD c50234ae; Phase 13 tasks from P13-T2 on renumbered by one; 1.2 applied preflight round 1 revisions; 1.1 changed D13 to a copy-drift halt)
+- **Version:** 1.4
 - **Work Mode:** full-bug (`spec.md` is the acceptance-criteria source; `user-story.md` is present and maps scenarios to spec sections)
 - **Branch:** `bug/agent-payload-gates-resolve-session-root-690` (head `d6bb5c65` at planning time)
 - **Research:** `research/2026-09-29T21-55-agent-payload-gates-session-root-research.md`
@@ -120,7 +120,7 @@ The session executing this plan runs this worktree's hooks, and each converted h
 
 ### Toolchain loop rule
 
-Each implementation phase runs, after its writes: MCP-PS-FORMAT over the phase's folders, a read-only A6 check, a `git status --porcelain` check, MCP-PS-ANALYZE, an A7 count, and the phase's A2 suite runs (the per-phase loop). If any step fails or changes a tracked file, fix the cause and restart that phase's loop from its format task. Phase 12 is the final PowerShell QA loop (format, analyze, test with coverage; PowerShell has no type-check stage per `.claude/rules/powershell.md`). Phase 13 runs the Python parity harness; no Python source file is created or changed, which P13-T3 verifies, so black, ruff, pyright, and Python coverage gates have no in-scope file.
+Each implementation phase runs, after its writes: MCP-PS-FORMAT over the phase's folders, a read-only A6 check, a `git status --porcelain` check, MCP-PS-ANALYZE, an A7 count, and the phase's A2 suite runs (the per-phase loop). If any step fails or changes a tracked file, fix the cause and restart that phase's loop from its format task. Phase 12 is the final PowerShell QA loop (format, analyze, test with coverage; PowerShell has no type-check stage per `.claude/rules/powershell.md`). Phase 13 runs the Python parity harness. The only Python change is the P13-T2 digest re-baseline of `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` (pin values only), which P13-T2 runs through black, ruff, and pyright and P13-T4 verifies; no other Python file is created or changed.
 
 ### Commit rule
 
@@ -432,16 +432,17 @@ If any Phase 12 step fails or changes a tracked file, fix the cause, re-mirror a
 ### Phase 13 — Python Parity, Scope Guards, and Coverage Comparison
 
 - [x] [P13-T1] Python parity. Command: CMD-PY-PARITY. Write FEATURE/evidence/qa-gates/python-parity.TS.md. Acceptance: every node other than the KL-510 node is PASSED and that node satisfies KL-510 (AC-44).
-- [ ] [P13-T2] Python regression over `tests/scripts/dev_tools`. Command: `poetry run pytest tests/scripts/dev_tools -q -rf`. Write FEATURE/evidence/qa-gates/python-dev-tools.TS.md. Acceptance: every `FAILED` line is a member of the P0-T38 baseline failure set and the collected total equals the P0-T38 total. When the KL-510 node is the only FAILED line and satisfies case (b), the artifact carries `ExpectedExitCode: 1`.
-- [ ] [P13-T3] No Python file changed. Commands: `git diff --name-only BASE_SHA -- "*.py"` and `git status --porcelain -- "*.py"`. Write FEATURE/evidence/qa-gates/python-scope.TS.md. Acceptance: both commands print nothing.
-- [ ] [P13-T4] No `.codex` file changed (AC-62). Commands: `git diff --name-only BASE_SHA -- .codex` and `git status --porcelain -- .codex`. Write FEATURE/evidence/qa-gates/codex-scope.TS.md. Acceptance: both commands print nothing.
-- [ ] [P13-T5] Byte-unchanged files (AC-54, AC-62). Commands: `git diff --exit-code BASE_SHA -- .claude/lib/worktree-resolution/WorktreeResolution.psm1 .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 .claude/hooks/validate-orchestrator-output.ps1 .claude/hooks/enforce-powershell-batch-budget.ps1 .claude/hooks/enforce-powershell-batch-budget-route.ps1` and CMD-PS-SCRIPT with script file-hashes (A5) over the Appendix F group BU. Write FEATURE/evidence/qa-gates/byte-unchanged.TS.md. Acceptance: the diff exits 0 with no output, and every A5 `Hash=` value equals its P0-T12 value.
-- [ ] [P13-T6] AC-26 re-check (A14 as P4-T12). Write FEATURE/evidence/qa-gates/wave-folder-function-final.TS.md. Acceptance: `FUNCTION-TEXT-EQUAL=True`.
-- [ ] [P13-T7] Final mirror check across Appendix F groups MP-EXIST and MP-NEW. Command: A13 over all 25 pairs. Write FEATURE/evidence/qa-gates/mirror-hashes-final.TS.md. Acceptance: `PAIR-SUMMARY pairs=25 unequal=0`.
-- [ ] [P13-T8] Registration check (AC-45, AC-47). Commands: CMD-GIT-COUNT with literal `WorktreeRunResolution.psm1` over CORE, RUNSET, RUNSETB; CMD-GIT-COUNT with literal `enforce-epic-merge-gate-resolution.ps1` over the same three; CMD-GIT-COUNT with literal `enforce-epic-worktree-removal-gate-resolution.ps1` over the same three; A13 over the RUNSET/RUNSETB pair. Write FEATURE/evidence/qa-gates/registration.TS.md. Acceptance: each count prints three lines with count 1; A13 prints `PAIR-SUMMARY pairs=1 unequal=0`.
-- [ ] [P13-T9] Commit manifest (AC-43, AC-57, AC-60). Command: CMD-PS-SCRIPT with script commit-manifest (A18) and `-BaseRef BASE_SHA` (BASE_SHA replaced by the recorded commit). Write FEATURE/evidence/qa-gates/commit-manifest.TS.md. Acceptance: the first `COMMIT` line is `d6bb5c65` (pre-plan documents), followed by the Phase 0-12 commits in order; the Phase 1 commit lists no path under `.claude/hooks/`; the Phase 2 commit precedes the Phase 3 commit; each gate commit (Phases 3-10) lists its primary hook or module file together with every sibling it writes and every CB mirror of those files (per the P3-FILES through P10-FILES lists of Appendix F).
-- [ ] [P13-T10] Coverage comparison. Write FEATURE/evidence/qa-gates/coverage-comparison.TS.md from the P0-T25 through P0-T32 and P12-T4 through P12-T12 artifacts. Acceptance: the artifact carries, for PowerShell, `Baseline Coverage:` (each existing file's BASEPCT), `Post-Change Coverage:` (each P12 value, including WRR, MRGR, EREMR), `New/Changed-code Coverage:` (the 13 `ChangedPercent=` values; WIR may be `NA`, recorded as "no executable changed line; the export is verified by T-REC X2 (P1-T12)"), and `Disposition:`; every other value is numeric. `Disposition:` is `PASS` only when WRR, MRGR, and EREMR are each at least 85, each existing file is at least its BASEPCT, and each of the 12 non-WIR `ChangedPercent=` values is at least 85; otherwise `BLOCKED`. The artifact states that no Python or TypeScript file is changed.
-- [ ] [P13-T11] Commit and push the final QA evidence. Commands: CMD-GIT-STATUS, then CMD-GIT-ADD with the FEATURE evidence directory plus every path CMD-GIT-STATUS listed (fixes made by Phase 12 restarts), CMD-GIT-COMMIT with message "docs(690): record final QA evidence", CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing and the push exits 0.
+- [x] [P13-T2] Re-baseline the frozen epic-surface digest pins (orchestrator decision option (a), following the #663 and #762 precedent; the Phase 2 Appendix D2 edit changed `.claude/skills/epic-orchestrate/SKILL.md`, whose SHA-256 is pinned in `PINNED_FROZEN_SURFACE_HASHES` at `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` lines 143-152; the only two pinned paths there are `.claude/agents/epic-orchestrator.md` and `.claude/skills/epic-orchestrate/SKILL.md`). Steps, in order: (1) `git diff --name-only BASE_SHA -- .claude/agents/epic-orchestrator.md .claude/skills/epic-orchestrate/SKILL.md` and `git status --porcelain -- .claude/agents/epic-orchestrator.md .claude/skills/epic-orchestrate/SKILL.md`, which identify the pinned files this branch changed; (2) write scratch script A19 committed-digest (Appendix H) under SCRATCH and run CMD-PS-SCRIPT with A19 over the two pinned paths, which prints one `DIGEST file=... committed=... working=... equal=...` line per path; (3) with the Edit tool, replace in the pin file the 64-character digest string of each pinned entry whose `committed=` value differs from its current pin by that `committed=` value, changing no other line (no comment is added; the re-baseline rationale is recorded in the evidence artifact); (4) `poetry run black tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, `poetry run ruff check tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, `poetry run pyright tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`; (5) `poetry run pytest tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py -q -rf`; (6) write FEATURE/evidence/qa-gates/frozen-surface-pins.TS.md with every command, the old and new digest per pinned path, and the rationale (issue #690 Appendix D2 identity-contract paragraph); (6a) AC-62 amendment (orchestrator decision option (b)): with the Edit tool, replace FEATURE/spec.md line 516 with the single line "- [ ] No file under `.codex/` is changed, no Python file is changed except the frozen-surface digest pin in `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` (re-baselined for the intended AC-41 edit to `.claude/skills/epic-orchestrate/SKILL.md`), and neither `validate-orchestrator-output.ps1` nor `Find-EpicWaveBarrierFeatureFolderFromPrompt` is changed.", then append at the end of FEATURE/spec.md a `## Change Log` section (spec.md has none at `c50234ae`) holding the single entry "- 2026-09-30: AC-62 amended by orchestrator decision to exempt the frozen-surface digest pin re-baseline required by the AC-41 skill edit; the criterion's intent (PowerShell-only fix, no Python hook legs) is unchanged."; (7) CMD-GIT-ADD with `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, FEATURE/spec.md, the FEATURE evidence directory, and PLAN; CMD-GIT-COMMIT with message "test(690): re-baseline the frozen epic-surface digest pins"; CMD-GIT-PUSH. Acceptance: step (1) lists `.claude/skills/epic-orchestrate/SKILL.md` and the status prints nothing; every A19 line carries `equal=True` (a `False` stops the task, because the local and CI digests would then differ); every updated pin equals its `committed=` value and every pin whose file this branch did not change is untouched; black prints `1 file left unchanged.`, ruff prints `All checks passed!`, pyright prints `0 errors, 0 warnings, 0 informations`; the pytest run reports no failure; FEATURE/spec.md line 516 reads exactly the step (6a) text, and CMD-GIT-COUNT with literal `## Change Log` over FEATURE/spec.md prints a count of 1 (the spec's AC line numbers and checkbox counts are unchanged, so P14 line references and P14-T65 counts still hold); CMD-GIT-STATUS prints nothing after the commit and the push exits 0.
+- [ ] [P13-T3] Python regression over `tests/scripts/dev_tools`. Command: `poetry run pytest tests/scripts/dev_tools -q -rf`. Write FEATURE/evidence/qa-gates/python-dev-tools.TS.md. Acceptance: every `FAILED` line is a member of the P0-T38 baseline failure set and the collected total equals the P0-T38 total. When the KL-510 node is the only FAILED line and satisfies case (b), the artifact carries `ExpectedExitCode: 1`.
+- [ ] [P13-T4] Only the pin file changed among Python files, and only its pin values. Commands: `git diff --name-only BASE_SHA -- "*.py"`, `git status --porcelain -- "*.py"`, and `git diff -U0 BASE_SHA -- tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`. Write FEATURE/evidence/qa-gates/python-scope.TS.md. Acceptance: the name-only diff prints exactly `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`; the status prints nothing; in the `-U0` diff every line that begins with a single `+` or `-` (the `+++` and `---` header lines excluded) is a pin value line (eight spaces, a double-quoted 64-character lowercase hexadecimal string, a comma), and the number of added and removed pin lines each equals the number of pins P13-T2 updated.
+- [ ] [P13-T5] No `.codex` file changed (AC-62). Commands: `git diff --name-only BASE_SHA -- .codex` and `git status --porcelain -- .codex`. Write FEATURE/evidence/qa-gates/codex-scope.TS.md. Acceptance: both commands print nothing.
+- [ ] [P13-T6] Byte-unchanged files (AC-54, AC-62). Commands: `git diff --exit-code BASE_SHA -- .claude/lib/worktree-resolution/WorktreeResolution.psm1 .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 .claude/hooks/validate-orchestrator-output.ps1 .claude/hooks/enforce-powershell-batch-budget.ps1 .claude/hooks/enforce-powershell-batch-budget-route.ps1` and CMD-PS-SCRIPT with script file-hashes (A5) over the Appendix F group BU. Write FEATURE/evidence/qa-gates/byte-unchanged.TS.md. Acceptance: the diff exits 0 with no output, and every A5 `Hash=` value equals its P0-T12 value.
+- [ ] [P13-T7] AC-26 re-check (A14 as P4-T12). Write FEATURE/evidence/qa-gates/wave-folder-function-final.TS.md. Acceptance: `FUNCTION-TEXT-EQUAL=True`.
+- [ ] [P13-T8] Final mirror check across Appendix F groups MP-EXIST and MP-NEW. Command: A13 over all 25 pairs. Write FEATURE/evidence/qa-gates/mirror-hashes-final.TS.md. Acceptance: `PAIR-SUMMARY pairs=25 unequal=0`.
+- [ ] [P13-T9] Registration check (AC-45, AC-47). Commands: CMD-GIT-COUNT with literal `WorktreeRunResolution.psm1` over CORE, RUNSET, RUNSETB; CMD-GIT-COUNT with literal `enforce-epic-merge-gate-resolution.ps1` over the same three; CMD-GIT-COUNT with literal `enforce-epic-worktree-removal-gate-resolution.ps1` over the same three; A13 over the RUNSET/RUNSETB pair. Write FEATURE/evidence/qa-gates/registration.TS.md. Acceptance: each count prints three lines with count 1; A13 prints `PAIR-SUMMARY pairs=1 unequal=0`.
+- [ ] [P13-T10] Commit manifest (AC-43, AC-57, AC-60). Command: CMD-PS-SCRIPT with script commit-manifest (A18) and `-BaseRef BASE_SHA` (BASE_SHA replaced by the recorded commit). Write FEATURE/evidence/qa-gates/commit-manifest.TS.md. Acceptance: the first `COMMIT` line is `d6bb5c65` (pre-plan documents), followed, in order, by 3ae80aa4, d120a539, 0dcb1cf5, 25069b47, db6a075d, 83d89c60, a696d710, ad2f8f41, 8f566bfb, 06e7b653, dd39cef8, 166b1de3, e5549ee1 (Phase 12 coverage fix), 1429d24a, c50234ae (P13 halt evidence), and then the P13-T2 pin re-baseline commit; the Phase 1 commit lists no path under `.claude/hooks/`; the Phase 2 commit precedes the Phase 3 commit; each gate commit (Phases 3-10) lists its primary hook or module file together with every sibling it writes and every CB mirror of those files (per the P3-FILES through P10-FILES lists of Appendix F).
+- [ ] [P13-T11] Coverage comparison. Write FEATURE/evidence/qa-gates/coverage-comparison.TS.md from the P0-T25 through P0-T32 and P12-T4 through P12-T12 artifacts. Acceptance: the artifact carries, for PowerShell, `Baseline Coverage:` (each existing file's BASEPCT), `Post-Change Coverage:` (each P12 value, including WRR, MRGR, EREMR), `New/Changed-code Coverage:` (the 13 `ChangedPercent=` values; WIR may be `NA`, recorded as "no executable changed line; the export is verified by T-REC X2 (P1-T12)"), and `Disposition:`; every other value is numeric. `Disposition:` is `PASS` only when WRR, MRGR, and EREMR are each at least 85, each existing file is at least its BASEPCT, and each of the 12 non-WIR `ChangedPercent=` values is at least 85; otherwise `BLOCKED`. The artifact states that the only Python change is the P13-T2 pin re-baseline and that no TypeScript file is changed.
+- [ ] [P13-T12] Commit and push the final QA evidence. Commands: CMD-GIT-STATUS, then CMD-GIT-ADD with the FEATURE evidence directory plus every path CMD-GIT-STATUS listed (fixes made by Phase 12 restarts), CMD-GIT-COMMIT with message "docs(690): record final QA evidence", CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing and the push exits 0.
 
 ### Phase 14 — Acceptance-Criteria Check-Off
 
@@ -472,7 +473,7 @@ Each check-off task edits one line of FEATURE/spec.md, changing its leading `- [
 - [ ] [P14-T23] Check off AC-23 (line 441). Evidence: P10-T15, P10-T17.
 - [ ] [P14-T24] Check off AC-24 (line 445). Evidence: P4-T10, P4-T11.
 - [ ] [P14-T25] Check off AC-25 (line 446). Evidence: P5-T10, P5-T11.
-- [ ] [P14-T26] Check off AC-26 (line 447). Evidence: P4-T12, P13-T6.
+- [ ] [P14-T26] Check off AC-26 (line 447). Evidence: P4-T12, P13-T7.
 - [ ] [P14-T27] Check off AC-27 (line 451). Evidence: P6-T12 (G4 M1).
 - [ ] [P14-T28] Check off AC-28 (line 452). Evidence: P6-T12 (G4 M2).
 - [ ] [P14-T29] Check off AC-29 (line 453). Evidence: P6-T12 (G4 M3-M5).
@@ -489,26 +490,26 @@ Each check-off task edits one line of FEATURE/spec.md, changing its leading `- [
 - [ ] [P14-T40] Check off AC-40 (line 479). Evidence: P2-T8, P2-T9.
 - [ ] [P14-T41] Check off AC-41 (line 480). Evidence: P2-T8 (epic-orchestrate and parallel-orchestrate counts), P2-T3 negative marker search.
 - [ ] [P14-T42] Check off AC-42 (line 481). Evidence: P2-T8 (three invoke-skill counts).
-- [ ] [P14-T43] Check off AC-43 (line 482). Evidence: P13-T9.
-- [ ] [P14-T44] Check off AC-44 (line 486) only when the P13-T1 artifact records `KL-510: PASSED`. Evidence: P13-T1, P13-T7. When P13-T1 records `KL-510: STATE-ONLY`, leave AC-44 unchecked and record the gap in the ac-checkoff artifact; the pull request's CI run closes it.
-- [ ] [P14-T45] Check off AC-45 (line 487). Evidence: P1-T7, P6-T8, P7-T8, P13-T8.
+- [ ] [P14-T43] Check off AC-43 (line 482). Evidence: P13-T10.
+- [ ] [P14-T44] Check off AC-44 (line 486) only when the P13-T1 artifact records `KL-510: PASSED`. Evidence: P13-T1, P13-T8. When P13-T1 records `KL-510: STATE-ONLY`, leave AC-44 unchecked and record the gap in the ac-checkoff artifact; the pull request's CI run closes it.
+- [ ] [P14-T45] Check off AC-45 (line 487). Evidence: P1-T7, P6-T8, P7-T8, P13-T9.
 - [ ] [P14-T46] Check off AC-46 (line 488). Evidence: P1-T6, P1-T13.
-- [ ] [P14-T47] Check off AC-47 (line 489). Evidence: P1-T8, P13-T8.
+- [ ] [P14-T47] Check off AC-47 (line 489). Evidence: P1-T8, P13-T9.
 - [ ] [P14-T48] Check off AC-48 (line 490). Evidence: P10-T9, P10-T14, P10-T15.
 - [ ] [P14-T49] Check off AC-49 (line 494). Evidence: G1A, G1B, G2-G7 rows listed in Appendix C per gate (P3-T13, P4-T10, P5-T10, P6-T12, P7-T12, P8-T10, P9-T10).
 - [ ] [P14-T50] Check off AC-50 (line 495). Evidence: P12-T18, P12-T19.
 - [ ] [P14-T51] Check off AC-51 (line 496). Evidence: P3-T9, P4-T6, P5-T6, P6-T7, P7-T7, P8-T6, P9-T6, P12-T13.
-- [ ] [P14-T52] Check off AC-52 (line 497). Evidence: P12-T4, P12-T12, P13-T10 (`Disposition: PASS`).
+- [ ] [P14-T52] Check off AC-52 (line 497). Evidence: P12-T4, P12-T12, P13-T11 (`Disposition: PASS`).
 - [ ] [P14-T53] Check off AC-53 (line 498). Evidence: P1-T13, P12-T14, P12-T15.
-- [ ] [P14-T54] Check off AC-54 (line 502). Evidence: P3-T15, P13-T5.
+- [ ] [P14-T54] Check off AC-54 (line 502). Evidence: P3-T15, P13-T6.
 - [ ] [P14-T55] Check off AC-55 (line 503). Evidence: P12-T17.
 - [ ] [P14-T56] Check off AC-56 (line 504). Evidence: P3-T15, P3-T16.
-- [ ] [P14-T57] Check off AC-57 (line 508). Evidence: P1-T16, P13-T9.
+- [ ] [P14-T57] Check off AC-57 (line 508). Evidence: P1-T16, P13-T10.
 - [ ] [P14-T58] Check off AC-58 (line 509). Evidence: WLOG entries from P1-T2, P3-T6, P4-T4, P5-T4, P6-T5, P7-T5, P8-T4, P9-T4, P10-T4 and the suite results appended by P3-T13 through P10-T15.
 - [ ] [P14-T59] Check off AC-59 (line 510). Evidence: P3-T2.
-- [ ] [P14-T60] Check off AC-60 (line 511). Evidence: P13-T9.
+- [ ] [P14-T60] Check off AC-60 (line 511). Evidence: P13-T10.
 - [ ] [P14-T61] Check off AC-61 (line 515). Evidence: P12-T1, P12-T2, P12-T4 through P12-T16.
-- [ ] [P14-T62] Check off AC-62 (line 516). Evidence: P13-T3, P13-T4, P13-T5, P13-T6.
+- [ ] [P14-T62] Check off AC-62 (line 516). Evidence: P13-T4, P13-T5, P13-T6, P13-T7.
 - [ ] [P14-T63] Check off AC-63 (line 517). Evidence: P11-T4 (E2, E3).
 - [ ] [P14-T64] Check off the four early-draft items of FEATURE/issue.md `## Acceptance Criteria (early draft)` (lines 62-68), each superseded by spec criteria: item 1 by AC-01/AC-16, item 2 by AC-17, item 3 by AC-14 through AC-16, item 4 by AC-49/AC-51. Acceptance: the four lines begin `- [x] ` and the ac-checkoff artifact records the mapping.
 - [ ] [P14-T65] Verify and commit the check-off. Commands: `git grep -c -F -e "- [x] " -- docs/features/active/2026-09-17-agent-payload-gates-resolve-session-root-690/spec.md docs/features/active/2026-09-17-agent-payload-gates-resolve-session-root-690/issue.md`, then `git grep -c -F -e "- [ ] " -- docs/features/active/2026-09-17-agent-payload-gates-resolve-session-root-690/spec.md docs/features/active/2026-09-17-agent-payload-gates-resolve-session-root-690/issue.md`; then CMD-GIT-ADD with FEATURE/spec.md, FEATURE/issue.md, the FEATURE evidence directory, and PLAN, CMD-GIT-COMMIT with message "docs(690): check off acceptance criteria", CMD-GIT-PUSH. Acceptance: when AC-44 is checked, the first search prints `spec.md:64` (63 criteria plus the pre-existing `- [x] High`) and the second prints `spec.md:3` (the three Impact/Severity boxes); when AC-44 is left unchecked by P14-T44, the first prints `spec.md:63` and the second prints `spec.md:4`. In both cases the first search prints `issue.md:5` (four criteria plus the pre-existing promotion box) and the second prints no `issue.md` line, each path printed in full; CMD-GIT-STATUS prints nothing after the push.
@@ -544,7 +545,7 @@ Each check-off task edits one line of FEATURE/spec.md, changing its leading `- [
 | AC-23 | P10-T10 | P10-T15, P10-T17 | qa-gates/pester-set-epicscope-p10, epic-scope-callers-unchanged |
 | AC-24 | P4-T3 | P4-T10, P4-T11 | regression-testing/wave-worktree-resolution |
 | AC-25 | P5-T3 | P5-T10, P5-T11 | regression-testing/cohort-worktree-resolution |
-| AC-26 | P4-T3 | P4-T12, P13-T6 | qa-gates/wave-folder-function-unchanged |
+| AC-26 | P4-T3 | P4-T12, P13-T7 | qa-gates/wave-folder-function-unchanged |
 | AC-27 | P6-T3, P6-T4 | P6-T12 (G4 M1) | regression-testing/merge-worktree-resolution |
 | AC-28 | P6-T3, P6-T4 | P6-T12 (G4 M2) | regression-testing/merge-worktree-resolution |
 | AC-29 | P6-T3, P6-T4 | P6-T12 (G4 M3-M5) | regression-testing/merge-worktree-resolution |
@@ -561,26 +562,26 @@ Each check-off task edits one line of FEATURE/spec.md, changing its leading `- [
 | AC-40 | P2-T1 | P2-T8, P2-T9 | qa-gates/skill-contract-p2, skill-markers-p2 |
 | AC-41 | P2-T2, P2-T3 | P2-T8, P2-T3 | qa-gates/skill-contract-p2 |
 | AC-42 | P2-T4, P2-T5, P2-T6 | P2-T8 | qa-gates/skill-contract-p2 |
-| AC-43 | P2-T11 | P13-T9 | qa-gates/commit-manifest |
-| AC-44 | P1-T9, P2-T7, P3-T10, P4-T7, P5-T7, P6-T9, P7-T9, P8-T7, P9-T7, P10-T11 | P13-T1, P13-T7 | qa-gates/mirror-hashes-final, python-parity |
-| AC-45 | P1-T7, P6-T8, P7-T8 | P13-T8 | qa-gates/registration |
+| AC-43 | P2-T11 | P13-T10 | qa-gates/commit-manifest |
+| AC-44 | P1-T9, P2-T7, P3-T10, P4-T7, P5-T7, P6-T9, P7-T9, P8-T7, P9-T7, P10-T11 | P13-T1, P13-T8 | qa-gates/mirror-hashes-final, python-parity |
+| AC-45 | P1-T7, P6-T8, P7-T8 | P13-T9 | qa-gates/registration |
 | AC-46 | P1-T6 | P1-T13 | qa-gates/pester-set-lib-p1 |
-| AC-47 | P1-T8, P6-T8, P7-T8 | P13-T8 | qa-gates/registration |
+| AC-47 | P1-T8, P6-T8, P7-T8 | P13-T9 | qa-gates/registration |
 | AC-48 | P10-T5, P10-T6, P10-T9 | P10-T14, P10-T15 | regression-testing/epic-scope-run-target |
 | AC-49 | P3-T7, P3-T8, P4-T5, P5-T5, P6-T6, P7-T6, P8-T5, P9-T5 | P3-T13, P4-T10, P5-T10, P6-T12, P7-T12, P8-T10, P9-T10 | regression-testing/*-worktree-resolution |
 | AC-50 | all new and edited test files | P12-T18, P12-T19 | qa-gates/ac50-no-temp-files-new, -edited |
 | AC-51 | P3-T9, P4-T6, P5-T6, P6-T7, P7-T7, P8-T6, P9-T6 | P3-T14, P4-T11, P5-T11, P6-T13, P7-T13, P8-T11, P9-T11, P12-T13 | qa-gates/pester-claude-hooks |
-| AC-52 | Phases 1-10 | P12-T4 through P12-T12, P13-T10 | qa-gates/coverage-comparison |
+| AC-52 | Phases 1-10 | P12-T4 through P12-T12, P13-T11 | qa-gates/coverage-comparison |
 | AC-53 | P1-T1 | P1-T13, P12-T14, P12-T15 | qa-gates/pester-claude-lib, pester-claude-runtime |
-| AC-54 | (no write to the two files) | P3-T15, P13-T5 | qa-gates/byte-unchanged |
+| AC-54 | (no write to the two files) | P3-T15, P13-T6 | qa-gates/byte-unchanged |
 | AC-55 | all phases | P12-T17 | qa-gates/line-counts-final |
 | AC-56 | P3-T4, P3-T5 | P3-T15, P3-T16 | qa-gates/pre-siblings-unchanged |
-| AC-57 | P1-T19 | P1-T16, P13-T9 | qa-gates/no-hook-importer-p1, commit-manifest |
+| AC-57 | P1-T19 | P1-T16, P13-T10 | qa-gates/no-hook-importer-p1, commit-manifest |
 | AC-58 | SW-5 entries | WLOG | qa-gates/gate-wiring-order |
 | AC-59 | P3-T2 | P3-T2 | qa-gates/pending-delegation-identity |
-| AC-60 | P3-T18 through P10-T20 | P13-T9 | qa-gates/commit-manifest |
+| AC-60 | P3-T18 through P10-T20 | P13-T10 | qa-gates/commit-manifest |
 | AC-61 | Phase 12 | P12-T1, P12-T2, P12-T4 through P12-T16 | qa-gates/powershell-format, powershell-analyze |
-| AC-62 | (no write to the protected paths) | P13-T3, P13-T4, P13-T5, P13-T6 | qa-gates/codex-scope, byte-unchanged |
+| AC-62 | (no write to the protected paths) | P13-T4, P13-T5, P13-T6, P13-T7 | qa-gates/codex-scope, byte-unchanged |
 | AC-63 | P11-T2, P11-T3 | P11-T4 | other/follow-up-entries |
 
 ---
@@ -1154,6 +1155,26 @@ foreach ($line in @(git log --reverse --format='%H%x09%s' "$BaseRef..HEAD")) {
     $parts = $line -split "`t", 2
     $files = @(git show --name-only --format= $parts[0] | Where-Object { $_ })
     Write-Output "COMMIT subject=$($parts[1]) files=$($files -join ',')"
+}
+```
+
+A19 committed-digest.ps1 (read-only; added in revision 1.3 and written by P13-T2, not by P0-T7; hashes the committed blob bytes captured from `git cat-file` as a byte stream, with no temporary file, and the working-tree bytes, in the lowercase form the pin file uses):
+
+```powershell
+param([Parameter(Mandatory, ValueFromRemainingArguments = $true)][string[]] $Path)
+$ErrorActionPreference = 'Stop'
+foreach ($file in $Path) {
+    $startInfo = [System.Diagnostics.ProcessStartInfo]::new('git', "cat-file blob HEAD:$file")
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.UseShellExecute = $false
+    $process = [System.Diagnostics.Process]::Start($startInfo)
+    $buffer = [System.IO.MemoryStream]::new()
+    $process.StandardOutput.BaseStream.CopyTo($buffer)
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "git cat-file failed for $file" }
+    $committed = ([System.Security.Cryptography.SHA256]::HashData($buffer.ToArray()) | ForEach-Object { $_.ToString('x2') }) -join ''
+    $working = (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()
+    Write-Output "DIGEST file=$file committed=$committed working=$working equal=$($committed -eq $working)"
 }
 ```
 
