@@ -15,6 +15,18 @@
 
 `.github/workflows/ci.yml` is gated on `pull_request: branches: [main, development]`, which filters the PR base ref. Every epic child PR targets `epic/<slug>-integration`, so `ci.yml` and the nine reusable workflows it calls never run for a child PR. A child that reports "CI green" from its checks tab has verified nothing; only the paths-gated `publish-extension.yml` attaches checks, and a child touching only bash, PowerShell, Python, or docs paths receives zero checks.
 
+## Acceptance Criteria
+
+- [ ] AC-1: `.github/workflows/ci.yml` `on.pull_request.branches` lists `main`, `development`, and `"epic/**"`, and `on.push.branches` remains exactly `[main, development]`. Verified by file content of `.github/workflows/ci.yml` and by AC-4.
+- [ ] AC-2: `.github/workflows/README.md` documents the `ci.yml` `pull_request` trigger branches, names `epic/**`, and states that it is included so that epic child PRs targeting `epic/<slug>-integration` run the full CI gate. Verified by file content of `.github/workflows/README.md`.
+- [ ] AC-3: `.claude/skills/orchestrate/SKILL.md` S9 CI gate text states that, for a PR whose base is an `epic/<slug>-integration` branch, an empty check list (including an empty `gh pr checks --required` result) is not accepted as green; the gate must observe at least one check from the `CI` workflow on the child head SHA and require every observed `CI` check to succeed. Verified by file content of `.claude/skills/orchestrate/SKILL.md`.
+- [ ] AC-4: New Pester 5 test `tests/scripts/workflows/CiWorkflow.Tests.ps1` parses `.github/workflows/ci.yml` as text (following the `on:`-block isolation pattern in `tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1`, with no YAML module, process launch, or temporary file) and asserts that the `pull_request` branch list contains `main`, `development`, and `epic/**`. Verified by a recorded failing run against the pre-fix `ci.yml` and a recorded passing run against the fixed `ci.yml` (via `Invoke-PoshQCTest`), both stored under `evidence/`.
+- [ ] AC-5: `actionlint` reports no findings for `.github/workflows/ci.yml`. Verified by running `scripts/dev-tools/run-actionlint.ps1` and recording its output under `evidence/qa-gates/`.
+- [ ] AC-6: `extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md` is byte-identical to `.claude/skills/orchestrate/SKILL.md`. Verified by a passing run of `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` (pytest).
+- [ ] AC-7: The `modified-workflow-needs-green-run` rule is satisfied: a `CI` workflow run whose head SHA equals the fix branch head concluded `success`. Verified at PR time by recording the run id, head SHA, and conclusion (from `gh run view`) under `evidence/`.
+
+Out of scope: `npm-audit-gate.yml`, the `ci.yml` `push` trigger, the `epic-orchestrate` skill, and behavior changes to `Invoke-CiGateParser.ps1`.
+
 ## Environment
 
 - OS/version: GitHub Actions, repository `drmoisan/drm-copilot`.
