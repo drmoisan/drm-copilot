@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Branch:** `bug/ci-gaps-linux-pester-and-kcov-set-u-743`
-- **Last Updated:** 2026-09-30T09-00
+- **Last Updated:** 2026-09-30T09-30
 - **Status:** Draft
 - **Version:** 1.0
 - **Work Mode:** full-bug
@@ -1235,11 +1235,15 @@ loop at P7-T1.
   the pre-pass observation. A printed diff is a failure; the file is corrected under the loop rule.
 - [ ] [P7-T5] QC step 5 (bash lint) via `scripts/bash/shell-qc.sh` into
   `<FEATURE>/evidence/qa-gates/qc-bash-check.<ts>.md`: run `sh scripts/bash/shell-qc.sh check`.
-  Acceptance: no diagnostic line names `scripts/bash/shell_qc_lib.sh` or `scripts/bash/kcov_trace_env.sh`,
-  and every printed diagnostic line is present in the P0-T15 record. When P0-T15 recorded
-  `LOCAL-DRIFT: NONE`, the run prints nothing and exits 0 (AC-11). When it recorded
-  `LOCAL-DRIFT: PRESENT`, the artifact carries `ExpectedExitCode:` equal to the P0-T15 `EXIT_CODE:`
-  value, and the observed `EXIT_CODE:` equals that value. The shfmt diff leg of this run is the
+  Acceptance: no diagnostic line names `scripts/bash/shell_qc_lib.sh` or `scripts/bash/kcov_trace_env.sh`.
+  The reduced drift set is the P0-T15 diagnostic record with two kinds of block removed: every
+  shfmt diff block whose `---` or `+++` header names `scripts/bash/shell_qc_lib.sh`, and every
+  shellcheck finding block whose `In ` header names that file. When P0-T15 recorded
+  `LOCAL-DRIFT: NONE`, the reduced drift set is empty. When the reduced drift set is empty, the
+  artifact carries `ExpectedExitCode: 0`, and the run prints nothing and exits 0 (AC-11). When it
+  is non-empty, the artifact carries `ExpectedExitCode:` equal to the P0-T15 `EXIT_CODE:` value,
+  the observed `EXIT_CODE:` equals that value, and every printed diagnostic line is present in the
+  reduced drift set. The shfmt diff leg of this run is the
   AC-21 bash format evidence; `shell-qc.sh format` is the write form of the same shfmt pass
   (`scripts/bash/shell_qc_lib.sh:188` runs `-d`, `:222` runs `-w`, over the same discovered file
   list) and is not run.
