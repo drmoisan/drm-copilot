@@ -756,10 +756,32 @@ items:
       contracts: []
       source: "declared"
       computed_at: "2026-09-30T01:44:08Z"
+  - issue_num: 739
+    feature_folder: "docs/features/active/2026-09-27-npm-token-guard-gaps-739"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".github/workflows/publish-mcp-npm.yml"
+        - "docs/features/active/2026-09-27-npm-token-guard-gaps-739/**"
+        - "docs/features/active/2026-09-27-npm-token-guard-gaps-739/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-09-27-npm-token-guard-gaps-739/issue.md"
+        - "docs/features/active/2026-09-27-npm-token-guard-gaps-739/plan.2026-09-29T21-55.md"
+        - "docs/features/active/2026-09-27-npm-token-guard-gaps-739/research/research.2026-09-29T22-05.md"
+        - "docs/features/completed/unused-npm-token-secret-712/evidence/baseline/baseline-pytest-coverage.2026-09-27T09-14.md"
+        - "docs/features/completed/unused-npm-token-secret-712/evidence/other/human-action-pending.2026-09-27T09-19.md"
+        - "docs/features/completed/unused-npm-token-secret-712/runbooks/delete-unused-npm-token-secret.runbook.md"
+        - "scripts/dev_tools/check_python_coverage_thresholds.py"
+        - "tests/scripts/dev_tools/test_workflow_npm_token_guard.py"
+      modules: []
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-30T02:23:49Z"
 ---
 
 # Parallel Run: bug-burndown-2026-09-29
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 14 of 22. Pending: 734, 739, 740, 741, 743, 744, 756, 764.
+Prepared: 15 of 22. Pending: 734, 740, 741, 743, 744, 756, 764.
