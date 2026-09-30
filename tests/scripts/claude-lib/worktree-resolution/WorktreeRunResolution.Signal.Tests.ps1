@@ -128,6 +128,18 @@ Describe 'Get-WorktreeRunCheckpointText' {
         # Assert
         $text | Should -Match 'Get-WorktreeRunCheckpointText'
     }
+
+    It 'T4 returns null and writes a diagnostic to stderr when the file cannot be read' {
+        # Arrange: a directory passes the mocked leaf test and makes ReadAllText throw; no file is created.
+        Mock -CommandName Test-Path -ModuleName WorktreeRunResolution -MockWith { $true }
+
+        # Act: capture the process error stream in memory and restore it afterwards.
+        $captured = [System.IO.StringWriter]::new(); $original = [Console]::Error; [Console]::SetError($captured); try { $text = Get-WorktreeRunCheckpointText -Path $PSScriptRoot } finally { [Console]::SetError($original) }
+
+        # Assert
+        $text | Should -BeNullOrEmpty
+        $captured.ToString() | Should -Match 'WORKTREE_RUN_CHECKPOINT_UNREADABLE'
+    }
 }
 
 Describe 'Get-WorktreeRunCheckpointPath' {

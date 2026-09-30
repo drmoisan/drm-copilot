@@ -99,7 +99,7 @@ function Find-WorktreeRunIdentitySignal {
 function Get-WorktreeRunCheckpointText {
     <#
     .SYNOPSIS
-        Return the raw text of a file, or $null when it is absent or unreadable.
+        Return the raw text of a file, or $null when it is absent or unreadable; an unreadable file also writes a diagnostic to stderr.
     .DESCRIPTION
         The module's only filesystem read, isolated as the seam a test mocks.
     .PARAMETER Path
@@ -113,7 +113,9 @@ function Get-WorktreeRunCheckpointText {
 
     if ([string]::IsNullOrWhiteSpace($Path)) { return $null }
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf -ErrorAction SilentlyContinue)) { return $null }
-    try { return [System.IO.File]::ReadAllText($Path) } catch { return $null }
+    # An unreadable file is reported on stderr and treated as absent, so resolution stays fail-closed and the hook's stdout stays JSON-only.
+    try { return [System.IO.File]::ReadAllText($Path) }
+    catch { [Console]::Error.WriteLine(("WORKTREE_RUN_CHECKPOINT_UNREADABLE: '{0}': {1}" -f $Path, $_.Exception.Message)); return $null }
 }
 
 function Get-WorktreeRunCheckpointPath {
