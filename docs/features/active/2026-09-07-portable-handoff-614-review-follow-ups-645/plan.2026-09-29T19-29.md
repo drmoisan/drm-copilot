@@ -5,49 +5,397 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-29T19-29
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 1.0
+- **Work Mode:** full-feature
+- Complexity band: C3 (assessed by the orchestrator; floor C1, no floor signals; judged C3 for three-language breadth, four TypeScript modules with a redaction constraint, and 500-line pressure).
+- **Branch:** `feature/portable-handoff-614-review-follow-ups-645`
+- **Requirements sources:** `spec.md` (AC-1 through AC-22, decisions D1-D5; governing), `user-story.md` (US-1 through US-9), `research/research.2026-09-29T23-40.md`, `issue.md` (superseded where the spec differs).
+- **Scope:** R16, R17, R18, R19 only (2026-09-29 consolidation comment on #645). R20 is out of scope (resolved by #647). No task in this plan edits `extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-path-boundary.test.ts`.
+- **Feature folder (FEATURE):** `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645`. Every evidence path below is written in full and resolves under `FEATURE/evidence/<kind>/`.
+- **Evidence-location correction:** `EVIDENCE_LOCATION_OVERRIDE_REJECTED: docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baselines/ (spec.md Implementation Strategy) replaced with docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/`. The spec's AC-22 requires canonical `<kind>/` subfolders, and `baselines` is not a canonical kind.
+- **Evidence artifact schema:** every command-step artifact carries `Timestamp:` (ISO-8601 `yyyy-MM-ddTHH-mm`), `Command:`, `EXIT_CODE:`, and `Output Summary:`. `<timestamp>` in an artifact filename is the execution-time timestamp in that format.
 
 ## Required References
 
-- General Coding Standards: [`.github/instructions/general-code-change.instructions.md`](../../../../.github/instructions/general-code-change.instructions.md)
-- General Unit Test Policy: [`.github/instructions/general-unit-test.instructions.md`](../../../../.github/instructions/general-unit-test.instructions.md)
-- (Add language-specific policies as needed, e.g. `python-code-change.instructions.md`)
+- `CLAUDE.md`
+- `.claude/rules/general-code-change.md`, `.github/instructions/general-code-change.instructions.md`
+- `.claude/rules/general-unit-test.md`, `.github/instructions/general-unit-test.instructions.md`
+- `.claude/rules/quality-tiers.md`
+- `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`
+- `.claude/rules/powershell.md`
+- `.claude/rules/typescript.md`, `.claude/rules/typescript-suppressions.md`
+- `.claude/rules/plan-acceptance-gates.md`
+- `.claude/rules/tonality.md`
 
 **All work must comply with these policies; do not duplicate their content here.**
 
+## Fixed Design Inputs (quoted so tasks can assert against them)
+
+- Cause-string grammar: `<stage>: <token>`; multiple causes join with `; `.
+- Helper to add to `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer-request.ts`, verbatim signature: `export function describeHandoffFailureCause(stage: string, error: unknown): string`. Token rule, in order: (1) when `error` is a non-null object with a `code` property whose value is a string matching `^[A-Z][A-Z0-9_]*$`, the token is that code; (2) otherwise, when `error instanceof Error`, the token is `error.name`; (3) otherwise the token is the literal `non-error value`. The helper never reads `message` or `stack`.
+- Stage labels (fixed literals in source): `checkpoint-read`, `envelope-decode`, `destination-projection`, `git-status`, `archive-write`, `archive-readback`, `candidate-write`, `candidate-readback`, `candidate-validate`, `candidate-replace`, `candidate-cleanup`, `envelope-read`, `plan-read`, `workspace-root`, `target-path`.
+- Sentinel literals: `workspace-root: unresolved`, `target-path: unresolved`, `destination-projection: invalid`.
+- Synthetic mismatch marker at materializer line 411: `Object.assign(new Error("Candidate validation failed."), { code: "HANDOFF_CANDIDATE_MISMATCH" })`. It is not added to `HandoffFailureCode` or the registry.
+- Projection parse message at materializer-production line 50, new text: `destination checkpoint must be valid JSON (destination-projection: SyntaxError)` for `JSON.parse` failures, produced as `` `destination checkpoint must be valid JSON (${describeHandoffFailureCause("destination-projection", error)})` ``.
+- New optional fields: `readonly failureCause?: string` on `TransitionPreparedOrchestrationResult` and `PortableHandoffAuthorityResult`; `readonly failure_cause?: string` on `PortableHandoffMcpToolResult`. Each is set by conditional spread, so the key is absent when unset.
+- R16 fixture contents (exact, one line each, trailing newline):
+  - `tests/fixtures/codex-hooks/invalid-operation-orchestration-handoff-registry.json`: `{"version":1,"semantic_tools":{"drm-copilot.validate_orchestration_artifacts":{"operation":"resolve_provider_routing","transport_aliases":["mcp__drm-copilot__validate_orchestration_artifacts"]}}}`
+  - `tests/fixtures/codex-hooks/invalid-alias-orchestration-handoff-registry.json`: `{"version":1,"semantic_tools":{"drm-copilot.validate_orchestration_artifacts":{"operation":"validate_orchestration_artifacts","transport_aliases":["mcp__other-server__validate_orchestration_artifacts"]}}}`
+- R16 exact messages (source `.codex/hooks/enforce-epic-planning-only.ps1` lines 58, 72, 77):
+  - line 58: `EPIC_PLANNING_ONLY_BLOCKED: semantic MCP registry '<RegistryPath>' does not exist.` with `<RegistryPath>` interpolated from `$script:MissingRegistryPath`.
+  - line 72: `EPIC_PLANNING_ONLY_BLOCKED: semantic MCP id 'drm-copilot.validate_orchestration_artifacts' has an invalid operation.`
+  - line 77: `EPIC_PLANNING_ONLY_BLOCKED: semantic MCP id 'drm-copilot.validate_orchestration_artifacts' has an invalid transport alias.`
+- New Jest test names (quoted verbatim; used by `-t` filters): describe blocks `describeHandoffFailureCause`, `materializer blocked-result failure causes`, `authority blocked-result failure causes`, `path-boundary guarded resolution`, `destination projection parse failure`; handler cases `maps a set failureCause to failure_cause` and `omits failure_cause when failureCause is unset`.
+- Pester context name (verbatim): `Get-EpicPlanningRegisteredMcpTool rejection messages (issue #645)`.
+- Jest threshold comment line (verbatim): `// Issue #645: the portable prepared-orchestration handoff production modules added by #614.`
+
 ## Implementation Plan (Atomic Tasks)
 
-> **Instructions for this section:**
-> - Break work into **Phases** (broad buckets) and **Atomic Tasks** (binary, 5-30 min units).
-> - Use `- [ ] [P#-T#]` for every task.
-> - Start every task with a **strong verb** (Implement, Create, Update, Verify).
-> - No "bucket" tasks like "Refactor module" or "Write tests"; split them into specific, verifiable steps.
-> - **Self-Validating Phases:** Include necessary test creation/update tasks *within* the phase that implements the code. Do not defer verification to a final "Testing" phase.
-> - Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for every language in scope when policy requires coverage.
-> - Name the expected artifact path or location in each evidence-producing task's acceptance criteria.
-> - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+### Phase 0 — Policy Reads, Scope Checks, and Baseline Capture
 
-### Phase 0: Compliance & Context
-- [ ] [P0-T1] Confirm alignment with repo policies by reading `.github/instructions/general-code-change.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, and `.github/instructions/python-unit-test.instructions.md` before touching code
-  - Acceptance: Development log contains policy review timestamp prior to Phase 1 commits
+Every Phase 0 task runs before any production, test, fixture, or configuration edit. AC-2, AC-16, and AC-17 compare against these baselines. If any baseline toolchain step (P0-T5 through P0-T17) records a pre-existing failure, the executor completes Phase 0, reports the failing step and its output to the caller, and does not start Phase 1 until the caller decides; the final-QC steps require a passing result and do not carry a pre-existing-failure waiver.
 
-### Phase 1: <Phase Name>
-- [ ] [P1-T1] <Atomic task with strong verb>
-- [ ] [P1-T2] <Atomic task>
-  - Preconditions: <optional>
-  - Acceptance: <optional>
+- [ ] [P0-T1] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/phase0-instructions-read.<timestamp>.md` after reading, in order: `CLAUDE.md`, `.github/copilot-instructions.md`, `.claude/rules/general-code-change.md`, `.github/instructions/general-code-change.instructions.md`, `.claude/rules/general-unit-test.md`, `.github/instructions/general-unit-test.instructions.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`, `.claude/rules/powershell.md`, `.github/instructions/powershell-code-change.instructions.md`, `.github/instructions/powershell-unit-test.instructions.md`, `.claude/rules/typescript.md`, `.claude/rules/typescript-suppressions.md`, `.github/instructions/typescript-code-change.instructions.md`, `.github/instructions/typescript-unit-test.instructions.md`, `.claude/rules/plan-acceptance-gates.md`, `.claude/rules/tonality.md`.
+  - Acceptance: the artifact contains `Timestamp:`, `Policy Order:`, and a list naming all 20 files above; no file under `.claude/rules/` or `.github/instructions/` is modified (`git diff --quiet origin/main -- .claude/rules .github/instructions` exits 0, recorded in the artifact).
+- [ ] [P0-T2] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/other/d5-tier-and-dependency-check.<timestamp>.md` recording decision D5 inputs: whether `quality-tiers.yml` exists at the worktree root (Glob) and whether `fast-check` appears in `extensions/drm-copilot/package.json` (Grep count).
+  - Acceptance: the artifact records `quality-tiers.yml: absent` and `fast-check count: 0`, with `SearchScope:`, `SearchPatterns:`, and `SearchResult:` lines. If either result differs, the artifact records `D5 ESCALATION REQUIRED` and execution stops for the caller; no dependency is added.
+- [ ] [P0-T3] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/line-counts.<timestamp>.md` recording the pre-edit line count (PowerShell `(Get-Content -LiteralPath <path>).Count`) of each file this plan edits: `tests/scripts/codex-hooks/codex-planning-only-registry.Tests.ps1`, `extensions/drm-copilot/jest.config.cjs`, `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer-request.ts`, `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts`, `extensions/drm-copilot/src/lib/validate/orchestration-handoff-authority-service.ts`, `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer-production.ts`, `extensions/drm-copilot/src/lib/validate/orchestration-handoff-path-boundary.ts`, `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer-support.ts`, `extensions/drm-copilot/src/mcp-repo-automation-tool-definitions-handoff.ts`, `extensions/drm-copilot/src/mcp-handlers/orchestration-handoff-handlers.ts`, `extensions/drm-copilot/src/mcp-tools.ts`, `extensions/drm-copilot/test/mcp-handlers/orchestration-handoff-handlers.test.ts`, `tests/scripts/dev_tools/test_orchestration_handoff_taskmaster_469.py`, `tests/scripts/dev_tools/orchestration_handoff_taskmaster_469_test_support.py`; and the absence of `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause.test.ts`, `tests/fixtures/codex-hooks/invalid-operation-orchestration-handoff-registry.json`, `tests/fixtures/codex-hooks/invalid-alias-orchestration-handoff-registry.json`, and `tests/fixtures/codex-hooks/absent-orchestration-handoff-registry.json`.
+  - Acceptance: 14 numeric counts and 4 `absent` entries are recorded; `orchestration-handoff-materializer.ts` is recorded at 444 (research value) or the artifact records the differing observed value.
+- [ ] [P0-T4] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/hook-parity.<timestamp>.md` by running `git diff --quiet origin/main -- .codex/hooks/enforce-epic-planning-only.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-planning-only.ps1` from the worktree root.
+  - Acceptance: `EXIT_CODE: 0` is recorded.
+- [ ] [P0-T5] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/py-black.<timestamp>.md` by running `poetry run black --check .` from the worktree root.
+  - Acceptance: the artifact records the exit code and, in `Output Summary:`, the literal black success line `would be left unchanged` with its file count, or the list of files black reports as `would reformat` (pre-existing drift, recorded as the baseline).
+- [ ] [P0-T6] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/py-ruff.<timestamp>.md` by running `poetry run ruff check .` from the worktree root.
+  - Acceptance: the artifact records the exit code and either the literal `All checks passed!` or the reported error count.
+- [ ] [P0-T7] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/py-pyright.<timestamp>.md` by running `poetry run pyright` from the worktree root.
+  - Acceptance: the artifact records the exit code and the pyright summary line (`<n> errors, <n> warnings, <n> informations`) with numeric values.
+- [ ] [P0-T8] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/py-pytest-coverage.<timestamp>.md` by running `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing` from the worktree root.
+  - Acceptance: the artifact records the exit code, the pytest pass/fail/skip counts line, and the coverage `TOTAL` row (`Stmts Miss Branch BrPart Cover`) verbatim. The dotted `scripts.dev_tools` coverage target is used in place of the spec's two filesystem-path targets (the `src` directory and the `scripts/dev_tools` directory) because no Python file exists under `src/` and the dotted form is required by the plan gates; the same argument is used in P7-T4 so the comparison is like-for-like.
+- [ ] [P0-T9] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/py-coverage-totals.<timestamp>.md` by running `poetry run coverage json -o artifacts/python/coverage-totals.json` immediately after P0-T8 and reading its `totals` object.
+  - Acceptance: the command prints `Wrote JSON report to artifacts/python/coverage-totals.json`; `Output Summary:` records `covered_lines`, `num_statements`, `covered_branches`, `num_branches`, and the derived baseline line percent (`covered_lines / num_statements`) and branch percent (`covered_branches / num_branches`) to two decimals.
+- [ ] [P0-T10] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/py-r19-focused-coverage.<timestamp>.md` by running `poetry run pytest tests/scripts/dev_tools/test_orchestration_handoff_taskmaster_469.py --cov=scripts.dev_tools.orchestration_handoff_contract_support --cov-branch --cov-report=term-missing` from the worktree root.
+  - Acceptance: the artifact records the exit code, the pass count, and the coverage row for `orchestration_handoff_contract_support.py` verbatim; `Output Summary:` states whether line 62 (`return raw_sha256(path.read_bytes())`) is inside the expanded `Missing` set (expected: yes; this is the R19 fail-before observation).
+- [ ] [P0-T11] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/ts-prettier.<timestamp>.md` by running `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"` from `extensions/drm-copilot`.
+  - Acceptance: the artifact records the exit code and either the literal `All matched files use Prettier code style!` or the list of files reported with style issues.
+- [ ] [P0-T12] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/ts-eslint.<timestamp>.md` by running `npx eslint --no-error-on-unmatched-pattern src test` from `extensions/drm-copilot`.
+  - Acceptance: the artifact records the exit code and the reported problem count (0 when eslint prints nothing).
+- [ ] [P0-T13] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/ts-typecheck.<timestamp>.md` by running `npx tsc -p ./ --noEmit` from `extensions/drm-copilot`.
+  - Acceptance: the artifact records the exit code and the diagnostic count (0 when tsc prints nothing).
+- [ ] [P0-T14] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/ts-tsc-jest-diagnostics.<timestamp>.md` by running `npx tsc -p tsconfig.jest.json --noEmit` from `extensions/drm-copilot`.
+  - Acceptance: the artifact records the exit code and the complete diagnostic list as `<file>(<line>,<col>): error TS<code>` entries; the TS2740 entry in `test/lib/validate/orchestration-handoff-materializer-path-boundary.test.ts` is recorded if present (pre-existing, owned by #647).
+- [ ] [P0-T15] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/ts-jest-coverage.<timestamp>.md` by running `npm --prefix extensions/drm-copilot run test:coverage` from the worktree root.
+  - Acceptance: the artifact records the exit code, the Jest `Tests:` summary line, the `text-summary` line and branch percentages, the pass count for `test/packaging/mcp-server-prepack.test.ts`, and a table with one row per the 14 modules listed in spec AC-5 giving `LH/LF` and `BRH/BRF` and the derived percentages, read from the `SF:` records of `extensions/drm-copilot/coverage/lcov.info` (key = `SF:` path ending in `src/<module>`). A module with `BRF:0` is recorded as `no branch construct`.
+- [ ] [P0-T16] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/ps-analyze.<timestamp>.md` by calling `mcp__drm-copilot__run_poshqc_analyze` with `workspace_root` set to the worktree root and `scan_folders` set to `["tests/scripts/codex-hooks"]`.
+  - Acceptance: the artifact records the MCP result `ok` flag as `EXIT_CODE: 0` when `ok` is true, and non-zero otherwise. No finding count is asserted, because the PoshQC MCP result carries no parseable output counts.
+- [ ] [P0-T17] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/ps-pester.<timestamp>.md` by calling `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the worktree root and no `scan_folders`, then reading `artifacts/pester/pester-junit.xml`.
+  - Acceptance: the artifact records the file's last-write time (later than the task's `Timestamp:`), and the root `<testsuites>` attributes `tests`, `failures`, and `errors` as numbers. Counts come from the XML, not from the MCP summary.
+- [ ] [P0-T18] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/baseline/ps-coverage.<timestamp>.md` by reading `artifacts/pester/powershell-coverage.xml` produced by P0-T17.
+  - Acceptance: `Output Summary:` records the report-level `<counter type="LINE">` `missed` and `covered` values with the derived line percent to two decimals, and the complete missed-line set for `enforce-epic-planning-only.ps1` under the `.codex/hooks` package (every `<line>` with `ci="0"`), and states that lines 58, 72, and 77 are members of that set.
 
-### Phase 2: <Phase Name>
-- [ ] [P2-T1] <Atomic task>
-- [ ] [P2-T2] <Atomic task>
+### Phase 1 — R16: Registry-Loader Rejection Cases (PowerShell)
+
+- [ ] [P1-T1] Create `tests/fixtures/codex-hooks/invalid-operation-orchestration-handoff-registry.json` with the exact content quoted in Fixed Design Inputs.
+  - Acceptance: the file content equals the quoted line plus a trailing newline; it parses as JSON.
+- [ ] [P1-T2] Create `tests/fixtures/codex-hooks/invalid-alias-orchestration-handoff-registry.json` with the exact content quoted in Fixed Design Inputs.
+  - Acceptance: the file content equals the quoted line plus a trailing newline; it parses as JSON.
+- [ ] [P1-T3] Update `tests/scripts/codex-hooks/codex-planning-only-registry.Tests.ps1` by adding, inside the existing top-level `Describe` and before its closing brace, a `Context 'Get-EpicPlanningRegisteredMcpTool rejection messages (issue #645)'` whose `BeforeAll` sets `$script:InvalidOperationRegistryPath` and `$script:InvalidAliasRegistryPath` by `Join-Path $script:RepoRoot` on the two new fixtures, plus one `It 'throws the exact missing-registry message'` case that calls `Get-EpicPlanningRegisteredMcpTool -RegistryPath $script:MissingRegistryPath -SemanticIds @('drm-copilot.validate_orchestration_artifacts')` inside `try`/`catch`, captures `$_`, and asserts `$caught.Exception.Message | Should -BeExactly "EPIC_PLANNING_ONLY_BLOCKED: semantic MCP registry '$script:MissingRegistryPath' does not exist."`.
+  - Acceptance: the file edit is accepted with no `.claude/hooks/check-powershell-test-purity.ps1` denial; the existing `It 'throws for a semantic tool when the registry fixture is invalid'` block is textually unchanged.
+- [ ] [P1-T4] Update `tests/scripts/codex-hooks/codex-planning-only-registry.Tests.ps1` by adding to the P1-T3 context `It 'throws the exact invalid-operation message'`, which calls `Get-EpicPlanningRegisteredMcpTool` with `-RegistryPath $script:InvalidOperationRegistryPath` and asserts with `Should -BeExactly` the line-72 message quoted in Fixed Design Inputs.
+  - Acceptance: the edit is accepted with no purity-hook denial.
+- [ ] [P1-T5] Update `tests/scripts/codex-hooks/codex-planning-only-registry.Tests.ps1` by adding to the P1-T3 context `It 'throws the exact invalid-transport-alias message'`, which calls `Get-EpicPlanningRegisteredMcpTool` with `-RegistryPath $script:InvalidAliasRegistryPath` and asserts with `Should -BeExactly` the line-77 message quoted in Fixed Design Inputs.
+  - Acceptance: the edit is accepted with no purity-hook denial; the file is at or under 500 lines.
+- [ ] [P1-T6] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/regression-testing/r16-pester.<timestamp>.md` by calling `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the worktree root and `scan_folders` set to `["tests/scripts/codex-hooks"]`, then reading `artifacts/pester/pester-junit.xml`.
+  - Acceptance: the XML last-write time is later than the task `Timestamp:`; the root `failures="0"` and `errors="0"`; the three test cases `throws the exact missing-registry message`, `throws the exact invalid-operation message`, and `throws the exact invalid-transport-alias message` appear as `<testcase>` elements with no `<failure>` or `<error>` child.
+- [ ] [P1-T7] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/regression-testing/r16-test-purity.<timestamp>.md` recording a Grep with pattern `TestDrive|New-TemporaryFile|GetTempPath|\$env:TEMP|tmpdir|tempfile|tmp_path` over `tests/scripts/codex-hooks/codex-planning-only-registry.Tests.ps1`, `tests/fixtures/codex-hooks/invalid-operation-orchestration-handoff-registry.json`, and `tests/fixtures/codex-hooks/invalid-alias-orchestration-handoff-registry.json`, plus a Glob of `tests/fixtures/codex-hooks/*`.
+  - Acceptance: the Grep returns 0 matches; the Glob lists exactly 4 files (the 2 pre-existing plus the 2 new); `tests/fixtures/codex-hooks/absent-orchestration-handoff-registry.json` is absent.
+
+### Phase 2 — R19: Call `raw_file_sha256` from the Pinned-Fixture Test (Python)
+
+- [ ] [P2-T1] Update `tests/scripts/dev_tools/orchestration_handoff_taskmaster_469_test_support.py` by adding a public `def fixture_paths(case: FixtureCase, fixture: dict[str, object]) -> tuple[Path, Path]:` with a docstring, returning `(case.root / _text(source["file"], "source_checkpoint.file"), case.root / _text(plan["file"], "plan.file"))`, and by changing `fixture_bytes` to read bytes from the paths `fixture_paths` returns.
+  - Acceptance: `fixture_bytes` keeps its signature and return type; the file is at or under 500 lines.
+- [ ] [P2-T2] Update `tests/scripts/dev_tools/test_orchestration_handoff_taskmaster_469.py` by importing `raw_file_sha256` from `scripts.dev_tools.orchestration_handoff_contract` and `fixture_paths` from the test support module, replacing the two `hashlib.sha256(...).hexdigest()` assertions in `test_taskmaster_469_fixture_hashes_and_source_history_are_pinned` with `raw_file_sha256(source_path) == source["sha256"]` and `raw_file_sha256(plan_path) == plan["sha256"]`, keeping `fixture_bytes` for the `source_bytes` receipt assertion, and removing `import hashlib`.
+  - Acceptance: `NEGATIVE_SCENARIOS` (lines 43-62 before the edit) is textually unchanged; a Grep for `hashlib` in the file returns 0 matches.
+- [ ] [P2-T3] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/regression-testing/r19-focused-coverage.<timestamp>.md` by running `poetry run pytest tests/scripts/dev_tools/test_orchestration_handoff_taskmaster_469.py --cov=scripts.dev_tools.orchestration_handoff_contract_support --cov-branch --cov-report=term-missing` from the worktree root.
+  - Acceptance: `EXIT_CODE: 0`; the pass count is at least the P0-T10 pass count with 0 failed; line 62 of `orchestration_handoff_contract_support.py` is not in the expanded `Missing` set of its coverage row (compared against P0-T10, where it was).
+
+### Phase 3 — R18: Result Fields, Cause Helper, and MCP Mapping (TypeScript)
+
+- [ ] [P3-T1] Update `extensions/drm-copilot/src/mcp-repo-automation-tool-definitions-handoff.ts` by adding `readonly failureCause?: string;` as the last member of `PortableHandoffAuthorityResult` (currently lines 48-56) and of `TransitionPreparedOrchestrationResult` (currently lines 58-70).
+  - Acceptance: no `inputSchema` block changes; `git diff origin/main -- extensions/drm-copilot/src/mcp-repo-automation-tool-definitions-handoff.ts` shows only the two added lines.
+- [ ] [P3-T2] Update `extensions/drm-copilot/src/mcp-tools.ts` by adding `readonly failure_cause?: string;` to `PortableHandoffMcpToolResult` after `unsupported_capabilities` (currently line 87).
+  - Acceptance: `git diff origin/main -- extensions/drm-copilot/src/mcp-tools.ts` shows exactly one added line.
+- [ ] [P3-T3] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer-request.ts` by adding the exported pure function `describeHandoffFailureCause(stage: string, error: unknown): string` with a TSDoc comment, implementing the token rule quoted in Fixed Design Inputs with a module constant for `^[A-Z][A-Z0-9_]*$`.
+  - Acceptance: the function body contains no reference to `.message` or `.stack`; the module keeps type-only imports.
+- [ ] [P3-T4] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer-request.ts` by adding `readonly failureCause?: string` to the `blockedResult` options bag and emitting it with `...(options.failureCause === undefined ? {} : { failureCause: options.failureCause })`.
+  - Acceptance: a `blockedResult` call without `failureCause` returns an object with no `failureCause` key.
+- [ ] [P3-T5] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer-request.ts` by forwarding `failureCause: authority.failureCause` from `authorityFailure` into `blockedResult` options.
+  - Acceptance: the file is at or under 500 lines.
+- [ ] [P3-T6] Update `extensions/drm-copilot/src/mcp-handlers/orchestration-handoff-handlers.ts` by adding `...(result.failureCause === undefined ? {} : { failure_cause: result.failureCause })` to the object returned by `toAuthorityMcpResult`.
+  - Acceptance: no other field of `toAuthorityMcpResult` changes.
+- [ ] [P3-T7] Update `extensions/drm-copilot/src/mcp-handlers/orchestration-handoff-handlers.ts` by adding the same conditional spread to the object returned by `toTransitionMcpResult`.
+  - Acceptance: no other field of `toTransitionMcpResult` changes.
+- [ ] [P3-T8] Create `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause.test.ts` containing `describe("describeHandoffFailureCause")` with a table-driven `it.each` covering: (a) `Object.assign(new Error("x"), { code: "EACCES" })` gives `checkpoint-read: EACCES`; (b) `Object.assign(new Error("x"), { code: "eacces-lower" })` gives `checkpoint-read: Error`; (c) `Object.assign(new Error("x"), { code: 13 })` gives `checkpoint-read: Error`; (d) `new TypeError("x")` gives `checkpoint-read: TypeError`; (e) the thrown string `"boom"` gives `checkpoint-read: non-error value`; (f) `undefined` gives `checkpoint-read: non-error value`; (g) the plain object `{ code: "ENOENT" }` gives `checkpoint-read: ENOENT`; and a redaction case whose errors carry messages `C:\Users\operator\AppData\secret.json`, `/home/operator/.ssh/id_rsa`, and `HOME=/home/operator`, each with and without `code: "EACCES"`, asserting that every output excludes each message substring and contains neither `/` nor `\`.
+  - Acceptance: Arrange-Act-Assert structure; no temporary file API; the file is at or under 500 lines.
+- [ ] [P3-T9] Update `extensions/drm-copilot/test/mcp-handlers/orchestration-handoff-handlers.test.ts` by adding `it("maps a set failureCause to failure_cause")`, which asserts `failure_cause` equals the service result's `failureCause` for the transition tool and for `resolve_orchestration_topology`, and `it("omits failure_cause when failureCause is unset")`, which asserts `not.toHaveProperty("failure_cause")` for a validated authority result and a materialized transition result.
+  - Acceptance: no existing case in the file is modified; the file is at or under 500 lines.
+- [ ] [P3-T10] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/regression-testing/r18-helper-and-mapping.<timestamp>.md` by running `node run-jest.cjs test/lib/validate/orchestration-handoff-failure-cause.test.ts test/mcp-handlers/orchestration-handoff-handlers.test.ts` from `extensions/drm-copilot`.
+  - Acceptance: `EXIT_CODE: 0`; the Jest `Tests:` line reports 0 failed and a passed count that includes the P3-T8 table rows and both P3-T9 cases.
+
+### Phase 4 — R18: Materializer Sites (TypeScript)
+
+All edits in this phase are in `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` unless a task names another file. Line numbers are pre-edit locations. Every rewritten `catch` binds `error: unknown` and uses the bound value. No `HANDOFF_*` code or branch order changes.
+
+- [ ] [P4-T1] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` so the `resolveWorkspaceRoot` null return (line 143) passes `{ failureCause: "workspace-root: unresolved" }` to `blockedResult`.
+  - Acceptance: the returned code remains `HANDOFF_PLAN_PATH_INVALID`.
+- [ ] [P4-T2] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` so the source/envelope `resolveExistingTarget` null return (line 154) passes `{ failureCause: "target-path: unresolved" }`.
+  - Acceptance: the returned code remains `HANDOFF_PLAN_PATH_INVALID`.
+- [ ] [P4-T3] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` so the archive/destination/candidate `resolveCreatableTarget` null return (line 242) adds `failureCause: "target-path: unresolved"` to its existing options.
+  - Acceptance: `handoffId` and `handoffHistorySha256` in that call are unchanged.
+- [ ] [P4-T4] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` so the read `catch` (line 162) binds `error: unknown` and passes `failureCause: describeHandoffFailureCause("checkpoint-read", error)`.
+  - Acceptance: the returned code remains `HANDOFF_VALIDATOR_UNAVAILABLE`.
+- [ ] [P4-T5] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` so the decode `catch` (line 175) binds the error and passes `describeHandoffFailureCause("envelope-decode", error)`.
+  - Acceptance: the returned code remains `HANDOFF_UNSUPPORTED_VERSION`.
+- [ ] [P4-T6] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` so the projection-error return (line 287) adds `failureCause: "destination-projection: invalid"`.
+  - Acceptance: `affectedPaths: [envelope.destinationCheckpointPath]` is unchanged.
+- [ ] [P4-T7] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` so the git `catch` (line 298) binds the error and adds `describeHandoffFailureCause("git-status", error)`.
+  - Acceptance: the returned code remains `HANDOFF_VALIDATOR_UNAVAILABLE`.
+- [ ] [P4-T8] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` so the archive-write `catch` (line 351) binds the write error as `archive-write` cause, the nested readback `catch` (line 357) binds its error and returns the joined cause `<archive-write cause>; <archive-readback cause>`, and the hash-mismatch return (line 365) carries the `archive-write` cause alone.
+  - Acceptance: when the readback succeeds and the hash matches, no cause is emitted and execution continues as before.
+- [ ] [P4-T9] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` so the candidate-write `catch` (line 379) binds the write error as `candidate-write` cause, the nested readback `catch` (line 385) returns `<candidate-write cause>; <candidate-readback cause>`, and the candidate-mismatch return (line 393) carries the `candidate-write` cause alone.
+  - Acceptance: the idempotent-retry path emits no cause.
+- [ ] [P4-T10] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` so `discardCandidate` returns `string | null`: `null` after a successful `removeFile`, otherwise `describeHandoffFailureCause("candidate-cleanup", error)` from a bound `catch` (line 440).
+  - Acceptance: `removeFile` is still called exactly once per invocation.
+- [ ] [P4-T11] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` so the synthetic throw (line 411) uses the marker quoted in Fixed Design Inputs, and the validation `catch` (line 413) binds the error, builds `describeHandoffFailureCause("candidate-validate", error)`, appends `; <cleanup cause>` when `discardCandidate` returns non-null, and passes the result as `failureCause`.
+  - Acceptance: `HANDOFF_CANDIDATE_MISMATCH` does not appear in `orchestration-handoff-contract.ts` or `config/orchestration-handoff-registry.json` (both unchanged against `origin/main`).
+- [ ] [P4-T12] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` so the replace `catch` (line 426) binds the error, builds `describeHandoffFailureCause("candidate-replace", error)`, appends the cleanup cause when non-null, and passes it as `failureCause`.
+  - Acceptance: a Grep for `catch\s*\{` over the file returns 0 matches.
+- [ ] [P4-T13] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/other/d2-materializer-line-count.<timestamp>.md` recording `(Get-Content -LiteralPath extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts).Count` after P4-T12.
+  - Acceptance: the artifact records the count and the D2 decision literal `D2: EXTRACTION REQUIRED` when the count exceeds 490, else `D2: NO EXTRACTION`.
+- [ ] [P4-T14] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer-support.ts` (conditional: only when P4-T13 records `D2: EXTRACTION REQUIRED`) by adding exported functions that hold the archive and candidate write-recovery blocks of `stageMaterialization`, each taking its dependencies as parameters and returning either a blocked result or `null`.
+  - Acceptance: when executed, the file is at or under 500 lines and gains no new production module; when not executed, the task is marked complete with the note `not required: D2: NO EXTRACTION` citing the P4-T13 artifact.
+- [ ] [P4-T15] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts` (conditional on P4-T14 executing) to call the extracted recovery functions in place of the moved blocks.
+  - Acceptance: when executed, the post-edit line count is at most 490 and is appended to the P4-T13 artifact; when not executed, the task is marked complete with the note `not required: D2: NO EXTRACTION`.
+- [ ] [P4-T16] Update `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause.test.ts` by adding `describe("materializer blocked-result failure causes")`, built on `createScenario` from `orchestration-handoff-materializer-test-support.ts` (imported, not edited) with `mockImplementation`/`mockRejectedValueOnce` overrides that throw `Object.assign(new Error(<message containing an absolute path>), { code })`. It contains one named case per row of the Materializer Case Table below, each asserting `primaryFailureCode` and `failureCause` (or the absence of the `failureCause` key).
+  - Acceptance: every table row is present as a separately named case; the file is at or under 500 lines.
+- [ ] [P4-T17] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/regression-testing/r18-materializer.<timestamp>.md` by running `node run-jest.cjs test/lib/validate/orchestration-handoff-failure-cause.test.ts test/lib/validate/orchestration-handoff-materializer.test.ts test/lib/validate/orchestration-handoff-materializer-production.test.ts test/lib/validate/orchestration-handoff-materializer-path-boundary.test.ts` from `extensions/drm-copilot`.
+  - Acceptance: `EXIT_CODE: 0`; the `Tests:` line reports 0 failed; the four files run and the materializer-path-boundary test file is only executed, not edited.
+
+#### Materializer Case Table (P4-T16)
+
+| Row | Arrange | Expected `primaryFailureCode` | Expected `failureCause` |
+|---|---|---|---|
+| M1 | source `readFile` throws code `EACCES` | `HANDOFF_VALIDATOR_UNAVAILABLE` | `checkpoint-read: EACCES` |
+| M2 | `envelopeBytes: Uint8Array.of(0xff, 0xfe, 0xfd)` | `HANDOFF_UNSUPPORTED_VERSION` | `envelope-decode: ERR_ENCODING_INVALID_ENCODED_DATA` |
+| M3 | `readPorcelainStatus` rejects with code `ENOENT` | `HANDOFF_VALIDATOR_UNAVAILABLE` | `git-status: ENOENT` |
+| M4 | `projectionErrors: ["invalid"]` | `HANDOFF_VALIDATOR_UNAVAILABLE` | `destination-projection: invalid` |
+| M5 | mode `materialize`; archive write throws `EEXIST`; archive readback throws `EACCES` | `HANDOFF_VALIDATOR_UNAVAILABLE` | `archive-write: EEXIST; archive-readback: EACCES` |
+| M6 | mode `materialize`; `writeFailureAt: "archive"` (plain `Error`, mismatched archive) | `HANDOFF_SOURCE_HASH_MISMATCH` | `archive-write: Error` |
+| M7 | mode `materialize`; candidate write throws `EEXIST`; candidate readback throws `EACCES` | `HANDOFF_VALIDATOR_UNAVAILABLE` | `candidate-write: EEXIST; candidate-readback: EACCES` |
+| M8 | mode `materialize`; candidate path pre-populated with different bytes | `HANDOFF_VALIDATOR_UNAVAILABLE` | `candidate-write: Error` |
+| M9 | mode `materialize`; `candidateProjectionErrors: ["invalid"]` | `HANDOFF_VALIDATOR_UNAVAILABLE` | `candidate-validate: HANDOFF_CANDIDATE_MISMATCH` |
+| M10 | mode `materialize`; `replaceFile` throws `EPERM` | `HANDOFF_VALIDATOR_UNAVAILABLE` | `candidate-replace: EPERM` |
+| M11 | mode `materialize`; `replaceFile` throws `EPERM`; `removeFile` throws `EBUSY` | `HANDOFF_VALIDATOR_UNAVAILABLE` | `candidate-replace: EPERM; candidate-cleanup: EBUSY` |
+| M12 | mode `materialize`; archive path pre-populated with the source bytes (idempotent retry) | `null` (status `materialized`) | key absent |
+| M13 | `request.workspaceRoot: "relative-root"` | `HANDOFF_PLAN_PATH_INVALID` | `workspace-root: unresolved` |
+| M14 | `request.sourceCheckpointPath: "../outside.json"` | `HANDOFF_PLAN_PATH_INVALID` | `target-path: unresolved` |
+| M15 | `transformEnvelope` sets `source.archivePath` to `../escape.json` | `HANDOFF_PLAN_PATH_INVALID` | `target-path: unresolved` |
+| M16 | topology `resolve` resolves a blocked authority result carrying `failureCause: "envelope-read: ENOENT"` and code `HANDOFF_VALIDATOR_UNAVAILABLE` | `HANDOFF_VALIDATOR_UNAVAILABLE` | `envelope-read: ENOENT` |
+| M17 | default scenario, mode `dry_run` | `null` (status `validated`) | key absent |
+
+### Phase 5 — R18: Authority, Production, and Path-Boundary Sites (TypeScript)
+
+- [ ] [P5-T1] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-authority-service.ts` by adding `readonly failureCause?: string` to the local `blocked` options bag (lines 100-104) and emitting it by conditional spread, and by importing `describeHandoffFailureCause` from `./orchestration-handoff-materializer-request`.
+  - Acceptance: a `blocked` call without `failureCause` returns no `failureCause` key.
+- [ ] [P5-T2] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-authority-service.ts` so the envelope-path null return (line 128) passes `{ failureCause: "target-path: unresolved" }`.
+  - Acceptance: the code remains `HANDOFF_PLAN_PATH_INVALID`.
+- [ ] [P5-T3] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-authority-service.ts` so the envelope-read `catch` (line 133) binds the error and passes `describeHandoffFailureCause("envelope-read", error)`.
+  - Acceptance: the code remains `HANDOFF_VALIDATOR_UNAVAILABLE`.
+- [ ] [P5-T4] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-authority-service.ts` so the private `observedPlanSha256` returns `{ readonly sha256: string } | { readonly failureCause: string }`: `{ failureCause: "target-path: unresolved" }` for the null path (line 165) and `{ failureCause: describeHandoffFailureCause("plan-read", error) }` from a bound `catch` (line 168).
+  - Acceptance: `observedPlanSha256` remains non-exported.
+- [ ] [P5-T5] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-authority-service.ts` so the caller (lines 321-331) returns `blocked(request, "HANDOFF_PLAN_PATH_INVALID", { handoffId: envelope.handoffId, failureCause })` for the failure variant and uses the `sha256` variant for the rest of the function.
+  - Acceptance: the `HANDOFF_PLAN_HASH_MISMATCH` comparison and `selectPrimaryHandoffFailure` call are unchanged in behavior.
+- [ ] [P5-T6] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-authority-service.ts` so the workspace-root null return (line 276) passes `{ failureCause: "workspace-root: unresolved" }`.
+  - Acceptance: a Grep for `catch\s*\{` over the file returns 0 matches; the file is at or under 500 lines.
+- [ ] [P5-T7] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer-production.ts` so the `JSON.parse` `catch` in `validateDestinationProjection` (line 49) binds the error and returns the one-element array whose message is quoted in Fixed Design Inputs.
+  - Acceptance: the `validator` dependency signature is unchanged; a Grep for `catch\s*\{` over the file returns 0 matches.
+- [ ] [P5-T8] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-path-boundary.ts` by adding a module-private helper that runs a supplied operation inside `try`/`catch (error: unknown)` and returns `{ ok: true; value }` or `{ ok: false; cause }` (cause built with `describeHandoffFailureCause`), and by routing the `realpath`/`stat` block of `resolveWorkspaceRoot` (lines 111-120) through it, mapping failure to `null`.
+  - Acceptance: the `HandoffPathBoundary` interface (lines 18-28) is textually unchanged.
+- [ ] [P5-T9] Update `extensions/drm-copilot/src/lib/validate/orchestration-handoff-path-boundary.ts` by routing the `realpath` block of `resolveExistingTarget` (lines 133-142) through the P5-T8 helper, mapping failure to `null`.
+  - Acceptance: a Grep for `catch\s*\{` over the file returns 0 matches; the bound `catch` in `resolveCreatableTarget` (line 180) is unchanged.
+- [ ] [P5-T10] Update `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause.test.ts` by adding `describe("authority blocked-result failure causes")` with a compact scenario builder (fake `FileSystem`, fake `HandoffPathBoundary`, fake `HandoffCheckoutContext`, envelope loaded from `tests/fixtures/orchestration-handoff/contract/valid-ordinary-claude-to-codex.json`) and one named case per row of the Authority Case Table below.
+  - Acceptance: every row is present; if adding the block would take the file above 480 lines, this task is not executed and P5-T11 is executed instead, with the reason recorded in the P5-T13 artifact.
+- [ ] [P5-T11] Create `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause-authority.test.ts` (conditional: only when P5-T10 records the 480-line overflow) containing the `describe("authority blocked-result failure causes")` block specified in P5-T10.
+  - Acceptance: when executed, the file is at or under 500 lines and the P5-T13 artifact records the deviation from spec AC-8's single-file naming; when not executed, the task is marked complete with the note `not required: single file within limit`.
+- [ ] [P5-T12] Update `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause.test.ts` by adding `describe("path-boundary guarded resolution")` (via `createHandoffPathBoundary` with a fake `realpath`/`stat`: B1 success arm returns the canonical root and target; B2 `realpath` throwing code `EACCES` returns `null` from both `resolveWorkspaceRoot` and `resolveExistingTarget`) and `describe("destination projection parse failure")` (P1: `createProductionHandoffMaterializer(<fake file system>, <fake runner>).dependencies.validator.validateDestinationProjection("{")` equals `["destination checkpoint must be valid JSON (destination-projection: SyntaxError)"]`).
+  - Acceptance: both arms of the path-boundary helper are executed by named cases; the file is at or under 500 lines.
+- [ ] [P5-T13] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/regression-testing/r18-authority-production-boundary.<timestamp>.md` by running `node run-jest.cjs test/lib/validate/orchestration-handoff-failure-cause.test.ts test/lib/validate/orchestration-handoff-authority-service.test.ts test/lib/validate/orchestration-handoff-path-boundary.test.ts test/lib/validate/orchestration-handoff-materializer-production.test.ts test/lib/validate/orchestration-handoff-contract.test.ts` from `extensions/drm-copilot` (adding `test/lib/validate/orchestration-handoff-failure-cause-authority.test.ts` when P5-T11 executed).
+  - Acceptance: `EXIT_CODE: 0`; the `Tests:` line reports 0 failed; `git diff --quiet origin/main -- extensions/drm-copilot/test/lib/validate/orchestration-handoff-path-boundary.test.ts extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-production.test.ts extensions/drm-copilot/test/lib/validate/orchestration-handoff-authority-service.test.ts extensions/drm-copilot/test/lib/validate/orchestration-handoff-contract.test.ts` exits 0.
+
+#### Authority Case Table (P5-T10)
+
+| Row | Arrange | Expected `primaryFailureCode` | Expected `failureCause` |
+|---|---|---|---|
+| A1 | envelope `readTextFile` throws code `ENOENT` | `HANDOFF_VALIDATOR_UNAVAILABLE` | `envelope-read: ENOENT` |
+| A2 | plan `readTextFile` throws code `EACCES` | `HANDOFF_PLAN_PATH_INVALID` | `plan-read: EACCES` |
+| A3 | `resolveWorkspaceRoot` returns `null` | `HANDOFF_PLAN_PATH_INVALID` | `workspace-root: unresolved` |
+| A4 | `resolveExistingTarget` returns `null` for the envelope path | `HANDOFF_PLAN_PATH_INVALID` | `target-path: unresolved` |
+| A5 | `resolveExistingTarget` returns `null` for the plan path only | `HANDOFF_PLAN_PATH_INVALID` | `target-path: unresolved` |
+| A6 | all reads succeed with matching hashes | `null` (status `validated`) | key absent |
+
+### Phase 6 — R17: Per-File Coverage Thresholds (Jest)
+
+- [ ] [P6-T1] Update `extensions/drm-copilot/jest.config.cjs` by inserting, after the `./src/lib/pr-context/index.ts` comment block (lines 319-323) and before the closing brace of `coverageThreshold` (line 324), the comment line quoted in Fixed Design Inputs followed by the 14 keys listed in spec AC-5, each set to `{ lines: 85, branches: 75 }`.
+  - Acceptance: no `global` key and no `coveragePathIgnorePatterns` key is added; no existing entry changes.
+- [ ] [P6-T2] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac5-threshold-static-check.<timestamp>.md` by reading `extensions/drm-copilot/jest.config.cjs` and recording, for each of the 14 AC-5 keys, the line number of its key and its `lines`/`branches` values, plus a Grep with pattern `(^|\s|")(global|coveragePathIgnorePatterns)"?\s*:` over the file.
+  - Acceptance: 14 keys found, each `lines: 85` and `branches: 75`; the Grep returns 0 matches; if any new production `.ts` file was created under `extensions/drm-copilot/src/` by this feature (Glob against the P0-T3 list), it has its own entry.
+
+### Phase 7 — Final QC Loop (Python, TypeScript, PowerShell)
+
+Run the steps in order. If any step fails or changes a file, fix the cause and restart from P7-T1; each rerun overwrites the step artifact with a new timestamp. A clean pass is one in which P7-T1 through P7-T16 all pass with no file changed.
+
+- [ ] [P7-T1] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/py-black.<timestamp>.md` by running `poetry run black --check .` from the worktree root.
+  - Acceptance: `EXIT_CODE: 0` and the success line containing `would be left unchanged`.
+- [ ] [P7-T2] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/py-ruff.<timestamp>.md` by running `poetry run ruff check .` from the worktree root.
+  - Acceptance: `EXIT_CODE: 0` and `All checks passed!`.
+- [ ] [P7-T3] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/py-pyright.<timestamp>.md` by running `poetry run pyright` from the worktree root.
+  - Acceptance: `EXIT_CODE: 0` and the summary line `0 errors`.
+- [ ] [P7-T4] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/py-pytest-coverage.<timestamp>.md` by running `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing` from the worktree root.
+  - Acceptance: `EXIT_CODE: 0`; 0 failed; the `TOTAL` row is recorded verbatim.
+- [ ] [P7-T5] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/py-coverage-totals.<timestamp>.md` by running `poetry run coverage json -o artifacts/python/coverage-totals.json` immediately after P7-T4.
+  - Acceptance: the command prints `Wrote JSON report to artifacts/python/coverage-totals.json`; line percent and branch percent are each at or above the P0-T9 values (AC-16).
+- [ ] [P7-T6] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/py-parity-and-precedence.<timestamp>.md` by running `poetry run pytest "tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py::test_handoff_runtime_has_root_bundle_resource_and_effective_pack_parity" "tests/scripts/dev_tools/test_orchestration_handoff_contract.py::test_failure_precedence_matches_the_shared_registry" tests/scripts/dev_tools/test_orchestration_handoff_taskmaster_469.py` from the worktree root.
+  - Acceptance: `EXIT_CODE: 0`; the two named node IDs are reported passed; every `NEGATIVE_SCENARIOS` parametrized case is reported passed.
+- [ ] [P7-T7] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ts-prettier.<timestamp>.md` by running `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"` from `extensions/drm-copilot`.
+  - Acceptance: `EXIT_CODE: 0` and the literal `All matched files use Prettier code style!`.
+- [ ] [P7-T8] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ts-eslint.<timestamp>.md` by running `npx eslint --no-error-on-unmatched-pattern src test` from `extensions/drm-copilot`.
+  - Acceptance: `EXIT_CODE: 0` with 0 problems reported.
+- [ ] [P7-T9] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ts-typecheck.<timestamp>.md` by running `npx tsc -p ./ --noEmit` from `extensions/drm-copilot`.
+  - Acceptance: `EXIT_CODE: 0` with no diagnostic output.
+- [ ] [P7-T10] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ts-tsc-jest-diagnostics.<timestamp>.md` by running `npx tsc -p tsconfig.jest.json --noEmit` from `extensions/drm-copilot`.
+  - Acceptance: every reported diagnostic is identical by file, line, column, and `TS` code to an entry in the P0-T14 list; the artifact lists new diagnostics as `none`.
+- [ ] [P7-T11] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ts-jest-coverage.<timestamp>.md` by running `npm --prefix extensions/drm-copilot run test:coverage` from the worktree root.
+  - Acceptance: `EXIT_CODE: 0`; the `Tests:` line reports 0 failed; `test/packaging/mcp-server-prepack.test.ts` reports all tests passed with a count equal to the P0-T15 count; the 14-module table (same derivation as P0-T15 from `extensions/drm-copilot/coverage/lcov.info`) shows each module at or above 85% line and 75% branch.
+- [ ] [P7-T12] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ts-precedence-tests.<timestamp>.md` by running `node run-jest.cjs test/lib/validate/orchestration-handoff-contract.test.ts test/lib/validate/orchestration-handoff-authority-service.test.ts -t "matches the shared Python failure precedence registry|selects registry-order precedence when several bindings are invalid at once"` from `extensions/drm-copilot`.
+  - Acceptance: `EXIT_CODE: 0`; exactly 2 tests passed and 0 failed.
+- [ ] [P7-T13] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ps-format.<timestamp>.md` by recording `git status --porcelain -- tests/scripts/codex-hooks tests/fixtures/codex-hooks`, calling `mcp__drm-copilot__run_poshqc_format` with `workspace_root` set to the worktree root and `scan_folders` set to `["tests/scripts/codex-hooks"]`, then recording `git status --porcelain -- tests/scripts/codex-hooks tests/fixtures/codex-hooks` again.
+  - Acceptance: the MCP `ok` flag is true and the before and after porcelain outputs are byte-identical (the formatter changed nothing). A difference restarts the loop at P7-T1.
+- [ ] [P7-T14] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ps-analyze.<timestamp>.md` by calling `mcp__drm-copilot__run_poshqc_analyze` with `workspace_root` set to the worktree root and `scan_folders` set to `["tests/scripts/codex-hooks"]`.
+  - Acceptance: the MCP `ok` flag is true, recorded as `EXIT_CODE: 0`. No finding count is asserted.
+- [ ] [P7-T15] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ps-pester.<timestamp>.md` by calling `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the worktree root and no `scan_folders`, then reading `artifacts/pester/pester-junit.xml`.
+  - Acceptance: the XML last-write time is later than the task `Timestamp:`; root `failures="0"` and `errors="0"`; the three P1-T6 case names are present with no `<failure>` or `<error>` child.
+- [ ] [P7-T16] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ps-coverage.<timestamp>.md` by reading `artifacts/pester/powershell-coverage.xml` produced by P7-T15.
+  - Acceptance: lines 58, 72, and 77 of `enforce-epic-planning-only.ps1` (package `.codex/hooks`) have `ci` greater than 0; the file's missed-line set is a subset of the P0-T18 set minus {58, 72, 77}; the report-level line percent is at or above the P0-T18 value.
+- [ ] [P7-T17] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/toolchain-loop-single-pass.<timestamp>.md` recording the timestamps of the final P7-T1 through P7-T16 artifacts and `git status --porcelain` output captured before P7-T1 and after P7-T16 of that pass.
+  - Acceptance: all 16 artifacts from one pass record passing results, and the two porcelain captures are identical (AC-20).
+
+### Phase 8 — Scope, Static, and Coverage-Delta Verification
+
+- [ ] [P8-T1] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac7-bare-catch.<timestamp>.md` recording a Grep with pattern `catch\s*\{` over the four R18 modules and a second Grep with the same pattern over the Glob `extensions/drm-copilot/src/**/*{handoff,semantic-mcp}*.ts`.
+  - Acceptance: both searches return 0 matches.
+- [ ] [P8-T2] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac4-hook-parity.<timestamp>.md` by running `git diff --quiet origin/main -- .codex/hooks/enforce-epic-planning-only.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-planning-only.ps1` and citing the P7-T6 pass of `test_handoff_runtime_has_root_bundle_resource_and_effective_pack_parity`.
+  - Acceptance: `EXIT_CODE: 0`.
+- [ ] [P8-T3] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac12-precedence-unchanged.<timestamp>.md` by running `git diff --quiet origin/main -- tests/scripts/dev_tools/test_orchestration_handoff_contract.py extensions/drm-copilot/test/lib/validate/orchestration-handoff-contract.test.ts extensions/drm-copilot/test/lib/validate/orchestration-handoff-authority-service.test.ts config/orchestration-handoff-registry.json extensions/drm-copilot/src/lib/validate/orchestration-handoff-contract.ts` and `git diff origin/main -- tests/scripts/dev_tools/test_orchestration_handoff_taskmaster_469.py`.
+  - Acceptance: the first command exits 0; no hunk of the second command has an old-file range intersecting lines 43-62 (`NEGATIVE_SCENARIOS`).
+- [ ] [P8-T4] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac13-fixtures-and-schemas.<timestamp>.md` by running `git diff --diff-filter=MDR --name-only origin/main`, `git status --porcelain`, and `git diff origin/main -- extensions/drm-copilot/src/mcp-repo-automation-tool-definitions-handoff.ts`.
+  - Acceptance: the name-only list and the porcelain `M`/`D`/`R` entries include no path under `tests/fixtures/`, `extensions/drm-copilot/test/fixtures/`, `config/`, or `extensions/drm-copilot/resources/config/`; the porcelain `??` entries under `tests/fixtures/` are exactly the two P1 fixtures; no hunk of the third command intersects an `inputSchema` block.
+- [ ] [P8-T5] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac14-r20-boundary.<timestamp>.md` by running `git diff --name-only origin/main` and `git status --porcelain`.
+  - Acceptance: neither output lists `extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-path-boundary.test.ts`.
+- [ ] [P8-T6] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac15-r19-static.<timestamp>.md` by running `git diff --quiet origin/main -- scripts/dev_tools/orchestration_handoff_contract.py scripts/dev_tools/orchestration_handoff_contract_support.py` and recording a Grep for `hashlib` over `tests/scripts/dev_tools/test_orchestration_handoff_taskmaster_469.py` and a Grep for `raw_file_sha256` over the same file.
+  - Acceptance: the diff exits 0; `hashlib` has 0 matches; `raw_file_sha256` has at least 2 matches (import and call).
+- [ ] [P8-T7] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac19-line-counts.<timestamp>.md` recording the post-edit line count of every non-Markdown, non-JSON-fixture file this plan wrote (the P0-T3 list plus `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause.test.ts` and, when created, `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause-authority.test.ts`).
+  - Acceptance: every count is at most 500; `orchestration-handoff-materializer.ts` is at most 490 or the P4-T14/P4-T15 extraction was applied.
+- [ ] [P8-T8] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac21-dependencies.<timestamp>.md` by running `git diff --quiet origin/main -- extensions/drm-copilot/package.json extensions/drm-copilot/package-lock.json pyproject.toml poetry.lock`.
+  - Acceptance: `EXIT_CODE: 0`.
+- [ ] [P8-T9] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac9-interface-unchanged.<timestamp>.md` by running `git diff origin/main -- extensions/drm-copilot/src/lib/validate/orchestration-handoff-path-boundary.ts`.
+  - Acceptance: no hunk's old-file range intersects lines 18-28 (the `HandoffPathBoundary` declaration).
+- [ ] [P8-T10] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac22-evidence-location.<timestamp>.md` by running `git status --porcelain -- artifacts/baselines artifacts/baseline artifacts/qa artifacts/qa-gates artifacts/coverage artifacts/evidence` and recording a Glob of `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/*/*`.
+  - Acceptance: the porcelain output is empty; the Glob lists the Phase 0 baseline artifacts under `evidence/baseline/` and the Phase 7 artifacts under `evidence/qa-gates/`.
+- [ ] [P8-T11] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/coverage-delta.<timestamp>.md` comparing baseline and post-change coverage for each language.
+  - Acceptance: records (a) Python line and branch percent, P0-T9 versus P7-T5, each non-decreasing, with changed-production-line coverage `N/A: no production Python file changed` (verified by P8-T6); (b) PowerShell report line percent, P0-T18 versus P7-T16, non-decreasing, with changed-production-line coverage `N/A: hook unchanged` (verified by P8-T2); (c) for each of the 14 TypeScript modules, line and branch percent from P0-T15 versus P7-T11, where the five R18 modules (`orchestration-handoff-materializer.ts`, `-authority-service.ts`, `-path-boundary.ts`, `-materializer-production.ts`, `-materializer-request.ts`) are each at or above baseline and at or above 85%/75% (AC-17); (d) TypeScript changed-line coverage, derived by intersecting the added line numbers from `git diff -U0 origin/main -- extensions/drm-copilot/src` with the `DA:<line>,<hits>` records of `extensions/drm-copilot/coverage/lcov.info`, reported as covered/total and percent, at or above 85%. Any missing value makes the result `REMEDIATION REQUIRED`.
+- [ ] [P8-T12] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac3-test-purity.<timestamp>.md` recording a Grep with pattern `TestDrive|New-TemporaryFile|GetTempPath|\$env:TEMP|tmpdir|tempfile|tmp_path` over every test file this plan added or changed: `tests/scripts/codex-hooks/codex-planning-only-registry.Tests.ps1`, `tests/scripts/dev_tools/test_orchestration_handoff_taskmaster_469.py`, `tests/scripts/dev_tools/orchestration_handoff_taskmaster_469_test_support.py`, `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause.test.ts`, `extensions/drm-copilot/test/mcp-handlers/orchestration-handoff-handlers.test.ts`, and, when created, `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause-authority.test.ts`.
+  - Acceptance: the Grep returns 0 matches in every listed file.
+
+### Phase 9 — Acceptance-Criteria Check-Off
+
+Each task changes only `- [ ]` to `- [x]` on the named criterion, and only after the cited evidence records a pass. A criterion whose evidence does not pass stays unchecked and is listed in P9-T32.
+
+- [ ] [P9-T1] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-1 after P1-T6 and P7-T15 pass.
+- [ ] [P9-T2] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-2 after P7-T16 passes.
+- [ ] [P9-T3] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-3 after P1-T7 and P8-T12 pass.
+- [ ] [P9-T4] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-4 after P8-T2 and P7-T6 pass.
+- [ ] [P9-T5] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-5 after P6-T2 passes.
+- [ ] [P9-T6] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-6 after P7-T11 and P6-T2 pass.
+- [ ] [P9-T7] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-7 after P8-T1 passes.
+- [ ] [P9-T8] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-8 after P4-T17 and P5-T13 pass.
+- [ ] [P9-T9] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-9 after P5-T13 and P8-T9 pass.
+- [ ] [P9-T10] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-10 after P3-T10 passes.
+- [ ] [P9-T11] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-11 after P3-T10 and P4-T17 pass.
+- [ ] [P9-T12] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-12 after P7-T6, P7-T12, and P8-T3 pass.
+- [ ] [P9-T13] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-13 after P8-T4 passes.
+- [ ] [P9-T14] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-14 after P8-T5 passes.
+- [ ] [P9-T15] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-15 after P2-T3 and P8-T6 pass.
+- [ ] [P9-T16] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-16 after P7-T4, P7-T5, and P8-T11 pass.
+- [ ] [P9-T17] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-17 after P8-T11 passes.
+- [ ] [P9-T18] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-18 after P7-T11 passes.
+- [ ] [P9-T19] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-19 after P8-T7 passes.
+- [ ] [P9-T20] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-20 after P7-T17 passes.
+- [ ] [P9-T21] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-21 after P8-T8 passes.
+- [ ] [P9-T22] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-22 after P8-T10 passes.
+- [ ] [P9-T23] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-1 after AC-8, AC-9, and AC-11 are checked.
+- [ ] [P9-T24] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-2 after AC-10 is checked.
+- [ ] [P9-T25] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-3 after AC-9, AC-11, AC-12, and AC-13 are checked.
+- [ ] [P9-T26] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-4 after AC-7 is checked.
+- [ ] [P9-T27] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-5 after AC-5, AC-6, and AC-17 are checked.
+- [ ] [P9-T28] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-6 after AC-1, AC-2, AC-3, and AC-4 are checked.
+- [ ] [P9-T29] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-7 after AC-15 is checked.
+- [ ] [P9-T30] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-8 after AC-16 through AC-20 are checked.
+- [ ] [P9-T31] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-9 after AC-14 and AC-21 are checked.
+- [ ] [P9-T32] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/other/ac-status-summary.<timestamp>.md` with the Acceptance Criteria Status block defined by the acceptance-criteria-tracking skill for `spec.md` (22 items) and `user-story.md` (9 items).
+  - Acceptance: totals, checked counts, and the list of any unchecked items are recorded and match the checkbox state of both files.
+
+## Write Set (blast radius)
+
+Production and configuration:
+- `extensions/drm-copilot/jest.config.cjs`
+- `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer-request.ts`
+- `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts`
+- `extensions/drm-copilot/src/lib/validate/orchestration-handoff-authority-service.ts`
+- `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer-production.ts`
+- `extensions/drm-copilot/src/lib/validate/orchestration-handoff-path-boundary.ts`
+- `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer-support.ts` (conditional, D2)
+- `extensions/drm-copilot/src/mcp-repo-automation-tool-definitions-handoff.ts`
+- `extensions/drm-copilot/src/mcp-handlers/orchestration-handoff-handlers.ts`
+- `extensions/drm-copilot/src/mcp-tools.ts`
+
+Tests and fixtures:
+- `tests/scripts/codex-hooks/codex-planning-only-registry.Tests.ps1`
+- `tests/fixtures/codex-hooks/invalid-operation-orchestration-handoff-registry.json` (new)
+- `tests/fixtures/codex-hooks/invalid-alias-orchestration-handoff-registry.json` (new)
+- `tests/scripts/dev_tools/test_orchestration_handoff_taskmaster_469.py`
+- `tests/scripts/dev_tools/orchestration_handoff_taskmaster_469_test_support.py`
+- `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause.test.ts` (new)
+- `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause-authority.test.ts` (new, conditional)
+- `extensions/drm-copilot/test/mcp-handlers/orchestration-handoff-handlers.test.ts`
+
+Requirements documents (check-off only): `spec.md`, `user-story.md` in the feature folder.
+
+Bundled mirrors: none. Re-verified: no `extensions/drm-copilot/resources/` mirror exists for any file in the write set; the only mirrored files on this surface (`.codex/hooks/enforce-epic-planning-only.ps1`, `config/orchestration-handoff-registry.json`, `config/orchestration-handoff.schema.json`) are not edited. `extensions/drm-copilot/test/packaging/mcp-server-prepack.test.ts` contains no output-field assertion (Grep for `primary_failure_code|affected_paths|unsupported_capabilities|failure_cause|handoff` returned 0 matches), so D4 requires execution only (P7-T11) and no edit.
+
+Not edited (explicit): `.codex/hooks/enforce-epic-planning-only.ps1`, its resources copy, `extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-path-boundary.test.ts`, `extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-test-support.ts`, `extensions/drm-copilot/test/lib/validate/orchestration-handoff-path-boundary.test.ts`, `extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-production.test.ts`, `scripts/dev_tools/orchestration_handoff_contract.py`, `scripts/dev_tools/orchestration_handoff_contract_support.py`, all fixtures under `tests/fixtures/orchestration-handoff/`, `config/`.
 
 ## Test Plan
 
-- Unit: ...
-- Integration: ...
-- Manual/CLI: ...
-- Coverage evidence: list baseline artifact paths, post-change artifact paths, and comparison artifact paths for each in-scope language
+- Unit (TypeScript): `orchestration-handoff-failure-cause.test.ts` (helper table, 17 materializer rows, 6 authority rows, 2 path-boundary arms, 1 projection case); 2 handler cases in `orchestration-handoff-handlers.test.ts`; existing handoff suites run unchanged.
+- Unit (PowerShell): 3 new Pester cases in `codex-planning-only-registry.Tests.ps1`.
+- Unit (Python): updated `test_taskmaster_469_fixture_hashes_and_source_history_are_pinned`.
+- Contract/parity: `test_handoff_runtime_has_root_bundle_resource_and_effective_pack_parity`, `test_failure_precedence_matches_the_shared_registry`, the TS precedence registry test, the authority registry-order test, and `mcp-server-prepack.test.ts`.
+- Property tests: not added. D5 is confirmed by P0-T2 (`quality-tiers.yml` absent, `fast-check` not a dependency); the redaction property is covered by the table-driven P3-T8 cases.
+- Coverage evidence: baselines P0-T9 (Python), P0-T15 (TypeScript per-file), P0-T18 (PowerShell); post-change P7-T5, P7-T11, P7-T16; comparison P8-T11.
 
 ## Open Questions / Notes
 
-- ...
+- Assumption: Node's fatal `TextDecoder` throws a `TypeError` with `code` `ERR_ENCODING_INVALID_ENCODED_DATA` for invalid UTF-8 (row M2). This was not executed during planning. If the observed code differs, the executor records the observed value in the P4-T17 artifact and stops for the caller rather than changing the expected literal.
+- Assumption: `@typescript-eslint/no-unused-vars` uses `caughtErrors: "all"` (research inference). Every rewritten `catch` uses its bound value, so the rule is satisfied either way; P7-T8 confirms.
+- For AC-16, the dotted `scripts.dev_tools` coverage target replaces the spec's two filesystem-path targets (`src` and `scripts/dev_tools`). No Python file exists under `src/`, so the measured population is the same; baseline and final use the identical argument.
+- Planning-session limit: no shell or validator tool was available to the planner, so no command output was observed during planning. The success-case literals in acceptance conditions (`would be left unchanged`, `All checks passed!`, `0 errors`, `All matched files use Prettier code style!`, `Wrote JSON report to`, Jest `Tests:`) are the documented success output of each tool and prior repository evidence; P0 tasks observe each one before any final-QC assertion depends on it.
+- #647 overlap: if #647 merges first and changes `orchestration-handoff-materializer-test-support.ts`, rebase and adjust only the new failure-cause test file.
