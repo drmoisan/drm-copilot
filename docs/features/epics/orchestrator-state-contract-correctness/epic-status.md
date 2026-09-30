@@ -5,7 +5,7 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 - Epic issue: #771
 - Integration branch: `epic/orchestrator-state-contract-correctness-integration`
 - Current wave: 0
-- Next step: await wave-0 merges (#405 PR #800 in CI; #464 executing), then launch wave 1
+- Next step: #405 PR #800 blocked by repo-wide NPM Audit Gate failure (new brace-expansion and fast-uri advisories); awaiting decision. #464 executing. Wave 1 waits on wave-0 merges.
 - Last updated: 2026-09-30T11:10:59Z
 
 ## Features
