@@ -36,7 +36,7 @@ Records the completion of the full Python QA toolchain loop in a single pass wit
 ### P3-T5: Pytest with Coverage
 - Status: ✓ PASS
 - Tests passed: 20 / 20
-- Coverage: Line 70% (baseline 70%), Branch 78.57% (baseline 78.57%)
+- Coverage: Line 70% (baseline 70%), Branch 21.43% (baseline 21.43%)
 - No regression
 
 ### P3-T6: Coverage Comparison
@@ -54,3 +54,4 @@ Records the completion of the full Python QA toolchain loop in a single pass wit
 - Exit code: 0
 
 The renamed test function and removal of the unauthorized suppression pass all toolchain quality gates in a single pass.
+Correction (remediation 2026-09-30T12-05, finding R2): the branch percentage previously derived here as (Branch - BrPart) / Branch was wrong. BrPart counts partially covered branch points, not missed branches. The measured branch hit fraction is BRH / BRF = 3 / 14 = 21.43%, read from the LCOV record during the 2026-09-30T12-05 audit and consistent with the printed Cover of 63% = (56 + 3) / (80 + 14). The line percentage and the no-regression conclusion are unchanged.

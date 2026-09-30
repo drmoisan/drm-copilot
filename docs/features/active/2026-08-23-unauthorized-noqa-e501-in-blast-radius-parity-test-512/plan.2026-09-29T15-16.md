@@ -3,8 +3,8 @@
 - **Issue:** #512
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-29T15-16
-- **Status:** Draft
+- **Last Updated:** 2026-09-30T12-03
+- **Status:** Complete
 - **Version:** 0.3
 - **Work Mode:** full-bug
 - **Requirements source:** `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md` (sole acceptance-criteria source), with `issue.md` and `research/2026-09-29T19-20-noqa-e501-rename.research.md` as context.
@@ -79,6 +79,7 @@ Run P3-T1 through P3-T7 in order as one pass. If any step exits non-zero or chan
 - [x] [P3-T4] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-pyright.2026-09-29T15-16.md` from `poetry run pyright tests/scripts/dev_tools/test_blast_radius_config_parity.py`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` quotes `0 errors, 0 warnings, 0 informations`. ✓ Verified: artifact created with EXIT_CODE: 0, zero errors.
 - [x] [P3-T5] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-pytest-coverage.2026-09-29T15-16.md` from `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py --cov=scripts.dev_tools.compute_blast_radius --cov-branch --cov-report=term-missing`. Acceptance: `EXIT_CODE: 0`, the `N passed` count equals the passed count recorded in P0-T9 with zero failures, and `Output Summary:` records numeric `Stmts`, `Miss`, `Branch`, `BrPart`, and `Cover` values for the row for `compute_blast_radius.py` (printed with the platform path separator) and the `TOTAL` row, plus the derived line and branch percentages. ✓ Verified: artifact created with EXIT_CODE: 0, 20 passed (matches baseline), coverage identical.
 - [x] [P3-T6] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/coverage-comparison.2026-09-29T15-16.md` comparing the P0-T10 and P3-T5 artifacts. Acceptance: the artifact carries `Timestamp:`, `Command:` (naming the two artifacts compared), `EXIT_CODE: 0`, and `Output Summary:` listing baseline coverage, post-change coverage, and changed-code coverage; post-change `Miss` and `BrPart` for the module row are less than or equal to baseline, the derived line percentage is not lower than baseline, the derived branch percentage is not lower than baseline, and changed-code coverage is stated as not applicable because the changed line is a test-function definition excluded from measurement by `omit = ["tests/*", ...]`. ✓ Verified: artifact created with EXIT_CODE: 0, no regression (70% baseline → 70% final, 78.57% baseline → 78.57% final).
+Remediation note (R2, remediation 2026-09-30T12-05): the branch-percentage derivation (Branch - BrPart) / Branch named in P0-T10, P3-T5, and P3-T6 was wrong. The measured branch hit fraction is BRH / BRF = 3 / 14 = 21.43%. The recorded artifacts were corrected in place and the no-regression conclusion is unchanged.
 - [x] [P3-T7] Create `docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-qc-loop-pass.2026-09-29T15-16.md` recording that P3-T1 through P3-T6 completed in one uninterrupted pass with no file changes and no restart, or the number of restarts and the cause of each. Acceptance: the artifact carries `Timestamp:`, `Command:` (the sequence P3-T1 to P3-T6), `EXIT_CODE: 0`, and `Output Summary:` stating the pass count and that Black reported `1 file left unchanged.` on the final pass. ✓ Verified: artifact created, one uninterrupted pass, no restarts needed.
 
 ### Phase 4 — Scope Verification and Acceptance-Criteria Check-Off

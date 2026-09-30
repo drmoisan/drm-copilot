@@ -3,8 +3,8 @@
 - **Issue:** #512
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-29T15-16
-- **Status:** Draft
+- **Last Updated:** 2026-09-30T12-03
+- **Status:** Complete
 - **Version:** 0.1
 
 ## Context
@@ -179,7 +179,7 @@ Seeded from issue:
       `test_every_class_two_and_three_key_is_consumed_by_its_registered_assertion` at 74 characters.
       Remove the `# noqa: E501` in the same edit and confirm `poetry run ruff check .` stays clean.
 - [x] Integration scenario to retest: `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py`
-      should still collect and pass 17 tests. Re-confirm the gate is non-vacuous by registering a key
+      should still collect and pass 20 tests. Re-confirm the gate is non-vacuous by registering a key
       against an assertion that does not read it and observing exactly one failure.
 - [x] Manual verification notes: decide the general question this raises, which is whether `E501`
       belongs in the pre-authorized list for long descriptive test names. Three existing precedents
@@ -219,7 +219,7 @@ by this change; it is recorded as follow-up (a) and requires a user decision.
 - [x] `poetry run pytest tests/scripts/dev_tools/test_blast_radius_config_parity.py` passes, and its collected and passed test counts equal the pre-change counts. ✓ Verified by evidence/regression-testing/pytest-collect-after.2026-09-29T15-16.md (20 collected, matches baseline) and evidence/qa-gates/final-pytest-coverage.2026-09-29T15-16.md (20 passed, matches baseline).
 - [x] The test body, docstring, and assertions of the renamed test are unchanged, and the file is at or under 500 lines. ✓ Verified by evidence/regression-testing/rename-delta-check.2026-09-29T15-16.md (1 line added, 1 line deleted; body unchanged) and evidence/regression-testing/file-line-count-after.2026-09-29T15-16.md (499 lines, matches baseline).
 - [x] No file other than files in this feature folder and `tests/scripts/dev_tools/test_blast_radius_config_parity.py` is changed; in particular, nothing else under `tests/` or `scripts/`, no production code, no `pyproject.toml`, and no policy file under `.claude/rules/` or `.github/`. ✓ Verified by evidence/qa-gates/scope-check.2026-09-29T15-16.md (only target test file changed outside feature folder).
-- [x] The full Python toolchain (black, ruff, pyright, pytest with coverage) passes in a single clean pass, with line and branch coverage not regressed against the pre-change run. ✓ Verified by evidence/qa-gates/final-qc-loop-pass.2026-09-29T15-16.md (one uninterrupted pass, no restarts) and evidence/qa-gates/coverage-comparison.2026-09-29T15-16.md (line 70% baseline → 70% final, branch 78.57% baseline → 78.57% final, no regression).
+- [x] The full Python toolchain (black, ruff, pyright, pytest with coverage) passes in a single clean pass, with line and branch coverage not regressed against the pre-change run. ✓ Verified by evidence/qa-gates/final-qc-loop-pass.2026-09-29T15-16.md (one uninterrupted pass, no restarts) and evidence/qa-gates/coverage-comparison.2026-09-29T15-16.md (line 70% baseline → 70% final, branch 21.43% baseline → 21.43% final (measured branch hit fraction 3 / 14; the earlier derivation (Branch - BrPart) / Branch was wrong and was corrected by remediation 2026-09-30T12-05), no regression).
 - [x] Follow-ups (a), (b), and (c) from Scope & Non-Goals are recorded in this spec as out of scope pending a user decision, and the completed #500 plan and historical documents are unedited. ✓ Verified by evidence/qa-gates/followups-recorded.2026-09-29T15-16.md (all three follow-ups present) and evidence/qa-gates/scope-check.2026-09-29T15-16.md (#500 plan and historical documents not edited).
 
 ## Risks & Mitigations
