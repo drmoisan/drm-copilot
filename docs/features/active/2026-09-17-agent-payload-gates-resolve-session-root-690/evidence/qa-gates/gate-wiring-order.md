@@ -3,7 +3,7 @@
 Timestamp: 2026-09-29T23-31
 Command: SW procedure (LH-2) and per-phase A2 runs
 EXIT_CODE: 0
-Output Summary: Latest entry 13 (P9-T4): enforce-parallel-drift-gate.ps1 written through SW; SW-4 hashes equal.
+Output Summary: Latest entry 14 (P10-T4): EpicScopeResolution.psm1 written through SW; SW-4 hashes equal.
 
 ## Live-file writes
 
@@ -22,6 +22,7 @@ Output Summary: Latest entry 13 (P9-T4): enforce-parallel-drift-gate.ps1 written
 | 11 | P7-T4 | .claude/hooks/enforce-epic-worktree-removal-gate.ps1 (EREM, next repository write) | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 | True (3042E2804480999462D308C25188064F673E519B81091F140E1EA18E99D4D060) | 2026-09-30T00-13 | n/a |
 | 12 | P8-T4 | .claude/hooks/enforce-parallel-worktree-removal-gate.ps1 (PREM) | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 | True (67CB665EDF02839E58EF5A6FBC3F311E0C872B2B4EFA56B0683047D8C8EA1F25) | 2026-09-30T00-19 | n/a |
 | 13 | P9-T4 | .claude/hooks/enforce-parallel-drift-gate.ps1 (DRIFT) | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 | True (418DBCF5DD1D15EC9D7A52BBF5C7C2395243F59E6E607043CD3C0523D04930EB) | 2026-09-30T00-28 | n/a |
+| 14 | P10-T4 | .claude/lib/worktree-resolution/EpicScopeResolution.psm1 (ESR) | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 | True (1169A3B25DD3298E836956319164C36DA217A0A416852906970D1D381FD89F47) | 2026-09-30T00-33 | n/a |
 
 ## Copy-drift probes (D13)
 
@@ -34,6 +35,7 @@ Output Summary: Latest entry 13 (P9-T4): enforce-parallel-drift-gate.ps1 written
 | P7-T1 | False | 57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD | 57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD | False | 2026-09-30T00-10 |
 | P8-T1 | False | 57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD | 57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD | False | 2026-09-30T00-17 |
 | P9-T1 | False | 57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD | 57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD | False | 2026-09-30T00-25 |
+| P10-T1 | False | 57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD | 57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD | False | 2026-09-30T00-31 |
 
 ## Suite results
 
@@ -53,3 +55,5 @@ Output Summary: Latest entry 13 (P9-T4): enforce-parallel-drift-gate.ps1 written
 | P8-T11 | SET-PREM | 151 | 151 | 0 | 2026-09-30T00-24 |
 | P9-T10 | G7 | 6 | 6 | 0 | 2026-09-30T00-30 |
 | P9-T11 | SET-DRIFT | 80 | 80 | 0 | 2026-09-30T00-30 |
+| P10-T14 | T-ESR + GUARD | 37 | 37 | 0 | 2026-09-30T00-41 |
+| P10-T15 | SET-EPICSCOPE | 361 | 361 | 0 | 2026-09-30T00-41 |

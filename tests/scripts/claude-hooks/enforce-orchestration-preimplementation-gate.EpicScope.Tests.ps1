@@ -78,6 +78,9 @@ BeforeAll {
         Mock Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution { $merge }.GetNewClosure()
     }
     Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
+    Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeRunResolution.psm1')
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    Mock Resolve-WorktreeEpicTarget -ModuleName EpicScopeResolution { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = $SessionRoot; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
 }
 
 Describe 'enforce-orchestration-preimplementation-gate.ps1 epic scope (issue #663)' {

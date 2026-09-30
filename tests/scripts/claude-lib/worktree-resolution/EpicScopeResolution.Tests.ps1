@@ -52,6 +52,7 @@ BeforeAll {
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $checkpointTextValue }.GetNewClosure()
         Mock Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution { $headBranchValue }.GetNewClosure()
         Mock Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution { $mergeInProgressValue }.GetNewClosure()
+        Mock Resolve-WorktreeEpicTarget -ModuleName EpicScopeResolution { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = $SessionRoot; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 }
 
