@@ -59,6 +59,15 @@ A fixed 3-minute window. 1.1.11 resolved in about 1.5 minutes, so the window pas
 - [ ] Integration scenario to retest: the next `mcp-server-v*` release goes green.
 - [ ] Manual verification notes: reword the timeout error to "not yet resolvable after N minutes; the publish step succeeded — check the registry before re-running (re-publishing an existing version fails)". Consider checking the publish step's own output as the primary success signal and making resolution a warning-level check. Update the release runbook/memory: a red verify step after a green publish step is not a failed release, and the paired extension tag still needs pushing.
 
+## Acceptance Criteria
+
+- [ ] AC-1: The "Verify the published version resolves on the registry" step in `.github/workflows/publish-mcp-npm.yml` polls for a cumulative sleep budget of at least 600 seconds before failing (recommended schedule: `$maxAttempts = 14`, sleep after failed attempt `k` of `min(10*k, 60)` seconds, 630 s total), and a Pester test in `tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` asserts the attempt count and the backoff expression.
+- [ ] AC-2: The poll interval grows between attempts and is capped at 60 seconds, and no sleep follows the final attempt; a Pester test asserts the cap and the final-attempt guard.
+- [ ] AC-3: The timeout error message no longer contains `tag push did not publish`; it states that the version was not yet resolvable after the polling window, that the publish step succeeded, and that the registry should be checked before re-running because re-publishing an existing version fails. A Pester test asserts the old text is absent and the new message tokens are present.
+- [ ] AC-4: The step still fails the job (explicit `exit 1`) when the version never resolves, still exits `exit 0` on success, keeps the `$LASTEXITCODE = 0` reset after the deliberately-failing `npm view`, keeps the exact-version operand `@danmoisan/drm-copilot-mcp@$version`, and keeps its `startsWith(github.ref, 'refs/tags/mcp-server-v')` ref guard; every existing test in `tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` passes.
+- [ ] AC-5: `docs/engineering/missed-npm-publish.runbook.md` states that a red verify step after a green "Publish to npm" step is not a failed release, that the version must be checked on the registry instead of re-running the publish, and that the paired extension tag still needs to be pushed.
+- [ ] AC-6: `actionlint` reports no findings for `.github/workflows/publish-mcp-npm.yml`, and `tests/scripts/dev_tools/test_workflow_npm_token_guard.py` still passes (no `NPM_TOKEN` or `NODE_AUTH_TOKEN` string introduced).
+
 ## Next Step
 
 - [ ] Promote to GitHub issue (bug-report template)
