@@ -833,10 +833,45 @@ items:
       contracts: []
       source: "declared"
       computed_at: "2026-09-30T03:07:10Z"
+  - issue_num: 741
+    feature_folder: "docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh"
+        - ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
+        - ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh"
+        - ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh"
+        - ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh"
+        - ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh"
+        - ".claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh"
+        - ".claude/skills/cleanup-merged-worktrees/SKILL.md"
+        - ".github/workflows/_shell-coverage.yml"
+        - "docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/**"
+        - "docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/issue.md"
+        - "docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/research/research.2026-09-29T22-35.md"
+        - "docs/features/completed/2026-09-06-cleanup-worktrees-skips-detached-head-worktrees-630/evidence/remediation-baseline/bash-test-coverage.2026-09-07T15-00.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+        - "tests/fixtures/cleanup_worktrees/scenarios/scan_roots_derived/worktree-list.out"
+        - "tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py"
+        - "tests/shell/test_cleanup_worktrees_scan_helper.bats"
+        - "tests/shell/test_cleanup_worktrees_scan_roots.bats"
+      modules: []
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-30T03:18:14Z"
 ---
 
 # Parallel Run: bug-burndown-2026-09-29
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 17 of 22. Pending: 741, 743, 744, 756, 764.
+Prepared: 18 of 22. Pending: 743, 744, 756, 764.
