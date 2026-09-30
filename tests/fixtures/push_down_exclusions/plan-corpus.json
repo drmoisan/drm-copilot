@@ -1,0 +1,233 @@
+{
+  "cases": [
+    {
+      "destination_present": [],
+      "expected_kept": [
+        ".claude/rules/python.md"
+      ],
+      "expected_lines": [
+        "push-down exclusion: skipped .claude/rules/quality-tiers.md (entry .claude/rules/quality-tiers.md, line 1)"
+      ],
+      "expected_skipped": [
+        {
+          "destination_status": "absent",
+          "entry": ".claude/rules/quality-tiers.md",
+          "line": 1,
+          "relative_path": ".claude/rules/quality-tiers.md"
+        }
+      ],
+      "expected_unmatched_entries": [],
+      "id": "skip-absent",
+      "manifest_text": ".claude/rules/quality-tiers.md\n",
+      "payload_paths": [
+        ".claude/rules/quality-tiers.md",
+        ".claude/rules/python.md"
+      ]
+    },
+    {
+      "destination_present": [
+        ".claude/rules/quality-tiers.md"
+      ],
+      "expected_kept": [
+        ".claude/rules/python.md"
+      ],
+      "expected_lines": [
+        "push-down exclusion conflict: destination file present, not overwritten: .claude/rules/quality-tiers.md (entry .claude/rules/quality-tiers.md, line 1)"
+      ],
+      "expected_skipped": [
+        {
+          "destination_status": "present",
+          "entry": ".claude/rules/quality-tiers.md",
+          "line": 1,
+          "relative_path": ".claude/rules/quality-tiers.md"
+        }
+      ],
+      "expected_unmatched_entries": [],
+      "id": "conflict-present",
+      "manifest_text": ".claude/rules/quality-tiers.md\n",
+      "payload_paths": [
+        ".claude/rules/quality-tiers.md",
+        ".claude/rules/python.md"
+      ]
+    },
+    {
+      "destination_present": [
+        ".claude/rules/quality-tiers.md"
+      ],
+      "expected_kept": [
+        ".claude/rules/python.md"
+      ],
+      "expected_lines": [
+        "push-down exclusion conflict: destination file present, not overwritten: .claude/rules/quality-tiers.md (entry .claude/rules/quality-tiers.md, line 2)",
+        "push-down exclusion: entry matched no payload path: .claude/agent-memory/** (line 4)"
+      ],
+      "expected_skipped": [
+        {
+          "destination_status": "present",
+          "entry": ".claude/rules/quality-tiers.md",
+          "line": 2,
+          "relative_path": ".claude/rules/quality-tiers.md"
+        }
+      ],
+      "expected_unmatched_entries": [
+        ".claude/agent-memory/**"
+      ],
+      "id": "unmatched-stale-entry",
+      "manifest_text": "# Coverage model kept local; see issue #178, PR #179.\n.claude/rules/quality-tiers.md\n# Agent memory is authored here, not pushed.\n.claude/agent-memory/**\n",
+      "payload_paths": [
+        ".claude/rules/quality-tiers.md",
+        ".claude/rules/python.md"
+      ]
+    },
+    {
+      "destination_present": [],
+      "expected_kept": [],
+      "expected_lines": [
+        "push-down exclusion: skipped .claude/rules/quality-tiers.md (entry .claude/rules/quality-tiers.md, line 1)",
+        "push-down exclusion: skipped .claude/rules/python.md (entry .claude/rules/**, line 2)"
+      ],
+      "expected_skipped": [
+        {
+          "destination_status": "absent",
+          "entry": ".claude/rules/quality-tiers.md",
+          "line": 1,
+          "relative_path": ".claude/rules/quality-tiers.md"
+        },
+        {
+          "destination_status": "absent",
+          "entry": ".claude/rules/**",
+          "line": 2,
+          "relative_path": ".claude/rules/python.md"
+        }
+      ],
+      "expected_unmatched_entries": [],
+      "id": "first-match-precedence",
+      "manifest_text": ".claude/rules/quality-tiers.md\n.claude/rules/**\n",
+      "payload_paths": [
+        ".claude/rules/quality-tiers.md",
+        ".claude/rules/python.md"
+      ]
+    },
+    {
+      "destination_present": [],
+      "expected_kept": [],
+      "expected_lines": [
+        "push-down exclusion: skipped .claude/rules/quality-tiers.md (entry .claude/rules/**, line 1)",
+        "push-down exclusion: entry matched no payload path: .claude/rules/quality-tiers.md (line 2)"
+      ],
+      "expected_skipped": [
+        {
+          "destination_status": "absent",
+          "entry": ".claude/rules/**",
+          "line": 1,
+          "relative_path": ".claude/rules/quality-tiers.md"
+        }
+      ],
+      "expected_unmatched_entries": [
+        ".claude/rules/quality-tiers.md"
+      ],
+      "id": "shadowed-entry-is-unmatched",
+      "manifest_text": ".claude/rules/**\n.claude/rules/quality-tiers.md\n",
+      "payload_paths": [
+        ".claude/rules/quality-tiers.md"
+      ]
+    },
+    {
+      "destination_present": [
+        "config/orchestration-routing.json"
+      ],
+      "expected_kept": [
+        ".claude/settings.json",
+        "config/blast-radius.json"
+      ],
+      "expected_lines": [
+        "push-down exclusion conflict: destination file present, not overwritten: config/orchestration-routing.json (entry config/orchestration-routing.json, line 1)"
+      ],
+      "expected_skipped": [
+        {
+          "destination_status": "present",
+          "entry": "config/orchestration-routing.json",
+          "line": 1,
+          "relative_path": "config/orchestration-routing.json"
+        }
+      ],
+      "expected_unmatched_entries": [],
+      "id": "merged-path-routing-excluded",
+      "manifest_text": "config/orchestration-routing.json\n",
+      "payload_paths": [
+        ".claude/settings.json",
+        "config/blast-radius.json",
+        "config/orchestration-routing.json"
+      ]
+    },
+    {
+      "destination_present": [],
+      "expected_kept": [
+        ".claude/settings.json",
+        "config/orchestration-routing.json"
+      ],
+      "expected_lines": [
+        "push-down exclusion: skipped config/blast-radius.json (entry config/blast-radius.json, line 1)"
+      ],
+      "expected_skipped": [
+        {
+          "destination_status": "absent",
+          "entry": "config/blast-radius.json",
+          "line": 1,
+          "relative_path": "config/blast-radius.json"
+        }
+      ],
+      "expected_unmatched_entries": [],
+      "id": "merged-path-blast-radius-excluded",
+      "manifest_text": "config/blast-radius.json\n",
+      "payload_paths": [
+        ".claude/settings.json",
+        "config/blast-radius.json",
+        "config/orchestration-routing.json"
+      ]
+    },
+    {
+      "destination_present": [
+        ".claude/a.md"
+      ],
+      "expected_kept": [
+        ".claude/a.md",
+        ".claude/b.md"
+      ],
+      "expected_lines": [],
+      "expected_skipped": [],
+      "expected_unmatched_entries": [],
+      "id": "empty-manifest-filters-nothing",
+      "manifest_text": "# nothing\n",
+      "payload_paths": [
+        ".claude/a.md",
+        ".claude/b.md"
+      ]
+    },
+    {
+      "destination_present": [],
+      "expected_kept": [
+        ".claude/rules/python.md"
+      ],
+      "expected_lines": [
+        "push-down exclusion: skipped .claude/agent-memory/x/MEMORY.md (entry .claude/agent-memory/, line 1)"
+      ],
+      "expected_skipped": [
+        {
+          "destination_status": "absent",
+          "entry": ".claude/agent-memory/",
+          "line": 1,
+          "relative_path": ".claude/agent-memory/x/MEMORY.md"
+        }
+      ],
+      "expected_unmatched_entries": [],
+      "id": "directory-entry-trailing-slash-equivalence",
+      "manifest_text": ".claude/agent-memory/\n",
+      "payload_paths": [
+        ".claude/agent-memory/x/MEMORY.md",
+        ".claude/rules/python.md"
+      ]
+    }
+  ],
+  "manifest_relative_path": ".push-down-exclusions"
+}

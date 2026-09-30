@@ -128,6 +128,9 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride' {
         BeforeAll {
             # Imported without -Force so the Context binds to the instance the hook loaded.
             Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution/EpicScopeResolution.psm1").Path
+            Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1").Path
+            Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+            Mock Resolve-WorktreeEpicTarget -ModuleName EpicScopeResolution { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = $SessionRoot; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
         }
 
         BeforeEach {

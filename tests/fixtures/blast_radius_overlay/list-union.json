@@ -1,0 +1,5 @@
+{
+  "base_text": "{\n  \"version\": 1,\n  \"shared_surfaces\": [\n    \"a.json\",\n    \"b.json\"\n  ],\n  \"mandate_reads\": [],\n  \"path_roots\": [\n    \"src\"\n  ]\n}\n",
+  "overlay_text": "{\"shared_surfaces\": [\"c.json\", \"a.json\", \"c.json\"], \"mandate_reads\": [\"docs/**\"], \"mergeable_paths\": [\"**/*.props\"]}\n",
+  "expected_text": "{\n  \"version\": 1,\n  \"shared_surfaces\": [\n    \"a.json\",\n    \"b.json\",\n    \"c.json\"\n  ],\n  \"mandate_reads\": [\n    \"docs/**\"\n  ],\n  \"path_roots\": [\n    \"src\"\n  ],\n  \"mergeable_paths\": [\n    \"**/*.props\"\n  ]\n}\n"
+}
