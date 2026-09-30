@@ -1151,6 +1151,43 @@ items:
 
 # Parallel Run: bug-burndown-2026-09-29
 
-Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
+Run manifest maintained by parallel-planner. All 22 items are prepared: preflight ALL CLEAR and a declared blast radius that passed V1 and V2. Cohorts are seeded at generation 0 from the derived conflict graph (46 edges, 8 tolerated overlaps) and passed the recomputation-parity check.
 
-Prepared: 22 of 22. Pending: .
+## Cohorts (generation 0)
+
+| cohort | issue_num |
+| --- | --- |
+| 0 | 512, 623, 659, 723, 743, 764 |
+| 1 | 406, 609, 647, 734, 739, 744 |
+| 2 | 527, 532, 543, 741 |
+| 3 | 510, 645, 658, 756 |
+| 4 | 338, 740 |
+
+## Items
+
+| issue_num | kind | complexity | branch |
+| --- | --- | --- | --- |
+| 338 | bug | C2 | bug/potential-entry-ide-launcher-audit-gaps-338 |
+| 406 | bug | C2 | bug/potential-to-issue-python-files-oversized-406 |
+| 510 | bug | C2 | bug/claude-resource-parity-enumerates-gitignored-state-510 |
+| 512 | bug | C1 | bug/unauthorized-noqa-e501-in-blast-radius-parity-test-512 |
+| 527 | bug | C3 | bug/poshqc-coverage-denominator-not-reproducible-527 |
+| 532 | bug | C3 | bug/parallel-parent-routes-on-a-band-nothing-produces-532 |
+| 543 | bug | C3 | bug/epic-planner-ready-gate-demands-codex-only-launch-binding-543 |
+| 609 | bug | C2 | bug/bash-lane-assertion-newline-edges-divergence-609 |
+| 623 | bug | C3 | bug/promotion-receipt-destination-unverified-623 |
+| 645 | feature | C3 | feature/portable-handoff-614-review-follow-ups-645 |
+| 647 | bug | C3 | bug/test-tree-typecheck-not-gated-647 |
+| 658 | bug | C3 | bug/epic-child-prs-trigger-no-ci-658 |
+| 659 | bug | C3 | bug/epic-wave-barrier-violations-lack-start-guard-659 |
+| 723 | bug | C2 | bug/npm-publish-verify-window-too-short-723 |
+| 734 | bug | C3 | bug/quality-tiers-yml-missing-and-unenforced-734 |
+| 739 | bug | C3 | bug/npm-token-guard-gaps-739 |
+| 740 | bug | C3 | bug/pr-context-helper-duplication-and-vacuous-tests-740 |
+| 741 | bug | C3 | bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741 |
+| 743 | bug | C3 | bug/ci-gaps-linux-pester-and-kcov-set-u-743 |
+| 744 | bug | C3 | bug/orchestration-completion-gate-and-tooling-friction-744 |
+| 756 | bug | C2 | bug/cleanup-worktrees-631-spec-contradiction-and-untested-error-paths-756 |
+| 764 | bug | C2 | bug/feature-review-skill-cites-nonexistent-validator-764 |
+
+Scheduling detail (conflict edges with hard/cost/benefit, tolerated overlaps, lane-assertion result) is recorded in artifacts/orchestration/parallel-planner-state.json.
