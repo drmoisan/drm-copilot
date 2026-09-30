@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-09-30T12:26:56Z
+- `last_updated`: 2026-09-30T13:24:40Z
 
 **Items**
 
@@ -30,11 +30,11 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 532 | docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532 | 2 | scheduled | not_started |  |  |  |  |  |
 | 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | scheduled | not_started |  |  |  |  |  |
 | 609 | docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609 | 1 | scheduled | not_started |  |  |  |  |  |
-| 623 | docs/features/active/promotion-receipt-destination-unverified-623 | 0 | in_flight | worktree_created |  |  | 2026-09-30T12:21:20Z |  |  |
+| 623 | docs/features/active/promotion-receipt-destination-unverified-623 | 0 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/804 |  | 2026-09-30T12:21:20Z |  |  |
 | 645 | docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645 | 3 | scheduled | not_started |  |  |  |  |  |
 | 647 | docs/features/active/2026-09-07-test-tree-typecheck-not-gated-647 | 1 | scheduled | not_started |  |  |  |  |  |
 | 658 | docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658 | 3 | scheduled | not_started |  |  |  |  |  |
-| 659 | docs/features/active/2026-09-08-epic-wave-barrier-violations-lack-start-guard-659 | 0 | scheduled | not_started |  |  |  |  |  |
+| 659 | docs/features/active/2026-09-08-epic-wave-barrier-violations-lack-start-guard-659 | 0 | in_flight | worktree_created |  |  | 2026-09-30T13:24:40Z |  |  |
 | 723 | docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723 | 0 | scheduled | not_started |  |  |  |  |  |
 | 734 | docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734 | 1 | scheduled | not_started |  |  |  |  |  |
 | 739 | docs/features/active/2026-09-27-npm-token-guard-gaps-739 | 1 | scheduled | not_started |  |  |  |  |  |
