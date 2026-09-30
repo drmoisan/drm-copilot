@@ -3,7 +3,7 @@
 Timestamp: 2026-09-29T23-31
 Command: SW procedure (LH-2) and per-phase A2 runs
 EXIT_CODE: 0
-Output Summary: Latest entry 1 (P1-T2): WorktreeItemResolution.psm1 written through SW; SW-4 hashes equal.
+Output Summary: Latest entry 12 (P8-T4): enforce-parallel-worktree-removal-gate.ps1 written through SW; SW-4 hashes equal.
 
 ## Live-file writes
 
@@ -20,6 +20,7 @@ Output Summary: Latest entry 1 (P1-T2): WorktreeItemResolution.psm1 written thro
 | 9 | P6-T4 | .claude/hooks/enforce-epic-merge-gate.ps1 (MRG, next repository write) | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 | True (EBE5EC17E3109023551FDFE458A440088787F2732CC5A85BCA6C81E7F588A678) | 2026-09-30T00-06 | n/a |
 | 10 | P7-T3 | .claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1 (EREMR, new sibling first) | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 | True (57B410B45518393450AF62710706A4D6D2101B7C2885772B32852D28AF0750E9) | 2026-09-30T00-12 | n/a |
 | 11 | P7-T4 | .claude/hooks/enforce-epic-worktree-removal-gate.ps1 (EREM, next repository write) | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 | True (3042E2804480999462D308C25188064F673E519B81091F140E1EA18E99D4D060) | 2026-09-30T00-13 | n/a |
+| 12 | P8-T4 | .claude/hooks/enforce-parallel-worktree-removal-gate.ps1 (PREM) | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 | True (67CB665EDF02839E58EF5A6FBC3F311E0C872B2B4EFA56B0683047D8C8EA1F25) | 2026-09-30T00-19 | n/a |
 
 ## Copy-drift probes (D13)
 
@@ -30,6 +31,7 @@ Output Summary: Latest entry 1 (P1-T2): WorktreeItemResolution.psm1 written thro
 | P5-T1 | False | 1A99715D69ECA03D7295A6062D5E6AEF74782B168122A92F94059F364C38EEE8 | 1A99715D69ECA03D7295A6062D5E6AEF74782B168122A92F94059F364C38EEE8 | False | 2026-09-29T23-59 |
 | P6-T1 | False | 1A99715D69ECA03D7295A6062D5E6AEF74782B168122A92F94059F364C38EEE8 | 1A99715D69ECA03D7295A6062D5E6AEF74782B168122A92F94059F364C38EEE8 | False | 2026-09-30T00-03 |
 | P7-T1 | False | 57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD | 57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD | False | 2026-09-30T00-10 |
+| P8-T1 | False | 57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD | 57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD | False | 2026-09-30T00-17 |
 
 ## Suite results
 
@@ -45,3 +47,5 @@ Output Summary: Latest entry 1 (P1-T2): WorktreeItemResolution.psm1 written thro
 | P6-T13 | SET-MERGE | 141 | 141 | 0 | 2026-09-30T00-09 |
 | P7-T12 | G5 | 6 | 6 | 0 | 2026-09-30T00-16 |
 | P7-T13 | SET-EREM | 154 | 154 | 0 | 2026-09-30T00-16 |
+| P8-T10 | G6 | 6 | 6 | 0 | 2026-09-30T00-24 |
+| P8-T11 | SET-PREM | 151 | 151 | 0 | 2026-09-30T00-24 |

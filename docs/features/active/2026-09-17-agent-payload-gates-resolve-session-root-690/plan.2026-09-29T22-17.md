@@ -338,24 +338,24 @@ The searches in this plan use these fixed strings, quoted here so each is an exp
 - [x] [P7-T13] Run SET-EREM (A2). Write FEATURE/evidence/qa-gates/pester-set-erem-p7.TS.md and append to WLOG. Acceptance: `TotalCount=` equals BASE_EREM plus 6 and every `FAILED:` line is a member of the P0-T21 baseline failure set.
 - [x] [P7-T14] Line counts for EREM, EREMR, G5, and the EXIST-EREM suites (A4). Write FEATURE/evidence/qa-gates/line-counts-p7.TS.md. Acceptance: every value is at most 500.
 - [x] [P7-T15] Python parity (CMD-PY-PARITY). Write FEATURE/evidence/regression-testing/python-parity-p7.TS.md. Acceptance: as P3-T17.
-- [ ] [P7-T16] Commit and push Phase 7. Commands: CMD-GIT-ADD with P7-FILES, the FEATURE evidence directory, and PLAN, CMD-GIT-COMMIT with message "fix(690): resolve epic worktree-removal checkpoints by worktree path", CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing and the push exits 0.
+- [x] [P7-T16] Commit and push Phase 7. Commands: CMD-GIT-ADD with P7-FILES, the FEATURE evidence directory, and PLAN, CMD-GIT-COMMIT with message "fix(690): resolve epic worktree-removal checkpoints by worktree path", CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing and the push exits 0.
 
 ### Phase 8 — Parallel Worktree-Removal Gate
 
-- [ ] [P8-T1] D13 copy-drift gate (read-only). Command, WLOG row, and acceptance as P3-T1, artifact FEATURE/evidence/qa-gates/epic-copy-drift-p8.TS.md.
-- [ ] [P8-T2] Stage and check PREM per Appendix B9 (SW-1, SW-2). Acceptance: A15 prints the clean `STAGE-CHECK` line for `SCRATCH/stage/enforce-parallel-worktree-removal-gate.ps1`.
-- [ ] [P8-T3] SW-3 for PREM. Acceptance: the Write succeeds without a hook denial.
-- [ ] [P8-T4] SW-4 for PREM and the WLOG entry. Acceptance: hashes equal; WLOG records PREM.
-- [ ] [P8-T5] Write G6 per Appendix C11 (6 rows). Acceptance: the Write succeeds without a hook denial.
-- [ ] [P8-T6] Add DT-LINE with seam `Resolve-ParallelWorktreeGateRunTarget` to each EXIST-PREM suite's relevant `BeforeAll` (for `CleanupWorktreeManifestGateMatrix.Tests.ps1`, the parallel `Describe` `BeforeAll` at line 272 (271 at `d6bb5c65`, moved by P7-T7)), and in the two read-seam rows of `enforce-parallel-worktree-removal-gate.Tests.ps1` (lines 317, 323) pass `-Path` a test-local absolute synthetic path and compare the ParameterFilters to it, leaving assertion lines unchanged. Acceptance: CMD-GIT-COUNT with literal `Mock Resolve-ParallelWorktreeGateRunTarget` over the four EXIST-PREM files prints four lines, each with count 1.
-- [ ] [P8-T7] Mirror PREM into CB (CMD-CP). Acceptance: A13 prints `PAIR-SUMMARY pairs=1 unequal=0`.
-- [ ] [P8-T8] Format: MCP-PS-FORMAT (scan_folders `.claude/hooks`, `tests/scripts/claude-hooks`); CMD-GIT-STATUS; A6 over PREM, G6, and the EXIST-PREM suites. Write FEATURE/evidence/qa-gates/format-p8.TS.md. Acceptance: the MCP call returns; CMD-GIT-STATUS names no path outside P8-FILES, the FEATURE evidence directory, and the plan file; `FORMAT-SUMMARY ChangedCount=0`.
-- [ ] [P8-T9] Analyze: MCP-PS-ANALYZE; A7 over the P8-T8 files. Write FEATURE/evidence/qa-gates/analyze-p8.TS.md. Acceptance: the MCP call returns and `PSSA-SUMMARY DiagnosticCount=0`.
-- [ ] [P8-T10] Run G6 (A2 with `-Path tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.WorktreeResolution.Tests.ps1`). Write FEATURE/evidence/regression-testing/prem-worktree-resolution.TS.md and append to WLOG. Acceptance: `TotalCount=6`, `PassedCount=6`, `FailedCount=0`.
-- [ ] [P8-T11] Run SET-PREM (A2). Write FEATURE/evidence/qa-gates/pester-set-prem-p8.TS.md and append to WLOG. Acceptance: `TotalCount=` equals BASE_PREM plus 6 and every `FAILED:` line is a member of the P0-T22 baseline failure set.
-- [ ] [P8-T12] Line counts for PREM, G6, and the EXIST-PREM suites (A4). Write FEATURE/evidence/qa-gates/line-counts-p8.TS.md. Acceptance: every value is at most 500.
-- [ ] [P8-T13] Python parity (CMD-PY-PARITY). Write FEATURE/evidence/regression-testing/python-parity-p8.TS.md. Acceptance: as P3-T17.
-- [ ] [P8-T14] Commit and push Phase 8. Commands: CMD-GIT-ADD with P8-FILES, the FEATURE evidence directory, and PLAN, CMD-GIT-COMMIT with message "fix(690): resolve parallel worktree-removal checkpoints by worktree path", CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing and the push exits 0.
+- [x] [P8-T1] D13 copy-drift gate (read-only). Command, WLOG row, and acceptance as P3-T1, artifact FEATURE/evidence/qa-gates/epic-copy-drift-p8.TS.md.
+- [x] [P8-T2] Stage and check PREM per Appendix B9 (SW-1, SW-2). Acceptance: A15 prints the clean `STAGE-CHECK` line for `SCRATCH/stage/enforce-parallel-worktree-removal-gate.ps1`.
+- [x] [P8-T3] SW-3 for PREM. Acceptance: the Write succeeds without a hook denial.
+- [x] [P8-T4] SW-4 for PREM and the WLOG entry. Acceptance: hashes equal; WLOG records PREM.
+- [x] [P8-T5] Write G6 per Appendix C11 (6 rows). Acceptance: the Write succeeds without a hook denial.
+- [x] [P8-T6] Add DT-LINE with seam `Resolve-ParallelWorktreeGateRunTarget` to each EXIST-PREM suite's relevant `BeforeAll` (for `CleanupWorktreeManifestGateMatrix.Tests.ps1`, the parallel `Describe` `BeforeAll` at line 272 (271 at `d6bb5c65`, moved by P7-T7)), and in the two read-seam rows of `enforce-parallel-worktree-removal-gate.Tests.ps1` (lines 317, 323) pass `-Path` a test-local absolute synthetic path and compare the ParameterFilters to it, leaving assertion lines unchanged. Acceptance: CMD-GIT-COUNT with literal `Mock Resolve-ParallelWorktreeGateRunTarget` over the four EXIST-PREM files prints four lines, each with count 1.
+- [x] [P8-T7] Mirror PREM into CB (CMD-CP). Acceptance: A13 prints `PAIR-SUMMARY pairs=1 unequal=0`.
+- [x] [P8-T8] Format: MCP-PS-FORMAT (scan_folders `.claude/hooks`, `tests/scripts/claude-hooks`); CMD-GIT-STATUS; A6 over PREM, G6, and the EXIST-PREM suites. Write FEATURE/evidence/qa-gates/format-p8.TS.md. Acceptance: the MCP call returns; CMD-GIT-STATUS names no path outside P8-FILES, the FEATURE evidence directory, and the plan file; `FORMAT-SUMMARY ChangedCount=0`.
+- [x] [P8-T9] Analyze: MCP-PS-ANALYZE; A7 over the P8-T8 files. Write FEATURE/evidence/qa-gates/analyze-p8.TS.md. Acceptance: the MCP call returns and `PSSA-SUMMARY DiagnosticCount=0`.
+- [x] [P8-T10] Run G6 (A2 with `-Path tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.WorktreeResolution.Tests.ps1`). Write FEATURE/evidence/regression-testing/prem-worktree-resolution.TS.md and append to WLOG. Acceptance: `TotalCount=6`, `PassedCount=6`, `FailedCount=0`.
+- [x] [P8-T11] Run SET-PREM (A2). Write FEATURE/evidence/qa-gates/pester-set-prem-p8.TS.md and append to WLOG. Acceptance: `TotalCount=` equals BASE_PREM plus 6 and every `FAILED:` line is a member of the P0-T22 baseline failure set.
+- [x] [P8-T12] Line counts for PREM, G6, and the EXIST-PREM suites (A4). Write FEATURE/evidence/qa-gates/line-counts-p8.TS.md. Acceptance: every value is at most 500.
+- [x] [P8-T13] Python parity (CMD-PY-PARITY). Write FEATURE/evidence/regression-testing/python-parity-p8.TS.md. Acceptance: as P3-T17.
+- [x] [P8-T14] Commit and push Phase 8. Commands: CMD-GIT-ADD with P8-FILES, the FEATURE evidence directory, and PLAN, CMD-GIT-COMMIT with message "fix(690): resolve parallel worktree-removal checkpoints by worktree path", CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing and the push exits 0.
 
 ### Phase 9 — Parallel Drift Gate
 
