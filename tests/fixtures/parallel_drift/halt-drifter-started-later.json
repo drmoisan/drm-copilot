@@ -1,0 +1,101 @@
+{
+  "name": "halt-drifter-started-later",
+  "description": "The drifter started after its peer and is still never halted.",
+  "item_key": 446,
+  "changed_paths": [
+    "src/app.py"
+  ],
+  "at": "2026-08-08T10-00",
+  "computed_at": "2026-08-08T10-05",
+  "state": {
+    "items": [
+      {
+        "issue_num": 446,
+        "state": "in_flight",
+        "blast_radius": {
+          "paths": [
+            "scripts/dev_tools/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-08T09-00"
+        },
+        "worktree_created_at": "2026-08-08T09-30"
+      },
+      {
+        "issue_num": 445,
+        "state": "in_flight",
+        "blast_radius": {
+          "paths": [
+            "src/app.py"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-08T09-00"
+        },
+        "worktree_created_at": "2026-08-08T08-00"
+      }
+    ],
+    "conflict_edges": []
+  },
+  "config": {
+    "shared_surfaces": [
+      ".claude/settings.json"
+    ],
+    "shared_surface_globs": [],
+    "modules": {
+      "python-dev-tools": [
+        "scripts/dev_tools/**"
+      ],
+      "mcp-server": [
+        "packages/mcp-server/**"
+      ]
+    }
+  },
+  "expected": {
+    "result": "halt_required",
+    "item_key": 446,
+    "at": "2026-08-08T10-00",
+    "computed_at": "2026-08-08T10-05",
+    "escaped_paths": [
+      "src/app.py"
+    ],
+    "newly_conflicting_pairs": [
+      [
+        445,
+        446
+      ]
+    ],
+    "halted_item_keys": [
+      445
+    ],
+    "drift_event": {
+      "item_key": 446,
+      "declared": [
+        "scripts/dev_tools/**"
+      ],
+      "observed": [
+        "src/app.py"
+      ],
+      "escaped_paths": [
+        "src/app.py"
+      ],
+      "at": "2026-08-08T10-00",
+      "action": "halted_later_started_item"
+    },
+    "observed_radius": {
+      "paths": [
+        "src/app.py"
+      ],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "observed",
+      "computed_at": "2026-08-08T10-05"
+    }
+  }
+}

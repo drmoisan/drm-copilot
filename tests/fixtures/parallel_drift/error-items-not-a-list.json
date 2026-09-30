@@ -1,0 +1,34 @@
+{
+  "name": "error-items-not-a-list",
+  "description": "A checkpoint whose items collection is not a list is a data error.",
+  "item_key": 446,
+  "changed_paths": [
+    "src/app.py"
+  ],
+  "at": "2026-08-08T10-00",
+  "computed_at": "2026-08-08T10-05",
+  "state": {
+    "items": {
+      "446": {}
+    },
+    "conflict_edges": []
+  },
+  "config": {
+    "shared_surfaces": [
+      ".claude/settings.json"
+    ],
+    "shared_surface_globs": [],
+    "modules": {
+      "python-dev-tools": [
+        "scripts/dev_tools/**"
+      ],
+      "mcp-server": [
+        "packages/mcp-server/**"
+      ]
+    }
+  },
+  "expected_error": {
+    "exit_code": 1,
+    "stderr_prefix": "parallel drift detection failed: "
+  }
+}

@@ -25,6 +25,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-worktree-removal-gate.ps1").Path
         . $script:UnderTest
+        Mock Resolve-EpicWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     Context 'commands outside scope' {
@@ -172,14 +173,14 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
 
     Context 'real Test-Path read seam' {
         It 'Get-EpicWorktreeGateCheckpointContent returns $null when the checkpoint file does not exist' {
-            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $script:EpicCheckpointPath }
-            Get-EpicWorktreeGateCheckpointContent | Should -BeNullOrEmpty
+            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/erem-seam/artifacts/orchestration/epic-orchestrator-state.json' }
+            Get-EpicWorktreeGateCheckpointContent -Path '/synthetic-worktrees/erem-seam/artifacts/orchestration/epic-orchestrator-state.json' | Should -BeNullOrEmpty
         }
 
         It 'Get-EpicWorktreeGateCheckpointContent reads real content when the file exists' {
-            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $script:EpicCheckpointPath }
-            Mock -CommandName Get-Content -MockWith { '{"features":[]}' } -ParameterFilter { $LiteralPath -eq $script:EpicCheckpointPath }
-            Get-EpicWorktreeGateCheckpointContent | Should -Be '{"features":[]}'
+            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/erem-seam/artifacts/orchestration/epic-orchestrator-state.json' }
+            Mock -CommandName Get-Content -MockWith { '{"features":[]}' } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/erem-seam/artifacts/orchestration/epic-orchestrator-state.json' }
+            Get-EpicWorktreeGateCheckpointContent -Path '/synthetic-worktrees/erem-seam/artifacts/orchestration/epic-orchestrator-state.json' | Should -Be '{"features":[]}'
         }
     }
 
@@ -415,14 +416,14 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
 
     Context 'real Test-Path parallel read seam (AC-9)' {
         It 'Get-EpicWorktreeGateParallelCheckpointContent returns $null when the checkpoint file does not exist' {
-            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Get-EpicWorktreeGateParallelCheckpointContent | Should -BeNullOrEmpty
+            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/erem-seam/artifacts/orchestration/parallel-orchestrator-state.json' }
+            Get-EpicWorktreeGateParallelCheckpointContent -Path '/synthetic-worktrees/erem-seam/artifacts/orchestration/parallel-orchestrator-state.json' | Should -BeNullOrEmpty
         }
 
         It 'Get-EpicWorktreeGateParallelCheckpointContent reads real content when the file exists' {
-            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Mock -CommandName Get-Content -MockWith { '{"route_id":"parallel","items":[]}' } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Get-EpicWorktreeGateParallelCheckpointContent | Should -Be '{"route_id":"parallel","items":[]}'
+            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/erem-seam/artifacts/orchestration/parallel-orchestrator-state.json' }
+            Mock -CommandName Get-Content -MockWith { '{"route_id":"parallel","items":[]}' } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/erem-seam/artifacts/orchestration/parallel-orchestrator-state.json' }
+            Get-EpicWorktreeGateParallelCheckpointContent -Path '/synthetic-worktrees/erem-seam/artifacts/orchestration/parallel-orchestrator-state.json' | Should -Be '{"route_id":"parallel","items":[]}'
         }
     }
 }
@@ -435,6 +436,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1 manifest branch' {
     BeforeAll {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-worktree-removal-gate.ps1").Path
         Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1").Path -Force
+        Mock Resolve-EpicWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     BeforeEach {
