@@ -68,3 +68,20 @@ The guard was scoped to the reference forms seen historically.
 
 - [ ] Promote to GitHub issue (bug-report template)
 - [ ] Move to active fix folder / branch
+
+## Acceptance Criteria
+
+Source: research `research/research.2026-09-29T22-05.md` (Proposed Acceptance Criteria). Scope decisions for the research open questions: no `.npmrc` scan outside `.github/`, no `_auth`/`_password` keys, no `env.` context for `find_npm_token_references`, and no edit to the #712 pending evidence record; each is outside the issue's stated scope.
+
+- [ ] AC1: `tests/scripts/dev_tools/test_workflow_npm_token_guard.py` defines a helper that reports every line containing an `_authToken` configuration key in any casing: a registry-scoped `.npmrc` line, a bare `_authToken=` line, `NPM_CONFIG__AUTHTOKEN`, `npm_config__authToken`, `npm_config_//registry.npmjs.org/:_authToken`, and `npm config set [//registry.npmjs.org/:]_authToken`. Each form has its own parametrized positive case.
+- [ ] AC2: The `_authToken` helper does not report `id-token: write`, `registry-url: "https://registry.npmjs.org"`, `always-auth: true`, `NODE_AUTH_TOKEN: x`, or a letter-prefixed name such as `GH_AUTHTOKEN: x`. Each has a parametrized negative case.
+- [ ] AC3: `find_npm_token_references` reports `vars.NPM_TOKEN` and `vars['NPM_TOKEN']` in addition to the existing `secrets` forms, with a parametrized positive case for each; `vars.NPM_TOKEN_V2` is a parametrized negative case.
+- [ ] AC4: The module defines a helper that reports an `NPM_TOKEN` assignment: a YAML mapping key (block, flow, or quoted), a shell `NPM_TOKEN=` assignment including a `$GITHUB_ENV` append, and a PowerShell `$env:NPM_TOKEN =` assignment. Each has a parametrized positive case, and one case feeds the key from a differently named secret.
+- [ ] AC5: The `NPM_TOKEN` assignment helper does not report `${{ secrets.NPM_TOKEN }}`, `${{ env.NPM_TOKEN }}`, `NPM_TOKEN_V2: x`, `MY_NPM_TOKEN: x`, or `# NPM_TOKEN is no longer used`. Each has a parametrized negative case.
+- [ ] AC6: A tree-scan test asserts that no `*.yml`/`*.yaml` file under `.github/` has a line reported by any of the four helpers, and names each offender as `<relative-posix-path>:<line>`. The test passes on the current tree.
+- [ ] AC7: Parametrized cases `spaced-bracket` (`${{ secrets[ 'NPM_TOKEN' ] }}`) and `lowercase-bracket` (`${{ secrets['npm_token'] }}`) exist for `find_npm_token_references` and pass.
+- [ ] AC8: The module docstring no longer says "tracked files"; it states that files are enumerated and read from disk through `pathlib` whether or not version control tracks them, and it names every detected family.
+- [ ] AC9: Runbook `docs/features/completed/unused-npm-token-secret-712/runbooks/delete-unused-npm-token-secret.runbook.md` "Recording completion" step 2 names `docs/features/completed/unused-npm-token-secret-712/evidence/other/human-action-pending.2026-09-27T09-19.md` as the record to update, says not to change AC4 status (citing D5), and no longer references `docs/features/active/unused-npm-token-secret-712/` or `issue.md`.
+- [ ] AC10: `.github/workflows/publish-mcp-npm.yml` is not modified by this change (`git diff --name-only origin/main...HEAD -- .github` produces no output).
+- [ ] AC11: The test module is under 500 lines.
+- [ ] AC12: `poetry run black`, `poetry run ruff check`, and `poetry run pyright` on the test module report no errors, `poetry run pytest tests/scripts/dev_tools/test_workflow_npm_token_guard.py -q` passes, and the full suite `poetry run pytest --cov --cov-branch --cov-report=term-missing` meets the 85% line and 75% branch thresholds.
