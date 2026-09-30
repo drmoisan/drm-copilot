@@ -22,6 +22,7 @@
     ".claude/agents/staged-review.md",
     ".claude/agents/status-updater.md",
     ".claude/agents/task-researcher.md",
+    ".claude/hooks/enforce-batch-budget-route.ps1",
     ".claude/hooks/enforce-checkpoint-monotonic.ps1",
     ".claude/hooks/enforce-completion-consistency.ps1",
     ".claude/hooks/enforce-discovery-artifact-gate.ps1",

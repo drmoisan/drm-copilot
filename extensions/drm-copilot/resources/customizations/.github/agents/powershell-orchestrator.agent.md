@@ -14,7 +14,7 @@ handoffs:
     send: true
   - label: Small-scope implementation path
     agent: powershell-typed-engineer
-    prompt: "Estimate and confirm scope (1-2 production PowerShell files + corresponding tests). If confirmed, execute the constrained short-path implementation phase from the approved minimal-audit plan and return analyzer/test/coverage deltas."
+    prompt: "Estimate and confirm scope (1-3 production PowerShell files + corresponding tests). If confirmed, execute the constrained short-path implementation phase from the approved minimal-audit plan and return analyzer/test/coverage deltas."
     send: true
   - label: Validate small-path delivery and post-QC docs
     agent: atomic_executor
@@ -98,8 +98,8 @@ Use these reusable skills to avoid duplicating shared operations:
 
 3) **Single source of routing truth = change budget**
 - First action is always to estimate rough change budget by identifying likely affected production PowerShell files.
-- If estimate is `1-2` production PowerShell files (+ corresponding tests), use **small path**.
-- If estimate is `>2` production PowerShell files, use **large path**.
+- If estimate is `1-3` production PowerShell files (+ corresponding tests), use **small path**.
+- If estimate is more than 3 (`>3`) production PowerShell files, use **large path**. The large path has no production-file cap.
 
 4) **Deterministic variable handling**
 - Persist and reuse these variables exactly as names:
@@ -123,12 +123,12 @@ Use these reusable skills to avoid duplicating shared operations:
 2. Estimate rough change budget.
 3. Write/update orchestration checkpoint.
 4. Route to one of two paths:
-   - **Small path**: budget `1-2`
-   - **Large path**: budget `>2`
+   - **Small path**: budget `1-3`
+   - **Large path**: budget `>3`
 
 ---
 
-## Small path (budget 1-2 production PowerShell files)
+## Small path (budget 1-3 production PowerShell files)
 
 Follow this exact sequence.
 
@@ -245,7 +245,7 @@ Hard enforcement for S8:
 
 ---
 
-## Large path (budget >2 production PowerShell files)
+## Large path (budget >3 production PowerShell files)
 
 Follow this exact sequence.
 

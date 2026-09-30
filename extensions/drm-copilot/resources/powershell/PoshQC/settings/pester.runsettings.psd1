@@ -29,6 +29,7 @@
             '.claude/hooks/check-powershell-test-purity.ps1'
             '.claude/hooks/enforce-python-batch-budget.ps1'
             '.claude/hooks/enforce-powershell-batch-budget.ps1'
+            '.claude/hooks/enforce-batch-budget-route.ps1'
             # Issue #272 hardened this PreToolUse hook with a new orchestrator-state preflight
             # check; measured here so the change produces real per-file coverage evidence.
             '.claude/hooks/enforce-pr-author-skill.ps1'
@@ -134,6 +135,7 @@
             '.codex/hooks/check-powershell-test-purity.ps1'
             '.codex/hooks/enforce-python-batch-budget.ps1'
             '.codex/hooks/enforce-powershell-batch-budget.ps1'
+            '.codex/hooks/enforce-batch-budget-route.ps1'
             '.codex/hooks/enforce-evidence-locations.ps1'
             '.codex/hooks/enforce-checkpoint-monotonic.ps1'
             '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'
