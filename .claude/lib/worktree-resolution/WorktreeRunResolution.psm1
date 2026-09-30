@@ -408,7 +408,7 @@ function Resolve-WorktreeRunTargetByRecord {
         Epic checkpoints are searched in epic_merge_pr.pr_number and features[].pr_number, or
         features[].worktree_path; parallel checkpoints in items[].pr_number or
         items[].worktree_path. Zero matches resolve NoTarget, one resolves, and several are
-        Ambiguous. A blank value, or a pr_number that is not all digits, is NoTarget.
+        Ambiguous. A blank value, or a pr_number that is not all digits or does not fit a 64-bit integer, is NoTarget.
     .PARAMETER Kind
         epic or parallel.
     .PARAMETER RecordField
@@ -429,7 +429,9 @@ function Resolve-WorktreeRunTargetByRecord {
 
     $description = "{0} '{1}' in the {2} checkpoint" -f $RecordField, $Value, $Kind
     $isBlank = [string]::IsNullOrWhiteSpace($Value)
-    if ($isBlank -or ($RecordField -eq 'pr_number' -and $Value.Trim() -notmatch '^\d+$')) {
+    $parsedNumber = [long] 0
+    $isNumber = -not $isBlank -and $Value.Trim() -match '^\d+$' -and [long]::TryParse($Value.Trim(), [ref] $parsedNumber)
+    if ($isBlank -or ($RecordField -eq 'pr_number' -and -not $isNumber)) {
         return (New-WorktreeResolutionTargetResult -Status 'NoTarget' -SessionRoot $SessionRoot -Detail (
                 'the command names no usable {0}, so the {1} run it belongs to cannot be identified' -f $RecordField, $Kind))
     }

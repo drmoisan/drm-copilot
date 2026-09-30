@@ -235,6 +235,19 @@ Describe 'Resolve-WorktreeRunTargetByRecord' {
         # Assert
         $target.Status | Should -Be 'NoTarget'
     }
+
+    It 'B13 resolves NoTarget for a pull request value too large for a 64-bit integer without enumerating live roots' {
+        # Arrange: a recorded checkpoint would make an unguarded conversion throw.
+        Set-RecordTopology -Live @('/synthetic-worktrees/w-epic') -Epic @{ '/synthetic-worktrees/w-epic' = '{"route_id":"epic","features":[{"pr_number":812}]}' }
+
+        # Act
+        $target = Resolve-WorktreeRunTargetByRecord -Kind epic -RecordField pr_number -Value '12345678901234567890' -SessionRoot $script:Session
+
+        # Assert
+        $target.Status | Should -Be 'NoTarget'
+        $target.ReasonCode | Should -Be $script:NoTargetCode
+        Should -Invoke Get-WorktreeItemLiveRoot -ModuleName WorktreeRunResolution -Times 0 -Exactly
+    }
 }
 
 Describe 'Resolve-WorktreeOperandTarget' {
