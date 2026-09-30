@@ -18,7 +18,9 @@ tools:
   - "Bash(bash .claude/lib/bash/compute-cohorts.sh*)"
   - "Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"
   - "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"
+  - "Bash(bash .claude/lib/bash/abandon-parallel-item.sh*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1*)"
+  - "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1*)"
   - "Bash(dotnet tool restore*)"
   - "Bash(dotnet csharpier check *)"
   - "Bash(dotnet build *)"
@@ -94,12 +96,16 @@ batching use `compute-cohorts.sh` and `compute-concurrency-batches.sh` under the
 entry.
 
 The `poetry run` grants remain for the repository-local paths that still need an interpreter. The
-skill's `## Parallel-Level Checkpoint` section now validates through
-`mcp__drm-copilot__validate_orchestration_artifacts`, so exactly one named consumer is left: the
-drift-detection CLI, invoked as `poetry run python -m`. Each grant stays scoped to its own
-`poetry run python` invocation form — not to `poetry run` as a whole — so `pytest`, `black`,
-`ruff`, and every other `poetry run` subcommand remain outside the allowlist. The sibling persona
-`.claude/agents/parallel-planner.md` records the same destination-runtime posture.
+skill's `## Parallel-Level Checkpoint` section validates through
+`mcp__drm-copilot__validate_orchestration_artifacts`, and since issue #763 radius drift detection runs
+through the destination-runtime PowerShell entry point
+`.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1` and the abandon disposition through the
+bundled entry point `.claude/lib/bash/abandon-parallel-item.sh`, so no skill step names a
+`poetry run` consumer. The two `poetry run python` grants are left unchanged pending a separate
+removal decision. Each grant stays scoped to its own `poetry run python` invocation form — not to
+`poetry run` as a whole — so `pytest`, `black`, `ruff`, and every other `poetry run` subcommand
+remain outside the allowlist. The sibling persona `.claude/agents/parallel-planner.md` records the
+same destination-runtime posture.
 
 ## Startup Protocol
 

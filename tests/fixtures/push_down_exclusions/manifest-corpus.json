@@ -1,0 +1,109 @@
+{
+  "cases": [
+    {
+      "expected_entries": [],
+      "id": "empty-text",
+      "text": ""
+    },
+    {
+      "expected_entries": [],
+      "id": "comments-and-blank-only",
+      "text": "# a\n\n   \n  # b\n"
+    },
+    {
+      "expected_entries": [
+        {
+          "kind": "exact",
+          "line": 2,
+          "normalized": ".claude/rules/quality-tiers.md"
+        },
+        {
+          "kind": "glob",
+          "line": 4,
+          "normalized": ".claude/agent-memory/**"
+        }
+      ],
+      "id": "two-entries-with-comments",
+      "text": "# reason\n.claude/rules/quality-tiers.md\n\n.claude/agent-memory/**\n"
+    },
+    {
+      "expected_entries": [
+        {
+          "kind": "exact",
+          "line": 1,
+          "normalized": ".claude/rules/a.md"
+        },
+        {
+          "kind": "exact",
+          "line": 2,
+          "normalized": ".claude/rules/b.md"
+        }
+      ],
+      "id": "crlf-line-endings",
+      "text": ".claude/rules/a.md\r\n.claude/rules/b.md\r\n"
+    },
+    {
+      "expected_entries": [
+        {
+          "kind": "exact",
+          "line": 1,
+          "normalized": ".claude/rules/a.md"
+        }
+      ],
+      "id": "bom-stripped",
+      "text": "\ufeff.claude/rules/a.md\n"
+    },
+    {
+      "expected_entries": [
+        {
+          "kind": "directory",
+          "line": 1,
+          "normalized": ".claude/agent-memory/"
+        }
+      ],
+      "id": "trailing-slash-directory",
+      "text": ".claude/agent-memory/\n"
+    },
+    {
+      "expected_error_line": 1,
+      "id": "error-empty-after-normalization",
+      "text": "./\n"
+    },
+    {
+      "expected_error_line": 1,
+      "id": "error-absolute-posix",
+      "text": "/etc/x\n"
+    },
+    {
+      "expected_error_line": 1,
+      "id": "error-drive-prefix",
+      "text": "C:/x\n"
+    },
+    {
+      "expected_error_line": 1,
+      "id": "error-parent-segment",
+      "text": ".claude/../x\n"
+    },
+    {
+      "expected_error_line": 1,
+      "id": "error-negation",
+      "text": "!.claude/rules/x.md\n"
+    },
+    {
+      "expected_error_line": 1,
+      "id": "error-character-class",
+      "text": ".claude/rules/[ab].md\n"
+    },
+    {
+      "expected_error_line": 1,
+      "id": "error-wildcard-trailing-slash",
+      "text": ".claude/**/\n"
+    },
+    {
+      "expected_error_line": 4,
+      "id": "error-line-number-after-comments",
+      "text": "# c\n\n.claude/ok.md\n!bad\n"
+    }
+  ],
+  "manifest_relative_path": ".push-down-exclusions"
+}

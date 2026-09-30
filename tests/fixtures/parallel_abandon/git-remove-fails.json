@@ -1,0 +1,14 @@
+{
+  "name": "git-remove-fails",
+  "description": "A failed worktree removal after a successful close exits 1 with the reference message.",
+  "argv": ["--item", "42", "--disposition", "abandon", "--confirm-abandon", "--pr", "7", "--worktree", "../wt-42"],
+  "shim_exit": {"gh": 0, "git": 128},
+  "missing_executable": null,
+  "expected": {
+    "exit_code": 1,
+    "stderr_mode": "exact",
+    "stderr": "PARALLEL_ABANDON_ERROR: abandon side effect failed with exit code 128: git worktree remove ../wt-42",
+    "calls": [["gh", "pr", "close", "7"], ["git", "worktree", "remove", "../wt-42"]]
+  },
+  "divergence": null
+}

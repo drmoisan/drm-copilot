@@ -324,6 +324,12 @@
             # CodeCoverage.Path is an explicit per-file allow-list, so the relocated production
             # file is registered here to stay in the coverage denominator.
             '.claude/lib/ci-gate/Invoke-CiGateParser.ps1'
+            # Issue #763 ported radius drift detection to the destination runtime as two pure
+            # modules and an entry script under .claude/lib/parallel-drift. CodeCoverage.Path is an
+            # explicit per-file allow-list, so each new production file is registered here.
+            '.claude/lib/parallel-drift/ParallelDriftHalt.psm1'
+            '.claude/lib/parallel-drift/ParallelDrift.psm1'
+            '.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
