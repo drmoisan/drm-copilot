@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from scripts.dev_tools import potential_to_issue as mod
+from scripts.dev_tools import potential_to_issue_filesystem as filesystem_mod
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -291,3 +292,17 @@ def test_promote_potential_returns_destination_when_move_succeeds() -> None:
     assert outcome.messages[-1] == (
         f"Moved potential file to promoted folder: {EXPECTED_DEST}"
     )
+
+
+def test_filesystem_names_are_reexported() -> None:
+    """The workflow module re-exports the extracted filesystem seam unchanged.
+
+    Existing callers and test doubles import `FileSystem` and `RealFileSystem`
+    from `potential_to_issue`; both names must be the same objects defined in
+    `potential_to_issue_filesystem`.
+    """
+    # Arrange / Act: nothing to build; the names are resolved at import time.
+
+    # Assert
+    assert mod.FileSystem is filesystem_mod.FileSystem
+    assert mod.RealFileSystem is filesystem_mod.RealFileSystem

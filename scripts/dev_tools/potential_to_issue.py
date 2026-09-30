@@ -466,6 +466,9 @@ def promote_potential(
     filesystem.ensure_dir(promoted_dir)
     dest_path = promoted_dir / resolved.name
     filesystem.move(resolved, dest_path)
+    if not filesystem.exists(dest_path):
+        _emit(f"Promoted file missing after move: {dest_path}")
+        return PromotionOutcome(exit_code=1, messages=messages)
     _emit(f"Moved potential file to promoted folder: {dest_path}")
 
     return PromotionOutcome(exit_code=0, messages=messages, destination=dest_path)
