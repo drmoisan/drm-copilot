@@ -242,9 +242,15 @@ cross-call/conversation-state visibility.
   dependency's `merge_status` is `merged` or `worktree_removed`.
 - **Layer 2 — retrospective backstop:** the wave-barrier ordering invariant inside
   `validate_epic_orchestrator_state_text`, enforced at `epic-orchestrator` `SubagentStop` time via
-  the parameterized `validate-orchestrator-output.ps1` hook. It appends
-  `EPIC_WAVE_BARRIER_VIOLATION: <f> started before dependency <d> merged` when a dependency edge's
-  timing invariant is violated.
+  the parameterized `validate-orchestrator-output.ps1` hook. It checks only a dependent feature
+  that is treated as started: one with a string `worktree_created_at`, or with a `merge_status`
+  other than `not_started` (a missing or non-string `merge_status` counts as started). It appends
+  exactly one error per violated dependency edge. When the dependency's `merge_status` is not
+  `merged` or `worktree_removed`, the error is
+  `EPIC_WAVE_BARRIER_VIOLATION: <f> is treated as started while dependency <d> is not merged`.
+  Otherwise, when the dependency's `merge_confirmed_at` is later than the dependent's
+  `worktree_created_at`, the error is
+  `EPIC_WAVE_BARRIER_VIOLATION: <f> worktree_created_at precedes dependency <d> merge_confirmed_at`.
 
 Both layers are required; neither alone closes the gap. `epic-orchestrator` does not launch wave
 N+1 until every wave-N feature's dependency edges are durably confirmed merged, verified against
