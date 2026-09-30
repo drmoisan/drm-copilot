@@ -1197,17 +1197,25 @@ loop at P7-T1.
   `epic-child-launch-hardening.Tests.ps1`, `epic-child-worktree-launcher.Tests.ps1`, or
   `enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1` (SP1 prints absolute paths with
   backslash separators, so the match is on the file name alone; each name is unique in the
-  repository); the `Formatted: ` set, normalized as in P0-T10, equals the P0-T10 set; the post-pass
+  repository); the `Formatted: ` set, normalized as in P0-T10, equals the P0-T10 set after every P0-T10 entry ending with one of those four file names is removed; the post-pass
   porcelain listing equals the pre-pass listing. A `Formatted: ` line ending with one of those four
   file names is a failure; the file is corrected
   under the loop rule and the loop restarts at P7-T1.
 - [ ] [P7-T2] QC step 2 (PowerShell analyze) for the PowerShell files in scope, into
   `<FEATURE>/evidence/qa-gates/qc-ps-analyze.<ts>.md`: run
-  `pwsh -NoProfile -File <session-scratchpad>/ps-analyze.ps1`. Acceptance: `EXIT_CODE: 0` and the
-  output contains the line that begins `PSScriptAnalyzer passed: no findings under`. When P0-T11
-  recorded a baseline finding set, the findings table instead matches that set exactly and
-  contains no row naming any of the four file names listed in P7-T1 (matched on the file name
-  alone, because the table's script column is not expected to carry the directory).
+  `pwsh -NoProfile -File <session-scratchpad>/ps-analyze.ps1`. The reduced baseline set is the
+  P0-T11 baseline finding set after every P0-T11 row naming one of the four file names listed in
+  P7-T1 is removed (matched on the file name alone, because the table's script column is not
+  expected to carry the directory); when P0-T11 recorded the `PSScriptAnalyzer passed: no findings under`
+  line, the reduced baseline set is empty. Acceptance when the reduced baseline set is empty: the
+  artifact carries `ExpectedExitCode: 0`, the observed `EXIT_CODE:` is 0, and the output contains
+  the line that begins `PSScriptAnalyzer passed: no findings under` (`PoshQC.Analyzer.psm1:185`
+  prints it only when no finding remains). Acceptance when the reduced baseline set is non-empty:
+  the artifact carries `ExpectedExitCode:` equal to the P0-T11 `EXIT_CODE:` value, the observed
+  `EXIT_CODE:` equals that value, the issue count in the thrown `PSScriptAnalyzer reported` message
+  (`PoshQC.Analyzer.psm1:183`) equals the P0-T11 count minus the number of rows removed to form the
+  reduced baseline set, and the findings table matches the reduced baseline set exactly, so it
+  contains no row naming any of the four file names.
 - [ ] [P7-T3] QC step 3 (PowerShell test with coverage; type checking does not apply) for the
   PowerShell suites in scope, into `<FEATURE>/evidence/qa-gates/qc-ps-pester-full.<ts>.md`: run
   `pwsh -NoProfile -File <session-scratchpad>/ps-test-full.ps1`, then
