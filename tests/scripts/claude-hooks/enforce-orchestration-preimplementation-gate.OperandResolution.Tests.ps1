@@ -168,9 +168,12 @@ Describe 'preimplementation gate command leg' {
 
 Describe 'preimplementation gate import failure' {
     It 'O7 denies naming WorktreeRunResolution.psm1 when that import failed, and the entry point exits 0' {
-        # Arrange
+        # Arrange: reload the gate with the WorktreeRunResolution.psm1 import throwing, so
+        # the sibling's import guard records the failure; every other import is a no-op.
         $payload = ConvertTo-BashPayload -Command 'git add scripts/Sample.ps1'
-        $script:OrchestrationGateResolutionImportFailure = 'WorktreeRunResolution.psm1'
+        Mock Import-Module { }
+        Mock Import-Module { throw 'simulated import failure (issue #690)' } -ParameterFilter { $Name -like '*WorktreeRunResolution.psm1' }
+        . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-orchestration-preimplementation-gate.ps1").Path
         try {
             # Act
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $payload

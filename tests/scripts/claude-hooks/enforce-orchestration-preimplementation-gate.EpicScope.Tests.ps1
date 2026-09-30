@@ -318,6 +318,35 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 epic scope (issue #66
             Should -Invoke Get-Content -Times 1 -Exactly -ParameterFilter { $LiteralPath -eq $script:ParallelSeamPath -and $Raw }
         }
 
+        It 'issue #690 the relocated per-feature read seam returns an empty string when the checkpoint file is absent' {
+            # Arrange
+            $itemPath = '/synthetic-worktrees/item-seam/artifacts/orchestration/orchestrator-state.json'
+            Mock Test-Path { $false }
+            Mock Get-Content { throw 'an absent checkpoint must not be read' }
+
+            # Act
+            $text = Get-CheckpointContent -Path $itemPath
+
+            # Assert
+            $text | Should -BeExactly ''
+            Should -Invoke Test-Path -Times 1 -Exactly -ParameterFilter { $LiteralPath -eq $itemPath }
+            Should -Invoke Get-Content -Times 0 -Exactly
+        }
+
+        It 'issue #690 the relocated per-feature read seam returns the raw checkpoint text when the file exists' {
+            # Arrange
+            $itemPath = '/synthetic-worktrees/item-seam/artifacts/orchestration/orchestrator-state.json'
+            Mock Test-Path { $true }
+            Mock Get-Content { '{"route_id":"small"}' }
+
+            # Act
+            $text = Get-CheckpointContent -Path $itemPath
+
+            # Assert
+            $text | Should -BeExactly '{"route_id":"small"}'
+            Should -Invoke Get-Content -Times 1 -Exactly -ParameterFilter { $LiteralPath -eq $itemPath -and $Raw }
+        }
+
         It 'issue #663 the epic-scope decision returns null without resolving when the call carries neither a command nor a path' {
             # Arrange
             Mock Resolve-EpicScopeCheckpoint { throw 'a call with no leg must not be resolved' }
