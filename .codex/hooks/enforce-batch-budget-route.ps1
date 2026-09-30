@@ -1,19 +1,21 @@
 <#
 .SYNOPSIS
-    Pure route helpers for the PowerShell batch-budget hook.
+    Pure route helpers shared by the batch-budget hooks.
 
 .DESCRIPTION
     Defines the functions that read the selected route from orchestrator checkpoint
     text and decide whether that checkpoint selects the uncapped orchestrated large
-    path. The file is dot-sourced by enforce-powershell-batch-budget.ps1 and has no
-    entry point. None of the functions reads a file or an environment variable; the
-    checkpoint text is supplied by the caller.
+    path. The file is dot-sourced by the PowerShell and Python batch-budget hooks and
+    has no entry point. The Claude and Codex runtime copies of this file are
+    byte-identical, and a parity test holds them identical. None of the functions
+    reads a file or an environment variable; the checkpoint text is supplied by the
+    caller.
 
 .NOTES
     Compatible with PowerShell 7+.
 #>
 
-function ConvertFrom-PowerShellBatchBudgetCheckpoint {
+function ConvertFrom-BatchBudgetCheckpoint {
     <#
     .SYNOPSIS
         Parses orchestrator checkpoint text into a checkpoint object.
@@ -50,7 +52,7 @@ function ConvertFrom-PowerShellBatchBudgetCheckpoint {
     return $null
 }
 
-function Get-PowerShellBatchBudgetSelectedRoute {
+function Get-BatchBudgetSelectedRoute {
     <#
     .SYNOPSIS
         Returns the route selected by an orchestrator checkpoint.
@@ -69,7 +71,7 @@ function Get-PowerShellBatchBudgetSelectedRoute {
         [string] $CheckpointText
     )
 
-    $checkpoint = ConvertFrom-PowerShellBatchBudgetCheckpoint -CheckpointText $CheckpointText
+    $checkpoint = ConvertFrom-BatchBudgetCheckpoint -CheckpointText $CheckpointText
     if ($null -eq $checkpoint) {
         return ''
     }
@@ -89,7 +91,7 @@ function Get-PowerShellBatchBudgetSelectedRoute {
     return ''
 }
 
-function Test-PowerShellBatchBudgetLargePathRoute {
+function Test-BatchBudgetLargePathRoute {
     <#
     .SYNOPSIS
         Reports whether an orchestrator checkpoint selects the uncapped large path.
@@ -110,12 +112,12 @@ function Test-PowerShellBatchBudgetLargePathRoute {
     )
 
     try {
-        $checkpoint = ConvertFrom-PowerShellBatchBudgetCheckpoint -CheckpointText $CheckpointText
+        $checkpoint = ConvertFrom-BatchBudgetCheckpoint -CheckpointText $CheckpointText
         if ($null -eq $checkpoint) {
             return $false
         }
 
-        $route = Get-PowerShellBatchBudgetSelectedRoute -CheckpointText $CheckpointText
+        $route = Get-BatchBudgetSelectedRoute -CheckpointText $CheckpointText
         if (-not (@('large', 'remediation', 'preparation') -ccontains $route)) {
             return $false
         }

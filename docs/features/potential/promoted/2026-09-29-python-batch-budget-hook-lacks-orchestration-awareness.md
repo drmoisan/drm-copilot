@@ -1,10 +1,13 @@
-# python-batch-budget-hook-lacks-orchestration-awareness (Potential Bug)
+# python-batch-budget-hook-lacks-orchestration-awareness (Issue #773)
 
 - Date captured: 2026-09-29
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/python-batch-budget-hook-lacks-orchestration-awareness/ (Issue #773)
 - Related: #769
 
+- Issue: #773
+- Issue URL: https://github.com/drmoisan/drm-copilot/issues/773
+- Last Updated: 2026-09-29
 ## Summary
 
 The Python batch-budget hooks follow the session-keyed per-batch pattern that #769 replaced for PowerShell. They count production and test files per session, deny when a fixed cap is reached, and tell the caller to split the work, raise the cap, or delete the state file. They do not read the orchestrator checkpoint, so an orchestrated large-path Python change is capped the same way a direct-mode change is.
@@ -29,7 +32,7 @@ The deny messages are at `.claude/hooks/enforce-python-batch-budget.ps1:293` and
 
 ## Constraints & Risks
 
-- The Python threshold differs from the PowerShell threshold and must be confirmed before the text surfaces are reconciled.
+- Threshold confirmed 2026-09-29: every Python surface already agrees that 1-3 production files is the small path and more than 3 is the large path (`.claude/skills/python-change-budget-router/SKILL.md` Canonical Routing Rules; the hook denies the 4th production file; `extensions/drm-copilot/src/lib/validate/codex-topology-resolver.ts` `LANGUAGE_BUDGETS.python.max_production_files: 3`). No threshold text changes are required; only the per-batch cap, batching, override, and scope-expansion text is removed. Per the owner's #769 direction, the large path has no cap on the number of files it may touch.
 - The Codex topology resolver carries its own Python budget; any change must keep the resolver and the hook text consistent.
 
 ## Next Step
