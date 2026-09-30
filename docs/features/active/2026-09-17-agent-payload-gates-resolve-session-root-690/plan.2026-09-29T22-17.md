@@ -431,7 +431,7 @@ If any Phase 12 step fails or changes a tracked file, fix the cause, re-mirror a
 
 ### Phase 13 — Python Parity, Scope Guards, and Coverage Comparison
 
-- [ ] [P13-T1] Python parity. Command: CMD-PY-PARITY. Write FEATURE/evidence/qa-gates/python-parity.TS.md. Acceptance: every node other than the KL-510 node is PASSED and that node satisfies KL-510 (AC-44).
+- [x] [P13-T1] Python parity. Command: CMD-PY-PARITY. Write FEATURE/evidence/qa-gates/python-parity.TS.md. Acceptance: every node other than the KL-510 node is PASSED and that node satisfies KL-510 (AC-44).
 - [ ] [P13-T2] Python regression over `tests/scripts/dev_tools`. Command: `poetry run pytest tests/scripts/dev_tools -q -rf`. Write FEATURE/evidence/qa-gates/python-dev-tools.TS.md. Acceptance: every `FAILED` line is a member of the P0-T38 baseline failure set and the collected total equals the P0-T38 total. When the KL-510 node is the only FAILED line and satisfies case (b), the artifact carries `ExpectedExitCode: 1`.
 - [ ] [P13-T3] No Python file changed. Commands: `git diff --name-only BASE_SHA -- "*.py"` and `git status --porcelain -- "*.py"`. Write FEATURE/evidence/qa-gates/python-scope.TS.md. Acceptance: both commands print nothing.
 - [ ] [P13-T4] No `.codex` file changed (AC-62). Commands: `git diff --name-only BASE_SHA -- .codex` and `git status --porcelain -- .codex`. Write FEATURE/evidence/qa-gates/codex-scope.TS.md. Acceptance: both commands print nothing.
