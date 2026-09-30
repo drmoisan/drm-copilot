@@ -5,40 +5,366 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-29T22-26
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 1.0
+- **Work Mode:** minor-audit
+- **Complexity band:** C3 (signal: `cross_module_contract_change`; floor C3).
+- **Branch:** `bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741`
+- **Language in scope:** bash (shell scripts and bats tests); one Python pytest run for bundle-mirror parity only
+- **Requirements source (sole AC source):** `docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/issue.md`, section `## Acceptance Criteria` (AC-1 through AC-12). The `## Scope Decisions` section of the same file is binding design input.
+- **Design input (not a requirements source):** `docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/research/research.2026-09-29T22-35.md`. Every citation this plan takes from it was re-derived against the current tree at planning time.
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+**Mode note (minor-audit):** `spec.md` and `user-story.md` must not exist in the feature folder and are not required. Only the `## Acceptance Criteria` section of `issue.md` is the acceptance-criteria source. Execution fails closed if `spec.md` or `user-story.md` appears in the feature folder, if the `## Acceptance Criteria` section is missing from `issue.md`, if a required Phase 0 artifact is missing or incomplete, or if checklist state contradicts evidence on disk.
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+**Fail-closed evidence rule:** Shell policy (`.claude/rules/shell.md`, `.claude/rules/quality-tiers.md`) requires kcov line coverage >= 85%; kcov measures no branch coverage for bash, so no branch gate applies. Baseline and final-QC coverage tasks record numeric values. If any required baseline artifact, final-QC artifact, or coverage value is missing, the audit verdict is BLOCKED or INCOMPLETE, never PASS.
 
+**Evidence accounting rule:** Every evidence-producing task names its artifact path. A task is not checked off until its artifact exists and carries every required field. Every command-step artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. An artifact whose expected exit code is not 0 also carries `ExpectedExitCode:`. The top-level `EXIT_CODE:` of a multi-command artifact is the exit code of the task's last command other than a grep; a task made only of greps records the last grep's exit code. Every other command's exit code and printed value are recorded inside `Output Summary:`. No planned command task may record `EXIT_CODE: SKIPPED`.
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+## Terms used in every task
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+- FEATURE means `docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741`. Evidence is written only under FEATURE/evidence/baseline/, FEATURE/evidence/regression-testing/, FEATURE/evidence/qa-gates/, and FEATURE/evidence/other/. No `artifacts/` path is an evidence location. The caller supplied no non-canonical evidence path, so no override was recorded.
+- TS means the execution time of the task in yyyy-MM-ddTHH-mm form.
+- SCRATCH means the executor's session scratchpad directory, outside the repository. Artifacts record it as the literal token SCRATCH, never as a host path.
+- BASE_SHA means the commit recorded by P0-T3 before any edit. Every scope diff, changed-line computation, and byte-identity comparison is anchored to it. BASE_SHA is used instead of `origin/main` because `origin/main` may advance during execution (issue #756 edits the same library); a comparison against a moving ref would report upstream changes as changes made by this plan.
+- BRANCH means `bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741`.
+- BATS means `npx --yes bats --formatter tap`. The TAP formatter is fixed so every run prints a `1..N` plan line and one `ok` or `not ok` line per test.
+- TARGETED-SET means these eight existing suites, in this order: `tests/shell/test_cleanup_worktrees_report_records.bats`, `tests/shell/test_cleanup_worktrees_scan_helper.bats`, `tests/shell/test_cleanup_worktrees_scan_seam.bats`, `tests/shell/test_cleanup_worktrees_enumeration.bats`, `tests/shell/test_cleanup_worktrees_preserve.bats`, `tests/shell/test_cleanup_worktrees_preserve_failures.bats`, `tests/shell/test_cleanup_worktrees_preserve_eol.bats`, `tests/shell/test_cleanup_worktrees_cli.bats`. Planning-time `@test` count: 86.
+- NEW-SUITE means `tests/shell/test_cleanup_worktrees_scan_roots.bats` (created by P1-T3, 16 tests).
+- CHANGED-SH means the five canonical production scripts this plan edits: `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh`, `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh`, `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh`, `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh`, `.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`.
+- Scratch scripts A1 and A2 are defined verbatim in the Appendix and run as `sh SCRATCH/<name>.sh <arguments>` from the repository root.
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#741-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+## Execution constraints
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+- Host: Windows with Git Bash. The agent worktree rejects command text containing the words bash, pwsh, or wsl, and rejects heredocs. Every command in this plan avoids them. Scratch scripts are written with the Write tool into SCRATCH.
+- Local tools: `shfmt`, `shellcheck`, `npx --yes bats`, `poetry`, `gh`, `git`, `grep`, `wc`, `cp`, `sha256sum`. kcov has no local route; coverage comes only from `.github/workflows/_shell-coverage.yml` on GitHub Actions. CI tool versions (shfmt 3.8.0, apt shellcheck and bats, kcov v43) are canonical when local and CI results disagree (`.claude/rules/shell.md`).
+- CI runtime ranges from about 6 to more than 30 minutes. Poll; slowness is not failure. `jq` is not installed locally; use `gh ... --json ... --jq`.
+- Hooks. If a hook denies a command, stop and report the denial text. Do not bypass it.
+- Stop conditions. When a task's stop condition is reached, write the task's artifact with the stop reason and report to the caller. Do not improvise a substitute design.
+- Issue #756 boundary (AC-12). `classify_all_branches` and `run_report_scans` in `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh`, and the whole file `tests/shell/test_cleanup_worktrees_report_records.bats`, are not edited. If any task appears to require editing one of them, stop and report.
+- Files not edited: `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh` (496 lines) and `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh` (495 lines), both near the 500-line cap; `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` (no new production file is added).
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+## Recorded design decisions
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+- D1 — Home of the new code. `cleanup_wt_scan_roots` moves wholesale from `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh` (lines 114-150 at planning time) into `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh` (252 lines), which already defines `parse_worktree_list` (line 85) and `normalize_wt_path` (line 150). The report library is 476 lines and cannot absorb the derivation under the 500-line cap. Every consumer already sources the enumeration library before the report library (wrapper line 18 before line 23; `tests/shell/test_cleanup_worktrees_report_records.bats` line 30), so no `source` line changes in the wrapper or in any existing test. Both definitions must never coexist: the report library is sourced later and its copy would shadow the new one, so P1-T6 removes it immediately after P1-T5 adds the new one.
+- D2 — New functions in the enumeration library, with these exact names:
+  - `cleanup_wt_is_absolute_path <path>`: returns 0 when absolute, else 1. Body: `[[ $path == /* || $path == [A-Za-z]:[/\\]* ]]` with `local path=${1:-}`. The docstring carries over the #706 text from `scan_helper_is_absolute_path` (`.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh` lines 74-82). The bracket expression `[A-Za-z]:[` appears only in this predicate body, never in a comment, because P1-T5 and P2-T7 count its occurrences.
+  - `cleanup_wt_split_roots <value>`: echoes one absolute root per line. Contract: split on `;` and on newline; split each piece on `:` except where the text before the `:` in the current segment is exactly one ASCII letter and the character after it is `/` or `\`; drop empty segments; drop a segment for which `cleanup_wt_is_absolute_path` fails and write the one-line stderr diagnostic "cleanup-worktrees: CLEANUP_WT_ORPHAN_ROOTS entry is not absolute, dropped: " followed by the segment. The walk uses parameter expansion character by character (the `preserve_split_tsv` style), never unquoted word splitting, so no pathname expansion occurs.
+  - `cleanup_wt_derive_scan_roots <records>`: takes `parse_worktree_list` output. The first record is the main worktree. For each record after the first, compute `p=${path//\\//}` and `parent=${p%/*}`; drop an empty parent or a parent equal to `p`. Keep a candidate only when its `normalize_wt_path` value N satisfies both: N is not the normalized main path M and M does not begin with `N/`; and N is not equal to, and does not begin with `W/` for, the normalized path W of any record (main included). Emit kept candidates in `LC_ALL=C` order of N, one per normalized value, using the first spelling seen in record order.
+  - `cleanup_wt_scan_roots`: captures `parse_worktree_list` once (`out=$(...) || rc=$?`). Configured roots are `cleanup_wt_split_roots "$CLEANUP_WT_ORPHAN_ROOTS"` when the variable is non-empty, otherwise `<main>/.claude/worktrees` then `<main>-wt` (only when `rc == 0` and the main path is non-empty). Derived roots are `cleanup_wt_derive_scan_roots "$out"` when `rc == 0`. Output is configured roots in order, then derived roots, deduplicated by `normalize_wt_path` with the first spelling kept. Always returns 0. With no override and `rc != 0`, nothing is emitted (AC-3); with an override and `rc != 0`, exactly the override roots are emitted (AC-4).
+- D3 — Shared predicate wiring (AC-7). `preserve_relative_path_reason` line 161 of `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh` becomes `elif cleanup_wt_is_absolute_path "$val"; then` (the preserve library already requires the enumeration library, header lines 11-13). The scan helper runs as a separate process (report library line 180), so it sources its sibling directly after its `set -euo pipefail` (line 42): `source "$(dirname -- "${BASH_SOURCE[0]}")/cleanup_worktrees_enumerate_lib.sh"`, preceded by `# shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh` and `# shellcheck disable=SC1091`, the pair the wrapper uses at lines 16-17. `scan_helper_is_absolute_path` (lines 73-85) is deleted and its caller at line 116 calls `cleanup_wt_is_absolute_path`.
+- D4 — Test placement. All new tests go in NEW-SUITE with their own file-local helpers. `tests/shell/test_cleanup_worktrees_report_records.bats` is not modified. The two #706 predicate table tests (`tests/shell/test_cleanup_worktrees_scan_helper.bats` lines 69-101) move to NEW-SUITE and target `cleanup_wt_is_absolute_path`; they source only the enumeration library, which never enables nounset.
+- D5 — Fixtures. One new fixture: `tests/fixtures/cleanup_worktrees/scenarios/scan_roots_derived/worktree-list.out` (content in P1-T2). The override-with-listing-failure case reuses the existing `tests/fixtures/cleanup_worktrees/scenarios/worktree_list_error/worktree-list.rc` (content `128`). The drive-letter preserve case is a direct `preserve_relative_path_reason` assertion in NEW-SUITE, so the counted field matrix in `tests/shell/test_cleanup_worktrees_preserve.bats` (loop at line 176) is not touched. No `scan-dirs.out` is needed: the scan stub (`tests/fixtures/cleanup_worktrees/stub-bin/scan` lines 29 and 38-46) logs its argv to stderr and replays nothing when the file is absent.
+- D6 — `load_helper` removal (AC-8). `tests/shell/test_cleanup_worktrees_scan_helper.bats` gains one file-local function `run_helper_sourced`, placed after `setup()`, that runs `run env CLEANUP_WT_SCAN_GITFILE_NAME=dotgit` over a child shell which sources `"${HELPER}"`, clears nounset with the literal `set +u`, and then runs the caller's body with the caller's arguments. Its comment states the kcov rationale once and contains the token PS4 exactly once and does not contain the literal `set +u`. The drive-letter sourced test (lines 36-55) calls it; its comment no longer restates the rationale.
+- D7 — Documentation text (AC-10). The wrapper usage entry (`.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh` lines 142-143) is replaced by this text, keeping the existing two-space name indent and the existing continuation-column indent:
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+  ```text
+  CLEANUP_WT_ORPHAN_ROOTS      Worktree-tracking roots scanned for ORPHAN_DIR and
+                               WARN|registration-lost. Entries are separated by a
+                               semicolon, a newline, or a colon; a colon that follows
+                               a single drive letter and precedes / or \ is part of
+                               the path (C:/x). Empty and relative entries are
+                               dropped. When set, it replaces the default pair
+                               <main>/.claude/worktrees and <main>-wt. The parent of
+                               every non-main registered worktree is always added,
+                               except a parent that is the main worktree or its
+                               ancestor, or is equal to or inside a registered
+                               worktree.
+  ```
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+  The `ORPHAN_DIR` bullet of `.claude/skills/cleanup-merged-worktrees/SKILL.md` (lines 129-133) is replaced by this text:
+
+  ```text
+  - `ORPHAN_DIR|<path>|<size>` — a directory under a worktree-tracking root that carries
+    no `.git` pointer file and no `git worktree list` entry. `<size>` is best-effort and
+    may be the literal `unknown`. The scanned roots are the default pair
+    `<main>/.claude/worktrees` and `<main>-wt`, or the `CLEANUP_WT_ORPHAN_ROOTS` entries
+    when that variable is set (the override replaces the default pair), plus the parent
+    directory of every non-main registered worktree, which is always added. A derived
+    parent is skipped when it is the main worktree or one of its ancestors, or is equal to
+    or inside a registered worktree. `CLEANUP_WT_ORPHAN_ROOTS` entries are separated by a
+    semicolon, a newline, or a colon; a colon that follows a single drive letter and
+    precedes `/` or `\` is part of the path, and empty or relative entries are dropped.
+    The record is advisory: it reports the directory, and nothing in apply mode acts on
+    it. For the disposition, see the Dirty Worktree Triage Procedure's step 7, which
+    governs how an orphaned directory is handled.
+  ```
+
+  Both blocks are shown with two extra leading spaces because they are nested in this list item. In the files, the SKILL.md bullet line starts at column 1 with its continuation lines indented two spaces, as the current bullet is, and the wrapper entry keeps the indentation of the current lines 142-143.
+
+  The three single-line tokens "semicolon", "default pair", and "always added" each occur zero times in both files at planning time; P2-T8 asserts each is present after the edit.
+- D8 — File sizes measured at planning time: enumeration library 252, report library 476, preserve library 492, scan helper 182, wrapper 234, `tests/shell/test_cleanup_worktrees_scan_helper.bats` 101, `tests/shell/test_cleanup_worktrees_report_records.bats` 132. Targets: enumeration library at most 430, report library at most 450, preserve library at most 492 (one condition is replaced in place), scan helper at most 180, wrapper at most 246, NEW-SUITE at most 300, scan-helper suite at most 90. Hard limit 500 for every file (P2-T4).
+- D9 — Interpretation of AC-11 "changed files" for `shfmt -d` and `shellcheck`: the changed files inside the shell-qc discovery contract (`.claude/rules/shell.md`), that is CHANGED-SH. The bats files use a `bats` shebang and are outside that contract; their gates are execution (P2-T3, P2-T12) and line count (P2-T4). The CI run's `shell-qc.sh check` step additionally runs shfmt and shellcheck over every discovered script, so a passing CI conclusion covers the discovered set. Mirror copies are byte-identical to their canonical files (P2-T5), so they are not linted separately.
+- D10 — Tier and obligations. The skill scripts are developer tooling (T4 in `.claude/rules/quality-tiers.md`). No property-test or mutation obligation applies. `quality-tiers.yml` does not exist at the repository root.
+
+### Phase 0 — Policy Reads and Baseline Capture
+
+- [ ] [P0-T1] Verify the minor-audit preconditions for FEATURE (`docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/issue.md`) and record FEATURE/evidence/baseline/phase0-mode-check.TS.md.
+      Commands: `ls docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741`; `grep -c -x -F "## Acceptance Criteria" docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/issue.md`; `grep -c -F "Work Mode: minor-audit" docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/issue.md`.
+      Acceptance: the listing contains neither `spec.md` nor `user-story.md`; each grep prints 1. Any other result stops the plan.
+- [ ] [P0-T2] Read the policy files in the required order and record FEATURE/evidence/baseline/phase0-instructions-read.md (`docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/evidence/baseline/phase0-instructions-read.md`) with `Timestamp:`, `Policy Order:`, and the list of files read, in this order: (1) `.github/copilot-instructions.md`, `CLAUDE.md`, `.claude/rules/tonality.md`; (2) `.github/instructions/general-code-change.instructions.md`, `.claude/rules/general-code-change.md`; (3) `.github/instructions/general-unit-test.instructions.md`, `.claude/rules/general-unit-test.md`; (4) `.claude/rules/shell.md`; (5) `.claude/rules/quality-tiers.md`, `.claude/rules/plan-acceptance-gates.md`; (6) `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`.
+      Acceptance: the artifact has the three required headers and lists all 11 files in that order.
+- [ ] [P0-T3] Record BASE_SHA and the clean pre-edit state of every path this plan edits, and record FEATURE/evidence/baseline/base-sha.TS.md (`.claude/skills/cleanup-merged-worktrees`, `tests/shell`, `tests/fixtures/cleanup_worktrees`).
+      Commands: `git fetch origin main`; `git rev-parse HEAD`; `git merge-base origin/main HEAD`; `git diff --name-only origin/main...HEAD -- .claude/skills/cleanup-merged-worktrees extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees tests/shell tests/fixtures/cleanup_worktrees`; `git status --porcelain -- .claude/skills/cleanup-merged-worktrees extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees tests/shell tests/fixtures/cleanup_worktrees`.
+      Acceptance: `git rev-parse HEAD` prints one 40-character SHA, recorded as BASE_SHA; the merge-base SHA is recorded; the three-dot diff prints nothing (the branch carries no script, test, or fixture change relative to its merge base); the status command prints nothing. Any output from the last two commands stops the plan, because the baseline would not measure the committed code.
+- [ ] [P0-T4] Prepare scratch scripts A1 (`changed-line-coverage.sh`) and A2 (`function-identity.sh`) verbatim from the Appendix in SCRATCH (outside the repository), hash them, and record FEATURE/evidence/baseline/scratch-scripts.TS.md (`docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/evidence/baseline/`).
+      Command: `sha256sum SCRATCH/changed-line-coverage.sh SCRATCH/function-identity.sh`.
+      Acceptance: exit 0 and two hash lines, recorded with the SCRATCH token.
+- [ ] [P0-T5] Baseline line counts for CHANGED-SH, the two not-edited libraries, and the two affected suites (`.claude/skills/cleanup-merged-worktrees/scripts/`, `tests/shell/`), and record FEATURE/evidence/baseline/line-counts.TS.md.
+      Command: `wc -l .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh tests/shell/test_cleanup_worktrees_scan_helper.bats tests/shell/test_cleanup_worktrees_report_records.bats`.
+      Acceptance: exit 0 and the counts 252, 476, 492, 182, 234, 496, 495, 101, 132 in that order. A different count for any of the first five stops the plan, because the D1 and D8 size budget was derived from these values.
+- [ ] [P0-T6] Baseline mirror identity for the six canonical files and their bundle copies under `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/`, and record FEATURE/evidence/baseline/mirror-identity.TS.md.
+      Commands (one per pair, then one status): `git diff --no-index --exit-code .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh`; the same form for `scripts/cleanup_worktrees_report_records_lib.sh`, `scripts/cleanup_worktrees_preserve_lib.sh`, `scripts/cleanup_worktrees_scan_helper.sh`, `scripts/cleanup-worktrees.sh`, and `SKILL.md`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees`.
+      Acceptance: each of the six diff commands exits 0 and prints nothing; the status command prints nothing. An unequal pair stops the plan, because a later copy would then not be a pure sync.
+- [ ] [P0-T7] Baseline format check over CHANGED-SH (`.claude/skills/cleanup-merged-worktrees/scripts/`) in diff mode, and record FEATURE/evidence/baseline/shfmt.TS.md.
+      Command: `shfmt -d .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`.
+      Acceptance: the command runs and its exit code and output are recorded. `shfmt -d` prints nothing and exits 0 on a clean file set. A non-empty diff is recorded verbatim as pre-existing drift, which P2-T1 must clear.
+- [ ] [P0-T8] Baseline lint over CHANGED-SH (`.claude/skills/cleanup-merged-worktrees/scripts/`), and record FEATURE/evidence/baseline/shellcheck.TS.md.
+      Command: `shellcheck .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`.
+      Acceptance: the exit code and output are recorded. shellcheck prints nothing and exits 0 when it finds nothing. Every finding line is recorded verbatim as pre-existing, which P2-T2 must clear.
+- [ ] [P0-T9] Baseline local bats run over TARGETED-SET (`tests/shell/`), and record FEATURE/evidence/baseline/bats-targeted.TS.md.
+      Command: `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_report_records.bats tests/shell/test_cleanup_worktrees_scan_helper.bats tests/shell/test_cleanup_worktrees_scan_seam.bats tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_preserve.bats tests/shell/test_cleanup_worktrees_preserve_failures.bats tests/shell/test_cleanup_worktrees_preserve_eol.bats tests/shell/test_cleanup_worktrees_cli.bats`.
+      Acceptance: the exit code, the `1..N` plan line, and every `not ok` line are recorded; N is recorded as BASELINE_LOCAL_N (planning-time expectation 86). The `not ok` lines, if any, are the local baseline failure set. A `not ok` line from `tests/shell/test_cleanup_worktrees_report_records.bats` or `tests/shell/test_cleanup_worktrees_scan_helper.bats` stops the plan, because those suites gate AC-3, AC-5, and AC-8.
+- [ ] [P0-T10] Baseline bundle-parity pytest (`tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`), and record FEATURE/evidence/baseline/bundle-parity-pytest.TS.md.
+      Command: `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`.
+      Acceptance: the exit code and the pytest summary line (passed and failed counts) are recorded. A failure whose only assertion message begins with the literal "Repo file missing from bundle:" and names a path for which `git check-ignore -q <path>` exits 0 is recorded as the known local issue #510 (`KL-510: STATE-ONLY`, with `ExpectedExitCode: 1`). Any other failure stops the plan.
+- [ ] [P0-T11] Baseline CI dispatch on BRANCH before any production change (`.github/workflows/_shell-coverage.yml`), and record FEATURE/evidence/baseline/shell-coverage-ci-dispatch.TS.md. The baseline coverage source is this dispatched run on BRANCH at BASE_SHA; the most recent main run is not used.
+      Commands: `git push origin bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741`; `git rev-parse origin/bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741`; `date -u +%Y-%m-%dT%H:%M:%SZ` (record as DISPATCH_START); `gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741`; then, repeated until it prints a run whose headSha equals BASE_SHA and whose createdAt is later than DISPATCH_START, `gh run list --workflow _shell-coverage.yml --branch bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741 --event workflow_dispatch --limit 1 --json databaseId,headSha,createdAt,status --jq '.[0]'`.
+      Acceptance: the push exits 0; the remote branch SHA equals BASE_SHA; the dispatch exits 0; the run's databaseId is recorded as BASELINE_RUN_ID. A remote SHA different from BASE_SHA stops the plan.
+- [ ] [P0-T12] Baseline CI coverage readout for BASELINE_RUN_ID (`.github/workflows/_shell-coverage.yml`), and record FEATURE/evidence/baseline/shell-coverage-ci.TS.md.
+      Commands: repeated until the first field is `completed`, `gh run view BASELINE_RUN_ID --json status,conclusion,headSha --jq '.status + " " + .conclusion + " " + .headSha'`; `gh run view BASELINE_RUN_ID --log | grep -F "coverage (lines)"`; `gh run view BASELINE_RUN_ID --log | grep -c "not ok"`; `gh run download BASELINE_RUN_ID -n shell-coverage -D SCRATCH/ci-baseline`; `sh SCRATCH/changed-line-coverage.sh SCRATCH/ci-baseline/cov.xml BASE_SHA .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh` (substitute the recorded values for BASELINE_RUN_ID and BASE_SHA).
+      Acceptance: status `completed`, conclusion `success`, headSha equal to BASE_SHA; the log line `Bash coverage (lines): NN.N%` is recorded with its number as BASELINE_AGGREGATE; the `not ok` count is 0 (grep prints 0 and exits 1, which is the pass condition here); A1 exits 0 and prints one `LINE-RATE file=... rate=...` line per file, each recorded as a number in `Output Summary:`. A conclusion other than `success` stops the plan and is reported, because AC-11 requires a passing run on the branch head and a pre-existing CI failure would make it unsatisfiable without out-of-scope work.
+
+### Phase 1 — Constrained Small-Path Implementation
+
+This phase is one delegated handoff. The small-path implementation engineer performs P1-T2 through P1-T18 in order. No implementation is performed during planning. Each of P1-T2 through P1-T18 writes FEATURE/evidence/other/p1-tN.TS.md (N is the task number) recording its commands, exit codes, and output summary, except P1-T4 and P1-T18, whose artifacts are named in those tasks. Each such artifact carries exactly one top-level `EXIT_CODE:`, equal to the exit code of the task's last non-grep command. Each grep's printed value and exit code are recorded inside `Output Summary:` as `GREP value=<v> exit=<n>`, in command order.
+
+- [ ] [P1-T1] Delegated implementation handoff: apply P1-T2 through P1-T18 to the 15 files listed in the write list at the end of this plan (canonical scripts under `.claude/skills/cleanup-merged-worktrees/`, their bundle mirrors, NEW-SUITE, `tests/shell/test_cleanup_worktrees_scan_helper.bats`, and one fixture) and to no other file.
+      Constraints: no edit to `classify_all_branches`, `run_report_scans`, or `tests/shell/test_cleanup_worktrees_report_records.bats`; no edit to `cleanup_worktrees_lib.sh`, `cleanup_worktrees_dirt_lib.sh`, or `core.json`; no `set -u` added to any `*_lib.sh`; no temporary files in tests; mirrors are produced by `cp`, never by Write or Edit.
+      Acceptance: every acceptance condition of P1-T2 through P1-T18 holds, and FEATURE/evidence/other/p1-t1.TS.md records the engineer's completion report (no `EXIT_CODE:` line, because P1-T1 runs no command).
+- [ ] [P1-T2] Create `tests/fixtures/cleanup_worktrees/scenarios/scan_roots_derived/worktree-list.out` with LF line endings and exactly this content: ten stanzas, each of the form `worktree <path>`, `HEAD <sha>`, `branch refs/heads/<name>`, followed by one blank line, in this order:
+      (1) `/repo/main`, `aaaa0000`, `main`; (2) `/repo/main-wt/a`, `aaaa0001`, `wt-a`; (3) `/repo/main-wt/a-wt/b`, `aaaa0002`, `wt-b`; (4) `/scratch/planhome/ph1`, `aaaa0003`, `ph1`; (5) `/Scratch/PlanHome/ph2`, `aaaa0004`, `ph2`; (6) `/repo/sibling-plan`, `aaaa0005`, `sibling-plan`; (7) `/repo/main/sub`, `aaaa0006`, `sub`; (8) `/repo/main/.claude/x`, `aaaa0007`, `x`; (9) `/scratch/planhome/ph1/inner/c`, `aaaa0008`, `c`; (10) `/scratch/planhome/ph1/d`, `aaaa0009`, `d`.
+      Stanza roles: (2) derives `/repo/main-wt`, a duplicate of a default root; (3) derives the nested root `/repo/main-wt/a-wt` (kept); (4) derives `/scratch/planhome` (kept); (5) derives a case variant of `/scratch/planhome` (deduplicated); (6) derives `/repo`, the main worktree's parent (excluded as an ancestor); (7) derives `/repo/main` (excluded as equal to the main worktree); (8) derives `/repo/main/.claude` (excluded as inside the main worktree); (9) derives `/scratch/planhome/ph1/inner` (excluded as inside a registered worktree); (10) derives `/scratch/planhome/ph1` (excluded as equal to a registered worktree).
+      Commands: `grep -c "^worktree " tests/fixtures/cleanup_worktrees/scenarios/scan_roots_derived/worktree-list.out`; `git status --porcelain -- tests/fixtures/cleanup_worktrees/scenarios/scan_roots_derived`.
+      Acceptance: the grep prints 10; the status output lists the new directory or file as untracked.
+- [ ] [P1-T3] Create `tests/shell/test_cleanup_worktrees_scan_roots.bats` (NEW-SUITE) with a header comment stating its scope and "No temporary files; no scratch git repositories.", a `setup()` that defines `REPO_ROOT`, `ELIB`, `LIB`, `RLIB`, `DLIB`, `DIRTLIB`, `PLIB` (`.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh`), `STUB`, `SCAN`, and `SCEN` exactly as `tests/shell/test_cleanup_worktrees_report_records.bats` lines 10-23 do plus `PLIB`, and three file-local helpers:
+      - `roots_run <scenario> <override>`: `run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" CLEANUP_WT_ORPHAN_ROOTS="$2"` over a child shell that sources `${ELIB}` then `${RLIB}` and runs `cleanup_wt_scan_roots 2>/dev/null`. An empty `<override>` behaves as unset.
+      - `roots_run_raw <scenario> <override>`: the same with stderr retained.
+      - `report_run <scenario>`: the `report_raw` form of `tests/shell/test_cleanup_worktrees_report_records.bats` lines 33-42 (sources ELIB, LIB, DIRTLIB, RLIB, DLIB; runs `run_report`; stderr retained).
+      It holds exactly these 16 tests, with these exact names, each in Arrange-Act-Assert form with a one-line purpose comment:
+      - (T1) `cleanup_wt_scan_roots appends registration-derived parents after the default pair` (AC-1): `roots_run scan_roots_derived ""`; status 0; exactly 4 lines: `/repo/main/.claude/worktrees`, `/repo/main-wt`, `/repo/main-wt/a-wt`, `/scratch/planhome`.
+      - (T2) `cleanup_wt_scan_roots excludes the main worktree, its ancestors, and paths equal to or inside a registered worktree` (AC-2): same invocation; exactly 4 lines, and no line equals `/repo`, `/repo/main`, `/repo/main/.claude`, `/scratch/planhome/ph1`, or `/scratch/planhome/ph1/inner`.
+      - (T3) `cleanup_wt_scan_roots appends derived roots after the override roots` (AC-1, override rule): `roots_run scan_roots_derived "/a/one:/b/two"`; exactly 5 lines: `/a/one`, `/b/two`, `/repo/main-wt`, `/repo/main-wt/a-wt`, `/scratch/planhome`.
+      - (T4) `cleanup_wt_scan_roots emits exactly the override roots when the worktree listing hard-fails` (AC-4): `roots_run worktree_list_error "/a/one:/b/two"`; exactly 2 lines: `/a/one`, `/b/two`.
+      - (T5) `CLEANUP_WT_ORPHAN_ROOTS keeps a drive-letter root whole` (AC-5): override `C:/a/one` on scenario `orphan_dir_present`; exactly 1 line `C:/a/one`.
+      - (T6) `CLEANUP_WT_ORPHAN_ROOTS splits colon-separated drive-letter roots` (AC-5): override `C:/a/one:D:\b\two` (single-quoted); exactly 2 lines `C:/a/one`, `D:\b\two`.
+      - (T7) `CLEANUP_WT_ORPHAN_ROOTS splits on semicolons` (AC-5): override `C:/a/one;D:/b/two`; exactly 2 lines `C:/a/one`, `D:/b/two`.
+      - (T8) `CLEANUP_WT_ORPHAN_ROOTS splits on newlines` (AC-5): override `$'C:/a\n/b'`; exactly 2 lines `C:/a`, `/b`.
+      - (T9) `CLEANUP_WT_ORPHAN_ROOTS drops empty segments` (AC-5): override `/a/one::/b/two;;`; exactly 2 lines `/a/one`, `/b/two`.
+      - (T10) `CLEANUP_WT_ORPHAN_ROOTS keeps a glob character literally` (AC-5): override `/*` (single-quoted); exactly 1 line, equal to `/*`.
+      - (T11) `CLEANUP_WT_ORPHAN_ROOTS drops a relative segment with a stderr diagnostic` (AC-5): `roots_run_raw orphan_dir_present "rel:/b/two"`; the output contains the line "cleanup-worktrees: CLEANUP_WT_ORPHAN_ROOTS entry is not absolute, dropped: rel", contains a line equal to `/b/two`, and contains no line equal to `rel`.
+      - (T12) `run_report passes a registration-derived root to its single filesystem scan` (AC-6): `report_run scan_roots_derived`; the count of output lines containing `stub-scan: scan-dirs` is 1 (the `grep -c ... || true` idiom of `tests/shell/test_cleanup_worktrees_report_records.bats` line 130), and the output contains the exact line "stub-scan: scan-dirs /repo/main/.claude/worktrees /repo/main-wt /repo/main-wt/a-wt /scratch/planhome".
+      - (T13) `cleanup_wt_is_absolute_path returns 0 for slash-leading and drive-letter paths` (AC-7): the body of `tests/shell/test_cleanup_worktrees_scan_helper.bats` lines 69-83 retargeted to source only `${ELIB}` and call `cleanup_wt_is_absolute_path` over `/abs`, `C:/x`, `c:/x`, `C:\x`; status 0 and empty output.
+      - (T14) `cleanup_wt_is_absolute_path returns non-zero for relative, drive-relative, and empty paths` (AC-7): lines 85-101 retargeted the same way over `../rel`, `rel`, `C:rel`, and the empty string; status 0 and empty output.
+      - (T15) `preserve_relative_path_reason honors an override of the shared absolute-path predicate` (AC-7; the name deliberately omits the predicate's identifier so the P1-T5 filter selects only T13 and T14): a child shell sources `${ELIB}` then `${PLIB}`, redefines `cleanup_wt_is_absolute_path() { return 1; }`, and calls `preserve_relative_path_reason source_path /abs/x`; status 0 and empty output (the override is honored only when the preserve library calls the shared function).
+      - (T16) `preserve_relative_path_reason rejects a drive-letter source_path as absolute` (AC-7): a child shell sources `${ELIB}` then `${PLIB}` and calls `preserve_relative_path_reason source_path C:/x/lesson.md`; output equals "source_path is absolute: C:/x/lesson.md".
+      Commands: `grep -c "^@test " tests/shell/test_cleanup_worktrees_scan_roots.bats`; `wc -l tests/shell/test_cleanup_worktrees_scan_roots.bats`; `git status --porcelain -- tests/shell/test_cleanup_worktrees_scan_roots.bats`.
+      Acceptance: the grep prints 16; the line count is at most 300; the status lists the file as untracked.
+- [ ] [P1-T4] [expect-fail] Run NEW-SUITE (`tests/shell/test_cleanup_worktrees_scan_roots.bats`) before any production edit and record FEATURE/evidence/regression-testing/expect-fail-scan-roots.TS.md with `ExpectedExitCode: 1`.
+      Commands: `git status --porcelain -- .claude/skills/cleanup-merged-worktrees`; `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_scan_roots.bats`.
+      Acceptance: the status command prints nothing (no production file has changed yet); bats exits 1 and prints `1..16`; exactly 14 `not ok` lines, naming T1, T2, T3, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, and T15; `ok` lines for T4 and T16. T4 and T16 pass before the fix by design: the current override path returns before reading the listing (report library lines 129-137), and the current inline predicate at preserve library line 161 already rejects `C:/`. They guard AC-4 and AC-7 against regression. Every line of TAP output is recorded. Any other pass/fail split stops the plan.
+- [ ] [P1-T5] Update `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh`: add `cleanup_wt_is_absolute_path`, `cleanup_wt_split_roots`, `cleanup_wt_derive_scan_roots`, and `cleanup_wt_scan_roots` per D2, each with a docstring comment in the file's existing style, and extend the header comment (lines 1-16) to name the scan-root functions and to state that the scan helper also sources this library.
+      Commands: `grep -c "^cleanup_wt_scan_roots() {" .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh`; `grep -c -F "[A-Za-z]:[" .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh`; `wc -l .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh`; `npx --yes bats --formatter tap --filter "cleanup_wt_is_absolute_path" tests/shell/test_cleanup_worktrees_scan_roots.bats`.
+      Acceptance: the first grep prints 1; the second prints 1; the line count is at most 430; bats exits 0 and prints `1..2` with 2 `ok` lines (T13, T14).
+- [ ] [P1-T6] Update `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh`: remove `cleanup_wt_scan_roots` (lines 114-150 at planning time), add `cleanup_wt_scan_roots` to the list of enumeration-library functions in the header comment (lines 7-11), and state in the `cleanup_wt_scan_records` docstring that the roots come from `cleanup_wt_scan_roots` in `cleanup_worktrees_enumerate_lib.sh`. No other line changes; `run_report_scans` and `classify_all_branches` are not touched.
+      Commands: `grep -c "^cleanup_wt_scan_roots() {" .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh`; `sh SCRATCH/function-identity.sh BASE_SHA` (substitute the recorded SHA); `wc -l .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh`; `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_report_records.bats`; `npx --yes bats --formatter tap --filter "cleanup_wt_scan_roots|CLEANUP_WT_ORPHAN_ROOTS|run_report" tests/shell/test_cleanup_worktrees_scan_roots.bats`.
+      Acceptance: the grep prints 0 (exit 1 is the pass condition here); A2 exits 0 and prints `FUNCTION run_report_scans IDENTICAL lines=39` and `FUNCTION classify_all_branches IDENTICAL lines=131`; the line count is at most 450; the first bats run exits 0 with `1..10` and 10 `ok` lines (the three existing `cleanup_wt_scan_roots` tests and the one-scan test included, unchanged); the second bats run exits 0 with `1..12` and 12 `ok` lines (T1 through T12).
+- [ ] [P1-T7] Update `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh`: replace the condition at line 161 of `preserve_relative_path_reason` with `elif cleanup_wt_is_absolute_path "$val"; then` per D3, with no net line growth.
+      Commands: `grep -c -F "cleanup_wt_is_absolute_path" .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh`; `wc -l .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh`; `npx --yes bats --formatter tap --filter "preserve_relative_path_reason" tests/shell/test_cleanup_worktrees_scan_roots.bats`; `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_preserve.bats tests/shell/test_cleanup_worktrees_preserve_failures.bats`.
+      Acceptance: the grep prints 1 or more; the line count is at most 492; the first bats run exits 0 with `1..2` and 2 `ok` lines (T15, T16); the second bats run shows no `not ok` line outside the P0-T9 baseline failure set.
+- [ ] [P1-T8] Update `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh`: add the sibling `source` block after line 42 per D3, delete `scan_helper_is_absolute_path` (lines 73-85), and make `scan_helper_gitdir_target_exists` call `cleanup_wt_is_absolute_path`.
+      Commands: `grep -c "scan_helper_is_absolute_path" .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh`; `grep -c -F "cleanup_wt_is_absolute_path" .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh`; `wc -l .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh`; `npx --yes bats --formatter tap --filter "scan-dirs" tests/shell/test_cleanup_worktrees_scan_helper.bats`.
+      Acceptance: the first grep prints 0 (exit 1 is the pass condition here); the second prints 1 or more; the line count is at most 180; bats exits 0 with `1..3` and 3 `ok` lines (the three existing `scan-dirs` tests, including both #706 drive-letter tests, run against the shared predicate).
+- [ ] [P1-T9] Update `tests/shell/test_cleanup_worktrees_scan_helper.bats`: delete the two `scan_helper_is_absolute_path` tests (lines 69-101, moved to NEW-SUITE as T13 and T14), add `run_helper_sourced` per D6, and rewrite the drive-letter sourced test (lines 36-55) to call it with its existing body and assertions.
+      Commands: `grep -rn load_helper tests`; `grep -c -F "set +u" tests/shell/test_cleanup_worktrees_scan_helper.bats`; `grep -c -F "PS4" tests/shell/test_cleanup_worktrees_scan_helper.bats`; `grep -c -F "run_helper_sourced" tests/shell/test_cleanup_worktrees_scan_helper.bats`; `wc -l tests/shell/test_cleanup_worktrees_scan_helper.bats`; `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_scan_helper.bats`.
+      Acceptance: the recursive grep prints nothing and exits 1 (planning-time value: 9 matching lines, all in this file, at lines 42, 48, 49, 72, 74, 75, 88, 90, 91); `set +u` count is 1 (planning-time value 3); PS4 count is 1 (planning-time value 3); `run_helper_sourced` count is 2 or more; the line count is at most 90; bats exits 0 with `1..3` and 3 `ok` lines.
+- [ ] [P1-T10] Update `.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`: replace the `CLEANUP_WT_ORPHAN_ROOTS` usage entry (lines 142-143) with the D7 wrapper text.
+      Commands: `grep -c -F "semicolon" .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`; `grep -c -F "Colon-separated override" .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`; `wc -l .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`; `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_cli.bats`.
+      Acceptance: the first grep prints 1; the second prints 0 (exit 1 is the pass condition here); the line count is at most 246; bats shows no `not ok` line outside the P0-T9 baseline failure set.
+- [ ] [P1-T11] Update `.claude/skills/cleanup-merged-worktrees/SKILL.md`: replace the `ORPHAN_DIR` bullet (lines 129-133) with the D7 SKILL.md text. No other line changes.
+      Commands: `grep -c -F "always added" .claude/skills/cleanup-merged-worktrees/SKILL.md`; `git diff --numstat BASE_SHA -- .claude/skills/cleanup-merged-worktrees/SKILL.md` (substitute the recorded SHA); `git status --porcelain -- .claude/skills/cleanup-merged-worktrees/SKILL.md`.
+      Acceptance: the grep prints 1; the numstat prints one line reporting 11 added and 3 deleted lines (the old bullet is 5 lines and the D7 bullet is 13 lines; their first two lines are identical); the status shows the file modified.
+- [ ] [P1-T12] Update `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh` by byte copy from its canonical file.
+      Commands: `cp .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh`; `git diff --no-index --exit-code .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh`.
+      Acceptance: cp exits 0; the diff exits 0 and prints nothing; the status shows the mirror modified.
+- [ ] [P1-T13] Update `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh` by byte copy from its canonical file.
+      Commands: `cp .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh`; `git diff --no-index --exit-code .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh`.
+      Acceptance: cp exits 0; the diff exits 0 and prints nothing; the status shows the mirror modified.
+- [ ] [P1-T14] Update `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh` by byte copy from its canonical file.
+      Commands: `cp .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh`; `git diff --no-index --exit-code .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh`.
+      Acceptance: cp exits 0; the diff exits 0 and prints nothing; the status shows the mirror modified.
+- [ ] [P1-T15] Update `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh` by byte copy from its canonical file.
+      Commands: `cp .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh`; `git diff --no-index --exit-code .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh`.
+      Acceptance: cp exits 0; the diff exits 0 and prints nothing; the status shows the mirror modified.
+- [ ] [P1-T16] Update `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh` by byte copy from its canonical file.
+      Commands: `cp .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`; `git diff --no-index --exit-code .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`.
+      Acceptance: cp exits 0; the diff exits 0 and prints nothing; the status shows the mirror modified.
+- [ ] [P1-T17] Update `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md` by byte copy from its canonical file.
+      Commands: `cp .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`; `git diff --no-index --exit-code .claude/skills/cleanup-merged-worktrees/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md`.
+      Acceptance: cp exits 0; the diff exits 0 and prints nothing; the status shows the mirror modified.
+- [ ] [P1-T18] Pass-after gate: run NEW-SUITE and TARGETED-SET (`tests/shell/`) together after every production change, and record FEATURE/evidence/regression-testing/pass-after-scan-roots.TS.md.
+      Command: `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_scan_roots.bats tests/shell/test_cleanup_worktrees_report_records.bats tests/shell/test_cleanup_worktrees_scan_helper.bats tests/shell/test_cleanup_worktrees_scan_seam.bats tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_preserve.bats tests/shell/test_cleanup_worktrees_preserve_failures.bats tests/shell/test_cleanup_worktrees_preserve_eol.bats tests/shell/test_cleanup_worktrees_cli.bats`.
+      Acceptance: the plan line is `1..M` with M equal to BASELINE_LOCAL_N plus 14 (16 added, 2 moved out of the scan-helper suite); all 16 NEW-SUITE tests, including the 14 that failed in P1-T4, print `ok`; no `not ok` line appears outside the P0-T9 baseline failure set. The artifact lists each of the 14 P1-T4 failures with its new `ok` line.
+
+### Phase 2 — Final QC Loop, Targeted Verification, and End State
+
+Run the shell toolchain in order: format check (P2-T1), lint (P2-T2), type checking (not applicable to bash per `.claude/rules/shell.md`; no task), then tests (P2-T3 locally, P2-T12 with kcov coverage in CI). If any Phase 2 task fails or its remediation changes a file, the small-path engineer remediates, re-runs the matching mirror copy task (P1-T12 through P1-T17) for every changed canonical file, and restarts from P2-T1; after a new commit, P2-T11 through P2-T13 are re-run. Every Phase 2 command task is unconditional; none has a SKIPPED outcome. Artifacts go to FEATURE/evidence/qa-gates/ unless stated.
+
+- [ ] [P2-T1] Format check over CHANGED-SH (`.claude/skills/cleanup-merged-worktrees/scripts/`) in diff mode, and record FEATURE/evidence/qa-gates/shfmt.TS.md.
+      Command: `shfmt -d .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`.
+      Acceptance: exit 0 and no output. `shfmt -d` is the read-only gate; it prints a unified diff and exits non-zero when a file is not formatted. On a diff, the engineer applies `shfmt -w` to the listed files, re-copies their mirrors, and restarts from P2-T1.
+- [ ] [P2-T2] Lint over CHANGED-SH (`.claude/skills/cleanup-merged-worktrees/scripts/`), and record FEATURE/evidence/qa-gates/shellcheck.TS.md.
+      Command: `shellcheck .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`.
+      Acceptance: exit 0 and no output.
+- [ ] [P2-T3] Local bats run over NEW-SUITE and TARGETED-SET (`tests/shell/`), and record FEATURE/evidence/qa-gates/bats-targeted.TS.md.
+      Command: the P1-T18 command.
+      Acceptance: the plan line is `1..M` with M equal to BASELINE_LOCAL_N plus 14; no `not ok` line from `tests/shell/test_cleanup_worktrees_scan_roots.bats`, `tests/shell/test_cleanup_worktrees_report_records.bats`, or `tests/shell/test_cleanup_worktrees_scan_helper.bats`; no `not ok` line outside the P0-T9 baseline failure set. The full suite is gated in CI by P2-T12.
+- [ ] [P2-T4] Line limits for AC-11 over CHANGED-SH and the two changed suites (`tests/shell/`), and record FEATURE/evidence/qa-gates/line-counts.TS.md.
+      Command: `wc -l .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh tests/shell/test_cleanup_worktrees_scan_roots.bats tests/shell/test_cleanup_worktrees_scan_helper.bats`.
+      Acceptance: exit 0 and every per-file count is at most 500. The artifact also reports each count against its D8 target (informational).
+- [ ] [P2-T5] Mirror identity for AC-9 over the six canonical files and their copies under `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/`, and record FEATURE/evidence/qa-gates/mirror-identity.TS.md.
+      Commands: the six `git diff --no-index --exit-code` commands of P0-T6; `git status --porcelain -- .claude/skills/cleanup-merged-worktrees extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees`.
+      Acceptance: each diff exits 0 and prints nothing. Before P2-T11 commits, the status lists the six canonical files and the six mirrors as modified and nothing else; after the commit, it prints nothing.
+- [ ] [P2-T6] Bundle byte-identity pytest for AC-9 (`tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`), and record FEATURE/evidence/qa-gates/bundle-parity-pytest.TS.md.
+      Command: `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`.
+      Acceptance, case (a): exit 0 and the summary line reports no failure; the artifact records `KL-510: PASSED`. Case (b), the known local issue #510: the only failing node is `test_bundled_claude_payload_contains_all_repo_runtime_contracts`, its assertion message begins with the literal "Repo file missing from bundle:" followed by one path, `git check-ignore -q` on that path exits 0, and no output line contains the literal "Bundle content differs from repo for:"; the artifact records `KL-510: STATE-ONLY`, quotes the message, and carries `ExpectedExitCode: 1`. Any other outcome fails the task. P2-T5 remains the direct identity proof.
+- [ ] [P2-T7] Structural checks for AC-7 and AC-8 over `.claude/skills/cleanup-merged-worktrees/scripts/` and `tests/`, and record FEATURE/evidence/qa-gates/structural-checks.TS.md.
+      Commands: `grep -rn "^cleanup_wt_is_absolute_path() {" .claude/skills/cleanup-merged-worktrees/scripts`; `grep -rn -F "[A-Za-z]:[" .claude/skills/cleanup-merged-worktrees/scripts`; `grep -rl scan_helper_is_absolute_path .claude/skills/cleanup-merged-worktrees extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees tests/shell`; `grep -c -F "cleanup_wt_is_absolute_path" .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh`; `grep -c -F "cleanup_wt_is_absolute_path" .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh`; `grep -rn load_helper tests`; `grep -c -F "set +u" tests/shell/test_cleanup_worktrees_scan_helper.bats`; `grep -c -F "PS4" tests/shell/test_cleanup_worktrees_scan_helper.bats`.
+      Acceptance: the first grep prints exactly one line, in `cleanup_worktrees_enumerate_lib.sh`; the second prints exactly two lines, one in `cleanup_worktrees_enumerate_lib.sh` (the shared predicate) and one in `cleanup_worktrees_preserve_lib.sh` (the host-token regex HT1, a content scan rather than a path predicate; planning-time total 3 lines including `cleanup_worktrees_scan_helper.sh` line 84 and preserve line 161); the third prints nothing and exits 1; the fourth and fifth each print 1 or more; the sixth prints nothing and exits 1; the seventh prints 1; the eighth prints 1.
+- [ ] [P2-T8] Documentation contract for AC-10 in `.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh` and `.claude/skills/cleanup-merged-worktrees/SKILL.md`, and record FEATURE/evidence/qa-gates/doc-contract.TS.md.
+      Commands: `grep -c -F "semicolon" .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`; `grep -c -F "default pair" .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`; `grep -c -F "always added" .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`; the same three greps against `.claude/skills/cleanup-merged-worktrees/SKILL.md`.
+      Acceptance: each of the six greps prints 1 or more (planning-time value 0 for all six). The artifact quotes the final wrapper entry and the final SKILL.md bullet verbatim and confirms each states the separator contract, the override-replaces-default-pair rule, and the always-added derived roots with their exclusions.
+- [ ] [P2-T9] Issue #756 boundary for AC-12 (`.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh`, `tests/shell/test_cleanup_worktrees_report_records.bats`), and record FEATURE/evidence/qa-gates/ac12-boundary.TS.md.
+      Commands: `sh SCRATCH/function-identity.sh BASE_SHA`; `git diff --exit-code BASE_SHA -- tests/shell/test_cleanup_worktrees_report_records.bats`; `git status --porcelain -- tests/shell/test_cleanup_worktrees_report_records.bats` (substitute the recorded SHA).
+      Acceptance: A2 exits 0 and prints `FUNCTION run_report_scans IDENTICAL lines=39` and `FUNCTION classify_all_branches IDENTICAL lines=131`; the diff exits 0 and prints nothing; the status prints nothing.
+- [ ] [P2-T10] Scope check against the write list (`.claude/skills`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills`, `tests`), and record FEATURE/evidence/qa-gates/scope.TS.md.
+      Commands: `git diff --name-only BASE_SHA -- .claude/skills extensions tests scripts .github`; `git status --porcelain --untracked-files=all -- .claude/skills extensions tests scripts .github` (substitute the recorded SHA; `--untracked-files=all` lists the new fixture file itself rather than its collapsed directory). The pathspec leaves out `.claude/agent-memory`, which other agents may write during the run.
+      Acceptance: the union of the paths listed by the two commands equals exactly the 15 repository paths in the write list at the end of this plan (the feature-folder documents are outside the pathspec), and each of the 15 appears. `cleanup_worktrees_lib.sh`, `cleanup_worktrees_dirt_lib.sh`, `core.json`, and `tests/shell/test_cleanup_worktrees_report_records.bats` do not appear.
+- [ ] [P2-T11] Commit and push the change so CI measures the branch head (`docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741`), and record FEATURE/evidence/other/commit-push.TS.md.
+      Commands: `git add -- <the 15 write-list paths> docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741`; `git commit -m "fix(741): derive cleanup-worktrees scan roots from registrations and split orphan roots drive-safely"`; `git push origin bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741`; `git rev-parse HEAD`; `git rev-parse origin/bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741`; `git status --porcelain -- .claude/skills extensions tests`.
+      Acceptance: add, commit, and push exit 0; the two rev-parse values are equal and recorded as FINAL_SHA; the status prints nothing. If a hook denies staging or committing, stop and report the denial text.
+- [ ] [P2-T12] Final CI run with kcov coverage on FINAL_SHA (`.github/workflows/_shell-coverage.yml`), and record FEATURE/evidence/qa-gates/shell-coverage-ci.TS.md.
+      Commands: `date -u +%Y-%m-%dT%H:%M:%SZ` (DISPATCH_START); `gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741`; the P0-T11 `gh run list` command, repeated until it prints a run whose headSha equals FINAL_SHA and whose createdAt is later than DISPATCH_START (record FINAL_RUN_ID); the P0-T12 `gh run view` status command for FINAL_RUN_ID, repeated until `completed`; `gh run view FINAL_RUN_ID --log | grep -F "coverage (lines)"`; `gh run view FINAL_RUN_ID --log | grep -c "not ok"`; `gh run download FINAL_RUN_ID -n shell-coverage -D SCRATCH/ci-final`; `sh SCRATCH/changed-line-coverage.sh SCRATCH/ci-final/cov.xml BASE_SHA .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`.
+      Acceptance: conclusion `success` and headSha equal to FINAL_SHA (this covers the CI `shell-qc.sh check` step and the full bats suite); the `Bash coverage (lines): NN.N%` value is recorded as FINAL_AGGREGATE; the `not ok` count is 0 (exit 1 is the pass condition); A1 exits 0; every `LINE-RATE` value is at least 0.850; every `CHANGED` line is recorded with its instrumented, covered, and missed values.
+- [ ] [P2-T13] Coverage threshold and delta for AC-11 over CHANGED-SH (`.claude/skills/cleanup-merged-worktrees/scripts/`), from the P0-T12 and P2-T12 artifacts, and record FEATURE/evidence/qa-gates/coverage-delta.TS.md.
+      Command: `awk 'BEGIN { printf "DELTA=%.1f\n", FINAL_AGGREGATE - BASELINE_AGGREGATE }'`, with the two recorded percentages substituted as literal numbers.
+      Acceptance: the artifact tabulates, per file, the baseline line rate, the final line rate, and the changed-line values (instrumented, covered, percentage), plus both aggregates and DELTA. PASS only if every final per-file line rate is at least 0.850 and, for every file whose instrumented changed-line count is greater than 0, covered divided by instrumented is at least 0.85; `cleanup_worktrees_enumerate_lib.sh` must have an instrumented changed-line count greater than 0. A negative DELTA is recorded with the per-file cause. Otherwise the artifact states remediation-required and the task fails.
+- [ ] [P2-T14] Update `docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/issue.md`: check off AC-1 through AC-12 in `## Acceptance Criteria` only for criteria whose mapped evidence artifacts (traceability table below) exist and record passing results, and record FEATURE/evidence/other/ac-checkoff.TS.md.
+      Commands: `grep -c -F "[x] AC-" docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/issue.md`; `grep -c -F "[ ] AC-" docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/issue.md`.
+      Acceptance: the first grep prints 12 and the second prints 0 and exits 1 when every criterion is evidenced (the artifact therefore carries `EXIT_CODE: 1` and `ExpectedExitCode: 1`); otherwise each unchecked criterion is named in the artifact with its missing or failing evidence and the task fails. No section other than `## Acceptance Criteria` changes. This edit and the evidence written after P2-T11 remain uncommitted; the orchestrator commits them with the pull request. They are confined to FEATURE and do not change any file the P2-T12 run measured.
+- [ ] [P2-T15] Reduced-audit handoff: record FEATURE/evidence/other/small-audit-handoff.TS.md (under `docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/evidence/other/`) listing AC-1 through AC-12, each with the artifact paths that evidence it per the traceability table below. The orchestrator then delegates the minor-audit review with that file as its evidence index.
+      Command: `ls docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/evidence/baseline docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/evidence/regression-testing docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/evidence/qa-gates docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/evidence/other`.
+      Acceptance: every artifact path named in the handoff file appears in the listing.
+
+## Acceptance-criteria traceability
+
+| AC | Criterion (abridged) | Implementation | Tests | Evidence |
+| --- | --- | --- | --- | --- |
+| AC-1 | Unset override: default pair then derived parents, deduplicated, exact order | P1-T2, P1-T5, P1-T6 | NEW-SUITE T1, T3 | regression-testing/expect-fail-scan-roots, regression-testing/pass-after-scan-roots, qa-gates/bats-targeted, qa-gates/shell-coverage-ci |
+| AC-2 | Main, ancestor, equal-to or inside registered worktree excluded | P1-T2, P1-T5 | NEW-SUITE T2 | regression-testing/expect-fail-scan-roots, regression-testing/pass-after-scan-roots, qa-gates/bats-targeted |
+| AC-3 | Listing hard-fails, no override: no root; existing test unchanged | P1-T5, P1-T6 | `tests/shell/test_cleanup_worktrees_report_records.bats` test "cleanup_wt_scan_roots emits no root when the worktree listing hard-fails" | other/p1-t6, qa-gates/bats-targeted, qa-gates/ac12-boundary |
+| AC-4 | Override set, listing hard-fails: exactly the override roots | P1-T5 | NEW-SUITE T4 | regression-testing/pass-after-scan-roots, qa-gates/bats-targeted |
+| AC-5 | Separator contract cases; existing override test unchanged | P1-T5 | NEW-SUITE T5-T11; existing test "cleanup_wt_scan_roots honors the CLEANUP_WT_ORPHAN_ROOTS override" | regression-testing/expect-fail-scan-roots, regression-testing/pass-after-scan-roots, qa-gates/bats-targeted |
+| AC-6 | One `scan-dirs` call whose argv includes a derived root | P1-T5, P1-T6 | NEW-SUITE T12 | regression-testing/expect-fail-scan-roots, regression-testing/pass-after-scan-roots, qa-gates/bats-targeted |
+| AC-7 | One shared `cleanup_wt_is_absolute_path`; preserve and scan helper call it; old helper gone; drive-letter source_path rejected | P1-T5, P1-T7, P1-T8 | NEW-SUITE T13-T16; scan-helper `scan-dirs` drive-letter tests | qa-gates/structural-checks, regression-testing/pass-after-scan-roots, qa-gates/bats-targeted |
+| AC-8 | Inline `load_helper` removed; one file-local helper with the kcov rationale once | P1-T9 | `tests/shell/test_cleanup_worktrees_scan_helper.bats` (3 tests) | other/p1-t9, qa-gates/structural-checks |
+| AC-9 | Canonical files byte-identical to mirrors; parity pytest passes | P1-T12 through P1-T17 | P2-T5 diffs; `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` | qa-gates/mirror-identity, qa-gates/bundle-parity-pytest |
+| AC-10 | Usage text and SKILL.md bullet state the contract | P1-T10, P1-T11 | P2-T8 token checks | qa-gates/doc-contract |
+| AC-11 | <= 500 lines; shfmt and shellcheck clean; CI bats pass; kcov >= 85% per changed file | P1-T5 through P1-T10 | P2-T1, P2-T2, P2-T4, P2-T12 | qa-gates/shfmt, qa-gates/shellcheck, qa-gates/line-counts, qa-gates/shell-coverage-ci, qa-gates/coverage-delta |
+| AC-12 | `classify_all_branches`, `run_report_scans` byte-unchanged; report-records suite unmodified | P1-T1 constraints, P1-T6 | P1-T6 and P2-T9 (A2, anchored diff) | qa-gates/ac12-boundary, qa-gates/scope |
+
+## Write list (every repository file this plan writes)
+
+Canonical production (6):
+
+1. `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh` (P1-T5)
+2. `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh` (P1-T6)
+3. `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh` (P1-T7)
+4. `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh` (P1-T8)
+5. `.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh` (P1-T10)
+6. `.claude/skills/cleanup-merged-worktrees/SKILL.md` (P1-T11)
+
+Bundle mirrors (6):
+
+7. `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh` (P1-T12)
+8. `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh` (P1-T13)
+9. `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh` (P1-T14)
+10. `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh` (P1-T15)
+11. `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh` (P1-T16)
+12. `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/SKILL.md` (P1-T17)
+
+Tests and fixtures (3):
+
+13. `tests/fixtures/cleanup_worktrees/scenarios/scan_roots_derived/worktree-list.out` (P1-T2, new)
+14. `tests/shell/test_cleanup_worktrees_scan_roots.bats` (P1-T3, new)
+15. `tests/shell/test_cleanup_worktrees_scan_helper.bats` (P1-T9)
+
+Feature documents (outside the P2-T10 pathspec): `docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/issue.md` (P2-T14, AC check-off only) and evidence artifacts under FEATURE/evidence/baseline/, FEATURE/evidence/regression-testing/, FEATURE/evidence/qa-gates/, and FEATURE/evidence/other/.
+
+## Appendix — scratch scripts (written verbatim by P0-T4 into SCRATCH)
+
+A1 `changed-line-coverage.sh` (reads a kcov Cobertura report; prints each file's line rate and the coverage of lines added since a base commit):
+
+```sh
+#!/bin/sh
+# Usage: sh changed-line-coverage.sh <cov.xml> <base-sha> <file>...
+set -eu
+cov=$1
+base=$2
+shift 2
+for f in "$@"; do
+	added=$(git diff -U0 "$base" -- "$f" | awk '/^@@ / { s = $3; sub(/^\+/, "", s); n = split(s, a, ","); c = (n > 1) ? a[2] : 1; for (i = 0; i < c; i++) printf "%d ", a[1] + i }')
+	awk -v file="$f" -v added=" $added " '
+		/<class / {
+			inside = (index($0, "filename=\"" file "\"") > 0)
+			if (inside && match($0, /line-rate="[0-9.]+"/)) { rate = substr($0, RSTART + 11, RLENGTH - 12); found = 1 }
+		}
+		inside && /<line / {
+			if (match($0, /number="[0-9]+"/)) num = substr($0, RSTART + 8, RLENGTH - 9)
+			if (match($0, /hits="[0-9]+"/)) hits = substr($0, RSTART + 6, RLENGTH - 7)
+			if (index(added, " " num " ") > 0) { total++; if (hits + 0 > 0) covered++; else missed = missed " " num }
+		}
+		/<\/class>/ { inside = 0 }
+		END {
+			if (!found) { printf "LINE-RATE file=%s NOT-FOUND\n", file; exit 2 }
+			printf "LINE-RATE file=%s rate=%s\n", file, rate
+			printf "CHANGED file=%s instrumented=%d covered=%d missed=[%s]\n", file, total, covered, missed
+		}
+	' "$cov"
+done
+```
+
+The `<class ... filename="<repo-relative path>" ... line-rate="0.NNN">` element shape was observed in a recorded run of this workflow (`docs/features/completed/2026-09-06-cleanup-worktrees-skips-detached-head-worktrees-630/evidence/remediation-baseline/bash-test-coverage.2026-09-07T15-00.md` line 72). A `NOT-FOUND` line with exit 2 means the report carries no class for that path; the task then fails rather than reading a number that was never printed.
+
+A2 `function-identity.sh` (compares two function bodies in the report library between a base commit and the working tree):
+
+```sh
+#!/bin/sh
+# Usage: sh function-identity.sh <base-sha>
+set -eu
+base=$1
+f=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_report_records_lib.sh
+prog='$0 == fn "() {" { p = 1 } p { print } p && $0 == "}" { exit }'
+rc=0
+for fn in run_report_scans classify_all_branches; do
+	before=$(git show "$base:$f" | awk -v fn="$fn" "$prog")
+	after=$(awk -v fn="$fn" "$prog" "$f")
+	if [ -n "$before" ] && [ "$before" = "$after" ]; then
+		printf 'FUNCTION %s IDENTICAL lines=%s\n' "$fn" "$(printf '%s\n' "$before" | wc -l | tr -d ' ')"
+	else
+		printf 'FUNCTION %s DIFFERS\n' "$fn"
+		rc=1
+	fi
+done
+exit "$rc"
+```
+
+At planning time `run_report_scans` spans lines 306-344 (39 lines) and `classify_all_branches` spans lines 346-476 (131 lines) of the report library, so a correct run prints `lines=39` and `lines=131`. The repository checks out with `* text=auto eol=lf` (`.gitattributes` line 1), so the working-tree text and the blob text compare byte for byte.
