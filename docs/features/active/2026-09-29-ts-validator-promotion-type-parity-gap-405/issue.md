@@ -18,10 +18,10 @@ The MCP surface over-reports a missing-receipt error for bug-type `large`-route 
 
 ## Acceptance Criteria
 
-- [ ] `extensions/drm-copilot/src/lib/validate/orchestrator-state-routing.ts` (or equivalent) resolves the promotion-entry MCP tool name from `promotion-type`, mirroring `scripts/dev_tools/_orchestrator_state_routing.py`.
-- [ ] A bug-type, `large`-route checkpoint with a `new_potential_bug_entry` receipt passes MCP `validate_orchestration_artifacts` with `require_complete: true`.
-- [ ] A feature-type, `large`-route checkpoint continues to require `new_potential_entry` (no regression).
-- [ ] New TypeScript tests cover both cases plus the dead-skill-name and bug-type-with-only-feature-tool-rejection scenarios.
-- [ ] Full toolchain (format -> lint -> type-check -> test) passes with no coverage regression.
+- [x] `extensions/drm-copilot/src/lib/validate/orchestrator-state-routing.ts` (or equivalent) resolves the promotion-entry MCP tool name from `promotion-type`, mirroring `scripts/dev_tools/_orchestrator_state_routing.py`.
+- [x] A bug-type, `large`-route checkpoint with a `new_potential_bug_entry` receipt passes MCP `validate_orchestration_artifacts` with `require_complete: true`.
+- [x] A feature-type, `large`-route checkpoint continues to require `new_potential_entry` (no regression).
+- [x] New TypeScript tests cover both cases plus the dead-skill-name and bug-type-with-only-feature-tool-rejection scenarios.
+- [x] Full toolchain (format -> lint -> type-check -> test) passes with no coverage regression.
 
 Authoritative requirements for full-bug mode are in `spec.md`; the source issue body is the GitHub issue #405.

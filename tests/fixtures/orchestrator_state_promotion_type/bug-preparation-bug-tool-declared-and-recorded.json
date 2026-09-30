@@ -1,0 +1,81 @@
+{
+  "name": "bug-preparation-bug-tool-declared-and-recorded",
+  "notes": "A bug-type preparation-route checkpoint that declares and records the bug promotion-entry tool is accepted.",
+  "checkpoint": {
+    "route_id": "preparation",
+    "promotion-type": "bug",
+    "required_agents": [
+      "task-researcher",
+      "prd-feature",
+      "atomic-planner",
+      "atomic-executor"
+    ],
+    "required_skills": [
+      "orchestrate",
+      "feature-promotion-lifecycle",
+      "atomic-plan-contract"
+    ],
+    "required_mcp_tools": [
+      "new_potential_bug_entry",
+      "potential_to_issue",
+      "new_active_feature_folder",
+      "validate_orchestration_artifacts"
+    ],
+    "delegation_receipts": [
+      {
+        "agent_name": "task-researcher"
+      },
+      {
+        "agent_name": "prd-feature"
+      },
+      {
+        "agent_name": "atomic-planner"
+      },
+      {
+        "agent_name": "atomic-executor"
+      }
+    ],
+    "skill_receipts": [
+      {
+        "skill": "orchestrate",
+        "required": true,
+        "evidence": "e"
+      },
+      {
+        "skill": "feature-promotion-lifecycle",
+        "required": true,
+        "evidence": "e"
+      },
+      {
+        "skill": "atomic-plan-contract",
+        "required": true,
+        "evidence": "e"
+      }
+    ],
+    "mcp_call_receipts": [
+      {
+        "tool": "new_potential_bug_entry",
+        "ok": true,
+        "evidence": "e"
+      },
+      {
+        "tool": "potential_to_issue",
+        "ok": true,
+        "evidence": "e"
+      },
+      {
+        "tool": "new_active_feature_folder",
+        "ok": true,
+        "evidence": "e"
+      },
+      {
+        "tool": "validate_orchestration_artifacts",
+        "ok": true,
+        "evidence": "e"
+      }
+    ],
+    "local_execution_overrides": [],
+    "delegation_bypasses": []
+  },
+  "expected_errors": []
+}

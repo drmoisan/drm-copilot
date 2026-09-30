@@ -1,5 +1,6 @@
 import type { FileSystem } from "../file-system";
 import { toPosixPath } from "../file-system";
+import { resolvePromotionEntryTools } from "./orchestrator-state-promotion-tools";
 
 /**
  * Routing and mandatory-handoff invariants for orchestrator checkpoints.
@@ -405,7 +406,10 @@ export function validateRoutingContract(
   const errors: string[] = [];
   const requiredAgents = routeList(rawRoute, "required_agents");
   const requiredSkills = routeList(rawRoute, "required_skills");
-  const requiredMcpTools = routeList(rawRoute, "required_mcp_tools");
+  const requiredMcpTools = resolvePromotionEntryTools(
+    routeList(rawRoute, "required_mcp_tools"),
+    state,
+  );
 
   if (stateList(state, "required_agents", requiredAgents) === null) {
     errors.push(
