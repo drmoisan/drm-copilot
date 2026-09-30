@@ -1076,10 +1076,38 @@ items:
       contracts: []
       source: "declared"
       computed_at: "2026-09-30T08:23:08Z"
+  - issue_num: 764
+    feature_folder: "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/skills/feature-review-workflow/SKILL.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/**"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/evidence/baseline/baseline-citation-grep.2026-09-30T05-20.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/evidence/baseline/baseline-code-source-diff.2026-09-30T05-20.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/evidence/baseline/baseline-pytest.2026-09-30T05-20.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/evidence/baseline/baseline-rootfolders-diff.2026-09-30T05-20.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/evidence/baseline/minor-audit-preconditions.2026-09-30T05-20.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/evidence/qa-gates/final-citation-grep.2026-09-30T05-20.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/evidence/qa-gates/final-pytest.2026-09-30T05-20.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/evidence/qa-gates/final-rootfolders-diff.2026-09-30T05-20.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/evidence/qa-gates/final-toolchain-applicability.2026-09-30T05-20.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/evidence/regression-testing/edit-diff.2026-09-30T05-20.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/evidence/regression-testing/targeted-parity-test.2026-09-30T05-20.md"
+        - "docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/issue.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md"
+        - "scripts/feature-review/Test-ModifiedWorkflowNeedsGreenRun.ps1"
+      modules: []
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-30T09:12:50Z"
 ---
 
 # Parallel Run: bug-burndown-2026-09-29
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 20 of 22. Pending: 743, 764.
+Prepared: 21 of 22. Pending: 743.
