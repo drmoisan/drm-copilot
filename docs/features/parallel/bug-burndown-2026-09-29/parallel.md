@@ -756,6 +756,36 @@ items:
       contracts: []
       source: "declared"
       computed_at: "2026-09-30T01:44:08Z"
+  - issue_num: 734
+    feature_folder: "docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".agents/skills/quality-tiers/SKILL.md"
+        - ".claude/rules/quality-tiers.md"
+        - ".github/workflows/_quality-checks.yml"
+        - "docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734/**"
+        - "docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734/plan.2026-09-29T21-45.md"
+        - "docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734/spec.md"
+        - "docs/features/potential/2026-09-29-issue-734-quality-tiers-follow-ups.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/rules/quality-tiers.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/quality-tiers/SKILL.md"
+        - "quality-tiers.yml"
+        - "scripts/dev_tools/check_quality_tiers.py"
+        - "scripts/dev_tools/quality_tiers_contract.py"
+        - "tests/scripts/dev_tools/test_check_quality_tiers.py"
+        - "tests/scripts/dev_tools/test_quality_tiers_contract.py"
+      modules: []
+      shared_surfaces:
+        - "quality-tiers.yml"
+      contracts:
+        - "package.json"
+        - "quality-tiers.yml"
+        - "tier-classification"
+        - "version"
+      source: "declared"
+      computed_at: "2026-09-30T02:55:00Z"
   - issue_num: 739
     feature_folder: "docs/features/active/2026-09-27-npm-token-guard-gaps-739"
     kind: "bug"
@@ -784,4 +814,4 @@ items:
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 15 of 22. Pending: 734, 740, 741, 743, 744, 756, 764.
+Prepared: 16 of 22. Pending: 740, 741, 743, 744, 756, 764.
