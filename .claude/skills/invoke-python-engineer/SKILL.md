@@ -41,6 +41,10 @@ The worker must return the `python-qa-gate` reporting block:
 4. Diffs (patch-style or full-file replacements).
 5. QA Gate Results (Ruff, Pyright, Pytest, and coverage deltas, or clearly marked **unverified**).
 
+## Delegation Identity Lines
+
+Every delegation prompt this skill sends to `python-typed-engineer` carries the canonical issue-number line (`Canonical issue number for this feature is <issue_num>. All artifact content, file paths, and cross-references must use this number.`) and a `branch: <name>` label naming the branch checked out in the item's worktree, written as the first `branch:` occurrence in the prompt. `enforce-orchestration-preimplementation-gate.ps1` resolves the item's worktree from these two lines and denies a delegation that carries neither with `TARGET_WORKTREE_NOT_DERIVABLE`.
+
 ## Worker Routing
 
 - Worker: `python-typed-engineer`

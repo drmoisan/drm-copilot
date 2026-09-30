@@ -43,6 +43,7 @@ Describe 'enforce-parallel-worktree-removal-gate trigger scoping (issue #545)' {
                     tool_input = @{ command = $Command }
                 } | ConvertTo-Json -Compress -Depth 5)
         }
+        Mock Resolve-ParallelWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     Context 'operand resolution - the --force flag never becomes the path' {

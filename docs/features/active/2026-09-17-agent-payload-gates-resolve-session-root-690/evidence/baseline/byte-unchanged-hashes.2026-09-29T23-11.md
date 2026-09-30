@@ -1,0 +1,17 @@
+# Byte-Unchanged File Hashes (P0-T12)
+
+Timestamp: 2026-09-29T23-11
+Command: sh SCRATCH/run-ps.sh SCRATCH/file-hashes.ps1 <11 BU files>
+EXIT_CODE: 0
+Output Summary:
+- .claude/lib/worktree-resolution/WorktreeResolution.psm1 Hash=2D655A4CB47334F1E8075EB35DCEBDEC8CDE5E21F4EAAFAF0E7A68FC0B5D4C65
+- .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 Hash=DC4E7DA545D2A8DADF9C11CDD0F1B08A5485ECAE2EE3AE2C1E090835035B0D65
+- .claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1 Hash=5216EB9FD638C92761FFB553A8C8829BC3BA1EDAAA578AFF10755CB16A8806CD
+- .claude/hooks/enforce-epic-merge-gate-authorization.ps1 Hash=08FB2DE608B32EB0F830151C004F172CCE9A83C40477A1A90A1C2112CF1129C3
+- .claude/hooks/validate-orchestrator-output.ps1 Hash=E8A1E931C4A20075A4AF94A7C440A34C618C2E5A94476B9DC13C77DEEB5A84E1
+- .claude/hooks/enforce-powershell-batch-budget.ps1 Hash=B7F7F72B04D0FC448DAB2C706CD7CD79688B3B41E0557691515FA4ACEB3A59B0
+- .claude/hooks/enforce-powershell-batch-budget-route.ps1 Hash=B4B397A2DEF1397505FF253D77AE2333D0B1E34B2FF1BFB3247E18097096E92C
+- .claude/hooks/enforce-model-routing-receipt.ps1 Hash=59145AC5F0F44AA4EA1FA0A6E78BD3520446837406521CADF63FD1BDF500F586
+- .claude/hooks/enforce-pr-author-skill.ps1 Hash=0F8F021BD8FA7E9B298A6EE0C706A47BC7F977871850107D3C3793FB3999D1A7
+- .claude/hooks/enforce-pr-author-skill-helpers.ps1 Hash=FAE566112A3C4B394A9F11E4EF6F7DB76FF1569B1CA1CE9EB90C2C5C64AB4E32
+- .claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1 Hash=F47367EF0B7B360F5CF343D742C3086499365EA128E0A05AE363180E4C2EC266

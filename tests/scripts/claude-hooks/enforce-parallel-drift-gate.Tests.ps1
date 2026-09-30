@@ -50,6 +50,7 @@ Describe 'enforce-parallel-drift-gate.ps1' {
             if ($NoDriftEvents) { $events = '[]' }
             return '{"items":[' + $item + '],"drift_events":' + $events + '}'
         }
+        Mock Resolve-ParallelDriftGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     Context 'allow paths that never engage the gate' {
@@ -322,14 +323,14 @@ Describe 'enforce-parallel-drift-gate.ps1' {
 
     Context 'read seams' {
         It 'Get-ParallelDriftGateCheckpointContent returns $null when the checkpoint file is absent' {
-            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Get-ParallelDriftGateCheckpointContent | Should -BeNullOrEmpty
+            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/drift-seam/artifacts/orchestration/parallel-orchestrator-state.json' }
+            Get-ParallelDriftGateCheckpointContent -Path '/synthetic-worktrees/drift-seam/artifacts/orchestration/parallel-orchestrator-state.json' | Should -BeNullOrEmpty
         }
 
         It 'Get-ParallelDriftGateCheckpointContent reads content when the checkpoint file exists' {
-            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Mock -CommandName Get-Content -MockWith { '{"items":[]}' } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Get-ParallelDriftGateCheckpointContent | Should -Be '{"items":[]}'
+            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/drift-seam/artifacts/orchestration/parallel-orchestrator-state.json' }
+            Mock -CommandName Get-Content -MockWith { '{"items":[]}' } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/drift-seam/artifacts/orchestration/parallel-orchestrator-state.json' }
+            Get-ParallelDriftGateCheckpointContent -Path '/synthetic-worktrees/drift-seam/artifacts/orchestration/parallel-orchestrator-state.json' | Should -Be '{"items":[]}'
         }
 
         It 'Test-ParallelDriftFindingPresent reports absence for <Label>' -ForEach @(
