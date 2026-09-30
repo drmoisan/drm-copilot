@@ -426,3 +426,9 @@ def validate_orchestrator_state_text(
         errors.extend(codex_topology.validate_codex_topology_gate(state_map))
 
     return errors
+
+
+if __name__ == "__main__":
+    from scripts.dev_tools.validate_orchestrator_state_cli import main
+
+    raise SystemExit(main(validate=validate_orchestrator_state_text))
