@@ -271,22 +271,22 @@ Fixed strings used by searches in this plan, quoted here as explicit instruction
 
 Each task changes exactly one `- [ ] AC-n:` line to `- [x] AC-n:` in `FEATURE/spec.md`, only when the cited evidence exists and meets its acceptance condition. Acceptance for each task: `grep -c -F -e "- [x] AC-n:" "docs/features/active/promotion-receipt-destination-unverified-623/spec.md"` (with n replaced by that task's AC number; the `-e` is required because the pattern begins with a hyphen) prints 1.
 
-- [ ] [P11-T1] Check off AC-1 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/regression-testing/ts-move-verification-pass-after.STAMP.md` (P3-T2).
-- [ ] [P11-T2] Check off AC-2 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/regression-testing/ts-move-verification-fail-before.STAMP.md` (P1-T5).
-- [ ] [P11-T3] Check off AC-3 in `FEATURE/spec.md`. Evidence: P3-T2, P3-T4, and P10-T7 artifacts.
-- [ ] [P11-T4] Check off AC-4 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/regression-testing/ts-service-call-pass-after.STAMP.md` (P3-T3).
-- [ ] [P11-T5] Check off AC-5 in `FEATURE/spec.md`. Evidence: P3-T3, P7-T5 (`DA223`), and P10-T6 artifacts.
-- [ ] [P11-T6] Check off AC-6 in `FEATURE/spec.md`. Evidence: P2-T2 (fail-before) and P5-T4 (pass-after) artifacts.
-- [ ] [P11-T7] Check off AC-7 in `FEATURE/spec.md`. Evidence: P5-T4, P5-T6, and P10-T7 artifacts.
-- [ ] [P11-T8] Check off AC-8 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/qa-gates/message-parity.STAMP.md` (P10-T1).
-- [ ] [P11-T9] Check off AC-9 in `FEATURE/spec.md`. Evidence: P10-T2 and P5-T4 artifacts.
-- [ ] [P11-T10] Check off AC-10 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/qa-gates/py-line-count.STAMP.md` (P10-T3).
-- [ ] [P11-T11] Check off AC-11 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/qa-gates/line-limits.STAMP.md` (P10-T4).
-- [ ] [P11-T12] Check off AC-12 in `FEATURE/spec.md`. Evidence: P5-T5 and P10-T5 artifacts.
-- [ ] [P11-T13] Check off AC-13 in `FEATURE/spec.md`. Evidence: P7-T1 through P7-T5 artifacts from one clean pass of Phase 7 with P7-T5 in case (a), P6-T2 decision `DECISION: ADDED`, and P9-T1.
-- [ ] [P11-T14] Check off AC-14 in `FEATURE/spec.md`. Evidence: P8-T1 through P8-T5 artifacts from one clean pass of Phase 8 with P8-T5 in case (a) or case (b), and P9-T2.
-- [ ] [P11-T15] Check off AC-15 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/qa-gates/scope.STAMP.md` (P10-T8).
-- [ ] [P11-T16] Verify the check-off totals and record `FEATURE/evidence/qa-gates/ac-checkoff.STAMP.md`. Commands: `grep -c -F -e "- [x] AC-" "docs/features/active/promotion-receipt-destination-unverified-623/spec.md"` and `grep -c -F -e "- [ ] AC-" "docs/features/active/promotion-receipt-destination-unverified-623/spec.md"` (the second prints 15 at planning time). Acceptance: the printed integers are 15 and 0 respectively.
+- [x] [P11-T1] Check off AC-1 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/regression-testing/ts-move-verification-pass-after.STAMP.md` (P3-T2).
+- [x] [P11-T2] Check off AC-2 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/regression-testing/ts-move-verification-fail-before.STAMP.md` (P1-T5).
+- [x] [P11-T3] Check off AC-3 in `FEATURE/spec.md`. Evidence: P3-T2, P3-T4, and P10-T7 artifacts.
+- [x] [P11-T4] Check off AC-4 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/regression-testing/ts-service-call-pass-after.STAMP.md` (P3-T3).
+- [x] [P11-T5] Check off AC-5 in `FEATURE/spec.md`. Evidence: P3-T3, P7-T5 (`DA223`), and P10-T6 artifacts.
+- [x] [P11-T6] Check off AC-6 in `FEATURE/spec.md`. Evidence: P2-T2 (fail-before) and P5-T4 (pass-after) artifacts.
+- [x] [P11-T7] Check off AC-7 in `FEATURE/spec.md`. Evidence: P5-T4, P5-T6, and P10-T7 artifacts.
+- [x] [P11-T8] Check off AC-8 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/qa-gates/message-parity.STAMP.md` (P10-T1).
+- [x] [P11-T9] Check off AC-9 in `FEATURE/spec.md`. Evidence: P10-T2 and P5-T4 artifacts.
+- [x] [P11-T10] Check off AC-10 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/qa-gates/py-line-count.STAMP.md` (P10-T3).
+- [x] [P11-T11] Check off AC-11 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/qa-gates/line-limits.STAMP.md` (P10-T4).
+- [x] [P11-T12] Check off AC-12 in `FEATURE/spec.md`. Evidence: P5-T5 and P10-T5 artifacts.
+- [x] [P11-T13] Check off AC-13 in `FEATURE/spec.md`. Evidence: P7-T1 through P7-T5 artifacts from one clean pass of Phase 7 with P7-T5 in case (a), P6-T2 decision `DECISION: ADDED`, and P9-T1.
+- [x] [P11-T14] Check off AC-14 in `FEATURE/spec.md`. Evidence: P8-T1 through P8-T5 artifacts from one clean pass of Phase 8 with P8-T5 in case (a) or case (b), and P9-T2.
+- [x] [P11-T15] Check off AC-15 in `FEATURE/spec.md`. Evidence: `FEATURE/evidence/qa-gates/scope.STAMP.md` (P10-T8).
+- [x] [P11-T16] Verify the check-off totals and record `FEATURE/evidence/qa-gates/ac-checkoff.STAMP.md`. Commands: `grep -c -F -e "- [x] AC-" "docs/features/active/promotion-receipt-destination-unverified-623/spec.md"` and `grep -c -F -e "- [ ] AC-" "docs/features/active/promotion-receipt-destination-unverified-623/spec.md"` (the second prints 15 at planning time). Acceptance: the printed integers are 15 and 0 respectively.
 
 ## Requirements Traceability
 
