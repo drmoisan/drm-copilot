@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-09-30T13:48:50Z
+- `last_updated`: 2026-09-30T14:06:35Z
 
 **Items**
 
@@ -43,7 +43,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 743 | docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743 | 0 | scheduled | not_started |  |  |  |  |  |
 | 744 | docs/features/active/2026-09-27-orchestration-completion-gate-and-tooling-friction-744 | 1 | scheduled | not_started |  |  |  |  |  |
 | 756 | docs/features/active/2026-09-28-cleanup-worktrees-631-spec-contradiction-and-untested-error-paths-756 | 3 | scheduled | not_started |  |  |  |  |  |
-| 764 | docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764 | 0 | in_flight | worktree_created |  |  | 2026-09-30T13:44:42Z |  |  |
+| 764 | docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/805 | a2541d6d5a487c8e979447baf596ef38c07029ab | 2026-09-30T13:44:42Z | 2026-09-30T14:06:35Z |  |
 
 **Cohorts**
 
