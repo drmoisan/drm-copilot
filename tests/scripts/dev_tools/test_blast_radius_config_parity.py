@@ -355,7 +355,7 @@ def test_class_three_bundled_modules_are_payload_modules_only() -> None:
     )
 
 
-def test_every_class_two_and_class_three_key_is_consumed_by_its_registered_assertion() -> (  # noqa: E501
+def test_every_class_two_and_three_key_is_consumed_by_its_registered_assertion() -> (
     None
 ):
     """Require every Class 2 and Class 3 key to be consumed, not merely present.
