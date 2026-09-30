@@ -253,6 +253,32 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #621: the destination exclusion manifest, its filter, and the
+    // entry point, service call, engine, and command files it changes.
+    "./src/lib/push-down/claude-exclusion-manifest.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down/claude-exclusion-filter.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down/claude-customizations.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down/push-down-service-call.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down/copilot-customizations-engine.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/repo-automation-command-registration-admin.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #508: the blast-radius overlay; the map has no `global` key.
     "./src/lib/push-down/claude-blast-radius-overlay.ts": {
       lines: 85,
