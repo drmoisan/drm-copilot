@@ -5,40 +5,270 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-29T22-17
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 1.0
+- **Work Mode:** minor-audit
+- **Complexity Band: C3** (signals: ordering-invariant change to `compareCodePoint`; cross-module helper contract within `extensions/drm-copilot/src/lib/pr-context/`)
+- **Language in scope:** TypeScript only
+- **Requirements source (sole AC source):** `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md`, section `## Acceptance Criteria` (AC-1 through AC-14)
+- **Supporting context (not an AC source):** `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/research/research.2026-09-29T22-25.md`, sections 1, 4, 5, 6
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+**Mode note (minor-audit):** `spec.md` and `user-story.md` are intentionally absent and are not required. Only the `## Acceptance Criteria` section of `issue.md` is the acceptance-criteria source. Execution fails closed if `spec.md` or `user-story.md` appears in the feature folder, if the `## Acceptance Criteria` section is missing from `issue.md`, if a required Phase 0 artifact is missing or incomplete, or if checklist state contradicts evidence on disk.
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+**Fail-closed evidence rule:** TypeScript policy requires line coverage >= 85% and branch coverage >= 75%. Baseline and final-QC coverage tasks record numeric per-file values. If any required baseline artifact, final-QC artifact, or coverage value is missing, the audit verdict is BLOCKED or INCOMPLETE, never PASS.
 
+**Evidence accounting rule:** Every evidence-producing task names its artifact path. A task is not checked off until its artifact exists and carries every required field. Every command-step artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`; an artifact whose expected exit code is not 0 also carries `ExpectedExitCode:`.
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+## Terms used in every task
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+- FEATURE means `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740`. Evidence is written only under FEATURE/evidence/baseline/, FEATURE/evidence/regression-testing/, FEATURE/evidence/qa-gates/, and FEATURE/evidence/other/. No `artifacts/` path is an evidence location. No non-canonical evidence path was supplied by the caller, so no override was recorded.
+- TS means the execution time of the task in yyyy-MM-ddTHH-mm form.
+- EXT means `extensions/drm-copilot`. Every `npx` command runs with working directory EXT. Every `git` command runs from the repository root. Artifacts record the repository root as the literal token REPO, never as a host path.
+- PR-CONTEXT means `extensions/drm-copilot/src/lib/pr-context`.
+- JEST means `npx jest --config jest.config.cjs`, run in EXT. This is the allowlisted equivalent of the repository runner `node run-jest.cjs` (`extensions/drm-copilot/run-jest.cjs` adds only a guard against `--passWithNoTests`, `--onlyChanged`, and `--lastCommit`, none of which this plan passes, and then spawns Jest with `--config jest.config.cjs`). The `npm run lint` and `npm run typecheck` scripts named in AC-12 are likewise run as their script bodies `npx eslint --no-error-on-unmatched-pattern src test` and `npx tsc -p ./ --noEmit` (`extensions/drm-copilot/package.json` lines 208-209). The coverage command named in AC-13, `npm run test:coverage` (`package.json` line 212), is run as JEST with the same flags plus `--coverageReporters=json-summary`, which adds per-file percentages.
+- PROD-FILES means the eight production files this plan edits: `extensions/drm-copilot/src/lib/pr-context/models.ts`, `extensions/drm-copilot/src/lib/pr-context/collector-core.ts`, `extensions/drm-copilot/src/lib/pr-context/render.ts`, `extensions/drm-copilot/src/lib/pr-context/gh-client-details.ts`, `extensions/drm-copilot/src/lib/pr-context/render-pr-helpers.ts`, `extensions/drm-copilot/src/lib/pr-context/verification-evidence.ts`, `extensions/drm-copilot/src/lib/pr-context/render-feature-excerpts.ts`, `extensions/drm-copilot/src/lib/pr-context/feature-docs-parsers.ts`.
+- TEST-FILES means `extensions/drm-copilot/test/lib/pr-context/models.test.ts` and `extensions/drm-copilot/test/lib/pr-context/feature-docs.test.ts`.
+- CONFIG means `extensions/drm-copilot/jest.config.cjs`.
+- IN-SCOPE means PROD-FILES, TEST-FILES, and CONFIG (11 files), plus FEATURE/issue.md, this plan file, and new files under FEATURE/evidence/.
+- SUMMARY means `extensions/drm-copilot/coverage/coverage-summary.json` and LCOV means `extensions/drm-copilot/coverage/lcov.info` (both gitignored tool output, read with the Read or Grep tool). Keys in SUMMARY are absolute paths; a file is located by the key ending in its PR-CONTEXT-relative name (for example the key ending `pr-context\render.ts` on Windows or `pr-context/render.ts` elsewhere).
+- Code-point escapes: this plan writes non-printing and non-ASCII test characters only as JavaScript escapes. U+E000 is `"\uE000"`, U+FFFF is `"\uFFFF"`, U+FF5E is `"\uFF5E"`, U+FFFD is `"\uFFFD"`, U+00E9 is `"\u00E9"` (the character é), U+2028 is `"\u2028"`, and supplementary characters use `"\u{1F600}"`, `"\u{1F601}"`, `"\u{10000}"`, `"\u{20000}"`. The raw U+E000 and U+FFFF characters in issue.md AC-2, AC-3, and AC-5 correspond to `"\uE000"` and `"\uFFFF"`. Test source uses these escape forms, not raw characters.
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#740-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+## Scope and recorded design decisions
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+- D1 — Ordering contract. `compareCodePoint` changes from UTF-16 code-unit order to Unicode code-point order, matching Python `str` comparison (research 2.1). The implementation finds the first differing UTF-16 code unit and compares `codePointAt` values at that index; a proper prefix sorts first; the return value is exactly -1, 0, or 1. The observable change is limited to strings whose first difference is a supplementary character against a BMP character in U+E000..U+FFFF; research 1.7 found no existing fixture containing such a pair.
+- D2 — Canonical homes (research 2.2). `sortedSet`, `escapeRegExp`, and `splitLines` are exported from `models.ts`; `relativeToPosix` stays exported from `feature-docs-parsers.ts`. No new module is added. `models.ts` imports nothing from pr-context, and `feature-docs-parsers.ts` imports only `./models` and `../file-system`, so the new edges cannot form an import cycle (research 1.4).
+- D3 — Optional inline reuse is excluded. The research's optional replacement of the inline `sortedSet` equivalents in `extensions/drm-copilot/src/lib/pr-context/feature-docs.ts` (lines 309-311) and `extensions/drm-copilot/src/lib/pr-context/autoclose.ts` (line 210) is not performed. AC-6 does not require it, and excluding it keeps the edit set to the eleven IN-SCOPE code files. Neither file is edited by this plan.
+- D4 — No new dependency. Property checks stay enumerative over a fixed domain; `fast-check` is not installed (research 1.2) and is not added.
+- D5 — Out of scope (AC-14, issue Out of Scope). No file under `extensions/drm-copilot/src/lib/codex-native-converter/`, `extensions/drm-copilot/src/lib/push-down/`, or `extensions/drm-copilot/src/lib/subagent-tree/`, and no Python file under `scripts/`, is modified. The follow-up for comparator consolidation outside pr-context is recorded by the orchestrator, not by this plan.
+- D6 — 500-line limit. Measured at planning time: `models.ts` 348, `collector-core.ts` 386, `render.ts` 400, `gh-client-details.ts` 387, `render-pr-helpers.ts` 407, `verification-evidence.ts` 293, `render-feature-excerpts.ts` 442, `feature-docs-parsers.ts` 316, `models.test.ts` 237, `feature-docs.test.ts` 311, `jest.config.cjs` 356. Only `models.ts` (about +40), `models.test.ts` (about +150), `feature-docs.test.ts` (about +50), and `jest.config.cjs` (about +15) grow.
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+## Execution constraints
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+- Dependencies. `extensions/drm-copilot/node_modules` is absent in this worktree at planning time. P0-T9 installs it before any toolchain command.
+- Task ordering around deliberately failing tests. P1-T2 adds tests that fail against the pre-fix `compareCodePoint`. Between P1-T2 and P1-T5 no command runs `extensions/drm-copilot/test/lib/pr-context` as a whole, runs `models.test.ts` without the `-t` filter of P1-T3, or runs the full suite. The first unfiltered run of `models.test.ts` is P1-T19, after the fix.
+- Hooks. If a hook or permission rule denies a command in this plan, stop and report the denial text. Do not bypass it.
+- Stop conditions. When a stop condition in a task is reached, write the task's artifact with the stop reason and report to the caller. Do not improvise a substitute design.
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+### Phase 0 — Baseline Capture
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+- [ ] [P0-T1] Verify the minor-audit preconditions for FEATURE (`docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md`) and write FEATURE/evidence/baseline/phase0-mode-check.TS.md.
+      Commands: `git ls-files docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740`; Glob `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/{spec,user-story}.md`; `git grep -c -F "## Acceptance Criteria" -- docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md`; `git grep -c -F "Work Mode: minor-audit" -- docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md`.
+      Acceptance: neither the listing nor the Glob returns spec.md or user-story.md; each `git grep -c` prints a count of 1. Any other result stops the plan.
+- [ ] [P0-T2] Read `CLAUDE.md` (policy order step 1: standing instructions, including the tonality reference to `.claude/rules/tonality.md`).
+      Acceptance: the file is read in full and listed first in the P0-T8 artifact.
+- [ ] [P0-T3] Read `.claude/rules/general-code-change.md` (policy order step 2).
+      Acceptance: the file is read in full and listed second in the P0-T8 artifact.
+- [ ] [P0-T4] Read `.claude/rules/general-unit-test.md` (policy order step 3).
+      Acceptance: the file is read in full and listed third in the P0-T8 artifact.
+- [ ] [P0-T5] Read `.claude/rules/typescript.md` (policy order step 4, TypeScript).
+      Acceptance: the file is read in full and listed fourth in the P0-T8 artifact.
+- [ ] [P0-T6] Read `.claude/rules/typescript-suppressions.md` (policy order step 4, TypeScript).
+      Acceptance: the file is read in full and listed fifth in the P0-T8 artifact.
+- [ ] [P0-T7] Read `.claude/rules/quality-tiers.md` (coverage thresholds referenced by step 3).
+      Acceptance: the file is read in full and listed sixth in the P0-T8 artifact.
+- [ ] [P0-T8] Write FEATURE/evidence/baseline/phase0-instructions-read.md (`docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/evidence/baseline/phase0-instructions-read.md`) with `Timestamp:`, `Policy Order:`, and the explicit list of the six files read in P0-T2 through P0-T7, in that order.
+      Acceptance: the artifact exists with the three required headers and lists exactly those six files in order.
+- [ ] [P0-T9] Install EXT dependencies and write FEATURE/evidence/baseline/ts-npm-ci.TS.md.
+      Commands: Glob `extensions/drm-copilot/node_modules/jest/package.json`; when it returns no file, `npm ci --no-audit --no-fund` in EXT; then `git status --porcelain -- extensions/drm-copilot/package.json extensions/drm-copilot/package-lock.json`.
+      Acceptance: after the task, the Glob returns `extensions/drm-copilot/node_modules/jest/package.json`; `npm ci` (when run) exits 0; the status command prints nothing, so the lockfile is unchanged. If the install command is denied by a permission rule, stop and report, because every later toolchain task depends on it.
+- [ ] [P0-T10] Record the pre-edit scope baseline and write FEATURE/evidence/baseline/scope-baseline.TS.md.
+      Commands: `git rev-parse HEAD`; `git rev-parse origin/main`; `git diff --name-only origin/main -- extensions/drm-copilot scripts`; `git status --porcelain -- extensions/drm-copilot scripts`.
+      Acceptance: both rev-parse commands print one 40-character hexadecimal SHA, recorded as HEAD_SHA and MAIN_SHA; the complete output of the diff and status commands is recorded verbatim as BASELINE-DRIFT (it is expected to be empty). If BASELINE-DRIFT lists any IN-SCOPE code file, stop, because the coverage delta of P2-T9 would then mix pre-existing drift into the changed-line set.
+- [ ] [P0-T11] Baseline format check (read-only) and write FEATURE/evidence/baseline/ts-prettier.TS.md.
+      Command: `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"` (in EXT).
+      Acceptance: the command is executed and its exit code and output recorded. Observed success output on this toolchain is the line "All matched files use Prettier code style!" with exit 0. A non-zero exit is recorded with every file name it lists as pre-existing drift; it is not repaired in Phase 0.
+- [ ] [P0-T12] Baseline lint and write FEATURE/evidence/baseline/ts-eslint.TS.md.
+      Command: `npx eslint --no-error-on-unmatched-pattern src test` (in EXT).
+      Acceptance: the command is executed; exit code, error count, and warning count are recorded. Observed success output is empty with exit 0.
+- [ ] [P0-T13] Baseline type check and write FEATURE/evidence/baseline/ts-tsc.TS.md.
+      Command: `npx tsc -p ./ --noEmit` (in EXT).
+      Acceptance: the command is executed; exit code and the count of `error TS` lines are recorded. Observed success output is empty with exit 0.
+- [ ] [P0-T14] Baseline targeted pr-context test run and write FEATURE/evidence/baseline/ts-jest-pr-context.TS.md.
+      Command: `npx jest --config jest.config.cjs test/lib/pr-context` (in EXT).
+      Acceptance: exit 0; the `Test Suites:` and `Tests:` summary lines are recorded verbatim, and the Tests total is recorded as PRC_BASE_TOTAL. A non-zero exit stops the plan, because AC-11 presumes a green pr-context baseline.
+- [ ] [P0-T15] Baseline full test suite with coverage and write FEATURE/evidence/baseline/ts-jest-coverage.TS.md.
+      Commands: `npx jest --config jest.config.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary --coverageReporters=json-summary` (in EXT); then read SUMMARY.
+      Acceptance: exit 0; the `Test Suites:` and `Tests:` lines and the four text-summary percentages are recorded; no `coverage threshold` failure line appears. `Output Summary:` records, for each of the eight PROD-FILES, `lines.pct (covered/total)` and `branches.pct (covered/total)` from SUMMARY as numbers. A non-zero exit stops the plan. If `render.ts`, `gh-client-details.ts`, or `verification-evidence.ts` is below 85 lines or 75 branches, record it and stop before P1-T18, because adding its threshold entry would fail AC-13 on pre-existing coverage.
+- [ ] [P0-T16] Baseline line counts of the eleven IN-SCOPE code files and write FEATURE/evidence/baseline/line-counts.TS.md.
+      Command: `git grep -c -E "^" -- extensions/drm-copilot/src/lib/pr-context/models.ts extensions/drm-copilot/src/lib/pr-context/collector-core.ts extensions/drm-copilot/src/lib/pr-context/render.ts extensions/drm-copilot/src/lib/pr-context/gh-client-details.ts extensions/drm-copilot/src/lib/pr-context/render-pr-helpers.ts extensions/drm-copilot/src/lib/pr-context/verification-evidence.ts extensions/drm-copilot/src/lib/pr-context/render-feature-excerpts.ts extensions/drm-copilot/src/lib/pr-context/feature-docs-parsers.ts extensions/drm-copilot/test/lib/pr-context/models.test.ts extensions/drm-copilot/test/lib/pr-context/feature-docs.test.ts extensions/drm-copilot/jest.config.cjs`.
+      Acceptance: exit 0 and eleven `path:count` lines recorded. The counts are expected to match D6 within one line each (trailing-newline accounting); a larger difference is recorded and the D6 headroom is re-derived in the artifact.
+- [ ] [P0-T17] Baseline helper-definition count for AC-6 and write FEATURE/evidence/baseline/helper-definitions.TS.md.
+      Command: `git grep -n -E "function (sortedSet|relativeToPosix|escapeRegExp|splitLines)\(" -- extensions/drm-copilot/src/lib/pr-context`.
+      Acceptance: exit 0 and exactly 12 output lines: `verification-evidence.ts:266` and `:280`, `render-feature-excerpts.ts:431` and `:440`, `render.ts:377` and `:387`, `gh-client-details.ts:123`, `render-pr-helpers.ts:394`, `feature-docs-parsers.ts:299` and `:314`, `collector-core.ts:384`, `models.ts:221`. This proves the P2-T10 condition (exactly 4 lines) can fail.
+
+### Phase 1 — Constrained Small-Path Implementation
+
+This phase is one delegated handoff. atomic-executor delegates P1-T2 through P1-T21 to the typescript-engineer persona, which performs them in order. No implementation is performed during planning. Only the files named as the first path in each write task title are edited.
+
+- [ ] [P1-T1] Delegate P1-T2 through P1-T21 to the typescript-engineer persona with this plan file as the task list, and write FEATURE/evidence/other/p1-handoff.TS.md recording the delegation and the engineer's completion report.
+      Constraints: edit only PROD-FILES, TEST-FILES, and CONFIG; no edit under `extensions/drm-copilot/src/lib/codex-native-converter/`, `extensions/drm-copilot/src/lib/push-down/`, `extensions/drm-copilot/src/lib/subagent-tree/`, `extensions/drm-copilot/src/lib/pr-context/feature-docs.ts`, `extensions/drm-copilot/src/lib/pr-context/autoclose.ts`, or `scripts/`; no new dependency; no change to the expected value of any pre-existing test outside `models.test.ts` (AC-11).
+      Acceptance: every acceptance condition of P1-T2 through P1-T21 holds and the handoff artifact records the completion report.
+- [ ] [P1-T2] Edit `extensions/drm-copilot/test/lib/pr-context/models.test.ts` to add the fixed-order code-point tests (AC-1, AC-2, AC-3), remove the two vacuous tests (AC-4), and add pair diagnostics and the disagreement characters to the enumerative block (AC-5). Do not touch `models.ts` in this task.
+      (a) Add a new top-level block titled "compareCodePoint issue #740 code-point order" containing exactly these nine tests, each with a literal expected value and Arrange-Act-Assert comments:
+      - "D1 orders U+FFFF before U+1F600 in both argument orders": `compareCodePoint("\uFFFF", "\u{1F600}")` is -1 and `compareCodePoint("\u{1F600}", "\uFFFF")` is 1.
+      - "D2 orders U+E000 before U+10000": `compareCodePoint("\uE000", "\u{10000}")` is -1.
+      - "D3 orders U+FF5E before U+1F600": `compareCodePoint("\uFF5E", "\u{1F600}")` is -1.
+      - "D4 orders a shared-prefix U+FFFD before a shared-prefix U+1F600": `compareCodePoint("a\uFFFD", "a\u{1F600}")` is -1.
+      - "S1 sorts a mixed BMP and non-BMP array into a literal code-point order": `["b", "\u{1F600}", "a", "\uFFFF", "\u00E9", "", "A", "ab", "\uE000"]` sorted with `compareCodePoint` equals the literal `["", "A", "a", "ab", "b", "\u00E9", "\uE000", "\uFFFF", "\u{1F600}"]`.
+      - "A1 orders U+00E9 before U+1F600": -1.
+      - "A2 orders U+1F600 before U+1F601 (trail-surrogate difference)": -1.
+      - "A3 orders U+1F600 before U+20000 (lead-surrogate difference)": -1.
+      - "A4 orders a before a U+1F600 extension (prefix)": `compareCodePoint("a", "a\u{1F600}")` is -1.
+      (b) Delete the test "agrees with the native < and > operators for every ordered pair in the domain" (currently line 215) and the test "produces the same order as native comparison via Array.prototype.sort, including an astral surrogate-pair string" (currently line 230).
+      (c) In the block "compareCodePoint - enumerative properties over a fixed domain", extend `DOMAIN` (currently line 177) with `"\uE000"` and `"\uFFFF"`. Rewrite "is antisymmetric for every ordered pair in the domain" and "is transitive for every ordered triple in the domain" so each collects a `violations` string array, with each entry naming the offending pair or triple as U+XXXX code-point sequences through a small local helper, and ends with the single assertion "expect(violations).toEqual([])". Keep both test titles unchanged.
+      Acceptance: the file contains the nine titles above and the literal "expect(violations).toEqual([])" at least twice; `git grep -c -F "agrees with the native" -- extensions/drm-copilot/test/lib/pr-context/models.test.ts` finds no match (exit 1); the file still imports only names that `models.ts` exports today.
+- [ ] [P1-T3] [expect-fail] Run the new code-point block against the pre-fix `compareCodePoint` and write FEATURE/evidence/regression-testing/ts-fail-before.TS.md (`extensions/drm-copilot/test/lib/pr-context/models.test.ts`).
+      Command: `npx jest --config jest.config.cjs --runTestsByPath test/lib/pr-context/models.test.ts -t "issue #740 code-point order"` (in EXT).
+      Acceptance: exit 1; the `Tests:` line reports 5 failed and 4 passed (plus a skipped count for the filtered-out tests); the five failing titles are exactly D1, D2, D3, D4, and S1, and each failure shows an expected value of -1 (or the S1 literal array) against the UTF-16 result. The artifact carries `ExpectedExitCode: 1` and lists the failing titles verbatim. Any other failure set, or a compile error, fails this task and stops the plan.
+- [ ] [P1-T4] Fix `extensions/drm-copilot/src/lib/pr-context/models.ts` so `compareCodePoint` (currently lines 339-348) orders strings by Unicode code point per D1, and replace its one-line JSDoc with a block stating that it compares by Unicode code point, matches Python `str` comparison, differs from the JavaScript `<` operator (UTF-16 code units) for a supplementary character against U+E000..U+FFFF, and returns exactly -1, 0, or 1.
+      Acceptance: the function body contains no `left < right` or `left > right` comparison of the two strings; `npx tsc -p ./ --noEmit` (in EXT) exits 0.
+- [ ] [P1-T5] Run the code-point block after the fix (pass-after) and write FEATURE/evidence/regression-testing/ts-pass-after.TS.md (`extensions/drm-copilot/test/lib/pr-context/models.test.ts`).
+      Command: `npx jest --config jest.config.cjs --runTestsByPath test/lib/pr-context/models.test.ts -t "issue #740 code-point order"` (in EXT).
+      Acceptance: exit 0; the `Tests:` line reports 9 passed and 0 failed; the artifact cites the P1-T3 artifact as its fail-before counterpart.
+- [ ] [P1-T6] Update `extensions/drm-copilot/src/lib/pr-context/models.ts` to export `sortedSet(values: Iterable<string>): string[]` (body `[...new Set(values)].sort(compareCodePoint)`, with a JSDoc) and `escapeRegExp(value: string): string` (body `value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&")`, with a JSDoc), each defined with the `export function` form.
+      Acceptance: `git grep -c -E "export function (sortedSet|escapeRegExp)\(" -- extensions/drm-copilot/src/lib/pr-context/models.ts` prints a count of 2.
+- [ ] [P1-T7] Update `extensions/drm-copilot/src/lib/pr-context/models.ts` so the `splitLines` JSDoc (currently lines 211-220) no longer claims to reproduce Python `str.splitlines()` and instead contains the single-line literal "Supported terminators: `\r\n`, `\r`, and `\n`." and a line containing the literal "a subset of the Python" followed by `str.splitlines()` line boundaries (AC-8). The function body is unchanged.
+      Acceptance: `git grep -c -F "Supported terminators:" -- extensions/drm-copilot/src/lib/pr-context/models.ts` prints 1 and `git grep -c -F "a subset of the Python" -- extensions/drm-copilot/src/lib/pr-context/models.ts` prints 1.
+- [ ] [P1-T8] Update `extensions/drm-copilot/src/lib/pr-context/models.ts` so the module header comment (currently lines 1-21, the "Responsibilities" list) names the pure helpers `splitLines`, `compareCodePoint`, `sortedSet`, and `escapeRegExp` in addition to the existing names (AC-9).
+      Acceptance: each of the four names appears on at least one line numbered lower than the line of `import { type CommandResult } from "../subprocess-runner";`, as shown by `git grep -n -E "compareCodePoint|sortedSet|escapeRegExp|splitLines|type CommandResult" -- extensions/drm-copilot/src/lib/pr-context/models.ts`.
+- [ ] [P1-T9] Update `extensions/drm-copilot/src/lib/pr-context/collector-core.ts` to delete the private `sortedSet` (currently lines 383-386) and add `sortedSet` to the existing `./models` import (currently lines 21-28). Remove `compareCodePoint` from that import only if no reference remains.
+      Acceptance: `git grep -c -F "function sortedSet(" -- extensions/drm-copilot/src/lib/pr-context/collector-core.ts` finds no match (exit 1); `npx tsc -p ./ --noEmit` (in EXT) exits 0.
+- [ ] [P1-T10] Update `extensions/drm-copilot/src/lib/pr-context/render.ts` to delete the private `sortedSet` (currently lines 376-379) and the private `splitLines` (currently lines 381-400), and import both from `./models` in the existing `./models` import (currently lines 18-24). Remove `compareCodePoint` from that import if no reference remains.
+      Acceptance: `git grep -c -E "function (sortedSet|splitLines)\(" -- extensions/drm-copilot/src/lib/pr-context/render.ts` finds no match (exit 1); `npx tsc -p ./ --noEmit` (in EXT) exits 0.
+- [ ] [P1-T11] Update `extensions/drm-copilot/src/lib/pr-context/gh-client-details.ts` to delete the private `sortedSet` and its JSDoc (currently lines 115-125), and merge the two `./models` import statements (currently lines 18-19) into one statement that imports `findUserStoryLink`, `sortedSet`, `type IssueDetails`, and `type PullRequestDetails` (plus `compareCodePoint` only if a reference remains) (AC-10).
+      Acceptance: `git grep -c -F 'from "./models"' -- extensions/drm-copilot/src/lib/pr-context/gh-client-details.ts` prints 1 (it prints 2 today); `git grep -c -F "function sortedSet(" -- extensions/drm-copilot/src/lib/pr-context/gh-client-details.ts` finds no match (exit 1).
+- [ ] [P1-T12] Update `extensions/drm-copilot/src/lib/pr-context/render-pr-helpers.ts` to delete the private `splitLines` (currently lines 388-407) and add `splitLines` to the existing `./models` import (currently lines 19-28).
+      Acceptance: `git grep -c -F "function splitLines(" -- extensions/drm-copilot/src/lib/pr-context/render-pr-helpers.ts` finds no match (exit 1); `npx tsc -p ./ --noEmit` (in EXT) exits 0.
+- [ ] [P1-T13] Update `extensions/drm-copilot/src/lib/pr-context/verification-evidence.ts` to delete the private `relativeToPosix` (currently lines 259-272) and the private `splitLines` (currently lines 274-293), import `relativeToPosix` from `./feature-docs-parsers`, and add `splitLines` to the existing `./models` import (currently line 22). Keep `toPosixPath` imported while line 89 still uses it.
+      Acceptance: `git grep -c -E "function (relativeToPosix|splitLines)\(" -- extensions/drm-copilot/src/lib/pr-context/verification-evidence.ts` finds no match (exit 1); `npx tsc -p ./ --noEmit` (in EXT) exits 0.
+- [ ] [P1-T14] Update `extensions/drm-copilot/src/lib/pr-context/render-feature-excerpts.ts` to delete the private `relativeToPosix` (currently lines 430-437) and the private `escapeRegExp` (currently lines 439-442), import `relativeToPosix` from `./feature-docs-parsers`, and add `escapeRegExp` to the existing `./models` import (currently lines 19-26). Remove `toPosixPath` from the `../file-system` import only if no reference remains.
+      Acceptance: `git grep -c -E "function (relativeToPosix|escapeRegExp)\(" -- extensions/drm-copilot/src/lib/pr-context/render-feature-excerpts.ts` finds no match (exit 1); `npx tsc -p ./ --noEmit` (in EXT) exits 0.
+- [ ] [P1-T15] Update `extensions/drm-copilot/src/lib/pr-context/feature-docs-parsers.ts` to delete the private `escapeRegExp` (currently lines 308-316), add `escapeRegExp` to the existing `./models` import (currently lines 18-22), and extend the `relativeToPosix` JSDoc (currently lines 290-298) to state that a path outside `root` returns the POSIX path with leading slashes stripped, where Python `relative_to` would raise.
+      Acceptance: `git grep -c -F "function escapeRegExp(" -- extensions/drm-copilot/src/lib/pr-context/feature-docs-parsers.ts` finds no match (exit 1); `git grep -c -F "export function relativeToPosix(" -- extensions/drm-copilot/src/lib/pr-context/feature-docs-parsers.ts` prints 1; `npx tsc -p ./ --noEmit` (in EXT) exits 0.
+- [ ] [P1-T16] Add direct helper tests to `extensions/drm-copilot/test/lib/pr-context/models.test.ts` (AC-7): import `sortedSet`, `escapeRegExp`, and `splitLines` from the models module and add three top-level blocks with exactly these 15 tests, each with a literal expected value:
+      - Block "sortedSet": "removes duplicates and sorts by code point" (`["b", "a", "b", "A"]` gives `["A", "a", "b"]`); "orders U+FFFF before U+1F600" (`["\u{1F600}", "\uFFFF"]` gives `["\uFFFF", "\u{1F600}"]`); "accepts a Set and a generator" (both give `["a", "b"]`); "does not mutate the input array"; "returns an empty array for empty input".
+      - Block "escapeRegExp": "escapes every regex metacharacter so the pattern matches the literal text" (for the string of the characters `. * + ? ^ $ { } ( ) | [ ] \`, `new RegExp("^" + escapeRegExp(text) + "$", "u").test(text)` is true); "leaves a hyphen unescaped" (`"a-b"` gives `"a-b"`); "returns plain text unchanged" (`"abc"` gives `"abc"`).
+      - Block "splitLines": "returns an empty array for the empty string"; "splits on CRLF" (`"a\r\nb"` gives `["a", "b"]`); "splits on a lone CR" (`"a\rb"` gives `["a", "b"]`); "drops a single trailing terminator" (`"a\n"` gives `["a"]`); "keeps an interior empty line before a trailing terminator" (`"a\n\n"` gives `["a", ""]`); "returns one empty line for a lone newline" (`"\n"` gives `[""]`); "does not split on U+2028" (`"a\u2028b"` gives `["a\u2028b"]`).
+      Acceptance: `npx jest --config jest.config.cjs --runTestsByPath test/lib/pr-context/models.test.ts -t "^(sortedSet|escapeRegExp|splitLines) "` (in EXT) exits 0 and its `Tests:` line reports 15 passed and 0 failed.
+- [ ] [P1-T17] Add direct `relativeToPosix` tests to `extensions/drm-copilot/test/lib/pr-context/feature-docs.test.ts` (AC-7): add `relativeToPosix` to the existing feature-docs-parsers import (currently lines 4-9) as an added line, and add one top-level block "relativeToPosix" with exactly these five tests:
+      - "returns the path relative to a POSIX root" (`("/repo", "/repo/docs/a.md")` gives `"docs/a.md"`);
+      - "normalizes a Windows-style root and path" (`("C:\\repo\\", "C:\\repo\\docs\\a.md")` gives `"docs/a.md"`);
+      - "strips a trailing slash from the root" (`("/repo/", "/repo/x.md")` gives `"x.md"`);
+      - "returns the leading-slash-stripped path for a path outside the root" (`("/repo", "/other/x.md")` gives `"other/x.md"`);
+      - "does not treat a sibling directory sharing the root prefix as inside the root" (`("/repo", "/repository/x.md")` gives `"repository/x.md"`).
+      No existing line of the file is modified or deleted.
+      Acceptance: `npx jest --config jest.config.cjs --runTestsByPath test/lib/pr-context/feature-docs.test.ts -t "^relativeToPosix "` (in EXT) exits 0 and its `Tests:` line reports 5 passed and 0 failed.
+- [ ] [P1-T18] Update `extensions/drm-copilot/jest.config.cjs` to add per-file threshold entries `{ lines: 85, branches: 75 }` for "./src/lib/pr-context/render.ts", "./src/lib/pr-context/gh-client-details.ts", and "./src/lib/pr-context/verification-evidence.ts", placed after the "./src/lib/pr-context/render-pr-helpers.ts" entry under a comment naming issue #740 and stating that the three files changed without an existing entry. The comment names the files by bare file name only and does not repeat any quoted `./src/...` key, so each key occurs on exactly one line. Precondition: P0-T15 recorded each of the three at or above 85 lines and 75 branches; otherwise this task does not run and the plan is stopped per P0-T15.
+      Acceptance: for each of the three keys, `git grep -c -F "./src/lib/pr-context/render.ts" -- extensions/drm-copilot/jest.config.cjs` (and the same command with the other two keys) prints 1.
+- [ ] [P1-T19] Run the full `models.test.ts` file (first unfiltered run after the fix) and write FEATURE/evidence/other/p1-models-test.TS.md (`extensions/drm-copilot/test/lib/pr-context/models.test.ts`).
+      Command: `npx jest --config jest.config.cjs --runTestsByPath test/lib/pr-context/models.test.ts` (in EXT).
+      Acceptance: exit 0 and 0 failed on the `Tests:` line.
+- [ ] [P1-T20] Verify the AC-6 helper-definition count after consolidation and write FEATURE/evidence/other/p1-helper-definitions.TS.md (`extensions/drm-copilot/src/lib/pr-context/models.ts`).
+      Command: `git grep -n -E "function (sortedSet|relativeToPosix|escapeRegExp|splitLines)\(" -- extensions/drm-copilot/src/lib/pr-context`.
+      Acceptance: exactly 4 output lines (P0-T17 recorded 12): three in `models.ts` (`sortedSet`, `escapeRegExp`, `splitLines`) and one in `feature-docs-parsers.ts` (`relativeToPosix`), each line containing `export function`.
+- [ ] [P1-T21] Run the targeted pr-context suite as the fast gate and write FEATURE/evidence/other/p1-pr-context.TS.md (`extensions/drm-copilot/test/lib/pr-context`).
+      Command: `npx jest --config jest.config.cjs test/lib/pr-context` (in EXT).
+      Acceptance: exit 0, 0 failed, the `Test Suites:` count equals the P0-T14 count, and the `Tests:` total equals PRC_BASE_TOTAL plus 27 (29 added: 9 in P1-T2, 15 in P1-T16, 5 in P1-T17; 2 removed in P1-T2).
+
+### Phase 2 — Final QC Loop
+
+Run the TypeScript toolchain in order: format (P2-T1), lint (P2-T2), type check (P2-T3), architecture (P2-T4), tests (P2-T5 through P2-T8), then the threshold and structural checks (P2-T9 through P2-T15). If any of P2-T1 through P2-T15 fails or changes a file, the typescript-engineer remediates, and the loop restarts from P2-T1 until P2-T1 through P2-T15 pass in one pass with no file changed. Every Phase 2 command task is unconditional; none has a SKIPPED outcome. Artifacts go to FEATURE/evidence/qa-gates/ unless stated. Contract/schema checks do not apply (no host-service boundary changes) and integration tests (`test/lib/pr-context/collector-integration.test.ts`, `test/extension.collect-pr-context.test.ts`) run inside P2-T5 and P2-T8.
+
+- [ ] [P2-T1] Format check and write FEATURE/evidence/qa-gates/ts-prettier.TS.md (`extensions/drm-copilot/src/lib/pr-context/models.ts` and the other IN-SCOPE files).
+      Command: `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"` (in EXT).
+      Acceptance: exit 0 and the output line "All matched files use Prettier code style!" is recorded. On a non-zero exit, the engineer runs `npx prettier --write` over only the IN-SCOPE files the check listed, the artifact records the listed files, and the loop restarts from P2-T1; the task passes only on a run that prints "All matched files use Prettier code style!" with exit 0. A listed file outside IN-SCOPE that P0-T11 also listed is pre-existing drift, is not rewritten, and is recorded; in that case the pass condition is that the check lists no IN-SCOPE file.
+- [ ] [P2-T2] Lint and write FEATURE/evidence/qa-gates/ts-eslint.TS.md (EXT `src` and `test`).
+      Command: `npx eslint --no-error-on-unmatched-pattern src test` (in EXT).
+      Acceptance: exit 0 with empty output (0 errors, 0 warnings).
+- [ ] [P2-T3] Type check and write FEATURE/evidence/qa-gates/ts-tsc.TS.md (`extensions/drm-copilot/tsconfig.json`).
+      Command: `npx tsc -p ./ --noEmit` (in EXT).
+      Acceptance: exit 0 and zero `error TS` lines.
+- [ ] [P2-T4] Architecture-boundary stage and write FEATURE/evidence/qa-gates/ts-architecture.TS.md (`extensions/drm-copilot/.dependency-cruiser.cjs`).
+      Command: `git ls-files -- .dependency-cruiser.cjs extensions/drm-copilot/.dependency-cruiser.cjs extensions/drm-copilot/.dependency-cruiser.js`.
+      Acceptance: exit 0 with empty output, recorded with `Output Summary:` "NOT APPLICABLE: no dependency-cruiser configuration and no architecture test exist for this extension (research section 6, item 4); import-cycle safety of the new edges rests on the research 1.4 import map and on P2-T3." If the command lists any file, the stage is applicable: stop and request a plan revision to run it.
+- [ ] [P2-T5] Targeted pr-context regression for AC-11 and write FEATURE/evidence/qa-gates/ts-jest-pr-context.TS.md (`extensions/drm-copilot/test/lib/pr-context`).
+      Command: `npx jest --config jest.config.cjs test/lib/pr-context` (in EXT).
+      Acceptance: exit 0, 0 failed, the `Test Suites:` count equals the P0-T14 count, and the `Tests:` total equals PRC_BASE_TOTAL plus 27.
+- [ ] [P2-T6] Code-point block pass run for AC-1, AC-2, and AC-3 and write FEATURE/evidence/qa-gates/ts-code-point-order.TS.md (`extensions/drm-copilot/test/lib/pr-context/models.test.ts`).
+      Command: `npx jest --config jest.config.cjs --runTestsByPath test/lib/pr-context/models.test.ts -t "issue #740 code-point order"` (in EXT).
+      Acceptance: exit 0 and the `Tests:` line reports 9 passed and 0 failed.
+- [ ] [P2-T7] Direct helper tests for AC-7 and write FEATURE/evidence/qa-gates/ts-helper-tests.TS.md (`extensions/drm-copilot/test/lib/pr-context/models.test.ts`, `extensions/drm-copilot/test/lib/pr-context/feature-docs.test.ts`).
+      Commands: `npx jest --config jest.config.cjs --runTestsByPath test/lib/pr-context/models.test.ts -t "^(sortedSet|escapeRegExp|splitLines) "`; `npx jest --config jest.config.cjs --runTestsByPath test/lib/pr-context/feature-docs.test.ts -t "^relativeToPosix "` (both in EXT).
+      Acceptance: both exit 0; the first reports 15 passed and the second 5 passed, each with 0 failed.
+- [ ] [P2-T8] Full suite with coverage for AC-13 and write FEATURE/evidence/qa-gates/ts-jest-coverage.TS.md (`extensions/drm-copilot/jest.config.cjs`).
+      Commands: `npx jest --config jest.config.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary --coverageReporters=json-summary` (in EXT); then read SUMMARY.
+      Acceptance: exit 0; 0 failed; no `coverage threshold` failure line; the `Test Suites:` and `Tests:` lines and the four text-summary percentages are recorded; `Output Summary:` records `lines.pct (covered/total)` and `branches.pct (covered/total)` from SUMMARY for each of the eight PROD-FILES, and each is at least 85 lines and 75 branches.
+- [ ] [P2-T9] Coverage delta and changed-line coverage and write FEATURE/evidence/qa-gates/coverage-delta.TS.md (`extensions/drm-copilot/src/lib/pr-context/models.ts` and the other PROD-FILES).
+      Command: `git diff -U0 origin/main -- extensions/drm-copilot/src/lib/pr-context` (added-line numbers from each `@@ ... +start,count @@` hunk header), then read LCOV `DA:` records for those lines.
+      Acceptance: for each of the eight PROD-FILES the artifact records baseline lines.pct and branches.pct (P0-T15), post-change lines.pct and branches.pct (P2-T8), and changed-line coverage as covered added lines over added lines that carry a `DA:` record. PASS only if every post-change value is at least 85 lines and 75 branches, no post-change lines.pct is lower than its baseline by more than 0.5 percentage points without a recorded cause, and aggregate changed-line coverage across PROD-FILES is at least 85%. Otherwise the artifact states remediation-required and the task fails.
+- [ ] [P2-T10] Helper-definition count for AC-6 and write FEATURE/evidence/qa-gates/helper-definitions.TS.md (`extensions/drm-copilot/src/lib/pr-context/models.ts`, `extensions/drm-copilot/src/lib/pr-context/feature-docs-parsers.ts`).
+      Commands: `git grep -n -E "function (sortedSet|relativeToPosix|escapeRegExp|splitLines)\(" -- extensions/drm-copilot/src/lib/pr-context`; `git grep -n -E "(const|let|var) (sortedSet|relativeToPosix|escapeRegExp|splitLines)[ :=]" -- extensions/drm-copilot/src/lib/pr-context`.
+      Acceptance: the first command prints exactly 4 lines, each containing `export function`: `sortedSet`, `escapeRegExp`, and `splitLines` in `models.ts`, and `relativeToPosix` in `feature-docs-parsers.ts` (P0-T17 recorded 12). The second command finds no match (exit 1).
+- [ ] [P2-T11] Test-file structure for AC-4 and AC-5 and write FEATURE/evidence/qa-gates/models-test-structure.TS.md (`extensions/drm-copilot/test/lib/pr-context/models.test.ts`).
+      Commands: `git grep -c -F "agrees with the native" -- extensions/drm-copilot/test/lib/pr-context/models.test.ts`; `git grep -c -F "same order as native comparison" -- extensions/drm-copilot/test/lib/pr-context/models.test.ts`; `git grep -n -E "left < right|left > right" -- extensions/drm-copilot/test/lib/pr-context/models.test.ts`; `git grep -c -F "? -1 :" -- extensions/drm-copilot/test/lib/pr-context/models.test.ts`; `git grep -c -F "expect(violations).toEqual([])" -- extensions/drm-copilot/test/lib/pr-context/models.test.ts`; `git grep -n -F "const DOMAIN" -- extensions/drm-copilot/test/lib/pr-context/models.test.ts`.
+      Acceptance: the first four commands find no match (exit 1 each; today they find 1, 1, 3 lines, and 1 respectively); the fifth prints 2 or more; the DOMAIN line contains both `"\uE000"` and `"\uFFFF"`. The artifact also states, from a read of the file, that no remaining test computes its expected value with the string `<` or `>` operators.
+- [ ] [P2-T12] Documentation and import checks for AC-8, AC-9, and AC-10 and write FEATURE/evidence/qa-gates/models-doc-and-imports.TS.md (`extensions/drm-copilot/src/lib/pr-context/models.ts`, `extensions/drm-copilot/src/lib/pr-context/gh-client-details.ts`).
+      Commands: `git grep -c -F "Supported terminators:" -- extensions/drm-copilot/src/lib/pr-context/models.ts`; `git grep -c -F "a subset of the Python" -- extensions/drm-copilot/src/lib/pr-context/models.ts`; `git grep -n -E "compareCodePoint|sortedSet|escapeRegExp|splitLines|type CommandResult" -- extensions/drm-copilot/src/lib/pr-context/models.ts`; `git grep -c -F 'from "./models"' -- extensions/drm-copilot/src/lib/pr-context/gh-client-details.ts`.
+      Acceptance: the first two print 1 each; in the third output each of the four helper names appears on a line numbered lower than the `type CommandResult` import line; the fourth prints 1.
+- [ ] [P2-T13] Threshold-entry check for AC-13 and write FEATURE/evidence/qa-gates/jest-threshold-entries.TS.md (`extensions/drm-copilot/jest.config.cjs`).
+      Command: `git grep -n -E "\./src/lib/pr-context/(models|collector-core|render|gh-client-details|render-pr-helpers|verification-evidence|render-feature-excerpts|feature-docs-parsers)\.ts\"" -- extensions/drm-copilot/jest.config.cjs`.
+      Acceptance: exactly 8 output lines, one per PROD-FILE.
+- [ ] [P2-T14] Line limits for AC-14 and write FEATURE/evidence/qa-gates/line-counts.TS.md (the eleven IN-SCOPE code files, starting with `extensions/drm-copilot/src/lib/pr-context/models.ts`).
+      Command: the `git grep -c -E "^"` command of P0-T16 with the same eleven paths.
+      Acceptance: exit 0, eleven `path:count` lines, and every count is at most 500.
+- [ ] [P2-T15] Scope and unchanged-expectation check for AC-11 and AC-14 and write FEATURE/evidence/qa-gates/scope.TS.md (`extensions/drm-copilot/src/lib`).
+      Commands: `git diff --name-only origin/main -- extensions/drm-copilot scripts`; `git status --porcelain -- extensions/drm-copilot scripts`; `git diff --numstat origin/main -- extensions/drm-copilot/test/lib/pr-context/feature-docs.test.ts`.
+      Acceptance: the union of paths from the first two commands, minus the BASELINE-DRIFT paths recorded by P0-T10, equals the eleven IN-SCOPE code files exactly; no path under `extensions/drm-copilot/src/lib/codex-native-converter/`, `extensions/drm-copilot/src/lib/push-down/`, `extensions/drm-copilot/src/lib/subagent-tree/`, or `scripts/` appears beyond BASELINE-DRIFT; no test file under `extensions/drm-copilot/test/lib/pr-context/` other than TEST-FILES appears; the numstat line for `feature-docs.test.ts` shows 0 deleted lines.
+- [ ] [P2-T16] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-1, citing FEATURE/evidence/regression-testing/ts-fail-before.TS.md (P1-T3), FEATURE/evidence/regression-testing/ts-pass-after.TS.md (P1-T5), and the P2-T6 artifact.
+      Acceptance: the AC-1 line reads `- [x] AC-1:` and all three cited artifacts exist.
+- [ ] [P2-T17] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-2, citing the P2-T6 artifact (tests D1-D4, A2, A3).
+      Acceptance: the AC-2 line reads `- [x] AC-2:` and the P2-T6 artifact reports 9 passed.
+- [ ] [P2-T18] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-3, citing the P2-T6 artifact (test S1) and the P2-T11 artifact.
+      Acceptance: the AC-3 line reads `- [x] AC-3:` and both cited artifacts record PASS.
+- [ ] [P2-T19] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-4, citing the P2-T11 artifact.
+      Acceptance: the AC-4 line reads `- [x] AC-4:` and the P2-T11 artifact records no match for the first four commands.
+- [ ] [P2-T20] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-5, citing the P2-T11 artifact and the P2-T5 artifact.
+      Acceptance: the AC-5 line reads `- [x] AC-5:` and both cited artifacts record PASS.
+- [ ] [P2-T21] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-6, citing FEATURE/evidence/baseline/helper-definitions.TS.md (12 lines) and the P2-T10 artifact (4 lines).
+      Acceptance: the AC-6 line reads `- [x] AC-6:` and the P2-T10 artifact records exactly 4 lines.
+- [ ] [P2-T22] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-7, citing the P2-T7 artifact.
+      Acceptance: the AC-7 line reads `- [x] AC-7:` and the P2-T7 artifact records 15 passed and 5 passed.
+- [ ] [P2-T23] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-8, citing the P2-T12 artifact.
+      Acceptance: the AC-8 line reads `- [x] AC-8:` and the P2-T12 artifact records 1 for each of its first two commands.
+- [ ] [P2-T24] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-9, citing the P2-T12 artifact.
+      Acceptance: the AC-9 line reads `- [x] AC-9:` and the P2-T12 artifact records the header-line condition as PASS.
+- [ ] [P2-T25] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-10, citing the P2-T12 artifact.
+      Acceptance: the AC-10 line reads `- [x] AC-10:` and the P2-T12 artifact records a count of 1 for the `./models` import.
+- [ ] [P2-T26] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-11, citing the P2-T5 and P2-T15 artifacts.
+      Acceptance: the AC-11 line reads `- [x] AC-11:` and both cited artifacts record PASS.
+- [ ] [P2-T27] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-12, citing the P2-T1, P2-T2, and P2-T3 artifacts from the final clean loop pass.
+      Acceptance: the AC-12 line reads `- [x] AC-12:` and each cited artifact records `EXIT_CODE: 0`.
+- [ ] [P2-T28] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-13, citing the P2-T8, P2-T9, and P2-T13 artifacts.
+      Acceptance: the AC-13 line reads `- [x] AC-13:` and all three cited artifacts record PASS.
+- [ ] [P2-T29] Update `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` to check off AC-14, citing the P2-T14 and P2-T15 artifacts.
+      Acceptance: the AC-14 line reads `- [x] AC-14:` and both cited artifacts record PASS.
+- [ ] [P2-T30] Reduced-audit handoff: write FEATURE/evidence/other/small-audit-handoff.TS.md (under `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/evidence/other/`) listing AC-1 through AC-14, each with the artifact paths that evidence it per the traceability table below. The orchestrator then delegates the minor-audit review with that file as its evidence index.
+      Command: `git status --porcelain -- docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/evidence`.
+      Acceptance: every artifact path named in the handoff file exists on disk (listed by the status command as new, or already committed and confirmed with the Read tool).
+
+## Acceptance-criteria traceability
+
+| AC | issue.md criterion (abridged) | Implementation | Verification | Evidence |
+| --- | --- | --- | --- | --- |
+| AC-1 | code-point order and JSDoc; fixed-order tests fail before, pass after | P1-T2, P1-T4 | P1-T3, P1-T5, P2-T6 | regression-testing/ts-fail-before, regression-testing/ts-pass-after, qa-gates/ts-code-point-order |
+| AC-2 | literal disagreement and agreement pairs | P1-T2 | P1-T3, P2-T6 | qa-gates/ts-code-point-order |
+| AC-3 | fixed-order sort test with a literal expected array | P1-T2 | P1-T3, P2-T6, P2-T11 | qa-gates/ts-code-point-order, qa-gates/models-test-structure |
+| AC-4 | vacuous tests removed; no operator-derived expectations | P1-T2 | P2-T11 | qa-gates/models-test-structure |
+| AC-5 | antisymmetry/transitivity report offending pairs; domain extended | P1-T2 | P2-T11, P2-T5 | qa-gates/models-test-structure, qa-gates/ts-jest-pr-context |
+| AC-6 | each helper defined once in its canonical home | P1-T6, P1-T9 to P1-T15 | P0-T17, P1-T20, P2-T10 | baseline/helper-definitions, qa-gates/helper-definitions |
+| AC-7 | direct tests for the four helpers | P1-T16, P1-T17 | P2-T7 | qa-gates/ts-helper-tests |
+| AC-8 | `splitLines` JSDoc states terminators and subset | P1-T7 | P2-T12 | qa-gates/models-doc-and-imports |
+| AC-9 | `models.ts` header lists the four helpers | P1-T8 | P2-T12 | qa-gates/models-doc-and-imports |
+| AC-10 | single `./models` import in `gh-client-details.ts` | P1-T11 | P2-T12 | qa-gates/models-doc-and-imports |
+| AC-11 | pre-existing pr-context tests pass unchanged | P1-T9 to P1-T15 | P0-T14, P2-T5, P2-T15 | baseline/ts-jest-pr-context, qa-gates/ts-jest-pr-context, qa-gates/scope |
+| AC-12 | Prettier, ESLint, TSC exit 0 | all Phase 1 write tasks | P2-T1, P2-T2, P2-T3 | qa-gates/ts-prettier, qa-gates/ts-eslint, qa-gates/ts-tsc |
+| AC-13 | coverage run exits 0; per-file 85/75; threshold entries | P1-T16 to P1-T18 | P0-T15, P2-T8, P2-T9, P2-T13 | baseline/ts-jest-coverage, qa-gates/ts-jest-coverage, qa-gates/coverage-delta, qa-gates/jest-threshold-entries |
+| AC-14 | no file over 500 lines; out-of-scope trees unmodified | P1-T1 constraints | P0-T10, P0-T16, P2-T14, P2-T15 | baseline/scope-baseline, qa-gates/line-counts, qa-gates/scope |
+
+## Files written by this plan
+
+Code and configuration (each is the first path in its write task title): `extensions/drm-copilot/src/lib/pr-context/models.ts` (P1-T4, P1-T6, P1-T7, P1-T8), `extensions/drm-copilot/src/lib/pr-context/collector-core.ts` (P1-T9), `extensions/drm-copilot/src/lib/pr-context/render.ts` (P1-T10), `extensions/drm-copilot/src/lib/pr-context/gh-client-details.ts` (P1-T11), `extensions/drm-copilot/src/lib/pr-context/render-pr-helpers.ts` (P1-T12), `extensions/drm-copilot/src/lib/pr-context/verification-evidence.ts` (P1-T13), `extensions/drm-copilot/src/lib/pr-context/render-feature-excerpts.ts` (P1-T14), `extensions/drm-copilot/src/lib/pr-context/feature-docs-parsers.ts` (P1-T15), `extensions/drm-copilot/test/lib/pr-context/models.test.ts` (P1-T2, P1-T16), `extensions/drm-copilot/test/lib/pr-context/feature-docs.test.ts` (P1-T17), `extensions/drm-copilot/jest.config.cjs` (P1-T18). Feature documents: `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md` (P2-T16 to P2-T29), this plan file (check-offs), and new evidence files under `docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/evidence/`. P0-T9 writes only the gitignored `extensions/drm-copilot/node_modules/`.
