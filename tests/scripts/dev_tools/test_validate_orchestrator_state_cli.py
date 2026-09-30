@@ -20,10 +20,10 @@ import sys
 from typing import TYPE_CHECKING, cast
 
 import pytest
-import scripts.dev_tools.validate_orchestrator_state_cli as cli
 
 import scripts.dev_tools.validate_orchestration_artifacts as dispatcher
 import scripts.dev_tools.validate_orchestrator_state as state_validator
+import scripts.dev_tools.validate_orchestrator_state_cli as cli
 from tests.scripts.dev_tools.validate_orchestrator_state_test_support import (
     build_complete_small_state,
     build_valid_orchestrator_state,
@@ -108,7 +108,19 @@ def test_main_returns_zero_for_complete_small_state_with_require_complete(
     """A completion-safe small-route checkpoint passes --require-complete."""
 
     # Arrange
-    text = json.dumps(build_complete_small_state())
+    state = build_complete_small_state()
+    state["pr_gate"] = {
+        "pr_number": 464,
+        "pr_url": "https://github.com/drmoisan/drm-copilot/pull/464",
+        "head_branch": "bug/example-464",
+        "head_sha": "current-head-sha",
+    }
+    state["ci_gate"] = {
+        "conclusion": "success",
+        "head_sha": "current-head-sha",
+        "verified_at": "2026-06-25T07:45:00Z",
+    }
+    text = json.dumps(state)
     monkeypatch.setattr(cli, "read_checkpoint_text", make_read_stub(text))
 
     # Act
