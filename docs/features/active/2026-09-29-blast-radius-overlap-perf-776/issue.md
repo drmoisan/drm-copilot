@@ -68,7 +68,7 @@ Every CI run on every PR and push to `main` waits on this file. Production sched
 
 - [x] `BlastRadius.HistoricalRuns.Tests.ps1`, `BlastRadius.Parity.Tests.ps1`, and every other blast-radius Pester suite pass with no edits to their fixtures or assertions.
 - [x] A before/after local timing of `BlastRadius.HistoricalRuns.Tests.ps1` with coverage disabled is recorded as evidence and shows a material reduction from the 190s baseline.
-- [ ] The CI PowerShell QC job duration on the PR head is measurably lower than in run 1043 (838s).
+- [x] The CI PowerShell QC job duration on the PR head is measurably lower than in run 1043 (838s).
 - [x] Exported function signatures and return values of the blast-radius modules are unchanged.
 - [x] Line coverage stays at or above 85% for every touched production file, and no touched file exceeds 500 lines.
 
