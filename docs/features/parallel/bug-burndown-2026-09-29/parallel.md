@@ -868,6 +868,49 @@ items:
       contracts: []
       source: "declared"
       computed_at: "2026-09-30T03:18:14Z"
+  - issue_num: 743
+    feature_folder: "docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/hooks/enforce-orchestration-preimplementation-gate.ps1"
+        - ".claude/skills/atomic-plan-contract/SKILL.md"
+        - ".codex/scripts/epic-child-sandbox-preflight.ps1:33"
+        - ".codex/scripts/launch-epic-child-wave.ps1:153"
+        - ".github/workflows/_drm-copilot-extension-tests.yml"
+        - ".github/workflows/_poshqc.yml"
+        - ".github/workflows/_quality-checks.yml"
+        - ".github/workflows/_shell-coverage.yml"
+        - ".github/workflows/ci.yml"
+        - "docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/**"
+        - "docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/spec.md"
+        - "docs/features/completed/cleanup-report-registration-lost-false-positive-706/evidence/qa-gates/ci-shell-coverage.2026-09-27T10-38.md:42"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md"
+        - "scripts/bash/kcov_trace_env.sh"
+        - "scripts/bash/shell_qc_lib.sh"
+        - "scripts/bash/shell_qc_lib.sh:188"
+        - "scripts/bash/shell-qc.sh"
+        - "scripts/dev-tools/run-actionlint.ps1"
+        - "scripts/dev-tools/run-actionlint.ps1:128"
+        - "scripts/powershell/PoshQC/PoshQC.psd1"
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+        - "tests/fixtures/shell_qc/kcov_trace/nounset_lib.sh"
+        - "tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1"
+        - "tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1"
+        - "tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1"
+        - "tests/scripts/workflows/PoshQcWorkflow.Tests.ps1"
+        - "tests/shell/test_shell_qc_commands.bats"
+      modules:
+        - "codex-runtime"
+        - "poshqc"
+        - "powershell-dev-tools"
+      shared_surfaces:
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+      contracts:
+        - "poshqc-linux-hook-test-results"
+      source: "declared"
+      computed_at: "2026-09-30T09:17:33Z"
   - issue_num: 744
     feature_folder: "docs/features/active/2026-09-27-orchestration-completion-gate-and-tooling-friction-744"
     kind: "bug"
@@ -1110,4 +1153,4 @@ items:
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 21 of 22. Pending: 743.
+Prepared: 22 of 22. Pending: .
