@@ -2,8 +2,9 @@
 
 Covers ``evaluate_skill_bundle``, ``find_violations``, ``find_stale_exceptions``,
 and the ``KNOWN_UNBUNDLED_REFERENCES`` registry in
-``scripts/dev_tools/skill_bundle_contract.py``. Every snapshot is inline and
-every path is fictitious.
+``scripts/dev_tools/skill_bundle_contract.py``, which is empty since issue #763
+ported its last two entries. Every snapshot is inline and every path is
+fictitious.
 """
 
 from __future__ import annotations
@@ -244,25 +245,14 @@ def test_find_stale_exceptions_returns_empty_when_all_match() -> None:
     assert result == (), result
 
 
-def test_known_unbundled_references_cite_issue_763() -> None:
-    """The registry holds exactly the two #763 Python CLI references."""
+def test_known_unbundled_references_registry_is_empty() -> None:
+    """Issue #763 ported both registered references, so the registry is empty."""
 
     # Arrange
-    expected = (
-        KnownUnbundledReference(
-            "parallel-orchestrate",
-            "scripts/dev_tools/parallel_drift_detection_cli.py",
-            "#763",
-        ),
-        KnownUnbundledReference(
-            "parallel-remove",
-            "scripts/dev_tools/parallel_mutation_abandon_cli.py",
-            "#763",
-        ),
-    )
+    expected: tuple[KnownUnbundledReference, ...] = ()
 
     # Act
     registry = KNOWN_UNBUNDLED_REFERENCES
 
     # Assert
-    assert registry == expected, registry
+    assert registry == expected, f"Expected an empty registry, got {registry}"

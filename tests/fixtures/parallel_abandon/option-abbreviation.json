@@ -1,0 +1,20 @@
+{
+  "name": "option-abbreviation",
+  "description": "An abbreviated disposition option is a usage error in the bash port; argparse accepts the unique prefix, so the Python reference abandons the item (declared divergence).",
+  "argv": ["--item", "42", "--disp", "abandon", "--confirm-abandon", "--pr", "7", "--worktree", "../wt-42"],
+  "shim_exit": {"gh": 0, "git": 0},
+  "missing_executable": null,
+  "expected": {
+    "exit_code": 2,
+    "stderr_mode": "usage",
+    "stderr": null,
+    "calls": []
+  },
+  "divergence": "option-abbreviation",
+  "python_expected": {
+    "exit_code": 0,
+    "stderr_mode": "none",
+    "stderr": null,
+    "calls": [["gh", "pr", "close", "7"], ["git", "worktree", "remove", "../wt-42"]]
+  }
+}
