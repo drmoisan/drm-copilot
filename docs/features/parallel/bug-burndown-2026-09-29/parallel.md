@@ -645,10 +645,42 @@ items:
       contracts: []
       source: "declared"
       computed_at: "2026-09-30T01:19:27Z"
+  - issue_num: 723
+    feature_folder: "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".github/workflows/publish-mcp-npm.yml"
+        - "docs/engineering/missed-npm-publish.runbook.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/**"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-actionlint-publish-mcp-npm.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-branch-state.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-feature-folder-shape.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-pester-publish-mcp-npm-workflow.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-token-guard-pytest.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/qa-gates/final-actionlint-publish-mcp-npm.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/qa-gates/final-analyze-pester-file.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/qa-gates/final-forbidden-token-scan-workflow.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/qa-gates/final-format-pester-file.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/qa-gates/final-no-source-change-check.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/qa-gates/final-pester-publish-mcp-npm-workflow.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/qa-gates/final-runbook-ac5-lines.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/qa-gates/final-token-guard-pytest.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/regression-testing/expect-fail-new-pester-assertions.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/regression-testing/pass-after-new-pester-assertions.md"
+        - "docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/issue.md"
+        - "tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1"
+      modules: []
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-30T01:44:08Z"
 ---
 
 # Parallel Run: bug-burndown-2026-09-29
 
 Run manifest maintained by parallel-planner. Items appear here once prepared (preflight ALL CLEAR and declared radius V1/V2-clear). Cohorts are seeded after every item is prepared.
 
-Prepared: 12 of 22. Pending: 659, 723, 734, 739, 740, 741, 743, 744, 756, 764.
+Prepared: 13 of 22. Pending: 659, 734, 739, 740, 741, 743, 744, 756, 764.
