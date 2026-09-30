@@ -40,6 +40,20 @@ import {
   type MemoryMode,
   type PackManifest,
 } from "./claude-pack-selection";
+import {
+  assertManifestPathIsRootLevel,
+  EXCLUSION_MANIFEST_RELATIVE_PATH,
+  type ExclusionManifest,
+  matchesExclusionEntry,
+  type SkippedPath,
+} from "./claude-exclusion-manifest";
+import {
+  appendExclusionsToArtifact,
+  buildExclusionReport,
+  ExclusionFilterFileSystem,
+  type ExclusionReport,
+  readExclusionManifest,
+} from "./claude-exclusion-filter";
 
 /** Artifact directory for the Claude push-down summary. */
 export const ARTIFACT_DIRECTORY = "artifacts/claude-customizations";
@@ -54,6 +68,9 @@ export const ARTIFACT_DIRECTORY = "artifacts/claude-customizations";
  * `config` is appended after `.claude` rather than inserted before it.
  */
 export const ROOT_FOLDERS: ReadonlyArray<string> = [".claude", "config"];
+
+// The manifest must sit outside every published root so it is never enumerated.
+assertManifestPathIsRootLevel(EXCLUSION_MANIFEST_RELATIVE_PATH, ROOT_FOLDERS);
 
 /**
  * Destination-relative path of the routing document merged on every push.
@@ -177,6 +194,20 @@ export {
   composeBlastRadiusOverlay,
 } from "./claude-blast-radius-overlay";
 export { type PushDownSummary, type CSharpVariant, type MemoryMode };
+export {
+  EXCLUSION_MANIFEST_RELATIVE_PATH,
+  ExclusionManifestError,
+  type SkippedPath,
+} from "./claude-exclusion-manifest";
+export {
+  ExclusionViolationError,
+  type ExclusionReport,
+} from "./claude-exclusion-filter";
+
+/** Engine summary plus the exclusion report, present only with a manifest. */
+export interface ClaudePushDownSummary extends PushDownSummary {
+  readonly exclusions?: ExclusionReport;
+}
 
 /**
  * Passthrough rewrite for `.claude` content (no command rewrites).
@@ -305,11 +336,12 @@ export interface ClaudePushDownOptions {
  * @returns The completed run summary including the written artifact path.
  * @throws ManifestError When a selected manifest is missing/malformed or both C#
  *   variants are selected.
+ * @throws ExclusionManifestError When the destination manifest is malformed.
  * @throws Error When destination validation fails.
  */
 export function pushDownCustomizations(
   options: ClaudePushDownOptions,
-): PushDownSummary {
+): ClaudePushDownSummary {
   const {
     repoRoot,
     destinationRoot,
@@ -330,6 +362,10 @@ export function pushDownCustomizations(
   // bundleRoot (the bundled template) overrides this.
   const effectiveBundle =
     bundleRoot ?? joinPosix(effectiveSource, BUNDLE_ROOT_RELATIVE_DIR);
+
+  // Read the destination manifest before any write so a malformed manifest
+  // fails the run with the destination untouched.
+  const manifest = readExclusionManifest(fs, destinationRoot);
 
   // Resolve the published-path set only when a pack selection is supplied so the
   // no-argument path performs no manifest I/O.
@@ -363,10 +399,22 @@ export function pushDownCustomizations(
     },
   );
 
+  // Outermost, so a matched path never reaches any decorator beneath it.
+  const exclusionFs =
+    manifest === undefined
+      ? undefined
+      : new ExclusionFilterFileSystem(
+          excludingFs,
+          effectiveSource,
+          destinationRoot,
+          manifest,
+          ARTIFACT_DIRECTORY,
+        );
+
   const summary = enginePushDown({
     repoRoot,
     destinationRoot,
-    fs: excludingFs,
+    fs: exclusionFs ?? excludingFs,
     ...(sourceRoot === undefined ? {} : { sourceRoot }),
     ...(artifactRoot === undefined ? {} : { artifactRoot }),
     rootFolders: ROOT_FOLDERS,
@@ -375,8 +423,21 @@ export function pushDownCustomizations(
     ...(clock === undefined ? {} : { clock }),
   });
 
-  deliverDestinationGitignore(fs, destinationRoot);
-  return summary;
+  const gitignoreSkip = deliverDestinationGitignore(
+    fs,
+    destinationRoot,
+    manifest,
+  );
+  if (manifest === undefined || exclusionFs === undefined) {
+    return summary;
+  }
+  const skipped =
+    gitignoreSkip === undefined
+      ? exclusionFs.skipped
+      : [...exclusionFs.skipped, gitignoreSkip];
+  const report = buildExclusionReport(manifest, skipped);
+  appendExclusionsToArtifact(fs, summary.artifactPath, report);
+  return { ...summary, exclusions: report };
 }
 
 /**
@@ -400,15 +461,30 @@ export function pushDownCustomizations(
  *
  * @param fs Adapter used to read and write the destination file.
  * @param destinationRoot Absolute destination workspace root.
+ * @param manifest Parsed exclusion manifest, or `undefined` without one.
+ * @returns The skip record, with no read or write performed, when the manifest
+ *   excludes `.gitignore`; otherwise `undefined`.
  */
 function deliverDestinationGitignore(
   fs: PushDownFileSystem,
   destinationRoot: string,
-): void {
+  manifest: ExclusionManifest | undefined,
+): SkippedPath | undefined {
   const destinationPath = joinPosix(
     destinationRoot,
     CLAUDE_GITIGNORE_RELATIVE_PATH,
   );
+  const entry = manifest?.entries.find((candidate) =>
+    matchesExclusionEntry(candidate, CLAUDE_GITIGNORE_RELATIVE_PATH),
+  );
+  if (entry !== undefined) {
+    return {
+      relativePath: CLAUDE_GITIGNORE_RELATIVE_PATH,
+      entry: entry.normalized,
+      line: entry.line,
+      destinationStatus: fs.isFile(destinationPath) ? "present" : "absent",
+    };
+  }
   const currentText = fs.isFile(destinationPath)
     ? fs.readTextFile(destinationPath)
     : "";
@@ -416,4 +492,5 @@ function deliverDestinationGitignore(
   if (mergedText !== currentText) {
     fs.writeTextFile(destinationPath, mergedText);
   }
+  return undefined;
 }

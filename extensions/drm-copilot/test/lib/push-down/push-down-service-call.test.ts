@@ -1,4 +1,4 @@
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it, jest } from "@jest/globals";
 
 import {
   pushDownClaudeCustomizationsServiceCall,
@@ -194,5 +194,97 @@ describe("pushDownClaudeCustomizationsServiceCall", () => {
     // Assert: the canonical destination received legacy content (variant routed)
     // and only the selected pack path was published (pack filter threaded).
     expect(fs.readTextFile(`${WS}/.claude/rules/csharp.md`)).toBe("# Legacy\n");
+  });
+});
+
+describe("pushDownClaudeCustomizationsServiceCall exclusion reporting", () => {
+  const bundle = `${EXT}/resources/claude-customizations`;
+
+  /**
+   * Seed a two-rule bundle plus optional destination files.
+   *
+   * @param destinationFiles Files to seed under the workspace.
+   * @returns The seeded in-memory filesystem.
+   */
+  function seedBundle(
+    destinationFiles: Record<string, string> = {},
+  ): ReturnType<typeof buildInMemoryFileSystem> {
+    return buildInMemoryFileSystem(
+      {
+        [`${bundle}/.claude/rules/quality-tiers.md`]: "tiers",
+        [`${bundle}/.claude/rules/python.md`]: "python",
+        ...destinationFiles,
+      },
+      [WS],
+    );
+  }
+
+  it("carries warnings with the pinned line text and invokes log once per line when a manifest produces skips, conflicts, or unmatched entries", () => {
+    // Arrange: plan-corpus case unmatched-stale-entry.
+    const fs = seedBundle({
+      [`${WS}/.push-down-exclusions`]:
+        "# Coverage model kept local; see issue #178, PR #179.\n.claude/rules/quality-tiers.md\n# Agent memory is authored here, not pushed.\n.claude/agent-memory/**\n",
+      [`${WS}/.claude/rules/quality-tiers.md`]: "local",
+    });
+    const log = jest.fn<(message: string) => void>();
+    const expectedLines = [
+      "push-down exclusion conflict: destination file present, not overwritten: .claude/rules/quality-tiers.md (entry .claude/rules/quality-tiers.md, line 2)",
+      "push-down exclusion: entry matched no payload path: .claude/agent-memory/** (line 4)",
+    ];
+
+    // Act
+    const result = pushDownClaudeCustomizationsServiceCall({
+      fs,
+      extensionRoot: EXT,
+      workspaceRoot: WS,
+      clock: CLOCK,
+      log,
+    });
+
+    // Assert
+    expect(result.warnings).toEqual(expectedLines);
+    expect(log.mock.calls).toEqual(expectedLines.map((line) => [line]));
+    expect(fs.readTextFile(`${WS}/.claude/rules/quality-tiers.md`)).toBe(
+      "local",
+    );
+  });
+
+  it("omits warnings and never invokes log when the manifest produces nothing to report", () => {
+    // Arrange
+    const fs = seedBundle({ [`${WS}/.push-down-exclusions`]: "# nothing\n" });
+    const log = jest.fn<(message: string) => void>();
+
+    // Act
+    const result = pushDownClaudeCustomizationsServiceCall({
+      fs,
+      extensionRoot: EXT,
+      workspaceRoot: WS,
+      clock: CLOCK,
+      log,
+    });
+
+    // Assert
+    expect("warnings" in result).toBe(false);
+    expect(log).not.toHaveBeenCalled();
+  });
+
+  it("omits warnings and never invokes log without a manifest", () => {
+    // Arrange
+    const fs = seedBundle();
+    const log = jest.fn<(message: string) => void>();
+
+    // Act
+    const result = pushDownClaudeCustomizationsServiceCall({
+      fs,
+      extensionRoot: EXT,
+      workspaceRoot: WS,
+      clock: CLOCK,
+      log,
+    });
+
+    // Assert
+    expect("warnings" in result).toBe(false);
+    expect(log).not.toHaveBeenCalled();
+    expect(fs.isFile(`${WS}/.claude/rules/python.md`)).toBe(true);
   });
 });

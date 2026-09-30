@@ -252,6 +252,32 @@ The repository can publish each scoped customization tree into another workspace
 
 During Copilot publication, supported script references are rewritten to stable live VS Code command references contributed by the extension. The Claude push-down tool accepts optional `packs` (language pack selection; `core` is always included), a `csharp_variant` (`modern` default or `legacy`), and a `memory_mode` (`overwrite` default, `merge`, or `skip`).
 
+### Destination exclusion manifest
+
+A destination repository can keep specific Claude push-down payload paths out of its tree by committing a manifest at `.push-down-exclusions` in the destination root. The file sits outside every published root, so the push-down never writes, merges, or deletes the manifest; this repository ships no manifest and does not deliver one. The Copilot and Codex publishers do not read it.
+
+Grammar:
+
+- The file is UTF-8 text; a leading byte-order mark is stripped, and line endings may be LF or CRLF.
+- One entry per line. Blank lines and lines whose first non-blank character is `#` are ignored, so each entry can carry a comment with its reason and issue reference.
+- Each entry is a destination-relative POSIX path. Normalization trims surrounding whitespace, converts `\` to `/`, strips one leading `./`, and collapses repeated `/`.
+- An entry without wildcards matches a payload path exactly, or as a directory prefix: `foo/bar` matches `foo/bar` and every path under `foo/bar/`. A trailing `/` is optional and only documents intent; `foo/bar` and `foo/bar/` match the same set.
+- An entry containing `*` or `?` is a wildcard entry matched against the whole path: `**` matches any run of characters including `/`, `*` matches any run excluding `/`, and `?` matches exactly one character other than `/`. Every other character is literal.
+- Comparison is ordinal and case-sensitive; an entry must use the bundle's canonical case.
+- Entries are evaluated in file order, and the first matching entry is the one reported for a path.
+
+A malformed manifest fails the run with `ExclusionManifestError` before any destination write. The error names the manifest path `.push-down-exclusions` and, where one applies, the offending line number. The eight malformed conditions are: the manifest path is not a regular file; the text is not valid UTF-8; an entry is empty after normalization; an entry is absolute (leading `/` or a drive prefix such as `X:`); an entry contains a `..` segment; an entry begins with `!`; an entry contains `[` or `]`; an entry combines a wildcard with a trailing `/`. A manifest containing only comments and blank lines is valid and filters nothing.
+
+A matched payload path is not written. Each skipped path and each entry that matched no payload path is reported with one line:
+
+- `push-down exclusion: skipped <path> (entry <normalized>, line <n>)` when the destination holds no file at the path.
+- `push-down exclusion conflict: destination file present, not overwritten: <path> (entry <normalized>, line <n>)` when the destination already holds a file at the path. The destination bytes are unchanged and the run still succeeds.
+- `push-down exclusion: entry matched no payload path: <normalized> (line <n>)` for a stale or out-of-scope entry. This is not an error.
+
+These lines appear in the summary artifact's `exclusions` object (with `conflict_count`, `entries`, `manifest_path`, `skipped`, `skipped_count`, and `unmatched_entries`), in the MCP result's `warnings` field, in the drm-copilot output channel, and on Python CLI stdout after the `Wrote push-down summary artifact to:` line. The VS Code command additionally shows a warning notification when at least one conflict is reported. When no manifest exists, behavior is unchanged: no `exclusions` key, no `warnings` field, no additional lines, and no notification.
+
+Limitations: the push-down never deletes destination files, so a file already present at an excluded path is removed by the destination once. Detection of dangling references (an excluded file that other pushed-down content still cites) is a non-goal of this feature and is not reported.
+
 ### Sync AGENTS.md from instructions
 
 `drmCopilotExtension.syncAgentsFromInstructions` regenerates `AGENTS.md` in the destination workspace by discovering all `.github/instructions/*.instructions.md` files under the active workspace root, aggregating their content deterministically, and writing the consolidated result. This replaces any manual edits to `AGENTS.md` with a fully generated output derived from the canonical instruction files.
