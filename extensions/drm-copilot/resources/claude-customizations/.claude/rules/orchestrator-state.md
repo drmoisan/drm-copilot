@@ -92,7 +92,11 @@ The session `model_budget.fable_policy` switch is a three-way enum `disabled | a
 
 ## Require-Model-Routing Mode Scope and Backward Compatibility
 
-The complexity-assessment and model-routing-receipt invariants above are key-gated: they run only when their key is present, so a checkpoint that omits both arrays passes at every stage. The `require_model_routing` mode adds an existence gate that closes that gap without changing the default behavior. It is an opt-in keyword on `validate_orchestrator_state_text(..., require_model_routing=False)` (CLI flag `--require-model-routing`; MCP parameter `require_model_routing`), defaulting off. Plain, `require_complete`, and `require_pr_creation_ready` calls are unaffected and produce byte-identical results.
+The complexity-assessment and model-routing-receipt invariants above are key-gated: they run only when their key is present, so a checkpoint that omits both arrays passes at every stage. The `require_model_routing` mode adds an existence gate that closes that gap without changing the default behavior. It is an opt-in keyword on `validate_orchestrator_state_text(..., require_model_routing=False)` (CLI flag `--require-model-routing`, accepted by the dispatcher `orchestrator-state` subcommand and by the bare-module CLI; MCP parameter `require_model_routing`), defaulting off. Plain, `require_complete`, and `require_pr_creation_ready` calls are unaffected and produce byte-identical results.
+
+## Bare-Module CLI Contract
+
+The validator module runs directly as `python -m scripts.dev_tools.validate_orchestrator_state <path> [--require-complete] [--require-model-routing] [--require-pr-creation-ready] [--require-codex-model-routing] [--require-codex-topology]`. The dispatcher `python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state` stays available and accepts the same flags. Exit code 0 means the checkpoint passed and the success line `orchestrator-state validation passed: <path>` is written to stdout. Exit code 1 means validation errors, written one per stderr line. Exit code 2 means the path is missing, unreadable, or not UTF-8, with one stderr diagnostic and no traceback; argparse usage errors also exit 2.
 
 ## Invariants (require_model_routing mode)
 
