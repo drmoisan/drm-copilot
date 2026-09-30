@@ -18,6 +18,9 @@ from typing import cast
 import pytest
 
 import scripts.dev_tools.validate_orchestrator_state as state_validator
+from tests.scripts.dev_tools.validate_orchestrator_state_test_support import (
+    build_complete_small_state,
+)
 
 _FIXTURES_ROOT = Path(__file__).resolve().parents[2] / "fixtures"
 _BACKCOMPAT_DIR = _FIXTURES_ROOT / "orchestrator_state_blocked_reason_backcompat"
@@ -102,3 +105,91 @@ def test_backcompat_error_lists_are_unchanged(stem: str, mode: str) -> None:
 
     # Assert
     assert actual == expected, f"{stem}/{mode}: {actual!r} != {expected!r}"
+
+
+# Validator-level tests for the five non-mechanical members added by #523 and
+# for the non-string guard on the plain-validation membership check. None of
+# these test names contains the back-compat marker.
+
+_NEW_MEMBERS = (
+    "premise_falsified",
+    "external_dependency",
+    "policy_hold",
+    "awaiting_ci",
+    "human_decision_required",
+)
+_COMPLETION_MESSAGE = (
+    "Checkpoint completion validation failed: blocked_reason is not `none`."
+)
+_READINESS_MESSAGE = (
+    "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+)
+
+
+def _checkpoint_text(value: object) -> str:
+    """Return a completion-safe small checkpoint with ``blocked_reason`` set."""
+
+    state = build_complete_small_state()
+    state["blocked_reason"] = value
+    return json.dumps(state)
+
+
+@pytest.mark.parametrize("member", _NEW_MEMBERS)
+def test_new_member_is_accepted_by_plain_validation(member: str) -> None:
+    """Each new member yields no ``blocked_reason`` error in plain validation."""
+
+    # Arrange
+    text = _checkpoint_text(member)
+
+    # Act
+    errors = state_validator.validate_orchestrator_state_text(text)
+
+    # Assert
+    blocked_errors = [error for error in errors if "blocked_reason" in error]
+    assert blocked_errors == [], f"{member}: {blocked_errors!r}"
+
+
+@pytest.mark.parametrize("member", _NEW_MEMBERS)
+def test_new_member_blocks_completion_with_existing_message(member: str) -> None:
+    """Each new member yields exactly one completion message under require_complete."""
+
+    # Arrange
+    text = _checkpoint_text(member)
+
+    # Act
+    errors = state_validator.validate_orchestrator_state_text(
+        text, require_complete=True
+    )
+
+    # Assert
+    assert errors.count(_COMPLETION_MESSAGE) == 1, f"{member}: {errors!r}"
+
+
+@pytest.mark.parametrize("member", _NEW_MEMBERS)
+def test_new_member_blocks_pr_creation_readiness(member: str) -> None:
+    """Each new member yields the existing PR-creation readiness message."""
+
+    # Arrange
+    text = _checkpoint_text(member)
+
+    # Act
+    errors = state_validator.validate_orchestrator_state_text(
+        text, require_pr_creation_ready=True
+    )
+
+    # Assert
+    assert _READINESS_MESSAGE in errors, f"{member}: {errors!r}"
+
+
+@pytest.mark.parametrize("value", [["none"], {"k": "none"}], ids=["list", "dict"])
+def test_non_string_value_yields_invalid_error_without_raising(value: object) -> None:
+    """A list or dict value yields the invalid-value error rather than TypeError."""
+
+    # Arrange
+    text = _checkpoint_text(value)
+
+    # Act
+    errors = state_validator.validate_orchestrator_state_text(text)
+
+    # Assert
+    assert f"Checkpoint has invalid blocked_reason: {value}" in errors, repr(errors)
