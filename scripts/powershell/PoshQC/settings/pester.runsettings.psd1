@@ -48,6 +48,7 @@
             '.claude/hooks/enforce-epic-merge-gate-resolution.ps1'
             '.claude/hooks/enforce-epic-wave-barrier.ps1'
             '.claude/hooks/enforce-epic-worktree-removal-gate.ps1'
+            '.claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1'
             '.claude/hooks/enforce-pr-author-skill.ps1'
             '.claude/hooks/validate-orchestrator-output.ps1'
             '.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1'
