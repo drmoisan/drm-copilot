@@ -359,20 +359,20 @@ The searches in this plan use these fixed strings, quoted here so each is an exp
 
 ### Phase 9 — Parallel Drift Gate
 
-- [ ] [P9-T1] D13 copy-drift gate (read-only). Command, WLOG row, and acceptance as P3-T1, artifact FEATURE/evidence/qa-gates/epic-copy-drift-p9.TS.md.
-- [ ] [P9-T2] Stage and check DRIFT per Appendix B10 (SW-1, SW-2). Acceptance: A15 prints the clean `STAGE-CHECK` line for `SCRATCH/stage/enforce-parallel-drift-gate.ps1`.
-- [ ] [P9-T3] SW-3 for DRIFT. Acceptance: the Write succeeds without a hook denial.
-- [ ] [P9-T4] SW-4 for DRIFT and the WLOG entry. Acceptance: hashes equal; WLOG records DRIFT.
-- [ ] [P9-T5] Write G7 per Appendix C12 (6 rows). Acceptance: the Write succeeds without a hook denial.
-- [ ] [P9-T6] Edit `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`: add DT-LINE with seam `Resolve-ParallelDriftGateTarget` as the last statement of its hook-loading `BeforeAll`; in the two read-seam rows (lines 326, 332) pass `-Path` a test-local absolute synthetic path and compare the ParameterFilters to it, leaving assertion lines unchanged. Acceptance: CMD-GIT-COUNT with literal `Mock Resolve-ParallelDriftGateTarget` over that file prints a count of 1.
-- [ ] [P9-T7] Mirror DRIFT into CB (CMD-CP). Acceptance: A13 prints `PAIR-SUMMARY pairs=1 unequal=0`.
-- [ ] [P9-T8] Format: MCP-PS-FORMAT (scan_folders `.claude/hooks`, `tests/scripts/claude-hooks`); CMD-GIT-STATUS; A6 over DRIFT, G7, and the edited suite. Write FEATURE/evidence/qa-gates/format-p9.TS.md. Acceptance: the MCP call returns; CMD-GIT-STATUS names no path outside P9-FILES, the FEATURE evidence directory, and the plan file; `FORMAT-SUMMARY ChangedCount=0`.
-- [ ] [P9-T9] Analyze: MCP-PS-ANALYZE; A7 over the three P9-T8 files. Write FEATURE/evidence/qa-gates/analyze-p9.TS.md. Acceptance: the MCP call returns and `PSSA-SUMMARY DiagnosticCount=0`.
-- [ ] [P9-T10] Run G7 (A2 with `-Path tests/scripts/claude-hooks/enforce-parallel-drift-gate.WorktreeResolution.Tests.ps1`). Write FEATURE/evidence/regression-testing/drift-worktree-resolution.TS.md and append to WLOG. Acceptance: `TotalCount=6`, `PassedCount=6`, `FailedCount=0`.
-- [ ] [P9-T11] Run SET-DRIFT (A2). Write FEATURE/evidence/qa-gates/pester-set-drift-p9.TS.md and append to WLOG. Acceptance: `TotalCount=` equals BASE_DRIFT plus 6 and every `FAILED:` line is a member of the P0-T23 baseline failure set.
-- [ ] [P9-T12] Line counts for DRIFT, G7, and the edited suite (A4). Write FEATURE/evidence/qa-gates/line-counts-p9.TS.md. Acceptance: every value is at most 500.
-- [ ] [P9-T13] Python parity (CMD-PY-PARITY). Write FEATURE/evidence/regression-testing/python-parity-p9.TS.md. Acceptance: as P3-T17.
-- [ ] [P9-T14] Commit and push Phase 9. Commands: CMD-GIT-ADD with P9-FILES, the FEATURE evidence directory, and PLAN, CMD-GIT-COMMIT with message "fix(690): resolve the parallel drift gate checkpoint from parallel_slug", CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing and the push exits 0.
+- [x] [P9-T1] D13 copy-drift gate (read-only). Command, WLOG row, and acceptance as P3-T1, artifact FEATURE/evidence/qa-gates/epic-copy-drift-p9.TS.md.
+- [x] [P9-T2] Stage and check DRIFT per Appendix B10 (SW-1, SW-2). Acceptance: A15 prints the clean `STAGE-CHECK` line for `SCRATCH/stage/enforce-parallel-drift-gate.ps1`.
+- [x] [P9-T3] SW-3 for DRIFT. Acceptance: the Write succeeds without a hook denial.
+- [x] [P9-T4] SW-4 for DRIFT and the WLOG entry. Acceptance: hashes equal; WLOG records DRIFT.
+- [x] [P9-T5] Write G7 per Appendix C12 (6 rows). Acceptance: the Write succeeds without a hook denial.
+- [x] [P9-T6] Edit `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`: add DT-LINE with seam `Resolve-ParallelDriftGateTarget` as the last statement of its hook-loading `BeforeAll`; in the two read-seam rows (lines 326, 332) pass `-Path` a test-local absolute synthetic path and compare the ParameterFilters to it, leaving assertion lines unchanged. Acceptance: CMD-GIT-COUNT with literal `Mock Resolve-ParallelDriftGateTarget` over that file prints a count of 1.
+- [x] [P9-T7] Mirror DRIFT into CB (CMD-CP). Acceptance: A13 prints `PAIR-SUMMARY pairs=1 unequal=0`.
+- [x] [P9-T8] Format: MCP-PS-FORMAT (scan_folders `.claude/hooks`, `tests/scripts/claude-hooks`); CMD-GIT-STATUS; A6 over DRIFT, G7, and the edited suite. Write FEATURE/evidence/qa-gates/format-p9.TS.md. Acceptance: the MCP call returns; CMD-GIT-STATUS names no path outside P9-FILES, the FEATURE evidence directory, and the plan file; `FORMAT-SUMMARY ChangedCount=0`.
+- [x] [P9-T9] Analyze: MCP-PS-ANALYZE; A7 over the three P9-T8 files. Write FEATURE/evidence/qa-gates/analyze-p9.TS.md. Acceptance: the MCP call returns and `PSSA-SUMMARY DiagnosticCount=0`.
+- [x] [P9-T10] Run G7 (A2 with `-Path tests/scripts/claude-hooks/enforce-parallel-drift-gate.WorktreeResolution.Tests.ps1`). Write FEATURE/evidence/regression-testing/drift-worktree-resolution.TS.md and append to WLOG. Acceptance: `TotalCount=6`, `PassedCount=6`, `FailedCount=0`.
+- [x] [P9-T11] Run SET-DRIFT (A2). Write FEATURE/evidence/qa-gates/pester-set-drift-p9.TS.md and append to WLOG. Acceptance: `TotalCount=` equals BASE_DRIFT plus 6 and every `FAILED:` line is a member of the P0-T23 baseline failure set.
+- [x] [P9-T12] Line counts for DRIFT, G7, and the edited suite (A4). Write FEATURE/evidence/qa-gates/line-counts-p9.TS.md. Acceptance: every value is at most 500.
+- [x] [P9-T13] Python parity (CMD-PY-PARITY). Write FEATURE/evidence/regression-testing/python-parity-p9.TS.md. Acceptance: as P3-T17.
+- [x] [P9-T14] Commit and push Phase 9. Commands: CMD-GIT-ADD with P9-FILES, the FEATURE evidence directory, and PLAN, CMD-GIT-COMMIT with message "fix(690): resolve the parallel drift gate checkpoint from parallel_slug", CMD-GIT-PUSH. Acceptance: CMD-GIT-STATUS prints nothing and the push exits 0.
 
 ### Phase 10 — Epic-Scope Resolution and the Isolation Guard
 
