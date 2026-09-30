@@ -5,7 +5,8 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 - Epic issue: #771
 - Integration branch: `epic/orchestrator-state-contract-correctness-integration`
 - Current wave: 1
-- Next step: #509 and #523 executing (wave 1); launch #484 (wave 2) after #523 merges.
+- Throttle (quota, from 14:18Z): 1 concurrent child; #509 and #523 continue; the next launch waits until no child is running.
+- Next step: #509 and #523 executing (wave 1); launch #484 (wave 2) after #523 merges and no child is running.
 - Last updated: 2026-09-30T14:10:18Z
 
 ## Features
