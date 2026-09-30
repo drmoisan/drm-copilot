@@ -63,21 +63,21 @@ Schedule arithmetic: sleeps after attempts 1 through 6 are 10, 20, 30, 40, 50, 6
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Read the policy files in the order defined by the policy-compliance-order skill: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`.
+- [x] [P0-T1] Read the policy files in the order defined by the policy-compliance-order skill: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`.
   - Acceptance: each of the four files was opened in this session; the file list is recorded by P0-T3.
-- [ ] [P0-T2] Read the domain policy files: `.claude/rules/powershell.md`, `.claude/rules/ci-workflows.md`, `.github/instructions/github-actions.instructions.md`, `.claude/rules/plan-acceptance-gates.md`.
+- [x] [P0-T2] Read the domain policy files: `.claude/rules/powershell.md`, `.claude/rules/ci-workflows.md`, `.github/instructions/github-actions.instructions.md`, `.claude/rules/plan-acceptance-gates.md`.
   - Acceptance: each of the four files was opened in this session; the file list is recorded by P0-T3.
-- [ ] [P0-T3] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/phase0-instructions-read.md` listing every file read in P0-T1 and P0-T2, in the order read.
+- [x] [P0-T3] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/phase0-instructions-read.md` listing every file read in P0-T1 and P0-T2, in the order read.
   - Acceptance: the artifact contains a `Timestamp:` line, a `Policy Order:` line, and one list entry for each of the eight files read in P0-T1 and P0-T2.
-- [ ] [P0-T4] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-branch-state.md` recording the output of `git status --porcelain --branch`.
+- [x] [P0-T4] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-branch-state.md` recording the output of `git status --porcelain --branch`.
   - Acceptance: the artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` that quotes the first output line beginning with two hash characters (the branch line).
-- [ ] [P0-T5] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-feature-folder-shape.md` recording the output of `git ls-files --cached --others -- docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/spec.md docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/user-story.md`.
+- [x] [P0-T5] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-feature-folder-shape.md` recording the output of `git ls-files --cached --others -- docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/spec.md docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/user-story.md`.
   - Acceptance: the artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` stating the command printed nothing, which proves neither minor-audit-forbidden document exists. Any printed path fails the task.
 - [ ] [P0-T6] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-pester-publish-mcp-npm-workflow.md` recording the output of `pwsh -NoProfile -Command "Invoke-Pester -Path tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1 -Output Detailed"` run before any edit.
   - Acceptance: the artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:` that quotes the Pester summary line and the printed `Failed: 0` token. The tree contains six existing `It` blocks, so the recorded passed count is expected to be 6; record the printed value as observed.
-- [ ] [P0-T7] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-actionlint-publish-mcp-npm.md` recording the result of `actionlint .github/workflows/publish-mcp-npm.yml`.
+- [x] [P0-T7] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-actionlint-publish-mcp-npm.md` recording the result of `actionlint .github/workflows/publish-mcp-npm.yml`.
   - Acceptance: the artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` stating the output was empty (actionlint prints nothing on success).
-- [ ] [P0-T8] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-token-guard-pytest.md` recording the output of `poetry run pytest tests/scripts/dev_tools/test_workflow_npm_token_guard.py -q`.
+- [x] [P0-T8] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/baseline/baseline-token-guard-pytest.md` recording the output of `poetry run pytest tests/scripts/dev_tools/test_workflow_npm_token_guard.py -q`.
   - Acceptance: the artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` that quotes the pytest summary line containing the token `passed` and no `failed`.
 
 ### Phase 1 — Implementation (small-path, constrained)
