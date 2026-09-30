@@ -42,7 +42,7 @@ AnalyzeStep: success
 
 Command: gh run download 36732800820 -n poshqc-test-results -D <session scratchpad outside the evidence tree>
 EXIT_CODE: 0
-Output Summary: pester-junit.xml and powershell-coverage.xml written into this folder with sanitization steps 1-4 applied in order (runner workspace prefix D:\a\drm-copilot\drm-copilot in both separator forms replaced by WORKTREE_ROOT; remaining absolute paths replaced by ABSOLUTE_PATH; properties blocks removed; hostname values replaced by HOST). No analyzer-output.txt for Source B. Junit root: tests="6183" failures="0" errors="0" disabled="10" (repository-wide scope, limit (b); H0 root was tests="6109").
+Output Summary: pester-junit.xml and powershell-coverage.xml written into this folder with sanitization steps 1-4 applied in order (runner workspace prefix (the CI checkout root) in both separator forms replaced by WORKTREE_ROOT; remaining absolute paths replaced by ABSOLUTE_PATH; properties blocks removed; hostname values replaced by HOST). No analyzer-output.txt for Source B. Junit root: tests="6183" failures="0" errors="0" disabled="10" (repository-wide scope, limit (b); H0 root was tests="6109").
 
 ### Post-sanitization checks
 
