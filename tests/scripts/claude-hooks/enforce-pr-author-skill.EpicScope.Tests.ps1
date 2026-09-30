@@ -60,6 +60,9 @@ BeforeAll {
         & $Mutate $checkpoint
         return ($checkpoint | ConvertTo-Json -Depth 6 -Compress)
     }
+    Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeRunResolution.psm1')
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    Mock Resolve-WorktreeEpicTarget -ModuleName EpicScopeResolution { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = $SessionRoot; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
 }
 
 Describe 'enforce-pr-author-skill.ps1 epic scope (issue #663)' {

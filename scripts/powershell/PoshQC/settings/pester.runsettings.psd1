@@ -45,8 +45,10 @@
             '.claude/hooks/enforce-epic-merge-gate.ps1'
             # Issue #670: CodeCoverage.Path is an explicit per-file allow-list, so the dot-sourced helpers file is listed here.
             '.claude/hooks/enforce-epic-merge-gate-authorization.ps1'
+            '.claude/hooks/enforce-epic-merge-gate-resolution.ps1'
             '.claude/hooks/enforce-epic-wave-barrier.ps1'
             '.claude/hooks/enforce-epic-worktree-removal-gate.ps1'
+            '.claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1'
             '.claude/hooks/enforce-pr-author-skill.ps1'
             '.claude/hooks/validate-orchestrator-output.ps1'
             '.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1'
@@ -319,11 +321,19 @@
             # Issue #663 added the epic-scope resolver and its pure readiness predicates.
             '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'
             '.claude/lib/worktree-resolution/EpicScopeReadiness.psm1'
+            # Issue #690 added the run-target resolver; registered so it stays in the coverage denominator.
+            '.claude/lib/worktree-resolution/WorktreeRunResolution.psm1'
             # Issue #762 relocated the CI gate parser into the bundled .claude/lib tree so
             # push-down carries it with the orchestrate and epic-orchestrate skills.
             # CodeCoverage.Path is an explicit per-file allow-list, so the relocated production
             # file is registered here to stay in the coverage denominator.
             '.claude/lib/ci-gate/Invoke-CiGateParser.ps1'
+            # Issue #763 ported radius drift detection to the destination runtime as two pure
+            # modules and an entry script under .claude/lib/parallel-drift. CodeCoverage.Path is an
+            # explicit per-file allow-list, so each new production file is registered here.
+            '.claude/lib/parallel-drift/ParallelDriftHalt.psm1'
+            '.claude/lib/parallel-drift/ParallelDrift.psm1'
+            '.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0

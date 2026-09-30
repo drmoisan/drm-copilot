@@ -2,14 +2,19 @@
 
 Covers ``main`` in ``scripts/dev_tools/skill_bundle_contract_cli.py`` with an
 injected loader that returns an inline snapshot, so no test touches the
-filesystem. Every path is fictitious.
+filesystem. The default exception registry is empty since issue #763, so the
+suppression and staleness branches are exercised through the injected
+``exceptions`` registry. Every path is fictitious.
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from scripts.dev_tools.skill_bundle_contract import SkillBundleInputs
+from scripts.dev_tools.skill_bundle_contract import (
+    KnownUnbundledReference,
+    SkillBundleInputs,
+)
 from scripts.dev_tools.skill_bundle_contract_cli import main
 
 if TYPE_CHECKING:
@@ -20,8 +25,6 @@ if TYPE_CHECKING:
 
 _SCRIPT = ".claude/lib/example/example.sh"
 _UNBUNDLED = "scripts/tools/example.sh"
-_DRIFT_CLI = "scripts/dev_tools/parallel_drift_detection_cli.py"
-_ABANDON_CLI = "scripts/dev_tools/parallel_mutation_abandon_cli.py"
 
 
 def _loader(inputs: SkillBundleInputs) -> Callable[[Path], SkillBundleInputs]:
@@ -50,24 +53,20 @@ def _loader(inputs: SkillBundleInputs) -> Callable[[Path], SkillBundleInputs]:
 
 
 def _clean_inputs(*, extra_skill_text: str = "") -> SkillBundleInputs:
-    """Build a snapshot whose only findings are the two registered exceptions.
+    """Build a snapshot with no finding.
 
     Args:
         extra_skill_text (str): Text appended to the demo skill body.
 
     Returns:
-        SkillBundleInputs: Snapshot in which both #763 exceptions match a
-        violation and the demo skill's bundled script is carried by core.
+        SkillBundleInputs: Snapshot in which the demo skill's only reference is
+        a bundled script carried by the core pack.
     """
 
     return SkillBundleInputs(
-        skill_texts={
-            "demo-skill": f"Run `bash {_SCRIPT}`.{extra_skill_text}",
-            "parallel-orchestrate": f"Run `python {_DRIFT_CLI}`.",
-            "parallel-remove": f"Run `python {_ABANDON_CLI}`.",
-        },
+        skill_texts={"demo-skill": f"Run `bash {_SCRIPT}`.{extra_skill_text}"},
         skill_folder_files={},
-        repository_files=frozenset({_SCRIPT, _UNBUNDLED, _DRIFT_CLI, _ABANDON_CLI}),
+        repository_files=frozenset({_SCRIPT, _UNBUNDLED}),
         bundle_files=frozenset({_SCRIPT}),
         pack_paths={"core": frozenset({_SCRIPT})},
     )
@@ -108,31 +107,19 @@ def test_main_returns_one_and_prints_violation_lines(
 def test_main_returns_one_for_stale_exception(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """An exception whose violation disappeared exits 1 and is reported."""
+    """An injected exception that matches no violation exits 1 and is reported."""
 
     # Arrange
-    clean = _clean_inputs()
-    # Drop the parallel-remove skill so its registered exception matches nothing.
-    stale_inputs = SkillBundleInputs(
-        skill_texts={
-            name: text
-            for name, text in clean.skill_texts.items()
-            if name != "parallel-remove"
-        },
-        skill_folder_files=clean.skill_folder_files,
-        repository_files=clean.repository_files,
-        bundle_files=clean.bundle_files,
-        pack_paths=clean.pack_paths,
-    )
+    stale = KnownUnbundledReference("demo-skill", _UNBUNDLED, "#1")
 
     # Act
-    exit_code = main([], loader=_loader(stale_inputs))
+    exit_code = main([], loader=_loader(_clean_inputs()), exceptions=(stale,))
 
     # Assert
     captured = capsys.readouterr()
     assert exit_code == 1, f"Expected 1, got {exit_code}"
     assert captured.err.splitlines() == [
-        f"skill-bundle stale exception: parallel-remove | {_ABANDON_CLI} | #763"
+        f"skill-bundle stale exception: demo-skill | {_UNBUNDLED} | #1"
     ], captured.err
 
 
@@ -149,4 +136,22 @@ def test_main_prints_nothing_to_stderr_when_clean(
 
     # Assert
     captured = capsys.readouterr()
+    assert captured.err == "", f"Expected empty stderr, got {captured.err!r}"
+
+
+def test_main_suppresses_a_registered_exception(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A violation matched by an injected exception exits 0 with empty stderr."""
+
+    # Arrange
+    inputs = _clean_inputs(extra_skill_text=f" Then `bash {_UNBUNDLED}`.")
+    registered = KnownUnbundledReference("demo-skill", _UNBUNDLED, "#1")
+
+    # Act
+    exit_code = main([], loader=_loader(inputs), exceptions=(registered,))
+
+    # Assert
+    captured = capsys.readouterr()
+    assert exit_code == 0, f"Expected 0, got {exit_code}"
     assert captured.err == "", f"Expected empty stderr, got {captured.err!r}"
