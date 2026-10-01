@@ -9,8 +9,8 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 - Throttle (quota, 2026-10-01): 1 concurrent child.
 - HOLD from 2026-10-01T11:05Z released at 15:52Z (one concurrent child).
 - HOLD (quota, from 2026-10-01T16:02Z): no new launches until RESUME; the in-flight #509 resume continues.
-- Next step: #509 resumed at remediation cycle 1; launch #484 (wave 2) after #509 merges and RESUME.
-- Last updated: 2026-10-01T16:02:00Z
+- Next step: #509 in remediation cycle 1 (branch at 70c6df2f, pushed, 16:59Z); launch #484 (wave 2) after #509 merges and RESUME.
+- Last updated: 2026-10-01T16:59:00Z
 
 ## Features
 
