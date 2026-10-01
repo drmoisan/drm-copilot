@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-01T11:10:36Z
+- `last_updated`: 2026-10-01T11:11:28Z
 
 **Items**
 
@@ -30,7 +30,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 532 | docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532 | 2 | scheduled | not_started |  |  |  |  |  |
 | 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | scheduled | not_started |  |  |  |  |  |
 | 609 | docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609 | 1 | scheduled | not_started |  |  |  |  |  |
-| 623 | docs/features/active/promotion-receipt-destination-unverified-623 | 0 | in_flight | ci_green | https://github.com/drmoisan/drm-copilot/pull/804 |  | 2026-09-30T12:21:20Z |  |  |
+| 623 | docs/features/active/promotion-receipt-destination-unverified-623 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/804 | 2b0121abf74f5862a3d12929d833504668941156 | 2026-09-30T12:21:20Z | 2026-09-30T13:42:13Z |  |
 | 645 | docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645 | 3 | scheduled | not_started |  |  |  |  |  |
 | 647 | docs/features/active/2026-09-07-test-tree-typecheck-not-gated-647 | 1 | scheduled | not_started |  |  |  |  |  |
 | 658 | docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658 | 3 | scheduled | not_started |  |  |  |  |  |
