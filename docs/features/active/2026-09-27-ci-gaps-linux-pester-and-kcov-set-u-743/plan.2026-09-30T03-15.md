@@ -891,7 +891,7 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
 - [x] [P1-T1] Create `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` with the Write tool, content
   exactly as reference block R1. Acceptance: the file exists and its first line is
   `Set-StrictMode -Version Latest`.
-- [ ] [P1-T2] [expect-fail] Fail-before run of `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` into
+- [x] [P1-T2] [expect-fail] Fail-before run of `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` into
   `<FEATURE>/evidence/regression-testing/fail-before-poshqc-workflow.<ts>.md` with
   `ExpectedExitCode: 1`: run
   `pwsh -NoProfile -File <session-scratchpad>/ps-pester-targeted.ps1 -PathList tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`.
@@ -1000,11 +1000,11 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
 
 ### Phase 3 — Linux Hook-Suite Job in `_poshqc.yml`
 
-- [ ] [P3-T1] Update `.github/workflows/_poshqc.yml` by appending reference block R8 after the line
+- [x] [P3-T1] Update `.github/workflows/_poshqc.yml` by appending reference block R8 after the line
   `          if-no-files-found: ignore`. Acceptance: `grep -c -F 'poshqc-linux-hooks:' .github/workflows/_poshqc.yml`
   prints `1` and `grep -c -F 'name: poshqc-linux-hook-test-results' .github/workflows/_poshqc.yml`
   prints `1`.
-- [ ] [P3-T2] Pass-after run of `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` into
+- [x] [P3-T2] Pass-after run of `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` into
   `<FEATURE>/evidence/regression-testing/pass-after-poshqc-workflow.<ts>.md`: run
   `pwsh -NoProfile -File <session-scratchpad>/ps-pester-targeted.ps1 -PathList tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`.
   Acceptance: `EXIT_CODE: 0`; the output line reads `FAILED-COUNT: 0 PASSED-COUNT: 7 SKIPPED-COUNT: 0`;
@@ -1018,7 +1018,7 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
   (`scripts/dev-tools/run-actionlint.ps1:128`), so on a non-zero exit the task also runs
   `actionlint .github/workflows/_poshqc.yml` (on PATH per P0-T7; `tools/actionlint/bin/actionlint.exe`
   when P0-T7 recorded `ACTIONLINT-ON-PATH: NO`) into the same artifact to record the findings.
-- [ ] [P3-T4] Verify that the `poshqc` job in `.github/workflows/_poshqc.yml` is unchanged (AC-4)
+- [x] [P3-T4] Verify that the `poshqc` job in `.github/workflows/_poshqc.yml` is unchanged (AC-4)
   into `<FEATURE>/evidence/regression-testing/poshqc-job-unchanged.<ts>.md`: run
   `git diff --numstat <MERGE_BASE> -- .github/workflows/_poshqc.yml` and
   `git diff -U0 <MERGE_BASE> -- .github/workflows/_poshqc.yml`. Acceptance: the numstat line's
@@ -1028,7 +1028,7 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
 
 ### Phase 4 — First Linux CI Run (Discovery)
 
-- [ ] [P4-T1] Commit and push the Phase 1 to Phase 3 changes of `bug/ci-gaps-linux-pester-and-kcov-set-u-743`:
+- [x] [P4-T1] Commit and push the Phase 1 to Phase 3 changes of `bug/ci-gaps-linux-pester-and-kcov-set-u-743`:
   run `git add -- .github/workflows/_poshqc.yml tests/scripts/workflows/PoshQcWorkflow.Tests.ps1 scripts/bash/kcov_trace_env.sh scripts/bash/shell_qc_lib.sh tests/shell/test_shell_qc_commands.bats tests/fixtures/shell_qc/kcov_trace/ tests/fixtures/shell_qc/stub-bin/bats-nounset-source tests/fixtures/shell_qc/stub-bin/bats-nounset-source-reset docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/`,
   then `git commit -F <message file> --` with the same paths, then `git rev-parse HEAD` (CI_SHA_1),
   then `git push origin bug/ci-gaps-linux-pester-and-kcov-set-u-743` and
@@ -1036,13 +1036,13 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
   `<FEATURE>/evidence/other/commit-push-discovery.<ts>.md`. Acceptance: every command exits 0 and the
   remote head equals CI_SHA_1. If the preimplementation gate refuses a command, record the refusal
   text and stop (BLOCKED).
-- [ ] [P4-T2] Dispatch the first run of `.github/workflows/_poshqc.yml` with the new job: record the
+- [x] [P4-T2] Dispatch the first run of `.github/workflows/_poshqc.yml` with the new job: record the
   dispatch time (UTC), run `gh workflow run _poshqc.yml --ref bug/ci-gaps-linux-pester-and-kcov-set-u-743`,
   and repeat the P0-T22 `_poshqc.yml` poll until it returns a run created after the dispatch time;
   its `databaseId` is `<RUN_ID>` for this phase. Start `gh run watch <RUN_ID>` in the background.
   Record the pairs in `<FEATURE>/evidence/qa-gates/linux-first-run.<ts>.md`. Acceptance: the run's
   `headSha` equals CI_SHA_1.
-- [ ] [P4-T3] [expect-fail] Read the first Linux run of `.github/workflows/_poshqc.yml` after the
+- [x] [P4-T3] [expect-fail] Read the first Linux run of `.github/workflows/_poshqc.yml` after the
   background watch finishes, appending to `<FEATURE>/evidence/qa-gates/linux-first-run.<ts>.md`: run
   `gh run view <RUN_ID> --json conclusion,jobs`; with the `PowerShell hook suites (Linux)` job's
   `databaseId` as `<JOB_ID>`, run `gh run view <RUN_ID> --log --job <JOB_ID>` filtered by
@@ -1067,7 +1067,7 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
   `RUN_ID:`, `CI_SHA:` (CI_SHA_1), the `gh run view <RUN_ID> --json conclusion,jobs`
   `Command:`/`EXIT_CODE:` pair, `Output Summary:` stating the Linux job conclusion, and every
   `FAIL:` line.
-- [ ] [P4-T4] Write the AC-10 inventory `<FEATURE>/evidence/qa-gates/linux-first-run-failures.<ts>.md`
+- [x] [P4-T4] Write the AC-10 inventory `<FEATURE>/evidence/qa-gates/linux-first-run-failures.<ts>.md`
   from the P4-T3 `FAIL:` lines: `Timestamp:`, `RUN_ID:`, `CI_SHA:`, and one table row per `FAIL:`
   line with the columns `File`, `Testcase`, `Class`, and `Planned disposition`. `Class` is one of
   S1, S1b, S1c, S2, S3, S5, or NEW. `Planned disposition` is `P5-T1`, `P5-T2`, or `P5-T3` for the
@@ -1077,7 +1077,7 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
   `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1`
   respectively, and `REMEDIATION-REQUIRED` for a row of any class in any other file. Acceptance: the row count
   equals the number of `FAIL:` lines, and every row has all four columns filled.
-- [ ] [P4-T5] Fix `.github/workflows/_poshqc.yml` in the `poshqc-linux-hooks` job only (conditional:
+- [x] [P4-T5] Fix `.github/workflows/_poshqc.yml` in the `poshqc-linux-hooks` job only (conditional:
   only when P4-T3 recorded a failure outside `Test PowerShell hook suites`; otherwise record
   `P4-T5: NOT REQUIRED` in the P4-T3 artifact and mark this task done). The fix is limited to the
   `poshqc-linux-hooks` job, and the R1 invariants must still hold. Then re-run P3-T2, P3-T3, P3-T4,
@@ -1436,6 +1436,8 @@ Authority: binding operator decision of 2026-10-01 (Option A). No `pwsh` process
 | D8 | P3-T2 | Pass-after is evidenced by the CI `PowerShell QC` JUnit for `PoshQcWorkflow.Tests.ps1` on the P4-T1 push / P4-T2 run, plus `mcp__drm-copilot__run_poshqc_test`. |
 | D9 | P4-T3, P7-T18, P7-T19 | The SP7 summary is produced by the Python JUnit helper. |
 | D10 | P5-T8 | The CI `PowerShell QC` JUnit for the three modified Codex suites on the push after Phase 5, plus `mcp__drm-copilot__run_poshqc_test` with `scan_folders` `["tests/scripts/codex-hooks"]`, replaces SP6. |
+| D11 | P1-T2 | The `poshqc` job's upload step has no `if: always()`, so CI run 36892883441 (Windows `Test PowerShell` failed as expected) uploaded no `poshqc-test-results` artifact and no JUnit exists. The `poshqc` job may not be modified (AC-4), so the fail-before per-test evidence is the job log: the `Tests Passed:` line and the six `[-]` lines. |
+| D12 | P4-T1 | P4-T1's commit is also the Phase 3 boundary commit required by the run constraints; no separate Phase 3 commit is made, so P4-T1's pathspec (which omits the plan file) is used unchanged. Plan check marks for Phases 3 and 4 are committed at the Phase 4 boundary. |
 
 Operator-run blockers (left unchecked; `actionlint` run directly as supplementary evidence only):
 
