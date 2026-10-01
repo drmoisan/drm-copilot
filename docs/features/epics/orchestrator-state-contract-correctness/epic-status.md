@@ -2,15 +2,12 @@
 
 Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not edit by hand.
 
-- Epic issue: #771
+- Epic issue: #771 (closed)
 - Integration branch: `epic/orchestrator-state-contract-correctness-integration`
-- Current wave: 2
+- Current wave: 2 (complete)
 - Interruption: an account session limit terminated the run and both wave-1 children at about 2026-09-30T14:35Z; resumed 2026-10-01T11:00Z.
-- Throttle (quota, 2026-10-01): 1 concurrent child.
-- HOLD from 2026-10-01T11:05Z released at 15:52Z (one concurrent child).
-- HOLD from 2026-10-01T16:02Z released at 20:55Z (one concurrent child).
-- Next step: all five features merged; open the integration-to-main PR (closes #771, #405, #464, #509, #523, #484).
-- Last updated: 2026-10-01T23:48:00Z
+- Next step: DONE (deferred: removal of harness-locked child worktrees)
+- Last updated: 2026-10-02T00:00:30Z
 
 ## Features
 
@@ -24,5 +21,7 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 
 ## Integration-to-main PR
 
-- PR: not opened
-- Merge commit: -
+- PR: [#812](https://github.com/drmoisan/drm-copilot/pull/812), opened 2026-10-01T23:48:50Z
+- CI: ci.yml run 36942780545 success on head 6ae34446 (16 jobs, 19 checks, 0 failed)
+- Merge commit: dcd48c0e76363141b6b7ab9acc9e0a7cf053b5e0 (merged 2026-10-01T23:58:42Z)
+- Closed issues: #771, #405, #464, #509, #523, #484
