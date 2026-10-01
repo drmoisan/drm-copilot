@@ -26,6 +26,10 @@ from scripts.dev_tools._epic_orchestrator_state_resolution import (
     resolve_feature_reference,
     validate_intent_block,
 )
+from scripts.dev_tools._epic_orchestrator_state_wave_barrier import (
+    MERGED_STATUSES,
+    validate_wave_barrier_ordering,
+)
 from scripts.dev_tools._orchestrator_state_codex_model_routing import (
     CODEX_MODEL_ROUTING_RECEIPTS_KEY,
     validate_codex_model_routing_gate,
@@ -57,7 +61,6 @@ VALID_MERGE_STATUS = {
     "merged",
     "worktree_removed",
 }
-MERGED_STATUSES = {"merged", "worktree_removed"}
 
 
 def _missing_baseline_and_epic_keys(state: dict[str, Any]) -> list[str]:
@@ -240,73 +243,6 @@ def _validate_merge_status_enum(features: list[dict[str, Any]]) -> list[str]:
     return errors
 
 
-def _validate_wave_barrier_ordering(features: list[dict[str, Any]]) -> list[str]:
-    """Validate the retrospective wave-barrier ordering invariant.
-
-    Purpose:
-        For every feature f with non-empty depends_on, each dependency d must
-        have merge_status in {merged, worktree_removed} and a non-null
-        merge_confirmed_at timestamp that is chronologically <=
-        f.worktree_created_at (when both are non-null), per spec.md section 6.
-
-    Args:
-        features (list[dict[str, Any]]): Object-shaped features[] entries.
-
-    Returns:
-        list[str]: One EPIC_WAVE_BARRIER_VIOLATION error per violated edge.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    errors: list[str] = []
-    by_folder = {
-        f["feature_folder"]: f
-        for f in features
-        if isinstance(f.get("feature_folder"), str)
-    }
-    # Resolve dependencies through the union index so a barrier edge is found
-    # whether the reference is an issue_num or a folder-basename hint; on legacy
-    # folder strings the resolved key equals the reference, so lookups match.
-    by_folder_hint, by_issue_num = build_feature_reference_index(features)
-
-    for feature in features:
-        folder = feature.get("feature_folder")
-        depends_on = feature.get("depends_on")
-        if not isinstance(folder, str) or not isinstance(depends_on, list):
-            continue
-        worktree_created_at = feature.get("worktree_created_at")
-
-        # Every dependency edge must be durably confirmed merged before this
-        # feature is considered to have safely started its own wave.
-        for dependency in cast("list[Any]", depends_on):
-            resolved = resolve_feature_reference(
-                dependency, by_folder_hint, by_issue_num
-            )
-            dependency_feature = (
-                by_folder.get(resolved) if resolved is not None else None
-            )
-            if dependency_feature is None:
-                continue
-            dep_merge_status = dependency_feature.get("merge_status")
-            dep_confirmed_at = dependency_feature.get("merge_confirmed_at")
-            status_violation = dep_merge_status not in MERGED_STATUSES
-            timing_violation = (
-                isinstance(dep_confirmed_at, str)
-                and isinstance(worktree_created_at, str)
-                and dep_confirmed_at > worktree_created_at
-            )
-            if status_violation or timing_violation:
-                errors.append(
-                    f"EPIC_WAVE_BARRIER_VIOLATION: {folder} started before "
-                    f"dependency {dependency} merged"
-                )
-    return errors
-
-
 def _validate_waves_consistency(state: dict[str, Any]) -> list[str]:
     """Validate consistency between waves[].feature_folders and wave_number.
 
@@ -452,7 +388,7 @@ def validate_epic_orchestrator_state_text(
     if cycle_error is not None:
         errors.append(cycle_error)
     errors.extend(_validate_merge_status_enum(features))
-    errors.extend(_validate_wave_barrier_ordering(features))
+    errors.extend(validate_wave_barrier_ordering(features))
     errors.extend(_validate_waves_consistency(state_map))
     # Presence-gated: only runs when the checkpoint carries a top-level intent
     # object, so an intent-free checkpoint stays byte-identical.
