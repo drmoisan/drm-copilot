@@ -512,7 +512,7 @@ R8. Forbidden-path pattern (AC-20), used verbatim in P0-T10 and P3-T14:
   `<FEATURE>/evidence/regression-testing/p2-t9-ps-test-hooks.<ts>.md`: run the MCP tool `mcp__drm-copilot__run_poshqc_test` with
   `workspace_root` set to the item worktree and `scan_folders` set to `["tests/scripts/claude-hooks","tests/scripts/codex-hooks"]`.
   Acceptance: `ok: true` (the P0-T15 baseline for the same folders was also `ok: true`). No count or test name is asserted.
-- [ ] [P2-T10] Commit and push the Phase 2 boundary: write `<session-scratchpad>/commit-msg-p2.txt` from reference block R6, then
+- [x] [P2-T10] Commit and push the Phase 2 boundary: write `<session-scratchpad>/commit-msg-p2.txt` from reference block R6, then
   run `git add --` and `git commit -F <session-scratchpad>/commit-msg-p2.txt --` with the paths
   `tests/scripts/claude-hooks/enforce-powershell-batch-budget-routing.Tests.ps1 tests/scripts/claude-hooks/enforce-python-batch-budget-routing.Tests.ps1 tests/scripts/codex-hooks/codex-powershell-batch-budget-routing.Tests.ps1 tests/scripts/codex-hooks/codex-python-batch-budget-routing.Tests.ps1 docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/ docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/remediation-plan.2026-10-01T18-07.md`,
   then `git push origin bug/ci-gaps-linux-pester-and-kcov-set-u-743`, then
@@ -528,29 +528,29 @@ remediation changes a file, fix the cause and restart at P3-T1. Artifacts from a
 writes new timestamped artifacts. A fix that changes a test file is committed by re-running the Phase 1 or Phase 2 boundary
 commit pattern into a new `commit-push-*.<ts>.md` artifact before P4-T1.
 
-- [ ] [P3-T1] QC step 1 (PowerShell format) over the whole worktree into `<FEATURE>/evidence/qa-gates/qc-ps-format.<ts>.md`.
+- [x] [P3-T1] QC step 1 (PowerShell format) over the whole worktree into `<FEATURE>/evidence/qa-gates/qc-ps-format.<ts>.md`.
   Pre-pass observation: `git status --porcelain` and `sha256sum` over the five files of P0-T8 plus every file listed in the latest
   P4-T11 artifact (none on the first pass). Run the MCP tool
   `mcp__drm-copilot__run_poshqc_format` (`workspace_root` = item worktree). Post-pass observation: re-run both commands.
   Acceptance (success-case observation): `ok: true`; the post-pass porcelain listing equals the pre-pass listing; the post-pass
   hashes equal the pre-pass hashes. No `Formatted:` count is asserted.
-- [ ] [P3-T2] QC step 2 (PowerShell analyze) into `<FEATURE>/evidence/qa-gates/qc-ps-analyze.<ts>.md`: run the MCP tool
+- [x] [P3-T2] QC step 2 (PowerShell analyze) into `<FEATURE>/evidence/qa-gates/qc-ps-analyze.<ts>.md`: run the MCP tool
   `mcp__drm-copilot__run_poshqc_analyze` (`workspace_root` = item worktree). Acceptance: `ok: true`. The finding set is read from the
   CI `Analyze PowerShell` step of the head run in P4-T4. Type checking does not apply to PowerShell.
-- [ ] [P3-T3] QC step 3 (PowerShell test; coverage is read from CI) into `<FEATURE>/evidence/qa-gates/qc-ps-test.<ts>.md`: run the MCP
+- [x] [P3-T3] QC step 3 (PowerShell test; coverage is read from CI) into `<FEATURE>/evidence/qa-gates/qc-ps-test.<ts>.md`: run the MCP
   tool `mcp__drm-copilot__run_poshqc_test` (`workspace_root` = item worktree, no `scan_folders`). Acceptance: `ok: true`. The tool
   returns no counts or coverage, so the numeric Windows coverage for this step is the P4-T9 value from the same head. The P0-T16
   baseline for the same call was also `ok: true`.
-- [ ] [P3-T4] QC step 4 (bash format) into `<FEATURE>/evidence/qa-gates/qc-bash-format.<ts>.md`. Pre-pass observation:
+- [x] [P3-T4] QC step 4 (bash format) into `<FEATURE>/evidence/qa-gates/qc-bash-format.<ts>.md`. Pre-pass observation:
   `git status --porcelain -- scripts/ tools/ .claude/lib/bash/ .claude/skills/` and
   `sha256sum scripts/bash/shell_qc_lib.sh scripts/bash/kcov_trace_env.sh`. Run `sh scripts/bash/shell-qc.sh format`. Post-pass
   observation: re-run both commands. Acceptance: exit 0; the post-pass porcelain listing and hashes equal the pre-pass values (the
   executed plan recorded `LOCAL-DRIFT: NONE`, so the formatter has nothing to rewrite). A changed path outside this plan's file list is
   restored with `git restore -- <path>`, recorded as `FORMAT-DRIFT: <path>`, and the plan outcome is returned to the orchestrator.
-- [ ] [P3-T5] QC step 5 (bash lint) into `<FEATURE>/evidence/qa-gates/qc-bash-check.<ts>.md` with `ExpectedExitCode: 0`: run
+- [x] [P3-T5] QC step 5 (bash lint) into `<FEATURE>/evidence/qa-gates/qc-bash-check.<ts>.md` with `ExpectedExitCode: 0`: run
   `sh scripts/bash/shell-qc.sh check`. Acceptance: exit 0 and no output (the success-case output of this command was observed as
   empty in `qc-bash-check.2026-10-01T17-23.md`).
-- [ ] [P3-T6] QC step 6 (full bash test with the kcov simulation active) into
+- [x] [P3-T6] QC step 6 (full bash test with the kcov simulation active) into
   `<FEATURE>/evidence/qa-gates/qc-shell-qc-test-full.<ts>.md`. Record `date -u +%Y-%m-%dT%H-%M-%S` as `RUN_START`, run
   `SHELL_QC_BATS_BIN=<BATS_DIRECT> sh scripts/bash/shell-qc.sh test` in the background with output redirected to
   `<session-scratchpad>/shell-qc-test-final.log`, then record the exit code from the completion notification and `RUN_END` from
@@ -561,40 +561,40 @@ commit pattern into a new `commit-push-*.<ts>.md` artifact before P4-T1.
   `ExpectedExitCode: 1`, in `<FEATURE>/evidence/qa-gates/qc-shell-qc-test-not-ok.<ts>.md`); wall time derived from `RUN_START` and
   `RUN_END` is recorded (not gated). When P0-T11 or P0-T12 recorded `BATS-DIRECT: UNAVAILABLE`, record `LOCAL-FULL-RUN: UNAVAILABLE`;
   AC-21 then stays unchecked.
-- [ ] [P3-T7] QC step 7 (Python parity test) into `<FEATURE>/evidence/qa-gates/qc-pytest-claude-resource-contracts.<ts>.md`: run
+- [x] [P3-T7] QC step 7 (Python parity test) into `<FEATURE>/evidence/qa-gates/qc-pytest-claude-resource-contracts.<ts>.md`: run
   `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`. Acceptance: exit 0 and the summary line
   reports `passed` with no `failed` (the executed plan recorded `14 passed`). If the only failure is the known bundle-parity case
   `test_bundled_claude_payload_contains_all_repo_runtime_contracts` (issue #510), record `KNOWN-ISSUE-510` with the output of
   `git status --porcelain --ignored -- .claude/state` and cite the CI `quality-checks7` job conclusion from P4-T4 for the AC-21 pytest part.
-- [ ] [P3-T8] Supplementary workflow lint into `<FEATURE>/evidence/qa-gates/qc-actionlint-direct.<ts>.md` with
+- [x] [P3-T8] Supplementary workflow lint into `<FEATURE>/evidence/qa-gates/qc-actionlint-direct.<ts>.md` with
   `ExpectedExitCode: 0`: run `actionlint .github/workflows/_poshqc.yml` (binary on PATH). Acceptance: exit 0 and no output, as in
   `qc-actionlint.2026-10-01T17-23.md`. The artifact states that this is supplementary evidence only and that the wrapper run named by
   AC-5 and AC-21 is the operator-run item above. No workflow file is edited by this plan, so the result is expected to match.
-- [ ] [P3-T9] Verify line counts for the edited files (AC-22) into `<FEATURE>/evidence/qa-gates/line-counts.<ts>.md`: run `wc -l`
+- [x] [P3-T9] Verify line counts for the edited files (AC-22) into `<FEATURE>/evidence/qa-gates/line-counts.<ts>.md`: run `wc -l`
   over the five files of P0-T8 plus every file listed in the latest P4-T11 artifact. Acceptance: every count is at most 500.
-- [ ] [P3-T10] Verify that the edited tests create no temporary files (AC-22) into `<FEATURE>/evidence/qa-gates/no-temp-files.<ts>.md`
+- [x] [P3-T10] Verify that the edited tests create no temporary files (AC-22) into `<FEATURE>/evidence/qa-gates/no-temp-files.<ts>.md`
   with `ExpectedExitCode: 1`, holding only the command
   `git diff -U0 dcb2abf1 -- tests/ | grep -c -E '^\+.*(mktemp|New-TemporaryFile|GetTempFileName|GetTempPath|TestDrive)'` where `dcb2abf1` is replaced by the
   40-character `<START_SHA>`. Acceptance: the count prints `0` and exits 1 (the diff covers only this cycle's test edits).
-- [ ] [P3-T11] Verify that no skip was added (AC-10) into `<FEATURE>/evidence/qa-gates/no-unconditional-skip.<ts>.md` with
+- [x] [P3-T11] Verify that no skip was added (AC-10) into `<FEATURE>/evidence/qa-gates/no-unconditional-skip.<ts>.md` with
   `ExpectedExitCode: 1`, holding only the command
   `git diff -U0 41217012d31d35c2ee33a50be50684affd2f5f43 -- tests/scripts/codex-hooks/ tests/scripts/claude-hooks/ | grep -c -E '^\+.*-Skip([[:space:]]|$|:\$true)'`.
   Acceptance: the count prints `0` and exits 1 (the P0-T9 baseline was also `0`).
-- [ ] [P3-T12] Verify that no skipped-result call was added into `<FEATURE>/evidence/qa-gates/no-set-itresult.<ts>.md` with
+- [x] [P3-T12] Verify that no skipped-result call was added into `<FEATURE>/evidence/qa-gates/no-set-itresult.<ts>.md` with
   `ExpectedExitCode: 1`, holding only the command
   `git diff -U0 41217012d31d35c2ee33a50be50684affd2f5f43 -- tests/scripts/codex-hooks/ tests/scripts/claude-hooks/ | grep -c -F -e 'Set-ItResult'`.
   Acceptance: the count prints `0` and exits 1.
-- [ ] [P3-T13] Verify the cycle scope (AC-20 and the Do-Not-Do list) into `<FEATURE>/evidence/qa-gates/scope-check.<ts>.md`: run
+- [x] [P3-T13] Verify the cycle scope (AC-20 and the Do-Not-Do list) into `<FEATURE>/evidence/qa-gates/scope-check.<ts>.md`: run
   `git diff --name-only <START_SHA>` (with the 40-character value substituted) and `git status --porcelain`. Acceptance: every listed
   path is one of the five test files of P0-T8, a file listed in the latest P4-T11 artifact, or lies under `<FEATURE>/`; no path under `.github/`, `.claude/rules/`,
   `.github/instructions/`, `scripts/`, `.claude/hooks/`, or `.codex/` is listed; the porcelain listing shows no path outside that set.
-- [ ] [P3-T14] Verify that no forbidden path is changed relative to the merge base into
+- [x] [P3-T14] Verify that no forbidden path is changed relative to the merge base into
   `<FEATURE>/evidence/qa-gates/scope-forbidden-paths.<ts>.md` with `ExpectedExitCode: 1`, holding only the command
   `git diff --name-only 41217012d31d35c2ee33a50be50684affd2f5f43 | grep -c -E '<R8 pattern>'` with the reference block R8 pattern
   substituted verbatim; the same task also runs `git status --porcelain` into the artifact
   `<FEATURE>/evidence/qa-gates/scope-forbidden-paths-status.<ts>.md` so untracked paths are visible. Acceptance: the count prints `0`
   and exits 1.
-- [ ] [P3-T15] Record the clean loop pass into `<FEATURE>/evidence/qa-gates/qc-loop-pass.<ts>.md`: the pass number, the artifact paths
+- [x] [P3-T15] Record the clean loop pass into `<FEATURE>/evidence/qa-gates/qc-loop-pass.<ts>.md`: the pass number, the artifact paths
   of P3-T1 through P3-T14 of that pass, and the output of `sha256sum` over the five files of P0-T8 plus every file listed in the
   latest P4-T11 artifact, run immediately after P3-T14.
   Acceptance: P3-T1 through P3-T14 all passed in the same pass without changing a file after P3-T1 (the post-pass hashes of P3-T1
