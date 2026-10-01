@@ -295,7 +295,7 @@ skill use. The checkpoint must include:
 - `required_mcp_tools`: exactly the selected route's `required_mcp_tools`
 - `delegation_receipts`: one receipt for each required agent
 - `skill_receipts`: one required receipt for each required skill, with evidence
-- `mcp_call_receipts`: one successful receipt for each required MCP tool
+- `mcp_call_receipts`: one successful receipt for each required MCP tool unless a valid `issue_adoption` record waives it
 - `local_execution_overrides`: an empty list at completion
 - `delegation_bypasses`: an empty list at completion
 - `lifecycle_operations`: any lifecycle operation must record `surface: "mcp"`

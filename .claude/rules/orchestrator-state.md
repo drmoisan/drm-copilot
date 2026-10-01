@@ -185,6 +185,43 @@ not a cryptographic or security control.
 
 Field checks 3 through 9 run in the fixed order `pr_url`, `issue_num`, `branch_name`, `authorized_by`, `authorized_at`, `basis`, `run_slug`, `session_id`; the first failure wins and the gate denies with `STANDALONE_MERGE_AUTHORIZATION_MALFORMED` naming that field.
 
+## Issue-Adoption Scope and Backward Compatibility
+
+These invariants apply only when a checkpoint contains a top-level `issue_adoption` key. The key records that the orchestration adopted a GitHub issue that already existed before orchestration started (transferred, filed by hand, or created by epic decomposition), so the issue was never created through `potential_to_issue`. The key is presence-gated: a checkpoint without it validates byte-identically to before and produces no new errors. It is evaluated only by the routing-contract completion check (`validate_routing_contract` and its TypeScript and PowerShell ports). It is not a member of `REQUIRED_STATE_KEYS`, it is not read by plain (non-completion) validation, and it is not read by the PR-creation-readiness gate. No JSON Schema file is authored, imported, or read for it.
+
+Honest disclosure: the validators perform no network I/O. They cannot confirm that the issue exists, so `evidence` and `verified_via` are an auditable declaration of the read-only verification the orchestrator performed, not proof of it. This matches the `standalone_merge_authorizations` precedent above: the record is a policy-level declaration, not a security control.
+
+## Invariants (issue_adoption object)
+
+The object has the shape `{ issue_num, issue_url, origin, verified_via, verified_at, evidence, waived_tools, potential_record? }`.
+
+| Field | Rule |
+| --- | --- |
+| `issue_num` | A string of decimal digits without a leading zero; equal to the checkpoint `issue-num` when that is a string. |
+| `issue_url` | A string ending with `/issues/` followed by `issue_num`. |
+| `origin` | One of `transferred`, `filed_before_orchestration`, `epic_decomposition`. |
+| `verified_via` | One of `gh_issue_view`, `gh_api_get`, `github_mcp_issue_read`. |
+| `verified_at` | Present, not `null`, and not a blank string. |
+| `evidence` | A string with non-whitespace content. |
+| `waived_tools` | A non-empty list of non-blank tool names that includes `potential_to_issue`. |
+| `potential_record` | Required when waiving a promotion-entry tool: a path under `docs/features/potential/` ending in `.md`. |
+
+The rules run in this order, and their errors accumulate:
+
+1. A present value that is not an object (including `null`) yields `Checkpoint issue_adoption must be an object when present.` and evaluation stops.
+2. `issue_num` must be a string of decimal digits without a leading zero (a JSON number is invalid). Only when it is valid and the checkpoint `issue-num` is a different string, `issue_num` must equal the checkpoint issue-num.
+3. `issue_url` must end with `/issues/` followed by a valid `issue_num`.
+4. `origin` must be one of the three origin values.
+5. `verified_via` must be one of the three verification values.
+6. `verified_at` must be present: absent, `null`, and blank strings are rejected; any other value passes.
+7. `evidence` must be a non-empty string.
+8. `waived_tools` must be a non-empty list of non-blank strings; otherwise no further rule-8 or rule-9 check runs. Each entry, in list order, receives the first applicable error of: listed more than once; not in the closed waivable set; not required by the selected route after promotion-type resolution; already holding a successful MCP receipt. The list must include `potential_to_issue`.
+9. Only when the rule-8 shape check passed: each distinct waived promotion-entry tool (`new_potential_entry` or `new_potential_bug_entry`) requires a valid `potential_record`.
+
+The closed waivable set is `potential_to_issue`, `new_potential_entry`, and `new_potential_bug_entry`. `new_active_feature_folder`, `collect_pr_context`, `validate_orchestration_artifacts`, and every other tool can never be waived. All comparisons are ordinal and case-sensitive.
+
+Fail-closed behavior: any adoption error waives nothing, so each missing receipt is still reported as `Checkpoint missing successful MCP receipt: <tool>.`. Adoption errors are placed after the receipt-loop errors and before the `local_execution_overrides` errors. The waiver affects only receipt presence: the declared `required_mcp_tools` equality check with the routing matrix is unchanged, so a checkpoint must still declare every route tool it waives.
+
 ## Enforcement
 
 - `scripts/dev_tools/validate_orchestrator_state.py` appends one error per violated invariant when a `remediation_loop` is present, using the existing validator message style (literal, checkpoint-context prefixed). The validator returns a list of error strings and does not mutate its input.
@@ -196,3 +233,4 @@ Field checks 3 through 9 run in the fixed order `pr_url`, `issue_num`, `branch_n
 - The standalone-merge authorization invariants are enforced by the `PreToolUse` merge gate (`.claude/hooks/enforce-epic-merge-gate.ps1` with its dot-sourced helpers file, and `.codex/hooks/enforce-epic-merge-gate.ps1`) at merge time. The Python checkpoint validator
   does not currently validate standalone_merge_authorizations
   entries; adding that check is recorded as follow-up FU-3.
+- The `issue_adoption` invariants are enforced at completion by the routing-contract check in all three runtimes: `scripts/dev_tools/_orchestrator_state_issue_adoption.py` (Python authority), `extensions/drm-copilot/src/lib/validate/orchestrator-state-issue-adoption.ts`, and `.claude/lib/orchestrator-state/OrchestratorStateIssueAdoption.psm1`, with byte-identical error strings pinned by the shared corpus under `tests/fixtures/orchestrator_state_issue_adoption/`.

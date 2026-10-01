@@ -142,6 +142,7 @@
     ".claude/lib/orchestrator-state/OrchestratorStateRoutingMatrix.psm1",
     ".claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1",
     ".claude/lib/orchestrator-state/OrchestratorStateRoutingContract.psm1",
+    ".claude/lib/orchestrator-state/OrchestratorStateIssueAdoption.psm1",
     ".claude/lib/orchestrator-state/OrchestratorStateUnconditional.psm1",
     ".claude/lib/discovery-validation/DiscoveryValidation.psm1",
     ".claude/lib/codex-routing/CodexDeployment.psm1",

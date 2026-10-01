@@ -421,6 +421,8 @@ Example:
 ]
 ```
 
-The validator counts an MCP receipt as successful only when `tool` is a non-empty string, `ok` is exactly `true`, and `evidence` is a non-empty string. Every `required_mcp_tools` entry must have such a receipt.
+The validator counts an MCP receipt as successful only when `tool` is a non-empty string, `ok` is exactly `true`, and `evidence` is a non-empty string. Every `required_mcp_tools` entry must have such a receipt unless a valid `issue_adoption` record waives it.
+
+When the GitHub issue already exists before orchestration starts (transferred, filed by hand, or created by epic decomposition) and has been verified read-only (`gh issue view`, a `gh api` GET, or a GitHub MCP issue read), do not call `potential_to_issue`. Record a top-level `issue_adoption` object in the checkpoint instead of a `potential_to_issue` receipt. It may waive only `potential_to_issue` and, with a valid `potential_record` under `docs/features/potential/`, the checkpoint's promotion-entry tool (`new_potential_entry`, or `new_potential_bug_entry` for a bug-type checkpoint); `potential_to_issue` must always be listed. Every other required tool still needs a successful receipt. Any adoption error waives nothing. The field rules, the closed waivable set, and the error placement are defined in `.claude/rules/orchestrator-state.md` under `## Invariants (issue_adoption object)`.
 
 These three receipt arrays, populated with the retained required names of the selected route, are what allow the routing-contract validation under `require_complete: true` to pass.

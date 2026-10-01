@@ -205,7 +205,8 @@ Completion-state invariants:
 - every required skill MUST have a matching required `skill_receipts[].skill`
   with non-empty evidence.
 - every required MCP tool MUST have a successful `mcp_call_receipts[].tool`
-  receipt with non-empty evidence.
+  receipt with non-empty evidence, unless a valid `issue_adoption` record
+  waives the tool.
 - `local_execution_overrides` and `delegation_bypasses` MUST be empty lists at
   completion.
 - every recorded `lifecycle_operations[]` item MUST use `surface: "mcp"`.
@@ -411,7 +412,7 @@ Do not claim mission completion until all of the following are true:
 - small-path implementation has a receipt from the exact language-specific generated
   typed-engineer deployment profile
 - all required skills have `skill_receipts` with evidence
-- all required MCP tools have successful `mcp_call_receipts`
+- all required MCP tools have successful `mcp_call_receipts`, unless a valid `issue_adoption` record waives the tool
 - no local execution override or delegation bypass is recorded
 - the checkpoint is updated with the final state
 - the canonical checkpoint path was used without sidecar replacement or backup substitution
