@@ -34,17 +34,39 @@ Write timestamped artifacts into the active feature folder:
 - `policy-audit.<timestamp>.md`
 - `code-review.<timestamp>.md`
 - `feature-audit.<timestamp>.md`
-- `remediation-inputs.<timestamp>.md` when remediation is required
-- `remediation-plan.<timestamp>.md` when remediation is required
+- `remediation-inputs.<timestamp>.md` for every review with at least one blocking finding, including `HALT_NON_REMEDIABLE` and `AWAITING_CI` reviews
+- `remediation-plan.<timestamp>.md` only when the verdict is `REMEDIATION_REQUIRED`
 
 The final review report MUST end with these exact single-line fields:
-- `REVIEW_STATUS: PASS` or `REVIEW_STATUS: REMEDIATION_REQUIRED`
+- `REVIEW_STATUS: PASS`, `REVIEW_STATUS: REMEDIATION_REQUIRED`, `REVIEW_STATUS: HALT_NON_REMEDIABLE`, or `REVIEW_STATUS: AWAITING_CI`
 - `FEATURE_FOLDER: <path>`
 - `POLICY_AUDIT: <path>`
 - `CODE_REVIEW: <path>`
 - `FEATURE_AUDIT: <path>`
 - `REMEDIATION_INPUTS: <path-or-NONE>`
 - `REMEDIATION_PLAN: <path-or-NONE>`
+
+`HALT_NON_REMEDIABLE` and `AWAITING_CI` require `REMEDIATION_PLAN: NONE`.
+
+### Remediability Contract
+
+Every blocking finding receives exactly one remediability class (exact, case-sensitive):
+- `autonomous`: repository remediation can resolve the finding without a human decision. This is the default when a finding block carries no remediability line.
+- `external_dependency`: a system, service, runtime, or published artifact outside the repository is unavailable or mismatched.
+- `policy_hold`: proceeding requires a policy decision, exception, or authorization the orchestrator may not grant.
+- `awaiting_ci`: the finding resolves when a CI result that has not completed becomes available.
+- `human_decision_required`: a human must choose between alternatives or approve a direction.
+
+A published MCP runtime that lags the repository contract is classified `external_dependency`.
+
+The verdict follows from the classes of all blocking findings: no blocking findings is `PASS`; at least one `autonomous` finding is `REMEDIATION_REQUIRED`; otherwise at least one `external_dependency`, `policy_hold`, or `human_decision_required` finding is `HALT_NON_REMEDIABLE`; otherwise every finding is `awaiting_ci` and the verdict is `AWAITING_CI`.
+
+The remediation inputs file carries these line formats:
+- one line `Review-Verdict: <VERDICT>` for the review,
+- inside each blocking finding block, one line `Remediability: <class>`,
+- inside each blocking finding block, one line `Remediability-Evidence: <text>` stating why the class applies.
+
+These lines, including the evidence text, never contain the substrings the orchestrator counts when it counts blocking findings, so their presence does not change the blocking count.
 
 Each required review artifact MUST pass the matching validator command before review can be reported as complete:
 - the `validate_orchestration_artifacts` MCP tool with `artifact_type: "policy-audit"` and `artifact_path: <path>`
@@ -63,10 +85,12 @@ Each required review artifact MUST pass the matching validator command before re
 5. Create the policy audit, code review, and feature audit.
    - validate each artifact immediately after writing it
 6. Check off passing acceptance criteria in the authoritative requirement sources per `acceptance-criteria-tracking`.
-7. If remediation is required, create remediation inputs first and then hand off plan creation using `remediation-handoff-atomic-planner`.
+7. Classify every blocking finding per the Remediability Contract. Remediation is required only when at least one blocking finding is `autonomous`. If remediation is required, create remediation inputs first and then hand off plan creation using `remediation-handoff-atomic-planner`. When every blocking finding is non-remediable, write the remediation inputs, report `HALT_NON_REMEDIABLE` or `AWAITING_CI` with `REMEDIATION_PLAN: NONE`, create no remediation plan target, and do not hand off to `atomic-planner`.
 8. In the final report:
-   - set `REVIEW_STATUS: PASS` only when no remediation artifact is required,
-   - set `REVIEW_STATUS: REMEDIATION_REQUIRED` when remediation inputs or a remediation plan were required,
+   - set `REVIEW_STATUS: PASS` only when no blocking finding exists,
+   - set `REVIEW_STATUS: REMEDIATION_REQUIRED` when at least one blocking finding is `autonomous`,
+   - set `REVIEW_STATUS: HALT_NON_REMEDIABLE` when no blocking finding is `autonomous` and at least one is `external_dependency`, `policy_hold`, or `human_decision_required`,
+   - set `REVIEW_STATUS: AWAITING_CI` when every blocking finding is `awaiting_ci`,
    - include every required artifact-path field exactly once.
 
 ### Enforced Remediation Handoff Contract

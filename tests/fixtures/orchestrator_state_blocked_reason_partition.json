@@ -1,0 +1,18 @@
+{
+  "not_blocked": ["none"],
+  "mechanical": [
+    "delegate_contract_incomplete",
+    "delegate_no_receipt",
+    "delegation_launch_failed",
+    "spawn_agent_unavailable",
+    "user_requested_stop",
+    "validator_failed"
+  ],
+  "non_mechanical": [
+    "awaiting_ci",
+    "external_dependency",
+    "human_decision_required",
+    "policy_hold",
+    "premise_falsified"
+  ]
+}
