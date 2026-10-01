@@ -1133,7 +1133,7 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
   unchecked, sets the plan outcome to REMEDIATION-REQUIRED (not PASS), and the plan continues so
   that the remaining acceptance criteria are still evaluated. No file outside the
   `Files written by this plan` list is edited.
-- [ ] [P5-T8] Windows pass run of the modified Codex suites into
+- [x] [P5-T8] Windows pass run of the modified Codex suites into
   `<FEATURE>/evidence/regression-testing/pass-after-codex-windows.<ts>.md`: run
   `pwsh -NoProfile -File <session-scratchpad>/ps-pester-targeted.ps1 -PathList tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1,tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1,tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1`.
   Acceptance: `EXIT_CODE: 0`; `FAILED-COUNT: 0`; the passed count is at least the P0-T14 passed
@@ -1438,6 +1438,7 @@ Authority: binding operator decision of 2026-10-01 (Option A). No `pwsh` process
 | D10 | P5-T8 | The CI `PowerShell QC` JUnit for the three modified Codex suites on the push after Phase 5, plus `mcp__drm-copilot__run_poshqc_test` with `scan_folders` `["tests/scripts/codex-hooks"]`, replaces SP6. |
 | D11 | P1-T2 | The `poshqc` job's upload step has no `if: always()`, so CI run 36892883441 (Windows `Test PowerShell` failed as expected) uploaded no `poshqc-test-results` artifact and no JUnit exists. The `poshqc` job may not be modified (AC-4), so the fail-before per-test evidence is the job log: the `Tests Passed:` line and the six `[-]` lines. |
 | D12 | P4-T1 | P4-T1's commit is also the Phase 3 boundary commit required by the run constraints; no separate Phase 3 commit is made, so P4-T1's pathspec (which omits the plan file) is used unchanged. Plan check marks for Phases 3 and 4 are committed at the Phase 4 boundary. |
+| D13 | P5-T1 to P5-T4, P7-T24 | An out-of-band WIP checkpoint commit, 3f85b23d (`wip(743): checkpoint in-progress test and spec edits before quota limit`), was created and pushed in this worktree outside the executor's commit route while Phase 5 was in progress. It contains the Phase 5 edits to the three Codex test files and the `spec.md` AC-1 to AC-4 check-offs, byte-identical to the executor's working tree. The Phase 5 boundary commit a412698b therefore carries only the evidence and plan files. No content was lost or altered. |
 
 Operator-run blockers (left unchecked; `actionlint` run directly as supplementary evidence only):
 
