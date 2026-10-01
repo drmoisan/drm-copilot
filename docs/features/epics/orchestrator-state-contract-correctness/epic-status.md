@@ -8,8 +8,9 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 - Interruption: an account session limit terminated the run and both wave-1 children at about 2026-09-30T14:35Z; resumed 2026-10-01T11:00Z.
 - Throttle (quota, 2026-10-01): 1 concurrent child.
 - HOLD from 2026-10-01T11:05Z released at 15:52Z (one concurrent child).
-- Next step: #509 resumed at remediation cycle 1 (merging #523 via integration a7d6ea03); launch #484 (wave 2) after #509 merges.
-- Last updated: 2026-10-01T15:54:00Z
+- HOLD (quota, from 2026-10-01T16:02Z): no new launches until RESUME; the in-flight #509 resume continues.
+- Next step: #509 resumed at remediation cycle 1; launch #484 (wave 2) after #509 merges and RESUME.
+- Last updated: 2026-10-01T16:02:00Z
 
 ## Features
 
