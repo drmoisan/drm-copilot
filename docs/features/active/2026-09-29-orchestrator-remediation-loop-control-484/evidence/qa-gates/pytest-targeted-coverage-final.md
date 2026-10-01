@@ -1,6 +1,6 @@
 # Targeted Python Coverage Final (P8-T6)
 
-Timestamp: 2026-10-01T23-24
+Timestamp: 2026-10-01T22-44
 Task: P8-T6
 Loop iteration: 2
 Split: not applied (P3-T6), so only `scripts.dev_tools._orchestrator_state_remediation_loop` is measured.

@@ -1,6 +1,6 @@
 # Integration Stage, Python (P8-T9)
 
-Timestamp: 2026-10-01T23-26
+Timestamp: 2026-10-01T22-44
 Task: P8-T9
 Loop iteration: 2
 Sequence: P0-T19 reset (both kinds), `.claude/state` listing, pytest, then the generator check, in one shell invocation with no Write or Edit in between.
