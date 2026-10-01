@@ -72,7 +72,7 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
 - The rule provides a second, independent line of defense for CI-gate-modifying features, separate from and prior to the orchestrator's S9 CI green gate.
 - "Green workflow run against the branch head" means a workflow run whose head SHA matches the current branch head and whose conclusion is success for the affected workflow.
 - A green `workflow_dispatch` run against the branch head also satisfies the rule, not only a PR-context run. This mitigates the chicken-and-egg case where a feature must land its CI gate before the gate can run in PR context (see spec.md Risks & Mitigations).
-- When the rule fires and no qualifying green-run evidence is present, record a Blocking finding and route it through the standard remediation handoff. The supporting validator `scripts/feature-review/Test-ModifiedWorkflowNeedsGreenRun.ps1` implements the trigger-path and evidence-presence logic.
+- When the rule fires and no qualifying green-run evidence is present, record a Blocking finding and route it through the standard remediation handoff.
 
 ## Ordered Procedure
 

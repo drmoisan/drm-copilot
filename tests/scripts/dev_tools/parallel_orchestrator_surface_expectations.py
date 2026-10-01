@@ -140,6 +140,11 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # citation to the explicit `pwsh -NoProfile -File .claude/lib/ci-gate/...` form, so
 # push-down carries the parser the skill invokes. Only the skill digest moved; the
 # agent digest is unchanged and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #659. That change rewrote the epic skill's Layer 2
+# retrospective-backstop bullet to describe the wave-barrier start guard and the
+# two-message error text (status case and timing case). Only the skill digest
+# moved; the agent digest is unchanged and the pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -147,7 +152,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "4e9c47c36aeb3c0a6c3c1f06c7c21012a9027a279b81e5e1c0a1e8ce5bb093c8",
+        "9bff54a44cb4eab17405e09afb96233a38d5fdffabbd9dc5ffd71b80d4000ba5",
     ),
 )
 

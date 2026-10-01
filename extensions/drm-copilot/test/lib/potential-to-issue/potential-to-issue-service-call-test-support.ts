@@ -86,14 +86,20 @@ export function makeRunner(recorded: string[][]): CommandRunner {
 }
 
 /**
- * Filesystem fake that reports one designated path as absent.
+ * Filesystem fake that reports one designated path as present on its first
+ * existence query and absent on every later query.
  *
- * Used to drive the receipt post-condition: the promotion still moves the file
- * normally, but the reported destination fails its existence check.
+ * Models the sequence that keeps the #487 receipt guard reachable after the
+ * #623 post-move check: the workflow's post-move check (first query) passes,
+ * and the service-call receipt guard (second query) fails. The promotion still
+ * moves the file normally.
  */
-export class BlockedPathPotentialFileSystem extends FakePotentialFileSystem {
+export class LateBlockedPathPotentialFileSystem extends FakePotentialFileSystem {
+  private blockedPathQueries = 0;
+
   /**
-   * @param blockedPath Path whose existence check always reports false.
+   * @param blockedPath Path whose existence answer turns false after the first
+   *   query.
    */
   constructor(private readonly blockedPath: string) {
     super();
@@ -101,10 +107,15 @@ export class BlockedPathPotentialFileSystem extends FakePotentialFileSystem {
 
   /**
    * @param path Path to test.
-   * @returns False for the blocked path; otherwise the inherited answer.
+   * @returns For the blocked path, true on the first query and false on every
+   *   later query; otherwise the inherited answer.
    */
   override exists(path: string): boolean {
-    return path === this.blockedPath ? false : super.exists(path);
+    if (path !== this.blockedPath) {
+      return super.exists(path);
+    }
+    this.blockedPathQueries += 1;
+    return this.blockedPathQueries === 1;
   }
 }
 
