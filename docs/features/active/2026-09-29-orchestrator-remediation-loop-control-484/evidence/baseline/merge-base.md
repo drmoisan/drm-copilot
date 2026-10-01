@@ -1,30 +1,30 @@
 # Branch Position and Merge-Base (P0-T2)
 
-Timestamp: 2026-10-01T21-03
+Timestamp: 2026-10-01T21-05
 Task: P0-T2
 Branch: bug/orchestrator-remediation-loop-control-484-r2
-HEAD: 453437d542b4b44c0dd0c74178b69da86bec7f48
+HEAD: aee08d8569918bbdbd7a59b5f573be2131d13f57
+Pre-step: `git fetch origin epic/orchestrator-state-contract-correctness-integration` (remote-tracking ref and FETCH_HEAD both resolve to 40faab4136d72512e20b50b5193a14dd4e78eaf2)
 
 ## Command 1
 
 Command: git rev-list --left-right --count origin/epic/orchestrator-state-contract-correctness-integration...HEAD
 EXIT_CODE: 0
-Output: `1	0`
+Output: `0	2`
 
 ## Command 2
 
 Command: git merge-base HEAD origin/epic/orchestrator-state-contract-correctness-integration
 EXIT_CODE: 0
-Output: `453437d542b4b44c0dd0c74178b69da86bec7f48`
+Output: `40faab4136d72512e20b50b5193a14dd4e78eaf2`
 
 ## Output Summary:
 
-- LeftCount: 1 (commits on the integration branch not contained in HEAD)
-- RightCount: 0 (commits on HEAD not contained in the integration branch)
-- MergeBase: 453437d542b4b44c0dd0c74178b69da86bec7f48
-- Integration tip (local remote-tracking ref, not re-fetched): 40faab4136d72512e20b50b5193a14dd4e78eaf2
-- Commit ahead on the integration branch: `40faab4136d72512e20b50b5193a14dd4e78eaf2 2026-10-01 16:57:09 -0400 docs(771): record #484 launch in epic-status` (touches only `docs/features/epics/orchestrator-state-contract-correctness/epic-status.md`, 4 insertions, 4 deletions).
+- LeftCount: 0 (the branch contains the integration tip)
+- RightCount: 2 (1fe4fcd6 docs(484) phase 0 policy reads; aee08d85 merge of the integration branch)
+- MergeBase: 40faab4136d72512e20b50b5193a14dd4e78eaf2
+- `<merge-base-sha>` for every later task: 40faab4136d72512e20b50b5193a14dd4e78eaf2
 
 ## Result
 
-STOP: the left count is `1`, not `0`. Per P0-T2, a non-zero left count stops the plan and is returned to the orchestrator for a rebase onto the integration branch; no later task runs. P0-T2 is not checked off.
+PASS: both commands exited 0, the left count is `0`, and the merge-base is a 40-character SHA. This run supersedes the earlier stop record (left count 1, merge-base 453437d5) written before the integration merge.
