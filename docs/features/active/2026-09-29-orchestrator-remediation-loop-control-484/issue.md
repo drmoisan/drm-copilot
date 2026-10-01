@@ -51,12 +51,12 @@ The binary review contract forced every blocker into remediation. The pass count
 
 ## Acceptance Criteria
 
-- [ ] AC-1: The review verdict classifies every blocking finding as either autonomously remediable or as one of the non-remediable classes: external runtime incompatibility, policy decision, awaiting-CI state, or human-decision requirement.
-- [ ] AC-2: A review whose blocking findings are all non-remediable halts or waits without creating a remediation plan and without consuming a remediation cycle.
-- [ ] AC-3: Remediation-cycle accounting counts completed remediation attempts only; an unexecuted pass, or a pass that ends with no corrective candidate applied, does not occupy a cycle number.
-- [ ] AC-4: The Python, PowerShell, and TypeScript orchestrator-state validators accept and enforce the new verdict and cycle-accounting fields identically.
-- [ ] AC-5: Checkpoints and review artifacts that do not use the new fields validate byte-identically to the current behavior.
-- [ ] AC-6: Runtime capability or version incompatibility (for example a published MCP inventory that lags the repository) is detected before execution, or is recorded as a scoped follow-up when it exceeds this feature's budget.
+- [x] AC-1: The review verdict classifies every blocking finding as either autonomously remediable or as one of the non-remediable classes: external runtime incompatibility, policy decision, awaiting-CI state, or human-decision requirement.
+- [x] AC-2: A review whose blocking findings are all non-remediable halts or waits without creating a remediation plan and without consuming a remediation cycle.
+- [x] AC-3: Remediation-cycle accounting counts completed remediation attempts only; an unexecuted pass, or a pass that ends with no corrective candidate applied, does not occupy a cycle number.
+- [x] AC-4: The Python, PowerShell, and TypeScript orchestrator-state validators accept and enforce the new verdict and cycle-accounting fields identically.
+- [x] AC-5: Checkpoints and review artifacts that do not use the new fields validate byte-identically to the current behavior.
+- [x] AC-6: Runtime capability or version incompatibility (for example a published MCP inventory that lags the repository) is detected before execution, or is recorded as a scoped follow-up when it exceeds this feature's budget.
 
 ## Suspected Cause / Notes
 
