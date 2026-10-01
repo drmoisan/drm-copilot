@@ -145,6 +145,12 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # retrospective-backstop bullet to describe the wave-barrier start guard and the
 # two-message error text (status case and timing case). Only the skill digest
 # moved; the agent digest is unchanged and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #484. That change rewrote steps 4 and 5 of the epic
+# skill's merge-conflict procedure to count conflict cycles in
+# `remediation_loop.completed_attempts` and to halt after three completed
+# attempts. Only the skill digest moved; the agent digest is unchanged and the
+# pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -152,7 +158,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "9bff54a44cb4eab17405e09afb96233a38d5fdffabbd9dc5ffd71b80d4000ba5",
+        "03f95bfb9d046bc3fb6c94c0f2844369a56bee9307ca5a8c96f7ab8341a13719",
     ),
 )
 
@@ -208,7 +214,7 @@ MERGE_ON_GREEN_FRAGMENTS: tuple[str, ...] = (
 )
 
 MERGE_CONFLICT_FRAGMENTS: tuple[str, ...] = (
-    "with the cap of 3",
+    "the child halts after three completed attempts",
     "terminal `merge_status: blocked_ci_loop_limit`",
     "Boundary with F8",
     "leaving drift recording in `drift_events[]`, quiesce of admission, "
