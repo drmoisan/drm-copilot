@@ -10,7 +10,7 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 - HOLD from 2026-10-01T11:05Z released at 15:52Z (one concurrent child).
 - HOLD from 2026-10-01T16:02Z released at 20:55Z (one concurrent child).
 - Next step: #484 executing (wave 2, single child); on merge, sync main and open the integration-to-main PR.
-- Last updated: 2026-10-01T20:56:22Z
+- Last updated: 2026-10-01T23:34:06Z
 
 ## Features
 
@@ -20,7 +20,7 @@ Generated from `artifacts/orchestration/epic-orchestrator-state.json`. Do not ed
 | 2026-09-29-validate-orchestrator-state-cli-entry-point-464 | 464 | 0 | merged | [#801](https://github.com/drmoisan/drm-copilot/pull/801) | 815a962f0575ad10919c8014185e444727991eb5 | 2026-09-30T12:12:12Z | 2026-09-30T12:47:09Z | 2026-09-30T13:39:23Z | - |
 | 2026-08-22-promotion-gate-lacks-preexisting-issue-branch-509 | 509 | 1 | merged | [#809](https://github.com/drmoisan/drm-copilot/pull/809) | 243192f454e8acb734c2b2de5f386437b290c555 | 2026-09-30T13:40:30Z | 2026-10-01T17:15:44Z | 2026-10-01T17:24:03Z | - |
 | 2026-09-29-blocked-reason-premise-falsified-halt-523 | 523 | 1 | merged | [#808](https://github.com/drmoisan/drm-copilot/pull/808) | 2bd929baf1bb26f5e0c67ebd948496b25a9e0f6a | 2026-09-30T14:10:18Z | 2026-10-01T11:21:19Z | 2026-10-01T11:32:39Z | - |
-| 2026-09-29-orchestrator-remediation-loop-control-484 | 484 | 2 | worktree_created | - | - | 2026-10-01T20:56:22Z | - | - | - |
+| 2026-09-29-orchestrator-remediation-loop-control-484 | 484 | 2 | pr_open | [#811](https://github.com/drmoisan/drm-copilot/pull/811) | - | 2026-10-01T20:56:22Z | 2026-10-01T23:33:29Z | - | - |
 
 ## Integration-to-main PR
 
