@@ -346,6 +346,11 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #623: promotion.ts gained the post-move destination check, so it sits behind the same per-file gate as the rest of this cluster.
+    "./src/lib/potential-to-issue/promotion.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Still no entry for "./src/repo-automation-service-contract.ts" after
     // issue #525 added the optional `targetRepository` property to it: the file
     // remains interface-only with no executable behavior, so it stays omitted

@@ -169,3 +169,26 @@ export function buildBugContent(
   }
   return lines.join("\n");
 }
+
+/**
+ * Filesystem fake whose `move` removes the source without writing the
+ * destination.
+ *
+ * Reproduces the #623 signature: the move call returns normally, yet the
+ * promoted destination does not exist afterwards, so only a post-move
+ * existence check can detect the missing file.
+ */
+export class DroppingMovePotentialFileSystem extends FakePotentialFileSystem {
+  /**
+   * @param src Source path; must exist in {@link FakePotentialFileSystem.files}.
+   * @param dest Destination path; recorded in the move log but never written.
+   * @throws Error when the source path is absent, matching the base fake.
+   */
+  override move(src: string, dest: string): void {
+    if (!this.files.has(src)) {
+      throw new Error(`File not found: ${src}`);
+    }
+    this.files.delete(src);
+    this.moves.push([src, dest]);
+  }
+}
