@@ -599,7 +599,7 @@ commit pattern into a new `commit-push-*.<ts>.md` artifact before P4-T1.
   latest P4-T11 artifact, run immediately after P3-T14.
   Acceptance: P3-T1 through P3-T14 all passed in the same pass without changing a file after P3-T1 (the post-pass hashes of P3-T1
   equal these hashes); every artifact path exists.
-- [ ] [P3-T16] Commit and push the Phase 3 boundary: write `<session-scratchpad>/commit-msg-p3.txt` from reference block R6, then
+- [x] [P3-T16] Commit and push the Phase 3 boundary: write `<session-scratchpad>/commit-msg-p3.txt` from reference block R6, then
   run `git add --` and `git commit -F <session-scratchpad>/commit-msg-p3.txt --` with the paths
   `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/ docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/remediation-plan.2026-10-01T18-07.md`
   (the test files are already committed by P1-T10, P2-T10, and the P4-T11 contingency commit; a pathspec without changes is accepted), then
@@ -613,33 +613,33 @@ commit pattern into a new `commit-push-*.<ts>.md` artifact before P4-T1.
 Loop rule. When P4-T10 lists further failures, P4-T11 fixes them, the loop restarts at P3-T1, and P4-T1 through P4-T9 repeat against a
 new `<RUN_ID>` into new timestamped artifacts. The artifacts of the superseded run are kept.
 
-- [ ] [P4-T1] Record the CI head into `<FEATURE>/evidence/qa-gates/ci-remediation-head.<ts>.md` (several command pairs):
+- [x] [P4-T1] Record the CI head into `<FEATURE>/evidence/qa-gates/ci-remediation-head.<ts>.md` (several command pairs):
   `git rev-parse HEAD` (this value is `<CI_SHA>`), `git status --porcelain -- scripts/ tests/ .github/ .claude/skills/ extensions/`, and
   `git ls-remote origin refs/heads/bug/ci-gaps-linux-pester-and-kcov-set-u-743`. Acceptance: the porcelain listing prints nothing; the
   remote head equals `<CI_SHA>`.
-- [ ] [P4-T2] Dispatch the verification run of `.github/workflows/ci.yml` (so the checks carry their `poshqc / ...` names) into
+- [x] [P4-T2] Dispatch the verification run of `.github/workflows/ci.yml` (so the checks carry their `poshqc / ...` names) into
   `<FEATURE>/evidence/qa-gates/ci-remediation-run.<ts>.md`: record the dispatch time with `date -u +%Y-%m-%dT%H:%M:%SZ`, run
   `gh workflow run ci.yml --ref bug/ci-gaps-linux-pester-and-kcov-set-u-743`, and repeat
   `gh run list --workflow=ci.yml --branch bug/ci-gaps-linux-pester-and-kcov-set-u-743 --event workflow_dispatch --limit 1 --json databaseId,headSha,status,conclusion,createdAt`
   until it returns a run created after the dispatch time; its `databaseId` is `<RUN_ID>`. Acceptance: the run's `headSha` equals
   `<CI_SHA>`.
-- [ ] [P4-T3] Wait for the run to complete into `<FEATURE>/evidence/qa-gates/ci-remediation-complete.<ts>.md`: start
+- [x] [P4-T3] Wait for the run to complete into `<FEATURE>/evidence/qa-gates/ci-remediation-complete.<ts>.md`: start
   `gh run watch <RUN_ID>` in the background (Bash tool background mode), then run `gh run view <RUN_ID> --json status,conclusion`
   after the watch exits. Acceptance: `status` is `completed`. The overall conclusion is recorded and is not asserted here, because
   jobs owned by other items can fail independently.
-- [ ] [P4-T4] Record the job and step conclusions (R1, R3, AC-6, AC-7, AC-16) into
+- [x] [P4-T4] Record the job and step conclusions (R1, R3, AC-6, AC-7, AC-16) into
   `<FEATURE>/evidence/qa-gates/ci-remediation-conclusions.<ts>.md`: run `gh run view <RUN_ID> --json jobs,headSha` piped into
   `poetry run python <session-scratchpad>/pester_xml_summary.py jobs`. Acceptance: the `HEAD-SHA:` line equals `<CI_SHA>`; the
   `JOB:` lines for `poshqc / PowerShell hook suites (Linux)` (its `databaseId` is `<LINUX_JOB_ID>`),
   `poshqc / PowerShell QC` (its `databaseId` is `<WINDOWS_JOB_ID>`), and `shell-coverage / Shell Coverage (Bats + kcov)` each end with
   `success`; the `STEP:` lines for `<WINDOWS_JOB_ID>` named `Format PowerShell` and `Analyze PowerShell` end with `success`. The conclusions
   of jobs owned by other items are recorded and not asserted. A `failure` of the Linux job proceeds to P4-T10 with AC-6 left unchecked. When the acceptance is not met, record the observed values in the artifact, leave this task unchecked, and continue to P4-T5.
-- [ ] [P4-T5] Record the Linux log result (AC-6) into `<FEATURE>/evidence/qa-gates/ci-remediation-linux-log.<ts>.md`: run
+- [x] [P4-T5] Record the Linux log result (AC-6) into `<FEATURE>/evidence/qa-gates/ci-remediation-linux-log.<ts>.md`: run
   `gh run view <RUN_ID> --log --job <LINUX_JOB_ID>` filtered with `grep -F 'Tests Passed:'`. Acceptance: exactly one line is printed and it
   contains `Failed: 0,` (the line shape `Tests Passed: N, Failed: F, Skipped: S, ...` was observed on the baseline run). When the acceptance
   is not met, record the observed values in the artifact, leave this task unchecked, and continue to P4-T10; the task is re-run in the
   next Phase 4 loop iteration.
-- [ ] [P4-T6] Record the Linux JUnit result (AC-6) into `<FEATURE>/evidence/qa-gates/ci-remediation-linux-junit.<ts>.md`: run
+- [x] [P4-T6] Record the Linux JUnit result (AC-6) into `<FEATURE>/evidence/qa-gates/ci-remediation-linux-junit.<ts>.md`: run
   `gh run download <RUN_ID> --name poshqc-linux-hook-test-results --dir <session-scratchpad>/linux-final-743-<RUN_ID>` and
   `poetry run python <session-scratchpad>/pester_xml_summary.py junit <session-scratchpad>/linux-final-743-<RUN_ID>/pester-junit-linux-hooks.xml`.
   Acceptance: the `JUNIT-ROOT:` line reports `failures=0 errors=0` (the `tests` value is recorded and is not asserted); no `FAIL:` line is
@@ -647,7 +647,7 @@ new `<RUN_ID>` into new timestamped artifacts. The artifacts of the superseded r
   `tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1`, and `tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1`
   report `failures=0` (AC-8 and AC-9 on Linux). When the acceptance is not met, record the observed values in the artifact, leave this
   task unchecked, and continue to P4-T10; the task is re-run in the next Phase 4 loop iteration.
-- [ ] [P4-T7] Record the named AC-10 inventory result into `<FEATURE>/evidence/qa-gates/ci-remediation-inventory.<ts>.md`: run
+- [x] [P4-T7] Record the named AC-10 inventory result into `<FEATURE>/evidence/qa-gates/ci-remediation-inventory.<ts>.md`: run
   `poetry run python <session-scratchpad>/pester_xml_summary.py inventory <session-scratchpad>/linux-final-743-<RUN_ID>/pester-junit-linux-hooks.xml`.
   Acceptance: the output contains the line `INVENTORY-SUMMARY: pass=<12 + k> fail=0 missing=0 other-fail=0` and one `ROW n: PASS` line for
   each of the 12 + k rows, where k is the number of rows P4-T11 appended to the helper `INVENTORY` (k is 0 when P4-T11 recorded
@@ -655,13 +655,13 @@ new `<RUN_ID>` into new timestamped artifacts. The artifacts of the superseded r
   n = 1 to 12). The P0-T4 baseline for the same command was `pass=0 fail=12 missing=0 other-fail=0`, so this assertion could fail. When
   the acceptance is not met, record the observed values in the artifact, leave this task unchecked, and continue to P4-T10; the task is
   re-run in the next Phase 4 loop iteration.
-- [ ] [P4-T8] Record the Windows log result (AC-7) into `<FEATURE>/evidence/qa-gates/ci-remediation-windows-log.<ts>.md`: run
+- [x] [P4-T8] Record the Windows log result (AC-7) into `<FEATURE>/evidence/qa-gates/ci-remediation-windows-log.<ts>.md`: run
   `gh run view <RUN_ID> --log --job <WINDOWS_JOB_ID>` filtered with `grep -F 'Tests Passed:'`. Acceptance: exactly one line is printed and
   it contains `Failed: 0,`. If the Windows job failed, this artifact also records the failing test lines from the same log, filtered with
   `grep -F '[-]'` (executed-plan deviation D11: no result file is uploaded when the job fails). When the acceptance is not met, record the
   observed values in the artifact, leave this task unchecked, and continue to P4-T10; the task is re-run in the next Phase 4 loop
   iteration.
-- [ ] [P4-T9] Record the Windows JUnit and coverage results (AC-7, AC-21 coverage part) into
+- [x] [P4-T9] Record the Windows JUnit and coverage results (AC-7, AC-21 coverage part) into
   `<FEATURE>/evidence/qa-gates/ci-remediation-windows-results.<ts>.md`: run
   `gh run download <RUN_ID> --name poshqc-test-results --dir <session-scratchpad>/windows-final-743-<RUN_ID>`, then
   `poetry run python <session-scratchpad>/pester_xml_summary.py junit <session-scratchpad>/windows-final-743-<RUN_ID>/pester-junit.xml`, then
@@ -673,7 +673,7 @@ new `<RUN_ID>` into new timestamped artifacts. The artifacts of the superseded r
   at least 85.00 and at least the P0-T5 baseline `B_PS` (96.31); the covered and missed counts are recorded as numbers. When the
   acceptance is not met, record the observed values in the artifact, leave this task unchecked, and continue to P4-T10; the task is
   re-run in the next Phase 4 loop iteration.
-- [ ] [P4-T10] Derive the further-failure set into `<FEATURE>/evidence/qa-gates/ci-remediation-further-failures.<ts>.md`: the set is the
+- [x] [P4-T10] Derive the further-failure set into `<FEATURE>/evidence/qa-gates/ci-remediation-further-failures.<ts>.md`: the set is the
   union of (a) the `OTHER-FAIL:` lines of the P4-T7 output, (b) any `FAIL:` line of the P4-T6 or P4-T9 output, and (c) when P4-T8 recorded
   failing `[-]` log lines, the file and test name of each, and (d) each of the three jobs whose `JOB:` line P4-T4 asserts, when that `JOB:` line does
   not end with `success`, and each `STEP:` line of those three jobs that ends with `failure`, `cancelled`, or `timed_out`, that no line
@@ -687,7 +687,7 @@ new `<RUN_ID>` into new timestamped artifacts. The artifacts of the superseded r
   `<FEATURE>/evidence/qa-gates/ci-remediation-further-failures-error-<job id>.<ts>.md`. Each of those artifacts carries `ExpectedExitCode: 1`
   when its filter prints nothing and carries no expectation field when it prints at least one line.
   Acceptance: the `ci-remediation-further-failures.<ts>.md` artifact contains exactly one `FURTHER-FAILURES:` declaration.
-- [ ] [P4-T11] Contingency fix. When P4-T10 recorded `FURTHER-FAILURES: NONE`, record `CONTINGENCY: NOT-APPLICABLE (no further
+- [x] [P4-T11] Contingency fix. When P4-T10 recorded `FURTHER-FAILURES: NONE`, record `CONTINGENCY: NOT-APPLICABLE (no further
   failures)` in `<FEATURE>/evidence/qa-gates/ci-remediation-contingency.<ts>.md` and this task is complete. Otherwise, apply the
   following steps in order. When P4-T10 recorded any `UNATTRIBUTED:` line, record it in the contingency artifact, report it to the
   orchestrator (BLOCKED), and stop.
