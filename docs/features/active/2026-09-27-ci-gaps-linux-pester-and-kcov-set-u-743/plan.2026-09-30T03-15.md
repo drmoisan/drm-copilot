@@ -682,7 +682,7 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
 
 ### Phase 0 — Policy Reads, Base Anchor, Edit-Site Detection, and Baseline Capture
 
-- [ ] [P0-T1] Record the base anchor in `<FEATURE>/evidence/baseline/base-anchor.<ts>.md`: run
+- [x] [P0-T1] Record the base anchor in `<FEATURE>/evidence/baseline/base-anchor.<ts>.md`: run
   `git fetch origin main`, `git rev-parse HEAD`, `git merge-base HEAD origin/main`, and
   `git diff --exit-code --stat <MERGE_BASE> HEAD -- scripts/ tests/ .github/ .claude/skills/ extensions/`,
   each with its own `Command:`/`EXIT_CODE:` pair (the third command's printed SHA is
@@ -690,7 +690,7 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   `<MERGE_BASE>` literal; the scoped diff exits 0 with empty output (the branch carries only
   documentation commits under `<FEATURE>/`). Any other result stops the plan (BLOCKED, returned to
   the planner).
-- [ ] [P0-T2] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md`:
+- [x] [P0-T2] Read the policy files in the order of `.claude/skills/policy-compliance-order/SKILL.md`:
   `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, then the
   language rules `.claude/rules/powershell.md` and `.claude/rules/shell.md`, then the supplementary
   rules `.claude/rules/quality-tiers.md`, `.claude/rules/ci-workflows.md`,
@@ -699,15 +699,15 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, and
   `.claude/skills/acceptance-criteria-tracking/SKILL.md`. Acceptance: all thirteen files read in
   that order; no file edited.
-- [ ] [P0-T3] Write `<FEATURE>/evidence/baseline/phase0-instructions-read.md` with `Timestamp:`,
+- [x] [P0-T3] Write `<FEATURE>/evidence/baseline/phase0-instructions-read.md` with `Timestamp:`,
   `Policy Order:` (the P0-T2 order), and the explicit list of the thirteen files read. Acceptance:
   the file exists with all three fields and thirteen listed paths.
-- [ ] [P0-T4] Record the quality-tier assumption in `<FEATURE>/evidence/baseline/quality-tier.<ts>.md`
+- [x] [P0-T4] Record the quality-tier assumption in `<FEATURE>/evidence/baseline/quality-tier.<ts>.md`
   with `ExpectedExitCode: 1`: run `test -e quality-tiers.yml`. Acceptance: `EXIT_CODE: 1`, and the
   artifact states `Tier: T4 (assumed; dev tooling, CI scaffolding, and tests)`. If the command exits
   0, record the tiers the file assigns to `scripts/` and `.github/`; if either is T1 or T2, stop the
   plan (BLOCKED, returned to the planner).
-- [ ] [P0-T5] Edit-site detection into `<FEATURE>/evidence/baseline/edit-site-detection.<ts>.md`,
+- [x] [P0-T5] Edit-site detection into `<FEATURE>/evidence/baseline/edit-site-detection.<ts>.md`,
   each command with its own pair:
   `grep -c -F 'run_test() {' scripts/bash/shell_qc_lib.sh`;
   `grep -c -F 'extract_cobertura_line_rate() {' scripts/bash/shell_qc_lib.sh`;
@@ -722,7 +722,7 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   Acceptance: the printed counts are, in order, `1`, `1`, `1`, `1`, `2`, `1`, `15`, `1`, and `1`.
   Any other count means a sibling change moved an anchor; stop the plan (BLOCKED, returned to the
   planner).
-- [ ] [P0-T6] Absence detection for the new names, each command in its own artifact under
+- [x] [P0-T6] Absence detection for the new names, each command in its own artifact under
   `<FEATURE>/evidence/baseline/` with `ExpectedExitCode: 1`:
   `test -e scripts/bash/kcov_trace_env.sh` (`new-trace-env-absent.<ts>.md`);
   `test -e tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` (`new-workflow-suite-absent.<ts>.md`);
@@ -732,7 +732,7 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   `grep -n -F 'kcov_trace_env' scripts/bash/shell_qc_lib.sh` (`new-lib-ref-absent.<ts>.md`).
   Acceptance: each command prints nothing and exits 1. Any other result stops the plan (BLOCKED,
   returned to the planner).
-- [ ] [P0-T7] Record tool availability in `<FEATURE>/evidence/baseline/tool-versions.<ts>.md`, each
+- [x] [P0-T7] Record tool availability in `<FEATURE>/evidence/baseline/tool-versions.<ts>.md`, each
   command with its own pair: `shfmt --version`, `shellcheck --version`, `npx --yes bats --version`,
   `gh version` (the subcommand form),
   `pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()'`,
@@ -744,14 +744,14 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   into `tools/actionlint/bin/` on first use; that untracked directory is never staged and is the
   only untracked path P7-T22 tolerates. If bats cannot be resolved through npx, record the output
   verbatim; every later local bats step then uses the CI fallback named in that step.
-- [ ] [P0-T8] Locate the direct bats-core script into `<FEATURE>/evidence/baseline/bats-direct.<ts>.md`:
+- [x] [P0-T8] Locate the direct bats-core script into `<FEATURE>/evidence/baseline/bats-direct.<ts>.md`:
   write SP8 into `<session-scratchpad>` and run `sh <session-scratchpad>/locate-bats.sh`.
   Acceptance: the output lists exactly one path; it is recorded as `<BATS_DIRECT>` in the form
   `<npm-cache>/_npx/<hash>/node_modules/bats/bin/bats` (no absolute host path in the artifact), and
   `<BATS_DIRECT> --version` prints a line beginning `Bats `. When the output lists zero paths or more
   than one, record `BATS-DIRECT: UNAVAILABLE` with the output. P0-T24 and P7-T12 then use their
   stated CI fallback.
-- [ ] [P0-T9] Start the baseline full local `shell-qc.sh test` run for `scripts/bash/shell-qc.sh`
+- [x] [P0-T9] Start the baseline full local `shell-qc.sh test` run for `scripts/bash/shell-qc.sh`
   (skip this task when P0-T8 recorded `BATS-DIRECT: UNAVAILABLE`, and record that skip reason in
   P0-T24): write SP9 into `<session-scratchpad>` and start
   `sh <session-scratchpad>/shell-qc-test-local.sh <BATS_DIRECT>` in the background with its output
@@ -759,7 +759,7 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   started and its start time is recorded in P0-T24. No file under `tests/`, `scripts/`, or
   `.github/` is edited until P0-T24 is complete, because the run reads those files while it
   executes.
-- [ ] [P0-T10] Baseline PowerShell format check (check mode, no write) into
+- [x] [P0-T10] Baseline PowerShell format check (check mode, no write) into
   `<FEATURE>/evidence/baseline/ps-format-check.<ts>.md`: write SP1 into `<session-scratchpad>` and
   run `pwsh -NoProfile -File <session-scratchpad>/ps-format-check.ps1`. Acceptance: `EXIT_CODE: 0`;
   the artifact records the count of output lines beginning `Already formatted: ` and the count and
@@ -769,12 +769,12 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   count is recorded as `FORMAT-DRIFT: NONE`, and otherwise as `FORMAT-DRIFT: PRESENT` with the list.
   No file is written by this task: `git status --porcelain` run before and after prints the same
   listing, and both runs are recorded.
-- [ ] [P0-T11] Baseline PowerShell analyze into `<FEATURE>/evidence/baseline/ps-analyze.<ts>.md`:
+- [x] [P0-T11] Baseline PowerShell analyze into `<FEATURE>/evidence/baseline/ps-analyze.<ts>.md`:
   write SP3 into `<session-scratchpad>` and run `pwsh -NoProfile -File <session-scratchpad>/ps-analyze.ps1`.
   Acceptance: the artifact records `EXIT_CODE:` and either the line that begins
   `PSScriptAnalyzer passed: no findings under` or the full findings table and the thrown
   `PSScriptAnalyzer reported <n> issue(s).` message (the baseline finding set).
-- [ ] [P0-T12] Baseline full Windows Pester run with coverage into
+- [x] [P0-T12] Baseline full Windows Pester run with coverage into
   `<FEATURE>/evidence/baseline/ps-pester-full.<ts>.md`: write SP4 into `<session-scratchpad>` and run
   `pwsh -NoProfile -File <session-scratchpad>/ps-test-full.ps1`. Then write SP7 and run
   `pwsh -NoProfile -File <session-scratchpad>/ps-junit-summary.ps1 -Path artifacts/pester/pester-junit.xml`,
@@ -785,13 +785,13 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   `tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1`,
   `tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1`, and
   `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1` are recorded.
-- [ ] [P0-T13] Baseline PowerShell line coverage into `<FEATURE>/evidence/baseline/ps-coverage.<ts>.md`:
+- [x] [P0-T13] Baseline PowerShell line coverage into `<FEATURE>/evidence/baseline/ps-coverage.<ts>.md`:
   write SP5 into `<session-scratchpad>` and run `pwsh -NoProfile -File <session-scratchpad>/ps-line-coverage.ps1`
   against the report P0-T12 produced. Acceptance: `EXIT_CODE: 0` and the `PS-LINE-COVERAGE:` line
   with numeric `covered`, `missed`, and `percent` values is recorded as the PowerShell baseline. A
   `ROOT-LINE-COUNTER-COUNT:` line (exit 1) marks the coverage baseline remediation-required, and the
   plan outcome cannot be PASS without a numeric baseline.
-- [ ] [P0-T14] Baseline targeted Pester run for the three Codex suites into
+- [x] [P0-T14] Baseline targeted Pester run for the three Codex suites into
   `<FEATURE>/evidence/baseline/ps-pester-codex-targeted.<ts>.md`: write SP6 into `<session-scratchpad>`
   and run
   `pwsh -NoProfile -File <session-scratchpad>/ps-pester-targeted.ps1 -PathList tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1,tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1,tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1`.
@@ -801,20 +801,20 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   `builds codex exec with exact model, reasoning, instructions, skills, permissions, and worktree`,
   `resolves a relative path against the supplied working directory`, and
   `keeps a rooted path and trims a trailing separator`.
-- [ ] [P0-T15] Baseline repo-wide bash check via `scripts/bash/shell-qc.sh` into
+- [x] [P0-T15] Baseline repo-wide bash check via `scripts/bash/shell-qc.sh` into
   `<FEATURE>/evidence/baseline/shell-qc-check.<ts>.md`: run `sh scripts/bash/shell-qc.sh check`.
   Acceptance: the artifact records `EXIT_CODE:` and every diagnostic line verbatim, and states
   `LOCAL-DRIFT: NONE` when the run prints nothing and exits 0, or `LOCAL-DRIFT: PRESENT` with the
   files named by any shfmt diff otherwise (local shfmt and shellcheck versions differ from CI).
-- [ ] [P0-T16] Baseline targeted lint and format for `scripts/bash/shell_qc_lib.sh`: run
+- [x] [P0-T16] Baseline targeted lint and format for `scripts/bash/shell_qc_lib.sh`: run
   `shellcheck -f gcc scripts/bash/shell_qc_lib.sh` into `<FEATURE>/evidence/baseline/shellcheck-lib.<ts>.md`
   and `shfmt -d scripts/bash/shell_qc_lib.sh` into `<FEATURE>/evidence/baseline/shfmt-lib.<ts>.md`.
   Acceptance: each artifact records `EXIT_CODE:` and its output verbatim (expected: no output and exit 0
   for both; a pre-existing finding is recorded, not fixed, here).
-- [ ] [P0-T17] Baseline syntax step for `scripts/bash/shell_qc_lib.sh` (bash has no type checker):
+- [x] [P0-T17] Baseline syntax step for `scripts/bash/shell_qc_lib.sh` (bash has no type checker):
   run `sh -n scripts/bash/shell_qc_lib.sh` into `<FEATURE>/evidence/baseline/syntax-lib.<ts>.md`.
   Acceptance: `EXIT_CODE: 0` and no output.
-- [ ] [P0-T18] Baseline local bats run for `tests/shell/test_shell_qc_commands.bats` and
+- [x] [P0-T18] Baseline local bats run for `tests/shell/test_shell_qc_commands.bats` and
   `tests/shell/test_shell_qc_discovery.bats` into `<FEATURE>/evidence/baseline/bats-shell-qc.<ts>.md`:
   run `npx --yes bats tests/shell/test_shell_qc_commands.bats tests/shell/test_shell_qc_discovery.bats`.
   Acceptance: the full TAP output is recorded, including a `1..N` line and the lines
@@ -830,7 +830,7 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   (`scripts/dev-tools/run-actionlint.ps1:128`), so on a non-zero exit the task also runs
   `actionlint .github/workflows/_poshqc.yml` (on PATH per P0-T7; `tools/actionlint/bin/actionlint.exe`
   when P0-T7 recorded `ACTIONLINT-ON-PATH: NO`) into the same artifact to record the findings.
-- [ ] [P0-T20] Baseline skill-mirror parity for `.claude/skills/atomic-plan-contract/SKILL.md`: run
+- [x] [P0-T20] Baseline skill-mirror parity for `.claude/skills/atomic-plan-contract/SKILL.md`: run
   `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` into
   `<FEATURE>/evidence/baseline/pytest-claude-resource-contracts.<ts>.md`, and
   `sha256sum .claude/skills/atomic-plan-contract/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`
@@ -840,12 +840,12 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   contains `Repo file missing from bundle:` and `batch-budget`, record `KNOWN-ISSUE-510` with the
   output of `git status --porcelain --ignored -- .claude/state`; the baseline then rests on the
   equal hashes and the recorded passed count.
-- [ ] [P0-T21] Baseline line counts for every file this plan modifies: run
+- [x] [P0-T21] Baseline line counts for every file this plan modifies: run
   `wc -l .github/workflows/_poshqc.yml scripts/bash/shell_qc_lib.sh tests/shell/test_shell_qc_commands.bats tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1 tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1 tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1 .claude/skills/atomic-plan-contract/SKILL.md`
   into `<FEATURE>/evidence/baseline/line-counts.<ts>.md`. Acceptance: every count recorded (at
   authoring: 52, 379, 169, 469, 495, and 251 for the first six; the recorded values govern), and
   each of the first six is below 500.
-- [ ] [P0-T22] Push the branch `bug/ci-gaps-linux-pester-and-kcov-set-u-743` and dispatch the
+- [x] [P0-T22] Push the branch `bug/ci-gaps-linux-pester-and-kcov-set-u-743` and dispatch the
   baseline CI runs: run `git push -u origin bug/ci-gaps-linux-pester-and-kcov-set-u-743` (no force),
   `git ls-remote origin refs/heads/bug/ci-gaps-linux-pester-and-kcov-set-u-743`, record the dispatch
   time (UTC), then run `gh workflow run _shell-coverage.yml --ref bug/ci-gaps-linux-pester-and-kcov-set-u-743`
@@ -856,7 +856,7 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   `<FEATURE>/evidence/baseline/ci-baseline-dispatch.<ts>.md`. Acceptance: the push and ls-remote
   exit 0; the remote head equals the P0-T1 HEAD SHA; both run IDs are recorded and each `headSha`
   equals that SHA.
-- [ ] [P0-T23] Record the CI baselines after both watches finish, into
+- [x] [P0-T23] Record the CI baselines after both watches finish, into
   `<FEATURE>/evidence/baseline/ci-baseline-results.<ts>.md`. For the `_shell-coverage.yml` run: run
   `gh run view <RUN_ID> --json conclusion,jobs`, then `gh run view <RUN_ID> --log` filtered by
   `grep -F 'Bash coverage (lines):'`, by `grep -c -E ' not ok [0-9]+ '`, and by
@@ -874,7 +874,7 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
   `gh run view <RUN_ID> --log-failed` are recorded under `CI Windows Pester baseline failure set:`.
   When the shell run failed or printed no headline, record `gh run view <RUN_ID> --log-failed` and
   mark the bash coverage baseline remediation-required (the plan outcome cannot be PASS without it).
-- [ ] [P0-T24] Complete the baseline full local `shell-qc.sh test` record for
+- [x] [P0-T24] Complete the baseline full local `shell-qc.sh test` record for
   `scripts/bash/shell-qc.sh` into `<FEATURE>/evidence/baseline/shell-qc-test-full.<ts>.md` after the
   P0-T9 background run exits. Acceptance: the artifact records `Command:` (the SP9 command),
   `EXIT_CODE:` (the `SHELL_QC_TEST_EXIT=` value), the `RUN_START=` and `RUN_END=` values and the
@@ -1419,3 +1419,28 @@ loop at P7-T1.
   `tools/actionlint/` when P0-T7 recorded `ACTIONLINT-ON-PATH: NO`, as in P7-T22); the post-ci-scope artifact states that these
   files are committed by the commit/PR stage in a commit restricted to `<FEATURE>/`, and that
   CI_SHA identifies the code verified in P7-T17 to P7-T20.
+
+## Execution Deviations
+
+Authority: binding operator decision of 2026-10-01 (Option A). No `pwsh` process is run in this execution, in any form. PowerShell format, analyze and Pester run only through the PoshQC MCP tools (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`) with `workspace_root` set to the item worktree. Those tools return only an `ok` flag and a summary composed before the child runs; no count, test name, or coverage value is read from them. Where a task asserts Pester output, the evidence is the CI `_poshqc.yml` run on the pushed head, read from the job log and from the downloaded JUnit and coverage XML by a Python helper in `<session-scratchpad>` that prints the SP5/SP7 line shapes (`JUNIT-ROOT:`, `SUITE:`, `FAIL:`, `PS-LINE-COVERAGE:`). Helper scripts SP1 and SP3 to SP7 are not written or run as PowerShell.
+
+| ID | Tasks | Deviation |
+| --- | --- | --- |
+| D1 | P0-T7 | The three `pwsh -Command` probes are not run. The PowerShell and Pester versions come from the CI `PowerShell QC` job log of the P0-T22 baseline run; the actionlint probe is `command -v actionlint`. |
+| D2 | P0-T10, P7-T1 | `mcp__drm-copilot__run_poshqc_format` replaces SP1, with `git status --porcelain` before and after. The `Formatted:` and `Already formatted:` counts are unavailable; the equal before/after listing is the observation, plus the CI `Format PowerShell` step conclusion of the corresponding run. |
+| D3 | P0-T11, P7-T2 | `mcp__drm-copilot__run_poshqc_analyze` replaces SP3 and its `ok` flag is recorded; the finding set comes from the CI `Analyze PowerShell` step of the corresponding run. |
+| D4 | P0-T12, P7-T3 (test part) | The CI `PowerShell QC` job `Tests Passed:` log line and the JUnit from the `poshqc-test-results` artifact replace SP4/SP7; `mcp__drm-copilot__run_poshqc_test` is also run and its `ok` flag recorded. |
+| D5 | P0-T13, P7-T3 (coverage part) | The report-level `LINE` counter of `powershell-coverage.xml` from the CI `poshqc-test-results` artifact replaces SP5. |
+| D6 | P0-T14 | Per-testcase results of the three Codex suites come from the CI JUnit; the five named tests must appear as passing testcases. |
+| D7 | P1-T2 | Fail-before is evidenced by the CI `PowerShell QC` JUnit for `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` on the Phase 1 boundary push (a `workflow_dispatch` of `_poshqc.yml`), plus `mcp__drm-copilot__run_poshqc_test` with `scan_folders` `["tests/scripts/workflows"]`. |
+| D8 | P3-T2 | Pass-after is evidenced by the CI `PowerShell QC` JUnit for `PoshQcWorkflow.Tests.ps1` on the P4-T1 push / P4-T2 run, plus `mcp__drm-copilot__run_poshqc_test`. |
+| D9 | P4-T3, P7-T18, P7-T19 | The SP7 summary is produced by the Python JUnit helper. |
+| D10 | P5-T8 | The CI `PowerShell QC` JUnit for the three modified Codex suites on the push after Phase 5, plus `mcp__drm-copilot__run_poshqc_test` with `scan_folders` `["tests/scripts/codex-hooks"]`, replaces SP6. |
+
+Operator-run blockers (left unchecked; `actionlint` run directly as supplementary evidence only):
+
+| ID | Task | Operator command |
+| --- | --- | --- |
+| B1 | P0-T19 | `pwsh -NoProfile -File scripts/dev-tools/run-actionlint.ps1 .github/workflows/_poshqc.yml` |
+| B2 | P3-T3 | `pwsh -NoProfile -File scripts/dev-tools/run-actionlint.ps1 .github/workflows/_poshqc.yml` |
+| B3 | P7-T9 | `pwsh -NoProfile -File scripts/dev-tools/run-actionlint.ps1 .github/workflows/_poshqc.yml` |
