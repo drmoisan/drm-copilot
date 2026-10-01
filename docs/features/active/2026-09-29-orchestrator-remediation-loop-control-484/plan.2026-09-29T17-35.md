@@ -294,7 +294,7 @@ Type checking does not apply to PowerShell; the loop order is format, analyze, a
 - [x] [P12-T1] Record the seven spec follow-ups (spec `## Rollout & Follow-up`, post-fix items 1-7, item 1 being the AC-6 write-up in `## Out-of-Scope Follow-up: Published-MCP Contract Lag`) in `docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/evidence/other/follow-ups.md`, one numbered line each with its source citation, for the orchestrator to file through the MCP promotion path. Acceptance: `grep -c -E "^[1-7]\. " docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/evidence/other/follow-ups.md` prints `7`.
 - [x] [P12-T2] Check off the twenty `## Acceptance Criteria` items in `docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/spec.md`, each only when the evidence mapped to it in `## Planner Review Record` exists and meets its acceptance condition; commit with a pathspec commit. Acceptance: `grep -c -F -e "- [x] " docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/spec.md` prints `22` (the planning tree holds two checked boxes, `Blocker` and the attached-logs box; 2 + 20 = 22), or prints `21` only when `docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/evidence/other/checkpoint-issue-adoption.md` records `BLOCKER: AC-18 checkpoint record absent` and the commit message and P12-T4 notes list AC-18 as open.
 - [x] [P12-T3] Check off the six `## Acceptance Criteria` items in `docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/issue.md` (issue AC-1 to AC-6 map to spec AC-1 to AC-6), each only after the corresponding spec item is checked; commit with a pathspec commit. Acceptance: `grep -c -F -e "- [x] " docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/issue.md` prints `9` (the planning tree holds three checked boxes: attached logs, `Blocker`, and the promotion box; 3 + 6 = 9).
-- [ ] [P12-T4] Append a section headed `## Implementation Notes` to the end of `docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/plan.2026-09-29T17-35.md` recording: the batch-budget resets performed (P1-T1, P5-T1, P6-T1, P5-T9 if taken, the pre-test resets in P0-T19, P0-T34, P6-T29, P8-T5, and P8-T9 including every loop iteration, and each `docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/evidence/other/batch-budget-reset-qa-<n>.md` pre-fix reset made in Phases 7–10, listed by n with its kind) and the authorization identifier OD-484-2 the orchestrator recorded; the P3-T6 and P4-T4 split decisions; the P5-T9 branch taken; the P0-T27 `ThresholdGap` value; the P0-T32 pre-existing Pester failure set and any member that no longer fails; any AC left open by P12-T2; and any count or key that differed from this plan's stated expectation. Acceptance: `grep -c -E "^## Implementation Notes" docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/plan.2026-09-29T17-35.md` prints `1`.
+- [x] [P12-T4] Append a section headed `## Implementation Notes` to the end of `docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/plan.2026-09-29T17-35.md` recording: the batch-budget resets performed (P1-T1, P5-T1, P6-T1, P5-T9 if taken, the pre-test resets in P0-T19, P0-T34, P6-T29, P8-T5, and P8-T9 including every loop iteration, and each `docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/evidence/other/batch-budget-reset-qa-<n>.md` pre-fix reset made in Phases 7–10, listed by n with its kind) and the authorization identifier OD-484-2 the orchestrator recorded; the P3-T6 and P4-T4 split decisions; the P5-T9 branch taken; the P0-T27 `ThresholdGap` value; the P0-T32 pre-existing Pester failure set and any member that no longer fails; any AC left open by P12-T2; and any count or key that differed from this plan's stated expectation. Acceptance: `grep -c -E "^## Implementation Notes" docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/plan.2026-09-29T17-35.md` prints `1`.
 
 ## Planner Review Record
 
@@ -466,3 +466,57 @@ AC-MAPPING: AC-19 | IMPLEMENTATION: P12-T1 | TESTS: P12-T1 | EVIDENCE: P12-T1
 AC-MAPPING: AC-20 | IMPLEMENTATION: P8-T1, P9-T1, P10-T1 | TESTS: P8-T5, P9-T5, P10-T4, P10-T5 | EVIDENCE: P0-T34, P11-T5
 UNRESOLVED-GAPS: NONE
 PREFLIGHT: ALL CLEAR
+
+## Implementation Notes
+
+Recorded by `atomic-executor` at plan completion (2026-10-01). Deviations D1-D11 are recorded in full in `docs/features/active/2026-09-29-orchestrator-remediation-loop-control-484/evidence/other/plan-deviations.md`; no plan task text was edited.
+
+### Batch-budget resets (authorization OD-484-2, recorded by the orchestrator in the checkpoint)
+
+Every reset ran the P1-T1 command through the sh-wrapped `pwsh -NoProfile -Command` route. No reset removed a file: every run printed `removed=0` and `remaining=0` for each kind it covered. No hook file, hook test, or issue #769 file was edited.
+
+| Reset point | Kind(s) | Evidence |
+|---|---|---|
+| P0-T19 (pre-test) | python, powershell | `evidence/baseline/contract-suites-before.md` |
+| P0-T34 (pre-test) | python, powershell | `evidence/baseline/pytest-full-baseline.md` |
+| P1-T1 | python, powershell | `evidence/other/batch-budget-reset-p1.md` |
+| P5-T1 | powershell | `evidence/other/batch-budget-reset-p5.md` |
+| P5-T9 conditional reset | not taken (equal branch) | `evidence/other/runsettings-second-file.md` |
+| P6-T1 | python | `evidence/other/batch-budget-reset-p6.md` |
+| P6-T29 (pre-test) | python, powershell | `evidence/qa-gates/contract-suites-after.md` |
+| P8-T5 (pre-test), loop iteration 1 | python, powershell | recorded in `evidence/qa-gates/pytest-full-final.md` (iteration 1 section) |
+| QA pre-fix reset n=1 (before the D9 fix) | python | `evidence/other/batch-budget-reset-qa-1.md` |
+| P8-T5 (pre-test), loop iteration 2 | python, powershell | `evidence/qa-gates/pytest-full-final.md` |
+| P8-T9 (pre-test), loop iteration 2 | python, powershell | `evidence/qa-gates/integration-python-final.md` |
+
+P8-T9 ran only in iteration 2, because iteration 1 stopped at P8-T5. One pre-fix reset was made in Phases 7-10 (`batch-budget-reset-qa-1.md`, kind `python`).
+
+### Decisions and branches
+
+- P3-T6: `Split: not applied` (Python remediation module kept in `scripts/dev_tools/_orchestrator_state_remediation_loop.py`).
+- P4-T4: `Split: applied`; `extensions/drm-copilot/src/lib/validate/orchestrator-state-remediation-accounting.ts` created with its own Jest threshold (D4, D8, D11).
+- P5-T9: equal branch taken (`RunsettingsPairEqual: True`); the second run-settings file was produced by `Copy-Item`.
+- P0-T27: `ThresholdGap: false` (baseline 136/136 lines, 18/18 branches).
+
+### Final QA loop
+
+- Iteration 1 stopped at P8-T5 with two new failures in `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py`, both caused by the Phase 6 document edits; fixed in f8d1d136 by re-pinning `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` (D9). Iteration 2 passed every stage of Phases 8-10 without changing a file (`evidence/qa-gates/toolchain-summary.md`).
+- Coverage, baseline to final: Python `_orchestrator_state_remediation_loop.py` line 97.22% to 100.00%, branch 87.50% to 98.65%; Jest `orchestrator-state-remediation.ts` 100%/100% to 100%/100%, split module 98.19% lines / 95.56% branches (new); Pester `OrchestratorStateReceipts.psm1` 100.00% to 100.00%, `OrchestratorStateRemediationAccounting.psm1` 100.00% (new). Changed-line coverage: Python 111/111, TypeScript 166/166 and 217/221, PowerShell 11/11.
+
+### P0-T32 pre-existing Pester failure set
+
+The P0-T32 set was `enforce-pr-author-skill.ps1.allowed commands.allows gh pr create --body-file artifacts/pr_body_12.md when context exists` and `Every registered Codex PreToolUse handler accepts every tool name its matcher admits.allows every registered handler for every tool name its own matcher admits`. Both still fail in P10-T4 and P10-T5; no member stopped failing and no new failure appeared. Both are hook surfaces outside this plan's scope.
+
+### Acceptance criteria left open
+
+None. P12-T2 checked all twenty spec criteria (count 22) and P12-T3 the six issue criteria (count 9). AC-20 relies on the baseline-identity evaluation of P10-T6 and P10-T7 recorded in D10.
+
+### Counts and keys that differed from this plan's stated expectation
+
+- P8-T5 iteration 1: 2 failed against an expected `0 failed` (D9; fixed).
+- P10-T6 and P10-T7: `Failed=38` against an expected `Failed=0`; the 38 are the P0-T30 pre-existing `OrchestratorStateIssueAdoption.Tests.ps1` failures, unchanged (D10). Artifacts declare `ExpectedExitCode: 38` authorized by P0-T30.
+- P10-T5: `ExpectedExitCode: 2` (conditions (a)-(c) held), so P11-T5 lists it with P0-T32 as the authorizing baseline.
+- P11-T3 and P11-T5 enumerate the TypeScript split module and the P10-T6/P10-T7 expectations (D11).
+- P4-T2 search count across the split: 3 + 2 = 5 (D4).
+- Earlier deviations D1-D8: delegation tooling unavailable (D1); batch-boundary commits before P1-T15 and P6-T30 (D2, D7); Jest accounting suite failed at run time rather than compile time (D3); Pester accounting-test import order (D5); Codex generator CRLF manifest rewrite restored (D6, accepted by the orchestrator); Phase 7 checks include the split module (D8).
+- Artifact timestamps written in Phases 8 and 9 were corrected to UTC in 189e0c31 so they agree with the commit times.
