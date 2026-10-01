@@ -405,7 +405,7 @@ R8. Forbidden-path pattern (AC-20), used verbatim in P0-T10 and P3-T14:
   `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the item worktree and no `scan_folders`. Acceptance: the tool result
   has `ok: true`. When it returns `ok: false`, record `LOCAL-BASELINE: FAILING` in the artifact, stop, and return to the orchestrator.
   No count or coverage value is asserted from the tool.
-- [ ] [P0-T17] Commit and push the Phase 0 boundary: write `<session-scratchpad>/commit-msg-p0.txt` from reference block R6,
+- [x] [P0-T17] Commit and push the Phase 0 boundary: write `<session-scratchpad>/commit-msg-p0.txt` from reference block R6,
   then run `git add -- docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/remediation-baseline/ docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/regression-testing/ docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/remediation-plan.2026-10-01T18-07.md`,
   `git commit -F <session-scratchpad>/commit-msg-p0.txt -- docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/remediation-baseline/ docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/regression-testing/ docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/remediation-plan.2026-10-01T18-07.md`,
   `git push origin bug/ci-gaps-linux-pester-and-kcov-set-u-743`, and
@@ -415,47 +415,47 @@ R8. Forbidden-path pattern (AC-20), used verbatim in P0-T10 and P3-T14:
 
 ### Phase 1 — Portable Synthetic Root in the Drift-Gate Suite (AC-10 rows 1 to 8)
 
-- [ ] [P1-T1] Edit `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`: apply reference edit R1a (the
+- [x] [P1-T1] Edit `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`: apply reference edit R1a (the
   `$script:SyntheticWorktree` definition in `BeforeAll`). Acceptance: `grep -c -F -e '$script:SyntheticWorktree = if ($IsWindows)' tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`
   prints `1`. Record in `<FEATURE>/evidence/regression-testing/p1-t1-synthetic-worktree.<ts>.md`.
-- [ ] [P1-T2] Edit `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`: apply reference edit R1b (the line-46 JSON
+- [x] [P1-T2] Edit `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`: apply reference edit R1b (the line-46 JSON
   built by concatenation). Acceptance: `grep -c -F -e '+ $script:SyntheticWorktree +' tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`
   prints `1`. Record in `<FEATURE>/evidence/regression-testing/p1-t2-json-root.<ts>.md`. The absence check
   `grep -c -F -e '"worktree_path":"C:/worktrees/alpha"' tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`
   prints `0` (it printed `1` before this task) and exits 1; it is recorded alone, with `ExpectedExitCode: 1`, in
   `<FEATURE>/evidence/regression-testing/p1-t2-json-root-absent.<ts>.md`.
-- [ ] [P1-T3] Edit `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`: apply reference edit R1c (the line-338
+- [x] [P1-T3] Edit `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`: apply reference edit R1c (the line-338
   `-ForEach` row derives its root inline). Acceptance:
   `grep -c -F -e "else { '/worktrees/alpha' }" tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1` prints `2`
   (the R1a line and the R1c row). Record in `<FEATURE>/evidence/regression-testing/p1-t3-foreach-root.<ts>.md`. The absence check
   `grep -c -F -e "Worktree = 'C:/worktrees/alpha'" tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1` prints `0` (it printed
   `1` before) and exits 1; it is recorded alone, with `ExpectedExitCode: 1`, in
   `<FEATURE>/evidence/regression-testing/p1-t3-foreach-root-absent.<ts>.md`.
-- [ ] [P1-T4] Edit `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`: apply reference edit R1d at the four
+- [x] [P1-T4] Edit `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`: apply reference edit R1d at the four
   `Test-ParallelDriftFindingPresent` call sites. Acceptance:
   `grep -c -F -e '-WorktreePath $script:SyntheticWorktree' tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1` prints `4`.
   Record in `<FEATURE>/evidence/regression-testing/p1-t4-call-sites.<ts>.md`. The absence check
   `grep -c -F -e "-WorktreePath 'C:/worktrees/alpha'" tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1` prints `0` (it printed
   `4` before) and exits 1; it is recorded alone, with `ExpectedExitCode: 1`, in
   `<FEATURE>/evidence/regression-testing/p1-t4-call-sites-absent.<ts>.md`.
-- [ ] [P1-T5] Verify the residual Windows literal count in `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1` into
+- [x] [P1-T5] Verify the residual Windows literal count in `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1` into
   `<FEATURE>/evidence/regression-testing/p1-t5-residual.<ts>.md`: run
   `grep -c -F -e 'C:/worktrees/alpha' tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`. Acceptance: the count prints `2`
   (the Windows branch of the R1a line and the Windows branch of the R1c row); P0-T6 recorded six.
-- [ ] [P1-T6] Verify the line count of `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1` into
+- [x] [P1-T6] Verify the line count of `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1` into
   `<FEATURE>/evidence/regression-testing/p1-t6-line-count.<ts>.md`: run
   `wc -l tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`. Acceptance: the count is at most 500.
-- [ ] [P1-T7] Run the PowerShell format step for the edited suite into
+- [x] [P1-T7] Run the PowerShell format step for the edited suite into
   `<FEATURE>/evidence/regression-testing/p1-t7-ps-format.<ts>.md`. Pre-pass observation: `git status --porcelain` and
   `sha256sum tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`. Run the MCP tool
   `mcp__drm-copilot__run_poshqc_format` (`workspace_root` = item worktree). Post-pass observation: re-run both commands.
   Acceptance: `ok: true`, and the post-pass hash and porcelain listing equal the pre-pass values. If the formatter changed the
   file, the formatted file is kept, P1-T1 to P1-T6 are re-checked against it, and this task is re-run into a new artifact until
   the hash is unchanged.
-- [ ] [P1-T8] Run the PowerShell analyze step into `<FEATURE>/evidence/regression-testing/p1-t8-ps-analyze.<ts>.md`: run the MCP
+- [x] [P1-T8] Run the PowerShell analyze step into `<FEATURE>/evidence/regression-testing/p1-t8-ps-analyze.<ts>.md`: run the MCP
   tool `mcp__drm-copilot__run_poshqc_analyze` (`workspace_root` = item worktree). Acceptance: `ok: true`. The finding set is
   read from the CI `Analyze PowerShell` step in P4-T4.
-- [ ] [P1-T9] Run the Windows regression smoke for the Claude hook suites into
+- [x] [P1-T9] Run the Windows regression smoke for the Claude hook suites into
   `<FEATURE>/evidence/regression-testing/p1-t9-ps-test-claude-hooks.<ts>.md`: run the MCP tool
   `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the item worktree and `scan_folders` set to
   `["tests/scripts/claude-hooks"]`. Acceptance: `ok: true` (the P0-T15 baseline for the same folders was also `ok: true`). No count
