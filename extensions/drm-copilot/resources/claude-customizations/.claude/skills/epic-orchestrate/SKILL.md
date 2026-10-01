@@ -221,9 +221,10 @@ Procedure, triggered by S9 step 6's merge failure:
 3. The existing R1–R5 loop processes this finding exactly as a local blocking finding:
    `atomic-planner` (R1) plans the resolution, `atomic-executor` performs preflight (R2) then
    resolves the conflict markers, stages, and commits (R3), `feature-review` re-audits (R4).
-4. The child's own `remediation_pass` counter is shared with local-finding and CI-failure passes
-   (cap 3), unmodified.
-5. On the third conflict pass without resolution, the child's `orchestrator` records
+4. Conflict cycles share the child's own `remediation_loop.completed_attempts` count with
+   local-finding and CI-failure cycles. The active cycle number is `completed_attempts + 1`, and a
+   cycle without an applied candidate consumes no number.
+5. After three completed attempts without resolution, the child's `orchestrator` records
    `step9_status: "blocked_conflict_loop_limit"` (parallel to `blocked_ci_loop_limit`), does not
    write DONE, and halts. It reports this status to `epic-orchestrator`, which mirrors it into
    the epic checkpoint's per-feature `merge_status: "blocked_conflict_loop_limit"` field.
