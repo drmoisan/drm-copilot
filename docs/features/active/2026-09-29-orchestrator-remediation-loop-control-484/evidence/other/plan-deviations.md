@@ -15,3 +15,9 @@ Each entry records the task ID, what the plan expected, and what was observed.
 - Task ID: P1-T15.
 - Expected: one pathspec commit naming `tests/fixtures/orchestrator_state_remediation_loop_backcompat`, `tests/fixtures/orchestrator_state_remediation_loop_backcompat_expected.json`, and the three P1-T14 test files.
 - Observed: the caller's execution contract requires a commit and push at every batch boundary, so the capture files were committed in the B1 (075394db), B2 (142a6802), and B3 (a2ac3c18) commits. The P1-T15 pathspec commit names the same five paths plus the P1-T12 to P1-T15 evidence and the plan; the five capture paths carry no further change in it. The P1-T15 acceptance (`git status --porcelain -- tests extensions/drm-copilot/test` prints nothing; a 40-character SHA recorded) is unaffected.
+
+## D3 — Jest accounting suite fails at run time, not at compile time
+
+- Task ID: P2-T8.
+- Expected: the parenthetical states that "the accounting suite fails to compile on the missing exports; the parity suite fails on the new-error cases".
+- Observed: `extensions/drm-copilot/tsconfig.jest.json` sets `isolatedModules: true`, so ts-jest transpiles without type diagnostics. The accounting suite loads, the nine missing exports are `undefined` at run time, and 100 cases fail (`TypeError: ... deriveReviewVerdict is not a function` and missing R5-R11 messages). The acceptance condition (`EXIT_CODE: 1`; `Test Suites:` line reports `2 failed`) is met as written. The compile-level failure is observable separately: `npx tsc -p tsconfig.jest.json --noEmit` reports nine `TS2305` errors in the accounting test file, one per missing export. No plan text was reinterpreted; only the parenthetical mechanism differs.
