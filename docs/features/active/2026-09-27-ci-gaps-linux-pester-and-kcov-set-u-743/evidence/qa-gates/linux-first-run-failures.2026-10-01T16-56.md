@@ -29,9 +29,15 @@ Root cause shared by every row except the three `windows.sandbox` rows: the Linu
 | 17 | tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1 | allows a removal whose feature record reports worktree_removed | S3 | P5-T3 | R10 (c): checkpoint JSON and `git worktree remove` command built with `-f $script:SyntheticRoot`; `-WorkingDirectory $script:SyntheticRoot` |
 | 18 | tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1 | uses inline project trust, ignores user config, and denies Codex install paths | S1b | P5-T1 | R9 at line 245: `$arguments \| Should -Contain 'windows.sandbox="elevated"'` becomes `($arguments -contains 'windows.sandbox="elevated"') \| Should -Be $IsWindows -Because '...'` |
 | 19 | tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1 | preflights the elevated Windows sandbox from an isolated CODEX_HOME | S1 | P5-T1 | R9 at line 346 (same replacement) |
-| 20 | tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1 | repeats the exact terminal receipt timestamp under the matching status key | S5 | P5-T4 | raised at `.codex/scripts/launch-epic-child-wave.ps1:218` (`Join-Path` on `worktree_path = 'C:\worktree'`); fix recorded in the P5-T4 section below |
+| 20 | tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1 | repeats the exact terminal receipt timestamp under the matching status key | S5 | P5-T4 | raised at `.codex/scripts/launch-epic-child-wave.ps1:218` (`Join-Path` on `worktree_path = 'C:\worktree'`). P5-T4 fix (R10 pattern, OS-derived synthetic root), line 427: old `Entry   = [pscustomobject]@{ worktree_path = 'C:\worktree' }`; new `Entry   = [pscustomobject]@{ worktree_path = $(if ($IsWindows) { 'C:\worktree' } else { '/worktree' }) }`. File stays at 469 lines. |
 | 21 | tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1 | builds codex exec with exact model, reasoning, instructions, skills, permissions, and worktree | S1c | P5-T2 | R9 at line 315 (same replacement) |
 
 Row count (21) equals the number of P4-T3 `FAIL:` lines (21). Every row has File, Testcase, Class, and Planned disposition filled.
 
+P5-T4: one row (row 20), fixed as recorded in its Fix column; `wc -l` of `tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1` is 469 (at most 500).
+
 P5-T5: NO ROWS (no row was assigned to P5-T5).
+
+P5-T6: one row (row 15). No additional edit was needed: the R10 (c) replacements made by P5-T3 remove every drive-letter literal the case used. `wc -l` of `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1` is 258 (at most 500).
+
+No unconditional skip was added by any fix.

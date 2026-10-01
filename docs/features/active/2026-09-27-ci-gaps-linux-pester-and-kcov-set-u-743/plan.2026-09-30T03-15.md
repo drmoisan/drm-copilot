@@ -1087,27 +1087,27 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
 
 ### Phase 5 — Portable Codex Hook-Suite Fixes
 
-- [ ] [P5-T1] Fix `tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1` (S1 and S1b) by
+- [x] [P5-T1] Fix `tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1` (S1 and S1b) by
   replacing both occurrences of `$arguments | Should -Contain 'windows.sandbox="elevated"'` with the
   reference block R9 line, keeping each line's indentation. Acceptance:
   `grep -c -F 'windows.sandbox="elevated"' tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1`
   prints `2`;
   `grep -F 'windows.sandbox="elevated"' tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1 | grep -c -F 'Should -Be $IsWindows'`
   prints `2`; `wc -l` of the file equals its P0-T21 count (AC-8).
-- [ ] [P5-T2] Fix `tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1` (S1c) by
+- [x] [P5-T2] Fix `tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1` (S1c) by
   replacing the one occurrence of `$arguments | Should -Contain 'windows.sandbox="elevated"'` with
   the reference block R9 line, keeping its indentation. Acceptance:
   `grep -F 'windows.sandbox="elevated"' tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1 | grep -c -F 'Should -Be $IsWindows'`
   prints `1`; `grep -c -F 'windows.sandbox="elevated"' tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1`
   prints `1`; `wc -l` of the file equals its P0-T21 count.
-- [ ] [P5-T3] Fix `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1`
+- [x] [P5-T3] Fix `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1`
   (S2, S3, S4) with reference block R10 parts (a), (b), and (c). Acceptance:
   `grep -c -F -e 'C:/repo' -e 'C:/elsewhere' -e 'C:/nonexistent' tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1`
   prints `3` (the three `if ($IsWindows)` definition lines);
   `grep -c -F 'if ($IsWindows)' tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1`
   prints `3`; `grep -c -F 'IsPathRooted' tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1`
   prints `1` (the corrected premise comment, AC-9); `wc -l` of the file is at most 500.
-- [ ] [P5-T4] Fix `tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1` for every further
+- [x] [P5-T4] Fix `tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1` for every further
   inventory row that P4-T4 assigned to `P5-T4` (conditional: when there is no such row, record
   `P5-T4: NO ROWS` in the P4-T4 inventory and mark this task done). Each fix is portable: an
   OS-derived synthetic root (the R10 pattern), or an assertion of the host's actual behavior (the
@@ -1116,17 +1116,17 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
   Acceptance: each row's fix (old text and new text) is recorded in the inventory's
   `Fix` column; `wc -l` of the file is at most 500. A row that cannot be fixed within 500 lines is
   re-marked `REMEDIATION-REQUIRED`.
-- [ ] [P5-T5] Fix `tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1` for every further
+- [x] [P5-T5] Fix `tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1` for every further
   inventory row that P4-T4 assigned to `P5-T5` (conditional: when there is no such row, record
   `P5-T5: NO ROWS` and mark this task done), under the same rules as P5-T4. The file is 495 lines at
   authoring, so a fix that adds lines beyond the 500-line cap is not applied, and its row is
   re-marked `REMEDIATION-REQUIRED`. Acceptance: each applied fix is recorded in the inventory's
   `Fix` column; `wc -l` of the file is at most 500.
-- [ ] [P5-T6] Fix `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1`
+- [x] [P5-T6] Fix `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1`
   for every further inventory row that P4-T4 assigned to `P5-T6` (conditional: when there is no
   such row, record `P5-T6: NO ROWS` and mark this task done), under the same rules as P5-T4.
   Acceptance: each fix is recorded in the inventory's `Fix` column; `wc -l` of the file is at most 500.
-- [ ] [P5-T7] Record the remediation-required set in `<FEATURE>/evidence/qa-gates/linux-remediation-required.<ts>.md`:
+- [x] [P5-T7] Record the remediation-required set in `<FEATURE>/evidence/qa-gates/linux-remediation-required.<ts>.md`:
   list every inventory row marked `REMEDIATION-REQUIRED` with its file and testcase, or the line
   `REMEDIATION-REQUIRED: NONE`. Acceptance: the artifact exists, and its row count equals the
   number of `REMEDIATION-REQUIRED` rows in the inventory. A non-empty set leaves AC-6 and AC-10
