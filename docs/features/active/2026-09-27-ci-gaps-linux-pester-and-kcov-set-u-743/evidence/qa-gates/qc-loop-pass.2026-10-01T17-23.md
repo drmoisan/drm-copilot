@@ -8,7 +8,7 @@ Deviations: D2, D3, D4, D5 (PowerShell steps through MCP plus CI evidence), D14 
 | --- | --- | --- | --- |
 | 1 | P7-T1 | qa-gates/qc-ps-format.2026-10-01T17-14.md | MCP `ok: true`; porcelain listing unchanged |
 | 2 | P7-T2 | qa-gates/qc-ps-analyze.2026-10-01T17-15.md | MCP `ok: true`; CI finding set in P7-T17 |
-| 3 | P7-T3 | qa-gates/qc-ps-pester-full.*.md (written from the P7-T16 run) | MCP `ok: true`; CI counts and coverage in P7-T19 |
+| 3 | P7-T3 | qa-gates/qc-ps-pester-full.2026-10-01T17-57.md | MCP `ok: true`; CI `Failed: 0`, coverage 96.31% (run 36901896617) |
 | 4 | P7-T4 | qa-gates/qc-bash-format.2026-10-01T17-23.md | pass; hashes unchanged |
 | 5 | P7-T5 | qa-gates/qc-bash-check.2026-10-01T17-23.md | pass; exit 0, no output |
 | 6 | P7-T6 | qa-gates/qc-bash-targeted.2026-10-01T17-23.md | pass |

@@ -10,4 +10,4 @@ Output Summary: `ok: true`; summary `Ran bundled PoshQC analyze against '<REPO_R
 
 Reduced baseline set: empty (P0-T11 recorded `PSScriptAnalyzer passed: no findings under <RUNNER_ROOT>`).
 
-CI finding set: the `Analyze PowerShell` step of the final verification run (P7-T17) is the source of the `PSScriptAnalyzer passed: no findings under` line; it is recorded in `ci-final-conclusions.*.md`.
+CI finding set: run 36901896617 (CI_SHA ecba8829), job `poshqc / PowerShell QC` 110502826187, step `Analyze PowerShell` concluded `success` and printed `PSScriptAnalyzer passed: no findings under <RUNNER_ROOT>` (recorded in `ci-final-conclusions.2026-10-01T17-57.md`). The finding set is empty, matching the empty reduced baseline set.

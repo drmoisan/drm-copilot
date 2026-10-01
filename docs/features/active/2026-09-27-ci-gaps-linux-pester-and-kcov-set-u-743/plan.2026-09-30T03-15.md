@@ -1188,7 +1188,7 @@ cycle. When a restart changes `.github/workflows/_poshqc.yml`, P3-T2 and P3-T4 a
 timestamped artifacts before P7-T15. A fix applied under P7-T12 changes a file and restarts the
 loop at P7-T1.
 
-- [ ] [P7-T1] QC step 1 (PowerShell format) for the PowerShell files in scope, into
+- [x] [P7-T1] QC step 1 (PowerShell format) for the PowerShell files in scope, into
   `<FEATURE>/evidence/qa-gates/qc-ps-format.<ts>.md`. First run `git status --porcelain` as the
   pre-pass observation. Run SP1 (check mode, writes nothing):
   `pwsh -NoProfile -File <session-scratchpad>/ps-format-check.ps1`, then re-run
@@ -1201,7 +1201,7 @@ loop at P7-T1.
   porcelain listing equals the pre-pass listing. A `Formatted: ` line ending with one of those four
   file names is a failure; the file is corrected
   under the loop rule and the loop restarts at P7-T1.
-- [ ] [P7-T2] QC step 2 (PowerShell analyze) for the PowerShell files in scope, into
+- [x] [P7-T2] QC step 2 (PowerShell analyze) for the PowerShell files in scope, into
   `<FEATURE>/evidence/qa-gates/qc-ps-analyze.<ts>.md`: run
   `pwsh -NoProfile -File <session-scratchpad>/ps-analyze.ps1`. The reduced baseline set is the
   P0-T11 baseline finding set after every P0-T11 row naming one of the four file names listed in
@@ -1216,7 +1216,7 @@ loop at P7-T1.
   (`PoshQC.Analyzer.psm1:183`) equals the P0-T11 count minus the number of rows removed to form the
   reduced baseline set, and the findings table matches the reduced baseline set exactly, so it
   contains no row naming any of the four file names.
-- [ ] [P7-T3] QC step 3 (PowerShell test with coverage; type checking does not apply) for the
+- [x] [P7-T3] QC step 3 (PowerShell test with coverage; type checking does not apply) for the
   PowerShell suites in scope, into `<FEATURE>/evidence/qa-gates/qc-ps-pester-full.<ts>.md`: run
   `pwsh -NoProfile -File <session-scratchpad>/ps-test-full.ps1`, then
   `pwsh -NoProfile -File <session-scratchpad>/ps-junit-summary.ps1 -Path artifacts/pester/pester-junit.xml`,
@@ -1225,7 +1225,7 @@ loop at P7-T1.
   P0-T12 local baseline failure set; the `SUITE:` lines for `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`
   (`tests=7`) and the three modified Codex suites show `failures=0` and `errors=0`; the
   `PS-LINE-COVERAGE:` percent is at least 85.00 and at least the P0-T13 baseline percent (AC-21).
-- [ ] [P7-T4] QC step 4 (bash format check) for `scripts/bash/shell_qc_lib.sh` and `scripts/bash/kcov_trace_env.sh`,
+- [x] [P7-T4] QC step 4 (bash format check) for `scripts/bash/shell_qc_lib.sh` and `scripts/bash/kcov_trace_env.sh`,
   into `<FEATURE>/evidence/qa-gates/qc-bash-format.<ts>.md`. Before the check, run
   `git status --porcelain -- scripts/ tools/ .claude/lib/bash/ .claude/skills/` and
   `sha256sum scripts/bash/shell_qc_lib.sh scripts/bash/kcov_trace_env.sh` as the pre-pass
@@ -1233,7 +1233,7 @@ loop at P7-T1.
   mode, writes nothing). Then re-run both observation commands. Acceptance: the shfmt run prints
   nothing and exits 0; the post-pass porcelain listing and the post-pass hashes are unchanged from
   the pre-pass observation. A printed diff is a failure; the file is corrected under the loop rule.
-- [ ] [P7-T5] QC step 5 (bash lint) via `scripts/bash/shell-qc.sh` into
+- [x] [P7-T5] QC step 5 (bash lint) via `scripts/bash/shell-qc.sh` into
   `<FEATURE>/evidence/qa-gates/qc-bash-check.<ts>.md`: run `sh scripts/bash/shell-qc.sh check`.
   Acceptance: no diagnostic line names `scripts/bash/shell_qc_lib.sh` or `scripts/bash/kcov_trace_env.sh`.
   The reduced drift set is the P0-T15 diagnostic record with two kinds of block removed: every
@@ -1247,16 +1247,16 @@ loop at P7-T1.
   AC-21 bash format evidence; `shell-qc.sh format` is the write form of the same shfmt pass
   (`scripts/bash/shell_qc_lib.sh:188` runs `-d`, `:222` runs `-w`, over the same discovered file
   list) and is not run.
-- [ ] [P7-T6] QC step 6 (targeted bash lint and format check) on `scripts/bash/shell_qc_lib.sh` and
+- [x] [P7-T6] QC step 6 (targeted bash lint and format check) on `scripts/bash/shell_qc_lib.sh` and
   `scripts/bash/kcov_trace_env.sh` into `<FEATURE>/evidence/qa-gates/qc-bash-targeted.<ts>.md`: run
   `shellcheck -f gcc scripts/bash/shell_qc_lib.sh scripts/bash/kcov_trace_env.sh` and
   `shfmt -d scripts/bash/shell_qc_lib.sh scripts/bash/kcov_trace_env.sh`. Acceptance: both exit 0
   with no output. The only suppression allowed is the R6b directive, when P2-T3 applied it.
-- [ ] [P7-T7] QC step 7 (bash syntax; bash has no type checker) on `scripts/bash/shell_qc_lib.sh` and
+- [x] [P7-T7] QC step 7 (bash syntax; bash has no type checker) on `scripts/bash/shell_qc_lib.sh` and
   `scripts/bash/kcov_trace_env.sh` into `<FEATURE>/evidence/qa-gates/qc-bash-syntax.<ts>.md`: run
   `sh -n scripts/bash/shell_qc_lib.sh` and `sh -n scripts/bash/kcov_trace_env.sh`. Acceptance: both
   exit 0 with no output.
-- [ ] [P7-T8] QC step 8 (bash tests, named suites) on `tests/shell/test_shell_qc_commands.bats` and
+- [x] [P7-T8] QC step 8 (bash tests, named suites) on `tests/shell/test_shell_qc_commands.bats` and
   `tests/shell/test_shell_qc_discovery.bats` into `<FEATURE>/evidence/qa-gates/qc-bats-shell-qc.<ts>.md`:
   run `npx --yes bats tests/shell/test_shell_qc_commands.bats tests/shell/test_shell_qc_discovery.bats`.
   Acceptance: the lines for the three R5 tests,
@@ -1272,7 +1272,7 @@ loop at P7-T1.
   (`scripts/dev-tools/run-actionlint.ps1:128`), so on a non-zero exit the task also runs
   `actionlint .github/workflows/_poshqc.yml` (on PATH per P0-T7; `tools/actionlint/bin/actionlint.exe`
   when P0-T7 recorded `ACTIONLINT-ON-PATH: NO`) into the same artifact to record the findings.
-- [ ] [P7-T10] QC step 10 (Python parity test) for `.claude/skills/atomic-plan-contract/SKILL.md`
+- [x] [P7-T10] QC step 10 (Python parity test) for `.claude/skills/atomic-plan-contract/SKILL.md`
   and its mirror, into `<FEATURE>/evidence/qa-gates/qc-pytest-claude-resource-contracts.<ts>.md`: run
   `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`.
   Acceptance: exit 0 with zero `failed` in the summary (AC-19). When the only failure is
@@ -1283,13 +1283,13 @@ loop at P7-T1.
   KNOWN-ISSUE-510 branch the artifact keeps its observed `EXIT_CODE:`, adds no `ExpectedExitCode:`
   field, and cites issue #510; this step counts as passed for P7-T11, and the pytest part of AC-21
   is evidenced by P7-T17.
-- [ ] [P7-T11] Record the clean loop pass in `<FEATURE>/evidence/qa-gates/qc-loop-pass.<ts>.md`: the
+- [x] [P7-T11] Record the clean loop pass in `<FEATURE>/evidence/qa-gates/qc-loop-pass.<ts>.md`: the
   pass number, the artifact paths of P7-T1 through P7-T10 of that pass, and the output of
   `sha256sum .github/workflows/_poshqc.yml scripts/bash/shell_qc_lib.sh scripts/bash/kcov_trace_env.sh tests/shell/test_shell_qc_commands.bats tests/scripts/workflows/PoshQcWorkflow.Tests.ps1 tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1 tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1 tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1 .claude/skills/atomic-plan-contract/SKILL.md`,
   run immediately after P7-T10. Acceptance: all ten steps passed in the same pass (P7-T10 counts as passed
   when it recorded KNOWN-ISSUE-510) without changing
   a file; the two bash hashes equal the P7-T4 post-pass hashes of that pass.
-- [ ] [P7-T12] Full local `shell-qc.sh test` run with the simulation active, for `scripts/bash/shell-qc.sh`
+- [x] [P7-T12] Full local `shell-qc.sh test` run with the simulation active, for `scripts/bash/shell-qc.sh`
   (AC-15), into `<FEATURE>/evidence/qa-gates/qc-shell-qc-test-full.<ts>.md`: run
   `sh <session-scratchpad>/shell-qc-test-local.sh <BATS_DIRECT>` in the background, with output
   captured to `<session-scratchpad>/shell-qc-test-final.log`, and record after it exits. Acceptance:
@@ -1302,11 +1302,11 @@ loop at P7-T1.
   `Files written by this plan` list may be fixed here. When P0-T8 recorded `BATS-DIRECT: UNAVAILABLE`,
   record `LOCAL-FULL-RUN: UNAVAILABLE`; the AC-15 evidence is then the P7-T20 CI job
   `shell-coverage / Shell Coverage (Bats + kcov)`.
-- [ ] [P7-T13] Verify line counts for every file this plan modifies or creates (AC-22) into
+- [x] [P7-T13] Verify line counts for every file this plan modifies or creates (AC-22) into
   `<FEATURE>/evidence/qa-gates/line-counts.<ts>.md`: run
   `wc -l .github/workflows/_poshqc.yml scripts/bash/shell_qc_lib.sh scripts/bash/kcov_trace_env.sh tests/shell/test_shell_qc_commands.bats tests/fixtures/shell_qc/kcov_trace/nounset_lib.sh tests/fixtures/shell_qc/stub-bin/bats-nounset-source tests/fixtures/shell_qc/stub-bin/bats-nounset-source-reset tests/scripts/workflows/PoshQcWorkflow.Tests.ps1 tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1 tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1 tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1`.
   Acceptance: every listed file is at most 500 lines. The SKILL.md copies are Markdown and exempt.
-- [ ] [P7-T14] Verify that the new and modified tests in `tests/` create no temporary files (AC-22)
+- [x] [P7-T14] Verify that the new and modified tests in `tests/` create no temporary files (AC-22)
   into `<FEATURE>/evidence/qa-gates/no-temp-files.<ts>.md` with `ExpectedExitCode: 1`, holding
   only the command
   `git diff -U0 <MERGE_BASE> -- tests/ | grep -c -E '^\+.*(mktemp|BATS_TEST_TMPDIR|BATS_TMPDIR|BATS_FILE_TMPDIR|New-TemporaryFile|GetTempFileName|GetTempPath|TestDrive)'`.
@@ -1315,7 +1315,7 @@ loop at P7-T1.
   records a code-review statement that the R1, R3, R4, and R5 content writes nothing to disk.
   Acceptance: the count prints `0` and exits 1. The porcelain listing shows no untracked path under
   `tests/` (every new test and fixture file was committed by P4-T1), so the diff covers all of them.
-- [ ] [P7-T15] Commit and push the final state of `bug/ci-gaps-linux-pester-and-kcov-set-u-743`: run
+- [x] [P7-T15] Commit and push the final state of `bug/ci-gaps-linux-pester-and-kcov-set-u-743`: run
   `git add --` and `git commit -F <message file> --` with the paths `tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1 tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1 tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1 .claude/skills/atomic-plan-contract/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md .github/workflows/_poshqc.yml scripts/bash/shell_qc_lib.sh scripts/bash/kcov_trace_env.sh tests/shell/test_shell_qc_commands.bats tests/scripts/workflows/PoshQcWorkflow.Tests.ps1 tests/fixtures/shell_qc/kcov_trace/ tests/fixtures/shell_qc/stub-bin/bats-nounset-source tests/fixtures/shell_qc/stub-bin/bats-nounset-source-reset docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/`
   (paths without changes are accepted by the pathspec), then `git rev-parse HEAD` (CI_SHA),
   `git status --porcelain -- scripts/ tests/ .github/ .claude/skills/ extensions/`,
@@ -1324,14 +1324,14 @@ loop at P7-T1.
   `<FEATURE>/evidence/other/commit-push-final.<ts>.md`. Acceptance: every command exits 0; the
   porcelain status prints nothing; the remote head equals CI_SHA. If the preimplementation gate
   refuses a command, record the refusal text and stop (BLOCKED).
-- [ ] [P7-T16] Dispatch the final verification run of `.github/workflows/ci.yml` on CI_SHA: record
+- [x] [P7-T16] Dispatch the final verification run of `.github/workflows/ci.yml` on CI_SHA: record
   the dispatch time (UTC), run `gh workflow run ci.yml --ref bug/ci-gaps-linux-pester-and-kcov-set-u-743`,
   and repeat
   `gh run list --workflow=ci.yml --branch bug/ci-gaps-linux-pester-and-kcov-set-u-743 --event workflow_dispatch --limit 1 --json databaseId,headSha,status,conclusion,createdAt`
   until it returns a run created after the dispatch time; its `databaseId` is `<RUN_ID>` for
   P7-T17 to P7-T20. Start `gh run watch <RUN_ID>` in the background. Record the pairs in
   `<FEATURE>/evidence/qa-gates/ci-final-run.<ts>.md`. Acceptance: the run's `headSha` equals CI_SHA.
-- [ ] [P7-T17] Record the final check conclusions for `.github/workflows/_poshqc.yml` and
+- [x] [P7-T17] Record the final check conclusions for `.github/workflows/_poshqc.yml` and
   `.github/workflows/_shell-coverage.yml` after the watch finishes, into
   `<FEATURE>/evidence/qa-gates/ci-final-conclusions.<ts>.md`: run `gh run view <RUN_ID> --json jobs,headSha`.
   Acceptance: `headSha` equals CI_SHA and equals the P7-T15 remote head. The jobs named
@@ -1354,7 +1354,7 @@ loop at P7-T1.
   Acceptance: the `Tests Passed:` line reports `Failed: 0`; `JUNIT-ROOT:` reports `failures=0` and
   `errors=0`; no `FAIL:` line is printed; the `SUITE:` lines for the three modified Codex suites show
   `failures=0`. Every P4-T4 inventory row is absent from the `FAIL:` output.
-- [ ] [P7-T19] Verify the Windows results of `.github/workflows/_poshqc.yml` (AC-7) into
+- [x] [P7-T19] Verify the Windows results of `.github/workflows/_poshqc.yml` (AC-7) into
   `<FEATURE>/evidence/qa-gates/ci-final-windows.<ts>.md`: run
   `gh run view <RUN_ID> --log --job <JOB_ID>` (the `poshqc / PowerShell QC` job) filtered by
   `grep -F 'Tests Passed:'`, then `gh run download <RUN_ID> --name poshqc-test-results --dir <session-scratchpad>/windows-final-743`
@@ -1362,7 +1362,7 @@ loop at P7-T1.
   Acceptance: `Failed: 0` in the `Tests Passed:` line; no `FAIL:` line; the `SUITE:` lines for
   `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` and the three modified Codex suites show
   `failures=0` and `errors=0`.
-- [ ] [P7-T20] Verify the kcov results of `.github/workflows/_shell-coverage.yml` (AC-16, and AC-15
+- [x] [P7-T20] Verify the kcov results of `.github/workflows/_shell-coverage.yml` (AC-16, and AC-15
   when P0-T8 recorded `BATS-DIRECT: UNAVAILABLE`) into `<FEATURE>/evidence/qa-gates/ci-final-shell-coverage.<ts>.md`:
   run `gh run view <RUN_ID> --log --job <JOB_ID>` (the `shell-coverage / Shell Coverage (Bats + kcov)` job)
   filtered by `grep -F 'Bash coverage (lines):'`, by `grep -E ' not ok [0-9]+ '`, and by
@@ -1378,7 +1378,7 @@ loop at P7-T1.
   `NOT-INSTRUMENTED` (a comment or blank line), and at least one `LINE:` record with `hits=` exists
   for each of the two files. The `git diff --exit-code` exits 0 with no output (`_shell-coverage.yml`
   unchanged).
-- [ ] [P7-T21] Close the AC-10 inventory `<FEATURE>/evidence/qa-gates/linux-first-run-failures.<ts>.md`
+- [x] [P7-T21] Close the AC-10 inventory `<FEATURE>/evidence/qa-gates/linux-first-run-failures.<ts>.md`
   (a new timestamped copy of the P4-T4 artifact, with a `Final status` column; the inventory copy
   carries no expectation field), and record
   `git diff -U0 <MERGE_BASE> -- tests/scripts/codex-hooks/ tests/scripts/claude-hooks/ | grep -c -E '^\+.*-Skip([[:space:]]|$|:\$true)'`
@@ -1386,14 +1386,14 @@ loop at P7-T1.
   `ExpectedExitCode: 1`. Acceptance: every row's `Final status` is `PASSING IN P7-T18` (with its
   fix and the fixing task) or `REMEDIATION-REQUIRED`; the skip count prints `0` and exits 1, so no
   unconditional skip was added (AC-10).
-- [ ] [P7-T22] Scope verification (AC-20) into `<FEATURE>/evidence/qa-gates/scope-check.<ts>.md`: run
+- [x] [P7-T22] Scope verification (AC-20) into `<FEATURE>/evidence/qa-gates/scope-check.<ts>.md`: run
   `git diff --name-only <MERGE_BASE>`, `git status --porcelain`, and, in its own artifact
   `<FEATURE>/evidence/qa-gates/scope-forbidden-paths.<ts>.md` with `ExpectedExitCode: 1`,
   `git diff --name-only <MERGE_BASE> | grep -c -E '^(\.github/workflows/(_quality-checks|_drm-copilot-extension-tests|ci|_shell-coverage)\.yml|scripts/powershell/PoshQC/settings/pester\.runsettings\.psd1|\.claude/rules/|\.github/instructions/)'`.
   Acceptance: the forbidden-path count prints `0` and exits 1. Every path in the name listing is in
   the `Files written by this plan` list or under `<FEATURE>/`. The porcelain listing shows no path
   outside that list, except `tools/actionlint/` when P0-T7 recorded `ACTIONLINT-ON-PATH: NO`.
-- [ ] [P7-T23] Write the coverage comparison `<FEATURE>/evidence/qa-gates/coverage-comparison.<ts>.md`:
+- [x] [P7-T23] Write the coverage comparison `<FEATURE>/evidence/qa-gates/coverage-comparison.<ts>.md`:
   PowerShell baseline (P0-T13) and post-change (P7-T3) `covered`, `missed`, and `percent`; bash
   baseline (P0-T23) and post-change (P7-T20) headline percentages; the P0-T23 and P7-T20
   `line-rate` values for `scripts/bash/shell_qc_lib.sh`; and the P7-T20 changed-line `LINE:` records
@@ -1401,7 +1401,7 @@ loop at P7-T1.
   least 85.00 and at least the baseline; the bash post-change headline is at least 85.0; no
   changed, instrumented bash line has `hits=0`. A missing value makes the outcome
   remediation-required, not PASS.
-- [ ] [P7-T24] Update `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/spec.md`
+- [x] [P7-T24] Update `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/spec.md`
   by checking off each of AC-1 through AC-22 whose evidence artifacts above satisfy it, and nothing
   else. Acceptance: each checked item cites its evidence artifact path in the P7-T25 index. An AC
   whose evidence is missing, failed, or remediation-required stays unchecked; that applies to AC-6
@@ -1409,7 +1409,7 @@ loop at P7-T1.
   When KNOWN-ISSUE-510 was recorded, AC-19 is evidenced by the P6-T4 equal sha256 values and the
   P6-T2 `cmp` exit 0, and the pytest part of AC-21 by `ci-final-parity-pytest.<ts>.md`; the P7-T25
   index cites issue #510 on both lines.
-- [ ] [P7-T25] Write the evidence index `<FEATURE>/evidence/other/ac-evidence-index.<ts>.md`: one
+- [x] [P7-T25] Write the evidence index `<FEATURE>/evidence/other/ac-evidence-index.<ts>.md`: one
   line per AC-1 through AC-22 naming its satisfying artifact paths and status (`PASS`,
   `REMEDIATION-REQUIRED`, or `PRE-EXISTING-FAILURE`), and the plan outcome (`PASS` only when all
   twenty-two are `PASS`). Then run `git diff --name-only <CI_SHA>` and `git status --porcelain`
@@ -1439,6 +1439,7 @@ Authority: binding operator decision of 2026-10-01 (Option A). No `pwsh` process
 | D11 | P1-T2 | The `poshqc` job's upload step has no `if: always()`, so CI run 36892883441 (Windows `Test PowerShell` failed as expected) uploaded no `poshqc-test-results` artifact and no JUnit exists. The `poshqc` job may not be modified (AC-4), so the fail-before per-test evidence is the job log: the `Tests Passed:` line and the six `[-]` lines. |
 | D12 | P4-T1 | P4-T1's commit is also the Phase 3 boundary commit required by the run constraints; no separate Phase 3 commit is made, so P4-T1's pathspec (which omits the plan file) is used unchanged. Plan check marks for Phases 3 and 4 are committed at the Phase 4 boundary. |
 | D13 | P5-T1 to P5-T4, P7-T24 | An out-of-band WIP checkpoint commit, 3f85b23d (`wip(743): checkpoint in-progress test and spec edits before quota limit`), was created and pushed in this worktree outside the executor's commit route while Phase 5 was in progress. It contains the Phase 5 edits to the three Codex test files and the `spec.md` AC-1 to AC-4 check-offs, byte-identical to the executor's working tree. The Phase 5 boundary commit a412698b therefore carries only the evidence and plan files. No content was lost or altered. |
+| D14 | P7-T1, P7-T2, P7-T3, P7-T11 | Their CI evidence (D2 to D5) exists only after P7-T15 and P7-T16, so these four tasks are checked off after P7-T19 has recorded the final run, not in strict list order. The local MCP calls ran in loop order (pass 1, before P7-T4). |
 
 Operator-run blockers (left unchecked; `actionlint` run directly as supplementary evidence only):
 

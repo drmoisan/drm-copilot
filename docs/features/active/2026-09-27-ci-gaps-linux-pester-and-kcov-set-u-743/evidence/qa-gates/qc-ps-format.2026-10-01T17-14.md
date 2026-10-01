@@ -15,4 +15,4 @@ Command: git status --porcelain
 EXIT_CODE: 0
 Output Summary (post-pass): identical to the pre-pass listing. The formatter changed no tracked file, so none of `PoshQcWorkflow.Tests.ps1`, `epic-child-launch-hardening.Tests.ps1`, `epic-child-worktree-launcher.Tests.ps1`, or `enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1` was reformatted. The P0-T10 `Formatted:` set was empty, and no file changed here, so the reduced sets agree.
 
-CI corroboration: see the `Format PowerShell` step of the final verification run recorded in `ci-final-conclusions.*.md` (P7-T17).
+CI corroboration: run 36901896617 (CI_SHA ecba8829), job `poshqc / PowerShell QC` 110502826187, step `Format PowerShell` concluded `success`; the job reformatted no file (details in `ci-final-conclusions.2026-10-01T17-57.md`, P7-T17).
