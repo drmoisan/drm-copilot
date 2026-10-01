@@ -231,10 +231,10 @@ Resolution of the seeded items: the Linux leg is a separate job rather than a ma
 
 
 ## Acceptance Criteria
-- [ ] AC-1: `.github/workflows/_poshqc.yml` contains a job `poshqc-linux-hooks` named `PowerShell hook suites (Linux)` with `runs-on: ubuntu-latest` and `permissions: contents: read`. Verified by `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`.
-- [ ] AC-2: The `poshqc-linux-hooks` job runs `Invoke-Pester` with `Run.Path` naming `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks` and no other path, `Run.Exit = $true`, and `CodeCoverage.Enabled = $false`. Verified by `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`.
-- [ ] AC-3: The `poshqc-linux-hooks` job uploads its JUnit result under an artifact name other than `poshqc-test-results` (`poshqc-linux-hook-test-results`). Verified by `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`.
-- [ ] AC-4: The existing `poshqc` job is unchanged: `git diff origin/main -- .github/workflows/_poshqc.yml` shows only added lines outside the `poshqc` job, and `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` asserts that `poshqc` still uses `windows-latest` and `Invoke-PoshQCTest`.
+- [x] AC-1: `.github/workflows/_poshqc.yml` contains a job `poshqc-linux-hooks` named `PowerShell hook suites (Linux)` with `runs-on: ubuntu-latest` and `permissions: contents: read`. Verified by `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`.
+- [x] AC-2: The `poshqc-linux-hooks` job runs `Invoke-Pester` with `Run.Path` naming `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks` and no other path, `Run.Exit = $true`, and `CodeCoverage.Enabled = $false`. Verified by `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`.
+- [x] AC-3: The `poshqc-linux-hooks` job uploads its JUnit result under an artifact name other than `poshqc-test-results` (`poshqc-linux-hook-test-results`). Verified by `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`.
+- [x] AC-4: The existing `poshqc` job is unchanged: `git diff origin/main -- .github/workflows/_poshqc.yml` shows only added lines outside the `poshqc` job, and `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` asserts that `poshqc` still uses `windows-latest` and `Invoke-PoshQCTest`.
 - [ ] AC-5: `scripts/dev-tools/run-actionlint.ps1` reports no findings for `.github/workflows/_poshqc.yml`.
 - [ ] AC-6: The CI check `poshqc / PowerShell hook suites (Linux)` completes with conclusion `success` on the feature branch head, with no failed Pester tests; the run ID is recorded in `<FEATURE>/evidence/qa-gates/`. Verified by `gh run view <run-id>`.
 - [ ] AC-7: The CI check `poshqc / PowerShell QC` completes with conclusion `success` on the same branch head, showing the modified Codex hook tests still pass on Windows. Verified by `gh run view <run-id>`.
