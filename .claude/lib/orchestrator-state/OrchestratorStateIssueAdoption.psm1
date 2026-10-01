@@ -16,7 +16,7 @@
       - Errors accumulate in the fixed rule order of the feature specification.
       - Fail-closed: WaivedTools is empty whenever Errors is non-empty.
       - Every string comparison is ordinal and case-sensitive.
-      - Messages interpolate only validated tool names and the route id.
+      - Messages interpolate only non-blank `waived_tools` entries and the route id.
 
     Every function is pure: it reads no file, starts no process, and never mutates
     its input.

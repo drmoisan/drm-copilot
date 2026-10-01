@@ -21,7 +21,7 @@ Invariants / Constraints:
     - Errors accumulate in the fixed rule order of the feature specification.
     - Fail-closed: ``waived_tools`` is empty whenever ``errors`` is non-empty.
     - Every comparison is ordinal and case-sensitive.
-    - Messages interpolate only validated tool names and the route id.
+    - Messages interpolate only non-blank ``waived_tools`` entries and the route id.
 
 Side Effects:
     None. The module performs no I/O and does not mutate its inputs.
