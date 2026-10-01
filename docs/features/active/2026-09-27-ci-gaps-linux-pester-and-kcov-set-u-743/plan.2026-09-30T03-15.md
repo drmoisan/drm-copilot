@@ -888,7 +888,7 @@ check '**Do not assert a fixed-string search literal that contains a backslash.*
 
 No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is complete.
 
-- [ ] [P1-T1] Create `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` with the Write tool, content
+- [x] [P1-T1] Create `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` with the Write tool, content
   exactly as reference block R1. Acceptance: the file exists and its first line is
   `Set-StrictMode -Version Latest`.
 - [ ] [P1-T2] [expect-fail] Fail-before run of `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` into
@@ -899,16 +899,16 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
   the only `[+]` line names `keeps the poshqc job on windows-latest running Invoke-PoshQCTest`; the
   six `[-]` lines name the other six `It` blocks of R1. A failure of the `keeps the poshqc job` test,
   or a discovery or parse error, fails this task.
-- [ ] [P1-T3] Create `tests/fixtures/shell_qc/kcov_trace/nounset_lib.sh` with the Write tool, content
+- [x] [P1-T3] Create `tests/fixtures/shell_qc/kcov_trace/nounset_lib.sh` with the Write tool, content
   exactly as reference block R2. Acceptance: the file exists; no other file exists under
   `tests/fixtures/shell_qc/kcov_trace/`.
-- [ ] [P1-T4] Create `tests/fixtures/shell_qc/stub-bin/bats-nounset-source` with the Write tool,
+- [x] [P1-T4] Create `tests/fixtures/shell_qc/stub-bin/bats-nounset-source` with the Write tool,
   content exactly as reference block R3. Acceptance: the file exists and its first line is
   `#!/usr/bin/env bash`.
-- [ ] [P1-T5] Create `tests/fixtures/shell_qc/stub-bin/bats-nounset-source-reset` with the Write tool,
+- [x] [P1-T5] Create `tests/fixtures/shell_qc/stub-bin/bats-nounset-source-reset` with the Write tool,
   content exactly as reference block R4. Acceptance: the file exists and its first line is
   `#!/usr/bin/env bash`.
-- [ ] [P1-T6] Verify the three new fixture files in `tests/fixtures/shell_qc/` into
+- [x] [P1-T6] Verify the three new fixture files in `tests/fixtures/shell_qc/` into
   `<FEATURE>/evidence/regression-testing/fixture-check.<ts>.md`: for each of
   `tests/fixtures/shell_qc/kcov_trace/nounset_lib.sh`, `tests/fixtures/shell_qc/stub-bin/bats-nounset-source`,
   and `tests/fixtures/shell_qc/stub-bin/bats-nounset-source-reset`, run
@@ -917,7 +917,7 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
   return); each `git check-attr` prints `text: auto` and `eol: lf` (the repository rule
   `* text=auto eol=lf` covers the paths, so `.gitattributes` is not edited); each `sh -n` exits 0
   with no output.
-- [ ] [P1-T7] Update `tests/shell/test_shell_qc_commands.bats` by appending the three tests of
+- [x] [P1-T7] Update `tests/shell/test_shell_qc_commands.bats` by appending the three tests of
   reference block R5 after the test `an unknown test flag exits 2`. Verify with
   `git diff --numstat <MERGE_BASE> -- tests/shell/test_shell_qc_commands.bats` and
   `grep -n -F '@test "' tests/shell/test_shell_qc_commands.bats`. Acceptance: the numstat
@@ -926,7 +926,7 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
   `test passes when a bats child resets nounset after sourcing`, and
   `kcov_trace_env.sh sets the kcov PS4 format`; the file header, `setup()`, `teardown()`, and every
   existing test are byte-unchanged.
-- [ ] [P1-T8] [expect-fail] Fail-before run of `tests/shell/test_shell_qc_commands.bats` into
+- [x] [P1-T8] [expect-fail] Fail-before run of `tests/shell/test_shell_qc_commands.bats` into
   `<FEATURE>/evidence/regression-testing/fail-before-bats.<ts>.md` with `ExpectedExitCode: 1`: with
   `scripts/bash/shell_qc_lib.sh` still unmodified and `scripts/bash/kcov_trace_env.sh` still absent,
   run `npx --yes bats --print-output-on-failure tests/shell/test_shell_qc_commands.bats`.
