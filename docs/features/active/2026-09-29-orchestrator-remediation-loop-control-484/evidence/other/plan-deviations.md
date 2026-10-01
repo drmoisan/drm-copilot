@@ -49,3 +49,10 @@ Each entry records the task ID, what the plan expected, and what was observed.
 - Task ID: P6-T30.
 - Expected: one pathspec commit naming the fifteen documents, their fifteen bundle copies, the twelve `feature-reviewer*.toml` files, and `tests/scripts/dev_tools/test_orchestrator_state_remediation_docs.py`.
 - Observed: the caller's execution contract requires a commit and push at every batch boundary, so the B10 test file was committed with the P6-T1 to P6-T3 evidence in 8d56c122. The P6-T30 pathspec commit still names the test file; it carries no further change in that commit. The P6-T30 acceptance (`git status --porcelain -- .agents .claude .codex extensions/drm-copilot/resources tests` prints nothing after the commit) is unaffected. This is the same pattern as D2.
+
+## D8 — Phase 7 checks include the TypeScript split module (follows D4)
+
+- Task IDs: P7-T12 (change-set classification), P7-T14 (final line counts).
+- Expected: P7-T12 permits "`extensions/drm-copilot/src/lib/validate/orchestrator-state-remediation.ts` (and the P4-T4 split file)"; P7-T14 measures "every production and test file created or edited (the P7-T12 set excluding documents, fixtures, and `.toml` files)". Neither task names `orchestrator-state-remediation-accounting.ts` literally.
+- Observed: the P4-T4 split branch applied (D4), so `extensions/drm-copilot/src/lib/validate/orchestrator-state-remediation-accounting.ts` exists (`A` in the P7-T12 listing, 221 lines).
+- Adjustment applied: P7-T12 classifies the file under the "P4-T4 split file" allowance (`evidence/other/scope-change-set.md`), and P7-T14 measures it as a created production file (`evidence/other/line-counts-final.md`, 221 lines, at or below 500). P7-T13's file list names test files only and needs no adjustment; P7-T9 and P7-T10 enumerate excluded files and need none. P7-T14 also excludes `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` as JSON configuration, not production or test code. No plan text is edited.
