@@ -1,0 +1,16 @@
+docs(509): document the issue_adoption record across runtime surfaces
+
+Add the Issue-Adoption Scope and Backward Compatibility and the
+Invariants (issue_adoption object) sections plus an Enforcement bullet
+to .claude/rules/orchestrator-state.md (operator-approved edit). Qualify
+the receipt requirement and describe the pre-existing-issue path in the
+Claude orchestrate and feature-promotion-lifecycle skills, the three
+.agents skills, and .codex/agents/orchestrator.toml, and regenerate the
+five orchestrator variants. Copy every source to its bundled mirror.
+
+Mirror, bundle, and variant parity tests pass (75 passed). Include
+Phase 7 evidence, plan check-offs, and the AC-17 check-off.
+
+Refs #509
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
