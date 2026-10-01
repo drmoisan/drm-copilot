@@ -157,6 +157,13 @@ Blocked-reason enum:
   - `commit_context_missing`
   - `no_staged_changes`
   - `pre_implementation_gate_violation`
+  - `premise_falsified` — Every delegation and validator succeeded, but evidence gathered during execution falsified the premise on which the plan was built, so continuing would implement an invalid plan.
+  - `external_dependency` — The run cannot proceed because a system, service, runtime, or artifact outside the repository's control is unavailable or mismatched, and no in-repository remediation can resolve it.
+  - `policy_hold` — The run is stopped because proceeding requires a policy decision, exception, or authorization that the orchestrator is not permitted to grant autonomously.
+  - `awaiting_ci` — The run is waiting for a CI result that has not yet completed, and no remediation is warranted until that result is available.
+  - `human_decision_required` — The run requires a human to choose between alternatives or approve a direction before it can continue.
+
+Blocked-reason partition: `none` (or JSON `null`) means the run is not blocked. The six validator-enforced members `spawn_agent_unavailable`, `delegation_launch_failed`, `delegate_no_receipt`, `delegate_contract_incomplete`, `validator_failed`, and `user_requested_stop` form the mechanical partition. The five members `premise_falsified`, `external_dependency`, `policy_hold`, `awaiting_ci`, and `human_decision_required` form the non-mechanical partition. The full vocabulary is published in `.claude/rules/orchestrator-state.md`.
 
 Pre-implementation violation schema:
 - `pre-implementation-violation` MUST be either `null` or an object with:

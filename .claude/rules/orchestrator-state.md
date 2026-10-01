@@ -56,6 +56,41 @@ These invariants apply only when the checkpoint contains a top-level `human_inte
 
 3. **Exception requires `runbook_path`.** A requirement whose `response == "exception"` must carry a non-empty `runbook_path` string. A missing, non-string, or empty/whitespace-only `runbook_path` on an `exception` requirement is a malformed requirement.
 
+## Blocked-Reason Vocabulary
+
+The checkpoint key `blocked_reason` accepts exactly the twelve members below. The authoritative definition is `scripts/dev_tools/_orchestrator_state_blocked_reason.py`; the TypeScript module `extensions/drm-copilot/src/lib/validate/orchestrator-state-blocked-reason.ts` and the grouped arrays in `.claude/lib/orchestrator-state/OrchestratorState.psm1` mirror it.
+
+| Member | Partition | Definition |
+|---|---|---|
+| `none` | not blocked | The run is not blocked. JSON `null` is equivalent for classification. |
+| `spawn_agent_unavailable` | mechanical | Existing member; meaning unchanged. |
+| `delegation_launch_failed` | mechanical | Existing member; meaning unchanged. |
+| `delegate_no_receipt` | mechanical | Existing member; meaning unchanged. |
+| `delegate_contract_incomplete` | mechanical | Existing member; meaning unchanged. |
+| `validator_failed` | mechanical | Existing member; meaning unchanged. |
+| `user_requested_stop` | mechanical | Existing member; meaning unchanged. |
+| `premise_falsified` | non-mechanical | Every delegation and validator succeeded, but evidence gathered during execution falsified the premise on which the plan was built, so continuing would implement an invalid plan. |
+| `external_dependency` | non-mechanical | The run cannot proceed because a system, service, runtime, or artifact outside the repository's control is unavailable or mismatched, and no in-repository remediation can resolve it. |
+| `policy_hold` | non-mechanical | The run is stopped because proceeding requires a policy decision, exception, or authorization that the orchestrator is not permitted to grant autonomously. |
+| `awaiting_ci` | non-mechanical | The run is waiting for a CI result that has not yet completed, and no remediation is warranted until that result is available. |
+| `human_decision_required` | non-mechanical | The run requires a human to choose between alternatives or approve a direction before it can continue. |
+
+Partition definitions:
+
+- **Not blocked:** `none`, JSON `null`, or key absent at a gate. Plain validation still reports an absent key through the required-key check.
+- **Mechanical:** the orchestration process itself did not complete a step: a tool or delegation failed, a delegate returned no or an incomplete receipt, a validator failed, or the operator stopped execution. Membership is defined by the published constant, not by the wording.
+- **Non-mechanical:** every process step could proceed, but the work cannot continue for a reason that no retry or remediation cycle of the process resolves.
+
+The classification is recoverable from `blocked_reason` alone by looking the value up in the published partition (`classify_blocked_reason` in Python, `classifyBlockedReason` in TypeScript).
+
+Enforcement parity: the Python, PowerShell, and TypeScript validators enforce this vocabulary identically, with case-sensitive comparison. A value outside the vocabulary, including a case variant of any member, is rejected with `Checkpoint has invalid blocked_reason: <value>`. Every non-`none` member, including the five non-mechanical members, blocks completion and PR-creation readiness with the existing messages.
+
+Relationship to `human_interaction.requirements[].response == "halt"`: a human-decision halt may appear in both places. `blocked_reason: "human_decision_required"` classifies the run's halt, and a `human_interaction.requirements[]` entry with `response: "halt"` describes the specific requirement. There is no cross-field rule between them: either may appear without the other, and neither is validated against the other.
+
+Producer guidance for `premise_falsified`: set it when every delegation and validator succeeded but evidence gathered during execution falsified the plan's premise. The evidence path is still recorded in free-form checkpoint keys; `blocked_reason` carries the classification only.
+
+Extension point for #484: #484 consumes `external_dependency`, `policy_hold`, `awaiting_ci`, and `human_decision_required` without renaming, removing, or re-partitioning them; any further halt class is a separate contract change that appends the literal to the non-mechanical partition in all three runtimes, updates the partition oracle and corpus, and updates this section.
+
 ## Complexity-Assessment Scope and Backward Compatibility
 
 These invariants apply only when the checkpoint contains a top-level `complexity_assessments` array. A checkpoint with no `complexity_assessments` key (the existing checkpoint shape) is unaffected: it validates exactly as before and produces no new errors. The invariants are additive and support the two-axis model-selection mechanism documented in `.claude/skills/orchestrate/SKILL.md` (`## Model Selection`). Enforcement is the Python validator, not an imported schema.

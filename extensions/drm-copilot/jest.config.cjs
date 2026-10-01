@@ -74,6 +74,10 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/lib/validate/orchestrator-state-blocked-reason.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #509: the issue-adoption resolver and the routing validator that
     // consumes it. Per-file entries only; the map has no `global` key.
     "./src/lib/validate/orchestrator-state-issue-adoption.ts": {
