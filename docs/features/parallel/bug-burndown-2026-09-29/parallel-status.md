@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-01T11:11:28Z
+- `last_updated`: 2026-10-01T11:12:35Z
 
 **Items**
 
@@ -34,7 +34,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 645 | docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645 | 3 | scheduled | not_started |  |  |  |  |  |
 | 647 | docs/features/active/2026-09-07-test-tree-typecheck-not-gated-647 | 1 | scheduled | not_started |  |  |  |  |  |
 | 658 | docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658 | 3 | scheduled | not_started |  |  |  |  |  |
-| 659 | docs/features/active/2026-09-08-epic-wave-barrier-violations-lack-start-guard-659 | 0 | in_flight | ci_green | https://github.com/drmoisan/drm-copilot/pull/807 |  | 2026-09-30T13:24:40Z |  |  |
+| 659 | docs/features/active/2026-09-08-epic-wave-barrier-violations-lack-start-guard-659 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/807 | 41217012d31d35c2ee33a50be50684affd2f5f43 | 2026-09-30T13:24:40Z | 2026-10-01T11:12:35Z |  |
 | 723 | docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723 | 0 | in_flight | worktree_created |  |  | 2026-09-30T13:34:37Z |  |  |
 | 734 | docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734 | 1 | scheduled | not_started |  |  |  |  |  |
 | 739 | docs/features/active/2026-09-27-npm-token-guard-gaps-739 | 1 | scheduled | not_started |  |  |  |  |  |
