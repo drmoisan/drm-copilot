@@ -208,7 +208,7 @@ describe("validateEpicOrchestratorStateText", () => {
     expect(
       errors.some((e) =>
         e.includes(
-          "EPIC_WAVE_BARRIER_VIOLATION: 2026-07-02-child-b-301 started before dependency 2026-07-02-child-a-300 merged",
+          "EPIC_WAVE_BARRIER_VIOLATION: 2026-07-02-child-b-301 is treated as started while dependency 2026-07-02-child-a-300 is not merged",
         ),
       ),
     ).toBe(true);
