@@ -99,6 +99,16 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #484: gate the remediation-loop validator (R5-R11 accounting).
+    "./src/lib/validate/orchestrator-state-remediation.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #484: gate the review-outcome module split from the validator above.
+    "./src/lib/validate/orchestrator-state-remediation-accounting.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/validate-orchestration-service-call.ts": {
       lines: 85,
       branches: 75,
