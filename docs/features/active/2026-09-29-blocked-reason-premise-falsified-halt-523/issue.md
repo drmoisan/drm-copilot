@@ -62,10 +62,10 @@ The enum is defined in three runtimes: `VALID_BLOCKED_REASONS` in `scripts/dev_t
 
 ## Acceptance Criteria
 
-- [ ] `blocked_reason` can express a halt where all delegations and validators succeeded but the premise was falsified (for example a `premise_falsified` member, or an orthogonal `blocked_class` field).
-- [ ] The validator accepts the new value and continues to reject values outside the enum.
-- [ ] The distinction between "not blocked" and "blocked for a non-mechanical reason" is recoverable from the structured fields alone, without reading free-form text.
-- [ ] Existing checkpoints that omit the field, or set it to an existing member, validate byte-identically.
+- [x] `blocked_reason` can express a halt where all delegations and validators succeeded but the premise was falsified (for example a `premise_falsified` member, or an orthogonal `blocked_class` field).
+- [x] The validator accepts the new value and continues to reject values outside the enum.
+- [x] The distinction between "not blocked" and "blocked for a non-mechanical reason" is recoverable from the structured fields alone, without reading free-form text.
+- [x] Existing checkpoints that omit the field, or set it to an existing member, validate byte-identically.
 
 ## Next Step
 

@@ -7,6 +7,7 @@ from typing import Any, cast
 
 from scripts.dev_tools import _orchestrator_state_codex_topology as codex_topology
 from scripts.dev_tools import orchestration_handoff_contract as handoff
+from scripts.dev_tools._orchestrator_state_blocked_reason import VALID_BLOCKED_REASONS
 from scripts.dev_tools._orchestrator_state_codex_model_routing import (
     CODEX_MODEL_ROUTING_RECEIPTS_KEY,
     validate_codex_model_routing_gate,
@@ -83,15 +84,6 @@ VALID_STEP_STATUS = {
     "not_started",
     "in_progress",
     "completed",
-}
-VALID_BLOCKED_REASONS = {
-    "none",
-    "spawn_agent_unavailable",
-    "delegation_launch_failed",
-    "delegate_no_receipt",
-    "delegate_contract_incomplete",
-    "validator_failed",
-    "user_requested_stop",
 }
 REQUIRED_RECEIPT_KEYS = (
     "step",
@@ -345,7 +337,10 @@ def validate_orchestrator_state_text(
     )
 
     blocked_reason = state_map.get("blocked_reason")
-    if blocked_reason is not None and blocked_reason not in VALID_BLOCKED_REASONS:
+    if blocked_reason is not None and (
+        not isinstance(blocked_reason, str)
+        or blocked_reason not in VALID_BLOCKED_REASONS
+    ):
         errors.append(f"Checkpoint has invalid blocked_reason: {blocked_reason}")
 
     receipts = state_map.get("delegation_receipts")
