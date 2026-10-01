@@ -120,9 +120,12 @@ $variantCase = @(
 
 BeforeAll {
     $moduleDirectory = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/orchestrator-state").Path
-    Import-Module (Join-Path -Path $moduleDirectory -ChildPath 'OrchestratorStateRemediationAccounting.psm1') -Force
     Import-Module (Join-Path -Path $moduleDirectory -ChildPath 'OrchestratorStateUnconditional.psm1') -Force
     Import-Module (Join-Path -Path $moduleDirectory -ChildPath 'OrchestratorState.psm1') -Force
+    # Imported last: OrchestratorStateReceipts.psm1 (reached through the
+    # unconditional module) re-imports this module with -Force, which would
+    # remove a global import made before it.
+    Import-Module (Join-Path -Path $moduleDirectory -ChildPath 'OrchestratorStateRemediationAccounting.psm1') -Force
     $script:CorpusDirectory = (Resolve-Path "$PSScriptRoot/../../../../tests/fixtures/orchestrator_state_remediation_loop").Path
 
     # Call the entry point with the loop object and its cycle list (or $null
