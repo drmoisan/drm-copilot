@@ -1141,18 +1141,18 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
 
 ### Phase 6 — Planner Guidance in `atomic-plan-contract`
 
-- [ ] [P6-T1] Update `.claude/skills/atomic-plan-contract/SKILL.md` by inserting the two bullets of
+- [x] [P6-T1] Update `.claude/skills/atomic-plan-contract/SKILL.md` by inserting the two bullets of
   reference block R11 immediately after the bullet that begins
   `- **Check that the task-ordering does not make the condition unsatisfiable.**`. Acceptance: the
   two new lines are the last two bullets of the "Wrap-Tolerant Assertion Authoring (Mandatory)"
   section; no other line of the file changes (`git diff --numstat <MERGE_BASE> -- .claude/skills/atomic-plan-contract/SKILL.md`
   prints `2	0`).
-- [ ] [P6-T2] Update `extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`
+- [x] [P6-T2] Update `extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`
   as a byte copy: run
   `cp .claude/skills/atomic-plan-contract/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`.
   Acceptance: `cmp .claude/skills/atomic-plan-contract/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`
   exits 0 with no output.
-- [ ] [P6-T3] Verify the bullet content and placement in `.claude/skills/atomic-plan-contract/SKILL.md`
+- [x] [P6-T3] Verify the bullet content and placement in `.claude/skills/atomic-plan-contract/SKILL.md`
   into `<FEATURE>/evidence/qa-gates/skill-guidance.<ts>.md`: write SP11 into `<session-scratchpad>`
   and run `sh <session-scratchpad>/skill-bullet-tokens.sh .claude/skills/atomic-plan-contract/SKILL.md`;
   then run
@@ -1160,7 +1160,7 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
   Acceptance: both `BULLET:` lines report `lines=1`; every line begins `TOKEN-PRESENT:` and no
   line begins `TOKEN-MISSING:` (AC-17, AC-18); the `grep -n` output prints four lines, in that
   order, with ascending line numbers, so both bullets lie inside the section.
-- [ ] [P6-T4] Verify skill-mirror byte identity for `extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`
+- [x] [P6-T4] Verify skill-mirror byte identity for `extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`
   (AC-19): run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`
   into `<FEATURE>/evidence/qa-gates/pytest-claude-resource-contracts.<ts>.md`, and
   `sha256sum .claude/skills/atomic-plan-contract/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`
