@@ -712,7 +712,7 @@ new `<RUN_ID>` into new timestamped artifacts. The artifacts of the superseded r
   `git ls-remote origin refs/heads/bug/ci-gaps-linux-pester-and-kcov-set-u-743` with `git rev-parse HEAD`, into
   `<FEATURE>/evidence/other/commit-push-contingency.<ts>.md`; every command exits 0 and the remote head equals `git rev-parse HEAD`.
   Then restart the loop at P3-T1. P3-T1 to P3-T16 and P4-T1 to P4-T10 are repeated, until P4-T10 records `FURTHER-FAILURES: NONE`. When the repeated P4-T10 lists further failures, P4-T11 is applied again into new timestamped artifacts.
-- [ ] [P4-T12] Commit and push the Phase 4 boundary: write `<session-scratchpad>/commit-msg-p4.txt` from reference block R6, then run
+- [x] [P4-T12] Commit and push the Phase 4 boundary: write `<session-scratchpad>/commit-msg-p4.txt` from reference block R6, then run
   `git add --` and `git commit -F <session-scratchpad>/commit-msg-p4.txt --` with the paths
   `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/ docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/remediation-plan.2026-10-01T18-07.md`,
   then `git push origin bug/ci-gaps-linux-pester-and-kcov-set-u-743`, then
@@ -721,7 +721,7 @@ new `<RUN_ID>` into new timestamped artifacts. The artifacts of the superseded r
 
 ### Phase 5 — Inventory Closure, Acceptance Check-off, and Final Scope
 
-- [ ] [P5-T1] Write the closed AC-10 inventory `<FEATURE>/evidence/qa-gates/linux-first-run-failures.<ts>.md` as a new timestamped copy of
+- [x] [P5-T1] Write the closed AC-10 inventory `<FEATURE>/evidence/qa-gates/linux-first-run-failures.<ts>.md` as a new timestamped copy of
   `<FEATURE>/evidence/qa-gates/linux-first-run-failures.2026-10-01T17-57.md`: keep its 21 rows, replace the `Fix` text of rows 1 to 12 with
   the reference block R4 descriptions, add any P4-T11 rows, and set every row's `Final status` to the literal
   `PASSING (remediation P4-T7)`. The literal `REMEDIATION-REQUIRED` also appears in the `Planned disposition` column of rows 1 to 12 and
@@ -732,37 +732,37 @@ new `<RUN_ID>` into new timestamped artifacts. The artifacts of the superseded r
   number of P4-T11 rows), and `grep -c -F -e 'REMEDIATION-REQUIRED' <that file>` prints `0` and exits 1. The first check is recorded in
   `<FEATURE>/evidence/qa-gates/inventory-closed-passing.<ts>.md`. The second is recorded alone, with `ExpectedExitCode: 1`, in
   `<FEATURE>/evidence/qa-gates/inventory-closed-absent.<ts>.md`. Neither command is written into the inventory file.
-- [ ] [P5-T2] Write the coverage comparison `<FEATURE>/evidence/qa-gates/coverage-comparison.<ts>.md`: PowerShell baseline `B_PS` (P0-T5)
+- [x] [P5-T2] Write the coverage comparison `<FEATURE>/evidence/qa-gates/coverage-comparison.<ts>.md`: PowerShell baseline `B_PS` (P0-T5)
   and post-change (P4-T9) `covered`, `missed`, and `percent`, plus a statement that the changed files (the five files of P0-T8 plus every file listed in the P4-T11 artifacts) are tests and no production
   PowerShell file changed. Acceptance: every value is numeric; the post-change percent is at least 85.00 and at least `B_PS`; a missing
   value makes the outcome remediation-required.
-- [ ] [P5-T3] Record the operator-run item into `<FEATURE>/evidence/other/operator-run-items.<ts>.md`: the exact command
+- [x] [P5-T3] Record the operator-run item into `<FEATURE>/evidence/other/operator-run-items.<ts>.md`: the exact command
   `pwsh -NoProfile -File scripts/dev-tools/run-actionlint.ps1 .github/workflows/_poshqc.yml` as an operator command that was not run by the
   executor, the expected result (exit 0, no findings), the destination `<FEATURE>/evidence/qa-gates/`, the paths of the supplementary
   direct-actionlint artifacts (`qc-actionlint-direct.<ts>.md` from P3-T8 and `qc-actionlint.2026-10-01T17-23.md`), and the statement that AC-5 and
   AC-21 remain unchecked. Acceptance: the artifact exists and contains the operator command verbatim once
   (`grep -c -F -e 'run-actionlint.ps1 .github/workflows/_poshqc.yml' <that file>` prints `1`). The check is recorded in
   `<FEATURE>/evidence/other/operator-run-items-check.<ts>.md`, not in the operator-run-items file.
-- [ ] [P5-T4] Check off AC-6 in `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/spec.md`, changing only
+- [x] [P5-T4] Check off AC-6 in `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/spec.md`, changing only
   `- [ ] AC-6:` to `- [x] AC-6:`, after P4-T4, P4-T5, and P4-T6 passed. Record the run ID and `<LINUX_JOB_ID>` in
   `<FEATURE>/evidence/qa-gates/ac-6-run-record.<ts>.md` (the spec requires the run ID in `<FEATURE>/evidence/qa-gates/`). Acceptance:
   `grep -c -F -e '- [x] AC-6:' <spec.md path>` prints `1`.
-- [ ] [P5-T5] Check off AC-10 in `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/spec.md`, changing only
+- [x] [P5-T5] Check off AC-10 in `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/spec.md`, changing only
   `- [ ] AC-10:` to `- [x] AC-10:`, after P4-T7, P5-T1, and P3-T11 passed. Acceptance:
   `grep -c -F -e '- [x] AC-10:' <spec.md path>` prints `1`.
-- [ ] [P5-T6] Verify the AC-5 and AC-21 state in `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/spec.md` into
+- [x] [P5-T6] Verify the AC-5 and AC-21 state in `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/spec.md` into
   `<FEATURE>/evidence/qa-gates/spec-ac-state.<ts>.md`: run `grep -c -F -e '- [x] AC-' <spec.md path>` and
   `grep -c -F -e '- [ ] AC-' <spec.md path>`, then `grep -n -F -e '- [ ] AC-5:' -e '- [ ] AC-21:' <spec.md path>`. Acceptance: the counts are
   `20` and `2`, and the third command prints exactly the AC-5 and AC-21 lines. AC-21 is not checked because its actionlint wrapper step is not
   evidenced (operator-run item); AC-5 is not checked for the same reason.
-- [ ] [P5-T7] Write the evidence index `<FEATURE>/evidence/other/ac-evidence-index.<ts>.md`: one line per AC-1 through AC-22 naming its
+- [x] [P5-T7] Write the evidence index `<FEATURE>/evidence/other/ac-evidence-index.<ts>.md`: one line per AC-1 through AC-22 naming its
   satisfying artifact paths and status (`PASS`, `OPERATOR-PENDING`, or `REMEDIATION-REQUIRED`), then the plan outcome line and the
   Acceptance Criteria Status summary of the acceptance-criteria-tracking skill (source, total, checked, remaining, remaining items).
   Expected statuses: AC-5 and AC-21 `OPERATOR-PENDING`; all others `PASS`; outcome `OPERATOR-PENDING` (20 of 22 PASS; the wrapper run
   remains). Acceptance: `grep -c -E '^- AC-[0-9]+:' <that file>` prints `22`, one outcome line exists, and every AC's status agrees with its
   checkbox in `spec.md` (P5-T6). The `Items remaining` entry lists the remaining AC IDs inline on one line (for example
   `Items remaining: AC-5, AC-21`) and does not use lines beginning `- AC-`, so the count of `^- AC-` lines reflects only the 22 index lines.
-- [ ] [P5-T8] Verify the post-CI scope into `<FEATURE>/evidence/other/post-ci-scope.<ts>.md`: run `git diff --name-only <CI_SHA>` (40-character
+- [x] [P5-T8] Verify the post-CI scope into `<FEATURE>/evidence/other/post-ci-scope.<ts>.md`: run `git diff --name-only <CI_SHA>` (40-character
   value) and `git status --porcelain`. Acceptance: every listed path lies under `<FEATURE>/`; the artifact states that `<CI_SHA>` identifies the
   code verified by P4-T4 to P4-T9 and that only feature-folder documents changed after it.
 - [ ] [P5-T9] Commit and push the final state: write `<session-scratchpad>/commit-msg-p5.txt` from reference block R6, then run `git add --`
