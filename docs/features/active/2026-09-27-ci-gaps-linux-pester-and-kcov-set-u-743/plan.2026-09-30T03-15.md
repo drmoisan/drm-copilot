@@ -945,34 +945,34 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
 
 ### Phase 2 — kcov Trace Simulation in `run_test`
 
-- [ ] [P2-T1] Create `scripts/bash/kcov_trace_env.sh` with the Write tool, content exactly as
+- [x] [P2-T1] Create `scripts/bash/kcov_trace_env.sh` with the Write tool, content exactly as
   reference block R6. Acceptance: `grep -c -F 'PS4=' scripts/bash/kcov_trace_env.sh` prints `1` and
   `grep -c -x -F 'set -x' scripts/bash/kcov_trace_env.sh` prints `1`. The exact `PS4` value is
   asserted by the bats test `kcov_trace_env.sh sets the kcov PS4 format` in P2-T6.
-- [ ] [P2-T2] Lint `scripts/bash/kcov_trace_env.sh` into
+- [x] [P2-T2] Lint `scripts/bash/kcov_trace_env.sh` into
   `<FEATURE>/evidence/regression-testing/shellcheck-trace-env-initial.<ts>.md`: run
   `shellcheck -f gcc scripts/bash/kcov_trace_env.sh`. Acceptance: `EXIT_CODE:` and the output are
   recorded verbatim, and the artifact states `SC2016: REPORTED` when any output line contains
   `SC2016`, otherwise `SC2016: NOT REPORTED`. Any finding other than SC2016 fails this task; fix it
   in the file and re-run.
-- [ ] [P2-T3] Update `scripts/bash/kcov_trace_env.sh` with reference block R6b (conditional: only
+- [x] [P2-T3] Update `scripts/bash/kcov_trace_env.sh` with reference block R6b (conditional: only
   when P2-T2 recorded `SC2016: REPORTED`; otherwise record `R6b: NOT APPLIED` in the P2-T2
   artifact and mark this task done). Then run `shellcheck -f gcc scripts/bash/kcov_trace_env.sh`
   into `<FEATURE>/evidence/regression-testing/shellcheck-trace-env-final.<ts>.md`. Acceptance: the
   final run exits 0 with no output.
-- [ ] [P2-T4] Update `scripts/bash/shell_qc_lib.sh` by replacing `run_test` with reference block R7.
+- [x] [P2-T4] Update `scripts/bash/shell_qc_lib.sh` by replacing `run_test` with reference block R7.
   Acceptance: `grep -c -F 'kcov_trace_env.sh' scripts/bash/shell_qc_lib.sh` prints `2` (one comment
   reference, one assignment); `grep -c -F 'BASH_XTRACEFD="$trace_fd"' scripts/bash/shell_qc_lib.sh`
   prints `1`; `git diff -U0 <MERGE_BASE> -- scripts/bash/shell_qc_lib.sh` shows hunks only between
   the lines `run_test() {` and `extract_cobertura_line_rate() {` (so `run_test_coverage` is
   unchanged, AC-12).
-- [ ] [P2-T5] Format, lint, and syntax check `scripts/bash/shell_qc_lib.sh` and
+- [x] [P2-T5] Format, lint, and syntax check `scripts/bash/shell_qc_lib.sh` and
   `scripts/bash/kcov_trace_env.sh` into `<FEATURE>/evidence/regression-testing/bash-static-post-edit.<ts>.md`:
   run `shfmt -d scripts/bash/shell_qc_lib.sh scripts/bash/kcov_trace_env.sh`,
   `shellcheck -f gcc scripts/bash/shell_qc_lib.sh scripts/bash/kcov_trace_env.sh`, and
   `sh -n scripts/bash/shell_qc_lib.sh`, each with its own pair. Acceptance: each exits 0 with no
   output. A shfmt diff is fixed by editing the file to match, not by suppressing it.
-- [ ] [P2-T6] Pass-after run of `tests/shell/test_shell_qc_commands.bats` into
+- [x] [P2-T6] Pass-after run of `tests/shell/test_shell_qc_commands.bats` into
   `<FEATURE>/evidence/regression-testing/pass-after-bats.<ts>.md`: run
   `npx --yes bats --print-output-on-failure tests/shell/test_shell_qc_commands.bats`. Acceptance:
   `EXIT_CODE: 0`; zero `not ok` lines; the lines for the three R5 tests and every P0-T18 baseline
@@ -981,11 +981,11 @@ No file under `tests/`, `scripts/`, or `.github/` is edited before P0-T24 is com
   descriptor did not reach the bats process), record `TRACE-FD-NOT-INHERITED` and continue to
   P2-T7. Any other failure fails this task. CI fallback when npx cannot resolve bats: as in P1-T8,
   with the run expected to conclude `success`.
-- [ ] [P2-T7] Update `scripts/bash/shell_qc_lib.sh` with reference block R7b (conditional: only when
+- [x] [P2-T7] Update `scripts/bash/shell_qc_lib.sh` with reference block R7b (conditional: only when
   P2-T6 recorded `TRACE-FD-NOT-INHERITED`; otherwise record `R7b: NOT APPLIED` in the P2-T6 artifact
   and mark this task done). Then re-run the P2-T5 commands and the P2-T6 command into new
   timestamped artifacts. Acceptance: the P2-T5 and P2-T6 acceptance conditions hold on the re-run.
-- [ ] [P2-T8] Update `scripts/bash/shell_qc_lib.sh` temporarily for a negative control of the
+- [x] [P2-T8] Update `scripts/bash/shell_qc_lib.sh` temporarily for a negative control of the
   trace-discard assertion in `tests/shell/test_shell_qc_commands.bats`, then restore it byte for
   byte, proving `test passes when a bats child resets nounset after sourcing` can fail, recorded in
   `<FEATURE>/evidence/regression-testing/trace-discard-negative-control.<ts>.md` with
