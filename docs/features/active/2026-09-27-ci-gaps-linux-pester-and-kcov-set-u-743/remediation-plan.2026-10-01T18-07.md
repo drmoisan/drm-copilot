@@ -460,7 +460,7 @@ R8. Forbidden-path pattern (AC-20), used verbatim in P0-T10 and P3-T14:
   `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the item worktree and `scan_folders` set to
   `["tests/scripts/claude-hooks"]`. Acceptance: `ok: true` (the P0-T15 baseline for the same folders was also `ok: true`). No count
   or test name is asserted; the per-test result is read from CI in P4-T9.
-- [ ] [P1-T10] Commit and push the Phase 1 boundary: write `<session-scratchpad>/commit-msg-p1.txt` from reference block R6, then
+- [x] [P1-T10] Commit and push the Phase 1 boundary: write `<session-scratchpad>/commit-msg-p1.txt` from reference block R6, then
   run `git add --` and `git commit -F <session-scratchpad>/commit-msg-p1.txt --` with the paths
   `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1 docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/ docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/remediation-plan.2026-10-01T18-07.md`,
   then `git push origin bug/ci-gaps-linux-pester-and-kcov-set-u-743`, then
@@ -470,45 +470,45 @@ R8. Forbidden-path pattern (AC-20), used verbatim in P0-T10 and P3-T14:
 
 ### Phase 2 — Portable Absent Root in the Four Routing Suites (AC-10 rows 9 to 12)
 
-- [ ] [P2-T1] Edit `tests/scripts/claude-hooks/enforce-powershell-batch-budget-routing.Tests.ps1`: apply reference edits R2a and R2b in
+- [x] [P2-T1] Edit `tests/scripts/claude-hooks/enforce-powershell-batch-budget-routing.Tests.ps1`: apply reference edits R2a and R2b in
   the `checkpoint seam` case `the default reader yields direct mode when the checkpoint file is absent`. Acceptance, each
   command run against that file: `grep -c -F -e '$absentRoot = if ($IsWindows)'` prints `1`; `grep -c -F -e '-Root $absentRoot'` prints `1`.
   Record in `<FEATURE>/evidence/regression-testing/p2-t1-claude-powershell-routing.<ts>.md`. The absence check
   `grep -c -F -e "-Root 'C:/synthetic-absent-root'"` on the same file prints `0` (it printed `1` before) and exits 1; it is recorded alone,
   with `ExpectedExitCode: 1`, in `<FEATURE>/evidence/regression-testing/p2-t1-claude-powershell-routing-absent.<ts>.md`.
-- [ ] [P2-T2] Edit `tests/scripts/claude-hooks/enforce-python-batch-budget-routing.Tests.ps1`: apply reference edits R2a and R2b in the
+- [x] [P2-T2] Edit `tests/scripts/claude-hooks/enforce-python-batch-budget-routing.Tests.ps1`: apply reference edits R2a and R2b in the
   same-named case. Acceptance, each command run against that file: `grep -c -F -e '$absentRoot = if ($IsWindows)'` prints `1`;
   `grep -c -F -e '-Root $absentRoot'` prints `1`. Record in
   `<FEATURE>/evidence/regression-testing/p2-t2-claude-python-routing.<ts>.md`. The absence check
   `grep -c -F -e "-Root 'C:/synthetic-absent-root'"` on the same file prints `0` (it printed `1` before) and exits 1; it is recorded alone,
   with `ExpectedExitCode: 1`, in `<FEATURE>/evidence/regression-testing/p2-t2-claude-python-routing-absent.<ts>.md`.
-- [ ] [P2-T3] Edit `tests/scripts/codex-hooks/codex-powershell-batch-budget-routing.Tests.ps1`: apply reference edits R2a and R2b in the
+- [x] [P2-T3] Edit `tests/scripts/codex-hooks/codex-powershell-batch-budget-routing.Tests.ps1`: apply reference edits R2a and R2b in the
   same-named case (the invocation is a single line). Acceptance, each command run against that file:
   `grep -c -F -e '$absentRoot = if ($IsWindows)'` prints `1`; `grep -c -F -e '-Root $absentRoot'` prints `1`.
   Record in `<FEATURE>/evidence/regression-testing/p2-t3-codex-powershell-routing.<ts>.md`. The absence check
   `grep -c -F -e "-Root 'C:/synthetic-absent-root'"` on the same file prints `0` (it printed `1` before) and exits 1; it is recorded alone,
   with `ExpectedExitCode: 1`, in `<FEATURE>/evidence/regression-testing/p2-t3-codex-powershell-routing-absent.<ts>.md`.
-- [ ] [P2-T4] Edit `tests/scripts/codex-hooks/codex-python-batch-budget-routing.Tests.ps1`: apply reference edits R2a and R2b in the
+- [x] [P2-T4] Edit `tests/scripts/codex-hooks/codex-python-batch-budget-routing.Tests.ps1`: apply reference edits R2a and R2b in the
   same-named case (the invocation is a single line). Acceptance, each command run against that file:
   `grep -c -F -e '$absentRoot = if ($IsWindows)'` prints `1`; `grep -c -F -e '-Root $absentRoot'` prints `1`.
   Record in `<FEATURE>/evidence/regression-testing/p2-t4-codex-python-routing.<ts>.md`. The absence check
   `grep -c -F -e "-Root 'C:/synthetic-absent-root'"` on the same file prints `0` (it printed `1` before) and exits 1; it is recorded alone,
   with `ExpectedExitCode: 1`, in `<FEATURE>/evidence/regression-testing/p2-t4-codex-python-routing-absent.<ts>.md`.
-- [ ] [P2-T5] Verify the residual Windows literal in the four routing files into
+- [x] [P2-T5] Verify the residual Windows literal in the four routing files into
   `<FEATURE>/evidence/regression-testing/p2-t5-residual.<ts>.md`: run
   `grep -c -F -e 'C:/synthetic-absent-root' tests/scripts/claude-hooks/enforce-powershell-batch-budget-routing.Tests.ps1 tests/scripts/claude-hooks/enforce-python-batch-budget-routing.Tests.ps1 tests/scripts/codex-hooks/codex-powershell-batch-budget-routing.Tests.ps1 tests/scripts/codex-hooks/codex-python-batch-budget-routing.Tests.ps1`.
   Acceptance: four per-file lines are printed, each ending `:1` (only the Windows branch of the R2a line remains).
-- [ ] [P2-T6] Verify the line counts of the four routing files into `<FEATURE>/evidence/regression-testing/p2-t6-line-counts.<ts>.md`:
+- [x] [P2-T6] Verify the line counts of the four routing files into `<FEATURE>/evidence/regression-testing/p2-t6-line-counts.<ts>.md`:
   run `wc -l` over the four paths of P2-T5. Acceptance: every count is at most 500.
-- [ ] [P2-T7] Run the PowerShell format step for the edited suites into
+- [x] [P2-T7] Run the PowerShell format step for the edited suites into
   `<FEATURE>/evidence/regression-testing/p2-t7-ps-format.<ts>.md`. Pre-pass observation: `git status --porcelain` and `sha256sum` over
   the four routing files. Run the MCP tool `mcp__drm-copilot__run_poshqc_format` (`workspace_root` = item worktree). Post-pass
   observation: re-run both commands. Acceptance: `ok: true`; the post-pass hashes and porcelain listing equal the pre-pass values. A
   changed file is kept, P2-T1 to P2-T6 are re-checked against it, and this task is re-run into a new artifact until the hashes are
   unchanged.
-- [ ] [P2-T8] Run the PowerShell analyze step into `<FEATURE>/evidence/regression-testing/p2-t8-ps-analyze.<ts>.md`: run the MCP
+- [x] [P2-T8] Run the PowerShell analyze step into `<FEATURE>/evidence/regression-testing/p2-t8-ps-analyze.<ts>.md`: run the MCP
   tool `mcp__drm-copilot__run_poshqc_analyze` (`workspace_root` = item worktree). Acceptance: `ok: true`.
-- [ ] [P2-T9] Run the Windows regression smoke for both hook folders into
+- [x] [P2-T9] Run the Windows regression smoke for both hook folders into
   `<FEATURE>/evidence/regression-testing/p2-t9-ps-test-hooks.<ts>.md`: run the MCP tool `mcp__drm-copilot__run_poshqc_test` with
   `workspace_root` set to the item worktree and `scan_folders` set to `["tests/scripts/claude-hooks","tests/scripts/codex-hooks"]`.
   Acceptance: `ok: true` (the P0-T15 baseline for the same folders was also `ok: true`). No count or test name is asserted.

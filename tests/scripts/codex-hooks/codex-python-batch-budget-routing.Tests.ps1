@@ -292,10 +292,11 @@ Describe 'Codex enforce-python-batch-budget.ps1 large-path routing' {
 
     Context 'checkpoint seam' {
         It 'the default reader yields direct mode when the checkpoint file is absent' {
+            $absentRoot = if ($IsWindows) { 'C:/synthetic-absent-root' } else { '/synthetic-absent-root' }
             Initialize-CodexRoutingStore -PersistedText $script:ThreeProductionPaths
             $seams = Get-CodexRoutingSeam
 
-            $decision = Invoke-PythonBatchBudgetHook -ToolInputRaw (Get-CodexRoutingToolInput -FilePath 'src/d.py') -SessionId 'routing' -Root 'C:/synthetic-absent-root' @seams
+            $decision = Invoke-PythonBatchBudgetHook -ToolInputRaw (Get-CodexRoutingToolInput -FilePath 'src/d.py') -SessionId 'routing' -Root $absentRoot @seams
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PYTHON_LARGE_PATH_REQUIRED:*'
