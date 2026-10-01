@@ -765,7 +765,7 @@ new `<RUN_ID>` into new timestamped artifacts. The artifacts of the superseded r
 - [x] [P5-T8] Verify the post-CI scope into `<FEATURE>/evidence/other/post-ci-scope.<ts>.md`: run `git diff --name-only <CI_SHA>` (40-character
   value) and `git status --porcelain`. Acceptance: every listed path lies under `<FEATURE>/`; the artifact states that `<CI_SHA>` identifies the
   code verified by P4-T4 to P4-T9 and that only feature-folder documents changed after it.
-- [ ] [P5-T9] Commit and push the final state: write `<session-scratchpad>/commit-msg-p5.txt` from reference block R6, then run `git add --`
+- [x] [P5-T9] Commit and push the final state: write `<session-scratchpad>/commit-msg-p5.txt` from reference block R6, then run `git add --`
   and `git commit -F <session-scratchpad>/commit-msg-p5.txt --` with the paths
   `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/spec.md docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/ docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/remediation-plan.2026-10-01T18-07.md`,
   then `git push origin bug/ci-gaps-linux-pester-and-kcov-set-u-743`, then
