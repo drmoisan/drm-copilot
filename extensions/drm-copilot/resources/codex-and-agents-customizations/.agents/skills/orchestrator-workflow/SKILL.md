@@ -236,6 +236,8 @@ Do not advance on summaries alone when an exact result signal is required.
 - feature review result:
   - `REVIEW_STATUS: PASS`
   - `REVIEW_STATUS: REMEDIATION_REQUIRED`
+  - `REVIEW_STATUS: HALT_NON_REMEDIABLE`
+  - `REVIEW_STATUS: AWAITING_CI`
   - `FEATURE_FOLDER: <path>`
   - `POLICY_AUDIT: <path>`
   - `CODE_REVIEW: <path>`
@@ -390,18 +392,23 @@ Required behavior:
 
 Apply this loop after any required review returns `REVIEW_STATUS: REMEDIATION_REQUIRED`.
 
+Attempt accounting: `remediation-pass` equals `remediation_loop.completed_attempts`, the number of cycles whose `candidate_applied` is `true`. A cycle records `candidate_applied: true` only when remediation execution completed and the remediation commit recorded a non-empty change set. The active cycle number is `completed_attempts + 1`, and a cycle without a candidate consumes no number. Cap: halt after three completed attempts, that is, when `completed_attempts` equals 3 and the latest review is not `REVIEW_STATUS: PASS`, with `step6_status: "blocked_remediation_loop_limit"`.
+
+Halt and wait branches: a review that returns `REVIEW_STATUS: HALT_NON_REMEDIABLE` or `REVIEW_STATUS: AWAITING_CI` never enters or continues this loop and opens no cycle. On `HALT_NON_REMEDIABLE`, set `blocked_reason` to the highest-precedence halt class present (`human_decision_required`, then `policy_hold`, then `external_dependency`), append one `human_interaction.requirements[]` entry with `response: "halt"` per halt class present, and stop. On `AWAITING_CI`, set `blocked_reason: "awaiting_ci"`, set `next_step` to the step that re-checks, persist, and stop; on resume, set `blocked_reason: "none"` and re-run that step.
+
 1. Persist `review-status`, `remediation-inputs-path`, `remediation-plan-path`, and `remediation-pass` in the checkpoint.
 2. Delegate `atomic-executor` in validation-only mode against the exact `remediation-plan-path`.
 3. If the executor returns `PREFLIGHT: REVISIONS REQUIRED`, delegate `atomic-planner` to update the same `remediation-plan-path` in place and then repeat preflight clearance.
 4. Only after `PREFLIGHT: ALL CLEAR`, delegate `atomic-executor` to execute the remediation plan exactly as written.
 5. Stage all files with `git add -A`.
 6. If staging is empty after execution, set `blocked_reason` to `no_staged_changes` and stop.
+   - Record `candidate_applied: false` for that cycle; it consumes no attempt number.
 7. Use `repo-automation-adapter` to run MCP tool `collect_commit_context`, capture the returned on-disk artifact path as `commit-context-path`, and stop with `blocked_reason: commit_context_missing` if that path is unavailable.
 8. Delegate `commit-steward` using `commit-context-path` as the authoritative staged-change input.
 9. Commit the staged work with the exact message returned by `commit-steward`.
 10. Use `repo-automation-adapter` to refresh PR-context artifacts through MCP tool `collect_pr_context` with the resolved base branch.
 11. Delegate `feature-reviewer` again with the refreshed PR context.
-12. If the new review still returns `REVIEW_STATUS: REMEDIATION_REQUIRED`, increment `remediation-pass` and repeat the loop. Exit only when the latest review returns `REVIEW_STATUS: PASS`.
+12. Record `candidate_applied: true` for the cycle and set `remediation_loop.completed_attempts` and `remediation-pass` to the new count. If the new review still returns `REVIEW_STATUS: REMEDIATION_REQUIRED`, repeat the loop under the cap. Exit only when the latest review returns `REVIEW_STATUS: PASS`, or follow the halt or wait branch.
 
 ## Completion Gates
 

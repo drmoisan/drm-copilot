@@ -104,6 +104,8 @@
             # measured here so the new production modules are not excluded from coverage.
             '.claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateReceipts.psm1'
+            # Issue #484 added the remediation-loop R5-R11 accounting module.
+            '.claude/lib/orchestrator-state/OrchestratorStateRemediationAccounting.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateModelReceipts.psm1'
             # Issue #475 added the portable Codex routing resolvers so the U6.X and U6.T
             # checkpoint checks resolve deployments and topologies without a Python
