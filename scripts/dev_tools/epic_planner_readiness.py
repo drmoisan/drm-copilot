@@ -284,9 +284,17 @@ def _validate_kickoff_against_state(
 
 
 def validate_epic_readiness_integrity(
-    state: dict[str, Any], state_text: str, context: EpicReadinessContext
+    state: dict[str, Any],
+    state_text: str,
+    context: EpicReadinessContext,
+    *,
+    require_launch_paths: bool = False,
 ) -> list[str]:
-    """Run repository, kickoff, artifact, and Git readiness checks."""
+    """Run repository, kickoff, artifact, and Git readiness checks.
+
+    ``require_launch_paths`` is forwarded to the launch-evidence check, where a
+    true value skips features that carry neither launch path key.
+    """
 
     errors = _validate_artifact_source(state_text, context)
     slug = state.get("epic_feature_folder")
@@ -351,7 +359,11 @@ def validate_epic_readiness_integrity(
             errors.extend(feature_errors)
             if plan is not None:
                 plans.append(plan)
-    errors.extend(validate_epic_planner_launch_evidence(state, context))
+    errors.extend(
+        validate_epic_planner_launch_evidence(
+            state, context, require_launch_paths=require_launch_paths
+        )
+    )
     if parsed is not None:
         branch = cast("str", state.get("integration_branch"))
         errors.extend(

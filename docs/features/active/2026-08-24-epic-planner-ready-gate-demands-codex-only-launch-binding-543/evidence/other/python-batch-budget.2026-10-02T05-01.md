@@ -25,3 +25,15 @@ Resets scheduled: 1 (P2-T4)
 State at planning of this run: `.claude/state/` does not exist in this worktree (`ls` reported no such directory).
 
 ## Reset log
+
+### Reset 1 (P2-T4)
+
+Timestamp: 2026-10-02T05-30
+Command: `ls .claude/state/python-batch-budget.*.json` (worktree root), then `rm` of each listed file; recount with the same `ls` (D3 substitute for `Get-ChildItem ... | Remove-Item` and the `.Count` recount)
+Route: native (D3)
+EXIT_CODE: 2 (ls: no such file or directory)
+
+- Files listed before deletion: none. `.claude/state/` does not exist in this worktree, so no production or test file was recorded in any state file here.
+- Deleted files: none (nothing to delete).
+- Recount immediately after the step: 0 files.
+- Observation: the hook's synopsis exempts the orchestrated large path from counting. `artifacts/orchestration/orchestrator-state.json` in this worktree carries `route_id: "large"` and `next_step: "S5_atomic_execution"` (non-terminal), so the three batch-1 production edits (P2-T1 to P2-T3) were not counted and no state file was written. A session-keyed state file exists in the coordinator checkout (outside this worktree); it lists `prodFiles: []` and was not touched, because this run operates only inside its own worktree.

@@ -281,8 +281,15 @@ def validate_epic_planner_state_text(
     *,
     require_ready_for_execution: bool = False,
     readiness_context: EpicReadinessContext | None = None,
+    require_codex_model_routing: bool = False,
+    require_codex_topology: bool = False,
 ) -> list[str]:
-    """Validate planner checkpoint structure and optional execution readiness."""
+    """Validate planner checkpoint structure and optional execution readiness.
+
+    ``require_codex_model_routing`` and ``require_codex_topology`` make launch
+    evidence unconditional under execution readiness. When neither is set, launch
+    evidence is validated only for features that carry a launch path key.
+    """
 
     try:
         value = json.loads(text)
@@ -318,6 +325,8 @@ def validate_epic_planner_state_text(
             f"Non-epic planner checkpoint next_step must be {NON_EPIC_NEXT_STEP!r}."
         )
     if require_ready_for_execution:
+        # Launch evidence is key-gated per feature unless a Codex flag is asserted.
+        key_gated = not (require_codex_model_routing or require_codex_topology)
         if verdict != "epic":
             errors.append(
                 "Execution readiness requires epic_worthiness.verdict 'epic'."
@@ -328,7 +337,11 @@ def validate_epic_planner_state_text(
                 f"{READY_NEXT_STEP!r}."
             )
         errors.extend(_validate_ready_features(features))
-        errors.extend(validate_epic_planner_child_launch_bindings(features))
+        errors.extend(
+            validate_epic_planner_child_launch_bindings(
+                features, require_launch_paths=key_gated
+            )
+        )
         errors.extend(_validate_planner_topology_receipt(state.get("topology_receipt")))
         slug = state.get("epic_feature_folder")
         expected_kickoff = f"artifacts/orchestration/epic-kickoff-{slug}.md"
@@ -343,7 +356,9 @@ def validate_epic_planner_state_text(
             )
         else:
             errors.extend(
-                validate_epic_readiness_integrity(state, text, readiness_context)
+                validate_epic_readiness_integrity(
+                    state, text, readiness_context, require_launch_paths=key_gated
+                )
             )
     return errors
 

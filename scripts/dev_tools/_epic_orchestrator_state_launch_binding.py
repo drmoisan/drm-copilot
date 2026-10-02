@@ -5,7 +5,10 @@ from __future__ import annotations
 import ntpath
 import posixpath
 import re
-from typing import Any, TypeGuard, cast
+from typing import TYPE_CHECKING, Any, TypeGuard, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 _LAUNCH_ARTIFACT_PARTS = (
     "artifacts",
@@ -199,7 +202,7 @@ def _validate_model_receipt(
     return errors
 
 
-def _carries_launch_path(feature: dict[str, Any]) -> bool:
+def feature_carries_launch_path(feature: Mapping[str, object]) -> bool:
     """Return whether the feature records either launch path key."""
 
     return "launch_receipt_path" in feature or "launch_status_path" in feature
@@ -225,7 +228,7 @@ def _validate_launch_bindings(
         feature = cast("dict[str, Any]", item)
         if skip_not_started and feature.get("merge_status") == "not_started":
             continue
-        if require_launch_paths and not _carries_launch_path(feature):
+        if require_launch_paths and not feature_carries_launch_path(feature):
             continue
         prefix = (
             f"Epic planner checkpoint features[{index}] launch binding"
@@ -258,8 +261,14 @@ def _validate_launch_bindings(
 
 def validate_epic_planner_child_launch_bindings(
     features: list[dict[str, Any]],
+    *,
+    require_launch_paths: bool = False,
 ) -> list[str]:
-    """Require durable preparation-child launch evidence for every feature."""
+    """Require durable preparation-child launch evidence for validated features.
+
+    When ``require_launch_paths`` is true, a feature carrying neither launch path
+    key is skipped; otherwise every feature is validated.
+    """
 
     return _validate_launch_bindings(
         cast("list[object]", features),
@@ -267,7 +276,7 @@ def validate_epic_planner_child_launch_bindings(
         expected_execution_context="epic_preparation_child",
         require_generated_orchestrator=True,
         skip_not_started=False,
-        require_launch_paths=False,
+        require_launch_paths=require_launch_paths,
     )
 
 
