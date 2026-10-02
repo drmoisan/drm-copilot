@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 1
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-02T05:13:22Z
+- `last_updated`: 2026-10-02T07:15:04Z
 
 **Items**
 
@@ -36,12 +36,12 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 658 | docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658 | 3 | scheduled | not_started |  |  |  |  |  |
 | 659 | docs/features/active/2026-09-08-epic-wave-barrier-violations-lack-start-guard-659 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/807 | 41217012d31d35c2ee33a50be50684affd2f5f43 | 2026-09-30T13:24:40Z | 2026-10-01T11:12:35Z |  |
 | 723 | docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/813 | 12fd3c2639f17aec3572f90e8d929205059be56d | 2026-09-30T13:34:37Z | 2026-10-02T00:43:34Z |  |
-| 734 | docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734 | 1 | scheduled | not_started |  |  |  |  |  |
+| 734 | docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734 | 1 | in_flight | worktree_created |  |  | 2026-10-02T07:15:04Z |  |  |
 | 739 | docs/features/active/2026-09-27-npm-token-guard-gaps-739 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/814 | dcb605ef9078ccf8bffffff08e4f1344a0c76594 | 2026-10-02T00:44:12Z | 2026-10-02T01:22:30Z |  |
 | 740 | docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740 | 4 | scheduled | not_started |  |  |  |  |  |
 | 741 | docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741 | 2 | scheduled | not_started |  |  |  |  |  |
 | 743 | docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/810 | 1b1e349f1d0fb8b00eb69a809ef380fcc6eb35b9 | 2026-10-01T15:52:55Z | 2026-10-02T03:08:04Z |  |
-| 744 | docs/features/active/2026-09-27-orchestration-completion-gate-and-tooling-friction-744 | 1 | in_flight | worktree_created |  |  | 2026-10-02T05:13:22Z |  |  |
+| 744 | docs/features/active/2026-09-27-orchestration-completion-gate-and-tooling-friction-744 | 1 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/817 |  | 2026-10-02T05:13:22Z |  |  |
 | 756 | docs/features/active/2026-09-28-cleanup-worktrees-631-spec-contradiction-and-untested-error-paths-756 | 3 | scheduled | not_started |  |  |  |  |  |
 | 764 | docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/805 | a2541d6d5a487c8e979447baf596ef38c07029ab | 2026-09-30T13:44:42Z | 2026-09-30T14:06:35Z |  |
 
