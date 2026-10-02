@@ -40,6 +40,9 @@
 # the SHELL_QC_<TOOL>_BIN seams substitute a checked-in stand-in for a real dependency.
 # An empty value is treated as missing and falls back to `.git`.
 set -euo pipefail
+# shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh
+# shellcheck disable=SC1091
+source "$(dirname -- "${BASH_SOURCE[0]}")/cleanup_worktrees_enumerate_lib.sh"
 
 scan_helper_dir_size() {
 	# Echo the best-effort human-readable size of a directory, or `unknown`.
@@ -68,20 +71,6 @@ scan_helper_gitfile_name() {
 		return 0
 	fi
 	printf '%s\n' ".git"
-}
-
-scan_helper_is_absolute_path() {
-	# Return 0 when <path> is absolute, else 1. Pure: no filesystem access.
-	#
-	# Absolute forms are a leading `/` (POSIX paths, MSYS `/c/...` paths, and `//server`
-	# UNC paths) and a drive letter followed by `/` or `\` (`C:/...`, `c:/...`,
-	# `C:\...`), which is the form Git for Windows writes into a worktree's `.git`
-	# pointer file (issue #706). A drive letter with no separator (`C:rel`) is
-	# drive-relative and is not absolute; an empty path is not absolute.
-	#
-	# Args: $1 = path. Returns 0 (absolute) or 1 (not absolute).
-	local path=${1:-}
-	[[ $path == /* || $path == [A-Za-z]:[/\\]* ]]
 }
 
 scan_helper_target_present() {
@@ -113,7 +102,7 @@ scan_helper_gitdir_target_exists() {
 		printf '0\n'
 		return 0
 	fi
-	if ! scan_helper_is_absolute_path "$target"; then
+	if ! cleanup_wt_is_absolute_path "$target"; then
 		target="$dir/$target"
 	fi
 	if scan_helper_target_present "$target"; then
