@@ -292,6 +292,8 @@ S9 procedure:
 5. Write the `ci_gate` object and `last_verified_ci_sha` to the checkpoint, and set `step9_status` to `passed` only when `ci_gate.conclusion == "success"` AND `ci_gate.head_sha` equals the current PR head SHA.
 6. If the checkpoint's `epic_mode` is `true`, execute `gh pr merge --merge <PR>` merging the feature branch into `epic_context.integration_branch` (already the PR's base branch per the epic-mode `--base` override applied at S8). On success, record `epic_merge: { merge_commit_sha, target_branch, merged_at }` in the checkpoint. On failure due to merge conflict (non-mergeable PR), do not retry blindly: convert the conflict into a synthetic Blocking finding per "Merge-Conflict Remediation" below and re-enter the standard R1–R5 remediation loop; do not proceed to DONE.
 
+CI-dependent acceptance criteria: when the item has acceptance criteria whose verification requires the result of CI on the PR head, the item's own orchestrator run owns their check-off, and a parent or coordinating session never commits them from its own root. After step 5 records `ci_gate.conclusion == "success"`, check off each CI-dependent criterion in the item's own worktree, commit, push to the PR branch, and re-run S9 from step 1 against the new head SHA, so that `ci_gate.head_sha` equals the final PR head before DONE. In epic mode this completes before step 6 merges. A failed re-run enters `## Remediation Loop — CI-Failure Handling` below; the shared `remediation_loop.completed_attempts` count and its halt after three completed attempts are unchanged.
+
 DONE is not written while `step9_status` is anything other than `passed`.
 
 ## Checkpoint Schema — CI Gate Fields
@@ -348,6 +350,7 @@ The orchestrator must not create a PR, push a branch for PR purposes, or report 
 
 1. `blocking_findings_resolved: true` — the most recent `feature-review` produced zero blocking findings.
 2. The AC verification artifact (`p14-acceptance-criteria-checkoff.md` or equivalent) confirms all acceptance criteria pass.
+   A CI-dependent acceptance criterion, one whose verification requires the result of CI on the PR head, cannot pass before CI exists: condition 2 is satisfied when every other criterion passes and each CI-dependent criterion is listed as pending-CI in the AC verification artifact. Pending-CI criteria are checked off under S9 before DONE. This clarifies condition 2 and adds no condition.
 3. The mandatory toolchain passed in its most recent run on the branch (no linting/type-check/test failures).
 4. The checkpoint `next_step` is `S8_create_pr` (precondition to entering S9).
 5. PR body produced via the pr-author handoff: `artifacts/pr_body_<N>.md` exists with a matching `artifacts/pr_body_<N>.receipt.json`, created with `--body-file`.
