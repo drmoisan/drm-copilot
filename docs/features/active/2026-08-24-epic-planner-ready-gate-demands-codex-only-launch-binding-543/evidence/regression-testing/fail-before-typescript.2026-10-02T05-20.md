@@ -1,6 +1,7 @@
 # Fail-before: TypeScript regression test (issue #543)
 
-Timestamp: 2026-10-02T05-20
+Timestamp: 2026-10-02T05-16
+Timestamp-Correction: original value 2026-10-02T05-20 was composed on a fixed schedule rather than read from the host clock; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T05-58.md), an upper bound on the command run time.
 Task: P1-T4 [expect-fail]
 Command: `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts -t "skips launch binding for a feature without launch paths"` (in `extensions/drm-copilot/`)
 EXIT_CODE: 1

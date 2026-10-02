@@ -1,6 +1,7 @@
 # TypeScript launch-evidence and dispatch suites (issue #543)
 
-Timestamp: 2026-10-02T06-00
+Timestamp: 2026-10-02T05-28
+Timestamp-Correction: original value 2026-10-02T06-00 was composed on a fixed schedule rather than read from the host clock; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T05-58.md), an upper bound on the command run time.
 Task: P5-T10
 Command: `node run-jest.cjs test/lib/validate/epic-planner-launch-evidence.test.ts test/lib/validate/validate-orchestration-service-call.test.ts --verbose` (in `extensions/drm-copilot/`); supplementary title listing: the same command with `--json --outputFile=<scratchpad>/p5t10.json` in place of `--verbose`
 EXIT_CODE: 0

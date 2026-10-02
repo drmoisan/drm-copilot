@@ -1,6 +1,7 @@
 # Final Python contract / schema compatibility (issue #543)
 
-Timestamp: 2026-10-02T06-25
+Timestamp: 2026-10-02T05-39
+Timestamp-Correction: original value 2026-10-02T06-25 was composed on a fixed schedule rather than read from the host clock; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T05-58.md), an upper bound on the command run time.
 Task: P8-T7
 Loop iteration: 1
 Command: `git diff ef80c57df8f8bbc7d2e9ac51586150dfee3cd5fd --stat -- scripts/dev_tools/validate_orchestration_artifacts.py` and `git status --porcelain -- scripts/dev_tools/validate_orchestration_artifacts.py`

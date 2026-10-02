@@ -1,6 +1,7 @@
 # Final Python tests and coverage (issue #543)
 
-Timestamp: 2026-10-02T06-25
+Timestamp: 2026-10-02T05-38
+Timestamp-Correction: original value 2026-10-02T06-25 was composed on a fixed schedule rather than read from the host clock; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T05-58.md), an upper bound on the command run time.
 Task: P8-T5
 Loop iteration: 1
 Command: `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --deselect tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` (worktree root, full suite; same selection as P0-T10)

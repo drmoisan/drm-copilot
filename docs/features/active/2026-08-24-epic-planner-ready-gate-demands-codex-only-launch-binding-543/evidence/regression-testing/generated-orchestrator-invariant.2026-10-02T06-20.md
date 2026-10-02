@@ -1,6 +1,7 @@
 # Generated-orchestrator invariant (issue #543)
 
-Timestamp: 2026-10-02T06-20
+Timestamp: 2026-10-02T05-36
+Timestamp-Correction: original value 2026-10-02T06-20 was composed on a fixed schedule rather than read from the host clock; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T05-58.md), an upper bound on the command run time.
 Task: P7-T3
 Command:
 1. Grep tool, fixed string `require_generated_orchestrator=True` over `scripts/dev_tools/_epic_orchestrator_state_launch_binding.py` (D3 substitute for `Select-String ... -SimpleMatch`)

@@ -1,6 +1,7 @@
 # Scope verification (issue #543)
 
-Timestamp: 2026-10-02T06-50
+Timestamp: 2026-10-02T05-47
+Timestamp-Correction: original value 2026-10-02T06-50 was composed on a fixed schedule rather than read from the host clock; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T05-58.md), an upper bound on the command run time.
 Task: P10-T4
 Command: `git diff ef80c57df8f8bbc7d2e9ac51586150dfee3cd5fd --name-only` and `git status --porcelain` (both from the worktree root)
 Route: native (D2, D3)

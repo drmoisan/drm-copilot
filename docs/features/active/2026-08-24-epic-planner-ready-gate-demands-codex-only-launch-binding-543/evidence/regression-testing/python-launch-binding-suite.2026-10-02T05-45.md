@@ -1,6 +1,7 @@
 # Python launch-binding suite (issue #543)
 
-Timestamp: 2026-10-02T05-45
+Timestamp: 2026-10-02T05-23
+Timestamp-Correction: original value 2026-10-02T05-45 was composed on a fixed schedule rather than read from the host clock; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T05-58.md), an upper bound on the command run time.
 Task: P4-T6
 Command: `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py -v`
 EXIT_CODE: 0

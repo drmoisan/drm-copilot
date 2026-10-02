@@ -1,6 +1,7 @@
 # TypeScript launch-binding suite (issue #543)
 
-Timestamp: 2026-10-02T05-55
+Timestamp: 2026-10-02T05-27
+Timestamp-Correction: original value 2026-10-02T05-55 was composed on a fixed schedule rather than read from the host clock; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T05-58.md), an upper bound on the command run time.
 Task: P5-T6
 Command: `node run-jest.cjs test/lib/validate/epic-planner-state-launch-binding.test.ts --verbose` (in `extensions/drm-copilot/`); supplementary title listing: the same command with `--json --outputFile=<scratchpad>/p5t6.json` in place of `--verbose`, read with a scratchpad reader
 EXIT_CODE: 0

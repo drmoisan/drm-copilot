@@ -1,6 +1,7 @@
 # Coverage delta verification (issue #543)
 
-Timestamp: 2026-10-02T06-45
+Timestamp: 2026-10-02T05-46
+Timestamp-Correction: original value 2026-10-02T06-45 was composed on a fixed schedule rather than read from the host clock; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T05-58.md), an upper bound on the command run time.
 Task: P10-T1
 Command: `git diff -U0 ef80c57df8f8bbc7d2e9ac51586150dfee3cd5fd -- scripts/dev_tools/_epic_orchestrator_state_launch_binding.py scripts/dev_tools/epic_planner_launch_evidence.py scripts/dev_tools/epic_planner_readiness.py scripts/dev_tools/validate_epic_planner_state.py extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-launch-binding.ts extensions/drm-copilot/src/lib/validate/epic-planner-launch-evidence.ts extensions/drm-copilot/src/lib/validate/epic-planner-readiness-integrity.ts extensions/drm-copilot/src/lib/validate/epic-planner-state-core.ts extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts`
 Route: native (D2, D3)

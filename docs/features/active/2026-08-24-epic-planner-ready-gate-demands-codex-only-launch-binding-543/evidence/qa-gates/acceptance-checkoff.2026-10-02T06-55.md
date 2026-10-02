@@ -1,6 +1,7 @@
 # Acceptance criteria check-off (issue #543)
 
-Timestamp: 2026-10-02T06-55
+Timestamp: 2026-10-02T05-48
+Timestamp-Correction: original value 2026-10-02T06-55 was composed on a fixed schedule rather than read from the host clock; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T05-58.md), an upper bound on the command run time.
 Task: P10-T6
 Command: `grep -c '^- \[x\] ' spec.md` and `grep -c '^- \[ \] ' spec.md` (feature-folder `spec.md`; D3 substitute for the two `Select-String ... .Count` commands)
 Route: native (D3) (replaces the plan's `Route: sh-pwsh`)
