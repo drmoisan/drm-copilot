@@ -8,3 +8,5 @@ Output Summary:
 - `<base-sha>` re-derived with `git merge-base HEAD origin/main`: `b080a69ecb60b65d016362b21fffed0a34be9144`.
 - First command: exit 0, empty output (no committed change to any deferred-scope path).
 - Companion command: exit 0, empty output.
+
+Post-QA re-run: 2026-10-02T01-52, after Phases 13 and 14, with `<base-sha>` re-derived as `b080a69ecb60b65d016362b21fffed0a34be9144`. Both commands re-run unchanged: each exited 0 with empty output. Acceptance still met.
