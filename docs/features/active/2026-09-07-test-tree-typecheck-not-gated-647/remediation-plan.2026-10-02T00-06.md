@@ -1,0 +1,156 @@
+# 2026-09-07-test-tree-typecheck-not-gated — Remediation Plan, Cycle 1
+
+- **Issue:** #647
+- **Branch:** `bug/test-tree-typecheck-not-gated-647` (worktree HEAD at planning time `3bf57756`)
+- **Last Updated:** 2026-10-02T00-06
+- **Status:** Draft (awaiting validator run and executor preflight)
+- **Work Mode:** full-bug (`issue.md` marker). Acceptance-criteria source: `FEATURE/spec.md`, section `## Acceptance Criteria`.
+- **Inputs:** `FEATURE/remediation-inputs.2026-10-02T00-06.md` (finding F1), `FEATURE/code-review.2026-10-02T00-06.md` (CR-1), `FEATURE/policy-audit.2026-10-02T00-06.md` (PA-1), `FEATURE/feature-audit.2026-10-02T00-06.md`.
+- **Language scope:** TypeScript (`extensions/drm-copilot`) only. One test file is written. No production file, configuration file, or workflow is written.
+
+Complexity band: C1
+Rationale: one test in one test file regains its explicit-undefined arrangement and one arrange-guard assertion; no production behavior changes.
+
+**Fail-closed evidence rule:** if any Phase 0 baseline, Phase 1 fail-before/pass-after, or Phase 2 final-QC artifact is missing or lacks `Timestamp:`, `Command:`, `EXIT_CODE:`, or `Output Summary:`, the remediation verdict is BLOCKED or INCOMPLETE, never PASS.
+
+---
+
+## 0. Scope
+
+In scope: finding F1 (CR-1 / PA-1, remediability `autonomous`). The test `omits an optional key when its value is explicitly undefined` in `extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts` (lines 82-102 at planning time) is restored so that its input carries all five optional keys as own enumerable properties whose value is `undefined`, with an arrange-guard assertion proving that before the Act step.
+
+Out of scope: finding F2 (CR-2 / PA-2, remediability `awaiting_ci`, spec AC-15). The orchestrator resolves F2 after opening the pull request. This plan contains no pull-request creation task and no CI task. Informational findings CR-3 to CR-9 are out of scope.
+
+## 1. Rules binding on every task
+
+1. **Symbols.** `FEATURE` = `docs/features/active/2026-09-07-test-tree-typecheck-not-gated-647`. `TEST_FILE` = `extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts`. `<ts>` = the execution timestamp in `yyyy-MM-ddTHH-mm` format, fixed once at the start of Phase 0 and reused for every artifact. `SCRATCH` = the executor session scratchpad directory (outside the repository), written with forward slashes. `BASE_SHA` and `P0_HEAD_SHA` = the values [P0-T13] records. The executor substitutes literal values for every symbol before running a command.
+2. **Evidence location and schema.** Every artifact is written under `FEATURE/evidence/<kind>/` with `<kind>` one of `remediation-baseline`, `regression-testing`, `qa-gates`. Every command-step artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. An artifact whose command is expected to exit non-zero also carries `ExpectedExitCode: <n>`. `EXIT_CODE: SKIPPED` is never a passing outcome; no task in this plan authorizes a skip.
+3. **No host data.** No artifact contains an absolute filesystem path, drive-letter host path, user-profile path, or account name. Where a command prints such a value, the artifact replaces the worktree root with `<WORKSPACE_ROOT>` and the scratchpad with `<SCRATCH>`. Raw Jest output is not persisted.
+4. **Command route.** Every command runs in the Bash tool from the worktree root. No command uses `cd`. No command text contains `pwsh`, `bash`, `wsl`, a heredoc, `${PIPESTATUS}`, or any shell variable other than `$?`. Exit codes are captured by appending `; echo "EXIT=$?"` (for `tsc`, `; echo "TSC_EXIT=$?"`). Commands use `node`, `npm`, `git`, `grep`, `xargs`, and `echo`. The exit-code suffix applies to every command whether or not the task text shows it; "exit code N" in an acceptance condition means the printed `EXIT=N` or `TSC_EXIT=N` value.
+5. **D7 capture pattern (Jest and coverage).** A Jest or coverage command is run as `<command> > SCRATCH/<name>.txt 2>&1; echo "EXIT=$?"`. The summary lines are then read with `grep -E '^(Test Suites|Tests):' SCRATCH/<name>.txt` and, for coverage, `grep -E '^ *(Statements|Branches|Functions|Lines) +:' SCRATCH/<name>.txt`. The artifact records the command, the true exit code, and the extracted lines verbatim. `PASSED` and `FAILED` are read from the `Tests:` line (`FAILED` is 0 when the line has no `failed` term).
+6. **Artifact writing route.** Every `.md` artifact is written with the Write tool from captured command output (rule 3 applied).
+7. **Prohibited constructs.** No `any` (`: any`, `as any`, `<any>`, `any[]`), no `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`, or `eslint-disable`, no `as unknown as` cast, no `.skip`/`.only`/`xit`/`xdescribe`/`xtest`, no temporary file in any test. No file under `extensions/drm-copilot/src/` and no `tsconfig*.json`, `jest.config.cjs`, `run-jest.cjs`, `package.json`, ESLint configuration, or workflow file is written. The test title and the five existing `expect("<key>" in result).toBe(false)` assertions are not changed. If a diagnostic appears to require a suppression, the executor stops as BLOCKED and does not add it.
+8. **Write set.** `TEST_FILE`; this plan file (checklist state only); the evidence files each task names. A write-mode formatter run that rewrites any other path stops execution as BLOCKED.
+9. **Line budget.** `TEST_FILE` has at most 500 lines after formatting, measured with `grep -c '' TEST_FILE` (163 at planning time).
+10. **Commit and push per phase.** Each phase ends with a commit-and-push task. Staging uses `git add` with explicit paths only (never `-A`, `.`, or a directory). The commit message is supplied with two `-m` arguments; the second is exactly `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`, so the message ends with that trailer. The push command is `git push origin HEAD`. No rebase and no force push. Checklist state: the executor checks off each task in this plan file after its acceptance condition is met, so the check-off of a commit task modifies this plan file after that commit; that modification is carried by the next phase's commit, and the check-off of [P2-T12] is left for the orchestrator's next commit.
+11. **Permitted dirty paths.** Within Phase 1 and Phase 2, a `git status --porcelain` acceptance condition stated as "lists only permitted dirty paths" is met when every listed path is one of: `FEATURE/remediation-plan.2026-10-02T00-06.md`; a path under `FEATURE/evidence/regression-testing/` or `FEATURE/evidence/qa-gates/` that a task of the current phase names; or `TEST_FILE` (in Phase 2, only after a loop-restart repair).
+12. **Stop conditions.** Any hook denial, any failed acceptance condition that the task text does not say to repair and re-run, or any baseline that deviates from a Phase 0 expectation stated as blocking stops execution as BLOCKED with the reason recorded in that task's artifact. The executor never works around a hook.
+
+## 2. Target end state for the restored test
+
+The restored test body, before Prettier formatting, is the following. Prettier may re-wrap lines; it does not change tokens.
+
+```ts
+  it("omits an optional key when its value is explicitly undefined", () => {
+    // Arrange: all five optional keys are present as own enumerable properties
+    // whose value is explicitly undefined; the builder checks each with `=== undefined`.
+    const optionalKeys = [
+      "requireComplete",
+      "requireModelRouting",
+      "requireCodexModelRouting",
+      "requireCodexTopology",
+      "requireReadyForExecution",
+    ] as const;
+    const input = {
+      workspaceRoot: "C:/workspace",
+      artifactType: "orchestrator-state",
+      artifactPath: "docs/state.json",
+    };
+    for (const key of optionalKeys) {
+      Object.defineProperty(input, key, {
+        value: undefined,
+        enumerable: true,
+        writable: true,
+        configurable: true,
+      });
+    }
+    expect(Object.entries(input)).toEqual(
+      expect.arrayContaining(optionalKeys.map((key) => [key, undefined])),
+    );
+
+    // Act
+    const result = buildValidateOrchestrationServiceCallInput(
+      fileSystemStub,
+      input,
+    );
+
+    // Assert
+    expect("requireComplete" in result).toBe(false);
+    expect("requireModelRouting" in result).toBe(false);
+    expect("requireCodexModelRouting" in result).toBe(false);
+    expect("requireCodexTopology" in result).toBe(false);
+    expect("requireReadyForExecution" in result).toBe(false);
+  });
+```
+
+Design notes:
+
+- `Object.defineProperty` adds the keys at runtime without widening the object literal's inferred type, so the builder call type-checks under `exactOptionalPropertyTypes` with no cast, no `any`, and no suppression. This is the primary remediation the inputs name.
+- The arrange guard `expect(Object.entries(input)).toEqual(expect.arrayContaining(...))` requires each of the five `[key, undefined]` pairs to be present. `Object.entries` lists only own enumerable properties, so the single guard proves both presence and the `undefined` value. Against the prior key-less arrangement, `Object.entries(input)` holds only the three string pairs and the guard fails; [P1-T2] observes that failure.
+- The literal tokens the executor creates are quoted here for the gate: `Object.defineProperty(input, key, {` and `expect(Object.entries(input)).toEqual(` and `const optionalKeys = [`.
+
+---
+
+### Phase 0 — Policy reads and baseline capture
+
+- [ ] [P0-T1] Read `CLAUDE.md`. Acceptance: the path is listed in the [P0-T12] artifact.
+- [ ] [P0-T2] Read `.github/copilot-instructions.md`. Acceptance: the path is listed in the [P0-T12] artifact.
+- [ ] [P0-T3] Read `.github/instructions/general-code-change.instructions.md`. Acceptance: the path is listed in the [P0-T12] artifact.
+- [ ] [P0-T4] Read `.github/instructions/general-unit-test.instructions.md`. Acceptance: the path is listed in the [P0-T12] artifact.
+- [ ] [P0-T5] Read `.github/instructions/typescript-code-change.instructions.md`. Acceptance: the path is listed in the [P0-T12] artifact.
+- [ ] [P0-T6] Read `.github/instructions/typescript-unit-test.instructions.md`. Acceptance: the path is listed in the [P0-T12] artifact.
+- [ ] [P0-T7] Read `.claude/rules/general-code-change.md`. Acceptance: the path is listed in the [P0-T12] artifact.
+- [ ] [P0-T8] Read `.claude/rules/general-unit-test.md`. Acceptance: the path is listed in the [P0-T12] artifact.
+- [ ] [P0-T9] Read `.claude/rules/typescript.md`. Acceptance: the path is listed in the [P0-T12] artifact.
+- [ ] [P0-T10] Read `.claude/rules/typescript-suppressions.md`. Acceptance: the path is listed in the [P0-T12] artifact.
+- [ ] [P0-T11] Read `.claude/rules/quality-tiers.md`. Acceptance: the path is listed in the [P0-T12] artifact.
+- [ ] [P0-T12] Create `FEATURE/evidence/remediation-baseline/phase0-instructions-read.<ts>.md` with the Write tool, carrying `Timestamp:`, `Policy Order:` (CLAUDE.md, copilot-instructions, general code change, general unit test, TypeScript code change and unit test, then the `.claude/rules/` mirrors and quality tiers), and the explicit list of the 11 paths read in [P0-T1] to [P0-T11]. Acceptance: the artifact exists with all three fields and lists exactly 11 paths.
+- [ ] [P0-T13] Create `FEATURE/evidence/remediation-baseline/git-refs.<ts>.md` recording the output of `git branch --show-current`, `git rev-parse HEAD` (`P0_HEAD_SHA`), `git merge-base origin/main HEAD` (`BASE_SHA`), and `git status --porcelain`. Acceptance: the branch is `bug/test-tree-typecheck-not-gated-647`; both SHAs are 40 hexadecimal characters; `git status --porcelain` lists no path outside `FEATURE/`; otherwise stop as BLOCKED. Every listed path other than `FEATURE/remediation-plan.2026-10-02T00-06.md` is recorded verbatim as `PRE_EXISTING_FEATURE_PATHS` (for example uncommitted audit or remediation-input files); the list may be empty. The artifact also records whether `BASE_SHA` equals `1b1e349f1d0fb8b00eb69a809ef380fcc6eb35b9` (the audit base); a different value is recorded and used, not blocking.
+- [ ] [P0-T14] Create `FEATURE/evidence/remediation-baseline/tsc-jest.<ts>.md` by running `node extensions/drm-copilot/node_modules/typescript/bin/tsc -p extensions/drm-copilot/tsconfig.jest.json --noEmit > SCRATCH/tsc-jest-base.txt 2>&1; echo "TSC_EXIT=$?"` followed by `grep -c 'error TS' SCRATCH/tsc-jest-base.txt`. Acceptance: `TSC_EXIT=0` and the count is 0; otherwise stop as BLOCKED.
+- [ ] [P0-T15] Create `FEATURE/evidence/remediation-baseline/jest-target.<ts>.md` by running `npm --prefix extensions/drm-copilot run test -- test/lib/validate/build-validate-orchestration-service-call-input.test.ts > SCRATCH/jest-target-base.txt 2>&1; echo "EXIT=$?"` and extracting the summary lines (rule 5). Acceptance: `EXIT=0`; the `Tests:` line reads `Tests:       5 passed, 5 total` (`TARGET_BASE_PASSED` = 5, `FAILED` 0); otherwise stop as BLOCKED.
+- [ ] [P0-T16] Create `FEATURE/evidence/remediation-baseline/coverage.<ts>.md` by running `npm --prefix extensions/drm-copilot run test:coverage > SCRATCH/coverage-base.txt 2>&1; echo "EXIT=$?"` and extracting the `Test Suites:`, `Tests:`, and coverage summary lines (rule 5). This script runs the full Jest suite and passes the `text-summary` reporter, which prints separate `Lines` and `Branches` rows (observed in `FEATURE/evidence/qa-gates/final-coverage.2026-10-01T23-18.md`). Acceptance: `EXIT=0`; `FAILED` 0; `FULL_BASE_PASSED` equals 3786, otherwise stop as BLOCKED; `Output Summary:` records `LINES_BASE_PCT` and `BRANCHES_BASE_PCT` as the numeric percentages from the `Lines` and `Branches` rows, and states whether they equal the reference values 97.07 and 91.35 (a difference is recorded, not blocking). If separate `Lines` and `Branches` rows are not printed, stop as BLOCKED.
+- [ ] [P0-T17] Commit and push Phase 0 by running `git add FEATURE/remediation-plan.2026-10-02T00-06.md FEATURE/evidence/remediation-baseline/phase0-instructions-read.<ts>.md FEATURE/evidence/remediation-baseline/git-refs.<ts>.md FEATURE/evidence/remediation-baseline/tsc-jest.<ts>.md FEATURE/evidence/remediation-baseline/jest-target.<ts>.md FEATURE/evidence/remediation-baseline/coverage.<ts>.md` plus each path in `PRE_EXISTING_FEATURE_PATHS` from [P0-T13] named individually, then `git commit -m "docs(647): add remediation cycle 1 plan and baseline evidence" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"`, then `git push origin HEAD`, then `git status --porcelain` and `git rev-parse HEAD origin/bug/test-tree-typecheck-not-gated-647`. Acceptance: each of the commit and push commands prints `EXIT=0`; `git status --porcelain` prints no line; the two `git rev-parse` values are identical.
+
+### Phase 1 — Restore the explicit-undefined arrangement (F1)
+
+- [ ] [P1-T1] Edit `extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts`: inside the test `omits an optional key when its value is explicitly undefined`, replace the single Arrange comment line that begins `// Arrange: optional fields omitted;` (line 83 at planning time) with the two-line comment shown in section 2, insert the `const optionalKeys = [ ... ] as const;` declaration before `const input = {`, and insert the arrange-guard assertion `expect(Object.entries(input)).toEqual(expect.arrayContaining(optionalKeys.map((key) => [key, undefined])));` between the closing `};` of `input` and the `// Act` comment. Do not add the `for` loop in this task. Acceptance: `grep -c 'const optionalKeys = \[' TEST_FILE` prints 1, `grep -c 'expect(Object.entries(input)).toEqual(' TEST_FILE` prints 1, and `grep -c 'Object.defineProperty(input, key' TEST_FILE` prints 0.
+- [ ] [P1-T2] [expect-fail] Create `FEATURE/evidence/regression-testing/fail-before.remediation-1.<ts>.md` by running `npm --prefix extensions/drm-copilot run test -- test/lib/validate/build-validate-orchestration-service-call-input.test.ts > SCRATCH/jest-fail-before.txt 2>&1; echo "EXIT=$?"`, extracting the summary lines (rule 5), and running `grep -n 'explicitly undefined' SCRATCH/jest-fail-before.txt` and `grep -ciE 'arraycontaining' SCRATCH/jest-fail-before.txt`. This run is against the prior key-less arrangement plus the new guard, so the guard is expected to fail. The artifact carries `ExpectedExitCode: 1`, states the state as "after P1-T1, before P1-T3", and records the `grep -n` lines. Acceptance: `EXIT=1`; the `Tests:` line reads `Tests:       1 failed, 4 passed, 5 total`; the case-insensitive `arraycontaining` count is at least 1 (the failure report shows the guard matcher). The other four tests in `TEST_FILE` are unmodified and passed at [P0-T15], so the one failure is the modified test. If the run exits 0, or fails with a TypeScript diagnostic instead of the guard assertion, stop as BLOCKED, because the guard would not discriminate.
+- [ ] [P1-T3] Edit `extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts`: insert the `for (const key of optionalKeys) { Object.defineProperty(input, key, { value: undefined, enumerable: true, writable: true, configurable: true }); }` loop from section 2 between the closing `};` of `input` and the arrange-guard assertion. Acceptance: `grep -c 'Object.defineProperty(input, key' TEST_FILE` prints 1 and `grep -c 'value: undefined' TEST_FILE` prints 1.
+- [ ] [P1-T4] Create `FEATURE/evidence/qa-gates/remediation-1-phase-1-format.<ts>.md` by running `node extensions/drm-copilot/node_modules/prettier/bin/prettier.cjs --write extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts; echo "EXIT=$?"`, re-running the same command once if the first run's file line does not end with `(unchanged)`. Acceptance: `EXIT=0` on each run; the final run prints exactly one file line, it names `TEST_FILE`, and it ends with `(unchanged)`; `git status --porcelain` lists only permitted dirty paths (rule 11). The artifact records each run's file line.
+- [ ] [P1-T5] Create `FEATURE/evidence/regression-testing/pass-after.remediation-1.<ts>.md` by running `npm --prefix extensions/drm-copilot run test -- test/lib/validate/build-validate-orchestration-service-call-input.test.ts > SCRATCH/jest-pass-after.txt 2>&1; echo "EXIT=$?"` and extracting the summary lines (rule 5). Acceptance: `EXIT=0`; the `Tests:` line reads `Tests:       5 passed, 5 total`, equal to `TARGET_BASE_PASSED`.
+- [ ] [P1-T6] Create `FEATURE/evidence/qa-gates/remediation-1-phase-1-diff.<ts>.md` by running `git diff -U0 P0_HEAD_SHA -- extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts > SCRATCH/phase-1-diff.txt; echo "EXIT=$?"`, then `grep -E '^-' SCRATCH/phase-1-diff.txt | grep -v '^---'` (removed lines), then `git status --porcelain`. Acceptance: the removed-line output is exactly one line, the prior Arrange comment beginning `-    // Arrange: optional fields omitted;`, which proves the test title and the five `in result` assertions are unchanged; `git status --porcelain` lists `TEST_FILE` as modified and otherwise only permitted dirty paths (rule 11). The artifact records the full removed-line output and the added-line count from `grep -cE '^\+' SCRATCH/phase-1-diff.txt` (which includes the one `+++` header).
+- [ ] [P1-T7] Create `FEATURE/evidence/qa-gates/remediation-1-phase-1-tsc.<ts>.md` by running `node extensions/drm-copilot/node_modules/typescript/bin/tsc -p extensions/drm-copilot/tsconfig.jest.json --noEmit > SCRATCH/tsc-jest-phase-1.txt 2>&1; echo "TSC_EXIT=$?"` and `grep -c 'error TS' SCRATCH/tsc-jest-phase-1.txt`. Acceptance: `TSC_EXIT=0` and the count is 0. A diagnostic in `TEST_FILE` is repaired in `TEST_FILE` only under rule 7 and the task re-run from [P1-T4]; a diagnostic that cannot be repaired without a rule-7 construct stops execution as BLOCKED.
+- [ ] [P1-T8] Commit and push Phase 1 by running `git add extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts FEATURE/remediation-plan.2026-10-02T00-06.md FEATURE/evidence/regression-testing/fail-before.remediation-1.<ts>.md FEATURE/evidence/regression-testing/pass-after.remediation-1.<ts>.md FEATURE/evidence/qa-gates/remediation-1-phase-1-format.<ts>.md FEATURE/evidence/qa-gates/remediation-1-phase-1-diff.<ts>.md FEATURE/evidence/qa-gates/remediation-1-phase-1-tsc.<ts>.md`, then `git commit -m "test(647): restore explicit-undefined arrangement in builder omission test" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"`, then `git push origin HEAD`, then `git status --porcelain` and `git rev-parse HEAD origin/bug/test-tree-typecheck-not-gated-647`. Acceptance: each of the commit and push commands prints `EXIT=0`; `git status --porcelain` prints no line; the two `git rev-parse` values are identical. The new HEAD is recorded as `P1_HEAD_SHA` in the Phase 2 artifacts.
+
+### Phase 2 — Final QC loop
+
+Loop rule: run [P2-T1] to [P2-T10] in order. If any task fails, or [P2-T1] reports a line that does not end with `(unchanged)`, repair `TEST_FILE` only (rule 7), and restart from [P2-T1]. [P2-T11] records the single clean pass. Each re-run overwrites the same artifact path and the artifact records the pass number.
+
+- [ ] [P2-T1] Create `FEATURE/evidence/qa-gates/remediation-1-final-format.<ts>.md` by running `node extensions/drm-copilot/node_modules/prettier/bin/prettier.cjs --write extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts; echo "EXIT=$?"` and then `git status --porcelain`. Acceptance: `EXIT=0`; the output is exactly one file line naming `TEST_FILE` and ending with the success literal `(unchanged)`; `git status --porcelain` lists only permitted dirty paths (rule 11) and, on the first loop pass, does not list `TEST_FILE`.
+- [ ] [P2-T2] Create `FEATURE/evidence/qa-gates/remediation-1-final-lint.<ts>.md` by running `npm --prefix extensions/drm-copilot run lint > SCRATCH/lint-final.txt 2>&1; echo "EXIT=$?"` and `grep -c 'problem' SCRATCH/lint-final.txt`. Acceptance: `EXIT=0` and the `problem` count is 0.
+- [ ] [P2-T3] Create `FEATURE/evidence/qa-gates/remediation-1-final-typecheck.<ts>.md` by running `npm --prefix extensions/drm-copilot run typecheck > SCRATCH/typecheck-final.txt 2>&1; echo "EXIT=$?"` and `grep -c '^> tsc -p tsconfig.jest.json --noEmit' SCRATCH/typecheck-final.txt`. Acceptance: `EXIT=0` and the banner count is 1 (the `typecheck:test` leg ran; banner observed in `FEATURE/evidence/qa-gates/final-typecheck.2026-10-01T23-18.md`).
+- [ ] [P2-T4] Create `FEATURE/evidence/qa-gates/remediation-1-final-tsc-jest.<ts>.md` by running `node extensions/drm-copilot/node_modules/typescript/bin/tsc -p extensions/drm-copilot/tsconfig.jest.json --noEmit > SCRATCH/tsc-jest-final.txt 2>&1; echo "TSC_EXIT=$?"` and `grep -c 'error TS' SCRATCH/tsc-jest-final.txt` (AC-1). Acceptance: `TSC_EXIT=0` and the count is 0.
+- [ ] [P2-T5] Create `FEATURE/evidence/qa-gates/remediation-1-final-jest-target.<ts>.md` by running `npm --prefix extensions/drm-copilot run test -- test/lib/validate/build-validate-orchestration-service-call-input.test.ts > SCRATCH/jest-target-final.txt 2>&1; echo "EXIT=$?"` and extracting the summary lines (rule 5). Acceptance: `EXIT=0`; the `Tests:` line reads `Tests:       5 passed, 5 total`.
+- [ ] [P2-T6] Create `FEATURE/evidence/qa-gates/remediation-1-final-coverage.<ts>.md` by running `npm --prefix extensions/drm-copilot run test:coverage > SCRATCH/coverage-final.txt 2>&1; echo "EXIT=$?"` and extracting the `Test Suites:`, `Tests:`, and coverage summary lines (rule 5) (AC-10, AC-11). Acceptance: `EXIT=0`; `FAILED` 0; `PASSED` is at least `FULL_BASE_PASSED` (3786); `Output Summary:` records `LINES_FINAL_PCT` and `BRANCHES_FINAL_PCT` from the `Lines` and `Branches` rows next to `LINES_BASE_PCT` and `BRANCHES_BASE_PCT` from [P0-T16] and the reference values 97.07 and 91.35; `LINES_FINAL_PCT` is at least `LINES_BASE_PCT` and `BRANCHES_FINAL_PCT` is at least `BRANCHES_BASE_PCT`. The change is test-only, so the changed-line coverage obligation applies to no production line; the artifact states this.
+- [ ] [P2-T7] Create `FEATURE/evidence/qa-gates/remediation-1-final-prettier-check.<ts>.md` by running `node extensions/drm-copilot/node_modules/prettier/bin/prettier.cjs --check "extensions/drm-copilot/src/**/*.ts" "extensions/drm-copilot/test/**/*.ts" "extensions/drm-copilot/*.json" "extensions/drm-copilot/*.cjs"; echo "EXIT=$?"` (AC-14, the root-relative form of the spec command used throughout this feature). Acceptance: `EXIT=0` and the output contains the line `All matched files use Prettier code style!`.
+- [ ] [P2-T8] Create `FEATURE/evidence/qa-gates/remediation-1-final-added-lines.<ts>.md` by running `git diff -U0 BASE_SHA -- extensions/drm-copilot > SCRATCH/added-lines.txt; echo "EXIT=$?"`, then `grep -E '^\+' SCRATCH/added-lines.txt | grep -v '^+++' | grep -cE '@ts-ignore|@ts-expect-error|@ts-nocheck|eslint-disable|:\s*any\b|\bas\s+any\b|<any>|\bany\[\]'` (AC-12), then `grep -E '^\+' SCRATCH/added-lines.txt | grep -v '^+++' | grep -cE '\.(skip|only)\(|\bx(it|describe|test)\('` (AC-10 skip/only scan), then the positive control `echo '+const probe: any = 1;' | grep -cE ':\s*any\b'`, then `git status --porcelain`. Acceptance: the AC-12 count is 0; the skip/only count is 0; the positive control prints 1 (the pattern matches a known violation, so a 0 count is meaningful); `git status --porcelain` lists only permitted dirty paths (rule 11), none of them untracked under `extensions/drm-copilot/`, so the anchored diff (which compares `BASE_SHA` with the working tree) covers every change.
+- [ ] [P2-T9] Create `FEATURE/evidence/qa-gates/remediation-1-final-line-counts.<ts>.md` by running `grep -c '' extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts`, `git diff --numstat BASE_SHA -- extensions/drm-copilot/test/extension.workflow-commands.test.ts`, `git diff --name-only --diff-filter=AM BASE_SHA -- extensions/drm-copilot > SCRATCH/am-files.txt; echo "EXIT=$?"`, `grep -E '\.ts$' SCRATCH/am-files.txt | xargs grep -c '' | grep -vE ':([0-9]{1,2}|[1-4][0-9]{2}|500)$'`, and `git status --porcelain` (AC-13). Acceptance: the `TEST_FILE` count is at most 500; the numstat added count is at most its deleted count; the over-limit filter prints no line; `git status --porcelain` lists only permitted dirty paths (rule 11), none of them under `extensions/drm-copilot/` and untracked, so no created `.ts` file is missing from the name list.
+- [ ] [P2-T10] Create `FEATURE/evidence/qa-gates/remediation-1-final-scope.<ts>.md` by running `git diff --name-only P0_HEAD_SHA > SCRATCH/scope.txt; echo "EXIT=$?"`, `grep -vE '^docs/features/active/2026-09-07-test-tree-typecheck-not-gated-647/' SCRATCH/scope.txt`, and `git status --porcelain`. Acceptance: the filter prints exactly one line, `extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts`; `git status --porcelain` lists only permitted dirty paths (rule 11), so no untracked path outside `FEATURE/` escapes the name list.
+- [ ] [P2-T11] Create `FEATURE/evidence/qa-gates/remediation-1-final-loop-passes.<ts>.md` with the Write tool, carrying `Timestamp:`, `Command:` (the list of [P2-T1] to [P2-T10] commands), `EXIT_CODE: 0`, and `Output Summary:` stating the number of loop passes, the reason for each restart, and the clean-pass result of each of [P2-T1] to [P2-T10] including `LINES_FINAL_PCT` and `BRANCHES_FINAL_PCT`. Acceptance: the final recorded pass shows every one of [P2-T1] to [P2-T10] meeting its acceptance condition with no file rewritten.
+- [ ] [P2-T12] Commit and push Phase 2 by running `git add FEATURE/remediation-plan.2026-10-02T00-06.md FEATURE/evidence/qa-gates/remediation-1-final-format.<ts>.md FEATURE/evidence/qa-gates/remediation-1-final-lint.<ts>.md FEATURE/evidence/qa-gates/remediation-1-final-typecheck.<ts>.md FEATURE/evidence/qa-gates/remediation-1-final-tsc-jest.<ts>.md FEATURE/evidence/qa-gates/remediation-1-final-jest-target.<ts>.md FEATURE/evidence/qa-gates/remediation-1-final-coverage.<ts>.md FEATURE/evidence/qa-gates/remediation-1-final-prettier-check.<ts>.md FEATURE/evidence/qa-gates/remediation-1-final-added-lines.<ts>.md FEATURE/evidence/qa-gates/remediation-1-final-line-counts.<ts>.md FEATURE/evidence/qa-gates/remediation-1-final-scope.<ts>.md FEATURE/evidence/qa-gates/remediation-1-final-loop-passes.<ts>.md` (plus `TEST_FILE` only if a loop restart repaired it), then `git commit -m "docs(647): record remediation cycle 1 final QC evidence" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"`, then `git push origin HEAD`, then `git status --porcelain` and `git rev-parse HEAD origin/bug/test-tree-typecheck-not-gated-647`. Acceptance: each of the commit and push commands prints `EXIT=0`; `git status --porcelain` prints no line; the two `git rev-parse` values are identical. If a loop restart repaired `TEST_FILE` after [P1-T8], [P2-T10] already reflects it and the commit includes it.
+
+---
+
+## 3. Acceptance-criteria traceability
+
+| ID | Requirement | Implementation | Tests / checks | Evidence |
+|---|---|---|---|---|
+| F1 | Explicit-undefined scenario restored with arrange guard; title and five `in result` assertions unchanged; Arrange comment corrected | P1-T1, P1-T3 | P1-T2 (fail-before), P1-T5, P1-T6, P2-T5 | `regression-testing/fail-before.remediation-1.<ts>.md`, `regression-testing/pass-after.remediation-1.<ts>.md`, `qa-gates/remediation-1-phase-1-diff.<ts>.md` |
+| AC-1 | `tsc -p tsconfig.jest.json` exits 0 with no `error TS` | P1-T3 | P1-T7, P2-T4 | `qa-gates/remediation-1-final-tsc-jest.<ts>.md` |
+| AC-10 | Full suite passes, count not reduced, no skip/only | P1-T3 | P2-T6, P2-T8 | `qa-gates/remediation-1-final-coverage.<ts>.md`, `qa-gates/remediation-1-final-added-lines.<ts>.md` |
+| AC-11 | Coverage thresholds met, not lower than base | P1-T3 | P2-T6 | `qa-gates/remediation-1-final-coverage.<ts>.md` |
+| AC-12 | No `any` or suppression in added lines | P1-T1, P1-T3 | P2-T8 | `qa-gates/remediation-1-final-added-lines.<ts>.md` |
+| AC-13 | Line limits | P1-T3 | P2-T9 | `qa-gates/remediation-1-final-line-counts.<ts>.md` |
+| AC-14 | Lint and Prettier check exit 0 | P1-T4 | P2-T2, P2-T7 | `qa-gates/remediation-1-final-lint.<ts>.md`, `qa-gates/remediation-1-final-prettier-check.<ts>.md` |
+
+AC-15 (F2) is excluded by scope (section 0).
