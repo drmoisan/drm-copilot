@@ -1,9 +1,7 @@
 """Unit tests for the pure quality-tiers validation core.
 
-Every input is supplied as an in-memory YAML string, an in-memory manifest, or an
-in-memory list of tracked paths. The two committed-tree tests read the committed
-``quality-tiers.yml`` from the repository root, read-only, using the same
-repository-root pattern as the rules-frontmatter contract test.
+Inputs are in-memory YAML strings, manifests, and tracked-path lists. Only the two
+committed-tree tests read the committed ``quality-tiers.yml``, read-only.
 """
 
 from __future__ import annotations
@@ -24,22 +22,16 @@ from scripts.dev_tools.quality_tiers_contract import (
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
-VALID_MANIFEST_TEXT = """\
-version: 1
-projects:
-  - path: "extensions/drm-copilot"
-    tier: "T3"
-    rationale: "VS Code extension."
-  - path: "scripts/bash"
-    tier: "T4"
-    rationale: "Shell QC scripts."
-"""
-
 _VALID_ENTRY_TEXT = """\
   - path: "scripts/bash"
     tier: "T4"
     rationale: "Shell QC scripts."
 """
+
+VALID_MANIFEST_TEXT = (
+    'version: 1\nprojects:\n  - path: "extensions/drm-copilot"\n    tier: "T3"\n'
+    '    rationale: "VS Code extension."\n' + _VALID_ENTRY_TEXT
+)
 
 
 def _codes(errors: list[QualityTierError]) -> list[str]:
@@ -49,13 +41,8 @@ def _codes(errors: list[QualityTierError]) -> list[str]:
 
 def _manifest(*entries: tuple[str, str]) -> QualityTierManifest:
     """Build an in-memory manifest from ``(path, tier)`` pairs."""
-    return QualityTierManifest(
-        version=1,
-        entries=tuple(
-            QualityTierEntry(path=path, tier=tier, rationale="rationale")
-            for path, tier in entries
-        ),
-    )
+    items = tuple(QualityTierEntry(path, tier, "rationale") for path, tier in entries)
+    return QualityTierManifest(version=1, entries=items)
 
 
 def test_parse_quality_tiers_accepts_valid_manifest() -> None:
