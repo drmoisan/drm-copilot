@@ -404,6 +404,25 @@ def test_consumer_authority_is_typescript_only_and_scope_owners_are_unchanged() 
     assert "require_launch_paths=key_gated" in ready_gate
 
 
+def test_epic_planner_ready_gate_guidance_passes_both_codex_flags() -> None:
+    """Codex planner ready-gate callers must assert both Codex enforcement flags."""
+
+    expected = (
+        "`epic-planner-state` with `require_ready_for_execution: true`, "
+        "`require_codex_topology: true`, `require_codex_model_routing: true`, "
+        "and the explicit workspace root"
+    )
+    for relative_path in (
+        ".agents/skills/epic-plan/SKILL.md",
+        ".agents/skills/epic-run/SKILL.md",
+        ".codex/agents/epic-orchestrator.toml",
+    ):
+        for root in (REPO_ROOT, CODEX_BUNDLE_ROOT):
+            text = (root / relative_path).read_text(encoding="utf-8")
+            collapsed = " ".join(text.split())
+            assert expected in collapsed, f"{root}: {relative_path}"
+
+
 def test_codex_guidance_requires_independent_expected_context() -> None:
     """Codex and agents guidance must demand caller-supplied context."""
 
