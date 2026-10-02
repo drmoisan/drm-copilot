@@ -206,7 +206,8 @@
     "bundle:mcp-server": "node esbuild-mcp-server.cjs",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"*.json\" \"*.cjs\"",
     "lint": "eslint --no-error-on-unmatched-pattern src test",
-    "typecheck": "tsc -p ./ --noEmit",
+    "typecheck": "tsc -p ./ --noEmit && npm run typecheck:test",
+    "typecheck:test": "tsc -p tsconfig.jest.json --noEmit",
     "test": "node run-jest.cjs",
     "test:unit": "node run-jest.cjs",
     "test:coverage": "node run-jest.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary"
