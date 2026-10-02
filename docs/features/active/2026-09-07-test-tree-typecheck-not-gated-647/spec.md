@@ -238,7 +238,7 @@ Definitions used below:
 - [x] AC-12 The added lines in `git diff -U0 <base> -- extensions/drm-copilot` (lines starting with `+`, excluding `+++` headers) contain no match for `@ts-ignore|@ts-expect-error|@ts-nocheck|eslint-disable|:\s*any\b|\bas\s+any\b|<any>|\bany\[\]`.
 - [x] AC-13 `git diff --numstat <base> -- extensions/drm-copilot/test/extension.workflow-commands.test.ts` reports an added-line count less than or equal to the deleted-line count. Every other `.ts` file listed by `git diff --name-only --diff-filter=AM <base> -- extensions/drm-copilot` has at most 500 lines at HEAD, measured with `(Get-Content <path>).Count`.
 - [x] AC-14 `npm --prefix extensions/drm-copilot run lint` exits 0. From `extensions/drm-copilot`, `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"` exits 0.
-- [ ] AC-15 The PR's `ci.yml` run at the branch head completes with conclusion `success` for every matrix leg of `drm-copilot-extension-tests`, and each leg includes the step `Type-check extension source and test tree`. Verified with `gh run view <run-id> --json jobs`, and the run ID is recorded in `evidence/qa-gates/`.
+- [x] AC-15 The PR's `ci.yml` run at the branch head completes with conclusion `success` for every matrix leg of `drm-copilot-extension-tests`, and each leg includes the step `Type-check extension source and test tree`. Verified with `gh run view <run-id> --json jobs`, and the run ID is recorded in `evidence/qa-gates/`.
 
 ## Risks & Mitigations
 
