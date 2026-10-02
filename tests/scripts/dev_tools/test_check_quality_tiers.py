@@ -90,8 +90,9 @@ def _tracked(paths: Sequence[str]) -> Callable[[Path], list[str]]:
     return list_files
 
 
-def _assert_failure_output(captured: pytest.CaptureResult[str]) -> list[str]:
+def _assert_failure_output(capsys: pytest.CaptureFixture[str]) -> list[str]:
     """Assert stdout is empty and every stderr line carries a QT prefix."""
+    captured = capsys.readouterr()
     assert captured.out == "", f"stdout must be empty on failure: {captured.out!r}"
     lines = captured.err.splitlines()
     assert lines, "a failure must write at least one stderr line"
@@ -136,7 +137,7 @@ def test_main_returns_one_with_qt001_when_manifest_missing(
     )
 
     # Assert
-    lines = _assert_failure_output(capsys.readouterr())
+    lines = _assert_failure_output(capsys)
     assert exit_code == 1
     assert [line[:5] for line in lines] == ["QT001"]
 
@@ -160,7 +161,7 @@ def test_main_returns_one_with_qt002_and_skips_git_for_invalid_yaml(
     )
 
     # Assert
-    lines = _assert_failure_output(capsys.readouterr())
+    lines = _assert_failure_output(capsys)
     assert exit_code == 1
     assert [line[:5] for line in lines] == ["QT002"]
     assert calls == []
@@ -183,7 +184,7 @@ def test_main_returns_one_with_qt009_when_runner_raises_oserror(
     )
 
     # Assert
-    lines = _assert_failure_output(capsys.readouterr())
+    lines = _assert_failure_output(capsys)
     assert exit_code == 1
     assert [line[:5] for line in lines] == ["QT009"]
 
@@ -208,7 +209,7 @@ def test_main_returns_one_with_qt009_when_git_exits_nonzero(
     )
 
     # Assert
-    lines = _assert_failure_output(capsys.readouterr())
+    lines = _assert_failure_output(capsys)
     assert exit_code == 1
     assert [line[:5] for line in lines] == ["QT009"]
 
@@ -233,7 +234,7 @@ def test_main_returns_one_with_qt009_when_git_not_found(
     )
 
     # Assert
-    lines = _assert_failure_output(capsys.readouterr())
+    lines = _assert_failure_output(capsys)
     assert exit_code == 1
     assert [line[:5] for line in lines] == ["QT009"]
 
@@ -255,7 +256,7 @@ def test_main_reports_entry_errors_alongside_qt009(
     )
 
     # Assert
-    lines = _assert_failure_output(capsys.readouterr())
+    lines = _assert_failure_output(capsys)
     assert exit_code == 1
     assert sorted(line[:5] for line in lines) == ["QT004", "QT009"]
 
@@ -272,7 +273,7 @@ def test_main_returns_one_with_qt008_when_entry_removed(
     )
 
     # Assert
-    lines = _assert_failure_output(capsys.readouterr())
+    lines = _assert_failure_output(capsys)
     assert exit_code == 1
     qt008_lines = [line for line in lines if line.startswith("QT008:")]
     assert len(qt008_lines) == 1, f"expected one QT008 line: {lines}"
@@ -294,7 +295,7 @@ def test_main_reports_qt004_and_qt008_in_one_run(
     )
 
     # Assert
-    lines = _assert_failure_output(capsys.readouterr())
+    lines = _assert_failure_output(capsys)
     assert exit_code == 1
     assert sorted(line[:5] for line in lines) == ["QT004", "QT008"]
 
