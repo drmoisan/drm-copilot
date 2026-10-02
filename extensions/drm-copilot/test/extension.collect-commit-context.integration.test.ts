@@ -77,7 +77,12 @@ import { activate } from "../src/extension";
 
 const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
-  spawnSync: jest.Mock;
+  spawnSync: jest.Mock<
+    (
+      executable: string,
+      args: ReadonlyArray<string>,
+    ) => { status: number; stdout: Buffer }
+  >;
 };
 
 /**
