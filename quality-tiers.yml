@@ -1,0 +1,75 @@
+# The tier-classification step in the quality-checks workflow validates this file (scripts/dev_tools/check_quality_tiers.py).
+version: 1
+projects:
+  - path: "."
+    tier: T4
+    rationale: "Root TypeScript scaffold and tool configuration only"
+  - path: "extensions/drm-copilot"
+    tier: T3
+    rationale: "VS Code extension and MCP server; glue over the VS Code API, MCP SDK, and subprocesses"
+  - path: "packages/mcp-server"
+    tier: T4
+    rationale: "npm packaging manifest plus esbuild/prepack scripts; no source of its own"
+  - path: "scripts/powershell/PoshQC"
+    tier: T3
+    rationale: "QC module bundled into the extension; wraps PSScriptAnalyzer and Pester"
+  - path: "scripts/dev_tools"
+    tier: T4
+    rationale: "Repository-internal Python dev tooling (validators, CLIs); not published by push-down"
+  - path: "scripts/dev-tools"
+    tier: T4
+    rationale: "PowerShell release, bootstrap, and developer scripts"
+  - path: "scripts/bash"
+    tier: T4
+    rationale: "Shell QC and coverage scripts"
+  - path: "scripts/powershell"
+    tier: T4
+    rationale: "Extension build/publish script"
+  - path: ".claude/hooks"
+    tier: T3
+    rationale: "Enforcement hooks shipped to consumers; adapters over the Claude Code hook payload API"
+  - path: ".codex/hooks"
+    tier: T3
+    rationale: "Enforcement hooks shipped to consumers; adapters over the Codex hook API"
+  - path: ".claude/lib/bash"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/blast-radius"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/ci-gate"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/cleanup-manifest"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/codex-routing"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/discovery-validation"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/hook-payload"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/mermaid"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/model-routing"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/orchestrator-state"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/parallel-drift"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/project-file-merge"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/requirements"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/worktree-resolution"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
