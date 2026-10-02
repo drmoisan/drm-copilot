@@ -1,6 +1,6 @@
 # P0-T11 Baseline CI dispatch on BRANCH
 
-Timestamp: 2026-10-02T03-40
+Timestamp: 2026-10-02T03-34
 Command: git rev-parse origin/bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741 (executor, after git fetch origin bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741). Push, dispatch, and run lookup performed by the orchestrator (DEV-3): git push origin bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741; date -u +%Y-%m-%dT%H:%M:%SZ; gh workflow run _shell-coverage.yml --ref bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741; gh run list --workflow _shell-coverage.yml --branch bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741 --event workflow_dispatch --limit 1 --json databaseId,headSha,createdAt,status --jq '.[0]'
 EXIT_CODE: 0
 Output Summary:

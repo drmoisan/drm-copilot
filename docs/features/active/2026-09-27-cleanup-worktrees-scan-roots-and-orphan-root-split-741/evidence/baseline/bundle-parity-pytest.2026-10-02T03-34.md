@@ -1,6 +1,6 @@
 # P0-T10 Baseline bundle-parity pytest
 
-Timestamp: 2026-10-02T03-39
+Timestamp: 2026-10-02T03-34
 Command: poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py
 EXIT_CODE: 0
 Output Summary:

@@ -1,6 +1,6 @@
 # P0-T9 Baseline local bats run over TARGETED-SET (deviated; evidence deferred to CI)
 
-Timestamp: 2026-10-02T03-38
+Timestamp: 2026-10-02T03-34
 Command: none (plan command `npx --yes bats --formatter tap tests/shell/test_cleanup_worktrees_report_records.bats tests/shell/test_cleanup_worktrees_scan_helper.bats tests/shell/test_cleanup_worktrees_scan_seam.bats tests/shell/test_cleanup_worktrees_enumeration.bats tests/shell/test_cleanup_worktrees_preserve.bats tests/shell/test_cleanup_worktrees_preserve_failures.bats tests/shell/test_cleanup_worktrees_preserve_eol.bats tests/shell/test_cleanup_worktrees_cli.bats` not run; task deviated under DEV-2)
 EXIT_CODE: n/a-deviated
 Output Summary:

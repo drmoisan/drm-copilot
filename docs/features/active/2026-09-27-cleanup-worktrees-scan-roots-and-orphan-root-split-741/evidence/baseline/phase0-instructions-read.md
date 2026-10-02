@@ -1,6 +1,6 @@
 # P0-T2 Phase 0 policy reads
 
-Timestamp: 2026-10-02T03-31
+Timestamp: 2026-10-02T03-34
 Policy Order: (1) tone; (2) general code change; (3) general unit test; (4) shell language rule; (5) tier and plan-acceptance gates; (6) evidence conventions. Order as stated in plan task P0-T2.
 
 Files read (in this order, from the worktree checkout on branch bug/cleanup-worktrees-scan-roots-and-orphan-root-split-741 at df5eb303129a30289a7d81775fdadaa40631be63):
