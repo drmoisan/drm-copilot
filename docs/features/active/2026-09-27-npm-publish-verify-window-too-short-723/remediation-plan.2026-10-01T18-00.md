@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-01T18-00
-- **Status:** Not Started
+- **Status:** In Progress (Phases 0-2 executed except P2-T2; P2-T2 reaudit is performed by the orchestrator)
 - **Version:** 0.1
 - **Work Mode:** minor-audit
 - **Complexity Band:** C1
@@ -33,16 +33,16 @@ Source: GitHub Actions run https://github.com/drmoisan/drm-copilot/actions/runs/
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Read the policy files in the order defined by the policy-compliance-order skill: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/powershell.md`.
+- [x] [P0-T1] Read the policy files in the order defined by the policy-compliance-order skill: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/powershell.md`.
   - Acceptance: each of the four files was opened in this session; the file list is recorded by P0-T2.
-- [ ] [P0-T2] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/remediation-baseline/phase0-instructions-read.md` listing every file read in P0-T1, in the order read.
+- [x] [P0-T2] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/remediation-baseline/phase0-instructions-read.md` listing every file read in P0-T1, in the order read.
   - Acceptance: the artifact contains a `Timestamp:` line, a `Policy Order:` line, and one list entry for each of the four files read in P0-T1.
-- [ ] [P0-T3] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/remediation-baseline/baseline-branch-state.md` recording the output of `git status --porcelain --branch`.
+- [x] [P0-T3] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/remediation-baseline/baseline-branch-state.md` recording the output of `git status --porcelain --branch`.
   - Acceptance: the artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` that quotes the first output line beginning with two hash characters (the branch line), which names branch `bug/npm-publish-verify-window-too-short-723`.
 
 ### Phase 1 — Implementation (evidence-only remediation of R1)
 
-- [ ] [P1-T1] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/qa-gates/final-powershell-coverage.md` recording the CI poshqc PowerShell coverage output using the values in the Fixed Evidence Values section of this plan.
+- [x] [P1-T1] Create `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/qa-gates/final-powershell-coverage.md` recording the CI poshqc PowerShell coverage output using the values in the Fixed Evidence Values section of this plan.
   - The artifact must contain these fields: a `Timestamp:` line in ISO-8601 form; a `Command:` line stating `gh run download 36927150048 --repo drmoisan/drm-copilot -n poshqc-test-results`; the line `EXIT_CODE: 0`; and an `Output Summary:` block.
   - The `Output Summary:` block must state: artifact name `poshqc-test-results`, file `powershell-coverage.xml`, run https://github.com/drmoisan/drm-copilot/actions/runs/36927150048, job "poshqc / PowerShell QC" 110587188174, head 9a6e0aa7; LINE counter missed 430 and covered 11353; line coverage 11353/11783 = 96.35 percent against the 85 percent threshold; no branch metric exists for PowerShell (Pester exempt); no production `.ps1` file changed and the only changed `.ps1` is the test file, with a reference to `evidence/qa-gates/final-no-source-change-check.md`.
   - Acceptance: the file exists at the stated path, contains all four fields, and the `Output Summary:` quotes the literals "11353", "430", and "96.35".
@@ -51,7 +51,7 @@ Source: GitHub Actions run https://github.com/drmoisan/drm-copilot/actions/runs/
 
 Format, lint, type-check, and test loops are not applicable: no code, test, workflow, or runbook file changes in this remediation, and the already-green CI run named above covers the existing gates.
 
-- [ ] [P2-T1] Verify with the Grep tool that `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/qa-gates/final-powershell-coverage.md` contains the token "11353" (pattern `11353`, output mode content, path set to that file).
+- [x] [P2-T1] Verify with the Grep tool that `docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723/evidence/qa-gates/final-powershell-coverage.md` contains the token "11353" (pattern `11353`, output mode content, path set to that file).
   - Acceptance: the Grep result returns at least one matching line within the artifact. Zero matches fails the task and returns the loop to P1-T1.
 - [ ] [P2-T2] Re-run the feature-review reaudit handoff, supplying the feature folder, `remediation-inputs.2026-10-01T18-00.md`, this plan, and the new artifact `evidence/qa-gates/final-powershell-coverage.md`, so that finding R1 is re-evaluated.
   - Acceptance: the reviewer receives the handoff with all Phase 0, Phase 1, and Phase 2 artifacts from this plan present on disk, and the reaudit is requested to re-verify the PowerShell coverage verdict against the new artifact.
