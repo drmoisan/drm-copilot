@@ -139,8 +139,17 @@ Environment overrides:
                                nonexistent value is treated as missing (falls back to
                                the bundled cleanup_worktrees_scan_helper.sh). This is
                                the filesystem-scan test-stub seam.
-  CLEANUP_WT_ORPHAN_ROOTS      Colon-separated override for the worktree-tracking roots
-                               scanned for ORPHAN_DIR and WARN|registration-lost.
+  CLEANUP_WT_ORPHAN_ROOTS      Worktree-tracking roots scanned for ORPHAN_DIR and
+                               WARN|registration-lost. Entries are separated by a
+                               semicolon, a newline, or a colon; a colon that follows
+                               a single drive letter and precedes / or \ is part of
+                               the path (C:/x). Empty and relative entries are
+                               dropped. When set, it replaces the default pair
+                               <main>/.claude/worktrees and <main>-wt. The parent of
+                               every non-main registered worktree is always added,
+                               except a parent that is the main worktree or its
+                               ancestor, or is equal to or inside a registered
+                               worktree.
   CLEANUP_WT_STUB_SCENARIO     Scenario directory consumed by the checked-in git and
                                scan stubs (tests only).
   CLEANUP_WT_CONSOLIDATION_PATH Override the derived consolidation worktree path
