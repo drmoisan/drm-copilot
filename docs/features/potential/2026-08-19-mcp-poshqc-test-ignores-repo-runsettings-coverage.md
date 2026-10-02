@@ -2,7 +2,7 @@
 
 - Date captured: 2026-08-19
 - Author: Dan Moisan
-- Status: Draft
+- Status: Superseded by #527
 - Severity: High — every coverage gate driven through the MCP tool measures a stale, bundled file set
 
 ## Summary
@@ -89,6 +89,16 @@ indistinguishable from success at the call site.
 - [ ] Negative control: a module absent from every `CodeCoverage.Path` entry does not appear in the
       report, so the fix does not simply measure everything.
 - [ ] A repository with no local runsettings file still succeeds via the bundled copy.
+
+## Disposition
+
+Issue #527 (`docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527/`)
+makes the PoshQC coverage population workspace-derived: `Invoke-PoshQCTest` reads
+`config/poshqc-coverage.json` in the workspace, else the effective test scan folders, and the shipped
+`CodeCoverage.Path` lists are removed from both runsettings copies. The measured file set therefore no
+longer depends on which runsettings copy the module resolved. The MCP route shows the change after the
+next extension and MCP package release, because the MCP tool runs the PoshQC copy bundled in the
+published package. This entry is not promoted separately.
 
 ## Next Step
 

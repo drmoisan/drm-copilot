@@ -240,3 +240,45 @@ Output Summary: named deviations from plan.2026-09-29T15-32.md recorded per task
 - Task: Phase 4 commit point (micro-action; same rationale as DEV-TOOLCHAIN-P2).
 - Replacement: `mcp__drm-copilot__run_poshqc_format` and `mcp__drm-copilot__run_poshqc_analyze` with `scan_folders` `["tests/scripts/powershell/PoshQC"]`; both returned `ok: true`; `git hash-object` of `PoshQC.Comprehensive.Tests.ps1` (`c27d726c`) and `PoshQC.TestingInvokeSummary.Tests.ps1` (`bda2eefd`) was identical before and after. Not acceptance evidence (D10).
 - Evidence: this entry.
+
+## DEV-P5-T1 — README token counts by git grep
+
+- Task: P5-T1.
+- Plan mechanism: `Select-String -SimpleMatch` counts.
+- Replacement: `git grep -c -F -e <token> -- scripts/powershell/PoshQC/README.md` printed `poshqc-coverage.json` 3, `fallback` 1, `*.Tests.ps1` 1, `DefaultExcludedDirs` 1, `source=` 1; for `src/**/*.ps1` it printed nothing and exited 1 (count 0).
+- Evidence: this entry.
+
+## DEV-P5-MIRROR — mirrors by git blob copy; HS by git hash-object
+
+- Task: P5-T2 to P5-T6.
+- Plan mechanism: `Copy-Item` in a `pwsh` child, then rule HS on both paths.
+- Replacement: the README source was committed first (commit `9b5aa44e`), so every source was in `HEAD`; each mirror was written with `git -C <ROOT> show HEAD:<source> > <ROOT>/<mirror>` (no Write or Edit on a mirror). `git hash-object` on both paths gave equal values for all five pairs, and `cmp` on each pair reported no difference.
+- Evidence: `evidence/other/mirror-copy.2026-10-02T08-50.md`.
+
+## DEV-P5-T7 — literal BASE_SHA
+
+- Task: P5-T7.
+- Plan mechanism: `$base` read from the base-ref artifact by a scratchpad PowerShell script.
+- Replacement: the literal `589b51a30d856dca973a2ed9988f9443c35339cf` from `evidence/baseline/base-ref.2026-10-02T07-45.md` was substituted into the `git diff --exit-code` command (the BASE rule permits literal substitution for `git` commands run through the Bash tool).
+- Evidence: `evidence/other/manifest-unchanged.2026-10-02T08-50.md`.
+
+## DEV-P5-T8 / DEV-P5-T10 — Select-String counts by git grep
+
+- Task: P5-T8, P5-T10.
+- Plan mechanism: `Select-String -SimpleMatch` counts.
+- Replacement: `git grep -c -F` printed 1 for `"scripts/powershell/PoshQC/PoshQC.Coverage.psm1",` in the parity test, and 1 each for `Superseded by #527` and `## Disposition` in the potential entry.
+- Evidence: this entry.
+
+## DEV-P5-T9 — pytest from the worktree without a cd
+
+- Task: P5-T9.
+- Plan mechanism: `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py` from the repository root.
+- Replacement: `poetry -C <ROOT> run pytest <ROOT>/tests/scripts/dev_tools/test_poshqc_bundled_parity.py` (same test, absolute path; the session runs no `cd`). Result `1 passed`.
+- Evidence: `evidence/regression-testing/parity-after-mirror.2026-10-02T08-55.md`.
+
+## DEV-P5-HS — rule HS replaced by git hash-object around the MCP format call
+
+- Task: P5-T11.
+- Plan mechanism: rule HS (`Get-FileHash` SHA256) over the eleven `CHANGED_PS` paths before and after the call.
+- Replacement: `git hash-object` over the same eleven paths before and after; all eleven values were identical.
+- Evidence: `evidence/other/mcp-route-compliance.2026-10-02T09-00.md`.
