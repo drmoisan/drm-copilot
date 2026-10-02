@@ -32,8 +32,18 @@ export const PUSH_DOWN_CODEX_ARTIFACT_PATH = workspacePath(
   "artifacts/codex-and-agents-customizations/push-down-20260405T174500Z.json",
 );
 
+/**
+ * MCP service mock. The optional `transitionPreparedOrchestration` seam is
+ * narrowed to a typed mock so a test can program its resolved value.
+ */
+export type MockService = jest.Mocked<RepoAutomationService> & {
+  transitionPreparedOrchestration?: jest.MockedFunction<
+    NonNullable<RepoAutomationService["transitionPreparedOrchestration"]>
+  >;
+};
+
 /** Create a fully mocked MCP service while retaining optional handoff seams. */
-export function createMockService(): jest.Mocked<RepoAutomationService> {
+export function createMockService(): MockService {
   return {
     collectCommitContext: jest.fn(),
     collectPrContext: jest.fn(),
@@ -55,7 +65,10 @@ export function createMockService(): jest.Mocked<RepoAutomationService> {
     resolveExecuteHardLockPrompt: jest.fn(),
     resolveAtomicPlanPrompt: jest.fn(),
     validateOrchestrationArtifacts: jest.fn(),
-    transitionPreparedOrchestration: jest.fn(),
+    transitionPreparedOrchestration:
+      jest.fn<
+        NonNullable<RepoAutomationService["transitionPreparedOrchestration"]>
+      >(),
     renderSubagentTree: jest.fn(),
     validateDiscoveryArtifacts: jest.fn(),
     runDiscoveryInit: jest.fn(),

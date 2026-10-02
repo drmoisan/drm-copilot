@@ -1,0 +1,12 @@
+extensions/drm-copilot/src/lib/codex-native-converter/index.ts(
+extensions/drm-copilot/src/lib/codex-native-converter/models.ts(
+extensions/drm-copilot/test/lib/codex-native-converter/models.test.ts(
+extensions/drm-copilot/test/lib/codex-native-converter/parser.test.ts(
+extensions/drm-copilot/test/codex-native-converter-handlers.test.ts(
+extensions/drm-copilot/test/lib/collect-commit-context.test-helpers.ts(
+extensions/drm-copilot/test/lib/collect-commit-context.run-git.test.ts(
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(
+extensions/drm-copilot/test/lib/json-config.test.ts(
+extensions/drm-copilot/test/lib/markdown-label-formatter.test.ts(
+extensions/drm-copilot/test/lib/new-potential-bug-entry-service-call.test.ts(
+extensions/drm-copilot/test/lib/new-potential-bug-entry.test.ts(
