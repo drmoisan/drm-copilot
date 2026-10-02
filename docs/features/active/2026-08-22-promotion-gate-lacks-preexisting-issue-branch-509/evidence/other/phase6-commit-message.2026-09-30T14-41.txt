@@ -1,0 +1,18 @@
+feat(509): add TypeScript issue-adoption resolver and coverage thresholds
+
+Add extensions/drm-copilot/src/lib/validate/orchestrator-state-issue-adoption.ts
+exporting resolveIssueAdoption, a pure port of the Python resolver that
+imports its promotion-entry constants from the unchanged #405 module.
+Wire it into validateRoutingContract: a valid record skips the receipt
+check for its waived tools, and adoption errors follow the receipt loop
+and precede the local_execution_overrides errors.
+
+Add per-file coverageThreshold entries (lines 85, branches 75) for the
+adoption module and orchestrator-state-routing.ts. Add the unit suite
+(42 tests) and the shared-corpus parity reader (32 tests); the validate
+directory passes 1239 tests (1165 + 42 + 32). Include Phase 6 evidence,
+plan check-offs, and the AC-9, AC-11 to AC-15 check-offs.
+
+Refs #509
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

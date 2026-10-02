@@ -312,7 +312,7 @@ config = [
             ($arguments -join "`n") | Should -Match 'default_permissions='
             $arguments | Should -Contain 'approval_policy="never"'
             $arguments | Should -Contain '--ignore-user-config'
-            $arguments | Should -Contain 'windows.sandbox="elevated"'
+            ($arguments -contains 'windows.sandbox="elevated"') | Should -Be $IsWindows -Because 'Codex receives the elevated sandbox argument only on Windows hosts'
             ($arguments -join "`n") | Should -Match 'projects=\{'
             ($arguments -join "`n") | Should -Match 'permissions\.epic-child-workspace='
             $arguments | Should -Contain '--dangerously-bypass-hook-trust'

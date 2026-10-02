@@ -40,6 +40,18 @@ class InMemoryFileSystem implements FileSystem {
     return this.files.has(path);
   }
 
+  exists(): boolean {
+    throw new Error("not used");
+  }
+
+  isDirectory(): boolean {
+    throw new Error("not used");
+  }
+
+  listDirectory(): string[] {
+    throw new Error("not used");
+  }
+
   readTextFile(path: string): string {
     const content = this.files.get(path);
     if (content === undefined) {

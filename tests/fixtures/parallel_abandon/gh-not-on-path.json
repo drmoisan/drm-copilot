@@ -1,0 +1,14 @@
+{
+  "name": "gh-not-on-path",
+  "description": "An absent gh executable is reported with exit code -1 and nothing runs.",
+  "argv": ["--item", "42", "--disposition", "abandon", "--confirm-abandon", "--pr", "7", "--worktree", "../wt-42"],
+  "shim_exit": {"gh": 0, "git": 0},
+  "missing_executable": "gh",
+  "expected": {
+    "exit_code": 1,
+    "stderr_mode": "exact",
+    "stderr": "PARALLEL_ABANDON_ERROR: abandon side effect failed with exit code -1: gh pr close 7",
+    "calls": []
+  },
+  "divergence": null
+}

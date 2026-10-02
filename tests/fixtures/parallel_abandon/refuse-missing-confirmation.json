@@ -1,0 +1,14 @@
+{
+  "name": "refuse-missing-confirmation",
+  "description": "An abandon request without the confirmation marker is refused with exit 2 before any side effect.",
+  "argv": ["--item", "42", "--disposition", "abandon", "--pr", "7", "--worktree", "../wt-42"],
+  "shim_exit": {"gh": 0, "git": 0},
+  "missing_executable": null,
+  "expected": {
+    "exit_code": 2,
+    "stderr_mode": "exact",
+    "stderr": "PARALLEL_ABANDON_ERROR: refusing to abandon item 42 without the explicit --confirm-abandon confirmation marker; no side effect was performed.",
+    "calls": []
+  },
+  "divergence": null
+}

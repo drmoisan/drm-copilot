@@ -23,8 +23,12 @@ const CLAUDE_PROJECTS_ROOT = "/claude-root/projects";
 const MATCHING_DIR = "c--users-danmoisan-repos-drm-copilot";
 
 const commandHandlers = new Map<string, CommandHandler>();
+type PickItem = { path: string };
+type PickResult = Promise<PickItem | undefined>;
+type PickFn = (items: readonly PickItem[], options?: unknown) => PickResult;
+type RootFn = (...args: unknown[]) => string;
 const appendLineMock = jest.fn<(line: string) => void>();
-const showQuickPickMock = jest.fn();
+const showQuickPickMock = jest.fn<PickFn>();
 const showErrorMessageMock = jest.fn();
 const registerCommandMock = jest.fn(
   (command: string, handler: CommandHandler) => {
@@ -47,8 +51,8 @@ jest.mock(
   { virtual: true },
 );
 
-const getWorkspaceRootMock = jest.fn(() => WORKSPACE_ROOT);
-const getClaudeProjectsRootMock = jest.fn(() => CLAUDE_PROJECTS_ROOT);
+const getWorkspaceRootMock = jest.fn<RootFn>(() => WORKSPACE_ROOT);
+const getClaudeProjectsRootMock = jest.fn<RootFn>(() => CLAUDE_PROJECTS_ROOT);
 
 jest.mock("../src/command-runtime", () => ({
   getWorkspaceRoot: (...args: unknown[]) => getWorkspaceRootMock(...args),
@@ -195,9 +199,8 @@ describe("drm-copilot showSubagentTree command", () => {
     const fileSystem = new InMemoryFileSystem();
     addRootSession(fileSystem, MATCHING_DIR, "session-1.jsonl");
     addRootSession(fileSystem, MATCHING_DIR, "session-2.jsonl");
-    showQuickPickMock.mockImplementation(
-      async (items: ReadonlyArray<{ path: string }>) =>
-        items.find((item) => item.path.includes("session-2.jsonl")),
+    showQuickPickMock.mockImplementation(async (items) =>
+      items.find((item) => item.path.includes("session-2.jsonl")),
     );
     const terminalWriter = new FakeTerminalWriter();
     const handler = activateAndGetHandler(fileSystem, terminalWriter);
@@ -425,9 +428,8 @@ describe("drm-copilot showSubagentTree command", () => {
     addRootSession(fileSystem, MATCHING_DIR, "alpha.jsonl");
     addRootSession(fileSystem, MATCHING_DIR, "beta.jsonl");
     const betaPath = `${CLAUDE_PROJECTS_ROOT}/${MATCHING_DIR}/beta.jsonl`;
-    showQuickPickMock.mockImplementation(
-      async (items: ReadonlyArray<{ path: string }>) =>
-        items.find((item) => item.path === betaPath),
+    showQuickPickMock.mockImplementation(async (items) =>
+      items.find((item) => item.path === betaPath),
     );
     const terminalWriter = new FakeTerminalWriter();
     const handler = activateAndGetHandler(fileSystem, terminalWriter);
@@ -488,7 +490,6 @@ describe("drm-copilot showSubagentTree command", () => {
     expect(showQuickPickMock).toHaveBeenCalledTimes(1);
     const [entries] = showQuickPickMock.mock.calls[0] as [
       ReadonlyArray<{ label: string; path: string }>,
-      unknown,
     ];
     expect(entries.map((entry) => entry.path)).toEqual([
       readablePath,

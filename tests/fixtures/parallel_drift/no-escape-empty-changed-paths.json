@@ -1,0 +1,52 @@
+{
+  "name": "no-escape-empty-changed-paths",
+  "description": "An empty changed-path list yields no_escape.",
+  "item_key": 446,
+  "changed_paths": [],
+  "at": "2026-08-08T10-00",
+  "computed_at": "2026-08-08T10-05",
+  "state": {
+    "items": [
+      {
+        "issue_num": 446,
+        "state": "in_flight",
+        "blast_radius": {
+          "paths": [
+            "scripts/dev_tools/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-08T09-00"
+        }
+      }
+    ],
+    "conflict_edges": []
+  },
+  "config": {
+    "shared_surfaces": [
+      ".claude/settings.json"
+    ],
+    "shared_surface_globs": [],
+    "modules": {
+      "python-dev-tools": [
+        "scripts/dev_tools/**"
+      ],
+      "mcp-server": [
+        "packages/mcp-server/**"
+      ]
+    }
+  },
+  "expected": {
+    "result": "no_escape",
+    "item_key": 446,
+    "at": "2026-08-08T10-00",
+    "computed_at": "2026-08-08T10-05",
+    "escaped_paths": [],
+    "newly_conflicting_pairs": [],
+    "halted_item_keys": [],
+    "drift_event": null,
+    "observed_radius": null
+  }
+}

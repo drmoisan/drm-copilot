@@ -50,3 +50,41 @@ jobs:
             artifacts/pester/powershell-coverage.xml
             artifacts/pester/powershell-coverage.koverage.xml
           if-no-files-found: ignore
+
+  poshqc-linux-hooks:
+    name: PowerShell hook suites (Linux)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Install PoshQC tooling
+        shell: pwsh
+        run: |
+          Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
+          Install-PoshQCTools
+
+      - name: Test PowerShell hook suites
+        shell: pwsh
+        run: |
+          Import-Module Pester -MinimumVersion 5.6.1
+          New-Item -ItemType Directory -Force -Path artifacts/pester | Out-Null
+          $config = New-PesterConfiguration
+          $config.Run.Path = @('tests/scripts/claude-hooks', 'tests/scripts/codex-hooks')
+          $config.Run.Exit = $true
+          $config.CodeCoverage.Enabled = $false
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputFormat = 'JUnitXml'
+          $config.TestResult.OutputPath = 'artifacts/pester/pester-junit-linux-hooks.xml'
+          Invoke-Pester -Configuration $config
+
+      - name: Upload PowerShell hook-suite test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: poshqc-linux-hook-test-results
+          path: artifacts/pester/pester-junit-linux-hooks.xml
+          if-no-files-found: ignore

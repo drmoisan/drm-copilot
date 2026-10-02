@@ -428,6 +428,43 @@ PAYLOAD_MANIFEST() {
     [ "${lines[0]}" = "$merged_header" ]
 }
 
+EDGES_MERGED_HEADER="Lane assertion: 1 derived conflict component(s); 0 disagreement(s)."
+EDGES_SPLIT_HEADER="Lane assertion: 2 derived conflict component(s); 0 disagreement(s)."
+# Assert the first output line for each --edges value after $1, then for the 101:202 control.
+edges_header_is() {
+    local value
+    for value in "${@:2}"; do
+        run bash "$(ENTRY_POINT)" --manifest "$(PAYLOAD_MANIFEST)" --edges "$value"
+        [ "$status:${lines[0]}" = "0:$1" ]
+    done
+    run bash "$(ENTRY_POINT)" --manifest "$(PAYLOAD_MANIFEST)" --edges "101:202"
+    [ "$status:${lines[0]}" = "0:$EDGES_MERGED_HEADER" ]
+}
+
+@test "edges-parity: a newline-separated value matches the single-line control" {
+    edges_header_is "$EDGES_MERGED_HEADER" $'999:998\n101:202'
+}
+
+@test "edges-parity: a tab-separated value matches the single-line control" {
+    edges_header_is "$EDGES_MERGED_HEADER" $'999:998\t101:202'
+}
+
+@test "edges-parity: a CR-separated value matches the single-line control" {
+    edges_header_is "$EDGES_MERGED_HEADER" $'999:998\r101:202'
+}
+
+@test "edges-parity: a CRLF-terminated final token is kept" {
+    edges_header_is "$EDGES_MERGED_HEADER" $'999:998\r\n101:202\r\n' $'101:202\r\n'
+}
+
+@test "edges-parity: newline-separated edges naming only undeclared vertices are skipped" {
+    edges_header_is "$EDGES_SPLIT_HEADER" $'999:998\n997:996'
+}
+
+@test "edges-parity: mixed separators with a trailing newline match the single-line control" {
+    edges_header_is "$EDGES_MERGED_HEADER" $'999:998\n\t101:202\r\n'
+}
+
 @test "no library file sources the diagnostic" {
     # The diagnostic is advisory and one-directional: the entry point sources
     # the library, and nothing else in .claude/lib/bash/ sources either file. If

@@ -84,6 +84,18 @@ class VirtualFileSystem implements FileSystem {
     return this.files.has(relative);
   }
 
+  exists(): boolean {
+    throw new Error("not used");
+  }
+
+  isDirectory(): boolean {
+    throw new Error("not used");
+  }
+
+  listDirectory(): string[] {
+    throw new Error("not used");
+  }
+
   readTextFile(): string {
     throw new Error("not used");
   }
