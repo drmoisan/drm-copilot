@@ -1,0 +1,8 @@
+{
+  "shared_surfaces": [".claude/settings.json"],
+  "shared_surface_globs": [],
+  "modules": {
+    "python-dev-tools": ["scripts/dev_tools/**"],
+    "mcp-server": ["packages/mcp-server/**"]
+  }
+}

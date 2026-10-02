@@ -7,6 +7,7 @@ from typing import Any, cast
 
 from scripts.dev_tools import _orchestrator_state_codex_topology as codex_topology
 from scripts.dev_tools import orchestration_handoff_contract as handoff
+from scripts.dev_tools._orchestrator_state_blocked_reason import VALID_BLOCKED_REASONS
 from scripts.dev_tools._orchestrator_state_codex_model_routing import (
     CODEX_MODEL_ROUTING_RECEIPTS_KEY,
     validate_codex_model_routing_gate,
@@ -32,6 +33,10 @@ from scripts.dev_tools._orchestrator_state_pr_creation_readiness import (
 )
 from scripts.dev_tools._orchestrator_state_preparation_terminal import (
     validate_preparation_terminal_contract,
+)
+from scripts.dev_tools._orchestrator_state_remediation_loop import (
+    REMEDIATION_LOOP_KEY,
+    _validate_remediation_loop,
 )
 from scripts.dev_tools._orchestrator_state_routing import (
     route_requires_ci_gate,
@@ -80,15 +85,6 @@ VALID_STEP_STATUS = {
     "in_progress",
     "completed",
 }
-VALID_BLOCKED_REASONS = {
-    "none",
-    "spawn_agent_unavailable",
-    "delegation_launch_failed",
-    "delegate_no_receipt",
-    "delegate_contract_incomplete",
-    "validator_failed",
-    "user_requested_stop",
-}
 REQUIRED_RECEIPT_KEYS = (
     "step",
     "agent_name",
@@ -107,74 +103,6 @@ PROMOTION_RECEIPT_KEYS = (
     "feature_folder",
 )
 CI_GATE_KEYS = ("conclusion", "head_sha", "verified_at")
-REMEDIATION_LOOP_KEY = "remediation_loop"
-REMEDIATION_CYCLES_KEY = "cycles"
-EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT = {
-    "in_progress",
-    "complete",
-    "failed",
-}
-PREFLIGHT_CLEARED_STATUS = "clear"
-
-
-def _validate_remediation_cycle(index: int, cycle: dict[str, Any]) -> list[str]:
-    """Validate one remediation cycle without changing checkpoint state."""
-
-    errors: list[str] = []
-
-    plan_path = cycle.get("plan_path")
-    if not isinstance(plan_path, str) or not plan_path.strip():
-        errors.append(
-            f"Checkpoint remediation cycle #{index} plan_path must be a "
-            "non-empty string."
-        )
-
-    execution_status = cycle.get("execution_status")
-    if execution_status in EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT:
-        preflight = cycle.get("preflight")
-        preflight_status: object = (
-            cast("dict[str, Any]", preflight).get("final_status")
-            if isinstance(preflight, dict)
-            else None
-        )
-        if preflight_status != PREFLIGHT_CLEARED_STATUS:
-            errors.append(
-                f"Checkpoint remediation cycle #{index} execution_status is "
-                f"{execution_status} but preflight.final_status is not 'clear'."
-            )
-
-    if cycle.get("exit_condition_met") is True and cycle.get("blocking_count") != 0:
-        errors.append(
-            f"Checkpoint remediation cycle #{index} exit_condition_met is true "
-            "but blocking_count is not 0."
-        )
-
-    return errors
-
-
-def _validate_remediation_loop(remediation_loop: object) -> list[str]:
-    errors: list[str] = []
-
-    # A non-object remediation_loop carries no cycles to validate; treat it as
-    # nothing to enforce rather than fabricating a structural error here.
-    if not isinstance(remediation_loop, dict):
-        return errors
-    loop_map = cast("dict[str, Any]", remediation_loop)
-
-    cycles = loop_map.get(REMEDIATION_CYCLES_KEY)
-    if not isinstance(cycles, list):
-        return errors
-    cycle_list = cast("list[object]", cycles)
-
-    # Validate each cycle independently so callers receive a complete error
-    # list instead of stopping at the first malformed cycle.
-    for index, cycle in enumerate(cycle_list):
-        if not isinstance(cycle, dict):
-            errors.append(f"Checkpoint remediation cycle #{index} must be an object.")
-            continue
-        errors.extend(_validate_remediation_cycle(index, cast("dict[str, Any]", cycle)))
-
-    return errors
 
 
 def _missing_object_keys(value: object, keys: tuple[str, ...]) -> list[str]:
@@ -409,7 +337,10 @@ def validate_orchestrator_state_text(
     )
 
     blocked_reason = state_map.get("blocked_reason")
-    if blocked_reason is not None and blocked_reason not in VALID_BLOCKED_REASONS:
+    if blocked_reason is not None and (
+        not isinstance(blocked_reason, str)
+        or blocked_reason not in VALID_BLOCKED_REASONS
+    ):
         errors.append(f"Checkpoint has invalid blocked_reason: {blocked_reason}")
 
     receipts = state_map.get("delegation_receipts")
@@ -490,3 +421,9 @@ def validate_orchestrator_state_text(
         errors.extend(codex_topology.validate_codex_topology_gate(state_map))
 
     return errors
+
+
+if __name__ == "__main__":
+    from scripts.dev_tools.validate_orchestrator_state_cli import main
+
+    raise SystemExit(main(validate=validate_orchestrator_state_text))

@@ -1,0 +1,14 @@
+{
+  "name": "gh-close-fails",
+  "description": "A failed pull-request close exits 1 and the worktree removal is not attempted.",
+  "argv": ["--item", "42", "--disposition", "abandon", "--confirm-abandon", "--pr", "7", "--worktree", "../wt-42"],
+  "shim_exit": {"gh": 1, "git": 0},
+  "missing_executable": null,
+  "expected": {
+    "exit_code": 1,
+    "stderr_mode": "exact",
+    "stderr": "PARALLEL_ABANDON_ERROR: abandon side effect failed with exit code 1: gh pr close 7",
+    "calls": [["gh", "pr", "close", "7"]]
+  },
+  "divergence": null
+}

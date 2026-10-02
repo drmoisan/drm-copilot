@@ -122,7 +122,7 @@ Describe 'enforce-powershell-batch-budget.ps1 large-path routing' {
             @{ Name = 'empty text'; Text = ''; Expected = $false }
             @{ Name = 'whitespace text'; Text = '   '; Expected = $false }
         ) {
-            Test-PowerShellBatchBudgetLargePathRoute -CheckpointText $Text | Should -Be $Expected
+            Test-BatchBudgetLargePathRoute -CheckpointText $Text | Should -Be $Expected
         }
     }
 
@@ -133,7 +133,7 @@ Describe 'enforce-powershell-batch-budget.ps1 large-path routing' {
             @{ Text = '{"path_selected":"remediation"}'; Expected = 'remediation' }
             @{ Text = '{not-json'; Expected = '' }
         ) {
-            Get-PowerShellBatchBudgetSelectedRoute -CheckpointText $Text | Should -Be $Expected
+            Get-BatchBudgetSelectedRoute -CheckpointText $Text | Should -Be $Expected
         }
     }
 
@@ -294,13 +294,14 @@ Describe 'enforce-powershell-batch-budget.ps1 large-path routing' {
 
     Context 'checkpoint seam' {
         It 'the default reader yields direct mode when the checkpoint file is absent' {
+            $absentRoot = if ($IsWindows) { 'C:/synthetic-absent-root' } else { '/synthetic-absent-root' }
             Initialize-RoutingStore -PersistedText $script:ThreeProductionPaths
             $seams = Get-RoutingStateSeam
 
             $decision = Invoke-PowerShellBatchBudgetHook `
                 -ToolInputRaw (Get-RoutingToolInput -FilePath 'scripts/d.ps1') `
                 -SessionId 'routing' `
-                -Root 'C:/synthetic-absent-root' `
+                -Root $absentRoot `
                 @seams
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'

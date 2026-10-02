@@ -19,6 +19,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-worktree-removal-gate.ps1").Path
         . $script:UnderTest
+        Mock Resolve-ParallelWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     # Issue #688 added a second read seam. Defaulting it to absent keeps every pre-existing
@@ -313,14 +314,14 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1' {
 
     Context 'real Test-Path read seam' {
         It 'Get-ParallelWorktreeRemovalGateCheckpointContent returns $null when the checkpoint file does not exist' {
-            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Get-ParallelWorktreeRemovalGateCheckpointContent | Should -BeNullOrEmpty
+            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/prem-seam/artifacts/orchestration/parallel-orchestrator-state.json' }
+            Get-ParallelWorktreeRemovalGateCheckpointContent -Path '/synthetic-worktrees/prem-seam/artifacts/orchestration/parallel-orchestrator-state.json' | Should -BeNullOrEmpty
         }
 
         It 'Get-ParallelWorktreeRemovalGateCheckpointContent reads real content when the file exists' {
-            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Mock -CommandName Get-Content -MockWith { '{"items":[]}' } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Get-ParallelWorktreeRemovalGateCheckpointContent | Should -Be '{"items":[]}'
+            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/prem-seam/artifacts/orchestration/parallel-orchestrator-state.json' }
+            Mock -CommandName Get-Content -MockWith { '{"items":[]}' } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/prem-seam/artifacts/orchestration/parallel-orchestrator-state.json' }
+            Get-ParallelWorktreeRemovalGateCheckpointContent -Path '/synthetic-worktrees/prem-seam/artifacts/orchestration/parallel-orchestrator-state.json' | Should -Be '{"items":[]}'
         }
     }
 
@@ -405,6 +406,7 @@ Describe 'enforce-parallel-worktree-removal-gate.ps1 manifest branch' {
     BeforeAll {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-worktree-removal-gate.ps1").Path
         Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1").Path -Force
+        Mock Resolve-ParallelWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     BeforeEach {

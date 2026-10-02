@@ -1,0 +1,389 @@
+{
+  "python": {
+    "absent": {
+      "plain": [
+        "Checkpoint missing required key: blocked_reason"
+      ],
+      "require_complete": [
+        "Checkpoint missing required key: blocked_reason",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint missing required key: blocked_reason"
+      ],
+      "require_model_routing": [
+        "Checkpoint missing required key: blocked_reason",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "null": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at."
+      ],
+      "require_pr_creation_ready": [],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "none": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at."
+      ],
+      "require_pr_creation_ready": [],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "spawn_agent_unavailable": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "delegation_launch_failed": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "delegate_no_receipt": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "delegate_contract_incomplete": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "validator_failed": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "user_requested_stop": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    }
+  },
+  "typescript": {
+    "absent": {
+      "plain": [
+        "Checkpoint missing required key: blocked_reason"
+      ],
+      "require_complete": [
+        "Checkpoint missing required key: blocked_reason",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint required_agents must match routing matrix for route small.",
+        "Checkpoint required_skills must match routing matrix for route small.",
+        "Checkpoint required_mcp_tools must match routing matrix for route small."
+      ],
+      "require_model_routing": [
+        "Checkpoint missing required key: blocked_reason",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "null": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint required_agents must match routing matrix for route small.",
+        "Checkpoint required_skills must match routing matrix for route small.",
+        "Checkpoint required_mcp_tools must match routing matrix for route small."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "none": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint required_agents must match routing matrix for route small.",
+        "Checkpoint required_skills must match routing matrix for route small.",
+        "Checkpoint required_mcp_tools must match routing matrix for route small."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "spawn_agent_unavailable": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint required_agents must match routing matrix for route small.",
+        "Checkpoint required_skills must match routing matrix for route small.",
+        "Checkpoint required_mcp_tools must match routing matrix for route small."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "delegation_launch_failed": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint required_agents must match routing matrix for route small.",
+        "Checkpoint required_skills must match routing matrix for route small.",
+        "Checkpoint required_mcp_tools must match routing matrix for route small."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "delegate_no_receipt": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint required_agents must match routing matrix for route small.",
+        "Checkpoint required_skills must match routing matrix for route small.",
+        "Checkpoint required_mcp_tools must match routing matrix for route small."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "delegate_contract_incomplete": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint required_agents must match routing matrix for route small.",
+        "Checkpoint required_skills must match routing matrix for route small.",
+        "Checkpoint required_mcp_tools must match routing matrix for route small."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "validator_failed": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint required_agents must match routing matrix for route small.",
+        "Checkpoint required_skills must match routing matrix for route small.",
+        "Checkpoint required_mcp_tools must match routing matrix for route small."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    },
+    "user_requested_stop": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint required_agents must match routing matrix for route small.",
+        "Checkpoint required_skills must match routing matrix for route small.",
+        "Checkpoint required_mcp_tools must match routing matrix for route small."
+      ],
+      "require_model_routing": [
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ]
+    }
+  },
+  "powershell": {
+    "absent": {
+      "plain": [
+        "Checkpoint missing required key: blocked_reason"
+      ],
+      "require_complete": [
+        "Checkpoint missing required key: blocked_reason",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint missing required key: blocked_reason"
+      ]
+    },
+    "null": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ],
+      "require_pr_creation_ready": []
+    },
+    "none": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ],
+      "require_pr_creation_ready": []
+    },
+    "spawn_agent_unavailable": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+      ]
+    },
+    "delegation_launch_failed": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+      ]
+    },
+    "delegate_no_receipt": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+      ]
+    },
+    "delegate_contract_incomplete": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+      ]
+    },
+    "validator_failed": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+      ]
+    },
+    "user_requested_stop": {
+      "plain": [],
+      "require_complete": [
+        "Checkpoint completion validation failed: blocked_reason is not `none`.",
+        "Checkpoint completion validation failed: ci_gate must be an object with keys: conclusion, head_sha, verified_at.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-planner.",
+        "Checkpoint model_routing_receipts is missing a receipt for delegated agent: feature-review."
+      ],
+      "require_pr_creation_ready": [
+        "Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`."
+      ]
+    }
+  }
+}
