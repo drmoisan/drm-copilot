@@ -316,3 +316,109 @@ CI runs used in this segment (dispatched by the orchestrator with `_poshqc.yml`;
 - Task: P4-T1, P4-T2, P4-T4, P4-T5, P4-T6 (completes DEV-P4-TR).
 - Replacement: P4-T2 from the pre-adaptation CI run job log; P4-T1, P4-T4, P4-T5, P4-T6 from run A JUnit with the TR-equivalent filter (`tr`) and the named-title check (`named`). The Python TR port does not print FAILED_CONTAINERS; the value 0 is derived from the absence of container or discovery failure lines in the job log together with JX `ERRORS=0`. For P4-T1 the C3 template title is matched by its fixed prefix `fails fast naming config/poshqc-coverage.json for ` (8 cases). P4-T4 and P4-T5 name no artifact path; their records are written to `evidence/regression-testing/pass-after-invokesummary.2026-10-02T08-45.md` and `evidence/regression-testing/pass-after-comprehensive.2026-10-02T08-45.md` (row 24).
 - Evidence: `evidence/regression-testing/pass-after-new-tests.2026-10-02T08-45.md`, `evidence/other/existing-tests-pre-adaptation.2026-10-02T08-45.md`, `evidence/regression-testing/pass-after-invokesummary.2026-10-02T08-45.md`, `evidence/regression-testing/pass-after-comprehensive.2026-10-02T08-45.md`, `evidence/regression-testing/pass-after-poshqc-targeted.2026-10-02T08-45.md`.
+
+## DEV-P6-T1 — write-mode format through MCP plus the CI Format step
+
+- Task: P6-T1.
+- Plan mechanism: `Invoke-PoshQCFormat` over the eleven CHANGED_PS paths in a `pwsh` child with rule HS before and after.
+- Replacement: `mcp__drm-copilot__run_poshqc_format` (scan folders `scripts/powershell/PoshQC`, `tests/scripts/powershell/PoshQC`, `tests/fixtures/poshqc-consumer`) bracketed by `git hash-object` over the eleven paths (identical before and after) and porcelain status (empty before and after); the eleven `Already formatted:` lines and the zero `Formatted:` count come from the run A CI `Format PowerShell` step, which ran the branch copy over the same code tree. The formatter changed no file.
+- Evidence: `evidence/qa-gates/final-pwsh-format.2026-10-02T08-45.md`.
+
+## DEV-P6-T2 — HS replaced by git hash-object
+
+- Task: P6-T2.
+- Replacement: `git hash-object` on both sides of the six pairs; all equal.
+- Evidence: `evidence/qa-gates/final-mirror-parity.2026-10-02T08-45.md`.
+
+## DEV-P6-T3 — analyzer gate from CI; MCP call made
+
+- Task: P6-T3.
+- Replacement: CI `Analyze PowerShell` step of run A (`PSScriptAnalyzer passed: no findings under <CI_ROOT>`, repository-wide, a superset of the ten files) and of run B; `mcp__drm-copilot__run_poshqc_analyze` called for route compliance (installed copy; not acceptance evidence). No file changed.
+- Evidence: `evidence/qa-gates/final-pwsh-analyze.2026-10-02T08-45.md`.
+
+## DEV-P6-RUNS — runs A and B from CI; local copies replaced by artifact download
+
+- Task: P6-T4, P6-T5, P6-T6, P6-T7, P6-T8, and the A and B legs of P6-T12.
+- Plan mechanism: FR, JX, CX locally, `Copy-Item` of the run A coverage XML to `final-run-a-coverage.xml`, run logs `final-run-a.log` / `final-run-b.log`.
+- Replacement: run A (36983551836) and run B (36984586891) on a987ebfb; the downloaded `artifacts/ci/run-<id>/` directories replace the local copies, and the CI job log replaces the FR run log (the CI step's logger writes to the job output). No file under `.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts`, `tests/powershell`, `tests/scripts`, or `config/` changed between or after the runs; only feature-folder files were committed (ab266ca9 and the closing commit of this segment).
+- Evidence: `evidence/qa-gates/final-pwsh-test-run-a.2026-10-02T08-45.md`, `evidence/qa-gates/final-pwsh-coverage-run-a.2026-10-02T08-45.md`, `evidence/regression-testing/pass-after-named-tests.2026-10-02T08-45.md`, `evidence/qa-gates/final-pwsh-test-run-b.2026-10-02T08-45.md`, `evidence/qa-gates/final-pwsh-coverage-run-b.2026-10-02T08-45.md`, `evidence/qa-gates/population-source.2026-10-02T08-45.md`.
+
+## DEV-P6-T9-T10 — run C is an operator-run blocker
+
+- Task: P6-T9, P6-T10 (and the C legs of P6-T11 and P6-T12).
+- Plan mechanism: FR from a different current directory (`-WorkingSubdirectory artifacts`) with the same absolute root, then JX and CX.
+- Replacement: none available without `pwsh`; a CI runner always starts in the checkout root, so CI cannot reproduce the different-current-directory condition. No evidence is written for P6-T9 or P6-T10; both stay unchecked. Operator commands (classification row P6-T9, P6-T10): save the plan's FR, JX, and CX bodies as `fr.ps1`, `jx.ps1`, `cx.ps1` outside the repository and run from the repository root: `pwsh -NoProfile -File fr.ps1 -RunRoot . -LogName final-run-c.log -WorkingSubdirectory artifacts`, then `pwsh -NoProfile -File jx.ps1 -RunRoot .`, then `pwsh -NoProfile -File cx.ps1 -RunRoot . -XmlRelativePath artifacts/pester/powershell-coverage.xml`. Then complete P6-T11 (compare with A and B: LINE_TOTAL=15738, KEYS_SHA256=6a803e82ff66245e1dd760c850bc8e3636465509d6540193b6de39b4235d5953) and P6-T12 (one `Code coverage population: source=config; files=` line in `artifacts/pester/final-run-c.log`).
+- Evidence: none (blocker). Partial records: `evidence/qa-gates/determinism-comparison.2026-10-02T08-45.md` (A == B), `evidence/qa-gates/population-source.2026-10-02T08-45.md` (A and B legs).
+
+## DEV-P6-CL — changed-line coverage by the Python CL port
+
+- Task: P6-T13.
+- Replacement: `ci_evidence.py cl` on the run A coverage XML, anchored at BASE_SHA 589b51a30d856dca973a2ed9988f9443c35339cf against the worktree (code tree equal to a987ebfb); re-run by the executor this segment with identical output.
+- Evidence: `evidence/qa-gates/coverage-new-code.2026-10-02T08-45.md`.
+
+## DEV-P6-T14 — follow-up list correction
+
+- Task: P6-T14.
+- Observation: the orchestrator's `below85.txt` holds 43 lines; the last, ` missed=0 covered=0 pct=0.00`, has an empty key and matches no KEY row of the run A CX output (no KEY row has `missed=0 covered=0`). An independent single-line Python recount over `cx.txt` printed `KEYS 174 BELOW85 42 ZERO_TOTAL 0`. The artifact lists the 42 real rows and notes the omitted line.
+- Evidence: `evidence/qa-gates/coverage-aggregate.2026-10-02T08-45.md`.
+
+## DEV-P6-T15-T19 — post-fix consumer fixture run is an operator-run blocker
+
+- Task: P6-T15, P6-T16, P6-T17, P6-T18, P6-T19 (and P6-T41, P6-T42, P6-T43).
+- Plan mechanism: FR, JX, and FX on `tests/fixtures/poshqc-consumer` with the branch copy of PoshQC, bracketed by porcelain snapshots.
+- Replacement: none available. The MCP route runs the installed (pre-fix) extension copy, so it cannot show post-fix behaviour, and the CI job does not run the fixture. No evidence is written; all five tasks stay unchecked. Operator commands (classification row P6-T15 to P6-T19), from the repository root with FR, JX, FX saved as `fr.ps1`, `jx.ps1`, `fx.ps1` outside the repository: `git status --porcelain --untracked-files=all -- . ':(exclude)docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527'`, `pwsh -NoProfile -File fr.ps1 -RunRoot tests/fixtures/poshqc-consumer -LogName fixture-run.log -ScanFolderList scripts,tests/scripts`, `pwsh -NoProfile -File jx.ps1 -RunRoot tests/fixtures/poshqc-consumer`, `pwsh -NoProfile -File fx.ps1 -RunRoot tests/fixtures/poshqc-consumer`, the same `git status` again, and `git check-ignore -v tests/fixtures/poshqc-consumer/artifacts/pester/powershell-coverage.xml`. Expected: population line `Code coverage population: source=fallback; files=1`, FX `SOURCEFILES=1 SAMPLE_PRESENT=1 SAMPLE_LINE_COVERED=`>0 `STANDIN_PRESENT=0 CLAUDE_KEYS=0 OUTSIDE_PACKAGES=0`, identical before/after listings.
+- Evidence: none (blocker).
+
+## DEV-P6-PY — Python loop with absolute paths
+
+- Task: P6-T20, P6-T21, P6-T22, P6-T23.
+- Replacement: `poetry -C <ROOT> run <tool> <ROOT>/tests/scripts/dev_tools/test_poshqc_bundled_parity.py` (same tools and file, no `cd`; DEV-P5-T9 form). All four exited 0 with the required output lines.
+- Evidence: `evidence/qa-gates/final-python-black.2026-10-02T08-45.md`, `final-python-ruff`, `final-python-pyright`, `final-python-pytest-parity` (same folder and timestamp).
+
+## DEV-P6-T24 / DEV-P6-T25 — static shape checks
+
+- Task: P6-T24, P6-T25.
+- Replacement: Read tool on both runsettings copies (identical git blob) and on `config/poshqc-coverage.json` (blob 71d9bfcc, unchanged since P3-T7); parse proof from run A, which loaded the repository runsettings copy and validated the config (`source=config; files=174`).
+- Evidence: `evidence/qa-gates/runsettings-shape.2026-10-02T08-45.md`, `evidence/qa-gates/coverage-config.2026-10-02T08-45.md`.
+
+## DEV-P6-T26 / DEV-P6-T29 — Select-String counts by git grep
+
+- Task: P6-T26, P6-T29.
+- Replacement: `git grep -c -F -e <token>` on both README copies and on the potential entry.
+- Evidence: `evidence/qa-gates/readme-documentation.2026-10-02T08-45.md`, `evidence/qa-gates/potential-entry-disposition.2026-10-02T08-45.md`.
+
+## DEV-P6-T27 — test purity by git grep and PreToolUse hook non-denial
+
+- Task: P6-T27.
+- Replacement: `git grep -n -F` over the six files with the six banned tokens printed nothing and exited 1 (count 0). Rule PD is replaced by the `check-powershell-test-purity.ps1` PreToolUse hook (registered for `Write|Edit` in `.claude/settings.json` lines 127-141), which ran on every Write/Edit of the six files and denied none; for the two Edit-only files the hook saw the edit payload, and the whole-file token scan covers the rest. Operator PD command (classification row P6-T27): save the PD body as `pd.ps1` and run `pwsh -NoProfile -File pd.ps1 -FileList <the six paths comma-separated>`.
+- Evidence: `evidence/qa-gates/test-purity.2026-10-02T08-45.md`.
+
+## DEV-P6-T28 — rule LL by git grep
+
+- Task: P6-T28.
+- Replacement: `git grep -c ''` over the nine files.
+- Evidence: `evidence/qa-gates/line-limits.2026-10-02T08-45.md`.
+
+## DEV-P6-T30 — literal BASE_SHA
+
+- Task: P6-T30.
+- Replacement: `git diff --name-only 589b51a30d856dca973a2ed9988f9443c35339cf` (literal BASE_SHA, as in DEV-P5-T7) plus porcelain status, run after commit ab266ca9 and before the AC check-off edits; `spec.md` (row 22) changes afterwards.
+- Evidence: `evidence/qa-gates/scope-check.2026-10-02T08-45.md`.
+
+## DEV-AC-05-10 — AC-05 and AC-10 checked with P6-T12 open on its run C leg only
+
+- Task: P6-T35, P6-T40.
+- Plan mechanism: check AC-05 after P4-T1 (R3) and P6-T12; check AC-10 after P6-T12 and P6-T25.
+- Replacement: P6-T12 stays unchecked because its acceptance names the run C log, which does not exist (operator-run blocker). The criterion text of AC-05 (Invoke-PoshQCTest logs source and file count before Pester runs; unit tests assert it) is met by R3 passing in run A and by the run A and run B job logs; the criterion text of AC-10 (the file exists with version 1 and the five roots; a self-hosted repository run logs source `config`) is met by P6-T25 and by the run A and run B population lines. On orchestrator instruction, AC-05 and AC-10 are checked and P6-T35 and P6-T40 are checked; the run C leg remains open under P6-T12.
+- Evidence: `evidence/qa-gates/population-source.2026-10-02T08-45.md`, `evidence/qa-gates/coverage-config.2026-10-02T08-45.md`, `evidence/regression-testing/pass-after-new-tests.2026-10-02T08-45.md`.
+
+## DEV-P6-T48 — AC counter by git grep; P6-T48 left unchecked
+
+- Task: P6-T48.
+- Plan mechanism: `Get-Content`/`IndexOf` unchecked count and `Get-NamedSectionCheckboxCount` in `pwsh`.
+- Replacement: `git grep -n -E '^- \[( |x)\] '` on `spec.md`, restricted to lines 266-283 (between `## Acceptance Criteria` at line 264 and `## Risks & Mitigations` at line 285): 18 items, 14 checked, 4 unchecked. AC-18 is checked because P6-T28 passed; P6-T48 stays unchecked because its zero-unchecked condition cannot hold while AC-01, AC-11, AC-12, AC-13 are open.
+- Evidence: `evidence/qa-gates/ac-checkoff-complete.2026-10-02T08-45.md`.
+
+## Open blockers carried forward
+
+- P1-T4 (operator command in DEV-P1-T4), P6-T9, P6-T10, P6-T11, P6-T12 (run C), P6-T15 to P6-T19 (post-fix fixture run), P6-T31, P6-T41, P6-T42, P6-T43 (AC-01, AC-11, AC-12, AC-13), and P6-T48.
