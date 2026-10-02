@@ -1,6 +1,7 @@
 # Baseline TypeScript PR-Context Evidence Suite
 
-Timestamp: 2026-10-02T01-17
+Timestamp: 2026-10-02T01-24
+Timestamp-Correction: original value 2026-10-02T01-17 was a Phase 0 start reading reused through Phase 4; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T02-02.md), an upper bound on the command run time.
 Command: npm --prefix extensions/drm-copilot run test -- test/lib/pr-context/verification-evidence.test.ts
 EXIT_CODE: 0
 Output Summary:

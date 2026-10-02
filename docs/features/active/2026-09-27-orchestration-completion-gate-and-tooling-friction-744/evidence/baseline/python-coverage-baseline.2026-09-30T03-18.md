@@ -1,6 +1,7 @@
 # Baseline Python Numeric Coverage
 
-Timestamp: 2026-10-02T01-17
+Timestamp: 2026-10-02T01-22
+Timestamp-Correction: original value 2026-10-02T01-17 was a Phase 0 start reading reused through Phase 4; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T02-02.md), an upper bound on the command run time.
 Command: poetry run python -c "import json; j = json.load(open('artifacts/python/coverage-744-baseline.json', encoding='utf-8')); t = j['totals']; f = [v for k, v in j['files'].items() if k.replace(chr(92), '/') == 'scripts/dev_tools/pr_context/verification_evidence.py'][0]; s = f['summary']; print('TOTAL lines=%d/%d branches=%d/%d' % (t['covered_lines'], t['num_statements'], t['covered_branches'], t['num_branches'])); print('FILE lines=%d/%d branches=%d/%d missing_lines=%s' % (s['covered_lines'], s['num_statements'], s['covered_branches'], s['num_branches'], ','.join(str(n) for n in f['missing_lines'])))"
 EXIT_CODE: 0
 Output Summary:

@@ -1,6 +1,7 @@
 # Baseline TypeScript Formatting
 
-Timestamp: 2026-10-02T01-17
+Timestamp: 2026-10-02T01-23
+Timestamp-Correction: original value 2026-10-02T01-17 was a Phase 0 start reading reused through Phase 4; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T02-02.md), an upper bound on the command run time.
 Command: npx --prefix extensions/drm-copilot prettier --check "extensions/drm-copilot/src/**/*.ts" "extensions/drm-copilot/test/**/*.ts" "extensions/drm-copilot/*.json" "extensions/drm-copilot/*.cjs"
 EXIT_CODE: 0
 Output Summary:

@@ -1,6 +1,7 @@
 # Fail-Before: Completion-Gate Documentation Contracts
 
-Timestamp: 2026-10-02T01-17
+Timestamp: 2026-10-02T01-31
+Timestamp-Correction: original value 2026-10-02T01-17 was a Phase 0 start reading reused through Phase 4; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T02-02.md), an upper bound on the command run time.
 Command: poetry run pytest tests/scripts/dev_tools/test_completion_gate_documentation_contracts.py -q -rA
 EXIT_CODE: 1
 ExpectedExitCode: 1
