@@ -15,6 +15,15 @@ const fileSystemStub: FileSystem = {
   isFile() {
     throw new Error("not used");
   },
+  exists() {
+    throw new Error("not used");
+  },
+  isDirectory() {
+    throw new Error("not used");
+  },
+  listDirectory() {
+    throw new Error("not used");
+  },
   readTextFile() {
     throw new Error("not used");
   },
@@ -71,16 +80,11 @@ describe("buildValidateOrchestrationServiceCallInput", () => {
   });
 
   it("omits an optional key when its value is explicitly undefined", () => {
-    // Arrange: both optional fields explicitly undefined.
+    // Arrange: optional fields omitted; the builder checks each with `=== undefined`.
     const input = {
       workspaceRoot: "C:/workspace",
       artifactType: "orchestrator-state",
       artifactPath: "docs/state.json",
-      requireComplete: undefined,
-      requireModelRouting: undefined,
-      requireCodexModelRouting: undefined,
-      requireCodexTopology: undefined,
-      requireReadyForExecution: undefined,
     };
 
     // Act

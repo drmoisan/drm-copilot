@@ -100,7 +100,11 @@ function extractKickoffTemplate(text: string): string {
   if (match === null) {
     throw new Error("no fenced markdown block follows '## Kickoff Artifact'");
   }
-  return match[1];
+  const template = match[1];
+  if (template === undefined) {
+    throw new Error("kickoff fenced block has no captured template body");
+  }
+  return template;
 }
 
 /**

@@ -3,8 +3,12 @@ import { describe, expect, it } from "@jest/globals";
 import { resolveCodexTopology } from "../../../src/lib/validate/codex-topology-resolver";
 import { validateEpicPlannerStateText } from "../../../src/lib/validate/epic-planner-state-core";
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 function record(value: unknown): Record<string, unknown> {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+  if (!isRecord(value)) {
     throw new Error("test fixture value must be an object");
   }
   return value;
