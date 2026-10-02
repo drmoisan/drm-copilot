@@ -324,13 +324,13 @@ Seeded from issue:
 - [x] The manual negative check (remove one entry in the working copy, run the CLI, observe exit 1 with QT008, restore) is performed and recorded as evidence.
 - [x] Tests use no temporary files and start no external processes; file contents and the tracked-file list are injected as inputs.
 - [x] `.github/workflows/_quality-checks.yml` job `quality-checks7` contains a step named `tier-classification` that runs `poetry run python -m scripts.dev_tools.check_quality_tiers` with `continue-on-error: false`, placed before "Run tests with Pytest", and no other job structure changes.
-- [ ] The `tier-classification` step runs and passes in a CI run on the branch head.
+- [x] The `tier-classification` step runs and passes in a CI run on the branch head.
 - [x] `actionlint` reports no findings on the modified `.github/workflows/_quality-checks.yml`.
 - [x] The citation in `.claude/rules/quality-tiers.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/rules/quality-tiers.md`, `.agents/skills/quality-tiers/SKILL.md`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/quality-tiers/SKILL.md` is replaced with the exact new text in "Policy-document edits (operator-directed)", and no other line in those files changes.
 - [x] `test_bundled_claude_payload_contains_all_repo_runtime_contracts` and `test_bundled_codex_and_agents_payload_contains_all_repo_runtime_contracts` pass.
 - [x] A search for `ci.research.md` outside `docs/` returns only the test fixture string in `tests/scripts/claude-lib/blast-radius/BlastRadiusConfig.Tests.ps1`, and no file under `.github/` is edited other than `.github/workflows/_quality-checks.yml`.
 - [x] The Python toolchain (Black, Ruff, Pyright, full Pytest suite) passes in a single pass, and the new modules each meet >= 85% line and >= 75% branch coverage with the repository-wide `check_python_coverage_thresholds` gate passing.
-- [ ] The new modules use no Python 3.11+ APIs and pass in the 3.10 matrix leg of `quality-checks7`.
+- [x] The new modules use no Python 3.11+ APIs and pass in the 3.10 matrix leg of `quality-checks7`.
 - [x] Follow-ups are recorded for the `.agents/skills/quality-tiers.md` broken citation and for the deferred T1/T2 elevation candidates.
 
 Note on counts: no acceptance criterion asserts a numeric project count. The research record's numeric derivation does not independently cover the complete discovery family (its Complete Family and cross-check strategy omit `*.csproj`, the cross-check does not verify the R3 "directly contains" condition, and both derivations enumerate the filesystem rather than `git ls-files`). Completeness is instead enforced by the validator (QT007/QT008) at implementation time.
