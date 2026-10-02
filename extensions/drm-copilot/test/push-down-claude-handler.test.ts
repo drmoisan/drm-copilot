@@ -124,7 +124,7 @@ describe("handlePushDownCopilotCustomizations", () => {
     };
     const service = {
       pushDownCopilotCustomizations:
-        jest.fn<() => Promise<RepoAutomationExecutionResult>>(),
+        jest.fn<RepoAutomationService["pushDownCopilotCustomizations"]>(),
     };
     service.pushDownCopilotCustomizations.mockResolvedValue(mockResult);
 

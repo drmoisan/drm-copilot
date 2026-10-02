@@ -275,6 +275,12 @@ In `closed` mode, do not report completion until:
    `artifact_type: "parallel-orchestrator-state"`).
 4. Acceptance criteria in the AC source files of each item have been checked off by that item's own
    run, per the `acceptance-criteria-tracking` skill.
+   A CI-dependent criterion, whose verification requires the result of CI on the pull-request head,
+   is checked off and pushed by the item's own run after its S9 success and before its DONE, and
+   that run re-runs S9 so its reported `ci_gate.head_sha` is the final head. Before `gh pr merge`,
+   confirm that the `headRefOid` value equals that reported `ci_gate.head_sha` and that the item
+   reported no pending CI-dependent criteria. You never commit acceptance-criteria check-offs from
+   the coordinator root.
 
 In `open` mode there is no automatic completion. The run is a standing queue and terminates only
 via `/parallel-close`, which is owned by F6 and is not specified here or shipped by this feature. Do

@@ -1,0 +1,12 @@
+extensions/drm-copilot/test/poshqc-folder-picker.test.ts
+extensions/drm-copilot/test/push-down-claude-handler.test.ts
+extensions/drm-copilot/test/remove-worktrees.test.ts
+extensions/drm-copilot/test/remove-worktrees-runner.test.ts
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts
+extensions/drm-copilot/test/repo-automation-dispatch.test.ts
+extensions/drm-copilot/test/repo-automation-dispatch-pr-context-verification.test.ts
+extensions/drm-copilot/test/repo-automation-execute-discovery.test.ts
+extensions/drm-copilot/test/repo-automation-hard-lock-prompt.test.ts
+extensions/drm-copilot/test/repo-automation-orchestration-validation.test.ts
+extensions/drm-copilot/test/repo-automation-service.resolve-atomic-plan-prompt.test.ts
+extensions/drm-copilot/test/subagent-tree-command.test.ts

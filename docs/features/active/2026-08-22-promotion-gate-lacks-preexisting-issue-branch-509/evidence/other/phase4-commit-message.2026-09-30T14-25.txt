@@ -1,0 +1,14 @@
+test(509): add shared issue-adoption parity corpus and Python reader
+
+Add the 29-file shared corpus tests/fixtures/orchestrator_state_issue_adoption/
+({name, notes, checkpoint, expected_errors}) covering valid adoptions,
+presence gating, every rejection rule, the closed waivable set, error
+ordering relative to local_execution_overrides, and case-sensitive tool
+names. Add tests/scripts/dev_tools/test_orchestrator_state_issue_adoption_parity.py,
+which reads the corpus with a minimum-size guard (29) and asserts ordered
+equality against validate_routing_contract (32 passed). Include Phase 4
+evidence and plan check-offs.
+
+Refs #509
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

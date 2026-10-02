@@ -104,9 +104,13 @@ jobs:
         run: |
           $version = '${{ steps.resolve-publish-version.outputs.publishVersion }}'
           $packageOperand = "@danmoisan/drm-copilot-mcp@$version"
-          $maxAttempts = 18
-          $intervalSeconds = 10
+          $maxAttempts = 14
+          $initialIntervalSeconds = 10
+          $maxIntervalSeconds = 60
           $resolved = $false
+          # Issue #723: registry propagation can exceed the former 180 second window. The wait
+          # after failed attempt k is min(10 x k, 60) seconds and is skipped after the final
+          # attempt, so 13 waits cover a 630 second schedule.
           for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
             $observed = (npm view $packageOperand version 2>$null | Select-Object -First 1)
             # The exact-version query is EXPECTED to fail on every attempt before the version
@@ -119,10 +123,13 @@ jobs:
               break
             }
             Write-Host "Attempt $attempt of ${maxAttempts}: $packageOperand not resolvable yet."
-            Start-Sleep -Seconds $intervalSeconds
+            if ($attempt -lt $maxAttempts) {
+              $sleepSeconds = [Math]::Min($initialIntervalSeconds * $attempt, $maxIntervalSeconds)
+              Start-Sleep -Seconds $sleepSeconds
+            }
           }
           if (-not $resolved) {
-            Write-Host "::error::$packageOperand did not resolve within $maxAttempts attempts; the tag push did not publish."
+            Write-Host "::error::$packageOperand was not yet resolvable on the registry after $maxAttempts attempts over about 10 minutes. The publish step succeeded before this check ran, so the version is probably published. Check the registry with 'npm view $packageOperand version' before re-running, because re-publishing an existing version fails."
             exit 1
           }
           exit 0

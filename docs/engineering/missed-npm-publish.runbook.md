@@ -125,6 +125,16 @@ first version may still be propagating. If the version still does not resolve af
 verification pass well outside the propagation window, treat it as `RUN_FAILED` with a consumed
 version and apply the disposition decision.
 
+## Red verify step after a green publish step
+
+The workflow step titled "Verify the published version resolves on the registry" is a workflow step, not one of the verifier state tokens listed above.
+
+A red verify step after a green Publish to npm step is not a failed release.
+
+Check the exact version on the registry instead of re-running the publish, because re-publishing an existing version fails.
+
+The paired extension tag still needs to be pushed, because the VS Code extension release is not published until that tag is pushed.
+
 ## VERSION_CONSUMED_ELSEWHERE
 
 **Meaning.** The pre-push registry check found the target version already present on the registry

@@ -12,6 +12,7 @@ import {
 } from "./runtime-test-helpers";
 
 type CommandHandler = (...args: unknown[]) => Promise<void> | void;
+type MessageFn = (message: string, ...items: unknown[]) => Promise<unknown>;
 
 interface MockTerminal {
   readonly show: jest.Mock;
@@ -21,14 +22,18 @@ interface MockTerminal {
 
 const commandHandlers = new Map<string, CommandHandler>();
 const appendLineMock = jest.fn<(line: string) => void>();
-const showInputBoxMock = jest.fn();
-const showQuickPickMock = jest.fn();
-const showOpenDialogMock = jest.fn();
-const showWarningMessageMock = jest.fn();
-const showInformationMessageMock = jest.fn();
-const showErrorMessageMock = jest.fn();
-const openTextDocumentMock = jest.fn();
-const showTextDocumentMock = jest.fn();
+const showInputBoxMock =
+  jest.fn<(options?: unknown) => Promise<string | undefined>>();
+const showQuickPickMock =
+  jest.fn<(items: unknown, options?: unknown) => Promise<unknown>>();
+const showOpenDialogMock = jest.fn<(options?: unknown) => Promise<unknown>>();
+const showWarningMessageMock = jest.fn<MessageFn>();
+const showInformationMessageMock = jest.fn<MessageFn>();
+const showErrorMessageMock = jest.fn<MessageFn>();
+const openTextDocumentMock =
+  jest.fn<(uri: { fsPath: string }) => Promise<{ uri: { fsPath: string } }>>();
+const showTextDocumentMock =
+  jest.fn<(document: unknown, options?: unknown) => Promise<unknown>>();
 function buildMockTerminal(): MockTerminal {
   return {
     show: jest.fn(),
@@ -37,7 +42,9 @@ function buildMockTerminal(): MockTerminal {
   };
 }
 
-const createTerminalMock = jest.fn((): MockTerminal => buildMockTerminal());
+const createTerminalMock = jest.fn<(options?: unknown) => MockTerminal>(() =>
+  buildMockTerminal(),
+);
 const registerCommandMock = jest.fn(
   (command: string, handler: CommandHandler) => {
     commandHandlers.set(command, handler);
@@ -50,7 +57,9 @@ let workspaceFoldersState: Array<{ uri: { fsPath: string } }> | undefined = [
   { uri: { fsPath: "C:/workspace" } },
 ];
 
-const registerMcpServerDefinitionProviderMock = jest.fn(() => ({
+const registerMcpServerDefinitionProviderMock = jest.fn<
+  (id: string, provider: unknown) => { dispose: jest.Mock }
+>(() => ({
   dispose: jest.fn(),
 }));
 
@@ -343,8 +352,8 @@ export function setInstalledCodexExtensionRoots(
 }
 
 export function resetExtensionHarnessState(): void {
-  process.env.PATH = "C:/bin";
-  process.env.PATHEXT = ".EXE;.CMD";
+  process.env["PATH"] = "C:/bin";
+  process.env["PATHEXT"] = ".EXE;.CMD";
   commandHandlers.clear();
   appendLineMock.mockReset();
   registerCommandMock.mockClear();
@@ -457,7 +466,6 @@ export {
   prepareFreshModulesWithPosixPathResolve,
   registerCommandMock,
   registerMcpServerDefinitionProviderMock,
-  resolveCodexExecutable,
   openTextDocumentMock,
   showInputBoxMock,
   showOpenDialogMock,

@@ -234,7 +234,9 @@ describe("runPoshQCTest terminal streaming and failure semantics", () => {
 
     // Act
     const handler = activateAndGetHandler("drmCopilotExtension.runPoshQCTest");
-    const error = await handler(["--scan-folder", "C:/workspace/src"]).then(
+    const error = await Promise.resolve(
+      handler(["--scan-folder", "C:/workspace/src"]),
+    ).then(
       () => undefined,
       (caught: unknown) => caught,
     );

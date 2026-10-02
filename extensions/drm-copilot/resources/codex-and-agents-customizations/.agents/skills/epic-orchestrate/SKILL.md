@@ -112,9 +112,11 @@ authoritative backstop.
 
 Each child owns its implementation, review, PR, CI-green gate, and merge into the integration
 branch. A merge conflict enters that child's existing remediation loop with a blocking
-`remediation-inputs.<timestamp>.md`. After three unresolved passes, record
-`blocked_conflict_loop_limit` and stop that edge. The epic agent must not resolve child conflicts
-locally.
+`remediation-inputs.<timestamp>.md`. Conflict cycles share the child's attempt count,
+`remediation_loop.completed_attempts`. The active cycle number is `completed_attempts + 1`, and a
+cycle without an applied candidate consumes no number. After three completed attempts without a
+`PASS` review, record `blocked_conflict_loop_limit` and stop that edge. The epic agent must not
+resolve child conflicts locally.
 
 ## Worktree Cleanup
 
