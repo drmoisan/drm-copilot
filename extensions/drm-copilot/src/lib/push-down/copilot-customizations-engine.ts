@@ -280,7 +280,7 @@ export function renderPushDownSummary(summary: PushDownSummary): string {
  * @param indent Indentation width in spaces.
  * @returns Sorted-key JSON string.
  */
-function stringifySorted(value: unknown, indent: number): string {
+export function stringifySorted(value: unknown, indent: number): string {
   const sortKeys = (input: unknown): unknown => {
     if (Array.isArray(input)) {
       return input.map(sortKeys);

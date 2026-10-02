@@ -19,6 +19,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1 payload envelope' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-cohort-barrier.ps1").Path
         . $script:UnderTest
+        Mock Resolve-ParallelCohortBarrierTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     Context 'entry-point exit code and emitted decision (AC-4, no child process)' {

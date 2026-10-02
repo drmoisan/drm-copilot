@@ -109,6 +109,7 @@ select = [
 "tests/scripts/dev_tools/test_parallel_mutation_protocol_properties.py" = ["S311"]
 "tests/scripts/dev_tools/test_parallel_mutation_contention_properties.py" = ["S311"]
 "tests/scripts/dev_tools/test_parallel_mutation_pin_stability_properties.py" = ["S311"]
+"tests/scripts/dev_tools/test_push_down_exclusion_manifest.py" = ["S311"]
 
 [tool.pytest.ini_options]
 minversion = "7.0"

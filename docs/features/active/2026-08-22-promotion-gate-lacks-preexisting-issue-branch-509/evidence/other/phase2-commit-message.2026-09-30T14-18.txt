@@ -1,0 +1,12 @@
+test(509): add failing issue-adoption regression test
+
+Add tests/scripts/dev_tools/test_validate_orchestrator_state_issue_adoption.py,
+which reproduces the defect: a large-route checkpoint whose issue existed
+before orchestration has no potential_to_issue receipt and cannot pass
+completion validation. Against the split-only code the file records
+3 failed, 1 passed (expected failure, evidence recorded). Include the
+batch-budget reset B2 evidence and the Phase 2 plan check-offs.
+
+Refs #509
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

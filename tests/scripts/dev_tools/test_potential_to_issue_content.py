@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from scripts.dev_tools import potential_to_issue_content as mod
 
 
@@ -229,3 +231,65 @@ def test_normalize_smart_punctuation_replaces_all_mapped_characters() -> None:
     normalized = mod.normalize_smart_punctuation(raw)
 
     assert normalized == "\"quoted\" 'apostrophe' 'dash' - - "
+
+
+def test_get_feature_name_variants() -> None:
+    """Verify feature name extraction from headings and filename fallbacks."""
+    assert (
+        mod.get_feature_name("# My Feature Name\n## Section", Path("test.md"))
+        == "My Feature Name"
+    )
+    assert mod.get_feature_name("# Feature (Potential)\n", Path("test.md")) == "Feature"
+    assert mod.get_feature_name("No heading", Path("feature-name.md")) == "feature-name"
+    assert mod.get_feature_name("No heading", Path("my-feature")) == "my-feature"
+    assert (
+        mod.get_feature_name("#   Feature Name (Potential)  \n", Path("test.md"))
+        == "Feature Name"
+    )
+    assert (
+        mod.get_feature_name("# First Feature\n## Second\n# Third", Path("test.md"))
+        == "First Feature"
+    )
+    assert (
+        mod.get_feature_name("# Bug Title (Potential Bug)\n", Path("test.md"))
+        == "Bug Title"
+    )
+
+
+def test_get_feature_path_variants() -> None:
+    """Verify feature-path normalization across punctuation and spacing cases."""
+    assert mod.get_feature_path("My Feature Name") == "My_Feature_Name"
+    assert mod.get_feature_path("Feature: (v2.0) @ Test!") == "Feature_v20__Test"
+    assert mod.get_feature_path("Feature   Name") == "Feature_Name"
+    assert mod.get_feature_path("my-feature-name") == "my-feature-name"
+    assert mod.get_feature_path("Feature v2 Update") == "Feature_v2_Update"
+    assert mod.get_feature_path("A") == "A"
+
+
+def test_get_section_variants() -> None:
+    """Verify markdown section extraction for common and edge-case layouts."""
+    content = "## Problem / Why\nabc\n## Proposed Behavior\ndef"
+    assert mod.get_section(content, "Problem / Why") == "abc"
+
+    multi_line = "## Problem / Why\nline1\nline2\nline3\n## Next Section\nother"
+    assert mod.get_section(multi_line, "Problem / Why") == "line1\nline2\nline3"
+
+    assert mod.get_section(content, "NonExistent") == ""
+
+    end_section = "## Problem / Why\nabc\n## Last Section\nfinal content"
+    assert mod.get_section(end_section, "Last Section") == "final content"
+
+    trimmed = "## Problem / Why\n  abc  \n  def  \n## Next"
+    assert mod.get_section(trimmed, "Problem / Why") == "abc  \n  def"
+
+    special_heading = "## Acceptance Criteria (early draft)\ncontent here\n## Next"
+    assert (
+        mod.get_section(special_heading, "Acceptance Criteria (early draft)")
+        == "content here"
+    )
+
+    empty_section = "## Problem / Why\n\n## Proposed Behavior\ndef"
+    assert mod.get_section(empty_section, "Problem / Why") == ""
+
+    windows_endings = "## Problem / Why\r\nabc\r\n## Proposed Behavior\r\ndef"
+    assert mod.get_section(windows_endings, "Problem / Why") == "abc"

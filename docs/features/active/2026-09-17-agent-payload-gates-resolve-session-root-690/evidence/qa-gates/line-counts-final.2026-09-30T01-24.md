@@ -1,0 +1,65 @@
+# Final Line Counts (P12-T17)
+
+Timestamp: 2026-09-30T01-24
+Command: sh SCRATCH/run-ps.sh SCRATCH/line-counts.ps1 <FINAL-PS, 58 files>
+EXIT_CODE: 0
+Output Summary:
+- .claude/lib/worktree-resolution/WorktreeRunResolution.psm1 LineCount=493
+- .claude/lib/worktree-resolution/WorktreeItemResolution.psm1 LineCount=407
+- .claude/lib/worktree-resolution/EpicScopeResolution.psm1 LineCount=390
+- .claude/hooks/enforce-orchestration-preimplementation-gate.ps1 LineCount=466
+- .claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 LineCount=279
+- .claude/hooks/enforce-epic-wave-barrier.ps1 LineCount=381
+- .claude/hooks/enforce-parallel-cohort-barrier.ps1 LineCount=331
+- .claude/hooks/enforce-epic-merge-gate.ps1 LineCount=459
+- .claude/hooks/enforce-epic-merge-gate-resolution.ps1 LineCount=221
+- .claude/hooks/enforce-epic-worktree-removal-gate.ps1 LineCount=457
+- .claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1 LineCount=144
+- .claude/hooks/enforce-parallel-worktree-removal-gate.ps1 LineCount=474
+- .claude/hooks/enforce-parallel-drift-gate.ps1 LineCount=444
+- scripts/powershell/PoshQC/settings/pester.runsettings.psd1 LineCount=340
+- tests/scripts/claude-lib/worktree-resolution/WorktreeRunResolution.Signal.Tests.ps1 LineCount=162
+- tests/scripts/claude-lib/worktree-resolution/WorktreeRunResolution.Tests.ps1 LineCount=261
+- tests/scripts/claude-lib/worktree-resolution/WorktreeRunResolution.Record.Tests.ps1 LineCount=428
+- tests/scripts/claude-lib/worktree-resolution/EpicScopeResolution.RunTarget.Tests.ps1 LineCount=115
+- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.WorktreeResolution.Tests.ps1 LineCount=279
+- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.OperandResolution.Tests.ps1 LineCount=249
+- tests/scripts/claude-hooks/enforce-epic-wave-barrier.WorktreeResolution.Tests.ps1 LineCount=206
+- tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.WorktreeResolution.Tests.ps1 LineCount=171
+- tests/scripts/claude-hooks/enforce-epic-merge-gate.WorktreeResolution.Tests.ps1 LineCount=220
+- tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.WorktreeResolution.Tests.ps1 LineCount=163
+- tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.WorktreeResolution.Tests.ps1 LineCount=166
+- tests/scripts/claude-hooks/enforce-parallel-drift-gate.WorktreeResolution.Tests.ps1 LineCount=158
+- tests/scripts/claude-hooks/EpicStateIsolation.Helpers.ps1 LineCount=198
+- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Tests.ps1 LineCount=467
+- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1 LineCount=362
+- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1 LineCount=338
+- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1 LineCount=493
+- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.AttributionTrailer.Tests.ps1 LineCount=103
+- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-absolute-paths.Tests.ps1 LineCount=229
+- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-classifier.Tests.ps1 LineCount=160
+- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1 LineCount=492
+- tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.Tests.ps1 LineCount=458
+- tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.Payload.Tests.ps1 LineCount=93
+- tests/scripts/claude-hooks/enforce-epic-merge-gate.Tests.ps1 LineCount=456
+- tests/scripts/claude-hooks/enforce-epic-merge-gate.Authorization.Tests.ps1 LineCount=169
+- tests/scripts/claude-hooks/enforce-epic-merge-gate.TriggerScoping.Tests.ps1 LineCount=175
+- tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1 LineCount=230
+- tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Tests.ps1 LineCount=497
+- tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1 LineCount=108
+- tests/scripts/claude-hooks/CleanupWorktreeManifestGateMatrix.Tests.ps1 LineCount=320
+- tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1 LineCount=466
+- tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.EpicAuthorization.Tests.ps1 LineCount=141
+- tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1 LineCount=89
+- tests/scripts/claude-hooks/enforce-pr-author-skill.TargetResolution.Tests.ps1 LineCount=116
+- tests/scripts/claude-hooks/enforce-pr-author-skill.WorktreeResolution.Tests.ps1 LineCount=399
+- tests/scripts/claude-hooks/enforce-model-routing-receipt.WorktreeResolution.Tests.ps1 LineCount=396
+- tests/scripts/claude-hooks/enforce-model-routing-receipt.EpicScope.Tests.ps1 LineCount=152
+- tests/scripts/claude-hooks/enforce-pr-author-skill.EpicScope.Tests.ps1 LineCount=161
+- tests/scripts/claude-hooks/enforce-pr-author-skill.epic-base-branch.Tests.ps1 LineCount=207
+- tests/scripts/claude-hooks/enforce-epic-wave-barrier.Tests.ps1 LineCount=261
+- tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1 LineCount=438
+- tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1 LineCount=373
+- tests/scripts/claude-lib/worktree-resolution/EpicScopeResolution.Tests.ps1 LineCount=400
+- tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1 LineCount=104
+- Every LineCount value is at most 500 (maximum 497).

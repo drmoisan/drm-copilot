@@ -1,0 +1,59 @@
+{
+  "path": "/dest/config/orchestration-routing.json",
+  "cases": [
+    {
+      "name": "destination-absent-source-copied-verbatim",
+      "destination": null,
+      "source": "{\n    \"version\": 1,\n    \"routes\": {\n        \"parallel\": {\n            \"agent\": \"parallel-orchestrator\"\n        }\n    }\n}\n",
+      "expected": "{\n    \"version\": 1,\n    \"routes\": {\n        \"parallel\": {\n            \"agent\": \"parallel-orchestrator\"\n        }\n    }\n}\n"
+    },
+    {
+      "name": "new-source-route-appended",
+      "destination": "{\n  \"version\": 1,\n  \"routes\": {\n    \"feature\": {\n      \"agent\": \"feature-orchestrator\"\n    }\n  }\n}\n",
+      "source": "{\n  \"version\": 2,\n  \"routes\": {\n    \"feature\": {\n      \"agent\": \"source-feature-orchestrator\"\n    },\n    \"preparation\": {\n      \"agent\": \"preparation-orchestrator\",\n      \"max_depth\": 2\n    }\n  }\n}\n",
+      "expected": "{\n  \"version\": 1,\n  \"routes\": {\n    \"feature\": {\n      \"agent\": \"feature-orchestrator\"\n    },\n    \"preparation\": {\n      \"agent\": \"preparation-orchestrator\",\n      \"max_depth\": 2\n    }\n  }\n}\n"
+    },
+    {
+      "name": "stale-parallel-replaced",
+      "destination": "{\n  \"version\": 1,\n  \"routes\": {\n    \"parallel\": {\n      \"agent\": \"stale-parallel\",\n      \"max_workers\": 1\n    },\n    \"local_only\": {\n      \"agent\": \"local-agent\"\n    }\n  }\n}\n",
+      "source": "{\n  \"version\": 1,\n  \"routes\": {\n    \"parallel\": {\n      \"agent\": \"parallel-orchestrator\",\n      \"max_workers\": 4,\n      \"gates\": [\n        \"preflight\",\n        \"qa\"\n      ]\n    }\n  }\n}\n",
+      "expected": "{\n  \"version\": 1,\n  \"routes\": {\n    \"parallel\": {\n      \"agent\": \"parallel-orchestrator\",\n      \"max_workers\": 4,\n      \"gates\": [\n        \"preflight\",\n        \"qa\"\n      ]\n    },\n    \"local_only\": {\n      \"agent\": \"local-agent\"\n    }\n  }\n}\n"
+    },
+    {
+      "name": "destination-local-top-level-keys-preserved",
+      "destination": "{\n  \"custom_settings\": {\n    \"enabled\": true,\n    \"label\": \"local\"\n  },\n  \"routes\": {\n    \"review\": {\n      \"agent\": \"local-review\"\n    }\n  },\n  \"notes\": null\n}\n",
+      "source": "{\n  \"version\": 3,\n  \"routes\": {\n    \"review\": {\n      \"agent\": \"source-review\"\n    }\n  },\n  \"defaults\": {\n    \"timeout_seconds\": 30,\n    \"retry\": false\n  }\n}\n",
+      "expected": "{\n  \"custom_settings\": {\n    \"enabled\": true,\n    \"label\": \"local\"\n  },\n  \"routes\": {\n    \"review\": {\n      \"agent\": \"local-review\"\n    }\n  },\n  \"notes\": null,\n  \"version\": 3,\n  \"defaults\": {\n    \"timeout_seconds\": 30,\n    \"retry\": false\n  }\n}\n"
+    },
+    {
+      "name": "non-object-destination-routes-treated-as-absent",
+      "destination": "{\n  \"version\": 1,\n  \"routes\": [\n    1,\n    2,\n    3\n  ],\n  \"comment\": \"routes is a list\"\n}\n",
+      "source": "{\n  \"version\": 2,\n  \"routes\": {\n    \"parallel\": {\n      \"agent\": \"parallel-orchestrator\"\n    },\n    \"bugfix\": {\n      \"agent\": \"bug-orchestrator\"\n    }\n  }\n}\n",
+      "expected": "{\n  \"version\": 1,\n  \"routes\": {\n    \"parallel\": {\n      \"agent\": \"parallel-orchestrator\"\n    },\n    \"bugfix\": {\n      \"agent\": \"bug-orchestrator\"\n    }\n  },\n  \"comment\": \"routes is a list\"\n}\n"
+    },
+    {
+      "name": "appended-non-object-source-routes-becomes-empty-object",
+      "destination": "{\n  \"version\": 1,\n  \"owner\": \"destination\"\n}\n",
+      "source": "{\n  \"version\": 2,\n  \"routes\": \"not-an-object\",\n  \"extra\": [\n    true,\n    false,\n    null\n  ]\n}\n",
+      "expected": "{\n  \"version\": 1,\n  \"owner\": \"destination\",\n  \"routes\": {},\n  \"extra\": [\n    true,\n    false,\n    null\n  ]\n}\n"
+    },
+    {
+      "name": "invalid-destination-json",
+      "destination": "{\"version\": 1, \"routes\": {\n",
+      "source": "{\n  \"version\": 1,\n  \"routes\": {}\n}\n",
+      "expectedErrorPrefix": "Destination routing document is not valid JSON and was not written: /dest/config/orchestration-routing.json ("
+    },
+    {
+      "name": "non-object-source-root",
+      "destination": "{\n  \"version\": 1,\n  \"routes\": {}\n}\n",
+      "source": "[1, 2, 3]\n",
+      "expectedErrorPrefix": "Destination routing document is not valid JSON and was not written: /dest/config/orchestration-routing.json ("
+    },
+    {
+      "name": "nan-destination-rejected",
+      "destination": "{\"version\": NaN, \"routes\": {}}\n",
+      "source": "{\n  \"version\": 1,\n  \"routes\": {}\n}\n",
+      "expectedErrorPrefix": "Destination routing document is not valid JSON and was not written: /dest/config/orchestration-routing.json ("
+    }
+  ]
+}
