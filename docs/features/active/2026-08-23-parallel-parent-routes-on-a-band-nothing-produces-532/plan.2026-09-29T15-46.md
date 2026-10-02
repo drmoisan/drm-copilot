@@ -224,7 +224,7 @@ Exact P10 error literals for `items[0]` (prefix `Parallel planner checkpoint ite
   Acceptance: `cmp` exits 0 with no output.
 - [x] [P5-T20] Verify byte parity for the `parallel-orchestration` rule pair: `cmp .claude/rules/parallel-orchestration.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md`; write `FEATURE/evidence/qa-gates/mirror-parity-parallel-orchestration-rule.<ts>.md`.
   Acceptance: `cmp` exits 0 with no output.
-- [ ] [P5-T21] Reset the Python per-session batch budget before the fourth test file of this session: list `ls .claude/state`, delete every `.claude/state/python-batch-budget.*.json` file (Bash `rm -f`, run as its own command), list again; write `FEATURE/evidence/other/python-batch-budget-reset.<ts>.md` with the second `ls .claude/state` as the single `Command:` and `EXIT_CODE:`, and the first listing and the `rm -f` command each recorded as a `- <command> exited <n>` list item (the first listing followed by its output lines) in `Output Summary:`.
+- [x] [P5-T21] Reset the Python per-session batch budget before the fourth test file of this session: list `ls .claude/state`, delete every `.claude/state/python-batch-budget.*.json` file (Bash `rm -f`, run as its own command), list again; write `FEATURE/evidence/other/python-batch-budget-reset.<ts>.md` with the second `ls .claude/state` as the single `Command:` and `EXIT_CODE:`, and the first listing and the `rm -f` command each recorded as a `- <command> exited <n>` list item (the first listing followed by its output lines) in `Output Summary:`.
   Acceptance: `EXIT_CODE: 0`; the second listing shows no `python-batch-budget.` file; the artifact records both listings.
 - [x] [P5-T22] Create `tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py` with the seven tests named in spec AC 22 through 28. Each test reads the target file with UTF-8, extracts the named `## ` section where the AC names one (from the heading line to the next line starting with `## `), collapses whitespace with `" ".join(text.split())`, and asserts these tokens: `test_parallel_plan_has_complexity_assessment_section` — a line equal to `## Complexity Assessment`, `Get-ComplexityFloor`, `Resolve-DelegationModel`, and `(P10)` inside the paragraph that begins `**Readiness contract.**`; `test_parallel_plan_uses_claude_receipt_agent_field` — `logical_agent` absent from `.claude/skills/parallel-plan/SKILL.md`; `test_parallel_orchestrate_names_planner_checkpoint_band_source` — `## Model Selection` contains `artifacts/orchestration/parallel-planner-state.json`, `model_routing_receipt`, `complexity_band`, `## Item Summary`, and `` `complexity` column ``; `test_parallel_orchestrator_agent_names_planner_checkpoint_band_source` — `## Delegation Model` of `.claude/agents/parallel-orchestrator.md` contains `artifacts/orchestration/parallel-planner-state.json`, `model_routing_receipt`, and `` `complexity` column ``; `test_parallel_add_requires_complexity_assessment` — the text from `2. **Prepare the item.**` to `3. **Compute conflict edges` contains `## Complexity Assessment` and `complexity_band`, and `## Constraints` contains `complexity_band` and `existing scheduling field`; `test_parallel_planner_agent_requires_routing_record` — `## Checkpoint Persistence` contains `complexity_assessment` and `## Completion Requirements` contains `(P10)` and `model_routing_receipt`; `test_parallel_orchestration_rule_defines_p10` — the rule contains `P10 — Ready gate, routing record.`, `_parallel_planner_state_routing.py`, and `structural subset`.
   Acceptance: `grep -c -E "^def test_" tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py` prints `7`.
@@ -235,73 +235,73 @@ Exact P10 error literals for `items[0]` (prefix `Parallel planner checkpoint ite
 
 ### Phase 6 — Scope Verification and Acceptance-Criteria Check-off (AC-01 to AC-32)
 
-- [ ] [P6-T1] Verify the scope boundary: run `git diff --stat b7b4a2dc -- scripts/dev_tools/validate_parallel_orchestrator_state.py scripts/dev_tools/_parallel_state_common.py scripts/dev_tools/_parallel_state_structures.py scripts/dev_tools/_parallel_state_records.py scripts/dev_tools/validate_epic_planner_state.py .claude/skills/epic-plan/SKILL.md .claude/agents/epic-planner.md .claude/hooks/enforce-model-routing-receipt.ps1` and `git status --porcelain -- scripts/dev_tools/validate_parallel_orchestrator_state.py scripts/dev_tools/_parallel_state_common.py scripts/dev_tools/_parallel_state_structures.py scripts/dev_tools/_parallel_state_records.py scripts/dev_tools/validate_epic_planner_state.py .claude/skills/epic-plan/SKILL.md .claude/agents/epic-planner.md .claude/hooks/enforce-model-routing-receipt.ps1`; write `FEATURE/evidence/qa-gates/scope-boundary.<ts>.md` with the `git diff --stat` command as the single `Command:` and `EXIT_CODE:` and the `git status --porcelain` command as a `- <command> exited <n>` list item followed by its output lines in `Output Summary:`.
+- [x] [P6-T1] Verify the scope boundary: run `git diff --stat b7b4a2dc -- scripts/dev_tools/validate_parallel_orchestrator_state.py scripts/dev_tools/_parallel_state_common.py scripts/dev_tools/_parallel_state_structures.py scripts/dev_tools/_parallel_state_records.py scripts/dev_tools/validate_epic_planner_state.py .claude/skills/epic-plan/SKILL.md .claude/agents/epic-planner.md .claude/hooks/enforce-model-routing-receipt.ps1` and `git status --porcelain -- scripts/dev_tools/validate_parallel_orchestrator_state.py scripts/dev_tools/_parallel_state_common.py scripts/dev_tools/_parallel_state_structures.py scripts/dev_tools/_parallel_state_records.py scripts/dev_tools/validate_epic_planner_state.py .claude/skills/epic-plan/SKILL.md .claude/agents/epic-planner.md .claude/hooks/enforce-model-routing-receipt.ps1`; write `FEATURE/evidence/qa-gates/scope-boundary.<ts>.md` with the `git diff --stat` command as the single `Command:` and `EXIT_CODE:` and the `git status --porcelain` command as a `- <command> exited <n>` list item followed by its output lines in `Output Summary:`.
   Acceptance: `EXIT_CODE: 0`, the `git diff --stat` output is empty, and the `git status --porcelain` list item ends `exited 0` with no output lines. `b7b4a2dc` equals the merge-base recorded in P0-T8.
-- [ ] [P6-T2] Verify that no Codex or `.agents` mirror was created: `git status --porcelain --untracked-files=all -- .agents .codex .github`; write `FEATURE/evidence/qa-gates/scope-boundary-mirrors.<ts>.md` (its own artifact, so the P6-T1 artifact keeps a single `EXIT_CODE:`).
+- [x] [P6-T2] Verify that no Codex or `.agents` mirror was created: `git status --porcelain --untracked-files=all -- .agents .codex .github`; write `FEATURE/evidence/qa-gates/scope-boundary-mirrors.<ts>.md` (its own artifact, so the P6-T1 artifact keeps a single `EXIT_CODE:`).
   Acceptance: `EXIT_CODE: 0` and the output is empty.
-- [ ] [P6-T3] Check off AC-01 (Python fail-before regression) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming the P1-T6 and P3-T5 artifacts.
+- [x] [P6-T3] Check off AC-01 (Python fail-before regression) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming the P1-T6 and P3-T5 artifacts.
   Acceptance: the AC-01 line changes from `- [ ]` to `- [x]` with its text unchanged.
-- [ ] [P6-T4] Check off AC-02 (`test_ready_gate_accepts_item_with_valid_routing_record`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T4] Check off AC-02 (`test_ready_gate_accepts_item_with_valid_routing_record`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T5] Check off AC-03 (`test_gate_off_accepts_item_without_routing_fields`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T5] Check off AC-03 (`test_gate_off_accepts_item_without_routing_fields`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T6] Check off AC-04 (`test_ready_gate_rejects_floor_that_disagrees_with_signals`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T6] Check off AC-04 (`test_ready_gate_rejects_floor_that_disagrees_with_signals`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T7] Check off AC-05 (`test_ready_gate_rejects_band_below_floor`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T7] Check off AC-05 (`test_ready_gate_rejects_band_below_floor`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T8] Check off AC-06 (`test_ready_gate_rejects_receipt_model_that_disagrees_with_resolver`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T8] Check off AC-06 (`test_ready_gate_rejects_receipt_model_that_disagrees_with_resolver`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T9] Check off AC-07 (`test_ready_gate_rejects_disabled_policy_fable_model`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T9] Check off AC-07 (`test_ready_gate_rejects_disabled_policy_fable_model`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T10] Check off AC-08 (assessment and receipt band mismatch tests) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T10] Check off AC-08 (assessment and receipt band mismatch tests) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T11] Check off AC-09 (`test_ready_gate_rejects_non_orchestrator_agent`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T11] Check off AC-09 (`test_ready_gate_rejects_non_orchestrator_agent`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T12] Check off AC-10 (`test_ready_gate_rejects_unknown_fable_policy`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T12] Check off AC-10 (`test_ready_gate_rejects_unknown_fable_policy`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T13] Check off AC-11 (`test_ready_gate_rejects_non_object_assessment_and_receipt`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T13] Check off AC-11 (`test_ready_gate_rejects_non_object_assessment_and_receipt`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T14] Check off AC-12 (`test_ready_gate_rejects_missing_assessed_at`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T14] Check off AC-12 (`test_ready_gate_rejects_missing_assessed_at`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T15] Check off AC-13 (`test_band_mismatch_reported_when_item_band_invalid`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T15] Check off AC-13 (`test_band_mismatch_reported_when_item_band_invalid`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T16] Check off AC-14 (`test_p10_errors_follow_p7_errors_for_same_item`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
+- [x] [P6-T16] Check off AC-14 (`test_p10_errors_follow_p7_errors_for_same_item`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T17] Check off AC-15 (routing helper reuses Claude helpers only) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T1 and P3-T5.
+- [x] [P6-T17] Check off AC-15 (routing helper reuses Claude helpers only) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T1 and P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T18] Check off AC-16 (builder-absence assertion replaced) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P1-T3 and P3-T6.
+- [x] [P6-T18] Check off AC-16 (builder-absence assertion replaced) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P1-T3 and P3-T6.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T19] Check off AC-17 (builders module; importers pass unedited) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P1-T1 and P3-T6.
+- [x] [P6-T19] Check off AC-17 (builders module; importers pass unedited) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P1-T1 and P3-T6.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T20] Check off AC-18 (TypeScript fail-before case) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P2-T6 and P4-T5.
+- [x] [P6-T20] Check off AC-18 (TypeScript fail-before case) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P2-T6 and P4-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T21] Check off AC-19 (TypeScript exact shared strings) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P4-T4, P4-T5, and P3-T5.
+- [x] [P6-T21] Check off AC-19 (TypeScript exact shared strings) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P4-T4, P4-T5, and P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T22] Check off AC-20 (TypeScript divergence pinned) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P4-T5.
+- [x] [P6-T22] Check off AC-20 (TypeScript divergence pinned) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P4-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T23] Check off AC-21 (TypeScript builders carry routing fields; gate-off replacement) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P2-T2, P2-T3, and P4-T5.
+- [x] [P6-T23] Check off AC-21 (TypeScript builders carry routing fields; gate-off replacement) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P2-T2, P2-T3, and P4-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T24] Check off AC-22 (`test_parallel_plan_has_complexity_assessment_section`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
+- [x] [P6-T24] Check off AC-22 (`test_parallel_plan_has_complexity_assessment_section`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T25] Check off AC-23 (`test_parallel_plan_uses_claude_receipt_agent_field`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
+- [x] [P6-T25] Check off AC-23 (`test_parallel_plan_uses_claude_receipt_agent_field`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T26] Check off AC-24 (`test_parallel_orchestrate_names_planner_checkpoint_band_source`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
+- [x] [P6-T26] Check off AC-24 (`test_parallel_orchestrate_names_planner_checkpoint_band_source`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T27] Check off AC-25 (`test_parallel_orchestrator_agent_names_planner_checkpoint_band_source`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
+- [x] [P6-T27] Check off AC-25 (`test_parallel_orchestrator_agent_names_planner_checkpoint_band_source`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T28] Check off AC-26 (`test_parallel_add_requires_complexity_assessment`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
+- [x] [P6-T28] Check off AC-26 (`test_parallel_add_requires_complexity_assessment`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T29] Check off AC-27 (`test_parallel_planner_agent_requires_routing_record`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
+- [x] [P6-T29] Check off AC-27 (`test_parallel_planner_agent_requires_routing_record`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T30] Check off AC-28 (`test_parallel_orchestration_rule_defines_p10`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
+- [x] [P6-T30] Check off AC-28 (`test_parallel_orchestration_rule_defines_p10`) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T31] Check off AC-29 (bundle parity) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T15 through P5-T20 and P5-T23.
+- [x] [P6-T31] Check off AC-29 (bundle parity) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T15 through P5-T20 and P5-T23.
   Acceptance: only the `- [ ]` marker of that line changes.
 - [ ] [P6-T32] Check off AC-30 (existing surface-contract tests pass) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P5-T23 and P5-T24.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T33] Check off AC-31 (scope diff) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P6-T1.
+- [x] [P6-T33] Check off AC-31 (scope diff) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P6-T1.
   Acceptance: only the `- [ ]` marker of that line changes.
-- [ ] [P6-T34] Check off AC-32 (`REQUIRED_ITEM_KEYS` unchanged; comment qualified) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T3 and the `test_required_item_keys_unchanged` pass in P3-T5.
+- [x] [P6-T34] Check off AC-32 (`REQUIRED_ITEM_KEYS` unchanged; comment qualified) in `docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/spec.md` after confirming P3-T3 and the `test_required_item_keys_unchanged` pass in P3-T5.
   Acceptance: only the `- [ ]` marker of that line changes.
 
 ### Phase 7 — Final QA Loop (Python and TypeScript) and Final Check-off
