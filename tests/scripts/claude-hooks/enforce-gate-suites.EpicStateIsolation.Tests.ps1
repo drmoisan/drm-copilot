@@ -3,22 +3,26 @@
 
 <#
 .SYNOPSIS
-    Epic-state isolation guard for the gate-1, gate-3, and gate-4 hook suites (issue #709).
+    Epic-state isolation guard for the gate-1, gate-3, and gate-4 hook suites (issues #709, #690).
 
 .DESCRIPTION
-    Seven hook suites reach Resolve-EpicScopeCheckpoint in
-    .claude/lib/worktree-resolution/EpicScopeResolution.psm1 through the hooks they load.
-    Unmocked, that resolver reads the gitignored epic checkpoint at the checkout root, so a
-    leftover local epic checkpoint could change their results on a developer machine.
+    Eight hook suites reach Resolve-EpicScopeCheckpoint in
+    .claude/lib/worktree-resolution/EpicScopeResolution.psm1 through the hooks they load, and
+    that resolver now locates the epic checkpoint through WorktreeRunResolution.psm1. Unmocked,
+    either module reads a gitignored run checkpoint, so leftover local state could change their
+    results on a developer machine.
 
-    The structural guard parses each of the seven committed suites and requires, inside the
+    The structural guard parses each of the eight committed suites and requires, inside the
     suite's outermost BeforeAll, the hook dot-source, then an Import-Module of
-    EpicScopeResolution.psm1 without -Force, then a Mock of Get-EpicScopeCheckpointText in
-    module scope EpicScopeResolution whose body is exactly $null.
+    EpicScopeResolution.psm1 without -Force followed by a $null Mock of
+    Get-EpicScopeCheckpointText in module scope EpicScopeResolution, and an Import-Module of
+    WorktreeRunResolution.psm1 without -Force followed by a $null Mock of
+    Get-WorktreeRunCheckpointText in module scope WorktreeRunResolution. The predicate lives in
+    EpicStateIsolation.Helpers.ps1.
 
 .NOTES
-    Known limit (decision D9): the guard iterates an explicit list of seven suite paths, so
-    a suite added later that reaches the resolver is not guarded automatically.
+    Known limit (decision D9): the guard iterates an explicit list of suite paths, so a suite
+    added later that reaches the resolver is not guarded automatically.
 
     This file loads no hook, creates no file, reads no gitignored state, and runs no git
     command. It reads only committed suite files located from $PSScriptRoot and builds
@@ -27,164 +31,7 @@
 
 BeforeAll {
     $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
-
-    function Get-EpicStateIsolationCommandDepth {
-        # Pure: the number of CommandAst ancestors of an AST node.
-        [OutputType([int])]
-        param([Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $Node)
-        $depth = 0
-        $parent = $Node.Parent
-        while ($null -ne $parent) {
-            if ($parent -is [System.Management.Automation.Language.CommandAst]) { $depth++ }
-            $parent = $parent.Parent
-        }
-        return $depth
-    }
-
-    function Get-EpicStateIsolationElementText {
-        # Pure: the literal value of a command element, or its source text.
-        [OutputType([string])]
-        param([AllowNull()] [System.Management.Automation.Language.Ast] $Element)
-        if ($null -eq $Element) { return $null }
-        if ($Element -is [System.Management.Automation.Language.StringConstantExpressionAst]) { return $Element.Value }
-        return $Element.Extent.Text
-    }
-
-    function Get-EpicStateIsolationMockBinding {
-        # Pure: the CommandName, ModuleName, and MockWith elements of a Mock command,
-        # bound by name or by position (CommandName is position 0, MockWith position 1).
-        [OutputType([hashtable])]
-        param([Parameter(Mandatory)] [System.Management.Automation.Language.CommandAst] $Command)
-        $valueParameters = @('CommandName', 'ModuleName', 'MockWith', 'ParameterFilter', 'RemoveParameterType', 'RemoveParameterValidation')
-        $named = @{}
-        $positional = [System.Collections.Generic.List[System.Management.Automation.Language.Ast]]::new()
-        $elements = $Command.CommandElements
-        $index = 1
-        while ($index -lt $elements.Count) {
-            $element = $elements[$index]
-            if ($element -is [System.Management.Automation.Language.CommandParameterAst]) {
-                if ($null -ne $element.Argument) {
-                    $named[$element.ParameterName] = $element.Argument
-                } elseif ($valueParameters -contains $element.ParameterName -and ($index + 1) -lt $elements.Count) {
-                    $index++
-                    $named[$element.ParameterName] = $elements[$index]
-                } else {
-                    $named[$element.ParameterName] = $null
-                }
-            } else {
-                $positional.Add($element)
-            }
-            $index++
-        }
-        $nextPosition = 0
-        $target = $named['CommandName']
-        if (-not $named.ContainsKey('CommandName') -and $positional.Count -gt $nextPosition) {
-            $target = $positional[$nextPosition]
-            $nextPosition++
-        }
-        $body = $named['MockWith']
-        if (-not $named.ContainsKey('MockWith') -and $positional.Count -gt $nextPosition) {
-            $body = $positional[$nextPosition]
-        }
-        return @{
-            CommandName   = Get-EpicStateIsolationElementText -Element $target
-            HasModuleName = $named.ContainsKey('ModuleName')
-            ModuleName    = Get-EpicStateIsolationElementText -Element $named['ModuleName']
-            MockWith      = $body
-        }
-    }
-
-    function Test-EpicStateIsolationNullBody {
-        # Pure: true when a Mock body is a script block holding exactly one $null statement.
-        [OutputType([bool])]
-        param([AllowNull()] [System.Management.Automation.Language.Ast] $Body)
-        if ($Body -isnot [System.Management.Automation.Language.ScriptBlockExpressionAst]) { return $false }
-        $block = $Body.ScriptBlock
-        if ($null -ne $block.ParamBlock -or $null -ne $block.BeginBlock -or $null -ne $block.ProcessBlock -or $null -eq $block.EndBlock) { return $false }
-        $statements = @($block.EndBlock.Statements)
-        return ($statements.Count -eq 1 -and $statements[0].Extent.Text.Trim() -ceq '$null')
-    }
-
-    function Get-EpicStateIsolationFinding {
-        <#
-            Pure: the epic-state isolation findings for one parsed suite, empty when the
-            suite's outermost BeforeAll dot-sources the hook, then imports
-            EpicScopeResolution.psm1 without -Force, then declares the $null Mock of
-            Get-EpicScopeCheckpointText in module scope EpicScopeResolution.
-        #>
-        [OutputType([string])]
-        param([Parameter(Mandatory)] [System.Management.Automation.Language.ScriptBlockAst] $Ast)
-
-        $isCommand = { param($node) $node -is [System.Management.Automation.Language.CommandAst] }
-        $outermost = @($Ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -eq 'BeforeAll' }, $true) |
-                Sort-Object -Property @{ Expression = { Get-EpicStateIsolationCommandDepth -Node $_ } }, @{ Expression = { $_.Extent.StartOffset } } |
-                    Select-Object -First 1)
-        $blockExpression = if ($outermost.Count -eq 1) {
-            @($outermost[0].CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.ScriptBlockExpressionAst] }) | Select-Object -First 1
-        }
-        if ($null -eq $blockExpression) {
-            'no outermost BeforeAll'
-            return
-        }
-
-        $commands = @($blockExpression.ScriptBlock.FindAll($isCommand, $true) | Sort-Object -Property { $_.Extent.StartOffset })
-        $mock = $null
-        $binding = $null
-        foreach ($command in $commands) {
-            if ($command.GetCommandName() -ne 'Mock') { continue }
-            $candidate = Get-EpicStateIsolationMockBinding -Command $command
-            if ($candidate.CommandName -eq 'Get-EpicScopeCheckpointText') {
-                $mock = $command
-                $binding = $candidate
-                break
-            }
-        }
-        $import = $commands | Where-Object {
-            $_.GetCommandName() -eq 'Import-Module' -and
-            (@($_.CommandElements | Select-Object -Skip 1 | ForEach-Object { $_.Extent.Text }) -join ' ') -match 'EpicScopeResolution\.psm1'
-        } | Select-Object -First 1
-        $dotSource = $commands | Where-Object { $_.InvocationOperator -eq [System.Management.Automation.Language.TokenKind]::Dot } | Select-Object -First 1
-
-        if ($null -eq $mock) {
-            'Mock of Get-EpicScopeCheckpointText missing from outermost BeforeAll'
-        } else {
-            if (-not $binding.HasModuleName -or $binding.ModuleName -ne 'EpicScopeResolution') { 'Mock lacks -ModuleName EpicScopeResolution' }
-            if (-not (Test-EpicStateIsolationNullBody -Body $binding.MockWith)) { 'Mock body is not exactly $null' }
-        }
-        if ($null -eq $import) {
-            'Import-Module of EpicScopeResolution.psm1 missing from outermost BeforeAll'
-        } elseif (@($import.CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.CommandParameterAst] -and $_.ParameterName -eq 'Force' }).Count -gt 0) {
-            'Import-Module of EpicScopeResolution.psm1 uses -Force'
-        }
-        if ($null -ne $mock -and $null -ne $import) {
-            $ordered = $null -ne $dotSource -and
-            $dotSource.Extent.StartOffset -lt $import.Extent.StartOffset -and
-            $import.Extent.StartOffset -lt $mock.Extent.StartOffset
-            if (-not $ordered) { 'hook dot-source, Import-Module, Mock order violated' }
-        }
-    }
-
-    function Get-EpicStateIsolationSuiteFinding {
-        # Parse one committed suite, located from the repository root, and return its
-        # findings prefixed by the repository-relative path.
-        [OutputType([string])]
-        param([Parameter(Mandatory)] [string] $RelativePath)
-        $fullPath = Join-Path $script:RepoRoot $RelativePath
-        if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
-            "suite file not found: $RelativePath"
-            return
-        }
-        $tokens = $null
-        $errors = $null
-        $ast = [System.Management.Automation.Language.Parser]::ParseFile($fullPath, [ref] $tokens, [ref] $errors)
-        if (@($errors).Count -gt 0) {
-            "${RelativePath}: parse error: $($errors[0].Message)"
-            return
-        }
-        foreach ($finding in @(Get-EpicStateIsolationFinding -Ast $ast)) {
-            "${RelativePath}: $finding"
-        }
-    }
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Helpers.ps1')
 }
 
 Describe 'gate suites isolate the epic checkpoint read (structural guard)' {
@@ -196,9 +43,10 @@ Describe 'gate suites isolate the epic checkpoint read (structural guard)' {
         @{ Path = 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1' }
         @{ Path = 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1' }
         @{ Path = 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-absolute-paths.Tests.ps1' }
+        @{ Path = 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.OperandResolution.Tests.ps1' }
     ) {
         # Arrange and act: parse the committed suite.
-        $findings = @(Get-EpicStateIsolationSuiteFinding -RelativePath $Path)
+        $findings = @(Get-EpicStateIsolationSuiteFinding -RepoRoot $script:RepoRoot -RelativePath $Path)
 
         # Assert: no finding; the message names the suite and each missing property.
         @($findings).Count | Should -Be 0 -Because ($findings -join '; ')
@@ -206,7 +54,8 @@ Describe 'gate suites isolate the epic checkpoint read (structural guard)' {
 
     Context 'guard predicate discrimination' {
         # Each row parses an in-memory fixture, so the guard is shown to reject every
-        # non-compliant shape rather than passing vacuously.
+        # non-compliant shape rather than passing vacuously. Every fixture carries both
+        # pairs except where the row targets one, so it fails only for its own reason.
         It 'accepts the compliant <Name> form with zero findings' -ForEach @(
             @{
                 Name   = 'positional'
@@ -216,6 +65,8 @@ Describe 'fixture' {
         . $script:UnderTest
         Import-Module ./EpicScopeResolution.psm1
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     }
 }
 '@
@@ -228,6 +79,8 @@ Describe 'fixture' {
         . $script:UnderTest
         Import-Module ./EpicScopeResolution.psm1
         Mock -CommandName Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution -MockWith { $null }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock -CommandName Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution -MockWith { $null }
     }
 }
 '@
@@ -255,6 +108,8 @@ Describe 'fixture' {
         . $script:UnderTest
         Import-Module ./EpicScopeResolution.psm1
         Mock Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution { $null }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     }
 }
 '@
@@ -268,6 +123,8 @@ Describe 'fixture' {
         . $script:UnderTest
         Import-Module ./EpicScopeResolution.psm1
         Mock Get-EpicScopeCheckpointText { $null }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     }
 }
 '@
@@ -281,6 +138,8 @@ Describe 'fixture' {
         . $script:UnderTest
         Import-Module ./EpicScopeResolution.psm1
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { '' }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     }
 }
 '@
@@ -293,6 +152,8 @@ Describe 'fixture' {
     BeforeAll {
         . $script:UnderTest
         Import-Module ./EpicScopeResolution.psm1
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     }
     Context 'nested' {
         BeforeAll {
@@ -311,6 +172,8 @@ Describe 'fixture' {
         . $script:UnderTest
         Import-Module ./EpicScopeResolution.psm1 -Force
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     }
 }
 '@
@@ -324,6 +187,66 @@ Describe 'fixture' {
         Import-Module ./EpicScopeResolution.psm1
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
         . $script:UnderTest
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+            }
+            @{
+                Name     = 'a missing Get-WorktreeRunCheckpointText Mock'
+                Expected = 'Mock of Get-WorktreeRunCheckpointText missing from outermost BeforeAll'
+                Source   = @'
+Describe 'fixture' {
+    BeforeAll {
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        Import-Module ./WorktreeRunResolution.psm1
+    }
+}
+'@
+            }
+            @{
+                Name     = 'a Get-WorktreeRunCheckpointText Mock without -ModuleName'
+                Expected = 'Mock lacks -ModuleName WorktreeRunResolution'
+                Source   = @'
+Describe 'fixture' {
+    BeforeAll {
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText { $null }
+    }
+}
+'@
+            }
+            @{
+                Name     = 'a missing WorktreeRunResolution import'
+                Expected = 'Import-Module of WorktreeRunResolution.psm1 missing from outermost BeforeAll'
+                Source   = @'
+Describe 'fixture' {
+    BeforeAll {
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+            }
+            @{
+                Name     = 'a WorktreeRunResolution import with -Force'
+                Expected = 'Import-Module of WorktreeRunResolution.psm1 uses -Force'
+                Source   = @'
+Describe 'fixture' {
+    BeforeAll {
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        Import-Module ./WorktreeRunResolution.psm1 -Force
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     }
 }
 '@
@@ -346,7 +269,7 @@ Describe 'fixture' {
             $missingPath = '/synthetic-worktrees/missing/enforce-missing.Tests.ps1'
 
             # Act
-            $findings = @(Get-EpicStateIsolationSuiteFinding -RelativePath $missingPath)
+            $findings = @(Get-EpicStateIsolationSuiteFinding -RepoRoot $script:RepoRoot -RelativePath $missingPath)
 
             # Assert
             @($findings).Count | Should -Be 1
@@ -366,18 +289,20 @@ BeforeDiscovery {
     )
 }
 
-Describe 'the Get-EpicScopeCheckpointText mock blocks the epic-state read (seam sufficiency)' {
+Describe 'the run-checkpoint mocks block the epic-state read (seam sufficiency)' {
     BeforeAll {
-        # This file loads no hook, so there is no module instance to bind to; -Force loads a fresh one.
+        # This file loads no hook, so there is no module instance to bind to; -Force loads a
+        # fresh ESR, and the WRR import binds the instance ESR loaded.
         Import-Module (Join-Path $script:RepoRoot '.claude/lib/worktree-resolution/EpicScopeResolution.psm1') -Force
+        Import-Module (Join-Path $script:RepoRoot '.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')
         $script:HostileEpicJson = '{"route_id":"epic","integration_branch":"epic/hostile-integration","epic_feature_folder":"hostile-epic","features":[]}'
         $script:SessionRoot = '/synthetic-worktrees/local-checkout'
 
         function Set-HostileEpicSeam {
             <#
-                Mock the lower seams inside EpicScopeResolution so that, without the
-                Get-EpicScopeCheckpointText mock, the resolver reads a hostile ready epic
-                checkpoint whose integration_branch matches every call shape.
+                Mock the lower seams inside EpicScopeResolution and WorktreeRunResolution so
+                that, without the run-checkpoint mocks, the resolver locates and reads a
+                hostile ready epic checkpoint whose integration_branch matches every call shape.
             #>
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
             param()
@@ -390,6 +315,8 @@ Describe 'the Get-EpicScopeCheckpointText mock blocks the epic-state read (seam 
             Mock Get-WorktreeResolutionGitFileText -ModuleName EpicScopeResolution { $hostileText }.GetNewClosure()
             Mock Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution { 'epic/hostile-integration' }
             Mock Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution { $false }
+            Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeRunResolution { , [string[]] @('/synthetic-worktrees/local-checkout') }
+            Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $hostileText }.GetNewClosure()
         }
 
         function Invoke-HostileEpicResolution {
@@ -401,7 +328,7 @@ Describe 'the Get-EpicScopeCheckpointText mock blocks the epic-state read (seam 
         }
     }
 
-    It '<Gate> control: the hostile payload is epic scope without the mock' -ForEach $script:HostileShapes {
+    It '<Gate> control: the hostile payload is epic scope without the mocks' -ForEach $script:HostileShapes {
         # Arrange: only the hostile lower seams.
         Set-HostileEpicSeam
 
@@ -413,8 +340,25 @@ Describe 'the Get-EpicScopeCheckpointText mock blocks the epic-state read (seam 
         Should -Invoke Get-WorktreeResolutionGitFileText -ModuleName EpicScopeResolution -Times 1 -Exactly -ParameterFilter { $Path -like '*epic-orchestrator-state.json' }
     }
 
-    It '<Gate> treatment: the $null mock blocks the epic-state read' -ForEach $script:HostileShapes {
-        # Arrange: the hostile lower seams plus the mock the seven suites declare.
+    It '<Gate> treatment A: both $null mocks block the target lookup and the epic-state read' -ForEach $script:HostileShapes {
+        # Arrange: the hostile lower seams plus the two mocks the guarded suites declare.
+        Set-HostileEpicSeam
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+
+        # Act
+        $result = Invoke-HostileEpicResolution -Text $Text -MatchWorktreeHead $MatchWorktreeHead -WorktreeSelector $WorktreeSelector
+
+        # Assert
+        $result.IsEpicScope | Should -BeFalse
+        $result.Reason | Should -Be 'epic-checkpoint-absent-or-unparseable'
+        Should -Invoke Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution -Times 0 -Exactly
+        Should -Invoke Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution -Times ([int]$MatchWorktreeHead) -Exactly
+        Should -Invoke Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution -Times 0 -Exactly
+    }
+
+    It '<Gate> treatment B: the Get-EpicScopeCheckpointText mock alone blocks the epic-state read' -ForEach $script:HostileShapes {
+        # Arrange: the hostile lower seams plus only the epic-scope text mock.
         Set-HostileEpicSeam
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
 
@@ -423,10 +367,7 @@ Describe 'the Get-EpicScopeCheckpointText mock blocks the epic-state read (seam 
 
         # Assert
         $result.IsEpicScope | Should -BeFalse
-        $result.Reason | Should -Be 'epic-checkpoint-absent-or-unparseable'
         Should -Invoke Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution -Times 1 -Exactly
         Should -Invoke Get-WorktreeResolutionGitFileText -ModuleName EpicScopeResolution -Times 0 -Exactly -ParameterFilter { $Path -like '*epic-orchestrator-state.json' }
-        Should -Invoke Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution -Times 0 -Exactly
-        Should -Invoke Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution -Times 0 -Exactly
     }
 }

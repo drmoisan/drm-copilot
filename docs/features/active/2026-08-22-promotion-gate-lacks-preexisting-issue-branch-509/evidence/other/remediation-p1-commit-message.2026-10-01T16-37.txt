@@ -1,0 +1,12 @@
+test(509): split issue-adoption unit tests below 500 lines
+
+Split tests/scripts/dev_tools/test_orchestrator_state_issue_adoption.py
+(744 lines) into the kept file (AC-6, AC-7, AC-9 grid; 462 lines), a new
+test_orchestrator_state_issue_adoption_waivers.py (AC-8, AC-11, AC-16;
+177 lines), and a non-collected support module
+orchestrator_state_issue_adoption_test_support.py (187 lines). Tests
+moved verbatim apart from the helper renames (e8dup, e8cannot, e8notreq,
+e8receipt, e9, _adoption, _state, _resolve to descriptive public names);
+all 39 collected node names are preserved and no behavior changes.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

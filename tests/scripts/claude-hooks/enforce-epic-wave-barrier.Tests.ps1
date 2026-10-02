@@ -9,6 +9,7 @@ Describe 'enforce-epic-wave-barrier.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-wave-barrier.ps1").Path
         . $script:UnderTest
+        Mock Resolve-EpicWaveBarrierTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     Context 'envelope anomalies and out-of-scope delegations' {
@@ -175,14 +176,16 @@ Describe 'enforce-epic-wave-barrier.ps1' {
 
     Context 'real Test-Path read seam' {
         It 'Get-EpicWaveBarrierCheckpointContent returns $null when the checkpoint file does not exist' {
-            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $script:EpicCheckpointPath }
-            Get-EpicWaveBarrierCheckpointContent | Should -BeNullOrEmpty
+            $seamPath = '/synthetic-worktrees/wave-seam/artifacts/orchestration/epic-orchestrator-state.json'
+            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $seamPath }
+            Get-EpicWaveBarrierCheckpointContent -Path $seamPath | Should -BeNullOrEmpty
         }
 
         It 'Get-EpicWaveBarrierCheckpointContent reads real content when the file exists' {
-            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $script:EpicCheckpointPath }
-            Mock -CommandName Get-Content -MockWith { '{"features":[]}' } -ParameterFilter { $LiteralPath -eq $script:EpicCheckpointPath }
-            Get-EpicWaveBarrierCheckpointContent | Should -Be '{"features":[]}'
+            $seamPath = '/synthetic-worktrees/wave-seam/artifacts/orchestration/epic-orchestrator-state.json'
+            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $seamPath }
+            Mock -CommandName Get-Content -MockWith { '{"features":[]}' } -ParameterFilter { $LiteralPath -eq $seamPath }
+            Get-EpicWaveBarrierCheckpointContent -Path $seamPath | Should -Be '{"features":[]}'
         }
     }
 
