@@ -165,3 +165,51 @@ Output Summary: named deviations from plan.2026-09-29T15-32.md recorded per task
 - Plan mechanism: the MCP route-compliance calls are scheduled at P5-T11 to P5-T13.
 - Replacement: the CI `poshqc / PowerShell QC` job runs Format, then Analyze, then Test, and stops at the first failing step, so a formatter rewrite or analyzer finding on the Phase 2 head would prevent the P2-T4/P2-T5 CI evidence. `mcp__drm-copilot__run_poshqc_format` and `mcp__drm-copilot__run_poshqc_analyze` were called with `workspace_root` = the worktree root and `scan_folders` `["tests/scripts/powershell/PoshQC"]` before the commit. Both returned `ok: true` with only the fixed summary string. The formatter changed no file: `git status --porcelain --untracked-files=all` listed only the two new test files and two feature-folder files, and the modification times of the two new test files equal their Write times. These calls ran the installed extension copy and are not acceptance evidence (D10); the CI Format and Analyze steps on the pushed head are the gates.
 - Evidence: this entry.
+
+## DEV-P3-T2 — parse check left to CI
+
+- Task: P3-T2.
+- Plan mechanism: `[System.Management.Automation.Language.Parser]::ParseFile(...)` in a `pwsh` child printing `PARSE_ERRORS=0`.
+- Replacement: CI-evidence deviation (classification row P3-T2). `PoshQC.psm1` throws on any sub-module parse error at import, so a CI run in which the PoshQC suites pass proves `PARSE_ERRORS=0`. P3-T2 stays unchecked until the orchestrator records that run. The file was written in full; it contains only the four D1 function definitions with comment-based help, `[CmdletBinding()]`, and `[OutputType()]`.
+- Evidence: pending (orchestrator CI run on PHASE3_SHA or later).
+
+## DEV-P3-T3 — Select-String count by git grep
+
+- Task: P3-T3.
+- Plan mechanism: `@(Select-String -LiteralPath scripts/powershell/PoshQC/PoshQC.psm1 -SimpleMatch -Pattern "'PoshQC.Coverage.psm1',").Count`.
+- Replacement: `git grep --untracked -c -F -e "'PoshQC.Coverage.psm1'," -- scripts/powershell/PoshQC/PoshQC.psm1` printed 1.
+- Evidence: this entry.
+
+## DEV-P3-T4 — rule LL and Select-String counts by git grep
+
+- Task: P3-T4.
+- Plan mechanism: rule LL and two `Select-String -SimpleMatch` counts.
+- Replacement: `git grep --untracked -c '' -- scripts/powershell/PoshQC/PoshQC.Testing.psm1` printed 460 (at or under 500); `git grep --untracked -c -F -e 'ResolveCoveragePopulation'` printed 3 (help entry, parameter, invocation); `git grep --untracked -c -F -e 'Code coverage population: source='` printed 1. The current variable holding the effective scan-folder roots in `Invoke-PoshQCTest` is `$effectiveScanFolders` (unchanged name), so the D3 (c) invocation is used verbatim.
+- Evidence: this entry.
+
+## DEV-P3-T6 — Path array span and key-set check by Read
+
+- Task: P3-T6.
+- Plan mechanism: delete current lines 23-325 and verify with `Import-PowerShellDataFile` in a `pwsh` child (`HAS_PATH=False`, `KEYS=CoveragePercentTarget,Enabled,OutputFormat,OutputPath`).
+- Replacement: the `CodeCoverage.Path` array spans lines 23-341 on the current base (16 entries added on main by #743/#744; see DEV-MERGE); lines 23-341 were removed and the two D5 comment lines added after `OutputPath`. `git diff --stat HEAD -- scripts/powershell/PoshQC/settings/pester.runsettings.psd1` reported `2 insertions(+), 319 deletions(-)`; the trailing bytes of the file are unchanged. The `CodeCoverage` block was read with the Read tool: its keys are `Enabled`, `OutputFormat`, `OutputPath`, `CoveragePercentTarget` (sorted: `CoveragePercentTarget,Enabled,OutputFormat,OutputPath`) and no `Path` key is present. The CI run that loads this settings file is the parse proof.
+- Evidence: this entry.
+
+## DEV-P3-T7 — JSON check by Read and Python parse
+
+- Task: P3-T7.
+- Plan mechanism: `ConvertFrom-Json` in a `pwsh` child printing `VERSION=1 ROOTS=...`.
+- Replacement: the file was read with the Read tool and matches the D6 document (two-space indentation, one root per line, trailing newline); `git ls-files --eol` reports `w/lf`; a single-line `poetry run python -c` JSON parse printed `VERSION=1 ROOTS=.claude/hooks,.claude/lib,.codex/hooks,.codex/scripts,scripts`. `git hash-object config/poshqc-coverage.json` = `71d9bfcc52a93df274d0eb5cf8fcf12b667c78e3`.
+- Evidence: this entry.
+
+## DEV-P3-T8 — module surface split into a static half and a CI half
+
+- Task: P3-T8.
+- Plan mechanism: import the module in a `pwsh` child and print `EXPORTED=0` and `DEFINED=4`.
+- Replacement: `EXPORTED=0` established by `git grep` (no internal name in `PoshQC.psm1` or `PoshQC.psd1`); `DEFINED=4` is a CI-evidence deviation. P3-T8 stays unchecked until the CI half is recorded.
+- Evidence: `evidence/other/module-surface.2026-10-02T08-30.md`.
+
+## DEV-TOOLCHAIN-P3 — MCP format and analyze before the Phase 3 commit
+
+- Task: Phase 3 commit point (micro-action; same rationale as DEV-TOOLCHAIN-P2).
+- Replacement: `mcp__drm-copilot__run_poshqc_format` and `mcp__drm-copilot__run_poshqc_analyze` with `scan_folders` `["scripts/powershell/PoshQC","tests/scripts/powershell/PoshQC"]`; both returned `ok: true`. `git hash-object` of `PoshQC.Coverage.psm1` (`23cd722f`), `PoshQC.Testing.psm1` (`8a3d6acf`), `PoshQC.psm1` (`2ce1628f`), and `settings/pester.runsettings.psd1` (`b7abb1a7`) was identical before and after the format call. Not acceptance evidence (D10).
+- Evidence: this entry.
