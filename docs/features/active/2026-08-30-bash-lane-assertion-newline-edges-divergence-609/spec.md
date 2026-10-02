@@ -134,7 +134,7 @@ No measurable change; one parameter expansion over a short operator string.
 - [x] A bats regression test in `tests/shell/parallel_lane_assertion.bats` asserts that a newline-separated `--edges` value yields the same header as the single-line `101:202` control.
 - [x] A bats regression test in `tests/shell/parallel_lane_assertion.bats` asserts that a tab-separated `--edges` value yields the same header as the single-line control.
 - [x] A bats regression test in `tests/shell/parallel_lane_assertion.bats` asserts that a CR-separated value and a CRLF-separated value each yield the same header as the single-line control, and that a CRLF-terminated final token is not dropped.
-- [ ] The new bats regression tests fail when run against the unmodified library and pass after the fix; evidence recorded under `docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/`.
+- [x] The new bats regression tests fail when run against the unmodified library and pass after the fix; evidence recorded under `docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609/evidence/`.
 - [x] `tests/fixtures/parallel_lane_assertion/edges_newline_separated.json` exists, follows the schema of `edges_endpoint_interior_whitespace.json`, and its `expected_stdout` equals the output of the Python authority for the same manifest and edges (regeneration by running `scripts/dev_tools/parallel_lane_assertion.py` yields no diff).
 - [x] `bats tests/shell/parallel_lane_assertion_parity.bats` passes, including the new fixture record.
 - [x] `poetry run pytest tests/scripts/dev_tools/test_parallel_lane_assertion_bash_parity.py` passes, including the new fixture record.
