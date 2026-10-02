@@ -299,6 +299,8 @@ skill use. The checkpoint must include:
 - `local_execution_overrides`: an empty list at completion
 - `delegation_bypasses`: an empty list at completion
 - `lifecycle_operations`: any lifecycle operation must record `surface: "mcp"`
+- `ci_gate`: the CI result object defined in `## CI Green Gate`, with keys `conclusion`, `head_sha`, and `verified_at`
+- `pr_gate`: the pull-request object defined in `## CI Green Gate`, with keys `pr_number`, `pr_url`, `head_branch`, and `head_sha`
 
 If any required handoff, skill receipt, MCP receipt, or empty bypass list is
 missing, `validate_orchestration_artifacts --require-complete` fails and the
@@ -454,6 +456,12 @@ Before PR/DONE completion, the orchestrator must observe the live PR head SHA
 and required GitHub checks through `gh`. The checkpoint must record the checked
 head SHA and CI result. DONE is blocked unless the required checks pass for the
 current PR head SHA.
+
+The checkpoint records the CI result in a top-level `ci_gate` object with the required keys `conclusion`, `head_sha`, and `verified_at`. `conclusion` is one of `success`, `failure`, or `pending`; `head_sha` is the PR head SHA the required checks were observed against; `verified_at` is the ISO-8601 time at which this gate (S9) recorded the result. DONE requires `ci_gate.conclusion` equal to `success` and `ci_gate.head_sha` equal to the current PR head SHA. The key set is defined by `CI_GATE_KEYS` in `scripts/dev_tools/validate_orchestrator_state.py`, and the TypeScript MCP validator used by the Codex runtime requires the same keys.
+
+The checkpoint records the pull request in a top-level `pr_gate` object with the keys `pr_number`, `pr_url`, `head_branch`, and `head_sha`. The key set is defined by `PR_GATE_KEYS` in `scripts/dev_tools/_orchestrator_state_routing.py`.
+
+CI-dependent acceptance criteria are criteria whose verification requires the result of CI on the PR head. The item's own orchestrator run owns their check-off. After `ci_gate.conclusion` is `success`, check off each CI-dependent criterion in the item's own worktree, commit, push to the PR branch, and re-run this gate against the new head SHA, so that `ci_gate.head_sha` equals the final PR head before DONE. A failed re-run enters the Remediation Loop (R1–R5) as a blocking finding; the shared `remediation_loop.completed_attempts` count and its halt after three completed attempts are unchanged. A parent or coordinating session never commits these check-offs from its own root.
 
 ## PR Creation Gate
 
