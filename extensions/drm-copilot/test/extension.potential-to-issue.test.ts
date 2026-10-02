@@ -22,7 +22,10 @@ type MockUri = { fsPath: string };
 const commandHandlers = new Map<string, CommandHandler>();
 const showOpenDialogMock =
   jest.fn<(options?: unknown) => Promise<ReadonlyArray<MockUri> | undefined>>();
-const showQuickPickMock = jest.fn<() => Promise<string | undefined>>();
+const showQuickPickMock =
+  jest.fn<
+    (items: readonly string[], options?: unknown) => Promise<string | undefined>
+  >();
 const showInputBoxMock = jest.fn<() => Promise<string | undefined>>();
 const appendLineMock = jest.fn<(line: string) => void>();
 const registerCommandMock = jest.fn(
@@ -157,8 +160,8 @@ function expectNoPythonSpawn(): void {
 
 describe("drm-copilot potentialToIssue command", () => {
   beforeEach(() => {
-    process.env.PATH = "C:/bin";
-    process.env.PATHEXT = ".EXE;.CMD";
+    process.env["PATH"] = "C:/bin";
+    process.env["PATHEXT"] = ".EXE;.CMD";
     commandHandlers.clear();
     appendLineMock.mockReset();
     registerCommandMock.mockClear();

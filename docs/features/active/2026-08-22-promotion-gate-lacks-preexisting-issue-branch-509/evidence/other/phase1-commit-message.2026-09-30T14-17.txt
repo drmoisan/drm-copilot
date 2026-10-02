@@ -1,0 +1,12 @@
+docs(509): record Phase 1 split evidence and plan progress
+
+Add the Phase 1 evidence for the behavior-preserving split of
+_orchestrator_state_routing: batch-budget reset B1, split suites (62
+passed = 29 baseline + 33 split tests), importer-unchanged check,
+import-direction check, line counts, Black/Ruff/Pyright gates, the
+split commit record (SPLIT_COMMIT_SHA 5a3278df), and the re-run at the
+split commit. Check off P1-T1 through P1-T14 and AC-1 and AC-3.
+
+Refs #509
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

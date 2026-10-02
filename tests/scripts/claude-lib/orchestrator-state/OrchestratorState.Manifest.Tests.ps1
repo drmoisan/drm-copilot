@@ -30,12 +30,14 @@ BeforeAll {
         '.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateReceipts.psm1',
+        '.claude/lib/orchestrator-state/OrchestratorStateRemediationAccounting.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateModelReceipts.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateCodexModelReceipts.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateCodexTopologyReceipts.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateRoutingMatrix.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateRoutingContract.psm1',
+        '.claude/lib/orchestrator-state/OrchestratorStateIssueAdoption.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateUnconditional.psm1'
     )
 }

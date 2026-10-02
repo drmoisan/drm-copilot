@@ -193,22 +193,22 @@ describe("resolveExecutableOnPath", () => {
 
 describe("defaultWhichGh", () => {
   const originalPlatform = Object.getOwnPropertyDescriptor(process, "platform");
-  const originalPath = process.env.PATH;
-  const originalPathExt = process.env.PATHEXT;
+  const originalPath = process.env["PATH"];
+  const originalPathExt = process.env["PATHEXT"];
 
   afterEach(() => {
     if (originalPlatform) {
       Object.defineProperty(process, "platform", originalPlatform);
     }
     if (originalPath === undefined) {
-      delete process.env.PATH;
+      delete process.env["PATH"];
     } else {
-      process.env.PATH = originalPath;
+      process.env["PATH"] = originalPath;
     }
     if (originalPathExt === undefined) {
-      delete process.env.PATHEXT;
+      delete process.env["PATHEXT"];
     } else {
-      process.env.PATHEXT = originalPathExt;
+      process.env["PATHEXT"] = originalPathExt;
     }
     jest.resetAllMocks();
   });
@@ -216,8 +216,8 @@ describe("defaultWhichGh", () => {
   it("resolves gh from process PATH, PATHEXT, and platform through fs.existsSync", () => {
     // Arrange
     Object.defineProperty(process, "platform", { value: "linux" });
-    process.env.PATH = "/opt/gh-bin";
-    delete process.env.PATHEXT;
+    process.env["PATH"] = "/opt/gh-bin";
+    delete process.env["PATHEXT"];
     fsMock.existsSync.mockImplementation(
       (candidate: string) => candidate === "/opt/gh-bin/gh",
     );
@@ -232,8 +232,8 @@ describe("defaultWhichGh", () => {
 
   it("returns undefined when fs.existsSync reports no candidate", () => {
     Object.defineProperty(process, "platform", { value: "linux" });
-    process.env.PATH = "/opt/gh-bin";
-    delete process.env.PATHEXT;
+    process.env["PATH"] = "/opt/gh-bin";
+    delete process.env["PATHEXT"];
     fsMock.existsSync.mockReturnValue(false);
 
     expect(defaultWhichGh()).toBeUndefined();

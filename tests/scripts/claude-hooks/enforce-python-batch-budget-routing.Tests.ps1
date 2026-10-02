@@ -295,13 +295,14 @@ Describe 'enforce-python-batch-budget.ps1 large-path routing' {
 
     Context 'checkpoint seam' {
         It 'the default reader yields direct mode when the checkpoint file is absent' {
+            $absentRoot = if ($IsWindows) { 'C:/synthetic-absent-root' } else { '/synthetic-absent-root' }
             Initialize-RoutingStore -PersistedText $script:ThreeProductionPaths
             $seams = Get-RoutingStateSeam
 
             $decision = Invoke-PythonBatchBudgetHook `
                 -ToolInputRaw (Get-RoutingToolInput -FilePath 'src/d.py') `
                 -SessionId 'routing' `
-                -Root 'C:/synthetic-absent-root' `
+                -Root $absentRoot `
                 @seams
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'

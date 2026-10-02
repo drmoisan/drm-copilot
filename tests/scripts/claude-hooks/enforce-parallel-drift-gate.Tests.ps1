@@ -26,6 +26,8 @@ Describe 'enforce-parallel-drift-gate.ps1' {
 
         $script:AlphaFolder = '2026-08-07-parallel-alpha-501'
         $script:AlphaPrompt = "Parallel mode: true. parallel_slug: demo. cohort_index: 0. docs/features/active/$script:AlphaFolder/spec.md"
+        # Synthetic worktree root chosen per host OS: Join-Path raises DriveNotFoundException for a drive-letter path on Linux.
+        $script:SyntheticWorktree = if ($IsWindows) { 'C:/worktrees/alpha' } else { '/worktrees/alpha' }
 
         function Get-ToolInputJson {
             param([string] $Subagent = 'feature-review', [string] $Prompt = '')
@@ -43,7 +45,7 @@ Describe 'enforce-parallel-drift-gate.ps1' {
                 [switch] $NoDriftEvents
             )
             $item = '{"issue_num":501,"feature_folder":"' + $script:AlphaFolder + '","state":"in_flight",' +
-            '"worktree_path":"C:/worktrees/alpha","blast_radius":{"paths":["scripts/declared/"],"modules":[],' +
+            '"worktree_path":"' + $script:SyntheticWorktree + '","blast_radius":{"paths":["scripts/declared/"],"modules":[],' +
             '"shared_surfaces":[],"contracts":[],"source":"' + $Source + '","computed_at":"' + $ComputedAt + '"}}'
             $events = '[{"item_key":501,"declared":["scripts/declared/"],"observed":["scripts/other/escape.py"],' +
             '"escaped_paths":["scripts/other/escape.py"],"at":"' + $EventAt + '","action":"raised_blocking_finding"}]'
@@ -335,26 +337,26 @@ Describe 'enforce-parallel-drift-gate.ps1' {
 
         It 'Test-ParallelDriftFindingPresent reports absence for <Label>' -ForEach @(
             @{ Label = 'a null worktree path'; Worktree = ''; Folder = 'alpha-501' }
-            @{ Label = 'a blank feature folder'; Worktree = 'C:/worktrees/alpha'; Folder = '' }
+            @{ Label = 'a blank feature folder'; Worktree = $(if ($IsWindows) { 'C:/worktrees/alpha' } else { '/worktrees/alpha' }); Folder = '' }
         ) {
             Test-ParallelDriftFindingPresent -WorktreePath $Worktree -FeatureFolder $Folder -EventAt '2026-08-08T21-19' | Should -BeFalse
         }
 
         It 'Test-ParallelDriftFindingPresent reports absence when the feature folder does not exist' {
             Mock -CommandName Test-Path -MockWith { $false }
-            Test-ParallelDriftFindingPresent -WorktreePath 'C:/worktrees/alpha' -FeatureFolder 'alpha-501' -EventAt '2026-08-08T21-19' | Should -BeFalse
+            Test-ParallelDriftFindingPresent -WorktreePath $script:SyntheticWorktree -FeatureFolder 'alpha-501' -EventAt '2026-08-08T21-19' | Should -BeFalse
         }
 
         It 'Test-ParallelDriftFindingPresent reports absence when no remediation-inputs file is present' {
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-ChildItem -MockWith { @([pscustomobject]@{ Name = 'spec.md' }, [pscustomobject]@{ Name = 'remediation-inputs.2026-01-01T00-00.txt' }) }
-            Test-ParallelDriftFindingPresent -WorktreePath 'C:/worktrees/alpha' -FeatureFolder 'alpha-501' -EventAt '2026-01-01T00-00' | Should -BeFalse
+            Test-ParallelDriftFindingPresent -WorktreePath $script:SyntheticWorktree -FeatureFolder 'alpha-501' -EventAt '2026-01-01T00-00' | Should -BeFalse
         }
 
         It 'Test-ParallelDriftFindingPresent reports presence for a remediation-inputs markdown file' {
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-ChildItem -MockWith { @([pscustomobject]@{ Name = 'plan.md' }, [pscustomobject]@{ Name = 'remediation-inputs.2026-08-08T21-19.md' }) }
-            Test-ParallelDriftFindingPresent -WorktreePath 'C:/worktrees/alpha' -FeatureFolder 'alpha-501' -EventAt '2026-08-08T21-19' | Should -BeTrue
+            Test-ParallelDriftFindingPresent -WorktreePath $script:SyntheticWorktree -FeatureFolder 'alpha-501' -EventAt '2026-08-08T21-19' | Should -BeTrue
         }
 
         It 'Test-ParallelDriftFindingPresent reports absence for a non-canonical EventAt' {
@@ -362,7 +364,7 @@ Describe 'enforce-parallel-drift-gate.ps1' {
             # reference: an ordinal comparison across shapes is the F8-N4 inversion.
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-ChildItem -MockWith { @([pscustomobject]@{ Name = 'remediation-inputs.2026-08-08T21-19.md' }) }
-            Test-ParallelDriftFindingPresent -WorktreePath 'C:/worktrees/alpha' -FeatureFolder 'alpha-501' -EventAt '2026-08-08T21:19:00Z' | Should -BeFalse
+            Test-ParallelDriftFindingPresent -WorktreePath $script:SyntheticWorktree -FeatureFolder 'alpha-501' -EventAt '2026-08-08T21:19:00Z' | Should -BeFalse
         }
     }
 
