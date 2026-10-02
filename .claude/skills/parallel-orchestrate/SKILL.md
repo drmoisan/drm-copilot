@@ -262,6 +262,14 @@ Spawn parameters, passed on the `Agent` call and never written into the prompt t
 `isolation: "worktree"`, `run_in_background: true`, branch base `origin/main`, and `model` equal to
 that item's model routing receipt's resolved model.
 
+**Band and receipt source.** The parent reads each item's `complexity_band` and
+`model_routing_receipt` from the planner checkpoint `artifacts/orchestration/parallel-planner-state.json`.
+When the planner checkpoint is unavailable, the committed kickoff artifact's `## Item Summary`
+`complexity` column is the fallback band source. The parent passes `model` equal to the receipt's
+`model` when the run's `fable_policy` equals the receipt's `fable_policy`; otherwise it re-resolves
+with `Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>` and
+passes that result.
+
 Negative obligations on the prompt:
 
 - It never carries `Preparation mode: true`. Preparation fan-out belongs to `parallel-planner` and
@@ -300,6 +308,15 @@ delegation per item. It applies the same per-delegation resolution to that chann
 omitted `model` falls back to the delegate's frontmatter default, `opus`, which suppresses a
 `fable` resolution — and MUST NOT hard-code `model=opus` in a way that overrides the resolved
 routing model.
+
+The band and receipt for each item come from the planner checkpoint
+`artifacts/orchestration/parallel-planner-state.json`: the parent reads the item's `complexity_band`
+and `model_routing_receipt` there. When the planner checkpoint is unavailable, the committed kickoff
+artifact's `## Item Summary` `complexity` column is the fallback band source. The parent passes
+`model` equal to the receipt's `model` when the run's `fable_policy` equals the receipt's
+`fable_policy`; otherwise it re-resolves with
+`Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>` and
+passes that result.
 
 `route` is never an input to model selection. `route` remains file-count driven and governs only
 agents, skills, and MCP tools. A skill whose frontmatter `context` field holds the value `fork`

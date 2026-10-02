@@ -176,8 +176,13 @@ parameters:
 - `isolation: "worktree"` — the item runs in its own isolated git worktree.
 - `run_in_background: true` — items within a cohort run concurrently up to `max_concurrency`.
 - branch base `origin/main` — every item in a cohort branches from the same recorded `main` tip.
-- `model` — bound to that item's model routing receipt, resolved per the skill's
-  `## Model Selection` section.
+- `model` — read the item's `complexity_band` and `model_routing_receipt` from the planner
+  checkpoint `artifacts/orchestration/parallel-planner-state.json`; when that checkpoint is
+  unavailable, use the committed kickoff artifact's `## Item Summary` `complexity` column as the
+  fallback band source. Pass the receipt's `model` when the run's `fable_policy` equals the
+  receipt's `fable_policy`; otherwise re-resolve with
+  `Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>` and
+  pass that result, per the skill's `## Model Selection` section.
 
 Each child `orchestrator` runs its own route inside that worktree, including its own delegations to
 `atomic-planner`, `atomic-executor`, `feature-review`, and `pr-author`. You do not delegate to
