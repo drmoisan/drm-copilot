@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 1
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-02T03:08:04Z
+- `last_updated`: 2026-10-02T03:14:17Z
 
 **Items**
 
@@ -29,10 +29,10 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 527 | docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527 | 2 | scheduled | not_started |  |  |  |  |  |
 | 532 | docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532 | 2 | scheduled | not_started |  |  |  |  |  |
 | 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | scheduled | not_started |  |  |  |  |  |
-| 609 | docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609 | 1 | scheduled | not_started |  |  |  |  |  |
+| 609 | docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609 | 1 | in_flight | worktree_created |  |  | 2026-10-02T03:09:33Z |  |  |
 | 623 | docs/features/active/promotion-receipt-destination-unverified-623 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/804 | 2b0121abf74f5862a3d12929d833504668941156 | 2026-09-30T12:21:20Z | 2026-09-30T13:42:13Z |  |
 | 645 | docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645 | 3 | scheduled | not_started |  |  |  |  |  |
-| 647 | docs/features/active/2026-09-07-test-tree-typecheck-not-gated-647 | 1 | scheduled | not_started |  |  |  |  |  |
+| 647 | docs/features/active/2026-09-07-test-tree-typecheck-not-gated-647 | 1 | in_flight | worktree_created |  |  | 2026-10-02T03:14:17Z |  |  |
 | 658 | docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658 | 3 | scheduled | not_started |  |  |  |  |  |
 | 659 | docs/features/active/2026-09-08-epic-wave-barrier-violations-lack-start-guard-659 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/807 | 41217012d31d35c2ee33a50be50684affd2f5f43 | 2026-09-30T13:24:40Z | 2026-10-01T11:12:35Z |  |
 | 723 | docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/813 | 12fd3c2639f17aec3572f90e8d929205059be56d | 2026-09-30T13:34:37Z | 2026-10-02T00:43:34Z |  |
