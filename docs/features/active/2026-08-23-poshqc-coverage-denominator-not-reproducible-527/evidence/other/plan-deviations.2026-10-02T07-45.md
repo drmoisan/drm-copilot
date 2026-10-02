@@ -72,3 +72,66 @@ Output Summary: named deviations from plan.2026-09-29T15-32.md recorded per task
 - Plan mechanism: rule TR (args 'tests/scripts/powershell/PoshQC', '') locally.
 - Replacement: the same CI run's JUnit filtered to `tests/scripts/powershell/PoshQC` with `poetry run python artifacts/ci/ci_evidence.py tr ...`; FAILED_CONTAINERS (not printed by the filter) derived from the ten `testsuite` elements, each with errors="0" and failures="0".
 - Evidence: `evidence/baseline/pwsh-poshqc-targeted.2026-10-02T07-45.md`.
+
+## DEV-P1-T1 — Rule BR reset R1 performed without `pwsh`
+
+- Task: P1-T1.
+- Plan mechanism: Rule BR body run per D10 (`Get-ChildItem ... | Remove-Item` in a `pwsh` child).
+- Replacement: orchestrator-performed deviation; `.claude/state/` inspected with `ls -la`. The orchestrator reported the directory absent at segment start; at reset time the executor observed it present and empty (created by the hook runtime during this segment). No `powershell-batch-budget.*.json` file existed, so nothing was deleted.
+- Evidence: `evidence/other/batch-budget-resets.2026-10-02T07-55.md`.
+
+## DEV-P1-T2 — fixture module acceptance through the MCP fixture test run
+
+- Task: P1-T2.
+- Plan mechanism: `pwsh -NoProfile -Command { Import-Module ./tests/fixtures/poshqc-consumer/scripts/Sample.psm1 -Force; Get-SampleGreeting -Name 'Ada' }` printing `Hello, Ada.`.
+- Replacement: `mcp__drm-copilot__run_poshqc_test` with workspace_root = the fixture directory and scan_folders ["scripts","tests/scripts"]; the passing test case `returns a greeting for the supplied name` asserts `Get-SampleGreeting -Name 'Ada' | Should -Be 'Hello, Ada.'`.
+- Evidence: `evidence/other/fixture-mcp-run.2026-10-02T07-55.md`.
+
+## DEV-P1-T3 — fixture test acceptance through the MCP fixture test run
+
+- Task: P1-T3.
+- Plan mechanism: rule TR args 'tests/fixtures/poshqc-consumer/tests/scripts/Sample.Tests.ps1', 'returns a greeting for the supplied name'.
+- Replacement: the same MCP run; the fixture JUnit shows the named test case Passed and the single testsuite with tests=1 errors=0 failures=0 skipped=0, giving PASSED=1 FAILED=0 SKIPPED=0 MISSING_REQUIRED=0 FAILED_CONTAINERS=0.
+- Evidence: `evidence/other/fixture-mcp-run.2026-10-02T07-55.md`.
+
+## DEV-P1-T4 — stand-in hook acceptance is an operator-run blocker
+
+- Task: P1-T4.
+- Plan mechanism: `pwsh -NoProfile -Command { . ./tests/fixtures/poshqc-consumer/.claude/hooks/validate-bash.ps1; Test-StandInHookPayload }` printing `True`.
+- Replacement: none available without `pwsh`. The file was created as specified; the acceptance command is left for the operator: `pwsh -NoProfile -Command ". ./tests/fixtures/poshqc-consumer/.claude/hooks/validate-bash.ps1; Test-StandInHookPayload"` (expected `True`). P1-T4 stays unchecked. Supporting observation only (not acceptance): the MCP fixture run's coverage XML lists `Test-StandInHookPayload` as a method of validate-bash.ps1 at line 24, so the file parsed and the function is defined.
+- Evidence: `evidence/regression-testing/fail-first-fixture-check.2026-10-02T07-55.md` (supporting only).
+
+## DEV-P1-T5 — fixture inventory by git and find; check-ignore form corrected
+
+- Task: P1-T5.
+- Plan mechanism: `pwsh` Get-ChildItem inventory plus `Test-Path` for `config`, and `git check-ignore -q <three paths>`.
+- Replacement: `git status --porcelain --untracked-files=all -- tests/fixtures/poshqc-consumer`, `git ls-files -- tests/fixtures/poshqc-consumer`, `find tests/fixtures/poshqc-consumer -type f | sort`, `test -e tests/fixtures/poshqc-consumer/config`. The plan's `git check-ignore -q` with three paths exits 128 (`fatal: --quiet is only valid with a single pathname`), so it cannot produce the expected exit 1; the check was run without `-q` and exited 1 with no output.
+- Evidence: `evidence/other/fixture-inventory.2026-10-02T07-55.md`.
+
+## DEV-P1-ORDER — P1-T6 edit applied before P1-T5 inventory
+
+- Task: P1-T5, P1-T6.
+- Plan mechanism: P1-T5 then P1-T6.
+- Replacement: the `.gitignore` edit of P1-T6 was applied immediately after P1-T4 and before the P1-T5 inventory, so that the MCP fixture run (which writes under tests/fixtures/poshqc-consumer/artifacts/) would produce ignored output. Both tasks' acceptance is unaffected: the inventory was captured before the MCP run and lists only the three fixture files.
+- Evidence: `evidence/other/fixture-inventory.2026-10-02T07-55.md`, `evidence/other/fixture-ignore.2026-10-02T07-55.md`.
+
+## DEV-P1-T7 — CR scan by `git ls-files --eol`
+
+- Task: P1-T7.
+- Plan mechanism: `pwsh` `[IO.File]::ReadAllText(...).Contains("`r")` per file.
+- Replacement: `git ls-files --eol -- <three fixture files>` after staging; all report `i/lf w/lf`.
+- Evidence: `evidence/other/fixture-eol.2026-10-02T07-55.md`.
+
+## DEV-P2-T6 — pre-fix fixture run through MCP, executed in segment 1
+
+- Task: P2-T6.
+- Plan mechanism: rule FR args 'tests/fixtures/poshqc-consumer', 'fixture-run.log', '', 'scripts,tests/scripts' then rule JX, run in Phase 2.
+- Replacement: the MCP fixture run (installed pre-fix PoshQC copy with its bundled allow-list, the #623 item 1 configuration); JX values read from the fixture JUnit. Executed during segment 1 (Phase 1) on orchestrator instruction, before Phase 2's other tasks; no Phase 2 production or test change exists yet, so the pre-fix state is the same. No run log is written by the MCP route.
+- Evidence: `evidence/regression-testing/fail-first-fixture-run.2026-10-02T07-55.md`.
+
+## DEV-P2-T7 — FX by inspection of the MCP coverage XML
+
+- Task: P2-T7.
+- Plan mechanism: rule FX args 'tests/fixtures/poshqc-consumer' in a `pwsh` child.
+- Replacement: each FX field computed by reading the fixture `powershell-coverage.xml` with the Read tool; FX exit derived from the FX exit expression. Result SOURCEFILES=1 SAMPLE_PRESENT=0 SAMPLE_LINE_COVERED=0 STANDIN_PRESENT=1 CLAUDE_KEYS=1 OUTSIDE_PACKAGES=0, exit 1 (expected 1).
+- Evidence: `evidence/regression-testing/fail-first-fixture-check.2026-10-02T07-55.md`.
