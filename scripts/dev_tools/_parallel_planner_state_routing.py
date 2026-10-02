@@ -75,6 +75,41 @@ def _rewrite_prefix(errors: list[str], old_prefix: str, new_prefix: str) -> list
     ]
 
 
+def _hashable_entry(
+    entry: dict[str, object], keys: tuple[str, ...]
+) -> dict[str, object]:
+    """Return a shallow copy safe for the reused helpers' set membership tests.
+
+    The helpers test ``band``, ``floor``, and the receipt ``complexity_band``
+    with ``frozenset`` membership, which raises ``TypeError`` for a list or an
+    object. Such a value is replaced by its ``str`` form, which renders
+    identically in every helper message and is never a valid band.
+
+    Args:
+        entry (dict[str, object]): The item's assessment or receipt object.
+        keys (tuple[str, ...]): The keys the helper tests by set membership.
+
+    Returns:
+        dict[str, object]: A copy with each list- or object-valued key in
+        ``keys`` replaced by its ``str`` form; ``entry`` is not mutated.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    return {
+        key: (
+            str(cast("object", value))
+            if key in keys and isinstance(value, (list, dict))
+            else value
+        )
+        for key, value in entry.items()
+    }
+
+
 def _validate_assessment(
     assessment: dict[str, object], band: object, entry_context: str
 ) -> list[str]:
@@ -98,7 +133,9 @@ def _validate_assessment(
 
     context = f"{entry_context} complexity_assessment"
     errors = _rewrite_prefix(
-        _validate_complexity_assessments([assessment]),
+        _validate_complexity_assessments(
+            [_hashable_entry(assessment, ("band", "floor"))]
+        ),
         _ASSESSMENT_HELPER_PREFIX,
         context,
     )
@@ -139,7 +176,11 @@ def _validate_receipt(
 
     context = f"{entry_context} model_routing_receipt"
     errors = _rewrite_prefix(
-        _validate_model_routing_receipts([receipt]), _RECEIPT_HELPER_PREFIX, context
+        _validate_model_routing_receipts(
+            [_hashable_entry(receipt, ("complexity_band",))]
+        ),
+        _RECEIPT_HELPER_PREFIX,
+        context,
     )
     agent = receipt.get("agent")
     if agent != ROUTING_AGENT:

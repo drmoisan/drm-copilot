@@ -81,6 +81,8 @@ RECEIPT_BAND_ENUM = (
     "Parallel planner checkpoint items[0] model_routing_receipt complexity_band "
     "must be one of C1, C2, C3, C4; got: C9."
 )
+ASSESSMENT_BAND_LIST = ASSESSMENT_BAND_ENUM.replace("C9.", "['C3'].")
+RECEIPT_BAND_LIST = RECEIPT_BAND_ENUM.replace("C9.", "['C3'].")
 RESOLVER_MISMATCH = (
     "Parallel planner checkpoint items[0] model_routing_receipt model opus does "
     "not equal resolve_delegation_model(agent, complexity_band, fable_policy) "
@@ -332,12 +334,7 @@ def test_ready_gate_rejects_missing_assessed_at() -> None:
 
 
 def test_band_mismatch_reported_when_item_band_invalid() -> None:
-    """An invalid item band still reports the check-5 and check-9 mismatches.
-
-    The check-1 literal occurs twice: once from the presence-gated enum check
-    in ``_validate_item_contract`` and once from P10 check 1; neither path
-    deduplicates.
-    """
+    """An invalid band reports checks 5 and 9; check 1 occurs twice (P3, P10)."""
 
     # Arrange
     state = build_valid_planner_state()
@@ -415,12 +412,14 @@ def test_routing_helper_reuses_claude_helpers_only() -> None:
         ("model_routing_receipt", "complexity_band", "C2", RECEIPT_BAND_MISMATCH),
         ("model_routing_receipt", "fable_policy", "sometimes", UNKNOWN_FABLE_POLICY),
         ("model_routing_receipt", "complexity_band", "C9", RECEIPT_BAND_ENUM),
+        ("complexity_assessment", "band", ["C3"], ASSESSMENT_BAND_LIST),
+        ("model_routing_receipt", "complexity_band", ["C3"], RECEIPT_BAND_LIST),
     ],
 )
 def test_ready_gate_emits_shared_literal_strings(
-    target: str, key: str, value: str, expected: str
+    target: str, key: str, value: object, expected: str
 ) -> None:
-    """Each single-field mutation emits the literal shared with TypeScript."""
+    """Each mutation emits the TypeScript-shared literal; list values never raise."""
 
     # Arrange
     record = build_routing_fields()
