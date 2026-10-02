@@ -232,7 +232,7 @@ function validateModelReceipt(
 }
 
 /** Return whether the feature records either launch path key. */
-function featureCarriesLaunchPath(feature: Record<string, unknown>): boolean {
+export function featureCarriesLaunchPath(feature: Record<string, unknown>): boolean {
   return "launch_receipt_path" in feature || "launch_status_path" in feature;
 }
 
@@ -284,16 +284,23 @@ function validateLaunchBindings(
   return errors;
 }
 
-/** Require durable preparation-child launch evidence for every feature. */
+/** Options that key-gate launch evidence per feature. */
+export interface LaunchPathGateOptions {
+  /** Skip a feature that carries neither launch path key when true. */
+  readonly requireLaunchPaths?: boolean;
+}
+
+/** Require durable preparation-child launch evidence for validated features. */
 export function validateEpicPlannerChildLaunchBindings(
   features: ReadonlyArray<Record<string, unknown>>,
+  options: LaunchPathGateOptions = {},
 ): string[] {
   return validateLaunchBindings(features, {
     expectedExecutionContext: "epic_preparation_child",
     planner: true,
     requireGeneratedOrchestrator: true,
     skipNotStarted: false,
-    requireLaunchPaths: false,
+    requireLaunchPaths: options.requireLaunchPaths === true,
   });
 }
 

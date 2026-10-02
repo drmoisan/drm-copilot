@@ -53,6 +53,10 @@ export interface ValidateEpicPlannerStateOptions {
   readonly requireReadyForExecution?: boolean;
   /** Repository and Git context required by the execution-readiness gate. */
   readonly readinessContext?: EpicReadinessContext;
+  /** When true, require launch evidence for every feature (Codex routing). */
+  readonly requireCodexModelRouting?: boolean;
+  /** When true, require launch evidence for every feature (Codex topology). */
+  readonly requireCodexTopology?: boolean;
 }
 
 /** Type guard for a plain object. */
@@ -416,6 +420,10 @@ export function validateEpicPlannerStateText(
   }
 
   if (options.requireReadyForExecution === true) {
+    // Launch evidence is key-gated per feature unless a Codex flag is asserted.
+    const requireLaunchPaths =
+      options.requireCodexModelRouting !== true &&
+      options.requireCodexTopology !== true;
     if (worthiness.verdict !== "epic") {
       errors.push(
         "Execution readiness requires epic_worthiness.verdict 'epic'.",
@@ -428,7 +436,9 @@ export function validateEpicPlannerStateText(
     }
     errors.push(...validateReadyFeatures(featureResult.features));
     errors.push(
-      ...validateEpicPlannerChildLaunchBindings(featureResult.features),
+      ...validateEpicPlannerChildLaunchBindings(featureResult.features, {
+        requireLaunchPaths,
+      }),
     );
     errors.push(...validatePlannerTopologyReceipt(value["topology_receipt"]));
 
@@ -451,6 +461,7 @@ export function validateEpicPlannerStateText(
           value,
           text,
           options.readinessContext,
+          { requireLaunchPaths },
         ),
       );
     }
