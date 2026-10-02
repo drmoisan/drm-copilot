@@ -1,0 +1,5 @@
+{
+  "base_text": "{\n  \"version\": 1,\n  \"write_intent_extraction\": true,\n  \"modules\": {},\n  \"over_breadth_fraction\": 0.25\n}\n",
+  "overlay_text": "{\"over_breadth_fraction\": 0.5, \"write_intent_extraction\": false, \"custom_policy\": {\"mode\": \"strict\", \"limit\": 3}, \"notes\": [\"local\"]}\n",
+  "expected_text": "{\n  \"version\": 1,\n  \"write_intent_extraction\": false,\n  \"modules\": {},\n  \"over_breadth_fraction\": 0.5,\n  \"custom_policy\": {\n    \"mode\": \"strict\",\n    \"limit\": 3\n  },\n  \"notes\": [\n    \"local\"\n  ]\n}\n"
+}

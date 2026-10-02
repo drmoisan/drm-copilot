@@ -324,7 +324,7 @@ describe("drm-copilot core command behavior", () => {
         string[],
       ];
       expect(
-        args[args.length - 1].startsWith("C:/extension/resources/templates/"),
+        args[args.length - 1]?.startsWith("C:/extension/resources/templates/"),
       ).toBe(true);
     } finally {
       jest.dontMock("node:path");

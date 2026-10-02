@@ -67,6 +67,18 @@ export class InMemoryFileSystem implements FileSystem {
     throw new Error("not used");
   }
 
+  exists(): boolean {
+    throw new Error("not used");
+  }
+
+  isDirectory(): boolean {
+    throw new Error("not used");
+  }
+
+  listDirectory(): string[] {
+    throw new Error("not used");
+  }
+
   readTextFile(): string {
     throw new Error("not used");
   }

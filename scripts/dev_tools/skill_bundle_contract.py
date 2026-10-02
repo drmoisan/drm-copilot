@@ -129,20 +129,11 @@ class KnownUnbundledReference:
     issue: str
 
 
-# The two Python CLI references whose ports into a bundled runtime are tracked
-# by issue #763. Each entry must keep matching a real violation (AC7).
-KNOWN_UNBUNDLED_REFERENCES: tuple[KnownUnbundledReference, ...] = (
-    KnownUnbundledReference(
-        "parallel-orchestrate",
-        "scripts/dev_tools/parallel_drift_detection_cli.py",
-        "#763",
-    ),
-    KnownUnbundledReference(
-        "parallel-remove",
-        "scripts/dev_tools/parallel_mutation_abandon_cli.py",
-        "#763",
-    ),
-)
+# Script references a skill may keep while its bundled port is pending, each
+# tied to its tracking issue. Issue #763 ported the last two entries, so the
+# registry is empty and the guard enforces every reference. An entry added here
+# must keep matching a real violation, or the staleness check reports it.
+KNOWN_UNBUNDLED_REFERENCES: tuple[KnownUnbundledReference, ...] = ()
 
 
 @dataclass(frozen=True)

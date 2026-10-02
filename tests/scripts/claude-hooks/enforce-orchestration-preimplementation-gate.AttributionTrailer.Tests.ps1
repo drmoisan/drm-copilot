@@ -37,6 +37,7 @@ Describe 'preimplementation gate attribution trailers (<Runtime>)' -ForEach @(
                 -ToolInputRaw ($toolInput | ConvertTo-Json -Compress -Depth 5) `
                 -CheckpointRaw ($checkpoint | ConvertTo-Json -Compress)
         }
+        if ($Runtime -eq 'claude') { Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } } }
     }
 
     It 'admits <Label>' -ForEach @(

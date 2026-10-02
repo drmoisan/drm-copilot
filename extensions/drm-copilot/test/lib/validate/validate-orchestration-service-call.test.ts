@@ -31,6 +31,18 @@ class VirtualFileSystem implements FileSystem {
     return this.contents.has(path);
   }
 
+  exists(): boolean {
+    throw new Error("not used");
+  }
+
+  isDirectory(): boolean {
+    throw new Error("not used");
+  }
+
+  listDirectory(): string[] {
+    throw new Error("not used");
+  }
+
   readTextFile(path: string): string {
     this.lastReadPath = path;
     const content = this.contents.get(path);

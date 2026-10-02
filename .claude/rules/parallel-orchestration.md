@@ -611,6 +611,27 @@ in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, mirrored in
 union of both copies' top-level keys is exhaustively covered by the three declared classes, and
 an unclassified key or a key present in only one copy fails loudly and names itself.
 
+**A destination records its own entries in `config/blast-radius.local.json` (issue #508).** The
+push-down regenerates a destination's `config/blast-radius.json` on every push, so an entry
+hand-added to that file does not survive the next push. The supported extension point is the
+destination-owned overlay `config/blast-radius.local.json`. No payload contains it, and the
+push-down never writes or publishes it: both implementations list it in `EXCLUDED_RELATIVE_PATHS`.
+At push time the overlay is composed onto the freshly generated base document (the derived document
+in TypeScript, the published document in Python), and the composed result is written to
+`config/blast-radius.json`, so consumers continue to read one file. Per-key semantics: the
+string-list keys `shared_surfaces`, `shared_surface_globs`, `mandate_reads`, `mergeable_paths`, and
+`path_roots` take an ordered union (base entries first, then overlay-only entries, duplicates
+removed); an overlay module absent from the base is added and an overlay module with the same name
+replaces that module's glob list, with module names emitted in ordinal order; `conflict_tolerance`
+merges recursively (nested lists by union, nested objects per member, nested scalars overlay-wins);
+the scalars `over_breadth_fraction` and `write_intent_extraction` take the overlay value; overlay-only
+keys are appended after the base keys. An overlay `version` must equal the base `version`, and the
+forbidden-glob guard (`**`, `docs/**`, `tests/**`) applies to the composed module map, including
+overlay-authored modules. A malformed overlay, a `version` mismatch, or a forbidden glob raises an
+error before any write, so `config/blast-radius.json` keeps its prior bytes. With no overlay
+present, the written file is byte-identical to the base document. The overlay cannot remove a
+shipped surface or a derived module.
+
 ## Enforcement
 
 - `scripts/dev_tools/validate_parallel_orchestrator_state.py`, with the helper modules `scripts/dev_tools/_parallel_state_common.py`, `scripts/dev_tools/_parallel_state_structures.py`, and `scripts/dev_tools/_parallel_state_records.py`, appends one error per violated orchestrator invariant. The completion-gate invariants 20 and 21 run only when the caller passes `require_complete=True`.

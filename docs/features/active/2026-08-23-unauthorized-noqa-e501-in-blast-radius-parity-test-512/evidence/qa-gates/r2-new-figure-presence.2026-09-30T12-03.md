@@ -1,0 +1,4 @@
+Timestamp: 2026-09-30T12-03
+Command: grep -c -F "21.43" docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/baseline/pytest-coverage-baseline.2026-09-29T15-16.md docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-pytest-coverage.2026-09-29T15-16.md docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/coverage-comparison.2026-09-29T15-16.md docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/qa-gates/final-qc-loop-pass.2026-09-29T15-16.md docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/spec.md
+EXIT_CODE: 0
+Output Summary: Printed counts in listed order: 3, 3, 5, 2, 1 (baseline, final-pytest-coverage, coverage-comparison, final-qc-loop-pass, spec.md). Matches the expected counts.

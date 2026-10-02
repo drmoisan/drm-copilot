@@ -48,6 +48,18 @@ function buildValidEpicState(): Record<string, unknown> {
   };
 }
 
+/** Return `features[index]`, throwing when the fixture has no such entry. */
+function featureAt(
+  features: Record<string, unknown>[],
+  index: number,
+): Record<string, unknown> {
+  const feature = features[index];
+  if (feature === undefined) {
+    throw new Error(`fixture has no feature at index ${String(index)}`);
+  }
+  return feature;
+}
+
 describe("validateEpicOrchestratorStateText", () => {
   it("rejects a JSON root that is not an object", () => {
     // Arrange / Act
@@ -145,7 +157,7 @@ describe("validateEpicOrchestratorStateText", () => {
   it("rejects an unresolved depends_on reference", () => {
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
-    features[1]["depends_on"] = ["does-not-exist"];
+    featureAt(features, 1)["depends_on"] = ["does-not-exist"];
     const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
     expect(errors.some((e) => e.includes("unresolved feature_folder"))).toBe(
       true,
@@ -155,8 +167,8 @@ describe("validateEpicOrchestratorStateText", () => {
   it("rejects a dependency cycle", () => {
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
-    features[0]["depends_on"] = ["2026-07-02-child-b-301"];
-    features[1]["depends_on"] = ["2026-07-02-child-a-300"];
+    featureAt(features, 0)["depends_on"] = ["2026-07-02-child-b-301"];
+    featureAt(features, 1)["depends_on"] = ["2026-07-02-child-a-300"];
     const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
     expect(errors.some((e) => e.includes("cycle"))).toBe(true);
   });
@@ -175,7 +187,7 @@ describe("validateEpicOrchestratorStateText", () => {
     for (const status of validStatuses) {
       const state = buildValidEpicState();
       const features = state["features"] as Record<string, unknown>[];
-      features[1]["merge_status"] = status;
+      featureAt(features, 1)["merge_status"] = status;
       const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
       expect(errors.some((e) => e.includes("invalid merge_status"))).toBe(
         false,
@@ -186,7 +198,7 @@ describe("validateEpicOrchestratorStateText", () => {
   it("rejects an invalid merge_status value", () => {
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
-    features[1]["merge_status"] = "unknown_status";
+    featureAt(features, 1)["merge_status"] = "unknown_status";
     const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
     expect(errors.some((e) => e.includes("invalid merge_status"))).toBe(true);
   });
@@ -203,12 +215,12 @@ describe("validateEpicOrchestratorStateText", () => {
   it("rejects wave-barrier ordering when a dependency has not yet merged", () => {
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
-    features[0]["merge_status"] = "pr_open";
+    featureAt(features, 0)["merge_status"] = "pr_open";
     const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
     expect(
       errors.some((e) =>
         e.includes(
-          "EPIC_WAVE_BARRIER_VIOLATION: 2026-07-02-child-b-301 started before dependency 2026-07-02-child-a-300 merged",
+          "EPIC_WAVE_BARRIER_VIOLATION: 2026-07-02-child-b-301 is treated as started while dependency 2026-07-02-child-a-300 is not merged",
         ),
       ),
     ).toBe(true);
@@ -217,7 +229,7 @@ describe("validateEpicOrchestratorStateText", () => {
   it("rejects wave-barrier ordering on out-of-order timestamps", () => {
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
-    features[0]["merge_confirmed_at"] = "2026-07-02T20-00";
+    featureAt(features, 0)["merge_confirmed_at"] = "2026-07-02T20-00";
     const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
     expect(errors.some((e) => e.includes("EPIC_WAVE_BARRIER_VIOLATION"))).toBe(
       true,
@@ -227,7 +239,7 @@ describe("validateEpicOrchestratorStateText", () => {
   it("rejects a waves[]/wave_number inconsistency", () => {
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
-    features[1]["wave_number"] = 2;
+    featureAt(features, 1)["wave_number"] = 2;
     const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
     expect(
       errors.some((e) =>
@@ -256,8 +268,8 @@ describe("validateEpicOrchestratorStateText", () => {
   it("rejects requireComplete when epic_merge_pr.merge_commit_sha is missing", () => {
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
-    features[1]["merge_status"] = "merged";
-    features[1]["merge_confirmed_at"] = "2026-07-02T18-30";
+    featureAt(features, 1)["merge_status"] = "merged";
+    featureAt(features, 1)["merge_confirmed_at"] = "2026-07-02T18-30";
     const errors = validateEpicOrchestratorStateText(JSON.stringify(state), {
       requireComplete: true,
     });
@@ -271,8 +283,8 @@ describe("validateEpicOrchestratorStateText", () => {
   it("accepts a fully complete checkpoint under requireComplete", () => {
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
-    features[1]["merge_status"] = "worktree_removed";
-    features[1]["merge_confirmed_at"] = "2026-07-02T18-30";
+    featureAt(features, 1)["merge_status"] = "worktree_removed";
+    featureAt(features, 1)["merge_confirmed_at"] = "2026-07-02T18-30";
     for (const feature of features) {
       const folder = String(feature["feature_folder"]);
       const issueNum = feature["issue_num"];
@@ -329,7 +341,7 @@ describe("validateEpicOrchestratorStateText issue_num-keyed DAG", () => {
     // Arrange: child-b depends on child-a via its issue_num (300).
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
-    features[1]["depends_on"] = [300];
+    featureAt(features, 1)["depends_on"] = [300];
     // Act
     const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
     // Assert
@@ -340,7 +352,7 @@ describe("validateEpicOrchestratorStateText issue_num-keyed DAG", () => {
     // Arrange: 999 is not a defined issue_num.
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
-    features[1]["depends_on"] = [999];
+    featureAt(features, 1)["depends_on"] = [999];
     // Act
     const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
     // Assert
@@ -353,7 +365,7 @@ describe("validateEpicOrchestratorStateText issue_num-keyed DAG", () => {
     // Arrange
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
-    features[1]["depends_on"] = [
+    featureAt(features, 1)["depends_on"] = [
       "docs/features/completed/2026-07-02-child-a-300",
     ];
     // Act
@@ -366,7 +378,7 @@ describe("validateEpicOrchestratorStateText issue_num-keyed DAG", () => {
     // Arrange
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
-    features[1]["depends_on"] = ["active/2026-07-02-child-a-300"];
+    featureAt(features, 1)["depends_on"] = ["active/2026-07-02-child-a-300"];
     // Act
     const errors = validateEpicOrchestratorStateText(JSON.stringify(state));
     // Assert

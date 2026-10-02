@@ -1,0 +1,47 @@
+{
+  "name": "error-item-key-missing",
+  "description": "A checkpoint with no record for the evaluated item key is a data error.",
+  "item_key": 446,
+  "changed_paths": [
+    "src/app.py"
+  ],
+  "at": "2026-08-08T10-00",
+  "computed_at": "2026-08-08T10-05",
+  "state": {
+    "items": [
+      {
+        "issue_num": 445,
+        "state": "in_flight",
+        "blast_radius": {
+          "paths": [
+            "src/app.py"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-08T09-00"
+        }
+      }
+    ],
+    "conflict_edges": []
+  },
+  "config": {
+    "shared_surfaces": [
+      ".claude/settings.json"
+    ],
+    "shared_surface_globs": [],
+    "modules": {
+      "python-dev-tools": [
+        "scripts/dev_tools/**"
+      ],
+      "mcp-server": [
+        "packages/mcp-server/**"
+      ]
+    }
+  },
+  "expected_error": {
+    "exit_code": 1,
+    "stderr_prefix": "parallel drift detection failed: "
+  }
+}

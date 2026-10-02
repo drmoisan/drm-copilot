@@ -1,0 +1,13 @@
+test(509): declare issue-adoption regression tests without globals()
+
+Replace the module-namespace registration in
+tests/scripts/dev_tools/test_validate_orchestrator_state_issue_adoption.py
+with two ordinary test functions whose def lines fit in 88 columns:
+test_large_checkpoint_with_valid_issue_adoption_completes_without_potential_to_issue_receipt
+becomes test_valid_adoption_completes_without_potential_to_issue_receipt, and
+test_adoption_error_fails_closed_and_orders_errors_before_local_execution_overrides
+becomes test_adoption_error_fails_closed_before_local_execution_overrides.
+Bodies, docstrings, and assertions are unchanged. The executed plan cites
+the new names, and the rename record is added under evidence/other.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
