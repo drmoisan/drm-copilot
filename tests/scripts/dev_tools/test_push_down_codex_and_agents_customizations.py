@@ -366,7 +366,7 @@ def test_every_selected_pack_generates_identical_handoff_runtime_files() -> None
 
 
 def test_consumer_authority_is_typescript_only_and_scope_owners_are_unchanged() -> None:
-    """Installed authority avoids Python and leaves #467/#543 behavior unchanged."""
+    """Installed authority avoids Python and pins the #543 ready-gate key gate."""
 
     authority_paths = (
         "repo-automation-tool-names.ts",
@@ -400,7 +400,8 @@ def test_consumer_authority_is_typescript_only_and_scope_owners_are_unchanged() 
     ready_gate = epic_validator[
         epic_validator.index("if require_ready_for_execution:") :
     ]
-    assert "validate_epic_planner_child_launch_bindings(features)" in ready_gate
+    assert "validate_epic_planner_child_launch_bindings(" in ready_gate
+    assert "require_launch_paths=key_gated" in ready_gate
 
 
 def test_codex_guidance_requires_independent_expected_context() -> None:
