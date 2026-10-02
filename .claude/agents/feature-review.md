@@ -9,6 +9,7 @@ tools:
   - "Bash(git diff *)"
   - "Bash(git log *)"
   - "Write(/docs/features/active/**)"
+  - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
   - policy-compliance-order
   - acceptance-criteria-tracking
@@ -50,6 +51,8 @@ Report the required artifact paths in the final response using these tokens:
 - `feature-audit-path: docs/features/active/<feature-or-selected-version>/feature-audit.<timestamp>.md`
 - When remediation inputs are produced: `remediation-inputs-path: docs/features/active/<feature-or-selected-version>/remediation-inputs.<timestamp>.md`
 - Optional: `review-status: <VERDICT>` with the same verdict as the remediation inputs (`PASS` when none were produced). The orchestrator treats the remediation inputs as authoritative and this token as a cross-check.
+
+Validate each review artifact immediately after writing it with `mcp__drm-copilot__validate_orchestration_artifacts`, passing `artifact_path` set to that artifact: use `artifact_type: "policy-audit"` for `policy-audit.<timestamp>.md`, `artifact_type: "code-review"` for `code-review.<timestamp>.md`, and `artifact_type: "feature-audit"` for `feature-audit.<timestamp>.md`. When the validator reports a failure, fix the artifact in the same review and validate it again. Report an artifact path only after its validation passes.
 
 ## Context Sources
 

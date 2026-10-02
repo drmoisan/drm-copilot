@@ -118,15 +118,18 @@ def parse_verification_evidence_markdown(
     """
     parsed: dict[str, str] = {}
 
-    # Parse `Key: value` rows once and keep only required schema fields.
+    # Parse `Key: value` rows once. The first occurrence of each accepted field
+    # (the required fields and `ExpectedExitCode`) forms the record, matching
+    # the TypeScript parser; later occurrences, including empty later values,
+    # are ignored.
     for raw_line in markdown.splitlines():
         if ":" not in raw_line:
             continue
         key, value = raw_line.split(":", 1)
         key = key.strip()
-        if key in REQUIRED_FIELDS:
-            parsed[key] = value.strip()
-        elif key == EXPECTED_EXIT_CODE_FIELD and key not in parsed:
+        if (
+            key in REQUIRED_FIELDS or key == EXPECTED_EXIT_CODE_FIELD
+        ) and key not in parsed:
             parsed[key] = value.strip()
 
     timestamp = parsed.get("Timestamp")
