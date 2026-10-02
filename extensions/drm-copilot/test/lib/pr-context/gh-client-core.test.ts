@@ -27,7 +27,7 @@ class QueueRunner implements CommandRunner {
   }
 
   run(args: readonly string[], options?: CommandRunOptions): CommandResult {
-    this.calls.push({ args, options });
+    this.calls.push({ args, ...(options ? { options } : {}) });
     const next = this.queue.shift();
     if (next === undefined) {
       throw new Error(`Unexpected extra runner call: ${args.join(" ")}`);

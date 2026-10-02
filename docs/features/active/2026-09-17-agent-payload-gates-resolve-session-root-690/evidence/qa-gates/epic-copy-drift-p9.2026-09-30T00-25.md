@@ -1,0 +1,14 @@
+# D13 Copy-Drift Probe, Phase 9 (P9-T1)
+
+Timestamp: 2026-09-30T00-25
+Command: sh SCRATCH/run-ps.sh SCRATCH/epic-coexistence-probe.ps1 -Mode drift -EpicWorktreeRoot ../2026-09-29T14-15-epic-770
+EXIT_CODE: 0
+Output Summary:
+- SESSION_EPIC_PRESENT=True
+- FIRST_COPY_DRIFT=False
+- EPIC_WORKTREE_LEAF=2026-09-29T14-15-epic-770
+- EPIC_WORKTREE_PRESENT=True
+- SESSION_EPIC_SHA256=57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD
+- EPIC_WORKTREE_SHA256=57FE03E188391AE209696FDD58E5E52DC0A117AF94112F79E0D1CB11DCC8E5BD
+- COPY_DRIFT=False (both present, equal hashes; the phase proceeds)
+- Read-only: neither epic checkpoint copy was written.

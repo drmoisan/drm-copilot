@@ -146,9 +146,9 @@ describe("mappingRecordToJson", () => {
     const json = mappingRecordToJson(record);
 
     // Assert
-    expect(json.target_path).toBeNull();
-    expect(json.notes).toEqual([]);
-    expect(json.is_required).toBe(false);
+    expect(json["target_path"]).toBeNull();
+    expect(json["notes"]).toEqual([]);
+    expect(json["is_required"]).toBe(false);
   });
 });
 
@@ -228,10 +228,10 @@ describe("runOptionsToJson", () => {
     const json = runOptionsToJson(options);
 
     // Assert
-    expect(json.selected_paths).toEqual(["a/b.md", "c/d.md"]);
-    expect(json.destination_root).toBe("C:/repo/dest");
-    expect(json.enable_repo_prompts).toBe(true);
-    expect(json.emit_intermediate_state).toBe(true);
+    expect(json["selected_paths"]).toEqual(["a/b.md", "c/d.md"]);
+    expect(json["destination_root"]).toBe("C:/repo/dest");
+    expect(json["enable_repo_prompts"]).toBe(true);
+    expect(json["emit_intermediate_state"]).toBe(true);
   });
 });
 
@@ -340,11 +340,11 @@ describe("sourceArtifactToJson", () => {
     const json = sourceArtifactToJson(artifact);
 
     // Assert: frontmatter keys sorted (applyTo before mode), cues preserved.
-    expect(Object.keys(json.frontmatter as Record<string, string>)).toEqual([
+    expect(Object.keys(json["frontmatter"] as Record<string, string>)).toEqual([
       "applyTo",
       "mode",
     ]);
-    expect(json.sections).toEqual([
+    expect(json["sections"]).toEqual([
       {
         section_id: ".github/prompts/x.prompt.md#workflow-3",
         heading: "Workflow",

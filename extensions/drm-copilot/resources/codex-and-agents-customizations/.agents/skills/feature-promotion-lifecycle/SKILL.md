@@ -83,7 +83,7 @@ Lifecycle guardrails:
 
 4) Create the potential entry through `mcp__drm-copilot__new_potential_entry` or `mcp__drm-copilot__new_potential_bug_entry`.
 
-5) Promote the potential document through `mcp__drm-copilot__potential_to_issue` with the selected `${work-mode}` and capture the numeric `${issue-num}`.
+5) Promote the potential document through `mcp__drm-copilot__potential_to_issue` with the selected `${work-mode}` and capture the numeric `${issue-num}`. When the issue already exists, do not call `potential_to_issue`; verify the issue read-only and record `issue_adoption` with the existing number as `${issue-num}`.
 
 6) Rename the branch to the final branch:
 - `${final-branch}`

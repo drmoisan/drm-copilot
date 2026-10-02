@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import type { FileSystem } from "../src/lib/file-system";
 
-const mockShowQuickPick = jest.fn();
+const mockShowQuickPick =
+  jest.fn<(items: unknown, options?: unknown) => Promise<unknown>>();
 const mockShowInformationMessage = jest.fn();
 
 jest.mock(

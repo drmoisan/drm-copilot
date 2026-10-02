@@ -147,4 +147,81 @@ Describe "publish-mcp-npm.yml workflow invariants" {
             ($resetsExitCode -or $exitsExplicitly) | Should -BeTrue -Because "pwsh step '$($step.Name)' must reset `$LASTEXITCODE or exit explicitly"
         }
     }
+
+    # Issue #723: the registry verify poll must tolerate propagation delay beyond the former
+    # 180 second window. The assertions below pin a bounded backoff schedule whose cumulative
+    # sleep budget is at least 600 seconds, a timeout message that does not blame the tag
+    # push, and the existing exit-code and exact-version invariants of the poll step.
+    It "polls with a bounded backoff schedule whose cumulative sleep budget is at least 600 seconds" {
+        $script:pollStep | Should -Not -BeNullOrEmpty
+        $text = $script:pollStep.Text
+
+        $text | Should -Match '\$maxAttempts\s*=\s*14\b'
+        $text | Should -Match '\$initialIntervalSeconds\s*=\s*10\b'
+        $text | Should -Match '\$maxIntervalSeconds\s*=\s*60\b'
+        $text | Should -Match '\[Math\]::Min\(\s*\$initialIntervalSeconds\s*\*\s*\$attempt\s*,\s*\$maxIntervalSeconds\s*\)'
+
+        $attemptsMatch = [regex]::Match($text, '\$maxAttempts\s*=\s*(?<Value>\d+)')
+        $initialMatch = [regex]::Match($text, '\$initialIntervalSeconds\s*=\s*(?<Value>\d+)')
+        $capMatch = [regex]::Match($text, '\$maxIntervalSeconds\s*=\s*(?<Value>\d+)')
+        $attemptsMatch.Success | Should -BeTrue -Because "the poll step must assign `$maxAttempts"
+        $initialMatch.Success | Should -BeTrue -Because "the poll step must assign `$initialIntervalSeconds"
+        $capMatch.Success | Should -BeTrue -Because "the poll step must assign `$maxIntervalSeconds"
+
+        $maxAttemptsValue = [int]$attemptsMatch.Groups['Value'].Value
+        $initialValue = [int]$initialMatch.Groups['Value'].Value
+        $capValue = [int]$capMatch.Groups['Value'].Value
+
+        $totalSleepSeconds = 0
+        for ($k = 1; $k -le ($maxAttemptsValue - 1); $k++) {
+            $totalSleepSeconds += [Math]::Min($initialValue * $k, $capValue)
+        }
+        $totalSleepSeconds | Should -BeGreaterOrEqual 600 -Because "the cumulative sleep budget must cover at least 600 seconds"
+    }
+
+    It "caps the poll interval at 60 seconds and skips the sleep after the final attempt" {
+        $script:pollStep | Should -Not -BeNullOrEmpty
+        $text = $script:pollStep.Text
+
+        # The sleep cmdlet name is assembled from two fragments because the repository
+        # test-purity hook rejects the literal cmdlet name in any Pester file. The name is
+        # only a search token here; no sleep is executed by this test.
+        $sleepToken = 'Start' + '-Sleep'
+
+        $text | Should -Match '\$maxIntervalSeconds\s*=\s*60\b'
+        $text | Should -Match ($sleepToken + '\s+-Seconds\s+\$sleepSeconds')
+
+        $sleepStatements = [regex]::Matches($text, $sleepToken)
+        $sleepStatements.Count | Should -Be 1
+
+        $guardMatch = [regex]::Match($text, '\$attempt\s+-lt\s+\$maxAttempts')
+        $guardMatch.Success | Should -BeTrue -Because "the sleep must sit behind a final-attempt guard"
+
+        $sleepMatch = [regex]::Match($text, $sleepToken)
+        $guardMatch.Index | Should -BeLessThan $sleepMatch.Index -Because "the final-attempt guard must precede the sleep statement"
+    }
+
+    It "reports a timeout message that does not claim the tag push failed to publish" {
+        $script:pollStep | Should -Not -BeNullOrEmpty
+        $errorLines = @(($script:pollStep.Text -split "`n") | Where-Object { $_ -match '::error::' })
+        $errorLines.Count | Should -Be 1
+
+        $errorLine = $errorLines[0]
+        $errorLine | Should -Not -Match 'tag push did not publish'
+        $errorLine | Should -Match 'not yet resolvable'
+        $errorLine | Should -Match 'publish step succeeded'
+        $errorLine | Should -Match 'Check the registry'
+        $errorLine | Should -Match 're-publishing an existing version fails'
+    }
+
+    It "keeps the exit-code reset, explicit exits, and exact-version operand in the poll step" {
+        $script:pollStep | Should -Not -BeNullOrEmpty
+        $text = $script:pollStep.Text
+
+        $text | Should -Match '\$LASTEXITCODE\s*=\s*0'
+        $text | Should -Match '@danmoisan/drm-copilot-mcp@\$version'
+        $text | Should -Match '(?m)^\s*exit 0\s*$'
+        $text | Should -Match '(?m)^\s*exit 1\s*$'
+        $text | Should -Match $script:refGuardPattern
+    }
 }

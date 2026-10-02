@@ -242,7 +242,7 @@ Describe 'Codex epic-child launcher hardening' {
         $arguments = [string[]]$info.ArgumentList
 
         $arguments | Should -Contain '--ignore-user-config'
-        $arguments | Should -Contain 'windows.sandbox="elevated"'
+        ($arguments -contains 'windows.sandbox="elevated"') | Should -Be $IsWindows -Because 'Codex receives the elevated sandbox argument only on Windows hosts'
         ($arguments -join "`n") | Should -Match 'projects=\{.*trust_level='
         ($arguments -join "`n") | Should -Match 'permissions\.epic-child-workspace=.*deny'
         ($arguments -join "`n") | Should -Not -Match '\*\*'
@@ -343,7 +343,7 @@ Describe 'Codex epic-child launcher hardening' {
 
         $arguments[0] | Should -BeExactly 'sandbox'
         $arguments | Should -Contain 'epic-child-workspace'
-        $arguments | Should -Contain 'windows.sandbox="elevated"'
+        ($arguments -contains 'windows.sandbox="elevated"') | Should -Be $IsWindows -Because 'Codex receives the elevated sandbox argument only on Windows hosts'
         $info.Environment['CODEX_HOME'] | Should -BeExactly 'C:\isolated'
         $sandbox | Should -Match 'WaitForExit\(15000\)'
         $sandbox | Should -Match 'Kill\(\$true\)'
@@ -424,7 +424,7 @@ Describe 'Codex epic-child launcher hardening' {
     It 'repeats the exact terminal receipt timestamp under the matching status key' {
         $child = [pscustomobject]@{
             Process = [pscustomobject]@{ ExitCode = 0; Id = 123 }
-            Entry   = [pscustomobject]@{ worktree_path = 'C:\worktree' }
+            Entry   = [pscustomobject]@{ worktree_path = $(if ($IsWindows) { 'C:\worktree' } else { '/worktree' }) }
             SessionId = 'session-a'; BasePath = 'C:\artifacts\launch-a'
             Receipt = [pscustomobject]@{ completed_at = '2026-07-10T12:00:00Z'; failed_at = '' }
         }

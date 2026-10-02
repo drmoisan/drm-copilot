@@ -9,6 +9,7 @@ Describe 'enforce-epic-merge-gate.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-merge-gate.ps1").Path
         . $script:UnderTest
+        Mock Resolve-EpicMergeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     Context 'commands outside scope' {
@@ -231,14 +232,14 @@ Describe 'enforce-epic-merge-gate.ps1' {
 
     Context 'real Test-Path read seam for the parallel checkpoint' {
         It 'Get-ParallelOrchestratorCheckpointContent returns $null when the checkpoint file does not exist' {
-            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Get-ParallelOrchestratorCheckpointContent | Should -BeNullOrEmpty
+            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/merge-seam/artifacts/orchestration/parallel-orchestrator-state.json' }
+            Get-ParallelOrchestratorCheckpointContent -Path '/synthetic-worktrees/merge-seam/artifacts/orchestration/parallel-orchestrator-state.json' | Should -BeNullOrEmpty
         }
 
         It 'Get-ParallelOrchestratorCheckpointContent reads real content when the file exists' {
-            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Mock -CommandName Get-Content -MockWith { '{"route_id":"parallel"}' } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Get-ParallelOrchestratorCheckpointContent | Should -Be '{"route_id":"parallel"}'
+            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/merge-seam/artifacts/orchestration/parallel-orchestrator-state.json' }
+            Mock -CommandName Get-Content -MockWith { '{"route_id":"parallel"}' } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/merge-seam/artifacts/orchestration/parallel-orchestrator-state.json' }
+            Get-ParallelOrchestratorCheckpointContent -Path '/synthetic-worktrees/merge-seam/artifacts/orchestration/parallel-orchestrator-state.json' | Should -Be '{"route_id":"parallel"}'
         }
     }
 
@@ -290,25 +291,25 @@ Describe 'enforce-epic-merge-gate.ps1' {
 
     Context 'real Test-Path read seams' {
         It 'Get-ChildOrchestratorCheckpointContent returns $null when the checkpoint file does not exist' {
-            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $script:ChildCheckpointPath }
-            Get-ChildOrchestratorCheckpointContent | Should -BeNullOrEmpty
+            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/merge-seam/artifacts/orchestration/orchestrator-state.json' }
+            Get-ChildOrchestratorCheckpointContent -Path '/synthetic-worktrees/merge-seam/artifacts/orchestration/orchestrator-state.json' | Should -BeNullOrEmpty
         }
 
         It 'Get-ChildOrchestratorCheckpointContent reads real content when the file exists' {
-            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $script:ChildCheckpointPath }
-            Mock -CommandName Get-Content -MockWith { '{"epic_mode":true}' } -ParameterFilter { $LiteralPath -eq $script:ChildCheckpointPath }
-            Get-ChildOrchestratorCheckpointContent | Should -Be '{"epic_mode":true}'
+            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/merge-seam/artifacts/orchestration/orchestrator-state.json' }
+            Mock -CommandName Get-Content -MockWith { '{"epic_mode":true}' } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/merge-seam/artifacts/orchestration/orchestrator-state.json' }
+            Get-ChildOrchestratorCheckpointContent -Path '/synthetic-worktrees/merge-seam/artifacts/orchestration/orchestrator-state.json' | Should -Be '{"epic_mode":true}'
         }
 
         It 'Get-EpicOrchestratorCheckpointContent returns $null when the checkpoint file does not exist' {
-            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $script:EpicCheckpointPath }
-            Get-EpicOrchestratorCheckpointContent | Should -BeNullOrEmpty
+            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/merge-seam/artifacts/orchestration/epic-orchestrator-state.json' }
+            Get-EpicOrchestratorCheckpointContent -Path '/synthetic-worktrees/merge-seam/artifacts/orchestration/epic-orchestrator-state.json' | Should -BeNullOrEmpty
         }
 
         It 'Get-EpicOrchestratorCheckpointContent reads real content when the file exists' {
-            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $script:EpicCheckpointPath }
-            Mock -CommandName Get-Content -MockWith { '{"epic_merge_pr":{}}' } -ParameterFilter { $LiteralPath -eq $script:EpicCheckpointPath }
-            Get-EpicOrchestratorCheckpointContent | Should -Be '{"epic_merge_pr":{}}'
+            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/merge-seam/artifacts/orchestration/epic-orchestrator-state.json' }
+            Mock -CommandName Get-Content -MockWith { '{"epic_merge_pr":{}}' } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/merge-seam/artifacts/orchestration/epic-orchestrator-state.json' }
+            Get-EpicOrchestratorCheckpointContent -Path '/synthetic-worktrees/merge-seam/artifacts/orchestration/epic-orchestrator-state.json' | Should -Be '{"epic_merge_pr":{}}'
         }
     }
 

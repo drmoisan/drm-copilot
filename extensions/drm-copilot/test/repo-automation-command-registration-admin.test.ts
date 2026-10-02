@@ -10,7 +10,8 @@ import { afterEach, describe, expect, it, jest } from "@jest/globals";
  * time and invoked directly.
  */
 
-const showQuickPickMock = jest.fn();
+const showQuickPickMock =
+  jest.fn<(items: unknown, options?: unknown) => Promise<unknown>>();
 const showWarningMessageMock = jest.fn();
 const registerCommandMock = jest.fn();
 
@@ -106,7 +107,9 @@ describe("registerPushDownCodexAndAgentsCustomizationsCommand selections", () =>
 
   it("prompts for packs and C# variant then forwards the public selection", async () => {
     const captured = captureHandlers();
-    const pushDownCodexMock = jest.fn(() => Promise.resolve());
+    const pushDownCodexMock = jest.fn<(input: unknown) => Promise<void>>(() =>
+      Promise.resolve(),
+    );
     const options = {
       context: {} as unknown,
       output: { appendLine: jest.fn() },
@@ -137,7 +140,9 @@ describe("registerPushDownCodexAndAgentsCustomizationsCommand selections", () =>
 
   it("does not prompt for a C# variant when C# is not selected", async () => {
     const captured = captureHandlers();
-    const pushDownCodexMock = jest.fn(() => Promise.resolve());
+    const pushDownCodexMock = jest.fn<(input: unknown) => Promise<void>>(() =>
+      Promise.resolve(),
+    );
     const options = {
       context: {} as unknown,
       output: { appendLine: jest.fn() },
@@ -168,7 +173,9 @@ describe("registerPushDownCodexAndAgentsCustomizationsCommand selections", () =>
 
   it("cancels before service invocation when a selection returns undefined", async () => {
     const captured = captureHandlers();
-    const pushDownCodexMock = jest.fn(() => Promise.resolve());
+    const pushDownCodexMock = jest.fn<(input: unknown) => Promise<void>>(() =>
+      Promise.resolve(),
+    );
     const options = {
       context: {} as unknown,
       output: { appendLine: jest.fn() },
@@ -191,7 +198,9 @@ describe("registerPushDownCodexAndAgentsCustomizationsCommand selections", () =>
 
   it("cancels before service invocation when the C# variant selection is cancelled", async () => {
     const captured = captureHandlers();
-    const pushDownCodexMock = jest.fn(() => Promise.resolve());
+    const pushDownCodexMock = jest.fn<(input: unknown) => Promise<void>>(() =>
+      Promise.resolve(),
+    );
     const options = {
       context: {} as unknown,
       output: { appendLine: jest.fn() },

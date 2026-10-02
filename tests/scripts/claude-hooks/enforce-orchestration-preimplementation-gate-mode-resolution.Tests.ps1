@@ -103,6 +103,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
             return '{"route_id":"' + $RouteId + '","parallel_slug":"' + $ParallelSlug +
             '","parallel_manifest_path":"' + $ParallelManifestPath + '","items":' + $items + '}'
         }
+        Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     Context 'Fault-1 wording independence, direction (b): the new allow-to-deny change' {

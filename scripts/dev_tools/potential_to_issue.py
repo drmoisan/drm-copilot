@@ -4,12 +4,18 @@ from __future__ import annotations
 
 import argparse
 import os
-import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING
 
+from scripts.dev_tools.potential_to_issue_adapters import (
+    FEATURE_LABEL_COLOR,
+    FEATURE_LABEL_DESCRIPTION,
+    GhClient,
+    GhResult,
+    RealGhClient,
+)
 from scripts.dev_tools.potential_to_issue_content import (
     BUG_SECTION_HEADINGS,
     PLACEHOLDER,
@@ -24,13 +30,32 @@ from scripts.dev_tools.potential_to_issue_content import (
     parse_issue_reference,
     update_metadata_lines,
 )
+from scripts.dev_tools.potential_to_issue_filesystem import FileSystem, RealFileSystem
 from scripts.dev_tools.prompt_mode_contract import (
     ACCEPTED_WORK_MODES,
     normalize_requested_work_mode,
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable
+    from collections.abc import Callable
+
+__all__ = [
+    "FEATURE_LABEL_COLOR",
+    "FEATURE_LABEL_DESCRIPTION",
+    "PROMOTION_TYPES",
+    "TITLE_PREFIXES",
+    "WORK_MODES",
+    "FileSystem",
+    "GhClient",
+    "GhResult",
+    "PromotionError",
+    "PromotionOutcome",
+    "RealFileSystem",
+    "RealGhClient",
+    "main",
+    "parse_args",
+    "promote_potential",
+]
 
 PROMOTION_TYPES = ("epic", "feature", "refactor", "bug")
 WORK_MODES = ACCEPTED_WORK_MODES
@@ -40,239 +65,10 @@ TITLE_PREFIXES = {
     "refactor": "Refactor",
     "bug": "Bug",
 }
-FEATURE_LABEL_COLOR = "0e8a16"
-FEATURE_LABEL_DESCRIPTION = "Feature work"
 
 
 class PromotionError(Exception):
     """Raised when a promotion precondition fails."""
-
-
-@dataclass
-class GhResult:
-    """Capture gh command execution output and exit status.
-
-    Purpose:
-        Provide a typed transport object for gh subprocess results used by promotion
-        workflows.
-
-    Usage:
-        Created by gh client implementations and consumed by promotion logic.
-
-    Flow:
-        Store output lines and integer exit code from a single gh invocation.
-
-    Invariants / Constraints:
-        `exit_code` is the process return code for the related command.
-
-    Side Effects:
-        None.
-
-    Attributes:
-        output (list[str]): Combined stdout/stderr lines from gh command execution.
-        exit_code (int): Process return code from the gh command.
-    """
-
-    output: list[str]
-    exit_code: int
-
-
-class GhClient(Protocol):
-    def is_authenticated(self) -> bool: ...
-
-    def issue_create(self, title: str, body: str, promotion_type: str) -> GhResult: ...
-
-    def ensure_label(self, label: str) -> GhResult: ...
-
-    def issue_view(self, issue_number: str) -> GhResult: ...
-
-
-@dataclass
-class RealGhClient(GhClient):
-    """Invoke the GitHub CLI and translate results into typed records.
-
-    Purpose:
-        Provide the concrete gh-backed implementation for issue creation/view flows.
-
-    Usage:
-        Instantiated by `promote_potential` unless a fake client is injected.
-
-    Flow:
-        Resolve `gh` path, validate authentication, execute commands, and return
-        `GhResult` payloads.
-
-    Invariants / Constraints:
-        `gh_path` must resolve to an executable before command execution.
-
-    Side Effects:
-        Executes subprocess calls to the local `gh` CLI.
-
-    Attributes:
-        gh_path (str | None): Resolved gh executable path.
-    """
-
-    gh_path: str | None = None
-
-    def __post_init__(self) -> None:
-        if self.gh_path is None:
-            self.gh_path = shutil.which("gh")
-        if not self.gh_path:
-            raise FileNotFoundError(
-                "gh CLI not found on PATH. Install gh and authenticate first."
-            )
-
-    def is_authenticated(self) -> bool:
-        """Check if gh CLI is authenticated by running gh auth status."""
-        gh_exe = self.gh_path
-        if gh_exe is None:
-            return False
-
-        result = subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
-            [gh_exe, "auth", "status"],
-            capture_output=True,
-            check=False,
-        )
-        return result.returncode == 0
-
-    def _run(self, args: list[str], body: str | None = None) -> GhResult:
-        gh_exe = self.gh_path
-        if gh_exe is None:
-            raise RuntimeError("gh CLI path was not resolved")
-
-        proc: subprocess.CompletedProcess[str] = (
-            subprocess.run(  # noqa: S603 - static analysis can't verify runtime validation
-                [gh_exe, *args],
-                input=body,
-                text=True,
-                encoding="utf-8",
-                capture_output=True,
-                check=False,
-            )
-        )
-        stdout = proc.stdout or ""
-        stderr = proc.stderr or ""
-        combined = stdout + stderr
-        return GhResult(output=combined.splitlines(), exit_code=int(proc.returncode))
-
-    def issue_create(self, title: str, body: str, promotion_type: str) -> GhResult:
-        args = [
-            "issue",
-            "create",
-            "--title",
-            title,
-            "--body-file",
-            "-",
-            "--label",
-            promotion_type,
-        ]
-        return self._run(args, body)
-
-    def ensure_label(self, label: str) -> GhResult:
-        """Ensure a GitHub label exists before retrying issue creation."""
-        args = [
-            "label",
-            "create",
-            label,
-            "--color",
-            FEATURE_LABEL_COLOR,
-            "--description",
-            FEATURE_LABEL_DESCRIPTION,
-        ]
-        return self._run(args)
-
-    def issue_view(self, issue_number: str) -> GhResult:
-        args = [
-            "issue",
-            "view",
-            issue_number,
-            "--json",
-            "number,title,url,author,updatedAt",
-        ]
-        return self._run(args)
-
-
-class FileSystem(Protocol):
-    """Define filesystem operations required by promotion workflows.
-
-    Purpose:
-        Provide an abstraction boundary for filesystem interactions.
-
-    Usage:
-        Implemented by `RealFileSystem` and test doubles.
-
-    Flow:
-        Expose read/write/move/exists primitives used by promotion orchestration.
-
-    Invariants / Constraints:
-        Implementations must preserve UTF-8 behavior for markdown IO.
-
-    Side Effects:
-        Implementations may perform local disk IO.
-
-    Attributes:
-        None.
-    """
-
-    def resolve_path(self, path_str: str) -> Path: ...
-
-    def exists(self, path: Path) -> bool: ...
-
-    def read_text(self, path: Path) -> str: ...
-
-    def write_text(self, path: Path, content: str) -> None: ...
-
-    def write_lines(self, path: Path, lines: Iterable[str]) -> None: ...
-
-    def ensure_dir(self, path: Path) -> None: ...
-
-    def move(self, src: Path, dest: Path) -> None: ...
-
-
-@dataclass
-class RealFileSystem(FileSystem):
-    """Concrete filesystem adapter using local disk operations.
-
-    Purpose:
-        Execute production file operations behind the `FileSystem` protocol.
-
-    Usage:
-        Used by default in promotion workflows and replaceable in tests.
-
-    Flow:
-        Resolve paths, read/write text, ensure directories, and move files.
-
-    Invariants / Constraints:
-        Paths are treated as UTF-8 text files when reading/writing markdown content.
-
-    Side Effects:
-        Reads/writes/moves files on the local filesystem.
-
-    Attributes:
-        None.
-    """
-
-    def resolve_path(self, path_str: str) -> Path:
-        return Path(path_str).expanduser().resolve()
-
-    def exists(self, path: Path) -> bool:
-        return path.exists()
-
-    def read_text(self, path: Path) -> str:
-        return path.read_text(encoding="utf-8")
-
-    def write_text(self, path: Path, content: str) -> None:
-        path.write_text(content, encoding="utf-8")
-
-    def write_lines(self, path: Path, lines: Iterable[str]) -> None:
-        joined = "\n".join(lines)
-        path.write_text(joined, encoding="utf-8")
-
-    def ensure_dir(self, path: Path) -> None:
-        path.mkdir(parents=True, exist_ok=True)
-
-    def move(self, src: Path, dest: Path) -> None:
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.move(str(src), str(dest))
 
 
 @dataclass
@@ -549,6 +345,9 @@ def promote_potential(
     filesystem.ensure_dir(promoted_dir)
     dest_path = promoted_dir / resolved.name
     filesystem.move(resolved, dest_path)
+    if not filesystem.exists(dest_path):
+        _emit(f"Promoted file missing after move: {dest_path}")
+        return PromotionOutcome(exit_code=1, messages=messages)
     _emit(f"Moved potential file to promoted folder: {dest_path}")
 
     return PromotionOutcome(exit_code=0, messages=messages, destination=dest_path)

@@ -177,8 +177,8 @@ describe("removeAllSecondaryWorktrees — skip on failure", () => {
     // Assert
     expect(summary.removed).toEqual(["/repo/wt-2"]);
     expect(summary.skipped).toHaveLength(1);
-    expect(summary.skipped[0].path).toBe("/repo/wt-1");
-    expect(summary.skipped[0].reason).toContain("modified or untracked files");
+    expect(summary.skipped[0]?.path).toBe("/repo/wt-1");
+    expect(summary.skipped[0]?.reason).toContain("modified or untracked files");
   });
 });
 
@@ -214,7 +214,7 @@ describe("removeAllSecondaryWorktrees — locked and prunable skip", () => {
     const removeCalls = git.calls.filter((call) => call.args[1] === "remove");
     expect(removeCalls).toHaveLength(0);
     expect(git.calls).toHaveLength(1);
-    expect(git.calls[0].args).toEqual(["worktree", "list", "--porcelain"]);
+    expect(git.calls[0]?.args).toEqual(["worktree", "list", "--porcelain"]);
   });
 });
 

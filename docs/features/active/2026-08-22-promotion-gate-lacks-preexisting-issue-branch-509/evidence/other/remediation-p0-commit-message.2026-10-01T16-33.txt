@@ -1,0 +1,10 @@
+docs(509): record remediation cycle 1 baseline evidence
+
+Capture the Phase 0 baseline for remediation cycle 1 on the merged tree
+(0aff3f47 plus plan-only commits): policy and requirements reads, git
+ancestry, file line counts, collected node names, targeted and full
+Python coverage, Black/Ruff/Pyright state, PowerShell bundle hash and
+MCP format/analyze status, document-pair byte identity, and the
+post-merge TypeScript coverage run. No source file is changed.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
