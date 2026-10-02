@@ -133,7 +133,7 @@ If a publish fails after this runbook is completed, the cause is the OIDC or tru
 ### Recording completion
 
 1. Add a comment to issue #712 stating that the `NPM_TOKEN` repository secret was deleted and the corresponding npm access token was revoked, with the completion date and the verification results from steps 1 and 2 above. Do not include any secret value, token value, abbreviated token string, or token ID in the comment.
-2. Update the pending human-action status in `docs/features/active/unused-npm-token-secret-712/` from pending to complete: mark acceptance criterion AC4 in `issue.md` as satisfied and reference the issue #712 comment. This update may be made by the human or requested from an agent with a link to the comment.
+2. Update the pending evidence record `docs/features/completed/unused-npm-token-secret-712/evidence/other/human-action-pending.2026-09-27T09-19.md`: change `Status: pending` to `Status: complete`, and add the completion date and a link to the issue #712 comment from step 1. Do not change acceptance criterion AC4 in `spec.md`; AC4 was satisfied when the human action was recorded as pending (spec decision D5), and completion is recorded only by this follow-up note and the issue comment. Do not record any secret value, token value, abbreviated token string, or token ID in the record. This update may be made by the human or requested from an agent with a link to the comment.
 
 ## Source and Citation
 
