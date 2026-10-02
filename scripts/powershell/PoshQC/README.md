@@ -65,8 +65,14 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
 - PSScriptAnalyzer settings: `./settings/pssa.settings.psd1`
    - Enforces compatible syntax for 5.1 and 7.6, 4-space indentation, ShouldProcess for state-changing functions, and safety guards (no Invoke-Expression, no global vars, etc.).
 - Pester settings: `./settings/pester.runsettings.psd1`
-  - Runs tests under `scripts` and `tests/powershell`, outputs JUnit XML and CoverageGutters coverage, and enables coverage over `scripts/dev-tools/*.ps1`, `scripts/powershell/**/*.psm1`, and `src/**/*.ps1`.
+  - Runs tests under `scripts` and `tests/powershell`, outputs JUnit XML and CoverageGutters coverage, and enables coverage. The shipped runsettings carry no `CodeCoverage.Path` list; `Invoke-PoshQCTest` derives the coverage population from the workspace (see Coverage population below).
   - When `-ScanFolders` is supplied to `Invoke-PoshQCSuite` or the lower-level commands, the suite narrows discovery to those workspace-relative or workspace-contained folders.
+- Coverage population (issue #527): `Invoke-PoshQCTest` measures the same file set for the same workspace whichever module copy is loaded.
+  - Workspace configuration: `config/poshqc-coverage.json` with the schema `{"version": 1, "roots": [...]}`. Each root is a workspace-relative folder. The file is validated fail-fast, and every error names `config/poshqc-coverage.json`: empty content, invalid JSON, a `version` other than 1, a missing or non-array `roots`, and a blank, absolute, or `..`-segment entry are rejected. An empty `roots` array yields an empty population.
+  - Precedence, reported as the source name: (1) `settings` - a caller-supplied settings file (`-SettingsPath` other than the module's own `settings/pester.runsettings.psd1`) with a non-empty `CodeCoverage.Path` is honored, and each entry that does not exist is pruned and logged; a `CodeCoverage.Path` list in the module's own settings file is ignored and the ignore is logged. (2) `config` - `config/poshqc-coverage.json` exists. (3) `fallback` - the effective test scan folders: explicit `-ScanFolders`, else `config/poshqc-scan.json`, else the settings `Run.Path`.
+  - Built-in exclusions: `.ps1` and `.psm1` files only; files named `*.Tests.ps1` are excluded, as are files whose first root-relative segment is `tests` and files under any root-relative directory named in `DefaultExcludedDirs` (for example `node_modules`, `artifacts`, `.venv`). A nonexistent root is skipped with a warning.
+  - An empty population disables coverage for that invocation, logs `Code coverage disabled for this invocation`, and still runs the tests.
+  - Each run logs `Code coverage population: source=<source>; files=<count>` before Pester starts.
 
 ## Typical workflow
 
@@ -77,4 +83,4 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
 ## Notes for standalone use
 
 - Place `PoshQC.psm1`, `PoshQC.psd1`, and the `settings/` folder together; import the module from that directory.
-- Adjust `settings/pester.runsettings.psd1` and `settings/pssa.settings.psd1` to match your repo paths and policies.
+- Adjust `settings/pester.runsettings.psd1` and `settings/pssa.settings.psd1` to match your repo paths and policies. Declare coverage roots in `config/poshqc-coverage.json` at the workspace root rather than in the runsettings.
