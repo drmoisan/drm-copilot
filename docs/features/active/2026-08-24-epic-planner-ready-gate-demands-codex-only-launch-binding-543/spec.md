@@ -295,7 +295,7 @@ Evidence goes under `docs/features/active/2026-08-24-epic-planner-ready-gate-dem
 - [x] `tests/scripts/dev_tools/test_epic_planner_launch_evidence.py` contains two passing tests:
   - `test_require_launch_paths_skips_feature_without_launch_keys` asserts that `validate_epic_planner_launch_evidence(state, context, require_launch_paths=True)` returns no errors for a feature whose two launch keys are removed.
   - `test_require_launch_paths_still_rejects_partial_launch_keys` asserts that removing only `launch_status_path` still yields the existing `launch status path must identify a launch artifact in this repository.` error.
-- [ ] `extensions/drm-copilot/test/lib/validate/epic-planner-state-launch-binding.test.ts` contains passing TypeScript twins of the Python planner tests above:
+- [x] `extensions/drm-copilot/test/lib/validate/epic-planner-state-launch-binding.test.ts` contains passing TypeScript twins of the Python planner tests above:
   - `it("skips launch binding for a feature without launch paths")`
   - `it("rejects a partial launch binding")`
   - `it("keeps launch binding unconditional under a Codex flag")`, covering `requireCodexModelRouting` and `requireCodexTopology`
@@ -303,10 +303,10 @@ Evidence goes under `docs/features/active/2026-08-24-epic-planner-ready-gate-dem
   - `it("validates a feature with an empty launch path value")`
 
   The pre-existing `it("activates only for execution readiness")` is rewritten to assert its errors under `requireCodexTopology: true`. Every asserted error string is byte-identical to the corresponding Python assertion.
-- [ ] `extensions/drm-copilot/test/lib/validate/epic-planner-launch-evidence.test.ts` contains passing twins of the two Python launch-evidence tests:
+- [x] `extensions/drm-copilot/test/lib/validate/epic-planner-launch-evidence.test.ts` contains passing twins of the two Python launch-evidence tests:
   - `it("skips a feature without launch keys when requireLaunchPaths is set")`
   - `it("still rejects a partial launch key when requireLaunchPaths is set")`
-- [ ] `extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts` contains a passing test, `it("threads the Codex flags into epic-planner-state")`. It proves that `requireCodexModelRouting` and `requireCodexTopology` supplied to `validateOrchestrationServiceCall` for `epic-planner-state` restore unconditional launch-binding validation for a keyless feature.
+- [x] `extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts` contains a passing test, `it("threads the Codex flags into epic-planner-state")`. It proves that `requireCodexModelRouting` and `requireCodexTopology` supplied to `validateOrchestrationServiceCall` for `epic-planner-state` restore unconditional launch-binding validation for a keyless feature.
 - [ ] `validate_epic_planner_child_launch_bindings` in `scripts/dev_tools/_epic_orchestrator_state_launch_binding.py` still passes `require_generated_orchestrator=True`. `validateEpicPlannerChildLaunchBindings` in `extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-launch-binding.ts` still passes `requireGeneratedOrchestrator: true`. Both are verified by reading the source and by the existing `agent_name` test (`must name a generated orchestrator agent.`) passing unchanged in both runtimes.
 - [x] `test_consumer_authority_is_typescript_only_and_scope_owners_are_unchanged` in `tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py` asserts the new ready-gate call text in place of the literal `"validate_epic_planner_child_launch_bindings(features)"`. Its docstring no longer states that #543 behaviour is unchanged, and the test passes.
 - [ ] Each of these guidance files passes `require_codex_topology: true` and `require_codex_model_routing: true` in its `epic-planner-state` ready-gate invocation:
