@@ -1,0 +1,111 @@
+{
+  "name": "tolerated-overlap-under-conflict-tolerance",
+  "description": "A same-file overlap within conflict_tolerance is tolerated, so nothing is halted.",
+  "item_key": 446,
+  "changed_paths": [
+    "src/app.py"
+  ],
+  "at": "2026-08-08T10-00",
+  "computed_at": "2026-08-08T10-05",
+  "state": {
+    "items": [
+      {
+        "issue_num": 446,
+        "state": "in_flight",
+        "blast_radius": {
+          "paths": [
+            "scripts/dev_tools/**"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-08T09-00"
+        }
+      },
+      {
+        "issue_num": 445,
+        "state": "in_flight",
+        "blast_radius": {
+          "paths": [
+            "src/app.py"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-08T09-00"
+        }
+      }
+    ],
+    "conflict_edges": []
+  },
+  "config": {
+    "shared_surfaces": [
+      ".claude/settings.json"
+    ],
+    "shared_surface_globs": [],
+    "modules": {
+      "python-dev-tools": [
+        "scripts/dev_tools/**"
+      ],
+      "mcp-server": [
+        "packages/mcp-server/**"
+      ]
+    },
+    "conflict_tolerance": {
+      "tolerance_percent": 100,
+      "weights": {
+        "same_file": 8,
+        "possible_overlap": 2,
+        "append_only": 1,
+        "module": 2
+      },
+      "band_durations": {
+        "C1": 1,
+        "C2": 2,
+        "C3": 4,
+        "C4": 8
+      },
+      "default_band": "C4",
+      "append_only_paths": [
+        "**/CHANGELOG.md"
+      ]
+    }
+  },
+  "expected": {
+    "result": "no_new_conflict",
+    "item_key": 446,
+    "at": "2026-08-08T10-00",
+    "computed_at": "2026-08-08T10-05",
+    "escaped_paths": [
+      "src/app.py"
+    ],
+    "newly_conflicting_pairs": [],
+    "halted_item_keys": [],
+    "drift_event": {
+      "item_key": 446,
+      "declared": [
+        "scripts/dev_tools/**"
+      ],
+      "observed": [
+        "src/app.py"
+      ],
+      "escaped_paths": [
+        "src/app.py"
+      ],
+      "at": "2026-08-08T10-00",
+      "action": "raised_blocking_finding"
+    },
+    "observed_radius": {
+      "paths": [
+        "src/app.py"
+      ],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "observed",
+      "computed_at": "2026-08-08T10-05"
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "cases": [
+    {
+      "candidate": ".claude/rules/quality-tiers.md",
+      "entry": ".claude/rules/quality-tiers.md",
+      "expected": true,
+      "id": "exact-file-match"
+    },
+    {
+      "candidate": ".claude/rules/xy.md",
+      "entry": ".claude/rules/x",
+      "expected": false,
+      "id": "exact-file-sibling-prefix-nonmatch"
+    },
+    {
+      "candidate": ".claude/agent-memory/atomic-planner/MEMORY.md",
+      "entry": ".claude/agent-memory",
+      "expected": true,
+      "id": "directory-prefix-no-slash"
+    },
+    {
+      "candidate": ".claude/agent-memory/atomic-planner/MEMORY.md",
+      "entry": ".claude/agent-memory/",
+      "expected": true,
+      "id": "directory-prefix-trailing-slash"
+    },
+    {
+      "candidate": ".claude/agent-memory",
+      "entry": ".claude/agent-memory/",
+      "expected": true,
+      "id": "directory-trailing-slash-matches-exact-name"
+    },
+    {
+      "candidate": ".claude/rules/sub/x.md",
+      "entry": ".claude/rules/*",
+      "expected": false,
+      "id": "star-does-not-cross-slash"
+    },
+    {
+      "candidate": ".claude/rules/python.md",
+      "entry": ".claude/rules/*.md",
+      "expected": true,
+      "id": "star-matches-within-segment"
+    },
+    {
+      "candidate": ".claude/agent-memory/a/b/MEMORY.md",
+      "entry": ".claude/agent-memory/**",
+      "expected": true,
+      "id": "doublestar-crosses-slash"
+    },
+    {
+      "candidate": ".claude/rules/quality-tiers.md",
+      "entry": "**/quality-tiers.md",
+      "expected": true,
+      "id": "doublestar-prefix"
+    },
+    {
+      "candidate": "xfoo",
+      "entry": "**/foo",
+      "expected": false,
+      "id": "doublestar-slash-requires-separator"
+    },
+    {
+      "candidate": "config/blast-radius.json",
+      "entry": "config/blast-radius.jso?",
+      "expected": true,
+      "id": "question-mark-one-char"
+    },
+    {
+      "candidate": "config/blast-radius.json",
+      "entry": "config?blast-radius.json",
+      "expected": false,
+      "id": "question-mark-not-slash"
+    },
+    {
+      "candidate": ".claude/rules/python.md",
+      "entry": ".claude/Rules/python.md",
+      "expected": false,
+      "id": "case-sensitive"
+    },
+    {
+      "candidate": ".claude/rules/python.md",
+      "entry": ".claude\\rules\\python.md",
+      "expected": true,
+      "id": "backslash-normalized"
+    },
+    {
+      "candidate": "config/blast-radius.json",
+      "entry": "./config/blast-radius.json",
+      "expected": true,
+      "id": "dot-slash-stripped"
+    },
+    {
+      "candidate": "config/blast-radius.json",
+      "entry": "config//blast-radius.json",
+      "expected": true,
+      "id": "repeated-slash-collapsed"
+    },
+    {
+      "candidate": ".claude/rules/python.md",
+      "entry": "*.md",
+      "expected": false,
+      "id": "glob-whole-match-required"
+    },
+    {
+      "candidate": "config/orchestration-routing.json",
+      "entry": "  config/orchestration-routing.json  ",
+      "expected": true,
+      "id": "surrounding-whitespace-trimmed"
+    }
+  ],
+  "manifest_relative_path": ".push-down-exclusions"
+}

@@ -60,7 +60,7 @@ param()
 
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
-. (Join-Path $PSScriptRoot 'enforce-powershell-batch-budget-route.ps1')
+. (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1')
 
 function Test-PowerShellBatchBudgetPathInRoot {
     <#
@@ -392,8 +392,8 @@ function Invoke-PowerShellBatchBudgetHook {
         $checkpointText = ''
     }
 
-    $isLargePath = Test-PowerShellBatchBudgetLargePathRoute -CheckpointText $checkpointText
-    $observedRoute = Get-PowerShellBatchBudgetSelectedRoute -CheckpointText $checkpointText
+    $isLargePath = Test-BatchBudgetLargePathRoute -CheckpointText $checkpointText
+    $observedRoute = Get-BatchBudgetSelectedRoute -CheckpointText $checkpointText
     if ($isLargePath) {
         return Invoke-PowerShellBatchBudgetDecision -FilePath $filePath -State (Get-PowerShellBatchBudgetState -ProdCap $ProdCap) -StateFile $stateFile -Root $Root -LargePathRoute
     }

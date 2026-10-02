@@ -23,7 +23,6 @@ If the estimated scope exceeds the direct-mode budget, this skill defers to the 
 - Files or entrypoints in scope (exact script or module paths and corresponding `*.Tests.ps1` paths).
 - Constraints, including public function or module contracts that must be preserved.
 - Optional approved plan. If none is supplied, the worker delegates plan authoring to `atomic_planner` before any edits.
-- Optional budget override in the form `budget: prod=<N>, test=<M>` subject to repo policy compliance.
 
 ## Output Paths
 

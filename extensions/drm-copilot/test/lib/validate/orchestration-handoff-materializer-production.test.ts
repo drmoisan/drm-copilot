@@ -6,7 +6,7 @@ const mockMkdirSync = jest.fn();
 const mockWriteFileSync = jest.fn();
 const mockRenameSync = jest.fn();
 const mockUnlinkSync = jest.fn();
-const mockRealpathSyncNative = jest.fn();
+const mockRealpathSyncNative = jest.fn<(targetPath: string) => string>();
 const mockStatSync = jest.fn();
 
 jest.mock("node:fs", () => ({

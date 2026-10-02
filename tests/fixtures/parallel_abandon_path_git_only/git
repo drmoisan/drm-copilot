@@ -1,0 +1,14 @@
+#!/bin/sh
+# Checked-in PATH shim for the parallel abandon bats suites (issue #763).
+#
+# The abandon entry point runs gh and git through PATH resolution. The suites set
+# PATH to this directory alone, so the shim stands in for the real executable: it
+# records its argument vector as one "SHIM-CALL" line on stderr and exits with the
+# code the test selects through ABANDON_SHIM_GIT_EXIT (default 0). It never starts a
+# real process, so no pull request is closed and no worktree is removed.
+printf 'SHIM-CALL git' >&2
+for argument in "$@"; do
+	printf ' %s' "$argument" >&2
+done
+printf '\n' >&2
+exit "${ABANDON_SHIM_GIT_EXIT:-0}"

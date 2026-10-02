@@ -20,6 +20,8 @@ Trigger remediation when any of these are true:
 - Toolchain checks fail.
 - Acceptance criteria are not met.
 
+Remediation triggers only on blocking findings classified `autonomous`. Each blocking finding carries one remediability class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`). Non-remediable findings halt (`HALT_NON_REMEDIABLE`) or wait (`AWAITING_CI`): they receive remediation inputs but no remediation plan target and no `atomic_planner` handoff.
+
 ## Required Remediation Inputs
 
 Create `remediation/<timestamp>/remediation-inputs.md` (one timestamped `remediation/` folder per cycle; reaudit artifacts from a triggering or exit review live under the sibling `audit/<timestamp>/` folder, per the canonical pattern documented in the Claude-side `remediation-handoff-atomic-planner` skill) with:

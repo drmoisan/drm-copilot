@@ -22,14 +22,14 @@ import {
 // Re-export the intermediate types so consumers import a single contract
 // surface, mirroring the Python `models.py` re-exports and `__all__`.
 export {
-  PlannedEmission,
-  SectionIntent,
+  type PlannedEmission,
+  type SectionIntent,
   SectionIntentKind,
-  SemanticCue,
+  type SemanticCue,
   SemanticCueKind,
-  SourceSection,
+  type SourceSection,
   TargetRole,
-  TranslationTrace,
+  type TranslationTrace,
   plannedEmissionToJson,
   sectionIntentToJson,
   translationTraceToJson,

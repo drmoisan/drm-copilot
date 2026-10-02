@@ -1,0 +1,12 @@
+docs(509): correct the issue-adoption message-interpolation invariant
+
+Reword the invariant "Messages interpolate only validated tool names and
+the route id." to state that messages interpolate only non-blank
+waived_tools entries and the route id, because the duplicate and
+cannot-be-waived messages render the raw non-blank waived_tools string.
+The change is documentation-only in all three files (the Python module
+docstring and the comment-based help of both OrchestratorStateIssueAdoption.psm1
+copies); no executable line changes, and the PowerShell source and
+bundled copy stay byte-identical.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

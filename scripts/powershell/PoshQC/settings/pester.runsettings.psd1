@@ -29,7 +29,7 @@
             '.claude/hooks/check-powershell-test-purity.ps1'
             '.claude/hooks/enforce-python-batch-budget.ps1'
             '.claude/hooks/enforce-powershell-batch-budget.ps1'
-            '.claude/hooks/enforce-powershell-batch-budget-route.ps1'
+            '.claude/hooks/enforce-batch-budget-route.ps1'
             # Issue #272 hardened this PreToolUse hook with a new orchestrator-state preflight
             # check; measured here so the change produces real per-file coverage evidence.
             '.claude/hooks/enforce-pr-author-skill.ps1'
@@ -45,8 +45,10 @@
             '.claude/hooks/enforce-epic-merge-gate.ps1'
             # Issue #670: CodeCoverage.Path is an explicit per-file allow-list, so the dot-sourced helpers file is listed here.
             '.claude/hooks/enforce-epic-merge-gate-authorization.ps1'
+            '.claude/hooks/enforce-epic-merge-gate-resolution.ps1'
             '.claude/hooks/enforce-epic-wave-barrier.ps1'
             '.claude/hooks/enforce-epic-worktree-removal-gate.ps1'
+            '.claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1'
             '.claude/hooks/enforce-pr-author-skill.ps1'
             '.claude/hooks/validate-orchestrator-output.ps1'
             '.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1'
@@ -102,6 +104,8 @@
             # measured here so the new production modules are not excluded from coverage.
             '.claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateReceipts.psm1'
+            # Issue #484 added the remediation-loop R5-R11 accounting module.
+            '.claude/lib/orchestrator-state/OrchestratorStateRemediationAccounting.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateModelReceipts.psm1'
             # Issue #475 added the portable Codex routing resolvers so the U6.X and U6.T
             # checkpoint checks resolve deployments and topologies without a Python
@@ -119,6 +123,8 @@
             '.claude/lib/orchestrator-state/OrchestratorStateRoutingMatrix.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateRoutingContract.psm1'
+            # Issue #509 added the issue-adoption resolver consumed by the routing contract.
+            '.claude/lib/orchestrator-state/OrchestratorStateIssueAdoption.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateUnconditional.psm1'
             # Issue #392 changed the Invoke-PoshQCTest default seams ($EnsureModule -Global
             # import and the global-session-state $InvokePester trampoline) so the bundled
@@ -135,6 +141,7 @@
             '.codex/hooks/check-powershell-test-purity.ps1'
             '.codex/hooks/enforce-python-batch-budget.ps1'
             '.codex/hooks/enforce-powershell-batch-budget.ps1'
+            '.codex/hooks/enforce-batch-budget-route.ps1'
             '.codex/hooks/enforce-evidence-locations.ps1'
             '.codex/hooks/enforce-checkpoint-monotonic.ps1'
             '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'
@@ -318,11 +325,19 @@
             # Issue #663 added the epic-scope resolver and its pure readiness predicates.
             '.claude/lib/worktree-resolution/EpicScopeResolution.psm1'
             '.claude/lib/worktree-resolution/EpicScopeReadiness.psm1'
+            # Issue #690 added the run-target resolver; registered so it stays in the coverage denominator.
+            '.claude/lib/worktree-resolution/WorktreeRunResolution.psm1'
             # Issue #762 relocated the CI gate parser into the bundled .claude/lib tree so
             # push-down carries it with the orchestrate and epic-orchestrate skills.
             # CodeCoverage.Path is an explicit per-file allow-list, so the relocated production
             # file is registered here to stay in the coverage denominator.
             '.claude/lib/ci-gate/Invoke-CiGateParser.ps1'
+            # Issue #763 ported radius drift detection to the destination runtime as two pure
+            # modules and an entry script under .claude/lib/parallel-drift. CodeCoverage.Path is an
+            # explicit per-file allow-list, so each new production file is registered here.
+            '.claude/lib/parallel-drift/ParallelDriftHalt.psm1'
+            '.claude/lib/parallel-drift/ParallelDrift.psm1'
+            '.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1'
         )
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
