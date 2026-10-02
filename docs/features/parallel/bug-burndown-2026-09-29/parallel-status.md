@@ -14,9 +14,9 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `parallel_slug`: bug-burndown-2026-09-29
 - `mode`: closed
 - `max_concurrency`: 3
-- `current_cohort`: 1
+- `current_cohort`: 2
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-02T07:34:44Z
+- `last_updated`: 2026-10-02T08:16:26Z
 
 **Items**
 
@@ -27,7 +27,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 510 | docs/features/active/2026-08-19-claude-resource-parity-enumerates-gitignored-state-510 | 3 | scheduled | not_started |  |  |  |  |  |
 | 512 | docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/799 | 021b37e600afab00b191276cda803f87419a4a87 | 2026-09-30T11:19:00Z | 2026-09-30T13:33:38Z |  |
 | 527 | docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527 | 2 | in_flight | worktree_created |  |  | 2026-10-02T07:34:44Z |  |  |
-| 532 | docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532 | 2 | scheduled | not_started |  |  |  |  |  |
+| 532 | docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532 | 2 | in_flight | worktree_created |  |  | 2026-10-02T08:16:26Z |  |  |
 | 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | scheduled | not_started |  |  |  |  |  |
 | 609 | docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/815 | 28443d3be64d69b4b96b1ceca6715a9e577a6dc7 | 2026-10-02T03:09:33Z | 2026-10-02T04:13:42Z |  |
 | 623 | docs/features/active/promotion-receipt-destination-unverified-623 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/804 | 2b0121abf74f5862a3d12929d833504668941156 | 2026-09-30T12:21:20Z | 2026-09-30T13:42:13Z |  |
@@ -36,7 +36,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 658 | docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658 | 3 | scheduled | not_started |  |  |  |  |  |
 | 659 | docs/features/active/2026-09-08-epic-wave-barrier-violations-lack-start-guard-659 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/807 | 41217012d31d35c2ee33a50be50684affd2f5f43 | 2026-09-30T13:24:40Z | 2026-10-01T11:12:35Z |  |
 | 723 | docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/813 | 12fd3c2639f17aec3572f90e8d929205059be56d | 2026-09-30T13:34:37Z | 2026-10-02T00:43:34Z |  |
-| 734 | docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734 | 1 | in_flight | worktree_created |  |  | 2026-10-02T07:15:04Z |  |  |
+| 734 | docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/818 | 74e1d6741485aa38c28fecbbc77ea169f31df0ef | 2026-10-02T07:15:04Z | 2026-10-02T08:15:36Z |  |
 | 739 | docs/features/active/2026-09-27-npm-token-guard-gaps-739 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/814 | dcb605ef9078ccf8bffffff08e4f1344a0c76594 | 2026-10-02T00:44:12Z | 2026-10-02T01:22:30Z |  |
 | 740 | docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740 | 4 | scheduled | not_started |  |  |  |  |  |
 | 741 | docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741 | 2 | in_flight | worktree_created |  |  | 2026-10-02T07:25:34Z |  |  |
