@@ -128,9 +128,17 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
   per-file outcome is reported by the companion `ACTION|preserve-stage|...` record.
 - `ORPHAN_DIR|<path>|<size>` — a directory under a worktree-tracking root that carries
   no `.git` pointer file and no `git worktree list` entry. `<size>` is best-effort and
-  may be the literal `unknown`. The record is advisory: it reports the directory, and
-  nothing in apply mode acts on it. For the disposition, see the Dirty Worktree Triage
-  Procedure's step 7, which governs how an orphaned directory is handled.
+  may be the literal `unknown`. The scanned roots are the default pair
+  `<main>/.claude/worktrees` and `<main>-wt`, or the `CLEANUP_WT_ORPHAN_ROOTS` entries
+  when that variable is set (the override replaces the default pair), plus the parent
+  directory of every non-main registered worktree, which is always added. A derived
+  parent is skipped when it is the main worktree or one of its ancestors, or is equal to
+  or inside a registered worktree. `CLEANUP_WT_ORPHAN_ROOTS` entries are separated by a
+  semicolon, a newline, or a colon; a colon that follows a single drive letter and
+  precedes `/` or `\` is part of the path, and empty or relative entries are dropped.
+  The record is advisory: it reports the directory, and nothing in apply mode acts on
+  it. For the disposition, see the Dirty Worktree Triage Procedure's step 7, which
+  governs how an orphaned directory is handled.
 - `STALE_REF|<refname>` — a `refs/remotes/<name>/*` ref whose `<name>` is not a
   configured remote, named in full ref form. Advisory only; no ref is ever pruned by
   this tool.
