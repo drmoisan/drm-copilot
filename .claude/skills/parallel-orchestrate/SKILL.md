@@ -313,6 +313,12 @@ unchanged: `.claude/skills/orchestrate/SKILL.md` is **not modified by this featu
 `parallel_mode` clause in its step 9, no `parallel_merge` object in the child checkpoint, and no
 additional condition on the child's PR Creation Gate.
 
+Issue #744 later amended two parts of that child contract for CI-dependent acceptance criteria,
+whose verification requires the result of CI on the item's pull-request head: PR Creation Gate
+condition 2 and step S9 of `.claude/skills/orchestrate/SKILL.md`. The child checks those criteria
+off in its own worktree, pushes the check-off commit to its pull-request branch, and re-runs S9
+before DONE. The parent never commits acceptance-criteria check-offs from the coordinator root.
+
 Procedure, per item:
 
 1. The item's child orchestration runs unmodified, with `epic_mode` `false` or absent, and finishes
@@ -323,6 +329,11 @@ Procedure, per item:
    `gh pr view --json state,mergedAt,headRefOid`, and with `gh pr checks` when the check conclusion
    must be re-read — never from an in-memory completion notification — then record
    `merge_status: ci_green`.
+   Before recording `merge_status: ci_green`, confirm that the `headRefOid` value equals the
+   `ci_gate.head_sha` the child reported at DONE and that the child reported no pending
+   CI-dependent acceptance criteria. When either check fails, do not record
+   `merge_status: ci_green` and do not run `gh pr merge`; the item waits until its child pushes
+   the check-off and re-runs S9, and the parent does not commit the check-off itself.
 3. Execute `gh pr merge --merge <PR>` for that item's pull request, whose base is `main`.
 4. On success, record `merge_commit_sha`, `merged_at`, and `merge_status: merged`, then regenerate
    `docs/features/parallel/<slug>/parallel-status.md`.
@@ -569,6 +580,8 @@ hold:
    `artifact_type: "parallel-orchestrator-state"`.
 4. Each item's acceptance criteria have been checked off in that item's own acceptance-criteria
    source files by that item's own run, per the `acceptance-criteria-tracking` skill.
+   A CI-dependent criterion is checked off and pushed by that item's own run before its DONE, so
+   the head the parent merges already contains the check-off; the parent never commits it.
 
 In `open` mode there is no automatic completion. The run is a standing queue and terminates only via
 `/parallel-close`, which is owned by F6 and is neither specified nor shipped by this feature. Do not
