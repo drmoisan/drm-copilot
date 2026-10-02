@@ -1,0 +1,18 @@
+feat(509): waive promotion receipts for adopted pre-existing issues
+
+Add scripts/dev_tools/_orchestrator_state_issue_adoption.py, a pure
+resolver for the optional issue_adoption checkpoint object. A valid
+record waives the successful-receipt requirement for potential_to_issue
+and, with a potential record, for the checkpoint's promotion-entry tool.
+Any adoption error waives nothing (fail-closed), and the errors are
+placed after the receipt loop and before the local_execution_overrides
+errors. Checkpoints without the key validate exactly as before.
+
+Wire the resolver into validate_routing_contract and add 39 resolver
+unit tests (100% line and branch coverage of the new module). The Phase 2
+regression test now passes (4 passed). Include Phase 3 evidence, plan
+check-offs, and AC-4, AC-5, AC-6, AC-7, AC-8, AC-10 check-offs.
+
+Refs #509
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -417,8 +417,10 @@ the escalation path.
 2. The parent re-delegates that item's child orchestration. The child processes the finding through
    its unmodified R1 through R5 remediation loop exactly as it processes any local Blocking
    finding. No new remediation loop is introduced by this procedure.
-3. The child's `remediation_pass` counter is shared with its local-finding and CI-failure passes,
-   with the cap of 3, unmodified.
+3. Drift cycles share the child's `remediation_loop.completed_attempts` count with its
+   local-finding and CI-failure cycles, and the child halts after three completed attempts. The
+   active cycle number is `completed_attempts + 1`, and a cycle without an applied candidate
+   consumes no number.
 4. Each remediated pass ends again at child DONE with the pull request open and CI green, after
    which the parent retries the merge per `## Per-Item Merge to Main (Merge-on-Green)`. During
    remediation the item's `merge_status` legitimately remains `pr_open` or `ci_green`: the
@@ -1113,7 +1115,7 @@ R5 loop that drives the remediation preceding either write is **reused
 unmodified**: `atomic-planner` plans the resolution, `atomic-executor` performs preflight then
 resolves, `feature-review` re-audits, and the loop exits on zero blocking findings. No new
 remediation loop is authored, no line of the existing loop is modified, and the shared
-`remediation_pass` cap of 3 applies. `.claude/skills/orchestrate/SKILL.md` is not modified by this
+`remediation_loop.completed_attempts` count applies, with the halt after three completed attempts. `.claude/skills/orchestrate/SKILL.md` is not modified by this
 feature.
 
 #### Layer-1 Narrowing — a Documented Limitation
