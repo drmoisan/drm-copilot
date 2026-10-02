@@ -147,6 +147,9 @@ Custom path for Koverage-compatible coverage XML output.
 Skip creation of Koverage-friendly coverage copy.
 .PARAMETER ScanFolders
 Optional workspace-relative or workspace-contained folders to scan instead of the entire root.
+.PARAMETER ResolveCoveragePopulation
+Injectable seam that derives the code-coverage file population from the workspace (issue #527).
+Defaults to Resolve-PoshQCCoveragePopulation.
 #>
 function Invoke-PoshQCTest {
     [CmdletBinding()]
@@ -282,6 +285,10 @@ function Invoke-PoshQCTest {
         [scriptblock] $CopyCoverage = {
             param([string] $CoveragePath, [string] $RepoRoot, [string] $KoveragePath)
             Convert-PoshQCCoverageToRelative -InputPath $CoveragePath -OutputPath $KoveragePath -RepoRoot $RepoRoot
+        },
+        [scriptblock] $ResolveCoveragePopulation = {
+            param([string] $RootPath, $Settings, [string] $SettingsFile, [string[]] $ScanFolderRoots, [string[]] $Excluded, [scriptblock] $PathExists, [scriptblock] $Log)
+            Resolve-PoshQCCoveragePopulation -Root $RootPath -Settings $Settings -SettingsFile $SettingsFile -ScanFolderRoots $ScanFolderRoots -ExcludeDirs $Excluded -SettingsPathExists $PathExists -Logger $Log
         }
     )
 
@@ -289,6 +296,10 @@ function Invoke-PoshQCTest {
 
     if (-not $Root) {
         $Root = $PWD.ProviderPath
+    }
+    # Resolve a relative -Root once so run, coverage, and output paths are absolute (issue #527).
+    if (-not [IO.Path]::IsPathRooted($Root)) {
+        $Root = [IO.Path]::GetFullPath([IO.Path]::Combine($PWD.ProviderPath, $Root))
     }
 
     & $EnsureModule 'Pester' "Pester is not installed. Run Install-PoshQCTool (alias Install-PoshQCTools) first."
@@ -336,34 +347,20 @@ function Invoke-PoshQCTest {
     }
 
     if ($coverageEnabled -and $config.CodeCoverage) {
-        if ($config.CodeCoverage.Path.Value) {
-            $resolvedCoveragePaths = @(
-                $config.CodeCoverage.Path.Value |
-                    ForEach-Object {
-                        if ([IO.Path]::IsPathRooted($_)) { $_ } else { Join-Path $Root $_ }
-                    }
-            )
-
-            # Prune coverage paths that do not exist under the resolved root before Pester sees
-            # them. Pester's Resolve-CoverageInfo discards the whole set and raises a terminating
-            # error on the first unresolvable entry, which aborts the run at RunStart in any
-            # workspace that does not contain this repository's coverage layout (issue #409).
-            # Rooted entries are tested as-is; they are never re-joined to $Root.
-            $survivingCoveragePaths = @($resolvedCoveragePaths | Where-Object { & $TestPathExists $_ })
-            foreach ($prunedPath in @($resolvedCoveragePaths | Where-Object { $survivingCoveragePaths -notcontains $_ })) {
-                # Log every prune individually so coverage removal is never silent.
-                & $Logger "Pruned nonexistent code coverage path: $prunedPath"
-            }
-
-            if ($survivingCoveragePaths.Count -gt 0) {
-                $config.CodeCoverage.Path = $survivingCoveragePaths
-            } else {
-                # An enabled-but-empty path set makes Pester instrument every Run.Path directory,
-                # so disable coverage for this invocation instead and continue with the test run.
-                $config.CodeCoverage.Enabled = $false
-                $coverageEnabled = $false
-                & $Logger "Code coverage disabled for this invocation: no configured coverage path exists under root '$Root'."
-            }
+        # The coverage population is derived from the workspace, not from a list shipped with the
+        # module, so the measured set does not depend on which module copy was loaded (issue #527).
+        # Nonexistent caller-supplied entries are pruned and logged by the resolver (issue #409).
+        $population = & $ResolveCoveragePopulation $Root $settings $SettingsPath $effectiveScanFolders $ExcludeDirs $TestPathExists $Logger
+        $populationPaths = @($population.Paths | Where-Object { $_ })
+        & $Logger "Code coverage population: source=$($population.Source); files=$($populationPaths.Count)"
+        if ($populationPaths.Count -gt 0) {
+            $config.CodeCoverage.Path = $populationPaths
+        } else {
+            # An enabled-but-empty path set makes Pester instrument every Run.Path directory,
+            # so disable coverage for this invocation instead and continue with the test run.
+            $config.CodeCoverage.Enabled = $false
+            $coverageEnabled = $false
+            & $Logger "Code coverage disabled for this invocation: no configured coverage path exists under root '$Root'."
         }
 
         if ($config.CodeCoverage.OutputPath.Value) {
