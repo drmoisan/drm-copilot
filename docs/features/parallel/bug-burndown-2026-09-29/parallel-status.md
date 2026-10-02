@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 2
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-02T08:16:26Z
+- `last_updated`: 2026-10-02T08:52:46Z
 
 **Items**
 
@@ -28,7 +28,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 512 | docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/799 | 021b37e600afab00b191276cda803f87419a4a87 | 2026-09-30T11:19:00Z | 2026-09-30T13:33:38Z |  |
 | 527 | docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527 | 2 | in_flight | worktree_created |  |  | 2026-10-02T07:34:44Z |  |  |
 | 532 | docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532 | 2 | in_flight | worktree_created |  |  | 2026-10-02T08:16:26Z |  |  |
-| 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | scheduled | not_started |  |  |  |  |  |
+| 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | in_flight | worktree_created |  |  | 2026-10-02T08:52:46Z |  |  |
 | 609 | docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/815 | 28443d3be64d69b4b96b1ceca6715a9e577a6dc7 | 2026-10-02T03:09:33Z | 2026-10-02T04:13:42Z |  |
 | 623 | docs/features/active/promotion-receipt-destination-unverified-623 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/804 | 2b0121abf74f5862a3d12929d833504668941156 | 2026-09-30T12:21:20Z | 2026-09-30T13:42:13Z |  |
 | 645 | docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645 | 3 | scheduled | not_started |  |  |  |  |  |
@@ -39,7 +39,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 734 | docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/818 | 74e1d6741485aa38c28fecbbc77ea169f31df0ef | 2026-10-02T07:15:04Z | 2026-10-02T08:15:36Z |  |
 | 739 | docs/features/active/2026-09-27-npm-token-guard-gaps-739 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/814 | dcb605ef9078ccf8bffffff08e4f1344a0c76594 | 2026-10-02T00:44:12Z | 2026-10-02T01:22:30Z |  |
 | 740 | docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740 | 4 | scheduled | not_started |  |  |  |  |  |
-| 741 | docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741 | 2 | in_flight | worktree_created |  |  | 2026-10-02T07:25:34Z |  |  |
+| 741 | docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/819 | ef80c57df8f8bbc7d2e9ac51586150dfee3cd5fd | 2026-10-02T07:25:34Z | 2026-10-02T08:51:49Z |  |
 | 743 | docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/810 | 1b1e349f1d0fb8b00eb69a809ef380fcc6eb35b9 | 2026-10-01T15:52:55Z | 2026-10-02T03:08:04Z |  |
 | 744 | docs/features/active/2026-09-27-orchestration-completion-gate-and-tooling-friction-744 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/817 | 71f8dcb49d8ce5d1402ff441855a64be15b37f29 | 2026-10-02T05:13:22Z | 2026-10-02T07:24:50Z |  |
 | 756 | docs/features/active/2026-09-28-cleanup-worktrees-631-spec-contradiction-and-untested-error-paths-756 | 3 | scheduled | not_started |  |  |  |  |  |
