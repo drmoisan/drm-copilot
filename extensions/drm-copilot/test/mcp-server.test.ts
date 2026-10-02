@@ -21,7 +21,6 @@ jest.mock(
 
 import { createRepoAutomationMcpServer } from "../src/mcp-server";
 import { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "../src/mcp-tools";
-import type { RepoAutomationService } from "../src/repo-automation-service";
 import {
   PUSH_DOWN_CODEX_ARTIFACT_PATH,
   VIRTUAL_WORKSPACE_ROOT,
@@ -45,7 +44,7 @@ const INDEPENDENT_CONTEXT_ARGUMENTS = {
 
 describe("repo automation MCP server", () => {
   let client: Client;
-  let service: jest.Mocked<RepoAutomationService>;
+  let service: ReturnType<typeof createMockService>;
   let server: ReturnType<typeof createRepoAutomationMcpServer>;
 
   beforeEach(async () => {
