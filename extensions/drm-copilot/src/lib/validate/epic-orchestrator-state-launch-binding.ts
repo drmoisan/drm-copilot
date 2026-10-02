@@ -232,7 +232,9 @@ function validateModelReceipt(
 }
 
 /** Return whether the feature records either launch path key. */
-export function featureCarriesLaunchPath(feature: Record<string, unknown>): boolean {
+export function featureCarriesLaunchPath(
+  feature: Record<string, unknown>,
+): boolean {
   return "launch_receipt_path" in feature || "launch_status_path" in feature;
 }
 

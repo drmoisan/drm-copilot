@@ -413,7 +413,10 @@ export function validateEpicPlannerLaunchEvidence(
       return;
     }
     // A keyless feature contributes neither errors nor a shared status path.
-    if (options.requireLaunchPaths === true && !featureCarriesLaunchPath(item)) {
+    if (
+      options.requireLaunchPaths === true &&
+      !featureCarriesLaunchPath(item)
+    ) {
       return;
     }
     const receipt = validateReceipt(item, index, context);

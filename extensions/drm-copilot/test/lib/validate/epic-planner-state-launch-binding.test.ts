@@ -158,7 +158,9 @@ describe("epic planner child launch binding", () => {
       [],
     );
     expect(
-      errors.filter((error) => error.includes("must identify a launch artifact")),
+      errors.filter((error) =>
+        error.includes("must identify a launch artifact"),
+      ),
     ).toEqual([]);
   });
 
