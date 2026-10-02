@@ -135,3 +135,33 @@ Output Summary: named deviations from plan.2026-09-29T15-32.md recorded per task
 - Plan mechanism: rule FX args 'tests/fixtures/poshqc-consumer' in a `pwsh` child.
 - Replacement: each FX field computed by reading the fixture `powershell-coverage.xml` with the Read tool; FX exit derived from the FX exit expression. Result SOURCEFILES=1 SAMPLE_PRESENT=0 SAMPLE_LINE_COVERED=0 STANDIN_PRESENT=1 CLAUDE_KEYS=1 OUTSIDE_PACKAGES=0, exit 1 (expected 1).
 - Evidence: `evidence/regression-testing/fail-first-fixture-check.2026-10-02T07-55.md`.
+
+## Segment 2 entries (2026-10-02T08-05)
+
+## DEV-BR — Rule BR resets R2 to R5 not performed
+
+- Task: P2-T1, P3-T1, P3-T5, P4-T3.
+- Plan mechanism: Rule BR deletes `.claude/state/powershell-batch-budget.*.json` before each batch.
+- Replacement: not performed. `.claude/hooks/enforce-powershell-batch-budget.ps1` on the current base exempts the orchestrated large route at lines 293-296 (`if ($LargePathRoute) { ... allow ... }`), the orchestrator checkpoint carries `route_id` `large`, and test files are never counted (line 299). `.claude/state/` was inspected with `ls -la` and held no `powershell-batch-budget.*.json` file. One line per reset ID is appended to the batch-budget-resets file stating that no state file was deleted.
+- Evidence: `evidence/other/batch-budget-resets.2026-10-02T07-55.md`.
+
+## DEV-P2-T2 — rule LL and title check by git grep
+
+- Task: P2-T2.
+- Plan mechanism: rule LL (`(Get-Content -LiteralPath $file).Count` in a `pwsh` child) and a verbatim-title check.
+- Replacement: `git grep --untracked -c '' -- tests/scripts/powershell/PoshQC/PoshQC.Coverage.Tests.ps1` printed 405 (at or under 500); `git grep --untracked -c -F` with the thirteen `It` titles and the two `Describe` titles as fixed-string patterns printed 15 (one line per title); `git grep --untracked -n -i -E 'TestDrive|New-TemporaryFile|GetTempFileName|GetTempPath|env:TEMP|env:TMP'` exited 1 (no D13 token present).
+- Evidence: this entry (command output recorded above).
+
+## DEV-P2-T3 — rule LL and title check by git grep
+
+- Task: P2-T3.
+- Plan mechanism: rule LL and a verbatim-title check.
+- Replacement: `git grep --untracked -c '' -- tests/scripts/powershell/PoshQC/PoshQC.CoverageConfig.Tests.ps1` printed 253; `git grep --untracked -c -F` with the ten `It` titles (C3 as its unexpanded template title) and the two `Describe` titles printed 12; `git grep --untracked -c -E` over the eight `@{ Case = '<name>';` rows printed 8; the D13 token scan exited 1.
+- Evidence: this entry.
+
+## DEV-TOOLCHAIN-P2 — MCP format and analyze before the Phase 2 commit
+
+- Task: Phase 2 commit point (no plan task; micro-action).
+- Plan mechanism: the MCP route-compliance calls are scheduled at P5-T11 to P5-T13.
+- Replacement: the CI `poshqc / PowerShell QC` job runs Format, then Analyze, then Test, and stops at the first failing step, so a formatter rewrite or analyzer finding on the Phase 2 head would prevent the P2-T4/P2-T5 CI evidence. `mcp__drm-copilot__run_poshqc_format` and `mcp__drm-copilot__run_poshqc_analyze` were called with `workspace_root` = the worktree root and `scan_folders` `["tests/scripts/powershell/PoshQC"]` before the commit. Both returned `ok: true` with only the fixed summary string. The formatter changed no file: `git status --porcelain --untracked-files=all` listed only the two new test files and two feature-folder files, and the modification times of the two new test files equal their Write times. These calls ran the installed extension copy and are not acceptance evidence (D10); the CI Format and Analyze steps on the pushed head are the gates.
+- Evidence: this entry.
