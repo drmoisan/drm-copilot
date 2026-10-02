@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 2
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-02T09:42:06Z
+- `last_updated`: 2026-10-02T09:49:33Z
 
 **Items**
 
@@ -26,7 +26,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 406 | docs/features/active/2026-07-24-potential-to-issue-python-files-oversized-406 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/806 | b83f300047c4181223d99eb27eb0b025acca0125 | 2026-09-30T13:48:50Z | 2026-09-30T14:20:25Z |  |
 | 510 | docs/features/active/2026-08-19-claude-resource-parity-enumerates-gitignored-state-510 | 3 | scheduled | not_started |  |  |  |  |  |
 | 512 | docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/799 | 021b37e600afab00b191276cda803f87419a4a87 | 2026-09-30T11:19:00Z | 2026-09-30T13:33:38Z |  |
-| 527 | docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527 | 2 | in_flight | worktree_created |  |  | 2026-10-02T07:34:44Z |  |  |
+| 527 | docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527 | 2 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/821 |  | 2026-10-02T07:34:44Z |  |  |
 | 532 | docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532 | 2 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/820 |  | 2026-10-02T08:16:26Z |  |  |
 | 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | in_flight | worktree_created |  |  | 2026-10-02T08:52:46Z |  |  |
 | 609 | docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/815 | 28443d3be64d69b4b96b1ceca6715a9e577a6dc7 | 2026-10-02T03:09:33Z | 2026-10-02T04:13:42Z |  |
@@ -120,3 +120,14 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 
 | issue_num | path | resolved_at | merged_against | merge_commit_sha | entries_added_from_ours | entries_added_from_theirs | version_resolutions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+
+## Paused By Operator
+
+- `at`: 2026-10-02T09:49:33Z
+- `directive`: user directive relayed by coordinator 2026-10-02T09:50Z: commit-and-hold for TaskMaster priority
+
+| issue_num | branch | head | pr_number | state | resume_task |
+| --- | --- | --- | --- | --- | --- |
+| 527 | bug/poshqc-coverage-denominator-not-reproducible-527 | 6984859cee79c06fdd556f5d9516cef7de68bc55 | 821 | awaiting CI (18 pass, 2 pending) | S9 CI gate; first unchecked plan task P1-T4 |
+| 532 | bug/parallel-parent-routes-on-a-band-nothing-produces-532 | fd665ffc535b5c4de008a374054b957d3698f035 | 820 | awaiting CI (19 pass, 1 pending) | P5-T24 (post-CI AC-30/AC-35 check-off) |
+| 543 | bug/epic-planner-ready-gate-demands-codex-only-launch-binding-543 | ecbe5ba1838d3da89c59c6c407f9e6f43c1cca81 |  | plan tasks all checked; no PR | S7 feature-review |
