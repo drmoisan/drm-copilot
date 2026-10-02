@@ -2,6 +2,21 @@ import { describe, expect, it } from "@jest/globals";
 
 import { resolveCodexTopology } from "../../../src/lib/validate/codex-topology-resolver";
 import { validateEpicPlannerStateText } from "../../../src/lib/validate/epic-planner-state-core";
+import { launchEvidenceFixture } from "./epic-planner-launch-evidence-test-support";
+
+const LAUNCH_BINDING_KEYS = [
+  "branch_name",
+  "worktree_path",
+  "delegation_receipt",
+  "launch_receipt_path",
+  "launch_status_path",
+];
+
+function stripLaunchBinding(item: Record<string, unknown>): void {
+  for (const key of LAUNCH_BINDING_KEYS) {
+    delete item[key];
+  }
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -121,6 +136,27 @@ describe("epic planner child launch binding", () => {
         ),
       ),
     ).toBe(true);
+  });
+
+  it("skips launch binding for a feature without launch paths", () => {
+    // Arrange
+    const value = state();
+    stripLaunchBinding((value["features"] as Record<string, unknown>[])[0]!);
+
+    // Act
+    const errors = validateEpicPlannerStateText(JSON.stringify(value), {
+      requireReadyForExecution: true,
+      readinessContext: launchEvidenceFixture().context,
+    });
+
+    // Assert
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors.filter((error) => error.includes(" launch binding"))).toEqual(
+      [],
+    );
+    expect(
+      errors.filter((error) => error.includes("must identify a launch artifact")),
+    ).toEqual([]);
   });
 
   it.each([

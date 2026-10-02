@@ -12,6 +12,24 @@ from scripts.dev_tools.resolve_codex_topology import resolve_codex_topology
 from scripts.dev_tools.validate_epic_planner_state import (
     validate_epic_planner_state_text,
 )
+from tests.scripts.dev_tools.epic_planner_launch_evidence_test_support import (
+    launch_evidence_fixture,
+)
+
+_LAUNCH_BINDING_KEYS = (
+    "branch_name",
+    "worktree_path",
+    "delegation_receipt",
+    "launch_receipt_path",
+    "launch_status_path",
+)
+
+
+def _strip_launch_binding(feature: dict[str, Any]) -> None:
+    """Remove every launch-binding key to produce a Claude-prepared feature."""
+
+    for key in _LAUNCH_BINDING_KEYS:
+        feature.pop(key)
 
 
 def _feature(issue_num: int) -> dict[str, Any]:
@@ -111,6 +129,29 @@ def test_launch_evidence_is_required_only_for_execution_readiness() -> None:
         "features[0] launch binding.delegation_receipt must be an object" in error
         for error in errors
     )
+
+
+def test_ready_gate_skips_launch_binding_for_feature_without_launch_paths() -> None:
+    """Skip launch evidence for a keyless feature when no Codex flag is set."""
+
+    # Arrange
+    state = _state()
+    _strip_launch_binding(state["features"][0])
+    context = launch_evidence_fixture()[1]
+
+    # Act
+    errors = validate_epic_planner_state_text(
+        json.dumps(state), require_ready_for_execution=True, readiness_context=context
+    )
+
+    # Assert
+    assert errors, "readiness integrity must still run and report other errors"
+    offending = [
+        error
+        for error in errors
+        if " launch binding" in error or "must identify a launch artifact" in error
+    ]
+    assert offending == []
 
 
 @pytest.mark.parametrize(
