@@ -282,3 +282,37 @@ Output Summary: named deviations from plan.2026-09-29T15-32.md recorded per task
 - Plan mechanism: rule HS (`Get-FileHash` SHA256) over the eleven `CHANGED_PS` paths before and after the call.
 - Replacement: `git hash-object` over the same eleven paths before and after; all eleven values were identical.
 - Evidence: `evidence/other/mcp-route-compliance.2026-10-02T09-00.md`.
+
+## Segment 3 entries (2026-10-02T08-45)
+
+CI runs used in this segment (dispatched by the orchestrator with `_poshqc.yml`; artifacts downloaded to the git-ignored `artifacts/ci/run-<id>/` and reduced with `poetry run python artifacts/ci/ci_evidence.py jx|cx|tr|named|cl ...`, the Python port of rules JX, CX, TR, and CL; CI checkout root written `<CI_ROOT>`):
+
+- Fail-first: temporary branch `tmp/527-phase2-failfirst` at PHASE2_SHA bb233fe7, run https://github.com/drmoisan/drm-copilot/actions/runs/36983544629, job https://github.com/drmoisan/drm-copilot/actions/runs/36983544629/job/110763320058.
+- Pre-adaptation: temporary branch `tmp/527-phase3-preadapt` at PHASE3_SHA 94853dca, run https://github.com/drmoisan/drm-copilot/actions/runs/36983547210, job https://github.com/drmoisan/drm-copilot/actions/runs/36983547210/job/110763325528.
+- Run A: item branch at a987ebfb184a8a1466d0faeb1dc99264c019f4d1, run https://github.com/drmoisan/drm-copilot/actions/runs/36983551836, job https://github.com/drmoisan/drm-copilot/actions/runs/36983551836/job/110763341194.
+- Run B: same SHA, run https://github.com/drmoisan/drm-copilot/actions/runs/36984586891, job https://github.com/drmoisan/drm-copilot/actions/runs/36984586891/job/110766595828.
+
+## DEV-P2-T4 / DEV-P2-T5 — fail-first TR runs from a CI job log
+
+- Task: P2-T4, P2-T5.
+- Plan mechanism: rule TR on each new test file against the pre-fix code, locally.
+- Replacement: the fail-first CI run above (tests present, fix absent). The JUnit artifact is not uploaded on a failing Test step, so per-node results and messages come from the job log (`##[error][-]` lines and their `Message` groups, lines 1250-1456). TR-equivalent counts per file: Coverage 0 passed / 13 failed; CoverageConfig 0 passed / 17 failed; summary line `Tests Passed: 6489, Failed: 30, Skipped: 10`. FAILED_CONTAINERS=0 derived from the absence of container or discovery failure lines.
+- Evidence: `evidence/regression-testing/fail-first-coverage-tests.2026-10-02T08-45.md`, `evidence/regression-testing/fail-first-coverageconfig-tests.2026-10-02T08-45.md`.
+
+## DEV-P3-T2-CI — parse check recorded
+
+- Task: P3-T2 (completes DEV-P3-T2).
+- Replacement: the pre-adaptation CI run (module imported; the 30 new nodes ran and passed; only the four D14 tests failed) and run A (coverage XML lists the four functions of `PoshQC.Coverage.psm1`). The plan names no artifact path for P3-T2; the record is written to `evidence/other/module-parse.2026-10-02T08-45.md` (row 24).
+- Evidence: `evidence/other/module-parse.2026-10-02T08-45.md`.
+
+## DEV-P3-T8-CI — DEFINED=4 from run A
+
+- Task: P3-T8 (completes DEV-P3-T8).
+- Replacement: run A: all 30 issue-527 nodes passed, the three suites call three of the functions directly inside `InModuleScope PoshQC`, and the coverage XML records covered lines in all four methods, including `Get-PoshQCSettingsList`. A new artifact carries both halves; the 08-30 static-half artifact is kept unchanged.
+- Evidence: `evidence/other/module-surface.2026-10-02T08-45.md`.
+
+## DEV-P4-TR-CI — Phase 4 targeted runs recorded
+
+- Task: P4-T1, P4-T2, P4-T4, P4-T5, P4-T6 (completes DEV-P4-TR).
+- Replacement: P4-T2 from the pre-adaptation CI run job log; P4-T1, P4-T4, P4-T5, P4-T6 from run A JUnit with the TR-equivalent filter (`tr`) and the named-title check (`named`). The Python TR port does not print FAILED_CONTAINERS; the value 0 is derived from the absence of container or discovery failure lines in the job log together with JX `ERRORS=0`. For P4-T1 the C3 template title is matched by its fixed prefix `fails fast naming config/poshqc-coverage.json for ` (8 cases). P4-T4 and P4-T5 name no artifact path; their records are written to `evidence/regression-testing/pass-after-invokesummary.2026-10-02T08-45.md` and `evidence/regression-testing/pass-after-comprehensive.2026-10-02T08-45.md` (row 24).
+- Evidence: `evidence/regression-testing/pass-after-new-tests.2026-10-02T08-45.md`, `evidence/other/existing-tests-pre-adaptation.2026-10-02T08-45.md`, `evidence/regression-testing/pass-after-invokesummary.2026-10-02T08-45.md`, `evidence/regression-testing/pass-after-comprehensive.2026-10-02T08-45.md`, `evidence/regression-testing/pass-after-poshqc-targeted.2026-10-02T08-45.md`.
