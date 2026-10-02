@@ -141,10 +141,14 @@ def test_parse_quality_tiers_rejects_non_mapping_root_with_qt002() -> None:
     "text",
     [
         pytest.param("projects:\n" + _VALID_ENTRY_TEXT, id="missing-version"),
-        pytest.param("version: 2\nprojects:\n" + _VALID_ENTRY_TEXT, id="version-not-one"),
+        pytest.param(
+            "version: 2\nprojects:\n" + _VALID_ENTRY_TEXT, id="version-not-one"
+        ),
         pytest.param("version: 1\nprojects: []\n", id="projects-empty"),
         pytest.param("version: 1\nprojects: scripts/bash\n", id="projects-not-list"),
-        pytest.param("version: 1\nprojects:\n  - scripts/bash\n", id="entry-not-mapping"),
+        pytest.param(
+            "version: 1\nprojects:\n  - scripts/bash\n", id="entry-not-mapping"
+        ),
         pytest.param(
             'version: 1\nprojects:\n  - path: "scripts/bash"\n    tier: "T4"\n',
             id="missing-key",
@@ -382,7 +386,9 @@ def test_find_entry_errors_reports_qt004_for_invalid_tier(tier: str) -> None:
 def test_find_entry_errors_reports_qt005_for_duplicate_path() -> None:
     """Two entries with the same path yield QT005."""
     # Act
-    errors = find_entry_errors(_manifest(("scripts/bash", "T4"), ("scripts/bash", "T3")))
+    errors = find_entry_errors(
+        _manifest(("scripts/bash", "T4"), ("scripts/bash", "T3"))
+    )
 
     # Assert
     assert _codes(errors) == ["QT005"]
@@ -438,9 +444,7 @@ def test_find_classification_errors_reports_qt008_for_unclassified_project() -> 
     assert "scripts/new" in errors[0].render()
 
 
-def test_find_classification_errors_empty_project_set_reports_qt007_for_every_entry() -> (
-    None
-):
+def test_find_classification_errors_empty_project_set_reports_qt007_for_every_entry():
     """An empty discovered set never passes silently: every entry yields QT007."""
     # Arrange
     manifest = _manifest(("scripts/bash", "T4"), (".", "T4"))

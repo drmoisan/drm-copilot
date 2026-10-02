@@ -9,9 +9,9 @@ from __future__ import annotations
 
 import functools
 import re
-from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -20,6 +20,9 @@ from scripts.dev_tools.check_quality_tiers import (
     main,
     read_manifest_text,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
 
 _QT_LINE = re.compile(r"^QT\d{3}: ")
 
