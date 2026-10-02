@@ -6,8 +6,12 @@
  *     `validate_parallel_planner_state_text`. Enforces the repository contract
  *     for `artifacts/orchestration/parallel-planner-state.json` -- spec
  *     invariants P1 through P4 unconditionally and the structural readiness gate
- *     P6 through P9 only under `requireReadyForExecution` -- before a prepared
- *     parallel run is handed to the orchestrator surface.
+ *     P6 through P10 only under `requireReadyForExecution` -- before a prepared
+ *     parallel run is handed to the orchestrator surface. Invariant P10 (the
+ *     per-item routing record) is enforced as a structural subset by
+ *     `parallel-planner-state-routing.ts`; the Python validator is
+ *     authoritative for floor equality, resolved-model equality, and the
+ *     disabled clamp.
  *
  * Flow:
  *     Parse the checkpoint JSON, reject a non-object root, check the S3
@@ -48,6 +52,7 @@ import {
   scanProhibitedKeys,
   validateItems,
 } from "./parallel-state-shared";
+import { validateReadyItemRouting } from "./parallel-planner-state-routing";
 import {
   collectIssueNumbers,
   validateCohortShapes,
@@ -132,7 +137,7 @@ const READY_ITEM_PATH_KEYS: readonly string[] = ["research_path", "plan_path"];
 
 /** Options controlling parallel-planner-state validation. */
 export interface ValidateParallelPlannerStateOptions {
-  /** When true, enforce the structural readiness gate (invariants P6-P9). */
+  /** When true, enforce the structural readiness gate (invariants P6-P10). */
   readonly requireReadyForExecution?: boolean;
 }
 
@@ -251,8 +256,9 @@ function validateItemContract(items: unknown): string[] {
       }
     }
     const band = record["complexity_band"];
-    // The band is optional: absence is the backward-compatible shape, so the
-    // enum check is presence-gated rather than requirement-gated.
+    // The band is optional only outside the ready gate: invariant P10 requires
+    // it under requireReadyForExecution, so this enum check stays
+    // presence-gated rather than requirement-gated.
     if (
       "complexity_band" in record &&
       !isEnumMember(VALID_COMPLEXITY_BANDS, band)
@@ -368,15 +374,17 @@ function validateReadyItem(
 }
 
 /**
- * Enforce the structural readiness gate (invariants P6 through P9).
+ * Enforce the structural readiness gate (invariants P6 through P10).
  *
  * The gate is structural only. It checks cardinality, per-item preparation, the
- * sentinel, and the kickoff PATH; it never opens the kickoff document and never
- * consults a repository. Those checks belong to F4.
+ * per-item routing record (P10), the sentinel, and the kickoff PATH; it never
+ * opens the kickoff document and never consults a repository. Those checks
+ * belong to F4.
  *
  * @param state The parsed checkpoint object.
- * @returns The cardinality error, then per-item readiness errors in positional
- * order, then the sentinel error, then the kickoff-path error.
+ * @returns The cardinality error, then per-item errors in positional order (each
+ * item's P7 errors followed by its P10 errors), then the sentinel error, then
+ * the kickoff-path error.
  */
 function validateReadyGate(state: Record<string, unknown>): string[] {
   const errors: string[] = [];
@@ -391,7 +399,10 @@ function validateReadyGate(state: Record<string, unknown>): string[] {
       );
     }
     for (const { index, record } of itemRecords(items)) {
-      errors.push(...validateReadyItem(record, itemContext(CONTEXT, index)));
+      const entryContext = itemContext(CONTEXT, index);
+      // P10 follows P7 for the same item, so P7 ordering is unchanged.
+      errors.push(...validateReadyItem(record, entryContext));
+      errors.push(...validateReadyItemRouting(record, entryContext));
     }
   }
 
@@ -417,7 +428,7 @@ function validateReadyGate(state: Record<string, unknown>): string[] {
  *
  * @param text Raw checkpoint JSON text.
  * @param options When `requireReadyForExecution` is true, additionally enforce
- * the structural readiness gate (invariants P6 through P9). When false the gate
+ * the structural readiness gate (invariants P6 through P10). When false the gate
  * contributes no errors, so a checkpoint written mid-preparation validates.
  * @returns Validation errors for a malformed or unready checkpoint; an empty
  * array when the checkpoint is valid. Invalid JSON and a non-object root each
