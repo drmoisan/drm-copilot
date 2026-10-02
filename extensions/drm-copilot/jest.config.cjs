@@ -74,7 +74,38 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/lib/validate/orchestrator-state-blocked-reason.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #509: the issue-adoption resolver and the routing validator that
+    // consumes it. Per-file entries only; the map has no `global` key.
+    "./src/lib/validate/orchestrator-state-issue-adoption.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestrator-state-routing.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #405: the pure promotion-type tool resolver used by the routing
+    // validator. This map carries no `global` key, so a new production file
+    // without its own entry here would be completely ungated.
+    "./src/lib/validate/orchestrator-state-promotion-tools.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/orchestration-artifacts.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #484: gate the remediation-loop validator (R5-R11 accounting).
+    "./src/lib/validate/orchestrator-state-remediation.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #484: gate the review-outcome module split from the validator above.
+    "./src/lib/validate/orchestrator-state-remediation-accounting.ts": {
       lines: 85,
       branches: 75,
     },

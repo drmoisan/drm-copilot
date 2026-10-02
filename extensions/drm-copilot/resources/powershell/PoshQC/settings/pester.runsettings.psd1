@@ -104,6 +104,8 @@
             # measured here so the new production modules are not excluded from coverage.
             '.claude/lib/orchestrator-state/OrchestratorStateCheckpointValue.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateReceipts.psm1'
+            # Issue #484 added the remediation-loop R5-R11 accounting module.
+            '.claude/lib/orchestrator-state/OrchestratorStateRemediationAccounting.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateModelReceipts.psm1'
             # Issue #475 added the portable Codex routing resolvers so the U6.X and U6.T
             # checkpoint checks resolve deployments and topologies without a Python
@@ -121,6 +123,8 @@
             '.claude/lib/orchestrator-state/OrchestratorStateRoutingMatrix.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateRoutingContract.psm1'
+            # Issue #509 added the issue-adoption resolver consumed by the routing contract.
+            '.claude/lib/orchestrator-state/OrchestratorStateIssueAdoption.psm1'
             '.claude/lib/orchestrator-state/OrchestratorStateUnconditional.psm1'
             # Issue #392 changed the Invoke-PoshQCTest default seams ($EnsureModule -Global
             # import and the global-session-state $InvokePester trampoline) so the bundled
