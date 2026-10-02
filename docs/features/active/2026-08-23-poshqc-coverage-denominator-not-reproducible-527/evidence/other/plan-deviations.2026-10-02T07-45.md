@@ -213,3 +213,30 @@ Output Summary: named deviations from plan.2026-09-29T15-32.md recorded per task
 - Task: Phase 3 commit point (micro-action; same rationale as DEV-TOOLCHAIN-P2).
 - Replacement: `mcp__drm-copilot__run_poshqc_format` and `mcp__drm-copilot__run_poshqc_analyze` with `scan_folders` `["scripts/powershell/PoshQC","tests/scripts/powershell/PoshQC"]`; both returned `ok: true`. `git hash-object` of `PoshQC.Coverage.psm1` (`23cd722f`), `PoshQC.Testing.psm1` (`8a3d6acf`), `PoshQC.psm1` (`2ce1628f`), and `settings/pester.runsettings.psd1` (`b7abb1a7`) was identical before and after the format call. Not acceptance evidence (D10).
 - Evidence: this entry.
+
+## DEV-P4-TR — Phase 4 targeted runs from CI
+
+- Task: P4-T1, P4-T2, P4-T4 (TR acceptance), P4-T5 (TR acceptance), P4-T6.
+- Plan mechanism: rule TR in a `pwsh` child.
+- Replacement: CI-evidence deviation (classification row P4-T1 et al.). P4-T2 uses the CI run on PHASE3_SHA `94853dca5206bf1276ab91a0df958613ff326207` (fix present, no Phase 4 adaptation); P4-T1, P4-T4, P4-T5, and P4-T6 use the CI run on the Phase 4/5 head. All five tasks stay unchecked until the orchestrator records those runs.
+- Evidence: pending.
+
+## DEV-P4-T4 — edit location and line count
+
+- Task: P4-T4.
+- Plan mechanism: add `-ResolveCoveragePopulation { ... }` to the two D14 calls and set `$fixedMessageCount = 5` with an explanatory comment.
+- Replacement: none for the edit; the seam argument was inserted on the existing `-ResolveScanConfig { @() } ... -EnumerateTests {` line of each call (lines 76 and 119), so no continuation line was added. The comment above `$fixedMessageCount` grew by one line, so the file is 142 lines (P0-T3 baseline 141; the plan sets no line-neutral condition for this file). `git diff -U0 HEAD` shows only lines 76, 119, and 136-138 changed.
+- Evidence: this entry.
+
+## DEV-P4-T5 — LL by git grep; anchored replacement
+
+- Task: P4-T5.
+- Plan mechanism: rule LL compared with the P0-T3 baseline.
+- Replacement: `git grep -c '' -- tests/scripts/powershell/PoshQC/PoshQC.Comprehensive.Tests.ps1` printed 766, equal to the P0-T3 baseline 766. The identical two-line pair also exists at lines 394-395 (test 'Should handle no test files gracefully', which the plan does not name); the replacement was anchored on the preceding `Mock -CommandName New-Item -MockWith { }` line, which precedes only the lines 621-622 and 745-746 occurrences, and `git diff -U0 HEAD` confirms that only lines 621-622 and 745-746 changed.
+- Evidence: this entry.
+
+## DEV-TOOLCHAIN-P4 — MCP format and analyze before the Phase 4 commit
+
+- Task: Phase 4 commit point (micro-action; same rationale as DEV-TOOLCHAIN-P2).
+- Replacement: `mcp__drm-copilot__run_poshqc_format` and `mcp__drm-copilot__run_poshqc_analyze` with `scan_folders` `["tests/scripts/powershell/PoshQC"]`; both returned `ok: true`; `git hash-object` of `PoshQC.Comprehensive.Tests.ps1` (`c27d726c`) and `PoshQC.TestingInvokeSummary.Tests.ps1` (`bda2eefd`) was identical before and after. Not acceptance evidence (D10).
+- Evidence: this entry.
