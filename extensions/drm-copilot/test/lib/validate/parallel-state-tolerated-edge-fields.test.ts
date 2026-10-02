@@ -13,6 +13,7 @@
 import { validateParallelPlannerStateText } from "../../../src/lib/validate/parallel-planner-state-core";
 import {
   buildBlastRadius,
+  buildPlannerRoutingFields,
   buildValidParallelState,
   validateState,
   type JsonRecord,
@@ -75,6 +76,7 @@ function buildPlannerItem(issueNum: number, slug: string): JsonRecord {
     research_path: `docs/features/active/${slug}/research.md`,
     plan_path: `docs/features/active/${slug}/plan.md`,
     preflight_status: "PREFLIGHT: ALL CLEAR",
+    ...buildPlannerRoutingFields(),
   };
 }
 
