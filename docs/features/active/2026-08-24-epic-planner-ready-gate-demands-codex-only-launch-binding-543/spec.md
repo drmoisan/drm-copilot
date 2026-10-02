@@ -307,7 +307,7 @@ Evidence goes under `docs/features/active/2026-08-24-epic-planner-ready-gate-dem
   - `it("skips a feature without launch keys when requireLaunchPaths is set")`
   - `it("still rejects a partial launch key when requireLaunchPaths is set")`
 - [x] `extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts` contains a passing test, `it("threads the Codex flags into epic-planner-state")`. It proves that `requireCodexModelRouting` and `requireCodexTopology` supplied to `validateOrchestrationServiceCall` for `epic-planner-state` restore unconditional launch-binding validation for a keyless feature.
-- [ ] `validate_epic_planner_child_launch_bindings` in `scripts/dev_tools/_epic_orchestrator_state_launch_binding.py` still passes `require_generated_orchestrator=True`. `validateEpicPlannerChildLaunchBindings` in `extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-launch-binding.ts` still passes `requireGeneratedOrchestrator: true`. Both are verified by reading the source and by the existing `agent_name` test (`must name a generated orchestrator agent.`) passing unchanged in both runtimes.
+- [x] `validate_epic_planner_child_launch_bindings` in `scripts/dev_tools/_epic_orchestrator_state_launch_binding.py` still passes `require_generated_orchestrator=True`. `validateEpicPlannerChildLaunchBindings` in `extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-launch-binding.ts` still passes `requireGeneratedOrchestrator: true`. Both are verified by reading the source and by the existing `agent_name` test (`must name a generated orchestrator agent.`) passing unchanged in both runtimes.
 - [x] `test_consumer_authority_is_typescript_only_and_scope_owners_are_unchanged` in `tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py` asserts the new ready-gate call text in place of the literal `"validate_epic_planner_child_launch_bindings(features)"`. Its docstring no longer states that #543 behaviour is unchanged, and the test passes.
 - [x] Each of these guidance files passes `require_codex_topology: true` and `require_codex_model_routing: true` in its `epic-planner-state` ready-gate invocation:
   - `.agents/skills/epic-plan/SKILL.md`
@@ -318,14 +318,14 @@ Evidence goes under `docs/features/active/2026-08-24-epic-planner-ready-gate-dem
   - `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml`
 
   `Invoke-Pester tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1` passes, including `keeps root and tracked bundle runtime copies byte-identical`.
-- [ ] Existing tests that keep both launch keys present pass without modification:
+- [x] Existing tests that keep both launch keys present pass without modification:
   - `test_rejects_invalid_branch_or_launch_path`, `test_rejects_invalid_delegation_binding`, `test_rejects_invalid_model_receipt_binding`, `test_requires_unique_branch_and_delegation_identifiers`, and `test_complete_launch_evidence_reaches_repository_context_gate`
   - `tests/scripts/dev_tools/test_validate_epic_planner_state.py`
   - `tests/scripts/dev_tools/test_epic_planner_readiness.py`
   - `tests/scripts/dev_tools/test_validate_epic_orchestrator_state_launch_binding.py`
 
   Verified by the targeted `poetry run pytest` command in Test Strategy exiting 0.
-- [ ] The targeted `node run-jest.cjs` command in Test Strategy exits 0 from `extensions/drm-copilot/`. It covers `epic-planner-state-core.test.ts`, `epic-planner-readiness-integrity.test.ts`, `epic-orchestrator-state-launch-binding.test.ts`, and `orchestration-artifacts.test.ts` unchanged.
+- [x] The targeted `node run-jest.cjs` command in Test Strategy exits 0 from `extensions/drm-copilot/`. It covers `epic-planner-state-core.test.ts`, `epic-planner-readiness-integrity.test.ts`, `epic-orchestrator-state-launch-binding.test.ts`, and `orchestration-artifacts.test.ts` unchanged.
 - [ ] `git diff main -- scripts/dev_tools/validate_orchestration_artifacts.py .claude .github` produces no output. This confirms that the Python CLI deferral and the exclusion of `.claude/**` and `.github/**` were respected.
 - [ ] Every production and test file named under "Files/modules to change" is at most 500 lines long after the change, verified with `(Get-Content <path>).Count` for each file. No new test is added to `tests/scripts/dev_tools/test_epic_planner_readiness.py`, `extensions/drm-copilot/test/lib/validate/epic-planner-readiness-integrity.test.ts`, or `extensions/drm-copilot/test/lib/validate/orchestration-artifacts.test.ts`.
 - [ ] `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing` exits 0. It reports at least 85% line and 75% branch coverage for `scripts/dev_tools/validate_epic_planner_state.py`, `scripts/dev_tools/_epic_orchestrator_state_launch_binding.py`, `scripts/dev_tools/epic_planner_launch_evidence.py`, and `scripts/dev_tools/epic_planner_readiness.py`.
