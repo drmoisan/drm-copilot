@@ -26,8 +26,16 @@
       - For each changed language, the policy audit must contain a
         coverage-scoped PASS or FAIL verdict.
       - Scope-narrowing phrases on coverage rows are treated as failures.
-      - When repo-wide coverage is below 80 percent for an available artifact,
-        the policy audit must carry a FAIL verdict for that language.
+      - Coverage floors follow the threshold precedence of the pushed quality-tiers
+        rule: when the repository's root CLAUDE.md states a line or branch coverage
+        threshold, that threshold governs; otherwise the 85 percent line and 75 percent
+        branch defaults govern.
+      - Each metric falls back independently, so a root CLAUDE.md that states only
+        a line threshold leaves the 75 percent branch default in force. The figures are
+        read by Get-FeatureReviewCoverageThreshold (feature-review-coverage-thresholds.ps1).
+      - When repo-wide line coverage for an available artifact is below the governing
+        line threshold, the policy audit must carry a FAIL verdict for that language;
+        branch coverage below the governing branch threshold blocks termination.
 
 .NOTES
     Reads the hook payload from CLAUDE_HOOK_INPUT as JSON. Exits 0 to allow
@@ -37,6 +45,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'feature-review-coverage-thresholds.ps1')
 
 function Get-ArtifactFileContent {
     [CmdletBinding()]
@@ -261,7 +270,9 @@ function Test-LanguageCoverageRow {
         [string]$AuditText,
         [string]$Language,
         [Nullable[double]]$RepoWidePct,
-        [Nullable[double]]$BranchPct
+        [Nullable[double]]$BranchPct,
+        [double]$LineFloor = 85.0,
+        [double]$BranchFloor = 75.0
     )
 
     $languageLabelMap = @{
@@ -310,21 +321,20 @@ function Test-LanguageCoverageRow {
         }
     }
 
-    if ($null -ne $RepoWidePct -and $RepoWidePct -lt 85.0) {
+    if ($null -ne $RepoWidePct -and $RepoWidePct -lt $LineFloor) {
         $failLines = $coverageLines | Where-Object { $_ -match '\bFAIL\b' }
         if (-not $failLines -or $failLines.Count -eq 0) {
             return @{
                 Ok     = $false
-                Reason = ("{0} repo-wide coverage is {1}% (below the 85% line coverage floor) but the policy-audit contains no FAIL verdict on a coverage row for {0}." -f $Language, $RepoWidePct)
+                Reason = ("{0} repo-wide coverage is {1}% (below the {2}% line coverage floor) but the policy-audit contains no FAIL verdict on a coverage row for {0}." -f $Language, $RepoWidePct, $LineFloor)
             }
         }
     }
 
-    $BranchFloor = 75.0
     if ($null -ne $BranchPct -and $BranchPct -lt $BranchFloor) {
         return @{
             Ok     = $false
-            Reason = ("{0} branch coverage is {1}% (below the 75% branch coverage floor); policy-audit must record FAIL on the corresponding coverage row." -f $Language, $BranchPct)
+            Reason = ("{0} branch coverage is {1}% (below the {2}% branch coverage floor); policy-audit must record FAIL on the corresponding coverage row." -f $Language, $BranchPct, $BranchFloor)
         }
     }
 
@@ -428,11 +438,13 @@ function Invoke-FeatureReviewCoverageValidation {
     }
 
     $policyAuditText = $artifactMeta['policy-audit'].Text
+    $claudeMd = Get-ArtifactFileContent -Path 'CLAUDE.md'
+    $thresholds = Get-FeatureReviewCoverageThreshold -ClaudeMdText $claudeMd.Text
     $coverageFailures = [System.Collections.Generic.List[string]]::new()
     foreach ($lang in $changedLanguages.Keys) {
         $repoPct = Get-LanguageRepoCoverage -Language $lang
         $branchPct = Get-LanguageBranchCoverage -Language $lang
-        $result = Test-LanguageCoverageRow -AuditText $policyAuditText -Language $lang -RepoWidePct $repoPct -BranchPct $branchPct
+        $result = Test-LanguageCoverageRow -AuditText $policyAuditText -Language $lang -RepoWidePct $repoPct -BranchPct $branchPct -LineFloor $thresholds.Line -BranchFloor $thresholds.Branch
         if (-not $result.Ok) {
             $coverageFailures.Add($result.Reason)
         }

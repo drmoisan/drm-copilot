@@ -74,4 +74,86 @@ Describe 'hook-command-raw-invocation, Codex copy (issue #824)' {
             $result | Should -BeFalse -Because "'$RawText' carries no token-bounded $CommandWord $($SubcommandPath -join ' ') sequence with a literal position"
         }
     }
+
+    Context 'issue #824 cycle 1 - wrapped bypass forms classify' {
+        It 'R824-P<Id> classifies <Label>' -Tag 'Issue824' -ForEach @(
+            @{ Id = 21; Label = 'a variable holding both subcommand words'; RawText = 'bash -c ''cmd="issue create"; gh $cmd'''; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+            @{ Id = 22; Label = 'a PowerShell array splat'; RawText = 'pwsh -c ''$a = "issue","create"; gh @a'''; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+            @{ Id = 23; Label = 'a bash array expansion'; RawText = 'bash -c ''args=(issue create); gh "${args[@]}"'''; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+            @{ Id = 24; Label = 'a backslash-newline inside double quotes'; RawText = ('bash -c "gh issue \' + "`n" + 'create"'); CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+            @{ Id = 25; Label = 'a variable holding worktree remove'; RawText = 'bash -c ''a="worktree remove"; git $a ../x'''; CommandWord = 'git'; SubcommandPath = @('worktree', 'remove') }
+        ) {
+            # Arrange: the row supplies RawText, CommandWord, and SubcommandPath.
+
+            # Act
+            $result = Test-CommandLineRawInvocation -RawText $RawText -CommandWord $CommandWord -SubcommandPath $SubcommandPath
+
+            # Assert
+            $result | Should -BeTrue -Because "'$RawText' carries the literal $CommandWord with every subcommand word reachable through an expansion or a line continuation"
+        }
+    }
+
+    Context 'issue #824 cycle 1 - absorption and command-position expansions need the literal words' {
+        It 'R824-N<Id> rejects <Label>' -Tag 'Issue824' -ForEach @(
+            @{ Id = 8; Label = 'an expansion after gh with neither subcommand word present'; RawText = 'gh $x'; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+            @{ Id = 9; Label = 'an expansion before issue create with no gh token'; RawText = 'pwsh -c ''Write-Output "$prefix issue create"'''; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+            @{ Id = 10; Label = 'an expansion before worktree remove with no git token'; RawText = 'pwsh -c ''Write-Host "$path worktree remove"'''; CommandWord = 'git'; SubcommandPath = @('worktree', 'remove') }
+        ) {
+            # Arrange: the row supplies RawText, CommandWord, and SubcommandPath.
+
+            # Act
+            $result = Test-CommandLineRawInvocation -RawText $RawText -CommandWord $CommandWord -SubcommandPath $SubcommandPath
+
+            # Assert
+            $result | Should -BeFalse -Because "'$RawText' lacks a token-bounded $CommandWord or a token-bounded subcommand word"
+        }
+    }
+
+    Context 'issue #824 cycle 1 - wrapped removal operand' {
+        It 'R824-O<Id> reads <Label>' -Tag 'Issue824' -ForEach @(
+            @{ Id = 1; Label = 'a bash -c operand'; RawText = 'bash -c "git worktree remove ../x"'; Status = 'Operand'; Operand = '../x' }
+            @{ Id = 2; Label = 'an operand after --force'; RawText = 'pwsh -Command ''git worktree remove --force C:/w/a'''; Status = 'Operand'; Operand = 'C:/w/a' }
+            @{ Id = 3; Label = 'an operand after a quoted -C option'; RawText = 'pwsh -Command ''git -C "a b" worktree remove ../x'''; Status = 'Operand'; Operand = '../x' }
+            @{ Id = 4; Label = 'an operand after the -- separator'; RawText = 'bash -c ''git worktree remove -- ../x'''; Status = 'Operand'; Operand = '../x' }
+            @{ Id = 5; Label = 'an escaped-quote operand'; RawText = 'bash -c "git worktree remove \"../x\""'; Status = 'Operand'; Operand = '../x' }
+            @{ Id = 6; Label = 'a wrapped removal naming no operand'; RawText = 'bash -c "git worktree remove"'; Status = 'NoOperand'; Operand = $null }
+            @{ Id = 7; Label = 'a removal whose subcommand is an expansion'; RawText = 'bash -c ''a="worktree remove"; git $a ../x'''; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 8; Label = 'two removals naming different operands'; RawText = 'bash -c ''git worktree remove ../a; git worktree remove ../b'''; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 9; Label = 'an unmodeled dash option before the operand'; RawText = 'bash -c ''git worktree remove --unknown ../x'''; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 10; Label = 'an operand that is an expansion'; RawText = 'bash -c ''git worktree remove "$target"'''; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 11; Label = 'a worktree list'; RawText = 'pwsh -Command ''git worktree list'''; Status = 'NoMatch'; Operand = $null }
+        ) {
+            # Arrange: the row supplies RawText and the expected Status and Operand.
+
+            # Act
+            $result = Get-CommandLineRawInvocationOperand -RawText $RawText -CommandWord 'git' -SubcommandPath @('worktree', 'remove')
+
+            # Assert
+            $result.Status | Should -Be $Status -Because "'$RawText' must resolve to $Status"
+            $result.Operand | Should -Be $Operand -Because "'$RawText' must report the operand only when it is literal and unique"
+        }
+    }
+
+    Context 'issue #824 cycle 1 - wrapped removal operand resolution' {
+        BeforeAll {
+            . (Join-Path $script:HookRoot 'hook-command-invocation.ps1')
+        }
+
+        It 'R824-W<Id> resolves <Label>' -Tag 'Issue824' -ForEach @(
+            @{ Id = 1; Label = 'a non-matching command'; CommandText = 'git worktree list'; Status = 'NotApplicable'; Operand = $null }
+            @{ Id = 2; Label = 'a structural removal'; CommandText = 'git worktree remove ../x'; Status = 'NotApplicable'; Operand = $null }
+            @{ Id = 3; Label = 'an unbalanced wrapped removal'; CommandText = 'bash -c "git worktree remove ../x'; Status = 'NotApplicable'; Operand = $null }
+            @{ Id = 4; Label = 'a structural removal with an unmodeled option'; CommandText = 'git --bogus-option worktree remove ../x'; Status = 'NotApplicable'; Operand = $null }
+            @{ Id = 5; Label = 'a wrapped removal'; CommandText = 'bash -c "git worktree remove ../x"'; Status = 'Operand'; Operand = '../x' }
+        ) {
+            # Arrange: the row supplies CommandText and the expected Status and Operand.
+
+            # Act
+            $result = Resolve-CommandLineWrappedInvocationOperand -CommandText $CommandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove')
+
+            # Assert
+            $result.Status | Should -Be $Status -Because "'$CommandText' must resolve to $Status"
+            $result.Operand | Should -Be $Operand -Because "'$CommandText' must report a raw operand only for a wrapped removal"
+        }
+    }
 }

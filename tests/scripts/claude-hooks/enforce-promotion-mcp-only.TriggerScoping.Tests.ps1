@@ -257,4 +257,36 @@ pwsh -NoProfile -Command '$parts = New-Object System.Collections.Generic.List[st
                 Should -Be (Get-PromotionMcpOnlyGhIssueBlockedReason)
         }
     }
+
+    Context 'issue #824 cycle 1 - wrapped bypass forms and command-position expansions' {
+        It 'P824-D<Id> denies <Label>' -Tag 'Issue824' -ForEach @(
+            @{ Id = 12; Label = 'bash -c ''cmd="issue create"; gh $cmd'''; Command = 'bash -c ''cmd="issue create"; gh $cmd''' }
+            @{ Id = 13; Label = 'pwsh -c ''$a = "issue","create"; gh @a'''; Command = 'pwsh -c ''$a = "issue","create"; gh @a''' }
+            @{ Id = 14; Label = 'bash -c ''args=(issue create); gh "${args[@]}"'''; Command = 'bash -c ''args=(issue create); gh "${args[@]}"''' }
+            @{ Id = 15; Label = 'bash -c with a backslash-newline between issue and create'; Command = ('bash -c "gh issue \' + "`n" + 'create"') }
+        ) {
+            # Arrange: $Command comes from the -ForEach row.
+
+            # Act
+            $decision = Get-PromotionTriggerScopingDecision -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'a literal gh whose subcommand words reach it through an expansion or a line continuation must stay gated'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -Be (Get-PromotionMcpOnlyGhIssueBlockedReason)
+        }
+
+        It 'P824-A4 allows a wrapped Write-Output whose expansion precedes issue create' -Tag 'Issue824' {
+            # Arrange: no token-bounded gh occurs anywhere in the wrapped payload.
+            $command = 'pwsh -c ''Write-Output "$prefix issue create"'''
+
+            # Act
+            $decision = Get-PromotionTriggerScopingDecision -Command $command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'an expansion in the command position needs a token-bounded gh elsewhere in the raw text'
+        }
+    }
 }

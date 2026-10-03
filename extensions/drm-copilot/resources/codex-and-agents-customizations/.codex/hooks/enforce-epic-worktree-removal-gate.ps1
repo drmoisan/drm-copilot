@@ -127,6 +127,13 @@ function Invoke-CodexWorktreeRemovalDecision {
         return $null
     }
     $target = Get-CodexWorktreeRemovalPath -Command $command
+    # Issue #824 addendum 1: a wrapper-led or substitution removal carries its operand in
+    # raw text. A raw operand takes part in the checkpoint lookup below; a wrapped match
+    # that names no operand removes nothing and is allowed; an indeterminate match keeps
+    # the structural path and is denied by the unchanged predicates below.
+    $wrapped = Resolve-CommandLineWrappedInvocationOperand -CommandText $command -CommandWord 'git' -SubcommandPath @('worktree', 'remove')
+    if ($wrapped.Status -eq 'NoOperand') { return $null }
+    if ($wrapped.Status -eq 'Operand') { $target = $wrapped.Operand }
     $checkpoint = ConvertFrom-CodexWorktreeJson -Raw $EpicCheckpointRaw -Name 'epic checkpoint' -Optional
     $workingDirectory = if ([string]::IsNullOrWhiteSpace([string]$payload.cwd)) {
         (Get-Location).Path

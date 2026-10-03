@@ -112,4 +112,128 @@ Describe 'enforce-parallel-worktree-removal-gate trigger scoping (issue #545)' {
                 Should -Match '^PARALLEL_WORKTREE_REMOVAL_BLOCKED'
         }
     }
+
+    Context 'issue #824 addendum 1 - no authorizing record' {
+        BeforeAll {
+            $script:AddendumReproduction = @'
+pwsh -NoProfile -Command 'Set-Location -LiteralPath "C:/repo/.claude/worktrees/agent-x"; if (Test-Path -LiteralPath "src/Old.cs") { Remove-Item -LiteralPath "src/Old.cs" -Force }; git status --porcelain -- "src/Old.cs"'
+'@
+        }
+
+        BeforeEach {
+            # The checkpoint names a DIFFERENT worktree, so nothing authorizes the removal
+            # of item-a-101. The epic checkpoint is absent.
+            Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
+                '{"items":[{"issue_num":102,"worktree_path":"/repo/worktrees/item-b-102","merge_status":"merged"}]}'
+            }
+            Mock -CommandName Get-ParallelWorktreeRemovalGateEpicCheckpointContent -MockWith { $null }
+        }
+
+        It 'A824-WT3 allows the addendum reproduction even though raw containment matches it' -Tag 'Issue824' {
+            # Arrange
+            $command = $script:AddendumReproduction
+
+            # Act
+            $containment = Test-CommandLineRawContainment -RawText $command -CommandWord 'git' -SubcommandPath @('worktree', 'remove')
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            # Assert
+            $containment | Should -BeTrue -Because 'the negative control: containment-based R2 would classify this text'
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'no token-bounded git worktree remove sequence occurs in the wrapped payload'
+        }
+
+        It 'A824-WT4-<Id> denies <Label> without an authorizing record' -Tag 'Issue824' -ForEach @(
+            @{ Id = 1; Label = 'git worktree remove /repo/worktrees/item-a-101'; Command = 'git worktree remove /repo/worktrees/item-a-101' }
+            @{ Id = 2; Label = 'git worktree remove --force /repo/worktrees/item-a-101'; Command = 'git worktree remove --force /repo/worktrees/item-a-101' }
+            @{ Id = 3; Label = 'git -C /repo/main worktree remove /repo/worktrees/item-a-101'; Command = 'git -C /repo/main worktree remove /repo/worktrees/item-a-101' }
+            @{ Id = 4; Label = 'pwsh -Command ''git worktree remove /repo/worktrees/item-a-101'''; Command = 'pwsh -Command ''git worktree remove /repo/worktrees/item-a-101''' }
+            @{ Id = 5; Label = 'bash -c "git worktree remove /repo/worktrees/item-a-101"'; Command = 'bash -c "git worktree remove /repo/worktrees/item-a-101"' }
+        ) {
+            # Arrange: $Command comes from the -ForEach row.
+
+            # Act
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $Command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -Match '^PARALLEL_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'A824-WT6 allows a wrapped removal that names no operand' -Tag 'Issue824' {
+            # Arrange
+            $command = 'pwsh -NoProfile -Command ''git worktree remove'''
+
+            # Act
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'a wrapped removal that names no operand removes nothing'
+        }
+
+        It 'A824-WT9 allows a wrapped Write-Host whose expansion precedes worktree remove' -Tag 'Issue824' {
+            # Arrange
+            $command = 'pwsh -c ''Write-Host "$path worktree remove"'''
+
+            # Act
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'an expansion in the command position needs a token-bounded git elsewhere in the raw text'
+        }
+    }
+
+    Context 'issue #824 addendum 1 - authorizing record present' {
+        BeforeEach {
+            # The checkpoint authorizes the removal of item-a-101.
+            Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith {
+                '{"items":[{"issue_num":101,"worktree_path":"/repo/worktrees/item-a-101","merge_status":"merged"}]}'
+            }
+            Mock -CommandName Get-ParallelWorktreeRemovalGateEpicCheckpointContent -MockWith { $null }
+        }
+
+        It 'A824-WT5-<Id> allows <Label> with an authorizing record' -Tag 'Issue824' -ForEach @(
+            @{ Id = 1; Label = 'git worktree remove /repo/worktrees/item-a-101'; Command = 'git worktree remove /repo/worktrees/item-a-101' }
+            @{ Id = 2; Label = 'git worktree remove --force /repo/worktrees/item-a-101'; Command = 'git worktree remove --force /repo/worktrees/item-a-101' }
+            @{ Id = 3; Label = 'git -C /repo/main worktree remove /repo/worktrees/item-a-101'; Command = 'git -C /repo/main worktree remove /repo/worktrees/item-a-101' }
+            @{ Id = 4; Label = 'pwsh -Command ''git worktree remove /repo/worktrees/item-a-101'''; Command = 'pwsh -Command ''git worktree remove /repo/worktrees/item-a-101''' }
+            @{ Id = 5; Label = 'bash -c "git worktree remove /repo/worktrees/item-a-101"'; Command = 'bash -c "git worktree remove /repo/worktrees/item-a-101"' }
+        ) {
+            # Arrange: $Command comes from the -ForEach row.
+
+            # Act
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $Command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'the checkpoint carries a merged record for the removed worktree'
+        }
+
+        It 'A824-WT7 denies an unbalanced wrapped removal even with an authorizing record' -Tag 'Issue824' {
+            # Arrange
+            $command = 'bash -c "git worktree remove /repo/worktrees/item-a-101'
+
+            # Act
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'an unbalanced segment stays fail-closed'
+        }
+
+        It 'A824-WT8 denies a removal whose subcommand is carried by an expansion even with an authorizing record' -Tag 'Issue824' {
+            # Arrange
+            $command = 'bash -c ''a="worktree remove"; git $a /repo/worktrees/item-a-101'''
+
+            # Act
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'an indeterminate operand keeps the structural path and is denied'
+        }
+    }
 }

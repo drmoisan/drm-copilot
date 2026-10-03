@@ -43,8 +43,8 @@ If there is any conflict between these documents, halt and notify the user.
 
 - For C# work, use these concrete commands for the general policy toolchain loop:
   1. `csharpier .`
-  2. `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
-  3. `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+  2. `msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+  3. `msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
   4. `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
 
 - The loop behavior (restart rules, must-pass requirements, and audit expectations) is defined by `general-code-change.instructions.md` and is intentionally not repeated here.

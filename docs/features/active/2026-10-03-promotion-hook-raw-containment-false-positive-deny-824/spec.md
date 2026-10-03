@@ -177,7 +177,7 @@ Each criterion below is verified by an `Issue824`-tagged test in both `enforce-p
 - [x] AC-11: `pwsh -c "& gh issue new"` is denied.
 - [x] AC-12: `bash -c "gh issue create"` is denied.
 - [x] AC-13: `gh api repos/o/r/issues -X POST` is denied.
-- [ ] AC-14: Detection of real bypasses that raw containment caught before the fix is not weakened: `bash -c "gh -R o/r issue create"`, `bash -c 'x=create; gh issue $x'`, and `bash -c 'c=gh; $c issue create'` are each denied, and `gh --repo o/r issue list` is allowed.
+- [x] AC-14: Detection of real bypasses that raw containment caught before the fix is not weakened: `bash -c "gh -R o/r issue create"`, `bash -c 'x=create; gh issue $x'`, and `bash -c 'c=gh; $c issue create'` are each denied, and `gh --repo o/r issue list` is allowed.
 
 ### Negative control
 
@@ -219,10 +219,10 @@ Source: https://github.com/drmoisan/drm-copilot/issues/824#issuecomment-59700855
 
 Reproduction: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "C:/repo/.claude/worktrees/agent-x"; if (Test-Path -LiteralPath "src/Old.cs") { Remove-Item -LiteralPath "src/Old.cs" -Force }; git status --porcelain -- "src/Old.cs"'`
 
-- [ ] AC-30: The reproduction command is allowed by both worktree-removal gates.
-- [ ] AC-31: These are still gated exactly as today (denied without an authorizing checkpoint, allowed with one): `git worktree remove <path>`; `git worktree remove --force <path>`; `git -C <dir> worktree remove <path>`; `pwsh -Command 'git worktree remove <path>'`; `bash -c "git worktree remove <path>"`.
-- [ ] AC-32: Pester tests cover each case. They include a negative control that fails if the substring-containment deny path is restored.
-- [ ] AC-33: The PowerShell toolchain passes.
+- [x] AC-30: The reproduction command is allowed by both worktree-removal gates.
+- [x] AC-31: These are still gated exactly as today (denied without an authorizing checkpoint, allowed with one): `git worktree remove <path>`; `git worktree remove --force <path>`; `git -C <dir> worktree remove <path>`; `pwsh -Command 'git worktree remove <path>'`; `bash -c "git worktree remove <path>"`.
+- [x] AC-32: Pester tests cover each case. They include a negative control that fails if the substring-containment deny path is restored.
+- [x] AC-33: The PowerShell toolchain passes.
 
 ### Addendum 2: issue #823 follow-ups
 
@@ -234,14 +234,14 @@ Maintainer decisions recorded in that comment:
 
 Canonical policy edit authorization: the repository owner authorizes edits to the canonical `.github/instructions/` files for FU-823-3 only (comment 5970141337). No other `.github/instructions/` or `.claude/rules/` change is authorized by this addendum beyond the files the comment lists. The PR body must call out these canonical edits.
 
-- [ ] AC-34: FU-823-1: the hook resolves thresholds by the precedence above. Pester tests cover: a root `CLAUDE.md` with lower figures, no figures, and a line-only figure. The docstring matches the behavior.
-- [ ] AC-35: FU-823-2: no pushed file in the listed set names TaskMaster or No-COM. A test fails if those names reappear in pushed rule or skill files.
-- [ ] AC-36: FU-823-3: no surface hard-codes `TaskMaster.sln`. A test fails if it reappears. The bundled-payload parity tests stay green.
-- [ ] AC-37: FU-823-5: step 8 of the workflow refers to the governing thresholds, not fixed 80/90 figures.
-- [ ] AC-38: Review note A: the per-metric fallback is stated wherever the precedence wording appears.
-- [ ] AC-39: Review note B: the test asserts only on coverage-threshold context.
-- [ ] AC-40: The follow-ups file marks FU-823-1, -2, -3 and -5 as resolved by #824, and FU-823-4 as still open.
-- [ ] AC-41: The full toolchain passes (Python, TypeScript/Jest, and PowerShell format, analyze and test with coverage).
+- [x] AC-34: FU-823-1: the hook resolves thresholds by the precedence above. Pester tests cover: a root `CLAUDE.md` with lower figures, no figures, and a line-only figure. The docstring matches the behavior.
+- [x] AC-35: FU-823-2: no pushed file in the listed set names TaskMaster or No-COM. A test fails if those names reappear in pushed rule or skill files.
+- [x] AC-36: FU-823-3: no surface hard-codes `TaskMaster.sln`. A test fails if it reappears. The bundled-payload parity tests stay green.
+- [x] AC-37: FU-823-5: step 8 of the workflow refers to the governing thresholds, not fixed 80/90 figures.
+- [x] AC-38: Review note A: the per-metric fallback is stated wherever the precedence wording appears.
+- [x] AC-39: Review note B: the test asserts only on coverage-threshold context.
+- [x] AC-40: The follow-ups file marks FU-823-1, -2, -3 and -5 as resolved by #824, and FU-823-4 as still open.
+- [x] AC-41: The full toolchain passes (Python, TypeScript/Jest, and PowerShell format, analyze and test with coverage).
 
 ## Non-Goals / Follow-ups
 The following pre-existing gaps were identified by research and are not acceptance criteria for #824. They should be filed as follow-up items.

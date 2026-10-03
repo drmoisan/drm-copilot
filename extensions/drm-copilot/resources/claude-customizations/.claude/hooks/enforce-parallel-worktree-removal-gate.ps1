@@ -363,6 +363,13 @@ function Invoke-ParallelWorktreeRemovalGateDecision {
     }
 
     $worktreePath = Get-ParallelWorktreeRemovalCommandPath -CommandText $commandText
+    # Issue #824 addendum 1: a wrapper-led or substitution removal carries its operand in
+    # raw text. A raw operand takes part in the checkpoint lookup below; a wrapped match
+    # that names no operand removes nothing and is allowed; an indeterminate match keeps
+    # the structural path and is denied by the unchanged predicates below.
+    $wrapped = Resolve-CommandLineWrappedInvocationOperand -CommandText $commandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove')
+    if ($wrapped.Status -eq 'NoOperand') { return Get-ParallelWorktreeGateAllowDecision }
+    if ($wrapped.Status -eq 'Operand') { $worktreePath = $wrapped.Operand }
 
     # Each run checkpoint is read beneath the worktree that records this path (issue #690),
     # parallel kind first; an ambiguous target denies before any allow or manifest check.

@@ -23,3 +23,21 @@ This record lists every hook that reaches `Resolve-CommandLineInvocation`, and t
 `enforce-parallel-abandon-gate.ps1` dot-sources the helper but calls only `Read-CommandLineSegment` and `Test-CommandLineSegmentRawScan`, so it does not reach R2 and is not affected by this change.
 
 Derivation. The call-site set is taken from research `research/research.2026-10-03T08-30.md`, Numeric Derivation Evidence, Claim N1 (34 call expressions in 13 files: Claude 22 in 8, Codex 12 in 5), and the effect column from section 3 of the same document. The set was re-derived against the worktree after the fix in `evidence/other/call-site-derivation.2026-10-03T10-01.md` (FEATURE/evidence/other/call-site-derivation.TS.md), which prints the same 34 `file:line` values in 13 files.
+
+## Remediation cycle 1 addendum (issue #824)
+
+Timestamp: 2026-10-03T13-23
+
+Re-derived in `evidence/other/r1-call-site-derivation.2026-10-03T13-23.md` (step script SCRATCH/steps/r1-p7-t9.ps1):
+
+CALL-SITES=37 FILES=13
+
+The three new call sites, one in each worktree-removal gate:
+
+- `.claude/hooks/enforce-epic-worktree-removal-gate.ps1:364`
+- `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1:370`
+- `.codex/hooks/enforce-epic-worktree-removal-gate.ps1:134`
+
+Each is the `Resolve-CommandLineWrappedInvocationOperand -CommandText ... -CommandWord 'git' -SubcommandPath @('worktree', 'remove')` call that the worktree-removal gates now use to read a wrapped removal's operand. A raw operand joins the checkpoint lookup, a wrapped match that names no operand is allowed, and an indeterminate match keeps the structural path and is denied. The file count is unchanged at 13 because all three gates already carried call sites.
+
+Covering tests: `A824-WT3` to `A824-WT9` in S6, S7, and S8 (`A824-WT3`, `A824-WT4-1` to `-5`, `A824-WT5-1` to `-5`, `A824-WT6`, `A824-WT7`, `A824-WT8`, `A824-WT9`).

@@ -127,4 +127,116 @@ Describe 'Codex enforce-epic-worktree-removal-gate trigger scoping (issue #545)'
                 Should -Match '^EPIC_WORKTREE_REMOVAL_BLOCKED'
         }
     }
+
+    Context 'issue #824 addendum 1 - no authorizing record' {
+        BeforeAll {
+            $script:AddendumReproduction = @'
+pwsh -NoProfile -Command 'Set-Location -LiteralPath "C:/repo/.claude/worktrees/agent-x"; if (Test-Path -LiteralPath "src/Old.cs") { Remove-Item -LiteralPath "src/Old.cs" -Force }; git status --porcelain -- "src/Old.cs"'
+'@
+        }
+
+        It 'A824-WT3 allows the addendum reproduction even though raw containment matches it' -Tag 'Issue824' {
+            # Arrange
+            $command = $script:AddendumReproduction
+
+            # Act
+            $containment = Test-CommandLineRawContainment -RawText $command -CommandWord 'git' -SubcommandPath @('worktree', 'remove')
+            $decision = Invoke-CodexWorktreeRemovalDecision -PayloadRaw (ConvertTo-CodexWorktreeTriggerScopingPayload -Command $command) -EpicCheckpointRaw $script:UnrelatedCheckpoint
+
+            # Assert
+            $containment | Should -BeTrue -Because 'the negative control: containment-based R2 would classify this text'
+            $decision | Should -BeNullOrEmpty -Because 'the Codex seam returns null for allow, and no token-bounded git worktree remove sequence occurs'
+        }
+
+        It 'A824-WT4-<Id> denies <Label> without an authorizing record' -Tag 'Issue824' -ForEach @(
+            @{ Id = 1; Label = 'git worktree remove worktrees/item-a-101'; Command = 'git worktree remove worktrees/item-a-101' }
+            @{ Id = 2; Label = 'git worktree remove --force worktrees/item-a-101'; Command = 'git worktree remove --force worktrees/item-a-101' }
+            @{ Id = 3; Label = 'git -C /repo/main worktree remove worktrees/item-a-101'; Command = 'git -C /repo/main worktree remove worktrees/item-a-101' }
+            @{ Id = 4; Label = 'pwsh -Command ''git worktree remove worktrees/item-a-101'''; Command = 'pwsh -Command ''git worktree remove worktrees/item-a-101''' }
+            @{ Id = 5; Label = 'bash -c "git worktree remove worktrees/item-a-101"'; Command = 'bash -c "git worktree remove worktrees/item-a-101"' }
+        ) {
+            # Arrange: $Command comes from the -ForEach row.
+
+            # Act
+            $decision = Invoke-CodexWorktreeRemovalDecision -PayloadRaw (ConvertTo-CodexWorktreeTriggerScopingPayload -Command $Command) -EpicCheckpointRaw $script:UnrelatedCheckpoint
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -Match '^EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'A824-WT6 allows a wrapped removal that names no operand' -Tag 'Issue824' {
+            # Arrange
+            $command = 'pwsh -NoProfile -Command ''git worktree remove'''
+
+            # Act
+            $decision = Invoke-CodexWorktreeRemovalDecision -PayloadRaw (ConvertTo-CodexWorktreeTriggerScopingPayload -Command $command) -EpicCheckpointRaw $script:UnrelatedCheckpoint
+
+            # Assert
+            $decision | Should -BeNullOrEmpty -Because 'a wrapped removal that names no operand removes nothing'
+        }
+
+        It 'A824-WT9 allows a wrapped Write-Host whose expansion precedes worktree remove' -Tag 'Issue824' {
+            # Arrange
+            $command = 'pwsh -c ''Write-Host "$path worktree remove"'''
+
+            # Act
+            $decision = Invoke-CodexWorktreeRemovalDecision -PayloadRaw (ConvertTo-CodexWorktreeTriggerScopingPayload -Command $command) -EpicCheckpointRaw $script:UnrelatedCheckpoint
+
+            # Assert
+            $decision | Should -BeNullOrEmpty -Because 'an expansion in the command position needs a token-bounded git elsewhere in the raw text'
+        }
+    }
+
+    Context 'issue #824 addendum 1 - authorizing record present' {
+        BeforeAll {
+            $script:AddendumReproduction = @'
+pwsh -NoProfile -Command 'Set-Location -LiteralPath "C:/repo/.claude/worktrees/agent-x"; if (Test-Path -LiteralPath "src/Old.cs") { Remove-Item -LiteralPath "src/Old.cs" -Force }; git status --porcelain -- "src/Old.cs"'
+'@
+            $script:AuthorizingCheckpoint = @{ features = @(@{ worktree_path = $script:TargetPath; merge_status = 'merged' }) } | ConvertTo-Json -Compress -Depth 4
+        }
+
+        It 'A824-WT5-<Id> allows <Label> with an authorizing record' -Tag 'Issue824' -ForEach @(
+            @{ Id = 1; Label = 'git worktree remove worktrees/item-a-101'; Command = 'git worktree remove worktrees/item-a-101' }
+            @{ Id = 2; Label = 'git worktree remove --force worktrees/item-a-101'; Command = 'git worktree remove --force worktrees/item-a-101' }
+            @{ Id = 3; Label = 'git -C /repo/main worktree remove worktrees/item-a-101'; Command = 'git -C /repo/main worktree remove worktrees/item-a-101' }
+            @{ Id = 4; Label = 'pwsh -Command ''git worktree remove worktrees/item-a-101'''; Command = 'pwsh -Command ''git worktree remove worktrees/item-a-101''' }
+            @{ Id = 5; Label = 'bash -c "git worktree remove worktrees/item-a-101"'; Command = 'bash -c "git worktree remove worktrees/item-a-101"' }
+        ) {
+            # Arrange: $Command comes from the -ForEach row.
+
+            # Act
+            $decision = Invoke-CodexWorktreeRemovalDecision -PayloadRaw (ConvertTo-CodexWorktreeTriggerScopingPayload -Command $Command) -EpicCheckpointRaw $script:AuthorizingCheckpoint
+
+            # Assert
+            $decision | Should -BeNullOrEmpty -Because 'the checkpoint carries a merged record for the removed worktree'
+        }
+
+        It 'A824-WT7 denies an unbalanced wrapped removal even with an authorizing record' -Tag 'Issue824' {
+            # Arrange
+            $command = 'bash -c "git worktree remove worktrees/item-a-101'
+
+            # Act
+            $decision = Invoke-CodexWorktreeRemovalDecision -PayloadRaw (ConvertTo-CodexWorktreeTriggerScopingPayload -Command $command) -EpicCheckpointRaw $script:AuthorizingCheckpoint
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -Match '^EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'A824-WT8 denies a removal whose subcommand is carried by an expansion even with an authorizing record' -Tag 'Issue824' {
+            # Arrange
+            $command = 'bash -c ''a="worktree remove"; git $a worktrees/item-a-101'''
+
+            # Act
+            $decision = Invoke-CodexWorktreeRemovalDecision -PayloadRaw (ConvertTo-CodexWorktreeTriggerScopingPayload -Command $command) -EpicCheckpointRaw $script:AuthorizingCheckpoint
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -Match '^EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+    }
 }

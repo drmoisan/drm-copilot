@@ -1,0 +1,12 @@
+# r1 P0-T4 — helper scripts A1 to A4 saved to SCRATCH
+
+Timestamp: 2026-10-03T12-41
+Command: pwsh -NoProfile -File SCRATCH/steps/r1-p0-t4.ps1 -Worktree WORKTREE (A0 preamble, then the P0-T4 `Get-FileHash` command and VERDICT line verbatim)
+EXIT_CODE: 0
+Output Summary:
+- A1 to A4 were written verbatim from the plan Appendix with the Write tool.
+- SHA256 SCRATCH/cov-derive.ps1 (A1): 48E5BF3FABE20684C551A50AF509C0FB9A2F9BEAABA127C23ADC75C683BE4519
+- SHA256 SCRATCH/issue824-pester.ps1 (A2): DA76DBD7912EF77D290AF6F544992C4531C7F9B8B39A6221F64B6C6C801535BA
+- SHA256 SCRATCH/resolver-ast-check.ps1 (A3): D170E4C050066B055F041B8826AF6E960A32A7353D845AB3DD9CE0E8CF0F639C
+- SHA256 SCRATCH/phrase-scan.ps1 (A4): 71A87C737F25AE729A3617BC5784187CB35FA43286ECA22519991C3618A50CD4
+- Four hash lines; VERDICT(`$hashes.Count -eq 4`) held.
