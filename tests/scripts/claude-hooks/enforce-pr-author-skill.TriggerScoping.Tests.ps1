@@ -333,4 +333,22 @@ EOF
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
+
+    Context 'issue #824 - a substring arrangement is not a gh pr create invocation' {
+        BeforeEach {
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+        }
+
+        It 'A824-PR1 allows a wrapped Select-String whose text carries high, priority, and create' -Tag 'Issue824' {
+            # Arrange: gh appears only inside "high" and pr only inside "priority".
+            $command = 'pwsh -NoProfile -Command ''Select-String -Path README.md -Pattern "high priority" | ForEach-Object { "create" }'''
+
+            # Act
+            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -Match 'PR_AUTHOR_SKILL_BLOCKED'
+        }
+    }
 }

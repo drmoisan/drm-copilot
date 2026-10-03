@@ -107,4 +107,24 @@ Describe 'Codex enforce-epic-worktree-removal-gate trigger scoping (issue #545)'
                 Should -BeNullOrEmpty -Because 'list is not the remove subcommand'
         }
     }
+
+    Context 'issue #824 - wrapper-led removal classification' {
+        It 'A824-WT1 allows a wrapped git worktree list whose filter text carries removed' -Tag 'Issue824' {
+            $command = 'pwsh -NoProfile -Command ''git worktree list --porcelain | Select-String -NotMatch "removed"'''
+
+            $decision = Invoke-CodexWorktreeRemovalDecision -PayloadRaw (ConvertTo-CodexWorktreeTriggerScopingPayload -Command $command) -EpicCheckpointRaw $script:UnrelatedCheckpoint
+
+            $decision | Should -BeNullOrEmpty -Because 'the Codex seam returns null for allow, and removed is not the token remove'
+        }
+
+        It 'A824-WT2 still denies git worktree remove carried inside a bash -c argument' -Tag 'Issue824' {
+            $command = 'bash -c "git worktree remove ../x"'
+
+            $decision = Invoke-CodexWorktreeRemovalDecision -PayloadRaw (ConvertTo-CodexWorktreeTriggerScopingPayload -Command $command) -EpicCheckpointRaw $script:UnrelatedCheckpoint
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -Match '^EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+    }
 }

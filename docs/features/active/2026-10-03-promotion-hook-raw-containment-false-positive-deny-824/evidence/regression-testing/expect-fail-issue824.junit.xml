@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<testsuites xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="junit_schema_4.xsd" name="Pester" tests="262" errors="0" failures="14" disabled="219" time="2.336">
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" tests="22" errors="0" failures="2" hostname="MEGALODON4" id="0" skipped="0" disabled="8" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" time="0.653">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-A1 allows the issue 824 reproduction command" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.189">
+      <failure message="Expected strings to be the same, because no token-bounded gh issue new sequence occurs in the wrapped payload, but they were different.&#xD;&#xA;Expected length: 5&#xD;&#xA;Actual length:   4&#xD;&#xA;Strings differ at index 0.&#xD;&#xA;Expected: 'allow'&#xD;&#xA;But was:  'deny'&#xD;&#xA;           ^">at Should -Be 'allow' -Because 'no token-bounded gh issue new sequence occurs in the wrapped payload', C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1:214
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1:213</failure>
+    </testcase>
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-A2 allows a wrapped payload carrying through, issue, and New-Object with no gh issue sequence" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.009">
+      <failure message="Expected strings to be the same, because the words occur, but never as a gh issue new or gh issue create sequence, but they were different.&#xD;&#xA;Expected length: 5&#xD;&#xA;Actual length:   4&#xD;&#xA;Strings differ at index 0.&#xD;&#xA;Expected: 'allow'&#xD;&#xA;But was:  'deny'&#xD;&#xA;           ^">at Should -Be 'allow' -Because 'the words occur, but never as a gh issue new or gh issue create sequence', C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1:223
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1:222</failure>
+    </testcase>
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-A3 allows gh --repo o/r issue list" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.010" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D1 denies gh issue create --title x" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.008" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D2 denies gh issue new --title x" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D3 denies GH  Issue  Create" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D4 denies pwsh -NoProfile -Command 'gh issue create --title x'" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D5 denies pwsh -c &quot;&amp; gh issue new&quot;" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D6 denies bash -c &quot;gh issue create&quot;" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D7 denies gh api repos/o/r/issues -X POST" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.005" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D8 denies bash -c &quot;gh -R o/r issue create&quot;" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.007" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D9 denies bash -c 'x=create; gh issue $x'" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D10 denies bash -c 'c=gh; $c issue create'" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D11 denies the unbalanced segment echo unterminated" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.004" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" tests="22" errors="0" failures="2" hostname="MEGALODON4" id="1" skipped="0" disabled="8" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" time="0.178">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-A1 allows the issue 824 reproduction command" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.019">
+      <failure message="Expected strings to be the same, because no token-bounded gh issue new sequence occurs in the wrapped payload, but they were different.&#xD;&#xA;Expected length: 5&#xD;&#xA;Actual length:   4&#xD;&#xA;Strings differ at index 0.&#xD;&#xA;Expected: 'allow'&#xD;&#xA;But was:  'deny'&#xD;&#xA;           ^">at Should -Be 'allow' -Because 'no token-bounded gh issue new sequence occurs in the wrapped payload', C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1:200
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1:199</failure>
+    </testcase>
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-A2 allows a wrapped payload carrying through, issue, and New-Object with no gh issue sequence" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.009">
+      <failure message="Expected strings to be the same, because the words occur, but never as a gh issue new or gh issue create sequence, but they were different.&#xD;&#xA;Expected length: 5&#xD;&#xA;Actual length:   4&#xD;&#xA;Strings differ at index 0.&#xD;&#xA;Expected: 'allow'&#xD;&#xA;But was:  'deny'&#xD;&#xA;           ^">at Should -Be 'allow' -Because 'the words occur, but never as a gh issue new or gh issue create sequence', C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1:209
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1:208</failure>
+    </testcase>
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-A3 allows gh --repo o/r issue list" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.005" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D1 denies gh issue create --title x" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D2 denies gh issue new --title x" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D3 denies GH  Issue  Create" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D4 denies pwsh -NoProfile -Command 'gh issue create --title x'" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D5 denies pwsh -c &quot;&amp; gh issue new&quot;" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.020" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D6 denies bash -c &quot;gh issue create&quot;" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D7 denies gh api repos/o/r/issues -X POST" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D8 denies bash -c &quot;gh -R o/r issue create&quot;" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D9 denies bash -c 'x=create; gh issue $x'" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D10 denies bash -c 'c=gh; $c issue create'" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D11 denies the unbalanced segment echo unterminated" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.002" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-invocation.Tests.ps1" tests="45" errors="0" failures="1" hostname="MEGALODON4" id="2" skipped="0" disabled="44" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-invocation.Tests.ps1" time="0.093">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="hook-command-invocation (issue #545 D2 Piece 3 and D12).fail-closed rules.N824-1 negative control: raw containment matches the reproduction but Test-CommandLineInvocation does not" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-invocation.Tests.ps1" assertions="0" time="0.015">
+      <failure message="Expected $false, because no token-bounded gh issue new sequence occurs in the raw text, but got $true.">at Should -BeFalse -Because 'no token-bounded gh issue new sequence occurs in the raw text', C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-invocation.Tests.ps1:244
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-invocation.Tests.ps1:243</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-invocation.Tests.ps1" tests="40" errors="0" failures="1" hostname="MEGALODON4" id="3" skipped="0" disabled="39" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-invocation.Tests.ps1" time="0.066">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="hook-command-invocation, Codex copy (issue #545 D2 Piece 3 and D12).fail-closed rules.N824-1 negative control: raw containment matches the reproduction but Test-CommandLineInvocation does not" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-invocation.Tests.ps1" assertions="0" time="0.008">
+      <failure message="Expected $false, because no token-bounded gh issue new sequence occurs in the raw text, but got $true.">at Should -BeFalse -Because 'no token-bounded gh issue new sequence occurs in the raw text', C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-invocation.Tests.ps1:244
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-invocation.Tests.ps1:243</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-pr-author-skill.TriggerScoping.Tests.ps1" tests="23" errors="0" failures="1" hostname="MEGALODON4" id="4" skipped="0" disabled="22" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-pr-author-skill.TriggerScoping.Tests.ps1" time="0.263">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="enforce-pr-author-skill trigger scoping (issue #545).issue #824 - a substring arrangement is not a gh pr create invocation.A824-PR1 allows a wrapped Select-String whose text carries high, priority, and create" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-pr-author-skill.TriggerScoping.Tests.ps1" assertions="0" time="0.115">
+      <failure message="Expected strings to be the same, but they were different.&#xD;&#xA;Expected length: 5&#xD;&#xA;Actual length:   4&#xD;&#xA;Strings differ at index 0.&#xD;&#xA;Expected: 'allow'&#xD;&#xA;But was:  'deny'&#xD;&#xA;           ^">at $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow', C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-pr-author-skill.TriggerScoping.Tests.ps1:350
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-pr-author-skill.TriggerScoping.Tests.ps1:350</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1" tests="7" errors="0" failures="1" hostname="MEGALODON4" id="5" skipped="0" disabled="5" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1" time="0.176">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="enforce-epic-worktree-removal-gate trigger scoping (issue #545).issue #824 - wrapper-led removal classification.A824-WT1 allows a wrapped git worktree list whose filter text carries removed" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1" assertions="0" time="0.052">
+      <failure message="Expected strings to be the same, because removed is not the token remove, and list is not the remove subcommand, but they were different.&#xD;&#xA;Expected length: 5&#xD;&#xA;Actual length:   4&#xD;&#xA;Strings differ at index 0.&#xD;&#xA;Expected: 'allow'&#xD;&#xA;But was:  'deny'&#xD;&#xA;           ^">at Should -Be 'allow' -Because 'removed is not the token remove, and list is not the remove subcommand', C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1:122
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1:121</failure>
+    </testcase>
+    <testcase name="enforce-epic-worktree-removal-gate trigger scoping (issue #545).issue #824 - wrapper-led removal classification.A824-WT2 still denies git worktree remove carried inside a bash -c argument" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1" assertions="0" time="0.035" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1" tests="5" errors="0" failures="1" hostname="MEGALODON4" id="6" skipped="0" disabled="3" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1" time="0.128">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="enforce-parallel-worktree-removal-gate trigger scoping (issue #545).issue #824 - wrapper-led removal classification.A824-WT1 allows a wrapped git worktree list whose filter text carries removed" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1" assertions="0" time="0.035">
+      <failure message="Expected strings to be the same, because removed is not the token remove, and list is not the remove subcommand, but they were different.&#xD;&#xA;Expected length: 5&#xD;&#xA;Actual length:   4&#xD;&#xA;Strings differ at index 0.&#xD;&#xA;Expected: 'allow'&#xD;&#xA;But was:  'deny'&#xD;&#xA;           ^">at Should -Be 'allow' -Because 'removed is not the token remove, and list is not the remove subcommand', C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1:102
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1:101</failure>
+    </testcase>
+    <testcase name="enforce-parallel-worktree-removal-gate trigger scoping (issue #545).issue #824 - wrapper-led removal classification.A824-WT2 still denies git worktree remove carried inside a bash -c argument" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1" assertions="0" time="0.010" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1" tests="7" errors="0" failures="1" hostname="MEGALODON4" id="7" skipped="0" disabled="5" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1" time="0.098">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="Codex enforce-epic-worktree-removal-gate trigger scoping (issue #545).issue #824 - wrapper-led removal classification.A824-WT1 allows a wrapped git worktree list whose filter text carries removed" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1" assertions="0" time="0.034">
+      <failure message="Expected $null or empty, because the Codex seam returns null for allow, and removed is not the token remove, but got System.Collections.Specialized.OrderedDictionary.">at $decision | Should -BeNullOrEmpty -Because 'the Codex seam returns null for allow, and removed is not the token remove', C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1:117
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1:117</failure>
+    </testcase>
+    <testcase name="Codex enforce-epic-worktree-removal-gate trigger scoping (issue #545).issue #824 - wrapper-led removal classification.A824-WT2 still denies git worktree remove carried inside a bash -c argument" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1" assertions="0" time="0.005" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\validate-bash.TriggerScoping.Tests.ps1" tests="17" errors="0" failures="1" hostname="MEGALODON4" id="8" skipped="0" disabled="16" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\validate-bash.TriggerScoping.Tests.ps1" time="0.077">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="validate-bash.ps1 trigger scoping (issue #545).issue #824 - wrapper-led structural leg.A824-VB1 returns no blocked pattern for pwsh -f running legit-push.ps1" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\validate-bash.TriggerScoping.Tests.ps1" assertions="0" time="0.013">
+      <failure message="Expected $null or empty, but got 'git push -f'.">at Get-BlockedPatternMatch -Command 'pwsh -NoProfile -f ./scripts/legit-push.ps1' | Should -BeNullOrEmpty, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\validate-bash.TriggerScoping.Tests.ps1:152
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\validate-bash.TriggerScoping.Tests.ps1:152</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\validate-bash-trigger-scoping.Tests.ps1" tests="9" errors="0" failures="1" hostname="MEGALODON4" id="9" skipped="0" disabled="8" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\validate-bash-trigger-scoping.Tests.ps1" time="0.073">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="Codex validate-bash trigger scoping (issue #545).issue #824 - wrapper-led structural leg.A824-VB1 returns no blocked pattern for pwsh -f running legit-push.ps1" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\validate-bash-trigger-scoping.Tests.ps1" assertions="0" time="0.022">
+      <failure message="Expected $null or empty, but got 'git push -f'.">at Get-BlockedPatternMatch -Command 'pwsh -NoProfile -f ./scripts/legit-push.ps1' | Should -BeNullOrEmpty, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\validate-bash-trigger-scoping.Tests.ps1:84
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\validate-bash-trigger-scoping.Tests.ps1:84</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1" tests="20" errors="0" failures="1" hostname="MEGALODON4" id="10" skipped="0" disabled="19" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1" time="0.170">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="enforce-orchestration-preimplementation-gate.ps1 trigger scoping (issue #545).issue #824 - wrapper-led staging classification.A824-PI1 does not classify a wrapped Write-Output carrying digit and address as implementation" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1" assertions="0" time="0.038">
+      <failure message="Expected $false, because no token-bounded git add sequence occurs in the wrapped payload, but got $true.">at Should -BeFalse -Because 'no token-bounded git add sequence occurs in the wrapped payload', C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1:343
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1:342</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1" tests="24" errors="0" failures="1" hostname="MEGALODON4" id="11" skipped="0" disabled="23" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1" time="0.132">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="Codex enforce-orchestration-preimplementation-gate trigger scoping (issue #545).issue #824 - wrapper-led staging classification.A824-PI1 does not classify a wrapped Write-Output carrying digit and address as implementation" status="Failed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1" assertions="0" time="0.021">
+      <failure message="Expected $false, because no token-bounded git add sequence occurs in the wrapped payload, but got $true.">at Should -BeFalse -Because 'no token-bounded git add sequence occurs in the wrapped payload', C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1:357
+at &lt;ScriptBlock&gt;, C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1:356</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-merge-gate.TriggerScoping.Tests.ps1" tests="13" errors="0" failures="0" hostname="MEGALODON4" id="12" skipped="0" disabled="12" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-merge-gate.TriggerScoping.Tests.ps1" time="0.155">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="enforce-epic-merge-gate.ps1 trigger scoping (issue #545).issue #824 - wrapper-led merge classification.A824-MG1 still routes gh pr merge --merge inside a bash -c argument to the checkpoint check" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-merge-gate.TriggerScoping.Tests.ps1" assertions="0" time="0.052" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-merge-gate-trigger-scoping.Tests.ps1" tests="8" errors="0" failures="0" hostname="MEGALODON4" id="13" skipped="0" disabled="7" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-merge-gate-trigger-scoping.Tests.ps1" time="0.075">
+    <properties>
+      <property name="os-version" value="10.0.26200" />
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="user" value="DanMoisan" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="Codex enforce-epic-merge-gate trigger scoping (issue #545).issue #824 - wrapper-led merge classification.A824-MG1 still routes gh pr merge --merge inside a bash -c argument to the checkpoint check" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-merge-gate-trigger-scoping.Tests.ps1" assertions="0" time="0.013" />
+  </testsuite>
+</testsuites>

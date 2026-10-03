@@ -15,6 +15,7 @@
 #>
 
 . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-raw-invocation.ps1')
 
 # The transparent-wrapper set of D2 Piece 3 step 2. These prefix a command without changing
 # which command runs, so the structural matcher skips them. All five are also members of the
@@ -26,9 +27,10 @@ $script:CommandLineTransparentWrapperNames = @('command', 'env', 'nohup', 'time'
 # in WithArgument consumes the following token as its value, or carries the value inline in
 # the '--name=value' form; an option in Standalone consumes only itself. A dash-leading token
 # in neither list is UNMODELED, and an unmodeled token between the command word and the
-# subcommand classifies as a match: over-classification only forces a checkpoint check,
-# whereas under-classification is a bypass. Pinned by test through
-# Get-CommandLineGlobalOption (rule R6).
+# subcommand classifies as a match. A classification is not always a checkpoint check: the
+# promotion hook, the pr-author gh pr create check, both worktree-removal gates, and the
+# validate-bash structural leg deny on it. Under-classification is a bypass. Pinned by test
+# through Get-CommandLineGlobalOption (rule R6).
 $script:CommandLineGlobalOptions = @{
     git = [pscustomobject]@{
         WithArgument = @('-C', '-c', '--git-dir', '--work-tree', '--namespace', '--exec-path')
@@ -94,9 +96,11 @@ function Test-CommandLineRawContainment {
     .SYNOPSIS
         Report whether a raw text contains the command word and every subcommand element.
     .DESCRIPTION
-        The "in any arrangement" test D12 specifies for a wrapper-led or live-substitution
-        segment. Comparison is ordinal case-insensitive containment, which is deliberately
-        loose: a false positive only forces a checkpoint check, a false negative is a bypass.
+        Loose, ordinal case-insensitive containment of every word anywhere in the raw text,
+        with no word-boundary, order, or adjacency check. It is used only by the informational
+        Test-CommandLineMention predicate. No classification or deny decision is made from it;
+        wrapper-led and live-substitution segments are classified by the token-aware
+        Test-CommandLineRawInvocation (hook-command-raw-invocation.ps1).
     .OUTPUTS
         System.Boolean
     #>
@@ -170,11 +174,15 @@ function Resolve-CommandLineInvocation {
     .DESCRIPTION
         Implements the four mandatory fail-closed rules of D12 in order, per segment:
         an Unbalanced segment classifies because its structure could not be resolved; a
-        wrapper-led or live-substitution segment classifies when its RawText contains the
-        command word and every subcommand element in any arrangement; an unmodeled
-        dash-leading token between the command word and the subcommand classifies; and a
-        non-dash token that is not the next expected subcommand element terminates that
-        segment's scan without a match, so 'git log --grep add' does not classify.
+        wrapper-led or live-substitution segment classifies when Test-CommandLineRawInvocation
+        finds the command word followed by every subcommand element as a token-bounded,
+        ordered sequence in its RawText, including inside a quoted -Command or -c argument;
+        an unmodeled dash-leading token between the command word and the subcommand
+        classifies; and a non-dash token that is not the next expected subcommand element
+        terminates that segment's scan without a match, so 'git log --grep add' does not
+        classify. A classification is a hard deny for the promotion hook, the pr-author gh pr
+        create check, both worktree-removal gates, and the validate-bash structural leg, so R2
+        must not over-classify.
 
         Returns $null when no segment matched. Otherwise returns Segment, the matched record,
         and OperandIndex, the token position just past the subcommand path - or -1 when the
@@ -200,7 +208,7 @@ function Resolve-CommandLineInvocation {
         }
 
         if (($segment.IsWrapperLed -or $segment.HasLiveSubstitution) -and
-            (Test-CommandLineRawContainment -RawText $segment.RawText -CommandWord $CommandWord -SubcommandPath $SubcommandPath)) {
+            (Test-CommandLineRawInvocation -RawText $segment.RawText -CommandWord $CommandWord -SubcommandPath $SubcommandPath)) {
             return [pscustomobject]@{ Segment = $segment; OperandIndex = -1 }
         }
 

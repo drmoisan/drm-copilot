@@ -1,0 +1,308 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<testsuites xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="junit_schema_4.xsd" name="Pester" tests="316" errors="0" failures="0" disabled="219" time="2.473">
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" tests="22" errors="0" failures="0" hostname="MEGALODON4" id="0" skipped="0" disabled="8" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" time="0.630">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-A1 allows the issue 824 reproduction command" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.138" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-A2 allows a wrapped payload carrying through, issue, and New-Object with no gh issue sequence" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.007" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-A3 allows gh --repo o/r issue list" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.009" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D1 denies gh issue create --title x" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.010" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D2 denies gh issue new --title x" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D3 denies GH  Issue  Create" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D4 denies pwsh -NoProfile -Command 'gh issue create --title x'" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D5 denies pwsh -c &quot;&amp; gh issue new&quot;" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D6 denies bash -c &quot;gh issue create&quot;" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D7 denies gh api repos/o/r/issues -X POST" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.021" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D8 denies bash -c &quot;gh -R o/r issue create&quot;" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.006" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D9 denies bash -c 'x=create; gh issue $x'" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D10 denies bash -c 'c=gh; $c issue create'" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="enforce-promotion-mcp-only.ps1 trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D11 denies the unbalanced segment echo unterminated" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-promotion-mcp-only.TriggerScoping.Tests.ps1" assertions="0" time="0.004" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" tests="22" errors="0" failures="0" hostname="MEGALODON4" id="1" skipped="0" disabled="8" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" time="0.179">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-A1 allows the issue 824 reproduction command" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.017" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-A2 allows a wrapped payload carrying through, issue, and New-Object with no gh issue sequence" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.008" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-A3 allows gh --repo o/r issue list" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.006" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D1 denies gh issue create --title x" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.006" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D2 denies gh issue new --title x" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D3 denies GH  Issue  Create" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D4 denies pwsh -NoProfile -Command 'gh issue create --title x'" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.015" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D5 denies pwsh -c &quot;&amp; gh issue new&quot;" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D6 denies bash -c &quot;gh issue create&quot;" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D7 denies gh api repos/o/r/issues -X POST" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.005" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D8 denies bash -c &quot;gh -R o/r issue create&quot;" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D9 denies bash -c 'x=create; gh issue $x'" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.006" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D10 denies bash -c 'c=gh; $c issue create'" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.005" />
+    <testcase name="Codex enforce-promotion-mcp-only trigger scoping (issue #545).issue #824 - token-aware classification of wrapper-led segments.P824-D11 denies the unbalanced segment echo unterminated" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-promotion-mcp-only-trigger-scoping.Tests.ps1" assertions="0" time="0.003" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-invocation.Tests.ps1" tests="45" errors="0" failures="0" hostname="MEGALODON4" id="2" skipped="0" disabled="44" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-invocation.Tests.ps1" time="0.128">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="hook-command-invocation (issue #545 D2 Piece 3 and D12).fail-closed rules.N824-1 negative control: raw containment matches the reproduction but Test-CommandLineInvocation does not" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-invocation.Tests.ps1" assertions="0" time="0.028" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-invocation.Tests.ps1" tests="40" errors="0" failures="0" hostname="MEGALODON4" id="3" skipped="0" disabled="39" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-invocation.Tests.ps1" time="0.067">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="hook-command-invocation, Codex copy (issue #545 D2 Piece 3 and D12).fail-closed rules.N824-1 negative control: raw containment matches the reproduction but Test-CommandLineInvocation does not" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-invocation.Tests.ps1" assertions="0" time="0.005" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-pr-author-skill.TriggerScoping.Tests.ps1" tests="23" errors="0" failures="0" hostname="MEGALODON4" id="4" skipped="0" disabled="22" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-pr-author-skill.TriggerScoping.Tests.ps1" time="0.267">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="enforce-pr-author-skill trigger scoping (issue #545).issue #824 - a substring arrangement is not a gh pr create invocation.A824-PR1 allows a wrapped Select-String whose text carries high, priority, and create" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-pr-author-skill.TriggerScoping.Tests.ps1" assertions="0" time="0.122" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1" tests="7" errors="0" failures="0" hostname="MEGALODON4" id="5" skipped="0" disabled="5" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1" time="0.187">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="enforce-epic-worktree-removal-gate trigger scoping (issue #545).issue #824 - wrapper-led removal classification.A824-WT1 allows a wrapped git worktree list whose filter text carries removed" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1" assertions="0" time="0.014" />
+    <testcase name="enforce-epic-worktree-removal-gate trigger scoping (issue #545).issue #824 - wrapper-led removal classification.A824-WT2 still denies git worktree remove carried inside a bash -c argument" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1" assertions="0" time="0.071" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1" tests="5" errors="0" failures="0" hostname="MEGALODON4" id="6" skipped="0" disabled="3" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1" time="0.124">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="enforce-parallel-worktree-removal-gate trigger scoping (issue #545).issue #824 - wrapper-led removal classification.A824-WT1 allows a wrapped git worktree list whose filter text carries removed" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1" assertions="0" time="0.010" />
+    <testcase name="enforce-parallel-worktree-removal-gate trigger scoping (issue #545).issue #824 - wrapper-led removal classification.A824-WT2 still denies git worktree remove carried inside a bash -c argument" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1" assertions="0" time="0.026" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1" tests="7" errors="0" failures="0" hostname="MEGALODON4" id="7" skipped="0" disabled="5" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1" time="0.076">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="Codex enforce-epic-worktree-removal-gate trigger scoping (issue #545).issue #824 - wrapper-led removal classification.A824-WT1 allows a wrapped git worktree list whose filter text carries removed" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1" assertions="0" time="0.012" />
+    <testcase name="Codex enforce-epic-worktree-removal-gate trigger scoping (issue #545).issue #824 - wrapper-led removal classification.A824-WT2 still denies git worktree remove carried inside a bash -c argument" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1" assertions="0" time="0.007" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\validate-bash.TriggerScoping.Tests.ps1" tests="17" errors="0" failures="0" hostname="MEGALODON4" id="8" skipped="0" disabled="16" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\validate-bash.TriggerScoping.Tests.ps1" time="0.083">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="validate-bash.ps1 trigger scoping (issue #545).issue #824 - wrapper-led structural leg.A824-VB1 returns no blocked pattern for pwsh -f running legit-push.ps1" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\validate-bash.TriggerScoping.Tests.ps1" assertions="0" time="0.012" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\validate-bash-trigger-scoping.Tests.ps1" tests="9" errors="0" failures="0" hostname="MEGALODON4" id="9" skipped="0" disabled="8" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\validate-bash-trigger-scoping.Tests.ps1" time="0.061">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="Codex validate-bash trigger scoping (issue #545).issue #824 - wrapper-led structural leg.A824-VB1 returns no blocked pattern for pwsh -f running legit-push.ps1" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\validate-bash-trigger-scoping.Tests.ps1" assertions="0" time="0.007" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1" tests="20" errors="0" failures="0" hostname="MEGALODON4" id="10" skipped="0" disabled="19" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1" time="0.146">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="enforce-orchestration-preimplementation-gate.ps1 trigger scoping (issue #545).issue #824 - wrapper-led staging classification.A824-PI1 does not classify a wrapped Write-Output carrying digit and address as implementation" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1" assertions="0" time="0.010" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1" tests="24" errors="0" failures="0" hostname="MEGALODON4" id="11" skipped="0" disabled="23" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1" time="0.109">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="Codex enforce-orchestration-preimplementation-gate trigger scoping (issue #545).issue #824 - wrapper-led staging classification.A824-PI1 does not classify a wrapped Write-Output carrying digit and address as implementation" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1" assertions="0" time="0.010" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-merge-gate.TriggerScoping.Tests.ps1" tests="13" errors="0" failures="0" hostname="MEGALODON4" id="12" skipped="0" disabled="12" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-merge-gate.TriggerScoping.Tests.ps1" time="0.140">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="enforce-epic-merge-gate.ps1 trigger scoping (issue #545).issue #824 - wrapper-led merge classification.A824-MG1 still routes gh pr merge --merge inside a bash -c argument to the checkpoint check" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\enforce-epic-merge-gate.TriggerScoping.Tests.ps1" assertions="0" time="0.061" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-merge-gate-trigger-scoping.Tests.ps1" tests="8" errors="0" failures="0" hostname="MEGALODON4" id="13" skipped="0" disabled="7" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-merge-gate-trigger-scoping.Tests.ps1" time="0.071">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="Codex enforce-epic-merge-gate trigger scoping (issue #545).issue #824 - wrapper-led merge classification.A824-MG1 still routes gh pr merge --merge inside a bash -c argument to the checkpoint check" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\enforce-epic-merge-gate-trigger-scoping.Tests.ps1" assertions="0" time="0.013" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" tests="27" errors="0" failures="0" hostname="MEGALODON4" id="14" skipped="0" disabled="0" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" time="0.100">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P1 classifies adjacent words" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.005" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P2 classifies extra whitespace" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P3 classifies mixed case" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.016" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P4 classifies a leading ampersand" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P5 classifies a leading semicolon" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P6 classifies a leading pipe" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P7 classifies a leading parenthesis" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P8 classifies a leading double quote" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P9 classifies a leading single quote" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P10 classifies a leading newline" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P11 classifies a /usr/bin path" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P12 classifies a Windows exe path" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P13 classifies a quoted exe path" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P14 classifies escaped quotes" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P15 classifies a short repo option" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P16 classifies a repo option in equals form" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P17 classifies a quoted directory option" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P18 classifies an unmodeled dash option" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P19 classifies an expansion in the command position" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P20 classifies an expansion in a subcommand position" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N1 rejects through issue New-Object" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="hook-command-raw-invocation (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N2 rejects legit push" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N3 rejects a worktree list filtered on removed" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N4 rejects high priority create" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N5 rejects gh issue newline" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N6 rejects gh issue list" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N7 rejects an all-expansion sequence" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\claude-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+  </testsuite>
+  <testsuite name="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" tests="27" errors="0" failures="0" hostname="MEGALODON4" id="15" skipped="0" disabled="0" package="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" time="0.105">
+    <properties>
+      <property name="platform" value="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" />
+      <property name="os-version" value="10.0.26200" />
+      <property name="user" value="DanMoisan" />
+      <property name="user-domain" value="Megalodon4" />
+      <property name="framework-version" value="5.6.1" />
+      <property name="machine-name" value="MEGALODON4" />
+      <property name="cwd" value="C:\Users\DanMoisan\repos\drm-copilot-wt-824" />
+      <property name="clr-version" value="10.0.12" />
+      <property name="junit-version" value="4" />
+    </properties>
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P1 classifies adjacent words" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P2 classifies extra whitespace" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P3 classifies mixed case" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P4 classifies a leading ampersand" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.001" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P5 classifies a leading semicolon" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.007" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P6 classifies a leading pipe" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P7 classifies a leading parenthesis" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P8 classifies a leading double quote" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.003" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P9 classifies a leading single quote" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P10 classifies a leading newline" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P11 classifies a /usr/bin path" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P12 classifies a Windows exe path" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P13 classifies a quoted exe path" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P14 classifies escaped quotes" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P15 classifies a short repo option" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P16 classifies a repo option in equals form" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P17 classifies a quoted directory option" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P18 classifies an unmodeled dash option" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P19 classifies an expansion in the command position" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).positive rows - a token-bounded ordered sequence classifies.R824-P20 classifies an expansion in a subcommand position" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N1 rejects through issue New-Object" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N2 rejects legit push" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N3 rejects a worktree list filtered on removed" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.004" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N4 rejects high priority create" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N5 rejects gh issue newline" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N6 rejects gh issue list" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+    <testcase name="hook-command-raw-invocation, Codex copy (issue #824).negative rows - substrings, other subcommands, and all-expansion sequences do not classify.R824-N7 rejects an all-expansion sequence" status="Passed" classname="C:\Users\DanMoisan\repos\drm-copilot-wt-824\tests\scripts\codex-hooks\hook-command-raw-invocation.Tests.ps1" assertions="0" time="0.002" />
+  </testsuite>
+</testsuites>

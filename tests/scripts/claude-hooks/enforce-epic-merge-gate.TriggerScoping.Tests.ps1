@@ -172,4 +172,18 @@ Describe 'enforce-epic-merge-gate.ps1 trigger scoping (issue #545)' {
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
         }
     }
+
+    Context 'issue #824 - wrapper-led merge classification' {
+        It 'A824-MG1 still routes gh pr merge --merge inside a bash -c argument to the checkpoint check' -Tag 'Issue824' {
+            # All three checkpoint seams return null, so an in-scope command necessarily denies.
+            Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicOrchestratorCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-ParallelOrchestratorCheckpointContent -MockWith { $null }
+
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw (ConvertTo-MergeGateEnvelope -Command 'bash -c "gh pr merge --merge 688"')
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+    }
 }

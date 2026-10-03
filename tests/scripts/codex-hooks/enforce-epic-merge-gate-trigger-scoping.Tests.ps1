@@ -103,4 +103,15 @@ Describe 'Codex enforce-epic-merge-gate trigger scoping (issue #545)' {
             $decision | Should -BeNullOrEmpty
         }
     }
+
+    Context 'issue #824 - wrapper-led merge classification' {
+        It 'A824-MG1 still routes gh pr merge --merge inside a bash -c argument to the checkpoint check' -Tag 'Issue824' {
+            # Both checkpoint texts are empty, so an in-scope command necessarily denies.
+            $decision = Invoke-CodexEpicMergeDecision -PayloadRaw (ConvertTo-CodexMergeTriggerScopingPayload -Command 'bash -c "gh pr merge --merge 688"') -ChildCheckpointRaw '' -EpicCheckpointRaw ''
+
+            $decision | Should -Not -BeNullOrEmpty
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_MERGE_GATE_BLOCKED'
+        }
+    }
 }

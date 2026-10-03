@@ -335,4 +335,12 @@ EOF
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PREIMPLEMENTATION_GATE_BLOCKED'
         }
     }
+
+    Context 'issue #824 - wrapper-led staging classification' {
+        It 'A824-PI1 does not classify a wrapped Write-Output carrying digit and address as implementation' -Tag 'Issue824' {
+            # git appears only inside digit and add only inside address.
+            Test-ImplementationCommand -Command 'pwsh -NoProfile -Command ''Write-Output "digit address"''' |
+                Should -BeFalse -Because 'no token-bounded git add sequence occurs in the wrapped payload'
+        }
+    }
 }

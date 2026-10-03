@@ -144,4 +144,12 @@ Describe 'validate-bash.ps1 trigger scoping (issue #545)' {
             Get-CdChainedReadCommandMatch -Command 'echo "cd /x && head f"' | Should -BeNullOrEmpty
         }
     }
+
+    Context 'issue #824 - wrapper-led structural leg' {
+        It 'A824-VB1 returns no blocked pattern for pwsh -f running legit-push.ps1' -Tag 'Issue824' {
+            # git appears only inside legit and push only inside legit-push, so no forced
+            # git push is invoked although a -f token is present.
+            Get-BlockedPatternMatch -Command 'pwsh -NoProfile -f ./scripts/legit-push.ps1' | Should -BeNullOrEmpty
+        }
+    }
 }

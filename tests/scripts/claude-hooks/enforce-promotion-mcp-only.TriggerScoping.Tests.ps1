@@ -84,6 +84,12 @@ cat > artifacts/orchestration/orchestrator-state.json <<'JSON'
 }
 JSON
 '@
+
+        # The issue #824 reproduction: a wrapper-led segment whose raw text carries gh
+        # (inside "through"), issue, and new (inside "New-Object") as substrings only.
+        $script:Issue824Reproduction = @'
+pwsh -NoProfile -Command '$parts = New-Object System.Collections.Generic.List[string]; foreach ($t in @("a phrase that runs through the text", "The call is guarded (issue #1)")) { Write-Output $t }'
+'@
     }
 
     Context 'the over-match allow case - a receipt value is not an invocation' {
@@ -192,6 +198,63 @@ JSON
 
             $decision.hookSpecificOutput.permissionDecision |
                 Should -Be 'allow' -Because 'a read operation is not an issue-creation subcommand'
+        }
+    }
+
+    Context 'issue #824 - token-aware classification of wrapper-led segments' {
+        It 'P824-A1 allows the issue 824 reproduction command' -Tag 'Issue824' {
+            # Arrange: the raw text carries gh, issue, and new only as substrings.
+            $command = $script:Issue824Reproduction
+
+            # Act
+            $decision = Get-PromotionTriggerScopingDecision -Command $command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'no token-bounded gh issue new sequence occurs in the wrapped payload'
+        }
+
+        It 'P824-A2 allows a wrapped payload carrying through, issue, and New-Object with no gh issue sequence' -Tag 'Issue824' {
+            $command = 'pwsh -NoProfile -Command ''Write-Output "through"; "issue"; New-Object Text.StringBuilder'''
+
+            $decision = Get-PromotionTriggerScopingDecision -Command $command
+
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'the words occur, but never as a gh issue new or gh issue create sequence'
+        }
+
+        It 'P824-A3 allows gh --repo o/r issue list' -Tag 'Issue824' {
+            $command = 'gh --repo o/r issue list'
+
+            $decision = Get-PromotionTriggerScopingDecision -Command $command
+
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'list is not an issue-creation subcommand'
+        }
+
+        It 'P824-D<Id> denies <Label>' -Tag 'Issue824' -ForEach @(
+            @{ Id = 1; Label = 'gh issue create --title x'; Command = 'gh issue create --title x' }
+            @{ Id = 2; Label = 'gh issue new --title x'; Command = 'gh issue new --title x' }
+            @{ Id = 3; Label = 'GH  Issue  Create'; Command = 'GH  Issue  Create' }
+            @{ Id = 4; Label = 'pwsh -NoProfile -Command ''gh issue create --title x'''; Command = 'pwsh -NoProfile -Command ''gh issue create --title x''' }
+            @{ Id = 5; Label = 'pwsh -c "& gh issue new"'; Command = 'pwsh -c "& gh issue new"' }
+            @{ Id = 6; Label = 'bash -c "gh issue create"'; Command = 'bash -c "gh issue create"' }
+            @{ Id = 7; Label = 'gh api repos/o/r/issues -X POST'; Command = 'gh api repos/o/r/issues -X POST' }
+            @{ Id = 8; Label = 'bash -c "gh -R o/r issue create"'; Command = 'bash -c "gh -R o/r issue create"' }
+            @{ Id = 9; Label = 'bash -c ''x=create; gh issue $x'''; Command = 'bash -c ''x=create; gh issue $x''' }
+            @{ Id = 10; Label = 'bash -c ''c=gh; $c issue create'''; Command = 'bash -c ''c=gh; $c issue create''' }
+            @{ Id = 11; Label = 'the unbalanced segment echo unterminated'; Command = 'echo "unterminated' }
+        ) {
+            # Arrange: $Command comes from the -ForEach row.
+
+            # Act
+            $decision = Get-PromotionTriggerScopingDecision -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'a genuine or unresolvable gh issue creation must stay gated'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -Be (Get-PromotionMcpOnlyGhIssueBlockedReason)
         }
     }
 }

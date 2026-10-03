@@ -105,4 +105,31 @@ Describe 'enforce-epic-worktree-removal-gate trigger scoping (issue #545)' {
                 Should -Be 'allow' -Because 'list is not the remove subcommand'
         }
     }
+
+    Context 'issue #824 - wrapper-led removal classification' {
+        BeforeEach {
+            # Both seams are absent, so any classified command denies.
+            Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith { $null }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
+        }
+
+        It 'A824-WT1 allows a wrapped git worktree list whose filter text carries removed' -Tag 'Issue824' {
+            $command = 'pwsh -NoProfile -Command ''git worktree list --porcelain | Select-String -NotMatch "removed"'''
+
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'removed is not the token remove, and list is not the remove subcommand'
+        }
+
+        It 'A824-WT2 still denies git worktree remove carried inside a bash -c argument' -Tag 'Issue824' {
+            $command = 'bash -c "git worktree remove ../x"'
+
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -Match '^EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+    }
 }

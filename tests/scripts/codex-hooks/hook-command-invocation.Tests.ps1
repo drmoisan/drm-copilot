@@ -23,6 +23,12 @@ Describe 'hook-command-invocation, Codex copy (issue #545 D2 Piece 3 and D12)' {
     BeforeAll {
         $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks").Path
         . (Join-Path $script:HookRoot 'hook-command-invocation.ps1')
+
+        # The issue #824 reproduction: a wrapper-led segment whose raw text carries gh
+        # (inside "through"), issue, and new (inside "New-Object") as substrings only.
+        $script:Issue824Reproduction = @'
+pwsh -NoProfile -Command '$parts = New-Object System.Collections.Generic.List[string]; foreach ($t in @("a phrase that runs through the text", "The call is guarded (issue #1)")) { Write-Output $t }'
+'@
     }
 
     Context 'structural git classification' {
@@ -198,7 +204,7 @@ Describe 'hook-command-invocation, Codex copy (issue #545 D2 Piece 3 and D12)' {
     }
 
     Context 'fail-closed rules' {
-        It 'classifies a wrapper-led segment whose raw text carries the words in any arrangement' {
+        It 'classifies a wrapper-led segment whose raw text carries the words as a token-aware ordered sequence' {
             Test-CommandLineInvocation -CommandText "bash -c 'git add .'" -CommandWord 'git' -SubcommandPath @('add') |
                 Should -BeTrue
             Test-CommandLineInvocation -CommandText 'echo x | xargs git add' -CommandWord 'git' -SubcommandPath @('add') |
@@ -225,6 +231,17 @@ Describe 'hook-command-invocation, Codex copy (issue #545 D2 Piece 3 and D12)' {
         It 'does not classify a quoted mention in a non-wrapper segment' {
             Test-CommandLineInvocation -CommandText 'echo "run git add docs/x"' -CommandWord 'git' -SubcommandPath @('add') |
                 Should -BeFalse
+        }
+
+        It 'N824-1 negative control: raw containment matches the reproduction but Test-CommandLineInvocation does not' -Tag 'Issue824' {
+            # Arrange: the reproduction carries gh, issue, and new only as substrings.
+            $text = $script:Issue824Reproduction
+
+            # Act and Assert: loose containment still matches, the invocation predicate does not.
+            Test-CommandLineRawContainment -RawText $text -CommandWord 'gh' -SubcommandPath @('issue', 'new') |
+                Should -BeTrue -Because 'the loose containment test sees gh in through, issue, and new in New-Object'
+            Test-CommandLineInvocation -CommandText $text -CommandWord 'gh' -SubcommandPath @('issue', 'new') |
+                Should -BeFalse -Because 'no token-bounded gh issue new sequence occurs in the raw text'
         }
     }
 

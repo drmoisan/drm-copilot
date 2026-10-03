@@ -86,4 +86,30 @@ Describe 'enforce-parallel-worktree-removal-gate trigger scoping (issue #545)' {
                 Should -Be 'allow' -Because 'the echo segment mentions the phrase inside a quoted span and removes nothing'
         }
     }
+
+    Context 'issue #824 - wrapper-led removal classification' {
+        BeforeEach {
+            # The seam is absent, so any classified command denies.
+            Mock -CommandName Get-ParallelWorktreeRemovalGateCheckpointContent -MockWith { $null }
+        }
+
+        It 'A824-WT1 allows a wrapped git worktree list whose filter text carries removed' -Tag 'Issue824' {
+            $command = 'pwsh -NoProfile -Command ''git worktree list --porcelain | Select-String -NotMatch "removed"'''
+
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'removed is not the token remove, and list is not the remove subcommand'
+        }
+
+        It 'A824-WT2 still denies git worktree remove carried inside a bash -c argument' -Tag 'Issue824' {
+            $command = 'bash -c "git worktree remove ../x"'
+
+            $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)
+
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -Match '^PARALLEL_WORKTREE_REMOVAL_BLOCKED'
+        }
+    }
 }

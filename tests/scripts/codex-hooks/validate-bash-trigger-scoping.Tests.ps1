@@ -76,4 +76,12 @@ Describe 'Codex validate-bash trigger scoping (issue #545)' {
         # against the three-disjunct fix.
         Get-BlockedPatternMatch -Command 'echo "rm -rf /tmp/x' | Should -Be 'rm -rf'
     }
+
+    Context 'issue #824 - wrapper-led structural leg' {
+        It 'A824-VB1 returns no blocked pattern for pwsh -f running legit-push.ps1' -Tag 'Issue824' {
+            # git appears only inside legit and push only inside legit-push, so no forced
+            # git push is invoked although a -f token is present.
+            Get-BlockedPatternMatch -Command 'pwsh -NoProfile -f ./scripts/legit-push.ps1' | Should -BeNullOrEmpty
+        }
+    }
 }
