@@ -177,7 +177,7 @@ Each criterion below is verified by an `Issue824`-tagged test in both `enforce-p
 - [x] AC-11: `pwsh -c "& gh issue new"` is denied.
 - [x] AC-12: `bash -c "gh issue create"` is denied.
 - [x] AC-13: `gh api repos/o/r/issues -X POST` is denied.
-- [x] AC-14: Detection of real bypasses that raw containment caught before the fix is not weakened: `bash -c "gh -R o/r issue create"`, `bash -c 'x=create; gh issue $x'`, and `bash -c 'c=gh; $c issue create'` are each denied, and `gh --repo o/r issue list` is allowed.
+- [ ] AC-14: Detection of real bypasses that raw containment caught before the fix is not weakened: `bash -c "gh -R o/r issue create"`, `bash -c 'x=create; gh issue $x'`, and `bash -c 'c=gh; $c issue create'` are each denied, and `gh --repo o/r issue list` is allowed.
 
 ### Negative control
 
@@ -208,6 +208,40 @@ Each criterion below is verified by an `Issue824`-tagged test in both `enforce-p
 - [ ] AC-27: The repository's full toolchain passes on the PR head, including the Windows PoshQC job and the Linux hook-suite Pester job in `.github/workflows/_poshqc.yml`. (CI-dependent; checked off at S9.)
 - [x] AC-28: No file changed or added by this issue exceeds 500 lines, including `hook-command-invocation.ps1` and `hook-command-raw-invocation.ps1` on both surfaces and every modified test file. Verified by a line count of each changed file.
 - [x] AC-29: The public parameter signatures of `Test-CommandLineInvocation`, `Get-CommandLineOperand`, `Get-CommandLineFlagValue`, and `Test-CommandLineFlag` are unchanged. Verified by the existing signature-pin tests in `hook-command-invocation.Tests.ps1` (both surfaces) passing without edits.
+
+## Scope Extension
+
+The two addenda below were posted on issue #824 by the repository owner (`drmoisan`) and are added to this spec's acceptance criteria. Their criteria text is copied verbatim from the issue comments; only the AC identifiers are added. The defect descriptions, required changes, and maintainer decisions are in the linked comments.
+
+### Addendum 1: worktree-removal gates
+
+Source: https://github.com/drmoisan/drm-copilot/issues/824#issuecomment-5970085575 (posted 2026-10-03T14:27:16Z by `drmoisan`). Scope: `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` and `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` (and their `.codex` and bundled counterparts where they exist). Required changes: (1) a token-aware match of an actual `git [-C <dir>] worktree remove` invocation on wrapper-led and substitution segments, including the `-Command` / `-c` argument, with Unbalanced segments kept fail-closed; (2) a containment match with no extractable operand (empty target path) must not deny unconditionally; (3) both changes applied to the parallel gate.
+
+Reproduction: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "C:/repo/.claude/worktrees/agent-x"; if (Test-Path -LiteralPath "src/Old.cs") { Remove-Item -LiteralPath "src/Old.cs" -Force }; git status --porcelain -- "src/Old.cs"'`
+
+- [ ] AC-30: The reproduction command is allowed by both worktree-removal gates.
+- [ ] AC-31: These are still gated exactly as today (denied without an authorizing checkpoint, allowed with one): `git worktree remove <path>`; `git worktree remove --force <path>`; `git -C <dir> worktree remove <path>`; `pwsh -Command 'git worktree remove <path>'`; `bash -c "git worktree remove <path>"`.
+- [ ] AC-32: Pester tests cover each case. They include a negative control that fails if the substring-containment deny path is restored.
+- [ ] AC-33: The PowerShell toolchain passes.
+
+### Addendum 2: issue #823 follow-ups
+
+Source: https://github.com/drmoisan/drm-copilot/issues/824#issuecomment-5970141337 (posted 2026-10-03T14:34:03Z by `drmoisan`). Source follow-ups file: `docs/features/potential/2026-10-03-issue-823-tier-rule-adoption-follow-ups.md`. Out of scope: FU-823-4 (the extension release); no release automation is run.
+
+Maintainer decisions recorded in that comment:
+- FU-823-2: neutralize names only (keep each rule's substance and push-down status).
+- FU-823-3: generalize `msbuild TaskMaster.sln` to a solution-neutral form, including the canonical `.github/instructions/csharp-code-change.instructions.md` and `.github/instructions/csharp-unit-test.instructions.md`.
+
+Canonical policy edit authorization: the repository owner authorizes edits to the canonical `.github/instructions/` files for FU-823-3 only (comment 5970141337). No other `.github/instructions/` or `.claude/rules/` change is authorized by this addendum beyond the files the comment lists. The PR body must call out these canonical edits.
+
+- [ ] AC-34: FU-823-1: the hook resolves thresholds by the precedence above. Pester tests cover: a root `CLAUDE.md` with lower figures, no figures, and a line-only figure. The docstring matches the behavior.
+- [ ] AC-35: FU-823-2: no pushed file in the listed set names TaskMaster or No-COM. A test fails if those names reappear in pushed rule or skill files.
+- [ ] AC-36: FU-823-3: no surface hard-codes `TaskMaster.sln`. A test fails if it reappears. The bundled-payload parity tests stay green.
+- [ ] AC-37: FU-823-5: step 8 of the workflow refers to the governing thresholds, not fixed 80/90 figures.
+- [ ] AC-38: Review note A: the per-metric fallback is stated wherever the precedence wording appears.
+- [ ] AC-39: Review note B: the test asserts only on coverage-threshold context.
+- [ ] AC-40: The follow-ups file marks FU-823-1, -2, -3 and -5 as resolved by #824, and FU-823-4 as still open.
+- [ ] AC-41: The full toolchain passes (Python, TypeScript/Jest, and PowerShell format, analyze and test with coverage).
 
 ## Non-Goals / Follow-ups
 The following pre-existing gaps were identified by research and are not acceptance criteria for #824. They should be filed as follow-up items.
