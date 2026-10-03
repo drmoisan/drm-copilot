@@ -329,4 +329,69 @@ pwsh -NoProfile -Command 'Set-Location -LiteralPath "C:/repo/.claude/worktrees/a
                 Should -Match '^EPIC_WORKTREE_REMOVAL_BLOCKED'
         }
     }
+
+    Context 'issue #824 cycle 3 - multi-removal commands with a record for item-b-102 only' {
+        BeforeEach {
+            # The epic checkpoint authorizes only item-b-102. Each deny row also removes
+            # item-a-101, removes in more than one segment, or wraps more than one command.
+            # The parallel checkpoint is absent.
+            Mock -CommandName Get-EpicWorktreeGateCheckpointContent -MockWith {
+                '{"features":[{"worktree_path":"/repo/worktrees/item-b-102","merge_status":"merged"}]}'
+            }
+            Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
+        }
+
+        It 'A824-W<Id> denies <Label> when only item-b-102 is authorized' -Tag 'Issue824' -ForEach @(
+            @{ Id = 1; Label = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; git worktree remove >/dev/null /repo/worktrees/item-a-101'''; Command = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; git worktree remove >/dev/null /repo/worktrees/item-a-101''' }
+            @{ Id = 2; Label = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; echo /repo/worktrees/item-a-101 | xargs git worktree remove'''; Command = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; echo /repo/worktrees/item-a-101 | xargs git worktree remove''' }
+            @{ Id = 3; Label = 'pwsh -c ''git worktree remove /repo/worktrees/item-b-102; git worktree remove (Join-Path /repo/worktrees item-a-101)'''; Command = 'pwsh -c ''git worktree remove /repo/worktrees/item-b-102; git worktree remove (Join-Path /repo/worktrees item-a-101)''' }
+            @{ Id = 4; Label = 'bash -c ''git worktree remove /repo/worktrees/item-b-102 && git worktree remove </dev/null /repo/worktrees/item-a-101'''; Command = 'bash -c ''git worktree remove /repo/worktrees/item-b-102 && git worktree remove </dev/null /repo/worktrees/item-a-101''' }
+            @{ Id = 5; Label = 'bash -c "git worktree remove /repo/worktrees/item-b-102"; bash -c "git worktree remove /repo/worktrees/item-a-101"'; Command = 'bash -c "git worktree remove /repo/worktrees/item-b-102"; bash -c "git worktree remove /repo/worktrees/item-a-101"' }
+            @{ Id = 6; Label = 'bash -c "git worktree remove /repo/worktrees/item-b-102" && git worktree remove /repo/worktrees/item-a-101'; Command = 'bash -c "git worktree remove /repo/worktrees/item-b-102" && git worktree remove /repo/worktrees/item-a-101' }
+            @{ Id = 7; Label = 'git worktree remove /repo/worktrees/item-b-102 && git worktree remove /repo/worktrees/item-a-101'; Command = 'git worktree remove /repo/worktrees/item-b-102 && git worktree remove /repo/worktrees/item-a-101' }
+            @{ Id = 8; Label = 'git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-a-101'; Command = 'git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-a-101' }
+            @{ Id = 9; Label = 'git worktree remove /repo/worktrees/item-b-102 || git worktree remove /repo/worktrees/item-a-101'; Command = 'git worktree remove /repo/worktrees/item-b-102 || git worktree remove /repo/worktrees/item-a-101' }
+            @{ Id = 10; Label = 'two structural removals on separate lines'; Command = ('git worktree remove /repo/worktrees/item-b-102' + [string][char]10 + 'git worktree remove /repo/worktrees/item-a-101') }
+            @{ Id = 11; Label = '(git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-a-101)'; Command = '(git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-a-101)' }
+            @{ Id = 12; Label = 'git worktree remove /repo/worktrees/item-b-102; echo /repo/worktrees/item-a-101 | xargs git worktree remove'; Command = 'git worktree remove /repo/worktrees/item-b-102; echo /repo/worktrees/item-a-101 | xargs git worktree remove' }
+            @{ Id = 13; Label = 'git worktree remove /repo/worktrees/item-b-102 && bash -c "git worktree remove /repo/worktrees/item-a-101"'; Command = 'git worktree remove /repo/worktrees/item-b-102 && bash -c "git worktree remove /repo/worktrees/item-a-101"' }
+            @{ Id = 14; Label = 'a substitution removal after a structural removal'; Command = 'git worktree remove /repo/worktrees/item-b-102; echo "$(git worktree remove /repo/worktrees/item-a-101)"' }
+            @{ Id = 15; Label = 'git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-b-102'; Command = 'git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-b-102' }
+            @{ Id = 16; Label = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-a-101'''; Command = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-a-101''' }
+            @{ Id = 17; Label = 'bash <<< ''git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-a-101'''; Command = 'bash <<< ''git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-a-101''' }
+            @{ Id = 18; Label = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; for p in /repo/worktrees/item-a-101; do git worktree remove "$p"; done'''; Command = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; for p in /repo/worktrees/item-a-101; do git worktree remove "$p"; done''' }
+            @{ Id = 19; Label = 'an escaped subcommand word in a second wrapped removal'; Command = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; git worktree rem\ove /repo/worktrees/item-a-101''' }
+            @{ Id = 20; Label = 'a wrapped loop over two worktrees'; Command = 'bash -c ''for p in /repo/worktrees/item-b-102 /repo/worktrees/item-a-101; do git worktree remove "$p"; done''' }
+            @{ Id = 21; Label = 'an ANSI-C quoted payload whose escaped newline hides a second removal'; Command = 'bash -c $''git worktree remove /repo/worktrees/item-b-102 \ngit worktree remove /repo/worktrees/item-a-101''' }
+            # Id C2 keeps the A824-WC2 name: removing item-b-102 twice in one wrapped payload is two commands.
+            @{ Id = 'C2'; Label = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-b-102'''; Command = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-b-102''' }
+        ) {
+            # Arrange: $Command comes from the -ForEach row. It removes item-a-101 as well as
+            # item-b-102, removes in more than one segment, or wraps more than one command.
+
+            # Act
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $Command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'a record authorizes a command only when one segment removes, its wrapped payload is one command, and that command names the authorized literal operand'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -Match '^EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'A824-WC<Id> allows <Label> when only item-b-102 is authorized' -Tag 'Issue824' -ForEach @(
+            @{ Id = 1; Label = 'bash -c "git worktree remove /repo/worktrees/item-b-102"'; Command = 'bash -c "git worktree remove /repo/worktrees/item-b-102"' }
+            @{ Id = 3; Label = 'git worktree remove /repo/worktrees/item-b-102'; Command = 'git worktree remove /repo/worktrees/item-b-102' }
+            @{ Id = 4; Label = 'cd /repo/main && git worktree remove /repo/worktrees/item-b-102'; Command = 'cd /repo/main && git worktree remove /repo/worktrees/item-b-102' }
+        ) {
+            # Arrange: $Command comes from the -ForEach row. One segment removes item-b-102.
+
+            # Act
+            $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $Command)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'allow' -Because 'one segment removes item-b-102, which the checkpoint authorizes'
+        }
+    }
 }

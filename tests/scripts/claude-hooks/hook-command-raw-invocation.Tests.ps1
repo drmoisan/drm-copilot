@@ -188,4 +188,54 @@ Describe 'hook-command-raw-invocation (issue #824)' {
             $result | Should -BeFalse -Because "'$RawText' lacks at least one of $CommandWord $($SubcommandPath -join ' ') as a whole token"
         }
     }
+
+    Context 'issue #824 cycle 3 - every removal in the raw text must yield the same literal operand' {
+        It 'R824-O<Id> reads <Label>' -Tag 'Issue824' -ForEach @(
+            @{ Id = 12; Label = 'a second removal whose operand follows an output redirection'; RawText = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; git worktree remove >/dev/null /repo/worktrees/item-a-101'''; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 13; Label = 'a second removal whose operand xargs supplies'; RawText = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; echo /repo/worktrees/item-a-101 | xargs git worktree remove'''; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 14; Label = 'a second removal whose operand a subexpression supplies'; RawText = 'pwsh -c ''git worktree remove /repo/worktrees/item-b-102; git worktree remove (Join-Path /repo/worktrees item-a-101)'''; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 15; Label = 'a second removal whose operand follows an input redirection'; RawText = 'bash -c ''git worktree remove /repo/worktrees/item-b-102 && git worktree remove </dev/null /repo/worktrees/item-a-101'''; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 16; Label = 'the same literal operand named twice'; RawText = 'git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-b-102'; Status = 'Operand'; Operand = '/repo/worktrees/item-b-102' }
+            @{ Id = 17; Label = 'an unreadable operand before a literal operand'; RawText = 'bash -c ''git worktree remove >/dev/null /repo/worktrees/item-a-101; git worktree remove /repo/worktrees/item-b-102'''; Status = 'Indeterminate'; Operand = $null }
+        ) {
+            # Arrange: the row supplies RawText and the expected Status and Operand.
+
+            # Act
+            $result = Get-CommandLineRawInvocationOperand -RawText $RawText -CommandWord 'git' -SubcommandPath @('worktree', 'remove')
+
+            # Assert
+            $result.Status | Should -Be $Status -Because "'$RawText' must resolve to $Status, because an operand is reported only when every removal names the same literal operand"
+            $result.Operand | Should -Be $Operand -Because "'$RawText' must report the operand only when it is literal and the same for every removal"
+        }
+    }
+
+    Context 'issue #824 cycle 3 - wrapped removal operand resolution reads every segment' {
+        BeforeAll {
+            . (Join-Path $script:HookRoot 'hook-command-invocation.ps1')
+        }
+
+        It 'R824-W<Id> resolves <Label>' -Tag 'Issue824' -ForEach @(
+            @{ Id = 6; Label = 'two wrapped segments'; CommandText = 'bash -c "git worktree remove /repo/worktrees/item-b-102"; bash -c "git worktree remove /repo/worktrees/item-a-101"'; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 7; Label = 'a wrapped segment followed by a structural removal'; CommandText = 'bash -c "git worktree remove /repo/worktrees/item-b-102" && git worktree remove /repo/worktrees/item-a-101'; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 8; Label = 'two structural removals'; CommandText = 'git worktree remove /repo/worktrees/item-b-102 && git worktree remove /repo/worktrees/item-a-101'; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 9; Label = 'the same structural removal twice'; CommandText = 'git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-b-102'; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 10; Label = 'a wrapped removal after a segment that removes nothing'; CommandText = 'cd /repo && bash -c "git worktree remove /repo/worktrees/item-b-102"'; Status = 'Operand'; Operand = '/repo/worktrees/item-b-102' }
+            @{ Id = 11; Label = 'a wrapped payload that removes the same worktree twice'; CommandText = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; git worktree remove /repo/worktrees/item-b-102'''; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 12; Label = 'an escaped subcommand word in a second wrapped removal'; CommandText = 'bash -c ''git worktree remove /repo/worktrees/item-b-102; git worktree rem\ove /repo/worktrees/item-a-101'''; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 13; Label = 'a wrapped loop over two worktrees'; CommandText = 'bash -c ''for p in /repo/worktrees/item-b-102 /repo/worktrees/item-a-101; do git worktree remove "$p"; done'''; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 14; Label = 'a heredoc whose body holds two commands'; CommandText = ('bash <<''EOF''' + [string][char]10 + 'git worktree remove /repo/worktrees/item-b-102' + [string][char]10 + 'git worktree rem\ove /repo/worktrees/item-a-101' + [string][char]10 + 'EOF'); Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 15; Label = 'a substitution that removes one worktree'; CommandText = 'echo "$(git worktree remove /repo/worktrees/item-b-102)"'; Status = 'Indeterminate'; Operand = $null }
+            @{ Id = 16; Label = 'a here-string that removes one worktree'; CommandText = 'bash <<< ''git worktree remove /repo/worktrees/item-b-102'''; Status = 'Operand'; Operand = '/repo/worktrees/item-b-102' }
+            @{ Id = 17; Label = 'an ANSI-C quoted payload whose escaped newline hides a second removal'; CommandText = 'bash -c $''git worktree remove /repo/worktrees/item-b-102 \ngit worktree remove /repo/worktrees/item-a-101'''; Status = 'Indeterminate'; Operand = $null }
+        ) {
+            # Arrange: the row supplies CommandText and the expected Status and Operand.
+
+            # Act
+            $result = Resolve-CommandLineWrappedInvocationOperand -CommandText $CommandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove')
+
+            # Assert
+            $result.Status | Should -Be $Status -Because "'$CommandText' must resolve to $Status, because a removal in a second segment or a second wrapped command is never authorized on the first"
+            $result.Operand | Should -Be $Operand -Because "'$CommandText' must report a raw operand only when exactly one segment classifies and its wrapped payload is one command"
+        }
+    }
 }
