@@ -2,38 +2,31 @@
 .SYNOPSIS
     Token-aware raw-text invocation matcher for wrapper-led and live-substitution segments.
 .DESCRIPTION
-    Realizes the corrected R2 fail-closed rule of issue #824 and its remediation cycle 1
-    corrections. A wrapper-led or live-substitution segment carries its nested command line
-    inside its raw text, often inside a quoted -Command or -c argument, so the structural
-    token walk cannot see it. This module answers whether that raw text contains the
-    command word followed by every subcommand element as a token-bounded, ordered sequence,
-    rather than merely containing each word somewhere as a substring.
+    Realizes the R2 fail-closed rule of issue #824 as revised by remediation cycle 2. A
+    wrapper-led or live-substitution segment carries its nested command line inside its
+    raw text, often inside a quoted -Command or -c argument, so the structural token walk
+    cannot see it. Test-CommandLineRawInvocation classifies such a segment when the
+    command word and every subcommand element each occur in the raw text as whole tokens,
+    in any order, rather than merely as substrings of longer words.
 
-    Matching rules, applied case-insensitively and culture-invariantly:
-      - A command or subcommand position is bounded on both sides: no word character or
-        hyphen may touch it, so 'gh' inside 'through' and 'new' inside 'New-Object' do not
-        match.
-      - The command word may carry a '.exe' suffix and may be followed by a closing quote,
-        optionally backslash-escaped, so quoted and path-qualified spellings still match.
-      - Positions are separated by whitespace or by a backslash-newline continuation.
-      - Before each subcommand element, a run of dash-leading options is skipped, each with
-        an optional quoted or unquoted value, so 'gh -R o/r issue create' still matches.
-      - Sequence form: a shell expansion ('$name', '${...}', '$(...)', or a backtick span)
-        may stand in for any position, because its run-time value is unknown. A match
-        counts only when at least one position matched its literal, and, when the command
-        position is an expansion, only when the command word also occurs token-bounded
-        somewhere in the raw text.
-      - Absorption form: the literal command word, the first k subcommand elements as
-        literals, then one absorbing token (an expansion, '@name', or '@(...)') that may
-        carry the remaining elements. A match counts only when every remaining element
-        occurs token-bounded somewhere in the raw text, so 'gh $cmd' classifies when the
-        script that assigns $cmd names 'issue' and 'create'.
+    Whole-token rule, applied case-insensitively and culture-invariantly: no word
+    character or hyphen may touch the word on either side, so 'gh' inside 'through' and
+    'new' inside 'New-Object' do not match, while '/usr/bin/gh', 'gh.exe', and a quoted or
+    backslash-escaped 'gh' do. Order, adjacency, and the number of occurrences are not
+    checked, so positional parameters ('gh "$@"'), xargs-led invocations, variables,
+    splats, and arrays that carry the subcommand words still classify.
 
-    Get-CommandLineRawInvocationOperand reads the operand of such an invocation, and
-    Resolve-CommandLineWrappedInvocationOperand applies it to the segment a wrapped removal
-    classified on. The latter calls Resolve-CommandLineInvocation, which is defined in
-    hook-command-invocation.ps1; that module dot-sources this file, so the function resolves
-    at call time (a runtime dependency, not a load-time one).
+    Operand extraction is separate from classification. Get-CommandLineRawInvocationMatch
+    finds the invocation as a sequence (the command word followed by the subcommand
+    elements, with options skipped and shell expansions standing in for positions) or as
+    an absorption (a token after the command word that may carry the remaining elements).
+    Get-CommandLineRawInvocationOperand reads the operand that follows a fully literal
+    sequence, and Resolve-CommandLineWrappedInvocationOperand applies it to the segment a
+    wrapped invocation classified on. The worktree-removal gates deny a classified segment
+    from which exactly one literal operand is not read. Resolve-CommandLineWrappedInvocationOperand
+    calls Resolve-CommandLineInvocation, which is defined in hook-command-invocation.ps1;
+    that module dot-sources this file, so the function resolves at call time (a runtime
+    dependency, not a load-time one).
 
     Pure string logic only: no disk, process, network, clock, or environment access. It is
     dot-sourced by hook-command-invocation.ps1 as:
@@ -95,10 +88,13 @@ function Get-CommandLineRawInvocationPattern {
 function Test-CommandLineRawWordPresent {
     <#
     .SYNOPSIS
-        Report whether a word occurs token-bounded somewhere in a raw text.
+        Report whether a word occurs as a whole token somewhere in a raw text.
     .DESCRIPTION
-        Token-bounded means that no word character or hyphen touches the word on either
-        side; the word may carry a '.exe' suffix. Compared case-insensitively.
+        A whole token is bounded on both sides: no word character or hyphen touches it, as
+        matched by (?<![\w-])word(?![\w-]) with the word regex-escaped. A '.exe' suffix, a
+        path prefix, and a surrounding or backslash-escaped quote need no special case,
+        because '.', '/', '\', and the quote characters are not word characters. Compared
+        case-insensitively and culture-invariantly.
     .OUTPUTS
         System.Boolean
     #>
@@ -109,7 +105,7 @@ function Test-CommandLineRawWordPresent {
         [Parameter(Mandatory)][string] $Word
     )
 
-    $pattern = '(?<![\w-])' + [regex]::Escape($Word) + '(?:\.exe)?(?![\w-])'
+    $pattern = '(?<![\w-])' + [regex]::Escape($Word) + '(?![\w-])'
     $options = [System.Text.RegularExpressions.RegexOptions]'IgnoreCase, CultureInvariant'
     return [regex]::IsMatch($RawText, $pattern, $options)
 }
@@ -166,18 +162,20 @@ function Get-CommandLineRawInvocationMatch {
 function Test-CommandLineRawInvocation {
     <#
     .SYNOPSIS
-        Report whether a raw text invokes a command word with a subcommand path as a
-        token-bounded, ordered sequence.
+        Report whether a raw text names a command word and every subcommand element as
+        whole tokens, in any order.
     .DESCRIPTION
         The R2 predicate of Resolve-CommandLineInvocation for a wrapper-led or
-        live-substitution segment. Returns $true when Get-CommandLineRawInvocationMatch
-        accepts at least one sequence or absorption match in RawText, and $false otherwise.
+        live-substitution segment. Returns $true when Test-CommandLineRawWordPresent finds
+        the command word and each subcommand element in RawText, and $false as soon as one
+        of them is absent. Order, adjacency, and the number of occurrences are not checked,
+        and the sequence grammar used for operand extraction plays no part.
     .PARAMETER RawText
         The segment's raw text, including the contents of any quoted -Command or -c argument.
     .PARAMETER CommandWord
         The command name, e.g. 'git' or 'gh'. Compared case-insensitively.
     .PARAMETER SubcommandPath
-        One or more ordered subcommand tokens. Compared case-insensitively.
+        One or more subcommand tokens. Compared case-insensitively; their order is not checked.
     .OUTPUTS
         System.Boolean
     #>
@@ -189,8 +187,12 @@ function Test-CommandLineRawInvocation {
         [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]] $SubcommandPath
     )
 
-    $found = @(Get-CommandLineRawInvocationMatch -RawText $RawText -CommandWord $CommandWord -SubcommandPath $SubcommandPath)
-    return $found.Count -gt 0
+    foreach ($word in @($CommandWord) + @($SubcommandPath)) {
+        if (-not (Test-CommandLineRawWordPresent -RawText $RawText -Word $word)) {
+            return $false
+        }
+    }
+    return $true
 }
 
 function Get-CommandLineRawInvocationOperand {

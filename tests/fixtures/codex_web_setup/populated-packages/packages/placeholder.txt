@@ -1,0 +1,1 @@
+Fixture: a non-empty packages/ directory for tests/shell/test_codex_web_setup_codex_copy.bats (issue #824).

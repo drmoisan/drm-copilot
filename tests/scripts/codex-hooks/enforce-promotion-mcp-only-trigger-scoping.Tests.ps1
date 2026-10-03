@@ -275,4 +275,25 @@ pwsh -NoProfile -Command '$parts = New-Object System.Collections.Generic.List[st
                 Should -Be 'allow' -Because 'an expansion in the command position needs a token-bounded gh elsewhere in the raw text'
         }
     }
+
+    Context 'issue #824 cycle 2 - review pass 2 bypass forms' {
+        It 'P824-D<Id> denies <Label>' -Tag 'Issue824' -ForEach @(
+            @{ Id = 16; Label = 'bash -c ''gh "$@"'' _ issue create'; Command = 'bash -c ''gh "$@"'' _ issue create' }
+            @{ Id = 17; Label = 'bash -c ''gh $*'' _ issue create'; Command = 'bash -c ''gh $*'' _ issue create' }
+            @{ Id = 18; Label = 'bash -c ''echo issue create | xargs gh'''; Command = 'bash -c ''echo issue create | xargs gh''' }
+            @{ Id = 19; Label = 'bash -c ''gh $1 $2'' _ issue create'; Command = 'bash -c ''gh $1 $2'' _ issue create' }
+        ) {
+            # Arrange: $Command comes from the -ForEach row. Each form names gh, issue, and
+            # create as whole tokens, so the whole-token R2 rule classifies it.
+
+            # Act
+            $decision = Get-CodexPromotionTriggerScopingDecision -Command $Command
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision |
+                Should -Be 'deny' -Because 'a wrapped gh whose subcommand words arrive as positional parameters or through xargs must stay gated'
+            $decision.hookSpecificOutput.permissionDecisionReason |
+                Should -Be (Get-PromotionMcpOnlyGhIssueBlockedReason)
+        }
+    }
 }

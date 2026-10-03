@@ -1,19 +1,38 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Print the repository root. Codex Web copies this script to /tmp before running it, so
+# the script-relative root can resolve to / rather than the actual checkout. The checkout
+# is recognized by a solution file at its root; the solution name is not assumed. When the
+# script-relative root lists no solution file, fall back to the working directory, which
+# Codex sets to the repo root.
+# Args: $1 = script-relative root; $2 = solution file names at that root, one per line.
+resolve_repo_root() {
+  if [ -n "$2" ]; then
+    printf '%s\n' "$1"
+  else
+    pwd
+  fi
+}
+
+# Print the first solution file name in LC_ALL=C order, or nothing when none is listed.
+# Args: $1 = solution file names, one per line.
+select_solution_file() {
+  if [ -n "$1" ]; then
+    printf '%s\n' "$1" | LC_ALL=C sort | sed -n '1p'
+  fi
+}
+
+# Print the names of the solution files at the root of a directory, one per line.
+# Args: $1 = directory.
+list_root_solution_files() {
+  find "$1" -maxdepth 1 -type f -name '*.sln' -printf '%f\n' 2>/dev/null
+}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-
-# Codex Web copies this script to /tmp before running it, so the script-relative
-# REPO_ROOT resolves to / rather than the actual checkout.  Fall back to the
-# working directory, which Codex sets to the repo root.  The checkout is recognized
-# by a solution file at its root; the solution name is not assumed.
-if ! compgen -G "${REPO_ROOT}/*.sln" >/dev/null; then
-  REPO_ROOT="$(pwd)"
-fi
-
-# The first solution file at the repository root, by name, or empty when none exists.
-SOLUTION_FILE="$(find "${REPO_ROOT}" -maxdepth 1 -type f -name '*.sln' -printf '%f\n' 2>/dev/null | LC_ALL=C sort | sed -n '1p')"
+SCRIPT_RELATIVE_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_ROOT="$(resolve_repo_root "${SCRIPT_RELATIVE_ROOT}" "$(list_root_solution_files "${SCRIPT_RELATIVE_ROOT}")")"
+SOLUTION_FILE="$(select_solution_file "$(list_root_solution_files "${REPO_ROOT}")")"
 
 log() {
   printf '[codex-web-setup] %s\n' "$*"
@@ -294,17 +313,9 @@ verify_windows_visual_studio_task_capability() {
   [ -n "${SOLUTION_FILE}" ] || fail "No solution file was found at ${REPO_ROOT}; MSBuild task verification needs one."
   pwsh -NoProfile -ExecutionPolicy Bypass -File "${REPO_ROOT}/scripts/vscode/Invoke-VSBuild.ps1" -SolutionPath "${SOLUTION_FILE}" -Configuration Debug -Platform 'Any CPU' -NoExecute >/dev/null || fail "MSBuild tooling required by the restore/build/lint/type-check tasks is unavailable."
 
-  pwsh -NoProfile -ExecutionPolicy Bypass -Command "& {
-    \$vswherePath = Join-Path \${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
-    if (-not (Test-Path \$vswherePath)) {
-      throw 'vswhere.exe was not found. Install Visual Studio 2022 (or Build Tools) with Test Platform components.'
-    }
-
-    \$vstestPath = & \$vswherePath -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-    if (-not \$vstestPath) {
-      throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.'
-    }
-  }" >/dev/null || fail "Visual Studio test tooling required by the MSTest tasks is unavailable."
+  local vswhere_check="\$vswherePath = Join-Path \${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'; if (-not (Test-Path \$vswherePath)) { throw 'vswhere.exe was not found. Install Visual Studio 2022 (or Build Tools) with Test Platform components.' }"
+  local vstest_check="\$vstestPath = & \$vswherePath -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1; if (-not \$vstestPath) { throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.' }"
+  pwsh -NoProfile -ExecutionPolicy Bypass -Command "& { ${vswhere_check}; ${vstest_check} }" >/dev/null || fail "Visual Studio test tooling required by the MSTest tasks is unavailable."
 }
 
 verify_build_and_test_capability() {
@@ -391,4 +402,4 @@ main() {
   log "Setup complete."
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi

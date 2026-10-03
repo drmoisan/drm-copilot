@@ -1,0 +1,14 @@
+# r2 P0-T4 scratch helper scripts
+
+Timestamp: 2026-10-03T15-50
+Command: pwsh -NoProfile -File "SCRATCH/steps/r2-p0-t4.ps1" -Worktree "WORKTREE" (Get-FileHash -Algorithm SHA256 over the five helper scripts; VERDICT $hashes.Count -eq 5)
+EXIT_CODE: 0
+Output Summary: A1 to A5 written verbatim from the plan Appendix with the Write tool; five SHA256 hashes printed; VERDICT passed.
+
+| Helper | Path | SHA256 |
+|---|---|---|
+| A1 | SCRATCH/cov-derive.ps1 | 48E5BF3FABE20684C551A50AF509C0FB9A2F9BEAABA127C23ADC75C683BE4519 |
+| A2 | SCRATCH/issue824-pester.ps1 | DA76DBD7912EF77D290AF6F544992C4531C7F9B8B39A6221F64B6C6C801535BA |
+| A3 | SCRATCH/resolver-ast-check.ps1 | D170E4C050066B055F041B8826AF6E960A32A7353D845AB3DD9CE0E8CF0F639C |
+| A4 | SCRATCH/phrase-scan.ps1 | 71A87C737F25AE729A3617BC5784187CB35FA43286ECA22519991C3618A50CD4 |
+| A5 | SCRATCH/raw-predicate-ast-check.ps1 | 641266752AFB789AA0E09027B8D4DA661784345AF7998F0301285704BD39DD65 |

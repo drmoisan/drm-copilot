@@ -29,8 +29,10 @@ $script:CommandLineTransparentWrapperNames = @('command', 'env', 'nohup', 'time'
 # in neither list is UNMODELED, and an unmodeled token between the command word and the
 # subcommand classifies as a match. A classification is not always a checkpoint check: the
 # promotion hook, the pr-author gh pr create check, both worktree-removal gates, and the
-# validate-bash structural leg deny on it. Under-classification is a bypass. Pinned by test
-# through Get-CommandLineGlobalOption (rule R6).
+# validate-bash structural leg deny on it, both for this rule and for R2, which classifies a
+# wrapper-led or live-substitution segment only when the command word and every subcommand
+# element occur in its raw text as whole tokens. Under-classification is a bypass. Pinned
+# by test through Get-CommandLineGlobalOption (rule R6).
 $script:CommandLineGlobalOptions = @{
     git = [pscustomobject]@{
         WithArgument = @('-C', '-c', '--git-dir', '--work-tree', '--namespace', '--exec-path')
@@ -99,8 +101,9 @@ function Test-CommandLineRawContainment {
         Loose, ordinal case-insensitive containment of every word anywhere in the raw text,
         with no word-boundary, order, or adjacency check. It is used only by the informational
         Test-CommandLineMention predicate. No classification or deny decision is made from it;
-        wrapper-led and live-substitution segments are classified by the token-aware
-        Test-CommandLineRawInvocation (hook-command-raw-invocation.ps1).
+        wrapper-led and live-substitution segments are classified by
+        Test-CommandLineRawInvocation (hook-command-raw-invocation.ps1), which requires the
+        command word and every subcommand element to occur as whole tokens.
     .OUTPUTS
         System.Boolean
     #>
@@ -175,8 +178,8 @@ function Resolve-CommandLineInvocation {
         Implements the four mandatory fail-closed rules of D12 in order, per segment:
         an Unbalanced segment classifies because its structure could not be resolved; a
         wrapper-led or live-substitution segment classifies when Test-CommandLineRawInvocation
-        finds the command word followed by every subcommand element as a token-bounded,
-        ordered sequence in its RawText, including inside a quoted -Command or -c argument;
+        finds the command word and every subcommand element as whole tokens, in any order,
+        in its RawText, including inside a quoted -Command or -c argument;
         an unmodeled dash-leading token between the command word and the subcommand
         classifies; and a non-dash token that is not the next expected subcommand element
         terminates that segment's scan without a match, so 'git log --grep add' does not

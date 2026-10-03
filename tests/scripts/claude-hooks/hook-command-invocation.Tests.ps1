@@ -204,7 +204,7 @@ pwsh -NoProfile -Command '$parts = New-Object System.Collections.Generic.List[st
     }
 
     Context 'fail-closed rules' {
-        It 'classifies a wrapper-led segment whose raw text carries the words as a token-aware ordered sequence' {
+        It 'classifies a wrapper-led segment whose raw text carries every word as a whole token' {
             Test-CommandLineInvocation -CommandText "bash -c 'git add .'" -CommandWord 'git' -SubcommandPath @('add') |
                 Should -BeTrue
             Test-CommandLineInvocation -CommandText 'echo x | xargs git add' -CommandWord 'git' -SubcommandPath @('add') |
@@ -241,7 +241,7 @@ pwsh -NoProfile -Command '$parts = New-Object System.Collections.Generic.List[st
             Test-CommandLineRawContainment -RawText $text -CommandWord 'gh' -SubcommandPath @('issue', 'new') |
                 Should -BeTrue -Because 'the loose containment test sees gh in through, issue, and new in New-Object'
             Test-CommandLineInvocation -CommandText $text -CommandWord 'gh' -SubcommandPath @('issue', 'new') |
-                Should -BeFalse -Because 'no token-bounded gh issue new sequence occurs in the raw text'
+                Should -BeFalse -Because 'gh does not occur as a whole token in the reproduction'
         }
     }
 

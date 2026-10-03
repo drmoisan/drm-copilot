@@ -7,10 +7,10 @@
 .DESCRIPTION
     Drives .codex/hooks/hook-command-raw-invocation.ps1 directly through
     Test-CommandLineRawInvocation. The positive rows (R824-P) are spellings in which the
-    command word and every subcommand element appear as a token-bounded, ordered sequence
-    and must classify. The negative rows (R824-N) carry the same words only as substrings,
-    out of order, with a different subcommand, or only as shell expansions, and must not
-    classify.
+    command word and every subcommand element each occur as whole tokens, in any order,
+    and must classify. The negative rows (R824-N) lack at least one of the words as a
+    whole token (it occurs only inside a longer word, only through a shell expansion, or
+    not at all) and must not classify. The R824-O and R824-W rows cover operand extraction.
 
     Determinism: every case is a pure string case. No temporary file, no child process, no
     live executable, no clock, and no disk read beyond dot-sourcing the file under test.
@@ -22,7 +22,7 @@ Describe 'hook-command-raw-invocation, Codex copy (issue #824)' {
         . (Join-Path $script:HookRoot 'hook-command-raw-invocation.ps1')
     }
 
-    Context 'positive rows - a token-bounded ordered sequence classifies' {
+    Context 'positive rows - every word occurs as a whole token' {
         It 'R824-P<Id> classifies <Label>' -Tag 'Issue824' -ForEach @(
             @{ Id = 1; Label = 'adjacent words'; RawText = 'gh issue create --title x'; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
             @{ Id = 2; Label = 'extra whitespace'; RawText = 'gh   issue    create'; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
@@ -51,7 +51,7 @@ Describe 'hook-command-raw-invocation, Codex copy (issue #824)' {
             $result = Test-CommandLineRawInvocation -RawText $RawText -CommandWord $CommandWord -SubcommandPath $SubcommandPath
 
             # Assert
-            $result | Should -BeTrue -Because "'$RawText' carries $CommandWord $($SubcommandPath -join ' ') as a token-bounded ordered sequence"
+            $result | Should -BeTrue -Because "'$RawText' carries $CommandWord $($SubcommandPath -join ' ') as whole tokens"
         }
     }
 
@@ -71,7 +71,7 @@ Describe 'hook-command-raw-invocation, Codex copy (issue #824)' {
             $result = Test-CommandLineRawInvocation -RawText $RawText -CommandWord $CommandWord -SubcommandPath $SubcommandPath
 
             # Assert
-            $result | Should -BeFalse -Because "'$RawText' carries no token-bounded $CommandWord $($SubcommandPath -join ' ') sequence with a literal position"
+            $result | Should -BeFalse -Because "'$RawText' lacks $CommandWord or a subcommand word as a whole token"
         }
     }
 
@@ -154,6 +154,38 @@ Describe 'hook-command-raw-invocation, Codex copy (issue #824)' {
             # Assert
             $result.Status | Should -Be $Status -Because "'$CommandText' must resolve to $Status"
             $result.Operand | Should -Be $Operand -Because "'$CommandText' must report a raw operand only for a wrapped removal"
+        }
+    }
+
+    Context 'issue #824 cycle 2 - whole-token order-independent classification' {
+        It 'R824-P<Id> classifies <Label>' -Tag 'Issue824' -ForEach @(
+            @{ Id = 26; Label = 'every word named in another order'; RawText = 'pwsh -c ''Write-Output "create an issue with gh"'''; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+            @{ Id = 27; Label = 'a positional-parameter list after the command word'; RawText = 'bash -c ''gh "$@"'' _ issue create'; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+            @{ Id = 28; Label = 'a special-parameter expansion after the command word'; RawText = 'bash -c ''gh $*'' _ issue create'; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+            @{ Id = 29; Label = 'an xargs-led command word'; RawText = 'bash -c ''echo issue create | xargs gh'''; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+            @{ Id = 30; Label = 'numbered positional parameters'; RawText = 'bash -c ''gh $1 $2'' _ issue create'; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+        ) {
+            # Arrange: the row supplies RawText, CommandWord, and SubcommandPath. Row 26 pins the
+            # accepted false-positive trade recorded in the spec's Risks and Mitigations section.
+
+            # Act
+            $result = Test-CommandLineRawInvocation -RawText $RawText -CommandWord $CommandWord -SubcommandPath $SubcommandPath
+
+            # Assert
+            $result | Should -BeTrue -Because "'$RawText' names $CommandWord and every word of $($SubcommandPath -join ' ') as a whole token, in some order"
+        }
+
+        It 'R824-N<Id> rejects <Label>' -Tag 'Issue824' -ForEach @(
+            @{ Id = 11; Label = 'a positional-parameter list whose trailing words name another subcommand'; RawText = 'bash -c ''gh "$@"'' _ pr list'; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+            @{ Id = 12; Label = 'an xargs-led command word with one subcommand word absent'; RawText = 'echo issue | xargs gh'; CommandWord = 'gh'; SubcommandPath = @('issue', 'create') }
+        ) {
+            # Arrange: the row supplies RawText, CommandWord, and SubcommandPath.
+
+            # Act
+            $result = Test-CommandLineRawInvocation -RawText $RawText -CommandWord $CommandWord -SubcommandPath $SubcommandPath
+
+            # Assert
+            $result | Should -BeFalse -Because "'$RawText' lacks at least one of $CommandWord $($SubcommandPath -join ' ') as a whole token"
         }
     }
 }

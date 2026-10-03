@@ -60,3 +60,38 @@ jobs:
           name: shell-coverage
           path: artifacts/pester/kcov/**
           if-no-files-found: error
+
+      - name: Measure .codex/codex-web-setup.sh coverage with kcov (issue 824)
+        # .codex/ is outside the shell-QC kcov include roots, so this step runs only the
+        # setup script's bats file under kcov with the include pattern restricted to it.
+        # Pull requests also record the script's zero-context diff against the base commit.
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          out_dir="artifacts/pester/kcov-codex-web-setup"
+          mkdir -p "${out_dir}"
+          kcov "--include-pattern=${GITHUB_WORKSPACE}/.codex/codex-web-setup.sh" "${out_dir}/run" "$(command -v bats)" tests/shell/test_codex_web_setup_codex_copy.bats
+          kcov --merge "${out_dir}/merged" "${out_dir}/run"
+          test -f "${out_dir}/merged/kcov-merged/cov.xml"
+          if [[ -n "${BASE_SHA}" ]]; then
+            git fetch --no-tags --depth=1 origin "${BASE_SHA}"
+            git diff --unified=0 "${BASE_SHA}" HEAD -- .codex/codex-web-setup.sh >"${out_dir}/changed-lines.diff"
+          fi
+
+      - name: Upload .codex/codex-web-setup.sh coverage artifacts (issue 824)
+        uses: actions/upload-artifact@v7
+        with:
+          name: shell-coverage-codex-web-setup
+          path: artifacts/pester/kcov-codex-web-setup/**
+          if-no-files-found: error
+
+      - name: Gate .codex/codex-web-setup.sh changed-function coverage (issue 824)
+        shell: pwsh
+        run: |
+          . ./scripts/dev-tools/KcovFunctionCoverageGate.ps1
+          $diffPath = 'artifacts/pester/kcov-codex-web-setup/changed-lines.diff'
+          if (-not (Test-Path -LiteralPath $diffPath)) { $diffPath = '' }
+          $report = Invoke-KcovFunctionCoverageGate -CoberturaPath 'artifacts/pester/kcov-codex-web-setup/merged/kcov-merged/cov.xml' -SourcePath '.codex/codex-web-setup.sh' -DiffPath $diffPath -Function @('resolve_repo_root', 'select_solution_file', 'list_root_solution_files', 'restore_packages_if_needed', 'verify_windows_visual_studio_task_capability', 'write_repo_notes') -Threshold 85
+          $report.Message
+          exit $report.ExitCode
