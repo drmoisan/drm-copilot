@@ -16,6 +16,8 @@ Three lines cite `.agents/skills/quality-tiers.md`, which does not exist:
 
 The bundled copies under `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/` carry the same lines. The correct target is `.agents/skills/quality-tiers/SKILL.md`. #734 left these lines unchanged because the operator limited the #511 scope to the `docs/ci.research.md` citation. Correct the repository copies and the bundled copies in the same commit so that the bundled-payload parity tests continue to pass.
 
+Status (2026-10-03): Resolved by #823 for the Codex sentences that #823 rewrote. `.agents/skills/general-code-change/SKILL.md` (Module Rigor Tiers section) and `.agents/skills/general-unit-test/SKILL.md` (Coverage Requirements and Test Categories sections), together with their bundled copies, now cite `.agents/skills/quality-tiers/SKILL.md`.
+
 ## FU-734-2: Deferred T1/T2 elevation candidates (decision)
 
 #734 assigned only T3 and T4. The following projects are candidates for elevation:
@@ -32,6 +34,8 @@ Elevation adds property-test density and mutation-score obligations under the `.
 ## FU-734-4: The pushed-down rule's CI-enforcement statement in consumer workspaces (candidate)
 
 The pushed-down copy of `.claude/rules/quality-tiers.md` tells consumer workspaces that adding an unclassified project fails CI. Those workspaces receive neither `quality-tiers.yml` nor `scripts/dev_tools/check_quality_tiers.py`, so the statement does not hold there. #734 left this wording unchanged because of its citation-only constraint.
+
+Status (2026-10-03): Superseded by #823 (`docs/features/active/2026-10-03-pushed-tier-rule-not-gated-on-adoption-823/spec.md`), which gates the pushed tier rule on the presence of `quality-tiers.yml` and defines coverage-threshold precedence. Do not promote this entry.
 
 ---
 
