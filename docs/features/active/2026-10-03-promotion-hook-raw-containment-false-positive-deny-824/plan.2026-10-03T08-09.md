@@ -3,42 +3,553 @@
 - **Issue:** #824
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-03T08-09
+- **Last Updated:** 2026-10-03 (revision 2: child exit-code propagation for A2 runs, TREE-DIGEST bracket around every MCP route step, call-site count protection in D1, Phase 7 timestamp binding, S3/S4 insertion point re-derived, quote-doubling rule for P1 tokens, own S3 run for P4-T7, BASE_SHA versus citation-snapshot wording, backtick-free command spans in P2-T3 and P4-T7)
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 1.0
+- **Work Mode:** full-bug
+- **Branch:** `bug/promotion-hook-raw-containment-false-positive-deny-824`
+- **Language in scope:** PowerShell (hooks and Pester suites). JSON pack manifests are edited. Python and TypeScript test suites are run for contract and parity verification only; no Python or TypeScript file is edited.
+- **Requirements source (sole AC source):** `docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/spec.md`, section `## Acceptance Criteria` (AC-1 through AC-29).
+- **Design input (not a requirements source):** `docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/research/research.2026-10-03T08-30.md` (Option A). Every citation this plan takes from it was re-derived against the current tree at planning time.
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+**Mode note (full-bug):** `spec.md` is required and is the only acceptance-criteria source. `user-story.md` is not required. Execution fails closed if `spec.md` is missing, if its `## Acceptance Criteria` section is missing, if a required Phase 0 artifact is missing or incomplete, or if checklist state contradicts evidence on disk.
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+**Fail-closed evidence rule:** PowerShell policy (`.claude/rules/powershell.md`, `.claude/rules/quality-tiers.md`) requires line coverage >= 85% on every changed or new production file and no uncovered changed line. Pester measures no branch coverage, so no branch gate applies. Baseline (P0-T14) and final-QC (P6-T4) coverage tasks record numeric values. No production Python or TypeScript file changes, so the Python and TypeScript new-code coverage values are the literal `N/A - no production file of this language changes`, which does not trigger this clause. If any required baseline artifact, final-QC artifact, or PowerShell coverage value is missing, the audit verdict is BLOCKED or INCOMPLETE, never PASS.
 
+**Evidence accounting rule:** Every evidence-producing task names its artifact path. A task is not checked off until its artifact exists and carries every required field. Every command-step artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. An artifact whose expected exit code is not 0 also carries `ExpectedExitCode:`. The top-level `EXIT_CODE:` of a multi-command artifact is the exit code of the task's last command, determined as stated in the STEP-SCRIPT term, except in P6-T1, P6-T2, and P6-T3, where it is the direct run's exit code; every other command's exit code and printed value are recorded inside `Output Summary:`. No planned command task may record `EXIT_CODE: SKIPPED`; the only authorized skip branch in this plan is the MCP route step defined in "Execution constraints".
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+## Terms used in every task
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+- FEATURE means `docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824`. Evidence is written only under FEATURE/evidence/baseline/, FEATURE/evidence/regression-testing/, FEATURE/evidence/qa-gates/, and FEATURE/evidence/other/. No `artifacts/` path is an evidence location; `artifacts/pester/` is used only as the Pester tool output location that the repository settings already define. The caller supplied no non-canonical evidence path, so no override was recorded.
+- TS means the execution time of the task in yyyy-MM-ddTHH-mm form, read from the host clock. It is the value of the `TS=` line that the A0 preamble prints (`Get-Date -Format yyyy-MM-ddTHH-mm`) when the task's step script runs. Where a task has more than one step script, TS is the value printed by its first one. Two places state their time source explicitly: P0-T2 (its `Timestamp:` value comes from a step script containing only A0) and Phase 7 (the P7-T1 value, shared by P7-T2 to P7-T30).
+- SCRATCH means the executor's session scratchpad directory. It is a temporary directory under the host user's temp folder, outside the repository and outside both checkouts, so nothing written there is tracked or committed. Step scripts are written under SCRATCH/steps/. Artifacts record it as the literal token SCRATCH, never as a host path. Inside commands the plan writes it as the variable `$Scratch`, which A0 sets.
+- WORKTREE means the worktree root the caller supplied for this branch (the checkout whose current branch is `bug/promotion-hook-raw-containment-false-positive-deny-824`). Artifacts record it as the literal token WORKTREE, never as a host path.
+- BASE_SHA means the commit recorded by P0-T3 before any edit. Every scope diff, changed-line computation, and identity comparison is anchored to it. In a step script it is written as the recorded 40-character value.
+- STEP-SCRIPT means the execution form of every command in this plan, including the commands named in Acceptance lines. For each task, the executor writes the file SCRATCH/steps/<task-id>.ps1 (for example SCRATCH/steps/p0-t1.ps1) with the Write tool, containing the A0 preamble from the Appendix followed by the task's commands verbatim, in the order listed, each on its own line, with BASE_SHA substituted. It then runs the file through its Bash tool as `pwsh -NoProfile -File "<SCRATCH>/steps/<task-id>.ps1" -Worktree "<WORKTREE>"`, with both absolute paths written with forward slashes, and records the printed output in the task's artifact. The Bash tool's working directory resets to the main checkout between calls, so A0 sets the location to WORKTREE inside the script before any command runs. A re-run task rewrites its step script.
+  - A command written `pwsh -NoProfile -Command '<script>'` starts a child pwsh process whose working directory is WORKTREE; the outer single quotes keep the step script from expanding `$` in `<script>`, and the child's exit code is read from `$LASTEXITCODE` immediately afterwards. These single-quoted forms call module functions directly (`Invoke-PoshQCFormat`, `Invoke-PoshQCAnalyze`, `Invoke-PoshQCTest`) and do not invoke a script file through `&`; no acceptance in this plan depends on a specific non-zero code from them, only on 0 versus non-zero plus a printed count read from their log.
+  - A command written ``pwsh -NoProfile -Command "& '$Scratch/issue824-pester.ps1' ...; exit `$LASTEXITCODE"`` starts A2 in a child process; the outer double quotes expand `$Scratch` in the step script, the backtick keeps `$LASTEXITCODE` literal so the child exits with A2's exit code (without it a non-zero script exit is reported as 1), and every inner literal is single-quoted. Every A2 command in this plan ends with ``; exit `$LASTEXITCODE`` immediately before its closing double quote. Commands that contain a backtick are delimited in this plan by double backticks; the command text is the content between them, without the single padding space on each side.
+  - A command written `& "$Scratch/<helper>.ps1" <args>; $LASTEXITCODE` runs A1, A3, or A4 in the step-script process; the helper's `exit` returns control to the step script and sets `$LASTEXITCODE`.
+  - EXIT_CODE: when a task's last command is a native command (for example `git`, `npm`, `poetry`), a child pwsh process, or a helper, its exit code is the `$LASTEXITCODE` value printed after it; where the plan does not already write `; $LASTEXITCODE` after that last command, the executor appends it to that line of the step script. When the last command is a cmdlet expression, it is the step-script process exit code the Bash tool reports (0 when the script completes, 1 when a terminating error stops it).
+  - Tasks that use the Write or Edit tool, or an MCP tool, perform that tool call directly and run their verification commands as a step script.
+- POSHQC-IMPORT means `Import-Module ./scripts/powershell/PoshQC/PoshQC.psm1 -Force`, the same module path `.github/workflows/_poshqc.yml` imports (lines 19, 25, 35, 41).
+- A0 means the step-script preamble defined verbatim in the Appendix. A1, A2, A3, A4 mean the helper scripts defined verbatim in the Appendix, saved by P0-T4 as SCRATCH/cov-derive.ps1, SCRATCH/issue824-pester.ps1, SCRATCH/resolver-ast-check.ps1, and SCRATCH/phrase-scan.ps1.
+- Suites S1 to S14 (existing suites this plan extends; planning-time line counts in brackets):
+  - S1 `tests/scripts/claude-hooks/enforce-promotion-mcp-only.TriggerScoping.Tests.ps1` [197]
+  - S2 `tests/scripts/codex-hooks/enforce-promotion-mcp-only-trigger-scoping.Tests.ps1` [183]
+  - S3 `tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1` [330]
+  - S4 `tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1` [267]
+  - S5 `tests/scripts/claude-hooks/enforce-pr-author-skill.TriggerScoping.Tests.ps1` [336]
+  - S6 `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1` [108]
+  - S7 `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1` [89]
+  - S8 `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1` [110]
+  - S9 `tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1` [147]
+  - S10 `tests/scripts/codex-hooks/validate-bash-trigger-scoping.Tests.ps1` [79]
+  - S11 `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1` [338]
+  - S12 `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1` [352]
+  - S13 `tests/scripts/claude-hooks/enforce-epic-merge-gate.TriggerScoping.Tests.ps1` [175]
+  - S14 `tests/scripts/codex-hooks/enforce-epic-merge-gate-trigger-scoping.Tests.ps1` [106]
+- U1 means `tests/scripts/claude-hooks/hook-command-raw-invocation.Tests.ps1` and U2 means `tests/scripts/codex-hooks/hook-command-raw-invocation.Tests.ps1` (both new).
+- LEGACY means `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` [497].
+- CLAUDE-INV and CODEX-INV mean `.claude/hooks/hook-command-invocation.ps1` and `.codex/hooks/hook-command-invocation.ps1` [483 each]. CLAUDE-RAW and CODEX-RAW mean `.claude/hooks/hook-command-raw-invocation.ps1` and `.codex/hooks/hook-command-raw-invocation.ps1` (both new).
+- MIRROR-PAIRS means these four canonical-to-bundle pairs:
+  - CLAUDE-INV and `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-invocation.ps1`
+  - CLAUDE-RAW and `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-raw-invocation.ps1`
+  - CODEX-INV and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-invocation.ps1`
+  - CODEX-RAW and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-raw-invocation.ps1`
+- PARITY-PYTEST means `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py tests/scripts/dev_tools/test_codex_core_manifest_closure.py -q; $LASTEXITCODE`, run as a step script line after A0 has removed `VIRTUAL_ENV` and set the location to WORKTREE. The first four files are the AC-24 set; `test_codex_core_manifest_closure.py` is added because it computes the dot-source closure of every registered Codex hook (`test_core_manifest_contains_registered_hook_closure_and_resolver_paths`, line 277) and requires every closure member in the Codex `core.json`, which the new dot-sourced module joins.
+- ISSUE-510-BRANCH means: PARITY-PYTEST passes when it exits 0. It also passes, and only in this case, when it exits 1 with exactly one failed test, `test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`, whose failure message names a path under `.claude/state/` (open issue #510: the test enumerates the filesystem, and the batch-budget and session-id hooks write gitignored files under `.claude/state/`). In that case the same task must also show, by `Get-FileHash`, that every canonical `.claude/hooks` file this plan changes or adds is identical to its bundle copy, which is the property that test exists to enforce. Any other failure fails the task.
+- TREE-DIGEST means this one step-script line (BASE_SHA substituted), which prints one `TREE-DIGEST=` line covering every tracked change against BASE_SHA and the content hash of every untracked, non-ignored file, outside the feature folder and the tracked agent-memory tree: `$d = git diff BASE_SHA --binary -- . ':(exclude)docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824' ':(exclude).claude/agent-memory' | Out-String; $u = git ls-files --others --exclude-standard -- . ':(exclude)docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824' ':(exclude).claude/agent-memory' | ForEach-Object { "$((Get-FileHash -LiteralPath $_).Hash) $_" } | Out-String; "TREE-DIGEST=$([BitConverter]::ToString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($d + $u))))"`. The agent-memory exclusion matches the P6-T10 filter, because agents write that tracked tree during a run. Two equal `TREE-DIGEST=` values taken around an MCP route step show that the MCP call changed no file in scope.
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#824-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+## Execution constraints
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+- Command route. Every command runs through the executor's Bash tool in STEP-SCRIPT form (`pwsh -NoProfile -File <step script> -Worktree <WORKTREE>`), which is the ordinary way to run multi-line PowerShell. The executor's tool allowlist is Read, Grep, Glob, Edit, Write, `Bash(poetry run black/ruff/pyright/pytest *)`, `Bash(npx prettier/eslint/tsc/jest *)`, `Bash(pwsh *)`, `Bash(git *)`, and the four `mcp__drm-copilot__run_poshqc_*` tools (`.claude/agents/atomic-executor.md` lines 5-24); it has no PowerShell tool. Because the Bash tool's working directory resets to the main checkout between calls, a bare `poetry run`, `npx`, or `git` Bash command would act on the main checkout, so every `git`, `poetry run`, and `npm` command in this plan is a line inside a step script, after A0 has set the location to WORKTREE. Hooks in this session run the main checkout's hook scripts, which do not contain this fix, so a denial is possible. Halt rule: if any hook denies any command or write (for example `PROMOTION_MCP_ONLY_BLOCKED`, `PREIMPLEMENTATION_GATE_BLOCKED`, `POWERSHELL_LARGE_PATH_REQUIRED`), stop, record the denial text in the current task's artifact, and report to the caller. Do not reword, re-route, split, or re-quote a command to avoid a hook, and do not bypass a hook.
+- Prepared environments. The orchestrator prepared both environments before this plan: WORKTREE's `.venv` (poetry install, exit 0) and `extensions/drm-copilot/node_modules` (npm ci, exit 0). The executor does not install dependencies; P0-T9 and P0-T10 verify presence and stop the plan when either is missing. The session environment variable `VIRTUAL_ENV` points at the main checkout's virtual environment, which makes `poetry run` from WORKTREE resolve the wrong environment; A0 removes `Env:VIRTUAL_ENV` from every step-script process before any command runs, and P0-T9 verifies that `poetry env info --path` then resolves to WORKTREE's `.venv`.
+- Production-file writes. Only CLAUDE-RAW (created by P2-T1) and CLAUDE-INV (edited by P2-T3 and P2-T4) are written with the Write or Edit tool. CODEX-RAW, CODEX-INV, and the four bundle copies are produced with `Copy-Item` lines in step scripts (P2-T6, P3-T1). The only reason is that each must be byte-identical to its source: a file copy guarantees identity, and each copy is then confirmed by `Get-FileHash`. No hook entry-point file is edited; the optional comment edit to `enforce-promotion-mcp-only.ps1` lines 122-125 named in the spec is not made (D7).
+- MCP route step. `.claude/rules/powershell.md` names `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, and `mcp__drm-copilot__run_poshqc_test`. Those tools return a summary string composed before the child runs, carry no exit code or output, and read the installed extension's settings, so no count, finding, or percentage can be read from them. P6-T1, P6-T2, and P6-T3 therefore call the MCP tool as a route-compliance step, with its workspace or target-root parameter set to the worktree root, and record its call disposition (`MCP_ROUTE: CALLED` and whether the call returned or raised); the direct self-hosted command is the gating measurement. Because the MCP tools may run in write mode with the installed extension's settings, every MCP route step is bracketed by two TREE-DIGEST runs, one immediately before and one immediately after the call. In P6-T1 and P6-T2 the direct command runs first, so an MCP rewrite cannot be absorbed into the gating run; in P6-T3 the bracketed MCP call runs first and the direct run last, so the `artifacts/pester` output read by P6-T4 and P6-T11 comes from the direct run. These tasks therefore use two step scripts, SCRATCH/steps/p6-tN.ps1 (before the MCP call) and SCRATCH/steps/p6-tN-after.ps1 (after it), and the artifact's top-level `EXIT_CODE:` is the direct run's exit code. Unequal `TREE-DIGEST=` values mean the MCP route step rewrote files: record the changed paths (`git status --porcelain`) and stop for a caller decision, without restarting the loop. Authorized skip branch: if the MCP tool is not present in the executor's tool list, or it exposes no parameter that targets the worktree (a call would act on a different checkout), do not call it and record `MCP_ROUTE: UNAVAILABLE` with the reason; the direct command and both TREE-DIGEST runs in the same task remain mandatory. `mcp__drm-copilot__run_poshqc_analyze_autofix` is not used by this plan.
+- Long runs. P0-T13, P4-T2, and P6-T3 can exceed ten minutes. Run each step script with the Bash tool's background mode (or with the longest available timeout) and wait for the completion notification. A run stopped by a tool timeout produces no evidence and is re-run in full.
+- No commits. The executor does not stage or commit. Scope checks therefore pair an anchored `git diff --numstat BASE_SHA` with `git status --porcelain`.
+- Test-integrity rule. Apart from the one title rename in P2-T8 (AC-16), no existing line of any test file is modified or deleted. If an existing test fails after P2-T3 and its fix would require editing an existing assertion, stop and report; do not edit it.
+- Stop conditions. When a task's stop condition is reached, write the task's artifact with the stop reason and report to the caller. Do not substitute a different design.
+- Spec deviations recorded at planning time (no spec edit is made):
+  - The spec's Boundaries section and AC-29 refer to signature pins in `hook-command-invocation.Tests.ps1` "(both surfaces)". Only S3 carries them (Context `D12 public parser contract`, lines 268-329; the `pins the ... parameter list and OutputType` tests at lines 300, 306, 312, 318, 324). S4 ends at line 267 with the `constant tables` context and has no pins. AC-29 is verified by the S3 pins (P4-T7) together with the CLAUDE-INV/CODEX-INV byte identity (P6-T8), which makes the Codex signatures identical.
+  - AC-1 names Grep as its verification. P4-T3 runs that Grep and additionally scopes the check to the body of `Resolve-CommandLineInvocation` through the PowerShell AST (A3), which a line search cannot do.
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+## Recorded design decisions
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+- D1 - New module. CLAUDE-RAW defines `Test-CommandLineRawInvocation` and may define one private helper `Get-CommandLineRawInvocationPattern`. Signature: `Test-CommandLineRawInvocation -RawText <string> -CommandWord <string> -SubcommandPath <string[]>`, returning `[bool]`, with `[CmdletBinding()]`, `[OutputType([bool])]`, `[Parameter(Mandatory)][AllowEmptyString()][string] $RawText`, `[Parameter(Mandatory)][string] $CommandWord`, and `[Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]] $SubcommandPath` (the same parameter attributes as the containment test, CLAUDE-INV lines 105-109). The module is pure string logic: it reads no file, starts no process, reads no clock or environment, and dot-sources nothing. Its header comment states it is dot-sourced by `hook-command-invocation.ps1`. It does not contain the literal `Test-CommandLineRawContainment` and does not contain the literal `-CommandWord '` (so the P5-T1 call-site count stays 34), and does not contain the phrase "only forces a checkpoint check". Size target: at most 200 lines.
+- D2 - Matcher grammar (spec Proposed Fix; research section 8), applied case-insensitively and culture-invariantly to the segment RawText, which includes the contents of a quoted `-Command` or `-c` argument:
+  - Leading boundary `(?<![\w-])` before the command position.
+  - Command position: the escaped command word followed by optional `(?:\.exe)?`, or an expansion token; then an optional closing quote `(?:\\?['"])?`.
+  - Before each subcommand element, an option run `(?:\s+-[^\s'"]*(?:\s+(?:"[^"]*"|'[^']*'|[^\s'"-][^\s'"]*))?)*`.
+  - Subcommand element: `\s+(?:\\?['"])?` followed by the escaped element or an expansion token, then `(?:\\?['"])?`.
+  - Trailing boundary `(?![\w-])` after the command word and after every element.
+  - Expansion token: `\$[A-Za-z_]\w*`, `\$\{[^}]*\}`, `\$\([^)]*\)`, or a backtick span. A match counts only when at least one position matched its literal. Implementation: evaluate the pattern inside a zero-width lookahead so every start index is tried, and accept when any match has at least one literal-position group that succeeded. At any one start index the literal-versus-expansion choice at each position is fixed by that position's first character (a literal begins with a word character or quote, an expansion begins with `$` or a backtick), so the per-start parse is unambiguous on that choice.
+- D3 - R2 switch. CLAUDE-INV gains one line after line 17: `. (Join-Path $PSScriptRoot 'hook-command-raw-invocation.ps1')`. This exact form is required because `test_codex_core_manifest_closure.py` follows the `. (Join-Path $PSScriptRoot '<name>')` form (its test at line 204). In the R2 branch (CLAUDE-INV line 203) `Test-CommandLineRawContainment -RawText $segment.RawText -CommandWord $CommandWord -SubcommandPath $SubcommandPath` becomes `Test-CommandLineRawInvocation -RawText $segment.RawText -CommandWord $CommandWord -SubcommandPath $SubcommandPath`. R1 (lines 198-200), R3 and R3a (lines 207-234), the `OperandIndex = -1` result of R2, and every public signature stay unchanged. `Test-CommandLineRawContainment` stays in CLAUDE-INV and is called only by `Test-CommandLineMention` (line 482).
+- D4 - Comment corrections (AC-22). Three regions of CLAUDE-INV are replaced with the exact text below (shown with two extra leading spaces because it is nested in this list; in the file each line keeps the indentation shown inside the block). None of the replacement text contains `Test-CommandLineRawContainment` or "only forces a checkpoint check".
+  - Region 1, planning-time lines 25-31 (the option-table comment), replaced by:
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+    ```text
+    # The modeled global-option tables of D2 Piece 3 steps 3 and the D6/D10 gh surface. An option
+    # in WithArgument consumes the following token as its value, or carries the value inline in
+    # the '--name=value' form; an option in Standalone consumes only itself. A dash-leading token
+    # in neither list is UNMODELED, and an unmodeled token between the command word and the
+    # subcommand classifies as a match. A classification is not always a checkpoint check: the
+    # promotion hook, the pr-author gh pr create check, both worktree-removal gates, and the
+    # validate-bash structural leg deny on it. Under-classification is a bypass. Pinned by test
+    # through Get-CommandLineGlobalOption (rule R6).
+    ```
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+  - Region 2, planning-time lines 97-99 (the `.DESCRIPTION` body of `Test-CommandLineRawContainment`; the `.DESCRIPTION` keyword at line 96 stays), replaced by:
+
+    ```text
+            Loose, ordinal case-insensitive containment of every word anywhere in the raw text,
+            with no word-boundary, order, or adjacency check. It is used only by the informational
+            Test-CommandLineMention predicate. No classification or deny decision is made from it;
+            wrapper-led and live-substitution segments are classified by the token-aware
+            Test-CommandLineRawInvocation (hook-command-raw-invocation.ps1).
+    ```
+
+  - Region 3, planning-time lines 171-177 (the rule paragraph of the `Resolve-CommandLineInvocation` description), replaced by:
+
+    ```text
+            Implements the four mandatory fail-closed rules of D12 in order, per segment:
+            an Unbalanced segment classifies because its structure could not be resolved; a
+            wrapper-led or live-substitution segment classifies when Test-CommandLineRawInvocation
+            finds the command word followed by every subcommand element as a token-bounded,
+            ordered sequence in its RawText, including inside a quoted -Command or -c argument;
+            an unmodeled dash-leading token between the command word and the subcommand
+            classifies; and a non-dash token that is not the next expected subcommand element
+            terminates that segment's scan without a match, so 'git log --grep add' does not
+            classify. A classification is a hard deny for the promotion hook, the pr-author gh pr
+            create check, both worktree-removal gates, and the validate-bash structural leg, so R2
+            must not over-classify.
+    ```
+
+  - Net line change of D3 plus D4: +1 (dot-source) +1 (region 1) +2 (region 2) +4 (region 3) = +8, so CLAUDE-INV goes from 483 to 491. Hard ceiling for this plan: 495 (P2-T9, P6-T9).
+- D5 - Test inventory. Every new `It` carries `-Tag 'Issue824'`. Tables passed to `-ForEach` are written inline in the `It` call (Pester evaluates `-ForEach` data at discovery, so a `BeforeAll` variable is not visible there). The reproduction string is held in a single-line single-quoted here-string assigned in the suite's `BeforeAll`:
+
+  ```text
+  $script:Issue824Reproduction = @'
+  pwsh -NoProfile -Command '$parts = New-Object System.Collections.Generic.List[string]; foreach ($t in @("a phrase that runs through the text", "The call is guarded (issue #1)")) { Write-Output $t }'
+  '@
+  ```
+
+  The exact `It` names are fixed in the Phase 1 and Phase 2 tasks. Expected Issue824 counts: S1 14, S2 14, S3 1, S4 1, S5 1, S6 2, S7 2, S8 2, S9 1, S10 1, S11 1, S12 1, S13 1, S14 1 (total 43), U1 27, U2 27 (total with units 97).
+- D6 - Expected fail-before set (14 tests). Against the unfixed helper these fail: S1 and S2 `P824-A1` and `P824-A2`; S3 and S4 `N824-1`; S5 `A824-PR1`; S6, S7, and S8 `A824-WT1`; S9 and S10 `A824-VB1`; S11 and S12 `A824-PI1`. These pass before and after the fix (29 tests): S1 and S2 `P824-A3` and `P824-D1` to `P824-D11`; S6, S7, and S8 `A824-WT2`; S13 and S14 `A824-MG1`. Derivation for each failing case: the fixture is one wrapper-led segment whose raw text contains the command word and every subcommand element as substrings (reproduction: "gh" in "through", "issue", "new" in "New-Object"; A824-PR1: "gh" in "high", "pr" in "priority", "create"; A824-WT1: "git", "worktree", "remove" in "removed"; A824-VB1: "git" in "legit", "push", plus a `-f` token; A824-PI1: "git" in "digit", "add" in "address"), so CLAUDE-INV R2 (line 202-205) classifies it today.
+- D7 - Scope exclusions. Not edited: every hook entry-point file (including `enforce-promotion-mcp-only.ps1` on both surfaces), `.claude/hooks/hook-command-scanner.ps1` and its Codex copy (483 lines each), `.claude/settings.json`, `issue.md`, `research/`, and every file outside the 27 paths listed in P6-T10.
+- D8 - Tier. `.claude/hooks` and `.codex/hooks` are T3 (`quality-tiers.yml` lines 28-33). Uniform 85% line coverage applies; no property-test or mutation obligation applies.
+- D9 - Orphaned-contract ownership table (every repository contract the new module or the edits can invalidate, and the task that owns it):
+
+  | Contract | Location | Owning task |
+  |---|---|---|
+  | Every repo `.claude/**` file byte-identical in the Claude bundle | `test_push_down_claude_resource_contracts.py` line 118 | P3-T1 (copy), P3-T6 and P6-T5 (verify) |
+  | Every bundled Claude hook listed in a pack manifest | `test_push_down_claude_pack_manifest_completeness.py` line 86 | P3-T2 |
+  | Every bundled Codex hook listed in the Codex manifest | `test_push_down_codex_and_agents_pack_manifest_completeness.py` line 165 | P3-T3 |
+  | Codex dot-source closure listed in Codex `core.json` | `test_codex_core_manifest_closure.py` line 277 | P3-T3 (manifest), D3 (dot-source form) |
+  | Shared-module list: parse, 500-line cap, root/bundle byte identity, manifest membership | LEGACY lines 30, 96-120, 137-142 | P3-T4, P3-T1 |
+  | Every `.codex/hooks/*.ps1` within 500 lines | `tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1` lines 172-183 | P6-T9 |
+  | Bundled Claude hooks listed in a manifest (TypeScript copy of the check) | `extensions/drm-copilot/test/lib/push-down/claude-pack-manifest-completeness.test.ts` | P6-T6 |
+  | Coverage population | `config/poshqc-coverage.json` lines 3-9 (folder roots include both hooks roots; no per-file list in `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, lines 23-24) | none needed; P6-T4 records the new files' per-file values |
+  | Public signature pins | S3 lines 300-328 | P4-T7 |
+  | Hard count pins over manifests or shared-module lists | none found (planning-time search of `tests/scripts/dev_tools` and `tests/scripts/codex-hooks`) | none |
+
+### Phase 0 — Policy Reads, Environment, and Baseline Capture
+
+- [ ] [P0-T1] Verify the full-bug preconditions for FEATURE and record FEATURE/evidence/baseline/phase0-mode-check.TS.md.
+      Commands: `Get-ChildItem -Name docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824`; `(Select-String -LiteralPath docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/issue.md -SimpleMatch -Pattern 'Work Mode: full-bug').Count`; `(Select-String -LiteralPath docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/spec.md -Pattern '^## Acceptance Criteria$').Count`; `(Select-String -LiteralPath docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/spec.md -Pattern '^- \[ \] AC-\d+:').Count`.
+      Acceptance: the listing contains `spec.md`; the three counts print 1, 1, and 29. Any other result stops the plan.
+- [ ] [P0-T2] Read the policy files in the required order and record FEATURE/evidence/baseline/phase0-instructions-read.md (`docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/evidence/baseline/phase0-instructions-read.md`) with `Timestamp:`, `Policy Order:`, and the list of files read, in this order: (1) `CLAUDE.md`; (2) `.claude/rules/general-code-change.md`; (3) `.claude/rules/general-unit-test.md`; (4) `.claude/rules/quality-tiers.md`; (5) `.claude/rules/powershell.md`; then (6) `.claude/rules/tonality.md`; (7) `.claude/rules/plan-acceptance-gates.md`; (8) `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`. The artifact states that `.claude/rules/python.md` is not read because no Python file is edited (PARITY-PYTEST only runs existing tests).
+      Its `Timestamp:` is the `TS=` value printed by a step script containing only A0 (SCRATCH/steps/p0-t2.ps1).
+      Acceptance: the artifact has the three required headers and lists all eight files in that order, plus the python.md statement.
+- [ ] [P0-T3] Record BASE_SHA and the clean pre-edit state of every path this plan edits, and record FEATURE/evidence/baseline/base-sha.TS.md.
+      Commands: `git branch --show-current`; `git rev-parse HEAD`; `git merge-base --is-ancestor 93725814 HEAD; $LASTEXITCODE`; `git diff --name-only 93725814 HEAD -- .claude/hooks .codex/hooks extensions/drm-copilot/resources/claude-customizations/.claude/hooks extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks extensions/drm-copilot/resources/claude-customizations/pack-manifests extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests tests/scripts/claude-hooks tests/scripts/codex-hooks`; `git status --porcelain --untracked-files=all -- .claude/hooks .codex/hooks extensions/drm-copilot/resources/claude-customizations/.claude/hooks extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks extensions/drm-copilot/resources/claude-customizations/pack-manifests extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests tests/scripts/claude-hooks tests/scripts/codex-hooks`.
+      Acceptance: the branch prints `bug/promotion-hook-raw-containment-false-positive-deny-824`; `git rev-parse HEAD` prints one 40-character SHA, and that printed value, whatever it is, is recorded as BASE_SHA (the branch head at revision 2 was `05cb4c3f8ecacdccfc73143be59c9696130bd6f3`, but BASE_SHA is taken only from this command's output); the ancestry check prints 0; the diff and status commands print nothing. `93725814` is not BASE_SHA: it is the citation-snapshot commit (the `main` commit current when the planning-time citations were first taken), and the diff from it to HEAD over the in-scope code paths proves that every planning-time line citation still describes the tree at BASE_SHA. Any output from the last two commands stops the plan.
+- [ ] [P0-T4] Write scratch scripts A1, A2, A3, and A4 verbatim from the Appendix into SCRATCH with the Write tool, hash them, and record FEATURE/evidence/baseline/scratch-scripts.TS.md.
+      Command: `Get-FileHash -Algorithm SHA256 -LiteralPath "$Scratch/cov-derive.ps1", "$Scratch/issue824-pester.ps1", "$Scratch/resolver-ast-check.ps1", "$Scratch/phrase-scan.ps1" | ForEach-Object { $_.Hash }`.
+      Acceptance: exit 0 and four hash lines, recorded with the SCRATCH token.
+- [ ] [P0-T5] Baseline line counts and record FEATURE/evidence/baseline/line-counts.TS.md.
+      Command: `foreach ($f in @('.claude/hooks/hook-command-invocation.ps1', '.codex/hooks/hook-command-invocation.ps1', 'tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1', 'tests/scripts/claude-hooks/enforce-promotion-mcp-only.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-promotion-mcp-only-trigger-scoping.Tests.ps1', 'tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1', 'tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1', 'tests/scripts/claude-hooks/enforce-pr-author-skill.TriggerScoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1', 'tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/validate-bash-trigger-scoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-epic-merge-gate.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-epic-merge-gate-trigger-scoping.Tests.ps1')) { "$f $((Get-Content -LiteralPath $f).Count)" }`.
+      Acceptance: exit 0 and the counts 483, 483, 497, 197, 183, 330, 267, 336, 108, 89, 110, 147, 79, 338, 352, 175, 106 in that order. A different count for either hook file or LEGACY stops the plan, because the D4 line budget and the AC-25 no-growth limit were derived from these values.
+- [ ] [P0-T6] Baseline identity of the cross-surface pair and the two existing mirror pairs, and record FEATURE/evidence/baseline/identity.TS.md.
+      Command: `foreach ($p in @(@('.claude/hooks/hook-command-invocation.ps1', '.codex/hooks/hook-command-invocation.ps1'), @('.claude/hooks/hook-command-invocation.ps1', 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-invocation.ps1'), @('.codex/hooks/hook-command-invocation.ps1', 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-invocation.ps1'))) { $a = (Get-FileHash -LiteralPath $p[0]).Hash; $b = (Get-FileHash -LiteralPath $p[1]).Hash; "$($p[0]) | $($p[1]) | EQUAL=$($a -eq $b)" }`.
+      Acceptance: exit 0 and three lines, each ending `EQUAL=True`. `EQUAL=False` on the first line stops the plan, because P2-T6 overwrites CODEX-INV with a copy of CLAUDE-INV and would discard a real difference.
+- [ ] [P0-T7] Baseline the AC-2, AC-22, and call-site inventories, and record FEATURE/evidence/baseline/inventory.TS.md.
+      Commands: `Select-String -Path .claude/hooks/*.ps1, .codex/hooks/*.ps1 -SimpleMatch -Pattern 'Test-CommandLineRawContainment' | ForEach-Object { "$($_.Filename):$($_.LineNumber)" }`; `& "$Scratch/phrase-scan.ps1" -Root @('.claude/hooks', '.codex/hooks', 'extensions/drm-copilot/resources'); $LASTEXITCODE`; `(Select-String -Path .claude/hooks/*.ps1, .codex/hooks/*.ps1 -SimpleMatch -Pattern "-CommandWord '").Count`; `@(Select-String -Path .claude/hooks/*.ps1, .codex/hooks/*.ps1 -SimpleMatch -Pattern "-CommandWord '" | Select-Object -ExpandProperty Path -Unique).Count`.
+      Acceptance: the first command prints exactly six locations, `hook-command-invocation.ps1:92`, `:203`, and `:482` once for each hooks root; the phrase scan exits 0 and prints `HITS=4` with four `HIT:` lines (CLAUDE-INV, CODEX-INV, and their two bundle copies); the last two commands print 34 and 13 (research Numeric Derivation Evidence, Claim N1).
+- [ ] [P0-T8] Record the PowerShell tool versions and record FEATURE/evidence/baseline/tool-versions.TS.md.
+      Command: `pwsh -NoProfile -Command 'Get-Module -ListAvailable -Name Pester, PSScriptAnalyzer | Sort-Object Name, Version -Descending | ForEach-Object { "$($_.Name) $($_.Version)" }; $PSVersionTable.PSVersion.ToString()'`.
+      Acceptance: exit 0; at least one Pester version at or above 5.0.0 and one PSScriptAnalyzer version are printed, and the PowerShell version is 7 or later. A missing module stops the plan.
+- [ ] [P0-T9] Verify the prepared Python environment and the `VIRTUAL_ENV` handling, and record FEATURE/evidence/baseline/python-env.TS.md.
+      Commands: `"VIRTUAL_ENV-SET=$(Test-Path -Path Env:VIRTUAL_ENV)"`; `"VENV-PYTHON=$(Test-Path -LiteralPath .venv/Scripts/python.exe)"`; `$envPath = (poetry env info --path | Out-String).Trim(); "POETRY-ENV-EXIT=$LASTEXITCODE"`; `"POETRY-ENV-IS-WORKTREE-VENV=$(($envPath -replace '\\', '/').EndsWith('drm-copilot-wt-824/.venv', [System.StringComparison]::OrdinalIgnoreCase))"`; `poetry run python --version; $LASTEXITCODE`.
+      Acceptance: the output prints `VIRTUAL_ENV-SET=False` (A0 removed it), `VENV-PYTHON=True`, `POETRY-ENV-EXIT=0`, and `POETRY-ENV-IS-WORKTREE-VENV=True` (the `poetry env info --path` value, with separators normalized to `/`, ends in the worktree's `drm-copilot-wt-824/.venv`); the last command prints a `Python 3.` version line followed by 0. Any other value stops the plan and is reported; the executor does not run `poetry install`.
+- [ ] [P0-T10] Verify the prepared extension Node environment and record FEATURE/evidence/baseline/node-env.TS.md.
+      Commands: `"JEST-PACKAGE=$(Test-Path -LiteralPath extensions/drm-copilot/node_modules/jest/package.json)"`; `node --version; $LASTEXITCODE`; `npm --version; $LASTEXITCODE`.
+      Acceptance: the output prints `JEST-PACKAGE=True`, and each version command prints a version line followed by 0. Any other value stops the plan and is reported; the executor does not run `npm ci`.
+- [ ] [P0-T11] Baseline format check in check-only mode over the whole worktree, and record FEATURE/evidence/baseline/poshqc-format.TS.md.
+      Command: `pwsh -NoProfile -Command 'Import-Module ./scripts/powershell/PoshQC/PoshQC.psm1 -Force; Invoke-PoshQCFormat -Root (Get-Location).Path -WriteFile { param([string] $Path, [string] $Content) }' *> "$Scratch/format-baseline.log"; $LASTEXITCODE`, then `(Select-String -LiteralPath "$Scratch/format-baseline.log" -Pattern '^Formatted: ').Count` and `(Select-String -LiteralPath "$Scratch/format-baseline.log" -Pattern '^Already formatted: ').Count`.
+      Acceptance: the run exits 0; the `Formatted: ` count is 0 and the `Already formatted: ` count is greater than 0. The injected no-op `-WriteFile` (a parameter of `Invoke-PoshQCFormat`, `PoshQC.Analyzer.psm1` line 30) makes this a check that rewrites nothing, and the module logs `Formatted: <path>` for a file it would change (line 62). A non-zero `Formatted: ` count is recorded with the paths and stops the plan, because pre-existing drift would make the P6-T1 zero-change condition unsatisfiable for reasons outside this plan.
+- [ ] [P0-T12] Baseline analyze over the whole worktree and record FEATURE/evidence/baseline/poshqc-analyze.TS.md.
+      Command: `pwsh -NoProfile -Command 'Import-Module ./scripts/powershell/PoshQC/PoshQC.psm1 -Force; Invoke-PoshQCAnalyze -Root (Get-Location).Path' *> "$Scratch/analyze-baseline.log"; $LASTEXITCODE`, then `(Select-String -LiteralPath "$Scratch/analyze-baseline.log" -SimpleMatch -Pattern 'PSScriptAnalyzer passed: no findings under').Count`.
+      Acceptance: the exit code and the count are recorded. A clean run exits 0 and the count is 1 (`PoshQC.Analyzer.psm1` line 185). A failing run throws `PSScriptAnalyzer reported N issue(s).` (line 183); record N and the finding rows, and stop the plan, because a pre-existing finding would make P6-T2 unsatisfiable.
+- [ ] [P0-T13] Baseline full Pester run with coverage, the CI-equivalent command, and record FEATURE/evidence/baseline/poshqc-test.TS.md. Run in the background and wait for completion.
+      Commands: `pwsh -NoProfile -Command 'Import-Module ./scripts/powershell/PoshQC/PoshQC.psm1 -Force; Invoke-PoshQCTest -Root (Get-Location).Path' *> "$Scratch/pester-baseline.log"; $LASTEXITCODE`; `Copy-Item -LiteralPath artifacts/pester/powershell-coverage.xml -Destination "$Scratch/baseline-coverage.xml"`; `Copy-Item -LiteralPath artifacts/pester/pester-junit.xml -Destination "$Scratch/baseline-junit.xml"`; `[xml]$j = Get-Content -Raw -LiteralPath "$Scratch/baseline-junit.xml"; "tests=$($j.testsuites.tests) failures=$($j.testsuites.failures) errors=$($j.testsuites.errors) disabled=$($j.testsuites.disabled)"; $j.SelectNodes('//testcase[failure]') | ForEach-Object { "FAILED: $($_.name)" }`.
+      Acceptance: the run's exit code (Pester `Run.Exit = $true` exits with the failed-test count), the totals line, and every `FAILED:` line are recorded in `Output Summary:`. The baseline failing set is recorded as BASELINE-FAILURES (possibly empty). This task does not stop on failures; P6-T3 uses BASELINE-FAILURES.
+- [ ] [P0-T14] Derive the baseline per-file coverage from the copy saved by P0-T13 and record FEATURE/evidence/baseline/coverage.TS.md.
+      Command: `& "$Scratch/cov-derive.ps1" -CoveragePath "$Scratch/baseline-coverage.xml" -BaseSha 'BASE_SHA'; $LASTEXITCODE` (BASE_SHA substituted).
+      Acceptance: exit 0; the output contains one `COV TOTAL` line with numeric covered, missed, and pct values; `COV .claude/hooks/hook-command-invocation.ps1` and `COV .codex/hooks/hook-command-invocation.ps1` lines each carry numeric covered, missed, and pct values; the two `hook-command-raw-invocation.ps1` lines print `ABSENT rows=0` (the files do not exist yet). The two invocation pct values are recorded as BASELINE-INV-CLAUDE and BASELINE-INV-CODEX. A non-numeric value for either invocation file stops the plan.
+- [ ] [P0-T15] Baseline the Python contract and parity suites and record FEATURE/evidence/baseline/parity-pytest.TS.md.
+      Command: PARITY-PYTEST.
+      Acceptance: the exit code and the pytest summary line (passed and failed counts) are recorded. The result satisfies ISSUE-510-BRANCH; any other failure is recorded and stops the plan.
+- [ ] [P0-T16] Baseline the extension pack-manifest completeness tests and record FEATURE/evidence/baseline/jest-manifest.TS.md.
+      Command: `npm --prefix extensions/drm-copilot test -- test/lib/push-down/claude-pack-manifest-completeness.test.ts test/lib/push-down/codex-agents-customizations.test.ts; $LASTEXITCODE`.
+      Acceptance: exit 0 and the Jest summary line `Tests:` with a passed count greater than 0 and no failed count. A failure is recorded and stops the plan.
+
+### Phase 1 — Regression Tests (fail first against the unfixed helper)
+
+Phase 1 and Phase 2 carve-out: the restart-on-failure rule of the final QA loop does not apply in these phases. The 14 tests listed in D6 are intended to fail at P1-T15 and are made to pass in Phase 2; the restart rule resumes in Phase 6. Each P1 authoring task only adds lines; its acceptance is static (parse, names, line count, no deleted line) and deliberately runs no test, because P1-T15 runs them together against the unfixed helper.
+
+Shared static acceptance for P1-T1 to P1-T14 (stated once; each task names its file F and its tokens): `[System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path F).Path, [ref]$null, [ref]$e) | Out-Null; $e.Count` prints 0; for each named token, `(Select-String -LiteralPath F -SimpleMatch -Pattern '<token>').Count` prints 1; `(Get-Content -LiteralPath F).Count` is at or below the task's line budget; `git diff --numstat BASE_SHA -- F` prints an added count greater than 0 and a deleted count of 0. A token containing `'` is written with the quote doubled inside the single-quoted pattern, for example `-Pattern 'Issue824Reproduction = @'''`.
+
+- [ ] [P1-T1] Add the promotion acceptance matrix to S1 (`tests/scripts/claude-hooks/enforce-promotion-mcp-only.TriggerScoping.Tests.ps1`) and record FEATURE/evidence/other/p1-t1.TS.md.
+      Content: in the Describe `BeforeAll`, assign `$script:Issue824Reproduction` exactly as in D5. Add `Context 'issue #824 - token-aware classification of wrapper-led segments'` containing, all driven through the file's `Get-PromotionTriggerScopingDecision` helper and each tagged `Issue824`:
+      (a) `It 'P824-A1 allows the issue 824 reproduction command'`: command `$script:Issue824Reproduction`; asserts `permissionDecision` is `allow` (AC-5).
+      (b) `It 'P824-A2 allows a wrapped payload carrying through, issue, and New-Object with no gh issue sequence'`: command `pwsh -NoProfile -Command 'Write-Output "through"; "issue"; New-Object Text.StringBuilder'`; asserts `allow` (AC-6).
+      (c) `It 'P824-A3 allows gh --repo o/r issue list'`: command `gh --repo o/r issue list`; asserts `allow` (AC-14).
+      (d) `It 'P824-D<Id> denies <Label>' -ForEach @(...)` with eleven inline rows (Id, Label, Command), Label equal to Command for rows 1-10: 1 `gh issue create --title x`; 2 `gh issue new --title x`; 3 `GH  Issue  Create` (two spaces between words); 4 `pwsh -NoProfile -Command 'gh issue create --title x'`; 5 `pwsh -c "& gh issue new"`; 6 `bash -c "gh issue create"`; 7 `gh api repos/o/r/issues -X POST`; 8 `bash -c "gh -R o/r issue create"`; 9 `bash -c 'x=create; gh issue $x'`; 10 `bash -c 'c=gh; $c issue create'`; 11 Label `the unbalanced segment echo unterminated`, Command `echo "unterminated`. Each row asserts `permissionDecision` is `deny` and `permissionDecisionReason` equals `Get-PromotionMcpOnlyGhIssueBlockedReason` (AC-3, AC-7 to AC-14). Arrange-Act-Assert layout; no file, process, or clock access.
+      Tokens: `P824-A1`, `P824-A2`, `P824-A3`, `P824-D<Id>`, `Issue824Reproduction = @'`. Line budget: 300.
+- [ ] [P1-T2] Add the same matrix to S2 (`tests/scripts/codex-hooks/enforce-promotion-mcp-only-trigger-scoping.Tests.ps1`), driven through the file's `Get-CodexPromotionTriggerScopingDecision` helper, with the identical `It` names, rows, assertions, and tags as P1-T1, and record FEATURE/evidence/other/p1-t2.TS.md.
+      Tokens: `P824-A1`, `P824-A2`, `P824-A3`, `P824-D<Id>`, `Issue824Reproduction = @'`. Line budget: 290.
+- [ ] [P1-T3] Add the negative control to S3 (`tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1`) inside `Context 'fail-closed rules'` (planning-time line 200), after its last `It` (planning-time lines 225-228, `does not classify a quoted mention in a non-wrapper segment`) and before the Context's closing brace at planning-time line 229, which precedes `Context 'constant tables'` at line 231, and record FEATURE/evidence/other/p1-t3.TS.md.
+      Content: assign `$script:Issue824Reproduction` (D5) in the Describe `BeforeAll`. Add `It 'N824-1 negative control: raw containment matches the reproduction but Test-CommandLineInvocation does not' -Tag 'Issue824'` asserting, in the same block, `Test-CommandLineRawContainment -RawText $script:Issue824Reproduction -CommandWord 'gh' -SubcommandPath @('issue', 'new')` is `$true` and `Test-CommandLineInvocation -CommandText $script:Issue824Reproduction -CommandWord 'gh' -SubcommandPath @('issue', 'new')` is `$false` (AC-15). No line at or after `Context 'D12 public parser contract'` changes.
+      Tokens: `N824-1`, `Issue824Reproduction = @'`. Line budget: 350.
+- [ ] [P1-T4] Add the same negative control, with the identical `It` name and assertions, to S4 (`tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1`) inside its `Context 'fail-closed rules'` (planning-time line 200), after its last `It` (planning-time lines 225-228) and before the Context's closing brace at planning-time line 229, and record FEATURE/evidence/other/p1-t4.TS.md.
+      Tokens: `N824-1`, `Issue824Reproduction = @'`. Line budget: 290.
+- [ ] [P1-T5] Add the pr-author false-positive case to S5 (`tests/scripts/claude-hooks/enforce-pr-author-skill.TriggerScoping.Tests.ps1`) and record FEATURE/evidence/other/p1-t5.TS.md.
+      Content: `Context 'issue #824 - a substring arrangement is not a gh pr create invocation'` with `BeforeEach { Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true } }` and `It 'A824-PR1 allows a wrapped Select-String whose text carries high, priority, and create' -Tag 'Issue824'`: command `pwsh -NoProfile -Command 'Select-String -Path README.md -Pattern "high priority" | ForEach-Object { "create" }'`, act through `Invoke-PrAuthorSkillDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)`, assert `permissionDecision` is `allow` and `permissionDecisionReason` does not match `PR_AUTHOR_SKILL_BLOCKED` (AC-18).
+      Tokens: `A824-PR1`. Line budget: 360.
+- [ ] [P1-T6] Add the worktree-gate cases to S6 (`tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1`) and record FEATURE/evidence/other/p1-t6.TS.md.
+      Content: `Context 'issue #824 - wrapper-led removal classification'` with `BeforeEach` mocking `Get-EpicWorktreeGateCheckpointContent` and `Get-EpicWorktreeGateParallelCheckpointContent` to `$null` (so any classified command denies). `It 'A824-WT1 allows a wrapped git worktree list whose filter text carries removed' -Tag 'Issue824'`: command `pwsh -NoProfile -Command 'git worktree list --porcelain | Select-String -NotMatch "removed"'`, asserts `allow`. `It 'A824-WT2 still denies git worktree remove carried inside a bash -c argument' -Tag 'Issue824'`: command `bash -c "git worktree remove ../x"`, asserts `deny` and a reason matching `^EPIC_WORKTREE_REMOVAL_BLOCKED` (AC-19). Act through `Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-CommandEnvelope -Command $command)`.
+      Tokens: `A824-WT1`, `A824-WT2`. Line budget: 140.
+- [ ] [P1-T7] Add the same two cases to S7 (`tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1`) with `Get-ParallelWorktreeRemovalGateCheckpointContent` mocked to `$null`, acting through `Invoke-ParallelWorktreeRemovalGateDecision`, with the deny reason matching `^PARALLEL_WORKTREE_REMOVAL_BLOCKED`, and record FEATURE/evidence/other/p1-t7.TS.md.
+      Tokens: `A824-WT1`, `A824-WT2`. Line budget: 125.
+- [ ] [P1-T8] Add the same two cases to S8 (`tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1`), acting through `Invoke-CodexWorktreeRemovalDecision -PayloadRaw (ConvertTo-CodexWorktreeTriggerScopingPayload -Command $command) -EpicCheckpointRaw $script:UnrelatedCheckpoint`; A824-WT1 asserts the result `Should -BeNullOrEmpty` (the Codex seam returns `$null` for allow), A824-WT2 asserts `deny` with a reason matching `^EPIC_WORKTREE_REMOVAL_BLOCKED`; record FEATURE/evidence/other/p1-t8.TS.md.
+      Tokens: `A824-WT1`, `A824-WT2`. Line budget: 140.
+- [ ] [P1-T9] Add the validate-bash case to S9 (`tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1`) and record FEATURE/evidence/other/p1-t9.TS.md.
+      Content: `It 'A824-VB1 returns no blocked pattern for pwsh -f running legit-push.ps1' -Tag 'Issue824'` asserting `Get-BlockedPatternMatch -Command 'pwsh -NoProfile -f ./scripts/legit-push.ps1' | Should -BeNullOrEmpty` (AC-20), in a new `Context 'issue #824 - wrapper-led structural leg'`.
+      Tokens: `A824-VB1`. Line budget: 165.
+- [ ] [P1-T10] Add the same case, with the identical name and assertion, to S10 (`tests/scripts/codex-hooks/validate-bash-trigger-scoping.Tests.ps1`) and record FEATURE/evidence/other/p1-t10.TS.md.
+      Tokens: `A824-VB1`. Line budget: 95.
+- [ ] [P1-T11] Add the preimplementation case to S11 (`tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1`) and record FEATURE/evidence/other/p1-t11.TS.md.
+      Content: `Context 'issue #824 - wrapper-led staging classification'` with `It 'A824-PI1 does not classify a wrapped Write-Output carrying digit and address as implementation' -Tag 'Issue824'` asserting `Test-ImplementationCommand -Command 'pwsh -NoProfile -Command ''Write-Output "digit address"'''` is `$false` (AC-21).
+      Tokens: `A824-PI1`. Line budget: 360.
+- [ ] [P1-T12] Add the same case, with the identical name and assertion, to S12 (`tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1`) and record FEATURE/evidence/other/p1-t12.TS.md.
+      Tokens: `A824-PI1`. Line budget: 375.
+- [ ] [P1-T13] Add the merge-gate routing case to S13 (`tests/scripts/claude-hooks/enforce-epic-merge-gate.TriggerScoping.Tests.ps1`) and record FEATURE/evidence/other/p1-t13.TS.md.
+      Content: `Context 'issue #824 - wrapper-led merge classification'` with `It 'A824-MG1 still routes gh pr merge --merge inside a bash -c argument to the checkpoint check' -Tag 'Issue824'`: mock `Get-ChildOrchestratorCheckpointContent`, `Get-EpicOrchestratorCheckpointContent`, and `Get-ParallelOrchestratorCheckpointContent` to `$null`; act through `Invoke-EpicMergeGateDecision -ToolInputRaw (ConvertTo-MergeGateEnvelope -Command 'bash -c "gh pr merge --merge 688"')`; assert `deny` and a reason matching `EPIC_MERGE_GATE_BLOCKED` (AC-21).
+      Tokens: `A824-MG1`. Line budget: 195.
+- [ ] [P1-T14] Add the same routing case to S14 (`tests/scripts/codex-hooks/enforce-epic-merge-gate-trigger-scoping.Tests.ps1`), acting through `Invoke-CodexEpicMergeDecision -PayloadRaw (ConvertTo-CodexMergeTriggerScopingPayload -Command 'bash -c "gh pr merge --merge 688"') -ChildCheckpointRaw '' -EpicCheckpointRaw ''`, asserting a non-null result, `deny`, and a reason matching `EPIC_MERGE_GATE_BLOCKED`; record FEATURE/evidence/other/p1-t14.TS.md.
+      Tokens: `A824-MG1`. Line budget: 125.
+- [ ] [P1-T15] [expect-fail] Run every Issue824 test in S1 to S14 against the unfixed helper and record FEATURE/evidence/regression-testing/expect-fail-issue824.TS.md with `ExpectedExitCode: 14`.
+      Command: `` pwsh -NoProfile -Command "& '$Scratch/issue824-pester.ps1' -Path @('tests/scripts/claude-hooks/enforce-promotion-mcp-only.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-promotion-mcp-only-trigger-scoping.Tests.ps1', 'tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1', 'tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1', 'tests/scripts/claude-hooks/enforce-pr-author-skill.TriggerScoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1', 'tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/validate-bash-trigger-scoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-epic-merge-gate.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-epic-merge-gate-trigger-scoping.Tests.ps1') -JUnitPath 'docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/evidence/regression-testing/expect-fail-issue824.junit.xml' -Tag 'Issue824'; exit `$LASTEXITCODE"; $LASTEXITCODE ``.
+      Acceptance: exit code 14; the `TOTALS` line prints `passed=29 failed=14`; no `CONTAINER-ERROR:` line; the 14 `FAILED:` names are exactly the D6 failing set (two `P824-A1`, two `P824-A2`, two `N824-1`, one `A824-PR1`, three `A824-WT1`, two `A824-VB1`, two `A824-PI1`) and the `PASSED:` names are exactly the D6 passing set. The artifact lists every `FAILED:` and `PASSED:` line. Any other failing or passing set stops the plan: a passing test in the failing set means it does not reproduce the defect, and a failing test in the passing set means a deny the plan relies on is not present today.
+
+### Phase 2 — Shared Matcher Implementation
+
+- [ ] [P2-T1] Create CLAUDE-RAW (`.claude/hooks/hook-command-raw-invocation.ps1`) per D1 and D2 with the Write tool, and record FEATURE/evidence/other/p2-t1.TS.md.
+      Acceptance: `[System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path .claude/hooks/hook-command-raw-invocation.ps1).Path, [ref]$null, [ref]$e) | Out-Null; $e.Count` prints 0; `(Get-Content -LiteralPath .claude/hooks/hook-command-raw-invocation.ps1).Count` is at most 200; `(Select-String -LiteralPath .claude/hooks/hook-command-raw-invocation.ps1 -SimpleMatch -Pattern 'function Test-CommandLineRawInvocation').Count` prints 1; `(Select-String -LiteralPath .claude/hooks/hook-command-raw-invocation.ps1 -SimpleMatch -Pattern 'Test-CommandLineRawContainment').Count` prints 0; `(Select-String -LiteralPath .claude/hooks/hook-command-raw-invocation.ps1 -Pattern 'Get-Content|Set-Content|Start-Process|Invoke-Expression|Get-Date|\$env:').Count` prints 0; `(Select-String -LiteralPath .claude/hooks/hook-command-raw-invocation.ps1 -SimpleMatch -Pattern "-CommandWord '").Count` prints 0.
+- [ ] [P2-T2] Create U1 (`tests/scripts/claude-hooks/hook-command-raw-invocation.Tests.ps1`), dot-sourcing `.claude/hooks/hook-command-raw-invocation.ps1` resolved from `$PSScriptRoot/../../../.claude/hooks`, run it, and record FEATURE/evidence/other/p2-t2.TS.md.
+      Content (AC-4): `It 'R824-P<Id> classifies <Label>' -Tag 'Issue824' -ForEach @(...)` with twenty inline rows (Id, Label, RawText, CommandWord, SubcommandPath), each asserting `Test-CommandLineRawInvocation` returns `$true`: P1 `adjacent words` / `gh issue create --title x` / gh / issue,create; P2 `extra whitespace` / `gh   issue    create`; P3 `mixed case` / `GH Issue CREATE`; P4 `a leading ampersand` / `& gh issue create`; P5 `a leading semicolon` / `echo a;gh issue create`; P6 `a leading pipe` / `echo a|gh issue create`; P7 `a leading parenthesis` / `(gh issue create)`; P8 `a leading double quote` / `bash -c "gh issue create"`; P9 `a leading single quote` / `bash -c 'gh issue create'`; P10 `a leading newline` / the double-quoted PowerShell string with a backtick-n escape between `echo a` and `gh issue create`; P11 `a /usr/bin path` / `/usr/bin/gh issue create`; P12 `a Windows exe path` / `C:\tools\gh.exe issue create`; P13 `a quoted exe path` / `& "C:\Program Files\GitHub CLI\gh.exe" issue create`; P14 `escaped quotes` / `pwsh -c "& \"gh\" issue create"`; P15 `a short repo option` / `gh -R o/r issue create`; P16 `a repo option in equals form` / `gh --repo=o/r issue create`; P17 `a quoted directory option` / `git -C "../my wt" worktree remove ../x` / git / worktree,remove; P18 `an unmodeled dash option` / `gh --future-flag issue create`; P19 `an expansion in the command position` / `c=gh; $c issue create`; P20 `an expansion in a subcommand position` / `x=create; gh issue $x`. All unlisted CommandWord and SubcommandPath values are gh and issue,create. `It 'R824-N<Id> rejects <Label>' -Tag 'Issue824' -ForEach @(...)` with seven rows asserting `$false`: N1 `through issue New-Object` / gh / issue,new; N2 `legit push` / git / push; N3 `a worktree list filtered on removed` / `git worktree list --porcelain | Select-String -NotMatch "removed"` / git / worktree,remove; N4 `high priority create` / `Select-String -Pattern "high priority" | ForEach-Object { "create" }` / gh / pr,create; N5 `gh issue newline` / gh / issue,new; N6 `gh issue list` / gh / issue,create; N7 `an all-expansion sequence` / `$a $b $c` / gh / issue,create. No file, process, or clock access.
+      Command: `` pwsh -NoProfile -Command "& '$Scratch/issue824-pester.ps1' -Path @('tests/scripts/claude-hooks/hook-command-raw-invocation.Tests.ps1') -JUnitPath '$Scratch/u1.junit.xml' -Tag 'Issue824'; exit `$LASTEXITCODE"; $LASTEXITCODE ``.
+      Acceptance: exit 0; `TOTALS` prints `passed=27 failed=0`; `(Get-Content -LiteralPath tests/scripts/claude-hooks/hook-command-raw-invocation.Tests.ps1).Count` is at most 200. A failing row is fixed in CLAUDE-RAW, never by changing the row.
+- [ ] [P2-T3] Edit CLAUDE-INV per D3 (dot-source line after line 17; R2 predicate at line 203) with the Edit tool and record FEATURE/evidence/other/p2-t3.TS.md.
+      Commands: `& "$Scratch/resolver-ast-check.ps1" -Path '.claude/hooks/hook-command-invocation.ps1'; $LASTEXITCODE`; `(Select-String -LiteralPath .claude/hooks/hook-command-invocation.ps1 -SimpleMatch -Pattern '. (Join-Path $PSScriptRoot ''hook-command-raw-invocation.ps1'')').Count` (single-quoted, so `$PSScriptRoot` is literal and the inner quotes are doubled; no backtick).
+      Acceptance: the AST check exits 0 and prints `RAWINVOCATION=1` and `RAWCONTAINMENT=0`; the dot-source count prints 1.
+- [ ] [P2-T4] Replace the three comment regions of CLAUDE-INV with the exact D4 text using the Edit tool and record FEATURE/evidence/other/p2-t4.TS.md.
+      Commands: `& "$Scratch/phrase-scan.ps1" -Root @('.claude/hooks'); $LASTEXITCODE`; `Select-String -LiteralPath .claude/hooks/hook-command-invocation.ps1 -SimpleMatch -Pattern 'Test-CommandLineRawContainment' | ForEach-Object { $_.LineNumber }`; `(Select-String -LiteralPath .claude/hooks/hook-command-invocation.ps1 -SimpleMatch -Pattern 'function Test-CommandLineMention').LineNumber`; `(Get-Content -LiteralPath .claude/hooks/hook-command-invocation.ps1).Count`.
+      Acceptance: the phrase scan exits 0 and prints `HITS=0` with a `FILES-SCANNED=` value greater than 0; the containment search prints exactly two line numbers, the first being the `function Test-CommandLineRawContainment {` line and the second greater than the `function Test-CommandLineMention` line number; the line count is at most 495 (491 expected per D4).
+- [ ] [P2-T5] Verify the Claude-surface behaviour after the fix and record FEATURE/evidence/regression-testing/claude-surface-after-fix.TS.md.
+      Commands: `` pwsh -NoProfile -Command "& '$Scratch/issue824-pester.ps1' -Path @('tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1') -JUnitPath '$Scratch/s3-full.junit.xml'; exit `$LASTEXITCODE"; $LASTEXITCODE ``; `` pwsh -NoProfile -Command "& '$Scratch/issue824-pester.ps1' -Path @('tests/scripts/claude-hooks/enforce-promotion-mcp-only.TriggerScoping.Tests.ps1', 'tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1', 'tests/scripts/claude-hooks/enforce-pr-author-skill.TriggerScoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1', 'tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-epic-merge-gate.TriggerScoping.Tests.ps1') -JUnitPath '$Scratch/claude-issue824.junit.xml' -Tag 'Issue824'; exit `$LASTEXITCODE"; $LASTEXITCODE ``.
+      Acceptance: the first run (every test in S3, no tag filter) exits 0 with `failed=0`; the second exits 0 with `passed=23 failed=0` (D5 counts S1 14, S3 1, S5 1, S6 2, S7 2, S9 1, S11 1, S13 1).
+- [ ] [P2-T6] Copy CLAUDE-RAW to CODEX-RAW and CLAUDE-INV to CODEX-INV with `Copy-Item` lines in the task's step script, verify, and record FEATURE/evidence/other/p2-t6.TS.md.
+      Commands: `Copy-Item -LiteralPath .claude/hooks/hook-command-raw-invocation.ps1 -Destination .codex/hooks/hook-command-raw-invocation.ps1`; `Copy-Item -LiteralPath .claude/hooks/hook-command-invocation.ps1 -Destination .codex/hooks/hook-command-invocation.ps1 -Force`; `foreach ($n in @('hook-command-invocation.ps1', 'hook-command-raw-invocation.ps1')) { "$n EQUAL=$((Get-FileHash -LiteralPath .claude/hooks/$n).Hash -eq (Get-FileHash -LiteralPath .codex/hooks/$n).Hash)" }`; `` pwsh -NoProfile -Command "& '$Scratch/issue824-pester.ps1' -Path @('tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1') -JUnitPath '$Scratch/s4-full.junit.xml'; exit `$LASTEXITCODE"; $LASTEXITCODE ``; `` pwsh -NoProfile -Command "& '$Scratch/issue824-pester.ps1' -Path @('tests/scripts/codex-hooks/enforce-promotion-mcp-only-trigger-scoping.Tests.ps1', 'tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1', 'tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1', 'tests/scripts/codex-hooks/validate-bash-trigger-scoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-epic-merge-gate-trigger-scoping.Tests.ps1') -JUnitPath '$Scratch/codex-issue824.junit.xml' -Tag 'Issue824'; exit `$LASTEXITCODE"; $LASTEXITCODE ``.
+      Acceptance: both identity lines end `EQUAL=True`; the S4 run exits 0 with `failed=0`; the Codex Issue824 run exits 0 with `passed=20 failed=0` (S2 14, S4 1, S8 2, S10 1, S12 1, S14 1).
+- [ ] [P2-T7] Create U2 (`tests/scripts/codex-hooks/hook-command-raw-invocation.Tests.ps1`) with the identical 27 rows, names, and tags as U1, dot-sourcing `.codex/hooks/hook-command-raw-invocation.ps1` resolved from `$PSScriptRoot/../../../.codex/hooks`, run it, and record FEATURE/evidence/other/p2-t7.TS.md.
+      Command: `` pwsh -NoProfile -Command "& '$Scratch/issue824-pester.ps1' -Path @('tests/scripts/codex-hooks/hook-command-raw-invocation.Tests.ps1') -JUnitPath '$Scratch/u2.junit.xml' -Tag 'Issue824'; exit `$LASTEXITCODE"; $LASTEXITCODE ``.
+      Acceptance: exit 0; `TOTALS` prints `passed=27 failed=0`; the file is at most 200 lines.
+- [ ] [P2-T8] Rename the test titled `classifies a wrapper-led segment whose raw text carries the words in any arrangement` at line 201 of S3 and of S4 to `classifies a wrapper-led segment whose raw text carries the words as a token-aware ordered sequence`, changing only the title string, and record FEATURE/evidence/other/p2-t8.TS.md (AC-16).
+      Commands: for F in S3 and S4: `(Select-String -LiteralPath F -SimpleMatch -Pattern 'in any arrangement').Count`; `(Select-String -LiteralPath F -SimpleMatch -Pattern 'as a token-aware ordered sequence').Count`; `git diff --numstat BASE_SHA -- F`.
+      Acceptance: for each file the counts print 0 and 1, and the numstat deleted count is exactly 1 (the renamed line; the P1 additions add lines only).
+- [ ] [P2-T9] Check the Phase 2 line budgets and record FEATURE/evidence/other/p2-t9.TS.md.
+      Command: `foreach ($f in @('.claude/hooks/hook-command-invocation.ps1', '.codex/hooks/hook-command-invocation.ps1', '.claude/hooks/hook-command-raw-invocation.ps1', '.codex/hooks/hook-command-raw-invocation.ps1', 'tests/scripts/claude-hooks/hook-command-raw-invocation.Tests.ps1', 'tests/scripts/codex-hooks/hook-command-raw-invocation.Tests.ps1')) { "$f $((Get-Content -LiteralPath $f).Count)" }`.
+      Acceptance: exit 0; the two invocation files are at most 495 lines each and equal; the two raw-invocation files are at most 200 lines each and equal; the two unit suites are at most 200 lines each.
+
+### Phase 3 — Bundled Mirrors, Pack Manifests, and the Shared-Module List
+
+- [ ] [P3-T1] Copy the four canonical files of MIRROR-PAIRS to their bundle paths with `Copy-Item` lines in the task's step script, verify identity, and record FEATURE/evidence/other/p3-t1.TS.md.
+      Commands: `Copy-Item -LiteralPath .claude/hooks/hook-command-invocation.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-invocation.ps1 -Force`; `Copy-Item -LiteralPath .claude/hooks/hook-command-raw-invocation.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-raw-invocation.ps1`; `Copy-Item -LiteralPath .codex/hooks/hook-command-invocation.ps1 -Destination extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-invocation.ps1 -Force`; `Copy-Item -LiteralPath .codex/hooks/hook-command-raw-invocation.ps1 -Destination extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-raw-invocation.ps1`; then one `Get-FileHash` comparison per MIRROR-PAIRS pair printing `<canonical> EQUAL=<bool>`.
+      Acceptance: four lines, each ending `EQUAL=True`.
+- [ ] [P3-T2] Insert the line `    ".claude/hooks/hook-command-raw-invocation.ps1",` immediately after the line `    ".claude/hooks/hook-command-invocation.ps1",` (planning-time line 55) of `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, and record FEATURE/evidence/other/p3-t2.TS.md.
+      Commands: `(Get-Content -Raw -LiteralPath extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json | ConvertFrom-Json).paths -contains '.claude/hooks/hook-command-raw-invocation.ps1'`; `git diff --numstat BASE_SHA -- extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`.
+      Acceptance: the first prints True (the file parses as JSON); the numstat prints `1	0`. The inserted entry sits between two existing entries, so no trailing comma changes.
+- [ ] [P3-T3] Insert the line `    ".codex/hooks/hook-command-raw-invocation.ps1",` immediately after the line `    ".codex/hooks/hook-command-invocation.ps1",` (planning-time line 45) of `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`, and record FEATURE/evidence/other/p3-t3.TS.md.
+      Commands: `(Get-Content -Raw -LiteralPath extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json | ConvertFrom-Json).paths -contains '.codex/hooks/hook-command-raw-invocation.ps1'`; `git diff --numstat BASE_SHA -- extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`.
+      Acceptance: True; numstat `1	0`.
+- [ ] [P3-T4] Edit LEGACY line 30 in place so the inline list reads `@('codex-pretooluse-file-mapping.ps1', 'enforce-orchestration-preimplementation-gate-helpers.ps1', 'hook-command-scanner.ps1', 'hook-command-invocation.ps1', 'hook-command-raw-invocation.ps1', 'enforce-batch-budget-route.ps1')`, adding no line, and record FEATURE/evidence/other/p3-t4.TS.md (AC-25).
+      Commands: `(Get-Content -LiteralPath tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1)[29].Contains("'hook-command-raw-invocation.ps1'")`; `(Get-Content -LiteralPath tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1).Count`; `git diff --numstat BASE_SHA -- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`.
+      Acceptance: True; 497; numstat `1	1`.
+- [ ] [P3-T5] Run LEGACY in full and record FEATURE/evidence/other/p3-t5.TS.md.
+      Command: `` pwsh -NoProfile -Command "& '$Scratch/issue824-pester.ps1' -Path @('tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1') -JUnitPath '$Scratch/legacy.junit.xml'; exit `$LASTEXITCODE"; $LASTEXITCODE ``.
+      Acceptance: exit 0 with `failed=0`, and the `PASSED:` lines include `parse-checks each root and bundled hook and keeps every file within 500 lines`, `keeps the canonical hooks byte-identical to their bundled copies`, and `lists every shared hook module in the core pack manifest`.
+- [ ] [P3-T6] Run PARITY-PYTEST after the mirror and manifest edits and record FEATURE/evidence/other/p3-t6.TS.md.
+      Command: PARITY-PYTEST, then `foreach ($n in @('hook-command-invocation.ps1', 'hook-command-raw-invocation.ps1')) { "$n EQUAL=$((Get-FileHash -LiteralPath .claude/hooks/$n).Hash -eq (Get-FileHash -LiteralPath extensions/drm-copilot/resources/claude-customizations/.claude/hooks/$n).Hash)" }`.
+      Acceptance: the result satisfies ISSUE-510-BRANCH and both identity lines end `EQUAL=True`.
+
+### Phase 4 — Pass-After Verification
+
+- [ ] [P4-T1] Run every Issue824 test in S1 to S14, U1, and U2 and record FEATURE/evidence/regression-testing/pass-after-issue824.TS.md.
+      Command: the P1-T15 command with `'tests/scripts/claude-hooks/hook-command-raw-invocation.Tests.ps1', 'tests/scripts/codex-hooks/hook-command-raw-invocation.Tests.ps1'` appended to the `-Path` list (single-quoted, inside the same double-quoted child command) and the `-JUnitPath` value set to `'docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/evidence/regression-testing/pass-after-issue824.junit.xml'`; the ``; exit `$LASTEXITCODE`` suffix before the closing double quote and the trailing `; $LASTEXITCODE` are kept unchanged from P1-T15.
+      Acceptance: exit 0; `TOTALS` prints `passed=97 failed=0`; no `CONTAINER-ERROR:` line; every name in the D6 failing set appears as `PASSED:`.
+- [ ] [P4-T2] Run every test in `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks` without coverage (the local equivalent of the `poshqc / PowerShell hook suites (Linux)` job's suite selection, run on Windows), and record FEATURE/evidence/regression-testing/hook-suites-full.TS.md. Run in the background and wait for completion.
+      Command: `` pwsh -NoProfile -Command "& '$Scratch/issue824-pester.ps1' -Path @('tests/scripts/claude-hooks', 'tests/scripts/codex-hooks') -JUnitPath '$Scratch/hook-suites.junit.xml'; exit `$LASTEXITCODE" *> "$Scratch/hook-suites.log"; $LASTEXITCODE ``, then `Select-String -LiteralPath "$Scratch/hook-suites.log" -Pattern '^(TOTALS|FAILED:|CONTAINER-ERROR:)' | ForEach-Object { $_.Line }`.
+      Acceptance: exit 0; the `TOTALS` line prints `failed=0`; no `FAILED:` or `CONTAINER-ERROR:` line. If a failure occurs and the same test is in BASELINE-FAILURES (P0-T13) and lives in a file this plan does not touch, record it as pre-existing and stop for a caller decision; any other failure is fixed in CLAUDE-RAW or CLAUDE-INV (then P2-T6 and P3-T1 are re-run), never by editing an existing assertion. This covers every pre-existing wrapper deny pin of research section 6.1, including `tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1` (AT-6) and both promotion decision-surface suites (AC-16).
+- [ ] [P4-T3] Verify AC-1 on both surfaces and record FEATURE/evidence/qa-gates/ac1-r2-predicate.TS.md.
+      Commands: `& "$Scratch/resolver-ast-check.ps1" -Path '.claude/hooks/hook-command-invocation.ps1'; $LASTEXITCODE`; the same for `.codex/hooks/hook-command-invocation.ps1`; `Select-String -Path .claude/hooks/hook-command-invocation.ps1, .codex/hooks/hook-command-invocation.ps1 -SimpleMatch -Pattern 'Test-CommandLineRawInvocation -RawText $segment.RawText' | ForEach-Object { "$($_.Path | Resolve-Path -Relative):$($_.LineNumber)" }`.
+      Acceptance: each AST check exits 0 and prints `RAWINVOCATION=1` and `RAWCONTAINMENT=0`; the Grep prints exactly one line per surface.
+- [ ] [P4-T4] Verify AC-2 and record FEATURE/evidence/qa-gates/ac2-containment-callers.TS.md.
+      Commands: `Select-String -Path .claude/hooks/*.ps1, .codex/hooks/*.ps1 -SimpleMatch -Pattern 'Test-CommandLineRawContainment' | ForEach-Object { "$($_.Path | Resolve-Path -Relative):$($_.LineNumber):$($_.Line.Trim())" }`; `Select-String -Path .claude/hooks/hook-command-invocation.ps1, .codex/hooks/hook-command-invocation.ps1 -SimpleMatch -Pattern 'function Test-CommandLineMention' | ForEach-Object { "$($_.Path | Resolve-Path -Relative):$($_.LineNumber)" }`.
+      Acceptance: the first command prints exactly four lines, two per hooks root, all in `hook-command-invocation.ps1`; on each surface one line is the `function Test-CommandLineRawContainment {` definition and the other has a line number greater than that surface's `function Test-CommandLineMention` line (the only remaining caller).
+- [ ] [P4-T5] Verify AC-22 and record FEATURE/evidence/qa-gates/ac22-contract-comment.TS.md.
+      Commands: `& "$Scratch/phrase-scan.ps1" -Root @('.claude/hooks', '.codex/hooks', 'extensions/drm-copilot/resources'); $LASTEXITCODE`; `(Select-String -Path .claude/hooks/*.ps1, .codex/hooks/*.ps1 -SimpleMatch -Pattern 'only forces a checkpoint check').Count`; `(Select-String -Path .claude/hooks/hook-command-invocation.ps1, .codex/hooks/hook-command-invocation.ps1 -SimpleMatch -Pattern 'token-bounded,').Count`.
+      Acceptance: the phrase scan exits 0 and prints `HITS=0` with `FILES-SCANNED=` greater than 0 (the scan joins comment lines, so a wrapped phrase is still found); the line search prints 0; the `token-bounded,` count prints 2 (region 3 of D4 on each surface).
+- [ ] [P4-T6] Verify that no pre-existing test line was edited beyond the AC-16 rename and record FEATURE/evidence/qa-gates/ac16-test-integrity.TS.md.
+      Command: `git diff --numstat BASE_SHA -- tests/scripts/claude-hooks tests/scripts/codex-hooks`; `git status --porcelain --untracked-files=all -- tests/scripts/claude-hooks tests/scripts/codex-hooks`.
+      Acceptance: the numstat lists exactly 15 tracked files (S1 to S14 and LEGACY); the deleted count is 1 for S3, S4, and LEGACY and 0 for every other file; the status command lists those 15 files as modified and exactly two untracked files, U1 and U2.
+- [ ] [P4-T7] Verify AC-29 and record FEATURE/evidence/qa-gates/ac29-signature-pins.TS.md.
+      Commands: `` pwsh -NoProfile -Command "& '$Scratch/issue824-pester.ps1' -Path @('tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1') -JUnitPath '$Scratch/s3-p4.junit.xml'; exit `$LASTEXITCODE"; $LASTEXITCODE ``; then `$old = (git show BASE_SHA:tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1 | Out-String) -replace '\r', ''; $new = (Get-Content -Raw -LiteralPath tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1) -replace '\r', ''; $marker = "Context 'D12 public parser contract'"; "PIN-BLOCK-UNCHANGED=$($old.Substring($old.IndexOf($marker)).TrimEnd() -eq $new.Substring($new.IndexOf($marker)).TrimEnd())"` (the single-quoted regex `'\r'` removes carriage returns, so no backtick is needed); then `[xml]$j = Get-Content -Raw -LiteralPath "$Scratch/s3-p4.junit.xml"; @($j.SelectNodes('//testcase') | Where-Object { $_.name -like '*pins the *' -and -not $_.failure }).Count`.
+      Acceptance: the S3 run exits 0 with `failed=0`; `PIN-BLOCK-UNCHANGED=True`; the count prints 5 (the five pin tests at planning-time S3 lines 300-328, shifted down by the P1-T3 insertion, passed in this run without edits). Zero matching testcases is a failure, not a pass.
+
+### Phase 5 — Hook Audit
+
+- [ ] [P5-T1] Re-derive the resolver call sites for the audit and record FEATURE/evidence/other/call-site-derivation.TS.md.
+      Command: `Select-String -Path .claude/hooks/*.ps1, .codex/hooks/*.ps1 -SimpleMatch -Pattern "-CommandWord '" | ForEach-Object { "$($_.Path | Resolve-Path -Relative):$($_.LineNumber)" }`.
+      Acceptance: exit 0 and 34 lines in 13 files whose `file:line` set equals the research Claim N1 primary member set (Claude: epic-merge 128, 134, 342, 343; preimplementation 142; epic-worktree 140, 141, 355; validate-bash 123, 127; promotion 126, 127; epic-base-branch 92, 100, 138; pr-author-helpers 279, 280, 290, 291; parallel-worktree 201, 202, 361. Codex: epic-worktree 58, 59, 126; epic-merge 63, 69, 141, 142; preimplementation 161; promotion 123, 124; validate-bash 96, 100). These hook files are not edited by this plan, so a difference stops the plan.
+- [ ] [P5-T2] Write the audit record FEATURE/evidence/other/containment-path-hook-audit.md (`docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/evidence/other/containment-path-hook-audit.md`) (AC-17).
+      Content: `Timestamp:`; a table with one row per hook and runtime (13 rows): `enforce-promotion-mcp-only.ps1` (Claude), (Codex); `enforce-pr-author-skill-helpers.ps1` (Claude); `enforce-pr-author-skill.epic-base-branch.ps1` (Claude); `enforce-epic-worktree-removal-gate.ps1` (Claude), (Codex); `enforce-parallel-worktree-removal-gate.ps1` (Claude); `validate-bash.ps1` (Claude), (Codex); `enforce-orchestration-preimplementation-gate.ps1` (Claude), (Codex); `enforce-epic-merge-gate.ps1` (Claude), (Codex). Columns: resolver call sites (the `file:line` values from P5-T1); effect of an R2 false positive before the fix (research section 3 table); disposition after the fix (R2 now requires a token-aware sequence through the shared helper; no per-hook code change); covering Issue824 test (P824 rows for promotion, A824-PR1, A824-WT1/WT2, A824-VB1, A824-PI1, A824-MG1, or "none - corrected through the shared helper; checkpoint-conditional" for epic-base-branch). A sentence stating that `enforce-parallel-abandon-gate.ps1` dot-sources the helper but calls only `Read-CommandLineSegment` and `Test-CommandLineSegmentRawScan`, so it does not reach R2. A paragraph citing research `research/research.2026-10-03T08-30.md`, Numeric Derivation Evidence, Claim N1 (34 call expressions in 13 files: Claude 22 in 8, Codex 12 in 5), and FEATURE/evidence/other/call-site-derivation.TS.md as the re-derivation.
+      Acceptance: for each token `enforce-promotion-mcp-only.ps1`, `enforce-pr-author-skill-helpers.ps1`, `enforce-pr-author-skill.epic-base-branch.ps1`, `enforce-epic-worktree-removal-gate.ps1`, `enforce-parallel-worktree-removal-gate.ps1`, `validate-bash.ps1`, `enforce-orchestration-preimplementation-gate.ps1`, `enforce-epic-merge-gate.ps1`, `enforce-parallel-abandon-gate.ps1`, `Claim N1`, `Timestamp:`, `(Select-String -LiteralPath docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/evidence/other/containment-path-hook-audit.md -SimpleMatch -Pattern '<token>').Count` is at least 1; the table has 13 data rows.
+
+### Phase 6 — Final QC Loop
+
+Loop rule: P6-T1 (format), P6-T2 (analyze), and P6-T3 (test with coverage) form the PowerShell toolchain loop; type checking is not applicable to PowerShell. If the P6-T1 direct format run rewrites any file, or P6-T2 or P6-T3 fails, fix the cause, re-run P2-T6 and P3-T1 when a canonical hook file changed (so CODEX copies and bundle copies stay identical), and restart from P6-T1. Each re-run writes a new artifact with a new TS; the artifacts of the last clean pass are the gating ones. P6-T4 to P6-T11 run after the clean pass; if any of them leads to a file change, restart from P6-T1. Exception: unequal `TREE-DIGEST=` values around an MCP route step in P6-T1, P6-T2, or P6-T3 do not restart the loop; they stop the plan for a caller decision. Python and TypeScript have no changed file, so their format, lint, and type-check stages are not applicable (recorded in P6-T12); their contract suites run in P6-T5 and P6-T6.
+
+- [ ] [P6-T1] Format: the direct whole-worktree format in write mode (gating run), then the MCP route step bracketed by TREE-DIGEST; record FEATURE/evidence/qa-gates/poshqc-format.TS.md.
+      Commands, in this order: (1) step script SCRATCH/steps/p6-t1.ps1: `pwsh -NoProfile -Command 'Import-Module ./scripts/powershell/PoshQC/PoshQC.psm1 -Force; Invoke-PoshQCFormat -Root (Get-Location).Path' *> "$Scratch/format-final.log"; $LASTEXITCODE`; `(Select-String -LiteralPath "$Scratch/format-final.log" -Pattern '^Formatted: ').Count`; `(Select-String -LiteralPath "$Scratch/format-final.log" -Pattern '^Already formatted: ').Count`; then (2) TREE-DIGEST as the last line of the same step script; (3) `mcp__drm-copilot__run_poshqc_format` (route step, per Execution constraints); (4) step script SCRATCH/steps/p6-t1-after.ps1 containing A0 and TREE-DIGEST.
+      Acceptance: the direct run exits 0 (recorded as the artifact's top-level `EXIT_CODE:`); the `Formatted: ` count is 0 and the `Already formatted: ` count is greater than 0. On a clean tree every file logs `Already formatted: <path>` (`PoshQC.Analyzer.psm1` line 64); a `Formatted: <path>` line means the file was rewritten, which triggers the loop restart. `MCP_ROUTE:` is recorded; the two `TREE-DIGEST=` values are equal. Unequal values mean the MCP route step rewrote files; record the changed paths (`git status --porcelain`) and stop for a caller decision, without restarting the loop.
+- [ ] [P6-T2] Analyze: the direct whole-worktree analysis (gating run), then the MCP route step bracketed by TREE-DIGEST; record FEATURE/evidence/qa-gates/poshqc-analyze.TS.md.
+      Commands, in this order: (1) step script SCRATCH/steps/p6-t2.ps1: `pwsh -NoProfile -Command 'Import-Module ./scripts/powershell/PoshQC/PoshQC.psm1 -Force; Invoke-PoshQCAnalyze -Root (Get-Location).Path' *> "$Scratch/analyze-final.log"; $LASTEXITCODE`; `(Select-String -LiteralPath "$Scratch/analyze-final.log" -SimpleMatch -Pattern 'PSScriptAnalyzer passed: no findings under').Count`; then (2) TREE-DIGEST as the last line of the same step script; (3) `mcp__drm-copilot__run_poshqc_analyze` (route step); (4) step script SCRATCH/steps/p6-t2-after.ps1 containing A0 and TREE-DIGEST.
+      Acceptance: the direct run exits 0 (recorded as the artifact's top-level `EXIT_CODE:`) and the count prints 1 (zero findings, AC-26). `MCP_ROUTE:` is recorded; the two `TREE-DIGEST=` values are equal. Unequal values mean the MCP route step rewrote files; record the changed paths (`git status --porcelain`) and stop for a caller decision, without restarting the loop.
+- [ ] [P6-T3] Test with coverage: the MCP route step bracketed by TREE-DIGEST, then the direct full Pester run (gating run, last, so `artifacts/pester` holds its output); record FEATURE/evidence/qa-gates/poshqc-test.TS.md. Run the second step script in the background and wait for completion.
+      Commands, in this order: (1) step script SCRATCH/steps/p6-t3.ps1 containing A0 and TREE-DIGEST; (2) `mcp__drm-copilot__run_poshqc_test` with scan folders `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks` (route step); (3) step script SCRATCH/steps/p6-t3-after.ps1 containing A0, then TREE-DIGEST, then `pwsh -NoProfile -Command 'Import-Module ./scripts/powershell/PoshQC/PoshQC.psm1 -Force; Invoke-PoshQCTest -Root (Get-Location).Path' *> "$Scratch/pester-final.log"; $LASTEXITCODE`; `Copy-Item -LiteralPath artifacts/pester/powershell-coverage.xml -Destination "$Scratch/final-coverage.xml" -Force`; `[xml]$j = Get-Content -Raw -LiteralPath artifacts/pester/pester-junit.xml; "tests=$($j.testsuites.tests) failures=$($j.testsuites.failures) errors=$($j.testsuites.errors) disabled=$($j.testsuites.disabled)"; $j.SelectNodes('//testcase[failure]') | ForEach-Object { "FAILED: $($_.name)" }`.
+      Acceptance: `MCP_ROUTE:` recorded; the two `TREE-DIGEST=` values (from SCRATCH/steps/p6-t3.ps1 and the first line after A0 of SCRATCH/steps/p6-t3-after.ps1) are equal, and unequal values mean the MCP route step rewrote files, so record the changed paths (`git status --porcelain`) and stop for a caller decision, without restarting the loop; the direct run exits 0 (recorded as the artifact's top-level `EXIT_CODE:`); the totals line prints `failures=0 errors=0` and a `tests=` value greater than the P0-T13 value (54 unit tests and 43 hook-level tests were added); no `FAILED:` line. If a failure occurs and the same test name is in BASELINE-FAILURES and lives in a file this plan does not touch, record it as pre-existing and stop for a caller decision instead of restarting.
+- [ ] [P6-T4] Coverage derivation and delta; record FEATURE/evidence/qa-gates/coverage-delta.TS.md (AC-26).
+      Command: `& "$Scratch/cov-derive.ps1" -CoveragePath "$Scratch/final-coverage.xml" -BaseSha 'BASE_SHA'; $LASTEXITCODE` (BASE_SHA substituted).
+      Acceptance: exit 0; the artifact records, in `Output Summary:`, the baseline values (P0-T14 `COV TOTAL`, BASELINE-INV-CLAUDE, BASELINE-INV-CODEX), the post-change `COV TOTAL` line, and the four post-change per-file lines, each numeric. Pass conditions: the pct of each of `.claude/hooks/hook-command-invocation.ps1`, `.codex/hooks/hook-command-invocation.ps1`, `.claude/hooks/hook-command-raw-invocation.ps1`, and `.codex/hooks/hook-command-raw-invocation.ps1` is at least 85; each invocation pct is at least its baseline value; and each of the four `UNCOVERED-CHANGED` lines prints `NONE`. New/changed-code coverage is reported as the two raw-invocation pct values plus the four `UNCOVERED-CHANGED` results. An `ABSENT` line or a non-numeric value is a failure (remediation required, never PASS). A failing condition is fixed by adding a test case, then the loop restarts from P6-T1.
+- [ ] [P6-T5] Python contract and parity suites; record FEATURE/evidence/qa-gates/parity-pytest.TS.md (AC-24).
+      Command: PARITY-PYTEST, then `foreach ($n in @('hook-command-invocation.ps1', 'hook-command-raw-invocation.ps1')) { "$n EQUAL=$((Get-FileHash -LiteralPath .claude/hooks/$n).Hash -eq (Get-FileHash -LiteralPath extensions/drm-copilot/resources/claude-customizations/.claude/hooks/$n).Hash)" }`.
+      Acceptance: the result satisfies ISSUE-510-BRANCH; both identity lines end `EQUAL=True`; the pytest summary line is recorded. Python new-code coverage: `N/A - no production file of this language changes`.
+- [ ] [P6-T6] Extension pack-manifest completeness tests; record FEATURE/evidence/qa-gates/jest-manifest.TS.md.
+      Command: `npm --prefix extensions/drm-copilot test -- test/lib/push-down/claude-pack-manifest-completeness.test.ts test/lib/push-down/codex-agents-customizations.test.ts; $LASTEXITCODE`.
+      Acceptance: exit 0 and the Jest `Tests:` summary line with no failed count. TypeScript new-code coverage: `N/A - no production file of this language changes`.
+- [ ] [P6-T7] Manifest JSON validity; record FEATURE/evidence/qa-gates/manifest-json.TS.md.
+      Command: `foreach ($m in @('extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json', 'extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json')) { $p = (Get-Content -Raw -LiteralPath $m | ConvertFrom-Json).paths; "$m paths=$($p.Count) unique=$(@($p | Select-Object -Unique).Count) raw=$(@($p | Where-Object { $_ -like '*/hook-command-raw-invocation.ps1' }).Count)" }`.
+      Acceptance: exit 0; on each line `paths` equals `unique` (no duplicate entry) and `raw=1`.
+- [ ] [P6-T8] Identity checks; record FEATURE/evidence/qa-gates/identity.TS.md (AC-23, AC-24).
+      Command: `foreach ($p in @(@('.claude/hooks/hook-command-invocation.ps1', '.codex/hooks/hook-command-invocation.ps1'), @('.claude/hooks/hook-command-raw-invocation.ps1', '.codex/hooks/hook-command-raw-invocation.ps1'), @('.claude/hooks/hook-command-invocation.ps1', 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-invocation.ps1'), @('.claude/hooks/hook-command-raw-invocation.ps1', 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-raw-invocation.ps1'), @('.codex/hooks/hook-command-invocation.ps1', 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-invocation.ps1'), @('.codex/hooks/hook-command-raw-invocation.ps1', 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-raw-invocation.ps1'))) { "$($p[0]) | $($p[1]) | EQUAL=$((Get-FileHash -LiteralPath $p[0]).Hash -eq (Get-FileHash -LiteralPath $p[1]).Hash)" }`.
+      Acceptance: six lines, each ending `EQUAL=True` (the first two are AC-23; the last four are the MIRROR-PAIRS half of AC-24).
+- [ ] [P6-T9] Line counts of every changed or added PowerShell file; record FEATURE/evidence/qa-gates/line-counts.TS.md (AC-28, AC-25).
+      Command: `foreach ($f in @('.claude/hooks/hook-command-invocation.ps1', '.codex/hooks/hook-command-invocation.ps1', '.claude/hooks/hook-command-raw-invocation.ps1', '.codex/hooks/hook-command-raw-invocation.ps1', 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-invocation.ps1', 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-command-raw-invocation.ps1', 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-invocation.ps1', 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-command-raw-invocation.ps1', 'tests/scripts/claude-hooks/hook-command-raw-invocation.Tests.ps1', 'tests/scripts/codex-hooks/hook-command-raw-invocation.Tests.ps1', 'tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1', 'tests/scripts/claude-hooks/enforce-promotion-mcp-only.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-promotion-mcp-only-trigger-scoping.Tests.ps1', 'tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1', 'tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1', 'tests/scripts/claude-hooks/enforce-pr-author-skill.TriggerScoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1', 'tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/validate-bash-trigger-scoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1', 'tests/scripts/claude-hooks/enforce-epic-merge-gate.TriggerScoping.Tests.ps1', 'tests/scripts/codex-hooks/enforce-epic-merge-gate-trigger-scoping.Tests.ps1')) { "$f $((Get-Content -LiteralPath $f).Count)" }`; `@(Get-ChildItem .codex/hooks -Filter *.ps1 -File | Where-Object { (Get-Content -LiteralPath $_.FullName).Count -gt 500 }).Count`.
+      Acceptance: exit 0; every listed count is at most 500; each of the four invocation copies is at most 495; LEGACY prints 497; each test file is within its P1 or P2 line budget; the last command prints 0.
+- [ ] [P6-T10] Scope check; record FEATURE/evidence/qa-gates/scope.TS.md.
+      Commands: `git diff --numstat BASE_SHA -- .claude/hooks .codex/hooks extensions/drm-copilot/resources/claude-customizations/.claude/hooks extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks extensions/drm-copilot/resources/claude-customizations/pack-manifests extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests tests/scripts/claude-hooks tests/scripts/codex-hooks`; `git status --porcelain --untracked-files=all -- .claude/hooks .codex/hooks extensions/drm-copilot/resources/claude-customizations/.claude/hooks extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks extensions/drm-copilot/resources/claude-customizations/pack-manifests extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests tests/scripts/claude-hooks tests/scripts/codex-hooks`; `git status --porcelain --untracked-files=no | Where-Object { $_ -notmatch 'docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/' -and $_ -notmatch '\.claude/agent-memory/' }`.
+      Acceptance: the numstat lists exactly the 21 tracked files: CLAUDE-INV, CODEX-INV, their two bundle copies, the two `core.json` files, LEGACY, and S1 to S14. The scoped status lists those 21 as modified and exactly six untracked files: CLAUDE-RAW, CODEX-RAW, their two bundle copies, U1, and U2. The last command prints exactly the same 21 tracked paths and nothing else (no tracked file outside the plan's scope changed). The two filters exclude only the feature folder (plan, spec check-offs, evidence) and the tracked agent-memory tree, which planners and executors write during a run. Any other extra path is recorded and stops the plan for a caller decision.
+- [ ] [P6-T11] Confirm the LEGACY result inside the final full run; record FEATURE/evidence/qa-gates/legacy-contracts.TS.md (AC-25).
+      Command: `[xml]$j = Get-Content -Raw -LiteralPath artifacts/pester/pester-junit.xml; $cases = @($j.SelectNodes('//testcase') | Where-Object { $_.classname -like '*legacy-codex-hook-contracts*' -or $_.name -like '*byte-identical to their bundled copies*' -or $_.name -like '*lists every shared hook module in the core pack manifest*' }); "matched=$($cases.Count) failed=$(@($cases | Where-Object { $_.failure }).Count)"`.
+      Acceptance: `matched=` is greater than 0 and `failed=0`. Zero matched testcases is a failure, not a pass; in that case record the JUnit `classname` form observed and re-derive the selector before re-running.
+- [ ] [P6-T12] Record the QC loop completion and record FEATURE/evidence/qa-gates/qc-loop-complete.TS.md.
+      Content: `Timestamp:`; the list of gating artifacts from the last clean pass (P6-T1 to P6-T11); the number of loop passes; `Type check: N/A - PowerShell has no type-check stage (.claude/rules/powershell.md toolchain step 3)`; `Python format/lint/type-check: N/A - no Python file changed`; `TypeScript format/lint/type-check: N/A - no TypeScript file changed`.
+      Acceptance: the artifact exists with every listed field, and each listed gating artifact exists on disk (`Test-Path` prints True for each).
+
+### Phase 7 — Acceptance-Criteria Check-off
+
+Rule for P7-T1 to P7-T29: a task changes the line beginning `- [ ] AC-n:` in `docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/spec.md` to `- [x] AC-n:` only when every named evidence artifact exists with its acceptance met, and its acceptance is `(Select-String -LiteralPath docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/spec.md -SimpleMatch -Pattern '- [x] AC-n:').Count` printing 1 (the colon keeps AC-1 distinct from AC-10 to AC-19). Each task appends one line to FEATURE/evidence/other/ac-checkoff.TS.md, where TS is the value printed by the P7-T1 step script; P7-T2 to P7-T30 append to that same file. Each appended line names the AC and its evidence.
+
+- [ ] [P7-T1] Check off AC-1 (evidence: FEATURE/evidence/qa-gates/ac1-r2-predicate.TS.md, FEATURE/evidence/other/p2-t1.TS.md).
+- [ ] [P7-T2] Check off AC-2 (evidence: FEATURE/evidence/qa-gates/ac2-containment-callers.TS.md).
+- [ ] [P7-T3] Check off AC-3 (evidence: FEATURE/evidence/regression-testing/pass-after-issue824.TS.md, `P824-D11` passed in S1 and S2).
+- [ ] [P7-T4] Check off AC-4 (evidence: FEATURE/evidence/other/p2-t2.TS.md, FEATURE/evidence/other/p2-t7.TS.md, FEATURE/evidence/regression-testing/pass-after-issue824.TS.md).
+- [ ] [P7-T5] Check off AC-5 (evidence: FEATURE/evidence/regression-testing/expect-fail-issue824.TS.md and pass-after-issue824.TS.md, `P824-A1` in S1 and S2).
+- [ ] [P7-T6] Check off AC-6 (evidence: the same two artifacts, `P824-A2` in S1 and S2).
+- [ ] [P7-T7] Check off AC-7 (evidence: pass-after-issue824.TS.md, `P824-D1` in S1 and S2).
+- [ ] [P7-T8] Check off AC-8 (evidence: pass-after-issue824.TS.md, `P824-D2` in S1 and S2).
+- [ ] [P7-T9] Check off AC-9 (evidence: pass-after-issue824.TS.md, `P824-D3` in S1 and S2).
+- [ ] [P7-T10] Check off AC-10 (evidence: pass-after-issue824.TS.md, `P824-D4` in S1 and S2).
+- [ ] [P7-T11] Check off AC-11 (evidence: pass-after-issue824.TS.md, `P824-D5` in S1 and S2).
+- [ ] [P7-T12] Check off AC-12 (evidence: pass-after-issue824.TS.md, `P824-D6` in S1 and S2).
+- [ ] [P7-T13] Check off AC-13 (evidence: pass-after-issue824.TS.md, `P824-D7` in S1 and S2).
+- [ ] [P7-T14] Check off AC-14 (evidence: pass-after-issue824.TS.md, `P824-D8`, `P824-D9`, `P824-D10`, and `P824-A3` in S1 and S2).
+- [ ] [P7-T15] Check off AC-15 (evidence: expect-fail-issue824.TS.md and pass-after-issue824.TS.md, `N824-1` in S3 and S4).
+- [ ] [P7-T16] Check off AC-16 (evidence: FEATURE/evidence/other/p2-t8.TS.md, FEATURE/evidence/qa-gates/ac16-test-integrity.TS.md, FEATURE/evidence/regression-testing/hook-suites-full.TS.md).
+- [ ] [P7-T17] Check off AC-17 (evidence: FEATURE/evidence/other/containment-path-hook-audit.md, FEATURE/evidence/other/call-site-derivation.TS.md).
+- [ ] [P7-T18] Check off AC-18 (evidence: expect-fail-issue824.TS.md and pass-after-issue824.TS.md, `A824-PR1`).
+- [ ] [P7-T19] Check off AC-19 (evidence: expect-fail-issue824.TS.md and pass-after-issue824.TS.md, `A824-WT1` and `A824-WT2` in S6, S7, and S8).
+- [ ] [P7-T20] Check off AC-20 (evidence: expect-fail-issue824.TS.md and pass-after-issue824.TS.md, `A824-VB1` in S9 and S10).
+- [ ] [P7-T21] Check off AC-21 (evidence: expect-fail-issue824.TS.md and pass-after-issue824.TS.md, `A824-PI1` in S11 and S12 and `A824-MG1` in S13 and S14).
+- [ ] [P7-T22] Check off AC-22 (evidence: FEATURE/evidence/qa-gates/ac22-contract-comment.TS.md, FEATURE/evidence/other/p2-t4.TS.md).
+- [ ] [P7-T23] Check off AC-23 (evidence: FEATURE/evidence/qa-gates/identity.TS.md, first two lines).
+- [ ] [P7-T24] Check off AC-24 (evidence: FEATURE/evidence/qa-gates/parity-pytest.TS.md, FEATURE/evidence/qa-gates/identity.TS.md, FEATURE/evidence/other/p3-t2.TS.md, FEATURE/evidence/other/p3-t3.TS.md).
+- [ ] [P7-T25] Check off AC-25 (evidence: FEATURE/evidence/other/p3-t4.TS.md, FEATURE/evidence/qa-gates/legacy-contracts.TS.md, FEATURE/evidence/qa-gates/line-counts.TS.md).
+- [ ] [P7-T26] Check off AC-26 (evidence: FEATURE/evidence/qa-gates/poshqc-format.TS.md, poshqc-analyze.TS.md, poshqc-test.TS.md, coverage-delta.TS.md, qc-loop-complete.TS.md).
+- [ ] [P7-T27] Record AC-27 as pending CI and leave its checkbox unchecked; record FEATURE/evidence/other/ac27-pending-ci.TS.md naming the two jobs it depends on, `poshqc / PowerShell QC` (`windows-latest`, every suite with coverage) and `poshqc / PowerShell hook suites (Linux)` (`ubuntu-latest`, `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks`, coverage disabled), both in `.github/workflows/_poshqc.yml` (lines 8-52 and 54-90), plus the rest of the repository CI on the PR head. AC-27 is checked off at orchestration step S9 after those jobs pass.
+      Acceptance: the artifact exists with `Timestamp:` and both job names; `(Select-String -LiteralPath docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/spec.md -SimpleMatch -Pattern '- [ ] AC-27:').Count` prints 1.
+- [ ] [P7-T28] Check off AC-28 (evidence: FEATURE/evidence/qa-gates/line-counts.TS.md).
+- [ ] [P7-T29] Check off AC-29 (evidence: FEATURE/evidence/qa-gates/ac29-signature-pins.TS.md, FEATURE/evidence/qa-gates/identity.TS.md).
+- [ ] [P7-T30] Verify the final checkbox state of `docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/spec.md` and append the result to FEATURE/evidence/other/ac-checkoff.TS.md.
+      Commands: `(Select-String -LiteralPath docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/spec.md -Pattern '^- \[x\] AC-\d+:').Count`; `(Select-String -LiteralPath docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/spec.md -Pattern '^- \[ \] AC-\d+:').Count`.
+      Acceptance: 28 and 1 (the unchecked one is AC-27).
+
+## Appendix — step-script preamble and helper scripts (save verbatim)
+
+A0 step-script preamble, the first lines of every SCRATCH/steps/<task-id>.ps1 (the task's commands follow it; A1 to A4 are run from a step script, so their working directory is WORKTREE):
+
+```powershell
+param([Parameter(Mandatory)][string] $Worktree)
+Remove-Item -Path Env:VIRTUAL_ENV -ErrorAction SilentlyContinue
+Set-Location -LiteralPath $Worktree -ErrorAction Stop
+$Scratch = (Split-Path -Parent $PSScriptRoot) -replace '\\', '/'
+"TS=$(Get-Date -Format yyyy-MM-ddTHH-mm)"
+```
+
+A1 `SCRATCH/cov-derive.ps1`:
+
+```powershell
+param(
+    [Parameter(Mandatory)][string] $CoveragePath,
+    [Parameter(Mandatory)][string] $BaseSha
+)
+$ErrorActionPreference = 'Stop'
+[xml]$report = Get-Content -Raw -LiteralPath $CoveragePath
+$rootPath = ((Get-Location).Path -replace '\\', '/').TrimEnd('/')
+$totalCovered = 0
+$totalMissed = 0
+foreach ($measured in @($report.report.package | ForEach-Object { $_.class })) {
+    $classLine = @($measured.counter | Where-Object { $_.type -eq 'LINE' })
+    if ($classLine.Count -gt 0) {
+        $totalCovered += [int]$classLine[0].covered
+        $totalMissed += [int]$classLine[0].missed
+    }
+}
+if (($totalCovered + $totalMissed) -eq 0) { 'COV TOTAL ABSENT'; exit 1 }
+"COV TOTAL covered=$totalCovered missed=$totalMissed pct=$([math]::Round(100.0 * $totalCovered / ($totalCovered + $totalMissed), 2))"
+$targets = @(
+    @{ Surface = '.claude/hooks'; File = 'hook-command-invocation.ps1' },
+    @{ Surface = '.codex/hooks'; File = 'hook-command-invocation.ps1' },
+    @{ Surface = '.claude/hooks'; File = 'hook-command-raw-invocation.ps1' },
+    @{ Surface = '.codex/hooks'; File = 'hook-command-raw-invocation.ps1' }
+)
+foreach ($target in $targets) {
+    $relative = "$($target.Surface)/$($target.File)"
+    $package = @($report.report.package | Where-Object { ($_.name -replace '\\', '/') -eq "$rootPath/$($target.Surface)" })
+    $class = @($package | ForEach-Object { $_.class } | Where-Object { $_.sourcefilename -eq $target.File })
+    if ($class.Count -ne 1) { "COV $relative ABSENT rows=$($class.Count)"; continue }
+    $line = @($class[0].counter | Where-Object { $_.type -eq 'LINE' })[0]
+    $covered = [int]$line.covered
+    $missed = [int]$line.missed
+    $pct = if (($covered + $missed) -gt 0) { [math]::Round(100.0 * $covered / ($covered + $missed), 2) } else { 0 }
+    "COV $relative covered=$covered missed=$missed pct=$pct"
+    $changed = [System.Collections.Generic.HashSet[int]]::new()
+    git cat-file -e "$($BaseSha):$relative" 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        $hunks = git diff --unified=0 $BaseSha -- $relative | Select-String -Pattern '^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@'
+        foreach ($hunk in $hunks) {
+            $start = [int]$hunk.Matches[0].Groups[1].Value
+            $count = if ($hunk.Matches[0].Groups[2].Success) { [int]$hunk.Matches[0].Groups[2].Value } else { 1 }
+            for ($n = $start; $n -lt ($start + $count); $n++) { [void]$changed.Add($n) }
+        }
+    } else {
+        $lineCount = @(Get-Content -LiteralPath $relative).Count
+        for ($n = 1; $n -le $lineCount; $n++) { [void]$changed.Add($n) }
+    }
+    $source = @($package | ForEach-Object { $_.sourcefile } | Where-Object { $_.name -eq $target.File })
+    if ($source.Count -ne 1) { "UNCOVERED-CHANGED $relative SOURCE-ABSENT"; continue }
+    $uncovered = @(@($source[0].line) | Where-Object { [int]$_.ci -eq 0 -and $changed.Contains([int]$_.nr) } | ForEach-Object { [int]$_.nr })
+    $list = if ($uncovered.Count -gt 0) { $uncovered -join ',' } else { 'NONE' }
+    "UNCOVERED-CHANGED $relative $list"
+}
+exit 0
+```
+
+A2 `SCRATCH/issue824-pester.ps1`:
+
+```powershell
+param(
+    [Parameter(Mandatory)][string[]] $Path,
+    [Parameter(Mandatory)][string] $JUnitPath,
+    [string[]] $Tag = @()
+)
+$ErrorActionPreference = 'Stop'
+Import-Module Pester -MinimumVersion 5.0.0
+$config = New-PesterConfiguration
+$config.Run.Path = $Path
+$config.Run.PassThru = $true
+$config.Run.Exit = $false
+if ($Tag.Count -gt 0) { $config.Filter.Tag = $Tag }
+$config.CodeCoverage.Enabled = $false
+$config.TestResult.Enabled = $true
+$config.TestResult.OutputFormat = 'JUnitXml'
+$config.TestResult.OutputPath = $JUnitPath
+$config.Output.Verbosity = 'Normal'
+$result = Invoke-Pester -Configuration $config
+"TOTALS passed=$($result.PassedCount) failed=$($result.FailedCount) skipped=$($result.SkippedCount) notrun=$($result.NotRunCount) total=$($result.TotalCount)"
+foreach ($test in $result.Passed) { "PASSED: $($test.ExpandedName)" }
+foreach ($test in $result.Failed) { "FAILED: $($test.ExpandedName)" }
+$containerErrors = @($result.Containers | Where-Object { $_.Result -eq 'Failed' -and $_.ErrorRecord.Count -gt 0 })
+foreach ($container in $containerErrors) { "CONTAINER-ERROR: $(Resolve-Path -LiteralPath ([string]$container.Item) -Relative)" }
+exit ($result.FailedCount + $containerErrors.Count)
+```
+
+A3 `SCRATCH/resolver-ast-check.ps1`:
+
+```powershell
+param([Parameter(Mandatory)][string] $Path)
+$ErrorActionPreference = 'Stop'
+$tokens = $null
+$errors = $null
+$ast = [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path -LiteralPath $Path).Path, [ref]$tokens, [ref]$errors)
+if ($errors) { "PARSE-ERRORS=$($errors.Count)"; exit 1 }
+$function = $ast.Find({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Resolve-CommandLineInvocation' }, $true)
+if ($null -eq $function) { 'FUNCTION-ABSENT'; exit 1 }
+$names = @($function.Body.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true) | ForEach-Object { $_.GetCommandName() })
+"RAWINVOCATION=$(@($names | Where-Object { $_ -eq 'Test-CommandLineRawInvocation' }).Count)"
+"RAWCONTAINMENT=$(@($names | Where-Object { $_ -eq 'Test-CommandLineRawContainment' }).Count)"
+exit 0
+```
+
+A4 `SCRATCH/phrase-scan.ps1`:
+
+```powershell
+param([Parameter(Mandatory)][string[]] $Root)
+$ErrorActionPreference = 'Stop'
+$hits = 0
+$files = 0
+foreach ($scanRoot in $Root) {
+    foreach ($file in Get-ChildItem -LiteralPath $scanRoot -Recurse -File -Filter '*.ps1') {
+        $files++
+        $text = ((Get-Content -Raw -LiteralPath $file.FullName) -replace '(?m)^\s*#', ' ') -replace '\s+', ' '
+        if ($text.IndexOf('only forces a checkpoint check', [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+            "HIT: $(Resolve-Path -LiteralPath $file.FullName -Relative)"
+            $hits++
+        }
+    }
+}
+"FILES-SCANNED=$files HITS=$hits"
+exit 0
+```
