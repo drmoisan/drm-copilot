@@ -177,7 +177,7 @@ Each criterion below is verified by an `Issue824`-tagged test in both `enforce-p
 - [x] AC-11: `pwsh -c "& gh issue new"` is denied.
 - [x] AC-12: `bash -c "gh issue create"` is denied.
 - [x] AC-13: `gh api repos/o/r/issues -X POST` is denied.
-- [x] AC-14: Detection of real bypasses that raw containment caught before the fix is not weakened: `bash -c "gh -R o/r issue create"`, `bash -c 'x=create; gh issue $x'`, and `bash -c 'c=gh; $c issue create'` are each denied, and `gh --repo o/r issue list` is allowed.
+- [ ] AC-14: Detection of real bypasses that raw containment caught before the fix is not weakened: `bash -c "gh -R o/r issue create"`, `bash -c 'x=create; gh issue $x'`, and `bash -c 'c=gh; $c issue create'` are each denied, and `gh --repo o/r issue list` is allowed.
 
 ### Negative control
 
