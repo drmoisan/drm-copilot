@@ -62,6 +62,12 @@ Every PR into `main` fails required CI. This blocks parallel run `bug-burndown-2
 - [ ] `npm audit --audit-level=moderate` exits 0 in all three packages, and `npm ls @modelcontextprotocol/sdk proxy-addr` shows only patched versions.
 - [ ] The root and extension TypeScript toolchains and the mcp-server build pass, and PR CI is green, including Publish to Marketplace.
 
+## Acceptance Criteria
+
+- [ ] AC-1: In all three manifests (`package.json`, `extensions/drm-copilot/package.json`, `packages/mcp-server/package.json`), the `@modelcontextprotocol/sdk` dependency is `"^1.31.0"` and `overrides` contains `"proxy-addr": "^2.0.8"` next to the existing `fast-uri` and `brace-expansion` overrides; `@types/vscode`, `@types/node`, and `typescript-eslint` are unchanged; and each `package-lock.json` is regenerated with npm install to match.
+- [ ] AC-2: `npm audit --audit-level=moderate` exits 0 in all three packages, and `npm ls @modelcontextprotocol/sdk proxy-addr` shows only patched versions (@modelcontextprotocol/sdk >= 1.31.0, proxy-addr >= 2.0.8).
+- [ ] AC-3: The root and extension TypeScript toolchains (format check, lint, type check, tests) pass with coverage not below baseline, except the pre-existing root `format:check` failure on `tests/fixtures/**` JSON (excluded as in #802). The mcp-server build passes, and PR CI is green, including Publish to Marketplace.
+
 ## Next Step
 
 - [ ] Promote to GitHub issue (bug-report template)
