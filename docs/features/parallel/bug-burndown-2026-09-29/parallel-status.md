@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 2
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-07T13:43:41Z
+- `last_updated`: 2026-10-07T13:55:12Z
 
 **Items**
 
@@ -28,7 +28,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 512 | docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/799 | 021b37e600afab00b191276cda803f87419a4a87 | 2026-09-30T11:19:00Z | 2026-09-30T13:33:38Z |  |
 | 527 | docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/821 | 9fb35e7fff0fd7caec36c0de15adff894abdf304 | 2026-10-02T07:34:44Z | 2026-10-02T11:37:59Z |  |
 | 532 | docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/820 | 1920378812e61be21a5fc96f9ffbf474b4bbbee4 | 2026-10-02T08:16:26Z | 2026-10-02T11:38:33Z |  |
-| 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | in_flight | worktree_created |  |  | 2026-10-02T08:52:46Z |  |  |
+| 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/829 |  | 2026-10-02T08:52:46Z |  |  |
 | 609 | docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/815 | 28443d3be64d69b4b96b1ceca6715a9e577a6dc7 | 2026-10-02T03:09:33Z | 2026-10-02T04:13:42Z |  |
 | 623 | docs/features/active/promotion-receipt-destination-unverified-623 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/804 | 2b0121abf74f5862a3d12929d833504668941156 | 2026-09-30T12:21:20Z | 2026-09-30T13:42:13Z |  |
 | 645 | docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645 | 3 | scheduled | not_started |  |  |  |  |  |
