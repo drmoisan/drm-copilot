@@ -157,7 +157,7 @@ Update it after every completed step with:
 - `local_execution_overrides`, `delegation_bypasses`, `lifecycle_operations`
 - raw promotion MCP receipts under `delegation_receipts.promotion.potential_entry`, `delegation_receipts.promotion.issue`, and `delegation_receipts.promotion.feature_folder`
 
-Each required skill in the selected route must have a `skill_receipts[]` entry with `required = true` and non-empty `evidence`. Each required MCP tool must have an `mcp_call_receipts[]` entry with `ok = true` and non-empty `evidence`. `local_execution_overrides` and `delegation_bypasses` must remain empty at completion. Any lifecycle operation recorded in `lifecycle_operations[]` must use `surface = "mcp"`.
+Each required skill in the selected route must have a `skill_receipts[]` entry with `required = true` and non-empty `evidence`. Each required MCP tool must have an `mcp_call_receipts[]` entry with `ok = true` and non-empty `evidence` unless a valid `issue_adoption` record waives it. `local_execution_overrides` and `delegation_bypasses` must remain empty at completion. Any lifecycle operation recorded in `lifecycle_operations[]` must use `surface = "mcp"`.
 
 ## Native Automation Surface
 

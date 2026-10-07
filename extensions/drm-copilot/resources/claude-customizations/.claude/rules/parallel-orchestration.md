@@ -87,13 +87,13 @@ When `require_complete` is not passed, invariants 20 and 21 contribute zero erro
 
 ## Invariants (parallel planner checkpoint)
 
-Enforced by `validate_parallel_planner_state_text(text, *, require_ready_for_execution=False)` in `scripts/dev_tools/validate_parallel_planner_state.py`. P1 through P4 are enforced unconditionally; P6 through P9 are enforced only under `require_ready_for_execution`.
+Enforced by `validate_parallel_planner_state_text(text, *, require_ready_for_execution=False)` in `scripts/dev_tools/validate_parallel_planner_state.py`. P1 through P4 are enforced unconditionally; P6 through P10 are ready-gate invariants, enforced only under `require_ready_for_execution`.
 
 - **P1 — Required keys.** The checkpoint must carry `objective`, `parallel_slug`, `parallel_manifest_path`, `mode`, `max_concurrency`, `items`, `cohorts`, `conflict_edges`, `recolor_generation`, `completed_steps`, `next_step`, and `last_updated`. One error is emitted per missing key. `kickoff_prompt_path` is optional outside the ready gate.
 
 - **P2 — Route-consistent identity.** `parallel_slug` and `parallel_manifest_path` must be non-empty strings; `mode` and `max_concurrency` satisfy orchestrator invariants 3 and 4.
 
-- **P3 — Item shape.** Each `items[]` entry must carry `issue_num`, `feature_folder`, `kind`, `state`, `blast_radius`, `preparation_status`, `research_path`, `plan_path`, and `preflight_status`. `issue_num` must be a positive integer unique across items; `kind` must be in `{feature, bug}`; `state` must be in the item-state enum; `blast_radius` must satisfy orchestrator invariant 9; `complexity_band`, when present, must be in `{C1, C2, C3, C4}`. The prohibited-key rejections of orchestrator invariants 10 and 11 apply.
+- **P3 — Item shape.** Each `items[]` entry must carry `issue_num`, `feature_folder`, `kind`, `state`, `blast_radius`, `preparation_status`, `research_path`, `plan_path`, and `preflight_status`. `issue_num` must be a positive integer unique across items; `kind` must be in `{feature, bug}`; `state` must be in the item-state enum; `blast_radius` must satisfy orchestrator invariant 9; `complexity_band` is optional outside the ready gate (P10 requires it under `require_ready_for_execution`) and, when present, must be in `{C1, C2, C3, C4}`. The prohibited-key rejections of orchestrator invariants 10 and 11 apply.
 
 - **P4 — Cohort and edge shape.** `cohorts[]`, `conflict_edges[]`, and `recolor_generation` satisfy orchestrator invariants 12 through 15.
 
@@ -107,7 +107,9 @@ Enforced by `validate_parallel_planner_state_text(text, *, require_ready_for_exe
 
 - **P9 — Ready gate, kickoff path.** Under `require_ready_for_execution`, `kickoff_prompt_path` must be exactly `artifacts/orchestration/parallel-kickoff-<parallel_slug>.md`.
 
-The planner checkpoint carries no `epic_worthiness` analogue and no `NON_EPIC_RECOMMENDED` branch; the parallel surface has no worthiness verdict, and scale assessment happens before parallel planning is invoked. When `require_ready_for_execution` is not passed, P6 through P9 contribute zero errors.
+- **P10 — Ready gate, routing record.** Under `require_ready_for_execution`, each object-shaped item must carry `complexity_band` in `{C1, C2, C3, C4}`; a `complexity_assessment` object `{band, floor, signals_present, rationale, assessed_at}` whose `floor` equals `compute_complexity_floor(signals_present)`, whose `band` is at or above `floor` and equals `complexity_band`, and whose `rationale` and `assessed_at` are non-empty strings; and a Claude `model_routing_receipt` object `{agent, phase, complexity_band, fable_policy, table_model, clamped_from, model}` with `agent == 'orchestrator'`, `complexity_band` equal to the item's band, `fable_policy` in `{disabled, available, preferred}`, and `model` equal to `resolve_delegation_model('orchestrator', complexity_band, fable_policy)['model']`, including the disabled-mode clamp invariants. The checks run per item in this order: (1) the band enum, reported as `None` when absent; (2) the assessment object, skipping checks 3 through 5 when it fails; (3) the assessment entry checks of `_validate_complexity_assessments`, prefix-rewritten to `<item> complexity_assessment`; (4) `assessed_at`; (5) assessment band equals item band; (6) the receipt object, skipping checks 7 through 10 when it fails; (7) the receipt entry checks of `_validate_model_routing_receipts`, prefix-rewritten to `<item> model_routing_receipt`; (8) `agent`; (9) receipt band equals item band; (10) the `fable_policy` enum. Checks 5 and 9 are reported whenever the two values differ, including when check 1 failed. Each item's P10 errors follow that item's P7 errors.
+
+The planner checkpoint carries no `epic_worthiness` analogue and no `NON_EPIC_RECOMMENDED` branch; the parallel surface has no worthiness verdict, and scale assessment happens before parallel planning is invoked. When `require_ready_for_execution` is not passed, P6 through P10 contribute zero errors.
 
 ## Invariants (parallel run manifest)
 
@@ -611,13 +613,34 @@ in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, mirrored in
 union of both copies' top-level keys is exhaustively covered by the three declared classes, and
 an unclassified key or a key present in only one copy fails loudly and names itself.
 
+**A destination records its own entries in `config/blast-radius.local.json` (issue #508).** The
+push-down regenerates a destination's `config/blast-radius.json` on every push, so an entry
+hand-added to that file does not survive the next push. The supported extension point is the
+destination-owned overlay `config/blast-radius.local.json`. No payload contains it, and the
+push-down never writes or publishes it: both implementations list it in `EXCLUDED_RELATIVE_PATHS`.
+At push time the overlay is composed onto the freshly generated base document (the derived document
+in TypeScript, the published document in Python), and the composed result is written to
+`config/blast-radius.json`, so consumers continue to read one file. Per-key semantics: the
+string-list keys `shared_surfaces`, `shared_surface_globs`, `mandate_reads`, `mergeable_paths`, and
+`path_roots` take an ordered union (base entries first, then overlay-only entries, duplicates
+removed); an overlay module absent from the base is added and an overlay module with the same name
+replaces that module's glob list, with module names emitted in ordinal order; `conflict_tolerance`
+merges recursively (nested lists by union, nested objects per member, nested scalars overlay-wins);
+the scalars `over_breadth_fraction` and `write_intent_extraction` take the overlay value; overlay-only
+keys are appended after the base keys. An overlay `version` must equal the base `version`, and the
+forbidden-glob guard (`**`, `docs/**`, `tests/**`) applies to the composed module map, including
+overlay-authored modules. A malformed overlay, a `version` mismatch, or a forbidden glob raises an
+error before any write, so `config/blast-radius.json` keeps its prior bytes. With no overlay
+present, the written file is byte-identical to the base document. The overlay cannot remove a
+shipped surface or a derived module.
+
 ## Enforcement
 
 - `scripts/dev_tools/validate_parallel_orchestrator_state.py`, with the helper modules `scripts/dev_tools/_parallel_state_common.py`, `scripts/dev_tools/_parallel_state_structures.py`, and `scripts/dev_tools/_parallel_state_records.py`, appends one error per violated orchestrator invariant. The completion-gate invariants 20 and 21 run only when the caller passes `require_complete=True`.
-- `scripts/dev_tools/validate_parallel_planner_state.py` appends one error per violated planner invariant. The ready-gate invariants P6 through P9 run only when the caller passes `require_ready_for_execution=True`.
+- `scripts/dev_tools/validate_parallel_planner_state.py`, with the helper module `scripts/dev_tools/_parallel_planner_state_routing.py` for invariant P10, appends one error per violated planner invariant. The ready-gate invariants P6 through P10 run only when the caller passes `require_ready_for_execution=True`.
 - `scripts/dev_tools/parallel_manifest_contract.py` appends one error per violated manifest invariant and exposes the default-resolving accessors. Manifest validation is a library call, not an MCP artifact type.
 - `scripts/dev_tools/validate_orchestration_artifacts.py` registers the CLI subparsers `parallel-orchestrator-state` (with `--require-complete`) and `parallel-planner-state` (with `--require-ready-for-execution`). An unknown artifact type continues to fail with `Unsupported artifact type: {type}`.
-- The TypeScript parity port at `extensions/drm-copilot/src/lib/validate/parallel-state-shared.ts`, `parallel-state-structures.ts`, `parallel-state-records.ts`, `parallel-orchestrator-state-core.ts`, and `parallel-planner-state-core.ts` reproduces the same invariants and is dispatched from `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` for both new `artifact_type` values. Verified scope: 96 of 96 error strings matched across 43 constructed documents, for JSON-representable values that round-trip through both runtimes' native types. Three divergence classes are known outside that verified scope: (1) **`pythonRepr` quote selection** — `parallel-state-shared.ts:112-132` always single-quotes, while Python's `repr` switches to double quotes when the value contains a single quote (recorded repo-wide at `docs/features/potential/2026-08-07-python-repr-quote-selection-divergence.md`); (2) **integral floats** — `JSON.parse` erases Python's `int`/`float` distinction, so an integral float value produces a different Python-side error count than the TypeScript side; (3) **boolean/integer equality** — `parallel-state-structures.ts:228` uses `===`, so a boolean value is not selected the way Python's `True == 1` equality selects it, producing differing error counts.
+- The TypeScript parity port at `extensions/drm-copilot/src/lib/validate/parallel-state-shared.ts`, `parallel-state-structures.ts`, `parallel-state-records.ts`, `parallel-orchestrator-state-core.ts`, and `parallel-planner-state-core.ts` reproduces the same invariants and is dispatched from `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` for both new `artifact_type` values. Verified scope: 96 of 96 error strings matched across 43 constructed documents, for JSON-representable values that round-trip through both runtimes' native types. Three divergence classes are known outside that verified scope: (1) **`pythonRepr` quote selection** — `parallel-state-shared.ts:112-132` always single-quotes, while Python's `repr` switches to double quotes when the value contains a single quote (recorded repo-wide at `docs/features/potential/2026-08-07-python-repr-quote-selection-divergence.md`); (2) **integral floats** — `JSON.parse` erases Python's `int`/`float` distinction, so an integral float value produces a different Python-side error count than the TypeScript side; (3) **boolean/integer equality** — `parallel-state-structures.ts:228` uses `===`, so a boolean value is not selected the way Python's `True == 1` equality selects it, producing differing error counts. For ready-gate invariant P10, `extensions/drm-copilot/src/lib/validate/parallel-planner-state-routing.ts` enforces the P10 structural subset (the band enums, the assessment and receipt object checks, `signals_present` shape, `band >= floor` ordering, non-empty `rationale` and `assessed_at`, the band-equality cross-checks, `agent`, and the `fable_policy` enum) with byte-identical error strings; the Python validator is authoritative for floor equality, resolved-model equality, and the disabled clamp, which the TypeScript port does not check.
 - Enforcement is therefore Python validator logic, plus the TypeScript parity port, plus this prose file. It is NEVER an imported JSON Schema. No schema file is read at validation time.
 - The `parallel` route entry lives in `config/orchestration-routing.json` with `requires_pr_gate: false` (there is no run-level pull request to gate; each child's own route checkpoint enforces its per-item pull-request gate) and is mirrored byte-for-byte in `extensions/drm-copilot/resources/config/orchestration-routing.json`.
 - The `PreToolUse` merge gate `.claude/hooks/enforce-epic-merge-gate.ps1` carries a parallel allow-branch that authorizes a per-item `gh pr merge --merge` from the parallel-orchestrator checkpoint when `route_id == "parallel"`, the target item's `merge_status == "ci_green"`, and the command's PR number matches that item's `pr_number`; any other case fails closed with `EPIC_MERGE_GATE_BLOCKED`.

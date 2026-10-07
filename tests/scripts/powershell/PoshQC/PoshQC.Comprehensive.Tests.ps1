@@ -618,8 +618,8 @@ Describe 'Invoke-PoshQCTest' {
                     if ($Path -eq $testSettings) {
                         return $true
                     }
-                    # Run path check
-                    if ($Path -eq "$testRoot/tests") {
+                    # Run path check; the coverage source entry must also exist (issue #527)
+                    if ($Path -eq "$testRoot/tests" -or $Path -like '*src*') {
                         return $true
                     }
                     return $false
@@ -742,8 +742,8 @@ Describe 'Invoke-PoshQCTest' {
                     if ($Path -eq $testSettings) {
                         return $true
                     }
-                    # Run path check
-                    if ($Path -eq "$testRoot/tests") {
+                    # Run path check; the coverage source entry must also exist (issue #527)
+                    if ($Path -eq "$testRoot/tests" -or $Path -like '*src*') {
                         return $true
                     }
                     return $false

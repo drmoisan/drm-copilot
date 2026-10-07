@@ -89,6 +89,8 @@ BeforeAll {
             return , [string[]] $liveSet
         }.GetNewClosure()
     }
+    Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeRunResolution.psm1')
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 }
 
 Describe 'enforce-model-routing-receipt.ps1 worktree-resolution matrix' {

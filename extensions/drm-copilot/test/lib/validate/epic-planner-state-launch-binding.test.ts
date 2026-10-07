@@ -2,9 +2,29 @@ import { describe, expect, it } from "@jest/globals";
 
 import { resolveCodexTopology } from "../../../src/lib/validate/codex-topology-resolver";
 import { validateEpicPlannerStateText } from "../../../src/lib/validate/epic-planner-state-core";
+import type { ValidateEpicPlannerStateOptions } from "../../../src/lib/validate/epic-planner-state-core";
+import { launchEvidenceFixture } from "./epic-planner-launch-evidence-test-support";
+
+const LAUNCH_BINDING_KEYS = [
+  "branch_name",
+  "worktree_path",
+  "delegation_receipt",
+  "launch_receipt_path",
+  "launch_status_path",
+];
+
+function stripLaunchBinding(item: Record<string, unknown>): void {
+  for (const key of LAUNCH_BINDING_KEYS) {
+    delete item[key];
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
 function record(value: unknown): Record<string, unknown> {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+  if (!isRecord(value)) {
     throw new Error("test fixture value must be an object");
   }
   return value;
@@ -77,10 +97,21 @@ function state(): Record<string, unknown> {
   };
 }
 
-function readyErrors(value: Record<string, unknown>): string[] {
+function readyErrors(
+  value: Record<string, unknown>,
+  options: Pick<
+    ValidateEpicPlannerStateOptions,
+    "requireCodexModelRouting" | "requireCodexTopology"
+  > = {},
+): string[] {
   return validateEpicPlannerStateText(JSON.stringify(value), {
     requireReadyForExecution: true,
+    ...options,
   });
+}
+
+function launchBindingErrors(errors: string[]): string[] {
+  return errors.filter((error) => error.includes(" launch binding"));
 }
 
 describe("epic planner child launch binding", () => {
@@ -92,19 +123,10 @@ describe("epic planner child launch binding", () => {
 
   it("activates only for execution readiness", () => {
     const value = state();
-    const item = (value["features"] as Record<string, unknown>[])[0]!;
-    for (const key of [
-      "branch_name",
-      "worktree_path",
-      "delegation_receipt",
-      "launch_receipt_path",
-      "launch_status_path",
-    ]) {
-      delete item[key];
-    }
+    stripLaunchBinding((value["features"] as Record<string, unknown>[])[0]!);
 
     expect(validateEpicPlannerStateText(JSON.stringify(value))).toEqual([]);
-    const errors = readyErrors(value);
+    const errors = readyErrors(value, { requireCodexTopology: true });
     expect(
       errors.some((error) =>
         error.includes("features[0] launch binding.branch_name"),
@@ -117,6 +139,107 @@ describe("epic planner child launch binding", () => {
         ),
       ),
     ).toBe(true);
+  });
+
+  it("skips launch binding for a feature without launch paths", () => {
+    // Arrange
+    const value = state();
+    stripLaunchBinding((value["features"] as Record<string, unknown>[])[0]!);
+
+    // Act
+    const errors = validateEpicPlannerStateText(JSON.stringify(value), {
+      requireReadyForExecution: true,
+      readinessContext: launchEvidenceFixture().context,
+    });
+
+    // Assert
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors.filter((error) => error.includes(" launch binding"))).toEqual(
+      [],
+    );
+    expect(
+      errors.filter((error) =>
+        error.includes("must identify a launch artifact"),
+      ),
+    ).toEqual([]);
+  });
+
+  it("rejects a partial launch binding", () => {
+    // Arrange
+    const value = state();
+    delete (value["features"] as Record<string, unknown>[])[0]![
+      "launch_status_path"
+    ];
+
+    // Act
+    const errors = launchBindingErrors(readyErrors(value));
+
+    // Assert
+    expect(errors).toEqual([
+      "Epic planner checkpoint features[0] launch binding.launch_status_path must be under artifacts/orchestration/epic-child-launches/.",
+    ]);
+  });
+
+  it("keeps launch binding unconditional under a Codex flag", () => {
+    for (const flags of [
+      { requireCodexModelRouting: true },
+      { requireCodexTopology: true },
+    ]) {
+      // Arrange
+      const value = state();
+      stripLaunchBinding((value["features"] as Record<string, unknown>[])[0]!);
+
+      // Act
+      const errors = readyErrors(value, flags);
+
+      // Assert
+      expect(
+        errors.some((error) =>
+          error.includes("features[0] launch binding.branch_name"),
+        ),
+      ).toBe(true);
+      expect(
+        errors.some((error) =>
+          error.includes(
+            "features[0] launch binding.delegation_receipt must be an object",
+          ),
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it("preserves the feature index when an earlier feature is skipped", () => {
+    // Arrange
+    const value = state();
+    const [first, second] = value["features"] as Record<string, unknown>[];
+    stripLaunchBinding(first!);
+    delete second!["launch_status_path"];
+
+    // Act
+    const errors = launchBindingErrors(readyErrors(value));
+
+    // Assert
+    expect(errors).toEqual([
+      "Epic planner checkpoint features[1] launch binding.launch_status_path must be under artifacts/orchestration/epic-child-launches/.",
+    ]);
+  });
+
+  it("validates a feature with an empty launch path value", () => {
+    for (const launchStatusPath of ["", null]) {
+      // Arrange
+      const value = state();
+      (value["features"] as Record<string, unknown>[])[0]![
+        "launch_status_path"
+      ] = launchStatusPath;
+
+      // Act
+      const errors = launchBindingErrors(readyErrors(value));
+
+      // Assert
+      expect(errors).toEqual([
+        "Epic planner checkpoint features[0] launch binding.launch_status_path must be under artifacts/orchestration/epic-child-launches/.",
+      ]);
+    }
   });
 
   it.each([

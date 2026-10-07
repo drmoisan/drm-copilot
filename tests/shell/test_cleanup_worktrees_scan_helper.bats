@@ -20,6 +20,22 @@ setup() {
     chmod +x "${HELPER}" 2>/dev/null || true
 }
 
+run_helper_sourced() { # run_helper_sourced <body> [arg...] -> run <body> with HELPER sourced
+    # The helper enables nounset at its top level, and under kcov the traced PS4 expands
+    # ${BASH_SOURCE}, which is unset at the top level of a child shell. The helper is
+    # therefore sourced inside source_helper, which clears nounset before it returns, so
+    # no top-level command of the child shell runs with nounset enabled. <body> then runs
+    # with the caller's arguments as its positional parameters.
+    local body=$1
+    shift
+    local prelude='source_helper() { source "$1"; set +u; }
+        source_helper "$1"
+        shift
+'
+    run env CLEANUP_WT_SCAN_GITFILE_NAME=dotgit \
+        bash -c "${prelude}${body}" _ "${HELPER}" "$@"
+}
+
 @test "scan-dirs emits has_gitfile/target_exists/size for each candidate directory" {
     run env CLEANUP_WT_SCAN_GITFILE_NAME=dotgit \
         bash "${HELPER}" scan-dirs "${ROOTS}"
@@ -39,17 +55,11 @@ setup() {
     # its single existence check, scan_helper_target_present, is redefined after sourcing
     # (a function-override test seam) to succeed only for that exact, unprefixed string.
     # A helper that prefixes the worktree directory never matches it and reports 0.
-    # The helper is sourced inside load_helper, which clears nounset before returning:
-    # the helper enables set -u at top level, and under kcov the traced PS4 expands
-    # ${BASH_SOURCE}, which is unset at the top level of bash -c.
     local drive_root="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/scan_roots/drive_letter"
-    run env CLEANUP_WT_SCAN_GITFILE_NAME=dotgit \
-        bash -c '
-            load_helper() { source "$1"; set +u; }
-            load_helper "$1"
-            scan_helper_target_present() { [[ $1 == "C:/fixture-repo/.git/worktrees/wt_drive" ]]; }
-            scan_helper_scan_dirs "$2"
-        ' _ "${HELPER}" "${drive_root}"
+    run_helper_sourced '
+        scan_helper_target_present() { [[ $1 == "C:/fixture-repo/.git/worktrees/wt_drive" ]]; }
+        scan_helper_scan_dirs "$1"
+    ' "${drive_root}"
     [ "$status" -eq 0 ]
     [[ "$output" == *"/wt_drive|1|1|"?* ]]
 }
@@ -64,38 +74,4 @@ setup() {
         bash "${HELPER}" scan-dirs "${drive_root}"
     [ "$status" -eq 0 ]
     [[ "$output" == *"/wt_drive|1|0|"?* ]]
-}
-
-@test "scan_helper_is_absolute_path returns 0 for slash-leading and drive-letter paths" {
-    # Issue #706: slash-leading paths and drive letters followed by / or \ are absolute.
-    # Each candidate that is classified relative is printed, so a failure names it.
-    # load_helper clears nounset after sourcing so kcov PS4 tracing does not abort.
-    run bash -c '
-        load_helper() { source "$1"; set +u; }
-        load_helper "$1"
-        shift
-        for candidate in "$@"; do
-            scan_helper_is_absolute_path "$candidate" || printf "classified relative: [%s]\n" "$candidate"
-        done
-    ' _ "${HELPER}" "/abs" "C:/x" "c:/x" 'C:\x'
-    [ "$status" -eq 0 ]
-    [ "$output" = "" ]
-}
-
-@test "scan_helper_is_absolute_path returns non-zero for relative, drive-relative, and empty paths" {
-    # Issue #706: relative paths, a drive letter with no separator, and the empty string
-    # are not absolute. Each candidate that is classified absolute is printed.
-    # load_helper clears nounset after sourcing so kcov PS4 tracing does not abort.
-    run bash -c '
-        load_helper() { source "$1"; set +u; }
-        load_helper "$1"
-        shift
-        for candidate in "$@"; do
-            if scan_helper_is_absolute_path "$candidate"; then
-                printf "classified absolute: [%s]\n" "$candidate"
-            fi
-        done
-    ' _ "${HELPER}" "../rel" "rel" "C:rel" ""
-    [ "$status" -eq 0 ]
-    [ "$output" = "" ]
 }

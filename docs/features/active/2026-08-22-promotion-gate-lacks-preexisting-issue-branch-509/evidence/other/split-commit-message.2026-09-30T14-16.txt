@@ -1,0 +1,18 @@
+refactor(509): split _orchestrator_state_routing below 500 lines
+
+Move the route-gate helpers (routing-matrix loader, selected-route
+resolution, PR-gate and CI-gate predicates, route-membership and
+mandatory-phase validation, PR-gate completion check, and _string_list)
+into scripts/dev_tools/_orchestrator_state_route_gates.py, and the
+promotion-entry tool constants and _resolve_promotion_entry_tools into
+scripts/dev_tools/_orchestrator_state_promotion_tools.py.
+
+Code moved verbatim with no behavior change. The routing-contract module
+re-exports all fifteen moved names through __all__, so existing callers
+and tests import them unchanged, and the receipt harvesters stay defined
+in the routing-contract module. A re-export identity test pins the
+split (33 tests).
+
+Refs #509
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

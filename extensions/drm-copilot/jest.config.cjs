@@ -74,7 +74,38 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/lib/validate/orchestrator-state-blocked-reason.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #509: the issue-adoption resolver and the routing validator that
+    // consumes it. Per-file entries only; the map has no `global` key.
+    "./src/lib/validate/orchestrator-state-issue-adoption.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestrator-state-routing.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #405: the pure promotion-type tool resolver used by the routing
+    // validator. This map carries no `global` key, so a new production file
+    // without its own entry here would be completely ungated.
+    "./src/lib/validate/orchestrator-state-promotion-tools.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/orchestration-artifacts.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #484: gate the remediation-loop validator (R5-R11 accounting).
+    "./src/lib/validate/orchestrator-state-remediation.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #484: gate the review-outcome module split from the validator above.
+    "./src/lib/validate/orchestrator-state-remediation-accounting.ts": {
       lines: 85,
       branches: 75,
     },
@@ -235,6 +266,12 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #532: the planner ready-gate invariant P10 structural subset, split
+    // out of `parallel-planner-state-core.ts`, sits behind the same gate.
+    "./src/lib/validate/parallel-planner-state-routing.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/push-down/claude-blast-radius-derive-core.ts": {
       lines: 85,
       branches: 75,
@@ -250,6 +287,37 @@ module.exports = {
     // `global` key, so a new production file without its own entry would be
     // completely ungated.
     "./src/lib/push-down/claude-gitignore-merge.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #621: the destination exclusion manifest, its filter, and the
+    // entry point, service call, engine, and command files it changes.
+    "./src/lib/push-down/claude-exclusion-manifest.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down/claude-exclusion-filter.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down/claude-customizations.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down/push-down-service-call.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down/copilot-customizations-engine.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/repo-automation-command-registration-admin.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #508: the blast-radius overlay; the map has no `global` key.
+    "./src/lib/push-down/claude-blast-radius-overlay.ts": {
       lines: 85,
       branches: 75,
     },
@@ -301,6 +369,11 @@ module.exports = {
       branches: 75,
     },
     "./src/lib/potential-to-issue/potential-to-issue-service-call.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #623: promotion.ts gained the post-move destination check, so it sits behind the same per-file gate as the rest of this cluster.
+    "./src/lib/potential-to-issue/promotion.ts": {
       lines: 85,
       branches: 75,
     },

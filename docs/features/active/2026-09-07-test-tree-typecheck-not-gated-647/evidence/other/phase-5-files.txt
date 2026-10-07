@@ -1,0 +1,9 @@
+extensions/drm-copilot/test/extension-test-harness.ts(
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(
+extensions/drm-copilot/test/extension.discovery-commands.test.ts(
+extensions/drm-copilot/test/extension.new-potential-bug-entry-inprocess.test.ts(
+extensions/drm-copilot/test/extension.resolve-policy-audit-template.test.ts(
+extensions/drm-copilot/test/extension.run-poshqc-commands.test.ts(
+extensions/drm-copilot/test/extension.run-poshqc-suite.test.ts(
+extensions/drm-copilot/test/extension.test.ts(
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(

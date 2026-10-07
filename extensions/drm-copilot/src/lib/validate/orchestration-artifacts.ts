@@ -317,6 +317,12 @@ function dispatchValidatorErrors(input: ValidateArtifactInput): string[] {
         ...(input.requireReadyForExecution === undefined
           ? {}
           : { requireReadyForExecution: input.requireReadyForExecution }),
+        ...(input.requireCodexModelRouting === undefined
+          ? {}
+          : { requireCodexModelRouting: input.requireCodexModelRouting }),
+        ...(input.requireCodexTopology === undefined
+          ? {}
+          : { requireCodexTopology: input.requireCodexTopology }),
         ...(input.fs === undefined ||
         input.root === undefined ||
         input.artifactPath === undefined ||

@@ -6,6 +6,7 @@ import {
   parseEpicKickoff,
   type ParsedEpicKickoff,
 } from "./epic-kickoff-artifact";
+import type { LaunchPathGateOptions } from "./epic-orchestrator-state-launch-binding";
 import {
   type ReadinessGitRepository,
   validateCommittedFile,
@@ -261,11 +262,16 @@ function validateKickoffAgainstState(
   return errors;
 }
 
-/** Run repository, kickoff, artifact, and Git readiness checks. */
+/**
+ * Run repository, kickoff, artifact, and Git readiness checks.
+ * `options` is forwarded to the launch-evidence check, where
+ * `requireLaunchPaths` skips features that carry neither launch path key.
+ */
 export function validateEpicReadinessIntegrity(
   state: Readonly<Record<string, unknown>>,
   stateText: string,
   context: EpicReadinessContext,
+  options: LaunchPathGateOptions = {},
 ): string[] {
   const errors = validateArtifactSource(stateText, context);
   const slug = state["epic_feature_folder"];
@@ -338,7 +344,7 @@ export function validateEpicReadinessIntegrity(
       }
     });
   }
-  errors.push(...validateEpicPlannerLaunchEvidence(state, context));
+  errors.push(...validateEpicPlannerLaunchEvidence(state, context, options));
   if (parsed !== undefined) {
     errors.push(
       ...validatePlanningGitIntegrity(state, parsed, plans, context.git),

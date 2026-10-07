@@ -40,9 +40,15 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
         $script:UnderTest = Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-worktree-removal-gate.ps1'
         . $script:UnderTest
 
-        # A synthetic absolute path. No epic checkpoint records it, so a removal aimed at
-        # it denies whatever the on-disk checkpoint holds.
-        $script:SyntheticTarget = 'C:/nonexistent-545-fixture/worktree-9f2a1c'
+        # Synthetic rooted prefixes chosen per host OS. [System.IO.Path]::IsPathRooted treats a
+        # drive-letter path (a letter, a colon, and a slash) as rooted only on Windows; on Linux
+        # and macOS it is relative, and GetFullPath would prefix the current directory. Deriving
+        # each prefix from $IsWindows keeps every path below rooted on the host that runs the suite.
+        $script:SyntheticRoot = if ($IsWindows) { 'C:/repo' } else { '/repo' }
+        $script:SyntheticElsewhere = if ($IsWindows) { 'C:/elsewhere' } else { '/elsewhere' }
+        # A synthetic path that is absolute on the host OS. No epic checkpoint records it, so a
+        # removal aimed at it denies whatever the on-disk checkpoint holds.
+        $script:SyntheticTarget = if ($IsWindows) { 'C:/nonexistent-545-fixture/worktree-9f2a1c' } else { '/nonexistent-545-fixture/worktree-9f2a1c' }
 
         function ConvertTo-CodexWorktreeDecisionPayload {
             <# Builds the full Codex stdin payload the decision seam consumes. #>
@@ -131,33 +137,33 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
 
     Context 'Get-NormalizedCodexWorktreePath resolves both rooted and relative inputs' {
         It 'resolves a relative path against the supplied working directory' {
-            Get-NormalizedCodexWorktreePath -Path 'worktrees/child-a' -WorkingDirectory 'C:/repo' |
-                Should -Be 'C:/repo/worktrees/child-a'
+            Get-NormalizedCodexWorktreePath -Path 'worktrees/child-a' -WorkingDirectory $script:SyntheticRoot |
+                Should -Be "$script:SyntheticRoot/worktrees/child-a"
         }
 
         It 'keeps a rooted path and trims a trailing separator' {
-            Get-NormalizedCodexWorktreePath -Path 'C:/repo/worktrees/child-a/' -WorkingDirectory 'C:/elsewhere' |
-                Should -Be 'C:/repo/worktrees/child-a'
+            Get-NormalizedCodexWorktreePath -Path "$script:SyntheticRoot/worktrees/child-a/" -WorkingDirectory $script:SyntheticElsewhere |
+                Should -Be "$script:SyntheticRoot/worktrees/child-a"
         }
     }
 
     Context 'Find-CodexWorktreeFeature tolerates incomplete checkpoints' {
         It 'returns null for a null checkpoint' {
-            Find-CodexWorktreeFeature -Checkpoint $null -TargetPath 'C:/repo/wt' -WorkingDirectory 'C:/repo' |
+            Find-CodexWorktreeFeature -Checkpoint $null -TargetPath "$script:SyntheticRoot/wt" -WorkingDirectory $script:SyntheticRoot |
                 Should -BeNullOrEmpty
         }
 
         It 'returns null for a checkpoint that carries no features array' {
             $checkpoint = '{"route_id":"epic"}' | ConvertFrom-Json
 
-            Find-CodexWorktreeFeature -Checkpoint $checkpoint -TargetPath 'C:/repo/wt' -WorkingDirectory 'C:/repo' |
+            Find-CodexWorktreeFeature -Checkpoint $checkpoint -TargetPath "$script:SyntheticRoot/wt" -WorkingDirectory $script:SyntheticRoot |
                 Should -BeNullOrEmpty
         }
 
         It 'skips a feature record whose worktree_path is blank and reports no match' {
             $checkpoint = '{"features":[{"worktree_path":"","merge_status":"merged"}]}' | ConvertFrom-Json
 
-            Find-CodexWorktreeFeature -Checkpoint $checkpoint -TargetPath 'C:/repo/wt' -WorkingDirectory 'C:/repo' |
+            Find-CodexWorktreeFeature -Checkpoint $checkpoint -TargetPath "$script:SyntheticRoot/wt" -WorkingDirectory $script:SyntheticRoot |
                 Should -BeNullOrEmpty
         }
 
@@ -166,8 +172,8 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
 
             $feature = Find-CodexWorktreeFeature `
                 -Checkpoint $checkpoint `
-                -TargetPath 'C:/repo/worktrees/child-a' `
-                -WorkingDirectory 'C:/repo'
+                -TargetPath "$script:SyntheticRoot/worktrees/child-a" `
+                -WorkingDirectory $script:SyntheticRoot
 
             $feature.merge_status | Should -Be 'merged'
         }
@@ -184,7 +190,7 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
         It 'denies an in-scope removal that names no operand at all' {
             # The scope filter admits the bare invocation, the operand resolver returns the
             # empty string, and the feature lookup is skipped, so the gate denies.
-            $payload = ConvertTo-CodexWorktreeDecisionPayload -Command 'git worktree remove' -WorkingDirectory 'C:/repo'
+            $payload = ConvertTo-CodexWorktreeDecisionPayload -Command 'git worktree remove' -WorkingDirectory $script:SyntheticRoot
 
             $decision = Invoke-CodexWorktreeRemovalDecision -PayloadRaw $payload -EpicCheckpointRaw ''
 
@@ -194,8 +200,9 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
         }
 
         It 'falls back to the current location when the payload carries no cwd' {
-            # The target is absolute, so the working directory does not change the
-            # normalized target and the deny holds wherever the suite runs from.
+            # SyntheticTarget is absolute on the host OS (BeforeAll derives it from $IsWindows),
+            # so the working directory does not change the normalized target and the deny holds
+            # wherever the suite runs from.
             $payload = ConvertTo-CodexWorktreeDecisionPayload -Command ('git worktree remove "' + $script:SyntheticTarget + '"')
 
             $decision = Invoke-CodexWorktreeRemovalDecision -PayloadRaw $payload -EpicCheckpointRaw ''
@@ -204,10 +211,10 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
         }
 
         It 'allows a removal whose feature record reports worktree_removed' {
-            $checkpoint = '{"features":[{"worktree_path":"C:/repo/worktrees/child-a","merge_status":"worktree_removed"}]}'
+            $checkpoint = '{{"features":[{{"worktree_path":"{0}/worktrees/child-a","merge_status":"worktree_removed"}}]}}' -f $script:SyntheticRoot
             $payload = ConvertTo-CodexWorktreeDecisionPayload `
-                -Command 'git worktree remove "C:/repo/worktrees/child-a"' `
-                -WorkingDirectory 'C:/repo'
+                -Command ('git worktree remove "{0}/worktrees/child-a"' -f $script:SyntheticRoot) `
+                -WorkingDirectory $script:SyntheticRoot
 
             Invoke-CodexWorktreeRemovalDecision -PayloadRaw $payload -EpicCheckpointRaw $checkpoint |
                 Should -BeNullOrEmpty
@@ -228,7 +235,7 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
         It 'writes the deny envelope and exits 0 for a removal no epic checkpoint authorizes' {
             $payload = ConvertTo-CodexWorktreeDecisionPayload `
                 -Command ('git worktree remove "' + $script:SyntheticTarget + '"') `
-                -WorkingDirectory 'C:/repo'
+                -WorkingDirectory $script:SyntheticRoot
 
             $result = Invoke-CodexWorktreeGateEntryPoint -HookPath $script:UnderTest -PayloadRaw $payload
 

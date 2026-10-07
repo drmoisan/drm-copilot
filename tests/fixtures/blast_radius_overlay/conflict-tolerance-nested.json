@@ -1,0 +1,5 @@
+{
+  "base_text": "{\n  \"version\": 1,\n  \"conflict_tolerance\": {\n    \"tolerance_percent\": 100,\n    \"weights\": {\n      \"same_file\": 8,\n      \"module\": 2\n    },\n    \"band_durations\": {\n      \"C1\": 1,\n      \"C2\": 2\n    },\n    \"default_band\": \"C1\",\n    \"append_only_paths\": [\n      \"**/CHANGELOG.md\"\n    ]\n  }\n}\n",
+  "overlay_text": "{\"conflict_tolerance\": {\"weights\": {\"module\": 3, \"append_only\": 1}, \"band_durations\": {\"C3\": 4}, \"default_band\": \"C2\", \"append_only_paths\": [\"docs/log.md\", \"**/CHANGELOG.md\"]}}\n",
+  "expected_text": "{\n  \"version\": 1,\n  \"conflict_tolerance\": {\n    \"tolerance_percent\": 100,\n    \"weights\": {\n      \"same_file\": 8,\n      \"module\": 3,\n      \"append_only\": 1\n    },\n    \"band_durations\": {\n      \"C1\": 1,\n      \"C2\": 2,\n      \"C3\": 4\n    },\n    \"default_band\": \"C2\",\n    \"append_only_paths\": [\n      \"**/CHANGELOG.md\",\n      \"docs/log.md\"\n    ]\n  }\n}\n"
+}

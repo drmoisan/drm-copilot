@@ -27,17 +27,12 @@ SOURCE = "evidence/qa-gates/gate.md"
 # expected_expectation). The identifiers and their ORDER are the contract that
 # makes this table textually diffable against the TypeScript transcription in
 # `extensions/drm-copilot/test/lib/pr-context/verification-evidence.test.ts`
-# (AC8). Shapes 01-05 and 07-11 each carry exactly ONE `EXIT_CODE:` line, so the
-# duplicate-`EXIT_CODE` precedence divergence deferred by the spec cannot
-# confound them.
+# (AC8). Shapes 01-05 and 07-11 each carry exactly ONE `EXIT_CODE:` line.
 #
 # shape-06 is the DUPLICATED-`EXIT_CODE` case and therefore carries TWO
-# `EXIT_CODE:` lines by definition. Its expected record is RUNTIME-SPECIFIC:
-# Python assigns unconditionally in the parse loop, so LAST occurrence wins and
-# this case asserts the SECOND value (`0`). The TypeScript case asserts the
-# FIRST value (`1`). shape-06 is EXCLUDED from the AC8 cross-runtime agreement
-# assertion; the exclusion is attributable to the deferred duplicate-`EXIT_CODE`
-# defect, not to this change.
+# `EXIT_CODE:` lines by definition. Both runtimes keep the first occurrence of
+# every accepted field (issue #744), so this case asserts the first value (`1`)
+# and agrees with the TypeScript case.
 SHAPE_CASES: list[tuple[str, str, str, int | None, int]] = [
     (
         "shape-01",
@@ -77,8 +72,8 @@ SHAPE_CASES: list[tuple[str, str, str, int | None, int]] = [
     (
         "shape-06",
         "Timestamp: t\nCommand: c\nEXIT_CODE: 1\nEXIT_CODE: 0",
-        "pass",
-        0,
+        "fail",
+        1,
         0,
     ),
     (

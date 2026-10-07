@@ -1,0 +1,14 @@
+{
+  "name": "refuse-detach-disposition",
+  "description": "A detach disposition is refused with exit 2 before any side effect.",
+  "argv": ["--item", "42", "--disposition", "detach", "--confirm-abandon", "--pr", "7", "--worktree", "../wt-42"],
+  "shim_exit": {"gh": 0, "git": 0},
+  "missing_executable": null,
+  "expected": {
+    "exit_code": 2,
+    "stderr_mode": "exact",
+    "stderr": "PARALLEL_ABANDON_ERROR: this CLI executes the 'abandon' disposition only; got 'detach'.",
+    "calls": []
+  },
+  "divergence": null
+}

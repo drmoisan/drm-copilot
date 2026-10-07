@@ -1,0 +1,19 @@
+feat(509): add PowerShell issue-adoption resolver and routing wiring
+
+Add .claude/lib/orchestrator-state/OrchestratorStateIssueAdoption.psm1,
+exporting Get-OrchestratorStateIssueAdoptionResult, a pure port of the
+Python resolve_issue_adoption with identical E1-E9 messages and only
+case-sensitive comparison operators. Wire it into
+Get-OrchestratorStateRoutingContractError (C6.15): a valid record skips
+the receipt check for its waived tools, and adoption errors follow the
+receipt loop and precede the local_execution_overrides errors.
+
+Mirror both modules byte-identically into the claude-customizations
+bundle, register the new module in core.json, both pester.runsettings.psd1
+files, and OrchestratorState.Manifest.Tests.ps1. Add the Pester unit
+suite (42 tests) and the shared-corpus parity reader (32 tests). Include
+Phase 5 evidence, plan check-offs, and the AC-16 check-off.
+
+Refs #509
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,6 +1,6 @@
 {
   "name": "@danmoisan/drm-copilot-mcp",
-  "version": "1.1.15",
+  "version": "1.1.18",
   "description": "Stdio MCP server exposing drm-copilot repo-automation tools.",
   "license": "MIT",
   "type": "commonjs",
@@ -38,16 +38,18 @@
     "prepack": "node prepack.cjs"
   },
   "overrides": {
-    "fast-uri": "^3.1.4",
+    "fast-uri": "^3.1.8",
+    "proxy-addr": "^2.0.8",
     "hono": "^4.12.27",
     "ip-address": "^10.7.2",
     "qs": "^6.15.2",
-    "@hono/node-server": "^2.0.5"
+    "@hono/node-server": "^2.0.5",
+    "brace-expansion": "^5.0.12"
   },
   "devDependencies": {
     "esbuild": "^0.28.0"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0"
+    "@modelcontextprotocol/sdk": "^1.31.0"
   }
 }

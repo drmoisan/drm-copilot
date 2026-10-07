@@ -3,6 +3,8 @@
 import { createHash } from "node:crypto";
 
 import { toPosixPath } from "../file-system";
+import { featureCarriesLaunchPath } from "./epic-orchestrator-state-launch-binding";
+import type { LaunchPathGateOptions } from "./epic-orchestrator-state-launch-binding";
 import type { EpicReadinessContext } from "./epic-planner-readiness-integrity";
 
 const LAUNCH_ROOT = "artifacts/orchestration/epic-child-launches";
@@ -389,10 +391,15 @@ function validateStatus(
   return errors;
 }
 
-/** Verify every prepared feature's receipt, specification, and final status. */
+/**
+ * Verify every prepared feature's receipt, specification, and final status.
+ * With `options.requireLaunchPaths`, a feature carrying neither launch path key
+ * is skipped; otherwise every feature is verified.
+ */
 export function validateEpicPlannerLaunchEvidence(
   state: Readonly<Record<string, unknown>>,
   context: EpicReadinessContext,
+  options: LaunchPathGateOptions = {},
 ): string[] {
   const features = state["features"];
   if (!Array.isArray(features)) {
@@ -403,6 +410,13 @@ export function validateEpicPlannerLaunchEvidence(
   let status: Record<string, unknown> | undefined;
   features.forEach((item, index) => {
     if (!isRecord(item)) {
+      return;
+    }
+    // A keyless feature contributes neither errors nor a shared status path.
+    if (
+      options.requireLaunchPaths === true &&
+      !featureCarriesLaunchPath(item)
+    ) {
       return;
     }
     const receipt = validateReceipt(item, index, context);

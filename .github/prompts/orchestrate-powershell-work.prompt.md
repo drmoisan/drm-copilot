@@ -21,9 +21,9 @@ Coordinate the user request from intake to completion using the correct path bas
 ## Required orchestration behavior
 
 1. Estimate rough change budget first (production PowerShell files).
-2. If budget is **1–2 production PowerShell files** (+ corresponding tests):
+2. If budget is **1-3 production PowerShell files** (+ corresponding tests):
    - Delegate directly to `powershell-typed-engineer` for plan + implementation + QA closure.
-3. If budget is **>2 production PowerShell files**:
+3. If budget is **more than 3 production PowerShell files**:
    - Execute full large-path lifecycle:
      1) Scope and create potential entry (`feature` vs `bug`, short-name creation)
      2) Promote to GitHub issue and capture issue metadata

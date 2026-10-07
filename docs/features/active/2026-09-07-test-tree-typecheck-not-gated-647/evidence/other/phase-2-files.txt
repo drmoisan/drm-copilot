@@ -1,0 +1,11 @@
+extensions/drm-copilot/test/lib/executable-resolver.test.ts(
+extensions/drm-copilot/test/lib/file-system.test.ts(
+extensions/drm-copilot/test/lib/new-active-feature-folder/models.test.ts(
+extensions/drm-copilot/test/lib/pr-context/gh-client-core.test.ts(
+extensions/drm-copilot/test/lib/push-down/claude-config-carriage.test.ts(
+extensions/drm-copilot/test/lib/push-down/claude-pack-selection.test.ts(
+extensions/drm-copilot/test/lib/push-down/filesystem-adapter.test.ts(
+extensions/drm-copilot/test/lib/resolve/file-prompt-core.test.ts(
+extensions/drm-copilot/test/lib/resolve/file-prompt-variables.test.ts(
+extensions/drm-copilot/test/lib/resolve/hard-lock-prompt.test.ts(
+extensions/drm-copilot/test/lib/resolve/resolve-prompts-service-call.test.ts(

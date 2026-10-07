@@ -31,6 +31,18 @@ class VirtualFileSystem implements FileSystem {
     return this.contents.has(path);
   }
 
+  exists(): boolean {
+    throw new Error("not used");
+  }
+
+  isDirectory(): boolean {
+    throw new Error("not used");
+  }
+
+  listDirectory(): string[] {
+    throw new Error("not used");
+  }
+
   readTextFile(path: string): string {
     this.lastReadPath = path;
     const content = this.contents.get(path);
@@ -143,6 +155,53 @@ describe("validateOrchestrationServiceCall", () => {
     ).toThrow(
       "Checkpoint codex_topology_receipts must be a list when present.",
     );
+  });
+
+  it("threads the Codex flags into epic-planner-state", () => {
+    // Arrange: a prepared feature that carries no launch-binding key.
+    const feature = {
+      issue_num: 101,
+      feature_folder: "docs/features/active/feature-101",
+      depends_on: [],
+      wave: 0,
+      complexity_band: "C3",
+      preparation_status: "prepared",
+      research_path: "artifacts/research/feature-101.md",
+      plan_path: "docs/features/active/feature-101/plan.md",
+      preflight_status: "PREFLIGHT: ALL CLEAR",
+    };
+    const fileSystem = new VirtualFileSystem({
+      "C:/workspace/artifacts/orchestration/epic-planner-state.json":
+        JSON.stringify({ features: [feature] }),
+    });
+    const messageFor = (flags: {
+      readonly requireCodexModelRouting?: boolean;
+      readonly requireCodexTopology?: boolean;
+    }): string => {
+      try {
+        validateOrchestrationServiceCall({
+          fileSystem,
+          workspaceRoot: "C:/workspace",
+          artifactType: "epic-planner-state",
+          artifactPath: "artifacts/orchestration/epic-planner-state.json",
+          requireReadyForExecution: true,
+          ...flags,
+        });
+      } catch (error: unknown) {
+        return error instanceof Error ? error.message : String(error);
+      }
+      throw new Error("expected epic-planner-state validation to fail");
+    };
+
+    // Act
+    const routing = messageFor({ requireCodexModelRouting: true });
+    const topology = messageFor({ requireCodexTopology: true });
+    const keyGated = messageFor({});
+
+    // Assert
+    expect(routing).toContain("features[0] launch binding.branch_name");
+    expect(topology).toContain("features[0] launch binding.branch_name");
+    expect(keyGated).not.toContain(" launch binding");
   });
 
   it("throws with the aggregated error text when validation errors are present", () => {

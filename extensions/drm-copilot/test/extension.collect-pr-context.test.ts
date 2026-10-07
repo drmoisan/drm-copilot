@@ -84,10 +84,10 @@ import { activate } from "../src/extension";
 
 const fsMock = jest.requireMock("node:fs") as {
   existsSync: jest.MockedFunction<(filePath: string) => boolean>;
-  statSync: jest.Mock;
+  statSync: jest.Mock<(filePath: string) => unknown>;
   readdirSync: jest.Mock;
-  readFileSync: jest.Mock;
-  writeFileSync: jest.Mock;
+  readFileSync: jest.Mock<(filePath: string) => string>;
+  writeFileSync: jest.Mock<(filePath: string, content: string) => void>;
   mkdirSync: jest.Mock;
 };
 
@@ -129,11 +129,9 @@ function setCollectorFileSystemState(): void {
     throw new Error(`ENOENT: ${filePath}`);
   });
   fsMock.mkdirSync.mockReturnValue(undefined);
-  fsMock.writeFileSync.mockImplementation(
-    (filePath: string, content: string) => {
-      writtenFiles.set(filePath, content);
-    },
-  );
+  fsMock.writeFileSync.mockImplementation((filePath, content) => {
+    writtenFiles.set(filePath, content);
+  });
 }
 
 function setGitBranchDiscoveryState(input: {
@@ -260,8 +258,8 @@ function activateAndGetHandler(commandId: string): CommandHandler {
 
 describe("drm-copilot collectPrContext command behavior", () => {
   beforeEach(() => {
-    process.env.PATH = "C:/bin";
-    process.env.PATHEXT = ".EXE;.CMD";
+    process.env["PATH"] = "C:/bin";
+    process.env["PATHEXT"] = ".EXE;.CMD";
     commandHandlers.clear();
     appendLineMock.mockReset();
     registerCommandMock.mockClear();
