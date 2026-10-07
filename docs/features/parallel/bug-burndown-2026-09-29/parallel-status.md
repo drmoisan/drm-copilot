@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 3
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-07T14:59:00Z
+- `last_updated`: 2026-10-07T15:00:03Z
 
 **Items**
 
@@ -24,7 +24,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 338 | docs/features/active/2026-07-09-potential-entry-ide-launcher-audit-gaps-338 | 4 | scheduled | not_started |  |  |  |  |  |
 | 406 | docs/features/active/2026-07-24-potential-to-issue-python-files-oversized-406 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/806 | b83f300047c4181223d99eb27eb0b025acca0125 | 2026-09-30T13:48:50Z | 2026-09-30T14:20:25Z |  |
-| 510 | docs/features/active/2026-08-19-claude-resource-parity-enumerates-gitignored-state-510 | 3 | scheduled | not_started |  |  |  |  |  |
+| 510 | docs/features/active/2026-08-19-claude-resource-parity-enumerates-gitignored-state-510 | 3 | in_flight | worktree_created |  |  | 2026-10-07T15:00:03Z |  |  |
 | 512 | docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/799 | 021b37e600afab00b191276cda803f87419a4a87 | 2026-09-30T11:19:00Z | 2026-09-30T13:33:38Z |  |
 | 527 | docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/821 | 9fb35e7fff0fd7caec36c0de15adff894abdf304 | 2026-10-02T07:34:44Z | 2026-10-02T11:37:59Z |  |
 | 532 | docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/820 | 1920378812e61be21a5fc96f9ffbf474b4bbbee4 | 2026-10-02T08:16:26Z | 2026-10-02T11:38:33Z |  |
