@@ -214,6 +214,7 @@
   },
   "overrides": {
     "fast-uri": "^3.1.8",
+    "proxy-addr": "^2.0.8",
     "hono": "^4.12.27",
     "ip-address": "^10.7.2",
     "qs": "^6.15.2",
@@ -241,6 +242,6 @@
     "typescript-eslint": "^8.70.1"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.30.1"
+    "@modelcontextprotocol/sdk": "^1.31.0"
   }
 }
