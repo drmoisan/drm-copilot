@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 2
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-07T13:12:29Z
+- `last_updated`: 2026-10-07T13:43:41Z
 
 **Items**
 
