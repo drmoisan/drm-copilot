@@ -21,6 +21,7 @@ import {
 import { VALID_MODES } from "../../../src/lib/validate/parallel-state-shared";
 import {
   buildBlastRadius,
+  buildPlannerRoutingFields,
   cohortAt,
   itemAt,
   radiusOf,
@@ -47,6 +48,7 @@ function buildItem(issueNum: number, slug: string): JsonRecord {
     research_path: `docs/features/active/${slug}/research.md`,
     plan_path: `docs/features/active/${slug}/plan.md`,
     preflight_status: "PREFLIGHT: ALL CLEAR",
+    ...buildPlannerRoutingFields(),
   };
 }
 
@@ -134,11 +136,16 @@ describe("invariant P1 required top-level keys", () => {
     );
   });
 
-  it("treats kickoff_prompt_path and complexity_band as optional off the gate", () => {
+  it("treats kickoff_prompt_path and the routing fields as optional off the gate", () => {
     const state = buildValidPlannerState();
     delete state["kickoff_prompt_path"];
+    for (const index of [0, 1]) {
+      const item = itemAt(state, index);
+      delete item["complexity_band"];
+      delete item["complexity_assessment"];
+      delete item["model_routing_receipt"];
+    }
 
-    expect("complexity_band" in itemAt(state, 0)).toBe(false);
     expect(validate(state)).toEqual([]);
   });
 });

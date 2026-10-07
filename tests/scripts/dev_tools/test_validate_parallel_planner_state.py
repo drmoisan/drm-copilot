@@ -8,6 +8,9 @@ error per helper; the helpers' exhaustive per-branch behavior is covered by
 the Phase 1 orchestrator-checkpoint test files. The deliberate omission
 recorded as spec P5 is asserted as an absence. Checkpoints are built as
 dictionaries and serialized with ``json.dumps``; no temporary file is created.
+The checkpoint builders live in the non-test support module
+``tests.scripts.dev_tools.parallel_planner_state_builders`` and are imported
+here, so the sibling suites that import them from this module are unchanged.
 """
 
 from __future__ import annotations
@@ -25,63 +28,20 @@ from scripts.dev_tools.validate_parallel_planner_state import (
     VALID_COMPLEXITY_BANDS,
     validate_parallel_planner_state_text,
 )
+from tests.scripts.dev_tools.parallel_planner_state_builders import (
+    EXPECTED_KICKOFF,
+    build_item,
+    build_valid_planner_state,
+)
 from tests.scripts.dev_tools.test_validate_parallel_orchestrator_state import (
     build_blast_radius,
 )
 
 CONTEXT = "Parallel planner checkpoint"
 
-# The kickoff path invariant P9 pins for the builder's slug (assumption A6).
-EXPECTED_KICKOFF = "artifacts/orchestration/parallel-kickoff-wave-one.md"
-
 # Error-string prefix for the second builder item, which the readiness-gate
 # cases mutate so a reported error is unambiguously attributable to them.
 ITEM1 = f"{CONTEXT} items[1]"
-
-
-def build_item(issue_num: int, slug: str) -> dict[str, object]:
-    """Return one fully prepared, preflight-cleared planner item."""
-
-    return {
-        "issue_num": issue_num,
-        "feature_folder": f"2026-08-07-{slug}-{issue_num}",
-        "kind": "feature",
-        "state": "prepared",
-        "blast_radius": build_blast_radius(),
-        "preparation_status": "prepared",
-        "research_path": f"docs/features/active/{slug}/research.md",
-        "plan_path": f"docs/features/active/{slug}/plan.md",
-        "preflight_status": "PREFLIGHT: ALL CLEAR",
-    }
-
-
-def build_valid_planner_state() -> dict[str, object]:
-    """Return a minimally valid, execution-ready planner checkpoint payload.
-
-    Two prepared items sit in one current-generation cohort with no conflict
-    edges, so a test can mutate one field and attribute any resulting error to
-    that mutation. The payload also satisfies the readiness gate, so the same
-    builder serves both the gate-off and gate-on cases.
-    """
-
-    return {
-        "objective": "prepare parallel run wave-one",
-        "parallel_slug": "wave-one",
-        "parallel_manifest_path": "docs/features/parallel/wave-one/parallel.md",
-        "mode": "closed",
-        "max_concurrency": 4,
-        "items": [
-            build_item(444, "parallel-schema-validators"),
-            build_item(445, "parallel-cohort-scheduler"),
-        ],
-        "cohorts": [{"index": 0, "generation": 0, "item_keys": [444, 445]}],
-        "conflict_edges": [],
-        "recolor_generation": 0,
-        "completed_steps": ["manifest_parsed"],
-        "next_step": "PARALLEL_EXECUTION_READY",
-        "last_updated": "2026-08-07T10-00",
-        "kickoff_prompt_path": EXPECTED_KICKOFF,
-    }
 
 
 def item_at(state: dict[str, object], index: int) -> dict[str, object]:
@@ -168,13 +128,16 @@ def test_invariant_p1_empty_object_reports_every_required_key() -> None:
     assert len(validate_parallel_planner_state_text("{}")) == len(REQUIRED_KEYS)
 
 
-def test_optional_keys_are_absent_from_the_builder_and_yield_no_errors() -> None:
-    """``kickoff_prompt_path`` and ``complexity_band`` are optional off the gate."""
+def test_routing_fields_and_kickoff_path_are_optional_off_the_gate() -> None:
+    """The kickoff path and the item routing fields are optional off the gate."""
 
     state = build_valid_planner_state()
     del state["kickoff_prompt_path"]
+    for item in cast("list[dict[str, object]]", state["items"]):
+        del item["complexity_band"]
+        del item["complexity_assessment"]
+        del item["model_routing_receipt"]
 
-    assert "complexity_band" not in item_at(state, 0)
     assert validate(state) == []
 
 

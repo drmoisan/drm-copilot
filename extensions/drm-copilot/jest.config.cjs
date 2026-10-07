@@ -266,6 +266,12 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #532: the planner ready-gate invariant P10 structural subset, split
+    // out of `parallel-planner-state-core.ts`, sits behind the same gate.
+    "./src/lib/validate/parallel-planner-state-routing.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/push-down/claude-blast-radius-derive-core.ts": {
       lines: 85,
       branches: 75,

@@ -56,7 +56,10 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    contract for parallel admission. Preparation yields the item's DECLARED blast radius, and only
    the planner-computed declared radius is authoritative for scheduling. The item's lifecycle
    advances `proposed` -> `admitted` -> `prepared` during this step, recorded as item-state updates in
-   `items[]` with the checkpoint's lifecycle timestamps.
+   `items[]` with the checkpoint's lifecycle timestamps. After the admitted item's preflight
+   clearance, perform the `parallel-plan` skill's `## Complexity Assessment` procedure for it, and
+   record the resulting `complexity_band` on the admitted orchestrator-checkpoint item so step 3's
+   edge derivation and the parent's model routing read the same band.
 
 3. **Compute conflict edges over ALL items, including in-flight ones.** Invoke the scheduling
    entry point Get-BlastRadiusConflictEdge from the destination-runtime PowerShell port
@@ -168,6 +171,8 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
   and `benefit` (tolerated-not-validated, returned by the scheduling entry point), and no reason
   member is added: the four `conflict_edges[].reason` members are unchanged. The nine parallel
   enums are owned by `.claude/rules/parallel-orchestration.md` and are consumed, never extended.
+  The `complexity_band` recorded in step 2 is not a new field: it is an existing scheduling field
+  read by drift re-scheduling.
 - This operation never moves, restates, or re-derives an in-flight item's cohort or state.
 - This operation performs no destructive side effect: it closes no pull request and removes no
   worktree. Those belong to `/parallel-remove` with `--disposition abandon`.

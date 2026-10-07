@@ -73,7 +73,7 @@ Describe 'Invoke-PoshQCTest post-run summary branches (issue #392)' {
                 CodeCoverage = @{ Enabled = @{ Value = $true }; Path = @{ Value = $null }; OutputPath = @{ Value = $null } }
                 Output       = @{ Verbosity = 'Normal' }
             }
-        } -ResolveScanConfig { @() } -EnumerateTests {
+        } -ResolveScanConfig { @() } -ResolveCoveragePopulation { [pscustomobject]@{ Source = 'config'; Paths = @('/summary-root/scripts/sample.ps1') } } -EnumerateTests {
             @([pscustomobject]@{ FullName = '/summary-root/tests/sample.Tests.ps1' })
         } -InvokePester {
             param($Config)
@@ -116,7 +116,7 @@ Describe 'Invoke-PoshQCTest post-run summary branches (issue #392)' {
                 CodeCoverage = @{ Enabled = @{ Value = $true }; Path = @{ Value = $null }; OutputPath = @{ Value = $null } }
                 Output       = @{ Verbosity = 'Normal' }
             }
-        } -ResolveScanConfig { @() } -EnumerateTests {
+        } -ResolveScanConfig { @() } -ResolveCoveragePopulation { [pscustomobject]@{ Source = 'config'; Paths = @('/summary-root/scripts/sample.ps1') } } -EnumerateTests {
             @([pscustomobject]@{ FullName = '/summary-root/tests/sample.Tests.ps1' })
         } -InvokePester {
             param($Config)
@@ -133,8 +133,9 @@ Describe 'Invoke-PoshQCTest post-run summary branches (issue #392)' {
         } -Logger { param([string] $Message) $logs.Add($Message) | Out-Null } | Out-Null
 
         # Assert: the fallback recovered the marker line itself as the sole replayed coverage
-        # line, so the logger emitted exactly one extra message beyond the fixed summary lines.
-        $fixedMessageCount = 4
+        # line, so the logger emitted exactly one extra message beyond the fixed lines: the four
+        # fixed summary lines plus the coverage population line precede the replayed coverage line.
+        $fixedMessageCount = 5
         $logs.Count | Should -Be ($fixedMessageCount + 1)
         $logs[-1] | Should -Be $singleLineCoverageReport
     }
