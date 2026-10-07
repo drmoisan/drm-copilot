@@ -366,7 +366,7 @@ def test_every_selected_pack_generates_identical_handoff_runtime_files() -> None
 
 
 def test_consumer_authority_is_typescript_only_and_scope_owners_are_unchanged() -> None:
-    """Installed authority avoids Python and leaves #467/#543 behavior unchanged."""
+    """Installed authority avoids Python and pins the #543 ready-gate key gate."""
 
     authority_paths = (
         "repo-automation-tool-names.ts",
@@ -400,7 +400,27 @@ def test_consumer_authority_is_typescript_only_and_scope_owners_are_unchanged() 
     ready_gate = epic_validator[
         epic_validator.index("if require_ready_for_execution:") :
     ]
-    assert "validate_epic_planner_child_launch_bindings(features)" in ready_gate
+    assert "validate_epic_planner_child_launch_bindings(" in ready_gate
+    assert "require_launch_paths=key_gated" in ready_gate
+
+
+def test_epic_planner_ready_gate_guidance_passes_both_codex_flags() -> None:
+    """Codex planner ready-gate callers must assert both Codex enforcement flags."""
+
+    expected = (
+        "`epic-planner-state` with `require_ready_for_execution: true`, "
+        "`require_codex_topology: true`, `require_codex_model_routing: true`, "
+        "and the explicit workspace root"
+    )
+    for relative_path in (
+        ".agents/skills/epic-plan/SKILL.md",
+        ".agents/skills/epic-run/SKILL.md",
+        ".codex/agents/epic-orchestrator.toml",
+    ):
+        for root in (REPO_ROOT, CODEX_BUNDLE_ROOT):
+            text = (root / relative_path).read_text(encoding="utf-8")
+            collapsed = " ".join(text.split())
+            assert expected in collapsed, f"{root}: {relative_path}"
 
 
 def test_codex_guidance_requires_independent_expected_context() -> None:
