@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 3
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-07T15:00:03Z
+- `last_updated`: 2026-10-07T15:12:55Z
 
 **Items**
 
@@ -127,6 +127,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | --- | --- | --- | --- |
 | 2026-10-07T13:12:29Z | #543 (resumed) | remediation cycle 2: plan, preflight, execute, re-review, PR | 2 (orchestrator + 1 delegate at a time) |
 | 2026-10-07T14:59:26Z | #510 | start: merge main, resume atomic execution from committed plan | 2 (orchestrator + 1 delegate at a time) |
+| 2026-10-07T15:12:55Z | (hold) | held by coordinator: weekly pace; no new starts until GO | 510 in flight: up to 2 |
 
 ## Paused By Operator (history)
 
