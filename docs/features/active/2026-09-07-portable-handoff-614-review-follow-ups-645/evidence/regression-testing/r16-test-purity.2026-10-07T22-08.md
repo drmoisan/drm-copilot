@@ -1,6 +1,6 @@
 # R16 Test Purity (P1-T7)
 
-Timestamp: 2026-10-07T22-10
+Timestamp: 2026-10-07T22-08
 Task: [P1-T7]
 Command: grep -cE 'TestDrive|New-TemporaryFile|GetTempPath|\$env:TEMP|tmpdir|tempfile|tmp_path' tests/scripts/codex-hooks/codex-planning-only-registry.Tests.ps1 tests/fixtures/codex-hooks/invalid-operation-orchestration-handoff-registry.json tests/fixtures/codex-hooks/invalid-alias-orchestration-handoff-registry.json; Glob tests/fixtures/codex-hooks/*
 EXIT_CODE: 1
