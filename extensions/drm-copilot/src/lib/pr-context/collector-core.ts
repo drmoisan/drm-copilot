@@ -20,6 +20,7 @@ import { type FileSystem } from "../file-system";
 import { type CommandRunner } from "../subprocess-runner";
 import {
   compareCodePoint,
+  sortedSet,
   type FeatureDocExcerpt,
   type IssueDetails,
   type PrContextResult,
@@ -378,9 +379,4 @@ export function collectPrContext(
 /** Extract a message from a thrown value, matching Python `str(exc)`. */
 function errorMessage(exc: unknown): string {
   return exc instanceof Error ? exc.message : String(exc);
-}
-
-/** Sort a deduplicated set of strings by Unicode code point. */
-function sortedSet(values: Iterable<string>): string[] {
-  return [...new Set(values)].sort(compareCodePoint);
 }

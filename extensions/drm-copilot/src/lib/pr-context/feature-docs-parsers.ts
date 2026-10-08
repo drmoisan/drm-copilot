@@ -18,6 +18,7 @@ import { type FileSystem, toPosixPath } from "../file-system";
 import {
   ISSUE_REFERENCE_PATTERN,
   compareCodePoint,
+  escapeRegExp,
   splitLines,
 } from "./models";
 
@@ -290,11 +291,16 @@ export function resolveReadinessSignal(
 /**
  * Compute a repo-relative POSIX path for a path under `root`.
  *
- * Mirrors Python `Path.relative_to(root).as_posix()`.
+ * Mirrors Python `Path.relative_to(root).as_posix()` for a path under `root`.
+ * Both arguments are normalized to forward slashes and trailing slashes are
+ * stripped from `root`. A path outside `root` (including a sibling directory
+ * that only shares the root as a string prefix) returns the POSIX path with
+ * leading slashes stripped, where Python `relative_to` would raise.
  *
  * @param root Repository root.
- * @param path Absolute path under `root`.
- * @returns The repo-relative POSIX path.
+ * @param path Absolute path, normally under `root`.
+ * @returns The repo-relative POSIX path, or the leading-slash-stripped POSIX
+ *   path when `path` is outside `root`.
  */
 export function relativeToPosix(root: string, path: string): string {
   const normalizedRoot = toPosixPath(root).replace(/\/+$/u, "");
@@ -303,14 +309,4 @@ export function relativeToPosix(root: string, path: string): string {
     return normalized.slice(normalizedRoot.length + 1);
   }
   return normalized.replace(/^\/+/u, "");
-}
-
-/**
- * Escape regex metacharacters for use in a dynamic pattern.
- *
- * @param value Literal text.
- * @returns The escaped text.
- */
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
 }

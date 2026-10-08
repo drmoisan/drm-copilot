@@ -64,6 +64,21 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #740: render.ts, gh-client-details.ts, and verification-evidence.ts
+    // changed (helper consolidation) without an existing per-file entry.
+    // Per-file entries only; the map has no `global` key.
+    "./src/lib/pr-context/render.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/gh-client-details.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/pr-context/verification-evidence.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #588: the new PATH executable resolver. Per-file entry only; the
     // map has no `global` key.
     "./src/lib/executable-resolver.ts": {

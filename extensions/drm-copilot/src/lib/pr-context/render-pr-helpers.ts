@@ -24,6 +24,7 @@ import {
   type PullRequestDetails,
   formatList,
   section,
+  splitLines,
   truncate,
 } from "./models";
 import { type GitClient } from "./git-client";
@@ -383,25 +384,4 @@ function padName(name: string): string {
 /** Test whether a string is a non-empty run of ASCII digits (Python isdigit). */
 function isDigits(value: string): boolean {
   return value.length > 0 && /^\d+$/u.test(value);
-}
-
-/**
- * Split text into lines the way Python `str.splitlines()` does.
- *
- * @param value Text to split.
- * @returns Lines without terminators.
- */
-function splitLines(value: string): string[] {
-  if (value === "") {
-    return [];
-  }
-  const lines = value.split(/\r\n|\r|\n/u);
-  if (
-    lines.length > 0 &&
-    lines[lines.length - 1] === "" &&
-    /(\r\n|\r|\n)$/u.test(value)
-  ) {
-    lines.pop();
-  }
-  return lines;
 }
