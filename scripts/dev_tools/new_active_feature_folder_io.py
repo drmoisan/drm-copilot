@@ -267,7 +267,7 @@ def _resolve_code_cli(
     env_lookup: Callable[[str], str | None] | None = None,
 ) -> str | None:
     """Resolve the best VS Code CLI executable path for the current session.
-        [code_cmd, "--reuse-window", *[file_path.as_posix() for file_path in files]],
+
     Purpose:
         Choose the correct CLI path while preserving fallback to the standard
             `code` command when an Insiders-specific executable is unavailable.
