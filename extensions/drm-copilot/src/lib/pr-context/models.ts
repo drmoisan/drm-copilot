@@ -336,13 +336,28 @@ export function formatList(
   return valuesList.map((item) => `- ${item}`).join("\n");
 }
 
-/** Compare two strings by Unicode code point (Python `sorted` semantics). */
+/**
+ * Compare two strings by Unicode code point, matching Python `str` comparison.
+ *
+ * This differs from the JavaScript `<` operator, which compares
+ * UTF-16 code units: a supplementary character (a surrogate pair) sorts
+ * before a BMP character in U+E000..U+FFFF under `<`, but after it here.
+ * The first differing UTF-16 code unit is located and the code points at
+ * that index are compared; a proper prefix sorts first.
+ *
+ * @returns Exactly -1, 0, or 1.
+ */
 export function compareCodePoint(left: string, right: string): number {
-  if (left < right) {
-    return -1;
+  const sharedLength = Math.min(left.length, right.length);
+  for (let index = 0; index < sharedLength; index += 1) {
+    if (left.charCodeAt(index) !== right.charCodeAt(index)) {
+      const leftPoint = left.codePointAt(index)!;
+      const rightPoint = right.codePointAt(index)!;
+      return leftPoint < rightPoint ? -1 : 1;
+    }
   }
-  if (left > right) {
-    return 1;
+  if (left.length === right.length) {
+    return 0;
   }
-  return 0;
+  return left.length < right.length ? -1 : 1;
 }
