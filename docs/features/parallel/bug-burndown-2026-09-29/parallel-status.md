@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 3
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-08T01:43:07Z
+- `last_updated`: 2026-10-08T01:53:24Z
 
 **Items**
 
@@ -33,7 +33,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 623 | docs/features/active/promotion-receipt-destination-unverified-623 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/804 | 2b0121abf74f5862a3d12929d833504668941156 | 2026-09-30T12:21:20Z | 2026-09-30T13:42:13Z |  |
 | 645 | docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645 | 3 | in_flight | worktree_created |  |  | 2026-10-08T01:43:07Z |  |  |
 | 647 | docs/features/active/2026-09-07-test-tree-typecheck-not-gated-647 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/816 | b080a69ecb60b65d016362b21fffed0a34be9144 | 2026-10-02T03:14:17Z | 2026-10-02T05:12:02Z |  |
-| 658 | docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658 | 3 | scheduled | not_started |  |  |  |  |  |
+| 658 | docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658 | 3 | in_flight | worktree_created |  |  | 2026-10-08T01:53:24Z |  |  |
 | 659 | docs/features/active/2026-09-08-epic-wave-barrier-violations-lack-start-guard-659 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/807 | 41217012d31d35c2ee33a50be50684affd2f5f43 | 2026-09-30T13:24:40Z | 2026-10-01T11:12:35Z |  |
 | 723 | docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/813 | 12fd3c2639f17aec3572f90e8d929205059be56d | 2026-09-30T13:34:37Z | 2026-10-02T00:43:34Z |  |
 | 734 | docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/818 | 74e1d6741485aa38c28fecbbc77ea169f31df0ef | 2026-10-02T07:15:04Z | 2026-10-02T08:15:36Z |  |
@@ -42,7 +42,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 741 | docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/819 | ef80c57df8f8bbc7d2e9ac51586150dfee3cd5fd | 2026-10-02T07:25:34Z | 2026-10-02T08:51:49Z |  |
 | 743 | docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/810 | 1b1e349f1d0fb8b00eb69a809ef380fcc6eb35b9 | 2026-10-01T15:52:55Z | 2026-10-02T03:08:04Z |  |
 | 744 | docs/features/active/2026-09-27-orchestration-completion-gate-and-tooling-friction-744 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/817 | 71f8dcb49d8ce5d1402ff441855a64be15b37f29 | 2026-10-02T05:13:22Z | 2026-10-02T07:24:50Z |  |
-| 756 | docs/features/active/2026-09-28-cleanup-worktrees-631-spec-contradiction-and-untested-error-paths-756 | 3 | scheduled | not_started |  |  |  |  |  |
+| 756 | docs/features/active/2026-09-28-cleanup-worktrees-631-spec-contradiction-and-untested-error-paths-756 | 3 | in_flight | worktree_created |  |  | 2026-10-08T01:53:24Z |  |  |
 | 764 | docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/805 | a2541d6d5a487c8e979447baf596ef38c07029ab | 2026-09-30T13:44:42Z | 2026-09-30T14:06:35Z |  |
 
 **Cohorts**
@@ -129,6 +129,8 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 2026-10-07T14:59:26Z | #510 | start: merge main, resume atomic execution from committed plan | 2 (orchestrator + 1 delegate at a time) |
 | 2026-10-07T15:12:55Z | (hold) | held by coordinator: weekly pace; no new starts until GO | 510 in flight: up to 2 |
 | 2026-10-08T01:42:43Z | #645 | start: merge main, resume atomic execution from committed plan | 2 (orchestrator + 1 delegate at a time); subtree max 5 |
+| 2026-10-08T01:52:42Z | #658 | start: merge main, resume atomic execution | uncapped |
+| 2026-10-08T01:52:42Z | #756 | start: merge main, resume atomic execution | uncapped |
 
 ## Paused By Operator (history)
 
