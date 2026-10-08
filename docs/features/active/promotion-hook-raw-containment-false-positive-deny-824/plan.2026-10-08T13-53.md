@@ -415,7 +415,7 @@ Rules for every new test file: Arrange-Act-Assert; no temporary file; no network
   - Acceptance: the pytest summary line is printed and reports a total greater than 0 (otherwise BLOCKED); failing node IDs are a subset of `B_PY`.
 - [x] [P7-T9] Run the [P0-T20] jest command (the same three files under `extensions/drm-copilot/test/lib/push-down/`) and record `FEATURE/evidence/qa-gates/jest-parity-phase7.STAMP.md`.
   - Acceptance: the Jest `Tests:` line is printed and reports a total greater than 0 (otherwise BLOCKED); failing test names are a subset of `B_JS`.
-- [ ] [P7-T10] Commit and push every bundled mirror path of section 3, both `core.json` files, `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`, `FEATURE/evidence`, and the plan (`git commit -m "chore(824): bundle mirrors and pack-manifest entries" --` same pathspecs), then `git push -u origin BRANCH`.
+- [x] [P7-T10] Commit and push every bundled mirror path of section 3, both `core.json` files, `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`, `FEATURE/evidence`, and the plan (`git commit -m "chore(824): bundle mirrors and pack-manifest entries" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
 
 ### Phase 8 — Pass-After Regression and Negative Controls
