@@ -15,6 +15,8 @@
 #>
 
 . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-payload.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-payload-powershell.ps1')
 
 # The transparent-wrapper set of D2 Piece 3 step 2. These prefix a command without changing
 # which command runs, so the structural matcher skips them. All five are also members of the

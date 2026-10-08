@@ -284,24 +284,24 @@ Rules for every new test file: Arrange-Act-Assert; no temporary file; no network
   - Acceptance: `PESTER_FAILED` names only tests in `B_SCOPED`; no `FAILED_TEST:` line names a T-SCAN row; every Phase 2 shared-module edit that [P2-T3] did not copy has a matching `mirror-<group>-phase2` artifact written before this run (rule 6).
 - [x] [P2-T6] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase2-lines.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0` and `OVER_500: NONE`.
-- [ ] [P2-T7] Commit and push the four production files, the new test file, and evidence (`git add -- .claude/hooks/hook-command-scanner.ps1 .claude/hooks/hook-command-heredoc.ps1 .codex/hooks/hook-command-scanner.ps1 .codex/hooks/hook-command-heredoc.ps1 tests/scripts/claude-hooks/hook-command-scanner.Issue824.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every other shared module (both surfaces) edited or copied under rule 6 during Phase 2, matching `git commit -m "feat(824): scanner delimiter capture and heredoc module" -- <same paths>`, `git push -u origin BRANCH`).
+- [x] [P2-T7] Commit and push the four production files, the new test file, and evidence (`git add -- .claude/hooks/hook-command-scanner.ps1 .claude/hooks/hook-command-heredoc.ps1 .codex/hooks/hook-command-scanner.ps1 .codex/hooks/hook-command-heredoc.ps1 tests/scripts/claude-hooks/hook-command-scanner.Issue824.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every other shared module (both surfaces) edited or copied under rule 6 during Phase 2, matching `git commit -m "feat(824): scanner delimiter capture and heredoc module" -- <same paths>`, `git push -u origin BRANCH`).
   - Acceptance: each command exits 0.
 
 ### Phase 3 — Payload Modules
 
-- [ ] [P3-T1] Create `.claude/hooks/hook-command-payload.ps1` implementing `Read-CommandLineInvocationSegment` (DC-3, DC-4, DC-6, DC-8, DC-9), `Test-CommandLineWordPresent` (DC-13), leaf normalization (DC-5), transparent-wrapper skipping (DC-4), and the inert proof (DC-14), using approved verbs and `CmdletBinding`.
+- [x] [P3-T1] Create `.claude/hooks/hook-command-payload.ps1` implementing `Read-CommandLineInvocationSegment` (DC-3, DC-4, DC-6, DC-8, DC-9), `Test-CommandLineWordPresent` (DC-13), leaf normalization (DC-5), transparent-wrapper skipping (DC-4), and the inert proof (DC-14), using approved verbs and `CmdletBinding`.
   - Acceptance: [P3-T6] rows PY-01..PY-24 pass.
-- [ ] [P3-T2] Create `.claude/hooks/hook-command-payload-powershell.ps1` implementing the `pwsh`/`powershell` flag parsing, base64 decode, and AST adapter (DC-4, DC-7).
+- [x] [P3-T2] Create `.claude/hooks/hook-command-payload-powershell.ps1` implementing the `pwsh`/`powershell` flag parsing, base64 decode, and AST adapter (DC-4, DC-7).
   - Acceptance: [P3-T6] rows PY-07..PY-11 and PY-19 pass.
-- [ ] [P3-T3] Edit `.claude/hooks/hook-command-invocation.ps1`: after `:17` add dot-source lines for `hook-command-payload.ps1` and `hook-command-payload-powershell.ps1`.
+- [x] [P3-T3] Edit `.claude/hooks/hook-command-invocation.ps1`: after `:17` add dot-source lines for `hook-command-payload.ps1` and `hook-command-payload-powershell.ps1`.
   - Acceptance: [P3-T6] loads both modules through `hook-command-invocation.ps1` only.
-- [ ] [P3-T4] Run `sh SCRATCHPAD/s-mirror.sh codex-payload` and record `FEATURE/evidence/other/mirror-codex-payload.STAMP.md`.
+- [x] [P3-T4] Run `sh SCRATCHPAD/s-mirror.sh codex-payload` and record `FEATURE/evidence/other/mirror-codex-payload.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; three `COPIED` lines with equal hashes.
-- [ ] [P3-T5] Create `tests/scripts/claude-hooks/hook-command-payload.Tests.ps1` with rows PY-01..PY-24 (section 5 T-PAY).
+- [x] [P3-T5] Create `tests/scripts/claude-hooks/hook-command-payload.Tests.ps1` with rows PY-01..PY-24 (section 5 T-PAY).
   - Acceptance: [P3-T6] reports every PY row passed for both runtimes.
-- [ ] [P3-T6] Run `sh SCRATCHPAD/s-pester.sh P3` and record `FEATURE/evidence/qa-gates/phase3-pester.STAMP.md`.
+- [x] [P3-T6] Run `sh SCRATCHPAD/s-pester.sh P3` and record `FEATURE/evidence/qa-gates/phase3-pester.STAMP.md`.
   - Acceptance: failures are a subset of `B_SCOPED`; no T-SCAN or T-PAY row fails; every Phase 3 shared-module edit that [P3-T4] did not copy has a matching `mirror-<group>-phase3` artifact written before this run (rule 6).
-- [ ] [P3-T7] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase3-lines.STAMP.md`.
+- [x] [P3-T7] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase3-lines.STAMP.md`.
   - Acceptance: `OVER_500: NONE`.
 - [ ] [P3-T8] Commit and push (`git add --` and `git commit -m "feat(824): payload extraction and PowerShell adapter" --` over `.claude/hooks/hook-command-payload.ps1 .claude/hooks/hook-command-payload-powershell.ps1 .claude/hooks/hook-command-invocation.ps1 .codex/hooks/hook-command-payload.ps1 .codex/hooks/hook-command-payload-powershell.ps1 .codex/hooks/hook-command-invocation.ps1 tests/scripts/claude-hooks/hook-command-payload.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every other shared module (both surfaces) edited or copied under rule 6 during Phase 3, as the pathspecs of both the `git add --` and the `git commit ... --` commands; then `git push -u origin BRANCH`).
   - Acceptance: each command exits 0.
