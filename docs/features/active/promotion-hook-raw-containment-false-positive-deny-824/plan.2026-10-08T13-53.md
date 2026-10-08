@@ -218,45 +218,45 @@ Rules for every new test file: Arrange-Act-Assert; no temporary file; no network
 
 ### Phase 0 — Policy Reads, Environment, and Baseline Capture
 
-- [ ] [P0-T1] Read the repository instruction file `./CLAUDE.md` in full.
+- [x] [P0-T1] Read the repository instruction file `./CLAUDE.md` in full.
   - Acceptance: recorded in `FEATURE/evidence/baseline/phase0-instructions-read.md` by [P0-T6].
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
   - Acceptance: recorded by [P0-T6].
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
   - Acceptance: recorded by [P0-T6].
-- [ ] [P0-T4] Read `.claude/rules/quality-tiers.md` in full.
+- [x] [P0-T4] Read `.claude/rules/quality-tiers.md` in full.
   - Acceptance: recorded by [P0-T6].
-- [ ] [P0-T5] Read `.claude/rules/powershell.md` in full (the only language in scope; no Python, TypeScript, or C# file is changed).
+- [x] [P0-T5] Read `.claude/rules/powershell.md` in full (the only language in scope; no Python, TypeScript, or C# file is changed).
   - Acceptance: recorded by [P0-T6].
-- [ ] [P0-T6] Write `FEATURE/evidence/baseline/phase0-instructions-read.md`.
+- [x] [P0-T6] Write `FEATURE/evidence/baseline/phase0-instructions-read.md`.
   - Acceptance: the file contains `Timestamp:`, `Policy Order: CLAUDE.md > general-code-change > general-unit-test > quality-tiers > powershell`, and the five repository-relative paths read in [P0-T1]-[P0-T5].
-- [ ] [P0-T7] Write `FEATURE/evidence/other/evidence-location-overrides.STAMP.md` containing the three `EVIDENCE_LOCATION_OVERRIDE_REJECTED:` lines of rule 2.
+- [x] [P0-T7] Write `FEATURE/evidence/other/evidence-location-overrides.STAMP.md` containing the three `EVIDENCE_LOCATION_OVERRIDE_REJECTED:` lines of rule 2.
   - Acceptance: the file contains `Timestamp:` and exactly those three lines.
-- [ ] [P0-T8] Run `git branch --show-current` and record it in `FEATURE/evidence/baseline/git-branch.STAMP.md`.
+- [x] [P0-T8] Run `git branch --show-current` and record it in `FEATURE/evidence/baseline/git-branch.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0` and `Output Summary:` is exactly `bug/promotion-hook-raw-containment-false-positive-deny-exec-824`; any other value stops execution as BLOCKED.
-- [ ] [P0-T9] Run `git fetch origin epic/enforcement-hook-precision-integration`, then `git merge-base HEAD origin/epic/enforcement-hook-precision-integration` (value `BASE_SHA`), then `git rev-parse HEAD` (value `HEAD_SHA`); record all three in `FEATURE/evidence/baseline/git-baseline.STAMP.md`.
+- [x] [P0-T9] Run `git fetch origin epic/enforcement-hook-precision-integration`, then `git merge-base HEAD origin/epic/enforcement-hook-precision-integration` (value `BASE_SHA`), then `git rev-parse HEAD` (value `HEAD_SHA`); record all three in `FEATURE/evidence/baseline/git-baseline.STAMP.md`.
   - Acceptance: three `EXIT_CODE: 0` lines; `BASE_SHA:` and `HEAD_SHA:` are 40-hex values.
-- [ ] [P0-T10] Run `git diff --quiet BASE_SHA -- .claude/hooks .codex/hooks .claude/agents/pr-author.md .claude/skills/pr-author/SKILL.md extensions/drm-copilot/resources tests/scripts/claude-hooks tests/scripts/codex-hooks` and record it in `FEATURE/evidence/baseline/production-equals-base.STAMP.md`.
+- [x] [P0-T10] Run `git diff --quiet BASE_SHA -- .claude/hooks .codex/hooks .claude/agents/pr-author.md .claude/skills/pr-author/SKILL.md extensions/drm-copilot/resources tests/scripts/claude-hooks tests/scripts/codex-hooks` and record it in `FEATURE/evidence/baseline/production-equals-base.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0` (no in-scope path differs from the integration base, so later fail-before runs observe base behavior). A non-zero exit stops execution as BLOCKED.
-- [ ] [P0-T11] Write every section-6 script and launcher to `SCRATCHPAD/` and copy each script's full text into `FEATURE/evidence/other/observation-scripts.STAMP.md`.
+- [x] [P0-T11] Write every section-6 script and launcher to `SCRATCHPAD/` and copy each script's full text into `FEATURE/evidence/other/observation-scripts.STAMP.md`.
   - Acceptance: the artifact contains one fenced block per script named in section 6 (12 scripts) and one fenced block for the four-line `s-full-run.sh` launcher of the rule 4 exception.
-- [ ] [P0-T12] Run `sh SCRATCHPAD/s-hash.sh baseline` and record `FEATURE/evidence/baseline/parity-hashes.STAMP.md`.
+- [x] [P0-T12] Run `sh SCRATCHPAD/s-hash.sh baseline` and record `FEATURE/evidence/baseline/parity-hashes.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; `Output Summary:` lists every `GROUP ... DISTINCT=1` line. Any group with `DISTINCT` other than 1 stops execution as BLOCKED, because rule 6 would overwrite a divergent copy.
-- [ ] [P0-T13] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/baseline/line-counts.STAMP.md`.
+- [x] [P0-T13] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/baseline/line-counts.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; `Output Summary:` lists each `LINES` line and `MAX_LINES:`.
-- [ ] [P0-T14] Run `sh SCRATCHPAD/s-fmtcheck.sh folders` and record `FEATURE/evidence/baseline/format-check.STAMP.md`.
+- [x] [P0-T14] Run `sh SCRATCHPAD/s-fmtcheck.sh folders` and record `FEATURE/evidence/baseline/format-check.STAMP.md`.
   - Acceptance: `EXIT_CODE:` recorded; `Output Summary:` records `FORMAT_DRIFT_COUNT:` and every `FORMAT_DRIFT` path as set `B_FMT`. This script writes nothing, so the baseline reflects pre-existing drift.
-- [ ] [P0-T15] Run `sh SCRATCHPAD/s-pssa.sh` and record `FEATURE/evidence/baseline/pssa.STAMP.md`.
+- [x] [P0-T15] Run `sh SCRATCHPAD/s-pssa.sh` and record `FEATURE/evidence/baseline/pssa.STAMP.md`.
   - Acceptance: `EXIT_CODE:` recorded; `Output Summary:` records `PSSA_FINDING_COUNT:` and each finding line.
-- [ ] [P0-T16] Run `sh SCRATCHPAD/s-pester.sh A` and record `FEATURE/evidence/baseline/pester-scoped.STAMP.md`.
+- [x] [P0-T16] Run `sh SCRATCHPAD/s-pester.sh A` and record `FEATURE/evidence/baseline/pester-scoped.STAMP.md`.
   - Acceptance: `EXIT_CODE:` recorded; `Output Summary:` records `PESTER_TOTAL`, `PESTER_PASSED`, `PESTER_FAILED`, and every `FAILED_TEST:` name as set `B_SCOPED`.
-- [ ] [P0-T17] Run `sh SCRATCHPAD/s-full-run.sh` with the Bash parameter `run_in_background: true`, wait for the completion notification, and record `FEATURE/evidence/baseline/pester-full-run.STAMP.md`.
+- [x] [P0-T17] Run `sh SCRATCHPAD/s-full-run.sh` with the Bash parameter `run_in_background: true`, wait for the completion notification, and record `FEATURE/evidence/baseline/pester-full-run.STAMP.md`.
   - Acceptance: the output contains a `FULL_RUN_EXIT_CODE:` line and `EXIT_CODE:` records its integer (a non-zero value is permitted at baseline and is explained by [P0-T18]); `artifacts/pester/powershell-coverage.xml` exists after the run.
-- [ ] [P0-T18] Run `sh SCRATCHPAD/s-full-parse.sh baseline` and record `FEATURE/evidence/baseline/pester-full-coverage.STAMP.md`.
+- [x] [P0-T18] Run `sh SCRATCHPAD/s-full-parse.sh baseline` and record `FEATURE/evidence/baseline/pester-full-coverage.STAMP.md`.
   - Acceptance: `Output Summary:` records `JUNIT_TESTS`, `JUNIT_FAILURES`, every `FAILED_TEST:` name as set `B_FULL`, and a numeric `COVERAGE ... pct=` line for each of the ten existing production files (`.claude/hooks/hook-command-invocation.ps1`, `.claude/hooks/hook-command-scanner.ps1`, `.claude/hooks/enforce-promotion-mcp-only.ps1`, `.claude/hooks/enforce-epic-worktree-removal-gate.ps1`, `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1`, `.claude/hooks/enforce-pr-author-skill-helpers.ps1`, `.codex/hooks/hook-command-invocation.ps1`, `.codex/hooks/hook-command-scanner.ps1`, `.codex/hooks/enforce-promotion-mcp-only.ps1`, `.codex/hooks/enforce-epic-worktree-removal-gate.ps1`); the nine new files are recorded as `NEW_FILE`. A missing numeric value for an existing file makes the baseline remediation-required.
-- [ ] [P0-T19] Run `poetry install --no-interaction` (its own Bash call), then run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py` and record both in `FEATURE/evidence/baseline/pytest-parity.STAMP.md`.
+- [x] [P0-T19] Run `poetry install --no-interaction` (its own Bash call), then run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py` and record both in `FEATURE/evidence/baseline/pytest-parity.STAMP.md`.
   - Acceptance: `poetry install` exits 0; the pytest `EXIT_CODE:` is recorded; `Output Summary:` records the final pytest summary line (for example `N passed`) and every failing node ID as set `B_PY`. The summary line is printed and its total of passed, failed, and errored tests is greater than 0; a missing summary line or a total of 0 stops execution as BLOCKED.
-- [ ] [P0-T20] Run `npm --prefix extensions/drm-copilot ci` (its own Bash call), then run `npm --prefix extensions/drm-copilot run test -- test/lib/push-down/claude-pack-manifest-completeness.test.ts test/lib/push-down/claude-customizations.test.ts test/lib/push-down/codex-agents-customizations.test.ts` and record both in `FEATURE/evidence/baseline/jest-parity.STAMP.md`.
+- [x] [P0-T20] Run `npm --prefix extensions/drm-copilot ci` (its own Bash call), then run `npm --prefix extensions/drm-copilot run test -- test/lib/push-down/claude-pack-manifest-completeness.test.ts test/lib/push-down/claude-customizations.test.ts test/lib/push-down/codex-agents-customizations.test.ts` and record both in `FEATURE/evidence/baseline/jest-parity.STAMP.md`.
   - Acceptance: `npm ci` exits 0; the Jest `EXIT_CODE:` is recorded; `Output Summary:` records the Jest `Tests:` line and every failing test name as set `B_JS`. The `Tests:` line is printed and reports a total greater than 0; a missing `Tests:` line or a total of 0 stops execution as BLOCKED.
 - [ ] [P0-T21] Commit and push Phase 0 evidence: `git add -- FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, `git commit -m "docs(824): record phase 0 baseline evidence" -- FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, `git push -u origin BRANCH`.
   - Acceptance: each command exits 0; the push output names `BRANCH`.
