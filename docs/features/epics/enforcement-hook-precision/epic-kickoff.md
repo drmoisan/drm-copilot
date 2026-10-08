@@ -22,14 +22,14 @@ of docs/features/epics/enforcement-hook-precision/epic-kickoff.md before the fir
 
 | issue_num | feature_folder | wave | complexity | plan-path |
 | --- | --- | --- | --- | --- |
-| 565 | 2026-08-26-epic-wave-barrier-resolves-nested-artifact-as-feature-folder-565 | 0 | C3 | docs/features/active/2026-08-26-epic-wave-barrier-resolves-nested-artifact-as-feature-folder-565/plan.2026-10-08T13-52.md |
-| 736 | 2026-09-27-completion-consistency-codex-copy-and-fail-open-divergence-736 | 0 | C2 | docs/features/active/2026-09-27-completion-consistency-codex-copy-and-fail-open-divergence-736/plan.2026-10-08T13-52.md |
-| 824 | promotion-hook-raw-containment-false-positive-deny-824 | 0 | C3 | docs/features/active/promotion-hook-raw-containment-false-positive-deny-824/plan.2026-10-08T13-53.md |
-| 732 | 2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732 | 1 | C4 | docs/features/active/2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732/plan.2026-10-08T13-53.md |
-| 787 | 2026-09-29-validate-orchestrator-output-session-relative-read-787 | 1 | C3 | docs/features/active/2026-09-29-validate-orchestrator-output-session-relative-read-787/plan.2026-10-08T13-54.md |
-| 850 | 2026-10-08-pr-author-and-merge-gates-read-session-root-files-850 | 1 | C3 | docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md |
-| 737 | 2026-09-27-hook-test-isolation-remaining-gaps-737 | 2 | C2 | docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737/plan.2026-10-08T13-54.md |
-| 786 | 2026-09-29-hook-preexisting-imports-fail-open-786 | 2 | C3 | docs/features/active/2026-09-29-hook-preexisting-imports-fail-open-786/plan.2026-10-08T13-54.md |
+| 565 | docs/features/active/2026-08-26-epic-wave-barrier-resolves-nested-artifact-as-feature-folder-565 | 0 | C3 | docs/features/active/2026-08-26-epic-wave-barrier-resolves-nested-artifact-as-feature-folder-565/plan.2026-10-08T13-52.md |
+| 736 | docs/features/active/2026-09-27-completion-consistency-codex-copy-and-fail-open-divergence-736 | 0 | C2 | docs/features/active/2026-09-27-completion-consistency-codex-copy-and-fail-open-divergence-736/plan.2026-10-08T13-52.md |
+| 824 | docs/features/active/promotion-hook-raw-containment-false-positive-deny-824 | 0 | C3 | docs/features/active/promotion-hook-raw-containment-false-positive-deny-824/plan.2026-10-08T13-53.md |
+| 732 | docs/features/active/2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732 | 1 | C4 | docs/features/active/2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732/plan.2026-10-08T13-53.md |
+| 787 | docs/features/active/2026-09-29-validate-orchestrator-output-session-relative-read-787 | 1 | C3 | docs/features/active/2026-09-29-validate-orchestrator-output-session-relative-read-787/plan.2026-10-08T13-54.md |
+| 850 | docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850 | 1 | C3 | docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md |
+| 737 | docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737 | 2 | C2 | docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737/plan.2026-10-08T13-54.md |
+| 786 | docs/features/active/2026-09-29-hook-preexisting-imports-fail-open-786 | 2 | C3 | docs/features/active/2026-09-29-hook-preexisting-imports-fail-open-786/plan.2026-10-08T13-54.md |
 
 ## Execution Notes
 
