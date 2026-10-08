@@ -251,9 +251,9 @@ All edits in this phase are in `extensions/drm-copilot/src/lib/validate/orchestr
 
 ### Phase 6 — R17: Per-File Coverage Thresholds (Jest)
 
-- [ ] [P6-T1] Update `extensions/drm-copilot/jest.config.cjs` by inserting, after the `./src/lib/pr-context/index.ts` comment block (lines 319-323) and before the closing brace of `coverageThreshold` (line 324), the comment line quoted in Fixed Design Inputs followed by the 14 keys listed in spec AC-5, each set to `{ lines: 85, branches: 75 }`.
+- [x] [P6-T1] Update `extensions/drm-copilot/jest.config.cjs` by inserting, after the `./src/lib/pr-context/index.ts` comment block (lines 319-323) and before the closing brace of `coverageThreshold` (line 324), the comment line quoted in Fixed Design Inputs followed by the 14 keys listed in spec AC-5, each set to `{ lines: 85, branches: 75 }`.
   - Acceptance: no `global` key and no `coveragePathIgnorePatterns` key is added; no existing entry changes.
-- [ ] [P6-T2] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac5-threshold-static-check.<timestamp>.md` by reading `extensions/drm-copilot/jest.config.cjs` and recording, for each of the 14 AC-5 keys, the line number of its key and its `lines`/`branches` values, plus a Grep with pattern `(^|\s|")(global|coveragePathIgnorePatterns)"?\s*:` over the file.
+- [x] [P6-T2] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/qa-gates/ac5-threshold-static-check.<timestamp>.md` by reading `extensions/drm-copilot/jest.config.cjs` and recording, for each of the 14 AC-5 keys, the line number of its key and its `lines`/`branches` values, plus a Grep with pattern `(^|\s|")(global|coveragePathIgnorePatterns)"?\s*:` over the file.
   - Acceptance: 14 keys found, each `lines: 85` and `branches: 75`; the Grep returns 0 matches; if any new production `.ts` file was created under `extensions/drm-copilot/src/` by this feature (Glob against the P0-T3 list), it has its own entry.
 
 ### Phase 7 — Final QC Loop (Python, TypeScript, PowerShell)

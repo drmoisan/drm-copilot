@@ -394,5 +394,62 @@ module.exports = {
     // because no module under `src` or `test` imports the barrel path. It is
     // omitted only from the per-file threshold gate for that reason and
     // stays inside `collectCoverageFrom`, i.e. measured but not gated.
+    // Issue #645: the portable prepared-orchestration handoff production modules added by #614.
+    "./src/lib/validate/orchestration-handoff-authority-service.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestration-handoff-checkout-context.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestration-handoff-contract-support.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestration-handoff-contract.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestration-handoff-materializer-production.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestration-handoff-materializer-request.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestration-handoff-materializer-support.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestration-handoff-materializer.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestration-handoff-path-boundary.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestration-handoff-provider-adapters.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestration-handoff-validation.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/semantic-mcp-identity.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-handlers/orchestration-handoff-handlers.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-repo-automation-tool-definitions-handoff.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };
