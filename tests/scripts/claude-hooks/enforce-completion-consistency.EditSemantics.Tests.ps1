@@ -174,6 +174,16 @@ Describe 'enforce-completion-consistency.ps1 edit semantics (issue #736)' {
         $result.Content | Should -BeExactly "z`ny"
     }
 
+    It 'returns Failure no-old_string when old_string is empty' {
+        # Arrange
+        # Act
+        $result = Invoke-SingleOccurrenceEdit -Text 'abc' -OldString '' -NewString 'z' -ReplaceAll $false
+
+        # Assert: an empty old_string is a failure, never a replacement.
+        $result.Failure | Should -Be 'no-old_string'
+        $result.Content | Should -BeNullOrEmpty
+    }
+
     It 'denies an ambiguous patch without replace_all as old_string-ambiguous' {
         # Arrange
         $json = ConvertTo-EditEnvelopeJson -FilePath $script:AbsoluteTarget -OldString '"pending"' -NewString '"waiting"'

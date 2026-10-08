@@ -13,6 +13,8 @@ Command: wc -l <ten test files>
 EXIT_CODE: 0
 Output Summary: new files 273, 240, 152, 279, 274, 239, 153 (each at most 450); enforce-completion-consistency.Tests.ps1 491 (at most 491); enforce-completion-consistency.EditTarget.Tests.ps1 231 (at most 500); codex-pretooluse-transport.Tests.ps1 450 (fewer than 492).
 
+Addendum (recorded at [P5-T7] remediation, 2026-10-08T18-23): one row (`returns Failure no-old_string when old_string is empty`) was added to each EditSemantics suite, so those two files now hold 16 It lines and 283 and 284 lines respectively (each at most 450); the banned-construct scan still prints 0 for both.
+
 Edit-row acceptance greps (all as specified in [P1-T4], [P1-T5], [P1-T10]):
 - "denies an Edit when the on-disk checkpoint file does not exist" in the main Claude suite: 1
 - "denies an Edit when old_string is not found in the on-disk content" in the main Claude suite: 1
