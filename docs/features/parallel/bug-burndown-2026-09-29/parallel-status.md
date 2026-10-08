@@ -14,15 +14,15 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `parallel_slug`: bug-burndown-2026-09-29
 - `mode`: closed
 - `max_concurrency`: 3
-- `current_cohort`: 3
+- `current_cohort`: 4
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-08T02:31:32Z
+- `last_updated`: 2026-10-08T06:35:30Z
 
 **Items**
 
 | issue_num | feature_folder | cohort_index | state | merge_status | pr_url | merge_commit_sha | worktree_created_at | merged_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 338 | docs/features/active/2026-07-09-potential-entry-ide-launcher-audit-gaps-338 | 4 | scheduled | not_started |  |  |  |  |  |
+| 338 | docs/features/active/2026-07-09-potential-entry-ide-launcher-audit-gaps-338 | 4 | in_flight | worktree_created |  |  | 2026-10-08T06:35:30Z |  |  |
 | 406 | docs/features/active/2026-07-24-potential-to-issue-python-files-oversized-406 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/806 | b83f300047c4181223d99eb27eb0b025acca0125 | 2026-09-30T13:48:50Z | 2026-09-30T14:20:25Z |  |
 | 510 | docs/features/active/2026-08-19-claude-resource-parity-enumerates-gitignored-state-510 | 3 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/834 | 08ee030d9584bf15882fbb3654c8e38f34c7c359 | 2026-10-07T15:00:03Z | 2026-10-07T15:36:24Z |  |
 | 512 | docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/799 | 021b37e600afab00b191276cda803f87419a4a87 | 2026-09-30T11:19:00Z | 2026-09-30T13:33:38Z |  |
@@ -31,14 +31,14 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/829 | 869c4fade2c3f98ee3ec4ca5a59ea0becf28fb0d | 2026-10-02T08:52:46Z | 2026-10-07T14:59:00Z |  |
 | 609 | docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/815 | 28443d3be64d69b4b96b1ceca6715a9e577a6dc7 | 2026-10-02T03:09:33Z | 2026-10-02T04:13:42Z |  |
 | 623 | docs/features/active/promotion-receipt-destination-unverified-623 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/804 | 2b0121abf74f5862a3d12929d833504668941156 | 2026-09-30T12:21:20Z | 2026-09-30T13:42:13Z |  |
-| 645 | docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645 | 3 | in_flight | worktree_created |  |  | 2026-10-08T01:43:07Z |  |  |
+| 645 | docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645 | 3 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/836 | 0394ca27517956dc7dafb9407f057c18bb80974b | 2026-10-08T01:43:07Z | 2026-10-08T06:34:33Z |  |
 | 647 | docs/features/active/2026-09-07-test-tree-typecheck-not-gated-647 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/816 | b080a69ecb60b65d016362b21fffed0a34be9144 | 2026-10-02T03:14:17Z | 2026-10-02T05:12:02Z |  |
-| 658 | docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658 | 3 | in_flight | worktree_created |  |  | 2026-10-08T01:53:24Z |  |  |
+| 658 | docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658 | 3 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/837 | 6dac65b0930b299dc7b3c3925a607735a05fca35 | 2026-10-08T01:53:24Z | 2026-10-08T06:34:39Z |  |
 | 659 | docs/features/active/2026-09-08-epic-wave-barrier-violations-lack-start-guard-659 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/807 | 41217012d31d35c2ee33a50be50684affd2f5f43 | 2026-09-30T13:24:40Z | 2026-10-01T11:12:35Z |  |
 | 723 | docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/813 | 12fd3c2639f17aec3572f90e8d929205059be56d | 2026-09-30T13:34:37Z | 2026-10-02T00:43:34Z |  |
 | 734 | docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/818 | 74e1d6741485aa38c28fecbbc77ea169f31df0ef | 2026-10-02T07:15:04Z | 2026-10-02T08:15:36Z |  |
 | 739 | docs/features/active/2026-09-27-npm-token-guard-gaps-739 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/814 | dcb605ef9078ccf8bffffff08e4f1344a0c76594 | 2026-10-02T00:44:12Z | 2026-10-02T01:22:30Z |  |
-| 740 | docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740 | 4 | scheduled | not_started |  |  |  |  |  |
+| 740 | docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740 | 4 | in_flight | worktree_created |  |  | 2026-10-08T06:35:30Z |  |  |
 | 741 | docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/819 | ef80c57df8f8bbc7d2e9ac51586150dfee3cd5fd | 2026-10-02T07:25:34Z | 2026-10-02T08:51:49Z |  |
 | 743 | docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/810 | 1b1e349f1d0fb8b00eb69a809ef380fcc6eb35b9 | 2026-10-01T15:52:55Z | 2026-10-02T03:08:04Z |  |
 | 744 | docs/features/active/2026-09-27-orchestration-completion-gate-and-tooling-friction-744 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/817 | 71f8dcb49d8ce5d1402ff441855a64be15b37f29 | 2026-10-02T05:13:22Z | 2026-10-02T07:24:50Z |  |
@@ -131,6 +131,8 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 2026-10-08T01:42:43Z | #645 | start: merge main, resume atomic execution from committed plan | 2 (orchestrator + 1 delegate at a time); subtree max 5 |
 | 2026-10-08T01:52:42Z | #658 | start: merge main, resume atomic execution | uncapped |
 | 2026-10-08T01:52:42Z | #756 | start: merge main, resume atomic execution | uncapped |
+| 2026-10-08T06:34:55Z | #338 | start: merge main, resume atomic execution | uncapped |
+| 2026-10-08T06:34:55Z | #740 | start: merge main, resume atomic execution | uncapped |
 
 ## Paused By Operator (history)
 
