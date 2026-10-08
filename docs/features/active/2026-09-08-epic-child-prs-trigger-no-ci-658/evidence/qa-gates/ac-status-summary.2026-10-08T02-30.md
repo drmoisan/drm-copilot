@@ -19,7 +19,7 @@ Per-criterion evidence:
 - AC-4: evidence/regression-testing/fail-before-direct.2026-10-07T22-30.md, evidence/regression-testing/fail-before-poshqc.2026-10-07T22-30.md, evidence/regression-testing/pass-after-direct.2026-10-08T02-30.md, evidence/regression-testing/pass-after-poshqc.2026-10-08T02-30.md
 - AC-5: evidence/qa-gates/final-actionlint.2026-10-08T02-30.md (DEV-ACTIONLINT-DIRECT)
 - AC-6: evidence/other/orchestrate-mirror-hash.2026-10-07T22-40.md, evidence/qa-gates/final-bundle-parity.2026-10-08T02-30.md
-- AC-7: evidence/qa-gates/ac7-ci-green-run.2026-10-08T02-30.md (DEV-AC7-EARLY), pointer record evidence/other/ac7-deferred-to-pr-time.2026-10-08T02-30.md
+- AC-7: evidence/qa-gates/ac7-ci-green-run.2026-10-08T02-55.md (run 37719545156 on head dd3fc879; supersedes evidence/qa-gates/ac7-ci-green-run.2026-10-08T02-30.md, DEV-AC7-EARLY), pointer record evidence/other/ac7-deferred-to-pr-time.2026-10-08T02-30.md
 
 Issue #510 condition: not observed in [P2-T5]; AC-6 is not deferred.
 
