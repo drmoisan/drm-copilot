@@ -304,10 +304,10 @@ Known local false failure: `test_push_down_claude_resource_contracts.py` can fai
 ### Size, coverage, purity, and toolchain
 
 - [x] No new or changed production or test file exceeds 500 lines, including both `enforce-orchestration-preimplementation-gate-modes.ps1` copies and `enforce-parallel-drift-gate.ps1`, verified by line count.
-- [ ] Line coverage is at least 85% for every new or changed production PowerShell file, including each copy of `feature-folder-resolution.ps1` measured independently, as reported in `artifacts/pester/powershell-coverage.xml` from the self-hosted `Invoke-PoshQCTest` run and recorded under `evidence/qa-gates/`.
+- [x] Line coverage is at least 85% for every new or changed production PowerShell file, including each copy of `feature-folder-resolution.ps1` measured independently, as reported in `artifacts/pester/powershell-coverage.xml` from the self-hosted `Invoke-PoshQCTest` run and recorded under `evidence/qa-gates/`.
 - [x] No new or changed test file uses `TestDrive`, `New-TemporaryFile`, `[System.IO.Path]::GetTempPath`, or `[System.IO.Path]::GetTempFileName`, and the PowerShell test-purity hook raises no finding on them.
 - [x] No Python file is added under `.claude/hooks/` or `.codex/hooks/`, and no changed hook invokes `python`, `py`, or `poetry`.
-- [ ] PoshQC format, analyze, and test complete without errors on all changed PowerShell files in a single pass.
+- [x] PoshQC format, analyze, and test complete without errors on all changed PowerShell files in a single pass.
 
 ## Risks & Mitigations
 

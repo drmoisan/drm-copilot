@@ -188,7 +188,7 @@ function Find-ParallelCohortBarrierFeatureFolderFromPrompt {
         [string] $Prompt
     )
 
-    return @(Find-FeatureFolderCandidate -Text $Prompt)
+    return [string[]]@(Find-FeatureFolderCandidate -Text $Prompt)
 }
 
 function Get-ParallelCohortBarrierAllowDecision {

@@ -116,6 +116,13 @@ Describe 'enforce-feature-folder-order.ps1' {
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
+        It 'Get-FeatureFolderMissingFile defaults to the full-feature prerequisite set when no required set is supplied' {
+            Mock -CommandName Get-FeatureFolderFileExistence -MockWith { $false }
+            $missing = @(Get-FeatureFolderMissingFile -PlanFilePath 'docs/features/active/2026-01-01-foo-1/plan.2026-08-23T23-22.md')
+            ($missing -join '|') | Should -BeExactly 'issue.md|spec.md|user-story.md'
+            Should -Invoke Get-FeatureFolderFileExistence -Times 1 -Exactly -ParameterFilter { $Path -eq 'docs/features/active/2026-01-01-foo-1/user-story.md' }
+        }
+
         It 'handles archive feature folders too' {
             Mock -CommandName Get-FeatureFolderFileExistence -MockWith { $false }
             $json = '{"tool_input":{"file_path":"docs/features/archive/2025-12-01-old-1/plan.md"}}'

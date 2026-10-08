@@ -240,7 +240,7 @@ function Find-OrchestrationDelegationTargetFolder {
     param([AllowNull()][AllowEmptyString()][string] $Prompt)
 
     if ($script:OrchestrationFeatureFolderResolutionImportFailure) { return }
-    return @(Find-FeatureFolderCandidate -Text $Prompt)
+    return [string[]]@(Find-FeatureFolderCandidate -Text $Prompt)
 }
 
 function Find-OrchestrationDelegationIssueNumber {

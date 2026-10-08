@@ -233,7 +233,7 @@ function Find-ParallelDriftGateFeatureFolderFromPrompt {
     [OutputType([string[]])]
     param([Parameter(Mandatory)][AllowEmptyString()][string] $Prompt)
 
-    return @(Find-FeatureFolderCandidate -Text $Prompt)
+    return [string[]]@(Find-FeatureFolderCandidate -Text $Prompt)
 }
 
 function Find-ParallelDriftGateItemRecord {
