@@ -371,26 +371,26 @@ Rules for every new test file: Arrange-Act-Assert; no temporary file; no network
   - Acceptance: failures are a subset of `B_SCOPED`; no row in a file created by this plan fails; every shared-module edit made in Phase 5 has a matching `mirror-<group>-phase5` artifact written before this run (rule 6).
 - [x] [P5-T19] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase5-lines.STAMP.md`.
   - Acceptance: `OVER_500: NONE`.
-- [ ] [P5-T20] Commit and push every path edited or created in [P5-T1]..[P5-T17], every shared module (both surfaces) edited or copied under rule 6 during Phase 5, plus `FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` (`git commit -m "feat(824): promotion and worktree gates consume the structural matcher" --` with the same pathspecs), then `git push -u origin BRANCH`.
+- [x] [P5-T20] Commit and push every path edited or created in [P5-T1]..[P5-T17], every shared module (both surfaces) edited or copied under rule 6 during Phase 5, plus `FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` (`git commit -m "feat(824): promotion and worktree gates consume the structural matcher" --` with the same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
 
 ### Phase 6 — pr-author Matching, Allowlist Hook, and Receipt Procedure
 
-- [ ] [P6-T1] Edit `.claude/hooks/enforce-pr-author-skill-helpers.ps1` per DC-19 (`Get-PrAuthorBodyFileRoot`, check 1 at `:169-177`, fallback at `:293-311`).
+- [x] [P6-T1] Edit `.claude/hooks/enforce-pr-author-skill-helpers.ps1` per DC-19 (`Get-PrAuthorBodyFileRoot`, check 1 at `:169-177`, fallback at `:293-311`).
   - Acceptance: [P6-T7] rows PA-01..PA-22 pass and every existing `enforce-pr-author-skill*.Tests.ps1` row in set `P6` passes (subset of `B_SCOPED` otherwise).
-- [ ] [P6-T2] Create `.claude/hooks/enforce-pr-author-command-allowlist.ps1` per DC-20.
+- [x] [P6-T2] Create `.claude/hooks/enforce-pr-author-command-allowlist.ps1` per DC-20.
   - Acceptance: [P6-T7] rows AL-01..AL-32, AL-36, AL-37 pass.
-- [ ] [P6-T3] Edit `.claude/agents/pr-author.md` per DC-21 (frontmatter `:8-20`, protocol `:52`, `:59-60`, new paragraph after `:70`).
+- [x] [P6-T3] Edit `.claude/agents/pr-author.md` per DC-21 (frontmatter `:8-20`, protocol `:52`, `:59-60`, new paragraph after `:70`).
   - Acceptance: [P6-T7] rows AL-33, AL-34, AL-35 pass.
-- [ ] [P6-T4] Edit `.claude/skills/pr-author/SKILL.md` per DC-21: replace step 2 at `:52` with the step-2 sentence; insert the `created_at` sentence as a new three-space-indented paragraph of step 3 immediately after the closing JSON fence at `:64` (the fenced block `:55-64` is unchanged).
+- [x] [P6-T4] Edit `.claude/skills/pr-author/SKILL.md` per DC-21: replace step 2 at `:52` with the step-2 sentence; insert the `created_at` sentence as a new three-space-indented paragraph of step 3 immediately after the closing JSON fence at `:64` (the fenced block `:55-64` is unchanged).
   - Acceptance: [P6-T7] rows AL-34 and AL-35 pass.
-- [ ] [P6-T5] Create `tests/scripts/claude-hooks/enforce-pr-author-skill.Issue824.Tests.ps1` with rows PA-01..PA-22; PA-20 tagged `NegativeControl`.
+- [x] [P6-T5] Create `tests/scripts/claude-hooks/enforce-pr-author-skill.Issue824.Tests.ps1` with rows PA-01..PA-22; PA-20 tagged `NegativeControl`.
   - Acceptance: [P6-T7] reports every PA row passed.
-- [ ] [P6-T6] Create `tests/scripts/claude-hooks/enforce-pr-author-command-allowlist.Tests.ps1` with rows AL-01..AL-37.
+- [x] [P6-T6] Create `tests/scripts/claude-hooks/enforce-pr-author-command-allowlist.Tests.ps1` with rows AL-01..AL-37.
   - Acceptance: [P6-T7] reports every AL row passed.
-- [ ] [P6-T7] Run `sh SCRATCHPAD/s-pester.sh P6` and record `FEATURE/evidence/qa-gates/phase6-pester.STAMP.md`.
+- [x] [P6-T7] Run `sh SCRATCHPAD/s-pester.sh P6` and record `FEATURE/evidence/qa-gates/phase6-pester.STAMP.md`.
   - Acceptance: failures are a subset of `B_SCOPED`; no PA or AL row fails; every shared-module edit made in Phase 6 has a matching `mirror-<group>-phase6` artifact written before this run (rule 6).
-- [ ] [P6-T8] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase6-lines.STAMP.md`.
+- [x] [P6-T8] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase6-lines.STAMP.md`.
   - Acceptance: `OVER_500: NONE`.
 - [ ] [P6-T9] Commit and push `.claude/hooks/enforce-pr-author-skill-helpers.ps1 .claude/hooks/enforce-pr-author-command-allowlist.ps1 .claude/agents/pr-author.md .claude/skills/pr-author/SKILL.md tests/scripts/claude-hooks/enforce-pr-author-skill.Issue824.Tests.ps1 tests/scripts/claude-hooks/enforce-pr-author-command-allowlist.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every shared module (both surfaces) edited or copied under rule 6 during Phase 6, as the pathspecs of both the `git add --` and the `git commit ... --` commands (`git commit -m "feat(824): pr-author body-file matching and per-segment allowlist hook" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
