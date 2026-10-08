@@ -40,3 +40,9 @@ Analysis for the caller (no action taken):
 - The spec D5 escalation condition is "a tier classification that requires property tests". The observed classification (T3) does not require property tests, so the D5 outcome (table-driven example cases, no `fast-check` dependency) appears to remain valid.
 - No dependency was added. `extensions/drm-copilot/package.json` is unchanged.
 - The plan's literal acceptance (`quality-tiers.yml: absent`) is not met, so P0-T2 remains unchecked and execution stops for the caller after Phase 0 per the plan's P0-T2 rule.
+
+## Caller Decision
+
+Timestamp: 2026-10-07T22-00
+Decision: D5 confirmed by caller: T3, property tests not required
+Detail: the orchestrator verified that `quality-tiers.yml` classifies `extensions/drm-copilot` as T3, and `.claude/rules/quality-tiers.md` requires property tests only for T1 and T2. No `fast-check` dependency is added. P0-T2 is checked off on this caller decision and execution continues from P1-T1.
