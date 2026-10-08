@@ -130,6 +130,19 @@ Describe 'Codex enforce-epic-worktree-removal-gate issue #824 decisions' {
             $delivered | Should -BeNullOrEmpty
             $mocked.hookSpecificOutput.permissionDecision | Should -Be 'deny' -Because 'substring presence finds worktree inside worktrees and remove inside Remove-Item'
         }
+
+        It 'CW-40 returns no decision for an in-scope command when the target resolver reports NoMatch' -Tag 'Issue824' {
+            $script:Checkpoint = ConvertTo-CodexCheckpoint -Path $script:Q
+            $command = "git worktree remove $($script:P)"
+            $delivered = Invoke-CodexRow -Command $command
+            Mock Resolve-CommandLineInvocationTarget { [pscustomobject]@{ Status = 'NoMatch'; Targets = [string[]]@() } }
+
+            $mocked = Invoke-CodexRow -Command $command
+
+            $delivered.hookSpecificOutput.permissionDecision | Should -Be 'deny' -Because 'the checkpoint authorizes only Q'
+            $mocked | Should -BeNullOrEmpty -Because 'a NoMatch resolution returns no decision without reading the checkpoint'
+            Should -Invoke Resolve-CommandLineInvocationTarget -Times 1 -Exactly
+        }
     }
 
     Context 'checkpoint authorizes only Q' {

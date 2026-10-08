@@ -277,4 +277,34 @@ Describe 'hook-command-payload iterator, <Runtime> copy (issue #824)' -ForEach $
         $substitution.Count | Should -Be 1
         $substitution[0].PresenceText | Should -Not -Match 'route the matcher' -Because 'the heredoc body is blanked in TokenText'
     }
+
+    It 'PY-25 skips the transparent wrapper <Command> before detecting the bash payload' -Tag 'Issue824' -ForEach @(
+        @{ Command = "time -p bash -c 'git add .'"; Word = 'time' }
+        @{ Command = "command -p bash -c 'git add .'"; Word = 'command' }
+    ) {
+        $records = Get-InvocationRecord -CommandText $Command
+
+        $records.Count | Should -Be 2
+        $records[0].CommandWord | Should -Be $Word
+        $records[1].Origin | Should -Be 'WrapperPayload'
+        $records[1].Wrapper | Should -Be 'bash'
+        $records[1].CommandWord | Should -Be 'git'
+    }
+
+    It 'PY-26 extracts a substitution body after a single-quoted word and across an escaped quote' -Tag 'Issue824' {
+        $records = Get-InvocationRecord -CommandText 'echo ''x'' "a \"b\" $(git add .)"'
+
+        $body = @($records | Where-Object { $_.Origin -eq 'Substitution' -and $_.CommandWord -eq 'git' })
+        $body.Count | Should -Be 1
+        ($body[0].Tokens -join ',') | Should -Be 'git,add,.'
+        $body[0].Depth | Should -Be 1
+    }
+
+    It 'PY-27 marks a substitution record Opaque with DepthLimit when the body would exceed MaxDepth' -Tag 'Issue824' {
+        $records = @(Read-CommandLineInvocationSegment -CommandText 'echo "$(git add .)"' -MaxDepth 0)
+
+        $records.Count | Should -Be 1
+        $records[0].Opaque | Should -BeTrue
+        $records[0].OpaqueReason | Should -Be 'DepthLimit'
+    }
 }

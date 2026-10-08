@@ -126,6 +126,18 @@ Describe 'enforce-parallel-worktree-removal-gate issue #824 decisions' {
             $delivered | Should -Be 'allow'
             $mocked | Should -Be 'deny' -Because 'substring presence finds worktree inside worktrees and remove inside Remove-Item'
         }
+
+        It 'PW-40 allows an in-scope command when the target resolver reports NoMatch' -Tag 'Issue824' {
+            $command = "git worktree remove $($script:P)"
+            $delivered = (Invoke-ParallelRow -Command $command).hookSpecificOutput.permissionDecision
+            Mock Resolve-CommandLineInvocationTarget { [pscustomobject]@{ Status = 'NoMatch'; Targets = [string[]]@() } }
+
+            $mocked = (Invoke-ParallelRow -Command $command).hookSpecificOutput.permissionDecision
+
+            $delivered | Should -Be 'deny' -Because 'no checkpoint authorizes P'
+            $mocked | Should -Be 'allow' -Because 'a NoMatch resolution allows without reading any checkpoint'
+            Should -Invoke Resolve-CommandLineInvocationTarget -Times 1 -Exactly
+        }
     }
 
     Context 'checkpoint authorizes only Q' {

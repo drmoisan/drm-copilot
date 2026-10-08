@@ -441,112 +441,112 @@ Rules for every new test file: Arrange-Act-Assert; no temporary file; no network
   - Acceptance: the mirror contains either a comment URL or the `POSTING BLOCKED` header.
 - [x] [P9-T5] Write `FEATURE/evidence/other/pr-author-hook-live-smoke.STAMP.md` with `Status: PENDING-ORCHESTRATOR` and the procedure: delegate to `pr-author` with a prompt that issues `git log -1 --format=%H && sha256sum artifacts/pr_body_5.md`, and record that the tool call is denied with a reason beginning `PR_AUTHOR_COMMAND_NOT_ALLOWED:`.
   - Acceptance: the file contains `Status: PENDING-ORCHESTRATOR` and the command and expected reason prefix.
-- [ ] [P9-T6] Commit and push `FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` (`git commit -m "docs(824): record dispositions and handoff artifacts" --` same pathspecs), then `git push -u origin BRANCH`.
+- [x] [P9-T6] Commit and push `FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` (`git commit -m "docs(824): record dispositions and handoff artifacts" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
 
 ### Phase 10 — Final QC Loop and AC Check-Off
 
 Loop rule: run [P10-T1] through [P10-T17] in order. If any task fails, or [P10-T2] rewrites a write-set path, fix the cause, apply rule 6 to any write-set file with a bundle copy that changed, record the pass number `N` in each artifact name (`...pass-N.STAMP.md`), and restart at [P10-T1]. A rewritten path outside the write set is restored by [P10-T2] and does not restart the loop. The loop ends after a pass in which every task passes and no write-set path changed. AC check-off tasks [P10-T20] onward run only after [P10-T18] names a clean pass.
 
-- [ ] [P10-T1] Run `git status --porcelain` and record `FEATURE/evidence/qa-gates/qc-pass-N-porcelain-before.STAMP.md`. Then, when the listing contains any write-set path, run `git hash-object -- <every write-set path in the listing>` as one call and record each hash; when it contains none, record `WRITESET_LISTED: NONE`.
+- [x] [P10-T1] Run `git status --porcelain` and record `FEATURE/evidence/qa-gates/qc-pass-N-porcelain-before.STAMP.md`. Then, when the listing contains any write-set path, run `git hash-object -- <every write-set path in the listing>` as one call and record each hash; when it contains none, record `WRITESET_LISTED: NONE`.
   - Acceptance: `EXIT_CODE: 0`; the listing is recorded verbatim as the pre-format snapshot; the hash list or `WRITESET_LISTED: NONE` is recorded.
-- [ ] [P10-T2] Call `mcp__drm-copilot__run_poshqc_format` with `workspace_root` set to the worktree root and, when the tool accepts it, `scan_folders` set to `.claude/hooks`, `.codex/hooks`, `tests/scripts/claude-hooks`, `tests/scripts/codex-hooks`; then run `git status --porcelain`; then re-run the [P10-T1] `git hash-object` command over the same paths (omitted when [P10-T1] recorded `WRITESET_LISTED: NONE`); then apply the `git restore -- <path>` step of the acceptance below (one call per path) and run `git status --porcelain` again; then run `sh SCRATCHPAD/s-fmtcheck.sh writeset`. Record the MCP disposition and every command in `FEATURE/evidence/qa-gates/qc-pass-N-format.STAMP.md`.
+- [x] [P10-T2] Call `mcp__drm-copilot__run_poshqc_format` with `workspace_root` set to the worktree root and, when the tool accepts it, `scan_folders` set to `.claude/hooks`, `.codex/hooks`, `tests/scripts/claude-hooks`, `tests/scripts/codex-hooks`; then run `git status --porcelain`; then re-run the [P10-T1] `git hash-object` command over the same paths (omitted when [P10-T1] recorded `WRITESET_LISTED: NONE`); then apply the `git restore -- <path>` step of the acceptance below (one call per path) and run `git status --porcelain` again; then run `sh SCRATCHPAD/s-fmtcheck.sh writeset`. Record the MCP disposition and every command in `FEATURE/evidence/qa-gates/qc-pass-N-format.STAMP.md`.
   - Acceptance: the MCP disposition is recorded. Each path in the post-call porcelain listing that is outside the write set and outside `FEATURE/` is restored with `git restore -- <path>` and listed in the artifact; a restored path that is not in `B_FMT` is additionally recorded as `FORMAT_OUTSIDE_BASELINE: <path>` and does not restart the loop. `git status --porcelain` is then run again and recorded. After removing every line under `FEATURE/` from both listings, this second listing equals the [P10-T1] listing. `FORMAT_DRIFT_COUNT: 0`. Each recomputed hash equals its [P10-T1] value; a differing hash is a rewritten write-set path. A rewritten write-set path restarts the loop.
-- [ ] [P10-T3] Call `mcp__drm-copilot__run_poshqc_analyze` (same arguments), then run `sh SCRATCHPAD/s-pssa.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-analyze.STAMP.md`.
+- [x] [P10-T3] Call `mcp__drm-copilot__run_poshqc_analyze` (same arguments), then run `sh SCRATCHPAD/s-pssa.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-analyze.STAMP.md`.
   - Acceptance: MCP disposition recorded; `PSSA_FINDING_COUNT: 0`.
-- [ ] [P10-T4] Call `mcp__drm-copilot__run_poshqc_test` (same arguments); record `FEATURE/evidence/qa-gates/qc-pass-N-mcp-test.STAMP.md`.
+- [x] [P10-T4] Call `mcp__drm-copilot__run_poshqc_test` (same arguments); record `FEATURE/evidence/qa-gates/qc-pass-N-mcp-test.STAMP.md`.
   - Acceptance: MCP disposition recorded. No count is read from it (rule 4).
-- [ ] [P10-T5] Run `sh SCRATCHPAD/s-full-run.sh` with the Bash parameter `run_in_background: true`, wait for the completion notification, and record `FEATURE/evidence/qa-gates/qc-pass-N-pester-full-run.STAMP.md`.
+- [x] [P10-T5] Run `sh SCRATCHPAD/s-full-run.sh` with the Bash parameter `run_in_background: true`, wait for the completion notification, and record `FEATURE/evidence/qa-gates/qc-pass-N-pester-full-run.STAMP.md`.
   - Acceptance: the output contains a `FULL_RUN_EXIT_CODE:` line and `EXIT_CODE:` records its integer; `artifacts/pester/powershell-coverage.xml` and `artifacts/pester/pester-junit.xml` are rewritten by this run (last-write time after the task start, recorded).
-- [ ] [P10-T6] Run `sh SCRATCHPAD/s-full-parse.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-pester-full-coverage.STAMP.md`.
+- [x] [P10-T6] Run `sh SCRATCHPAD/s-full-parse.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-pester-full-coverage.STAMP.md`.
   - Acceptance: every `FAILED_TEST:` name is in `B_FULL` and none belongs to a file created by this plan; a numeric `COVERAGE ... pct=` line for each of the 19 production files; `COVERAGE_BELOW_85: NONE`.
-- [ ] [P10-T7] Run `sh SCRATCHPAD/s-changedcov.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-changed-line-coverage.STAMP.md`.
+- [x] [P10-T7] Run `sh SCRATCHPAD/s-changedcov.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-changed-line-coverage.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0` and `UNCOVERED_CHANGED_TOTAL: 0`.
-- [ ] [P10-T8] Write `FEATURE/evidence/qa-gates/coverage-delta.STAMP.md` listing, per production file, baseline coverage ([P0-T18]; `NEW_FILE` for new files), post-change coverage ([P10-T6]), and changed-line coverage counts ([P10-T7]).
+- [x] [P10-T8] Write `FEATURE/evidence/qa-gates/coverage-delta.STAMP.md` listing, per production file, baseline coverage ([P0-T18]; `NEW_FILE` for new files), post-change coverage ([P10-T6]), and changed-line coverage counts ([P10-T7]).
   - Acceptance: 19 rows with numeric post-change values at or above 85.00; no modified file's post-change value is below its baseline value unless the changed-line uncovered count is 0 and the decrease is explained by deleted covered lines (recorded per file).
-- [ ] [P10-T9] Run `sh SCRATCHPAD/s-pester.sh I824`; record `FEATURE/evidence/qa-gates/qc-pass-N-issue824.STAMP.md`.
+- [x] [P10-T9] Run `sh SCRATCHPAD/s-pester.sh I824`; record `FEATURE/evidence/qa-gates/qc-pass-N-issue824.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0` and `PESTER_FAILED: 0`.
-- [ ] [P10-T10] Run the [P0-T19] pytest command (the same four files under `tests/scripts/dev_tools/`); record `FEATURE/evidence/qa-gates/qc-pass-N-pytest-parity.STAMP.md`.
+- [x] [P10-T10] Run the [P0-T19] pytest command (the same four files under `tests/scripts/dev_tools/`); record `FEATURE/evidence/qa-gates/qc-pass-N-pytest-parity.STAMP.md`.
   - Acceptance: the pytest summary line is printed and reports a total greater than 0 (otherwise BLOCKED); failing node IDs are a subset of `B_PY`.
-- [ ] [P10-T11] Run the [P0-T20] jest command (the same three files under `extensions/drm-copilot/test/lib/push-down/`); record `FEATURE/evidence/qa-gates/qc-pass-N-jest-parity.STAMP.md`.
+- [x] [P10-T11] Run the [P0-T20] jest command (the same three files under `extensions/drm-copilot/test/lib/push-down/`); record `FEATURE/evidence/qa-gates/qc-pass-N-jest-parity.STAMP.md`.
   - Acceptance: the Jest `Tests:` line is printed and reports a total greater than 0 (otherwise BLOCKED); failing test names are a subset of `B_JS`.
-- [ ] [P10-T12] Run `sh SCRATCHPAD/s-lines.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-lines.STAMP.md`.
+- [x] [P10-T12] Run `sh SCRATCHPAD/s-lines.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-lines.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`, `OVER_500: NONE`, and the line for `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` reads 497.
-- [ ] [P10-T13] Run `sh SCRATCHPAD/s-nopy.sh` and record `FEATURE/evidence/qa-gates/qc-pass-N-no-python.STAMP.md`; then run `sh SCRATCHPAD/s-pester.sh PARITY` and record `FEATURE/evidence/qa-gates/qc-pass-N-parity-pester.STAMP.md`.
+- [x] [P10-T13] Run `sh SCRATCHPAD/s-nopy.sh` and record `FEATURE/evidence/qa-gates/qc-pass-N-no-python.STAMP.md`; then run `sh SCRATCHPAD/s-pester.sh PARITY` and record `FEATURE/evidence/qa-gates/qc-pass-N-parity-pester.STAMP.md`.
   - Acceptance: the no-python artifact records `EXIT_CODE: 0` and `PYTHON_INVOCATION_COUNT: 0`; the parity-pester artifact records `PESTER_FAILED` naming only tests in `B_SCOPED`, and every `RESULT` line for `enforcement-hooks-no-python-invocation.Tests.ps1` reads `Passed`.
-- [ ] [P10-T14] Run `sh SCRATCHPAD/s-hash.sh final`; record `FEATURE/evidence/qa-gates/qc-pass-N-parity-hashes.STAMP.md`.
+- [x] [P10-T14] Run `sh SCRATCHPAD/s-hash.sh final`; record `FEATURE/evidence/qa-gates/qc-pass-N-parity-hashes.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; every group `DISTINCT=1`.
-- [ ] [P10-T15] Run `sh SCRATCHPAD/s-scope.sh` and `git status --porcelain`; record `FEATURE/evidence/qa-gates/qc-pass-N-scope.STAMP.md`.
+- [x] [P10-T15] Run `sh SCRATCHPAD/s-scope.sh` and `git status --porcelain`; record `FEATURE/evidence/qa-gates/qc-pass-N-scope.STAMP.md`.
   - Acceptance: `OUT_OF_SET_COUNT: 0` and `ADDENDUM2_COUNT: 0`.
-- [ ] [P10-T16] Run `sh SCRATCHPAD/s-tokens.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-deny-tokens.STAMP.md`.
+- [x] [P10-T16] Run `sh SCRATCHPAD/s-tokens.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-deny-tokens.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; `NEW_TOKEN_COUNT:` is 1 or 2; the `NEW_TOKEN:` lines are a subset of {`PR_AUTHOR_COMMAND_NOT_ALLOWED:`, `TARGET_WORKTREE_NOT_DERIVABLE:`} and include `PR_AUTHOR_COMMAND_NOT_ALLOWED:`.
-- [ ] [P10-T17] Run `git diff --quiet BASE_SHA -- tests/scripts/claude-hooks/validate-bash.Tests.ps1 tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1 tests/scripts/codex-hooks/validate-bash-trigger-scoping.Tests.ps1 tests/scripts/codex-hooks/validate-bash-decision-surface.Tests.ps1 .claude/hooks/validate-bash.ps1 .codex/hooks/validate-bash.ps1`; record `FEATURE/evidence/qa-gates/qc-pass-N-validate-bash-unchanged.STAMP.md`.
+- [x] [P10-T17] Run `git diff --quiet BASE_SHA -- tests/scripts/claude-hooks/validate-bash.Tests.ps1 tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1 tests/scripts/codex-hooks/validate-bash-trigger-scoping.Tests.ps1 tests/scripts/codex-hooks/validate-bash-decision-surface.Tests.ps1 .claude/hooks/validate-bash.ps1 .codex/hooks/validate-bash.ps1`; record `FEATURE/evidence/qa-gates/qc-pass-N-validate-bash-unchanged.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0` (the `cd ... && <read>` rule and its suites are unmodified; their pass state is read from [P10-T6]).
-- [ ] [P10-T18] Write `FEATURE/evidence/qa-gates/qc-loop-summary.STAMP.md` naming the final clean pass number and listing each [P10-T1]..[P10-T17] artifact of that pass.
+- [x] [P10-T18] Write `FEATURE/evidence/qa-gates/qc-loop-summary.STAMP.md` naming the final clean pass number and listing each [P10-T1]..[P10-T17] artifact of that pass.
   - Acceptance: the named pass has a passing artifact for every task and its [P10-T2] reports no rewritten write-set path (restored paths outside the write set are listed and do not count).
-- [ ] [P10-T19] Write `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` listing AC-1..AC-31 with the evidence artifact(s) for each (section 7) and the status `CHECKED` or `PENDING-ORCHESTRATOR` (AC-20 live smoke; AC-21 when [P9-T4] recorded `POSTING BLOCKED`; AC-24 CI result).
+- [x] [P10-T19] Write `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` listing AC-1..AC-31 with the evidence artifact(s) for each (section 7) and the status `CHECKED` or `PENDING-ORCHESTRATOR` (AC-20 live smoke; AC-21 when [P9-T4] recorded `POSTING BLOCKED`; AC-24 CI result).
   - Acceptance: 31 rows; every `CHECKED` row names at least one existing artifact.
-- [ ] [P10-T20] Check off AC-1 in `FEATURE/spec.md` (`- [ ] AC-1:` to `- [x] AC-1:`) when [P8-T1] REG-01 and [P10-T9] PM-01 passed for both runtimes.
+- [x] [P10-T20] Check off AC-1 in `FEATURE/spec.md` (`- [ ] AC-1:` to `- [x] AC-1:`) when [P8-T1] REG-01 and [P10-T9] PM-01 passed for both runtimes.
   - Acceptance: the AC-1 line reads `- [x]`.
-- [ ] [P10-T21] Check off AC-2 in `FEATURE/spec.md` when [P10-T9] PM-02..PM-13 passed for both runtimes.
+- [x] [P10-T21] Check off AC-2 in `FEATURE/spec.md` when [P10-T9] PM-02..PM-13 passed for both runtimes.
   - Acceptance: the AC-2 line reads `- [x]`.
-- [ ] [P10-T22] Check off AC-3 in `FEATURE/spec.md` when [P8-T1] REG-02, REG-04, REG-06 and [P10-T9] EW-01, PW-01, CW-01 passed.
+- [x] [P10-T22] Check off AC-3 in `FEATURE/spec.md` when [P8-T1] REG-02, REG-04, REG-06 and [P10-T9] EW-01, PW-01, CW-01 passed.
   - Acceptance: the AC-3 line reads `- [x]`.
-- [ ] [P10-T23] Check off AC-4 in `FEATURE/spec.md` when [P10-T9] EW-03..07, PW-03..07, CW-03..07 passed.
+- [x] [P10-T23] Check off AC-4 in `FEATURE/spec.md` when [P10-T9] EW-03..07, PW-03..07, CW-03..07 passed.
   - Acceptance: the AC-4 line reads `- [x]`.
-- [ ] [P10-T24] Check off AC-5 in `FEATURE/spec.md` when [P10-T9] EW-08..12, PW-08..12, CW-08..12 passed.
+- [x] [P10-T24] Check off AC-5 in `FEATURE/spec.md` when [P10-T9] EW-08..12, PW-08..12, CW-08..12 passed.
   - Acceptance: the AC-5 line reads `- [x]`.
-- [ ] [P10-T25] Check off AC-6 in `FEATURE/spec.md` when [P10-T9] EW-13..20, PW-13..20, CW-13..20 passed, and add to the AC-6 row of `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` (written by [P10-T19]) this note: the AC-6 clause "the deny names the first unauthorized target" applies only to the derivable-target rows (-13, W5 at -18, W6 at -19); W1-W4 (-14..-17) carry an operand that cannot be derived, so they deny with `TARGET_WORKTREE_NOT_DERIVABLE` under AC-7 and name no target.
+- [x] [P10-T25] Check off AC-6 in `FEATURE/spec.md` when [P10-T9] EW-13..20, PW-13..20, CW-13..20 passed, and add to the AC-6 row of `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` (written by [P10-T19]) this note: the AC-6 clause "the deny names the first unauthorized target" applies only to the derivable-target rows (-13, W5 at -18, W6 at -19); W1-W4 (-14..-17) carry an operand that cannot be derived, so they deny with `TARGET_WORKTREE_NOT_DERIVABLE` under AC-7 and name no target.
   - Acceptance: the AC-6 line reads `- [x]` and the ledger AC-6 row contains the note.
-- [ ] [P10-T26] Check off AC-7 in `FEATURE/spec.md` when [P10-T9] EW-21..28, PW-21..28, CW-21..28 passed.
+- [x] [P10-T26] Check off AC-7 in `FEATURE/spec.md` when [P10-T9] EW-21..28, PW-21..28, CW-21..28 passed.
   - Acceptance: the AC-7 line reads `- [x]`.
-- [ ] [P10-T27] Check off AC-8 in `FEATURE/spec.md` when [P8-T1] REG-03, REG-05, REG-07, REG-08 and [P10-T9] IV-09, IV-10, IV-11 passed.
+- [x] [P10-T27] Check off AC-8 in `FEATURE/spec.md` when [P8-T1] REG-03, REG-05, REG-07, REG-08 and [P10-T9] IV-09, IV-10, IV-11 passed.
   - Acceptance: the AC-8 line reads `- [x]`.
-- [ ] [P10-T28] Check off AC-9 in `FEATURE/spec.md` when [P10-T9] PM-14..PM-18, every IV-06 sink row, and IV-07 passed.
+- [x] [P10-T28] Check off AC-9 in `FEATURE/spec.md` when [P10-T9] PM-14..PM-18, every IV-06 sink row, and IV-07 passed.
   - Acceptance: the AC-9 line reads `- [x]`.
-- [ ] [P10-T29] Check off AC-10 in `FEATURE/spec.md` when [P10-T9] PM-19, EW-21, PW-21, CW-21, AL-25 passed.
+- [x] [P10-T29] Check off AC-10 in `FEATURE/spec.md` when [P10-T9] PM-19, EW-21, PW-21, CW-21, AL-25 passed.
   - Acceptance: the AC-10 line reads `- [x]`.
-- [ ] [P10-T30] Check off AC-11 in `FEATURE/spec.md` (amended AC-11) when every row ID listed in the [P9-T2] mapping is `Passed` in the [P10-T9] artifact and the [P9-T2] artifact records the X5/X6/X9/Y4 search command, its `EXIT_CODE` (0 or 1), and its `SearchResult:` output.
+- [x] [P10-T30] Check off AC-11 in `FEATURE/spec.md` (amended AC-11) when every row ID listed in the [P9-T2] mapping is `Passed` in the [P10-T9] artifact and the [P9-T2] artifact records the X5/X6/X9/Y4 search command, its `EXIT_CODE` (0 or 1), and its `SearchResult:` output.
   - Acceptance: the AC-11 line reads `- [x]`.
-- [ ] [P10-T31] Check off AC-12 in `FEATURE/spec.md` when [P10-T9] PY-01, PY-02, PY-22, PY-23, IV-01, IV-02, OP-01, OP-10 passed.
+- [x] [P10-T31] Check off AC-12 in `FEATURE/spec.md` when [P10-T9] PY-01, PY-02, PY-22, PY-23, IV-01, IV-02, OP-01, OP-10 passed.
   - Acceptance: the AC-12 line reads `- [x]`.
-- [ ] [P10-T32] Check off AC-13 in `FEATURE/spec.md` when [P10-T6] shows the existing pin rows (`tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1:300-328`) passed and [P10-T9] IV-12, IV-13, IV-24 passed.
+- [x] [P10-T32] Check off AC-13 in `FEATURE/spec.md` when [P10-T6] shows the existing pin rows (`tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1:300-328`) passed and [P10-T9] IV-12, IV-13, IV-24 passed.
   - Acceptance: the AC-13 line reads `- [x]`.
-- [ ] [P10-T33] Check off AC-14 in `FEATURE/spec.md` when [P8-T2] shows all 8 negative-control executions passed and [P10-T9] IV-17 passed.
+- [x] [P10-T33] Check off AC-14 in `FEATURE/spec.md` when [P8-T2] shows all 8 negative-control executions passed and [P10-T9] IV-17 passed.
   - Acceptance: the AC-14 line reads `- [x]`.
-- [ ] [P10-T34] Check off AC-15 in `FEATURE/spec.md` when [P8-T1] REG-09..REG-12 and [P10-T9] PA-01..PA-05 passed.
+- [x] [P10-T34] Check off AC-15 in `FEATURE/spec.md` when [P8-T1] REG-09..REG-12 and [P10-T9] PA-01..PA-05 passed.
   - Acceptance: the AC-15 line reads `- [x]`.
-- [ ] [P10-T35] Check off AC-16 in `FEATURE/spec.md` when [P8-T1] REG-13..REG-17 and [P10-T9] PA-06..PA-15, PA-21 passed.
+- [x] [P10-T35] Check off AC-16 in `FEATURE/spec.md` when [P8-T1] REG-13..REG-17 and [P10-T9] PA-06..PA-15, PA-21 passed.
   - Acceptance: the AC-16 line reads `- [x]`.
-- [ ] [P10-T36] Check off AC-17 in `FEATURE/spec.md` when [P10-T9] PA-16..PA-19 passed and [P10-T15] shows `.claude/hooks/enforce-pr-author-skill.ps1` unchanged.
+- [x] [P10-T36] Check off AC-17 in `FEATURE/spec.md` when [P10-T9] PA-16..PA-19 passed and [P10-T15] shows `.claude/hooks/enforce-pr-author-skill.ps1` unchanged.
   - Acceptance: the AC-17 line reads `- [x]`.
-- [ ] [P10-T37] Check off AC-18 in `FEATURE/spec.md` when [P8-T1] REG-18 and [P10-T9] AL-11..AL-31 passed.
+- [x] [P10-T37] Check off AC-18 in `FEATURE/spec.md` when [P8-T1] REG-18 and [P10-T9] AL-11..AL-31 passed.
   - Acceptance: the AC-18 line reads `- [x]`.
-- [ ] [P10-T38] Check off AC-19 in `FEATURE/spec.md` when [P8-T1] REG-20, REG-21 and [P10-T9] AL-07, AL-08, AL-34, AL-35 passed.
+- [x] [P10-T38] Check off AC-19 in `FEATURE/spec.md` when [P8-T1] REG-20, REG-21 and [P10-T9] AL-07, AL-08, AL-34, AL-35 passed.
   - Acceptance: the AC-19 line reads `- [x]`.
-- [ ] [P10-T39] Record AC-20 as `PENDING-ORCHESTRATOR` in `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` with [P10-T9] AL-33 as the static evidence and [P9-T5] as the pending live-smoke artifact; leave the AC-20 line of `FEATURE/spec.md` unchecked.
+- [x] [P10-T39] Record AC-20 as `PENDING-ORCHESTRATOR` in `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` with [P10-T9] AL-33 as the static evidence and [P9-T5] as the pending live-smoke artifact; leave the AC-20 line of `FEATURE/spec.md` unchecked.
   - Acceptance: the ledger row reads `PENDING-ORCHESTRATOR` and the AC-20 line reads `- [ ]`.
-- [ ] [P10-T40] If [P9-T4] posted the comment, check off AC-21 in `FEATURE/spec.md`; otherwise record it as `PENDING-ORCHESTRATOR` in `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` and leave it unchecked.
+- [x] [P10-T40] If [P9-T4] posted the comment, check off AC-21 in `FEATURE/spec.md`; otherwise record it as `PENDING-ORCHESTRATOR` in `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` and leave it unchecked.
   - Acceptance: the AC-21 line state matches the ledger row.
-- [ ] [P10-T41] Check off AC-22 in `FEATURE/spec.md` when [P10-T6] shows set-`A` suites with failures only in `B_FULL` and [P10-T9] CN-01..CN-10 passed.
+- [x] [P10-T41] Check off AC-22 in `FEATURE/spec.md` when [P10-T6] shows set-`A` suites with failures only in `B_FULL` and [P10-T9] CN-01..CN-10 passed.
   - Acceptance: the AC-22 line reads `- [x]`.
-- [ ] [P10-T42] Check off AC-23 in `FEATURE/spec.md` when [P10-T14] reports every group `DISTINCT=1`.
+- [x] [P10-T42] Check off AC-23 in `FEATURE/spec.md` when [P10-T14] reports every group `DISTINCT=1`.
   - Acceptance: the AC-23 line reads `- [x]`.
-- [ ] [P10-T43] Record AC-24 as `PENDING-ORCHESTRATOR` (CI result) in `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` with [P10-T10], [P10-T11], [P10-T13] as local evidence; leave the AC-24 line of `FEATURE/spec.md` unchecked.
+- [x] [P10-T43] Record AC-24 as `PENDING-ORCHESTRATOR` (CI result) in `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` with [P10-T10], [P10-T11], [P10-T13] as local evidence; leave the AC-24 line of `FEATURE/spec.md` unchecked.
   - Acceptance: the ledger row reads `PENDING-ORCHESTRATOR` and the AC-24 line reads `- [ ]`.
-- [ ] [P10-T44] Check off AC-25 in `FEATURE/spec.md` when [P10-T16] passed and [P10-T9] PM-02, EW-03, PW-03, CW-03, PA-11, PA-16, AL-11 passed.
+- [x] [P10-T44] Check off AC-25 in `FEATURE/spec.md` when [P10-T16] passed and [P10-T9] PM-02, EW-03, PW-03, CW-03, PA-11, PA-16, AL-11 passed.
   - Acceptance: the AC-25 line reads `- [x]`.
-- [ ] [P10-T45] Check off AC-26 in `FEATURE/spec.md` when [P10-T13] passed.
+- [x] [P10-T45] Check off AC-26 in `FEATURE/spec.md` when [P10-T13] passed.
   - Acceptance: the AC-26 line reads `- [x]`.
-- [ ] [P10-T46] Check off AC-27 in `FEATURE/spec.md` when [P10-T12] passed.
+- [x] [P10-T46] Check off AC-27 in `FEATURE/spec.md` when [P10-T12] passed.
   - Acceptance: the AC-27 line reads `- [x]`.
-- [ ] [P10-T47] Check off AC-28 in `FEATURE/spec.md` when [P10-T6], [P10-T7], and [P10-T8] passed.
+- [x] [P10-T47] Check off AC-28 in `FEATURE/spec.md` when [P10-T6], [P10-T7], and [P10-T8] passed.
   - Acceptance: the AC-28 line reads `- [x]`.
-- [ ] [P10-T48] Check off AC-29 in `FEATURE/spec.md` when [P10-T18] names a clean pass.
+- [x] [P10-T48] Check off AC-29 in `FEATURE/spec.md` when [P10-T18] names a clean pass.
   - Acceptance: the AC-29 line reads `- [x]`.
-- [ ] [P10-T49] Check off AC-30 in `FEATURE/spec.md` when [P8-T3] lists seven `Failed`-before and `Passed`-after rows.
+- [x] [P10-T49] Check off AC-30 in `FEATURE/spec.md` when [P8-T3] lists seven `Failed`-before and `Passed`-after rows.
   - Acceptance: the AC-30 line reads `- [x]`.
-- [ ] [P10-T50] Check off AC-31 in `FEATURE/spec.md` when [P10-T15] reports `ADDENDUM2_COUNT: 0` and `OUT_OF_SET_COUNT: 0`.
+- [x] [P10-T50] Check off AC-31 in `FEATURE/spec.md` when [P10-T15] reports `ADDENDUM2_COUNT: 0` and `OUT_OF_SET_COUNT: 0`.
   - Acceptance: the AC-31 line reads `- [x]`.
 - [ ] [P10-T51] Commit and push `FEATURE/spec.md FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` plus any write-set path changed during the QC loop (`git commit -m "docs(824): final QC evidence and AC check-off" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.

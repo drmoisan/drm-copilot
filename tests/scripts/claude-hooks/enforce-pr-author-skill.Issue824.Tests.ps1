@@ -118,11 +118,28 @@ Describe 'enforce-pr-author-skill issue #824 decisions' {
             $withBodyFile.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PR_CONTEXT_MISSING:*'
             $withoutBody.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PR_AUTHOR_SKILL_BLOCKED:*'
         }
+
+        It 'PA-24 treats a create with no readable body-file value as non-canonical' -Tag 'Issue824' {
+            $command = 'gh pr create --head bug/x-5'
+
+            $value = Get-PrAuthorBodyFileValue -CommandText $command
+            $reason = Test-PrAuthorReceiptVerification -CommandText $command -CheckpointPath 'unused-checkpoint-path'
+
+            $value | Should -BeNullOrEmpty
+            $reason | Should -BeLike 'PR_BODY_PATH_NONCANONICAL:*'
+        }
     }
 
     Context 'inline-body and no-body pull requests' {
         It '<Id> denies <Command> with PR_AUTHOR_SKILL_BLOCKED' -Tag 'Issue824' -ForEach $script:SkillBlockedRows {
             Get-PrAuthorBypassReason -CommandText $Command -ContextExists $true | Should -BeLike 'PR_AUTHOR_SKILL_BLOCKED:*'
+        }
+
+        It 'PA-23 reads an inline body from the raw text of an unmodeled-option create' -Tag 'Issue824' {
+            $reason = Get-PrAuthorBypassReason -CommandText 'gh --unmodeled pr create --body x' -ContextExists $true
+
+            $reason | Should -BeLike 'PR_AUTHOR_SKILL_BLOCKED:*'
+            $reason | Should -Match 'must use .--body-file. with a file' -Because 'the raw-text fallback classifies --body as an inline body'
         }
 
         It 'PA-20 denies the G1 command when substring presence is reinstated' -Tag 'Issue824', 'NegativeControl' {

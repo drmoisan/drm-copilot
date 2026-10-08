@@ -172,4 +172,12 @@ Describe 'enforce-pr-author-command-allowlist.ps1 (issue #824)' {
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'PR_AUTHOR_COMMAND_NOT_ALLOWED: *'
     }
+
+    It 'AL-38 matches no allowed form for a record with no tokens' -Tag 'Issue824' {
+        $whole = Test-PrAuthorAllowlistForm -Token ([string[]]@()) -IsWholeCommand $true
+        $partial = Test-PrAuthorAllowlistForm -Token ([string[]]@()) -IsWholeCommand $false
+
+        $whole | Should -BeFalse
+        $partial | Should -BeFalse
+    }
 }
