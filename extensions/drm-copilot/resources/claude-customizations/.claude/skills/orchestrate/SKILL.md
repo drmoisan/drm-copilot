@@ -287,6 +287,9 @@ S9 procedure:
 
 1. Resolve the live PR head SHA for the feature branch (`gh pr view --json headRefOid` or equivalent).
 2. Invoke `gh pr checks --required --json bucket,name,state,link,workflow` (or an equivalent JSON-emitting command) against that head SHA. `gh` is the only sanctioned channel for querying GitHub Actions state.
+
+   Epic-child rule: when the PR base branch is an `epic/<slug>-integration` branch (checkpoint `epic_mode` is `true`), run the step 2 query without `--required`, because integration branches carry no required-status-check protection and `--required` then returns an empty set. An empty check list, including an empty `gh pr checks --required` result, is not accepted as green for such a PR: the gate must observe at least one check whose `workflow` is `CI` against the child head SHA, and every observed `CI` check must succeed before `ci_gate.conclusion` is accepted as `success`.
+
 3. Parse the JSON by running `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1 -ChecksJson <checks-json> -HeadSha <head-sha>`, which emits the `ci_gate` object defined below and derives `ci_gate.conclusion` as `success` when all required checks pass, `failure` when any required check failed, and `pending` when any required check is still in progress.
 4. Poll with a bounded interval and a documented total timeout while `conclusion == "pending"`. When the timeout is exhausted, record the timeout as a finding with `Remediability: awaiting_ci` in `remediation-inputs.<timestamp>.md` and follow the wait branch in Post-Review Outcome Evaluation (`blocked_reason: "awaiting_ci"`, `next_step: "S9_ci_green"`); `step9_status` stays `pending`. A poll timeout does not enter the remediation loop.
 5. Write the `ci_gate` object and `last_verified_ci_sha` to the checkpoint, and set `step9_status` to `passed` only when `ci_gate.conclusion == "success"` AND `ci_gate.head_sha` equals the current PR head SHA.
