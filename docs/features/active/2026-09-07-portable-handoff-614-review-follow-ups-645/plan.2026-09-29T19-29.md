@@ -326,38 +326,38 @@ Run the steps in order. If any step fails or changes a file, fix the cause and r
 
 Each task changes only `- [ ]` to `- [x]` on the named criterion, and only after the cited evidence records a pass. A criterion whose evidence does not pass stays unchecked and is listed in P9-T32.
 
-- [ ] [P9-T1] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-1 after P1-T6 and P7-T15 pass.
-- [ ] [P9-T2] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-2 after P7-T16 passes.
-- [ ] [P9-T3] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-3 after P1-T7 and P8-T12 pass.
-- [ ] [P9-T4] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-4 after P8-T2 and P7-T6 pass.
-- [ ] [P9-T5] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-5 after P6-T2 passes.
-- [ ] [P9-T6] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-6 after P7-T11 and P6-T2 pass.
-- [ ] [P9-T7] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-7 after P8-T1 passes.
-- [ ] [P9-T8] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-8 after P4-T17 and P5-T13 pass.
-- [ ] [P9-T9] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-9 after P4-T17, P5-T13, and P8-T9 pass.
-- [ ] [P9-T10] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-10 after P3-T10 passes.
-- [ ] [P9-T11] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-11 after P3-T10 and P4-T17 pass.
-- [ ] [P9-T12] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-12 after P7-T6, P7-T12, and P8-T3 pass.
-- [ ] [P9-T13] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-13 after P8-T4 passes.
-- [ ] [P9-T14] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-14 after P8-T5 passes.
-- [ ] [P9-T15] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-15 after P2-T3 and P8-T6 pass.
-- [ ] [P9-T16] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-16 after P7-T4, P7-T5, and P8-T11 pass.
-- [ ] [P9-T17] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-17 after P8-T11 passes.
-- [ ] [P9-T18] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-18 after P7-T11 passes.
-- [ ] [P9-T19] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-19 after P8-T7 passes.
-- [ ] [P9-T20] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-20 after P7-T17 passes.
-- [ ] [P9-T21] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-21 after P8-T8 passes.
-- [ ] [P9-T22] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-22 after P8-T10 passes.
-- [ ] [P9-T23] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-1 after AC-8, AC-9, and AC-11 are checked.
-- [ ] [P9-T24] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-2 after AC-10 is checked.
-- [ ] [P9-T25] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-3 after AC-9, AC-11, AC-12, and AC-13 are checked.
-- [ ] [P9-T26] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-4 after AC-7 is checked.
-- [ ] [P9-T27] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-5 after AC-5, AC-6, and AC-17 are checked.
-- [ ] [P9-T28] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-6 after AC-1, AC-2, AC-3, and AC-4 are checked.
-- [ ] [P9-T29] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-7 after AC-15 is checked.
-- [ ] [P9-T30] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-8 after AC-16 through AC-20 are checked.
-- [ ] [P9-T31] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-9 after AC-14 and AC-21 are checked.
-- [ ] [P9-T32] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/other/ac-status-summary.<timestamp>.md` with the Acceptance Criteria Status block defined by the acceptance-criteria-tracking skill for `spec.md` (22 items) and `user-story.md` (9 items).
+- [x] [P9-T1] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-1 after P1-T6 and P7-T15 pass.
+- [x] [P9-T2] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-2 after P7-T16 passes.
+- [x] [P9-T3] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-3 after P1-T7 and P8-T12 pass.
+- [x] [P9-T4] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-4 after P8-T2 and P7-T6 pass.
+- [x] [P9-T5] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-5 after P6-T2 passes.
+- [x] [P9-T6] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-6 after P7-T11 and P6-T2 pass.
+- [x] [P9-T7] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-7 after P8-T1 passes.
+- [x] [P9-T8] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-8 after P4-T17 and P5-T13 pass.
+- [x] [P9-T9] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-9 after P4-T17, P5-T13, and P8-T9 pass.
+- [x] [P9-T10] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-10 after P3-T10 passes.
+- [x] [P9-T11] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-11 after P3-T10 and P4-T17 pass.
+- [x] [P9-T12] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-12 after P7-T6, P7-T12, and P8-T3 pass.
+- [x] [P9-T13] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-13 after P8-T4 passes.
+- [x] [P9-T14] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-14 after P8-T5 passes.
+- [x] [P9-T15] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-15 after P2-T3 and P8-T6 pass.
+- [x] [P9-T16] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-16 after P7-T4, P7-T5, and P8-T11 pass.
+- [x] [P9-T17] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-17 after P8-T11 passes.
+- [x] [P9-T18] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-18 after P7-T11 passes.
+- [x] [P9-T19] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-19 after P8-T7 passes.
+- [x] [P9-T20] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-20 after P7-T17 passes.
+- [x] [P9-T21] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-21 after P8-T8 passes.
+- [x] [P9-T22] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` to check AC-22 after P8-T10 passes.
+- [x] [P9-T23] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-1 after AC-8, AC-9, and AC-11 are checked.
+- [x] [P9-T24] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-2 after AC-10 is checked.
+- [x] [P9-T25] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-3 after AC-9, AC-11, AC-12, and AC-13 are checked.
+- [x] [P9-T26] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-4 after AC-7 is checked.
+- [x] [P9-T27] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-5 after AC-5, AC-6, and AC-17 are checked.
+- [x] [P9-T28] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-6 after AC-1, AC-2, AC-3, and AC-4 are checked.
+- [x] [P9-T29] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-7 after AC-15 is checked.
+- [x] [P9-T30] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-8 after AC-16 through AC-20 are checked.
+- [x] [P9-T31] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` to check US-9 after AC-14 and AC-21 are checked.
+- [x] [P9-T32] Create `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/other/ac-status-summary.<timestamp>.md` with the Acceptance Criteria Status block defined by the acceptance-criteria-tracking skill for `spec.md` (22 items) and `user-story.md` (9 items).
   - Acceptance: totals, checked counts, and the list of any unchecked items are recorded and match the checkbox state of both files.
 
 ## Write Set (blast radius)
@@ -424,3 +424,4 @@ Not edited (explicit): `.codex/hooks/enforce-epic-planning-only.ps1`, its resour
 - DEV-10 Jest verbose listing: in this agent environment `node run-jest.cjs --verbose ...` prints only the summary block (no `PASS` lines or per-test listing), although the `Tests:` line and exit code are correct. Where a task asserts on the per-test listing (P3-T10), a second run appending `--reporters=default` after the test paths is recorded beside the plan command. Tasks asserting only on `Tests:` counts are unaffected. P3-T9 hunk header observed as `@@ -310,0 +311,87 @@` (DEV-2(b) re-derived anchor: last `it` ends at line 310).
 - DEV-11 Materializer structure: the P4-T11 (candidate-validate) and P4-T12 (candidate-replace) sites route through one new module-private method, `discardedCandidateResult(request, preparation, cause)`, instead of two duplicated discard-and-block blocks. It calls `discardCandidate` once and appends `; <cleanup cause>` when the return is non-null. Behavior, failure codes, `affectedPaths`, and the once-per-invocation `removeFile` call are as the tasks specify. Post-edit length 488 lines, so D2 recorded `D2: NO EXTRACTION`.
 - DEV-12 Observation details: (a) P8-T9 observed the P5-T8 helper insertion as `@@ -82,0 +84,19 @@`, not the expected `-81,0`, because git aligned the block after the blank line that follows `missingPath`; N=82 lies outside 18-27, so the check passes. (b) P7-T6 recorded the exact plan command (exit 0, 58 passed) plus a companion `-v -p no:cacheprovider` run of the same selection to list node results for the named-node and `NEGATIVE_SCENARIOS` assertions. (c) P5-T11 recorded `AUTHORITY PLACEMENT: 480-LINE OVERFLOW` (608 lines), so P5-T12 created `orchestration-handoff-failure-cause-authority.test.ts`; this deviates from spec AC-8's single-file naming as the plan anticipates.
+- DEV-13 P9-T32 counting: the acceptance-criteria-tracking skill names `.claude/lib/requirements/GeneratedDocumentCounters.psm1` for counts, but the worktree isolation guard refuses PowerShell command text (operator decision 2026-10-01, Option A). The AC summary counts were taken with a Python regex over `spec.md` and `user-story.md`, and a line-by-line diff check confirmed that each of the 31 changed lines differs only by `- [ ]` -> `- [x]`.

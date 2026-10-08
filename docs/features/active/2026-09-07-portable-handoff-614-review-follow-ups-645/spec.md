@@ -153,19 +153,19 @@ The four sites are:
 
 Each criterion names its verification method. "Phase 0 baseline" means the values recorded under `evidence/baselines/` before any production or test edit.
 
-- [ ] AC-1: `tests/scripts/codex-hooks/codex-planning-only-registry.Tests.ps1` contains three new `It` cases that call `Get-EpicPlanningRegisteredMcpTool` directly. Each case asserts the captured `$_.Exception.Message` with `Should -BeExactly` against the exact message of one throw:
+- [x] AC-1: `tests/scripts/codex-hooks/codex-planning-only-registry.Tests.ps1` contains three new `It` cases that call `Get-EpicPlanningRegisteredMcpTool` directly. Each case asserts the captured `$_.Exception.Message` with `Should -BeExactly` against the exact message of one throw:
   - line 58, using the absent sentinel `tests/fixtures/codex-hooks/absent-orchestration-handoff-registry.json`;
   - line 72, using `invalid-operation-orchestration-handoff-registry.json`;
   - line 77, using `invalid-alias-orchestration-handoff-registry.json`.
 
   Verification: the PoshQC Pester run (`mcp__drm-copilot__run_poshqc_test`) is followed by a read of `artifacts/pester/pester-junit.xml`, which must report `failures="0"` and `errors="0"` and list the three new cases as passed. The existing line-67 case is unchanged.
-- [ ] AC-2: `artifacts/pester/powershell-coverage.xml` from the same run shows lines 58, 72, and 77 of `.codex/hooks/enforce-epic-planning-only.ps1` as covered. The file's missed-line set must be a subset of the Phase 0 missed-line set minus {58, 72, 77}, so no new missed line appears. The report-level PowerShell line coverage must be at or above the Phase 0 baseline.
-- [ ] AC-3: Fixtures and test purity.
+- [x] AC-2: `artifacts/pester/powershell-coverage.xml` from the same run shows lines 58, 72, and 77 of `.codex/hooks/enforce-epic-planning-only.ps1` as covered. The file's missed-line set must be a subset of the Phase 0 missed-line set minus {58, 72, 77}, so no new missed line appears. The report-level PowerShell line coverage must be at or above the Phase 0 baseline.
+- [x] AC-3: Fixtures and test purity.
   - Exactly two new files are added under `tests/fixtures/codex-hooks/`: `invalid-operation-orchestration-handoff-registry.json` and `invalid-alias-orchestration-handoff-registry.json`.
   - A Grep for `TestDrive|New-TemporaryFile|GetTempPath|\$env:TEMP|tmpdir|tempfile|tmp_path` over every test file added or changed by this feature returns zero matches.
   - `.claude/hooks/check-powershell-test-purity.ps1` does not deny the Pester file.
-- [ ] AC-4: `git diff --quiet origin/main -- .codex/hooks/enforce-epic-planning-only.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-planning-only.ps1` exits 0. `tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py::test_handoff_runtime_has_root_bundle_resource_and_effective_pack_parity` passes.
-- [ ] AC-5: Static check of `extensions/drm-copilot/jest.config.cjs`.
+- [x] AC-4: `git diff --quiet origin/main -- .codex/hooks/enforce-epic-planning-only.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-planning-only.ps1` exits 0. `tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py::test_handoff_runtime_has_root_bundle_resource_and_effective_pack_parity` passes.
+- [x] AC-5: Static check of `extensions/drm-copilot/jest.config.cjs`.
   - `coverageThreshold` contains the following 14 keys, each set to exactly `{ lines: 85, branches: 75 }`:
     - `./src/lib/validate/orchestration-handoff-authority-service.ts`
     - `./src/lib/validate/orchestration-handoff-checkout-context.ts`
@@ -182,47 +182,47 @@ Each criterion names its verification method. "Phase 0 baseline" means the value
     - `./src/mcp-handlers/orchestration-handoff-handlers.ts`
     - `./src/mcp-repo-automation-tool-definitions-handoff.ts`
   - The file contains no `global` key and no `coveragePathIgnorePatterns` key. (Member set: research N1.)
-- [ ] AC-6: `npm --prefix extensions/drm-copilot run test:coverage` exits 0.
+- [x] AC-6: `npm --prefix extensions/drm-copilot run test:coverage` exits 0.
   - The lcov output reports each of the 14 files at or above 85% line and 75% branch.
   - Any new production `.ts` file created under `extensions/drm-copilot/src/` by this feature has its own `{ lines: 85, branches: 75 }` entry.
-- [ ] AC-7: A Grep for `catch\s*\{` over the four modules returns zero matches. The modules are `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts`, `-authority-service.ts`, `-path-boundary.ts`, and `-materializer-production.ts`. The same Grep over every `extensions/drm-copilot/src/**/*{handoff,semantic-mcp}*.ts` file also returns zero matches. (Site set: research N2.)
-- [ ] AC-8: `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause.test.ts` covers each blocked result that follows a caught error. There is at least one named case per result: materializer checkpoint-read, envelope-decode, git-status, archive-write plus archive-readback, candidate-write plus candidate-readback, candidate-validate, candidate-replace, candidate-cleanup appended; authority envelope-read and plan-read.
+- [x] AC-7: A Grep for `catch\s*\{` over the four modules returns zero matches. The modules are `extensions/drm-copilot/src/lib/validate/orchestration-handoff-materializer.ts`, `-authority-service.ts`, `-path-boundary.ts`, and `-materializer-production.ts`. The same Grep over every `extensions/drm-copilot/src/**/*{handoff,semantic-mcp}*.ts` file also returns zero matches. (Site set: research N2.)
+- [x] AC-8: `extensions/drm-copilot/test/lib/validate/orchestration-handoff-failure-cause.test.ts` covers each blocked result that follows a caught error. There is at least one named case per result: materializer checkpoint-read, envelope-decode, git-status, archive-write plus archive-readback, candidate-write plus candidate-readback, candidate-validate, candidate-replace, candidate-cleanup appended; authority envelope-read and plan-read.
   - Each case asserts the unchanged `primaryFailureCode` and a `failureCause` equal to the expected `<stage>: <token>` string.
   - The idempotent-retry case asserts that no `failureCause` is present when recovery succeeds.
-- [ ] AC-9: Decision D1 is implemented and verified by named tests.
+- [x] AC-9: Decision D1 is implemented and verified by named tests.
   - The `HandoffPathBoundary` interface declaration is unchanged, as a static check against `origin/main`.
   - The existing tests in `orchestration-handoff-path-boundary.test.ts` pass unchanged, and a test executes both arms of the new module-private helper.
   - Blocked results from `null` path resolution carry `workspace-root: unresolved` or `target-path: unresolved` together with the unchanged `HANDOFF_PLAN_PATH_INVALID`.
   - The authority plan-read case carries `plan-read: <token>`.
   - `validateDestinationProjection` returns exactly one message for invalid JSON, and that message contains the error token. The existing `toHaveLength(1)` assertion in `orchestration-handoff-materializer-production.test.ts` passes unchanged.
   - The blocked result at materializer.ts ~286 carries `destination-projection: invalid`.
-- [ ] AC-10: Table-driven unit tests of `describeHandoffFailureCause` cover the `error.code` branch, the `error.name` branch, the non-error branch, and a `code` that does not match `^[A-Z][A-Z0-9_]*$`. Given errors whose `message` contains a Windows absolute path, a POSIX absolute path, and an environment-variable-like value, the output contains none of those substrings, and contains no `/` or `\` character.
-- [ ] AC-11: Additive output is verified in `extensions/drm-copilot/test/mcp-handlers/orchestration-handoff-handlers.test.ts`:
+- [x] AC-10: Table-driven unit tests of `describeHandoffFailureCause` cover the `error.code` branch, the `error.name` branch, the non-error branch, and a `code` that does not match `^[A-Z][A-Z0-9_]*$`. Given errors whose `message` contains a Windows absolute path, a POSIX absolute path, and an environment-variable-like value, the output contains none of those substrings, and contains no `/` or `\` character.
+- [x] AC-11: Additive output is verified in `extensions/drm-copilot/test/mcp-handlers/orchestration-handoff-handlers.test.ts`:
   - the MCP result includes `failure_cause` when `failureCause` is set;
   - the key is absent (`not.toHaveProperty("failure_cause")`) when it is unset;
   - validated and materialized results carry no `failureCause`.
-- [ ] AC-12: Failure-code assignment and precedence are unchanged.
+- [x] AC-12: Failure-code assignment and precedence are unchanged.
   - The following tests pass with no edit to their files, confirmed by `git diff --quiet origin/main` on each file:
     - `tests/scripts/dev_tools/test_orchestration_handoff_contract.py::test_failure_precedence_matches_the_shared_registry`;
     - the `HANDOFF_FAILURE_PRECEDENCE` registry-equality test in `extensions/drm-copilot/test/lib/validate/orchestration-handoff-contract.test.ts`;
     - the registry-order selection test in `extensions/drm-copilot/test/lib/validate/orchestration-handoff-authority-service.test.ts`.
   - The `NEGATIVE_SCENARIOS` cases in `tests/scripts/dev_tools/test_orchestration_handoff_taskmaster_469.py` pass, and the `NEGATIVE_SCENARIOS` definition is textually unchanged against `origin/main`. That file is edited only by R19.
   - `config/orchestration-handoff-registry.json` and `extensions/drm-copilot/src/lib/validate/orchestration-handoff-contract.ts` are unchanged against `origin/main`.
-- [ ] AC-13: No existing fixture or schema changes. `git diff --diff-filter=MDR --name-only origin/main` lists no file under `tests/fixtures/`, `extensions/drm-copilot/test/fixtures/`, `config/`, or `extensions/drm-copilot/resources/config/`. The `inputSchema` blocks in `src/mcp-repo-automation-tool-definitions-handoff.ts` are textually unchanged against `origin/main`.
-- [ ] AC-14: `git diff --name-only origin/main` does not list `extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-path-boundary.test.ts`. R20 is out of scope (resolved by #647).
-- [ ] AC-15: `raw_file_sha256`, imported from `scripts.dev_tools.orchestration_handoff_contract`, is called in `test_taskmaster_469_fixture_hashes_and_source_history_are_pinned`, and that test passes. A Grep for `hashlib` in `test_orchestration_handoff_taskmaster_469.py` returns zero matches. `scripts/dev_tools/orchestration_handoff_contract.py` and `scripts/dev_tools/orchestration_handoff_contract_support.py` are unchanged against `origin/main`.
-- [ ] AC-16: `poetry run pytest --cov=src --cov=scripts/dev_tools --cov-branch --cov-report=term-missing` exits 0. The repository Python line and branch coverage are each at or above the Phase 0 baseline.
-- [ ] AC-17: For each R18 module, lcov line and branch coverage after the change is at or above its Phase 0 baseline and at or above 85% line and 75% branch. The R18 modules are `orchestration-handoff-materializer.ts`, `-authority-service.ts`, `-path-boundary.ts`, `-materializer-production.ts`, and `-materializer-request.ts`.
-- [ ] AC-18: `extensions/drm-copilot/test/packaging/mcp-server-prepack.test.ts` runs in the `test:coverage` invocation and reports all of its tests passed. None of its assertions is removed or weakened.
-- [ ] AC-19: Every file added or modified by this feature, other than Markdown documentation and JSON fixtures, is at or under 500 lines, confirmed by a post-edit line count recorded in evidence. If `orchestration-handoff-materializer.ts` exceeds 490 lines, the D2 extraction into `orchestration-handoff-materializer-support.ts` is applied.
-- [ ] AC-20: The full toolchain loop passes in a single pass for Python, TypeScript, and PowerShell. The loop covers format, lint, type check, tests, and the packaging and parity tests.
+- [x] AC-13: No existing fixture or schema changes. `git diff --diff-filter=MDR --name-only origin/main` lists no file under `tests/fixtures/`, `extensions/drm-copilot/test/fixtures/`, `config/`, or `extensions/drm-copilot/resources/config/`. The `inputSchema` blocks in `src/mcp-repo-automation-tool-definitions-handoff.ts` are textually unchanged against `origin/main`.
+- [x] AC-14: `git diff --name-only origin/main` does not list `extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-path-boundary.test.ts`. R20 is out of scope (resolved by #647).
+- [x] AC-15: `raw_file_sha256`, imported from `scripts.dev_tools.orchestration_handoff_contract`, is called in `test_taskmaster_469_fixture_hashes_and_source_history_are_pinned`, and that test passes. A Grep for `hashlib` in `test_orchestration_handoff_taskmaster_469.py` returns zero matches. `scripts/dev_tools/orchestration_handoff_contract.py` and `scripts/dev_tools/orchestration_handoff_contract_support.py` are unchanged against `origin/main`.
+- [x] AC-16: `poetry run pytest --cov=src --cov=scripts/dev_tools --cov-branch --cov-report=term-missing` exits 0. The repository Python line and branch coverage are each at or above the Phase 0 baseline.
+- [x] AC-17: For each R18 module, lcov line and branch coverage after the change is at or above its Phase 0 baseline and at or above 85% line and 75% branch. The R18 modules are `orchestration-handoff-materializer.ts`, `-authority-service.ts`, `-path-boundary.ts`, `-materializer-production.ts`, and `-materializer-request.ts`.
+- [x] AC-18: `extensions/drm-copilot/test/packaging/mcp-server-prepack.test.ts` runs in the `test:coverage` invocation and reports all of its tests passed. None of its assertions is removed or weakened.
+- [x] AC-19: Every file added or modified by this feature, other than Markdown documentation and JSON fixtures, is at or under 500 lines, confirmed by a post-edit line count recorded in evidence. If `orchestration-handoff-materializer.ts` exceeds 490 lines, the D2 extraction into `orchestration-handoff-materializer-support.ts` is applied.
+- [x] AC-20: The full toolchain loop passes in a single pass for Python, TypeScript, and PowerShell. The loop covers format, lint, type check, tests, and the packaging and parity tests.
   - Python: `black --check`, `ruff check`, `pyright`, `pytest`.
   - TypeScript: `prettier --check`, `npm run lint`, `npm run typecheck`, `npm run test:coverage`.
   - PowerShell: PoshQC format, analyze, and test.
 
   `npx tsc -p extensions/drm-copilot/tsconfig.jest.json --noEmit` reports no diagnostic outside the Phase 0 diagnostic list.
-- [ ] AC-21: No dependency is added or removed. `extensions/drm-copilot/package.json` dependency blocks and `pyproject.toml` dependency tables are unchanged against `origin/main`.
-- [ ] AC-22: Phase 0 baseline evidence and final coverage evidence exist under `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/` in the canonical `<kind>/` subfolders. No evidence is written under `artifacts/baselines/`, `artifacts/qa/`, or `artifacts/coverage/`.
+- [x] AC-21: No dependency is added or removed. `extensions/drm-copilot/package.json` dependency blocks and `pyproject.toml` dependency tables are unchanged against `origin/main`.
+- [x] AC-22: Phase 0 baseline evidence and final coverage evidence exist under `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/evidence/` in the canonical `<kind>/` subfolders. No evidence is written under `artifacts/baselines/`, `artifacts/qa/`, or `artifacts/coverage/`.
 
 ## Non-Goals
 
