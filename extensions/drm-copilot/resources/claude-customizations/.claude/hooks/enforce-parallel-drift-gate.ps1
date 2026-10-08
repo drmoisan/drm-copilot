@@ -8,13 +8,14 @@
     parallel-mode kickoff marker defined in the "Parallel-Mode Kickoff Parameter" section
     of .claude/skills/parallel-orchestrate/SKILL.md, matched byte-for-byte (ordinal).
 
-    Decision procedure: resolve the target item's feature folder from the prompt by scanning
-    for a docs/features/active/<token> path, the shape the parallel kickoff contract emits
-    for exactly this purpose (adapted from enforce-epic-wave-barrier.ps1's
-    Find-EpicWaveBarrierFeatureFolderFromPrompt: longest match wins, a .md-suffixed match
-    uses its parent directory); read the parallel checkpoint and locate the items[] record
-    whose feature_folder basename matches; derive which item keys have an unresolved latest
-    drift event; deny with PARALLEL_DRIFT_GATE_BLOCKED when the resolved item is one of them
+    Decision procedure: collect the cited feature-folder candidates with the shared resolver
+    (feature-folder-resolution.ps1, issue #565), which truncates every docs/features/active/
+    path to its feature-folder segment; read the parallel checkpoint and select the target
+    among the candidates with Select-FeatureFolderTarget, using the canonical issue-number
+    line as a tie-break when it names exactly one number and denying an unresolved tie as
+    ambiguous; locate the items[] record whose feature_folder basename matches the selected
+    basename, which is also the folder the finding probe inspects; derive which item keys
+    have an unresolved latest drift event; deny with PARALLEL_DRIFT_GATE_BLOCKED when the resolved item is one of them
     and no synthetic Blocking finding file dated at or after that item's latest drift event has
     been written. Allowed: a non-feature-review target, a prompt without the marker, a resolved
     latest event, and an unresolved event whose finding file is dated at or after it, so the
@@ -50,8 +51,10 @@
     ambiguous target denies after the subagent and marker filter and before the folder check.
 
 .NOTES
-    PowerShell 7+. Depends on WorktreeRunResolution.psm1 (issue #690), imported inside a
-    guard: a failed import is recorded and the decision denies naming the module. Both read
+    PowerShell 7+. Depends on WorktreeItemResolution.psm1 and WorktreeRunResolution.psm1
+    (issue #690) and the pure sibling feature-folder-resolution.ps1 (issue #565), each
+    loaded inside a guard: the first failure is recorded and the decision denies naming
+    the dependency. Both read
     boundaries -- the checkpoint read and the finding-file existence check -- are injectable
     wrapper functions, so tests mock them without writing temporary files.
 
@@ -69,13 +72,25 @@ param()
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 
-# Import guard (issue #690): a failed import denies instead of failing open.
+# Import guard (issue #690): a failed import denies instead of failing open. The item
+# module supplies Find-WorktreeItemIssueSignal, which the run module does not re-export.
 $script:ParallelDriftGateResolutionImportFailure = $null
+foreach ($resolutionModule in @('WorktreeItemResolution.psm1', 'WorktreeRunResolution.psm1')) {
+    try {
+        Import-Module (Join-Path $PSScriptRoot "../lib/worktree-resolution/$resolutionModule") -Force -ErrorAction Stop
+    }
+    catch {
+        if (-not $script:ParallelDriftGateResolutionImportFailure) { $script:ParallelDriftGateResolutionImportFailure = $resolutionModule }
+    }
+}
+
+# Shared feature-folder resolution (issue #565). Guarded so a failed dot-source denies
+# rather than failing open; an earlier recorded failure is kept.
 try {
-    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop
+    . (Join-Path $PSScriptRoot 'feature-folder-resolution.ps1')
 }
 catch {
-    $script:ParallelDriftGateResolutionImportFailure = 'WorktreeRunResolution.psm1'
+    if (-not $script:ParallelDriftGateResolutionImportFailure) { $script:ParallelDriftGateResolutionImportFailure = 'feature-folder-resolution.ps1' }
 }
 
 # Dot-source the shape-and-derivation helpers. Guarded so a missing file produces a clear error
@@ -209,32 +224,16 @@ function Test-ParallelDriftFindingPresent {
 function Find-ParallelDriftGateFeatureFolderFromPrompt {
     <#
     .SYNOPSIS
-        Scan a delegation prompt for docs/features/active/<...> path tokens and return the
-        longest unique match's basename, or $null when none is found.
+        Return the distinct feature-folder basenames cited in a delegation prompt, in
+        first-occurrence order, through the shared Find-FeatureFolderCandidate (issue #565).
+        A nested research/ or evidence/ citation names its own folder. No output when no
+        folder is cited; selection among several is made by Select-FeatureFolderTarget.
     #>
     [CmdletBinding()]
-    [OutputType([string])]
+    [OutputType([string[]])]
     param([Parameter(Mandatory)][AllowEmptyString()][string] $Prompt)
 
-    if (-not $Prompt) {
-        return $null
-    }
-    $matchList = [regex]::Matches($Prompt, 'docs[\\/]+features[\\/]+active[\\/]+[^\s"''`]+')
-    if ($matchList.Count -eq 0) {
-        return $null
-    }
-
-    # Collect distinct normalized tokens so the longest, most specific one can be selected.
-    $unique = @{}
-    foreach ($found in $matchList) {
-        $unique[($found.Value -replace '\\', '/').TrimEnd('/')] = $true
-    }
-
-    $best = @(@($unique.Keys) | Sort-Object -Property Length -Descending)[0]
-    if ($best -match '\.md$') {
-        $best = $best -replace '/[^/]+\.md$', ''
-    }
-    return ($best -split '/')[-1]
+    return @(Find-FeatureFolderCandidate -Text $Prompt)
 }
 
 function Find-ParallelDriftGateItemRecord {
@@ -352,8 +351,8 @@ function Invoke-ParallelDriftGateDecision {
         return Get-ParallelDriftGateBlockDecision -Reason "PARALLEL_DRIFT_GATE_BLOCKED: $($target.ReasonCode): $($target.Detail)"
     }
 
-    $featureFolder = Find-ParallelDriftGateFeatureFolderFromPrompt -Prompt $prompt
-    if (-not $featureFolder) {
+    $candidates = @(Find-ParallelDriftGateFeatureFolderFromPrompt -Prompt $prompt)
+    if ($candidates.Count -eq 0) {
         return Get-ParallelDriftGateBlockDecision -Reason 'PARALLEL_DRIFT_GATE_BLOCKED: a parallel-mode feature-review delegation must reference the target item feature folder in the prompt so its drift state can be verified.'
     }
 
@@ -367,8 +366,19 @@ function Invoke-ParallelDriftGateDecision {
         }
     }
     if ($null -eq $checkpoint) {
-        return Get-ParallelDriftGateBlockDecision -Reason "PARALLEL_DRIFT_GATE_BLOCKED: the parallel checkpoint 'artifacts/orchestration/parallel-orchestrator-state.json' in worktree '$($target.WorktreeRoot)' is missing or unreadable, so the drift state of '$featureFolder' cannot be verified."
+        return Get-ParallelDriftGateBlockDecision -Reason "PARALLEL_DRIFT_GATE_BLOCKED: the parallel checkpoint 'artifacts/orchestration/parallel-orchestrator-state.json' in worktree '$($target.WorktreeRoot)' is missing or unreadable, so the drift state of '$($candidates -join ', ')' cannot be verified."
     }
+
+    # The target is selected among the cited candidates (issue #565). The canonical
+    # issue-number line breaks a tie only when it names exactly one number.
+    $selectionArguments = @{ Records = @($checkpoint.items | Where-Object { $null -ne $_ }); Candidate = $candidates }
+    $declared = Find-WorktreeItemIssueSignal -Text $prompt
+    if (@($declared).Count -eq 1) { $selectionArguments['DeclaredIssueNumber'] = [int]@($declared)[0] }
+    $selection = Select-FeatureFolderTarget @selectionArguments
+    if ($selection.Status -eq 'Ambiguous') {
+        return Get-ParallelDriftGateBlockDecision -Reason "PARALLEL_DRIFT_GATE_BLOCKED: $($selection.Detail)."
+    }
+    $featureFolder = $selection.Basename
 
     $item = Find-ParallelDriftGateItemRecord -Checkpoint $checkpoint -FeatureFolder $featureFolder
     if ($null -eq $item -or -not (Test-ParallelDriftGateItemKey -Value $item.issue_num)) {
