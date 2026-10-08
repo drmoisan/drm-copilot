@@ -102,7 +102,7 @@ items:
   - issue_num: 791
     feature_folder: "docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follow-ups-791"
     kind: "bug"
-    state: "prepared"
+    state: "admitted"
     blast_radius:
       paths:
         - ".claude/agents/parallel-orchestrator.md"
@@ -408,7 +408,7 @@ Run branch: `parallel/bug-burndown-2026-10-08-plan`. Each item opens its own pul
 | P5 | 849 | proposed |  | bug/parallel-items-fail-completion-on-promotion-receipts-849 |  |
 | P6 | 843 | proposed |  | bug/parallel-model-routing-admitted-item-source-and-absent-band-test-843 |  |
 | P7 | 790 | prepared | C3 | bug/issue-507-python-push-down-divergence-follow-ups-790 | docs/features/active/2026-09-29-issue-507-python-push-down-divergence-follow-ups-790/plan.2026-10-08T13-56.md |
-| P8 | 791 | prepared | C3 | bug/issue-763-parallel-skill-cli-port-follow-ups-791 | docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follow-ups-791/plan.2026-10-08T13-56.md |
+| P8 | 791 | admitted | C3 | bug/issue-763-parallel-skill-cli-port-follow-ups-791 | docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follow-ups-791/plan.2026-10-08T13-56.md |
 | P9 | 796 | proposed |  | bug/duplicated-string-comparators-outside-pr-context-796 |  |
 | P10 | 844 | proposed |  | bug/handoff-failure-cause-fallback-and-name-gaps-844 |  |
 | P11 | 845 | proposed |  | bug/npm-token-guard-comparison-false-positive-and-stale-docstring-845 |  |
