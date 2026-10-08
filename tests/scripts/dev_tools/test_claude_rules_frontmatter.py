@@ -26,15 +26,15 @@ from typing import cast
 
 import yaml
 
+from tests.scripts.dev_tools.claude_payload_scope_test_support import (
+    LOCAL_ONLY_CLAUDE_SUBDIRS as EXCLUDED_CLAUDE_SUBDIRS,
+)
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
 CLAUDE_ROOT = REPO_ROOT / ".claude"
 RULES_DIR = CLAUDE_ROOT / "rules"
 AGENTS_DIR = CLAUDE_ROOT / "agents"
 SKILLS_DIR = CLAUDE_ROOT / "skills"
-
-# `.claude/agent-memory/`, `.claude/worktrees/`, and `.claude/state/` are gitignored,
-# machine-local subtrees excluded here for determinism.
-EXCLUDED_CLAUDE_SUBDIRS = frozenset({"agent-memory", "worktrees", "state"})
 
 # A `paths:` entry that matches every file scopes nothing, so a rule carrying one
 # loads unconditionally exactly as an unscoped rule does.

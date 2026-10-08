@@ -1,0 +1,6 @@
+# P8-T19 File Sizes (pass 1, FAILED; superseded by a later timestamp)
+
+Timestamp: 2026-10-02T03-37
+Command: poetry run python -c "import pathlib; print({p: len(pathlib.Path(p).read_text(encoding='utf-8').splitlines()) for p in ['scripts/dev_tools/quality_tiers_contract.py', 'scripts/dev_tools/check_quality_tiers.py', 'tests/scripts/dev_tools/test_quality_tiers_contract.py', 'tests/scripts/dev_tools/test_check_quality_tiers.py']})"
+EXIT_CODE: 0
+Output Summary: FAIL. Counts: quality_tiers_contract.py 391, check_quality_tiers.py 193, test_quality_tiers_contract.py 508, test_check_quality_tiers.py 388. The contract test file exceeds the 500-line limit by 8 lines. Per the Phase 8 restart rule, the file is corrected under its original write tasks (P1-T1 through P1-T3), the correction is committed with a pathspec-bearing commit, and the loop restarts at P8-T1. Pass-1 results for P8-T11 through P8-T18 and P8-T20 were all within expectation (6393 passed, 6 skipped; gate exit 0; totals 93.61 line and 86.89 branch; contract stage 10 passed; integration OK 24/24 with empty stderr; actionlint clean; hermeticity and 3.10 searches exit 1; 61 tests collected), but this pass is abandoned and those results are not cited by P8-T22.

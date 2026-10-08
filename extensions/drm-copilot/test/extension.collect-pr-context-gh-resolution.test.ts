@@ -78,10 +78,10 @@ import { activate } from "../src/extension";
 
 const fsMock = jest.requireMock("node:fs") as {
   existsSync: jest.MockedFunction<(filePath: string) => boolean>;
-  statSync: jest.Mock;
+  statSync: jest.Mock<(filePath: string) => unknown>;
   readdirSync: jest.Mock;
-  readFileSync: jest.Mock;
-  writeFileSync: jest.Mock;
+  readFileSync: jest.Mock<(filePath: string) => string>;
+  writeFileSync: jest.Mock<(filePath: string, content: string) => void>;
   mkdirSync: jest.Mock;
 };
 
@@ -167,10 +167,10 @@ describe("drm-copilot collectPrContext gh resolution", () => {
 
   beforeEach(() => {
     originalPlatform = Object.getOwnPropertyDescriptor(process, "platform");
-    originalPath = process.env.PATH;
-    originalPathExt = process.env.PATHEXT;
+    originalPath = process.env["PATH"];
+    originalPathExt = process.env["PATHEXT"];
     Object.defineProperty(process, "platform", { value: "linux" });
-    delete process.env.PATHEXT;
+    delete process.env["PATHEXT"];
     commandHandlers.clear();
     setCollectorFileSystemState();
     setSpawnSyncState();
@@ -181,21 +181,21 @@ describe("drm-copilot collectPrContext gh resolution", () => {
       Object.defineProperty(process, "platform", originalPlatform);
     }
     if (originalPath === undefined) {
-      delete process.env.PATH;
+      delete process.env["PATH"];
     } else {
-      process.env.PATH = originalPath;
+      process.env["PATH"] = originalPath;
     }
     if (originalPathExt === undefined) {
-      delete process.env.PATHEXT;
+      delete process.env["PATHEXT"];
     } else {
-      process.env.PATHEXT = originalPathExt;
+      process.env["PATHEXT"] = originalPathExt;
     }
     jest.clearAllMocks();
   });
 
   it("collectPrContext spawns the PATH-resolved gh with auth status", async () => {
     // Arrange: gh exists only in /opt/gh-bin, which is on PATH.
-    process.env.PATH = "/opt/gh-bin";
+    process.env["PATH"] = "/opt/gh-bin";
     fsMock.existsSync.mockImplementation(
       (filePath: string) => filePath === "/opt/gh-bin/gh",
     );
@@ -214,7 +214,7 @@ describe("drm-copilot collectPrContext gh resolution", () => {
 
   it("collectPrContext does not spawn gh when no PATH directory contains it", async () => {
     // Arrange: PATH has one directory, and no file exists anywhere.
-    process.env.PATH = "/opt/empty-bin";
+    process.env["PATH"] = "/opt/empty-bin";
     fsMock.existsSync.mockReturnValue(false);
     const handler = activateAndGetHandler();
 

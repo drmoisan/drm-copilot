@@ -1,0 +1,5 @@
+{
+  "base_text": "{\n  \"version\": 1,\n  \"shared_surfaces\": [\n    \"a.json\"\n  ],\n  \"modules\": {\n    \"b\": [\n      \"b/**\"\n    ],\n    \"a\": [\n      \"a/**\"\n    ]\n  }\n}\n",
+  "overlay_text": "{}\n",
+  "expected_text": "{\n  \"version\": 1,\n  \"shared_surfaces\": [\n    \"a.json\"\n  ],\n  \"modules\": {\n    \"b\": [\n      \"b/**\"\n    ],\n    \"a\": [\n      \"a/**\"\n    ]\n  }\n}\n"
+}

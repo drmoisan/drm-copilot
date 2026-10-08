@@ -37,7 +37,13 @@ import {
 
 const fsMock = jest.requireMock("node:fs") as { existsSync: MockExistsSync };
 const childProcessMock = jest.requireMock("node:child_process") as {
-  spawn: jest.Mock;
+  spawn: jest.Mock<
+    (
+      executable: string,
+      args: ReadonlyArray<string>,
+      options: { cwd: string },
+    ) => MockChildProcess
+  >;
 };
 
 const WORKSPACE_ROOT = "C:/workspace";

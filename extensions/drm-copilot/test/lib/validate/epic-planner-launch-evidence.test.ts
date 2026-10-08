@@ -220,4 +220,44 @@ describe("epic planner launch file and status evidence", () => {
     expect(actual).toContain("must contain launch_id");
     expect(actual).toContain("must share one launch_status_path");
   });
+
+  it("skips a feature without launch keys when requireLaunchPaths is set", () => {
+    // Arrange
+    const value = launchEvidenceFixture();
+    const item = features(value)[0]!;
+    delete item["launch_receipt_path"];
+    delete item["launch_status_path"];
+
+    // Act
+    const actual = validateEpicPlannerLaunchEvidence(
+      value.state,
+      value.context,
+      { requireLaunchPaths: true },
+    );
+
+    // Assert
+    expect(actual).toEqual([]);
+  });
+
+  it("still rejects a partial launch key when requireLaunchPaths is set", () => {
+    // Arrange
+    const value = launchEvidenceFixture();
+    delete features(value)[0]!["launch_status_path"];
+
+    // Act
+    const actual = validateEpicPlannerLaunchEvidence(
+      value.state,
+      value.context,
+      { requireLaunchPaths: true },
+    );
+
+    // Assert
+    expect(
+      actual.some((error) =>
+        error.includes(
+          "launch status path must identify a launch artifact in this repository.",
+        ),
+      ),
+    ).toBe(true);
+  });
 });

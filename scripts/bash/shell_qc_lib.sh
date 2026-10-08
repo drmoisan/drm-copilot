@@ -224,12 +224,21 @@ run_format() {
 }
 
 run_test() {
-	# Run bats against tests/shell and tests/bash without coverage.
+	# Run bats against tests/shell and tests/bash without coverage, under a kcov-equivalent
+	# trace environment.
 	#
 	# No test directory prints the exact skip marker consumed by fix_all.py and
 	# returns 0. A missing bats prints the exact non-coverage skip marker and returns
 	# 0. Otherwise bats runs once per directory; all directories run even if one
 	# fails, and the maximum exit code is returned.
+	#
+	# Every bats run inherits BASH_ENV set to kcov_trace_env.sh (resolved from this
+	# library's own directory) and BASH_XTRACEFD set to a descriptor opened on /dev/null,
+	# so each non-interactive child bash traces with kcov v43's PS4 and the trace is
+	# discarded. A test that sources a nounset-enabling library at the top level of
+	# bash -c therefore fails here with "BASH_SOURCE: unbound variable", as it does under
+	# kcov in CI (issue #743). run_test_coverage does not use this environment, because
+	# real kcov installs its own.
 	local -a test_dirs=()
 	mapfile -t test_dirs < <(find_bats_test_dirs)
 	if ((${#test_dirs[@]} == 0)); then
@@ -241,15 +250,21 @@ run_test() {
 		printf 'bats not installed; skipping shell tests.\n'
 		return 0
 	fi
+	local lib_dir trace_env trace_fd
+	lib_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+	trace_env="$lib_dir/kcov_trace_env.sh"
+	# bash writes xtrace lines to BASH_XTRACEFD; this descriptor discards them.
+	exec {trace_fd}>/dev/null
 	local exit_code=0 rc=0 test_dir
 	# Run every directory even on failure so all suites report, matching prior behavior.
 	for test_dir in "${test_dirs[@]}"; do
 		rc=0
-		"$bats_bin" "$test_dir" || rc=$?
+		BASH_ENV="$trace_env" BASH_XTRACEFD="$trace_fd" "$bats_bin" "$test_dir" || rc=$?
 		if ((rc > exit_code)); then
 			exit_code=$rc
 		fi
 	done
+	exec {trace_fd}>&-
 	return "$exit_code"
 }
 

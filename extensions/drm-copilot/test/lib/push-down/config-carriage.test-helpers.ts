@@ -144,6 +144,22 @@ export const SOURCE_BLAST_RADIUS = `${JSON.stringify(
 )}\n`;
 
 /**
+ * A destination-owned blast-radius overlay (issue #508).
+ *
+ * Seeded at `config/blast-radius.local.json` in the destination. Its surface
+ * and module must appear in every regenerated `config/blast-radius.json`, and
+ * the overlay file itself must never be written by a push.
+ */
+export const OVERLAY_TEXT = `${JSON.stringify(
+  {
+    shared_surfaces: ["Directory.Build.props"],
+    modules: { "destination-app": ["app/**"] },
+  },
+  null,
+  2,
+)}\n`;
+
+/**
  * Serialize a pack manifest for seeding.
  *
  * @param fields Manifest fields to serialize.

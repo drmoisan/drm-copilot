@@ -259,8 +259,8 @@ def test_validate_wave_barrier_ordering_rejects_unmerged_dependency() -> None:
     errors = validate_epic_orchestrator_state_text(json.dumps(state))
 
     assert any(
-        "EPIC_WAVE_BARRIER_VIOLATION: 2026-07-02-child-b-301 started before "
-        "dependency 2026-07-02-child-a-300 merged" in error
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-07-02-child-b-301 is treated as started "
+        "while dependency 2026-07-02-child-a-300 is not merged" in error
         for error in errors
     )
 

@@ -10,7 +10,9 @@ import { afterEach, describe, expect, it, jest } from "@jest/globals";
  * time and invoked directly.
  */
 
-const showQuickPickMock = jest.fn();
+const showQuickPickMock =
+  jest.fn<(items: unknown, options?: unknown) => Promise<unknown>>();
+const showWarningMessageMock = jest.fn();
 const registerCommandMock = jest.fn();
 
 jest.mock(
@@ -18,6 +20,7 @@ jest.mock(
   () => ({
     window: {
       showQuickPick: showQuickPickMock,
+      showWarningMessage: showWarningMessageMock,
     },
     commands: {
       registerCommand: registerCommandMock,
@@ -104,7 +107,9 @@ describe("registerPushDownCodexAndAgentsCustomizationsCommand selections", () =>
 
   it("prompts for packs and C# variant then forwards the public selection", async () => {
     const captured = captureHandlers();
-    const pushDownCodexMock = jest.fn(() => Promise.resolve());
+    const pushDownCodexMock = jest.fn<(input: unknown) => Promise<void>>(() =>
+      Promise.resolve(),
+    );
     const options = {
       context: {} as unknown,
       output: { appendLine: jest.fn() },
@@ -135,7 +140,9 @@ describe("registerPushDownCodexAndAgentsCustomizationsCommand selections", () =>
 
   it("does not prompt for a C# variant when C# is not selected", async () => {
     const captured = captureHandlers();
-    const pushDownCodexMock = jest.fn(() => Promise.resolve());
+    const pushDownCodexMock = jest.fn<(input: unknown) => Promise<void>>(() =>
+      Promise.resolve(),
+    );
     const options = {
       context: {} as unknown,
       output: { appendLine: jest.fn() },
@@ -166,7 +173,9 @@ describe("registerPushDownCodexAndAgentsCustomizationsCommand selections", () =>
 
   it("cancels before service invocation when a selection returns undefined", async () => {
     const captured = captureHandlers();
-    const pushDownCodexMock = jest.fn(() => Promise.resolve());
+    const pushDownCodexMock = jest.fn<(input: unknown) => Promise<void>>(() =>
+      Promise.resolve(),
+    );
     const options = {
       context: {} as unknown,
       output: { appendLine: jest.fn() },
@@ -189,7 +198,9 @@ describe("registerPushDownCodexAndAgentsCustomizationsCommand selections", () =>
 
   it("cancels before service invocation when the C# variant selection is cancelled", async () => {
     const captured = captureHandlers();
-    const pushDownCodexMock = jest.fn(() => Promise.resolve());
+    const pushDownCodexMock = jest.fn<(input: unknown) => Promise<void>>(() =>
+      Promise.resolve(),
+    );
     const options = {
       context: {} as unknown,
       output: { appendLine: jest.fn() },
@@ -210,5 +221,88 @@ describe("registerPushDownCodexAndAgentsCustomizationsCommand selections", () =>
     await handler();
 
     expect(pushDownCodexMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("registerPushDownClaudeCustomizationsCommand conflict notification", () => {
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  const CONFLICT_LINE =
+    "push-down exclusion conflict: destination file present, not overwritten: .claude/rules/quality-tiers.md (entry .claude/rules/quality-tiers.md, line 1)";
+  const SKIPPED_LINE =
+    "push-down exclusion: skipped .claude/rules/python.md (entry .claude/rules/python.md, line 2)";
+  const UNMATCHED_LINE =
+    "push-down exclusion: entry matched no payload path: .claude/agent-memory/** (line 3)";
+
+  /**
+   * Run the Claude push-down command with a service resolving `result`.
+   *
+   * @param result The service result the mock resolves.
+   */
+  async function runCommand(result: Record<string, unknown>): Promise<void> {
+    const captured = captureHandlers();
+    const options = {
+      context: {} as unknown,
+      output: { appendLine: jest.fn() },
+      service: {
+        pushDownClaudeCustomizations: jest.fn(() => Promise.resolve(result)),
+      },
+    } as unknown as RepoAutomationCommandRegistrationOptions;
+    registerRepoAutomationAdminCommands(options);
+    const handler = findHandler(
+      captured,
+      "drmCopilotExtension.pushDownClaudeCustomizations",
+    );
+    // Pack multi-select without C# (no variant prompt), then memory mode.
+    showQuickPickMock
+      .mockResolvedValueOnce([
+        { label: "Python", pack: "python", picked: true },
+      ])
+      .mockResolvedValueOnce("overwrite");
+    await handler();
+  }
+
+  const BASE_RESULT = {
+    tool: "push_down_claude_customizations",
+    workspaceRoot: "/fake/workspace",
+    summary: "Pushed bundled Claude Code customizations.",
+    artifacts: [],
+  };
+
+  it("shows one warning notification when the result carries at least one conflict line", async () => {
+    // Arrange / Act
+    await runCommand({
+      ...BASE_RESULT,
+      warnings: [CONFLICT_LINE, SKIPPED_LINE],
+    });
+
+    // Assert
+    expect(showWarningMessageMock).toHaveBeenCalledTimes(1);
+    const [message] = showWarningMessageMock.mock.calls[0] as [string];
+    expect(message.startsWith("Push-down exclusion conflicts: 1")).toBe(true);
+    expect(message).toContain(
+      "See the drm-copilot output channel for the affected paths.",
+    );
+  });
+
+  it("shows no notification when the result carries only skipped and unmatched lines", async () => {
+    // Arrange / Act
+    await runCommand({
+      ...BASE_RESULT,
+      warnings: [SKIPPED_LINE, UNMATCHED_LINE],
+    });
+
+    // Assert
+    expect(showWarningMessageMock).not.toHaveBeenCalled();
+  });
+
+  it("shows no notification when the result carries no warnings", async () => {
+    // Arrange / Act
+    await runCommand(BASE_RESULT);
+
+    // Assert
+    expect(showWarningMessageMock).not.toHaveBeenCalled();
   });
 });

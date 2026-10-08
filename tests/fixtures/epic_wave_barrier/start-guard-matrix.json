@@ -1,0 +1,334 @@
+{
+  "schema_version": 1,
+  "envelope": {
+    "objective": "validate the epic wave-barrier start guard",
+    "route_id": "epic",
+    "epic_feature_folder": "2026-09-29-start-guard-epic-659",
+    "integration_branch": "epic/start-guard-659-integration",
+    "max_parallel_features": 4,
+    "completed_steps": [],
+    "next_step": "wave_1_launch",
+    "last_updated": "2026-09-29T00-00",
+    "waves": []
+  },
+  "cases": [
+    {
+      "name": "unstarted-dependent-unmerged-dependency",
+      "acceptance_criteria": ["AC-1"],
+      "notes": "A dependent whose merge_status is not_started and that has no worktree timestamp is not checked.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-alpha-901",
+          "issue_num": 901,
+          "depends_on": [],
+          "merge_status": "pr_open"
+        },
+        {
+          "feature_folder": "2026-09-29-bravo-902",
+          "issue_num": 902,
+          "depends_on": ["2026-09-29-alpha-901"],
+          "merge_status": "not_started"
+        }
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "unstarted-dependent-null-timestamp",
+      "acceptance_criteria": ["AC-1"],
+      "notes": "A null worktree_created_at does not mark a not_started dependent as started.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-alpha-901",
+          "issue_num": 901,
+          "depends_on": [],
+          "merge_status": "worktree_created"
+        },
+        {
+          "feature_folder": "2026-09-29-bravo-902",
+          "issue_num": 902,
+          "depends_on": ["2026-09-29-alpha-901"],
+          "merge_status": "not_started",
+          "worktree_created_at": null
+        }
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "started-by-status-unmerged-dependency",
+      "acceptance_criteria": ["AC-2"],
+      "notes": "A dependent started by status with an unmerged dependency produces the status error.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-alpha-901",
+          "issue_num": 901,
+          "depends_on": [],
+          "merge_status": "pr_open"
+        },
+        {
+          "feature_folder": "2026-09-29-bravo-902",
+          "issue_num": 902,
+          "depends_on": ["2026-09-29-alpha-901"],
+          "merge_status": "worktree_created"
+        }
+      ],
+      "expected_barrier_errors": ["EPIC_WAVE_BARRIER_VIOLATION: 2026-09-29-bravo-902 is treated as started while dependency 2026-09-29-alpha-901 is not merged"]
+    },
+    {
+      "name": "merge-status-absent-treated-as-started",
+      "acceptance_criteria": ["AC-2"],
+      "notes": "A dependent with no merge_status key fails closed and is treated as started.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-alpha-901",
+          "issue_num": 901,
+          "depends_on": [],
+          "merge_status": "pr_open"
+        },
+        {
+          "feature_folder": "2026-09-29-bravo-902",
+          "issue_num": 902,
+          "depends_on": ["2026-09-29-alpha-901"]
+        }
+      ],
+      "expected_barrier_errors": ["EPIC_WAVE_BARRIER_VIOLATION: 2026-09-29-bravo-902 is treated as started while dependency 2026-09-29-alpha-901 is not merged"]
+    },
+    {
+      "name": "merge-status-null-treated-as-started",
+      "acceptance_criteria": ["AC-2"],
+      "notes": "A dependent with a null merge_status fails closed and is treated as started.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-alpha-901",
+          "issue_num": 901,
+          "depends_on": [],
+          "merge_status": "ci_green"
+        },
+        {
+          "feature_folder": "2026-09-29-bravo-902",
+          "issue_num": 902,
+          "depends_on": ["2026-09-29-alpha-901"],
+          "merge_status": null
+        }
+      ],
+      "expected_barrier_errors": ["EPIC_WAVE_BARRIER_VIOLATION: 2026-09-29-bravo-902 is treated as started while dependency 2026-09-29-alpha-901 is not merged"]
+    },
+    {
+      "name": "not-started-with-timestamp-treated-as-started",
+      "acceptance_criteria": ["AC-2"],
+      "notes": "A string worktree_created_at marks a not_started dependent as started.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-alpha-901",
+          "issue_num": 901,
+          "depends_on": [],
+          "merge_status": "pr_open"
+        },
+        {
+          "feature_folder": "2026-09-29-bravo-902",
+          "issue_num": 902,
+          "depends_on": ["2026-09-29-alpha-901"],
+          "merge_status": "not_started",
+          "worktree_created_at": "2026-09-29T10-00"
+        }
+      ],
+      "expected_barrier_errors": ["EPIC_WAVE_BARRIER_VIOLATION: 2026-09-29-bravo-902 is treated as started while dependency 2026-09-29-alpha-901 is not merged"]
+    },
+    {
+      "name": "dependency-merge-status-absent",
+      "acceptance_criteria": ["AC-2"],
+      "notes": "A dependency with no merge_status key is reported as not merged.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-alpha-901",
+          "issue_num": 901,
+          "depends_on": []
+        },
+        {
+          "feature_folder": "2026-09-29-bravo-902",
+          "issue_num": 902,
+          "depends_on": ["2026-09-29-alpha-901"],
+          "merge_status": "worktree_created",
+          "worktree_created_at": "2026-09-29T10-00"
+        }
+      ],
+      "expected_barrier_errors": ["EPIC_WAVE_BARRIER_VIOLATION: 2026-09-29-bravo-902 is treated as started while dependency 2026-09-29-alpha-901 is not merged"]
+    },
+    {
+      "name": "two-unmerged-dependencies-in-order",
+      "acceptance_criteria": ["AC-2"],
+      "notes": "Two unmerged dependencies produce one status error each in depends_on order.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-alpha-901",
+          "issue_num": 901,
+          "depends_on": [],
+          "merge_status": "pr_open"
+        },
+        {
+          "feature_folder": "2026-09-29-bravo-902",
+          "issue_num": 902,
+          "depends_on": [],
+          "merge_status": "merge_conflict"
+        },
+        {
+          "feature_folder": "2026-09-29-charlie-903",
+          "issue_num": 903,
+          "depends_on": ["2026-09-29-bravo-902", "2026-09-29-alpha-901"],
+          "merge_status": "worktree_created"
+        }
+      ],
+      "expected_barrier_errors": ["EPIC_WAVE_BARRIER_VIOLATION: 2026-09-29-charlie-903 is treated as started while dependency 2026-09-29-bravo-902 is not merged", "EPIC_WAVE_BARRIER_VIOLATION: 2026-09-29-charlie-903 is treated as started while dependency 2026-09-29-alpha-901 is not merged"]
+    },
+    {
+      "name": "merged-dependency-confirmed-after-start",
+      "acceptance_criteria": ["AC-3"],
+      "notes": "A merged dependency confirmed after the dependent started produces the timing error.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-alpha-901",
+          "issue_num": 901,
+          "depends_on": [],
+          "merge_status": "merged",
+          "merge_confirmed_at": "2026-09-29T12-00"
+        },
+        {
+          "feature_folder": "2026-09-29-bravo-902",
+          "issue_num": 902,
+          "depends_on": ["2026-09-29-alpha-901"],
+          "merge_status": "worktree_created",
+          "worktree_created_at": "2026-09-29T10-00"
+        }
+      ],
+      "expected_barrier_errors": ["EPIC_WAVE_BARRIER_VIOLATION: 2026-09-29-bravo-902 worktree_created_at precedes dependency 2026-09-29-alpha-901 merge_confirmed_at"]
+    },
+    {
+      "name": "dependencies-merged-before-start",
+      "acceptance_criteria": ["AC-3"],
+      "notes": "Dependencies merged at or before the dependent started produce no error.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-alpha-901",
+          "issue_num": 901,
+          "depends_on": [],
+          "merge_status": "merged",
+          "merge_confirmed_at": "2026-09-29T09-00"
+        },
+        {
+          "feature_folder": "2026-09-29-bravo-902",
+          "issue_num": 902,
+          "depends_on": [],
+          "merge_status": "worktree_removed",
+          "merge_confirmed_at": "2026-09-29T10-00"
+        },
+        {
+          "feature_folder": "2026-09-29-charlie-903",
+          "issue_num": 903,
+          "depends_on": ["2026-09-29-alpha-901", "2026-09-29-bravo-902"],
+          "merge_status": "pr_open",
+          "worktree_created_at": "2026-09-29T10-00"
+        }
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "status-and-timing-on-one-edge",
+      "acceptance_criteria": ["AC-2", "AC-3"],
+      "notes": "When both the status and the timing condition hold on one edge, only the status error is reported.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-alpha-901",
+          "issue_num": 901,
+          "depends_on": [],
+          "merge_status": "pr_open",
+          "merge_confirmed_at": "2026-09-29T12-00"
+        },
+        {
+          "feature_folder": "2026-09-29-bravo-902",
+          "issue_num": 902,
+          "depends_on": ["2026-09-29-alpha-901"],
+          "merge_status": "worktree_created",
+          "worktree_created_at": "2026-09-29T10-00"
+        }
+      ],
+      "expected_barrier_errors": ["EPIC_WAVE_BARRIER_VIOLATION: 2026-09-29-bravo-902 is treated as started while dependency 2026-09-29-alpha-901 is not merged"]
+    },
+    {
+      "name": "integer-issue-number-reference",
+      "acceptance_criteria": ["AC-2"],
+      "notes": "An integer issue-number dependency reference is rendered as its decimal text.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-alpha-901",
+          "issue_num": 901,
+          "depends_on": [],
+          "merge_status": "pr_open"
+        },
+        {
+          "feature_folder": "2026-09-29-bravo-902",
+          "issue_num": 902,
+          "depends_on": [901],
+          "merge_status": "worktree_created"
+        }
+      ],
+      "expected_barrier_errors": ["EPIC_WAVE_BARRIER_VIOLATION: 2026-09-29-bravo-902 is treated as started while dependency 901 is not merged"]
+    },
+    {
+      "name": "epic-678-checkpoint-shape",
+      "acceptance_criteria": ["AC-6"],
+      "notes": "The epic 678 checkpoint shape with a not_started dependent produces no barrier error.",
+      "features": [
+        {
+          "feature_folder": "2026-09-13-false-approval-elimination-pr-author-model-routing-673",
+          "issue_num": 673,
+          "depends_on": [],
+          "merge_status": "pr_open"
+        },
+        {
+          "feature_folder": "2026-09-13-taskmaster-push-down-and-resume-674",
+          "issue_num": 674,
+          "depends_on": ["2026-09-13-false-approval-elimination-pr-author-model-routing-673"],
+          "merge_status": "not_started"
+        }
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "kickoff-all-not-started",
+      "acceptance_criteria": ["AC-6"],
+      "notes": "A kickoff checkpoint in which every feature is not_started produces no barrier error.",
+      "features": [
+        {
+          "feature_folder": "2026-09-29-kickoff-630",
+          "issue_num": 630,
+          "depends_on": [],
+          "merge_status": "not_started"
+        },
+        {
+          "feature_folder": "2026-09-29-kickoff-631",
+          "issue_num": 631,
+          "depends_on": ["2026-09-29-kickoff-630"],
+          "merge_status": "not_started"
+        },
+        {
+          "feature_folder": "2026-09-29-kickoff-632",
+          "issue_num": 632,
+          "depends_on": ["2026-09-29-kickoff-630"],
+          "merge_status": "not_started"
+        },
+        {
+          "feature_folder": "2026-09-29-kickoff-635",
+          "issue_num": 635,
+          "depends_on": ["2026-09-29-kickoff-631"],
+          "merge_status": "not_started"
+        },
+        {
+          "feature_folder": "2026-09-29-kickoff-637",
+          "issue_num": 637,
+          "depends_on": ["2026-09-29-kickoff-632"],
+          "merge_status": "not_started"
+        }
+      ],
+      "expected_barrier_errors": []
+    }
+  ]
+}

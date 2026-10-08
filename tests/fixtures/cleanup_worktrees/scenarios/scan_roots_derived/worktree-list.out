@@ -1,0 +1,40 @@
+worktree /repo/main
+HEAD aaaa0000
+branch refs/heads/main
+
+worktree /repo/main-wt/a
+HEAD aaaa0001
+branch refs/heads/wt-a
+
+worktree /repo/main-wt/a-wt/b
+HEAD aaaa0002
+branch refs/heads/wt-b
+
+worktree /scratch/planhome/ph1
+HEAD aaaa0003
+branch refs/heads/ph1
+
+worktree /Scratch/PlanHome/ph2
+HEAD aaaa0004
+branch refs/heads/ph2
+
+worktree /repo/sibling-plan
+HEAD aaaa0005
+branch refs/heads/sibling-plan
+
+worktree /repo/main/sub
+HEAD aaaa0006
+branch refs/heads/sub
+
+worktree /repo/main/.claude/x
+HEAD aaaa0007
+branch refs/heads/x
+
+worktree /scratch/planhome/ph1/inner/c
+HEAD aaaa0008
+branch refs/heads/c
+
+worktree /scratch/planhome/ph1/d
+HEAD aaaa0009
+branch refs/heads/d
+

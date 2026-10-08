@@ -11,9 +11,9 @@ jest.mock("node:fs", () => ({
   mkdirSync: jest.fn(),
 }));
 
-const readdirSyncMock = fs.readdirSync as jest.MockedFunction<
-  typeof fs.readdirSync
->;
+const readdirSyncMock = jest.mocked<
+  (path: fs.PathLike, options: { withFileTypes: true }) => fs.Dirent[]
+>(fs.readdirSync);
 const statSyncMock = fs.statSync as jest.MockedFunction<typeof fs.statSync>;
 const readFileSyncMock = fs.readFileSync as jest.MockedFunction<
   typeof fs.readFileSync
@@ -129,17 +129,12 @@ describe("RealFileSystem", () => {
       readdirSyncMock.mockImplementation((dir: fs.PathLike) => {
         const path = String(dir);
         if (path.endsWith("/repo") || path === "/repo") {
-          return [dirent("scripts", true)] as unknown as ReturnType<
-            typeof fs.readdirSync
-          >;
+          return [dirent("scripts", true)];
         }
         if (path.endsWith("scripts")) {
-          return [
-            dirent("config.json", false),
-            dirent("notes.txt", false),
-          ] as unknown as ReturnType<typeof fs.readdirSync>;
+          return [dirent("config.json", false), dirent("notes.txt", false)];
         }
-        return [] as unknown as ReturnType<typeof fs.readdirSync>;
+        return [];
       });
       const sut = new RealFileSystem();
 
@@ -170,16 +165,12 @@ describe("RealFileSystem", () => {
       readdirSyncMock.mockImplementation((dir: fs.PathLike) => {
         const path = String(dir);
         if (path === "/repo") {
-          return [dirent("data", true)] as unknown as ReturnType<
-            typeof fs.readdirSync
-          >;
+          return [dirent("data", true)];
         }
         if (path.endsWith("data")) {
-          return [dirent("corpus.json", false)] as unknown as ReturnType<
-            typeof fs.readdirSync
-          >;
+          return [dirent("corpus.json", false)];
         }
-        return [] as unknown as ReturnType<typeof fs.readdirSync>;
+        return [];
       });
       const sut = new RealFileSystem();
 

@@ -162,7 +162,7 @@ describe("RealPushDownFileSystem", () => {
   describe("readTextFile", () => {
     it("reads UTF-8 text", () => {
       // Arrange
-      readFileSyncMock.mockReturnValue("content" as unknown as Buffer);
+      readFileSyncMock.mockReturnValue("content");
       const sut = new RealPushDownFileSystem();
 
       // Act

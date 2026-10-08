@@ -1,0 +1,493 @@
+extensions/drm-copilot/src/lib/codex-native-converter/index.ts(18,3): error TS1205: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+extensions/drm-copilot/src/lib/codex-native-converter/index.ts(21,3): error TS1205: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+extensions/drm-copilot/src/lib/codex-native-converter/index.ts(23,3): error TS1205: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+extensions/drm-copilot/src/lib/codex-native-converter/index.ts(32,3): error TS1205: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+extensions/drm-copilot/src/lib/codex-native-converter/models.ts(25,3): error TS1205: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+extensions/drm-copilot/src/lib/codex-native-converter/models.ts(26,3): error TS1205: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+extensions/drm-copilot/src/lib/codex-native-converter/models.ts(28,3): error TS1205: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+extensions/drm-copilot/src/lib/codex-native-converter/models.ts(30,3): error TS1205: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+extensions/drm-copilot/src/lib/codex-native-converter/models.ts(32,3): error TS1205: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+extensions/drm-copilot/test/codex-native-converter-handlers.test.ts(37,66): error TS2554: Expected 0 arguments, but got 1.
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(44,46): error TS2345: Argument of type '"Start the Codex session."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(52,33): error TS2352: Conversion of type '[] | undefined' to type '[{ name: string; cwd: string; shellPath: string; shellArgs: readonly string[]; }]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '[]' is not comparable to type '[{ name: string; cwd: string; shellPath: string; shellArgs: readonly string[]; }]'.
+    Source has 0 element(s) but target requires 1.
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(148,46): error TS2345: Argument of type '"Start the Codex session."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(186,46): error TS2345: Argument of type '"Start the Codex session."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(214,46): error TS2345: Argument of type '"Start the Codex session."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(248,46): error TS2345: Argument of type '"   "' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(271,40): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(284,44): error TS2345: Argument of type '"Start the Codex session."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(298,44): error TS2345: Argument of type '"Start the Codex session."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(315,46): error TS2345: Argument of type '"Implement issue 268"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(352,46): error TS2345: Argument of type '"Implement issue 306"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/codex-worktree-session-command.test.ts(378,44): error TS2345: Argument of type '"Implement issue 306"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(158,44): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(164,44): error TS2345: Argument of type '"my-short-name"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(173,7): error TS2345: Argument of type '(options: { validateInput?: (v: string) => string | undefined; }) => Promise<string>' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'options' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type '{ validateInput?: (v: string) => string | undefined; }'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(191,44): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(200,7): error TS2345: Argument of type '(options: { validateInput?: (v: string) => string | undefined; }) => Promise<string>' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'options' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type '{ validateInput?: (v: string) => string | undefined; }'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(218,44): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(224,44): error TS2345: Argument of type '"   "' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(230,44): error TS2345: Argument of type '"42"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(239,7): error TS2345: Argument of type '(options: { validateInput?: (v: string) => string | undefined; }) => Promise<string>' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'options' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type '{ validateInput?: (v: string) => string | undefined; }'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(254,7): error TS2345: Argument of type '(options: { validateInput?: (v: string) => string | undefined; }) => Promise<string>' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'options' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type '{ validateInput?: (v: string) => string | undefined; }'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(285,46): error TS2345: Argument of type '{ fsPath: string; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(295,46): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(321,46): error TS2345: Argument of type '{ fsPath: string; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(334,46): error TS2345: Argument of type '{ fsPath: string; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(353,46): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-command-helpers.test.ts(359,46): error TS2345: Argument of type '{ fsPath: string; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-test-harness.ts(346,15): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/extension-test-harness.ts(347,15): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/extension-test-harness.ts(381,43): error TS2345: Argument of type '(uri: { fsPath: string; }) => Promise<{ uri: { fsPath: string; }; }>' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'uri' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type '{ fsPath: string; }'.
+extensions/drm-copilot/test/extension-test-harness.ts(384,42): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension-test-harness.ts(433,17): error TS2323: Cannot redeclare exported variable 'resolveCodexExecutable'.
+extensions/drm-copilot/test/extension-test-harness.ts(460,3): error TS2323: Cannot redeclare exported variable 'resolveCodexExecutable'.
+extensions/drm-copilot/test/extension-test-harness.ts(460,3): error TS2484: Export declaration conflicts with exported declaration of 'resolveCodexExecutable'.
+extensions/drm-copilot/test/extension.collect-commit-context.integration.test.ts(90,5): error TS2345: Argument of type '(_executable: string, args: ReadonlyArray<string>) => { status: number; stdout: Buffer; }' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters '_executable' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(101,38): error TS2345: Argument of type '(filePath: string) => never' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'filePath' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(105,42): error TS2345: Argument of type '(filePath: string) => string' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'filePath' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(114,5): error TS2345: Argument of type '(filePath: string, content: string) => void' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'filePath' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(170,32): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(171,35): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(173,24): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(184,26): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(186,19): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(189,26): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(191,19): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(198,17): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(217,17): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/extension.collect-pr-context.test.ts(115,38): error TS2345: Argument of type '(filePath: string) => never' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'filePath' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+extensions/drm-copilot/test/extension.collect-pr-context.test.ts(121,42): error TS2345: Argument of type '(filePath: string) => string' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'filePath' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+extensions/drm-copilot/test/extension.collect-pr-context.test.ts(133,5): error TS2345: Argument of type '(filePath: string, content: string) => void' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'filePath' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+extensions/drm-copilot/test/extension.collect-pr-context.test.ts(263,17): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/extension.collect-pr-context.test.ts(264,17): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/extension.discovery-commands.test.ts(91,45): error TS2345: Argument of type '"all"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.discovery-commands.test.ts(92,44): error TS2345: Argument of type '"discovery/"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.discovery-commands.test.ts(120,44): error TS2345: Argument of type '"discovery"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.discovery-commands.test.ts(233,30): error TS2345: Argument of type '"fc.yaml"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.discovery-commands.test.ts(234,30): error TS2345: Argument of type '"pm.yaml"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.discovery-commands.test.ts(235,30): error TS2345: Argument of type '"rc.yaml"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.discovery-commands.test.ts(263,45): error TS2345: Argument of type '"completion"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.discovery-commands.test.ts(265,30): error TS2345: Argument of type '"cov.json"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.discovery-commands.test.ts(266,30): error TS2345: Argument of type '"par.yaml"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.integration.test.ts(131,5): error TS2345: Argument of type '(_executable: string, args: ReadonlyArray<string>) => { status: number; stdout: string; stderr: string; } | { status: number; stdout: Buffer<ArrayBuffer>; stderr: string; }' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters '_executable' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+extensions/drm-copilot/test/extension.integration.test.ts(187,5): error TS2345: Argument of type '(items: ReadonlyArray<{ label: string; }>) => Promise<{ label: string; } | undefined>' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'items' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'readonly { label: string; }[]'.
+extensions/drm-copilot/test/extension.integration.test.ts(429,44): error TS2345: Argument of type '"12"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.integration.test.ts(429,72): error TS2345: Argument of type '"34"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.integration.test.ts(465,40): error TS2345: Argument of type '"template-less-entry"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.new-active-feature-folder-inprocess.test.ts(123,17): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/extension.new-active-feature-folder-inprocess.test.ts(124,17): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/extension.new-active-feature-folder.test.ts(112,17): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/extension.new-active-feature-folder.test.ts(113,17): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/extension.new-potential-bug-entry-inprocess.test.ts(117,40): error TS2345: Argument of type '"blank-pr-context"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.new-potential-bug-entry-inprocess.test.ts(182,40): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.new-potential-bug-entry-inprocess.test.ts(199,40): error TS2345: Argument of type '"blank-pr-context"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.new-potential-bug-entry-inprocess.test.ts(216,40): error TS2345: Argument of type '"blank-pr-context"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.new-potential-bug-entry-inprocess.test.ts(231,40): error TS2345: Argument of type '"test-bug"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.potential-to-issue.test.ts(160,17): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/extension.potential-to-issue.test.ts(161,17): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/extension.potential-to-issue.test.ts(305,7): error TS2554: Expected 1 arguments, but got 3.
+extensions/drm-copilot/test/extension.potential-to-issue.test.ts(327,7): error TS2554: Expected 1 arguments, but got 3.
+extensions/drm-copilot/test/extension.resolve-atomic-plan-prompt.test.ts(155,17): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/extension.resolve-atomic-plan-prompt.test.ts(156,17): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/extension.resolve-hard-lock-prompt.test.ts(155,17): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/extension.resolve-hard-lock-prompt.test.ts(156,17): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/extension.resolve-policy-audit-template.test.ts(45,45): error TS2345: Argument of type '"agents"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.run-poshqc-commands.test.ts(104,47): error TS2345: Argument of type '"Select folders to scan"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.run-poshqc-commands.test.ts(105,48): error TS2345: Argument of type '{ fsPath: string; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.run-poshqc-commands.test.ts(136,30): error TS2345: Argument of type '"Select folders to scan"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.run-poshqc-commands.test.ts(137,30): error TS2345: Argument of type '{ label: string; folder: string; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.run-poshqc-commands.test.ts(169,30): error TS2345: Argument of type '"Select folders to scan"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.run-poshqc-commands.test.ts(170,30): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.run-poshqc-commands.test.ts(208,64): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+extensions/drm-copilot/test/extension.run-poshqc-commands.test.ts(237,72): error TS2339: Property 'then' does not exist on type 'void | Promise<void>'.
+  Property 'then' does not exist on type 'void'.
+extensions/drm-copilot/test/extension.run-poshqc-suite.test.ts(81,45): error TS2345: Argument of type '"Select folders to scan"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.run-poshqc-suite.test.ts(82,46): error TS2345: Argument of type '{ fsPath: string; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.test.ts(327,9): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/extension.test.ts(358,46): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.test.ts(370,46): error TS2345: Argument of type '"Remove All"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(60,30): error TS2345: Argument of type '"review"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(61,30): error TS2345: Argument of type '"github-copilot"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(62,30): error TS2345: Argument of type '"Yes"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(63,44): error TS2345: Argument of type '"C:/source-runtime"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(84,30): error TS2345: Argument of type '"apply"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(85,30): error TS2345: Argument of type '"claude"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(87,30): error TS2345: Argument of type '"C:/source-runtime"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(88,30): error TS2345: Argument of type '"   "' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(135,7): error TS2554: Expected 0 arguments, but got 2.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(169,40): error TS2345: Argument of type '"stale-cache"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(227,40): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(239,40): error TS2345: Argument of type '"stale-cache"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(252,40): error TS2345: Argument of type '"stale-cache"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(277,46): error TS2345: Argument of type '"Refactor the auth module."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(286,33): error TS2352: Conversion of type '[] | undefined' to type '[{ name: string; cwd: string; shellPath: string; shellArgs: readonly string[]; }]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '[]' is not comparable to type '[{ name: string; cwd: string; shellPath: string; shellArgs: readonly string[]; }]'.
+    Source has 0 element(s) but target requires 1.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(370,46): error TS2345: Argument of type '"Refactor the auth module."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(420,46): error TS2345: Argument of type '"Refactor the auth module."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(448,46): error TS2345: Argument of type '"   "' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(481,46): error TS2345: Argument of type '"Refactor the auth module."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(517,46): error TS2345: Argument of type '"Refactor the auth module."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(553,46): error TS2345: Argument of type '"Refactor the auth module."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(595,46): error TS2345: Argument of type '"Refactor the auth module."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(634,46): error TS2345: Argument of type '"Refactor the auth module."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(661,40): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(674,44): error TS2345: Argument of type '"Refactor the auth module."' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(688,44): error TS2345: Argument of type '"12"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(688,72): error TS2345: Argument of type '"34"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(739,40): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(751,30): error TS2345: Argument of type '"12"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(752,30): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(764,44): error TS2345: Argument of type '"12"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(764,72): error TS2345: Argument of type '"34"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/extension.workflow-commands.test.ts(781,40): error TS2345: Argument of type '"test-entry"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/lib/codex-native-converter/models.test.ts(149,17): error TS4111: Property 'target_path' comes from an index signature, so it must be accessed with ['target_path'].
+extensions/drm-copilot/test/lib/codex-native-converter/models.test.ts(150,17): error TS4111: Property 'notes' comes from an index signature, so it must be accessed with ['notes'].
+extensions/drm-copilot/test/lib/codex-native-converter/models.test.ts(151,17): error TS4111: Property 'is_required' comes from an index signature, so it must be accessed with ['is_required'].
+extensions/drm-copilot/test/lib/codex-native-converter/models.test.ts(231,17): error TS4111: Property 'selected_paths' comes from an index signature, so it must be accessed with ['selected_paths'].
+extensions/drm-copilot/test/lib/codex-native-converter/models.test.ts(232,17): error TS4111: Property 'destination_root' comes from an index signature, so it must be accessed with ['destination_root'].
+extensions/drm-copilot/test/lib/codex-native-converter/models.test.ts(233,17): error TS4111: Property 'enable_repo_prompts' comes from an index signature, so it must be accessed with ['enable_repo_prompts'].
+extensions/drm-copilot/test/lib/codex-native-converter/models.test.ts(234,17): error TS4111: Property 'emit_intermediate_state' comes from an index signature, so it must be accessed with ['emit_intermediate_state'].
+extensions/drm-copilot/test/lib/codex-native-converter/models.test.ts(343,29): error TS4111: Property 'frontmatter' comes from an index signature, so it must be accessed with ['frontmatter'].
+extensions/drm-copilot/test/lib/codex-native-converter/models.test.ts(347,17): error TS4111: Property 'sections' comes from an index signature, so it must be accessed with ['sections'].
+extensions/drm-copilot/test/lib/codex-native-converter/parser.test.ts(75,33): error TS4111: Property 'agent' comes from an index signature, so it must be accessed with ['agent'].
+extensions/drm-copilot/test/lib/codex-native-converter/parser.test.ts(76,33): error TS4111: Property 'description' comes from an index signature, so it must be accessed with ['description'].
+extensions/drm-copilot/test/lib/codex-native-converter/parser.test.ts(106,30): error TS4111: Property 'applyTo' comes from an index signature, so it must be accessed with ['applyTo'].
+extensions/drm-copilot/test/lib/codex-native-converter/parser.test.ts(107,30): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+extensions/drm-copilot/test/lib/collect-commit-context.run-git.test.ts(19,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.run-git.test.ts(45,60): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.run-git.test.ts(59,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.run-git.test.ts(78,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test-helpers.ts(58,14): error TS2420: Class 'InMemoryFileSystem' incorrectly implements interface 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(18,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(32,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(96,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(132,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(151,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(181,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(200,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(223,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(246,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(272,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(291,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(321,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/collect-commit-context.test.ts(343,47): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/executable-resolver.test.ts(196,36): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/lib/executable-resolver.test.ts(197,39): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/lib/executable-resolver.test.ts(204,26): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/lib/executable-resolver.test.ts(206,19): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/lib/executable-resolver.test.ts(209,26): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/lib/executable-resolver.test.ts(211,19): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/lib/executable-resolver.test.ts(219,17): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/lib/executable-resolver.test.ts(220,24): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/lib/executable-resolver.test.ts(235,17): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/lib/executable-resolver.test.ts(236,24): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/lib/file-system.test.ts(129,42): error TS2345: Argument of type '(dir: fs.PathLike) => fs.Dirent<NonSharedBuffer>[]' is not assignable to parameter of type '{ (path: PathLike, options?: BufferEncoding | { encoding: BufferEncoding | null; withFileTypes?: false | undefined; recursive?: boolean | undefined; } | null | undefined): string[]; (path: PathLike, options: { ...; } | "buffer"): NonSharedBuffer[]; (path: PathLike, options?: BufferEncoding | ... 2 more ... | undefin...'.
+  Type 'Dirent<NonSharedBuffer>[]' is not assignable to type 'string[]'.
+    Type 'Dirent<NonSharedBuffer>' is not assignable to type 'string'.
+extensions/drm-copilot/test/lib/file-system.test.ts(170,42): error TS2345: Argument of type '(dir: fs.PathLike) => fs.Dirent<NonSharedBuffer>[]' is not assignable to parameter of type '{ (path: PathLike, options?: BufferEncoding | { encoding: BufferEncoding | null; withFileTypes?: false | undefined; recursive?: boolean | undefined; } | null | undefined): string[]; (path: PathLike, options: { ...; } | "buffer"): NonSharedBuffer[]; (path: PathLike, options?: BufferEncoding | ... 2 more ... | undefin...'.
+  Type 'Dirent<NonSharedBuffer>[]' is not assignable to type 'string[]'.
+    Type 'Dirent<NonSharedBuffer>' is not assignable to type 'string'.
+extensions/drm-copilot/test/lib/json-config.test.ts(51,7): error TS2420: Class 'VirtualFileSystem' incorrectly implements interface 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(124,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(135,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(146,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(157,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(168,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(179,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(190,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(201,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(212,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(223,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(234,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(248,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/json-config.test.ts(260,38): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/markdown-label-formatter.test.ts(21,7): error TS2420: Class 'InMemoryFileSystem' incorrectly implements interface 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/markdown-label-formatter.test.ts(249,32): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/markdown-label-formatter.test.ts(260,32): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/markdown-label-formatter.test.ts(273,17): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/markdown-label-formatter.test.ts(287,17): error TS2345: Argument of type 'InMemoryFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-active-feature-folder/models.test.ts(48,43): error TS2345: Argument of type '(dir: nodeFs.PathLike) => nodeFs.Dirent<NonSharedBuffer>[]' is not assignable to parameter of type '{ (path: PathLike, options?: BufferEncoding | { encoding: BufferEncoding | null; withFileTypes?: false | undefined; recursive?: boolean | undefined; } | null | undefined): string[]; (path: PathLike, options: { ...; } | "buffer"): NonSharedBuffer[]; (path: PathLike, options?: BufferEncoding | ... 2 more ... | undefin...'.
+  Type 'Dirent<NonSharedBuffer>[]' is not assignable to type 'string[]'.
+    Type 'Dirent<NonSharedBuffer>' is not assignable to type 'string'.
+extensions/drm-copilot/test/lib/new-potential-bug-entry-service-call.test.ts(19,7): error TS2420: Class 'InMemoryFileSystem' incorrectly implements interface 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry-service-call.test.ts(74,7): error TS2739: Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry-service-call.test.ts(97,7): error TS2739: Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry-service-call.test.ts(121,7): error TS2739: Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry-service-call.test.ts(150,9): error TS2739: Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry.test.ts(31,7): error TS2420: Class 'InMemoryFileSystem' incorrectly implements interface 'FileSystem'.
+  Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry.test.ts(241,7): error TS2739: Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry.test.ts(263,7): error TS2739: Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry.test.ts(289,7): error TS2739: Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry.test.ts(314,7): error TS2739: Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry.test.ts(338,7): error TS2739: Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry.test.ts(359,7): error TS2739: Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry.test.ts(383,9): error TS2739: Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/new-potential-bug-entry.test.ts(401,9): error TS2739: Type 'InMemoryFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/pr-context/gh-client-core.test.ts(30,21): error TS2379: Argument of type '{ args: readonly string[]; options: CommandRunOptions | undefined; }' is not assignable to parameter of type '{ args: readonly string[]; options?: CommandRunOptions; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'options' are incompatible.
+    Type 'CommandRunOptions | undefined' is not assignable to type 'CommandRunOptions'.
+      Type 'undefined' is not assignable to type 'CommandRunOptions'.
+extensions/drm-copilot/test/lib/push-down/claude-config-carriage.test.ts(172,24): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(o: {}): string[]', gave the following error.
+    Argument of type 'Record<string, unknown> | undefined' is not assignable to parameter of type '{}'.
+      Type 'undefined' is not assignable to type '{}'.
+  Overload 2 of 2, '(o: object): string[]', gave the following error.
+    Argument of type 'Record<string, unknown> | undefined' is not assignable to parameter of type 'object'.
+      Type 'undefined' is not assignable to type 'object'.
+extensions/drm-copilot/test/lib/push-down/claude-config-carriage.test.ts(200,12): error TS18048: 'routes' is possibly 'undefined'.
+extensions/drm-copilot/test/lib/push-down/claude-pack-selection.test.ts(82,51): error TS2345: Argument of type 'number[]' is not assignable to parameter of type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'number[]'.
+extensions/drm-copilot/test/lib/push-down/filesystem-adapter.test.ts(165,40): error TS2345: Argument of type 'Buffer<ArrayBufferLike>' is not assignable to parameter of type 'string | NonSharedBuffer'.
+  Type 'Buffer<ArrayBufferLike>' is not assignable to type 'NonSharedBuffer'.
+    Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+      Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+        Types of property '[Symbol.toStringTag]' are incompatible.
+          Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+extensions/drm-copilot/test/lib/resolve/file-prompt-core.test.ts(19,9): error TS2739: Type '{ glob: () => never[]; isFile: (path: string) => boolean; readTextFile: (path: string) => string; writeTextFile: () => undefined; ensureDir: () => undefined; }' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/resolve/file-prompt-variables.test.ts(36,9): error TS2739: Type '{ glob: () => never[]; isFile: (path: string) => boolean; readTextFile: (path: string) => string; writeTextFile: (path: string, content: string) => void; ensureDir: (path: string) => void; }' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/resolve/hard-lock-prompt.test.ts(26,9): error TS2739: Type '{ glob: () => never[]; isFile: (path: string) => boolean; readTextFile: (path: string) => string; writeTextFile: (path: string, content: string) => void; ensureDir: (path: string) => void; }' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/resolve/resolve-prompts-service-call.test.ts(21,9): error TS2739: Type '{ glob: () => never[]; isFile: (path: string) => boolean; readTextFile: (path: string) => string; writeTextFile: (path: string, content: string) => void; ensureDir: () => undefined; }' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts(11,7): error TS2739: Type '{ glob(): never; isFile(): never; readTextFile(): never; writeTextFile(): never; ensureDir(): never; }' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/build-validate-orchestration-service-call-input.test.ts(89,7): error TS2379: Argument of type '{ workspaceRoot: string; artifactType: string; artifactPath: string; requireComplete: undefined; requireModelRouting: undefined; requireCodexModelRouting: undefined; requireCodexTopology: undefined; requireReadyForExecution: undefined; }' is not assignable to parameter of type '{ readonly workspaceRoot: string; readonly artifactType: string; readonly artifactPath: string; readonly requireComplete?: boolean; readonly requireModelRouting?: boolean; readonly requireCodexModelRouting?: boolean; readonly requireCodexTopology?: boolean; readonly requireReadyForExecution?: boolean; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'requireComplete' are incompatible.
+    Type 'undefined' is not assignable to type 'boolean'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(148,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(158,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(159,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(178,7): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(189,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(206,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(220,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(230,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(259,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(260,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(274,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(275,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(332,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(343,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(356,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts(369,5): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-launch-binding.test.ts(9,3): error TS2322: Type 'object' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type '{}'.
+extensions/drm-copilot/test/lib/validate/epic-planner-state-launch-binding.test.ts(10,3): error TS2322: Type 'object' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type '{}'.
+extensions/drm-copilot/test/lib/validate/evidence-locations.test.ts(16,7): error TS2420: Class 'VirtualFileSystem' incorrectly implements interface 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/evidence-locations.test.ts(75,45): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/evidence-locations.test.ts(92,43): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/evidence-locations.test.ts(103,43): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/evidence-locations.test.ts(114,43): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/evidence-locations.test.ts(123,11): error TS2739: Type '{ glob: () => string[]; isFile: () => false; readTextFile: () => never; writeTextFile: () => never; ensureDir: () => never; }' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/evidence-locations.test.ts(146,11): error TS2739: Type '{ glob: () => string[]; isFile: () => true; readTextFile: () => never; writeTextFile: () => never; ensureDir: () => never; }' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(47,7): error TS2420: Class 'VirtualFileSystem' incorrectly implements interface 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(154,36): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(166,36): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(178,36): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(190,36): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(202,36): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(216,36): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(231,36): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(250,36): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(270,36): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(288,36): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(305,36): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/json-validator.test.ts(319,36): error TS2345: Argument of type 'VirtualFileSystem' is not assignable to parameter of type 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-authority-service.test.ts(99,9): error TS2322: Type '{ expectedRepositoryId: string; expectedWorkspaceRoot: string; expectedBranch: string; expectedSourceHeadSha: string; allowedHeadRelationship: "equal" | "equal_or_descendant"; expectedIssueNumber: number; ... 7 more ...; destinationProvider: PortableHandoffProvider; }' is not assignable to type 'PortableHandoffReferenceRequest'.
+  Types of property 'expectedWorkMode' are incompatible.
+    Type 'string' is not assignable to type 'PortableHandoffWorkMode'.
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-authority-service.test.ts(150,28): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-authority-service.test.ts(425,7): error TS2554: Expected 0 arguments, but got 1.
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-authority-service.test.ts(439,71): error TS2554: Expected 0 arguments, but got 1.
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-contract.test.ts(94,15): error TS7053: Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type 'any[] | Record<string, unknown>'.
+  No index signature with a parameter of type 'string' was found on type 'any[] | Record<string, unknown>'.
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-path-boundary.test.ts(182,9): error TS2740: Type '{ workspaceRoot: string; sourceCheckpointPath: string; expectedSourceCheckpointSha256: string; handoffEnvelopePath: string; expectedHandoffEnvelopeSha256: string; destinationProvider: "codex"; mode: "materialize"; }' is missing the following properties from type 'TransitionPreparedOrchestrationRequest': expectedRepositoryId, expectedWorkspaceRoot, expectedBranch, expectedSourceHeadSha, and 6 more.
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-path-boundary.test.ts(255,53): error TS2554: Expected 0 arguments, but got 1.
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-production.test.ts(102,7): error TS2345: Argument of type '(targetPath: string) => string' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'targetPath' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-production.test.ts(289,7): error TS2345: Argument of type '(targetPath: string) => string' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'targetPath' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+extensions/drm-copilot/test/lib/validate/parallel-kickoff-template-seam.test.ts(103,3): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+extensions/drm-copilot/test/lib/validate/plan-gate-discrimination-cov.test.ts(135,30): error TS2345: Argument of type '{ taskId: string; sourceLine: number; rawSpan: string; argv: string[]; kind: PlanCommandKind; }' is not assignable to parameter of type 'PlanCommand'.
+  Property 'taskText' is missing in type '{ taskId: string; sourceLine: number; rawSpan: string; argv: string[]; kind: PlanCommandKind; }' but required in type 'PlanCommand'.
+extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts(18,7): error TS2420: Class 'VirtualFileSystem' incorrectly implements interface 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts(61,7): error TS2739: Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts(82,7): error TS2739: Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts(101,9): error TS2739: Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts(117,9): error TS2739: Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts(137,9): error TS2739: Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/lib/validate/validate-orchestration-service-call.test.ts(157,9): error TS2739: Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/mcp-handlers/orchestration-handoff-handlers.test.ts(277,7): error TS2554: Expected 0 arguments, but got 1.
+extensions/drm-copilot/test/mcp-handlers/orchestration-handoff-handlers.test.ts(280,7): error TS2554: Expected 0 arguments, but got 1.
+extensions/drm-copilot/test/mcp-handlers/orchestration-handoff-handlers.test.ts(283,7): error TS2554: Expected 0 arguments, but got 1.
+extensions/drm-copilot/test/mcp-provider.test.ts(182,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/mcp-server-test-service.ts(58,5): error TS2322: Type 'Mock<UnknownFunction>' is not assignable to type '(input: TransitionPreparedOrchestrationRequest) => Promise<TransitionPreparedOrchestrationResult>'.
+  Type 'unknown' is not assignable to type 'Promise<TransitionPreparedOrchestrationResult>'.
+extensions/drm-copilot/test/mcp-server.test.ts(439,46): error TS2339: Property 'mockResolvedValue' does not exist on type '(input: TransitionPreparedOrchestrationRequest) => Promise<TransitionPreparedOrchestrationResult>'.
+extensions/drm-copilot/test/poshqc-folder-picker.test.ts(131,45): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/poshqc-folder-picker.test.ts(161,45): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/poshqc-folder-picker.test.ts(180,45): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/poshqc-folder-picker.test.ts(198,45): error TS2345: Argument of type '{ label: string; folder: string; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/poshqc-folder-picker.test.ts(218,45): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/poshqc-folder-picker.test.ts(232,45): error TS2345: Argument of type 'never[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/push-down-claude-handler.test.ts(137,72): error TS2554: Expected 0 arguments, but got 1.
+extensions/drm-copilot/test/remove-worktrees-runner.test.ts(180,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees-runner.test.ts(181,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees-runner.test.ts(217,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(28,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(29,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(30,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(31,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(69,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(70,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(83,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(84,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(98,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(99,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(114,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(115,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(130,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(131,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(132,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/remove-worktrees.test.ts(159,12): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(90,30): error TS2345: Argument of type '{ label: string; pack: string; picked: boolean; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(91,30): error TS2345: Argument of type '"modern"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(92,30): error TS2345: Argument of type '"overwrite"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(124,30): error TS2345: Argument of type '{ label: string; pack: string; picked: boolean; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(125,30): error TS2345: Argument of type '"legacy"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(129,52): error TS2554: Expected 0 arguments, but got 1.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(154,45): error TS2345: Argument of type '{ label: string; pack: string; picked: boolean; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(161,52): error TS2554: Expected 0 arguments, but got 1.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(185,45): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(209,30): error TS2345: Argument of type '{ label: string; pack: string; picked: boolean; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(210,30): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(251,30): error TS2345: Argument of type '{ label: string; pack: string; picked: boolean; }[]' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/repo-automation-command-registration-admin.test.ts(254,30): error TS2345: Argument of type '"overwrite"' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/repo-automation-dispatch-pr-context-verification.test.ts(93,47): error TS2379: Argument of type '{ extensionRoot: string; output: { appendLine: () => undefined; }; fileSystem: FileSystem | undefined; runner: { run: (args: readonly string[]) => { stdout: string; stderr: string; code: number; }; }; }' is not assignable to parameter of type 'RepoAutomationServiceOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'fileSystem' are incompatible.
+    Type 'FileSystem | undefined' is not assignable to type 'FileSystem'.
+      Type 'undefined' is not assignable to type 'FileSystem'.
+extensions/drm-copilot/test/repo-automation-dispatch.test.ts(74,17): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/repo-automation-dispatch.test.ts(75,17): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/repo-automation-dispatch.test.ts(159,7): error TS2739: Type '{ glob: () => never[]; isFile: () => false; readTextFile: () => string; writeTextFile: (p: string, c: string) => undefined; ensureDir: (d: string) => undefined; }' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/repo-automation-dispatch.test.ts(245,14): error TS2532: Object is possibly 'undefined'.
+extensions/drm-copilot/test/repo-automation-execute-discovery.test.ts(59,5): error TS2345: Argument of type '(executable: string, args: ReadonlyArray<string>, options: { cwd: string; }) => MockChildProcess' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'executable' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+extensions/drm-copilot/test/repo-automation-execute-discovery.test.ts(84,5): error TS2345: Argument of type '(executable: string, args: ReadonlyArray<string>, options: { cwd: string; }) => MockChildProcess' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'executable' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+extensions/drm-copilot/test/repo-automation-hard-lock-prompt.test.ts(53,9): error TS2739: Type '{ glob: () => never[]; isFile: (path: string) => boolean; readTextFile: (path: string) => string; writeTextFile: (path: string, content: string) => void; ensureDir: () => undefined; }' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/repo-automation-orchestration-validation.test.ts(168,7): error TS2420: Class 'VirtualFileSystem' incorrectly implements interface 'FileSystem'.
+  Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/repo-automation-orchestration-validation.test.ts(202,17): error TS4111: Property 'PATH' comes from an index signature, so it must be accessed with ['PATH'].
+extensions/drm-copilot/test/repo-automation-orchestration-validation.test.ts(203,17): error TS4111: Property 'PATHEXT' comes from an index signature, so it must be accessed with ['PATHEXT'].
+extensions/drm-copilot/test/repo-automation-orchestration-validation.test.ts(220,7): error TS2739: Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/repo-automation-orchestration-validation.test.ts(246,7): error TS2739: Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/repo-automation-orchestration-validation.test.ts(271,7): error TS2739: Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/repo-automation-orchestration-validation.test.ts(295,7): error TS2739: Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/repo-automation-orchestration-validation.test.ts(320,7): error TS2739: Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/repo-automation-orchestration-validation.test.ts(397,9): error TS2739: Type 'VirtualFileSystem' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/repo-automation-service.resolve-atomic-plan-prompt.test.ts(42,9): error TS2739: Type '{ glob: () => never[]; isFile: (path: string) => boolean; readTextFile: (path: string) => string; writeTextFile: () => undefined; ensureDir: () => undefined; }' is missing the following properties from type 'FileSystem': exists, isDirectory, listDirectory
+extensions/drm-copilot/test/subagent-tree-command.test.ts(54,66): error TS2556: A spread argument must either have a tuple type or be passed to a rest parameter.
+extensions/drm-copilot/test/subagent-tree-command.test.ts(56,31): error TS2556: A spread argument must either have a tuple type or be passed to a rest parameter.
+extensions/drm-copilot/test/subagent-tree-command.test.ts(199,7): error TS2345: Argument of type '(items: ReadonlyArray<{ path: string; }>) => Promise<{ path: string; } | undefined>' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'items' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'readonly { path: string; }[]'.
+extensions/drm-copilot/test/subagent-tree-command.test.ts(370,41): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/subagent-tree-command.test.ts(398,41): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.
+extensions/drm-copilot/test/subagent-tree-command.test.ts(429,7): error TS2345: Argument of type '(items: ReadonlyArray<{ path: string; }>) => Promise<{ path: string; } | undefined>' is not assignable to parameter of type 'UnknownFunction'.
+  Types of parameters 'items' and 'args' are incompatible.
+    Type 'unknown' is not assignable to type 'readonly { path: string; }[]'.
+extensions/drm-copilot/test/subagent-tree-command.test.ts(475,41): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'never'.

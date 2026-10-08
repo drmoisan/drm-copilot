@@ -1,6 +1,7 @@
 import { describe, expect, it, jest } from "@jest/globals";
 
 import { handlePortableHandoffTool } from "../../src/mcp-handlers/orchestration-handoff-handlers";
+import type { RepoAutomationService } from "../../src/repo-automation-service-contract";
 import {
   VIRTUAL_WORKSPACE_ROOT,
   createMockService,
@@ -244,9 +245,15 @@ describe("portable orchestration handoff MCP handlers", () => {
       resolution: { provider: "codex" },
     } as const;
     const service = Object.assign(createMockService(), {
-      resolveOrchestrationTopology: jest.fn(async () => resolution),
-      resolveProviderRouting: jest.fn(async () => resolution),
-      transitionPreparedOrchestration: jest.fn(async () => fixture.result),
+      resolveOrchestrationTopology: jest.fn<
+        NonNullable<RepoAutomationService["resolveOrchestrationTopology"]>
+      >(async () => resolution),
+      resolveProviderRouting: jest.fn<
+        NonNullable<RepoAutomationService["resolveProviderRouting"]>
+      >(async () => resolution),
+      transitionPreparedOrchestration: jest.fn<
+        NonNullable<RepoAutomationService["transitionPreparedOrchestration"]>
+      >(async () => fixture.result),
     });
 
     // Act
