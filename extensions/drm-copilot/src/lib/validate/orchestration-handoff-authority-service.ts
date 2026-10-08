@@ -22,6 +22,7 @@ import {
   type CheckoutObservation,
   type HandoffCheckoutContext,
 } from "./orchestration-handoff-checkout-context";
+import { describeHandoffFailureCause } from "./orchestration-handoff-materializer-request";
 import {
   createNodeHandoffPathBoundary,
   type HandoffPathBoundary,
@@ -101,6 +102,7 @@ function blocked(
     readonly handoffId?: string | null;
     readonly affectedPaths?: readonly string[];
     readonly unsupportedCapabilities?: readonly string[];
+    readonly failureCause?: string;
   } = {},
 ): PortableHandoffAuthorityResult {
   return {
@@ -111,6 +113,9 @@ function blocked(
     affectedPaths: options.affectedPaths ?? [],
     unsupportedCapabilities: options.unsupportedCapabilities ?? [],
     resolution: null,
+    ...(options.failureCause === undefined
+      ? {}
+      : { failureCause: options.failureCause }),
   };
 }
 
@@ -125,13 +130,17 @@ function readEnvelope(
     request.handoffEnvelopePath,
   );
   if (envelopePath === null) {
-    return blocked(request, "HANDOFF_PLAN_PATH_INVALID");
+    return blocked(request, "HANDOFF_PLAN_PATH_INVALID", {
+      failureCause: "target-path: unresolved",
+    });
   }
   let envelopeText: string;
   try {
     envelopeText = fileSystem.readTextFile(envelopePath);
-  } catch {
-    return blocked(request, "HANDOFF_VALIDATOR_UNAVAILABLE");
+  } catch (error: unknown) {
+    return blocked(request, "HANDOFF_VALIDATOR_UNAVAILABLE", {
+      failureCause: describeHandoffFailureCause("envelope-read", error),
+    });
   }
   if (sha256(envelopeText) !== request.expectedHandoffEnvelopeSha256) {
     return blocked(request, "HANDOFF_SOURCE_HASH_MISMATCH");
@@ -157,16 +166,16 @@ function observedPlanSha256(
   expectedPlanPath: string,
   pathBoundary: HandoffPathBoundary,
   canonicalWorkspaceRoot: string,
-): string | null {
+): { readonly sha256: string } | { readonly failureCause: string } {
   const planPath = pathBoundary.resolveExistingTarget(
     canonicalWorkspaceRoot,
     expectedPlanPath,
   );
-  if (planPath === null) return null;
+  if (planPath === null) return { failureCause: "target-path: unresolved" };
   try {
-    return sha256(fileSystem.readTextFile(planPath));
-  } catch {
-    return null;
+    return { sha256: sha256(fileSystem.readTextFile(planPath)) };
+  } catch (error: unknown) {
+    return { failureCause: describeHandoffFailureCause("plan-read", error) };
   }
 }
 
@@ -273,7 +282,9 @@ export function resolvePortableHandoffAuthority(
     request.workspaceRoot,
   );
   if (canonicalWorkspaceRoot === null) {
-    return blocked(request, "HANDOFF_PLAN_PATH_INVALID");
+    return blocked(request, "HANDOFF_PLAN_PATH_INVALID", {
+      failureCause: "workspace-root: unresolved",
+    });
   }
   // The checkout is observed before the envelope is read, so the independent
   // context is established without any input from the envelope it will prove.
@@ -318,17 +329,19 @@ export function resolvePortableHandoffAuthority(
       handoffId: envelope.handoffId,
     });
   }
-  const planSha256 = observedPlanSha256(
+  const planObservation = observedPlanSha256(
     fileSystem,
     request.expectedPlanPath,
     effectivePathBoundary,
     canonicalWorkspaceRoot,
   );
-  if (planSha256 === null) {
+  if ("failureCause" in planObservation) {
     return blocked(request, "HANDOFF_PLAN_PATH_INVALID", {
       handoffId: envelope.handoffId,
+      failureCause: planObservation.failureCause,
     });
   }
+  const planSha256 = planObservation.sha256;
   const validation = collectHandoffValidationFailures(envelope, {
     repositoryId: request.expectedRepositoryId,
     workspaceRoot: request.expectedWorkspaceRoot,

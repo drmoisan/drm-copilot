@@ -1,6 +1,11 @@
 import { describe, expect, it, jest } from "@jest/globals";
+import * as path from "node:path";
 
+import type { FileSystem } from "../../../src/lib/file-system";
+import type { CommandRunner } from "../../../src/lib/subprocess-runner";
 import type { HandoffFailureCode } from "../../../src/lib/validate/orchestration-handoff-contract";
+import { createProductionHandoffMaterializer } from "../../../src/lib/validate/orchestration-handoff-materializer-production";
+import { createHandoffPathBoundary } from "../../../src/lib/validate/orchestration-handoff-path-boundary";
 import {
   OrchestrationHandoffMaterializer,
   type HandoffMaterializerDependencies,
@@ -356,4 +361,82 @@ describe("materializer blocked-result failure causes", () => {
       }
     },
   );
+});
+
+describe("path-boundary guarded resolution", () => {
+  const workspaceRoot = path.resolve("guarded-workspace");
+  const canonicalRoot = workspaceRoot.replaceAll("\\", "/");
+  const directory = { isDirectory: () => true };
+
+  it("B1 returns the canonical root and target when realpath succeeds", () => {
+    // Arrange
+    const boundary = createHandoffPathBoundary({
+      realpath: (targetPath) => targetPath,
+      stat: () => directory,
+    });
+
+    // Act
+    const root = boundary.resolveWorkspaceRoot(workspaceRoot);
+    const target = boundary.resolveExistingTarget(
+      canonicalRoot,
+      "artifacts/handoff.json",
+    );
+
+    // Assert
+    expect(root).toBe(canonicalRoot);
+    expect(target).toBe(`${canonicalRoot}/artifacts/handoff.json`);
+  });
+
+  it("B2 returns null from both resolvers when realpath throws EACCES", () => {
+    // Arrange
+    const boundary = createHandoffPathBoundary({
+      realpath: () => {
+        throw codedError("EACCES");
+      },
+      stat: () => directory,
+    });
+
+    // Act
+    const root = boundary.resolveWorkspaceRoot(workspaceRoot);
+    const target = boundary.resolveExistingTarget(
+      canonicalRoot,
+      "artifacts/handoff.json",
+    );
+
+    // Assert
+    expect(root).toBeNull();
+    expect(target).toBeNull();
+  });
+});
+
+describe("destination projection parse failure", () => {
+  it("P1 names the parse failure stage without echoing the input", () => {
+    // Arrange
+    const fileSystem = {
+      glob: () => [],
+      isFile: () => false,
+      exists: () => false,
+      isDirectory: () => false,
+      listDirectory: () => [],
+      readTextFile: () => "",
+      writeTextFile: () => undefined,
+      ensureDir: () => undefined,
+    } satisfies FileSystem;
+    const runner: CommandRunner = {
+      run: () => ({ stdout: "", stderr: "", code: 0 }),
+    };
+    const materializer = createProductionHandoffMaterializer(
+      fileSystem,
+      runner,
+    );
+
+    // Act
+    const errors =
+      materializer.dependencies.validator.validateDestinationProjection("{");
+
+    // Assert
+    expect(errors).toEqual([
+      "destination checkpoint must be valid JSON (destination-projection: SyntaxError)",
+    ]);
+  });
 });

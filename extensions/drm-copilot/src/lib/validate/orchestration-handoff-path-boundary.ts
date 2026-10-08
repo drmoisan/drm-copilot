@@ -2,6 +2,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 import { toPosixPath } from "../file-system";
+import { describeHandoffFailureCause } from "./orchestration-handoff-materializer-request";
 
 /** Metadata needed to distinguish a creatable descendant from a file child. */
 export interface HandoffPathMetadata {
@@ -80,6 +81,25 @@ function missingPath(error: unknown): boolean {
   );
 }
 
+type GuardedResolution<T> =
+  | { readonly ok: true; readonly value: T }
+  | { readonly ok: false; readonly cause: string };
+
+/**
+ * Run one host path operation, converting a throw into a redaction-safe cause
+ * so callers map the failure explicitly instead of discarding the error.
+ */
+function guardedResolution<T>(
+  stage: string,
+  operation: () => T,
+): GuardedResolution<T> {
+  try {
+    return { ok: true, value: operation() };
+  } catch (error: unknown) {
+    return { ok: false, cause: describeHandoffFailureCause(stage, error) };
+  }
+}
+
 function lexicalCandidate(
   canonicalWorkspaceRoot: string,
   repositoryPath: string,
@@ -108,16 +128,15 @@ export function createHandoffPathBoundary(
 ): HandoffPathBoundary {
   const resolveWorkspaceRoot = (workspaceRoot: string): string | null => {
     if (!path.isAbsolute(workspaceRoot)) return null;
-    try {
+    const resolution = guardedResolution("workspace-root", () => {
       const canonicalRoot = normalizedAbsolutePath(
         fileSystem.realpath(path.resolve(workspaceRoot)),
       );
       return fileSystem.stat(canonicalRoot).isDirectory()
         ? canonicalRoot
         : null;
-    } catch {
-      return null;
-    }
+    });
+    return resolution.ok ? resolution.value : null;
   };
 
   const resolveExistingTarget = (
@@ -130,16 +149,13 @@ export function createHandoffPathBoundary(
       caseSensitive,
     );
     if (candidate === null) return null;
-    try {
-      const canonicalTarget = normalizedAbsolutePath(
-        fileSystem.realpath(candidate),
-      );
-      return isContained(canonicalWorkspaceRoot, canonicalTarget, caseSensitive)
-        ? canonicalTarget
-        : null;
-    } catch {
-      return null;
-    }
+    const resolution = guardedResolution("target-path", () =>
+      normalizedAbsolutePath(fileSystem.realpath(candidate)),
+    );
+    if (!resolution.ok) return null;
+    return isContained(canonicalWorkspaceRoot, resolution.value, caseSensitive)
+      ? resolution.value
+      : null;
   };
 
   const resolveCreatableTarget = (
