@@ -187,8 +187,8 @@ describe("compareCodePoint - enumerative properties over a fixed domain", () => 
     "ba",
     "é",
     "😀",
-    "",
-    "￿",
+    "\uE000",
+    "\uFFFF",
   ];
 
   /**
@@ -274,13 +274,9 @@ describe("compareCodePoint - enumerative properties over a fixed domain", () => 
 
 describe("compareCodePoint issue #740 code-point order", () => {
   it("D1 orders U+FFFF before U+1F600 in both argument orders", () => {
-    // Arrange
-    const bmpLast = "￿";
-    const supplementary = "\u{1F600}";
-
-    // Act
-    const forward = compareCodePoint(bmpLast, supplementary);
-    const backward = compareCodePoint(supplementary, bmpLast);
+    // Arrange / Act
+    const forward = compareCodePoint("\uFFFF", "\u{1F600}");
+    const backward = compareCodePoint("\u{1F600}", "\uFFFF");
 
     // Assert
     expect(forward).toBe(-1);
@@ -288,36 +284,24 @@ describe("compareCodePoint issue #740 code-point order", () => {
   });
 
   it("D2 orders U+E000 before U+10000", () => {
-    // Arrange
-    const privateUse = "";
-    const firstSupplementary = "\u{10000}";
-
-    // Act
-    const result = compareCodePoint(privateUse, firstSupplementary);
+    // Arrange / Act
+    const result = compareCodePoint("\uE000", "\u{10000}");
 
     // Assert
     expect(result).toBe(-1);
   });
 
   it("D3 orders U+FF5E before U+1F600", () => {
-    // Arrange
-    const fullwidthTilde = "～";
-    const supplementary = "\u{1F600}";
-
-    // Act
-    const result = compareCodePoint(fullwidthTilde, supplementary);
+    // Arrange / Act
+    const result = compareCodePoint("\uFF5E", "\u{1F600}");
 
     // Assert
     expect(result).toBe(-1);
   });
 
   it("D4 orders a shared-prefix U+FFFD before a shared-prefix U+1F600", () => {
-    // Arrange
-    const left = "a�";
-    const right = "a\u{1F600}";
-
-    // Act
-    const result = compareCodePoint(left, right);
+    // Arrange / Act
+    const result = compareCodePoint("a\uFFFD", "a\u{1F600}");
 
     // Assert
     expect(result).toBe(-1);
@@ -329,12 +313,12 @@ describe("compareCodePoint issue #740 code-point order", () => {
       "b",
       "\u{1F600}",
       "a",
-      "￿",
-      "é",
+      "\uFFFF",
+      "\u00E9",
       "",
       "A",
       "ab",
-      "",
+      "\uE000",
     ];
 
     // Act
@@ -347,56 +331,40 @@ describe("compareCodePoint issue #740 code-point order", () => {
       "a",
       "ab",
       "b",
-      "é",
-      "",
-      "￿",
+      "\u00E9",
+      "\uE000",
+      "\uFFFF",
       "\u{1F600}",
     ]);
   });
 
   it("A1 orders U+00E9 before U+1F600", () => {
-    // Arrange
-    const left = "é";
-    const right = "\u{1F600}";
-
-    // Act
-    const result = compareCodePoint(left, right);
+    // Arrange / Act
+    const result = compareCodePoint("\u00E9", "\u{1F600}");
 
     // Assert
     expect(result).toBe(-1);
   });
 
   it("A2 orders U+1F600 before U+1F601 (trail-surrogate difference)", () => {
-    // Arrange
-    const left = "\u{1F600}";
-    const right = "\u{1F601}";
-
-    // Act
-    const result = compareCodePoint(left, right);
+    // Arrange / Act
+    const result = compareCodePoint("\u{1F600}", "\u{1F601}");
 
     // Assert
     expect(result).toBe(-1);
   });
 
   it("A3 orders U+1F600 before U+20000 (lead-surrogate difference)", () => {
-    // Arrange
-    const left = "\u{1F600}";
-    const right = "\u{20000}";
-
-    // Act
-    const result = compareCodePoint(left, right);
+    // Arrange / Act
+    const result = compareCodePoint("\u{1F600}", "\u{20000}");
 
     // Assert
     expect(result).toBe(-1);
   });
 
   it("A4 orders a before a U+1F600 extension (prefix)", () => {
-    // Arrange
-    const prefix = "a";
-    const extension = "a\u{1F600}";
-
-    // Act
-    const result = compareCodePoint(prefix, extension);
+    // Arrange / Act
+    const result = compareCodePoint("a", "a\u{1F600}");
 
     // Assert
     expect(result).toBe(-1);
@@ -405,25 +373,19 @@ describe("compareCodePoint issue #740 code-point order", () => {
 
 describe("sortedSet", () => {
   it("removes duplicates and sorts by code point", () => {
-    // Arrange
-    const values = ["b", "a", "b", "A"];
-
-    // Act
-    const result = sortedSet(values);
+    // Arrange / Act
+    const result = sortedSet(["b", "a", "b", "A"]);
 
     // Assert
     expect(result).toEqual(["A", "a", "b"]);
   });
 
   it("orders U+FFFF before U+1F600", () => {
-    // Arrange
-    const values = ["\u{1F600}", "￿"];
-
-    // Act
-    const result = sortedSet(values);
+    // Arrange / Act
+    const result = sortedSet(["\u{1F600}", "\uFFFF"]);
 
     // Assert
-    expect(result).toEqual(["￿", "\u{1F600}"]);
+    expect(result).toEqual(["\uFFFF", "\u{1F600}"]);
   });
 
   it("accepts a Set and a generator", () => {
@@ -519,6 +481,6 @@ describe("splitLines", () => {
   });
 
   it("does not split on U+2028", () => {
-    expect(splitLines("a b")).toEqual(["a b"]);
+    expect(splitLines("a\u2028b")).toEqual(["a\u2028b"]);
   });
 });
