@@ -72,8 +72,8 @@ describe("parseSourceArtifact", () => {
     );
 
     // Assert
-    expect(artifact.frontmatter.agent).toBe("orchestrator");
-    expect(artifact.frontmatter.description).toBe(
+    expect(artifact.frontmatter["agent"]).toBe("orchestrator");
+    expect(artifact.frontmatter["description"]).toBe(
       "Fixture prompt for parser tests",
     );
     expect(artifact.sections.map((section) => section.heading)).toEqual([
@@ -103,8 +103,8 @@ describe("parseSourceArtifact", () => {
 
     // Assert
     expect(second).toEqual(first);
-    expect(first.frontmatter.applyTo).toBe("**");
-    expect(first.frontmatter.name).toBe("fixture-general-policy");
+    expect(first.frontmatter["applyTo"]).toBe("**");
+    expect(first.frontmatter["name"]).toBe("fixture-general-policy");
     expect(first.sections).toHaveLength(1);
     expect(first.sections[0]?.heading).toBe("Fixture instruction");
   });

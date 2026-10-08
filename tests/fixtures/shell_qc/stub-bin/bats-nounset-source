@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Stub bats for the shell-qc kcov-trace regression tests (issue #743), wired through the
+# SHELL_QC_BATS_BIN seam. It echoes its argv, then runs the pattern that fails only under
+# kcov tracing: a bash -c child that sources a library enabling nounset at top level and
+# then runs one more command. It exits with that child's status. Writes no files.
+stub_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+lib="${stub_dir}/../kcov_trace/nounset_lib.sh"
+echo "nounset-stub ran: $*"
+rc=0
+bash -c 'source "$1"; true' _ "$lib" || rc=$?
+exit "$rc"

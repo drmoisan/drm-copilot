@@ -245,6 +245,9 @@ function toAuthorityMcpResult(
     affected_paths: result.affectedPaths,
     unsupported_capabilities: result.unsupportedCapabilities,
     resolution: result.resolution,
+    ...(result.failureCause === undefined
+      ? {}
+      : { failure_cause: result.failureCause }),
   };
 }
 
@@ -268,6 +271,9 @@ function toTransitionMcpResult(
     primary_failure_code: result.primaryFailureCode,
     affected_paths: result.affectedPaths,
     unsupported_capabilities: result.unsupportedCapabilities,
+    ...(result.failureCause === undefined
+      ? {}
+      : { failure_cause: result.failureCause }),
   };
 }
 

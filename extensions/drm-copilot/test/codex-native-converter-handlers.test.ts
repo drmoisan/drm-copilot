@@ -19,7 +19,7 @@ describe("handleRunCodexNativeConverter", () => {
     };
     const service = {
       runCodexNativeConverter:
-        jest.fn<() => Promise<RepoAutomationExecutionResult>>(),
+        jest.fn<RepoAutomationService["runCodexNativeConverter"]>(),
     };
     service.runCodexNativeConverter.mockResolvedValue(expected);
 

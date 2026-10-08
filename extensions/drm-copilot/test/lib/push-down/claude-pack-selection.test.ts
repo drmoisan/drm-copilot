@@ -18,7 +18,7 @@ const MANIFEST_DIR = "/bundle/pack-manifests";
  * @param manifest Partial manifest fields to serialize.
  * @returns A JSON manifest string.
  */
-function manifestJson(manifest: Record<string, unknown>): string {
+function manifestJson(manifest: unknown): string {
   return JSON.stringify(manifest);
 }
 

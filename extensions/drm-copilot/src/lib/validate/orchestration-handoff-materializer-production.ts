@@ -12,6 +12,7 @@ import {
   type HandoffEnvelopeValidationResult,
   type HandoffMaterializerDependencies,
 } from "./orchestration-handoff-materializer";
+import { describeHandoffFailureCause } from "./orchestration-handoff-materializer-request";
 import { providerAdapterFor } from "./orchestration-handoff-provider-adapters";
 import { resolvePortableHandoffAuthority } from "./orchestration-handoff-authority-service";
 import { createGitCheckoutContext } from "./orchestration-handoff-checkout-context";
@@ -46,8 +47,10 @@ function validateDestinationProjection(text: string): readonly string[] {
   let value: unknown;
   try {
     value = JSON.parse(text);
-  } catch {
-    return ["destination checkpoint must be valid JSON"];
+  } catch (error: unknown) {
+    return [
+      `destination checkpoint must be valid JSON (${describeHandoffFailureCause("destination-projection", error)})`,
+    ];
   }
   if (!isRecord(value)) return ["destination checkpoint must be an object"];
   const provider = value["provider"];

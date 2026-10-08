@@ -5,6 +5,16 @@ orchestrator that composes eight reusable per-stage workflows (the `_<name>.yml`
 below) via `workflow_call`. Each reusable workflow can also be dispatched independently
 via `workflow_dispatch` for targeted re-runs without triggering the full `ci.yml` suite.
 
+## Triggers
+
+`ci.yml` runs on three triggers:
+
+- `push` to `main` and `development`.
+- `pull_request` into `main`, `development`, and `epic/**`.
+- `workflow_dispatch`.
+
+The `epic/**` pattern is included so that epic child PRs targeting `epic/<slug>-integration` run the full CI gate, because every epic child PR targets its epic's integration branch rather than `main` (issue #658).
+
 ## Per-Stage Dispatch
 
 | Reusable workflow file | Declared triggers | Standalone dispatch command |

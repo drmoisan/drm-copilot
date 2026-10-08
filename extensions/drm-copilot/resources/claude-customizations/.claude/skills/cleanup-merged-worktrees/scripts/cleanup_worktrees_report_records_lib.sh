@@ -6,10 +6,10 @@
 # whose gitdir pointer no longer resolves, and the ancestor relationship between two
 # branches that both resolve NOT_MERGED. The enumeration/protection seam
 # (cleanup_wt_git, enumerate_branches, parse_worktree_list, normalize_wt_path,
-# compute_protected, check_main_freshness) lives in cleanup_worktrees_enumerate_lib.sh
-# and the classification ladder (classify_branch) lives in cleanup_worktrees_lib.sh;
-# both MUST be sourced before this file. Keeping these records in a sibling file keeps
-# every file within the 500-line cap.
+# compute_protected, check_main_freshness, cleanup_wt_scan_roots) lives in
+# cleanup_worktrees_enumerate_lib.sh and the classification ladder (classify_branch)
+# lives in cleanup_worktrees_lib.sh; both MUST be sourced before this file. Keeping
+# these records in a sibling file keeps every file within the 500-line cap.
 #
 # Sourcing contract: this library defines functions only; it never runs work at source
 # time, so the wrapper and the bats suites can source it without side effects.
@@ -111,47 +111,10 @@ scan_stale_refs() {
 	return 0
 }
 
-cleanup_wt_scan_roots() {
-	# Echo the worktree-tracking roots to scan, one per line.
-	#
-	# CLEANUP_WT_ORPHAN_ROOTS overrides the derivation with a colon-separated list.
-	# Otherwise BOTH roots derive from the main worktree path — the first
-	# `git worktree list --porcelain` stanza, the same derivation
-	# consolidation_worktree_path uses in cleanup_worktrees_actions_lib.sh. They are
-	# `<main-worktree-path>` joined with `.claude/worktrees` (the agent worktree folder)
-	# and `<main-worktree-path>-wt` (the sibling worktree folder), in that order.
-	#
-	# Deriving both from one read means a parse_worktree_list hard failure emits no root
-	# at all, rather than a bare relative path that would be resolved against whatever
-	# the process's current working directory happened to be. cleanup_wt_scan_records
-	# returns 0 with no record for an empty root list, so the advisory records degrade to
-	# silence rather than to a misleading scan. Always returns 0.
-	local override=${CLEANUP_WT_ORPHAN_ROOTS:-}
-	if [[ -n $override ]]; then
-		local IFS=:
-		local part
-		for part in $override; do
-			[[ -n $part ]] && printf '%s\n' "$part"
-		done
-		return 0
-	fi
-	local out rc=0 first_record main_wt=""
-	out=$(parse_worktree_list) || rc=$?
-	if ((rc != 0)); then
-		return 0
-	fi
-	first_record=${out%%$'\n'*}
-	main_wt=${first_record%%|*}
-	if [[ -n $main_wt ]]; then
-		printf '%s\n' "${main_wt}/.claude/worktrees"
-		printf '%s\n' "${main_wt}-wt"
-	fi
-	return 0
-}
-
 cleanup_wt_scan_records() {
 	# Echo the raw `<path>|<has_gitfile>|<gitdir_target_exists>|<size>` records for every
-	# candidate directory under the resolved scan roots, one per line.
+	# candidate directory under the resolved scan roots, one per line. The roots come
+	# from cleanup_wt_scan_roots in cleanup_worktrees_enumerate_lib.sh.
 	#
 	# Every filesystem read goes through the CLEANUP_WT_SCAN_BIN seam, so the bats suites
 	# replay canned records instead of touching the real filesystem. The scan output is

@@ -269,3 +269,41 @@ def test_features_must_share_one_status_with_each_launch_present() -> None:
 
     assert any("must contain launch_id" in error for error in errors)
     assert any("must share one launch_status_path" in error for error in errors)
+
+
+def test_require_launch_paths_skips_feature_without_launch_keys() -> None:
+    """Skip a feature with neither launch key when launch paths are key-gated."""
+
+    # Arrange
+    state, _, context, _ = _fixture()
+    feature = _feature(state, 0)
+    del feature["launch_receipt_path"]
+    del feature["launch_status_path"]
+
+    # Act
+    errors = validate_epic_planner_launch_evidence(
+        state, context, require_launch_paths=True
+    )
+
+    # Assert
+    assert errors == []
+
+
+def test_require_launch_paths_still_rejects_partial_launch_keys() -> None:
+    """Validate a feature that keeps one launch key when launch paths are key-gated."""
+
+    # Arrange
+    state, _, context, _ = _fixture()
+    del _feature(state, 0)["launch_status_path"]
+
+    # Act
+    errors = validate_epic_planner_launch_evidence(
+        state, context, require_launch_paths=True
+    )
+
+    # Assert
+    assert any(
+        "launch status path must identify a launch artifact in this repository."
+        in error
+        for error in errors
+    )

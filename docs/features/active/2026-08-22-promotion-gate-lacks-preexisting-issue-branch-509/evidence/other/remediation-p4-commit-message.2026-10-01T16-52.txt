@@ -1,0 +1,13 @@
+docs(509): record remediation cycle 1 final QA and check off AC-2
+
+Record the remediation cycle 1 final QA evidence: Black, Ruff, and
+Pyright clean on the five changed Python files; targeted, four-module,
+and full-suite coverage equal to baseline (issue-adoption module 100%
+line and branch; repository 93.5% line, 86.6% branch); PowerShell MCP
+format and analyze success; bundle, resource-contract, and document-pair
+identity checks passing; the post-merge TypeScript coverage run with all
+three thresholds honored; the 500-line gate with every changed code file
+below 500 lines; and the diff-scope gate. Check off AC-2 in spec.md and
+P8-T17 and P8-T22 in the executed plan, and add the handoff notes.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

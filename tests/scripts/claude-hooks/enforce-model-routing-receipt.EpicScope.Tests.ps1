@@ -72,6 +72,9 @@ BeforeAll {
         Mock -CommandName Resolve-ModelRoutingWorktreeTarget -MockWith { $target }.GetNewClosure()
         Mock -CommandName Get-ModelRoutingCheckpoint -MockWith { $featureCheckpoint }.GetNewClosure()
     }
+    Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeRunResolution.psm1')
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    Mock Resolve-WorktreeEpicTarget -ModuleName EpicScopeResolution { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = $SessionRoot; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
 }
 
 Describe 'enforce-model-routing-receipt.ps1 epic scope (issue #663)' {

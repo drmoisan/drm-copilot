@@ -3,7 +3,8 @@
 These tests require the bundled `.claude` payload at
 `extensions/drm-copilot/resources/claude-customizations/`, which exists in the
 repository, so they are expected to pass. The byte-identical mirror assertion
-exempts `.claude/agent-memory/**`, distributed by scope rather than mirrored.
+exempts local-only runtime paths (`.claude/agent-memory/**`, `.claude/state/**`,
+`.claude/worktrees/**`, `.claude/settings.local.json`) through the shared helper.
 """
 
 from __future__ import annotations
@@ -13,6 +14,9 @@ import json
 import re
 from pathlib import Path
 
+from tests.scripts.dev_tools.claude_payload_scope_test_support import (
+    filter_distributable_claude_paths,
+)
 from tests.scripts.dev_tools.push_down_handoff_test_support import (
     assert_independent_context_guidance,
     assert_installed_consumer_authority,
@@ -82,56 +86,19 @@ def test_bundled_claude_payload_contains_required_runtime_files() -> None:
         ), f"Required bundled file missing: {relative_path}"
 
 
-AGENT_MEMORY_RELATIVE_ROOT = Path(".claude/agent-memory")
-
-
-def _is_agent_memory_path(relative_path: Path) -> bool:
-    """Return whether a scoped relative path lives under `.claude/agent-memory/`.
-
-    Purpose:
-        Identify agent-memory files so the byte-identical mirror assertion can
-        exempt them: general memories live in the bundle but not at the
-        gitignored root `.claude/agent-memory/`, so they cannot be compared
-        against a root copy.
-
-    Args:
-        relative_path (Path): A `.claude`-scoped path relative to a payload
-            root.
-
-    Returns:
-        bool: True when the path is under `.claude/agent-memory/`.
-
-    Raises:
-        None.
-
-    Side Effects:
-        None.
-    """
-
-    try:
-        relative_path.relative_to(AGENT_MEMORY_RELATIVE_ROOT)
-    except ValueError:
-        return False
-    return True
-
-
 def test_bundled_claude_payload_contains_all_repo_runtime_contracts() -> None:
-    """Require every non-memory repo `.claude` file to exist in the bundle.
+    """Require every distributable repo `.claude` file to exist in the bundle.
 
-    Excludes settings.local.json and the `.claude/agent-memory/**` subtree.
-    Agent memories are distributed by scope (general memories live in the
-    bundle but not at the gitignored root), so they are not subject to the
-    byte-identical mirror assertion.
+    Local-only runtime paths (`.claude/agent-memory/**`, `.claude/state/**`,
+    `.claude/worktrees/**`, `.claude/settings.local.json`) are excluded
+    through the shared helper, so they are not subject to the byte-identical
+    mirror assertion.
     """
 
     bundled_files = list_scoped_files(BUNDLED_ROOT)
-    # Enumerate repo .claude files, excluding the local-only settings file and
-    # the scope-filtered agent-memory subtree.
-    repo_runtime_files = [
-        f
-        for f in list_scoped_files(REPO_ROOT)
-        if f != Path(".claude/settings.local.json") and not _is_agent_memory_path(f)
-    ]
+    # Enumerate repo .claude files; local-only runtime paths are excluded
+    # through filter_distributable_claude_paths.
+    repo_runtime_files = filter_distributable_claude_paths(list_scoped_files(REPO_ROOT))
 
     for relative_path in repo_runtime_files:
         assert (

@@ -3,7 +3,7 @@
   "displayName": "drm-copilot",
   "description": "Repository automation, customization publishing, and MCP bridge for drm-copilot workflows.",
   "icon": "resources/icon.png",
-  "version": "1.1.15",
+  "version": "1.1.18",
   "publisher": "DanMoisan",
   "license": "MIT",
   "repository": {
@@ -206,20 +206,22 @@
     "bundle:mcp-server": "node esbuild-mcp-server.cjs",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"*.json\" \"*.cjs\"",
     "lint": "eslint --no-error-on-unmatched-pattern src test",
-    "typecheck": "tsc -p ./ --noEmit",
+    "typecheck": "tsc -p ./ --noEmit && npm run typecheck:test",
+    "typecheck:test": "tsc -p tsconfig.jest.json --noEmit",
     "test": "node run-jest.cjs",
     "test:unit": "node run-jest.cjs",
     "test:coverage": "node run-jest.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary"
   },
   "overrides": {
-    "fast-uri": "^3.1.4",
+    "fast-uri": "^3.1.8",
+    "proxy-addr": "^2.0.8",
     "hono": "^4.12.27",
     "ip-address": "^10.7.2",
     "qs": "^6.15.2",
     "@babel/core": "^7.29.6",
     "js-yaml": "^4.2.0",
     "@hono/node-server": "^2.0.5",
-    "brace-expansion": "^5.0.8",
+    "brace-expansion": "^5.0.12",
     "minimatch": "^10.2.5",
     "babel-plugin-istanbul": {
       "test-exclude": "^7.0.2"
@@ -240,6 +242,6 @@
     "typescript-eslint": "^8.70.1"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.30.1"
+    "@modelcontextprotocol/sdk": "^1.31.0"
   }
 }

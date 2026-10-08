@@ -25,10 +25,10 @@ describe("parseWorktreePorcelain", () => {
 
     // Assert
     expect(entries).toHaveLength(1);
-    expect(entries[0].path).toBe("/repo/main");
-    expect(entries[0].isPrimary).toBe(true);
-    expect(entries[0].isLocked).toBe(false);
-    expect(entries[0].isPrunable).toBe(false);
+    expect(entries[0]?.path).toBe("/repo/main");
+    expect(entries[0]?.isPrimary).toBe(true);
+    expect(entries[0]?.isLocked).toBe(false);
+    expect(entries[0]?.isPrunable).toBe(false);
   });
 
   it("marks only the first block as primary across multiple blocks", () => {
@@ -66,8 +66,8 @@ describe("parseWorktreePorcelain", () => {
     const entries = parseWorktreePorcelain(raw);
 
     // Assert
-    expect(entries[1].isLocked).toBe(true);
-    expect(entries[1].lockReason).toBe("needs review");
+    expect(entries[1]?.isLocked).toBe(true);
+    expect(entries[1]?.lockReason).toBe("needs review");
   });
 
   it("parses a locked entry with no reason", () => {
@@ -80,8 +80,8 @@ describe("parseWorktreePorcelain", () => {
     const entries = parseWorktreePorcelain(raw);
 
     // Assert
-    expect(entries[1].isLocked).toBe(true);
-    expect(entries[1].lockReason).toBe("");
+    expect(entries[1]?.isLocked).toBe(true);
+    expect(entries[1]?.lockReason).toBe("");
   });
 
   it("parses a prunable entry with a reason", () => {
@@ -95,8 +95,8 @@ describe("parseWorktreePorcelain", () => {
     const entries = parseWorktreePorcelain(raw);
 
     // Assert
-    expect(entries[1].isPrunable).toBe(true);
-    expect(entries[1].pruneReason).toBe(
+    expect(entries[1]?.isPrunable).toBe(true);
+    expect(entries[1]?.pruneReason).toBe(
       "gitdir file points to non-existent location",
     );
   });
@@ -111,8 +111,8 @@ describe("parseWorktreePorcelain", () => {
     const entries = parseWorktreePorcelain(raw);
 
     // Assert
-    expect(entries[1].isPrunable).toBe(true);
-    expect(entries[1].pruneReason).toBe("");
+    expect(entries[1]?.isPrunable).toBe(true);
+    expect(entries[1]?.pruneReason).toBe("");
   });
 
   it("recognizes detached and bare flags without affecting removal data", () => {
@@ -127,9 +127,9 @@ describe("parseWorktreePorcelain", () => {
 
     // Assert
     expect(entries).toHaveLength(2);
-    expect(entries[1].path).toBe("/repo/wt-1");
-    expect(entries[1].isLocked).toBe(false);
-    expect(entries[1].isPrunable).toBe(false);
+    expect(entries[1]?.path).toBe("/repo/wt-1");
+    expect(entries[1]?.isLocked).toBe(false);
+    expect(entries[1]?.isPrunable).toBe(false);
   });
 
   it("splits blocks separated by CRLF blank lines", () => {
@@ -156,7 +156,7 @@ describe("parseWorktreePorcelain", () => {
 
     // Assert
     expect(entries).toHaveLength(1);
-    expect(entries[0].path).toBe("/repo/main");
+    expect(entries[0]?.path).toBe("/repo/main");
   });
 });
 

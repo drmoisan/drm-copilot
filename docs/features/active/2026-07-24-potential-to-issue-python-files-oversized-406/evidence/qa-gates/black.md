@@ -1,0 +1,4 @@
+Timestamp: 2026-09-30T10-20
+Command: poetry run black "scripts/dev_tools/potential_to_issue.py" "scripts/dev_tools/potential_to_issue_adapters.py" "tests/scripts/dev_tools/potential_to_issue_test_support.py" "tests/scripts/dev_tools/test_potential_to_issue.py" "tests/scripts/dev_tools/test_potential_to_issue_bug_bodies.py" "tests/scripts/dev_tools/test_potential_to_issue_work_modes.py" "tests/scripts/dev_tools/test_potential_to_issue_cli_and_adapters.py" "tests/scripts/dev_tools/test_potential_to_issue_content.py"
+EXIT_CODE: 0
+Output Summary: Final clean pass: `All done!` followed by `8 files left unchanged.` An earlier pass in the same loop reformatted 3 test files (`3 files reformatted, 5 files left unchanged.`), so the loop restarted at P2-T1; the artifact records the uninterrupted pass that followed.

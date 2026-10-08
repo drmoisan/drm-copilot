@@ -4,16 +4,19 @@
 # every file within the 500-line cap. Provides the git-binary test seam
 # (cleanup_wt_git), branch/worktree enumeration (enumerate_branches,
 # parse_worktree_list), path normalization (normalize_wt_path), the
-# current-worktree/branch and base-branch protection set (compute_protected), and
-# the main-freshness warning (check_main_freshness). The classification ladder,
-# consolidation, deletion, and the CLI live in sibling files (cleanup_worktrees_lib.sh,
-# cleanup_worktrees_actions_lib.sh, cleanup-worktrees.sh).
+# current-worktree/branch and base-branch protection set (compute_protected), the
+# main-freshness warning (check_main_freshness), the shared absolute-path predicate
+# (cleanup_wt_is_absolute_path), and the worktree-tracking scan roots
+# (cleanup_wt_split_roots, cleanup_wt_derive_scan_roots, cleanup_wt_scan_roots). The
+# classification ladder, consolidation, deletion, and the CLI live in sibling files
+# (cleanup_worktrees_lib.sh, cleanup_worktrees_actions_lib.sh, cleanup-worktrees.sh).
 #
 # Sourcing contract: defines functions and the single constant CLEANUP_WT_BASE_BRANCH
 # and runs no other work at source time, so wrapper and bats suites source it safely.
 # It MUST be sourced before cleanup_worktrees_lib.sh, whose classification functions
 # call cleanup_wt_git, parse_worktree_list, compute_protected, and normalize_wt_path
-# defined here.
+# defined here. The filesystem-scan helper cleanup_worktrees_scan_helper.sh runs as a
+# separate process and sources this library directly for cleanup_wt_is_absolute_path.
 #
 # All git commands go through cleanup_wt_git so tests can stub the git binary via
 # CLEANUP_WT_GIT_BIN. Git exit-code capture rule: the `git worktree list --porcelain`
@@ -248,5 +251,166 @@ check_main_freshness() {
 	if [[ -n $local_sha && -n $origin_sha && $local_sha != "$origin_sha" ]]; then
 		printf 'WARN|main-divergence|%s|%s\n' "$local_sha" "$origin_sha"
 	fi
+	return 0
+}
+
+cleanup_wt_is_absolute_path() {
+	# Return 0 when <path> is absolute, else 1. Pure: no filesystem access.
+	#
+	# Absolute forms are a leading `/` (POSIX paths, MSYS `/c/...` paths, and `//server`
+	# UNC paths) and a drive letter followed by `/` or `\` (`C:/...`, `c:/...`,
+	# `C:\...`), which is the form Git for Windows writes into a worktree's `.git`
+	# pointer file (issue #706). A drive letter with no separator (`C:rel`) is
+	# drive-relative and is not absolute; an empty path is not absolute. This is the one
+	# absolute-path predicate of the skill: the preserve library and the filesystem-scan
+	# helper both call it.
+	#
+	# Args: $1 = path. Returns 0 (absolute) or 1 (not absolute).
+	local path=${1:-}
+	[[ $path == /* || $path == [A-Za-z]:[/\\]* ]]
+}
+
+cleanup_wt_split_roots() {
+	# Split a CLEANUP_WT_ORPHAN_ROOTS value into absolute roots, one per line.
+	#
+	# Entries are separated by `;`, by a newline, or by `:`. A `:` is part of the path
+	# instead when the text before it in the current entry is exactly one ASCII letter
+	# and the character after it is `/` or `\` (a drive letter, as in `C:/x`). Empty
+	# entries are dropped. An entry that is not absolute (cleanup_wt_is_absolute_path) is
+	# dropped with a one-line stderr diagnostic naming it, because a relative root would
+	# be resolved against the process's current working directory.
+	#
+	# The value is walked one character at a time with parameter expansion and never
+	# word-split, so no pathname expansion occurs and a `*` is emitted literally.
+	#
+	# Args: $1 = the override value. Always returns 0.
+	local value=${1:-}
+	local -a entries=()
+	local entry="" ch next i
+	for ((i = 0; i < ${#value}; i++)); do
+		ch=${value:i:1}
+		if [[ $ch == ';' || $ch == $'\n' ]]; then
+			entries+=("$entry")
+			entry=""
+		elif [[ $ch == ':' ]]; then
+			next=${value:i+1:1}
+			if [[ ${#entry} -eq 1 && $entry == [A-Za-z] && $next == [/\\] ]]; then
+				entry+=$ch
+			else
+				entries+=("$entry")
+				entry=""
+			fi
+		else
+			entry+=$ch
+		fi
+	done
+	entries+=("$entry")
+	for entry in "${entries[@]}"; do
+		[[ -z $entry ]] && continue
+		if ! cleanup_wt_is_absolute_path "$entry"; then
+			printf 'cleanup-worktrees: CLEANUP_WT_ORPHAN_ROOTS entry is not absolute, dropped: %s\n' "$entry" >&2
+			continue
+		fi
+		printf '%s\n' "$entry"
+	done
+	return 0
+}
+
+cleanup_wt_derive_scan_roots() {
+	# Echo the registration-derived scan roots, one per line.
+	#
+	# Input is parse_worktree_list output; its first record is the main worktree. The
+	# candidate for every later record is the parent directory of its path (backslashes
+	# converted to `/`). A candidate is kept only when its normalize_wt_path value N:
+	#   - is not the main worktree's normalized path and is not one of its ancestors
+	#     (scanning an ancestor would list the main worktree's siblings), and
+	#   - is not equal to, and not inside, any registered worktree, main included
+	#     (its subdirectories are that worktree's own content, not worktrees).
+	# Kept candidates are emitted in LC_ALL=C order of N, once per N, using the first
+	# spelling seen in record order.
+	#
+	# Args: $1 = parse_worktree_list output. Always returns 0.
+	local records=${1:-}
+	local -a paths=() norms=()
+	local record path
+	while IFS= read -r record; do
+		[[ -z $record ]] && continue
+		path=${record%%|*}
+		paths+=("$path")
+		norms+=("$(normalize_wt_path "$path")")
+	done <<<"$records"
+	((${#paths[@]} < 2)) && return 0
+	local main_norm=${norms[0]}
+	local -A seen=()
+	local -a kept=()
+	local i p parent n w inside
+	for ((i = 1; i < ${#paths[@]}; i++)); do
+		p=${paths[i]//\\//}
+		parent=${p%/*}
+		[[ -z $parent || $parent == "$p" ]] && continue
+		n=$(normalize_wt_path "$parent")
+		[[ -z $n || -n ${seen[$n]:-} ]] && continue
+		[[ $n == "$main_norm" || $main_norm == "$n"/* ]] && continue
+		inside=0
+		for w in "${norms[@]}"; do
+			[[ -z $w ]] && continue
+			if [[ $n == "$w" || $n == "$w"/* ]]; then
+				inside=1
+				break
+			fi
+		done
+		((inside == 1)) && continue
+		seen[$n]=1
+		kept+=("$n|$parent")
+	done
+	((${#kept[@]} == 0)) && return 0
+	local line
+	while IFS= read -r line; do
+		printf '%s\n' "${line#*|}"
+	done < <(printf '%s\n' "${kept[@]}" | LC_ALL=C sort -t '|' -k1,1)
+	return 0
+}
+
+cleanup_wt_scan_roots() {
+	# Echo the worktree-tracking roots to scan, one per line.
+	#
+	# Configured roots come first: the CLEANUP_WT_ORPHAN_ROOTS entries
+	# (cleanup_wt_split_roots) when that variable is set, otherwise the default pair
+	# derived from the main worktree path (the first `git worktree list --porcelain`
+	# stanza, the same derivation consolidation_worktree_path uses in
+	# cleanup_worktrees_actions_lib.sh): `<main>/.claude/worktrees` then `<main>-wt`.
+	# Registration-derived roots (cleanup_wt_derive_scan_roots) are always appended.
+	# The combined list is deduplicated by normalize_wt_path, keeping the first spelling.
+	#
+	# The listing is read once (`out=$(...) || rc=$?`). On a parse_worktree_list hard
+	# failure nothing is derived from it: with no override no root is emitted at all,
+	# rather than a bare relative path resolved against the current working directory,
+	# and with an override exactly the override roots are emitted.
+	# cleanup_wt_scan_records returns 0 with no record for an empty root list, so the
+	# advisory records degrade to silence rather than to a misleading scan.
+	# Always returns 0.
+	local out rc=0 first_record main_wt="" configured="" derived=""
+	out=$(parse_worktree_list) || rc=$?
+	if ((rc == 0)); then
+		first_record=${out%%$'\n'*}
+		main_wt=${first_record%%|*}
+		derived=$(cleanup_wt_derive_scan_roots "$out")
+	fi
+	if [[ -n ${CLEANUP_WT_ORPHAN_ROOTS:-} ]]; then
+		configured=$(cleanup_wt_split_roots "$CLEANUP_WT_ORPHAN_ROOTS")
+	elif [[ -n $main_wt ]]; then
+		configured="${main_wt}/.claude/worktrees"$'\n'"${main_wt}-wt"
+	fi
+	local -A seen=()
+	local root n
+	while IFS= read -r root; do
+		[[ -z $root ]] && continue
+		n=$(normalize_wt_path "$root")
+		# A root of `/` normalizes to empty, which is not a valid array key.
+		[[ -z $n ]] && n=/
+		[[ -n ${seen[$n]:-} ]] && continue
+		seen[$n]=1
+		printf '%s\n' "$root"
+	done <<<"${configured}"$'\n'"${derived}"
 	return 0
 }

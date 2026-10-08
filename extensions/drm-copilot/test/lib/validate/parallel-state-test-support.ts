@@ -37,6 +37,90 @@ export function buildBlastRadius(): JsonRecord {
 }
 
 /**
+ * Return the per-item routing record that ready-gate invariant P10 requires.
+ *
+ * The values match the Python builders module
+ * `tests/scripts/dev_tools/parallel_planner_state_builders.py`, so both
+ * language ports start from the same routing record (issue #532).
+ *
+ * @returns A fresh object carrying `complexity_band`, `complexity_assessment`,
+ *   and `model_routing_receipt`; nested objects are new on every call.
+ */
+export function buildPlannerRoutingFields(): JsonRecord {
+  return {
+    complexity_band: "C3",
+    complexity_assessment: {
+      band: "C3",
+      floor: "C3",
+      signals_present: ["cross_module_contract_change"],
+      rationale: "Changes a validator contract shared across modules.",
+      assessed_at: "2026-08-07T10-00",
+    },
+    model_routing_receipt: {
+      agent: "orchestrator",
+      phase: "execution",
+      complexity_band: "C3",
+      fable_policy: "available",
+      table_model: "opus",
+      clamped_from: null,
+      model: "opus",
+    },
+  };
+}
+
+/**
+ * Return one fully prepared, preflight-cleared planner item.
+ *
+ * @param issueNum The item's issue number.
+ * @param slug The feature slug used to build the item's paths.
+ * @returns A fresh planner item record carrying the P10 routing record.
+ */
+export function buildPlannerItem(issueNum: number, slug: string): JsonRecord {
+  return {
+    issue_num: issueNum,
+    feature_folder: `2026-08-07-${slug}-${String(issueNum)}`,
+    kind: "feature",
+    state: "prepared",
+    blast_radius: buildBlastRadius(),
+    preparation_status: "prepared",
+    research_path: `docs/features/active/${slug}/research.md`,
+    plan_path: `docs/features/active/${slug}/plan.md`,
+    preflight_status: "PREFLIGHT: ALL CLEAR",
+    ...buildPlannerRoutingFields(),
+  };
+}
+
+/**
+ * Return a minimally valid, execution-ready planner checkpoint payload.
+ *
+ * Two prepared items sit in one current-generation cohort with no conflict
+ * edges, so a test can mutate one field and attribute any resulting error to
+ * it. The payload also satisfies the readiness gate.
+ *
+ * @returns A fresh planner checkpoint object.
+ */
+export function buildValidPlannerState(): JsonRecord {
+  return {
+    objective: "prepare parallel run wave-one",
+    parallel_slug: "wave-one",
+    parallel_manifest_path: "docs/features/parallel/wave-one/parallel.md",
+    mode: "closed",
+    max_concurrency: 4,
+    items: [
+      buildPlannerItem(444, "parallel-schema-validators"),
+      buildPlannerItem(445, "parallel-cohort-scheduler"),
+    ],
+    cohorts: [{ index: 0, generation: 0, item_keys: [444, 445] }],
+    conflict_edges: [],
+    recolor_generation: 0,
+    completed_steps: ["manifest_parsed"],
+    next_step: "PARALLEL_EXECUTION_READY",
+    last_updated: "2026-08-07T10-00",
+    kickoff_prompt_path: "artifacts/orchestration/parallel-kickoff-wave-one.md",
+  };
+}
+
+/**
  * Return a minimally valid parallel-orchestrator checkpoint payload.
  *
  * Two scheduled items sit in one current-generation cohort with empty edge,

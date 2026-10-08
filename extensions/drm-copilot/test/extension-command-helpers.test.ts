@@ -18,9 +18,15 @@ import {
 
 // ----- VS Code mock ---------------------------------------------------------
 
-const showInputBoxMock = jest.fn();
-const showQuickPickMock = jest.fn();
-const showOpenDialogMock = jest.fn();
+const showInputBoxMock =
+  jest.fn<
+    (options: {
+      validateInput?: (v: string) => string | undefined;
+    }) => Promise<string | undefined>
+  >();
+const showQuickPickMock =
+  jest.fn<(items: unknown, options?: unknown) => Promise<unknown>>();
+const showOpenDialogMock = jest.fn<(options?: unknown) => Promise<unknown>>();
 
 let activeEditorFsPath: string | null = null;
 

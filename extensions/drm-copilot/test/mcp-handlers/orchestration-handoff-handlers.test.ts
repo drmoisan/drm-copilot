@@ -1,6 +1,7 @@
 import { describe, expect, it, jest } from "@jest/globals";
 
 import { handlePortableHandoffTool } from "../../src/mcp-handlers/orchestration-handoff-handlers";
+import type { RepoAutomationService } from "../../src/repo-automation-service-contract";
 import {
   VIRTUAL_WORKSPACE_ROOT,
   createMockService,
@@ -244,9 +245,15 @@ describe("portable orchestration handoff MCP handlers", () => {
       resolution: { provider: "codex" },
     } as const;
     const service = Object.assign(createMockService(), {
-      resolveOrchestrationTopology: jest.fn(async () => resolution),
-      resolveProviderRouting: jest.fn(async () => resolution),
-      transitionPreparedOrchestration: jest.fn(async () => fixture.result),
+      resolveOrchestrationTopology: jest.fn<
+        NonNullable<RepoAutomationService["resolveOrchestrationTopology"]>
+      >(async () => resolution),
+      resolveProviderRouting: jest.fn<
+        NonNullable<RepoAutomationService["resolveProviderRouting"]>
+      >(async () => resolution),
+      transitionPreparedOrchestration: jest.fn<
+        NonNullable<RepoAutomationService["transitionPreparedOrchestration"]>
+      >(async () => fixture.result),
     });
 
     // Act
@@ -300,5 +307,98 @@ describe("portable orchestration handoff MCP handlers", () => {
         expectedPlanSha256: INDEPENDENT_CONTEXT_ARGUMENTS.expected_plan_sha256,
       }),
     );
+  });
+
+  it("maps a set failureCause to failure_cause", async () => {
+    // Arrange
+    const fixture = createCompleteTransitionCase();
+    const blockedAuthority = {
+      status: "blocked",
+      handoffId: "handoff-614",
+      handoffEnvelopeSha256: fixture.arguments.expected_handoff_envelope_sha256,
+      primaryFailureCode: "HANDOFF_VALIDATOR_UNAVAILABLE",
+      affectedPaths: [],
+      unsupportedCapabilities: [],
+      resolution: null,
+      failureCause: "envelope-read: ENOENT",
+    } as const;
+    const blockedTransition = {
+      ...fixture.result,
+      status: "blocked",
+      destinationCheckpointPath: null,
+      destinationCheckpointSha256: null,
+      primaryFailureCode: "HANDOFF_VALIDATOR_UNAVAILABLE",
+      failureCause: "candidate-replace: EPERM; candidate-cleanup: EBUSY",
+    } as const;
+    const service = Object.assign(createMockService(), {
+      resolveOrchestrationTopology: jest.fn<
+        NonNullable<RepoAutomationService["resolveOrchestrationTopology"]>
+      >(async () => blockedAuthority),
+      transitionPreparedOrchestration: jest.fn<
+        NonNullable<RepoAutomationService["transitionPreparedOrchestration"]>
+      >(async () => blockedTransition),
+    });
+
+    // Act
+    const topology = await handlePortableHandoffTool(
+      "resolve_orchestration_topology",
+      fixture.arguments,
+      service,
+    );
+    const transition = await handlePortableHandoffTool(
+      "transition_prepared_orchestration",
+      fixture.arguments,
+      service,
+    );
+
+    // Assert
+    expect(topology).toMatchObject({
+      status: "blocked",
+      failure_cause: blockedAuthority.failureCause,
+    });
+    expect(transition).toMatchObject({
+      status: "blocked",
+      failure_cause: blockedTransition.failureCause,
+    });
+  });
+
+  it("omits failure_cause when failureCause is unset", async () => {
+    // Arrange
+    const fixture = createCompleteTransitionCase();
+    const validatedAuthority = {
+      status: "validated",
+      handoffId: "handoff-614",
+      handoffEnvelopeSha256: fixture.arguments.expected_handoff_envelope_sha256,
+      primaryFailureCode: null,
+      affectedPaths: [],
+      unsupportedCapabilities: [],
+      resolution: { provider: "codex" },
+    } as const;
+    const service = Object.assign(createMockService(), {
+      resolveOrchestrationTopology: jest.fn<
+        NonNullable<RepoAutomationService["resolveOrchestrationTopology"]>
+      >(async () => validatedAuthority),
+      transitionPreparedOrchestration: jest.fn<
+        NonNullable<RepoAutomationService["transitionPreparedOrchestration"]>
+      >(async () => fixture.result),
+    });
+
+    // Act
+    const topology = await handlePortableHandoffTool(
+      "resolve_orchestration_topology",
+      fixture.arguments,
+      service,
+    );
+    const transition = await handlePortableHandoffTool(
+      "transition_prepared_orchestration",
+      fixture.arguments,
+      service,
+    );
+
+    // Assert
+    expect(topology).toMatchObject({ status: "validated" });
+    expect(topology).not.toHaveProperty("failure_cause");
+    expect(transition).toMatchObject({ status: "materialized" });
+    expect(transition).not.toHaveProperty("failure_cause");
   });
 });

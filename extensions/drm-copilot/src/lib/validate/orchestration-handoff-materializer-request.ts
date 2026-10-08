@@ -14,6 +14,37 @@ import type { HandoffFailureCode } from "./orchestration-handoff-contract";
  * added, following the `parallel-state-records.ts` split precedent.
  */
 
+/** A system or synthetic error code: an uppercase identifier such as `EACCES`. */
+const HANDOFF_ERROR_CODE_PATTERN = /^[A-Z][A-Z0-9_]*$/;
+
+/**
+ * Build a redaction-safe `<stage>: <token>` cause string for a blocked result.
+ *
+ * The token is, in order: the error's string `code` when it is an uppercase
+ * identifier; otherwise `error.name` for an `Error`; otherwise the literal
+ * `non-error value`. The error's `message` and `stack` are never read, so no
+ * path, environment value, or other host data can reach the cause string.
+ *
+ * @param stage - Fixed stage label naming the operation that failed.
+ * @param error - The caught value.
+ * @returns The cause string, for example `checkpoint-read: EACCES`.
+ */
+export function describeHandoffFailureCause(
+  stage: string,
+  error: unknown,
+): string {
+  if (typeof error === "object" && error !== null && "code" in error) {
+    const code: unknown = error.code;
+    if (typeof code === "string" && HANDOFF_ERROR_CODE_PATTERN.test(code)) {
+      return `${stage}: ${code}`;
+    }
+  }
+  if (error instanceof Error) {
+    return `${stage}: ${error.name}`;
+  }
+  return `${stage}: non-error value`;
+}
+
 /**
  * Narrow a transition request to its reference shape while carrying the entire
  * caller-supplied independent context, so both authorities validate against the
@@ -48,6 +79,7 @@ export function blockedResult(
     readonly handoffHistorySha256?: string | null;
     readonly affectedPaths?: readonly string[];
     readonly unsupportedCapabilities?: readonly string[];
+    readonly failureCause?: string;
   } = {},
 ): TransitionPreparedOrchestrationResult {
   return {
@@ -62,6 +94,9 @@ export function blockedResult(
     primaryFailureCode,
     affectedPaths: options.affectedPaths ?? [],
     unsupportedCapabilities: options.unsupportedCapabilities ?? [],
+    ...(options.failureCause === undefined
+      ? {}
+      : { failureCause: options.failureCause }),
   };
 }
 
@@ -79,6 +114,9 @@ export function authorityFailure(
       handoffHistorySha256,
       affectedPaths: authority.affectedPaths,
       unsupportedCapabilities: authority.unsupportedCapabilities,
+      ...(authority.failureCause === undefined
+        ? {}
+        : { failureCause: authority.failureCause }),
     },
   );
 }

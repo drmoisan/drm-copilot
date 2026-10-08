@@ -136,6 +136,8 @@ Always apply:
      - required acceptance criteria are FAIL or PARTIAL
      - coverage regression below policy threshold (< 80% repo-wide per language, < 80% or regression for modified files, or < 90% for new files)
      - coverage artifact absent for any language that has changed files
+   - Classify each blocking finding before triggering remediation: every blocking finding receives one `Remediability` class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated).
+   - Trigger remediation only for `autonomous` findings. When no blocking finding is `autonomous`, write the remediation inputs, report `HALT_NON_REMEDIABLE` (at least one `external_dependency`, `policy_hold`, or `human_decision_required` finding) or `AWAITING_CI` (every finding `awaiting_ci`) with `REMEDIATION_PLAN: NONE`, create no remediation plan target, and do not hand off to `atomic-planner`.
    - Create `remediation-inputs.<timestamp>.md` first.
    - Create the target remediation plan file from the canonical plan template.
    - Hand off plan creation through `remediation-handoff-atomic-planner`.
@@ -145,7 +147,7 @@ Always apply:
    - Verify every reported artifact exists on disk before reporting completion.
    - Report artifact paths and a concise go/no-go recommendation for PR readiness.
    - End the final report with these exact single-line fields:
-     - `REVIEW_STATUS: PASS` or `REVIEW_STATUS: REMEDIATION_REQUIRED`
+     - `REVIEW_STATUS: PASS`, `REVIEW_STATUS: REMEDIATION_REQUIRED`, `REVIEW_STATUS: HALT_NON_REMEDIABLE`, or `REVIEW_STATUS: AWAITING_CI`
      - `FEATURE_FOLDER: <path>`
      - `POLICY_AUDIT: <path>`
      - `CODE_REVIEW: <path>`

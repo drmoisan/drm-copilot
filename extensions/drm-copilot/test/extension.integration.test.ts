@@ -9,8 +9,14 @@ type MockChildProcess = EventEmitter & {
 
 const handlers = new Map<string, CommandHandler>();
 const generatedArtifacts = new Map<string, string>();
-const showQuickPickMock = jest.fn();
-const showInputBoxMock = jest.fn();
+const showQuickPickMock =
+  jest.fn<
+    (
+      items: ReadonlyArray<{ label: string }>,
+    ) => Promise<{ label: string } | undefined>
+  >();
+const showInputBoxMock =
+  jest.fn<(options?: unknown) => Promise<string | undefined>>();
 let workspaceFoldersState: Array<{ uri: { fsPath: string } }> | undefined = [
   { uri: { fsPath: "C:/workspace" } },
 ];
@@ -115,7 +121,12 @@ const fsMock = jest.requireMock("node:fs") as {
 
 const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
-  spawnSync: jest.Mock;
+  spawnSync: jest.Mock<
+    (
+      executable: string,
+      args: ReadonlyArray<string>,
+    ) => { status: number; stdout: string | Buffer; stderr: string }
+  >;
 };
 
 function setGitBranchDiscoveryState(input: {
@@ -127,73 +138,69 @@ function setGitBranchDiscoveryState(input: {
   const remoteRefs = input.remoteRefs ?? ["origin/HEAD", "origin/main"];
   const localRefs = input.localRefs ?? ["main"];
 
-  childProcessMock.spawnSync.mockImplementation(
-    (_executable: string, args: ReadonlyArray<string>) => {
-      const joined = args.join(" ");
-      if (joined.includes("symbolic-ref") && joined.includes("origin/HEAD")) {
-        return {
-          status: originHead.length > 0 ? 0 : 1,
-          stdout: originHead,
-          stderr: originHead.length > 0 ? "" : "origin/HEAD not set",
-        };
-      }
+  childProcessMock.spawnSync.mockImplementation((_executable, args) => {
+    const joined = args.join(" ");
+    if (joined.includes("symbolic-ref") && joined.includes("origin/HEAD")) {
+      return {
+        status: originHead.length > 0 ? 0 : 1,
+        stdout: originHead,
+        stderr: originHead.length > 0 ? "" : "origin/HEAD not set",
+      };
+    }
 
-      if (
-        joined.includes("for-each-ref") &&
-        joined.includes("refs/remotes/origin")
-      ) {
-        return {
-          status: 0,
-          stdout: remoteRefs.join("\n"),
-          stderr: "",
-        };
-      }
-
-      if (joined.includes("for-each-ref") && joined.includes("refs/heads")) {
-        return {
-          status: 0,
-          stdout: localRefs.join("\n"),
-          stderr: "",
-        };
-      }
-
-      // Non-empty diff. `SubprocessRunner` (which the in-process collector
-      // uses, unlike the branch-discovery calls above) decodes stdout only
-      // when it is a Buffer, so these two responses must supply one.
-      if (joined.startsWith("diff --name-status")) {
-        return {
-          status: 0,
-          stdout: Buffer.from("M\tsrc/example.ts"),
-          stderr: "",
-        };
-      }
-      if (joined.startsWith("diff --numstat")) {
-        return {
-          status: 0,
-          stdout: Buffer.from("1\t0\tsrc/example.ts"),
-          stderr: "",
-        };
-      }
-
+    if (
+      joined.includes("for-each-ref") &&
+      joined.includes("refs/remotes/origin")
+    ) {
       return {
         status: 0,
-        stdout: "",
+        stdout: remoteRefs.join("\n"),
         stderr: "",
       };
-    },
-  );
+    }
 
-  showQuickPickMock.mockImplementation(
-    async (items: ReadonlyArray<{ label: string }>) => {
-      if (!quickPickResultLabel) {
-        return undefined;
-      }
+    if (joined.includes("for-each-ref") && joined.includes("refs/heads")) {
+      return {
+        status: 0,
+        stdout: localRefs.join("\n"),
+        stderr: "",
+      };
+    }
 
-      return (
-        items.find((item) => item.label === quickPickResultLabel) ?? items[0]
-      );
-    },
-  );
+    // Non-empty diff. `SubprocessRunner` (which the in-process collector
+    // uses, unlike the branch-discovery calls above) decodes stdout only
+    // when it is a Buffer, so these two responses must supply one.
+    if (joined.startsWith("diff --name-status")) {
+      return {
+        status: 0,
+        stdout: Buffer.from("M\tsrc/example.ts"),
+        stderr: "",
+      };
+    }
+    if (joined.startsWith("diff --numstat")) {
+      return {
+        status: 0,
+        stdout: Buffer.from("1\t0\tsrc/example.ts"),
+        stderr: "",
+      };
+    }
+
+    return {
+      status: 0,
+      stdout: "",
+      stderr: "",
+    };
+  });
+
+  showQuickPickMock.mockImplementation(async (items) => {
+    if (!quickPickResultLabel) {
+      return undefined;
+    }
+
+    return (
+      items.find((item) => item.label === quickPickResultLabel) ?? items[0]
+    );
+  });
 }
 
 function mockProcessSuccess(): MockChildProcess {

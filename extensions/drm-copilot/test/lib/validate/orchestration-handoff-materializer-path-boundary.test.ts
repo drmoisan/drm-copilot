@@ -11,6 +11,7 @@ import {
   type HandoffMaterializerDependencies,
 } from "../../../src/lib/validate/orchestration-handoff-materializer";
 import { candidateFilePath } from "../../../src/lib/validate/orchestration-handoff-materializer-support";
+import { INDEPENDENT_CONTEXT } from "./orchestration-handoff-materializer-test-support";
 
 type RejectedTarget =
   "source" | "envelope" | "archive" | "destination" | "candidate";
@@ -155,7 +156,9 @@ function createScenario(rejectedTarget?: RejectedTarget) {
       },
     ),
   };
-  const gitStatus = jest.fn(async () => "");
+  const gitStatus = jest.fn<(workspaceRoot: string) => Promise<string>>(
+    async () => "",
+  );
   const dependencies: HandoffMaterializerDependencies = {
     fileSystem: {
       readFile,
@@ -180,6 +183,8 @@ function createScenario(rejectedTarget?: RejectedTarget) {
     clock: { nowIso8601: jest.fn(() => "2026-08-31T08:00:00Z") },
   };
   const request: TransitionPreparedOrchestrationRequest = {
+    ...INDEPENDENT_CONTEXT,
+    expectedWorkspaceRoot: "C:/workspace",
     workspaceRoot: "C:/workspace",
     sourceCheckpointPath: envelope.source.checkpointPath,
     expectedSourceCheckpointSha256: sourceSha256,
