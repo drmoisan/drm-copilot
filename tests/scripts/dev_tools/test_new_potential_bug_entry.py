@@ -11,7 +11,16 @@ import pytest
 from scripts.dev_tools import new_potential_bug_entry as mod
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
+
+resolve_code_cli: Callable[
+    [Callable[[str], str | None] | None, Callable[[str], str | None] | None],
+    str | None,
+] = vars(mod)["_resolve_code_cli"]
+is_insiders_session: Callable[[Callable[[str], str | None] | None], bool] = vars(mod)[
+    "_is_insiders_session"
+]
+insiders_signal_names: tuple[str, ...] = vars(mod)["_INSIDERS_SIGNAL_NAMES"]
 
 
 class FakeFileSystem(mod.FileSystem):
@@ -303,3 +312,104 @@ def test_create_bug_entry_falls_back_to_workspace_when_no_template_root() -> Non
     )
 
     assert created == workspace / "docs/features/potential/2025-12-15-api-timeout.md"
+
+
+def _clear_signal_variables(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Remove every Insiders signal variable so the session reads as non-Insiders."""
+    for name in insiders_signal_names:
+        monkeypatch.delenv(name, raising=False)
+
+
+def _patch_launcher_seams(
+    monkeypatch: pytest.MonkeyPatch, cli_path: str
+) -> list[list[str]]:
+    """Patch PATH lookup and subprocess execution; return the recorded commands."""
+    launched: list[list[str]] = []
+
+    def fake_run(cmd: list[str], check: bool) -> None:  # noqa: ARG001
+        launched.append(cmd)
+
+    def fake_which(_name: str) -> str:
+        return cli_path
+
+    monkeypatch.setattr(mod.shutil, "which", fake_which)
+    monkeypatch.setattr(mod.subprocess, "run", fake_run)
+    _clear_signal_variables(monkeypatch)
+    return launched
+
+
+def test_launcher_converts_backslashes_to_forward_slashes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Backslash separators in a file path are passed to the CLI as forward slashes."""
+    launched = _patch_launcher_seams(monkeypatch, "/usr/bin/code")
+
+    result = mod.default_code_launcher([Path("docs\\a.md")])
+
+    assert result is True
+    assert launched == [["/usr/bin/code", "--reuse-window", "docs/a.md"]]
+
+
+def test_launcher_passes_every_file_after_reuse_window(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Every file argument follows --reuse-window in the supplied order."""
+    launched = _patch_launcher_seams(monkeypatch, "/usr/bin/code")
+
+    result = mod.default_code_launcher([Path("docs\\a.md"), Path("docs\\b.md")])
+
+    assert result is True
+    assert launched == [["/usr/bin/code", "--reuse-window", "docs/a.md", "docs/b.md"]]
+
+
+def test_launcher_cli_fallback_uses_code_when_insiders_cli_missing() -> None:
+    """An Insiders session falls back to code when code-insiders does not resolve."""
+    probed: list[str] = []
+
+    def which_lookup(name: str) -> str | None:
+        probed.append(name)
+        return "/usr/bin/code" if name == "code" else None
+
+    def env_lookup(_name: str) -> str | None:
+        return "1.110.0-insider"
+
+    resolved = resolve_code_cli(which_lookup, env_lookup)
+
+    assert resolved == "/usr/bin/code"
+    assert probed == ["code-insiders", "code"]
+
+
+def test_launcher_cli_fallback_uses_insiders_when_code_missing() -> None:
+    """A non-Insiders session falls back to code-insiders when code does not resolve."""
+    probed: list[str] = []
+
+    def which_lookup(name: str) -> str | None:
+        probed.append(name)
+        return "/usr/bin/code-insiders" if name == "code-insiders" else None
+
+    def env_lookup(_name: str) -> str | None:
+        return None
+
+    resolved = resolve_code_cli(which_lookup, env_lookup)
+
+    assert resolved == "/usr/bin/code-insiders"
+    assert probed == ["code", "code-insiders"]
+
+
+@pytest.mark.parametrize("signal_name", insiders_signal_names)
+def test_launcher_insiders_detected_for_each_signal_variable(signal_name: str) -> None:
+    """Each supported signal variable alone marks the session as Insiders."""
+
+    def env_lookup(name: str) -> str | None:
+        return "1.110.0-insider" if name == signal_name else None
+
+    assert is_insiders_session(env_lookup) is True
+
+
+def test_launcher_insiders_not_detected_without_insider_marker() -> None:
+    """Signal values lacking the insider marker do not mark the session as Insiders."""
+
+    def env_lookup(_name: str) -> str | None:
+        return "vscode"
+
+    assert is_insiders_session(env_lookup) is False
