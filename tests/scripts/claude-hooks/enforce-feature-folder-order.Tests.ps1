@@ -178,4 +178,34 @@ Describe 'enforce-feature-folder-order.ps1' {
             (Test-IsFeaturePlanPath -NormalizedPath 'other/plan.md') | Should -BeFalse
         }
     }
+
+    Context 'issue #568 plan-path matching' {
+        It 'F1: recognizes a timestamped plan file in an active feature folder' {
+            (Test-IsFeaturePlanPath -NormalizedPath 'docs/features/active/foo/plan.2026-08-23T23-22.md') | Should -BeTrue
+        }
+
+        It 'F2: recognizes a timestamped plan file in an archive feature folder' {
+            (Test-IsFeaturePlanPath -NormalizedPath 'docs/features/archive/foo/plan.2026-08-23T23-22.md') | Should -BeTrue
+        }
+
+        It 'F3: denies a timestamped plan write when the prerequisite documents are missing' {
+            Mock -CommandName Get-FeatureFolderFileExistence -MockWith { $false }
+            $json = '{"tool_input":{"file_path":"docs/features/active/foo/plan.2026-08-23T23-22.md"}}'
+            $decision = Invoke-FeatureFolderOrderDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match '^FEATURE_FOLDER_ORDER_BLOCKED:'
+        }
+
+        It 'F4: rejects a plan file whose timestamp carries no time component' {
+            (Test-IsFeaturePlanPath -NormalizedPath 'docs/features/active/foo/plan.2026-08-23.md') | Should -BeFalse
+        }
+
+        It 'F5: rejects a planning document whose name only starts with plan' {
+            (Test-IsFeaturePlanPath -NormalizedPath 'docs/features/active/foo/planning.md') | Should -BeFalse
+        }
+
+        It 'F6: rejects a plan file nested below the feature folder' {
+            (Test-IsFeaturePlanPath -NormalizedPath 'docs/features/active/foo/research/plan.md') | Should -BeFalse
+        }
+    }
 }
