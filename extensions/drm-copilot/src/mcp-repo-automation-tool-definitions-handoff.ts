@@ -53,6 +53,7 @@ export interface PortableHandoffAuthorityResult {
   readonly affectedPaths: readonly string[];
   readonly unsupportedCapabilities: readonly string[];
   readonly resolution: Readonly<Record<string, unknown>> | null;
+  readonly failureCause?: string;
 }
 
 export interface TransitionPreparedOrchestrationResult {
@@ -67,6 +68,7 @@ export interface TransitionPreparedOrchestrationResult {
   readonly primaryFailureCode: HandoffFailureCode | null;
   readonly affectedPaths: readonly string[];
   readonly unsupportedCapabilities: readonly string[];
+  readonly failureCause?: string;
 }
 
 const repositoryRelativePathProperty = {
