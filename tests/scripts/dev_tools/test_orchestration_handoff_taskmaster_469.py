@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 from dataclasses import asdict, replace
 from typing import cast
 
@@ -20,6 +19,7 @@ from scripts.dev_tools.orchestration_handoff_contract import (
     PlanIdentity,
     SchedulerContext,
     SchedulerKind,
+    raw_file_sha256,
     read_legacy_v1,
     select_primary_failure,
     validate_bindings,
@@ -34,6 +34,7 @@ from tests.scripts.dev_tools.orchestration_handoff_taskmaster_469_test_support i
     bounded_result,
     build_envelope,
     fixture_bytes,
+    fixture_paths,
     load_fixture,
     mapping,
     projection_facts,
@@ -71,10 +72,11 @@ def test_taskmaster_469_fixture_hashes_and_source_history_are_pinned(
     fixture = load_fixture(case)
     source = mapping(fixture["source_checkpoint"], "source_checkpoint")
     plan = mapping(fixture["plan"], "plan")
-    source_bytes, plan_bytes = fixture_bytes(case, fixture)
+    source_path, plan_path = fixture_paths(case, fixture)
+    source_bytes, _ = fixture_bytes(case, fixture)
 
-    assert hashlib.sha256(source_bytes).hexdigest() == source["sha256"]
-    assert hashlib.sha256(plan_bytes).hexdigest() == plan["sha256"]
+    assert raw_file_sha256(source_path) == source["sha256"]
+    assert raw_file_sha256(plan_path) == plan["sha256"]
     assert case.destination_provider.encode() not in source_bytes.lower()
 
 

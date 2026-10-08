@@ -85,6 +85,7 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly primary_failure_code?: string | null;
   readonly affected_paths?: ReadonlyArray<string>;
   readonly unsupported_capabilities?: ReadonlyArray<string>;
+  readonly failure_cause?: string;
   readonly resolution?: Readonly<Record<string, unknown>> | null;
 }
 
