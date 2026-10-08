@@ -20,6 +20,11 @@
 # No temporary file is created: the manifest under test is the checked-in
 # fixture tests/fixtures/parallel_manifest_payload/parallel.md and the PATH
 # shims are checked-in fixtures.
+#
+# The abandon entry point (issue #763) is proven with the separate checked-in
+# shim directory tests/fixtures/parallel_abandon_path, which exposes only gh and
+# git shims that record their argument vector and start no process, so the
+# no-interpreter shim directory above stays unchanged.
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
@@ -28,10 +33,12 @@ setup() {
     FIXTURE_MANIFEST="${REPO_ROOT}/tests/fixtures/parallel_manifest_payload/parallel.md"
     BASH_BIN="$(command -v bash)"
     RESTRICTED_PATH="${REPO_ROOT}/tests/fixtures/parallel_payload_path"
+    ABANDON_PATH="${REPO_ROOT}/tests/fixtures/parallel_abandon_path"
     # Checked-in shims may be stored without the executable bit on some
     # platforms; make them runnable for this checkout. Idempotent; creates no
     # files.
     chmod +x "${RESTRICTED_PATH}"/* 2>/dev/null || true
+    chmod +x "${ABANDON_PATH}"/* 2>/dev/null || true
 }
 
 # Run a payload entry point with the restricted PATH from the payload root.
@@ -117,4 +124,26 @@ run_payload() {
     run_payload report-lane-assertion.sh --manifest "$FIXTURE_MANIFEST"
     [ "$status" -eq 0 ]
     [ "${lines[0]}" = "Lane assertion: 2 derived conflict component(s); 0 disagreement(s)." ]
+}
+
+@test "the payload directory carries the abandon entry point" {
+    [ -f "${PAYLOAD_LIB}/abandon-parallel-item.sh" ]
+}
+
+@test "the abandon shim PATH exposes no Python interpreter" {
+    run env -i PATH="$ABANDON_PATH" "$BASH_BIN" -c 'command -v python'
+    [ "$status" -ne 0 ]
+    run env -i PATH="$ABANDON_PATH" "$BASH_BIN" -c 'command -v python3'
+    [ "$status" -ne 0 ]
+    run env -i PATH="$ABANDON_PATH" "$BASH_BIN" -c 'command -v poetry'
+    [ "$status" -ne 0 ]
+}
+
+@test "the payload abandons an item without Python on PATH" {
+    run env -i PATH="$ABANDON_PATH" HOME="$HOME" "$BASH_BIN" "${PAYLOAD_LIB}/abandon-parallel-item.sh" \
+        --item 42 --disposition abandon --confirm-abandon --pr 7 --worktree wt-42
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -eq 2 ]
+    [ "${lines[0]}" = "SHIM-CALL gh pr close 7" ]
+    [ "${lines[1]}" = "SHIM-CALL git worktree remove wt-42" ]
 }

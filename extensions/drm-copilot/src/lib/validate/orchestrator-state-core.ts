@@ -1,4 +1,5 @@
 import type { FileSystem } from "../file-system";
+import { VALID_BLOCKED_REASONS } from "./orchestrator-state-blocked-reason";
 import { validateCodexModelRoutingState } from "./orchestrator-state-codex-model-routing";
 import { validateCodexTopologyState } from "./orchestrator-state-codex-topology";
 import {
@@ -28,6 +29,7 @@ import {
 // callers and tests can continue to import them from this module.
 export { CI_GATE_KEYS, PR_GATE_KEYS } from "./orchestrator-state-completion";
 export { PROMOTION_RECEIPT_KEYS, PROMOTION_RECEIPT_NAMESPACE_KEY };
+export { VALID_BLOCKED_REASONS };
 
 /**
  * Core orchestrator-state checkpoint validator.
@@ -90,17 +92,6 @@ export const VALID_STEP_STATUS: ReadonlySet<string> = new Set([
   "not_started",
   "in_progress",
   "completed",
-]);
-
-/** Permitted blocked-reason values. */
-export const VALID_BLOCKED_REASONS: ReadonlySet<string> = new Set([
-  "none",
-  "spawn_agent_unavailable",
-  "delegation_launch_failed",
-  "delegate_no_receipt",
-  "delegate_contract_incomplete",
-  "validator_failed",
-  "user_requested_stop",
 ]);
 
 /** Keys required on each legacy list delegation receipt. */

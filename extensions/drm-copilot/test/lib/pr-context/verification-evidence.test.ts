@@ -166,12 +166,9 @@ describe("parseVerificationEvidenceMarkdown", () => {
   // carry exactly ONE `EXIT_CODE:` line.
   //
   // shape-06 is the DUPLICATED-`EXIT_CODE` case and carries TWO `EXIT_CODE:`
-  // lines by definition. Its expected record is RUNTIME-SPECIFIC: the guard
-  // `!parsed.has(key)` makes TypeScript FIRST-wins, so this case asserts the
-  // FIRST value (`1`), deliberately differing from the Python case, which
-  // asserts the second (`0`). shape-06 is EXCLUDED from the AC8 cross-runtime
-  // agreement assertion; the exclusion is attributable to the deferred
-  // duplicate-`EXIT_CODE` defect, not to this change.
+  // lines by definition. Both runtimes keep the first occurrence of every
+  // accepted field (issue #744), so this case asserts the first value (`1`) in
+  // agreement with the Python case.
   const shapeCases: readonly {
     readonly shapeId: string;
     readonly markdown: string;

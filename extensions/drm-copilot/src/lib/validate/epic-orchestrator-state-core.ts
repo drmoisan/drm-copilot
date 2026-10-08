@@ -73,6 +73,8 @@ const MERGED_STATUSES: ReadonlySet<string> = new Set([
   "worktree_removed",
 ]);
 
+const NOT_STARTED_MERGE_STATUS = "not_started";
+
 /** Options controlling epic-orchestrator-state validation. */
 export interface ValidateEpicOrchestratorStateOptions {
   /** When true, enforce completion-safe feature/merge state. */
@@ -233,7 +235,34 @@ function validateMergeStatusEnum(
 }
 
 /**
+ * Report whether a feature is treated as started for the wave barrier.
+ *
+ * Mirrors Python `feature_has_started`. Fail-closed: a feature is started when its
+ * `worktree_created_at` is a string (including an empty one), or when its
+ * `merge_status` is not the literal `not_started` (a missing, null, or other
+ * non-string `merge_status` counts as started).
+ *
+ * @param feature One object-shaped `features[]` entry.
+ * @returns True when the feature is treated as started.
+ */
+function hasStarted(feature: Record<string, unknown>): boolean {
+  return (
+    typeof feature["worktree_created_at"] === "string" ||
+    feature["merge_status"] !== NOT_STARTED_MERGE_STATUS
+  );
+}
+
+/**
  * Validate the retrospective wave-barrier ordering invariant.
+ *
+ * Only a dependent feature that is treated as started (`hasStarted`) is checked.
+ * Exactly one error is reported per violated dependency edge, and the status case
+ * takes precedence over the timing case:
+ * - `EPIC_WAVE_BARRIER_VIOLATION: <f> is treated as started while dependency <d> is not merged`
+ *   when the dependency's `merge_status` is not `merged` or `worktree_removed`;
+ * - `EPIC_WAVE_BARRIER_VIOLATION: <f> worktree_created_at precedes dependency <d> merge_confirmed_at`
+ *   when the dependency's `merge_confirmed_at` is later than the dependent's
+ *   `worktree_created_at`.
  *
  * @param features Object-shaped `features[]` entries.
  * @returns One `EPIC_WAVE_BARRIER_VIOLATION` error per violated dependency edge.
@@ -260,6 +289,11 @@ function validateWaveBarrierOrdering(
     if (typeof folder !== "string" || !Array.isArray(dependsOn)) {
       continue;
     }
+    // Start guard: a dependent that has not started cannot have violated the
+    // ordering of its dependencies, so its edges are not checked.
+    if (!hasStarted(feature)) {
+      continue;
+    }
     const worktreeCreatedAt = feature["worktree_created_at"];
 
     // Every dependency edge must be durably confirmed merged before this
@@ -280,9 +314,13 @@ function validateWaveBarrierOrdering(
         typeof depConfirmedAt === "string" &&
         typeof worktreeCreatedAt === "string" &&
         depConfirmedAt > worktreeCreatedAt;
-      if (statusViolation || timingViolation) {
+      if (statusViolation) {
         errors.push(
-          `EPIC_WAVE_BARRIER_VIOLATION: ${folder} started before dependency ${String(dependency)} merged`,
+          `EPIC_WAVE_BARRIER_VIOLATION: ${folder} is treated as started while dependency ${String(dependency)} is not merged`,
+        );
+      } else if (timingViolation) {
+        errors.push(
+          `EPIC_WAVE_BARRIER_VIOLATION: ${folder} worktree_created_at precedes dependency ${String(dependency)} merge_confirmed_at`,
         );
       }
     }

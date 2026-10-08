@@ -4,6 +4,8 @@ node_modules
 .vscode-test/
 *.vsix
 /artifacts
+# Issue #527: output of the consumer-fixture PoshQC acceptance run.
+/tests/fixtures/poshqc-consumer/artifacts/
 .agent_logs
 
 # Python

@@ -180,6 +180,18 @@ class VirtualFileSystem implements FileSystem {
     return this.contents.has(path);
   }
 
+  exists(): boolean {
+    throw new Error("not used");
+  }
+
+  isDirectory(): boolean {
+    throw new Error("not used");
+  }
+
+  listDirectory(): string[] {
+    throw new Error("not used");
+  }
+
   readTextFile(path: string): string {
     const content = this.contents.get(path);
     if (content === undefined) {
@@ -199,8 +211,8 @@ class VirtualFileSystem implements FileSystem {
 
 describe("repo automation orchestration validation", () => {
   beforeEach(() => {
-    process.env.PATH = "C:/bin";
-    process.env.PATHEXT = ".EXE;.CMD";
+    process.env["PATH"] = "C:/bin";
+    process.env["PATHEXT"] = ".EXE;.CMD";
     appendLineMock.mockReset();
     childProcessMock.spawn.mockReset();
   });

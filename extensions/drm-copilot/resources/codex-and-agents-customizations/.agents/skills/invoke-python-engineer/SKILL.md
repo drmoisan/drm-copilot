@@ -1,6 +1,6 @@
 ---
 name: invoke-python-engineer
-description: Invoke the python-typed-engineer worker to design, implement, and verify Python changes within typed repository boundaries. Applies Black, Ruff, Pyright, and Pytest with a three-production plus three-test per-batch budget and zero-regression quality gates.
+description: Invoke the python-typed-engineer worker to design, implement, and verify Python changes within typed repository boundaries. Applies Black, Ruff, Pyright, and Pytest with a 1-3 production-file direct-mode budget, routing to the orchestrated large path above it, and zero-regression quality gates.
 ---
 
 # Implement Python Skill
@@ -15,7 +15,7 @@ Use this skill when:
 - Estimated scope fits the small path (1-3 production files plus corresponding tests).
 - The toolchain (Black, Ruff, Pyright, Pytest) can be run in the current environment, or the user has explicitly authorized an unverified plan-only response.
 
-If the estimated scope exceeds the small-path budget, this skill defers to the orchestrated flow via `python-change-budget-router` instead of proceeding directly.
+If the estimated scope is more than 3 production files, this skill defers to the orchestrated large path (`.codex/prompts/orchestrate-work.md`) via `python-change-budget-router` instead of proceeding directly. The large path has no production-file cap, and test files are not counted toward the routing threshold.
 
 ## Inputs
 
@@ -23,7 +23,6 @@ If the estimated scope exceeds the small-path budget, this skill defers to the o
 - Files or entrypoints in scope.
 - Constraints, including public APIs that must be preserved.
 - Optional approved plan. If none is supplied, the worker delegates plan authoring to `atomic_planner` before any edits.
-- Optional budget override in the form `budget: prod=<N>, test=<M>` subject to repo policy compliance.
 
 ## Output Paths
 

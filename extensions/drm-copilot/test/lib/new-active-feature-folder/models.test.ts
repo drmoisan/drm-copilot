@@ -21,6 +21,9 @@ import {
 } from "../../../src/lib/new-active-feature-folder/models";
 
 const fsMock = nodeFs as jest.Mocked<typeof nodeFs>;
+const readdirSyncMock = jest.mocked<
+  (path: nodeFs.PathLike, options: { withFileTypes: true }) => nodeFs.Dirent[]
+>(nodeFs.readdirSync);
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -45,20 +48,15 @@ describe("RealFolderFileSystem.copyTree", () => {
   it("preserves each source-relative path and copies files only", () => {
     // Arrange: a source tree with one nested dir, one nested file, one top file.
     const fs = new RealFolderFileSystem();
-    fsMock.readdirSync.mockImplementation((dir: nodeFs.PathLike) => {
+    readdirSyncMock.mockImplementation((dir: nodeFs.PathLike) => {
       const dirStr = String(dir).replace(/\\/g, "/");
       if (dirStr === "/workspace/templates") {
-        return [
-          dirent("nested", "dir"),
-          dirent("two.txt", "file"),
-        ] as unknown as ReturnType<typeof nodeFs.readdirSync>;
+        return [dirent("nested", "dir"), dirent("two.txt", "file")];
       }
       if (dirStr === "/workspace/templates/nested") {
-        return [dirent("one.md", "file")] as unknown as ReturnType<
-          typeof nodeFs.readdirSync
-        >;
+        return [dirent("one.md", "file")];
       }
-      return [] as unknown as ReturnType<typeof nodeFs.readdirSync>;
+      return [];
     });
     fsMock.mkdirSync.mockReturnValue(undefined);
     fsMock.copyFileSync.mockReturnValue(undefined);

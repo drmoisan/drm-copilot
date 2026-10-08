@@ -135,7 +135,7 @@ branch created off `origin/main`; and `routes.preparation` declares no epic-spec
 agent, skill, or MCP tool.
 
 **Collected per child at termination:** `plan-path`, preflight status, the promotion receipt (the
-`issue_num` back-fill source), the model-routing receipt with `logical_agent: "orchestrator"`, the
+`issue_num` back-fill source), the model-routing receipt with `agent: "orchestrator"`, the
 topology receipt, `branch_name`, and `worktree_path`. There is no fan-in merge step: the planner
 fetches and records each pushed item branch, back-fills `issue_num` into the manifest on
 `parallel/<slug>-plan`, and updates the checkpoint.
@@ -275,6 +275,44 @@ concurrently.
 
 Derivation, the V1-V3 rules, and the contention relation are implemented upstream. This skill calls
 them; it defines none of them.
+
+## Complexity Assessment
+
+**Assessment point.** Assess each item's complexity band after the item is `prepared` — its
+preflight status is `PREFLIGHT: ALL CLEAR` and its `declared` radius is V1/V2-clear — and before
+cohort seeding, which consumes the band through the scheduling entry point. The parallel parent
+reads the same band to choose the `model` of that item's `Agent(orchestrator)` spawn, so an item
+without a band cannot be routed.
+
+**Signals and scale.** Read the signal catalog and the band scale from `model_policy` in
+`config/orchestration-routing.json`. Record every signal the item's approved plan and spec exhibit
+in `signals_present`, then choose a band from the scale.
+
+**Floor.** Compute the floor with `Get-ComplexityFloor -SignalsPresent <signals>` from
+`.claude/lib/model-routing/ModelRouting.psm1` in PowerShell, or `compute_complexity_floor(signals)`
+in Python. The chosen band must be at or above the floor; the floor is a lower bound only.
+
+**Model resolution.** Resolve the child model with
+`Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <fable_policy>` from the same
+module, or `resolve_delegation_model("orchestrator", band, fable_policy)` in Python, using the
+run's `model_budget.fable_policy`.
+
+**Per-item record.** Write three fields on the item:
+
+- `complexity_band` — one of `C1`, `C2`, `C3`, `C4`.
+- `complexity_assessment` — `{ band, floor, signals_present, rationale, assessed_at }`, where `band`
+  equals `complexity_band`, `floor` is the computed floor, `rationale` is a non-empty string, and
+  `assessed_at` is a non-empty ISO-8601 string.
+- `model_routing_receipt` — `{ agent: "orchestrator", phase, complexity_band, fable_policy,
+  table_model, clamped_from, model }`, copied from the resolver output, with `complexity_band`
+  equal to the item's band.
+
+The kickoff artifact's `## Item Summary` `complexity` cell for the item equals its
+`complexity_band`.
+
+**Routing input, not a verdict.** The band is a routing input for model selection and edge
+derivation. It is distinct from the deliberately absent worthiness verdict: assessing a band never
+admits, rejects, or reorders an item.
 
 ## Cohort Seeding
 
@@ -448,7 +486,8 @@ Top-level fields: `objective`, `parallel_slug`, `parallel_manifest_path`, `mode`
 `last_updated`. F3's landed required-key set (planner invariant P1) is a strict subset of this
 list, and `plan_home_branch` is a permitted additional field.
 
-Per item: `issue_num`, `feature_folder`, `kind`, `state`, `complexity_band`, `preparation_status`,
+Per item: `issue_num`, `feature_folder`, `kind`, `state`, `complexity_band`, `complexity_assessment`,
+`preparation_status`,
 `research_path`, `plan_path`, `preflight_status`, `branch_name`, `worktree_path`, `blast_radius`
 (with `source: "declared"`), `radius_validation` (the `v1`, `v2`, and `v3` results with their
 severities), `model_routing_receipt`, and `topology_receipt`.
@@ -461,8 +500,10 @@ blast-radius overlap.
 `require_ready_for_execution` gate: at least two items (invariant P6); every item
 `preparation_status: prepared` with `preflight_status` exactly `PREFLIGHT: ALL CLEAR`, non-empty
 `research_path` and `plan_path`, and `blast_radius.source == "declared"` (P7); `next_step` exactly
-the ready sentinel `PARALLEL_EXECUTION_READY` (P8); and `kickoff_prompt_path` exactly
-`artifacts/orchestration/parallel-kickoff-<slug>.md` (P9).
+the ready sentinel `PARALLEL_EXECUTION_READY` (P8); `kickoff_prompt_path` exactly
+`artifacts/orchestration/parallel-kickoff-<slug>.md` (P9); and every item carries a valid
+`complexity_band`, a `complexity_assessment`, and a `model_routing_receipt` with
+`agent: "orchestrator"` that agree with the band (P10).
 
 **Git integrity is F4-owned.** F3's `require_ready_for_execution` gate is structural only, so
 verifying that each item's committed plan blob exists on that item's pushed branch ref — and that

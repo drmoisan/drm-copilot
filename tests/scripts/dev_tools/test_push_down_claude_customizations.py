@@ -77,7 +77,7 @@ def test_module_exposes_claude_root_folders_and_artifact_directory() -> None:
 
     module = _load_module()
 
-    assert module.ROOT_FOLDERS == (Path(".claude"),)
+    assert module.ROOT_FOLDERS == (Path(".claude"), Path("config"))
     assert module.ARTIFACT_DIRECTORY == "artifacts/claude-customizations"
     assert (
         module.MODULE_ENTRY_POINT == "scripts.dev_tools.push_down_claude_customizations"

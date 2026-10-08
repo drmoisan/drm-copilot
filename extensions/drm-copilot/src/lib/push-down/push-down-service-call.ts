@@ -31,6 +31,7 @@ import {
   type MemoryMode,
   pushDownCustomizations as pushDownClaude,
 } from "./claude-customizations";
+import { renderExclusionLines } from "./claude-exclusion-filter";
 
 /** Preserved result shape of a push-down service call. */
 export interface PushDownServiceCallResult {
@@ -38,6 +39,8 @@ export interface PushDownServiceCallResult {
   readonly workspaceRoot: string;
   readonly summary: string;
   readonly artifacts: ReadonlyArray<string>;
+  /** Exclusion report lines; present only when there is at least one. */
+  readonly warnings?: ReadonlyArray<string>;
 }
 
 /** Common input for the copilot and codex/agents service calls. */
@@ -191,11 +194,21 @@ export function pushDownClaudeCustomizationsServiceCall(
     ...(input.memoryMode === undefined ? {} : { memoryMode: input.memoryMode }),
     ...(input.clock === undefined ? {} : { clock: input.clock }),
   });
+  // Exclusion lines reach the output channel through the log sink and the
+  // caller through `warnings`; both stay silent when nothing was reported.
+  const lines =
+    summary.exclusions === undefined
+      ? []
+      : renderExclusionLines(summary.exclusions);
+  for (const line of lines) {
+    input.log?.(line);
+  }
   return {
     tool: "push_down_claude_customizations",
     workspaceRoot: input.workspaceRoot,
     summary:
       "Pushed bundled Claude Code customizations into the destination workspace.",
     artifacts: [normalizeGeneratedPath(summary.artifactPath)],
+    ...(lines.length > 0 ? { warnings: lines } : {}),
   };
 }

@@ -91,7 +91,11 @@ function replaceAtPath(
         );
       return;
     }
-    current = current[segment];
+    if (typeof segment === "number" && Array.isArray(current))
+      current = current[segment];
+    else if (typeof segment === "string" && isRecord(current))
+      current = current[segment];
+    else throw new Error("Fixture mutation path has an invalid segment.");
   }
 }
 

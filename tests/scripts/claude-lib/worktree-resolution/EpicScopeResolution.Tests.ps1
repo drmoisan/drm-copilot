@@ -52,6 +52,7 @@ BeforeAll {
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $checkpointTextValue }.GetNewClosure()
         Mock Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution { $headBranchValue }.GetNewClosure()
         Mock Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution { $mergeInProgressValue }.GetNewClosure()
+        Mock Resolve-WorktreeEpicTarget -ModuleName EpicScopeResolution { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = $SessionRoot; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 }
 
@@ -195,6 +196,22 @@ Describe 'Resolve-EpicScopeCheckpoint fail-closed non-matches' {
         $scope.IsEpicScope | Should -BeFalse
         $scope.Reason | Should -Be 'branch-mismatch'
         Should -Invoke Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution -Times 0 -Exactly
+    }
+
+    It 'is not epic scope and locates no checkpoint when a head-matched leg has a detached HEAD (issue #690)' {
+        # Arrange: the helper's [string] parameter turns $null into '', so the detached HEAD
+        # ($null, as Get-EpicScopeWorktreeHeadBranch returns it) is mocked directly.
+        Set-EpicScopeResolverMock -CheckpointText $script:ReadyEpicJson -HeadBranch $null
+        Mock Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution { $null }
+
+        # Act
+        $scope = Resolve-EpicScopeCheckpoint -Text 'git add scripts/powershell/Sample.ps1' -SessionRoot $script:CoordinatorRoot -MatchWorktreeHead
+
+        # Assert
+        $scope.IsEpicScope | Should -BeFalse
+        $scope.Reason | Should -Be 'branch-mismatch'
+        Should -Invoke Resolve-WorktreeEpicTarget -ModuleName EpicScopeResolution -Times 0 -Exactly
+        Should -Invoke Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution -Times 0 -Exactly
     }
 
     It 'is not epic scope and reads no checkpoint when there is no branch signal and head matching is off' {

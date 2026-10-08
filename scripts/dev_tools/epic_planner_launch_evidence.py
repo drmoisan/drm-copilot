@@ -9,6 +9,10 @@ from datetime import datetime
 from pathlib import Path, PurePosixPath
 from typing import TYPE_CHECKING, TypeGuard, cast
 
+from scripts.dev_tools._epic_orchestrator_state_launch_binding import (
+    feature_carries_launch_path,
+)
+
 if TYPE_CHECKING:
     from scripts.dev_tools.epic_planner_readiness import EpicReadinessContext
 
@@ -296,9 +300,16 @@ def _validate_status(
 
 
 def validate_epic_planner_launch_evidence(
-    state: dict[str, object], context: EpicReadinessContext
+    state: dict[str, object],
+    context: EpicReadinessContext,
+    *,
+    require_launch_paths: bool = False,
 ) -> list[str]:
-    """Verify every prepared feature's receipt, specification, and final status."""
+    """Verify every prepared feature's receipt, specification, and final status.
+
+    When ``require_launch_paths`` is true, a feature carrying neither launch path
+    key is skipped; otherwise every feature is verified.
+    """
 
     features = state.get("features")
     if not isinstance(features, list):
@@ -308,6 +319,9 @@ def validate_epic_planner_launch_evidence(
     status: dict[str, object] | None = None
     for index, item in enumerate(cast("list[object]", features)):
         if not _is_record(item):
+            continue
+        # A keyless feature contributes neither errors nor a shared status path.
+        if require_launch_paths and not feature_carries_launch_path(item):
             continue
         receipt, receipt_path, receipt_errors = _validate_receipt(item, index, context)
         errors.extend(receipt_errors)

@@ -5,6 +5,7 @@ import { describe, expect, it, jest } from "@jest/globals";
 
 import type {
   PortableHandoffProvider,
+  PortableHandoffWorkMode,
   PortableHandoffReferenceRequest,
 } from "../../../src/mcp-repo-automation-tool-definitions-handoff";
 import type { FileSystem } from "../../../src/lib/file-system";
@@ -27,7 +28,11 @@ interface EnvelopeFixture {
     allowed_head_relationship: "equal" | "equal_or_descendant";
   };
   destination: { provider: PortableHandoffProvider };
-  identity: { issue_number: number; feature_folder: string; work_mode: string };
+  identity: {
+    issue_number: number;
+    feature_folder: string;
+    work_mode: PortableHandoffWorkMode;
+  };
   plan: { path: string; sha256: string };
 }
 
@@ -115,9 +120,9 @@ function createScenario(options: ScenarioOptions = {}) {
   const observe = jest.fn<(workspaceRoot: string) => CheckoutObservation>(
     () => observation,
   );
-  const isHeadRelationshipSatisfied = jest.fn(
-    () => options.headRelationshipSatisfied ?? true,
-  );
+  const isHeadRelationshipSatisfied = jest.fn<
+    HandoffCheckoutContext["isHeadRelationshipSatisfied"]
+  >(() => options.headRelationshipSatisfied ?? true);
   const checkoutContext: HandoffCheckoutContext = {
     observe,
     isHeadRelationshipSatisfied,
@@ -146,7 +151,7 @@ function createScenario(options: ScenarioOptions = {}) {
   } satisfies FileSystem;
   const pathBoundary: HandoffPathBoundary = {
     resolveWorkspaceRoot: jest.fn(() => canonicalWorkspaceRoot),
-    resolveExistingTarget: jest.fn((_root, repositoryPath) => {
+    resolveExistingTarget: jest.fn((_root: string, repositoryPath: string) => {
       if (blockedPaths.has(repositoryPath)) return null;
       if (repositoryPath === handoffEnvelopePath) return canonicalEnvelopePath;
       if (repositoryPath === expectedPlanPath) return canonicalPlanPath;

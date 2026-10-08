@@ -1,5 +1,7 @@
 import type { FileSystem } from "../file-system";
 import { toPosixPath } from "../file-system";
+import { resolvePromotionEntryTools } from "./orchestrator-state-promotion-tools";
+import { resolveIssueAdoption } from "./orchestrator-state-issue-adoption";
 
 /**
  * Routing and mandatory-handoff invariants for orchestrator checkpoints.
@@ -405,7 +407,10 @@ export function validateRoutingContract(
   const errors: string[] = [];
   const requiredAgents = routeList(rawRoute, "required_agents");
   const requiredSkills = routeList(rawRoute, "required_skills");
-  const requiredMcpTools = routeList(rawRoute, "required_mcp_tools");
+  const requiredMcpTools = resolvePromotionEntryTools(
+    routeList(rawRoute, "required_mcp_tools"),
+    state,
+  );
 
   if (stateList(state, "required_agents", requiredAgents) === null) {
     errors.push(
@@ -438,11 +443,22 @@ export function validateRoutingContract(
   }
 
   const actualTools = mcpTools(state);
+  // A valid issue_adoption record waives the receipt requirement for the tools
+  // it lists; any adoption error waives nothing.
+  const adoption = resolveIssueAdoption(state, {
+    routeId,
+    requiredMcpTools,
+    successfulTools: actualTools,
+  });
   for (const tool of requiredMcpTools) {
+    if (adoption.waivedTools.has(tool)) {
+      continue;
+    }
     if (!actualTools.has(tool)) {
       errors.push(`Checkpoint missing successful MCP receipt: ${tool}.`);
     }
   }
+  errors.push(...adoption.errors);
 
   errors.push(...validateEmptyListField(state, "local_execution_overrides"));
   errors.push(...validateEmptyListField(state, "delegation_bypasses"));

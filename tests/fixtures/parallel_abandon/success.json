@@ -1,0 +1,14 @@
+{
+  "name": "success",
+  "description": "A confirmed abandon closes the pull request, then removes the worktree, and exits 0 with no stderr line.",
+  "argv": ["--item", "42", "--disposition", "abandon", "--confirm-abandon", "--pr", "7", "--worktree", "../wt-42"],
+  "shim_exit": {"gh": 0, "git": 0},
+  "missing_executable": null,
+  "expected": {
+    "exit_code": 0,
+    "stderr_mode": "none",
+    "stderr": null,
+    "calls": [["gh", "pr", "close", "7"], ["git", "worktree", "remove", "../wt-42"]]
+  },
+  "divergence": null
+}

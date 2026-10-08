@@ -19,6 +19,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-cohort-barrier.ps1").Path
         . $script:UnderTest
+        Mock Resolve-ParallelCohortBarrierTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
     Context 'allow (no-op) when the call is out of scope' {
@@ -442,14 +443,16 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
 
     Context 'real Test-Path read seam' {
         It 'Get-ParallelCohortBarrierCheckpointContent returns $null when the checkpoint file does not exist' {
-            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Get-ParallelCohortBarrierCheckpointContent | Should -BeNullOrEmpty
+            $seamPath = '/synthetic-worktrees/cohort-seam/artifacts/orchestration/parallel-orchestrator-state.json'
+            Mock -CommandName Test-Path -MockWith { $false } -ParameterFilter { $LiteralPath -eq $seamPath }
+            Get-ParallelCohortBarrierCheckpointContent -Path $seamPath | Should -BeNullOrEmpty
         }
 
         It 'Get-ParallelCohortBarrierCheckpointContent reads real content when the file exists' {
-            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Mock -CommandName Get-Content -MockWith { '{"items":[]}' } -ParameterFilter { $LiteralPath -eq $script:ParallelCheckpointPath }
-            Get-ParallelCohortBarrierCheckpointContent | Should -Be '{"items":[]}'
+            $seamPath = '/synthetic-worktrees/cohort-seam/artifacts/orchestration/parallel-orchestrator-state.json'
+            Mock -CommandName Test-Path -MockWith { $true } -ParameterFilter { $LiteralPath -eq $seamPath }
+            Mock -CommandName Get-Content -MockWith { '{"items":[]}' } -ParameterFilter { $LiteralPath -eq $seamPath }
+            Get-ParallelCohortBarrierCheckpointContent -Path $seamPath | Should -Be '{"items":[]}'
         }
     }
 }

@@ -158,7 +158,7 @@ preserve_relative_path_reason() {
 	local name=${1-} val=${2-}
 	if [[ -z $val ]]; then
 		printf '%s is empty' "$name"
-	elif [[ $val == /* || $val == [A-Za-z]:[\\/]* ]]; then
+	elif cleanup_wt_is_absolute_path "$val"; then
 		printf '%s is absolute: %s' "$name" "$val"
 	elif [[ $val == ".." || $val == "../"* || $val == *"/../"* || $val == *"/.." ]]; then
 		printf '%s contains a .. segment: %s' "$name" "$val"

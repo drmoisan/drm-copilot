@@ -1,0 +1,8 @@
+extensions/drm-copilot/test/mcp-server-test-service.ts(
+extensions/drm-copilot/test/mcp-server.test.ts(
+extensions/drm-copilot/test/mcp-handlers/orchestration-handoff-handlers.test.ts(
+extensions/drm-copilot/test/mcp-provider.test.ts(
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-authority-service.test.ts(
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-contract.test.ts(
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-path-boundary.test.ts(
+extensions/drm-copilot/test/lib/validate/orchestration-handoff-materializer-production.test.ts(

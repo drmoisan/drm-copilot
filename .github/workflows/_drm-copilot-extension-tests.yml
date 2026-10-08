@@ -26,5 +26,8 @@ jobs:
       - name: Install extension dependencies
         run: npm --prefix extensions/drm-copilot ci
 
+      - name: Type-check extension source and test tree
+        run: npm --prefix extensions/drm-copilot run typecheck
+
       - name: Run extension unit/integration tests
         run: npm --prefix extensions/drm-copilot run test

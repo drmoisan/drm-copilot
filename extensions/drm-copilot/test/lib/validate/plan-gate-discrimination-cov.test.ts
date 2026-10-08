@@ -138,6 +138,7 @@ describe("evaluatePlanGates --cov classification", () => {
       rawSpan: argv.join(" "),
       argv,
       kind: classifyKind(argv),
+      taskText: "",
     });
 
     // Assert

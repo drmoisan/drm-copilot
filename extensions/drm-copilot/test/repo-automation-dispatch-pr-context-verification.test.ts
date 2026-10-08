@@ -93,7 +93,7 @@ function buildService(
   const service = createRepoAutomationService({
     extensionRoot: "C:/extension",
     output: { appendLine: () => undefined },
-    fileSystem,
+    ...(fileSystem ? { fileSystem } : {}),
     runner: {
       run: (args: readonly string[]) => {
         // gh is unavailable in this hermetic test; git resolves.
