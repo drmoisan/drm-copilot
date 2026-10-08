@@ -1,44 +1,595 @@
 # 2026-09-27-exempt-operand-bypass-brace-and-dot-segments (Plan)
 
-- **Issue:** #732
-- **Parent (optional):** none
+- **Issue:** #732 (primary); bundled #738, #745, #735
+- **Parent (optional):** epic #852 (`enforcement-hook-precision`), child C1b
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-08T13-53
-- **Status:** Draft
-- **Version:** 0.1
+- **Last Updated:** 2026-10-08T15-30
+- **Status:** Draft (awaiting validator run and executor preflight)
+- **Version:** 1.0
+- **Work Mode:** full-bug (`issue.md` marker `- Work Mode: full-bug`). Acceptance-criteria source: `docs/features/active/2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732/spec.md`, section `## Acceptance Criteria`, 30 checkbox criteria. No `user-story.md` exists or is required.
+- **Inputs:** `issue.md` (`## Bundled Issues`), `spec.md` (decisions D1 to D8 and D2a), `research/research.2026-10-08T14-00.md`, and `docs/features/epics/enforcement-hook-precision/epic.md`, all read in [P0-T2].
+- **Branch:** `bug/exempt-operand-bypass-brace-and-dot-segments-732`, merged with `origin/epic/enforcement-hook-precision-integration` in [P0-T7]. `BASE_SHA` is the integration-branch SHA recorded in [P0-T5] after the fetch; every `git diff` in this plan is anchored to it or to the integration ref.
+- **Complexity band:** C4 (epic manifest).
+- **Execution scope:** Phases 0 to 8. Each phase ends with a pathspec-bearing commit and a non-force push. No task rebases, force-pushes, or opens a pull request.
+- **Implementation delegation:** every change is made by `atomic-executor` applying `.claude/rules/powershell.md`. The executor spawns no sub-agent.
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+`FEATURE` below denotes `docs/features/active/2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732`. Every evidence path is `<FEATURE>/evidence/<kind>/<name>` with `<kind>` one of `baseline`, `regression-testing`, `qa-gates`, `other`.
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+**Fail-closed evidence rule:** PowerShell is the only in-scope code language. Baseline artifacts are produced in Phase 0 ([P0-T13] to [P0-T18]), final-QC artifacts in Phase 7 ([P7-T2] to [P7-T10]), and the coverage comparison in [P7-T6]. If any required baseline, QA, or coverage-comparison artifact is missing, incomplete, or carries a non-numeric coverage value, the audit verdict is BLOCKED or INCOMPLETE, never PASS.
 
+**Evidence accounting rule:** every evidence-producing task names its artifact path. No evidence-backed task is checked off without its artifact on disk.
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+---
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+## 1. Rules binding on every task
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#732-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+1. **Evidence schema.** Every command-step artifact carries `Timestamp:` (format `yyyy-MM-ddTHH-mm`), `Command:`, `EXIT_CODE:`, and `Output Summary:`. An artifact whose primary command is expected to exit non-zero also carries `ExpectedExitCode: <n>`. When one artifact records several commands, `Command:` and `EXIT_CODE:` describe the task's primary command (the last section-7 script the task runs, otherwise the first command it names); every other command's exit code is recorded on its own labelled line. `EXIT_CODE: SKIPPED` is never a passing outcome; the only authorized branches that omit a step are the ones written into [P0-T8], [P7-T2] (the MCP compliance call only), and [P7-T7].
+2. **No host data.** No artifact, test, or document written by this plan contains an absolute host path, a drive letter of the host, a user-profile path, or the executing account name. Printed values are recorded with the worktree root replaced by `<WORKSPACE_ROOT>` and the session scratchpad by `<SCRATCHPAD>`. Test fixtures use only the synthetic roots `/synthetic-worktrees/...`, `/outside/...`, `/a`, `/b`, and the literal `C:/wt` / `C:\wt` spellings named in section 5.
+3. **PowerShell route.** Every section-7 script is written with the Write tool to `<SCRATCHPAD>/<name>.ps1`. It is run with the PowerShell tool as `& '<SCRATCHPAD>/<name>.ps1'` from the worktree root when that tool is available; otherwise through a launcher `<SCRATCHPAD>/<name>.sh` whose only line is `exec pwsh -NoProfile -File "$(dirname "$0")/<name>.ps1"`, run with the Bash tool as `sh <SCRATCHPAD>/<name>.sh`. Each artifact records `ROUTE: powershell-tool` or `ROUTE: sh-launcher`. Each script obtains the root with `$root = (Get-Location).Path` and names repository files by repository-relative path. If both routes are refused, the executor records the refusal text and stops as BLOCKED.
+4. **Plain commands.** `git`, `gh`, and `poetry` commands run directly in the Bash tool, one command per call: no `&&`, no `;`, no `cd`, no heredoc, no backslash anywhere in the command text.
+5. **No count is read from a PoshQC MCP result.** `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, and `mcp__drm-copilot__run_poshqc_test` return a summary composed before the child process runs, read installed-extension settings, and carry no exit code, count, or coverage. They are called in Phase 7 as the route-compliance step with `workspace_root` set to the worktree root; the analyze and test calls carry no `scan_folders`, and the format call carries `scan_folders` `.claude/hooks`, `.codex/hooks`, `tests/scripts/claude-hooks`, and `tests/scripts/codex-hooks` and is made only under the [P7-T2] condition, because a repository-wide write-mode call would rewrite pre-existing drift outside this plan's scope. Only their disposition (`MCP_CALL: returned`, `MCP_CALL: error <message>`, or `MCP_CALL: unavailable <reason>`) is recorded. Every count, percentage, test name, and finding that an acceptance condition reads comes from a section-7 script or from `artifacts/pester/pester-junit.xml` as named in the task.
+6. **Anchors, not line numbers.** Every edit is located by function name and by the exact whole-line text anchors of section 3 and section 4, compared with `-ceq` including leading spaces. Line numbers quoted in this plan describe the pre-merge tree and are informational only; [P0-T10] re-derives every anchor, line count, and budget against the post-merge tree, and its stop conditions govern.
+7. **Mirrors are byte copies.** Every non-canonical copy (the three helpers mirrors, the three targets mirrors, the Codex gate bundle copy, both epic-scope bundle copies, and the three skill-document bundle copies) is written only by R-MIRROR (`Copy-Item -LiteralPath <source> -Destination <mirror> -Force`), never with Write or Edit. R-MIRROR appends the repository-relative source, destination, and both SHA256 values to `<FEATURE>/evidence/other/mirror-log.md`.
+8. **Change budget and route.** This plan authors five canonical production PowerShell files with Write or Edit: `.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1`, `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`, `.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1`, `.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`, and `.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`. `.claude/hooks/enforce-powershell-batch-budget.ps1` denies the fourth distinct production file unless `artifacts/orchestration/orchestrator-state.json` selects `large`, `remediation`, or `preparation` and is not terminal. [P0-T12] verifies the route; this plan never deletes or edits the batch-budget state file.
+9. **Hook denials.** If any hook denies a Write, Edit, Bash, or PowerShell call of this plan, the executor records the denial text in the task's artifact and stops as BLOCKED. It never works around a hook.
+10. **Live-hook nuance.** Hooks execute from the checked-out worktree, so from [P2-T1] onward the live preimplementation gate in this worktree applies the new helpers, and from [P5-T1] onward the new epic-scope decision, to the executor's own commands. Every executor `git` command therefore uses plain forward-slash repository-relative operands, single-quoted messages, and no backslash. Tests always exercise the branch copies directly by repository-relative path; no test depends on the registered hook.
+11. **Commit form.** Each commit task runs `git add -- <paths>` then `git commit -m '<subject>' --trailer '<Co-Authored-By value>' --trailer '<Claude-Session value>' -- <paths>` with the attribution values the executing session's instructions require, then `git push -u origin bug/exempt-operand-bypass-brace-and-dot-segments-732`. No `--force`, no `--force-with-lease`, no `--amend`. The task appends `COMMIT: <sha> <subject>` and `PUSH_EXIT: <n>` to `<FEATURE>/evidence/other/commits-log.md`.
+12. **Pre-existing failures (pre-declared).** [P0-T15] records the failing Pester test names of the scoped run (set `B_SCOPED`) and [P0-T17] those of the full run (set `B_FULL`). A later Pester gate passes when its failing-name set is a subset of the matching baseline set **and** no test fails in a protected suite. Protected suites are every file in the NEW-732, D2A, TRAILER, NEW-738, and AC738-EXISTING sets of section 6, plus `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.Parity.Tests.ps1` and `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`. An acceptance criterion that requires a suite to pass is checked off only when that suite has zero failures.
+13. **KNOWN_ISSUE_510 (pre-declared).** A pytest run may fail only `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`, and only when its AssertionError names a path under `.claude/state/` that `git status --porcelain --ignored --untracked-files=all -- .claude/state` lists with the `!!` prefix. Such a run is recorded with `KNOWN_ISSUE_510` and `ExpectedExitCode: 1`; it does not stop the plan, but the acceptance criterion that names that suite stays unchecked and is listed as pending-CI. Any other pytest failure stops the plan as BLOCKED. The state file is never deleted.
+14. **No temporary files in tests.** No test file written or edited by this plan uses `TestDrive`, `New-TemporaryFile`, `GetTempFileName`, `$env:TEMP`, `Set-Content`, `Out-File`, `New-Item`, or `Set-Location`. [P7-T14] verifies this mechanically.
+15. **Interpreter tokens.** No file written by this plan under `.claude/hooks/`, `.codex/hooks/`, or their bundled mirrors contains the words `python` or `poetry` in any case (`tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope.Tests.ps1` already asserts this for the Codex epic-scope file).
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+## 2. Write set (complete)
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+Canonical production files (Write or Edit, five files; rule 8):
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+1. `.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1` (Edit, [P2-T1])
+2. `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` (Edit, header only, [P2-T5])
+3. `.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1` (new, Write, [P4-T2])
+4. `.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1` (Edit, [P5-T1])
+5. `.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1` (Edit, [P5-T2])
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+Byte copies (R-MIRROR): `.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1`; `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1`; `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1`; `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`; `.codex/hooks/enforce-orchestration-preimplementation-gate-targets.ps1`; `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1`; `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-targets.ps1`; `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`; `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`; `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-plan/SKILL.md`; `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md`; `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-plan/SKILL.md`.
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+Manifests and documents (Edit): `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`; `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`; `.claude/skills/epic-plan/SKILL.md`; `.claude/skills/parallel-plan/SKILL.md`; `.agents/skills/epic-plan/SKILL.md`; `spec.md` in FEATURE (AC check-offs only, Phase 8); this plan file (checklist state only).
+
+New test files (Write): `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.OperandNormalization.Tests.ps1`; `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.OperandBypass.Tests.ps1`; `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-operand-bypass.Tests.ps1`; `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.Tests.ps1`; `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.Parity.Tests.ps1`; `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScopeTargets.Tests.ps1`; `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope-targets.Tests.ps1`; and, only on the [P7-T7] remediation branch, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.C1bCoverage.Tests.ps1`.
+
+Edited test files (line-neutral unless stated): `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1`; `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1`; `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.ChainEscape.Tests.ps1`; `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.AttributionTrailer.Tests.ps1` (+5 lines); `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1`; `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope.Tests.ps1`; `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`.
+
+Evidence files under `<FEATURE>/evidence/`, each named in its task.
+
+Never written (scope boundary, spec D8 and Non-Goals): any copy of `enforce-orchestration-preimplementation-gate-modes.ps1`, `hook-command-invocation.ps1`, or `hook-command-scanner.ps1`; `.codex/hooks/enforce-orchestration-preimplementation-gate-epic-resolution.ps1`; `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`; anything under `.claude/lib/`, `.claude/rules/`, `.github/instructions/`; `issue.md`; the research artifact.
+
+## 3. Helpers edit (anchored by text)
+
+All edits are in `.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1`, then copied by R-MIRROR. The "region" of a line is the name in the nearest preceding line of the form `function <Name> {`, or `preamble`.
+
+**E1 - header note (region `preamble`).** Immediately after the whole line `    fallback for every unmodeled form.` insert these five lines (the first is empty):
+
+```text
+
+    Shell-agnostic parsing (issue #735): the shell that executes a hooked command is
+    undetermined per command, so every shape whose meaning differs between a POSIX shell
+    and PowerShell denies - a backslash anywhere, and { } , ( ) @ outside quotes. Evidence:
+    research/research.2026-10-08T14-00.md (Q1) in the issue #732 feature folder.
+```
+
+**E2 - outside-quote constant block (region `preamble`).** Replace whole lines:
+
+| Label | Old line | New line |
+| --- | --- | --- |
+| K1 | `# issues #663 and #713): interpolation characters outside single quotes; outside-quote` | `# issues #663, #713, #732, and #735): interpolation characters outside single quotes;` |
+| K2 | ``# characters (`<`, `>`, and the `#` comment introducer) outside any quote; and typographic`` | ``# outside-quote characters (`<`, `>`, the `#` comment introducer, and the shell-divergent`` |
+| K3 | `# quotes (U+2018 to U+201E) anywhere, because a PowerShell host reads them as quotes.` | ``# `{ } , ( ) @`) outside any quote; and typographic quotes (U+2018 to U+201E) anywhere.`` |
+| K4 | `$script:OutsideQuoteCommandCharacters = [char[]]@('>', '<', '#')` | `$script:OutsideQuoteCommandCharacters = [char[]]@('>', '<', '#', '{', '}', ',', '(', ')', '@')` |
+| K5 | `# Wildcards that make an operand a glob (D4 row 15). Only the literal prefix before the` | `# Wildcards a selector value may not carry (LACS L6). An operand carrying one fails the` |
+| K6 | `# first of these is prefix-tested.` | `# operand allowlist (issue #732).` |
+
+**E3 - `Test-OrchestrationCommandTextUnresolvable` docstring.** Replace the six whole lines beginning `        Realizes D4 row 12 as narrowed by issues #663 and #713, with quote state tracked as in` and ending `        a shell may end the span where this scan does not (fail closed).` with:
+
+```text
+        Realizes D4 row 12 as narrowed by issues #663, #713, #732, and #735, with quote state
+        tracked as in Split-OrchestrationCommandLine. `$` or backtick answers true outside
+        quotes or inside double quotes (single quotes keep it literal); `<`, `>`, `#`, and
+        `{ } , ( ) @` answer true only outside a quoted span. A typographic quote (U+2018 to
+        U+201E) or a backslash answers true anywhere, because POSIX shells and PowerShell read
+        them differently and the executing shell is undetermined (fail closed).
+```
+
+**E4 - backslash test (FR-1.1, #745 item 4).** Replace whole lines:
+
+| Label | Old line | New line |
+| --- | --- | --- |
+| B1 | `    # An escaped or typographic quote moves a span boundary the scan cannot model (#663, #713).` | `    # A backslash or typographic quote is read differently by POSIX shells and PowerShell (#735).` |
+| B2 | `    if ($CommandText.Contains('\"') -or $CommandText.Contains("\'") -or $CommandText.IndexOfAny($script:TypographicQuoteCharacters) -ge 0) {` | `    if ($CommandText.Contains('\') -or $CommandText.IndexOfAny($script:TypographicQuoteCharacters) -ge 0) {` |
+
+B2 new is 107 characters.
+
+**E5 - remove the double-quote backslash branch.** Replace the seven consecutive whole lines
+
+```text
+        # Decide by quote state: inside a span only the closing quote matters, and any
+        # backslash inside a double-quoted span is an unmodelled escape; outside a span a
+        # quote opens one and a redirection character is unresolvable.
+        if ($openQuote -ne [char]0) {
+            if ($openQuote -eq '"' -and $character -eq '\') {
+                return $true
+            }
+```
+
+with
+
+```text
+        # Decide by quote state: inside a span only the closing quote matters; outside a
+        # span a quote opens one and an outside-quote character is unresolvable.
+        if ($openQuote -ne [char]0) {
+```
+
+**E6 - `Test-ExemptOrchestrationOperand` (FR-2).** Replace every line from `function Test-ExemptOrchestrationOperand {` through the `}` that closes it (the line before the blank line preceding `function Test-ExemptOrchestrationSelector {`) with:
+
+```powershell
+function Test-ExemptOrchestrationOperand {
+    <#
+    .SYNOPSIS
+        Tests one pathspec operand against the five exempt orchestration trees.
+    .DESCRIPTION
+        Realizes D4 rows 3, 9, 15, 16, and 17 as narrowed by issues #732 and #735. An operand
+        is exempt only when it matches the plain ASCII allowlist A-Z a-z 0-9 . _ / - (which
+        excludes pathspec magic, drive letters, backslashes, globs, braces, and non-ASCII
+        look-alikes), is not rooted, carries no '..' segment, and starts with an exempt tree.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $Operand)
+
+    if ($Operand -cnotmatch '^[A-Za-z0-9._/-]+$' -or $Operand.StartsWith('/')) {
+        return $false
+    }
+    if (($Operand -split '/') -contains '..') {
+        return $false
+    }
+    foreach ($tree in $script:OrchestrationBookkeepingTrees) {
+        if ($Operand.StartsWith($tree)) {
+            return $true
+        }
+    }
+    return $false
+}
+```
+
+**E7 - `Test-ExemptOrchestrationStagingCommand` comments.** Replace whole lines:
+
+| Label | Old line | New line |
+| --- | --- | --- |
+| S1 | `        trees after balanced-quote stripping and separator normalization.` | `        trees after balanced-quote stripping.` |
+| S2 | ``    # Row 12: `$` or backtick outside single quotes, `<`, `>`, or `#` outside quotes, any`` | ``    # Row 12: `$` or backtick outside single quotes, `< > # { } , ( ) @` outside quotes, and`` |
+| S3 | `    # typographic quote, and unmodelled backslash escapes make the operand list untrustworthy.` | `    # any typographic quote or backslash make the operand list untrustworthy (#732, #735).` |
+
+No other line changes. `Test-ExemptOrchestrationSelector` and `$script:PathspecWildcardCharacters` stay. No new line contains `#>` outside a docstring terminator. Expected net change: +5 (E1) -4 (E5) -28 (E6) = -27 lines.
+
+**Codex gate header (FR-5).** In `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`, immediately after the whole line `    Blocks implementation operations before orchestration readiness exists.` insert these seven lines (+7):
+
+```text
+.DESCRIPTION
+    Executing shell (issue #735): Codex runs a command through PowerShell by default on native
+    Windows, but the model may choose another shell per call, and the PreToolUse payload carries
+    only the raw command string, so the executing shell is undetermined per command and every
+    shell-divergent command shape denies (research/research.2026-10-08T14-00.md in the issue
+    #732 feature folder). The payload carries no workdir either, so the session root is the
+    default target of a segment without an explicit -C (issue #738, decision D4).
+```
+
+## 4. Targets file and epic-scope decision contract (#738)
+
+**File.** `enforce-orchestration-preimplementation-gate-targets.ps1`, four byte-identical copies (section 2). Pure string logic: no disk, process, network, clock, or environment access; no dot-source of its own. Header comment states purity, the call-time dependencies recorded in `<FEATURE>/evidence/other/c1a-api-verification.md` (`SEGMENT_READER`, `GIT_OPTION_TABLE`, `WRAPPER_GIT_MATCHER`), and that it is dot-sourced by both epic-scope files. It never calls `Split-OrchestrationCommandLine` or `ConvertTo-OrchestrationCommandToken`.
+
+**Functions** (approved verbs, `CmdletBinding`, typed parameters):
+
+1. `ConvertTo-OrchestrationTargetPath -Path <string>` returns the path with `\` replaced by `/` and one trailing `/` removed (except a bare root). Used for the session root and path-leg inputs only, never for `-C` values.
+2. `Get-OrchestrationPatchMarkerPath -PatchText <string>` returns the trimmed paths of every `*** Add File:`, `*** Update File:`, `*** Delete File:`, and `*** Move to:` line when the text's first non-empty line is `*** Begin Patch`; otherwise an empty array.
+3. `Get-OrchestrationCommandTarget -Command <string> -FilePath <string[]> -SessionRoot <string>` returns `[pscustomobject]@{ Resolved = [bool]; Targets = [string[]]; ReasonCode = [string]; Detail = [string] }` (spec FR-3 shape; `-FilePath` is an array so Codex patch markers pass through it). `ReasonCode` is `''` when resolved and `target-unresolvable` otherwise; `Detail` begins with one rule token from the list below followed by `: ` and the offending segment text or value.
+4. `Resolve-OrchestrationEpicTargetVerdict -SessionRoot <string> -TargetResult <pscustomobject> -ScopeResolver <scriptblock>` returns `[pscustomobject]@{ Verdict = 'none'|'deny'|'evaluate'; ReasonCode; Detail; Evaluations }`, where `Evaluations` is an array of `[pscustomobject]@{ Target; IsSessionRoot; Scope }`. `ScopeResolver` is invoked as `& $ScopeResolver $selector` with `$selector = ''` for the session root and the target path otherwise, and returns an epic-scope result object (`IsEpicScope`, `Reason`, `Checkpoint`, `CheckpointPath`, `MergeInProgress`).
+
+**Resolution rules** (FR-3; first failing rule decides; Detail tokens in backticks):
+
+- R0 Session root: normalized by function 1; not matching `^[A-Za-z]:/` or `^/(?!/)` gives `session-root-not-absolute`.
+- R1 Path leg (`-FilePath` non-empty): each path normalized by function 1; an absolute path (same pattern as R0) carrying a `.` or `..` segment gives `path-dot-segment`; any other absolute path contributes itself; a relative path contributes the session root.
+- R2 Command leg: records from `SEGMENT_READER`; a record with `Unbalanced` true gives `segment-unbalanced`. A command with no records contributes the session root.
+- R3 A record whose `CommandWord` equals (ordinal case-insensitive) `cd`, `pushd`, `popd`, `chdir`, `Set-Location`, `sl`, `Push-Location`, or `Pop-Location` gives `directory-change`.
+- R4 A record with `IsWrapperLed` or `HasLiveSubstitution` true for which `WRAPPER_GIT_MATCHER` reports command word `git` with subcommand path `add` or `commit` gives `wrapper-git`. Such a record that does not invoke `git` contributes the session root.
+- R5 A record whose `RawText` contains (ordinal case-insensitive) `GIT_DIR`, `GIT_WORK_TREE`, `GIT_COMMON_DIR`, or `GIT_INDEX_FILE`, or a `git` record carrying a global option `--git-dir`, `--work-tree` (separate or `=` form), or `-c` whose value begins `core.worktree` (case-insensitive), gives `git-relocation`.
+- R6 For a record whose `CommandWord` is `git`, global options are walked from the token after `git` with `GIT_OPTION_TABLE` until the first non-option token. A dash-leading token in neither list gives `git-option-unmodeled`. Every `-C` value is collected: a missing value gives `selector-missing-value`; a value containing `\` gives `selector-backslash`; a value not matching `^[A-Za-z]:/` or `^/(?!/)` gives `selector-not-absolute`; a value with a `.` or `..` segment gives `selector-dot-segment`; otherwise the value is a target. A `git` record with no `-C` contributes the session root (D4). Every other non-directory-changing record contributes the session root.
+- R7 `Targets` is the ordinal case-insensitive distinct set, in first-seen order.
+
+**Verdict rules** (function 4; evaluated in order; each distinct key, compared ordinal case-insensitive, is resolved at most once, and a target equal to the session root reuses the session-root scope):
+
+- V1 Resolve the session-root scope and, when `TargetResult.Resolved`, every target scope.
+- V2 When no resolved scope has `IsEpicScope` true or `Reason` equal to `target-worktree-ambiguous`, return `Verdict = 'none'`.
+- V3 `TargetResult.Resolved` false: `deny`, `target-unresolvable`, Detail from the target result.
+- V4 Any target scope with `Reason` `target-worktree-ambiguous`: `deny`, `target-ambiguous`.
+- V5 Any target scope with `Reason` `selector-unresolved`: `deny`, `target-unresolvable`, Detail `selector-unresolved: <target>`.
+- V6 Any target scope with `IsEpicScope` false: `deny`, `target-mixed`, Detail `<target>`.
+- V7 Otherwise `evaluate`, with one `Evaluations` entry per target.
+
+**Decision functions (FR-4).** `Get-OrchestrationEpicScopeDecision` keeps its name, parameters, and the leading guard `if (-not $Command -and -not $FilePath) { return $null }` on both surfaces.
+
+- Claude: `ScopeResolver` calls `Resolve-EpicScopeCheckpoint -Text ([string]$Command) -SessionRoot <session root> -WorktreeSelector $selector -MatchWorktreeHead`. The path leg passes `-FilePath @($FilePath)`.
+- Codex: `ScopeResolver` calls `Resolve-EpicScopeCheckpoint -SessionRoot <session root> -WorktreeSelector $selector`. When `Get-OrchestrationPatchMarkerPath -PatchText $Command` returns one or more paths, the call is a path leg with those paths and an empty command.
+- Session root: `(Get-Location).Path`, unchanged from today.
+- `Verdict = 'none'` returns `$null`. `deny` returns `Get-OrchestrationPreimplementationGateBlockDecision` with the reason built from the formats below. `evaluate` runs `Get-EpicCommandLegReadinessFailure -Checkpoint $scope.Checkpoint -MergeInProgress $scope.MergeInProgress` per evaluation in order; the first failure denies; no failure returns `Get-OrchestrationPreimplementationGateAllowDecision`.
+- A readiness failure of an evaluation whose `IsSessionRoot` is true returns the existing reason text byte-for-byte (`PREIMPLEMENTATION_GATE_BLOCKED: this epic-scope operation was evaluated against ...`). A readiness failure of any other evaluation uses the `target-not-ready` format.
+- `Get-OrchestrationEpicScopeSelector` stays unchanged on both surfaces (Claude `Resolve-OrchestrationGateTarget` and the Codex selector tests still use it; FU-5).
+- Each epic-scope file dot-sources the targets file with the single line `. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-targets.ps1')` placed with its existing imports, and its header `.NOTES` names the new call-time dependencies.
+
+**Deny reason formats** (each is one string; `<...>` are runtime values):
+
+- `PREIMPLEMENTATION_GATE_BLOCKED: target-unresolvable: the target worktree of this epic-scope operation cannot be resolved (<Detail>). Implementation operations in epic scope require every command segment and path to name an absolute, resolvable target.`
+- `PREIMPLEMENTATION_GATE_BLOCKED: target-ambiguous: more than one worktree claims the epic integration branch for target <target>. Implementation operations in epic scope require an unambiguous target worktree.`
+- `PREIMPLEMENTATION_GATE_BLOCKED: target-mixed: target <target> is not in the epic scope that governs this operation. Implementation operations in epic scope may not also target a worktree outside it.`
+- `PREIMPLEMENTATION_GATE_BLOCKED: target-not-ready: the epic-scope target <target> was evaluated against <CheckpointPath>, and the failed readiness predicate is '<failure>'. Implementation operations in epic scope require that checkpoint to satisfy every readiness predicate, and a production path may be staged or edited only while a merge is in progress.`
+
+## 5. Test content
+
+All new test files: `#Requires -Version 7.0`, `#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }`, a header comment naming the issue and stating that the file creates no file and starts no child process, LF line endings, Arrange-Act-Assert comments, one behavior per `It`, assertions with `-Because`. Paths are resolved from `$PSScriptRoot` with `Join-Path`. Mocks register in `BeforeAll` or the `It` before the act step and mock seams by name, never a blanket mock of the unit under test.
+
+### 5.1 OperandNormalization suite (NEW-732)
+
+`tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.OperandNormalization.Tests.ps1`. Structure follows the ChainEscape suite: `Describe 'preimplementation gate helpers operand normalization (<Surface>)' -ForEach @( @{ Surface = '.claude/hooks' }, @{ Surface = '.codex/hooks' } )`, `BeforeAll` dot-sources `<Surface>/enforce-orchestration-preimplementation-gate-helpers.ps1`; `It 'denies <Label>' -ForEach <deny rows>` asserts `Test-ExemptOrchestrationStagingCommand -CommandText $Command` is `$false`; `It 'admits <Label>' -ForEach <allow rows>` asserts `$true`. Labels and commands (PowerShell literal text):
+
+| ID | Label | Command | Before fix |
+| --- | --- | --- | --- |
+| D01 | `the issue 732 brace-expansion shape` | `'git add docs/features/active/{..,..}/{..,..}/{..,..}/src/prod.ts'` | fails |
+| D02 | `the issue 732 escaped dot-segment shape` | `'git add docs/features/active/.\./.\./.\./src/x.ps1'` | fails |
+| D03 | `an escaped semicolon in a message` | `'git commit -m a\;b -- docs/features/active/x/a.md'` | fails |
+| D04 | `an escaped ampersand in a message` | `'git commit -m a\&b -- docs/features/active/x/a.md'` | fails |
+| D05 | `an escaped pipe in a message` | `'git commit -m a\|b -- docs/features/active/x/a.md'` | fails |
+| D06 | `a mixed dot-backslash segment in an operand` | `'git add docs/features/active/x/.\./a.md'` | fails |
+| D07 | `a backslash-spelled operand` | `'git add docs\features\active\x\a.md'` | fails |
+| D08 | `a comma brace in an operand` | `'git add docs/features/active/x/{a,b}.md'` | fails |
+| D09 | `a range brace in an operand` | `'git add docs/features/active/x/{a..b}.md'` | fails |
+| D10 | `a brace in an unquoted message` | `'git commit -m {a,b} -- docs/features/active/x/a.md'` | fails |
+| D11 | `an unquoted comma in a message` | `'git commit -m a,b -- docs/features/active/x/a.md'` | fails |
+| D12 | `an unquoted at-sign name in a message` | `'git commit -m @msg -- docs/features/active/x/a.md'` | fails |
+| D13 | `an unquoted opening parenthesis in a message` | `'git commit -m a(b -- docs/features/active/x/a.md'` | fails |
+| D14 | `an unquoted closing parenthesis in a message` | `'git commit -m a)b -- docs/features/active/x/a.md'` | fails |
+| D15 | `a star glob under an exempt tree` | `'git add docs/features/active/x/*.md'` | fails |
+| D16 | `a question-mark glob under an exempt tree` | `'git add docs/features/active/x/a?.md'` | fails |
+| D17 | `a bracket glob under an exempt tree` | `'git add docs/features/active/x/[ab].md'` | fails |
+| D18 | `a leading slash` | `'git add /docs/features/active/x/a.md'` | passes (pin) |
+| D19 | `a leading double slash` | `'git add //docs/features/active/x/a.md'` | passes (pin) |
+| D20 | `a parent-directory segment` | `'git add docs/features/active/../../src/x.ps1'` | passes (pin) |
+| D21 | `a drive-letter operand` | `'git add C:/docs/features/active/x/a.md'` | passes (pin) |
+| D22 | `a tilde in an operand` | `'git add docs/features/active/x/~a.md'` | fails |
+| D23 | `a percent sign in an operand` | `'git add docs/features/active/x/%a.md'` | fails |
+| D24 | `a caret in an operand` | `'git add docs/features/active/x/a^.md'` | fails |
+| D25 | `an exclamation mark in an operand` | `'git add docs/features/active/x/a!.md'` | fails |
+| D26 | `an equals sign in an operand` | `'git add docs/features/active/x/a=b.md'` | fails |
+| D27 | `a plus sign in an operand` | `'git add docs/features/active/x/a+b.md'` | fails |
+| D28 | `a non-ASCII division-slash look-alike in an operand` | `('git add docs/features/active/x/a' + [char]0x2215 + 'b.md')` | fails |
+| A01 | `an ordinary operand under the epics tree` | `'git add docs/features/epics/x/epic.md'` | passes (pin) |
+| A02 | `an ordinary operand under the parallel tree` | `'git add docs/features/parallel/x/parallel.md'` | passes (pin) |
+| A03 | `an ordinary operand under the active tree` | `'git add docs/features/active/x/spec.md'` | passes (pin) |
+| A04 | `an ordinary operand under the potential tree` | `'git add docs/features/potential/x.md'` | passes (pin) |
+| A05 | `an ordinary operand under the orchestration artifacts tree` | `'git add artifacts/orchestration/epic-orchestrator-state.json'` | passes (pin) |
+| A06 | `an operand with a dot segment inside an exempt tree` | `'git add docs/features/active/x/./a.md'` | passes (pin) |
+| A07 | `a single-quoted message containing an opening brace` | `'git commit -m ''a{b'' -- docs/features/active/x/a.md'` | passes (pin) |
+| A08 | `a single-quoted message containing a comma` | `'git commit -m ''a,b'' -- docs/features/active/x/a.md'` | passes (pin) |
+| A09 | `a single-quoted message containing an opening parenthesis` | `'git commit -m ''a(b'' -- docs/features/active/x/a.md'` | passes (pin) |
+| A10 | `a single-quoted message containing an at sign` | `'git commit -m ''a@b'' -- docs/features/active/x/a.md'` | passes (pin) |
+
+Inventory: 38 rows per surface, 76 tests. Fail-before: the 24 rows marked `fails` per surface, 48 tests.
+
+### 5.2 Gate-level operand-bypass suites (NEW-732)
+
+`tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.OperandBypass.Tests.ps1`: `Describe 'enforce-orchestration-preimplementation-gate.ps1 exempt-operand bypass (issue #732)'`; `BeforeAll` reproduces the CommandExemption suite's setup exactly (dot-source `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`; import `EpicScopeResolution.psm1` and mock `Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }`; mock `Resolve-OrchestrationGateTarget` with the SessionRoot object; import `WorktreeRunResolution.psm1` with its two mocks); payload `@{ tool_name = 'Bash'; tool_input = @{ command = $Command } }`; `-CheckpointRaw` an explicitly not-ready checkpoint. `It 'denies the <Label> without an authorizing checkpoint' -ForEach` rows D01 and D02 of 5.1 (same labels and commands); assertions: `permissionDecision` is `deny`, and `permissionDecisionReason.StartsWith('PREIMPLEMENTATION_GATE_BLOCKED:')` is `$true`.
+
+`tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-operand-bypass.Tests.ps1`: same rows and assertions against `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` with mapped `tool_input` JSON `@{ command = $Command }`, `-CheckpointRaw` not-ready, and `Mock Get-EpicScopeCheckpointText { $null }`. Describe `Codex preimplementation gate exempt-operand bypass (issue #732)`.
+
+Fail-before: 2 tests per file.
+
+### 5.3 Intended reversals (D2A, line-neutral)
+
+- Claude and Codex CommandExemption suites, `It` anchored by the whole line `        It 'allows a backslash-spelled operand after separator normalization (D4 row 18)' {`: replace that line with `        It 'denies a backslash-spelled operand (D4 row 18 reversed by issues #732 and #735)' {`, the assertion line `                Should -Be 'allow' -Because 'backslashes normalize to forward slashes before the prefix test'` with `                Should -Be 'deny' -Because 'a backslash anywhere is shell-divergent and denies (issue #735)'`. Fail-before: 1 test per suite.
+- Claude and Codex CommandExemption suites, LACS allow 3: delete the whole line beginning `            @{ Label = 'issue #671 LACS allow 3 - backslash-spelled absolute selector normalized before the rooting test'` from the allow table and insert, immediately after the whole line beginning `            @{ Label = 'issue #671 LACS L7 - stray colon in the selector'` in the deny table, the line `            @{ Label = 'issue #732 LACS allow 3 reversed - backslash-spelled absolute selector'; Command = 'git -C C:\repo\wt add -- docs/features/active/x/spec.md' }`. Fail-before: 1 test per suite.
+- ChainEscape suite: replace `    It 'exempts a commit whose message contains an escaped semicolon' {` with `    It 'does not exempt a commit whose message contains an escaped semicolon (issue #732 D2a)' {`, `        $isExempt | Should -BeTrue -Because 'the shell runs one git commit whose message is fix;done'` with `        $isExempt | Should -BeFalse -Because 'under PowerShell this is a pathless commit followed by done (issue #735)'`. Fail-before: 1 test per surface, 2 total.
+
+### 5.4 AttributionTrailer additions (TRAILER, +5 lines)
+
+After the whole line beginning `        @{ Label = 'an empty single-quoted trailer value';` append to the admit table:
+`        @{ Label = 'a trailer option taking the double-dash separator as its value (CR-4)'; Command = 'git commit -m x --trailer -- docs/features/active/x/a.md' }`
+
+After the whole line beginning `        @{ Label = 'a typographic single quote around a non-exempt pathspec';` append to the deny table:
+`        @{ Label = 'a trailer option taking the double-dash separator before a non-exempt operand (CR-4)'; Command = 'git commit -m x --trailer -- src/x.ts' }`
+`        @{ Label = 'a single low-9 quotation mark (U+201A)'; Command = ('git commit -m ''a' + [char]0x201A + 'b'' -- docs/features/active/x/plan.md') }`
+`        @{ Label = 'a single high-reversed-9 quotation mark (U+201B)'; Command = ('git commit -m ''a' + [char]0x201B + 'b'' -- docs/features/active/x/plan.md') }`
+`        @{ Label = 'a double low-9 quotation mark (U+201E)'; Command = ('git commit -m ''a' + [char]0x201E + 'b'' -- docs/features/active/x/plan.md') }`
+
+These five rows run on both runtimes (10 tests) and pass before and after the fix (pins).
+
+### 5.5 Gate-level epic-scope target suites (NEW-738)
+
+Shared fixture model (both files): session root maps to `/synthetic-worktrees/epic-coordinator`; per-root HEAD map default `epic/sample-epic-integration` with `/synthetic-worktrees/epic-other` = `feature/standalone-item`; per-root merge map default `$true` with `/synthetic-worktrees/epic-child` = `$false`; the ascent mock returns `$null` for `/outside/*`, the first two path segments for `/synthetic-worktrees/<name>/...`, and `/synthetic-worktrees/epic-coordinator` otherwise; the epic checkpoint text is the ready epic JSON of the existing EpicScope suites unless a row says "no epic checkpoint". Every gate call passes `-CheckpointRaw` a not-ready single-feature checkpoint. Deny-code rows assert `permissionDecision` `deny`, `permissionDecisionReason.StartsWith('PREIMPLEMENTATION_GATE_BLOCKED: ')`, and `permissionDecisionReason.Contains('<code>')`.
+
+`tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScopeTargets.Tests.ps1` (Describe `enforce-orchestration-preimplementation-gate.ps1 epic-scope targets (issue #738)`; dot-source the Claude gate; seams mocked in module `EpicScopeResolution`: `Find-WorktreeResolutionRoot`, `Get-EpicScopeCheckpointText`, `Get-EpicScopeWorktreeHeadBranch`, `Test-EpicScopeMergeInProgress`, `Resolve-WorktreeEpicTarget` (SessionRoot status, except row C10); `Resolve-OrchestrationGateTarget` and the `WorktreeRunResolution` mocks as in the EpicScope suite):
+
+| ID | It name | Input | Expected | Before fix |
+| --- | --- | --- | --- | --- |
+| C01 | `denies a second segment that targets a different not-ready worktree` | Bash `git add scripts/powershell/A.ps1 && git -C /synthetic-worktrees/epic-child add scripts/powershell/B.ps1` | deny `target-not-ready` | fails |
+| C02 | `evaluates every value of a repeated -C selector` | Bash `git -C /synthetic-worktrees/epic-integration -C /synthetic-worktrees/epic-child add scripts/powershell/Sample.ps1` | deny `target-not-ready`; HEAD read invoked once for each of the two roots | fails |
+| C03 | `denies a relative -C selector in epic scope` | Bash `git -C subdir add scripts/powershell/Sample.ps1` | deny `target-unresolvable` | fails |
+| C04 | `denies an unresolvable -C selector in epic scope` | Bash `git -C /outside/elsewhere add scripts/powershell/Sample.ps1` | deny `target-unresolvable` | fails |
+| C05 | `denies a directory-changing segment in epic scope` | Bash `cd /synthetic-worktrees/epic-child && git add scripts/powershell/Sample.ps1` | deny `target-unresolvable` | fails |
+| C06 | `denies a wrapper-led git segment in epic scope` | Bash `nohup git -C /synthetic-worktrees/epic-child add scripts/powershell/Sample.ps1` | deny `target-unresolvable` | fails |
+| C07 | `denies a Write into a not-ready epic worktree` | Write `file_path` `/synthetic-worktrees/epic-child/scripts/powershell/Sample.ps1` | deny `target-not-ready` | fails |
+| C08 | `allows when every target is epic scope and ready` | Bash `git -C /synthetic-worktrees/epic-integration add scripts/powershell/A.ps1 && git -C /synthetic-worktrees/epic-coordinator add scripts/powershell/B.ps1` | allow | passes (pin) |
+| C09a | `keeps the single-feature decision for a relative -C selector outside epic scope` | no epic checkpoint; Bash `git -C subdir add scripts/powershell/Sample.ps1` | deny with reason `-BeExactly` the single-feature reason | passes (pin) |
+| C09b | `keeps the single-feature decision for a directory change outside epic scope` | no epic checkpoint; Bash `cd /synthetic-worktrees/epic-child && git add scripts/powershell/Sample.ps1` | same as C09a | passes (pin) |
+| C10 | `denies an ambiguous epic target` | `Resolve-WorktreeEpicTarget` returns `Status = 'Ambiguous'`; Bash `git add scripts/powershell/Sample.ps1` | deny `target-ambiguous` | fails |
+| C11 | `denies a target outside the epic scope of the session root` | Bash `git -C /synthetic-worktrees/epic-other add scripts/powershell/Sample.ps1` | deny `target-mixed` | fails |
+
+`tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope-targets.Tests.ps1` (Describe `Codex preimplementation gate epic-scope targets (issue #738)`; dot-source the Codex gate; plain-name mocks of the same four seams; mapped `tool_input` JSON): rows C01, C02, C03, C04, C05, C06, C08, C09a, C09b, C11 with the same inputs as `@{ command = ... }` and the same expectations, plus:
+
+| ID | It name | Input | Expected | Before fix |
+| --- | --- | --- | --- | --- |
+| X12 | `denies an apply_patch absolute file marker into a not-ready epic worktree` | `command` = `"*** Begin Patch`n*** Update File: /synthetic-worktrees/epic-child/scripts/powershell/Sample.ps1`n@@`n-old`n+new`n*** End Patch"` | deny `target-not-ready` | fails |
+| X13 | `resolves a segment without -C to the session root` | `command` = `git add scripts/powershell/Sample.ps1` | allow; HEAD read invoked once with `WorktreeRoot` `/synthetic-worktrees/epic-coordinator` | passes (pin) |
+
+Inventory: Claude 12 tests (9 fail before), Codex 12 tests (8 fail before).
+
+### 5.6 D3 intended changes to existing rows (line-neutral)
+
+- `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1`, `It 'epic scope ignores a text branch label and decides the -C selector worktree by its own HEAD'`: new name `It 'epic scope denies a -C selector worktree outside the session-root epic scope as target-mixed (issue #738)'`; the assertion `permissionDecisionReason | Should -BeExactly $script:SingleFeatureReason` becomes `permissionDecisionReason.Contains('target-mixed') | Should -BeTrue -Because 'the session root is epic scope and the selector worktree is not (D3)'`; the merge-probe assertion gains `-ParameterFilter { $WorktreeRoot -eq '/synthetic-worktrees/epic-other' }` and keeps `-Times 0 -Exactly`. Fails before the fix.
+- `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope.Tests.ps1`, `It 'a -C selector command whose selector HEAD differs returns the single-feature decision although the session-root HEAD matches'`: new name `It 'a -C selector command whose selector HEAD differs is denied as target-mixed when the session-root HEAD matches (issue #738)'`; the `-BeExactly $script:SingleFeatureReason` assertion becomes `.Contains('target-mixed') | Should -BeTrue`. Fails before the fix.
+
+### 5.7 Targets unit suite and parity suite (NEW-738)
+
+`tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.Tests.ps1`: `Describe 'preimplementation gate targets (<Surface>)' -ForEach` `.claude/hooks` and `.codex/hooks`; `BeforeAll` dot-sources `<Surface>/hook-command-scanner.ps1`, `<Surface>/hook-command-invocation.ps1`, then `<Surface>/enforce-orchestration-preimplementation-gate-targets.ps1`. Session root literal `/synthetic-worktrees/session`. Rows (each a named `It`, `-ForEach` where listed):
+
+- U01 path leg absolute `/synthetic-worktrees/other/a.ps1` gives `Targets` exactly that path.
+- U02 path leg relative `scripts/a.ps1` gives the session root.
+- U03 path leg `/synthetic-worktrees/other/../a.ps1` gives `Resolved` false, Detail starting `path-dot-segment`.
+- U04 path leg `C:\wt\a.ps1` gives `C:/wt/a.ps1`.
+- U05 two patch-marker paths, one absolute and one relative, give both targets in order.
+- U06 `git add "x` gives `segment-unbalanced`.
+- U07 `-ForEach` command words `cd`, `pushd`, `popd`, `chdir`, `Set-Location`, `sl`, `Push-Location`, `Pop-Location` (each as `<word> /x && git add a.ps1`) give `directory-change`.
+- U08 `nohup git add a.ps1` gives `wrapper-git`.
+- U09 `git add "$(echo a.ps1)"` gives `wrapper-git`.
+- U10 `timeout 60 pytest` resolves to the session root.
+- U11 `-ForEach` `GIT_DIR=/x git add a.ps1`, `GIT_WORK_TREE=/x git add a.ps1`, `GIT_COMMON_DIR=/x git add a.ps1`, `GIT_INDEX_FILE=/x git add a.ps1`, `export GIT_DIR=/x && git add a.ps1` give `git-relocation`.
+- U12 `-ForEach` `git --git-dir=/x add a.ps1`, `git --git-dir /x add a.ps1`, `git --work-tree /x add a.ps1`, `git -c core.worktree=/x add a.ps1` give `git-relocation`.
+- U13 `git -C /a -C /b add a.ps1` gives `Targets` `/a`, `/b`.
+- U14 `git -C sub add a.ps1` gives `selector-not-absolute`; `git -C //server/share add a.ps1` gives `selector-not-absolute`.
+- U15 `git -C /a/./b add a.ps1` and `git -C /a/../b add a.ps1` give `selector-dot-segment`.
+- U16 `git -C C:\wt add a.ps1` gives `selector-backslash`.
+- U17 `git -C` gives `selector-missing-value`.
+- U18 `git --bogus add a.ps1` gives `git-option-unmodeled`.
+- U19 `git add a.ps1 && git -C /a add b.ps1` gives `Targets` session root and `/a`.
+- U20 session root `relative/root` gives `session-root-not-absolute`; session root `C:\wt` normalizes to `C:/wt`.
+- U21 `Get-OrchestrationPatchMarkerPath` returns four paths for a patch with Add, Update, Delete, and Move markers, and an empty array for `git add a.ps1`.
+- U22 `-ForEach` verdict rows with an in-memory `ScopeResolver` scriptblock that returns fixed scope objects per selector: no epic scope gives `none`; unresolved target result with an epic session root gives `deny` `target-unresolvable`; ambiguous target gives `target-ambiguous`; `selector-unresolved` target gives `target-unresolvable`; non-epic target gives `target-mixed`; all-epic targets give `evaluate` with one evaluation per target and `IsSessionRoot` set only for the session-root key.
+- U23 a target equal to the session root invokes the resolver once (counted through a variable captured by the scriptblock).
+
+Every `Resolved` false row also asserts `ReasonCode` `target-unresolvable`.
+
+`tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.Parity.Tests.ps1`: identical in structure to `enforce-orchestration-preimplementation-gate-helpers.Parity.Tests.ps1` with file name `enforce-orchestration-preimplementation-gate-targets.ps1`, Describe `enforce-orchestration-preimplementation-gate-targets.ps1 surface parity (issue #738)`, and the same two cases (four SHA256 hashes, one distinct; each copy at most 500 lines).
+
+### 5.8 Documentation text (#745)
+
+**Q1 - quoting-rule append (FR-6.2).** Appended, after one space, to the end of the single physical line beginning `Quoting rules: ` in `.claude/skills/epic-plan/SKILL.md` and `.claude/skills/parallel-plan/SKILL.md`:
+
+```markdown
+Because the executing shell is undetermined (issue #735), a shape whose meaning differs between a POSIX shell and PowerShell is denied: a backslash anywhere in the command line is denied, and `{`, `}`, `,`, `(`, `)`, and `@` are denied outside quotes. Every staging operand must be a plain forward-slash repository-relative path that uses only the characters `A-Z a-z 0-9 . _ / -`.
+```
+
+**Q2 - `.agents` section (FR-6.1, FR-6.2, FR-6.3).** Inserted in `.agents/skills/epic-plan/SKILL.md` after the last paragraph of `## Integration Branch` and one empty line, followed by one empty line before `## Concurrent Preparation`. Each paragraph and bullet is one physical line:
+
+```markdown
+## Integration Commit Form
+
+The epic planner's own commits of the epic manifest, the fanned-in child feature folders and approved plans, and the kickoff copy are orchestration bookkeeping. `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` exempts them without a ready feature checkpoint only when the invocation is pathspec-bearing and every path operand lies inside `docs/features/epics/`, `docs/features/parallel/`, `docs/features/active/`, `docs/features/potential/`, or `artifacts/orchestration/`. A pathless commit, a whole-tree operand, or any operand outside those trees is denied.
+
+Admitted commit forms, each followed by `--` and the exempt path operands:
+
+- A single-quoted message containing `$`, for example `git commit -m 'docs: costs $5' -- <exempt paths>`.
+- A single-quoted message containing a backtick, for example ``git commit -m 'docs: fix `Foo`' -- <exempt paths>``.
+- The trailer option on `git commit` only, in the separate-value form `--trailer 'Co-Authored-By: Name <email>'` or the `--trailer=<value>` form, any number of times.
+
+Quoting rules: `$` and backtick are admitted only inside single quotes. `<`, `>`, and `#` are admitted only inside quotes. A typographic quote character (U+2018 to U+201E) is denied anywhere. Because the executing shell is undetermined (issue #735), a shape whose meaning differs between a POSIX shell and PowerShell is denied: a backslash anywhere in the command line is denied, and `{`, `}`, `,`, `(`, `)`, and `@` are denied outside quotes. Every staging operand must be a plain forward-slash repository-relative path that uses only the characters `A-Z a-z 0-9 . _ / -`.
+
+Not admitted: heredoc-fed messages, and message files supplied through `-F <file>` or `--file=<file>` (issue #732, decision D5).
+```
+
+## 6. Test sets
+
+- **NEW-732:** the three files of 5.1 and 5.2.
+- **D2A:** `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1`, `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1`, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.ChainEscape.Tests.ps1`.
+- **TRAILER:** `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.AttributionTrailer.Tests.ps1`.
+- **NEW-738:** the two files of 5.5, the two files of 5.7.
+- **AC738-EXISTING:** `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1`, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.OperandResolution.Tests.ps1`, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.WorktreeResolution.Tests.ps1`, `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope.Tests.ps1`, `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-resolution.Tests.ps1`, and every `tests/scripts/claude-lib/worktree-resolution/*.Tests.ps1`.
+- **HRS (regression set):** AC738-EXISTING, D2A, TRAILER, plus `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Tests.ps1`, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1`, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-classifier.Tests.ps1`, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-absolute-paths.Tests.ps1`, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.Parity.Tests.ps1`, `tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1`, `tests/scripts/claude-hooks/hook-command-scanner.Tests.ps1`, `tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1`, `tests/scripts/claude-hooks/PreToolUseSchema.Contract.Tests.ps1`, `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1`, `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.Tests.ps1`, `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-routing.Tests.ps1`, `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-trigger-scoping.Tests.ps1`, `tests/scripts/codex-hooks/codex-preimplementation-gate-absolute-paths.Tests.ps1`, `tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1`, `tests/scripts/codex-hooks/enforce-completion-consistency-epic-scope.Tests.ps1`, `tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1`, `tests/scripts/codex-hooks/hook-command-scanner.Tests.ps1`, `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`. [P0-T10] records `HRS_MISSING:` for any member absent after the merge; an absent member is dropped from every run and listed in every Pester artifact.
+- **ALL-SCOPED:** HRS plus NEW-732 plus NEW-738, plus `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.C1bCoverage.Tests.ps1` when the [P7-T7] remediation branch has created it.
+- **COV-FILES:** `.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1`, `.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1`, `.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1`, `.codex/hooks/enforce-orchestration-preimplementation-gate-targets.ps1`, `.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`, `.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`, `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`.
+- **PYTEST-CONTRACTS:** `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`, `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`, `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py`, `tests/scripts/dev_tools/test_codex_core_manifest_closure.py`.
+
+## 7. Scripts (rule-3 route)
+
+- **R-SCOPED <files>.** `$ErrorActionPreference = 'Stop'`; `Import-Module Pester -MinimumVersion 5.0.0`; `$c = New-PesterConfiguration`; `$c.Run.Path = @(<files>)`; `$c.Run.PassThru = $true`; `$c.Output.Verbosity = 'Normal'`; `$r = Invoke-Pester -Configuration $c`; print `PassedCount: <n>`, `FailedCount: <n>`, `FailedBlocksCount: <n>`, `FailedContainersCount: <n>`, one `FAILED: <ExpandedPath>` per failed test, one `PASSED: <ExpandedPath>` per passed test; exit 1 when any failed count is non-zero, else 0.
+- **R-COV <files>.** R-SCOPED over ALL-SCOPED plus `$c.CodeCoverage.Enabled = $true`, `$c.CodeCoverage.Path = @(<COV-FILES present on disk>)`, `$c.CodeCoverage.OutputPath = '<SCRATCHPAD>/c1b.coverage.xml'`. Per file: executed = distinct `Line` of `$r.CodeCoverage.CommandsExecuted` for that file; missed = distinct `Line` of `CommandsMissed` not in executed; print `LINE_COVERAGE: <path> covered=<n> missed=<n> percent=<2 decimals>` and `MISSED_LINES: <path> <lines or none>`. Changed lines: for a file present at `BASE_SHA` (`git cat-file -e <BASE_SHA>:<path>` exit 0), the `+` line ranges of `git diff -U0 <BASE_SHA> -- <path>`; otherwise every line. Print one `CHANGED_LINE: <path>:<line> executed|missed|not-a-command` per changed line.
+- **R-DETECT.** For every path named in a P0-T10 anchor row print `LINES: <path> <count>` and `CR_PRESENT: <path> <True|False>`; for the four helpers copies `SHA256: <path> <hash>` and `BYTE_IDENTICAL: <True|False>`; for every anchor `ANCHOR: <id> count=<n> line=<first or 0> region=<region or none>`; for the canonical helpers file `FUNCTION: <name> start=<line>` for each `function <Name> {` line; `PARSE_ERRORS: <n>` for every file a task names as parsed; `FUNCTION_UNCHANGED: <path> <name> <True|False>` for every function a task names, comparing the function's AST extent text with the same function parsed from `git show <BASE_SHA>:<path>`; and the token counts a task names as `TOKEN: <path> <token> lines=<n>` (`Select-String -SimpleMatch`).
+- **R-FMTCHECK (read-only).** Import `scripts/powershell/PoshQC/PoshQC.psm1`; run `Invoke-PoshQCFormat -Root $root -WriteFile { param([string] $Path, [string] $Content) } 6>&1` capturing each record as a string; print `FORMAT_CHANGED_COUNT: <records beginning Formatted: >`, `FORMAT_ALREADY_COUNT: <records beginning Already formatted: >`, and `FORMAT_CHANGED: <relative path>` per changed record.
+- **R-FORMAT (write mode, write set only).** Import `PSScriptAnalyzer`. For every `.ps1` file of the section-2 write set that is canonical (not a byte copy) and exists: read with `Get-Content -Raw`, replace CRLF with LF, run `Invoke-Formatter -ScriptDefinition <text> -Settings scripts/powershell/PoshQC/settings/pssa.settings.psd1`; when the result differs, write it back with `Set-Content -NoNewline -Encoding utf8` and print `Formatted: <path>`, otherwise print `Already formatted: <path>`. Print `FORMAT_CHANGED_COUNT: <n>` and `FORMAT_ALREADY_COUNT: <n>`. When a canonical production file is reformatted, R-MIRROR re-runs for each of its byte copies before the loop restarts.
+- **R-ANALYZE.** Import `scripts/powershell/PoshQC/PoshQC.psm1`; inside `try` run `Invoke-PoshQCAnalyze -Root $root 6>&1`, print every record with the root replaced, print `ANALYZE_RESULT: passed` when a record begins `PSScriptAnalyzer passed: no findings under`, exit 0; in `catch` print `ANALYZE_RESULT: failed <message>` and exit 1.
+- **R-FULL.** Script A prints `RUN_START_UTC: <time>`, imports `scripts/powershell/PoshQC/PoshQC.psm1`, runs `Invoke-PoshQCTest -Root $root`. Script B reads `artifacts/pester/pester-junit.xml` and prints `JUNIT_LAST_WRITE_UTC:`, `JUNIT_TESTS:`, `JUNIT_FAILURES:`, `JUNIT_ERRORS:`, one `JUNIT_SUITE: <relative path> tests=<n> failures=<n> errors=<n>` per `testsuite`, one `JUNIT_FAILED: <relative path> :: <testcase name>` per failing case, and `JUNIT_SUITE_MISSING: <path>` for any NEW-732 or NEW-738 file with no suite or `tests=0` once those files exist.
+- **R-MIRROR <source> <destination>.** `Copy-Item -LiteralPath <source> -Destination <destination> -Force`; print `MIRROR: <source> -> <destination> source_sha256=<hash> destination_sha256=<hash>`; exit 1 when the hashes differ.
+- **R-API.** Parse `.claude/hooks/hook-command-invocation.ps1` and `.claude/hooks/hook-command-scanner.ps1` with `[System.Management.Automation.Language.Parser]::ParseFile`. Print `API: <file> | <function> | params: <name:type,...> | outputtype: <OutputType value or none>` per function; `RECORD_KEYS: <function> | <keys>` for every `[pscustomobject]@{...}` literal in the scanner; `INVOCATION_DOTSOURCES_SCANNER: <True|False>`. Dot-source the invocation file and print `GIT_WITH_ARGUMENT: <(Get-CommandLineGlobalOption -CommandWord git).WithArgument -join ' '>` and `GIT_STANDALONE: <...Standalone...>`. Inside function `Resolve-CommandLineInvocation`, print `WRAPPER_MATCHER_CANDIDATE: <command name> | params: <names>` for every command invoked inside an `if` condition whose text contains `IsWrapperLed`.
+- **R-CALLS <file>.** Parse the file; print `DEFINED: <name>` per function and `EXTERNAL_CALL: <name>` per distinct `CommandAst` name that is not defined in the file; print `TOKEN_SPLIT: <lines containing Split-OrchestrationCommandLine>` and `TOKEN_CONVERT: <lines containing ConvertTo-OrchestrationCommandToken>`.
+- **R-LINES <files>.** Print `LINES: <path> <(Get-Content -LiteralPath <path>).Count>` and `OVER_500: <path>` when above 500.
+- **R-LINELEN.** For the four helpers copies print `LONGEST_ADDED: <path> <n>` over the `+` lines of `git diff -U0 <BASE_SHA> -- <path>`, `OVER_120: <path>:<line> <length>` for each added line above 120, and `BACKSLASH_TEST_LENGTH: <path> <length of the line containing CommandText.Contains('\')>`.
+- **R-NOPY.** For every path listed by `git diff --name-only <BASE_SHA> HEAD -- .claude/hooks .codex/hooks extensions/drm-copilot/resources/claude-customizations/.claude/hooks extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks`: print `PY_FILE: <path>` when it ends `.py`; dot-source `tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1` and print `PY_FINDINGS: <path> <(Get-PythonInvocationFinding -ScriptText <text> -SourceLabel <path>).Count>` for each `.ps1` path.
+- **R-PORT <files>.** Print `TOKEN: <path> <token> matches=<n>` (simple match) for `TestDrive`, `New-TemporaryFile`, `GetTempFileName`, `$env:TEMP`, `Set-Content`, `Out-File`, `New-Item`, `Set-Location`.
+- **R-DOCTOKENS.** For each of the six skill documents print `DOC_TOKEN: <path> <token> lines=<n>` (`Select-String -SimpleMatch`) for the tokens of [P6-T5], and `PAIR_IDENTICAL: <canonical> <True|False>` for each canonical-mirror pair by SHA256.
+
+---
+
+### Phase 0 — Upstream dependency gate, policy reads, and baselines
+
+- [ ] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/powershell.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md`, `.claude/rules/plan-acceptance-gates.md`, `.claude/skills/atomic-plan-contract/SKILL.md`, `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, and `.claude/skills/acceptance-criteria-tracking/SKILL.md`, and write `<FEATURE>/evidence/baseline/phase0-instructions-read.md` with `Timestamp:`, `Policy Order:`, and one `Read: <path>` line per file in that order. Done when the artifact lists all ten paths.
+- [ ] [P0-T2] Read `<FEATURE>/issue.md`, `<FEATURE>/spec.md`, `<FEATURE>/research/research.2026-10-08T14-00.md`, and `docs/features/epics/enforcement-hook-precision/epic.md`, and write `<FEATURE>/evidence/baseline/p0-feature-inputs-read.md` recording `WORK_MODE: full-bug`, `SPEC_AC_UNCHECKED: <count of lines beginning - [ ] between the lines ## Acceptance Criteria and ## Risks & Mitigations of spec.md>`, and `EPIC_DEPENDS_ON_732: [824, 565]`. Done when `SPEC_AC_UNCHECKED: 30`; any other count stops as BLOCKED.
+- [ ] [P0-T3] Run `gh issue view 732 --json body,comments`, `gh issue view 738 --json body,comments`, `gh issue view 745 --json body,comments`, and `gh issue view 735 --json body,comments`, and write `<FEATURE>/evidence/baseline/p0-issue-comments.md` with each exit code, each comment count, and, for every comment whose `createdAt` is later than `2026-10-08T14:30`, its author, `createdAt`, and first 300 characters as `NEW_COMMENT:` lines. Done when all four exit codes are 0 and no `NEW_COMMENT:` line exists; one or more `NEW_COMMENT:` lines stop the plan as BLOCKED for operator review of possible overriding decisions.
+- [ ] [P0-T4] Run `git rev-parse --abbrev-ref HEAD` and `git status --porcelain` and write `<FEATURE>/evidence/baseline/p0-branch-state.md`. Done when the branch is `bug/exempt-operand-bypass-brace-and-dot-segments-732` and porcelain lists no path outside `docs/features/active/2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732/`.
+- [ ] [P0-T5] Run `git fetch origin` then `git rev-parse origin/epic/enforcement-hook-precision-integration` and write `<FEATURE>/evidence/baseline/p0-fetch.md` with both exit codes and `BASE_SHA: <sha>`. Done when both exit 0 and `BASE_SHA` is a 40-character hash.
+- [ ] [P0-T6] Run `git log --format=%H%x09%s origin/epic/enforcement-hook-precision-integration` and write `<FEATURE>/evidence/other/upstream-merge-verification.md` recording `C1A_MERGED: <sha> <subject>` for the first commit whose subject contains `false-positive-deny-824` or `(824)`, and `C2_MERGED: <sha> <subject>` for the first whose subject contains `feature-folder-565` or `(565)`, plus `C1A_FOLDER:` and `C2_FOLDER:` with the matching `docs/features/` directories listed by `git ls-tree -d -r --name-only origin/epic/enforcement-hook-precision-integration -- docs/features` (or `none`). Done when both `C1A_MERGED` and `C2_MERGED` carry a SHA; a missing one stops the plan as BLOCKED with `UPSTREAM_NOT_MERGED: <824|565>`.
+- [ ] [P0-T7] Run `git merge --no-edit origin/epic/enforcement-hook-precision-integration`, then `git merge-base --is-ancestor origin/epic/enforcement-hook-precision-integration HEAD`, then `git rev-parse HEAD`, and write `<FEATURE>/evidence/baseline/p0-integration-merge.md` with the merge output summary (`Already up to date.` or the merge commit), `ANCESTOR_EXIT: <n>`, and `HEAD_SHA: <sha>`. Done when the merge exits 0 and `ANCESTOR_EXIT: 0`; a conflict is followed by `git merge --abort` and stops the plan as BLOCKED. No rebase and no push in this task.
+- [ ] [P0-T8] Run `git ls-files --error-unmatch docs/features/active/2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732/research/research.2026-10-08T14-00.md` and `git log --format=%H origin/epic/enforcement-hook-precision-integration..HEAD -- .codex/hooks extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks` and write `<FEATURE>/evidence/other/research-commit-precedence.md` with `RESEARCH_TRACKED_EXIT: <n>` and `CODEX_HOOK_COMMITS: <count>`. Authorized branch: when `RESEARCH_TRACKED_EXIT` is non-zero, stage and commit `<FEATURE>/research/research.2026-10-08T14-00.md`, `<FEATURE>/spec.md`, and `<FEATURE>/issue.md` by the rule-11 form with subject `docs(732): record C1b research and spec`, then re-run the first command. Done when `RESEARCH_TRACKED_EXIT: 0` and `CODEX_HOOK_COMMITS: 0`.
+- [ ] [P0-T9] Run R-API and `git diff --quiet origin/epic/enforcement-hook-precision-integration -- .claude/hooks/hook-command-invocation.ps1 .claude/hooks/hook-command-scanner.ps1 .codex/hooks/hook-command-invocation.ps1 .codex/hooks/hook-command-scanner.ps1`, and write `<FEATURE>/evidence/other/c1a-api-verification.md` with every R-API line, `UNCHANGED_FROM_INTEGRATION_EXIT: <n>`, and the selections `SEGMENT_READER: Read-CommandLineSegment`, `SEGMENT_FIELDS: RawText Tokens CommandWord IsWrapperLed HasLiveSubstitution Unbalanced`, `GIT_OPTION_TABLE: Get-CommandLineGlobalOption`, and `WRAPPER_GIT_MATCHER: <the single WRAPPER_MATCHER_CANDIDATE name>`. Done when the diff exits 0, an `API:` line exists for `Read-CommandLineSegment` with a `CommandText` parameter and for `Get-CommandLineGlobalOption` with a `CommandWord` parameter, one `RECORD_KEYS:` line contains all six SEGMENT_FIELDS names, `GIT_WITH_ARGUMENT` contains `-C`, `-c`, `--git-dir`, and `--work-tree`, and exactly one `WRAPPER_MATCHER_CANDIDATE` exists whose params include `CommandWord` and `SubcommandPath`. Any unmet condition is recorded as `C1A-API-BLOCKER: <condition>` and stops the plan as BLOCKED before any edit; no successor name is chosen by the executor.
+- [ ] [P0-T10] Run R-DETECT over the anchors below and write `<FEATURE>/evidence/baseline/p0-detect.md`, recording `HRS_MISSING:` lines for any absent section-6 HRS member. Anchors: every section-3 old line (E1 insertion line, K1 to K6, the first and last E3 lines, B1, B2, the first line of E5, `function Test-ExemptOrchestrationOperand {`, S1 to S3) in the canonical helpers file; `    Blocks implementation operations before orchestration readiness exists.` in `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`; `function Get-OrchestrationEpicScopeDecision {` in both epic-scope files; every section-5.3, 5.4, and 5.6 old line in its file; the `$script:SharedModuleNames = @(` line in `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`; the modes-file entry line of each `pack-manifests/core.json`; the `Quoting rules: ` line of the two `.claude` skill documents; and `## Integration Branch` and `## Concurrent Preparation` in `.agents/skills/epic-plan/SKILL.md`. Done when `BYTE_IDENTICAL: True`, every anchor has `count=1` (the E1 insertion line and every E3, E5, and E6 anchor in its expected region), `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` has `LINES` at most 493, each epic-scope file at most 420, the AttributionTrailer suite at most 495, and every other edited test file at most 500. Any failed condition stops the plan as BLOCKED with the R-DETECT output as plan-revision input.
+- [ ] [P0-T11] Run `git hash-object .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1` and write `<FEATURE>/evidence/baseline/p0-helpers-hash-object.md` with the four object IDs. Done when the command exits 0 and the four IDs are equal.
+- [ ] [P0-T12] Read `artifacts/orchestration/orchestrator-state.json` and write `<FEATURE>/evidence/baseline/p0-execution-route.md` with `ROUTE_ID: <route_id or path_selected>`, `NEXT_STEP: <value>`, and `TERMINAL: <True when next_step is complete or completed_steps contains S12_complete>`. Done when `ROUTE_ID` is `large` or `remediation` and `TERMINAL: False`; otherwise the plan stops as BLOCKED with `ROUTE_REQUIRED: large (five production PowerShell files, rule 8)`.
+- [ ] [P0-T13] Run R-FMTCHECK and write `<FEATURE>/evidence/baseline/p0-poshqc-format.md` with `FORMAT_CHANGED_COUNT`, `FORMAT_ALREADY_COUNT`, and every `FORMAT_CHANGED:` line in `Output Summary:`. Done when the script exits 0 and the counts are recorded; a non-zero `FORMAT_CHANGED_COUNT` is recorded as pre-existing drift (`B_FORMAT` set) and does not stop the plan.
+- [ ] [P0-T14] Run R-ANALYZE and write `<FEATURE>/evidence/baseline/p0-poshqc-analyze.md`. Done when the artifact records `ANALYZE_RESULT: passed` or `ANALYZE_RESULT: failed <message>`; a failure is recorded as the pre-existing finding set `B_ANALYZE` and does not stop the plan.
+- [ ] [P0-T15] Run R-SCOPED over HRS and write `<FEATURE>/evidence/baseline/p0-pester-scoped.md` with the four counts in `Output Summary:` and every `FAILED:` line as set `B_SCOPED`. Done when the counts are numeric and `B_SCOPED` is recorded (possibly empty).
+- [ ] [P0-T16] Run R-COV with ALL-SCOPED reduced to HRS and COV-FILES reduced to the five files present at `BASE_SHA`, and write `<FEATURE>/evidence/baseline/p0-coverage.md` with one `LINE_COVERAGE:` and one `MISSED_LINES:` line per file and the numeric percentages in `Output Summary:`. Done when five numeric `percent=` values are recorded.
+- [ ] [P0-T17] Run R-FULL script A then script B and write `<FEATURE>/evidence/baseline/p0-pester-full.md` with the runner summary line (`Tests Passed: <n>, Failed: <n>, ...`), `JUNIT_TESTS`, `JUNIT_FAILURES`, `JUNIT_ERRORS`, and every `JUNIT_FAILED:` line as set `B_FULL`. Done when `JUNIT_LAST_WRITE_UTC` is later than `RUN_START_UTC` and the counts are numeric.
+- [ ] [P0-T18] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py tests/scripts/dev_tools/test_codex_core_manifest_closure.py -q` and write `<FEATURE>/evidence/baseline/p0-pytest-contracts.md` with the final summary line verbatim and every `FAILED` node ID. Done when the summary reports `0 failed` or matches rule 13.
+- [ ] [P0-T19] Commit the Phase 0 evidence files under `<FEATURE>/evidence/` by the rule-11 form with subject `docs(732): record phase 0 baselines and upstream verification` and push. Done when `git show --name-only --format=%H HEAD` lists only paths under `<FEATURE>/evidence/`, `git status --porcelain` lists none of them, and `PUSH_EXIT: 0` is appended to `<FEATURE>/evidence/other/commits-log.md`.
+
+### Phase 1 — #732 fail-before regression tests and intended reversals
+
+- [ ] [P1-T1] Write `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.OperandNormalization.Tests.ps1` with the structure and the 38 rows of section 5.1. Done when R-SCOPED over the file reports `PassedCount` plus `FailedCount` equal to 76 and `FailedContainersCount: 0` (pass/fail split is asserted in [P1-T10]).
+- [ ] [P1-T2] Write `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.OperandBypass.Tests.ps1` per section 5.2. Done when R-SCOPED over the file reports 2 tests and `FailedContainersCount: 0`.
+- [ ] [P1-T3] Write `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-operand-bypass.Tests.ps1` per section 5.2. Done when R-SCOPED over the file reports 2 tests and `FailedContainersCount: 0`.
+- [ ] [P1-T4] Edit `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1` with both section-5.3 CommandExemption changes (D4 row 18 and LACS allow 3). Done when R-LINES reports the same line count as [P0-T10] for the file and R-DETECT reports `count=0` for both old anchors and `count=1` for both new lines.
+- [ ] [P1-T5] Edit `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-command-exemption.Tests.ps1` with the same two section-5.3 changes. Done when the same line-count and anchor conditions as [P1-T4] hold for this file.
+- [ ] [P1-T6] Edit `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.ChainEscape.Tests.ps1` with the section-5.3 ChainEscape change. Done when R-LINES reports the [P0-T10] line count and R-DETECT reports `count=1` for the new `It` line `does not exempt a commit whose message contains an escaped semicolon (issue #732 D2a)`.
+- [ ] [P1-T7] Edit `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.AttributionTrailer.Tests.ps1` with the five section-5.4 rows. Done when R-LINES reports the [P0-T10] count plus 5 and R-DETECT reports `count=1` for each of the five new lines.
+- [ ] [P1-T8] Run R-PORT over the seven NEW-732, D2A, and TRAILER files and write `<FEATURE>/evidence/qa-gates/phase1-test-portability.md`. Done when every `TOKEN:` line in the three new files reports `matches=0` and every edited file reports the same counts as its `BASE_SHA` version (re-run R-PORT on `git show <BASE_SHA>:<path>` text for comparison).
+- [ ] [P1-T9] Run R-LINES over the seven files and write `<FEATURE>/evidence/qa-gates/phase1-line-counts.md`. Done when no `OVER_500:` line is printed.
+- [ ] [P1-T10] [expect-fail] Before any helpers edit, run R-SCOPED over NEW-732, D2A, and TRAILER and write `<FEATURE>/evidence/regression-testing/fail-before-732.md` with `ExpectedExitCode: 1`, the four counts, and every `FAILED:` line. Done when `EXIT_CODE: 1`, `FailedContainersCount: 0`, `FailedBlocksCount: 0`, and the `FAILED:` set equals exactly: the 48 section-5.1 `fails` rows (24 per surface, including both rows `denies the issue 732 brace-expansion shape` and `denies the issue 732 escaped dot-segment shape` on both surfaces), the 4 section-5.2 rows, the 2 D4 row 18 rows, the 2 LACS allow 3 reversed rows, and the 2 ChainEscape rows, for `FailedCount: 58`. Every section-5.4 row appears as `PASSED:`. A different set stops the plan as BLOCKED.
+- [ ] [P1-T11] Commit the seven test files and the Phase 1 evidence by the rule-11 form with subject `test(732): add fail-before rows for exempt-operand bypass and intended reversals` and push. Done when `git show --name-only --format=%H HEAD` lists exactly those paths, `git status --porcelain` lists none of them, and `PUSH_EXIT: 0` is logged.
+
+### Phase 2 — #732, #735, #745 helpers fix and Codex gate header
+
+- [ ] [P2-T1] Edit `.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1` with edits E1 to E7 of section 3. Done when the file parses without error (`[System.Management.Automation.Language.Parser]::ParseFile` reports zero errors, recorded in [P2-T2]).
+- [ ] [P2-T2] Run R-DETECT on the canonical helpers file and write `<FEATURE>/evidence/qa-gates/helpers-edit-anchors.md` with `PARSE_ERRORS: <n>`, every section-3 old anchor count, every new line count, and, within region `Test-ExemptOrchestrationOperand`, `TOKEN` counts for `-replace`, `literalPrefix`, and `PathspecWildcardCharacters`. Done when `PARSE_ERRORS: 0`, every old anchor reports `count=0`, every new line (K1 to K6, B1, B2, S1 to S3, the E6 `-cnotmatch` line) reports `count=1`, the three region tokens report `lines=0`, and the line `$script:OutsideQuoteCommandCharacters = [char[]]@('>', '<', '#', '{', '}', ',', '(', ')', '@')` reports `count=1`.
+- [ ] [P2-T3] Run R-MIRROR from `.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1` to each of `.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1`. Done when all three R-MIRROR runs exit 0 and their `MIRROR:` lines are appended to `<FEATURE>/evidence/other/mirror-log.md`.
+- [ ] [P2-T4] Run `git hash-object` over the four helpers copies (same argument list as [P0-T11]) and write `<FEATURE>/evidence/qa-gates/helpers-hash-object.md`. Done when the four object IDs are equal and differ from the [P0-T11] ID.
+- [ ] [P2-T5] Edit `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` with the section-3 Codex gate header insertion. Done when the file parses with zero errors and R-LINES reports the [P0-T10] count plus 7.
+- [ ] [P2-T6] Run R-MIRROR from `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`. Done when R-MIRROR exits 0 and the line is appended to the mirror log.
+- [ ] [P2-T7] Run R-DETECT token counts and write `<FEATURE>/evidence/qa-gates/header-735-tokens.md`: for the four helpers copies `TOKEN` `issue #735` and `undetermined per command`; for both Codex gate copies `TOKEN` `issue #735`, `undetermined per command`, `no workdir`, and `session root is the`. Done when every listed count is at least 1 and the four helpers copies report equal counts.
+- [ ] [P2-T8] Run R-SCOPED over NEW-732, D2A, and TRAILER and write `<FEATURE>/evidence/regression-testing/pass-after-732.md`. Done when `FailedCount: 0`, `FailedBlocksCount: 0`, `FailedContainersCount: 0`, and `PassedCount` equals the [P1-T10] `PassedCount` plus 58.
+- [ ] [P2-T9] Run R-SCOPED over HRS and write `<FEATURE>/evidence/qa-gates/phase2-hrs.md`. Done when the `FAILED:` set is a subset of `B_SCOPED` and no protected-suite test fails (rule 12); any other failing test stops the plan as BLOCKED with `UNPLANNED_REVERSAL: <name>` (spec D2a lists the reversals exhaustively).
+- [ ] [P2-T10] Run R-LINES over the four helpers copies and both Codex gate copies, and R-LINELEN, and write `<FEATURE>/evidence/qa-gates/phase2-line-checks.md`. Done when no `OVER_500:` and no `OVER_120:` line is printed and each `BACKSLASH_TEST_LENGTH` is 107.
+- [ ] [P2-T11] Commit the four helpers copies, both Codex gate copies, and the Phase 2 evidence by the rule-11 form with subject `fix(732): deny shell-divergent operands with an ASCII allowlist` and push. Done when `git show --name-only --format=%H HEAD` lists exactly those paths, `git status --porcelain` lists none of them, and `PUSH_EXIT: 0` is logged.
+
+### Phase 3 — #738 fail-before regression tests
+
+- [ ] [P3-T1] Write `<FEATURE>/evidence/other/d3-intended-changes.md` listing, before either row is edited, the two section-5.6 rows (file, old `It` name, new `It` name, old assertion, new assertion, and the D3 rule that changes the outcome: session root epic scope with a non-epic `-C` target is `target-mixed`) and the pre-declared classification rule for any later failing existing row: it is a D3 intended change only when its input has an epic-scope candidate and either a non-epic target (mixed), a relative or dot-segment `-C`, an ambiguous target, or a readiness failure of a target other than the session root. Done when the artifact carries `Timestamp:` earlier than the [P3-T4] edit and both rows are listed.
+- [ ] [P3-T2] Write `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScopeTargets.Tests.ps1` with the 12 Claude rows of section 5.5. Done when R-SCOPED over the file reports 12 tests and `FailedContainersCount: 0`.
+- [ ] [P3-T3] Write `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope-targets.Tests.ps1` with the 12 Codex rows of section 5.5. Done when R-SCOPED over the file reports 12 tests and `FailedContainersCount: 0`.
+- [ ] [P3-T4] Edit `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1` with the section-5.6 Claude change. Done when R-LINES reports the [P0-T10] line count and R-DETECT reports `count=1` for the new `It` line.
+- [ ] [P3-T5] Edit `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope.Tests.ps1` with the section-5.6 Codex change. Done when R-LINES reports the [P0-T10] line count and R-DETECT reports `count=1` for the new `It` line.
+- [ ] [P3-T6] [expect-fail] Before any epic-scope or targets edit, run R-SCOPED over the two section-5.5 files and the two section-5.6 files and write `<FEATURE>/evidence/regression-testing/fail-before-738.md` with `ExpectedExitCode: 1`. Done when `EXIT_CODE: 1`, `FailedContainersCount: 0`, and the `FAILED:` set equals exactly the 9 Claude and 8 Codex section-5.5 rows marked `fails` plus the two section-5.6 rows, for `FailedCount: 19`; a different set stops the plan as BLOCKED.
+- [ ] [P3-T7] Write `<FEATURE>/evidence/regression-testing/fail-before-exception.<yyyy-MM-ddTHH-mm>.md` for `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.Tests.ps1` and `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.Parity.Tests.ps1` with `Timestamp:`, `WhyFailingRunImpossible:` (the unit under test, `enforce-orchestration-preimplementation-gate-targets.ps1`, does not exist before Phase 4, so no row can execute against a pre-change implementation), and an alternative-proof section citing `git cat-file -e <BASE_SHA>:.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1` with its non-zero exit code. Done when the artifact carries all three fields and the recorded exit code is non-zero.
+- [ ] [P3-T8] Run R-PORT and R-LINES over the four Phase 3 test files and write `<FEATURE>/evidence/qa-gates/phase3-test-checks.md`. Done when both new files report `matches=0` for every token, the edited files match their `BASE_SHA` counts, and no `OVER_500:` line is printed.
+- [ ] [P3-T9] Commit the four Phase 3 test files and the Phase 3 evidence by the rule-11 form with subject `test(738): add fail-before rows for per-segment epic-scope targets` and push. Done when `git show --name-only --format=%H HEAD` lists exactly those paths, `git status --porcelain` lists none of them, and `PUSH_EXIT: 0` is logged.
+
+### Phase 4 — #738 shared targets file
+
+- [ ] [P4-T1] Read `<FEATURE>/evidence/other/c1a-api-verification.md` and write `<FEATURE>/evidence/qa-gates/phase4-api-precheck.md` recording its `SEGMENT_READER`, `GIT_OPTION_TABLE`, and `WRAPPER_GIT_MATCHER` values and `BLOCKER_LINES: <count of C1A-API-BLOCKER lines>`. Done when the three values are non-empty and `BLOCKER_LINES: 0`; otherwise the plan stops as BLOCKED before [P4-T2].
+- [ ] [P4-T2] Write `.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1` implementing the four functions and rules R0 to R7 and V1 to V7 of section 4, calling only the three recorded API functions for segment, option, and wrapper parsing. Done when the file parses with zero errors and R-LINES reports at most 500 lines.
+- [ ] [P4-T3] Write `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.Tests.ps1` with rows U01 to U23 of section 5.7. Done when the file parses with zero errors; its execution is asserted in [P4-T11], after [P4-T5] has created the `.codex/hooks` copy it also loads.
+- [ ] [P4-T4] Write `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.Parity.Tests.ps1` per section 5.7. Done when the file parses with zero errors.
+- [ ] [P4-T5] Run R-MIRROR from `.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1` to `.codex/hooks/enforce-orchestration-preimplementation-gate-targets.ps1`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-targets.ps1`. Done when all three runs exit 0 and are logged in the mirror log.
+- [ ] [P4-T6] Run `git hash-object .claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1 .codex/hooks/enforce-orchestration-preimplementation-gate-targets.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-targets.ps1` and write `<FEATURE>/evidence/qa-gates/targets-hash-object.md`. Done when the four IDs are equal.
+- [ ] [P4-T7] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` to insert the entry `".claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1",` on the line after `".claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1",`. Done when the file parses with `ConvertFrom-Json` and its `paths` array contains the new entry exactly once (recorded in [P4-T10]).
+- [ ] [P4-T8] Edit `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json` to insert `".codex/hooks/enforce-orchestration-preimplementation-gate-targets.ps1",` on the line after `".codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1",`. Done when the file parses with `ConvertFrom-Json` and its `paths` array contains the new entry exactly once (recorded in [P4-T10]).
+- [ ] [P4-T9] Edit `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` so the `$script:SharedModuleNames` array also contains `'enforce-orchestration-preimplementation-gate-targets.ps1'` (same line, line-neutral). Done when R-LINES reports the [P0-T10] count and R-DETECT reports `count=1` for a line containing both `SharedModuleNames = @(` and `enforce-orchestration-preimplementation-gate-targets.ps1`.
+- [ ] [P4-T10] Run R-CALLS on `.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1` and parse both manifests, and write `<FEATURE>/evidence/qa-gates/targets-calls-and-manifests.md`. Done when `TOKEN_SPLIT: 0`, `TOKEN_CONVERT: 0`, every `EXTERNAL_CALL` is one of the three recorded API names or `Where-Object`, `ForEach-Object`, `Select-Object`, `Sort-Object`, `Write-Debug`, and each manifest contains its new entry exactly once.
+- [ ] [P4-T11] Run R-SCOPED over the two section-5.7 files and `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` and write `<FEATURE>/evidence/regression-testing/pass-after-738-targets.md`. Done when `FailedCount`, `FailedBlocksCount`, and `FailedContainersCount` are 0, a `PASSED:` line exists for every U01 to U23 `It` on both `(.claude/hooks)` and `(.codex/hooks)`, and both parity cases are `PASSED:`.
+- [ ] [P4-T12] Run R-PORT and R-LINES over the two new test files and `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`, and R-LINES over the four targets copies, and write `<FEATURE>/evidence/qa-gates/phase4-checks.md`. Done when the new files report `matches=0` for every token and no `OVER_500:` line is printed.
+- [ ] [P4-T13] Commit the four targets copies, both manifests, the three Phase 4 test files, and the Phase 4 evidence by the rule-11 form with subject `feat(738): add per-segment target resolver for the preimplementation gate` and push. Done when `git show --name-only --format=%H HEAD` lists exactly those paths, `git status --porcelain` lists none of them, and `PUSH_EXIT: 0` is logged.
+
+### Phase 5 — #738 epic-scope decision on both surfaces
+
+- [ ] [P5-T1] Edit `.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`: add the targets dot-source line, replace the body of `Get-OrchestrationEpicScopeDecision` per section 4 (Claude scope resolver), and update the header `.NOTES` dependency list. Done when the file parses with zero errors, `Get-OrchestrationEpicScopeSelector` and `Resolve-OrchestrationGateTarget` are textually unchanged against `BASE_SHA` (R-DETECT `FUNCTION_UNCHANGED`), and R-LINES reports at most 500.
+- [ ] [P5-T2] Edit `.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`: add the targets dot-source line after the existing epic-resolution dot-source, replace the body of `Get-OrchestrationEpicScopeDecision` per section 4 (Codex scope resolver and patch-marker path leg), and update the header `.NOTES` while keeping its `AUTHORITY: PowerShell-authoritative` line unchanged. Done when the file parses with zero errors, `Get-OrchestrationEpicScopeSelector` and `Get-EpicCommandLegReadinessFailure` are textually unchanged against `BASE_SHA` (R-DETECT `FUNCTION_UNCHANGED`), the line beginning `    AUTHORITY: PowerShell-authoritative.` reports `count=1`, the words `python` and `poetry` do not occur (case-insensitive count 0), and R-LINES reports at most 500.
+- [ ] [P5-T3] Run R-MIRROR from each edited epic-scope file to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1` respectively. Done when both runs exit 0 and are logged.
+- [ ] [P5-T4] Run R-SCOPED over the two section-5.5 files and the two section-5.6 files and write `<FEATURE>/evidence/regression-testing/pass-after-738.md`. Done when `FailedCount`, `FailedBlocksCount`, and `FailedContainersCount` are 0 and every name in the [P3-T6] `FAILED:` set (19 names) appears as `PASSED:`.
+- [ ] [P5-T5] Run R-SCOPED over AC738-EXISTING and write `<FEATURE>/evidence/qa-gates/phase5-ac738-existing.md`. Done when `FailedCount: 0`, `FailedBlocksCount: 0`, and `FailedContainersCount: 0`; a failing row that meets the [P3-T1] D3 rule stops the plan as BLOCKED with `UNLISTED_D3_CHANGE: <name>` as a plan-revision input (the D3 record must list it before its assertion changes), and any other failing row stops the plan as BLOCKED with `D3_DEFECT: <name>`.
+- [ ] [P5-T6] Run R-SCOPED over ALL-SCOPED and write `<FEATURE>/evidence/qa-gates/phase5-all-scoped.md`. Done when the `FAILED:` set is a subset of `B_SCOPED` and no protected-suite test fails.
+- [ ] [P5-T7] Run R-LINES over the four epic-scope copies and write `<FEATURE>/evidence/qa-gates/phase5-line-counts.md`. Done when no `OVER_500:` line is printed.
+- [ ] [P5-T8] Commit the four epic-scope copies and the Phase 5 evidence by the rule-11 form with subject `fix(738): resolve every segment target in epic-scope decisions` and push. Done when `git show --name-only --format=%H HEAD` lists exactly those paths, `git status --porcelain` lists none of them, and `PUSH_EXIT: 0` is logged.
+
+### Phase 6 — #745 documentation
+
+- [ ] [P6-T1] Edit `.claude/skills/epic-plan/SKILL.md`: append the section-5.8 Q1 text to the line beginning `Quoting rules: `. Done when the file still has exactly one line beginning `Quoting rules: ` and that line ends with the Q1 text (R-DOCTOKENS in [P6-T5]).
+- [ ] [P6-T2] Edit `.claude/skills/parallel-plan/SKILL.md`: append the section-5.8 Q1 text to the line beginning `Quoting rules: `. Done when the file still has exactly one line beginning `Quoting rules: ` and that line ends with the Q1 text.
+- [ ] [P6-T3] Edit `.agents/skills/epic-plan/SKILL.md`: insert the section-5.8 Q2 block at its stated position. Done when the file has exactly one line `## Integration Commit Form`, located after the line `## Integration Branch` and before the line `## Concurrent Preparation`.
+- [ ] [P6-T4] Run R-MIRROR for the three edited documents to `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-plan/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-plan/SKILL.md`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-plan/SKILL.md`. Done when all three runs exit 0 and are logged.
+- [ ] [P6-T5] Run R-DOCTOKENS with tokens `backslash anywhere`, `are denied outside quotes. Every staging operand`, `A-Z a-z 0-9 . _ / -`, `undetermined (issue #735)`, and, for the two `.agents` copies only, `## Integration Commit Form`, `--trailer=`, and `single-quoted`, and write `<FEATURE>/evidence/qa-gates/documentation-tokens.md`. Done when each listed token reports `lines` of at least 1 in each applicable file and every `PAIR_IDENTICAL` is `True`.
+- [ ] [P6-T6] Run the PYTEST-CONTRACTS command of [P0-T18] and write `<FEATURE>/evidence/qa-gates/phase6-pytest-contracts.md`. Done when the summary reports `0 failed` or matches rule 13.
+- [ ] [P6-T7] Commit the six skill documents and the Phase 6 evidence by the rule-11 form with subject `docs(745): document admitted commit forms and shell-divergent denials` and push. Done when `git show --name-only --format=%H HEAD` lists exactly those paths, `git status --porcelain` lists none of them, and `PUSH_EXIT: 0` is logged.
+
+### Phase 7 — Final QA loop
+
+Loop rule: tasks [P7-T2] to [P7-T10] form one pass. If any of them fails or changes a file, the executor fixes the cause (production code, never by weakening an assertion), records the pass number, and restarts at [P7-T2]. Type checking is not applicable to PowerShell and is recorded as `TYPECHECK: not-applicable (PowerShell)` in [P7-T10].
+
+- [ ] [P7-T1] Run `git rev-parse HEAD`, `git merge-base --is-ancestor <BASE_SHA> HEAD`, and `git status --porcelain` and write `<FEATURE>/evidence/qa-gates/final-preloop-state.md`. Done when the ancestry check exits 0 and porcelain lists no path outside FEATURE.
+- [ ] [P7-T2] Run `git status --porcelain`; then call `mcp__drm-copilot__run_poshqc_format` with the rule-5 `scan_folders` only when `B_FORMAT` contains no path under those four folders (authorized branch: otherwise record `MCP_CALL: not-made (pre-existing drift in scan folders)` with the paths); then run R-FORMAT; then `git status --porcelain` again; and write `<FEATURE>/evidence/qa-gates/final-poshqc-format.md` with `MCP_CALL:`, `FORMAT_CHANGED_COUNT`, `FORMAT_ALREADY_COUNT`, and both porcelain outputs. Done when R-FORMAT prints `FORMAT_CHANGED_COUNT: 0` (every write-set file reported `Already formatted: `) and the two porcelain outputs are identical.
+- [ ] [P7-T3] Call `mcp__drm-copilot__run_poshqc_analyze` (rule 5), then run R-ANALYZE, and write `<FEATURE>/evidence/qa-gates/final-poshqc-analyze.md`. Done when R-ANALYZE prints `ANALYZE_RESULT: passed`, or its findings are exactly `B_ANALYZE` and none names a write-set path.
+- [ ] [P7-T4] Run R-SCOPED over ALL-SCOPED and write `<FEATURE>/evidence/qa-gates/final-pester-scoped.md`. Done when the `FAILED:` set is a subset of `B_SCOPED` and no protected-suite test fails.
+- [ ] [P7-T5] Run R-COV over ALL-SCOPED and COV-FILES and write `<FEATURE>/evidence/qa-gates/final-coverage.md` with the seven `LINE_COVERAGE:` lines, `MISSED_LINES:` lines, and every `CHANGED_LINE:` line, and the seven numeric percentages in `Output Summary:`. Done when seven numeric `percent=` values are recorded.
+- [ ] [P7-T6] Write `<FEATURE>/evidence/qa-gates/final-coverage-delta.md` with, per COV-FILES path, `BASELINE: <[P0-T16] percent or NEW_FILE>`, `POST: <[P7-T5] percent>`, `CHANGED_EXECUTED: <n>`, `CHANGED_MISSED: <n>`, and `VERDICT: PASS|FAIL`. Done when every row is `PASS`, meaning `POST` at least 85.00 and `CHANGED_MISSED: 0`.
+- [ ] [P7-T7] Coverage remediation. Authorized branch: when [P7-T6] has no `FAIL` row, write `COVERAGE_REMEDIATION: not-required` to `<FEATURE>/evidence/qa-gates/final-coverage-remediation.md` and write no test file. Otherwise write `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.C1bCoverage.Tests.ps1` with rows that drive each `MISSED_LINES` entry of each failing file through its public functions (no temporary files, rule 14), record the rows in the same artifact, and restart the loop at [P7-T2]. Done when the artifact exists and, on the remediation branch, the next pass's [P7-T6] has no `FAIL` row.
+- [ ] [P7-T8] Call `mcp__drm-copilot__run_poshqc_test` (rule 5), then run R-FULL script A and script B, and write `<FEATURE>/evidence/qa-gates/final-pester-full.md`. Done when `JUNIT_LAST_WRITE_UTC` is later than `RUN_START_UTC`, the `JUNIT_FAILED:` set is a subset of `B_FULL`, no `JUNIT_SUITE_MISSING:` line exists, and every NEW-732 and NEW-738 suite reads `failures=0 errors=0`.
+- [ ] [P7-T9] Run the PYTEST-CONTRACTS command of [P0-T18] and write `<FEATURE>/evidence/qa-gates/final-pytest-contracts.md`. Done when the summary reports `0 failed` or matches rule 13.
+- [ ] [P7-T10] Write `<FEATURE>/evidence/qa-gates/final-toolchain-loop.md` recording the pass number, `TYPECHECK: not-applicable (PowerShell)`, and the result line of each of [P7-T2] to [P7-T9] for that pass. Done when one pass records all eight as passing with no file changed by [P7-T2].
+- [ ] [P7-T11] Run R-LINES over every production and test file in the section-2 write set that exists and write `<FEATURE>/evidence/qa-gates/final-line-counts.md`. Done when no `OVER_500:` line is printed.
+- [ ] [P7-T12] Run R-LINELEN and write `<FEATURE>/evidence/qa-gates/final-line-length.md`. Done when no `OVER_120:` line is printed and each `BACKSLASH_TEST_LENGTH` is at most 120.
+- [ ] [P7-T13] Run R-NOPY and write `<FEATURE>/evidence/qa-gates/final-no-python.md`. Done when no `PY_FILE:` line is printed and every `PY_FINDINGS:` value is 0.
+- [ ] [P7-T14] Run R-PORT over every new and edited test file in the write set and write `<FEATURE>/evidence/qa-gates/final-test-portability.md`. Done when every new file reports `matches=0` for every token and every edited file reports the same counts as its `BASE_SHA` version.
+- [ ] [P7-T15] Run `git diff --name-only origin/epic/enforcement-hook-precision-integration...HEAD` and `git status --porcelain` and write `<FEATURE>/evidence/qa-gates/final-scope-boundary.md` with both outputs. Done when neither output lists a path ending `enforce-orchestration-preimplementation-gate-modes.ps1`, `hook-command-invocation.ps1`, `hook-command-scanner.ps1`, or `enforce-orchestration-preimplementation-gate-epic-resolution.ps1`, and the diff lists no path outside the section-2 write set.
+- [ ] [P7-T16] Run `git log --format=%H -n 1 --diff-filter=A -- docs/features/active/2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732/research/research.2026-10-08T14-00.md`, `git log --reverse --format=%H origin/epic/enforcement-hook-precision-integration..HEAD -- .codex/hooks extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks`, and `git merge-base --is-ancestor <research commit> <first listed codex commit>`, and write `<FEATURE>/evidence/qa-gates/final-research-precedence.md` with `RESEARCH_COMMIT:`, `FIRST_CODEX_HOOK_COMMIT:`, and `ANCESTOR_EXIT:`. Done when both SHAs are present, they differ, and `ANCESTOR_EXIT: 0`.
+- [ ] [P7-T17] Run `git hash-object` over the four helpers copies and over the four targets copies and write `<FEATURE>/evidence/qa-gates/final-hash-object.md`. Done when each group of four IDs is identical.
+- [ ] [P7-T18] Commit the Phase 7 evidence (and, on the [P7-T7] remediation branch, the coverage test file) by the rule-11 form with subject `docs(732): record final QA evidence` and push. Done when `git show --name-only --format=%H HEAD` lists exactly those paths, `git status --porcelain` lists none of them, and `PUSH_EXIT: 0` is logged.
+
+### Phase 8 — Follow-ups and acceptance-criteria check-off
+
+Check-off rule: each task below changes exactly one `- [ ]` to `- [x]` in `<FEATURE>/spec.md` under `## Acceptance Criteria`, without changing the criterion text, and only when every named artifact shows the stated condition; otherwise the line stays unchecked and the gap is recorded in [P8-T32].
+
+- [ ] [P8-T1] Write `<FEATURE>/evidence/other/follow-ups.md` recording FU-1 to FU-5 exactly as named in the spec's `### Unfiled follow-up candidates` table (ID, candidate, source), each with `Status: recorded, not filed (no GitHub issue created in this run)`. Done when the artifact lists all five IDs and no `gh issue create` command appears in any Phase 8 artifact.
+- [ ] [P8-T2] Check off the #732 criterion beginning `` `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-helpers.OperandNormalization.Tests.ps1` asserts that `` when `fail-before-732.md` lists both issue 732 shape rows on both surfaces as `FAILED:` and `pass-after-732.md` reports `FailedCount: 0`.
+- [ ] [P8-T3] Check off the #732 criterion beginning `The same suite asserts` and containing `for every deny row` when `pass-after-732.md` lists all 28 deny rows per surface as `PASSED:`.
+- [ ] [P8-T4] Check off the #732 criterion beginning `The same suite asserts` and containing `for an ordinary operand under each of` when `pass-after-732.md` lists rows A01 to A10 per surface as `PASSED:`.
+- [ ] [P8-T5] Check off the #732 criterion naming `OperandBypass.Tests.ps1` when `pass-after-732.md` lists the four section-5.2 tests as `PASSED:` and `final-pester-scoped.md` shows no failure in either file.
+- [ ] [P8-T6] Check off the #732 criterion naming `The D4 row 18 backslash-operand row and the LACS allow 3 row` when `pass-after-732.md` lists the four reversed rows as `PASSED:` and `final-pester-scoped.md` shows zero failures in both CommandExemption suites.
+- [ ] [P8-T7] Check off the #732 criterion naming the escaped-semicolon ChainEscape row when `pass-after-732.md` lists the renamed row on both surfaces as `PASSED:` and the ChainEscape suite has zero failures in `final-pester-scoped.md`.
+- [ ] [P8-T8] Check off the #732 criterion beginning `` `Test-ExemptOrchestrationOperand` in `` when `helpers-edit-anchors.md` reports `lines=0` for `-replace`, `literalPrefix`, and `PathspecWildcardCharacters` in that region and `count=1` for the new `OutsideQuoteCommandCharacters` line.
+- [ ] [P8-T9] Check off the #732 criterion naming `enforce-orchestration-preimplementation-gate-helpers.Parity.Tests.ps1` when that suite has zero failures in `final-pester-scoped.md` and `final-hash-object.md` shows four identical helpers IDs.
+- [ ] [P8-T10] Check off the #738 criterion beginning `` `evidence/other/` contains a C1a API verification record `` when `c1a-api-verification.md` has no `C1A-API-BLOCKER` line, `git merge-base --is-ancestor` of the commit that added it and the commit that added `.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1` exits 0 (recorded in this task's line of `<FEATURE>/evidence/other/ac-checkoff.md`), and `targets-calls-and-manifests.md` reports `TOKEN_SPLIT: 0` with every `EXTERNAL_CALL` in the allowed set.
+- [ ] [P8-T11] Check off the #738 criterion beginning `` `enforce-orchestration-preimplementation-gate-targets.ps1` exists in `` when `final-hash-object.md` shows four identical targets IDs, the targets parity suite and legacy-codex suite have zero failures in `final-pester-scoped.md`, and `targets-calls-and-manifests.md` shows both manifest entries.
+- [ ] [P8-T12] Check off the #738 criterion naming `enforce-orchestration-preimplementation-gate-targets.Tests.ps1` when that suite has zero failures in `final-pester-scoped.md` and rows U01 to U23 appear as `PASSED:` on both surfaces.
+- [ ] [P8-T13] Check off the #738 criterion naming `EpicScopeTargets.Tests.ps1` when the 12 Claude section-5.5 rows appear as `PASSED:` in `pass-after-738.md` and the suite has zero failures in `final-pester-scoped.md`.
+- [ ] [P8-T14] Check off the #738 criterion naming `epic-scope-targets.Tests.ps1` when the 12 Codex section-5.5 rows appear as `PASSED:` in `pass-after-738.md` and the suite has zero failures in `final-pester-scoped.md`.
+- [ ] [P8-T15] Check off the #738 criterion beginning `Every new epic-scope deny asserted` when both section-5.5 suites pass in `final-pester-scoped.md` (each deny-code row asserts the `PREIMPLEMENTATION_GATE_BLOCKED: ` prefix and one of the four codes, section 5.5).
+- [ ] [P8-T16] Check off the #738 criterion beginning `The existing suites` when `phase5-ac738-existing.md` and `final-pester-scoped.md` show zero failures in every AC738-EXISTING file and `d3-intended-changes.md` lists both section-5.6 rows.
+- [ ] [P8-T17] Check off the #745 criterion naming `.agents/skills/epic-plan/SKILL.md` and the Integration Commit Form when `documentation-tokens.md` shows the `.agents` tokens and `PAIR_IDENTICAL: True` for that pair, and `final-pytest-contracts.md` shows no failure in `test_push_down_codex_and_agents_resource_contracts.py`.
+- [ ] [P8-T18] Check off the #745 criterion beginning `The quoting-rule text` when `documentation-tokens.md` shows `backslash anywhere`, `are denied outside quotes. Every staging operand`, and `A-Z a-z 0-9 . _ / -` in all six skill documents.
+- [ ] [P8-T19] Check off the #745 criterion naming the `--trailer --` admit and deny rows when both rows appear as `PASSED:` on both runtimes in `pass-after-732.md` and the AttributionTrailer suite has zero failures in `final-pester-scoped.md`.
+- [ ] [P8-T20] Check off the #745 criterion naming U+201A, U+201B, and U+201E when the three rows appear as `PASSED:` on both runtimes in `pass-after-732.md`.
+- [ ] [P8-T21] Check off the #745 criterion naming the 120-character limit when `final-line-length.md` has no `OVER_120:` line.
+- [ ] [P8-T22] Check off the #745 criterion naming the D5 adopt-or-defer decision after reading the spec Decisions row `D5` and confirming it records `deferred` with its rationale; record the read in `<FEATURE>/evidence/other/ac-checkoff.md`.
+- [ ] [P8-T23] Check off the #735 criterion naming section Q1 after reading `<FEATURE>/research/research.2026-10-08T14-00.md` and confirming the heading `## Q1.` and its evidence table rows E1 to E12; record the read in `ac-checkoff.md`.
+- [ ] [P8-T24] Check off the #735 criterion naming the commit that added the research artifact when `final-research-precedence.md` shows `ANCESTOR_EXIT: 0` with two different SHAs.
+- [ ] [P8-T25] Check off the #735 criterion naming the header comments when `header-735-tokens.md` meets its [P2-T7] done condition and `final-hash-object.md` shows the four helpers copies identical.
+- [ ] [P8-T26] Check off the cross-cutting criterion naming `git diff --name-only` when `final-scope-boundary.md` meets its done condition.
+- [ ] [P8-T27] Check off the cross-cutting criterion listing the parity and manifest suites when `final-pester-scoped.md` shows zero failures in `legacy-codex-hook-contracts.Tests.ps1` and `final-pytest-contracts.md` reports `0 failed`; when `final-pytest-contracts.md` carries `KNOWN_ISSUE_510`, leave the line unchecked and record it as pending-CI in `ac-checkoff.md`.
+- [ ] [P8-T28] Check off the cross-cutting criterion naming Python files when `final-no-python.md` meets its done condition.
+- [ ] [P8-T29] Check off the cross-cutting criterion naming 500 lines when `final-line-counts.md` has no `OVER_500:` line.
+- [ ] [P8-T30] Check off the cross-cutting criterion naming PoshQC line coverage when `final-coverage-delta.md` has every row `PASS` and `p0-coverage.md` exists with numeric values.
+- [ ] [P8-T31] Check off the cross-cutting criterion naming the PowerShell toolchain when `final-toolchain-loop.md` records one clean pass.
+- [ ] [P8-T32] Write `<FEATURE>/evidence/other/ac-status-summary.md` in the acceptance-criteria-tracking summary form (`Source:`, `Total AC items: 30`, `Checked off (delivered): <M>`, `Remaining (unchecked): <30 - M>`, `Items remaining:` with each unchecked criterion and its gap or pending-CI reason). Done when `M` equals the count of `- [x]` lines under `## Acceptance Criteria` in `<FEATURE>/spec.md`.
+- [ ] [P8-T33] Commit `<FEATURE>/spec.md`, this plan file, and the Phase 8 evidence by the rule-11 form with subject `docs(732): check off verified acceptance criteria and record follow-ups` and push. Done when `git show --name-only --format=%H HEAD` lists exactly those paths, `git status --porcelain` lists none of them, and `PUSH_EXIT: 0` is logged.
