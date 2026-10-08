@@ -46,9 +46,11 @@ features:
 
 Epic issue: #852.
 
-> **Manifest status.** Placeholder `feature_folder` values. Each child is keyed by its primary
-> existing issue. The folder basenames are back-filled from each prepared child's active folder at
-> fan-in.
+> **Manifest status.** Resolved on 2026-10-08. Each child is keyed by its primary existing issue,
+> and every `feature_folder` value was back-filled from the prepared child's active folder at
+> fan-in. C1a's folder carries no date prefix, and its branch is
+> `bug/promotion-hook-raw-containment-false-positive-deny-824-r2` because an earlier local #824
+> branch exists.
 
 ## Goal
 
