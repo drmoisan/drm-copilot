@@ -288,39 +288,39 @@ Each catalog item becomes one `It` (or one `-ForEach` row group under one `It`) 
 
 Each task changes only `- [ ]` to `- [x]` on the named `FEATURE/spec.md` line and then runs `grep -c -e '- \[x\] ' docs/features/active/2026-08-26-epic-wave-barrier-resolves-nested-artifact-as-feature-folder-565/spec.md`, which must print the stated cumulative count. A task whose cited evidence is missing or failing leaves the item unchecked and records the gap in FEATURE/evidence/other/ac-gaps.<ts>.md.
 
-- [ ] [P9-T1] Confirm the starting state of FEATURE/spec.md: `grep -c -e '- \[x\] '` prints 0 and `grep -c -e '- \[ \] '` prints 35 on that file.
-- [ ] [P9-T2] Check off FEATURE/spec.md AC item 1 (line beginning "`.claude/hooks/feature-folder-resolution.ps1` and") on evidence P8-T4 (W01/W09 pair) and P2-T7/P2-T8 (H01). Count: 1.
-- [ ] [P9-T3] Check off FEATURE/spec.md AC item 2 ("`feature-folder-resolution.ps1` defines") on P8-T12 and P2-T7. Count: 2.
-- [ ] [P9-T4] Check off FEATURE/spec.md AC item 3 ("`feature-folder-resolution.ps1` contains no") on P8-T3. Count: 3.
-- [ ] [P9-T5] Check off FEATURE/spec.md AC item 4 ("`Find-FeatureFolderCandidate` tests pass") on P2-T7 and P2-T8 (S01-S09). Count: 4.
-- [ ] [P9-T6] Check off FEATURE/spec.md AC item 5 ("`Find-FeatureFolderRecord` tests pass") on P2-T7 and P2-T8 (R01-R08). Count: 5.
-- [ ] [P9-T7] Check off FEATURE/spec.md AC item 6 ("`Select-FeatureFolderTarget` tests pass") on P2-T7 and P2-T8 (T01-T12). Count: 6.
-- [ ] [P9-T8] Check off FEATURE/spec.md AC item 7 ("A `Select-FeatureFolderTarget` test supplies") on P2-T7 and P2-T8 (O01). Count: 7.
-- [ ] [P9-T9] Check off FEATURE/spec.md AC item 8 ("`enforce-epic-wave-barrier.ps1` resolves the target") on P3-T3 and P8-T1. Count: 8.
-- [ ] [P9-T10] Check off FEATURE/spec.md AC item 9 ("`enforce-epic-wave-barrier.ps1` treats a `depends_on`") on P3-T3 (W8a, W8b). Count: 9.
-- [ ] [P9-T11] Check off FEATURE/spec.md AC item 10 ("`enforce-parallel-cohort-barrier.ps1` resolves") on P4-T3 (C1-C6, C4b). Count: 10.
-- [ ] [P9-T12] Check off FEATURE/spec.md AC item 11 ("`enforce-parallel-drift-gate.ps1` resolves") on P4-T8 (D1-D6, D8). Count: 11.
-- [ ] [P9-T13] Check off FEATURE/spec.md AC item 12 ("The `enforce-parallel-drift-gate.Tests.ps1` case") on P1-T12 and P4-T9. Count: 12.
-- [ ] [P9-T14] Check off FEATURE/spec.md AC item 13 ("`.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` resolves") on P5-T2. Count: 13.
-- [ ] [P9-T15] Check off FEATURE/spec.md AC item 14 ("`.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` resolves") on P5-T6. Count: 14.
-- [ ] [P9-T16] Check off FEATURE/spec.md AC item 15 ("#621/#508 regression") on P1-T9, P1-T13, P1-T14 (fail-before) and P8-T1 (W7a, W7b, M7, M7d pass-after). Count: 15.
-- [ ] [P9-T17] Check off FEATURE/spec.md AC item 16 ("An ambiguous target produces a deny") on P8-T1 (W5a, C5a, D5a, M5 on both surfaces). Count: 16.
-- [ ] [P9-T18] Check off FEATURE/spec.md AC item 17 ("A simulated dot-source failure") on P8-T1 (W9, C7, D7, M9 on both surfaces). Count: 17.
-- [ ] [P9-T19] Check off FEATURE/spec.md AC item 18 ("A search of `*.ps1` and `*.psm1` files") on P8-T2. Count: 18.
-- [ ] [P9-T20] Check off FEATURE/spec.md AC item 19 ("Existing Pester suites for the epic wave barrier") on P8-T9 and P8-T10. Count: 19.
-- [ ] [P9-T21] Check off FEATURE/spec.md AC item 20 ("`enforce-feature-folder-order.ps1` gates both") on P6-T7 (F1-F6, F19). Count: 20.
-- [ ] [P9-T22] Check off FEATURE/spec.md AC item 21 ("`enforce-feature-folder-order.ps1` requires `issue.md`") on P6-T7 (F7-F15). Count: 21.
-- [ ] [P9-T23] Check off FEATURE/spec.md AC item 22 ("A plan write to a `full-bug` folder") on P6-T7 (F7, F8, F16, F17) and P6-T3. Count: 22.
-- [ ] [P9-T24] Check off FEATURE/spec.md AC item 23 ("`enforce-feature-folder-order.ps1` reads `issue.md` only through") on P6-T6 and P6-T7 (E1-E3). Count: 23.
-- [ ] [P9-T25] Check off FEATURE/spec.md AC item 24 ("`Resolve-PrdFeatureWorkMode` delegates") on P6-T11 (P4), P6-T12, and P6-T13. Count: 24.
-- [ ] [P9-T26] Check off FEATURE/spec.md AC item 25 ("`tests/scripts/claude-hooks/enforce-prd-feature-before-planner.CheckpointFolder.Tests.ps1` calls") on P6-T10. Count: 25.
-- [ ] [P9-T27] Check off FEATURE/spec.md AC item 26 ("That suite passes for: field present") on P6-T11 (K1-K6). Count: 26.
-- [ ] [P9-T28] Check off FEATURE/spec.md AC item 27 ("Every new or changed file under `.claude/hooks/`") on P8-T4. Count: 27.
-- [ ] [P9-T29] Check off FEATURE/spec.md AC item 28 ("Every new or changed file under `.codex/hooks/`") on P8-T4. Count: 28.
-- [ ] [P9-T30] Check off FEATURE/spec.md AC item 29 ("Both `pack-manifests/core.json` files list") on P8-T5. Count: 29.
-- [ ] [P9-T31] Check off FEATURE/spec.md AC item 31 ("No new or changed production or test file exceeds 500 lines") on P8-T6. Count: 30.
-- [ ] [P9-T32] Check off FEATURE/spec.md AC item 33 ("No new or changed test file uses `TestDrive`") on P8-T7. Count: 31.
-- [ ] [P9-T33] Check off FEATURE/spec.md AC item 34 ("No Python file is added under") on P8-T8. Count: 32.
+- [x] [P9-T1] Confirm the starting state of FEATURE/spec.md: `grep -c -e '- \[x\] '` prints 0 and `grep -c -e '- \[ \] '` prints 35 on that file.
+- [x] [P9-T2] Check off FEATURE/spec.md AC item 1 (line beginning "`.claude/hooks/feature-folder-resolution.ps1` and") on evidence P8-T4 (W01/W09 pair) and P2-T7/P2-T8 (H01). Count: 1.
+- [x] [P9-T3] Check off FEATURE/spec.md AC item 2 ("`feature-folder-resolution.ps1` defines") on P8-T12 and P2-T7. Count: 2.
+- [x] [P9-T4] Check off FEATURE/spec.md AC item 3 ("`feature-folder-resolution.ps1` contains no") on P8-T3. Count: 3.
+- [x] [P9-T5] Check off FEATURE/spec.md AC item 4 ("`Find-FeatureFolderCandidate` tests pass") on P2-T7 and P2-T8 (S01-S09). Count: 4.
+- [x] [P9-T6] Check off FEATURE/spec.md AC item 5 ("`Find-FeatureFolderRecord` tests pass") on P2-T7 and P2-T8 (R01-R08). Count: 5.
+- [x] [P9-T7] Check off FEATURE/spec.md AC item 6 ("`Select-FeatureFolderTarget` tests pass") on P2-T7 and P2-T8 (T01-T12). Count: 6.
+- [x] [P9-T8] Check off FEATURE/spec.md AC item 7 ("A `Select-FeatureFolderTarget` test supplies") on P2-T7 and P2-T8 (O01). Count: 7.
+- [x] [P9-T9] Check off FEATURE/spec.md AC item 8 ("`enforce-epic-wave-barrier.ps1` resolves the target") on P3-T3 and P8-T1. Count: 8.
+- [x] [P9-T10] Check off FEATURE/spec.md AC item 9 ("`enforce-epic-wave-barrier.ps1` treats a `depends_on`") on P3-T3 (W8a, W8b). Count: 9.
+- [x] [P9-T11] Check off FEATURE/spec.md AC item 10 ("`enforce-parallel-cohort-barrier.ps1` resolves") on P4-T3 (C1-C6, C4b). Count: 10.
+- [x] [P9-T12] Check off FEATURE/spec.md AC item 11 ("`enforce-parallel-drift-gate.ps1` resolves") on P4-T8 (D1-D6, D8). Count: 11.
+- [x] [P9-T13] Check off FEATURE/spec.md AC item 12 ("The `enforce-parallel-drift-gate.Tests.ps1` case") on P1-T12 and P4-T9. Count: 12.
+- [x] [P9-T14] Check off FEATURE/spec.md AC item 13 ("`.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` resolves") on P5-T2. Count: 13.
+- [x] [P9-T15] Check off FEATURE/spec.md AC item 14 ("`.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` resolves") on P5-T6. Count: 14.
+- [x] [P9-T16] Check off FEATURE/spec.md AC item 15 ("#621/#508 regression") on P1-T9, P1-T13, P1-T14 (fail-before) and P8-T1 (W7a, W7b, M7, M7d pass-after). Count: 15.
+- [x] [P9-T17] Check off FEATURE/spec.md AC item 16 ("An ambiguous target produces a deny") on P8-T1 (W5a, C5a, D5a, M5 on both surfaces). Count: 16.
+- [x] [P9-T18] Check off FEATURE/spec.md AC item 17 ("A simulated dot-source failure") on P8-T1 (W9, C7, D7, M9 on both surfaces). Count: 17.
+- [x] [P9-T19] Check off FEATURE/spec.md AC item 18 ("A search of `*.ps1` and `*.psm1` files") on P8-T2. Count: 18.
+- [x] [P9-T20] Check off FEATURE/spec.md AC item 19 ("Existing Pester suites for the epic wave barrier") on P8-T9 and P8-T10. Count: 19.
+- [x] [P9-T21] Check off FEATURE/spec.md AC item 20 ("`enforce-feature-folder-order.ps1` gates both") on P6-T7 (F1-F6, F19). Count: 20.
+- [x] [P9-T22] Check off FEATURE/spec.md AC item 21 ("`enforce-feature-folder-order.ps1` requires `issue.md`") on P6-T7 (F7-F15). Count: 21.
+- [x] [P9-T23] Check off FEATURE/spec.md AC item 22 ("A plan write to a `full-bug` folder") on P6-T7 (F7, F8, F16, F17) and P6-T3. Count: 22.
+- [x] [P9-T24] Check off FEATURE/spec.md AC item 23 ("`enforce-feature-folder-order.ps1` reads `issue.md` only through") on P6-T6 and P6-T7 (E1-E3). Count: 23.
+- [x] [P9-T25] Check off FEATURE/spec.md AC item 24 ("`Resolve-PrdFeatureWorkMode` delegates") on P6-T11 (P4), P6-T12, and P6-T13. Count: 24.
+- [x] [P9-T26] Check off FEATURE/spec.md AC item 25 ("`tests/scripts/claude-hooks/enforce-prd-feature-before-planner.CheckpointFolder.Tests.ps1` calls") on P6-T10. Count: 25.
+- [x] [P9-T27] Check off FEATURE/spec.md AC item 26 ("That suite passes for: field present") on P6-T11 (K1-K6). Count: 26.
+- [x] [P9-T28] Check off FEATURE/spec.md AC item 27 ("Every new or changed file under `.claude/hooks/`") on P8-T4. Count: 27.
+- [x] [P9-T29] Check off FEATURE/spec.md AC item 28 ("Every new or changed file under `.codex/hooks/`") on P8-T4. Count: 28.
+- [x] [P9-T30] Check off FEATURE/spec.md AC item 29 ("Both `pack-manifests/core.json` files list") on P8-T5. Count: 29.
+- [x] [P9-T31] Check off FEATURE/spec.md AC item 31 ("No new or changed production or test file exceeds 500 lines") on P8-T6. Count: 30.
+- [x] [P9-T32] Check off FEATURE/spec.md AC item 33 ("No new or changed test file uses `TestDrive`") on P8-T7. Count: 31.
+- [x] [P9-T33] Check off FEATURE/spec.md AC item 34 ("No Python file is added under") on P8-T8. Count: 32.
 
 ### Phase 10 — Final QC Loop (format, analyze, test with coverage) and Acceptance Closure
 

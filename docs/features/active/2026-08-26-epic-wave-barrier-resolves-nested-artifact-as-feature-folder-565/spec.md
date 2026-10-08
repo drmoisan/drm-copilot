@@ -258,55 +258,55 @@ Known local false failure: `test_push_down_claude_resource_contracts.py` can fai
 
 ### Shared resolver
 
-- [ ] `.claude/hooks/feature-folder-resolution.ps1` and `.codex/hooks/feature-folder-resolution.ps1` exist and have equal SHA256 hashes, and each per-surface `feature-folder-resolution.Tests.ps1` contains a hash-equality assertion that passes.
-- [ ] `feature-folder-resolution.ps1` defines `Find-FeatureFolderCandidate`, `ConvertTo-FeatureFolderBasename`, `Find-FeatureFolderRecord`, `Select-FeatureFolderTarget`, `Resolve-FeatureFolderWorkMode`, and `Get-FeatureFolderPlanPrerequisite` with the parameters and return contracts stated in the Functions table of this spec.
-- [ ] `feature-folder-resolution.ps1` contains no `Import-Module`, no filesystem cmdlets (`Get-Content`, `Set-Content`, `Test-Path`, `Out-File`, `New-Item`, `Get-ChildItem`), no `Start-Process` or `Invoke-WebRequest`, and no `$env:` reference, verified by search of the file.
-- [ ] `Find-FeatureFolderCandidate` tests pass for: four-segment truncation of `research/` and `evidence/<kind>/` paths; order-preserving dedupe of repeated citations; backslash and absolute-prefixed tokens; trailing `.`, `,`, `;`, `:` trimmed; `docs/features/active/` and `docs/features/active/.` yielding no candidate.
-- [ ] `Find-FeatureFolderRecord` tests pass for an integer reference, a numeric-string reference, a bare folder basename, an `active/<b>` value, and a `docs/features/active/<b>` value, and return `$null` for zero or multiple matches.
-- [ ] `Select-FeatureFolderTarget` tests pass for `Resolved`, `NoTarget`, and `Ambiguous` outcomes, including dependency pruning with `-DependencyAware`, the declared-issue-number tie-break, the declared issue number being unable to select a record outside the cited set, and the fallback-issue-number path for zero candidates.
-- [ ] A `Select-FeatureFolderTarget` test supplies the same two non-dependency candidates in both orders and with either slug as the longer one, and every case returns `Ambiguous` with both candidates in `Remaining`.
+- [x] `.claude/hooks/feature-folder-resolution.ps1` and `.codex/hooks/feature-folder-resolution.ps1` exist and have equal SHA256 hashes, and each per-surface `feature-folder-resolution.Tests.ps1` contains a hash-equality assertion that passes.
+- [x] `feature-folder-resolution.ps1` defines `Find-FeatureFolderCandidate`, `ConvertTo-FeatureFolderBasename`, `Find-FeatureFolderRecord`, `Select-FeatureFolderTarget`, `Resolve-FeatureFolderWorkMode`, and `Get-FeatureFolderPlanPrerequisite` with the parameters and return contracts stated in the Functions table of this spec.
+- [x] `feature-folder-resolution.ps1` contains no `Import-Module`, no filesystem cmdlets (`Get-Content`, `Set-Content`, `Test-Path`, `Out-File`, `New-Item`, `Get-ChildItem`), no `Start-Process` or `Invoke-WebRequest`, and no `$env:` reference, verified by search of the file.
+- [x] `Find-FeatureFolderCandidate` tests pass for: four-segment truncation of `research/` and `evidence/<kind>/` paths; order-preserving dedupe of repeated citations; backslash and absolute-prefixed tokens; trailing `.`, `,`, `;`, `:` trimmed; `docs/features/active/` and `docs/features/active/.` yielding no candidate.
+- [x] `Find-FeatureFolderRecord` tests pass for an integer reference, a numeric-string reference, a bare folder basename, an `active/<b>` value, and a `docs/features/active/<b>` value, and return `$null` for zero or multiple matches.
+- [x] `Select-FeatureFolderTarget` tests pass for `Resolved`, `NoTarget`, and `Ambiguous` outcomes, including dependency pruning with `-DependencyAware`, the declared-issue-number tie-break, the declared issue number being unable to select a record outside the cited set, and the fallback-issue-number path for zero candidates.
+- [x] A `Select-FeatureFolderTarget` test supplies the same two non-dependency candidates in both orders and with either slug as the longer one, and every case returns `Ambiguous` with both candidates in `Remaining`.
 
 ### #565 resolvers
 
-- [ ] `enforce-epic-wave-barrier.ps1` resolves the target through the shared resolver, and `enforce-epic-wave-barrier.FolderResolution.Tests.ps1` passes every case of the Test Strategy matrix (items 1-7).
-- [ ] `enforce-epic-wave-barrier.ps1` treats a `depends_on` entry recorded as an issue number as matching the record with that `issue_num`, verified by a test that allows when that dependency is merged and denies when it is `pr_open`.
-- [ ] `enforce-parallel-cohort-barrier.ps1` resolves the target through the shared resolver, and `enforce-parallel-cohort-barrier.FolderResolution.Tests.ps1` passes every case of the Test Strategy matrix (items 1-6), including a case where the canonical issue-number line resolves an otherwise ambiguous pair.
-- [ ] `enforce-parallel-drift-gate.ps1` resolves the target through the shared resolver, uses the resolved basename for both the item record and the `remediation-inputs` probe, and `enforce-parallel-drift-gate.FolderResolution.Tests.ps1` passes every case of the Test Strategy matrix (items 1-6).
-- [ ] The `enforce-parallel-drift-gate.Tests.ps1` case that expected the longest of two distinct folders is rewritten to expect an `Ambiguous` deny, and the suite passes.
-- [ ] `.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` resolves the delegation target through the shared resolver, and the Claude `...-mode-resolution.TargetFolder.Tests.ps1` passes every case of the Test Strategy matrix (items 1-7) and the existing decision-D3 issue-number fallback cases.
-- [ ] `.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` resolves the delegation target through the shared resolver, and the Codex `...-mode-resolution.TargetFolder.Tests.ps1` passes every case of the Test Strategy matrix (items 1-7) and the existing decision-D3 issue-number fallback cases.
-- [ ] #621/#508 regression: with the fixture in Test Strategy item 7, the epic wave barrier evaluates feature 621 (allow while 507 and 508 are merged; deny when 508 is `pr_open`), and the preimplementation gate on both surfaces resolves 621 and does not fail the `merge_status` predicate.
-- [ ] An ambiguous target produces a deny whose reason begins with the gate's existing leading token (`EPIC_WAVE_BARRIER_BLOCKED:`, `PARALLEL_COHORT_BARRIER_BLOCKED:`, `PARALLEL_DRIFT_GATE_BLOCKED:`, or `PREIMPLEMENTATION_GATE_BLOCKED:` with failure name `target-ambiguous`) and names the remaining candidates, verified by a test per gate.
-- [ ] A simulated dot-source failure of the shared file produces a deny decision in each of the three Claude barrier hooks and a deny-producing result from both `-modes.ps1` surfaces, verified by tests.
-- [ ] A search of `*.ps1` and `*.psm1` files under `.claude/`, `.codex/`, and `extensions/drm-copilot/resources/` for `Sort-Object` ordered by `Length` returns no feature-folder selection.
-- [ ] Existing Pester suites for the epic wave barrier, parallel cohort barrier, parallel drift gate, and preimplementation gate (both surfaces) pass without changes to their assertions other than the drift-gate case named above.
+- [x] `enforce-epic-wave-barrier.ps1` resolves the target through the shared resolver, and `enforce-epic-wave-barrier.FolderResolution.Tests.ps1` passes every case of the Test Strategy matrix (items 1-7).
+- [x] `enforce-epic-wave-barrier.ps1` treats a `depends_on` entry recorded as an issue number as matching the record with that `issue_num`, verified by a test that allows when that dependency is merged and denies when it is `pr_open`.
+- [x] `enforce-parallel-cohort-barrier.ps1` resolves the target through the shared resolver, and `enforce-parallel-cohort-barrier.FolderResolution.Tests.ps1` passes every case of the Test Strategy matrix (items 1-6), including a case where the canonical issue-number line resolves an otherwise ambiguous pair.
+- [x] `enforce-parallel-drift-gate.ps1` resolves the target through the shared resolver, uses the resolved basename for both the item record and the `remediation-inputs` probe, and `enforce-parallel-drift-gate.FolderResolution.Tests.ps1` passes every case of the Test Strategy matrix (items 1-6).
+- [x] The `enforce-parallel-drift-gate.Tests.ps1` case that expected the longest of two distinct folders is rewritten to expect an `Ambiguous` deny, and the suite passes.
+- [x] `.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` resolves the delegation target through the shared resolver, and the Claude `...-mode-resolution.TargetFolder.Tests.ps1` passes every case of the Test Strategy matrix (items 1-7) and the existing decision-D3 issue-number fallback cases.
+- [x] `.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1` resolves the delegation target through the shared resolver, and the Codex `...-mode-resolution.TargetFolder.Tests.ps1` passes every case of the Test Strategy matrix (items 1-7) and the existing decision-D3 issue-number fallback cases.
+- [x] #621/#508 regression: with the fixture in Test Strategy item 7, the epic wave barrier evaluates feature 621 (allow while 507 and 508 are merged; deny when 508 is `pr_open`), and the preimplementation gate on both surfaces resolves 621 and does not fail the `merge_status` predicate.
+- [x] An ambiguous target produces a deny whose reason begins with the gate's existing leading token (`EPIC_WAVE_BARRIER_BLOCKED:`, `PARALLEL_COHORT_BARRIER_BLOCKED:`, `PARALLEL_DRIFT_GATE_BLOCKED:`, or `PREIMPLEMENTATION_GATE_BLOCKED:` with failure name `target-ambiguous`) and names the remaining candidates, verified by a test per gate.
+- [x] A simulated dot-source failure of the shared file produces a deny decision in each of the three Claude barrier hooks and a deny-producing result from both `-modes.ps1` surfaces, verified by tests.
+- [x] A search of `*.ps1` and `*.psm1` files under `.claude/`, `.codex/`, and `extensions/drm-copilot/resources/` for `Sort-Object` ordered by `Length` returns no feature-folder selection.
+- [x] Existing Pester suites for the epic wave barrier, parallel cohort barrier, parallel drift gate, and preimplementation gate (both surfaces) pass without changes to their assertions other than the drift-gate case named above.
 
 ### #568 feature-folder-order
 
-- [ ] `enforce-feature-folder-order.ps1` gates both `plan.md` and `plan.<yyyy-MM-ddTHH-mm>.md` under `docs/features/active/<f>/` and `docs/features/archive/<f>/`, and does not gate the non-plan near-misses listed in the Test Strategy, verified by tests.
-- [ ] `enforce-feature-folder-order.ps1` requires `issue.md` for `minor-audit`; `issue.md` and `spec.md` for `full-bug`; `issue.md`, `spec.md`, and `user-story.md` for `full-feature` and legacy `full`; and the `full-feature` set when the marker is missing, empty, malformed, unrecognized, or `issue.md` is unreadable, verified by a test per case.
-- [ ] A plan write to a `full-bug` folder containing `issue.md` and `spec.md` only, and to a `minor-audit` folder containing `issue.md` only, is allowed; a plan write missing any mode-required file is denied with a reason beginning `FEATURE_FOLDER_ORDER_BLOCKED:` that names the plan file, the resolved work mode, and the missing files.
-- [ ] `enforce-feature-folder-order.ps1` reads `issue.md` only through `Get-FeatureFolderIssueContent`, and `enforce-feature-folder-order.Tests.ps1` mocks that seam so no case reads the repository filesystem.
-- [ ] `Resolve-PrdFeatureWorkMode` delegates to `Resolve-FeatureFolderWorkMode`, and the existing `enforce-prd-feature-before-planner` suites pass unchanged.
+- [x] `enforce-feature-folder-order.ps1` gates both `plan.md` and `plan.<yyyy-MM-ddTHH-mm>.md` under `docs/features/active/<f>/` and `docs/features/archive/<f>/`, and does not gate the non-plan near-misses listed in the Test Strategy, verified by tests.
+- [x] `enforce-feature-folder-order.ps1` requires `issue.md` for `minor-audit`; `issue.md` and `spec.md` for `full-bug`; `issue.md`, `spec.md`, and `user-story.md` for `full-feature` and legacy `full`; and the `full-feature` set when the marker is missing, empty, malformed, unrecognized, or `issue.md` is unreadable, verified by a test per case.
+- [x] A plan write to a `full-bug` folder containing `issue.md` and `spec.md` only, and to a `minor-audit` folder containing `issue.md` only, is allowed; a plan write missing any mode-required file is denied with a reason beginning `FEATURE_FOLDER_ORDER_BLOCKED:` that names the plan file, the resolved work mode, and the missing files.
+- [x] `enforce-feature-folder-order.ps1` reads `issue.md` only through `Get-FeatureFolderIssueContent`, and `enforce-feature-folder-order.Tests.ps1` mocks that seam so no case reads the repository filesystem.
+- [x] `Resolve-PrdFeatureWorkMode` delegates to `Resolve-FeatureFolderWorkMode`, and the existing `enforce-prd-feature-before-planner` suites pass unchanged.
 
 ### #696 Get-PrdFeatureCheckpointFolder
 
-- [ ] `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.CheckpointFolder.Tests.ps1` calls `Get-PrdFeatureCheckpointFolder` with an absolute synthetic `-CheckpointPath` and does not mock `Get-PrdFeatureCheckpointFolder`.
-- [ ] That suite passes for: field present (returns the value, and asserts `Test-Path` and `Get-Content -Raw` were invoked with the exact `LiteralPath`); field missing; field empty; invalid JSON; `Get-Content` throwing; and file absent (returns `$null` and asserts `Get-Content` was not invoked).
+- [x] `tests/scripts/claude-hooks/enforce-prd-feature-before-planner.CheckpointFolder.Tests.ps1` calls `Get-PrdFeatureCheckpointFolder` with an absolute synthetic `-CheckpointPath` and does not mock `Get-PrdFeatureCheckpointFolder`.
+- [x] That suite passes for: field present (returns the value, and asserts `Test-Path` and `Get-Content -Raw` were invoked with the exact `LiteralPath`); field missing; field empty; invalid JSON; `Get-Content` throwing; and file absent (returns `$null` and asserts `Get-Content` was not invoked).
 
 ### Mirrors, manifests, and parity
 
-- [ ] Every new or changed file under `.claude/hooks/` has a bundled mirror under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/` with an equal SHA256 hash.
-- [ ] Every new or changed file under `.codex/hooks/` has a bundled mirror under `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/` with an equal SHA256 hash.
-- [ ] Both `pack-manifests/core.json` files list `feature-folder-resolution.ps1`, and `$script:SharedModuleNames` in `legacy-codex-hook-contracts.Tests.ps1` includes it.
+- [x] Every new or changed file under `.claude/hooks/` has a bundled mirror under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/` with an equal SHA256 hash.
+- [x] Every new or changed file under `.codex/hooks/` has a bundled mirror under `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/` with an equal SHA256 hash.
+- [x] Both `pack-manifests/core.json` files list `feature-folder-resolution.ps1`, and `$script:SharedModuleNames` in `legacy-codex-hook-contracts.Tests.ps1` includes it.
 - [ ] `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py`, `test_codex_core_manifest_closure.py`, `codex-epic-runtime-contracts.Tests.ps1`, and `legacy-codex-hook-contracts.Tests.ps1` pass in CI on the pull request.
 
 ### Size, coverage, purity, and toolchain
 
-- [ ] No new or changed production or test file exceeds 500 lines, including both `enforce-orchestration-preimplementation-gate-modes.ps1` copies and `enforce-parallel-drift-gate.ps1`, verified by line count.
+- [x] No new or changed production or test file exceeds 500 lines, including both `enforce-orchestration-preimplementation-gate-modes.ps1` copies and `enforce-parallel-drift-gate.ps1`, verified by line count.
 - [ ] Line coverage is at least 85% for every new or changed production PowerShell file, including each copy of `feature-folder-resolution.ps1` measured independently, as reported in `artifacts/pester/powershell-coverage.xml` from the self-hosted `Invoke-PoshQCTest` run and recorded under `evidence/qa-gates/`.
-- [ ] No new or changed test file uses `TestDrive`, `New-TemporaryFile`, `[System.IO.Path]::GetTempPath`, or `[System.IO.Path]::GetTempFileName`, and the PowerShell test-purity hook raises no finding on them.
-- [ ] No Python file is added under `.claude/hooks/` or `.codex/hooks/`, and no changed hook invokes `python`, `py`, or `poetry`.
+- [x] No new or changed test file uses `TestDrive`, `New-TemporaryFile`, `[System.IO.Path]::GetTempPath`, or `[System.IO.Path]::GetTempFileName`, and the PowerShell test-purity hook raises no finding on them.
+- [x] No Python file is added under `.claude/hooks/` or `.codex/hooks/`, and no changed hook invokes `python`, `py`, or `poetry`.
 - [ ] PoshQC format, analyze, and test complete without errors on all changed PowerShell files in a single pass.
 
 ## Risks & Mitigations
