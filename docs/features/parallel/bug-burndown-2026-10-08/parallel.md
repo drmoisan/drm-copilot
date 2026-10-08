@@ -102,7 +102,7 @@ items:
   - issue_num: 791
     feature_folder: "docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follow-ups-791"
     kind: "bug"
-    state: "admitted"
+    state: "prepared"
     blast_radius:
       paths:
         - ".claude/agents/parallel-orchestrator.md"
@@ -169,7 +169,7 @@ items:
       contracts:
         - "parallel-remove"
       source: "declared"
-      computed_at: "10/08/2026 19:00:39"
+      computed_at: "10/08/2026 21:38:36"
   - issue_num: 793
     feature_folder: "docs/features/active/2026-09-30-epic-orchestrator-state-validator-crashes-on-unhashable-merge-status-793"
     kind: "bug"
@@ -242,7 +242,7 @@ items:
   - issue_num: 794
     feature_folder: "parallel-cohorts-split-words-drops-tokens-after-first-newline"
     kind: "bug"
-    state: "proposed"
+    state: "admitted"
     blast_radius:
       paths: []
       modules: []
@@ -253,7 +253,7 @@ items:
   - issue_num: 796
     feature_folder: "duplicated-string-comparators-outside-pr-context"
     kind: "bug"
-    state: "proposed"
+    state: "admitted"
     blast_radius:
       paths: []
       modules: []
@@ -264,7 +264,7 @@ items:
   - issue_num: 797
     feature_folder: "blast-radius-path-extractor-misses-real-plan-writes"
     kind: "bug"
-    state: "proposed"
+    state: "admitted"
     blast_radius:
       paths: []
       modules: []
@@ -275,7 +275,7 @@ items:
   - issue_num: 798
     feature_folder: "orchestration-validator-last-updated-undocumented-and-file-path-invocation-fails"
     kind: "bug"
-    state: "proposed"
+    state: "admitted"
     blast_radius:
       paths: []
       modules: []
@@ -401,15 +401,15 @@ Run branch: `parallel/bug-burndown-2026-10-08-plan`. Each item opens its own pul
 
 | group | issue_num | state | band | branch | plan-path |
 | --- | --- | --- | --- | --- | --- |
-| P1 | 797 | proposed |  | bug/blast-radius-path-extractor-misses-real-plan-writes-797 |  |
-| P2 | 794 | proposed |  | bug/parallel-cohorts-split-words-drops-tokens-after-first-newline-794 |  |
+| P1 | 797 | admitted |  | bug/blast-radius-path-extractor-misses-real-plan-writes-797 |  |
+| P2 | 794 | admitted |  | bug/parallel-cohorts-split-words-drops-tokens-after-first-newline-794 |  |
 | P3 | 793 | prepared | C2 | bug/epic-orchestrator-state-validator-crashes-on-unhashable-merge-status-793 | docs/features/active/2026-09-30-epic-orchestrator-state-validator-crashes-on-unhashable-merge-status-793/plan.2026-10-08T13-57.md |
-| P4 | 798 | proposed |  | bug/orchestration-validator-last-updated-undocumented-and-file-path-invocation-fails-798 |  |
+| P4 | 798 | admitted |  | bug/orchestration-validator-last-updated-undocumented-and-file-path-invocation-fails-798 |  |
 | P5 | 849 | proposed |  | bug/parallel-items-fail-completion-on-promotion-receipts-849 |  |
 | P6 | 843 | proposed |  | bug/parallel-model-routing-admitted-item-source-and-absent-band-test-843 |  |
 | P7 | 790 | prepared | C3 | bug/issue-507-python-push-down-divergence-follow-ups-790 | docs/features/active/2026-09-29-issue-507-python-push-down-divergence-follow-ups-790/plan.2026-10-08T13-56.md |
-| P8 | 791 | admitted | C3 | bug/issue-763-parallel-skill-cli-port-follow-ups-791 | docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follow-ups-791/plan.2026-10-08T13-56.md |
-| P9 | 796 | proposed |  | bug/duplicated-string-comparators-outside-pr-context-796 |  |
+| P8 | 791 | prepared | C3 | bug/issue-763-parallel-skill-cli-port-follow-ups-791 | docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follow-ups-791/plan.2026-10-08T13-56.md |
+| P9 | 796 | admitted |  | bug/duplicated-string-comparators-outside-pr-context-796 |  |
 | P10 | 844 | proposed |  | bug/handoff-failure-cause-fallback-and-name-gaps-844 |  |
 | P11 | 845 | proposed |  | bug/npm-token-guard-comparison-false-positive-and-stale-docstring-845 |  |
 | P12 | 842 | proposed |  | bug/cleanup-worktrees-scan-root-derivation-follow-ups-842 |  |
