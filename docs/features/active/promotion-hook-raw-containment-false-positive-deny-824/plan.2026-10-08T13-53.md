@@ -267,22 +267,22 @@ Rules for every new test file: Arrange-Act-Assert; no temporary file; no network
   - Acceptance: [P1-T2] reports `PESTER_TOTAL: 23`.
 - [x] [P1-T2] [expect-fail] Run `sh SCRATCHPAD/s-pester.sh REG` against the unchanged production tree and record `FEATURE/evidence/regression-testing/fail-before.STAMP.md`.
   - Acceptance: `EXIT_CODE: 1`, `ExpectedExitCode: 1`, `PESTER_TOTAL: 23`, `PESTER_PASSED: 0`, `PESTER_FAILED: 23`; `Output Summary:` lists one `RESULT Failed` line per row with its `R-...` ID and the first assertion or error message. REG-13..REG-17 fail with `PR_BODY_PATH_NONCANONICAL` or on the not-yet-defined `Get-PrAuthorBodyFileRoot` mock target; REG-18..REG-21 fail because `.claude/hooks/enforce-pr-author-command-allowlist.ps1` does not exist yet. REG-09..REG-12 fail with a `PR_AUTHOR_SKILL_BLOCKED:` reason, not on a mock or setup error. The artifact states the failure cause per row.
-- [ ] [P1-T3] Commit and push (`git add --` and `git commit -m "test(824): add named regression rows (fail-before)" --` over `tests/scripts/claude-hooks/hook-command-invocation.Issue824Regression.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from that test file and listed in `FEATURE/evidence/other/test-split-log.md`, as the pathspecs of both the `git add --` and the `git commit ... --` commands; then `git push -u origin BRANCH`).
+- [x] [P1-T3] Commit and push (`git add --` and `git commit -m "test(824): add named regression rows (fail-before)" --` over `tests/scripts/claude-hooks/hook-command-invocation.Issue824Regression.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from that test file and listed in `FEATURE/evidence/other/test-split-log.md`, as the pathspecs of both the `git add --` and the `git commit ... --` commands; then `git push -u origin BRANCH`).
   - Acceptance: each command exits 0.
 
 ### Phase 2 — Scanner Delimiter, TokenText, and Heredoc Module
 
-- [ ] [P2-T1] Create `.claude/hooks/hook-command-heredoc.ps1` containing `Read-CommandLineHeredocHeader` and `Read-CommandLineHeredocBody` moved verbatim from `.claude/hooks/hook-command-scanner.ps1:198-301`, with a header docblock in the scanner's style (pure string logic, dot-sourced by the scanner).
+- [x] [P2-T1] Create `.claude/hooks/hook-command-heredoc.ps1` containing `Read-CommandLineHeredocHeader` and `Read-CommandLineHeredocBody` moved verbatim from `.claude/hooks/hook-command-scanner.ps1:198-301`, with a header docblock in the scanner's style (pure string logic, dot-sourced by the scanner).
   - Acceptance: [P2-T5] row SC-13 passes.
-- [ ] [P2-T2] Edit `.claude/hooks/hook-command-scanner.ps1`: delete the two moved functions; add `. (Join-Path $PSScriptRoot 'hook-command-heredoc.ps1')` after the header docblock; add `Delimiter` and `TokenText` per DC-2 to `ConvertTo-CommandLineSegmentRecord` and to both record-construction sites in `Read-CommandLineSegment`; extend the `.OUTPUTS` list at `:318-336`.
+- [x] [P2-T2] Edit `.claude/hooks/hook-command-scanner.ps1`: delete the two moved functions; add `. (Join-Path $PSScriptRoot 'hook-command-heredoc.ps1')` after the header docblock; add `Delimiter` and `TokenText` per DC-2 to `ConvertTo-CommandLineSegmentRecord` and to both record-construction sites in `Read-CommandLineSegment`; extend the `.OUTPUTS` list at `:318-336`.
   - Acceptance: [P2-T5] rows SC-01..SC-12 pass and the existing scanner suites pass.
-- [ ] [P2-T3] Run `sh SCRATCHPAD/s-mirror.sh codex-scanner` and record `FEATURE/evidence/other/mirror-codex-scanner.STAMP.md`.
+- [x] [P2-T3] Run `sh SCRATCHPAD/s-mirror.sh codex-scanner` and record `FEATURE/evidence/other/mirror-codex-scanner.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; two `COPIED` lines whose source and target hashes are equal.
-- [ ] [P2-T4] Create `tests/scripts/claude-hooks/hook-command-scanner.Issue824.Tests.ps1` with rows SC-01..SC-13 (section 5 T-SCAN).
+- [x] [P2-T4] Create `tests/scripts/claude-hooks/hook-command-scanner.Issue824.Tests.ps1` with rows SC-01..SC-13 (section 5 T-SCAN).
   - Acceptance: [P2-T5] reports every SC row passed for both runtimes.
-- [ ] [P2-T5] Run `sh SCRATCHPAD/s-pester.sh P2` and record `FEATURE/evidence/qa-gates/phase2-pester.STAMP.md`.
+- [x] [P2-T5] Run `sh SCRATCHPAD/s-pester.sh P2` and record `FEATURE/evidence/qa-gates/phase2-pester.STAMP.md`.
   - Acceptance: `PESTER_FAILED` names only tests in `B_SCOPED`; no `FAILED_TEST:` line names a T-SCAN row; every Phase 2 shared-module edit that [P2-T3] did not copy has a matching `mirror-<group>-phase2` artifact written before this run (rule 6).
-- [ ] [P2-T6] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase2-lines.STAMP.md`.
+- [x] [P2-T6] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase2-lines.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0` and `OVER_500: NONE`.
 - [ ] [P2-T7] Commit and push the four production files, the new test file, and evidence (`git add -- .claude/hooks/hook-command-scanner.ps1 .claude/hooks/hook-command-heredoc.ps1 .codex/hooks/hook-command-scanner.ps1 .codex/hooks/hook-command-heredoc.ps1 tests/scripts/claude-hooks/hook-command-scanner.Issue824.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every other shared module (both surfaces) edited or copied under rule 6 during Phase 2, matching `git commit -m "feat(824): scanner delimiter capture and heredoc module" -- <same paths>`, `git push -u origin BRANCH`).
   - Acceptance: each command exits 0.
