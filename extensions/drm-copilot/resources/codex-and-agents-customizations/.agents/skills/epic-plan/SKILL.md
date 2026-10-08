@@ -181,7 +181,8 @@ byte-identical; the manifest, durable kickoff, plans, and planning commits must 
 repository-aware readiness validator without worktree drift.
 
 Invoke `validate_orchestration_artifacts` for `epic-planner-state` with
-`require_ready_for_execution: true` and the explicit workspace root. Do not write or delegate the
+`require_ready_for_execution: true`, `require_codex_topology: true`,
+`require_codex_model_routing: true`, and the explicit workspace root. Do not write or delegate the
 kickoff until this canonical gate succeeds.
 
 ## Kickoff Artifacts

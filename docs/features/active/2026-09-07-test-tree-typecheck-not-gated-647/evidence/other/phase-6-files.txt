@@ -1,0 +1,10 @@
+extensions/drm-copilot/test/extension-command-helpers.test.ts(
+extensions/drm-copilot/test/extension.collect-commit-context.integration.test.ts(
+extensions/drm-copilot/test/extension.collect-pr-context-gh-resolution.test.ts(
+extensions/drm-copilot/test/extension.collect-pr-context.test.ts(
+extensions/drm-copilot/test/extension.integration.test.ts(
+extensions/drm-copilot/test/extension.new-active-feature-folder-inprocess.test.ts(
+extensions/drm-copilot/test/extension.new-active-feature-folder.test.ts(
+extensions/drm-copilot/test/extension.potential-to-issue.test.ts(
+extensions/drm-copilot/test/extension.resolve-atomic-plan-prompt.test.ts(
+extensions/drm-copilot/test/extension.resolve-hard-lock-prompt.test.ts(

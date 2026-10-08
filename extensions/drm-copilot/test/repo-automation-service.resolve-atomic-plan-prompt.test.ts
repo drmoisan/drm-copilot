@@ -42,6 +42,15 @@ function createFakeFileSystem(seedTemplate: boolean): { fs: FileSystem } {
   const fs: FileSystem = {
     glob: () => [],
     isFile: (path: string) => store.has(path),
+    exists: () => {
+      throw new Error("not used");
+    },
+    isDirectory: () => {
+      throw new Error("not used");
+    },
+    listDirectory: () => {
+      throw new Error("not used");
+    },
     readTextFile: (path: string) => {
       const content = store.get(path);
       if (content === undefined) {

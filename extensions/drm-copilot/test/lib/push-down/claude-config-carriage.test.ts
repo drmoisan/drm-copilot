@@ -169,6 +169,9 @@ describe("issue #462 AC7: the routing write merges rather than overwrites", () =
     const routes = (merged as Record<string, Record<string, unknown>>)[
       "routes"
     ];
+    if (routes === undefined) {
+      throw new Error("merged routing config has no routes object");
+    }
     expect(Object.keys(routes)).toEqual(["small", "parallel", "preparation"]);
   });
 
@@ -197,6 +200,9 @@ describe("issue #462 AC7: the routing write merges rather than overwrites", () =
     const routes = (merged as Record<string, Record<string, unknown>>)[
       "routes"
     ];
+    if (routes === undefined) {
+      throw new Error("merged routing config has no routes object");
+    }
     expect(routes["parallel"]).toEqual({
       route_id: "parallel",
       requires_pr_gate: false,

@@ -152,8 +152,8 @@ function setActiveEditorPath(filePath: string | undefined): void {
 
 describe("drm-copilot resolveAtomicPlanPrompt command", () => {
   beforeEach(() => {
-    process.env.PATH = "C:/bin";
-    process.env.PATHEXT = ".EXE;.CMD";
+    process.env["PATH"] = "C:/bin";
+    process.env["PATHEXT"] = ".EXE;.CMD";
     commandHandlers.clear();
     appendLineMock.mockReset();
     registerCommandMock.mockClear();

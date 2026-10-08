@@ -221,9 +221,10 @@ Procedure, triggered by S9 step 6's merge failure:
 3. The existing R1–R5 loop processes this finding exactly as a local blocking finding:
    `atomic-planner` (R1) plans the resolution, `atomic-executor` performs preflight (R2) then
    resolves the conflict markers, stages, and commits (R3), `feature-review` re-audits (R4).
-4. The child's own `remediation_pass` counter is shared with local-finding and CI-failure passes
-   (cap 3), unmodified.
-5. On the third conflict pass without resolution, the child's `orchestrator` records
+4. Conflict cycles share the child's own `remediation_loop.completed_attempts` count with
+   local-finding and CI-failure cycles. The active cycle number is `completed_attempts + 1`, and a
+   cycle without an applied candidate consumes no number.
+5. After three completed attempts without resolution, the child's `orchestrator` records
    `step9_status: "blocked_conflict_loop_limit"` (parallel to `blocked_ci_loop_limit`), does not
    write DONE, and halts. It reports this status to `epic-orchestrator`, which mirrors it into
    the epic checkpoint's per-feature `merge_status: "blocked_conflict_loop_limit"` field.
@@ -242,9 +243,15 @@ cross-call/conversation-state visibility.
   dependency's `merge_status` is `merged` or `worktree_removed`.
 - **Layer 2 — retrospective backstop:** the wave-barrier ordering invariant inside
   `validate_epic_orchestrator_state_text`, enforced at `epic-orchestrator` `SubagentStop` time via
-  the parameterized `validate-orchestrator-output.ps1` hook. It appends
-  `EPIC_WAVE_BARRIER_VIOLATION: <f> started before dependency <d> merged` when a dependency edge's
-  timing invariant is violated.
+  the parameterized `validate-orchestrator-output.ps1` hook. It checks only a dependent feature
+  that is treated as started: one with a string `worktree_created_at`, or with a `merge_status`
+  other than `not_started` (a missing or non-string `merge_status` counts as started). It appends
+  exactly one error per violated dependency edge. When the dependency's `merge_status` is not
+  `merged` or `worktree_removed`, the error is
+  `EPIC_WAVE_BARRIER_VIOLATION: <f> is treated as started while dependency <d> is not merged`.
+  Otherwise, when the dependency's `merge_confirmed_at` is later than the dependent's
+  `worktree_created_at`, the error is
+  `EPIC_WAVE_BARRIER_VIOLATION: <f> worktree_created_at precedes dependency <d> merge_confirmed_at`.
 
 Both layers are required; neither alone closes the gap. `epic-orchestrator` does not launch wave
 N+1 until every wave-N feature's dependency edges are durably confirmed merged, verified against

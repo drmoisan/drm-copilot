@@ -3,15 +3,16 @@ import { describe, expect, it } from "@jest/globals";
 import { potentialToIssueServiceCall } from "../../../src/lib/potential-to-issue/potential-to-issue-service-call";
 import { resolvePotentialToIssueToolInput } from "../../../src/mcp-tool-inputs";
 import {
+  DroppingMovePotentialFileSystem,
   FakeGhClient,
   FakePotentialFileSystem,
   type RecordedGhCall,
   WORKSPACE,
 } from "./promotion-test-support";
 import {
-  BlockedPathPotentialFileSystem,
   DIFFERING_POTENTIAL,
   DIFFERING_WORKSPACE,
+  LateBlockedPathPotentialFileSystem,
   makeRecordingResolver,
   makeRunner,
   POTENTIAL,
@@ -333,9 +334,10 @@ describe("potentialToIssueServiceCall receipt post-condition", () => {
   const DESTINATION = "/workspace/docs/features/potential/promoted/sample.md";
 
   it("throws when the promoted destination is absent", () => {
-    // Arrange: the promoted destination reports as absent after the move.
+    // Arrange: the promoted destination passes the workflow's post-move check
+    // and then reports as absent at the service-call receipt guard.
     const build = (): FakePotentialFileSystem => {
-      const fs = new BlockedPathPotentialFileSystem(DESTINATION);
+      const fs = new LateBlockedPathPotentialFileSystem(DESTINATION);
       seedFeature(fs, POTENTIAL);
       return fs;
     };
@@ -393,5 +395,40 @@ describe("potentialToIssueServiceCall receipt post-condition", () => {
     // Assert
     expect(result.destinationPath).toBe(DESTINATION);
     expect(result.artifacts).toEqual(["https://example.com/issues/123"]);
+  });
+
+  it("throws with the exit code, issue URL, and missing-path line when the workflow move check fails", () => {
+    // Arrange: the move drops the file, so the workflow's post-move check
+    // returns a non-zero outcome that the service call surfaces as an error.
+    const fs = new DroppingMovePotentialFileSystem();
+    seedFeature(fs, POTENTIAL);
+    const gh = new FakeGhClient(
+      { output: ["Created: https://example.com/issues/123"], exitCode: 0 },
+      { output: [], exitCode: 0 },
+    );
+
+    // Act
+    let thrown: unknown;
+    try {
+      potentialToIssueServiceCall({
+        fileSystem: fs,
+        runner: makeRunner([]),
+        gh,
+        workspaceRoot: WORKSPACE,
+        potentialPath: POTENTIAL,
+        promotionType: "feature",
+        workMode: "full",
+      });
+    } catch (error: unknown) {
+      thrown = error;
+    }
+
+    // Assert: the message carries the exit code, the created issue URL, and the
+    // missing-path line so the caller can reconcile the orphaned issue.
+    expect(thrown).toBeInstanceOf(Error);
+    const message = thrown instanceof Error ? thrown.message : "";
+    expect(message).toContain("Command exited with code 1.");
+    expect(message).toContain("https://example.com/issues/123");
+    expect(message).toContain("Promoted file missing after move:");
   });
 });

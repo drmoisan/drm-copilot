@@ -37,6 +37,18 @@ class VirtualFileSystem implements FileSystem {
     return this.files.has(relative);
   }
 
+  exists(): boolean {
+    throw new Error("not used");
+  }
+
+  isDirectory(): boolean {
+    throw new Error("not used");
+  }
+
+  listDirectory(): string[] {
+    throw new Error("not used");
+  }
+
   readTextFile(): string {
     throw new Error("not used");
   }
@@ -123,6 +135,15 @@ describe("findForbiddenPaths", () => {
     const fs: FileSystem = {
       glob: () => [`${ROOT}/artifacts/baselines`],
       isFile: () => false,
+      exists: () => {
+        throw new Error("not used");
+      },
+      isDirectory: () => {
+        throw new Error("not used");
+      },
+      listDirectory: () => {
+        throw new Error("not used");
+      },
       readTextFile: () => {
         throw new Error("not used");
       },
@@ -146,6 +167,15 @@ describe("findForbiddenPaths", () => {
     const fs: FileSystem = {
       glob: () => ["/other/artifacts/baselines/x.md"],
       isFile: () => true,
+      exists: () => {
+        throw new Error("not used");
+      },
+      isDirectory: () => {
+        throw new Error("not used");
+      },
+      listDirectory: () => {
+        throw new Error("not used");
+      },
       readTextFile: () => {
         throw new Error("not used");
       },

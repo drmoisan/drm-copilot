@@ -13,6 +13,7 @@ import {
   getFreshFsMock,
   prepareFreshModulesWithPosixPathResolve,
   setExecutablePresenceOnFsMock,
+  type ExecutablePresence,
 } from "./runtime-test-helpers";
 
 const appendLineMock = jest.fn<(line: string) => void>();
@@ -45,12 +46,7 @@ const childProcessMock = jest.requireMock("node:child_process") as {
   spawn: jest.Mock;
 };
 
-function setFreshExecutablePresence(presence: {
-  readonly python?: boolean;
-  readonly py?: boolean;
-  readonly pwsh?: boolean;
-  readonly powershell?: boolean;
-}): void {
+function setFreshExecutablePresence(presence: ExecutablePresence): void {
   setExecutablePresenceOnFsMock(getFreshFsMock(), presence);
 }
 
@@ -60,19 +56,14 @@ function createFreshRepoAutomationService(): typeof import("../src/repo-automati
   );
 }
 
-function setExecutablePresence(presence: {
-  readonly python?: boolean;
-  readonly py?: boolean;
-  readonly pwsh?: boolean;
-  readonly powershell?: boolean;
-}): void {
+function setExecutablePresence(presence: ExecutablePresence): void {
   setExecutablePresenceOnFsMock(fsMock, presence);
 }
 
 describe("repo automation dispatch", () => {
   beforeEach(() => {
-    process.env.PATH = "C:/bin";
-    process.env.PATHEXT = ".EXE;.CMD";
+    process.env["PATH"] = "C:/bin";
+    process.env["PATHEXT"] = ".EXE;.CMD";
     appendLineMock.mockReset();
     childProcessMock.spawn.mockReset();
     fsMock.copyFileSync.mockReset();
@@ -159,6 +150,15 @@ describe("repo automation dispatch", () => {
       fileSystem: {
         glob: () => [],
         isFile: () => false,
+        exists: () => {
+          throw new Error("not used");
+        },
+        isDirectory: () => {
+          throw new Error("not used");
+        },
+        listDirectory: () => {
+          throw new Error("not used");
+        },
         readTextFile: () => "",
         writeTextFile: (p: string, c: string) =>
           void writes.set(p.replace(/\\/g, "/"), c),
@@ -242,7 +242,7 @@ describe("repo automation dispatch", () => {
         string,
         string[],
       ];
-      expect(args[5].startsWith("C:/extension/resources/templates/")).toBe(
+      expect(args[5]?.startsWith("C:/extension/resources/templates/")).toBe(
         true,
       );
     } finally {

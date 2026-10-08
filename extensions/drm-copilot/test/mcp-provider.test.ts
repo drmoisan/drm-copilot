@@ -179,7 +179,7 @@ describe("registerMcpProvider", () => {
     // Assert: the constructed server definition had cwd assigned to the
     // workspace URI.
     expect(mcpServerDefInstances).toHaveLength(1);
-    expect(mcpServerDefInstances[0].cwd).toBe(workspaceUri);
+    expect(mcpServerDefInstances[0]?.cwd).toBe(workspaceUri);
   });
 
   it("returns the server argument unchanged from resolveMcpServerDefinition", async () => {

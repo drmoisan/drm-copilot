@@ -108,9 +108,10 @@ export function discoverCanonicalEvidenceFiles(
  * Parse required schema fields and normalize verification status.
  *
  * Mirrors Python `parse_verification_evidence_markdown`: parse `Key: value`
- * rows (first occurrence wins for required fields), and when any required field
- * is missing or `EXIT_CODE` is not an integer, the result is `unparseable`;
- * otherwise `pass` when exit code is `0`, else `fail`.
+ * rows with the first occurrence winning for the required fields and for
+ * `ExpectedExitCode` in both the Python and TypeScript parsers, and when any
+ * required field is missing or `EXIT_CODE` is not an integer, the result is
+ * `unparseable`; otherwise `pass` when exit code is `0`, else `fail`.
  *
  * @param params Feature id, source path, and raw markdown content.
  * @returns A normalized evidence record.
@@ -124,7 +125,8 @@ export function parseVerificationEvidenceMarkdown(params: {
   const parsed = new Map<string, string>();
 
   // Parse `Key: value` rows once, keeping only the first occurrence of each
-  // required schema field (mirrors the Python dict-first-write semantics).
+  // required schema field; the Python parser applies the same first-occurrence
+  // rule.
   for (const rawLine of splitLines(markdown)) {
     const colonIndex = rawLine.indexOf(":");
     if (colonIndex === -1) {
