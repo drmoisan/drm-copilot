@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 4
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-08T07:10:26Z
+- `last_updated`: 2026-10-08T07:34:14Z
 
 **Items**
 
@@ -38,7 +38,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 723 | docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/813 | 12fd3c2639f17aec3572f90e8d929205059be56d | 2026-09-30T13:34:37Z | 2026-10-02T00:43:34Z |  |
 | 734 | docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/818 | 74e1d6741485aa38c28fecbbc77ea169f31df0ef | 2026-10-02T07:15:04Z | 2026-10-02T08:15:36Z |  |
 | 739 | docs/features/active/2026-09-27-npm-token-guard-gaps-739 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/814 | dcb605ef9078ccf8bffffff08e4f1344a0c76594 | 2026-10-02T00:44:12Z | 2026-10-02T01:22:30Z |  |
-| 740 | docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740 | 4 | in_flight | worktree_created |  |  | 2026-10-08T06:35:30Z |  |  |
+| 740 | docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740 | 4 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/839 | e7d3779b398604af919678c16c877c8539a86cc0 | 2026-10-08T06:35:30Z | 2026-10-08T07:33:09Z |  |
 | 741 | docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/819 | ef80c57df8f8bbc7d2e9ac51586150dfee3cd5fd | 2026-10-02T07:25:34Z | 2026-10-02T08:51:49Z |  |
 | 743 | docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/810 | 1b1e349f1d0fb8b00eb69a809ef380fcc6eb35b9 | 2026-10-01T15:52:55Z | 2026-10-02T03:08:04Z |  |
 | 744 | docs/features/active/2026-09-27-orchestration-completion-gate-and-tooling-friction-744 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/817 | 71f8dcb49d8ce5d1402ff441855a64be15b37f29 | 2026-10-02T05:13:22Z | 2026-10-02T07:24:50Z |  |
