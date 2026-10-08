@@ -51,48 +51,48 @@
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Verify the minor-audit preconditions for FEATURE (`docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md`) and write FEATURE/evidence/baseline/phase0-mode-check.TS.md.
+- [x] [P0-T1] Verify the minor-audit preconditions for FEATURE (`docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md`) and write FEATURE/evidence/baseline/phase0-mode-check.TS.md.
       Commands: `git ls-files docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740`; the Glob tool with the pattern docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/{spec,user-story}.md; `git grep -c -F "## Acceptance Criteria" -- docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md`; `git grep -c -F "Work Mode: minor-audit" -- docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/issue.md`.
       Acceptance: neither the listing nor the Glob returns spec.md or user-story.md; each `git grep -c` prints a count of 1. Any other result stops the plan.
-- [ ] [P0-T2] Read `CLAUDE.md` (policy order step 1: standing instructions, including the tonality reference to .claude/rules/tonality.md).
+- [x] [P0-T2] Read `CLAUDE.md` (policy order step 1: standing instructions, including the tonality reference to .claude/rules/tonality.md).
       Acceptance: the file is read in full and listed first in the P0-T8 artifact.
-- [ ] [P0-T3] Read `.claude/rules/general-code-change.md` (policy order step 2).
+- [x] [P0-T3] Read `.claude/rules/general-code-change.md` (policy order step 2).
       Acceptance: the file is read in full and listed second in the P0-T8 artifact.
-- [ ] [P0-T4] Read `.claude/rules/general-unit-test.md` (policy order step 3).
+- [x] [P0-T4] Read `.claude/rules/general-unit-test.md` (policy order step 3).
       Acceptance: the file is read in full and listed third in the P0-T8 artifact.
-- [ ] [P0-T5] Read `.claude/rules/typescript.md` (policy order step 4, TypeScript).
+- [x] [P0-T5] Read `.claude/rules/typescript.md` (policy order step 4, TypeScript).
       Acceptance: the file is read in full and listed fourth in the P0-T8 artifact.
-- [ ] [P0-T6] Read `.claude/rules/typescript-suppressions.md` (policy order step 4, TypeScript).
+- [x] [P0-T6] Read `.claude/rules/typescript-suppressions.md` (policy order step 4, TypeScript).
       Acceptance: the file is read in full and listed fifth in the P0-T8 artifact.
-- [ ] [P0-T7] Read `.claude/rules/quality-tiers.md` (coverage thresholds referenced by step 3).
+- [x] [P0-T7] Read `.claude/rules/quality-tiers.md` (coverage thresholds referenced by step 3).
       Acceptance: the file is read in full and listed sixth in the P0-T8 artifact.
-- [ ] [P0-T8] Write FEATURE/evidence/baseline/phase0-instructions-read.md (`docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/evidence/baseline/phase0-instructions-read.md`) with `Timestamp:`, `Policy Order:`, and the explicit list of the six files read in P0-T2 through P0-T7, in that order.
+- [x] [P0-T8] Write FEATURE/evidence/baseline/phase0-instructions-read.md (`docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740/evidence/baseline/phase0-instructions-read.md`) with `Timestamp:`, `Policy Order:`, and the explicit list of the six files read in P0-T2 through P0-T7, in that order.
       Acceptance: the artifact exists with the three required headers and lists exactly those six files in order.
-- [ ] [P0-T9] Install EXT dependencies and write FEATURE/evidence/baseline/ts-npm-ci.TS.md.
+- [x] [P0-T9] Install EXT dependencies and write FEATURE/evidence/baseline/ts-npm-ci.TS.md.
       Commands: the Glob tool with the pattern extensions/drm-copilot/node_modules/jest/package.json; when it returns no file, `cd extensions/drm-copilot && npm ci --no-audit --no-fund`; then `git status --porcelain -- extensions/drm-copilot/package.json extensions/drm-copilot/package-lock.json`.
       Acceptance: after the task, the Glob returns extensions/drm-copilot/node_modules/jest/package.json; `npm ci` (when run) exits 0; the status command prints nothing, so the lockfile is unchanged. If the install command is denied by a permission rule, stop and report, because every later toolchain task depends on it.
-- [ ] [P0-T10] Record the pre-edit scope baseline and write FEATURE/evidence/baseline/scope-baseline.TS.md.
+- [x] [P0-T10] Record the pre-edit scope baseline and write FEATURE/evidence/baseline/scope-baseline.TS.md.
       Commands: `git rev-parse HEAD`; `git merge-base HEAD origin/main`; then, with the merge-base output substituted for BASE_SHA, `git diff --name-only BASE_SHA -- extensions/drm-copilot scripts`; `git status --porcelain -- extensions/drm-copilot scripts`.
       Acceptance: the rev-parse and merge-base commands each print one 40-character hexadecimal SHA, recorded as HEAD_SHA and BASE_SHA; the complete output of the diff and status commands is recorded verbatim as BASELINE-DRIFT (it is expected to be empty). If BASELINE-DRIFT lists any IN-SCOPE code file, stop, because the coverage delta of P2-T9 would then mix pre-existing drift into the changed-line set.
-- [ ] [P0-T11] Baseline format check (read-only) and write FEATURE/evidence/baseline/ts-prettier.TS.md.
+- [x] [P0-T11] Baseline format check (read-only) and write FEATURE/evidence/baseline/ts-prettier.TS.md.
       Command: `cd extensions/drm-copilot && npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"`.
       Acceptance: the command is executed and its exit code and output recorded. Observed success output on this toolchain is the line "All matched files use Prettier code style!" with exit 0. A non-zero exit is recorded with every file name it lists as pre-existing drift; it is not repaired in Phase 0.
-- [ ] [P0-T12] Baseline lint and write FEATURE/evidence/baseline/ts-eslint.TS.md.
+- [x] [P0-T12] Baseline lint and write FEATURE/evidence/baseline/ts-eslint.TS.md.
       Command: `cd extensions/drm-copilot && npx eslint --no-error-on-unmatched-pattern src test`.
       Acceptance: the command is executed; exit code, error count, and warning count are recorded. Observed success output is empty with exit 0.
-- [ ] [P0-T13] Baseline type check and write FEATURE/evidence/baseline/ts-tsc.TS.md.
+- [x] [P0-T13] Baseline type check and write FEATURE/evidence/baseline/ts-tsc.TS.md.
       Command: `cd extensions/drm-copilot && npx tsc -p ./ --noEmit`.
       Acceptance: the command is executed; exit code and the count of `error TS` lines are recorded. Observed success output is empty with exit 0.
-- [ ] [P0-T14] Baseline targeted pr-context test run and write FEATURE/evidence/baseline/ts-jest-pr-context.TS.md.
+- [x] [P0-T14] Baseline targeted pr-context test run and write FEATURE/evidence/baseline/ts-jest-pr-context.TS.md.
       Command: `cd extensions/drm-copilot && npx jest --config jest.config.cjs test/lib/pr-context`.
       Acceptance: exit 0; the `Test Suites:` and `Tests:` summary lines are recorded verbatim, and the Tests total is recorded as PRC_BASE_TOTAL. A non-zero exit stops the plan, because AC-11 presumes a green pr-context baseline.
-- [ ] [P0-T15] Baseline full test suite with coverage and write FEATURE/evidence/baseline/ts-jest-coverage.TS.md.
+- [x] [P0-T15] Baseline full test suite with coverage and write FEATURE/evidence/baseline/ts-jest-coverage.TS.md.
       Commands: `cd extensions/drm-copilot && npx jest --config jest.config.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary --coverageReporters=json-summary`; then read SUMMARY.
       Acceptance: exit 0; the `Test Suites:` and `Tests:` lines and the four text-summary percentages are recorded; no `coverage threshold` failure line appears. `Output Summary:` records, for each of the eight PROD-FILES, `lines.pct (covered/total)` and `branches.pct (covered/total)` from SUMMARY as numbers. A non-zero exit stops the plan. If `render.ts`, `gh-client-details.ts`, or `verification-evidence.ts` is below 85 lines or 75 branches, record it and stop before P1-T18, because adding its threshold entry would fail AC-13 on pre-existing coverage.
-- [ ] [P0-T16] Baseline line counts of the eleven IN-SCOPE code files and write FEATURE/evidence/baseline/line-counts.TS.md.
+- [x] [P0-T16] Baseline line counts of the eleven IN-SCOPE code files and write FEATURE/evidence/baseline/line-counts.TS.md.
       Command: `git grep -c -E "^" -- extensions/drm-copilot/src/lib/pr-context/models.ts extensions/drm-copilot/src/lib/pr-context/collector-core.ts extensions/drm-copilot/src/lib/pr-context/render.ts extensions/drm-copilot/src/lib/pr-context/gh-client-details.ts extensions/drm-copilot/src/lib/pr-context/render-pr-helpers.ts extensions/drm-copilot/src/lib/pr-context/verification-evidence.ts extensions/drm-copilot/src/lib/pr-context/render-feature-excerpts.ts extensions/drm-copilot/src/lib/pr-context/feature-docs-parsers.ts extensions/drm-copilot/test/lib/pr-context/models.test.ts extensions/drm-copilot/test/lib/pr-context/feature-docs.test.ts extensions/drm-copilot/jest.config.cjs`.
       Acceptance: exit 0 and eleven `path:count` lines recorded. The counts are expected to match D6 within one line each (trailing-newline accounting); a larger difference is recorded and the D6 headroom is re-derived in the artifact.
-- [ ] [P0-T17] Baseline helper-definition count for AC-6 and write FEATURE/evidence/baseline/helper-definitions.TS.md.
+- [x] [P0-T17] Baseline helper-definition count for AC-6 and write FEATURE/evidence/baseline/helper-definitions.TS.md.
       Command: `git grep -n -E "function (sortedSet|relativeToPosix|escapeRegExp|splitLines)\(" -- extensions/drm-copilot/src/lib/pr-context`.
       Acceptance: exit 0 and exactly 12 output lines: `verification-evidence.ts:266` and `:280`, `render-feature-excerpts.ts:431` and `:440`, `render.ts:377` and `:387`, `gh-client-details.ts:123`, `render-pr-helpers.ts:394`, `feature-docs-parsers.ts:299` and `:314`, `collector-core.ts:384`, `models.ts:221`. This proves the P2-T10 condition (exactly 4 lines) can fail.
 
