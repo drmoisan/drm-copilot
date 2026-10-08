@@ -1,44 +1,653 @@
 # 2026-09-27-hook-test-isolation-remaining-gaps (Plan)
 
-- **Issue:** #737
-- **Parent (optional):** none
+- **Issue:** #737 (primary); #746 (bundled secondary)
+- **Parent (optional):** epic #852 (`enforcement-hook-precision`), child C5b
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-08T13-54
-- **Status:** Draft
-- **Version:** 0.1
+- **Last Updated:** 2026-10-08T15-10
+- **Status:** Draft v1.0; ready for executor preflight
+- **Version:** 1.0
+- **Work Mode:** full-bug (from `issue.md` metadata; `spec.md` is the sole acceptance-criteria source; `user-story.md` is absent by design)
+- **Branch:** `bug/hook-test-isolation-remaining-gaps-737`
+- **Integration branch:** `origin/epic/enforcement-hook-precision-integration`
+- **Feature folder:** `docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737/` (referred to below as `<FEATURE>`)
+- **Requirements:** `<FEATURE>/spec.md` (AC-1 through AC-28, decisions D1 through D10), `<FEATURE>/issue.md`, `<FEATURE>/research/research.2026-10-08T14-00.md`, `docs/features/epics/enforcement-hook-precision/epic.md`
 
 **Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
 
 **Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
 
+## Scope Summary
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+Test-only change set. No file under `.claude/hooks`, `.codex/hooks`, `.claude/lib`, `scripts/`, or `extensions/` is edited (AC-26). Python is not changed or executed by any hook; the only Python executed is the existing bundle-parity pytest file, run read-only.
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+Files named by this plan (new files are created by this plan; edited files exist today):
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#737-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+| ID | Repository-relative path | Change |
+|---|---|---|
+| N1 | `tests/scripts/claude-hooks/EpicStateIsolation.Discovery.Helpers.ps1` | new: suite enumeration, closure, seam census, process-spawning detection |
+| N1b | `tests/scripts/claude-hooks/EpicStateIsolation.Compliance.Helpers.ps1` | new: compliance-form evaluation (F1, F2, F3, helper form) and process-spawning report |
+| N2 | `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1` | new: discovery guard over both surfaces |
+| N3 | `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Predicate.Tests.ps1` | new: CR-2 predicate rows (AC-8 through AC-12) |
+| N3b | `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Branches.Tests.ps1` | new: CR-3 branch rows (AC-13) |
+| N4 | `tests/scripts/claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1` | new: `Register-EpicStateBaselineMock` and `Invoke-EpicStateInterceptionProbe` |
+| N5 | `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Probe.Tests.ps1` | new: probe and baseline-helper rows (AC-6, AC-7) |
+| N6 | `tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.ScanRoots.Helpers.ps1` | new: scan-root definition and file enumeration |
+| N7 | `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Parity.Tests.ps1` | new: gate behavioral parity (AC-17, AC-18) |
+| N8 | `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Parity.Cases.ps1` | new: shared case table (data only) |
+| N9 | `tests/scripts/claude-lib/codex-routing/CodexDeployment.GeneratedFamilies.Parity.Tests.ps1` | new: families parity (AC-19) |
+| E1 | `tests/scripts/claude-hooks/EpicStateIsolation.Helpers.ps1` | edit: CR-2 fixes, requirement parameter, helper-form recognition |
+| E2 | `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1` | edit: remove fixed `-ForEach` list and the D9 known-limit note |
+| E3 | `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` | edit: dot-source N6, add `.codex/hooks` |
+| E4 | `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1` | edit: #746 |
+| E5 | `tests/scripts/claude-hooks/enforce-pr-author-skill.WorktreeResolution.Tests.ps1` | edit: CR-7 comment (plus any edit-set change) |
+| E6 | `tests/scripts/claude-hooks/enforce-model-routing-receipt.WorktreeResolution.Tests.ps1` | edit: CR-7 comment (plus any edit-set change) |
+| ES | the EDIT-SET (derived mechanically in P5-T1; never listed here) | edit: baseline mocks, probe row, process-spawning fixes |
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+`tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1` is read-only in this plan (500 lines today; it must stay at or below 500). `tests/scripts/claude-lib/codex-routing/CodexDeployment.Parity.Tests.ps1` is edited only if P8-T7 records a replacement decision. Read-only inputs: the two main gates, `.claude/lib/codex-routing/CodexDeployment.psm1`, `scripts/dev_tools/resolve_codex_deployment.py`, `config/orchestration-routing.json`, `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+## Evidence Location
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+All evidence is written under `<FEATURE>/evidence/<kind>/` with kinds `baseline`, `regression-testing`, `qa-gates`, `other`, and `remediation-baseline` only. No path under `artifacts/` is an evidence location. `artifacts/orchestration/` is used by this plan only for the deliberately present local checkpoint of AC-24, which is local state under test and not evidence.
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+`<ts>` in an artifact name is the executor's write time in `yyyy-MM-ddTHH-mm` form. Every command-step artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`; an artifact whose expected exit code is non-zero also carries `ExpectedExitCode: 1`. Artifacts record repository-relative paths only; replace any absolute worktree prefix that a tool prints with `<repo>` before writing.
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+## Plan Interpretations (PI)
+
+These resolve points where the specification is silent or two acceptance criteria interact. Each is recorded again in the AC-1 and AC-23 check-off artifacts.
+
+- PI-1 (AC-23 and AC-6). A probe `It` row is an addition to an existing suite, so the Passed count after the edit exceeds the baseline by the number of probe rows. The comparison rule is: Failed is 0 before and after, Skipped and NotRun are equal, and `Passed(after) - ProbeRows(after) = Passed(before)`. `ProbeRows` is the count of tests whose name begins with the literal `baseline mock interception probe`. Suites whose rows change by design (E2, E4) are compared by named rows and Failed=0 instead; new suites are reported `NEW`.
+- PI-2 (AC-6). The probe is required in every suite that complies with a module or script-scope text seam (`Get-EpicScopeCheckpointText`, `Get-WorktreeRunCheckpointText`, `Get-WorktreeItemCheckpointText`, `Get-WorktreeItemLiveRoot`) by form F1 or the helper form. A suite that complies only by form F2 or F3 has no baseline seam mock to probe and is exempt; the guard records the exemption by form.
+- PI-3 (AC-13). A branch that the unmodified predicate already handles cannot fail before the fix. For each such row P2-T9 writes a fail-before exception dossier under `evidence/regression-testing/` per `evidence-and-timestamp-conventions`, with an absence-of-test proof.
+- PI-4 (AC-4 and AC-5). Process-spawning report lines are not findings. AC-4 counts findings only.
+- PI-5 (suite population). The population is computed by CR-ENUM at run time. No task lists the in-scope suites; tasks that act on the flagged suites read them from the EDIT-SET artifact written by P5-T1. Line numbers in the research record are pre-upstream and are never used as anchors.
+- PI-6 (group slots). The EDIT-SET is edited in groups of at most four suites. Ten group slots (P5-T2 through P5-T11) are provided. A slot whose group does not exist records `NO-GROUP-<k>`. If the EDIT-SET needs more than ten groups, P5-T1 stops with BLOCKED and requests a plan revision.
+
+## Hermeticity Constraints (apply to every new or edited test and helper)
+
+- No temporary files: no `New-TemporaryFile`, no `TestDrive:`, no write under `$env:TEMP`, no `GetTempPath`, no `GetTempFileName`. Inputs are committed files or in-memory strings.
+- No gitignored state: no test reads `artifacts/orchestration/`. The only creation of such a file is the executor-side AC-24 task, which deletes it afterward.
+- No git invocation from test code (the CI checkout is depth-1); suite discovery is directory enumeration.
+- No drive letters or Windows-only paths; synthetic roots use `/synthetic-worktrees/...`; repository files are located from `$PSScriptRoot` with `Join-Path`.
+- No `-Force` on an `Import-Module` that precedes a module-scoped baseline mock.
+- Each file is 500 lines or fewer. Markdown evidence files are exempt.
+
+## Baseline-Edit Protocol (EP) for suites in the EDIT-SET
+
+- EP-1 Read the suite; locate the outermost `BeforeAll` block(s) by content. The guard finding names the suite, the seam, and the violated rule.
+- EP-2 For each flagged text seam add a null-returning mock after the hook dot-source (module seam: `Import-Module` without `-Force`, then `Mock <seam> -ModuleName <module> { $null }`; script-defined Claude or Codex seam: `Mock <seam> { $null }` without `-ModuleName`). When the post-edit line count would exceed 490, use the helper form instead: one dot-source of `tests/scripts/claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1` (located through `$PSScriptRoot`) and one `Register-EpicStateBaselineMock` statement after the hook dot-source.
+- EP-3 For a flagged cwd-derived resolver (form F3) add a mock of the resolver that returns a `/synthetic-worktrees/` root, copying the shape of the same hook family's resolver mock from a sibling suite.
+- EP-4 If the suite complies with the F1 or helper form, add exactly one `It 'baseline mock interception probe ...'` row whose body calls `Invoke-EpicStateInterceptionProbe` (PI-2).
+- EP-5 If the suite already complies, record `ALREADY-COMPLIANT: <path>` and make no edit.
+- EP-6 If a baseline mock changes the suite's Failed count, revert that suite's edit, record the failing row, and apply form F2 (the suite mocks `Test-Path` and `Get-Content` with a `-ParameterFilter` on a `/synthetic-worktrees/` literal, and every direct call to the seam passes that literal). If F2 cannot hold, stop with BLOCKED and cite the row.
+- EP-7 For a process-spawning suite found state-dependent by the differential (P1-T11), bind the child process working directory or the hook arguments to a committed fixture path outside the real repository root, in the shape `tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1` already uses; do not weaken any assertion.
+- EP-8 Do not reflow, reorder, or reformat any existing line. Do not add a comment except where the guard requires one.
+
+## Command Reference (CR)
+
+Every CR body runs from the worktree root. Primary invocation: through the PowerShell tool as `pwsh -NoProfile -Command { <body>; exit $code }`. Fallback, only when the agent-worktree isolation guard denies text containing `pwsh`: run `& { <body> }` directly in the PowerShell tool and take `EXIT_CODE` from the printed `EXIT_CODE_COMPUTED:` line. Route C, when neither works: write the CR body to a `.ps1` file in the session scratchpad directory (outside the repository; not a test file), write a scratchpad `.sh` file whose one command line runs `pwsh -NoProfile -File` on it, and run `sh <that .sh>` through the Bash tool from the worktree root; cross-check `EXIT_CODE` against `EXIT_CODE_COMPUTED:` and stop with BLOCKED if they disagree. CR-PESTER-FULL always runs through Route C or a background process, because it takes several minutes. The artifact `Command:` field records which route ran and the list substituted for `<LIST>`.
+
+Route note for counts: every count, finding, and percentage asserted by this plan is read from the direct CR output. The `mcp__drm-copilot__run_poshqc_*` tools return a summary that does not carry tool output, so no task asserts a count, percentage, or finding from them. They run only in P10-T18 and P10-T19, where the record is the call disposition and a before-and-after tree observation. `mcp__drm-copilot__run_poshqc_test` must not run between CR-PESTER-FULL and CR-COV-TOTAL, because it overwrites `artifacts/pester/powershell-coverage.xml`.
+
+Success-output observation rule: the Phase 0 observation run of each CR is the reference. Before any later task asserts over a CR's output, the Phase 0 artifact must show the success-case literal named in the CR. If a named literal is absent from a successful run, record the observed output and stop with BLOCKED; do not substitute a different literal.
+
+Branch reference: `origin/epic/enforcement-hook-precision-integration`, written as `<REF>` in CR bodies below. Every `git diff` in this plan carries that ref as an operand.
+
+### CR-ENUM (mechanical suite population; no fixed list)
+
+```powershell
+$root = (Get-Location).Path
+$list = [System.Collections.Generic.List[string]]::new()
+foreach ($dir in 'tests/scripts/claude-hooks', 'tests/scripts/codex-hooks') {
+    $found = @(Get-ChildItem -LiteralPath $dir -Filter '*.Tests.ps1' -File | ForEach-Object { $_.FullName.Substring($root.Length + 1).Replace([string][char]92, '/') })
+    "POPULATION-SURFACE: $dir | suites=$($found.Count)"
+    foreach ($item in $found) { $list.Add($item) }
+}
+$sorted = [string[]]$list.ToArray()
+[System.Array]::Sort($sorted, [System.StringComparer]::Ordinal)
+foreach ($item in $sorted) { "POPULATION-SUITE: $item" }
+"POPULATION-TOTAL: $($sorted.Count)"
+$code = [int]($sorted.Count -eq 0)
+"EXIT_CODE_COMPUTED: $code"
+```
+
+Success-case literals: two `POPULATION-SURFACE:` lines, one `POPULATION-SUITE:` line per suite, `POPULATION-TOTAL:` with a positive number, `EXIT_CODE_COMPUTED: 0`. `LIST-POP` is the `$sorted` array of this derivation, re-derived at the time each task runs. `LIST-AUX` is `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`, `tests/scripts/claude-lib/codex-routing/CodexDeployment.Parity.Tests.ps1`, `tests/scripts/claude-lib/codex-routing/CodexRouting.Manifest.Tests.ps1`.
+
+### CR-PESTER-LIST (direct Pester over an explicit file list, keyed by repository-relative path)
+
+```powershell
+$Paths = @( <LIST> )
+$NamePatterns = @( <PATTERNS> )   # wildcard patterns matched against each test's ExpandedName; may be empty
+$root = (Get-Location).Path
+Import-Module Pester -MinimumVersion 5.0.0 -ErrorAction Stop
+$configuration = New-PesterConfiguration
+$configuration.Run.Path = $Paths
+$configuration.Run.PassThru = $true
+$configuration.Output.Verbosity = 'Normal'
+$result = Invoke-Pester -Configuration $configuration
+function Get-RelativeName([string] $File) { return $File.Substring($root.Length + 1).Replace([string][char]92, '/') }
+foreach ($container in $result.Containers) { "CONTAINER: $(Get-RelativeName ([string]$container.Item)) | Result=$($container.Result)" }
+foreach ($group in ($result.Tests | Group-Object { Get-RelativeName ([string]$_.ScriptBlock.File) } | Sort-Object Name)) {
+    $passed = @($group.Group | Where-Object Result -EQ 'Passed').Count
+    $failed = @($group.Group | Where-Object Result -EQ 'Failed').Count
+    $skipped = @($group.Group | Where-Object Result -EQ 'Skipped').Count
+    $notRun = @($group.Group | Where-Object Result -EQ 'NotRun').Count
+    $probe = @($group.Group | Where-Object { $_.ExpandedName -like 'baseline mock interception probe*' }).Count
+    "SUITE: $($group.Name) | Passed=$passed | Failed=$failed | Skipped=$skipped | NotRun=$notRun | ProbeRows=$probe"
+}
+foreach ($pattern in $NamePatterns) {
+    $hits = @($result.Tests | Where-Object { $_.ExpandedName -like $pattern })
+    "NAMED: $pattern | Passed=$(@($hits | Where-Object Result -EQ 'Passed').Count) | Failed=$(@($hits | Where-Object Result -EQ 'Failed').Count) | Total=$($hits.Count)"
+}
+foreach ($test in $result.Failed) { "FAILED: $($test.ExpandedPath) :: $((($test.ErrorRecord | Select-Object -First 1).Exception.Message) -replace '\s+', ' ')" }
+"TOTAL: Passed=$($result.PassedCount) | Failed=$($result.FailedCount) | Skipped=$($result.SkippedCount) | NotRun=$($result.NotRunCount) | FailedBlocks=$($result.FailedBlocksCount) | FailedContainers=$($result.FailedContainersCount)"
+$code = if ($result.Result -eq 'Passed') { 0 } else { 1 }
+"EXIT_CODE_COMPUTED: $code"
+```
+
+Success-case literals: one `CONTAINER:` line per file with `Result=Passed`, one `SUITE:` line per file, one `NAMED:` line per pattern, a `TOTAL:` line with `Failed=0`, `EXIT_CODE_COMPUTED: 0`. The `SUITE:` lines are copied verbatim into artifacts so CR-COMPARE can read them.
+
+### CR-COMPARE (before and after suite counts; applies PI-1)
+
+```powershell
+$BeforePath = '<BEFORE-ARTIFACT>'
+$AfterPath = '<AFTER-ARTIFACT>'
+$ByDesign = @( <PATHS DECLARED BY DESIGN> )
+function Read-SuiteLine([string] $Path) {
+    $map = @{}
+    foreach ($line in Get-Content -LiteralPath $Path) {
+        if ($line -match '^\s*SUITE: (?<n>.+?) \| Passed=(?<p>\d+) \| Failed=(?<f>\d+) \| Skipped=(?<s>\d+) \| NotRun=(?<r>\d+)(?: \| ProbeRows=(?<q>\d+))?\s*$') {
+            $q = 0
+            if ($Matches['q']) { $q = [int]$Matches['q'] }
+            $map[$Matches['n']] = @{ P = [int]$Matches['p']; F = [int]$Matches['f']; S = [int]$Matches['s']; R = [int]$Matches['r']; Q = $q }
+        }
+    }
+    return $map
+}
+$before = Read-SuiteLine $BeforePath
+$after = Read-SuiteLine $AfterPath
+$different = 0
+foreach ($name in (@($before.Keys) + @($after.Keys) | Sort-Object -Unique)) {
+    $b = $before[$name]; $a = $after[$name]
+    if ($null -eq $a) { $verdict = 'MISSING' }
+    elseif ($null -eq $b) { $verdict = 'NEW' }
+    elseif ($ByDesign -contains $name) { $verdict = if ($a.F -eq 0) { 'BY-DESIGN-OK' } else { 'BY-DESIGN-FAIL' } }
+    elseif ($a.F -eq 0 -and $b.F -eq 0 -and ($a.P - $a.Q) -eq $b.P -and $a.S -eq $b.S -and $a.R -eq $b.R) { $verdict = 'EQUAL' }
+    else { $verdict = 'DIFFERENT' }
+    if ($verdict -in 'MISSING', 'DIFFERENT', 'BY-DESIGN-FAIL') { $different++ }
+    "COMPARE: $name | result=$verdict"
+}
+"COMPARE-DIFFERENT-COUNT: $different"
+$code = [int]($different -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+```
+
+Success-case literals: one `COMPARE:` line per suite, `COMPARE-DIFFERENT-COUNT: 0`, `EXIT_CODE_COMPUTED: 0`. A suite compared with itself reports `EQUAL` (observed in P0-T14).
+
+### CR-FORMAT-CHECK (read-only; mirrors the comparison in `Invoke-PoshQCFormat`)
+
+```powershell
+$Paths = @( <LIST> )
+Import-Module PSScriptAnalyzer -ErrorAction Stop
+$settings = (Resolve-Path 'scripts/powershell/PoshQC/settings/pssa.settings.psd1').Path
+$drift = 0
+foreach ($path in $Paths) {
+    $normalized = (Get-Content -Raw -LiteralPath $path) -replace "`r?`n", "`n"
+    $formatted = Invoke-Formatter -ScriptDefinition $normalized -Settings $settings
+    if ($formatted -ne $normalized) { $drift++; "FORMAT-DRIFT: $path" } else { "FORMAT-CLEAN: $path" }
+}
+"FORMAT-DRIFT-COUNT: $drift"
+$code = [int]($drift -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+```
+
+Success-case literals: one `FORMAT-CLEAN:` line per file, `FORMAT-DRIFT-COUNT: 0`, `EXIT_CODE_COMPUTED: 0`. This check writes no file.
+
+### CR-PSSA (PSScriptAnalyzer with repository settings)
+
+```powershell
+$Paths = @( <LIST> )
+Import-Module PSScriptAnalyzer -ErrorAction Stop
+$settings = (Resolve-Path 'scripts/powershell/PoshQC/settings/pssa.settings.psd1').Path
+$total = 0
+foreach ($path in $Paths) {
+    $findings = @(Invoke-ScriptAnalyzer -Path $path -Settings $settings -Severity Error, Warning, Information)
+    $total += $findings.Count
+    "PSSA: $($path) | findings=$($findings.Count)"
+    foreach ($finding in $findings) { "PSSA-FINDING: $($path):$($finding.Line) $($finding.RuleName) $($finding.Severity)" }
+}
+"PSSA-TOTAL: $total"
+$code = [int]($total -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+```
+
+Success-case literals: one `PSSA:` line per file with `findings=0`, `PSSA-TOTAL: 0`, `EXIT_CODE_COMPUTED: 0`.
+
+### CR-PESTER-FULL (full configured run)
+
+Route C body: `Import-Module ./scripts/powershell/PoshQC/PoshQC.psm1; Invoke-PoshQCTest; exit 0`. This uses `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` (`Run.Exit = $true`, coverage written to `artifacts/pester/powershell-coverage.xml`). A failing run terminates the process inside `Invoke-Pester` with a non-zero exit code; the trailing `exit 0` is reached only on a zero-failure run. Record the process exit code, the last `Tests Passed: <n>, Failed: <n>, Skipped: <n>, Inconclusive: <n>, NotRun: <n>` line, any `BeforeAll \ AfterAll failed:` or `Container failed:` line, and every line that begins `[-]`.
+
+### CR-COV-TOTAL (total line coverage from the full run)
+
+```powershell
+[xml] $report = Get-Content -Raw -LiteralPath 'artifacts/pester/powershell-coverage.xml'
+$nodes = @($report.SelectNodes('//sourcefile'))
+$covered = 0
+$missed = 0
+foreach ($node in $nodes) {
+    $line = $node.SelectSingleNode("counter[@type='LINE']")
+    if ($null -ne $line) { $covered += [int]$line.covered; $missed += [int]$line.missed }
+}
+"SOURCEFILE-COUNT: $($nodes.Count)"
+"TOTAL-LINE-COVERAGE: covered=$covered | missed=$missed | percent=$([math]::Round(100 * $covered / [math]::Max(1, $covered + $missed), 2))"
+$code = [int]($nodes.Count -eq 0)
+"EXIT_CODE_COMPUTED: $code"
+```
+
+Success-case literals: a positive `SOURCEFILE-COUNT:` and one `TOTAL-LINE-COVERAGE:` line with numeric values. Branch coverage is not measured for PowerShell and is not recorded.
+
+### CR-PARSE (parse and function-presence check)
+
+```powershell
+$Checks = @( @{ Path = '<path>'; Functions = @('<name>') } )
+$bad = 0
+foreach ($check in $Checks) {
+    $tokens = $null; $errors = $null
+    $ast = [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path -LiteralPath $check.Path).Path, [ref] $tokens, [ref] $errors)
+    $defined = @($ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true) | ForEach-Object { $_.Name })
+    $missing = @($check.Functions | Where-Object { $defined -cnotcontains $_ })
+    if (@($errors).Count -gt 0 -or $missing.Count -gt 0) { $bad++ }
+    "PARSE: $($check.Path) | errors=$(@($errors).Count) | functions-missing=$($missing.Count)"
+}
+$code = [int]($bad -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+```
+
+Success-case literal: `PARSE: <path> | errors=0 | functions-missing=0` for every checked file.
+
+### CR-LINES, CR-HERMETIC, CR-MIRROR, CR-PHRASE, CR-CHANGED
+
+```powershell
+# CR-LINES
+$Paths = @( <LIST> )
+$over = 0
+foreach ($path in $Paths) { $count = @(Get-Content -LiteralPath $path).Count; if ($count -gt 500) { $over++ }; "LINES: $path | $count" }
+"LINES-OVER-500: $over"
+$code = [int]($over -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+```
+
+```powershell
+# CR-HERMETIC: scans only lines this branch added relative to the integration ref
+$Paths = @( <LIST> )
+$tokens = @('New-TemporaryFile', 'TestDrive', 'GetTempPath', 'GetTempFileName', 'env:TEMP', 'Set-Content', 'Out-File', 'New-Item')
+$total = 0
+foreach ($path in $Paths) {
+    $added = @(git diff -U0 origin/epic/enforcement-hook-precision-integration -- $path | Where-Object { $_ -like '+*' -and $_ -notlike '+++*' })
+    $hits = 0
+    foreach ($token in $tokens) { $hits += @($added | Where-Object { $_.Contains($token) }).Count }
+    $hits += @($added | Where-Object { $_ -match '(?<![A-Za-z0-9])[A-Za-z]:[\\/]' }).Count
+    $total += $hits
+    "HERMETIC: $path | addedLines=$($added.Count) | matches=$hits"
+}
+"HERMETIC-MATCH-COUNT: $total"
+$code = [int]($total -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+```
+
+```powershell
+# CR-MIRROR
+$Paths = @( <LIST> )
+foreach ($path in $Paths) {
+    $leaf = Split-Path -Leaf $path
+    $matches = @(Get-ChildItem -LiteralPath 'extensions/drm-copilot/resources' -Recurse -File -Filter $leaf -ErrorAction SilentlyContinue)
+    "MIRROR: $path | matches=$($matches.Count)"
+}
+"EXIT_CODE_COMPUTED: 0"
+```
+
+```powershell
+# CR-PHRASE: wrap-tolerant phrase count (collapses a line break, indentation, and a leading comment marker into one space)
+$Checks = @( @{ Path = '<path>'; Phrase = '<phrase>' } )
+foreach ($check in $Checks) {
+    $raw = Get-Content -Raw -LiteralPath $check.Path
+    $flat = [regex]::Replace($raw, '\s*\r?\n\s*(#\s*)?', ' ')
+    "PHRASE: $($check.Path) | phrase=$($check.Phrase) | matches=$([regex]::Matches($flat, [regex]::Escape($check.Phrase)).Count)"
+}
+"EXIT_CODE_COMPUTED: 0"
+```
+
+```powershell
+# CR-CHANGED
+$tracked = @(git diff --name-only --diff-filter=ACMR origin/epic/enforcement-hook-precision-integration)
+$status = @(git status --porcelain --untracked-files=all)
+$untracked = @($status | Where-Object { $_ -like '?? *' } | ForEach-Object { $_.Substring(3) })
+$all = @($tracked + $untracked | Sort-Object -Unique)
+foreach ($item in $all) { "CHANGED: $item" }
+"CHANGED-TOTAL: $($all.Count)"
+"UNTRACKED-TOTAL: $($untracked.Count)"
+"UNTRACKED-TESTS: $(@($untracked | Where-Object { $_ -like 'tests/*' }).Count)"
+"EXIT_CODE_COMPUTED: 0"
+```
+
+Success-case literals (observed in P0-T9): `LINES:` lines and `LINES-OVER-500:`; `HERMETIC:` lines and `HERMETIC-MATCH-COUNT:`; `MIRROR:` lines; `PHRASE:` lines with a numeric `matches=`; `CHANGED-TOTAL:`, `UNTRACKED-TOTAL:`, and `UNTRACKED-TESTS:`.
+
+## Group Slots and Commit Boundaries
+
+Phases end with a pathspec-bearing commit and a non-force push. A hook that denies a staging or commit command is not bypassed: record the denial in the task artifact and hand back to the orchestrator. The executor never force-pushes.
+
+### Phase 0 — Policy Reads, Branch Sync, Upstream Verification, and Baseline Capture
+
+Phase preamble: tasks P0-T1 and P0-T2 run before any checkbox in this plan is marked, so that the merge in P0-T1 runs against a tree whose only modification lies under `<FEATURE>/`. Mark P0-T1 and P0-T2 after both complete. The suite population is never listed; it is derived by CR-ENUM.
+
+- [ ] [P0-T1] Branch sync. Run `git status --porcelain --untracked-files=no` (every listed path must lie under `docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737/`, otherwise stop with BLOCKED), then `git fetch origin epic/enforcement-hook-precision-integration`, then `git rev-list --count HEAD..origin/epic/enforcement-hook-precision-integration`, then, if the count is not 0, `git merge --no-edit origin/epic/enforcement-hook-precision-integration`. On a merge conflict run `git merge --abort` and stop with BLOCKED. Never rebase and never force-push. Then run `git rev-list --count HEAD..origin/epic/enforcement-hook-precision-integration` again, `git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`, and `git rev-parse origin/epic/enforcement-hook-precision-integration`. Write `<FEATURE>/evidence/baseline/git-base.<ts>.md` with the four schema fields; `Output Summary:` carries the before and after counts, the merge outcome (`NOT-NEEDED`, `MERGED`, or `CONFLICT-ABORTED`), the branch name, the HEAD SHA, and the integration-ref SHA. Done when the after count is 0, the recorded branch name is `bug/hook-test-isolation-remaining-gaps-737`, and both SHAs are 40 hexadecimal characters.
+- [ ] [P0-T2] Upstream verification. For each issue number in 736, 732, and 850, find a merged pull request into `epic/enforcement-hook-precision-integration` whose title, body, or head branch name carries that number as a whole token, using `gh pr list --base epic/enforcement-hook-precision-integration --state merged --limit 300 --json number,title,body,headRefName,mergeCommit`, and test that its merge commit is an ancestor of the integration ref with `git merge-base --is-ancestor <mergeCommit.oid> origin/epic/enforcement-hook-precision-integration` (exit 0). Write `<FEATURE>/evidence/baseline/upstream-verification.<ts>.md` with the four schema fields and one line per issue in the form `UPSTREAM: <issue> | PR=<number> | MERGE-COMMIT=<sha> | ANCESTOR=True`, then `UPSTREAM-VERIFIED: 3`. Done when the artifact shows exactly three `ANCESTOR=True` lines and `UPSTREAM-VERIFIED: 3`. If any of the three is absent or not an ancestor, record the missing issue numbers and stop with BLOCKED before any census; do not proceed to P0-T3.
+- [ ] [P0-T3] Read, in order, `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/instructions/tonality.instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/powershell-code-change.instructions.md`, `.github/instructions/powershell-unit-test.instructions.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/powershell.md`, and `.claude/rules/tonality.md`. Write `<FEATURE>/evidence/baseline/phase0-instructions-read.md` with `Timestamp:`, `Policy Order:`, and the twelve repository-relative paths in the order read. Done when the artifact has all three fields and twelve paths.
+- [ ] [P0-T4] Read `<FEATURE>/issue.md`, `<FEATURE>/spec.md`, and `<FEATURE>/research/research.2026-10-08T14-00.md`. Write `<FEATURE>/evidence/baseline/phase0-requirements-read.<ts>.md` with `Timestamp:`, `Work Mode: full-bug`, the AC inventory `AC-1` through `AC-28` in document order, the decisions `D1` through `D10`, and the six interpretations PI-1 through PI-6 from this plan. Done when the artifact lists 28 AC identifiers, 10 decision identifiers, and 6 PI identifiers.
+- [ ] [P0-T5] Local-state precondition. Run `Test-Path -LiteralPath 'artifacts/orchestration/epic-orchestrator-state.json'` and `git check-ignore -v artifacts/orchestration/epic-orchestrator-state.json` from the worktree root. Write `<FEATURE>/evidence/baseline/epic-state-presence.<ts>.md` with the four schema fields. `Output Summary:` carries `EPIC-STATE-PRESENT: False` or `True` and the ignore rule line. Done when `EPIC-STATE-PRESENT: False`, the `git check-ignore` exit code is 0, and the printed rule names `/artifacts`. If the value is `True`, do not delete or edit the file; stop with BLOCKED, because baseline counts would not reflect the CI condition.
+- [ ] [P0-T6] Record toolchain versions: `Get-Module -ListAvailable Pester, PSScriptAnalyzer | Sort-Object Name, Version -Descending | Select-Object Name, Version` and `$PSVersionTable.PSVersion`. Write `<FEATURE>/evidence/baseline/toolchain-versions.<ts>.md` with the four schema fields. Done when the highest Pester version is 5.x and PowerShell is 7.x; otherwise stop with BLOCKED.
+- [ ] [P0-T7] Mock-semantics probe. Run the in-memory probe below through the CR routes (no file is created) and write `<FEATURE>/evidence/baseline/pester-mock-semantics-probe.<ts>.md` with the four schema fields. Done when the output contains `PROBE: Passed=4 | Failed=0`. If it does not, stop with BLOCKED: the root-level mock placement, the helper-registered mock placement, or the `Should -Invoke` count semantics that the guard and the interception probe rely on does not hold, and the specification requires revision.
+
+```powershell
+Import-Module Pester -MinimumVersion 5.0.0 -ErrorAction Stop
+$probe = {
+    BeforeAll {
+        New-Module -Name Probe737 -ScriptBlock {
+            function Get-Probe737Seam { 'real' }
+            function Get-Probe737Value { Get-Probe737Seam }
+            Export-ModuleMember -Function Get-Probe737Seam, Get-Probe737Value
+        } | Import-Module
+        function Get-Probe737Script { 'real' }
+        function Register-Probe737Mock {
+            Mock Get-Probe737Seam -ModuleName Probe737 { 'mocked' }
+            Mock Get-Probe737Script { 'mocked' }
+        }
+        Register-Probe737Mock
+    }
+    Describe 'probe' {
+        Context 'nested' {
+            It 'module mock registered by a helper function applies in a nested It' { Get-Probe737Value | Should -Be 'mocked' }
+            It 'module mock call count is observable inside one It' { Get-Probe737Value | Out-Null; Should -Invoke Get-Probe737Seam -ModuleName Probe737 -Times 1 -Exactly }
+            It 'script-scope mock registered by a helper function applies in a nested It' { Get-Probe737Script | Should -Be 'mocked' }
+            It 'script-scope mock call count is observable inside one It' { Get-Probe737Script | Out-Null; Should -Invoke Get-Probe737Script -Times 1 -Exactly }
+        }
+    }
+}
+$configuration = New-PesterConfiguration
+$configuration.Run.Container = New-PesterContainer -ScriptBlock $probe
+$configuration.Run.PassThru = $true
+$result = Invoke-Pester -Configuration $configuration
+"PROBE: Passed=$($result.PassedCount) | Failed=$($result.FailedCount)"
+$code = [int]($result.Result -ne 'Passed')
+"EXIT_CODE_COMPUTED: $code"
+```
+
+- [ ] [P0-T8] Population observation: run CR-ENUM and write `<FEATURE>/evidence/baseline/population-enumeration.<ts>.md` with the four schema fields and every `POPULATION-SURFACE:`, `POPULATION-SUITE:`, and `POPULATION-TOTAL:` line. Done when both surfaces report at least one suite and `EXIT_CODE: 0`. The counts are observations only; no later task asserts a literal suite count.
+- [ ] [P0-T9] Observation run of the remaining CRs on the unchanged tree. Run CR-LINES with `<LIST>` = the 15 files named in `research.2026-10-08T14-00.md` section 11.2 that exist today (any missing path is recorded `ABSENT`, not an error), CR-HERMETIC with `<LIST>` = `tests/scripts/claude-hooks/EpicStateIsolation.Helpers.ps1`, CR-MIRROR with `<LIST>` = `tests/scripts/claude-hooks/EpicStateIsolation.Helpers.ps1` and `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1`, CR-PHRASE with the checks (`tests/scripts/claude-hooks/enforce-pr-author-skill.WorktreeResolution.Tests.ps1`, `three library modules`), (`tests/scripts/claude-hooks/enforce-model-routing-receipt.WorktreeResolution.Tests.ps1`, `three library modules`), (`tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`, `two scan roots`), (`tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1`, `decision D9`), and (`tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1`, `Non-vacuity floor`), and CR-CHANGED. Write `<FEATURE>/evidence/baseline/cr-observation.<ts>.md` with the four schema fields and all printed lines. Done when every CR printed its success-case literals, `HERMETIC-MATCH-COUNT: 0`, every `MIRROR:` line shows `matches=0`, `CHANGED-TOTAL:` shows only paths under `docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737/`, and each of the five `PHRASE:` lines shows `matches=1` or more. A `matches=0` line means upstream already changed that text; record it and continue.
+- [ ] [P0-T10] Baseline format check: run CR-FORMAT-CHECK with `<LIST>` = LIST-POP, LIST-AUX, `tests/scripts/claude-hooks/EpicStateIsolation.Helpers.ps1`, and `tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1`, and write `<FEATURE>/evidence/baseline/format-check-baseline.<ts>.md` with the four schema fields and every `FORMAT-DRIFT:` line. Done when the artifact records a numeric `FORMAT-DRIFT-COUNT:`. Pre-existing drift is recorded, not fixed; P5 and P10 handle a drifted file that this plan edits.
+- [ ] [P0-T11] Baseline analyzer: run CR-PSSA with the same `<LIST>` as P0-T10 and write `<FEATURE>/evidence/baseline/pssa-baseline.<ts>.md` with the four schema fields and every `PSSA-FINDING:` line. Done when the artifact records a numeric `PSSA-TOTAL:`. Pre-existing findings are recorded, not fixed.
+- [ ] [P0-T12] Baseline population Pester: run CR-PESTER-LIST with `<LIST>` = LIST-POP and `<PATTERNS>` = `'accepts the compliant*'`, `'rejects *'`, and write `<FEATURE>/evidence/baseline/pester-population-baseline.<ts>.md` with the four schema fields and every `SUITE:`, `NAMED:`, and `TOTAL:` line verbatim. Done when the number of `SUITE:` lines equals `POPULATION-TOTAL` from P0-T8, every `CONTAINER:` line shows `Result=Passed`, and `EXIT_CODE: 0`. If any test fails, record the `FAILED:` lines and stop with BLOCKED (failure outside this feature).
+- [ ] [P0-T13] Baseline auxiliary Pester: run CR-PESTER-LIST with `<LIST>` = LIST-AUX and an empty `<PATTERNS>`, and write `<FEATURE>/evidence/baseline/pester-aux-baseline.<ts>.md` with the four schema fields and every `SUITE:` line verbatim. Done when there are three `SUITE:` lines and `EXIT_CODE: 0`. A failure is recorded and stops with BLOCKED.
+- [ ] [P0-T14] CR-COMPARE observation: run CR-COMPARE with the artifact of P0-T12 as both `<BEFORE-ARTIFACT>` and `<AFTER-ARTIFACT>` and an empty `<PATHS DECLARED BY DESIGN>`, and write `<FEATURE>/evidence/baseline/compare-self-observation.<ts>.md` with the four schema fields. Done when the output shows one `result=EQUAL` line per suite and `COMPARE-DIFFERENT-COUNT: 0`.
+- [ ] [P0-T15] Baseline bundle-parity pytest: run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` (fallback when `poetry` is unavailable: `python -m pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`) and write `<FEATURE>/evidence/baseline/bundle-parity-pytest-baseline.<ts>.md` with the four schema fields. `Output Summary:` carries pytest's final summary line (the line that contains `passed`). Done when `EXIT_CODE: 0` and the summary line shows at least one passed test and no failed test. No Python file is changed by this plan, so Python line coverage is not applicable and is recorded as such.
+- [ ] [P0-T16] Baseline full configured Pester run: run CR-PESTER-FULL and write `<FEATURE>/evidence/baseline/pester-full-baseline.<ts>.md` with the four schema fields; `Output Summary:` carries the `Tests Passed:` line, any `BeforeAll \ AfterAll failed:` or `Container failed:` line, and every `[-]` line. Done when the artifact contains the summary and the exit code. Pre-existing failures are recorded, not fixed.
+- [ ] [P0-T17] Baseline coverage: immediately after P0-T16, run CR-COV-TOTAL and write `<FEATURE>/evidence/baseline/coverage-total-baseline.<ts>.md` with the four schema fields; `Output Summary:` carries the `SOURCEFILE-COUNT:` and `TOTAL-LINE-COVERAGE:` lines. Done when `SOURCEFILE-COUNT` is positive and `percent=` is numeric. If the count is 0, record the element names of the first three XML levels and stop with BLOCKED, because AC-27 cannot be measured.
+
+### Phase 1 — Discovery Helpers, Census, and Local-State Differential (fail-before data)
+
+Phase preamble: N1 holds pure functions over text and AST; its only file read is the committed tree through an injectable reader. The census is measure-only: no suite is edited in this phase. N1 is created before any suite edit so that the census describes the unedited tree.
+
+- [ ] [P1-T1] Create `tests/scripts/claude-hooks/EpicStateIsolation.Discovery.Helpers.ps1` with comment-based help and the function `Get-EpicStateDiscoveredSuite` (parameters `-RepoRoot` and `-Surface` with values `claude-hooks` or `codex-hooks`; returns repository-relative paths of every `*.Tests.ps1` directly in `tests/scripts/<Surface>`, ordinal sorted, by directory enumeration with no recursion and no literal path). Done when CR-PARSE for the file and function reports `errors=0 | functions-missing=0` and CR-LINES reports at most 500 lines.
+- [ ] [P1-T2] Add to `tests/scripts/claude-hooks/EpicStateIsolation.Discovery.Helpers.ps1` the function `Get-EpicStateLoadedSourceClosure` (parameters `-SuiteText`, `-ReadSource` as a script block that takes a repository-relative path and returns its text or `$null`, and `-LibraryDirectory` as a string array of repository-relative library directories). Contract: collect every string literal matching `hooks/<name>.ps1` in `-SuiteText`; resolve each name against `.claude/hooks` and `.codex/hooks` (union); expand transitively by scanning string literals ending `.ps1` or `.psm1` in each loaded file and resolving them beside the file or in each `-LibraryDirectory`; return objects with `Path` and `Text`. Literal scanning is required because the closure includes variable-driven loads. Done when CR-PARSE reports the function present with `errors=0` and the file is at most 500 lines.
+- [ ] [P1-T3] Add to the same file the function `Get-EpicStateSeamCensus` (parameter `-ClosureFile`, the objects from P1-T2). Contract: a seam is a function in a closure file whose body contains a read primitive (`Get-Content`, `[System.IO.File]::ReadAllText`, `ReadAllLines`) and either whose name matches `Checkpoint` or whose body or defining file contains an `artifacts/` literal (Decision 3), plus the four named seams of Decision 1 (`Get-EpicScopeCheckpointText`, `Get-WorktreeRunCheckpointText`, `Get-WorktreeItemCheckpointText`, `Get-WorktreeItemLiveRoot`) whenever defined in the closure. Each result carries `Name`, `Class` (`ModuleTextSeam`, `HookLocalContentSeam`, `CwdDerivedResolver` for bodies containing `(Get-Location).Path`, or `DefaultParameterSeam`), and `DefiningFile`. Done when CR-PARSE reports the function present with `errors=0` and the file is at most 500 lines.
+- [ ] [P1-T4] Add to the same file the function `Get-EpicStateProcessSpawningHook` (parameter `-SuiteText`; returns the hook script names launched when the text contains `ProcessStartInfo`, `Start-Process`, or the composed process-start form, and names a hook script by a `hooks/<name>.ps1` literal; returns nothing otherwise). Done when CR-PARSE reports the function present with `errors=0` and the file is at most 500 lines.
+- [ ] [P1-T5] Add to the same file the function `Get-EpicStateSuiteCensusRow` (parameters `-RepoRoot` and `-RelativePath`) that composes P1-T1 through P1-T4 for one suite and prints, through a companion `Format-EpicStateCensusLine`, the line forms `CENSUS-SUITE: <path> | closure=<n> | seams=<comma-separated names or NONE> | process-spawning=<True or False> | hooks-launched=<comma-separated names or NONE>`. Done when CR-PARSE reports both functions present with `errors=0` and the file is at most 500 lines.
+- [ ] [P1-T6] Census run on the unedited tree. Run, through the CR routes, a body that dot-sources `tests/scripts/claude-hooks/EpicStateIsolation.Discovery.Helpers.ps1`, enumerates each surface with `Get-EpicStateDiscoveredSuite`, prints `CENSUS-SURFACE: <surface> | suites=<n>` and one `CENSUS-SUITE:` line per suite, then `CENSUS-TOTAL: <n>` and `EXIT_CODE_COMPUTED: <0 or 1>` (1 when either surface has zero suites). Write `<FEATURE>/evidence/regression-testing/census-fail-before.<ts>.md` with the four schema fields and every printed line. Done when both surfaces report at least one suite, `CENSUS-TOTAL` equals `POPULATION-TOTAL` from P0-T8, and `EXIT_CODE: 0`. This artifact is the AC-1 census record; the guard findings against the unedited suites follow in P3-T14.
+- [ ] [P1-T7] Process-spawning cross-check by two independent derivations. Strategy 1: the `process-spawning=True` suites in the P1-T6 artifact. Strategy 2: run `Select-String -Path <each LIST-POP file> -Pattern 'ProcessStartInfo', 'Start-Process', '-NoProfile'` and keep the files with at least one match. Compare the two as member sets. Write `<FEATURE>/evidence/baseline/process-spawning-crosscheck.<ts>.md` with the four schema fields and the lines `STRATEGY-1-ONLY: <path>` and `STRATEGY-2-ONLY: <path>` for each difference, then `CROSSCHECK-DIFFERENCES: <n>`. Done when `CROSSCHECK-DIFFERENCES: 0`, or every difference is explained in the artifact and the detection tokens in `Get-EpicStateProcessSpawningHook` are corrected so that a rerun of P1-T6 and this task reports 0.
+- [ ] [P1-T8] Create the deliberately present local epic checkpoint. Through the PowerShell tool, write the single-line content `{"route_id":"epic","integration_branch":"epic/hostile-integration","epic_feature_folder":"hostile-epic","features":[]}` to `artifacts/orchestration/epic-orchestrator-state.json` (create the directory if needed). The file is gitignored and is never staged. Write `<FEATURE>/evidence/baseline/hostile-checkpoint-created.<ts>.md` with the four schema fields. Done when `Test-Path` returns True and `git status --porcelain --untracked-files=all` does not list the file. If every write route is denied by a hook, record the denial and stop with BLOCKED.
+- [ ] [P1-T9] Differential run with the local checkpoint present: run CR-PESTER-LIST with `<LIST>` = LIST-POP and an empty `<PATTERNS>`, and write `<FEATURE>/evidence/baseline/pester-population-with-local-checkpoint.<ts>.md` with the four schema fields and every `SUITE:` line verbatim. Done when the number of `SUITE:` lines equals `POPULATION-TOTAL` from P0-T8. The exit code may be non-zero; failing rows are the finding.
+- [ ] [P1-T10] Delete the local checkpoint: `Remove-Item -LiteralPath artifacts/orchestration/epic-orchestrator-state.json` through the PowerShell tool, then `Test-Path -LiteralPath artifacts/orchestration/epic-orchestrator-state.json`. Write `<FEATURE>/evidence/baseline/hostile-checkpoint-deleted.<ts>.md` with the four schema fields. Done when `Test-Path` returns False. This task runs even when P1-T9 failed.
+- [ ] [P1-T11] Differential comparison: run CR-COMPARE with `<BEFORE-ARTIFACT>` = the P0-T12 artifact, `<AFTER-ARTIFACT>` = the P1-T9 artifact, and an empty `<PATHS DECLARED BY DESIGN>`, and write `<FEATURE>/evidence/regression-testing/differential-before.<ts>.md` with the four schema fields and every `COMPARE:` line. Done when the artifact records `COMPARE-DIFFERENT-COUNT: <n>` and lists each `DIFFERENT` suite path; those suites are local-state-dependent today and enter the EDIT-SET in P5-T1. The artifact carries `ExpectedExitCode: 1` when `n` is greater than 0.
+- [ ] [P1-T12] Production-defect screen. Review the P1-T11 differences and the P1-T6 census for any case where the dependence lies in a production hook or library rather than in a test. Write `<FEATURE>/evidence/other/census-production-defects.<ts>.md` with `Timestamp:` and `PRODUCTION-DEFECTS: <n>`, one entry per defect (file, symptom, evidence line). Done when the artifact exists with the count field. No hook or library file is edited under this feature (AC-26); a defect is recorded for a separate decision.
+- [ ] [P1-T13] Phase 1 commit and push. Run `git add -- tests/scripts/claude-hooks/EpicStateIsolation.Discovery.Helpers.ps1 docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737`, then `git commit -m "test(737): add discovery helpers and census evidence" -- tests/scripts/claude-hooks/EpicStateIsolation.Discovery.Helpers.ps1 docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737`, then `git push origin bug/hook-test-isolation-remaining-gaps-737`, then `git fetch origin bug/hook-test-isolation-remaining-gaps-737` and `git rev-list --count origin/bug/hook-test-isolation-remaining-gaps-737..HEAD`. Write `<FEATURE>/evidence/other/commit-phase1.<ts>.md` with the four schema fields. Done when the count is 0 and `git status --porcelain --untracked-files=all -- tests/scripts` prints nothing.
+
+### Phase 2 — Predicate Hardening (CR-2 fixes and CR-3 rows)
+
+Phase preamble: the rows in N3 and N3b use only the existing signature `Get-EpicStateIsolationFinding -Ast` and in-memory fixtures, so they run unchanged against the unmodified predicate. Row names carry the literal prefixes `AC-8`, `AC-9`, `AC-10`, `AC-11`, `AC-12`, `AC-13 non-compliant`, and `AC-13 compliant`, which CR-PESTER-LIST patterns match. Interim failing rows are permitted in Phases 2 through 5 only where recorded as fail-before evidence; Phase 10 requires zero.
+
+- [ ] [P2-T1] Create `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Predicate.Tests.ps1` with the Pester 5 `#Requires` lines, a header stating purpose (issue #737, CR-2) and that no file is created, a file-level `BeforeAll` that dot-sources `tests/scripts/claude-hooks/EpicStateIsolation.Helpers.ps1` through `$PSScriptRoot` and defines `ConvertTo-EpicStateFixtureAst` (parses an in-memory string with `[System.Management.Automation.Language.Parser]::ParseInput`), and an empty `Describe 'CR-2 false-pass paths'`. Done when CR-PARSE reports `errors=0` and `ConvertTo-EpicStateFixtureAst` present only if it is declared at file scope; otherwise CR-PARSE with an empty `Functions` list reports `errors=0`.
+- [ ] [P2-T2] Add to N3 two rows for AC-8 named `AC-8 non-compliant ordering against a helper dot-source` and `AC-8 compliant hook dot-source first`. Non-compliant fixture: an outermost `BeforeAll` with an earlier helper dot-source `. (Join-Path $PSScriptRoot 'Helper.ps1')`, then an `Import-Module` and a `$null` `Mock`, then the hook dot-source `. $script:UnderTest` where `$script:UnderTest` is assigned from a `hooks/enforce-x.ps1` literal; the row asserts one or more findings. Compliant fixture: hook dot-source first, then import and mock; the row asserts zero findings. Done when the file parses.
+- [ ] [P2-T3] Add to N3 two rows named `AC-9 non-compliant mock and import only inside a function body` and `AC-9 compliant direct statements`. Non-compliant fixture: `Mock` and `Import-Module` appear only inside a function defined in the outermost `BeforeAll`; the row asserts one or more findings. Compliant fixture asserts zero findings. Done when the file parses.
+- [ ] [P2-T4] Add to N3 two rows named `AC-10 non-compliant second top-level Describe lacks isolation` and `AC-10 compliant every top-level Describe isolates`. Non-compliant fixture: two top-level `Describe` blocks with no file-level `BeforeAll`, only the first isolating; the row asserts one or more findings. Done when the file parses.
+- [ ] [P2-T5] Add to N3 two rows named `AC-11 non-compliant later non-null Mock of the same seam` and `AC-11 compliant single null Mock`. Non-compliant fixture: a `$null` `Mock` of `Get-EpicScopeCheckpointText` followed by a later `Mock` of the same seam with a non-null body in the same block; the row asserts one or more findings. Done when the file parses.
+- [ ] [P2-T6] Add to N3 two rows named `AC-12 non-compliant module file name only in a non-import argument` and `AC-12 compliant genuine import argument`. Non-compliant fixture: an `Import-Module` whose arguments are a string containing `EpicScopeResolution.psm1` but not a module path (for example `-Name 'note-EpicScopeResolution.psm1-text'`) with no real import; the row asserts one or more findings. Compliant fixture: an `Import-Module (Join-Path $PSScriptRoot 'EpicScopeResolution.psm1')`; the row asserts zero findings. Done when the file parses.
+- [ ] [P2-T7] Create `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Branches.Tests.ps1` (same header and dot-source shape as N3) with exactly seven rows named `AC-13 non-compliant <branch>` and three rows named `AC-13 compliant <branch>`. Non-compliant branches (row-name suffixes): `no outermost BeforeAll`; `parse error returned as a finding` (the row calls `Get-EpicStateIsolationTextFinding -Text` with malformed in-memory text and asserts a finding containing `parse error`; that function is created in P2-T15, so this row fails before for that reason, which P2-T9 records); ESR-side import absent with mock present; no dot-source at all in the `BeforeAll`; the colon-bound `-ModuleName:EpicScopeResolution` form with a wrong module name; a `MockWith` body containing a `param`, `begin`, or `process` block; a non-string module-name element. Compliant branches: the colon-bound form with the correct module name; an ESR pair with both import and mock; a `BeforeAll` with the hook dot-source present. Done when the file parses and contains ten `It` rows.
+- [ ] [P2-T8] [expect-fail] Fail-before run: run CR-PESTER-LIST with `<LIST>` = N3 and N3b and `<PATTERNS>` = `'AC-8 non-compliant*'`, `'AC-8 compliant*'`, `'AC-9 non-compliant*'`, `'AC-9 compliant*'`, `'AC-10 non-compliant*'`, `'AC-10 compliant*'`, `'AC-11 non-compliant*'`, `'AC-11 compliant*'`, `'AC-12 non-compliant*'`, `'AC-12 compliant*'`, `'AC-13 non-compliant*'`, `'AC-13 compliant*'`, against the unmodified `tests/scripts/claude-hooks/EpicStateIsolation.Helpers.ps1`. Write `<FEATURE>/evidence/regression-testing/predicate-fail-before.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:` carrying every `NAMED:` and `FAILED:` line. Done when each of the five `AC-8` through `AC-12` non-compliant patterns shows `Failed=1`, each of their five compliant patterns shows `Passed=1`, and the `AC-13 compliant` pattern shows `Failed=0`.
+- [ ] [P2-T9] AC-13 fail-before disposition. From the P2-T8 artifact, list each of the seven `AC-13 non-compliant` rows as `FAILED-BEFORE` or `PASSED-BEFORE`. For each `PASSED-BEFORE` row, write `<FEATURE>/evidence/regression-testing/fail-before-exception.<ts>.md` with `WhyFailingRunImpossible:` (the unmodified predicate already handles the fixture) and an absence-of-test proof: `git grep -c "AC-13 non-compliant" origin/epic/enforcement-hook-precision-integration -- tests/scripts/claude-hooks` exits 1 and prints nothing, showing that no row for the branch exists at the base ref. The literal `AC-13 non-compliant` is the row-name prefix this plan asks P2-T7 to create. Done when every `PASSED-BEFORE` row has a dossier entry with both fields and the git grep exit code 1, and the artifact lists all seven rows.
+- [ ] [P2-T10] Fix CR-2 path 1 in `tests/scripts/claude-hooks/EpicStateIsolation.Helpers.ps1`: identify the hook dot-source as the dot-source command whose argument text, or the string literal assigned to the variable it references in the suite, contains a `hooks/<name>.ps1` literal, rather than the first dot-source; measure import and mock order against that command. A suite with no identifiable hook dot-source yields a finding naming the rule. Done when CR-PESTER-LIST over N3 with `<PATTERNS>` = `'AC-8*'` shows `Passed=2 | Failed=0`, and the pre-existing predicate rows matched by the P0-T12 patterns report the same `NAMED:` counts as the P0-T12 artifact.
+- [ ] [P2-T11] Fix CR-2 path 2 in the same file: search only direct statements of the outermost `BeforeAll` script block, excluding nested script blocks, function bodies, and nested `Describe`/`Context` blocks. Done when `'AC-9*'` shows `Passed=2 | Failed=0` and the P0-T12 pattern counts are unchanged.
+- [ ] [P2-T12] Fix CR-2 path 3 in the same file: evaluate every outermost `BeforeAll` (every `BeforeAll` at the minimum command depth), not only the first. Done when `'AC-10*'` shows `Passed=2 | Failed=0` and the P0-T12 pattern counts are unchanged.
+- [ ] [P2-T13] Fix CR-2 path 4 in the same file: evaluate every `Mock` of a seam in the block and report a finding when any of them has a non-null body. Done when `'AC-11*'` shows `Passed=2 | Failed=0` and the P0-T12 pattern counts are unchanged.
+- [ ] [P2-T14] Fix CR-2 path 5 in the same file: match the import by a parsed module-path argument (a positional or `-Name`/`-Path` argument that resolves to a path ending in the module file name), not by a regex over joined element text. Done when `'AC-12*'` shows `Passed=2 | Failed=0` and the P0-T12 pattern counts are unchanged.
+- [ ] [P2-T15] Add to `tests/scripts/claude-hooks/EpicStateIsolation.Helpers.ps1` the pure function `Get-EpicStateIsolationTextFinding` (parameters `-Text` and `-RelativePath`; parses the in-memory text with `Parser::ParseInput`, returns `<RelativePath>: parse error: <message>` when the parser reports errors, and otherwise the result of `Get-EpicStateIsolationFinding` prefixed by the path), and change `Get-EpicStateIsolationSuiteFinding` to read the file text and delegate to it. This makes the parse-error branch testable without a file. Done when CR-PARSE reports `Get-EpicStateIsolationTextFinding` present with `errors=0`, and the `AC-13 non-compliant parse error returned as a finding` row passes.
+- [ ] [P2-T16] Pass-after run for the predicate rows: run CR-PESTER-LIST with `<LIST>` = N3 and N3b and the `<PATTERNS>` of P2-T8 and write `<FEATURE>/evidence/regression-testing/predicate-pass-after.<ts>.md` with the four schema fields and every `NAMED:` line. Done when `EXIT_CODE: 0`, each `AC-8` through `AC-12` non-compliant and compliant pattern shows `Passed=1 | Failed=0`, `AC-13 non-compliant*` shows `Passed=7 | Failed=0`, and `AC-13 compliant*` shows `Passed=3 | Failed=0`.
+- [ ] [P2-T17] Legacy guard after hardening: run CR-PESTER-LIST with `<LIST>` = E2 and an empty `<PATTERNS>` and write `<FEATURE>/evidence/regression-testing/legacy-guard-after-hardening.<ts>.md` with the four schema fields, the `SUITE:` line, and every `FAILED:` line. Done when the artifact exists. A `FAILED:` line is permitted only if its message names a suite path and a hardening rule; each such suite is a newly flagged suite and enters the EDIT-SET in P5-T1. The artifact carries `ExpectedExitCode: 1` when any row failed.
+- [ ] [P2-T18] Size check: run CR-LINES with `<LIST>` = E1, N3, N3b and write `<FEATURE>/evidence/qa-gates/phase2-lines.<ts>.md` with the four schema fields. Done when `LINES-OVER-500: 0`. If E1 exceeds 500 lines, move the pair-evaluation functions into `tests/scripts/claude-hooks/EpicStateIsolation.Pairs.Helpers.ps1` and re-run P2-T16.
+- [ ] [P2-T19] Phase 2 commit and push, in the form of P1-T13, with the pathspec `tests/scripts/claude-hooks docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737` and the message `test(737): harden epic-state isolation predicate (CR-2, CR-3)`. Write `<FEATURE>/evidence/other/commit-phase2.<ts>.md` with the four schema fields. Done when the ahead count is 0 and `git status --porcelain --untracked-files=all -- tests/scripts` prints nothing.
+
+### Phase 3 — Discovery Guard (both surfaces), Process-Spawning Report, and Fail-Before Run
+
+Phase preamble: the guard builds its `-ForEach` rows in `BeforeDiscovery`, which dot-sources the helpers (Pester 5 requires helper functions at discovery time). Row names carry the literal prefixes `AC-2`, `AC-3`, `AC-4`, `AC-5`, and `AC-6`.
+
+- [ ] [P3-T1] Extend `tests/scripts/claude-hooks/EpicStateIsolation.Helpers.ps1`: add the optional parameter `-Requirement` (array of hashtables with `Seam`, `ModuleName`, and `ModuleFile`; a `$null` `ModuleName` means a script-scope seam, mocked without `-ModuleName`, with no import requirement) to `Get-EpicStateIsolationFinding`, defaulting to the two existing pairs so existing callers are unchanged. Done when CR-PESTER-LIST over N3, N3b, and E2 with the P0-T12 patterns reports `Failed=0` and unchanged `NAMED:` counts.
+- [ ] [P3-T2] Extend the same file: recognize the helper form. A direct statement of the outermost `BeforeAll`, after the hook dot-source, that is a command named `Register-EpicStateBaselineMock` with a `-Seam` argument naming a required seam satisfies that seam's requirement. Done when CR-PARSE reports `errors=0`; the helper-form rows follow in P3-T12.
+- [ ] [P3-T3] Create `tests/scripts/claude-hooks/EpicStateIsolation.Compliance.Helpers.ps1` with the function `Test-EpicStateSeamUnderTestForm` implementing form F2: true when every direct call to the seam in the suite AST passes a literal path beginning `/synthetic-worktrees/` and the suite mocks `Test-Path` and `Get-Content` with a `-ParameterFilter` on a `/synthetic-worktrees/` literal. Done when CR-PARSE reports the function present with `errors=0`.
+- [ ] [P3-T4] Add to the same file `Test-EpicStateResolverPinnedForm` implementing form F3: true when the outermost `BeforeAll` mocks the named cwd-derived resolver to return a value containing a `/synthetic-worktrees/` literal. Done when CR-PARSE reports the function present with `errors=0`.
+- [ ] [P3-T5] Add to the same file `Get-EpicStateSuiteCompliance` (parameters `-RepoRoot` and `-RelativePath`). Contract: parse the suite (a missing or unparseable suite yields one finding naming the path); compute the closure and seam census with the N1 functions; map each seam to a requirement (a seam defined in a `.psm1` file under a `lib` directory is a module seam with `ModuleName` and `ModuleFile` taken from that file; any other seam is a script-scope seam with a `$null` `ModuleName`); for each seam require F1 or the helper form (via `Get-EpicStateIsolationFinding -Requirement`), else F2, else (for `CwdDerivedResolver` seams only) F3; `DefaultParameterSeam` seams are report-only; return finding strings of the form `<path>: seam <name>: <violated rule>`. Done when CR-PARSE reports the function present with `errors=0`.
+- [ ] [P3-T6] Add to the same file `Get-EpicStateProcessSpawningReport` (parameters `-RepoRoot` and `-RelativePath`) that returns one `REPORT: <path> launches <hook names>` string for a process-spawning suite and nothing otherwise, never a finding. Done when CR-PARSE reports the function present with `errors=0` and CR-LINES reports the file at most 500 lines.
+- [ ] [P3-T7] Create `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1` with a header (purpose, issue #737, no file created, no literal suite list), a `BeforeDiscovery` that dot-sources N1, N1b, and E1 through `$PSScriptRoot` and builds the per-surface rows with `Get-EpicStateDiscoveredSuite` from the repository root, and a `Describe` containing, per surface, an `It` named `AC-2 non-vacuity <Surface> yields at least one suite` that asserts the discovered count is greater than zero. Done when CR-PARSE reports `errors=0` and CR-PESTER-LIST over the file with `<PATTERNS>` = `'AC-2 non-vacuity*'` shows `Passed=2 | Failed=0`.
+- [ ] [P3-T8] Add to N2 the per-suite rows `AC-4 <Path> complies with the baseline isolation form for every closure seam` (`-ForEach` over the discovered rows of both surfaces), each asserting that `Get-EpicStateSuiteCompliance` returns zero findings, with the findings in the `-Because` text. Done when the file parses and CR-PESTER-LIST over N2 with `<PATTERNS>` = `'AC-4 *'` shows a `Total` equal to the `POPULATION-TOTAL` printed by a CR-ENUM run in the same task (one row per discovered suite, and no literal count appears in N2).
+- [ ] [P3-T9] Add to N2 one row per surface named `AC-5 process-spawning report <Surface>` that collects `Get-EpicStateProcessSpawningReport` output for every discovered suite and emits each report line with `Write-Information`, asserting only that the collection completed without throwing (the row never fails on a report entry). Done when the file parses and `'AC-5 process-spawning report*'` shows `Passed=2 | Failed=0`.
+- [ ] [P3-T10] Add to N2 the no-fixed-list rows `AC-2 no hard-coded suite list in N2` and `AC-2 no hard-coded suite list or decision D9 note in the legacy guard`. The first parses N2 and asserts it holds no string literal that ends in `.Tests.ps1` and contains `hooks`. The second parses E2 with `Parser::ParseFile` and asserts the same, and asserts the text of E2 (line breaks and comment markers collapsed to one space) does not contain `decision D9`. Done when the file parses; the first row passes and the second row fails until P3-T15.
+- [ ] [P3-T11] Add to N2 the AC-3 and AC-5 fixture rows, all over in-memory text with an in-memory `-ReadSource` script block: `AC-3 closure-only variable-driven load is detected` (the suite names only `hooks/a.ps1`; `a.ps1` loads `b.psm1` through a variable assigned from a string literal; the closure includes `b.psm1`), `AC-3 suite whose rows never reach the seam is still flagged` (a fixture whose closure contains a seam and whose rows never call it yields a finding), `AC-5 process-spawning fixture is reported and does not fail` (the report function returns a line and the compliance function returns no finding for the process-start fixture), and `AC-2 missing suite yields a finding` plus `AC-2 unparseable suite yields a finding`. Done when the file parses and `'AC-3 *'` shows `Passed=2 | Failed=0`, `'AC-5 process-spawning fixture*'` shows `Passed=1 | Failed=0`, and `'AC-2 missing*'` and `'AC-2 unparseable*'` each show `Passed=1 | Failed=0`.
+- [ ] [P3-T12] Add to N2 the helper-form and requirement rows: `AC-4 helper form satisfies the requirement`, `AC-4 helper form naming the wrong seam is a finding`, `AC-4 script-scope seam needs no import`, `AC-4 form F2 fixture complies`, and `AC-4 form F3 fixture complies`. Done when the file parses and `'AC-4 helper*'`, `'AC-4 script-scope*'`, `'AC-4 form F2*'`, and `'AC-4 form F3*'` show `Failed=0` with `Passed` at least 1 each.
+- [ ] [P3-T13] Size check: run CR-LINES with `<LIST>` = N1, N1b, N2, E1 and write `<FEATURE>/evidence/qa-gates/phase3-lines.<ts>.md` with the four schema fields. Done when `LINES-OVER-500: 0`.
+- [ ] [P3-T14] [expect-fail] Guard fail-before run against the unedited suites: run CR-PESTER-LIST with `<LIST>` = N2 and `<PATTERNS>` = `'AC-4 *'`, `'AC-2 *'`, `'AC-3 *'`, `'AC-5 *'`, and write `<FEATURE>/evidence/regression-testing/discovery-guard-fail-before.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:` carrying every `NAMED:` and `FAILED:` line. Done when at least one `FAILED:` line names an `AC-4` per-suite `complies` row, no `AC-3`, `AC-5`, or `AC-2 non-vacuity` row failed, and the only `AC-2` failure is the legacy-guard row of P3-T10. If no `complies` row failed, write `<FEATURE>/evidence/regression-testing/fail-before-exception.<ts>.md` with `WhyFailingRunImpossible:` and the P1-T6 census lines as alternative proof, then stop with BLOCKED for orchestrator review, because AC-1 requires at least one flagged suite.
+- [ ] [P3-T15] Edit E2 `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1`: delete the fixed-list `It ... -ForEach @( ... )` structural-guard row together with its data rows, and delete the D9 known-limit note in the header comment. Leave the predicate-discrimination `Context` and the seam-sufficiency `Describe` unchanged. Done when CR-PHRASE with (`tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1`, `decision D9`) reports `matches=0`, CR-PESTER-LIST over N2 with `<PATTERNS>` = `'AC-2 *'` shows `Failed=0`, CR-PESTER-LIST over E2 reports `EXIT_CODE: 0`, and CR-LINES reports E2 at most 500 lines.
+- [ ] [P3-T16] Phase 3 commit and push, in the form of P1-T13, with the pathspec `tests/scripts/claude-hooks docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737` and the message `test(737): add epic-state discovery guard over both hook surfaces`. Write `<FEATURE>/evidence/other/commit-phase3.<ts>.md` with the four schema fields. Done when the ahead count is 0 and `git status --porcelain --untracked-files=all -- tests/scripts` prints nothing.
+
+### Phase 4 — Interception Probe and Probe-Presence Guard
+
+Phase preamble: N4 serves two roles. `Register-EpicStateBaselineMock` is the single-statement helper form used by suites near the 500-line cap. `Invoke-EpicStateInterceptionProbe` is the probe (AC-6, AC-7). The probe registers hostile in-memory payloads for the lower seams (no file), calls the exported resolver by name, and asserts the resolver result, one invocation of the suite's baseline mock, and zero invocations of the lower hostile read. Probe rows in suites are named with the literal prefix `baseline mock interception probe`.
+
+- [ ] [P4-T1] Create `tests/scripts/claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1` with comment-based help and the function `Register-EpicStateBaselineMock` (parameters `-Seam` as a string array and `-Surface` with values `Claude` or `Codex`). Contract: for each module seam in a table inside the file (`Get-EpicScopeCheckpointText` in `EpicScopeResolution`, `Get-WorktreeRunCheckpointText` in `WorktreeRunResolution`, `Get-WorktreeItemCheckpointText` and `Get-WorktreeItemLiveRoot` in `WorktreeItemResolution`) on the Claude surface, import the module file from `.claude/lib/worktree-resolution/` without `-Force` and register `Mock <seam> -ModuleName <module> { $null }`; for any other seam, and for every seam on the Codex surface, register `Mock <seam> { $null }` without `-ModuleName`. Done when CR-PARSE reports the function present with `errors=0`.
+- [ ] [P4-T2] Add to N4 the function `Invoke-EpicStateInterceptionProbe` for the epic-scope seam on the Claude surface: register hostile in-memory lower-seam mocks in module scope `EpicScopeResolution` (`Find-WorktreeResolutionRoot`, `Get-WorktreeResolutionGitEntryKind` returning `File`, `Get-WorktreeResolutionGitFileText` returning the hostile ready epic JSON of P1-T8, `Get-EpicScopeWorktreeHeadBranch`), call `Resolve-EpicScopeCheckpoint` by name, and assert `IsEpicScope` is false with reason `epic-checkpoint-absent-or-unparseable`, `Should -Invoke Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution -Times 1 -Exactly`, and `Should -Invoke Get-WorktreeResolutionGitFileText -ModuleName EpicScopeResolution -Times 0 -Exactly`. Done when CR-PARSE reports the function present with `errors=0`.
+- [ ] [P4-T3] Extend `Invoke-EpicStateInterceptionProbe` in N4 with the worktree-run and item-checkpoint branches: read the current exported entry points of `.claude/lib/worktree-resolution/WorktreeRunResolution.psm1` and `.claude/lib/worktree-resolution/WorktreeItemResolution.psm1` that call `Get-WorktreeRunCheckpointText`, `Get-WorktreeItemCheckpointText`, and `Get-WorktreeItemLiveRoot`, register hostile in-memory payloads for the seams below them, and assert one invocation of the baseline mock and zero invocations of the hostile read for each. Done when CR-PARSE reports `errors=0` and the file is at most 500 lines.
+- [ ] [P4-T4] Extend `Invoke-EpicStateInterceptionProbe` in N4 with the Codex script-scope branch (`-Surface Codex`): register hostile script-scope mocks of `Get-WorktreeResolutionGitEntryKind` and `Get-WorktreeResolutionGitFileText` without `-ModuleName`, call the Codex `Resolve-EpicScopeCheckpoint` by name, and assert the same three conditions without `-ModuleName`. Done when CR-PARSE reports `errors=0` and the file is at most 500 lines.
+- [ ] [P4-T5] Create `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Probe.Tests.ps1` with a header, a file-level `BeforeAll` that dot-sources N4 through `$PSScriptRoot` and imports `.claude/lib/worktree-resolution/EpicScopeResolution.psm1` without `-Force`, and rows named `AC-6 helper registers a module-scoped null mock`, `AC-6 helper registers a script-scope null mock`, and `AC-6 helper imports without Force`, over in-memory fake modules created with `New-Module` where a real module is not needed. Done when CR-PESTER-LIST over the file with `<PATTERNS>` = `'AC-6 helper*'` shows `Passed=3 | Failed=0`.
+- [ ] [P4-T6] Add to the N5 file two rows named `AC-6 probe passes when the baseline mock is bound to the resolver's module instance` and `AC-6 probe fails when the baseline mock is bound to a different module instance`. The failing row registers the baseline mock, then re-imports the module with `-Force` so the resolver runs in a new instance, calls the probe, and asserts that the probe reports a failure caused by a read of the hostile payload and a zero invocation count of the suite's mock (the assertion is that the probe call throws, checked with `Should -Throw`). Done when `'AC-6 probe*'` shows `Passed=2 | Failed=0`.
+- [ ] [P4-T7] Add to the N5 file four rows named `AC-7 Claude epic-scope seam is intercepted`, `AC-7 Claude worktree-run seam is intercepted`, `AC-7 Claude item-checkpoint seams are intercepted`, and `AC-7 Codex script-scope seam is intercepted`. Each registers the baseline mock through `Register-EpicStateBaselineMock`, registers hostile in-memory lower-seam payloads, and asserts the resolver result, one baseline-mock invocation, and zero hostile reads. No temporary file is created. Done when `'AC-7 *'` shows `Passed=4 | Failed=0`.
+- [ ] [P4-T8] Add to N2 the probe-presence rows `AC-6 <Path> calls the interception probe from inside an It` (`-ForEach` over the discovered suites whose compliance is by form F1 or the helper form, PI-2), which parse the suite and assert that an `It` script block contains a command named `Invoke-EpicStateInterceptionProbe`, and `AC-6 suite lacking a probe call yields a finding` (in-memory fixture, asserts a finding) and `AC-6 suite with a probe call yields none` (fixture, asserts none). Done when the file parses, CR-LINES reports N2 at most 500 lines, and `'AC-6 suite*'` shows `Passed=2 | Failed=0`.
+- [ ] [P4-T9] [expect-fail] Probe-presence fail-before run: run CR-PESTER-LIST with `<LIST>` = N2 and `<PATTERNS>` = `'AC-6 *'`, and write `<FEATURE>/evidence/regression-testing/probe-presence-fail-before.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:` carrying every `NAMED:` and `FAILED:` line. Done when at least one `FAILED:` line names an `AC-6 <Path> calls the interception probe` row. If none failed, record the result and stop with BLOCKED, because that outcome means no suite complies by F1 and the F1 rows were never generated.
+- [ ] [P4-T10] Run all probe harness rows: run CR-PESTER-LIST with `<LIST>` = N5 and an empty `<PATTERNS>` and write `<FEATURE>/evidence/regression-testing/probe-harness-pass.<ts>.md` with the four schema fields. Done when `EXIT_CODE: 0` and the `SUITE:` line shows `Failed=0`.
+- [ ] [P4-T11] Size check: run CR-LINES with `<LIST>` = N2, N4, N5 and write `<FEATURE>/evidence/qa-gates/phase4-lines.<ts>.md` with the four schema fields. Done when `LINES-OVER-500: 0`.
+- [ ] [P4-T12] Phase 4 commit and push, in the form of P1-T13, with the pathspec `tests/scripts/claude-hooks docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737` and the message `test(737): add baseline helper and interception probe`. Write `<FEATURE>/evidence/other/commit-phase4.<ts>.md` with the four schema fields. Done when the ahead count is 0 and `git status --porcelain --untracked-files=all -- tests/scripts` prints nothing.
+
+### Phase 5 — Baseline Mocks, Probe Rows, and Fixes Driven by Guard Findings
+
+Phase preamble: the edit targets are not listed here. They are the EDIT-SET recorded by P5-T1 from the Phase 1 through Phase 4 fail-before artifacts. Each group slot applies the Baseline-Edit Protocol (EP) to the suites of one group.
+
+- [ ] [P5-T1] Derive the EDIT-SET. Union (a) every suite path named by an `AC-4 <Path> complies` row in the `FAILED:` lines of `<FEATURE>/evidence/regression-testing/discovery-guard-fail-before.<ts>.md`, (b) every suite path named by an `AC-6 <Path> calls the interception probe` row in the `FAILED:` lines of `<FEATURE>/evidence/regression-testing/probe-presence-fail-before.<ts>.md`, (c) every suite that P1-T11 reports `DIFFERENT`, and (d) every suite that `<FEATURE>/evidence/regression-testing/legacy-guard-after-hardening.<ts>.md` names in a `FAILED:` line. Sort the union ordinally and split it into groups of at most four in that order (`EG-1`, `EG-2`, and so on). Write `<FEATURE>/evidence/other/edit-set.<ts>.md` with `Timestamp:`, the four source artifact paths, `EDIT-SET-COUNT: <n>`, `EDIT-GROUP-COUNT: <g>`, and one line per group `EG-<k>: <path>, <path>, ...`. Done when the artifact exists with those fields and every path in it exists in the tree. If `EDIT-GROUP-COUNT` is greater than 10, stop with BLOCKED and request a plan revision (PI-6).
+- [ ] [P5-T2] Group slot EG-1. Apply EP-1 through EP-8 to every suite listed under `EG-1` in the edit-set artifact; if `EG-1` is absent record `NO-GROUP-1`. Then run CR-PESTER-LIST with `<LIST>` = the group's suites and an empty `<PATTERNS>`, run CR-COMPARE with the P0-T12 artifact as `<BEFORE-ARTIFACT>` and the new run as `<AFTER-ARTIFACT>`, run CR-LINES on the group, and run CR-PESTER-LIST over N2 with `<PATTERNS>` = `'AC-4 <each path in the group> *'` and `'AC-6 <each path in the group> *'`. Write `<FEATURE>/evidence/regression-testing/edit-group-1.<ts>.md` with the four schema fields and the printed lines. Done when every group suite shows `result=EQUAL` or `ALREADY-COMPLIANT`, `LINES-OVER-500: 0`, and every `AC-4` and `AC-6` pattern for the group shows `Failed=0`; or when the artifact records `NO-GROUP-1`.
+- [ ] [P5-T3] Group slot EG-2, with the same procedure, Done condition, and artifact form as P5-T2, writing `<FEATURE>/evidence/regression-testing/edit-group-2.<ts>.md` and recording `NO-GROUP-2` when the group is absent.
+- [ ] [P5-T4] Group slot EG-3, with the same procedure, Done condition, and artifact form as P5-T2, writing `<FEATURE>/evidence/regression-testing/edit-group-3.<ts>.md` and recording `NO-GROUP-3` when the group is absent.
+- [ ] [P5-T5] Group slot EG-4, with the same procedure, Done condition, and artifact form as P5-T2, writing `<FEATURE>/evidence/regression-testing/edit-group-4.<ts>.md` and recording `NO-GROUP-4` when the group is absent.
+- [ ] [P5-T6] Group slot EG-5, with the same procedure, Done condition, and artifact form as P5-T2, writing `<FEATURE>/evidence/regression-testing/edit-group-5.<ts>.md` and recording `NO-GROUP-5` when the group is absent.
+- [ ] [P5-T7] Group slot EG-6, with the same procedure, Done condition, and artifact form as P5-T2, writing `<FEATURE>/evidence/regression-testing/edit-group-6.<ts>.md` and recording `NO-GROUP-6` when the group is absent.
+- [ ] [P5-T8] Group slot EG-7, with the same procedure, Done condition, and artifact form as P5-T2, writing `<FEATURE>/evidence/regression-testing/edit-group-7.<ts>.md` and recording `NO-GROUP-7` when the group is absent.
+- [ ] [P5-T9] Group slot EG-8, with the same procedure, Done condition, and artifact form as P5-T2, writing `<FEATURE>/evidence/regression-testing/edit-group-8.<ts>.md` and recording `NO-GROUP-8` when the group is absent.
+- [ ] [P5-T10] Group slot EG-9, with the same procedure, Done condition, and artifact form as P5-T2, writing `<FEATURE>/evidence/regression-testing/edit-group-9.<ts>.md` and recording `NO-GROUP-9` when the group is absent.
+- [ ] [P5-T11] Group slot EG-10, with the same procedure, Done condition, and artifact form as P5-T2, writing `<FEATURE>/evidence/regression-testing/edit-group-10.<ts>.md` and recording `NO-GROUP-10` when the group is absent.
+- [ ] [P5-T12] CR-7 comment for E5: in `tests/scripts/claude-hooks/enforce-pr-author-skill.WorktreeResolution.Tests.ps1`, replace the comment that begins "The hook is dot-sourced first" so that it names, by module file base name, every module the file imports without `-Force`, and contains no count word. Derive the names by listing the `Import-Module` commands of the file that lack `-Force`. Write `<FEATURE>/evidence/regression-testing/cr7-pr-author.<ts>.md` with the four schema fields, the derived module names, and CR-PHRASE output for (`tests/scripts/claude-hooks/enforce-pr-author-skill.WorktreeResolution.Tests.ps1`, `three library modules`). Done when that `PHRASE:` line shows `matches=0`, each derived module name appears in the flattened comment text, and the file is at most 500 lines.
+- [ ] [P5-T13] CR-7 comment for E6: the same procedure for `tests/scripts/claude-hooks/enforce-model-routing-receipt.WorktreeResolution.Tests.ps1`, writing `<FEATURE>/evidence/regression-testing/cr7-model-routing.<ts>.md`. Done when its `PHRASE:` line shows `matches=0`, each derived module name appears in the flattened comment text, and the file is at most 500 lines.
+- [ ] [P5-T14] Process-spawning evidence for AC-5. Run, through the CR routes, a body that dot-sources N1 and N1b, calls `Get-EpicStateProcessSpawningReport` for every suite in the Codex and Claude populations, and prints each `REPORT:` line followed by `REPORT-TOTAL: <n>` and `EXIT_CODE_COMPUTED: 0`. Write `<FEATURE>/evidence/other/process-spawning-report.<ts>.md` with the four schema fields, every `REPORT:` line, and, for each suite that P1-T11 reported `DIFFERENT` and that appears in a `REPORT:` line, the edit-group artifact path that records its fix. Done when the artifact exists and every `DIFFERENT` process-spawning suite cites a fix artifact; a report line with no differential difference is recorded `INDEPENDENCE-NOT-PROVEN-STATICALLY`, not as a failure.
+- [ ] [P5-T15] Guard pass-after run: run CR-PESTER-LIST with `<LIST>` = N2 and N5 and `<PATTERNS>` = `'AC-4 *'`, `'AC-6 *'`, `'AC-2 *'`, `'AC-3 *'`, `'AC-5 *'`, `'AC-7 *'`, and write `<FEATURE>/evidence/regression-testing/discovery-guard-pass-after.<ts>.md` with the four schema fields and every `NAMED:` line. Done when `EXIT_CODE: 0` and every `NAMED:` line shows `Failed=0`. A remaining `AC-4` or `AC-6` failure names a suite; fix it under the EP and rerun this task.
+- [ ] [P5-T16] Phase 5 commit and push, in the form of P1-T13, with the pathspec `tests/scripts docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737` and the message `test(737): isolate flagged hook suites from local orchestration state`. Write `<FEATURE>/evidence/other/commit-phase5.<ts>.md` with the four schema fields. Done when the ahead count is 0 and `git status --porcelain --untracked-files=all -- tests/scripts` prints nothing.
+
+### Phase 6 — No-Python Guard Extension to `.codex/hooks` (#707)
+
+Phase preamble: N6 is created first as a pure move, so that the move changes no behavior; the root extension follows. Row names carry the literal prefix `AC-15`.
+
+- [ ] [P6-T1] Create `tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.ScanRoots.Helpers.ps1` containing the scan-root definition (`.claude/hooks` and `.claude/lib` only at this step) and `Get-GuardedPowerShellFile`, moved verbatim from E3 with its `.claude/lib/bash/*` exclusion, plus a header stating that the file is not mirrored under `extensions/drm-copilot/resources/`. Done when CR-PARSE reports `Get-GuardedPowerShellFile` present with `errors=0`.
+- [ ] [P6-T2] Edit E3 `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`: replace the moved scan-root definition and function with one dot-source of N6 located through `$PSScriptRoot`. Done when CR-PESTER-LIST over E3 reports `EXIT_CODE: 0`, its `SUITE:` line equals, field for field, the E3 line of the P0-T13 artifact, and CR-LINES reports E3 at most 500 lines.
+- [ ] [P6-T3] Add to N6 the function `Test-GuardedPathUnderScanRoot` (parameter `-RelativePath`; true when the path lies under a configured scan root and not under `extensions/`). Done when CR-PARSE reports the function present with `errors=0`.
+- [ ] [P6-T4] Add to E3 four rows named `AC-15 claude hooks path is under a scan root`, `AC-15 codex hooks path is under a scan root`, `AC-15 bundled mirror path is outside every scan root`, and `AC-15 unrelated path is outside every scan root`, plus one row named `AC-15 enumeration includes at least one codex hooks file` that runs `Get-GuardedPowerShellFile` and asserts at least one result whose relative path begins `.codex/hooks/`. Done when the file parses and CR-LINES reports E3 at most 500 lines.
+- [ ] [P6-T5] [expect-fail] Run CR-PESTER-LIST with `<LIST>` = E3 and `<PATTERNS>` = `'AC-15 *'` against the two-root N6 and write `<FEATURE>/evidence/regression-testing/no-python-codex-fail-before.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:` carrying every `NAMED:` and `FAILED:` line. Done when the `FAILED:` lines name `AC-15 codex hooks path is under a scan root` and `AC-15 enumeration includes at least one codex hooks file`, and `AC-15 bundled mirror path is outside every scan root` is not among them.
+- [ ] [P6-T6] Add `.codex/hooks` to the scan roots in N6 and update the header comment that states the number of roots to state three. Done when CR-PARSE reports `errors=0`.
+- [ ] [P6-T7] Edit E3: update the comment that states "Exactly two scan roots" to state three roots, update the repository-scan assertion text "enumerated paths outside the two scan roots" to name three roots, and change the inline root check to call `Test-GuardedPathUnderScanRoot`; keep the `extensions/*` exclusion assertion unchanged. Done when CR-PHRASE with (`tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`, `two scan roots`) and (`tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.ScanRoots.Helpers.ps1`, `two scan roots`) both report `matches=0`, and CR-LINES reports E3 at most 500 lines.
+- [ ] [P6-T8] Run the extended guard: run CR-PESTER-LIST with `<LIST>` = E3 and `<PATTERNS>` = `'AC-15 *'` and write `<FEATURE>/evidence/regression-testing/no-python-codex-pass-after.<ts>.md` with the four schema fields. Done when `EXIT_CODE: 0`, `'AC-15 *'` shows `Passed=5 | Failed=0`, and the `SUITE:` line for E3 shows `Failed=0`. If a `.codex/hooks` finding appears, write `<FEATURE>/evidence/other/no-python-codex-findings.<ts>.md` listing each finding with its classification (existing carve-out a or b, or a production defect), then stop with BLOCKED for an orchestrator decision; the detection helper is at the 500-line cap and cannot grow, and no hook file is edited.
+- [ ] [P6-T9] Size check: run CR-LINES with `<LIST>` = E3, N6, and `tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1` and write `<FEATURE>/evidence/qa-gates/phase6-lines.<ts>.md` with the four schema fields. Done when `LINES-OVER-500: 0`.
+- [ ] [P6-T10] Phase 6 commit and push, in the form of P1-T13, with the pathspec `tests/scripts/claude-runtime docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737` and the message `test(737): scan .codex/hooks in the no-Python guard`. Write `<FEATURE>/evidence/other/commit-phase6.<ts>.md` with the four schema fields. Done when the ahead count is 0 and `git status --porcelain --untracked-files=all -- tests/scripts` prints nothing.
+
+### Phase 7 — Preimplementation-Gate Behavioral Parity (#555 remainder)
+
+Phase preamble: the case table is authored against the gates as they stand after the #732 merge. No text comparison and no hash is used. The two main gates are read only. Row names carry the literal prefix `AC-17` or `AC-18`.
+
+- [ ] [P7-T1] Gate function inventory. Run, through the CR routes, a body that parses `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` and `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` with `Parser::ParseFile` and prints `GATE-FUNCTIONS: <surface> | <name>` for every `FunctionDefinitionAst` of each file, then `SHARED: <name>` for names in both, `CLAUDE-ONLY: <name>`, and `CODEX-ONLY: <name>`. Write `<FEATURE>/evidence/baseline/gate-function-inventory.<ts>.md` with the four schema fields and the printed lines. Done when both parse with zero errors and the artifact lists the shared and per-surface-only sets; these sets are the declared sets of P7-T10.
+- [ ] [P7-T2] Create `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Parity.Cases.ps1` (data only: no function calls beyond hashtable construction) defining `$script:PathCases` with at least eight rows, each with `Name`, `Input`, and `Expected` (and an optional `Surfaces` and `Reason` for a declared divergence): a repository-relative implementation path, an absolute implementation path, a case-variant path, a checkpoint file name, a feature-documentation path, an evidence path, a non-implementation extension, and an empty string. Expected values are derived by reading the post-#732 `Test-ImplementationPath` of each gate. Done when the file parses and `$script:PathCases` holds at least eight rows.
+- [ ] [P7-T3] Add to the case file `$script:CommandCases` with at least six non-`apply_patch` rows for `Test-ImplementationCommand` (a write redirect, a `git add` of an implementation path, a read-only command, `git status`, a formatter invocation, an empty string), with expected values derived from both gates. Done when the file parses and the table holds at least six rows.
+- [ ] [P7-T4] Add to the case file `$script:DelegationCases` with at least four rows for `Test-PreparationModeDelegation` and `Test-ImplementationDelegation` (a delegation to an implementation agent, a delegation to a preparation agent, a non-delegation tool, an empty input). Done when the file parses and the table holds at least four rows.
+- [ ] [P7-T5] Add to the case file `$script:ReadinessCases` with at least four rows for `Test-OrchestrationReady` (a ready checkpoint, a not-ready checkpoint, an empty checkpoint, an unparseable checkpoint). Done when the file parses and the table holds at least four rows.
+- [ ] [P7-T6] Add to the case file `$script:DecisionCases` with at least six rows for `Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw -CheckpointRaw` (allow for a documentation path, block for an implementation path with a not-ready checkpoint, allow for an implementation path with a ready checkpoint, allow for an empty input, and two Agent-payload rows). Done when the file parses and the table holds at least six rows.
+- [ ] [P7-T7] Add to the case file `$script:DeclaredDivergence`, an array of `@{ Table; Name; Reason }` entries for every row whose expected value differs by surface, each with a written reason. Done when the file parses and every row in the five tables that carries a `Surfaces` or per-surface expectation has a matching `$script:DeclaredDivergence` entry (an empty array is valid if no row diverges).
+- [ ] [P7-T8] Create `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Parity.Tests.ps1` with a header, a `BeforeDiscovery` that dot-sources the case file and builds the two-runtime table (`claude` with `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`, `codex` with `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`) following `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.AttributionTrailer.Tests.ps1`, a per-runtime `BeforeAll` that dot-sources the gate (never both in one scope), registers the baseline epic-state mocks with `Register-EpicStateBaselineMock` after the dot-source, mocks the Claude target resolver to `/synthetic-worktrees/default-session`, and adds one row named `baseline mock interception probe` that calls `Invoke-EpicStateInterceptionProbe`; and the path-classification rows named `AC-17 path classification <Name> <Runtime>`. Done when the file parses, CR-LINES reports at most 500 lines, and CR-PESTER-LIST over the file with `<PATTERNS>` = `'AC-17 path classification*'` shows `Failed=0` and `Passed` equal to twice the row count of `$script:PathCases` (the executor records both numbers).
+- [ ] [P7-T9] Add to N7 the rows `AC-17 command classification <Name> <Runtime>`, `AC-17 delegation classification <Name> <Runtime>`, `AC-17 readiness <Name> <Runtime>`, and `AC-17 decision <Name> <Runtime>`, each comparing the gate output with the row's expected value, or with the declared per-surface expectation. Done when CR-PESTER-LIST over N7 with the four patterns (`'AC-17 command classification*'`, `'AC-17 delegation classification*'`, `'AC-17 readiness*'`, `'AC-17 decision*'`) shows `Failed=0` and `Passed` equal to twice the row count of the matching table.
+- [ ] [P7-T10] Add to N7 the declared-divergence rows `AC-17 the set of rows with differing per-surface expectations equals the declared set` (computed from the tables and compared with `$script:DeclaredDivergence`) and `AC-17 an undeclared divergence fails` (an in-memory fixture table with one undeclared differing row; the assertion is that the check throws, using `Should -Throw`). Done when `'AC-17 the set of rows*'` and `'AC-17 an undeclared*'` each show `Passed=1 | Failed=0`.
+- [ ] [P7-T11] Add to N7 the inventory rows `AC-18 each gate's function names equal the shared set plus its declared per-surface set` (AST of each canonical gate file against the sets recorded by P7-T1, declared in the case file or N7) and `AC-18 an undeclared added function fails` (in-memory fixture AST with one extra function; asserts the check throws), and `AC-18 the parity test reads only the two canonical gate files` (asserts the gate paths used by N7 are exactly the two `hooks/enforce-orchestration-preimplementation-gate.ps1` paths and that N7 and the case file hold no `Get-FileHash` or whole-file text-comparison command, by AST). Done when `'AC-18 *'` shows `Passed=3 | Failed=0`.
+- [ ] [P7-T12] Size and run check: run CR-LINES with `<LIST>` = N7 and N8, and CR-PESTER-LIST with `<LIST>` = N7 and an empty `<PATTERNS>`, and write `<FEATURE>/evidence/regression-testing/gate-parity-pass.<ts>.md` with the four schema fields, the `LINES:` lines, and the `SUITE:` line. Done when `LINES-OVER-500: 0`, the N7 `SUITE:` line shows `Failed=0 | Skipped=0`, and the `ProbeRows` field shows 2 (one probe row per runtime).
+- [ ] [P7-T13] Run the discovery guard against the new suite: run CR-PESTER-LIST with `<LIST>` = N2 and `<PATTERNS>` = `'AC-4 tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Parity.Tests.ps1*'` and `'AC-6 tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Parity.Tests.ps1*'` and write `<FEATURE>/evidence/regression-testing/gate-parity-guard.<ts>.md` with the four schema fields. Done when each pattern shows `Total=1 | Failed=0`.
+- [ ] [P7-T14] Phase 7 commit and push, in the form of P1-T13, with the pathspec `tests/scripts/claude-hooks docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737` and the message `test(737): add preimplementation-gate behavioral parity test`. Write `<FEATURE>/evidence/other/commit-phase7.<ts>.md` with the four schema fields. Done when the ahead count is 0 and `git status --porcelain --untracked-files=all -- tests/scripts` prints nothing.
+
+### Phase 8 — `GENERATED_AGENT_FAMILIES` Parity (#646 remainder)
+
+Phase preamble: no interpreter is launched. The Python literal is read as text. Row names carry the literal prefix `AC-19`.
+
+- [ ] [P8-T1] Create `tests/scripts/claude-lib/codex-routing/CodexDeployment.GeneratedFamilies.Parity.Tests.ps1` with a header, a file-level `BeforeAll` that resolves the repository root from `$PSScriptRoot` and defines `Get-GeneratedFamilyFromPythonText` (parameter `-Text`; locates every `GENERATED_AGENT_FAMILIES` declaration, extracts the quoted members of the `frozenset` literal, and returns an object with `Declarations` and `Members`). Done when the file parses and CR-LINES reports at most 500 lines.
+- [ ] [P8-T2] Add the extractor rows `AC-19 extractor rejects text with zero declarations` (the check throws on a fixture with no declaration, asserted with `Should -Throw`) and `AC-19 extractor detects a divergent member` (a fixture literal with one extra member differs from the module set). Done when `'AC-19 extractor*'` shows `Passed=2 | Failed=0`.
+- [ ] [P8-T3] Add the row `AC-19 module set equals the central config set`: import `.claude/lib/codex-routing/CodexDeployment.psm1`, read `$script:GENERATED_AGENT_FAMILIES` through `InModuleScope 'CodexDeployment'`, read `codex_model_policy.generated_agent_families` from `config/orchestration-routing.json`, and compare the sorted sets with a case-sensitive ordinal comparison. Done when the row passes (`'AC-19 module set equals the central config set'` shows `Passed=1 | Failed=0`).
+- [ ] [P8-T4] Add the row `AC-19 module set equals the Python authority set`: read `scripts/dev_tools/resolve_codex_deployment.py` as text, extract with `Get-GeneratedFamilyFromPythonText`, and compare with the module set by case-sensitive ordinal comparison. Done when `'AC-19 module set equals the Python authority set'` shows `Passed=1 | Failed=0`.
+- [ ] [P8-T5] Add the non-vacuity rows `AC-19 module set is non-empty`, `AC-19 config set is non-empty`, `AC-19 Python set is non-empty`, and `AC-19 non-vacuity check rejects an empty set and a null set`. The first three use the leading-comma idiom when capturing each set so that a single member is not unrolled. The fourth runs the non-vacuity check on `@()` and on `$null` and asserts that both throw. Done when `'AC-19 *non-empty'` shows `Passed=3 | Failed=0` and `'AC-19 non-vacuity check*'` shows `Passed=1 | Failed=0`.
+- [ ] [P8-T6] Add the row `AC-19 the test launches no interpreter`: parse this file and assert that it contains no command whose name is `python`, `python3`, `py`, `poetry`, `Start-Process`, or `Invoke-Expression`. Done when the row passes.
+- [ ] [P8-T7] Replacement decision for `tests/scripts/claude-lib/codex-routing/CodexDeployment.Parity.Tests.ps1`: keep the hard-coded copy unless P8-T4 failed; with all rows passing it is redundant but not wrong. Write `<FEATURE>/evidence/other/families-hardcoded-copy-decision.<ts>.md` with `Timestamp:`, `DECISION: KEEP` or `DECISION: REPLACE`, and the reason. Done when the artifact exists. If `REPLACE`, the replacement edit is a separate task recorded in the artifact and the file is added to the Phase 8 commit pathspec.
+- [ ] [P8-T8] Fail-before disposition: write `<FEATURE>/evidence/regression-testing/fail-before-exception.<ts>.md` (a new file; append a section if P2-T9 already created one in the same minute) with `WhyFailingRunImpossible:` (all four copies of the family list are equal today, so the live parity rows pass on first run) and an alternative proof: the extractor rows of P8-T2 and the empty and null rows of P8-T5 are the discriminating cases, and they pass because the check throws on divergent, empty, and null input. Done when the section exists with both fields.
+- [ ] [P8-T9] Run check: run CR-PESTER-LIST with `<LIST>` = the N9 file and `<PATTERNS>` = `'AC-19 *'` and CR-LINES on it, and write `<FEATURE>/evidence/regression-testing/families-parity-pass.<ts>.md` with the four schema fields. Done when `EXIT_CODE: 0`, the `NAMED:` line for `'AC-19 *'` shows `Failed=0`, and `LINES-OVER-500: 0`.
+- [ ] [P8-T10] Phase 8 commit and push, in the form of P1-T13, with the pathspec `tests/scripts/claude-lib docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737` and the message `test(737): add GENERATED_AGENT_FAMILIES parity test`. Write `<FEATURE>/evidence/other/commit-phase8.<ts>.md` with the four schema fields. Done when the ahead count is 0 and `git status --porcelain --untracked-files=all -- tests/scripts` prints nothing.
+
+### Phase 9 — `Get-CodexPreToolUseRegistration` Return Shape (#746)
+
+Phase preamble: the helper is test-local to E4. Row names carry the literal prefixes `AC-20` and `AC-21`. The helper reads its configuration through `Get-Content`, which the new rows mock with in-memory lines.
+
+- [ ] [P9-T1] Add to E4 `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1` the rows `AC-20 one registration returns an array of count one` and `AC-20 zero registrations return an empty array that is not null`, each calling `Get-CodexPreToolUseRegistration` directly with `Get-Content` mocked to in-memory configuration lines (read the helper's parsing to build one-registration and zero-registration inputs). The first asserts the result `-is [array]` and `Count` equals 1; the second asserts `$null -ne $result` and `Count` equals 0. Done when the file parses.
+- [ ] [P9-T2] [expect-fail] Run CR-PESTER-LIST with `<LIST>` = E4 and `<PATTERNS>` = `'AC-20 *'` against the unmodified helper and write `<FEATURE>/evidence/regression-testing/pretooluse-registration-fail-before.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:` carrying the `NAMED:` and `FAILED:` lines. Done when the `NAMED:` line shows `Passed=0 | Failed=2`.
+- [ ] [P9-T3] Change the statement `return $registrations.ToArray()` in the helper of E4 to `return ,$registrations.ToArray()`. Done when `'AC-20 *'` shows `Passed=2 | Failed=0` in a CR-PESTER-LIST run over E4.
+- [ ] [P9-T4] In E4 replace the `@($script:Registrations | Where-Object { $null -ne $_ }).Count` count assertion with a call to a small test-local function `Assert-RegistrationSetNotEmpty` (defined in the same `BeforeAll`) that fails for `$null` and for an empty array, and add the rows `AC-21 registration count assertion rejects an empty array` and `AC-21 registration count assertion rejects a null result`, each asserting that `Assert-RegistrationSetNotEmpty` throws for its input (`Should -Throw`). Leave the `@(... | Select-Object -Unique).Count` assertion unchanged. Done when `'AC-21 *'` shows `Passed=2 | Failed=0`.
+- [ ] [P9-T5] Remove from E4 the documentation `Context 'Non-vacuity floor for the registration count'` and its rows that exercise the legacy expression. Done when CR-PHRASE with (`tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1`, `Non-vacuity floor`) reports `matches=0` and CR-PHRASE with (`tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1`, `legacy expression`) reports `matches=0`.
+- [ ] [P9-T6] Run check: run CR-PESTER-LIST with `<LIST>` = E4 and `<PATTERNS>` = `'AC-20 *'`, `'AC-21 *'` and write `<FEATURE>/evidence/regression-testing/pretooluse-registration-pass-after.<ts>.md` with the four schema fields. Done when `EXIT_CODE: 0`, `'AC-20 *'` shows `Passed=2 | Failed=0`, `'AC-21 *'` shows `Passed=2 | Failed=0`, and the E4 `SUITE:` line shows `Failed=0`.
+- [ ] [P9-T7] Mirror check for E4: run CR-MIRROR with `<LIST>` = E4 and write `<FEATURE>/evidence/regression-testing/pretooluse-mirror.<ts>.md` with the four schema fields. Done when the `MIRROR:` line shows `matches=0`, which records that no bundled mirror of the test exists. If a mirror exists, update it to match and add the bundle-parity run of P10-T11 to this task's evidence.
+- [ ] [P9-T8] Phase 9 commit and push, in the form of P1-T13, with the pathspec `tests/scripts/codex-hooks docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737` and the message `test(737): return registrations as an array in the pretooluse helper (#746)`. Write `<FEATURE>/evidence/other/commit-phase9.<ts>.md` with the four schema fields. Done when the ahead count is 0 and `git status --porcelain --untracked-files=all -- tests/scripts` prints nothing.
+
+### Phase 10 — Final QA Loop, Scope Verification, and Acceptance Check-off
+
+Loop rule: P10-T16 through P10-T22 form the PowerShell QA loop (format, analyze, targeted tests, full run with coverage). PowerShell has no type-check stage. If any of them fails or any file changes during them, fix the cause, then restart at P10-T16. A task in this loop is checked only from a pass in which all of them succeeded without a file change.
+
+Check-off rule (P10-T29 through P10-T56): `AC-n` is the nth bullet of the `spec.md` "Acceptance Criteria" section (the P0-T4 inventory). A check-off task changes only that bullet's `- [ ]` to `- [x]` in `spec.md`; no other character of `spec.md` changes. The cited artifact paths are recorded in `<FEATURE>/evidence/qa-gates/ac-checkoff.<ts>.md`, created by P10-T28 and extended by each later check-off task, under a section headed with the AC identifier that carries its own `Timestamp:` line.
+
+- [ ] [P10-T1] Freshness: run `git fetch origin epic/enforcement-hook-precision-integration` and `git rev-list --count HEAD..origin/epic/enforcement-hook-precision-integration`, and write `<FEATURE>/evidence/qa-gates/freshness.<ts>.md` with the four schema fields. Done when the count is 0. If it is not 0, run `git merge --no-edit origin/epic/enforcement-hook-precision-integration` (never rebase, never force-push), then rerun CR-ENUM and the guard (P10-T2); a newly present suite is handled under the EP before this task is checked.
+- [ ] [P10-T2] Final guard run on the population as it stands now: run CR-ENUM, then CR-PESTER-LIST with `<LIST>` = N2 and N5 and `<PATTERNS>` = `'AC-4 *'`, `'AC-6 *'`, `'AC-7 *'`, and write `<FEATURE>/evidence/qa-gates/guard-final.<ts>.md` with the four schema fields. Done when `EXIT_CODE: 0`, the `AC-4` pattern shows `Failed=0` with `Total` at least `POPULATION-TOTAL` from the same run, and the `AC-6` and `AC-7` patterns show `Failed=0`.
+- [ ] [P10-T3] Final population run without the local checkpoint: run CR-PESTER-LIST with `<LIST>` = LIST-POP (re-derived now) and an empty `<PATTERNS>` and write `<FEATURE>/evidence/qa-gates/pester-population-final.<ts>.md` with the four schema fields and every `SUITE:` line verbatim. Done when `EXIT_CODE: 0` and the number of `SUITE:` lines equals the current `POPULATION-TOTAL`.
+- [ ] [P10-T4] Create the deliberately present local epic checkpoint, with the same content and procedure as P1-T8, and write `<FEATURE>/evidence/qa-gates/hostile-checkpoint-created.<ts>.md` with the four schema fields. Done when `Test-Path` returns True and `git status --porcelain --untracked-files=all` does not list the file. The file is never staged or committed.
+- [ ] [P10-T5] Final population run with the local checkpoint present: run CR-PESTER-LIST with the same `<LIST>` as P10-T3 and write `<FEATURE>/evidence/qa-gates/pester-population-with-local-checkpoint.<ts>.md` with the four schema fields and every `SUITE:` line verbatim. Done when the `SUITE:` line count equals the P10-T3 count. The exit code is recorded.
+- [ ] [P10-T6] Delete the local checkpoint as in P1-T10 and write `<FEATURE>/evidence/qa-gates/hostile-checkpoint-deleted.<ts>.md` with the four schema fields. Done when `Test-Path -LiteralPath artifacts/orchestration/epic-orchestrator-state.json` returns False and `git status --porcelain --untracked-files=all` lists no path under `artifacts/`. This task runs even when P10-T5 failed.
+- [ ] [P10-T7] AC-24 comparison: run CR-COMPARE with `<BEFORE-ARTIFACT>` = the P10-T3 artifact, `<AFTER-ARTIFACT>` = the P10-T5 artifact, and an empty `<PATHS DECLARED BY DESIGN>`, and write `<FEATURE>/evidence/qa-gates/local-state-differential-after.<ts>.md` with the four schema fields and every `COMPARE:` line. Done when `COMPARE-DIFFERENT-COUNT: 0` and every `COMPARE:` line is `result=EQUAL`, with the Passed, Failed, and Skipped counts identical for every suite.
+- [ ] [P10-T8] AC-23 comparison: run CR-COMPARE with `<BEFORE-ARTIFACT>` = the P0-T12 artifact, `<AFTER-ARTIFACT>` = the P10-T3 artifact, and `<PATHS DECLARED BY DESIGN>` = `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1`, `tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1`, and write `<FEATURE>/evidence/qa-gates/suite-counts-before-after.<ts>.md` with the four schema fields and every `COMPARE:` line. Done when `COMPARE-DIFFERENT-COUNT: 0`, every pre-existing suite reports `EQUAL` or `BY-DESIGN-OK`, and every new suite reports `NEW`. The artifact restates PI-1.
+- [ ] [P10-T9] Auxiliary suites after the change: run CR-PESTER-LIST with `<LIST>` = LIST-AUX and an empty `<PATTERNS>`, then CR-COMPARE with the P0-T13 artifact as `<BEFORE-ARTIFACT>`, the new run as `<AFTER-ARTIFACT>`, and `<PATHS DECLARED BY DESIGN>` = `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`, and write `<FEATURE>/evidence/qa-gates/pester-aux-final.<ts>.md` with the four schema fields. Done when `EXIT_CODE: 0`, `COMPARE-DIFFERENT-COUNT: 0`, and the `SUITE:` lines are present for all three files.
+- [ ] [P10-T10] Mirror determination (AC-22): run CR-CHANGED, and run CR-MIRROR with `<LIST>` = the `CHANGED:` paths of the CR-CHANGED run that end in `.ps1` or `.psm1`, and write `<FEATURE>/evidence/qa-gates/mirror-check.<ts>.md` with the four schema fields. Done when `UNTRACKED-TESTS: 0` and every `MIRROR:` line shows `matches=0`. If any line shows a match, update that mirror to match the changed file before P10-T11.
+- [ ] [P10-T11] Bundle-parity tests (AC-22): run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` (fallback `python -m pytest ...` as in P0-T15), and CR-PESTER-LIST with `<LIST>` = `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` and `tests/scripts/claude-lib/codex-routing/CodexRouting.Manifest.Tests.ps1`, and write `<FEATURE>/evidence/qa-gates/bundle-parity.<ts>.md` with the four schema fields. Done when pytest exits 0 with a passed count equal to the P0-T15 passed count and no failed test, and both Pester suites show `Failed=0`.
+- [ ] [P10-T12] Scope verification: run `git diff --name-only --diff-filter=ACMR origin/epic/enforcement-hook-precision-integration` and `git status --porcelain --untracked-files=all`, and write `<FEATURE>/evidence/qa-gates/scope-diff.<ts>.md` with the four schema fields and the union of listed paths. Done when every non-`docs/` path begins with `tests/scripts/` and no path begins with `.claude/`, `.codex/`, `scripts/`, or `extensions/`.
+- [ ] [P10-T13] Hook-immutability check (AC-26): run `git diff --name-only origin/epic/enforcement-hook-precision-integration -- .claude/hooks .codex/hooks` and `git status --porcelain --untracked-files=all -- .claude/hooks .codex/hooks`, and write `<FEATURE>/evidence/qa-gates/hooks-unchanged.<ts>.md` with the four schema fields. Done when both commands print nothing.
+- [ ] [P10-T14] Line-count check (AC-25): run CR-LINES with `<LIST>` = the `CHANGED:` paths of a fresh CR-CHANGED run that end in `.ps1` or `.psm1`, plus `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` and `tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1`, and write `<FEATURE>/evidence/qa-gates/line-counts.<ts>.md` with the four schema fields. Done when `LINES-OVER-500: 0`.
+- [ ] [P10-T15] Temporary-file check (AC-26): run CR-HERMETIC with `<LIST>` = the same `.ps1` and `.psm1` paths as P10-T14, and write `<FEATURE>/evidence/qa-gates/hermeticity-scan.<ts>.md` with the four schema fields. Done when `HERMETIC-MATCH-COUNT: 0` and the file list in the artifact equals the P10-T14 list.
+- [ ] [P10-T16] QA loop step 1, format: run CR-FORMAT-CHECK with `<LIST>` = the P10-T14 `.ps1` and `.psm1` paths and write `<FEATURE>/evidence/qa-gates/format-check.<ts>.md` with the four schema fields. Done when the output shows one `FORMAT-CLEAN:` line per file, `FORMAT-DRIFT-COUNT: 0`, and `EXIT_CODE: 0`. On drift, apply `Invoke-Formatter` output (same normalization as `Invoke-PoshQCFormat`) to that one file, record the before-and-after `git diff --numstat origin/epic/enforcement-hook-precision-integration -- <that file>` lines together with `git status --porcelain --untracked-files=all`, and restart the loop. A file whose drift is recorded in the P0-T10 baseline may be reformatted in full.
+- [ ] [P10-T17] QA loop step 1b, repository format route: call `mcp__drm-copilot__run_poshqc_format` with `scan_folders` limited to the directories that contain changed files. Record `git status --porcelain --untracked-files=all` immediately before and immediately after the call in `<FEATURE>/evidence/qa-gates/format-mcp.<ts>.md` with the four schema fields. Done when the two status outputs are identical, which shows the formatter changed nothing. No count is read from the tool result; only the call disposition is recorded.
+- [ ] [P10-T18] QA loop step 2, analyze: run CR-PSSA with the same `<LIST>` as P10-T16 and write `<FEATURE>/evidence/qa-gates/pssa.<ts>.md` with the four schema fields. Done when the output shows one `PSSA:` line per file with `findings=0`, `PSSA-TOTAL: 0`, and `EXIT_CODE: 0`.
+- [ ] [P10-T19] QA loop step 2b, repository analyze route: call `mcp__drm-copilot__run_poshqc_analyze` with `scan_folders` limited to the directories that contain changed files, and record the call disposition only in `<FEATURE>/evidence/qa-gates/analyze-mcp.<ts>.md` with the four schema fields. Done when the artifact exists and states that no count was read from the result (P10-T18 is the count authority).
+- [ ] [P10-T20] QA loop step 3, targeted tests: run CR-PESTER-LIST with `<LIST>` = the `.Tests.ps1` paths of the P10-T14 list (the changed and new test files) and the three LIST-AUX files, with `<PATTERNS>` = `'AC-8 *'`, `'AC-9 *'`, `'AC-10 *'`, `'AC-11 *'`, `'AC-12 *'`, `'AC-13 *'`, `'AC-15 *'`, `'AC-17 *'`, `'AC-18 *'`, `'AC-19 *'`, `'AC-20 *'`, `'AC-21 *'`, and write `<FEATURE>/evidence/qa-gates/pester-targeted.<ts>.md` with the four schema fields. Done when `EXIT_CODE: 0` and every `NAMED:` line shows `Failed=0` with `Passed` equal to its `Total` and at least 2, except `AC-15 *` (`Passed=5`), `AC-18 *` (`Passed=3`), `AC-20 *` (`Passed=2`), and `AC-21 *` (`Passed=2`).
+- [ ] [P10-T21] QA loop step 4, full configured run: run CR-PESTER-FULL and write `<FEATURE>/evidence/qa-gates/pester-full.<ts>.md` with the four schema fields, the run summary, and every `[-]` line. Done when the exit code is 0 and the last `Tests Passed:` line shows `Failed: 0`. If failures remain that are also listed in the P0-T16 artifact, record them as pre-existing, leave AC-27 unchecked, and escalate; any failure not listed in P0-T16 follows the loop rule.
+- [ ] [P10-T22] QA loop step 5, coverage comparison: immediately after P10-T21, run CR-COV-TOTAL and write `<FEATURE>/evidence/qa-gates/coverage-total.<ts>.md` with the four schema fields and a comparison block: baseline percent (P0-T17), post-change percent, delta, the 85 percent line threshold, and the changed-production-code figure. Derive that figure by running `git diff --name-only origin/epic/enforcement-hook-precision-integration -- .claude .codex scripts extensions` together with `git status --porcelain --untracked-files=all -- .claude .codex scripts extensions`; when both print nothing, record `Changed production lines: 0` and `New/changed-code coverage: not applicable (no production file changed)`. Done when both commands print nothing, `SOURCEFILE-COUNT` is positive, and the post-change percent is greater than or equal to both the P0-T17 baseline percent and 85. Branch coverage is not measured for PowerShell and is not recorded; Python coverage is not applicable (no Python file changed).
+- [ ] [P10-T23] Record the QA loop result in `<FEATURE>/evidence/qa-gates/qa-loop.<ts>.md`: `Timestamp:`, the number of loop passes, and the artifact paths from the final clean pass of P10-T16 through P10-T22. Done when the artifact names one pass in which all seven tasks succeeded without a file change.
+- [ ] [P10-T24] Stale-comment repository search (AC-14): run CR-PHRASE with a check for each file returned by `Get-ChildItem -LiteralPath tests -Recurse -File -Include '*.ps1','*.psm1','*.py','*.ts'` and the phrase `the three library modules are imported without -Force`, and write `<FEATURE>/evidence/qa-gates/stale-comment-search.<ts>.md` with the four schema fields and the number of files checked. Done when every `PHRASE:` line shows `matches=0` and at least one file was checked.
+- [ ] [P10-T25] Follow-ups record: write `<FEATURE>/evidence/other/follow-ups.md` with `Timestamp:` and one entry per item that remains open: each `INDEPENDENCE-NOT-PROVEN-STATICALLY` process-spawning suite from P5-T14, each production defect from P1-T12, and any `.codex/hooks` no-Python finding from P6-T8 (or the statement `NONE` for each empty class). Done when the artifact has all three class headings.
+- [ ] [P10-T26] Final commit and push of evidence: run `git add -- tests docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737`, then `git commit -m "docs(737): record final QA evidence" -- tests docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737`, then `git push origin bug/hook-test-isolation-remaining-gaps-737`, and write `<FEATURE>/evidence/other/commit-final.<ts>.md` with the four schema fields. Done when the ahead count against `origin/bug/hook-test-isolation-remaining-gaps-737` is 0, `git status --porcelain --untracked-files=all` lists no path outside `artifacts/`, and the local checkpoint file is absent.
+- [ ] [P10-T27] Rerun of the freshness check after the last commit: run `git fetch origin epic/enforcement-hook-precision-integration` and `git rev-list --count HEAD..origin/epic/enforcement-hook-precision-integration` and append the output to the P10-T1 artifact. Done when the count is 0, or when it is not 0 and the integration changes were merged and P10-T2 through P10-T26 were rerun.
+- [ ] [P10-T28] Create `<FEATURE>/evidence/qa-gates/ac-checkoff.<ts>.md` with `Timestamp:` and the heading list `AC-1` through `AC-28` empty of content. Done when the file exists with 28 headings.
+- [ ] [P10-T29] Check off AC-1 in `<FEATURE>/spec.md` when the P1-T6 census artifact and the P3-T14 fail-before artifact exist under `<FEATURE>/evidence/regression-testing/`, the P0-T2 artifact shows `UPSTREAM-VERIFIED: 3`, and the P3-T14 artifact shows at least one failed `AC-4` `complies` row. Record the three artifact paths under `AC-1`; the section also restates PI-5.
+- [ ] [P10-T30] Check off AC-2 in `<FEATURE>/spec.md` when the P5-T15 artifact shows `'AC-2 *'` with `Failed=0`, including `AC-2 non-vacuity` `Passed=2`, the two no-hard-coded-list rows, and P3-T15 recorded the removal of the fixed list and the D9 note (`decision D9` `matches=0`). Record the artifact paths under `AC-2`.
+- [ ] [P10-T31] Check off AC-3 in `<FEATURE>/spec.md` when the P5-T15 artifact shows `'AC-3 *'` with `Passed=2 | Failed=0` (the closure-only row and the never-reaches-the-seam row). Record the artifact path under `AC-3`.
+- [ ] [P10-T32] Check off AC-4 in `<FEATURE>/spec.md` when the P10-T2 artifact shows the `AC-4` pattern with `Failed=0` and `Total` at least the current population total, and P10-T7 shows no regression. Record the artifact paths under `AC-4`.
+- [ ] [P10-T33] Check off AC-5 in `<FEATURE>/spec.md` when the P5-T15 artifact shows `'AC-5 *'` with `Failed=0` (the report rows and the fixture row) and the P5-T14 report artifact exists. Record both paths under `AC-5`.
+- [ ] [P10-T34] Check off AC-6 in `<FEATURE>/spec.md` when the P10-T2 artifact shows `'AC-6 *'` with `Failed=0`, including the probe-presence rows, the missing-probe fixture row, and the wrong-instance and right-instance rows. Record the artifact path under `AC-6`.
+- [ ] [P10-T35] Check off AC-7 in `<FEATURE>/spec.md` when the P10-T2 artifact shows `'AC-7 *'` with `Passed=4 | Failed=0` and the P10-T15 artifact shows `HERMETIC-MATCH-COUNT: 0`. Record both paths under `AC-7`.
+- [ ] [P10-T36] Check off AC-8 in `<FEATURE>/spec.md` when the P2-T8 artifact shows `AC-8 non-compliant*` with `Failed=1` and the P10-T20 artifact shows `'AC-8 *'` with `Failed=0`. Record both paths under `AC-8`.
+- [ ] [P10-T37] Check off AC-9 in `<FEATURE>/spec.md` when the P2-T8 artifact shows `AC-9 non-compliant*` with `Failed=1` and the P10-T20 artifact shows `'AC-9 *'` with `Failed=0`. Record both paths under `AC-9`.
+- [ ] [P10-T38] Check off AC-10 in `<FEATURE>/spec.md` when the P2-T8 artifact shows `AC-10 non-compliant*` with `Failed=1` and the P10-T20 artifact shows `'AC-10 *'` with `Failed=0`. Record both paths under `AC-10`.
+- [ ] [P10-T39] Check off AC-11 in `<FEATURE>/spec.md` when the P2-T8 artifact shows `AC-11 non-compliant*` with `Failed=1` and the P10-T20 artifact shows `'AC-11 *'` with `Failed=0`. Record both paths under `AC-11`.
+- [ ] [P10-T40] Check off AC-12 in `<FEATURE>/spec.md` when the P2-T8 artifact shows `AC-12 non-compliant*` with `Failed=1` and the P10-T20 artifact shows `'AC-12 *'` with `Failed=0`. Record both paths under `AC-12`.
+- [ ] [P10-T41] Check off AC-13 in `<FEATURE>/spec.md` when the P2-T9 disposition artifact lists all seven branches (each `FAILED-BEFORE`, or `PASSED-BEFORE` with a dossier) and the P10-T20 artifact shows `'AC-13 *'` with `Failed=0`. Record both paths under `AC-13`; the section restates PI-3.
+- [ ] [P10-T42] Check off AC-14 in `<FEATURE>/spec.md` when the P10-T24 artifact shows every `PHRASE:` line with `matches=0` and the P5-T12 and P5-T13 artifacts record the derived module names found in the replacement comments. Record the three paths under `AC-14`.
+- [ ] [P10-T43] Check off AC-15 in `<FEATURE>/spec.md` when the P6-T5 artifact shows the expected failures, the P10-T20 artifact shows `'AC-15 *'` with `Passed=5 | Failed=0`, and the extension exclusion row of E3 passes in the P10-T9 run (`Failed=0`). Record the three paths under `AC-15`.
+- [ ] [P10-T44] Check off AC-16 in `<FEATURE>/spec.md` when `tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.ScanRoots.Helpers.ps1` exists, the P6-T7 artifact shows `two scan roots` with `matches=0` in both files, and the P6-T8 artifact shows no `.codex/hooks` finding (or `no-python-codex-findings` records each finding with its carve-out). Record the paths under `AC-16`.
+- [ ] [P10-T45] Check off AC-17 in `<FEATURE>/spec.md` when the P10-T20 artifact shows `'AC-17 *'` with `Failed=0` and the `AC-17 an undeclared divergence fails` row passing, and the P7-T12 artifact shows the per-runtime probe rows. Record both paths under `AC-17`.
+- [ ] [P10-T46] Check off AC-18 in `<FEATURE>/spec.md` when the P10-T20 artifact shows `'AC-18 *'` with `Passed=3 | Failed=0`. Record the path under `AC-18`.
+- [ ] [P10-T47] Check off AC-19 in `<FEATURE>/spec.md` when the P10-T20 artifact shows `'AC-19 *'` with `Failed=0` and the P8-T8 dossier exists. Record both paths under `AC-19`.
+- [ ] [P10-T48] Check off AC-20 in `<FEATURE>/spec.md` when the P9-T2 artifact shows `Passed=0 | Failed=2` for `'AC-20 *'` and the P10-T20 artifact shows `'AC-20 *'` with `Passed=2 | Failed=0`. Record both paths under `AC-20`.
+- [ ] [P10-T49] Check off AC-21 in `<FEATURE>/spec.md` when the P10-T20 artifact shows `'AC-21 *'` with `Passed=2 | Failed=0` and the P9-T5 phrase checks show `matches=0`. Record both paths under `AC-21`.
+- [ ] [P10-T50] Check off AC-22 in `<FEATURE>/spec.md` when the P10-T10 artifact shows every `MIRROR:` line with `matches=0` and the P10-T11 artifact shows the three bundle-parity tests passing. Record both paths under `AC-22`, together with the statement that no changed file has a mirror.
+- [ ] [P10-T51] Check off AC-23 in `<FEATURE>/spec.md` when the P10-T8 artifact shows `COMPARE-DIFFERENT-COUNT: 0` with the P0-T12 baseline and the P10-T3 run. Record both paths under `AC-23`; the section restates PI-1 and names the two by-design suites.
+- [ ] [P10-T52] Check off AC-24 in `<FEATURE>/spec.md` when the P10-T7 artifact shows `COMPARE-DIFFERENT-COUNT: 0` and the P10-T4 and P10-T6 artifacts show the checkpoint created and then deleted. Record the three paths under `AC-24`.
+- [ ] [P10-T53] Check off AC-25 in `<FEATURE>/spec.md` when the P10-T14 artifact shows `LINES-OVER-500: 0` and lists both `enforcement-hooks-no-python-invocation.Tests.ps1` and `EnforcementHooksNoPythonInvocation.Helpers.ps1` at 500 lines or fewer. Record the path under `AC-25`.
+- [ ] [P10-T54] Check off AC-26 in `<FEATURE>/spec.md` when the P10-T13 artifact shows no hook file changed and the P10-T15 artifact shows `HERMETIC-MATCH-COUNT: 0`. Record both paths under `AC-26`.
+- [ ] [P10-T55] Check off AC-27 in `<FEATURE>/spec.md` when the P10-T16 artifact shows `FORMAT-DRIFT-COUNT: 0`, the P10-T18 artifact shows `PSSA-TOTAL: 0`, the P10-T21 artifact shows `Failed: 0`, and the P10-T22 artifact shows the post-change percent at or above the baseline and 85 with `Changed production lines: 0`. Record the four paths under `AC-27`.
+- [ ] [P10-T56] Check off AC-28 in `<FEATURE>/spec.md` when `git status --porcelain --untracked-files=all` and `git diff --name-only --diff-filter=ACMR origin/epic/enforcement-hook-precision-integration` list evidence files only under `docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737/evidence/` and none under `artifacts/` (run both commands in this task and write `<FEATURE>/evidence/qa-gates/evidence-location.<ts>.md` with the four schema fields), and every artifact named in this plan's census, fail-before, fail-after, before-and-after count, and process-spawning-report tasks exists. Record the path under `AC-28`.
+- [ ] [P10-T57] Commit and push the check-offs: run `git add -- docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737`, then `git commit -m "docs(737): check off acceptance criteria" -- docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737`, then `git push origin bug/hook-test-isolation-remaining-gaps-737`, then `git fetch origin bug/hook-test-isolation-remaining-gaps-737` and `git rev-list --count origin/bug/hook-test-isolation-remaining-gaps-737..HEAD`, and write `<FEATURE>/evidence/other/commit-checkoff.<ts>.md` with the four schema fields. Done when the ahead count is 0 and `git status --porcelain --untracked-files=all -- docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737` prints nothing.
+
+## AC Traceability Mapping
+
+| AC | Implementation | Tests (named rows) | Evidence |
+|---|---|---|---|
+| AC-1 | N1 census functions; P1-T6 | `AC-4 <Path> complies ...` fail-before | `evidence/regression-testing/census-fail-before.<ts>.md`, `discovery-guard-fail-before.<ts>.md` |
+| AC-2 | N2 discovery; E2 edit | `AC-2 non-vacuity`, `AC-2 no hard-coded suite list` | `discovery-guard-pass-after.<ts>.md` |
+| AC-3 | N1 closure and census; N1b | `AC-3 *` fixture rows | `discovery-guard-pass-after.<ts>.md` |
+| AC-4 | N1b compliance; EDIT-SET edits | `AC-4 <Path> complies ...` | `guard-final.<ts>.md`, `edit-group-<k>.<ts>.md` |
+| AC-5 | N1b report function | `AC-5 *` | `process-spawning-report.<ts>.md` |
+| AC-6 | N4 probe and helper; N2 presence rows | `AC-6 *` | `probe-presence-fail-before.<ts>.md`, `guard-final.<ts>.md` |
+| AC-7 | N4 probe branches; N5 | `AC-7 *` | `guard-final.<ts>.md` |
+| AC-8 | E1 hook dot-source fix; N3 | `AC-8 *` | `predicate-fail-before.<ts>.md`, `predicate-pass-after.<ts>.md` |
+| AC-9 | E1 direct-statement fix; N3 | `AC-9 *` | same |
+| AC-10 | E1 every-BeforeAll fix; N3 | `AC-10 *` | same |
+| AC-11 | E1 every-Mock fix; N3 | `AC-11 *` | same |
+| AC-12 | E1 parsed-import fix; N3 | `AC-12 *` | same |
+| AC-13 | E1; N3b | `AC-13 non-compliant *`, `AC-13 compliant *` | `fail-before-exception.<ts>.md`, `predicate-pass-after.<ts>.md` |
+| AC-14 | E5, E6 comment edits | CR-PHRASE repository search | `cr7-pr-author.<ts>.md`, `cr7-model-routing.<ts>.md`, `stale-comment-search.<ts>.md` |
+| AC-15 | E3; N6 | `AC-15 *` | `no-python-codex-fail-before.<ts>.md`, `no-python-codex-pass-after.<ts>.md` |
+| AC-16 | N6; E3 | `AC-15 *` and the E3 repository-scan rows | `no-python-codex-pass-after.<ts>.md` |
+| AC-17 | N7; N8 | `AC-17 *` | `gate-parity-pass.<ts>.md` |
+| AC-18 | N7 | `AC-18 *` | `gate-parity-pass.<ts>.md`, `gate-function-inventory.<ts>.md` |
+| AC-19 | N9 | `AC-19 *` | `families-parity-pass.<ts>.md` |
+| AC-20 | E4 helper | `AC-20 *` | `pretooluse-registration-fail-before.<ts>.md`, `pretooluse-registration-pass-after.<ts>.md` |
+| AC-21 | E4 assertions | `AC-21 *` | `pretooluse-registration-pass-after.<ts>.md` |
+| AC-22 | none (test-only; no mirror) | `legacy-codex-hook-contracts.Tests.ps1`, `CodexRouting.Manifest.Tests.ps1`, bundle-parity pytest | `mirror-check.<ts>.md`, `bundle-parity.<ts>.md` |
+| AC-23 | EDIT-SET edits | CR-COMPARE over `SUITE:` lines | `suite-counts-before-after.<ts>.md` |
+| AC-24 | executor-side local checkpoint, created then deleted | CR-COMPARE with and without the file | `local-state-differential-after.<ts>.md` |
+| AC-25 | all files | CR-LINES | `line-counts.<ts>.md` |
+| AC-26 | all files | CR-HERMETIC; `git diff` over hook paths | `hermeticity-scan.<ts>.md`, `hooks-unchanged.<ts>.md` |
+| AC-27 | all files | CR-FORMAT-CHECK, CR-PSSA, CR-PESTER-FULL, CR-COV-TOTAL | `format-check.<ts>.md`, `pssa.<ts>.md`, `pester-full.<ts>.md`, `coverage-total.<ts>.md` |
+| AC-28 | all evidence tasks | path check | `evidence-location.<ts>.md` |
