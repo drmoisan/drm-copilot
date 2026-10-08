@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 3
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-08T01:53:24Z
+- `last_updated`: 2026-10-08T02:31:32Z
 
 **Items**
 
@@ -42,7 +42,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 741 | docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/819 | ef80c57df8f8bbc7d2e9ac51586150dfee3cd5fd | 2026-10-02T07:25:34Z | 2026-10-02T08:51:49Z |  |
 | 743 | docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/810 | 1b1e349f1d0fb8b00eb69a809ef380fcc6eb35b9 | 2026-10-01T15:52:55Z | 2026-10-02T03:08:04Z |  |
 | 744 | docs/features/active/2026-09-27-orchestration-completion-gate-and-tooling-friction-744 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/817 | 71f8dcb49d8ce5d1402ff441855a64be15b37f29 | 2026-10-02T05:13:22Z | 2026-10-02T07:24:50Z |  |
-| 756 | docs/features/active/2026-09-28-cleanup-worktrees-631-spec-contradiction-and-untested-error-paths-756 | 3 | in_flight | worktree_created |  |  | 2026-10-08T01:53:24Z |  |  |
+| 756 | docs/features/active/2026-09-28-cleanup-worktrees-631-spec-contradiction-and-untested-error-paths-756 | 3 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/835 | 6c3649b07322374035df8c11996f4d64a043e138 | 2026-10-08T01:53:24Z | 2026-10-08T02:31:32Z |  |
 | 764 | docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/805 | a2541d6d5a487c8e979447baf596ef38c07029ab | 2026-09-30T13:44:42Z | 2026-09-30T14:06:35Z |  |
 
 **Cohorts**
