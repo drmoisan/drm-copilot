@@ -17,7 +17,7 @@ intent:
     - Claude, Codex, and bundled copies of each changed hook stay byte-identical where they are required to be.
 features:
   - issue_num: 824
-    feature_folder: 2026-10-08-promotion-hook-raw-containment-false-positive-deny-824
+    feature_folder: promotion-hook-raw-containment-false-positive-deny-824
     depends_on: []
   - issue_num: 565
     feature_folder: 2026-08-26-epic-wave-barrier-resolves-nested-artifact-as-feature-folder-565
