@@ -17,15 +17,29 @@
 
     PURITY. This file is pure string and object logic, with no filesystem,
     process, network, or environment access: it opens no file, probes no path,
-    issues no web request, launches no executable, and imports no module. Every
-    readiness predicate accepts an ALREADY-PARSED checkpoint object, or $null; the
-    per-mode read seams live in the main gate hook. It is a new sibling rather than
-    an addition to the issue #539 helpers file, whose header declares a different
-    normative contract and which lacks headroom under the 500-line cap; leaving
-    that file byte-untouched is the proof the #539 exemption is unchanged.
+    issues no web request, launches no executable, and imports no module. It
+    dot-sources one pure sibling, feature-folder-resolution.ps1 (issue #565),
+    inside a guard: a failure sets a modes-local flag, and the target finder and
+    the readiness predicates then fail closed. Every readiness predicate accepts
+    an ALREADY-PARSED checkpoint object, or $null; the per-mode read seams live
+    in the main gate hook. It is a new sibling rather than an addition to the
+    issue #539 helpers file, whose header declares a different normative
+    contract and which lacks headroom under the 500-line cap; leaving that file
+    byte-untouched is the proof the #539 exemption is unchanged.
 #>
 [CmdletBinding()]
 param()
+
+# Shared pure feature-folder resolution (issue #565). Guarded: a failed dot-source
+# sets the modes-local flag, so the target finder returns nothing and the readiness
+# predicates name feature-folder-resolution-import instead of failing open.
+$script:OrchestrationFeatureFolderResolutionImportFailure = $null
+try {
+    . (Join-Path $PSScriptRoot 'feature-folder-resolution.ps1')
+}
+catch {
+    $script:OrchestrationFeatureFolderResolutionImportFailure = 'feature-folder-resolution.ps1'
+}
 
 # --- Constant table 1: the fixed mode table --------------------------------------
 # Markers are reused verbatim from shipped contracts and hooks; do not invent them.
@@ -215,39 +229,18 @@ function Test-OrchestrationImplementationAgent {
 function Find-OrchestrationDelegationTargetFolder {
     <#
     .SYNOPSIS
-        Resolves the target feature-folder basename out of a delegation prompt,
-        reusing the wave-barrier technique in shape: scan for slash-separated
-        docs/features/active/ tokens, longest unique match wins, a Markdown match
-        resolves to its parent, and the basename is returned. $null when no token
-        resolves, which the caller treats as a deny.
+        Returns the distinct feature-folder basenames cited in a delegation prompt,
+        in first-occurrence order, through the shared Find-FeatureFolderCandidate
+        (issue #565). A nested research/ or evidence/ citation names its own folder.
+        No output when no folder is cited or the shared resolver failed to load; the
+        readiness predicates select among several candidates.
     #>
     [CmdletBinding()]
-    [OutputType([string])]
+    [OutputType([string[]])]
     param([AllowNull()][AllowEmptyString()][string] $Prompt)
 
-    if (-not $Prompt) { return $null }
-
-    $pattern = 'docs[\\/]+features[\\/]+active[\\/]+[^\s"''`]+'
-    $matchList = [regex]::Matches($Prompt, $pattern)
-    if ($matchList.Count -eq 0) { return $null }
-
-    $unique = [ordered]@{}
-    foreach ($item in $matchList) { $unique[$item.Value] = $true }
-    $candidates = @(@($unique.Keys) | Sort-Object -Property Length -Descending)
-    $best = [string]$candidates[0]
-
-    # Sentence punctuation trails a bare path token in every shipped kickoff
-    # contract. A trailing period is stripped only when it does not form the
-    # Markdown extension the next branch depends on.
-    $best = $best.TrimEnd(',', ';', ':')
-    while ($best.EndsWith('.') -and -not $best.EndsWith('.md')) {
-        $best = $best.Substring(0, $best.Length - 1)
-    }
-    if ($best -match '\.md$') { $best = $best -replace '[\\/][^\\/]+\.md$', '' }
-
-    $basename = Get-OrchestrationModeFolderBasename -Path $best
-    if (-not $basename) { return $null }
-    return $basename
+    if ($script:OrchestrationFeatureFolderResolutionImportFailure) { return }
+    return @(Find-FeatureFolderCandidate -Text $Prompt)
 }
 
 function Find-OrchestrationDelegationIssueNumber {
@@ -371,13 +364,15 @@ function Get-EpicOrchestrationReadinessFailure {
         merged nor worktree_removed. The epic_manifest_path conjunct deliberately
         tightens relative to validate_epic_orchestrator_state.py, whose
         required-key set omits it, but is not stricter than the producing skill's
-        contract, which mandates it; a false deny names the failed conjunct.
+        contract, which mandates it; a false deny names the failed conjunct. The
+        target is selected among the cited folders with dependency pruning (issue
+        #565); an unresolved tie fails as target-ambiguous.
     #>
     [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory)][AllowNull()] $Checkpoint,
-        [AllowNull()][AllowEmptyString()][string] $TargetFolder,
+        [AllowNull()][AllowEmptyCollection()][AllowEmptyString()][string[]] $TargetFolder,
         [AllowNull()][AllowEmptyString()][string] $IssueNumber
     )
 
@@ -397,7 +392,13 @@ function Get-EpicOrchestrationReadinessFailure {
     }
     $features = Get-OrchestrationModeCollection -Value $Checkpoint -Name 'features'
     if ($features.Count -eq 0) { return 'features' }
-    $record = Find-OrchestrationModeRecord -Records $features -TargetFolder $TargetFolder -IssueNumber $IssueNumber
+    if ($script:OrchestrationFeatureFolderResolutionImportFailure) { return 'feature-folder-resolution-import' }
+    $selectionArguments = @{ Records = $features; Candidate = @($TargetFolder | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }); DependencyAware = $true }
+    $declared = 0
+    if ($IssueNumber -match '^\d+$' -and [int]::TryParse($IssueNumber, [ref]$declared)) { $selectionArguments['DeclaredIssueNumber'] = $declared }
+    $selection = Select-FeatureFolderTarget @selectionArguments
+    if ($selection.Status -eq 'Ambiguous') { return 'target-ambiguous: ' + ($selection.Remaining -join ', ') }
+    $record = Find-OrchestrationModeRecord -Records $features -TargetFolder $selection.Basename -IssueNumber $IssueNumber
     if ($null -eq $record) { return 'target-record' }
     if (Test-OrchestrationModeTerminalMergeStatus -Record $record) { return 'merge_status' }
     return ''
@@ -412,7 +413,7 @@ function Test-EpicOrchestrationReady {
     [OutputType([bool])]
     param(
         [Parameter(Mandatory)][AllowNull()] $Checkpoint,
-        [AllowNull()][AllowEmptyString()][string] $TargetFolder,
+        [AllowNull()][AllowEmptyCollection()][AllowEmptyString()][string[]] $TargetFolder,
         [AllowNull()][AllowEmptyString()][string] $IssueNumber
     )
 
@@ -430,13 +431,15 @@ function Get-ParallelOrchestrationReadinessFailure {
         parallel_manifest_path; present and non-empty items; the resolved target
         present as a record in items; and that record's merge_status neither merged
         nor worktree_removed. It consumes the parallel item-state and merge-status
-        member sets and adds no member to either.
+        member sets and adds no member to either. The target is selected among the
+        cited folders, with the issue number as a tie-break (issue #565); an
+        unresolved tie fails as target-ambiguous.
     #>
     [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory)][AllowNull()] $Checkpoint,
-        [AllowNull()][AllowEmptyString()][string] $TargetFolder,
+        [AllowNull()][AllowEmptyCollection()][AllowEmptyString()][string[]] $TargetFolder,
         [AllowNull()][AllowEmptyString()][string] $IssueNumber
     )
 
@@ -452,7 +455,13 @@ function Get-ParallelOrchestrationReadinessFailure {
     }
     $items = Get-OrchestrationModeCollection -Value $Checkpoint -Name 'items'
     if ($items.Count -eq 0) { return 'items' }
-    $record = Find-OrchestrationModeRecord -Records $items -TargetFolder $TargetFolder -IssueNumber $IssueNumber
+    if ($script:OrchestrationFeatureFolderResolutionImportFailure) { return 'feature-folder-resolution-import' }
+    $selectionArguments = @{ Records = $items; Candidate = @($TargetFolder | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
+    $declared = 0
+    if ($IssueNumber -match '^\d+$' -and [int]::TryParse($IssueNumber, [ref]$declared)) { $selectionArguments['DeclaredIssueNumber'] = $declared }
+    $selection = Select-FeatureFolderTarget @selectionArguments
+    if ($selection.Status -eq 'Ambiguous') { return 'target-ambiguous: ' + ($selection.Remaining -join ', ') }
+    $record = Find-OrchestrationModeRecord -Records $items -TargetFolder $selection.Basename -IssueNumber $IssueNumber
     if ($null -eq $record) { return 'target-record' }
     if (Test-OrchestrationModeTerminalMergeStatus -Record $record) { return 'merge_status' }
     return ''
@@ -467,7 +476,7 @@ function Test-ParallelOrchestrationReady {
     [OutputType([bool])]
     param(
         [Parameter(Mandatory)][AllowNull()] $Checkpoint,
-        [AllowNull()][AllowEmptyString()][string] $TargetFolder,
+        [AllowNull()][AllowEmptyCollection()][AllowEmptyString()][string[]] $TargetFolder,
         [AllowNull()][AllowEmptyString()][string] $IssueNumber
     )
 
