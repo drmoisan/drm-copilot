@@ -16,13 +16,13 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 4
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-08T06:35:30Z
+- `last_updated`: 2026-10-08T07:10:26Z
 
 **Items**
 
 | issue_num | feature_folder | cohort_index | state | merge_status | pr_url | merge_commit_sha | worktree_created_at | merged_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 338 | docs/features/active/2026-07-09-potential-entry-ide-launcher-audit-gaps-338 | 4 | in_flight | worktree_created |  |  | 2026-10-08T06:35:30Z |  |  |
+| 338 | docs/features/active/2026-07-09-potential-entry-ide-launcher-audit-gaps-338 | 4 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/838 | fb413fce27eaff416999bd2201011b759250cfbe | 2026-10-08T06:35:30Z | 2026-10-08T07:10:26Z |  |
 | 406 | docs/features/active/2026-07-24-potential-to-issue-python-files-oversized-406 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/806 | b83f300047c4181223d99eb27eb0b025acca0125 | 2026-09-30T13:48:50Z | 2026-09-30T14:20:25Z |  |
 | 510 | docs/features/active/2026-08-19-claude-resource-parity-enumerates-gitignored-state-510 | 3 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/834 | 08ee030d9584bf15882fbb3654c8e38f34c7c359 | 2026-10-07T15:00:03Z | 2026-10-07T15:36:24Z |  |
 | 512 | docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/799 | 021b37e600afab00b191276cda803f87419a4a87 | 2026-09-30T11:19:00Z | 2026-09-30T13:33:38Z |  |
