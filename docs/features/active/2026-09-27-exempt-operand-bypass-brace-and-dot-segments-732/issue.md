@@ -72,8 +72,9 @@ This feature is child C1b of epic #852 (`enforcement-hook-precision`). It delive
 
 Acceptance conditions:
 
-- Epic-scope target resolution, on both the Claude and Codex surfaces, resolves the effective target of every command segment (each `git -C <path>`, a repeated `-C`, a path operand into another worktree, and on Codex the `workdir`), consuming the segment and invocation API owned by `.claude/hooks/hook-command-invocation.ps1` (C1a, #824) rather than re-implementing segment parsing.
+- Epic-scope target resolution, on both the Claude and Codex surfaces, resolves the effective target of every command segment (each `git -C <path>`, a repeated `-C`, a path operand into another worktree), consuming the segment and invocation API owned by `.claude/hooks/hook-command-invocation.ps1` (C1a, #824) rather than re-implementing segment parsing.
 - Every resolved target must satisfy the readiness conditions; an unresolvable or ambiguous target fails closed.
+- Codex `workdir` (amended 2026-10-08 after research): the Codex PreToolUse payload carries the raw command string only, with no shell and no `workdir` field, so `workdir` is unobservable to the hook. The session root is the target for a segment without an explicit `-C`; this residual is recorded in the spec as a follow-up candidate (upstream payload support, or a Codex strict mode requiring an absolute `-C`).
 - Gate-level Pester tests cover a two-segment command whose second segment targets a different worktree, a repeated `-C`, a relative `-C` path, and an unresolvable `-C` path, on both surfaces.
 
 ### #745 — Trailer-form documentation and missing trailer tests
