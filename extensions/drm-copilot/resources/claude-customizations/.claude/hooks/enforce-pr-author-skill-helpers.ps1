@@ -120,6 +120,61 @@ function Get-PrAuthorTargetCheckpointResolution {
     }
 }
 
+function Get-PrAuthorBodyFileRoot {
+    <#
+    .SYNOPSIS
+        Return the session root a rooted --body-file value is made relative to (seam).
+    .DESCRIPTION
+        Issue #824. The only session-root read used for body-file normalization, so a test
+        can state the root without depending on the process working directory.
+    .OUTPUTS
+        System.String
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param()
+
+    return (Get-Location).Path
+}
+
+function Get-PrAuthorBodyFileValue {
+    <#
+    .SYNOPSIS
+        Return the normalized --body-file value of the matched gh pr create or gh pr edit, or $null.
+    .DESCRIPTION
+        Reads the flag value from the first Structural gh pr create match, else gh pr edit. A
+        rooted value is made relative to Get-PrAuthorBodyFileRoot, backslashes become forward
+        slashes, and one leading './' is removed (issue #824).
+    .PARAMETER CommandText
+        The Bash command text under evaluation.
+    .OUTPUTS
+        System.String or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $CommandText
+    )
+
+    $subcommandPath = @('pr', 'edit')
+    if (Test-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'create')) {
+        $subcommandPath = @('pr', 'create')
+    }
+    $value = Get-CommandLineFlagValue -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath -FlagName '--body-file'
+    if ($null -eq $value) {
+        return $null
+    }
+    if ([System.IO.Path]::IsPathRooted($value)) {
+        $value = [System.IO.Path]::GetRelativePath((Get-PrAuthorBodyFileRoot), $value)
+    }
+    $value = $value.Replace('\', '/')
+    if ($value.StartsWith('./')) {
+        $value = $value.Substring(2)
+    }
+    return $value
+}
+
 function Test-PrAuthorReceiptVerification {
     <#
     .SYNOPSIS
@@ -167,8 +222,11 @@ function Test-PrAuthorReceiptVerification {
     )
 
     # Check 1: the --body-file argument must match the canonical artifacts/pr_body_<N>.md pattern.
-    # The match is case-sensitive (-cmatch) so a non-canonical path is rejected before any read.
-    if ($CommandText -cnotmatch '--body-file\s+artifacts/pr_body_(\d+)\.md\b') {
+    # Issue #824: the value is read structurally from the matched gh pr create (else gh pr
+    # edit) invocation, so a quoted, equals-joined, rooted, './'-led, or backslash-separated
+    # spelling of the canonical path is normalized before the case-sensitive (-cmatch) test.
+    $bodyFileValue = Get-PrAuthorBodyFileValue -CommandText $CommandText
+    if ($null -eq $bodyFileValue -or $bodyFileValue -cnotmatch '^artifacts/pr_body_(\d+)\.md$') {
         return "PR_BODY_PATH_NONCANONICAL: ``--body-file`` must reference a canonical ``artifacts/pr_body_<N>.md`` file produced by the pr-author skill. The path supplied does not match ``artifacts/pr_body_<N>.md``."
     }
 
@@ -290,22 +348,21 @@ function Get-PrAuthorBypassReason {
     $hasBodyFile = Test-CommandLineFlag -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath -FlagName '--body-file'
     $hasInlineBody = Test-CommandLineFlag -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath -FlagName '--body'
 
-    # Raw-scan fallback for a wrapper-led, live-substitution, or unbalanced segment. A
-    # wrapper's quoted argument collapses into ONE token, so both flags read absent there and
-    # the gh pr edit no-body branch below allowed bash -c "gh pr edit 42 --body 'x'". The
-    # --body-file test runs first and wins, so a --body-file carried inside a wrapper is never
-    # misread as an inline body. That ordering restores the pre-parser routing, in which one
-    # whole-text --body-file match set $hasBodyFile for exactly this input.
+    # Raw-scan fallback (issue #824). Wrapper payloads are now read structurally, so the flags
+    # above already come from a payload's own tokens. The raw text is scanned only when the
+    # invocation could not be read structurally at all: no Structural match exists for the
+    # subcommand path and at least one Indeterminate match does. The --body-file test runs
+    # first and wins, so a --body-file is never misread as an inline body.
     if (-not $hasBodyFile -and -not $hasInlineBody) {
-        $comparison = [System.StringComparison]::OrdinalIgnoreCase
-        foreach ($segment in @(Read-CommandLineSegment -CommandText $CommandText)) {
-            if (-not (Test-CommandLineSegmentRawScan -Segment $segment)) {
-                continue
-            }
-            if ($segment.ScanText.IndexOf('--body-file', $comparison) -ge 0) {
-                $hasBodyFile = $true
-            } elseif ($segment.ScanText.IndexOf('--body', $comparison) -ge 0) {
-                $hasInlineBody = $true
+        $matchList = @(Get-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath)
+        if (@($matchList | Where-Object { $_.Status -eq 'Structural' }).Count -eq 0) {
+            $comparison = [System.StringComparison]::OrdinalIgnoreCase
+            foreach ($match in @($matchList | Where-Object { $_.Status -eq 'Indeterminate' })) {
+                if ($match.Segment.RawText.IndexOf('--body-file', $comparison) -ge 0) {
+                    $hasBodyFile = $true
+                } elseif ($match.Segment.RawText.IndexOf('--body', $comparison) -ge 0) {
+                    $hasInlineBody = $true
+                }
             }
         }
     }

@@ -70,7 +70,7 @@ Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -
 # Invoke-EpicWorktreeRemovalGateDecision.
 Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -Force
 # Shared command-line parser (issue #545), consumed by the scope filter in
-# Invoke-EpicWorktreeRemovalGateDecision and by Get-EpicWorktreeRemovalCommandPath.
+# Invoke-EpicWorktreeRemovalGateDecision and by Resolve-CommandLineInvocationTarget.
 . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
 . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
 # Checkpoint read seams, the import guard, and run-target resolution (issue #690).
@@ -106,47 +106,6 @@ function ConvertFrom-EpicWorktreeGateJson {
     } catch {
         return $null
     }
-}
-
-function Get-EpicWorktreeRemovalCommandPath {
-    <#
-    .SYNOPSIS
-        Extract the target worktree path argument from a git worktree remove command.
-    .DESCRIPTION
-        The operand comes from the segment that structurally invokes git worktree remove,
-        so a 'cd <path> &&' segment chained before the removal contributes nothing and a
-        quoted mention of the phrase resolves to no operand at all. Quotes around the path
-        are already stripped by the tokenizer.
-
-        '--force' is a zero-argument flag, so it never contributes an operand and may be
-        written on either side of the target path. Its presence is read structurally through
-        Test-CommandLineFlag rather than by searching the raw text, so a '--force' spelling
-        that appears inside an unrelated quoted argument cannot change how the operand list
-        is read. When no operand resolves, a present '--force' is reported in its place, so
-        the checkpoint lookup fails closed on a value that matches no recorded worktree_path
-        - the same value the previous raw-text pattern returned for that input.
-    .PARAMETER CommandText
-        The Bash command text under evaluation.
-    .OUTPUTS
-        System.String or $null
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory)]
-        [string] $CommandText
-    )
-
-    $hasForce = Test-CommandLineFlag -CommandText $CommandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove') -FlagName '--force'
-    $operands = @(Get-CommandLineOperand -CommandText $CommandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove'))
-
-    if ($operands.Count -gt 0) {
-        return $operands[0]
-    }
-    if ($hasForce) {
-        return '--force'
-    }
-    return $null
 }
 
 function Find-EpicWorktreeFeatureRecord {
@@ -356,7 +315,43 @@ function Invoke-EpicWorktreeRemovalGateDecision {
         return Get-EpicWorktreeGateAllowDecision
     }
 
-    $worktreePath = Get-EpicWorktreeRemovalCommandPath -CommandText $commandText
+    # Issue #824: the removal targets are derived structurally from every invocation.
+    # A target that cannot be derived denies before any checkpoint is read, and every
+    # derived target must be authorized on its own.
+    $resolution = Resolve-CommandLineInvocationTarget -CommandText $commandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove')
+    if ($resolution.Status -eq 'NoMatch') {
+        return Get-EpicWorktreeGateAllowDecision
+    }
+    if ($resolution.Status -ne 'Targets') {
+        return Get-EpicWorktreeGateBlockDecision -Reason 'EPIC_WORKTREE_REMOVAL_BLOCKED: TARGET_WORKTREE_NOT_DERIVABLE: the git worktree remove target cannot be derived from the command text. No checkpoint can authorize this removal.'
+    }
+    foreach ($target in @($resolution.Targets)) {
+        $denial = Get-EpicWorktreeRemovalTargetDenial -WorktreePath $target
+        if ($null -ne $denial) {
+            return $denial
+        }
+    }
+    return Get-EpicWorktreeGateAllowDecision
+}
+
+function Get-EpicWorktreeRemovalTargetDenial {
+    <#
+    .SYNOPSIS
+        Evaluate one derived removal target and return its deny decision, or $null when authorized.
+    .DESCRIPTION
+        Holds the per-path authorization cascade (epic checkpoint, parallel checkpoint,
+        sanctioned-removal manifest) for a single worktree path (issue #824).
+    .PARAMETER WorktreePath
+        One removal target derived by Resolve-CommandLineInvocationTarget.
+    .OUTPUTS
+        System.Collections.Specialized.OrderedDictionary or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $WorktreePath
+    )
 
     # Each run checkpoint is read beneath the worktree that records this path (issue #690);
     # an ambiguous target denies before any allow or manifest evaluation.
@@ -371,12 +366,12 @@ function Invoke-EpicWorktreeRemovalGateDecision {
 
     $featureRecord = Find-EpicWorktreeFeatureRecord -Checkpoint $checkpoint -WorktreePath $worktreePath
     if (Test-EpicWorktreeRemovalAllowed -FeatureRecord $featureRecord) {
-        return Get-EpicWorktreeGateAllowDecision
+        return $null
     }
 
     $parallelCheckpoint = $parallelRead.Checkpoint
     if (Test-ParallelCheckpointAllowsWorktreeRemoval -Checkpoint $parallelCheckpoint -WorktreePath $worktreePath) {
-        return Get-EpicWorktreeGateAllowDecision
+        return $null
     }
 
     # Sanctioned-removal manifest branch (issue #635). It runs last, so an
@@ -392,7 +387,7 @@ function Invoke-EpicWorktreeRemovalGateDecision {
     if (-not (Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'features' -WorktreePath $worktreePath) -and
         -not (Test-CleanupManifestCheckpointCoversPath -Checkpoint $parallelCheckpoint -RecordArrayName 'items' -WorktreePath $worktreePath) -and
         (Test-CleanupWorktreeManifestAuthorizesRemoval -WorktreePath $worktreePath)) {
-        return Get-EpicWorktreeGateAllowDecision
+        return $null
     }
 
     # When neither kind resolved, the deny names the resolution reason first (issue #690).

@@ -392,28 +392,28 @@ Rules for every new test file: Arrange-Act-Assert; no temporary file; no network
   - Acceptance: failures are a subset of `B_SCOPED`; no PA or AL row fails; every shared-module edit made in Phase 6 has a matching `mirror-<group>-phase6` artifact written before this run (rule 6).
 - [x] [P6-T8] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase6-lines.STAMP.md`.
   - Acceptance: `OVER_500: NONE`.
-- [ ] [P6-T9] Commit and push `.claude/hooks/enforce-pr-author-skill-helpers.ps1 .claude/hooks/enforce-pr-author-command-allowlist.ps1 .claude/agents/pr-author.md .claude/skills/pr-author/SKILL.md tests/scripts/claude-hooks/enforce-pr-author-skill.Issue824.Tests.ps1 tests/scripts/claude-hooks/enforce-pr-author-command-allowlist.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every shared module (both surfaces) edited or copied under rule 6 during Phase 6, as the pathspecs of both the `git add --` and the `git commit ... --` commands (`git commit -m "feat(824): pr-author body-file matching and per-segment allowlist hook" --` same pathspecs), then `git push -u origin BRANCH`.
+- [x] [P6-T9] Commit and push `.claude/hooks/enforce-pr-author-skill-helpers.ps1 .claude/hooks/enforce-pr-author-command-allowlist.ps1 .claude/agents/pr-author.md .claude/skills/pr-author/SKILL.md tests/scripts/claude-hooks/enforce-pr-author-skill.Issue824.Tests.ps1 tests/scripts/claude-hooks/enforce-pr-author-command-allowlist.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every shared module (both surfaces) edited or copied under rule 6 during Phase 6, as the pathspecs of both the `git add --` and the `git commit ... --` commands (`git commit -m "feat(824): pr-author body-file matching and per-segment allowlist hook" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
 
 ### Phase 7 — Bundled Mirrors, Pack Manifests, and Parity
 
-- [ ] [P7-T1] Run `sh SCRATCHPAD/s-mirror.sh claude-bundle` and record `FEATURE/evidence/other/mirror-claude-bundle.STAMP.md`.
+- [x] [P7-T1] Run `sh SCRATCHPAD/s-mirror.sh claude-bundle` and record `FEATURE/evidence/other/mirror-claude-bundle.STAMP.md`.
   - Acceptance: 13 `COPIED` lines with equal source and target hashes.
-- [ ] [P7-T2] Run `sh SCRATCHPAD/s-mirror.sh codex-bundle` and record `FEATURE/evidence/other/mirror-codex-bundle.STAMP.md`.
+- [x] [P7-T2] Run `sh SCRATCHPAD/s-mirror.sh codex-bundle` and record `FEATURE/evidence/other/mirror-codex-bundle.STAMP.md`.
   - Acceptance: 8 `COPIED` lines with equal hashes.
-- [ ] [P7-T3] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: insert `.claude/hooks/enforce-pr-author-command-allowlist.ps1` before `:49` and `.claude/hooks/hook-command-heredoc.ps1`, `.claude/hooks/hook-command-invocation-operands.ps1`, `.claude/hooks/hook-command-payload.ps1`, `.claude/hooks/hook-command-payload-powershell.ps1` around `:55-56` in sorted position.
+- [x] [P7-T3] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: insert `.claude/hooks/enforce-pr-author-command-allowlist.ps1` before `:49` and `.claude/hooks/hook-command-heredoc.ps1`, `.claude/hooks/hook-command-invocation-operands.ps1`, `.claude/hooks/hook-command-payload.ps1`, `.claude/hooks/hook-command-payload-powershell.ps1` around `:55-56` in sorted position.
   - Acceptance: [P7-T8] pytest and [P7-T9] jest manifest-completeness tests pass.
-- [ ] [P7-T4] Edit `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`: insert `.codex/hooks/hook-command-heredoc.ps1`, `.codex/hooks/hook-command-invocation-operands.ps1`, `.codex/hooks/hook-command-payload.ps1`, `.codex/hooks/hook-command-payload-powershell.ps1` after `:46`.
+- [x] [P7-T4] Edit `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`: insert `.codex/hooks/hook-command-heredoc.ps1`, `.codex/hooks/hook-command-invocation-operands.ps1`, `.codex/hooks/hook-command-payload.ps1`, `.codex/hooks/hook-command-payload-powershell.ps1` after `:46`.
   - Acceptance: [P7-T8] Codex manifest-completeness tests pass.
-- [ ] [P7-T5] Edit `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1:30` in place to append `'hook-command-heredoc.ps1', 'hook-command-payload.ps1', 'hook-command-payload-powershell.ps1', 'hook-command-invocation-operands.ps1'` to `SharedModuleNames` on the same line; the file stays at 497 lines.
+- [x] [P7-T5] Edit `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1:30` in place to append `'hook-command-heredoc.ps1', 'hook-command-payload.ps1', 'hook-command-payload-powershell.ps1', 'hook-command-invocation-operands.ps1'` to `SharedModuleNames` on the same line; the file stays at 497 lines.
   - Acceptance: [P7-T7] reports the file passed; [P10-T12] reports `LINES tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 497`.
-- [ ] [P7-T6] Run `sh SCRATCHPAD/s-hash.sh final` and record `FEATURE/evidence/qa-gates/parity-hashes.STAMP.md`.
+- [x] [P7-T6] Run `sh SCRATCHPAD/s-hash.sh final` and record `FEATURE/evidence/qa-gates/parity-hashes.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; every group `DISTINCT=1`.
-- [ ] [P7-T7] Run `sh SCRATCHPAD/s-pester.sh PARITY` and record `FEATURE/evidence/qa-gates/parity-pester.STAMP.md`.
+- [x] [P7-T7] Run `sh SCRATCHPAD/s-pester.sh PARITY` and record `FEATURE/evidence/qa-gates/parity-pester.STAMP.md`.
   - Acceptance: `PESTER_FAILED: 0`, or failures only in `B_SCOPED`.
-- [ ] [P7-T8] Run the [P0-T19] pytest command (the same four files under `tests/scripts/dev_tools/`) and record `FEATURE/evidence/qa-gates/pytest-parity-phase7.STAMP.md`.
+- [x] [P7-T8] Run the [P0-T19] pytest command (the same four files under `tests/scripts/dev_tools/`) and record `FEATURE/evidence/qa-gates/pytest-parity-phase7.STAMP.md`.
   - Acceptance: the pytest summary line is printed and reports a total greater than 0 (otherwise BLOCKED); failing node IDs are a subset of `B_PY`.
-- [ ] [P7-T9] Run the [P0-T20] jest command (the same three files under `extensions/drm-copilot/test/lib/push-down/`) and record `FEATURE/evidence/qa-gates/jest-parity-phase7.STAMP.md`.
+- [x] [P7-T9] Run the [P0-T20] jest command (the same three files under `extensions/drm-copilot/test/lib/push-down/`) and record `FEATURE/evidence/qa-gates/jest-parity-phase7.STAMP.md`.
   - Acceptance: the Jest `Tests:` line is printed and reports a total greater than 0 (otherwise BLOCKED); failing test names are a subset of `B_JS`.
 - [ ] [P7-T10] Commit and push every bundled mirror path of section 3, both `core.json` files, `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`, `FEATURE/evidence`, and the plan (`git commit -m "chore(824): bundle mirrors and pack-manifest entries" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
