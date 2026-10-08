@@ -42,6 +42,7 @@
     ".codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1",
     ".codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1",
     ".codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1",
+    ".codex/hooks/feature-folder-resolution.ps1",
     ".codex/hooks/hook-command-invocation.ps1",
     ".codex/hooks/hook-command-scanner.ps1",
     ".codex/hooks/record-subagent-routing-attestation.ps1",
