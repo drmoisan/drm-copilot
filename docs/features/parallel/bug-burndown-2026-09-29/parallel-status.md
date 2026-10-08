@@ -16,7 +16,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 3
 - `current_cohort`: 3
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-07T15:36:24Z
+- `last_updated`: 2026-10-08T01:43:07Z
 
 **Items**
 
@@ -31,7 +31,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/829 | 869c4fade2c3f98ee3ec4ca5a59ea0becf28fb0d | 2026-10-02T08:52:46Z | 2026-10-07T14:59:00Z |  |
 | 609 | docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/815 | 28443d3be64d69b4b96b1ceca6715a9e577a6dc7 | 2026-10-02T03:09:33Z | 2026-10-02T04:13:42Z |  |
 | 623 | docs/features/active/promotion-receipt-destination-unverified-623 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/804 | 2b0121abf74f5862a3d12929d833504668941156 | 2026-09-30T12:21:20Z | 2026-09-30T13:42:13Z |  |
-| 645 | docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645 | 3 | scheduled | not_started |  |  |  |  |  |
+| 645 | docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645 | 3 | in_flight | worktree_created |  |  | 2026-10-08T01:43:07Z |  |  |
 | 647 | docs/features/active/2026-09-07-test-tree-typecheck-not-gated-647 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/816 | b080a69ecb60b65d016362b21fffed0a34be9144 | 2026-10-02T03:14:17Z | 2026-10-02T05:12:02Z |  |
 | 658 | docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658 | 3 | scheduled | not_started |  |  |  |  |  |
 | 659 | docs/features/active/2026-09-08-epic-wave-barrier-violations-lack-start-guard-659 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/807 | 41217012d31d35c2ee33a50be50684affd2f5f43 | 2026-09-30T13:24:40Z | 2026-10-01T11:12:35Z |  |
@@ -128,6 +128,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 2026-10-07T13:12:29Z | #543 (resumed) | remediation cycle 2: plan, preflight, execute, re-review, PR | 2 (orchestrator + 1 delegate at a time) |
 | 2026-10-07T14:59:26Z | #510 | start: merge main, resume atomic execution from committed plan | 2 (orchestrator + 1 delegate at a time) |
 | 2026-10-07T15:12:55Z | (hold) | held by coordinator: weekly pace; no new starts until GO | 510 in flight: up to 2 |
+| 2026-10-08T01:42:43Z | #645 | start: merge main, resume atomic execution from committed plan | 2 (orchestrator + 1 delegate at a time); subtree max 5 |
 
 ## Paused By Operator (history)
 
