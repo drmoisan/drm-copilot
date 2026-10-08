@@ -3,9 +3,9 @@
 - **Issue:** #824 (primary); bundled #742, #733
 - **Parent (optional):** Epic #852 `enforcement-hook-precision`, child C1a command-invocation matching
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-08T21-00
-- **Status:** Draft (revision round 4 applied; awaiting validator re-run and executor preflight)
-- **Version:** 1.5
+- **Last Updated:** 2026-10-08T21-30
+- **Status:** Draft (revision round 5 applied; awaiting validator re-run and executor preflight)
+- **Version:** 1.6
 - **Work Mode:** full-bug. Acceptance criteria source: `spec.md` AC-1 through AC-31 only. `user-story.md` is absent by design.
 - **Inputs:** `issue.md`, `spec.md`, `research/research.2026-10-08T14-00.md` (this folder); `docs/features/epics/enforcement-hook-precision/epic.md`.
 
@@ -267,7 +267,7 @@ Rules for every new test file: Arrange-Act-Assert; no temporary file; no network
   - Acceptance: [P1-T2] reports `PESTER_TOTAL: 23`.
 - [ ] [P1-T2] [expect-fail] Run `sh SCRATCHPAD/s-pester.sh REG` against the unchanged production tree and record `FEATURE/evidence/regression-testing/fail-before.STAMP.md`.
   - Acceptance: `EXIT_CODE: 1`, `ExpectedExitCode: 1`, `PESTER_TOTAL: 23`, `PESTER_PASSED: 0`, `PESTER_FAILED: 23`; `Output Summary:` lists one `RESULT Failed` line per row with its `R-...` ID and the first assertion or error message. REG-13..REG-17 fail with `PR_BODY_PATH_NONCANONICAL` or on the not-yet-defined `Get-PrAuthorBodyFileRoot` mock target; REG-18..REG-21 fail because `.claude/hooks/enforce-pr-author-command-allowlist.ps1` does not exist yet. REG-09..REG-12 fail with a `PR_AUTHOR_SKILL_BLOCKED:` reason, not on a mock or setup error. The artifact states the failure cause per row.
-- [ ] [P1-T3] Commit and push: `git add -- tests/scripts/claude-hooks/hook-command-invocation.Issue824Regression.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, then `git commit -m "test(824): add named regression rows (fail-before)" -- <same paths>`, then `git push -u origin BRANCH`.
+- [ ] [P1-T3] Commit and push (`git add --` and `git commit -m "test(824): add named regression rows (fail-before)" --` over `tests/scripts/claude-hooks/hook-command-invocation.Issue824Regression.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from that test file and listed in `FEATURE/evidence/other/test-split-log.md`, as the pathspecs of both the `git add --` and the `git commit ... --` commands; then `git push -u origin BRANCH`).
   - Acceptance: each command exits 0.
 
 ### Phase 2 — Scanner Delimiter, TokenText, and Heredoc Module
@@ -589,4 +589,4 @@ Loop rule: run [P10-T1] through [P10-T17] in order. If any task fails, or [P10-T
 
 ## 8. Validator status
 
-The `mcp__drm-copilot__validate_orchestration_artifacts` tool (`artifact_type: "plan"`) is not available to the planning agent. The orchestrator ran it against this file on 2026-10-08 for versions 1.1 and 1.2, and both runs returned `ok: true`. The orchestrator will re-run it against this revision (version 1.5) before executor preflight and treats a non-passing result as a rejection.
+The `mcp__drm-copilot__validate_orchestration_artifacts` tool (`artifact_type: "plan"`) is not available to the planning agent. The orchestrator ran it against this file on 2026-10-08 for versions 1.1 and 1.2, and both runs returned `ok: true`. The orchestrator will re-run it against this revision (version 1.6) before executor preflight and treats a non-passing result as a rejection.
