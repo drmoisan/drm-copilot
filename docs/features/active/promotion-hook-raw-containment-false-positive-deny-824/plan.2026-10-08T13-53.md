@@ -548,7 +548,7 @@ Loop rule: run [P10-T1] through [P10-T17] in order. If any task fails, or [P10-T
   - Acceptance: the AC-30 line reads `- [x]`.
 - [x] [P10-T50] Check off AC-31 in `FEATURE/spec.md` when [P10-T15] reports `ADDENDUM2_COUNT: 0` and `OUT_OF_SET_COUNT: 0`.
   - Acceptance: the AC-31 line reads `- [x]`.
-- [ ] [P10-T51] Commit and push `FEATURE/spec.md FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` plus any write-set path changed during the QC loop (`git commit -m "docs(824): final QC evidence and AC check-off" --` same pathspecs), then `git push -u origin BRANCH`.
+- [x] [P10-T51] Commit and push `FEATURE/spec.md FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` plus any write-set path changed during the QC loop (`git commit -m "docs(824): final QC evidence and AC check-off" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
 
 ## 7. AC traceability
