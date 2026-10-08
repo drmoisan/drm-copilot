@@ -420,11 +420,11 @@ Rules for every new test file: Arrange-Act-Assert; no temporary file; no network
 
 ### Phase 8 — Pass-After Regression and Negative Controls
 
-- [ ] [P8-T1] Run `sh SCRATCHPAD/s-pester.sh REG` and record `FEATURE/evidence/regression-testing/pass-after.STAMP.md`.
+- [x] [P8-T1] Run `sh SCRATCHPAD/s-pester.sh REG` and record `FEATURE/evidence/regression-testing/pass-after.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`, `PESTER_TOTAL: 23`, `PESTER_PASSED: 23`, `PESTER_FAILED: 0`.
-- [ ] [P8-T2] Run `sh SCRATCHPAD/s-pester.sh NC` and record `FEATURE/evidence/regression-testing/negative-controls.STAMP.md`.
+- [x] [P8-T2] Run `sh SCRATCHPAD/s-pester.sh NC` and record `FEATURE/evidence/regression-testing/negative-controls.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; `RESULT Passed` lines for IV-16 (both runtimes), PM-29 (both runtimes), EW-39, PW-39, CW-39, and PA-20 (8 executions).
-- [ ] [P8-T3] Write `FEATURE/evidence/regression-testing/fail-before-pass-after-summary.STAMP.md` with one row per named reproduction (`R-824-MAIN`, `R-824-ADD1`, `R-742-1`, `R-733-714`, `R-733-GREP`, `R-733-715`, `R-733-712`) listing its REG row IDs, the [P1-T2] result, and the [P8-T1] result.
+- [x] [P8-T3] Write `FEATURE/evidence/regression-testing/fail-before-pass-after-summary.STAMP.md` with one row per named reproduction (`R-824-MAIN`, `R-824-ADD1`, `R-742-1`, `R-733-714`, `R-733-GREP`, `R-733-715`, `R-733-712`) listing its REG row IDs, the [P1-T2] result, and the [P8-T1] result.
   - Acceptance: seven rows, each `Failed` before and `Passed` after.
 - [ ] [P8-T4] Commit and push `FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus any write-set path (including its rule-6 mirror copies) changed by a fix made during Phase 8 (`git commit -m "docs(824): record pass-after regression evidence" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
