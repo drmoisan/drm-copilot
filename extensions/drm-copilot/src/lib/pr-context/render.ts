@@ -16,11 +16,12 @@
  */
 
 import {
-  compareCodePoint,
   type PrContextResult,
   type PullRequestDetails,
   normalizeReference,
   section,
+  sortedSet,
+  splitLines,
 } from "./models";
 import { type GitClient } from "./git-client";
 import {
@@ -371,30 +372,4 @@ export function buildPrContext(
 /** Extract a message from a thrown value, matching Python `str(exc)`. */
 function errorMessage(exc: unknown): string {
   return exc instanceof Error ? exc.message : String(exc);
-}
-
-/** Sort a deduplicated set of strings by Unicode code point. */
-function sortedSet(values: Iterable<string>): string[] {
-  return [...new Set(values)].sort(compareCodePoint);
-}
-
-/**
- * Split text into lines the way Python `str.splitlines()` does.
- *
- * @param value Text to split.
- * @returns Lines without terminators.
- */
-function splitLines(value: string): string[] {
-  if (value === "") {
-    return [];
-  }
-  const lines = value.split(/\r\n|\r|\n/u);
-  if (
-    lines.length > 0 &&
-    lines[lines.length - 1] === "" &&
-    /(\r\n|\r|\n)$/u.test(value)
-  ) {
-    lines.pop();
-  }
-  return lines;
 }

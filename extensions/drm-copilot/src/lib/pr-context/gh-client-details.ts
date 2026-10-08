@@ -15,8 +15,12 @@
  *       fallback string verbatim.
  */
 
-import { compareCodePoint, findUserStoryLink } from "./models";
-import { type IssueDetails, type PullRequestDetails } from "./models";
+import {
+  findUserStoryLink,
+  sortedSet,
+  type IssueDetails,
+  type PullRequestDetails,
+} from "./models";
 import {
   type GhClient,
   isRecord,
@@ -110,18 +114,6 @@ function extractClosingNumbers(raw: unknown): string[] {
     }
   }
   return numbers;
-}
-
-/**
- * Sort a set of strings by Unicode code point, mirroring Python
- * `sorted(set(...))`.
- *
- * Python's default `sorted` compares strings by code point, not by locale, so
- * multi-digit references such as `#10` sort before `#2`. A code-point comparator
- * is used rather than `localeCompare` to preserve that exact ordering.
- */
-function sortedSet(values: string[]): string[] {
-  return [...new Set(values)].sort(compareCodePoint);
 }
 
 /**

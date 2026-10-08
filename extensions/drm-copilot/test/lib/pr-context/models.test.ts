@@ -2,10 +2,13 @@ import { describe, expect, it } from "@jest/globals";
 
 import {
   compareCodePoint,
+  escapeRegExp,
   findUserStoryLink,
   formatList,
   normalizeReference,
   section,
+  sortedSet,
+  splitLines,
   truncate,
   truncateLines,
 } from "../../../src/lib/pr-context/models";
@@ -397,5 +400,125 @@ describe("compareCodePoint issue #740 code-point order", () => {
 
     // Assert
     expect(result).toBe(-1);
+  });
+});
+
+describe("sortedSet", () => {
+  it("removes duplicates and sorts by code point", () => {
+    // Arrange
+    const values = ["b", "a", "b", "A"];
+
+    // Act
+    const result = sortedSet(values);
+
+    // Assert
+    expect(result).toEqual(["A", "a", "b"]);
+  });
+
+  it("orders U+FFFF before U+1F600", () => {
+    // Arrange
+    const values = ["\u{1F600}", "￿"];
+
+    // Act
+    const result = sortedSet(values);
+
+    // Assert
+    expect(result).toEqual(["￿", "\u{1F600}"]);
+  });
+
+  it("accepts a Set and a generator", () => {
+    // Arrange
+    const fromSet = new Set(["b", "a"]);
+    function* generateValues(): Generator<string> {
+      yield "b";
+      yield "a";
+      yield "b";
+    }
+
+    // Act
+    const setResult = sortedSet(fromSet);
+    const generatorResult = sortedSet(generateValues());
+
+    // Assert
+    expect(setResult).toEqual(["a", "b"]);
+    expect(generatorResult).toEqual(["a", "b"]);
+  });
+
+  it("does not mutate the input array", () => {
+    // Arrange
+    const values = ["b", "a", "b"];
+
+    // Act
+    sortedSet(values);
+
+    // Assert
+    expect(values).toEqual(["b", "a", "b"]);
+  });
+
+  it("returns an empty array for empty input", () => {
+    // Arrange / Act
+    const result = sortedSet([]);
+
+    // Assert
+    expect(result).toEqual([]);
+  });
+});
+
+describe("escapeRegExp", () => {
+  it("escapes every regex metacharacter so the pattern matches the literal text", () => {
+    // Arrange
+    const text = ".*+?^${}()|[]\\";
+
+    // Act
+    const pattern = new RegExp("^" + escapeRegExp(text) + "$", "u");
+
+    // Assert
+    expect(pattern.test(text)).toBe(true);
+  });
+
+  it("leaves a hyphen unescaped", () => {
+    // Arrange / Act
+    const result = escapeRegExp("a-b");
+
+    // Assert
+    expect(result).toBe("a-b");
+  });
+
+  it("returns plain text unchanged", () => {
+    // Arrange / Act
+    const result = escapeRegExp("abc");
+
+    // Assert
+    expect(result).toBe("abc");
+  });
+});
+
+describe("splitLines", () => {
+  it("returns an empty array for the empty string", () => {
+    expect(splitLines("")).toEqual([]);
+  });
+
+  it("splits on CRLF", () => {
+    expect(splitLines("a\r\nb")).toEqual(["a", "b"]);
+  });
+
+  it("splits on a lone CR", () => {
+    expect(splitLines("a\rb")).toEqual(["a", "b"]);
+  });
+
+  it("drops a single trailing terminator", () => {
+    expect(splitLines("a\n")).toEqual(["a"]);
+  });
+
+  it("keeps an interior empty line before a trailing terminator", () => {
+    expect(splitLines("a\n\n")).toEqual(["a", ""]);
+  });
+
+  it("returns one empty line for a lone newline", () => {
+    expect(splitLines("\n")).toEqual([""]);
+  });
+
+  it("does not split on U+2028", () => {
+    expect(splitLines("a b")).toEqual(["a b"]);
   });
 });

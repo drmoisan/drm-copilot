@@ -5,6 +5,7 @@ import {
   completedPlanTasks,
   extractIssueReferences,
   parseSection,
+  relativeToPosix,
   resolveFeatureDir,
 } from "../../../src/lib/pr-context/feature-docs-parsers";
 import { gatherFeatureExcerpts } from "../../../src/lib/pr-context/feature-docs";
@@ -307,5 +308,47 @@ describe("gatherFeatureExcerpts", () => {
     expect(excerpts[0]!.contextFiles).toContain(
       `docs/features/active/${feature}/feature-audit.2026-03-03T19-24.md`,
     );
+  });
+});
+
+describe("relativeToPosix", () => {
+  it("returns the path relative to a POSIX root", () => {
+    // Arrange / Act
+    const result = relativeToPosix("/repo", "/repo/docs/a.md");
+
+    // Assert
+    expect(result).toBe("docs/a.md");
+  });
+
+  it("normalizes a Windows-style root and path", () => {
+    // Arrange / Act
+    const result = relativeToPosix("C:\\repo\\", "C:\\repo\\docs\\a.md");
+
+    // Assert
+    expect(result).toBe("docs/a.md");
+  });
+
+  it("strips a trailing slash from the root", () => {
+    // Arrange / Act
+    const result = relativeToPosix("/repo/", "/repo/x.md");
+
+    // Assert
+    expect(result).toBe("x.md");
+  });
+
+  it("returns the leading-slash-stripped path for a path outside the root", () => {
+    // Arrange / Act
+    const result = relativeToPosix("/repo", "/other/x.md");
+
+    // Assert: Python `relative_to` would raise; this port strips the slash.
+    expect(result).toBe("other/x.md");
+  });
+
+  it("does not treat a sibling directory sharing the root prefix as inside the root", () => {
+    // Arrange / Act
+    const result = relativeToPosix("/repo", "/repository/x.md");
+
+    // Assert
+    expect(result).toBe("repository/x.md");
   });
 });

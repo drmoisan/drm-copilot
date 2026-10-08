@@ -16,8 +16,10 @@
  */
 
 import { type FileSystem, toPosixPath } from "../file-system";
+import { relativeToPosix } from "./feature-docs-parsers";
 import {
   compareCodePoint,
+  escapeRegExp,
   type FeatureDocExcerpt,
   ISSUE_REFERENCE_PATTERN,
   section,
@@ -425,18 +427,4 @@ export function gatherFeatureExcerpts(
   }
 
   return excerpts;
-}
-
-/** Compute a repo-relative POSIX path for a path under `root`. */
-function relativeToPosix(root: string, path: string): string {
-  const normalized = toPosixPath(path);
-  if (normalized.startsWith(`${root}/`)) {
-    return normalized.slice(root.length + 1);
-  }
-  return normalized.replace(/^\/+/u, "");
-}
-
-/** Escape regex metacharacters for a dynamic heading pattern. */
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
 }

@@ -19,7 +19,8 @@
  */
 
 import { type FileSystem, toPosixPath } from "../file-system";
-import { compareCodePoint } from "./models";
+import { relativeToPosix } from "./feature-docs-parsers";
+import { compareCodePoint, splitLines } from "./models";
 
 /** Required schema fields parsed from an evidence markdown file. */
 export const REQUIRED_FIELDS = ["Timestamp", "Command", "EXIT_CODE"] as const;
@@ -256,40 +257,4 @@ function parseIntegerStrict(value: string): number | null {
     return null;
   }
   return Number.parseInt(value, 10);
-}
-
-/**
- * Convert an absolute POSIX path under `root` to a repo-relative POSIX path.
- *
- * @param root Normalized repository root (no trailing slash).
- * @param absolute Absolute POSIX path under `root`.
- * @returns The path relative to `root`, without a leading slash.
- */
-function relativeToPosix(root: string, absolute: string): string {
-  const normalized = toPosixPath(absolute);
-  if (normalized.startsWith(`${root}/`)) {
-    return normalized.slice(root.length + 1);
-  }
-  return normalized.replace(/^\/+/u, "");
-}
-
-/**
- * Split text into lines the way Python `str.splitlines()` does.
- *
- * @param value Text to split.
- * @returns Lines without terminators.
- */
-function splitLines(value: string): string[] {
-  if (value === "") {
-    return [];
-  }
-  const lines = value.split(/\r\n|\r|\n/u);
-  if (
-    lines.length > 0 &&
-    lines[lines.length - 1] === "" &&
-    /(\r\n|\r|\n)$/u.test(value)
-  ) {
-    lines.pop();
-  }
-  return lines;
 }

@@ -16,6 +16,9 @@
  *     - Provide the `SECTION_LINE` template, `CONVENTIONAL_TYPES` tuple, and the
  *       pure helpers `section`, `truncate`, `truncateLines`, `normalizeReference`,
  *       `findUserStoryLink`, and `formatList`.
+ *     - Provide the shared pure helpers `splitLines`, `compareCodePoint`,
+ *       `sortedSet`, and `escapeRegExp` (issue #740), the single definitions
+ *       used across the pr-context modules.
  *     - Provide the issue #622 shared literals `ISSUE_REFERENCE_PATTERN`,
  *       `AUTOCLOSE_UNVERIFIED_ANNOTATION`, and `AUTOCLOSE_PENDING_NOT_OPEN_TEXT`.
  */
@@ -209,11 +212,13 @@ export function truncate(text: string, limit = 800): string {
 }
 
 /**
- * Split a string into lines the way Python `str.splitlines()` does.
+ * Split a string into lines on a fixed set of line terminators.
  *
- * Python `splitlines()` breaks on `\n`, `\r`, and `\r\n` and does not include a
- * trailing empty element for a final line terminator. This helper reproduces
- * that behavior for the line-budget truncation used across the port.
+ * Supported terminators: `\r\n`, `\r`, and `\n`.
+ * These are a subset of the Python `str.splitlines()` line boundaries; other
+ * boundaries that Python recognizes (for example U+2028) are not split on.
+ * As in Python, a single trailing terminator does not yield a trailing empty
+ * element, and the empty string yields an empty list.
  *
  * @param value Text to split into lines.
  * @returns The list of lines without their terminators.
@@ -360,4 +365,27 @@ export function compareCodePoint(left: string, right: string): number {
     return 0;
   }
   return left.length < right.length ? -1 : 1;
+}
+
+/**
+ * Return the distinct values sorted by Unicode code point.
+ *
+ * Mirrors Python `sorted(set(values))`. The input is not mutated.
+ *
+ * @param values Values to deduplicate and sort.
+ * @returns A new array of distinct values ordered by {@link compareCodePoint}.
+ */
+export function sortedSet(values: Iterable<string>): string[] {
+  return [...new Set(values)].sort(compareCodePoint);
+}
+
+/**
+ * Escape every regular-expression metacharacter so the result matches `value`
+ * literally when used as a `RegExp` source (including with the `u` flag).
+ *
+ * @param value Literal text to escape.
+ * @returns `value` with `. * + ? ^ $ { } ( ) | [ ] \` each prefixed by `\`.
+ */
+export function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
 }
