@@ -130,3 +130,96 @@ report_raw() { # report_raw <scenario> -> run the full report driver, stderr RET
     scan_calls=$(printf '%s\n' "$output" | grep -c 'stub-scan: scan-dirs' || true)
     [ "$scan_calls" -eq 1 ]
 }
+
+# rr() sources only ELIB and RLIB and therefore cannot run the classification driver,
+# which calls classify_branch (LIB) and the dirt reads (DIRTLIB); this helper sources all four.
+classify_all_rr() { # classify_all_rr <scenario> -> run classify_all_branches with stderr retained
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && source '${RLIB}' && classify_all_branches"
+}
+
+ladder_rr() { # ladder_rr <scenario> <branch> -> run classify_branch for one branch, stderr discarded
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
+        bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && source '${DLIB}' && classify_branch '$2' 2>/dev/null"
+}
+
+# The redefinitions occur after sourcing, so run_report_scans calls the stand-ins. That
+# reaches the rc-maximization statements, which the real scans cannot reach when given
+# pre-scanned records.
+rs_override() { # rs_override <scenario> <orphan-rc> <registration-rc> -> run run_report_scans with both record scans replaced
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_SCAN_BIN="${SCAN}" \
+        CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
+        bash -c "source '${ELIB}' && source '${RLIB}'; scan_orphan_dirs() { return $2; }; scan_registration_loss() { return $3; }; run_report_scans 2>/dev/null"
+}
+
+@test "classify_all_branches: a hard pairwise probe failure returns rc 2 and emits no CHILD_OF record" {
+    # child_of_pairwise_probe_error is child_of_not_merged plus
+    # merge-base.feature-child.feature-parent.rc = 128. Only the pairwise probe reads that
+    # pair key, and both branches resolve NOT_MERGED, so rc 2 can only come from the probe.
+    classify_all_rr child_of_pairwise_probe_error
+    [ "$status" -eq 2 ]
+    [[ "$output" == *"BRANCH|feature-child|NOT_MERGED"* ]]
+    [[ "$output" == *"BRANCH|feature-parent|NOT_MERGED"* ]]
+    [[ "$output" != *"CHILD_OF|"* ]]
+    [[ "$output" != *"ANCESTRY_ERROR"* ]]
+}
+
+@test "classify_all_branches: a hard pairwise probe failure leaves each BRANCH record identical to the classify_branch record" {
+    # Comparing the same branch under the same scenario is what lets the assertion fail.
+    classify_all_rr child_of_pairwise_probe_error
+    [ "$status" -eq 2 ]
+    driver_child=$(printf '%s\n' "$output" | grep '^BRANCH|feature-child|' || true)
+    driver_parent=$(printf '%s\n' "$output" | grep '^BRANCH|feature-parent|' || true)
+    ladder_rr child_of_pairwise_probe_error feature-child
+    [ "$status" -eq 0 ]
+    ladder_child=$(printf '%s\n' "$output" | grep '^BRANCH|feature-child|' || true)
+    ladder_rr child_of_pairwise_probe_error feature-parent
+    [ "$status" -eq 0 ]
+    ladder_parent=$(printf '%s\n' "$output" | grep '^BRANCH|feature-parent|' || true)
+    [ "$driver_child" = "$ladder_child" ]
+    [ "$driver_parent" = "$ladder_parent" ]
+    [ "$driver_child" = "BRANCH|feature-child|NOT_MERGED" ]
+    [ "$driver_parent" = "BRANCH|feature-parent|NOT_MERGED" ]
+}
+
+@test "run_report_scans: a failed filesystem scan returns the scan rc and emits no scan-derived record" {
+    # The scan stub replays one orphan-shaped record and exits 3, so the partial output
+    # must be discarded and the scan exit code returned.
+    rr report_scans_scan_failure "run_report_scans"
+    [ "$status" -eq 3 ]
+    [ "$output" = "" ]
+}
+
+@test "run_report_scans: a stale-ref failure with a higher rc than a failed scan returns the stale-ref rc" {
+    # The scan exits 3 and the stale-ref read exits 5, so the larger code is returned.
+    rr report_scans_scan_failure_git_higher "run_report_scans"
+    [ "$status" -eq 5 ]
+    [ "$output" = "" ]
+}
+
+@test "run_report_scans: a stale-ref failure after a successful scan returns its rc and keeps the scan records" {
+    # The scan succeeds and the stale-ref read exits 4, so the success path returns 4 and
+    # still emits the orphan record.
+    rr report_scans_stale_ref_failure "run_report_scans"
+    [ "$status" -eq 4 ]
+    [ "$output" = "ORPHAN_DIR|.claude/worktrees/agent-old|128K" ]
+}
+
+@test "run_report_scans: the orphan-directory scan rc is returned when it is the maximum" {
+    # The orphan scan returns 7 and the registration scan returns 0.
+    rs_override report_single_scan 7 0
+    [ "$status" -eq 7 ]
+}
+
+@test "run_report_scans: the registration-loss scan rc is returned when it is the maximum" {
+    # The orphan scan returns 7 and the registration scan returns 9.
+    rs_override report_single_scan 7 9
+    [ "$status" -eq 9 ]
+}
+
+@test "run_report_scans: an earlier larger scan rc is kept when a later scan returns a smaller one" {
+    # The orphan scan returns 9 and the registration scan returns 7, so the later smaller
+    # code must not replace the earlier larger one.
+    rs_override report_single_scan 9 7
+    [ "$status" -eq 9 ]
+}
