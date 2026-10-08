@@ -121,17 +121,17 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
         }
     }
 
-    Context 'Get-CodexWorktreeRemovalPath resolves an operand or reports the flag' {
-        It 'returns the --force marker when the flag is present and no operand follows' {
-            Get-CodexWorktreeRemovalPath -Command 'git worktree remove --force' | Should -Be '--force'
+    Context 'Resolve-CommandLineInvocationTarget resolves an operand or reports it indeterminate' {
+        It 'reports Indeterminate when the flag is present and no operand follows' {
+            (Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove --force' -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Status | Should -Be 'Indeterminate'
         }
 
-        It 'returns the empty string for a bare removal that names neither operand nor flag' {
-            Get-CodexWorktreeRemovalPath -Command 'git worktree remove' | Should -Be ''
+        It 'reports Indeterminate for a bare removal that names neither operand nor flag' {
+            (Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove' -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Status | Should -Be 'Indeterminate'
         }
 
-        It 'returns the empty string for a subcommand that is not remove' {
-            Get-CodexWorktreeRemovalPath -Command 'git worktree list --porcelain' | Should -Be ''
+        It 'reports NoMatch for a subcommand that is not remove' {
+            (Resolve-CommandLineInvocationTarget -CommandText 'git worktree list --porcelain' -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Status | Should -Be 'NoMatch'
         }
     }
 

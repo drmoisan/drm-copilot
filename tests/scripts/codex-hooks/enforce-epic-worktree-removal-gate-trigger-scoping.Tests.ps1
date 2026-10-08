@@ -80,13 +80,13 @@ Describe 'Codex enforce-epic-worktree-removal-gate trigger scoping (issue #545)'
         It 'resolves the operand when --force precedes the path' {
             # Preservation pin. The previous pattern's optional (?:\s+--force)? group already
             # handled this spelling; the shared parser must not lose it.
-            Get-CodexWorktreeRemovalPath -Command ('git worktree remove --force "' + $script:TargetPath + '"') |
-                Should -Be $script:TargetPath
+            (Resolve-CommandLineInvocationTarget -CommandText ('git worktree remove --force "' + $script:TargetPath + '"') -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Targets |
+                Should -Be @($script:TargetPath)
         }
 
         It 'resolves the same operand when --force follows the path' {
-            Get-CodexWorktreeRemovalPath -Command ('git worktree remove "' + $script:TargetPath + '" --force') |
-                Should -Be $script:TargetPath
+            (Resolve-CommandLineInvocationTarget -CommandText ('git worktree remove "' + $script:TargetPath + '" --force') -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Targets |
+                Should -Be @($script:TargetPath)
         }
     }
 

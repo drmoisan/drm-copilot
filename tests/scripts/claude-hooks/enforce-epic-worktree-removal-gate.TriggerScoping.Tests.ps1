@@ -69,13 +69,13 @@ Describe 'enforce-epic-worktree-removal-gate trigger scoping (issue #545)' {
 
     Context 'operand resolution - the --force flag never becomes the path' {
         It 'resolves the operand when --force precedes the path' {
-            Get-EpicWorktreeRemovalCommandPath -CommandText 'git worktree remove --force /repo/worktrees/item-a-101' |
-                Should -Be '/repo/worktrees/item-a-101'
+            (Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove --force /repo/worktrees/item-a-101' -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Targets |
+                Should -Be @('/repo/worktrees/item-a-101')
         }
 
         It 'resolves the same operand when --force follows the path' {
-            Get-EpicWorktreeRemovalCommandPath -CommandText 'git worktree remove /repo/worktrees/item-a-101 --force' |
-                Should -Be '/repo/worktrees/item-a-101'
+            (Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove /repo/worktrees/item-a-101 --force' -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Targets |
+                Should -Be @('/repo/worktrees/item-a-101')
         }
     }
 

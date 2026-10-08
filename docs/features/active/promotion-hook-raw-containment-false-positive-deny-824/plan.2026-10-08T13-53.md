@@ -333,43 +333,43 @@ Rules for every new test file: Arrange-Act-Assert; no temporary file; no network
 
 ### Phase 5 — Promotion Hook and Worktree-Removal Gates
 
-- [ ] [P5-T1] Edit `.claude/hooks/enforce-promotion-mcp-only.ps1:114-120` per DC-17.
+- [x] [P5-T1] Edit `.claude/hooks/enforce-promotion-mcp-only.ps1:114-120` per DC-17.
   - Acceptance: [P5-T18] rows PM-14 and PM-30 pass for runtime `claude`.
-- [ ] [P5-T2] Edit `.codex/hooks/enforce-promotion-mcp-only.ps1:111-117` per DC-17.
+- [x] [P5-T2] Edit `.codex/hooks/enforce-promotion-mcp-only.ps1:111-117` per DC-17.
   - Acceptance: [P5-T18] rows PM-14 and PM-30 pass for runtime `codex`.
-- [ ] [P5-T3] Edit `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` per DC-18: delete `:111-150`, add `Get-EpicWorktreeRemovalTargetDenial`, replace `:359-403` with the `NoMatch`/`Indeterminate`/`Targets` dispatch; rewrite the comment at `:72-73` to name `Resolve-CommandLineInvocationTarget` in place of `Get-EpicWorktreeRemovalCommandPath`.
+- [x] [P5-T3] Edit `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` per DC-18: delete `:111-150`, add `Get-EpicWorktreeRemovalTargetDenial`, replace `:359-403` with the `NoMatch`/`Indeterminate`/`Targets` dispatch; rewrite the comment at `:72-73` to name `Resolve-CommandLineInvocationTarget` in place of `Get-EpicWorktreeRemovalCommandPath`.
   - Acceptance: [P5-T18] T-EPIC rows pass and `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Tests.ps1` row `emits the unchanged epic block reason` (`:480-488`) passes.
-- [ ] [P5-T4] Edit `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` per DC-18: delete `:167-211`, add `Get-ParallelWorktreeRemovalTargetDenial`, replace `:365-420`; rewrite the comment at `:41-44` to name `Resolve-CommandLineInvocationTarget` in place of `Get-ParallelWorktreeRemovalCommandPath`.
+- [x] [P5-T4] Edit `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` per DC-18: delete `:167-211`, add `Get-ParallelWorktreeRemovalTargetDenial`, replace `:365-420`; rewrite the comment at `:41-44` to name `Resolve-CommandLineInvocationTarget` in place of `Get-ParallelWorktreeRemovalCommandPath`.
   - Acceptance: [P5-T18] T-PAR rows pass and the existing parallel reason pin (`tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1:451`) passes.
-- [ ] [P5-T5] Edit `.codex/hooks/enforce-epic-worktree-removal-gate.ps1` per DC-18: delete `:36-68`, add `Get-CodexWorktreeRemovalTargetDenial`, replace `:126-153`.
+- [x] [P5-T5] Edit `.codex/hooks/enforce-epic-worktree-removal-gate.ps1` per DC-18: delete `:36-68`, add `Get-CodexWorktreeRemovalTargetDenial`, replace `:126-153`.
   - Acceptance: [P5-T18] T-CXEPIC rows and both existing Codex epic-gate suites pass, and `git grep -n -e Get-EpicWorktreeRemovalCommandPath -e Get-ParallelWorktreeRemovalCommandPath -e Get-CodexWorktreeRemovalPath -- .claude/hooks .codex/hooks` exits 1, recorded in `FEATURE/evidence/qa-gates/phase5-helper-removal.STAMP.md` with `ExpectedExitCode: 1`. The search is limited to the two hook folders: at this point the bundled copies under `extensions/drm-copilot/resources/` still carry the base text until [P7-T1]/[P7-T2] copy them (their later equality is asserted by [P7-T6] and [P10-T14]), and the test references at `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Tests.ps1:136-143`, `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1:72-77`, `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1:261-268`, `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1:54`, `tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1:195-197`, `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1:83-88`, and `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1:124-134` are rewritten later by [P5-T6]..[P5-T12].
-- [ ] [P5-T6] Edit `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Tests.ps1:136-145`: retitle the context `Resolve-CommandLineInvocationTarget for the epic gate`; the first row asserts `Targets` equals `@('/repo/worktrees/child-a')`; the second asserts `Status` is `NoMatch` for `git status`. The file stays at or below 500 lines (497 at base).
+- [x] [P5-T6] Edit `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Tests.ps1:136-145`: retitle the context `Resolve-CommandLineInvocationTarget for the epic gate`; the first row asserts `Targets` equals `@('/repo/worktrees/child-a')`; the second asserts `Status` is `NoMatch` for `git status`. The file stays at or below 500 lines (497 at base).
   - Acceptance: [P5-T18] reports the file with failures only in `B_SCOPED`; [P5-T19] reports it at or below 500.
-- [ ] [P5-T7] Edit `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1:70-80`: both rows assert `Targets` equals `@('/repo/worktrees/item-a-101')` via `Resolve-CommandLineInvocationTarget`.
+- [x] [P5-T7] Edit `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1:70-80`: both rows assert `Targets` equals `@('/repo/worktrees/item-a-101')` via `Resolve-CommandLineInvocationTarget`.
   - Acceptance: [P5-T18] reports the file with zero new failures.
-- [ ] [P5-T8] Edit `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1:261-270`: retitle the context `Resolve-CommandLineInvocationTarget for the parallel gate`; the first row asserts `(Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove /repo/worktrees/item-a-101' -CommandWord 'git' -SubcommandPath @('worktree','remove')).Targets` equals `@('/repo/worktrees/item-a-101')`; the second asserts `Status` is `NoMatch` for `git status`.
+- [x] [P5-T8] Edit `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1:261-270`: retitle the context `Resolve-CommandLineInvocationTarget for the parallel gate`; the first row asserts `(Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove /repo/worktrees/item-a-101' -CommandWord 'git' -SubcommandPath @('worktree','remove')).Targets` equals `@('/repo/worktrees/item-a-101')`; the second asserts `Status` is `NoMatch` for `git status`.
   - Acceptance: [P5-T18] reports the file with zero new failures.
-- [ ] [P5-T9] Edit `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1:50-56` (the single row `resolves the operand when --force precedes the path`, which calls `Get-ParallelWorktreeRemovalCommandPath`): the row asserts that `(Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove --force /repo/worktrees/item-a-101' -CommandWord 'git' -SubcommandPath @('worktree','remove')).Targets` equals `@('/repo/worktrees/item-a-101')`.
+- [x] [P5-T9] Edit `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1:50-56` (the single row `resolves the operand when --force precedes the path`, which calls `Get-ParallelWorktreeRemovalCommandPath`): the row asserts that `(Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove --force /repo/worktrees/item-a-101' -CommandWord 'git' -SubcommandPath @('worktree','remove')).Targets` equals `@('/repo/worktrees/item-a-101')`.
   - Acceptance: [P5-T18] reports the file with zero new failures.
-- [ ] [P5-T10] Edit `tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1:185-200`: AT-7 asserts `Targets` equals `@('/repo/worktrees/item-a-101')` from one `Resolve-CommandLineInvocationTarget` call; its comment states both gates consume that resolver.
+- [x] [P5-T10] Edit `tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1:185-200`: AT-7 asserts `Targets` equals `@('/repo/worktrees/item-a-101')` from one `Resolve-CommandLineInvocationTarget` call; its comment states both gates consume that resolver.
   - Acceptance: [P5-T18] reports the file with zero new failures.
-- [ ] [P5-T11] Edit `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1:79-91`: both rows assert `Targets` equals `@($script:TargetPath)`.
+- [x] [P5-T11] Edit `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1:79-91`: both rows assert `Targets` equals `@($script:TargetPath)`.
   - Acceptance: [P5-T18] reports the file with zero new failures.
-- [ ] [P5-T12] Edit `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1:124-136`: `git worktree remove --force` and `git worktree remove` assert `Status` `Indeterminate`; `git worktree list --porcelain` asserts `NoMatch`; the context title names `Resolve-CommandLineInvocationTarget`.
+- [x] [P5-T12] Edit `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1:124-136`: `git worktree remove --force` and `git worktree remove` assert `Status` `Indeterminate`; `git worktree list --porcelain` asserts `NoMatch`; the context title names `Resolve-CommandLineInvocationTarget`.
   - Acceptance: [P5-T18] reports the file with zero new failures.
-- [ ] [P5-T13] Create `tests/scripts/claude-hooks/enforce-promotion-mcp-only.Issue824.Tests.ps1` with rows PM-01..PM-32 (section 5 T-PROMO); PM-29 tagged `NegativeControl`.
+- [x] [P5-T13] Create `tests/scripts/claude-hooks/enforce-promotion-mcp-only.Issue824.Tests.ps1` with rows PM-01..PM-32 (section 5 T-PROMO); PM-29 tagged `NegativeControl`.
   - Acceptance: [P5-T18] reports every PM row passed for both runtimes.
-- [ ] [P5-T14] Create `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Issue824.Tests.ps1` with rows EW-01..EW-39; EW-39 tagged `NegativeControl`.
+- [x] [P5-T14] Create `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Issue824.Tests.ps1` with rows EW-01..EW-39; EW-39 tagged `NegativeControl`.
   - Acceptance: [P5-T18] reports every EW row passed.
-- [ ] [P5-T15] Create `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Issue824.Tests.ps1` with rows PW-01..PW-39; PW-39 tagged `NegativeControl`.
+- [x] [P5-T15] Create `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Issue824.Tests.ps1` with rows PW-01..PW-39; PW-39 tagged `NegativeControl`.
   - Acceptance: [P5-T18] reports every PW row passed.
-- [ ] [P5-T16] Create `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-issue824.Tests.ps1` with rows CW-01..CW-39; CW-39 tagged `NegativeControl`.
+- [x] [P5-T16] Create `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-issue824.Tests.ps1` with rows CW-01..CW-39; CW-39 tagged `NegativeControl`.
   - Acceptance: [P5-T18] reports every CW row passed.
-- [ ] [P5-T17] Create `tests/scripts/claude-hooks/hook-command-consumers.Issue824.Tests.ps1` with rows CN-01..CN-10 (section 5 T-CONS).
+- [x] [P5-T17] Create `tests/scripts/claude-hooks/hook-command-consumers.Issue824.Tests.ps1` with rows CN-01..CN-10 (section 5 T-CONS).
   - Acceptance: [P5-T18] reports every CN row passed.
-- [ ] [P5-T18] Run `sh SCRATCHPAD/s-pester.sh P5` and record `FEATURE/evidence/qa-gates/phase5-pester.STAMP.md`.
+- [x] [P5-T18] Run `sh SCRATCHPAD/s-pester.sh P5` and record `FEATURE/evidence/qa-gates/phase5-pester.STAMP.md`.
   - Acceptance: failures are a subset of `B_SCOPED`; no row in a file created by this plan fails; every shared-module edit made in Phase 5 has a matching `mirror-<group>-phase5` artifact written before this run (rule 6).
-- [ ] [P5-T19] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase5-lines.STAMP.md`.
+- [x] [P5-T19] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase5-lines.STAMP.md`.
   - Acceptance: `OVER_500: NONE`.
 - [ ] [P5-T20] Commit and push every path edited or created in [P5-T1]..[P5-T17], every shared module (both surfaces) edited or copied under rule 6 during Phase 5, plus `FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` (`git commit -m "feat(824): promotion and worktree gates consume the structural matcher" --` with the same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
