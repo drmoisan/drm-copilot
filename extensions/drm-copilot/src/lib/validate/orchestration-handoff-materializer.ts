@@ -19,6 +19,7 @@ import {
 import {
   authorityFailure,
   blockedResult,
+  describeHandoffFailureCause,
   toReferenceRequest,
 } from "./orchestration-handoff-materializer-request";
 import type { HandoffPathBoundary } from "./orchestration-handoff-path-boundary";
@@ -140,7 +141,9 @@ export class OrchestrationHandoffMaterializer {
       request.workspaceRoot,
     );
     if (canonicalWorkspaceRoot === null) {
-      return blockedResult(request, "HANDOFF_PLAN_PATH_INVALID");
+      return blockedResult(request, "HANDOFF_PLAN_PATH_INVALID", {
+        failureCause: "workspace-root: unresolved",
+      });
     }
     const sourcePath = pathBoundary.resolveExistingTarget(
       canonicalWorkspaceRoot,
@@ -151,7 +154,9 @@ export class OrchestrationHandoffMaterializer {
       request.handoffEnvelopePath,
     );
     if (sourcePath === null || envelopePath === null) {
-      return blockedResult(request, "HANDOFF_PLAN_PATH_INVALID");
+      return blockedResult(request, "HANDOFF_PLAN_PATH_INVALID", {
+        failureCause: "target-path: unresolved",
+      });
     }
 
     let sourceBytes: Uint8Array;
@@ -159,8 +164,10 @@ export class OrchestrationHandoffMaterializer {
     try {
       sourceBytes = this.dependencies.fileSystem.readFile(sourcePath);
       envelopeBytes = this.dependencies.fileSystem.readFile(envelopePath);
-    } catch {
-      return blockedResult(request, "HANDOFF_VALIDATOR_UNAVAILABLE");
+    } catch (error: unknown) {
+      return blockedResult(request, "HANDOFF_VALIDATOR_UNAVAILABLE", {
+        failureCause: describeHandoffFailureCause("checkpoint-read", error),
+      });
     }
     if (
       sha256(sourceBytes) !== request.expectedSourceCheckpointSha256 ||
@@ -172,8 +179,10 @@ export class OrchestrationHandoffMaterializer {
     let envelopeText: string;
     try {
       envelopeText = textDecoder.decode(envelopeBytes);
-    } catch {
-      return blockedResult(request, "HANDOFF_UNSUPPORTED_VERSION");
+    } catch (error: unknown) {
+      return blockedResult(request, "HANDOFF_UNSUPPORTED_VERSION", {
+        failureCause: describeHandoffFailureCause("envelope-decode", error),
+      });
     }
     const validation =
       this.dependencies.validator.validateEnvelope(envelopeText);
@@ -242,6 +251,7 @@ export class OrchestrationHandoffMaterializer {
       return blockedResult(request, "HANDOFF_PLAN_PATH_INVALID", {
         handoffId: envelope.handoffId,
         handoffHistorySha256: lastHistoryEntry.entrySha256,
+        failureCause: "target-path: unresolved",
       });
     }
 
@@ -288,6 +298,7 @@ export class OrchestrationHandoffMaterializer {
         handoffId: envelope.handoffId,
         handoffHistorySha256: lastHistoryEntry.entrySha256,
         affectedPaths: [envelope.destinationCheckpointPath],
+        failureCause: "destination-projection: invalid",
       });
     }
     let porcelainStatus: string;
@@ -295,10 +306,11 @@ export class OrchestrationHandoffMaterializer {
       porcelainStatus = await this.dependencies.git.readPorcelainStatus(
         canonicalWorkspaceRoot,
       );
-    } catch {
+    } catch (error: unknown) {
       return blockedResult(request, "HANDOFF_VALIDATOR_UNAVAILABLE", {
         handoffId: envelope.handoffId,
         handoffHistorySha256: lastHistoryEntry.entrySha256,
+        failureCause: describeHandoffFailureCause("git-status", error),
       });
     }
     const affectedPaths = porcelainAffectedPaths(porcelainStatus);
@@ -348,17 +360,22 @@ export class OrchestrationHandoffMaterializer {
         preparation.sourceBytes,
         { exclusive: true },
       );
-    } catch {
+    } catch (writeError: unknown) {
+      const writeCause = describeHandoffFailureCause(
+        "archive-write",
+        writeError,
+      );
       let archivedBytes: Uint8Array;
       try {
         archivedBytes = this.dependencies.fileSystem.readFile(
           preparation.archivePath,
         );
-      } catch {
+      } catch (readError: unknown) {
         return blockedResult(request, "HANDOFF_VALIDATOR_UNAVAILABLE", {
           handoffId: preparation.result.handoffId,
           handoffHistorySha256: preparation.result.handoffHistorySha256,
           affectedPaths: [preparation.archivePath],
+          failureCause: `${writeCause}; ${describeHandoffFailureCause("archive-readback", readError)}`,
         });
       }
       if (sha256(archivedBytes) !== expectedSourceSha256) {
@@ -366,6 +383,7 @@ export class OrchestrationHandoffMaterializer {
           handoffId: preparation.result.handoffId,
           handoffHistorySha256: preparation.result.handoffHistorySha256,
           affectedPaths: [preparation.archivePath],
+          failureCause: writeCause,
         });
       }
     }
@@ -376,17 +394,22 @@ export class OrchestrationHandoffMaterializer {
         preparation.projectionBytes,
         { exclusive: true },
       );
-    } catch {
+    } catch (writeError: unknown) {
+      const writeCause = describeHandoffFailureCause(
+        "candidate-write",
+        writeError,
+      );
       let existingCandidate: Uint8Array;
       try {
         existingCandidate = this.dependencies.fileSystem.readFile(
           preparation.candidatePath,
         );
-      } catch {
+      } catch (readError: unknown) {
         return blockedResult(request, "HANDOFF_VALIDATOR_UNAVAILABLE", {
           handoffId: preparation.result.handoffId,
           handoffHistorySha256: preparation.result.handoffHistorySha256,
           affectedPaths: [preparation.candidatePath],
+          failureCause: `${writeCause}; ${describeHandoffFailureCause("candidate-readback", readError)}`,
         });
       }
       if (sha256(existingCandidate) !== sha256(preparation.projectionBytes)) {
@@ -394,6 +417,7 @@ export class OrchestrationHandoffMaterializer {
           handoffId: preparation.result.handoffId,
           handoffHistorySha256: preparation.result.handoffHistorySha256,
           affectedPaths: [preparation.candidatePath],
+          failureCause: writeCause,
         });
       }
     }
@@ -408,37 +432,57 @@ export class OrchestrationHandoffMaterializer {
         this.dependencies.validator.validateDestinationProjection(writtenText)
           .length > 0
       ) {
-        throw new Error("Candidate validation failed.");
+        throw Object.assign(new Error("Candidate validation failed."), {
+          code: "HANDOFF_CANDIDATE_MISMATCH",
+        });
       }
-    } catch {
-      this.discardCandidate(preparation.candidatePath);
-      return blockedResult(request, "HANDOFF_VALIDATOR_UNAVAILABLE", {
-        handoffId: preparation.result.handoffId,
-        handoffHistorySha256: preparation.result.handoffHistorySha256,
-        affectedPaths: [preparation.candidatePath],
-      });
+    } catch (error: unknown) {
+      return this.discardedCandidateResult(
+        request,
+        preparation,
+        describeHandoffFailureCause("candidate-validate", error),
+      );
     }
     try {
       this.dependencies.fileSystem.replaceFile(
         preparation.candidatePath,
         preparation.destinationPath,
       );
-    } catch {
-      this.discardCandidate(preparation.candidatePath);
-      return blockedResult(request, "HANDOFF_VALIDATOR_UNAVAILABLE", {
-        handoffId: preparation.result.handoffId,
-        handoffHistorySha256: preparation.result.handoffHistorySha256,
-        affectedPaths: [preparation.candidatePath],
-      });
+    } catch (error: unknown) {
+      return this.discardedCandidateResult(
+        request,
+        preparation,
+        describeHandoffFailureCause("candidate-replace", error),
+      );
     }
     return { ...preparation.result, status: "materialized" };
   }
 
-  private discardCandidate(candidatePath: string): void {
+  /** Discard the candidate and block, appending any cleanup failure cause. */
+  private discardedCandidateResult(
+    request: TransitionPreparedOrchestrationRequest,
+    preparation: PreparedTransition,
+    cause: string,
+  ): TransitionPreparedOrchestrationResult {
+    const cleanupCause = this.discardCandidate(preparation.candidatePath);
+    return blockedResult(request, "HANDOFF_VALIDATOR_UNAVAILABLE", {
+      handoffId: preparation.result.handoffId,
+      handoffHistorySha256: preparation.result.handoffHistorySha256,
+      affectedPaths: [preparation.candidatePath],
+      failureCause: cleanupCause === null ? cause : `${cause}; ${cleanupCause}`,
+    });
+  }
+
+  /**
+   * Remove the candidate. Returns `null` on success, otherwise the cleanup
+   * cause; the blocked result names the retained candidate for explicit cleanup.
+   */
+  private discardCandidate(candidatePath: string): string | null {
     try {
       this.dependencies.fileSystem.removeFile(candidatePath);
-    } catch {
-      // The blocked result names the retained candidate for explicit cleanup.
+      return null;
+    } catch (error: unknown) {
+      return describeHandoffFailureCause("candidate-cleanup", error);
     }
   }
 }
