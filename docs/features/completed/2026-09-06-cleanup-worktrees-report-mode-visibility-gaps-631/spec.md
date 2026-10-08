@@ -277,8 +277,11 @@ on per-branch classification results. `CHILD_OF` lines are additive within the p
 section, alongside the `BRANCH|`/`COMMIT|` lines for the short-circuited branch.
 
 #### Error handling and logging updates
-- A hard failure in the new pairwise ancestry probe maps to `BRANCH|<name>|ANCESTRY_ERROR`,
-  matching every other hard-failure case in the ladder.
+- A hard failure in the pairwise ancestry probe (exit code greater than 1) emits no `CHILD_OF`
+  record for that pair, leaves the branch's own `BRANCH|` line exactly as `classify_branch`
+  produced it, and raises `classify_all_branches`' return code to at least 2. It does not map
+  to `BRANCH|<name>|ANCESTRY_ERROR`; that mapping applies only to a hard failure of the ladder's
+  own rung-2 probe inside `classify_branch` (see the outcome-preservation section).
 - A directory whose size cannot be resolved is still emitted as `ORPHAN_DIR|<path>|unknown`
   rather than silently dropped, to avoid recreating the exact visibility gap this feature closes.
 - `WARN|registration-lost` follows `WARN|main-divergence`'s advisory pattern: never blocks
@@ -407,9 +410,11 @@ All new coverage follows the established no-temp-file, checked-in-fixture, stub-
     absent when registered), `STALE_REF` (present when the remote is missing; absent when the
     remote exists), and `WARN|registration-lost` (present when the `.git` pointer target is
     missing; absent when it resolves).
-- Edge cases and negative scenarios: a hard git failure during the new pairwise
-  `merge-base --is-ancestor` probe maps to `ANCESTRY_ERROR`, not a silent "not an ancestor"
-  fallback; an unresolvable directory size is emitted as `ORPHAN_DIR|<path>|unknown` rather than
+- Edge cases and negative scenarios: a hard git failure (exit code greater than 1) during the
+  pairwise `merge-base --is-ancestor` probe emits no `CHILD_OF` record for the pair, leaves the
+  branches' `BRANCH|` lines unchanged, and raises the driver's return code to 2, rather than
+  degrading to a silent "not an ancestor" fallback; an unresolvable directory size is emitted as
+  `ORPHAN_DIR|<path>|unknown` rather than
   dropped; a `WARN|registration-lost` candidate whose `.git` file cannot be read is skipped
   silently rather than erroring the whole report.
 - Error handling and logging verification: covered by the edge-case tests above.
