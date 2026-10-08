@@ -15,6 +15,15 @@ const fileSystemStub: FileSystem = {
   isFile() {
     throw new Error("not used");
   },
+  exists() {
+    throw new Error("not used");
+  },
+  isDirectory() {
+    throw new Error("not used");
+  },
+  listDirectory() {
+    throw new Error("not used");
+  },
   readTextFile() {
     throw new Error("not used");
   },
@@ -71,17 +80,31 @@ describe("buildValidateOrchestrationServiceCallInput", () => {
   });
 
   it("omits an optional key when its value is explicitly undefined", () => {
-    // Arrange: both optional fields explicitly undefined.
+    // Arrange: all five optional keys are present as own enumerable properties
+    // whose value is explicitly undefined; the builder checks each with `=== undefined`.
+    const optionalKeys = [
+      "requireComplete",
+      "requireModelRouting",
+      "requireCodexModelRouting",
+      "requireCodexTopology",
+      "requireReadyForExecution",
+    ] as const;
     const input = {
       workspaceRoot: "C:/workspace",
       artifactType: "orchestrator-state",
       artifactPath: "docs/state.json",
-      requireComplete: undefined,
-      requireModelRouting: undefined,
-      requireCodexModelRouting: undefined,
-      requireCodexTopology: undefined,
-      requireReadyForExecution: undefined,
     };
+    for (const key of optionalKeys) {
+      Object.defineProperty(input, key, {
+        value: undefined,
+        enumerable: true,
+        writable: true,
+        configurable: true,
+      });
+    }
+    expect(Object.entries(input)).toEqual(
+      expect.arrayContaining(optionalKeys.map((key) => [key, undefined])),
+    );
 
     // Act
     const result = buildValidateOrchestrationServiceCallInput(

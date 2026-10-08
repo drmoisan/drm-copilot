@@ -258,4 +258,59 @@ Describe 'enforce-epic-planning-only.ps1 loads the semantic MCP registry lazily 
         $result.ExitCode | Should -Be 2
         $result.Stderr | Should -Match 'malformed JSON'
     }
+
+    Context 'Get-EpicPlanningRegisteredMcpTool rejection messages (issue #645)' {
+        BeforeAll {
+            $script:InvalidOperationRegistryPath = Join-Path $script:RepoRoot 'tests/fixtures/codex-hooks/invalid-operation-orchestration-handoff-registry.json'
+            $script:InvalidAliasRegistryPath = Join-Path $script:RepoRoot 'tests/fixtures/codex-hooks/invalid-alias-orchestration-handoff-registry.json'
+        }
+
+        It 'throws the exact missing-registry message' {
+            # Arrange
+            $caught = $null
+
+            # Act
+            try {
+                Get-EpicPlanningRegisteredMcpTool -RegistryPath $script:MissingRegistryPath -SemanticIds @('drm-copilot.validate_orchestration_artifacts')
+            } catch {
+                $caught = $_
+            }
+
+            # Assert
+            $caught | Should -Not -BeNullOrEmpty -Because 'a missing registry must throw'
+            $caught.Exception.Message | Should -BeExactly "EPIC_PLANNING_ONLY_BLOCKED: semantic MCP registry '$script:MissingRegistryPath' does not exist."
+        }
+
+        It 'throws the exact invalid-operation message' {
+            # Arrange
+            $caught = $null
+
+            # Act
+            try {
+                Get-EpicPlanningRegisteredMcpTool -RegistryPath $script:InvalidOperationRegistryPath -SemanticIds @('drm-copilot.validate_orchestration_artifacts')
+            } catch {
+                $caught = $_
+            }
+
+            # Assert
+            $caught | Should -Not -BeNullOrEmpty -Because 'a registry entry with a mismatched operation must throw'
+            $caught.Exception.Message | Should -BeExactly "EPIC_PLANNING_ONLY_BLOCKED: semantic MCP id 'drm-copilot.validate_orchestration_artifacts' has an invalid operation."
+        }
+
+        It 'throws the exact invalid-transport-alias message' {
+            # Arrange
+            $caught = $null
+
+            # Act
+            try {
+                Get-EpicPlanningRegisteredMcpTool -RegistryPath $script:InvalidAliasRegistryPath -SemanticIds @('drm-copilot.validate_orchestration_artifacts')
+            } catch {
+                $caught = $_
+            }
+
+            # Assert
+            $caught | Should -Not -BeNullOrEmpty -Because 'a registry entry with a foreign transport alias must throw'
+            $caught.Exception.Message | Should -BeExactly "EPIC_PLANNING_ONLY_BLOCKED: semantic MCP id 'drm-copilot.validate_orchestration_artifacts' has an invalid transport alias."
+        }
+    }
 }

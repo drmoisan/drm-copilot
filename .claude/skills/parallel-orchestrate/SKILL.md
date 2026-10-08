@@ -262,6 +262,14 @@ Spawn parameters, passed on the `Agent` call and never written into the prompt t
 `isolation: "worktree"`, `run_in_background: true`, branch base `origin/main`, and `model` equal to
 that item's model routing receipt's resolved model.
 
+**Band and receipt source.** The parent reads each item's `complexity_band` and
+`model_routing_receipt` from the planner checkpoint `artifacts/orchestration/parallel-planner-state.json`.
+When the planner checkpoint is unavailable, the committed kickoff artifact's `## Item Summary`
+`complexity` column is the fallback band source. The parent passes `model` equal to the receipt's
+`model` when the run's `fable_policy` equals the receipt's `fable_policy`; otherwise it re-resolves
+with `Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>` and
+passes that result.
+
 Negative obligations on the prompt:
 
 - It never carries `Preparation mode: true`. Preparation fan-out belongs to `parallel-planner` and
@@ -276,6 +284,8 @@ Negative obligations on the prompt:
 
 Excluded from the prompt as parent-side concerns: the item's declared blast radius,
 `max_concurrency`, and `mode`. Keeping the prompt minimal preserves the child contract unchanged.
+
+The run gates `enforce-orchestration-preimplementation-gate.ps1`, `enforce-parallel-cohort-barrier.ps1`, and `enforce-parallel-drift-gate.ps1` locate the parallel checkpoint by the `parallel_slug:` value of the marker line. They select the single live worktree whose `artifacts/orchestration/parallel-orchestrator-state.json` records `route_id` `parallel` and that slug, and deny the delegation with `TARGET_WORKTREE_NOT_DERIVABLE` or `TARGET_WORKTREE_AMBIGUOUS` when none or more than one matches. The child run's own delegations to implementation agents carry the canonical issue-number line and `branch:` label defined in `.claude/skills/orchestrate/SKILL.md` `## Issue Number Consistency`.
 
 ## Model Selection
 
@@ -299,6 +309,15 @@ omitted `model` falls back to the delegate's frontmatter default, `opus`, which 
 `fable` resolution — and MUST NOT hard-code `model=opus` in a way that overrides the resolved
 routing model.
 
+The band and receipt for each item come from the planner checkpoint
+`artifacts/orchestration/parallel-planner-state.json`: the parent reads the item's `complexity_band`
+and `model_routing_receipt` there. When the planner checkpoint is unavailable, the committed kickoff
+artifact's `## Item Summary` `complexity` column is the fallback band source. The parent passes
+`model` equal to the receipt's `model` when the run's `fable_policy` equals the receipt's
+`fable_policy`; otherwise it re-resolves with
+`Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>` and
+passes that result.
+
 `route` is never an input to model selection. `route` remains file-count driven and governs only
 agents, skills, and MCP tools. A skill whose frontmatter `context` field holds the value `fork`
 inherits the parent model and ignores a model override, so model selection applies to agent
@@ -311,6 +330,12 @@ unchanged: `.claude/skills/orchestrate/SKILL.md` is **not modified by this featu
 `parallel_mode` clause in its step 9, no `parallel_merge` object in the child checkpoint, and no
 additional condition on the child's PR Creation Gate.
 
+Issue #744 later amended two parts of that child contract for CI-dependent acceptance criteria,
+whose verification requires the result of CI on the item's pull-request head: PR Creation Gate
+condition 2 and step S9 of `.claude/skills/orchestrate/SKILL.md`. The child checks those criteria
+off in its own worktree, pushes the check-off commit to its pull-request branch, and re-runs S9
+before DONE. The parent never commits acceptance-criteria check-offs from the coordinator root.
+
 Procedure, per item:
 
 1. The item's child orchestration runs unmodified, with `epic_mode` `false` or absent, and finishes
@@ -321,6 +346,11 @@ Procedure, per item:
    `gh pr view --json state,mergedAt,headRefOid`, and with `gh pr checks` when the check conclusion
    must be re-read — never from an in-memory completion notification — then record
    `merge_status: ci_green`.
+   Before recording `merge_status: ci_green`, confirm that the `headRefOid` value equals the
+   `ci_gate.head_sha` the child reported at DONE and that the child reported no pending
+   CI-dependent acceptance criteria. When either check fails, do not record
+   `merge_status: ci_green` and do not run `gh pr merge`; the item waits until its child pushes
+   the check-off and re-runs S9, and the parent does not commit the check-off itself.
 3. Execute `gh pr merge --merge <PR>` for that item's pull request, whose base is `main`.
 4. On success, record `merge_commit_sha`, `merged_at`, and `merge_status: merged`, then regenerate
    `docs/features/parallel/<slug>/parallel-status.md`.
@@ -415,8 +445,10 @@ the escalation path.
 2. The parent re-delegates that item's child orchestration. The child processes the finding through
    its unmodified R1 through R5 remediation loop exactly as it processes any local Blocking
    finding. No new remediation loop is introduced by this procedure.
-3. The child's `remediation_pass` counter is shared with its local-finding and CI-failure passes,
-   with the cap of 3, unmodified.
+3. Drift cycles share the child's `remediation_loop.completed_attempts` count with its
+   local-finding and CI-failure cycles, and the child halts after three completed attempts. The
+   active cycle number is `completed_attempts + 1`, and a cycle without an applied candidate
+   consumes no number.
 4. Each remediated pass ends again at child DONE with the pull request open and CI green, after
    which the parent retries the merge per `## Per-Item Merge to Main (Merge-on-Green)`. During
    remediation the item's `merge_status` legitimately remains `pr_open` or `ci_green`: the
@@ -565,6 +597,8 @@ hold:
    `artifact_type: "parallel-orchestrator-state"`.
 4. Each item's acceptance criteria have been checked off in that item's own acceptance-criteria
    source files by that item's own run, per the `acceptance-criteria-tracking` skill.
+   A CI-dependent criterion is checked off and pushed by that item's own run before its DONE, so
+   the head the parent merges already contains the check-off; the parent never commits it.
 
 In `open` mode there is no automatic completion. The run is a standing queue and terminates only via
 `/parallel-close`, which is owned by F6 and is neither specified nor shipped by this feature. Do not
@@ -1111,7 +1145,7 @@ R5 loop that drives the remediation preceding either write is **reused
 unmodified**: `atomic-planner` plans the resolution, `atomic-executor` performs preflight then
 resolves, `feature-review` re-audits, and the loop exits on zero blocking findings. No new
 remediation loop is authored, no line of the existing loop is modified, and the shared
-`remediation_pass` cap of 3 applies. `.claude/skills/orchestrate/SKILL.md` is not modified by this
+`remediation_loop.completed_attempts` count applies, with the halt after three completed attempts. `.claude/skills/orchestrate/SKILL.md` is not modified by this
 feature.
 
 #### Layer-1 Narrowing — a Documented Limitation

@@ -167,3 +167,37 @@ teardown() {
     run bash -c "cd '${FIXTURE_ROOT}' && bash '${WRAPPER}' test --bogus"
     [ "$status" -eq 2 ]
 }
+
+@test "test fails when a bats child sources a nounset library inside bash -c" {
+    # Issue #743: kcov traces every child bash through BASH_ENV with a PS4 that expands
+    # BASH_SOURCE, which is unset at the top level of bash -c. Once a sourced library
+    # enables nounset, the next traced command aborts. shell-qc.sh test reproduces that
+    # trace environment, so the stub's child fails here as it does under CI kcov.
+    run env SHELL_QC_BATS_BIN="${STUB_DIR}/bats-nounset-source" \
+        bash -c "cd '${FIXTURE_ROOT}' && bash '${WRAPPER}' test"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"nounset-stub ran: tests/shell"* ]]
+    [[ "$output" == *"BASH_SOURCE"* ]]
+}
+
+@test "test passes when a bats child resets nounset after sourcing" {
+    # Issue #743: the same library loaded through a function that clears nounset before
+    # returning passes under the trace environment, and no trace line reaches the output.
+    run env SHELL_QC_BATS_BIN="${STUB_DIR}/bats-nounset-source-reset" \
+        bash -c "cd '${FIXTURE_ROOT}' && bash '${WRAPPER}' test"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"nounset-reset-stub ran: tests/shell"* ]]
+    [[ "$output" != *"kcov@"* ]]
+}
+
+@test "kcov_trace_env.sh sets the kcov PS4 format" {
+    # Issue #743: the trace environment must use kcov v43's PS4 byte for byte, so the
+    # simulation fails only tests that also fail under real kcov. The child's stderr, which
+    # carries its own xtrace output, is discarded; PS4 is printed on stdout. The file is
+    # also executed once as a script, so kcov records both of its lines in script form.
+    run bash "${REPO_ROOT}/scripts/bash/kcov_trace_env.sh"
+    [ "$status" -eq 0 ]
+    run bash -c 'exec 2>/dev/null; source "$1"; set +x; printf "%s\n" "$PS4"' _ "${REPO_ROOT}/scripts/bash/kcov_trace_env.sh"
+    [ "$status" -eq 0 ]
+    [ "$output" = 'kcov@${BASH_SOURCE}@${LINENO}@' ]
+}

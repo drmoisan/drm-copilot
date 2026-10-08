@@ -29,7 +29,7 @@ Apply these priorities in order when designing or changing code:
 
 ## Module Rigor Tiers
 
-Module rigor tiers (T1–T4) and the uniform-versus-tier-dependent gate matrix are defined in `.agents/skills/quality-tiers.md`. Every project must be classified in `quality-tiers.yml` at repo root.
+Module rigor tiers (T1–T4) and the uniform-versus-tier-dependent gate matrix are defined in `.agents/skills/quality-tiers/SKILL.md` and apply only when `quality-tiers.yml` exists at the repository root; in that case every project must be classified in it. A repository without `quality-tiers.yml` has not adopted tiers, and the tier requirements do not apply.
 
 ## Mandatory Toolchain Loop
 

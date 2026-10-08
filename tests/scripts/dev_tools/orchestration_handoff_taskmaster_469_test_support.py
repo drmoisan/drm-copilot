@@ -107,15 +107,22 @@ def load_fixture(case: FixtureCase) -> dict[str, object]:
     return mapping(parsed, "fixture")
 
 
-def fixture_bytes(case: FixtureCase, fixture: dict[str, object]) -> tuple[bytes, bytes]:
-    """Read the immutable source checkpoint and pinned plan bytes."""
+def fixture_paths(case: FixtureCase, fixture: dict[str, object]) -> tuple[Path, Path]:
+    """Return the immutable source checkpoint and pinned plan fixture paths."""
 
     source = mapping(fixture["source_checkpoint"], "source_checkpoint")
     plan = mapping(fixture["plan"], "plan")
     return (
-        (case.root / _text(source["file"], "source_checkpoint.file")).read_bytes(),
-        (case.root / _text(plan["file"], "plan.file")).read_bytes(),
+        case.root / _text(source["file"], "source_checkpoint.file"),
+        case.root / _text(plan["file"], "plan.file"),
     )
+
+
+def fixture_bytes(case: FixtureCase, fixture: dict[str, object]) -> tuple[bytes, bytes]:
+    """Read the immutable source checkpoint and pinned plan bytes."""
+
+    source_path, plan_path = fixture_paths(case, fixture)
+    return (source_path.read_bytes(), plan_path.read_bytes())
 
 
 def _receipt_references(source: dict[str, object]) -> tuple[ReceiptReference, ...]:

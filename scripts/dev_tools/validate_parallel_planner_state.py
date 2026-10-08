@@ -4,8 +4,11 @@ Purpose:
     Enforce the repository contract for
     ``artifacts/orchestration/parallel-planner-state.json`` -- spec invariants
     P1 through P4 unconditionally and the structural readiness gate P6 through
-    P9 only under ``require_ready_for_execution`` -- before a prepared parallel
-    run is handed to the orchestrator surface.
+    P10 only under ``require_ready_for_execution`` -- before a prepared parallel
+    run is handed to the orchestrator surface. Invariant P10 requires every
+    item to carry a valid ``complexity_band``, ``complexity_assessment``, and
+    ``model_routing_receipt``; it is enforced by
+    ``scripts/dev_tools/_parallel_planner_state_routing.py``.
 
 Flow:
     Parse the checkpoint JSON, reject a non-object root, check the S3
@@ -39,6 +42,9 @@ from __future__ import annotations
 import json
 from typing import cast
 
+from scripts.dev_tools._parallel_planner_state_routing import (
+    validate_ready_item_routing,
+)
 from scripts.dev_tools._parallel_state_common import (
     VALID_MODES,
     enum_error,
@@ -235,8 +241,9 @@ def _validate_item_contract(items: object) -> list[str]:
             if key not in record
         )
         band = record.get("complexity_band")
-        # The band is optional: absence is the backward-compatible shape, so
-        # the enum check is presence-gated rather than requirement-gated.
+        # The band is optional only outside the ready gate: invariant P10 requires
+        # it under require_ready_for_execution, so this enum check stays
+        # presence-gated rather than requirement-gated.
         if "complexity_band" in record and band not in VALID_COMPLEXITY_BANDS:
             errors.append(
                 enum_error(
@@ -352,18 +359,20 @@ def _validate_ready_item(record: dict[str, object], entry_context: str) -> list[
 
 
 def _validate_ready_gate(state: dict[str, object]) -> list[str]:
-    """Enforce the structural readiness gate (invariants P6 through P9).
+    """Enforce the structural readiness gate (invariants P6 through P10).
 
     The gate is structural only. It checks cardinality, per-item preparation,
-    the sentinel, and the kickoff PATH; it never opens the kickoff document and
-    never consults a repository. Those checks belong to F4.
+    the per-item routing record (P10), the sentinel, and the kickoff PATH; it
+    never opens the kickoff document and never consults a repository. Those
+    checks belong to F4.
 
     Args:
         state (dict[str, object]): The parsed checkpoint object.
 
     Returns:
-        list[str]: The cardinality error, then per-item readiness errors in
-        positional order, then the sentinel error, then the kickoff-path error.
+        list[str]: The cardinality error, then per-item errors in positional
+        order (each item's P7 errors followed by its P10 errors), then the
+        sentinel error, then the kickoff-path error.
 
     Raises:
         None.
@@ -385,7 +394,10 @@ def _validate_ready_gate(state: dict[str, object]) -> list[str]:
                 f"execution readiness; found: {count}."
             )
         for index, record in _item_records(entries):
-            errors.extend(_validate_ready_item(record, item_context(CONTEXT, index)))
+            entry_context = item_context(CONTEXT, index)
+            # P10 follows P7 for the same item, so P7 ordering is unchanged.
+            errors.extend(_validate_ready_item(record, entry_context))
+            errors.extend(validate_ready_item_routing(record, entry_context))
 
     next_step = state.get("next_step")
     if next_step != READY_NEXT_STEP:
@@ -411,7 +423,7 @@ def validate_parallel_planner_state_text(
     Args:
         text (str): Raw checkpoint JSON text.
         require_ready_for_execution (bool): When True, additionally enforce the
-            structural readiness gate (invariants P6 through P9). When False
+            structural readiness gate (invariants P6 through P10). When False
             the gate contributes no errors, so a checkpoint written mid-
             preparation validates.
 

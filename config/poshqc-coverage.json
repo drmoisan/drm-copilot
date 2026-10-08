@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "roots": [
+    ".claude/hooks",
+    ".claude/lib",
+    ".codex/hooks",
+    ".codex/scripts",
+    "scripts"
+  ]
+}
