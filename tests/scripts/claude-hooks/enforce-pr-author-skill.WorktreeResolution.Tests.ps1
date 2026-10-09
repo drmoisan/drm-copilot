@@ -15,17 +15,17 @@
     to state a resolution outcome directly.
 
     Every row runs inside a committed fixture root through Invoke-WorktreeResolutionFixtureCall
-    with an explicit working directory. That is required rather than tidy: the gate reads
-    artifacts/pr_body_<N>.receipt.json, artifacts/pr_body_<N>.md, and the last-write time of
-    artifacts/pr_context.summary.txt relative to the process directory, so a row that left
-    the directory to the executing process would pass in a development worktree holding a
-    root-level artifacts/ tree and fail on a clean checkout, before reaching its subject.
+    with an explicit working directory. The gate reads artifacts/pr_body_<N>.receipt.json,
+    artifacts/pr_body_<N>.md, and the last-write time of artifacts/pr_context.summary.txt
+    beneath the resolved worktree (issue #850); working directories remain explicit so that no
+    row depends on a root-level artifacts/ tree in the executing worktree.
 
-    No row mocks Get-PrContextArtifactExistence, Get-PrAuthorReceiptContent,
-    Get-PrBodyFileBytes, or Get-PrContextSummaryLastWriteUtc, and no row supplies the
-    context-existence flag to the bypass-reason function directly. The committed fixtures
-    remove the need, and entering through the production entrypoint is what exercises the
-    Case C branch rather than bypassing it.
+    Rows whose subject is the orchestrator-state preflight mock only the summary-existence
+    seam Get-PrContextArtifactExistence, because their resolved worktree holds no summary. No
+    row mocks Get-PrAuthorReceiptContent, Get-PrBodyFileBytes, or
+    Get-PrContextSummaryLastWriteUtc, and no row supplies the context-existence flag to the
+    bypass-reason function directly; entering through the production entrypoint is what
+    exercises the Case C branch rather than bypassing it.
 
 .NOTES
     Schema coupling: the four pr-author fixture checkpoints must keep satisfying
@@ -61,10 +61,10 @@ BeforeAll {
     $script:InvalidJson = Get-WorktreeResolutionFixturePath 'shared/item-own-invalid-json'
     $script:EmptyCheckpoint = Get-WorktreeResolutionFixturePath 'shared/item-own-empty'
     $script:NoCheckpoint = Get-WorktreeResolutionFixturePath 'shared/item-no-checkpoint'
-    $script:CaptureRoot = ([System.IO.Path]::GetPathRoot($PSScriptRoot) + 'f5-seam-root/capture').Replace([string][char]92, '/')
 
     $script:BodyCommand = 'gh pr create --title "B" --body-file artifacts/pr_body_1.md'
     $script:OwnBranchCommand = 'gh pr create --head f5-fixture-own --title "B" --body-file artifacts/pr_body_1.md'
+    $script:OwnReadyBodyCommand = "gh pr create --head f5-fixture-own --title ""B"" --body-file $($script:OwnReady)/artifacts/pr_body_1.md"
 
     # Return a Bash PreToolUse payload carrying one command string.
     function New-BashPayload {
@@ -106,7 +106,7 @@ Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
     It 'pr-author R1 allows when the resolved own checkpoint is ready and the working directory is the sibling session root' {
         # Arrange: the seam resolves to the own ready worktree while the row runs in the sibling.
         Set-ResolvedSeam -Status 'OtherWorktree' -WorktreeRoot $script:OwnReady
-        $payload = New-BashPayload -Command $script:OwnBranchCommand
+        $payload = New-BashPayload -Command $script:OwnReadyBodyCommand
 
         # Act
         $decision = Invoke-WorktreeResolutionFixtureCall -WorkingDirectory $script:SessionRootDir -ScriptBlock {
@@ -120,7 +120,7 @@ Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
     It 'pr-author R1 allows when the branch locates the own ready checkpoint from the sibling session root' {
         # Arrange: identity only. The branch is live in the own ready worktree alone.
         Set-LiveTopology -Live @($script:SessionRootDir, $script:OwnReady) -BranchRoot @($script:OwnReady)
-        $payload = New-BashPayload -Command $script:OwnBranchCommand
+        $payload = New-BashPayload -Command $script:OwnReadyBodyCommand
 
         # Act
         $decision = Invoke-WorktreeResolutionFixtureCall -WorkingDirectory $script:SessionRootDir -ScriptBlock {
@@ -148,6 +148,7 @@ Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
 
     It 'pr-author R3 denies with the preflight reason when the resolved own checkpoint is not ready' {
         # Arrange: the branch resolves to a worktree whose own checkpoint is not PR-ready.
+        Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
         Set-LiveTopology -Live @($script:OwnNotReady) -BranchRoot @($script:OwnNotReady)
         $payload = New-BashPayload -Command $script:OwnBranchCommand
 
@@ -179,6 +180,7 @@ Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
     It 'pr-author R4 takes the preflight verdict from the own checkpoint located by branch when the sibling checkpoint is ready' {
         # Arrange: both checkpoints are live. The sibling is ready; the branch names the one
         # that is not, so a verdict taken from the sibling would wrongly allow.
+        Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
         Set-LiveTopology -Live @($script:SessionRootDir, $script:OwnNotReady) -BranchRoot @($script:OwnNotReady)
         $payload = New-BashPayload -Command $script:OwnBranchCommand
 
@@ -195,11 +197,12 @@ Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
     It 'pr-author R4 takes the epic base-branch verdict from the own checkpoint when own and sibling checkpoints are both present' {
         # Arrange: the working directory is stated rather than defaulted, because this row is
         # the direct fail-before evidence for the epic base-branch binding and is the one row
-        # that must traverse checks 1 to 5 to reach check 6. The resolved worktree carries no
-        # artifact files, so the receipt, body, and context bytes come from the working
-        # directory while the epic verdict comes from the resolved checkpoint.
+        # that must traverse checks 1 to 5 to reach check 6. The receipt, body, and context
+        # bytes are read beneath the resolved epic-mode worktree, which carries byte-identical
+        # copies of the item-own-ready artifact files (issue #850, fixture copies D10), and the
+        # epic verdict comes from that worktree's checkpoint.
         Set-ResolvedSeam -Status 'OtherWorktree' -WorktreeRoot $script:OwnEpicMode
-        $payload = New-BashPayload -Command 'gh pr create --head f5-fixture-own --base main --title "B" --body-file artifacts/pr_body_1.md'
+        $payload = New-BashPayload -Command "gh pr create --head f5-fixture-own --base main --title ""B"" --body-file $($script:OwnEpicMode)/artifacts/pr_body_1.md"
 
         # Act
         $decision = Invoke-WorktreeResolutionFixtureCall -WorkingDirectory $script:SessionRootDir -ScriptBlock {
@@ -248,6 +251,7 @@ Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
 
     It 'pr-author R7 denies with the preflight reason when the resolved checkpoint is unparseable' {
         # Arrange: the branch resolves to a worktree whose checkpoint is not valid JSON.
+        Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
         Set-LiveTopology -Live @($script:InvalidJson) -BranchRoot @($script:InvalidJson)
         $payload = New-BashPayload -Command $script:OwnBranchCommand
 
@@ -263,6 +267,7 @@ Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
 
     It 'pr-author R7 denies with the preflight reason when the resolved checkpoint is empty' {
         # Arrange: the branch resolves to a worktree whose checkpoint is zero bytes.
+        Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
         Set-LiveTopology -Live @($script:EmptyCheckpoint) -BranchRoot @($script:EmptyCheckpoint)
         $payload = New-BashPayload -Command $script:OwnBranchCommand
 
@@ -323,6 +328,7 @@ Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
 
     It 'pr-author genuine-absence and target-resolution reason codes never appear in each other''s decisions' {
         # Arrange: one deny per family, produced by the gate rather than asserted as text.
+        Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
         Set-LiveTopology -Live @($script:OwnNotReady) -BranchRoot @($script:OwnNotReady)
         $withIdentity = New-BashPayload -Command $script:OwnBranchCommand
         $withoutIdentity = New-BashPayload -Command $script:BodyCommand
@@ -371,7 +377,7 @@ Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
     It 'pr-author passes one resolved checkpoint path to both the preflight and the epic base-branch check' {
         # Arrange: both readers capture the path they were given, so the row proves the two
         # checks agree rather than merely that each succeeded.
-        Set-ResolvedSeam -Status 'OtherWorktree' -WorktreeRoot $script:CaptureRoot
+        Set-ResolvedSeam -Status 'OtherWorktree' -WorktreeRoot $script:OwnReady
         $script:CapturedPreflightPath = $null
         $script:CapturedEpicPath = $null
         Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith {
@@ -384,7 +390,7 @@ Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
             $script:CapturedEpicPath = $CheckpointPath
             return $null
         }
-        $payload = New-BashPayload -Command $script:OwnBranchCommand
+        $payload = New-BashPayload -Command $script:OwnReadyBodyCommand
 
         # Act
         $null = Invoke-WorktreeResolutionFixtureCall -WorkingDirectory $script:SessionRootDir -ScriptBlock {
@@ -392,7 +398,7 @@ Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
         }
 
         # Assert: one resolved absolute path reaches both readers.
-        $expected = "$($script:CaptureRoot)/artifacts/orchestration/orchestrator-state.json"
+        $expected = "$($script:OwnReady)/artifacts/orchestration/orchestrator-state.json"
         $script:CapturedPreflightPath | Should -Be $expected
         $script:CapturedEpicPath | Should -Be $expected
     }

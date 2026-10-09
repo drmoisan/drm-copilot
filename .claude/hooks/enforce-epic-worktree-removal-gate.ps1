@@ -55,6 +55,10 @@
     enforce-epic-worktree-removal-gate-resolution.ps1. An ambiguous target denies before
     any allow; when neither kind resolves, the deny names TARGET_WORKTREE_NOT_DERIVABLE.
 
+    Issues #789 and #851: the final deny carries one leading EPIC_WORKTREE_REMOVAL_BLOCKED
+    token and ends with a diagnostics clause naming each run kind's status, checkpoint
+    path, and matched record; the allow-or-deny decision is unchanged.
+
 .NOTES
     Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 through the
     dot-sourced resolution sibling, whose import guard denies on a failed import.
@@ -391,11 +395,14 @@ function Get-EpicWorktreeRemovalTargetDenial {
     }
 
     # When neither kind resolved, the deny names the resolution reason first (issue #690).
+    # The gate token leads once and a diagnostics clause for this target closes the text
+    # (issues #789, #851).
     $prefix = ''
     if ($epicRead.Target.Status -eq 'NoTarget' -and $parallelRead.Target.Status -eq 'NoTarget') {
-        $prefix = "EPIC_WORKTREE_REMOVAL_BLOCKED: $($epicRead.Target.ReasonCode): $($epicRead.Target.Detail). "
+        $prefix = "$($epicRead.Target.ReasonCode): $($epicRead.Target.Detail). "
     }
-    return Get-EpicWorktreeGateBlockDecision -Reason ($prefix + "EPIC_WORKTREE_REMOVAL_BLOCKED: git worktree remove for '$worktreePath' requires either an epic checkpoint features[] record with merge_status in {merged, worktree_removed}, or a parallel-orchestrator checkpoint with route_id == ""parallel"" whose matching items[] record (matched by worktree_path) has merge_status in {merged, worktree_removed}. No checkpoint authorized this removal.")
+    $diagnostics = Get-EpicWorktreeGateDenyDiagnostics -EpicRead $epicRead -ParallelRead $parallelRead -WorktreePath $worktreePath
+    return Get-EpicWorktreeGateBlockDecision -Reason ('EPIC_WORKTREE_REMOVAL_BLOCKED: ' + $prefix + "git worktree remove for '$worktreePath' requires either an epic checkpoint features[] record with merge_status in {merged, worktree_removed}, or a parallel-orchestrator checkpoint with route_id == ""parallel"" whose matching items[] record (matched by worktree_path) has merge_status in {merged, worktree_removed}. No checkpoint authorized this removal. " + $diagnostics)
 }
 
 function Invoke-EpicWorktreeRemovalGateEntryPoint {

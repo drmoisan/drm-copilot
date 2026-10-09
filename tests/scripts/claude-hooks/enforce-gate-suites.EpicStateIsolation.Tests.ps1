@@ -6,13 +6,13 @@
     Epic-state isolation guard for the gate-1, gate-3, and gate-4 hook suites (issues #709, #690).
 
 .DESCRIPTION
-    Eight hook suites reach Resolve-EpicScopeCheckpoint in
+    Nine hook suites reach Resolve-EpicScopeCheckpoint in
     .claude/lib/worktree-resolution/EpicScopeResolution.psm1 through the hooks they load, and
     that resolver now locates the epic checkpoint through WorktreeRunResolution.psm1. Unmocked,
     either module reads a gitignored run checkpoint, so leftover local state could change their
     results on a developer machine.
 
-    The structural guard parses each of the eight committed suites and requires, inside the
+    The structural guard parses each of the nine committed suites and requires, inside the
     suite's outermost BeforeAll, the hook dot-source, then an Import-Module of
     EpicScopeResolution.psm1 without -Force followed by a $null Mock of
     Get-EpicScopeCheckpointText in module scope EpicScopeResolution, and an Import-Module of
@@ -44,6 +44,7 @@ Describe 'gate suites isolate the epic checkpoint read (structural guard)' {
         @{ Path = 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1' }
         @{ Path = 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-absolute-paths.Tests.ps1' }
         @{ Path = 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.OperandResolution.Tests.ps1' }
+        @{ Path = 'tests/scripts/claude-hooks/enforce-pr-author-skill.ItemArtifactRoot.Tests.ps1' }
     ) {
         # Arrange and act: parse the committed suite.
         $findings = @(Get-EpicStateIsolationSuiteFinding -RepoRoot $script:RepoRoot -RelativePath $Path)
