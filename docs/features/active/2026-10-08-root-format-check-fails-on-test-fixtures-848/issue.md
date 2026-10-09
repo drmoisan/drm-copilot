@@ -34,10 +34,10 @@ The root `npm run format:check` exits 2 on main because Prettier's `tests/**/*.{
 
 ## Acceptance Criteria
 
-- [ ] AC-1: From the repository root, `npm run format:check` exits 0 on the branch head.
-- [ ] AC-2: Prettier excludes `tests/fixtures/` for both the root `format` and `format:check` scripts, so no file under `tests/fixtures/` is reported, parsed, or rewritten by either script.
-- [ ] AC-3: No file under `tests/fixtures/` is modified by the change; in particular `tests/fixtures/worktree-resolution/shared/item-own-invalid-json/artifacts/orchestration/orchestrator-state.json` remains byte-identical and invalid JSON.
-- [ ] AC-4: The Pester suites that consume the invalid fixture (`tests/scripts/claude-hooks/enforce-model-routing-receipt.WorktreeResolution.Tests.ps1` and `tests/scripts/claude-hooks/enforce-pr-author-skill.WorktreeResolution.Tests.ps1`) pass unchanged after the change.
+- [x] AC-1: From the repository root, `npm run format:check` exits 0 on the branch head.
+- [x] AC-2: Prettier excludes `tests/fixtures/` for both the root `format` and `format:check` scripts, so no file under `tests/fixtures/` is reported, parsed, or rewritten by either script.
+- [x] AC-3: No file under `tests/fixtures/` is modified by the change; in particular `tests/fixtures/worktree-resolution/shared/item-own-invalid-json/artifacts/orchestration/orchestrator-state.json` remains byte-identical and invalid JSON.
+- [x] AC-4: The Pester suites that consume the invalid fixture (`tests/scripts/claude-hooks/enforce-model-routing-receipt.WorktreeResolution.Tests.ps1` and `tests/scripts/claude-hooks/enforce-pr-author-skill.WorktreeResolution.Tests.ps1`) pass unchanged after the change.
 
 Scope note (orchestrator, 2026-10-09): adding the root `format:check` to a CI workflow is listed in this issue as a consideration ("consider adding"), not an expected behavior, and is out of scope for this fix. The acceptance criteria above were authored by the orchestrator from the Expected Behavior and Proposed Fix sections because the promoted record carried no explicit `## Acceptance Criteria` section.
 
