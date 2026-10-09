@@ -52,6 +52,7 @@
     ".claude/hooks/enforce-prd-feature-before-planner-helpers.ps1",
     ".claude/hooks/enforce-prd-feature-before-planner.ps1",
     ".claude/hooks/enforce-promotion-mcp-only.ps1",
+    ".claude/hooks/feature-folder-resolution.ps1",
     ".claude/hooks/hook-command-invocation.ps1",
     ".claude/hooks/hook-command-scanner.ps1",
     ".claude/hooks/persist-session-id.ps1",

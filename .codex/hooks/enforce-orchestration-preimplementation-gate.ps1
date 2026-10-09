@@ -424,11 +424,13 @@ function Invoke-OrchestrationPreimplementationGateDecision {
             $modeCheckpoint = ConvertFrom-CheckpointJson -Json ([string]$modeRaw)
         } catch { $modeCheckpoint = $null }
         $folder = Find-OrchestrationDelegationTargetFolder -Prompt $prompt
-        $issue = Find-OrchestrationDelegationIssueNumber -Prompt $prompt
+        # Only the keyed issue number breaks a tie among cited folders (#565 CR-1); the bare hash form feeds the D3 record lookup only.
+        $issue = Find-OrchestrationDelegationIssueNumber -Prompt $prompt -KeyedOnly
+        $fallbackIssue = Find-OrchestrationDelegationIssueNumber -Prompt $prompt
         $failure = if ($isEpic) {
-            Get-EpicOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue
+            Get-EpicOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue -FallbackIssueNumber $fallbackIssue
         } else {
-            Get-ParallelOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue
+            Get-ParallelOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue -FallbackIssueNumber $fallbackIssue
         }
         if (-not $failure) { return Get-OrchestrationPreimplementationGateAllowDecision }
         return Get-OrchestrationPreimplementationGateBlockDecision -Reason (
