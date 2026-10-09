@@ -17,17 +17,17 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 - `max_concurrency`: 4
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-09T06:47:00Z
-- `next_step`: launch_batch_1
+- `last_updated`: 2026-10-09T06:49:01Z
+- `next_step`: monitor_batch1
 
 **Items**
 
 | issue_num | feature_folder | cohort_index | state | merge_status | pr_url | merge_commit_sha | worktree_created_at | merged_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 794 | docs/features/active/2026-09-30-parallel-cohorts-split-words-drops-tokens-after-first-newline-794 | 0 | prepared | not_started | - | - | - | - | - |
-| 797 | docs/features/active/2026-09-30-blast-radius-path-extractor-misses-real-plan-writes-797 | 0 | prepared | not_started | - | - | - | - | - |
-| 798 | docs/features/active/2026-09-30-orchestration-validator-last-updated-undocumented-and-file-path-invocation-fails-798 | 0 | prepared | not_started | - | - | - | - | - |
-| 844 | docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844 | 0 | prepared | not_started | - | - | - | - | - |
+| 794 | docs/features/active/2026-09-30-parallel-cohorts-split-words-drops-tokens-after-first-newline-794 | 0 | in_flight | worktree_created | - | - | 2026-10-09T06:48:10Z | - | - |
+| 797 | docs/features/active/2026-09-30-blast-radius-path-extractor-misses-real-plan-writes-797 | 0 | in_flight | worktree_created | - | - | 2026-10-09T06:48:10Z | - | - |
+| 798 | docs/features/active/2026-09-30-orchestration-validator-last-updated-undocumented-and-file-path-invocation-fails-798 | 0 | in_flight | worktree_created | - | - | 2026-10-09T06:48:10Z | - | - |
+| 844 | docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844 | 0 | in_flight | worktree_created | - | - | 2026-10-09T06:48:10Z | - | - |
 | 847 | docs/features/active/2026-10-08-powershell-aggregate-line-coverage-below-floor-847 | 0 | prepared | not_started | - | - | - | - | - |
 | 848 | docs/features/active/2026-10-08-root-format-check-fails-on-test-fixtures-848 | 0 | prepared | not_started | - | - | - | - | - |
 | 793 | docs/features/active/2026-09-30-epic-orchestrator-state-validator-crashes-on-unhashable-merge-status-793 | 1 | prepared | not_started | - | - | - | - | - |
