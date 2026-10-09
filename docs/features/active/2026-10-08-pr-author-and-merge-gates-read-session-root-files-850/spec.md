@@ -245,8 +245,8 @@ Each criterion is verified by the named Pester or parity test. The research reco
 
 ### #789 CR-4 UNC path comparison
 
-- [ ] UNC worktree paths recorded with different casing (`//Server/Share/x` and `//server/share/X`) resolve `OtherWorktree` through `Resolve-WorktreeRunTargetByRecord -RecordField worktree_path`. Verified by `WorktreeRunResolution.Record.Tests.ps1`, new row B14 "compares UNC paths case-insensitively".
-- [ ] Drive-letter comparison stays case-insensitive and single-slash-rooted POSIX comparison stays case-sensitive, and the module export set is unchanged. Verified by `WorktreeRunResolution.Record.Tests.ps1`, rows B11, B12, and X1.
+- [x] UNC worktree paths recorded with different casing (`//Server/Share/x` and `//server/share/X`) resolve `OtherWorktree` through `Resolve-WorktreeRunTargetByRecord -RecordField worktree_path`. Verified by `WorktreeRunResolution.Record.Tests.ps1`, new row B14 "compares UNC paths case-insensitively".
+- [x] Drive-letter comparison stays case-insensitive and single-slash-rooted POSIX comparison stays case-sensitive, and the module export set is unchanged. Verified by `WorktreeRunResolution.Record.Tests.ps1`, rows B11, B12, and X1.
 
 ### #789 CR-5 single deny token (parallel and epic removal gates)
 
