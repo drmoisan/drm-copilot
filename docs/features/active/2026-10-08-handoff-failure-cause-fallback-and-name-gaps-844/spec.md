@@ -211,7 +211,7 @@ Additional rows in existing files:
 - [x] AC-15: `npm run lint` run from `extensions/drm-copilot` exits 0 with no errors.
 - [x] AC-16: `npm run typecheck` run from `extensions/drm-copilot` exits 0 with no diagnostics. This includes `typecheck:test` over `test/**/*.ts`.
 - [x] AC-17: `npm run test:coverage` run from `extensions/drm-copilot` exits 0 with all suites passing. The per-file thresholds (lines >= 85%, branches >= 75%) hold for each of the four touched production files under `extensions/drm-copilot/src/lib/validate/`: `orchestration-handoff-authority-service.ts`, `orchestration-handoff-materializer.ts`, `orchestration-handoff-materializer-production.ts`, and `orchestration-handoff-materializer-request.ts`. No changed line in those files is uncovered.
-- [ ] AC-18: The branch diff against `main` contains no change to `extensions/drm-copilot/test/subagent-tree-command.test.ts`, `extensions/drm-copilot/src/lib/validate/orchestration-handoff-contract.ts`, `CHANGELOG.md`, MCP input schemas, the envelope schema, or fixtures. The PR body contains a closing keyword for #844 and references #846 without a closing keyword.
+- [x] AC-18: The branch diff against `main` contains no change to `extensions/drm-copilot/test/subagent-tree-command.test.ts`, `extensions/drm-copilot/src/lib/validate/orchestration-handoff-contract.ts`, `CHANGELOG.md`, MCP input schemas, the envelope schema, or fixtures. The PR body contains a closing keyword for #844 and references #846 without a closing keyword.
 
 ## Assumptions
 
