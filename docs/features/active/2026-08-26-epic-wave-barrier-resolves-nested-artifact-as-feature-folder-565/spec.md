@@ -299,7 +299,7 @@ Known local false failure: `test_push_down_claude_resource_contracts.py` can fai
 - [x] Every new or changed file under `.claude/hooks/` has a bundled mirror under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/` with an equal SHA256 hash.
 - [x] Every new or changed file under `.codex/hooks/` has a bundled mirror under `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/` with an equal SHA256 hash.
 - [x] Both `pack-manifests/core.json` files list `feature-folder-resolution.ps1`, and `$script:SharedModuleNames` in `legacy-codex-hook-contracts.Tests.ps1` includes it.
-- [ ] `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py`, `test_codex_core_manifest_closure.py`, `codex-epic-runtime-contracts.Tests.ps1`, and `legacy-codex-hook-contracts.Tests.ps1` pass in CI on the pull request.
+- [x] `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py`, `test_codex_core_manifest_closure.py`, `codex-epic-runtime-contracts.Tests.ps1`, and `legacy-codex-hook-contracts.Tests.ps1` pass in CI on the pull request.
 
 ### Size, coverage, purity, and toolchain
 
