@@ -483,53 +483,266 @@ items:
       source: "declared"
       computed_at: "10/08/2026 22:48:52"
   - issue_num: 824
-    feature_folder: "issue-823-tier-rule-adoption-follow-ups"
+    feature_folder: "docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824"
     kind: "bug"
-    state: "proposed"
+    state: "prepared"
     blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "10/08/2026 17:51:45"
+      paths:
+        - ".agents/skills/architecture-boundaries/SKILL.md"
+        - ".agents/skills/csharp-qa-gate/SKILL.md"
+        - ".agents/skills/csharp/SKILL.md"
+        - ".agents/skills/general-unit-test/SKILL.md"
+        - ".agents/skills/quality-tiers/SKILL.md"
+        - ".claude/agents/atomic-executor.md"
+        - ".claude/agents/feature-review.md"
+        - ".claude/hooks/enforce-epic-worktree-removal-gate.ps1"
+        - ".claude/hooks/enforce-parallel-worktree-removal-gate.ps1"
+        - ".claude/hooks/enforce-powershell-batch-budget.ps1"
+        - ".claude/hooks/enforce-promotion-mcp-only.ps1"
+        - ".claude/hooks/enforce-python-batch-budget.ps1"
+        - ".claude/hooks/feature-review-coverage-thresholds.ps1"
+        - ".claude/hooks/hook-command-invocation.ps1"
+        - ".claude/hooks/hook-command-raw-invocation.ps1"
+        - ".claude/hooks/validate-feature-review-coverage.ps1"
+        - ".claude/rules/architecture-boundaries.md"
+        - ".claude/rules/general-unit-test.md"
+        - ".claude/rules/quality-tiers.md"
+        - ".claude/skills/feature-review-workflow/SKILL.md"
+        - ".claude/skills/quota-throttling/SKILL.md"
+        - ".codex/agents/feature-review.toml"
+        - ".codex/codex-web-setup.sh"
+        - ".codex/hooks/validate-feature-review-coverage.ps1"
+        - ".github/agents/csharp-typed-engineer.agent.md"
+        - ".github/codex/codex-web-setup.sh"
+        - ".github/instructions/csharp-code-change.instructions.md"
+        - ".github/instructions/csharp-unit-test.instructions.md"
+        - ".github/skills/feature-review-workflow/SKILL.md"
+        - ".github/workflows/_shell-coverage.yml"
+        - "config/poshqc-coverage.json"
+        - "docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/**"
+        - "docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/issue.md"
+        - "docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/plan.2026-10-08T22-16.md"
+        - "docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/research/2026-10-09T02-25-issue-823-tier-rule-adoption-follow-ups-research.md"
+        - "docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md"
+        - "docs/features/potential/2026-10-03-issue-823-tier-rule-adoption-follow-ups.md"
+        - "extensions/drm-copilot/package.json"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/feature-review-coverage-thresholds.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/rules/architecture-boundaries.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-unit-test.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/rules/quality-tiers.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/quota-throttling/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/architecture-boundaries/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp-qa-gate/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/general-unit-test/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/quality-tiers/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json"
+        - "extensions/drm-copilot/resources/customizations/.github/agents/csharp-typed-engineer.agent.md"
+        - "extensions/drm-copilot/resources/customizations/.github/instructions/csharp-code-change.instructions.md"
+        - "extensions/drm-copilot/resources/customizations/.github/instructions/csharp-unit-test.instructions.md"
+        - "extensions/drm-copilot/test/lib/push-down/claude-pack-manifest-completeness.test.ts"
+        - "scripts/dev-tools/KcovFunctionCoverageGate.ps1"
+        - "scripts/powershell/PoshQC/PoshQC.Analyzer.psm1"
+        - "scripts/powershell/PoshQC/PoshQC.Testing.psm1"
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+        - "tests/fixtures/codex_web_setup/populated-packages/packages/placeholder.txt"
+        - "tests/scripts/claude-hooks/feature-review-coverage-thresholds.Tests.ps1"
+        - "tests/scripts/claude-hooks/validate-feature-review-coverage.Issue824.Tests.ps1"
+        - "tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1"
+        - "tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1"
+        - "tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py"
+        - "tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py"
+        - "tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py"
+        - "tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py"
+        - "tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py"
+        - "tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py"
+        - "tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1"
+        - "tests/scripts/workflows/ShellCoverageWorkflow.Tests.ps1"
+        - "tests/shell/test_codex_web_setup_codex_copy.bats"
+      modules:
+        - "codex-runtime"
+        - "config"
+        - "poshqc"
+        - "powershell-dev-tools"
+      shared_surfaces:
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+      contracts:
+        - "<solution>.sln"
+        - "CLAUDE.md"
+      source: "declared"
+      computed_at: "10/09/2026 03:39:48"
   - issue_num: 841
-    feature_folder: "ci-gate-vacuous-on-empty-check-list"
+    feature_folder: "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841"
     kind: "bug"
-    state: "proposed"
+    state: "prepared"
     blast_radius:
-      paths: []
+      paths:
+        - ".agents/skills/feature-review-workflow/SKILL.md"
+        - ".claude/agents/epic-orchestrator.md"
+        - ".claude/agents/orchestrator.md"
+        - ".claude/lib/ci-gate/Invoke-CiGateParser.ps1"
+        - ".claude/skills/epic-orchestrate/SKILL.md"
+        - ".claude/skills/feature-review-workflow/SKILL.md"
+        - ".claude/skills/orchestrate/SKILL.md"
+        - ".claude/skills/orchestrate/SKILL.md:342"
+        - ".github/skills/feature-review-workflow/SKILL.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/**"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/branch-state.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/line-counts.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/mirror-hashes.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/pester-ci-gate-coverage.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/pester-claude-runtime.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/phase0-instructions-read.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/powershell-analyze.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/powershell-format.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/pre-change-state.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/python-black.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/python-contract-suites.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/python-coverage.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/python-pyright.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/baseline/python-ruff.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/other/pre-edit-agents-review.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/other/pre-edit-claude-review.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/other/pre-edit-orchestrate.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/other/scratch-smoke.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/ac-verification.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/analyze-parser-phase2.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/coverage-comparison.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/final-claude-runtime-pester.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/final-contract-suites.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/final-mirror-hashes.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/final-pester-coverage.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/final-powershell-analyze.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/final-powershell-format.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/final-python-black.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/final-python-coverage.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/final-python-pyright.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/final-python-pytest.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/final-python-ruff.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/format-parser-phase2.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/line-counts.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/qa-gates/unchanged-files.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/regression-testing/agents-review-contracts.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/regression-testing/agents-review-suites.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/regression-testing/claude-review-contracts.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/regression-testing/claude-review-suites.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/regression-testing/claude-runtime-after-orchestrate.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/regression-testing/orchestrate-contracts.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/regression-testing/orchestrate-suites.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/regression-testing/parser-mirror-contracts.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/regression-testing/pester-after-parser-fix.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/regression-testing/pester-before-fix.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/evidence/regression-testing/pytest-before-fix.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/plan.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/research/research.2026-10-09T02-25.md"
+        - "docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/spec.md"
+        - "docs/features/potential/promoted/2026-10-08-ci-gate-vacuous-on-empty-check-list.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/lib/ci-gate/Invoke-CiGateParser.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md"
+        - "tests/scripts/claude-lib/ci-gate/CiGate.Manifest.Tests.ps1"
+        - "tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1"
+        - "tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py"
+        - "tests/scripts/dev_tools/test_ci_gate_epic_child_contracts.py"
+        - "tests/scripts/dev_tools/test_completion_gate_documentation_contracts.py"
+        - "tests/scripts/dev_tools/test_orchestrator_state_remediation_docs.py"
+        - "tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py"
+        - "tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py"
+        - "tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py:105"
+        - "tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py"
+        - "tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py"
+        - "tests/scripts/dev_tools/test_skill_bundle_contract_repo.py"
       modules: []
       shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "10/08/2026 17:51:45"
+      contracts:
+        - "ci_gate"
+      source: "declared"
+      computed_at: "10/09/2026 03:25:13"
   - issue_num: 842
-    feature_folder: "cleanup-worktrees-scan-root-derivation-follow-ups"
+    feature_folder: "docs/features/active/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups-842"
     kind: "bug"
-    state: "proposed"
+    state: "prepared"
     blast_radius:
-      paths: []
+      paths:
+        - ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_detached_lib.sh"
+        - ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
+        - ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_eol_lib.sh"
+        - ".claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh"
+        - ".claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh"
+        - ".github/workflows/_shell-coverage.yml"
+        - ".github/workflows/ci.yml"
+        - "docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/plan.2026-09-29T22-26.md"
+        - "docs/features/active/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups-842/**"
+        - "docs/features/active/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups-842/issue.md"
+        - "docs/features/active/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups-842/plan.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups-842/research/2026-10-09T02-22-scan-root-derivation-follow-ups-research.md"
+        - "docs/features/potential/promoted/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_detached_lib.sh"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh"
+        - "tests/fixtures/cleanup_worktrees/scenarios/scan_roots_backslash/worktree-list.out"
+        - "tests/fixtures/cleanup_worktrees/scenarios/scan_roots_drive_relative/worktree-list.out"
+        - "tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py"
+        - "tests/shell/test_cleanup_worktrees_scan_roots.bats"
       modules: []
       shared_surfaces: []
       contracts: []
-      source: "derived"
-      computed_at: "10/08/2026 17:51:45"
+      source: "declared"
+      computed_at: "10/09/2026 02:46:04"
   - issue_num: 843
-    feature_folder: "parallel-model-routing-admitted-item-source-and-absent-band-test"
+    feature_folder: "docs/features/active/2026-10-08-parallel-model-routing-admitted-item-source-and-absent-band-test-843"
     kind: "bug"
-    state: "proposed"
+    state: "prepared"
     blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
+      paths:
+        - ".claude/agents/parallel-orchestrator.md"
+        - ".claude/skills/parallel-add/SKILL.md"
+        - ".claude/skills/parallel-orchestrate/SKILL.md"
+        - "config/orchestration-routing.json"
+        - "docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532/evidence/qa-gates/python-black.2026-10-02T05-19.md"
+        - "docs/features/active/2026-10-08-parallel-model-routing-admitted-item-source-and-absent-band-test-843/**"
+        - "docs/features/active/2026-10-08-parallel-model-routing-admitted-item-source-and-absent-band-test-843/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-10-08-parallel-model-routing-admitted-item-source-and-absent-band-test-843/issue.md"
+        - "docs/features/active/2026-10-08-parallel-model-routing-admitted-item-source-and-absent-band-test-843/plan.2026-10-08T22-17.md"
+        - "docs/features/active/2026-10-08-parallel-model-routing-admitted-item-source-and-absent-band-test-843/research/research.2026-10-08T22-19.md"
+        - "docs/features/completed/2026-08-21-get-plan-paths-extracts-angle-bracket-placeholders-as-paths-502/evidence/baseline/typescript-install.md"
+        - "docs/features/potential/promoted/2026-10-08-parallel-model-routing-admitted-item-source-and-absent-band-test.md"
+        - "extensions/drm-copilot/coverage/coverage-summary.json"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+        - "extensions/drm-copilot/src/lib/validate/parallel-planner-state-routing.ts"
+        - "extensions/drm-copilot/test/lib/validate/parallel-planner-state-routing.test.ts"
+        - "extensions/drm-copilot/tsconfig.json"
+        - "scripts/dev_tools/_parallel_planner_state_routing.py"
+        - "scripts/dev_tools/check_python_coverage_thresholds.py"
+        - "tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1"
+        - "tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1"
+        - "tests/scripts/dev_tools/parallel_orchestrator_permission_seam_support.py"
+        - "tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py"
+        - "tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py"
+        - "tests/scripts/dev_tools/test_validate_parallel_planner_state_routing.py"
+      modules:
+        - "config"
+      shared_surfaces:
+        - "config/orchestration-routing.json"
       contracts: []
-      source: "derived"
-      computed_at: "10/08/2026 17:51:45"
+      source: "declared"
+      computed_at: "10/09/2026 02:59:04"
   - issue_num: 844
     feature_folder: "handoff-failure-cause-fallback-and-name-gaps"
     kind: "bug"
-    state: "proposed"
+    state: "admitted"
     blast_radius:
       paths: []
       modules: []
@@ -540,7 +753,7 @@ items:
   - issue_num: 845
     feature_folder: "npm-token-guard-comparison-false-positive-and-stale-docstring"
     kind: "bug"
-    state: "proposed"
+    state: "admitted"
     blast_radius:
       paths: []
       modules: []
@@ -551,7 +764,7 @@ items:
   - issue_num: 846
     feature_folder: "bug-burndown-2026-09-29-review-nits"
     kind: "bug"
-    state: "proposed"
+    state: "admitted"
     blast_radius:
       paths: []
       modules: []
@@ -562,7 +775,7 @@ items:
   - issue_num: 847
     feature_folder: "powershell-aggregate-line-coverage-below-floor"
     kind: "bug"
-    state: "proposed"
+    state: "admitted"
     blast_radius:
       paths: []
       modules: []
@@ -605,16 +818,16 @@ Run branch: `parallel/bug-burndown-2026-10-08-plan`. Each item opens its own pul
 | P3 | 793 | prepared | C2 | bug/epic-orchestrator-state-validator-crashes-on-unhashable-merge-status-793 | docs/features/active/2026-09-30-epic-orchestrator-state-validator-crashes-on-unhashable-merge-status-793/plan.2026-10-08T13-57.md |
 | P4 | 798 | prepared | C3 | bug/orchestration-validator-last-updated-undocumented-and-file-path-invocation-fails-798 | docs/features/active/2026-09-30-orchestration-validator-last-updated-undocumented-and-file-path-invocation-fails-798/plan.2026-10-08T17-24.md |
 | P5 | 849 | proposed |  | bug/parallel-items-fail-completion-on-promotion-receipts-849 |  |
-| P6 | 843 | proposed |  | bug/parallel-model-routing-admitted-item-source-and-absent-band-test-843 |  |
+| P6 | 843 | prepared | C3 | bug/parallel-model-routing-admitted-item-source-and-absent-band-test-843 | docs/features/active/2026-10-08-parallel-model-routing-admitted-item-source-and-absent-band-test-843/plan.2026-10-08T22-17.md |
 | P7 | 790 | prepared | C3 | bug/issue-507-python-push-down-divergence-follow-ups-790 | docs/features/active/2026-09-29-issue-507-python-push-down-divergence-follow-ups-790/plan.2026-10-08T13-56.md |
 | P8 | 791 | prepared | C3 | bug/issue-763-parallel-skill-cli-port-follow-ups-791 | docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follow-ups-791/plan.2026-10-08T13-56.md |
 | P9 | 796 | prepared | C3 | bug/duplicated-string-comparators-outside-pr-context-796 | docs/features/active/2026-09-30-duplicated-string-comparators-outside-pr-context-796/plan.2026-10-08T17-25.md |
-| P10 | 844 | proposed |  | bug/handoff-failure-cause-fallback-and-name-gaps-844 |  |
-| P11 | 845 | proposed |  | bug/npm-token-guard-comparison-false-positive-and-stale-docstring-845 |  |
-| P12 | 842 | proposed |  | bug/cleanup-worktrees-scan-root-derivation-follow-ups-842 |  |
+| P10 | 844 | admitted |  | bug/handoff-failure-cause-fallback-and-name-gaps-844 |  |
+| P11 | 845 | admitted |  | bug/npm-token-guard-comparison-false-positive-and-stale-docstring-845 |  |
+| P12 | 842 | prepared | C2 | bug/cleanup-worktrees-scan-root-derivation-follow-ups-842 | docs/features/active/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups-842/plan.2026-10-08T22-17.md |
 | P13 | 848 | proposed |  | bug/root-format-check-fails-on-test-fixtures-848 |  |
-| P14 | 847 | proposed |  | bug/powershell-aggregate-line-coverage-below-floor-847 |  |
-| P15 | 841 | proposed |  | bug/ci-gate-vacuous-on-empty-check-list-841 |  |
-| P16 | 824 | proposed |  | bug/issue-823-tier-rule-adoption-follow-ups-824 |  |
+| P14 | 847 | admitted |  | bug/powershell-aggregate-line-coverage-below-floor-847 |  |
+| P15 | 841 | prepared | C3 | bug/ci-gate-vacuous-on-empty-check-list-841 | docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841/plan.2026-10-08T22-17.md |
+| P16 | 824 | prepared | C3 | bug/issue-823-tier-rule-adoption-follow-ups-824 | docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/plan.2026-10-08T22-16.md |
 | P17 | 543 | prepared | C3 | bug/epic-planner-topology-receipt-gate-543 | docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/plan.2026-10-08T13-56.md |
-| P18 | 846 | proposed |  | bug/bug-burndown-2026-09-29-review-nits-846 |  |
+| P18 | 846 | admitted |  | bug/bug-burndown-2026-09-29-review-nits-846 |  |
