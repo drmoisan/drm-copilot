@@ -7,6 +7,8 @@
 
 ---
 
+- Work Mode: full-bug
+
 ## FU-823-1: Feature-review coverage hook ignores consumer thresholds (spec F1)
 
 `.claude/hooks/validate-feature-review-coverage.ps1` hard-codes 85.0 line and 75.0 branch floors (approximately lines 313-327), and its docstring (line 29) states 80. Issue #823 defined threshold precedence in the pushed rule text: a consuming repository's root `CLAUDE.md` thresholds govern when present. The hook does not apply that precedence, so a consumer whose root `CLAUDE.md` sets lower thresholds still receives a FAIL verdict demanded by the hook. The hook should read the governing thresholds under the same precedence, and the docstring should be corrected.
