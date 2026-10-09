@@ -25,6 +25,10 @@ BeforeAll {
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
     $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
     $script:LibRoot = Join-Path $script:RepoRoot '.claude/lib/worktree-resolution'
+    # A suite that ran earlier in the same Pester session can leave a module whose nested import
+    # still points at a replaced instance of a sibling module. Unloading the family first makes the
+    # imports below build one coherent set of instances, so the probe rows measure only the mock binding.
+    Remove-Module -Name 'EpicScopeResolution', 'WorktreeRunResolution', 'WorktreeItemResolution', 'WorktreeResolution', 'WorktreeTargetResolution', 'EpicScopeReadiness' -Force -ErrorAction SilentlyContinue
     Import-Module (Join-Path $script:LibRoot 'EpicScopeResolution.psm1')
     Import-Module (Join-Path $script:LibRoot 'WorktreeRunResolution.psm1')
     Import-Module (Join-Path $script:LibRoot 'WorktreeItemResolution.psm1')

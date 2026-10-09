@@ -22,7 +22,7 @@ $script:PathCases = @(
     @{ Name = 'a case-variant implementation path'; Input = 'SRC/Service.PY'; Expected = $true }
     @{ Name = 'a case-variant feature documentation path with a json extension'; Input = 'Docs/Features/Active/x/spec.json'; Expected = $true }
     @{ Name = 'a checkpoint file name'; Input = 'artifacts/orchestration/orchestrator-state.json'; Expected = $false }
-    @{ Name = 'an absolute checkpoint file name'; Input = 'C:/work/artifacts/orchestration/orchestrator-state.json'; Expected = $false }
+    @{ Name = 'an absolute checkpoint file name'; Input = '/synthetic-worktrees/item-a/artifacts/orchestration/orchestrator-state.json'; Expected = $false }
     @{ Name = 'a feature documentation path'; Input = 'docs/features/active/2026-10-01-x-1/plan.md'; Expected = $false }
     @{ Name = 'an evidence path with a json extension'; Input = 'docs/features/active/x/evidence/qa-gates/result.json'; Expected = $false }
     @{ Name = 'a non-implementation extension'; Input = 'README.md'; Expected = $false }
