@@ -11,3 +11,5 @@ PUSH_EXIT: 0
 COMMIT: 22c313556e95e58eda9914800b8c0729ab5b1f0d feat(738): add per-segment target resolver for the preimplementation gate
 PUSH_EXIT: 0
 COMMIT_SCOPE_NOTE: [P5-T8] also stages the four enforce-orchestration-preimplementation-gate-targets.ps1 copies, changed by the [P5-T6] fix (AllowEmptyString on the Token parameter); leaving them uncommitted would make the [P7-T1] porcelain condition unsatisfiable.
+COMMIT: 4dd2231d8d5dd777f8229e43758e116712bb0a7d fix(738): resolve every segment target in epic-scope decisions
+PUSH_EXIT: 0
