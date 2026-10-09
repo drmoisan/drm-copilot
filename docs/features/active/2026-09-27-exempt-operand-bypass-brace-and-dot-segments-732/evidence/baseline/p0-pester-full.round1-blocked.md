@@ -1,19 +1,14 @@
 # PoshQC full Pester run (issue #732)
 
-Timestamp: 2026-10-09T03-44
+Timestamp: 2026-10-09T03-27
 Task: [P0-T17]
 ROUTE: sh-launcher
-Command: sh <SCRATCHPAD>/c1b732/p0-t17.sh (step 0 preservation, then R-FULL script B <SCRATCHPAD>/c1b732/rfb.ps1, package-join rule)
-EXIT_CODE: 0
-PRIOR_BLOCKED_RECORD: docs/features/active/2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732/evidence/baseline/p0-pester-full.round1-blocked.md exists=True
-PRIOR_BLOCKED_RECORD_HAS_BLOCKER_LINE: True
+Command: sh <SCRATCHPAD>/c1b732/r-full-a.sh (R-FULL script A: Invoke-PoshQCTest -Root $root), then sh <SCRATCHPAD>/c1b732/p0-t17b.sh (R-FULL script B)
+EXIT_CODE: 2
 
 ## Output
 
 ```text
-SCRIPT_A: reused round 1
-REUSE_COMPARE_JUNIT_LAST_WRITE_UTC: 2026-10-09T03:27:08.5679398Z
-REUSE_COMPARE_POSHQC_COVERAGE_LAST_WRITE_UTC: 2026-10-09T03:24:15.3864083Z
 RUN_START_UTC: 2026-10-09T03:16:51.9736907Z
 RUNNER_SUMMARY: Tests Passed: 7584, Failed: 2, Skipped: 10, Inconclusive: 0, NotRun: 0
 SCRIPT_A_EXIT: 2
@@ -320,31 +315,37 @@ JUNIT_SUITE: tests/scripts/workflows/VerifyPublishedReleasesWorkflow.Tests.ps1 t
 JUNIT_FAILED: tests/scripts/claude-hooks/enforce-pr-author-skill.Tests.ps1 :: enforce-pr-author-skill.ps1.allowed commands.allows gh pr create --body-file artifacts/pr_body_12.md when context exists
 JUNIT_FAILED: tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits.allows every registered handler for every tool name its own matcher admits
 POSHQC_COVERAGE_LAST_WRITE_UTC: 2026-10-09T03:24:15.3864083Z
-POSHQC_RULE: package-join
-POSHQC_MATCH: .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 package-join classes=1
-POSHQC_LINE_COVERAGE: .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 covered=169 missed=3 percent=98.26
-POSHQC_MATCH: .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 package-join classes=1
-POSHQC_LINE_COVERAGE: .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 covered=169 missed=3 percent=98.26
-POSHQC_MATCH: .claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 package-join classes=1
-POSHQC_LINE_COVERAGE: .claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 covered=67 missed=0 percent=100.00
-POSHQC_MATCH: .codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 package-join classes=1
-POSHQC_LINE_COVERAGE: .codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 covered=44 missed=0 percent=100.00
-POSHQC_MATCH: .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 package-join classes=1
-POSHQC_LINE_COVERAGE: .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 covered=165 missed=0 percent=100.00
+POSHQC_LINE_COVERAGE_MISSING: .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1
+POSHQC_LINE_COVERAGE_MISSING: .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1
+POSHQC_LINE_COVERAGE_MISSING: .claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1
+POSHQC_LINE_COVERAGE_MISSING: .codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1
+POSHQC_LINE_COVERAGE_MISSING: .codex/hooks/enforce-orchestration-preimplementation-gate.ps1
 ```
 
 ## Done-condition evaluation
 
-- PRIOR_BLOCKED_RECORD exists=True; round-1 record carries a POSHQC_COVERAGE_BLOCKER: line: True.
-- JUNIT_LAST_WRITE_UTC later than RUN_START_UTC: True; POSHQC_COVERAGE_LAST_WRITE_UTC later than RUN_START_UTC: True.
-- POSHQC_RULE: package-join recorded; five POSHQC_MATCH lines ending package-join classes=1: True.
-- Numeric POSHQC_LINE_COVERAGE values: 5; MISSING or AMBIGUOUS lines: 0.
-- B_FULL = the 2 JUNIT_FAILED: lines above.
+- `JUNIT_LAST_WRITE_UTC` (2026-10-09T03:27:08Z) and `POSHQC_COVERAGE_LAST_WRITE_UTC` (2026-10-09T03:24:15Z) are both later than `RUN_START_UTC` (2026-10-09T03:16:51Z): met.
+- Counts numeric (JUNIT_TESTS 7596, JUNIT_FAILURES 2, JUNIT_ERRORS 0): met. B_FULL = the two `JUNIT_FAILED:` lines above.
+- Five numeric `POSHQC_LINE_COVERAGE` values: NOT met. All five COV-FILES paths present at BASE_SHA print `POSHQC_LINE_COVERAGE_MISSING:`.
 
-Output Summary: SCRIPT_A: reused round 1; RUNNER_SUMMARY: Tests Passed: 7584, Failed: 2, Skipped: 10, Inconclusive: 0, NotRun: 0; JUNIT_TESTS: 7596; JUNIT_FAILURES: 2; JUNIT_FAILED (B_FULL) 2; PoshQC line-coverage baseline (package-join):
-  .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 covered=169 missed=3 percent=98.26
-  .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 covered=169 missed=3 percent=98.26
-  .claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 covered=67 missed=0 percent=100.00
-  .codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 covered=44 missed=0 percent=100.00
-  .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 covered=165 missed=0 percent=100.00
+POSHQC_COVERAGE_BLOCKER: POSHQC_LINE_COVERAGE_MISSING for all five COV-FILES paths present at BASE_SHA (observed 5 MISSING lines, 0 values)
 
+## Cause (read-only observation, plan-revision input)
+
+The R-FULL script-B match rule (a `class` whose `sourcefilename`, with `\` replaced by `/`, equals the repository-relative path; fallback a `sourcefile` whose `name` equals the path) assumes the layout of the cited 2026-06-19 record, where `sourcefilename` carries a repository-relative path. The current `artifacts/pester/powershell-coverage.xml` written by `Invoke-PoshQCTest` uses a different layout: each `package` `name` is the absolute directory (`<WORKSPACE_ROOT>/.claude/hooks`), and each `class` `sourcefilename` and `sourcefile` `name` is the leaf file name only (for example `enforce-orchestration-preimplementation-gate-helpers.ps1`). No element equals a repository-relative path, so the rule matches nothing. The repository-relative Koverage copy (`artifacts/pester/powershell-coverage.koverage.xml`) is not produced, because `pester.runsettings.psd1` sets `Run.Exit = $true` and the process exits before `Invoke-PoshQCTest` reaches its coverage-copy step.
+
+Informational (not a selection; the executor does not choose a successor rule): joining the `package` `name` with the `class` `sourcefilename` and removing the workspace root yields these values from the same file:
+
+```text
+INFO_KOVERAGE_COPY_PRESENT: False
+INFO_PACKAGE_JOIN_LINE_COVERAGE: .claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 covered=67 missed=0 percent=100.00
+INFO_PACKAGE_JOIN_LINE_COVERAGE: .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 covered=169 missed=3 percent=98.26
+INFO_PACKAGE_JOIN_LINE_COVERAGE: .codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 covered=44 missed=0 percent=100.00
+INFO_PACKAGE_JOIN_LINE_COVERAGE: .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 covered=169 missed=3 percent=98.26
+INFO_PACKAGE_JOIN_LINE_COVERAGE: .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 covered=165 missed=0 percent=100.00
+INFO_CLASS_LAYOUT: package name = absolute <WORKSPACE_ROOT>/<dir>; class sourcefilename = leaf (check-powershell-test-purity.ps1)
+```
+
+Proposed plan delta (section 7, R-FULL script B, for the planner): replace the match clause with "for each `class` element, form `<package name>/<class sourcefilename>` with `\` replaced by `/`, remove the leading `<root>/` prefix (root with `\` replaced by `/`), and match when the result equals the COV-FILES path under ordinal case-insensitive comparison; print `POSHQC_MATCH: <path> package-join`". The same rule then serves [P7-T8] and [P8-T30].
+
+Output Summary: BLOCKED at [P0-T17]. The full PoshQC run completed (7584 passed, 2 failed, 10 skipped; JUnit 7596 tests, 2 failures, 0 errors; B_FULL recorded), but the plan's R-FULL coverage match rule finds no element for any of the five COV-FILES paths in the current coverage layout, so the plan-defined stop applies (POSHQC_LINE_COVERAGE_MISSING).
