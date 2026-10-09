@@ -6,3 +6,5 @@ COMMIT: ac649618e934be0c3062205b0e1f2be88399ba81 test(732): add fail-before rows
 PUSH_EXIT: 0
 COMMIT: 64a9ac52756b19a2983793710b2b124cb76d914b fix(732): deny shell-divergent operands with an ASCII allowlist
 PUSH_EXIT: 0
+COMMIT: 901933c06a3ee2157301f9e5f3a820b8c4de3fc5 test(738): add fail-before rows for per-segment epic-scope targets
+PUSH_EXIT: 0
