@@ -12,10 +12,23 @@ BeforeAll {
     # without executing the script entrypoint.
     $hookPath = Join-Path $PSScriptRoot '../../../.claude/hooks/validate-orchestrator-output.ps1'
     . $hookPath
+    $script:RealGetCheckpointFileContent = ${function:Get-CheckpointFileContent}
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/orchestrator-state/OrchestratorState.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+    Mock Get-CheckpointFileContent { $null }
+    Mock Get-OrchestratorStateCheckpoint -ModuleName OrchestratorState { $null }
+    Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 }
 
 Describe 'validate-orchestrator-output.ps1' {
     # Default resolution seam (issue #787): no row resolves against the developer machine.
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     BeforeAll { Mock Resolve-OrchestratorOutputCheckpointPath { [pscustomobject]@{ Resolved = $true; CheckpointPath = '/synthetic-worktrees/default-session/artifacts/orchestration/orchestrator-state.json'; WorktreeRoot = '/synthetic-worktrees/default-session'; Status = 'SessionRoot'; ReasonCode = $null; Detail = 'default resolved target (issue #787)' } } }
 
     Context 'payload validation' {
@@ -362,6 +375,10 @@ Describe 'validate-orchestrator-output.ps1' {
     }
 
     Context 'Get-CheckpointFileContent' {
+        BeforeAll {
+            Mock Get-CheckpointFileContent -MockWith $script:RealGetCheckpointFileContent
+        }
+
         It 'reports Exists=$false for a path that does not exist' {
             # Arrange
             $missing = Join-Path $PSScriptRoot 'this-checkpoint-definitely-does-not-exist.json'

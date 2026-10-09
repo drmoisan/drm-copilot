@@ -9,9 +9,16 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner.ps1").Path
         $script:Helpers = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-PrdFeatureCheckpointFolder { $null }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         . $script:Helpers
         Mock -CommandName Resolve-PrdFeatureWorktreeTarget -MockWith { New-WorktreeResolutionTargetResult -Status 'SessionRoot' -SessionRoot '/synthetic-worktrees/session-root' -WorktreeRoot '/synthetic-worktrees/session-root' -Signal 'Branch' -SignalValue 'f5-fixture-own' -Candidate @('/synthetic-worktrees/session-root') -Detail 'modelled session-root target for the delivered cases' }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 
     Context 'tool input parsing' {
         It 'denies an empty payload as an envelope anomaly (fail closed)' {

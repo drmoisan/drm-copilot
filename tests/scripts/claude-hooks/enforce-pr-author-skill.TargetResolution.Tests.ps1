@@ -22,6 +22,14 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-pr-author-skill.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/orchestrator-state/OrchestratorState.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-OrchestratorStateCheckpoint -ModuleName OrchestratorState { $null }
+        Mock Get-PrAuthorCheckpointContent { $null }
+        Mock Get-PrAuthorReceiptContent { $null }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution/EpicScopeResolution.psm1").Path
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
 
@@ -37,6 +45,8 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
         Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1").Path
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     Context 'the checkpoint is taken from the resolved target, not the session root' {
         It 'validates the sibling worktree checkpoint when --head names another worktree' {

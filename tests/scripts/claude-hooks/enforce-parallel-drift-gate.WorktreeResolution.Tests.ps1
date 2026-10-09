@@ -20,6 +20,13 @@
 
 BeforeAll {
     . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-drift-gate.ps1").Path
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+    Mock Get-ParallelDriftGateCheckpointContent { $null }
+    Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     $libRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution").Path
     Import-Module (Join-Path $libRoot 'WorktreeRunResolution.psm1')
     Import-Module (Join-Path $libRoot 'WorktreeTargetResolution.psm1')
@@ -66,6 +73,9 @@ BeforeAll {
 }
 
 Describe 'parallel drift gate target resolution' {
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     It 'D1 allows an undrifted item by reading the parallel checkpoint under the other worktree' {
         # Arrange
         Set-DriftRunTopology -Live @($script:Session, '/synthetic-worktrees/w-par') -Parallel @{ '/synthetic-worktrees/w-par' = $script:ClearParallel }

@@ -38,6 +38,11 @@ BeforeAll {
     $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner.ps1").Path
     $script:Helpers = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1").Path
     . $script:UnderTest
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    Mock Get-PrdFeatureCheckpointFolder { $null }
+    Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
     . $script:Helpers
 
     $script:LibRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution").Path
@@ -101,6 +106,9 @@ BeforeAll {
 }
 
 Describe 'enforce-prd-feature-before-planner.ps1 identity resolution' {
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
+
     It 'prd R1 allows a coordinating-session delegation whose item is identified by issue number while the folder exists in twelve worktrees' {
         # Arrange: twelve live worktrees, which is the ordinary count once a feature folder
         # has merged, and exactly one of them records the issue the prompt names. Before

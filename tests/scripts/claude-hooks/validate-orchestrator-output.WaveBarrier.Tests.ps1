@@ -22,6 +22,15 @@ param()
 
 BeforeAll {
     . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/validate-orchestrator-output.ps1").Path
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/orchestrator-state/OrchestratorState.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+    Mock Get-CheckpointFileContent { $null }
+    Mock Get-OrchestratorStateCheckpoint -ModuleName OrchestratorState { $null }
+    Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 
     $script:RoutingStub = { param($Path, $Type) [pscustomobject]@{ ExitCode = 0; Output = '' } }
     $script:Payload = (@{ output = 'Final summary. integration_branch: epic/c6-integration' } | ConvertTo-Json -Compress)
@@ -56,6 +65,9 @@ BeforeAll {
 }
 
 Describe 'validate-orchestrator-output Layer 2 wave barrier' {
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     BeforeAll {
         Set-BarrierResolvedTarget
     }

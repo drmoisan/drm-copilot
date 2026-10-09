@@ -20,6 +20,14 @@
 
 BeforeAll {
     . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/validate-orchestrator-output.ps1").Path
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/orchestrator-state/OrchestratorState.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+    Mock Get-CheckpointFileContent { $null }
+    Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     $libRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/lib").Path
     Import-Module (Join-Path $libRoot 'worktree-resolution/WorktreeTargetResolution.psm1')
     Import-Module (Join-Path $libRoot 'worktree-resolution/WorktreeResolution.psm1')
@@ -27,6 +35,7 @@ BeforeAll {
     # module is imported last to keep Get-OrchestratorStateCheckpoint mockable here.
     Import-Module (Join-Path $libRoot 'orchestrator-state/OrchestratorStateCompletion.psm1') -Force
     Import-Module (Join-Path $libRoot 'orchestrator-state/OrchestratorState.psm1') -Force
+    Mock Get-OrchestratorStateCheckpoint -ModuleName OrchestratorState { $null }
     . (Join-Path $PSScriptRoot 'WorktreeResolutionFixture.Helpers.ps1')
 
     $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
@@ -59,6 +68,9 @@ BeforeAll {
 }
 
 Describe 'validate-orchestrator-output resolution sibling' {
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     BeforeEach {
         Mock Get-CheckpointFileContent { @{ Exists = $false; Content = $null } }
     }
