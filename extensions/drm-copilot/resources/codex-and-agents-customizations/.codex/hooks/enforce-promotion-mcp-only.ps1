@@ -109,9 +109,12 @@ function Get-PromotionBypassReason {
     }
 
     # `gh issue create` and `gh issue new` are direct bypasses of the MCP
-    # promotion path. Tolerate any flags after the subcommand.
+    # promotion path. Tolerate any flags after the subcommand. The adjacency
+    # expression reads the masked text, so a quoted mention is not a match; wrapper
+    # payloads and substitution bodies are covered by the structural check below
+    # (issue #824).
     foreach ($segment in $segments) {
-        if ($segment.ScanText -match '(?i)\bgh\s+issue\s+(?:create|new)\b') {
+        if ($segment.MaskedText -match '(?i)\bgh\s+issue\s+(?:create|new)\b') {
             return (Get-PromotionMcpOnlyGhIssueBlockedReason)
         }
     }

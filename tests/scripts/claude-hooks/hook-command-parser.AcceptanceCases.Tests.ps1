@@ -191,11 +191,10 @@ JSON
             # runtimes have silently diverged.
             $commandText = 'git worktree remove --force /repo/worktrees/item-a-101'
 
-            # Act + Assert: both gates must resolve the same path.
-            Get-ParallelWorktreeRemovalCommandPath -CommandText $commandText |
-                Should -Be '/repo/worktrees/item-a-101'
-            Get-EpicWorktreeRemovalCommandPath -CommandText $commandText |
-                Should -Be '/repo/worktrees/item-a-101'
+            # Act + Assert: both removal gates consume Resolve-CommandLineInvocationTarget
+            # (issue #824), so one resolver call fixes the path for both of them.
+            (Resolve-CommandLineInvocationTarget -CommandText $commandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Targets |
+                Should -Be @('/repo/worktrees/item-a-101')
         }
     }
 

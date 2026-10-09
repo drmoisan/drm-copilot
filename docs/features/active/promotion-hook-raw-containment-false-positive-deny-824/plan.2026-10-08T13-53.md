@@ -20,7 +20,7 @@
 - `FEATURE` = `docs/features/active/promotion-hook-raw-containment-false-positive-deny-824`
 - `STAMP` = the artifact creation time in `yyyy-MM-ddTHH-mm` form, chosen when the artifact is written.
 - `SCRATCHPAD` = the executing agent's session scratchpad directory, spelled with forward slashes in Bash commands. It is recorded in artifacts only as the literal `<SCRATCHPAD>`.
-- `BRANCH` = `bug/promotion-hook-raw-containment-false-positive-deny-824-r2`
+- `BRANCH` = `bug/promotion-hook-raw-containment-false-positive-deny-exec-824` (orchestrator execution-time substitution, decision D5: the prepared branch `bug/promotion-hook-raw-containment-false-positive-deny-824-r2` is merged into `BASE_REF` and locked in its preparation worktree; execution runs on this branch created from `BASE_REF`. Every literal occurrence of the `-824-r2` branch name in a task below means `BRANCH`.)
 - `BASE_REF` = `origin/epic/enforcement-hook-precision-integration`
 - `BASE_SHA`, `HEAD_SHA` = values recorded by [P0-T9].
 - `P` = `/repo/worktrees/item-a-101`, `Q` = `/repo/worktrees/item-b-102` (synthetic Claude-side fixture paths). Codex fixture rows replace the leading `/repo` with `$script:SyntheticRoot` exactly as `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1:47` derives it (`C:/repo` on Windows, `/repo` elsewhere); those values are written `P_cx` and `Q_cx`.
@@ -218,337 +218,337 @@ Rules for every new test file: Arrange-Act-Assert; no temporary file; no network
 
 ### Phase 0 — Policy Reads, Environment, and Baseline Capture
 
-- [ ] [P0-T1] Read the repository instruction file `./CLAUDE.md` in full.
+- [x] [P0-T1] Read the repository instruction file `./CLAUDE.md` in full.
   - Acceptance: recorded in `FEATURE/evidence/baseline/phase0-instructions-read.md` by [P0-T6].
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
   - Acceptance: recorded by [P0-T6].
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
   - Acceptance: recorded by [P0-T6].
-- [ ] [P0-T4] Read `.claude/rules/quality-tiers.md` in full.
+- [x] [P0-T4] Read `.claude/rules/quality-tiers.md` in full.
   - Acceptance: recorded by [P0-T6].
-- [ ] [P0-T5] Read `.claude/rules/powershell.md` in full (the only language in scope; no Python, TypeScript, or C# file is changed).
+- [x] [P0-T5] Read `.claude/rules/powershell.md` in full (the only language in scope; no Python, TypeScript, or C# file is changed).
   - Acceptance: recorded by [P0-T6].
-- [ ] [P0-T6] Write `FEATURE/evidence/baseline/phase0-instructions-read.md`.
+- [x] [P0-T6] Write `FEATURE/evidence/baseline/phase0-instructions-read.md`.
   - Acceptance: the file contains `Timestamp:`, `Policy Order: CLAUDE.md > general-code-change > general-unit-test > quality-tiers > powershell`, and the five repository-relative paths read in [P0-T1]-[P0-T5].
-- [ ] [P0-T7] Write `FEATURE/evidence/other/evidence-location-overrides.STAMP.md` containing the three `EVIDENCE_LOCATION_OVERRIDE_REJECTED:` lines of rule 2.
+- [x] [P0-T7] Write `FEATURE/evidence/other/evidence-location-overrides.STAMP.md` containing the three `EVIDENCE_LOCATION_OVERRIDE_REJECTED:` lines of rule 2.
   - Acceptance: the file contains `Timestamp:` and exactly those three lines.
-- [ ] [P0-T8] Run `git branch --show-current` and record it in `FEATURE/evidence/baseline/git-branch.STAMP.md`.
-  - Acceptance: `EXIT_CODE: 0` and `Output Summary:` is exactly `bug/promotion-hook-raw-containment-false-positive-deny-824-r2`; any other value stops execution as BLOCKED.
-- [ ] [P0-T9] Run `git fetch origin epic/enforcement-hook-precision-integration`, then `git merge-base HEAD origin/epic/enforcement-hook-precision-integration` (value `BASE_SHA`), then `git rev-parse HEAD` (value `HEAD_SHA`); record all three in `FEATURE/evidence/baseline/git-baseline.STAMP.md`.
+- [x] [P0-T8] Run `git branch --show-current` and record it in `FEATURE/evidence/baseline/git-branch.STAMP.md`.
+  - Acceptance: `EXIT_CODE: 0` and `Output Summary:` is exactly `bug/promotion-hook-raw-containment-false-positive-deny-exec-824`; any other value stops execution as BLOCKED.
+- [x] [P0-T9] Run `git fetch origin epic/enforcement-hook-precision-integration`, then `git merge-base HEAD origin/epic/enforcement-hook-precision-integration` (value `BASE_SHA`), then `git rev-parse HEAD` (value `HEAD_SHA`); record all three in `FEATURE/evidence/baseline/git-baseline.STAMP.md`.
   - Acceptance: three `EXIT_CODE: 0` lines; `BASE_SHA:` and `HEAD_SHA:` are 40-hex values.
-- [ ] [P0-T10] Run `git diff --quiet BASE_SHA -- .claude/hooks .codex/hooks .claude/agents/pr-author.md .claude/skills/pr-author/SKILL.md extensions/drm-copilot/resources tests/scripts/claude-hooks tests/scripts/codex-hooks` and record it in `FEATURE/evidence/baseline/production-equals-base.STAMP.md`.
+- [x] [P0-T10] Run `git diff --quiet BASE_SHA -- .claude/hooks .codex/hooks .claude/agents/pr-author.md .claude/skills/pr-author/SKILL.md extensions/drm-copilot/resources tests/scripts/claude-hooks tests/scripts/codex-hooks` and record it in `FEATURE/evidence/baseline/production-equals-base.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0` (no in-scope path differs from the integration base, so later fail-before runs observe base behavior). A non-zero exit stops execution as BLOCKED.
-- [ ] [P0-T11] Write every section-6 script and launcher to `SCRATCHPAD/` and copy each script's full text into `FEATURE/evidence/other/observation-scripts.STAMP.md`.
+- [x] [P0-T11] Write every section-6 script and launcher to `SCRATCHPAD/` and copy each script's full text into `FEATURE/evidence/other/observation-scripts.STAMP.md`.
   - Acceptance: the artifact contains one fenced block per script named in section 6 (12 scripts) and one fenced block for the four-line `s-full-run.sh` launcher of the rule 4 exception.
-- [ ] [P0-T12] Run `sh SCRATCHPAD/s-hash.sh baseline` and record `FEATURE/evidence/baseline/parity-hashes.STAMP.md`.
+- [x] [P0-T12] Run `sh SCRATCHPAD/s-hash.sh baseline` and record `FEATURE/evidence/baseline/parity-hashes.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; `Output Summary:` lists every `GROUP ... DISTINCT=1` line. Any group with `DISTINCT` other than 1 stops execution as BLOCKED, because rule 6 would overwrite a divergent copy.
-- [ ] [P0-T13] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/baseline/line-counts.STAMP.md`.
+- [x] [P0-T13] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/baseline/line-counts.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; `Output Summary:` lists each `LINES` line and `MAX_LINES:`.
-- [ ] [P0-T14] Run `sh SCRATCHPAD/s-fmtcheck.sh folders` and record `FEATURE/evidence/baseline/format-check.STAMP.md`.
+- [x] [P0-T14] Run `sh SCRATCHPAD/s-fmtcheck.sh folders` and record `FEATURE/evidence/baseline/format-check.STAMP.md`.
   - Acceptance: `EXIT_CODE:` recorded; `Output Summary:` records `FORMAT_DRIFT_COUNT:` and every `FORMAT_DRIFT` path as set `B_FMT`. This script writes nothing, so the baseline reflects pre-existing drift.
-- [ ] [P0-T15] Run `sh SCRATCHPAD/s-pssa.sh` and record `FEATURE/evidence/baseline/pssa.STAMP.md`.
+- [x] [P0-T15] Run `sh SCRATCHPAD/s-pssa.sh` and record `FEATURE/evidence/baseline/pssa.STAMP.md`.
   - Acceptance: `EXIT_CODE:` recorded; `Output Summary:` records `PSSA_FINDING_COUNT:` and each finding line.
-- [ ] [P0-T16] Run `sh SCRATCHPAD/s-pester.sh A` and record `FEATURE/evidence/baseline/pester-scoped.STAMP.md`.
+- [x] [P0-T16] Run `sh SCRATCHPAD/s-pester.sh A` and record `FEATURE/evidence/baseline/pester-scoped.STAMP.md`.
   - Acceptance: `EXIT_CODE:` recorded; `Output Summary:` records `PESTER_TOTAL`, `PESTER_PASSED`, `PESTER_FAILED`, and every `FAILED_TEST:` name as set `B_SCOPED`.
-- [ ] [P0-T17] Run `sh SCRATCHPAD/s-full-run.sh` with the Bash parameter `run_in_background: true`, wait for the completion notification, and record `FEATURE/evidence/baseline/pester-full-run.STAMP.md`.
+- [x] [P0-T17] Run `sh SCRATCHPAD/s-full-run.sh` with the Bash parameter `run_in_background: true`, wait for the completion notification, and record `FEATURE/evidence/baseline/pester-full-run.STAMP.md`.
   - Acceptance: the output contains a `FULL_RUN_EXIT_CODE:` line and `EXIT_CODE:` records its integer (a non-zero value is permitted at baseline and is explained by [P0-T18]); `artifacts/pester/powershell-coverage.xml` exists after the run.
-- [ ] [P0-T18] Run `sh SCRATCHPAD/s-full-parse.sh baseline` and record `FEATURE/evidence/baseline/pester-full-coverage.STAMP.md`.
+- [x] [P0-T18] Run `sh SCRATCHPAD/s-full-parse.sh baseline` and record `FEATURE/evidence/baseline/pester-full-coverage.STAMP.md`.
   - Acceptance: `Output Summary:` records `JUNIT_TESTS`, `JUNIT_FAILURES`, every `FAILED_TEST:` name as set `B_FULL`, and a numeric `COVERAGE ... pct=` line for each of the ten existing production files (`.claude/hooks/hook-command-invocation.ps1`, `.claude/hooks/hook-command-scanner.ps1`, `.claude/hooks/enforce-promotion-mcp-only.ps1`, `.claude/hooks/enforce-epic-worktree-removal-gate.ps1`, `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1`, `.claude/hooks/enforce-pr-author-skill-helpers.ps1`, `.codex/hooks/hook-command-invocation.ps1`, `.codex/hooks/hook-command-scanner.ps1`, `.codex/hooks/enforce-promotion-mcp-only.ps1`, `.codex/hooks/enforce-epic-worktree-removal-gate.ps1`); the nine new files are recorded as `NEW_FILE`. A missing numeric value for an existing file makes the baseline remediation-required.
-- [ ] [P0-T19] Run `poetry install --no-interaction` (its own Bash call), then run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py` and record both in `FEATURE/evidence/baseline/pytest-parity.STAMP.md`.
+- [x] [P0-T19] Run `poetry install --no-interaction` (its own Bash call), then run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py` and record both in `FEATURE/evidence/baseline/pytest-parity.STAMP.md`.
   - Acceptance: `poetry install` exits 0; the pytest `EXIT_CODE:` is recorded; `Output Summary:` records the final pytest summary line (for example `N passed`) and every failing node ID as set `B_PY`. The summary line is printed and its total of passed, failed, and errored tests is greater than 0; a missing summary line or a total of 0 stops execution as BLOCKED.
-- [ ] [P0-T20] Run `npm --prefix extensions/drm-copilot ci` (its own Bash call), then run `npm --prefix extensions/drm-copilot run test -- test/lib/push-down/claude-pack-manifest-completeness.test.ts test/lib/push-down/claude-customizations.test.ts test/lib/push-down/codex-agents-customizations.test.ts` and record both in `FEATURE/evidence/baseline/jest-parity.STAMP.md`.
+- [x] [P0-T20] Run `npm --prefix extensions/drm-copilot ci` (its own Bash call), then run `npm --prefix extensions/drm-copilot run test -- test/lib/push-down/claude-pack-manifest-completeness.test.ts test/lib/push-down/claude-customizations.test.ts test/lib/push-down/codex-agents-customizations.test.ts` and record both in `FEATURE/evidence/baseline/jest-parity.STAMP.md`.
   - Acceptance: `npm ci` exits 0; the Jest `EXIT_CODE:` is recorded; `Output Summary:` records the Jest `Tests:` line and every failing test name as set `B_JS`. The `Tests:` line is printed and reports a total greater than 0; a missing `Tests:` line or a total of 0 stops execution as BLOCKED.
-- [ ] [P0-T21] Commit and push Phase 0 evidence: `git add -- FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, `git commit -m "docs(824): record phase 0 baseline evidence" -- FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, `git push -u origin BRANCH`.
+- [x] [P0-T21] Commit and push Phase 0 evidence: `git add -- FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, `git commit -m "docs(824): record phase 0 baseline evidence" -- FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, `git push -u origin BRANCH`.
   - Acceptance: each command exits 0; the push output names `BRANCH`.
 
 ### Phase 1 — Named Regression Rows (fail-before)
 
-- [ ] [P1-T1] Create `tests/scripts/claude-hooks/hook-command-invocation.Issue824Regression.Tests.ps1` with rows REG-01 through REG-21 exactly as section 5 T-REG defines, each tagged `Issue824` and its `R-...` ID.
+- [x] [P1-T1] Create `tests/scripts/claude-hooks/hook-command-invocation.Issue824Regression.Tests.ps1` with rows REG-01 through REG-21 exactly as section 5 T-REG defines, each tagged `Issue824` and its `R-...` ID.
   - Acceptance: [P1-T2] reports `PESTER_TOTAL: 23`.
-- [ ] [P1-T2] [expect-fail] Run `sh SCRATCHPAD/s-pester.sh REG` against the unchanged production tree and record `FEATURE/evidence/regression-testing/fail-before.STAMP.md`.
+- [x] [P1-T2] [expect-fail] Run `sh SCRATCHPAD/s-pester.sh REG` against the unchanged production tree and record `FEATURE/evidence/regression-testing/fail-before.STAMP.md`.
   - Acceptance: `EXIT_CODE: 1`, `ExpectedExitCode: 1`, `PESTER_TOTAL: 23`, `PESTER_PASSED: 0`, `PESTER_FAILED: 23`; `Output Summary:` lists one `RESULT Failed` line per row with its `R-...` ID and the first assertion or error message. REG-13..REG-17 fail with `PR_BODY_PATH_NONCANONICAL` or on the not-yet-defined `Get-PrAuthorBodyFileRoot` mock target; REG-18..REG-21 fail because `.claude/hooks/enforce-pr-author-command-allowlist.ps1` does not exist yet. REG-09..REG-12 fail with a `PR_AUTHOR_SKILL_BLOCKED:` reason, not on a mock or setup error. The artifact states the failure cause per row.
-- [ ] [P1-T3] Commit and push (`git add --` and `git commit -m "test(824): add named regression rows (fail-before)" --` over `tests/scripts/claude-hooks/hook-command-invocation.Issue824Regression.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from that test file and listed in `FEATURE/evidence/other/test-split-log.md`, as the pathspecs of both the `git add --` and the `git commit ... --` commands; then `git push -u origin BRANCH`).
+- [x] [P1-T3] Commit and push (`git add --` and `git commit -m "test(824): add named regression rows (fail-before)" --` over `tests/scripts/claude-hooks/hook-command-invocation.Issue824Regression.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from that test file and listed in `FEATURE/evidence/other/test-split-log.md`, as the pathspecs of both the `git add --` and the `git commit ... --` commands; then `git push -u origin BRANCH`).
   - Acceptance: each command exits 0.
 
 ### Phase 2 — Scanner Delimiter, TokenText, and Heredoc Module
 
-- [ ] [P2-T1] Create `.claude/hooks/hook-command-heredoc.ps1` containing `Read-CommandLineHeredocHeader` and `Read-CommandLineHeredocBody` moved verbatim from `.claude/hooks/hook-command-scanner.ps1:198-301`, with a header docblock in the scanner's style (pure string logic, dot-sourced by the scanner).
+- [x] [P2-T1] Create `.claude/hooks/hook-command-heredoc.ps1` containing `Read-CommandLineHeredocHeader` and `Read-CommandLineHeredocBody` moved verbatim from `.claude/hooks/hook-command-scanner.ps1:198-301`, with a header docblock in the scanner's style (pure string logic, dot-sourced by the scanner).
   - Acceptance: [P2-T5] row SC-13 passes.
-- [ ] [P2-T2] Edit `.claude/hooks/hook-command-scanner.ps1`: delete the two moved functions; add `. (Join-Path $PSScriptRoot 'hook-command-heredoc.ps1')` after the header docblock; add `Delimiter` and `TokenText` per DC-2 to `ConvertTo-CommandLineSegmentRecord` and to both record-construction sites in `Read-CommandLineSegment`; extend the `.OUTPUTS` list at `:318-336`.
+- [x] [P2-T2] Edit `.claude/hooks/hook-command-scanner.ps1`: delete the two moved functions; add `. (Join-Path $PSScriptRoot 'hook-command-heredoc.ps1')` after the header docblock; add `Delimiter` and `TokenText` per DC-2 to `ConvertTo-CommandLineSegmentRecord` and to both record-construction sites in `Read-CommandLineSegment`; extend the `.OUTPUTS` list at `:318-336`.
   - Acceptance: [P2-T5] rows SC-01..SC-12 pass and the existing scanner suites pass.
-- [ ] [P2-T3] Run `sh SCRATCHPAD/s-mirror.sh codex-scanner` and record `FEATURE/evidence/other/mirror-codex-scanner.STAMP.md`.
+- [x] [P2-T3] Run `sh SCRATCHPAD/s-mirror.sh codex-scanner` and record `FEATURE/evidence/other/mirror-codex-scanner.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; two `COPIED` lines whose source and target hashes are equal.
-- [ ] [P2-T4] Create `tests/scripts/claude-hooks/hook-command-scanner.Issue824.Tests.ps1` with rows SC-01..SC-13 (section 5 T-SCAN).
+- [x] [P2-T4] Create `tests/scripts/claude-hooks/hook-command-scanner.Issue824.Tests.ps1` with rows SC-01..SC-13 (section 5 T-SCAN).
   - Acceptance: [P2-T5] reports every SC row passed for both runtimes.
-- [ ] [P2-T5] Run `sh SCRATCHPAD/s-pester.sh P2` and record `FEATURE/evidence/qa-gates/phase2-pester.STAMP.md`.
+- [x] [P2-T5] Run `sh SCRATCHPAD/s-pester.sh P2` and record `FEATURE/evidence/qa-gates/phase2-pester.STAMP.md`.
   - Acceptance: `PESTER_FAILED` names only tests in `B_SCOPED`; no `FAILED_TEST:` line names a T-SCAN row; every Phase 2 shared-module edit that [P2-T3] did not copy has a matching `mirror-<group>-phase2` artifact written before this run (rule 6).
-- [ ] [P2-T6] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase2-lines.STAMP.md`.
+- [x] [P2-T6] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase2-lines.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0` and `OVER_500: NONE`.
-- [ ] [P2-T7] Commit and push the four production files, the new test file, and evidence (`git add -- .claude/hooks/hook-command-scanner.ps1 .claude/hooks/hook-command-heredoc.ps1 .codex/hooks/hook-command-scanner.ps1 .codex/hooks/hook-command-heredoc.ps1 tests/scripts/claude-hooks/hook-command-scanner.Issue824.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every other shared module (both surfaces) edited or copied under rule 6 during Phase 2, matching `git commit -m "feat(824): scanner delimiter capture and heredoc module" -- <same paths>`, `git push -u origin BRANCH`).
+- [x] [P2-T7] Commit and push the four production files, the new test file, and evidence (`git add -- .claude/hooks/hook-command-scanner.ps1 .claude/hooks/hook-command-heredoc.ps1 .codex/hooks/hook-command-scanner.ps1 .codex/hooks/hook-command-heredoc.ps1 tests/scripts/claude-hooks/hook-command-scanner.Issue824.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every other shared module (both surfaces) edited or copied under rule 6 during Phase 2, matching `git commit -m "feat(824): scanner delimiter capture and heredoc module" -- <same paths>`, `git push -u origin BRANCH`).
   - Acceptance: each command exits 0.
 
 ### Phase 3 — Payload Modules
 
-- [ ] [P3-T1] Create `.claude/hooks/hook-command-payload.ps1` implementing `Read-CommandLineInvocationSegment` (DC-3, DC-4, DC-6, DC-8, DC-9), `Test-CommandLineWordPresent` (DC-13), leaf normalization (DC-5), transparent-wrapper skipping (DC-4), and the inert proof (DC-14), using approved verbs and `CmdletBinding`.
+- [x] [P3-T1] Create `.claude/hooks/hook-command-payload.ps1` implementing `Read-CommandLineInvocationSegment` (DC-3, DC-4, DC-6, DC-8, DC-9), `Test-CommandLineWordPresent` (DC-13), leaf normalization (DC-5), transparent-wrapper skipping (DC-4), and the inert proof (DC-14), using approved verbs and `CmdletBinding`.
   - Acceptance: [P3-T6] rows PY-01..PY-24 pass.
-- [ ] [P3-T2] Create `.claude/hooks/hook-command-payload-powershell.ps1` implementing the `pwsh`/`powershell` flag parsing, base64 decode, and AST adapter (DC-4, DC-7).
+- [x] [P3-T2] Create `.claude/hooks/hook-command-payload-powershell.ps1` implementing the `pwsh`/`powershell` flag parsing, base64 decode, and AST adapter (DC-4, DC-7).
   - Acceptance: [P3-T6] rows PY-07..PY-11 and PY-19 pass.
-- [ ] [P3-T3] Edit `.claude/hooks/hook-command-invocation.ps1`: after `:17` add dot-source lines for `hook-command-payload.ps1` and `hook-command-payload-powershell.ps1`.
+- [x] [P3-T3] Edit `.claude/hooks/hook-command-invocation.ps1`: after `:17` add dot-source lines for `hook-command-payload.ps1` and `hook-command-payload-powershell.ps1`.
   - Acceptance: [P3-T6] loads both modules through `hook-command-invocation.ps1` only.
-- [ ] [P3-T4] Run `sh SCRATCHPAD/s-mirror.sh codex-payload` and record `FEATURE/evidence/other/mirror-codex-payload.STAMP.md`.
+- [x] [P3-T4] Run `sh SCRATCHPAD/s-mirror.sh codex-payload` and record `FEATURE/evidence/other/mirror-codex-payload.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; three `COPIED` lines with equal hashes.
-- [ ] [P3-T5] Create `tests/scripts/claude-hooks/hook-command-payload.Tests.ps1` with rows PY-01..PY-24 (section 5 T-PAY).
+- [x] [P3-T5] Create `tests/scripts/claude-hooks/hook-command-payload.Tests.ps1` with rows PY-01..PY-24 (section 5 T-PAY).
   - Acceptance: [P3-T6] reports every PY row passed for both runtimes.
-- [ ] [P3-T6] Run `sh SCRATCHPAD/s-pester.sh P3` and record `FEATURE/evidence/qa-gates/phase3-pester.STAMP.md`.
+- [x] [P3-T6] Run `sh SCRATCHPAD/s-pester.sh P3` and record `FEATURE/evidence/qa-gates/phase3-pester.STAMP.md`.
   - Acceptance: failures are a subset of `B_SCOPED`; no T-SCAN or T-PAY row fails; every Phase 3 shared-module edit that [P3-T4] did not copy has a matching `mirror-<group>-phase3` artifact written before this run (rule 6).
-- [ ] [P3-T7] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase3-lines.STAMP.md`.
+- [x] [P3-T7] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase3-lines.STAMP.md`.
   - Acceptance: `OVER_500: NONE`.
-- [ ] [P3-T8] Commit and push (`git add --` and `git commit -m "feat(824): payload extraction and PowerShell adapter" --` over `.claude/hooks/hook-command-payload.ps1 .claude/hooks/hook-command-payload-powershell.ps1 .claude/hooks/hook-command-invocation.ps1 .codex/hooks/hook-command-payload.ps1 .codex/hooks/hook-command-payload-powershell.ps1 .codex/hooks/hook-command-invocation.ps1 tests/scripts/claude-hooks/hook-command-payload.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every other shared module (both surfaces) edited or copied under rule 6 during Phase 3, as the pathspecs of both the `git add --` and the `git commit ... --` commands; then `git push -u origin BRANCH`).
+- [x] [P3-T8] Commit and push (`git add --` and `git commit -m "feat(824): payload extraction and PowerShell adapter" --` over `.claude/hooks/hook-command-payload.ps1 .claude/hooks/hook-command-payload-powershell.ps1 .claude/hooks/hook-command-invocation.ps1 .codex/hooks/hook-command-payload.ps1 .codex/hooks/hook-command-payload-powershell.ps1 .codex/hooks/hook-command-invocation.ps1 tests/scripts/claude-hooks/hook-command-payload.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every other shared module (both surfaces) edited or copied under rule 6 during Phase 3, as the pathspecs of both the `git add --` and the `git commit ... --` commands; then `git push -u origin BRANCH`).
   - Acceptance: each command exits 0.
 
 ### Phase 4 — Invocation Matcher, Operands Module, and Matcher Tests
 
-- [ ] [P4-T1] Create `.claude/hooks/hook-command-invocation-operands.ps1` containing `Get-CommandLineOperand`, `Get-CommandLineFlagValue`, `Test-CommandLineFlag` with unchanged parameter lists and OutputTypes (pinned at `tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1:306-322`) and the DC-15 behavior, plus `Resolve-CommandLineInvocationTarget` (DC-15).
+- [x] [P4-T1] Create `.claude/hooks/hook-command-invocation-operands.ps1` containing `Get-CommandLineOperand`, `Get-CommandLineFlagValue`, `Test-CommandLineFlag` with unchanged parameter lists and OutputTypes (pinned at `tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1:306-322`) and the DC-15 behavior, plus `Resolve-CommandLineInvocationTarget` (DC-15).
   - Acceptance: [P4-T8] rows OP-01..OP-16 and the existing operand/flag rows (`tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1:82-178`) pass.
-- [ ] [P4-T2] Edit `.claude/hooks/hook-command-invocation.ps1`: apply DC-10, DC-11, DC-15, DC-16 (add `Terminal`, move `--exec-path`, terminal handling in `Skip-CommandLineOption`, `Get-CommandLineInvocation`, `Status` on `Resolve-CommandLineInvocation`, token-bounded `Test-CommandLineMention`); delete `Test-CommandLineRawContainment` and the three moved readers; add the dot-source line for `hook-command-invocation-operands.ps1`; rewrite the contract text at `:25-31` and `:170-182`.
+- [x] [P4-T2] Edit `.claude/hooks/hook-command-invocation.ps1`: apply DC-10, DC-11, DC-15, DC-16 (add `Terminal`, move `--exec-path`, terminal handling in `Skip-CommandLineOption`, `Get-CommandLineInvocation`, `Status` on `Resolve-CommandLineInvocation`, token-bounded `Test-CommandLineMention`); delete `Test-CommandLineRawContainment` and the three moved readers; add the dot-source line for `hook-command-invocation-operands.ps1`; rewrite the contract text at `:25-31` and `:170-182`.
   - Acceptance: [P4-T8] rows IV-01..IV-24 pass; row IV-17 confirms the removal and the absence of the old contract sentence.
-- [ ] [P4-T3] Run `sh SCRATCHPAD/s-mirror.sh codex-invocation` and record `FEATURE/evidence/other/mirror-codex-invocation.STAMP.md`.
+- [x] [P4-T3] Run `sh SCRATCHPAD/s-mirror.sh codex-invocation` and record `FEATURE/evidence/other/mirror-codex-invocation.STAMP.md`.
   - Acceptance: two `COPIED` lines with equal hashes.
-- [ ] [P4-T4] Edit `tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1`: retitle `:201` to `classifies a wrapper-led segment whose payload invokes the command`, keep its two assertions; change the git table pin at `:239-245` to compare against `(@('-C','-c','--git-dir','--work-tree','--namespace') | Sort-Object) -join ','` for `WithArgument` and `(@('-p','--paginate','--no-pager','--literal-pathspecs','--no-optional-locks','--bare','--exec-path') | Sort-Object) -join ','` for `Standalone`.
+- [x] [P4-T4] Edit `tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1`: retitle `:201` to `classifies a wrapper-led segment whose payload invokes the command`, keep its two assertions; change the git table pin at `:239-245` to compare against `(@('-C','-c','--git-dir','--work-tree','--namespace') | Sort-Object) -join ','` for `WithArgument` and `(@('-p','--paginate','--no-pager','--literal-pathspecs','--no-optional-locks','--bare','--exec-path') | Sort-Object) -join ','` for `Standalone`.
   - Acceptance: [P4-T8] reports the file with zero failures.
-- [ ] [P4-T5] Apply the same two edits to `tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1` (`:201`, `:239-245`).
+- [x] [P4-T5] Apply the same two edits to `tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1` (`:201`, `:239-245`).
   - Acceptance: [P4-T8] reports the file with zero failures.
-- [ ] [P4-T6] Create `tests/scripts/claude-hooks/hook-command-invocation.Issue824.Tests.ps1` with rows IV-01..IV-24 (section 5 T-INV); IV-16 carries tag `NegativeControl`.
+- [x] [P4-T6] Create `tests/scripts/claude-hooks/hook-command-invocation.Issue824.Tests.ps1` with rows IV-01..IV-24 (section 5 T-INV); IV-16 carries tag `NegativeControl`.
   - Acceptance: [P4-T8] reports every IV row passed for both runtimes.
-- [ ] [P4-T7] Create `tests/scripts/claude-hooks/hook-command-invocation-operands.Tests.ps1` with rows OP-01..OP-16 (section 5 T-OPS).
+- [x] [P4-T7] Create `tests/scripts/claude-hooks/hook-command-invocation-operands.Tests.ps1` with rows OP-01..OP-16 (section 5 T-OPS).
   - Acceptance: [P4-T8] reports every OP row passed for both runtimes.
-- [ ] [P4-T8] Run `sh SCRATCHPAD/s-pester.sh P4` and record `FEATURE/evidence/qa-gates/phase4-pester.STAMP.md`.
+- [x] [P4-T8] Run `sh SCRATCHPAD/s-pester.sh P4` and record `FEATURE/evidence/qa-gates/phase4-pester.STAMP.md`.
   - Acceptance: failures are a subset of `B_SCOPED`; no T-SCAN, T-PAY, T-INV, or T-OPS row fails; every Phase 4 shared-module edit that [P4-T3] did not copy has a matching `mirror-<group>-phase4` artifact written before this run (rule 6).
-- [ ] [P4-T9] Run `sh SCRATCHPAD/s-pester.sh A-NOPARITY` and record `FEATURE/evidence/qa-gates/phase4-consumers.STAMP.md` (consumer suites against the new matcher before consumer edits).
+- [x] [P4-T9] Run `sh SCRATCHPAD/s-pester.sh A-NOPARITY` and record `FEATURE/evidence/qa-gates/phase4-consumers.STAMP.md` (consumer suites against the new matcher before consumer edits).
   - Acceptance: failures are a subset of `B_SCOPED`. Any other failure is a matcher regression and is fixed in Phase 4 before [P4-T11]; the gate path helpers deleted in Phase 5 still exist at this point, so their existing rows are expected to pass.
-- [ ] [P4-T10] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase4-lines.STAMP.md`.
+- [x] [P4-T10] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase4-lines.STAMP.md`.
   - Acceptance: `OVER_500: NONE`.
-- [ ] [P4-T11] Commit and push (`git add --` / `git commit -m "feat(824): structural invocation matcher and operand target resolver" --` over `.claude/hooks/hook-command-invocation.ps1 .claude/hooks/hook-command-invocation-operands.ps1 .codex/hooks/hook-command-invocation.ps1 .codex/hooks/hook-command-invocation-operands.ps1 tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1 tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1 tests/scripts/claude-hooks/hook-command-invocation.Issue824.Tests.ps1 tests/scripts/claude-hooks/hook-command-invocation-operands.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every other shared module (both surfaces) edited or copied under rule 6 during Phase 4, as the pathspecs of both the `git add --` and the `git commit ... --` commands; `git push -u origin BRANCH`).
+- [x] [P4-T11] Commit and push (`git add --` / `git commit -m "feat(824): structural invocation matcher and operand target resolver" --` over `.claude/hooks/hook-command-invocation.ps1 .claude/hooks/hook-command-invocation-operands.ps1 .codex/hooks/hook-command-invocation.ps1 .codex/hooks/hook-command-invocation-operands.ps1 tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1 tests/scripts/codex-hooks/hook-command-invocation.Tests.ps1 tests/scripts/claude-hooks/hook-command-invocation.Issue824.Tests.ps1 tests/scripts/claude-hooks/hook-command-invocation-operands.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every other shared module (both surfaces) edited or copied under rule 6 during Phase 4, as the pathspecs of both the `git add --` and the `git commit ... --` commands; `git push -u origin BRANCH`).
   - Acceptance: each command exits 0.
 
 ### Phase 5 — Promotion Hook and Worktree-Removal Gates
 
-- [ ] [P5-T1] Edit `.claude/hooks/enforce-promotion-mcp-only.ps1:114-120` per DC-17.
+- [x] [P5-T1] Edit `.claude/hooks/enforce-promotion-mcp-only.ps1:114-120` per DC-17.
   - Acceptance: [P5-T18] rows PM-14 and PM-30 pass for runtime `claude`.
-- [ ] [P5-T2] Edit `.codex/hooks/enforce-promotion-mcp-only.ps1:111-117` per DC-17.
+- [x] [P5-T2] Edit `.codex/hooks/enforce-promotion-mcp-only.ps1:111-117` per DC-17.
   - Acceptance: [P5-T18] rows PM-14 and PM-30 pass for runtime `codex`.
-- [ ] [P5-T3] Edit `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` per DC-18: delete `:111-150`, add `Get-EpicWorktreeRemovalTargetDenial`, replace `:359-403` with the `NoMatch`/`Indeterminate`/`Targets` dispatch; rewrite the comment at `:72-73` to name `Resolve-CommandLineInvocationTarget` in place of `Get-EpicWorktreeRemovalCommandPath`.
+- [x] [P5-T3] Edit `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` per DC-18: delete `:111-150`, add `Get-EpicWorktreeRemovalTargetDenial`, replace `:359-403` with the `NoMatch`/`Indeterminate`/`Targets` dispatch; rewrite the comment at `:72-73` to name `Resolve-CommandLineInvocationTarget` in place of `Get-EpicWorktreeRemovalCommandPath`.
   - Acceptance: [P5-T18] T-EPIC rows pass and `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Tests.ps1` row `emits the unchanged epic block reason` (`:480-488`) passes.
-- [ ] [P5-T4] Edit `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` per DC-18: delete `:167-211`, add `Get-ParallelWorktreeRemovalTargetDenial`, replace `:365-420`; rewrite the comment at `:41-44` to name `Resolve-CommandLineInvocationTarget` in place of `Get-ParallelWorktreeRemovalCommandPath`.
+- [x] [P5-T4] Edit `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` per DC-18: delete `:167-211`, add `Get-ParallelWorktreeRemovalTargetDenial`, replace `:365-420`; rewrite the comment at `:41-44` to name `Resolve-CommandLineInvocationTarget` in place of `Get-ParallelWorktreeRemovalCommandPath`.
   - Acceptance: [P5-T18] T-PAR rows pass and the existing parallel reason pin (`tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1:451`) passes.
-- [ ] [P5-T5] Edit `.codex/hooks/enforce-epic-worktree-removal-gate.ps1` per DC-18: delete `:36-68`, add `Get-CodexWorktreeRemovalTargetDenial`, replace `:126-153`.
+- [x] [P5-T5] Edit `.codex/hooks/enforce-epic-worktree-removal-gate.ps1` per DC-18: delete `:36-68`, add `Get-CodexWorktreeRemovalTargetDenial`, replace `:126-153`.
   - Acceptance: [P5-T18] T-CXEPIC rows and both existing Codex epic-gate suites pass, and `git grep -n -e Get-EpicWorktreeRemovalCommandPath -e Get-ParallelWorktreeRemovalCommandPath -e Get-CodexWorktreeRemovalPath -- .claude/hooks .codex/hooks` exits 1, recorded in `FEATURE/evidence/qa-gates/phase5-helper-removal.STAMP.md` with `ExpectedExitCode: 1`. The search is limited to the two hook folders: at this point the bundled copies under `extensions/drm-copilot/resources/` still carry the base text until [P7-T1]/[P7-T2] copy them (their later equality is asserted by [P7-T6] and [P10-T14]), and the test references at `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Tests.ps1:136-143`, `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1:72-77`, `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1:261-268`, `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1:54`, `tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1:195-197`, `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1:83-88`, and `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1:124-134` are rewritten later by [P5-T6]..[P5-T12].
-- [ ] [P5-T6] Edit `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Tests.ps1:136-145`: retitle the context `Resolve-CommandLineInvocationTarget for the epic gate`; the first row asserts `Targets` equals `@('/repo/worktrees/child-a')`; the second asserts `Status` is `NoMatch` for `git status`. The file stays at or below 500 lines (497 at base).
+- [x] [P5-T6] Edit `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Tests.ps1:136-145`: retitle the context `Resolve-CommandLineInvocationTarget for the epic gate`; the first row asserts `Targets` equals `@('/repo/worktrees/child-a')`; the second asserts `Status` is `NoMatch` for `git status`. The file stays at or below 500 lines (497 at base).
   - Acceptance: [P5-T18] reports the file with failures only in `B_SCOPED`; [P5-T19] reports it at or below 500.
-- [ ] [P5-T7] Edit `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1:70-80`: both rows assert `Targets` equals `@('/repo/worktrees/item-a-101')` via `Resolve-CommandLineInvocationTarget`.
+- [x] [P5-T7] Edit `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.TriggerScoping.Tests.ps1:70-80`: both rows assert `Targets` equals `@('/repo/worktrees/item-a-101')` via `Resolve-CommandLineInvocationTarget`.
   - Acceptance: [P5-T18] reports the file with zero new failures.
-- [ ] [P5-T8] Edit `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1:261-270`: retitle the context `Resolve-CommandLineInvocationTarget for the parallel gate`; the first row asserts `(Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove /repo/worktrees/item-a-101' -CommandWord 'git' -SubcommandPath @('worktree','remove')).Targets` equals `@('/repo/worktrees/item-a-101')`; the second asserts `Status` is `NoMatch` for `git status`.
+- [x] [P5-T8] Edit `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Tests.ps1:261-270`: retitle the context `Resolve-CommandLineInvocationTarget for the parallel gate`; the first row asserts `(Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove /repo/worktrees/item-a-101' -CommandWord 'git' -SubcommandPath @('worktree','remove')).Targets` equals `@('/repo/worktrees/item-a-101')`; the second asserts `Status` is `NoMatch` for `git status`.
   - Acceptance: [P5-T18] reports the file with zero new failures.
-- [ ] [P5-T9] Edit `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1:50-56` (the single row `resolves the operand when --force precedes the path`, which calls `Get-ParallelWorktreeRemovalCommandPath`): the row asserts that `(Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove --force /repo/worktrees/item-a-101' -CommandWord 'git' -SubcommandPath @('worktree','remove')).Targets` equals `@('/repo/worktrees/item-a-101')`.
+- [x] [P5-T9] Edit `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.TriggerScoping.Tests.ps1:50-56` (the single row `resolves the operand when --force precedes the path`, which calls `Get-ParallelWorktreeRemovalCommandPath`): the row asserts that `(Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove --force /repo/worktrees/item-a-101' -CommandWord 'git' -SubcommandPath @('worktree','remove')).Targets` equals `@('/repo/worktrees/item-a-101')`.
   - Acceptance: [P5-T18] reports the file with zero new failures.
-- [ ] [P5-T10] Edit `tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1:185-200`: AT-7 asserts `Targets` equals `@('/repo/worktrees/item-a-101')` from one `Resolve-CommandLineInvocationTarget` call; its comment states both gates consume that resolver.
+- [x] [P5-T10] Edit `tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1:185-200`: AT-7 asserts `Targets` equals `@('/repo/worktrees/item-a-101')` from one `Resolve-CommandLineInvocationTarget` call; its comment states both gates consume that resolver.
   - Acceptance: [P5-T18] reports the file with zero new failures.
-- [ ] [P5-T11] Edit `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1:79-91`: both rows assert `Targets` equals `@($script:TargetPath)`.
+- [x] [P5-T11] Edit `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-trigger-scoping.Tests.ps1:79-91`: both rows assert `Targets` equals `@($script:TargetPath)`.
   - Acceptance: [P5-T18] reports the file with zero new failures.
-- [ ] [P5-T12] Edit `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1:124-136`: `git worktree remove --force` and `git worktree remove` assert `Status` `Indeterminate`; `git worktree list --porcelain` asserts `NoMatch`; the context title names `Resolve-CommandLineInvocationTarget`.
+- [x] [P5-T12] Edit `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-decision-surface.Tests.ps1:124-136`: `git worktree remove --force` and `git worktree remove` assert `Status` `Indeterminate`; `git worktree list --porcelain` asserts `NoMatch`; the context title names `Resolve-CommandLineInvocationTarget`.
   - Acceptance: [P5-T18] reports the file with zero new failures.
-- [ ] [P5-T13] Create `tests/scripts/claude-hooks/enforce-promotion-mcp-only.Issue824.Tests.ps1` with rows PM-01..PM-32 (section 5 T-PROMO); PM-29 tagged `NegativeControl`.
+- [x] [P5-T13] Create `tests/scripts/claude-hooks/enforce-promotion-mcp-only.Issue824.Tests.ps1` with rows PM-01..PM-32 (section 5 T-PROMO); PM-29 tagged `NegativeControl`.
   - Acceptance: [P5-T18] reports every PM row passed for both runtimes.
-- [ ] [P5-T14] Create `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Issue824.Tests.ps1` with rows EW-01..EW-39; EW-39 tagged `NegativeControl`.
+- [x] [P5-T14] Create `tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Issue824.Tests.ps1` with rows EW-01..EW-39; EW-39 tagged `NegativeControl`.
   - Acceptance: [P5-T18] reports every EW row passed.
-- [ ] [P5-T15] Create `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Issue824.Tests.ps1` with rows PW-01..PW-39; PW-39 tagged `NegativeControl`.
+- [x] [P5-T15] Create `tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.Issue824.Tests.ps1` with rows PW-01..PW-39; PW-39 tagged `NegativeControl`.
   - Acceptance: [P5-T18] reports every PW row passed.
-- [ ] [P5-T16] Create `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-issue824.Tests.ps1` with rows CW-01..CW-39; CW-39 tagged `NegativeControl`.
+- [x] [P5-T16] Create `tests/scripts/codex-hooks/enforce-epic-worktree-removal-gate-issue824.Tests.ps1` with rows CW-01..CW-39; CW-39 tagged `NegativeControl`.
   - Acceptance: [P5-T18] reports every CW row passed.
-- [ ] [P5-T17] Create `tests/scripts/claude-hooks/hook-command-consumers.Issue824.Tests.ps1` with rows CN-01..CN-10 (section 5 T-CONS).
+- [x] [P5-T17] Create `tests/scripts/claude-hooks/hook-command-consumers.Issue824.Tests.ps1` with rows CN-01..CN-10 (section 5 T-CONS).
   - Acceptance: [P5-T18] reports every CN row passed.
-- [ ] [P5-T18] Run `sh SCRATCHPAD/s-pester.sh P5` and record `FEATURE/evidence/qa-gates/phase5-pester.STAMP.md`.
+- [x] [P5-T18] Run `sh SCRATCHPAD/s-pester.sh P5` and record `FEATURE/evidence/qa-gates/phase5-pester.STAMP.md`.
   - Acceptance: failures are a subset of `B_SCOPED`; no row in a file created by this plan fails; every shared-module edit made in Phase 5 has a matching `mirror-<group>-phase5` artifact written before this run (rule 6).
-- [ ] [P5-T19] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase5-lines.STAMP.md`.
+- [x] [P5-T19] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase5-lines.STAMP.md`.
   - Acceptance: `OVER_500: NONE`.
-- [ ] [P5-T20] Commit and push every path edited or created in [P5-T1]..[P5-T17], every shared module (both surfaces) edited or copied under rule 6 during Phase 5, plus `FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` (`git commit -m "feat(824): promotion and worktree gates consume the structural matcher" --` with the same pathspecs), then `git push -u origin BRANCH`.
+- [x] [P5-T20] Commit and push every path edited or created in [P5-T1]..[P5-T17], every shared module (both surfaces) edited or copied under rule 6 during Phase 5, plus `FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` (`git commit -m "feat(824): promotion and worktree gates consume the structural matcher" --` with the same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
 
 ### Phase 6 — pr-author Matching, Allowlist Hook, and Receipt Procedure
 
-- [ ] [P6-T1] Edit `.claude/hooks/enforce-pr-author-skill-helpers.ps1` per DC-19 (`Get-PrAuthorBodyFileRoot`, check 1 at `:169-177`, fallback at `:293-311`).
+- [x] [P6-T1] Edit `.claude/hooks/enforce-pr-author-skill-helpers.ps1` per DC-19 (`Get-PrAuthorBodyFileRoot`, check 1 at `:169-177`, fallback at `:293-311`).
   - Acceptance: [P6-T7] rows PA-01..PA-22 pass and every existing `enforce-pr-author-skill*.Tests.ps1` row in set `P6` passes (subset of `B_SCOPED` otherwise).
-- [ ] [P6-T2] Create `.claude/hooks/enforce-pr-author-command-allowlist.ps1` per DC-20.
+- [x] [P6-T2] Create `.claude/hooks/enforce-pr-author-command-allowlist.ps1` per DC-20.
   - Acceptance: [P6-T7] rows AL-01..AL-32, AL-36, AL-37 pass.
-- [ ] [P6-T3] Edit `.claude/agents/pr-author.md` per DC-21 (frontmatter `:8-20`, protocol `:52`, `:59-60`, new paragraph after `:70`).
+- [x] [P6-T3] Edit `.claude/agents/pr-author.md` per DC-21 (frontmatter `:8-20`, protocol `:52`, `:59-60`, new paragraph after `:70`).
   - Acceptance: [P6-T7] rows AL-33, AL-34, AL-35 pass.
-- [ ] [P6-T4] Edit `.claude/skills/pr-author/SKILL.md` per DC-21: replace step 2 at `:52` with the step-2 sentence; insert the `created_at` sentence as a new three-space-indented paragraph of step 3 immediately after the closing JSON fence at `:64` (the fenced block `:55-64` is unchanged).
+- [x] [P6-T4] Edit `.claude/skills/pr-author/SKILL.md` per DC-21: replace step 2 at `:52` with the step-2 sentence; insert the `created_at` sentence as a new three-space-indented paragraph of step 3 immediately after the closing JSON fence at `:64` (the fenced block `:55-64` is unchanged).
   - Acceptance: [P6-T7] rows AL-34 and AL-35 pass.
-- [ ] [P6-T5] Create `tests/scripts/claude-hooks/enforce-pr-author-skill.Issue824.Tests.ps1` with rows PA-01..PA-22; PA-20 tagged `NegativeControl`.
+- [x] [P6-T5] Create `tests/scripts/claude-hooks/enforce-pr-author-skill.Issue824.Tests.ps1` with rows PA-01..PA-22; PA-20 tagged `NegativeControl`.
   - Acceptance: [P6-T7] reports every PA row passed.
-- [ ] [P6-T6] Create `tests/scripts/claude-hooks/enforce-pr-author-command-allowlist.Tests.ps1` with rows AL-01..AL-37.
+- [x] [P6-T6] Create `tests/scripts/claude-hooks/enforce-pr-author-command-allowlist.Tests.ps1` with rows AL-01..AL-37.
   - Acceptance: [P6-T7] reports every AL row passed.
-- [ ] [P6-T7] Run `sh SCRATCHPAD/s-pester.sh P6` and record `FEATURE/evidence/qa-gates/phase6-pester.STAMP.md`.
+- [x] [P6-T7] Run `sh SCRATCHPAD/s-pester.sh P6` and record `FEATURE/evidence/qa-gates/phase6-pester.STAMP.md`.
   - Acceptance: failures are a subset of `B_SCOPED`; no PA or AL row fails; every shared-module edit made in Phase 6 has a matching `mirror-<group>-phase6` artifact written before this run (rule 6).
-- [ ] [P6-T8] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase6-lines.STAMP.md`.
+- [x] [P6-T8] Run `sh SCRATCHPAD/s-lines.sh` and record `FEATURE/evidence/qa-gates/phase6-lines.STAMP.md`.
   - Acceptance: `OVER_500: NONE`.
-- [ ] [P6-T9] Commit and push `.claude/hooks/enforce-pr-author-skill-helpers.ps1 .claude/hooks/enforce-pr-author-command-allowlist.ps1 .claude/agents/pr-author.md .claude/skills/pr-author/SKILL.md tests/scripts/claude-hooks/enforce-pr-author-skill.Issue824.Tests.ps1 tests/scripts/claude-hooks/enforce-pr-author-command-allowlist.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every shared module (both surfaces) edited or copied under rule 6 during Phase 6, as the pathspecs of both the `git add --` and the `git commit ... --` commands (`git commit -m "feat(824): pr-author body-file matching and per-segment allowlist hook" --` same pathspecs), then `git push -u origin BRANCH`.
+- [x] [P6-T9] Commit and push `.claude/hooks/enforce-pr-author-skill-helpers.ps1 .claude/hooks/enforce-pr-author-command-allowlist.ps1 .claude/agents/pr-author.md .claude/skills/pr-author/SKILL.md tests/scripts/claude-hooks/enforce-pr-author-skill.Issue824.Tests.ps1 tests/scripts/claude-hooks/enforce-pr-author-command-allowlist.Tests.ps1 FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus every sibling file split from a test file created in this phase and listed in `FEATURE/evidence/other/test-split-log.md`, plus every shared module (both surfaces) edited or copied under rule 6 during Phase 6, as the pathspecs of both the `git add --` and the `git commit ... --` commands (`git commit -m "feat(824): pr-author body-file matching and per-segment allowlist hook" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
 
 ### Phase 7 — Bundled Mirrors, Pack Manifests, and Parity
 
-- [ ] [P7-T1] Run `sh SCRATCHPAD/s-mirror.sh claude-bundle` and record `FEATURE/evidence/other/mirror-claude-bundle.STAMP.md`.
+- [x] [P7-T1] Run `sh SCRATCHPAD/s-mirror.sh claude-bundle` and record `FEATURE/evidence/other/mirror-claude-bundle.STAMP.md`.
   - Acceptance: 13 `COPIED` lines with equal source and target hashes.
-- [ ] [P7-T2] Run `sh SCRATCHPAD/s-mirror.sh codex-bundle` and record `FEATURE/evidence/other/mirror-codex-bundle.STAMP.md`.
+- [x] [P7-T2] Run `sh SCRATCHPAD/s-mirror.sh codex-bundle` and record `FEATURE/evidence/other/mirror-codex-bundle.STAMP.md`.
   - Acceptance: 8 `COPIED` lines with equal hashes.
-- [ ] [P7-T3] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: insert `.claude/hooks/enforce-pr-author-command-allowlist.ps1` before `:49` and `.claude/hooks/hook-command-heredoc.ps1`, `.claude/hooks/hook-command-invocation-operands.ps1`, `.claude/hooks/hook-command-payload.ps1`, `.claude/hooks/hook-command-payload-powershell.ps1` around `:55-56` in sorted position.
+- [x] [P7-T3] Edit `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: insert `.claude/hooks/enforce-pr-author-command-allowlist.ps1` before `:49` and `.claude/hooks/hook-command-heredoc.ps1`, `.claude/hooks/hook-command-invocation-operands.ps1`, `.claude/hooks/hook-command-payload.ps1`, `.claude/hooks/hook-command-payload-powershell.ps1` around `:55-56` in sorted position.
   - Acceptance: [P7-T8] pytest and [P7-T9] jest manifest-completeness tests pass.
-- [ ] [P7-T4] Edit `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`: insert `.codex/hooks/hook-command-heredoc.ps1`, `.codex/hooks/hook-command-invocation-operands.ps1`, `.codex/hooks/hook-command-payload.ps1`, `.codex/hooks/hook-command-payload-powershell.ps1` after `:46`.
+- [x] [P7-T4] Edit `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`: insert `.codex/hooks/hook-command-heredoc.ps1`, `.codex/hooks/hook-command-invocation-operands.ps1`, `.codex/hooks/hook-command-payload.ps1`, `.codex/hooks/hook-command-payload-powershell.ps1` after `:46`.
   - Acceptance: [P7-T8] Codex manifest-completeness tests pass.
-- [ ] [P7-T5] Edit `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1:30` in place to append `'hook-command-heredoc.ps1', 'hook-command-payload.ps1', 'hook-command-payload-powershell.ps1', 'hook-command-invocation-operands.ps1'` to `SharedModuleNames` on the same line; the file stays at 497 lines.
+- [x] [P7-T5] Edit `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1:30` in place to append `'hook-command-heredoc.ps1', 'hook-command-payload.ps1', 'hook-command-payload-powershell.ps1', 'hook-command-invocation-operands.ps1'` to `SharedModuleNames` on the same line; the file stays at 497 lines.
   - Acceptance: [P7-T7] reports the file passed; [P10-T12] reports `LINES tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 497`.
-- [ ] [P7-T6] Run `sh SCRATCHPAD/s-hash.sh final` and record `FEATURE/evidence/qa-gates/parity-hashes.STAMP.md`.
+- [x] [P7-T6] Run `sh SCRATCHPAD/s-hash.sh final` and record `FEATURE/evidence/qa-gates/parity-hashes.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; every group `DISTINCT=1`.
-- [ ] [P7-T7] Run `sh SCRATCHPAD/s-pester.sh PARITY` and record `FEATURE/evidence/qa-gates/parity-pester.STAMP.md`.
+- [x] [P7-T7] Run `sh SCRATCHPAD/s-pester.sh PARITY` and record `FEATURE/evidence/qa-gates/parity-pester.STAMP.md`.
   - Acceptance: `PESTER_FAILED: 0`, or failures only in `B_SCOPED`.
-- [ ] [P7-T8] Run the [P0-T19] pytest command (the same four files under `tests/scripts/dev_tools/`) and record `FEATURE/evidence/qa-gates/pytest-parity-phase7.STAMP.md`.
+- [x] [P7-T8] Run the [P0-T19] pytest command (the same four files under `tests/scripts/dev_tools/`) and record `FEATURE/evidence/qa-gates/pytest-parity-phase7.STAMP.md`.
   - Acceptance: the pytest summary line is printed and reports a total greater than 0 (otherwise BLOCKED); failing node IDs are a subset of `B_PY`.
-- [ ] [P7-T9] Run the [P0-T20] jest command (the same three files under `extensions/drm-copilot/test/lib/push-down/`) and record `FEATURE/evidence/qa-gates/jest-parity-phase7.STAMP.md`.
+- [x] [P7-T9] Run the [P0-T20] jest command (the same three files under `extensions/drm-copilot/test/lib/push-down/`) and record `FEATURE/evidence/qa-gates/jest-parity-phase7.STAMP.md`.
   - Acceptance: the Jest `Tests:` line is printed and reports a total greater than 0 (otherwise BLOCKED); failing test names are a subset of `B_JS`.
-- [ ] [P7-T10] Commit and push every bundled mirror path of section 3, both `core.json` files, `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`, `FEATURE/evidence`, and the plan (`git commit -m "chore(824): bundle mirrors and pack-manifest entries" --` same pathspecs), then `git push -u origin BRANCH`.
+- [x] [P7-T10] Commit and push every bundled mirror path of section 3, both `core.json` files, `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`, `FEATURE/evidence`, and the plan (`git commit -m "chore(824): bundle mirrors and pack-manifest entries" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
 
 ### Phase 8 — Pass-After Regression and Negative Controls
 
-- [ ] [P8-T1] Run `sh SCRATCHPAD/s-pester.sh REG` and record `FEATURE/evidence/regression-testing/pass-after.STAMP.md`.
+- [x] [P8-T1] Run `sh SCRATCHPAD/s-pester.sh REG` and record `FEATURE/evidence/regression-testing/pass-after.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`, `PESTER_TOTAL: 23`, `PESTER_PASSED: 23`, `PESTER_FAILED: 0`.
-- [ ] [P8-T2] Run `sh SCRATCHPAD/s-pester.sh NC` and record `FEATURE/evidence/regression-testing/negative-controls.STAMP.md`.
+- [x] [P8-T2] Run `sh SCRATCHPAD/s-pester.sh NC` and record `FEATURE/evidence/regression-testing/negative-controls.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; `RESULT Passed` lines for IV-16 (both runtimes), PM-29 (both runtimes), EW-39, PW-39, CW-39, and PA-20 (8 executions).
-- [ ] [P8-T3] Write `FEATURE/evidence/regression-testing/fail-before-pass-after-summary.STAMP.md` with one row per named reproduction (`R-824-MAIN`, `R-824-ADD1`, `R-742-1`, `R-733-714`, `R-733-GREP`, `R-733-715`, `R-733-712`) listing its REG row IDs, the [P1-T2] result, and the [P8-T1] result.
+- [x] [P8-T3] Write `FEATURE/evidence/regression-testing/fail-before-pass-after-summary.STAMP.md` with one row per named reproduction (`R-824-MAIN`, `R-824-ADD1`, `R-742-1`, `R-733-714`, `R-733-GREP`, `R-733-715`, `R-733-712`) listing its REG row IDs, the [P1-T2] result, and the [P8-T1] result.
   - Acceptance: seven rows, each `Failed` before and `Passed` after.
-- [ ] [P8-T4] Commit and push `FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus any write-set path (including its rule-6 mirror copies) changed by a fix made during Phase 8 (`git commit -m "docs(824): record pass-after regression evidence" --` same pathspecs), then `git push -u origin BRANCH`.
+- [x] [P8-T4] Commit and push `FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md`, plus any write-set path (including its rule-6 mirror copies) changed by a fix made during Phase 8 (`git commit -m "docs(824): record pass-after regression evidence" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
 
 ### Phase 9 — Dispositions and Handoff Artifacts
 
-- [ ] [P9-T1] Run `git grep -c -i -e sha256 -e receipt -- ".codex/agents/pr-author*.toml"` and write `FEATURE/evidence/other/receipt-procedure-codex-grep.STAMP.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:`. Then run `git ls-files ".codex/agents/pr-author*.toml"` and `git grep -n -e "Documentation-Only" -- .github/agents/pr-author.agent.md`, and write `FEATURE/evidence/other/receipt-procedure-surfaces.STAMP.md` with `Timestamp:`, one `Command:`/`EXIT_CODE:` pair per command, `Output Summary:`, and the DC-22 disposition.
+- [x] [P9-T1] Run `git grep -c -i -e sha256 -e receipt -- ".codex/agents/pr-author*.toml"` and write `FEATURE/evidence/other/receipt-procedure-codex-grep.STAMP.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:`. Then run `git ls-files ".codex/agents/pr-author*.toml"` and `git grep -n -e "Documentation-Only" -- .github/agents/pr-author.agent.md`, and write `FEATURE/evidence/other/receipt-procedure-surfaces.STAMP.md` with `Timestamp:`, one `Command:`/`EXIT_CODE:` pair per command, `Output Summary:`, and the DC-22 disposition.
   - Acceptance: the codex-grep artifact records `EXIT_CODE: 1` and `ExpectedExitCode: 1` (no match in any `pr-author*.toml` file); the surfaces artifact records both exit codes as 0, the `git ls-files` output lists six `pr-author*.toml` paths (so the grep searched a non-empty set), and the `Documentation-Only` output names line 140.
-- [ ] [P9-T2] Run exactly `git grep -n -E "\b(X5|X6|X9|Y4)\b" bug/promotion-hook-raw-containment-false-positive-deny-824 -- docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824` and write `FEATURE/evidence/other/prior-run-corpus-coverage.STAMP.md` containing `Timestamp:`, `Command:` (that command verbatim), `EXIT_CODE:`, `Output Summary:`, `SearchScope:` (`bug/promotion-hook-raw-containment-false-positive-deny-824:docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/`), `SearchPatterns:` (`\b(X5|X6|X9|Y4)\b`), and `SearchResult:` (the command's complete output verbatim, or `none` when it prints nothing), followed by a mapping of each recorded corpus ID of amended spec AC-11 (B1-B5; X1, X2, X3, X4, X7, X8, X10; Y1, Y2, Y3, Y5; W1-W6; fixtures AC-4, AC-5, AC-6, AC-18, AC-19, AC-21) to its section-5 test row IDs. When `EXIT_CODE` is 1 (no match), the artifact also carries `ExpectedExitCode: 1`.
+- [x] [P9-T2] Run exactly `git grep -n -E "\b(X5|X6|X9|Y4)\b" bug/promotion-hook-raw-containment-false-positive-deny-824 -- docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824` and write `FEATURE/evidence/other/prior-run-corpus-coverage.STAMP.md` containing `Timestamp:`, `Command:` (that command verbatim), `EXIT_CODE:`, `Output Summary:`, `SearchScope:` (`bug/promotion-hook-raw-containment-false-positive-deny-824:docs/features/active/2026-10-03-promotion-hook-raw-containment-false-positive-deny-824/`), `SearchPatterns:` (`\b(X5|X6|X9|Y4)\b`), and `SearchResult:` (the command's complete output verbatim, or `none` when it prints nothing), followed by a mapping of each recorded corpus ID of amended spec AC-11 (B1-B5; X1, X2, X3, X4, X7, X8, X10; Y1, Y2, Y3, Y5; W1-W6; fixtures AC-4, AC-5, AC-6, AC-18, AC-19, AC-21) to its section-5 test row IDs. When `EXIT_CODE` is 1 (no match), the artifact also carries `ExpectedExitCode: 1`.
   - Acceptance: `EXIT_CODE` is 0 or 1 (any other value, for example 128 for an unknown ref, stops execution as BLOCKED); `SearchResult:` reproduces the command output; every recorded corpus ID maps to at least one row ID defined in section 5. (Whether those rows passed is checked at [P10-T30].)
-- [ ] [P9-T3] Write `FEATURE/evidence/issue-updates/issue-742.STAMP.md` with `Timestamp:`, the comment text (item 2 worktree isolation guard: Claude Code runtime control, no repository code change, workarounds `sh file.sh`, `npx --yes ...`, MCP PoshQC tools; item 3 evidence-filename Write guard containing "report": runtime-owned, no repository code change, `.claude/hooks/enforce-evidence-locations.ps1:65-80` matches directory prefixes only; item 4 `.claude/hooks/validate-bash.ps1` `CdChainedReadCommandPattern` `:222`, `Get-CdChainedReadCommandMatch` `:230-323`, deny text `:340-343`: intentional and unchanged, its suites unmodified), and `PostedAs: comment`.
+- [x] [P9-T3] Write `FEATURE/evidence/issue-updates/issue-742.STAMP.md` with `Timestamp:`, the comment text (item 2 worktree isolation guard: Claude Code runtime control, no repository code change, workarounds `sh file.sh`, `npx --yes ...`, MCP PoshQC tools; item 3 evidence-filename Write guard containing "report": runtime-owned, no repository code change, `.claude/hooks/enforce-evidence-locations.ps1:65-80` matches directory prefixes only; item 4 `.claude/hooks/validate-bash.ps1` `CdChainedReadCommandPattern` `:222`, `Get-CdChainedReadCommandMatch` `:230-323`, deny text `:340-343`: intentional and unchanged, its suites unmodified), and `PostedAs: comment`.
   - Acceptance: the file contains the three item dispositions and `Timestamp:`.
-- [ ] [P9-T4] Run `gh pr list --head bug/promotion-hook-raw-containment-false-positive-deny-824-r2 --state open --json number`. If it prints a PR number, run `gh pr comment <that number> --body-file FEATURE/evidence/issue-updates/issue-742.STAMP.md` and add the comment URL to the mirror; if it prints `[]`, add a `POSTING BLOCKED: pull request not yet created; the orchestrator posts this body after PR creation` header to the mirror.
+- [x] [P9-T4] Run `gh pr list --head bug/promotion-hook-raw-containment-false-positive-deny-exec-824 --state open --json number`. If it prints a PR number, run `gh pr comment <that number> --body-file FEATURE/evidence/issue-updates/issue-742.STAMP.md` and add the comment URL to the mirror; if it prints `[]`, add a `POSTING BLOCKED: pull request not yet created; the orchestrator posts this body after PR creation` header to the mirror.
   - Acceptance: the mirror contains either a comment URL or the `POSTING BLOCKED` header.
-- [ ] [P9-T5] Write `FEATURE/evidence/other/pr-author-hook-live-smoke.STAMP.md` with `Status: PENDING-ORCHESTRATOR` and the procedure: delegate to `pr-author` with a prompt that issues `git log -1 --format=%H && sha256sum artifacts/pr_body_5.md`, and record that the tool call is denied with a reason beginning `PR_AUTHOR_COMMAND_NOT_ALLOWED:`.
+- [x] [P9-T5] Write `FEATURE/evidence/other/pr-author-hook-live-smoke.STAMP.md` with `Status: PENDING-ORCHESTRATOR` and the procedure: delegate to `pr-author` with a prompt that issues `git log -1 --format=%H && sha256sum artifacts/pr_body_5.md`, and record that the tool call is denied with a reason beginning `PR_AUTHOR_COMMAND_NOT_ALLOWED:`.
   - Acceptance: the file contains `Status: PENDING-ORCHESTRATOR` and the command and expected reason prefix.
-- [ ] [P9-T6] Commit and push `FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` (`git commit -m "docs(824): record dispositions and handoff artifacts" --` same pathspecs), then `git push -u origin BRANCH`.
+- [x] [P9-T6] Commit and push `FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` (`git commit -m "docs(824): record dispositions and handoff artifacts" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
 
 ### Phase 10 — Final QC Loop and AC Check-Off
 
 Loop rule: run [P10-T1] through [P10-T17] in order. If any task fails, or [P10-T2] rewrites a write-set path, fix the cause, apply rule 6 to any write-set file with a bundle copy that changed, record the pass number `N` in each artifact name (`...pass-N.STAMP.md`), and restart at [P10-T1]. A rewritten path outside the write set is restored by [P10-T2] and does not restart the loop. The loop ends after a pass in which every task passes and no write-set path changed. AC check-off tasks [P10-T20] onward run only after [P10-T18] names a clean pass.
 
-- [ ] [P10-T1] Run `git status --porcelain` and record `FEATURE/evidence/qa-gates/qc-pass-N-porcelain-before.STAMP.md`. Then, when the listing contains any write-set path, run `git hash-object -- <every write-set path in the listing>` as one call and record each hash; when it contains none, record `WRITESET_LISTED: NONE`.
+- [x] [P10-T1] Run `git status --porcelain` and record `FEATURE/evidence/qa-gates/qc-pass-N-porcelain-before.STAMP.md`. Then, when the listing contains any write-set path, run `git hash-object -- <every write-set path in the listing>` as one call and record each hash; when it contains none, record `WRITESET_LISTED: NONE`.
   - Acceptance: `EXIT_CODE: 0`; the listing is recorded verbatim as the pre-format snapshot; the hash list or `WRITESET_LISTED: NONE` is recorded.
-- [ ] [P10-T2] Call `mcp__drm-copilot__run_poshqc_format` with `workspace_root` set to the worktree root and, when the tool accepts it, `scan_folders` set to `.claude/hooks`, `.codex/hooks`, `tests/scripts/claude-hooks`, `tests/scripts/codex-hooks`; then run `git status --porcelain`; then re-run the [P10-T1] `git hash-object` command over the same paths (omitted when [P10-T1] recorded `WRITESET_LISTED: NONE`); then apply the `git restore -- <path>` step of the acceptance below (one call per path) and run `git status --porcelain` again; then run `sh SCRATCHPAD/s-fmtcheck.sh writeset`. Record the MCP disposition and every command in `FEATURE/evidence/qa-gates/qc-pass-N-format.STAMP.md`.
+- [x] [P10-T2] Call `mcp__drm-copilot__run_poshqc_format` with `workspace_root` set to the worktree root and, when the tool accepts it, `scan_folders` set to `.claude/hooks`, `.codex/hooks`, `tests/scripts/claude-hooks`, `tests/scripts/codex-hooks`; then run `git status --porcelain`; then re-run the [P10-T1] `git hash-object` command over the same paths (omitted when [P10-T1] recorded `WRITESET_LISTED: NONE`); then apply the `git restore -- <path>` step of the acceptance below (one call per path) and run `git status --porcelain` again; then run `sh SCRATCHPAD/s-fmtcheck.sh writeset`. Record the MCP disposition and every command in `FEATURE/evidence/qa-gates/qc-pass-N-format.STAMP.md`.
   - Acceptance: the MCP disposition is recorded. Each path in the post-call porcelain listing that is outside the write set and outside `FEATURE/` is restored with `git restore -- <path>` and listed in the artifact; a restored path that is not in `B_FMT` is additionally recorded as `FORMAT_OUTSIDE_BASELINE: <path>` and does not restart the loop. `git status --porcelain` is then run again and recorded. After removing every line under `FEATURE/` from both listings, this second listing equals the [P10-T1] listing. `FORMAT_DRIFT_COUNT: 0`. Each recomputed hash equals its [P10-T1] value; a differing hash is a rewritten write-set path. A rewritten write-set path restarts the loop.
-- [ ] [P10-T3] Call `mcp__drm-copilot__run_poshqc_analyze` (same arguments), then run `sh SCRATCHPAD/s-pssa.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-analyze.STAMP.md`.
+- [x] [P10-T3] Call `mcp__drm-copilot__run_poshqc_analyze` (same arguments), then run `sh SCRATCHPAD/s-pssa.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-analyze.STAMP.md`.
   - Acceptance: MCP disposition recorded; `PSSA_FINDING_COUNT: 0`.
-- [ ] [P10-T4] Call `mcp__drm-copilot__run_poshqc_test` (same arguments); record `FEATURE/evidence/qa-gates/qc-pass-N-mcp-test.STAMP.md`.
+- [x] [P10-T4] Call `mcp__drm-copilot__run_poshqc_test` (same arguments); record `FEATURE/evidence/qa-gates/qc-pass-N-mcp-test.STAMP.md`.
   - Acceptance: MCP disposition recorded. No count is read from it (rule 4).
-- [ ] [P10-T5] Run `sh SCRATCHPAD/s-full-run.sh` with the Bash parameter `run_in_background: true`, wait for the completion notification, and record `FEATURE/evidence/qa-gates/qc-pass-N-pester-full-run.STAMP.md`.
+- [x] [P10-T5] Run `sh SCRATCHPAD/s-full-run.sh` with the Bash parameter `run_in_background: true`, wait for the completion notification, and record `FEATURE/evidence/qa-gates/qc-pass-N-pester-full-run.STAMP.md`.
   - Acceptance: the output contains a `FULL_RUN_EXIT_CODE:` line and `EXIT_CODE:` records its integer; `artifacts/pester/powershell-coverage.xml` and `artifacts/pester/pester-junit.xml` are rewritten by this run (last-write time after the task start, recorded).
-- [ ] [P10-T6] Run `sh SCRATCHPAD/s-full-parse.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-pester-full-coverage.STAMP.md`.
+- [x] [P10-T6] Run `sh SCRATCHPAD/s-full-parse.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-pester-full-coverage.STAMP.md`.
   - Acceptance: every `FAILED_TEST:` name is in `B_FULL` and none belongs to a file created by this plan; a numeric `COVERAGE ... pct=` line for each of the 19 production files; `COVERAGE_BELOW_85: NONE`.
-- [ ] [P10-T7] Run `sh SCRATCHPAD/s-changedcov.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-changed-line-coverage.STAMP.md`.
+- [x] [P10-T7] Run `sh SCRATCHPAD/s-changedcov.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-changed-line-coverage.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0` and `UNCOVERED_CHANGED_TOTAL: 0`.
-- [ ] [P10-T8] Write `FEATURE/evidence/qa-gates/coverage-delta.STAMP.md` listing, per production file, baseline coverage ([P0-T18]; `NEW_FILE` for new files), post-change coverage ([P10-T6]), and changed-line coverage counts ([P10-T7]).
+- [x] [P10-T8] Write `FEATURE/evidence/qa-gates/coverage-delta.STAMP.md` listing, per production file, baseline coverage ([P0-T18]; `NEW_FILE` for new files), post-change coverage ([P10-T6]), and changed-line coverage counts ([P10-T7]).
   - Acceptance: 19 rows with numeric post-change values at or above 85.00; no modified file's post-change value is below its baseline value unless the changed-line uncovered count is 0 and the decrease is explained by deleted covered lines (recorded per file).
-- [ ] [P10-T9] Run `sh SCRATCHPAD/s-pester.sh I824`; record `FEATURE/evidence/qa-gates/qc-pass-N-issue824.STAMP.md`.
+- [x] [P10-T9] Run `sh SCRATCHPAD/s-pester.sh I824`; record `FEATURE/evidence/qa-gates/qc-pass-N-issue824.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0` and `PESTER_FAILED: 0`.
-- [ ] [P10-T10] Run the [P0-T19] pytest command (the same four files under `tests/scripts/dev_tools/`); record `FEATURE/evidence/qa-gates/qc-pass-N-pytest-parity.STAMP.md`.
+- [x] [P10-T10] Run the [P0-T19] pytest command (the same four files under `tests/scripts/dev_tools/`); record `FEATURE/evidence/qa-gates/qc-pass-N-pytest-parity.STAMP.md`.
   - Acceptance: the pytest summary line is printed and reports a total greater than 0 (otherwise BLOCKED); failing node IDs are a subset of `B_PY`.
-- [ ] [P10-T11] Run the [P0-T20] jest command (the same three files under `extensions/drm-copilot/test/lib/push-down/`); record `FEATURE/evidence/qa-gates/qc-pass-N-jest-parity.STAMP.md`.
+- [x] [P10-T11] Run the [P0-T20] jest command (the same three files under `extensions/drm-copilot/test/lib/push-down/`); record `FEATURE/evidence/qa-gates/qc-pass-N-jest-parity.STAMP.md`.
   - Acceptance: the Jest `Tests:` line is printed and reports a total greater than 0 (otherwise BLOCKED); failing test names are a subset of `B_JS`.
-- [ ] [P10-T12] Run `sh SCRATCHPAD/s-lines.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-lines.STAMP.md`.
+- [x] [P10-T12] Run `sh SCRATCHPAD/s-lines.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-lines.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`, `OVER_500: NONE`, and the line for `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` reads 497.
-- [ ] [P10-T13] Run `sh SCRATCHPAD/s-nopy.sh` and record `FEATURE/evidence/qa-gates/qc-pass-N-no-python.STAMP.md`; then run `sh SCRATCHPAD/s-pester.sh PARITY` and record `FEATURE/evidence/qa-gates/qc-pass-N-parity-pester.STAMP.md`.
+- [x] [P10-T13] Run `sh SCRATCHPAD/s-nopy.sh` and record `FEATURE/evidence/qa-gates/qc-pass-N-no-python.STAMP.md`; then run `sh SCRATCHPAD/s-pester.sh PARITY` and record `FEATURE/evidence/qa-gates/qc-pass-N-parity-pester.STAMP.md`.
   - Acceptance: the no-python artifact records `EXIT_CODE: 0` and `PYTHON_INVOCATION_COUNT: 0`; the parity-pester artifact records `PESTER_FAILED` naming only tests in `B_SCOPED`, and every `RESULT` line for `enforcement-hooks-no-python-invocation.Tests.ps1` reads `Passed`.
-- [ ] [P10-T14] Run `sh SCRATCHPAD/s-hash.sh final`; record `FEATURE/evidence/qa-gates/qc-pass-N-parity-hashes.STAMP.md`.
+- [x] [P10-T14] Run `sh SCRATCHPAD/s-hash.sh final`; record `FEATURE/evidence/qa-gates/qc-pass-N-parity-hashes.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; every group `DISTINCT=1`.
-- [ ] [P10-T15] Run `sh SCRATCHPAD/s-scope.sh` and `git status --porcelain`; record `FEATURE/evidence/qa-gates/qc-pass-N-scope.STAMP.md`.
+- [x] [P10-T15] Run `sh SCRATCHPAD/s-scope.sh` and `git status --porcelain`; record `FEATURE/evidence/qa-gates/qc-pass-N-scope.STAMP.md`.
   - Acceptance: `OUT_OF_SET_COUNT: 0` and `ADDENDUM2_COUNT: 0`.
-- [ ] [P10-T16] Run `sh SCRATCHPAD/s-tokens.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-deny-tokens.STAMP.md`.
+- [x] [P10-T16] Run `sh SCRATCHPAD/s-tokens.sh`; record `FEATURE/evidence/qa-gates/qc-pass-N-deny-tokens.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0`; `NEW_TOKEN_COUNT:` is 1 or 2; the `NEW_TOKEN:` lines are a subset of {`PR_AUTHOR_COMMAND_NOT_ALLOWED:`, `TARGET_WORKTREE_NOT_DERIVABLE:`} and include `PR_AUTHOR_COMMAND_NOT_ALLOWED:`.
-- [ ] [P10-T17] Run `git diff --quiet BASE_SHA -- tests/scripts/claude-hooks/validate-bash.Tests.ps1 tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1 tests/scripts/codex-hooks/validate-bash-trigger-scoping.Tests.ps1 tests/scripts/codex-hooks/validate-bash-decision-surface.Tests.ps1 .claude/hooks/validate-bash.ps1 .codex/hooks/validate-bash.ps1`; record `FEATURE/evidence/qa-gates/qc-pass-N-validate-bash-unchanged.STAMP.md`.
+- [x] [P10-T17] Run `git diff --quiet BASE_SHA -- tests/scripts/claude-hooks/validate-bash.Tests.ps1 tests/scripts/claude-hooks/validate-bash.TriggerScoping.Tests.ps1 tests/scripts/codex-hooks/validate-bash-trigger-scoping.Tests.ps1 tests/scripts/codex-hooks/validate-bash-decision-surface.Tests.ps1 .claude/hooks/validate-bash.ps1 .codex/hooks/validate-bash.ps1`; record `FEATURE/evidence/qa-gates/qc-pass-N-validate-bash-unchanged.STAMP.md`.
   - Acceptance: `EXIT_CODE: 0` (the `cd ... && <read>` rule and its suites are unmodified; their pass state is read from [P10-T6]).
-- [ ] [P10-T18] Write `FEATURE/evidence/qa-gates/qc-loop-summary.STAMP.md` naming the final clean pass number and listing each [P10-T1]..[P10-T17] artifact of that pass.
+- [x] [P10-T18] Write `FEATURE/evidence/qa-gates/qc-loop-summary.STAMP.md` naming the final clean pass number and listing each [P10-T1]..[P10-T17] artifact of that pass.
   - Acceptance: the named pass has a passing artifact for every task and its [P10-T2] reports no rewritten write-set path (restored paths outside the write set are listed and do not count).
-- [ ] [P10-T19] Write `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` listing AC-1..AC-31 with the evidence artifact(s) for each (section 7) and the status `CHECKED` or `PENDING-ORCHESTRATOR` (AC-20 live smoke; AC-21 when [P9-T4] recorded `POSTING BLOCKED`; AC-24 CI result).
+- [x] [P10-T19] Write `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` listing AC-1..AC-31 with the evidence artifact(s) for each (section 7) and the status `CHECKED` or `PENDING-ORCHESTRATOR` (AC-20 live smoke; AC-21 when [P9-T4] recorded `POSTING BLOCKED`; AC-24 CI result).
   - Acceptance: 31 rows; every `CHECKED` row names at least one existing artifact.
-- [ ] [P10-T20] Check off AC-1 in `FEATURE/spec.md` (`- [ ] AC-1:` to `- [x] AC-1:`) when [P8-T1] REG-01 and [P10-T9] PM-01 passed for both runtimes.
+- [x] [P10-T20] Check off AC-1 in `FEATURE/spec.md` (`- [ ] AC-1:` to `- [x] AC-1:`) when [P8-T1] REG-01 and [P10-T9] PM-01 passed for both runtimes.
   - Acceptance: the AC-1 line reads `- [x]`.
-- [ ] [P10-T21] Check off AC-2 in `FEATURE/spec.md` when [P10-T9] PM-02..PM-13 passed for both runtimes.
+- [x] [P10-T21] Check off AC-2 in `FEATURE/spec.md` when [P10-T9] PM-02..PM-13 passed for both runtimes.
   - Acceptance: the AC-2 line reads `- [x]`.
-- [ ] [P10-T22] Check off AC-3 in `FEATURE/spec.md` when [P8-T1] REG-02, REG-04, REG-06 and [P10-T9] EW-01, PW-01, CW-01 passed.
+- [x] [P10-T22] Check off AC-3 in `FEATURE/spec.md` when [P8-T1] REG-02, REG-04, REG-06 and [P10-T9] EW-01, PW-01, CW-01 passed.
   - Acceptance: the AC-3 line reads `- [x]`.
-- [ ] [P10-T23] Check off AC-4 in `FEATURE/spec.md` when [P10-T9] EW-03..07, PW-03..07, CW-03..07 passed.
+- [x] [P10-T23] Check off AC-4 in `FEATURE/spec.md` when [P10-T9] EW-03..07, PW-03..07, CW-03..07 passed.
   - Acceptance: the AC-4 line reads `- [x]`.
-- [ ] [P10-T24] Check off AC-5 in `FEATURE/spec.md` when [P10-T9] EW-08..12, PW-08..12, CW-08..12 passed.
+- [x] [P10-T24] Check off AC-5 in `FEATURE/spec.md` when [P10-T9] EW-08..12, PW-08..12, CW-08..12 passed.
   - Acceptance: the AC-5 line reads `- [x]`.
-- [ ] [P10-T25] Check off AC-6 in `FEATURE/spec.md` when [P10-T9] EW-13..20, PW-13..20, CW-13..20 passed, and add to the AC-6 row of `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` (written by [P10-T19]) this note: the AC-6 clause "the deny names the first unauthorized target" applies only to the derivable-target rows (-13, W5 at -18, W6 at -19); W1-W4 (-14..-17) carry an operand that cannot be derived, so they deny with `TARGET_WORKTREE_NOT_DERIVABLE` under AC-7 and name no target.
+- [x] [P10-T25] Check off AC-6 in `FEATURE/spec.md` when [P10-T9] EW-13..20, PW-13..20, CW-13..20 passed, and add to the AC-6 row of `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` (written by [P10-T19]) this note: the AC-6 clause "the deny names the first unauthorized target" applies only to the derivable-target rows (-13, W5 at -18, W6 at -19); W1-W4 (-14..-17) carry an operand that cannot be derived, so they deny with `TARGET_WORKTREE_NOT_DERIVABLE` under AC-7 and name no target.
   - Acceptance: the AC-6 line reads `- [x]` and the ledger AC-6 row contains the note.
-- [ ] [P10-T26] Check off AC-7 in `FEATURE/spec.md` when [P10-T9] EW-21..28, PW-21..28, CW-21..28 passed.
+- [x] [P10-T26] Check off AC-7 in `FEATURE/spec.md` when [P10-T9] EW-21..28, PW-21..28, CW-21..28 passed.
   - Acceptance: the AC-7 line reads `- [x]`.
-- [ ] [P10-T27] Check off AC-8 in `FEATURE/spec.md` when [P8-T1] REG-03, REG-05, REG-07, REG-08 and [P10-T9] IV-09, IV-10, IV-11 passed.
+- [x] [P10-T27] Check off AC-8 in `FEATURE/spec.md` when [P8-T1] REG-03, REG-05, REG-07, REG-08 and [P10-T9] IV-09, IV-10, IV-11 passed.
   - Acceptance: the AC-8 line reads `- [x]`.
-- [ ] [P10-T28] Check off AC-9 in `FEATURE/spec.md` when [P10-T9] PM-14..PM-18, every IV-06 sink row, and IV-07 passed.
+- [x] [P10-T28] Check off AC-9 in `FEATURE/spec.md` when [P10-T9] PM-14..PM-18, every IV-06 sink row, and IV-07 passed.
   - Acceptance: the AC-9 line reads `- [x]`.
-- [ ] [P10-T29] Check off AC-10 in `FEATURE/spec.md` when [P10-T9] PM-19, EW-21, PW-21, CW-21, AL-25 passed.
+- [x] [P10-T29] Check off AC-10 in `FEATURE/spec.md` when [P10-T9] PM-19, EW-21, PW-21, CW-21, AL-25 passed.
   - Acceptance: the AC-10 line reads `- [x]`.
-- [ ] [P10-T30] Check off AC-11 in `FEATURE/spec.md` (amended AC-11) when every row ID listed in the [P9-T2] mapping is `Passed` in the [P10-T9] artifact and the [P9-T2] artifact records the X5/X6/X9/Y4 search command, its `EXIT_CODE` (0 or 1), and its `SearchResult:` output.
+- [x] [P10-T30] Check off AC-11 in `FEATURE/spec.md` (amended AC-11) when every row ID listed in the [P9-T2] mapping is `Passed` in the [P10-T9] artifact and the [P9-T2] artifact records the X5/X6/X9/Y4 search command, its `EXIT_CODE` (0 or 1), and its `SearchResult:` output.
   - Acceptance: the AC-11 line reads `- [x]`.
-- [ ] [P10-T31] Check off AC-12 in `FEATURE/spec.md` when [P10-T9] PY-01, PY-02, PY-22, PY-23, IV-01, IV-02, OP-01, OP-10 passed.
+- [x] [P10-T31] Check off AC-12 in `FEATURE/spec.md` when [P10-T9] PY-01, PY-02, PY-22, PY-23, IV-01, IV-02, OP-01, OP-10 passed.
   - Acceptance: the AC-12 line reads `- [x]`.
-- [ ] [P10-T32] Check off AC-13 in `FEATURE/spec.md` when [P10-T6] shows the existing pin rows (`tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1:300-328`) passed and [P10-T9] IV-12, IV-13, IV-24 passed.
+- [x] [P10-T32] Check off AC-13 in `FEATURE/spec.md` when [P10-T6] shows the existing pin rows (`tests/scripts/claude-hooks/hook-command-invocation.Tests.ps1:300-328`) passed and [P10-T9] IV-12, IV-13, IV-24 passed.
   - Acceptance: the AC-13 line reads `- [x]`.
-- [ ] [P10-T33] Check off AC-14 in `FEATURE/spec.md` when [P8-T2] shows all 8 negative-control executions passed and [P10-T9] IV-17 passed.
+- [x] [P10-T33] Check off AC-14 in `FEATURE/spec.md` when [P8-T2] shows all 8 negative-control executions passed and [P10-T9] IV-17 passed.
   - Acceptance: the AC-14 line reads `- [x]`.
-- [ ] [P10-T34] Check off AC-15 in `FEATURE/spec.md` when [P8-T1] REG-09..REG-12 and [P10-T9] PA-01..PA-05 passed.
+- [x] [P10-T34] Check off AC-15 in `FEATURE/spec.md` when [P8-T1] REG-09..REG-12 and [P10-T9] PA-01..PA-05 passed.
   - Acceptance: the AC-15 line reads `- [x]`.
-- [ ] [P10-T35] Check off AC-16 in `FEATURE/spec.md` when [P8-T1] REG-13..REG-17 and [P10-T9] PA-06..PA-15, PA-21 passed.
+- [x] [P10-T35] Check off AC-16 in `FEATURE/spec.md` when [P8-T1] REG-13..REG-17 and [P10-T9] PA-06..PA-15, PA-21 passed.
   - Acceptance: the AC-16 line reads `- [x]`.
-- [ ] [P10-T36] Check off AC-17 in `FEATURE/spec.md` when [P10-T9] PA-16..PA-19 passed and [P10-T15] shows `.claude/hooks/enforce-pr-author-skill.ps1` unchanged.
+- [x] [P10-T36] Check off AC-17 in `FEATURE/spec.md` when [P10-T9] PA-16..PA-19 passed and [P10-T15] shows `.claude/hooks/enforce-pr-author-skill.ps1` unchanged.
   - Acceptance: the AC-17 line reads `- [x]`.
-- [ ] [P10-T37] Check off AC-18 in `FEATURE/spec.md` when [P8-T1] REG-18 and [P10-T9] AL-11..AL-31 passed.
+- [x] [P10-T37] Check off AC-18 in `FEATURE/spec.md` when [P8-T1] REG-18 and [P10-T9] AL-11..AL-31 passed.
   - Acceptance: the AC-18 line reads `- [x]`.
-- [ ] [P10-T38] Check off AC-19 in `FEATURE/spec.md` when [P8-T1] REG-20, REG-21 and [P10-T9] AL-07, AL-08, AL-34, AL-35 passed.
+- [x] [P10-T38] Check off AC-19 in `FEATURE/spec.md` when [P8-T1] REG-20, REG-21 and [P10-T9] AL-07, AL-08, AL-34, AL-35 passed.
   - Acceptance: the AC-19 line reads `- [x]`.
-- [ ] [P10-T39] Record AC-20 as `PENDING-ORCHESTRATOR` in `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` with [P10-T9] AL-33 as the static evidence and [P9-T5] as the pending live-smoke artifact; leave the AC-20 line of `FEATURE/spec.md` unchecked.
+- [x] [P10-T39] Record AC-20 as `PENDING-ORCHESTRATOR` in `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` with [P10-T9] AL-33 as the static evidence and [P9-T5] as the pending live-smoke artifact; leave the AC-20 line of `FEATURE/spec.md` unchecked.
   - Acceptance: the ledger row reads `PENDING-ORCHESTRATOR` and the AC-20 line reads `- [ ]`.
-- [ ] [P10-T40] If [P9-T4] posted the comment, check off AC-21 in `FEATURE/spec.md`; otherwise record it as `PENDING-ORCHESTRATOR` in `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` and leave it unchecked.
+- [x] [P10-T40] If [P9-T4] posted the comment, check off AC-21 in `FEATURE/spec.md`; otherwise record it as `PENDING-ORCHESTRATOR` in `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` and leave it unchecked.
   - Acceptance: the AC-21 line state matches the ledger row.
-- [ ] [P10-T41] Check off AC-22 in `FEATURE/spec.md` when [P10-T6] shows set-`A` suites with failures only in `B_FULL` and [P10-T9] CN-01..CN-10 passed.
+- [x] [P10-T41] Check off AC-22 in `FEATURE/spec.md` when [P10-T6] shows set-`A` suites with failures only in `B_FULL` and [P10-T9] CN-01..CN-10 passed.
   - Acceptance: the AC-22 line reads `- [x]`.
-- [ ] [P10-T42] Check off AC-23 in `FEATURE/spec.md` when [P10-T14] reports every group `DISTINCT=1`.
+- [x] [P10-T42] Check off AC-23 in `FEATURE/spec.md` when [P10-T14] reports every group `DISTINCT=1`.
   - Acceptance: the AC-23 line reads `- [x]`.
-- [ ] [P10-T43] Record AC-24 as `PENDING-ORCHESTRATOR` (CI result) in `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` with [P10-T10], [P10-T11], [P10-T13] as local evidence; leave the AC-24 line of `FEATURE/spec.md` unchecked.
+- [x] [P10-T43] Record AC-24 as `PENDING-ORCHESTRATOR` (CI result) in `FEATURE/evidence/other/ac-checkoff-ledger.STAMP.md` with [P10-T10], [P10-T11], [P10-T13] as local evidence; leave the AC-24 line of `FEATURE/spec.md` unchecked.
   - Acceptance: the ledger row reads `PENDING-ORCHESTRATOR` and the AC-24 line reads `- [ ]`.
-- [ ] [P10-T44] Check off AC-25 in `FEATURE/spec.md` when [P10-T16] passed and [P10-T9] PM-02, EW-03, PW-03, CW-03, PA-11, PA-16, AL-11 passed.
+- [x] [P10-T44] Check off AC-25 in `FEATURE/spec.md` when [P10-T16] passed and [P10-T9] PM-02, EW-03, PW-03, CW-03, PA-11, PA-16, AL-11 passed.
   - Acceptance: the AC-25 line reads `- [x]`.
-- [ ] [P10-T45] Check off AC-26 in `FEATURE/spec.md` when [P10-T13] passed.
+- [x] [P10-T45] Check off AC-26 in `FEATURE/spec.md` when [P10-T13] passed.
   - Acceptance: the AC-26 line reads `- [x]`.
-- [ ] [P10-T46] Check off AC-27 in `FEATURE/spec.md` when [P10-T12] passed.
+- [x] [P10-T46] Check off AC-27 in `FEATURE/spec.md` when [P10-T12] passed.
   - Acceptance: the AC-27 line reads `- [x]`.
-- [ ] [P10-T47] Check off AC-28 in `FEATURE/spec.md` when [P10-T6], [P10-T7], and [P10-T8] passed.
+- [x] [P10-T47] Check off AC-28 in `FEATURE/spec.md` when [P10-T6], [P10-T7], and [P10-T8] passed.
   - Acceptance: the AC-28 line reads `- [x]`.
-- [ ] [P10-T48] Check off AC-29 in `FEATURE/spec.md` when [P10-T18] names a clean pass.
+- [x] [P10-T48] Check off AC-29 in `FEATURE/spec.md` when [P10-T18] names a clean pass.
   - Acceptance: the AC-29 line reads `- [x]`.
-- [ ] [P10-T49] Check off AC-30 in `FEATURE/spec.md` when [P8-T3] lists seven `Failed`-before and `Passed`-after rows.
+- [x] [P10-T49] Check off AC-30 in `FEATURE/spec.md` when [P8-T3] lists seven `Failed`-before and `Passed`-after rows.
   - Acceptance: the AC-30 line reads `- [x]`.
-- [ ] [P10-T50] Check off AC-31 in `FEATURE/spec.md` when [P10-T15] reports `ADDENDUM2_COUNT: 0` and `OUT_OF_SET_COUNT: 0`.
+- [x] [P10-T50] Check off AC-31 in `FEATURE/spec.md` when [P10-T15] reports `ADDENDUM2_COUNT: 0` and `OUT_OF_SET_COUNT: 0`.
   - Acceptance: the AC-31 line reads `- [x]`.
-- [ ] [P10-T51] Commit and push `FEATURE/spec.md FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` plus any write-set path changed during the QC loop (`git commit -m "docs(824): final QC evidence and AC check-off" --` same pathspecs), then `git push -u origin BRANCH`.
+- [x] [P10-T51] Commit and push `FEATURE/spec.md FEATURE/evidence FEATURE/plan.2026-10-08T13-53.md` plus any write-set path changed during the QC loop (`git commit -m "docs(824): final QC evidence and AC check-off" --` same pathspecs), then `git push -u origin BRANCH`.
   - Acceptance: each command exits 0.
 
 ## 7. AC traceability

@@ -133,14 +133,14 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
         }
     }
 
-    Context 'Get-EpicWorktreeRemovalCommandPath helper' {
+    Context 'Resolve-CommandLineInvocationTarget for the epic gate' {
         It 'extracts the target path from the command text' {
-            Get-EpicWorktreeRemovalCommandPath -CommandText 'git worktree remove /repo/worktrees/child-a' |
-                Should -Be '/repo/worktrees/child-a'
+            (Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove /repo/worktrees/child-a' -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Targets |
+                Should -Be @('/repo/worktrees/child-a')
         }
 
-        It 'returns $null when the command does not name a path' {
-            Get-EpicWorktreeRemovalCommandPath -CommandText 'git status' | Should -BeNullOrEmpty
+        It 'reports NoMatch when the command does not invoke git worktree remove' {
+            (Resolve-CommandLineInvocationTarget -CommandText 'git status' -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Status | Should -Be 'NoMatch'
         }
     }
 

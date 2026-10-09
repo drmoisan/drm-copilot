@@ -51,8 +51,8 @@ Describe 'enforce-parallel-worktree-removal-gate trigger scoping (issue #545)' {
             # The AT-7 half this gate owns. The previous pattern returned the literal
             # --force, which matches no recorded worktree_path and falsely denies a
             # legitimate removal.
-            Get-ParallelWorktreeRemovalCommandPath -CommandText 'git worktree remove --force /repo/worktrees/item-a-101' |
-                Should -Be '/repo/worktrees/item-a-101'
+            (Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove --force /repo/worktrees/item-a-101' -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Targets |
+                Should -Be @('/repo/worktrees/item-a-101')
         }
     }
 
