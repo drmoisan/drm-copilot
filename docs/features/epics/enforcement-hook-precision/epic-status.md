@@ -6,7 +6,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - Integration branch: `epic/enforcement-hook-precision-integration`
 - Current wave: 0
 - Next step: `E3_await_wave0 (HOLD: no new child launches until coordinator GO, expected by 02:22Z)`
-- Last updated: 2026-10-09T01:08:00Z
+- Last updated: 2026-10-09T01:30:00Z
 
 ## Waves
 
@@ -20,7 +20,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 
 | feature_folder | issue_num | wave_number | merge_status | pr | merge_commit_sha | worktree_created_at | pr_opened_at | merge_confirmed_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2026-08-26-epic-wave-barrier-resolves-nested-artifact-as-feature-folder-565 | 565 | 0 | pr_open | [#854](https://github.com/drmoisan/drm-copilot/pull/854) | - | 2026-10-08T21:35:00Z | 2026-10-09T01:06:55Z | - | - |
+| 2026-08-26-epic-wave-barrier-resolves-nested-artifact-as-feature-folder-565 | 565 | 0 | merged | [#854](https://github.com/drmoisan/drm-copilot/pull/854) | 3d9f1451eaf7c5426819172696845f6bca1d6dda | 2026-10-08T21:35:00Z | 2026-10-09T01:06:55Z | 2026-10-09T01:27:37Z | - |
 | 2026-09-27-completion-consistency-codex-copy-and-fail-open-divergence-736 | 736 | 0 | merged | [#853](https://github.com/drmoisan/drm-copilot/pull/853) | bb3c988442c90ccb4c57c052f4d08fe6a3a231fe | 2026-10-08T21:35:00Z | 2026-10-08T22:43:50Z | 2026-10-08T23:14:03Z | - |
 | promotion-hook-raw-containment-false-positive-deny-824 | 824 | 0 | worktree_created | - | - | 2026-10-08T21:35:00Z | - | - | - |
 | 2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732 | 732 | 1 | not_started | - | - | - | - | - | - |
