@@ -93,6 +93,164 @@ function Test-EpicStateIsolationNullBody {
     return ($statements.Count -eq 1 -and $statements[0].Extent.Text.Trim() -ceq '$null')
 }
 
+function Test-EpicStateIsolationHookLiteral {
+    # Pure: true when an AST holds a string literal that names a hook script, hooks/<name>.ps1,
+    # other than the EpicStateIsolation helper files and other than a test file path.
+    [OutputType([bool])]
+    param([AllowNull()] [System.Management.Automation.Language.Ast] $Node)
+    if ($null -eq $Node) { return $false }
+    $isLiteral = {
+        param($candidate)
+        $candidate -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
+        $candidate -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
+    }
+    foreach ($literal in $Node.FindAll($isLiteral, $true)) {
+        foreach ($match in [regex]::Matches([string]$literal.Value, '(?<![A-Za-z0-9_-])hooks/(?<name>[A-Za-z0-9._-]+\.ps1)')) {
+            $name = $match.Groups['name'].Value
+            if ($name.StartsWith('EpicStateIsolation.', [System.StringComparison]::Ordinal)) { continue }
+            if ($name.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)) { continue }
+            return $true
+        }
+    }
+    return $false
+}
+
+function Get-EpicStateIsolationVariableKey {
+    # Pure: a variable name without its scope qualifier, lower-cased, for binding comparison.
+    [OutputType([string])]
+    param([Parameter(Mandatory)] [string] $UserPath)
+    $separator = $UserPath.IndexOf(':')
+    $name = if ($separator -ge 0) { $UserPath.Substring($separator + 1) } else { $UserPath }
+    return $name.ToLowerInvariant()
+}
+
+function Test-EpicStateIsolationVariableBoundToHook {
+    # Pure: true when the suite binds the named variable, by assignment or by a hashtable entry
+    # with the same key name (the -ForEach data shape), to an expression holding a hook literal.
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst,
+        [Parameter(Mandatory)] [string] $Key
+    )
+    $isAssignment = { param($candidate) $candidate -is [System.Management.Automation.Language.AssignmentStatementAst] }
+    foreach ($assignment in $SuiteAst.FindAll($isAssignment, $true)) {
+        $left = $assignment.Left
+        if ($left -is [System.Management.Automation.Language.ConvertExpressionAst]) { $left = $left.Child }
+        if ($left -isnot [System.Management.Automation.Language.VariableExpressionAst]) { continue }
+        if ((Get-EpicStateIsolationVariableKey -UserPath $left.VariablePath.UserPath) -ne $Key) { continue }
+        if (Test-EpicStateIsolationHookLiteral -Node $assignment.Right) { return $true }
+    }
+    $isHashtable = { param($candidate) $candidate -is [System.Management.Automation.Language.HashtableAst] }
+    foreach ($table in $SuiteAst.FindAll($isHashtable, $true)) {
+        foreach ($pair in $table.KeyValuePairs) {
+            $keyText = Get-EpicStateIsolationElementText -Element $pair.Item1
+            if ($null -eq $keyText -or $keyText.ToLowerInvariant() -ne $Key) { continue }
+            if (Test-EpicStateIsolationHookLiteral -Node $pair.Item2) { return $true }
+        }
+    }
+    return $false
+}
+
+function Get-EpicStateIsolationHookDotSource {
+    <#
+        Pure: the dot-source command that loads the hook. Order: (i) the dot-source whose argument
+        holds a hooks/<name>.ps1 literal; (ii) otherwise the dot-source whose argument references a
+        variable that the suite binds to such a literal; (iii) otherwise the first dot-source. The
+        first in source order wins within a step. $null when there is no dot-source.
+    #>
+    [OutputType([System.Management.Automation.Language.CommandAst])]
+    param(
+        [AllowEmptyCollection()] [object[]] $DotSource,
+        [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst
+    )
+    $candidates = @($DotSource)
+    if ($candidates.Count -eq 0) { return $null }
+    foreach ($candidate in $candidates) {
+        if (Test-EpicStateIsolationHookLiteral -Node $candidate) { return $candidate }
+    }
+    $isVariable = { param($node) $node -is [System.Management.Automation.Language.VariableExpressionAst] }
+    foreach ($candidate in $candidates) {
+        foreach ($variable in $candidate.FindAll($isVariable, $true)) {
+            $key = Get-EpicStateIsolationVariableKey -UserPath $variable.VariablePath.UserPath
+            if (Test-EpicStateIsolationVariableBoundToHook -SuiteAst $SuiteAst -Key $key) { return $candidate }
+        }
+    }
+    return $candidates[0]
+}
+
+function Get-EpicStateIsolationDirectCommand {
+    # Pure: the commands of a script block that are neither inside a nested script block nor inside
+    # a function body, so a Mock or Import-Module that never runs does not count as isolation.
+    [OutputType([System.Management.Automation.Language.CommandAst])]
+    param([Parameter(Mandatory)] [System.Management.Automation.Language.ScriptBlockAst] $Block)
+    $isCommand = { param($node) $node -is [System.Management.Automation.Language.CommandAst] }
+    foreach ($command in $Block.FindAll($isCommand, $true)) {
+        $nested = $false
+        $parent = $command.Parent
+        while ($null -ne $parent -and -not [object]::ReferenceEquals($parent, $Block)) {
+            if ($parent -is [System.Management.Automation.Language.ScriptBlockAst] -or
+                $parent -is [System.Management.Automation.Language.ScriptBlockExpressionAst] -or
+                $parent -is [System.Management.Automation.Language.FunctionDefinitionAst]) {
+                $nested = $true
+                break
+            }
+            $parent = $parent.Parent
+        }
+        if (-not $nested) { $command }
+    }
+}
+
+function Test-EpicStateIsolationModulePathNode {
+    # Pure: true when the node is, or contains, a string-constant or expandable-string element whose
+    # value ends with the module file name after a separator (or is exactly that name). A string that
+    # only contains the file name does not qualify.
+    [OutputType([bool])]
+    param(
+        [AllowNull()] [System.Management.Automation.Language.Ast] $Node,
+        [Parameter(Mandatory)] [string] $ModuleFile
+    )
+    if ($null -eq $Node) { return $false }
+    $isLiteral = {
+        param($candidate)
+        $candidate -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
+        $candidate -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
+    }
+    $pattern = '(^|[\\/])' + [regex]::Escape($ModuleFile) + '$'
+    foreach ($literal in $Node.FindAll($isLiteral, $true)) {
+        if ([regex]::IsMatch([string]$literal.Value, $pattern)) { return $true }
+    }
+    return $false
+}
+
+function Test-EpicStateIsolationModuleImport {
+    # Pure: true when an Import-Module command names the module file in a positional or -Name/-Path
+    # argument. Other value parameters (-Prefix, -ArgumentList, and similar) are skipped.
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)] [System.Management.Automation.Language.CommandAst] $Command,
+        [Parameter(Mandatory)] [string] $ModuleFile
+    )
+    $switchParameters = @('Force', 'Global', 'PassThru', 'DisableNameChecking', 'NoClobber', 'SkipEditionCheck', 'UseWindowsPowerShell', 'Verbose', 'Debug')
+    $pathParameters = @('Name', 'Path')
+    $elements = $Command.CommandElements
+    $index = 1
+    while ($index -lt $elements.Count) {
+        $element = $elements[$index]
+        if ($element -is [System.Management.Automation.Language.CommandParameterAst]) {
+            if ($null -ne $element.Argument) {
+                if ($pathParameters -contains $element.ParameterName -and (Test-EpicStateIsolationModulePathNode -Node $element.Argument -ModuleFile $ModuleFile)) { return $true }
+            } elseif ($switchParameters -notcontains $element.ParameterName -and ($index + 1) -lt $elements.Count) {
+                $index++
+                if ($pathParameters -contains $element.ParameterName -and (Test-EpicStateIsolationModulePathNode -Node $elements[$index] -ModuleFile $ModuleFile)) { return $true }
+            }
+        } elseif (Test-EpicStateIsolationModulePathNode -Node $element -ModuleFile $ModuleFile) {
+            return $true
+        }
+        $index++
+    }
+    return $false
+}
+
 function Get-EpicStateIsolationPairFinding {
     <#
         Pure: the findings for one import-and-mock pair among the commands of an outermost
@@ -108,39 +266,53 @@ function Get-EpicStateIsolationPairFinding {
         [Parameter(Mandatory)] [string] $ModuleFile
     )
 
-    $mock = $null
-    $binding = $null
+    $mocks = [System.Collections.Generic.List[object]]::new()
     foreach ($command in $Commands) {
         if ($command.GetCommandName() -ne 'Mock') { continue }
         $candidate = Get-EpicStateIsolationMockBinding -Command $command
-        if ($candidate.CommandName -eq $MockCommand) {
-            $mock = $command
-            $binding = $candidate
-            break
-        }
+        if ($candidate.CommandName -eq $MockCommand) { $mocks.Add([pscustomobject]@{ Command = $command; Binding = $candidate }) }
     }
-    $filePattern = [regex]::Escape($ModuleFile)
     $import = $Commands | Where-Object {
-        $_.GetCommandName() -eq 'Import-Module' -and
-        (@($_.CommandElements | Select-Object -Skip 1 | ForEach-Object { $_.Extent.Text }) -join ' ') -match $filePattern
+        $_.GetCommandName() -eq 'Import-Module' -and (Test-EpicStateIsolationModuleImport -Command $_ -ModuleFile $ModuleFile)
     } | Select-Object -First 1
 
-    if ($null -eq $mock) {
-        "Mock of $MockCommand missing from outermost BeforeAll"
+    $findings = [System.Collections.Generic.List[string]]::new()
+    if ($mocks.Count -eq 0) {
+        $findings.Add("Mock of $MockCommand missing from outermost BeforeAll")
     } else {
-        if (-not $binding.HasModuleName -or $binding.ModuleName -ne $ModuleName) { "Mock lacks -ModuleName $ModuleName" }
-        if (-not (Test-EpicStateIsolationNullBody -Body $binding.MockWith)) { 'Mock body is not exactly $null' }
+        # Every Mock of the seam is evaluated, so a later non-null Mock cannot hide behind an earlier null one.
+        foreach ($mock in $mocks) {
+            if (-not $mock.Binding.HasModuleName -or $mock.Binding.ModuleName -ne $ModuleName) { $findings.Add("Mock lacks -ModuleName $ModuleName") }
+            if (-not (Test-EpicStateIsolationNullBody -Body $mock.Binding.MockWith)) { $findings.Add('Mock body is not exactly $null') }
+        }
     }
     if ($null -eq $import) {
-        "Import-Module of $ModuleFile missing from outermost BeforeAll"
+        $findings.Add("Import-Module of $ModuleFile missing from outermost BeforeAll")
     } elseif (@($import.CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.CommandParameterAst] -and $_.ParameterName -eq 'Force' }).Count -gt 0) {
-        "Import-Module of $ModuleFile uses -Force"
+        $findings.Add("Import-Module of $ModuleFile uses -Force")
     }
-    if ($null -ne $mock -and $null -ne $import) {
+    if ($mocks.Count -gt 0 -and $null -ne $import) {
+        $firstMock = ($mocks | Sort-Object -Property { $_.Command.Extent.StartOffset } | Select-Object -First 1).Command
         $ordered = $null -ne $DotSource -and
         $DotSource.Extent.StartOffset -lt $import.Extent.StartOffset -and
-        $import.Extent.StartOffset -lt $mock.Extent.StartOffset
-        if (-not $ordered) { 'hook dot-source, Import-Module, Mock order violated' }
+        $import.Extent.StartOffset -lt $firstMock.Extent.StartOffset
+        if (-not $ordered) { $findings.Add('hook dot-source, Import-Module, Mock order violated') }
+    }
+    $findings | Select-Object -Unique
+}
+
+function Get-EpicStateIsolationOutermostBlock {
+    # Pure: the script block of every BeforeAll at the minimum command depth (the outermost
+    # BeforeAll blocks), in source order. Empty when the suite holds none.
+    [OutputType([System.Management.Automation.Language.ScriptBlockAst])]
+    param([Parameter(Mandatory)] [System.Management.Automation.Language.ScriptBlockAst] $Ast)
+    $beforeAll = @($Ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -eq 'BeforeAll' }, $true))
+    if ($beforeAll.Count -eq 0) { return }
+    $minimum = ($beforeAll | ForEach-Object { Get-EpicStateIsolationCommandDepth -Node $_ } | Measure-Object -Minimum).Minimum
+    $outermost = @($beforeAll | Where-Object { (Get-EpicStateIsolationCommandDepth -Node $_) -eq $minimum } | Sort-Object -Property { $_.Extent.StartOffset })
+    foreach ($command in $outermost) {
+        $expression = @($command.CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.ScriptBlockExpressionAst] }) | Select-Object -First 1
+        if ($null -ne $expression) { $expression.ScriptBlock }
     }
 }
 
@@ -153,27 +325,44 @@ function Get-EpicStateIsolationFinding {
     [OutputType([string])]
     param([Parameter(Mandatory)] [System.Management.Automation.Language.ScriptBlockAst] $Ast)
 
-    $isCommand = { param($node) $node -is [System.Management.Automation.Language.CommandAst] }
-    $outermost = @($Ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -eq 'BeforeAll' }, $true) |
-            Sort-Object -Property @{ Expression = { Get-EpicStateIsolationCommandDepth -Node $_ } }, @{ Expression = { $_.Extent.StartOffset } } |
-                Select-Object -First 1)
-    $blockExpression = if ($outermost.Count -eq 1) {
-        @($outermost[0].CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.ScriptBlockExpressionAst] }) | Select-Object -First 1
-    }
-    if ($null -eq $blockExpression) {
+    $blocks = @(Get-EpicStateIsolationOutermostBlock -Ast $Ast)
+    if ($blocks.Count -eq 0) {
         'no outermost BeforeAll'
         return
     }
 
-    $commands = @($blockExpression.ScriptBlock.FindAll($isCommand, $true) | Sort-Object -Property { $_.Extent.StartOffset })
-    $dotSource = $commands | Where-Object { $_.InvocationOperator -eq [System.Management.Automation.Language.TokenKind]::Dot } | Select-Object -First 1
+    foreach ($block in $blocks) {
+        $commands = @(Get-EpicStateIsolationDirectCommand -Block $block | Sort-Object -Property { $_.Extent.StartOffset })
+        $dotSources = @($commands | Where-Object { $_.InvocationOperator -eq [System.Management.Automation.Language.TokenKind]::Dot })
+        $dotSource = Get-EpicStateIsolationHookDotSource -DotSource $dotSources -SuiteAst $Ast
 
-    Get-EpicStateIsolationPairFinding -Commands $commands -DotSource $dotSource -MockCommand 'Get-EpicScopeCheckpointText' -ModuleName 'EpicScopeResolution' -ModuleFile 'EpicScopeResolution.psm1'
-    Get-EpicStateIsolationPairFinding -Commands $commands -DotSource $dotSource -MockCommand 'Get-WorktreeRunCheckpointText' -ModuleName 'WorktreeRunResolution' -ModuleFile 'WorktreeRunResolution.psm1'
+        Get-EpicStateIsolationPairFinding -Commands $commands -DotSource $dotSource -MockCommand 'Get-EpicScopeCheckpointText' -ModuleName 'EpicScopeResolution' -ModuleFile 'EpicScopeResolution.psm1'
+        Get-EpicStateIsolationPairFinding -Commands $commands -DotSource $dotSource -MockCommand 'Get-WorktreeRunCheckpointText' -ModuleName 'WorktreeRunResolution' -ModuleFile 'WorktreeRunResolution.psm1'
+    }
+}
+
+function Get-EpicStateIsolationTextFinding {
+    # Pure: parse in-memory suite text and return its findings prefixed by the repository-relative
+    # path; a parse error is returned as one finding, so that branch is testable without a file.
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)] [AllowEmptyString()] [string] $Text,
+        [Parameter(Mandatory)] [string] $RelativePath
+    )
+    $tokens = $null
+    $errors = $null
+    $ast = [System.Management.Automation.Language.Parser]::ParseInput($Text, [ref] $tokens, [ref] $errors)
+    if (@($errors).Count -gt 0) {
+        "${RelativePath}: parse error: $($errors[0].Message)"
+        return
+    }
+    foreach ($finding in @(Get-EpicStateIsolationFinding -Ast $ast)) {
+        "${RelativePath}: $finding"
+    }
 }
 
 function Get-EpicStateIsolationSuiteFinding {
-    # Parse one committed suite, located from the repository root, and return its
+    # Read one committed suite, located from the repository root, and return its
     # findings prefixed by the repository-relative path.
     [OutputType([string])]
     param(
@@ -185,14 +374,5 @@ function Get-EpicStateIsolationSuiteFinding {
         "suite file not found: $RelativePath"
         return
     }
-    $tokens = $null
-    $errors = $null
-    $ast = [System.Management.Automation.Language.Parser]::ParseFile($fullPath, [ref] $tokens, [ref] $errors)
-    if (@($errors).Count -gt 0) {
-        "${RelativePath}: parse error: $($errors[0].Message)"
-        return
-    }
-    foreach ($finding in @(Get-EpicStateIsolationFinding -Ast $ast)) {
-        "${RelativePath}: $finding"
-    }
+    Get-EpicStateIsolationTextFinding -Text (Get-Content -Raw -LiteralPath $fullPath) -RelativePath $RelativePath
 }
