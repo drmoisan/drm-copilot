@@ -8,7 +8,6 @@ import type {
 import { RealFileSystem, toPosixPath, type FileSystem } from "../file-system";
 import { SubprocessRunner } from "../subprocess-runner";
 import {
-  HandoffContractError,
   collectHandoffValidationFailures,
   parseHandoffEnvelopeText,
   selectPrimaryHandoffFailure,
@@ -22,7 +21,10 @@ import {
   type CheckoutObservation,
   type HandoffCheckoutContext,
 } from "./orchestration-handoff-checkout-context";
-import { describeHandoffFailureCause } from "./orchestration-handoff-materializer-request";
+import {
+  describeEnvelopeParseFailure,
+  describeHandoffFailureCause,
+} from "./orchestration-handoff-materializer-request";
 import {
   createNodeHandoffPathBoundary,
   type HandoffPathBoundary,
@@ -148,12 +150,10 @@ function readEnvelope(
   try {
     return parseHandoffEnvelopeText(envelopeText);
   } catch (error: unknown) {
-    return blocked(
-      request,
-      error instanceof HandoffContractError
-        ? error.code
-        : "HANDOFF_UNSUPPORTED_VERSION",
-    );
+    const failure = describeEnvelopeParseFailure(error);
+    return blocked(request, failure.code, {
+      failureCause: failure.failureCause,
+    });
   }
 }
 
