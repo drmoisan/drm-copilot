@@ -7,6 +7,7 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
         $script:HookRoot = Join-Path $script:RepoRoot '.codex/hooks'
         $script:ConfigPath = Join-Path $script:RepoRoot '.codex/config.toml'
         $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
+        . (Join-Path $script:HookRoot 'enforce-epic-wave-barrier.ps1')
 
         # Candidate tool names probed against each matcher regex. A future
         # registration cannot silently escape coverage, because the registration
@@ -91,6 +92,12 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
             $startInfo.UseShellExecute = $false
             $startInfo.Environment['CLAUDE_TOOL_INPUT'] = '{"command":"git reset --hard"}'
             $startInfo.Environment['CLAUDE_SESSION_ID'] = 'poisoned-legacy-session'
+            if ($HookName -eq 'enforce-epic-wave-barrier.ps1') {
+                # This hook reads its item checkpoint from its own script location, so the child working
+                # directory cannot isolate it; this launcher context returns allow before any checkpoint is read.
+                $startInfo.Environment['CODEX_EPIC_CHILD_LAUNCH_ID'] = 'native-hook-contract-launch'
+                $startInfo.Environment['CODEX_EPIC_CHILD_EXECUTION_CONTEXT'] = 'epic_preparation_child'
+            }
 
             $process = [System.Diagnostics.Process]::Start($startInfo)
             $process.StandardInput.Write($PayloadRaw)
@@ -199,6 +206,14 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
             Should -BeFalse -Because 'benign payloads must not create Python batch-budget state for the synthetic session'
         Test-Path -LiteralPath $syntheticPowerShellState |
             Should -BeFalse -Because 'benign payloads must not create PowerShell batch-budget state for the synthetic session'
+    }
+
+    It 'DEV-2 wave barrier allows a benign Bash payload when no local checkpoint text is supplied' {
+        $payload = ConvertTo-CodexPreToolPayload -ToolName 'Bash' -ToolInput (Get-CodexBenignToolInput -ToolName 'Bash' -RepoRoot $script:RepoRoot)
+
+        $decision = Invoke-CodexEpicWaveDecision -PayloadRaw $payload -LocalCheckpointRaw '' -EpicCheckpointRaw '' -LauncherEnvironment $null
+
+        $decision | Should -BeNullOrEmpty -Because 'an empty local checkpoint text must allow a benign payload in the native context'
     }
 
     Context 'Non-vacuity floor for the registration count' {

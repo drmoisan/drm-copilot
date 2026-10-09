@@ -8,6 +8,8 @@ Describe 'enforce-completion-consistency.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-completion-consistency.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex'
 
         # Builds a Write-shaped PreToolUse envelope for a checkpoint payload.
         function ConvertTo-CheckpointToolInput {

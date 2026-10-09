@@ -11,12 +11,15 @@
 # child process, and no network access.
 
 Describe 'preimplementation gate attribution trailers (<Runtime>)' -ForEach @(
-    @{ Runtime = 'claude'; GateRelativePath = '.claude/hooks/enforce-orchestration-preimplementation-gate.ps1'; PayloadKind = 'envelope' }
-    @{ Runtime = 'codex'; GateRelativePath = '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'; PayloadKind = 'mapped' }
+    @{ Runtime = 'claude'; GateRelativePath = '.claude/hooks/enforce-orchestration-preimplementation-gate.ps1'; PayloadKind = 'envelope'; Surface = 'Claude'; Seam = @('Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-EpicScopeCheckpointText'); ExtraSeam = @('Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent') }
+    @{ Runtime = 'codex'; GateRelativePath = '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'; PayloadKind = 'mapped'; Surface = 'Codex'; Seam = @('Get-EpicScopeCheckpointText'); ExtraSeam = @('Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText') }
 ) {
     BeforeAll {
         $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
         . (Join-Path $repoRoot $GateRelativePath)
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam $Seam -Surface $Surface
+        Register-EpicStateBaselineMock -Seam $ExtraSeam -Surface $Surface
 
         function Get-AttributionTrailerDecision {
             <#
@@ -39,6 +42,8 @@ Describe 'preimplementation gate attribution trailers (<Runtime>)' -ForEach @(
         }
         if ($Runtime -eq 'claude') { Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } } }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface $Surface -Seam $Seam }
 
     It 'admits <Label>' -ForEach @(
         @{ Label = 'a separate-value trailer option'; Command = 'git commit -m ''docs: plan'' --trailer ''Co-Authored-By: C <n@a.com>'' -- docs/features/active/x/plan.md' }

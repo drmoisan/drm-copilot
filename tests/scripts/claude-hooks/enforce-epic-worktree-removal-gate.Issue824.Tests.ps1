@@ -69,6 +69,9 @@ Describe 'enforce-epic-worktree-removal-gate issue #824 decisions' {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $script:RepoRoot '.claude/hooks/enforce-epic-worktree-removal-gate.ps1')
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateCheckpointContent' -Surface 'Codex'
         $script:P = '/repo/worktrees/item-a-101'
         $script:Q = '/repo/worktrees/item-b-102'
         $script:R824Add1 = 'pwsh -NoProfile -Command ''Set-Location -LiteralPath "C:/repo/.claude/worktrees/agent-x"; if (Test-Path -LiteralPath "src/Old.cs") { Remove-Item -LiteralPath "src/Old.cs" -Force }; git status --porcelain -- "src/Old.cs"'''
@@ -94,6 +97,8 @@ Describe 'enforce-epic-worktree-removal-gate issue #824 decisions' {
         Mock Get-EpicWorktreeGateParallelCheckpointContent { $null }
         Mock Test-CleanupWorktreeManifestAuthorizesRemoval { $false }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     Context 'no checkpoint' {
         BeforeEach { $script:Checkpoint = $null }

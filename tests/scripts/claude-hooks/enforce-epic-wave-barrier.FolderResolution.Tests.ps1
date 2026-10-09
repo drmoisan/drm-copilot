@@ -22,8 +22,15 @@ Describe 'enforce-epic-wave-barrier.ps1 feature-folder resolution (issue #565)' 
     BeforeAll {
         $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-wave-barrier.ps1").Path
         . $script:HookPath
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-EpicWaveBarrierCheckpointContent { $null }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        if (Get-Command Test-CodexEpicChildRoutingLaunchAuthority -ErrorAction SilentlyContinue) { Mock Test-CodexEpicChildRoutingLaunchAuthority { $null } }
         Mock Resolve-EpicWaveBarrierTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
-        Mock Get-EpicWaveBarrierCheckpointContent { $script:CheckpointJson }
 
         $script:Target = '2026-07-02-target-301'
         $script:Upstream = '2026-07-02-upstream-300'
@@ -55,6 +62,12 @@ Describe 'enforce-epic-wave-barrier.ps1 feature-folder resolution (issue #565)' 
             return (Invoke-EpicWaveBarrierDecision -ToolInputRaw (ConvertTo-WavePayload -Prompt $Prompt)).hookSpecificOutput
         }
     }
+
+    BeforeEach {
+        Mock Get-EpicWaveBarrierCheckpointContent { $script:CheckpointJson }
+    }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     Context 'nested-artifact citations resolve to the target folder' {
         BeforeEach {

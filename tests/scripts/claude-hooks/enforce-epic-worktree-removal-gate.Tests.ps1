@@ -20,14 +20,15 @@
     whether a parallel run happens to be in flight. A contributor adding a deny test
     inherits this rule.
 #>
-
 Describe 'enforce-epic-worktree-removal-gate.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-worktree-removal-gate.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
         Mock Resolve-EpicWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
-
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
     Context 'commands outside scope' {
         It 'denies an empty payload as an envelope anomaly (fail closed)' {
             Mock -CommandName Get-EpicWorktreeGateParallelCheckpointContent -MockWith { $null }
@@ -35,12 +36,10 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'EPIC_WORKTREE_REMOVAL_BLOCKED'
         }
-
         It 'allows when the JSON payload has no command field' {
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw '{"tool_input":{"other":"value"}}'
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
-
         It 'allows a non git-worktree-remove Bash command' {
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw '{"tool_input":{"command":"git worktree list"}}'
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
@@ -435,7 +434,10 @@ Describe 'enforce-epic-worktree-removal-gate.ps1' {
 Describe 'enforce-epic-worktree-removal-gate.ps1 manifest branch' {
     BeforeAll {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-worktree-removal-gate.ps1").Path
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
         Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1").Path -Force
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
         Mock Resolve-EpicWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
