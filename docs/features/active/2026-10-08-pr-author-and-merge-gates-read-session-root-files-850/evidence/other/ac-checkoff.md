@@ -23,3 +23,8 @@ Output Summary:
 - AC-34 (line 255), AC-35 (line 259), AC-36 (line 260), AC-37 (line 261): checked. Evidence: P3-T11 `evidence/regression-testing/erem-diagnostics-pass-after.2026-10-09T00-06.md` (T-EREM-DX 8/8 pass); fail-before P3-T2 `evidence/regression-testing/erem-diagnostics-fail-before.2026-10-09T00-02.md` (8/8 fail).
 - AC-38 (line 262): checked. Evidence: P3-T12 `evidence/qa-gates/pester-set-rem-p3.2026-10-09T00-06.md` (232/232 pass) and P3-T13 `evidence/qa-gates/erem-decision-unchanged.2026-10-09T00-07.md` (three suites added=0 removed=0; Tests.ps1 added=1 removed=0).
 - A14 output: `CHECKBOX checked=9 unchecked=38`; lines 255, 259, 260, 261, 262 `state=checked`.
+
+## P4-T13 (2026-10-09T00-13)
+
+- AC-15 (line 227), AC-16 (line 228), AC-17 (line 229), AC-18 (line 230): checked. Evidence: P4-T9 `evidence/regression-testing/wir-prnumber-pass-after.2026-10-09T00-12.md` (T-WIR-PR 11/11 pass); fail-before P4-T2 `evidence/regression-testing/wir-prnumber-fail-before.2026-10-09T00-09.md` (11/11 fail); P4-T10 SET-LIB 266/266.
+- A14 output: `CHECKBOX checked=13 unchecked=34`; lines 227-230 `state=checked`.
