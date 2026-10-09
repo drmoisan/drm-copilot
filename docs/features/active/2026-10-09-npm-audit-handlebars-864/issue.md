@@ -70,8 +70,8 @@ Every PR into `main` fails required CI. This blocks parallel run bug-burndown-20
 
 ## Acceptance Criteria
 
-- [ ] AC-1: In both manifests (`package.json` and `extensions/drm-copilot/package.json`), `overrides` contains `"handlebars": "^4.7.10"` next to the existing overrides; no other dependency is bumped; `packages/mcp-server` is untouched; and both `package-lock.json` files (root and `extensions/drm-copilot`) are regenerated with npm install to match.
-- [ ] AC-2: `npm audit --audit-level=moderate` exits 0 in all three packages (root, `extensions/drm-copilot`, `packages/mcp-server`), and `npm ls handlebars` shows only versions >= 4.7.10.
+- [x] AC-1: In both manifests (`package.json` and `extensions/drm-copilot/package.json`), `overrides` contains `"handlebars": "^4.7.10"` next to the existing overrides; no other dependency is bumped; `packages/mcp-server` is untouched; and both `package-lock.json` files (root and `extensions/drm-copilot`) are regenerated with npm install to match.
+- [x] AC-2: `npm audit --audit-level=moderate` exits 0 in all three packages (root, `extensions/drm-copilot`, `packages/mcp-server`), and `npm ls handlebars` shows only versions >= 4.7.10.
 - [ ] AC-3: The root and extension TypeScript toolchains (format check, lint, type check, tests) pass with coverage not below baseline, except the pre-existing root `format:check` failure on `tests/fixtures/**` JSON (excluded as in #802, tracked in #848). PR CI is green on all checks, including Publish to Marketplace, verified against the full check list rather than only the required checks.
 
 ## Next Step
