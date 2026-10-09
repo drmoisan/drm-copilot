@@ -271,8 +271,8 @@ Each criterion is verified by the named Pester or parity test. The research reco
 ### Constraints
 
 - [ ] No enforcement hook invokes Python. Verified by `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`.
-- [ ] No production or test PowerShell file created or changed by this child exceeds 500 lines. Verified by `session-root-reads-850.Constraints.Tests.ps1`, row "keeps every changed file within the line cap".
-- [ ] No suite created or changed by this child uses `TestDrive`, `GetTempPath`, `New-TemporaryFile`, or another temporary-file API, and none encodes an absolute host path. Verified by `session-root-reads-850.Constraints.Tests.ps1`, row "uses no temporary files and no host paths".
+- [x] No production or test PowerShell file created or changed by this child exceeds 500 lines. Verified by `session-root-reads-850.Constraints.Tests.ps1`, row "keeps every changed file within the line cap".
+- [x] No suite created or changed by this child uses `TestDrive`, `GetTempPath`, `New-TemporaryFile`, or another temporary-file API, and none encodes an absolute host path. Verified by `session-root-reads-850.Constraints.Tests.ps1`, row "uses no temporary files and no host paths".
 - [ ] Line coverage is at least 85% for every changed production PowerShell file, measured by a Pester code-coverage run whose `CodeCoverage.Path` names the changed files and whose per-file result is not `NA`. Verified by the Pester coverage run over the suites named in this section, recorded under `<FEATURE>/evidence/qa-gates/`.
 - [x] The epic gate-suite isolation guard passes with any new pr-author suite that reaches `Resolve-EpicScopeCheckpoint` added to its list. Verified by `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1`.
 

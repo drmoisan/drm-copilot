@@ -41,3 +41,8 @@ Output Summary:
 - AC-14 (line 223): checked. Evidence: P6-T21 `evidence/qa-gates/pester-set-pra-p6.2026-10-09T00-38.md` (SET-PRA 262/262, including OrchestratorState.Tests.ps1 and EE-1; no rule CR update).
 - AC-47 (line 277): checked. Evidence: P6-T20 `evidence/qa-gates/epic-state-isolation-p6.2026-10-09T00-38.md` (isolation guard 34/34 with T-PRA-IAR in its list).
 - A14 output: `CHECKBOX checked=39 unchecked=8`; lines 210-223 and 277 `state=checked`.
+
+## P7-T8 (2026-10-09T00-42)
+
+- AC-44 (line 274) and AC-45 (line 275): checked. Evidence: P7-T7 `evidence/qa-gates/constraints-850.2026-10-09T00-41.md` (T-CONS 2/2 pass: every changed file within 500 lines; no temporary-file token in any created or edited suite; no host path in any created file). The added-lines scan of edited suites runs again at P8-T15.
+- A14 output: `CHECKBOX checked=41 unchecked=6`; lines 274 and 275 `state=checked`.
