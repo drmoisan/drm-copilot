@@ -210,7 +210,7 @@ Describe 'Codex preimplementation gate epic scope (issue #707)' {
             }
         }
 
-        It 'a -C selector command whose selector HEAD differs returns the single-feature decision although the session-root HEAD matches' {
+        It 'a -C selector command whose selector HEAD differs is denied as target-mixed when the session-root HEAD matches (issue #738)' {
             # Arrange: only the session root has the integration branch checked out.
             Set-EpicScopeSeam -CheckpointText $script:ReadyEpicJson -MergeInProgress $true
             Mock Get-EpicScopeWorktreeHeadBranch {
@@ -224,7 +224,7 @@ Describe 'Codex preimplementation gate epic scope (issue #707)' {
 
             # Assert
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:SingleFeatureReason
+            $decision.hookSpecificOutput.permissionDecisionReason.Contains('target-mixed') | Should -BeTrue -Because 'the session root is epic scope and the selector HEAD differs (D3)'
         }
 
         It 'with <Label> the <Leg> leg returns the unchanged single-feature decision and reason' -ForEach @(
