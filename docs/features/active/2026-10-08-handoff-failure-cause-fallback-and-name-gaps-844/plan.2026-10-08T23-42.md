@@ -226,28 +226,28 @@ Run the steps in order. If any step fails or changes a file, fix the cause and r
 
 Each check-off task changes only `- [ ]` to `- [x]` on the named criterion in `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md`, and only after the cited evidence records a pass. A criterion whose evidence does not pass stays unchecked and is listed in P7-T20.
 
-- [ ] [P7-T1] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-1 after P3-T2 and P3-T11 (F1-F3 passed) pass.
-- [ ] [P7-T2] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-2 after P3-T7 and P3-T11 (A7 passed) pass.
-- [ ] [P7-T3] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-3 after P3-T4, P3-T8, and P3-T11 (F4 passed) pass.
-- [ ] [P7-T4] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-4 after P3-T5 and P3-T11 (F5 passed) pass.
-- [ ] [P7-T5] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-5 after P3-T6 and P3-T11 (F6 and F7 passed) pass.
-- [ ] [P7-T6] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-6 after P6-T1 passes.
-- [ ] [P7-T7] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-7 after P3-T1 and P3-T11 (rows (h), (i), (j) passed) pass.
-- [ ] [P7-T8] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-8 after P2-T4 and P3-T11 pass.
-- [ ] [P7-T9] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-9 after P3-T12, P5-T6, and P6-T4 pass.
-- [ ] [P7-T10] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-10 after P1-T5, P1-T9, and P6-T5 pass.
-- [ ] [P7-T11] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-11 after P0-T10 and P1-T8 pass.
-- [ ] [P7-T12] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-12 after P4-T3 passes.
-- [ ] [P7-T13] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-13 after P6-T2 passes.
-- [ ] [P7-T14] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-14 after P5-T1 and P5-T8 pass.
-- [ ] [P7-T15] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-15 after P5-T2 and P5-T8 pass.
-- [ ] [P7-T16] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-16 after P5-T3, P5-T4, and P5-T8 pass.
-- [ ] [P7-T17] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-17 after P5-T6 and P6-T6 pass.
+- [x] [P7-T1] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-1 after P3-T2 and P3-T11 (F1-F3 passed) pass.
+- [x] [P7-T2] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-2 after P3-T7 and P3-T11 (A7 passed) pass.
+- [x] [P7-T3] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-3 after P3-T4, P3-T8, and P3-T11 (F4 passed) pass.
+- [x] [P7-T4] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-4 after P3-T5 and P3-T11 (F5 passed) pass.
+- [x] [P7-T5] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-5 after P3-T6 and P3-T11 (F6 and F7 passed) pass.
+- [x] [P7-T6] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-6 after P6-T1 passes.
+- [x] [P7-T7] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-7 after P3-T1 and P3-T11 (rows (h), (i), (j) passed) pass.
+- [x] [P7-T8] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-8 after P2-T4 and P3-T11 pass.
+- [x] [P7-T9] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-9 after P3-T12, P5-T6, and P6-T4 pass.
+- [x] [P7-T10] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-10 after P1-T5, P1-T9, and P6-T5 pass.
+- [x] [P7-T11] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-11 after P0-T10 and P1-T8 pass.
+- [x] [P7-T12] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-12 after P4-T3 passes.
+- [x] [P7-T13] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-13 after P6-T2 passes.
+- [x] [P7-T14] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-14 after P5-T1 and P5-T8 pass.
+- [x] [P7-T15] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-15 after P5-T2 and P5-T8 pass.
+- [x] [P7-T16] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-16 after P5-T3, P5-T4, and P5-T8 pass.
+- [x] [P7-T17] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-17 after P5-T6 and P6-T6 pass.
 - [ ] [P7-T18] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` to check AC-18 only after P6-T3 passes and the pull request exists with a body that contains `Closes #844` (or `Fixes #844` / `Resolves #844`) and mentions `#846` with no closing keyword, read by `gh pr view --json body` from the worktree root.
   - Acceptance: when no pull request exists at execution time, or `gh` is not available to the executor, AC-18 stays unchecked and P7-T20 lists it as `pending-PR`; the item's orchestrator run performs the check-off after PR authoring, per the CI-Dependent Criteria rule of the acceptance-criteria-tracking skill.
-- [ ] [P7-T19] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/plan.2026-10-08T23-42.md` by checking each completed task and recording any deviation from this plan, with its reason, under `## Plan Deviations (execution)`.
+- [x] [P7-T19] Update `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/plan.2026-10-08T23-42.md` by checking each completed task and recording any deviation from this plan, with its reason, under `## Plan Deviations (execution)`.
   - Acceptance: the checkbox state of every task matches the presence and pass state of its artifact; the deviations section is either `none` or lists each deviation.
-- [ ] [P7-T20] Create `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/evidence/other/ac-status-summary.<timestamp>.md` with the Acceptance Criteria Status block defined by the acceptance-criteria-tracking skill for `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` (18 items), together with the test evidence index (P2-T4, P3-T11, P3-T12, P5-T6, P6-T6).
+- [x] [P7-T20] Create `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/evidence/other/ac-status-summary.<timestamp>.md` with the Acceptance Criteria Status block defined by the acceptance-criteria-tracking skill for `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/spec.md` (18 items), together with the test evidence index (P2-T4, P3-T11, P3-T12, P5-T6, P6-T6).
   - Acceptance: the total (18), checked count, and the list of unchecked items (with `pending-PR` for AC-18 when applicable) are recorded and match the checkbox state of `spec.md`.
 
 ## Blast Radius (every repository file this plan writes)
@@ -339,4 +339,6 @@ Not written (verified during planning): bundled mirrors under `extensions/drm-co
 
 ## Plan Deviations (execution)
 
-none
+1. [P6-T3] The promoted lifecycle record `docs/features/potential/promoted/2026-10-08-handoff-failure-cause-fallback-and-name-gaps.md` appears in the `git diff --name-status origin/main` list rather than in the P0-T2 porcelain capture, because it was already committed by the pre-execution commit 742f6775 (`docs(844): prepare feature folder, research, spec, and preflight-cleared plan`). The task's exemption is phrased against the P0-T2 porcelain capture; the record was treated as pre-existing on that basis, and the commit provenance is recorded in `evidence/qa-gates/ac18-scope.2026-10-09T03-55.md`. Reason: the exemption's intent (a lifecycle record not written by this execution) holds; only its detection channel differs.
+2. Commit cadence: per the operator's binding constraint, every phase boundary (Phases 0 through 7) was committed and pushed, in addition to the plan's own P1-T9 split commit. The P1-T9 commit was kept isolated to the three split test files, and the Phase 1 evidence was committed separately afterwards, so P6-T5 still observes exactly one commit touching the split files. Reason: operator instruction; no task outcome changed.
+3. [P7-T18] Left unchecked. No pull request exists at execution time, so AC-18 stays unchecked and is listed as `pending-PR` in P7-T20, as the task's own acceptance clause directs. The orchestrator performs the check-off after PR authoring.
