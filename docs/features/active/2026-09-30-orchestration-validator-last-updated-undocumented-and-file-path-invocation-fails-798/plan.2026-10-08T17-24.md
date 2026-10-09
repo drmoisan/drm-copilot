@@ -153,22 +153,22 @@ Files that must not change (spec "Files to Write"): `scripts/dev_tools/validate_
 
 Each task in this phase writes FEATURE/evidence/other/p1-tN.TS.md (N is the task number).
 
-- [ ] [P1-T1] Create `tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py` with exactly the content of Appendix A (Write tool, LF line endings).
+- [x] [P1-T1] Create `tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py` with exactly the content of Appendix A (Write tool, LF line endings).
       Commands: `git grep --no-index -c "^def test_" -- tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py`; `git status --porcelain -- tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py`.
       Acceptance: the grep prints 4; the status line shows the file as untracked (`??`).
-- [ ] [P1-T2] Create `tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py` with exactly the content of Appendix B (Write tool, LF line endings).
+- [x] [P1-T2] Create `tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py` with exactly the content of Appendix B (Write tool, LF line endings).
       Commands: `git grep --no-index -c "^def test_" -- tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`; `git status --porcelain -- tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`.
       Acceptance: the grep prints 10; the status line shows the file as untracked (`??`).
-- [ ] [P1-T3] Format INVOCATION-MODULE and DOCS-MODULE (`tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py`, `tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`) before their first run.
+- [x] [P1-T3] Format INVOCATION-MODULE and DOCS-MODULE (`tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py`, `tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`) before their first run.
       Commands: `poetry run black tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`; `poetry run black --check tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`.
       Acceptance: the first command exits 0 and its summary line ("2 files left unchanged." or a line containing "reformatted") is recorded verbatim; the `--check` command exits 0 and prints "2 files would be left unchanged.".
-- [ ] [P1-T4] Lint INVOCATION-MODULE and DOCS-MODULE (`tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py`, `tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`).
+- [x] [P1-T4] Lint INVOCATION-MODULE and DOCS-MODULE (`tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py`, `tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`).
       Command: `poetry run ruff check tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`.
       Acceptance: exit 0 and the line "All checks passed!". A finding is fixed in the test file only, without changing any assertion literal or test name and without adding a `noqa` comment, and P1-T3 is rerun.
-- [ ] [P1-T5] Type-check INVOCATION-MODULE and DOCS-MODULE (`tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py`, `tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`).
+- [x] [P1-T5] Type-check INVOCATION-MODULE and DOCS-MODULE (`tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py`, `tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`).
       Command: `poetry run pyright tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`.
       Acceptance: exit 0 and a summary line beginning "0 errors". A finding is fixed in the test file only, without changing any assertion literal or test name, and P1-T3 is rerun.
-- [ ] [P1-T6] Verify collection counts, size, and the absence of process and temporary-file use in both new modules (`tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py`, `tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`).
+- [x] [P1-T6] Verify collection counts, size, and the absence of process and temporary-file use in both new modules (`tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py`, `tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`).
       Commands: `poetry run pytest tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py --collect-only -q`; `poetry run pytest tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py --collect-only -q`; `wc -l tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`; `git grep --no-index -c -E "subprocess|tempfile|tmp_path|mkstemp|NamedTemporaryFile|mem_fs_path|write_text|write_bytes|os\.system|Popen" -- tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`.
       Acceptance: the first collection prints "4 tests collected"; the second prints "52 tests collected" (22 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 22 + 1); both exit 0; `wc -l` reports each file at or under 500 lines; the forbidden-pattern grep prints nothing (exit 1 is the pass condition here). The artifact records `EXIT_CODE: 1` with `ExpectedExitCode: 1` (the last grep's exit code).
 
