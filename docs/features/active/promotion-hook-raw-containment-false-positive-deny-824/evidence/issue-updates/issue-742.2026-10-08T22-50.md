@@ -1,7 +1,10 @@
-# POSTING BLOCKED: pull request not yet created; the orchestrator posts this body after PR creation
+# Issue #742 disposition comment (posted on PR #855)
 
 Timestamp: 2026-10-08T22-50
 PostedAs: comment
+PostedAt: 2026-10-09T01-45
+CommentURL: https://github.com/drmoisan/drm-copilot/pull/855#issuecomment-6072402795
+PostedBy: `gh pr comment 855 --repo drmoisan/drm-copilot --body-file <comment text below>` (exit 0)
 PostingCheck: `gh pr list --repo drmoisan/drm-copilot --head bug/promotion-hook-raw-containment-false-positive-deny-exec-824 --state open --json number` exited 0 and printed `[]` at 2026-10-08T22-51 ([P9-T4]).
 Target: pull request for branch bug/promotion-hook-raw-containment-false-positive-deny-exec-824 (bundles #742)
 
