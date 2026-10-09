@@ -46,3 +46,13 @@ Output Summary:
 
 - AC-44 (line 274) and AC-45 (line 275): checked. Evidence: P7-T7 `evidence/qa-gates/constraints-850.2026-10-09T00-41.md` (T-CONS 2/2 pass: every changed file within 500 lines; no temporary-file token in any created or edited suite; no host path in any created file). The added-lines scan of edited suites runs again at P8-T15.
 - A14 output: `CHECKBOX checked=41 unchecked=6`; lines 274 and 275 `state=checked`.
+
+## P8-T20 (2026-10-09T01-03)
+
+- AC-39 (line 266): checked. Evidence: P8-T16 `evidence/qa-gates/python-parity.2026-10-09T01-01.md` (KL-510 node PASSED) and P8-T18 `evidence/qa-gates/mirror-hashes-final.2026-10-09T01-01.md` (PAIR-SUMMARY pairs=14 unequal=0).
+- AC-40 (line 267): checked. Evidence: P8-T16 (test_push_down_claude_pack_manifest_completeness.py nodes PASSED; CORE registers PRAR, P6-T15).
+- AC-41 (line 268): checked. Evidence: P8-T11 `evidence/qa-gates/pester-claude-lib.2026-10-09T00-56.md` (WorktreeResolution.Manifest.Tests.ps1 passes; the only failures are the unchanged P0-T22 baseline set in OrchestratorStateIssueAdoption.Tests.ps1).
+- AC-42 (line 269): checked. Evidence: P8-T16 (test_push_down_codex_and_agents_resource_contracts.py nodes PASSED) and P8-T17 `evidence/qa-gates/scope-checks.2026-10-09T01-01.md` (no Codex, codex-and-agents bundle, or .claude/rules change).
+- AC-43 (line 273): checked. Evidence: P8-T12 `evidence/qa-gates/pester-claude-runtime.2026-10-09T00-57.md` (83/83; enforcement-hooks-no-python-invocation.Tests.ps1 passes).
+- AC-46 (line 276): checked. Evidence: P8-T4 to P8-T8 coverage artifacts (every file at least 85 percent) and P8-T9 `evidence/qa-gates/changed-line-coverage.2026-10-09T00-55.md`; summarized in `evidence/qa-gates/coverage-comparison.2026-10-09T01-02.md` (Disposition PASS).
+- A14 output: `CHECKBOX checked=47 unchecked=0`; lines 266-269, 273, 276 `state=checked`.

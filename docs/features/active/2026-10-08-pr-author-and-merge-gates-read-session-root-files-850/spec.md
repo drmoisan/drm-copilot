@@ -263,17 +263,17 @@ Each criterion is verified by the named Pester or parity test. The research reco
 
 ### Mirrors and parity
 
-- [ ] Every changed `.claude` hook, helper, module, rule, and skill file is byte-identical to its mirror under `extensions/drm-copilot/resources/claude-customizations/`. Verified by `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`.
-- [ ] The pack manifest is complete, including any new module or dot-sourced sibling added by this child. Verified by `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`.
-- [ ] Every `.claude/lib/worktree-resolution/*.psm1` module (including any new one) is registered in `core.json`, listed in the manifest suite's expected lists, and SHA-256-identical to its bundle copy. Verified by `tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1`.
-- [ ] The Codex merge and removal gates and their bundled mirrors are unchanged. Verified by `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`.
+- [x] Every changed `.claude` hook, helper, module, rule, and skill file is byte-identical to its mirror under `extensions/drm-copilot/resources/claude-customizations/`. Verified by `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`.
+- [x] The pack manifest is complete, including any new module or dot-sourced sibling added by this child. Verified by `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`.
+- [x] Every `.claude/lib/worktree-resolution/*.psm1` module (including any new one) is registered in `core.json`, listed in the manifest suite's expected lists, and SHA-256-identical to its bundle copy. Verified by `tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1`.
+- [x] The Codex merge and removal gates and their bundled mirrors are unchanged. Verified by `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`.
 
 ### Constraints
 
-- [ ] No enforcement hook invokes Python. Verified by `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`.
+- [x] No enforcement hook invokes Python. Verified by `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`.
 - [x] No production or test PowerShell file created or changed by this child exceeds 500 lines. Verified by `session-root-reads-850.Constraints.Tests.ps1`, row "keeps every changed file within the line cap".
 - [x] No suite created or changed by this child uses `TestDrive`, `GetTempPath`, `New-TemporaryFile`, or another temporary-file API, and none encodes an absolute host path. Verified by `session-root-reads-850.Constraints.Tests.ps1`, row "uses no temporary files and no host paths".
-- [ ] Line coverage is at least 85% for every changed production PowerShell file, measured by a Pester code-coverage run whose `CodeCoverage.Path` names the changed files and whose per-file result is not `NA`. Verified by the Pester coverage run over the suites named in this section, recorded under `<FEATURE>/evidence/qa-gates/`.
+- [x] Line coverage is at least 85% for every changed production PowerShell file, measured by a Pester code-coverage run whose `CodeCoverage.Path` names the changed files and whose per-file result is not `NA`. Verified by the Pester coverage run over the suites named in this section, recorded under `<FEATURE>/evidence/qa-gates/`.
 - [x] The epic gate-suite isolation guard passes with any new pr-author suite that reaches `Resolve-EpicScopeCheckpoint` added to its list. Verified by `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1`.
 
 ## Risks & Mitigations
