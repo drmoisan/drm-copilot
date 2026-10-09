@@ -35,6 +35,18 @@ Describe 'enforce-orchestration-preimplementation-gate-modes.ps1 target folder (
         $script:Features621 = '[{"feature_folder":"' + $script:F507 + '","issue_num":507,"depends_on":[],"merge_status":"merged"},' +
         '{"feature_folder":"' + $script:F508 + '","issue_num":508,"depends_on":[],"merge_status":"merged"},' +
         '{"feature_folder":"' + $script:F621 + '","issue_num":621,"depends_on":[507,508],"merge_status":"not_started"}]'
+        # Issue #565 CR-1 fixtures: a terminal target cited with a non-terminal sibling (one fixture for epic features and parallel items).
+        $script:CrossRecords = '[{"feature_folder":"docs/features/active/target-a-with-a-much-longer-slug-301","issue_num":301,"depends_on":[],"merge_status":"merged"},' +
+        '{"feature_folder":"docs/features/active/b-302","issue_num":302,"depends_on":[],"merge_status":"not_started"}]'
+        $script:CrossTail = 'Execute docs/features/active/target-a-with-a-much-longer-slug-301 with context from docs/features/active/b-302 now.'
+        $script:SingleRecord = '[{"feature_folder":"docs/features/active/child-b-301","issue_num":301,"depends_on":[],"merge_status":"not_started"}]'
+
+        function Invoke-ModesParallelDecision {
+            param([string] $Prompt, [string] $ItemsJson)
+            $payload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'orchestrator'; prompt = $Prompt } } | ConvertTo-Json -Compress -Depth 5
+            $raw = ConvertTo-ModesParallelCheckpointJson -ItemsJson $ItemsJson
+            return (Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $payload -ParallelCheckpointRaw $raw).hookSpecificOutput
+        }
 
         function ConvertTo-ModesEpicCheckpointJson {
             param([string] $FeaturesJson)
@@ -197,6 +209,65 @@ Describe 'enforce-orchestration-preimplementation-gate-modes.ps1 target folder (
             # Assert
             $folders.Count | Should -Be 0
             $failure | Should -Be 'feature-folder-resolution-import'
+        }
+    }
+
+    Context 'issue #565 CR-1: only the keyed issue number breaks a tie' {
+        It 'M10p: denies a parallel delegation as target-ambiguous when only a bare #302 sibling reference is cited' {
+            $decision = Invoke-ModesParallelDecision -Prompt ('Parallel mode: true. Coordinate with #302. ' + $script:CrossTail) -ItemsJson $script:CrossRecords
+            $decision.permissionDecision | Should -Be 'deny'
+            $decision.permissionDecisionReason | Should -Match '^PREIMPLEMENTATION_GATE_BLOCKED:'
+            $decision.permissionDecisionReason | Should -Match 'target-ambiguous'
+            $decision.permissionDecisionReason | Should -Match 'target-a-with-a-much-longer-slug-301'
+            $decision.permissionDecisionReason | Should -Match 'b-302'
+        }
+
+        It 'M10e: denies an epic delegation as target-ambiguous when only a bare #302 sibling reference is cited' {
+            $decision = Invoke-ModesEpicDecision -Prompt ('Epic mode: true. Coordinate with #302. ' + $script:CrossTail) -FeaturesJson $script:CrossRecords
+            $decision.permissionDecision | Should -Be 'deny'
+            $decision.permissionDecisionReason | Should -Match '^PREIMPLEMENTATION_GATE_BLOCKED:'
+            $decision.permissionDecisionReason | Should -Match 'target-ambiguous'
+            $decision.permissionDecisionReason | Should -Match 'target-a-with-a-much-longer-slug-301'
+            $decision.permissionDecisionReason | Should -Match 'b-302'
+        }
+
+        It 'M11p: selects the terminal parallel target through the keyed issue number despite a bare #302 sibling reference' {
+            $decision = Invoke-ModesParallelDecision -Prompt ('Parallel mode: true. issue_num: 301. Coordinate with #302. ' + $script:CrossTail) -ItemsJson $script:CrossRecords
+            $decision.permissionDecision | Should -Be 'deny'
+            $decision.permissionDecisionReason | Should -Match "predicate is 'merge_status'"
+            $decision.permissionDecisionReason | Should -Not -Match 'target-ambiguous'
+        }
+
+        It 'M11e: selects the terminal epic target through the keyed issue number despite a bare #302 sibling reference' {
+            $decision = Invoke-ModesEpicDecision -Prompt ('Epic mode: true. issue_num: 301. Coordinate with #302. ' + $script:CrossTail) -FeaturesJson $script:CrossRecords
+            $decision.permissionDecision | Should -Be 'deny'
+            $decision.permissionDecisionReason | Should -Match "predicate is 'merge_status'"
+            $decision.permissionDecisionReason | Should -Not -Match 'target-ambiguous'
+        }
+    }
+
+    Context 'issue #565 CR-1: keyed-only issue source and the D3 hash fallback' {
+        It 'M12a: returns no keyed issue number when only a bare hash form is present' {
+            Find-OrchestrationDelegationIssueNumber -Prompt 'Parallel mode: true. Coordinate with #302.' -KeyedOnly | Should -BeNullOrEmpty
+        }
+
+        It 'M12b: returns the keyed issue number and ignores a bare hash form' {
+            Find-OrchestrationDelegationIssueNumber -Prompt 'Parallel mode: true. issue_num: 301. Coordinate with #302.' -KeyedOnly | Should -Be '301'
+        }
+
+        It 'M12c: keeps the bare hash form as the default issue-number source' {
+            Find-OrchestrationDelegationIssueNumber -Prompt 'Parallel mode: true. Coordinate with #302.' | Should -Be '302'
+        }
+
+        It 'M8h: allows a zero-candidate delegation through the bare hash D3 fallback' {
+            (Invoke-ModesEpicDecision -Prompt 'Epic mode: true. Deliver the fix for #301 in this wave.' -FeaturesJson $script:SingleRecord).permissionDecision |
+                Should -Be 'allow'
+        }
+
+        It 'M8m: denies a zero-candidate delegation with no issue number as target-record' {
+            $decision = Invoke-ModesEpicDecision -Prompt 'Epic mode: true. Deliver the fix in this wave.' -FeaturesJson $script:SingleRecord
+            $decision.permissionDecision | Should -Be 'deny'
+            $decision.permissionDecisionReason | Should -Match "predicate is 'target-record'"
         }
     }
 }
