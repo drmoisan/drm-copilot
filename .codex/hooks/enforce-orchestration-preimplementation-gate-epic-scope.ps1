@@ -26,12 +26,16 @@
     Get-OrchestrationDelegationCheckpointPath (modes file), and the gate's allow and block
     decision constructors Get-OrchestrationPreimplementationGateAllowDecision and
     Get-OrchestrationPreimplementationGateBlockDecision. The resolver and its seams come
-    from the resolution sibling dot-sourced below.
+    from the resolution sibling dot-sourced below. The per-segment target resolver comes
+    from the targets file dot-sourced below (issue #738), which calls
+    Read-CommandLineSegment, Get-CommandLineGlobalOption, and Get-CommandLineInvocation,
+    loaded by the gate's dot-source of hook-command-invocation.ps1.
     Mirrored byte-identically under extensions/drm-copilot/resources/codex-and-agents-customizations/.
     AUTHORITY: PowerShell-authoritative. The epic readiness predicate has no reference implementation in another language, and this hook starts no interpreter process (issue #707, D15).
 #>
 
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-resolution.ps1')
+. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-targets.ps1')
 
 # An epic manifest lives under the epics tree; the pattern is tested after backslash
 # normalisation so either separator spelling is accepted.
@@ -152,11 +156,14 @@ function Get-OrchestrationEpicScopeDecision {
     .SYNOPSIS
         Returns the epic-scope decision for an implementation-classified command or path, or $null.
     .DESCRIPTION
-        Resolves epic scope with worktree-HEAD matching and the command's -C selector. When
-        the call is not epic scope, returns $null so the caller's single-feature path runs
-        unchanged. In epic scope, returns an allow decision when the epic command-leg
-        readiness predicate passes, and otherwise a deny naming the epic checkpoint and the
-        failed conjunct.
+        Resolves the target of every command segment, apply_patch file marker, and path
+        (issue #738), then the epic scope of the session root and of each target. A command
+        whose text is an apply_patch body is decided as a path leg over its marker paths.
+        When neither is epic scope, returns $null so the caller's single-feature path runs
+        unchanged. In epic scope, denies an unresolvable, ambiguous, or out-of-scope target,
+        and otherwise evaluates the epic command-leg readiness predicate against every
+        target: the first failure denies (the session-root wording is unchanged), and no
+        failure allows.
     .PARAMETER Command
         The command line of a command or apply_patch leg; empty for a path leg.
     .PARAMETER FilePath
@@ -175,15 +182,37 @@ function Get-OrchestrationEpicScopeDecision {
     if (-not $Command -and -not $FilePath) {
         return $null
     }
-    $selector = if ($Command) { Get-OrchestrationEpicScopeSelector -Command $Command } else { $null }
-    $scope = Resolve-EpicScopeCheckpoint -SessionRoot (Get-Location).Path -WorktreeSelector $selector
-    if (-not $scope.IsEpicScope) {
+    $epicScopeSessionRoot = (Get-Location).Path
+    $legCommand = [string]$Command
+    $legPaths = @($FilePath)
+    $markerPaths = @(Get-OrchestrationPatchMarkerPath -PatchText $legCommand)
+    if ($markerPaths.Count -gt 0) {
+        $legCommand = ''
+        $legPaths = $markerPaths
+    }
+    $targetResult = Get-OrchestrationCommandTarget -Command $legCommand -FilePath $legPaths -SessionRoot $epicScopeSessionRoot
+    $scopeResolver = {
+        param([string] $Selector)
+        Resolve-EpicScopeCheckpoint -SessionRoot $epicScopeSessionRoot -WorktreeSelector $Selector
+    }
+    $verdict = Resolve-OrchestrationEpicTargetVerdict -SessionRoot $epicScopeSessionRoot -TargetResult $targetResult -ScopeResolver $scopeResolver
+    if ($verdict.Verdict -eq 'none') {
         return $null
     }
-
-    $failure = Get-EpicCommandLegReadinessFailure -Checkpoint $scope.Checkpoint -MergeInProgress $scope.MergeInProgress
-    if (-not $failure) {
-        return Get-OrchestrationPreimplementationGateAllowDecision
+    if ($verdict.Verdict -eq 'deny') {
+        return Get-OrchestrationPreimplementationGateBlockDecision -Reason (Get-OrchestrationEpicTargetDenyReason -ReasonCode $verdict.ReasonCode -Detail $verdict.Detail)
     }
-    return Get-OrchestrationPreimplementationGateBlockDecision -Reason ("PREIMPLEMENTATION_GATE_BLOCKED: this epic-scope operation was evaluated against $($scope.CheckpointPath), and the failed readiness predicate is '$failure'. Implementation operations in epic scope require that checkpoint to satisfy every readiness predicate, and a production path may be staged or edited only while a merge is in progress.")
+
+    foreach ($evaluation in $verdict.Evaluations) {
+        $scope = $evaluation.Scope
+        $failure = Get-EpicCommandLegReadinessFailure -Checkpoint $scope.Checkpoint -MergeInProgress $scope.MergeInProgress
+        if (-not $failure) {
+            continue
+        }
+        if ($evaluation.IsSessionRoot) {
+            return Get-OrchestrationPreimplementationGateBlockDecision -Reason ("PREIMPLEMENTATION_GATE_BLOCKED: this epic-scope operation was evaluated against $($scope.CheckpointPath), and the failed readiness predicate is '$failure'. Implementation operations in epic scope require that checkpoint to satisfy every readiness predicate, and a production path may be staged or edited only while a merge is in progress.")
+        }
+        return Get-OrchestrationPreimplementationGateBlockDecision -Reason (Get-OrchestrationEpicTargetDenyReason -ReasonCode 'target-not-ready' -Detail $evaluation.Target -CheckpointPath $scope.CheckpointPath -Failure $failure)
+    }
+    return Get-OrchestrationPreimplementationGateAllowDecision
 }

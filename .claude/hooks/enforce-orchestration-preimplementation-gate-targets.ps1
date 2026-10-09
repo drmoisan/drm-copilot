@@ -123,7 +123,7 @@ function Get-OrchestrationGitSelectorTarget {
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
-    param([Parameter(Mandatory)][AllowEmptyCollection()][string[]] $Token)
+    param([Parameter(Mandatory)][AllowEmptyCollection()][AllowEmptyString()][string[]] $Token)
 
     $table = Get-CommandLineGlobalOption -CommandWord 'git'
     $start = [array]::IndexOf($Token, 'git') + 1
