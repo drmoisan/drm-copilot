@@ -54,19 +54,19 @@ Out of scope:
 
 ## Acceptance Criteria
 
-- [ ] AC-1: `compute-cohorts.sh --keys` with a newline-separated value (for example `$'1\n2'`) reports all keys and produces output equal to the single-line control `"1 2"` (`[[1,2]]`); the same holds for `compute-concurrency-batches.sh --keys`.
-- [ ] AC-2: `compute-cohorts.sh --edges` with a newline-separated value honors every edge and produces output equal to the same edges supplied space-separated, including a case where an edge after the first newline changes the cohort assignment relative to omitting that edge.
-- [ ] AC-3: Tab-, CR-, VT-, and FF-separated `--keys` and `--edges` values each produce output equal to their single-line controls, and a CRLF-terminated final token is kept.
-- [ ] AC-4: A mixed-separator value with a trailing newline, and a whitespace-only or newline-only value, behave as specified: the former equals its single-line control and the latter yields the empty-graph result.
-- [ ] AC-5: A malformed token placed after a newline in `--keys` or `--edges` is validated and causes exit status 2, where it was previously ignored.
-- [ ] AC-6: A library-level test sources `parallel-cohorts.sh`, calls `pcoh_split_words` directly with a multi-separator value, and asserts the element count and each element of `PCOH_WORDS`.
-- [ ] AC-7: The comment block above `pcoh_split_words` states the newline, CR, VT, and FF handling and the ASCII separator-set equivalence to Python `str.split()`, and describes the input as whitespace-separated.
-- [ ] AC-8: `extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-cohorts.sh` is byte-identical to `.claude/lib/bash/parallel-cohorts.sh`, and `tests/shell/parallel_bash_manifest_membership.bats` passes.
-- [ ] AC-9: Fail-before evidence is recorded under `<FEATURE>/evidence/` in the canonical evidence location, showing the new bats rows fail against the unfixed library (CI run or local `sh` run), followed by pass evidence after the fix.
-- [ ] AC-10: `bash scripts/bash/shell-qc.sh check` (shfmt, shellcheck) passes with no new suppressions, and the full bats suite passes, including `parallel_cohorts_parity.bats` and `parallel_payload_only.bats`.
-- [ ] AC-11: `bash scripts/bash/shell-qc.sh test --coverage` reports kcov line coverage of at least 85% on the changed bash file, and the changed line in `parallel-cohorts.sh` is executed by at least one test. No branch-coverage gate applies to bash.
-- [ ] AC-12: `.claude/lib/bash/parallel-items-validate.sh` and `.claude/lib/bash/parallel-lane-assertion.sh` (and their bundled mirrors) are unchanged by this work.
-- [ ] AC-13: No file touched by this work exceeds 500 lines, and no temporary file or new fixture is created by the new tests.
+- [x] AC-1: `compute-cohorts.sh --keys` with a newline-separated value (for example `$'1\n2'`) reports all keys and produces output equal to the single-line control `"1 2"` (`[[1,2]]`); the same holds for `compute-concurrency-batches.sh --keys`.
+- [x] AC-2: `compute-cohorts.sh --edges` with a newline-separated value honors every edge and produces output equal to the same edges supplied space-separated, including a case where an edge after the first newline changes the cohort assignment relative to omitting that edge.
+- [x] AC-3: Tab-, CR-, VT-, and FF-separated `--keys` and `--edges` values each produce output equal to their single-line controls, and a CRLF-terminated final token is kept.
+- [x] AC-4: A mixed-separator value with a trailing newline, and a whitespace-only or newline-only value, behave as specified: the former equals its single-line control and the latter yields the empty-graph result.
+- [x] AC-5: A malformed token placed after a newline in `--keys` or `--edges` is validated and causes exit status 2, where it was previously ignored.
+- [x] AC-6: A library-level test sources `parallel-cohorts.sh`, calls `pcoh_split_words` directly with a multi-separator value, and asserts the element count and each element of `PCOH_WORDS`.
+- [x] AC-7: The comment block above `pcoh_split_words` states the newline, CR, VT, and FF handling and the ASCII separator-set equivalence to Python `str.split()`, and describes the input as whitespace-separated.
+- [x] AC-8: `extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-cohorts.sh` is byte-identical to `.claude/lib/bash/parallel-cohorts.sh`, and `tests/shell/parallel_bash_manifest_membership.bats` passes.
+- [x] AC-9: Fail-before evidence is recorded under `<FEATURE>/evidence/` in the canonical evidence location, showing the new bats rows fail against the unfixed library (CI run or local `sh` run), followed by pass evidence after the fix.
+- [x] AC-10: `bash scripts/bash/shell-qc.sh check` (shfmt, shellcheck) passes with no new suppressions, and the full bats suite passes, including `parallel_cohorts_parity.bats` and `parallel_payload_only.bats`.
+- [x] AC-11: `bash scripts/bash/shell-qc.sh test --coverage` reports kcov line coverage of at least 85% on the changed bash file, and the changed line in `parallel-cohorts.sh` is executed by at least one test. No branch-coverage gate applies to bash.
+- [x] AC-12: `.claude/lib/bash/parallel-items-validate.sh` and `.claude/lib/bash/parallel-lane-assertion.sh` (and their bundled mirrors) are unchanged by this work.
+- [x] AC-13: No file touched by this work exceeds 500 lines, and no temporary file or new fixture is created by the new tests.
 
 ## Verification Plan
 
