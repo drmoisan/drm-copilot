@@ -177,11 +177,11 @@ No task in this phase runs a gate that requires exit 0 over the new cases. The o
 
 ### Phase 4 — #645 Documentation Correction (NB-1)
 
-- [ ] [P4-T1] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` by replacing line 189 (the `AC-8` item) with the replacement line quoted in Fixed Design Inputs; no other line changes.
+- [x] [P4-T1] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md` by replacing line 189 (the `AC-8` item) with the replacement line quoted in Fixed Design Inputs; no other line changes.
   - Acceptance: the new line begins `- [x] AC-8:` (checkbox state preserved).
-- [ ] [P4-T2] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` by replacing line 53 (the `US-1` item) with the replacement line quoted in Fixed Design Inputs; no other line changes.
+- [x] [P4-T2] Update `docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` by replacing line 53 (the `US-1` item) with the replacement line quoted in Fixed Design Inputs; no other line changes.
   - Acceptance: the new line begins `- [x] US-1` (checkbox state preserved).
-- [ ] [P4-T3] Create `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/evidence/other/nb1-doc-correction.<timestamp>.md` by running `git diff -U0 origin/main -- docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` from the worktree root, and recording a Grep with pattern `failure-cause-authority\.test\.ts` over each of the two files.
+- [x] [P4-T3] Create `docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844/evidence/other/nb1-doc-correction.<timestamp>.md` by running `git diff -U0 origin/main -- docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/spec.md docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645/user-story.md` from the worktree root, and recording a Grep with pattern `failure-cause-authority\.test\.ts` over each of the two files.
   - Acceptance: the diff shows, for each file, exactly one removed content line and one added content line, each beginning `- [x]`; the Grep returns exactly 1 matching line in `spec.md` (the AC-8 line) and exactly 1 in `user-story.md` (the US-1 line), against 0 in each at `origin/main` (AC-12).
 
 ### Phase 5 — Final QC Loop (TypeScript)
