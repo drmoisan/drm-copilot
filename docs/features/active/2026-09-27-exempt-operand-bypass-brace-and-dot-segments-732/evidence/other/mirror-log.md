@@ -1,0 +1,8 @@
+# Mirror log (issue #732)
+
+Each line is one R-MIRROR run: Copy-Item -LiteralPath <source> -Destination <destination> -Force, with both SHA256 values.
+
+[P2-T3] MIRROR: .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 -> .codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 source_sha256=67A1105A1BC526798FDDC4F7DE57FCAC9279E196CBA4576839BC1D53505AA9C2 destination_sha256=67A1105A1BC526798FDDC4F7DE57FCAC9279E196CBA4576839BC1D53505AA9C2
+[P2-T3] MIRROR: .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 -> extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 source_sha256=67A1105A1BC526798FDDC4F7DE57FCAC9279E196CBA4576839BC1D53505AA9C2 destination_sha256=67A1105A1BC526798FDDC4F7DE57FCAC9279E196CBA4576839BC1D53505AA9C2
+[P2-T3] MIRROR: .claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1 source_sha256=67A1105A1BC526798FDDC4F7DE57FCAC9279E196CBA4576839BC1D53505AA9C2 destination_sha256=67A1105A1BC526798FDDC4F7DE57FCAC9279E196CBA4576839BC1D53505AA9C2
+[P2-T6] MIRROR: .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 -> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1 source_sha256=F6F51FD8B2B06282F4728310C0CBEE0CE01333D3CCB97D01617803DA9896F682 destination_sha256=F6F51FD8B2B06282F4728310C0CBEE0CE01333D3CCB97D01617803DA9896F682
