@@ -17,19 +17,19 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 - `max_concurrency`: 4
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-09T23:34:11Z
-- `next_step`: await green on 860/861/862; monitor 847
+- `last_updated`: 2026-10-09T23:46:49Z
+- `next_step`: await green on 861/862; monitor 847 848
 
 **Items**
 
 | issue_num | feature_folder | cohort_index | state | merge_status | pr_url | merge_commit_sha | worktree_created_at | merged_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 794 | docs/features/active/2026-09-30-parallel-cohorts-split-words-drops-tokens-after-first-newline-794 | 0 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/860 | - | 2026-10-09T06:48:10Z | - | - |
+| 794 | docs/features/active/2026-09-30-parallel-cohorts-split-words-drops-tokens-after-first-newline-794 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/860 | 8754efe64ef2e724fbfcfbc6c32d3f0ea0e53979 | 2026-10-09T06:48:10Z | 2026-10-09T23:46:09Z | - |
 | 797 | docs/features/active/2026-09-30-blast-radius-path-extractor-misses-real-plan-writes-797 | 0 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/861 | - | 2026-10-09T06:48:10Z | - | - |
 | 798 | docs/features/active/2026-09-30-orchestration-validator-last-updated-undocumented-and-file-path-invocation-fails-798 | 0 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/862 | - | 2026-10-09T06:48:10Z | - | - |
 | 844 | docs/features/active/2026-10-08-handoff-failure-cause-fallback-and-name-gaps-844 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/859 | 460cd755de560b733be0c471d1d144e553fbe0e5 | 2026-10-09T06:48:10Z | 2026-10-09T23:33:41Z | - |
 | 847 | docs/features/active/2026-10-08-powershell-aggregate-line-coverage-below-floor-847 | 0 | in_flight | worktree_created | - | - | 2026-10-09T23:34:11Z | - | - |
-| 848 | docs/features/active/2026-10-08-root-format-check-fails-on-test-fixtures-848 | 0 | prepared | not_started | - | - | - | - | - |
+| 848 | docs/features/active/2026-10-08-root-format-check-fails-on-test-fixtures-848 | 0 | in_flight | worktree_created | - | - | 2026-10-09T23:46:27Z | - | - |
 | 793 | docs/features/active/2026-09-30-epic-orchestrator-state-validator-crashes-on-unhashable-merge-status-793 | 1 | prepared | not_started | - | - | - | - | - |
 | 824 | docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824 | 1 | prepared | not_started | - | - | - | - | - |
 | 843 | docs/features/active/2026-10-08-parallel-model-routing-admitted-item-source-and-absent-band-test-843 | 1 | prepared | not_started | - | - | - | - | - |
