@@ -53,7 +53,7 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
                 }
             }
 
-            return $registrations.ToArray()
+            return , $registrations.ToArray()
         }
 
         function Get-CodexBenignToolInput {
@@ -130,6 +130,18 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
             } | ConvertTo-Json -Compress -Depth 30
         }
 
+        function Assert-RegistrationSetNotEmpty {
+            <#
+                Fails for a null result and for an empty array, so a silently empty
+                parse cannot make the matrix below vacuously green.
+            #>
+            param([AllowNull()][AllowEmptyCollection()] $Registrations)
+
+            if ($null -eq $Registrations -or @($Registrations).Count -eq 0) {
+                throw 'The registration set is null or empty.'
+            }
+        }
+
         $script:Registrations = Get-CodexPreToolUseRegistration -ConfigPath $script:ConfigPath
         $script:RegisteredHookNames = @($script:Registrations | ForEach-Object { $_.HookName } | Select-Object -Unique)
     }
@@ -137,7 +149,7 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
     It 'parses at least three matcher groups and every registered handler from config.toml' {
         # Guards the derivation itself: a silently empty parse would make the
         # matrix below vacuously green.
-        @($script:Registrations | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0
+        Assert-RegistrationSetNotEmpty -Registrations $script:Registrations
         @($script:Registrations | ForEach-Object { $_.Matcher } | Select-Object -Unique).Count | Should -BeGreaterOrEqual 3
         $script:RegisteredHookNames | Should -Contain 'check-python-test-purity.ps1'
         $script:RegisteredHookNames | Should -Contain 'enforce-completion-consistency.ps1'
@@ -216,10 +228,29 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
         $decision | Should -BeNullOrEmpty -Because 'an empty local checkpoint text must allow a benign payload in the native context'
     }
 
-    Context 'Non-vacuity floor for the registration count' {
-        It 'documents that the legacy expression @($null).Count -gt 0 evaluates to $true while the filtered form is $false' {
-            (@($null).Count -gt 0) | Should -BeTrue
-            (@($null | Where-Object { $null -ne $_ }).Count -gt 0) | Should -BeFalse
-        }
+    It 'AC-20 one registration returns an array of count one' {
+        Mock Get-Content { @('[[hooks.PreToolUse]]', 'matcher = "^Bash$"', '[[hooks.PreToolUse.hooks]]', 'type = "command"', 'command = ''pwsh -NoProfile -File "/repo/.codex/hooks/validate-bash.ps1"''') }
+
+        $result = Get-CodexPreToolUseRegistration -ConfigPath '/synthetic-worktrees/config/config.toml'
+
+        ($result -is [array]) | Should -BeTrue -Because 'a single registration must still be returned as an array'
+        $result.Count | Should -Be 1
+    }
+
+    It 'AC-20 zero registrations return an empty array that is not null' {
+        Mock Get-Content { @('[[hooks.PreToolUse]]', 'matcher = "^Bash$"') }
+
+        $result = Get-CodexPreToolUseRegistration -ConfigPath '/synthetic-worktrees/config/config.toml'
+
+        ($null -ne $result) | Should -BeTrue -Because 'an empty registration set must be an empty array and not null'
+        $result.Count | Should -Be 0
+    }
+
+    It 'AC-21 registration count assertion rejects an empty array' {
+        { Assert-RegistrationSetNotEmpty -Registrations @() } | Should -Throw
+    }
+
+    It 'AC-21 registration count assertion rejects a null result' {
+        { Assert-RegistrationSetNotEmpty -Registrations $null } | Should -Throw
     }
 }
