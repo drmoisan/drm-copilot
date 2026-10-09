@@ -35,8 +35,10 @@
 #>
 
 BeforeAll {
-    # The hook is dot-sourced first, then the three library modules are imported without
-    # -Force, so the suite binds to whichever module instance the hook already loaded.
+    # The hook is dot-sourced first, then the library modules WorktreeItemResolution,
+    # WorktreeResolution, WorktreeTargetResolution, EpicScopeResolution, and
+    # WorktreeRunResolution are imported without -Force, so the suite binds to whichever
+    # module instance the hook already loaded.
     $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude").Path
     . (Join-Path $script:HookRoot 'hooks/enforce-model-routing-receipt.ps1')
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')

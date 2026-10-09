@@ -22,6 +22,10 @@ Describe 'enforce-epic-planning-only.ps1 loads the semantic MCP registry lazily 
         }
 
         . $script:PlanningHookPath
+        $script:RealGetEpicPlanningRegisteredMcpTool = ${function:Get-EpicPlanningRegisteredMcpTool}
+        $script:RealTestEpicPlanningBashAllowed = ${function:Test-EpicPlanningBashAllowed}
+        Mock Get-EpicPlanningRegisteredMcpTool { $null }
+        Mock Test-EpicPlanningBashAllowed { $null }
 
         function ConvertTo-PlanningPayload {
             <#
@@ -80,6 +84,11 @@ Describe 'enforce-epic-planning-only.ps1 loads the semantic MCP registry lazily 
                 [System.Environment]::SetEnvironmentVariable('CODEX_EPIC_CHILD_EXECUTION_CONTEXT', $savedContext)
             }
         }
+    }
+
+    BeforeEach {
+        Mock Get-EpicPlanningRegisteredMcpTool -MockWith $script:RealGetEpicPlanningRegisteredMcpTool
+        Mock Test-EpicPlanningBashAllowed -MockWith $script:RealTestEpicPlanningBashAllowed
     }
 
     It 'invokes Get-EpicPlanningRegisteredMcpTool from no top-level statement' {

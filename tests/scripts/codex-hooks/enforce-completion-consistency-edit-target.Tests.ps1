@@ -22,6 +22,7 @@ Describe 'enforce-completion-consistency.ps1 Codex Edit target path (issue #736)
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/enforce-completion-consistency.ps1").Path
         . $script:UnderTest
+        Mock Get-CheckpointFileContent { $null }
 
         $script:AbsoluteTarget = '/work/item-worktree/artifacts/orchestration/orchestrator-state.json'
         $script:BackslashTarget = '\work\item-worktree\artifacts\orchestration\orchestrator-state.json'

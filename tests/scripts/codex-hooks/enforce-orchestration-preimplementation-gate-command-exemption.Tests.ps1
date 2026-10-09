@@ -23,6 +23,9 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:UnderTest = Join-Path $script:RepoRoot '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
         # Issue #707 (D10): the epic-scope read is mocked so local epic state cannot change a decision.
         Mock Get-EpicScopeCheckpointText { $null }
 
@@ -65,6 +68,7 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
                 -CheckpointRaw (ConvertTo-CodexNotReadyCheckpointRaw)
         }
     }
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Codex' -Seam 'Get-EpicScopeCheckpointText' }
 
     Context 'issue #539 orchestration-tree staging exemption allow cases' {
         It 'allows staging an epic document under the epics tree' {

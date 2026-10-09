@@ -72,6 +72,16 @@ Describe 'Codex enforce-epic-worktree-removal-gate issue #824 decisions' {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-worktree-removal-gate.ps1')
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-CleanupWorktreeManifestContent -ModuleName CleanupWorktreeManifest { $null }
+        if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-EpicWorktreeGateCheckpointContent { $null } }
+        if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-EpicWorktreeGateParallelCheckpointContent { $null } }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
         $script:SyntheticRoot = if ($IsWindows) { 'C:/repo' } else { '/repo' }
         $script:P = "$script:SyntheticRoot/worktrees/item-a-101"
         $script:Q = "$script:SyntheticRoot/worktrees/item-b-102"
@@ -98,6 +108,8 @@ Describe 'Codex enforce-epic-worktree-removal-gate issue #824 decisions' {
             return Invoke-CodexWorktreeRemovalDecision -PayloadRaw $payload -EpicCheckpointRaw $script:Checkpoint
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     Context 'no checkpoint' {
         BeforeEach { $script:Checkpoint = '' }

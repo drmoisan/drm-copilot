@@ -29,6 +29,11 @@ Describe 'Codex preimplementation gate epic scope (issue #707)' {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $script:RepoRoot '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1')
+        $script:RealGetEpicCheckpointContent = ${function:Get-EpicCheckpointContent}
+        $script:RealGetParallelCheckpointContent = ${function:Get-ParallelCheckpointContent}
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-EpicScopeCheckpointText', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
         . (Join-Path $script:RepoRoot 'tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1')
 
         $script:BundleHookRoot = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks'
@@ -108,6 +113,8 @@ Describe 'Codex preimplementation gate epic scope (issue #707)' {
             Mock Test-EpicScopeMergeInProgress -MockWith ({ $merge }.GetNewClosure())
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Codex' -Seam 'Get-EpicScopeCheckpointText' }
 
     Context 'epic-scope decisions through the gate' {
         It 'epic scope allows the <Leg> leg of a production path while a merge is in progress' -ForEach @(
@@ -288,6 +295,11 @@ Describe 'Codex preimplementation gate epic scope (issue #707)' {
         # behaviour: the path comes from the fixed mode table, an absent file yields an
         # empty string, and a present file yields its raw text. Test-Path and the content
         # read are mocked, so no file is read or created.
+        BeforeAll {
+            Mock Get-EpicCheckpointContent -MockWith $script:RealGetEpicCheckpointContent
+            Mock Get-ParallelCheckpointContent -MockWith $script:RealGetParallelCheckpointContent
+        }
+
         BeforeEach {
             $script:EpicSeamPath = '/synthetic-worktrees/epic-coordinator/artifacts/orchestration/epic-orchestrator-state.json'
             $script:ParallelSeamPath = '/synthetic-worktrees/epic-coordinator/artifacts/orchestration/parallel-orchestrator-state.json'
