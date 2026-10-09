@@ -88,9 +88,9 @@
       "feature_folder": {
         "ok": true,
         "tool": "new_active_feature_folder",
-        "workspace_root": "C:\\Users\\DanMoisan\\repos\\drm-copilot\\.claude\\worktrees\\agent-a546f4f4f4a1eec79",
+        "workspace_root": "<worktree-root>",
         "summary": "Created a new active bug feature folder for '2026-10-08-pr-author-and-merge-gates-read-session-root-files'.",
-        "destination_path": "C:/Users/DanMoisan/repos/drm-copilot/.claude/worktrees/agent-a546f4f4f4a1eec79/docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850"
+        "destination_path": "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850"
       }
     },
     "agents": [
