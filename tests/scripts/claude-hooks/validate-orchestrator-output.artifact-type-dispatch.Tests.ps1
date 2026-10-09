@@ -77,6 +77,8 @@ BeforeAll {
 }
 
 Describe 'validate-orchestrator-output.ps1 $ArtifactType dispatch' {
+    # Default resolution seam (issue #787): no row resolves against the developer machine.
+    BeforeAll { Mock Resolve-OrchestratorOutputCheckpointPath { [pscustomobject]@{ Resolved = $true; CheckpointPath = '/synthetic-worktrees/default-session/artifacts/orchestration/orchestrator-state.json'; WorktreeRoot = '/synthetic-worktrees/default-session'; Status = 'SessionRoot'; ReasonCode = $null; Detail = 'default resolved target (issue #787)' } } }
 
     Context 'orchestrator-state routes to the complete-parity completion validation' {
         It 'invokes the completion entry point and reports its clean verdict' {

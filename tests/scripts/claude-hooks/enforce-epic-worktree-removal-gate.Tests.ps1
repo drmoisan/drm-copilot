@@ -481,6 +481,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1 manifest branch' {
         $target = '/repo/worktrees/not-authorized'
         $source = 'EPIC_WORKTREE_REMOVAL_BLOCKED: git worktree remove for ''$worktreePath'' requires either an epic checkpoint features[] record with merge_status in {merged, worktree_removed}, or a parallel-orchestrator checkpoint with route_id == ""parallel"" whose matching items[] record (matched by worktree_path) has merge_status in {merged, worktree_removed}. No checkpoint authorized this removal.'
         $expected = $source.Replace('$worktreePath', $target).Replace('""', '"')
+        $expected += " Diagnostics: epic run SessionRoot (checkpoint '/synthetic-worktrees/default-session/artifacts/orchestration/epic-orchestrator-state.json'), no matching features[] record; parallel run SessionRoot (checkpoint '/synthetic-worktrees/default-session/artifacts/orchestration/parallel-orchestrator-state.json'), no matching items[] record."
         $json = "{""tool_input"":{""command"":""git worktree remove $target""}}"
         $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $json
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'

@@ -163,4 +163,18 @@ Describe 'parallel worktree-removal gate run-target resolution' {
         $output[-1] | Should -Be 0
         ($output[0..($output.Count - 2)] -join "`n") | Should -Match 'deny'
     }
+
+    It 'Y7 emits a single leading token when both run kinds are unresolved' {
+        # Arrange
+        Set-RemovalRunTopology -Live @('/synthetic-worktrees/w-par')
+        Set-RemovalReadSeam -Parallel $null -Epic $null
+
+        # Act
+        $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-RemovalPayload -Command $script:Command)
+        $reason = $decision.hookSpecificOutput.permissionDecisionReason
+
+        # Assert
+        $reason.StartsWith('PARALLEL_WORKTREE_REMOVAL_BLOCKED: ') | Should -BeTrue -Because 'the deny text begins with the gate token'
+        ([regex]::Matches($reason, 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:')).Count | Should -Be 1 -Because 'the gate token appears exactly once'
+    }
 }

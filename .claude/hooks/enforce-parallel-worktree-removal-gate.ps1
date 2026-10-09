@@ -405,9 +405,9 @@ function Get-ParallelWorktreeRemovalTargetDenial {
     # When neither kind resolved, the deny names the resolution reason first (issue #690).
     $prefix = ''
     if ($parallelRead.Target.Status -eq 'NoTarget' -and $epicRead.Target.Status -eq 'NoTarget') {
-        $prefix = "PARALLEL_WORKTREE_REMOVAL_BLOCKED: $($parallelRead.Target.ReasonCode): $($parallelRead.Target.Detail). "
+        $prefix = "$($parallelRead.Target.ReasonCode): $($parallelRead.Target.Detail). "
     }
-    return Get-ParallelWorktreeGateBlockDecision -Reason ($prefix + "PARALLEL_WORKTREE_REMOVAL_BLOCKED: git worktree remove for '$worktreePath' requires a matching parallel checkpoint items[] record with merge_status in {merged, worktree_removed}. The checkpoint was unreadable, no matching record was found, or merge_status was not yet safe for removal.")
+    return Get-ParallelWorktreeGateBlockDecision -Reason ('PARALLEL_WORKTREE_REMOVAL_BLOCKED: ' + $prefix + "git worktree remove for '$worktreePath' requires a matching parallel checkpoint items[] record with merge_status in {merged, worktree_removed}. The checkpoint was unreadable, no matching record was found, or merge_status was not yet safe for removal.")
 }
 
 function Invoke-ParallelWorktreeRemovalGateEntryPoint {

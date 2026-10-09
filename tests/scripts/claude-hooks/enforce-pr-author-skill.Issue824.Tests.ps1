@@ -14,7 +14,7 @@
     Test-CommandLineWordPresent and shows that the R-733-GREP G1 command would then deny.
 
     Determinism: the context artifact, the worktree target, the orchestrator-state preflight,
-    the receipt, and the body-file root arrive only through mocked seams. No temporary file,
+    and the receipt arrive only through mocked seams, and the artifact root is supplied as `/session`. No temporary file,
     no child process, and no live executable.
 #>
 
@@ -90,11 +90,10 @@ Describe 'enforce-pr-author-skill issue #824 decisions' {
         BeforeEach {
             Mock Get-PrContextArtifactExistence { $true }
             Mock Resolve-PrAuthorWorktreeTarget {
-                [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = (Get-Location).Path; ReasonCode = $null; Detail = 'session root' }
+                [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/session'; ReasonCode = $null; Detail = 'session root' }
             }
             Mock Invoke-OrchestratorStatePreflight { @{ HasErrors = $false; ErrorText = '' } }
             Mock Get-PrAuthorReceiptContent { $null }
-            Mock Get-PrAuthorBodyFileRoot { '/session' }
         }
 
         It '<Id> reaches receipt verification for <Command>' -Tag 'Issue824', 'R-733-715' -ForEach $script:ReceiptRows {
@@ -123,7 +122,7 @@ Describe 'enforce-pr-author-skill issue #824 decisions' {
             $command = 'gh pr create --head bug/x-5'
 
             $value = Get-PrAuthorBodyFileValue -CommandText $command
-            $reason = Test-PrAuthorReceiptVerification -CommandText $command -CheckpointPath 'unused-checkpoint-path'
+            $reason = Test-PrAuthorReceiptVerification -CommandText $command -CheckpointPath 'unused-checkpoint-path' -ArtifactRoot '/session' -RelativeBodyAllowed $true
 
             $value | Should -BeNullOrEmpty
             $reason | Should -BeLike 'PR_BODY_PATH_NONCANONICAL:*'
@@ -132,30 +131,24 @@ Describe 'enforce-pr-author-skill issue #824 decisions' {
 
     Context 'inline-body and no-body pull requests' {
         It '<Id> denies <Command> with PR_AUTHOR_SKILL_BLOCKED' -Tag 'Issue824' -ForEach $script:SkillBlockedRows {
-            Get-PrAuthorBypassReason -CommandText $Command -ContextExists $true | Should -BeLike 'PR_AUTHOR_SKILL_BLOCKED:*'
+            Get-PrAuthorBypassReason -CommandText $Command | Should -BeLike 'PR_AUTHOR_SKILL_BLOCKED:*'
         }
 
         It 'PA-23 reads an inline body from the raw text of an unmodeled-option create' -Tag 'Issue824' {
-            $reason = Get-PrAuthorBypassReason -CommandText 'gh --unmodeled pr create --body x' -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText 'gh --unmodeled pr create --body x'
 
             $reason | Should -BeLike 'PR_AUTHOR_SKILL_BLOCKED:*'
             $reason | Should -Match 'must use .--body-file. with a file' -Because 'the raw-text fallback classifies --body as an inline body'
         }
 
         It 'PA-20 denies the G1 command when substring presence is reinstated' -Tag 'Issue824', 'NegativeControl' {
-            $delivered = Get-PrAuthorBypassReason -CommandText $script:G1 -ContextExists $true
+            $delivered = Get-PrAuthorBypassReason -CommandText $script:G1
             Mock Test-CommandLineWordPresent { $RawText.IndexOf($Word, [System.StringComparison]::OrdinalIgnoreCase) -ge 0 }
 
-            $mocked = Get-PrAuthorBypassReason -CommandText $script:G1 -ContextExists $true
+            $mocked = Get-PrAuthorBypassReason -CommandText $script:G1
 
             $delivered | Should -BeNullOrEmpty
             $mocked | Should -BeLike 'PR_AUTHOR_SKILL_BLOCKED:*' -Because 'substring presence finds gh inside high and pr inside priority'
-        }
-    }
-
-    Context 'body-file root seam' {
-        It 'PA-21 returns the current location as the body-file root' -Tag 'Issue824' {
-            Get-PrAuthorBodyFileRoot | Should -Be (Get-Location).Path
         }
     }
 }

@@ -6,7 +6,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - Integration branch: `epic/enforcement-hook-precision-integration`
 - Current wave: 1
 - Next step: `E5_await_wave1`
-- Last updated: 2026-10-09T02:35:00Z
+- Last updated: 2026-10-09T05:45:00Z
 
 ## Waves
 
@@ -24,8 +24,8 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 | 2026-09-27-completion-consistency-codex-copy-and-fail-open-divergence-736 | 736 | 0 | merged | [#853](https://github.com/drmoisan/drm-copilot/pull/853) | bb3c988442c90ccb4c57c052f4d08fe6a3a231fe | 2026-10-08T21:35:00Z | 2026-10-08T22:43:50Z | 2026-10-08T23:14:03Z | - |
 | promotion-hook-raw-containment-false-positive-deny-824 | 824 | 0 | merged | [#855](https://github.com/drmoisan/drm-copilot/pull/855) | 1f34ca31ab960f384c12501aee4feda1a64a6b65 | 2026-10-08T21:35:00Z | 2026-10-09T01:29:29Z | 2026-10-09T02:30:17Z | - |
 | 2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732 | 732 | 1 | worktree_created | - | - | 2026-10-09T02:35:00Z | - | - | - |
-| 2026-09-29-validate-orchestrator-output-session-relative-read-787 | 787 | 1 | worktree_created | - | - | 2026-10-09T02:35:00Z | - | - | - |
-| 2026-10-08-pr-author-and-merge-gates-read-session-root-files-850 | 850 | 1 | worktree_created | - | - | 2026-10-09T02:35:00Z | - | - | - |
+| 2026-09-29-validate-orchestrator-output-session-relative-read-787 | 787 | 1 | merged | [#856](https://github.com/drmoisan/drm-copilot/pull/856) | 191e69069d0198ef66be581568da781ea89fa3fb | 2026-10-09T02:35:00Z | 2026-10-09T04:24:51Z | 2026-10-09T04:44:27Z | - |
+| 2026-10-08-pr-author-and-merge-gates-read-session-root-files-850 | 850 | 1 | merged | [#857](https://github.com/drmoisan/drm-copilot/pull/857) | f8f7d0ab1b0ed927cccfedd25608a48d28083c57 | 2026-10-09T02:35:00Z | 2026-10-09T05:21:23Z | 2026-10-09T05:36:11Z | - |
 | 2026-09-27-hook-test-isolation-remaining-gaps-737 | 737 | 2 | not_started | - | - | - | - | - | - |
 | 2026-09-29-hook-preexisting-imports-fail-open-786 | 786 | 2 | not_started | - | - | - | - | - | - |
 

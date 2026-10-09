@@ -18,12 +18,16 @@
     mocked in every row, so no row reads, creates, or writes a file, reads a wall clock,
     starts a process, or touches the network. Synthetic roots use the
     /synthetic-worktrees/<name> form.
+
+    Issue #850: the per-feature checkpoint is now read beneath the item target the gate
+    resolves by pull request number, and M5 records the #788 behavior change.
 #>
 
 BeforeAll {
     . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-merge-gate.ps1").Path
     $libRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution").Path
     Import-Module (Join-Path $libRoot 'WorktreeRunResolution.psm1')
+    Import-Module (Join-Path $libRoot 'WorktreeItemResolution.psm1')
     Import-Module (Join-Path $libRoot 'WorktreeTargetResolution.psm1')
     Import-Module (Join-Path $libRoot 'WorktreeResolution.psm1')
     . (Join-Path $PSScriptRoot 'WorktreeResolutionFixture.Helpers.ps1')
@@ -67,6 +71,9 @@ BeforeAll {
             return $null
         }.GetNewClosure()
     }
+
+    $itemNone = New-WorktreeResolutionFixtureTarget -Status 'NoTarget'
+    Mock -CommandName Resolve-EpicMergeGateItemTarget -MockWith { $itemNone }.GetNewClosure()
 }
 
 Describe 'epic merge gate run-target resolution' {
@@ -102,6 +109,8 @@ Describe 'epic merge gate run-target resolution' {
 
     It 'M3 denies a child merge whose pr_gate.pr_number differs from the command PR number' {
         # Arrange
+        $item = New-WorktreeResolutionFixtureTarget -Status 'OtherWorktree' -WorktreeRoot '/synthetic-worktrees/w-item'
+        Mock -CommandName Resolve-EpicMergeGateItemTarget -MockWith { $item }.GetNewClosure()
         Set-MergeRunTopology -Live @('/synthetic-worktrees/w-epic')
         Set-MergeReadSeam -Child '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":811}}' -Epic $null -Parallel $null
 
@@ -114,6 +123,8 @@ Describe 'epic merge gate run-target resolution' {
 
     It 'M4 allows a child merge whose pr_gate.pr_number equals the command PR number' {
         # Arrange
+        $item = New-WorktreeResolutionFixtureTarget -Status 'OtherWorktree' -WorktreeRoot '/synthetic-worktrees/w-item'
+        Mock -CommandName Resolve-EpicMergeGateItemTarget -MockWith { $item }.GetNewClosure()
         Set-MergeRunTopology -Live @('/synthetic-worktrees/w-epic')
         Set-MergeReadSeam -Child '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":812}}' -Epic $null -Parallel $null
 
@@ -124,8 +135,16 @@ Describe 'epic merge gate run-target resolution' {
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
     }
 
-    It 'M5 allows a child merge whose checkpoint records no pr_gate, as before the change' {
-        # Arrange
+    It 'M5 denies a child merge whose checkpoint records neither pr_gate nor a standalone record for the number' {
+        # Arrange: the real item resolver runs over module-scoped seams; w-item records no binding.
+        $childText = $script:ChildPassed
+        Mock -CommandName Resolve-EpicMergeGateItemTarget -MockWith { Resolve-WorktreeItemTargetByPrNumber -PrNumber $PrNumber -SessionRoot '/synthetic-worktrees/session' }
+        Mock -CommandName Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution -MockWith { , [string[]] @('/synthetic-worktrees/w-item') }
+        Mock -CommandName Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution -MockWith {
+            param([string] $Path)
+            if ($Path -eq '/synthetic-worktrees/w-item/artifacts/orchestration/orchestrator-state.json') { return $childText }
+            return $null
+        }.GetNewClosure()
         Set-MergeRunTopology -Live @('/synthetic-worktrees/w-epic')
         Set-MergeReadSeam -Child $script:ChildPassed -Epic $null -Parallel $null
 
@@ -133,7 +152,9 @@ Describe 'epic merge gate run-target resolution' {
         $decision = Invoke-EpicMergeGateDecision -ToolInputRaw (ConvertTo-MergePayload -Command 'gh pr merge --merge 812')
 
         # Assert
-        $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -Match '^EPIC_MERGE_GATE_BLOCKED: '
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -Match $script:NoTargetCode
     }
 
     It 'M6 reads every checkpoint beneath the session worktree for a bare command without resolving' {
@@ -188,6 +209,8 @@ Describe 'epic merge gate run-target resolution' {
         '"issue_num":690,"branch_name":"bug/agent-payload-gates-resolve-session-root-690","authorized_by":"orchestrator",' +
         '"authorized_at":"2026-09-29T21:04:00Z","session_id":"' + $script:SessionId + '",' +
         '"basis":"Standalone merge for #690 after every required check passed."}]}'
+        $item = New-WorktreeResolutionFixtureTarget -Status 'OtherWorktree' -WorktreeRoot '/synthetic-worktrees/w-item'
+        Mock -CommandName Resolve-EpicMergeGateItemTarget -MockWith { $item }.GetNewClosure()
         Set-MergeRunTopology -Live @('/synthetic-worktrees/w-epic')
         Set-MergeReadSeam -Child $record -Epic $null -Parallel $null
 

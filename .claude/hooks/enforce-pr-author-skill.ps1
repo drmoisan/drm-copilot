@@ -19,7 +19,8 @@
     Block cases:
       Case A - gh pr create or gh pr edit with --body (inline, no --body-file): blocked.
       Case B - gh pr create with neither --body nor --body-file: blocked.
-      Case C - gh pr create or gh pr edit with --body-file but context artifact absent: blocked.
+      Case C - gh pr create or gh pr edit with --body-file but context artifact absent beneath
+               the resolved worktree: blocked.
       Preflight - --body-file/context present: orchestrator-state checkpoint must pass
                   --require-pr-creation-ready before receipt verification runs, else blocked.
       Receipt - preflight passed: the SHA-256 receipt is verified in five ordered checks
@@ -28,6 +29,11 @@
     Receipt verification decision order on the --body-file-with-context path:
       PR_BODY_PATH_NONCANONICAL -> PR_AUTHOR_RECEIPT_MISSING -> PR_AUTHOR_RECEIPT_NUMBER_MISMATCH
       -> PR_AUTHOR_RECEIPT_HASH_MISMATCH -> PR_AUTHOR_RECEIPT_STALE -> allow.
+
+    Issue #850: the context summary, the body, and the receipt are read beneath the worktree
+    the call resolves to (the item worktree, or the epic checkpoint's worktree under epic
+    scope), not beneath the process directory, so a gate running in the session worktree
+    validates the artifacts of the item it gates.
 
 .NOTES
     Compatible with PowerShell 7+. No external module dependencies.
@@ -56,14 +62,19 @@ function Get-PrContextArtifactExistence {
     <#
     .SYNOPSIS
         Wrapper around Test-Path for the PR context artifact. Tests mock this function.
+    .PARAMETER Path
+        The absolute path of artifacts/pr_context.summary.txt beneath the resolved worktree.
     .OUTPUTS
         System.Boolean
     #>
     [CmdletBinding()]
     [OutputType([bool])]
-    param()
+    param(
+        [Parameter(Mandatory)]
+        [string] $Path
+    )
 
-    return [bool](Test-Path -LiteralPath $script:PrContextArtifactPath)
+    return [bool](Test-Path -LiteralPath $Path)
 }
 
 function Get-PrBodyFileBytes {
@@ -75,7 +86,8 @@ function Get-PrBodyFileBytes {
         This is the injectable boundary for body-file bytes in tests; no test writes the body file
         to disk. The bytes are hashed inline by the receipt verification function.
     .PARAMETER BodyFilePath
-        The relative path to the PR body file (for example artifacts/pr_body_5.md).
+        The absolute path to the PR body file beneath the resolved worktree (for example
+        <worktree>/artifacts/pr_body_5.md).
     .OUTPUTS
         System.Byte[] or $null
     #>
@@ -103,7 +115,8 @@ function Get-PrAuthorReceiptContent {
         or $null when the receipt file is absent. This is the injectable boundary for receipt
         content in tests; no test writes the receipt file to disk.
     .PARAMETER ReceiptFilePath
-        The relative path to the receipt file (for example artifacts/pr_body_5.receipt.json).
+        The absolute path to the receipt file beneath the resolved worktree (for example
+        <worktree>/artifacts/pr_body_5.receipt.json).
     .OUTPUTS
         System.String or $null
     #>
@@ -129,18 +142,23 @@ function Get-PrContextSummaryLastWriteUtc {
         Returns the LastWriteTimeUtc of artifacts/pr_context.summary.txt, or $null when the file is
         absent. The staleness check compares the receipt's created_at against this value; both are
         artifact metadata, so no wall-clock seam is required.
+    .PARAMETER Path
+        The absolute path of artifacts/pr_context.summary.txt beneath the resolved worktree.
     .OUTPUTS
         System.DateTime or $null
     #>
     [CmdletBinding()]
     [OutputType([datetime])]
-    param()
+    param(
+        [Parameter(Mandatory)]
+        [string] $Path
+    )
 
-    if (-not (Test-Path -LiteralPath $script:PrContextArtifactPath)) {
+    if (-not (Test-Path -LiteralPath $Path)) {
         return $null
     }
 
-    return (Get-Item -LiteralPath $script:PrContextArtifactPath).LastWriteTimeUtc
+    return (Get-Item -LiteralPath $Path).LastWriteTimeUtc
 }
 
 . (Join-Path $PSScriptRoot 'enforce-pr-author-skill.epic-base-branch.ps1')
@@ -182,8 +200,7 @@ function Invoke-PrAuthorSkillDecision {
         return Get-PrAuthorSkillAllowDecision
     }
 
-    $contextExists = Get-PrContextArtifactExistence
-    $reason = Get-PrAuthorBypassReason -CommandText $commandText -ContextExists $contextExists
+    $reason = Get-PrAuthorBypassReason -CommandText $commandText
 
     if ($reason) {
         return Get-PrAuthorSkillBlockDecision -Reason $reason
@@ -242,8 +259,6 @@ function Test-PrAuthorBypassRequired {
         Return $true when a Bash command requires the pr-author skill to run first.
     .PARAMETER CommandText
         The Bash command text extracted from the envelope's tool_input.
-    .PARAMETER ContextExists
-        Whether artifacts/pr_context.summary.txt currently exists on disk.
     .OUTPUTS
         System.Boolean
     #>
@@ -251,13 +266,10 @@ function Test-PrAuthorBypassRequired {
     [OutputType([bool])]
     param(
         [Parameter(Mandatory)]
-        [string] $CommandText,
-
-        [Parameter(Mandatory)]
-        [bool] $ContextExists
+        [string] $CommandText
     )
 
-    return ($null -ne (Get-PrAuthorBypassReason -CommandText $CommandText -ContextExists $ContextExists))
+    return ($null -ne (Get-PrAuthorBypassReason -CommandText $CommandText))
 }
 
 function Invoke-PrAuthorSkillEntryPoint {

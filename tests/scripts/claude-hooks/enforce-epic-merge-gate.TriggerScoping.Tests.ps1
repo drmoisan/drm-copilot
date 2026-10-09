@@ -37,6 +37,7 @@ Describe 'enforce-epic-merge-gate.ps1 trigger scoping (issue #545)' {
             return (@{ tool_input = @{ command = $Command } } | ConvertTo-Json -Depth 5 -Compress)
         }
         Mock Resolve-EpicMergeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
+        Mock Resolve-EpicMergeGateItemTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #850)' } }
     }
 
     Context 'PR-number extraction comes from the matched segment only' {

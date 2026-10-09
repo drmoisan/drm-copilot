@@ -17,6 +17,9 @@ BeforeAll {
 }
 
 Describe 'validate-orchestrator-output.ps1 model-routing gate' {
+    # Default resolution seam (issue #787): no row resolves against the developer machine.
+    BeforeAll { Mock Resolve-OrchestratorOutputCheckpointPath { [pscustomobject]@{ Resolved = $true; CheckpointPath = '/synthetic-worktrees/default-session/artifacts/orchestration/orchestrator-state.json'; WorktreeRoot = '/synthetic-worktrees/default-session'; Status = 'SessionRoot'; ReasonCode = $null; Detail = 'default resolved target (issue #787)' } } }
+
     Context 'default routing invoker covers the model-routing gate' {
         It 'routes orchestrator-state to the complete-parity completion entry point' {
             # Before issue #475 this asserted that the default invoker threaded the
