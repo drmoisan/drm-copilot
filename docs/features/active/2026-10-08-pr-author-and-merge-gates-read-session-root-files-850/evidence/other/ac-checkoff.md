@@ -17,3 +17,9 @@ Output Summary:
 - AC-32 (spec line 253): checked. Evidence: P2-T9 `evidence/regression-testing/cr5-parallel-pass-after.2026-10-08T23-59.md` (Y7 passes; FailedCount=0); fail-before P2-T2 `evidence/regression-testing/cr5-parallel-fail-before.2026-10-08T23-57.md`.
 - AC-33 (spec line 254): checked. Evidence: P2-T10 `evidence/qa-gates/pester-set-rem-p2.2026-10-08T23-59.md` (224/224 pass) and P2-T11 `evidence/qa-gates/cr5-parallel-unchanged-rows.2026-10-09T00-00.md` (Tests.ps1 diff exit 0; WorktreeResolution suite removed=0).
 - A14 output: `CHECKBOX checked=4 unchecked=43`, `LINE n=253 state=checked`, `LINE n=254 state=checked`.
+
+## P3-T16 (2026-10-09T00-08)
+
+- AC-34 (line 255), AC-35 (line 259), AC-36 (line 260), AC-37 (line 261): checked. Evidence: P3-T11 `evidence/regression-testing/erem-diagnostics-pass-after.2026-10-09T00-06.md` (T-EREM-DX 8/8 pass); fail-before P3-T2 `evidence/regression-testing/erem-diagnostics-fail-before.2026-10-09T00-02.md` (8/8 fail).
+- AC-38 (line 262): checked. Evidence: P3-T12 `evidence/qa-gates/pester-set-rem-p3.2026-10-09T00-06.md` (232/232 pass) and P3-T13 `evidence/qa-gates/erem-decision-unchanged.2026-10-09T00-07.md` (three suites added=0 removed=0; Tests.ps1 added=1 removed=0).
+- A14 output: `CHECKBOX checked=9 unchecked=38`; lines 255, 259, 260, 261, 262 `state=checked`.
