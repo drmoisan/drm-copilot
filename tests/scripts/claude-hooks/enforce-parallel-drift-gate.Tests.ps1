@@ -299,9 +299,10 @@ Describe 'enforce-parallel-drift-gate.ps1' {
                 Should -Be 'alpha-501'
         }
 
-        It 'accepts a backslash-separated token and returns the longest match' {
-            Find-ParallelDriftGateFeatureFolderFromPrompt -Prompt 'docs\features\active\alpha-501\ and docs/features/active/b' |
-                Should -Be 'alpha-501'
+        It 'accepts a backslash-separated token and reports two distinct folders as Ambiguous' {
+            $candidates = @(Find-ParallelDriftGateFeatureFolderFromPrompt -Prompt 'docs\features\active\alpha-501\ and docs/features/active/b')
+            ($candidates -join '|') | Should -BeExactly 'alpha-501|b'
+            (Select-FeatureFolderTarget -Records @() -Candidate $candidates).Status | Should -Be 'Ambiguous'
         }
     }
 
