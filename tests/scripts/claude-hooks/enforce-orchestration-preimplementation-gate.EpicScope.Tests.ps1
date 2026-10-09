@@ -229,7 +229,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 epic scope (issue #66
         $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:SingleFeatureReason
     }
 
-    It 'epic scope ignores a text branch label and decides the -C selector worktree by its own HEAD' {
+    It 'epic scope denies a -C selector worktree outside the session-root epic scope as target-mixed (issue #738)' {
         # Arrange: only the session root has the integration branch checked out; the -C
         # selector worktree does not, although the commit message names integration_branch.
         Set-EpicScopeSeam -CheckpointText $script:ReadyEpicJson -MergeInProgress $true
@@ -244,8 +244,8 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 epic scope (issue #66
 
         # Assert: the selector worktree decides, so the call stays on the single-feature path.
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-        $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:SingleFeatureReason
-        Should -Invoke Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution -Times 0 -Exactly
+        $decision.hookSpecificOutput.permissionDecisionReason.Contains('target-mixed') | Should -BeTrue -Because 'the session root is epic scope and the selector worktree is not (D3)'
+        Should -Invoke Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution -Times 0 -Exactly -ParameterFilter { $WorktreeRoot -eq '/synthetic-worktrees/epic-other' }
     }
 
     Context 'issue #663 relocated read seams and the no-leg guard of the epic-scope sibling' {

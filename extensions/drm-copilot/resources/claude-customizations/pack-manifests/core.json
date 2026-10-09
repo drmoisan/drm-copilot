@@ -40,6 +40,7 @@
     ".claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1",
+    ".claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1",
     ".claude/hooks/enforce-parallel-abandon-gate.ps1",
     ".claude/hooks/enforce-parallel-cohort-barrier.ps1",
     ".claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1",

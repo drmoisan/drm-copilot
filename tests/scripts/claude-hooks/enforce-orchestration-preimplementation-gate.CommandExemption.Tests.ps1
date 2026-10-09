@@ -103,7 +103,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 command exemption (is
                 Should -Be 'allow' -Because 'balanced quotes are stripped before the prefix test'
         }
 
-        It 'allows a backslash-spelled operand after separator normalization (D4 row 18)' {
+        It 'denies a backslash-spelled operand (D4 row 18 reversed by issues #732 and #735)' {
             # Arrange
             $command = 'git add docs\features\active\2026-08-24-sample-feature-539\plan.md'
 
@@ -112,7 +112,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 command exemption (is
 
             # Assert
             $decision.hookSpecificOutput.permissionDecision |
-                Should -Be 'allow' -Because 'backslashes normalize to forward slashes before the prefix test'
+                Should -Be 'deny' -Because 'a backslash anywhere is shell-divergent and denies (issue #735)'
         }
 
         It 'allows staging a kickoff markdown file under the orchestration artifacts tree' {
@@ -307,7 +307,6 @@ NOTE
         It 'allows <Label>' -ForEach @(
             @{ Label = 'issue #671 LACS allow 1 - drive-letter absolute selector on the add subcommand'; Command = 'git -C C:/repo/wt add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS allow 2 - POSIX-rooted absolute selector on the add subcommand'; Command = 'git -C /repo/wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS allow 3 - backslash-spelled absolute selector normalized before the rooting test'; Command = 'git -C C:\repo\wt add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS allow 4 - absolute selector on the message-bearing commit form'; Command = 'git -C C:/repo/wt commit -m "epic scaffold" -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS allow 5 - chained add and commit segments each carrying the same absolute selector'; Command = 'git -C C:/repo/wt add -- docs/features/active/x/spec.md && git -C C:/repo/wt commit -m "epic scaffold" -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS allow 6 - absolute selector naming a sibling item worktree root'; Command = 'git -C C:/repo/wt-sibling add -- docs/features/active/y/spec.md' }
@@ -337,6 +336,7 @@ NOTE
             @{ Label = 'issue #671 LACS L5b - current-directory segment in the selector'; Command = 'git -C C:/repo/./wt add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS L6 - wildcard in the selector'; Command = 'git -C C:/repo/wt-? add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS L7 - stray colon in the selector'; Command = 'git -C C:/repo/wt:branch add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #732 LACS allow 3 reversed - backslash-spelled absolute selector'; Command = 'git -C C:\repo\wt add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 LACS L8 - empty selector value'; Command = 'git -C "" add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 selector followed by an unmodelled subcommand'; Command = 'git -C C:/repo/wt status && git add -- docs/features/active/x/spec.md' }
             @{ Label = 'issue #671 selector with a non-exempt pathspec operand'; Command = 'git -C C:/repo/wt add -- scripts/powershell/Sample.ps1' }

@@ -2,6 +2,13 @@
 <#
 .SYNOPSIS
     Blocks implementation operations before orchestration readiness exists.
+.DESCRIPTION
+    Executing shell (issue #735): Codex runs a command through PowerShell by default on native
+    Windows, but the model may choose another shell per call, and the PreToolUse payload carries
+    only the raw command string, so the executing shell is undetermined per command and every
+    shell-divergent command shape denies (research/research.2026-10-08T14-00.md in the issue
+    #732 feature folder). The payload carries no workdir either, so the session root is the
+    default target of a segment without an explicit -C (issue #738, decision D4).
 #>
 [CmdletBinding()]
 param()
