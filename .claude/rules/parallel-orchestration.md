@@ -382,6 +382,44 @@ admits.
 Enforcement of this rejection is prose plus validator logic, exactly as for the three shapes above.
 No JSON Schema is authored, imported, or read for it, and `config/blast-radius.json` gains no key.
 
+### File-shape recognition (issue #797)
+
+The classifier accepts a wildcard-free token that carries a separator only when its final component
+names a file. After any `:<line>` suffix is stripped, the final component names a file when either
+condition holds:
+
+1. **Dotted file name.** The component has a non-empty stem before its last dot, and the text after
+   that dot, lower-cased, fully matches the pattern
+   `[a-z][a-z0-9]*`
+   (an ASCII letter followed by ASCII letters or digits).
+2. **Known file name.** The component is an exact, ordinal member of the closed known-name set:
+   `Dockerfile`, `Makefile`, `LICENSE`, `CODEOWNERS`, `NOTICE`, `.gitignore`, `.gitattributes`,
+   `.gitkeep`, `.gitmodules`, `.vscodeignore`, `.npmignore`, `.npmrc`, `.nvmrc`, `.editorconfig`,
+   `.prettierrc`, `.prettierignore`, `.eslintignore`, `.shellcheckrc`.
+
+This rule replaces the former extension allowlist, which dropped files a plan writes with an
+unlisted extension (`.bats`, `.cjs`, `.out`), every dotfile, and every extensionless file name. The
+same predicate decides the wildcard branch: a wildcard token outside the known top-level segments is
+accepted only when its final component names a file by this rule.
+
+Directory-shaped tokens remain rejected (issue #489). A final component with no dot, a trailing
+slash, a dot-directory such as `.claude` or `.git` that is not in the known-name set, a digit-led
+tail such as `v1.2.0`, and a trailing dot all fail the predicate.
+
+**Accepted residuals (fail-closed direction).** Three token shapes that do not name a file are
+accepted by this rule: a dotted directory cited without a trailing slash, such as the C#-style
+`src/TaskMaster.Domain`; host-qualified tokens such as `example.com/page.html` or `owner/repo.git`;
+and refs whose final segment has a letter-led dotted tail. Each produces at most an extra contention
+edge, which serializes work. A missed write schedules concurrent edits, which is the unsafe
+direction under this doctrine. In the self-hosted repository W4 removes the host-qualified cases; in
+destinations, where `path_roots` is empty, W2 and W3 bound them.
+
+**Parity.** The known-name set and the extension pattern are code constants in both runtimes
+(`scripts/dev_tools/_blast_radius_token_shapes.py` and
+`.claude/lib/blast-radius/BlastRadiusTokenShape.psm1`), not configuration keys, so neither copy of
+`config/blast-radius.json` changes. A Pester test reads the Python source and pins the PowerShell
+known-name set and extension pattern equal to it.
+
 ### Module-map granularity criterion
 
 Issue #472 removed the location-bucket modules `docs` and `tests` because a bucket keyed on where a
@@ -526,6 +564,7 @@ Write-intent extraction can drop a genuine write in these cases:
 4. a read-verb task that also writes without a write verb in its title (W3);
 5. a new top-level directory not yet in `path_roots` (W4);
 6. a genuine file whose stem is in the placeholder set (W6).
+7. a genuine file cited only as a separator-free bare file name is not recorded, because only repository-relative paths and configured root surfaces are accepted (issue #797); the planner cites the repository-relative path or appends it to the declared radius.
 
 Three mitigations bound these cases:
 
