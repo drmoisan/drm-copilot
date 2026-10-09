@@ -1,0 +1,141 @@
+<!--
+  GENERATED FILE - DO NOT HAND-AUTHOR.
+  Generated projection of artifacts/orchestration/parallel-orchestrator-state.json,
+  regenerated in full by parallel-orchestrator at each documentation-maintenance boundary.
+  Never the source of the cohort table or the schedule.
+-->
+
+# bug-burndown-2026-09-29 - Parallel Run Status (generated)
+
+This document is regenerated from the parallel-orchestrator checkpoint and must not be hand-authored. The manifest and the checkpoint are authoritative.
+
+**Header**
+
+- `parallel_slug`: bug-burndown-2026-09-29
+- `mode`: closed
+- `max_concurrency`: 3
+- `current_cohort`: 4
+- `recolor_generation`: 0
+- `last_updated`: 2026-10-08T07:34:14Z
+
+**Items**
+
+| issue_num | feature_folder | cohort_index | state | merge_status | pr_url | merge_commit_sha | worktree_created_at | merged_at | worktree_removed_at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 338 | docs/features/active/2026-07-09-potential-entry-ide-launcher-audit-gaps-338 | 4 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/838 | fb413fce27eaff416999bd2201011b759250cfbe | 2026-10-08T06:35:30Z | 2026-10-08T07:10:26Z |  |
+| 406 | docs/features/active/2026-07-24-potential-to-issue-python-files-oversized-406 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/806 | b83f300047c4181223d99eb27eb0b025acca0125 | 2026-09-30T13:48:50Z | 2026-09-30T14:20:25Z |  |
+| 510 | docs/features/active/2026-08-19-claude-resource-parity-enumerates-gitignored-state-510 | 3 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/834 | 08ee030d9584bf15882fbb3654c8e38f34c7c359 | 2026-10-07T15:00:03Z | 2026-10-07T15:36:24Z |  |
+| 512 | docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/799 | 021b37e600afab00b191276cda803f87419a4a87 | 2026-09-30T11:19:00Z | 2026-09-30T13:33:38Z |  |
+| 527 | docs/features/active/2026-08-23-poshqc-coverage-denominator-not-reproducible-527 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/821 | 9fb35e7fff0fd7caec36c0de15adff894abdf304 | 2026-10-02T07:34:44Z | 2026-10-02T11:37:59Z |  |
+| 532 | docs/features/active/2026-08-23-parallel-parent-routes-on-a-band-nothing-produces-532 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/820 | 1920378812e61be21a5fc96f9ffbf474b4bbbee4 | 2026-10-02T08:16:26Z | 2026-10-02T11:38:33Z |  |
+| 543 | docs/features/active/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/829 | 869c4fade2c3f98ee3ec4ca5a59ea0becf28fb0d | 2026-10-02T08:52:46Z | 2026-10-07T14:59:00Z |  |
+| 609 | docs/features/active/2026-08-30-bash-lane-assertion-newline-edges-divergence-609 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/815 | 28443d3be64d69b4b96b1ceca6715a9e577a6dc7 | 2026-10-02T03:09:33Z | 2026-10-02T04:13:42Z |  |
+| 623 | docs/features/active/promotion-receipt-destination-unverified-623 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/804 | 2b0121abf74f5862a3d12929d833504668941156 | 2026-09-30T12:21:20Z | 2026-09-30T13:42:13Z |  |
+| 645 | docs/features/active/2026-09-07-portable-handoff-614-review-follow-ups-645 | 3 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/836 | 0394ca27517956dc7dafb9407f057c18bb80974b | 2026-10-08T01:43:07Z | 2026-10-08T06:34:33Z |  |
+| 647 | docs/features/active/2026-09-07-test-tree-typecheck-not-gated-647 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/816 | b080a69ecb60b65d016362b21fffed0a34be9144 | 2026-10-02T03:14:17Z | 2026-10-02T05:12:02Z |  |
+| 658 | docs/features/active/2026-09-08-epic-child-prs-trigger-no-ci-658 | 3 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/837 | 6dac65b0930b299dc7b3c3925a607735a05fca35 | 2026-10-08T01:53:24Z | 2026-10-08T06:34:39Z |  |
+| 659 | docs/features/active/2026-09-08-epic-wave-barrier-violations-lack-start-guard-659 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/807 | 41217012d31d35c2ee33a50be50684affd2f5f43 | 2026-09-30T13:24:40Z | 2026-10-01T11:12:35Z |  |
+| 723 | docs/features/active/2026-09-27-npm-publish-verify-window-too-short-723 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/813 | 12fd3c2639f17aec3572f90e8d929205059be56d | 2026-09-30T13:34:37Z | 2026-10-02T00:43:34Z |  |
+| 734 | docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/818 | 74e1d6741485aa38c28fecbbc77ea169f31df0ef | 2026-10-02T07:15:04Z | 2026-10-02T08:15:36Z |  |
+| 739 | docs/features/active/2026-09-27-npm-token-guard-gaps-739 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/814 | dcb605ef9078ccf8bffffff08e4f1344a0c76594 | 2026-10-02T00:44:12Z | 2026-10-02T01:22:30Z |  |
+| 740 | docs/features/active/2026-09-27-pr-context-helper-duplication-and-vacuous-tests-740 | 4 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/839 | e7d3779b398604af919678c16c877c8539a86cc0 | 2026-10-08T06:35:30Z | 2026-10-08T07:33:09Z |  |
+| 741 | docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/819 | ef80c57df8f8bbc7d2e9ac51586150dfee3cd5fd | 2026-10-02T07:25:34Z | 2026-10-02T08:51:49Z |  |
+| 743 | docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/810 | 1b1e349f1d0fb8b00eb69a809ef380fcc6eb35b9 | 2026-10-01T15:52:55Z | 2026-10-02T03:08:04Z |  |
+| 744 | docs/features/active/2026-09-27-orchestration-completion-gate-and-tooling-friction-744 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/817 | 71f8dcb49d8ce5d1402ff441855a64be15b37f29 | 2026-10-02T05:13:22Z | 2026-10-02T07:24:50Z |  |
+| 756 | docs/features/active/2026-09-28-cleanup-worktrees-631-spec-contradiction-and-untested-error-paths-756 | 3 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/835 | 6c3649b07322374035df8c11996f4d64a043e138 | 2026-10-08T01:53:24Z | 2026-10-08T02:31:32Z |  |
+| 764 | docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/805 | a2541d6d5a487c8e979447baf596ef38c07029ab | 2026-09-30T13:44:42Z | 2026-09-30T14:06:35Z |  |
+
+**Cohorts**
+
+| index | generation | item_keys |
+| --- | --- | --- |
+| 0 | 0 | 512, 623, 659, 723, 743, 764 |
+| 1 | 0 | 406, 609, 647, 734, 739, 744 |
+| 2 | 0 | 527, 532, 543, 741 |
+| 3 | 0 | 510, 645, 658, 756 |
+| 4 | 0 | 338, 740 |
+
+## Conflict Edges
+
+| a | b | reason |
+| --- | --- | --- |
+| 338 | 532 | path_overlap |
+| 338 | 623 | path_overlap |
+| 338 | 645 | path_overlap |
+| 338 | 647 | path_overlap |
+| 406 | 623 | path_overlap |
+| 510 | 527 | path_overlap |
+| 510 | 623 | path_overlap |
+| 510 | 659 | path_overlap |
+| 510 | 741 | path_overlap |
+| 510 | 744 | path_overlap |
+| 527 | 623 | path_overlap |
+| 527 | 645 | path_overlap |
+| 527 | 658 | path_overlap |
+| 527 | 743 | path_overlap |
+| 527 | 744 | path_overlap |
+| 532 | 623 | path_overlap |
+| 532 | 645 | path_overlap |
+| 532 | 647 | path_overlap |
+| 532 | 740 | path_overlap |
+| 532 | 744 | path_overlap |
+| 543 | 623 | path_overlap |
+| 543 | 647 | path_overlap |
+| 543 | 744 | path_overlap |
+| 609 | 658 | path_overlap |
+| 609 | 741 | path_overlap |
+| 609 | 743 | path_overlap |
+| 609 | 756 | path_overlap |
+| 623 | 645 | path_overlap |
+| 623 | 647 | path_overlap |
+| 623 | 740 | path_overlap |
+| 645 | 647 | path_overlap |
+| 645 | 740 | path_overlap |
+| 647 | 659 | path_overlap |
+| 647 | 743 | path_overlap |
+| 658 | 659 | path_overlap |
+| 658 | 723 | path_overlap |
+| 658 | 743 | path_overlap |
+| 658 | 744 | path_overlap |
+| 659 | 744 | path_overlap |
+| 723 | 739 | path_overlap |
+| 734 | 743 | path_overlap |
+| 740 | 744 | path_overlap |
+| 741 | 743 | path_overlap |
+| 741 | 756 | path_overlap |
+| 743 | 744 | path_overlap |
+| 743 | 756 | path_overlap |
+
+## Mutations
+
+| op | item_key | prior_state | new_state | disposition | recolor_generation | at |
+| --- | --- | --- | --- | --- | --- | --- |
+
+## Drift Events
+
+| item_key | declared | observed | escaped_paths | action | at |
+| --- | --- | --- | --- | --- | --- |
+
+## Mergeable Conflicts Resolved
+
+| issue_num | path | resolved_at | merged_against | merge_commit_sha | entries_added_from_ours | entries_added_from_theirs | version_resolutions |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
+## Item Start Announcements
+
+| at | item | phase | agents |
+| --- | --- | --- | --- |
+| 2026-10-07T13:12:29Z | #543 (resumed) | remediation cycle 2: plan, preflight, execute, re-review, PR | 2 (orchestrator + 1 delegate at a time) |
+| 2026-10-07T14:59:26Z | #510 | start: merge main, resume atomic execution from committed plan | 2 (orchestrator + 1 delegate at a time) |
+| 2026-10-07T15:12:55Z | (hold) | held by coordinator: weekly pace; no new starts until GO | 510 in flight: up to 2 |
+| 2026-10-08T01:42:43Z | #645 | start: merge main, resume atomic execution from committed plan | 2 (orchestrator + 1 delegate at a time); subtree max 5 |
+| 2026-10-08T01:52:42Z | #658 | start: merge main, resume atomic execution | uncapped |
+| 2026-10-08T01:52:42Z | #756 | start: merge main, resume atomic execution | uncapped |
+| 2026-10-08T06:34:55Z | #338 | start: merge main, resume atomic execution | uncapped |
+| 2026-10-08T06:34:55Z | #740 | start: merge main, resume atomic execution | uncapped |
+
+## Paused By Operator (history)
+
+- `at`: 2026-10-02T09:49:33Z
+- `resumed_at`: 2026-10-07T13:11:00Z
+- `directive`: user directive relayed by coordinator 2026-10-02T09:50Z: commit-and-hold for TaskMaster priority
