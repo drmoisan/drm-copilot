@@ -208,26 +208,26 @@ All Phase 0 artifacts are written under `FEATURE/evidence/remediation-baseline/`
 - [x] [P1-T7] Test purity: run PUR over RW15 and RW16; write `FEATURE/evidence/other/purity-cr1-tests.<ts>.md`. Acceptance: two `PURITY-CLEAN` lines.
 - [x] [P1-T8] [expect-fail] Fail-before (Claude): run TPC over RW15; write `FEATURE/evidence/regression-testing/fail-before-cr1-claude.<ts>.md` with `ExpectedExitCode: 1`. Acceptance: exit 1; summary line `Passed=21 Failed=4 FailedBlocks=0 FailedContainers=0`; exactly four `FAILED:` lines whose final segments begin `M10p:`, `M10e:`, `M12a:`, `M12b:`.
 - [x] [P1-T9] [expect-fail] Fail-before (Codex): run TPC over RW16; write `FEATURE/evidence/regression-testing/fail-before-cr1-codex.<ts>.md` with `ExpectedExitCode: 1`. Acceptance: the same counts and the same four case IDs as P1-T8.
-- [ ] [P1-T10] Commit and push Phase 1: `git add` RW15, RW16, `FEATURE/evidence`, and `FEATURE/remediation-plan.2026-10-08T19-24.md`; `git commit -m "test(565): add keyed-only tie-break regression cases on both surfaces"`; `git push origin BRANCH`; then `git rev-parse HEAD`, `git rev-parse origin/BRANCH`, `git status --porcelain`. Acceptance: as P0-T27.
+- [x] [P1-T10] Commit and push Phase 1: `git add` RW15, RW16, `FEATURE/evidence`, and `FEATURE/remediation-plan.2026-10-08T19-24.md`; `git commit -m "test(565): add keyed-only tie-break regression cases on both surfaces"`; `git push origin BRANCH`; then `git rev-parse HEAD`, `git rev-parse origin/BRANCH`, `git status --porcelain`. Acceptance: as P0-T27.
 
 ### Phase 2 — CR-1 Fix on Both Surfaces
 
-- [ ] [P2-T1] RESET (window W-R1); write `FEATURE/evidence/other/batch-budget-reset-rem1-1.<ts>.md`. Acceptance: `REMAINING 0`.
-- [ ] [P2-T2] Apply ED-1 through ED-6 to RW01 with Edit. Acceptance: each ED anchor was replaced exactly once and no other line changed.
-- [ ] [P2-T3] Parse and size RW01: run PARSE and LC over RW01; write `FEATURE/evidence/other/parse-size-rw01.<ts>.md`. Acceptance: `Errors=0` and `LINES 496`. On `Errors=` greater than 0, follow live-hook rule 1.
-- [ ] [P2-T4] Apply ED-7 to RW03 with Edit as one replacement. Acceptance: the six original lines are replaced by the eight ED-7 lines and no other line changed.
-- [ ] [P2-T5] Parse and size RW03: run PARSE and LC over RW03; write `FEATURE/evidence/other/parse-size-rw03.<ts>.md`. Acceptance: `Errors=0` and `LINES 468`. On `Errors=` greater than 0, follow live-hook rule 1.
-- [ ] [P2-T6] Apply ED-1 through ED-6 to RW02 with Edit (third file in W-R1). Acceptance: each ED anchor was replaced exactly once and no other line changed.
-- [ ] [P2-T7] RESET (window W-R2); write `FEATURE/evidence/other/batch-budget-reset-rem1-2.<ts>.md`. Acceptance: `REMAINING 0`.
-- [ ] [P2-T8] Apply ED-7 to RW04 with Edit as one replacement. Acceptance: the six original lines are replaced by the eight ED-7 lines and no other line changed.
-- [ ] [P2-T9] Parse and size the Codex files: run PARSE and LC over RW02 and RW04; write `FEATURE/evidence/other/parse-size-codex.<ts>.md`. Acceptance: two `Errors=0` lines, `LINES 493` for RW02, `LINES 489` for RW04.
-- [ ] [P2-T10] Copy mirrors: `Copy-Item` RW01→RW08, RW03→RW09, RW02→RW13, RW04→RW14 on the PowerShell route. Acceptance: four copies complete with exit 0.
-- [ ] [P2-T11] Mirror parity for the CR-1 pairs: run HASH over (RW01,RW08), (RW03,RW09), (RW02,RW13), (RW04,RW14); write `FEATURE/evidence/other/mirror-hashes-cr1.<ts>.md`. Acceptance: 4 `MATCH`, 0 `MISMATCH`.
-- [ ] [P2-T12] Surface symmetry: run TOKENS over RW01, RW02, RW03, RW04; write `FEATURE/evidence/other/cr1-symmetry.<ts>.md`. Acceptance: RW01 and RW02 each print `KeyedOnlyVar=2 FallbackVar=4 KeyedOnlySwitch=1 FallbackArg=0`; RW03 and RW04 each print `KeyedOnlyVar=0 FallbackVar=0 KeyedOnlySwitch=1 FallbackArg=2`.
-- [ ] [P2-T13] Pass-after (Claude): run TPC over RW15; write `FEATURE/evidence/regression-testing/pass-after-cr1-claude.<ts>.md`. Acceptance: exit 0 and `Passed=25 Failed=0 FailedBlocks=0 FailedContainers=0 Skipped=0 NotRun=0`.
-- [ ] [P2-T14] Pass-after (Codex): run TPC over RW16; write `FEATURE/evidence/regression-testing/pass-after-cr1-codex.<ts>.md`. Acceptance: exit 0 and `Passed=25 Failed=0 FailedBlocks=0 FailedContainers=0 Skipped=0 NotRun=0`.
-- [ ] [P2-T15] Existing preimplementation suites after the fix: run TPC over R-EXISTING-PRE (18 paths); write `FEATURE/evidence/regression-testing/existing-preimplementation-cr1.<ts>.md`. Acceptance: exit 0, `Failed=0 FailedBlocks=0 FailedContainers=0`, and `Passed=` equal to the P0-T19 value. A failure triggers the test-integrity rule (stop and report).
-- [ ] [P2-T16] Codex contract suites after the fix: run TPC over R-CONTRACTS; write `FEATURE/evidence/regression-testing/codex-contracts-cr1.<ts>.md`. Acceptance: exit 0 and `Failed=0 FailedBlocks=0 FailedContainers=0`.
+- [x] [P2-T1] RESET (window W-R1); write `FEATURE/evidence/other/batch-budget-reset-rem1-1.<ts>.md`. Acceptance: `REMAINING 0`.
+- [x] [P2-T2] Apply ED-1 through ED-6 to RW01 with Edit. Acceptance: each ED anchor was replaced exactly once and no other line changed.
+- [x] [P2-T3] Parse and size RW01: run PARSE and LC over RW01; write `FEATURE/evidence/other/parse-size-rw01.<ts>.md`. Acceptance: `Errors=0` and `LINES 496`. On `Errors=` greater than 0, follow live-hook rule 1.
+- [x] [P2-T4] Apply ED-7 to RW03 with Edit as one replacement. Acceptance: the six original lines are replaced by the eight ED-7 lines and no other line changed.
+- [x] [P2-T5] Parse and size RW03: run PARSE and LC over RW03; write `FEATURE/evidence/other/parse-size-rw03.<ts>.md`. Acceptance: `Errors=0` and `LINES 468`. On `Errors=` greater than 0, follow live-hook rule 1.
+- [x] [P2-T6] Apply ED-1 through ED-6 to RW02 with Edit (third file in W-R1). Acceptance: each ED anchor was replaced exactly once and no other line changed.
+- [x] [P2-T7] RESET (window W-R2); write `FEATURE/evidence/other/batch-budget-reset-rem1-2.<ts>.md`. Acceptance: `REMAINING 0`.
+- [x] [P2-T8] Apply ED-7 to RW04 with Edit as one replacement. Acceptance: the six original lines are replaced by the eight ED-7 lines and no other line changed.
+- [x] [P2-T9] Parse and size the Codex files: run PARSE and LC over RW02 and RW04; write `FEATURE/evidence/other/parse-size-codex.<ts>.md`. Acceptance: two `Errors=0` lines, `LINES 493` for RW02, `LINES 489` for RW04.
+- [x] [P2-T10] Copy mirrors: `Copy-Item` RW01→RW08, RW03→RW09, RW02→RW13, RW04→RW14 on the PowerShell route. Acceptance: four copies complete with exit 0.
+- [x] [P2-T11] Mirror parity for the CR-1 pairs: run HASH over (RW01,RW08), (RW03,RW09), (RW02,RW13), (RW04,RW14); write `FEATURE/evidence/other/mirror-hashes-cr1.<ts>.md`. Acceptance: 4 `MATCH`, 0 `MISMATCH`.
+- [x] [P2-T12] Surface symmetry: run TOKENS over RW01, RW02, RW03, RW04; write `FEATURE/evidence/other/cr1-symmetry.<ts>.md`. Acceptance: RW01 and RW02 each print `KeyedOnlyVar=2 FallbackVar=4 KeyedOnlySwitch=1 FallbackArg=0`; RW03 and RW04 each print `KeyedOnlyVar=0 FallbackVar=0 KeyedOnlySwitch=1 FallbackArg=2`.
+- [x] [P2-T13] Pass-after (Claude): run TPC over RW15; write `FEATURE/evidence/regression-testing/pass-after-cr1-claude.<ts>.md`. Acceptance: exit 0 and `Passed=25 Failed=0 FailedBlocks=0 FailedContainers=0 Skipped=0 NotRun=0`.
+- [x] [P2-T14] Pass-after (Codex): run TPC over RW16; write `FEATURE/evidence/regression-testing/pass-after-cr1-codex.<ts>.md`. Acceptance: exit 0 and `Passed=25 Failed=0 FailedBlocks=0 FailedContainers=0 Skipped=0 NotRun=0`.
+- [x] [P2-T15] Existing preimplementation suites after the fix: run TPC over R-EXISTING-PRE (18 paths); write `FEATURE/evidence/regression-testing/existing-preimplementation-cr1.<ts>.md`. Acceptance: exit 0, `Failed=0 FailedBlocks=0 FailedContainers=0`, and `Passed=` equal to the P0-T19 value. A failure triggers the test-integrity rule (stop and report).
+- [x] [P2-T16] Codex contract suites after the fix: run TPC over R-CONTRACTS; write `FEATURE/evidence/regression-testing/codex-contracts-cr1.<ts>.md`. Acceptance: exit 0 and `Failed=0 FailedBlocks=0 FailedContainers=0`.
 - [ ] [P2-T17] Commit and push Phase 2: `git add` RW01, RW02, RW03, RW04, RW08, RW09, RW13, RW14, `FEATURE/evidence`, and `FEATURE/remediation-plan.2026-10-08T19-24.md`; `git commit -m "fix(565): restrict the -modes tie-break to the keyed issue number"`; `git push origin BRANCH`; then `git rev-parse HEAD`, `git rev-parse origin/BRANCH`, `git status --porcelain`. Acceptance: as P0-T27.
 
 ### Phase 3 — CR-4 Barrier Import-Failure Wording

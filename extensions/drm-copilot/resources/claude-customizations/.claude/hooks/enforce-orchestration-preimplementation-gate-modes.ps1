@@ -252,16 +252,19 @@ function Find-OrchestrationDelegationIssueNumber {
         form; $null when neither resolves. Accepted widening: a bare hash form such
         as a pull-request reference can supply a number that is not the target's,
         which widens the SEARCH only - an unmatched number yields no record and
-        denies, so deny-by-default is preserved.
+        denies, so deny-by-default is preserved. -KeyedOnly returns the keyed form
+        or $null and never the bare hash form: the readiness tie-break among cited
+        candidates consumes only that value (issue #565, spec R4 and R6).
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param([AllowNull()][AllowEmptyString()][string] $Prompt)
+    param([AllowNull()][AllowEmptyString()][string] $Prompt, [switch] $KeyedOnly)
 
     if (-not $Prompt) { return $null }
 
     $keyed = [regex]::Match($Prompt, 'issue(?:[_-]?num(?:ber)?|\s+number)\s*[:=]\s*#?(\d+)', 'IgnoreCase')
     if ($keyed.Success) { return $keyed.Groups[1].Value }
+    if ($KeyedOnly) { return $null }
     $hashForm = [regex]::Match($Prompt, '(?:^|\s)#(\d+)\b')
     if ($hashForm.Success) { return $hashForm.Groups[1].Value }
     return $null
@@ -370,13 +373,15 @@ function Get-EpicOrchestrationReadinessFailure {
         contract, which mandates it; a false deny names the failed conjunct. The
         target is selected among the cited folders with dependency pruning (issue
         #565); an unresolved tie fails as target-ambiguous.
+        Only the keyed -IssueNumber breaks a tie; -FallbackIssueNumber feeds D3 only.
     #>
     [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory)][AllowNull()] $Checkpoint,
         [AllowNull()][AllowEmptyCollection()][AllowEmptyString()][string[]] $TargetFolder,
-        [AllowNull()][AllowEmptyString()][string] $IssueNumber
+        [AllowNull()][AllowEmptyString()][string] $IssueNumber,
+        [AllowNull()][AllowEmptyString()][string] $FallbackIssueNumber
     )
 
     if ($null -eq $Checkpoint) { return 'checkpoint-absent' }
@@ -401,7 +406,7 @@ function Get-EpicOrchestrationReadinessFailure {
     if ($IssueNumber -match '^\d+$' -and [int]::TryParse($IssueNumber, [ref]$declared)) { $selectionArguments['DeclaredIssueNumber'] = $declared }
     $selection = Select-FeatureFolderTarget @selectionArguments
     if ($selection.Status -eq 'Ambiguous') { return 'target-ambiguous: ' + ($selection.Remaining -join ', ') }
-    $record = Find-OrchestrationModeRecord -Records $features -TargetFolder $selection.Basename -IssueNumber $IssueNumber
+    $record = Find-OrchestrationModeRecord -Records $features -TargetFolder $selection.Basename -IssueNumber $(if ($IssueNumber) { $IssueNumber } else { $FallbackIssueNumber })
     if ($null -eq $record) { return 'target-record' }
     if (Test-OrchestrationModeTerminalMergeStatus -Record $record) { return 'merge_status' }
     return ''
@@ -437,13 +442,15 @@ function Get-ParallelOrchestrationReadinessFailure {
         member sets and adds no member to either. The target is selected among the
         cited folders, with the issue number as a tie-break (issue #565); an
         unresolved tie fails as target-ambiguous.
+        Only the keyed -IssueNumber breaks a tie; -FallbackIssueNumber feeds D3 only.
     #>
     [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory)][AllowNull()] $Checkpoint,
         [AllowNull()][AllowEmptyCollection()][AllowEmptyString()][string[]] $TargetFolder,
-        [AllowNull()][AllowEmptyString()][string] $IssueNumber
+        [AllowNull()][AllowEmptyString()][string] $IssueNumber,
+        [AllowNull()][AllowEmptyString()][string] $FallbackIssueNumber
     )
 
     if ($null -eq $Checkpoint) { return 'checkpoint-absent' }
@@ -464,7 +471,7 @@ function Get-ParallelOrchestrationReadinessFailure {
     if ($IssueNumber -match '^\d+$' -and [int]::TryParse($IssueNumber, [ref]$declared)) { $selectionArguments['DeclaredIssueNumber'] = $declared }
     $selection = Select-FeatureFolderTarget @selectionArguments
     if ($selection.Status -eq 'Ambiguous') { return 'target-ambiguous: ' + ($selection.Remaining -join ', ') }
-    $record = Find-OrchestrationModeRecord -Records $items -TargetFolder $selection.Basename -IssueNumber $IssueNumber
+    $record = Find-OrchestrationModeRecord -Records $items -TargetFolder $selection.Basename -IssueNumber $(if ($IssueNumber) { $IssueNumber } else { $FallbackIssueNumber })
     if ($null -eq $record) { return 'target-record' }
     if (Test-OrchestrationModeTerminalMergeStatus -Record $record) { return 'merge_status' }
     return ''
