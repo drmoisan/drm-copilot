@@ -140,6 +140,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1 feature-folder resolution (issue #
             $decision.permissionDecision | Should -Be 'deny'
             $decision.permissionDecisionReason | Should -Match '^PARALLEL_COHORT_BARRIER_BLOCKED:'
             $decision.permissionDecisionReason | Should -Match 'feature-folder-resolution\.ps1'
+            $decision.permissionDecisionReason | Should -Match "the dependency 'feature-folder-resolution\.ps1' failed to import"
 
             # Assert: exactly one try statement dot-sources the shared file, and its catch
             # clause records the failure in the hook's import-failure variable.

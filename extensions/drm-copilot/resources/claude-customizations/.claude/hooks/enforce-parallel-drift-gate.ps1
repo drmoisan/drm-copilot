@@ -318,10 +318,10 @@ function Invoke-ParallelDriftGateDecision {
         [string] $ToolInputRaw
     )
 
-    # A failed worktree-resolution import denies before any other logic (issue #690).
+    # A failed dependency import denies before any other logic (issues #690 and #565).
     if ($script:ParallelDriftGateResolutionImportFailure) {
         return Get-ParallelDriftGateBlockDecision -Reason (
-            "PARALLEL_DRIFT_GATE_BLOCKED: the worktree-resolution module '$($script:ParallelDriftGateResolutionImportFailure)' " +
+            "PARALLEL_DRIFT_GATE_BLOCKED: the dependency '$($script:ParallelDriftGateResolutionImportFailure)' " +
             'failed to import, so the parallel checkpoint that governs this review cannot be located; the gate fails closed.')
     }
 

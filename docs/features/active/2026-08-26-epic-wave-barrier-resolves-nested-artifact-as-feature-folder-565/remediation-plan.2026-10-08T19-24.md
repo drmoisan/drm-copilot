@@ -228,24 +228,24 @@ All Phase 0 artifacts are written under `FEATURE/evidence/remediation-baseline/`
 - [x] [P2-T14] Pass-after (Codex): run TPC over RW16; write `FEATURE/evidence/regression-testing/pass-after-cr1-codex.<ts>.md`. Acceptance: exit 0 and `Passed=25 Failed=0 FailedBlocks=0 FailedContainers=0 Skipped=0 NotRun=0`.
 - [x] [P2-T15] Existing preimplementation suites after the fix: run TPC over R-EXISTING-PRE (18 paths); write `FEATURE/evidence/regression-testing/existing-preimplementation-cr1.<ts>.md`. Acceptance: exit 0, `Failed=0 FailedBlocks=0 FailedContainers=0`, and `Passed=` equal to the P0-T19 value. A failure triggers the test-integrity rule (stop and report).
 - [x] [P2-T16] Codex contract suites after the fix: run TPC over R-CONTRACTS; write `FEATURE/evidence/regression-testing/codex-contracts-cr1.<ts>.md`. Acceptance: exit 0 and `Failed=0 FailedBlocks=0 FailedContainers=0`.
-- [ ] [P2-T17] Commit and push Phase 2: `git add` RW01, RW02, RW03, RW04, RW08, RW09, RW13, RW14, `FEATURE/evidence`, and `FEATURE/remediation-plan.2026-10-08T19-24.md`; `git commit -m "fix(565): restrict the -modes tie-break to the keyed issue number"`; `git push origin BRANCH`; then `git rev-parse HEAD`, `git rev-parse origin/BRANCH`, `git status --porcelain`. Acceptance: as P0-T27.
+- [x] [P2-T17] Commit and push Phase 2: `git add` RW01, RW02, RW03, RW04, RW08, RW09, RW13, RW14, `FEATURE/evidence`, and `FEATURE/remediation-plan.2026-10-08T19-24.md`; `git commit -m "fix(565): restrict the -modes tie-break to the keyed issue number"`; `git push origin BRANCH`; then `git rev-parse HEAD`, `git rev-parse origin/BRANCH`, `git status --porcelain`. Acceptance: as P0-T27.
 
 ### Phase 3 — CR-4 Barrier Import-Failure Wording
 
-- [ ] [P3-T1] RW17: add the CR-4 assertion line to W9 after RW17 line 208. Acceptance: W9 contains the new `Should -Match "the dependency 'feature-folder-resolution\.ps1' failed to import"` line and no other line changed.
-- [ ] [P3-T2] RW18: add the same assertion line to C7 after RW18 line 142. Acceptance: as P3-T1 for C7.
-- [ ] [P3-T3] RW19: add the same assertion line to D7 after RW19 line 144. Acceptance: as P3-T1 for D7.
-- [ ] [P3-T4] [expect-fail] Fail-before CR-4: run TPC over RW17, RW18, RW19; write `FEATURE/evidence/regression-testing/fail-before-cr4.<ts>.md` with `ExpectedExitCode: 1`. Acceptance: exit 1; `Failed=3 FailedBlocks=0 FailedContainers=0`; exactly three `FAILED:` lines whose final segments begin `W9:`, `C7:`, `D7:`.
-- [ ] [P3-T5] RESET (window W-R3); write `FEATURE/evidence/other/batch-budget-reset-rem1-3.<ts>.md`. Acceptance: `REMAINING 0`.
-- [ ] [P3-T6] Apply ED-8 to RW05 (lines 270 and 273). Acceptance: the comment line and the literal on line 273 are replaced; no other line changed.
-- [ ] [P3-T7] Apply ED-8 to RW06 (lines 239 and 242). Acceptance: as P3-T6.
-- [ ] [P3-T8] Apply ED-8 to RW07 (lines 321 and 324). Acceptance: as P3-T6.
-- [ ] [P3-T9] Parse and size the barriers: run PARSE and LC over RW05, RW06, RW07; write `FEATURE/evidence/other/parse-size-barriers.<ts>.md`. Acceptance: three `Errors=0` lines and each `LINES` value equal to its P0-T14 value.
-- [ ] [P3-T10] Copy mirrors: `Copy-Item` RW05→RW10, RW06→RW11, RW07→RW12. Acceptance: three copies complete with exit 0.
-- [ ] [P3-T11] Mirror parity for the CR-4 pairs: run HASH over (RW05,RW10), (RW06,RW11), (RW07,RW12); write `FEATURE/evidence/other/mirror-hashes-cr4.<ts>.md`. Acceptance: 3 `MATCH`, 0 `MISMATCH`.
-- [ ] [P3-T12] Pass-after CR-4: run TPC over RW17, RW18, RW19; write `FEATURE/evidence/regression-testing/pass-after-cr4.<ts>.md`. Acceptance: exit 0 and `Failed=0 FailedBlocks=0 FailedContainers=0`.
-- [ ] [P3-T13] Existing barrier suites after the wording change: run TPC over R-EXISTING-BARRIER (8 paths); write `FEATURE/evidence/regression-testing/existing-barrier-cr4.<ts>.md`. Acceptance: exit 0, `Failed=0 FailedBlocks=0 FailedContainers=0`.
-- [ ] [P3-T14] Old wording absent: in Bash run `grep -c "worktree-resolution module '" .claude/hooks/enforce-epic-wave-barrier.ps1 .claude/hooks/enforce-parallel-cohort-barrier.ps1 .claude/hooks/enforce-parallel-drift-gate.ps1` and `grep -c "the dependency '" .claude/hooks/enforce-epic-wave-barrier.ps1 .claude/hooks/enforce-parallel-cohort-barrier.ps1 .claude/hooks/enforce-parallel-drift-gate.ps1`; write `FEATURE/evidence/other/cr4-wording.<ts>.md` recording the second command's exit code as `EXIT_CODE:`. Acceptance: the first command prints `:0` for all three files; the second prints `:1` for all three files.
+- [x] [P3-T1] RW17: add the CR-4 assertion line to W9 after RW17 line 208. Acceptance: W9 contains the new `Should -Match "the dependency 'feature-folder-resolution\.ps1' failed to import"` line and no other line changed.
+- [x] [P3-T2] RW18: add the same assertion line to C7 after RW18 line 142. Acceptance: as P3-T1 for C7.
+- [x] [P3-T3] RW19: add the same assertion line to D7 after RW19 line 144. Acceptance: as P3-T1 for D7.
+- [x] [P3-T4] [expect-fail] Fail-before CR-4: run TPC over RW17, RW18, RW19; write `FEATURE/evidence/regression-testing/fail-before-cr4.<ts>.md` with `ExpectedExitCode: 1`. Acceptance: exit 1; `Failed=3 FailedBlocks=0 FailedContainers=0`; exactly three `FAILED:` lines whose final segments begin `W9:`, `C7:`, `D7:`.
+- [x] [P3-T5] RESET (window W-R3); write `FEATURE/evidence/other/batch-budget-reset-rem1-3.<ts>.md`. Acceptance: `REMAINING 0`.
+- [x] [P3-T6] Apply ED-8 to RW05 (lines 270 and 273). Acceptance: the comment line and the literal on line 273 are replaced; no other line changed.
+- [x] [P3-T7] Apply ED-8 to RW06 (lines 239 and 242). Acceptance: as P3-T6.
+- [x] [P3-T8] Apply ED-8 to RW07 (lines 321 and 324). Acceptance: as P3-T6.
+- [x] [P3-T9] Parse and size the barriers: run PARSE and LC over RW05, RW06, RW07; write `FEATURE/evidence/other/parse-size-barriers.<ts>.md`. Acceptance: three `Errors=0` lines and each `LINES` value equal to its P0-T14 value.
+- [x] [P3-T10] Copy mirrors: `Copy-Item` RW05→RW10, RW06→RW11, RW07→RW12. Acceptance: three copies complete with exit 0.
+- [x] [P3-T11] Mirror parity for the CR-4 pairs: run HASH over (RW05,RW10), (RW06,RW11), (RW07,RW12); write `FEATURE/evidence/other/mirror-hashes-cr4.<ts>.md`. Acceptance: 3 `MATCH`, 0 `MISMATCH`.
+- [x] [P3-T12] Pass-after CR-4: run TPC over RW17, RW18, RW19; write `FEATURE/evidence/regression-testing/pass-after-cr4.<ts>.md`. Acceptance: exit 0 and `Failed=0 FailedBlocks=0 FailedContainers=0`.
+- [x] [P3-T13] Existing barrier suites after the wording change: run TPC over R-EXISTING-BARRIER (8 paths); write `FEATURE/evidence/regression-testing/existing-barrier-cr4.<ts>.md`. Acceptance: exit 0, `Failed=0 FailedBlocks=0 FailedContainers=0`.
+- [x] [P3-T14] Old wording absent: in Bash run `grep -c "worktree-resolution module '" .claude/hooks/enforce-epic-wave-barrier.ps1 .claude/hooks/enforce-parallel-cohort-barrier.ps1 .claude/hooks/enforce-parallel-drift-gate.ps1` and `grep -c "the dependency '" .claude/hooks/enforce-epic-wave-barrier.ps1 .claude/hooks/enforce-parallel-cohort-barrier.ps1 .claude/hooks/enforce-parallel-drift-gate.ps1`; write `FEATURE/evidence/other/cr4-wording.<ts>.md` recording the second command's exit code as `EXIT_CODE:`. Acceptance: the first command prints `:0` for all three files; the second prints `:1` for all three files.
 - [ ] [P3-T15] Commit and push Phase 3: `git add` RW05, RW06, RW07, RW10, RW11, RW12, RW17, RW18, RW19, `FEATURE/evidence`, and `FEATURE/remediation-plan.2026-10-08T19-24.md`; `git commit -m "fix(565): name a failed barrier import as a dependency"`; `git push origin BRANCH`; then `git rev-parse HEAD`, `git rev-parse origin/BRANCH`, `git status --porcelain`. Acceptance: as P0-T27.
 
 ### Phase 4 — PA-3 Relocation, CR-3 Record, and Follow-Ups

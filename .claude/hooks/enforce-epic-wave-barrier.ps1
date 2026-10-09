@@ -267,10 +267,10 @@ function Invoke-EpicWaveBarrierDecision {
         [string] $ToolInputRaw
     )
 
-    # A failed worktree-resolution import denies before any other logic (issue #690).
+    # A failed dependency import denies before any other logic (issues #690 and #565).
     if ($script:EpicWaveBarrierResolutionImportFailure) {
         return Get-EpicWaveBarrierBlockDecision -Reason (
-            "EPIC_WAVE_BARRIER_BLOCKED: the worktree-resolution module '$($script:EpicWaveBarrierResolutionImportFailure)' " +
+            "EPIC_WAVE_BARRIER_BLOCKED: the dependency '$($script:EpicWaveBarrierResolutionImportFailure)' " +
             'failed to import, so the epic checkpoint that governs this delegation cannot be located; the gate fails closed.')
     }
 

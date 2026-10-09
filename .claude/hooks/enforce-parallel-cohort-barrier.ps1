@@ -236,10 +236,10 @@ function Invoke-ParallelCohortBarrierDecision {
         [string] $ToolInputRaw
     )
 
-    # A failed worktree-resolution import denies before any other logic (issue #690).
+    # A failed dependency import denies before any other logic (issues #690 and #565).
     if ($script:ParallelCohortBarrierResolutionImportFailure) {
         return Get-ParallelCohortBarrierBlockDecision -Reason (
-            "PARALLEL_COHORT_BARRIER_BLOCKED: the worktree-resolution module '$($script:ParallelCohortBarrierResolutionImportFailure)' " +
+            "PARALLEL_COHORT_BARRIER_BLOCKED: the dependency '$($script:ParallelCohortBarrierResolutionImportFailure)' " +
             'failed to import, so the parallel checkpoint that governs this delegation cannot be located; the gate fails closed.')
     }
 
