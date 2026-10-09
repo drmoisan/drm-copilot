@@ -250,8 +250,8 @@ Each criterion is verified by the named Pester or parity test. The research reco
 
 ### #789 CR-5 single deny token (parallel and epic removal gates)
 
-- [ ] When both run kinds resolve `NoTarget`, the parallel worktree removal gate's deny begins with `PARALLEL_WORKTREE_REMOVAL_BLOCKED: ` and the token does not appear again in the remainder of the text. Verified by `enforce-parallel-worktree-removal-gate.WorktreeResolution.Tests.ps1`, row "emits a single leading token when both run kinds are unresolved".
-- [ ] The parallel gate's deny text for a resolved target is byte-identical to the pre-change text. Verified by the exact-text row of `enforce-parallel-worktree-removal-gate.Tests.ps1` and row Y3 of `enforce-parallel-worktree-removal-gate.WorktreeResolution.Tests.ps1`, both unmodified.
+- [x] When both run kinds resolve `NoTarget`, the parallel worktree removal gate's deny begins with `PARALLEL_WORKTREE_REMOVAL_BLOCKED: ` and the token does not appear again in the remainder of the text. Verified by `enforce-parallel-worktree-removal-gate.WorktreeResolution.Tests.ps1`, row "emits a single leading token when both run kinds are unresolved".
+- [x] The parallel gate's deny text for a resolved target is byte-identical to the pre-change text. Verified by the exact-text row of `enforce-parallel-worktree-removal-gate.Tests.ps1` and row Y3 of `enforce-parallel-worktree-removal-gate.WorktreeResolution.Tests.ps1`, both unmodified.
 - [ ] When both run kinds resolve `NoTarget`, the epic worktree removal gate's deny begins with `EPIC_WORKTREE_REMOVAL_BLOCKED: ` and the token does not appear again in the remainder of the text. Verified by `enforce-epic-worktree-removal-gate.Diagnostics.Tests.ps1`, row "emits a single leading token when both run kinds are unresolved".
 
 ### #851 epic worktree removal gate diagnostics
