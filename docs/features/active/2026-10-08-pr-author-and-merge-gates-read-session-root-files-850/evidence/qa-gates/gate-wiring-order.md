@@ -4,7 +4,7 @@ Timestamp: 2026-10-08T23-56
 Command: SW procedure (LH-2) and per-phase A2 runs
 EXIT_CODE: 0
 Output Summary:
-  Latest entry: P4-T10 SET-LIB TotalCount=266 PassedCount=266 FailedCount=0.
+  Latest entry: P5-T14 SET-MRG TotalCount=160 PassedCount=160 FailedCount=0.
 
 ## Staged writes
 
@@ -15,6 +15,9 @@ Output Summary:
 | 3 | P3-T4/P3-T6 | .claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1 | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 (first SW-2 printed DiagnosticCount=1, PSUseSingularNouns on the plan-named Get-EpicWorktreeGateDenyDiagnostics; the staged copy was corrected with a justified suppression attribute before SW-3) | True (5929B17580B25577E9886AFCA4382018AF66513C2679BC1EA15F6BC224146D4D) | 2026-10-09T00-05 | n/a |
 | 4 | P3-T5/P3-T6 | .claude/hooks/enforce-epic-worktree-removal-gate.ps1 | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 | True (42CE72D70AE3A8FFC60B436DE0A58AEFFCEB238DAC948CE428E20D1485E19F74) | 2026-10-09T00-05 | n/a |
 | 5 | P4-T4/P4-T5 | .claude/lib/worktree-resolution/WorktreeItemResolution.psm1 | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 (SW-2b: LOAD-CHECK Module=WorktreeItemResolution Imported=True ExportCount=10) | True (BA2B4C4DFC4AE92532312308F471FCB795DE6BD06579D359A64602ABC84F7194) | 2026-10-09T00-12 | n/a |
+| 6 | P5-T4/P5-T6 | .claude/hooks/enforce-epic-merge-gate-resolution.ps1 | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 | True (2E079865E1BE2BC8014FFE33127CDDA2DDCAE39A78B7D12446369240F64533DE) | 2026-10-09T00-19 | n/a |
+| 7 | P5-T5/P5-T6 | .claude/hooks/enforce-epic-merge-gate.ps1 | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 | True (1B4488F7E7B835B15DC4666D3D9D09BDD4E3876E5DB14D27453A2B565B7762DD) | 2026-10-09T00-19 | n/a |
+| 8 | P5-T12 (corrective) | .claude/lib/worktree-resolution/WorktreeItemResolution.psm1 | STAGE-CHECK ParseErrors=0 FormatChanged=False DiagnosticCount=0 (SW-2b into SCRATCH/stage-lib-p4-2: LOAD-CHECK Module=WorktreeItemResolution Imported=True ExportCount=10) | True (74E7A2CDA251B1BEDFC75560D9D7C049EC173047E7B6B130F79D6C2CCF5C53DB) | 2026-10-09T00-23 | Corrective re-Write: P5-T12 rows "denies an unresolvable item target with the no-target code" and "observes module-scoped WorktreeItemResolution mocks" failed with "The property 'Name' cannot be found on this object" because Test-WorktreeItemCheckpointRecordsPr read PSObject.Properties.Name on an empty JSON object under strict mode; property names are now collected per property. |
 
 ## Suite results
 
@@ -24,3 +27,5 @@ Output Summary:
 | P2-T10 | SET-REM | 224 | 224 | 0 |
 | P3-T12 | SET-REM (with T-EREM-DX) | 232 | 232 | 0 |
 | P4-T10 | SET-LIB (with T-WIR-PR) | 266 | 266 | 0 |
+| P5 (WIR corrective re-check) | SET-LIB | 266 | 266 | 0 |
+| P5-T14 | SET-MRG (with T-MRG-IR), run 1 | 160 | 160 | 0 |

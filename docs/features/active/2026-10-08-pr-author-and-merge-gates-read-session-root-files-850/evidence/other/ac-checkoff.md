@@ -28,3 +28,9 @@ Output Summary:
 
 - AC-15 (line 227), AC-16 (line 228), AC-17 (line 229), AC-18 (line 230): checked. Evidence: P4-T9 `evidence/regression-testing/wir-prnumber-pass-after.2026-10-09T00-12.md` (T-WIR-PR 11/11 pass); fail-before P4-T2 `evidence/regression-testing/wir-prnumber-fail-before.2026-10-09T00-09.md` (11/11 fail); P4-T10 SET-LIB 266/266.
 - A14 output: `CHECKBOX checked=13 unchecked=34`; lines 227-230 `state=checked`.
+
+## P5-T17 (2026-10-09T00-25)
+
+- AC-19 to AC-24 (lines 231-236) and AC-26 to AC-29 (lines 241-244): checked. Evidence: P5-T12 `evidence/regression-testing/merge-item-pass-after.2026-10-09T00-22.md` (T-MRG-IR 19/19 pass, after the WIR corrective re-Write recorded in WLOG entry 8); fail-before P5-T2 `evidence/regression-testing/merge-item-fail-before.2026-10-09T00-15.md`; P5-T13 `evidence/regression-testing/merge-worktree-resolution-p5.2026-10-09T00-22.md` (M5 and M6, 10/10 pass).
+- AC-25 (line 237): checked. Evidence: P5-T14 `evidence/qa-gates/pester-set-mrg-p5.2026-10-09T00-23.md` (SET-MRG 160/160; no rule CR update).
+- A14 output: `CHECKBOX checked=24 unchecked=23`; lines 231-237 and 241-244 `state=checked`.

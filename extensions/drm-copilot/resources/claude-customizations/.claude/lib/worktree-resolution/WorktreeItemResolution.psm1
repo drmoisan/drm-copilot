@@ -410,14 +410,15 @@ function Test-WorktreeItemCheckpointRecordsPr {
     $payload = $null
     try { $payload = $Text | ConvertFrom-Json } catch { return $false }
     if ($null -eq $payload -or $payload -isnot [pscustomobject]) { return $false }
-    $names = $payload.PSObject.Properties.Name
-    if ($names -contains 'pr_gate' -and $payload.pr_gate -is [pscustomobject] -and $payload.pr_gate.PSObject.Properties.Name -contains 'pr_number') {
+    # Names are collected per property, because strict mode throws on .Name of an empty object.
+    $names = @($payload.PSObject.Properties | ForEach-Object { $_.Name })
+    if ($names -contains 'pr_gate' -and $payload.pr_gate -is [pscustomobject] -and @($payload.pr_gate.PSObject.Properties | ForEach-Object { $_.Name }) -contains 'pr_number') {
         $recorded = [long] 0
         if ([long]::TryParse([string] $payload.pr_gate.pr_number, [ref] $recorded) -and $recorded -eq $PrNumber) { return $true }
     }
     if ($names -notcontains 'standalone_merge_authorizations') { return $false }
     foreach ($entry in @($payload.standalone_merge_authorizations)) {
-        if ($entry -isnot [pscustomobject] -or $entry.PSObject.Properties.Name -notcontains 'pr_number') { continue }
+        if ($entry -isnot [pscustomobject] -or @($entry.PSObject.Properties | ForEach-Object { $_.Name }) -notcontains 'pr_number') { continue }
         $value = $entry.pr_number
         # Only a JSON integer counts; a string, fraction, zero, or negative never matches.
         if (($value -is [int] -or $value -is [long]) -and $value -gt 0 -and [long] $value -eq $PrNumber) { return $true }
