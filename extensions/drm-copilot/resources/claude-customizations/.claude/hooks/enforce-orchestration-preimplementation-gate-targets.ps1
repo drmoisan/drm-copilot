@@ -94,7 +94,7 @@ function Test-OrchestrationTargetDotSegment {
     return ($segments -contains '.' -or $segments -contains '..')
 }
 
-function New-OrchestrationTargetResult {
+function Get-OrchestrationTargetResult {
     # Builds the FR-3 result object; an unresolved result carries no targets.
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -192,14 +192,14 @@ function Get-OrchestrationCommandTarget {
 
     $root = ConvertTo-OrchestrationTargetPath -Path $SessionRoot
     if ($root -notmatch $script:OrchestrationTargetAbsolutePattern) {
-        return (New-OrchestrationTargetResult -Rule 'session-root-not-absolute' -Value $SessionRoot)
+        return (Get-OrchestrationTargetResult -Rule 'session-root-not-absolute' -Value $SessionRoot)
     }
     $targets = [System.Collections.Generic.List[string]]::new()
 
     foreach ($rawPath in @($FilePath | Where-Object { $_ })) {
         $path = ConvertTo-OrchestrationTargetPath -Path $rawPath
         if ($path -notmatch $script:OrchestrationTargetAbsolutePattern) { $targets.Add($root); continue }
-        if (Test-OrchestrationTargetDotSegment -Path $path) { return (New-OrchestrationTargetResult -Rule 'path-dot-segment' -Value $rawPath) }
+        if (Test-OrchestrationTargetDotSegment -Path $path) { return (Get-OrchestrationTargetResult -Rule 'path-dot-segment' -Value $rawPath) }
         $targets.Add($path)
     }
 
@@ -208,9 +208,9 @@ function Get-OrchestrationCommandTarget {
         if ($records.Count -eq 0) { $targets.Add($root) }
         foreach ($record in $records) {
             $text = ([string]$record.RawText).Trim()
-            if ($record.Unbalanced) { return (New-OrchestrationTargetResult -Rule 'segment-unbalanced' -Value $text) }
+            if ($record.Unbalanced) { return (Get-OrchestrationTargetResult -Rule 'segment-unbalanced' -Value $text) }
             if ($script:OrchestrationTargetDirectoryChangeWords -contains [string]$record.CommandWord) {
-                return (New-OrchestrationTargetResult -Rule 'directory-change' -Value $text)
+                return (Get-OrchestrationTargetResult -Rule 'directory-change' -Value $text)
             }
             $wrapped = [bool]$record.IsWrapperLed -or [bool]$record.HasLiveSubstitution
             if ($wrapped) {
@@ -218,16 +218,16 @@ function Get-OrchestrationCommandTarget {
                 foreach ($sub in @('add', 'commit')) {
                     $matchCount += @(Get-CommandLineInvocation -CommandText $record.RawText -CommandWord 'git' -SubcommandPath @($sub)).Count
                 }
-                if ($matchCount -gt 0) { return (New-OrchestrationTargetResult -Rule 'wrapper-git' -Value $text) }
+                if ($matchCount -gt 0) { return (Get-OrchestrationTargetResult -Rule 'wrapper-git' -Value $text) }
             }
             foreach ($name in $script:OrchestrationTargetRelocationNames) {
                 if ($text.IndexOf($name, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
-                    return (New-OrchestrationTargetResult -Rule 'git-relocation' -Value $text)
+                    return (Get-OrchestrationTargetResult -Rule 'git-relocation' -Value $text)
                 }
             }
             if ($wrapped -or [string]$record.CommandWord -cne 'git') { $targets.Add($root); continue }
             $git = Get-OrchestrationGitSelectorTarget -Token ([string[]]@($record.Tokens))
-            if ($git.Rule) { return (New-OrchestrationTargetResult -Rule $git.Rule -Value $git.Value) }
+            if ($git.Rule) { return (Get-OrchestrationTargetResult -Rule $git.Rule -Value $git.Value) }
             if ($git.Selectors.Count -eq 0) { $targets.Add($root) } else { foreach ($selector in $git.Selectors) { $targets.Add($selector) } }
         }
     }
@@ -236,7 +236,7 @@ function Get-OrchestrationCommandTarget {
     foreach ($target in $targets) {
         if (-not ($distinct | Where-Object { [string]::Equals($_, $target, [System.StringComparison]::OrdinalIgnoreCase) })) { $distinct.Add($target) }
     }
-    return (New-OrchestrationTargetResult -Targets $distinct.ToArray())
+    return (Get-OrchestrationTargetResult -Targets $distinct.ToArray())
 }
 
 function Resolve-OrchestrationEpicTargetVerdict {

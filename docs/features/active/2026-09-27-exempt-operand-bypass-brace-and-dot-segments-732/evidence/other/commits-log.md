@@ -13,3 +13,5 @@ PUSH_EXIT: 0
 COMMIT_SCOPE_NOTE: [P5-T8] also stages the four enforce-orchestration-preimplementation-gate-targets.ps1 copies, changed by the [P5-T6] fix (AllowEmptyString on the Token parameter); leaving them uncommitted would make the [P7-T1] porcelain condition unsatisfiable.
 COMMIT: 4dd2231d8d5dd777f8229e43758e116712bb0a7d fix(738): resolve every segment target in epic-scope decisions
 PUSH_EXIT: 0
+COMMIT: 7d1fea6264c1b6bc638c1b71d0f13a607e037633 docs(745): document admitted commit forms and shell-divergent denials
+PUSH_EXIT: 0
