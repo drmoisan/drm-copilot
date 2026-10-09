@@ -6,24 +6,18 @@
     Epic-state isolation guard for the gate-1, gate-3, and gate-4 hook suites (issues #709, #690).
 
 .DESCRIPTION
-    Nine hook suites reach Resolve-EpicScopeCheckpoint in
+    Hook suites reach Resolve-EpicScopeCheckpoint in
     .claude/lib/worktree-resolution/EpicScopeResolution.psm1 through the hooks they load, and
     that resolver now locates the epic checkpoint through WorktreeRunResolution.psm1. Unmocked,
     either module reads a gitignored run checkpoint, so leftover local state could change their
     results on a developer machine.
 
-    The structural guard parses each of the nine committed suites and requires, inside the
-    suite's outermost BeforeAll, the hook dot-source, then an Import-Module of
-    EpicScopeResolution.psm1 without -Force followed by a $null Mock of
-    Get-EpicScopeCheckpointText in module scope EpicScopeResolution, and an Import-Module of
-    WorktreeRunResolution.psm1 without -Force followed by a $null Mock of
-    Get-WorktreeRunCheckpointText in module scope WorktreeRunResolution. The predicate lives in
-    EpicStateIsolation.Helpers.ps1.
+    The predicate lives in EpicStateIsolation.Helpers.ps1. The per-suite structural check now
+    lives in enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1, which discovers the
+    suites on both hook surfaces by directory enumeration. This file keeps the
+    predicate-discrimination rows and the seam-sufficiency proof.
 
 .NOTES
-    Known limit (decision D9): the guard iterates an explicit list of suite paths, so a suite
-    added later that reaches the resolver is not guarded automatically.
-
     This file loads no hook, creates no file, reads no gitignored state, and runs no git
     command. It reads only committed suite files located from $PSScriptRoot and builds
     every other input in memory; synthetic roots use the /synthetic-worktrees/ form.
@@ -35,24 +29,6 @@ BeforeAll {
 }
 
 Describe 'gate suites isolate the epic checkpoint read (structural guard)' {
-    It '<Path> isolates the epic checkpoint read in its outermost BeforeAll' -ForEach @(
-        @{ Path = 'tests/scripts/claude-hooks/enforce-pr-author-skill.TargetResolution.Tests.ps1' }
-        @{ Path = 'tests/scripts/claude-hooks/enforce-pr-author-skill.WorktreeResolution.Tests.ps1' }
-        @{ Path = 'tests/scripts/claude-hooks/enforce-model-routing-receipt.WorktreeResolution.Tests.ps1' }
-        @{ Path = 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Tests.ps1' }
-        @{ Path = 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.TriggerScoping.Tests.ps1' }
-        @{ Path = 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1' }
-        @{ Path = 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-absolute-paths.Tests.ps1' }
-        @{ Path = 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.OperandResolution.Tests.ps1' }
-        @{ Path = 'tests/scripts/claude-hooks/enforce-pr-author-skill.ItemArtifactRoot.Tests.ps1' }
-    ) {
-        # Arrange and act: parse the committed suite.
-        $findings = @(Get-EpicStateIsolationSuiteFinding -RepoRoot $script:RepoRoot -RelativePath $Path)
-
-        # Assert: no finding; the message names the suite and each missing property.
-        @($findings).Count | Should -Be 0 -Because ($findings -join '; ')
-    }
-
     Context 'guard predicate discrimination' {
         # Each row parses an in-memory fixture, so the guard is shown to reject every
         # non-compliant shape rather than passing vacuously. Every fixture carries both

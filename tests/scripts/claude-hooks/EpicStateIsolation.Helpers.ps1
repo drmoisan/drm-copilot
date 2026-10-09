@@ -255,26 +255,32 @@ function Get-EpicStateIsolationPairFinding {
     <#
         Pure: the findings for one import-and-mock pair among the commands of an outermost
         BeforeAll: the $null Mock of MockCommand in module scope ModuleName, preceded by an
-        Import-Module of ModuleFile without -Force, both after the hook dot-source.
+        Import-Module of ModuleFile without -Force, both after the hook dot-source. A $null
+        ModuleName marks a script-scope seam: the Mock carries no -ModuleName, no import is
+        required, and the Mock follows the hook dot-source.
     #>
     [OutputType([string])]
     param(
         [Parameter(Mandatory)] [AllowEmptyCollection()] [object[]] $Commands,
         [AllowNull()] [System.Management.Automation.Language.CommandAst] $DotSource,
         [Parameter(Mandatory)] [string] $MockCommand,
-        [Parameter(Mandatory)] [string] $ModuleName,
-        [Parameter(Mandatory)] [string] $ModuleFile
+        [AllowNull()] [string] $ModuleName,
+        [AllowNull()] [string] $ModuleFile
     )
 
+    $scriptScope = [string]::IsNullOrEmpty($ModuleName)
     $mocks = [System.Collections.Generic.List[object]]::new()
     foreach ($command in $Commands) {
         if ($command.GetCommandName() -ne 'Mock') { continue }
         $candidate = Get-EpicStateIsolationMockBinding -Command $command
         if ($candidate.CommandName -eq $MockCommand) { $mocks.Add([pscustomobject]@{ Command = $command; Binding = $candidate }) }
     }
-    $import = $Commands | Where-Object {
-        $_.GetCommandName() -eq 'Import-Module' -and (Test-EpicStateIsolationModuleImport -Command $_ -ModuleFile $ModuleFile)
-    } | Select-Object -First 1
+    $import = $null
+    if (-not $scriptScope) {
+        $import = $Commands | Where-Object {
+            $_.GetCommandName() -eq 'Import-Module' -and (Test-EpicStateIsolationModuleImport -Command $_ -ModuleFile $ModuleFile)
+        } | Select-Object -First 1
+    }
 
     $findings = [System.Collections.Generic.List[string]]::new()
     if ($mocks.Count -eq 0) {
@@ -282,23 +288,107 @@ function Get-EpicStateIsolationPairFinding {
     } else {
         # Every Mock of the seam is evaluated, so a later non-null Mock cannot hide behind an earlier null one.
         foreach ($mock in $mocks) {
-            if (-not $mock.Binding.HasModuleName -or $mock.Binding.ModuleName -ne $ModuleName) { $findings.Add("Mock lacks -ModuleName $ModuleName") }
+            if ($scriptScope) {
+                if ($mock.Binding.HasModuleName) { $findings.Add("Mock of $MockCommand carries -ModuleName for a script-scope seam") }
+            } elseif (-not $mock.Binding.HasModuleName -or $mock.Binding.ModuleName -ne $ModuleName) {
+                $findings.Add("Mock lacks -ModuleName $ModuleName")
+            }
             if (-not (Test-EpicStateIsolationNullBody -Body $mock.Binding.MockWith)) { $findings.Add('Mock body is not exactly $null') }
         }
     }
-    if ($null -eq $import) {
-        $findings.Add("Import-Module of $ModuleFile missing from outermost BeforeAll")
-    } elseif (@($import.CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.CommandParameterAst] -and $_.ParameterName -eq 'Force' }).Count -gt 0) {
-        $findings.Add("Import-Module of $ModuleFile uses -Force")
+    if (-not $scriptScope) {
+        if ($null -eq $import) {
+            $findings.Add("Import-Module of $ModuleFile missing from outermost BeforeAll")
+        } elseif (@($import.CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.CommandParameterAst] -and $_.ParameterName -eq 'Force' }).Count -gt 0) {
+            $findings.Add("Import-Module of $ModuleFile uses -Force")
+        }
     }
-    if ($mocks.Count -gt 0 -and $null -ne $import) {
+    if ($mocks.Count -gt 0 -and ($scriptScope -or $null -ne $import)) {
         $firstMock = ($mocks | Sort-Object -Property { $_.Command.Extent.StartOffset } | Select-Object -First 1).Command
-        $ordered = $null -ne $DotSource -and
-        $DotSource.Extent.StartOffset -lt $import.Extent.StartOffset -and
-        $import.Extent.StartOffset -lt $firstMock.Extent.StartOffset
+        $ordered = $null -ne $DotSource -and $DotSource.Extent.StartOffset -lt $firstMock.Extent.StartOffset
+        if ($ordered -and -not $scriptScope) {
+            $ordered = $DotSource.Extent.StartOffset -lt $import.Extent.StartOffset -and $import.Extent.StartOffset -lt $firstMock.Extent.StartOffset
+        }
         if (-not $ordered) { $findings.Add('hook dot-source, Import-Module, Mock order violated') }
     }
     $findings | Select-Object -Unique
+}
+
+function Get-EpicStateIsolationStringConstant {
+    # Pure: every string-constant value inside an AST node (a bareword counts), in source order.
+    [OutputType([string])]
+    param([AllowNull()] [System.Management.Automation.Language.Ast] $Node)
+    if ($null -eq $Node) { return }
+    $isConstant = { param($candidate) $candidate -is [System.Management.Automation.Language.StringConstantExpressionAst] }
+    foreach ($constant in $Node.FindAll($isConstant, $true)) { [string]$constant.Value }
+}
+
+function Get-EpicStateIsolationBoundConstant {
+    # Pure: the string constants bound to a variable name anywhere in the suite, by assignment or by
+    # a hashtable entry with the same key name. A binding to an empty array literal contributes nothing.
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst,
+        [Parameter(Mandatory)] [string] $Key
+    )
+    $isAssignment = { param($candidate) $candidate -is [System.Management.Automation.Language.AssignmentStatementAst] }
+    foreach ($assignment in $SuiteAst.FindAll($isAssignment, $true)) {
+        $left = $assignment.Left
+        if ($left -is [System.Management.Automation.Language.ConvertExpressionAst]) { $left = $left.Child }
+        if ($left -isnot [System.Management.Automation.Language.VariableExpressionAst]) { continue }
+        if ((Get-EpicStateIsolationVariableKey -UserPath $left.VariablePath.UserPath) -ne $Key) { continue }
+        Get-EpicStateIsolationStringConstant -Node $assignment.Right
+    }
+    $isHashtable = { param($candidate) $candidate -is [System.Management.Automation.Language.HashtableAst] }
+    foreach ($table in $SuiteAst.FindAll($isHashtable, $true)) {
+        foreach ($pair in $table.KeyValuePairs) {
+            $keyText = Get-EpicStateIsolationElementText -Element $pair.Item1
+            if ($null -eq $keyText -or $keyText.ToLowerInvariant() -ne $Key) { continue }
+            Get-EpicStateIsolationStringConstant -Node $pair.Item2
+        }
+    }
+}
+
+function Get-EpicStateIsolationHelperSeam {
+    <#
+        Pure: the seam names that Register-EpicStateBaselineMock statements contribute through their
+        -Seam argument, among the direct statements placed after the hook dot-source. A variable
+        argument resolves by the binding rule: an assignment or a hashtable entry of the same key
+        name anywhere in the suite, scope qualifier ignored, names compared case-insensitively.
+    #>
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)] [AllowEmptyCollection()] [object[]] $Commands,
+        [AllowNull()] [System.Management.Automation.Language.CommandAst] $DotSource,
+        [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst
+    )
+    if ($null -eq $DotSource) { return }
+    foreach ($command in $Commands) {
+        if ($command.GetCommandName() -ne 'Register-EpicStateBaselineMock') { continue }
+        if ($command.Extent.StartOffset -le $DotSource.Extent.StartOffset) { continue }
+        $elements = $command.CommandElements
+        for ($index = 1; $index -lt $elements.Count; $index++) {
+            $element = $elements[$index]
+            if ($element -isnot [System.Management.Automation.Language.CommandParameterAst] -or $element.ParameterName -ne 'Seam') { continue }
+            $argument = if ($null -ne $element.Argument) { $element.Argument } elseif (($index + 1) -lt $elements.Count) { $elements[$index + 1] } else { $null }
+            if ($null -eq $argument) { continue }
+            if ($argument -is [System.Management.Automation.Language.VariableExpressionAst]) {
+                Get-EpicStateIsolationBoundConstant -SuiteAst $SuiteAst -Key (Get-EpicStateIsolationVariableKey -UserPath $argument.VariablePath.UserPath)
+            } else {
+                Get-EpicStateIsolationStringConstant -Node $argument
+            }
+        }
+    }
+}
+
+function Get-EpicStateIsolationDefaultRequirement {
+    # Pure: the two pairs of the original guard, used when a caller supplies no requirement.
+    [OutputType([hashtable])]
+    param()
+    return @(
+        @{ Seam = 'Get-EpicScopeCheckpointText'; ModuleName = 'EpicScopeResolution'; ModuleFile = 'EpicScopeResolution.psm1' }
+        @{ Seam = 'Get-WorktreeRunCheckpointText'; ModuleName = 'WorktreeRunResolution'; ModuleFile = 'WorktreeRunResolution.psm1' }
+    )
 }
 
 function Get-EpicStateIsolationOutermostBlock {
@@ -323,7 +413,10 @@ function Get-EpicStateIsolationFinding {
         EpicScopeResolution pair and the WorktreeRunResolution pair (issue #690).
     #>
     [OutputType([string])]
-    param([Parameter(Mandatory)] [System.Management.Automation.Language.ScriptBlockAst] $Ast)
+    param(
+        [Parameter(Mandatory)] [System.Management.Automation.Language.ScriptBlockAst] $Ast,
+        [hashtable[]] $Requirement = (Get-EpicStateIsolationDefaultRequirement)
+    )
 
     $blocks = @(Get-EpicStateIsolationOutermostBlock -Ast $Ast)
     if ($blocks.Count -eq 0) {
@@ -336,8 +429,11 @@ function Get-EpicStateIsolationFinding {
         $dotSources = @($commands | Where-Object { $_.InvocationOperator -eq [System.Management.Automation.Language.TokenKind]::Dot })
         $dotSource = Get-EpicStateIsolationHookDotSource -DotSource $dotSources -SuiteAst $Ast
 
-        Get-EpicStateIsolationPairFinding -Commands $commands -DotSource $dotSource -MockCommand 'Get-EpicScopeCheckpointText' -ModuleName 'EpicScopeResolution' -ModuleFile 'EpicScopeResolution.psm1'
-        Get-EpicStateIsolationPairFinding -Commands $commands -DotSource $dotSource -MockCommand 'Get-WorktreeRunCheckpointText' -ModuleName 'WorktreeRunResolution' -ModuleFile 'WorktreeRunResolution.psm1'
+        $helperSeam = @(Get-EpicStateIsolationHelperSeam -Commands $commands -DotSource $dotSource -SuiteAst $Ast)
+        foreach ($item in $Requirement) {
+            if ($helperSeam -contains $item.Seam) { continue }
+            Get-EpicStateIsolationPairFinding -Commands $commands -DotSource $dotSource -MockCommand $item.Seam -ModuleName $item.ModuleName -ModuleFile $item.ModuleFile
+        }
     }
 }
 
