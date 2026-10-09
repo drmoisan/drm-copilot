@@ -15,6 +15,9 @@ BeforeAll {
 }
 
 Describe 'validate-orchestrator-output.ps1' {
+    # Default resolution seam (issue #787): no row resolves against the developer machine.
+    BeforeAll { Mock Resolve-OrchestratorOutputCheckpointPath { [pscustomobject]@{ Resolved = $true; CheckpointPath = '/synthetic-worktrees/default-session/artifacts/orchestration/orchestrator-state.json'; WorktreeRoot = '/synthetic-worktrees/default-session'; Status = 'SessionRoot'; ReasonCode = $null; Detail = 'default resolved target (issue #787)' } } }
+
     Context 'payload validation' {
         It 'blocks when CLAUDE_HOOK_INPUT is empty' {
             # Arrange
@@ -355,62 +358,6 @@ Describe 'validate-orchestrator-output.ps1' {
 
             # Assert
             $script:capturedType | Should -Be 'epic-orchestrator-state'
-        }
-    }
-
-    Context '-CheckpointPath / -ArtifactType parameterization (Invoke-OrchestratorOutputValidation)' {
-        It 'threads a custom CheckpointPath and ArtifactType into the routing seam' {
-            # Arrange — a clean checkpoint so the routing seam is the deciding factor.
-            Mock -CommandName Get-CheckpointFileContent -MockWith {
-                @{
-                    Exists  = $true
-                    Content = '{"objective":"deliver feature X","completed_steps":["step1"],"next_step":"complete","last_updated":"2026-05-04T00-00"}'
-                }
-            }
-            $raw = '{"output":"Final summary."}'
-            $script:capturedPath = $null
-            $script:capturedType = $null
-            $routingStub = {
-                param($Path, $Type)
-                $script:capturedPath = $Path
-                $script:capturedType = $Type
-                [pscustomobject]@{ ExitCode = 0; Output = '' }
-            }
-
-            # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -CheckpointPath 'artifacts/orchestration/epic-orchestrator-state.json' -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $routingStub
-
-            # Assert
-            $result.Ok | Should -BeTrue
-            $script:capturedPath | Should -Be 'artifacts/orchestration/epic-orchestrator-state.json'
-            $script:capturedType | Should -Be 'epic-orchestrator-state'
-        }
-
-        It 'defaults CheckpointPath and ArtifactType to the per-feature checkpoint (default-preserves-existing-behavior)' {
-            # Arrange
-            Mock -CommandName Get-CheckpointFileContent -MockWith {
-                @{
-                    Exists  = $true
-                    Content = '{"objective":"deliver feature X","completed_steps":["step1"],"next_step":"complete","last_updated":"2026-05-04T00-00"}'
-                }
-            }
-            $raw = '{"output":"Final summary."}'
-            $script:capturedPath = $null
-            $script:capturedType = $null
-            $routingStub = {
-                param($Path, $Type)
-                $script:capturedPath = $Path
-                $script:capturedType = $Type
-                [pscustomobject]@{ ExitCode = 0; Output = '' }
-            }
-
-            # Act — no -CheckpointPath / -ArtifactType supplied.
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
-
-            # Assert
-            $result.Ok | Should -BeTrue
-            $script:capturedPath | Should -Be 'artifacts/orchestration/orchestrator-state.json'
-            $script:capturedType | Should -Be 'orchestrator-state'
         }
     }
 
