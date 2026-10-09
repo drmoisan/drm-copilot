@@ -7,7 +7,7 @@
 - **Status:** Draft for preflight (revision 2, after preflight round 2)
 - **Version:** 1.2
 - **Work Mode:** full-bug (`spec.md` is the sole acceptance-criteria source; `user-story.md` is absent by design)
-- **Branch:** `bug/pr-author-and-merge-gates-read-session-root-files-850`
+- **Branch:** `bug/pr-author-and-merge-gates-read-session-root-files-exec-850` (execution; prepared on `bug/pr-author-and-merge-gates-read-session-root-files-850`)
 - **Integration branch:** `epic/enforcement-hook-precision-integration`
 - **Inputs:** `issue.md`, `spec.md` (47 criteria), `research/research.2026-10-08T14-00.md`, `docs/features/epics/enforcement-hook-precision/epic.md`
 
@@ -86,7 +86,7 @@ Out of scope (spec non-goals): `.codex/hooks/enforce-epic-merge-gate.ps1`, `.cod
 ### Terms used in every task
 
 - FEATURE means `docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850`.
-- BRANCH means `bug/pr-author-and-merge-gates-read-session-root-files-850`; INTEG means `origin/epic/enforcement-hook-precision-integration`.
+- BRANCH means `bug/pr-author-and-merge-gates-read-session-root-files-exec-850` (orchestrator decision D-EXEC-1, 2026-10-08: the execution branch was created from INTEG tip `497cb504` because the prepared branch `bug/pr-author-and-merge-gates-read-session-root-files-850` is merged into INTEG and checked out in a locked preparation worktree); INTEG means `origin/epic/enforcement-hook-precision-integration`.
 - PLAN means `FEATURE/plan.2026-10-08T13-54.md` (this file).
 - CB means `extensions/drm-copilot/resources/claude-customizations`; CORE means `CB/pack-manifests/core.json`.
 - PRA means `.claude/hooks/enforce-pr-author-skill.ps1`; PRAH means `.claude/hooks/enforce-pr-author-skill-helpers.ps1`; PRAR means `.claude/hooks/enforce-pr-author-skill.artifact-root.ps1` (new); PRAE means `.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1` (not edited).
@@ -98,7 +98,7 @@ Out of scope (spec non-goals): `.codex/hooks/enforce-epic-merge-gate.ps1`, `.cod
 - WLOG means `FEATURE/evidence/qa-gates/gate-wiring-order.md` (Appendix J).
 - TS means the task's execution time in `yyyy-MM-ddTHH-mm` form.
 - SCRATCH means the executor's session scratchpad directory, outside the repository and never committed. Artifacts record it as the literal token SCRATCH, never as a host path.
-- PRE_MERGE_HEAD is recorded by P0-T8; BASE_SHA is recorded by P0-T11 (the merge-base of HEAD and INTEG after the integration merge; a fixed commit that later INTEG movement does not change).
+- PRE_MERGE_HEAD is recorded by P0-T8; under orchestrator decision D-EXEC-2 (2026-10-08) P0-T8 records the observed CMD-GIT-HEAD value as `EXEC_START_HEAD` and sets PRE_MERGE_HEAD to the prepared-branch tip `c79642f73e360122443eaf665f363b065f0efb2d` (the tree this plan and its preflight clearance were derived against), because the execution branch already starts at an INTEG tip that contains C1a; P0-T9 then compares that pre-C1a tree with INTEG as designed, and P0-T10 takes its authorized skip branch. BASE_SHA is recorded by P0-T11 (the merge-base of HEAD and INTEG after the integration merge; a fixed commit that later INTEG movement does not change).
 - Every command-step artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. An artifact whose expected exit code is not 0 also carries `ExpectedExitCode:`. The expectation field is per file, so a command step whose expected exit code is not 0 is recorded in its own artifact and never shares one with a step expected to exit 0. PowerShell coverage artifacts record numeric `LinePercent=` values in `Output Summary:`.
 - KL-510 is the known local failure of issue #510 in node `test_bundled_claude_payload_contains_all_repo_runtime_contracts`: gitignored files under `.claude/state/` are reported missing from the bundle. A run satisfies KL-510 in exactly two cases. Case (a): the node prints PASSED; the artifact carries `KL-510: PASSED`. Case (b): the node fails, its assertion message is the literal "Repo file missing from bundle:" followed by a path whose first two components are `.claude` and `state`, and no output line contains "Bundle content differs from repo for:"; the artifact carries `KL-510: STATE-ONLY`, quotes the assertion message, and carries `ExpectedExitCode: 1`. Any other outcome stops the task.
 
@@ -157,7 +157,7 @@ CMD-GIT-STATUS        git status --porcelain
 CMD-GIT-STATUS-PATH   git status --porcelain -- <pathspec>
 CMD-GIT-ADD           git add -- <exact paths listed in the task>
 CMD-GIT-COMMIT        git commit -m "<message given in the task>" --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session: https://claude.ai/code/session_01RsMhy8je7BeARkv8LPcpSa"
-CMD-GIT-PUSH          git push origin bug/pr-author-and-merge-gates-read-session-root-files-850
+CMD-GIT-PUSH          git push origin bug/pr-author-and-merge-gates-read-session-root-files-exec-850
 CMD-CP                cp <source> <destination>
 CMD-GREP-COUNT        grep -c -F -e '<literal>' <files>
 
