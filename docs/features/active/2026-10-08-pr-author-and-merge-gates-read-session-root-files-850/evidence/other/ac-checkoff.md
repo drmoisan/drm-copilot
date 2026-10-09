@@ -34,3 +34,10 @@ Output Summary:
 - AC-19 to AC-24 (lines 231-236) and AC-26 to AC-29 (lines 241-244): checked. Evidence: P5-T12 `evidence/regression-testing/merge-item-pass-after.2026-10-09T00-22.md` (T-MRG-IR 19/19 pass, after the WIR corrective re-Write recorded in WLOG entry 8); fail-before P5-T2 `evidence/regression-testing/merge-item-fail-before.2026-10-09T00-15.md`; P5-T13 `evidence/regression-testing/merge-worktree-resolution-p5.2026-10-09T00-22.md` (M5 and M6, 10/10 pass).
 - AC-25 (line 237): checked. Evidence: P5-T14 `evidence/qa-gates/pester-set-mrg-p5.2026-10-09T00-23.md` (SET-MRG 160/160; no rule CR update).
 - A14 output: `CHECKBOX checked=24 unchecked=23`; lines 231-237 and 241-244 `state=checked`.
+
+## P6-T24 (2026-10-09T00-40)
+
+- AC-01 to AC-13 (lines 210-222): checked. Evidence: P6-T19 `evidence/regression-testing/pr-author-artifact-root-pass-after.2026-10-09T00-38.md` (T-PRA-IAR 15/15 pass); fail-before P6-T3 `evidence/regression-testing/pr-author-artifact-root-fail-before.2026-10-09T00-28.md` (the eleven named rows fail).
+- AC-14 (line 223): checked. Evidence: P6-T21 `evidence/qa-gates/pester-set-pra-p6.2026-10-09T00-38.md` (SET-PRA 262/262, including OrchestratorState.Tests.ps1 and EE-1; no rule CR update).
+- AC-47 (line 277): checked. Evidence: P6-T20 `evidence/qa-gates/epic-state-isolation-p6.2026-10-09T00-38.md` (isolation guard 34/34 with T-PRA-IAR in its list).
+- A14 output: `CHECKBOX checked=39 unchecked=8`; lines 210-223 and 277 `state=checked`.

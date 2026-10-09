@@ -48,8 +48,9 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
                 [pscustomobject]@{ HasErrors = $false; ErrorText = '' }
             }
             Mock -CommandName Test-PrAuthorReceiptVerification -MockWith { $null }
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
 
-            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --head feature/item-701 --body-file artifacts/pr_body_701.md' -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --head feature/item-701 --body-file artifacts/pr_body_701.md'
 
             $reason | Should -BeNullOrEmpty
             $script:capturedPath | Should -BeLike ("{0}*" -f $script:ItemRoot)
@@ -65,8 +66,9 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
                 [pscustomobject]@{ HasErrors = $false; ErrorText = '' }
             }
             Mock -CommandName Test-PrAuthorReceiptVerification -MockWith { $null }
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
 
-            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --head feature/self --body-file artifacts/pr_body_1.md' -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --head feature/self --body-file artifacts/pr_body_1.md'
 
             $reason | Should -BeNullOrEmpty
             $script:capturedPath | Should -BeExactly "$($script:SessionRootPath)/$($script:CheckpointRelative)"
@@ -80,7 +82,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
             }
             Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { throw 'the gate must not consult any checkpoint for an underivable target' }
 
-            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --title x --body-file artifacts/pr_body_1.md' -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --title x --body-file artifacts/pr_body_1.md'
 
             $reason | Should -BeLike ("{0}*" -f (Get-WorktreeResolutionNoTargetReasonCode))
             $reason | Should -BeLike '*--head*'
@@ -93,7 +95,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
             }
             Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { throw 'the gate must not consult any checkpoint for an ambiguous target' }
 
-            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --head feature/shared --body-file artifacts/pr_body_1.md' -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --head feature/shared --body-file artifacts/pr_body_1.md'
 
             $reason | Should -BeLike ("{0}*" -f (Get-WorktreeResolutionAmbiguityReasonCode))
             Should -Invoke -CommandName Invoke-OrchestratorStatePreflight -Times 0 -Exactly
@@ -107,7 +109,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
             }
             Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { [pscustomobject]@{ HasErrors = $false; ErrorText = '' } }
 
-            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --body-file artifacts/pr_body_838.md' -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --body-file artifacts/pr_body_838.md'
 
             $reason | Should -Not -BeNullOrEmpty
             $reason | Should -BeLike ("{0}*" -f (Get-WorktreeResolutionNoTargetReasonCode))

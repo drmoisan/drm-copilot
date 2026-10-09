@@ -181,7 +181,7 @@ Describe 'Issue #824 regression: Claude pr-author skill gate' {
                 ')"'
             ) -join "`n"
 
-            $reason = Get-PrAuthorBypassReason -CommandText $command -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText $command
 
             $reason | Should -BeNullOrEmpty -Because 'the heredoc body is data passed to git commit, not a gh pr create invocation'
         }
@@ -189,7 +189,7 @@ Describe 'Issue #824 regression: Claude pr-author skill gate' {
         It 'REG-10 allows R-733-GREP G1, a Select-String search for a phrase' -Tag 'Issue824', 'R-733-GREP' {
             $command = 'pwsh -NoProfile -Command ''Select-String -Path x.md -Pattern "high priority" | ForEach-Object { "create" }'''
 
-            $reason = Get-PrAuthorBypassReason -CommandText $command -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText $command
 
             $reason | Should -BeNullOrEmpty -Because 'no segment of G1 invokes gh'
         }
@@ -197,7 +197,7 @@ Describe 'Issue #824 regression: Claude pr-author skill gate' {
         It 'REG-11 allows R-733-GREP G2, a grep inside a command substitution' -Tag 'Issue824', 'R-733-GREP' {
             $command = 'echo "$(sed -n ''1,20p'' notes.md | grep -n ''through the process that created it'')"'
 
-            $reason = Get-PrAuthorBypassReason -CommandText $command -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText $command
 
             $reason | Should -BeNullOrEmpty -Because 'no segment of G2 invokes gh'
         }
@@ -205,7 +205,7 @@ Describe 'Issue #824 regression: Claude pr-author skill gate' {
         It 'REG-12 allows R-733-GREP G3, a grep whose pattern is the literal gh pr create' -Tag 'Issue824', 'R-733-GREP' {
             $command = 'echo "$(grep -n ''gh pr create'' notes.md)"'
 
-            $reason = Get-PrAuthorBypassReason -CommandText $command -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText $command
 
             $reason | Should -BeNullOrEmpty -Because 'gh pr create is a quoted grep pattern inside a sink, not an invocation'
         }
@@ -214,35 +214,34 @@ Describe 'Issue #824 regression: Claude pr-author skill gate' {
     Context 'body-file spellings reach receipt verification (R-733-715)' {
         BeforeEach {
             Mock Get-PrAuthorReceiptContent { $null }
-            Mock Get-PrAuthorBodyFileRoot { '/session' }
         }
 
         It 'REG-13 accepts S1, a double-quoted body-file path' -Tag 'Issue824', 'R-733-715' {
-            $reason = Test-PrAuthorReceiptVerification -CommandText 'gh pr create --head bug/x-5 --body-file "artifacts/pr_body_5.md"' -CheckpointPath '/synthetic/checkpoint.json'
+            $reason = Test-PrAuthorReceiptVerification -CommandText 'gh pr create --head bug/x-5 --body-file "artifacts/pr_body_5.md"' -CheckpointPath '/synthetic/checkpoint.json' -ArtifactRoot '/session' -RelativeBodyAllowed $true
 
             $reason | Should -BeLike 'PR_AUTHOR_RECEIPT_MISSING:*' -Because 'the quoted canonical path must pass check 1 and stop at the absent receipt'
         }
 
         It 'REG-14 accepts S2, the --body-file=<path> form' -Tag 'Issue824', 'R-733-715' {
-            $reason = Test-PrAuthorReceiptVerification -CommandText 'gh pr create --head bug/x-5 --body-file=artifacts/pr_body_5.md' -CheckpointPath '/synthetic/checkpoint.json'
+            $reason = Test-PrAuthorReceiptVerification -CommandText 'gh pr create --head bug/x-5 --body-file=artifacts/pr_body_5.md' -CheckpointPath '/synthetic/checkpoint.json' -ArtifactRoot '/session' -RelativeBodyAllowed $true
 
             $reason | Should -BeLike 'PR_AUTHOR_RECEIPT_MISSING:*' -Because 'the equals form carries the same canonical path'
         }
 
         It 'REG-15 accepts S3, an absolute path under the session root' -Tag 'Issue824', 'R-733-715' {
-            $reason = Test-PrAuthorReceiptVerification -CommandText 'gh pr create --head bug/x-5 --body-file /session/artifacts/pr_body_5.md' -CheckpointPath '/synthetic/checkpoint.json'
+            $reason = Test-PrAuthorReceiptVerification -CommandText 'gh pr create --head bug/x-5 --body-file /session/artifacts/pr_body_5.md' -CheckpointPath '/synthetic/checkpoint.json' -ArtifactRoot '/session' -RelativeBodyAllowed $true
 
-            $reason | Should -BeLike 'PR_AUTHOR_RECEIPT_MISSING:*' -Because 'the absolute path normalizes to artifacts/pr_body_5.md relative to the session root'
+            $reason | Should -BeLike 'PR_AUTHOR_RECEIPT_MISSING:*' -Because 'the absolute path equals the canonical path beneath the artifact root'
         }
 
         It 'REG-16 accepts S4, a ./-prefixed relative path' -Tag 'Issue824', 'R-733-715' {
-            $reason = Test-PrAuthorReceiptVerification -CommandText 'gh pr create --head bug/x-5 --body-file ./artifacts/pr_body_5.md' -CheckpointPath '/synthetic/checkpoint.json'
+            $reason = Test-PrAuthorReceiptVerification -CommandText 'gh pr create --head bug/x-5 --body-file ./artifacts/pr_body_5.md' -CheckpointPath '/synthetic/checkpoint.json' -ArtifactRoot '/session' -RelativeBodyAllowed $true
 
             $reason | Should -BeLike 'PR_AUTHOR_RECEIPT_MISSING:*' -Because 'one leading ./ is stripped before the canonical match'
         }
 
         It 'REG-17 accepts S5, a backslash-separated path' -Tag 'Issue824', 'R-733-715' {
-            $reason = Test-PrAuthorReceiptVerification -CommandText 'gh pr create --head bug/x-5 --body-file artifacts\pr_body_5.md' -CheckpointPath '/synthetic/checkpoint.json'
+            $reason = Test-PrAuthorReceiptVerification -CommandText 'gh pr create --head bug/x-5 --body-file artifacts\pr_body_5.md' -CheckpointPath '/synthetic/checkpoint.json' -ArtifactRoot '/session' -RelativeBodyAllowed $true
 
             $reason | Should -BeLike 'PR_AUTHOR_RECEIPT_MISSING:*' -Because 'backslash separators normalize to forward slashes before the canonical match'
         }
