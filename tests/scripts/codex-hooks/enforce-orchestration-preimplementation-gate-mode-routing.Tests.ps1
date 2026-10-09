@@ -32,6 +32,9 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode routing (issue
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:UnderTest = Join-Path $script:RepoRoot '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-EpicScopeCheckpointText', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
 
         # The delegation prompts. Each carries its mode marker, the synthetic target
         # folder token the folder resolver reads, and the bare-hash issue number.
@@ -85,6 +88,8 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode routing (issue
             '","parallel_manifest_path":"' + $ParallelManifestPath + '","items":' + $items + '}'
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Codex' -Seam 'Get-EpicScopeCheckpointText' }
 
     Context 'the epic leg of the decision router' {
         It 'allows an epic-mode delegation against an injected ready epic checkpoint' {

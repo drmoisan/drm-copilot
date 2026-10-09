@@ -7,9 +7,22 @@
 BeforeAll {
     $hookPath = Join-Path $PSScriptRoot '../../../.claude/hooks/validate-feature-review-coverage.ps1'
     . $hookPath
+    $script:RealGetChangedLanguageSet = ${function:Get-ChangedLanguageSet}
+    $script:RealGetJacocoRepoCoverage = ${function:Get-JacocoRepoCoverage}
+    $script:RealGetLcovRepoCoverage = ${function:Get-LcovRepoCoverage}
+    Mock Get-ArtifactFileContent { $null }
+    if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Mock Get-ChangedLanguageSet { $null } }
+    if (Get-Command Get-JacocoRepoCoverage -ErrorAction SilentlyContinue) { Mock Get-JacocoRepoCoverage { $null } }
+    if (Get-Command Get-LcovRepoCoverage -ErrorAction SilentlyContinue) { Mock Get-LcovRepoCoverage { $null } }
 }
 
 Describe 'validate-feature-review-coverage.ps1' {
+    BeforeAll {
+        Mock Get-ChangedLanguageSet -MockWith $script:RealGetChangedLanguageSet
+        Mock Get-JacocoRepoCoverage -MockWith $script:RealGetJacocoRepoCoverage
+        Mock Get-LcovRepoCoverage -MockWith $script:RealGetLcovRepoCoverage
+    }
+
     Context 'required artifact tokens' {
         It 'blocks when required review artifact tokens are missing' {
             $raw = @{ output = 'Review complete.' } | ConvertTo-Json -Compress

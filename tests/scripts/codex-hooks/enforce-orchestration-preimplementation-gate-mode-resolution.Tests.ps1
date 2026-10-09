@@ -37,6 +37,9 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode resolution (is
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/enforce-orchestration-preimplementation-gate.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-EpicScopeCheckpointText', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
 
         # Dot-sourced explicitly as well as through the gate hook above, so a future
         # change to the hook's dot-source line cannot silently leave these cases
@@ -89,6 +92,8 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode resolution (is
             '","parallel_manifest_path":"' + $ParallelManifestPath + '","items":' + $items + '}'
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Codex' -Seam 'Get-EpicScopeCheckpointText' }
 
     Context 'mode resolution parity' {
         It 'resolves the <Expected> mode for its marker prompt' -ForEach @(

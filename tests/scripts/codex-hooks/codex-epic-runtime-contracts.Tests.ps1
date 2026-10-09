@@ -3,6 +3,17 @@
 
 Describe 'Codex epic runtime configuration and distribution contracts' {
     BeforeAll {
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        if (Get-Command Get-ChildOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChildOrchestratorCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-EpicOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicOrchestratorCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-EpicPlanningRegisteredMcpTool -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicPlanningRegisteredMcpTool' -Surface 'Codex' }
+        if (Get-Command Get-EpicWaveBarrierCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWaveBarrierCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateParallelCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelOrchestratorCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Test-CodexEpicChildRoutingLaunchAuthority -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Test-CodexEpicChildRoutingLaunchAuthority' -Surface 'Codex' }
+        if (Get-Command Test-EpicPlanningBashAllowed -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Test-EpicPlanningBashAllowed' -Surface 'Codex' }
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:BundleRoot = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations'
         $script:ConfigPath = Join-Path $script:RepoRoot '.codex/config.toml'
@@ -33,6 +44,8 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
             '.codex/scripts/launch-epic-child-wave.ps1'
         )
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     It 'uses the current nested command-handler hook schema' {
         $lines = Get-Content -LiteralPath $script:ConfigPath

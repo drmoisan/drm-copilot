@@ -26,6 +26,14 @@ BeforeAll {
     # isolated from any gitignored local checkpoint.
     $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude").Path
     . (Join-Path $script:HookRoot 'hooks/enforce-pr-author-skill.ps1')
+    $script:RealGetPrAuthorReceiptContent = ${function:Get-PrAuthorReceiptContent}
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/orchestrator-state/OrchestratorState.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    Mock Get-OrchestratorStateCheckpoint -ModuleName OrchestratorState { $null }
+    Mock Get-PrAuthorReceiptContent { $null }
+    Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/EpicScopeResolution.psm1')
     Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeRunResolution.psm1')
@@ -97,8 +105,12 @@ BeforeAll {
 }
 
 Describe 'enforce-pr-author-skill.ps1 item artifact root' {
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     It 'allows an OtherWorktree target whose artifacts exist only in the item worktree' {
         # Arrange: the process runs in a worktree without artifacts; the resolved one holds them.
+        Mock Get-PrAuthorReceiptContent -MockWith $script:RealGetPrAuthorReceiptContent
         Set-ResolvedSeam -Status 'OtherWorktree' -WorktreeRoot $script:OwnReady
         $payload = New-BashPayload -Command "gh pr create --head f5-fixture-own --title ""B"" --body-file $($script:OwnReady)/artifacts/pr_body_1.md"
 
