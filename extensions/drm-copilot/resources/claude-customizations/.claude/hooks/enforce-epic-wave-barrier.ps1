@@ -26,10 +26,14 @@
          is merged or worktree_removed. A missing/unreadable checkpoint, an unresolved
          target feature_folder, or a missing dependency record also denies (fail-closed).
 
-    This is the per-call deterrent (Layer 1) of the two-layer wave-barrier design; the
-    retrospective backstop (Layer 2) is the wave-barrier ordering invariant inside
-    validate_epic_orchestrator_state_text, enforced separately at epic-orchestrator
-    SubagentStop time.
+    This is the per-call deterrent (Layer 1) of the two-layer wave-barrier design. The
+    retrospective backstop (Layer 2) is the wave-barrier ordering invariant of
+    validate_epic_orchestrator_state_text, run at epic-orchestrator SubagentStop time by
+    validate-orchestrator-output.ps1 through its PowerShell port
+    OrchestratorStateEpicWaveBarrier.psm1, with parity pinned by tests/fixtures/epic_wave_barrier/.
+    That hook's runtime effect is likely to depend on the SubagentStop transport defect recorded in
+    docs/features/potential/2026-08-21-subagentstop-validators-read-undocumented-envelope.md.
+    The two layers share no code.
 
 .NOTES
     Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 (issue #690) and

@@ -151,14 +151,20 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # `remediation_loop.completed_attempts` and to halt after three completed
 # attempts. Only the skill digest moved; the agent digest is unchanged and the
 # pin stays live for both entries.
+#
+# RE-BASELINED by issue #787 (bundling #840). That change corrected the Layer 2
+# text in the epic skill's `## Wave Barrier (Two-Layer Design)` bullet and the
+# agent's `## Wave Scheduling` paragraph to describe the PowerShell port invoked
+# at epic-orchestrator SubagentStop. Both digests moved, and the pin stays live
+# for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "0d01e5484d63e418a6bc31f219aecaef7381cc439a4a796664006879f6a027ba",
+        "d5e5e3b015c810fd12911e0ecffee38e12122bcdf667683778c7bd6cbdf6f538",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "03f95bfb9d046bc3fb6c94c0f2844369a56bee9307ca5a8c96f7ab8341a13719",
+        "66c7baa9b6fe4340a479d7de62d73fbdf57dbf6c96aa6c747456ef9d425e1326",
     ),
 )
 

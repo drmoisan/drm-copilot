@@ -241,9 +241,15 @@ cross-call/conversation-state visibility.
   prompt text, reads `artifacts/orchestration/epic-orchestrator-state.json`, looks up that
   feature's `depends_on`, and denies with reason `EPIC_WAVE_BARRIER_BLOCKED` unless every
   dependency's `merge_status` is `merged` or `worktree_removed`.
-- **Layer 2 — retrospective backstop:** the wave-barrier ordering invariant inside
-  `validate_epic_orchestrator_state_text`, enforced at `epic-orchestrator` `SubagentStop` time via
-  the parameterized `validate-orchestrator-output.ps1` hook. It checks only a dependent feature
+- **Layer 2 — retrospective backstop:** the wave-barrier ordering invariant of
+  `validate_epic_orchestrator_state_text`, enforced at `epic-orchestrator` `SubagentStop` time by a
+  PowerShell port, `Get-OrchestratorStateEpicWaveBarrierError` in
+  `.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1`, which the parameterized
+  `validate-orchestrator-output.ps1` hook invokes for `epic-orchestrator-state` after resolving the
+  epic checkpoint through `WorktreeRunResolution.psm1`. The hook starts no Python process. Parity
+  with `validate_epic_orchestrator_state_text` is pinned by the shared fixtures under
+  `tests/fixtures/epic_wave_barrier/`, and the Python validator remains the authority used through
+  the `mcp__drm-copilot__validate_orchestration_artifacts` call. It checks only a dependent feature
   that is treated as started: one with a string `worktree_created_at`, or with a `merge_status`
   other than `not_started` (a missing or non-string `merge_status` counts as started). It appends
   exactly one error per violated dependency edge. When the dependency's `merge_status` is not
@@ -252,6 +258,9 @@ cross-call/conversation-state visibility.
   Otherwise, when the dependency's `merge_confirmed_at` is later than the dependent's
   `worktree_created_at`, the error is
   `EPIC_WAVE_BARRIER_VIOLATION: <f> worktree_created_at precedes dependency <d> merge_confirmed_at`.
+  A violation blocks with an instruction to report it to the operator and halt. The hook's runtime
+  effect is likely to depend on the `SubagentStop` transport and exit-code defect recorded in
+  `docs/features/potential/2026-08-21-subagentstop-validators-read-undocumented-envelope.md`.
 
 Both layers are required; neither alone closes the gap. `epic-orchestrator` does not launch wave
 N+1 until every wave-N feature's dependency edges are durably confirmed merged, verified against
