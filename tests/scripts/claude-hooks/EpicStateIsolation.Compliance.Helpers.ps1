@@ -74,24 +74,24 @@ function Test-EpicStateResolverPinnedForm {
 }
 
 function Get-EpicStateSeamRequirement {
-    # Pure: one requirement per distinct census seam. A seam defined in a lib .psm1 is a module seam
-    # (ModuleName and ModuleFile from that file); any other seam is script-scope (ModuleName $null).
+    # Pure: one requirement per distinct census seam and scope. A seam defined in a lib .psm1 is a
+    # module seam (ModuleName and ModuleFile from that file); any other seam is script-scope
+    # (ModuleName $null). A name defined both ways in one closure yields both requirements.
     # DefaultParameterSeam entries are report-only and produce no requirement.
     [OutputType([hashtable])]
     param([Parameter(Mandatory)] [AllowEmptyCollection()] [object[]] $Census)
-    foreach ($group in ($Census | Group-Object -Property Name)) {
-        $entries = @($group.Group)
-        $required = @($entries | Where-Object { $_.Class -ne 'DefaultParameterSeam' })
-        if ($required.Count -eq 0) { continue }
-        $chosen = @($required | Where-Object { $_.Class -eq 'ModuleTextSeam' }) | Select-Object -First 1
-        if ($null -eq $chosen) { $chosen = $required[0] }
+    $required = @($Census | Where-Object { $_.Class -ne 'DefaultParameterSeam' })
+    $modulePattern = '(^|/)lib/.+\.psm1$'
+    $groups = $required | Group-Object -Property { if ($_.DefiningFile -match $modulePattern) { $_.Name + '|' + $_.DefiningFile } else { $_.Name + '|script' } }
+    foreach ($group in $groups) {
+        $chosen = $group.Group[0]
         $moduleName = $null
         $moduleFile = $null
-        if ($chosen.Class -eq 'ModuleTextSeam') {
+        if ($chosen.DefiningFile -match $modulePattern) {
             $moduleFile = $chosen.DefiningFile.Split('/')[-1]
             $moduleName = [System.IO.Path]::GetFileNameWithoutExtension($moduleFile)
         }
-        @{ Seam = $group.Name; ModuleName = $moduleName; ModuleFile = $moduleFile; Class = $chosen.Class }
+        @{ Seam = $chosen.Name; ModuleName = $moduleName; ModuleFile = $moduleFile; Class = $chosen.Class }
     }
 }
 
@@ -106,7 +106,7 @@ function Get-EpicStateSuiteState {
     $reader = $ReadSource
     $library = @()
     if ($null -eq $reader) {
-        $reader = New-EpicStateSourceReader -RepoRoot $RepoRoot
+        $reader = Get-EpicStateSourceReader -RepoRoot $RepoRoot
         $library = @(Get-EpicStateLibraryDirectory -RepoRoot $RepoRoot)
     }
     $text = & $reader $RelativePath
@@ -138,6 +138,58 @@ function Get-EpicStateSuiteCompliance {
     }
 }
 
+function Get-EpicStateProbeSeam {
+    # The named seams (PI-2) for which the suite complies by form F1 or the helper form, in the order
+    # the closure census reports them. A suite that complies only by form F2 or F3 returns nothing.
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)] [string] $RepoRoot,
+        [Parameter(Mandatory)] [string] $RelativePath,
+        [scriptblock] $ReadSource
+    )
+    $named = @('Get-EpicScopeCheckpointText', 'Get-WorktreeRunCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot')
+    $state = Get-EpicStateSuiteState -RepoRoot $RepoRoot -RelativePath $RelativePath -ReadSource $ReadSource
+    if ($null -ne $state.Error) { return }
+    $found = [System.Collections.Generic.List[string]]::new()
+    foreach ($item in $state.Requirement) {
+        if ($named -cnotcontains $item.Seam) { continue }
+        if (@(Get-EpicStateIsolationFinding -Ast $state.Ast -Requirement @($item)).Count -eq 0 -and -not $found.Contains($item.Seam)) { $found.Add($item.Seam) }
+    }
+    return [string[]]$found.ToArray()
+}
+
+function Test-EpicStateProbeCalledFromIt {
+    # Pure: true when the suite AST calls Invoke-EpicStateInterceptionProbe from inside an It script block.
+    [OutputType([bool])]
+    param([Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $Ast)
+    $isProbe = { param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -eq 'Invoke-EpicStateInterceptionProbe' }
+    foreach ($call in $Ast.FindAll($isProbe, $true)) {
+        $parent = $call.Parent
+        while ($null -ne $parent) {
+            if ($parent -is [System.Management.Automation.Language.CommandAst] -and $parent.GetCommandName() -eq 'It') { return $true }
+            $parent = $parent.Parent
+        }
+    }
+    return $false
+}
+
+function Get-EpicStateProbeFinding {
+    # One finding when a suite that complies by form F1 or the helper form for a named seam (PI-2)
+    # never calls the interception probe from inside an It; nothing otherwise.
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)] [string] $RepoRoot,
+        [Parameter(Mandatory)] [string] $RelativePath,
+        [scriptblock] $ReadSource
+    )
+    $seam = @(Get-EpicStateProbeSeam -RepoRoot $RepoRoot -RelativePath $RelativePath -ReadSource $ReadSource)
+    if ($seam.Count -eq 0) { return }
+    $state = Get-EpicStateSuiteState -RepoRoot $RepoRoot -RelativePath $RelativePath -ReadSource $ReadSource
+    if (-not (Test-EpicStateProbeCalledFromIt -Ast $state.Ast)) {
+        "${RelativePath}: complies for $($seam -join ', ') but never calls Invoke-EpicStateInterceptionProbe from inside an It"
+    }
+}
+
 function Get-EpicStateProcessSpawningReport {
     # One REPORT line for a process-spawning suite and nothing otherwise; never a finding.
     [OutputType([string])]
@@ -147,7 +199,7 @@ function Get-EpicStateProcessSpawningReport {
         [scriptblock] $ReadSource
     )
     $reader = $ReadSource
-    if ($null -eq $reader) { $reader = New-EpicStateSourceReader -RepoRoot $RepoRoot }
+    if ($null -eq $reader) { $reader = Get-EpicStateSourceReader -RepoRoot $RepoRoot }
     $text = & $reader $RelativePath
     if ($null -eq $text) { return }
     $launched = @(Get-EpicStateProcessSpawningHook -SuiteText $text)

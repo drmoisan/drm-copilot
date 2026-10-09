@@ -9,7 +9,7 @@
     that closure, and detect process-spawning suites.
 
     Every function is pure over text and AST except the two readers at the file boundary,
-    Get-EpicStateDiscoveredSuite and New-EpicStateSourceReader, which read the committed tree
+    Get-EpicStateDiscoveredSuite and Get-EpicStateSourceReader, which read the committed tree
     from a supplied repository root. Callers inject a reader script block, so fixtures run over
     in-memory text. No function creates a file, runs a process, or reads gitignored state.
 
@@ -45,7 +45,7 @@ function Get-EpicStateDiscoveredSuite {
     return $sorted
 }
 
-function New-EpicStateSourceReader {
+function Get-EpicStateSourceReader {
     <#
         Reader: a script block that takes a repository-relative path and returns the file text,
         or $null when the file does not exist.
@@ -234,7 +234,7 @@ function Get-EpicStateSuiteCensusRow {
         [Parameter(Mandatory)] [string] $RepoRoot,
         [Parameter(Mandatory)] [string] $RelativePath
     )
-    $reader = New-EpicStateSourceReader -RepoRoot $RepoRoot
+    $reader = Get-EpicStateSourceReader -RepoRoot $RepoRoot
     $suiteText = & $reader $RelativePath
     if ($null -eq $suiteText) { $suiteText = '' }
     $closure = @(Get-EpicStateLoadedSourceClosure -SuiteText $suiteText -ReadSource $reader -LibraryDirectory @(Get-EpicStateLibraryDirectory -RepoRoot $RepoRoot))

@@ -28,6 +28,10 @@ BeforeDiscovery {
     $script:SuiteRow = @(foreach ($row in $script:SurfaceRow) {
             foreach ($suite in @(Get-EpicStateDiscoveredSuite -RepoRoot $discoveryRoot -Surface $row.Surface)) { @{ Path = $suite; Surface = $row.Surface } }
         })
+    # Probe rows exist only for suites that comply by form F1 or the helper form for a named seam (PI-2).
+    $script:ProbeRow = @(foreach ($row in $script:SuiteRow) {
+            if (@(Get-EpicStateProbeSeam -RepoRoot $discoveryRoot -RelativePath $row.Path).Count -gt 0) { @{ Path = $row.Path } }
+        })
 }
 
 BeforeAll {
@@ -36,7 +40,7 @@ BeforeAll {
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Compliance.Helpers.ps1')
     $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
 
-    function New-FixtureReader {
+    function Get-FixtureReader {
         # A reader over an in-memory file table (repository-relative path to text); no file is read.
         param([Parameter(Mandatory)] [hashtable] $File)
         $table = $File
@@ -52,7 +56,7 @@ BeforeAll {
         param([Parameter(Mandatory)] [string] $SuiteText, [hashtable] $Hook = @{})
         $files = @{ 'tests/scripts/fixture/Sample.Tests.ps1' = $SuiteText }
         foreach ($key in $Hook.Keys) { $files[$key] = $Hook[$key] }
-        $reader = New-FixtureReader -File $files
+        $reader = Get-FixtureReader -File $files
         return @(Get-EpicStateSuiteCompliance -RepoRoot '/synthetic-worktrees/fixture' -RelativePath 'tests/scripts/fixture/Sample.Tests.ps1' -ReadSource $reader)
     }
 
@@ -63,6 +67,12 @@ function Get-FixtureCheckpointContent {
     return (Get-Content -Raw -LiteralPath $Path)
 }
 '@
+    $script:ProbeHookText = @'
+function Get-EpicScopeCheckpointText {
+    param([string] $Path)
+    return (Get-Content -Raw -LiteralPath $Path)
+}
+'@ -replace "`r`n", "`n"
     $script:LoadHookSuite = @'
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../../.claude/hooks/a.ps1')
@@ -108,6 +118,36 @@ Describe 'discovery guard (both hook surfaces)' {
         $findings.Count | Should -Be 0 -Because ($findings -join '; ')
     }
 
+    It 'AC-6 <Path> calls the interception probe from inside an It' -ForEach $script:ProbeRow {
+        # Arrange and act: parse the suite and look for a probe call inside an It.
+        $findings = @(Get-EpicStateProbeFinding -RepoRoot $script:RepoRoot -RelativePath $Path)
+
+        # Assert
+        $findings.Count | Should -Be 0 -Because ($findings -join '; ')
+    }
+
+    It 'AC-6 suite lacking a probe call yields a finding' {
+        # Arrange and act: the suite complies for the epic-scope seam by a direct null Mock and calls no probe.
+        $suite = $script:LoadHookSuite.Replace("`n}`nDescribe", "`n    Mock Get-EpicScopeCheckpointText { `$null }`n}`nDescribe")
+        $reader = Get-FixtureReader -File @{ 'tests/scripts/fixture/Sample.Tests.ps1' = $suite; $script:HookFile = $script:ProbeHookText }
+        $findings = @(Get-EpicStateProbeFinding -RepoRoot '/synthetic-worktrees/fixture' -RelativePath 'tests/scripts/fixture/Sample.Tests.ps1' -ReadSource $reader)
+
+        # Assert
+        $findings.Count | Should -Be 1
+        $findings[0] | Should -BeLike '*never calls Invoke-EpicStateInterceptionProbe*'
+    }
+
+    It 'AC-6 suite with a probe call yields none' {
+        # Arrange and act: the same suite with a probe call inside an It.
+        $suite = $script:LoadHookSuite.Replace("`n}`nDescribe", "`n    Mock Get-EpicScopeCheckpointText { `$null }`n}`nDescribe") +
+        "Describe 'probe' { It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Codex' -Seam 'Get-EpicScopeCheckpointText' } }`n"
+        $reader = Get-FixtureReader -File @{ 'tests/scripts/fixture/Sample.Tests.ps1' = $suite; $script:HookFile = $script:ProbeHookText }
+        $findings = @(Get-EpicStateProbeFinding -RepoRoot '/synthetic-worktrees/fixture' -RelativePath 'tests/scripts/fixture/Sample.Tests.ps1' -ReadSource $reader)
+
+        # Assert
+        $findings.Count | Should -Be 0 -Because ($findings -join '; ')
+    }
+
     It 'AC-5 process-spawning report <Surface>' -ForEach $script:SurfaceRow {
         # Arrange and act: collect the report line of every process-spawning suite on the surface.
         $collect = {
@@ -144,7 +184,7 @@ Describe 'discovery guard (both hook surfaces)' {
         # Arrange: the suite names only a.ps1; a.ps1 loads b.psm1 through a variable assigned from a string literal.
         $hook = "`$modulePath = Join-Path `$PSScriptRoot '../lib/fixture/b.psm1'`nImport-Module `$modulePath`n"
         $module = "function Get-FixtureCheckpointText {`n    param([string] `$Path)`n    return [System.IO.File]::ReadAllText(`$Path)`n}`n"
-        $reader = New-FixtureReader -File @{ $script:HookFile = $hook; '.claude/lib/fixture/b.psm1' = $module }
+        $reader = Get-FixtureReader -File @{ $script:HookFile = $hook; '.claude/lib/fixture/b.psm1' = $module }
 
         # Act
         $closure = @(Get-EpicStateLoadedSourceClosure -SuiteText $script:LoadHookSuite -ReadSource $reader)
@@ -168,7 +208,7 @@ Describe 'discovery guard (both hook surfaces)' {
         # Arrange: the suite builds a process start description and names a hook script; the hook holds no seam.
         $suite = "BeforeAll {`n    `$startInfo = [System.Diagnostics.ProcessStartInfo]::new()`n    `$startInfo.ArgumentList.Add((Join-Path `$PSScriptRoot '../../../.claude/hooks/x.ps1'))`n}`n"
         $files = @{ 'tests/scripts/fixture/Sample.Tests.ps1' = $suite; '.claude/hooks/x.ps1' = "function Get-Thing { return 1 }`n" }
-        $reader = New-FixtureReader -File $files
+        $reader = Get-FixtureReader -File $files
 
         # Act
         $report = @(Get-EpicStateProcessSpawningReport -RepoRoot '/synthetic-worktrees/fixture' -RelativePath 'tests/scripts/fixture/Sample.Tests.ps1' -ReadSource $reader)
@@ -182,7 +222,7 @@ Describe 'discovery guard (both hook surfaces)' {
 
     It 'AC-2 missing suite yields a finding' {
         # Arrange and act: the reader holds no file.
-        $reader = New-FixtureReader -File @{}
+        $reader = Get-FixtureReader -File @{}
         $findings = @(Get-EpicStateSuiteCompliance -RepoRoot '/synthetic-worktrees/fixture' -RelativePath 'tests/scripts/fixture/Missing.Tests.ps1' -ReadSource $reader)
 
         # Assert
@@ -192,7 +232,7 @@ Describe 'discovery guard (both hook surfaces)' {
 
     It 'AC-2 unparseable suite yields a finding' {
         # Arrange and act: the suite text does not parse.
-        $reader = New-FixtureReader -File @{ 'tests/scripts/fixture/Broken.Tests.ps1' = 'Describe ( {' }
+        $reader = Get-FixtureReader -File @{ 'tests/scripts/fixture/Broken.Tests.ps1' = 'Describe ( {' }
         $findings = @(Get-EpicStateSuiteCompliance -RepoRoot '/synthetic-worktrees/fixture' -RelativePath 'tests/scripts/fixture/Broken.Tests.ps1' -ReadSource $reader)
 
         # Assert
