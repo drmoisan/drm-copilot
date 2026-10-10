@@ -16,6 +16,7 @@
  */
 
 import { type FileSystem } from "../file-system";
+import { compareCodePoint } from "../string-ordering";
 import { classifySourceArtifact } from "./classifier";
 import { discoverSourceArtifacts } from "./inventory";
 import { planTargetPaths } from "./mapping";
@@ -35,17 +36,6 @@ import {
   renderTargetContent,
 } from "./pipeline-render";
 import { buildPromptTranslationTraces } from "./pipeline-traces";
-
-/**
- * Compare two strings with stable ascending ordering.
- *
- * @param left Left operand.
- * @param right Right operand.
- * @returns Negative, zero, or positive ordering value.
- */
-function compareStrings(left: string, right: string): number {
-  return left < right ? -1 : left > right ? 1 : 0;
-}
 
 /**
  * Plan mappings for one converter run.
@@ -85,7 +75,7 @@ export function planMappings(
   }
 
   return [...mappingRecords].sort((left, right) =>
-    compareStrings(left.sourcePath, right.sourcePath),
+    compareCodePoint(left.sourcePath, right.sourcePath),
   );
 }
 
@@ -145,7 +135,7 @@ export function renderGeneratedOutput(
   // Render each target's content; AGENTS.md merges when several
   // standing-guidance records resolve to it.
   for (const targetPath of [...mappingRecordsByTarget.keys()].sort(
-    compareStrings,
+    compareCodePoint,
   )) {
     const recordsForTarget = mappingRecordsByTarget.get(targetPath) ?? [];
     if (recordsForTarget.length === 0) {
@@ -180,7 +170,7 @@ export function renderGeneratedOutput(
         .filter((emission) => emission.targetPath !== null)
         .map((emission) => emission.sourcePath),
     ),
-  ].sort(compareStrings);
+  ].sort(compareCodePoint);
   // Parse each source whose sections feed a planned emission so the section
   // renderer can resolve section bodies by id.
   for (const sourcePath of parsedSourcePaths) {
@@ -198,7 +188,7 @@ export function renderGeneratedOutput(
 
   // Render section emissions for any target not already produced above.
   for (const targetPath of [...sectionEmissionsByTarget.keys()].sort(
-    compareStrings,
+    compareCodePoint,
   )) {
     if (targetPath in generatedOutput) {
       continue;
@@ -240,15 +230,15 @@ export function buildTranslationTraces(
   }
 
   return [...translationTraces].sort((left, right) => {
-    const bySource = compareStrings(left.sourcePath, right.sourcePath);
+    const bySource = compareCodePoint(left.sourcePath, right.sourcePath);
     if (bySource !== 0) {
       return bySource;
     }
-    const bySection = compareStrings(left.sectionId, right.sectionId);
+    const bySection = compareCodePoint(left.sectionId, right.sectionId);
     if (bySection !== 0) {
       return bySection;
     }
-    return compareStrings(left.targetRole, right.targetRole);
+    return compareCodePoint(left.targetRole, right.targetRole);
   });
 }
 
@@ -301,7 +291,9 @@ export function writeDestinationOutputs(
 ): void {
   const normalizedRoot = destinationRoot.replace(/\/+$/, "");
   // Write each generated file in stable path order beneath the destination.
-  for (const targetPath of Object.keys(generatedOutput).sort(compareStrings)) {
+  for (const targetPath of Object.keys(generatedOutput).sort(
+    compareCodePoint,
+  )) {
     const fullPath =
       normalizedRoot === "" ? targetPath : `${normalizedRoot}/${targetPath}`;
     fileSystem.writeTextFile(fullPath, generatedOutput[targetPath] ?? "");

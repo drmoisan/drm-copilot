@@ -13,6 +13,7 @@
  */
 
 import { type FileSystem } from "../file-system";
+import { compareCodePoint } from "../string-ordering";
 import {
   type MappingRecord,
   type RunOptions,
@@ -54,7 +55,7 @@ function extractTopologyDestinations(
     if (left[0] !== right[0]) {
       return left[0] - right[0];
     }
-    return left[1] < right[1] ? -1 : left[1] > right[1] ? 1 : 0;
+    return compareCodePoint(left[1], right[1]);
   });
   return destinationsByPosition.map(([, destinationPath]) => destinationPath);
 }
@@ -90,7 +91,7 @@ export function buildTopologyEdges(
         .filter((record) => record.targetPath !== null)
         .map((record) => record.targetPath as string),
     ),
-  ].sort((left, right) => (left < right ? -1 : left > right ? 1 : 0));
+  ].sort(compareCodePoint);
   const topologyEdges: TopologyEdge[] = [];
   const translationTraceSourcePaths = new Set(
     translationTraces.map((trace) => trace.sourcePath),
@@ -144,12 +145,10 @@ export function buildTopologyEdges(
   }
 
   return [...topologyEdges].sort((left, right) => {
-    if (left.sourcePath !== right.sourcePath) {
-      return left.sourcePath < right.sourcePath ? -1 : 1;
+    const bySource = compareCodePoint(left.sourcePath, right.sourcePath);
+    if (bySource !== 0) {
+      return bySource;
     }
-    if (left.destinationPath !== right.destinationPath) {
-      return left.destinationPath < right.destinationPath ? -1 : 1;
-    }
-    return 0;
+    return compareCodePoint(left.destinationPath, right.destinationPath);
   });
 }
