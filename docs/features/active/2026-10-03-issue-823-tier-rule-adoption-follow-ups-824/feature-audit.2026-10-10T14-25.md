@@ -123,3 +123,39 @@ AC-1 to AC-12, AC-14, and AC-16 to AC-19 are verified PASS. AC-13 and AC-15 are 
 - Items remaining:
   - AC-13: The full toolchain passes (Python, TypeScript/Jest, and PowerShell format, analyze and test with coverage), with the new helper and modified hook at >= 85% line coverage and no coverage regression on changed lines. (Pending PR CI.)
   - AC-15: The PR references #824 with "Refs #824" and no closing keyword for #824, and its body calls out every `.claude/rules/` and `.github/instructions/` edit (including the FU-823-3 authorization for the canonical `.github/instructions/` files and the note A derivation for `.claude/rules/general-unit-test.md` and `.claude/rules/quality-tiers.md`), states that FU-823-4 remains open, and lists the out-of-scope follow-ups. (Pending PR authoring.)
+
+---
+
+## Post-PR verification (2026-10-10)
+
+Scope: AC-13 and AC-15 only, against PR #879 (base `main`, head `74777f4de69caebd03bca7ddc1bd8c8b00722c64`). The worktree HEAD equals the PR head.
+
+### AC-13 - PASS
+
+- CI run 38060480981 (`CI`, event `pull_request`, `headSha` `74777f4de6...`, conclusion `success`; confirmed with `gh run view`). The PR status-check rollup (`artifacts/orchestration/pr879-rollup.json`) lists 20 checks, all `COMPLETED SUCCESS`, including `quality-checks7 / Code Quality & Tests` (3.10, 3.11, 3.12, 3.13), `root-typescript-tests` (ubuntu, windows), `drm-copilot-extension-tests` (ubuntu, windows), `poshqc / PowerShell QC`, `poshqc / PowerShell hook suites (Linux)`, and `shell-coverage / Shell Coverage (Bats + kcov)`.
+- PowerShell coverage at the PR head, recomputed from the run 38060480981 artifact `poshqc-test-results` (`powershell-coverage.xml`, JaCoCo LINE counters):
+  - `.claude/hooks/feature-review-coverage-thresholds.ps1` (new helper): 21/21, 100.0%.
+  - `.claude/hooks/validate-feature-review-coverage.ps1` (modified hook): 202/212, 95.28% (baseline 49.52%; no regression).
+  - Repository: 14055/15856, 88.64% (baseline 88.0%).
+  - `pester-junit.xml`: 6800 tests, 0 failures, 0 errors, 10 disabled.
+- No branch-owned PowerShell file changed after `f03407757` (the head of the earlier PoshQC run 38022356096); the PR-head figures match the earlier figures recorded in `policy-audit.2026-10-10T14-25.md`.
+- kcov (run 38060480981, `shell-coverage/cov.xml`): `.codex/codex-web-setup.sh` 0.957, `scripts/bash/shell_qc_lib.sh` 0.905, repository 0.945 (3049/3225).
+- Not accessed: individual job logs. The verdict rests on job conclusions and the downloaded coverage and JUnit artifacts.
+
+### AC-15 - PASS
+
+- Posted body (`artifacts/orchestration/pr879-body.json`, from `gh pr view --json body`): `Refs #824` appears once. A case-insensitive search for `close/closes/closed/fix/fixes/fixed/resolve/resolves/resolved` followed by `#824` returns no match. The title prefix `fix(824):` is not a GitHub closing-keyword form. The `GitHub Auto-close` section states `None`, and the body states that issue #824 stays open.
+- `git diff --name-only origin/main...HEAD -- .claude/rules .github/instructions` lists six files. Each is called out under "Policy and rule surfaces (each called out)" or "Scope widening for PA-1":
+  - `.github/instructions/csharp-code-change.instructions.md`, `.github/instructions/csharp-unit-test.instructions.md`: called out with the FU-823-3 maintainer authorization (issue #824 Addendum 2, this item only).
+  - `.claude/rules/architecture-boundaries.md`: called out (FU-823-2).
+  - `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`: called out with the note A derivation.
+  - `.claude/rules/shell.md` and its bundled copy: called out with the operator PA-1 authorization (2026-10-10).
+- FU-823-4: stated as remaining open (Follow-ups item 2 and the closing paragraph).
+- Out-of-scope follow-ups: listed (PA-2, FU-823-4, CR-1 to CR-14, and the still-open callouts).
+
+### Acceptance Criteria Status (post-PR)
+- Source: `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`
+- Total AC items: 19
+- Checked off (delivered): 19
+- Remaining (unchecked): 0
+- Items remaining: none
