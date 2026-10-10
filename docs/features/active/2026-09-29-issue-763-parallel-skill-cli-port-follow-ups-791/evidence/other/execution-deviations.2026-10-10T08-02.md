@@ -68,3 +68,16 @@ Each entry records the task ID, the planned mechanism, the substituted mechanism
 - Planned mechanism: `sh <scratchpad>/run-ps-791.sh <scratchpad>/pester-791.ps1`; acceptance requires `Failed: 0` and the new case shown as passed.
 - Substituted mechanism: `mcp__drm-copilot__run_poshqc_test` (scan_folders = tests/scripts/claude-hooks, tests/scripts/claude-runtime); call disposition recorded; `Failed` count and the new case result recorded as `CI-DEFERRED: yes`, `CI-DEFERRED-ACS: AC-13` (the MCP result carries no Pester output).
 - Reason: operator constraint.
+
+## Phases 5-9 run (2026-10-10T08-34)
+
+## [P5-T6]
+- Planned mechanism: `grep -rnE` through the Bash tool.
+- Substituted mechanism: none. The operator authorized a Grep-tool substitution if the abandon PreToolUse gate denied the Bash command; the command was not denied (exit 1, no output), so the planned mechanism was used unchanged.
+- Reason: operator constraint (recorded for completeness; no substitution taken).
+
+## Phase-boundary commits (Phases 5-9)
+- Task ID: phase boundaries after [P5-T7], [P6-T8], [P7-T1], [P8-T17], and [P9-T2].
+- Planned mechanism: the plan defines no per-phase commit.
+- Substituted mechanism: `git fetch origin main` and `git merge-base --is-ancestor origin/main HEAD` (merge `origin/main` with `--no-edit` when main has moved), then `git add -A`, `git commit -F <scratchpad message file>`, and `git push origin bug/issue-763-parallel-skill-cli-port-follow-ups-791`.
+- Reason: operator constraint.
