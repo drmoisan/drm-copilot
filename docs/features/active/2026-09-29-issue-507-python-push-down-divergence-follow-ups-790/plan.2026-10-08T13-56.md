@@ -227,16 +227,16 @@ Each task in this phase writes FEATURE/evidence/other/p1-tN.TS.md (N is the task
 
 Each task in this phase writes FEATURE/evidence/other/p3-tN.TS.md.
 
-- [ ] [P3-T1] Create `scripts/dev_tools/push_down_claude_gitignore_merge.py` with exactly the content of Appendix A1 (constants, `merge_claude_gitignore`, `deliver_destination_gitignore`; module docstring states decisions D2 and D3).
+- [x] [P3-T1] Create `scripts/dev_tools/push_down_claude_gitignore_merge.py` with exactly the content of Appendix A1 (constants, `merge_claude_gitignore`, `deliver_destination_gitignore`; module docstring states decisions D2 and D3).
       Commands: `git grep --no-index -c -E "^def (merge_claude_gitignore|deliver_destination_gitignore)\(" -- scripts/dev_tools/push_down_claude_gitignore_merge.py`; `git grep --no-index -c -F "500-line limit" -- scripts/dev_tools/push_down_claude_gitignore_merge.py`; `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_gitignore_merge.py tests/scripts/dev_tools/test_push_down_claude_gitignore_parity.py`.
       Acceptance: the first grep prints 2; the second prints 1; pytest exits 0 with 17 passed.
-- [ ] [P3-T2] Update `scripts/dev_tools/push_down_claude_pack_selection.py` by appending the public `resolve_published_paths` of Appendix A2 (PD5).
+- [x] [P3-T2] Update `scripts/dev_tools/push_down_claude_pack_selection.py` by appending the public `resolve_published_paths` of Appendix A2 (PD5).
       Commands: `git grep --no-index -c -F "def resolve_published_paths(" -- scripts/dev_tools/push_down_claude_pack_selection.py`; `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_pack_selection.py`.
       Acceptance: the grep prints 1; pytest exits 0 with 19 passed.
-- [ ] [P3-T3] Update `scripts/dev_tools/push_down_claude_customizations.py` with replacements E1 through E5 of Appendix A3 (imports, removal of `_resolve_published_paths`, call of `resolve_published_paths`, post-copy delivery, docstring).
+- [x] [P3-T3] Update `scripts/dev_tools/push_down_claude_customizations.py` with replacements E1 through E5 of Appendix A3 (imports, removal of `_resolve_published_paths`, call of `resolve_published_paths`, post-copy delivery, docstring).
       Commands: `git grep --no-index -c -F "def _resolve_published_paths" -- scripts/dev_tools/push_down_claude_customizations.py`; `git grep --no-index -c -F "deliver_destination_gitignore(fs, destination_root, manifest)" -- scripts/dev_tools/push_down_claude_customizations.py`; `git grep --no-index -c -F "\"PACK_MANIFEST_SUBDIR\"," -- scripts/dev_tools/push_down_claude_customizations.py`; `wc -l scripts/dev_tools/push_down_claude_customizations.py`.
       Acceptance: the first grep prints nothing and exits 1 (the pass condition); the second prints 1; the third prints 1; the line count is at most 470 (planning-time projection 460).
-- [ ] [P3-T4] Verify the F-507-1 tests against the new Python code (`tests/scripts/dev_tools/test_push_down_claude_gitignore_delivery.py`, `tests/scripts/dev_tools/test_push_down_claude_pack_end_to_end.py`, `tests/scripts/dev_tools/test_push_down_claude_exclusion_filter.py`), and record FEATURE/evidence/other/p3-t4.TS.md.
+- [x] [P3-T4] Verify the F-507-1 tests against the new Python code (`tests/scripts/dev_tools/test_push_down_claude_gitignore_delivery.py`, `tests/scripts/dev_tools/test_push_down_claude_pack_end_to_end.py`, `tests/scripts/dev_tools/test_push_down_claude_exclusion_filter.py`), and record FEATURE/evidence/other/p3-t4.TS.md.
       Command: `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_gitignore_merge.py tests/scripts/dev_tools/test_push_down_claude_gitignore_parity.py tests/scripts/dev_tools/test_push_down_claude_gitignore_delivery.py tests/scripts/dev_tools/test_push_down_claude_pack_selection.py tests/scripts/dev_tools/test_push_down_claude_pack_end_to_end.py tests/scripts/dev_tools/test_push_down_claude_exclusion_filter.py`.
       Acceptance: exit 0 and no failed test; the passed count is recorded. A failure is fixed in the Phase 3 production files only; a test name or asserted literal from Appendix C is never changed.
 
