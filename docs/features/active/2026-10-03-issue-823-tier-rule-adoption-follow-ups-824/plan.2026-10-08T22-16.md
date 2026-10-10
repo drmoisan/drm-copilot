@@ -301,40 +301,40 @@ Each task writes FEATURE/evidence/other/p5-tN.TS.md unless it names another arti
 
 Each task writes FEATURE/evidence/other/p6-tN.TS.md.
 
-- [ ] [P6-T1] Update `.claude/skills/feature-review-workflow/SKILL.md` by HAP with patch `p07-skill-feature-review-workflow.patch` (step 5 fallback sentence; step 8 trigger). When P0-T4 recorded this path as MOVED (#841) and the forward check fails, use the Appendix A fallback.
+- [x] [P6-T1] Update `.claude/skills/feature-review-workflow/SKILL.md` by HAP with patch `p07-skill-feature-review-workflow.patch` (step 5 fallback sentence; step 8 trigger). When P0-T4 recorded this path as MOVED (#841) and the forward check fails, use the Appendix A fallback.
       Commands: the five HAP commands of Appendix A for this path; `grep -c -F "falls back independently" .claude/skills/feature-review-workflow/SKILL.md`; `grep -c -F "coverage below the governing thresholds defined in step 5" .claude/skills/feature-review-workflow/SKILL.md`; `grep -c -F "< 80% repo-wide" .claude/skills/feature-review-workflow/SKILL.md`.
       Acceptance: HAP acceptance holds (or the fallback is recorded); the first two greps each print 1; the last prints 0 (`EXIT_CODE: 1`, `ExpectedExitCode: 1`).
-- [ ] [P6-T2] Update `.claude/rules/quality-tiers.md` by HAP with patch `p05-rule-quality-tiers.patch` (note A; policy edit per PD1).
+- [x] [P6-T2] Update `.claude/rules/quality-tiers.md` by HAP with patch `p05-rule-quality-tiers.patch` (note A; policy edit per PD1).
       Commands: the five HAP commands of Appendix A for this path; `grep -c -F "falls back independently" .claude/rules/quality-tiers.md`; `grep -c -F "Threshold precedence: when the repository's root" .claude/rules/quality-tiers.md`.
       Acceptance: HAP acceptance holds; the fallback grep prints 2 (precedence paragraph and rationale); the precedence grep prints 1 (the #823 sentence is kept, so the #823 fragments still match).
-- [ ] [P6-T3] Update `.claude/rules/general-unit-test.md` by HAP with patch `p04-rule-general-unit-test.patch` (note A; policy edit per PD1).
+- [x] [P6-T3] Update `.claude/rules/general-unit-test.md` by HAP with patch `p04-rule-general-unit-test.patch` (note A; policy edit per PD1).
       Commands: the five HAP commands of Appendix A for this path; `grep -c -F "falls back independently" .claude/rules/general-unit-test.md`; `grep -c -F "Threshold precedence: when the repository's root" .claude/rules/general-unit-test.md`.
       Acceptance: HAP acceptance holds; both greps print 1.
-- [ ] [P6-T4] Update `.claude/agents/feature-review.md` by HAP with patch `p06-agent-feature-review.patch` (note A).
+- [x] [P6-T4] Update `.claude/agents/feature-review.md` by HAP with patch `p06-agent-feature-review.patch` (note A).
       Commands: the five HAP commands of Appendix A for this path; `grep -c -F "falls back independently" .claude/agents/feature-review.md`; `grep -c -F "version folder" .claude/agents/feature-review.md`; `grep -c -E "80%|90%" .claude/agents/feature-review.md`.
       Acceptance: HAP acceptance holds; the fallback grep prints 1; the pinned phrase grep prints 1 or more (`tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` pins it); the retired-figure grep prints 0 (`EXIT_CODE: 1`, `ExpectedExitCode: 1`).
-- [ ] [P6-T5] Update `.agents/skills/quality-tiers/SKILL.md` by HAP with patch `p13-agents-quality-tiers.patch` (note A, Codex chain wording).
+- [x] [P6-T5] Update `.agents/skills/quality-tiers/SKILL.md` by HAP with patch `p13-agents-quality-tiers.patch` (note A, Codex chain wording).
       Commands: the five HAP commands of Appendix A for this path; `grep -c -F "falls back independently" .agents/skills/quality-tiers/SKILL.md`.
       Acceptance: HAP acceptance holds; the grep prints 2.
-- [ ] [P6-T6] Update `.agents/skills/general-unit-test/SKILL.md` by HAP with patch `p12-agents-general-unit-test.patch` (note A, Codex chain wording).
+- [x] [P6-T6] Update `.agents/skills/general-unit-test/SKILL.md` by HAP with patch `p12-agents-general-unit-test.patch` (note A, Codex chain wording).
       Commands: the five HAP commands of Appendix A for this path; `grep -c -F "falls back independently" .agents/skills/general-unit-test/SKILL.md`.
       Acceptance: HAP acceptance holds; the grep prints 1.
-- [ ] [P6-T7] Update `extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md` by byte copy from `.claude/skills/feature-review-workflow/SKILL.md`.
+- [x] [P6-T7] Update `extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md` by byte copy from `.claude/skills/feature-review-workflow/SKILL.md`.
       Commands: `cp .claude/skills/feature-review-workflow/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md`; `git diff --no-index --exit-code .claude/skills/feature-review-workflow/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md`.
       Acceptance: `cp` exits 0; the diff exits 0 with no output; status shows ` M`.
-- [ ] [P6-T8] Update `extensions/drm-copilot/resources/claude-customizations/.claude/rules/quality-tiers.md` by byte copy from `.claude/rules/quality-tiers.md`.
+- [x] [P6-T8] Update `extensions/drm-copilot/resources/claude-customizations/.claude/rules/quality-tiers.md` by byte copy from `.claude/rules/quality-tiers.md`.
       Commands: `cp .claude/rules/quality-tiers.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/quality-tiers.md`; `git diff --no-index --exit-code .claude/rules/quality-tiers.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/quality-tiers.md`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/rules/quality-tiers.md`.
       Acceptance: as P6-T7.
-- [ ] [P6-T9] Update `extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-unit-test.md` by byte copy from `.claude/rules/general-unit-test.md`.
+- [x] [P6-T9] Update `extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-unit-test.md` by byte copy from `.claude/rules/general-unit-test.md`.
       Commands: `cp .claude/rules/general-unit-test.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-unit-test.md`; `git diff --no-index --exit-code .claude/rules/general-unit-test.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-unit-test.md`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-unit-test.md`.
       Acceptance: as P6-T7.
-- [ ] [P6-T10] Update `extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md` by byte copy from `.claude/agents/feature-review.md`.
+- [x] [P6-T10] Update `extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md` by byte copy from `.claude/agents/feature-review.md`.
       Commands: `cp .claude/agents/feature-review.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md`; `git diff --no-index --exit-code .claude/agents/feature-review.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md`.
       Acceptance: as P6-T7.
-- [ ] [P6-T11] Update `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/quality-tiers/SKILL.md` by byte copy from `.agents/skills/quality-tiers/SKILL.md`.
+- [x] [P6-T11] Update `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/quality-tiers/SKILL.md` by byte copy from `.agents/skills/quality-tiers/SKILL.md`.
       Commands: `cp .agents/skills/quality-tiers/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/quality-tiers/SKILL.md`; `git diff --no-index --exit-code .agents/skills/quality-tiers/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/quality-tiers/SKILL.md`; `git status --porcelain -- extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/quality-tiers/SKILL.md`.
       Acceptance: as P6-T7.
-- [ ] [P6-T12] Update `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/general-unit-test/SKILL.md` by byte copy from `.agents/skills/general-unit-test/SKILL.md`.
+- [x] [P6-T12] Update `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/general-unit-test/SKILL.md` by byte copy from `.agents/skills/general-unit-test/SKILL.md`.
       Commands: `cp .agents/skills/general-unit-test/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/general-unit-test/SKILL.md`; `git diff --no-index --exit-code .agents/skills/general-unit-test/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/general-unit-test/SKILL.md`; `git status --porcelain -- extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/general-unit-test/SKILL.md`.
       Acceptance: as P6-T7.
 
