@@ -1,7 +1,8 @@
 """Unit tests for the pure quality-tiers validation core.
 
-Inputs are in-memory YAML strings, manifests, and tracked-path lists. Only the two
-committed-tree tests read the committed ``quality-tiers.yml``, read-only.
+Covers manifest parsing and project discovery. Inputs are in-memory YAML strings
+and tracked-path lists; no test in this module reads the committed
+``quality-tiers.yml`` (the committed-tree tests live in the classification module).
 """
 
 from __future__ import annotations
