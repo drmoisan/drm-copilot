@@ -17,8 +17,8 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 - `max_concurrency`: 4
 - `current_cohort`: 1
 - `recolor_generation`: 1
-- `last_updated`: 2026-10-10T14:11:25Z
-- `next_step`: monitor 824 842 849; no unstarted items remain
+- `last_updated`: 2026-10-10T14:34:46Z
+- `next_step`: monitor 824 849
 
 **Items**
 
@@ -29,7 +29,7 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 | 791 | docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follow-ups-791 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/875 | 179c586676d0f942043e349f7666852c551f25fb | 2026-10-10T11:56:17Z | 2026-10-10T13:31:56Z | - |
 | 824 | docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824 | 1 | in_flight | worktree_created | - | - | 2026-10-10T02:33:53Z | - | - |
 | 841 | docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/877 | 2f66a8b897f4ec48b12b7629f8d4226a03ce3371 | 2026-10-10T13:04:27Z | 2026-10-10T14:11:14Z | - |
-| 842 | docs/features/active/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups-842 | 1 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/878 | - | 2026-10-10T13:32:16Z | - | - |
+| 842 | docs/features/active/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups-842 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/878 | 0ea7978a79b2ef5b237043923bff299e2b45cddf | 2026-10-10T13:32:16Z | 2026-10-10T14:34:38Z | - |
 | 849 | docs/features/active/2026-10-08-parallel-items-fail-completion-on-promotion-receipts-849 | 1 | in_flight | worktree_created | - | - | 2026-10-10T13:44:37Z | - | - |
 | 793 | docs/features/active/2026-09-30-epic-orchestrator-state-validator-crashes-on-unhashable-merge-status-793 | - | merged | merged | https://github.com/drmoisan/drm-copilot/pull/868 | 311dea0548cb2e2fe57259aec6e1e3a06a9bdd2a | 2026-10-09T23:56:38Z | 2026-10-10T00:51:14Z | - |
 | 794 | docs/features/active/2026-09-30-parallel-cohorts-split-words-drops-tokens-after-first-newline-794 | - | merged | merged | https://github.com/drmoisan/drm-copilot/pull/860 | 8754efe64ef2e724fbfcfbc6c32d3f0ea0e53979 | 2026-10-09T06:48:10Z | 2026-10-09T23:46:09Z | - |
