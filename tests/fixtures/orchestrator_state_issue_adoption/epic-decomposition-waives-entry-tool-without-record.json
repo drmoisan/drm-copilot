@@ -1,0 +1,120 @@
+{
+  "name": "epic-decomposition-waives-entry-tool-without-record",
+  "notes": "An epic_decomposition adoption that waives the feature promotion-entry tool still requires a potential record.",
+  "checkpoint": {
+    "route_id": "large",
+    "promotion-type": "feature",
+    "issue-num": "509",
+    "required_agents": [
+      "task-researcher",
+      "prd-feature",
+      "atomic-planner",
+      "atomic-executor",
+      "feature-review",
+      "pr-author"
+    ],
+    "required_skills": [
+      "orchestrate",
+      "feature-promotion-lifecycle",
+      "atomic-plan-contract",
+      "acceptance-criteria-tracking",
+      "pr-context-artifacts",
+      "pr-base-branch-merge-base"
+    ],
+    "required_mcp_tools": [
+      "new_potential_entry",
+      "potential_to_issue",
+      "new_active_feature_folder",
+      "collect_pr_context",
+      "validate_orchestration_artifacts"
+    ],
+    "delegation_receipts": [
+      {
+        "agent_name": "task-researcher"
+      },
+      {
+        "agent_name": "prd-feature"
+      },
+      {
+        "agent_name": "atomic-planner"
+      },
+      {
+        "agent_name": "atomic-executor"
+      },
+      {
+        "agent_name": "feature-review"
+      },
+      {
+        "agent_name": "pr-author"
+      }
+    ],
+    "skill_receipts": [
+      {
+        "skill": "orchestrate",
+        "required": true,
+        "evidence": "e"
+      },
+      {
+        "skill": "feature-promotion-lifecycle",
+        "required": true,
+        "evidence": "e"
+      },
+      {
+        "skill": "atomic-plan-contract",
+        "required": true,
+        "evidence": "e"
+      },
+      {
+        "skill": "acceptance-criteria-tracking",
+        "required": true,
+        "evidence": "e"
+      },
+      {
+        "skill": "pr-context-artifacts",
+        "required": true,
+        "evidence": "e"
+      },
+      {
+        "skill": "pr-base-branch-merge-base",
+        "required": true,
+        "evidence": "e"
+      }
+    ],
+    "mcp_call_receipts": [
+      {
+        "tool": "new_active_feature_folder",
+        "ok": true,
+        "evidence": "e"
+      },
+      {
+        "tool": "collect_pr_context",
+        "ok": true,
+        "evidence": "e"
+      },
+      {
+        "tool": "validate_orchestration_artifacts",
+        "ok": true,
+        "evidence": "e"
+      }
+    ],
+    "local_execution_overrides": [],
+    "delegation_bypasses": [],
+    "issue_adoption": {
+      "issue_num": "509",
+      "issue_url": "https://github.com/drmoisan/drm-copilot/issues/509",
+      "origin": "epic_decomposition",
+      "verified_via": "gh_issue_view",
+      "verified_at": "2026-09-29T15:15:00Z",
+      "evidence": "gh issue view 509 --json number,state,url: number 509, state OPEN",
+      "waived_tools": [
+        "potential_to_issue",
+        "new_potential_entry"
+      ]
+    }
+  },
+  "expected_errors": [
+    "Checkpoint missing successful MCP receipt: new_potential_entry.",
+    "Checkpoint missing successful MCP receipt: potential_to_issue.",
+    "Checkpoint issue_adoption.potential_record must name a markdown file under docs/features/potential/ when waiving new_potential_entry."
+  ]
+}

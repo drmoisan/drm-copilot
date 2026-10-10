@@ -42,6 +42,11 @@ identical forms.
 - **Promotion.** Unpromoted items are promoted by their own preparation-mode child, not by the
   planner. The `preparation` route already carries the promotion MCP tools (`new_potential_entry`,
   `potential_to_issue`, `new_active_feature_folder`).
+- **Issue adoption.** Issue-number items are adopted, not promoted. The item's GitHub issue
+  already exists, so its preparation child verifies the issue read-only and records a top-level
+  `issue_adoption` object in its checkpoint instead of calling `potential_to_issue` or the
+  promotion-entry tool. The delegation prompt carries that instruction as the issue-adoption line
+  under `## Preparation Fan-Out`.
 - **`issue_num` resolution.** `issue_num` is the primary key for every item reference. It is known
   at intake for issue-number items. For potential-entry items, record negative placeholders in
   intake order (`-1`, `-2`, ...) and back-fill the real number from each child's promotion receipt
@@ -102,11 +107,13 @@ invocations after the initial plan. Use `/parallel-plan` for intake and `/parall
 admit an item into a run that is already in flight.
 
 Each delegation prompt includes this literal kickoff line, followed by the model-budget marker
-line:
+line and, for an issue-number item only, the issue-adoption line:
 
 > `Preparation mode: true. route_id: preparation. parallel_slug: <slug>. Perform promotion, research, feature documents (spec.md, user-story.md), atomic planning, and preflight clearance only. Atomic execution, PR authoring, and CI monitoring are out of scope for this run and are executed later by parallel-orchestrator. After the atomic-executor preflight returns PREFLIGHT: ALL CLEAR, commit the feature folder and plan to the current branch, push the current branch to origin, set out-of-scope step statuses to not-applicable, set next_step to S5_atomic_execution, and stop, reporting the plan-path and preflight status.`
 >
 > `model_budget.fable_policy: <disabled|available|preferred>.`
+>
+> `Issue adoption: this item's GitHub issue already exists. Verify it read-only (gh issue view), do not call potential_to_issue or the promotion-entry tool, and record a top-level issue_adoption object in the checkpoint per .claude/rules/orchestrator-state.md with origin filed_before_orchestration (or transferred when the issue was transferred), waiving potential_to_issue and the promotion-entry tool for the checkpoint's promotion-type. When a lifecycle record for the item exists under docs/features/potential/promoted/, cite it as potential_record.`
 
 Properties of that line, each individually load-bearing:
 
@@ -128,6 +135,13 @@ does not apply to preparation. It contains no `Parallel mode: true`, so F7's fut
 hook, which matches that marker, will not gate preparation either. Both omissions are intentional
 and must be preserved verbatim when the line is emitted.
 
+**Issue-adoption line.** The issue-adoption line is emitted only for an issue-number item, after
+the model-budget marker line, and is omitted for a potential-entry item, whose child promotes it.
+The line carries no mode marker, no digits, and no active feature-folder path, so hook target
+resolution and mode classification are unchanged. The preparation checkpoint does not carry over
+to execution, so the execution child records its own adoption (see
+`.claude/skills/parallel-orchestrate/SKILL.md`, kickoff element 4).
+
 **No edit to shared surfaces.** No edit is made to `.claude/skills/orchestrate/SKILL.md` or to
 `config/orchestration-routing.json`, including the `preparation` route. The route mechanism is
 marker-driven; the child contract's "commit ... to the current branch" wording is satisfied by a
@@ -135,8 +149,9 @@ branch created off `origin/main`; and `routes.preparation` declares no epic-spec
 agent, skill, or MCP tool.
 
 **Collected per child at termination:** `plan-path`, preflight status, the promotion receipt (the
-`issue_num` back-fill source), the model-routing receipt with `agent: "orchestrator"`, the
-topology receipt, `branch_name`, and `worktree_path`. There is no fan-in merge step: the planner
+`issue_num` back-fill source for a potential-entry item) or, for an issue-number item, the
+`issue_adoption` record from the child checkpoint, the model-routing receipt with
+`agent: "orchestrator"`, the topology receipt, `branch_name`, and `worktree_path`. There is no fan-in merge step: the planner
 fetches and records each pushed item branch, back-fills `issue_num` into the manifest on
 `parallel/<slug>-plan`, and updates the checkpoint.
 

@@ -39,7 +39,7 @@ const CORPUS_SUFFIX = ".json";
  * Floor on corpus size. An empty or partially matched enumeration would make
  * every case disappear and the suite would pass vacuously.
  */
-const MINIMUM_CORPUS_COUNT = 29;
+const MINIMUM_CORPUS_COUNT = 34;
 
 /** The four keys every corpus file must carry. */
 const REQUIRED_FIXTURE_KEYS: readonly string[] = [

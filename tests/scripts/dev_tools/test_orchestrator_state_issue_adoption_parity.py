@@ -43,7 +43,7 @@ CORPUS_SUFFIX = ".json"
 # Floor on corpus size. An empty or partially matched glob would make every
 # parametrized case below disappear and the suite would pass vacuously, so the
 # count is asserted against this floor and against the files on disk.
-MINIMUM_CORPUS_COUNT = 29
+MINIMUM_CORPUS_COUNT = 34
 
 # The four keys every corpus file must carry.
 REQUIRED_FIXTURE_KEYS = ("name", "notes", "checkpoint", "expected_errors")

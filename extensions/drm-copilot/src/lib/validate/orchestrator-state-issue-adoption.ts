@@ -61,6 +61,11 @@ const PROMOTION_ENTRY_TOOLS: ReadonlySet<string> = new Set([
 ]);
 const POTENTIAL_RECORD_PREFIX = "docs/features/potential/";
 const POTENTIAL_RECORD_SUFFIX = ".md";
+// Origins whose promotion-entry waiver may omit the potential_record key (rule 9).
+const RECORD_OPTIONAL_ORIGINS: ReadonlySet<string> = new Set([
+  "transferred",
+  "filed_before_orchestration",
+]);
 const ISSUE_NUM_PATTERN = /^[1-9][0-9]*$/;
 
 const ERROR_NOT_OBJECT =
@@ -223,10 +228,27 @@ function waivedToolErrors(
   return errors;
 }
 
+/**
+ * Require a potential record when a promotion-entry tool is waived (rule 9).
+ *
+ * Nothing is reported when the `potential_record` key is absent and the origin
+ * is `transferred` or `filed_before_orchestration`. A present record, including
+ * `null`, is always validated.
+ */
 function potentialRecordErrors(
   waived: readonly string[],
   potentialRecord: unknown,
+  origin: unknown,
+  recordPresent: boolean,
 ): string[] {
+  if (
+    !recordPresent &&
+    typeof origin === "string" &&
+    RECORD_OPTIONAL_ORIGINS.has(origin)
+  ) {
+    return [];
+  }
+
   if (
     typeof potentialRecord === "string" &&
     potentialRecord.startsWith(POTENTIAL_RECORD_PREFIX) &&
@@ -286,7 +308,14 @@ export function resolveIssueAdoption(
   }
 
   errors.push(...waivedToolErrors(waived, options));
-  errors.push(...potentialRecordErrors(waived, adoption["potential_record"]));
+  errors.push(
+    ...potentialRecordErrors(
+      waived,
+      adoption["potential_record"],
+      adoption["origin"],
+      Object.prototype.hasOwnProperty.call(adoption, "potential_record"),
+    ),
+  );
 
   if (errors.length > 0) {
     return { errors, waivedTools: new Set<string>() };
