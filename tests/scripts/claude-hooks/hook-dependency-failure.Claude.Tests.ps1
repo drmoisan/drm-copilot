@@ -113,7 +113,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
                 [System.Console]::SetIn([System.IO.StringReader]::new($stdin))
                 [System.Console]::SetError($errorWriter)
                 $global:LASTEXITCODE = 0
-                $stdout = @(& (Join-HookGraphPath -Left $script:RepoRoot -Right $Hook))
+                $stdout = @(& (Get-HookInvocationPath -Left $script:RepoRoot -Right $Hook))
                 $exitCode = $LASTEXITCODE
             }
             finally {
@@ -166,7 +166,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
         Mock Join-Path { throw 'simulated load failure: hook-dependency-guard.ps1' } -ParameterFilter { $ChildPath -eq 'hook-dependency-guard.ps1' }
         # Act
         try {
-            . (Join-HookGraphPath -Left $script:RepoRoot -Right $Hook)
+            . (Get-HookInvocationPath -Left $script:RepoRoot -Right $Hook)
             $flag = $script:HookDependencyGuardLoadFailed
             $helperDefined = [bool](Get-Command -Name Add-HookDependencyFailure -CommandType Function -ErrorAction SilentlyContinue)
         }

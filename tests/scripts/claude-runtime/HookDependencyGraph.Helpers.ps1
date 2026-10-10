@@ -52,6 +52,15 @@ function Join-HookGraphPath {
     return (ConvertTo-HookGraphNormalPath -Path ("$Left/$Right"))
 }
 
+function Get-HookInvocationPath {
+    # The platform-native full path of a hook, used to invoke or dot-source it, so a hook run by a test is
+    # compiled under the same path spelling as the coverage population and the hook's own suites use.
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([AllowEmptyString()] [string] $Left, [AllowEmptyString()] [string] $Right)
+    return [System.IO.Path]::GetFullPath((Join-HookGraphPath -Left $Left -Right $Right))
+}
+
 function Get-HookRegistration {
     <#
     .SYNOPSIS

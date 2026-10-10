@@ -69,7 +69,7 @@ Describe 'Claude hook dependency-failure special cases (issue #786)' {
                 [System.Console]::SetIn([System.IO.StringReader]::new($stdin))
                 [System.Console]::SetError($errorWriter)
                 $global:LASTEXITCODE = 0
-                $stdout = @(& (Join-HookGraphPath -Left $script:RepoRoot -Right $Hook))
+                $stdout = @(& (Get-HookInvocationPath -Left $script:RepoRoot -Right $Hook))
                 $exitCode = $LASTEXITCODE
             }
             finally {
@@ -103,7 +103,7 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
             try {
                 [System.Console]::SetIn([System.IO.StringReader]::new('{"session_id":"c-786","hook_event_name":"SubagentStop"}'))
                 [System.Console]::SetError($errorWriter)
-                $output = @($shell.AddScript($driver).AddArgument((Join-HookGraphPath -Left $script:RepoRoot -Right $Hook)).Invoke())
+                $output = @($shell.AddScript($driver).AddArgument((Get-HookInvocationPath -Left $script:RepoRoot -Right $Hook)).Invoke())
             }
             finally {
                 [System.Console]::SetIn($priorIn)
@@ -173,7 +173,7 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
         # Arrange: drop any instance an earlier container loaded, then load the hook.
         Get-Module -Name $Module | Remove-Module -Force
         try {
-            . (Join-HookGraphPath -Left $script:RepoRoot -Right $Hook)
+            . (Get-HookInvocationPath -Left $script:RepoRoot -Right $Hook)
             # Act: evaluate the lazy-load condition where the importing code evaluates it.
             if ($Via -like '*.psm1') {
                 $owner = Get-Module -Name ([IO.Path]::GetFileNameWithoutExtension($Via)) | Select-Object -Last 1
@@ -194,7 +194,7 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
 
     It 'C5: enforce-mermaid-validation.ps1 returns no deny when MermaidValidation is unavailable' {
         # Arrange: the validation module cannot be imported.
-        . (Join-HookGraphPath -Left $script:RepoRoot -Right '.claude/hooks/enforce-mermaid-validation.ps1')
+        . (Get-HookInvocationPath -Left $script:RepoRoot -Right '.claude/hooks/enforce-mermaid-validation.ps1')
         Mock Import-Module { throw 'simulated load failure: MermaidValidation.psm1' } -ParameterFilter { $Name -like '*MermaidValidation.psm1' }
         Mock Resolve-ClaudeHookToolInput { [pscustomobject]@{ IsValid = $true; Anomaly = $null; Value = [pscustomobject]@{ file_path = 'docs/sample.md'; content = "``````mermaid`nflowchart TD`n  A -->`n``````" } } }
         # Act
