@@ -4,6 +4,7 @@ import {
   COPILOT_ROOT_FOLDERS,
   enumerateSourceFiles,
   pushDownCustomizations,
+  stringifySorted,
 } from "../../../src/lib/push-down/copilot-customizations-engine";
 import { buildInMemoryFileSystem, fixedClock } from "./push-down.test-helpers";
 
@@ -240,5 +241,18 @@ describe("enumerateSourceFiles", () => {
       "/src/.github/agents/nested/a.md",
       "/src/.github/agents/z.md",
     ]);
+  });
+});
+
+describe("stringifySorted", () => {
+  it("issue #796 emits a U+E000 key before a supplementary-character key", () => {
+    // Arrange: under UTF-16 code-unit order the surrogate-pair key sorts first.
+    const value = { "\u{1F600}": 1, "\uE000": 2 };
+
+    // Act
+    const serialized = stringifySorted(value, 0);
+
+    // Assert: code-point order places the U+E000 key first.
+    expect(serialized).toBe('{"\uE000":2,"\u{1F600}":1}');
   });
 });
