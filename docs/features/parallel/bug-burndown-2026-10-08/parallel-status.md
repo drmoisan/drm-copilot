@@ -17,8 +17,8 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 - `max_concurrency`: 4
 - `current_cohort`: 1
 - `recolor_generation`: 1
-- `last_updated`: 2026-10-10T14:34:46Z
-- `next_step`: monitor 824 849
+- `last_updated`: 2026-10-10T15:13:47Z
+- `next_step`: monitor 849 (last item)
 
 **Items**
 
@@ -27,7 +27,7 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 | 543 | docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/874 | 5431ccdd471c184917493c4211afcd715bb4b95c | 2026-10-10T11:56:17Z | 2026-10-10T13:04:09Z | - |
 | 790 | docs/features/active/2026-09-29-issue-507-python-push-down-divergence-follow-ups-790 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/876 | 793731a12e0aafb5f6eb645fffa072d941797de1 | 2026-10-10T11:56:17Z | 2026-10-10T13:44:19Z | - |
 | 791 | docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follow-ups-791 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/875 | 179c586676d0f942043e349f7666852c551f25fb | 2026-10-10T11:56:17Z | 2026-10-10T13:31:56Z | - |
-| 824 | docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824 | 1 | in_flight | worktree_created | - | - | 2026-10-10T02:33:53Z | - | - |
+| 824 | docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/879 | 2c7ba13b4620fc00e5a54774fae3d75e698ab503 | 2026-10-10T02:33:53Z | 2026-10-10T15:13:38Z | - |
 | 841 | docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/877 | 2f66a8b897f4ec48b12b7629f8d4226a03ce3371 | 2026-10-10T13:04:27Z | 2026-10-10T14:11:14Z | - |
 | 842 | docs/features/active/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups-842 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/878 | 0ea7978a79b2ef5b237043923bff299e2b45cddf | 2026-10-10T13:32:16Z | 2026-10-10T14:34:38Z | - |
 | 849 | docs/features/active/2026-10-08-parallel-items-fail-completion-on-promotion-receipts-849 | 1 | in_flight | worktree_created | - | - | 2026-10-10T13:44:37Z | - | - |
