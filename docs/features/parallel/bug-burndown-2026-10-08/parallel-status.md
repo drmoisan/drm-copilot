@@ -17,8 +17,8 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 - `max_concurrency`: 4
 - `current_cohort`: 1
 - `recolor_generation`: 1
-- `last_updated`: 2026-10-10T15:13:47Z
-- `next_step`: monitor 849 (last item)
+- `last_updated`: 2026-10-10T15:28:55Z
+- `next_step`: DONE
 
 **Items**
 
@@ -30,7 +30,7 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 | 824 | docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/879 | 2c7ba13b4620fc00e5a54774fae3d75e698ab503 | 2026-10-10T02:33:53Z | 2026-10-10T15:13:38Z | - |
 | 841 | docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/877 | 2f66a8b897f4ec48b12b7629f8d4226a03ce3371 | 2026-10-10T13:04:27Z | 2026-10-10T14:11:14Z | - |
 | 842 | docs/features/active/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups-842 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/878 | 0ea7978a79b2ef5b237043923bff299e2b45cddf | 2026-10-10T13:32:16Z | 2026-10-10T14:34:38Z | - |
-| 849 | docs/features/active/2026-10-08-parallel-items-fail-completion-on-promotion-receipts-849 | 1 | in_flight | worktree_created | - | - | 2026-10-10T13:44:37Z | - | - |
+| 849 | docs/features/active/2026-10-08-parallel-items-fail-completion-on-promotion-receipts-849 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/880 | daa6436cd37c05ff0348f74939c1e24afd1bac48 | 2026-10-10T13:44:37Z | 2026-10-10T15:28:09Z | - |
 | 793 | docs/features/active/2026-09-30-epic-orchestrator-state-validator-crashes-on-unhashable-merge-status-793 | - | merged | merged | https://github.com/drmoisan/drm-copilot/pull/868 | 311dea0548cb2e2fe57259aec6e1e3a06a9bdd2a | 2026-10-09T23:56:38Z | 2026-10-10T00:51:14Z | - |
 | 794 | docs/features/active/2026-09-30-parallel-cohorts-split-words-drops-tokens-after-first-newline-794 | - | merged | merged | https://github.com/drmoisan/drm-copilot/pull/860 | 8754efe64ef2e724fbfcfbc6c32d3f0ea0e53979 | 2026-10-09T06:48:10Z | 2026-10-09T23:46:09Z | - |
 | 796 | docs/features/active/2026-09-30-duplicated-string-comparators-outside-pr-context-796 | - | merged | merged | https://github.com/drmoisan/drm-copilot/pull/872 | 5c440e5b72ba0653f56329b46787ff263bc7a3a7 | 2026-10-10T01:01:51Z | 2026-10-10T02:23:38Z | - |
