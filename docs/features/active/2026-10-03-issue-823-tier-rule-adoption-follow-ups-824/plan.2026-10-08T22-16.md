@@ -3,13 +3,13 @@
 - **Issue:** #824 (Addendum 2 only)
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-09T04-10 (revision round 1: executor preflight defects 1-6 and the formatter-scope advisory)
+- **Last Updated:** 2026-10-10T05-00 (revision 2, preflight round 2 delta: P14-T3 `--stat --minimal`, ledger r and a counts with P17-T3 `--minimal` diff and r + a sum, rule 5 `REPO_BASH_LINE` stop branch; Phases 0-11 unchanged. Preflight round 1 delta: remediation-case numbering and ADDED_CASES, R4 `DIAG|` output, `cp`/W1 write-route exception, HOLD_HEAD_n string-block locator, ledger change class; Phases 0-11 unchanged. Revision 2: operator-approved scope widening for feature-review finding PA-1; Phases 12-17 and Appendices I-P added)
 - **Status:** Draft
-- **Version:** 1.1
+- **Version:** 1.4
 - **Work Mode:** full-bug
 - **Branch:** `bug/issue-823-tier-rule-adoption-follow-ups-824`
 - **Languages in scope:** PowerShell (one new and one modified hook, two Pester suites), Python (one new and one modified pytest module, no production module), Bash (one modified setup script, one bats suite), Markdown (rule, skill, agent, and instruction files), JSON (one pack manifest). TypeScript has no source change; its toolchain runs as a no-regression gate for AC-8 and AC-13.
-- **Requirements source (sole AC source):** `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`, section `## Acceptance Criteria` (AC-1 through AC-15).
+- **Requirements source (sole AC source):** `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`, section `## Acceptance Criteria` (AC-1 through AC-15; AC-16 through AC-19 are added by P12-T3 under the 2026-10-10 scope widening).
 - **Design input (not a requirements source):** `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/research/2026-10-09T02-25-issue-823-tier-rule-adoption-follow-ups-research.md` (sections 8, 9, 11, 12, 13, 14, 15). Every citation taken from it was re-derived against the worktree at planning time.
 
 **Mode note (full-bug):** `spec.md` is required and present; `user-story.md` is not required and is absent. The full QA loop applies.
@@ -62,6 +62,45 @@
 - PD10 - Pre-existing failures. A test failing at BASE_SHA is recorded by name in its baseline artifact as the pre-existing set. A final gate passes when its failing set is a subset of the recorded pre-existing set and contains no test from PESTER-824, the two Python modules this plan writes, or PARITY-SET (apart from KL-510). AC-13 lists every pre-existing failure that remains.
 - PD11 - TypeScript gates are no-regression gates: no TypeScript file changes, so each final TypeScript step must reproduce its baseline exit code and must not report a new finding or failing test.
 - PD12 - AC-15 concerns the pull request, which the parallel orchestrator authors after this plan. P7-T2 writes the PR-body callout notes; P11-T15 leaves AC-15 unchecked and records it as pending PR authoring.
+
+## Scope-widening addendum (2026-10-10; governs Phases 12-17 only)
+
+Phases 0-11 were executed and are not reopened; their checkboxes and artifacts stand. Feature review blocked on PA-1 (`docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/policy-audit.2026-10-10T00-44.md`, `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/remediation-inputs.2026-10-10T00-44.md`): `.codex/codex-web-setup.sh` gained functions and a source guard in this item, but kcov does not measure `.codex/`. The operator decided to widen #824 scope (decision option 2 of PA-1). Phases 12-17 deliver that decision. Where this addendum conflicts with the sections above, this addendum governs Phases 12-17 and the sections above continue to govern Phases 0-11.
+
+**Additional terms**
+
+- WIDEN_BASE means the commit P12-T1 records before any Phase 12-17 write. Every widening scope diff is anchored to it.
+- HOLD_HEAD_n means the commit a CI hold of round n records (P12-T7 for round 0, P16-T1 for round 1 and later). RUN_ID_n means the GitHub Actions run id the orchestrator supplies when it resumes the executor after round n. CI_DIR_n means `artifacts/orchestration/ci-shell-coverage/RUN_ID_n` (git-ignored, under the permitted non-evidence sub-path `artifacts/orchestration/`).
+- W-SET means these 18 repository paths, the complete write set of Phases 12-17 outside FEATURE: `.claude/rules/shell.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md`, `scripts/bash/shell_qc_lib.sh`, `tests/shell/test_shell_qc_discovery.bats`, `tests/shell/test_shell_qc_commands.bats`, `tests/fixtures/shell_qc/.codex/codex_entry.sh`, `.codex/codex-web-setup.sh`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh`, `tests/shell/test_codex_web_setup_codex_installers.bats`, `tests/shell/test_codex_web_setup_codex_dotnet.bats`, `tests/shell/test_codex_web_setup_codex_verify.bats`, `tests/fixtures/codex_web_setup/dotnet-repo/global.json`, `tests/fixtures/codex_web_setup/dotnet-repo/dotnet-tools.json`, `tests/fixtures/codex_web_setup/dotnet-repo/coverage.config`, `tests/fixtures/codex_web_setup/dotnet-sdk-installed/global.json`, `tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/dotnet/placeholder.txt`, `tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/sdk/8.0.100/placeholder.txt`, `tests/fixtures/codex_web_setup/bashrc-with-ci.txt`. Inside FEATURE, Phases 12-17 write only `spec.md`, `plan.2026-10-08T22-16.md` (task check-off), and artifacts under FEATURE/evidence/.
+- BATS-NEW means the three suites `tests/shell/test_codex_web_setup_codex_installers.bats` (C824-16 to C824-33), `tests/shell/test_codex_web_setup_codex_dotnet.bats` (C824-34 to C824-47), and `tests/shell/test_codex_web_setup_codex_verify.bats` (C824-48 to C824-61). With the 15 cases of `tests/shell/test_codex_web_setup_codex_copy.bats` (C824-1 to C824-15) the C824 set is 61 cases. Cases added under Phase 16 remediation rule 4 (C824-62 onward) belong to the suite that owns the uncovered function.
+- Tokens that Phase 12-17 searches look for and that do not exist in the tracked tree before these phases run (quoted so each search is an instruction): "all five discovery roots"; "for root in tools scripts .claude/lib/bash .claude/skills .codex; do"; the token `,$repo_root/.codex"` (the trailing double quote is part of it; it appears verbatim in Appendix J item J5); the token `"/.codex --exclude-pattern="` (Appendix J item J10); the token `[ "$shellcheck_calls" -eq 8 ]` (Appendix J item J9); "and .codex/ relative to the current dir."; "discover_shell_scripts finds a .sh file under the .codex root"; ".codex/codex_entry.sh"; "codex script fixture"; "8.0.100"; "PA-1 scope widening"; "## Change Log"; "AC-16:"; "AC-17:"; "AC-18:"; "AC-19:".
+
+**Research findings (re-derived 2026-10-10 against the worktree)**
+
+- `.codex/` shell scripts picked up by the widened discovery: exactly one, `.codex/codex-web-setup.sh`. Derivation: the only tracked `.codex/` file with a `.sh` suffix is `.codex/codex-web-setup.sh`, and the only `.codex/` file whose first line is a shebang is the same file (`#!/usr/bin/env bash`, line 1); every other tracked `.codex/` file is `.toml`, `.md`, `.json`, `.ps1`, or another non-shell type. `.codex/state/` is git-ignored (`.gitignore` line 71) and absent from a CI checkout. P12-T2 re-derives this set mechanically with the `is_shell_script` rule. The bundled copy under `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/` is not under any discovery root, so it is not shfmt-checked itself; it is held byte-identical to the repository copy instead.
+- `.github/codex/codex-web-setup.sh` is a different file. No parity test links it to `.codex/codex-web-setup.sh`: the three suites that source it (`tests/shell/test_codex_web_setup_apt_helpers.bats` line 8, `tests/shell/test_codex_web_setup_pypi_connectivity.bats` line 8, `tests/shell/test_codex_web_setup_source_safety.bats` line 13) test it alone, and the only bundle-parity test that reads `.codex/` (`tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py::test_bundled_codex_and_agents_payload_contains_all_repo_runtime_contracts`, lines 215-228) compares `.codex/` with its bundle copy only. `.github/` is not a discovery root. It is therefore out of scope and not written.
+- Tests that pin the root list or include pattern: `tests/shell/test_shell_qc_discovery.bats` (root tests lines 61-71; sorted-list test lines 87-99, which pins 7 entries) and `tests/shell/test_shell_qc_commands.bats` (line 81 pins 7 shellcheck calls over the fixture tree; lines 128-131 assert the include pattern). No Python, Pester, or Jest test reads the root list, the include pattern, or the shell.md discovery text.
+- Formatting gap: `.codex/codex-web-setup.sh` uses 2-space indentation on 254 lines; shfmt default formatting uses one tab per level (`.claude/rules/shell.md` Coding Standards). Nine of those lines (317-320 and 322-326) are inside the multi-line double-quoted `pwsh -Command` string that starts on line 316; shfmt does not re-indent string content, so they keep their spaces. The heredoc body of `write_repo_notes` (lines 351-376) has no leading whitespace.
+
+**Binding execution constraints for Phases 12-17**
+
+- OPS-1: no `sh`, `bash`, or `pwsh` invocation and no RUN script (Appendix G scripts are not used); no local bats, shfmt, shellcheck, or kcov run. Bats, shfmt, shellcheck, and kcov evidence comes only from the CI run of `.github/workflows/_shell-coverage.yml` that the orchestrator dispatches at a CI hold (Appendix P). The executor has no `gh` access.
+- Permitted executor commands: `git`, `poetry run pytest`, `poetry run python -c` (single-line programs only), `grep`, `wc`, `ls`, `tail`, and `cp`; file edits use the Edit and Write tools, except the byte copies by `cp` (P13-T3, P14-T2, and the re-copies in remediation rules 1 and 2) and the layout writer W1 (P14-T1). No PowerShell, Python production, or TypeScript file is written in Phases 12-17, so no PoshQC, Black, Ruff, Pyright, Prettier, ESLint, TSC, or Jest step applies to these phases; the Python parity suites still run because they read the bundled copies.
+- Commit and push at every phase boundary with `git add -- <explicit paths>` (each repository path and each evidence artifact named individually; never `.`, `-A`, a directory, or a glob), `git commit -m "<subject>" -m "Refs #824"`, and `git push origin bug/issue-823-tier-rule-adoption-follow-ups-824`. Never force-push, never rebase, never merge, and delete nothing. A commit task's own evidence artifact and the plan check-off it makes are committed by the next phase's commit task; the final ones (P17-T15) are committed by the orchestrator.
+- If a hook or permission rule denies any command, Write, or Edit (including `git add`, `git commit`, `git push`, a write under a `.codex/` directory, or an edit of `.claude/rules/shell.md`), stop, record the denial text verbatim in the task artifact, and report to the orchestrator. Do not reword the command and do not bypass the hook.
+- Hard exclusions are amended for Phases 12-17 by the operator decision: `scripts/bash/shell_qc_lib.sh`, the two `shell.md` copies, `tests/shell/test_shell_qc_discovery.bats`, `tests/shell/test_shell_qc_commands.bats`, and the W-SET fixtures and suites are in scope. `.github/workflows/_shell-coverage.yml`, `scripts/dev-tools/KcovFunctionCoverageGate.ps1` and its tests, `tests/scripts/workflows/ShellCoverageWorkflow.Tests.ps1`, `.github/codex/codex-web-setup.sh`, and every other hard exclusion listed in Execution constraints remain excluded. Any write outside W-SET and FEATURE stops the plan for a report.
+- Fail-closed evidence rule for Bash: the `N/A - .codex/ is outside the kcov include roots` literal recorded by P10-T1 is superseded. Phases 12-17 record numeric Bash coverage values from CI: the round-0 repo-wide value as baseline and the final-round repo-wide and per-file values as post-change. A missing value makes the Bash verdict REMEDIATION-REQUIRED, never PASS.
+- The Execution-constraints rule "The executor does not commit, stage, or push" and the `sh`-based routes do not apply to Phases 12-17.
+
+**Planner decisions for Phases 12-17**
+
+- PD13 - Discovery root and include pattern. The root `.codex` is added after `.claude/skills` in `discover_shell_scripts` (line 85) and `$repo_root/.codex` is appended to `include_pattern` in `run_test_coverage` (line 350). Under `LC_ALL=C` ordering `.codex/` sorts after `.claude/` (0x6C < 0x6F) and before `scripts/`, which fixes the new position in the sorted-list test.
+- PD14 - shfmt layout without a local shfmt. P14-T1 converts each leading run of two-space groups to the same number of tabs with a single-line `poetry run python -c` program, skipping the string content between the line that ends with `"& {` and the line that begins with `}"` (lines 317-326 at WIDEN_BASE). This matches shfmt default output for every construct the file uses (function bodies, `if` bodies, subshells, backslash continuations, and pipeline continuations each indent one level). The CI `shell-qc check` step (`shfmt -d`) is the authoritative check; any diff it prints is applied verbatim under the Phase 16 remediation rule.
+- PD15 - Behavior unchanged. Proof is two-part: `git diff -w WIDEN_BASE -- .codex/codex-web-setup.sh` is empty after P14-T1 (whitespace-only change), and the 15 pre-existing C824 cases pass in CI. A shellcheck remediation under the Phase 16 remediation rule (a behavior-preserving rewrite of the cited line, or an inline `# shellcheck disable=SCxxxx` comment with a reason) is recorded line by line in the round ledger; those ledgered lines are the only permitted non-whitespace differences, and P17-T3 checks the count.
+- PD16 - AC-14 under reformatting. Re-indenting line 337 (a `warn` text that names `vswhere.exe`) creates diff lines that mention `vswhere` without touching the `vswhere`/`vstest` block, so the P10-T3 command would now report a false positive. P14-T3 re-verifies AC-14 with `git diff -w`, which hides whitespace-only lines; P10-T3 and its artifact stand for the pre-widening tree.
+- PD17 - Coverage tests. BATS-NEW covers every function of `.codex/codex-web-setup.sh` that `tests/shell/test_codex_web_setup_codex_copy.bats` does not, including each branch. External commands are replaced by shell functions; tests that need a tool to be absent limit PATH (and HOME) to the test directory, the pattern C824-11 already uses. No temporary file is created: `append_if_missing` writes to `/dev/null` or to a fixture that already holds the line, and `touch`, `mkdir`, `rm`, `mktemp`, `curl`, `bash`, `tar`, `sudo`, and `dpkg` are stubbed wherever reached. Each suite's `teardown` removes the stubs so bats-core's own cleanup runs the real commands. The "already installed" SDK branch uses a fixture in which `.dotnet-sdk/dotnet` is a directory, which satisfies `[ -x ]` without a checked-in executable.
+- PD18 - CI rounds. Round 0 (P12-T7) runs on the branch before any widening edit and supplies the Bash baseline. Round 1 (P16-T1) runs after Phases 13-15. A failed round triggers the Phase 16 remediation rule and a new round. The executor stops at every hold; it never polls CI.
+- PD19 - AC-6 and AC-13. AC-6 was left unchecked only because the bats suite needed a CI run (P5-T16 `PENDING-CI`); the final round supplies that run, so P17-T12 checks AC-6 when C824-1 to C824-15 pass in it. AC-13 also waits on PR CI for the Python, TypeScript, and PowerShell toolchain, which these phases do not re-run, so P17-T13 records it as pending and leaves it unchecked.
 
 ### Phase 0 — Policy Reads, Baseline Capture, and Prior-Work Fetch
 
@@ -463,6 +502,186 @@ Each task checks one AC box in `docs/features/active/2026-10-03-issue-823-tier-r
       Commands: `grep -c "^- \[x\] AC-" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`; `grep -c "^- \[ \] AC-" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`.
       Acceptance: the two counts sum to 15; the summary's Checked off and Remaining values equal them; Items remaining lists AC-15 and, when P5-T16 recorded `PENDING-CI`, AC-6.
 
+### Phase 12 — Widening Preconditions, Spec Amendment, and Shell Baseline (CI Round 0)
+
+The Scope-widening addendum governs this phase and every later phase. Phase 12 writes no file outside FEATURE.
+
+- [ ] [P12-T1] Verify the branch, the clean tree, and the remote state before any widening write, and record WIDEN_BASE in FEATURE/evidence/baseline/widening-preconditions.TS.md.
+      Commands: `git branch --show-current`; `git status --porcelain --untracked-files=all`; `git rev-parse HEAD`; `git merge-base --is-ancestor 7bbd0b9b9 HEAD`; `git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git rev-parse origin/bug/issue-823-tier-rule-adoption-follow-ups-824`; `git merge-base --is-ancestor origin/bug/issue-823-tier-rule-adoption-follow-ups-824 HEAD`.
+      Acceptance: the branch command prints exactly `bug/issue-823-tier-rule-adoption-follow-ups-824`; the status command prints nothing (the orchestrator commits this plan revision before it resumes the executor, so any listed path stops the plan); `git rev-parse HEAD` prints one 40-character SHA, recorded as WIDEN_BASE; both ancestry checks exit 0 (origin/main 7bbd0b9b9 is merged in, and the local branch is not behind the remote). When the remote SHA equals WIDEN_BASE the artifact records `REMOTE: equal`. When it differs, run `git push origin bug/issue-823-tier-rule-adoption-follow-ups-824`, `git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824`, and `git rev-parse origin/bug/issue-823-tier-rule-adoption-follow-ups-824`, and record `REMOTE: pushed` with the new remote SHA, which must equal WIDEN_BASE. A failed ancestry check or a rejected push stops the plan. `EXIT_CODE` is that of the last command run.
+- [ ] [P12-T2] Re-derive the `.codex/` shell-script set with the `is_shell_script` rule of `scripts/bash/shell_qc_lib.sh` (lines 54-73), confirm the two affected bundle pairs are byte-identical, and record the pre-widening sizes in FEATURE/evidence/baseline/codex-shell-scope.TS.md.
+      Commands: reader R1 of Appendix P; `git diff --no-index --exit-code .claude/rules/shell.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md`; `git diff --no-index --exit-code .codex/codex-web-setup.sh extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh`; `grep -c "^  " .codex/codex-web-setup.sh`; `grep -c "^ " scripts/bash/shell_qc_lib.sh`; `wc -l .codex/codex-web-setup.sh scripts/bash/shell_qc_lib.sh tests/shell/test_shell_qc_discovery.bats tests/shell/test_shell_qc_commands.bats tests/shell/test_codex_web_setup_codex_copy.bats`.
+      Acceptance: R1 exits 0 and prints a `TRACKED <n>` line (n recorded) followed by exactly `SHELL ['.codex/codex-web-setup.sh']`; any other SHELL list stops the plan, because W-SET and Phase 14 assume this one file. Both diffs exit 0 with no output. The first indentation grep prints 254; the second prints 0. `wc` prints 413, 394, 99, 203, and 187 for the five files in that order; any other value stops the plan, because the Appendix J old texts and the P14-T1 counts were derived from these sizes. `wc` is last, so `EXIT_CODE: 0`.
+- [ ] [P12-T3] Update `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md` with insertion I1 of Appendix I (AC-16 through AC-19, unchecked; Edit tool; the operator authorized this spec write), and record FEATURE/evidence/other/p12-t3.TS.md.
+      Commands: `grep -c "^- \[ \] AC-1[6-9]:" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`; `grep -c "^- \[[ x]\] AC-[0-9]*:" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`; `grep -c -F "AC-19:" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`.
+      Acceptance: the greps print 4, 19, and 1. `EXIT_CODE: 0`.
+- [ ] [P12-T4] Update `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md` with insertion I2 of Appendix I (the dated `## Change Log` entry recording the operator decision on PA-1), and record FEATURE/evidence/other/p12-t4.TS.md.
+      Commands: `grep -c "^## Change Log$" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`; `grep -c -F "PA-1 scope widening" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`; `grep -c -F "2026-10-10" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`.
+      Acceptance: the greps print 1, 1, and at least 1. `EXIT_CODE: 0`.
+- [ ] [P12-T5] Baseline full pytest run before any widening write outside FEATURE, run in the background, and record FEATURE/evidence/baseline/widening-pytest-full.TS.md.
+      Command: `poetry run pytest`.
+      Acceptance: the exit code, the summary line, and every `FAILED` line are recorded; the passed count is WIDEN_PY_PASSED and the failing names other than KL-510 are WIDEN_PY_FAILED. A failure is recorded, not a stop condition (PD10 applies to P17-T2). The rootdir header is recorded only by its repository-relative tail.
+- [ ] [P12-T6] Commit and push Phase 12, and record FEATURE/evidence/other/commit-p12.TS.md.
+      Commands: `git add -- docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/plan.2026-10-08T22-16.md` followed by the full path of each artifact P12-T1 to P12-T5 wrote, named individually; `git commit -m "docs(824): amend spec for PA-1 scope widening and record widening baseline" -m "Refs #824"`; `git push origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git status --porcelain --untracked-files=all`; `git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git rev-parse HEAD origin/bug/issue-823-tier-rule-adoption-follow-ups-824`.
+      Acceptance: `git add`, `git commit`, and `git push` each exit 0 and the push is not forced; the status command prints nothing; the last command prints two equal SHAs. `EXIT_CODE: 0`. This artifact is committed by P13-T9.
+- [ ] [P12-T7] [CI-HOLD] Round 0: record HOLD_HEAD_0 in FEATURE/evidence/other/ci-hold-round0.TS.md, then stop and report the line `CI-HOLD: ROUND 0 HEAD <HOLD_HEAD_0>` to the orchestrator.
+      Commands: `git rev-parse HEAD`; `git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git rev-parse origin/bug/issue-823-tier-rule-adoption-follow-ups-824`.
+      Acceptance: the first and last commands print the same SHA, recorded as HOLD_HEAD_0; the artifact records `HOLD: round 0`, HOLD_HEAD_0, and `RESUME-CONDITION: orchestrator completes Appendix P steps O1-O8 for HOLD_HEAD_0 and resumes the executor with CI-RESUME: ROUND 0 RUN_ID <id>`. This task is checked off when the artifact exists; the executor then stops and performs no further task until it is resumed.
+
+### Phase 13 — CI Round-0 Readout and Shell-QC Scope Widening
+
+Each task writes the artifact it names; edit tasks write FEATURE/evidence/other/p13-tN.TS.md (N is the task number).
+
+- [ ] [P13-T1] Read the round-0 CI files the orchestrator placed in CI_DIR_0, and record the Bash baseline in FEATURE/evidence/baseline/ci-shell-round0.TS.md.
+      Commands (substitute RUN_ID_0): `ls artifacts/orchestration/ci-shell-coverage/RUN_ID_0`; reader R2 of Appendix P on `artifacts/orchestration/ci-shell-coverage/RUN_ID_0/run.json`; reader R3 on `artifacts/orchestration/ci-shell-coverage/RUN_ID_0/run.log`; reader R4 on `artifacts/orchestration/ci-shell-coverage/RUN_ID_0/run.log`; reader R5 on `artifacts/orchestration/ci-shell-coverage/RUN_ID_0/shell-coverage/cov.xml`.
+      Acceptance: `ls` lists `run.json` and `run.log`; R2 prints `HEAD` equal to HOLD_HEAD_0 (any other head stops the plan, because the run did not test the held commit). R2's `CONCLUSION` and STEP lines, R3's and R4's count lines, and R5's two lines are recorded verbatim. Expected pre-widening facts, recorded and not stop conditions: R5 prints `MATCHES 0` and `GATE FAIL` (kcov does not yet measure `.codex/`), and R4 prints `C824_OK` of at most 15. R4's `REPO_BASH_LINE` is recorded as BASE_BASH_LINE. When the coverage step did not complete (R4 prints `REPO_BASH_LINE MISSING`, or `shell-coverage/cov.xml` is absent and R5 exits 1), the artifact records `BASE_BASH_LINE: UNAVAILABLE (round 0 <failed step name from R2>)`, `EXIT_CODE: 1`, and `ExpectedExitCode: 1`, and P17-T6 reports the absolute thresholds without a baseline delta. Every `NOT_OK` and `CHECK|` line that reports a failure is recorded as the round-0 pre-existing set, with the `DIAG|` lines R4 prints for it. Otherwise R5 is last and exits 0, so `EXIT_CODE: 0`.
+- [ ] [P13-T2] Update `.claude/rules/shell.md` with replacements J1 and J2 of Appendix J (Edit tool; operator-approved edit of this policy file, Scope-widening addendum).
+      Commands: `grep -c -F "all five discovery roots" .claude/rules/shell.md`; `grep -c -F ".codex/codex-web-setup.sh" .claude/rules/shell.md`; `grep -c -F "four discovery roots" .claude/rules/shell.md`.
+      Acceptance: the greps print 1, 1, and 0. The last grep prints 0, so `EXIT_CODE: 1` with `ExpectedExitCode: 1`.
+- [ ] [P13-T3] Update `extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md` by byte copy from `.claude/rules/shell.md`.
+      Commands: `cp .claude/rules/shell.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md`; `git diff --no-index --exit-code .claude/rules/shell.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md`; `git status --porcelain -- .claude/rules/shell.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md`.
+      Acceptance: `cp` exits 0; the diff exits 0 with no output; the status listing is exactly ` M .claude/rules/shell.md` and ` M extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md`. `EXIT_CODE: 0`.
+- [ ] [P13-T4] Update `scripts/bash/shell_qc_lib.sh` with replacements J3, J4, and J5 of Appendix J (discovery comment, discovery roots, kcov include pattern and its comment; Edit tool; tab indentation kept).
+      Commands: `grep -c -F "for root in tools scripts .claude/lib/bash .claude/skills .codex; do" scripts/bash/shell_qc_lib.sh`; `grep -c -F ',$repo_root/.codex"' scripts/bash/shell_qc_lib.sh`; `grep -c -F "and .codex/ relative to the current dir." scripts/bash/shell_qc_lib.sh`; `grep -c -F "for root in tools scripts .claude/lib/bash .claude/skills; do" scripts/bash/shell_qc_lib.sh`; `grep -c "^ " scripts/bash/shell_qc_lib.sh`; `wc -l scripts/bash/shell_qc_lib.sh`.
+      Acceptance: the greps print 1, 1, 1, 0, and 0 (no line begins with a space, so the edits kept tab indentation); `wc` prints 394 (each replacement keeps its line count) and is last, so `EXIT_CODE: 0`.
+- [ ] [P13-T5] Create `tests/fixtures/shell_qc/.codex/codex_entry.sh` with exactly the content J6 of Appendix J (Write tool, LF line endings).
+      Commands: `grep -c -F "codex script fixture" tests/fixtures/shell_qc/.codex/codex_entry.sh`; `git check-ignore -q tests/fixtures/shell_qc/.codex/codex_entry.sh`; `git status --porcelain --untracked-files=all -- tests/fixtures/shell_qc`.
+      Acceptance: the grep prints 1; `git check-ignore -q` exits 1 (the path is not ignored); the status listing is exactly `?? tests/fixtures/shell_qc/.codex/codex_entry.sh`. `EXIT_CODE: 0`.
+- [ ] [P13-T6] Update `tests/shell/test_shell_qc_discovery.bats` with replacements J7 (new `.codex` root test) and J8 (sorted list of 8 entries) of Appendix J.
+      Commands: `grep -c "^@test" tests/shell/test_shell_qc_discovery.bats`; `grep -c -F "discover_shell_scripts finds a .sh file under the .codex root" tests/shell/test_shell_qc_discovery.bats`; `grep -c -F ".codex/codex_entry.sh" tests/shell/test_shell_qc_discovery.bats`; `grep -c -F -e "-eq 8 ]" tests/shell/test_shell_qc_discovery.bats`; `grep -c -F -e "-eq 7 ]" tests/shell/test_shell_qc_discovery.bats`; `wc -l tests/shell/test_shell_qc_discovery.bats`.
+      Acceptance: the greps print 14, 1, 2, 1, and 0; `wc` prints 107 (99 + 6 from J7 + 2 from J8) and is last, so `EXIT_CODE: 0`.
+- [ ] [P13-T7] Update `tests/shell/test_shell_qc_commands.bats` with replacements J9 (eight shellcheck calls over the fixture tree) and J10 (include-pattern assertion for `.codex`) of Appendix J.
+      Commands: `grep -c -F '[ "$shellcheck_calls" -eq 8 ]' tests/shell/test_shell_qc_commands.bats`; `grep -c -F '"/.codex --exclude-pattern="' tests/shell/test_shell_qc_commands.bats`; `grep -c -F '[ "$shellcheck_calls" -eq 7 ]' tests/shell/test_shell_qc_commands.bats`; `wc -l tests/shell/test_shell_qc_commands.bats`.
+      Acceptance: the greps print 1, 1, and 0; `wc` prints 204 and is last, so `EXIT_CODE: 0`.
+- [ ] [P13-T8] Run the Claude bundle-parity suites that read the bundled `shell.md`, and record FEATURE/evidence/qa-gates/claude-bundle-parity-widening.TS.md.
+      Command: `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`.
+      Acceptance: no failed test other than a KL-510 failure (classified by the KL-510 rule in Terms); with no KL-510 failure the run exits 0, and with one it exits 1 and the artifact records `KL-510: STATE-ONLY` and `ExpectedExitCode: 1`. Any other failure is fixed by correcting the Phase 13 edit and re-running P13-T3 and this task.
+- [ ] [P13-T9] Commit and push Phase 13, and record FEATURE/evidence/other/commit-p13.TS.md.
+      Commands: `git add -- .claude/rules/shell.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md scripts/bash/shell_qc_lib.sh tests/fixtures/shell_qc/.codex/codex_entry.sh tests/shell/test_shell_qc_discovery.bats tests/shell/test_shell_qc_commands.bats docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/plan.2026-10-08T22-16.md` followed by the full path of the P12-T6 and P12-T7 artifacts and of each artifact P13-T1 to P13-T8 wrote, named individually; `git commit -m "feat(824): bring .codex into shell-qc discovery and the kcov include roots" -m "Refs #824"`; `git push origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git status --porcelain --untracked-files=all`; `git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git rev-parse HEAD origin/bug/issue-823-tier-rule-adoption-follow-ups-824`.
+      Acceptance: as P12-T6. This artifact is committed by P14-T5.
+
+### Phase 14 — shfmt Layout for `.codex/codex-web-setup.sh` and Bundle Parity
+
+Each edit task writes FEATURE/evidence/other/p14-tN.TS.md unless it names another artifact.
+
+- [ ] [P14-T1] Update `.codex/codex-web-setup.sh` to the shfmt default layout with writer W1 of Appendix P (each leading two-space group becomes one tab; the `pwsh -Command` string content after the line ending in `"& {` through the line beginning `}"` is left byte-for-byte; PD14).
+      Commands: `grep -c "^  " .codex/codex-web-setup.sh`; writer W1 of Appendix P; `grep -c "^ " .codex/codex-web-setup.sh`; `wc -l .codex/codex-web-setup.sh`; `tail -n 1 .codex/codex-web-setup.sh`.
+      Acceptance: the first grep prints 254; W1 exits 0 and prints exactly `BLOCK_START_CANDIDATES 1 KEPT_BLOCK_LINES 10 CHANGED_LINES 245 SPACE_LEADING_AFTER 9 CR_BYTES 0` (this is the observation that separates a converting run from a no-op; when the task is re-run after a completed conversion, the first grep prints 9 and W1 prints `CHANGED_LINES 0` with the other four values unchanged, which is accepted); the second grep prints 9 (the nine string-content lines); `wc` prints 413; `tail` prints `if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi` (the guard C824-1 pins is unchanged). `EXIT_CODE: 0`.
+- [ ] [P14-T2] Update `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh` by byte copy from `.codex/codex-web-setup.sh`.
+      Commands: `cp .codex/codex-web-setup.sh extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh`; `git diff --no-index --exit-code .codex/codex-web-setup.sh extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh`; `git status --porcelain -- .codex/codex-web-setup.sh extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh`.
+      Acceptance: `cp` exits 0; the diff exits 0 with no output; the status listing is exactly ` M .codex/codex-web-setup.sh` and ` M extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh`. `EXIT_CODE: 0`.
+- [ ] [P14-T3] Verify that the layout change is whitespace-only (PD15) and re-verify the AC-14 `vswhere` condition under whitespace-insensitive comparison (PD16), and record FEATURE/evidence/qa-gates/codex-setup-behavior-check.TS.md.
+      Commands (substitute WIDEN_BASE, and BASE_SHA from the P0-T3 artifact): `git diff -w --exit-code WIDEN_BASE -- .codex/codex-web-setup.sh`; `git diff --stat --minimal WIDEN_BASE -- .codex/codex-web-setup.sh`; `git status --porcelain -- .codex/codex-web-setup.sh`; `git diff -w --unified=0 --no-color --output=artifacts/orchestration/codex-setup-widening-w.diff BASE_SHA -- .codex/codex-web-setup.sh`; `grep -c -e "^+.*list_root_solution_files" artifacts/orchestration/codex-setup-widening-w.diff`; `grep -c -e "^[-+].*vswhere" artifacts/orchestration/codex-setup-widening-w.diff`.
+      Acceptance: the first diff exits 0 with no output (no non-whitespace change since WIDEN_BASE); `--stat --minimal` prints a summary line `1 file changed, 245 insertions(+), 245 deletions(-)` (non-vacuous: the file did change) (the default diff algorithm prints 275 and 275 for this change, so `--minimal` is required); the status line is ` M .codex/codex-web-setup.sh`; the BASE_SHA diff exits 0; the `list_root_solution_files` grep prints 3 (the added definition and two calls, which proves the BASE_SHA diff carries the #824 change); the `vswhere` grep prints 0, so `EXIT_CODE: 1` with `ExpectedExitCode: 1`.
+- [ ] [P14-T4] Run the Codex bundle-parity node and the follow-ups module, and record FEATURE/evidence/qa-gates/codex-bundle-parity-widening.TS.md.
+      Command: `poetry run pytest "tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py::test_bundled_codex_and_agents_payload_contains_all_repo_runtime_contracts" tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`.
+      Acceptance: exit 0 and a summary reporting 44 passed (1 parity node and the 43 follow-ups cases P8-T1 recorded) and no failed test. A failure is fixed by correcting `.codex/codex-web-setup.sh` and re-running P14-T2 and this task.
+- [ ] [P14-T5] Commit and push Phase 14, and record FEATURE/evidence/other/commit-p14.TS.md.
+      Commands: `git add -- .codex/codex-web-setup.sh extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/plan.2026-10-08T22-16.md` followed by the full path of the P13-T9 artifact and of each artifact P14-T1 to P14-T4 wrote, named individually; `git commit -m "style(824): apply the shfmt default layout to .codex/codex-web-setup.sh" -m "Refs #824"`; `git push origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git status --porcelain --untracked-files=all`; `git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git rev-parse HEAD origin/bug/issue-823-tier-rule-adoption-follow-ups-824`.
+      Acceptance: as P12-T6. This artifact is committed by P15-T8.
+
+### Phase 15 — Bats Coverage Suites and Fixtures for `.codex/codex-web-setup.sh`
+
+Each task writes FEATURE/evidence/other/p15-tN.TS.md unless it names another artifact. Every file is written with the Write tool, with exactly the appendix content and LF line endings. None of these suites is run locally (OPS-1); they first run in the Phase 16 CI round.
+
+- [ ] [P15-T1] Create the three fixture files of item K1 of Appendix K under `tests/fixtures/codex_web_setup/dotnet-repo/` (`global.json`, `dotnet-tools.json`, `coverage.config`).
+      Commands: `grep -c -F "8.0.100" tests/fixtures/codex_web_setup/dotnet-repo/global.json`; `poetry run python -c "import json; [json.load(open(p, encoding='utf-8')) for p in ('tests/fixtures/codex_web_setup/dotnet-repo/global.json', 'tests/fixtures/codex_web_setup/dotnet-repo/dotnet-tools.json')]; print('JSON_OK', 2)"`; `ls tests/fixtures/codex_web_setup/dotnet-repo`.
+      Acceptance: the grep prints 1; the JSON check exits 0 and prints `JSON_OK 2`; `ls` lists exactly `coverage.config`, `dotnet-tools.json`, and `global.json`. `EXIT_CODE: 0`.
+- [ ] [P15-T2] Create the three fixture files of item K2 of Appendix K under `tests/fixtures/codex_web_setup/dotnet-sdk-installed/` (`global.json`, `.dotnet-sdk/dotnet/placeholder.txt`, `.dotnet-sdk/sdk/8.0.100/placeholder.txt`).
+      Commands: `grep -c -F "8.0.100" tests/fixtures/codex_web_setup/dotnet-sdk-installed/global.json`; `ls tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk`; `ls tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/dotnet tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/sdk/8.0.100`.
+      Acceptance: the grep prints 1; the first `ls` lists exactly `dotnet` and `sdk`; the second lists `placeholder.txt` under each of the two directories. `EXIT_CODE: 0`.
+- [ ] [P15-T3] Create `tests/fixtures/codex_web_setup/bashrc-with-ci.txt` with exactly the content of item K3 of Appendix K.
+      Commands: `grep -c -x -F "export CI=true" tests/fixtures/codex_web_setup/bashrc-with-ci.txt`; `wc -l tests/fixtures/codex_web_setup/bashrc-with-ci.txt`.
+      Acceptance: the grep prints 1; `wc` prints 1. `EXIT_CODE: 0`.
+- [ ] [P15-T4] Create `tests/shell/test_codex_web_setup_codex_installers.bats` with exactly the content of Appendix L (C824-16 to C824-33).
+      Commands: `grep -c "^@test" tests/shell/test_codex_web_setup_codex_installers.bats`; `grep -c -E "^@test \"C824-(1[6-9]|2[0-9]|3[0-3]) " tests/shell/test_codex_web_setup_codex_installers.bats`; `wc -l tests/shell/test_codex_web_setup_codex_installers.bats`.
+      Acceptance: the greps print 18 and 18; the line count is at most 500. `EXIT_CODE: 0`.
+- [ ] [P15-T5] Create `tests/shell/test_codex_web_setup_codex_dotnet.bats` with exactly the content of Appendix M (C824-34 to C824-47).
+      Commands: `grep -c "^@test" tests/shell/test_codex_web_setup_codex_dotnet.bats`; `grep -c -E "^@test \"C824-(3[4-9]|4[0-7]) " tests/shell/test_codex_web_setup_codex_dotnet.bats`; `wc -l tests/shell/test_codex_web_setup_codex_dotnet.bats`.
+      Acceptance: the greps print 14 and 14; the line count is at most 500. `EXIT_CODE: 0`.
+- [ ] [P15-T6] Create `tests/shell/test_codex_web_setup_codex_verify.bats` with exactly the content of Appendix N (C824-48 to C824-61).
+      Commands: `grep -c "^@test" tests/shell/test_codex_web_setup_codex_verify.bats`; `grep -c -E "^@test \"C824-(4[89]|5[0-9]|6[01]) " tests/shell/test_codex_web_setup_codex_verify.bats`; `wc -l tests/shell/test_codex_web_setup_codex_verify.bats`.
+      Acceptance: the greps print 14 and 14; the line count is at most 500. `EXIT_CODE: 0`.
+- [ ] [P15-T7] Static checks of BATS-NEW and the seven new fixtures (no temporary-directory use, LF only, not ignored, all untracked-new), and record FEATURE/evidence/qa-gates/bats-suites-static.TS.md.
+      Commands: `grep -c -E "BATS_TEST_TMPDIR|BATS_TMPDIR|BATS_FILE_TMPDIR|BATS_RUN_TMPDIR" tests/shell/test_codex_web_setup_codex_installers.bats tests/shell/test_codex_web_setup_codex_dotnet.bats tests/shell/test_codex_web_setup_codex_verify.bats`; reader R6 of Appendix P; `git check-ignore -v tests/shell/test_codex_web_setup_codex_installers.bats tests/shell/test_codex_web_setup_codex_dotnet.bats tests/shell/test_codex_web_setup_codex_verify.bats tests/fixtures/codex_web_setup/dotnet-repo/global.json tests/fixtures/codex_web_setup/dotnet-repo/dotnet-tools.json tests/fixtures/codex_web_setup/dotnet-repo/coverage.config tests/fixtures/codex_web_setup/dotnet-sdk-installed/global.json tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/dotnet/placeholder.txt tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/sdk/8.0.100/placeholder.txt tests/fixtures/codex_web_setup/bashrc-with-ci.txt`; `git status --porcelain --untracked-files=all -- tests/shell tests/fixtures/codex_web_setup`.
+      Acceptance: the grep prints `:0` for each of the three suites; R6 exits 0 and prints `CHECKED 10 CR_FILES 0 []`; `git check-ignore -v` exits 1 with no output (no path is ignored); the status listing is exactly ten `??` lines, one for each of the three suites and the seven fixtures named above. `EXIT_CODE: 0`.
+- [ ] [P15-T8] Commit and push Phase 15, and record FEATURE/evidence/other/commit-p15.TS.md.
+      Commands: `git add -- tests/shell/test_codex_web_setup_codex_installers.bats tests/shell/test_codex_web_setup_codex_dotnet.bats tests/shell/test_codex_web_setup_codex_verify.bats tests/fixtures/codex_web_setup/dotnet-repo/global.json tests/fixtures/codex_web_setup/dotnet-repo/dotnet-tools.json tests/fixtures/codex_web_setup/dotnet-repo/coverage.config tests/fixtures/codex_web_setup/dotnet-sdk-installed/global.json tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/dotnet/placeholder.txt tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/sdk/8.0.100/placeholder.txt tests/fixtures/codex_web_setup/bashrc-with-ci.txt docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/plan.2026-10-08T22-16.md` followed by the full path of the P14-T5 artifact and of each artifact P15-T1 to P15-T7 wrote, named individually; `git commit -m "test(824): add bats coverage suites and fixtures for .codex/codex-web-setup.sh" -m "Refs #824"`; `git push origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git status --porcelain --untracked-files=all`; `git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git rev-parse HEAD origin/bug/issue-823-tier-rule-adoption-follow-ups-824`.
+      Acceptance: as P12-T6. This artifact is committed by P16-T7.
+
+### Phase 16 — CI Shell Round (Hold, Readout, Remediation Until Clean)
+
+Round rule: the first round of this phase is round 1. Every round runs P16-T1 through P16-T6 and writes its artifacts with the round number n in the file name. A round fails when any of P16-T2 to P16-T5 fails its acceptance. After a failed round, apply the remediation rule below, then commit and push the remediation (`git add --` followed by each remediated W-SET path, the plan, and each artifact of the round, named individually; `git commit -m "fix(824): CI shell round n remediation" -m "Refs #824"` with n substituted; `git push origin bug/issue-823-tier-rule-adoption-follow-ups-824`), increase n by 1, and restart at P16-T1. P16-T1 to P16-T6 are checked off as each completes within a round (P16-T1 before the executor stops at the hold); after a failed round the executor clears those six checkboxes before restarting at P16-T1, so at the end they reflect the passing round only. After three failed rounds, stop and report the ledger to the orchestrator instead of starting a fourth. P16-T7 runs once, after a round whose verdict is PASS.
+
+Remediation rule (every fix is recorded in the round ledger with path, line, failure kind, the removed count r and added count a (the lines this fix removes and adds that still differ when whitespace is ignored, counting only lines with non-whitespace content), change class (`non-whitespace` when r + a is above 0, otherwise `whitespace-only`), and reason; only W-SET paths may change):
+1. shfmt difference (R3 `SHFMT_DIFF_FILES` above 0): apply the diff hunks R3 printed under `CHECK|` for the named file verbatim with the Edit tool; when the file is `.codex/codex-web-setup.sh`, re-run the P14-T2 commands. A hunk that touches the guard line pinned by C824-1, or a line inside the `pwsh -Command` string, stops the plan for a report.
+2. shellcheck finding (R3 `SHELLCHECK_FINDINGS` above 0): rewrite the cited line so the finding no longer applies without changing behavior; when no behavior-preserving rewrite exists, add `# shellcheck disable=SCxxxx  # <reason>` on the line directly above, with the code and a reason substituted. Re-copy the bundle as in item 1. A finding in a file outside W-SET stops the plan for a report.
+3. `not ok` in a BATS-NEW case: correct that case's stubs or assertions so they match the unchanged production behavior shown in the failure output. Never delete a case, never add `skip`, and never reduce a case to a status-only check. A `not ok` in C824-1 to C824-15, in `tests/shell/test_shell_qc_discovery.bats` or `tests/shell/test_shell_qc_commands.bats` that the Phase 13 edits do not explain, or in any other suite, stops the plan for a report. The failure output is the `NOT_OK|` and `DIAG|` lines R4 prints for that round.
+4. Coverage below the gate (R5 `MATCHES 1` and `GATE FAIL`): add cases to the BATS-NEW suite that owns the functions holding the `UNCOVERED` line numbers, numbered from the next free C824 number, each suite staying at or below 500 lines. When every remaining uncovered line lies inside the `pwsh -Command` string (the lines after the line ending in `"& {` through the line beginning `}"` in the file at HOLD_HEAD_n; WIDEN_BASE lines 317-326 when no line was inserted above them), stop and report, because AC-14 forbids changing that block. Each added case is named `C824-<n> <description>` with n consecutive from 62. The P16-T6 ledger records the cumulative number added as ADDED_CASES (0 when none).
+5. `MATCHES 0` with a successful coverage step, a missing `shell-coverage/cov.xml` after a successful upload step, or a failed step other than the check, test, and upload steps (tool installation or the kcov build); or `REPO_BASH_LINE` below 85.0 while R5 prints `GATE PASS` and R4 prints `NOT_OK 0`: stop and report; these are not fixable inside W-SET.
+
+- [ ] [P16-T1] [CI-HOLD] Round n: record HOLD_HEAD_n in FEATURE/evidence/other/ci-hold-round<n>.TS.md (n substituted), then stop and report the line `CI-HOLD: ROUND <n> HEAD <HOLD_HEAD_n>` to the orchestrator.
+      Commands: `git status --porcelain --untracked-files=all -- . ':!docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824'`; `git rev-parse HEAD`; `git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git rev-parse origin/bug/issue-823-tier-rule-adoption-follow-ups-824`.
+      Acceptance: the status command prints nothing (every W-SET change is committed and pushed); the two SHAs are equal and are recorded as HOLD_HEAD_n; the artifact records `HOLD: round n`, HOLD_HEAD_n, and `RESUME-CONDITION: orchestrator completes Appendix P steps O1-O8 for HOLD_HEAD_n and resumes the executor with CI-RESUME: ROUND n RUN_ID <id>`. The executor then stops and performs no further task until it is resumed. `EXIT_CODE: 0`.
+- [ ] [P16-T2] Read the run summary of round n and record FEATURE/evidence/qa-gates/ci-run-round<n>.TS.md.
+      Command (substitute RUN_ID_n): reader R2 of Appendix P on `artifacts/orchestration/ci-shell-coverage/RUN_ID_n/run.json`.
+      Acceptance: R2 exits 0; `HEAD` equals HOLD_HEAD_n; `CONCLUSION success`; the STEP lines for `Run shell-qc check (shfmt diff + shellcheck)`, `Run shell-qc test with coverage`, and `Upload shell coverage artifacts` each end in `| success`. Every STEP line is recorded verbatim.
+- [ ] [P16-T3] Read the `shell-qc check` step output of round n (shfmt diff and shellcheck over the widened discovery set, which now includes `.codex/codex-web-setup.sh`), and record FEATURE/evidence/qa-gates/ci-shell-qc-check-round<n>.TS.md.
+      Command (substitute RUN_ID_n): reader R3 of Appendix P on `artifacts/orchestration/ci-shell-coverage/RUN_ID_n/run.log`.
+      Acceptance: R3 exits 0 and its first line reports `CHECK_LINES` above 0 (the step is present in the log) with `SHELLCHECK_FINDINGS 0 SHFMT_DIFF_FILES 0`. The `CHECK|` lines are recorded only when a count is above 0.
+- [ ] [P16-T4] Read the bats results and the repo-wide Bash coverage line of round n, and record FEATURE/evidence/qa-gates/ci-bats-round<n>.TS.md.
+      Command (substitute RUN_ID_n): reader R4 of Appendix P on `artifacts/orchestration/ci-shell-coverage/RUN_ID_n/run.log`.
+      Acceptance: R4 exits 0 and prints `NOT_OK 0`; `C824_OK` and `C824_MAX` both equal 61 plus the ledgered ADDED_CASES (every C824 case, including C824-1 to C824-15, is `ok`); and an `OK` count above that value, and a numeric `REPO_BASH_LINE` of at least 85.0, recorded as FINAL_BASH_LINE. `DIAG|` lines are recorded verbatim when `NOT_OK` is above 0.
+- [ ] [P16-T5] Read the kcov Cobertura report of round n for `.codex/codex-web-setup.sh` against the 0.85 line-rate threshold, and record FEATURE/evidence/qa-gates/ci-kcov-codex-setup-round<n>.TS.md.
+      Command (substitute RUN_ID_n): reader R5 of Appendix P on `artifacts/orchestration/ci-shell-coverage/RUN_ID_n/shell-coverage/cov.xml`.
+      Acceptance: R5 exits 0; its first line reports `MATCHES 1`, a `CLASS_LINE_RATE` of at least 0.85, and `GATE PASS`; the `PCT` value is recorded as FINAL_CODEX_SETUP_PCT, `CLASS_LINE_RATE` as FINAL_CODEX_SETUP_RATE, and `ROOT_LINE_RATE` alongside FINAL_BASH_LINE (the two describe the same merged report). The `UNCOVERED` line is recorded verbatim.
+- [ ] [P16-T6] Update the round ledger FEATURE/evidence/qa-gates/ci-shell-rounds.TS.md (created in round 1 and extended in each later round; this is the only Phase 16 artifact that is not written anew per round).
+      Command: none (record `Command: none - ledger of CI shell rounds` and `EXIT_CODE: 0`).
+      Acceptance: the ledger has one entry per round with n, RUN_ID_n, HOLD_HEAD_n, PASS or FAIL for each of P16-T2 to P16-T5 with its artifact path, every remediation applied (path, line, failure kind, r, a, change class, reason), the cumulative ADDED_CASES value (0 when none), and `ROUND VERDICT: PASS` or `ROUND VERDICT: FAIL`. The last entry reads `ROUND VERDICT: PASS`, and no more than three rounds are listed.
+- [ ] [P16-T7] Commit and push the Phase 16 evidence, and record FEATURE/evidence/other/commit-p16.TS.md.
+      Commands: `git add -- docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/plan.2026-10-08T22-16.md` followed by the full path of the P15-T8 artifact and of every Phase 16 artifact not yet committed, named individually; `git commit -m "docs(824): record CI shell round evidence" -m "Refs #824"`; `git push origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git status --porcelain --untracked-files=all`; `git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git rev-parse HEAD origin/bug/issue-823-tier-rule-adoption-follow-ups-824`.
+      Acceptance: as P12-T6. This artifact is committed by P17-T15.
+
+### Phase 17 — Final Widening Verification, PR-Body Callouts, and AC Check-Off
+
+Check-off tasks P17-T8 to P17-T12 each change one line of `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md` from `- [ ] AC-n:` to `- [x] AC-n:` (nothing else), only when every named verifying task is checked and its artifact passes, and append one line `AC-n checked: <verifying artifact paths>` to FEATURE/evidence/other/ac-checkoff-widening.TS.md (created by P17-T8). Acceptance for each: `grep -c -F "[x] AC-n:" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md` prints 1 after the edit (n substituted; the trailing colon keeps AC-1 from matching AC-16 through AC-19), and the artifact line names every verifying artifact. An AC whose verification failed stays unchecked and the gap is recorded in the same artifact.
+
+- [ ] [P17-T1] Run PARITY-SET and the follow-ups module on the final tree, and record FEATURE/evidence/qa-gates/parity-set-widening.TS.md.
+      Command: `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`.
+      Acceptance: no failed test other than KL-510; with no KL-510 failure the run exits 0, and with one it exits 1 and the artifact records `KL-510: STATE-ONLY` and `ExpectedExitCode: 1`. The summary line is recorded.
+- [ ] [P17-T2] Full pytest run on the final tree, run in the background, and record FEATURE/evidence/qa-gates/widening-pytest-full.TS.md.
+      Command: `poetry run pytest`.
+      Acceptance: every failing test is in WIDEN_PY_FAILED or is KL-510, and none is in PARITY-SET (apart from KL-510) or in `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`; the passed count is at least WIDEN_PY_PASSED. With no failure in P12-T5 this is exit 0. The summary line and every `FAILED` line are recorded.
+- [ ] [P17-T3] Verify byte identity of the two widened bundle pairs and that `.codex/codex-web-setup.sh` differs from WIDEN_BASE only by whitespace and any ledgered `non-whitespace` shellcheck remediation, and record FEATURE/evidence/qa-gates/widening-mirror-identity.TS.md.
+      Commands (substitute WIDEN_BASE): `git diff --no-index --exit-code .claude/rules/shell.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md`; `git diff --no-index --exit-code .codex/codex-web-setup.sh extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh`; `git diff -w --minimal --unified=0 --no-color --output=artifacts/orchestration/codex-setup-final-w.diff WIDEN_BASE -- .codex/codex-web-setup.sh`; `git status --porcelain -- .codex/codex-web-setup.sh`; `grep -c -e "^+.*shellcheck disable=" artifacts/orchestration/codex-setup-final-w.diff`; `grep -c -e "^[-+][^-+]" artifacts/orchestration/codex-setup-final-w.diff`.
+      Acceptance: both identity diffs exit 0 with no output; the `-w` diff exits 0; the status command prints nothing (the change is committed, and the diff is anchored to WIDEN_BASE, so it carries the change in that state); the directive grep prints the number of `shellcheck disable` directives the P16-T6 ledger records for this file (0 when none); the changed-line grep prints exactly the sum of r + a over the ledger entries for this file (0 when none). `whitespace-only` entries are excluded because `-w` hides them, and each printed line is matched to its ledger entry in the artifact. When the changed-line grep prints 0 it exits 1, so `EXIT_CODE: 1` with `ExpectedExitCode: 1`; otherwise `EXIT_CODE: 0`. A changed line that the ledger does not record is a behavior change and blocks AC-18.
+- [ ] [P17-T4] Verify the 500-line limit for every shell and bats file the widening wrote or depends on, and record FEATURE/evidence/qa-gates/widening-line-counts.TS.md.
+      Command: `wc -l .codex/codex-web-setup.sh extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh scripts/bash/shell_qc_lib.sh tests/fixtures/shell_qc/.codex/codex_entry.sh tests/shell/test_shell_qc_discovery.bats tests/shell/test_shell_qc_commands.bats tests/shell/test_codex_web_setup_codex_copy.bats tests/shell/test_codex_web_setup_codex_installers.bats tests/shell/test_codex_web_setup_codex_dotnet.bats tests/shell/test_codex_web_setup_codex_verify.bats`.
+      Acceptance: exit 0 and every per-file count is at most 500.
+- [ ] [P17-T5] Verify the widening write set and the remaining hard exclusions against WIDEN_BASE, and record FEATURE/evidence/qa-gates/widening-scope-check.TS.md.
+      Commands (substitute WIDEN_BASE): `git diff --name-only WIDEN_BASE -- . ':!docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824'`; `git status --porcelain --untracked-files=all -- . ':!docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824'`; `git diff --name-only WIDEN_BASE -- docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824`; `git status --porcelain --untracked-files=all -- docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824`; `git diff --name-only WIDEN_BASE -- .github .claude/hooks .codex/hooks .codex/agents scripts/dev-tools tests/scripts`; `git branch --show-current`.
+      Acceptance: the union of the paths printed by the first two commands is exactly the 18 W-SET paths; the union of the third and fourth contains only `spec.md`, `plan.2026-10-08T22-16.md`, and paths under FEATURE `evidence/`; the fifth prints nothing; the branch is `bug/issue-823-tier-rule-adoption-follow-ups-824`. Any other path stops the plan for a report. `EXIT_CODE: 0`.
+- [ ] [P17-T6] Write the Bash coverage comparison FEATURE/evidence/qa-gates/bash-coverage-comparison.TS.md (inputs: P13-T1 and the passing round's P16-T4 and P16-T5 artifacts).
+      Command: none (record `Command: none - comparison of recorded values` and `EXIT_CODE: 0`).
+      Acceptance: the artifact lists BASE_BASH_LINE (or its UNAVAILABLE literal), FINAL_BASH_LINE, and their delta; `.codex/codex-web-setup.sh` baseline `NOT MEASURED (round 0 MATCHES 0)` and post-change FINAL_CODEX_SETUP_PCT with FINAL_CODEX_SETUP_RATE; `New/changed-code coverage: .codex/codex-web-setup.sh <FINAL_CODEX_SETUP_PCT> (the shfmt layout changed every indented line, so the whole-file value is the changed-line value)`; and `Branch coverage: N/A - kcov measures no bash branch coverage; no bash branch gate applies`. The verdict is `PASS` when FINAL_CODEX_SETUP_RATE is at least 0.85 and FINAL_BASH_LINE is at least 85.0, otherwise `REMEDIATION-REQUIRED`. The repo-wide delta is reported and not gated, because bringing a newly measured file into the denominator changes the population; the uniform 85% threshold is the gate.
+- [ ] [P17-T7] Write the PR-body callout addendum FEATURE/evidence/other/pr-body-callouts-widening.TS.md with the content of Appendix O (AC-15 requires the PR body to call out every `.claude/rules/` edit, which now includes `.claude/rules/shell.md`).
+      Commands (substitute the artifact's TS): `grep -c -F "Refs #824" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/other/pr-body-callouts-widening.TS.md`; `grep -c -F ".claude/rules/shell.md" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/other/pr-body-callouts-widening.TS.md`; `grep -c -F "PA-1" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/other/pr-body-callouts-widening.TS.md`; `grep -c -i -E "(close[sd]?|fix(e[sd])?|resolve[sd]?) #824" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/other/pr-body-callouts-widening.TS.md`.
+      Acceptance: the first three greps each print 1 or more; the closing-keyword grep prints 0, so `EXIT_CODE: 1` with `ExpectedExitCode: 1`.
+- [ ] [P17-T8] Update `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`: check off AC-16. Verifying tasks: P12-T2, P13-T2, P13-T3, P13-T8, P17-T1, P17-T3.
+- [ ] [P17-T9] Update `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`: check off AC-17. Verifying tasks: P13-T4, P13-T5, P13-T6, P13-T7, and the passing round's P16-T2, P16-T3, P16-T4 (`NOT_OK 0`, so both shell-qc suites passed in CI), and P16-T5 (`MATCHES 1`, so the widened include pattern took effect).
+- [ ] [P17-T10] Update `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`: check off AC-18. Verifying tasks: P14-T1, P14-T2, P14-T3, P14-T4, the passing round's P16-T3 (`SHELLCHECK_FINDINGS 0 SHFMT_DIFF_FILES 0`) and P16-T4 (C824-1 to C824-15 `ok`), and P17-T3.
+- [ ] [P17-T11] Update `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`: check off AC-19. Verifying tasks: P15-T1 through P15-T7, the passing round's P16-T4 (`C824_OK` equal to `C824_MAX` and to 61 plus the ledgered ADDED_CASES) and P16-T5 (`GATE PASS`), and P17-T6 (verdict `PASS`).
+- [ ] [P17-T12] Update `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`: check off AC-6 (PD19). Verifying tasks: P5-T1 through P5-T15 and P8-T1 (already passing), the passing round's P16-T4 (C824-1 to C824-15 `ok` in CI, which replaces the P5-T16 `PENDING-CI` record), and P17-T3.
+- [ ] [P17-T13] Record AC-13 as pending PR CI in FEATURE/evidence/other/ac-checkoff-widening.TS.md and leave `- [ ] AC-13:` unchanged in `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md` (PD19).
+      Command: `grep -c -F "[ ] AC-13:" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`.
+      Acceptance: the grep prints 1, and the artifact line reads `AC-13 pending PR CI: the Python, TypeScript, and PowerShell toolchain on the PR head; the shell portion is supplied by the passing CI shell round` followed by the passing round's P16-T4 artifact path.
+- [ ] [P17-T14] Write the AC status summary FEATURE/evidence/other/ac-status-summary-widening.TS.md in the acceptance-criteria-tracking format (Source, Total AC items 19, Checked off, Remaining, Items remaining).
+      Commands: `grep -c "^- \[x\] AC-" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`; `grep -c "^- \[ \] AC-" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`.
+      Acceptance: the two counts sum to 19; the summary's Checked off and Remaining values equal them; Items remaining lists AC-13 and AC-15, plus any AC whose verification failed in P17-T8 to P17-T12.
+- [ ] [P17-T15] Commit and push Phase 17, and record FEATURE/evidence/other/commit-p17.TS.md.
+      Commands: `git add -- docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/plan.2026-10-08T22-16.md` followed by the full path of the P16-T7 artifact and of each artifact P17-T1 to P17-T14 wrote, named individually; `git commit -m "docs(824): record widening verification and acceptance-criteria check-off" -m "Refs #824"`; `git push origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git status --porcelain --untracked-files=all`; `git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git rev-parse HEAD origin/bug/issue-823-tier-rule-adoption-follow-ups-824`.
+      Acceptance: as P12-T6. This artifact and the P17-T15 check-off are committed by the orchestrator.
+
 ## Appendix A — Hunk Application Procedure (HAP) and Patch Table
 
 For a path P and its patch file N (under `artifacts/orchestration/wip824-hunks/`), the five HAP commands are, in order (substitute recorded WIP_BASE and WIP_SHA):
@@ -835,11 +1054,1058 @@ The artifact carries `Timestamp:` and these sections, in plain wording, and must
 4. Out-of-scope follow-ups (spec Rollout & Follow-up): `.codex/hooks/validate-feature-review-coverage.ps1` and its mirror keep a separate 80 percent floor; 80/90 figures remain in `.agents/skills/feature-review-workflow/SKILL.md`, `.github/skills/feature-review-workflow/SKILL.md`, `.codex/agents/feature-review.toml`, and their mirrors; `No-COM` remains in `.claude/rules/typescript.md` and `.claude/rules/csharp.md` and their mirrors (held in the AC-5 exception set), and the `typescript.md` cross-reference no longer matches the renamed heading; `.codex/` is outside shell-qc discovery and kcov include roots; optionally, a new potential entry for FU-823-4.
 5. Verification status: AC-15 is pending this PR; AC-6 is pending CI when P5-T16 recorded `PENDING-CI`.
 
+## Appendix I — Spec Amendment for the PA-1 Scope Widening (P12-T3, P12-T4)
+
+I1 (P12-T3). Edit `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`. Old text (the end of the AC-15 line, the blank line, and the next heading):
+
+```text
+states that FU-823-4 remains open, and lists the out-of-scope follow-ups.
+
+## Files Written by the Implementation
+```
+
+New text: the same first line, then four new lines, then the blank line and the heading unchanged. Each of the four new lines consists of the six characters hyphen, space, left bracket, space, right bracket, space (an unchecked Markdown checkbox, as on the AC-1 to AC-15 lines) followed by the text quoted below, in this order:
+
+```text
+AC-16: Scope widening (operator decision on PA-1, 2026-10-10) — `.claude/rules/shell.md` and its bundled copy `extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md` name `.codex/` as a shell-qc discovery root and a kcov include root, and the two copies are byte-identical.
+AC-17: Scope widening — `scripts/bash/shell_qc_lib.sh` discovers shell scripts under `.codex/` (`discover_shell_scripts`) and passes `.codex` in the kcov include pattern (`run_test_coverage`); `tests/shell/test_shell_qc_discovery.bats` and `tests/shell/test_shell_qc_commands.bats` assert the widened root list and include pattern against the fixture `tests/fixtures/shell_qc/.codex/codex_entry.sh`, and they pass in the CI shell-coverage run.
+AC-18: Scope widening — `.codex/codex-web-setup.sh` passes `shell-qc check` (shfmt diff and shellcheck) in the CI shell-coverage run with its behavior unchanged, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh` stays byte-identical to it.
+AC-19: Scope widening — kcov measures `.codex/codex-web-setup.sh` in the CI shell-coverage run (`shell-coverage` artifact `cov.xml`) at >= 85% line coverage (Cobertura line-rate >= 0.85; bash has no branch gate), and every bats suite that exercises it (`tests/shell/test_codex_web_setup_codex_*.bats`) passes in that run.
+```
+
+I2 (P12-T4). Edit the same file. Old text (the end of the last line of the file, the Links bullet):
+
+```text
+prior work branch `origin/wip/preserve-824-addendum2-2026-10-08`.
+```
+
+New text: the same line, then one blank line, the heading line `## Change Log`, one blank line, and this single bullet line (one line, not wrapped):
+
+```text
+- 2026-10-10: PA-1 scope widening (operator decision). Feature review blocked on PA-1 (`policy-audit.2026-10-10T00-44.md`, `remediation-inputs.2026-10-10T00-44.md`): `.codex/codex-web-setup.sh` gained functions and a source guard in this item, but kcov did not measure `.codex/`. The operator chose to widen #824 scope rather than record a waiver. In scope as of this entry: `.codex/` shell scripts join the shell-qc discovery roots and the kcov include roots (`.claude/rules/shell.md`, its bundled copy, and `scripts/bash/shell_qc_lib.sh`, with `tests/shell/test_shell_qc_discovery.bats`, `tests/shell/test_shell_qc_commands.bats`, and the fixture `tests/fixtures/shell_qc/.codex/codex_entry.sh`); `.codex/codex-web-setup.sh` and its bundled copy are brought into shfmt and shellcheck compliance with behavior unchanged; and kcov measures `.codex/codex-web-setup.sh` at >= 85% line coverage through new bats suites under `tests/shell/` and fixtures under `tests/fixtures/codex_web_setup/`. The operator decision authorizes the edit of `.claude/rules/shell.md` and its bundled copy for this item only. The hard exclusion of "any other shell-coverage workflow work" is narrowed accordingly; `.github/workflows/_shell-coverage.yml`, `scripts/dev-tools/KcovFunctionCoverageGate.ps1` and its tests, and `tests/scripts/workflows/ShellCoverageWorkflow.Tests.ps1` remain excluded. `.github/codex/codex-web-setup.sh` is a separate file and is not changed. The Risks entry and the Rollout follow-up stating that `.codex/` is outside the kcov include roots are superseded. Acceptance criteria AC-16 through AC-19 were added; their bats, shfmt, shellcheck, and kcov evidence comes from the CI shell-coverage workflow.
+```
+
+## Appendix J — Shell-QC Scope Edits (P13-T2 to P13-T7)
+
+J1 (`.claude/rules/shell.md`, Discovery Contract). Old text:
+
+```text
+- Search roots: `tools/`, `scripts/`, `.claude/lib/bash/`, and `.claude/skills/`, relative to the
+  current working directory; a missing root is silently skipped. The `.claude/lib/bash/` root carries
+  the destination-portable bash library published by push-down, and the `.claude/skills/` root carries
+  scripts bundled inside a skill folder, so those scripts are held to the same format, lint, test, and
+  coverage standards as `tools/` and `scripts/`.
+```
+
+New text:
+
+```text
+- Search roots: `tools/`, `scripts/`, `.claude/lib/bash/`, `.claude/skills/`, and `.codex/`, relative
+  to the current working directory; a missing root is silently skipped. The `.claude/lib/bash/` root
+  carries the destination-portable bash library published by push-down, the `.claude/skills/` root
+  carries scripts bundled inside a skill folder, and the `.codex/` root carries the Codex runtime
+  scripts (for example `.codex/codex-web-setup.sh`), so those scripts are held to the same format,
+  lint, test, and coverage standards as `tools/` and `scripts/`.
+```
+
+J2 (`.claude/rules/shell.md`, Coverage Expectations; the dashes are the existing em dashes). Old text:
+
+```text
+- The kcov include pattern covers all four discovery roots — `tools/`, `scripts/`,
+  `.claude/lib/bash/`, and `.claude/skills/` — so the Claude bash library and skill-bundled scripts are
+  measured, not merely discovered. The `tests/` tree remains excluded.
+```
+
+New text:
+
+```text
+- The kcov include pattern covers all five discovery roots — `tools/`, `scripts/`,
+  `.claude/lib/bash/`, `.claude/skills/`, and `.codex/` — so the Claude bash library, skill-bundled
+  scripts, and Codex runtime scripts are measured, not merely discovered. The `tests/` tree remains
+  excluded.
+```
+
+J3 (`scripts/bash/shell_qc_lib.sh`, lines 76-77; each line begins with one tab character). Old text:
+
+```text
+	# Discover shell scripts under tools/, scripts/, .claude/lib/bash/, and
+	# .claude/skills/ relative to the current dir.
+```
+
+New text:
+
+```text
+	# Discover shell scripts under tools/, scripts/, .claude/lib/bash/, .claude/skills/,
+	# and .codex/ relative to the current dir.
+```
+
+J4 (`scripts/bash/shell_qc_lib.sh`, line 85; one leading tab). Old text:
+
+```text
+	for root in tools scripts .claude/lib/bash .claude/skills; do
+```
+
+New text:
+
+```text
+	for root in tools scripts .claude/lib/bash .claude/skills .codex; do
+```
+
+J5 (`scripts/bash/shell_qc_lib.sh`, lines 348-350; each line begins with one tab character). Old text:
+
+```text
+	# Scope coverage to repo scripts/tools, the Claude bash library, and scripts bundled
+	# inside skill folders; exclude the test sources themselves.
+	local include_pattern="$repo_root/tools,$repo_root/scripts,$repo_root/.claude/lib/bash,$repo_root/.claude/skills"
+```
+
+New text:
+
+```text
+	# Scope coverage to repo scripts/tools, the Claude bash library, scripts bundled inside
+	# skill folders, and the Codex runtime scripts; exclude the test sources themselves.
+	local include_pattern="$repo_root/tools,$repo_root/scripts,$repo_root/.claude/lib/bash,$repo_root/.claude/skills,$repo_root/.codex"
+```
+
+J6 (`tests/fixtures/shell_qc/.codex/codex_entry.sh`, new file; three lines, LF, trailing newline):
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+echo "codex script fixture"
+```
+
+J7 (`tests/shell/test_shell_qc_discovery.bats`, insert a test before the node_modules test; four-space indentation). Old text:
+
+```text
+@test "discover_shell_scripts prunes the excluded node_modules directory" {
+```
+
+New text:
+
+```text
+@test "discover_shell_scripts finds a .sh file under the .codex root" {
+    run bash -c "cd '${FIXTURE_ROOT}' && source '${LIB}' && discover_shell_scripts"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *".codex/codex_entry.sh"* ]]
+}
+
+@test "discover_shell_scripts prunes the excluded node_modules directory" {
+```
+
+J8 (`tests/shell/test_shell_qc_discovery.bats`, sorted-list test, lines 90-98). Old text:
+
+```text
+    [ "${#lines[@]}" -eq 7 ]
+    # Under LC_ALL=C the two .claude roots sort before scripts/ and tools/ (0x2E < 0x73).
+    [ "${lines[0]}" = ".claude/lib/bash/lib_entry.sh" ]
+    [ "${lines[1]}" = ".claude/skills/demo-skill/scripts/skill_entry.sh" ]
+    [ "${lines[2]}" = "scripts/env_s_bash" ]
+    [ "${lines[3]}" = "scripts/sh_shebang" ]
+    [ "${lines[4]}" = "scripts/uppercase_bash" ]
+    [ "${lines[5]}" = "scripts/with_shebang" ]
+    [ "${lines[6]}" = "tools/format_me.sh" ]
+```
+
+New text:
+
+```text
+    [ "${#lines[@]}" -eq 8 ]
+    # Under LC_ALL=C the three dot-prefixed roots sort before scripts/ and tools/ (0x2E < 0x73),
+    # and .claude/ sorts before .codex/ (0x6C < 0x6F).
+    [ "${lines[0]}" = ".claude/lib/bash/lib_entry.sh" ]
+    [ "${lines[1]}" = ".claude/skills/demo-skill/scripts/skill_entry.sh" ]
+    [ "${lines[2]}" = ".codex/codex_entry.sh" ]
+    [ "${lines[3]}" = "scripts/env_s_bash" ]
+    [ "${lines[4]}" = "scripts/sh_shebang" ]
+    [ "${lines[5]}" = "scripts/uppercase_bash" ]
+    [ "${lines[6]}" = "scripts/with_shebang" ]
+    [ "${lines[7]}" = "tools/format_me.sh" ]
+```
+
+J9 (`tests/shell/test_shell_qc_commands.bats`, line 81). Old text `    [ "$shellcheck_calls" -eq 7 ]`; new text `    [ "$shellcheck_calls" -eq 8 ]` (the fixture tree now holds eight shell scripts).
+
+J10 (`tests/shell/test_shell_qc_commands.bats`, after line 130). Old text:
+
+```text
+    [[ "$output" == *"--include-pattern="*"/.claude/skills"* ]]
+```
+
+New text (the old line, then one added line; the kcov stub `tests/fixtures/shell_qc/stub-bin/kcov` echoes its argv on one line, so the `.codex` entry is the last include-pattern element and is followed by the exclude option):
+
+```text
+    [[ "$output" == *"--include-pattern="*"/.claude/skills"* ]]
+    [[ "$output" == *"/.claude/skills,"*"/.codex --exclude-pattern="* ]]
+```
+
+## Appendix K — Fixtures for the `.codex/codex-web-setup.sh` Coverage Suites (P15-T1 to P15-T3)
+
+Every file ends with one LF; no file carries a carriage return.
+
+K1 (`tests/fixtures/codex_web_setup/dotnet-repo/`; a repository root with a pinned SDK, a tool manifest, and `coverage.config`, but no installed SDK):
+
+`global.json`:
+
+```json
+{
+  "sdk": {
+    "version": "8.0.100"
+  }
+}
+```
+
+`dotnet-tools.json`:
+
+```json
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {}
+}
+```
+
+`coverage.config` (one line):
+
+```text
+Fixture: a repository root that carries coverage.config, for tests/shell/test_codex_web_setup_codex_verify.bats (issue #824).
+```
+
+K2 (`tests/fixtures/codex_web_setup/dotnet-sdk-installed/`; a repository root whose repo-local SDK 8.0.100 is already present):
+
+`global.json`: the same five lines as K1 `global.json`.
+
+`.dotnet-sdk/dotnet/placeholder.txt` (one line):
+
+```text
+Fixture: .dotnet-sdk/dotnet is a directory, so the [ -x ] test in install_dotnet_sdk passes without a checked-in executable (issue #824).
+```
+
+`.dotnet-sdk/sdk/8.0.100/placeholder.txt` (one line):
+
+```text
+Fixture: the installed SDK 8.0.100 directory for tests/shell/test_codex_web_setup_codex_dotnet.bats (issue #824).
+```
+
+K3 (`tests/fixtures/codex_web_setup/bashrc-with-ci.txt`; one line):
+
+```text
+export CI=true
+```
+
+## Appendix L — `tests/shell/test_codex_web_setup_codex_installers.bats` (P15-T4)
+
+```bash
+#!/usr/bin/env bats
+# ------------------------------------------------------------------------------
+# test_codex_web_setup_codex_installers.bats
+#
+# Purpose:
+#   Cover the installer functions of .codex/codex-web-setup.sh (the Codex copy,
+#   not the GitHub Codex copy): install_apt_packages, install_powershell,
+#   install_nuget, and install_actionlint, including every skip and failure
+#   branch (issue #824, kcov scope widening for PA-1).
+#
+# Determinism: every external command an installer reaches (apt-get, id, sudo,
+# mktemp, curl, dpkg, rm, tar, mono, pwsh, nuget, actionlint) is replaced by a
+# shell function that prints its arguments to stderr. A test that needs a tool
+# to be absent runs through run_with_stub_path, which limits PATH and HOME to
+# this test directory (it holds no executable), so only the functions the test
+# defines satisfy `command -v`. Nothing is downloaded or installed and no
+# temporary file is created. teardown removes the stubs before bats-core runs
+# its own cleanup.
+# ------------------------------------------------------------------------------
+
+# Canonical absolute path, so kcov reports the sourced file as <repo>/.codex/codex-web-setup.sh.
+SCRIPT_UNDER_TEST="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)/.codex/codex-web-setup.sh"
+
+setup() {
+    # Sourcing defines the functions without running main (C824-1 pins the guard).
+    source "${SCRIPT_UNDER_TEST}"
+}
+
+teardown() {
+    unset -f actionlint apt-get curl dpkg id mktemp mono nuget pwsh rm sudo tar
+}
+
+# Run a command with PATH and HOME limited to this test directory.
+run_with_stub_path() {
+    local PATH="${BATS_TEST_DIRNAME}"
+    local HOME="${BATS_TEST_DIRNAME}"
+    "$@"
+}
+
+# Print a replaced command's name and arguments to stderr, which run captures.
+record() {
+    printf '%s\n' "$*" >&2
+}
+
+@test "C824-16 install_apt_packages warns and skips when apt-get is unavailable" {
+    # Act
+    run run_with_stub_path install_apt_packages
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"apt-get is unavailable; skipping OS package installation."* ]]
+}
+
+@test "C824-17 install_apt_packages installs directly when running as root" {
+    # Arrange
+    id() { printf '%s\n' 0; }
+    apt-get() { record "apt-get $*"; }
+    # Act
+    run run_with_stub_path install_apt_packages
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Installing Codex Web dependencies with apt-get..."* ]]
+    [[ "$output" == *"apt-get update"* ]]
+    [[ "$output" == *"apt-get install -y ca-certificates curl git jq lsb-release mono-complete ripgrep unzip zip"* ]]
+    [[ "$output" != *"sudo"* ]]
+}
+
+@test "C824-18 install_apt_packages runs apt-get through sudo when not root" {
+    # Arrange
+    id() { printf '%s\n' 1000; }
+    sudo() { record "sudo $*"; }
+    apt-get() { record "apt-get $*"; }
+    # Act
+    run run_with_stub_path install_apt_packages
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"sudo apt-get update"* ]]
+    [[ "$output" == *"sudo apt-get install -y ca-certificates"* ]]
+}
+
+@test "C824-19 install_apt_packages warns and skips when not root and sudo is unavailable" {
+    # Arrange
+    id() { printf '%s\n' 1000; }
+    apt-get() { record "apt-get $*"; }
+    # Act
+    run run_with_stub_path install_apt_packages
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"apt-get requires root and sudo is unavailable; skipping OS package installation."* ]]
+    [[ "$output" != *"apt-get update"* ]]
+}
+
+@test "C824-20 install_powershell skips when pwsh is already available" {
+    # Arrange
+    pwsh() { record "pwsh $*"; }
+    # Act
+    run install_powershell
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"PowerShell is already available; skipping."* ]]
+}
+
+@test "C824-21 install_powershell warns and skips when apt-get is unavailable" {
+    # Act
+    run run_with_stub_path install_powershell
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"apt-get is unavailable; skipping PowerShell installation."* ]]
+}
+
+@test "C824-22 install_powershell warns and skips when not root and sudo is unavailable" {
+    # Arrange
+    id() { printf '%s\n' 1000; }
+    apt-get() { record "apt-get $*"; }
+    # Act
+    run run_with_stub_path install_powershell
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"PowerShell installation requires root; skipping."* ]]
+}
+
+@test "C824-23 install_powershell registers the Microsoft repository and installs through sudo" {
+    # Arrange: lsb_release is absent, so the Ubuntu version falls back to 24.04.
+    id() { printf '%s\n' 1000; }
+    sudo() { record "sudo $*"; }
+    apt-get() { record "apt-get $*"; }
+    mktemp() { printf '%s\n' /nonexistent/packages-microsoft-prod.deb; }
+    curl() { record "curl $*"; }
+    rm() { record "rm $*"; }
+    # Act
+    run run_with_stub_path install_powershell
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Registering Microsoft package repository for PowerShell (Ubuntu 24.04)..."* ]]
+    [[ "$output" == *"curl -fsSL https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb -o /nonexistent/packages-microsoft-prod.deb"* ]]
+    [[ "$output" == *"sudo dpkg -i /nonexistent/packages-microsoft-prod.deb"* ]]
+    [[ "$output" == *"rm -f /nonexistent/packages-microsoft-prod.deb"* ]]
+    [[ "$output" == *"sudo apt-get install -y powershell"* ]]
+}
+
+@test "C824-24 install_powershell warns and skips when the repository package download fails" {
+    # Arrange
+    id() { printf '%s\n' 0; }
+    apt-get() { record "apt-get $*"; }
+    mktemp() { printf '%s\n' /nonexistent/packages-microsoft-prod.deb; }
+    curl() { return 1; }
+    rm() { record "rm $*"; }
+    # Act
+    run run_with_stub_path install_powershell
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"rm -f /nonexistent/packages-microsoft-prod.deb"* ]]
+    [[ "$output" == *"Could not download Microsoft package repo; skipping PowerShell installation."* ]]
+    [[ "$output" != *"apt-get install"* ]]
+}
+
+@test "C824-25 install_nuget skips when nuget is already available" {
+    # Arrange
+    nuget() { record "nuget $*"; }
+    # Act
+    run install_nuget
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"nuget is already available; skipping."* ]]
+}
+
+@test "C824-26 install_nuget warns when mono is unavailable" {
+    # Act
+    run run_with_stub_path install_nuget
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"mono is unavailable; cannot install nuget wrapper."* ]]
+}
+
+@test "C824-27 install_nuget writes the mono wrapper through sudo when not root" {
+    # Arrange: the sudo stub drains the wrapper text that tee would receive.
+    id() { printf '%s\n' 1000; }
+    mono() { record "mono $*"; }
+    curl() { record "curl $*"; }
+    sudo() {
+        if [ "${1:-}" = "tee" ]; then
+            while IFS= read -r _wrapper_line; do :; done
+        fi
+        record "sudo $*"
+    }
+    # Act
+    run run_with_stub_path install_nuget
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Downloading nuget.exe and creating mono wrapper..."* ]]
+    [[ "$output" == *"curl -fsSL https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -o /usr/local/bin/nuget.exe"* ]]
+    [[ "$output" == *"sudo tee /usr/local/bin/nuget"* ]]
+    [[ "$output" == *"sudo chmod +x /usr/local/bin/nuget"* ]]
+    [[ "$output" == *"nuget wrapper installed at /usr/local/bin/nuget."* ]]
+}
+
+@test "C824-28 install_nuget warns when the nuget.exe download fails" {
+    # Arrange
+    id() { printf '%s\n' 0; }
+    mono() { record "mono $*"; }
+    curl() { return 1; }
+    # Act
+    run run_with_stub_path install_nuget
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Could not download nuget.exe; skipping."* ]]
+    [[ "$output" != *"nuget wrapper installed"* ]]
+}
+
+@test "C824-29 install_actionlint skips when actionlint is already available" {
+    # Arrange
+    actionlint() { record "actionlint $*"; }
+    # Act
+    run install_actionlint
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"actionlint is already available; skipping."* ]]
+}
+
+@test "C824-30 install_actionlint warns when tar is unavailable" {
+    # Act
+    run run_with_stub_path install_actionlint
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"tar is unavailable; skipping actionlint installation."* ]]
+}
+
+@test "C824-31 install_actionlint warns when not root and sudo is unavailable" {
+    # Arrange
+    id() { printf '%s\n' 1000; }
+    tar() { record "tar $*"; }
+    # Act
+    run run_with_stub_path install_actionlint
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"actionlint installation requires root or sudo; skipping."* ]]
+}
+
+@test "C824-32 install_actionlint installs the pinned release through sudo" {
+    # Arrange
+    id() { printf '%s\n' 1000; }
+    sudo() { record "sudo $*"; }
+    tar() { record "tar $*"; }
+    mktemp() { printf '%s\n' /nonexistent/actionlint-tmp; }
+    curl() { record "curl $*"; }
+    rm() { record "rm $*"; }
+    # Act
+    run run_with_stub_path install_actionlint
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Installing actionlint v1.7.7..."* ]]
+    [[ "$output" == *"tar -xzf /nonexistent/actionlint-tmp/actionlint.tar.gz -C /nonexistent/actionlint-tmp actionlint"* ]]
+    [[ "$output" == *"sudo install -m 0755 /nonexistent/actionlint-tmp/actionlint /usr/local/bin/actionlint"* ]]
+    [[ "$output" == *"actionlint installed at /usr/local/bin/actionlint."* ]]
+    [[ "$output" == *"rm -rf /nonexistent/actionlint-tmp"* ]]
+}
+
+@test "C824-33 install_actionlint warns when the release download fails" {
+    # Arrange
+    id() { printf '%s\n' 0; }
+    tar() { record "tar $*"; }
+    mktemp() { printf '%s\n' /nonexistent/actionlint-tmp; }
+    curl() { return 1; }
+    rm() { record "rm $*"; }
+    # Act
+    run run_with_stub_path install_actionlint
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Could not download actionlint; skipping."* ]]
+    [[ "$output" == *"rm -rf /nonexistent/actionlint-tmp"* ]]
+}
+```
+
+## Appendix M — `tests/shell/test_codex_web_setup_codex_dotnet.bats` (P15-T5)
+
+```bash
+#!/usr/bin/env bats
+# ------------------------------------------------------------------------------
+# test_codex_web_setup_codex_dotnet.bats
+#
+# Purpose:
+#   Cover the .NET setup functions of .codex/codex-web-setup.sh (the Codex copy,
+#   not the GitHub Codex copy): read_global_json_sdk_version, append_if_missing,
+#   install_dotnet_sdk, install_dotnet_tools, and install_dotnet_coverage,
+#   including every skip and failure branch (issue #824, kcov scope widening for
+#   PA-1).
+#
+# Determinism: repository roots are the committed fixtures under
+# tests/fixtures/codex_web_setup/ or this test directory. External commands that
+# would download, install, or write (curl, bash, dotnet, dotnet-coverage, mkdir,
+# mktemp, rm, touch) are replaced by shell functions that print to stderr, and
+# append_if_missing is replaced wherever a caller would write to ~/.bashrc.
+# append_if_missing itself is exercised against /dev/null and a fixture that
+# already holds the line, so no file changes. No temporary file is created.
+# ------------------------------------------------------------------------------
+
+# Canonical absolute path, so kcov reports the sourced file as <repo>/.codex/codex-web-setup.sh.
+SCRIPT_UNDER_TEST="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)/.codex/codex-web-setup.sh"
+FIXTURES="$(cd "${BATS_TEST_DIRNAME}/../fixtures/codex_web_setup" && pwd)"
+
+setup() {
+    # Sourcing defines the functions without running main (C824-1 pins the guard).
+    source "${SCRIPT_UNDER_TEST}"
+}
+
+teardown() {
+    unset -f append_if_missing bash curl dotnet dotnet-coverage grep mkdir mktemp rm touch
+}
+
+# Run a command with PATH and HOME limited to this test directory.
+run_with_stub_path() {
+    local PATH="${BATS_TEST_DIRNAME}"
+    local HOME="${BATS_TEST_DIRNAME}"
+    "$@"
+}
+
+# Print a replaced command's name and arguments to stderr, which run captures.
+record() {
+    printf '%s\n' "$*" >&2
+}
+
+@test "C824-34 read_global_json_sdk_version fails when global.json is absent" {
+    # Arrange
+    REPO_ROOT="${BATS_TEST_DIRNAME}"
+    # Act
+    run read_global_json_sdk_version
+    # Assert
+    [ "$status" -eq 1 ]
+    [ -z "$output" ]
+}
+
+@test "C824-35 read_global_json_sdk_version prints the pinned SDK version" {
+    # Arrange
+    REPO_ROOT="${FIXTURES}/dotnet-repo"
+    # Act
+    run read_global_json_sdk_version
+    # Assert
+    [ "$status" -eq 0 ]
+    [ "$output" = "8.0.100" ]
+}
+
+@test "C824-36 append_if_missing appends a line the file does not contain" {
+    # Arrange: /dev/null never contains the line, so the append branch runs and nothing is kept.
+    touch() { record "touch $*"; }
+    # Act
+    run append_if_missing /dev/null 'export CI=true'
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"touch /dev/null"* ]]
+}
+
+@test "C824-37 append_if_missing leaves a file that already contains the line" {
+    # Arrange
+    touch() { record "touch $*"; }
+    # Act
+    run append_if_missing "${FIXTURES}/bashrc-with-ci.txt" 'export CI=true'
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"touch ${FIXTURES}/bashrc-with-ci.txt"* ]]
+    run grep -c -x 'export CI=true' "${FIXTURES}/bashrc-with-ci.txt"
+    [ "$output" = "1" ]
+}
+
+@test "C824-38 install_dotnet_sdk warns and skips when global.json names no SDK version" {
+    # Arrange
+    REPO_ROOT="${BATS_TEST_DIRNAME}"
+    append_if_missing() { record "append $*"; }
+    # Act
+    run install_dotnet_sdk
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Could not read the SDK version from global.json; skipping repo-local .NET SDK installation."* ]]
+    [[ "$output" != *"append"* ]]
+}
+
+@test "C824-39 install_dotnet_sdk reuses a repo-local SDK that is already installed" {
+    # Arrange: the fixture's .dotnet-sdk/dotnet is a directory, which satisfies [ -x ].
+    REPO_ROOT="${FIXTURES}/dotnet-sdk-installed"
+    append_if_missing() { record "append $*"; }
+    # Act
+    run install_dotnet_sdk
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Repo-local .NET SDK 8.0.100 is already available at ${FIXTURES}/dotnet-sdk-installed/.dotnet-sdk."* ]]
+    [[ "$output" == *"export DOTNET_ROOT=\"${FIXTURES}/dotnet-sdk-installed/.dotnet-sdk\""* ]]
+}
+
+@test "C824-40 install_dotnet_sdk downloads and runs the installer when the SDK is missing" {
+    # Arrange
+    REPO_ROOT="${FIXTURES}/dotnet-repo"
+    append_if_missing() { record "append $*"; }
+    mktemp() { printf '%s\n' /nonexistent/dotnet-install.sh; }
+    curl() { record "curl $*"; }
+    bash() { record "bash $*"; }
+    rm() { record "rm $*"; }
+    # Act
+    run install_dotnet_sdk
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Installing repo-local .NET SDK 8.0.100 into ${FIXTURES}/dotnet-repo/.dotnet-sdk..."* ]]
+    [[ "$output" == *"curl -fsSL https://dot.net/v1/dotnet-install.sh -o /nonexistent/dotnet-install.sh"* ]]
+    [[ "$output" == *"bash /nonexistent/dotnet-install.sh --version 8.0.100 --install-dir ${FIXTURES}/dotnet-repo/.dotnet-sdk"* ]]
+    [[ "$output" == *"rm -f /nonexistent/dotnet-install.sh"* ]]
+    [[ "$output" == *"export PATH=\"${FIXTURES}/dotnet-repo/.dotnet-sdk:\$PATH\""* ]]
+}
+
+@test "C824-41 install_dotnet_tools fails when dotnet is unavailable" {
+    # Arrange
+    REPO_ROOT="${FIXTURES}/dotnet-repo"
+    # Act
+    run run_with_stub_path install_dotnet_tools
+    # Assert
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"dotnet is unavailable; cannot restore the required dotnet tool manifest."* ]]
+}
+
+@test "C824-42 install_dotnet_tools fails when the tool manifest is missing" {
+    # Arrange
+    REPO_ROOT="${BATS_TEST_DIRNAME}"
+    dotnet() { record "dotnet $*"; }
+    # Act
+    run install_dotnet_tools
+    # Assert
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Required dotnet tool manifest not found at ${BATS_TEST_DIRNAME}/dotnet-tools.json."* ]]
+}
+
+@test "C824-43 install_dotnet_tools restores the repo-local tool manifest" {
+    # Arrange
+    REPO_ROOT="${FIXTURES}/dotnet-repo"
+    dotnet() { record "dotnet $*"; }
+    # Act
+    run install_dotnet_tools
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Restoring repo-local dotnet tools from dotnet-tools.json..."* ]]
+    [[ "$output" == *"dotnet tool restore --tool-manifest ${FIXTURES}/dotnet-repo/dotnet-tools.json"* ]]
+}
+
+@test "C824-44 install_dotnet_coverage fails when dotnet is unavailable" {
+    # Act
+    run run_with_stub_path install_dotnet_coverage
+    # Assert
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"dotnet is unavailable; cannot install dotnet-coverage."* ]]
+}
+
+@test "C824-45 install_dotnet_coverage skips when dotnet-coverage is already available" {
+    # Arrange
+    dotnet() { record "dotnet $*"; }
+    dotnet-coverage() { record "dotnet-coverage $*"; }
+    mkdir() { record "mkdir $*"; }
+    append_if_missing() { record "append $*"; }
+    # Act
+    run install_dotnet_coverage
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"mkdir -p "*"/.dotnet/tools"* ]]
+    [[ "$output" == *"dotnet-coverage is already available; skipping."* ]]
+}
+
+@test "C824-46 install_dotnet_coverage updates the global tool when it is already listed" {
+    # Arrange: the grep stub reports that dotnet tool list names dotnet-coverage.
+    dotnet() { record "dotnet $*"; }
+    grep() { return 0; }
+    mkdir() { record "mkdir $*"; }
+    append_if_missing() { record "append $*"; }
+    # Act
+    run run_with_stub_path install_dotnet_coverage
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Installing dotnet-coverage as a global dotnet tool..."* ]]
+    [[ "$output" == *"dotnet tool update --global dotnet-coverage"* ]]
+}
+
+@test "C824-47 install_dotnet_coverage installs the global tool when it is not listed" {
+    # Arrange: the grep stub reports that dotnet tool list does not name dotnet-coverage.
+    dotnet() { record "dotnet $*"; }
+    grep() { return 1; }
+    mkdir() { record "mkdir $*"; }
+    append_if_missing() { record "append $*"; }
+    # Act
+    run run_with_stub_path install_dotnet_coverage
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"dotnet tool install --global dotnet-coverage"* ]]
+    [[ "$output" != *"dotnet tool update"* ]]
+}
+```
+
+## Appendix N — `tests/shell/test_codex_web_setup_codex_verify.bats` (P15-T6)
+
+```bash
+#!/usr/bin/env bats
+# ------------------------------------------------------------------------------
+# test_codex_web_setup_codex_verify.bats
+#
+# Purpose:
+#   Cover the verification functions and main of .codex/codex-web-setup.sh (the
+#   Codex copy, not the GitHub Codex copy): verify_formatting_capability,
+#   is_windows_powershell_host, the Visual Studio test-tooling failure of
+#   verify_windows_visual_studio_task_capability, verify_build_and_test_capability,
+#   verify_required_task_tooling, and main (issue #824, kcov scope widening for
+#   PA-1).
+#
+# Determinism: dotnet, dotnet-coverage, pwsh, and git are replaced by shell
+# functions; main runs with every step it calls replaced by a function that
+# records the step name, so nothing is installed and ~/.bashrc is not written.
+# A test that needs a tool to be absent runs through run_with_stub_path, which
+# limits PATH and HOME to this test directory. No temporary file is created.
+# ------------------------------------------------------------------------------
+
+# Canonical absolute path, so kcov reports the sourced file as <repo>/.codex/codex-web-setup.sh.
+SCRIPT_UNDER_TEST="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)/.codex/codex-web-setup.sh"
+FIXTURES="$(cd "${BATS_TEST_DIRNAME}/../fixtures/codex_web_setup" && pwd)"
+
+setup() {
+    # Sourcing defines the functions without running main (C824-1 pins the guard).
+    source "${SCRIPT_UNDER_TEST}"
+}
+
+teardown() {
+    unset -f dotnet dotnet-coverage git pwsh
+}
+
+# Run a command with PATH and HOME limited to this test directory.
+run_with_stub_path() {
+    local PATH="${BATS_TEST_DIRNAME}"
+    local HOME="${BATS_TEST_DIRNAME}"
+    "$@"
+}
+
+# Print a replaced command's name and arguments to stderr, which run captures.
+record() {
+    printf '%s\n' "$*" >&2
+}
+
+@test "C824-48 verify_formatting_capability fails when dotnet is unavailable" {
+    # Act
+    run run_with_stub_path verify_formatting_capability
+    # Assert
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Verifying formatting capability..."* ]]
+    [[ "$output" == *"dotnet is not available after setup."* ]]
+}
+
+@test "C824-49 verify_formatting_capability fails when pwsh is unavailable" {
+    # Arrange
+    dotnet() { record "dotnet $*"; }
+    # Act
+    run run_with_stub_path verify_formatting_capability
+    # Assert
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"pwsh is not available after setup."* ]]
+}
+
+@test "C824-50 verify_formatting_capability fails when CSharpier is not runnable" {
+    # Arrange
+    REPO_ROOT="${BATS_TEST_DIRNAME}"
+    dotnet() { return 1; }
+    pwsh() { record "pwsh $*"; }
+    # Act
+    run verify_formatting_capability
+    # Assert
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"CSharpier is not runnable via 'dotnet tool run csharpier'."* ]]
+}
+
+@test "C824-51 verify_formatting_capability passes when dotnet, pwsh, and CSharpier are runnable" {
+    # Arrange
+    REPO_ROOT="${BATS_TEST_DIRNAME}"
+    dotnet() { record "dotnet $*"; }
+    pwsh() { record "pwsh $*"; }
+    # Act
+    run verify_formatting_capability
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"dotnet tool run csharpier --version"* ]]
+}
+
+@test "C824-52 is_windows_powershell_host succeeds when pwsh reports a Windows host" {
+    # Arrange
+    pwsh() { return 0; }
+    # Act
+    run is_windows_powershell_host
+    # Assert
+    [ "$status" -eq 0 ]
+}
+
+@test "C824-53 is_windows_powershell_host fails when pwsh reports a non-Windows host" {
+    # Arrange
+    pwsh() { return 1; }
+    # Act
+    run is_windows_powershell_host
+    # Assert
+    [ "$status" -eq 1 ]
+}
+
+@test "C824-54 verify_windows_visual_studio_task_capability fails when the Visual Studio test tooling is unavailable" {
+    # Arrange: the MSBuild probe (-File) succeeds and the vswhere/vstest probe (-Command) fails.
+    pwsh() { [ "${4:-}" = "-File" ]; }
+    REPO_ROOT="${BATS_TEST_DIRNAME}"
+    SOLUTION_FILE="Alpha.sln"
+    # Act
+    run verify_windows_visual_studio_task_capability
+    # Assert
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Visual Studio test tooling required by the MSTest tasks is unavailable."* ]]
+    [[ "$output" != *"MSBuild tooling required"* ]]
+}
+
+@test "C824-55 verify_build_and_test_capability fails when pwsh is unavailable" {
+    # Act
+    run run_with_stub_path verify_build_and_test_capability
+    # Assert
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Verifying restore/build/lint/type-check/test capability..."* ]]
+    [[ "$output" == *"pwsh is not available after setup."* ]]
+}
+
+@test "C824-56 verify_build_and_test_capability fails when dotnet-coverage is unavailable" {
+    # Arrange
+    pwsh() { record "pwsh $*"; }
+    # Act
+    run run_with_stub_path verify_build_and_test_capability
+    # Assert
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"dotnet-coverage is not available after setup."* ]]
+}
+
+@test "C824-57 verify_build_and_test_capability fails when coverage.config is missing" {
+    # Arrange
+    REPO_ROOT="${BATS_TEST_DIRNAME}"
+    pwsh() { record "pwsh $*"; }
+    dotnet-coverage() { record "dotnet-coverage $*"; }
+    # Act
+    run verify_build_and_test_capability
+    # Assert
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"coverage.config is missing from the repository root."* ]]
+}
+
+@test "C824-58 verify_build_and_test_capability warns and skips the Visual Studio checks on a non-Windows host" {
+    # Arrange
+    REPO_ROOT="${FIXTURES}/dotnet-repo"
+    pwsh() { return 1; }
+    dotnet-coverage() { record "dotnet-coverage $*"; }
+    verify_windows_visual_studio_task_capability() { record "vs-verification-called"; }
+    # Act
+    run verify_build_and_test_capability
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Skipping Windows-only Visual Studio task verification because this host is not Windows."* ]]
+    [[ "$output" != *"vs-verification-called"* ]]
+}
+
+@test "C824-59 verify_build_and_test_capability runs the Visual Studio checks on a Windows host" {
+    # Arrange
+    REPO_ROOT="${FIXTURES}/dotnet-repo"
+    pwsh() { return 0; }
+    dotnet-coverage() { record "dotnet-coverage $*"; }
+    verify_windows_visual_studio_task_capability() { record "vs-verification-called"; }
+    # Act
+    run verify_build_and_test_capability
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"vs-verification-called"* ]]
+}
+
+@test "C824-60 verify_required_task_tooling runs the formatting and the build checks" {
+    # Arrange
+    verify_formatting_capability() { record "formatting-checked"; }
+    verify_build_and_test_capability() { record "build-checked"; }
+    # Act
+    run verify_required_task_tooling
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"formatting-checked"*"build-checked"* ]]
+}
+
+@test "C824-61 main runs every setup step in order and reports completion" {
+    # Arrange: every step main calls is replaced, so main writes nothing and installs nothing.
+    REPO_ROOT="${BATS_TEST_DIRNAME}"
+    append_if_missing() { record "append $2"; }
+    install_apt_packages() { record "step install_apt_packages"; }
+    install_powershell() { record "step install_powershell"; }
+    install_nuget() { record "step install_nuget"; }
+    install_dotnet_sdk() { record "step install_dotnet_sdk"; }
+    install_dotnet_tools() { record "step install_dotnet_tools"; }
+    install_dotnet_coverage() { record "step install_dotnet_coverage"; }
+    verify_required_task_tooling() { record "step verify_required_task_tooling"; }
+    install_actionlint() { record "step install_actionlint"; }
+    restore_packages_if_needed() { record "step restore_packages_if_needed"; }
+    write_repo_notes() { record "step write_repo_notes"; }
+    git() { record "git $*"; }
+    # Act
+    run main
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Bootstrapping a Codex Web environment for ${BATS_TEST_DIRNAME}"* ]]
+    [[ "$output" == *"append export CI=true"*"append export NUGET_XMLDOC_MODE=skip"* ]]
+    [[ "$output" == *"step install_apt_packages"*"step install_powershell"*"step install_nuget"*"step install_dotnet_sdk"*"step install_dotnet_tools"*"step install_dotnet_coverage"*"step verify_required_task_tooling"*"step install_actionlint"*"step restore_packages_if_needed"* ]]
+    [[ "$output" == *"git config --global core.autocrlf input"*"step write_repo_notes"*"Setup complete."* ]]
+}
+```
+
+## Appendix O — PR-Body Callout Addendum (content of FEATURE/evidence/other/pr-body-callouts-widening.TS.md)
+
+The artifact carries `Timestamp:` and these sections, in plain wording, with the bracketed values substituted from the named artifacts, and must not contain a GitHub closing keyword followed by `#824`. It supplements, and does not replace, the P7-T2 callouts artifact.
+
+1. Issue reference: unchanged. The PR body references the issue with the exact line `Refs #824` and uses no closing keyword for #824.
+2. Additional policy edit: `.claude/rules/shell.md` and its bundled copy `extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md` add `.codex/` to the shell-qc discovery roots and the kcov include roots. Authority: the operator decision on feature-review finding PA-1 (2026-10-10), which widened #824 scope instead of recording a waiver and authorizes this edit for these two files only (spec.md Change Log, 2026-10-10).
+3. Shell toolchain change: `scripts/bash/shell_qc_lib.sh` adds the `.codex` discovery root and appends `.codex` to the kcov include pattern; `tests/shell/test_shell_qc_discovery.bats`, `tests/shell/test_shell_qc_commands.bats`, and the fixture `tests/fixtures/shell_qc/.codex/codex_entry.sh` cover the change. `.github/workflows/_shell-coverage.yml` is unchanged.
+4. `.codex/codex-web-setup.sh` now uses the shfmt default layout (a whitespace-only change, plus any shellcheck remediation listed in the P16-T6 ledger); its bundled copy stays byte-identical. `.github/codex/codex-web-setup.sh` is a separate file with no parity test against `.codex/codex-web-setup.sh` and is unchanged.
+5. Coverage: kcov measures `.codex/codex-web-setup.sh` at [FINAL_CODEX_SETUP_PCT]% line coverage (line-rate [FINAL_CODEX_SETUP_RATE]) in CI run [RUN_ID of the passing round]; repo-wide Bash line coverage is [FINAL_BASH_LINE]%. Three new bats suites (`tests/shell/test_codex_web_setup_codex_installers.bats`, `tests/shell/test_codex_web_setup_codex_dotnet.bats`, `tests/shell/test_codex_web_setup_codex_verify.bats`) add cases C824-16 to C824-[C824_MAX of the passing round].
+6. Follow-up list amendment: the out-of-scope follow-up stating that `.codex/` is outside shell-qc discovery and the kcov include roots is resolved by this PR and is removed from the follow-ups list. The other follow-ups in the P7-T2 callouts artifact are unchanged.
+
+## Appendix P — CI Hold Protocol, Readers, and the Layout Writer
+
+Orchestrator steps at a CI hold (the executor never runs these; it has no `gh` access). Substitute n, HOLD_HEAD_n, and RUN_ID_n. In a PowerShell session, write the two redirected files as UTF-8 (pipe to `Out-File -Encoding utf8 <path>` instead of `>`).
+
+- O1. Confirm the remote head: `git ls-remote origin refs/heads/bug/issue-823-tier-rule-adoption-follow-ups-824` prints HOLD_HEAD_n.
+- O2. Dispatch: `gh workflow run _shell-coverage.yml --ref bug/issue-823-tier-rule-adoption-follow-ups-824`.
+- O3. Identify the run: `gh run list --workflow _shell-coverage.yml --branch bug/issue-823-tier-rule-adoption-follow-ups-824 --event workflow_dispatch --limit 5 --json databaseId,headSha,createdAt,status`; RUN_ID_n is the newest run whose `headSha` equals HOLD_HEAD_n.
+- O4. Wait for completion: `gh run watch RUN_ID_n --exit-status`. A non-zero exit means the run failed; continue with O5-O8, because the executor reads the failure.
+- O5. `mkdir -p artifacts/orchestration/ci-shell-coverage/RUN_ID_n`, then `gh run view RUN_ID_n --json databaseId,headSha,conclusion,jobs > artifacts/orchestration/ci-shell-coverage/RUN_ID_n/run.json`.
+- O6. `gh run view RUN_ID_n --log > artifacts/orchestration/ci-shell-coverage/RUN_ID_n/run.log`.
+- O7. `gh run download RUN_ID_n -n shell-coverage -D artifacts/orchestration/ci-shell-coverage/RUN_ID_n/shell-coverage` (the artifact root holds `cov.xml`). When the run uploaded no `shell-coverage` artifact because an earlier step failed, skip the download and say so in O8.
+- O8. Resume the executor with the line `CI-RESUME: ROUND n RUN_ID RUN_ID_n`, followed by `ARTIFACT: absent` when O7 found no artifact.
+
+Executor readers. Each is one line; substitute RUN_ID with RUN_ID_n. Observed output formats these readers rely on: `gh run view --log` lines are `<job name>`, tab, `<step name>`, tab, `<timestamp ending in Z>`, space, content (recorded in `docs/features/active/2026-09-30-parallel-cohorts-split-words-drops-tokens-after-first-newline-794/evidence/qa-gates/final-shell-coverage-ci.2026-10-08T21-25.md` line 9); bats under CI prints TAP lines `ok <n> <name>` and `not ok <n> <name>` (recorded in `docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/evidence/regression-testing/pass-after-scan-roots.2026-10-02T04-06.md` lines 13-20); the shell-qc coverage step ends with `Bash coverage (lines): NN.N%`, and earlier lines of the same text in that step are not results, so the last match is used (same 794 artifact, line 8); kcov writes repository-relative Cobertura `filename` attributes and `<line number=... hits=...>` rows (same 794 artifact, lines 12-15).
+
+R1 `.codex/` shell-script set (P12-T2; applies the `is_shell_script` rule: a `.sh` suffix, or a first-line shebang whose interpreter, after an `env` and its option flags, is `bash` or `sh`):
+
+```sh
+poetry run python -c "import subprocess; fs = subprocess.run(['git', 'ls-files', '--', '.codex'], capture_output=True, text=True, check=True).stdout.splitlines(); first = lambda p: open(p, encoding='utf-8', errors='replace').readline().strip().lower(); toks = lambda l: [t.rsplit('/', 1)[-1] for t in l[2:].split() if not t.startswith('-')] if l.startswith('#!') else []; interp = lambda ts: (ts[1] if len(ts) > 1 else '') if ts and ts[0] == 'env' else (ts[0] if ts else ''); print('TRACKED', len(fs)); print('SHELL', [p for p in fs if p.lower().endswith('.sh') or interp(toks(first(p))) in ('bash', 'sh')])"
+```
+
+R2 run summary (prints the run id, head SHA, conclusion, and one line per step):
+
+```sh
+poetry run python -c "import json, sys; d = json.load(open(sys.argv[1], encoding='utf-8-sig')); print('RUN', d.get('databaseId'), 'HEAD', d.get('headSha'), 'CONCLUSION', d.get('conclusion')); [print('STEP', s.get('name'), '|', s.get('conclusion')) for j in d.get('jobs', []) for s in j.get('steps', [])]" artifacts/orchestration/ci-shell-coverage/RUN_ID/run.json
+```
+
+R3 `shell-qc check` step (counts the step's lines, the lines carrying a shellcheck code, and the shfmt diff file headers; prints every step line, prefixed `CHECK|`, only when a count is above 0):
+
+```sh
+poetry run python -c "import re, sys; rows = [l.split(chr(9), 2) for l in open(sys.argv[1], encoding='utf-8-sig', errors='replace').read().splitlines()]; c = [re.sub(r'^\S+Z ', '', r[2]) for r in rows if len(r) == 3 and r[1].startswith('Run shell-qc check')]; sc = [x for x in c if re.search(r'SC[0-9]{4}', x)]; df = [x for x in c if x.startswith('--- ')]; print('CHECK_LINES', len(c), 'SHELLCHECK_FINDINGS', len(sc), 'SHFMT_DIFF_FILES', len(df)); [print('CHECK|', x) for x in (c if sc or df else [])]" artifacts/orchestration/ci-shell-coverage/RUN_ID/run.log
+```
+
+R4 bats results and repo-wide Bash coverage (the coverage step's TAP lines and its last coverage summary; when any `not ok` line exists it also prints every step line beginning `# `, prefixed `DIAG|`, which are the bats failure diagnostics observed in `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/regression-testing/fail-before-bats.2026-10-01T16-32.md` lines 44-48):
+
+```sh
+poetry run python -c "import re, sys; rows = [l.split(chr(9), 2) for l in open(sys.argv[1], encoding='utf-8-sig', errors='replace').read().splitlines()]; t = [re.sub(r'^\S+Z ', '', r[2]) for r in rows if len(r) == 3 and r[1].startswith('Run shell-qc test with coverage')]; nok = [x for x in t if re.match(r'not ok [0-9]+ ', x)]; ok = [x for x in t if re.match(r'ok [0-9]+ ', x)]; ids = sorted({int(m.group(1)) for x in ok for m in [re.match(r'ok [0-9]+ C824-([0-9]+) ', x)] if m}); cov = [m.group(1) for x in t for m in [re.search(r'Bash coverage \(lines\): ([0-9.]+)%', x)] if m]; print('TEST_LINES', len(t), 'OK', len(ok), 'NOT_OK', len(nok), 'C824_OK', len(ids), 'C824_MAX', ids[-1] if ids else 0, 'REPO_BASH_LINE', cov[-1] if cov else 'MISSING'); [print('NOT_OK|', x) for x in nok]; [print('DIAG|', x) for x in (t if nok else []) if x.startswith('# ')]" artifacts/orchestration/ci-shell-coverage/RUN_ID/run.log
+```
+
+R5 kcov Cobertura reader for `.codex/codex-web-setup.sh` (selects the class whose `filename` is `.codex/codex-web-setup.sh` or ends in `/.codex/codex-web-setup.sh`, so `.github/codex/codex-web-setup.sh` cannot match; the gate is the class `line-rate` at or above 0.85; the hit ratio over the class's `line` rows and the uncovered line numbers are printed as a cross-check):
+
+```sh
+poetry run python -c "import sys, xml.etree.ElementTree as E; r = E.parse(sys.argv[1]).getroot(); fn = lambda c: c.get('filename', '').replace(chr(92), '/'); m = [c for c in r.iter('class') if fn(c) == '.codex/codex-web-setup.sh' or fn(c).endswith('/.codex/codex-web-setup.sh')]; ls = [l for c in m for l in c.iter('line')]; hit = [l for l in ls if int(l.get('hits', '0')) > 0]; un = [int(l.get('number')) for l in ls if int(l.get('hits', '0')) == 0]; rate = float(m[0].get('line-rate')) if len(m) == 1 else None; pct = round(100 * len(hit) / len(ls), 2) if ls else None; print('ROOT_LINE_RATE', r.get('line-rate'), 'MATCHES', len(m), 'CLASS_LINE_RATE', rate if rate is not None else 'MISSING', 'LINES', len(ls), 'HIT', len(hit), 'PCT', pct if pct is not None else 'MISSING', 'GATE', 'PASS' if rate is not None and rate >= 0.85 else 'FAIL'); print('UNCOVERED', un if un else 'NONE')" artifacts/orchestration/ci-shell-coverage/RUN_ID/shell-coverage/cov.xml
+```
+
+R6 carriage-return check over BATS-NEW and the seven new fixtures (P15-T7):
+
+```sh
+poetry run python -c "import pathlib, sys; ps = sys.argv[1:]; bad = [p for p in ps if b'\r' in pathlib.Path(p).read_bytes()]; print('CHECKED', len(ps), 'CR_FILES', len(bad), bad)" tests/shell/test_codex_web_setup_codex_installers.bats tests/shell/test_codex_web_setup_codex_dotnet.bats tests/shell/test_codex_web_setup_codex_verify.bats tests/fixtures/codex_web_setup/dotnet-repo/global.json tests/fixtures/codex_web_setup/dotnet-repo/dotnet-tools.json tests/fixtures/codex_web_setup/dotnet-repo/coverage.config tests/fixtures/codex_web_setup/dotnet-sdk-installed/global.json tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/dotnet/placeholder.txt tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/sdk/8.0.100/placeholder.txt tests/fixtures/codex_web_setup/bashrc-with-ci.txt
+```
+
+W1 layout writer for `.codex/codex-web-setup.sh` (P14-T1; PD14). It splits the file on LF, finds the one line ending in `"& {` (index a) and the first later line whose stripped text begins with `}"` (index b), leaves lines a+1 through b unchanged, replaces every other line's leading run of two-space groups with the same number of tabs, writes the result back with LF line endings, and prints its counts:
+
+```sh
+poetry run python -c "import pathlib, re; p = pathlib.Path('.codex/codex-web-setup.sh'); L = p.read_bytes().decode('utf-8').split(chr(10)); S = [i for i, l in enumerate(L) if l.endswith(chr(34) + '& {')]; a = S[0]; b = next(i for i in range(a + 1, len(L)) if L[i].lstrip().startswith('}' + chr(34))); O = [l if a < i <= b else re.sub('^(  )+', lambda m: chr(9) * (len(m.group(0)) // 2), l) for i, l in enumerate(L)]; p.write_bytes(chr(10).join(O).encode('utf-8')); print('BLOCK_START_CANDIDATES', len(S), 'KEPT_BLOCK_LINES', b - a, 'CHANGED_LINES', sum(1 for x, y in zip(L, O) if x != y), 'SPACE_LEADING_AFTER', sum(1 for l in O if l.startswith(' ')), 'CR_BYTES', p.read_bytes().count(13))"
+```
+
+W1 derivation at WIDEN_BASE: the file has 413 lines and 254 lines that begin with spaces, all in multiples of two; the only line ending in `"& {` is line 316 (index 315), and the first later line beginning `}"` after stripping is line 326 (index 325), so `KEPT_BLOCK_LINES` is 10 (lines 317-326, one of them the empty line 321). Nine of the kept lines begin with spaces, so `CHANGED_LINES` is 254 - 9 = 245 and `SPACE_LEADING_AFTER` is 9.
+
 ## Planner Self-Review Record
 
 SELF-REVIEW: RE-DERIVED THIS PASS
 
-Revision round 1 (executor preflight defects 1-6 and the formatter-scope advisory). Citations touched by this revision and their sibling regions, re-derived in this pass against the current worktree:
+Revision 2, preflight round 2 delta (2026-10-10; executor preflight round 2 defects 1-3). Citations touched by this delta and their sibling regions, re-derived in this pass:
+- `.codex/codex-web-setup.sh`: 254 lines begin with a space (count search); line 316 is the only line ending in `"& {` and line 326 begins `}"` after stripping; of lines 317-326, nine begin with spaces (321 is empty), so W1 changes 245 lines and the 168 unchanged lines bound the minimal diff at 245 removals and 245 additions. The default-algorithm value 275/275 is the executor's scratch-copy observation from preflight round 2 and is cited as such in P14-T3; it was not re-run by the planner, which has no shell tool in this pass.
+- P14-T3 (Commands and Acceptance): the `--stat --minimal` command and the `245` summary line are the only `--stat`/`245` mentions in Phases 12-17; the other `245` mentions (P14-T1 W1 output, W1 derivation in Appendix P) count changed lines, not diff-stat lines, and are unchanged. The Phase 0 `--stat` listing (P0 task near line 117) and the HAP `git diff --stat BASE_SHA` fallback are outside this delta and assert path presence only.
+- Ledger-field consumers: remediation-rule header (now path, line, failure kind, r, a, change class, reason), P16-T6 acceptance (same field list), P17-T3 acceptance (sum of r + a), PD15 ("P17-T3 checks the count", still accurate), P17-T3 title ("ledgered `non-whitespace` shellcheck remediation", consistent with change class derived from r + a), Appendix O item 4 (refers to the ledger generically). The P17-T3 sentence excluding `whitespace-only` entries remains true because those entries carry r + a = 0.
+- P17-T3 changed-line grep `^[-+][^-+]` over the `-w --minimal --unified=0` diff: header lines `---`/`+++` are excluded by the pattern, and `@@` lines do not begin with `-` or `+`.
+- Rule 5 stop branch: `REPO_BASH_LINE` and `NOT_OK` are printed by R4 and `GATE` by R5 (Appendix P R4 and R5 programs); the directive text attributed `NOT_OK 0` to R5, so the inserted clause names R4 for `NOT_OK 0`. Sibling consumers of the 85.0 line threshold: P16-T4 acceptance (`REPO_BASH_LINE` at least 85.0) and P17-T6 verdict; rule 4 covers `GATE FAIL` and rule 3 covers `NOT_OK` above 0, so the new branch covers the remaining case in which the round fails on P16-T4 alone.
+
+Revision 2, preflight round 1 delta (2026-10-10; executor preflight defects 1-5). Citations touched by this delta and their sibling regions, re-derived in this pass against the worktree:
+- `.codex/codex-web-setup.sh` line 316 (the only line ending in `"& {`) and line 326 (the only line beginning `}"` after stripping): basis of the rule 4 HOLD_HEAD_n locator, which names the same block W1 skips; the WIDEN_BASE fallback 317-326 is unchanged.
+- `tests/shell/test_codex_web_setup_codex_copy.bats`: 15 `@test "C824-` cases (C824-1 to C824-15); with BATS-NEW C824-16 to C824-61 (Appendix N ends at C824-61), the first free number for rule 4 is 62.
+- `docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/regression-testing/fail-before-bats.2026-10-01T16-32.md` lines 44-48: observed bats failure output, a `not ok` line followed by lines beginning `# ` (`# (in test file ...)`, `#   ... failed`, `# Last output:`); basis of the R4 `DIAG|` filter.
+- Plan sibling sweep (this file): every remaining `61` reference in Phases 12-17 and Appendices I-P is either the base count (BATS-NEW term, P15-T6 creation grep, Appendix N case C824-61) or now expressed as 61 plus ADDED_CASES (P16-T4, P17-T11) or as the passing round's C824_MAX (Appendix O item 5); the spec text in Appendix I (AC-16 to AC-19) names no case count. R4 consumers: P13-T1 (records `DIAG|` with round-0 failures), P16-T4, rule 3. Ledger field consumers: remediation rule header, P16-T6 (change class and ADDED_CASES), P17-T3 (title and changed-line count by `non-whitespace` class). The only `317-326` mentions are PD14, rule 4 (fallback), and the W1 derivation, all describing WIDEN_BASE. Write-route consumers of the amended "Permitted executor commands" bullet: P13-T3, P14-T1, P14-T2, rules 1 and 2.
+
+Revision 2 (2026-10-10, operator-approved PA-1 scope widening; Phases 12-17 and Appendices I-P). Every citation this revision added or relies on, and the sibling region of each, was re-derived in this pass against the worktree at HEAD 45f5326bf:
+- `scripts/bash/shell_qc_lib.sh`: 394 lines; no line begins with a space; `is_shell_script` lines 54-73; `discover_shell_scripts` lines 75-102 with the comment at lines 76-77 and the root list at line 85; `run_test_coverage` comment lines 348-349 and `include_pattern` line 350; the J3-J5 old texts were compared against these lines by a tab-anchored search of both files (identical).
+- `.claude/rules/shell.md`: Discovery Contract lines 46-59 (search roots lines 48-52, the J1 old text); Coverage Expectations lines 61-71 (lines 66-68, the J2 old text); Coding Standards lines 80-94 (shfmt tab indentation line 87, 500-line limit line 90, no temporary files and checked-in fixtures lines 91-94). The bundled copy carries the same text at lines 48 and 66 (search over both files).
+- `tests/shell/test_shell_qc_discovery.bats`: 99 lines, 13 `@test` blocks; root tests lines 61-71; node_modules test line 73 (J7 anchor); sorted-list test lines 87-99 pinning 7 entries at lines 90-98 (J8 old text).
+- `tests/shell/test_shell_qc_commands.bats`: 203 lines; shellcheck-call count at line 81 (J9); include-pattern assertions lines 128-131 (J10 anchor line 130); setup lines 9-22 (fixture root and stub directory).
+- `tests/fixtures/shell_qc/`: 19 files; `stub-bin/kcov` line 6 echoes its argv on one line (basis of the J10 assertion); `.claude/skills/demo-skill/scripts/skill_entry.sh` (model for J6).
+- `.codex/codex-web-setup.sh`: 413 lines; 254 lines begin with spaces, all in multiples of two, and none with a tab; discovery functions lines 10-30 and globals lines 32-35; installers lines 72-272; `restore_packages_if_needed` lines 274-294; `verify_windows_visual_studio_task_capability` lines 312-327 with the multi-line string from line 316 (the only line ending in `"& {`) to line 326 (the only line beginning `}"` after stripping); `warn` text naming `vswhere.exe` at line 337 (PD16); heredoc lines 350-377; `main` lines 380-411; guard line 413. Every stub, message, and argument string in Appendices L, M, and N was traced to these lines.
+- `.codex/` tracked content: one `.sh` file and one shebang line (`.codex/codex-web-setup.sh` line 1); every other file is `.toml`, `.md`, `.json`, `.ps1`, or another non-shell type (searches over `.codex/`).
+- `tests/shell/test_codex_web_setup_codex_copy.bats`: 187 lines, 15 cases; canonical script path line 19; source in `setup` lines 22-25; the restricted-PATH pattern of C824-11 lines 128-142 (model for `run_with_stub_path`).
+- `tests/shell/test_codex_web_setup_apt_helpers.bats` line 8, `tests/shell/test_codex_web_setup_pypi_connectivity.bats` line 8, `tests/shell/test_codex_web_setup_source_safety.bats` line 13: these source `.github/codex/codex-web-setup.sh`, not the `.codex` copy.
+- `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`: `is_publishable_runtime_path` lines 106-109, `list_scoped_files` lines 112-123, and the repo-to-bundle text comparison lines 215-228 (the `.codex/codex-web-setup.sh` parity test).
+- `.github/workflows/_shell-coverage.yml`: `workflow_dispatch` trigger line 5; check step line 51-52; coverage step lines 54-55; artifact `shell-coverage` from `artifacts/pester/kcov/**` lines 57-62.
+- `.gitignore`: `/artifacts` line 6; `coverage/` line 61; `.codex/state/` line 71; no pattern matches the W-SET fixture paths (searches for json, config, txt, sdk, dotnet, and bashrc).
+- `docs/features/active/2026-09-30-parallel-cohorts-split-words-drops-tokens-after-first-newline-794/evidence/qa-gates/final-shell-coverage-ci.2026-10-08T21-25.md` lines 8-15 and `docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/evidence/regression-testing/pass-after-scan-roots.2026-10-02T04-06.md` lines 13-20: observed success-case formats for the R3, R4, and R5 readers (log columns, last coverage summary, Cobertura class and line rows, TAP lines).
+- `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`: AC-1 to AC-15 lines 212-226 (AC-6, AC-13, AC-15 unchecked); I1 anchor at the end of line 226 and the heading at line 228; I2 anchor at line 308 (last line).
+- `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/remediation-inputs.2026-10-10T00-44.md` lines 18-28 (PA-1 and option 2) and lines 37-39 (the do-not-do list this operator decision overrides for the named files).
+- Sibling checks: P10-T3 (`vswhere` grep on an unanchored-whitespace diff) would report the line 337 re-indent, so P14-T3 re-verifies AC-14 with `git diff -w`; P11-T16 counted 15 ACs and is not re-run, so P17-T14 counts 19; the old Execution-constraints rules on `sh` routes and on not committing are scoped out of Phases 12-17 by the addendum.
+
+Revision round 1 record (historical; executor preflight defects 1-6 and the formatter-scope advisory). Citations touched by that revision and their sibling regions, re-derived in that pass:
 - `artifacts/orchestration/wip824-addendum2.patch` line 139 (WIP helper help text carrying the unconstrained pattern, replaced by D1) and line 163 (the WIP `$pattern` assignment, D2 old text); a non-ASCII search of the patch finds no character inside the helper hunk (lines 110-183) or the Pester hunks (lines 686-1015), and no `u2265` or `[char]0x2265` token anywhere, so after D1 and D2 the `[char]0x2265` grep matches only the D2 line and the helper is ASCII only.
 - Plan text (this file): a non-ASCII search after the edits finds only the en dash (Execution constraints) and the em dashes in headings; a search for a backslash-u-four-hex sequence finds none. Observed mechanism for defect 1: an Edit whose new text contained the backslash-u escape wrote the literal U+2265 sign, and a doubled backslash wrote two backslashes; D2 therefore uses `[char]0x2265`.
 - `artifacts/orchestration/wip824-addendum2.patch` line 262: the single added `-LineFloor $thresholds.Line` call; `.claude/hooks/validate-feature-review-coverage.ps1` has no `LineFloor` text on the current tree (only line 323 `$BranchFloor = 75.0`), so the single-quoted P3-T3 grep prints 1 after HAP.
@@ -853,7 +2119,7 @@ Revision round 1 (executor preflight defects 1-6 and the formatter-scope advisor
 - `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` lines 54, 55, 61; `.claude/skills/feature-review-workflow/SKILL.md` lines 143, 149, 158; `spec.md` AC lines 212 and 226: re-read to confirm the CITATION records below remain current.
 - G7 hunk arithmetic: for `@@ -12,3 +11,0 @@` the capture is `('11','0')` and `range(11, 11)` is empty; for `@@ -5 +5 @@` the capture is `('5','')` and the range is `{5}`. `--no-color` is added to the P9-T13 diff so a `color.ui=always` configuration cannot prefix the `@@` lines with escape codes.
 
-Initial-authoring citations not touched by this revision (carried as recorded in the round-0 pass; the subset also listed above was re-read this pass):
+Initial-authoring citations (historical; carried as recorded in the round-0 pass, and not relied on by Phases 12-17 except where re-derived in the revision 2 list above):
 - `.claude/hooks/validate-feature-review-coverage.ps1`: 459 lines; docstring lines 29-30 ("below 80 percent"); `Test-LanguageCoverageRow` parameters lines 258-265; hard-coded `85.0` line 313 and reason line 318; `$BranchFloor = 75.0` line 323 and reason line 327; per-language loop lines 430-439; dot-source guard lines 449-451; `Get-ArtifactFileContent` lines 41-63.
 - `tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1`: 4 `It` blocks (lines 14, 25, 58, 100); mocks return `Exists = $false` by default (lines 40, 81-83), so the added `CLAUDE.md` read does not change them.
 - `.codex/codex-web-setup.sh`: 384 lines; `TaskMaster.sln` at lines 10, 265, 285, 340, 341, 342; `vswhere` block lines 287-297; unconditional `main "$@"` line 384.
@@ -876,29 +2142,31 @@ Initial-authoring citations not touched by this revision (carried as recorded in
 
 PLANNER-INTERNAL-REVIEW: PASS
 CITATION-TO-TREE: PASS
-CITATION: .claude/hooks/validate-feature-review-coverage.ps1 | lines 29-30, 258-265, 313, 318, 323, 327, 430-439, 449-451
-CITATION: artifacts/orchestration/wip824-addendum2.patch | lines 139, 163, 262 (local git-ignored export of WIP_REF)
-CITATION: scripts/powershell/PoshQC/PoshQC.Testing.psm1 | line 287
-CITATION: tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1 | lines 297-313
-CITATION: .claude/agents/atomic-executor.md | frontmatter tools lines 11-20
-CITATION: .codex/codex-web-setup.sh | lines 10, 265, 285, 287-297, 340-342, 384
-CITATION: tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py | lines 136, 393, 463
-CITATION: tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py | lines 52-58, 162-177
-CITATION: tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py | lines 276-293
-CITATION: extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json | lines 54-55, 61
-CITATION: .claude/hooks/enforce-powershell-batch-budget.ps1 | lines 299, 309-316, 393-399
-CITATION: scripts/powershell/PoshQC/settings/pester.runsettings.psd1 | lines 15, 22, 26
-CITATION: .claude/skills/feature-review-workflow/SKILL.md | lines 111, 143, 149, 158
-CITATION: docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md | Acceptance Criteria lines 212-226
+CITATION: scripts/bash/shell_qc_lib.sh | lines 54-73, 75-102 (roots line 85), 348-350 (include_pattern line 350); 394 lines
+CITATION: .claude/rules/shell.md | lines 46-59, 61-71, 80-94
+CITATION: extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md | lines 48, 66
+CITATION: tests/shell/test_shell_qc_discovery.bats | lines 61-73, 87-99; 99 lines
+CITATION: tests/shell/test_shell_qc_commands.bats | lines 9-22, 74-83, 120-134; 203 lines
+CITATION: tests/fixtures/shell_qc/stub-bin/kcov | line 6
+CITATION: .codex/codex-web-setup.sh | lines 1-35, 72-272, 274-294, 312-327, 337, 350-377, 380-413; 413 lines
+CITATION: tests/shell/test_codex_web_setup_codex_copy.bats | lines 18-25, 128-142; 187 lines
+CITATION: tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py | lines 106-123, 215-228
+CITATION: .github/workflows/_shell-coverage.yml | lines 3-5, 51-62
+CITATION: .gitignore | lines 6, 61, 71
+CITATION: docs/features/active/2026-09-30-parallel-cohorts-split-words-drops-tokens-after-first-newline-794/evidence/qa-gates/final-shell-coverage-ci.2026-10-08T21-25.md | lines 8-15
+CITATION: docs/features/active/2026-09-27-cleanup-worktrees-scan-roots-and-orphan-root-split-741/evidence/regression-testing/pass-after-scan-roots.2026-10-02T04-06.md | lines 13-20
+CITATION: docs/features/active/2026-09-27-ci-gaps-linux-pester-and-kcov-set-u-743/evidence/regression-testing/fail-before-bats.2026-10-01T16-32.md | lines 44-48
+CITATION: docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md | Acceptance Criteria lines 212-226; Links line 308
+CITATION: docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/remediation-inputs.2026-10-10T00-44.md | lines 18-28, 37-39
 AC-TRACEABILITY: PASS
 SCOPE-BOUNDARY: PASS
-AC-INVENTORY: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15
+AC-INVENTORY: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19
 AC-MAPPING: AC-1 | IMPLEMENTATION: P3-T1, P3-T2, P3-T3, P3-T5, P3-T6 | TESTS: P3-T4, P8-T3 | EVIDENCE: evidence/regression-testing/pass-after-pester-824-final.TS.md
 AC-MAPPING: AC-2 | IMPLEMENTATION: P1-T4, P1-T5 | TESTS: P2-T2, P2-T3, P8-T3 | EVIDENCE: evidence/regression-testing/expect-fail-hook-pester.TS.md
 AC-MAPPING: AC-3 | IMPLEMENTATION: P3-T3, P3-T6 | TESTS: P8-T1 | EVIDENCE: evidence/other/p3-t3.TS.md
 AC-MAPPING: AC-4 | IMPLEMENTATION: P4-T1, P4-T2, P4-T3, P4-T4, P4-T5, P4-T6 | TESTS: P8-T1, P10-T2 | EVIDENCE: evidence/regression-testing/pass-after-follow-ups-pytest.TS.md
 AC-MAPPING: AC-5 | IMPLEMENTATION: P1-T1 | TESTS: P2-T1, P8-T1 | EVIDENCE: evidence/regression-testing/expect-fail-follow-ups-pytest.TS.md
-AC-MAPPING: AC-6 | IMPLEMENTATION: P5-T1, P5-T2, P5-T3, P5-T4, P5-T5, P5-T6, P5-T7, P5-T8, P5-T9, P5-T10, P5-T11, P5-T12, P5-T13, P5-T14, P5-T15 | TESTS: P5-T16, P8-T1, P9-T15 | EVIDENCE: evidence/regression-testing/pass-after-bats.TS.md
+AC-MAPPING: AC-6 | IMPLEMENTATION: P5-T1, P5-T2, P5-T3, P5-T4, P5-T5, P5-T6, P5-T7, P5-T8, P5-T9, P5-T10, P5-T11, P5-T12, P5-T13, P5-T14, P5-T15 | TESTS: P5-T16, P8-T1, P9-T15, P16-T4, P17-T12 | EVIDENCE: evidence/qa-gates/ci-bats-round<n>.TS.md (passing round)
 AC-MAPPING: AC-7 | IMPLEMENTATION: P1-T1 | TESTS: P2-T1, P8-T1 | EVIDENCE: evidence/regression-testing/pass-after-follow-ups-pytest.TS.md
 AC-MAPPING: AC-8 | IMPLEMENTATION: P3-T5, P3-T6, P3-T7, P4-T4, P5-T10, P6-T7 | TESTS: P8-T4, P8-T5, P8-T6, P9-T14 | EVIDENCE: evidence/qa-gates/parity-set-pytest.TS.md
 AC-MAPPING: AC-9 | IMPLEMENTATION: P6-T1, P6-T7 | TESTS: P8-T1 | EVIDENCE: evidence/other/p6-t1.TS.md
@@ -907,5 +2175,9 @@ AC-MAPPING: AC-11 | IMPLEMENTATION: P1-T2 | TESTS: P2-T5, P8-T2 | EVIDENCE: evid
 AC-MAPPING: AC-12 | IMPLEMENTATION: P7-T1 | TESTS: P7-T1 | EVIDENCE: evidence/other/p7-t1.TS.md
 AC-MAPPING: AC-13 | IMPLEMENTATION: P9-T1 | TESTS: P9-T10, P9-T12, P9-T13, P9-T14, P10-T1 | EVIDENCE: evidence/qa-gates/qc-loop-complete.TS.md
 AC-MAPPING: AC-14 | IMPLEMENTATION: P5-T9 | TESTS: P10-T2, P10-T3 | EVIDENCE: evidence/qa-gates/scope-check.TS.md
-AC-MAPPING: AC-15 | IMPLEMENTATION: P7-T2 | TESTS: P11-T15 | EVIDENCE: evidence/other/pr-body-callouts.TS.md
+AC-MAPPING: AC-15 | IMPLEMENTATION: P7-T2, P17-T7 | TESTS: P11-T15 | EVIDENCE: evidence/other/pr-body-callouts-widening.TS.md
+AC-MAPPING: AC-16 | IMPLEMENTATION: P13-T2, P13-T3 | TESTS: P12-T2, P13-T8, P17-T1, P17-T3, P17-T8 | EVIDENCE: evidence/qa-gates/widening-mirror-identity.TS.md
+AC-MAPPING: AC-17 | IMPLEMENTATION: P13-T4, P13-T5, P13-T6, P13-T7 | TESTS: P16-T2, P16-T3, P16-T4, P16-T5, P17-T9 | EVIDENCE: evidence/qa-gates/ci-bats-round<n>.TS.md (passing round)
+AC-MAPPING: AC-18 | IMPLEMENTATION: P14-T1, P14-T2 | TESTS: P14-T3, P14-T4, P16-T3, P16-T4, P17-T3, P17-T10 | EVIDENCE: evidence/qa-gates/ci-shell-qc-check-round<n>.TS.md (passing round)
+AC-MAPPING: AC-19 | IMPLEMENTATION: P15-T1, P15-T2, P15-T3, P15-T4, P15-T5, P15-T6 | TESTS: P15-T7, P16-T4, P16-T5, P17-T6, P17-T11 | EVIDENCE: evidence/qa-gates/ci-kcov-codex-setup-round<n>.TS.md (passing round)
 UNRESOLVED-GAPS: NONE
