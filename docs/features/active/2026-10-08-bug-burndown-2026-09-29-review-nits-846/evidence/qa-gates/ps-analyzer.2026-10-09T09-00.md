@@ -14,9 +14,10 @@ Dependent criterion AC-38 stays unchecked and is listed as pending-CI. The CI jo
 
 The MCP result payload carries only an `ok` flag and a summary string composed by the server; it does not carry analyzer findings or a count, so it is not a substitute for the A7-LOCAL acceptance literal `0`.
 
-Command: mcp__drm-copilot__run_poshqc_analyze (workspace_root C:\Users\DanMoisan\repos\drm-copilot\.claude\worktrees\agent-a6e4f01baf096421b, scan_folders ["tests/scripts/workflows"])
+Command: mcp__drm-copilot__run_poshqc_analyze (workspace_root <worktree>, scan_folders ["tests/scripts/workflows"])
 Result (verbatim):
 
 ```
-{"ok":true,"tool":"run_poshqc_analyze","workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot\\.claude\\worktrees\\agent-a6e4f01baf096421b","summary":"Ran bundled PoshQC analyze against 'C:\\Users\\DanMoisan\\repos\\drm-copilot\\.claude\\worktrees\\agent-a6e4f01baf096421b' with 1 selected scan folder(s)."}
+{"ok":true,"tool":"run_poshqc_analyze","workspace_root":"<worktree>","summary":"Ran bundled PoshQC analyze against '<worktree>' with 1 selected scan folder(s)."}
 ```
+Redaction: absolute worktree path replaced with <worktree> on 2026-10-09T22-23 (policy-audit PA-4); no other content changed.

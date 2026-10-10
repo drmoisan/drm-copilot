@@ -14,9 +14,10 @@ Dependent criteria AC-30 and AC-31 stay unchecked and are listed as pending-CI. 
 
 The MCP result payload carries only an `ok` flag and a summary string composed by the server; it does not carry Pester pass or fail counts, so it is not a substitute for the A7-LOCAL acceptance literal `Passed=11 Failed=0`.
 
-Command: mcp__drm-copilot__run_poshqc_test (workspace_root C:\Users\DanMoisan\repos\drm-copilot\.claude\worktrees\agent-a6e4f01baf096421b, scan_folders ["tests/scripts/workflows"])
+Command: mcp__drm-copilot__run_poshqc_test (workspace_root <worktree>, scan_folders ["tests/scripts/workflows"])
 Result (verbatim):
 
 ```
-{"ok":true,"tool":"run_poshqc_test","workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot\\.claude\\worktrees\\agent-a6e4f01baf096421b","summary":"Ran bundled PoshQC test against 'C:\\Users\\DanMoisan\\repos\\drm-copilot\\.claude\\worktrees\\agent-a6e4f01baf096421b' with 1 selected scan folder(s)."}
+{"ok":true,"tool":"run_poshqc_test","workspace_root":"<worktree>","summary":"Ran bundled PoshQC test against '<worktree>' with 1 selected scan folder(s)."}
 ```
+Redaction: absolute worktree path replaced with <worktree> on 2026-10-09T22-23 (policy-audit PA-4); no other content changed.

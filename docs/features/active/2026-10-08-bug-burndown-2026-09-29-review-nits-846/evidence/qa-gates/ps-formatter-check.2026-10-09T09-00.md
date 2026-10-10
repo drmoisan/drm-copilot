@@ -14,11 +14,12 @@ Dependent criterion AC-38 stays unchecked and is listed as pending-CI. The CI jo
 
 The MCP result payload carries only an `ok` flag and a summary string composed by the server; it does not carry a formatter change list, so it is not a substitute for the A7-LOCAL acceptance literal `True`.
 
-Command: mcp__drm-copilot__run_poshqc_format (workspace_root C:\Users\DanMoisan\repos\drm-copilot\.claude\worktrees\agent-a6e4f01baf096421b, scan_folders ["tests/scripts/workflows"])
+Command: mcp__drm-copilot__run_poshqc_format (workspace_root <worktree>, scan_folders ["tests/scripts/workflows"])
 Result (verbatim):
 
 ```
-{"ok":true,"tool":"run_poshqc_format","workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot\\.claude\\worktrees\\agent-a6e4f01baf096421b","summary":"Ran bundled PoshQC format against 'C:\\Users\\DanMoisan\\repos\\drm-copilot\\.claude\\worktrees\\agent-a6e4f01baf096421b' with 1 selected scan folder(s)."}
+{"ok":true,"tool":"run_poshqc_format","workspace_root":"<worktree>","summary":"Ran bundled PoshQC format against '<worktree>' with 1 selected scan folder(s)."}
 ```
 
 Tree observation: after the format run, `git status --porcelain --untracked-files=all` printed nothing, and `git hash-object tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` printed 45c0d062e2902624db729b2e282be044c489f5f3, equal to `git rev-parse HEAD:tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1`. The formatter modified no file, so no loop restart was required.
+Redaction: absolute worktree path replaced with <worktree> on 2026-10-09T22-23 (policy-audit PA-4); no other content changed.

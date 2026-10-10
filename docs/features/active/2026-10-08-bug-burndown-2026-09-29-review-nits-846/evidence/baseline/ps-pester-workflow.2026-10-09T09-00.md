@@ -14,5 +14,6 @@ EXIT_CODE: not reported by the tool (returned "ok": true)
 Output Summary: returned status recorded verbatim below. The result carries no pass, fail, or coverage counts, so none are recorded here. A follow-up `git status --porcelain --untracked-files=all` showed no tracked file modified by the run.
 
 ```
-{"ok":true,"tool":"run_poshqc_test","workspace_root":"C:\\Users\\DanMoisan\\repos\\drm-copilot\\.claude\\worktrees\\agent-a6e4f01baf096421b","summary":"Ran bundled PoshQC test against 'C:\\Users\\DanMoisan\\repos\\drm-copilot\\.claude\\worktrees\\agent-a6e4f01baf096421b' with 1 selected scan folder(s)."}
+{"ok":true,"tool":"run_poshqc_test","workspace_root":"<worktree>","summary":"Ran bundled PoshQC test against '<worktree>' with 1 selected scan folder(s)."}
 ```
+Redaction: absolute worktree path replaced with <worktree> on 2026-10-09T22-23 (policy-audit PA-4); no other content changed.
