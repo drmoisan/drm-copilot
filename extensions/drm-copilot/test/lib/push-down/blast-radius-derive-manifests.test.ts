@@ -181,3 +181,20 @@ describe("issue #643: re-export surface", () => {
     expect(coreClassifyProjectDirectories).toBe(classifyProjectDirectories);
   });
 });
+
+describe("issue #796: module path ordering", () => {
+  it("issue #796 sorts a supplementary-character module path after a U+E000 module path", () => {
+    // Arrange: under UTF-16 code-unit order the surrogate pair sorts first.
+    const observations = [
+      observe(""),
+      observe("\u{1F600}", "package.json"),
+      observe("\uE000", "package.json"),
+    ];
+
+    // Act
+    const result = classifyProjectDirectories(observations);
+
+    // Assert: code-point order places U+E000 before U+1F600.
+    expect(result.modulePaths).toEqual(["\uE000", "\u{1F600}"]);
+  });
+});

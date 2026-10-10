@@ -85,6 +85,12 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #796: the shared dependency-free string comparator module.
+    // Per-file entry only; the map has no `global` key.
+    "./src/lib/string-ordering.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/validate/orchestrator-state-core.ts": {
       lines: 85,
       branches: 75,

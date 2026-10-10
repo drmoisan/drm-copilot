@@ -1,3 +1,4 @@
+import { compareCodePoint } from "../string-ordering";
 import type {
   ScannedSession,
   ScannedSubagent,
@@ -93,15 +94,9 @@ function findParentKey(
   return undefined;
 }
 
-/** Ascending string comparison of two subagents' `agentId`. */
+/** Ascending code-point comparison of two subagents' `agentId` values. */
 function compareByAgentId(a: ScannedSubagent, b: ScannedSubagent): number {
-  if (a.meta.agentId < b.meta.agentId) {
-    return -1;
-  }
-  if (a.meta.agentId > b.meta.agentId) {
-    return 1;
-  }
-  return 0;
+  return compareCodePoint(a.meta.agentId, b.meta.agentId);
 }
 
 /**

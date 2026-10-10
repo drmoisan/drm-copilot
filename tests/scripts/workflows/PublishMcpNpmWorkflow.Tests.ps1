@@ -107,7 +107,8 @@ Describe "publish-mcp-npm.yml workflow invariants" {
 
         # Fails the job on inequality rather than merely reporting it.
         $script:equalityStep.Text | Should -Match '-ne'
-        $script:equalityStep.Text | Should -Match '(?m)^\s*exit 1\s*$'
+        [regex]::Matches($script:equalityStep.Text, '(?m)^\s*exit 1\s*$').Count | Should -Be 1
+        $script:equalityStep.Text | Should -Match '(?s)if \(\$tagVersion -ne \$manifestVersion\) \{[^}]*::error::[^}]*\bexit 1\b[^}]*\}'
     }
 
     It "polls the exact published version after publishing and fails the job on budget expiry" {
@@ -122,7 +123,8 @@ Describe "publish-mcp-npm.yml workflow invariants" {
         # A bounded poll with an explicit non-zero exit once the budget expires; a poll that
         # falls through silently would report success for a version that never published.
         $script:pollStep.Text | Should -Match 'maxAttempts'
-        $script:pollStep.Text | Should -Match '(?m)^\s*exit 1\s*$'
+        [regex]::Matches($script:pollStep.Text, '(?m)^\s*exit 1\s*$').Count | Should -Be 1
+        $script:pollStep.Text | Should -Match '(?s)if \(-not \$resolved\) \{[^}]*::error::[^}]*\bexit 1\b[^}]*\}'
     }
 
     It "ref-guards the post-publish registry poll step" {
@@ -221,7 +223,25 @@ Describe "publish-mcp-npm.yml workflow invariants" {
         $text | Should -Match '\$LASTEXITCODE\s*=\s*0'
         $text | Should -Match '@danmoisan/drm-copilot-mcp@\$version'
         $text | Should -Match '(?m)^\s*exit 0\s*$'
-        $text | Should -Match '(?m)^\s*exit 1\s*$'
+        [regex]::Matches($text, '(?m)^\s*exit 1\s*$').Count | Should -Be 1
+        $text | Should -Match '(?s)if \(-not \$resolved\) \{[^}]*::error::[^}]*\bexit 1\b[^}]*\}'
         $text | Should -Match $script:refGuardPattern
+    }
+
+    # Issue #723 refinement, closed under #846: the poll step's error message states that the
+    # publish step succeeded. That statement holds only while the poll step keeps the default
+    # success() status check (no always(), failure(), or cancelled() in its if: expression),
+    # the publish step cannot report success after a failure (no continue-on-error), and the
+    # poll step runs after the publish step.
+    It "runs the registry poll step only after a successful publish step" {
+        $script:pollStep | Should -Not -BeNullOrEmpty
+        $script:publishStep | Should -Not -BeNullOrEmpty
+
+        $pollConditions = @(($script:pollStep.Text -split "`n") | Where-Object { $_ -match '^\s+if:' })
+        $pollConditions.Count | Should -Be 1
+        $pollConditions[0] | Should -Not -Match 'always\(\)|failure\(\)|cancelled\(\)'
+
+        $script:publishStep.Text | Should -Not -Match 'continue-on-error'
+        $script:pollStep.Index | Should -BeGreaterThan $script:publishStep.Index
     }
 }

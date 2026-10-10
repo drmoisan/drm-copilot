@@ -16,9 +16,9 @@
  */
 
 import { type FileSystem, toPosixPath } from "../file-system";
+import { compareCodePoint } from "../string-ordering";
 import { relativeToPosix } from "./feature-docs-parsers";
 import {
-  compareCodePoint,
   escapeRegExp,
   type FeatureDocExcerpt,
   ISSUE_REFERENCE_PATTERN,

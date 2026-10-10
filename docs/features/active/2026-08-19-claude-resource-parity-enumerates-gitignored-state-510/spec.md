@@ -3,8 +3,8 @@
 - **Issue:** #510
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-29T14-30
-- **Status:** Draft
+- **Last Updated:** 2026-10-09T21-41
+- **Status:** Implemented (all 13 acceptance criteria checked; reviewed in code-review.2026-10-07T15-30.md; status corrected under #846, previously Draft)
 - **Version:** 0.2
 - **Work Mode:** full-bug
 
@@ -42,7 +42,7 @@ Actual:
 AssertionError: Repo file missing from bundle: .claude/state/python-batch-budget.default.json
 ```
 
-The walk excludes only `.claude/settings.local.json` and `.claude/agent-memory/**`. `.claude/state/` is gitignored at `.gitignore` line 68 but is not excluded from the walk. Observed 2026-08-22 during issue #500 orchestration; deleting the artifact returned `10 passed`.
+The walk excludes only `.claude/settings.local.json` and `.claude/agent-memory/**`. `.claude/state/` is gitignored at `.gitignore` line 70 (corrected under #846; previously cited as 68) but is not excluded from the walk. Observed 2026-08-22 during issue #500 orchestration; deleting the artifact returned `10 passed`.
 
 ## Scope & Non-Goals
 - In scope: the test-side fix recommended by the research (`research/research.2026-09-29T14-15.md`, section 4, option (a)). Specifically:
@@ -58,7 +58,7 @@ The walk was written with two explicit exclusions and no general rule, so each n
 
 The trigger has widened since the entry was first written. It originally reproduced only through `.claude/hooks/enforce-powershell-batch-budget.ps1`, which creates `.claude/state/powershell-batch-budget.<session_id>.json`. Issue #501 added an entry-point seam to the Python batch-budget hook, which creates `.claude/state/python-batch-budget.default.json`, so a Python-only session reproduces it too.
 
-Research also shows `.claude/worktrees/**` is gitignored (`.gitignore` line 21) and, in the primary checkout, holds full repository copies that the same `rglob` would enumerate. The three local-only subdirectories are `agent-memory` (line 67), `state` (line 68), and `worktrees` (line 21). `.claude/settings.local.json` is not in `.gitignore` and is excluded by production code, so it is handled as an explicit file entry.
+Research also shows `.claude/worktrees/**` is gitignored (`.gitignore` line 23) and, in the primary checkout, holds full repository copies that the same `rglob` would enumerate. The three local-only subdirectories are `agent-memory` (line 69), `state` (line 70), and `worktrees` (line 23). `.claude/settings.local.json` is not in `.gitignore` and is excluded by production code, so it is handled as an explicit file entry. (Line numbers corrected under #846; previously cited as 21, 67, and 68.)
 
 ## Proposed Fix
 
@@ -171,7 +171,7 @@ Pure-function tests over literal `Path` lists in `tests/scripts/dev_tools/test_c
 - [x] All created and modified test files are at or under 500 lines: `wc -l` (or an equivalent line count) on `tests/scripts/dev_tools/claude_payload_scope_test_support.py`, `tests/scripts/dev_tools/test_claude_payload_scope_support.py`, `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, and `tests/scripts/dev_tools/test_claude_rules_frontmatter.py` reports <= 500 for each.
 - [x] `poetry run black --check .`, `poetry run ruff check .`, and `poetry run pyright` report zero errors.
 - [x] The three affected test files pass: `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_claude_payload_scope_support.py tests/scripts/dev_tools/test_claude_rules_frontmatter.py -q` exits 0.
-- [x] Coverage of the new helper meets thresholds (line >= 85%, branch >= 75%). Because `pyproject.toml` omits `tests/*`, measurement uses an override rc file stored at `docs/features/active/2026-08-19-claude-resource-parity-enumerates-gitignored-state-510/evidence/coverage/coveragerc-helper.ini` containing `[run]` with `branch = True` and no `omit` entry: `poetry run pytest tests/scripts/dev_tools/test_claude_payload_scope_support.py --cov=tests.scripts.dev_tools.claude_payload_scope_test_support --cov-branch --cov-config=<that rc file> --cov-report=term-missing` reports the helper module line coverage >= 85% and branch coverage >= 75%. The dotted module form is required; a `.py` path form measures nothing.
+- [x] Coverage of the new helper meets thresholds (line >= 85%, branch >= 75%). Because `pyproject.toml` omits `tests/*`, measurement uses an override rc file stored at `docs/features/active/2026-08-19-claude-resource-parity-enumerates-gitignored-state-510/evidence/other/coveragerc-helper.ini` (path corrected under #846; previously named under the coverage evidence folder) containing `[run]` with `branch = True` and no `omit` entry: `poetry run pytest tests/scripts/dev_tools/test_claude_payload_scope_support.py --cov=tests.scripts.dev_tools.claude_payload_scope_test_support --cov-branch --cov-config=<that rc file> --cov-report=term-missing` reports the helper module line coverage >= 85% and branch coverage >= 75%. The dotted module form is required; a `.py` path form measures nothing.
 - [x] No production file is modified: `git diff --name-only main...HEAD` lists no path under `scripts/`, `src/`, or `extensions/`.
 - [x] The out-of-scope production defect (Python CLI and TS adapter copying `.claude/state` and `.claude/worktrees`) is recorded in "Out of Scope and Follow-up" with its research citations, and a separate follow-up issue is requested in the completion report.
 
