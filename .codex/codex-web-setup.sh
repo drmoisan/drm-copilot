@@ -1,15 +1,38 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+# Print the repository root. Codex Web copies this script to /tmp before running it, so
+# the script-relative root can resolve to / rather than the actual checkout. The checkout
+# is recognized by a solution file at its root; the solution name is not assumed. When the
+# script-relative root lists no solution file, fall back to the working directory, which
+# Codex sets to the repo root.
+# Args: $1 = script-relative root; $2 = solution file names at that root, one per line.
+resolve_repo_root() {
+  if [ -n "$2" ]; then
+    printf '%s\n' "$1"
+  else
+    pwd
+  fi
+}
 
-# Codex Web copies this script to /tmp before running it, so the script-relative
-# REPO_ROOT resolves to / rather than the actual checkout.  Fall back to the
-# working directory, which Codex sets to the repo root.
-if [ ! -f "${REPO_ROOT}/TaskMaster.sln" ]; then
-  REPO_ROOT="$(pwd)"
-fi
+# Print the first solution file name in LC_ALL=C order, or nothing when none is listed.
+# Args: $1 = solution file names, one per line.
+select_solution_file() {
+  if [ -n "$1" ]; then
+    printf '%s\n' "$1" | LC_ALL=C sort | sed -n '1p'
+  fi
+}
+
+# Print the names of the solution files at the root of a directory, one per line.
+# Args: $1 = directory.
+list_root_solution_files() {
+  find "$1" -maxdepth 1 -type f -name '*.sln' -printf '%f\n' 2>/dev/null
+}
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_RELATIVE_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_ROOT="$(resolve_repo_root "${SCRIPT_RELATIVE_ROOT}" "$(list_root_solution_files "${SCRIPT_RELATIVE_ROOT}")")"
+SOLUTION_FILE="$(select_solution_file "$(list_root_solution_files "${REPO_ROOT}")")"
 
 log() {
   printf '[codex-web-setup] %s\n' "$*"
@@ -261,8 +284,13 @@ restore_packages_if_needed() {
     return
   fi
 
+  if [ -z "${SOLUTION_FILE}" ]; then
+    warn "No solution file was found at ${REPO_ROOT}; skipping package restore."
+    return
+  fi
+
   log "Restoring solution packages into packages/..."
-  nuget restore "${REPO_ROOT}/TaskMaster.sln" -PackagesDirectory "${REPO_ROOT}/packages"
+  nuget restore "${REPO_ROOT}/${SOLUTION_FILE}" -PackagesDirectory "${REPO_ROOT}/packages"
 }
 
 verify_formatting_capability() {
@@ -282,7 +310,8 @@ is_windows_powershell_host() {
 }
 
 verify_windows_visual_studio_task_capability() {
-  pwsh -NoProfile -ExecutionPolicy Bypass -File "${REPO_ROOT}/scripts/vscode/Invoke-VSBuild.ps1" -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -NoExecute >/dev/null || fail "MSBuild tooling required by the restore/build/lint/type-check tasks is unavailable."
+  [ -n "${SOLUTION_FILE}" ] || fail "No solution file was found at ${REPO_ROOT}; MSBuild task verification needs one."
+  pwsh -NoProfile -ExecutionPolicy Bypass -File "${REPO_ROOT}/scripts/vscode/Invoke-VSBuild.ps1" -SolutionPath "${SOLUTION_FILE}" -Configuration Debug -Platform 'Any CPU' -NoExecute >/dev/null || fail "MSBuild tooling required by the restore/build/lint/type-check tasks is unavailable."
 
   pwsh -NoProfile -ExecutionPolicy Bypass -Command "& {
     \$vswherePath = Join-Path \${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
@@ -337,9 +366,9 @@ Useful follow-up commands after a successful setup run:
 - source ~/.bashrc
 - dotnet --info
 - dotnet tool run csharpier format .
-- pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-Restore.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU"
-- pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU" -EnableNETAnalyzers -EnforceCodeStyleInBuild
-- pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU" -EnableNullable -TreatWarningsAsErrors
+- pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-Restore.ps1 -SolutionPath <solution>.sln -Configuration Debug -Platform "Any CPU"
+- pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath <solution>.sln -Configuration Debug -Platform "Any CPU" -EnableNETAnalyzers -EnforceCodeStyleInBuild
+- pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath <solution>.sln -Configuration Debug -Platform "Any CPU" -EnableNullable -TreatWarningsAsErrors
 - pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTest.ps1 -SearchRoot . -Configuration Debug
 - pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug
 
@@ -381,4 +410,4 @@ main() {
   log "Setup complete."
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi
