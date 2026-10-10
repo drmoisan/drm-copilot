@@ -307,6 +307,27 @@ def test_acceptance_criteria_tracking_skill_defines_ci_dependent_rule(
     _assert_section_contains(skill_path, "## Check-Off Protocol", fragments)
 
 
+@pytest.mark.parametrize(
+    "skill_path",
+    [path for _, path in AC_TRACKING_SKILLS],
+    ids=[skill_id for skill_id, _ in AC_TRACKING_SKILLS],
+)
+def test_acceptance_criteria_tracking_skill_cross_references_ci_dependent_exception(
+    skill_path: Path,
+) -> None:
+    """The orchestrator check-off rule names the CI-dependent exception."""
+    # Arrange
+    fragments = (
+        "Orchestrators do not directly check off AC items. The one exception is a"
+        " CI-dependent criterion",
+        "as described in `### CI-Dependent Criteria` above. For every other"
+        " criterion, orchestrators instead:",
+    )
+
+    # Act / Assert
+    _assert_section_contains(skill_path, "## Check-Off Protocol", fragments)
+
+
 def test_feature_review_agent_grants_mcp_artifact_validator() -> None:
     """The feature-review agent's tools list ends with the MCP artifact validator."""
     # Arrange
