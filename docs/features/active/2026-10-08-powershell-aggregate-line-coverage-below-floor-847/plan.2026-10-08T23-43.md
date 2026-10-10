@@ -337,7 +337,7 @@ Contingency (stop, do not improvise): if P7-T2 reports `PSShouldProcess` (or any
 
 ### Phase 6 — Follow-up Record
 
-- [ ] [P6-T1] Create `docs/features/potential/2026-10-09-host-tools-manifest-and-bash-bootstrap-missing.md` from `docs/features/potential/template.md` recording the pre-existing missing-file defect (AC-14)
+- [x] [P6-T1] Create `docs/features/potential/2026-10-09-host-tools-manifest-and-bash-bootstrap-missing.md` from `docs/features/potential/template.md` recording the pre-existing missing-file defect (AC-14)
   - Required content: `Date captured: 2026-10-09`; origin issue #847; Problem stating that `scripts/host-tools.manifest.json` is read by `bootstrap-host.ps1` (now through `HostBootstrap.psm1`) and `verify-host.ps1` (now through `HostVerification.psm1`) but does not exist, so both scripts fail early on every host, and that the bootstrap non-Windows error message refers to `scripts/bash/bootstrap-host.sh`, which does not exist; Proposed Behavior (restore or relocate the manifest and either add the bash script or correct the message); draft acceptance criteria; Next Step checkboxes.
   - Acceptance: the file exists; `Select-String -LiteralPath docs/features/potential/2026-10-09-host-tools-manifest-and-bash-bootstrap-missing.md -SimpleMatch -Pattern 'host-tools.manifest.json'` returns at least one match; the same command with the pattern `bootstrap-host.sh` returns at least one match; the file contains `#847`.
 
