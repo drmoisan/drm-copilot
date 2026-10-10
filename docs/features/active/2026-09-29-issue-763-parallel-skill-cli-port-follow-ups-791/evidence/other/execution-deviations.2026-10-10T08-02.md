@@ -81,6 +81,32 @@ Each entry records the task ID, the planned mechanism, the substituted mechanism
 - Substituted mechanism: none (task-authorized branch). Current numbers differ for `parallel-add` (101, 108, 150; +2) and `parallel-orchestrate` (658, 813, 821; +24) after the `main` merge; `parallel-close` (49, 55, 65) and `_parallel_mutation_errors.py:192` are unchanged. Both the spec and current numbers, with a note, are recorded in `follow-ups.md`.
 - Reason: line drift from the earlier `main` merge (recorded per task text, not an operator constraint).
 
+## Artifact timestamp accuracy (Phases 6-7)
+- Task ID: [P6-T6], [P6-T7], [P6-T8], [P7-T1].
+- Planned mechanism: `<timestamp>` is the execution time in `yyyy-MM-ddTHH-mm` form.
+- Substituted mechanism: the artifact names `permission-surface-present.2026-10-10T08-41.md`, `permission-surface-absent.2026-10-10T08-41.md`, `permission-surface-tests.2026-10-10T08-42.md`, and the `Recorded: 2026-10-10T08-46` line of `follow-ups.md` were assigned without reading the clock; a `date` call at the start of Phase 8 returned `2026-10-10T08-39`, so those values are a few minutes later than the actual write times (approximately 08-36 to 08-38). The files were committed under those names and are not renamed (no deletions per operator constraint). From Phase 8 onward every timestamp was read from `date`.
+- Reason: executor error; recorded for audit accuracy.
+
+## [P8-T9]
+- Planned mechanism: `npx --yes bats` over the four suites, after the `command -v python3` pre-check.
+- Substituted mechanism: pre-check run (exit 0); bats not run; authorized bats-cannot-start-equivalent branch recorded with `Reason: operator constraint prohibits local bats execution`, `CI-DEFERRED: yes`, `CI-DEFERRED-ACS: AC-8, AC-9, AC-10, AC-11, AC-12`.
+- Reason: operator constraint.
+
+## [P8-T11]
+- Planned mechanism: `sh <scratchpad>/run-ps-791.sh <scratchpad>/format-check-791.ps1`, acceptance on `FORMAT_CLEAN`.
+- Substituted mechanism: `mcp__drm-copilot__run_poshqc_format` (scan_folders = tests/scripts/claude-hooks) with `git status --porcelain` and `git hash-object` of the TriggerScoping test before and after (identical, so no restart); `CI-DEFERRED: yes`.
+- Reason: operator constraint.
+
+## [P8-T12]
+- Planned mechanism: record the `mcp__drm-copilot__run_poshqc_analyze` disposition, then `sh <scratchpad>/run-ps-791.sh <scratchpad>/pssa-791.ps1`, acceptance on `PSSA_FINDINGS=0`.
+- Substituted mechanism: `mcp__drm-copilot__run_poshqc_analyze` (scan_folders = tests/scripts/claude-hooks) only; disposition recorded (returned, ok true); finding count `CI-DEFERRED: yes`.
+- Reason: operator constraint.
+
+## [P8-T13]
+- Planned mechanism: `sh <scratchpad>/run-ps-791.sh <scratchpad>/pester-791.ps1`, acceptance on `Failed: 0` and the `Covered` percentage >= the [P0-T15] value.
+- Substituted mechanism: `mcp__drm-copilot__run_poshqc_test` (scan_folders = tests/scripts/claude-hooks, tests/scripts/claude-runtime); disposition recorded (returned, ok true); counts and coverage `CI-DEFERRED: yes`, `CI-DEFERRED-ACS: AC-13`.
+- Reason: operator constraint.
+
 ## Phase-boundary commits (Phases 5-9)
 - Task ID: phase boundaries after [P5-T7], [P6-T8], [P7-T1], [P8-T17], and [P9-T2].
 - Planned mechanism: the plan defines no per-phase commit.
