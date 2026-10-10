@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<report name="pester-coverage-subset"><package name=".claude/lib/blast-radius"><sourcefile name="BlastRadiusExtraction.psm1">
+      <counter type="INSTRUCTION" missed="0" covered="99" />
+      <counter type="LINE" missed="0" covered="86" />
+      <counter type="METHOD" missed="0" covered="7" />
+      <counter type="CLASS" missed="0" covered="1" />
+    </sourcefile>
+    <sourcefile name="BlastRadiusTokenShape.psm1">
+      <counter type="INSTRUCTION" missed="0" covered="23" />
+      <counter type="LINE" missed="0" covered="20" />
+      <counter type="METHOD" missed="0" covered="3" />
+      <counter type="CLASS" missed="0" covered="1" />
+    </sourcefile>
+    </package></report>

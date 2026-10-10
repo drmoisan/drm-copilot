@@ -24,6 +24,8 @@
  *     - No I/O; every function is pure.
  */
 
+import { compareCodePoint } from "../string-ordering";
+
 /**
  * One visited destination directory and its shallow file listing. The scanner
  * supplies one per directory it visits, the root having an empty path.
@@ -113,16 +115,6 @@ export interface ProjectDirectoryClassification {
 }
 
 /**
- * Compare two strings ordinally.
- * @param left First string.
- * @param right Second string.
- * @returns Negative, zero, or positive per the comparator contract.
- */
-export function compareOrdinal(left: string, right: string): number {
-  return left < right ? -1 : left > right ? 1 : 0;
-}
-
-/**
  * Report whether a directory name is excluded from the destination scan.
  * @param name A single directory name, not a path.
  * @returns True when the name is a pruned bucket or begins with a dot.
@@ -196,5 +188,5 @@ export function classifyProjectDirectories(
       structureObserved = true;
     }
   }
-  return { modulePaths: modulePaths.sort(compareOrdinal), structureObserved };
+  return { modulePaths: modulePaths.sort(compareCodePoint), structureObserved };
 }

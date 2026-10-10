@@ -13,6 +13,7 @@
  */
 
 import { type FileSystem } from "../file-system";
+import { compareCodePoint } from "../string-ordering";
 import {
   type PlannedEmission,
   plannedEmissionToJson,
@@ -50,7 +51,7 @@ function sortKeysDeep(value: unknown): unknown {
     const sorted: Record<string, unknown> = {};
     // Sort keys lexicographically to mirror Python json.dumps sort_keys.
     for (const key of Object.keys(value as Record<string, unknown>).sort(
-      (left, right) => (left < right ? -1 : left > right ? 1 : 0),
+      compareCodePoint,
     )) {
       sorted[key] = sortKeysDeep((value as Record<string, unknown>)[key]);
     }
