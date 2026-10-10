@@ -87,3 +87,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## p11
+
+- Subject: docs(786): final QC evidence
+- Commit SHA: 2dc8e7eea5f8d8faae55441158b3ab1f9f3ebed4
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
