@@ -576,7 +576,7 @@ Each edit task writes FEATURE/evidence/other/p14-tN.TS.md unless it names anothe
 - [x] [P14-T4] Run the Codex bundle-parity node and the follow-ups module, and record FEATURE/evidence/qa-gates/codex-bundle-parity-widening.TS.md.
       Command: `poetry run pytest "tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py::test_bundled_codex_and_agents_payload_contains_all_repo_runtime_contracts" tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`.
       Acceptance: exit 0 and a summary reporting 44 passed (1 parity node and the 43 follow-ups cases P8-T1 recorded) and no failed test. A failure is fixed by correcting `.codex/codex-web-setup.sh` and re-running P14-T2 and this task.
-- [ ] [P14-T5] Commit and push Phase 14, and record FEATURE/evidence/other/commit-p14.TS.md.
+- [x] [P14-T5] Commit and push Phase 14, and record FEATURE/evidence/other/commit-p14.TS.md.
       Commands: `git add -- .codex/codex-web-setup.sh extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/plan.2026-10-08T22-16.md` followed by the full path of the P13-T9 artifact and of each artifact P14-T1 to P14-T4 wrote, named individually; `git commit -m "style(824): apply the shfmt default layout to .codex/codex-web-setup.sh" -m "Refs #824"`; `git push origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git status --porcelain --untracked-files=all`; `git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git rev-parse HEAD origin/bug/issue-823-tier-rule-adoption-follow-ups-824`.
       Acceptance: as P12-T6. This artifact is committed by P15-T8.
 
@@ -584,25 +584,25 @@ Each edit task writes FEATURE/evidence/other/p14-tN.TS.md unless it names anothe
 
 Each task writes FEATURE/evidence/other/p15-tN.TS.md unless it names another artifact. Every file is written with the Write tool, with exactly the appendix content and LF line endings. None of these suites is run locally (OPS-1); they first run in the Phase 16 CI round.
 
-- [ ] [P15-T1] Create the three fixture files of item K1 of Appendix K under `tests/fixtures/codex_web_setup/dotnet-repo/` (`global.json`, `dotnet-tools.json`, `coverage.config`).
+- [x] [P15-T1] Create the three fixture files of item K1 of Appendix K under `tests/fixtures/codex_web_setup/dotnet-repo/` (`global.json`, `dotnet-tools.json`, `coverage.config`).
       Commands: `grep -c -F "8.0.100" tests/fixtures/codex_web_setup/dotnet-repo/global.json`; `poetry run python -c "import json; [json.load(open(p, encoding='utf-8')) for p in ('tests/fixtures/codex_web_setup/dotnet-repo/global.json', 'tests/fixtures/codex_web_setup/dotnet-repo/dotnet-tools.json')]; print('JSON_OK', 2)"`; `ls tests/fixtures/codex_web_setup/dotnet-repo`.
       Acceptance: the grep prints 1; the JSON check exits 0 and prints `JSON_OK 2`; `ls` lists exactly `coverage.config`, `dotnet-tools.json`, and `global.json`. `EXIT_CODE: 0`.
-- [ ] [P15-T2] Create the three fixture files of item K2 of Appendix K under `tests/fixtures/codex_web_setup/dotnet-sdk-installed/` (`global.json`, `.dotnet-sdk/dotnet/placeholder.txt`, `.dotnet-sdk/sdk/8.0.100/placeholder.txt`).
+- [x] [P15-T2] Create the three fixture files of item K2 of Appendix K under `tests/fixtures/codex_web_setup/dotnet-sdk-installed/` (`global.json`, `.dotnet-sdk/dotnet/placeholder.txt`, `.dotnet-sdk/sdk/8.0.100/placeholder.txt`).
       Commands: `grep -c -F "8.0.100" tests/fixtures/codex_web_setup/dotnet-sdk-installed/global.json`; `ls tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk`; `ls tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/dotnet tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/sdk/8.0.100`.
       Acceptance: the grep prints 1; the first `ls` lists exactly `dotnet` and `sdk`; the second lists `placeholder.txt` under each of the two directories. `EXIT_CODE: 0`.
-- [ ] [P15-T3] Create `tests/fixtures/codex_web_setup/bashrc-with-ci.txt` with exactly the content of item K3 of Appendix K.
+- [x] [P15-T3] Create `tests/fixtures/codex_web_setup/bashrc-with-ci.txt` with exactly the content of item K3 of Appendix K.
       Commands: `grep -c -x -F "export CI=true" tests/fixtures/codex_web_setup/bashrc-with-ci.txt`; `wc -l tests/fixtures/codex_web_setup/bashrc-with-ci.txt`.
       Acceptance: the grep prints 1; `wc` prints 1. `EXIT_CODE: 0`.
-- [ ] [P15-T4] Create `tests/shell/test_codex_web_setup_codex_installers.bats` with exactly the content of Appendix L (C824-16 to C824-33).
+- [x] [P15-T4] Create `tests/shell/test_codex_web_setup_codex_installers.bats` with exactly the content of Appendix L (C824-16 to C824-33).
       Commands: `grep -c "^@test" tests/shell/test_codex_web_setup_codex_installers.bats`; `grep -c -E "^@test \"C824-(1[6-9]|2[0-9]|3[0-3]) " tests/shell/test_codex_web_setup_codex_installers.bats`; `wc -l tests/shell/test_codex_web_setup_codex_installers.bats`.
       Acceptance: the greps print 18 and 18; the line count is at most 500. `EXIT_CODE: 0`.
-- [ ] [P15-T5] Create `tests/shell/test_codex_web_setup_codex_dotnet.bats` with exactly the content of Appendix M (C824-34 to C824-47).
+- [x] [P15-T5] Create `tests/shell/test_codex_web_setup_codex_dotnet.bats` with exactly the content of Appendix M (C824-34 to C824-47).
       Commands: `grep -c "^@test" tests/shell/test_codex_web_setup_codex_dotnet.bats`; `grep -c -E "^@test \"C824-(3[4-9]|4[0-7]) " tests/shell/test_codex_web_setup_codex_dotnet.bats`; `wc -l tests/shell/test_codex_web_setup_codex_dotnet.bats`.
       Acceptance: the greps print 14 and 14; the line count is at most 500. `EXIT_CODE: 0`.
-- [ ] [P15-T6] Create `tests/shell/test_codex_web_setup_codex_verify.bats` with exactly the content of Appendix N (C824-48 to C824-61).
+- [x] [P15-T6] Create `tests/shell/test_codex_web_setup_codex_verify.bats` with exactly the content of Appendix N (C824-48 to C824-61).
       Commands: `grep -c "^@test" tests/shell/test_codex_web_setup_codex_verify.bats`; `grep -c -E "^@test \"C824-(4[89]|5[0-9]|6[01]) " tests/shell/test_codex_web_setup_codex_verify.bats`; `wc -l tests/shell/test_codex_web_setup_codex_verify.bats`.
       Acceptance: the greps print 14 and 14; the line count is at most 500. `EXIT_CODE: 0`.
-- [ ] [P15-T7] Static checks of BATS-NEW and the seven new fixtures (no temporary-directory use, LF only, not ignored, all untracked-new), and record FEATURE/evidence/qa-gates/bats-suites-static.TS.md.
+- [x] [P15-T7] Static checks of BATS-NEW and the seven new fixtures (no temporary-directory use, LF only, not ignored, all untracked-new), and record FEATURE/evidence/qa-gates/bats-suites-static.TS.md.
       Commands: `grep -c -E "BATS_TEST_TMPDIR|BATS_TMPDIR|BATS_FILE_TMPDIR|BATS_RUN_TMPDIR" tests/shell/test_codex_web_setup_codex_installers.bats tests/shell/test_codex_web_setup_codex_dotnet.bats tests/shell/test_codex_web_setup_codex_verify.bats`; reader R6 of Appendix P; `git check-ignore -v tests/shell/test_codex_web_setup_codex_installers.bats tests/shell/test_codex_web_setup_codex_dotnet.bats tests/shell/test_codex_web_setup_codex_verify.bats tests/fixtures/codex_web_setup/dotnet-repo/global.json tests/fixtures/codex_web_setup/dotnet-repo/dotnet-tools.json tests/fixtures/codex_web_setup/dotnet-repo/coverage.config tests/fixtures/codex_web_setup/dotnet-sdk-installed/global.json tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/dotnet/placeholder.txt tests/fixtures/codex_web_setup/dotnet-sdk-installed/.dotnet-sdk/sdk/8.0.100/placeholder.txt tests/fixtures/codex_web_setup/bashrc-with-ci.txt`; `git status --porcelain --untracked-files=all -- tests/shell tests/fixtures/codex_web_setup`.
       Acceptance: the grep prints `:0` for each of the three suites; R6 exits 0 and prints `CHECKED 10 CR_FILES 0 []`; `git check-ignore -v` exits 1 with no output (no path is ignored); the status listing is exactly ten `??` lines, one for each of the three suites and the seven fixtures named above. `EXIT_CODE: 0`.
 - [ ] [P15-T8] Commit and push Phase 15, and record FEATURE/evidence/other/commit-p15.TS.md.
