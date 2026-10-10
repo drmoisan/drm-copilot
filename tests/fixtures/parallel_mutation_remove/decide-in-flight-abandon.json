@@ -1,0 +1,10 @@
+{
+  "case": "decide-in-flight-abandon",
+  "subcommand": "decide",
+  "argv": ["decide", "--item", "7", "--state", "in_flight", "--removal-disposition", "abandon"],
+  "expected": {
+    "exit_code": 0,
+    "stdout": "{\"item_key\":7,\"prior_state\":\"in_flight\",\"new_state\":\"withdrawn\",\"disposition\":\"abandon\",\"triggers_recompute\":false}",
+    "stderr": null
+  }
+}

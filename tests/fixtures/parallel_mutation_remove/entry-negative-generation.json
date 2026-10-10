@@ -1,0 +1,10 @@
+{
+  "case": "entry-negative-generation",
+  "subcommand": "entry",
+  "argv": ["entry", "--item", "7", "--prior-state", "in_flight", "--removal-disposition", "detach", "--recompute", "false", "--generation", "-1", "--at", "2026-10-08T14-00"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation entry rejected: recolor_generation -1 violates the F3 mutations[] contract for op 'remove'."
+  }
+}
