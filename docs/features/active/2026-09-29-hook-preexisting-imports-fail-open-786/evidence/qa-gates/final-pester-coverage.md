@@ -1,69 +1,71 @@
-# Final Pester With Coverage ([P11-T3])
+# Final Pester With Coverage ([P11-T3]; re-recorded by remediation [P5-T3])
 
-Timestamp: 2026-10-10T06-08
-Pass: 4
-Command: R-PESTER (Invoke-PoshQCTest with scripts/powershell/PoshQC/settings/pester.runsettings.psd1, console streamed by <SCRATCHPAD>/pstream.ps1). Then <SCRATCHPAD>/rpester.ps1 -SkipRun ran R-JUNIT for 32 test files, R-COV for the 57 W-CHANGED-PROD files, and R-CHANGED-LINES against 86e457a003be0c60b65e01156e4cccd6495dfd1a. The 32 test files are every test file changed or created since BASE_SHA plus legacy-codex-hook-contracts.Tests.ps1. They include the ten section 4 files, the W-690-TESTS files, the section 2.6.6 files and the [P10-T2] files.
+Timestamp: 2026-10-10T17-50
+Pass: 1
+Command: sh <SCRATCHPAD>/r.sh rpester (R-PESTER: Invoke-PoshQCTest -Root $root -SettingsPath scripts/powershell/PoshQC/settings/pester.runsettings.psd1, fresh PowerShell 7 process); sh <SCRATCHPAD>/r.sh r1-wcp (W-CHANGED-PROD re-derived as in [P0-T7]); sh <SCRATCHPAD>/r.sh rpester -SkipRun -CovList <SCRATCHPAD>/r1-wchangedprod.txt -JunitList <SCRATCHPAD>/r1-p5-junit.list -ChangedBase 86e457a003be0c60b65e01156e4cccd6495dfd1a (R-JUNIT, R-COV, R-CHANGED-LINES in a fresh process over the same reports)
 EXIT_CODE: 0
-Output Summary:
-- Console: `Tests Passed: 9495, Failed: 0`, completed in 537.52s.
-- JUnit root: tests 9505, failures 0, errors 0. Report last-write times are 2026-10-10T06-17-04 (coverage) and 2026-10-10T06-18-35 (JUnit), both after Timestamp.
-- Every named file matches exactly one testsuite, with failures 0, errors 0 and at least one testcase.
-- 53 of the 57 changed production files are at or above 85.00.
+Output Summary: Console `Tests Passed: 9495, Failed: 0, Skipped: 10, Inconclusive: 0, NotRun: 0`; JUNIT_ROOT: tests=9505 failures=0 errors=0. 12 named test files each match one testsuite with failures 0 and errors 0. 57 W-CHANGED-PROD files, every row SOURCEFILE_MATCHES: 1; every file outside PS-SET is at or above 85.00. BELOW-FLOOR and REGRESSION list PS-SET files only; those files are judged for AC-24 from the per-surface measurement (rule 10, [P5-T4]); their combined-run figures are recorded unchanged below.
 
-BELOW-FLOOR: four files, identical to [P10-T3] pass 2.
+Tests completed line: Tests completed in 533.53s
+Tests Passed line: Tests Passed: 9495, Failed: 0, Skipped: 10, Inconclusive: 0, NotRun: 0
+Covered line: Covered 87.07% / 0%. 25,713 analyzed Commands in 192 Files.
+COVERAGE_LAST_WRITE: 2026-10-10T18-00-15
+JUNIT_LAST_WRITE: 2026-10-10T18-01-47
+JUNIT_ROOT: tests=9505 failures=0 errors=0
 
-| File | Coverage (%) |
-|---|---|
-| .codex/hooks/enforce-epic-child-worktree-binding.ps1 | 74.70 |
-| .codex/hooks/enforce-epic-planning-only.ps1 | 82.25 |
-| .codex/hooks/hook-dependency-guard.ps1 | 57.89 |
-| .codex/hooks/validate-bash.ps1 | 80.25 |
+PS-SET:
+- .codex/hooks/enforce-epic-child-worktree-binding.ps1
+- .codex/hooks/enforce-epic-planning-only.ps1
+- .codex/hooks/hook-dependency-guard.ps1
+- .codex/hooks/validate-bash.ps1
+- .codex/hooks/enforce-orchestration-preimplementation-gate.ps1
+- .codex/hooks/enforce-epic-merge-gate.ps1
 
-UNCOVERED-CHANGED: none of these lines is an RS-4 known-uncovered candidate.
-- .codex/hooks/enforce-orchestration-preimplementation-gate.ps1:466-468 (tail)
-- .codex/hooks/hook-dependency-guard.ps1:103-111 (decision body)
-- .codex/hooks/validate-bash.ps1:304-306 (tail)
+AC-24-ROUTE: .codex/hooks/enforce-epic-child-worktree-binding.ps1 | per-surface | evidence/qa-gates/r1-ac24-per-surface.md
+AC-24-ROUTE: .codex/hooks/enforce-epic-planning-only.ps1 | per-surface | evidence/qa-gates/r1-ac24-per-surface.md
+AC-24-ROUTE: .codex/hooks/hook-dependency-guard.ps1 | per-surface | evidence/qa-gates/r1-ac24-per-surface.md
+AC-24-ROUTE: .codex/hooks/validate-bash.ps1 | per-surface | evidence/qa-gates/r1-ac24-per-surface.md
+AC-24-ROUTE: .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 | per-surface | evidence/qa-gates/r1-ac24-per-surface.md
+AC-24-ROUTE: .codex/hooks/enforce-epic-merge-gate.ps1 | per-surface | evidence/qa-gates/r1-ac24-per-surface.md
 
-ACCEPTANCE-GAP: the conditions "every `COVERAGE:` percent at least 85.00" and "every `UNCOVERED-CHANGED:` line is an RS-4 candidate" do not hold. The covering tests pass, and folder-scoped runs report these files as covered. The full-run tracer attribution problem is described in p10-coverage-pass2.md and deviations.md ([P10-T3]). [P11-T3] is left unchecked and escalated with [P10-T3] and [P10-T4].
+BELOW-FLOOR: .codex/hooks/enforce-epic-child-worktree-binding.ps1 (74.70); .codex/hooks/enforce-epic-planning-only.ps1 (82.25); .codex/hooks/hook-dependency-guard.ps1 (57.89); .codex/hooks/validate-bash.ps1 (80.25)
+REGRESSION: .codex/hooks/enforce-epic-child-worktree-binding.ps1 (95.62 missed=7 -> 74.70 missed=42); .codex/hooks/enforce-epic-merge-gate.ps1 (98.68 missed=2 -> 98.09 missed=3); .codex/hooks/enforce-epic-planning-only.ps1 (95.71 missed=7 -> 82.25 missed=30); .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 (100.00 missed=0 -> 86.55 missed=23); .codex/hooks/validate-bash.ps1 (100.00 missed=0 -> 80.25 missed=16)
+KNOWN-UNCOVERED:
+- .codex/hooks/enforce-orchestration-preimplementation-gate.ps1:466 | if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PREIMPLEMENTATION_GATE_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+- .codex/hooks/validate-bash.ps1:304 | if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('HOOK_DEPENDENCY_LOAD_FAILED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+
+## Acceptance checks
 
 ```text
-RUN_START: 2026-10-10T06-18-49
-JUNIT_LAST_WRITE: 2026-10-10T06-18-35
-COVERAGE_LAST_WRITE: 2026-10-10T06-17-04
+CHECK: last-write-at-or-after-timestamp | pass | COVERAGE_LAST_WRITE: 2026-10-10T18-00-15; JUNIT_LAST_WRITE: 2026-10-10T18-01-47; Timestamp 2026-10-10T17-50
+CHECK: root-failures-errors-zero | pass | JUNIT_ROOT: tests=9505 failures=0 errors=0
+CHECK: named-files-one-suite-green | pass | named=12; nonconforming=0
+CHECK: sourcefile-matches-1 | pass | coverage rows=57; nonmatching=0
+CHECK: non-ps-set-at-or-above-85 | pass | files outside PS-SET below 85.00=0
+CHECK: below-floor-and-regression-in-ps-set | pass | non-PS-SET entries=0
+CHECK: non-ps-set-uncovered-are-rs4 | pass | non-PS-SET non-candidate lines=0
+```
+
+## Reporting output
+
+```text
+RUN_START: 2026-10-10T18-02-25
+JUNIT_LAST_WRITE: 2026-10-10T18-01-47
+COVERAGE_LAST_WRITE: 2026-10-10T18-00-15
 JUNIT_ROOT: tests=9505 failures=0 errors=0
 FAILING_TESTCASES: none
-JUNIT: tests/scripts/claude-hooks/enforce-epic-merge-gate.Coverage.Tests.ps1 | suites=1 | testcases=2 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/enforce-epic-merge-gate.ItemResolution.Tests.ps1 | suites=1 | testcases=20 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/enforce-epic-merge-gate.WorktreeResolution.Tests.ps1 | suites=1 | testcases=11 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/enforce-epic-wave-barrier.WorktreeResolution.Tests.ps1 | suites=1 | testcases=10 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.WorktreeResolution.Tests.ps1 | suites=1 | testcases=7 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.OperandResolution.Tests.ps1 | suites=1 | testcases=11 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/enforce-parallel-cohort-barrier.WorktreeResolution.Tests.ps1 | suites=1 | testcases=8 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/enforce-parallel-drift-gate.WorktreeResolution.Tests.ps1 | suites=1 | testcases=7 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/enforce-parallel-worktree-removal-gate.WorktreeResolution.Tests.ps1 | suites=1 | testcases=8 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1 | suites=1 | testcases=139 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/hook-dependency-failure.SpecialCases.Tests.ps1 | suites=1 | testcases=11 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/hook-dependency-guard.Tests.ps1 | suites=1 | testcases=12 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/hook-import-failure-exemptions.FailClosed.Tests.ps1 | suites=1 | testcases=19 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/validate-feature-review-coverage.Coverage.Tests.ps1 | suites=1 | testcases=43 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/validate-orchestrator-output.WaveBarrier.Tests.ps1 | suites=1 | testcases=13 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/validate-orchestrator-output-resolution.Tests.ps1 | suites=1 | testcases=13 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/validate-planner-output.Coverage.Tests.ps1 | suites=1 | testcases=1 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/validate-pr-author-output.Coverage.Tests.ps1 | suites=1 | testcases=2 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-hooks/validate-prd-feature-output.Coverage.Tests.ps1 | suites=1 | testcases=1 | failures=0 | errors=0
 JUNIT: tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1 | suites=1 | testcases=598 | failures=0 | errors=0
-JUNIT: tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1 | suites=1 | testcases=25 | failures=0 | errors=0
 JUNIT: tests/scripts/claude-runtime/hook-import-failure-exemptions.Guard.Tests.ps1 | suites=1 | testcases=10 | failures=0 | errors=0
-JUNIT: tests/scripts/codex-hooks/codex-epic-child-launch-attestation.Coverage.Tests.ps1 | suites=1 | testcases=4 | failures=0 | errors=0
-JUNIT: tests/scripts/codex-hooks/enforce-codex-model-routing.Coverage.Tests.ps1 | suites=1 | testcases=14 | failures=0 | errors=0
-JUNIT: tests/scripts/codex-hooks/enforce-epic-root-invocation.Coverage.Tests.ps1 | suites=1 | testcases=11 | failures=0 | errors=0
-JUNIT: tests/scripts/codex-hooks/enforce-epic-wave-barrier.Coverage.Tests.ps1 | suites=1 | testcases=21 | failures=0 | errors=0
-JUNIT: tests/scripts/codex-hooks/hook-dependency-failure.Codex.Tests.ps1 | suites=1 | testcases=75 | failures=0 | errors=0
+JUNIT: tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1 | suites=1 | testcases=25 | failures=0 | errors=0
+JUNIT: tests/scripts/claude-hooks/hook-dependency-guard.Tests.ps1 | suites=1 | testcases=12 | failures=0 | errors=0
 JUNIT: tests/scripts/codex-hooks/hook-dependency-guard.Tests.ps1 | suites=1 | testcases=11 | failures=0 | errors=0
+JUNIT: tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1 | suites=1 | testcases=139 | failures=0 | errors=0
+JUNIT: tests/scripts/codex-hooks/hook-dependency-failure.Codex.Tests.ps1 | suites=1 | testcases=75 | failures=0 | errors=0
+JUNIT: tests/scripts/claude-hooks/hook-dependency-failure.SpecialCases.Tests.ps1 | suites=1 | testcases=11 | failures=0 | errors=0
+JUNIT: tests/scripts/claude-hooks/hook-import-failure-exemptions.FailClosed.Tests.ps1 | suites=1 | testcases=19 | failures=0 | errors=0
 JUNIT: tests/scripts/codex-hooks/hook-import-failure-exemptions.FailClosed.Tests.ps1 | suites=1 | testcases=5 | failures=0 | errors=0
+JUNIT: tests/scripts/claude-hooks/validate-orchestrator-output.WaveBarrier.Tests.ps1 | suites=1 | testcases=13 | failures=0 | errors=0
 JUNIT: tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 | suites=1 | testcases=43 | failures=0 | errors=0
-JUNIT: tests/scripts/codex-hooks/validate-codex-subagent-routing.Coverage.Tests.ps1 | suites=1 | testcases=17 | failures=0 | errors=0
-JUNIT: tests/scripts/codex-hooks/validate-feature-review-coverage.Coverage.Tests.ps1 | suites=1 | testcases=29 | failures=0 | errors=0
 PACKAGES:
   <WORKSPACE_ROOT>/.claude/hooks
   <WORKSPACE_ROOT>/.claude/lib/blast-radius

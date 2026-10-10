@@ -155,3 +155,11 @@
 - Porcelain (post-commit, pre-append): empty
 - git diff --name-only df0965aeaa8a3905fe4966fcbb4b49143d566941 HEAD -- .claude/hooks .claude/lib .codex tests scripts config: (no output)
 - git status --porcelain -- .claude/hooks .claude/lib .codex tests scripts config: (no output)
+
+## r1-p4
+
+- Subject: test(786): assert the H8 leading token and record PR-body notes
+- Commit SHA: 1dfe7ec71dbc4841b6f871c98a01045ac11fedb6
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
