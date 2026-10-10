@@ -1,6 +1,7 @@
 # Acceptance-Criteria Verification
 
 Timestamp: 2026-10-02T01-52
+Note (added under #846, policy-audit PA-2): this file is a summary artifact of other evidence; no command was executed to produce it, so it carries no Command or EXIT_CODE row.
 Source: `docs/features/active/2026-09-27-orchestration-completion-gate-and-tooling-friction-744/spec.md` (`## Acceptance Criteria`, AC-1 through AC-19; work mode `full-bug`)
 Precondition: the [P12-T1], [P12-T3], and [P12-T5] commands were re-run after Phases 13 and 14. Each result is appended as `Post-QA re-run:` to `qa-gates/deferred-scope-diff`, `qa-gates/changed-file-set`, and `qa-gates/jest-config-unchanged`, and no new path was found.
 
