@@ -1,0 +1,2 @@
+# Fixtures keep exact bytes (CRLF, intentionally invalid JSON); see issue #848.
+tests/fixtures/

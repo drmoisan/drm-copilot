@@ -12,15 +12,15 @@ import { InMemoryFileSystem } from "./lib/subagent-tree/in-memory-file-system";
 
 type CommandHandler = () => Promise<void> | void;
 
-/** Absolute workspace root used across scenarios (mirrors a real Windows cwd). */
-const WORKSPACE_ROOT = "C:\\Users\\DanMoisan\\repos\\drm-copilot";
-/** Fake resolved user-global Claude projects directory (distinct from any
- * path under `WORKSPACE_ROOT`, so tests fail loudly if discovery regresses
- * to scanning the workspace root instead). */
-const CLAUDE_PROJECTS_ROOT = "/claude-root/projects";
-/** Encoded directory name matching `WORKSPACE_ROOT`, using a lowercase
- * drive-letter segment to exercise the case-insensitive matching rule. */
-const MATCHING_DIR = "c--users-danmoisan-repos-drm-copilot";
+import {
+  CLAUDE_PROJECTS_ROOT,
+  MATCHING_DIR,
+  WORKSPACE_ROOT,
+  FakeFileTimes,
+  FakeTerminalWriter,
+  addRootSession,
+  agentToolUseLine,
+} from "./subagent-tree-command-test-support";
 
 const commandHandlers = new Map<string, CommandHandler>();
 type PickItem = { path: string };
@@ -72,36 +72,6 @@ jest.mock("../src/terminal-writer", () => ({
 
 import { registerSubagentTreeCommand } from "../src/subagent-tree-command";
 
-/** In-test `TerminalWriter` fake capturing writes and reveal calls. */
-class FakeTerminalWriter implements TerminalWriter {
-  readonly writes: Array<{ header: string; body: string }> = [];
-  revealCallCount = 0;
-
-  write(header: string, body: string): void {
-    this.writes.push({ header, body });
-  }
-
-  reveal(): void {
-    this.revealCallCount += 1;
-  }
-}
-
-/**
- * In-test `FileTimes` fake backed by a path->mtime map. Any path not present
- * in the map resolves to `undefined`, modeling an unreadable mtime (stat
- * failure), which the production code renders as the timestamp `unknown` and
- * sorts last.
- */
-class FakeFileTimes implements FileTimes {
-  constructor(
-    private readonly times: ReadonlyMap<string, number | undefined> = new Map(),
-  ) {}
-
-  getModifiedTimeMs(path: string): number | undefined {
-    return this.times.get(path);
-  }
-}
-
 /** Register a command instance and return its handler, injecting the given fakes. */
 function activateAndGetHandler(
   fileSystem: InMemoryFileSystem,
@@ -121,28 +91,6 @@ function activateAndGetHandler(
     );
   }
   return handler;
-}
-
-/** Build a root transcript line containing one `Agent` tool-use block. */
-function agentToolUseLine(model: string, toolUseId: string): string {
-  return JSON.stringify({
-    message: {
-      model,
-      content: [{ type: "tool_use", name: "Agent", id: toolUseId }],
-    },
-  });
-}
-
-/** Register one root-session transcript file under a matched Claude projects directory. */
-function addRootSession(
-  fileSystem: InMemoryFileSystem,
-  directoryName: string,
-  sessionFileName: string,
-): void {
-  fileSystem.addFile(
-    `${CLAUDE_PROJECTS_ROOT}/${directoryName}/${sessionFileName}`,
-    "",
-  );
 }
 
 describe("drm-copilot showSubagentTree command", () => {
@@ -383,118 +331,5 @@ describe("drm-copilot showSubagentTree command", () => {
     const logs = appendLineMock.mock.calls.map(([line]) => line);
     expect(logs.some((line) => line.includes("canceled by user"))).toBe(true);
     expect(terminalWriter.writes).toHaveLength(0);
-  });
-
-  it("shows quick-pick entries ordered most-recent-first with formatted timestamp labels and matchOnDetail", async () => {
-    // Arrange: two candidates with distinct injected mtimes.
-    const fileSystem = new InMemoryFileSystem();
-    addRootSession(fileSystem, MATCHING_DIR, "older.jsonl");
-    addRootSession(fileSystem, MATCHING_DIR, "newer.jsonl");
-    const olderPath = `${CLAUDE_PROJECTS_ROOT}/${MATCHING_DIR}/older.jsonl`;
-    const newerPath = `${CLAUDE_PROJECTS_ROOT}/${MATCHING_DIR}/newer.jsonl`;
-    const fileTimes = new FakeFileTimes(
-      new Map([
-        [olderPath, 1609459200000], // 2021-01-01 00:00 UTC
-        [newerPath, 1640995200000], // 2022-01-01 00:00 UTC
-      ]),
-    );
-    showQuickPickMock.mockResolvedValue(undefined);
-    const terminalWriter = new FakeTerminalWriter();
-    const handler = activateAndGetHandler(
-      fileSystem,
-      terminalWriter,
-      fileTimes,
-    );
-
-    // Act
-    await handler();
-
-    // Assert: entries ordered newest-first with timestamp labels + matchOnDetail.
-    expect(showQuickPickMock).toHaveBeenCalledTimes(1);
-    const [entries, options] = showQuickPickMock.mock.calls[0] as [
-      ReadonlyArray<{ label: string; detail: string; path: string }>,
-      { matchOnDetail?: boolean },
-    ];
-    expect(entries.map((entry) => entry.path)).toEqual([newerPath, olderPath]);
-    expect(entries[0]?.label.startsWith("2022-01-01 00:00")).toBe(true);
-    expect(entries[1]?.label.startsWith("2021-01-01 00:00")).toBe(true);
-    expect(entries[0]?.detail).toBe(newerPath);
-    expect(options.matchOnDetail).toBe(true);
-  });
-
-  it("maps the selected quick-pick entry back to its full transcript path", async () => {
-    // Arrange: two candidates; the user selects the second by full path.
-    const fileSystem = new InMemoryFileSystem();
-    addRootSession(fileSystem, MATCHING_DIR, "alpha.jsonl");
-    addRootSession(fileSystem, MATCHING_DIR, "beta.jsonl");
-    const betaPath = `${CLAUDE_PROJECTS_ROOT}/${MATCHING_DIR}/beta.jsonl`;
-    showQuickPickMock.mockImplementation(async (items) =>
-      items.find((item) => item.path === betaPath),
-    );
-    const terminalWriter = new FakeTerminalWriter();
-    const handler = activateAndGetHandler(fileSystem, terminalWriter);
-
-    // Act
-    await handler();
-
-    // Assert: rendered tree header names the selected candidate's path.
-    expect(terminalWriter.writes).toHaveLength(1);
-    expect(terminalWriter.writes[0]?.header).toContain(betaPath);
-  });
-
-  it("auto-selects a single candidate without prompting even when a FileTimes is injected", async () => {
-    // Arrange: exactly one candidate with a readable mtime.
-    const fileSystem = new InMemoryFileSystem();
-    addRootSession(fileSystem, MATCHING_DIR, "solo.jsonl");
-    const soloPath = `${CLAUDE_PROJECTS_ROOT}/${MATCHING_DIR}/solo.jsonl`;
-    const fileTimes = new FakeFileTimes(new Map([[soloPath, 1609459200000]]));
-    const terminalWriter = new FakeTerminalWriter();
-    const handler = activateAndGetHandler(
-      fileSystem,
-      terminalWriter,
-      fileTimes,
-    );
-
-    // Act
-    await handler();
-
-    expect(showQuickPickMock).not.toHaveBeenCalled();
-    expect(terminalWriter.writes).toHaveLength(1);
-    expect(terminalWriter.writes[0]?.header).toContain(soloPath);
-  });
-
-  it("keeps the prompt working when one candidate's mtime is unreadable, sorting it last as 'unknown'", async () => {
-    // Arrange: one readable candidate and one whose mtime cannot be read
-    // (absent from the FakeFileTimes map -> undefined).
-    const fileSystem = new InMemoryFileSystem();
-    addRootSession(fileSystem, MATCHING_DIR, "readable.jsonl");
-    addRootSession(fileSystem, MATCHING_DIR, "unreadable.jsonl");
-    const readablePath = `${CLAUDE_PROJECTS_ROOT}/${MATCHING_DIR}/readable.jsonl`;
-    const unreadablePath = `${CLAUDE_PROJECTS_ROOT}/${MATCHING_DIR}/unreadable.jsonl`;
-    const fileTimes = new FakeFileTimes(
-      new Map([[readablePath, 1609459200000]]),
-    );
-    showQuickPickMock.mockResolvedValue(undefined);
-    const terminalWriter = new FakeTerminalWriter();
-    const handler = activateAndGetHandler(
-      fileSystem,
-      terminalWriter,
-      fileTimes,
-    );
-
-    // Act
-    await handler();
-
-    // Assert: no error; the unreadable candidate sorts last, labeled 'unknown'.
-    expect(showErrorMessageMock).not.toHaveBeenCalled();
-    expect(showQuickPickMock).toHaveBeenCalledTimes(1);
-    const [entries] = showQuickPickMock.mock.calls[0] as [
-      ReadonlyArray<{ label: string; path: string }>,
-    ];
-    expect(entries.map((entry) => entry.path)).toEqual([
-      readablePath,
-      unreadablePath,
-    ]);
-    expect(entries[1]?.label.startsWith("unknown")).toBe(true);
   });
 });

@@ -22,8 +22,8 @@
  *     - `buildCloseCandidatesSection`, `buildIssuesToAutocloseSection`.
  */
 
+import { compareCodePoint } from "../string-ordering";
 import {
-  compareCodePoint,
   AUTOCLOSE_PENDING_NOT_OPEN_TEXT,
   AUTOCLOSE_UNVERIFIED_ANNOTATION,
   type IssueDetails,

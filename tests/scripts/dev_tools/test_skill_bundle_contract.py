@@ -15,6 +15,9 @@ from scripts.dev_tools.skill_bundle_contract import (
     parse_allowed_tools,
 )
 
+# A Markdown code-fence marker: three backtick characters.
+_FENCE = chr(96) * 3
+
 
 def _skill(frontmatter: str, body: str) -> str:
     """Build a skill text from frontmatter lines and a body.
@@ -280,3 +283,58 @@ def test_extract_deduplicates_and_sorts_references() -> None:
         "scripts/tools/alpha.sh",
         "scripts/tools/zeta.sh",
     ), f"Got {references}"
+
+
+@pytest.mark.parametrize("fence", ["bash", "sh"])
+@pytest.mark.parametrize("verb", ["bash", "sh", "source"])
+def test_extract_reads_invocation_on_first_line_of_shell_fence(
+    fence: str, verb: str
+) -> None:
+    """An invocation on the first line of a shell fence yields its path.
+
+    Regression for issue #791 (FU-763-5): the fence info string must not
+    consume the next line's interpreter word.
+    """
+
+    # Arrange
+    text = f"{_FENCE}{fence}\n{verb} scripts/tools/example.sh --flag\n{_FENCE}"
+
+    # Act
+    references = extract_script_references(text)
+
+    # Assert
+    assert references == (
+        "scripts/tools/example.sh",
+    ), f"fence={fence} verb={verb}: got {references}"
+
+
+def test_extract_reads_python_invocation_on_first_line_of_python_fence() -> None:
+    """A python invocation on the first line of a python fence yields its path.
+
+    Regression for issue #791 (FU-763-5).
+    """
+
+    # Arrange
+    text = f"{_FENCE}python\npython scripts/tools/example.py\n{_FENCE}"
+
+    # Act
+    references = extract_script_references(text)
+
+    # Assert
+    assert references == ("scripts/tools/example.py",), f"Got {references}"
+
+
+def test_extract_ignores_verb_and_path_split_across_lines() -> None:
+    """A verb at line end and a path on the next line is not an invocation.
+
+    Regression for issue #791 (FU-763-5).
+    """
+
+    # Arrange
+    text = "Use bash\nscripts/tools/example.sh\n"
+
+    # Act
+    references = extract_script_references(text)
+
+    # Assert
+    assert references == (), f"Expected no references, got {references}"
