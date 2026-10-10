@@ -77,7 +77,7 @@ Report mode is advisory and read-only. M-3 can add a drive-relative scan root, w
 - [x] AC-4 (M-2): The `# shellcheck disable=SC1091` in `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh` carries an inline reason, consistent with `.claude/rules/shell.md` and the pattern at `cleanup-worktrees.sh`.
 - [x] AC-5 (M-1): The comment in `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_detached_lib.sh` that cites `cleanup_worktrees_enumerate_lib.sh` line numbers for the `DETACHED` branch-field write names the function (`emit_record` in `parse_worktree_list`) instead of a line range.
 - [x] AC-6: Each changed script's bundle mirror under `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/` is byte-identical to its source, and the repository mirror-identity and bundle-parity checks pass.
-- [ ] AC-7: `shfmt` and `shellcheck` report no findings on the changed scripts, and the cleanup-worktrees bats suites pass (CI is authoritative for bats), with bash line coverage of the changed library not regressed.
+- [x] AC-7: `shfmt` and `shellcheck` report no findings on the changed scripts, and the cleanup-worktrees bats suites pass (CI is authoritative for bats), with bash line coverage of the changed library not regressed.
 
 ### Assumptions
 
