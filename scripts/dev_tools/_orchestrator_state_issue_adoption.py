@@ -70,6 +70,10 @@ PROMOTION_ENTRY_TOOLS: tuple[str, ...] = (
 )
 POTENTIAL_RECORD_PREFIX = "docs/features/potential/"
 POTENTIAL_RECORD_SUFFIX = ".md"
+# Origins whose promotion-entry waiver may omit the potential_record key (rule 9).
+RECORD_OPTIONAL_ORIGINS: frozenset[str] = frozenset(
+    {"transferred", "filed_before_orchestration"}
+)
 ISSUE_NUM_PATTERN = re.compile(r"[1-9][0-9]*")
 
 ERROR_NOT_OBJECT = "Checkpoint issue_adoption must be an object when present."
@@ -233,9 +237,27 @@ def _waived_tool_errors(
 
 
 def _potential_record_errors(
-    waived: Sequence[str], potential_record: object
+    waived: Sequence[str],
+    potential_record: object,
+    *,
+    origin: object,
+    record_present: bool,
 ) -> list[str]:
-    """Require a potential record when a promotion-entry tool is waived (rule 9)."""
+    """Require a potential record when a promotion-entry tool is waived (rule 9).
+
+    The record is optional, and nothing is reported, when the
+    ``potential_record`` key is absent and ``origin`` is ``transferred`` or
+    ``filed_before_orchestration``. A present record, including ``None``, is
+    always validated, and an ``epic_decomposition`` or invalid origin always
+    requires a valid record.
+    """
+
+    if (
+        not record_present
+        and isinstance(origin, str)
+        and origin in RECORD_OPTIONAL_ORIGINS
+    ):
+        return []
 
     record_is_valid = (
         isinstance(potential_record, str)
@@ -317,7 +339,12 @@ def resolve_issue_adoption(
             )
         )
         errors.extend(
-            _potential_record_errors(waived, adoption.get("potential_record"))
+            _potential_record_errors(
+                waived,
+                adoption.get("potential_record"),
+                origin=adoption.get("origin"),
+                record_present="potential_record" in adoption,
+            )
         )
 
     if errors or waived is None:
