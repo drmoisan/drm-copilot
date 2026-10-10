@@ -179,9 +179,9 @@
 
 ### Phase 2 — #734 CR-1 and CR-2
 
-- [ ] [P2-T1] Edit `tests/scripts/dev_tools/test_quality_tiers_contract_classification.py` to rename `test_find_classification_errors_empty_project_set_reports_qt007_for_every_entry` to the annotated signature quoted here: "def test_find_classification_errors_empty_projects_reports_qt007() -> None:". The docstring and body are unchanged.
+- [x] [P2-T1] Edit `tests/scripts/dev_tools/test_quality_tiers_contract_classification.py` to rename `test_find_classification_errors_empty_project_set_reports_qt007_for_every_entry` to the annotated signature quoted here: "def test_find_classification_errors_empty_projects_reports_qt007() -> None:". The docstring and body are unchanged.
   - Acceptance: `grep -rn --include="*.py" -e "test_find_classification_errors_empty_project_set_reports_qt007_for_every_entry" tests/` prints nothing; `grep -rn --include="*.py" -F -e "def test_find_classification_errors_empty_projects_reports_qt007() -> None:" tests/` prints exactly one line. (`--include="*.py"` excludes the compiled `__pycache__` files, which retain the old name.)
-- [ ] [P2-T2] Add three `pytest.param` entries at the end of the parameter list of `test_parse_quality_tiers_rejects_schema_violation_with_qt003` in `tests/scripts/dev_tools/test_quality_tiers_contract.py`:
+- [x] [P2-T2] Add three `pytest.param` entries at the end of the parameter list of `test_parse_quality_tiers_rejects_schema_violation_with_qt003` in `tests/scripts/dev_tools/test_quality_tiers_contract.py`:
 
     ```python
             pytest.param(
@@ -194,7 +194,7 @@
     ```
 
   - Acceptance: `poetry run pytest tests/scripts/dev_tools/test_quality_tiers_contract.py -k "version-bool or version-string or missing-projects" -q` exits 0 with `3 passed`.
-- [ ] [P2-T3] Add `test_parse_quality_tiers_non_scalar_key_reports_qt002` to `tests/scripts/dev_tools/test_quality_tiers_contract.py`, placed after `test_parse_quality_tiers_rejects_non_mapping_root_with_qt002`:
+- [x] [P2-T3] Add `test_parse_quality_tiers_non_scalar_key_reports_qt002` to `tests/scripts/dev_tools/test_quality_tiers_contract.py`, placed after `test_parse_quality_tiers_rejects_non_mapping_root_with_qt002`:
 
     ```python
     def test_parse_quality_tiers_non_scalar_key_reports_qt002() -> None:
@@ -211,13 +211,13 @@
     ```
 
   - Acceptance: `poetry run pytest tests/scripts/dev_tools/test_quality_tiers_contract.py -k "non_scalar_key" -q` exits 0 with `1 passed`. (No message substring is asserted; spec R3.)
-- [ ] [P2-T4] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/quality-tiers-names-after.2026-10-09T09-00.md` from `poetry run pytest tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py --collect-only -q` and, as a second block, `grep -h -E "^def test_" tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py`.
+- [x] [P2-T4] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/quality-tiers-names-after.2026-10-09T09-00.md` from `poetry run pytest tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py --collect-only -q` and, as a second block, `grep -h -E "^def test_" tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py`.
   - Acceptance (AC-2): collected count equals `Baseline-Collected` + 4; the second block prints 29 names, and the recorded name-by-name comparison against the [P0-T10] sorted list shows exactly one removed name (`test_find_classification_errors_empty_project_set_reports_qt007_for_every_entry`) and exactly two added names (`test_find_classification_errors_empty_projects_reports_qt007`, `test_parse_quality_tiers_non_scalar_key_reports_qt002`).
-- [ ] [P2-T5] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/quality-tiers-helper-and-rename.2026-10-09T09-00.md` recording, as separate blocks: `grep -n -e "^def _codes" -e "^def _manifest" tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/scripts/dev_tools/quality_tiers_contract_test_support.py` (`ExpectedExitCode: 1`, prints nothing); `grep -n -e "^def qt_codes" -e "^def make_manifest" tests/scripts/dev_tools/quality_tiers_contract_test_support.py` (two lines); `grep -rn --include="*.py" -e "test_find_classification_errors_empty_project_set_reports_qt007_for_every_entry" tests/` (exit 1, nothing); `grep -rn --include="*.py" -F -e "def test_find_classification_errors_empty_projects_reports_qt007() -> None:" tests/` (one line); `poetry run black --check tests/scripts/dev_tools/test_quality_tiers_contract_classification.py` (`would be left unchanged`); `poetry run ruff check tests/scripts/dev_tools/test_quality_tiers_contract_classification.py` (`All checks passed!`).
+- [x] [P2-T5] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/quality-tiers-helper-and-rename.2026-10-09T09-00.md` recording, as separate blocks: `grep -n -e "^def _codes" -e "^def _manifest" tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/scripts/dev_tools/quality_tiers_contract_test_support.py` (`ExpectedExitCode: 1`, prints nothing); `grep -n -e "^def qt_codes" -e "^def make_manifest" tests/scripts/dev_tools/quality_tiers_contract_test_support.py` (two lines); `grep -rn --include="*.py" -e "test_find_classification_errors_empty_project_set_reports_qt007_for_every_entry" tests/` (exit 1, nothing); `grep -rn --include="*.py" -F -e "def test_find_classification_errors_empty_projects_reports_qt007() -> None:" tests/` (one line); `poetry run black --check tests/scripts/dev_tools/test_quality_tiers_contract_classification.py` (`would be left unchanged`); `poetry run ruff check tests/scripts/dev_tools/test_quality_tiers_contract_classification.py` (`All checks passed!`).
   - Acceptance: every block shows the stated result (AC-1 and AC-3 verification; plain grep is used because the new files are untracked).
-- [ ] [P2-T6] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-1 (change only `- [ ]` to `- [x]`) after [P2-T5] passes.
-- [ ] [P2-T7] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-2 after [P1-T4] and [P2-T4] pass.
-- [ ] [P2-T8] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-3 after [P2-T5] passes.
+- [x] [P2-T6] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-1 (change only `- [ ]` to `- [x]`) after [P2-T5] passes.
+- [x] [P2-T7] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-2 after [P1-T4] and [P2-T4] pass.
+- [x] [P2-T8] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-3 after [P2-T5] passes.
 
 ### Phase 3 — #734 CR-4: QT009 reports git stderr
 

@@ -107,6 +107,19 @@ def test_parse_quality_tiers_rejects_non_mapping_root_with_qt002() -> None:
     assert qt_codes(errors) == ["QT002"]
 
 
+def test_parse_quality_tiers_non_scalar_key_reports_qt002() -> None:
+    """A mapping key that is not a scalar yields QT002 and no manifest."""
+    # Arrange
+    text = "? [a, b]\n: 1\nversion: 1\n"
+
+    # Act
+    manifest, errors = parse_quality_tiers(text)
+
+    # Assert
+    assert manifest is None
+    assert qt_codes(errors) == ["QT002"]
+
+
 @pytest.mark.parametrize(
     "text",
     [
@@ -141,6 +154,13 @@ def test_parse_quality_tiers_rejects_non_mapping_root_with_qt002() -> None:
             "version: 1\nextra: true\nprojects:\n" + _VALID_ENTRY_TEXT,
             id="unknown-top-level-key",
         ),
+        pytest.param(
+            "version: true\nprojects:\n" + _VALID_ENTRY_TEXT, id="version-bool"
+        ),
+        pytest.param(
+            'version: "1"\nprojects:\n' + _VALID_ENTRY_TEXT, id="version-string"
+        ),
+        pytest.param("version: 1\n", id="missing-projects"),
     ],
 )
 def test_parse_quality_tiers_rejects_schema_violation_with_qt003(text: str) -> None:

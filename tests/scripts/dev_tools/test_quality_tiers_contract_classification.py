@@ -135,7 +135,7 @@ def test_find_classification_errors_reports_qt008_for_unclassified_project() -> 
     assert "scripts/new" in errors[0].render()
 
 
-def test_find_classification_errors_empty_project_set_reports_qt007_for_every_entry():
+def test_find_classification_errors_empty_projects_reports_qt007() -> None:
     """An empty discovered set never passes silently: every entry yields QT007."""
     # Arrange
     manifest = make_manifest(("scripts/bash", "T4"), (".", "T4"))
