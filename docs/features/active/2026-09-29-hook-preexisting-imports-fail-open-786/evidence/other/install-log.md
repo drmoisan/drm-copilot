@@ -312,3 +312,24 @@ INSTALLED: .claude/hooks/validate-prd-feature-output.ps1
 SMOKE: .claude/hooks/validate-prd-feature-output.ps1 | pass
 INSTALL-RESULT: OK
 ```
+
+## P8-T7#1
+
+Timestamp: 2026-10-10T00-20
+
+```text
+INSTALLED: .claude/hooks/validate-orchestrator-output.ps1
+SMOKE: .claude/hooks/validate-orchestrator-output.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P8-T8#1
+
+Timestamp: 2026-10-10T00-23
+
+```text
+INSTALLED: .claude/hooks/validate-orchestrator-output.ps1
+INSTALLED: .claude/hooks/validate-orchestrator-output-resolution.ps1
+SMOKE: .claude/hooks/validate-orchestrator-output.ps1 | pass
+INSTALL-RESULT: OK
+```

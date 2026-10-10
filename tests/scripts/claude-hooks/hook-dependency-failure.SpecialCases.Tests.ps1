@@ -183,7 +183,11 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
                 $command = Get-Command -Name $LazyFunction -ErrorAction SilentlyContinue
             }
         }
-        finally { Reset-HookDependencyState }
+        finally {
+            Reset-HookDependencyState
+            # The real imports above leave duplicate module instances that a later container's -ModuleName mocks would bind to.
+            Get-Module | Where-Object { $_.Path -like '*worktree-resolution*' -or $_.Path -like '*orchestrator-state*' } | Remove-Module -Force
+        }
         # Assert
         $command | Should -Not -BeNullOrEmpty -Because "the pre-loaded $Module must satisfy the Get-Command check for $LazyFunction"
     }

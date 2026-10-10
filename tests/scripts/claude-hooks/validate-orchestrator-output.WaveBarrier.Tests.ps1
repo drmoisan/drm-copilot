@@ -239,11 +239,11 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
             $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
         }
         finally {
-            $script:OrchestratorOutputWaveBarrierImportFailure = $null
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
         }
 
         # Assert
-        $result.Message.StartsWith('EPIC_WAVE_BARRIER_UNEVALUABLE:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Message
-        $result.Message.Contains('OrchestratorStateEpicWaveBarrier.psm1') | Should -BeTrue -Because $result.Message
+        $result.ExitCode | Should -Be 2 -Because $result.Reason
+        $result.Reason.Contains('OrchestratorStateEpicWaveBarrier.psm1') | Should -BeTrue -Because $result.Reason
     }
 }

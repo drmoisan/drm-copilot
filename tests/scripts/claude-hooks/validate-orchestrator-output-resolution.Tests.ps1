@@ -223,13 +223,13 @@ Describe 'validate-orchestrator-output resolution sibling' {
                 -CheckpointPath 'artifacts/orchestration/epic-orchestrator-state.json' -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
         }
         finally {
-            $script:OrchestratorOutputResolverImportFailure = $null
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
         }
 
         # Assert
-        $result.Message.Contains('ORCHESTRATOR_CHECKPOINT_UNRESOLVED:') | Should -BeTrue -Because $result.Message
-        $result.Message.Contains('RESOLVER_IMPORT_FAILED') | Should -BeTrue -Because $result.Message
-        $result.Message.Contains('WorktreeRunResolution.psm1') | Should -BeTrue -Because $result.Message
+        $result.ExitCode | Should -Be 2 -Because $result.Reason
+        $result.Reason.StartsWith('ORCHESTRATOR_CHECKPOINT_UNRESOLVED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Reason
+        $result.Reason.Contains('WorktreeRunResolution.psm1') | Should -BeTrue -Because $result.Reason
         Should -Invoke Get-CheckpointFileContent -Times 0 -Exactly
     }
 }

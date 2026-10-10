@@ -77,3 +77,10 @@
 - Copy-Item -LiteralPath .codex/hooks/validate-codex-subagent-routing.ps1 -Destination extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/validate-codex-subagent-routing.ps1 -Force | 8035E04A3C16B1F228AD1F1CF6C109C804C633196FA0724370E8E90EDB7E4D5D | 8035E04A3C16B1F228AD1F1CF6C109C804C633196FA0724370E8E90EDB7E4D5D | equal
 - Copy-Item -LiteralPath .codex/hooks/validate-feature-review-coverage.ps1 -Destination extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/validate-feature-review-coverage.ps1 -Force | 278F92FE329107E90A7B8792FEF191FC7B302BFBD7DF9C4168FD3F1AF0A42E7E | 278F92FE329107E90A7B8792FEF191FC7B302BFBD7DF9C4168FD3F1AF0A42E7E | equal
 
+## P8-T7 | 2026-10-10T00-20
+- Copy-Item -LiteralPath .claude/hooks/validate-orchestrator-output.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-orchestrator-output.ps1 -Force | D47978702C11E3858B4AB35DA89C4F06A211531089AD99CC7968A962BF2326C4 | D47978702C11E3858B4AB35DA89C4F06A211531089AD99CC7968A962BF2326C4 | equal
+
+## P8-T8 | 2026-10-10T00-23
+- Copy-Item -LiteralPath .claude/hooks/validate-orchestrator-output.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-orchestrator-output.ps1 -Force | 868B67A3DBDADFFFFAB8274B4470C77798104EF8A491AEEAC8D248F6187362CC | 868B67A3DBDADFFFFAB8274B4470C77798104EF8A491AEEAC8D248F6187362CC | equal
+- Copy-Item -LiteralPath .claude/hooks/validate-orchestrator-output-resolution.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-orchestrator-output-resolution.ps1 -Force | CB82780B3F32B27C962F504C30C074AAEBD73F608D4E54C6BF71D62D73E5F980 | CB82780B3F32B27C962F504C30C074AAEBD73F608D4E54C6BF71D62D73E5F980 | equal
+

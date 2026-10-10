@@ -21,3 +21,5 @@
 - P7-T3#2 | 2026-10-10T00-10 | deleted: none present
 - P7-T3#3 | 2026-10-10T00-10 | deleted: none present
 - P7-T5#1 | 2026-10-10T00-12 | deleted: none present
+- P8-T7#1 | 2026-10-10T00-20 | deleted: none present
+- P8-T8#1 | 2026-10-10T00-23 | deleted: none present
