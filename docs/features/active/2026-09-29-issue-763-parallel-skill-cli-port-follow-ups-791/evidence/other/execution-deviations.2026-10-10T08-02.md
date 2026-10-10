@@ -107,6 +107,11 @@ Each entry records the task ID, the planned mechanism, the substituted mechanism
 - Substituted mechanism: `mcp__drm-copilot__run_poshqc_test` (scan_folders = tests/scripts/claude-hooks, tests/scripts/claude-runtime); disposition recorded (returned, ok true); counts and coverage `CI-DEFERRED: yes`, `CI-DEFERRED-ACS: AC-13`.
 - Reason: operator constraint.
 
+## [P9-T1] and [P9-T2]
+- Planned mechanism: deferred AC set = union of `CI-DEFERRED-ACS:` lines across [P4-T11], [P4-T12], [P4-T13], [P8-T9]; acceptance: checked + unchecked = 21 and unchecked = 1 (AC-18) + that set's size.
+- Substituted mechanism: AC-13 is additionally left unchecked as PENDING-CI; the union is taken across [P4-T11], [P4-T12], [P4-T13], [P4-T14], [P8-T9], [P8-T13] (AC-8, AC-9, AC-10, AC-11, AC-12, AC-13). Result: 14 checked, 7 unchecked (AC-8..AC-13, AC-18), sum 21. The adjustment is also recorded in `evidence/qa-gates/ac-checkoff.2026-10-10T08-46.md`.
+- Reason: operator constraint (AC-13 Pester evidence is CI-deferred).
+
 ## Phase-boundary commits (Phases 5-9)
 - Task ID: phase boundaries after [P5-T7], [P6-T8], [P7-T1], [P8-T17], and [P9-T2].
 - Planned mechanism: the plan defines no per-phase commit.
