@@ -221,13 +221,13 @@ Substring asserted absent in both runtimes: `Epic planner topology_receipt` (it 
 
 ### Phase 3 — TypeScript production fix
 
-- [ ] [P3-T1] Update `extensions/drm-copilot/src/lib/validate/epic-planner-state-core.ts` in `validateEpicPlannerStateText`:
+- [x] [P3-T1] Update `extensions/drm-copilot/src/lib/validate/epic-planner-state-core.ts` in `validateEpicPlannerStateText`:
   - Replace the statement at planning-time line 443 with the three-line block opened by `if (!requireLaunchPaths || "topology_receipt" in value) {`, containing `errors.push(...validatePlannerTopologyReceipt(value["topology_receipt"]));`, and closed by `}`.
   - Replace the comment at planning-time line 423 with the two lines `// Launch evidence (per feature) and the planner topology receipt (top-level` and `// key) are key-gated unless a Codex flag is asserted.`
   - Leave `validatePlannerTopologyReceipt` (lines 102-114), `validateReadyFeatures`, and the `requireLaunchPaths` assignment (lines 424-426) unchanged. Do not rename `requireLaunchPaths`.
   - Acceptance: `grep -c -F -e 'if (!requireLaunchPaths || "topology_receipt" in value) {' extensions/drm-copilot/src/lib/validate/epic-planner-state-core.ts` prints `1` (it prints `0` before this task); `node run-jest.cjs test/lib/validate/epic-planner-state-core.test.ts` in `extensions/drm-copilot/` exits 0 with 0 failed; `awk 'END{print NR}' extensions/drm-copilot/src/lib/validate/epic-planner-state-core.ts` prints a value at or below 500 (expected 474).
 
-- [ ] [P3-T2] Record the TypeScript pass-after run by running `node run-jest.cjs test/lib/validate/epic-planner-state-core.test.ts -t "skips the planner topology receipt when the key is absent"` in `extensions/drm-copilot/`.
+- [x] [P3-T2] Record the TypeScript pass-after run by running `node run-jest.cjs test/lib/validate/epic-planner-state-core.test.ts -t "skips the planner topology receipt when the key is absent"` in `extensions/drm-copilot/`.
   - Acceptance: `docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/evidence/regression-testing/pass-after-typescript.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` showing `Tests:` with `1 passed` and 0 failed for that title, and citing the P1-T5 artifact as the paired fail-before run.
 
 ### Phase 4 — Python tests for the remaining matrix rows
