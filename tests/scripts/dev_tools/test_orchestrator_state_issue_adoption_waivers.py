@@ -233,9 +233,7 @@ def test_transferred_waives_feature_entry_tool_without_record() -> None:
     )
 
 
-def test_filed_before_orchestration_waives_bug_entry_tool_on_preparation_route_without_record() -> (
-    None
-):
+def test_filed_before_orchestration_preparation_route_waives_without_record() -> None:
     """The preparation route waives the bug entry tool without a record."""
 
     # Arrange
