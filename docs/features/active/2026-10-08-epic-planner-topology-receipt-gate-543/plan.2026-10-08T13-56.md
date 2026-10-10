@@ -209,14 +209,14 @@ Substring asserted absent in both runtimes: `Epic planner topology_receipt` (it 
 
 ### Phase 2 — Python production fix
 
-- [ ] [P2-T1] Update `scripts/dev_tools/validate_epic_planner_state.py` in `validate_epic_planner_state_text`:
+- [x] [P2-T1] Update `scripts/dev_tools/validate_epic_planner_state.py` in `validate_epic_planner_state_text`:
   - Replace the call at planning-time line 345 with the condition `if not key_gated or "topology_receipt" in state:` followed by the indented call `errors.extend(_validate_planner_topology_receipt(state.get("topology_receipt")))`, wrapped by Black into the three-line `errors.extend(` / argument / `)` form.
   - Replace the comment at planning-time line 328 with the two lines `# Launch evidence (per feature) and the planner topology receipt (top-level` and `# key) are key-gated unless a Codex flag is asserted.`
   - Replace the docstring paragraph at planning-time lines 289-291 with text stating that both Codex flags make launch evidence and the planner `topology_receipt` unconditional under execution readiness, and that when neither flag is set, launch evidence is validated only for features carrying a launch path key and the planner receipt only when the checkpoint carries a top-level `topology_receipt` key. The docstring must not contain the text `Epic planner`, and it writes the key name in the reStructuredText double-backtick form already used on line 289 (two backticks, `topology_receipt`, two backticks), never inside double quotes, so the P6-T5 count of added lines containing the quoted-key membership test stays at two.
   - Leave `_validate_planner_topology_receipt`, `_validate_ready_features`, the `key_gated` assignment (line 329), and the lines `validate_epic_planner_child_launch_bindings(` and `features, require_launch_paths=key_gated` unchanged.
   - Acceptance: `grep -c -F -e 'if not key_gated or "topology_receipt" in state:' scripts/dev_tools/validate_epic_planner_state.py` prints `1` (it prints `0` before this task); `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state.py` exits 0 with 0 failed; `awk 'END{print NR}' scripts/dev_tools/validate_epic_planner_state.py` prints a value at or below 500.
 
-- [ ] [P2-T2] Record the Python pass-after run by running `poetry run pytest "tests/scripts/dev_tools/test_validate_epic_planner_state.py::test_ready_gate_skips_planner_topology_receipt_when_key_absent" -vv`.
+- [x] [P2-T2] Record the Python pass-after run by running `poetry run pytest "tests/scripts/dev_tools/test_validate_epic_planner_state.py::test_ready_gate_skips_planner_topology_receipt_when_key_absent" -vv`.
   - Acceptance: `docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/evidence/regression-testing/pass-after-python.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` showing `1 passed` for that node and citing the P1-T3 artifact as the paired fail-before run.
 
 ### Phase 3 — TypeScript production fix
