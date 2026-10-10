@@ -370,6 +370,7 @@ def test_find_npm_auth_token_config_references_ignores_non_matching_text(
         ),
         pytest.param("$env:NPM_TOKEN = 'x'", [1], id="powershell-env"),
         pytest.param("npm_token: x", [1], id="lowercase-key"),
+        pytest.param("NPM_TOKEN=", [1], id="empty-assignment-end-of-line"),
     ],
 )
 def test_find_npm_token_assignments_detects_assignment(
@@ -394,6 +395,9 @@ def test_find_npm_token_assignments_detects_assignment(
         pytest.param("MY_NPM_TOKEN: x", id="prefixed-name-key"),
         pytest.param("# NPM_TOKEN is no longer used", id="prose-comment"),
         pytest.param("", id="empty"),
+        pytest.param("if: ${{ env.NPM_TOKEN == '' }}", id="equality-comparison"),
+        pytest.param('[[ $NPM_TOKEN == "" ]]', id="shell-equality-test"),
+        pytest.param("if: ${{ env.NPM_TOKEN != '' }}", id="inequality-comparison"),
     ],
 )
 def test_find_npm_token_assignments_ignores_non_matching_text(text: str) -> None:
