@@ -678,7 +678,7 @@ Check-off tasks P17-T8 to P17-T12 each change one line of `docs/features/active/
 - [x] [P17-T14] Write the AC status summary FEATURE/evidence/other/ac-status-summary-widening.TS.md in the acceptance-criteria-tracking format (Source, Total AC items 19, Checked off, Remaining, Items remaining).
       Commands: `grep -c "^- \[x\] AC-" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`; `grep -c "^- \[ \] AC-" docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md`.
       Acceptance: the two counts sum to 19; the summary's Checked off and Remaining values equal them; Items remaining lists AC-13 and AC-15, plus any AC whose verification failed in P17-T8 to P17-T12.
-- [ ] [P17-T15] Commit and push Phase 17, and record FEATURE/evidence/other/commit-p17.TS.md.
+- [x] [P17-T15] Commit and push Phase 17, and record FEATURE/evidence/other/commit-p17.TS.md.
       Commands: `git add -- docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/spec.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/plan.2026-10-08T22-16.md` followed by the full path of the P16-T7 artifact and of each artifact P17-T1 to P17-T14 wrote, named individually; `git commit -m "docs(824): record widening verification and acceptance-criteria check-off" -m "Refs #824"`; `git push origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git status --porcelain --untracked-files=all`; `git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824`; `git rev-parse HEAD origin/bug/issue-823-tier-rule-adoption-follow-ups-824`.
       Acceptance: as P12-T6. This artifact and the P17-T15 check-off are committed by the orchestrator.
 
