@@ -13,6 +13,9 @@ import re
 import sys
 from pathlib import Path
 
+# File-path invocation has no package context; make the repo root importable.
+sys.path += [str(Path(__file__).resolve().parents[2])] if not __package__ else []
+
 from scripts.dev_tools.epic_planner_readiness import build_epic_readiness_context
 from scripts.dev_tools.parallel_kickoff_contract import validate_parallel_kickoff_text
 from scripts.dev_tools.plan_gate_discrimination import (
