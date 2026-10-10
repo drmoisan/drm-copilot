@@ -71,12 +71,12 @@ Report mode is advisory and read-only. M-3 can add a drive-relative scan root, w
 
 ## Acceptance Criteria
 
-- [ ] AC-1 (M-3): `cleanup_wt_derive_scan_roots` passes each derived parent candidate through `cleanup_wt_is_absolute_path` and drops a candidate that is not absolute; a registration at `D:/wt` with the main worktree on `C:` emits no `D:` root. Verified by a named bats test in `tests/shell/test_cleanup_worktrees_scan_roots.bats`.
-- [ ] AC-2 (N-1): At least one bats test drives a backslash-form registration path (for example `C:\repo\main-wt\a`) through the derivation and asserts the emitted forward-slash parent.
-- [ ] AC-3: A bats test covers the `D:/wt` drive-root registration case and asserts the drive-relative root is absent from the output.
-- [ ] AC-4 (M-2): The `# shellcheck disable=SC1091` in `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh` carries an inline reason, consistent with `.claude/rules/shell.md` and the pattern at `cleanup-worktrees.sh`.
-- [ ] AC-5 (M-1): The comment in `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_detached_lib.sh` that cites `cleanup_worktrees_enumerate_lib.sh` line numbers for the `DETACHED` branch-field write names the function (`emit_record` in `parse_worktree_list`) instead of a line range.
-- [ ] AC-6: Each changed script's bundle mirror under `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/` is byte-identical to its source, and the repository mirror-identity and bundle-parity checks pass.
+- [x] AC-1 (M-3): `cleanup_wt_derive_scan_roots` passes each derived parent candidate through `cleanup_wt_is_absolute_path` and drops a candidate that is not absolute; a registration at `D:/wt` with the main worktree on `C:` emits no `D:` root. Verified by a named bats test in `tests/shell/test_cleanup_worktrees_scan_roots.bats`.
+- [x] AC-2 (N-1): At least one bats test drives a backslash-form registration path (for example `C:\repo\main-wt\a`) through the derivation and asserts the emitted forward-slash parent.
+- [x] AC-3: A bats test covers the `D:/wt` drive-root registration case and asserts the drive-relative root is absent from the output.
+- [x] AC-4 (M-2): The `# shellcheck disable=SC1091` in `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_scan_helper.sh` carries an inline reason, consistent with `.claude/rules/shell.md` and the pattern at `cleanup-worktrees.sh`.
+- [x] AC-5 (M-1): The comment in `.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_detached_lib.sh` that cites `cleanup_worktrees_enumerate_lib.sh` line numbers for the `DETACHED` branch-field write names the function (`emit_record` in `parse_worktree_list`) instead of a line range.
+- [x] AC-6: Each changed script's bundle mirror under `extensions/drm-copilot/resources/claude-customizations/.claude/skills/cleanup-merged-worktrees/scripts/` is byte-identical to its source, and the repository mirror-identity and bundle-parity checks pass.
 - [ ] AC-7: `shfmt` and `shellcheck` report no findings on the changed scripts, and the cleanup-worktrees bats suites pass (CI is authoritative for bats), with bash line coverage of the changed library not regressed.
 
 ### Assumptions
