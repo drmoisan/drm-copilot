@@ -165,16 +165,16 @@ Coverage and toolchain:
 - Manual validation: run the issue repro commands before and after the fix; confirm the traceback becomes an error message.
 
 ## Acceptance Criteria
-- [ ] AC-1: `_validate_merge_status_enum` in `scripts/dev_tools/validate_epic_orchestrator_state.py` guards the set-membership test with an `isinstance(merge_status, str)` check, and a non-string, non-None `merge_status` (list, dict, int, bool) returns the existing `invalid merge_status` error for that feature without raising.
-- [ ] AC-2: `_validate_completion` in `scripts/dev_tools/validate_epic_orchestrator_state.py` guards the set-membership test with an `isinstance(merge_status, str)` check, and a non-string `merge_status` (list, dict, int, bool) returns the existing completion-failure error for that feature without raising.
-- [ ] AC-3: Error message text and behavior for string and `None`/missing `merge_status` values are unchanged at both sites (valid strings pass, invalid strings fail with the same text, `None` is skipped by the enum check and reported by the completion check).
-- [ ] AC-4: `validate_epic_orchestrator_state_text` returns errors (and the CLI `scripts/dev_tools/validate_orchestration_artifacts.py epic-orchestrator-state` exits 1) rather than raising a traceback when a feature's `merge_status` is a list or a dict, including with `require_complete=True`.
-- [ ] AC-5: `tests/scripts/dev_tools/test_validate_epic_orchestrator_state_merge_status.py` exists with parametrized rows for list, dict, int, and bool at the enum site and the completion site, plus an entry-point row, and all rows pass.
-- [ ] AC-6: `extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-merge-status.test.ts` exists and asserts that the TypeScript port reports an error and does not throw for list, dict, number, and boolean `merge_status` at the enum site and the completion site, and the tests pass.
-- [ ] AC-7: No production TypeScript file is changed, and the wave-barrier module `scripts/dev_tools/_epic_orchestrator_state_wave_barrier.py` and its existing test remain unchanged and passing (non-regression).
-- [ ] AC-8: Python full toolchain passes (black, ruff, pyright, pytest) with line coverage >= 85% and branch coverage >= 75% for `scripts.dev_tools.validate_epic_orchestrator_state`, with no coverage regression on changed lines.
-- [ ] AC-9: TypeScript toolchain passes for the new test file (prettier, eslint, tsc, jest).
-- [ ] AC-10: No new or modified production or test file exceeds 500 lines, and no unintended behavior changes occur outside the defined scope.
+- [x] AC-1: `_validate_merge_status_enum` in `scripts/dev_tools/validate_epic_orchestrator_state.py` guards the set-membership test with an `isinstance(merge_status, str)` check, and a non-string, non-None `merge_status` (list, dict, int, bool) returns the existing `invalid merge_status` error for that feature without raising.
+- [x] AC-2: `_validate_completion` in `scripts/dev_tools/validate_epic_orchestrator_state.py` guards the set-membership test with an `isinstance(merge_status, str)` check, and a non-string `merge_status` (list, dict, int, bool) returns the existing completion-failure error for that feature without raising.
+- [x] AC-3: Error message text and behavior for string and `None`/missing `merge_status` values are unchanged at both sites (valid strings pass, invalid strings fail with the same text, `None` is skipped by the enum check and reported by the completion check).
+- [x] AC-4: `validate_epic_orchestrator_state_text` returns errors (and the CLI `scripts/dev_tools/validate_orchestration_artifacts.py epic-orchestrator-state` exits 1) rather than raising a traceback when a feature's `merge_status` is a list or a dict, including with `require_complete=True`.
+- [x] AC-5: `tests/scripts/dev_tools/test_validate_epic_orchestrator_state_merge_status.py` exists with parametrized rows for list, dict, int, and bool at the enum site and the completion site, plus an entry-point row, and all rows pass.
+- [x] AC-6: `extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-merge-status.test.ts` exists and asserts that the TypeScript port reports an error and does not throw for list, dict, number, and boolean `merge_status` at the enum site and the completion site, and the tests pass.
+- [x] AC-7: No production TypeScript file is changed, and the wave-barrier module `scripts/dev_tools/_epic_orchestrator_state_wave_barrier.py` and its existing test remain unchanged and passing (non-regression).
+- [x] AC-8: Python full toolchain passes (black, ruff, pyright, pytest) with line coverage >= 85% and branch coverage >= 75% for `scripts.dev_tools.validate_epic_orchestrator_state`, with no coverage regression on changed lines.
+- [x] AC-9: TypeScript toolchain passes for the new test file (prettier, eslint, tsc, jest).
+- [x] AC-10: No new or modified production or test file exceeds 500 lines, and no unintended behavior changes occur outside the defined scope.
 
 ## Risks & Mitigations
 - Technical or operational risks:
