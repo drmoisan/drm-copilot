@@ -17,8 +17,8 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 - `max_concurrency`: 4
 - `current_cohort`: 1
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-10T02:34:19Z
-- `next_step`: monitor 824 846
+- `last_updated`: 2026-10-10T03:12:25Z
+- `next_step`: monitor 824; 841 eligible after 824 merges
 
 **Items**
 
@@ -34,7 +34,7 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 | 824 | docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824 | 1 | in_flight | worktree_created | - | - | 2026-10-10T02:33:53Z | - | - |
 | 843 | docs/features/active/2026-10-08-parallel-model-routing-admitted-item-source-and-absent-band-test-843 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/869 | 46dd56a8c2d6df15571f5f088ae2d677e5123b55 | 2026-10-10T00:05:37Z | 2026-10-10T01:01:21Z | - |
 | 845 | docs/features/active/2026-10-08-npm-token-guard-comparison-false-positive-and-stale-docstring-845 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/870 | b9d0517bc393528bf70830ec09e3cdbca438e6c6 | 2026-10-10T00:20:51Z | 2026-10-10T01:11:39Z | - |
-| 846 | docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846 | 1 | in_flight | worktree_created | - | - | 2026-10-10T00:51:36Z | - | - |
+| 846 | docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/873 | 7bbd0b9b990737642b4eeded01a27b7c5c8348b3 | 2026-10-10T00:51:36Z | 2026-10-10T03:12:13Z | - |
 | 796 | docs/features/active/2026-09-30-duplicated-string-comparators-outside-pr-context-796 | 2 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/872 | 5c440e5b72ba0653f56329b46787ff263bc7a3a7 | 2026-10-10T01:01:51Z | 2026-10-10T02:23:38Z | - |
 | 841 | docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841 | 2 | prepared | not_started | - | - | - | - | - |
 | 543 | docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543 | 3 | prepared | not_started | - | - | - | - | - |
