@@ -91,7 +91,9 @@ class PromotionOutcome:
         None.
 
     Attributes:
-        exit_code (int): Final process-style exit code.
+        exit_code (int): Final process-style exit code: 0 on success; the gh
+            create exit code when issue creation fails; 1 when the promoted
+            file is missing after the move.
         messages (list[str]): Ordered emitted status lines.
         destination (Path | None): Promoted file destination when successful.
     """
@@ -345,6 +347,9 @@ def promote_potential(
     filesystem.ensure_dir(promoted_dir)
     dest_path = promoted_dir / resolved.name
     filesystem.move(resolved, dest_path)
+    # Verify the move produced the destination before reporting success. A
+    # missing destination is a non-zero outcome (not a raised error) so the
+    # caller still receives every emitted line, including the created issue URL.
     if not filesystem.exists(dest_path):
         _emit(f"Promoted file missing after move: {dest_path}")
         return PromotionOutcome(exit_code=1, messages=messages)
