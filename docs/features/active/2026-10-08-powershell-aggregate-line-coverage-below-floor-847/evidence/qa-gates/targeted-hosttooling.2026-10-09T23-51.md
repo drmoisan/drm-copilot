@@ -11,4 +11,8 @@ Output Summary:
 - JRP step 5 (whole dev-tools run): tests=452 failures=0 errors=0 disabled=2; failed testcases: 0.
 - JRP steps 2-3: `tests/scripts/dev-tools/HostTooling.Tests.ps1` cases=19 notPassed=0 -> PASS.
 - Derived EXIT_CODE per P1-T3 rule (Failed, FailedBlocks, FailedContainers all 0): 0 for the pass/fail part (failures=0, errors=0 in the junit).
-- CRP per-file `scripts/dev-tools/HostTooling.psm1`: PENDING CI. The orchestrator dispatches CI on the pushed head and supplies the coverage XML; this task stays unchecked until the CRP row is recorded and passes (>= 85%).
+- CRP per-file `scripts/dev-tools/HostTooling.psm1` (CI): `FILE HostTooling.psm1 covered=36 missed=2 total=38 pct=94.74 required=33 gap=0 PASS`.
+  - Source: CI `workflow_dispatch` of `_poshqc.yml`, run 38006685402 on head 92e5f9f0b, job `PowerShell QC` 114076981391, conclusion success. Artifacts downloaded to `artifacts/ci/run-38006685402/` (git-ignored); reduction file `artifacts/ci/run-38006685402/reduction.txt`, produced by `poetry run python <scratchpad>/reduce847.py artifacts/ci/run-38006685402/powershell-coverage.xml artifacts/ci/run-38006685402/pester-junit.xml`.
+  - CI JRP steps 2-3: suite `tests/scripts/dev-tools/HostTooling.Tests.ps1` cases=19 notPassed=0 -> PASS.
+  - CI analyzer log line: `PSScriptAnalyzer passed: no findings under D:\a\drm-copilot\drm-copilot` (Analyze PowerShell step).
+- Result: JRP and CRP parts both PASS; [P1-T3] verified.
