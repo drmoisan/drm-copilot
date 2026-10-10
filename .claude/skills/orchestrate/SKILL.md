@@ -34,6 +34,7 @@ On every invocation, the main session must:
 2. If a valid checkpoint exists with a matching objective, resume from the recorded `next_step`.
 3. If no checkpoint exists or the objective is new, begin the orchestration lifecycle from the start.
 4. **Checkpoint hygiene (issue #673).** When the checkpoint at `artifacts/orchestration/orchestrator-state.json` records an `issue-num` other than the item this invocation is about, move it to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json` before writing a new checkpoint, rather than overwriting it or leaving it in place. Apply the same move when this session hands an item whose checkpoint it holds to another session or worktree. A checkpoint left at a session root is read by gates that resolve against that root, so a foreign one there is state a gate can answer from.
+5. **Required checkpoint keys (issue #798).** Every checkpoint write carries each top-level key listed in `.claude/rules/orchestrator-state.md` under `## Required Top-Level Keys`; plain validation reports each absent key as `Checkpoint missing required key: <key>` under every flag combination. The list includes `last_updated`, an ISO-8601 UTC date-time string (for example `2026-10-08T17:28:00Z`) that is rewritten on every checkpoint write: after every completed step and every state transition, including halts.
 
 ## Prepared-State Portable Handoff Intake
 
@@ -267,7 +268,7 @@ Cycle accounting: a remediation attempt is complete when R3 execution finished (
 
 ## Issue Number Consistency
 
-The canonical issue number is derived once from the active feature folder name: extract the trailing integer from the folder base name (e.g., `2026-04-26-push-down-claude-customizations-162` yields `162`). Record as `issue_num` in the checkpoint.
+The canonical issue number is derived once from the active feature folder name: extract the trailing integer from the folder base name (e.g., `2026-04-26-push-down-claude-customizations-162` yields `162`). Record as `issue-num` in the checkpoint; the hyphenated key is the one listed in `.claude/rules/orchestrator-state.md` under `## Required Top-Level Keys`.
 
 Every delegation prompt to a receipt-gated subagent type — `atomic-planner`, `atomic-executor`, `feature-review`, `task-researcher`, `prd-feature`, and `pr-author` — must include the line:
 

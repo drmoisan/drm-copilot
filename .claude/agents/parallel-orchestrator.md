@@ -183,6 +183,15 @@ parameters:
   receipt's `fable_policy`; otherwise re-resolve with
   `Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>` and
   pass that result, per the skill's `## Model Selection` section.
+  For an item admitted through `/parallel-add`, which is absent from the planner checkpoint
+  `items[]` and from the kickoff `## Item Summary`, read the band from that item's
+  `complexity_band` on the orchestrator checkpoint
+  `artifacts/orchestration/parallel-orchestrator-state.json` `items[]`. Such an item carries no
+  `model_routing_receipt`, so resolve `model` at spawn time as
+  `model_policy.complexity_to_model[<band>]` from `config/orchestration-routing.json` under the
+  run's `fable_policy`, with `fable` clamped to `opus` when `fable_policy` is `disabled`, and pass
+  that explicit `model` on the spawn. When the admitted item has no `complexity_band` on the
+  orchestrator checkpoint, stop rather than spawn without `model`.
 
 Each child `orchestrator` runs its own route inside that worktree, including its own delegations to
 `atomic-planner`, `atomic-executor`, `feature-review`, and `pr-author`. You do not delegate to
