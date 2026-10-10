@@ -171,3 +171,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## r1-p6
+
+- Subject: docs(786): check off AC-6 and AC-24 after remediation cycle 1
+- Commit SHA: af7e232b1eec28d82f0104c1e5a1467487ca30f1
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
