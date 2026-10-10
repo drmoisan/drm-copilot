@@ -373,3 +373,27 @@ INSTALLED: .claude/hooks/validate-orchestrator-output.ps1
 SMOKE: .claude/hooks/validate-orchestrator-output.ps1 | pass
 INSTALL-RESULT: OK
 ```
+
+## P2-T9#E4-1
+
+Timestamp: 2026-10-10T18-30
+
+Remediation cycle 1 trial E4: candidate = .claude/hooks/validate-orchestrator-output.ps1 with line 51 (the non-Global guarded OrchestratorState.psm1 import) deleted; R-RESET entry P2-T9#1 ran before the write.
+
+```text
+INSTALLED: .claude/hooks/validate-orchestrator-output.ps1
+SMOKE: .claude/hooks/validate-orchestrator-output.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P2-T9#E4-2
+
+Timestamp: 2026-10-10T18-45
+
+Remediation cycle 1 trial E4 did not pass (probe LOSS yes); the original bytes of .claude/hooks/validate-orchestrator-output.ps1 are restored through R-INSTALL (candidate = original copy kept by r1-cand2.ps1). E4-RESTORE-DIFF-EXIT-CODE: 0.
+
+```text
+INSTALLED: .claude/hooks/validate-orchestrator-output.ps1
+SMOKE: .claude/hooks/validate-orchestrator-output.ps1 | pass
+INSTALL-RESULT: OK
+```

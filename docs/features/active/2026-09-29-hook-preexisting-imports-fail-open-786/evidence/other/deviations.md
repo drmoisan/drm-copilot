@@ -69,3 +69,60 @@ Rule 15 record of departures and their triggering observations.
 
 - Observation: the final R-PESTER run (QC pass 4) reports `Tests Passed: 9495, Failed: 0` and JUnit root failures 0 and errors 0. Every named testsuite passes. The same four Codex files are below 85.00, with the same values as [P10-T3]. The three UNCOVERED-CHANGED groups are also unchanged.
 - Action: [P11-T3] is left unchecked with an ACCEPTANCE-GAP line in final-pester-coverage.md. The plan revision input recorded for [P10-T3] and [P10-T4] applies unchanged.
+
+## Remediation cycle 1: coverage measurement artifact
+
+- Timestamp: 2026-10-10T18-55
+- Source: remediation-plan.2026-10-10T06-50.md rule 5, taken by [P2-T10] (cycle 1, hosting H2). Full records: evidence/other/r1-coverage-diagnosis.md, sections `[P2-T2]` to `[P2-T9]` `Cycle 1 (H2)` and `## Verdict`.
+- Verdict lines:
+  - HOSTING-PARITY: yes
+  - REPRODUCER-LOSS: k=234 | m=42
+  - ILOSS-REPRODUCER: k=125 | m=0
+  - Q-SET: tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1, tests/scripts/workflows/VerifyPublishedReleasesWorkflow.Tests.ps1
+  - CULPRIT: tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1 | role=pre | LOSS-WITHOUT=no | ILOSS-WITHOUT=no
+  - CULPRIT-CONFIRMED: tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1 | yes
+  - CULPRIT: tests/scripts/workflows/VerifyPublishedReleasesWorkflow.Tests.ps1 | role=post | LOSS-WITHOUT=no | ILOSS-WITHOUT=no
+  - CULPRIT-CONFIRMED: tests/scripts/workflows/VerifyPublishedReleasesWorkflow.Tests.ps1 | yes
+  - SHARED-CULPRIT: no | no container removes both signals
+  - MECHANISM: tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1 | other
+  - MECHANISM: tests/scripts/workflows/VerifyPublishedReleasesWorkflow.Tests.ps1 | other
+  - FIX-CLASS: none
+  - FIX-SUBJECT: none
+  - VERDICT: measurement artifact
+- NC results (cycle 1, H2): NC1-LOSS no; NC2-LOSS no; NC3-LOSS no; NC2-ILOSS no; NC3-ILOSS no; NC4: CleanupWorktreeManifestGateMatrix.Tests.ps1 22, hook-dependency-failure.Claude.Tests.ps1 1, hook-dependency-failure.Codex.Tests.ps1 1, activate.Tests.ps1 1.
+- Bisection lines (a = 238, b = 42; 23 new probes, cap 36):
+  - BISECT: search=ANY | stage=A | k=0 | m=42 | LOSS=no | ILOSS=no | reused=yes
+  - BISECT: search=ANY | stage=A | k=238 | m=42 | LOSS=yes | ILOSS=no | reused=yes
+  - BISECT: search=ANY | stage=A | k=119 | m=42 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=ANY | stage=A | k=178 | m=42 | LOSS=no | ILOSS=yes | reused=no
+  - BISECT: search=ANY | stage=A | k=148 | m=42 | LOSS=no | ILOSS=yes | reused=no
+  - BISECT: search=ANY | stage=A | k=133 | m=42 | LOSS=no | ILOSS=yes | reused=no
+  - BISECT: search=ANY | stage=A | k=126 | m=42 | LOSS=no | ILOSS=yes | reused=no
+  - BISECT: search=ANY | stage=A | k=122 | m=42 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=ANY | stage=A | k=124 | m=42 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=ANY | stage=A | k=125 | m=42 | LOSS=no | ILOSS=yes | reused=no
+  - LOOP-END: search=ANY | stage=A | lo=124 | hi=125
+  - BISECT: search=ANY | stage=B | k=125 | m=42 | LOSS=no | ILOSS=yes | reused=yes
+  - BISECT: search=ANY | stage=B | k=125 | m=0 | LOSS=no | ILOSS=yes | reused=no
+  - BISECT: search=LOSS | stage=A | k=0 | m=42 | LOSS=no | ILOSS=no | reused=yes
+  - BISECT: search=LOSS | stage=A | k=238 | m=42 | LOSS=yes | ILOSS=no | reused=yes
+  - BISECT: search=LOSS | stage=A | k=119 | m=42 | LOSS=no | ILOSS=no | reused=yes
+  - BISECT: search=LOSS | stage=A | k=178 | m=42 | LOSS=no | ILOSS=yes | reused=yes
+  - BISECT: search=LOSS | stage=A | k=208 | m=42 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=LOSS | stage=A | k=223 | m=42 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=LOSS | stage=A | k=230 | m=42 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=LOSS | stage=A | k=234 | m=42 | LOSS=yes | ILOSS=no | reused=no
+  - BISECT: search=LOSS | stage=A | k=232 | m=42 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=LOSS | stage=A | k=233 | m=42 | LOSS=no | ILOSS=no | reused=no
+  - LOOP-END: search=LOSS | stage=A | lo=233 | hi=234
+  - BISECT: search=LOSS | stage=B | k=234 | m=42 | LOSS=yes | ILOSS=no | reused=yes
+  - BISECT: search=LOSS | stage=B | k=234 | m=0 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=LOSS | stage=B | k=234 | m=21 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=LOSS | stage=B | k=234 | m=31 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=LOSS | stage=B | k=234 | m=36 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=LOSS | stage=B | k=234 | m=39 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=LOSS | stage=B | k=234 | m=40 | LOSS=no | ILOSS=no | reused=no
+  - BISECT: search=LOSS | stage=B | k=234 | m=41 | LOSS=no | ILOSS=no | reused=no
+  - LOOP-END: search=LOSS | stage=B | lo=41 | hi=42
+- Diagnosis evidence: the H2 probe reproduces the R-PESTER control exactly (X1 per-file values equal C0; HOSTING-PARITY yes). The loss needs both confirmed culprits, which only parse hook text (p_234) and read one workflow YAML file (q_42, the last container). Neither creates or leaves a module instance, and module or function cleanup does not remove the loss. The only applicable fix trial, E4, leaves the lost-line set unchanged. Containers p_235 to p_238 contribute a further part of the X1 loss that the single-predicate bisection does not isolate. The plan does not select a measurement route.
+- OPERATOR-DECISION-REQUIRED: AC-24 coverage measurement route

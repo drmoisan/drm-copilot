@@ -32,3 +32,41 @@ The [P2-T6] predicate requires every probe that contains S to reproduce the X-S 
 2. Keep R-VALID as written and add a cleanup container (for example K-MOD) between the selected PRE prefix and S in every bisection probe, recording that the predicate then measures loss with module residue removed.
 3. Bisect the X1 list directly (S fixed, PRE and POST prefixes varied) with R-VALID restricted to the six T-SET-relevant suites.
 4. Record the R-COVPROBE versus R-PESTER hosting difference (global trampoline) and decide whether the probe body should host Invoke-Pester the same way.
+
+## Resolution
+
+Timestamp: 2026-10-10T11-20
+
+RESUMED: [P2-T2] cycle 1 under hosting H2 after plan revision of 2026-10-10
+
+The plan revision (remediation-plan.2026-10-10T06-50.md, H2 hosting, INTERCEPTION-LOSS, R-VALID over non-interception rows, two-stage bisection) resolves the PROBE INVALID halt above. The H2 X-S reference run h2-xs-c1 is green (passed=1652, failed=0, every interception row passed).
+
+## Halt at [P2-T10] (remediation cycle 1, hosting H2)
+
+Timestamp: 2026-10-10T18-55
+Halting task: [P2-T10] (cycle 1)
+Halt rule: remediation plan [P2-T10] (`VERDICT: measurement artifact` applies rule 5 and halts), rule 5, and rule 4 (main-plan rule 14).
+Blocked state: MEASUREMENT ARTIFACT - OPERATOR-DECISION-REQUIRED: AC-24 coverage measurement route
+
+## Recorded values
+
+- VERDICT: measurement artifact
+- FIX-CLASS: none
+- FIX-SUBJECT: none
+- HOSTING-PARITY: yes (X1 under H2 equals the C0 R-PESTER control: 341 testsuites, same order, equal counts, equal per-file values)
+- REPRODUCER-LOSS: k=234 | m=42 (culprits tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1 pre, tests/scripts/workflows/VerifyPublishedReleasesWorkflow.Tests.ps1 post; both confirmed)
+- ILOSS-REPRODUCER: k=125 | m=0 (culprit tests/scripts/claude-hooks/validate-orchestrator-output-resolution.Tests.ps1)
+- SHARED-CULPRIT: no | no container removes both signals
+- MECHANISM: other (both Q)
+- Trials: E0a, E0b, E1, E2, E3 not applicable for both Q; E4 fail (restored, E4-RESTORE-DIFF-EXIT-CODE: 0)
+- PROBE-COUNT: 23 | cap=36 ([P2-T6]); 8 [P2-T7] runs; 1 [P2-T9] run
+- Deviation record: evidence/other/deviations.md, section `## Remediation cycle 1: coverage measurement artifact`, line `OPERATOR-DECISION-REQUIRED: AC-24 coverage measurement route`
+- Evidence: evidence/other/r1-coverage-diagnosis.md (sections `Cycle 1 (H2)` and `## Verdict`)
+
+## Reverted paths
+
+- .claude/hooks/validate-orchestrator-output.ps1: the E4 trial edit (line 51 deleted) was installed through R-INSTALL (P2-T9#E4-1) and restored to its original bytes through R-INSTALL (P2-T9#E4-2) in [P2-T9]; `git diff --exit-code df0965aeaa8a3905fe4966fcbb4b49143d566941 -- .claude/hooks/validate-orchestrator-output.ps1` exits 0. No other production or test file was edited in this cycle, and no fix from an earlier cycle exists.
+
+## Not executed
+
+[P3-T1] to [P3-T5], [P4-T1] to [P4-T4], [P5-T1] to [P5-T11], and [P6-T1] to [P6-T6] are not executed. AC-6 and AC-24 stay unchecked in spec.md. AC-6 was amended in Phase 1 and its verification ([P6-T1]) belongs to Phase 6, which this halt does not reach.

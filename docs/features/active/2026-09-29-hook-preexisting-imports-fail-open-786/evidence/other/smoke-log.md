@@ -759,3 +759,45 @@ Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-orchestrator-output.ps1:<PO
 ```
 SMOKE-RESULT: .claude/hooks/validate-orchestrator-output.ps1 | pass
 
+## P2-T9#E4-1 | 2026-10-10T16-22
+### pre-install .claude/hooks/validate-orchestrator-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-orchestrator-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-orchestrator-output.ps1:<POS>
+
+```
+### post-install .claude/hooks/validate-orchestrator-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-orchestrator-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-orchestrator-output.ps1:<POS>
+
+```
+SMOKE-RESULT: .claude/hooks/validate-orchestrator-output.ps1 | pass
+
+## P2-T9#E4-2 | 2026-10-10T16-32
+### pre-install .claude/hooks/validate-orchestrator-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-orchestrator-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-orchestrator-output.ps1:<POS>
+
+```
+### post-install .claude/hooks/validate-orchestrator-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-orchestrator-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-orchestrator-output.ps1:<POS>
+
+```
+SMOKE-RESULT: .claude/hooks/validate-orchestrator-output.ps1 | pass
+
