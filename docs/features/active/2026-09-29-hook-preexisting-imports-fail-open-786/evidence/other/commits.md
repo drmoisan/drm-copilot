@@ -39,3 +39,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## p5
+
+- Subject: fix(786): guard Claude PreToolUse hook dependencies
+- Commit SHA: ed9c9098daf96ad57ecf3516b50a1e74ae004de9
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty

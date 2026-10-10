@@ -145,7 +145,7 @@ Describe 'parallel cohort barrier target resolution' {
             $output = @(Invoke-ParallelCohortBarrierEntryPoint -ToolInputRaw $payload)
         }
         finally {
-            $script:ParallelCohortBarrierResolutionImportFailure = $null
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
         }
 
         # Assert

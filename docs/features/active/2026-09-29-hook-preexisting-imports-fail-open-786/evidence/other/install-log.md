@@ -221,3 +221,94 @@ INSTALLED: .claude/hooks/enforce-python-batch-budget.ps1
 SMOKE: .claude/hooks/enforce-python-batch-budget.ps1 | pass
 INSTALL-RESULT: OK
 ```
+
+## P6-T1#1
+
+Timestamp: 2026-10-09T23-48
+
+```text
+INSTALLED: .claude/hooks/validate-bash.ps1
+SMOKE: .claude/hooks/validate-bash.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P6-T1#2
+
+Timestamp: 2026-10-09T23-48
+
+```text
+INSTALLED: .claude/hooks/enforce-orchestration-preimplementation-gate.ps1
+INSTALLED: .claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1
+SMOKE: .claude/hooks/enforce-orchestration-preimplementation-gate.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P6-T1#3
+
+Timestamp: 2026-10-09T23-48
+
+```text
+INSTALLED: .claude/hooks/enforce-powershell-batch-budget.ps1
+SMOKE: .claude/hooks/enforce-powershell-batch-budget.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P6-T3#1
+
+Timestamp: 2026-10-09T23-53
+
+```text
+INSTALLED: .claude/hooks/validate-discovery-artifact-gate.ps1
+SMOKE: .claude/hooks/validate-discovery-artifact-gate.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P6-T3#2
+
+Timestamp: 2026-10-09T23-53
+
+```text
+INSTALLED: .claude/hooks/validate-feature-review-coverage.ps1
+SMOKE: .claude/hooks/validate-feature-review-coverage.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P6-T3#3
+
+Timestamp: 2026-10-09T23-53
+
+```text
+INSTALLED: .claude/hooks/validate-orchestrator-output.ps1
+SMOKE: .claude/hooks/validate-orchestrator-output.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P6-T3#4
+
+Timestamp: 2026-10-09T23-53
+
+```text
+INSTALLED: .claude/hooks/validate-planner-output.ps1
+SMOKE: .claude/hooks/validate-planner-output.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P6-T3#5
+
+Timestamp: 2026-10-09T23-53
+
+```text
+INSTALLED: .claude/hooks/validate-pr-author-output.ps1
+SMOKE: .claude/hooks/validate-pr-author-output.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P6-T3#6
+
+Timestamp: 2026-10-09T23-53
+
+```text
+INSTALLED: .claude/hooks/validate-prd-feature-output.ps1
+SMOKE: .claude/hooks/validate-prd-feature-output.ps1 | pass
+INSTALL-RESULT: OK
+```

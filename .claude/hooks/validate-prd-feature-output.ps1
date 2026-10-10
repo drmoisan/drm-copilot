@@ -5,6 +5,7 @@
 
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -71,6 +72,8 @@ function Invoke-PrdFeatureOutputValidation {
     [CmdletBinding()]
     [OutputType([hashtable])]
     param([string] $RawPayload)
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-prd-feature-output:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if ([string]::IsNullOrWhiteSpace($RawPayload)) { return @{ Ok = $false; Message = 'prd-feature hook: CLAUDE_HOOK_INPUT is empty.' } }
     try { $payload = $RawPayload | ConvertFrom-Json -ErrorAction Stop } catch { return @{ Ok = $false; Message = "prd-feature hook: failed to parse CLAUDE_HOOK_INPUT as JSON: $($_.Exception.Message)" } }
@@ -86,6 +89,9 @@ function Invoke-PrdFeatureOutputValidation {
 }
 
 if ($MyInvocation.InvocationName -eq '.') { return }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-prd-feature-output: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-prd-feature-output:'
+if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 $result = Invoke-PrdFeatureOutputValidation -RawPayload $env:CLAUDE_HOOK_INPUT
 if (-not $result.Ok) { Write-Error $result.Message; exit 1 }
 exit 0

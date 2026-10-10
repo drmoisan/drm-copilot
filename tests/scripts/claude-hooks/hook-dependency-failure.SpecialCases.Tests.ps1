@@ -79,6 +79,40 @@ Describe 'Claude hook dependency-failure special cases (issue #786)' {
             return [pscustomobject]@{ Stdout = (@($stdout | ForEach-Object { [string]$_ }) -join "`n"); Stderr = $errorWriter.ToString(); ExitCode = $exitCode }
         }
 
+        function Invoke-HookInFreshRunspace {
+            # Drives one SubagentStop hook in a new runspace with no enclosing try, as its own pwsh -File process has none: a
+            # statement-terminating error inside a catch then ends only that statement. In-process, the It's try would catch it.
+            # The helper bootstrap and the named dependency fail through runspace-local Join-Path and Import-Module functions.
+            param([string] $Hook, [string] $Dependency, [string] $Kind)
+            $failDot = if ($Kind -eq 'Module') { '' } else { $Dependency }
+            $failModule = if ($Kind -eq 'Module') { $Dependency } else { '<none>' }
+            $driver = @"
+param(`$HookPath)
+function Join-Path { [CmdletBinding()] param([Parameter(Position = 0)] [string] `$Path, [Parameter(Position = 1)] [string] `$ChildPath)
+    if (`$ChildPath -eq 'hook-dependency-guard.ps1' -or (`$ChildPath -eq '$failDot')) { throw "simulated load failure: `$ChildPath" }
+    Microsoft.PowerShell.Management\Join-Path -Path `$Path -ChildPath `$ChildPath }
+function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'simulated load failure: $failModule' } }
+`$global:LASTEXITCODE = 0
+& `$HookPath
+`$LASTEXITCODE
+"@
+            $priorIn = [System.Console]::In
+            $priorError = [System.Console]::Error
+            $errorWriter = [System.IO.StringWriter]::new()
+            $shell = [powershell]::Create()
+            try {
+                [System.Console]::SetIn([System.IO.StringReader]::new('{"session_id":"c-786","hook_event_name":"SubagentStop"}'))
+                [System.Console]::SetError($errorWriter)
+                $output = @($shell.AddScript($driver).AddArgument((Join-HookGraphPath -Left $script:RepoRoot -Right $Hook)).Invoke())
+            }
+            finally {
+                [System.Console]::SetIn($priorIn)
+                [System.Console]::SetError($priorError)
+                $shell.Dispose()
+            }
+            return [pscustomobject]@{ Stderr = $errorWriter.ToString(); ExitCode = [int]$output[-1] }
+        }
+
         function Get-DenyReason {
             # The permissionDecisionReason of a PreToolUse deny emitted at exit 0.
             param($Result)
@@ -188,14 +222,9 @@ Describe 'Claude hook dependency-failure special cases (issue #786)' {
     }
 
     It 'C8: <Hook> reaches the tail check without a script-terminating error when the helper and a dependency both fail' -ForEach $script:StopRows {
-        # Arrange: the helper bootstrap fails, so the dependency's catch calls an undefined function.
-        Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: hook-dependency-guard.ps1' } -ParameterFilter { $ChildPath -eq 'hook-dependency-guard.ps1' }
-        if ($Kind -eq 'Module') { Mock Import-Module ([scriptblock]::Create("throw 'simulated load failure: $Dependency'")) -ParameterFilter ([scriptblock]::Create("`$Name -like '*$Dependency'")) }
-        else { Mock Join-Path ([scriptblock]::Create("throw 'simulated load failure: $Dependency'")) -ParameterFilter ([scriptblock]::Create("`$ChildPath -eq '$Dependency'")) }
+        # Arrange: the helper bootstrap fails, so the dependency's catch calls an undefined function (failures set in the runspace).
         # Act
-        try { $result = Invoke-HookProcess -Hook $Hook -HookEvent $Event }
-        finally { Reset-HookDependencyState }
+        $result = Invoke-HookInFreshRunspace -Hook $Hook -Dependency $Dependency -Kind $Kind
         # Assert
         $result.ExitCode | Should -Be 2
         $result.Stderr.StartsWith("$($script:StopPrefix[$Hook]) hook-dependency-guard.ps1 failed to load", [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Stderr

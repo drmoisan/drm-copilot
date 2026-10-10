@@ -27,6 +27,7 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 function Test-PrAuthorOutputReportsPr {
     <#
@@ -86,6 +87,8 @@ function Get-PrAuthorOutputDecision {
     param(
         [string] $HookInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'PR_AUTHOR_OUTPUT_MISSING:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if ([string]::IsNullOrWhiteSpace($HookInputRaw)) {
         return [ordered]@{
@@ -125,6 +128,9 @@ function Get-PrAuthorOutputDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PR_AUTHOR_OUTPUT_MISSING: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'PR_AUTHOR_OUTPUT_MISSING:'
+if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
 $decision = Get-PrAuthorOutputDecision -HookInputRaw $env:CLAUDE_HOOK_INPUT
 

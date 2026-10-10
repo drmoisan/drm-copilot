@@ -448,3 +448,188 @@ SMOKE-CAPTURE: .claude/hooks/enforce-python-batch-budget.ps1 | exit=0 | parse_er
 ```
 SMOKE-RESULT: .claude/hooks/enforce-python-batch-budget.ps1 | pass
 
+## P6-T1#1 | 2026-10-09T23-48
+### pre-install .claude/hooks/validate-bash.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-bash.ps1 | exit=0 | parse_errors=0
+```stdout
+
+```
+```stderr
+
+```
+### post-install .claude/hooks/validate-bash.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-bash.ps1 | exit=0 | parse_errors=0
+```stdout
+
+```
+```stderr
+
+```
+SMOKE-RESULT: .claude/hooks/validate-bash.ps1 | pass
+
+## P6-T1#2 | 2026-10-09T23-48
+### pre-install .claude/hooks/enforce-orchestration-preimplementation-gate.ps1
+SMOKE-CAPTURE: .claude/hooks/enforce-orchestration-preimplementation-gate.ps1 | exit=0 | parse_errors=0
+```stdout
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow"}}
+
+```
+```stderr
+
+```
+### post-install .claude/hooks/enforce-orchestration-preimplementation-gate.ps1
+SMOKE-CAPTURE: .claude/hooks/enforce-orchestration-preimplementation-gate.ps1 | exit=0 | parse_errors=0
+```stdout
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow"}}
+
+```
+```stderr
+
+```
+SMOKE-RESULT: .claude/hooks/enforce-orchestration-preimplementation-gate.ps1 | pass
+
+## P6-T1#3 | 2026-10-09T23-48
+### pre-install .claude/hooks/enforce-powershell-batch-budget.ps1
+SMOKE-CAPTURE: .claude/hooks/enforce-powershell-batch-budget.ps1 | exit=0 | parse_errors=0
+```stdout
+
+```
+```stderr
+
+```
+### post-install .claude/hooks/enforce-powershell-batch-budget.ps1
+SMOKE-CAPTURE: .claude/hooks/enforce-powershell-batch-budget.ps1 | exit=0 | parse_errors=0
+```stdout
+
+```
+```stderr
+
+```
+SMOKE-RESULT: .claude/hooks/enforce-powershell-batch-budget.ps1 | pass
+
+## P6-T3#1 | 2026-10-09T23-53
+### pre-install .claude/hooks/validate-discovery-artifact-gate.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-discovery-artifact-gate.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: discovery artifact gate hook: CLAUDE_HOOK_INPUT is empty
+
+```
+### post-install .claude/hooks/validate-discovery-artifact-gate.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-discovery-artifact-gate.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: discovery artifact gate hook: CLAUDE_HOOK_INPUT is empty
+
+```
+SMOKE-RESULT: .claude/hooks/validate-discovery-artifact-gate.ps1 | pass
+
+## P6-T3#2 | 2026-10-09T23-53
+### pre-install .claude/hooks/validate-feature-review-coverage.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-feature-review-coverage.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-feature-review-coverage.ps1:<POS>
+
+```
+### post-install .claude/hooks/validate-feature-review-coverage.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-feature-review-coverage.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-feature-review-coverage.ps1:<POS>
+
+```
+SMOKE-RESULT: .claude/hooks/validate-feature-review-coverage.ps1 | pass
+
+## P6-T3#3 | 2026-10-09T23-53
+### pre-install .claude/hooks/validate-orchestrator-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-orchestrator-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-orchestrator-output.ps1:<POS>
+
+```
+### post-install .claude/hooks/validate-orchestrator-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-orchestrator-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-orchestrator-output.ps1:<POS>
+
+```
+SMOKE-RESULT: .claude/hooks/validate-orchestrator-output.ps1 | pass
+
+## P6-T3#4 | 2026-10-09T23-53
+### pre-install .claude/hooks/validate-planner-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-planner-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-planner-output.ps1:<POS>
+
+```
+### post-install .claude/hooks/validate-planner-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-planner-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-planner-output.ps1:<POS>
+
+```
+SMOKE-RESULT: .claude/hooks/validate-planner-output.ps1 | pass
+
+## P6-T3#5 | 2026-10-09T23-53
+### pre-install .claude/hooks/validate-pr-author-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-pr-author-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: PR_AUTHOR_OUTPUT_MISSING: CLAUDE_HOOK_INPUT is empty; the pr-author agent produced no transcript to validate.
+
+```
+### post-install .claude/hooks/validate-pr-author-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-pr-author-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: PR_AUTHOR_OUTPUT_MISSING: CLAUDE_HOOK_INPUT is empty; the pr-author agent produced no transcript to validate.
+
+```
+SMOKE-RESULT: .claude/hooks/validate-pr-author-output.ps1 | pass
+
+## P6-T3#6 | 2026-10-09T23-53
+### pre-install .claude/hooks/validate-prd-feature-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-prd-feature-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-prd-feature-output.ps1:<POS>
+
+```
+### post-install .claude/hooks/validate-prd-feature-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-prd-feature-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-prd-feature-output.ps1:<POS>
+
+```
+SMOKE-RESULT: .claude/hooks/validate-prd-feature-output.ps1 | pass
+

@@ -187,7 +187,7 @@ Describe 'preimplementation gate import failure' {
             $output = @(Invoke-OrchestrationPreimplementationGateEntryPoint -ToolInputRaw $payload)
         }
         finally {
-            $script:OrchestrationGateResolutionImportFailure = $null
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
         }
 
         # Assert
@@ -199,13 +199,13 @@ Describe 'preimplementation gate import failure' {
 
     It 'O8 denies naming WorktreeItemResolution.psm1 when that import failed' {
         # Arrange
-        $script:OrchestrationGateResolutionImportFailure = 'WorktreeItemResolution.psm1'
+        Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1'
         try {
             # Act
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw (ConvertTo-BashPayload -Command 'git add scripts/Sample.ps1')
         }
         finally {
-            $script:OrchestrationGateResolutionImportFailure = $null
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
         }
 
         # Assert

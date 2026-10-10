@@ -30,6 +30,7 @@
 
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -349,6 +350,8 @@ function Invoke-PlannerOutputValidation {
     param(
         [string] $RawPayload
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-planner-output:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if ([string]::IsNullOrWhiteSpace($RawPayload)) {
         return @{ Ok = $false; Message = 'atomic-planner hook: CLAUDE_HOOK_INPUT is empty; cannot validate planner output.' }
@@ -400,6 +403,9 @@ function Invoke-PlannerOutputValidation {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-planner-output: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-planner-output:'
+if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
 $result = Invoke-PlannerOutputValidation -RawPayload $env:CLAUDE_HOOK_INPUT
 if (-not $result.Ok) {

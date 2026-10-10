@@ -157,14 +157,14 @@ Describe 'epic worktree-removal gate run-target resolution' {
     It 'V6 denies naming WorktreeRunResolution.psm1 when the import failed, and the entry point exits 0' {
         # Arrange
         $payload = ConvertTo-RemovalPayload -Command $script:Command
-        $script:EpicWorktreeGateResolutionImportFailure = 'WorktreeRunResolution.psm1'
+        Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1'
         try {
             # Act
             $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $payload
             $output = @(Invoke-EpicWorktreeRemovalGateEntryPoint -ToolInputRaw $payload)
         }
         finally {
-            $script:EpicWorktreeGateResolutionImportFailure = $null
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
         }
 
         # Assert

@@ -6,9 +6,9 @@
     Dot-sourced by enforce-orchestration-preimplementation-gate.ps1. Holds four groups of
     functions:
 
-    - The import guard for the worktree-resolution modules (issue #690). A failed import
-      is recorded in $script:OrchestrationGateResolutionImportFailure, and
-      Get-OrchestrationGateImportFailureDecision turns that record into a deny, so a
+    - The import guards for the worktree-resolution modules (issue #690). A failed import
+      is recorded in $script:HookDependencyFailures, and the gate's call to
+      Get-HookDependencyFailureDecision turns that record into a deny, so a
       missing module cannot make the gate exit non-zero and fail open.
     - The three checkpoint read seams, Get-CheckpointContent, Get-EpicCheckpointContent,
       and Get-ParallelCheckpointContent. Each takes a mandatory absolute path, so no
@@ -41,39 +41,12 @@
     extensions/drm-copilot/resources/claude-customizations/.
 #>
 
-# Import guard (issue #690). Each worktree-resolution import is attempted in order; the
-# first failure is recorded by file name and the decision function denies on it.
-$script:OrchestrationGateResolutionImportFailure = $null
-foreach ($resolutionModule in @('WorktreeItemResolution.psm1', 'WorktreeRunResolution.psm1', 'EpicScopeResolution.psm1')) {
-    try {
-        Import-Module (Join-Path $PSScriptRoot "../lib/worktree-resolution/$resolutionModule") -Force -ErrorAction Stop
-    }
-    catch {
-        if (-not $script:OrchestrationGateResolutionImportFailure) { $script:OrchestrationGateResolutionImportFailure = $resolutionModule }
-    }
-}
-Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeReadiness.psm1') -Force -ErrorAction Stop
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'EpicScopeResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeReadiness.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'EpicScopeReadiness.psm1' -ErrorRecord $_ }
 # Per-segment target resolution for the epic-scope decision (issue #738).
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-targets.ps1')
-
-function Get-OrchestrationGateImportFailureDecision {
-    <#
-    .SYNOPSIS
-        Returns the deny for a failed worktree-resolution import, or $null.
-    .OUTPUTS
-        System.Collections.Specialized.OrderedDictionary, or $null when every import succeeded.
-    #>
-    [CmdletBinding()]
-    [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param()
-
-    if (-not $script:OrchestrationGateResolutionImportFailure) {
-        return $null
-    }
-    return Get-OrchestrationPreimplementationGateBlockDecision -Reason (
-        "PREIMPLEMENTATION_GATE_BLOCKED: the worktree-resolution module '$($script:OrchestrationGateResolutionImportFailure)' " +
-        'failed to import, so the checkpoint that governs this call cannot be located; the gate fails closed.')
-}
 
 # The three checkpoint read seams. Each takes the absolute path composed beneath a
 # resolved worktree root; an absent file returns an empty string, which the readiness
