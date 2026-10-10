@@ -66,6 +66,75 @@ def test_ci_gate_parser_skills_invoke_bundled_parser() -> None:
     ), f"Skills not invoking {_CI_GATE_PARSER}: {missing}; got {references}"
 
 
+def test_parallel_plan_extracts_compute_cohorts_under_bash_fence() -> None:
+    """The parallel-plan skill's bash-fenced cohort invocation is extracted.
+
+    Regression for issue #791 (FU-763-5): the invocation sits on the first
+    line of a bash fence.
+    """
+
+    # Arrange
+    text = (_REPO_ROOT / ".claude/skills/parallel-plan/SKILL.md").read_text(
+        encoding="utf-8"
+    )
+
+    # Act
+    references = extract_script_references(text)
+
+    # Assert
+    assert (
+        ".claude/lib/bash/compute-cohorts.sh" in references
+    ), f"compute-cohorts.sh not extracted from parallel-plan; got {references}"
+
+
+def test_parallel_remove_invokes_bundled_remove_script() -> None:
+    """The parallel-remove skill invokes the bundled bash removal script.
+
+    Regression for issue #791 (FU-763-3): the skill must call the bash entry
+    point rather than the Python mutation engine functions.
+    """
+
+    # Arrange
+    text = (_REPO_ROOT / ".claude/skills/parallel-remove/SKILL.md").read_text(
+        encoding="utf-8"
+    )
+
+    # Act
+    references = extract_script_references(text)
+
+    # Assert: (a) the bundled entry point is an extracted script reference.
+    assert (
+        ".claude/lib/bash/remove-parallel-item.sh" in references
+    ), f"remove-parallel-item.sh not extracted from parallel-remove; got {references}"
+    # Assert: (b) each subcommand is invoked through the entry point.
+    missing_subcommands = [
+        form
+        for form in (
+            "remove-parallel-item.sh decide",
+            "remove-parallel-item.sh recolor",
+            "remove-parallel-item.sh entry",
+        )
+        if form not in text
+    ]
+    assert (
+        not missing_subcommands
+    ), f"parallel-remove lacks subcommand invocations: {missing_subcommands}"
+    # Assert: (c) no Python engine function name remains.
+    remaining_functions = [
+        name
+        for name in ("decide_removal", "recolor_unstarted", "build_remove_entry")
+        if name in text
+    ]
+    assert (
+        not remaining_functions
+    ), f"parallel-remove still names Python engine functions: {remaining_functions}"
+    # Assert: (d) the Python parity module is cited at most once.
+    protocol_mentions = text.count("parallel_mutation_protocol")
+    assert (
+        protocol_mentions <= 1
+    ), f"parallel-remove cites parallel_mutation_protocol {protocol_mentions} times"
+
+
 def test_every_skill_folder_file_is_carried_by_skill_packs() -> None:
     """Every file inside a skill folder is bundled and carried by the skill's packs."""
 

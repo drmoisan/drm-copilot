@@ -1,0 +1,10 @@
+{
+  "case": "recolor-negative-current-cohort",
+  "subcommand": "recolor",
+  "argv": ["recolor", "--unstarted", "1", "--pinned", "", "--generation", "0", "--current-cohort", "-1", "--highest-pinned-cohort", "0"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "current_cohort must be >= 0 per F3 invariant 12; received -1."
+  }
+}

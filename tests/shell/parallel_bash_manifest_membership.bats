@@ -81,8 +81,8 @@ discover_lib_basenames() {
     done
 }
 
-@test "the five CLI entry points are present in both trees" {
-    for name in abandon-parallel-item.sh compute-cohorts.sh compute-concurrency-batches.sh report-lane-assertion.sh validate-parallel-manifest.sh; do
+@test "the six CLI entry points are present in both trees" {
+    for name in abandon-parallel-item.sh compute-cohorts.sh compute-concurrency-batches.sh remove-parallel-item.sh report-lane-assertion.sh validate-parallel-manifest.sh; do
         [ -f "${LIB_DIR}/${name}" ]
         [ -f "${BUNDLE_DIR}/${name}" ]
     done
