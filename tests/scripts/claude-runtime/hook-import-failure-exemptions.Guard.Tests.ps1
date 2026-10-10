@@ -57,7 +57,7 @@ function Invoke-SampleDecision {
             param([string] $HookText)
             $files = @{ '/synthetic-root/.claude/hooks/sample-gate.ps1' = $HookText }
             $read = { param([string] $Path) $files[$Path] }.GetNewClosure()
-            $list = { param([string] $Directory) @($files.Keys) }.GetNewClosure()
+            $list = { param([string] $Directory) $null = $Directory; @($files.Keys) }.GetNewClosure()
             return @(Get-HookExemptionFinding -Exemption @($script:SampleEntry) -HookRoot '/synthetic-root/.claude/hooks' -ReadText $read -ListFiles $list)
         }
     }

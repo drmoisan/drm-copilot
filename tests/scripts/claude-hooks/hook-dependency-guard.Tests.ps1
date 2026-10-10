@@ -17,37 +17,37 @@ Describe 'hook-dependency-guard.ps1 helper (Claude)' {
         . (Join-Path (Resolve-Path "$PSScriptRoot/../../..").Path '.claude/hooks/hook-dependency-guard.ps1')
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
 
-        function New-SampleErrorRecord {
+        function Get-SampleErrorRecord {
             # An ErrorRecord whose exception message spans two lines.
             param([string] $Message = "first line of the failure`nsecond line of the failure")
             return [System.Management.Automation.ErrorRecord]::new([System.IO.FileNotFoundException]::new($Message), 'SampleLoadFailure', [System.Management.Automation.ErrorCategory]::ObjectNotFound, $null)
         }
 
-        function Reset-HookDependencyState {
+        function Initialize-HookDependencyState {
             $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
             $script:HookDependencyGuardLoadFailed = $false
         }
     }
 
     BeforeEach {
-        Reset-HookDependencyState
+        Initialize-HookDependencyState
     }
 
     It 'H1: records a dependency failure by name' {
         try {
             # Act
-            Add-HookDependencyFailure -Name 'Sample.psm1' -ErrorRecord (New-SampleErrorRecord)
+            Add-HookDependencyFailure -Name 'Sample.psm1' -ErrorRecord (Get-SampleErrorRecord)
             # Assert
             $script:HookDependencyFailures.Count | Should -Be 1
             $script:HookDependencyFailures[0].Name | Should -Be 'Sample.psm1'
             $script:HookDependencyFailures[0].Message | Should -Be 'first line of the failure'
         }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
     }
 
     It 'H2: reports no failure before any record' {
         try { Test-HookDependencyFailure | Should -BeFalse }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
     }
 
     It 'H3: reports a failure after a record' {
@@ -56,37 +56,37 @@ Describe 'hook-dependency-guard.ps1 helper (Claude)' {
             Test-HookDependencyFailure | Should -BeTrue
             $script:HookDependencyFailures[0].Message | Should -Be 'no error record'
         }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
     }
 
     It 'H4: builds the reason from the prefix, the dependency name, and the first exception line' {
         try {
-            Add-HookDependencyFailure -Name 'First.psm1' -ErrorRecord (New-SampleErrorRecord)
-            Add-HookDependencyFailure -Name 'Second.psm1' -ErrorRecord (New-SampleErrorRecord -Message 'other')
+            Add-HookDependencyFailure -Name 'First.psm1' -ErrorRecord (Get-SampleErrorRecord)
+            Add-HookDependencyFailure -Name 'Second.psm1' -ErrorRecord (Get-SampleErrorRecord -Message 'other')
             Get-HookDependencyFailureReason -ReasonPrefix 'SAMPLE_BLOCKED:' |
                 Should -Be "SAMPLE_BLOCKED: the dependency 'First.psm1' failed to load (first line of the failure); the gate fails closed."
         }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
     }
 
     It 'H5: returns the PreToolUse deny decision in the hookSpecificOutput shape' {
         try {
-            Add-HookDependencyFailure -Name 'Sample.psm1' -ErrorRecord (New-SampleErrorRecord)
+            Add-HookDependencyFailure -Name 'Sample.psm1' -ErrorRecord (Get-SampleErrorRecord)
             $decision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'SAMPLE_BLOCKED:'
             ($decision | ConvertTo-Json -Compress -Depth 5) |
                 Should -Be '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"SAMPLE_BLOCKED: the dependency ''Sample.psm1'' failed to load (first line of the failure); the gate fails closed."}}'
         }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
     }
 
     It 'H6: returns a SubagentStop result carrying exit code 2 and the reason' {
         try {
-            Add-HookDependencyFailure -Name 'Sample.psm1' -ErrorRecord (New-SampleErrorRecord)
+            Add-HookDependencyFailure -Name 'Sample.psm1' -ErrorRecord (Get-SampleErrorRecord)
             $result = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'SAMPLE_BLOCKED:'
             $result.ExitCode | Should -Be 2
             $result.Reason | Should -Be "SAMPLE_BLOCKED: the dependency 'Sample.psm1' failed to load (first line of the failure); the gate fails closed."
         }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
     }
 
     It 'H7: returns null from the decision builder when nothing failed' {
@@ -94,7 +94,7 @@ Describe 'hook-dependency-guard.ps1 helper (Claude)' {
             Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'SAMPLE_BLOCKED:' | Should -BeNullOrEmpty
             Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'SAMPLE_BLOCKED:' | Should -BeNullOrEmpty
         }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
     }
 
     It 'H8: keeps earlier records when the helper is dot-sourced again' {
@@ -104,7 +104,7 @@ Describe 'hook-dependency-guard.ps1 helper (Claude)' {
             $script:HookDependencyFailures.Count | Should -Be 1
             $script:HookDependencyFailures[0].Name | Should -Be 'Earlier.psm1'
         }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
     }
 
     It 'H9: writes nothing to any output stream when recording a failure' {
@@ -112,11 +112,11 @@ Describe 'hook-dependency-guard.ps1 helper (Claude)' {
         $consoleWriter = [System.IO.StringWriter]::new()
         try {
             [System.Console]::SetOut($consoleWriter)
-            $streams = @(& { Add-HookDependencyFailure -Name 'Sample.psm1' -ErrorRecord (New-SampleErrorRecord); $null = Test-HookDependencyFailure } *>&1)
+            $streams = @(& { Add-HookDependencyFailure -Name 'Sample.psm1' -ErrorRecord (Get-SampleErrorRecord); $null = Test-HookDependencyFailure } *>&1)
         }
         finally {
             [System.Console]::SetOut($priorOut)
-            Reset-HookDependencyState
+            Initialize-HookDependencyState
         }
         $streams | Should -BeNullOrEmpty
         $consoleWriter.ToString() | Should -BeNullOrEmpty

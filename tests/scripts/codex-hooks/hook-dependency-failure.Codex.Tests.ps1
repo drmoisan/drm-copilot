@@ -105,7 +105,7 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
             return [pscustomobject]@{ Stdout = (@($stdout | ForEach-Object { [string]$_ }) -join "`n"); Stderr = $errorWriter.ToString(); ExitCode = $exitCode }
         }
 
-        function Reset-HookDependencyState {
+        function Initialize-HookDependencyState {
             $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
             $script:HookDependencyGuardLoadFailed = $false
         }
@@ -141,7 +141,7 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
         else { Mock Join-Path { throw "simulated load failure: $failedDependency" } -ParameterFilter { $ChildPath -eq $failedChildPath } }
         # Act
         try { $result = Invoke-HookProcess -Hook $Hook -HookEvent $Event }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         # Assert
         Assert-DependencyBlock -Result $result -HookEvent $Event -Prefix $script:ReasonPrefix[$Hook] -Dependency $Dependency
     }
@@ -155,7 +155,7 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
             $flag = $script:HookDependencyGuardLoadFailed
             $helperDefined = [bool](Get-Command -Name Add-HookDependencyFailure -CommandType Function -ErrorAction SilentlyContinue)
         }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         $flag | Should -BeTrue
         $helperDefined | Should -BeFalse
     }
@@ -164,7 +164,7 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
         Mock Import-Module { }
         Mock Join-Path { throw 'simulated load failure: hook-dependency-guard.ps1' } -ParameterFilter { $ChildPath -eq 'hook-dependency-guard.ps1' }
         try { $result = Invoke-HookProcess -Hook $Hook -HookEvent $Event }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         $result.ExitCode | Should -Be 2
         $result.Stderr.StartsWith("$($script:ReasonPrefix[$Hook]) hook-dependency-guard.ps1 failed to load", [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Stderr
     }
@@ -183,7 +183,7 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
             $failed = Test-HookDependencyFailure
             $count = @($script:HookDependencyFailures).Count
         }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         # Assert
         $failed | Should -BeFalse
         $count | Should -Be 0
@@ -196,7 +196,7 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
         Mock Join-Path { 'synthetic-missing/epic-child-launch-contract.ps1' } -ParameterFilter { $ChildPath -eq 'scripts/epic-child-launch-contract.ps1' }
         # Act
         try { $result = Invoke-HookProcess -Hook $Hook -HookEvent 'PreToolUse' }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         # Assert
         Assert-DependencyBlock -Result $result -HookEvent 'PreToolUse' -Prefix $script:ReasonPrefix[$Hook] -Dependency 'epic-child-launch-contract.ps1'
     }
@@ -204,7 +204,7 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
     It 'X3: validate-bash denies a dependency failure with HOOK_DEPENDENCY_LOAD_FAILED:' {
         Mock Join-Path { throw 'simulated load failure: hook-command-scanner.ps1' } -ParameterFilter { $ChildPath -eq 'hook-command-scanner.ps1' }
         try { $result = Invoke-HookProcess -Hook '.codex/hooks/validate-bash.ps1' -HookEvent 'PreToolUse' }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         Assert-DependencyBlock -Result $result -HookEvent 'PreToolUse' -Prefix 'HOOK_DEPENDENCY_LOAD_FAILED:' -Dependency 'hook-command-scanner.ps1'
     }
 }

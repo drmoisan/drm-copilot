@@ -124,7 +124,7 @@ function Resolve-HookGraphStaticPath {
     if ($Node -is [System.Management.Automation.Language.ParenExpressionAst]) { $Node = $Node.Pipeline }
     if ($Node -is [System.Management.Automation.Language.PipelineAst] -and $Node.PipelineElements.Count -eq 1) { $Node = $Node.PipelineElements[0] }
     if ($Node -is [System.Management.Automation.Language.CommandExpressionAst]) { $Node = $Node.Expression }
-    if ($Node -is [System.Management.Automation.Language.MemberExpressionAst] -and $Node.Member.Extent.Text -eq 'Path') { return (Resolve-HookGraphStaticPath $Node.Expression $Directory $Variables) }
+    if ($Node -is [System.Management.Automation.Language.MemberExpressionAst] -and $Node.Member.Extent.Text -eq 'Path') { return (Resolve-HookGraphStaticPath -Node $Node.Expression -Directory $Directory -Variables $Variables) }
     if ($Node -is [System.Management.Automation.Language.StringConstantExpressionAst]) { return $Node.Value }
     if ($Node -is [System.Management.Automation.Language.VariableExpressionAst]) {
         $name = $Node.VariablePath.UserPath -replace '^script:', ''
@@ -144,8 +144,8 @@ function Resolve-HookGraphStaticPath {
         return
     }
     if ($Node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and $Node.Member.Extent.Text -eq 'Combine' -and $Node.Arguments.Count -ge 2) {
-        foreach ($left in @(Resolve-HookGraphStaticPath $Node.Arguments[0] $Directory $Variables)) {
-            foreach ($right in @(Resolve-HookGraphStaticPath $Node.Arguments[1] $Directory $Variables)) { Join-HookGraphPath -Left $left -Right $right }
+        foreach ($left in @(Resolve-HookGraphStaticPath -Node $Node.Arguments[0] -Directory $Directory -Variables $Variables)) {
+            foreach ($right in @(Resolve-HookGraphStaticPath -Node $Node.Arguments[1] -Directory $Directory -Variables $Variables)) { Join-HookGraphPath -Left $left -Right $right }
         }
         return
     }
@@ -153,14 +153,14 @@ function Resolve-HookGraphStaticPath {
         $operands = @($Node.CommandElements | Select-Object -Skip 1 | Where-Object { $_ -isnot [System.Management.Automation.Language.CommandParameterAst] })
         $commandName = $Node.GetCommandName()
         if (($commandName -eq 'Join-Path' -or $commandName -eq 'Resolve-Path') -and $operands.Count -ge 1) {
-            if ($commandName -eq 'Resolve-Path') { return (Resolve-HookGraphStaticPath $operands[0] $Directory $Variables) }
+            if ($commandName -eq 'Resolve-Path') { return (Resolve-HookGraphStaticPath -Node $operands[0] -Directory $Directory -Variables $Variables) }
             if ($operands.Count -lt 2) { return }
-            foreach ($left in @(Resolve-HookGraphStaticPath $operands[0] $Directory $Variables)) {
-                foreach ($right in @(Resolve-HookGraphStaticPath $operands[1] $Directory $Variables)) { Join-HookGraphPath -Left $left -Right $right }
+            foreach ($left in @(Resolve-HookGraphStaticPath -Node $operands[0] -Directory $Directory -Variables $Variables)) {
+                foreach ($right in @(Resolve-HookGraphStaticPath -Node $operands[1] -Directory $Directory -Variables $Variables)) { Join-HookGraphPath -Left $left -Right $right }
             }
         }
         elseif ($commandName -eq 'Split-Path' -and $operands.Count -ge 1) {
-            foreach ($p in @(Resolve-HookGraphStaticPath $operands[0] $Directory $Variables)) { ConvertTo-HookGraphNormalPath -Path ($p -replace '/[^/]*$', '') }
+            foreach ($p in @(Resolve-HookGraphStaticPath -Node $operands[0] -Directory $Directory -Variables $Variables)) { ConvertTo-HookGraphNormalPath -Path ($p -replace '/[^/]*$', '') }
         }
     }
 }
@@ -191,7 +191,7 @@ function Get-HookScriptEdge {
     $directory = ConvertTo-HookGraphNormalPath -Path (($SourcePath -replace '\\', '/') -replace '/[^/]*$', '')
     $variables = @{}
     foreach ($assignment in $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.AssignmentStatementAst] -and $n.Left -is [System.Management.Automation.Language.VariableExpressionAst] }, $true)) {
-        $values = @(Resolve-HookGraphStaticPath $assignment.Right $directory $variables)
+        $values = @(Resolve-HookGraphStaticPath -Node $assignment.Right -Directory $directory -Variables $variables)
         if ($values.Count -eq 1) { $variables[($assignment.Left.VariablePath.UserPath -replace '^script:', '')] = [string]$values[0] }
     }
     foreach ($command in $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.CommandAst] }, $true)) {
@@ -227,7 +227,7 @@ function Get-HookScriptEdge {
                 if ($null -ne $element) { $lazy = $element.Extent.Text.Trim("'", '"') }
             }
         }
-        $targets = @(if ($null -ne $targetNode) { Resolve-HookGraphStaticPath $targetNode $directory $variables })
+        $targets = @(if ($null -ne $targetNode) { Resolve-HookGraphStaticPath -Node $targetNode -Directory $directory -Variables $variables })
         if ($targets.Count -eq 0) { $targets = @('UNRESOLVED: ' + $command.Extent.Text) }
         foreach ($target in $targets) {
             [pscustomobject]@{

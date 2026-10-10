@@ -34,7 +34,7 @@ Describe 'Codex enforce-codex-model-routing coverage (issue #786)' {
             }
         }
 
-        function New-Attestation {
+        function Get-SampleAttestation {
             # A schema-2 attestation with every required field; the named fields are overridden.
             param([hashtable] $Override = @{})
             $value = [ordered]@{
@@ -62,24 +62,24 @@ Describe 'Codex enforce-codex-model-routing coverage (issue #786)' {
             @{ Case = 'a required field'; Override = @{ profile_name = '' } },
             @{ Case = 'a well-formed profile hash'; Override = @{ profile_sha256 = 'xyz' } }
         ) {
-            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (New-Attestation -Override $Override) -RepositoryRoot 'C:\repo' | Should -BeFalse
+            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (Get-SampleAttestation -Override $Override) -RepositoryRoot 'C:\repo' | Should -BeFalse
         }
 
         It 'rejects an attestation whose agent profile cannot be read' {
             Mock Get-CodexAgentProfileAttestation { throw 'simulated profile read failure' }
-            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (New-Attestation) -RepositoryRoot 'C:\repo' | Should -BeFalse
+            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (Get-SampleAttestation) -RepositoryRoot 'C:\repo' | Should -BeFalse
         }
 
         It 'rejects an attestation whose profile binding does not hold' {
             Mock Get-CodexAgentProfileAttestation { [pscustomobject]@{ profile_name = 'p'; profile_model = 'm'; profile_reasoning_effort = 'high' } }
             Mock Test-CodexAgentProfileBinding { $false }
-            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (New-Attestation) -RepositoryRoot 'C:\repo' | Should -BeFalse
+            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (Get-SampleAttestation) -RepositoryRoot 'C:\repo' | Should -BeFalse
         }
 
         It 'accepts an attestation whose profile and payload agree' {
             Mock Get-CodexAgentProfileAttestation { [pscustomobject]@{ profile_name = 'p'; profile_model = 'm'; profile_reasoning_effort = 'high' } }
             Mock Test-CodexAgentProfileBinding { $true }
-            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (New-Attestation) -RepositoryRoot 'C:\repo' | Should -BeTrue
+            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (Get-SampleAttestation) -RepositoryRoot 'C:\repo' | Should -BeTrue
         }
 
         It 'allows a valid attestation and denies a routed agent without one' {

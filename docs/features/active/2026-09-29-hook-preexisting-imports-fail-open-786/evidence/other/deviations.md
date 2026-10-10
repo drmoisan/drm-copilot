@@ -64,3 +64,8 @@ Rule 15 record of departures and their triggering observations.
   - Isolate the Codex suites into their own R-PESTER pass for coverage measurement, or
   - pin the coverage mode (CodeCoverage.UseBreakpoints = $true) for this measurement.
   - Either option needs an operator decision, because R-PESTER and the runsettings file are fixed by the plan.
+
+## [P11-T3] Final full-run coverage gap (escalated)
+
+- Observation: the final R-PESTER run (QC pass 4) reports `Tests Passed: 9495, Failed: 0` and JUnit root failures 0 and errors 0. Every named testsuite passes. The same four Codex files are below 85.00, with the same values as [P10-T3]. The three UNCOVERED-CHANGED groups are also unchanged.
+- Action: [P11-T3] is left unchecked with an ACCEPTANCE-GAP line in final-pester-coverage.md. The plan revision input recorded for [P10-T3] and [P10-T4] applies unchanged.

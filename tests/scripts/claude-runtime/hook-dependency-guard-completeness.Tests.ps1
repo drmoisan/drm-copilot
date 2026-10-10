@@ -69,12 +69,12 @@ Describe 'hook dependency guard structural completeness (issue #786)' {
             }
         }
 
-        function New-Registration {
+        function Get-SyntheticRegistration {
             param([string] $RootPath, [string] $Surface, [string] $HookEvent, [string] $Hook)
             return [pscustomobject]@{ Surface = $Surface; Event = $HookEvent; Root = $RootPath; Hook = $Hook; Path = (Join-HookGraphPath -Left $RootPath -Right $Hook) }
         }
 
-        function New-SyntheticReader {
+        function Get-SyntheticReader {
             param([hashtable] $Files)
             $map = $Files
             return @{ ReadText = { param([string] $Path) $map[$Path] }.GetNewClosure(); TestPath = { param([string] $Path) $map.ContainsKey($Path) }.GetNewClosure() }
@@ -106,7 +106,7 @@ if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compr
 '@
         $script:GuardedPayload = "try { Import-Module (Join-Path `$PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord `$_ }"
 
-        function New-SampleHook {
+        function Get-SampleHookText {
             param([string] $Edges = $script:GuardedPayload, [string] $Before = '', [string] $TailText = $script:Tail, [switch] $NoBootstrap)
             $text = $script:Skeleton.Replace('#EDGES#', $Edges).Replace('#BEFORE#', $Before).Replace('#TAIL#', $TailText)
             if ($NoBootstrap) { $text = $text.Replace("`$script:HookDependencyGuardLoadFailed = `$false; try { . (Join-Path `$PSScriptRoot 'hook-dependency-guard.ps1') } catch { `$script:HookDependencyGuardLoadFailed = `$true }", '') }
@@ -127,11 +127,11 @@ if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compr
     }
 
     It 'S4: <Root> <Surface> <Event> <Hook> leaves no transitive edge uncovered or non-terminating' -ForEach $script:HookRows {
-        @(Get-TransitiveFinding -Registration (New-Registration -RootPath $RootPath -Surface $Surface -HookEvent $Event -Hook $Hook)) | Should -BeNullOrEmpty
+        @(Get-TransitiveFinding -Registration (Get-SyntheticRegistration -RootPath $RootPath -Surface $Surface -HookEvent $Event -Hook $Hook)) | Should -BeNullOrEmpty
     }
 
     It 'S5: <Root> <Surface> <Event> <Hook> pre-loads every runtime edge under a guard' -ForEach $script:HookRows {
-        @(Get-RuntimeFinding -Registration (New-Registration -RootPath $RootPath -Surface $Surface -HookEvent $Event -Hook $Hook) -Exemption $script:Exemptions) | Should -BeNullOrEmpty
+        @(Get-RuntimeFinding -Registration (Get-SyntheticRegistration -RootPath $RootPath -Surface $Surface -HookEvent $Event -Hook $Hook) -Exemption $script:Exemptions) | Should -BeNullOrEmpty
     }
 
     It 'S6: <Root> <Surface> <Event> <Hook> returns the dependency decision first in its decision function' -ForEach $script:HookRows {
@@ -140,7 +140,7 @@ if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compr
 
     It 'S7: discovers hooks from .claude/settings.json and .codex/config.toml' {
         # Arrange: a synthetic registration pair proves discovery reads the registrations, not a list.
-        $reader = New-SyntheticReader -Files @{
+        $reader = Get-SyntheticReader -Files @{
             '/synthetic-root/.claude/settings.json' = '{"hooks":{"PreToolUse":[{"hooks":[{"command":"pwsh -NoProfile -File .claude/hooks/sample-gate.ps1"}]}],"SubagentStop":[{"hooks":[{"command":"pwsh -NoProfile -Command \"exit 0\""}]}]}}'
             '/synthetic-root/.codex/config.toml'    = "[[hooks.SubagentStop]]`ncommand = `"pwsh -NoProfile -File .codex/hooks/sample-stop.ps1`"`n"
         }
@@ -162,48 +162,48 @@ if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compr
     }
 
     It 'F1: reports an unguarded direct edge in a synthetic hook' {
-        $text = New-SampleHook -Edges "Import-Module (Join-Path `$PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop"
+        $text = Get-SampleHookText -Edges "Import-Module (Join-Path `$PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop"
         @(Get-HookGuardShapeFinding -ScriptText $text -HookPath '.claude/hooks/sample-gate.ps1' -HookEvent PreToolUse | Where-Object { $_ -like 'S2:*HookPayload.psm1*' }).Count | Should -Be 1
     }
 
     It 'F2: reports a try body that holds more than the import statement' {
-        $text = New-SampleHook -Edges "try { Import-Module (Join-Path `$PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop; `$loaded = `$true } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord `$_ }"
+        $text = Get-SampleHookText -Edges "try { Import-Module (Join-Path `$PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop; `$loaded = `$true } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord `$_ }"
         @(Get-HookGuardShapeFinding -ScriptText $text -HookPath '.claude/hooks/sample-gate.ps1' -HookEvent PreToolUse | Where-Object { $_ -like 'S2:*single-statement*' }).Count | Should -Be 1
     }
 
     It 'F3: reports a guarded Import-Module without -ErrorAction Stop' {
-        $text = New-SampleHook -Edges "try { Import-Module (Join-Path `$PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord `$_ }"
+        $text = Get-SampleHookText -Edges "try { Import-Module (Join-Path `$PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord `$_ }"
         @(Get-HookGuardShapeFinding -ScriptText $text -HookPath '.claude/hooks/sample-gate.ps1' -HookEvent PreToolUse | Where-Object { $_ -like 'S3:*' }).Count | Should -Be 1
     }
 
     It 'F4: reports a hook without the bootstrap try' {
-        $findings = @(Get-HookGuardShapeFinding -ScriptText (New-SampleHook -NoBootstrap) -HookPath '.claude/hooks/sample-gate.ps1' -HookEvent PreToolUse)
+        $findings = @(Get-HookGuardShapeFinding -ScriptText (Get-SampleHookText -NoBootstrap) -HookPath '.claude/hooks/sample-gate.ps1' -HookEvent PreToolUse)
         @($findings | Where-Object { $_ -like 'S1: bootstrap*' }).Count | Should -Be 1
-        @(Get-HookGuardShapeFinding -ScriptText (New-SampleHook) -HookPath '.claude/hooks/sample-gate.ps1' -HookEvent PreToolUse) | Should -BeNullOrEmpty -Because 'the conforming skeleton reports nothing'
+        @(Get-HookGuardShapeFinding -ScriptText (Get-SampleHookText) -HookPath '.claude/hooks/sample-gate.ps1' -HookEvent PreToolUse) | Should -BeNullOrEmpty -Because 'the conforming skeleton reports nothing'
     }
 
     It 'F5: reports a missing tail check or one placed before the dot-source early return' {
-        $missing = @(Get-HookGuardShapeFinding -ScriptText (New-SampleHook -TailText '') -HookPath '.claude/hooks/sample-gate.ps1' -HookEvent PreToolUse)
-        $early = @(Get-HookGuardShapeFinding -ScriptText (New-SampleHook -TailText '' -Before $script:Tail) -HookPath '.claude/hooks/sample-gate.ps1' -HookEvent PreToolUse)
+        $missing = @(Get-HookGuardShapeFinding -ScriptText (Get-SampleHookText -TailText '') -HookPath '.claude/hooks/sample-gate.ps1' -HookEvent PreToolUse)
+        $early = @(Get-HookGuardShapeFinding -ScriptText (Get-SampleHookText -TailText '' -Before $script:Tail) -HookPath '.claude/hooks/sample-gate.ps1' -HookEvent PreToolUse)
         @($missing | Where-Object { $_ -like 'S1:*' }).Count | Should -Be 1
         @($early | Where-Object { $_ -like 'S1:*' }).Count | Should -Be 1
     }
 
     It 'F6: reports a runtime import that is not pre-loaded under a guard' {
-        $hook = New-SampleHook -Edges ($script:GuardedPayload + "`nfunction Get-Lazy { if (-not (Get-Command -Name Test-Lazy -ErrorAction SilentlyContinue)) { Import-Module (Join-Path `$PSScriptRoot '../lib/lazy/Lazy.psm1') -Force } }")
-        $reader = New-SyntheticReader -Files @{ '/synthetic-root/.claude/hooks/sample-gate.ps1' = $hook; '/synthetic-root/.claude/lib/lazy/Lazy.psm1' = "function Test-Lazy { `$true }`n" }
-        $findings = @(Get-RuntimeFinding -Registration (New-Registration -RootPath '/synthetic-root' -Surface 'claude' -HookEvent 'PreToolUse' -Hook '.claude/hooks/sample-gate.ps1') -Exemption @() -ReadText $reader.ReadText -TestPath $reader.TestPath)
+        $hook = Get-SampleHookText -Edges ($script:GuardedPayload + "`nfunction Get-Lazy { if (-not (Get-Command -Name Test-Lazy -ErrorAction SilentlyContinue)) { Import-Module (Join-Path `$PSScriptRoot '../lib/lazy/Lazy.psm1') -Force } }")
+        $reader = Get-SyntheticReader -Files @{ '/synthetic-root/.claude/hooks/sample-gate.ps1' = $hook; '/synthetic-root/.claude/lib/lazy/Lazy.psm1' = "function Test-Lazy { `$true }`n" }
+        $findings = @(Get-RuntimeFinding -Registration (Get-SyntheticRegistration -RootPath '/synthetic-root' -Surface 'claude' -HookEvent 'PreToolUse' -Hook '.claude/hooks/sample-gate.ps1') -Exemption @() -ReadText $reader.ReadText -TestPath $reader.TestPath)
         @($findings | Where-Object { $_ -like 'S5:*Lazy.psm1*' }).Count | Should -Be 1
     }
 
     It 'F7: reports a transitive Import-Module that is neither terminating nor covered' {
-        $hook = New-SampleHook -Edges ". (Join-Path `$PSScriptRoot 'sample-helpers.ps1')"
-        $reader = New-SyntheticReader -Files @{
+        $hook = Get-SampleHookText -Edges ". (Join-Path `$PSScriptRoot 'sample-helpers.ps1')"
+        $reader = Get-SyntheticReader -Files @{
             '/synthetic-root/.claude/hooks/sample-gate.ps1'    = $hook
             '/synthetic-root/.claude/hooks/sample-helpers.ps1' = "Import-Module (Join-Path `$PSScriptRoot '../lib/sample/Nested.psm1') -Force`n"
             '/synthetic-root/.claude/lib/sample/Nested.psm1'   = "function Get-Nested { 1 }`n"
         }
-        $findings = @(Get-TransitiveFinding -Registration (New-Registration -RootPath '/synthetic-root' -Surface 'claude' -HookEvent 'PreToolUse' -Hook '.claude/hooks/sample-gate.ps1') -ReadText $reader.ReadText -TestPath $reader.TestPath)
+        $findings = @(Get-TransitiveFinding -Registration (Get-SyntheticRegistration -RootPath '/synthetic-root' -Surface 'claude' -HookEvent 'PreToolUse' -Hook '.claude/hooks/sample-gate.ps1') -ReadText $reader.ReadText -TestPath $reader.TestPath)
         @($findings | Where-Object { $_ -like 'S4:*Nested.psm1*' }).Count | Should -Be 1
     }
 
@@ -216,16 +216,16 @@ if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compr
             "`$contractPath = Join-Path `$PSScriptRoot '../scripts/epic-child-launch-contract.ps1'",
             "if (Test-Path -LiteralPath `$contractPath -PathType Leaf) { try { . `$contractPath } catch { Add-HookDependencyFailure -Name 'epic-child-launch-contract.ps1' -ErrorRecord `$_ } }",
             "function Test-Mermaid { try { Import-Module (Join-Path `$PSScriptRoot '../lib/mermaid/MermaidValidation.psm1') -ErrorAction Stop; return `$true } catch { return `$false } }") -join "`n"
-        $hook = New-SampleHook -Edges $edges
+        $hook = Get-SampleHookText -Edges $edges
         $exemption = @(
             [pscustomobject]@{ Id = 'D2'; Kind = 'Design'; Surface = 'claude'; HandlerFile = @('.claude/hooks/sample-gate.ps1'); Leaf = @('MermaidValidation.psm1'); Justification = 'D2: synthetic' },
             [pscustomobject]@{ Id = 'HX'; Kind = 'Handler'; Surface = 'claude'; HandlerFile = '.claude/hooks/sample-gate.ps1'; Variable = 'SampleImportFailure'; Leaf = @('sample-resolution.ps1') })
-        $reader = New-SyntheticReader -Files @{
-            '/synthetic-root/.claude/hooks/sample-gate.ps1'                = $hook
-            '/synthetic-root/.claude/hooks/sample-resolution.ps1'          = "function Get-Sample { 1 }`n"
-            '/synthetic-root/.claude/lib/mermaid/MermaidValidation.psm1'   = "function Test-MermaidBlock { `$true }`n"
+        $reader = Get-SyntheticReader -Files @{
+            '/synthetic-root/.claude/hooks/sample-gate.ps1'              = $hook
+            '/synthetic-root/.claude/hooks/sample-resolution.ps1'        = "function Get-Sample { 1 }`n"
+            '/synthetic-root/.claude/lib/mermaid/MermaidValidation.psm1' = "function Test-MermaidBlock { `$true }`n"
         }
-        $registration = New-Registration -RootPath '/synthetic-root' -Surface 'claude' -HookEvent 'PreToolUse' -Hook '.claude/hooks/sample-gate.ps1'
+        $registration = Get-SyntheticRegistration -RootPath '/synthetic-root' -Surface 'claude' -HookEvent 'PreToolUse' -Hook '.claude/hooks/sample-gate.ps1'
         # Act
         $shape = @(Get-HookGuardShapeFinding -ScriptText $hook -HookPath '.claude/hooks/sample-gate.ps1' -HookEvent PreToolUse -Exemption $exemption)
         $runtime = @(Get-RuntimeFinding -Registration $registration -Exemption $exemption -ReadText $reader.ReadText -TestPath $reader.TestPath)

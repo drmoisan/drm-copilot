@@ -53,7 +53,7 @@ Describe 'hook-imported modules write nothing to the success or warning stream (
             }
         }
 
-        function New-SyntheticReader {
+        function Get-SyntheticReader {
             # A ReadText and TestPath pair over an in-memory path-to-text map.
             param([hashtable] $Files)
             $map = $Files
@@ -81,7 +81,7 @@ Describe 'hook-imported modules write nothing to the success or warning stream (
 
     It 'N3: discovers registered PreToolUse and SubagentStop hooks from both registrations' {
         # Arrange: a synthetic settings.json and config.toml supplied through the text seam.
-        $reader = New-SyntheticReader -Files @{ '/synthetic-root/.claude/settings.json' = $script:SyntheticSettings; '/synthetic-root/.codex/config.toml' = $script:SyntheticConfig }
+        $reader = Get-SyntheticReader -Files @{ '/synthetic-root/.claude/settings.json' = $script:SyntheticSettings; '/synthetic-root/.codex/config.toml' = $script:SyntheticConfig }
         # Act
         $registrations = @(Get-HookRegistration -ClaudeRoot '/synthetic-root' -CodexRoot '/synthetic-root' -ReadText $reader.ReadText)
         $live = @(Get-HookRegistration -ClaudeRoot $script:RepoRoot -CodexRoot $script:RepoRoot)
@@ -122,12 +122,12 @@ Describe 'hook-imported modules write nothing to the success or warning stream (
 
     It 'N6: reports an offender in a module imported transitively by a synthetic registered hook' {
         # Arrange: hook -> First.psm1 -> Second.psm1, which writes a warning.
-        $reader = New-SyntheticReader -Files @{
-            '/synthetic-root/.claude/settings.json'             = $script:SyntheticSettings
-            '/synthetic-root/.codex/config.toml'                = ''
-            '/synthetic-root/.claude/hooks/synthetic-gate.ps1'  = "Import-Module (Join-Path `$PSScriptRoot '../lib/sample/First.psm1') -Force -ErrorAction Stop`n"
-            '/synthetic-root/.claude/lib/sample/First.psm1'     = "Import-Module (Join-Path `$PSScriptRoot 'Second.psm1') -Force -ErrorAction Stop`n"
-            '/synthetic-root/.claude/lib/sample/Second.psm1'    = "function Get-Value {`n    Write-Warning 'diagnostic'`n}`n"
+        $reader = Get-SyntheticReader -Files @{
+            '/synthetic-root/.claude/settings.json'            = $script:SyntheticSettings
+            '/synthetic-root/.codex/config.toml'               = ''
+            '/synthetic-root/.claude/hooks/synthetic-gate.ps1' = "Import-Module (Join-Path `$PSScriptRoot '../lib/sample/First.psm1') -Force -ErrorAction Stop`n"
+            '/synthetic-root/.claude/lib/sample/First.psm1'    = "Import-Module (Join-Path `$PSScriptRoot 'Second.psm1') -Force -ErrorAction Stop`n"
+            '/synthetic-root/.claude/lib/sample/Second.psm1'   = "function Get-Value {`n    Write-Warning 'diagnostic'`n}`n"
         }
         # Act
         $findings = @(Get-ImportedModuleStdoutFinding -ClaudeRoot '/synthetic-root' -CodexRoot '/synthetic-root' -ReadText $reader.ReadText -TestPath $reader.TestPath)
@@ -136,20 +136,20 @@ Describe 'hook-imported modules write nothing to the success or warning stream (
     }
 
     It 'N7: does not report a Write-Output in a registered entry script invoked directly' {
-        $reader = New-SyntheticReader -Files @{
-            '/synthetic-root/.claude/settings.json'              = $script:SyntheticSettings
-            '/synthetic-root/.codex/config.toml'                 = ''
-            '/synthetic-root/.claude/hooks/synthetic-entry.ps1'  = "`$decision | ConvertTo-Json | Write-Output`n"
+        $reader = Get-SyntheticReader -Files @{
+            '/synthetic-root/.claude/settings.json'             = $script:SyntheticSettings
+            '/synthetic-root/.codex/config.toml'                = ''
+            '/synthetic-root/.claude/hooks/synthetic-entry.ps1' = "`$decision | ConvertTo-Json | Write-Output`n"
         }
         @(Get-ImportedModuleStdoutFinding -ClaudeRoot '/synthetic-root' -CodexRoot '/synthetic-root' -ReadText $reader.ReadText -TestPath $reader.TestPath) | Should -BeNullOrEmpty
     }
 
     It 'N8: does not report a Write-Output in a registered entry script dot-sourced by another hook' {
-        $reader = New-SyntheticReader -Files @{
-            '/synthetic-root/.claude/settings.json'              = $script:SyntheticSettings
-            '/synthetic-root/.codex/config.toml'                 = ''
-            '/synthetic-root/.claude/hooks/synthetic-gate.ps1'   = ". (Join-Path `$PSScriptRoot 'synthetic-entry.ps1')`n"
-            '/synthetic-root/.claude/hooks/synthetic-entry.ps1'  = "if (`$MyInvocation.InvocationName -eq '.') { return }`n`$decision | ConvertTo-Json | Write-Output`n"
+        $reader = Get-SyntheticReader -Files @{
+            '/synthetic-root/.claude/settings.json'             = $script:SyntheticSettings
+            '/synthetic-root/.codex/config.toml'                = ''
+            '/synthetic-root/.claude/hooks/synthetic-gate.ps1'  = ". (Join-Path `$PSScriptRoot 'synthetic-entry.ps1')`n"
+            '/synthetic-root/.claude/hooks/synthetic-entry.ps1' = "if (`$MyInvocation.InvocationName -eq '.') { return }`n`$decision | ConvertTo-Json | Write-Output`n"
         }
         @(Get-ImportedModuleStdoutFinding -ClaudeRoot '/synthetic-root' -CodexRoot '/synthetic-root' -ReadText $reader.ReadText -TestPath $reader.TestPath) | Should -BeNullOrEmpty
     }

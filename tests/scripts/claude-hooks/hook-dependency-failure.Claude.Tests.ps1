@@ -123,7 +123,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
             return [pscustomobject]@{ Stdout = (@($stdout | ForEach-Object { [string]$_ }) -join "`n"); Stderr = $errorWriter.ToString(); ExitCode = $exitCode }
         }
 
-        function Reset-HookDependencyState {
+        function Initialize-HookDependencyState {
             $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
             $script:HookDependencyGuardLoadFailed = $false
         }
@@ -145,7 +145,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
         $prefix = $script:ReasonPrefix[$Hook]
         # Act
         try { $result = Invoke-HookProcess -Hook $Hook -HookEvent $Event }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         # Assert
         if ($Event -eq 'PreToolUse') {
             $result.ExitCode | Should -Be 0
@@ -174,7 +174,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
             $flag = $script:HookDependencyGuardLoadFailed
             $helperDefined = [bool](Get-Command -Name Add-HookDependencyFailure -CommandType Function -ErrorAction SilentlyContinue)
         }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         # Assert
         $flag | Should -BeTrue
         $helperDefined | Should -BeFalse
@@ -184,7 +184,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
         Mock Import-Module { }
         Mock Join-Path { throw 'simulated load failure: hook-dependency-guard.ps1' } -ParameterFilter { $ChildPath -eq 'hook-dependency-guard.ps1' }
         try { $result = Invoke-HookProcess -Hook $Hook -HookEvent $Event }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         $result.ExitCode | Should -Be 2
         $result.Stderr.StartsWith("$($script:ReasonPrefix[$Hook]) hook-dependency-guard.ps1 failed to load", [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Stderr
     }

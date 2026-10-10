@@ -45,6 +45,7 @@ Describe 'Codex enforce-epic-wave-barrier coverage (issue #786)' {
             # Locals, not script variables: the mocks run inside the hook, whose script scope hides this file's.
             $launchReceiptText = '{"issue_num":"' + $IssueNum + '","feature_folder":"' + $Folder + '","checkpoint_path":"C:/epic-786.json"}'
             $epicText = $script:Epic
+            Write-Verbose -Message "launch receipt $launchReceiptText and epic checkpoint $epicText are read by the mocks"
             try {
                 $env:CODEX_EPIC_CHILD_LAUNCH_RECEIPT = 'C:/receipts/r-786.json'
                 $env:CODEX_EPIC_CHILD_EXECUTION_CONTEXT = 'epic_execution_child'

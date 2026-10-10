@@ -22,7 +22,7 @@ BeforeAll {
     if (Get-Command Get-JacocoRepoCoverage -ErrorAction SilentlyContinue) { Mock Get-JacocoRepoCoverage { $null } }
     if (Get-Command Get-LcovRepoCoverage -ErrorAction SilentlyContinue) { Mock Get-LcovRepoCoverage { $null } }
 
-    function New-ArtifactFile {
+    function Get-ArtifactFileResult {
         # The Get-ArtifactFileContent result shape for an existing file.
         param([string[]] $Lines)
         return @{ Exists = $true; Text = ($Lines -join "`n"); Lines = $Lines }
@@ -53,7 +53,7 @@ Describe 'validate-feature-review-coverage coverage (issue #786)' {
             $result = Get-ArtifactFileContent -Path 'artifacts/one.txt'
             $result.Exists | Should -BeTrue
             $result.Text | Should -Be 'only line'
-            ,$result.Lines | Should -BeOfType [array]
+            , $result.Lines | Should -BeOfType [array]
         }
 
         It 'returns an empty line array for an empty file' {
@@ -79,12 +79,12 @@ Describe 'validate-feature-review-coverage coverage (issue #786)' {
         }
 
         It 'sums LF and LH counters into a percent' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('LF:10', 'LH:5', 'LF:10', 'LH:10', 'DA:1,1') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('LF:10', 'LH:5', 'LF:10', 'LH:10', 'DA:1,1') }
             Get-LcovRepoCoverage -Path 'coverage/lcov.info' | Should -Be 75
         }
 
         It 'returns null line coverage when no lines are found' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('LF:0', 'LH:0') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('LF:0', 'LH:0') }
             Get-LcovRepoCoverage -Path 'coverage/lcov.info' | Should -BeNullOrEmpty
         }
 
@@ -94,12 +94,12 @@ Describe 'validate-feature-review-coverage coverage (issue #786)' {
         }
 
         It 'sums BRF and BRH counters into a percent' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('BRF:4', 'BRH:1', 'BRF:4', 'BRH:3', 'LF:1') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('BRF:4', 'BRH:1', 'BRF:4', 'BRH:3', 'LF:1') }
             Get-LcovBranchCoverage -Path 'coverage/lcov.info' | Should -Be 50
         }
 
         It 'returns null branch coverage when no branches are found' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('BRF:0') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('BRF:0') }
             Get-LcovBranchCoverage -Path 'coverage/lcov.info' | Should -BeNullOrEmpty
         }
     }
@@ -111,17 +111,17 @@ Describe 'validate-feature-review-coverage coverage (issue #786)' {
         }
 
         It 'computes line coverage from LINE counters' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('<report><counter type="LINE" missed="1" covered="3"/></report>') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('<report><counter type="LINE" missed="1" covered="3"/></report>') }
             Get-JacocoRepoCoverage -Path 'artifacts/csharp/coverage.xml' | Should -Be 75
         }
 
         It 'returns null when the report has no LINE counter' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('<report><counter type="BRANCH" missed="1" covered="1"/></report>') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('<report><counter type="BRANCH" missed="1" covered="1"/></report>') }
             Get-JacocoRepoCoverage -Path 'artifacts/csharp/coverage.xml' | Should -BeNullOrEmpty
         }
 
         It 'returns null when the LINE counters total zero' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('<report><counter type="LINE" missed="0" covered="0"/></report>') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('<report><counter type="LINE" missed="0" covered="0"/></report>') }
             Get-JacocoRepoCoverage -Path 'artifacts/csharp/coverage.xml' | Should -BeNullOrEmpty
         }
 
@@ -131,17 +131,17 @@ Describe 'validate-feature-review-coverage coverage (issue #786)' {
         }
 
         It 'computes branch coverage from BRANCH counters' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('<report><counter type="BRANCH" missed="3" covered="1"/></report>') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('<report><counter type="BRANCH" missed="3" covered="1"/></report>') }
             Get-JacocoBranchCoverage -Path 'artifacts/csharp/coverage.xml' | Should -Be 25
         }
 
         It 'returns null when the report has no BRANCH counter' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('<report><counter type="LINE" missed="1" covered="1"/></report>') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('<report><counter type="LINE" missed="1" covered="1"/></report>') }
             Get-JacocoBranchCoverage -Path 'artifacts/csharp/coverage.xml' | Should -BeNullOrEmpty
         }
 
         It 'returns null when the BRANCH counters total zero' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('<report><counter type="BRANCH" missed="0" covered="0"/></report>') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('<report><counter type="BRANCH" missed="0" covered="0"/></report>') }
             Get-JacocoBranchCoverage -Path 'artifacts/csharp/coverage.xml' | Should -BeNullOrEmpty
         }
     }
@@ -236,43 +236,43 @@ Describe 'validate-feature-review-coverage coverage (issue #786)' {
         }
 
         It 'blocks an artifact whose timestamp differs from the policy audit' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('text') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('text') }
             $raw = ConvertTo-ReviewPayload -Output (Get-ReviewOutput -CodeStamp '2026-10-10T00-01')
             (Invoke-FeatureReviewCoverageValidation -RawPayload $raw).Message | Should -Match 'code-review artifact must share'
         }
 
         It 'blocks a remediation-inputs path outside the required location' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('text') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('text') }
             $raw = ConvertTo-ReviewPayload -Output (Get-ReviewOutput -Extra 'remediation-inputs-path: elsewhere/r.md')
             (Invoke-FeatureReviewCoverageValidation -RawPayload $raw).Message | Should -Match 'remediation-inputs-path .* is outside'
         }
 
         It 'blocks a remediation-inputs artifact with a different timestamp' {
-            Mock Get-ArtifactFileContent { New-ArtifactFile -Lines @('text') }
+            Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('text') }
             $raw = ConvertTo-ReviewPayload -Output (Get-ReviewOutput -Extra "remediation-inputs-path: $script:Folder/remediation-inputs.2026-10-10T00-05.md")
             (Invoke-FeatureReviewCoverageValidation -RawPayload $raw).Message | Should -Match 'remediation-inputs artifact must share'
         }
 
         It 'blocks an advertised remediation-inputs artifact that does not exist' {
-            Mock Get-ArtifactFileContent { param([string] $Path) if ($Path -like '*remediation-inputs*') { @{ Exists = $false; Text = $null; Lines = @() } } else { New-ArtifactFile -Lines @('text') } }
+            Mock Get-ArtifactFileContent { param([string] $Path) if ($Path -like '*remediation-inputs*') { @{ Exists = $false; Text = $null; Lines = @() } } else { Get-ArtifactFileResult -Lines @('text') } }
             $raw = ConvertTo-ReviewPayload -Output (Get-ReviewOutput -Extra "remediation-inputs-path: $script:Folder/remediation-inputs.$script:Stamp.md")
             (Invoke-FeatureReviewCoverageValidation -RawPayload $raw).Message | Should -Match 'was advertised but no file exists'
         }
 
         It 'allows valid artifacts when the branch changes no tracked language' {
-            Mock Get-ArtifactFileContent { param([string] $Path) if ($Path -eq 'artifacts/pr_context.summary.txt') { @{ Exists = $false; Text = $null; Lines = @() } } else { New-ArtifactFile -Lines @('text') } }
+            Mock Get-ArtifactFileContent { param([string] $Path) if ($Path -eq 'artifacts/pr_context.summary.txt') { @{ Exists = $false; Text = $null; Lines = @() } } else { Get-ArtifactFileResult -Lines @('text') } }
             (Invoke-FeatureReviewCoverageValidation -RawPayload (ConvertTo-ReviewPayload -Output (Get-ReviewOutput))).Ok | Should -BeTrue
         }
 
         It 'blocks when a changed language has no coverage verdict' {
-            Mock Get-ArtifactFileContent { param([string] $Path) if ($Path -eq 'artifacts/pr_context.summary.txt') { New-ArtifactFile -Lines @('- src/a.py (+1/-0)') } else { New-ArtifactFile -Lines @('Python coverage 90%') } }
+            Mock Get-ArtifactFileContent { param([string] $Path) if ($Path -eq 'artifacts/pr_context.summary.txt') { Get-ArtifactFileResult -Lines @('- src/a.py (+1/-0)') } else { Get-ArtifactFileResult -Lines @('Python coverage 90%') } }
             Mock Get-LanguageRepoCoverage { $null }
             Mock Get-LanguageBranchCoverage { $null }
             (Invoke-FeatureReviewCoverageValidation -RawPayload (ConvertTo-ReviewPayload -Output (Get-ReviewOutput))).Message | Should -Match 'coverage validation failed'
         }
 
         It 'allows a changed language whose coverage row carries a verdict' {
-            Mock Get-ArtifactFileContent { param([string] $Path) if ($Path -eq 'artifacts/pr_context.summary.txt') { New-ArtifactFile -Lines @('- src/a.py (+1/-0)') } else { New-ArtifactFile -Lines @('Python coverage PASS') } }
+            Mock Get-ArtifactFileContent { param([string] $Path) if ($Path -eq 'artifacts/pr_context.summary.txt') { Get-ArtifactFileResult -Lines @('- src/a.py (+1/-0)') } else { Get-ArtifactFileResult -Lines @('Python coverage PASS') } }
             Mock Get-LanguageRepoCoverage { 90 }
             Mock Get-LanguageBranchCoverage { 80 }
             (Invoke-FeatureReviewCoverageValidation -RawPayload (ConvertTo-ReviewPayload -Output (Get-ReviewOutput))).Ok | Should -BeTrue

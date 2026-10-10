@@ -122,7 +122,7 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
             return [string]$output.permissionDecisionReason
         }
 
-        function Reset-HookDependencyState {
+        function Initialize-HookDependencyState {
             $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
             $script:HookDependencyGuardLoadFailed = $false
         }
@@ -141,7 +141,7 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
         Mock Import-Module { throw 'simulated load failure: EpicScopeReadiness.psm1' } -ParameterFilter { $Name -like '*EpicScopeReadiness.psm1' }
         # Act
         try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-pr-author-skill.ps1' }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         # Assert
         $reason = Get-DenyReason -Result $result
         $reason.StartsWith('PR_AUTHOR_SKILL_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
@@ -153,7 +153,7 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
         Mock Import-Module { }
         Mock Join-Path { 'synthetic-missing/hook-command-scanner.ps1' } -ParameterFilter { $ChildPath -eq 'hook-command-scanner.ps1' }
         try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-pr-author-skill.ps1' }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         $reason = Get-DenyReason -Result $result
         $reason.StartsWith('PR_AUTHOR_SKILL_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
         $reason.Contains("'enforce-pr-author-skill.epic-base-branch.ps1'") | Should -BeTrue -Because $reason
@@ -163,7 +163,7 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
         Mock Import-Module { }
         Mock Join-Path { throw 'simulated load failure: enforce-epic-merge-gate-authorization.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-epic-merge-gate-authorization.ps1' }
         try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-epic-merge-gate.ps1' }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         $reason = Get-DenyReason -Result $result
         $reason.StartsWith('EPIC_MERGE_GATE_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
         $reason.Contains('enforce-epic-merge-gate-authorization.ps1') | Should -BeTrue -Because $reason
@@ -184,7 +184,7 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
             }
         }
         finally {
-            Reset-HookDependencyState
+            Initialize-HookDependencyState
             # The real imports above leave duplicate module instances that a later container's -ModuleName mocks would bind to.
             Get-Module | Where-Object { $_.Path -like '*worktree-resolution*' -or $_.Path -like '*orchestrator-state*' } | Remove-Module -Force
         }
@@ -199,7 +199,7 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
         Mock Resolve-ClaudeHookToolInput { [pscustomobject]@{ IsValid = $true; Anomaly = $null; Value = [pscustomobject]@{ file_path = 'docs/sample.md'; content = "``````mermaid`nflowchart TD`n  A -->`n``````" } } }
         # Act
         try { $decision = Invoke-MermaidValidationDecision -ToolInputRaw '{"tool_input":{"file_path":"docs/sample.md"}}' }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         # Assert: the designed fail-open (D2) is unchanged.
         if ($null -ne $decision) { $decision.hookSpecificOutput.permissionDecision | Should -Not -Be 'deny' }
         Should -Invoke Import-Module -ParameterFilter { $Name -like '*MermaidValidation.psm1' } -Times 1
@@ -209,7 +209,7 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
         Mock Import-Module { }
         Mock Import-Module { throw 'simulated load failure: HookPayload.psm1' } -ParameterFilter { $Name -like '*HookPayload.psm1' }
         try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-mermaid-validation.ps1' }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         $reason = Get-DenyReason -Result $result
         $reason.StartsWith('MERMAID_VALIDATION_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
         $reason.Contains('HookPayload.psm1') | Should -BeTrue -Because $reason
@@ -219,7 +219,7 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
         Mock Import-Module { }
         Mock Import-Module { throw 'simulated load failure: HookPayload.psm1' } -ParameterFilter { $Name -like '*HookPayload.psm1' }
         try { $result = Invoke-HookProcess -Hook '.claude/hooks/validate-bash.ps1' }
-        finally { Reset-HookDependencyState }
+        finally { Initialize-HookDependencyState }
         $reason = Get-DenyReason -Result $result
         $reason.StartsWith('HOOK_DEPENDENCY_LOAD_FAILED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
         $reason.Contains('HookPayload.psm1') | Should -BeTrue -Because $reason

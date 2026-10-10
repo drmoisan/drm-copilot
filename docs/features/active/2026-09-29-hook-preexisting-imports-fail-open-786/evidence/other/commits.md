@@ -79,3 +79,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## p10
+
+- Subject: test(786): coverage remediation and comparison evidence (checkpoint commits b83b121f90634cbd9b7e3c1d23eb4a4ffc15f0a1 and e58047fd8a1a96dfd609ee9356d50c6cbcf6f929 precede it)
+- Commit SHA: 11f2aac9d9d60443410d500cebc440dd7e8fe2b3
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
