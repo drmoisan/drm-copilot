@@ -156,7 +156,9 @@ def deliver_destination_gitignore(
 
     destination_path = destination_root / GITIGNORE_RELATIVE_PATH
     entry = (
-        None if manifest is None else find_first_match(manifest, GITIGNORE_RELATIVE_PATH)
+        None
+        if manifest is None
+        else find_first_match(manifest, GITIGNORE_RELATIVE_PATH)
     )
     if entry is not None:
         return SkippedPath(
@@ -165,7 +167,9 @@ def deliver_destination_gitignore(
             line=entry.line,
             destination_status="present" if fs.is_file(destination_path) else "absent",
         )
-    current_text = fs.read_text(destination_path) if fs.is_file(destination_path) else ""
+    current_text = (
+        fs.read_text(destination_path) if fs.is_file(destination_path) else ""
+    )
     merged_text = merge_claude_gitignore(current_text)
     if merged_text != current_text:
         fs.write_text(destination_path, merged_text)
