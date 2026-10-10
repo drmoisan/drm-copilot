@@ -104,7 +104,23 @@ UNKNOWN_FABLE_POLICY = (
     "Parallel planner checkpoint items[0] model_routing_receipt.fable_policy "
     "must be one of disabled, available, preferred; found: 'sometimes'."
 )
-ROUTING_FIELDS = ("complexity_band", "complexity_assessment", "model_routing_receipt")
+ASSESSMENT_BAND_VS_ABSENT = (
+    "Parallel planner checkpoint items[0] complexity_assessment.band 'C3' does "
+    "not equal complexity_band None."
+)
+RECEIPT_BAND_VS_ABSENT = (
+    "Parallel planner checkpoint items[0] model_routing_receipt.complexity_band "
+    "'C3' does not equal complexity_band None."
+)
+RECEIPT_BAND_ABSENT_ENUM = (
+    "Parallel planner checkpoint items[0] model_routing_receipt complexity_band "
+    "must be one of C1, C2, C3, C4; got: None."
+)
+RECEIPT_BAND_ABSENT_VS_ITEM = (
+    "Parallel planner checkpoint items[0] model_routing_receipt.complexity_band "
+    "None does not equal complexity_band 'C3'."
+)
+ROUTING_FIELDS =("complexity_band", "complexity_assessment", "model_routing_receipt")
 
 
 def validate(state: dict[str, object], *, ready: bool) -> list[str]:
@@ -446,3 +462,33 @@ def test_required_item_keys_unchanged() -> None:
 
     # Assert
     assert actual == baseline
+
+
+def test_absent_item_band_with_assessment_and_receipt_present() -> None:
+    """Deleting only the item band yields exactly checks 1, 5, and 9 with None."""
+
+    # Arrange
+    record = build_routing_fields()
+    del record["complexity_band"]
+
+    # Act
+    errors = validate_ready_item_routing(record, CTX)
+
+    # Assert
+    expected = [BAND_ABSENT, ASSESSMENT_BAND_VS_ABSENT, RECEIPT_BAND_VS_ABSENT]
+    assert errors == expected, errors
+
+
+def test_absent_receipt_band_with_item_band_present() -> None:
+    """Deleting only the receipt band reports checks 7 and 9 rendering None."""
+
+    # Arrange
+    record = build_routing_fields()
+    del nested(record, "model_routing_receipt")["complexity_band"]
+
+    # Act
+    errors = validate_ready_item_routing(record, CTX)
+
+    # Assert
+    assert RECEIPT_BAND_ABSENT_ENUM in errors, errors
+    assert RECEIPT_BAND_ABSENT_VS_ITEM in errors, errors

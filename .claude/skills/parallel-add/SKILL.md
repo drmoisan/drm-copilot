@@ -60,6 +60,8 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    clearance, perform the `parallel-plan` skill's `## Complexity Assessment` procedure for it, and
    record the resulting `complexity_band` on the admitted orchestrator-checkpoint item so step 3's
    edge derivation and the parent's model routing read the same band.
+   The admitted item records `complexity_band` and no `model_routing_receipt`; the parent resolves
+   the item's model from that band at spawn time per `parallel-orchestrate` `## Model Selection`.
 
 3. **Compute conflict edges over ALL items, including in-flight ones.** Invoke the scheduling
    entry point Get-BlastRadiusConflictEdge from the destination-runtime PowerShell port
