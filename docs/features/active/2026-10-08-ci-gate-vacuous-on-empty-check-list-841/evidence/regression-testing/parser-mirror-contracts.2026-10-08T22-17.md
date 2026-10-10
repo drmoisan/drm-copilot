@@ -1,6 +1,6 @@
 # Claude Bundle Parity After the Parser Copy (#841, P2-T9 and P2-T10)
 
-Timestamp: 2026-10-10T09-25
+Timestamp: 2026-10-10T09-24
 Command: poetry run pytest -v tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py
 EXIT_CODE: 0
 Output Summary:
