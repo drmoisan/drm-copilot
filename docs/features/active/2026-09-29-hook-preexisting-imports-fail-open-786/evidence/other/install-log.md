@@ -333,3 +333,43 @@ INSTALLED: .claude/hooks/validate-orchestrator-output-resolution.ps1
 SMOKE: .claude/hooks/validate-orchestrator-output.ps1 | pass
 INSTALL-RESULT: OK
 ```
+
+## P10-T1#RS10-1
+
+Timestamp: 2026-10-10T01-27
+
+```text
+INSTALLED: .claude/hooks/enforce-discovery-artifact-gate.ps1
+SMOKE: .claude/hooks/enforce-discovery-artifact-gate.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P10-T1#RS10-2
+
+Timestamp: 2026-10-10T01-27
+
+```text
+INSTALLED: .claude/hooks/enforce-pr-author-skill.ps1
+SMOKE: .claude/hooks/enforce-pr-author-skill.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P10-T1#RS10-3
+
+Timestamp: 2026-10-10T01-27
+
+```text
+INSTALLED: .claude/hooks/validate-discovery-artifact-gate.ps1
+SMOKE: .claude/hooks/validate-discovery-artifact-gate.ps1 | pass
+INSTALL-RESULT: OK
+```
+
+## P10-T1#RS10-4
+
+Timestamp: 2026-10-10T01-27
+
+```text
+INSTALLED: .claude/hooks/validate-orchestrator-output.ps1
+SMOKE: .claude/hooks/validate-orchestrator-output.ps1 | pass
+INSTALL-RESULT: OK
+```

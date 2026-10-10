@@ -675,3 +675,87 @@ Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-orchestrator-output.ps1:<PO
 ```
 SMOKE-RESULT: .claude/hooks/validate-orchestrator-output.ps1 | pass
 
+## P10-T1#RS10-1 | 2026-10-10T01-27
+### pre-install .claude/hooks/enforce-discovery-artifact-gate.ps1
+SMOKE-CAPTURE: .claude/hooks/enforce-discovery-artifact-gate.ps1 | exit=0 | parse_errors=0
+```stdout
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow"}}
+
+```
+```stderr
+
+```
+### post-install .claude/hooks/enforce-discovery-artifact-gate.ps1
+SMOKE-CAPTURE: .claude/hooks/enforce-discovery-artifact-gate.ps1 | exit=0 | parse_errors=0
+```stdout
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow"}}
+
+```
+```stderr
+
+```
+SMOKE-RESULT: .claude/hooks/enforce-discovery-artifact-gate.ps1 | pass
+
+## P10-T1#RS10-2 | 2026-10-10T01-27
+### pre-install .claude/hooks/enforce-pr-author-skill.ps1
+SMOKE-CAPTURE: .claude/hooks/enforce-pr-author-skill.ps1 | exit=0 | parse_errors=0
+```stdout
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow"}}
+
+```
+```stderr
+
+```
+### post-install .claude/hooks/enforce-pr-author-skill.ps1
+SMOKE-CAPTURE: .claude/hooks/enforce-pr-author-skill.ps1 | exit=0 | parse_errors=0
+```stdout
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow"}}
+
+```
+```stderr
+
+```
+SMOKE-RESULT: .claude/hooks/enforce-pr-author-skill.ps1 | pass
+
+## P10-T1#RS10-3 | 2026-10-10T01-27
+### pre-install .claude/hooks/validate-discovery-artifact-gate.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-discovery-artifact-gate.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: discovery artifact gate hook: CLAUDE_HOOK_INPUT is empty
+
+```
+### post-install .claude/hooks/validate-discovery-artifact-gate.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-discovery-artifact-gate.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: discovery artifact gate hook: CLAUDE_HOOK_INPUT is empty
+
+```
+SMOKE-RESULT: .claude/hooks/validate-discovery-artifact-gate.ps1 | pass
+
+## P10-T1#RS10-4 | 2026-10-10T01-27
+### pre-install .claude/hooks/validate-orchestrator-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-orchestrator-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-orchestrator-output.ps1:<POS>
+
+```
+### post-install .claude/hooks/validate-orchestrator-output.ps1
+SMOKE-CAPTURE: .claude/hooks/validate-orchestrator-output.ps1 | exit=1 | parse_errors=0
+```stdout
+
+```
+```stderr
+Write-Error: <WORKSPACE_ROOT>\.claude\hooks\validate-orchestrator-output.ps1:<POS>
+
+```
+SMOKE-RESULT: .claude/hooks/validate-orchestrator-output.ps1 | pass
+

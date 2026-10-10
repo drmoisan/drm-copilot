@@ -167,8 +167,8 @@ try { . (Join-Path $PSScriptRoot 'enforce-pr-author-skill.epic-base-branch.ps1')
 # Dot-source the receipt-verification and bypass-reason helpers. Guarded so dot-sourcing this
 # hook in tests loads the helpers too (issue #501 headroom split).
 try { . (Join-Path $PSScriptRoot 'enforce-pr-author-skill-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-pr-author-skill-helpers.ps1' -ErrorRecord $_ }
-try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
-try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
 
 function Invoke-PrAuthorSkillDecision {
     <#

@@ -71,3 +71,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## p9
+
+- Subject: docs(786): structural, exemption-guard, and constraint verification evidence
+- Commit SHA: 00fb79b9d1c0e6f2148312deeb114f8658bd90d4
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
