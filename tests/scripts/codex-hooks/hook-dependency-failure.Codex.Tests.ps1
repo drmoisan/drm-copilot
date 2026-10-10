@@ -133,8 +133,12 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
     It 'B1: <Event> <Hook> blocks naming <Dependency> when that direct edge fails' -ForEach $script:EdgeRows {
         # Arrange: fail only this edge.
         Mock Import-Module { }
-        if ($Kind -eq 'Module') { Mock Import-Module ([scriptblock]::Create("throw 'simulated load failure: $Dependency'")) -ParameterFilter ([scriptblock]::Create("`$Name -like '*$Dependency'")) }
-        else { Mock Join-Path ([scriptblock]::Create("throw 'simulated load failure: $Dependency'")) -ParameterFilter ([scriptblock]::Create("`$ChildPath -eq '$ChildPath'")) }
+        # The mock bodies are literal scriptblocks that read the row through these locals; scriptblocks built with
+        # [scriptblock]::Create stop the coverage tracer from recording later containers in a full run.
+        $failedDependency = $Dependency
+        $failedChildPath = $ChildPath
+        if ($Kind -eq 'Module') { Mock Import-Module { throw "simulated load failure: $failedDependency" } -ParameterFilter { $Name -like "*$failedDependency" } }
+        else { Mock Join-Path { throw "simulated load failure: $failedDependency" } -ParameterFilter { $ChildPath -eq $failedChildPath } }
         # Act
         try { $result = Invoke-HookProcess -Hook $Hook -HookEvent $Event }
         finally { Reset-HookDependencyState }
