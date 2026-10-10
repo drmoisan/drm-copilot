@@ -2,6 +2,7 @@ import { describe, expect, it } from "@jest/globals";
 
 import { resolveCodexTopology } from "../../../src/lib/validate/codex-topology-resolver";
 import { validateEpicPlannerStateText } from "../../../src/lib/validate/epic-planner-state-core";
+import type { ValidateEpicPlannerStateOptions } from "../../../src/lib/validate/epic-planner-state-core";
 
 function topologyReceipt(
   rootPersona?: "epic-planner",
@@ -80,6 +81,21 @@ function readyState(): Record<string, unknown> {
     topology_receipt: topologyReceipt("epic-planner"),
   };
 }
+
+type CodexFlags = Pick<
+  ValidateEpicPlannerStateOptions,
+  "requireCodexModelRouting" | "requireCodexTopology"
+>;
+
+const codexFlagCases: readonly CodexFlags[] = [
+  { requireCodexModelRouting: true },
+  { requireCodexTopology: true },
+];
+
+const validReceiptCases: readonly CodexFlags[] = [
+  {},
+  { requireCodexTopology: true },
+];
 
 describe("validateEpicPlannerStateText", () => {
   it("accepts a fully prepared multi-feature epic", () => {
@@ -357,6 +373,54 @@ describe("validateEpicPlannerStateText", () => {
       errors.filter((error) => error.includes("Epic planner topology_receipt")),
     ).toEqual([]);
   });
+
+  it.each(codexFlagCases)(
+    "keeps the planner topology receipt unconditional under %p",
+    (flags) => {
+      const state = readyState();
+      delete state["topology_receipt"];
+
+      const errors = validateEpicPlannerStateText(JSON.stringify(state), {
+        requireReadyForExecution: true,
+        ...flags,
+      });
+
+      expect(errors).toContain(
+        "Epic planner topology_receipt must be an object.",
+      );
+    },
+  );
+
+  it("validates a present null planner topology receipt without a Codex flag", () => {
+    const state = readyState();
+    state["topology_receipt"] = null;
+
+    const errors = validateEpicPlannerStateText(JSON.stringify(state), {
+      requireReadyForExecution: true,
+    });
+
+    expect(errors).toContain(
+      "Epic planner topology_receipt must be an object.",
+    );
+  });
+
+  it.each(validReceiptCases)(
+    "accepts a present valid planner topology receipt under %p",
+    (flags) => {
+      const state = readyState();
+
+      const errors = validateEpicPlannerStateText(JSON.stringify(state), {
+        requireReadyForExecution: true,
+        ...flags,
+      });
+
+      expect(
+        errors.filter((error) =>
+          error.includes("Epic planner topology_receipt"),
+        ),
+      ).toEqual([]);
+    },
+  );
 
   it("requires each prepared child to route through an orchestrator", () => {
     const state = readyState();
