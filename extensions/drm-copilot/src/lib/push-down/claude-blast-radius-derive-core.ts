@@ -44,10 +44,8 @@
  *     None.
  */
 
-import {
-  classifyProjectDirectories,
-  compareOrdinal,
-} from "./claude-blast-radius-derive-manifests";
+import { compareCodePoint } from "../string-ordering";
+import { classifyProjectDirectories } from "./claude-blast-radius-derive-manifests";
 import type { DirectoryObservation } from "./claude-blast-radius-derive-manifests";
 
 export {
@@ -246,7 +244,7 @@ function topLevelDirectories(
       names.push(relativePath);
     }
   }
-  return names.sort(compareOrdinal);
+  return names.sort(compareCodePoint);
 }
 
 /**
@@ -273,7 +271,7 @@ function assembleModules(
   const modules: Record<string, string[]> = {};
   // Insertion order determines the serialized key order, so the names are
   // sorted before insertion rather than after.
-  for (const name of [...combined.keys()].sort(compareOrdinal)) {
+  for (const name of [...combined.keys()].sort(compareCodePoint)) {
     const globs = combined.get(name);
     if (globs !== undefined) {
       modules[name] = globs;
