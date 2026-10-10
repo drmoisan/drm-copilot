@@ -13,6 +13,7 @@
  */
 
 import { toPosixPath } from "../file-system";
+import { compareCodePoint } from "../string-ordering";
 import {
   type SemanticCue,
   type SourceSection,
@@ -255,9 +256,7 @@ export function sourceArtifactToJson(
 ): Record<string, unknown> {
   const sortedFrontmatter: Record<string, string> = {};
   // Sort frontmatter keys to match Python `dict(sorted(...))` determinism.
-  for (const key of Object.keys(artifact.frontmatter).sort((left, right) =>
-    left < right ? -1 : left > right ? 1 : 0,
-  )) {
+  for (const key of Object.keys(artifact.frontmatter).sort(compareCodePoint)) {
     sortedFrontmatter[key] = artifact.frontmatter[key] as string;
   }
   return {

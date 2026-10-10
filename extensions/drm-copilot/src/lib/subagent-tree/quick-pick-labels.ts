@@ -14,6 +14,8 @@
  *     Operates on plain strings only; performs no filesystem access.
  */
 
+import { compareCodePoint } from "../string-ordering";
+
 /** Maximum length of the right-anchored path label shown in a quick-pick entry. */
 export const MAX_PATH_LABEL_LENGTH = 60;
 
@@ -129,5 +131,5 @@ function compareCandidates(
     }
     return rightMs - leftMs;
   }
-  return left.path < right.path ? -1 : left.path > right.path ? 1 : 0;
+  return compareCodePoint(left.path, right.path);
 }
