@@ -296,28 +296,28 @@ Substring asserted absent in both runtimes: `Epic planner topology_receipt` (it 
 
 Loop rule: run P7-T1 through P7-T8 in order. If any stage fails or changes any file, fix the cause, record the restart in `docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/evidence/qa-gates/loop-restarts.<ts>.md`, and restart at P7-T1, incrementing `Loop iteration:` in every Phase 7 artifact. Every task is unconditional; `SKIPPED` is not a valid outcome.
 
-- [ ] [P7-T1] Python stage 1, formatting: run `poetry run black --check scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state.py`.
+- [x] [P7-T1] Python stage 1, formatting: run `poetry run black --check scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state.py`.
   - Acceptance: `docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/evidence/qa-gates/final-python-format.<ts>.md` exists with the four fields and `Loop iteration:`; `EXIT_CODE: 0` and the output contains `2 files would be left unchanged.` with no `would reformat` line. If the check fails, run `poetry run black scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state.py`, record its `reformatted <path>` lines and its closing summary (`N file(s) reformatted, M file(s) left unchanged`), and restart the loop.
 
-- [ ] [P7-T2] Python stage 2, linting: run `poetry run ruff check scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state.py`.
+- [x] [P7-T2] Python stage 2, linting: run `poetry run ruff check scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state.py`.
   - Acceptance: `docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/evidence/qa-gates/final-python-lint.<ts>.md` exists with the four fields; `EXIT_CODE: 0` and the output is `All checks passed!`. Any suppression must match `.claude/rules/python-suppressions.md`.
 
-- [ ] [P7-T3] Python stage 3, type checking: run `poetry run pyright scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state.py`.
+- [x] [P7-T3] Python stage 3, type checking: run `poetry run pyright scripts/dev_tools/validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state.py`.
   - Acceptance: `docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/evidence/qa-gates/final-python-typecheck.<ts>.md` exists with the four fields; `EXIT_CODE: 0` and the summary line `0 errors, 0 warnings, 0 informations`.
 
-- [ ] [P7-T4] Python stage 4, architecture boundaries: re-run the P0-T16 commands.
+- [x] [P7-T4] Python stage 4, architecture boundaries: re-run the P0-T16 commands.
   - Acceptance: `docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/evidence/qa-gates/final-python-architecture.<ts>.md` exists with the four fields and an `Output Summary:` identical in substance to P0-T16. When P0-T16 found a configured tool, this task runs it and requires zero violations.
 
-- [ ] [P7-T5] Python stage 5, unit tests with coverage: run `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --deselect tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` from the worktree root (same selection as P0-T10).
+- [x] [P7-T5] Python stage 5, unit tests with coverage: run `poetry run pytest --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --deselect tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` from the worktree root (same selection as P0-T10).
   - Acceptance: `docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/evidence/qa-gates/final-python-test-coverage.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording the result line (0 failed, 1 deselected, citing #510; passed count equal to the P0-T10 passed count plus 6, the new parametrized cases from P1-T2 and P4-T1 through P4-T3), the `TOTAL` row verbatim, and the `term-missing` row for `scripts/dev_tools/validate_epic_planner_state.py` including its `Missing` cell.
 
-- [ ] [P7-T6] Python per-file coverage: immediately after P7-T5, run `poetry run coverage json --data-file=artifacts/.coverage --include="*validate_epic_planner_state.py" --pretty-print -o artifacts/python/coverage-543-topology-final.json` and read the JSON.
+- [x] [P7-T6] Python per-file coverage: immediately after P7-T5, run `poetry run coverage json --data-file=artifacts/.coverage --include="*validate_epic_planner_state.py" --pretty-print -o artifacts/python/coverage-543-topology-final.json` and read the JSON.
   - Acceptance: `docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/evidence/qa-gates/final-python-per-file-coverage.<ts>.md` exists with the four fields and an `Output Summary:` recording `covered_lines`/`num_statements` and `covered_branches`/`num_branches` from `files[<key>].summary` with two-decimal percentages, and the `missing_lines` and `missing_branches` lists. The file shows at least 85.00% line coverage and at least 75.00% branch coverage. A shortfall requires added tests in `tests/scripts/dev_tools/test_validate_epic_planner_state.py` and a loop restart at P7-T1.
 
-- [ ] [P7-T7] Python stage 6, contract/schema compatibility: run `git diff MERGE_BASE_SHA --stat -- scripts/dev_tools/validate_orchestration_artifacts.py`, `git status --porcelain -- scripts/dev_tools/validate_orchestration_artifacts.py`, and `git diff -U0 MERGE_BASE_SHA -- scripts/dev_tools/validate_epic_planner_state.py | grep -c -e '^[-+]def '`.
+- [x] [P7-T7] Python stage 6, contract/schema compatibility: run `git diff MERGE_BASE_SHA --stat -- scripts/dev_tools/validate_orchestration_artifacts.py`, `git status --porcelain -- scripts/dev_tools/validate_orchestration_artifacts.py`, and `git diff -U0 MERGE_BASE_SHA -- scripts/dev_tools/validate_epic_planner_state.py | grep -c -e '^[-+]def '`.
   - Acceptance: `docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/evidence/qa-gates/final-python-contract.<ts>.md` exists with the four fields (SHA substituted); the first two commands print nothing (Python CLI unchanged) and the third prints `0` (exit 1, its stated expectation), confirming no function signature in `scripts/dev_tools/validate_epic_planner_state.py` was added, removed, or changed.
 
-- [ ] [P7-T8] Python stage 7, integration: re-run the P6-T1 command.
+- [x] [P7-T8] Python stage 7, integration: re-run the P6-T1 command.
   - Acceptance: `docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/evidence/qa-gates/final-python-integration.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording the result line with 0 failed.
 
 ### Phase 8 — TypeScript final QA loop (seven stages)
