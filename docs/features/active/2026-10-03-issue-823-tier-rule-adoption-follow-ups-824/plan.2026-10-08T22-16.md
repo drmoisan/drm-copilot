@@ -225,22 +225,22 @@ Each task writes FEATURE/evidence/other/p3-tN.TS.md unless it names another arti
 
 Each task writes FEATURE/evidence/other/p4-tN.TS.md.
 
-- [ ] [P4-T1] Update `.claude/rules/architecture-boundaries.md` by HAP with patch `p03-rule-architecture.patch` (canonical-policy edit authorized by PD1).
+- [x] [P4-T1] Update `.claude/rules/architecture-boundaries.md` by HAP with patch `p03-rule-architecture.patch` (canonical-policy edit authorized by PD1).
       Commands: the five HAP commands of Appendix A for this path; `grep -c -F "Host-Neutral Architecture Rules" .claude/rules/architecture-boundaries.md`; `grep -c -F "Outlook PIA" .claude/rules/architecture-boundaries.md`; `grep -c -E "TaskMaster|No-COM" .claude/rules/architecture-boundaries.md`.
       Acceptance: HAP acceptance holds; the heading grep prints 1; the substance grep prints 1 or more (rule substance kept); the name grep prints 0 (`EXIT_CODE: 1`, `ExpectedExitCode: 1`).
-- [ ] [P4-T2] Update `.agents/skills/architecture-boundaries/SKILL.md` by HAP with patch `p09-agents-architecture.patch`.
+- [x] [P4-T2] Update `.agents/skills/architecture-boundaries/SKILL.md` by HAP with patch `p09-agents-architecture.patch`.
       Commands: the five HAP commands of Appendix A for this path; `grep -c -F "Host-Neutral Architecture Rules" .agents/skills/architecture-boundaries/SKILL.md`; `grep -c -F "Outlook PIA" .agents/skills/architecture-boundaries/SKILL.md`; `grep -c -E "TaskMaster|No-COM" .agents/skills/architecture-boundaries/SKILL.md`.
       Acceptance: as P4-T1 (`EXIT_CODE: 1`, `ExpectedExitCode: 1`).
-- [ ] [P4-T3] Update `.claude/skills/quota-throttling/SKILL.md` by HAP with patch `p08-skill-quota-throttling.patch`.
+- [x] [P4-T3] Update `.claude/skills/quota-throttling/SKILL.md` by HAP with patch `p08-skill-quota-throttling.patch`.
       Commands: the five HAP commands of Appendix A for this path; `grep -c -F "consumer-repository runs" .claude/skills/quota-throttling/SKILL.md`; `grep -c -E "TaskMaster|No-COM" .claude/skills/quota-throttling/SKILL.md`.
       Acceptance: HAP acceptance holds; the first grep prints 1; the second prints 0 (`EXIT_CODE: 1`, `ExpectedExitCode: 1`).
-- [ ] [P4-T4] Update `extensions/drm-copilot/resources/claude-customizations/.claude/rules/architecture-boundaries.md` by byte copy from `.claude/rules/architecture-boundaries.md`.
+- [x] [P4-T4] Update `extensions/drm-copilot/resources/claude-customizations/.claude/rules/architecture-boundaries.md` by byte copy from `.claude/rules/architecture-boundaries.md`.
       Commands: `cp .claude/rules/architecture-boundaries.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/architecture-boundaries.md`; `git diff --no-index --exit-code .claude/rules/architecture-boundaries.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/architecture-boundaries.md`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/rules/architecture-boundaries.md`.
       Acceptance: `cp` exits 0; the diff exits 0 with no output; the status line shows ` M`.
-- [ ] [P4-T5] Update `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/architecture-boundaries/SKILL.md` by byte copy from `.agents/skills/architecture-boundaries/SKILL.md`.
+- [x] [P4-T5] Update `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/architecture-boundaries/SKILL.md` by byte copy from `.agents/skills/architecture-boundaries/SKILL.md`.
       Commands: `cp .agents/skills/architecture-boundaries/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/architecture-boundaries/SKILL.md`; `git diff --no-index --exit-code .agents/skills/architecture-boundaries/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/architecture-boundaries/SKILL.md`; `git status --porcelain -- extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/architecture-boundaries/SKILL.md`.
       Acceptance: `cp` exits 0; the diff exits 0 with no output; the status line shows ` M`.
-- [ ] [P4-T6] Update `extensions/drm-copilot/resources/claude-customizations/.claude/skills/quota-throttling/SKILL.md` by byte copy from `.claude/skills/quota-throttling/SKILL.md`.
+- [x] [P4-T6] Update `extensions/drm-copilot/resources/claude-customizations/.claude/skills/quota-throttling/SKILL.md` by byte copy from `.claude/skills/quota-throttling/SKILL.md`.
       Commands: `cp .claude/skills/quota-throttling/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/quota-throttling/SKILL.md`; `git diff --no-index --exit-code .claude/skills/quota-throttling/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/quota-throttling/SKILL.md`; `git status --porcelain -- extensions/drm-copilot/resources/claude-customizations/.claude/skills/quota-throttling/SKILL.md`.
       Acceptance: `cp` exits 0; the diff exits 0 with no output; the status line shows ` M`.
 
