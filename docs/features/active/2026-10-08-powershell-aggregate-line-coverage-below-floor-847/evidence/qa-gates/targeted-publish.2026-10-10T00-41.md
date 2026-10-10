@@ -23,9 +23,12 @@ Output Summary:
   - AC06-PUBLISH-VSIX-MISSING-THROWS hits=1 PASS
   - AC06-PUBLISH-CODECOMMAND-NOTFOUND-THROWS hits=1 PASS
 - Derived EXIT_CODE per P1-T3 rule: 0 for the pass/fail part (failures=0, errors=0).
-- CRP per-file `scripts/dev-tools/SideloadedExtensionPublish.psm1`: PENDING CI.
-- (information only) CRP per-file `scripts/dev-tools/vscode-cli.helpers.ps1`: PENDING CI.
-- This task stays unchecked until the orchestrator-supplied CI coverage XML yields a passing CRP row (>= 85%) for `SideloadedExtensionPublish.psm1`.
+- Coverage source (amendment route): CI run 38010605885 (`workflow_dispatch` of `_poshqc.yml` on head `e0a6cd13aa95e7ec40254906c78391ecd55b4a5e`, the pushed Phase 4 head; checkout commit confirmed in `artifacts/ci/run-38010605885/poshqc-job.log`), job `PowerShell QC` 114089470639, conclusion success. Artifact downloaded to `artifacts/ci/run-38010605885/` (`powershell-coverage.xml`, `pester-junit.xml`, `poshqc-job.log`); CRP/JRP reduction recorded in `artifacts/ci/run-38010605885/reduction.txt` (ROOT `D:/a/drm-copilot/drm-copilot`).
+- CRP per-file `scripts/dev-tools/SideloadedExtensionPublish.psm1`: covered=135 missed=4 total=139 pct=97.12 required=119 gap=0 -> PASS (100*135 >= 85*139).
+- (information only) CRP per-file `scripts/dev-tools/vscode-cli.helpers.ps1`: covered=15 missed=12 total=27 pct=55.56 (not gated; excluded path, unchanged by this plan).
+- CI JRP cross-check (same run): `SideloadedExtensionPublish.Tests.ps1` cases=27 notPassed=0 PASS; `SideloadedExtensionPublish.Invoke.Tests.ps1` cases=13 notPassed=0 PASS; the eight Phase 4 tokens PASS; whole-run tests=6700 failures=0 errors=0 disabled=10.
+- CI analyzer: `poshqc-job.log` line 843 `PSScriptAnalyzer passed: no findings under D:\a\drm-copilot\drm-copilot`.
+- Verdict (completed 2026-10-10T01-18): PASS. Derived EXIT_CODE 0; JRP steps 2-3 pass for both files; JRP step 4 passes for the eight Phase 4 tokens; CRP per-file passes for `SideloadedExtensionPublish.psm1`.
 
 ## Notes
 

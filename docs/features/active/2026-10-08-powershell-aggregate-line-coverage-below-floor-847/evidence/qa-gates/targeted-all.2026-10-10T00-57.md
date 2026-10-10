@@ -56,9 +56,19 @@ Output Summary:
   - AC06-PUBLISH-VSIX-MISSING-THROWS hits=1 PASS
   - AC06-PUBLISH-CODECOMMAND-NOTFOUND-THROWS hits=1 PASS
 - Derived EXIT_CODE per P1-T3 rule: 0 for the pass/fail part (failures=0, errors=0).
-- CRP per-file for the eight PROD8 files (`HostTooling.psm1`, `HostBootstrapWorkspace.psm1`, `HostBootstrap.psm1`, `HostVerification.psm1`, `SideloadedExtensionPublish.psm1`, `bootstrap-host.ps1`, `verify-host.ps1`, `publish-sideloaded-extension.ps1`): PENDING CI.
-- (information) CRP row `vscode-cli.helpers.ps1`: PENDING CI.
-- This task stays unchecked until the orchestrator-supplied CI coverage XML for the pushed Phase 5 head yields passing CRP rows (>= 85%) for all eight PROD8 files.
+- Coverage source (amendment route): CI run 38011932558 (`workflow_dispatch` of `_poshqc.yml` on head `1c3d1a4c6d0cc741081f45511c3ab6c5adf2d184`, which contains the Phase 5 commit `19d151f98` plus only the Phase 6 docs commit; checkout commit confirmed in `artifacts/ci/run-38011932558/poshqc-job.log`), job `PowerShell QC` 114093650487, conclusion success. Artifact downloaded to `artifacts/ci/run-38011932558/`; reduction in `artifacts/ci/run-38011932558/reduction.txt` (ROOT `D:/a/drm-copilot/drm-copilot`).
+- CRP per-file (D = `scripts/dev-tools`):
+  - `HostTooling.psm1` covered=36 missed=2 total=38 pct=94.74 -> PASS
+  - `HostBootstrapWorkspace.psm1` covered=70 missed=0 total=70 pct=100.0 -> PASS
+  - `HostBootstrap.psm1` covered=155 missed=0 total=155 pct=100.0 -> PASS
+  - `HostVerification.psm1` covered=149 missed=0 total=149 pct=100.0 -> PASS
+  - `SideloadedExtensionPublish.psm1` covered=136 missed=3 total=139 pct=97.84 -> PASS
+  - `bootstrap-host.ps1` covered=7 missed=0 total=7 pct=100.0 -> PASS
+  - `verify-host.ps1` covered=7 missed=0 total=7 pct=100.0 -> PASS
+  - `publish-sideloaded-extension.ps1` covered=24 missed=0 total=24 pct=100.0 -> PASS
+- (information) CRP row `vscode-cli.helpers.ps1`: covered=15 missed=12 total=27 pct=55.56 (not gated; excluded path).
+- CI JRP cross-check (same run): all eleven TEST11 suites PASS with the case counts listed above; all 32 tokens PASS; whole-run tests=6709 failures=0 errors=0 disabled=10.
+- Verdict (completed 2026-10-10T01-18): PASS. Derived EXIT_CODE 0; JRP steps 2-3 pass for all eleven files; JRP step 4 passes for all 32 tokens; CRP per-file passes for each PROD8 file. AC-03 is decided by P7-T5.
 
 ## Notes
 
