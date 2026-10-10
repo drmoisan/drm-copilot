@@ -274,7 +274,7 @@ The object has the shape `{ issue_num, issue_url, origin, verified_via, verified
 | `verified_at` | Present, not `null`, and not a blank string. |
 | `evidence` | A string with non-whitespace content. |
 | `waived_tools` | A non-empty list of non-blank tool names that includes `potential_to_issue`. |
-| `potential_record` | Required when waiving a promotion-entry tool: a path under `docs/features/potential/` ending in `.md`. |
+| `potential_record` | When waiving a promotion-entry tool: required when `origin` is `epic_decomposition`, optional when `origin` is `transferred` or `filed_before_orchestration`, and validated whenever it is present (a path under `docs/features/potential/` ending in `.md`). |
 
 The rules run in this order, and their errors accumulate:
 
@@ -286,9 +286,11 @@ The rules run in this order, and their errors accumulate:
 6. `verified_at` must be present: absent, `null`, and blank strings are rejected; any other value passes.
 7. `evidence` must be a non-empty string.
 8. `waived_tools` must be a non-empty list of non-blank strings; otherwise no further rule-8 or rule-9 check runs. Each entry, in list order, receives the first applicable error of: listed more than once; not in the closed waivable set; not required by the selected route after promotion-type resolution; already holding a successful MCP receipt. The list must include `potential_to_issue`.
-9. Only when the rule-8 shape check passed: each distinct waived promotion-entry tool (`new_potential_entry` or `new_potential_bug_entry`) requires a valid `potential_record`.
+9. Only when the rule-8 shape check passed: each distinct waived promotion-entry tool (`new_potential_entry` or `new_potential_bug_entry`) requires a valid `potential_record`, except that rule 9 reports nothing when `origin` is `transferred` or `filed_before_orchestration` and the `potential_record` key is absent. A present `potential_record`, including `null`, is always validated.
 
 The closed waivable set is `potential_to_issue`, `new_potential_entry`, and `new_potential_bug_entry`. `new_active_feature_folder`, `collect_pr_context`, `validate_orchestration_artifacts`, and every other tool can never be waived. All comparisons are ordinal and case-sensitive.
+
+A lifecycle record moved to `docs/features/potential/promoted/` satisfies the `potential_record` path rule, because the rule checks only the `docs/features/potential/` prefix and the `.md` suffix and does not check that the file exists.
 
 Fail-closed behavior: any adoption error waives nothing, so each missing receipt is still reported as `Checkpoint missing successful MCP receipt: <tool>.`. Adoption errors are placed after the receipt-loop errors and before the `local_execution_overrides` errors. The waiver affects only receipt presence: the declared `required_mcp_tools` equality check with the routing matrix is unchanged, so a checkpoint must still declare every route tool it waives.
 

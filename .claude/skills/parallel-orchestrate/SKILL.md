@@ -256,6 +256,14 @@ carries exactly these five elements.
    execution from that plan rather than re-running promotion, research, or planning. The item's
    prepared feature folder and approved atomic plan are already committed and preflight-clear on the
    item's own pushed feature branch.
+   The execution child starts a new checkpoint in its own worktree, and the preparation checkpoint
+   does not carry over, so the prompt also instructs the child to verify the item's GitHub issue
+   read-only (gh issue view), not to call `potential_to_issue` or the promotion-entry tool, and to
+   record its own top-level `issue_adoption` object per `.claude/rules/orchestrator-state.md`,
+   with origin `filed_before_orchestration` unless the issue was transferred, waiving
+   `potential_to_issue` and the promotion-entry tool for the checkpoint's promotion-type. When a
+   lifecycle record for the item exists under `docs/features/potential/promoted/`, the child cites
+   it as `potential_record`.
 5. The model-budget marker line `model_budget.fable_policy: <disabled|available|preferred>.`
 
 Spawn parameters, passed on the `Agent` call and never written into the prompt text:
