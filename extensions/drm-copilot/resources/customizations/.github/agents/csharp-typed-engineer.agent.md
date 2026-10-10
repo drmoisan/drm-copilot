@@ -170,8 +170,8 @@ If any gate fails, revert/fix immediately before proceeding.
 Run the repo-standard C# toolchain in this order:
 
 1) **Format**: `csharpier .`
-2) **Analyze/Lint build**: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
-3) **Type-safe nullable build**: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+2) **Analyze/Lint build**: `msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+3) **Type-safe nullable build**: `msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:Nullable=enable /p:TreatWarningsAsErrors=true`
 4) **Test with coverage**: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
 
 If tools cannot run in the environment, STOP implementation and provide plan + proposed diffs marked **unverified**.
