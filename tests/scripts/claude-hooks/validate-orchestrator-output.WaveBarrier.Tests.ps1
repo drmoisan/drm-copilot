@@ -245,5 +245,6 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
         # Assert
         $result.ExitCode | Should -Be 2 -Because $result.Reason
         $result.Reason.Contains('OrchestratorStateEpicWaveBarrier.psm1') | Should -BeTrue -Because $result.Reason
+        $result.Reason.StartsWith('ORCHESTRATOR_CHECKPOINT_UNRESOLVED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Reason
     }
 }

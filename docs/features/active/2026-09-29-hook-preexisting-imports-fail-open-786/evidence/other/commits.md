@@ -145,3 +145,13 @@
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
 - Note: operator rule (commit and push at every phase boundary); not a plan R-COMMIT task.
+
+## r1-p3
+
+- Subject: docs(786): record the AC-24 decision and per-surface coverage
+- Commit SHA: 6f79aec63000fc04681b565659ab30a43bd5fc4f
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
+- git diff --name-only df0965aeaa8a3905fe4966fcbb4b49143d566941 HEAD -- .claude/hooks .claude/lib .codex tests scripts config: (no output)
+- git status --porcelain -- .claude/hooks .claude/lib .codex tests scripts config: (no output)
