@@ -108,21 +108,21 @@ Tool output that is not a repository file: `extensions/drm-copilot/coverage/lcov
 
 Phase 3 writes no evidence artifact, because an artifact written after a commit would itself be uncommitted. Its outcomes are reported in the executor's return message. Before P3-T1, tick the checkboxes of P0-T1 through P2-T3 in this plan.
 
-- [ ] [P3-T1] Stage the feature folder.
+- [x] [P3-T1] Stage the feature folder.
       Commands: `git add -- docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543`; `git diff --cached --name-only -- . ":(exclude)docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543"`; `git status --porcelain --untracked-files=all`.
       Acceptance: all three commands exit 0. The second command prints nothing, so no staged path lies outside the feature folder. The third command prints only paths under the feature folder (the new evidence artifacts, this plan, and any review artifacts of the same cycle). A staged path outside the feature folder stops the plan.
-- [ ] [P3-T2] Commit the staged set with a single commit.
+- [x] [P3-T2] Commit the staged set with a single commit.
       Command: `git commit -m "docs(543): record TypeScript lcov coverage evidence for PA-1"`, with the commit-message trailers required by the session attribution instruction appended.
       Acceptance: exit 0 and the output names one new commit. The commit is made with no `--amend`, no `--no-verify`, and no history rewrite.
-- [ ] [P3-T3] Push the branch without force.
+- [x] [P3-T3] Push the branch without force.
       Command: `git push origin bug/epic-planner-topology-receipt-gate-543`.
       Acceptance: exit 0. The command carries no `--force`, no `--force-with-lease`, and no `+` refspec, and no rebase is run at any point. A rejected push (non-fast-forward) stops the plan and is reported to the caller for a decision; the executor does not rebase or force to resolve it.
-- [ ] [P3-T4] Verify the remote head equals the local head.
+- [x] [P3-T4] Verify the remote head equals the local head.
       Commands: `git ls-remote origin refs/heads/bug/epic-planner-topology-receipt-gate-543`; `git rev-parse HEAD`.
       Acceptance: both commands exit 0, and the commit id at the start of the `ls-remote` line equals the `rev-parse` value. A mismatch stops the plan.
-- [ ] [P3-T5] Verify the committed range since BASE-SHA touches only the feature folder.
+- [x] [P3-T5] Verify the committed range since BASE-SHA touches only the feature folder.
       Commands: `git diff --name-only e7612e93a4e88f68eadae6ee9e34ead251c82872 HEAD -- . ":(exclude)docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543"`; `git status --porcelain --untracked-files=all`.
       Acceptance: both commands exit 0. The diff command prints nothing, so the committed range touches only the feature folder, which is the re-review condition in `remediation-inputs.2026-10-10T08-29.md`. The status command prints nothing or prints only the modified path of this plan file (the P3 checkbox ticks made after the commit); any other path stops the plan.
-- [ ] [P3-T6] Tick P3-T1 through P3-T6 in this plan, then commit and push that single file, only if the P3-T5 status command printed the plan path.
+- [x] [P3-T6] Tick P3-T1 through P3-T6 in this plan, then commit and push that single file, only if the P3-T5 status command printed the plan path.
       Commands: `git add -- docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/remediation-plan.2026-10-10T08-29.md`; `git commit -m "docs(543): record remediation plan completion state"`, with the same trailers as P3-T2; `git push origin bug/epic-planner-topology-receipt-gate-543`; `git status --porcelain --untracked-files=all`.
       Acceptance: all four commands exit 0 and the final status command prints nothing, with no force and no rebase. If the P3-T5 status command printed nothing, this task is satisfied by ticking its checkbox after confirming that status is empty.
