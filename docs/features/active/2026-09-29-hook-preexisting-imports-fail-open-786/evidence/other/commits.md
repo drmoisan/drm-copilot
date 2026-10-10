@@ -136,3 +136,12 @@
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
 - Follow-up: this record is committed alone (subject docs(786): record remediation cycle 1 halt commit) because the halt leaves no later phase R-COMMIT; operator rule: commit and push at any pause.
+
+## r1-p2 (phase boundary, [P2-T11])
+
+- Subject: docs(786): record the AC-24 decision and close remediation cycle 1
+- Commit SHA: ef2e3020e99f0030e366758c13080715f8ae81dd
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
+- Note: operator rule (commit and push at every phase boundary); not a plan R-COMMIT task.

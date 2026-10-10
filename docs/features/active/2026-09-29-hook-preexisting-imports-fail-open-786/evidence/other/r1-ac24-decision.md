@@ -35,3 +35,11 @@ CHECK: t-set-figures | pass | count=6
 CHECK: operator-decision-resolved | pass | count=1
 VERIFY-RESULT: pass
 ```
+
+## Phase 3 skip branch
+
+NOT-RUN: [P3-T1] | not run: measurement artifact (orchestrator decision)
+NOT-RUN: [P3-T2] | not run: measurement artifact (orchestrator decision)
+NOT-RUN: [P3-T3] | not run: measurement artifact (orchestrator decision)
+NOT-RUN: [P3-T4] | not run: measurement artifact (orchestrator decision)
+NOT-RUN: [P3-T5] | not run: measurement artifact (orchestrator decision)
