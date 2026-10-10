@@ -232,19 +232,19 @@ Substring asserted absent in both runtimes: `Epic planner topology_receipt` (it 
 
 ### Phase 4 — Python tests for the remaining matrix rows
 
-- [ ] [P4-T1] Add `test_codex_flag_keeps_planner_topology_receipt_unconditional` to `tests/scripts/dev_tools/test_validate_epic_planner_state.py`, decorated with `@pytest.mark.parametrize("flag", ["require_codex_model_routing", "require_codex_topology"])`.
+- [x] [P4-T1] Add `test_codex_flag_keeps_planner_topology_receipt_unconditional` to `tests/scripts/dev_tools/test_validate_epic_planner_state.py`, decorated with `@pytest.mark.parametrize("flag", ["require_codex_model_routing", "require_codex_topology"])`.
   - Body: `state = _ready_state()`; `state.pop("topology_receipt")`; call `validate_epic_planner_state_text(json.dumps(state), require_ready_for_execution=True, require_codex_model_routing=flag == "require_codex_model_routing", require_codex_topology=flag == "require_codex_topology")` (explicit keyword arguments rather than `**` unpacking, so Pyright checks each argument type); assert `"Epic planner topology_receipt must be an object." in errors`. One-line docstring.
   - Acceptance: `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state.py -k test_codex_flag_keeps_planner_topology_receipt_unconditional -v` exits 0 with `2 passed`.
 
-- [ ] [P4-T2] Add `test_ready_gate_validates_present_null_planner_topology_receipt` to `tests/scripts/dev_tools/test_validate_epic_planner_state.py`.
+- [x] [P4-T2] Add `test_ready_gate_validates_present_null_planner_topology_receipt` to `tests/scripts/dev_tools/test_validate_epic_planner_state.py`.
   - Body: `state = _ready_state()`; `state["topology_receipt"] = None`; call `validate_epic_planner_state_text(json.dumps(state), require_ready_for_execution=True)` with no Codex flag; assert `"Epic planner topology_receipt must be an object." in errors`. One-line docstring stating that a present null key still arms the check.
   - Acceptance: `poetry run pytest "tests/scripts/dev_tools/test_validate_epic_planner_state.py::test_ready_gate_validates_present_null_planner_topology_receipt" -v` exits 0 with `1 passed`.
 
-- [ ] [P4-T3] Add `test_ready_gate_accepts_present_valid_planner_topology_receipt` to `tests/scripts/dev_tools/test_validate_epic_planner_state.py`, decorated with `@pytest.mark.parametrize("require_codex_topology", [False, True])`.
+- [x] [P4-T3] Add `test_ready_gate_accepts_present_valid_planner_topology_receipt` to `tests/scripts/dev_tools/test_validate_epic_planner_state.py`, decorated with `@pytest.mark.parametrize("require_codex_topology", [False, True])`.
   - Body: `state = _ready_state()` (which carries the valid forced planner receipt, lines 67-70 and 83); call `validate_epic_planner_state_text(json.dumps(state), require_ready_for_execution=True, require_codex_topology=require_codex_topology)`; assert that no returned error contains `"Epic planner topology_receipt"`, using the same `offending == []` form as P1-T2. One-line docstring.
   - Acceptance: `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state.py -k test_ready_gate_accepts_present_valid_planner_topology_receipt -v` exits 0 with `2 passed`; `awk 'END{print NR}' tests/scripts/dev_tools/test_validate_epic_planner_state.py` prints a value at or below 500.
 
-- [ ] [P4-T4] Run the whole Python test file: `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state.py -v`.
+- [x] [P4-T4] Run the whole Python test file: `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state.py -v`.
   - Acceptance: `docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543/evidence/regression-testing/python-topology-suite.<ts>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording 0 failed and listing as `PASSED` each of the five Python names under "Named tests and literals introduced by this plan" (seven node IDs in total, counting both parameters of each parametrized test), plus `test_readiness_requires_forced_epic_planner_persona` and `test_cli_dispatches_planner_readiness_flag`.
 
 ### Phase 5 — TypeScript twins and the MCP service-call assertion
