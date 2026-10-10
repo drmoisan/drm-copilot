@@ -35,7 +35,11 @@ SKILL_ADMITTED_TOKENS = (
     "rather than spawning without `model`",
 )
 AGENT_ADMITTED_TOKENS = (*ADMITTED_ITEM_TOKENS, "rather than spawn without `model`")
-STEP_TWO_TOKENS = ("parallel-orchestrate", "## Model Selection", "model_routing_receipt")
+STEP_TWO_TOKENS = (
+    "parallel-orchestrate",
+    "## Model Selection",
+    "model_routing_receipt",
+)
 
 
 def read_text(relative_path: Path) -> str:

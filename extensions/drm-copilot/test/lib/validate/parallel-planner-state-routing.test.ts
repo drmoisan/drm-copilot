@@ -55,7 +55,7 @@ const RECEIPT_BAND_ABSENT_ENUM =
   "Parallel planner checkpoint items[0] model_routing_receipt complexity_band must be one of C1, C2, C3, C4; got: None.";
 const RECEIPT_BAND_ABSENT_VS_ITEM =
   "Parallel planner checkpoint items[0] model_routing_receipt.complexity_band None does not equal complexity_band 'C3'.";
-const ASSESSMENT_BAND_LIST =ASSESSMENT_BAND_ENUM.replace("C9.", "['C3'].");
+const ASSESSMENT_BAND_LIST = ASSESSMENT_BAND_ENUM.replace("C9.", "['C3'].");
 const RECEIPT_BAND_LIST = RECEIPT_BAND_ENUM.replace("C9.", "['C3'].");
 const ROUTING_FIELDS = [
   "complexity_band",

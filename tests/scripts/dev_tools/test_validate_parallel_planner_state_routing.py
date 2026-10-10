@@ -120,7 +120,7 @@ RECEIPT_BAND_ABSENT_VS_ITEM = (
     "Parallel planner checkpoint items[0] model_routing_receipt.complexity_band "
     "None does not equal complexity_band 'C3'."
 )
-ROUTING_FIELDS =("complexity_band", "complexity_assessment", "model_routing_receipt")
+ROUTING_FIELDS = ("complexity_band", "complexity_assessment", "model_routing_receipt")
 
 
 def validate(state: dict[str, object], *, ready: bool) -> list[str]:
