@@ -349,25 +349,25 @@ Each task writes FEATURE/evidence/other/p6-tN.TS.md.
 
 ### Phase 8 — Pass-After Verification
 
-- [ ] [P8-T1] [pass-after] Run `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py` after every production, policy, and mirror edit, and record FEATURE/evidence/regression-testing/pass-after-follow-ups-pytest.TS.md.
+- [x] [P8-T1] [pass-after] Run `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py` after every production, policy, and mirror edit, and record FEATURE/evidence/regression-testing/pass-after-follow-ups-pytest.TS.md.
       Command: `poetry run pytest tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`.
       Acceptance: exit 0 and a summary reporting 43 passed and no failed. A failure is fixed by correcting the edited production or mirror file (and re-copying the mirror), never by editing the test module; the affected Phase 3-7 task and this task are rerun.
-- [ ] [P8-T2] [pass-after] Run `tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py` and record FEATURE/evidence/regression-testing/pass-after-tier-gate-pytest.TS.md.
+- [x] [P8-T2] [pass-after] Run `tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py` and record FEATURE/evidence/regression-testing/pass-after-tier-gate-pytest.TS.md.
       Commands: `poetry run pytest "tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py::test_retired_threshold_scan_reads_coverage_context_only"`; `poetry run pytest tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py`.
       Acceptance: the node run exits 0 and reports 1 passed; the module run exits 0 and reports BASE_TIER_COUNT plus 1 passed (81 at RESEARCH_BASE) and no failed.
-- [ ] [P8-T3] [pass-after] Re-run PESTER-824 after all edits and record FEATURE/evidence/regression-testing/pass-after-pester-824-final.TS.md.
+- [x] [P8-T3] [pass-after] Re-run PESTER-824 after all edits and record FEATURE/evidence/regression-testing/pass-after-pester-824-final.TS.md.
       Command: `sh artifacts/orchestration/wip824-run/pester-files.sh tests/scripts/claude-hooks/feature-review-coverage-thresholds.Tests.ps1 tests/scripts/claude-hooks/validate-feature-review-coverage.Issue824.Tests.ps1 tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1`.
       Acceptance: exit 0 and `Passed=32 Failed=0 FailedBlocks=0 FailedContainers=0`.
-- [ ] [P8-T4] Run PARITY-SET and record FEATURE/evidence/qa-gates/parity-set-pytest.TS.md.
+- [x] [P8-T4] Run PARITY-SET and record FEATURE/evidence/qa-gates/parity-set-pytest.TS.md.
       Commands: `poetry run pytest "tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py::test_codex_legacy_variant_files_contain_corrected_gate_commands" "tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py::test_bundled_claude_files_are_listed_in_some_pack_manifest"`; `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py`.
       Acceptance: the node run exits 0 and reports 2 passed (variant pins and manifest completeness, including the new helper); the PARITY-SET run has no failed test other than KL-510 (recorded as in P0-T14; otherwise exit 0), and its passed count is at least BASE_PARITY_PASSED plus 1 (the note B test) minus the KL-510 adjustment.
-- [ ] [P8-T5] Run the Jest twin `extensions/drm-copilot/test/lib/push-down/claude-pack-manifest-completeness.test.ts` and record FEATURE/evidence/qa-gates/jest-manifest-twin.TS.md.
+- [x] [P8-T5] Run the Jest twin `extensions/drm-copilot/test/lib/push-down/claude-pack-manifest-completeness.test.ts` and record FEATURE/evidence/qa-gates/jest-manifest-twin.TS.md.
       Command: `npm --prefix extensions/drm-copilot run test -- test/lib/push-down/claude-pack-manifest-completeness.test.ts`.
       Acceptance: exit 0; the Jest `Tests:` line reports at least one passed test and no failed test.
-- [ ] [P8-T6] Verify byte identity of all 17 repository/bundle pairs and record FEATURE/evidence/qa-gates/mirror-identity.TS.md.
+- [x] [P8-T6] Verify byte identity of all 17 repository/bundle pairs and record FEATURE/evidence/qa-gates/mirror-identity.TS.md.
       Commands: the 16 `git diff --no-index --exit-code` commands of P0-T9 in the same order; `git diff --no-index --exit-code .claude/hooks/feature-review-coverage-thresholds.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/feature-review-coverage-thresholds.ps1`; `git status --porcelain -- extensions/drm-copilot/resources`.
       Acceptance: each of the 17 diffs exits 0 with no output; the status listing shows exactly the 20 bundle paths of the P0-T7 write set: 19 ` M` lines (the 16 re-copied mirrors, the two variant files, and `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`) and 1 `??` line (the new helper mirror). When the orchestrator has committed between phases, `git diff --name-only BASE_SHA -- extensions/drm-copilot/resources` is recorded as well and the union of the two listings must equal the same 20 paths.
-- [ ] [P8-T7] Verify the 500-line limit for every production and test file this plan writes, and record FEATURE/evidence/qa-gates/line-counts.TS.md.
+- [x] [P8-T7] Verify the 500-line limit for every production and test file this plan writes, and record FEATURE/evidence/qa-gates/line-counts.TS.md.
       Command: `wc -l .claude/hooks/validate-feature-review-coverage.ps1 .claude/hooks/feature-review-coverage-thresholds.ps1 .codex/codex-web-setup.sh tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py tests/scripts/claude-hooks/feature-review-coverage-thresholds.Tests.ps1 tests/scripts/claude-hooks/validate-feature-review-coverage.Issue824.Tests.ps1 tests/shell/test_codex_web_setup_codex_copy.bats`.
       Acceptance: exit 0 and every per-file count is at most 500; the hook count and the #823 test count are recorded explicitly as FINAL_HOOK_LINES and FINAL_TIER_LINES.
 

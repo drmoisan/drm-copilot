@@ -113,6 +113,9 @@ PRE_EXISTING_NAME_EXCEPTIONS: frozenset[str] = frozenset(
         ".claude/rules/csharp.md",
         CLAUDE_BUNDLE + ".claude/rules/typescript.md",
         CLAUDE_BUNDLE + ".claude/rules/csharp.md",
+        # Added by #797 after #824 planning; out of scope for #824 (follow-up).
+        ".claude/rules/parallel-orchestration.md",
+        CLAUDE_BUNDLE + ".claude/rules/parallel-orchestration.md",
     }
 )
 
