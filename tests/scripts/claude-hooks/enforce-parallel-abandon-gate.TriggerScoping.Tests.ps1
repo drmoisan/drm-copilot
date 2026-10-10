@@ -97,4 +97,19 @@ Describe 'enforce-parallel-abandon-gate.ps1 trigger scoping (issue #545)' {
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
+
+    Context 'Issue 791 remove entry point' {
+        # Determinism: the case drives the pure decision seam and the pure scope function
+        # with one literal command fixture. No disk I/O, no child process, no temporary
+        # file, no live executable, no ambient state.
+        It 'R791-O1 keeps the remove entry point removal-disposition option out of scope' {
+            $command = 'bash .claude/lib/bash/remove-parallel-item.sh decide --item 5 --state in_flight --removal-disposition abandon'
+            $envelope = ConvertTo-AbandonGateEnvelope -Command $command
+            $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw $envelope
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+
+            $normalized = Get-ParallelAbandonNormalizedCommand -CommandText $command
+            Test-ParallelAbandonCommandInScope -NormalizedCommand $normalized | Should -BeFalse
+        }
+    }
 }

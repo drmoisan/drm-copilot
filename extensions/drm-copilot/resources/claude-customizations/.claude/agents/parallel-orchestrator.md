@@ -14,11 +14,11 @@ tools:
   - "Bash(git *)"
   - "Bash(gh *)"
   - "Bash(poetry run python -c *)"
-  - "Bash(poetry run python -m *)"
   - "Bash(bash .claude/lib/bash/compute-cohorts.sh*)"
   - "Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"
   - "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"
   - "Bash(bash .claude/lib/bash/abandon-parallel-item.sh*)"
+  - "Bash(bash .claude/lib/bash/remove-parallel-item.sh*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1*)"
   - "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1*)"
   - "Bash(dotnet tool restore*)"
@@ -95,17 +95,19 @@ reference; it is not invoked on the destination-runtime path. Cohort recoloring 
 batching use `compute-cohorts.sh` and `compute-concurrency-batches.sh` under the same allowlist
 entry.
 
-The `poetry run` grants remain for the repository-local paths that still need an interpreter. The
-skill's `## Parallel-Level Checkpoint` section validates through
-`mcp__drm-copilot__validate_orchestration_artifacts`, and since issue #763 radius drift detection runs
+The inline-code (`-c`) grant remains for the repository-local engine calls that `parallel-add`,
+`parallel-close`, and `parallel-orchestrate` still make. It stays scoped to that one invocation form
+— not to `poetry run` as a whole — so `pytest`, `black`, `ruff`, and every other `poetry run`
+subcommand remain outside the allowlist. The former module-form (`-m`) grant was removed under issue
+#791 because no skill in this agent's caller set invokes a module through it. The skill's
+`## Parallel-Level Checkpoint` section validates through
+`mcp__drm-copilot__validate_orchestration_artifacts`; since issue #763 radius drift detection runs
 through the destination-runtime PowerShell entry point
 `.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1` and the abandon disposition through the
-bundled entry point `.claude/lib/bash/abandon-parallel-item.sh`, so no skill step names a
-`poetry run` consumer. The two `poetry run python` grants are left unchanged pending a separate
-removal decision. Each grant stays scoped to its own `poetry run python` invocation form — not to
-`poetry run` as a whole — so `pytest`, `black`, `ruff`, and every other `poetry run` subcommand
-remain outside the allowlist. The sibling persona `.claude/agents/parallel-planner.md` records the
-same destination-runtime posture.
+bundled entry point `.claude/lib/bash/abandon-parallel-item.sh`; and since issue #791 the
+`parallel-remove` decide, recolor, and entry steps run through the bundled entry point
+`.claude/lib/bash/remove-parallel-item.sh`. The sibling persona `.claude/agents/parallel-planner.md`
+records the same destination-runtime posture.
 
 ## Startup Protocol
 

@@ -1,0 +1,10 @@
+{
+  "case": "decide-unknown-item",
+  "subcommand": "decide",
+  "argv": ["decide", "--item", "11"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation rejected: item key 11 does not resolve to a tracked items[].issue_num."
+  }
+}

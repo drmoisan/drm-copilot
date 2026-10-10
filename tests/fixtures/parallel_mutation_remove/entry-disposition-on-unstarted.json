@@ -1,0 +1,10 @@
+{
+  "case": "entry-disposition-on-unstarted",
+  "subcommand": "entry",
+  "argv": ["entry", "--item", "5", "--prior-state", "scheduled", "--removal-disposition", "detach", "--recompute", "true", "--generation", "0", "--at", "2026-10-08T14-00"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation entry rejected: disposition 'detach' violates the F3 mutations[] contract for op 'remove'."
+  }
+}

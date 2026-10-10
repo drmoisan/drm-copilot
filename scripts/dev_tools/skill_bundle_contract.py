@@ -48,8 +48,8 @@ _PLACEHOLDER_CHARACTERS = frozenset("*<>{}$")
 # the end of the text; the candidate is then validated against _PATH_TOKEN.
 _CANDIDATE = r"(?P<path>[^\s'\"`()]+)"
 _INVOCATION_PATTERNS: tuple[re.Pattern[str], ...] = (
-    # bash/sh/source <path>; the look-behind keeps "bash" from also matching "sh".
-    re.compile(r"(?<![A-Za-z0-9_-])(?:bash|sh|source)\s+" + _CANDIDATE),
+    # Horizontal-whitespace separator: a fence tag or line-end verb can't eat next line.
+    re.compile(r"(?<![A-Za-z0-9_-])(?:bash|sh|source)[ \t]+" + _CANDIDATE),
     # pwsh ... -File <path>, on one line.
     re.compile(r"(?<![A-Za-z0-9_-])pwsh\b[^\n]*?-File\s+" + _CANDIDATE),
     # & <path> (PowerShell call operator).
@@ -61,7 +61,7 @@ _INVOCATION_PATTERNS: tuple[re.Pattern[str], ...] = (
     # Import-Module (Join-Path <expr> '<path>') with single or double quotes.
     re.compile(r"Import-Module\s+\(Join-Path\s+[^'\"\n]*['\"](?P<path>[^'\"\n]+)['\"]"),
 )
-_PYTHON_PATH_PATTERN = re.compile(r"(?<![A-Za-z0-9_-])python3?\s+" + _CANDIDATE)
+_PYTHON_PATH_PATTERN = re.compile(r"(?<![A-Za-z0-9_-])python3?[ \t]+" + _CANDIDATE)
 _PYTHON_MODULE_PATTERN = re.compile(
     r"(?<![A-Za-z0-9_-])python3?\s+-m\s+"
     r"(?P<module>[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+)"

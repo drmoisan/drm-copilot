@@ -7,6 +7,8 @@
 
 ---
 
+- Work Mode: full-bug
+
 ## FU-763-1: Unused `Bash(poetry run python -m *)` grant after the port (spec D4)
 
 After #763 ports `parallel_drift_detection_cli` to a destination-runtime script, none of the named callers use the `Bash(poetry run python -m *)` grant in `.claude/agents/parallel-orchestrator.md`. Remove it, or confirm that another caller needs it.
