@@ -17,9 +17,16 @@
 Describe 'enforce-prd-feature-before-planner.ps1 checkpoint folder and work-mode delegate' {
     BeforeAll {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner.ps1").Path
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-PrdFeatureCheckpointFolder -ParameterFilter { $CheckpointPath -notlike "/synthetic-worktrees/*" } -MockWith { $null }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1").Path
         $script:CheckpointPath = '/synthetic-worktrees/session-root/artifacts/orchestration/orchestrator-state.json'
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 
     Context 'Get-PrdFeatureCheckpointFolder read, parse, and field extraction (issue #696)' {
         It 'K1: returns the recorded feature-folder and reads the exact path once with -Raw' {

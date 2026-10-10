@@ -26,6 +26,12 @@
 BeforeAll {
     $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude").Path
     . (Join-Path $script:HookRoot 'hooks/enforce-orchestration-preimplementation-gate.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
+    if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Mock Get-WorktreeResolutionGitFileText { $null } }
+    Mock Get-CheckpointContent -ParameterFilter { $Path -notlike "/synthetic-worktrees/*" } -MockWith { $null }
+    Mock Get-EpicCheckpointContent -ParameterFilter { $Path -notlike "/synthetic-worktrees/*" } -MockWith { $null }
+    Mock Get-ParallelCheckpointContent -ParameterFilter { $Path -notlike "/synthetic-worktrees/*" } -MockWith { $null }
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/EpicScopeResolution.psm1')
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeResolution.psm1')
 
@@ -84,6 +90,9 @@ BeforeAll {
 }
 
 Describe 'enforce-orchestration-preimplementation-gate.ps1 epic scope (issue #663)' {
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     It 'epic scope allows git add of a production path while a merge is in progress' {
         # Arrange
         Set-EpicScopeSeam -CheckpointText $script:ReadyEpicJson -MergeInProgress $true

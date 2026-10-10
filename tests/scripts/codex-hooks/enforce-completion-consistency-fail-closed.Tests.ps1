@@ -21,6 +21,7 @@ Describe 'enforce-completion-consistency.ps1 Codex fail-closed checkpoint handli
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/enforce-completion-consistency.ps1").Path
         . $script:UnderTest
+        Mock Get-CheckpointFileContent { $null }
 
         $script:AbsoluteTarget = '/work/item-worktree/artifacts/orchestration/orchestrator-state.json'
         $script:RelativeTarget = 'artifacts/orchestration/orchestrator-state.json'

@@ -5,10 +5,25 @@ Describe 'enforce-pr-author-skill.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-pr-author-skill.ps1").Path
         . $script:UnderTest
+        $script:RealGetPrAuthorReceiptContent = ${function:Get-PrAuthorReceiptContent}
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/EpicScopeResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/orchestrator-state/OrchestratorState.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        Mock Get-OrchestratorStateCheckpoint -ModuleName OrchestratorState { $null }
+        Mock Get-PrAuthorCheckpointContent { $null }
+        Mock Get-PrAuthorReceiptContent { $null }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 
         # SHA-256 (lowercase hex) of a single 0x41 ('A') byte, used by the receipt allow/hash tests.
         $script:HashOf0x41 = '559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd'
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     # Issue #687 routes the checkpoint through a resolution seam. Defaulting it to the
     # session root keeps these tests exercising receipt behaviour, and keeps them
@@ -415,6 +430,10 @@ Describe 'enforce-pr-author-skill.ps1' {
     }
 
     Context 'Get-PrAuthorReceiptContent real read seam' {
+        BeforeAll {
+            Mock Get-PrAuthorReceiptContent -MockWith $script:RealGetPrAuthorReceiptContent
+        }
+
         It 'returns $null when the receipt path does not exist' {
             Get-PrAuthorReceiptContent -ReceiptFilePath 'artifacts/this-receipt-path-does-not-exist.json' | Should -BeNullOrEmpty
         }

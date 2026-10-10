@@ -35,10 +35,17 @@
 #>
 
 BeforeAll {
-    # The hook is dot-sourced first, then the three library modules are imported without
-    # -Force, so the suite binds to whichever module instance the hook already loaded.
+    # The hook is dot-sourced first, then the library modules WorktreeItemResolution,
+    # WorktreeResolution, WorktreeTargetResolution, EpicScopeResolution, and
+    # WorktreeRunResolution are imported without -Force, so the suite binds to whichever
+    # module instance the hook already loaded.
     $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude").Path
     . (Join-Path $script:HookRoot 'hooks/enforce-model-routing-receipt.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    Mock Get-ModelRoutingCheckpoint -ParameterFilter { $CheckpointPath -notlike "/synthetic-worktrees/*" -and $CheckpointPath -notlike "*tests?fixtures*" -and $CheckpointPath -notlike "*f5-seam-root*" } -MockWith { $null }
+    Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution -ParameterFilter { $Path -notlike "*tests?fixtures*" } -MockWith { $null }
+    Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeItemResolution.psm1')
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeResolution.psm1')
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeTargetResolution.psm1')
@@ -94,6 +101,9 @@ BeforeAll {
 }
 
 Describe 'enforce-model-routing-receipt.ps1 worktree-resolution matrix' {
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     It 'model-routing R1 allows when the resolved own checkpoint records the receipt' {
         # Arrange: two live roots; the issue resolves to the one recording the receipt.
         Set-LiveTopology -Live @($script:SessionRootDir, $script:OwnReceipt)

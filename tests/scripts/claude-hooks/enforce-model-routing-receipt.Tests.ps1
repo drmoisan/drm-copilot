@@ -5,6 +5,16 @@ Describe 'enforce-model-routing-receipt.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-model-routing-receipt.ps1").Path
         . $script:UnderTest
+        $script:RealGetModelRoutingCheckpoint = ${function:Get-ModelRoutingCheckpoint}
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/EpicScopeResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        Mock Get-ModelRoutingCheckpoint { $null }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 
         function Get-SyntheticCheckpoint {
             param([string[]] $ReceiptAgents)
@@ -15,6 +25,8 @@ Describe 'enforce-model-routing-receipt.ps1' {
             return [pscustomobject]@{ model_routing_receipts = $receipts }
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     # Issue #673 routes the checkpoint through a resolution seam. Defaulting it to the
     # session root keeps these rows exercising presence gating, and independent of
@@ -112,6 +124,10 @@ Describe 'enforce-model-routing-receipt.ps1' {
     }
 
     Context 'Get-ModelRoutingCheckpoint filesystem seam' {
+        BeforeAll {
+            Mock Get-ModelRoutingCheckpoint -MockWith $script:RealGetModelRoutingCheckpoint
+        }
+
         It 'returns $null when the checkpoint path does not exist' {
             $missing = Join-Path $PSScriptRoot 'no-such-checkpoint-file.json'
             Get-ModelRoutingCheckpoint -CheckpointPath $missing | Should -BeNullOrEmpty

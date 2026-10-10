@@ -39,6 +39,16 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:UnderTest = Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-worktree-removal-gate.ps1'
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-CleanupWorktreeManifestContent -ModuleName CleanupWorktreeManifest { $null }
+        if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-EpicWorktreeGateCheckpointContent { $null } }
+        if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-EpicWorktreeGateParallelCheckpointContent { $null } }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 
         # Synthetic rooted prefixes chosen per host OS. [System.IO.Path]::IsPathRooted treats a
         # drive-letter path (a letter, a colon, and a slash) as rooted only on Windows; on Linux
@@ -99,6 +109,8 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
             }
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     Context 'ConvertFrom-CodexWorktreeJson separates required from optional sources' {
         It 'returns null rather than throwing for an empty optional source' {

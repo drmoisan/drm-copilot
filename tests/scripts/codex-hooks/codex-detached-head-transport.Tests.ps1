@@ -26,6 +26,8 @@ Describe 'enforce-epic-child-worktree-binding.ps1 resolves the live branch on a 
         $script:HookPath = Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-child-worktree-binding.ps1'
 
         . $script:HookPath
+        if (Get-Command Get-EpicPlanningRegisteredMcpTool -ErrorAction SilentlyContinue) { Mock Get-EpicPlanningRegisteredMcpTool { $null } }
+        if (Get-Command Test-EpicPlanningBashAllowed -ErrorAction SilentlyContinue) { Mock Test-EpicPlanningBashAllowed { $null } }
 
         # The attestation environment the hook reads. Cleared for every entrypoint
         # case so the guard runs in its dormant default, and restored in finally.
@@ -178,6 +180,8 @@ Describe 'enforce-epic-planning-only.ps1 resolves the current branch on a detach
         $script:PlanningHookPath = Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-planning-only.ps1'
 
         . $script:PlanningHookPath
+        if (Get-Command Get-EpicPlanningRegisteredMcpTool -ErrorAction SilentlyContinue) { Mock Get-EpicPlanningRegisteredMcpTool { $null } }
+        if (Get-Command Test-EpicPlanningBashAllowed -ErrorAction SilentlyContinue) { Mock Test-EpicPlanningBashAllowed { $null } }
 
         # A push-shaped Bash payload. Used only against the decision function, never
         # driven through the entrypoint, because the entrypoint reads the mutable

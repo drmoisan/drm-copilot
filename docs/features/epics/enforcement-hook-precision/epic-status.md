@@ -5,8 +5,8 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - Epic issue: #852
 - Integration branch: `epic/enforcement-hook-precision-integration`
 - Current wave: 2
-- Next step: `E7_await_wave2`
-- Last updated: 2026-10-09T06:25:00Z
+- Next step: `E7_await_wave2 (786 BLOCKED: operator decision required on DESIGN_CONFLICT; all other 7 merged)`
+- Last updated: 2026-10-09T11:10:00Z
 
 ## Waves
 
@@ -26,7 +26,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 | 2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732 | 732 | 1 | merged | [#858](https://github.com/drmoisan/drm-copilot/pull/858) | 73201b5fe7a2106d07b3e0a4f55a72ede6a1965c | 2026-10-09T02:35:00Z | 2026-10-09T06:06:07Z | 2026-10-09T06:17:26Z | - |
 | 2026-09-29-validate-orchestrator-output-session-relative-read-787 | 787 | 1 | merged | [#856](https://github.com/drmoisan/drm-copilot/pull/856) | 191e69069d0198ef66be581568da781ea89fa3fb | 2026-10-09T02:35:00Z | 2026-10-09T04:24:51Z | 2026-10-09T04:44:27Z | - |
 | 2026-10-08-pr-author-and-merge-gates-read-session-root-files-850 | 850 | 1 | merged | [#857](https://github.com/drmoisan/drm-copilot/pull/857) | f8f7d0ab1b0ed927cccfedd25608a48d28083c57 | 2026-10-09T02:35:00Z | 2026-10-09T05:21:23Z | 2026-10-09T05:36:11Z | - |
-| 2026-09-27-hook-test-isolation-remaining-gaps-737 | 737 | 2 | worktree_created | - | - | 2026-10-09T06:25:00Z | - | - | - |
+| 2026-09-27-hook-test-isolation-remaining-gaps-737 | 737 | 2 | merged | [#863](https://github.com/drmoisan/drm-copilot/pull/863) | 71dd62b0797a4aea9602936a33b2099c54703e70 | 2026-10-09T06:25:00Z | 2026-10-09T10:54:11Z | 2026-10-09T11:03:03Z | - |
 | 2026-09-29-hook-preexisting-imports-fail-open-786 | 786 | 2 | worktree_created | - | - | 2026-10-09T06:25:00Z | - | - | - |
 
 ## Integration PR

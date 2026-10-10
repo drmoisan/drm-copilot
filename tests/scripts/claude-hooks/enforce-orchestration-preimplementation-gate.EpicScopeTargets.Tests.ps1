@@ -20,6 +20,9 @@
 BeforeAll {
     $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude").Path
     . (Join-Path $script:HookRoot 'hooks/enforce-orchestration-preimplementation-gate.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
+    Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-EpicScopeCheckpointText', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/EpicScopeResolution.psm1')
 
     $script:ReadyEpicJson = '{"route_id":"epic","epic_feature_folder":"sample-epic","epic_manifest_path":"docs/features/epics/sample-epic/epic.md","integration_branch":"epic/sample-epic-integration","epic_issue_num":900,"features":[{"feature_folder":"2026-09-25-child-a-901","merge_status":"merged"}]}'
@@ -62,6 +65,9 @@ BeforeAll {
 }
 
 Describe 'enforce-orchestration-preimplementation-gate.ps1 epic-scope targets (issue #738)' {
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     It '<Name>' -ForEach @(
         @{ Name = 'denies a second segment that targets a different not-ready worktree'; Command = 'git add scripts/powershell/A.ps1 && git -C /synthetic-worktrees/epic-child add scripts/powershell/B.ps1'; FilePath = ''; Code = 'target-not-ready' }
         @{ Name = 'denies a relative -C selector in epic scope'; Command = 'git -C subdir add scripts/powershell/Sample.ps1'; FilePath = ''; Code = 'target-unresolvable' }

@@ -21,6 +21,15 @@
 
 BeforeAll {
     . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-merge-gate.ps1").Path
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+    Mock Get-ChildOrchestratorCheckpointContent { $null }
+    Mock Get-EpicOrchestratorCheckpointContent { $null }
+    Mock Get-ParallelOrchestratorCheckpointContent { $null }
+    Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     $libRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution").Path
     Import-Module (Join-Path $libRoot 'WorktreeRunResolution.psm1')
     Import-Module (Join-Path $libRoot 'WorktreeItemResolution.psm1')
@@ -76,6 +85,9 @@ BeforeAll {
 }
 
 Describe 'epic merge gate item-worktree resolution' {
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     It 'authorizes a standalone merge from the item worktree checkpoint' {
         # Arrange
         Set-ItemPrTopology -Live @('/synthetic-worktrees/item-a', '/synthetic-worktrees/session') -Text @{ '/synthetic-worktrees/item-a' = $script:Standalone }

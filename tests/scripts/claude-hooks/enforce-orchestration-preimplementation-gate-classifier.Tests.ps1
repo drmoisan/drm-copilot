@@ -33,6 +33,10 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 classifier (issue #55
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-orchestration-preimplementation-gate.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent' -Surface 'Codex'
+        if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Mock Get-WorktreeResolutionGitFileText { $null } }
 
         # Dot-sourced explicitly as well as through the gate hook above, so a future
         # change to the hook's dot-source line cannot silently leave these cases
@@ -75,6 +79,8 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 classifier (issue #55
         }
         Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     Context 'the preparation-mode delegation predicate' {
         # Finding R2. Test-PreparationModeDelegation lost its only production call site

@@ -1,6 +1,15 @@
 BeforeAll {
     $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
     . (Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-wave-barrier.ps1')
+    $script:RealTestCodexEpicChildRoutingLaunchAuthority = ${function:Test-CodexEpicChildRoutingLaunchAuthority}
+    . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+    if (Get-Command Get-EpicWaveBarrierCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-EpicWaveBarrierCheckpointContent { $null } }
+    Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    Mock Test-CodexEpicChildRoutingLaunchAuthority { $null }
     $script:Now = [datetimeoffset]'2026-07-10T22:00:00Z'
 
     function Get-WaveLaunchContext {
@@ -83,6 +92,12 @@ BeforeAll {
 }
 
 Describe 'Receipt-bound epic wave barrier' {
+    BeforeAll {
+        Mock Test-CodexEpicChildRoutingLaunchAuthority -MockWith $script:RealTestCodexEpicChildRoutingLaunchAuthority
+    }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     It 'blocks the first mutation before a local child checkpoint exists' {
         $context = Get-WaveLaunchContext
 

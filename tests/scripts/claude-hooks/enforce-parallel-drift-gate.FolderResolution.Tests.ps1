@@ -21,6 +21,9 @@ Describe 'enforce-parallel-drift-gate.ps1 feature-folder resolution (issue #565)
     BeforeAll {
         $script:HookPath = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-drift-gate.ps1").Path
         . $script:HookPath
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-ParallelDriftGateCheckpointContent' -Surface 'Codex'
         Mock Resolve-ParallelDriftGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
         Mock Get-ParallelDriftGateCheckpointContent { $script:CheckpointJson }
 
@@ -50,6 +53,8 @@ Describe 'enforce-parallel-drift-gate.ps1 feature-folder resolution (issue #565)
             return (Invoke-ParallelDriftGateDecision -ToolInputRaw $payload).hookSpecificOutput
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     BeforeEach {
         $script:CheckpointJson = Get-DriftCheckpoint

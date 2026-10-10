@@ -131,6 +131,9 @@ Describe 'codex enforce-orchestration-preimplementation-gate.ps1 absolute-path c
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/enforce-orchestration-preimplementation-gate.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
         # Issue #707 (D10): the epic-scope read is mocked so local epic state cannot change a decision.
         Mock Get-EpicScopeCheckpointText { $null }
 
@@ -184,6 +187,8 @@ Describe 'codex enforce-orchestration-preimplementation-gate.ps1 absolute-path c
                 -CheckpointRaw (ConvertTo-NotReadyCheckpointRaw)
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Codex' -Seam 'Get-EpicScopeCheckpointText' }
 
     Context 'checkpoint exemption holds in every spelling' {
         It 'allows the <Spelling> spelling of <Literal>' -ForEach $CheckpointAllowCases {

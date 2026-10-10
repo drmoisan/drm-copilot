@@ -29,6 +29,11 @@ Describe 'Codex epic-scope resolution sibling (issue #707)' {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $script:RepoRoot '.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1')
+        $script:RealGetEpicScopeCheckpointText = ${function:Get-EpicScopeCheckpointText}
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Mock Get-CheckpointContent { $null } }
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-EpicCheckpointContent', 'Get-EpicScopeCheckpointText', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
 
         $script:ReadyEpicJson = '{"route_id":"epic","epic_feature_folder":"sample-epic","epic_manifest_path":"docs/features/epics/sample-epic/epic.md","integration_branch":"epic/sample-epic-integration","epic_issue_num":900,"features":[{"feature_folder":"2026-09-25-child-a-901","merge_status":"merged"},{"feature_folder":"2026-09-25-child-b-902","merge_status":"worktree_removed"}],"model_routing_receipts":[{"agent":"pr-author"}]}'
         $script:SyntheticCheckpointPath = '/synthetic-worktrees/epic-coordinator/artifacts/orchestration/epic-orchestrator-state.json'
@@ -83,6 +88,8 @@ Describe 'Codex epic-scope resolution sibling (issue #707)' {
             Mock Test-EpicScopeMergeInProgress -MockWith ({ $merge }.GetNewClosure())
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Codex' -Seam 'Get-EpicScopeCheckpointText' }
 
     Context 'Resolve-EpicScopeCheckpoint' {
         It 'resolves reason <Reason> for <Label>' -ForEach @(
@@ -167,6 +174,10 @@ Describe 'Codex epic-scope resolution sibling (issue #707)' {
     }
 
     Context 'checkpoint, HEAD, and MERGE_HEAD seams' {
+        BeforeAll {
+            Mock Get-EpicScopeCheckpointText -MockWith $script:RealGetEpicScopeCheckpointText
+        }
+
         It 'returns null checkpoint text when the checkpoint file is absent' {
             # Arrange
             Mock Get-WorktreeResolutionGitEntryKind { 'None' }

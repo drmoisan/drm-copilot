@@ -20,6 +20,9 @@
 Describe 'enforce-orchestration-preimplementation-gate-modes.ps1 target folder (Codex, issue #565)' {
     BeforeAll {
         . (Join-Path (Resolve-Path "$PSScriptRoot/../../..").Path '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1')
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-EpicScopeCheckpointText', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
 
         $script:TargetFeatures = '[{"feature_folder":"docs/features/active/child-a-300","issue_num":300,"depends_on":[],"merge_status":"merged"},' +
         '{"feature_folder":"docs/features/active/child-b-301","issue_num":301,"depends_on":[300],"merge_status":"not_started"}]'
@@ -79,6 +82,8 @@ Describe 'enforce-orchestration-preimplementation-gate-modes.ps1 target folder (
                 -IssueNumber (Find-OrchestrationDelegationIssueNumber -Prompt $Prompt)
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Codex' -Seam 'Get-EpicScopeCheckpointText' }
 
     Context 'nested-artifact citations resolve to the target folder' {
         It 'M1: allows the target folder cited alone at decision level' {

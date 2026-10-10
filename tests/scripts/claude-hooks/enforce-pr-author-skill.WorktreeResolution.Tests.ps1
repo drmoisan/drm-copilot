@@ -40,10 +40,20 @@
 #>
 
 BeforeAll {
-    # The hook is dot-sourced first, then the three library modules are imported without
-    # -Force, so the suite binds to whichever module instance the hook already loaded.
+    # The hook is dot-sourced first, then the library modules OrchestratorState,
+    # WorktreeItemResolution, WorktreeResolution, WorktreeTargetResolution, EpicScopeResolution,
+    # and WorktreeRunResolution are imported without -Force, so the suite binds to whichever
+    # module instance the hook already loaded.
     $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude").Path
     . (Join-Path $script:HookRoot 'hooks/enforce-pr-author-skill.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/orchestrator-state/OrchestratorState.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    Mock Get-OrchestratorStateCheckpoint -ModuleName OrchestratorState -ParameterFilter { $CheckpointPath -notlike "*tests?fixtures*" } -MockWith { $null }
+    Mock Get-PrAuthorCheckpointContent -ParameterFilter { $CheckpointPath -notlike "*tests?fixtures*" } -MockWith { $null }
+    Mock Get-PrAuthorReceiptContent -ParameterFilter { $ReceiptFilePath -notlike "*tests?fixtures*" } -MockWith { $null }
+    Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeItemResolution.psm1')
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeResolution.psm1')
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeTargetResolution.psm1')
@@ -103,6 +113,9 @@ BeforeAll {
 }
 
 Describe 'enforce-pr-author-skill.ps1 worktree-resolution matrix' {
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     It 'pr-author R1 allows when the resolved own checkpoint is ready and the working directory is the sibling session root' {
         # Arrange: the seam resolves to the own ready worktree while the row runs in the sibling.
         Set-ResolvedSeam -Status 'OtherWorktree' -WorktreeRoot $script:OwnReady

@@ -20,6 +20,7 @@ Describe 'enforce-completion-consistency.ps1 Codex default reader against commit
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/enforce-completion-consistency.ps1").Path
         . $script:UnderTest
+        Mock Get-CheckpointFileContent -ParameterFilter { $Path -notlike "$($script:FixturesRoot)*" } -MockWith { $null }
 
         $script:FixturesRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../fixtures/worktree-resolution')).Path
         $script:NonEmptyFixture = Join-Path $script:FixturesRoot 'pr-author/item-own-not-ready/artifacts/orchestration/orchestrator-state.json'

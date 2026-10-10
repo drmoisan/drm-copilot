@@ -5,6 +5,10 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-orchestration-preimplementation-gate.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Mock Get-WorktreeResolutionGitFileText { $null } }
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-EpicScopeCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent' -Surface 'Codex'
         Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution/EpicScopeResolution.psm1").Path
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
 
@@ -58,6 +62,8 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeRunResolution { , [string[]] @() }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     Context 'implementation writes before orchestration readiness' {
         It 'blocks implementation writes when route metadata and lifecycle readiness are absent (generalized message)' {

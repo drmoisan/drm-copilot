@@ -24,6 +24,15 @@ Describe 'enforce-epic-merge-gate.ps1 standalone authorization (issue #670)' {
         # guarantees the helper functions come from the helpers file even if the parent's
         # dot-source line changes.
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-merge-gate.ps1").Path
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-ChildOrchestratorCheckpointContent { $null }
+        Mock Get-EpicOrchestratorCheckpointContent { $null }
+        Mock Get-ParallelOrchestratorCheckpointContent { $null }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-merge-gate-authorization.ps1").Path
 
         $script:SessionId = 'session-670-a1b2'
@@ -75,6 +84,8 @@ Describe 'enforce-epic-merge-gate.ps1 standalone authorization (issue #670)' {
         Mock Resolve-EpicMergeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
         Mock Resolve-EpicMergeGateItemTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #850)' } }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     Context 'decision matrix' {
         It 'decides <Expected> for <Name>' -ForEach @(

@@ -38,7 +38,17 @@ Describe 'Issue #824 regression: promotion gate (<Runtime>)' -ForEach $script:Ru
     BeforeAll {
         $repoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $repoRoot "$HookRoot/enforce-promotion-mcp-only.ps1")
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateParallelCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateEpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateEpicCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorReceiptContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorReceiptContent' -Surface 'Codex' }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     It 'REG-01 allows R-824-MAIN, whose prose only contains the letters of gh issue new' -Tag 'Issue824', 'R-824-MAIN' {
         $command = 'pwsh -NoProfile -Command ''$parts = New-Object System.Collections.Generic.List[string]; foreach ($t in @("a phrase that runs through the text", "The call is guarded (issue #1)")) { Write-Output $t }'''
@@ -53,6 +63,14 @@ Describe 'Issue #824 regression: Claude epic worktree-removal gate' {
     BeforeAll {
         $repoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $repoRoot '.claude/hooks/enforce-epic-worktree-removal-gate.ps1')
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateParallelCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateEpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateEpicCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorReceiptContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorReceiptContent' -Surface 'Codex' }
 
         function ConvertTo-RegressionEnvelope {
             param([Parameter(Mandatory)][string] $Command)
@@ -88,6 +106,14 @@ Describe 'Issue #824 regression: Claude parallel worktree-removal gate' {
     BeforeAll {
         $repoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $repoRoot '.claude/hooks/enforce-parallel-worktree-removal-gate.ps1')
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateParallelCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateEpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateEpicCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorReceiptContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorReceiptContent' -Surface 'Codex' }
 
         function ConvertTo-RegressionEnvelope {
             param([Parameter(Mandatory)][string] $Command)
@@ -121,6 +147,14 @@ Describe 'Issue #824 regression: Codex epic worktree-removal gate' {
     BeforeAll {
         $repoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $repoRoot '.codex/hooks/enforce-epic-worktree-removal-gate.ps1')
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateParallelCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateEpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateEpicCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorReceiptContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorReceiptContent' -Surface 'Codex' }
         $script:SyntheticRoot = if ($IsWindows) { 'C:/repo' } else { '/repo' }
 
         function ConvertTo-CodexRegressionPayload {
@@ -153,6 +187,14 @@ Describe 'Issue #824 regression: preimplementation gate (<Runtime>)' -ForEach $s
     BeforeAll {
         $repoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $repoRoot "$HookRoot/enforce-orchestration-preimplementation-gate.ps1")
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateParallelCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateEpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateEpicCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorReceiptContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorReceiptContent' -Surface 'Codex' }
         if ($Runtime -eq 'codex') {
             Mock Get-EpicScopeCheckpointText { $null }
         }
@@ -169,6 +211,14 @@ Describe 'Issue #824 regression: Claude pr-author skill gate' {
     BeforeAll {
         $repoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $repoRoot '.claude/hooks/enforce-pr-author-skill.ps1')
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateParallelCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateEpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateEpicCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorReceiptContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorReceiptContent' -Surface 'Codex' }
     }
 
     Context 'commands that mention gh pr create without invoking it (R-733-714, R-733-GREP)' {
@@ -252,6 +302,14 @@ Describe 'Issue #824 regression: pr-author command allowlist' {
     BeforeAll {
         $repoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $repoRoot '.claude/hooks/enforce-pr-author-command-allowlist.ps1')
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateParallelCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-ParallelWorktreeRemovalGateEpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelWorktreeRemovalGateEpicCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorCheckpointContent' -Surface 'Codex' }
+        if (Get-Command Get-PrAuthorReceiptContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorReceiptContent' -Surface 'Codex' }
     }
 
     It 'REG-18 denies the R-733-712 chained receipt procedure' -Tag 'Issue824', 'R-733-712' {

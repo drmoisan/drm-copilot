@@ -1,6 +1,8 @@
 BeforeAll {
     $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
     . (Join-Path $script:RepoRoot '.codex/hooks/codex-epic-child-launch-attestation.ps1')
+    $script:RealTestCodexEpicChildRoutingLaunchAuthority = ${function:Test-CodexEpicChildRoutingLaunchAuthority}
+    Mock Test-CodexEpicChildRoutingLaunchAuthority { $null }
     $script:Now = [datetimeoffset]'2026-07-10T22:00:00Z'
 
     function Get-TestLaunchReceipt {
@@ -71,6 +73,10 @@ BeforeAll {
 }
 
 Describe 'Codex epic-child launch attestation' {
+    BeforeAll {
+        Mock Test-CodexEpicChildRoutingLaunchAuthority -MockWith $script:RealTestCodexEpicChildRoutingLaunchAuthority
+    }
+
     It 'requires the launch-authority result in the routed SubagentStart attestation' {
         $recordHook = Get-Content -Raw -LiteralPath (
             Join-Path $script:RepoRoot '.codex/hooks/record-subagent-routing-attestation.ps1'

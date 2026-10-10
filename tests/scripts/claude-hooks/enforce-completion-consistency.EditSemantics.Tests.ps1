@@ -22,6 +22,7 @@ Describe 'enforce-completion-consistency.ps1 edit semantics (issue #736)' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-completion-consistency.ps1").Path
         . $script:UnderTest
+        Mock Get-CheckpointFileContent { $null }
 
         $script:AbsoluteTarget = '/work/item-worktree/artifacts/orchestration/orchestrator-state.json'
         $script:NonCompletionCheckpoint = '{"objective":"x","next_step":"S5_atomic_execution"}'

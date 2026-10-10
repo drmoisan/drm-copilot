@@ -25,6 +25,7 @@ Describe 'enforce-completion-consistency route-driven pr_gate evidence' {
         $script:CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 
         . $script:HookPath
+        Mock Get-CheckpointFileContent { $null }
 
         # A routing matrix whose single route opts into PR-gate evidence, and one
         # that does not. Both are supplied through the hook's RoutingMatrixReader
