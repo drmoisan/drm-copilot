@@ -26,10 +26,15 @@ Output Summary:
   - AC06-POETRY-PIP-FALLBACK hits=1 PASS
   - AC06-NONPOETRY-RETHROW hits=1 PASS
 - Derived EXIT_CODE per P1-T3 rule: 0 for the pass/fail part (failures=0, errors=0).
-- CRP per-file `scripts/dev-tools/HostBootstrapWorkspace.psm1`: PENDING CI.
-- CRP per-file `scripts/dev-tools/HostBootstrap.psm1`: PENDING CI.
-- (context) CRP per-file `scripts/dev-tools/HostTooling.psm1`: PENDING CI.
-- This task stays unchecked until the orchestrator-supplied CI coverage XML yields passing CRP rows (>= 85%) for both Phase 2 modules.
+- CRP per-file `scripts/dev-tools/HostBootstrapWorkspace.psm1` (CI): `FILE HostBootstrapWorkspace.psm1 covered=70 missed=0 total=70 pct=100.0 required=60 gap=0 PASS`.
+- CRP per-file `scripts/dev-tools/HostBootstrap.psm1` (CI): `FILE HostBootstrap.psm1 covered=155 missed=0 total=155 pct=100.0 required=132 gap=0 PASS`.
+- (context) CRP per-file `scripts/dev-tools/HostTooling.psm1` (CI): `FILE HostTooling.psm1 covered=36 missed=2 total=38 pct=94.74 required=33 gap=0 PASS`.
+  - Source: CI `workflow_dispatch` of `_poshqc.yml`, run 38008057360 on head 9ac5c06e2, job `PowerShell QC` 114081355999, conclusion success. Artifacts downloaded to `artifacts/ci/run-38008057360/` (git-ignored); reduction file `artifacts/ci/run-38008057360/reduction.txt`, produced by `poetry run python <scratchpad>/reduce847.py artifacts/ci/run-38008057360/powershell-coverage.xml artifacts/ci/run-38008057360/pester-junit.xml`.
+  - CI population line (`poshqc-job.log` line 828): `Code coverage population: source=config; files=177`.
+  - CI JRP step 5: `JUNIT_TOTALS tests=6628 failures=0 errors=0 disabled=10`; `FAILED_TESTCASES count=0`.
+  - CI JRP steps 2-3: `HostBootstrapWorkspace.Tests.ps1` cases=31, `HostBootstrap.Tests.ps1` cases=28, `HostBootstrap.Invoke.Tests.ps1` cases=16; all notPassed=0 -> PASS. CI JRP step 4: all ten Phase 2 tokens PASS (same hit counts as above).
+  - CI analyzer log line (`poshqc-job.log` line 821, Analyze PowerShell step): `PSScriptAnalyzer passed: no findings under D:\a\drm-copilot\drm-copilot`.
+- Result: JRP and CRP parts both PASS; [P2-T6] verified.
 
 ## Notes
 

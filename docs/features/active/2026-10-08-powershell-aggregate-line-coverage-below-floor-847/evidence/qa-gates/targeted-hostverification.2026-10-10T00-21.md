@@ -18,9 +18,15 @@ Output Summary:
   - AC06-VERIFY-SECTION-ORDER hits=1 PASS
   - AC06-VERIFY-EXIT-BOUNDARY hits=1 PASS
 - Derived EXIT_CODE per P1-T3 rule: 0 for the pass/fail part (failures=0, errors=0).
-- CRP per-file `scripts/dev-tools/HostVerification.psm1`: PENDING CI.
-- (context) CRP per-file `scripts/dev-tools/HostTooling.psm1`: PENDING CI for this head (Phase 1 head value 94.74% recorded in `targeted-hosttooling.2026-10-09T23-51.md`).
-- This task stays unchecked until the orchestrator-supplied CI coverage XML yields a passing CRP row (>= 85%) for `HostVerification.psm1`.
+- CRP per-file `scripts/dev-tools/HostVerification.psm1` (CI): `FILE HostVerification.psm1 covered=149 missed=0 total=149 pct=100.0 required=127 gap=0 PASS`.
+- (context) CRP per-file `scripts/dev-tools/HostTooling.psm1` (CI, this head): `FILE HostTooling.psm1 covered=36 missed=2 total=38 pct=94.74 required=33 gap=0 PASS`.
+  - Source: CI `workflow_dispatch` of `_poshqc.yml`, run 38009223981 on head 31d347da2, job `PowerShell QC` 114085095330, conclusion success. Artifacts downloaded to `artifacts/ci/run-38009223981/` (git-ignored); reduction file `artifacts/ci/run-38009223981/reduction.txt`, produced by `poetry run python <scratchpad>/reduce847.py artifacts/ci/run-38009223981/powershell-coverage.xml artifacts/ci/run-38009223981/pester-junit.xml`.
+  - CI population line (`poshqc-job.log` line 848): `Code coverage population: source=config; files=178`.
+  - CI JRP step 5: `JUNIT_TOTALS tests=6660 failures=0 errors=0 disabled=10`; `FAILED_TESTCASES count=0`.
+  - CI JRP steps 2-3: `HostVerification.Tests.ps1` cases=22 notPassed=0 PASS; `HostVerification.Invoke.Tests.ps1` cases=10 notPassed=0 PASS. CI JRP step 4: the three Phase 3 tokens hits=1 each, PASS.
+  - CI analyzer log line (`poshqc-job.log` line 841, Analyze PowerShell step): `PSScriptAnalyzer passed: no findings under D:\a\drm-copilot\drm-copilot`.
+  - (context, not a gate here) CI aggregate at this head: `AGGREGATE report covered=13738 missed=2412 total=16150 pct=85.07 required=13728 gap=0 PASS`.
+- Result: JRP and CRP parts both PASS; [P3-T4] verified.
 
 ## Notes
 
