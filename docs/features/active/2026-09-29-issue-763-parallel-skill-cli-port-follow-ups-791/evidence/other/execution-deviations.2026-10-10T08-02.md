@@ -29,3 +29,17 @@ Each entry records the task ID, the planned mechanism, the substituted mechanism
 - Planned mechanism: the plan defines no per-phase commit.
 - Substituted mechanism: `git add -A`, `git commit -F <scratchpad message file>`, and `git push origin bug/issue-763-parallel-skill-cli-port-follow-ups-791` after each of Phases 0, 1, and 2.
 - Reason: operator constraint.
+
+## Phases 3-4 run (2026-10-10T08-19)
+
+## Phase-boundary commits (Phases 3 and 4)
+- Task ID: phase boundaries after [P3-T9] and after [P4-T14].
+- Planned mechanism: the plan defines no per-phase commit.
+- Substituted mechanism: `git fetch origin main` and `git merge-base --is-ancestor origin/main HEAD` (merge `origin/main` with `--no-edit` when main has moved), then `git add -A`, `git commit -F <scratchpad message file>`, and `git push origin bug/issue-763-parallel-skill-cli-port-follow-ups-791` after Phase 3 and after Phase 4.
+- Reason: operator constraint.
+
+## Phase 3 pre-commit shell checks
+- Task ID: [P3-T1], [P3-T2].
+- Planned mechanism: the plan records the shfmt/shellcheck gate in Phase 8 only.
+- Substituted mechanism: `shfmt -d` and `shellcheck` were additionally run on the two new bash files before the Phase 3 commit (both exit 0 after fixes); nothing is recorded as gate evidence here, and Phase 8 records the gate.
+- Reason: operator constraint.
