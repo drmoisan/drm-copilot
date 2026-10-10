@@ -543,7 +543,7 @@ The anchored pattern used in this phase, quoted verbatim: `^- When the rule fire
 
 The workflow file under test (.github/workflows/publish-mcp-npm.yml) is read by the tests and is not written by this plan.
 
-- [ ] [P8-T1] Add a new `It` block to `tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1`, inserted immediately before the final closing `}` of the `Describe` block:
+- [x] [P8-T1] Add a new `It` block to `tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1`, inserted immediately before the final closing `}` of the `Describe` block:
 
     ```powershell
         # Issue #723 refinement, closed under #846: the poll step's error message states that the
@@ -565,7 +565,7 @@ The workflow file under test (.github/workflows/publish-mcp-npm.yml) is read by 
     ```
 
   - Acceptance: `grep -c -F -e "runs the registry poll step only after a successful publish step" tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` prints 1; the write is not denied by the PowerShell test-purity hook.
-- [ ] [P8-T2] Replace the equality-step assertion at line 110 of `tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` (`$script:equalityStep.Text | Should -Match '(?m)^\s*exit 1\s*$'`) with these two lines at the same indentation:
+- [x] [P8-T2] Replace the equality-step assertion at line 110 of `tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` (`$script:equalityStep.Text | Should -Match '(?m)^\s*exit 1\s*$'`) with these two lines at the same indentation:
 
     ```powershell
             [regex]::Matches($script:equalityStep.Text, '(?m)^\s*exit 1\s*$').Count | Should -Be 1
@@ -573,7 +573,7 @@ The workflow file under test (.github/workflows/publish-mcp-npm.yml) is read by 
     ```
 
   - Acceptance: `grep -c -F -e 'if \(\$tagVersion -ne \$manifestVersion\) \{' tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` prints 1.
-- [ ] [P8-T3] Replace the poll-step assertion at line 125 of `tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` (`$script:pollStep.Text | Should -Match '(?m)^\s*exit 1\s*$'`) with:
+- [x] [P8-T3] Replace the poll-step assertion at line 125 of `tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` (`$script:pollStep.Text | Should -Match '(?m)^\s*exit 1\s*$'`) with:
 
     ```powershell
             [regex]::Matches($script:pollStep.Text, '(?m)^\s*exit 1\s*$').Count | Should -Be 1
@@ -581,7 +581,7 @@ The workflow file under test (.github/workflows/publish-mcp-npm.yml) is read by 
     ```
 
   - Acceptance: `grep -c -F -e 'if \(-not \$resolved\) \{' tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` prints 1.
-- [ ] [P8-T4] Replace the poll-step assertion `$text | Should -Match '(?m)^\s*exit 1\s*$'` (line 224 before [P8-T2] and [P8-T3]; located by content) in `tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` with:
+- [x] [P8-T4] Replace the poll-step assertion `$text | Should -Match '(?m)^\s*exit 1\s*$'` (line 224 before [P8-T2] and [P8-T3]; located by content) in `tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` with:
 
     ```powershell
             [regex]::Matches($text, '(?m)^\s*exit 1\s*$').Count | Should -Be 1
@@ -589,20 +589,20 @@ The workflow file under test (.github/workflows/publish-mcp-npm.yml) is read by 
     ```
 
   - Acceptance: `grep -c -F -e 'if \(-not \$resolved\) \{' tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` prints 2 (the [P8-T3] line and this line); `grep -c -F -e "exit 1\s*\$').Count | Should -Be 1" tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1` prints 3 (the [P8-T2], [P8-T3], and [P8-T4] count assertions); the generic all-pwsh-steps rule (the `$exitsExplicitly` line) is unchanged.
-- [ ] [P8-T5] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/pester-workflow-after.2026-10-09T09-00.md` from the PowerShell-tool command `$r = Invoke-Pester -Path tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1 -Output Detailed -PassThru; "Passed=$($r.PassedCount) Failed=$($r.FailedCount)"` under the A7 branch rule.
+- [x] [P8-T5] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/pester-workflow-after.2026-10-09T09-00.md` from the PowerShell-tool command `$r = Invoke-Pester -Path tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1 -Output Detailed -PassThru; "Passed=$($r.PassedCount) Failed=$($r.FailedCount)"` under the A7 branch rule.
   - Acceptance (A7-LOCAL; AC-30, AC-31 Pester half): the printed line is `Passed=11 Failed=0` and the Detailed output lists `runs the registry poll step only after a successful publish step` as passed. Acceptance (A7-CI): `Outcome: LOCAL-PESTER-UNAVAILABLE` recorded with the denial or error text.
-- [ ] [P8-T6] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/doc-723-exit1-checks.2026-10-09T09-00.md` with `ExpectedExitCode: 1` from `git grep -n -F -e "Should -Match '(?m)^\s*exit 1\s*$'" -- tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1`.
+- [x] [P8-T6] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/doc-723-exit1-checks.2026-10-09T09-00.md` with `ExpectedExitCode: 1` from `git grep -n -F -e "Should -Match '(?m)^\s*exit 1\s*$'" -- tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1`.
   - Acceptance (AC-31 text half): exit 1 and nothing printed.
-- [ ] [P8-T7] Add the `npm view` command to `docs/engineering/missed-npm-publish.runbook.md` in section "Red verify step after a green publish step", immediately after line 134 ("Check the exact version on the registry instead of re-running the publish, because re-publishing an existing version fails."): a blank line, a fenced code block containing the single line `npm view @danmoisan/drm-copilot-mcp@<version> version` (deviation D-6), a blank line, and the sentence "Substitute the version under investigation for `<version>`."
+- [x] [P8-T7] Add the `npm view` command to `docs/engineering/missed-npm-publish.runbook.md` in section "Red verify step after a green publish step", immediately after line 134 ("Check the exact version on the registry instead of re-running the publish, because re-publishing an existing version fails."): a blank line, a fenced code block containing the single line `npm view @danmoisan/drm-copilot-mcp@<version> version` (deviation D-6), a blank line, and the sentence "Substitute the version under investigation for `<version>`."
   - Acceptance: `git diff --numstat e7d3779b398604af919678c16c877c8539a86cc0 -- docs/engineering/missed-npm-publish.runbook.md` reports 0 deleted lines.
-- [ ] [P8-T8] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/doc-723-runbook-checks.2026-10-09T09-00.md` from `git grep -n -F -e "npm view @danmoisan/drm-copilot-mcp@" -- docs/engineering/missed-npm-publish.runbook.md` and, as a second block, `git grep -n -E -e "^## " -- docs/engineering/missed-npm-publish.runbook.md`.
+- [x] [P8-T8] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/doc-723-runbook-checks.2026-10-09T09-00.md` from `git grep -n -F -e "npm view @danmoisan/drm-copilot-mcp@" -- docs/engineering/missed-npm-publish.runbook.md` and, as a second block, `git grep -n -E -e "^## " -- docs/engineering/missed-npm-publish.runbook.md`.
   - Acceptance (AC-32): the first block prints at least one line whose line number is greater than that of `## Red verify step after a green publish step` and less than that of the next `## ` heading (`## VERSION_CONSUMED_ELSEWHERE`), both read from the second block.
-- [ ] [P8-T9] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/workflow-unchanged.2026-10-09T09-00.md` from `git diff --name-only e7d3779b398604af919678c16c877c8539a86cc0 -- .github/workflows/`, then `git status --porcelain --untracked-files=all -- .github/workflows/`, then `poetry run pytest tests/scripts/dev_tools/test_workflow_npm_token_guard.py -q`.
+- [x] [P8-T9] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/workflow-unchanged.2026-10-09T09-00.md` from `git diff --name-only e7d3779b398604af919678c16c877c8539a86cc0 -- .github/workflows/`, then `git status --porcelain --untracked-files=all -- .github/workflows/`, then `poetry run pytest tests/scripts/dev_tools/test_workflow_npm_token_guard.py -q`.
   - Acceptance (AC-33): the two git blocks print nothing; pytest exits 0 with zero failed.
-- [ ] [P8-T10] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-30 only under A7-LOCAL after [P8-T5] passes; under A7-CI leave AC-30 unchecked and list it as pending-CI in [P13-T11].
-- [ ] [P8-T11] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-31 only under A7-LOCAL after [P8-T5] and [P8-T6] pass; under A7-CI leave AC-31 unchecked and list it as pending-CI in [P13-T11].
-- [ ] [P8-T12] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-32 after [P8-T8] passes.
-- [ ] [P8-T13] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-33 after [P8-T9] passes.
+- [x] [P8-T10] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-30 only under A7-LOCAL after [P8-T5] passes; under A7-CI leave AC-30 unchecked and list it as pending-CI in [P13-T11].
+- [x] [P8-T11] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-31 only under A7-LOCAL after [P8-T5] and [P8-T6] pass; under A7-CI leave AC-31 unchecked and list it as pending-CI in [P13-T11].
+- [x] [P8-T12] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-32 after [P8-T8] passes.
+- [x] [P8-T13] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-33 after [P8-T9] passes.
 
 ### Phase 9 — Fail-before exception dossier
 
