@@ -152,8 +152,8 @@ The operator is not consulted during execution. The following are recorded as as
 - [x] AC-11: The PowerShell toolchain is clean on all changed PowerShell files in a single pass: PoshQC format reports no changes, PSScriptAnalyzer reports zero errors and zero warnings, and the full Pester suite reports zero failures; results are recorded in `evidence/qa-gates/`.
 - [x] AC-12: Every new or modified file in the PR (production, test, and evidence `.ps1`/`.psm1` files) is <= 500 lines.
 - [x] AC-13: `git diff --name-only <merge-base>...HEAD` lists no path under `.codex/`, `.claude/rules/`, or `.github/instructions/`, and does not list `.claude/hooks/validate-feature-review-coverage.ps1`, `config/poshqc-coverage.json`, `scripts/powershell/PoshQC/**`, `quality-tiers.yml`, `.vscode/tasks.json`, or `scripts/dev-tools/vscode-cli.helpers.ps1`.
-- [ ] AC-14: A follow-up potential-issue entry exists under `docs/features/potential/` describing the missing `scripts/host-tools.manifest.json` (read by `bootstrap-host.ps1` and `verify-host.ps1`) and the missing `scripts/bash/bootstrap-host.sh` referenced by `bootstrap-host.ps1`, and the PR description references it.
-- [ ] AC-15: The CI `poshqc` job passes on the PR head commit (CI-dependent; verified from the PR checks).
+- [x] AC-14: A follow-up potential-issue entry exists under `docs/features/potential/` describing the missing `scripts/host-tools.manifest.json` (read by `bootstrap-host.ps1` and `verify-host.ps1`) and the missing `scripts/bash/bootstrap-host.sh` referenced by `bootstrap-host.ps1`, and the PR description references it.
+- [x] AC-15: The CI `poshqc` job passes on the PR head commit (CI-dependent; verified from the PR checks).
 
 ## Risks & Mitigations
 
