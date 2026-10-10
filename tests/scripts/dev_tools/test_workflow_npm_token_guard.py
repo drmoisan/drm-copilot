@@ -45,7 +45,7 @@ _NPM_AUTH_TOKEN_CONFIG_REFERENCE = re.compile(
     r"(?<![A-Za-z0-9])_authtoken\b", re.IGNORECASE
 )
 _NPM_TOKEN_ASSIGNMENT = re.compile(
-    r"(?<![\w.-])[\"']?NPM_TOKEN[\"']?\s*:|\bNPM_TOKEN\s*=", re.IGNORECASE
+    r"(?<![\w.-])[\"']?NPM_TOKEN[\"']?\s*:|\bNPM_TOKEN\s*=(?!=)", re.IGNORECASE
 )
 
 
@@ -124,8 +124,9 @@ def find_npm_token_assignments(text: str) -> list[int]:
 
     A YAML mapping key (block, flow, or quoted) and a shell or PowerShell
     assignment are reported whichever secret feeds them. A context read
-    (``secrets.NPM_TOKEN``, ``env.NPM_TOKEN``), a longer or prefixed name, and
-    prose without ``:`` or ``=`` after the name are not reported.
+    (``secrets.NPM_TOKEN``, ``env.NPM_TOKEN``), an ``==`` comparison, a longer
+    or prefixed name, and prose without ``:`` or ``=`` after the name are not
+    reported.
 
     Args:
         text: YAML document text to scan.
@@ -205,7 +206,7 @@ def enumerate_github_yaml_files(github_dir: Path) -> list[Path]:
 def test_find_npm_token_references_detects_reintroduced_reference(
     text: str, expected: list[int]
 ) -> None:
-    """A reintroduced ``NPM_TOKEN`` secret reference is reported at its line.
+    """A reintroduced ``NPM_TOKEN`` secret or variable reference is reported.
 
     Each case is an in-memory reintroduction of a shape a token-based publish
     would use, so the helper that drives the tree scan is shown to return a
@@ -370,6 +371,7 @@ def test_find_npm_auth_token_config_references_ignores_non_matching_text(
         ),
         pytest.param("$env:NPM_TOKEN = 'x'", [1], id="powershell-env"),
         pytest.param("npm_token: x", [1], id="lowercase-key"),
+        pytest.param("NPM_TOKEN=", [1], id="empty-assignment-end-of-line"),
     ],
 )
 def test_find_npm_token_assignments_detects_assignment(
@@ -394,6 +396,9 @@ def test_find_npm_token_assignments_detects_assignment(
         pytest.param("MY_NPM_TOKEN: x", id="prefixed-name-key"),
         pytest.param("# NPM_TOKEN is no longer used", id="prose-comment"),
         pytest.param("", id="empty"),
+        pytest.param("if: ${{ env.NPM_TOKEN == '' }}", id="equality-comparison"),
+        pytest.param('[[ $NPM_TOKEN == "" ]]', id="shell-equality-test"),
+        pytest.param("if: ${{ env.NPM_TOKEN != '' }}", id="inequality-comparison"),
     ],
 )
 def test_find_npm_token_assignments_ignores_non_matching_text(text: str) -> None:
