@@ -345,6 +345,19 @@ describe("validateEpicPlannerStateText", () => {
     );
   });
 
+  it("skips the planner topology receipt when the key is absent without a Codex flag", () => {
+    const state = readyState();
+    delete state["topology_receipt"];
+
+    const errors = validateEpicPlannerStateText(JSON.stringify(state), {
+      requireReadyForExecution: true,
+    });
+
+    expect(
+      errors.filter((error) => error.includes("Epic planner topology_receipt")),
+    ).toEqual([]);
+  });
+
   it("requires each prepared child to route through an orchestrator", () => {
     const state = readyState();
     const features = state["features"] as Record<string, unknown>[];

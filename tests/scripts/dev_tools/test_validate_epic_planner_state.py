@@ -219,7 +219,7 @@ def test_readiness_requires_epic_preparation_topology_receipts() -> None:
     state["features"][1]["topology_receipt"]["execution_context"] = "standalone"
 
     errors = validate_epic_planner_state_text(
-        json.dumps(state), require_ready_for_execution=True
+        json.dumps(state), require_ready_for_execution=True, require_codex_topology=True
     )
 
     assert any(
@@ -249,6 +249,20 @@ def test_readiness_requires_forced_epic_planner_persona() -> None:
     )
 
     assert any("root_persona must be 'epic-planner'" in error for error in errors)
+
+
+def test_ready_gate_skips_planner_topology_receipt_when_key_absent() -> None:
+    """Skip the planner receipt check for a Claude checkpoint without the key."""
+
+    state = _ready_state()
+    state.pop("topology_receipt")
+
+    errors = validate_epic_planner_state_text(
+        json.dumps(state), require_ready_for_execution=True
+    )
+
+    offending = [error for error in errors if "Epic planner topology_receipt" in error]
+    assert offending == []
 
 
 def test_readiness_requires_canonical_kickoff_path() -> None:
