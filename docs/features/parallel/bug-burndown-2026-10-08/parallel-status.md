@@ -17,18 +17,18 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 - `max_concurrency`: 4
 - `current_cohort`: 1
 - `recolor_generation`: 1
-- `last_updated`: 2026-10-10T11:57:02Z
-- `next_step`: monitor 543 790 791 824; next slots: 841 842 849
+- `last_updated`: 2026-10-10T13:04:47Z
+- `next_step`: monitor 790 791 824 841; next slots: 842 849
 
 **Items**
 
 | issue_num | feature_folder | cohort_index | state | merge_status | pr_url | merge_commit_sha | worktree_created_at | merged_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 543 | docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543 | 1 | in_flight | worktree_created | - | - | 2026-10-10T11:56:17Z | - | - |
+| 543 | docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/874 | 5431ccdd471c184917493c4211afcd715bb4b95c | 2026-10-10T11:56:17Z | 2026-10-10T13:04:09Z | - |
 | 790 | docs/features/active/2026-09-29-issue-507-python-push-down-divergence-follow-ups-790 | 1 | in_flight | worktree_created | - | - | 2026-10-10T11:56:17Z | - | - |
 | 791 | docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follow-ups-791 | 1 | in_flight | worktree_created | - | - | 2026-10-10T11:56:17Z | - | - |
 | 824 | docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824 | 1 | in_flight | worktree_created | - | - | 2026-10-10T02:33:53Z | - | - |
-| 841 | docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841 | 1 | prepared | not_started | - | - | - | - | - |
+| 841 | docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841 | 1 | in_flight | worktree_created | - | - | 2026-10-10T13:04:27Z | - | - |
 | 842 | docs/features/active/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups-842 | 1 | prepared | not_started | - | - | - | - | - |
 | 849 | docs/features/active/2026-10-08-parallel-items-fail-completion-on-promotion-receipts-849 | 1 | prepared | not_started | - | - | - | - | - |
 | 793 | docs/features/active/2026-09-30-epic-orchestrator-state-validator-crashes-on-unhashable-merge-status-793 | - | merged | merged | https://github.com/drmoisan/drm-copilot/pull/868 | 311dea0548cb2e2fe57259aec6e1e3a06a9bdd2a | 2026-10-09T23:56:38Z | 2026-10-10T00:51:14Z | - |
