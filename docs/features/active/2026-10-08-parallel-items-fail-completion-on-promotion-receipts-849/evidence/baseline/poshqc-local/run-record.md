@@ -38,6 +38,6 @@ Command: gh run download 38057875117 -n poshqc-test-results -D <session scratchp
 EXIT_CODE: 0
 Output Summary: downloaded pester-junit.xml, powershell-coverage.xml, powershell-coverage.koverage.xml outside the worktree; nothing downloaded appears in `git status --porcelain`.
 
-Command: python -S sanitize.py (session scratchpad script) applying, in order, root replacement (`D:\a\drm-copilot\drm-copilot` in both separator forms, case-insensitive, to WORKTREE_ROOT), absolute-path replacement (ABSOLUTE_PATH), `<properties>` block removal, and `hostname` value replacement (HOST)
+Command: python -S sanitize.py (session scratchpad script) applying, in order, root replacement (the GitHub runner workspace prefix that precedes `tests/` or `.claude/`, in both separator forms, case-insensitive, to WORKTREE_ROOT), absolute-path replacement (ABSOLUTE_PATH), `<properties>` block removal, and `hostname` value replacement (HOST)
 EXIT_CODE: 0
 Output Summary: pester-junit.xml: root 7591, absolute-paths 284, properties 279, hostname 279 replacements; powershell-coverage.xml: root 197, other 0; zero runner host tokens remain in either copy. analyzer-output.txt is not written for Source B; the AnalyzeStep line above stands for zero analyzer findings.
