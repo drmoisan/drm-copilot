@@ -70,3 +70,11 @@ Blocked state: MEASUREMENT ARTIFACT - OPERATOR-DECISION-REQUIRED: AC-24 coverage
 ## Not executed
 
 [P3-T1] to [P3-T5], [P4-T1] to [P4-T4], [P5-T1] to [P5-T11], and [P6-T1] to [P6-T6] are not executed. AC-6 and AC-24 stay unchecked in spec.md. AC-6 was amended in Phase 1 and its verification ([P6-T1]) belongs to Phase 6, which this halt does not reach.
+
+## Resolution
+
+Timestamp: 2026-10-10T17-36
+
+DECISION: AC-24 reads "measured per file from the Pester coverage XML" and does not name the combined run. For the Codex files in T-SET whose combined-run value is below 85% or below baseline, AC-24 is evaluated from a per-surface Pester coverage XML: the Codex suite set S (tests/scripts/codex-hooks/) run alone through the H2/R-PESTER hosting on the current tree, and the same S scope on the BASE tree extraction (the [P0-T10] r1-base extraction of 86e457a0…) for the "no changed line loses coverage" clause. The combined-run figures are retained and reported unchanged next to the per-surface figures. The final gate route, thresholds, exclusions and PoshQC configuration remain unchanged. No production or test code change is required for AC-24 under this decision.
+
+RESUMED: [P2-T11] cycle 1 closed at [P2-T10] with VERDICT: measurement artifact; execution continues at [P3-T1] under the orchestrator AC-24 decision of 2026-10-10

@@ -126,3 +126,9 @@ Rule 15 record of departures and their triggering observations.
   - LOOP-END: search=LOSS | stage=B | lo=41 | hi=42
 - Diagnosis evidence: the H2 probe reproduces the R-PESTER control exactly (X1 per-file values equal C0; HOSTING-PARITY yes). The loss needs both confirmed culprits, which only parse hook text (p_234) and read one workflow YAML file (q_42, the last container). Neither creates or leaves a module instance, and module or function cleanup does not remove the loss. The only applicable fix trial, E4, leaves the lost-line set unchanged. Containers p_235 to p_238 contribute a further part of the X1 loss that the single-predicate bisection does not isolate. The plan does not select a measurement route.
 - OPERATOR-DECISION-REQUIRED: AC-24 coverage measurement route
+
+## Remediation cycle 1: AC-24 decision
+
+Timestamp: 2026-10-10T17-36
+
+OPERATOR-DECISION-RESOLVED: AC-24 coverage measurement route | evidence/other/r1-ac24-decision.md
