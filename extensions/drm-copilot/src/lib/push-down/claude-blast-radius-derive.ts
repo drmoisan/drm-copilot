@@ -41,6 +41,7 @@
 
 import * as fs from "node:fs";
 
+import { compareCodePoint } from "../string-ordering";
 import { type PushDownFileSystem } from "./filesystem-adapter";
 import {
   BLAST_RADIUS_RELATIVE_PATH,
@@ -122,9 +123,7 @@ export const realDirectoryLister: DirectoryLister = (root) => {
   }
   return entries
     .map((entry) => ({ name: entry.name, isDir: entry.isDirectory() }))
-    .sort((left, right) =>
-      left.name < right.name ? -1 : left.name > right.name ? 1 : 0,
-    );
+    .sort((left, right) => compareCodePoint(left.name, right.name));
 };
 
 /**
