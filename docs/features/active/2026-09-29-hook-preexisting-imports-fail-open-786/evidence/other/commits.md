@@ -127,3 +127,12 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## r1-halt ([P2-T10], cycle 1 H2)
+
+- Subject: docs(786): remediation cycle 1 halted at [P2-T10]
+- Commit SHA: f40d403faf69137073562971bca3e9c65a8bb2ae
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
+- Follow-up: this record is committed alone (subject docs(786): record remediation cycle 1 halt commit) because the halt leaves no later phase R-COMMIT; operator rule: commit and push at any pause.
