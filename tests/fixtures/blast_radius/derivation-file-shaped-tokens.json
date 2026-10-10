@@ -1,0 +1,62 @@
+{
+  "description": "File-shape recognition (issue #797). Write-task citations of files whose final component carries a letter-led extension outside the former allowlist, a known dotfile, or a known extensionless file name are recorded; a dot-directory and a directory cited in the same plan stay rejected.",
+  "input": {
+    "plan_text": "### Phase 1 — Work\n- [ ] [P1-T1] Update `tests/shell/parallel_lane_assertion.bats` and `extensions/drm-copilot/jest.config.cjs`.\n- [ ] [P1-T2] Write `tests/fixtures/cleanup_worktrees/scenarios/scan_roots_derived/worktree-list.out` and `packages/mcp-server/.gitignore`.\n- [ ] [P1-T3] Edit `.devcontainer/codespaces/Dockerfile` and `scripts/dev_tools/compute_blast_radius.py`.\n- [ ] [P1-T4] Update `extensions/drm-copilot/resources/claude-customizations/.claude` and `scripts/dev_tools`.\n",
+    "spec_text": "",
+    "feature_folder": "2026-10-08-file-shaped-tokens-797",
+    "computed_at": "2026-10-08T12-00",
+    "tracked_file_count": 100,
+    "config": {
+      "version": 1,
+      "shared_surfaces": [
+        "config/orchestration-routing.json",
+        "quality-tiers.yml"
+      ],
+      "shared_surface_globs": [
+        "scripts/dev_tools/validate_*.py"
+      ],
+      "modules": {
+        "config": [
+          "config/**"
+        ],
+        "python-dev-tools": [
+          "scripts/dev_tools/**"
+        ],
+        "tests": [
+          "tests/**"
+        ]
+      },
+      "over_breadth_fraction": 0.25,
+      "write_intent_extraction": true,
+      "path_roots": [
+        ".devcontainer",
+        "extensions",
+        "packages",
+        "scripts",
+        "tests"
+      ]
+    }
+  },
+  "expected": {
+    "radius": {
+      "paths": [
+        ".devcontainer/codespaces/Dockerfile",
+        "docs/features/active/2026-10-08-file-shaped-tokens-797/**",
+        "extensions/drm-copilot/jest.config.cjs",
+        "packages/mcp-server/.gitignore",
+        "scripts/dev_tools/compute_blast_radius.py",
+        "tests/fixtures/cleanup_worktrees/scenarios/scan_roots_derived/worktree-list.out",
+        "tests/shell/parallel_lane_assertion.bats"
+      ],
+      "modules": [
+        "python-dev-tools",
+        "tests"
+      ],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "derived",
+      "computed_at": "2026-10-08T12-00"
+    },
+    "findings": []
+  }
+}

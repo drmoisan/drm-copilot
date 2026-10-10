@@ -145,15 +145,15 @@ Describe 'Get-PathTokenKind' {
             $kind | Should -Be 'concrete'
         }
 
-        It 'rejects a token outside the known segments with an unrecognized extension' {
-            # Arrange: a path-shaped token with an unknown extension.
+        It 'accepts a token outside the known segments with an unlisted letter-led extension' {
+            # Arrange: a letter-led extension names a file (issue #797).
             $token = 'weird/thing.unknownext'
 
             # Act: classify the token.
             $kind = Get-PathTokenKind -Token $token
 
-            # Assert: failing both shape rules drops the token.
-            $kind | Should -BeNullOrEmpty
+            # Assert: a letter-led extension names a file, so it is recorded (issue #797).
+            $kind | Should -Be 'concrete'
         }
 
         It 'matches a recognized extension case insensitively' {

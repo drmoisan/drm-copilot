@@ -223,3 +223,91 @@ def test_real_path_on_same_task_line_survives_placeholder_rejection() -> None:
         "Expected the real path cited on the same task line to survive; observed "
         f"{paths}."
     )
+
+
+# File-shaped tokens a plan writes that the former extension allowlist rejected
+# (issue #797): letter-led extensions outside the allowlist, a known dotfile, a
+# known extensionless file name, and a line-suffixed citation.
+FILE_SHAPED_TOKENS_797 = [
+    pytest.param("tests/shell/foo.bats", id="bats"),
+    pytest.param("extensions/drm-copilot/jest.config.cjs", id="cjs"),
+    pytest.param("tests/out/run.out", id="out"),
+    pytest.param(".agents/skills/x/refs/foo.bats", id="agents-bats"),
+    pytest.param(".claude/lib/x/.shellcheckrc", id="shellcheckrc"),
+    pytest.param(".devcontainer/codespaces/Dockerfile", id="dockerfile"),
+    pytest.param("tests/shell/parallel_lane_assertion.bats:12", id="bats-line-suffix"),
+]
+
+
+@pytest.mark.parametrize("token", FILE_SHAPED_TOKENS_797)
+def test_classify_path_token_admits_a_file_shaped_token_797(token: str) -> None:
+    """Admit a token whose final component names a file (issue #797).
+
+    A plan that writes a ``.bats`` script, a ``.cjs`` configuration, a ``.out``
+    fixture, a known dotfile, or a ``Dockerfile`` cites a real file. Rejecting
+    it omitted the write from the derived radius, so two items writing the same
+    file could be scheduled concurrently.
+    """
+    # Arrange / Act
+    kind = classify_path_token(token)
+
+    # Assert
+    assert (
+        kind == PATH_KIND_CONCRETE
+    ), f"Expected {token!r} to classify as concrete; observed {kind!r}."
+
+
+# Tokens that name no file and must stay rejected after the file-shape rule
+# replaces the extension allowlist (issue #797 false-positive guards).
+NON_FILE_TOKENS_797 = [
+    pytest.param("extensions/drm-copilot", id="directory-extension"),
+    pytest.param("scripts/dev_tools", id="directory-scripts"),
+    pytest.param(".claude/rules/", id="directory-trailing-slash"),
+    pytest.param(
+        "extensions/drm-copilot/resources/claude-customizations/.claude",
+        id="dot-directory-bundle",
+    ),
+    pytest.param("good_wt/.git", id="dot-git"),
+    pytest.param("release/v1.2.0", id="version-ref"),
+    pytest.param("actions/setup-node@v4.0.2", id="action-version"),
+    pytest.param("origin/main", id="branch-ref"),
+    pytest.param("https://x/y.md", id="url"),
+    pytest.param("C:/x.md", id="drive"),
+    pytest.param("/etc/hosts", id="absolute"),
+    pytest.param("scripts.dev_tools._blast_radius_extraction", id="dotted-module"),
+    pytest.param("Sample.*", id="bare-glob"),
+    pytest.param("README.md", id="bare-readme"),
+    pytest.param("pyproject.toml", id="bare-pyproject"),
+]
+
+
+@pytest.mark.parametrize("token", NON_FILE_TOKENS_797)
+def test_classify_path_token_still_rejects_a_non_file_token_797(token: str) -> None:
+    """Keep rejecting directories, refs, versions, and separator-free tokens.
+
+    The file-shape rule must not re-admit the directory-shaped tokens rejected
+    for issue #489, version strings, branch refs, URLs, rooted or
+    drive-qualified tokens, or separator-free names (issue #797).
+    """
+    # Arrange / Act
+    kind = classify_path_token(token)
+
+    # Assert
+    assert kind is None, f"Expected {token!r} to be rejected; observed {kind!r}."
+
+
+def test_classify_path_token_admits_the_dotted_directory_residual_797() -> None:
+    """Classify a dotted directory cited without a trailing slash as concrete.
+
+    This is the documented fail-closed residual of the file-shape rule (issue
+    #797): ``src/TaskMaster.Domain`` has a letter-led dotted tail, so it is read
+    as a file. The cost is at most an extra contention edge, which serializes
+    work; a missed write would schedule concurrent edits.
+    """
+    # Arrange / Act
+    kind = classify_path_token("src/TaskMaster.Domain")
+
+    # Assert
+    assert (
+        kind == PATH_KIND_CONCRETE
+    ), f"Expected the dotted-directory residual to be concrete; observed {kind!r}."
