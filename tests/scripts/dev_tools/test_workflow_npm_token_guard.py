@@ -45,7 +45,7 @@ _NPM_AUTH_TOKEN_CONFIG_REFERENCE = re.compile(
     r"(?<![A-Za-z0-9])_authtoken\b", re.IGNORECASE
 )
 _NPM_TOKEN_ASSIGNMENT = re.compile(
-    r"(?<![\w.-])[\"']?NPM_TOKEN[\"']?\s*:|\bNPM_TOKEN\s*=", re.IGNORECASE
+    r"(?<![\w.-])[\"']?NPM_TOKEN[\"']?\s*:|\bNPM_TOKEN\s*=(?!=)", re.IGNORECASE
 )
 
 
@@ -124,8 +124,9 @@ def find_npm_token_assignments(text: str) -> list[int]:
 
     A YAML mapping key (block, flow, or quoted) and a shell or PowerShell
     assignment are reported whichever secret feeds them. A context read
-    (``secrets.NPM_TOKEN``, ``env.NPM_TOKEN``), a longer or prefixed name, and
-    prose without ``:`` or ``=`` after the name are not reported.
+    (``secrets.NPM_TOKEN``, ``env.NPM_TOKEN``), an ``==`` comparison, a longer
+    or prefixed name, and prose without ``:`` or ``=`` after the name are not
+    reported.
 
     Args:
         text: YAML document text to scan.
@@ -205,7 +206,7 @@ def enumerate_github_yaml_files(github_dir: Path) -> list[Path]:
 def test_find_npm_token_references_detects_reintroduced_reference(
     text: str, expected: list[int]
 ) -> None:
-    """A reintroduced ``NPM_TOKEN`` secret reference is reported at its line.
+    """A reintroduced ``NPM_TOKEN`` secret or variable reference is reported.
 
     Each case is an in-memory reintroduction of a shape a token-based publish
     would use, so the helper that drives the tree scan is shown to return a
