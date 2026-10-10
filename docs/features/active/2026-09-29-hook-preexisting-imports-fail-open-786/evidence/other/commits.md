@@ -63,3 +63,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## p8
+
+- Subject: fix(786): apply conditional handler conversions and record them
+- Commit SHA: c4cc2fd637c980953626c929712ed8fd986f1729
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
