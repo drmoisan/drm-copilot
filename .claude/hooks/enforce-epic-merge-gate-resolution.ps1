@@ -7,9 +7,9 @@
     Holds:
 
     - The import guards for WorktreeRunResolution.psm1 and, after it,
-      WorktreeItemResolution.psm1 (issue #850). The first failed import is recorded in
-      $script:EpicMergeGateResolutionImportFailure, and
-      Get-EpicMergeGateImportFailureDecision turns it into a deny, so a missing module
+      WorktreeItemResolution.psm1 (issue #850). A failed import is recorded in
+      $script:HookDependencyFailures, and the gate's call to
+      Get-HookDependencyFailureDecision turns it into a deny, so a missing module
       cannot make the gate exit non-zero and fail open.
     - The three checkpoint read seams, relocated from the gate file with their names kept.
       Each takes a mandatory absolute path composed beneath a resolved worktree root.
@@ -32,43 +32,8 @@
     extensions/drm-copilot/resources/claude-customizations/.
 #>
 
-# Import guards (issues #690, #850): a failed import denies instead of failing open. The
-# run resolver is imported first and the item resolver second, each in its own guard, so
-# the item resolver instance the gate calls is the one a module-scoped test mock binds.
-$script:EpicMergeGateResolutionImportFailure = $null
-try {
-    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop
-}
-catch {
-    $script:EpicMergeGateResolutionImportFailure = 'WorktreeRunResolution.psm1'
-}
-try {
-    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop
-}
-catch {
-    if (-not $script:EpicMergeGateResolutionImportFailure) {
-        $script:EpicMergeGateResolutionImportFailure = 'WorktreeItemResolution.psm1'
-    }
-}
-
-function Get-EpicMergeGateImportFailureDecision {
-    <#
-    .SYNOPSIS
-        Returns the deny for a failed worktree-resolution import, or $null.
-    .OUTPUTS
-        System.Collections.Specialized.OrderedDictionary, or $null when the import succeeded.
-    #>
-    [CmdletBinding()]
-    [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param()
-
-    if (-not $script:EpicMergeGateResolutionImportFailure) {
-        return $null
-    }
-    return Get-EpicMergeGateBlockDecision -Reason (
-        "EPIC_MERGE_GATE_BLOCKED: the worktree-resolution module '$($script:EpicMergeGateResolutionImportFailure)' " +
-        'failed to import, so the run checkpoint that governs this merge cannot be located; the gate fails closed.')
-}
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
 
 function Get-ChildOrchestratorCheckpointContent {
     <#

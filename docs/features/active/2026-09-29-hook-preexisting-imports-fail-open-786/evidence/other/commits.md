@@ -31,3 +31,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## p4
+
+- Subject: fix(786): add shared hook-dependency-guard helper and registrations
+- Commit SHA: 261c77ffb029592f4cd25fdcb99f3c17de27fa28
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty

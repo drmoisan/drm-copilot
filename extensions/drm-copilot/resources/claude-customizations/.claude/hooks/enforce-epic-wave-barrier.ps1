@@ -44,18 +44,13 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 
-# Import guard (issue #690): a failed import denies instead of failing open.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 $script:EpicWaveBarrierResolutionImportFailure = $null
-try {
-    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop
-}
-catch {
-    $script:EpicWaveBarrierResolutionImportFailure = 'WorktreeRunResolution.psm1'
-}
 
 # Shared feature-folder resolution (issue #565). Guarded so a failed dot-source denies
 # rather than failing open; an earlier recorded failure is kept.
@@ -270,8 +265,10 @@ function Invoke-EpicWaveBarrierDecision {
     param(
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WAVE_BARRIER_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
-    # A failed dependency import denies before any other logic (issues #690 and #565).
+    # A failed dependency import denies before any other logic (issue #565).
     if ($script:EpicWaveBarrierResolutionImportFailure) {
         return Get-EpicWaveBarrierBlockDecision -Reason (
             "EPIC_WAVE_BARRIER_BLOCKED: the dependency '$($script:EpicWaveBarrierResolutionImportFailure)' " +
@@ -376,5 +373,8 @@ function Invoke-EpicWaveBarrierEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_WAVE_BARRIER_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WAVE_BARRIER_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 exit (Invoke-EpicWaveBarrierEntryPoint)

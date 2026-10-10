@@ -48,15 +48,16 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 $script:PrContextArtifactPath = 'artifacts/pr_context.summary.txt'
 # Null until the resolution step assigns the absolute path of the resolved worktree's
 # checkpoint (issue #673); a relative default here was the process-directory binding.
 $script:OrchestratorStateCheckpointPath = $null
 
-Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
 
 function Get-PrContextArtifactExistence {
     <#
@@ -161,11 +162,13 @@ function Get-PrContextSummaryLastWriteUtc {
     return (Get-Item -LiteralPath $Path).LastWriteTimeUtc
 }
 
-. (Join-Path $PSScriptRoot 'enforce-pr-author-skill.epic-base-branch.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-pr-author-skill.epic-base-branch.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-pr-author-skill.epic-base-branch.ps1' -ErrorRecord $_ }
 
 # Dot-source the receipt-verification and bypass-reason helpers. Guarded so dot-sourcing this
 # hook in tests loads the helpers too (issue #501 headroom split).
-. (Join-Path $PSScriptRoot 'enforce-pr-author-skill-helpers.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-pr-author-skill-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-pr-author-skill-helpers.ps1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
 
 function Invoke-PrAuthorSkillDecision {
     <#
@@ -186,6 +189,8 @@ function Invoke-PrAuthorSkillDecision {
         [AllowEmptyString()]
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PR_AUTHOR_SKILL_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $payload.IsValid) {
@@ -314,6 +319,9 @@ function Invoke-PrAuthorSkillEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PR_AUTHOR_SKILL_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PR_AUTHOR_SKILL_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 # The entry point returns its [int] exit code as the last pipeline element and the
 # decision JSON before it. `exit (<call>)` would capture BOTH into the exit

@@ -32,27 +32,21 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Sanctioned-removal manifest reader (issue #635), consumed by the manifest branch in
 # Invoke-ParallelWorktreeRemovalGateDecision. Same module the epic gate imports.
-Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'CleanupWorktreeManifest.psm1' -ErrorRecord $_ }
 # Shared command-line parser (issue #545), consumed by the scope filter in
 # Invoke-ParallelWorktreeRemovalGateDecision and by Resolve-CommandLineInvocationTarget.
 # Both call sites are byte-for-byte the calls the epic gate makes, so the duplicated
 # concern now has one implementation.
-. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
-. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 
-# Import guard (issue #690): a failed import denies instead of failing open.
-$script:ParallelWorktreeGateResolutionImportFailure = $null
-try {
-    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop
-}
-catch {
-    $script:ParallelWorktreeGateResolutionImportFailure = 'WorktreeRunResolution.psm1'
-}
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
 # Sanctioned-removal manifest location. Recorded here so every hook-read document this
@@ -288,13 +282,8 @@ function Invoke-ParallelWorktreeRemovalGateDecision {
     param(
         [string] $ToolInputRaw
     )
-
-    # A failed worktree-resolution import denies before any other logic (issue #690).
-    if ($script:ParallelWorktreeGateResolutionImportFailure) {
-        return Get-ParallelWorktreeGateBlockDecision -Reason (
-            "PARALLEL_WORKTREE_REMOVAL_BLOCKED: the worktree-resolution module '$($script:ParallelWorktreeGateResolutionImportFailure)' " +
-            'failed to import, so the run checkpoint that governs this removal cannot be located; the gate fails closed.')
-    }
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $payload.IsValid) {
@@ -452,6 +441,9 @@ function Invoke-ParallelWorktreeRemovalGateEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PARALLEL_WORKTREE_REMOVAL_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 # The entry point returns its [int] exit code as the last pipeline element and the
 # decision JSON before it. `exit (<call>)` would capture BOTH into the exit
