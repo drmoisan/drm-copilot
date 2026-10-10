@@ -325,6 +325,13 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #790: the runtime-directory filter added to the Claude filesystem
+    // adapter. This map carries no `global` key, so the file is gated only by
+    // its own entry here.
+    "./src/lib/push-down/claude-filesystem-adapter.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/lib/push-down/push-down-service-call.ts": {
       lines: 85,
       branches: 75,

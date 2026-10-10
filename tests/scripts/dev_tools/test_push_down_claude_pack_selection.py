@@ -346,3 +346,72 @@ def test_parse_args_explicit_values() -> None:
     assert args.packs == "core,typescript"
     assert args.csharp_variant == "legacy"
     assert args.memory_mode == "merge"
+
+
+# --- resolve_published_paths (issue #790) --------------------------------------
+
+
+def test_resolve_published_paths_returns_none_without_selection() -> None:
+    """Verify an absent or empty selection returns None without reading manifests."""
+    module = _selection_module()
+    source_root = Path("/repo")
+    manifest_dir = source_root / MANIFEST_DIR_RELATIVE
+    # No manifest exists, so any manifest read would raise.
+    fs = RecordingFileSystem()
+    selections: tuple[frozenset[str] | None, ...] = (None, frozenset())
+
+    for packs in selections:
+        result = module.resolve_published_paths(
+            packs=packs, manifest_dir=manifest_dir, fs=fs
+        )
+
+        assert result is None, packs
+
+
+def test_resolve_published_paths_unions_selected_pack_with_core() -> None:
+    """Verify the selected pack's paths are unioned with the core paths."""
+    module = _selection_module()
+    source_root = Path("/repo")
+    manifest_dir = source_root / MANIFEST_DIR_RELATIVE
+    fs = RecordingFileSystem()
+    _write_manifests(
+        fs,
+        source_root,
+        {
+            "core": _manifest_payload("core", "Core", [".claude/settings.json"]),
+            "python": _manifest_payload(
+                "python", "Python", [".claude/rules/python.md"]
+            ),
+        },
+    )
+
+    result = module.resolve_published_paths(
+        packs=frozenset({"python"}), manifest_dir=manifest_dir, fs=fs
+    )
+
+    assert result == frozenset({".claude/settings.json", ".claude/rules/python.md"})
+
+
+def test_resolve_published_paths_rejects_both_csharp_variants() -> None:
+    """Verify selecting both C# variants raises the mutual-exclusion error."""
+    module = _selection_module()
+    source_root = Path("/repo")
+    manifest_dir = source_root / MANIFEST_DIR_RELATIVE
+    fs = RecordingFileSystem()
+    csharp_paths = [".claude/rules/csharp.md"]
+    _write_manifests(
+        fs,
+        source_root,
+        {
+            "core": _manifest_payload("core", "Core", [".claude/settings.json"]),
+            "csharp-modern": _manifest_payload("csharp-modern", "C#", csharp_paths),
+            "csharp-legacy": _manifest_payload("csharp-legacy", "C#", csharp_paths),
+        },
+    )
+
+    with pytest.raises(module.ManifestError, match="C# mutual exclusion"):
+        module.resolve_published_paths(
+            packs=frozenset({"csharp-modern", "csharp-legacy"}),
+            manifest_dir=manifest_dir,
+            fs=fs,
+        )
