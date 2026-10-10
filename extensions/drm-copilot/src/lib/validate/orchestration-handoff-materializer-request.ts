@@ -5,6 +5,7 @@ import type {
   TransitionPreparedOrchestrationResult,
 } from "../../mcp-repo-automation-tool-definitions-handoff";
 import type { HandoffFailureCode } from "./orchestration-handoff-contract";
+import { HandoffContractError } from "./orchestration-handoff-contract-support";
 
 /**
  * Request-shaping and blocked-result helpers for the handoff materializer.
@@ -17,11 +18,16 @@ import type { HandoffFailureCode } from "./orchestration-handoff-contract";
 /** A system or synthetic error code: an uppercase identifier such as `EACCES`. */
 const HANDOFF_ERROR_CODE_PATTERN = /^[A-Z][A-Z0-9_]*$/;
 
+/** An error class name: an ASCII identifier such as `TypeError`. */
+const HANDOFF_ERROR_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
 /**
  * Build a redaction-safe `<stage>: <token>` cause string for a blocked result.
  *
  * The token is, in order: the error's string `code` when it is an uppercase
- * identifier; otherwise `error.name` for an `Error`; otherwise the literal
+ * identifier; otherwise, for an `Error`, its `name` when that name is an ASCII
+ * identifier, or the fallback token `Error` when it is not (an empty name or
+ * one containing spaces, separators, or path text); otherwise the literal
  * `non-error value`. The error's `message` and `stack` are never read, so no
  * path, environment value, or other host data can reach the cause string.
  *
@@ -40,9 +46,36 @@ export function describeHandoffFailureCause(
     }
   }
   if (error instanceof Error) {
-    return `${stage}: ${error.name}`;
+    return HANDOFF_ERROR_NAME_PATTERN.test(error.name)
+      ? `${stage}: ${error.name}`
+      : `${stage}: Error`;
   }
   return `${stage}: non-error value`;
+}
+
+/**
+ * Return the failure code and the `envelope-parse` cause for an error caught
+ * while parsing envelope text.
+ *
+ * A `HandoffContractError` keeps its own code; any other caught value maps to
+ * `HANDOFF_UNSUPPORTED_VERSION`. The cause is built by
+ * {@link describeHandoffFailureCause}, so it carries no message or host data.
+ *
+ * @param error - The value caught while parsing the envelope text.
+ * @returns The failure code and the cause string, for example
+ *   `envelope-parse: HANDOFF_UNSUPPORTED_VERSION`.
+ */
+export function describeEnvelopeParseFailure(error: unknown): {
+  readonly code: HandoffFailureCode;
+  readonly failureCause: string;
+} {
+  return {
+    code:
+      error instanceof HandoffContractError
+        ? error.code
+        : "HANDOFF_UNSUPPORTED_VERSION",
+    failureCause: describeHandoffFailureCause("envelope-parse", error),
+  };
 }
 
 /**
@@ -79,7 +112,7 @@ export function blockedResult(
     readonly handoffHistorySha256?: string | null;
     readonly affectedPaths?: readonly string[];
     readonly unsupportedCapabilities?: readonly string[];
-    readonly failureCause?: string;
+    readonly failureCause?: string | undefined;
   } = {},
 ): TransitionPreparedOrchestrationResult {
   return {

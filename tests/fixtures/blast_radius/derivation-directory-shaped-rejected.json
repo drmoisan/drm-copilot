@@ -1,5 +1,5 @@
 {
-  "description": "Directory-shaped token rejection. A wildcard-free token whose final component carries no recognized extension names a location rather than a write claim and is rejected; a subtree glob and a line-suffixed file citation stay admitted (issue #489).",
+  "description": "Directory-shaped token rejection. A wildcard-free token whose final component names no file (no letter-led extension and no known file name) names a location rather than a write claim and is rejected; a subtree glob and a line-suffixed file citation stay admitted (issue #489).",
   "input": {
     "plan_text": "### Phase 1 — Work\n- [ ] [P1-T1] Work in `extensions/drm-copilot` and `scripts/dev_tools`.\n- [ ] [P1-T2] Claim `tests/scripts/dev_tools/**` and cite `config/blast-radius.json:12`.\n",
     "spec_text": "",
