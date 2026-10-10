@@ -672,13 +672,13 @@ Pre-existing-failure rule: a step whose Phase 0 baseline ([P0-T17] for [P11-T1],
 
 Loop rule: run [P12-T1] through [P12-T3] in order under the A7 branch rule. If the formatter comparison prints `False`, write the formatted text back with the PowerShell-tool command `Set-Content -LiteralPath tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1 -Value $f -NoNewline` (the comparison then prints `True` on the rerun) and restart at [P12-T1].
 
-- [ ] [P12-T1] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/ps-formatter-check.2026-10-09T09-00.md` from the [P0-T24] PowerShell-tool command.
+- [x] [P12-T1] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/ps-formatter-check.2026-10-09T09-00.md` from the [P0-T24] PowerShell-tool command.
   - Acceptance (A7-LOCAL): prints `True`. Acceptance (A7-CI): the A7-CI record.
-- [ ] [P12-T2] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/ps-analyzer.2026-10-09T09-00.md` from the [P0-T25] PowerShell-tool command.
+- [x] [P12-T2] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/ps-analyzer.2026-10-09T09-00.md` from the [P0-T25] PowerShell-tool command.
   - Acceptance (A7-LOCAL): prints `0`. Acceptance (A7-CI): the A7-CI record.
-- [ ] [P12-T3] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/ps-pester.2026-10-09T09-00.md` from the [P8-T5] PowerShell-tool command.
+- [x] [P12-T3] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/ps-pester.2026-10-09T09-00.md` from the [P8-T5] PowerShell-tool command.
   - Acceptance (A7-LOCAL): `Passed=11 Failed=0`. Acceptance (A7-CI): the A7-CI record.
-- [ ] [P12-T4] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/ps-coverage-not-applicable.2026-10-09T09-00.md` recording that no production PowerShell file changed (only a `*.Tests.ps1` file), so the Pester line-coverage gate measures no changed production line, and that Pester measures no branch coverage.
+- [x] [P12-T4] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/ps-coverage-not-applicable.2026-10-09T09-00.md` recording that no production PowerShell file changed (only a `*.Tests.ps1` file), so the Pester line-coverage gate measures no changed production line, and that Pester measures no branch coverage.
   - Acceptance: the file exists with both statements.
 - [ ] [P12-T5] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-38 only under A7-LOCAL after [P12-T1] and [P12-T2] pass; under A7-CI leave AC-38 unchecked and list it as pending-CI in [P13-T11].
 
