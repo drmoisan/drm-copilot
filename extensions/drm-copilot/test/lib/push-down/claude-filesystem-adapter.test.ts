@@ -2,6 +2,7 @@ import { describe, expect, it } from "@jest/globals";
 
 import {
   ExcludingFileSystem,
+  LOCAL_RUNTIME_RELATIVE_DIRECTORIES,
   isGeneralMemoryFile,
   readMemoryScope,
 } from "../../../src/lib/push-down/claude-filesystem-adapter";
@@ -399,5 +400,13 @@ describe("ExcludingFileSystem", () => {
 
     // Assert: a path with no source-relative form is not filtered.
     expect([...listed].sort()).toEqual(["/other/.claude/state/x.json"]);
+  });
+
+  it("exports LOCAL_RUNTIME_RELATIVE_DIRECTORIES with the two runtime directories", () => {
+    // Act
+    const directories = [...LOCAL_RUNTIME_RELATIVE_DIRECTORIES];
+
+    // Assert
+    expect(directories).toEqual([".claude/state", ".claude/worktrees"]);
   });
 });

@@ -244,19 +244,19 @@ Each task in this phase writes FEATURE/evidence/other/p3-tN.TS.md.
 
 Each task in this phase writes FEATURE/evidence/other/p4-tN.TS.md.
 
-- [ ] [P4-T1] Update `scripts/dev_tools/push_down_claude_filesystem.py` with replacements G1 through G3 of Appendix A4 (module constant `LOCAL_RUNTIME_RELATIVE_DIRECTORIES`, private predicate `_is_local_runtime_path`, first operand in `list_files`).
+- [x] [P4-T1] Update `scripts/dev_tools/push_down_claude_filesystem.py` with replacements G1 through G3 of Appendix A4 (module constant `LOCAL_RUNTIME_RELATIVE_DIRECTORIES`, private predicate `_is_local_runtime_path`, first operand in `list_files`).
       Commands: `git grep --no-index -c -F "def _is_local_runtime_path(" -- scripts/dev_tools/push_down_claude_filesystem.py`; `git grep --no-index -c -F "if not self._is_local_runtime_path(p)" -- scripts/dev_tools/push_down_claude_filesystem.py`; `wc -l scripts/dev_tools/push_down_claude_filesystem.py`.
       Acceptance: each grep prints 1; the line count is at most 498.
-- [ ] [P4-T2] Update `extensions/drm-copilot/src/lib/push-down/claude-filesystem-adapter.ts` with replacements H1 through H3 of Appendix A5 (exported `LOCAL_RUNTIME_RELATIVE_DIRECTORIES`, private `isLocalRuntimePath`, first filter in `listFiles`).
+- [x] [P4-T2] Update `extensions/drm-copilot/src/lib/push-down/claude-filesystem-adapter.ts` with replacements H1 through H3 of Appendix A5 (exported `LOCAL_RUNTIME_RELATIVE_DIRECTORIES`, private `isLocalRuntimePath`, first filter in `listFiles`).
       Commands: `git grep --no-index -c -F "export const LOCAL_RUNTIME_RELATIVE_DIRECTORIES" -- extensions/drm-copilot/src/lib/push-down/claude-filesystem-adapter.ts`; `git grep --no-index -c -F "!this.isLocalRuntimePath(p)" -- extensions/drm-copilot/src/lib/push-down/claude-filesystem-adapter.ts`.
       Acceptance: each grep prints 1.
-- [ ] [P4-T3] Update `extensions/drm-copilot/test/lib/push-down/claude-filesystem-adapter.test.ts` with the import addition and test T6 of Appendix C9.
+- [x] [P4-T3] Update `extensions/drm-copilot/test/lib/push-down/claude-filesystem-adapter.test.ts` with the import addition and test T6 of Appendix C9.
       Commands: `git grep --no-index -c -E "^  it\(" -- extensions/drm-copilot/test/lib/push-down/claude-filesystem-adapter.test.ts`; `npm --prefix extensions/drm-copilot run test -- test/lib/push-down/claude-filesystem-adapter.test.ts`.
       Acceptance: the grep prints 29; Jest exits 0 and the `Tests:` line reports 29 passed, 29 total.
-- [ ] [P4-T4] Update `extensions/drm-copilot/jest.config.cjs` with the per-file threshold entry of Appendix A6 for `./src/lib/push-down/claude-filesystem-adapter.ts`, placed after the `./src/lib/push-down/claude-customizations.ts` entry. The baseline value from P0-T18 is quoted in this task's artifact.
+- [x] [P4-T4] Update `extensions/drm-copilot/jest.config.cjs` with the per-file threshold entry of Appendix A6 for `./src/lib/push-down/claude-filesystem-adapter.ts`, placed after the `./src/lib/push-down/claude-customizations.ts` entry. The baseline value from P0-T18 is quoted in this task's artifact.
       Commands: `git grep --no-index -c -F "\"./src/lib/push-down/claude-filesystem-adapter.ts\": {" -- extensions/drm-copilot/jest.config.cjs`; `poetry run python -c "import pathlib; t = pathlib.Path('extensions/drm-copilot/jest.config.cjs').read_text(encoding='utf-8'); i = t.index('./src/lib/push-down/claude-filesystem-adapter.ts'); print('ENTRY', t[i:i + 120].split('}')[0].replace(chr(10), ' '))"`.
       Acceptance: the grep prints 1; the Python command prints one line beginning `ENTRY ./src/lib/push-down/claude-filesystem-adapter.ts` that contains both `lines: 85` and `branches: 75`.
-- [ ] [P4-T5] Verify the F-507-2 Python tests and the static parity tests against both production edits (`tests/scripts/dev_tools/test_push_down_claude_customizations.py`, `tests/scripts/dev_tools/test_push_down_claude_parity.py`), and record FEATURE/evidence/other/p4-t5.TS.md.
+- [x] [P4-T5] Verify the F-507-2 Python tests and the static parity tests against both production edits (`tests/scripts/dev_tools/test_push_down_claude_customizations.py`, `tests/scripts/dev_tools/test_push_down_claude_parity.py`), and record FEATURE/evidence/other/p4-t5.TS.md.
       Command: `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_customizations.py tests/scripts/dev_tools/test_push_down_claude_parity.py`.
       Acceptance: exit 0 with 26 passed (14 plus 12). A failure is fixed in `scripts/dev_tools/push_down_claude_filesystem.py` or `extensions/drm-copilot/src/lib/push-down/claude-filesystem-adapter.ts` only.
 
