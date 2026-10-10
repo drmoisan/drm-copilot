@@ -250,8 +250,8 @@ try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookD
 - [x] AC-23: Every file changed or created under `.claude/hooks`, `.claude/lib`, `.codex/hooks`, or `.codex/scripts` is byte-identical to its bundle mirror, and the push-down parity and pack-manifest pytest suites named in the Test Strategy and `legacy-codex-hook-contracts.Tests.ps1` pass.
 - [ ] AC-24: Line coverage is >= 85% for each changed or created PowerShell production file (each hook, each dot-sourced sibling, and both helper copies), measured per file from the Pester coverage XML and recorded under `evidence/qa-gates/`, with the bootstrap `exit 2` lines listed as known uncovered lines; no changed line loses coverage.
 - [x] AC-25: Every changed or created PowerShell file (production, test, and test-support) is at most 500 lines on the final branch, measured and recorded under `evidence/qa-gates/`; the C2 near-cap files are re-measured on the integration branch before line budgets are planned.
-- [ ] AC-26: No hook or helper invokes Python; the no-Python guard test and `EnforcementHooksNoPythonInvocation.Helpers.ps1` are unmodified and pass; the discovery helper is a new test-support file (D5).
-- [ ] AC-27: The PowerShell toolchain passes in a single pass (format, analyze with zero errors and warnings on changed files, Pester), with results recorded under `evidence/qa-gates/`.
+- [x] AC-26: No hook or helper invokes Python; the no-Python guard test and `EnforcementHooksNoPythonInvocation.Helpers.ps1` are unmodified and pass; the discovery helper is a new test-support file (D5).
+- [x] AC-27: The PowerShell toolchain passes in a single pass (format, analyze with zero errors and warnings on changed files, Pester), with results recorded under `evidence/qa-gates/`.
 
 ## Risks & Mitigations
 
