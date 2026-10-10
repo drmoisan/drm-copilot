@@ -221,7 +221,7 @@
 
 ### Phase 3 — #734 CR-4: QT009 reports git stderr
 
-- [ ] [P3-T1] Edit `tests/scripts/dev_tools/test_check_quality_tiers.py`: add the field `stderr: bytes = b""` after `stdout: bytes` in `FakeRunResult`, and add two tests after `test_main_returns_one_with_qt009_when_git_exits_nonzero`:
+- [x] [P3-T1] Edit `tests/scripts/dev_tools/test_check_quality_tiers.py`: add the field `stderr: bytes = b""` after `stdout: bytes` in `FakeRunResult`, and add two tests after `test_main_returns_one_with_qt009_when_git_exits_nonzero`:
 
     ```python
     def test_qt009_message_includes_git_stderr(
@@ -285,9 +285,9 @@
     ```
 
   - Acceptance: `grep -c -E "^def test_" tests/scripts/dev_tools/test_check_quality_tiers.py` prints 16 (baseline 14); the production file is untouched at this point: `git diff --numstat e7d3779b398604af919678c16c877c8539a86cc0 -- scripts/dev_tools/check_quality_tiers.py` prints nothing and `git status --porcelain -- scripts/dev_tools/check_quality_tiers.py` prints nothing.
-- [ ] [P3-T2] [expect-fail] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/qt009-fail-before.2026-10-09T09-00.md` from `poetry run pytest tests/scripts/dev_tools/test_check_quality_tiers.py -k "qt009_message" -q` run against the unchanged production file, with `ExpectedExitCode: 1`.
+- [x] [P3-T2] [expect-fail] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/qt009-fail-before.2026-10-09T09-00.md` from `poetry run pytest tests/scripts/dev_tools/test_check_quality_tiers.py -k "qt009_message" -q` run against the unchanged production file, with `ExpectedExitCode: 1`.
   - Acceptance: exit 1; output reports `2 failed`; the assertion failure for `test_qt009_message_includes_git_stderr` (missing `fatal: not a git repository`) is quoted in the Output Summary (AC-6 observed fail-before run).
-- [ ] [P3-T3] Edit `scripts/dev_tools/check_quality_tiers.py`: add a read-only `stderr` property to the `GitRunResult` Protocol after `stdout`, in the same multi-line form, and replace the non-zero-exit raise in `list_tracked_files`:
+- [x] [P3-T3] Edit `scripts/dev_tools/check_quality_tiers.py`: add a read-only `stderr` property to the `GitRunResult` Protocol after `stdout`, in the same multi-line form, and replace the non-zero-exit raise in `list_tracked_files`:
 
     ```python
         @property
@@ -308,17 +308,17 @@
     ```
 
   - Acceptance: `poetry run black --check scripts/dev_tools/check_quality_tiers.py` prints `1 file would be left unchanged`; `poetry run ruff check scripts/dev_tools/check_quality_tiers.py` prints `All checks passed!`; the file is not denied by the Python batch-budget hook (first counted production file).
-- [ ] [P3-T4] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/qt009-pass-after.2026-10-09T09-00.md` from `poetry run pytest tests/scripts/dev_tools/test_check_quality_tiers.py -q` and, as a second block, `poetry run pyright scripts/dev_tools/check_quality_tiers.py tests/scripts/dev_tools/test_check_quality_tiers.py tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/scripts/dev_tools/quality_tiers_contract_test_support.py`.
+- [x] [P3-T4] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/qt009-pass-after.2026-10-09T09-00.md` from `poetry run pytest tests/scripts/dev_tools/test_check_quality_tiers.py -q` and, as a second block, `poetry run pyright scripts/dev_tools/check_quality_tiers.py tests/scripts/dev_tools/test_check_quality_tiers.py tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/scripts/dev_tools/quality_tiers_contract_test_support.py`.
   - Acceptance: first block exit 0 with `16 passed` (includes both new tests and the existing `test_main_returns_one_with_qt009_when_git_exits_nonzero`, which drives the empty-stderr branch); second block prints `0 errors, 0 warnings, 0 informations`.
-- [ ] [P3-T5] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/quality-tiers-coverage.2026-10-09T09-00.md` from `poetry run pytest tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/scripts/dev_tools/test_check_quality_tiers.py --cov=scripts.dev_tools.quality_tiers_contract --cov=scripts.dev_tools.check_quality_tiers --cov-branch --cov-report=term-missing "--cov-report=json:artifacts/python/cov-targeted.json"` followed by the COVJSON command.
+- [x] [P3-T5] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/quality-tiers-coverage.2026-10-09T09-00.md` from `poetry run pytest tests/scripts/dev_tools/test_quality_tiers_contract.py tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/scripts/dev_tools/test_check_quality_tiers.py --cov=scripts.dev_tools.quality_tiers_contract --cov=scripts.dev_tools.check_quality_tiers --cov-branch --cov-report=term-missing "--cov-report=json:artifacts/python/cov-targeted.json"` followed by the COVJSON command.
   - Acceptance (AC-4): exit 0; the quality_tiers_contract.py `Missing` column contains none of 124, 155, 199 (the file is unchanged, so the line numbers are stable); check_quality_tiers.py COVJSON line >= 85 and branch >= 75; both term-missing rows recorded verbatim.
-- [ ] [P3-T6] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/quality-tiers-cli.2026-10-09T09-00.md` from `poetry run python -m scripts.dev_tools.check_quality_tiers`.
+- [x] [P3-T6] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/quality-tiers-cli.2026-10-09T09-00.md` from `poetry run python -m scripts.dev_tools.check_quality_tiers`.
   - Acceptance (AC-7): exit 0; stdout is exactly one line beginning `quality-tiers: OK (`, recorded verbatim.
-- [ ] [P3-T7] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/qt009-message-form.2026-10-09T09-00.md` from `poetry run pytest tests/scripts/dev_tools/test_check_quality_tiers.py -k "qt009" -v`.
+- [x] [P3-T7] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/qt009-message-form.2026-10-09T09-00.md` from `poetry run pytest tests/scripts/dev_tools/test_check_quality_tiers.py -k "qt009" -v`.
   - Acceptance (AC-5 behavior half): exit 0; the PASSED node IDs recorded are `test_main_returns_one_with_qt009_when_runner_raises_oserror`, `test_main_returns_one_with_qt009_when_git_exits_nonzero`, `test_main_returns_one_with_qt009_when_git_not_found`, `test_main_reports_entry_errors_alongside_qt009`, `test_qt009_message_includes_git_stderr`, and `test_qt009_message_collapses_multiline_git_stderr` (6 passed).
-- [ ] [P3-T8] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-4 after [P3-T5] passes.
-- [ ] [P3-T9] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-6 after [P3-T2] and [P3-T4] pass.
-- [ ] [P3-T10] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-7 after [P3-T6] passes.
+- [x] [P3-T8] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-4 after [P3-T5] passes.
+- [x] [P3-T9] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-6 after [P3-T2] and [P3-T4] pass.
+- [x] [P3-T10] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-7 after [P3-T6] passes.
 
 ### Phase 4 — #744: skill cross-reference, pin test, and evidence notes
 
