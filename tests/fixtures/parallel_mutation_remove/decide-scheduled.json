@@ -1,0 +1,10 @@
+{
+  "case": "decide-scheduled",
+  "subcommand": "decide",
+  "argv": ["decide", "--item", "5", "--state", "scheduled"],
+  "expected": {
+    "exit_code": 0,
+    "stdout": "{\"item_key\":5,\"prior_state\":\"scheduled\",\"new_state\":\"withdrawn\",\"disposition\":null,\"triggers_recompute\":true}",
+    "stderr": null
+  }
+}

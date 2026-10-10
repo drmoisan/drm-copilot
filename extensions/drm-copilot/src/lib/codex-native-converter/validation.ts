@@ -11,6 +11,7 @@
  *     in a deterministic sorted order.
  */
 
+import { compareCodePoint } from "../string-ordering";
 import {
   ConversionClass,
   type MappingRecord,
@@ -265,9 +266,7 @@ function validateDuplicateTargets(
   }
 
   // Report conflicting section emissions in sorted target-path order.
-  for (const targetPath of [...conflictingTargets].sort((left, right) =>
-    left < right ? -1 : left > right ? 1 : 0,
-  )) {
+  for (const targetPath of [...conflictingTargets].sort(compareCodePoint)) {
     for (const plannedEmission of sectionEmissionsByTarget.get(targetPath) ??
       []) {
       findings.push(
@@ -356,17 +355,18 @@ export function validateConversionPlan(
   ];
 
   // Sort by (code, sourcePath, targetPath); null paths sort as empty strings.
-  const compare = (left: string, right: string): number =>
-    left < right ? -1 : left > right ? 1 : 0;
   return [...findings].sort((left, right) => {
-    const byCode = compare(left.code, right.code);
+    const byCode = compareCodePoint(left.code, right.code);
     if (byCode !== 0) {
       return byCode;
     }
-    const bySource = compare(left.sourcePath ?? "", right.sourcePath ?? "");
+    const bySource = compareCodePoint(
+      left.sourcePath ?? "",
+      right.sourcePath ?? "",
+    );
     if (bySource !== 0) {
       return bySource;
     }
-    return compare(left.targetPath ?? "", right.targetPath ?? "");
+    return compareCodePoint(left.targetPath ?? "", right.targetPath ?? "");
   });
 }

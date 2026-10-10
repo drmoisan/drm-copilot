@@ -25,6 +25,11 @@
 # shim directory tests/fixtures/parallel_abandon_path, which exposes only gh and
 # git shims that record their argument vector and start no process, so the
 # no-interpreter shim directory above stays unchanged.
+#
+# The remove entry point remove-parallel-item.sh (issue #791) is proven with the
+# no-interpreter shim directory above. Every case passes an explicit --at, so
+# the entry point reads no clock and needs no utility beyond sort, cut, and
+# dirname.
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
@@ -146,4 +151,16 @@ run_payload() {
     [ "${#lines[@]}" -eq 2 ]
     [ "${lines[0]}" = "SHIM-CALL gh pr close 7" ]
     [ "${lines[1]}" = "SHIM-CALL git worktree remove wt-42" ]
+}
+
+@test "the payload runs remove-parallel-item.sh without Python on PATH" {
+    run_payload remove-parallel-item.sh entry --item 5 --prior-state scheduled --recompute true --generation 2 --at 2026-10-08T14-00
+    [ "$status" -eq 0 ]
+    [ "$output" = '{"op":"remove","item_key":5,"at":"2026-10-08T14-00","prior_state":"scheduled","new_state":"withdrawn","disposition":null,"recolor_generation":3}' ]
+}
+
+@test "the payload recolors unstarted items without Python on PATH" {
+    run_payload remove-parallel-item.sh recolor --unstarted "1 2" --edges "1:4" --pinned "4" --generation 0 --current-cohort 0 --highest-pinned-cohort 2
+    [ "$status" -eq 0 ]
+    [ "$output" = '{"cohort_assignments":{"1":3,"2":3},"generation":1}' ]
 }

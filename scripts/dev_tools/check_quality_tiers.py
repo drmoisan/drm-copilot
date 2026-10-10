@@ -56,6 +56,11 @@ class GitRunResult(Protocol):
         """Captured standard output."""
         ...
 
+    @property
+    def stderr(self) -> bytes:
+        """Captured standard error."""
+        ...
+
 
 def read_manifest_text(path: Path) -> str:
     """Return the UTF-8 text of the manifest at ``path``.
@@ -91,7 +96,13 @@ def list_tracked_files(
         [git, "ls-files", "-z"], cwd=repo_root, capture_output=True, check=False
     )
     if result.returncode != 0:
-        raise OSError(f"git ls-files exited with code {result.returncode}")
+        # Collapse git's stderr to one line: _report prints one QTnnn line per
+        # error, and an embedded newline would emit a line without the prefix.
+        detail = " ".join(result.stderr.decode("utf-8", errors="replace").split())
+        message = f"git ls-files exited with code {result.returncode}"
+        if detail:
+            message = f"{message}: {detail}"
+        raise OSError(message)
     output = result.stdout.decode("utf-8", errors="surrogateescape")
     return [path for path in output.split("\0") if path]
 

@@ -1,0 +1,10 @@
+{
+  "case": "recolor-overlap",
+  "subcommand": "recolor",
+  "argv": ["recolor", "--unstarted", "2 4 6", "--pinned", "6 4", "--generation", "0", "--current-cohort", "0", "--highest-pinned-cohort", "0"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation rejected: item key 4 does not resolve to a tracked items[].issue_num."
+  }
+}

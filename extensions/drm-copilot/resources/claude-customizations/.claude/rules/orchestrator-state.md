@@ -32,6 +32,37 @@ A hardened snapshot from another repository contains a JSON Schema for the orche
 
 This prohibition is specific to the disqualified foreign schema identified by the `drmoisan.github.io/mix-calculator/` `$id`. A schema whose `$id` is repo-local and whose required-field set and `additionalProperties` policy match this repository's checkpoint contract is not the disqualified foreign artifact; even so, the repository's enforcement mechanism remains the Python validator prose-and-logic above, not an imported schema file.
 
+## Required Top-Level Keys
+
+Plain validation requires every key below at the top level of the orchestrator-state checkpoint. The authority is `REQUIRED_STATE_KEYS` in `scripts/dev_tools/validate_orchestrator_state.py`. The TypeScript port in `extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts` and the PowerShell port in `.claude/lib/orchestrator-state/OrchestratorState.psm1` carry the same keys in the same order.
+
+- `objective`
+- `change_budget_estimate`
+- `path_selected`
+- `promotion-type`
+- `short-name`
+- `relativeFile`
+- `long-name`
+- `issue-num`
+- `feature-folder`
+- `work-mode`
+- `plan-path`
+- `completed_steps`
+- `next_step`
+- `last_updated`
+- `step5_status`
+- `step6_status`
+- `step7_status`
+- `step8_status`
+- `step9_status`
+- `step10_status`
+- `delegation_receipts`
+- `blocked_reason`
+
+The check is unconditional: it runs with or without `--require-complete`, `--require-pr-creation-ready`, `--require-model-routing`, `--require-codex-model-routing`, and `--require-codex-topology`, and it is skipped only for a `portable_orchestration_handoff` envelope. The check is presence-only: a key whose value is any JSON value, including `null`, satisfies it. Each absent key produces one error line, `Checkpoint missing required key: <key>`. Some keys carry further validation when present, such as the step-status vocabulary for the `step*_status` keys and the Blocked-Reason Vocabulary below for `blocked_reason`.
+
+`last_updated` records when the checkpoint was last written. Write it as an ISO-8601 UTC date-time string, for example `2026-10-08T17:28:00Z`. The value is rewritten on every checkpoint write: after every completed step and every state transition, including halts. The validators check presence only and do not parse the value, so a non-UTC, placeholder, or `null` value still passes the required-key check.
+
 ## Scope and Backward Compatibility
 
 These invariants apply only when the checkpoint contains a top-level `remediation_loop`; the per-cycle invariants apply when it has a `cycles` array, and the review-outcome and attempt-count invariants apply when their keys are present. A checkpoint with no `remediation_loop` (the existing step-based checkpoint shape) is unaffected: it validates exactly as before and produces no new errors. The invariants are additive.
@@ -170,7 +201,7 @@ The complexity-assessment and model-routing-receipt invariants above are key-gat
 
 ## Bare-Module CLI Contract
 
-The validator module runs directly as `python -m scripts.dev_tools.validate_orchestrator_state <path> [--require-complete] [--require-model-routing] [--require-pr-creation-ready] [--require-codex-model-routing] [--require-codex-topology]`. The dispatcher `python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state` stays available and accepts the same flags. Exit code 0 means the checkpoint passed and the success line `orchestrator-state validation passed: <path>` is written to stdout. Exit code 1 means validation errors, written one per stderr line. Exit code 2 means the path is missing, unreadable, or not UTF-8, with one stderr diagnostic and no traceback; argparse usage errors also exit 2.
+The validator module runs directly as `python -m scripts.dev_tools.validate_orchestrator_state <path> [--require-complete] [--require-model-routing] [--require-pr-creation-ready] [--require-codex-model-routing] [--require-codex-topology]`. The dispatcher stays available and accepts the same flags in two invocation forms: the module form `python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state`, run from the repository root, and the file-path form `python scripts/dev_tools/validate_orchestration_artifacts.py orchestrator-state`. Both forms reach the same `main()`, so their flags, output lines, and exit codes are identical, and a relative artifact path resolves against the working directory in both. The file-path form derives the repository root from the script location and appends it to `sys.path` only when the script runs without a package context. The bare-module validator is supported in the module form only. Exit code 0 means the checkpoint passed and the success line `orchestrator-state validation passed: <path>` is written to stdout. Exit code 1 means validation errors, written one per stderr line. Exit code 2 means the path is missing, unreadable, or not UTF-8, with one stderr diagnostic and no traceback; argparse usage errors also exit 2.
 
 ## Invariants (require_model_routing mode)
 

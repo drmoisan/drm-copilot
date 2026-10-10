@@ -388,3 +388,60 @@ def test_push_down_claude_repeated_generation_is_deterministic() -> None:
     assert (
         first_map == second_map
     ), "Repeated generation must produce identical destination content."
+
+
+# A general-scoped agent memory used by the memory-mode filter test below.
+MEMORY_RELATIVE = ".claude/agent-memory/orchestrator/general.md"
+GENERAL_MEMORY_TEXT = "---\nname: g\nmetadata:\n  scope: general\n---\nbody\n"
+
+
+@pytest.mark.parametrize(
+    ("memory_mode", "destination_root", "destination_has_memory", "expect_listed"),
+    [
+        ("skip", Path("/dest"), False, False),
+        ("merge", Path("/dest"), True, False),
+        ("merge", Path("/dest"), False, True),
+        ("merge", None, False, True),
+    ],
+    ids=[
+        "skip-drops-general-memory",
+        "merge-drops-memory-present-at-destination",
+        "merge-keeps-memory-absent-at-destination",
+        "merge-without-destination-root-keeps-memory",
+    ],
+)
+def test_excluding_file_system_list_files_applies_memory_mode(
+    memory_mode: str,
+    destination_root: Path | None,
+    destination_has_memory: bool,
+    expect_listed: bool,
+) -> None:
+    """Verify list_files applies the skip and merge memory modes in memory.
+
+    Each case seeds one general-scoped agent memory under the source root and,
+    when requested, the same memory under the destination root. ``skip`` drops
+    the memory, ``merge`` drops it only when the destination already holds it,
+    and ``merge`` without a destination root keeps it.
+    """
+
+    # Arrange: seed the source memory and, when requested, the destination copy.
+    module = importlib.import_module("scripts.dev_tools.push_down_claude_filesystem")
+    source_memory = Path("/repo") / MEMORY_RELATIVE
+    files = {source_memory: MemoryFile(GENERAL_MEMORY_TEXT)}
+    if destination_has_memory:
+        files[Path("/dest") / MEMORY_RELATIVE] = MemoryFile("existing\n")
+    excluding = module.ExcludingFileSystem(
+        RecordingFileSystem(files=files),
+        Path("/repo"),
+        (),
+        source_root=Path("/repo"),
+        destination_root=destination_root,
+        memory_mode=memory_mode,
+    )
+
+    # Act: enumerate the source `.claude` tree through the filtered view.
+    listed = excluding.list_files(Path("/repo/.claude"))
+
+    # Assert: the memory is listed only when the active memory mode keeps it.
+    expected: list[Path] = [source_memory] if expect_listed else []
+    assert listed == expected

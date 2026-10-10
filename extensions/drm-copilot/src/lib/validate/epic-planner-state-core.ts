@@ -420,7 +420,8 @@ export function validateEpicPlannerStateText(
   }
 
   if (options.requireReadyForExecution === true) {
-    // Launch evidence is key-gated per feature unless a Codex flag is asserted.
+    // Launch evidence (per feature) and the planner topology receipt (top-level
+    // key) are key-gated unless a Codex flag is asserted.
     const requireLaunchPaths =
       options.requireCodexModelRouting !== true &&
       options.requireCodexTopology !== true;
@@ -440,7 +441,9 @@ export function validateEpicPlannerStateText(
         requireLaunchPaths,
       }),
     );
-    errors.push(...validatePlannerTopologyReceipt(value["topology_receipt"]));
+    if (!requireLaunchPaths || "topology_receipt" in value) {
+      errors.push(...validatePlannerTopologyReceipt(value["topology_receipt"]));
+    }
 
     const expectedKickoff = `artifacts/orchestration/epic-kickoff-${String(
       value["epic_feature_folder"],

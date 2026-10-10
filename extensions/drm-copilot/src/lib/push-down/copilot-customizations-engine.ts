@@ -20,6 +20,7 @@
  *     through the injected {@link PushDownFileSystem}.
  */
 
+import { compareCodePoint } from "../string-ordering";
 import { type PushDownFileSystem, toPosixPath } from "./filesystem-adapter";
 import {
   rewriteTextReferences,
@@ -167,7 +168,7 @@ export function enumerateSourceFiles(
     const sorted = [...rootFiles].sort((left, right) => {
       const leftRel = relativeToPosix(left, rootPath) ?? left;
       const rightRel = relativeToPosix(right, rootPath) ?? right;
-      return leftRel < rightRel ? -1 : leftRel > rightRel ? 1 : 0;
+      return compareCodePoint(leftRel, rightRel);
     });
     orderedFiles.push(...sorted);
   }
@@ -287,8 +288,7 @@ export function stringifySorted(value: unknown, indent: number): string {
     }
     if (input !== null && typeof input === "object") {
       const entries = Object.entries(input as Record<string, unknown>).sort(
-        ([leftKey], [rightKey]) =>
-          leftKey < rightKey ? -1 : leftKey > rightKey ? 1 : 0,
+        ([leftKey], [rightKey]) => compareCodePoint(leftKey, rightKey),
       );
       const result: Record<string, unknown> = {};
       // Re-insert keys in sorted order so JSON.stringify emits them sorted.

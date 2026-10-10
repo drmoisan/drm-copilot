@@ -37,6 +37,7 @@ interface AuthorityFixture {
 
 interface AuthorityCase {
   readonly row: string;
+  readonly envelopeText?: string;
   readonly envelopeReadError?: Error;
   readonly planReadError?: Error;
   readonly unresolved?: "workspace-root" | "envelope" | "plan";
@@ -60,7 +61,7 @@ function runAuthority(scenario: AuthorityCase): PortableHandoffAuthorityResult {
   ) as AuthorityFixture;
   const planText = "# Atomic plan\n";
   fixture.plan.sha256 = hashText(planText);
-  const envelopeText = JSON.stringify(fixture);
+  const envelopeText = scenario.envelopeText ?? JSON.stringify(fixture);
   const binding = fixture.binding;
   const request = {
     workspaceRoot: binding["workspace_root"],
@@ -162,6 +163,12 @@ const AUTHORITY_CASES: readonly AuthorityCase[] = [
     row: "A6 all reads succeed with matching hashes",
     code: null,
     cause: undefined,
+  },
+  {
+    row: "A7 envelope text is not valid JSON",
+    envelopeText: "{",
+    code: "HANDOFF_UNSUPPORTED_VERSION",
+    cause: "envelope-parse: HANDOFF_UNSUPPORTED_VERSION",
   },
 ];
 

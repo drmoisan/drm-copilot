@@ -20,13 +20,13 @@
  *     - Every error is raised before any write.
  */
 
+import { compareCodePoint } from "../string-ordering";
 import { type PushDownFileSystem } from "./filesystem-adapter";
 import {
   BLAST_RADIUS_RELATIVE_PATH,
   BlastRadiusGuardError,
   FORBIDDEN_GLOBS,
 } from "./claude-blast-radius-derive-core";
-import { compareOrdinal } from "./claude-blast-radius-derive-manifests";
 
 /** Destination-relative path of the destination-owned overlay. */
 export const BLAST_RADIUS_OVERLAY_RELATIVE_PATH =
@@ -197,7 +197,7 @@ function composeModules(
     merged[name] = globs;
   }
   const composed: JsonObject = {};
-  for (const name of Object.keys(merged).sort(compareOrdinal)) {
+  for (const name of Object.keys(merged).sort(compareCodePoint)) {
     const globs = merged[name] ?? [];
     composed[name] = globs;
     for (const glob of Array.isArray(globs) ? globs : []) {
