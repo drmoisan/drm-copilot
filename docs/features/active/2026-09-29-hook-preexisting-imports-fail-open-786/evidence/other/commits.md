@@ -111,3 +111,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## r1-p1
+
+- Subject: docs(786): amend AC-6 for the named-exemption edges
+- Commit SHA: 769c42c230896ccce3b9059441bb9f46d88708a6
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
