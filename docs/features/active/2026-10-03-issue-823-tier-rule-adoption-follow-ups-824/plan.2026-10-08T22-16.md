@@ -375,55 +375,55 @@ Each task writes FEATURE/evidence/other/p6-tN.TS.md.
 
 Restart rule: run P9-T1 through P9-T17 in order. If any step fails, or if any step changes a tracked or new file, fix the cause, re-copy the bundled mirror of any changed repository file that has one (the matching Phase 3-6 `cp` task), then restart from P9-T1 and rewrite every Phase 9 artifact with a new TS. The loop ends only when P9-T1 through P9-T17 pass in one uninterrupted pass. Each artifact records its loop iteration number in `Output Summary:`. When `poetry run black --check .` fails, the fix is `poetry run black` on the named files followed by a restart.
 
-- [ ] [P9-T1] Python format check, and record FEATURE/evidence/qa-gates/black-check.TS.md.
+- [x] [P9-T1] Python format check, and record FEATURE/evidence/qa-gates/black-check.TS.md.
       Command: `poetry run black --check .`.
       Acceptance: exit 0 and the summary containing "would be left unchanged" with no line containing "would reformat".
-- [ ] [P9-T2] PoshQC format over `.claude/hooks` and `tests/scripts/claude-hooks` with a before-and-after observation, and record FEATURE/evidence/qa-gates/poshqc-format.TS.md.
+- [x] [P9-T2] PoshQC format over `.claude/hooks` and `tests/scripts/claude-hooks` with a before-and-after observation, and record FEATURE/evidence/qa-gates/poshqc-format.TS.md.
       Commands: `git status --porcelain -- .claude/hooks tests/scripts/claude-hooks`; `sh artifacts/orchestration/wip824-run/poshqc-format.sh`; `git status --porcelain -- .claude/hooks tests/scripts/claude-hooks`.
       Acceptance: the formatter exits 0; its output contains no line beginning "Formatted:"; the two status listings are identical (the expected listing is ` M .claude/hooks/validate-feature-review-coverage.ps1`, `?? .claude/hooks/feature-review-coverage-thresholds.ps1`, and the two `??` test files, or nothing when the orchestrator has committed). A "Formatted:" line or a changed listing triggers the restart rule, with one exception: the formatter scans all of `.claude/hooks`, including the hard-excluded hooks, so a "Formatted:" line or a changed listing that names any file outside the P0-T7 write set (recorded by repository-relative tail) stops the plan for a report instead; the executor does not revert or re-edit that file on its own authority.
-- [ ] [P9-T3] Prettier check of the extension sources, and record FEATURE/evidence/qa-gates/prettier-check.TS.md.
+- [x] [P9-T3] Prettier check of the extension sources, and record FEATURE/evidence/qa-gates/prettier-check.TS.md.
       Command: `node extensions/drm-copilot/node_modules/prettier/bin/prettier.cjs --check "extensions/drm-copilot/src/**/*.ts" "extensions/drm-copilot/test/**/*.ts" "extensions/drm-copilot/*.json" "extensions/drm-copilot/*.cjs"`.
       Acceptance: the exit code and summary equal BASE_PRETTIER (PD11); with a clean baseline this is exit 0 and "All matched files use Prettier code style!".
-- [ ] [P9-T4] Python lint, and record FEATURE/evidence/qa-gates/ruff-check.TS.md.
+- [x] [P9-T4] Python lint, and record FEATURE/evidence/qa-gates/ruff-check.TS.md.
       Command: `poetry run ruff check`.
       Acceptance: exit 0 and "All checks passed!".
-- [ ] [P9-T5] PoshQC analyze over the same two folders, and record FEATURE/evidence/qa-gates/poshqc-analyze.TS.md.
+- [x] [P9-T5] PoshQC analyze over the same two folders, and record FEATURE/evidence/qa-gates/poshqc-analyze.TS.md.
       Command: `sh artifacts/orchestration/wip824-run/poshqc-analyze.sh`.
       Acceptance: exit 0 and a line beginning "PSScriptAnalyzer passed: no findings under".
-- [ ] [P9-T6] ESLint, and record FEATURE/evidence/qa-gates/eslint.TS.md.
+- [x] [P9-T6] ESLint, and record FEATURE/evidence/qa-gates/eslint.TS.md.
       Command: `npm --prefix extensions/drm-copilot run lint`.
       Acceptance: the exit code and problem summary equal BASE_ESLINT (PD11).
-- [ ] [P9-T7] Python type check, and record FEATURE/evidence/qa-gates/pyright.TS.md.
+- [x] [P9-T7] Python type check, and record FEATURE/evidence/qa-gates/pyright.TS.md.
       Command: `poetry run pyright`.
       Acceptance: exit 0 and a summary beginning "0 errors".
-- [ ] [P9-T8] TypeScript type check, and record FEATURE/evidence/qa-gates/tsc.TS.md.
+- [x] [P9-T8] TypeScript type check, and record FEATURE/evidence/qa-gates/tsc.TS.md.
       Command: `npm --prefix extensions/drm-copilot run typecheck`.
       Acceptance: the exit code and the "error TS" line count equal BASE_TSC (PD11).
-- [ ] [P9-T9] Shell syntax check of both setup-script copies, and record FEATURE/evidence/qa-gates/sh-syntax.TS.md.
+- [x] [P9-T9] Shell syntax check of both setup-script copies, and record FEATURE/evidence/qa-gates/sh-syntax.TS.md.
       Commands: `sh -n .codex/codex-web-setup.sh`; `sh -n extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh`.
       Acceptance: both exit 0 with no output.
-- [ ] [P9-T10] Full pytest run in coverage mode, run in the background, and record FEATURE/evidence/qa-gates/pytest-full-coverage.TS.md.
+- [x] [P9-T10] Full pytest run in coverage mode, run in the background, and record FEATURE/evidence/qa-gates/pytest-full-coverage.TS.md.
       Command: `poetry run pytest --cov --cov-branch --cov-report=term-missing --cov-report=json:artifacts/python/coverage.json`.
       Acceptance: the failing set is a subset of the P0-T15 pre-existing set (KL-510 included) and contains no test from the two Python modules this plan writes or from PARITY-SET other than KL-510 (PD10); with no pre-existing failure this is exit 0. The summary line, the verbatim `TOTAL` row, and the passed count are recorded; the passed count is at least BASE_FULL_PASSED plus 44 (43 new follow-up tests and 1 note B test) minus the KL-510 adjustment.
-- [ ] [P9-T11] Post-change numeric Python coverage from the P9-T10 JSON report, and record FEATURE/evidence/qa-gates/python-coverage-values.TS.md.
+- [x] [P9-T11] Post-change numeric Python coverage from the P9-T10 JSON report, and record FEATURE/evidence/qa-gates/python-coverage-values.TS.md.
       Command: the P0-T16 command, verbatim.
       Acceptance: exit 0 and `LINE <n> BRANCH <n> COMBINED <n>`, recorded as FINAL_PY_LINE, FINAL_PY_BRANCH, FINAL_PY_COMBINED; FINAL_PY_LINE is at least 85 and at least BASE_PY_LINE; FINAL_PY_BRANCH is at least 75 and at least BASE_PY_BRANCH.
-- [ ] [P9-T12] Full PoshQC test run with coverage, run in the background, plus the JUnit totals, and record FEATURE/evidence/qa-gates/poshqc-test.TS.md.
+- [x] [P9-T12] Full PoshQC test run with coverage, run in the background, plus the JUnit totals, and record FEATURE/evidence/qa-gates/poshqc-test.TS.md.
       Commands: `sh artifacts/orchestration/wip824-run/poshqc-test.sh`; the JUnit one-liner of Appendix G, item G6.
       Acceptance: the `FAILED` names are a subset of the P0-T20 pre-existing set and include no PESTER-824 case (PD10); with no pre-existing failure the test exit code is 0. TESTS is at least BASE_PS_TESTS plus 28 (11 resolver rows and 17 hook cases); FINAL_PS_TESTS and FINAL_PS_FAILURES are recorded.
-- [ ] [P9-T13] Post-change numeric PowerShell coverage, including changed-line coverage of the modified hook, from the P9-T12 report, and record FEATURE/evidence/qa-gates/powershell-coverage-values.TS.md.
+- [x] [P9-T13] Post-change numeric PowerShell coverage, including changed-line coverage of the modified hook, from the P9-T12 report, and record FEATURE/evidence/qa-gates/powershell-coverage-values.TS.md.
       Commands (substitute BASE_SHA): the coverage one-liner of Appendix G, item G5; `git diff --no-color --unified=0 --output=artifacts/orchestration/wip824-hunks/hook-final.diff BASE_SHA -- .claude/hooks/validate-feature-review-coverage.ps1`; `git status --porcelain -- .claude/hooks/validate-feature-review-coverage.ps1`; the changed-line one-liner of Appendix G, item G7.
       Acceptance: G5 exits 0; `REPO_LINE` is numeric (FINAL_PS_LINE) and at least BASE_PS_LINE; the hook `FILE` value (FINAL_HOOK_COV) is at least 85 and at least BASE_HOOK_COV; the helper `FILE` value (FINAL_HELPER_COV) is numeric and at least 85 (the helper is entirely new, so this whole-file value is its new-code coverage). The diff command exits 0; the status line is ` M .claude/hooks/validate-feature-review-coverage.ps1` or nothing when the orchestrator has committed (the diff is anchored to BASE_SHA, so it carries the hook change in both states). G7 exits 0 and prints one line `CHANGED_LINES <n> EXECUTABLE_CHANGED <n> UNCOVERED_CHANGED NONE` with `CHANGED_LINES` above 0 and `EXECUTABLE_CHANGED` above 0; the line is recorded verbatim as FINAL_HOOK_CHANGED_LINES. G7 is the last command, so `EXIT_CODE: 0`. A `MISSING` value, a figure below 85, `EXECUTABLE_CHANGED 0`, or any line number listed after `UNCOVERED_CHANGED` fails the loop and is reported as remediation-required (the fix is a test that executes the listed hook line, never an edit to the measurement).
-- [ ] [P9-T14] Jest suite in coverage mode, run in the background, and record FEATURE/evidence/qa-gates/jest-coverage.TS.md.
+- [x] [P9-T14] Jest suite in coverage mode, run in the background, and record FEATURE/evidence/qa-gates/jest-coverage.TS.md.
       Command: `npm --prefix extensions/drm-copilot run test:coverage`.
       Acceptance: the failing set is a subset of the P0-T26 pre-existing set (exit 0 when that set is empty); FINAL_TS_LINES and FINAL_TS_BRANCHES are recorded and each is at least its baseline value.
-- [ ] [P9-T15] Run the bats suite on the P0-T28 branch and record FEATURE/evidence/qa-gates/bats.TS.md.
+- [x] [P9-T15] Run the bats suite on the P0-T28 branch and record FEATURE/evidence/qa-gates/bats.TS.md.
       Command (branch `BATS_LOCAL: available`): `npx --yes bats tests/shell/test_codex_web_setup_codex_copy.bats`.
       Acceptance (local branch): exit 0, `1..15`, 15 `ok` lines, no `not ok`. CI branch: the artifact repeats the P5-T16 `PENDING-CI` record with `EXIT_CODE: 0` for the recording step; this is the only permitted non-execution branch and it keeps AC-6 unchecked.
-- [ ] [P9-T16] Re-verify byte identity of the 17 pairs after the loop, and record FEATURE/evidence/qa-gates/mirror-identity-final.TS.md.
+- [x] [P9-T16] Re-verify byte identity of the 17 pairs after the loop, and record FEATURE/evidence/qa-gates/mirror-identity-final.TS.md.
       Commands: the 17 diff commands of P8-T6 in the same order; `git status --porcelain -- extensions/drm-copilot/resources`.
       Acceptance: each diff exits 0 with no output.
-- [ ] [P9-T17] Record the loop result FEATURE/evidence/qa-gates/qc-loop-complete.TS.md.
+- [x] [P9-T17] Record the loop result FEATURE/evidence/qa-gates/qc-loop-complete.TS.md.
       Command: none (record `Command: none - loop summary of P9-T1 through P9-T16` and `EXIT_CODE: 0`).
       Acceptance: the artifact names the iteration number of the clean pass and the artifact path of each of P9-T1 through P9-T16 from that same iteration, each with exit code and pass status.
 
