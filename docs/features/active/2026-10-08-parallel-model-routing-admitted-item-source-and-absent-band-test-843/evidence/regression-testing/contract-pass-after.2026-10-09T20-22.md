@@ -1,0 +1,63 @@
+# Contract pass-after (P1-T11)
+
+Timestamp: 2026-10-09T20-22
+TimestampNote: the label was entered before a clock read; the clock read taken after the artifact was written showed 2026-10-09T20-16, so the actual run time lies between 2026-10-09T20-11 and 2026-10-09T20-16.
+Command: poetry run pytest tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py tests/scripts/dev_tools/test_parallel_orchestrator_permission_contracts.py tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py -v
+EXIT_CODE: 0
+Output Summary: every node line with status, then the result line (50 passed, no FAILED or ERROR line). The node list follows.
+
+Result line: ============================= 50 passed in 0.22s ==============================
+
+Node lines (all PASSED):
+
+- tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py::test_parallel_plan_has_complexity_assessment_section PASSED
+- tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py::test_parallel_plan_uses_claude_receipt_agent_field PASSED
+- tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py::test_parallel_orchestrate_names_planner_checkpoint_band_source PASSED
+- tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py::test_parallel_orchestrator_agent_names_planner_checkpoint_band_source PASSED
+- tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py::test_parallel_add_requires_complexity_assessment PASSED
+- tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py::test_parallel_planner_agent_requires_routing_record PASSED
+- tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py::test_parallel_orchestration_rule_defines_p10 PASSED
+- tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py::test_parallel_orchestrate_kickoff_band_source_names_admitted_item_source PASSED
+- tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py::test_parallel_orchestrate_model_selection_names_admitted_item_source PASSED
+- tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py::test_parallel_orchestrator_agent_names_admitted_item_source PASSED
+- tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py::test_parallel_add_step_two_defers_model_to_parallel_orchestrate PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_permission_contracts.py::test_every_prescribed_parent_write_target_has_a_persona_write_grant PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_permission_contracts.py::test_every_prescribed_command_invocation_has_a_persona_bash_grant PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_permission_contracts.py::test_manifest_validation_gate_prescribes_a_granted_command_invocation PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py: 36 nodes, all PASSED (agent frontmatter and tools allowlist, skill frontmatter fork, argument hints, status template, nine required headings, section order and reserved sections, per-obligation parametrized cases, kickoff no-child-merge, seam status template, checkpoint four arrays, F7 block reasons, run-skill stop path, no prescriptive epic literal x3, frozen epic surface digests x2).
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_agent_frontmatter_declares_parallel_orchestrator_identity PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_agent_tools_allowlist_excludes_pr_author_channel PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_agent_subagent_stop_hook_targets_parallel_checkpoint PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_skill_frontmatter_forks_the_parallel_orchestrator_agent[relative_path0] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_skill_frontmatter_forks_the_parallel_orchestrator_agent[relative_path1] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_argument_hint_accepts_manifest_path_or_slug PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_run_skill_argument_hint_is_the_parallel_slug PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_status_template_begins_with_generated_file_banner PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_agent_body_contains_exactly_the_nine_required_headings PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_intro_heading_precedes_prerequisites PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_first_thirteen_headings_match_required_layout PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_reserved_wave_four_sections_close_the_file PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_reserved_sections_carry_one_line_reserved_body PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_section_states_its_required_obligations[kickoff-marker-and-main-base] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_section_states_its_required_obligations[kickoff-never-carries-foreign-markers] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_section_states_its_required_obligations[kickoff-feature-folder-and-issue-number] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_section_states_its_required_obligations[kickoff-resume-at-plan-path] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_section_states_its_required_obligations[cohort-barrier-and-slot-filling-order] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_section_states_its_required_obligations[merge-on-green-parent-executes-merge] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_section_states_its_required_obligations[merge-conflict-exhaustion-and-f8-handoff] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_section_states_its_required_obligations[boundaries-generated-projection-rules] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_section_states_its_required_obligations[boundaries-regeneration-list] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_section_states_its_required_obligations[checkpoint-eight-merge-status-values] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_orchestrate_skill_section_states_its_required_obligations[completion-both-run-modes] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_kickoff_section_carries_no_child_merge_instruction PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_seam_status_template_realises_header_fields_prescribed_by_skill PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_seam_status_template_realises_cohort_columns_prescribed_by_skill PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_seam_status_template_realises_projections_prescribed_by_skill PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_checkpoint_section_states_the_four_arrays_never_written PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_skill_names_both_f7_dependency_block_reasons PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_run_skill_stop_path_names_parallel_plan_and_plan_path_resume PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_delivered_runtime_files_carry_no_prescriptive_epic_literal[relative_path0] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_delivered_runtime_files_carry_no_prescriptive_epic_literal[relative_path1] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_delivered_runtime_files_carry_no_prescriptive_epic_literal[relative_path2] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_frozen_epic_surface_matches_pinned_baseline_digest[.claude/agents/epic-orchestrator.md-0d01e5484d63e418a6bc31f219aecaef7381cc439a4a796664006879f6a027ba] PASSED
+- tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py::test_frozen_epic_surface_matches_pinned_baseline_digest[.claude/skills/epic-orchestrate/SKILL.md-03f95bfb9d046bc3fb6c94c0f2844369a56bee9307ca5a8c96f7ab8341a13719] PASSED

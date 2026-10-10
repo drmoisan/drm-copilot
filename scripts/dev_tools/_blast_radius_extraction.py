@@ -47,6 +47,7 @@ from typing import TYPE_CHECKING, Literal
 
 from scripts.dev_tools._blast_radius_token_shapes import (
     contains_placeholder_marker,
+    is_file_shaped_component,
     spans_multiple_feature_folders,
 )
 
@@ -70,11 +71,12 @@ INLINE_CODE_SPAN_RE = re.compile(r"`([^`]+)`")
 # Markdown ATX heading pattern used to locate spec interface sections.
 HEADING_RE = re.compile(r"^(?P<hashes>#{1,6}) (?P<title>.+)$")
 
-# Top-level directories of this repository. A token starting with one of these
-# is accepted without needing a recognized extension, which admits ``**`` globs
-# naming a subtree. ``artifacts/`` is deliberately absent (issue #489): the
-# process-artifact tree is read by mandate rather than written by a work item,
-# so admitting ``artifacts/**`` as a subtree claim made unrelated items contend.
+# Top-level directories of this repository. A wildcard token starting with one
+# of these is accepted without its final component naming a file (issue #797),
+# which admits ``**`` globs naming a subtree. ``artifacts/`` is deliberately
+# absent (issue #489): the process-artifact tree is read by mandate rather than
+# written by a work item, so admitting ``artifacts/**`` as a subtree claim made
+# unrelated items contend.
 KNOWN_TOP_LEVEL_SEGMENTS: tuple[str, ...] = tuple(
     (
         "scripts/ tests/ docs/ config/ schemas/ packages/ extensions/ "
@@ -83,18 +85,10 @@ KNOWN_TOP_LEVEL_SEGMENTS: tuple[str, ...] = tuple(
 )
 
 # A file citation may carry a trailing line reference such as ``:90``. The
-# suffix is stripped before the extension test so a line-anchored citation keeps
-# the acceptance its unanchored form has; the token itself is recorded verbatim.
+# suffix is stripped before the file-shape test (issue #797) so a line-anchored
+# citation keeps the acceptance its unanchored form has; the token itself is
+# recorded verbatim.
 LINE_SUFFIX_RE = re.compile(r":\d+$")
-
-# Fallback acceptance rule: a token shaped ``<segment>/.../<name>.<ext>`` counts
-# as a repository path when its final component carries one of these extensions.
-RECOGNIZED_PATH_EXTENSIONS: frozenset[str] = frozenset(
-    (
-        "cfg cs csproj ini js json jsx lock md ps1 psd1 psm1 "
-        "py sh sln toml ts tsx txt xml yaml yml"
-    ).split()
-)
 
 # A contract identifier names something callable or referenceable, so it must
 # carry at least one ASCII letter. Punctuation-only tokens such as ``->``, an
@@ -258,8 +252,10 @@ def classify_path_token(
         ``*``, ``"concrete"`` for an accepted token without one, and ``None``
         when the token is not a repository path reference. A wildcard-free
         token is accepted only when it names a file: it must be a configured
-        root surface or carry a recognized extension, optionally followed by a
-        ``:<line>`` suffix. A directory-shaped token is rejected (issue #489).
+        root surface, or its final component, after any ``:<line>`` suffix is
+        stripped, must satisfy ``is_file_shaped_component`` (a letter-led
+        extension or a known file name, issue #797). A directory-shaped token
+        is rejected (issue #489).
         A token carrying any member of ``PLACEHOLDER_MARKERS`` is rejected
         wherever the marker sits, because it documents a shape rather than
         naming a file (issue #502).
@@ -290,7 +286,7 @@ def classify_path_token(
     # disagree, and putting the cheaper marker scan first would only add work to
     # the common accepted case. It runs BEFORE the separator guard because a
     # marker-bearing token frequently does carry a separator and would otherwise
-    # sail past that guard and reach the extension rule, which accepts it: the
+    # sail past that guard and reach the file-shape rule, which accepts it: the
     # dominant corpus shape is an angle-bracketed leading segment followed by a
     # real ``.md`` tail, and that is exactly the token this guard exists to
     # reject.
@@ -306,28 +302,25 @@ def classify_path_token(
     if ":" in token.split("/", 1)[0]:
         return None
 
-    # Read the final component's extension for the fallback acceptance rule; a
-    # component with no dot (a directory name or ``**``) has no extension. A
+    # Decide whether the final component names a file (issue #797): a
+    # letter-led extension or a known file name does; a directory name, a
+    # dot-directory, ``**``, a digit-led tail, and a trailing dot do not. A
     # trailing line reference is stripped first so ``file.md:90`` reads as
-    # ``md`` rather than as the unrecognized extension ``md:90``.
+    # ``file.md`` rather than as the extension ``md:90``.
     final_component = LINE_SUFFIX_RE.sub("", token.rsplit("/", 1)[-1])
-    extension = ""
-    if "." in final_component:
-        extension = final_component.rsplit(".", 1)[-1].lower()
-
-    has_extension = extension in RECOGNIZED_PATH_EXTENSIONS
+    names_file = is_file_shaped_component(final_component)
 
     # A wildcard-free token must name a file, not a directory (issue #489). A
     # directory-shaped token such as ``scripts/dev_tools`` is a location
     # reference, not a write claim, and admitting it made every item touching
     # anything under that directory contend at the path level.
     if "*" not in token:
-        return PATH_KIND_CONCRETE if has_extension else None
+        return PATH_KIND_CONCRETE if names_file else None
 
     # A wildcard-bearing token must still satisfy one of the two documented
     # shape rules; failing both means the token is prose or a non-path
     # expression that merely contains a separator, so it is dropped.
-    if not (token.startswith(KNOWN_TOP_LEVEL_SEGMENTS) or has_extension):
+    if not (token.startswith(KNOWN_TOP_LEVEL_SEGMENTS) or names_file):
         return None
 
     # A documentation glob spanning the whole feature corpus is a cross-corpus

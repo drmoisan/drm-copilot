@@ -16,14 +16,15 @@
  *     - Provide the `SECTION_LINE` template, `CONVENTIONAL_TYPES` tuple, and the
  *       pure helpers `section`, `truncate`, `truncateLines`, `normalizeReference`,
  *       `findUserStoryLink`, and `formatList`.
- *     - Provide the shared pure helpers `splitLines`, `compareCodePoint`,
- *       `sortedSet`, and `escapeRegExp` (issue #740), the single definitions
- *       used across the pr-context modules.
+ *     - Provide the shared pure helpers `splitLines`, `sortedSet`, and
+ *       `escapeRegExp` (issue #740), the single definitions used across the
+ *       pr-context modules.
  *     - Provide the issue #622 shared literals `ISSUE_REFERENCE_PATTERN`,
  *       `AUTOCLOSE_UNVERIFIED_ANNOTATION`, and `AUTOCLOSE_PENDING_NOT_OPEN_TEXT`.
  */
 
 import { type CommandResult } from "../subprocess-runner";
+import { compareCodePoint } from "../string-ordering";
 
 /** Re-export of the shared command-result record (Python `CommandResult`). */
 export type { CommandResult };
@@ -339,32 +340,6 @@ export function formatList(
     return emptyText;
   }
   return valuesList.map((item) => `- ${item}`).join("\n");
-}
-
-/**
- * Compare two strings by Unicode code point, matching Python `str` comparison.
- *
- * This differs from the JavaScript `<` operator, which compares
- * UTF-16 code units: a supplementary character (a surrogate pair) sorts
- * before a BMP character in U+E000..U+FFFF under `<`, but after it here.
- * The first differing UTF-16 code unit is located and the code points at
- * that index are compared; a proper prefix sorts first.
- *
- * @returns Exactly -1, 0, or 1.
- */
-export function compareCodePoint(left: string, right: string): number {
-  const sharedLength = Math.min(left.length, right.length);
-  for (let index = 0; index < sharedLength; index += 1) {
-    if (left.charCodeAt(index) !== right.charCodeAt(index)) {
-      const leftPoint = left.codePointAt(index)!;
-      const rightPoint = right.codePointAt(index)!;
-      return leftPoint < rightPoint ? -1 : 1;
-    }
-  }
-  if (left.length === right.length) {
-    return 0;
-  }
-  return left.length < right.length ? -1 : 1;
 }
 
 /**
