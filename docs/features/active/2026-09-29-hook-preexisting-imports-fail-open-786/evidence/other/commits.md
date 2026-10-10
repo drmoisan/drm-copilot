@@ -95,3 +95,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## p12
+
+- Subject: docs(786): check off acceptance criteria and record AC status
+- Commit SHA: 561163c3ee915de2a60696094d6a0a7e745c5769
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
