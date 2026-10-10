@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-09T09-00
-- **Status:** Executed; pending-CI: AC-30, AC-31, AC-34, AC-38
+- **Status:** Executed; CI-dependent criteria verified on PR #873 head b9e1f7558
 - **Version:** 1.2
 - **Work Mode:** full-bug (spec.md is the sole acceptance-criteria source; user-story.md is intentionally absent)
 - **Requirements:** spec.md AC-1 through AC-40 in this feature folder; supporting inputs issue.md and research/research.2026-10-08T23-50.md
@@ -599,8 +599,8 @@ The workflow file under test (.github/workflows/publish-mcp-npm.yml) is read by 
   - Acceptance (AC-32): the first block prints at least one line whose line number is greater than that of `## Red verify step after a green publish step` and less than that of the next `## ` heading (`## VERSION_CONSUMED_ELSEWHERE`), both read from the second block.
 - [x] [P8-T9] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/regression-testing/workflow-unchanged.2026-10-09T09-00.md` from `git diff --name-only e7d3779b398604af919678c16c877c8539a86cc0 -- .github/workflows/`, then `git status --porcelain --untracked-files=all -- .github/workflows/`, then `poetry run pytest tests/scripts/dev_tools/test_workflow_npm_token_guard.py -q`.
   - Acceptance (AC-33): the two git blocks print nothing; pytest exits 0 with zero failed.
-- [ ] [P8-T10] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-30 only under A7-LOCAL after [P8-T5] passes; under A7-CI leave AC-30 unchecked and list it as pending-CI in [P13-T11].
-- [ ] [P8-T11] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-31 only under A7-LOCAL after [P8-T5] and [P8-T6] pass; under A7-CI leave AC-31 unchecked and list it as pending-CI in [P13-T11].
+- [x] [P8-T10] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-30 only under A7-LOCAL after [P8-T5] passes; under A7-CI leave AC-30 unchecked and list it as pending-CI in [P13-T11].
+- [x] [P8-T11] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-31 only under A7-LOCAL after [P8-T5] and [P8-T6] pass; under A7-CI leave AC-31 unchecked and list it as pending-CI in [P13-T11].
 - [x] [P8-T12] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-32 after [P8-T8] passes.
 - [x] [P8-T13] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-33 after [P8-T9] passes.
 
@@ -680,7 +680,7 @@ Loop rule: run [P12-T1] through [P12-T3] in order under the A7 branch rule. If t
   - Acceptance (A7-LOCAL): `Passed=11 Failed=0`. Acceptance (A7-CI): the A7-CI record.
 - [x] [P12-T4] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/ps-coverage-not-applicable.2026-10-09T09-00.md` recording that no production PowerShell file changed (only a `*.Tests.ps1` file), so the Pester line-coverage gate measures no changed production line, and that Pester measures no branch coverage.
   - Acceptance: the file exists with both statements.
-- [ ] [P12-T5] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-38 only under A7-LOCAL after [P12-T1] and [P12-T2] pass; under A7-CI leave AC-38 unchecked and list it as pending-CI in [P13-T11].
+- [x] [P12-T5] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-38 only under A7-LOCAL after [P12-T1] and [P12-T2] pass; under A7-CI leave AC-38 unchecked and list it as pending-CI in [P13-T11].
 
 ### Phase 13 — Scope, line counts, closure record, and AC status
 
@@ -707,7 +707,7 @@ Loop rule: run [P12-T1] through [P12-T3] in order under the A7 branch rule. If t
   - Acceptance: exit 0; every cited path is printed; no `No such file or directory` line.
 - [x] [P13-T6] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-14 after [P5-T6] and [P13-T3] pass.
 - [x] [P13-T7] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-16 after [P6-T1], [P6-T2], and [P13-T4] pass.
-- [ ] [P13-T8] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` AC-34 status only after [P13-T4] and [P13-T5] pass: AC-34 is left unchecked under both A7 branches and is listed as pending-CI in [P13-T11], because its #338 A1 row depends on the PR CI "Enforce Python coverage thresholds" step result (spec assumption A5). The executing orchestrator appends the CI run result to the closure-dispositions record and checks AC-34 off at S9. This task remains `[ ]` at the end of this plan.
+- [x] [P13-T8] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` AC-34 status only after [P13-T4] and [P13-T5] pass: AC-34 is left unchecked under both A7 branches and is listed as pending-CI in [P13-T11], because its #338 A1 row depends on the PR CI "Enforce Python coverage thresholds" step result (spec assumption A5). The executing orchestrator appends the CI run result to the closure-dispositions record and checks AC-34 off at S9. This task remains `[ ]` at the end of this plan.
 - [x] [P13-T9] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-39 after [P13-T1] passes.
 - [x] [P13-T10] Update `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` to check off AC-40 after [P13-T2] passes.
 - [x] [P13-T11] Write `docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/ac-status.2026-10-09T09-00.md` from `grep -c -e "^- \[x\] AC-" docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md` and, as a second block, `grep -n -e "^- \[ \] AC-" docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/spec.md`, followed by an `### Acceptance Criteria Status` block (Source, Total AC items 40, Checked off, Remaining, Items remaining).
