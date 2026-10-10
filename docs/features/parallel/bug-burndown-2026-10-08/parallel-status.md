@@ -17,8 +17,8 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 - `max_concurrency`: 4
 - `current_cohort`: 1
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-10T03:12:25Z
-- `next_step`: monitor 824; 841 eligible after 824 merges
+- `last_updated`: 2026-10-10T11:50:37Z
+- `next_step`: monitor 824 (scope widening); then 841
 
 **Items**
 
