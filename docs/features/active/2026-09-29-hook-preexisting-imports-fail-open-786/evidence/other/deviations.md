@@ -11,3 +11,8 @@ Rule 15 record of departures and their triggering observations.
 
 - Observation: the `Timestamp:` field of fourteen Phase 0 artifacts was first written with values ahead of the actual run time.
 - Correction applied: each value was replaced with the artifact's actual file write time (minute precision) before the Phase 0 commit; no other field changed. Affected artifacts: p0-execution-route.md, p0-pre-merge-state.md, p0-upstream-precondition.md, p0-merge.md, hook-dependency-enumeration-repo.md, hook-dependency-enumeration-mirror.md, hook-dependency-rows.md, hook-dependency-reconciliation.md, hook-guard-worklist.md, p0-line-counts.md, p0-batch-budget-probe.md, p0-poshqc-format.md, p0-mcp-poshqc-format.md, p0-poshqc-analyze.md.
+
+## [P3-T6] Behaviour-suite exception handling
+
+- Observation: the B, X, and C suites first caught the exception of an & invocation and asserted on it, so a failed row began with `Expected` and RS-6 would classify a raw load-failure throw as `NO-DECISION`, which would make the RS-4 `AND_ROUTE_MOCKS_OBSERVED` reading unmeasurable.
+- Correction applied (test construction, before the [P3-T6] run): `Invoke-HookProcess` in tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1, tests/scripts/codex-hooks/hook-dependency-failure.Codex.Tests.ps1, and tests/scripts/claude-hooks/hook-dependency-failure.SpecialCases.Tests.ps1 no longer catches the exception; it propagates to the It, which fails with the raw message. Stdin and stderr are still restored in finally. No assertion that judges a block result changed.

@@ -15,3 +15,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## p2
+
+- Subject: test(786): add discovery helpers, exemption list, #792 guard, completeness test, and exemption guard
+- Commit SHA: 1efedd033e33b6ba80b35d8c27dab4ac68f6dc32
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
