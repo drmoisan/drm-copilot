@@ -46,6 +46,7 @@
     ".codex/hooks/feature-folder-resolution.ps1",
     ".codex/hooks/hook-command-invocation.ps1",
     ".codex/hooks/hook-command-scanner.ps1",
+    ".codex/hooks/hook-dependency-guard.ps1",
     ".codex/hooks/hook-command-heredoc.ps1",
     ".codex/hooks/hook-command-invocation-operands.ps1",
     ".codex/hooks/hook-command-payload.ps1",

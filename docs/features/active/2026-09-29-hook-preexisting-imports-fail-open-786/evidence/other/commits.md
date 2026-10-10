@@ -23,3 +23,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## p3
+
+- Subject: test(786): add regression-first dependency-failure suites
+- Commit SHA: 22f31ae3c5ed4a8685566d1ddd9c687d9b968179
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
