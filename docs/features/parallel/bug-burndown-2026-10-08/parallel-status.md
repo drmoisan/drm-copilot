@@ -17,20 +17,20 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 - `max_concurrency`: 4
 - `current_cohort`: 1
 - `recolor_generation`: 1
-- `last_updated`: 2026-10-10T13:32:47Z
-- `next_step`: sync and merge 876; monitor 824 841 842; next slot 849
+- `last_updated`: 2026-10-10T13:45:03Z
+- `next_step`: monitor 824 841 842 849 (all remaining items in flight)
 
 **Items**
 
 | issue_num | feature_folder | cohort_index | state | merge_status | pr_url | merge_commit_sha | worktree_created_at | merged_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 543 | docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/874 | 5431ccdd471c184917493c4211afcd715bb4b95c | 2026-10-10T11:56:17Z | 2026-10-10T13:04:09Z | - |
-| 790 | docs/features/active/2026-09-29-issue-507-python-push-down-divergence-follow-ups-790 | 1 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/876 | - | 2026-10-10T11:56:17Z | - | - |
+| 790 | docs/features/active/2026-09-29-issue-507-python-push-down-divergence-follow-ups-790 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/876 | 793731a12e0aafb5f6eb645fffa072d941797de1 | 2026-10-10T11:56:17Z | 2026-10-10T13:44:19Z | - |
 | 791 | docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follow-ups-791 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/875 | 179c586676d0f942043e349f7666852c551f25fb | 2026-10-10T11:56:17Z | 2026-10-10T13:31:56Z | - |
 | 824 | docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824 | 1 | in_flight | worktree_created | - | - | 2026-10-10T02:33:53Z | - | - |
 | 841 | docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841 | 1 | in_flight | worktree_created | - | - | 2026-10-10T13:04:27Z | - | - |
 | 842 | docs/features/active/2026-10-08-cleanup-worktrees-scan-root-derivation-follow-ups-842 | 1 | in_flight | worktree_created | - | - | 2026-10-10T13:32:16Z | - | - |
-| 849 | docs/features/active/2026-10-08-parallel-items-fail-completion-on-promotion-receipts-849 | 1 | prepared | not_started | - | - | - | - | - |
+| 849 | docs/features/active/2026-10-08-parallel-items-fail-completion-on-promotion-receipts-849 | 1 | in_flight | worktree_created | - | - | 2026-10-10T13:44:37Z | - | - |
 | 793 | docs/features/active/2026-09-30-epic-orchestrator-state-validator-crashes-on-unhashable-merge-status-793 | - | merged | merged | https://github.com/drmoisan/drm-copilot/pull/868 | 311dea0548cb2e2fe57259aec6e1e3a06a9bdd2a | 2026-10-09T23:56:38Z | 2026-10-10T00:51:14Z | - |
 | 794 | docs/features/active/2026-09-30-parallel-cohorts-split-words-drops-tokens-after-first-newline-794 | - | merged | merged | https://github.com/drmoisan/drm-copilot/pull/860 | 8754efe64ef2e724fbfcfbc6c32d3f0ea0e53979 | 2026-10-09T06:48:10Z | 2026-10-09T23:46:09Z | - |
 | 796 | docs/features/active/2026-09-30-duplicated-string-comparators-outside-pr-context-796 | - | merged | merged | https://github.com/drmoisan/drm-copilot/pull/872 | 5c440e5b72ba0653f56329b46787ff263bc7a3a7 | 2026-10-10T01:01:51Z | 2026-10-10T02:23:38Z | - |
