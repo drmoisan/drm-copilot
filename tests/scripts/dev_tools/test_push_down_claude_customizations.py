@@ -8,8 +8,20 @@ import json
 from contextlib import redirect_stdout
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from types import ModuleType
+
+    from scripts.dev_tools.push_down_claude_blast_radius_derive import (
+        DirectoryEntry,
+    )
+    from scripts.dev_tools.push_down_claude_exclusion_filter import (
+        ClaudePushDownSummary,
+    )
 
 
 @dataclass
@@ -282,3 +294,165 @@ def test_parse_args_returns_destination_value() -> None:
     args = module.parse_args(["--destination", "C:/dest"])
 
     assert args.destination == "C:/dest"
+
+
+def _load_filesystem_module() -> ModuleType:
+    """Import the Claude push-down filesystem module under test."""
+
+    return importlib.import_module("scripts.dev_tools.push_down_claude_filesystem")
+
+
+def _empty_lister(_path: Path) -> Sequence[DirectoryEntry]:
+    """Describe an empty destination layout."""
+
+    return []
+
+
+def _push_source_files(
+    files: dict[str, str],
+) -> tuple[ClaudePushDownSummary, RecordingFileSystem]:
+    """Push ``/repo``-relative source files into ``/dest`` and return the result."""
+
+    module = _load_module()
+    repo_root = Path("/repo")
+    destination_root = Path("/dest")
+    fs = RecordingFileSystem(
+        files={
+            repo_root / relative: MemoryFile(text) for relative, text in files.items()
+        }
+    )
+    fs.directories.update({repo_root, destination_root})
+    summary: ClaudePushDownSummary = module.push_down_customizations(
+        repo_root=repo_root,
+        destination_root=destination_root,
+        fs=fs,
+        source_root=repo_root,
+        artifact_root=destination_root,
+        list_entries=_empty_lister,
+    )
+    return summary, fs
+
+
+def _published(summary: ClaudePushDownSummary) -> list[str]:
+    """Return the relative paths of the files a push-down published."""
+
+    return [result.relative_path for result in summary.files]
+
+
+def test_excluding_file_system_list_files_drops_local_runtime_directories() -> None:
+    """F1: list_files drops .claude/state and .claude/worktrees paths."""
+
+    module = _load_filesystem_module()
+    inner = RecordingFileSystem(
+        files={
+            Path("/repo/.claude/state"): MemoryFile("x"),
+            Path("/repo/.claude/state/batch-budget.json"): MemoryFile("{}"),
+            Path("/repo/.claude/worktrees/wt/a.md"): MemoryFile("a"),
+            Path("/repo/.claude/rules/python.md"): MemoryFile("py"),
+        }
+    )
+    excluding = module.ExcludingFileSystem(
+        inner, Path("/repo"), (), source_root=Path("/repo")
+    )
+
+    listed = excluding.list_files(Path("/repo/.claude"))
+
+    assert listed == [Path("/repo/.claude/rules/python.md")]
+    assert module.LOCAL_RUNTIME_RELATIVE_DIRECTORIES == (
+        ".claude/state",
+        ".claude/worktrees",
+    )
+
+
+def test_list_files_drops_runtime_paths_even_when_published() -> None:
+    """F2: a runtime path listed in the published set is still dropped."""
+
+    module = _load_filesystem_module()
+    inner = RecordingFileSystem(
+        files={
+            Path("/repo/.claude/state/batch-budget.json"): MemoryFile("{}"),
+            Path("/repo/.claude/worktrees/wt/a.md"): MemoryFile("a"),
+            Path("/repo/.claude/rules/python.md"): MemoryFile("py"),
+        }
+    )
+    excluding = module.ExcludingFileSystem(
+        inner,
+        Path("/repo"),
+        (),
+        source_root=Path("/repo"),
+        published_paths=frozenset(
+            {".claude/state/batch-budget.json", ".claude/rules/python.md"}
+        ),
+    )
+
+    listed = excluding.list_files(Path("/repo/.claude"))
+
+    assert listed == [Path("/repo/.claude/rules/python.md")]
+
+
+def test_push_down_excludes_claude_state_and_worktrees_subtrees() -> None:
+    """F3: a push-down publishes nothing below the runtime directories."""
+
+    summary, fs = _push_source_files(
+        {
+            ".claude/rules/python.md": "py\n",
+            ".claude/state/batch-budget.json": "{}\n",
+            ".claude/state/current-session-id": "id\n",
+            ".claude/worktrees/wt/.claude/settings.json": "{}\n",
+            ".claude/worktrees/wt/README.md": "readme\n",
+        }
+    )
+
+    assert _published(summary) == [".claude/rules/python.md"]
+    runtime_roots = (Path("/dest/.claude/state"), Path("/dest/.claude/worktrees"))
+    assert not [
+        path
+        for path in fs.files
+        if any(path.is_relative_to(root) for root in runtime_roots)
+    ]
+
+
+def test_push_down_retains_lookalike_runtime_paths() -> None:
+    """F4: paths that only resemble the runtime directories are published."""
+
+    lookalikes = [
+        ".claude/statement.md",
+        ".claude/worktrees-notes.md",
+        ".claude/hooks/state/x.ps1",
+    ]
+
+    summary, fs = _push_source_files({relative: "x\n" for relative in lookalikes})
+
+    published = _published(summary)
+    for relative in lookalikes:
+        assert relative in published, relative
+        assert Path("/dest") / relative in fs.files, relative
+
+
+def test_push_down_still_publishes_general_agent_memory() -> None:
+    """F5: a general-scoped agent memory is still published."""
+
+    memory = ".claude/agent-memory/orchestrator/general.md"
+
+    summary, fs = _push_source_files(
+        {memory: "---\nname: g\nmetadata:\n  scope: general\n---\nbody\n"}
+    )
+
+    assert memory in _published(summary)
+    assert Path("/dest") / memory in fs.files
+
+
+def test_list_files_passes_paths_outside_source_root_through() -> None:
+    """F6: a runtime-looking path outside the source root is not filtered."""
+
+    module = _load_filesystem_module()
+    inner = RecordingFileSystem(
+        files={Path("/other/.claude/state/x.json"): MemoryFile("{}")}
+    )
+    excluding = module.ExcludingFileSystem(
+        inner, Path("/repo"), (), source_root=Path("/repo")
+    )
+
+    listed = excluding.list_files(Path("/other/.claude"))
+
+    assert listed == [Path("/other/.claude/state/x.json")]

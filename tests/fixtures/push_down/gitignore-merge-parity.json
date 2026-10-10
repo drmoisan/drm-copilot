@@ -1,0 +1,59 @@
+{
+  "cases": [
+    {
+      "name": "absent",
+      "current": "",
+      "expected": "# BEGIN drm-copilot managed ignores\n.claude/state/\n.codex/state/\n# END drm-copilot managed ignores\n"
+    },
+    {
+      "name": "content-without-block",
+      "current": "node_modules/\n*.log\n",
+      "expected": "node_modules/\n*.log\n\n# BEGIN drm-copilot managed ignores\n.claude/state/\n.codex/state/\n# END drm-copilot managed ignores\n"
+    },
+    {
+      "name": "up-to-date-block",
+      "current": "node_modules/\n\n# BEGIN drm-copilot managed ignores\n.claude/state/\n.codex/state/\n# END drm-copilot managed ignores\n",
+      "expected": "node_modules/\n\n# BEGIN drm-copilot managed ignores\n.claude/state/\n.codex/state/\n# END drm-copilot managed ignores\n"
+    },
+    {
+      "name": "stale-block-with-surrounding-content",
+      "current": "dist/\n# BEGIN drm-copilot managed ignores\n.claude/state/\n# END drm-copilot managed ignores\ncoverage/\n",
+      "expected": "dist/\n# BEGIN drm-copilot managed ignores\n.claude/state/\n.codex/state/\n# END drm-copilot managed ignores\ncoverage/\n"
+    },
+    {
+      "name": "duplicate-entry-outside-block",
+      "current": ".claude/state/\nbuild/\n",
+      "expected": ".claude/state/\nbuild/\n\n# BEGIN drm-copilot managed ignores\n.claude/state/\n.codex/state/\n# END drm-copilot managed ignores\n"
+    },
+    {
+      "name": "no-trailing-newline",
+      "current": "node_modules/",
+      "expected": "node_modules/\n\n# BEGIN drm-copilot managed ignores\n.claude/state/\n.codex/state/\n# END drm-copilot managed ignores\n"
+    },
+    {
+      "name": "crlf-input",
+      "current": "node_modules/\r\n*.log\r\n",
+      "expected": "node_modules/\n*.log\n\n# BEGIN drm-copilot managed ignores\n.claude/state/\n.codex/state/\n# END drm-copilot managed ignores\n"
+    },
+    {
+      "name": "lone-cr-input",
+      "current": "node_modules/\r*.log\r",
+      "expected": "node_modules/\n*.log\n\n# BEGIN drm-copilot managed ignores\n.claude/state/\n.codex/state/\n# END drm-copilot managed ignores\n"
+    },
+    {
+      "name": "begin-without-end",
+      "current": "dist/\n# BEGIN drm-copilot managed ignores\nstale-entry/\n",
+      "expected": "dist/\n# BEGIN drm-copilot managed ignores\n.claude/state/\n.codex/state/\n# END drm-copilot managed ignores\nstale-entry/\n"
+    },
+    {
+      "name": "end-before-begin",
+      "current": "# END drm-copilot managed ignores\nkeep/\n# BEGIN drm-copilot managed ignores\nold/\n# END drm-copilot managed ignores\n",
+      "expected": "# END drm-copilot managed ignores\nkeep/\n# BEGIN drm-copilot managed ignores\n.claude/state/\n.codex/state/\n# END drm-copilot managed ignores\n"
+    },
+    {
+      "name": "multiple-trailing-blank-lines",
+      "current": "node_modules/\n\n\n\n",
+      "expected": "node_modules/\n\n# BEGIN drm-copilot managed ignores\n.claude/state/\n.codex/state/\n# END drm-copilot managed ignores\n"
+    }
+  ]
+}

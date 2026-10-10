@@ -303,4 +303,101 @@ describe("ExcludingFileSystem", () => {
     expect(sut.isFile("/repo/out/a.md")).toBe(true);
     expect(inner.readTextFile("/repo/out/a.md")).toBe("x");
   });
+
+  it("excludes .claude/state files from enumeration", () => {
+    // Arrange
+    const inner = buildInMemoryFileSystem({
+      "/repo/.claude/state/budget.json": "{}",
+      "/repo/.claude/state/session/id.txt": "id",
+      "/repo/.claude/rules/general.md": "rule",
+    });
+    const sut = new ExcludingFileSystem(inner, "/repo", [], {
+      sourceRoot: "/repo",
+    });
+
+    // Act
+    const listed = sut.listFiles("/repo/.claude");
+
+    // Assert: only the rule survives the runtime-directory filter.
+    expect([...listed].sort()).toEqual(["/repo/.claude/rules/general.md"]);
+  });
+
+  it("excludes .claude/worktrees files from enumeration", () => {
+    // Arrange
+    const inner = buildInMemoryFileSystem({
+      "/repo/.claude/worktrees/wt/.claude/settings.json": "{}",
+      "/repo/.claude/worktrees/wt/README.md": "readme",
+      "/repo/.claude/rules/general.md": "rule",
+    });
+    const sut = new ExcludingFileSystem(inner, "/repo", [], {
+      sourceRoot: "/repo",
+    });
+
+    // Act
+    const listed = sut.listFiles("/repo/.claude");
+
+    // Assert: only the rule survives the runtime-directory filter.
+    expect([...listed].sort()).toEqual(["/repo/.claude/rules/general.md"]);
+  });
+
+  it("excludes runtime directories even when the published set lists them", () => {
+    // Arrange
+    const inner = buildInMemoryFileSystem({
+      "/repo/.claude/state/budget.json": "{}",
+      "/repo/.claude/rules/general.md": "rule",
+    });
+    const sut = new ExcludingFileSystem(inner, "/repo", [], {
+      sourceRoot: "/repo",
+      publishedPaths: new Set([
+        ".claude/state/budget.json",
+        ".claude/rules/general.md",
+      ]),
+    });
+
+    // Act
+    const listed = sut.listFiles("/repo/.claude");
+
+    // Assert: the runtime filter runs before the pack filter.
+    expect([...listed].sort()).toEqual(["/repo/.claude/rules/general.md"]);
+  });
+
+  it("retains lookalike paths outside the runtime directories", () => {
+    // Arrange
+    const inner = buildInMemoryFileSystem({
+      "/repo/.claude/statement.md": "statement",
+      "/repo/.claude/worktrees-notes.md": "notes",
+      "/repo/.claude/hooks/state/x.ps1": "hook",
+    });
+    const sut = new ExcludingFileSystem(inner, "/repo", [], {
+      sourceRoot: "/repo",
+    });
+
+    // Act
+    const listed = sut.listFiles("/repo/.claude");
+
+    // Assert: prefix matching is by whole path segment, so all three remain.
+    expect([...listed].sort()).toEqual(
+      [
+        "/repo/.claude/statement.md",
+        "/repo/.claude/worktrees-notes.md",
+        "/repo/.claude/hooks/state/x.ps1",
+      ].sort(),
+    );
+  });
+
+  it("passes a path outside the source root through the runtime-directory filter", () => {
+    // Arrange
+    const inner = buildInMemoryFileSystem({
+      "/other/.claude/state/x.json": "{}",
+    });
+    const sut = new ExcludingFileSystem(inner, "/repo", [], {
+      sourceRoot: "/repo",
+    });
+
+    // Act
+    const listed = sut.listFiles("/other/.claude");
+
+    // Assert: a path with no source-relative form is not filtered.
+    expect([...listed].sort()).toEqual(["/other/.claude/state/x.json"]);
+  });
 });
