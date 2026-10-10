@@ -1,0 +1,10 @@
+{
+  "case": "entry-unstarted-recompute",
+  "subcommand": "entry",
+  "argv": ["entry", "--item", "5", "--prior-state", "scheduled", "--recompute", "true", "--generation", "2", "--at", "2026-10-08T14-00"],
+  "expected": {
+    "exit_code": 0,
+    "stdout": "{\"op\":\"remove\",\"item_key\":5,\"at\":\"2026-10-08T14-00\",\"prior_state\":\"scheduled\",\"new_state\":\"withdrawn\",\"disposition\":null,\"recolor_generation\":3}",
+    "stderr": null
+  }
+}

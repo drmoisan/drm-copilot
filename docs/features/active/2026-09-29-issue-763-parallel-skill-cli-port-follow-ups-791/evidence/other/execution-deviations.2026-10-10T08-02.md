@@ -43,3 +43,28 @@ Each entry records the task ID, the planned mechanism, the substituted mechanism
 - Planned mechanism: the plan records the shfmt/shellcheck gate in Phase 8 only.
 - Substituted mechanism: `shfmt -d` and `shellcheck` were additionally run on the two new bash files before the Phase 3 commit (both exit 0 after fixes); nothing is recorded as gate evidence here, and Phase 8 records the gate.
 - Reason: operator constraint.
+
+## [P4-T10]
+- Planned mechanism: the task edits the TriggerScoping test only; the plan's PowerShell format/analyze gates use the scratchpad runners.
+- Substituted mechanism: `mcp__drm-copilot__run_poshqc_format` and `mcp__drm-copilot__run_poshqc_analyze` (scan_folders = tests/scripts/claude-hooks) were called after the edit, with `git status --porcelain` and `git hash-object` of the edited file captured before and after format; dispositions recorded in `evidence/other/pester-trigger-scoping.2026-10-10T08-30.md`.
+- Reason: operator constraint.
+
+## [P4-T11]
+- Planned mechanism: `npx --yes bats tests/shell/parallel_mutation_remove.bats` run locally.
+- Substituted mechanism: not run; the plan's authorized CI-deferred branch taken with `CI-DEFERRED: yes`, `CI-DEFERRED-ACS: AC-8, AC-9`; verified from the CI bats job log on the pull request.
+- Reason: operator constraint (operator constraint prohibits local bats execution).
+
+## [P4-T12]
+- Planned mechanism: `command -v python3`, then `npx --yes bats tests/shell/parallel_mutation_remove_parity.bats` run locally.
+- Substituted mechanism: `command -v python3` run and recorded (exit 0); bats not run; the plan's authorized CI-deferred branch taken with `CI-DEFERRED: yes`, `CI-DEFERRED-ACS: AC-10`.
+- Reason: operator constraint (operator constraint prohibits local bats execution).
+
+## [P4-T13]
+- Planned mechanism: `npx --yes bats tests/shell/parallel_payload_only.bats tests/shell/parallel_bash_manifest_membership.bats` run locally.
+- Substituted mechanism: not run; the plan's authorized CI-deferred branch taken with `CI-DEFERRED: yes`, `CI-DEFERRED-ACS: AC-11, AC-12`.
+- Reason: operator constraint (operator constraint prohibits local bats execution).
+
+## [P4-T14]
+- Planned mechanism: `sh <scratchpad>/run-ps-791.sh <scratchpad>/pester-791.ps1`; acceptance requires `Failed: 0` and the new case shown as passed.
+- Substituted mechanism: `mcp__drm-copilot__run_poshqc_test` (scan_folders = tests/scripts/claude-hooks, tests/scripts/claude-runtime); call disposition recorded; `Failed` count and the new case result recorded as `CI-DEFERRED: yes`, `CI-DEFERRED-ACS: AC-13` (the MCP result carries no Pester output).
+- Reason: operator constraint.

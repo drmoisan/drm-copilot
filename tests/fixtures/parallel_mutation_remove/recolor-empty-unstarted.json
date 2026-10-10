@@ -1,0 +1,10 @@
+{
+  "case": "recolor-empty-unstarted",
+  "subcommand": "recolor",
+  "argv": ["recolor", "--unstarted", "", "--pinned", "4", "--generation", "3", "--current-cohort", "0", "--highest-pinned-cohort", "0"],
+  "expected": {
+    "exit_code": 0,
+    "stdout": "{\"cohort_assignments\":{},\"generation\":4}",
+    "stderr": null
+  }
+}
