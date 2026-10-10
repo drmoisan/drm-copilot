@@ -47,3 +47,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## p6
+
+- Subject: fix(786): guard Claude self-gating and SubagentStop hooks; migrate #690 guards
+- Commit SHA: 6b940612471342ed49d96da8b5ecd91e0aa48169
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty

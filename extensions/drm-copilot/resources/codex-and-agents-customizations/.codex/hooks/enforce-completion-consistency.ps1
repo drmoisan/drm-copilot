@@ -45,21 +45,21 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 # Reuse the adjacent hook's shared checkpoint policy logic. This dot-source is by
 # design, not a copy-paste defect, so the hook is not renamed.
-. (Join-Path $PSScriptRoot 'enforce-checkpoint-monotonic.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-checkpoint-monotonic.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-checkpoint-monotonic.ps1' -ErrorRecord $_ }
 
 # Shared Codex PreToolUse transport. Dot-sourced explicitly rather than relying on
 # the transitive load above, so this hook's transport does not depend on its
 # neighbour's internals. Every transport error it raises names this hook, because
 # the shared parser is called with -HookName 'enforce-completion-consistency'.
-. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
 
 # Dot-source the shared validation helpers. Guarded so a missing file produces a
 # clear error and so dot-sourcing this hook in tests loads the helpers too.
-$script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1'
-. $script:CompletionHelpersPath
+try { . (Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-completion-helpers.ps1' -ErrorRecord $_ }
 
 function ConvertFrom-CheckpointJson {
     <#
@@ -383,6 +383,8 @@ function Invoke-CompletionConsistencyDecision {
         [Parameter(Mandatory = $false)]
         [scriptblock] $RoutingMatrixReader
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'COMPLETION_CONSISTENCY_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if (-not $ToolInputRaw) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
@@ -462,6 +464,9 @@ function Invoke-CompletionConsistencyDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('COMPLETION_CONSISTENCY_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'COMPLETION_CONSISTENCY_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     # -HookName makes every transport error name this hook rather than the

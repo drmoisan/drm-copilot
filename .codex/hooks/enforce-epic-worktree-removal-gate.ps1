@@ -4,12 +4,13 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 # Shared command-line parser (issue #545). The scope filter and the operand extractor below
 # both run against the segment that structurally invokes `git worktree remove`, which is what
 # keeps the two runtimes on one implementation of the same concern.
-. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
-. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 
 $script:SafeWorktreeStatuses = @('merged', 'worktree_removed')
 
@@ -80,6 +81,8 @@ function Invoke-CodexWorktreeRemovalDecision {
         [Parameter(Mandatory)][string] $PayloadRaw,
         [AllowNull()][AllowEmptyString()][string] $EpicCheckpointRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WORKTREE_REMOVAL_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = ConvertFrom-CodexWorktreeJson -Raw $PayloadRaw -Name 'PreToolUse input'
     if ([string]$payload.tool_name -ne 'Bash') {
@@ -163,6 +166,9 @@ function Get-CodexWorktreeRemovalTargetDenial {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_WORKTREE_REMOVAL_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WORKTREE_REMOVAL_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     $payloadRaw = [Console]::In.ReadToEnd()

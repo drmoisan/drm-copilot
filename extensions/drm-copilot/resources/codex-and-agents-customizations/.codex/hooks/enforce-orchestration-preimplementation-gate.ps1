@@ -1,4 +1,3 @@
-
 <#
 .SYNOPSIS
     Blocks implementation operations before orchestration readiness exists.
@@ -12,28 +11,28 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 # Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
 # mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
-. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
 
 # Pure pathspec classifier for the issue #539 orchestration-bookkeeping staging exemption.
 # Extracted to a dot-sourced sibling so this file stays inside the 500-line cap, following
 # the headroom-split precedent already used on this side by enforce-completion-helpers.ps1.
-. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-helpers.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-helpers.ps1' -ErrorRecord $_ }
 
 # Pure mode dispatch and per-mode readiness predicates for issue #554. A new sibling
 # rather than an addition to the helpers file above, whose header declares a different
 # normative contract and which lacks headroom; leaving that file byte-untouched is the
 # proof the issue #539 exemption is behaviourally unchanged.
-. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-modes.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-modes.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-modes.ps1' -ErrorRecord $_ }
 # Epic-scope command and path legs (issue #707, porting issue #663 decision D2), plus the
 # two per-mode read seams relocated from this file to keep it inside the 500-line cap.
-. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-epic-scope.ps1' -ErrorRecord $_ }
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
-. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
-. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
-
+try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 # The readiness checkpoint this gate reads and names in its block message.
 $script:CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 
@@ -364,6 +363,8 @@ function Invoke-OrchestrationPreimplementationGateDecision {
         [AllowEmptyString()]
         [string] $ParallelCheckpointRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PREIMPLEMENTATION_GATE_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if (-not $ToolInputRaw) {
         return Get-OrchestrationPreimplementationGateAllowDecision
@@ -462,6 +463,9 @@ function Invoke-OrchestrationPreimplementationGateDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PREIMPLEMENTATION_GATE_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PREIMPLEMENTATION_GATE_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw ([Console]::In.ReadToEnd()) -HookName 'enforce-orchestration-preimplementation-gate'
