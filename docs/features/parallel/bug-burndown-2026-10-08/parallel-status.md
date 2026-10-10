@@ -17,8 +17,8 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 - `max_concurrency`: 4
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-10T00:51:56Z
-- `next_step`: await 869 green then merge; then 870; monitor 846 847
+- `last_updated`: 2026-10-10T01:02:13Z
+- `next_step`: await 870 green then merge; monitor 796 846 847
 
 **Items**
 
@@ -32,10 +32,10 @@ hand-authored. It is a read-only projection: the manifest and the checkpoint are
 | 848 | docs/features/active/2026-10-08-root-format-check-fails-on-test-fixtures-848 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/867 | 73ddf6c6ad83d8f4034f642758f07f30a545294c | 2026-10-09T23:46:27Z | 2026-10-10T00:20:36Z | - |
 | 793 | docs/features/active/2026-09-30-epic-orchestrator-state-validator-crashes-on-unhashable-merge-status-793 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/868 | 311dea0548cb2e2fe57259aec6e1e3a06a9bdd2a | 2026-10-09T23:56:38Z | 2026-10-10T00:51:14Z | - |
 | 824 | docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824 | 1 | prepared | not_started | - | - | - | - | - |
-| 843 | docs/features/active/2026-10-08-parallel-model-routing-admitted-item-source-and-absent-band-test-843 | 1 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/869 | - | 2026-10-10T00:05:37Z | - | - |
+| 843 | docs/features/active/2026-10-08-parallel-model-routing-admitted-item-source-and-absent-band-test-843 | 1 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/869 | 46dd56a8c2d6df15571f5f088ae2d677e5123b55 | 2026-10-10T00:05:37Z | 2026-10-10T01:01:21Z | - |
 | 845 | docs/features/active/2026-10-08-npm-token-guard-comparison-false-positive-and-stale-docstring-845 | 1 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/870 | - | 2026-10-10T00:20:51Z | - | - |
 | 846 | docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846 | 1 | in_flight | worktree_created | - | - | 2026-10-10T00:51:36Z | - | - |
-| 796 | docs/features/active/2026-09-30-duplicated-string-comparators-outside-pr-context-796 | 2 | prepared | not_started | - | - | - | - | - |
+| 796 | docs/features/active/2026-09-30-duplicated-string-comparators-outside-pr-context-796 | 2 | in_flight | worktree_created | - | - | 2026-10-10T01:01:51Z | - | - |
 | 841 | docs/features/active/2026-10-08-ci-gate-vacuous-on-empty-check-list-841 | 2 | prepared | not_started | - | - | - | - | - |
 | 543 | docs/features/active/2026-10-08-epic-planner-topology-receipt-gate-543 | 3 | prepared | not_started | - | - | - | - | - |
 | 791 | docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follow-ups-791 | 3 | prepared | not_started | - | - | - | - | - |
