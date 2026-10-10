@@ -132,3 +132,9 @@ Rule 15 record of departures and their triggering observations.
 Timestamp: 2026-10-10T17-36
 
 OPERATOR-DECISION-RESOLVED: AC-24 coverage measurement route | evidence/other/r1-ac24-decision.md
+
+## Remediation cycle 1: [P6-T6] check-off commit
+
+Timestamp: 2026-10-10T18-47
+
+- [P6-T6] commits commits.md alone after its r1-p6 record and requires an empty porcelain after that push (verified: empty after cf6645a5f284fc5163d2ce7f7ac919f80611ed08). Marking the [P6-T6] box on disk afterwards modifies the plan, so the check-off and this note are committed in one further commit (operator rule: commit and push at any pause). No production or test file is part of it.
