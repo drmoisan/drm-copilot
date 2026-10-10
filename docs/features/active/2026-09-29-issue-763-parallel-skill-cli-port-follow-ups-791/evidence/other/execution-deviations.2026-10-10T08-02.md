@@ -76,6 +76,11 @@ Each entry records the task ID, the planned mechanism, the substituted mechanism
 - Substituted mechanism: none. The operator authorized a Grep-tool substitution if the abandon PreToolUse gate denied the Bash command; the command was not denied (exit 1, no output), so the planned mechanism was used unchanged.
 - Reason: operator constraint (recorded for completeness; no substitution taken).
 
+## [P7-T1]
+- Planned mechanism: cite the spec D5 line sets; re-read each and record current numbers if they differ.
+- Substituted mechanism: none (task-authorized branch). Current numbers differ for `parallel-add` (101, 108, 150; +2) and `parallel-orchestrate` (658, 813, 821; +24) after the `main` merge; `parallel-close` (49, 55, 65) and `_parallel_mutation_errors.py:192` are unchanged. Both the spec and current numbers, with a note, are recorded in `follow-ups.md`.
+- Reason: line drift from the earlier `main` merge (recorded per task text, not an operator constraint).
+
 ## Phase-boundary commits (Phases 5-9)
 - Task ID: phase boundaries after [P5-T7], [P6-T8], [P7-T1], [P8-T17], and [P9-T2].
 - Planned mechanism: the plan defines no per-phase commit.
