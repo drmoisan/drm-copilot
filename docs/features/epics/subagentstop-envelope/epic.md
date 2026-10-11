@@ -21,13 +21,13 @@ features:
     depends_on: []
   - issue_num: 903
     feature_folder: subagentstop-envelope-orchestrator-family-903
-    depends_on: [subagentstop-envelope-core-897]
-  - issue_num: 897
-    feature_folder: subagentstop-envelope-artifact-gates-897
-    depends_on: [subagentstop-envelope-core-897]
+    depends_on: [897]
+  - issue_num: 905
+    feature_folder: subagentstop-envelope-artifact-gates-905
+    depends_on: [897]
   - issue_num: 896
     feature_folder: subagentstop-envelope-feature-review-coverage-896
-    depends_on: [subagentstop-envelope-core-897]
+    depends_on: [897]
 ---
 
 # Epic: SubagentStop Envelope
@@ -35,9 +35,8 @@ features:
 Epic issue: #904.
 
 > **Manifest status.** Resolved on 2026-10-11 after all four children were prepared and fanned in.
-> Each `feature_folder` value is the prepared child's active folder basename. `depends_on` uses
-> folder basenames rather than issue numbers because E1 and E3 are both keyed to #897; the
-> uniqueness of that key is an open decision recorded under Open Decisions.
+> Each `feature_folder` value is the prepared child's active folder basename, and `depends_on`
+> uses issue numbers. E3 was re-keyed from #897 to #905 (see Decisions).
 >
 > **Authoritative helper contract.** E1's `spec.md`
 > (`docs/features/active/subagentstop-envelope-core-897/spec.md`, section
@@ -109,7 +108,7 @@ agents whose final message lacks `plan-path`, `research-path`, `review-artifact`
 | --- | --- | --- | --- | --- | --- |
 | E1 core helper and inline command | #897 | none | 1 | C4 | new helper, `.claude/settings.json`, mirrors |
 | E2 orchestrator, executor, planner, required-artifact validators | #903 | #897 | 2 | C3 | 5 hooks, tests, mirrors |
-| E3 discovery, pr-author, prd-feature, task-researcher validators | #897 | none | 2 | C3 | 4 hooks, tests, mirrors |
+| E3 discovery, pr-author, prd-feature, task-researcher validators | #905 | #897 (parent) | 2 | C3 | 4 hooks, tests, mirrors, corpus false-positive gate |
 | E4 feature-review coverage | #896 | #884 (Codex half), #897 | 2 | C3 | Claude and Codex hooks, thresholds, skills, agent TOML, mirrors |
 
 Waves are numbered from 1 in this narrative; the manifest computation numbers them from 0
@@ -133,20 +132,30 @@ Complexity bands:
   contract consumed by every other child.
 - E2 C3: cross_module_contract_change across five hooks, including the orchestrator completion
   gate, plus a file split.
-- E3 C3: cross_module_contract_change across four hooks and an exit-code contract inversion in
-  two suites.
+- E3 C3: cross_module_contract_change across four hooks, an exit-code contract inversion in
+  two suites, and rule corrections validated against the main-branch artifact corpus.
 - E4 C3: cross_module_contract_change across the Claude and Codex hooks, a shared floor source,
   and a coverage increase from 7.30% to at least 85%.
 
 ## Issue Closure
 
-#897 is delivered by E1, E2 and E3 together, #903 only in part, and #884 only in its Codex half.
-Child pull requests reference these issues with `Refs` and do not use a closing keyword. #896 is
-fully delivered by E4. The integration-to-main pull request (epic issue #904) closes #897 and
-#896 and references #903 and #884.
+#897 is delivered by E1, E2 and E3 together (E3 through its slice #905), #903 only in part, and
+#884 only in its Codex half. Child pull requests reference these issues with `Refs` and do not use
+a closing keyword. #896 is fully delivered by E4. The integration-to-main pull request (epic issue
+#904) closes #897, #905 and #896 and references #903 and #884.
 
-## Open Decisions
+## Decisions
 
-- E1 and E3 are both keyed to #897. The epic manifest and the planner checkpoint require a unique
-  `issue_num` per child, and the decomposition directive forbids new child issues. Resolution is
-  recorded here once the user decides.
+- 2026-10-11, coordinator: E1 and E3 were both keyed to #897, which the manifest and planner
+  checkpoint reject. One new issue, #905, was created as the artifact-gate validators' slice of
+  #897 and linked from #897 and #904; E3's folder and branch were re-keyed to it
+  (`subagentstop-envelope-artifact-gates-905`, `bug/subagentstop-envelope-artifact-gates-905`).
+- 2026-10-11, coordinator: the task-researcher research-filename rule and the prd-feature
+  numeric-derivation rule were added to E3's scope. Before any E3 validator switches to exit-2
+  blocking, it is run against the existing artifacts on main and must show zero false positives.
+  E3's spec section `Rule Changes` records R1 (research filenames), R2 (numeric derivation applies
+  only to derived counts), and two further corrections the corpus run required: R3 (search-scope
+  wording accepts "whole" and "worktree") and R4 (discovery gate skips empty tokens). No policy
+  file is edited.
+- 2026-10-11, coordinator: the duplicate `-RequiredArtifact` in `.claude/agents/prd-feature.md:18`
+  is assigned to E2; if E2 cannot edit agent files it records an operator item.

@@ -1,6 +1,6 @@
 # Epic Kickoff: subagentstop-envelope
 
-Planned by epic-planner on 2026-10-11T14:17Z. All child features are prepared: issues promoted, active
+Planned by epic-planner on 2026-10-11T16:19Z. All child features are prepared: issues promoted, active
 folders created, research complete, spec/user-story written, atomic plans approved, preflight
 ALL CLEAR. Planning state: artifacts/orchestration/epic-planner-state.json (branch:
 epic/subagentstop-envelope-integration). Epic issue: #904.
@@ -23,7 +23,7 @@ of docs/features/epics/subagentstop-envelope/epic-kickoff.md before the first wa
 | issue_num | feature_folder | wave | complexity | plan-path |
 | --- | --- | --- | --- | --- |
 | 897 | docs/features/active/subagentstop-envelope-core-897 | 0 | C4 | docs/features/active/subagentstop-envelope-core-897/plan.2026-10-11T07-59.md |
-| 897 | docs/features/active/subagentstop-envelope-artifact-gates-897 | 1 | C3 | docs/features/active/subagentstop-envelope-artifact-gates-897/plan.2026-10-11T07-59.md |
+| 905 | docs/features/active/subagentstop-envelope-artifact-gates-905 | 1 | C3 | docs/features/active/subagentstop-envelope-artifact-gates-905/plan.2026-10-11T07-59.md |
 | 896 | docs/features/active/subagentstop-envelope-feature-review-coverage-896 | 1 | C3 | docs/features/active/subagentstop-envelope-feature-review-coverage-896/plan.2026-10-11T07-58.md |
 | 903 | docs/features/active/subagentstop-envelope-orchestrator-family-903 | 1 | C3 | docs/features/active/subagentstop-envelope-orchestrator-family-903/plan.2026-10-11T07-59.md |
 
@@ -36,17 +36,13 @@ of docs/features/epics/subagentstop-envelope/epic-kickoff.md before the first wa
   only then launch the wave. At planning completion the count was 0.
 - Child feature branches (prepared, pushed, already merged into the integration branch):
   - E1 #897: `bug/subagentstop-envelope-core-897`
-  - E3 #897: `bug/subagentstop-envelope-artifact-gates-897`
+  - E3 #905: `bug/subagentstop-envelope-artifact-gates-905` (re-keyed from #897; the older branch `bug/subagentstop-envelope-artifact-gates-897` is superseded and must not be used)
   - E4 #896: `bug/subagentstop-envelope-feature-review-coverage-896`
   - E2 #903: `bug/subagentstop-envelope-orchestrator-family-903`
 - Every child execution delegation must begin with the canonical issue-number line
   (`Canonical issue number for this feature is <N>.`) and a lowercase `branch:` label naming the
-  branch above. E1 and E3 share issue #897, so the branch label and the feature folder are the only
-  distinguishing signals; always state both, and never delegate E1 and E3 with an issue number
-  alone.
-- Duplicate key. E1 and E3 are both keyed to #897 in the manifest; the planner checkpoint
-  validator reports `issue_num must be unique`. The user directed that no new child issues be
-  created. Resolve this before `/epic-run` (see epic.md Open Decisions).
+  branch above. E3 is keyed to #905 (its slice of #897); use 905 in E3's canonical issue-number
+  line, never 897.
 - Each child checkpoint was prepared under `route_id: preparation`. The executing orchestrator
   must switch it to a non-terminal large route before Phase 0, because every child changes several
   PowerShell files plus mirrors.
@@ -58,18 +54,27 @@ of docs/features/epics/subagentstop-envelope/epic-kickoff.md before the first wa
 - E1 changes the SubagentStop behavior that every later child, and the orchestrators themselves,
   run under: it deletes the inline command at `.claude/settings.json:218`. After E1 merges, confirm
   the settings file loads and the discovery-gate entry still fires before launching wave 1.
-- After E2, E3 and E4 merge, the validators block for real. Two rules then start refusing work
-  (reported by E3, unchanged by this epic): `validate-task-researcher-output.ps1:95-98` accepts only
-  `<timestamp>-<short-name>-research.md` research names (more than 60 existing files, including
-  E1's, use `research.<timestamp>.md`), and `validate-prd-feature-output.ps1:68` treats any number
-  in an acceptance-criterion line as a numeric criterion that needs a derivation section. Expect
-  task-researcher and prd-feature delegations in later work to be refused on these grounds;
-  file follow-ups rather than widening scope.
+- E3 corrects four strict rules before its validators block (coordinator decision; spec section
+  `Rule Changes`): R1 research filenames accept the forms in use on main
+  (`<timestamp>-<short-name>-research.md`, `research.<timestamp>.md`, date-only and compact-date
+  forms, `research-addendum.<timestamp>.md`); R2 the prd-feature numeric-derivation rule applies
+  only to derived counts, not thresholds, exit codes, issue or line numbers, or policy-quoted
+  figures; R3 search-scope wording accepts "whole" and "worktree"; R4 the discovery gate skips
+  empty tokens. E3's plan runs each validator against the main-branch artifact corpus and requires
+  zero false positives before that validator switches to exit 2. No policy file is edited. If the
+  corpus on main has changed by execution time, E3 re-runs the corpus gate on the current tip.
+- E2 and E4 hooks are not covered by E3's corpus gate. When E2 and E4 make their validators
+  block, a rule that never fired at runtime may refuse legitimate work; record any such refusal as
+  a finding in that child's folder rather than widening its scope.
 - Ownership gap to assign to E2: `.claude/agents/prd-feature.md:18` registers E2's hook
   `validate-required-artifact-output.ps1` with `-RequiredArtifact` passed twice, which PowerShell
   normally rejects at parameter binding, so that registration likely never runs. E2 deferred it to
-  E3 (agent owner) and E3's plan asserts that its branch leaves agent files unchanged. Tell E2's
-  executing orchestrator to fix that registration (and its bundled mirror) inside E2.
+  E3 (agent owner) and E3's plan asserts that its branch leaves agent files unchanged. The
+  coordinator assigned it to E2: tell E2's executing orchestrator to fix that registration (and its
+  bundled mirror under `extensions/drm-copilot/resources/claude-customizations/.claude/agents/`)
+  inside E2. `.claude/agents/*.md` may be outside the executing agents' write scope; if E2 cannot
+  edit it, E2 records it as an operator item in its feature folder and the epic report, and does
+  not work around the permission.
 - `pack-manifests/core.json` gains entries from E1, E2 and E4 at nearby lines; expect a merge
   conflict there at fan-in and resolve it by keeping every entry.
 - E2 risk: SubagentStop hooks registered only in agent frontmatter (executor, required-artifact)
@@ -80,9 +85,9 @@ of docs/features/epics/subagentstop-envelope/epic-kickoff.md before the first wa
   resolved as fail-closed for an unreadable `CLAUDE.md` and defaults for a missing one.
 - The bundled-copy parity pytest can fail locally on gitignored state files (#510); verify that
   criterion on PR CI.
-- Issue closure: child PRs use `Refs #897`, `Refs #903` and `Refs #884` with no closing keyword;
-  E4 may close #896. The integration-to-main PR (#904) closes #897 and #896 and references #903
-  and #884.
+- Issue closure: child PRs use `Refs #897`, `Refs #905`, `Refs #903` and `Refs #884` with no
+  closing keyword; E4 may close #896. The integration-to-main PR (#904) closes #897, #905 and #896
+  and references #903 and #884.
 - Operator conflict policy: overlap between wave-1 children blocks only when both sides edit the
   same functions or rules and the cost is comparable to the time saved by running in parallel.
 - Throttle: the only limit is overall 5-hour usage, monitored by the coordinator. A brief API
