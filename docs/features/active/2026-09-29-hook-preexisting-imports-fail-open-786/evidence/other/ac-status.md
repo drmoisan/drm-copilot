@@ -20,3 +20,5 @@ Remediation cycle 1 check-offs:
 - AC-26 and AC-27 were checked off by the reviewer before this cycle (feature-audit.2026-10-10T06-50.md).
 
 Verification: `^- \[x\] AC-\d+:` matches 27 lines in spec.md, and `^- \[ \] AC-\d+:` matches 0 lines (sum 27).
+
+Remediation cycle 2 note: CI-1 (Linux hook-suite failures on PR #881) closed by test-only fixes (evidence/other/r2-ci-diagnosis.md); AC-17, AC-24, and AC-27 re-verified (evidence/qa-gates/r2-preexisting-tests.md, evidence/qa-gates/r2-final-pester-coverage.md, evidence/qa-gates/r2-ac24-per-surface.md, evidence/qa-gates/r2-final-qc-loop.md, evidence/qa-gates/r2-pr-checks.md).
