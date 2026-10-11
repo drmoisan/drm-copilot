@@ -1,0 +1,899 @@
+# subagentstop-envelope-feature-review-coverage (Plan)
+
+- **Issue:** #896 (Refs #884 Codex half only; Refs #897 feature-review coverage validator only)
+- **Parent (optional):** epic `subagentstop-envelope` (epic issue #904), child E4, integration branch `epic/subagentstop-envelope-integration`
+- **Owner:** drmoisan
+- **Last Updated:** 2026-10-11T15-00
+- **Status:** Draft v1.3 (revision after executor preflight round 3; awaiting validator run and executor preflight)
+- **Version:** 1.3
+- **Work Mode:** full-bug (from `issue.md` metadata; `spec.md` is the sole acceptance-criteria source; `user-story.md` is absent by design)
+- **Branch:** the value P0-T2 records in `Branch:`, which must match `^bug/subagentstop-envelope-feature-review-coverage(-exec)?-896$` (written `<BRANCH>` below; every push, fetch, and remote rev-parse uses `<BRANCH>`)
+- **Integration ref:** `origin/epic/subagentstop-envelope-integration` (written `<INT>` below; every `git diff` in this plan carries a ref operand)
+- **Feature folder:** `docs/features/active/subagentstop-envelope-feature-review-coverage-896/` (written `<FEATURE>` below)
+- **Requirements:** `<FEATURE>/spec.md` v1.1 (AC-1 through AC-31), `<FEATURE>/issue.md`, `<FEATURE>/research/research.2026-10-11T08-10.md`
+- **Upstream dependency:** E1 (#897, preparation branch `bug/subagentstop-envelope-core-897`, execution branch possibly `bug/subagentstop-envelope-core-exec-897`, folder `docs/features/active/subagentstop-envelope-core-897/`). Epic children have entered the integration branch through PRs from `-exec-` branches and through direct merges (E1's preparation documents entered by direct merge `cf3108b04`), so P0-T3 identifies the E1 merge by head-branch pattern or by the first-parent merge that introduced the helper, not by one fixed branch name. At authoring time E1's helper is not merged into this tree: `.claude/hooks/subagentstop-envelope.ps1` and the E1 feature folder do not exist here. This plan is written against the E1 contract recorded in spec Proposed Fix item 1 (reconciled at E1 head `cc3285559`). Phase 0 compares E1's merged spec with that recorded contract item by item and stops on any divergence (AC-1).
+
+**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+
+**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+
+## Scope Summary
+
+In scope (spec Scope & Non-Goals): the Claude feature-review hook transport (E1 helper, `-InputText`, exit 2 on every block path, E1 consumer rules 1-6 including the re-entry policy), CR-4, CR-6, CR-8, CR-9, the Codex hook floor source (byte-identical thresholds copy, root `CLAUDE.md` line floor, CR-4 within Codex semantics), the feature-review-workflow skill copies and `.codex/agents/feature-review.toml`, their bundled mirrors, both `core.json` pack manifests, `$script:SharedModuleNames` in `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1`, and `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`.
+
+Not edited by any task (AC-22, AC-27, spec Scope & Non-Goals): the E2 validators (`validate-orchestrator-output.ps1`, `validate-orchestrator-output-resolution.ps1`, `validate-executor-output.ps1`, `validate-planner-output.ps1`, `validate-required-artifact-output.ps1`) and E3 validators (`validate-discovery-artifact-gate.ps1`, `validate-pr-author-output.ps1`, `validate-prd-feature-output.ps1`, `validate-task-researcher-output.ps1`) and their mirrors; `.claude/settings.json`; `.claude/hooks/subagentstop-envelope.ps1` and its mirror; `.claude/lib/bash/compute-concurrency-batches.sh` and every other bash file; `.codex/config.toml` and its bundle copy; everything under `.github/instructions/` and `.claude/rules/`; the #824 folder `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/`; the guard-test helpers under `tests/scripts/claude-runtime/` (run, not edited). No Python is added to any hook.
+
+### Files named by this plan
+
+| ID | Repository-relative path | Change |
+|---|---|---|
+| H1 | `.claude/hooks/validate-feature-review-coverage.ps1` | edit: entry and decision only; transport; re-entry policy; CR-4 decision; help |
+| H2 | `.claude/hooks/validate-feature-review-coverage-metrics.ps1` | new: artifact reader, CR-4 reader, coverage parsers |
+| H3 | `.claude/hooks/validate-feature-review-coverage-rules.ps1` | new: artifact-path rules, language set, coverage-row rule (adds `Repairable`, `-LineSource`, `-BranchSource`) |
+| H4 | `.claude/hooks/feature-review-coverage-thresholds.ps1` | edit: CR-9 second alternative and help |
+| H5 | `.codex/hooks/validate-feature-review-coverage.ps1` | edit: floor source, `-LineFloor`, help |
+| H6 | `.codex/hooks/feature-review-coverage-thresholds.ps1` | new: byte copy of H4 |
+| M1-M6 | the six mirrors of H1-H6 under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/` (H1-H4) and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/` (H5, H6) | byte copies |
+| S1 | `.agents/skills/feature-review-workflow/SKILL.md` | edit: lines 111-114 and 148 |
+| S2 | `.github/skills/feature-review-workflow/SKILL.md` | edit: line 126 |
+| S3 | `.codex/agents/feature-review.toml` | edit: lines 121-123 and 133-135 |
+| SM1-SM3 | `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md`, `extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-review.toml` | byte copies of S1-S3 |
+| P1 | `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` | edit: two entries |
+| P2 | `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json` | edit: one entry |
+| T1 | `tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1` | edit: transport conversion, static tests E4-ST1, ST2, ST3, ST4, ST6 |
+| T2 | `tests/scripts/claude-hooks/validate-feature-review-coverage.Coverage.Tests.ps1` | edit: E4-TR1, TR2, TR3, TR3b, TR4, TR4a, TR4c, TR6, TR10a-d; transport conversion |
+| T3 | `tests/scripts/claude-hooks/validate-feature-review-coverage.Issue824.Tests.ps1` | edit: CR-6 and transport conversion |
+| T4 | `tests/scripts/claude-hooks/validate-feature-review-coverage.ThresholdsGuard.Tests.ps1` | edit: TG1 stdin, TG3 `-InputText`, E4-TG4 |
+| T5 | `tests/scripts/claude-hooks/feature-review-coverage-thresholds.Tests.ps1` | edit: E4-TR5 rows, E4-ST5 |
+| T6 | `tests/scripts/codex-hooks/validate-feature-review-coverage.Coverage.Tests.ps1` | edit: E4-TR7, TR8, TR9, ST7; floor row |
+| T7 | `tests/scripts/codex-hooks/feature-review-coverage-thresholds.Tests.ps1` | new: E4-PX2 and resolver rows on the Codex copy |
+| T8 | `tests/scripts/codex-hooks/feature-review-coverage-floor-parity.Tests.ps1` | new: E4-PX1 |
+| T9 | `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` | edit: line 30 only (no added line; file stays at 497 lines) |
+| T10 | `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py` | edit: `STEP_EIGHT_COPIES`, `EXPECTED_LISTED_COPY_COUNT`, new parametrized test |
+| T11 | `tests/scripts/claude-hooks/validate-feature-review-coverage.E4.Helpers.ps1` | new: E4 test-support harness and fixtures dot-sourced by T2's E4 Context (not a `*.Tests.ps1` file; outside the `config/poshqc-coverage.json` coverage roots, so no production exclude entry is involved) |
+
+`.claude/skills/feature-review-workflow/SKILL.md` and its mirror are read-only: they already contain `CLAUDE.md`, `85%`, `75%`, `governing thresholds`, and no `80%`/`90%`.
+
+## Planned File Split (CR-8)
+
+| File | Functions | Expected lines (target <= 300; hard cap < 500) |
+|---|---|---|
+| H1 `.claude/hooks/validate-feature-review-coverage.ps1` | comment-based help; guard bootstrap; guarded dot-sources of `feature-review-coverage-thresholds.ps1`, `validate-feature-review-coverage-metrics.ps1`, `validate-feature-review-coverage-rules.ps1`, `subagentstop-envelope.ps1`; `Invoke-FeatureReviewCoverageValidation -InputText` (dependency check, envelope read, validation in try/catch, re-entry policy); entry point | about 210-235 |
+| H2 `.claude/hooks/validate-feature-review-coverage-metrics.ps1` | `Get-ArtifactFileContent`, `Get-FeatureReviewClaudeMdText` (new, CR-4), `Get-LcovRepoCoverage`, `Get-LcovBranchCoverage`, `Get-JacocoBranchCoverage`, `Get-LanguageBranchCoverage`, `Get-JacocoRepoCoverage`, `Get-LanguageRepoCoverage` | about 165-180 |
+| H3 `.claude/hooks/validate-feature-review-coverage-rules.ps1` | `Get-ReviewArtifactPathFromOutput`, `Get-ReviewArtifactInfo`, `Get-ChangedLanguageSet`, `Test-LanguageCoverageRow` (adds `-LineSource`, `-BranchSource`, and a `Repairable` result key) | about 175-190 |
+| H4 `.claude/hooks/feature-review-coverage-thresholds.ps1` | `Get-FeatureReviewCoverageThreshold` (CR-9 alternative; help lists accepted forms) | about 85-95 |
+| H5 `.codex/hooks/validate-feature-review-coverage.ps1` | unchanged function set; `Test-LanguageCoverageRow -LineFloor`; entry reads root `CLAUDE.md` | about 315-325 (baseline 304; above the 300 design target, recorded by AC-10; below the 500 cap) |
+| H6 `.codex/hooks/feature-review-coverage-thresholds.ps1` | byte copy of H4 | same as H4 |
+
+The function lists of H1, H2, H3 are exactly those of spec Proposed Fix item 3 (plus the CR-4 reader the spec names for H2); no other function is added, because E4-ST4 (AC-9) compares each file's function set with the assigned list.
+
+## Evidence Location
+
+All evidence is written under `<FEATURE>/evidence/<kind>/` with kinds `baseline`, `regression-testing`, `qa-gates`, `other`, and `issue-updates` only. No path under `artifacts/` is an evidence location. `<ts>` in an artifact name is the executor's write time in `yyyy-MM-ddTHH-mm` form. Every command-step artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`; an artifact whose expected exit code is non-zero also carries `ExpectedExitCode: 1`. Artifacts record repository-relative paths only; replace any absolute worktree prefix a tool prints with `<repo>`.
+
+## Plan Interpretations (PI)
+
+- PI-1 (AC-26 check mapping). AC-26 is verified by four recorded checks, each matched to the AC-26 clause it covers: clauses (a) and (c) are recorded in `<FEATURE>/evidence/qa-gates/constraints.<ts>.md`; clause (b) in `<FEATURE>/evidence/qa-gates/constraints-no-python.<ts>.md`; the temporary-file clause in `<FEATURE>/evidence/qa-gates/constraints-temp-files.<ts>.md` (separate files because `ExpectedExitCode:` is per file and those two steps can carry `ExpectedExitCode: 1`); the constraints artifact names both separate files. Clause (a): P11-T4 runs the two AC-26 (a) commands verbatim, `git diff --name-status origin/epic/subagentstop-envelope-integration -- .claude/hooks/ .codex/hooks/` and `git status --porcelain -- .claude/hooks/ .codex/hooks/`. Clause (b): P11-T5 runs `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` on the branch head. Clause (c): P11-T6 runs CR-PY-TOKEN, which issues `git grep -i -c python origin/epic/subagentstop-envelope-integration -- <family paths>` and `git grep -i -c python HEAD -- <family paths>` for the two hook families (`.claude/hooks/`: H1, H2, H3, H4; `.codex/hooks/`: H5, H6) and compares the summed counts per family. The temporary-file clause: P11-T7. The token `python` occurs as data in the base files: `.claude/hooks/validate-feature-review-coverage.ps1` lines 23, 142, 224, 261, 281 (the `Python` language label, the `'python'`/`'pytest'` audit labels, and the `artifacts/python/lcov.info` coverage path) and `.codex/hooks/validate-feature-review-coverage.ps1` lines 13, 29, 77, 135, 152; `.claude/hooks/feature-review-coverage-thresholds.ps1` contains none. `git grep -c` counts matching lines, so the expected base count is 5 for each family. P11-T13 restates this mapping in the AC-26 check-off.
+- PI-2 (regression-test ordering). Each regression test carries the Pester tags `E4-Regression` and its own ID tag (`E4-TR1`, `E4-TR4`, `E4-TR5`, `E4-TR7`). Every gate that runs a file containing a regression test before the phase that fixes it excludes that test by tag (Phase 2: `E4-Regression`; Phase 3: `E4-TR1`, `E4-TR4`; Phase 4: `E4-TR4`). From Phase 5 onward no exclusion is used. The tags remain in the files.
+- PI-3 (E4-TR4 failure on the base). On the base, `Invoke-FeatureReviewCoverageValidation` has no `-InputText` parameter, so E4-TR4 fails at parameter binding before reaching the `CLAUDE.md` read. The fail-first artifact records that failure message verbatim and cites research Q4 (`research.2026-10-11T08-10.md` lines 152-165) for the behavioral defect (the unwrapped read at base line 444 propagates and ends as exit 1). E4-TR1, the E4-TR5 positive rows, and E4-TR7 fail on the base for behavioral reasons (exit 1 through `Write-Error`; default 85 instead of the stated figure; 80.5% accepted against the 80% floor).
+- PI-4 (message prefix). The five decision messages that begin `feature-review hook:` (base lines 355, 362, 370, 433, 457) are re-prefixed `validate-feature-review-coverage:` so that every `Message` begins with the prefix the spec requires and the dependency-failure tables pin (`hook-dependency-failure.Claude.Tests.ps1:97`, `hook-dependency-failure.SpecialCases.Tests.ps1:54`). No test asserts the old prefix.
+- PI-5 (E1 contract fields). Tasks that need an E1-defined value read it from the named field of the AC-1 artifact `<FEATURE>/evidence/other/upstream-merge-check.<ts>.md` (written by P0-T2 through P0-T9): `ValidityProperty:`, `AnomalyProperty:`, `AssistantTextProperty:`, `StopHookActiveProperty:`, `AnomalyReasonFunction:`, `AnomalyReasonCall:`, `ConsumerPolicy:`, `ReportAndHaltPhrase:`, `AnomalyNames:`, `RequiredEnvelopeFields:`. `Verdict: PROCEED` requires the four property fields to read exactly `IsValid`, `Anomaly`, `AssistantText`, `StopHookActive`, so the code and tests below use those names literally. `<AnomalyReasonCall>` below is replaced by the recorded `AnomalyReasonCall:` value, and `<ReportAndHalt>` by the recorded `ReportAndHaltPhrase:` value when it is not `NONE DEFINED`, otherwise by the spec clause `The subagent cannot repair this condition; report it in the final response and stop.` No task chooses these values.
+- PI-6 (line anchors). Line numbers in this plan were verified against the authoring tree. P0-T10 records whether the E1 merge touched any file this plan edits; if it did not, the line numbers hold; if it did, the executor locates each edit by the quoted content and records the shifted line numbers in the task's artifact.
+- PI-7 (AC-28 format and analyze). AC-28 names PoshQC format (no changes) and PoshQC analyze (0 errors). The `mcp__drm-copilot__run_poshqc_*` tools return a summary that carries no tool output, so no count can be read from them. This plan evaluates AC-28 format with CR-FORMAT-APPLY and AC-28 analyze with CR-PSSA. Both apply the PoshQC settings file `scripts/powershell/PoshQC/settings/pssa.settings.psd1` (the path `scripts/powershell/PoshQC/PoshQC.psm1:2` loads), and CR-FORMAT-APPLY performs the comparison and write of `Invoke-PoshQCFormat` (`scripts/powershell/PoshQC/PoshQC.Analyzer.psm1:56-66`). The file population is LIST-PROD plus LIST-TEST, the PowerShell files this feature changes or adds, not the whole repository. The AC-28 full Pester suite is the full-population PoshQC run (CR-POSHQC-FULL). P11-T15 restates this interpretation in the AC-28 check-off.
+
+## Decision Function Shape (H1; AC-4, AC-5, AC-30, AC-31)
+
+Phase 4 writes `Invoke-FeatureReviewCoverageValidation` in this shape; Phase 5 replaces the marked `CLAUDE.md` read. `<AnomalyReasonCall>` and `<ReportAndHalt>` follow PI-5.
+
+```powershell
+function Invoke-FeatureReviewCoverageValidation {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [AllowNull()] [AllowEmptyString()] [string] $InputText
+    )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-feature-review-coverage:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
+
+    $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
+    if (-not $envelope.IsValid) {
+        return @{ Ok = $false; Message = ('validate-feature-review-coverage: payload anomaly - ' + (<AnomalyReasonCall>)) }
+    }
+
+    try {
+        $finding = & {
+            # Base lines 365-459, with these changes: $agentOutput = [string]$envelope.AssistantText;
+            # each block return becomes @{ Message = <text>; HasRepairable = <bool>; HasNonRepairable = <bool> };
+            # each allow return becomes "return $null"; messages begin 'validate-feature-review-coverage:' (PI-4).
+        }
+    }
+    catch {
+        $finding = @{ Message = ('validate-feature-review-coverage: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.'); HasRepairable = $false; HasNonRepairable = $true }
+    }
+
+    if ($null -eq $finding) { return @{ Ok = $true; Message = $null } }
+    if ($envelope.StopHookActive -and -not $finding.HasRepairable) { return @{ Ok = $true; Message = $null } }
+    $message = if ($finding.HasNonRepairable) { "$($finding.Message) <ReportAndHalt>" } else { $finding.Message }
+    return @{ Ok = $false; Message = $message }
+}
+```
+
+Classification inside the script block (spec Proposed Fix item 2a):
+
+- Repairable (`HasRepairable = $true`, `HasNonRepairable = $false`): empty `AssistantText` (`validate-feature-review-coverage: agent output is empty; feature-review must report required artifact paths before termination.`); the collected artifact-path errors (`validate-feature-review-coverage: required review artifact validation failed:` followed by the existing error list).
+- Coverage rows: the message is `validate-feature-review-coverage: coverage validation failed against branch diff:` followed by every collected reason; `HasRepairable` is true when any failing row result has `Repairable = $true`, and `HasNonRepairable` is true when any has `Repairable = $false`.
+- Non-repairable: root `CLAUDE.md` unreadable (Phase 5: `validate-feature-review-coverage: root CLAUDE.md exists but could not be read (<first exception line>); coverage floors cannot be resolved, so the gate fails closed.`); validator error (the catch above).
+
+`Test-LanguageCoverageRow` in H3 returns `Repairable = $true` on its five repairable failure returns (base lines 293-296, 301-304, 311-314, 319-322, 328-331) and `Repairable = $false` on the branch-floor return (base lines 336-339).
+
+The entry point (base lines 464-477) becomes, with base lines 464-469 unchanged and in place:
+
+```powershell
+try { $result = Invoke-FeatureReviewCoverageValidation }
+catch { Exit-SubagentStopBlock -Message ('validate-feature-review-coverage: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed. <ReportAndHalt>') }
+if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
+exit 0
+```
+
+The first two statements of the function are the S6 statements (`tests/scripts/claude-runtime/HookGuardShape.Helpers.ps1:113-116`); they are not reshaped, and the dependency-failure return keeps the guard's `ExitCode`/`Reason` shape (`.claude/hooks/hook-dependency-guard.ps1:104-105`). The entry tail at base lines 467-469 stays inline (S1, `HookGuardShape.Helpers.ps1:40-55`) and does not call `Exit-SubagentStopBlock`.
+
+## Hermeticity and Authoring Constraints (every new or edited file)
+
+- No temporary files: no `New-TemporaryFile`, no `TestDrive:`, no write under the temp directory, no `GetTempFileName`. Stdin is supplied through `[System.Console]::SetIn([System.IO.StringReader]::new(...))` and stderr through `[System.Console]::SetError([System.IO.StringWriter]::new())`, both restored in `finally`. File content is supplied through mocks of `Get-ArtifactFileContent`, `Test-Path`, `Get-Content`, and `Get-ChildItem`. Static tests read committed repository files only.
+- No child process: the hook entry point is driven in-process through the `&` route, as `tests/scripts/codex-hooks/validate-feature-review-coverage.Coverage.Tests.ps1:26-43` does.
+- `.claude/hooks/check-powershell-test-purity.ps1` denies a write under `tests/` that contains certain tokens (for example the process-start cmdlet, the sleep cmdlet, the temporary-file cmdlet, or the temp environment variable). No test in this plan needs them; do not write them, including in comments.
+- No mock is built with `[scriptblock]::Create`; mock bodies are literal script blocks.
+- No new or edited line in H1-H6 contains the token `python` in any letter case, other than the base lines that move unchanged into H2 and H3 (CR-PY-TOKEN, AC-26 (c)).
+- No file under `.codex/hooks/` dot-sources a `.claude/` path; no hook adds a Python invocation.
+- Every test and production file stays below 500 lines.
+
+## Execution Notes
+
+- Command route rule: every PowerShell-syntax command in any task (for example `Test-Path`, `Copy-Item`, `ConvertFrom-Json`, `[System.Management.Automation.Language.Parser]::ParseFile`, `Get-Command`, `(Get-Content <path>).Count`) runs only as a CR body through the CR route below; no task runs a PowerShell cmdlet outside a CR. `git`, `gh`, `poetry`, and `sh` commands are shell-neutral and run directly.
+- `.claude/hooks/enforce-powershell-batch-budget.ps1` denies the fourth distinct production PowerShell file outside the orchestrated large path. This plan edits six production PowerShell files (H1-H6) plus their mirrors and runs under the epic orchestrator's large path. If the hook denies a write, stop with BLOCKED and report the denial text; do not bypass or edit the hook.
+- Never force-push. Every push is `git push origin <BRANCH>`, where `<BRANCH>` is the `Branch:` value recorded by P0-T2; every branch fetch is `git fetch origin <BRANCH>` and every remote-head comparison is `git rev-parse origin/<BRANCH>`.
+- The `mcp__drm-copilot__run_poshqc_*` tools return a summary that does not carry tool output, so no task asserts a count, percentage, or finding from them (PI-7). Every count and percentage in this plan is read from a CR output below.
+- Pre-existing failure rule (PEF): a gate marked `(PEF)` meets its `TOTAL:` acceptance when every `FAILED:` line names a test (the `ExpandedPath` before ` :: `) that P0-T12 lists as `PRE-EXISTING:` and whose name contains none of `validate-feature-review-coverage`, `feature-review-coverage-thresholds`, `E4-`, `TG1:`, `TG2:`, `TG3:`, `F824-`, `T824-`. When every `FAILED:` line meets this rule and at least one exists and the `TOTAL:` line reads `FailedBlocks=0 | FailedContainers=0`, that gate's `EXIT_CODE_COMPUTED: 0` and process-exit-0 acceptance is replaced by `EXIT_CODE_COMPUTED: 1` and process exit code 1, and the gate artifact records `ExpectedExitCode: 1` and lists each such line under `PRE-EXISTING-STILL-FAILING:`. The rule applies to `TOTAL:` lines only; `SUITE:` and `NAMED:` acceptances are exact, except the `NAMED: N1:*` acceptance, which follows the N1 rule under GUARD-PATTERNS. Any `PRE-EXISTING-STILL-FAILING:` entry leaves AC-28 unchecked (P11-T15). The full-run analogue for P10-T7 is stated in that task.
+- Commit messages end with the session's standard attribution trailer lines.
+
+## Command Reference (CR)
+
+Every CR body runs from the worktree root. Every CR body except CR-POSHQC-FULL ends with `exit $code`, where `$code` is the value printed on the `EXIT_CODE_COMPUTED:` line, so the process exit code equals the computed value. The artifact `EXIT_CODE:` field records the process exit code of the CR run.
+
+Routes. Primary route: the PowerShell tool runs the body and reports the process exit code. Scratchpad route: write the body to a `.ps1` file in the session scratchpad directory (outside the repository, not under any `tests` segment, not named `*.Tests.ps1`), write a scratchpad `.sh` file whose single command line runs the PowerShell host with `-NoProfile -File` on it, and run `sh <that .sh>` from the worktree root. The scratchpad route is used when the agent-worktree isolation guard denies the text, when no PowerShell tool is available, and always for CR-POSHQC-FULL (its `Run.Exit = $true` ends the host process). On either route, stop with BLOCKED if the process exit code disagrees with `EXIT_CODE_COMPUTED:`. The artifact `Command:` field records the route and the list substituted for each list placeholder.
+
+Success-output observation rule: Phase 0 runs every CR at least once (P0-T11 through P0-T23). Before a later task asserts over a CR's output, the Phase 0 artifact must show the success-case literal named under that CR. If a named literal is absent from a successful run, record the observed output and stop with BLOCKED; do not substitute a different literal.
+
+### Lists
+
+- LIST-PROD: `.claude/hooks/validate-feature-review-coverage.ps1`, `.claude/hooks/validate-feature-review-coverage-metrics.ps1`, `.claude/hooks/validate-feature-review-coverage-rules.ps1`, `.claude/hooks/feature-review-coverage-thresholds.ps1`, `.codex/hooks/validate-feature-review-coverage.ps1`, `.codex/hooks/feature-review-coverage-thresholds.ps1`.
+- LIST-PROD-BASE: `.claude/hooks/validate-feature-review-coverage.ps1`, `.claude/hooks/feature-review-coverage-thresholds.ps1`, `.codex/hooks/validate-feature-review-coverage.ps1`.
+- LIST-TEST: T1 through T9 and T11 paths from the table above (T11 is test support; it is formatted, analyzed, and size-checked with the tests but is not a Pester run path).
+- LIST-TEST-BASE: T1 through T6 and T9 paths (T7 and T8 do not exist on the base).
+- LIST-RUNTIME-SUITES: `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`, `tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1`.
+- LIST-CLAUDE-SUITES: T1, T2, T3, T4, T5, `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1`, `tests/scripts/claude-hooks/hook-dependency-failure.SpecialCases.Tests.ps1`, and LIST-RUNTIME-SUITES.
+- LIST-CODEX-SUITES: T6, T7, T8, T9, `tests/scripts/codex-hooks/hook-dependency-failure.Codex.Tests.ps1`, `tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1`.
+- LIST-AUX: `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`.
+- LIST-MIRROR-PAIRS (source then mirror): H1-H4 with `extensions/drm-copilot/resources/claude-customizations/<same path>`; H5, H6, S1, S3 with `extensions/drm-copilot/resources/codex-and-agents-customizations/<same path>`; S2 with `extensions/drm-copilot/resources/customizations/<same path>`.
+- GUARD-PATTERNS (Pester `ExpandedName` patterns for this hook's guard-completeness and no-stdout rows; the row names come from `hook-dependency-guard-completeness.Tests.ps1:117-139` with `Hook` set to the root-relative path, and from `hook-imported-modules-no-stdout.Tests.ps1:67`): `S1:*.claude/hooks/validate-feature-review-coverage.ps1*`, `S2:*.claude/hooks/validate-feature-review-coverage.ps1*`, `S6:*.claude/hooks/validate-feature-review-coverage.ps1*`, `N1:*`. Each `S` pattern matches one `repository` row and one `mirror` row (expected `Passed=2`); `N1:*` matches the `repository` and `mirror` rows (expected `Passed=2`). N1 rule: N1 scans the import closure of every registered hook, so a finding in another hook's module fails it. P0-T12 records `N1-BASELINE: PASSING` when its `NAMED: N1:*` line reads `Passed=2 | Failed=0`, otherwise `N1-BASELINE: FAILING`. When `N1-BASELINE: FAILING` is recorded, every later `NAMED: N1:* | Passed=2 | Failed=0` acceptance is replaced by: no `FAILED:` line whose name contains `N1: ` (the `ExpandedPath` is the `Describe` name, a dot, then the `It` name) has a message (the text after ` :: `) naming `validate-feature-review-coverage`, `feature-review-coverage-thresholds`, or `subagentstop-envelope`, and no N1 `FAILED:` message contains ` more)` (Pester lists at most ten findings in the message; a shortened message does not meet the N1 rule); the gate artifact copies each N1 `FAILED:` line verbatim.
+- PYTEST-SPEC: `poetry run pytest tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py tests/scripts/dev_tools/test_codex_core_manifest_closure.py` (the spec Test Strategy command, verbatim).
+
+### CR-PESTER-LIST (direct Pester over an explicit list, with tag filters)
+
+Adapted from the executed recipe in `docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737/plan.2026-10-08T13-54.md:120-150`; the two filter lines and the final `exit` are the only additions.
+
+```powershell
+$Paths = @( <LIST> )
+$IncludeTags = @( <TAGS-IN> )    # may be empty
+$ExcludeTags = @( <TAGS-OUT> )   # may be empty
+$NamePatterns = @( <PATTERNS> )  # wildcard patterns matched against ExpandedName; may be empty
+$root = (Get-Location).Path
+Import-Module Pester -MinimumVersion 5.0.0 -ErrorAction Stop
+$configuration = New-PesterConfiguration
+$configuration.Run.Path = $Paths
+$configuration.Run.PassThru = $true
+$configuration.Output.Verbosity = 'Normal'
+if ($IncludeTags.Count -gt 0) { $configuration.Filter.Tag = $IncludeTags }
+if ($ExcludeTags.Count -gt 0) { $configuration.Filter.ExcludeTag = $ExcludeTags }
+$result = Invoke-Pester -Configuration $configuration
+function Get-RelativeName([string] $File) { return $File.Substring($root.Length + 1).Replace([string][char]92, '/') }
+foreach ($container in $result.Containers) { "CONTAINER: $(Get-RelativeName ([string]$container.Item)) | Result=$($container.Result)" }
+foreach ($group in ($result.Tests | Group-Object { Get-RelativeName ([string]$_.ScriptBlock.File) } | Sort-Object Name)) {
+    $passed = @($group.Group | Where-Object Result -EQ 'Passed').Count
+    $failed = @($group.Group | Where-Object Result -EQ 'Failed').Count
+    $skipped = @($group.Group | Where-Object Result -EQ 'Skipped').Count
+    $notRun = @($group.Group | Where-Object Result -EQ 'NotRun').Count
+    "SUITE: $($group.Name) | Passed=$passed | Failed=$failed | Skipped=$skipped | NotRun=$notRun"
+}
+foreach ($pattern in $NamePatterns) {
+    $hits = @($result.Tests | Where-Object { $_.ExpandedName -like $pattern })
+    "NAMED: $pattern | Passed=$(@($hits | Where-Object Result -EQ 'Passed').Count) | Failed=$(@($hits | Where-Object Result -EQ 'Failed').Count) | NotRun=$(@($hits | Where-Object Result -EQ 'NotRun').Count) | Total=$($hits.Count)"
+}
+foreach ($test in $result.Failed) { "FAILED: $($test.ExpandedPath) :: $((($test.ErrorRecord | Select-Object -First 1).Exception.Message) -replace '\s+', ' ')" }
+"TOTAL: Passed=$($result.PassedCount) | Failed=$($result.FailedCount) | Skipped=$($result.SkippedCount) | NotRun=$($result.NotRunCount) | FailedBlocks=$($result.FailedBlocksCount) | FailedContainers=$($result.FailedContainersCount)"
+$code = if ($result.FailedCount -eq 0 -and $result.FailedBlocksCount -eq 0 -and $result.FailedContainersCount -eq 0) { 0 } else { 1 }
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals: one `CONTAINER:` line per file with `Result=Passed`, one `SUITE:` line per file, one `NAMED:` line per pattern, a `TOTAL:` line with `Failed=0`, `EXIT_CODE_COMPUTED: 0`.
+
+### CR-POSHQC-FULL (full-population PoshQC run; research Q8, `research.2026-10-11T08-10.md:274-278`)
+
+```powershell
+Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force
+Invoke-PoshQCTest -Root (Get-Location).Path -SettingsPath scripts/powershell/PoshQC/settings/pester.runsettings.psd1
+```
+
+Observed success-case output (`docs/features/active/epic-852-main-sync/evidence/qa-gates/final-pester-coverage.md:11-12`, a recorded scratchpad-route run): one line beginning `Tests Passed:` with `Failed: 0,` and one line beginning `Covered` of the form `Covered <x>% / 0%. <n> analyzed Commands in <m> Files.`. This command prints no per-file figure; per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` (`pester.runsettings.psd1:22`) by CR-COV-FILES, run immediately afterwards with no other Pester run in between. The run also writes `artifacts/pester/pester-junit.xml` (`pester.runsettings.psd1:15`), read by CR-JUNIT.
+
+### CR-JUNIT (totals of the full run)
+
+```powershell
+[xml] $junit = Get-Content -Raw -LiteralPath 'artifacts/pester/pester-junit.xml'
+$tests = 0; $failures = 0; $errors = 0
+foreach ($suite in @($junit.SelectNodes('//testsuite'))) { $tests += [int]$suite.tests; $failures += [int]$suite.failures; $errors += [int]$suite.errors }
+"JUNIT: tests=$tests | failures=$failures | errors=$errors"
+foreach ($case in @($junit.SelectNodes('//testcase[failure or error]'))) { "JUNIT-FAILED: $($case.name)" }
+$code = [int](($failures + $errors) -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals: `JUNIT: tests=<n> | failures=0 | errors=0`, `EXIT_CODE_COMPUTED: 0` (same summation as the executed script at `docs/features/active/promotion-hook-raw-containment-false-positive-deny-824/evidence/other/observation-scripts.2026-10-08T17-32.md:320-325`).
+
+### CR-COV-FILES (per-file line coverage from the CoverageGutters XML)
+
+Package/sourcefile resolution copied from the executed script at `docs/features/active/promotion-hook-raw-containment-false-positive-deny-824/evidence/other/observation-scripts.2026-10-08T17-32.md:327-347` (handles rooted and relative package names).
+
+```powershell
+$Files = @( <LIST> )
+$root = (Get-Location).Path
+[xml] $cov = Get-Content -Raw -LiteralPath 'artifacts/pester/powershell-coverage.xml'
+$index = @{}
+foreach ($pkg in @($cov.SelectNodes('//package'))) {
+    $dir = [string]$pkg.name
+    $relDir = if ([System.IO.Path]::IsPathRooted($dir)) { [System.IO.Path]::GetRelativePath($root, $dir) } else { $dir }
+    $relDir = $relDir.Replace([string][char]92, '/').TrimEnd('/')
+    foreach ($sf in @($pkg.SelectNodes('sourcefile'))) {
+        $counter = $sf.SelectSingleNode("counter[@type='LINE']")
+        if ($null -ne $counter) { $index["$relDir/$($sf.name)"] = $counter }
+    }
+}
+$below = @()
+foreach ($rel in $Files) {
+    if (-not $index.ContainsKey($rel)) { "COVERAGE: $rel | ABSENT"; $below += $rel; continue }
+    $c = [int]$index[$rel].covered; $m = [int]$index[$rel].missed
+    $pct = if (($c + $m) -gt 0) { [math]::Round(100.0 * $c / ($c + $m), 2) } else { 0 }
+    'COVERAGE: {0} | covered={1} | missed={2} | pct={3:F2}' -f $rel, $c, $m, $pct
+    if ($pct -lt 85.0) { $below += $rel }
+}
+if ($below.Count -eq 0) { 'COVERAGE-BELOW-85: NONE' } else { "COVERAGE-BELOW-85: $($below -join ', ')" }
+$code = [int]($below.Count -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals: one `COVERAGE:` line per file with numeric `covered=`, `missed=`, `pct=` values, `COVERAGE-BELOW-85: NONE`, `EXIT_CODE_COMPUTED: 0`.
+
+### CR-COV-CHANGED (changed-line coverage against the merge base)
+
+Line-map construction copied from the executed script at `docs/features/active/promotion-hook-raw-containment-false-positive-deny-824/evidence/other/observation-scripts.2026-10-08T17-32.md:359-370`. The three-dot form compares committed content, so the final-QC use runs after the Phase 10 commit.
+
+```powershell
+$Files = @( <LIST> )
+$root = (Get-Location).Path
+[xml] $cov = Get-Content -Raw -LiteralPath 'artifacts/pester/powershell-coverage.xml'
+$lineIndex = @{}
+foreach ($pkg in @($cov.SelectNodes('//package'))) {
+    $dir = [string]$pkg.name
+    $relDir = if ([System.IO.Path]::IsPathRooted($dir)) { [System.IO.Path]::GetRelativePath($root, $dir) } else { $dir }
+    $relDir = $relDir.Replace([string][char]92, '/').TrimEnd('/')
+    foreach ($sf in @($pkg.SelectNodes('sourcefile'))) {
+        $map = @{}
+        foreach ($ln in @($sf.SelectNodes('line'))) { $map[[int]$ln.nr] = [int]$ln.ci }
+        $lineIndex["$relDir/$($sf.name)"] = $map
+    }
+}
+$below = @()
+foreach ($rel in $Files) {
+    $changed = [System.Collections.Generic.List[int]]::new()
+    foreach ($hunk in @(git diff -U0 'origin/epic/subagentstop-envelope-integration...HEAD' -- $rel | Select-String -Pattern '^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@')) {
+        $start = [int]$hunk.Matches[0].Groups[1].Value
+        $count = if ($hunk.Matches[0].Groups[2].Success) { [int]$hunk.Matches[0].Groups[2].Value } else { 1 }
+        for ($n = $start; $n -lt $start + $count; $n++) { $changed.Add($n) }
+    }
+    $map = $lineIndex[$rel]
+    if ($null -eq $map) { "CHANGED-COVERAGE: $rel | ABSENT"; $below += $rel; continue }
+    $exec = @($changed | Where-Object { $map.ContainsKey($_) })
+    $hit = @($exec | Where-Object { $map[$_] -gt 0 })
+    $pct = if ($exec.Count -gt 0) { [math]::Round(100.0 * $hit.Count / $exec.Count, 2) } else { 100 }
+    'CHANGED-COVERAGE: {0} | changed={1} | executable={2} | covered={3} | pct={4:F2}' -f $rel, $changed.Count, $exec.Count, $hit.Count, $pct
+    if ($pct -lt 85.0) { $below += $rel }
+}
+if ($below.Count -eq 0) { 'CHANGED-BELOW-85: NONE' } else { "CHANGED-BELOW-85: $($below -join ', ')" }
+$code = [int]($below.Count -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals: one `CHANGED-COVERAGE:` line per file with numeric values, `CHANGED-BELOW-85: NONE`, `EXIT_CODE_COMPUTED: 0`.
+
+### CR-FORMAT-CHECK (read-only; mirrors the comparison in `Invoke-PoshQCFormat`, `scripts/powershell/PoshQC/PoshQC.Analyzer.psm1:56-66`)
+
+Copied from the executed recipe at `docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737/plan.2026-10-08T13-54.md:191-208`.
+
+```powershell
+$Paths = @( <LIST> )
+Import-Module PSScriptAnalyzer -ErrorAction Stop
+$settings = (Resolve-Path 'scripts/powershell/PoshQC/settings/pssa.settings.psd1').Path
+$drift = 0
+foreach ($path in $Paths) {
+    $normalized = (Get-Content -Raw -LiteralPath $path) -replace "`r?`n", "`n"
+    $formatted = Invoke-Formatter -ScriptDefinition $normalized -Settings $settings
+    if ($formatted -ne $normalized) { $drift++; "FORMAT-DRIFT: $path" } else { "FORMAT-CLEAN: $path" }
+}
+"FORMAT-DRIFT-COUNT: $drift"
+$code = [int]($drift -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals: one `FORMAT-CLEAN:` line per file, `FORMAT-DRIFT-COUNT: 0`, `EXIT_CODE_COMPUTED: 0`. Writes no file.
+
+### CR-FORMAT-APPLY (write mode over an explicit list; same write as `Invoke-PoshQCFormat`)
+
+```powershell
+$Paths = @( <LIST> )
+Import-Module PSScriptAnalyzer -ErrorAction Stop
+$settings = (Resolve-Path 'scripts/powershell/PoshQC/settings/pssa.settings.psd1').Path
+$applied = 0
+foreach ($path in $Paths) {
+    $normalized = (Get-Content -Raw -LiteralPath $path) -replace "`r?`n", "`n"
+    $formatted = Invoke-Formatter -ScriptDefinition $normalized -Settings $settings
+    if ($formatted -ne $normalized) { Set-Content -LiteralPath $path -Value $formatted -Encoding UTF8 -NoNewline; $applied++; "FORMAT-APPLIED: $path" } else { "FORMAT-UNCHANGED: $path" }
+}
+"FORMAT-APPLIED-COUNT: $applied"
+$code = 0
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals for a clean pass: one `FORMAT-UNCHANGED:` line per file and `FORMAT-APPLIED-COUNT: 0`. A non-zero `FORMAT-APPLIED-COUNT` means the tree changed and the QC loop restarts.
+
+### CR-PSSA (PSScriptAnalyzer with repository settings)
+
+Copied from the executed recipe at `docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737/plan.2026-10-08T13-54.md:210-228`.
+
+```powershell
+$Paths = @( <LIST> )
+Import-Module PSScriptAnalyzer -ErrorAction Stop
+$settings = (Resolve-Path 'scripts/powershell/PoshQC/settings/pssa.settings.psd1').Path
+$total = 0
+foreach ($path in $Paths) {
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { "PSSA: $path | MISSING"; $total++; continue }
+    $findings = @(Invoke-ScriptAnalyzer -Path $path -Settings $settings -Severity Error, Warning, Information)
+    $total += $findings.Count
+    "PSSA: $($path) | findings=$($findings.Count)"
+    foreach ($finding in $findings) { "PSSA-FINDING: $($path):$($finding.Line) $($finding.RuleName) $($finding.Severity)" }
+}
+"PSSA-TOTAL: $total"
+$code = [int]($total -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals: one `PSSA:` line per file with `findings=0`, `PSSA-TOTAL: 0`, `EXIT_CODE_COMPUTED: 0`. The `Test-Path` line is the only addition to the copied recipe; a missing file prints `PSSA: <path> | MISSING` and counts toward `PSSA-TOTAL:`.
+
+### CR-LINES (line counts against the 300-line target and the 500-line cap)
+
+```powershell
+$Files = @( <LIST> )
+$over = 0
+foreach ($rel in $Files) {
+    if (-not (Test-Path -LiteralPath $rel -PathType Leaf)) { "LINES: $rel | MISSING"; $over++; continue }
+    $count = (Get-Content -LiteralPath $rel).Count
+    $band = if ($count -ge 500) { 'OVER-CAP' } elseif ($count -gt 300) { 'OVER-TARGET' } else { 'WITHIN-TARGET' }
+    if ($count -ge 500) { $over++ }
+    "LINES: $rel | count=$count | $band"
+}
+"LINES-OVER-CAP: $over"
+$code = [int]($over -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals: one `LINES:` line per file with a numeric `count=`, `LINES-OVER-CAP: 0`, `EXIT_CODE_COMPUTED: 0`. The count is `(Get-Content <path>).Count`, the measure AC-10 names.
+
+### CR-SHA (source and mirror SHA256; read-only)
+
+```powershell
+$Pairs = @( <PAIRS> )   # each entry: @{ Source = '<path>'; Mirror = '<path>' }
+$differ = 0
+foreach ($pair in $Pairs) {
+    $s = (Get-FileHash -Algorithm SHA256 -LiteralPath $pair.Source).Hash
+    $m = (Get-FileHash -Algorithm SHA256 -LiteralPath $pair.Mirror).Hash
+    $state = if ($null -eq $s -or $null -eq $m) { 'MISSING' } elseif ($s -eq $m) { 'MATCH' } else { 'DIFFER' }
+    if ($state -ne 'MATCH') { $differ++ }
+    "SHA: $($pair.Source) | $s | $($pair.Mirror) | $m | $state"
+}
+"SHA-DIFFER-COUNT: $differ"
+$code = [int]($differ -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals: one `SHA:` line per pair ending `MATCH`, `SHA-DIFFER-COUNT: 0`, `EXIT_CODE_COMPUTED: 0`. A missing source or mirror yields a null hash, a line ending `MISSING`, and a non-zero `SHA-DIFFER-COUNT:`.
+
+### CR-MIRROR (copy each source to its mirror, then hash both; write mode)
+
+```powershell
+$Pairs = @( <PAIRS> )   # each entry: @{ Source = '<path>'; Mirror = '<path>' }
+$differ = 0
+foreach ($pair in $Pairs) {
+    Copy-Item -LiteralPath $pair.Source -Destination $pair.Mirror -Force
+    $s = (Get-FileHash -Algorithm SHA256 -LiteralPath $pair.Source).Hash
+    $m = (Get-FileHash -Algorithm SHA256 -LiteralPath $pair.Mirror).Hash
+    $state = if ($null -eq $s -or $null -eq $m) { 'MISSING' } elseif ($s -eq $m) { 'MATCH' } else { 'DIFFER' }
+    if ($state -ne 'MATCH') { $differ++ }
+    "COPIED: $($pair.Source) | $s | $($pair.Mirror) | $m | $state"
+}
+"COPY-DIFFER-COUNT: $differ"
+$code = [int]($differ -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals: one `COPIED:` line per pair ending `MATCH`, `COPY-DIFFER-COUNT: 0`, `EXIT_CODE_COMPUTED: 0`. The `MATCH` hash pair is the observation beyond the exit code for this write-mode command. A missing source (copy fails, null source hash) yields a line ending `MISSING` and a non-zero `COPY-DIFFER-COUNT:`.
+
+### CR-PARSE (parse check, function names, and `It` counts)
+
+```powershell
+$Files = @( <LIST> )
+$ItPatterns = @( <IT-PATTERNS> )   # wildcard patterns matched against each It block's literal name; may be empty
+$bad = 0
+foreach ($rel in $Files) {
+    $tokens = $null; $parseErrors = $null
+    $ast = [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path -LiteralPath $rel).Path, [ref]$tokens, [ref]$parseErrors)
+    $errorCount = @($parseErrors).Count
+    $bad += $errorCount
+    $functions = @($ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true) | ForEach-Object Name | Sort-Object)
+    "PARSE: $rel | errors=$errorCount | functions=$($functions -join ',')"
+    $itNames = @($ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.CommandAst] -and $n.GetCommandName() -eq 'It' }, $true) | ForEach-Object {
+            $first = @($_.CommandElements | Select-Object -Skip 1 | Where-Object { $_ -is [System.Management.Automation.Language.StringConstantExpressionAst] }) | Select-Object -First 1
+            [string]$first.Value
+        })
+    foreach ($pattern in $ItPatterns) { "IT-COUNT: $rel | $pattern | $(@($itNames | Where-Object { $_ -like $pattern }).Count)" }
+}
+"PARSE-ERROR-COUNT: $bad"
+$code = [int]($bad -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals: one `PARSE:` line per file with `errors=0` and a `functions=` list, one `IT-COUNT:` line per file and pattern with a numeric count, `PARSE-ERROR-COUNT: 0`, `EXIT_CODE_COMPUTED: 0`. An `It` declared with `-ForEach` counts once; its expanded rows are counted by CR-PESTER-LIST `NAMED:` lines.
+
+### CR-TEXT (file existence and literal presence or absence)
+
+```powershell
+$Checks = @( <CHECKS> )   # each entry: @{ Path = '<path>'; Present = @('<literal>'); Absent = @('<literal>'); Normalize = $false }
+$bad = 0
+foreach ($check in $Checks) {
+    $exists = Test-Path -LiteralPath $check.Path -PathType Leaf
+    "TEXT-FILE: $($check.Path) | exists=$exists"
+    if (-not $exists) { $bad++; continue }
+    $raw = Get-Content -Raw -LiteralPath $check.Path
+    $text = if ($check.Normalize) { $raw -replace '\s+', ' ' } else { $raw }
+    foreach ($token in @($check.Present | Where-Object { $_ })) { $hit = $text.Contains($token); if (-not $hit) { $bad++ }; "TEXT-PRESENT: $($check.Path) | $token | $hit" }
+    foreach ($token in @($check.Absent | Where-Object { $_ })) { $hit = $text.Contains($token); if ($hit) { $bad++ }; "TEXT-ABSENT: $($check.Path) | $token | $(-not $hit)" }
+}
+"TEXT-CHECK-FAILURES: $bad"
+$code = [int]($bad -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals: one `TEXT-FILE:` line per check with `exists=True`, one `TEXT-PRESENT:` or `TEXT-ABSENT:` line per literal ending `True`, `TEXT-CHECK-FAILURES: 0`, `EXIT_CODE_COMPUTED: 0`. The comparison is ordinal and case-sensitive.
+
+### CR-JSON (pack-manifest parse and entry presence)
+
+```powershell
+$ErrorActionPreference = 'Stop'
+$Path = '<MANIFEST>'
+$Expect = @( <ENTRIES> )
+$manifest = Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
+"JSON-PARSE: ok | paths=$(@($manifest.paths).Count)"
+$missing = 0
+foreach ($entry in $Expect) { $has = @($manifest.paths) -contains $entry; if (-not $has) { $missing++ }; "JSON-HAS: $entry | $has" }
+"JSON-MISSING-COUNT: $missing"
+$code = [int]($missing -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Success-case literals: `JSON-PARSE: ok` with a numeric `paths=`, one `JSON-HAS:` line per entry ending `True`, `JSON-MISSING-COUNT: 0`, `EXIT_CODE_COMPUTED: 0`. With `$ErrorActionPreference = 'Stop'`, a missing manifest or a parse failure ends the process with a non-zero exit before `JSON-PARSE:` is printed.
+
+### CR-PY-TOKEN (AC-26 (c); PI-1)
+
+```powershell
+$Mode = '<baseline|final>'
+$Ref = 'origin/epic/subagentstop-envelope-integration'
+$Families = [ordered]@{
+    'claude-hooks' = @('.claude/hooks/validate-feature-review-coverage.ps1', '.claude/hooks/validate-feature-review-coverage-metrics.ps1', '.claude/hooks/validate-feature-review-coverage-rules.ps1', '.claude/hooks/feature-review-coverage-thresholds.ps1')
+    'codex-hooks'  = @('.codex/hooks/validate-feature-review-coverage.ps1', '.codex/hooks/feature-review-coverage-thresholds.ps1')
+}
+function Get-PyTokenSum([string[]] $Lines) { $sum = 0; foreach ($line in $Lines) { if ($line -match ':(\d+)$') { $sum += [int]$Matches[1] } }; return $sum }
+$worse = 0
+foreach ($name in $Families.Keys) {
+    $paths = $Families[$name]
+    $baseLines = @(git grep -i -c python $Ref -- $paths)
+    foreach ($line in $baseLines) { "GREP-BASE: $line" }
+    $baseCount = Get-PyTokenSum $baseLines
+    if ($Mode -eq 'baseline') { "PY-TOKEN: $name | base=$baseCount"; continue }
+    $headLines = @(git grep -i -c python HEAD -- $paths)
+    foreach ($line in $headLines) { "GREP-HEAD: $line" }
+    $headCount = Get-PyTokenSum $headLines
+    $state = if ($headCount -le $baseCount) { 'NOT-INCREASED' } else { 'INCREASED' }
+    if ($headCount -gt $baseCount) { $worse++ }
+    "PY-TOKEN: $name | base=$baseCount | head=$headCount | $state"
+}
+"PY-TOKEN-INCREASED-COUNT: $worse"
+$code = [int]($worse -gt 0)
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+`git grep -c` prints one `<rev>:<path>:<count>` line per file with at least one matching line and exits 1 when no file matches; the body sums the trailing counts and ignores the grep exit code. Success-case literals: baseline mode prints two `PY-TOKEN:` lines with numeric `base=`; final mode prints two lines ending `NOT-INCREASED`, `PY-TOKEN-INCREASED-COUNT: 0`, `EXIT_CODE_COMPUTED: 0`.
+
+## Guarded Dot-Source Literals
+
+Each line below is added verbatim (one statement per line) and asserted by the static tests and by guard-completeness rule S2 (`HookGuardShape.Helpers.ps1:101-105`):
+
+- H1, after the existing thresholds line 47: `try { . (Join-Path $PSScriptRoot 'validate-feature-review-coverage-metrics.ps1') } catch { Add-HookDependencyFailure -Name 'validate-feature-review-coverage-metrics.ps1' -ErrorRecord $_ }`
+- H1, next line: `try { . (Join-Path $PSScriptRoot 'validate-feature-review-coverage-rules.ps1') } catch { Add-HookDependencyFailure -Name 'validate-feature-review-coverage-rules.ps1' -ErrorRecord $_ }`
+- H1, next line (Phase 4): `try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }`
+- H5, after the guard bootstrap at line 43: `try { . (Join-Path $PSScriptRoot 'feature-review-coverage-thresholds.ps1') } catch { Add-HookDependencyFailure -Name 'feature-review-coverage-thresholds.ps1' -ErrorRecord $_ }`
+
+The thresholds dot-source stays the first edge after the guard bootstrap in H1, because `hook-dependency-failure.SpecialCases.Tests.ps1:27-33` selects the first non-guard edge by line.
+
+## Help-Text Tokens (asserted by E4-ST3)
+
+Both the H1 comment-based help and the H5 comment-based help contain the sentences "an absent root CLAUDE.md uses the defaults" and "an unreadable root CLAUDE.md fails closed" (each may wrap; E4-ST3 compares whitespace-normalized text). The H1 help keeps the phrase "falls back independently".
+
+### Phase 0 — Policy Reads, Upstream-Merge Check, and Baseline Capture
+
+- [ ] [P0-T1] Read, in this order, `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/instructions/tonality.instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/powershell-code-change.instructions.md`, `.github/instructions/powershell-unit-test.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/powershell.md`, `.claude/rules/python.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md`, `.claude/rules/plan-acceptance-gates.md`, `.claude/skills/atomic-plan-contract/SKILL.md`, `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, `.claude/skills/acceptance-criteria-tracking/SKILL.md`; write `<FEATURE>/evidence/baseline/phase0-instructions-read.<ts>.md` with `Timestamp:`, `Policy Order:`, and the list of the 19 files read. Acceptance: the artifact lists all 19 paths in this order.
+- [ ] [P0-T2] UPSTREAM-MERGE CHECK, step 1 (first gating task; AC-1). Run `git fetch origin epic/subagentstop-envelope-integration` and `git rev-parse origin/epic/subagentstop-envelope-integration`; create `<FEATURE>/evidence/other/upstream-merge-check.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Base: <40-hex SHA>`, `StartHead:` from `git rev-parse HEAD`, and `Branch:` from `git rev-parse --abbrev-ref HEAD`. Acceptance: `Base:` holds a 40-character hexadecimal SHA and `Branch:` matches `^bug/subagentstop-envelope-feature-review-coverage(-exec)?-896$`; any other value is a failing field for P0-T8. The recorded `Branch:` value is `<BRANCH>` for every later push, fetch, and remote rev-parse in this plan.
+- [ ] [P0-T3] UPSTREAM-MERGE CHECK, step 2 (E1 merged). The lookup does not filter on a head-branch name, because epic children have merged from `-exec-` branches (for example PR #881 and PR #863), E1's preparation documents entered by direct merge `cf3108b04`, and #897 is shared with E3. Run `gh pr list --repo drmoisan/drm-copilot --state merged --base epic/subagentstop-envelope-integration --limit 300 --json number,headRefName,mergeCommit,mergedAt` and append its output and exit code to the P0-T2 artifact. Candidates are the listed PRs whose `headRefName` matches `^bug/subagentstop-envelope-core(-exec)?-897$`; append them as `E1Candidates:` (number, `headRefName`, `mergeCommit.oid`, `mergedAt` per candidate, or `NONE`). PR route: when at least one candidate exists, select the candidate with the greatest `mergedAt`, run `git merge-base --is-ancestor <its mergeCommit.oid> origin/epic/subagentstop-envelope-integration`, and append `E1MergeCommit: <that oid>`, `E1MergeRoute: pr`, and the ancestry exit code. Direct-merge route: when `E1Candidates: NONE`, run `git log --first-parent --merges --reverse --format=%H ac525c4ef..origin/epic/subagentstop-envelope-integration` (oldest first, limited to merges after the epic start commit `ac525c4ef`), then run `git cat-file -e <sha>:.claude/hooks/subagentstop-envelope.ps1` for each printed SHA in printed order, stopping at the first that exits 0; append each SHA tried with its exit code, then `E1MergeCommit: <that sha>` and `E1MergeRoute: direct-merge`, then run `git merge-base --is-ancestor <that sha> origin/epic/subagentstop-envelope-integration` and append its exit code; when no SHA exits 0, append `E1MergeCommit: NONE` and `E1MergeRoute: NONE`. Append `E1Merged: yes|no`. Acceptance: `E1Merged: yes` only when exactly one commit is recorded in `E1MergeCommit:` and its ancestry check exits 0; otherwise `E1Merged: no`.
+- [ ] [P0-T4] UPSTREAM-MERGE CHECK, step 3 (helper at base). Run `git cat-file -e origin/epic/subagentstop-envelope-integration:.claude/hooks/subagentstop-envelope.ps1`, `git cat-file -e origin/epic/subagentstop-envelope-integration:extensions/drm-copilot/resources/claude-customizations/.claude/hooks/subagentstop-envelope.ps1`, and `git grep -n -F -e "function Read-SubagentStopEnvelope" -e "function Get-SubagentStopEnvelopeAnomalyReason" -e "function Exit-SubagentStopBlock" origin/epic/subagentstop-envelope-integration -- .claude/hooks/subagentstop-envelope.ps1`; append the outputs to the P0-T2 artifact with `HelperPresent: yes|no`, `HelperMirrorPresent: yes|no`, `HelperFunctions: <count>`. The three searched literals are "function Read-SubagentStopEnvelope", "function Get-SubagentStopEnvelopeAnomalyReason", and "function Exit-SubagentStopBlock". Acceptance: both `cat-file` commands exit 0 and the grep prints exactly three lines, one per literal; otherwise the corresponding field is `no` or the count is not 3.
+- [ ] [P0-T5] UPSTREAM-MERGE CHECK, step 4 (stdin and stderr mechanisms). Run `git grep -n -F -e "Console]::In" origin/epic/subagentstop-envelope-integration -- .claude/hooks/subagentstop-envelope.ps1` and `git grep -n -F -e "Console]::Error" origin/epic/subagentstop-envelope-integration -- .claude/hooks/subagentstop-envelope.ps1`; append both outputs to the P0-T2 artifact with `StdinRedirectable: yes|no` and `StderrRedirectable: yes|no`. The searched literals are "Console]::In" and "Console]::Error" (each matches both the `[Console]` and the `[System.Console]` spelling). Acceptance: each field is `yes` only when its grep prints at least one line, because the E4 harness supplies stdin through `[System.Console]::SetIn` and reads stderr through `[System.Console]::SetError`.
+- [ ] [P0-T6] UPSTREAM-MERGE CHECK, step 5 (E1 merged spec, item-by-item comparison). Locate E1's spec with `git ls-tree -r --name-only origin/epic/subagentstop-envelope-integration -- docs/features` filtered to paths ending `subagentstop-envelope-core-897/spec.md`, read it with `git show origin/epic/subagentstop-envelope-integration:<that path>`, and append to the P0-T2 artifact: `E1SpecPath:`; a comparison table with one row per item of the contract recorded in `<FEATURE>/spec.md` Proposed Fix item 1, each marked `match` or `diverges` and cited to an E1 spec line: I1 `Read-SubagentStopEnvelope [-InputText <string>]` signature with `-InputText` optional; I2 never throws; I3 returned properties `IsValid`, `Anomaly`, `Envelope`, `AssistantText`, `StopHookActive`, `AgentType`, `HookEventName`; I4 reads stdin when `-InputText` is not supplied; I5 `Get-SubagentStopEnvelopeAnomalyReason` returns the clause for the `Anomaly` of an invalid envelope; I6 `Exit-SubagentStopBlock -Message <text>` writes to stderr and exits 2; I7 through I12 consumer rules 1 through 6 as worded in Proposed Fix item 1; I13 standard report-and-halt phrase. I13 is `match` when E1's spec defines no standard phrase, or defines one that contains `cannot repair this condition`; otherwise `diverges`. Then append the recorded fields: `ValidityProperty:`, `AnomalyProperty:`, `AssistantTextProperty:`, `StopHookActiveProperty:` (each the property name E1's spec gives); `AnomalyReasonFunction:` (its parameter list as E1's spec states it); `AnomalyReasonCall:` (derived mechanically: when the function's single parameter, as E1's spec states it, takes the anomaly code, `Get-SubagentStopEnvelopeAnomalyReason -<ParameterName> $envelope.Anomaly`; when it takes the result object, `Get-SubagentStopEnvelopeAnomalyReason -<ParameterName> $envelope`; any other signature is recorded `UNDERIVABLE`); `ConsumerPolicy:` (rules 1 through 6 quoted from E1's spec); `ReportAndHaltPhrase:` (the phrase E1's spec defines, or `NONE DEFINED`); `AnomalyNames:` (every anomaly value E1's spec defines); `RequiredEnvelopeFields:` (the envelope fields E1's spec requires for `IsValid = $true`). Acceptance: the table has 13 rows each marked `match` or `diverges` with an E1 spec line cited, and every recorded field is present with a value (`UNDEFINED` when E1's spec does not define it).
+- [ ] [P0-T7] UPSTREAM-MERGE CHECK, step 6 (spec drift since reconciliation). Run `git cat-file -t cc3285559`; when it prints `commit`, run `git diff cc3285559 origin/epic/subagentstop-envelope-integration -- docs/features/active/subagentstop-envelope-core-897/spec.md` and append its output under `E1SpecDiffFromReconciledHead:`; otherwise append `E1SpecDiffFromReconciledHead: cc3285559 unreachable` with the `cat-file` output. Acceptance: the field is present with either the diff output (possibly empty) or the unreachable statement.
+- [ ] [P0-T8] UPSTREAM-MERGE CHECK, verdict. Append `Verdict: PROCEED` to the P0-T2 artifact only when all hold: `Branch:` matches the P0-T2 pattern; `E1Merged: yes`; `HelperPresent: yes`; `HelperMirrorPresent: yes`; `HelperFunctions: 3`; `StdinRedirectable: yes`; `StderrRedirectable: yes`; all 13 comparison rows `match`; `ValidityProperty: IsValid`, `AnomalyProperty: Anomaly`, `AssistantTextProperty: AssistantText`, `StopHookActiveProperty: StopHookActive`; `AnomalyReasonCall:` is not `UNDERIVABLE` or `UNDEFINED`; `AnomalyNames:` includes `EmptyPayload` and `UnparseableJson`; every `RequiredEnvelopeFields:` entry is one of `session_id`, `hook_event_name`, `agent_type`, `stop_hook_active`, `last_assistant_message` (the fields every E4 test envelope carries); `ReportAndHaltPhrase:` is `NONE DEFINED` or contains `cannot repair this condition` (AC-30 asserts that text). Otherwise append `Verdict: STOP` followed by `FailingFields:` naming each failing field. When `Branch:` is among the failing fields, halt with BLOCKED without committing or pushing (the checked-out branch is not this feature's branch). Otherwise run `git add <FEATURE>/evidence`, `git commit -m "docs(896): record upstream-merge check STOP"`, `git push origin <BRANCH>`, and halt execution with BLOCKED; no production or test file is changed. Acceptance: the artifact contains exactly one `Verdict:` line; on STOP with a passing `Branch:`, `git status --porcelain` prints nothing after the push and, after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`; on STOP with a failing `Branch:`, no commit is created (`git rev-parse HEAD` equals the P0-T2 `StartHead:` value).
+- [ ] [P0-T9] Merge the integration ref (only after `Verdict: PROCEED`). Run `git merge --no-edit origin/epic/subagentstop-envelope-integration`. On a clean merge run `git merge-base --is-ancestor origin/epic/subagentstop-envelope-integration HEAD`, then CR-TEXT with `<CHECKS>` = `@{ Path = '.claude/hooks/subagentstop-envelope.ps1'; Present = @('function Read-SubagentStopEnvelope', 'function Get-SubagentStopEnvelopeAnomalyReason', 'function Exit-SubagentStopBlock') }`, and append the outputs to the P0-T2 artifact with `MergeOutcome: CLEAN` and `MergedHead: <sha>`. On a merge conflict run `git merge --abort`, append `MergeOutcome: CONFLICT` with the conflicting paths (no second `Verdict:` line), run `git add <FEATURE>/evidence`, `git commit -m "docs(896): record upstream merge conflict"`, `git push origin <BRANCH>`, and halt with BLOCKED. Acceptance: on `MergeOutcome: CLEAN`, the ancestry check exits 0 and CR-TEXT prints `TEXT-CHECK-FAILURES: 0`; on `MergeOutcome: CONFLICT`, `git status --porcelain` prints nothing after the push and, after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`.
+- [ ] [P0-T10] Record whether the E1 merge changed any file this plan edits: run `git diff --name-only ac525c4ef origin/epic/subagentstop-envelope-integration -- .claude/hooks/validate-feature-review-coverage.ps1 .claude/hooks/feature-review-coverage-thresholds.ps1 .codex/hooks/validate-feature-review-coverage.ps1 tests/scripts/claude-hooks tests/scripts/codex-hooks tests/scripts/claude-runtime tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py .agents/skills/feature-review-workflow .github/skills/feature-review-workflow .codex/agents/feature-review.toml extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json` together with `git status --porcelain`; append to the P0-T2 artifact as `AnchorDrift: NONE` or the listed paths (PI-6). Acceptance: the field is present and matches the diff output.
+- [ ] [P0-T11] Baseline line counts: run CR-LINES with `<LIST>` = LIST-PROD-BASE plus LIST-TEST-BASE plus `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`; write `<FEATURE>/evidence/baseline/file-size.<ts>.md`. Acceptance: one `LINES:` line per file with numeric `count=`, `LINES-OVER-CAP: 0`, and `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` at `count=497`.
+- [ ] [P0-T12] Baseline targeted Pester: run CR-PESTER-LIST with `<LIST>` = LIST-CLAUDE-SUITES, T6, T9, `tests/scripts/codex-hooks/hook-dependency-failure.Codex.Tests.ps1`, `tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1`, LIST-AUX; `<TAGS-IN>` empty; `<TAGS-OUT>` = `E4-Regression` (no test carries it yet; the run observes the filter code path); `<PATTERNS>` = `T824-*`, `F824-*`, `TG*`, and the four GUARD-PATTERNS; write `<FEATURE>/evidence/baseline/pester-targeted.<ts>.md` with every `SUITE:` and `NAMED:` line copied. Acceptance: the artifact records the `TOTAL:` line and `EXIT_CODE_COMPUTED:`; the `S1`, `S2`, and `S6` GUARD-PATTERN lines each show `Passed=2 | Failed=0` (the base hook already satisfies S1, S2, and S6); the `NAMED: N1:*` line shows `Passed=2 | Failed=0` and the artifact records `N1-BASELINE: PASSING`, or, when it does not, the artifact records `N1-BASELINE: FAILING` with each N1 `FAILED:` line verbatim (the N1 rule under GUARD-PATTERNS then governs later N1 acceptances); every `FAILED:` line is listed as `PRE-EXISTING:` for the PEF rule and for comparison in P10-T6.
+- [ ] [P0-T13] Baseline full-population run: run CR-POSHQC-FULL through the scratchpad route, then CR-JUNIT; write `<FEATURE>/evidence/baseline/pester-full-run.<ts>.md` with the `Tests Passed:` line, the `Covered` line, and the `JUNIT:` line verbatim. Acceptance: all three literals are present; each `JUNIT-FAILED:` line is listed as `PRE-EXISTING:`.
+- [ ] [P0-T14] Baseline per-file coverage (AC-25 baseline half), immediately after P0-T13 with no Pester run in between: run CR-COV-FILES with `<LIST>` = LIST-PROD-BASE; write `<FEATURE>/evidence/baseline/pester-coverage.<ts>.md` with `Output Summary:` stating the three numeric `pct=` values; then run CR-COV-CHANGED with the same list (observation run; the branch has no change yet) and append its output. Acceptance: three `COVERAGE:` lines with numeric `covered=`, `missed=`, `pct=` values and no `ABSENT` line; three `CHANGED-COVERAGE:` lines with `changed=0` and `CHANGED-BELOW-85: NONE`.
+- [ ] [P0-T15] Baseline format check: run CR-FORMAT-CHECK with `<LIST>` = LIST-PROD-BASE plus LIST-TEST-BASE; write `<FEATURE>/evidence/baseline/format-check.<ts>.md`; then run CR-FORMAT-APPLY with `<LIST>` = exactly the files that CR-FORMAT-CHECK reported `FORMAT-CLEAN:` (observation run) and record `git status --porcelain` before and after it. Acceptance: one check line per file and a numeric `FORMAT-DRIFT-COUNT:` (any `FORMAT-DRIFT:` file is recorded as pre-existing drift); the apply run prints one `FORMAT-UNCHANGED:` line per listed file and `FORMAT-APPLIED-COUNT: 0`, and the two status outputs are identical.
+- [ ] [P0-T16] Baseline PSScriptAnalyzer: run CR-PSSA with `<LIST>` = LIST-PROD-BASE plus LIST-TEST-BASE; write `<FEATURE>/evidence/baseline/pssa.<ts>.md`. Acceptance: one `PSSA:` line per file and a numeric `PSSA-TOTAL:`.
+- [ ] [P0-T17] Baseline Python contract tests: run PYTEST-SPEC; write `<FEATURE>/evidence/baseline/pytest-contracts.<ts>.md` with the final pytest summary line. Acceptance: the summary line carries numeric `passed` and `failed` counts (a missing `failed` word means 0 failed).
+- [ ] [P0-T18] Baseline auxiliary Python contract test: run `poetry run pytest tests/scripts/dev_tools/test_ci_gate_epic_child_contracts.py`; write `<FEATURE>/evidence/baseline/pytest-ci-gate-contracts.<ts>.md`. Acceptance: the summary line is recorded with numeric counts.
+- [ ] [P0-T19] Baseline Black check (read-only): run `poetry run black --check tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`; write `<FEATURE>/evidence/baseline/python-black-check.<ts>.md`. Acceptance: the artifact records the output line containing `would be left unchanged` or `would reformat`.
+- [ ] [P0-T20] Baseline Ruff: run `poetry run ruff check tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`; write `<FEATURE>/evidence/baseline/python-ruff.<ts>.md`. Acceptance: the artifact records `All checks passed!` or the listed findings.
+- [ ] [P0-T21] Baseline Pyright: run `poetry run pyright tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`; write `<FEATURE>/evidence/baseline/python-pyright.<ts>.md`. Acceptance: the artifact records the summary line with numeric error, warning, and information counts.
+- [ ] [P0-T22] Baseline Python-token counts (AC-26 (c)): run CR-PY-TOKEN with `$Mode = 'baseline'`, then with `$Mode = 'final'` (observation run; HEAD equals the merged base); write `<FEATURE>/evidence/baseline/python-token-count.<ts>.md`. Acceptance: the baseline run prints two `PY-TOKEN:` lines with numeric `base=` (expected `claude-hooks | base=5` and `codex-hooks | base=5` when P0-T10 recorded `AnchorDrift: NONE`; otherwise the observed values are recorded); the final-mode run prints two lines ending `NOT-INCREASED` and `PY-TOKEN-INCREASED-COUNT: 0`.
+- [ ] [P0-T23] CR observation run (success-output observation rule). Run, in order: CR-PARSE with `<LIST>` = LIST-PROD-BASE plus T5 and `<IT-PATTERNS>` = `T824-*`; CR-TEXT with `<CHECKS>` = `@{ Path = '.claude/hooks/validate-feature-review-coverage.ps1'; Present = @("ReasonPrefix 'validate-feature-review-coverage:'"); Absent = @('subagentstop-envelope.ps1') }`; CR-JSON with `<MANIFEST>` = P1 and `<ENTRIES>` = `.claude/hooks/validate-feature-review-coverage.ps1`; CR-SHA with `<PAIRS>` = the H4 pair; then, only when that CR-SHA line ends `MATCH`, CR-MIRROR with the same pair, recording `git status --porcelain` before and after; write `<FEATURE>/evidence/baseline/cr-observation.<ts>.md`. Acceptance: CR-PARSE prints `PARSE-ERROR-COUNT: 0` and `IT-COUNT: tests/scripts/claude-hooks/feature-review-coverage-thresholds.Tests.ps1 | T824-* | 1`; CR-TEXT prints `TEXT-CHECK-FAILURES: 0`; CR-JSON prints `JSON-MISSING-COUNT: 0`; CR-SHA prints `SHA-DIFFER-COUNT: 0`; CR-MIRROR prints `COPY-DIFFER-COUNT: 0`; the two status outputs are identical.
+- [ ] [P0-T24] Check off AC-1 in `<FEATURE>/spec.md` (change `- [ ] AC-1:` to `- [x] AC-1:`) only if the P0-T2 artifact contains exactly one `Verdict:` line and it reads `Verdict: PROCEED`, and it records `MergeOutcome: CLEAN`. Acceptance: exactly that one checkbox changed.
+- [ ] [P0-T25] Commit and push Phase 0: `git add <FEATURE>/evidence <FEATURE>/spec.md`, `git commit -m "docs(896): record upstream-merge check and baselines"`, `git push origin <BRANCH>`. Acceptance: `git status --porcelain` prints nothing, and after `git fetch origin <BRANCH>` the output of `git rev-parse HEAD` equals that of `git rev-parse origin/<BRANCH>`.
+
+### Phase 1 — Regression Tests First (expect-fail)
+
+- [ ] [P1-T1] [expect-fail] Create T11 `tests/scripts/claude-hooks/validate-feature-review-coverage.E4.Helpers.ps1` (test support, so that T2 stays below the 500-line cap; T2 is 296 lines on the base) with a comment-based header (synopsis "E4 (issue #896) harness and fixtures for validate-feature-review-coverage.Coverage.Tests.ps1"; it is dot-sourced from that file's E4 Context `BeforeAll`; it writes no file) and no top-level statement other than the function definitions and `$script:` assignments listed here. T11 defines: `Invoke-ClaudeReviewEntry` (parameter `[AllowEmptyString()][string] $Stdin`; saves `[System.Console]::In` and `[System.Console]::Error`, sets a `StringReader` and a `StringWriter`, sets `$global:LASTEXITCODE = 0`, runs `& $script:HookFile`, returns `ExitCode`, `Stdout`, `Stderr`, and restores both streams in `finally`); `ConvertTo-ClaudeEnvelope` (parameters `[AllowEmptyString()][string] $AssistantText` and `[bool] $StopHookActive = $false`; returns `[ordered]@{ session_id = 'e4-896'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $StopHookActive; last_assistant_message = $AssistantText } | ConvertTo-Json -Compress`); the paths `docs/features/active/foo/policy-audit.2026-05-04T08-00.md`, `docs/features/active/foo/code-review.2026-05-04T08-00.md`, `docs/features/active/foo/feature-audit.2026-05-04T08-00.md` and the three-token text `$script:E4Tokens` (the lines `policy-audit-path: <policy path>`, `code-review-path: <code path>`, `feature-audit-path: <feature path>` joined by newlines); `$script:E4Fixtures`, a hashtable of eight entries, each `@{ Text = <assistant text>; Map = <path-to-lines hashtable> }`, where the review map holds the three artifact paths (policy-audit lines as stated, code-review `code`, feature-audit `feature`): `MissingToken` (text: the code-review and feature-audit token lines only; review map with policy-audit `Python coverage PASS`), `AbsentArtifact` (`$script:E4Tokens`; empty map), `NoCoverageRow` (`$script:E4Tokens`; review map with policy-audit `Python style PASS`, plus `artifacts/pr_context.summary.txt` = `- src/foo.py (+1/-0)`), `LineBelowFloor` (policy-audit `Python coverage PASS`, the `.py` summary, `artifacts/python/lcov.info` = `LF:100`, `LH:80`, `BRF:100`, `BRH:80`), `BranchBelowFloor` (as `LineBelowFloor` with `LF:100`, `LH:90`, `BRF:100`, `BRH:70`), `UnreadableClaudeMd` (policy-audit `Python coverage PASS`, the `.py` summary, `CLAUDE.md` = the string `THROW`), `ValidatorError` (policy-audit `PowerShell coverage PASS`, summary `- scripts/foo.ps1 (+1/-0)`, `artifacts/pester/powershell-coverage.xml` = `<report`), `Mixed` (policy-audit lines `Python coverage PASS` and `TypeScript coverage PASS`, summary lines `- src/a.py (+1/-0)` and `- src/b.ts (+1/-0)`, `artifacts/python/lcov.info` = `LF:100`, `LH:80`, `BRF:100`, `BRH:80`, `coverage/lcov.info` = `LF:100`, `LH:90`, `BRF:100`, `BRH:70`); and `Use-E4Fixture -Name` (sets `$script:E4ArtifactMap` to the fixture's `Map` and returns its `Text`). `Invoke-ClaudeReviewEntry` reads the hook path from `$script:HookFile`, which T2's top-level `BeforeAll` (line 14) sets. In T2 `tests/scripts/claude-hooks/validate-feature-review-coverage.Coverage.Tests.ps1`, add `Context 'E4 (issue #896)'` inside the `Describe`. Its `BeforeAll` holds the single statement `. (Join-Path $PSScriptRoot 'validate-feature-review-coverage.E4.Helpers.ps1')` (the dot-source form of `enforce-completion-consistency.Tests.ps1:11`). Its `BeforeEach` (in T2, not in T11) sets `$script:E4ArtifactMap = @{}` and declares one literal mock: `Mock Get-ArtifactFileContent { param([string] $Path) $entry = $script:E4ArtifactMap[$Path]; if ($null -eq $entry) { return @{ Exists = $false; Text = $null; Lines = @() } }; if ($entry -is [string] -and $entry -eq 'THROW') { throw 'simulated read failure: access denied' }; return Get-ArtifactFileResult -Lines @($entry) }`. Add `It 'E4-TR1: the entry point exits 2 for an envelope without review-artifact tokens' -Tag 'E4-Regression', 'E4-TR1'` that calls `Invoke-ClaudeReviewEntry -Stdin (ConvertTo-ClaudeEnvelope -AssistantText 'Review complete.')` and asserts `ExitCode` is 2 and `Stderr.StartsWith('validate-feature-review-coverage:', [System.StringComparison]::Ordinal)` is true. Acceptance: CR-PARSE with `<LIST>` = T2, T11 and `<IT-PATTERNS>` = `E4-TR1:*` prints `PARSE-ERROR-COUNT: 0`, `IT-COUNT: tests/scripts/claude-hooks/validate-feature-review-coverage.Coverage.Tests.ps1 | E4-TR1:* | 1`, and a `PARSE:` line for T11 with `errors=0 | functions=ConvertTo-ClaudeEnvelope,Invoke-ClaudeReviewEntry,Use-E4Fixture`; CR-LINES with `<LIST>` = T2, T11 prints `LINES-OVER-CAP: 0`; CR-TEXT with `<CHECKS>` = `@{ Path = <T2>; Present = @("validate-feature-review-coverage.E4.Helpers.ps1')", 'Mock Get-ArtifactFileContent { param([string] $Path) $entry = $script:E4ArtifactMap[$Path]') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P1-T2] [expect-fail] In the same Context of T2, add `It 'E4-TR4: an unreadable root CLAUDE.md blocks with a structured message and exit 2' -Tag 'E4-Regression', 'E4-TR4'`: `$text = Use-E4Fixture -Name 'UnreadableClaudeMd'`; assert `(Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ClaudeEnvelope -AssistantText $text))` has `Ok` false and a `Message` containing `root CLAUDE.md` and `could not be read`; then assert `(Invoke-ClaudeReviewEntry -Stdin (ConvertTo-ClaudeEnvelope -AssistantText $text)).ExitCode` is 2. Acceptance: CR-PARSE with `<LIST>` = T2 and `<IT-PATTERNS>` = `E4-TR4:*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1.
+- [ ] [P1-T3] [expect-fail] In T5 `tests/scripts/claude-hooks/feature-review-coverage-thresholds.Tests.ps1`, add `It 'E4-TR5-P<Id> resolves <Label>' -Tag 'E4-Regression', 'E4-TR5' -ForEach` with six rows (Line, Branch, LineSource, BranchSource): P1 `line coverage: 70% minimum` (70, 75, claude-md, default); P2 `line coverage 80% at least` (80, 75, claude-md, default); P3 `line coverage of 80% or more` (80, 75, claude-md, default); P4 `branch coverage: 60% or higher` (85, 60, default, claude-md); P5 `line coverage 81% or above` (81, 75, claude-md, default); P6 `branch coverage 62% or greater` (85, 62, default, claude-md); and a separate `It 'E4-TR5-N<Id> keeps the defaults for <Label>' -ForEach` (no regression tag) with three rows: N1 `Line coverage was 62% last release`, N2 `Line and branch coverage: 70% minimum`, N3 `line coverage: 150% minimum`, each expecting 85, 75, default, default. Use the Arrange/Act/Assert body shape of lines 39-50. Acceptance: CR-PARSE with `<LIST>` = T5 and `<IT-PATTERNS>` = `E4-TR5-P*`, `E4-TR5-N*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1 for each pattern (row counts are checked by P1-T5 and P1-T6).
+- [ ] [P1-T4] [expect-fail] In T6 `tests/scripts/codex-hooks/validate-feature-review-coverage.Coverage.Tests.ps1`, inside `Context 'entry point'`, add `It 'E4-TR7: with no CLAUDE.md figure an 80.5% line row fails against the 85% floor' -Tag 'E4-Regression', 'E4-TR7'` with these mocks: `Mock Test-Path { param($Path) -not ([string]$Path).EndsWith('.xml') }`; `Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }` (the synthetic audit object of line 183); `Mock Get-Content { param($Path) $p = [string]$Path; if ($p.EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } elseif ($p.EndsWith('lcov.info')) { @('LF:1000', 'LH:805') } elseif ($p.EndsWith('CLAUDE.md')) { 'Project notes without coverage figures.' } else { 'Python coverage PASS' } }`; call `Invoke-CodexReviewEntry -Stdin $script:ReviewStop`; assert `ExitCode` 0, `Stdout` non-empty, `($result.Stdout | ConvertFrom-Json).decision` equals `block`, and the reason contains `below the 85% line coverage floor`. Acceptance: CR-PARSE with `<LIST>` = T6 and `<IT-PATTERNS>` = `E4-TR7:*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1.
+- [ ] [P1-T5] [expect-fail] Run CR-PESTER-LIST with `<LIST>` = T2, T5, T6; `<TAGS-IN>` = `E4-Regression`; `<TAGS-OUT>` empty; `<PATTERNS>` = `E4-TR1:*`, `E4-TR4:*`, `E4-TR5-P*`, `E4-TR7:*`; write `<FEATURE>/evidence/regression-testing/fail-first.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE: 1`, `ExpectedExitCode: 1`, `Output Summary:`, every `NAMED:` and `FAILED:` line verbatim, a `Base:` line copied from the P0-T2 artifact, and the PI-3 note for E4-TR4. Acceptance: `NAMED: E4-TR1:* | Passed=0 | Failed=1`, `NAMED: E4-TR4:* | Passed=0 | Failed=1`, `NAMED: E4-TR5-P* | Passed=0 | Failed=6`, `NAMED: E4-TR7:* | Passed=0 | Failed=1`, `EXIT_CODE_COMPUTED: 1`, and process exit code 1.
+- [ ] [P1-T6] Confirm the untagged rows of the three edited files still pass: run CR-PESTER-LIST with `<LIST>` = T2, T5, T6; `<TAGS-IN>` empty; `<TAGS-OUT>` = `E4-Regression`; `<PATTERNS>` = `E4-TR5-N*`, `T824-*`; write `<FEATURE>/evidence/regression-testing/phase1-untagged-rows.<ts>.md`. Acceptance: `NAMED: E4-TR5-N* | Passed=3 | Failed=0`, `NAMED: T824-* | Passed=11 | Failed=0`, `TOTAL:` with `Failed=0`, `EXIT_CODE_COMPUTED: 0`.
+- [ ] [P1-T7] Commit and push Phase 1: `git add tests/scripts/claude-hooks/validate-feature-review-coverage.Coverage.Tests.ps1 tests/scripts/claude-hooks/validate-feature-review-coverage.E4.Helpers.ps1 tests/scripts/claude-hooks/feature-review-coverage-thresholds.Tests.ps1 tests/scripts/codex-hooks/validate-feature-review-coverage.Coverage.Tests.ps1 <FEATURE>/evidence`, `git commit -m "test(896): add expect-fail regression tests E4-TR1, TR4, TR5, TR7"`, `git push origin <BRANCH>`. Acceptance: `git status --porcelain` prints nothing and, after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`.
+
+### Phase 2 — CR-8 Three-File Split (behavior-preserving move)
+
+- [ ] [P2-T1] Create H2 `.claude/hooks/validate-feature-review-coverage-metrics.ps1` with a comment-based file header (synopsis; "Dot-sourced by validate-feature-review-coverage.ps1"; PowerShell 7+; no `python` token) and move, unchanged, `Get-ArtifactFileContent` (H1 lines 51-73), `Get-LcovRepoCoverage` (150-169), `Get-LcovBranchCoverage` (171-194), `Get-JacocoBranchCoverage` (196-216), `Get-LanguageBranchCoverage` (218-229), `Get-JacocoRepoCoverage` (231-251), `Get-LanguageRepoCoverage` (253-266). The file has no `param()` block, no output-stream write, and no top-level statement other than function definitions. Acceptance: CR-PARSE with `<LIST>` = H2 prints `errors=0` and `functions=Get-ArtifactFileContent,Get-JacocoBranchCoverage,Get-JacocoRepoCoverage,Get-LanguageBranchCoverage,Get-LanguageRepoCoverage,Get-LcovBranchCoverage,Get-LcovRepoCoverage`.
+- [ ] [P2-T2] Create H3 `.claude/hooks/validate-feature-review-coverage-rules.ps1` with the same header form and move, unchanged, `Get-ReviewArtifactPathFromOutput` (H1 lines 75-104), `Get-ReviewArtifactInfo` (106-129), `Get-ChangedLanguageSet` (131-148), `Test-LanguageCoverageRow` (268-343). Acceptance: CR-PARSE with `<LIST>` = H3 prints `errors=0` and `functions=Get-ChangedLanguageSet,Get-ReviewArtifactInfo,Get-ReviewArtifactPathFromOutput,Test-LanguageCoverageRow`.
+- [ ] [P2-T3] Edit H1 `.claude/hooks/validate-feature-review-coverage.ps1`: delete the eleven moved function bodies and add the metrics and rules guarded dot-source lines quoted under Guarded Dot-Source Literals immediately after line 47. Acceptance: CR-PARSE with `<LIST>` = H1 prints `errors=0` and `functions=Invoke-FeatureReviewCoverageValidation`, and CR-TEXT with `<CHECKS>` = `@{ Path = <H1>; Present = @(<the two quoted lines>) }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P2-T4] Edit P1 `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: insert `".claude/hooks/validate-feature-review-coverage-metrics.ps1",` and `".claude/hooks/validate-feature-review-coverage-rules.ps1",` between the entries at lines 70 (`validate-executor-output.ps1`) and 71 (`validate-feature-review-coverage.ps1`). Acceptance: CR-JSON with `<MANIFEST>` = P1 and `<ENTRIES>` = the two new strings prints `JSON-MISSING-COUNT: 0`.
+- [ ] [P2-T5] Mirror H1, H2, H3: run CR-MIRROR with `<PAIRS>` = the H1, H2, H3 pairs of LIST-MIRROR-PAIRS; write `<FEATURE>/evidence/other/phase2-mirror.<ts>.md`. Acceptance: three `COPIED:` lines ending `MATCH` and `COPY-DIFFER-COUNT: 0`.
+- [ ] [P2-T6] In T1 `tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1`, add `It 'E4-ST4: <File> defines exactly its assigned functions' -ForEach` with three rows: H1 (`Invoke-FeatureReviewCoverageValidation`), H2 (the seven P2-T1 names), H3 (the four P2-T2 names); each row parses the file with `[System.Management.Automation.Language.Parser]::ParseFile` and asserts the sorted `FunctionDefinitionAst` name set equals the sorted assigned list. Acceptance: CR-PARSE with `<LIST>` = T1 and `<IT-PATTERNS>` = `E4-ST4*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1.
+- [ ] [P2-T7] Gate: run CR-PESTER-LIST with `<LIST>` = LIST-CLAUDE-SUITES; `<TAGS-IN>` empty; `<TAGS-OUT>` = `E4-Regression`; `<PATTERNS>` = `E4-ST4*`, `TG1:*`, `TG2:*`, `TG3:*`, `F824-*`, `B1:*validate-feature-review-coverage*`, and the four GUARD-PATTERNS; write `<FEATURE>/evidence/qa-gates/phase2-split-pester.<ts>.md`. Acceptance: `NAMED: E4-ST4* | Passed=3 | Failed=0`, `NAMED: TG1:* | Passed=2 | Failed=0`, `NAMED: TG2:* | Passed=2 | Failed=0`, `NAMED: TG3:* | Passed=2 | Failed=0`, `NAMED: B1:*validate-feature-review-coverage* | Passed=3 | Failed=0` (thresholds, metrics, rules edges), each `S1`, `S2`, `S6` GUARD-PATTERN line `Passed=2 | Failed=0`, `NAMED: N1:* | Passed=2 | Failed=0` (N1 rule), `TOTAL:` with `Failed=0` and `EXIT_CODE_COMPUTED: 0`, or, when every `FAILED:` line meets the PEF, `EXIT_CODE_COMPUTED: 1`, process exit code 1, and an artifact recording `ExpectedExitCode: 1` and `PRE-EXISTING-STILL-FAILING:` (PEF).
+- [ ] [P2-T8] Run CR-LINES with `<LIST>` = H1, H2, H3; write `<FEATURE>/evidence/qa-gates/phase2-file-size.<ts>.md`. Acceptance: three `LINES:` lines with `count=` below 500 and `LINES-OVER-CAP: 0`.
+- [ ] [P2-T9] Commit and push Phase 2: `git add .claude/hooks/validate-feature-review-coverage.ps1 .claude/hooks/validate-feature-review-coverage-metrics.ps1 .claude/hooks/validate-feature-review-coverage-rules.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1 <FEATURE>/evidence`, `git commit -m "refactor(896): split feature-review coverage hook into entry, metrics, and rules files"`, `git push origin <BRANCH>`. Acceptance: `git status --porcelain` prints nothing and after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`.
+
+### Phase 3 — CR-9 Resolver Form and Floor-Source Messages
+
+- [ ] [P3-T1] Edit H4 `.claude/hooks/feature-review-coverage-thresholds.ps1` line 57: replace the pattern with one that keeps the combined-metric lookbehind and adds the trailing-floor alternative from spec Proposed Fix item 5, in the form `'(?im)(?<!\b(?:line|branch)\s*(?:and|or|&|/)\s*)\b' + $metric + '\s+coverage\b[^\r\n%]*?(?:(?:>=|' + [char]0x2265 + '|\bat\s+least\b|\bminimum(?:\s+of)?\b|\bno\s+less\s+than\b)\s*:?\s*(?<![\d.])(?<pct>\d{1,3}(?:\.\d+)?)\s*%|(?<![\d.])(?<pct>\d{1,3}(?:\.\d+)?)\s*%\s*(?:minimum|at\s+least|or\s+(?:more|higher|above|greater))\b)'`; keep the 0..100 range check and first-valid-match loop (lines 58-66) unchanged. Acceptance: CR-PARSE with `<LIST>` = H4 prints `errors=0`, and CR-TEXT with `<CHECKS>` = `@{ Path = <H4>; Present = @('or\s+(?:more|higher|above|greater)') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P3-T2] Edit the `Get-FeatureReviewCoverageThreshold` help (H4 lines 22-36) to list the accepted forms: comparator before the figure (`>=`, the U+2265 sign, `at least`, `minimum`, `minimum of`, `no less than`) and trailing floor phrase after the figure (`minimum`, `at least`, `or more`, `or higher`, `or above`, `or greater`), each on the same line as `<metric> coverage`; keep the combined-metric limitation paragraph. Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <H4>; Normalize = $true; Present = @('>=', 'U+2265', 'at least', 'minimum of', 'no less than', 'or more', 'or higher', 'or above', 'or greater') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P3-T3] Edit `Test-LanguageCoverageRow` in H3: add parameters `[string] $LineSource = 'default'` and `[string] $BranchSource = 'default'`; compute the label `(root CLAUDE.md)` when the source is `claude-md` and `(default)` otherwise; append the label after `line coverage floor` and after `branch coverage floor` in the two floor messages (base H1 lines 330 and 338), producing for example `below the 70% line coverage floor (root CLAUDE.md)`. Acceptance: CR-PARSE with `<LIST>` = H3 prints `errors=0`, and CR-TEXT with `<CHECKS>` = `@{ Path = <H3>; Present = @('[string] $LineSource', '[string] $BranchSource', '(root CLAUDE.md)') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P3-T4] Edit `Invoke-FeatureReviewCoverageValidation` in H1: pass `-LineSource $thresholds.LineSource -BranchSource $thresholds.BranchSource` in the `Test-LanguageCoverageRow` call (base line 450). Acceptance: CR-PARSE with `<LIST>` = H1 prints `errors=0`, and CR-TEXT with `<CHECKS>` = `@{ Path = <H1>; Present = @('-LineSource $thresholds.LineSource') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P3-T5] In T2, inside `Context 'Test-LanguageCoverageRow'`, add `It 'E4-TR6: <Metric> floor message names <Expected>' -ForEach` with four rows: line/claude-md (`-RepoWidePct 60 -LineFloor 70 -LineSource 'claude-md'`, expects `70% line coverage floor (root CLAUDE.md)`), line/default (`-RepoWidePct 60`, expects `85% line coverage floor (default)`), branch/claude-md (`-RepoWidePct 90 -BranchPct 50 -BranchFloor 60 -BranchSource 'claude-md'`, expects `60% branch coverage floor (root CLAUDE.md)`), branch/default (`-RepoWidePct 90 -BranchPct 50`, expects `75% branch coverage floor (default)`); audit text `Python coverage PASS`; assert `.Reason.Contains($Expected)`. Acceptance: CR-PARSE with `<LIST>` = T2 and `<IT-PATTERNS>` = `E4-TR6*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1.
+- [ ] [P3-T6] In T5, add `It 'E4-ST5: the resolver help names every accepted comparator form'` that parses H4, takes the `Get-FeatureReviewCoverageThreshold` `FunctionDefinitionAst`, reads `GetHelpContent().Description`, collapses whitespace runs to one space, and asserts it contains each P3-T2 token. Acceptance: CR-PARSE with `<LIST>` = T5 and `<IT-PATTERNS>` = `E4-ST5:*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1.
+- [ ] [P3-T7] Mirror H1, H3, H4: run CR-MIRROR with `<PAIRS>` = the H1, H3, H4 pairs of LIST-MIRROR-PAIRS; write `<FEATURE>/evidence/other/phase3-mirror.<ts>.md`. Acceptance: three `COPIED:` lines ending `MATCH` and `COPY-DIFFER-COUNT: 0`.
+- [ ] [P3-T8] Gate (CR-9 regression now passing): run CR-PESTER-LIST with `<LIST>` = T5; no tag filters; `<PATTERNS>` = `E4-TR5-P*`, `E4-TR5-N*`, `T824-*`, `E4-ST5:*`; write `<FEATURE>/evidence/qa-gates/phase3-resolver-pester.<ts>.md`. Acceptance: `NAMED: E4-TR5-P* | Passed=6 | Failed=0`, `NAMED: E4-TR5-N* | Passed=3 | Failed=0`, `NAMED: T824-* | Passed=11 | Failed=0`, `NAMED: E4-ST5:* | Passed=1 | Failed=0`, `EXIT_CODE_COMPUTED: 0`.
+- [ ] [P3-T9] Gate: run CR-PESTER-LIST with `<LIST>` = LIST-CLAUDE-SUITES; `<TAGS-OUT>` = `E4-TR1`, `E4-TR4`; `<PATTERNS>` = `E4-TR6*`, `E4-ST4*`, `TG*`, `F824-*`; write `<FEATURE>/evidence/qa-gates/phase3-claude-pester.<ts>.md`. Acceptance: `NAMED: E4-TR6* | Passed=4 | Failed=0`, `NAMED: E4-ST4* | Passed=3 | Failed=0`, `TOTAL:` with `Failed=0` and `EXIT_CODE_COMPUTED: 0`, or, when every `FAILED:` line meets the PEF, `EXIT_CODE_COMPUTED: 1`, process exit code 1, and an artifact recording `ExpectedExitCode: 1` and `PRE-EXISTING-STILL-FAILING:` (PEF).
+- [ ] [P3-T10] Check off AC-11 in `<FEATURE>/spec.md` (P1-T5 recorded the base failures of the positive rows; P3-T8 shows all rows passing). Acceptance: only the AC-11 checkbox changed.
+- [ ] [P3-T11] Check off AC-12 in `<FEATURE>/spec.md` (P3-T8 `E4-ST5`, P3-T9 `E4-TR6`). Acceptance: only the AC-12 checkbox changed.
+- [ ] [P3-T12] Commit and push Phase 3: `git add .claude/hooks/feature-review-coverage-thresholds.ps1 .claude/hooks/validate-feature-review-coverage.ps1 .claude/hooks/validate-feature-review-coverage-rules.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks tests/scripts/claude-hooks <FEATURE>/evidence <FEATURE>/spec.md`, `git commit -m "fix(896): accept trailing-floor coverage statements and name the floor source (CR-9)"`, `git push origin <BRANCH>`. Acceptance: `git status --porcelain` prints nothing and after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`.
+
+### Phase 4 — Claude Hook Transport, Consumer Policy, and Dependency Handling
+
+- [ ] [P4-T1] Edit H1: add the `subagentstop-envelope.ps1` guarded dot-source line quoted under Guarded Dot-Source Literals immediately after the rules line (E1 consumer rule 4; AC-31). Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <H1>; Present = @(<the quoted subagentstop-envelope.ps1 line>) }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P4-T2] Edit `Test-LanguageCoverageRow` in H3: add `Repairable = $true` to the five repairable failure returns (base lines 293-296, 301-304, 311-314, 319-322, 328-331) and `Repairable = $false` to the branch-floor return (base lines 336-339), as stated under Decision Function Shape; the success return is unchanged. Acceptance: CR-PARSE with `<LIST>` = H3 prints `errors=0`, and CR-TEXT with `<CHECKS>` = `@{ Path = <H3>; Present = @('Repairable = $true', 'Repairable = $false') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P4-T3] Rewrite `Invoke-FeatureReviewCoverageValidation` in H1 to the Decision Function Shape: replace `[string] $RawPayload` with `[AllowNull()] [AllowEmptyString()] [string] $InputText`; keep the first two statements verbatim (base lines 351-352); read the envelope with `Read-SubagentStopEnvelope -InputText $InputText` when the parameter is bound and `Read-SubagentStopEnvelope` otherwise; return the payload-anomaly result for an invalid envelope (E1 consumer rule 1); move the base validation (lines 365-459) into the script block inside `try`, replacing the JSON parse and `output` property blocks (base lines 354-368) with `$agentOutput = [string]$envelope.AssistantText`, converting returns to the finding shape, and re-prefixing messages (PI-4); add the `catch` and the re-entry tail (E1 consumer rule 2). Leave the `CLAUDE.md` read (`Get-ArtifactFileContent -Path 'CLAUDE.md'`, base line 444) in place for Phase 5. Acceptance: CR-PARSE with `<LIST>` = H1 prints `errors=0`, and CR-TEXT with `<CHECKS>` = `@{ Path = <H1>; Present = @("`$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-feature-review-coverage:'", 'if ($null -ne $dependencyDecision) { return $dependencyDecision }', 'Read-SubagentStopEnvelope -InputText $InputText', 'payload anomaly - ', 'validator error: ', 'HasRepairable'); Absent = @('[string] $RawPayload', 'ConvertFrom-Json', 'feature-review hook:') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P4-T4] Edit the H1 entry point (base lines 471-477): replace the `CLAUDE_HOOK_INPUT` call and the `Write-Error`/`exit 1` block with the four entry statements under Decision Function Shape (E1 consumer rules 5 and 6); base lines 464-469 stay unchanged and in place. Acceptance: CR-PARSE with `<LIST>` = H1 prints `errors=0`, and CR-TEXT with `<CHECKS>` = `@{ Path = <H1>; Present = @("if (`$script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-feature-review-coverage: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }", 'if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }', 'Exit-SubagentStopBlock -Message $result.Message'); Absent = @('Write-Error', 'exit 1', '$env:CLAUDE_HOOK_INPUT', 'RawPayload') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P4-T5] Edit the H1 comment-based help `.NOTES` (base lines 40-42): state that the hook reads the SubagentStop envelope from stdin through `Read-SubagentStopEnvelope`, exits 0 to allow, and blocks through `Exit-SubagentStopBlock` (stderr reason, exit 2) on every block path including payload anomalies and validator errors; that dependency failures block through the inline guard tail; and that a non-repairable condition blocks once and does not block again when `stop_hook_active` is true. Keep the precedence text with "falls back independently" (base lines 29-35). Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <H1>; Present = @('Exit-SubagentStopBlock', 'falls back independently'); Absent = @('CLAUDE_HOOK_INPUT') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P4-T6] Convert T1 `tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1` lines 26-135: in each of the four tests, replace the `@{ output = <text> } | ConvertTo-Json -Compress` payload with `[ordered]@{ session_id = 't1-896'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $false; last_assistant_message = <text> } | ConvertTo-Json -Compress` and call `Invoke-FeatureReviewCoverageValidation -InputText $raw`; assertions are unchanged. Acceptance: CR-PARSE with `<LIST>` = T1 prints `errors=0`, and CR-TEXT with `<CHECKS>` = `@{ Path = <T1>; Present = @('-InputText $raw', 'last_assistant_message'); Absent = @('RawPayload', 'CLAUDE_HOOK_INPUT', 'output = ') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P4-T7] Convert T2 `Context 'Invoke-FeatureReviewCoverageValidation'` (lines 200-280): replace `ConvertTo-ReviewPayload` with `ConvertTo-ReviewEnvelope -Output` (returns the T1 envelope shape with `last_assistant_message = $Output`); change the empty-payload test to `-InputText ''` and the malformed-payload test to `-InputText '{not json'`, each asserting `Ok` false and `Message` like `validate-feature-review-coverage: payload anomaly - *`; change the empty-output test to `-InputText (ConvertTo-ReviewEnvelope -Output '')`, asserting `Ok` false and `Message.StartsWith('validate-feature-review-coverage:', [System.StringComparison]::Ordinal)`; every other call passes `-InputText (ConvertTo-ReviewEnvelope -Output <former output>)` with its assertions unchanged. Delete `Context 'entry point'` (lines 282-295), which asserts the base `Write-Error` exit-1 path (comment at line 292). Acceptance: CR-PARSE with `<LIST>` = T2 prints `errors=0`, and CR-TEXT with `<CHECKS>` = `@{ Path = <T2>; Present = @('ConvertTo-ReviewEnvelope'); Absent = @('RawPayload', 'CLAUDE_HOOK_INPUT', 'blocks through Write-Error') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P4-T8] In T2 `Context 'E4 (issue #896)'`, add: `It 'E4-TR2: a valid envelope whose advertised artifact does not exist blocks'` (`$text = Use-E4Fixture -Name 'AbsentArtifact'`; assert the decision with `-InputText (ConvertTo-ClaudeEnvelope -AssistantText $text)` returns `Ok` false and a `Message` containing `no file exists at that location`; assert `Invoke-ClaudeReviewEntry` with the same envelope returns `ExitCode` 2 and stderr containing `no file exists at that location`); `It 'E4-TR3: an unhandled exception in the decision blocks with a validator error and exit 2'` (`Use-E4Fixture -Name 'ValidatorError'`; entry with `stop_hook_active` false; assert `ExitCode` 2 and stderr containing `validator error`); `It 'E4-TR3b: the <Anomaly> anomaly blocks with the E1 anomaly clause' -ForEach @(@{ Anomaly = 'EmptyPayload'; Stdin = '' }, @{ Anomaly = 'UnparseableJson'; Stdin = '{bad' })` (arrange `$envelope = Read-SubagentStopEnvelope -InputText $Stdin`, assert `[string]$envelope.Anomaly` equals `$Anomaly`, and set `$expected = 'validate-feature-review-coverage: payload anomaly - ' + (<AnomalyReasonCall>)`; assert `Invoke-ClaudeReviewEntry -Stdin $Stdin` returns `ExitCode` 2 and `Stderr.StartsWith($expected, [System.StringComparison]::Ordinal)`; assert `Invoke-FeatureReviewCoverageValidation -InputText $Stdin` returns `Ok` false and `Message` equal to `$expected`). Acceptance: CR-PARSE with `<LIST>` = T2 and `<IT-PATTERNS>` = `E4-TR2:*`, `E4-TR3:*`, `E4-TR3b:*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1 for each pattern.
+- [ ] [P4-T9] Convert T3 `tests/scripts/claude-hooks/validate-feature-review-coverage.Issue824.Tests.ps1` with the CR-6 helper (spec Proposed Fix item 6): in the `Describe` `BeforeAll`, change `ConvertTo-FeatureReviewPayload` (lines 39-52) to return `[ordered]@{ session_id = 'f824'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $false; last_assistant_message = ($outputLines -join "`n") } | ConvertTo-Json -Compress`, and define `Get-ArtifactFileResult -Lines` (as in T2 lines 25-29) and `Set-ReviewArtifactMap -Override <hashtable>` (builds `$map` from the three default artifacts, policy audit `Python coverage PASS`, code review `code`, feature audit `feature`, merged with the overrides; values are multi-line strings). Because the `Set` verb triggers PSScriptAnalyzer rule `PSUseShouldProcessForStateChangingFunctions` (which would block `PSSA-TOTAL: 0`; `.claude/rules/powershell.md:30`), `Set-ReviewArtifactMap` declares `[CmdletBinding(SupportsShouldProcess)]` and performs its only state change as `if ($PSCmdlet.ShouldProcess('ReviewArtifactMap', 'Set')) { $script:ReviewArtifactMap = $map }`. In each of the two F824 Contexts (lines 55-127, 129-256) add a `BeforeEach` with one literal mock: `Mock Get-ArtifactFileContent { param([string] $Path) if ($script:ReviewArtifactMap.ContainsKey($Path)) { Get-ArtifactFileResult -Lines @($script:ReviewArtifactMap[$Path] -split "`n") } else { @{ Exists = $false; Text = $null; Lines = @() } } }`. Rewrite F824-1..F824-8 so each calls `Set-ReviewArtifactMap -Override @{ ... }` with exactly its differing entries (policy-audit text, `artifacts/pr_context.summary.txt`, coverage report, `CLAUDE.md`) and then `Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-FeatureReviewPayload)`, with each test's original assertions unchanged. Move F824-9 (lines 242-255) into its own `Context` whose `BeforeEach` holds `Mock Get-ArtifactFileContent -MockWith $script:RealGetArtifactFileContent`. In the validation-paths Context (lines 258-288), give each row an `InputText` value and call `-InputText $InputText`: V1 `''` with pattern `payload anomaly`; V2 `'{not json'` with pattern `payload anomaly`; V3 the envelope with an empty `last_assistant_message` (literal JSON `{"session_id":"f824","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":""}`) with pattern `^validate-feature-review-coverage:`; V4-V8 the same literal JSON shape whose `last_assistant_message` carries the former `output` text (with `\n` escapes), patterns unchanged. Acceptance: CR-PARSE with `<LIST>` = T3 prints `errors=0`, and CR-TEXT with `<CHECKS>` = `@{ Path = <T3>; Present = @('Set-ReviewArtifactMap', 'last_assistant_message', 'SupportsShouldProcess'); Absent = @('RawPayload', 'CLAUDE_HOOK_INPUT', '[scriptblock]::Create') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P4-T10] Convert T4 `tests/scripts/claude-hooks/validate-feature-review-coverage.ThresholdsGuard.Tests.ps1` and add E4-TG4: in `Invoke-ThresholdsGuardHookProcess` (lines 32-50) remove the environment-variable save, set, and restore and instead save `[System.Console]::In`, set it to a `StringReader` over `{"session_id":"tg-896","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":""}`, and restore it in `finally`; update the comment at line 33 accordingly. In TG3 (lines 101-120) change only the call at line 113 to `Invoke-FeatureReviewCoverageValidation -InputText ''`; its name and its `ExitCode`/`Reason` assertions (lines 118-119) are unchanged (AC-5, AC-31). Add `It 'E4-TG4: <Copy> exits 2 naming subagentstop-envelope.ps1 when the E1 helper dot-source fails' -ForEach` over the same two rows as TG1: `Mock Join-Path { throw 'simulated load failure: subagentstop-envelope.ps1' } -ParameterFilter { $ChildPath -eq 'subagentstop-envelope.ps1' }`, `Initialize-ThresholdsGuardDependencyState`, run `Invoke-ThresholdsGuardHookProcess`, and assert `ExitCode` 2, stderr starting `validate-feature-review-coverage:` (ordinal), and stderr containing `subagentstop-envelope.ps1`. Acceptance: CR-PARSE with `<LIST>` = T4 and `<IT-PATTERNS>` = `E4-TG4:*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1, and CR-TEXT with `<CHECKS>` = `@{ Path = <T4>; Present = @("-InputText ''", '$decision.ExitCode | Should -Be 2'); Absent = @('RawPayload', 'CLAUDE_HOOK_INPUT') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P4-T11] In T1, add: `It 'E4-ST1: <File> has no legacy transport or exit-1 block path' -ForEach` over H1, H2, H3 and their three mirrors (six rows; each asserts the file text does not contain `CLAUDE_HOOK_INPUT`, the AST holds no `CommandAst` named `Write-Error`, and no `ExitStatementAst` whose pipeline text is `1`); `It 'E4-ST1: <File> dot-sources the E1 helper through the guarded pattern' -ForEach` over H1 and its mirror (two rows; each asserts the file contains the quoted `subagentstop-envelope.ps1` guarded line); `It 'E4-ST2: Invoke-FeatureReviewCoverageValidation takes InputText and passes it to the E1 reader'` (asserts `(Get-Command Invoke-FeatureReviewCoverageValidation).Parameters.Keys` contains `InputText` and contains neither `RawPayload` nor `AssistantText`, and that the H1 text contains `Read-SubagentStopEnvelope -InputText $InputText`); `It 'E4-ST6: the Issue824 suite declares no Get-ArtifactFileContent mock inside an It block'` (parses T3; for every `CommandAst` named `It`, finds no descendant `CommandAst` named `Mock` whose elements include `Get-ArtifactFileContent`; asserts the `Describe`-level `BeforeAll` script block defines functions `Get-ArtifactFileResult` and `Set-ReviewArtifactMap`; asserts the file text does not contain `[scriptblock]::Create`). Acceptance: CR-PARSE with `<LIST>` = T1 and `<IT-PATTERNS>` = `E4-ST1:*`, `E4-ST2:*`, `E4-ST6:*` prints `PARSE-ERROR-COUNT: 0` and `IT-COUNT:` values 2, 1, 1.
+- [ ] [P4-T12] Mirror H1 and H3: run CR-MIRROR with `<PAIRS>` = the H1 and H3 pairs, then CR-SHA with `<PAIRS>` = the H1, H2, H3 pairs; write `<FEATURE>/evidence/other/phase4-mirror.<ts>.md`. Acceptance: `COPY-DIFFER-COUNT: 0` and `SHA-DIFFER-COUNT: 0`.
+- [ ] [P4-T13] Gate: run CR-PESTER-LIST with `<LIST>` = LIST-CLAUDE-SUITES; `<TAGS-OUT>` = `E4-TR4`; `<PATTERNS>` = `E4-TR1:*`, `E4-TR2:*`, `E4-TR3:*`, `E4-TR3b*`, `E4-ST1*`, `E4-ST2:*`, `E4-ST6:*`, `TG1:*`, `TG2:*`, `TG3:*`, `E4-TG4*`, `F824-*`, `B1:*validate-feature-review-coverage*`, `B3:*validate-feature-review-coverage*`, and the four GUARD-PATTERNS; write `<FEATURE>/evidence/qa-gates/phase4-transport-pester.<ts>.md`. Acceptance: `NAMED: E4-TR1:* | Passed=1 | Failed=0`, `NAMED: E4-TR2:* | Passed=1 | Failed=0`, `NAMED: E4-TR3:* | Passed=1 | Failed=0`, `NAMED: E4-TR3b* | Passed=2 | Failed=0`, `NAMED: E4-ST1* | Passed=8 | Failed=0`, `NAMED: E4-ST2:* | Passed=1 | Failed=0`, `NAMED: E4-ST6:* | Passed=1 | Failed=0`, `NAMED: F824-* | Passed=17 | Failed=0`, `NAMED: TG1:* | Passed=2 | Failed=0`, `NAMED: TG2:* | Passed=2 | Failed=0`, `NAMED: TG3:* | Passed=2 | Failed=0`, `NAMED: E4-TG4* | Passed=2 | Failed=0`, `NAMED: B1:*validate-feature-review-coverage* | Passed=4 | Failed=0`, `NAMED: B3:*validate-feature-review-coverage* | Passed=1 | Failed=0`, each `S1`, `S2`, `S6` GUARD-PATTERN line `Passed=2 | Failed=0`, `NAMED: N1:* | Passed=2 | Failed=0` (N1 rule), `TOTAL:` with `Failed=0` and `EXIT_CODE_COMPUTED: 0`, or, when every `FAILED:` line meets the PEF, `EXIT_CODE_COMPUTED: 1`, process exit code 1, and an artifact recording `ExpectedExitCode: 1` and `PRE-EXISTING-STILL-FAILING:` (PEF).
+- [ ] [P4-T14] AC-6 search: run `git grep -n -e CLAUDE_HOOK_INPUT -e "-RawPayload" -- tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1 tests/scripts/claude-hooks/validate-feature-review-coverage.Coverage.Tests.ps1 tests/scripts/claude-hooks/validate-feature-review-coverage.Issue824.Tests.ps1 tests/scripts/claude-hooks/validate-feature-review-coverage.ThresholdsGuard.Tests.ps1`; write `<FEATURE>/evidence/qa-gates/claude-suites-transport-grep.<ts>.md` with `ExpectedExitCode: 1`. The searched literals are "CLAUDE_HOOK_INPUT" and "-RawPayload"; all four files are tracked. Acceptance: no output and `EXIT_CODE: 1`.
+- [ ] [P4-T15] Check off AC-2 in `<FEATURE>/spec.md` (P4-T13 `E4-ST1` over repository copies and mirrors). Acceptance: only the AC-2 checkbox changed.
+- [ ] [P4-T16] Check off AC-3 in `<FEATURE>/spec.md` (P1-T5 base failure; P4-T13 `E4-TR1` passing). Acceptance: only the AC-3 checkbox changed.
+- [ ] [P4-T17] Check off AC-4 in `<FEATURE>/spec.md` (P4-T13 `E4-TR2`, `E4-TR3`, both `E4-TR3b` rows; P4-T7 removed the line-292 exit-1 test). Acceptance: only the AC-4 checkbox changed.
+- [ ] [P4-T18] Check off AC-5 in `<FEATURE>/spec.md` (P4-T13 `E4-ST2`, and `TG1`-`TG3` for both copies with TG3 still asserting `ExitCode = 2` and the `Reason`). Acceptance: only the AC-5 checkbox changed.
+- [ ] [P4-T19] Check off AC-13 in `<FEATURE>/spec.md` (P4-T13 `E4-ST6` and `F824-*` passing). Acceptance: only the AC-13 checkbox changed.
+- [ ] [P4-T20] Check off AC-31 in `<FEATURE>/spec.md` (P4-T13: the S2 and S6 GUARD-PATTERN rows of `hook-dependency-guard-completeness.Tests.ps1` and both `E4-TG4` rows passing; P4-T4 CR-TEXT shows the inline tail unchanged) only if no `PRE-EXISTING-STILL-FAILING:` entry in the P4-T13 artifact names a test in `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`, that is, its P4-T13 `SUITE:` line reads `Failed=0`; otherwise leave it unchecked and record the reason in `<FEATURE>/evidence/qa-gates/phase4-transport-pester.<ts>.md`. Acceptance: only the AC-31 checkbox changed, or it stays unchecked with the reason recorded.
+- [ ] [P4-T21] Commit and push Phase 4: `git add .claude/hooks/validate-feature-review-coverage.ps1 .claude/hooks/validate-feature-review-coverage-rules.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks tests/scripts/claude-hooks <FEATURE>/evidence <FEATURE>/spec.md`, `git commit -m "fix(896): read the SubagentStop envelope through the E1 helper and block with exit 2"`, `git push origin <BRANCH>`. Acceptance: `git status --porcelain` prints nothing and after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`.
+
+AC-6 is checked off in P5-T11, after P5-T9 runs all four Claude hook suites with no tag exclusion.
+
+### Phase 5 — CR-4 (Unreadable Root CLAUDE.md) and Re-entry Policy Tests
+
+- [ ] [P5-T1] Add `Get-FeatureReviewClaudeMdText` to H2 (`[CmdletBinding()]`, `[OutputType([hashtable])]`, no parameters): `try { $file = Get-ArtifactFileContent -Path 'CLAUDE.md'; return @{ Text = $file.Text; ReadError = $null } } catch { return @{ Text = $null; ReadError = ([string]$_.Exception.Message -split "`r?`n")[0] } }`, with comment-based help stating that an absent file yields `Text = $null` and `ReadError = $null`. Acceptance: CR-PARSE with `<LIST>` = H2 prints `errors=0` and a `functions=` list that includes `Get-FeatureReviewClaudeMdText`.
+- [ ] [P5-T2] Edit the H1 decision script block: replace `Get-ArtifactFileContent -Path 'CLAUDE.md'` with `$claudeMd = Get-FeatureReviewClaudeMdText`; when `$claudeMd.ReadError` is not null return the non-repairable finding `@{ Message = "validate-feature-review-coverage: root CLAUDE.md exists but could not be read ($($claudeMd.ReadError)); coverage floors cannot be resolved, so the gate fails closed."; HasRepairable = $false; HasNonRepairable = $true }`; otherwise pass `$claudeMd.Text` to `Get-FeatureReviewCoverageThreshold`. Acceptance: CR-PARSE with `<LIST>` = H1 prints `errors=0`, and CR-TEXT with `<CHECKS>` = `@{ Path = <H1>; Present = @('Get-FeatureReviewClaudeMdText', 'could not be read'); Absent = @("Get-ArtifactFileContent -Path 'CLAUDE.md'") }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P5-T3] Edit the H1 comment-based help to add the two Help-Text Tokens sentences ("an absent root CLAUDE.md uses the defaults"; "an unreadable root CLAUDE.md fails closed") next to the precedence text. Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <H1>; Normalize = $true; Present = @('an absent root CLAUDE.md uses the defaults', 'an unreadable root CLAUDE.md fails closed', 'falls back independently') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P5-T4] In T2 `Context 'E4 (issue #896)'`, add `It 'E4-TR4a: an absent root CLAUDE.md applies the default <Metric> floor' -ForEach @(@{ Metric = 'line'; Fixture = 'LineBelowFloor'; Expected = '85% line coverage floor (default)' }, @{ Metric = 'branch'; Fixture = 'BranchBelowFloor'; Expected = '75% branch coverage floor (default)' })` (each row: `$text = Use-E4Fixture -Name $Fixture`; the fixture has policy audit `Python coverage PASS` and no `CLAUDE.md` entry, so the file is absent; the line row's report is `LF:100`, `LH:80`, `BRF:100`, `BRH:80` and the branch row's is `LF:100`, `LH:90`, `BRF:100`, `BRH:70`; call the decision with `-InputText (ConvertTo-ClaudeEnvelope -AssistantText $text)`; assert `Ok` false and `Message.Contains($Expected)`), and `It 'E4-TR4c: the CLAUDE.md reader reports a read error without throwing'` (`Mock Get-ArtifactFileContent -MockWith $script:RealGetArtifactFileContent`, `Mock Test-Path { $true }`, `Mock Get-Content { throw 'simulated read failure: access denied' }`; assert `Get-FeatureReviewClaudeMdText` returns `Text` null and `ReadError` containing `access denied`). Acceptance: CR-PARSE with `<LIST>` = T2 and `<IT-PATTERNS>` = `E4-TR4a:*`, `E4-TR4c:*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1 for each pattern.
+- [ ] [P5-T5] In T2 `Context 'E4 (issue #896)'`, add the AC-30 tests: `It 'E4-TR10a: <Fixture> is repairable with stop_hook_active <Active>' -ForEach` with eight rows (`MissingToken`, `AbsentArtifact`, `NoCoverageRow`, `LineBelowFloor`, each with `Active = $false` and `Active = $true`), asserting the decision result for `-InputText (ConvertTo-ClaudeEnvelope -AssistantText (Use-E4Fixture -Name $Fixture) -StopHookActive $Active)` has `Ok` false and a `Message` that does not contain `cannot repair this condition`; `It 'E4-TR10b: <Fixture> is not repairable with stop_hook_active <Active>' -ForEach` with six rows (`UnreadableClaudeMd`, `BranchBelowFloor`, `ValidatorError`, each with `Active = $false` and `Active = $true`), asserting `Ok` false and a `Message` containing `cannot repair this condition` when `Active` is false, and `Ok` true when `Active` is true; `It 'E4-TR10c: a repairable and a non-repairable coverage condition still block with stop_hook_active true'` (`Mixed`, `-StopHookActive $true`; assert `Ok` false); `It 'E4-TR10d: an unreadable root CLAUDE.md through the entry point exits <ExitCode> with stop_hook_active <Active>' -ForEach @(@{ Active = $false; ExitCode = 2 }, @{ Active = $true; ExitCode = 0 })` (`Invoke-ClaudeReviewEntry -Stdin (ConvertTo-ClaudeEnvelope -AssistantText (Use-E4Fixture -Name 'UnreadableClaudeMd') -StopHookActive $Active)`; assert `ExitCode`). Acceptance: CR-PARSE with `<LIST>` = T2 and `<IT-PATTERNS>` = `E4-TR10a:*`, `E4-TR10b:*`, `E4-TR10c:*`, `E4-TR10d:*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1 for each pattern.
+- [ ] [P5-T6] In T1, update the H2 row of `E4-ST4` to the eight names (the seven P2-T1 names plus `Get-FeatureReviewClaudeMdText`). Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <T1>; Present = @('Get-FeatureReviewClaudeMdText') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P5-T7] Mirror H1 and H2: run CR-MIRROR with `<PAIRS>` = the H1 and H2 pairs, then CR-SHA with `<PAIRS>` = the H1, H2, H3 pairs; write `<FEATURE>/evidence/other/phase5-mirror.<ts>.md`. Acceptance: `COPY-DIFFER-COUNT: 0` and `SHA-DIFFER-COUNT: 0`.
+- [ ] [P5-T8] Run CR-LINES with `<LIST>` = H1, H2, H3, T2, T11; write `<FEATURE>/evidence/qa-gates/phase5-file-size.<ts>.md`. Acceptance: five `LINES:` lines with numeric `count=` and `LINES-OVER-CAP: 0` (T2 below 500 lines after all E4 `It` blocks, with the harness and fixtures held in T11).
+- [ ] [P5-T9] Gate (no tag exclusion): run CR-PESTER-LIST with `<LIST>` = LIST-CLAUDE-SUITES; `<PATTERNS>` = `E4-TR1:*`, `E4-TR4:*`, `E4-TR4a:*`, `E4-TR4c:*`, `E4-TR10a*`, `E4-TR10b*`, `E4-TR10c*`, `E4-TR10d*`, `E4-ST4*`, `E4-ST1*`, `TG*`, `E4-TG4*`, `F824-*`, `E4-TR5-P*`, and the four GUARD-PATTERNS; write `<FEATURE>/evidence/qa-gates/phase5-cr4-pester.<ts>.md`. Acceptance: `NAMED: E4-TR1:* | Passed=1 | Failed=0`, `NAMED: E4-TR4:* | Passed=1 | Failed=0`, `NAMED: E4-TR4a:* | Passed=2 | Failed=0`, `NAMED: E4-TR4c:* | Passed=1 | Failed=0`, `NAMED: E4-TR10a* | Passed=8 | Failed=0`, `NAMED: E4-TR10b* | Passed=6 | Failed=0`, `NAMED: E4-TR10c* | Passed=1 | Failed=0`, `NAMED: E4-TR10d* | Passed=2 | Failed=0`, `NAMED: E4-ST4* | Passed=3 | Failed=0`, `NAMED: E4-TR5-P* | Passed=6 | Failed=0`, each `S1`, `S2`, `S6` GUARD-PATTERN line `Passed=2 | Failed=0`, `NAMED: N1:* | Passed=2 | Failed=0` (N1 rule), `TOTAL:` with `Failed=0` and `EXIT_CODE_COMPUTED: 0`, or, when every `FAILED:` line meets the PEF, `EXIT_CODE_COMPUTED: 1`, process exit code 1, and an artifact recording `ExpectedExitCode: 1` and `PRE-EXISTING-STILL-FAILING:` (PEF).
+- [ ] [P5-T10] Check off AC-7 in `<FEATURE>/spec.md` (P5-T9 both `E4-TR4a` rows and `E4-TR4`; P1-T5 base failure of `E4-TR4`). Acceptance: only the AC-7 checkbox changed.
+- [ ] [P5-T11] Check off AC-6 in `<FEATURE>/spec.md` (P4-T14 empty search; P5-T9 all four Claude hook suites passing with no exclusion). Acceptance: only the AC-6 checkbox changed.
+- [ ] [P5-T12] Check off AC-30 in `<FEATURE>/spec.md` (P5-T9 `E4-TR10a` through `E4-TR10d`). Acceptance: only the AC-30 checkbox changed.
+- [ ] [P5-T13] Commit and push Phase 5: `git add .claude/hooks/validate-feature-review-coverage.ps1 .claude/hooks/validate-feature-review-coverage-metrics.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks tests/scripts/claude-hooks <FEATURE>/evidence <FEATURE>/spec.md`, `git commit -m "fix(896): fail closed on an unreadable root CLAUDE.md (CR-4) and pin the re-entry policy"`, `git push origin <BRANCH>`. Acceptance: `git status --porcelain` prints nothing and after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`.
+
+### Phase 6 — Codex Hook Floor Source (#884 Codex half)
+
+- [ ] [P6-T1] Create H6 `.codex/hooks/feature-review-coverage-thresholds.ps1` as a byte copy of H4: run CR-MIRROR with `<PAIRS>` = `@{ Source = '.claude/hooks/feature-review-coverage-thresholds.ps1'; Mirror = '.codex/hooks/feature-review-coverage-thresholds.ps1' }`; write `<FEATURE>/evidence/other/phase6-thresholds-copy.<ts>.md`. Acceptance: one `COPIED:` line ending `MATCH` and `COPY-DIFFER-COUNT: 0`.
+- [ ] [P6-T2] Edit H5 `.codex/hooks/validate-feature-review-coverage.ps1`: add the H5 guarded dot-source line quoted under Guarded Dot-Source Literals immediately after line 43. Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <H5>; Present = @(<the quoted H5 line>) }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P6-T3] Edit `Test-LanguageCoverageRow` in H5 (lines 142-207): add `[double] $LineFloor = 85.0`; replace `-lt 80.0` (line 196) with `-lt $LineFloor`; replace the line-201 message with `("{0} repo-wide coverage is {1}% (below the {2}% line coverage floor) but the policy-audit contains no FAIL verdict on a coverage row for {0}." -f $Language, $RepoWidePct, $LineFloor)`. Acceptance: CR-PARSE with `<LIST>` = H5 prints `errors=0`, and CR-TEXT with `<CHECKS>` = `@{ Path = <H5>; Present = @('[double] $LineFloor = 85.0', '-lt $LineFloor'); Absent = @('80.0') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P6-T4] Edit the H5 entry (lines 264-290): after the `$changedLanguages.Count -eq 0` exit (lines 267-269), add `$claudeMdPath = Join-Path $repoRoot 'CLAUDE.md'`, `$claudeMdText = $null`, `if (Test-Path -Path $claudeMdPath) { try { $claudeMdText = Get-Content -Path $claudeMdPath -Raw -ErrorAction Stop } catch { throw "root CLAUDE.md exists but could not be read ($(([string]$_.Exception.Message -split "`r?`n")[0])); coverage floors cannot be resolved, so the gate fails closed." } }`, and `$thresholds = Get-FeatureReviewCoverageThreshold -ClaudeMdText $claudeMdText`; pass `-LineFloor $thresholds.Line` in the line-275 call; replace the line-284 footer text `below 80%` with `below the governing line coverage floor ($($thresholds.Line)%)`. Use `-Path` (not `-LiteralPath`) and no `-PathType` argument, matching the existing Codex reads (for example line 69) and the existing mocks' `param($Path)` binding. Keep the stdin read, `stop_hook_active` handling, continuation output, and catch (lines 237-262, 286-304) unchanged. Acceptance: CR-PARSE with `<LIST>` = H5 prints `errors=0`, and CR-TEXT with `<CHECKS>` = `@{ Path = <H5>; Present = @('Get-FeatureReviewCoverageThreshold -ClaudeMdText $claudeMdText', '-LineFloor $thresholds.Line'); Absent = @('80%') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P6-T5] Edit the H5 comment-based help (lines 22-25): replace the 80-percent text with the governing-floor statement (root `CLAUDE.md` line threshold when stated, otherwise the 85 percent default; the Codex hook enforces the line floor only) including the two Help-Text Tokens sentences; add no `python` token. Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <H5>; Normalize = $true; Present = @('an absent root CLAUDE.md uses the defaults', 'an unreadable root CLAUDE.md fails closed'); Absent = @('80.0', '80%', '80 percent') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P6-T6] In T6, change the `low coverage without FAIL` row (line 135) pattern from `below the 80% floor` to `below the 85% line coverage floor`. Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <T6>; Present = @('below the 85% line coverage floor'); Absent = @('80% floor') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P6-T7] In T6 `Context 'entry point'`, add `It 'E4-TR8: a CLAUDE.md line floor of 70 lets a 72% row pass'` (the P1-T4 `Test-Path` and `Get-ChildItem` mocks, and the P1-T4 `Get-Content` mock with `@('LF:100', 'LH:72')` for paths ending `lcov.info` and `Line coverage >= 70%` for paths ending `CLAUDE.md`; assert `ExitCode` 0 and empty `Stdout`) and `It 'E4-TR9: an unreadable CLAUDE.md <Case>' -ForEach` with two rows that both use the P1-T4 `Test-Path`, `Get-ChildItem`, and `Get-Content` mocks except that `Get-Content` throws `simulated read failure: access denied` for paths ending `CLAUDE.md` (literal: `Mock Get-Content { param($Path) $p = [string]$Path; if ($p.EndsWith('CLAUDE.md')) { throw 'simulated read failure: access denied' } elseif ($p.EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } elseif ($p.EndsWith('lcov.info')) { @('LF:1000', 'LH:805') } else { 'Python coverage PASS' } }`): `stop_hook_active false exits 2` (stdin `$script:ReviewStop`; assert `ExitCode` 2 and `Stderr` containing `root CLAUDE.md` and `could not be read`) and `stop_hook_active true emits continue false` (stdin `$script:ReviewStopActive`; assert `ExitCode` 0, `Stdout` containing `"continue":false`, and `($result.Stdout | ConvertFrom-Json).continue` false). Add `It 'E4-ST7: the Codex hook reads the floor from its own thresholds copy'` that reads H5 and asserts: the text contains the H5 guarded line; no dot-source `CommandAst` (invocation operator `Dot`) has an extent containing `.claude`; the text contains neither `subagentstop-envelope.ps1` nor `Exit-SubagentStopBlock`; the text contains none of `80.0`, `80%`, `80 percent`. Acceptance: CR-PARSE with `<LIST>` = T6 and `<IT-PATTERNS>` = `E4-TR8:*`, `E4-TR9:*`, `E4-ST7:*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1 for each pattern.
+- [ ] [P6-T8] Create T7 `tests/scripts/codex-hooks/feature-review-coverage-thresholds.Tests.ps1` (Pester 5; `#Requires -Version 7.0`; header help stating the determinism rules): `It 'E4-PX2: the four thresholds copies are byte-identical'` asserting equal `Get-FileHash -Algorithm SHA256` values for `.claude/hooks/feature-review-coverage-thresholds.ps1`, `.codex/hooks/feature-review-coverage-thresholds.ps1`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/feature-review-coverage-thresholds.ps1`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/feature-review-coverage-thresholds.ps1` (located from `$PSScriptRoot` with `Join-Path`); and `It 'E4-PX2-<Id> the Codex copy resolves <Label>' -ForEach` carrying the eleven T824 rows of T5 lines 28-38 and the nine E4-TR5 rows of P1-T3, run against the `.codex/hooks/` copy dot-sourced in `BeforeAll`. Acceptance: CR-PARSE with `<LIST>` = T7 and `<IT-PATTERNS>` = `E4-PX2:*`, `E4-PX2-*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1 for each pattern (the twenty rows are counted by P6-T13).
+- [ ] [P6-T9] Edit T9 `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` line 30: append `, 'feature-review-coverage-thresholds.ps1'` inside the `$script:SharedModuleNames` array on the same line. Acceptance: CR-LINES with `<LIST>` = T9 prints `count=497`, and CR-TEXT with `<CHECKS>` = `@{ Path = <T9>; Present = @("'hook-dependency-guard.ps1', 'feature-review-coverage-thresholds.ps1')") }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P6-T10] Edit P2 `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`: insert `".codex/hooks/feature-review-coverage-thresholds.ps1",` after line 46 (`.codex/hooks/feature-folder-resolution.ps1`). Acceptance: CR-JSON with `<MANIFEST>` = P2 and `<ENTRIES>` = `.codex/hooks/feature-review-coverage-thresholds.ps1` prints `JSON-MISSING-COUNT: 0`.
+- [ ] [P6-T11] Mirror H5 and H6 to `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/`: run CR-MIRROR with `<PAIRS>` = the H5 and H6 pairs, then CR-SHA with `<PAIRS>` = the H4, H5, H6 pairs and the `.claude`-to-`.codex` thresholds pair; write `<FEATURE>/evidence/other/phase6-mirror.<ts>.md`. Acceptance: `COPY-DIFFER-COUNT: 0`, four `SHA:` lines ending `MATCH`, and `SHA-DIFFER-COUNT: 0`.
+- [ ] [P6-T12] In T1, add `It 'E4-ST3: <File> help states the absent and unreadable CLAUDE.md rules' -ForEach` over H1 and H5: each row reads the file's first comment block (the script-level help), collapses whitespace runs to one space, and asserts it contains "an absent root CLAUDE.md uses the defaults" and "an unreadable root CLAUDE.md fails closed"; the H1 row also asserts "falls back independently". Acceptance: CR-PARSE with `<LIST>` = T1 and `<IT-PATTERNS>` = `E4-ST3*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1.
+- [ ] [P6-T13] Gate: run CR-PESTER-LIST with `<LIST>` = T6, T7, T9, `tests/scripts/codex-hooks/hook-dependency-failure.Codex.Tests.ps1`, `tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1`, T1, and LIST-RUNTIME-SUITES; no tag filters; `<PATTERNS>` = `E4-TR7:*`, `E4-TR8:*`, `E4-TR9:*`, `E4-ST7:*`, `E4-PX2*`, `E4-ST3*`, `uses one SubagentStop continuation*`, `S2:*.codex/hooks/validate-feature-review-coverage.ps1*`, `N1:*`; write `<FEATURE>/evidence/qa-gates/phase6-codex-pester.<ts>.md`. Acceptance: `NAMED: E4-TR7:* | Passed=1 | Failed=0`, `NAMED: E4-TR8:* | Passed=1 | Failed=0`, `NAMED: E4-TR9:* | Passed=2 | Failed=0`, `NAMED: E4-ST7:* | Passed=1 | Failed=0`, `NAMED: E4-PX2* | Passed=21 | Failed=0`, `NAMED: E4-ST3* | Passed=2 | Failed=0`, the continuation pattern `Passed=1 | Failed=0`, `NAMED: S2:*.codex/hooks/validate-feature-review-coverage.ps1* | Passed=2 | Failed=0`, `NAMED: N1:* | Passed=2 | Failed=0` (N1 rule), `TOTAL:` with `Failed=0` and `EXIT_CODE_COMPUTED: 0`, or, when every `FAILED:` line meets the PEF, `EXIT_CODE_COMPUTED: 1`, process exit code 1, and an artifact recording `ExpectedExitCode: 1` and `PRE-EXISTING-STILL-FAILING:` (PEF).
+- [ ] [P6-T14] AC-17 configuration check: run `git diff --name-only origin/epic/subagentstop-envelope-integration...HEAD -- .codex/config.toml extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml` and `git status --porcelain -- .codex/config.toml extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml`; write `<FEATURE>/evidence/qa-gates/codex-config-unchanged.<ts>.md`. Acceptance: both commands print nothing.
+- [ ] [P6-T15] Check off AC-14 in `<FEATURE>/spec.md` (P6-T13 `E4-PX2`). Acceptance: only the AC-14 checkbox changed.
+- [ ] [P6-T16] Check off AC-15 in `<FEATURE>/spec.md` (P6-T13 `E4-ST7`). Acceptance: only the AC-15 checkbox changed.
+- [ ] [P6-T17] Check off AC-16 in `<FEATURE>/spec.md` (P1-T5 base failure of `E4-TR7`; P6-T13 `E4-TR7`, `E4-TR8`, both `E4-TR9` rows). Acceptance: only the AC-16 checkbox changed.
+- [ ] [P6-T18] Check off AC-17 in `<FEATURE>/spec.md` (P6-T13 legacy, dependency-failure, and probe suites passing; P6-T14 empty diff) only if no `PRE-EXISTING-STILL-FAILING:` entry in the P6-T13 artifact names a test in T9, `tests/scripts/codex-hooks/hook-dependency-failure.Codex.Tests.ps1`, or `tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1`, that is, the P6-T13 `SUITE:` line of each of those three files reads `Failed=0`; otherwise leave it unchecked and record the reason in `<FEATURE>/evidence/qa-gates/phase6-codex-pester.<ts>.md`. Acceptance: only the AC-17 checkbox changed, or it stays unchecked with the reason recorded.
+- [ ] [P6-T19] Commit and push Phase 6: `git add .codex/hooks/validate-feature-review-coverage.ps1 .codex/hooks/feature-review-coverage-thresholds.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json tests/scripts/codex-hooks tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1 <FEATURE>/evidence <FEATURE>/spec.md`, `git commit -m "fix(896): read the Codex feature-review line floor from root CLAUDE.md (Refs #884)"`, `git push origin <BRANCH>`. Acceptance: `git status --porcelain` prints nothing and after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`.
+
+### Phase 7 — Claude and Codex Floor Parity
+
+- [ ] [P7-T1] Create T8 `tests/scripts/codex-hooks/feature-review-coverage-floor-parity.Tests.ps1` (Pester 5; header help): define `Get-FloorFromReason` (returns the number captured by `below the (?<floor>\d+(?:\.\d+)?)% line coverage floor`); define `Get-ClaudeFloorReason -ClaudeMdText` as `& { param($HookPath, $Text) . $HookPath; $t = Get-FeatureReviewCoverageThreshold -ClaudeMdText $Text; (Test-LanguageCoverageRow -AuditText 'Python coverage PASS' -Language 'Python' -RepoWidePct 60 -LineFloor $t.Line -LineSource $t.LineSource).Reason } <H1 path> $ClaudeMdText` and `Get-CodexFloorReason -ClaudeMdText` with the same shape over the H5 path and `-LineFloor $t.Line` (so each hook loads in its own child scope); add `It 'E4-PX1: <Label> reports line floor <Floor> on both surfaces' -ForEach` with rows `no figure` (`Project notes without coverage figures.`, 85), `comparator form` (`Line coverage >= 70%`, 70), `trailing form` (`line coverage: 92% minimum`, 92), each asserting the Claude floor equals the Codex floor equals the row's `Floor`. Acceptance: CR-PARSE with `<LIST>` = T8 and `<IT-PATTERNS>` = `E4-PX1:*` prints `PARSE-ERROR-COUNT: 0` and an `IT-COUNT:` of 1.
+- [ ] [P7-T2] Gate: run CR-PESTER-LIST with `<LIST>` = T8; `<PATTERNS>` = `E4-PX1*`; write `<FEATURE>/evidence/qa-gates/phase7-parity-pester.<ts>.md`. Acceptance: `NAMED: E4-PX1* | Passed=3 | Failed=0`, `EXIT_CODE_COMPUTED: 0`.
+- [ ] [P7-T3] Check off AC-19 in `<FEATURE>/spec.md`. Acceptance: only the AC-19 checkbox changed.
+- [ ] [P7-T4] Commit and push Phase 7: `git add tests/scripts/codex-hooks/feature-review-coverage-floor-parity.Tests.ps1 <FEATURE>/evidence <FEATURE>/spec.md`, `git commit -m "test(896): pin Claude and Codex feature-review floor parity"`, `git push origin <BRANCH>`. Acceptance: `git status --porcelain` prints nothing and after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`.
+
+### Phase 8 — Skill and Agent Texts
+
+- [ ] [P8-T1] Edit S1 `.agents/skills/feature-review-workflow/SKILL.md` lines 111-114: replace the four threshold lines with "Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured); modified files must also show no regression on changed lines. Repo-wide coverage per language must meet the governing thresholds. Flag as FAIL otherwise." (research Q9, `research.2026-10-11T08-10.md:312`), keeping the list indentation of line 111. Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <S1>; Present = @('CLAUDE.md', '85%', '75%') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P8-T2] Edit S1 line 148: replace it with "coverage below the governing thresholds defined in step 5 (repo-wide per language, modified files including any regression on changed lines, or new files)", keeping its indentation. Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <S1>; Present = @('governing thresholds'); Absent = @('80%', '90%') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P8-T3] Edit S2 `.github/skills/feature-review-workflow/SKILL.md` line 126: replace it with "coverage below the governing thresholds (the root `CLAUDE.md` thresholds when stated, otherwise the defaults: line 85%, branch 75% for branch-capable languages; repo-wide per language, modified files including any regression on changed lines, or new files)", keeping its indentation. Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <S2>; Present = @('CLAUDE.md', '85%', '75%', 'governing thresholds'); Absent = @('80%', '90%') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P8-T4] Edit S3 `.codex/agents/feature-review.toml` lines 121-123: replace the three bullets with the P8-T1 statement adapted to bullets (root `CLAUDE.md` governs when it states a threshold; otherwise line 85% and branch 75% for branch-capable languages; each metric falls back independently; new and modified files meet the governing line threshold; modified files show no regression on changed lines; repo-wide coverage meets the governing thresholds). Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <S3>; Present = @('CLAUDE.md', '85%', '75%') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P8-T5] Edit S3 lines 133-135: replace each fixed figure with "below the governing line threshold" wording (repo-wide; each new file; each modified file, including regression from baseline). Acceptance: CR-TEXT with `<CHECKS>` = `@{ Path = <S3>; Present = @('governing line threshold'); Absent = @('80%', '90%') }` prints `TEXT-CHECK-FAILURES: 0`.
+- [ ] [P8-T6] Mirror S1, S2, S3: run CR-MIRROR with `<PAIRS>` = the S1, S2, S3 pairs of LIST-MIRROR-PAIRS; write `<FEATURE>/evidence/other/phase8-mirror.<ts>.md`. Acceptance: three `COPIED:` lines ending `MATCH` and `COPY-DIFFER-COUNT: 0`.
+- [ ] [P8-T7] Edit T10 `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`: extend `STEP_EIGHT_COPIES` (lines 70-73) with `".agents/skills/feature-review-workflow/SKILL.md"`, `CODEX_BUNDLE + ".agents/skills/feature-review-workflow/SKILL.md"`, `".github/skills/feature-review-workflow/SKILL.md"`, `GITHUB_BUNDLE + ".github/skills/feature-review-workflow/SKILL.md"`; set `EXPECTED_LISTED_COPY_COUNT` (line 94) to `40`; add `FEATURE_REVIEW_TEXT_COPIES` (the six `feature-review-workflow/SKILL.md` copies and both `.codex/agents/feature-review.toml` copies), `CLAUDE_MD_FLOOR_SOURCE = "CLAUDE.md"`, `DEFAULT_FLOOR_FIGURES = ("85%", "75%")`, and a fully annotated `@pytest.mark.parametrize("relative_path", FEATURE_REVIEW_TEXT_COPIES)` test `test_feature_review_texts_name_claude_md_floor_source(relative_path: str) -> None` with a docstring and Arrange/Act/Assert sections asserting the file contains neither `80%` nor `90%`, contains `CLAUDE.md`, and contains `85%` and `75%`. Do not add the new tuple to the `listed` tuple of `test_every_follow_up_copy_exists`. Acceptance: `poetry run python -m py_compile tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py` exits 0 and CR-LINES with `<LIST>` = T10 prints `LINES-OVER-CAP: 0`.
+- [ ] [P8-T8] Gate: run `poetry run pytest "tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py::test_feature_review_texts_name_claude_md_floor_source"`; write `<FEATURE>/evidence/qa-gates/phase8-texts-pytest.<ts>.md`. Acceptance: the summary line reads `8 passed` with no failure.
+- [ ] [P8-T9] Gate: run `poetry run pytest "tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py::test_review_workflow_step_eight_uses_governing_thresholds" "tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py::test_every_follow_up_copy_exists"`; write `<FEATURE>/evidence/qa-gates/phase8-step-eight-pytest.<ts>.md`. Acceptance: the summary line reads `7 passed` with no failure (six step-8 copies plus the existence test).
+- [ ] [P8-T10] Gate: run `poetry run pytest tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py tests/scripts/dev_tools/test_ci_gate_epic_child_contracts.py`; write `<FEATURE>/evidence/qa-gates/phase8-module-pytest.<ts>.md`. Acceptance: the summary line has a numeric `passed` count and no `failed` count.
+- [ ] [P8-T11] AC-22 check: run `git diff --name-only origin/epic/subagentstop-envelope-integration...HEAD -- .github/instructions .claude/rules` and `git status --porcelain -- .github/instructions .claude/rules`; write `<FEATURE>/evidence/qa-gates/policy-files-unchanged.<ts>.md`. Acceptance: both commands print nothing.
+- [ ] [P8-T12] Check off AC-20 in `<FEATURE>/spec.md` (P8-T8). Acceptance: only the AC-20 checkbox changed.
+- [ ] [P8-T13] Check off AC-21 in `<FEATURE>/spec.md` (P8-T9). Acceptance: only the AC-21 checkbox changed.
+- [ ] [P8-T14] Check off AC-22 in `<FEATURE>/spec.md` (P8-T11). Acceptance: only the AC-22 checkbox changed.
+- [ ] [P8-T15] Check off AC-8 in `<FEATURE>/spec.md` (P6-T13 `E4-ST3`; P8-T10 `test_push_down_issue_824_follow_ups.py` passing; spec Proposed Fix item 4 records the supersession of the #824 spec line 122). Acceptance: only the AC-8 checkbox changed.
+- [ ] [P8-T16] Commit and push Phase 8: `git add .agents/skills/feature-review-workflow/SKILL.md .github/skills/feature-review-workflow/SKILL.md .codex/agents/feature-review.toml extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-review.toml tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py <FEATURE>/evidence <FEATURE>/spec.md`, `git commit -m "docs(896): name root CLAUDE.md as the feature-review floor source in skill and agent texts"`, `git push origin <BRANCH>`. Acceptance: `git status --porcelain` prints nothing and after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`.
+
+### Phase 9 — Mirror and Manifest Verification
+
+- [ ] [P9-T1] Run CR-SHA with `<PAIRS>` = all nine LIST-MIRROR-PAIRS entries; write `<FEATURE>/evidence/other/mirror-log.<ts>.md` (AC-23) with every `SHA:` line verbatim, including the `.github/skills/feature-review-workflow/SKILL.md` pair, which has no automated parity test. Acceptance: nine `SHA:` lines ending `MATCH` and `SHA-DIFFER-COUNT: 0`.
+- [ ] [P9-T2] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`; write `<FEATURE>/evidence/qa-gates/mirror-parity-pytest.<ts>.md`. Acceptance: numeric `passed` count and no `failed` count.
+- [ ] [P9-T3] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py tests/scripts/dev_tools/test_codex_core_manifest_closure.py`; write `<FEATURE>/evidence/qa-gates/manifest-pytest.<ts>.md`. Acceptance: numeric `passed` count and no `failed` count.
+- [ ] [P9-T4] Check off AC-9 in `<FEATURE>/spec.md` (P5-T9 `E4-ST4`; P9-T3 Claude manifest completeness). Acceptance: only the AC-9 checkbox changed.
+- [ ] [P9-T5] Check off AC-18 in `<FEATURE>/spec.md` (P9-T3 Codex manifest completeness; P6-T13 legacy contracts passing; P6-T9 `count=497`) only if no `PRE-EXISTING-STILL-FAILING:` entry in the P6-T13 artifact names a test in T9, that is, the P6-T13 `SUITE:` line for `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` reads `Failed=0`; otherwise leave it unchecked and record the reason in `<FEATURE>/evidence/qa-gates/manifest-pytest.<ts>.md`. Acceptance: only the AC-18 checkbox changed, or it stays unchecked with the reason recorded.
+- [ ] [P9-T6] Check off AC-23 in `<FEATURE>/spec.md` (P9-T1, P9-T2). Acceptance: only the AC-23 checkbox changed.
+- [ ] [P9-T7] Commit and push Phase 9: `git add <FEATURE>/evidence <FEATURE>/spec.md`, `git commit -m "docs(896): record mirror and manifest verification"`, `git push origin <BRANCH>`. Acceptance: `git status --porcelain` prints nothing and after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`.
+
+### Phase 10 — Final QC Loop (PowerShell and Python)
+
+Loop rule: run P10-T1 through P10-T9 in order. If any step fails, or P10-T1 reports a non-zero `FORMAT-APPLIED-COUNT`, or P10-T3 reports `reformatted`, fix the cause, re-run CR-MIRROR for any changed mirrored file, and restart from P10-T1. Number each pass in the artifact names (`pass<k>`). A step that passes only under the PEF does not restart the loop. The loop is complete only when one pass runs P10-T1 through P10-T9 with every step meeting its acceptance (directly or under the PEF) and no file change.
+
+- [ ] [P10-T1] PowerShell format (write mode; PI-7): run CR-FORMAT-APPLY with `<LIST>` = LIST-PROD plus LIST-TEST; write `<FEATURE>/evidence/qa-gates/final-format.pass<k>.<ts>.md`. Acceptance for a clean pass: one `FORMAT-UNCHANGED:` line per file and `FORMAT-APPLIED-COUNT: 0`; also record `git status --porcelain` before and after, which must be identical.
+- [ ] [P10-T2] PowerShell lint (PI-7): run CR-PSSA with `<LIST>` = LIST-PROD plus LIST-TEST; write `<FEATURE>/evidence/qa-gates/final-pssa.pass<k>.<ts>.md`. Acceptance: one `PSSA:` line per file with `findings=0`, `PSSA-TOTAL: 0`, `EXIT_CODE_COMPUTED: 0`.
+- [ ] [P10-T3] Python format (write mode): run `poetry run black tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`; write `<FEATURE>/evidence/qa-gates/final-python-black.pass<k>.<ts>.md`. Acceptance for a clean pass: the output contains `1 file left unchanged` and does not contain `reformatted`.
+- [ ] [P10-T4] Python lint: run `poetry run ruff check tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`; write `<FEATURE>/evidence/qa-gates/final-python-ruff.pass<k>.<ts>.md`. Acceptance: the output contains `All checks passed!` and `EXIT_CODE: 0`.
+- [ ] [P10-T5] Python type check: run `poetry run pyright tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`; write `<FEATURE>/evidence/qa-gates/final-python-pyright.pass<k>.<ts>.md`. Acceptance: the summary line reports `0 errors` and `EXIT_CODE: 0`.
+- [ ] [P10-T6] Targeted Pester over every in-scope suite: run CR-PESTER-LIST with `<LIST>` = LIST-CLAUDE-SUITES plus LIST-CODEX-SUITES plus LIST-AUX; no tag filters; `<PATTERNS>` = `E4-TR*`, `E4-ST*`, `E4-PX*`, `E4-TG*`, `TG*`, `F824-*`, `T824-*`, and the four GUARD-PATTERNS; write `<FEATURE>/evidence/qa-gates/final-pester-targeted.pass<k>.<ts>.md` and compare each `SUITE:` line with P0-T12. Acceptance: each `S1`, `S2`, `S6` GUARD-PATTERN line `Passed=2 | Failed=0`; every suite present in P0-T12 present here; and either `TOTAL:` with `Failed=0` and `EXIT_CODE_COMPUTED: 0`, or, when every `FAILED:` line meets the PEF, `EXIT_CODE_COMPUTED: 1`, process exit code 1, and an artifact recording `ExpectedExitCode: 1` and `PRE-EXISTING-STILL-FAILING:` (PEF).
+- [ ] [P10-T7] Full-population Pester with coverage: run CR-POSHQC-FULL through the scratchpad route, then CR-JUNIT; write `<FEATURE>/evidence/qa-gates/final-pester-full-run.pass<k>.<ts>.md` with the `Tests Passed:`, `Covered`, and `JUNIT:` lines verbatim. The artifact `EXIT_CODE:` records the CR-JUNIT process exit code. Acceptance: the `Tests Passed:` and `Covered` lines are present, and either (a) the `Tests Passed:` line contains `Failed: 0,`, `JUNIT:` shows `failures=0 | errors=0`, and `EXIT_CODE_COMPUTED: 0`, or (b) every `JUNIT-FAILED:` name is listed `PRE-EXISTING:` in the P0-T13 artifact and contains none of the PEF tokens (`validate-feature-review-coverage`, `feature-review-coverage-thresholds`, `E4-`, `TG1:`, `TG2:`, `TG3:`, `F824-`, `T824-`), `EXIT_CODE_COMPUTED: 1`, and the artifact records `ExpectedExitCode: 1` and lists each such name under `PRE-EXISTING-STILL-FAILING:`. This run includes `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1` and `tests/scripts/claude-hooks/hook-dependency-failure.SpecialCases.Tests.ps1` through the `tests/scripts` run path (`pester.runsettings.psd1:3`). A pre-existing failure under (b) is recorded, not fixed, and leaves AC-28 unchecked (P11-T15).
+- [ ] [P10-T8] Per-file coverage (AC-25 final half), immediately after P10-T7 with no Pester run in between: run CR-COV-FILES with `<LIST>` = LIST-PROD; write `<FEATURE>/evidence/qa-gates/final-pester-coverage.<ts>.md`. Acceptance: six `COVERAGE:` lines with numeric values, each `pct=` at least 85.00, `COVERAGE-BELOW-85: NONE`, `EXIT_CODE_COMPUTED: 0`.
+- [ ] [P10-T9] Python contract tests: run PYTEST-SPEC, then `poetry run pytest tests/scripts/dev_tools/test_ci_gate_epic_child_contracts.py`; write `<FEATURE>/evidence/qa-gates/final-pytest-contracts.pass<k>.<ts>.md` with both summary lines. Acceptance: both summary lines have a numeric `passed` count and no `failed` count.
+- [ ] [P10-T10] Write `<FEATURE>/evidence/qa-gates/final-qc-loop.<ts>.md` listing each pass number, the artifacts of the clean pass, and the restart causes of earlier passes. Acceptance: the artifact names one pass in which P10-T1 through P10-T9 all met their acceptance with no file change.
+- [ ] [P10-T11] Commit and push Phase 10: `git add <FEATURE>/evidence` plus any file changed by a restarted pass (named explicitly in the commit), `git commit -m "docs(896): record final QC loop"`, `git push origin <BRANCH>`. When any pass changed a LIST-MIRROR-PAIRS source, run CR-SHA with `<PAIRS>` = all nine LIST-MIRROR-PAIRS entries before the commit and append its output to the P9-T1 `mirror-log` artifact under `## Post-QC re-hash`. Acceptance: when that re-hash ran, nine `SHA:` lines ending `MATCH` and `SHA-DIFFER-COUNT: 0` in that section; `git status --porcelain` prints nothing and after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`.
+
+### Phase 11 — Verification Records and Acceptance-Criteria Check-off
+
+- [ ] [P11-T1] File sizes (AC-10): run CR-LINES with `<LIST>` = LIST-PROD plus LIST-TEST plus `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`; write `<FEATURE>/evidence/qa-gates/file-size.<ts>.md`, stating the 300-line design target and the count of each production file. Acceptance: `LINES-OVER-CAP: 0`; each of H1, H2, H3 reports `WITHIN-TARGET`; T9 reports `count=497`; any `OVER-TARGET` production file (expected: H5) is named with its count.
+- [ ] [P11-T2] Coverage delta: run CR-COV-CHANGED with `<LIST>` = LIST-PROD (after the Phase 10 commit; `artifacts/pester/powershell-coverage.xml` is the P10-T7 output); write `<FEATURE>/evidence/qa-gates/coverage-delta.<ts>.md` containing a table of baseline `pct=` (P0-T14; `NEW` for H2, H3, H6), post-change `pct=` (P10-T8), and changed-line `pct=` (this task) per file. Acceptance: six `CHANGED-COVERAGE:` lines, `CHANGED-BELOW-85: NONE`, `EXIT_CODE_COMPUTED: 0`, and no post-change figure below 85.00.
+- [ ] [P11-T3] Fail-first head run (AC-24): run CR-PESTER-LIST with `<LIST>` = T2, T5, T6; `<TAGS-IN>` = `E4-Regression`; `<PATTERNS>` = `E4-TR1:*`, `E4-TR4:*`, `E4-TR5-P*`, `E4-TR7:*`; write `<FEATURE>/evidence/qa-gates/fail-first-head-run.<ts>.md`, and append a `## Branch-head run` section to the P1-T5 artifact with the command, the `NAMED:` lines, and `HEAD_RUN_EXIT_CODE:`. Acceptance: `NAMED: E4-TR1:* | Passed=1 | Failed=0`, `NAMED: E4-TR4:* | Passed=1 | Failed=0`, `NAMED: E4-TR5-P* | Passed=6 | Failed=0`, `NAMED: E4-TR7:* | Passed=1 | Failed=0`, `EXIT_CODE_COMPUTED: 0`.
+- [ ] [P11-T4] Constraints, AC-26 (a) (PI-1): run `git diff --name-status origin/epic/subagentstop-envelope-integration -- .claude/hooks/ .codex/hooks/` and `git status --porcelain -- .claude/hooks/ .codex/hooks/` (the AC-26 (a) commands verbatim); create `<FEATURE>/evidence/qa-gates/constraints.<ts>.md` with both outputs and the PI-1 statement. Acceptance: the diff output contains the lines for `.claude/hooks/validate-feature-review-coverage-metrics.ps1`, `.claude/hooks/validate-feature-review-coverage-rules.ps1`, and `.codex/hooks/feature-review-coverage-thresholds.ps1` with status `A`; no diff line with status `A` names a path ending `.py`; the status command prints nothing (so no untracked `.py` path exists).
+- [ ] [P11-T5] Constraints, AC-26 (b) (PI-1): run CR-PESTER-LIST with `<LIST>` = LIST-AUX; no tag filters; no patterns; write the output to its own artifact `<FEATURE>/evidence/qa-gates/constraints-no-python.<ts>.md` (separate from the constraints artifact, because `ExpectedExitCode:` is per file and this step may need `ExpectedExitCode: 1`), and add one line to the constraints artifact naming that path. Acceptance: one `SUITE:` line for `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` with `Failed=0`, `TOTAL:` with `Failed=0`, `EXIT_CODE_COMPUTED: 0`; or, when every `FAILED:` line names a test that P0-T12 lists as `PRE-EXISTING:` and the `TOTAL:` line reads `FailedBlocks=0 | FailedContainers=0` (the PEF condition), `EXIT_CODE_COMPUTED: 1`, process exit code 1, and the constraints-no-python artifact records `ExpectedExitCode: 1` for this step, each such line under `PRE-EXISTING-STILL-FAILING:`, and `AC-26(b): NOT MET`.
+- [ ] [P11-T6] Constraints, AC-26 (c) (PI-1): run CR-PY-TOKEN with `$Mode = 'final'`; append the output to the constraints artifact. Acceptance: two `PY-TOKEN:` lines (`claude-hooks`, `codex-hooks`) ending `NOT-INCREASED`, `PY-TOKEN-INCREASED-COUNT: 0`, `EXIT_CODE_COMPUTED: 0`.
+- [ ] [P11-T7] Constraints, AC-26 temporary-file clause: run `git grep -n -F -e New-TemporaryFile -e GetTempFileName -e TestDrive -e '$env:TEMP' -- tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1 tests/scripts/claude-hooks/validate-feature-review-coverage.Coverage.Tests.ps1 tests/scripts/claude-hooks/validate-feature-review-coverage.E4.Helpers.ps1 tests/scripts/claude-hooks/validate-feature-review-coverage.Issue824.Tests.ps1 tests/scripts/claude-hooks/validate-feature-review-coverage.ThresholdsGuard.Tests.ps1 tests/scripts/claude-hooks/feature-review-coverage-thresholds.Tests.ps1 tests/scripts/codex-hooks/validate-feature-review-coverage.Coverage.Tests.ps1 tests/scripts/codex-hooks/feature-review-coverage-thresholds.Tests.ps1 tests/scripts/codex-hooks/feature-review-coverage-floor-parity.Tests.ps1 tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py` (single-quoted so no shell expands the variable); write the output to its own artifact `<FEATURE>/evidence/qa-gates/constraints-temp-files.<ts>.md` with `ExpectedExitCode: 1` (separate from the constraints artifact, because `ExpectedExitCode:` is per file and the constraints artifact's other steps expect exit 0), and add one line to the constraints artifact naming that path. Acceptance: no output and exit code 1.
+- [ ] [P11-T8] Scope boundary (AC-27): run `git diff --name-only origin/epic/subagentstop-envelope-integration...HEAD` and `git status --porcelain`; write `<FEATURE>/evidence/qa-gates/scope-boundary.<ts>.md` with the full list and a check line per forbidden path (the nine E2/E3 validator files under `.claude/hooks/` and their mirrors under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`, `.claude/settings.json`, `.claude/hooks/subagentstop-envelope.ps1` and its mirror, `.claude/lib/bash/compute-concurrency-batches.sh`, and the prefix `docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/`). Acceptance: every check line reads `ABSENT` and `git status --porcelain` prints nothing.
+- [ ] [P11-T9] Write `<FEATURE>/evidence/other/ac-29-handoff.<ts>.md` stating the AC-29 requirements for the later PR body (`Refs #884` and `Refs #897` present; no closing keyword adjacent to `#884` or `#897`; a closing keyword permitted for `#896` only) and that AC-29 is verified at PR time under the epic orchestrator from `gh pr view <number> --json body` recorded in `<FEATURE>/evidence/issue-updates/`. Acceptance: the artifact exists with those three requirements; AC-29 stays unchecked.
+- [ ] [P11-T10] Check off AC-10 in `<FEATURE>/spec.md` (P11-T1). Acceptance: only the AC-10 checkbox changed.
+- [ ] [P11-T11] Check off AC-24 in `<FEATURE>/spec.md` (P1-T5 and P11-T3). Acceptance: only the AC-24 checkbox changed.
+- [ ] [P11-T12] Check off AC-25 in `<FEATURE>/spec.md` (P0-T14 and P10-T8). Acceptance: only the AC-25 checkbox changed.
+- [ ] [P11-T13] Check off AC-26 in `<FEATURE>/spec.md`, citing AC-26 (a) P11-T4, (b) P11-T5, (c) P11-T6, and the temporary-file clause P11-T7, under PI-1 (the constraints artifact restates PI-1), only if no `PRE-EXISTING-STILL-FAILING:` entry in the P11-T5 output in `<FEATURE>/evidence/qa-gates/constraints-no-python.<ts>.md` names a test in LIST-AUX, that is, the P11-T5 `SUITE:` line for `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` reads `Failed=0`; otherwise leave it unchecked and record the reason in the constraints artifact. Acceptance: only the AC-26 checkbox changed, or it stays unchecked with the reason recorded.
+- [ ] [P11-T14] Check off AC-27 in `<FEATURE>/spec.md` (P11-T8). Acceptance: only the AC-27 checkbox changed.
+- [ ] [P11-T15] Check off AC-28 in `<FEATURE>/spec.md` under PI-7 (format and analyze evaluated by CR-FORMAT-APPLY and CR-PSSA with the PoshQC settings file over LIST-PROD plus LIST-TEST, because the MCP PoshQC results carry no output) only if the P10-T10 clean pass shows `FORMAT-APPLIED-COUNT: 0`, `PSSA-TOTAL: 0`, full-run `failures=0 | errors=0`, and PYTEST-SPEC passing, with no `PRE-EXISTING-STILL-FAILING:` entry in any Phase 10 artifact. Acceptance: only the AC-28 checkbox changed, or it stays unchecked with the reason recorded in `<FEATURE>/evidence/qa-gates/final-qc-loop.<ts>.md`.
+- [ ] [P11-T16] Write the AC status summary per `acceptance-criteria-tracking` into `<FEATURE>/evidence/other/ac-status.<ts>.md` (source `spec.md`; total 31; checked count; remaining list, expected to be AC-29 only). Acceptance: the counts equal the number of `- [x] AC-` and `- [ ] AC-` lines in `<FEATURE>/spec.md`.
+- [ ] [P11-T17] Commit and push Phase 11: `git add <FEATURE>/evidence <FEATURE>/spec.md`, `git commit -m "docs(896): record verification evidence and acceptance-criteria status"`, `git push origin <BRANCH>`. Acceptance: `git status --porcelain` prints nothing and after `git fetch origin <BRANCH>`, `git rev-parse HEAD` equals `git rev-parse origin/<BRANCH>`.
+
+PR authoring, CI monitoring, and feature review are out of this plan's scope; they run later under the epic orchestrator, which verifies AC-29 at PR time.
+
+## Planner Self-Review
+
+SELF-REVIEW: RE-DERIVED THIS PASS
+
+Citations re-derived against the current tree in this pass (round-3 revision, v1.3; file and locator):
+
+R3-a. `.claude/hooks/validate-feature-review-coverage.ps1` — line 349 is `        [string] $RawPayload` (the P4-T3 absent token `[string] $RawPayload` matches it); `RawPayload` occurs only at lines 349, 354, 359 (removed by P4-T3) and 471 (`-RawPayload $env:CLAUDE_HOOK_INPUT`, removed by P4-T4); `ConvertFrom-Json` occurs only at 359; so P4-T3 can pass while line 471 remains and P4-T4 then asserts `RawPayload` absent from the whole file.
+R3-b. `tests/scripts/claude-hooks/validate-feature-review-coverage.Issue824.Tests.ps1` — `It` names F824-1 (56), F824-2 (79), F824-3 (103), F824-4 (130), F824-5 (153), F824-6 (176), F824-7 (198), F824-8 (220), F824-9 (242), and the `F824-V<Id>` `-ForEach` with eight rows (269-277); 9 + 8 = 17 matches for `F824-*`, the P4-T13 count. P4-T9 keeps all 17 (F824-9 moves to its own Context; V1-V8 keep their IDs).
+R3-c. `tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1` — line 73 asserts a findings collection with `Should -BeNullOrEmpty`, so a long findings list is abbreviated in the failure message; this is the basis of the ` more)` clause added to the N1 rule.
+R3-d. Plan-internal: LIST-MIRROR-PAIRS has nine entries (H1, H2, H3, H4; H5, H6, S1, S3; S2), the count P9-T1 and the P10-T11 re-hash assert. `ac525c4ef` is the epic start commit already used by P0-T10; P0-T3 now uses it as the lower bound of the direct-merge scan.
+R3-e. Plan-internal per-file `ExpectedExitCode` scan: P11-T5 (may need `ExpectedExitCode: 1` under the PEF) and P11-T7 (always `ExpectedExitCode: 1`) previously appended to the shared constraints artifact, whose P11-T4 and P11-T6 steps expect exit 0; both now write their own artifact (`constraints-no-python.<ts>.md`, `constraints-temp-files.<ts>.md`); PI-1, P11-T13, and the AC-26 mapping were updated to match. Every other `ExpectedExitCode: 1` use (P1-T5, P4-T14, the six PEF gates P2-T7, P3-T9, P4-T13, P5-T9, P6-T13, P10-T6, and P10-T7) already writes its own artifact; the multi-command artifacts P0-T14, P0-T22, P0-T23, P4-T12, P5-T7, P6-T11, and the P9-T1 mirror-log with the P10-T11 re-hash expect exit 0 in every step; P11-T3 appends to the P1-T5 artifact under `HEAD_RUN_EXIT_CODE:`, not a second `EXIT_CODE:` field.
+R3-f. Sibling text re-checked: Header line 14 (first-parent merge that introduced the helper) agrees with the oldest-first scan; the Execution Notes PEF sentence and the P11-T5 PEF branch now both require `FailedBlocks=0 | FailedContainers=0`; P4-T11 `E4-ST2` (parameter keys contain no `RawPayload`) and P4-T6/P4-T7/P4-T9/P4-T10 test-file `RawPayload` absences are unaffected by the H1 token change.
+
+Citations from the round-2 pass (carried; this pass's edits do not alter what they assert):
+
+R1. `.claude/rules/powershell.md` — line 30 ("Implement **ShouldProcess/SupportsShouldProcess** for state-changing actions."), cited by P4-T9.
+R2. `tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1` — 156 lines; root rows line 19 (`repository`, `mirror`); `N1` It at 67-74, whose failure message is the list of `<SourceLabel>:<Line> <Form>` findings (line 73), so a finding's module path appears after ` :: ` in a CR-PESTER-LIST `FAILED:` line; cited by the GUARD-PATTERNS N1 rule and P0-T12.
+R3. `tests/scripts/claude-hooks/validate-feature-review-coverage.Coverage.Tests.ps1` — 296 lines; top-level `BeforeAll` 13-30 with `$script:HookFile` at 14, `$script:RealGetArtifactFileContent` at 16, `Get-ArtifactFileResult` at 25-29; `Describe` at 32; cited by P1-T1, P4-T9, P5-T8.
+R4. `tests/scripts/claude-hooks/enforce-completion-consistency.Tests.ps1` — line 11, a `. (Join-Path $PSScriptRoot '<name>.Helpers.ps1')` dot-source inside a `Describe` `BeforeAll` (8-12); cited by P1-T1 as the T11 dot-source form.
+R5. `tests/scripts/claude-hooks/` — existing `*.Helpers.ps1` test-support files (`EpicStateIsolation.Baseline.Helpers.ps1`, `WorktreeResolutionFixture.Helpers.ps1`, and three others), the naming convention T11 follows.
+R6. `config/poshqc-coverage.json` — `roots` lines 3-9 (`.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts`); `tests/` is outside the coverage population, so T11 needs no exclude entry and no production path is excluded.
+R7. `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` — run paths line 3, `Exit = $true` line 4, JUnit path line 15, coverage output line 22, no coverage `Path` list (lines 23-24); cited by CR-POSHQC-FULL and P10-T7.
+R8. `tests/scripts/claude-hooks/validate-feature-review-coverage.Issue824.Tests.ps1` — 289 lines; file `BeforeAll` 21 (`Get-ArtifactFileContent` mock 27); `Describe` `BeforeAll` 34; `ConvertTo-FeatureReviewPayload` 39; Contexts 55, 129, 258; F824-9 at 242 with the in-`It` mock at 244; cited by P4-T9.
+R9. `tests/scripts/codex-hooks/validate-feature-review-coverage.Coverage.Tests.ps1` — `$global:LASTEXITCODE = 0` at line 35 inside the stdin helper 26-43, the pattern `Invoke-ClaudeReviewEntry` in T11 follows.
+R10. Absence: no `docs/features/active/subagentstop-envelope-core-897/` folder in this worktree (Glob); E1's helper and spec are read only from the integration ref by P0-T4 through P0-T7.
+R11. Plan-internal cross-references touched by this pass: every `git push origin <BRANCH>` (P0-T8, P0-T9, P0-T25, P1-T7, P2-T9, P3-T12, P4-T21, P5-T13, P6-T19, P7-T4, P8-T16, P9-T7, P10-T11, P11-T17), and no literal branch name remains outside the header pattern and P0-T2; the five `(PEF)` gate acceptances P2-T7, P3-T9, P4-T13, P5-T9, P6-T13 plus P10-T6; the four `(N1 rule)` acceptances P2-T7, P4-T13, P5-T9, P6-T13; LIST-TEST (T11 added) and its uses P10-T1, P10-T2, P11-T1; LIST-CLAUDE-SUITES (T11 not added; it is not a Pester run path).
+
+Caller-supplied facts this pass could not verify with the available tools (no shell or `gh`): `ac525c4ef` as the epic start commit (if it is unreachable, the P0-T3 `git log` prints no SHA, which records `E1MergeCommit: NONE` and leads to `Verdict: STOP`); the ten-finding abbreviation in Pester failure messages; integration head `cf3108b04` as a direct merge of E1 preparation documents; PR #881 and PR #863 head names; E1's spec stating `-Anomaly` without `Mandatory`. P0-T3 does not depend on the PR examples (it filters by pattern and falls back to the first-parent merge history), and P0-T6 derives `AnomalyReasonCall:` from E1's spec at execution time.
+
+Re-derived in the round-1 revision pass and not changed by this pass's edits (carried; the edits in this pass do not alter what these assert):
+
+1. `docs/features/active/subagentstop-envelope-feature-review-coverage-896/spec.md` — v1.1; Proposed Fix items 1 (lines 68-79), 2 (80-87), 2a (88-106), 2b (107-111), 3 (112-116), 6 (119); AC-1 through AC-31 (lines 210-278); AC-26 text (258); AC-30 (266-270); AC-31 (271-278).
+2. `.claude/hooks/validate-feature-review-coverage.ps1` — 477 lines; help 29-35 ("falls back independently" at 33) and `.NOTES` 40-42; bootstrap 46; thresholds dot-source 47; `$ErrorActionPreference` 49; function starts 51, 75, 106, 131, 150, 171, 196, 218, 231, 253, 268, 345; `Test-LanguageCoverageRow` failure returns 293-296, 301-304, 311-314, 319-322, 328-331, branch return 336-339; floor checks 325-340; decision 345-462 (S6 statements 351-352; payload blocks 354-371; `feature-review hook:` messages 355, 362, 370, 433, 457; `CLAUDE.md` read 444-445; row call 450); entry 464-477 (tail 467-469; `CLAUDE_HOOK_INPUT` 471; `Write-Error` 473; `exit 1` 474); `python` lines 23, 142, 224, 261, 281.
+3. `.claude/hooks/feature-review-coverage-thresholds.ps1` — 77 lines; help 19-41 (forms 22-36); defaults 48; regex 57; match loop 58-66; no `python` token.
+4. `.codex/hooks/validate-feature-review-coverage.ps1` — 304 lines; help 22-25; guard 43; `Test-LanguageCoverageRow` 142-207 (`80.0` at 196, message 201); continuation 209-228; entry 237-304 (stdin 238; audit exit 259-262 with `exit 0` at 261; changed-language exit 267-269 with `exit 0` at 268; row call 275; footer 284; catch 294-304); `python` lines 13, 29, 77, 135, 152.
+5. `.claude/hooks/hook-dependency-guard.ps1` — lines 8-10 (fail-closed purpose), 104-105 (SubagentStop decision `ExitCode`/`Reason`).
+6. `tests/scripts/claude-runtime/HookGuardShape.Helpers.ps1` — 155 lines; S1 tail 40-55; S2 101-105; S6 109-116 (`$body[1].Extent.Text -eq 'if ($null -ne $dependencyDecision) { return $dependencyDecision }'` at 115).
+7. `tests/scripts/claude-runtime/HookDependencyGraph.Helpers.ps1` — `Get-HookRegistration` 64-118 (`Hook` root-relative, 98 and 114); `Get-HookScriptEdge` 168-240; `Get-HookDependencyClosure` 250-296; `Get-HookDecisionFunctionName` 298-328 (rule (b) at 323).
+8. `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1` — row discovery 17-29 (`Root` = `repository`/`mirror`); It names S1-S6 at 117-139.
+9. `tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1` — root rows 19; `N1` at 67-74.
+10. `tests/scripts/claude-hooks/validate-feature-review-coverage.Coverage.Tests.ps1` — 296 lines; top `BeforeAll` 13-30 (`$script:HookFile` 14; `Get-ArtifactFileResult` 25-29); `Describe` mocks 32-37; `Test-LanguageCoverageRow` context 170-198; Invoke context 200-280 (empty/malformed/empty-output tests 216-226); entry context 282-295 (comment 292).
+11. `tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1` — 135 lines; four tests 26-135 using `-RawPayload` and `@{ output = ... }`.
+12. `tests/scripts/claude-hooks/validate-feature-review-coverage.Issue824.Tests.ps1` — 289 lines; helper 39-52; F824 contexts 55-127 and 129-256; F824-9 242-255 (in-`It` mock 244); validation-paths context 258-288 (rows 269-277).
+13. `tests/scripts/claude-hooks/validate-feature-review-coverage.ThresholdsGuard.Tests.ps1` — 121 lines; process helper 32-50 (comment 33; env var 36-47); TG1 59-75; TG2 77-99; TG3 101-120 (call 113; `ExitCode`/`Reason` 118-119).
+14. `tests/scripts/claude-hooks/feature-review-coverage-thresholds.Tests.ps1` — 51 lines; T824 rows 28-38; body 39-50.
+15. `tests/scripts/codex-hooks/validate-feature-review-coverage.Coverage.Tests.ps1` — 199 lines; stdin helper 26-43; `$script:ReviewStop`/`ReviewStopActive` 45-46; row pattern 135; entry context 150-198 (synthetic audit object 183).
+16. `tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1` — 497 lines; `$script:SharedModuleNames` line 30 (last element `'hook-dependency-guard.ps1'`).
+17. `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1` — edge discovery 18-33; reason prefix 97; process helper 104-124; B1 134-164; B3 183-190.
+18. `tests/scripts/claude-hooks/hook-dependency-failure.SpecialCases.Tests.ps1` — first-edge selection 27-33; `StopPrefix` 53-58.
+19. `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` — entries 58, 59, 70, 71.
+20. `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json` — `paths` array at line 4; entries 46, 68.
+21. `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py` — bundles 27-29; `STEP_EIGHT_COPIES` 70; `EXPECTED_LISTED_COPY_COUNT = 36` line 94; existence test 181-196; step-8 test 241-242.
+22. `.agents/skills/feature-review-workflow/SKILL.md` lines 112, 113, 114, 148; `.github/skills/feature-review-workflow/SKILL.md` line 126; `.codex/agents/feature-review.toml` lines 121, 122, 123, 133, 134, 135; `.claude/skills/feature-review-workflow/SKILL.md` has no `80%`/`90%` line.
+23. `scripts/powershell/PoshQC/PoshQC.Analyzer.psm1` — format loop 56-66; `scripts/powershell/PoshQC/PoshQC.psm1` line 2 (settings path).
+24. `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` — run paths 3; `Exit = $true` 4; JUnit path 15; coverage output 22.
+25. `docs/features/active/epic-852-main-sync/evidence/qa-gates/final-pester-coverage.md` — success lines 11-12; per-file figures 20-23.
+26. Existence: `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`, `tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1`, `docs/features/active/promotion-hook-raw-containment-false-positive-deny-824/evidence/other/observation-scripts.2026-10-08T17-32.md`, `docs/features/active/2026-09-27-hook-test-isolation-remaining-gaps-737/plan.2026-10-08T13-54.md`.
+27. Absence: no file matching `**/subagentstop-envelope*.ps1` and no `docs/features/active/subagentstop-envelope-core-897/` folder in this tree (E1 not merged here).
+
+Carried from the prior pass without re-derivation (no edit in this pass changed what they assert): `observation-scripts.2026-10-08T17-32.md` lines 320-325, 327-347, 359-370; `plan.2026-10-08T13-54.md` lines 120-150, 191-208, 210-228; `research.2026-10-11T08-10.md` lines 152-165, 274-278, 312.
+
+Sibling-region checks performed: (a) S6 reads `$body[0]` and `$body[1]` of the decision function's end block; the `param()` block is not an end-block statement, so the reshaped parameter does not move the two statements. (b) Rule R-DECISION (b) selects `Invoke-FeatureReviewCoverageValidation` because the entry's call inside a top-level `try` is outside every function definition; the scriptblock inside the function is not a `FunctionDefinitionAst`, so E4-ST4's H1 function set stays `Invoke-FeatureReviewCoverageValidation`. (c) The S1 tail check reads the three statements after the dot-source early return; base lines 467-469 stay in place and the new entry statements follow them. (d) B1 discovers H1's direct edges from the AST: three after Phase 2 (thresholds, metrics, rules) and four after Phase 4 (plus `subagentstop-envelope.ps1`); a failure of any edge exits through the inline tail with the reason naming the dependency. (e) SpecialCases first-edge selection keeps the thresholds edge first. (f) The F824 and T2 assertions `below the 85% line coverage floor`, `below the 75% branch coverage floor`, and `Should -Not -Match 'line coverage floor'` remain true after the `(default)` suffix and the report-and-halt clause, which are appended after the matched text. (g) The Codex entry tests at T6 lines 169-197 do not reach the new `CLAUDE.md` read placed after the changed-language exit, except `requests a continuation`, whose `Get-Content` mock returns figure-free text for `CLAUDE.md`, and `stops the continuation loop`, which still ends in `continue:false`. (h) E4-TR9 needs `Get-ChildItem` and PR-summary mocks because the Codex entry exits 0 at line 261 without an audit and at line 268 without a changed language. (i) `Test-LanguageCoverageRow` returns at the first failure, so E4-TR4a uses one row per metric and E4-TR10c uses two languages (Python line, TypeScript branch) to carry both classes. (j) `git grep -c` counts lines, so the expected per-family base count is 5, not the occurrence count.
+
+Sibling-region checks added in this pass: (k) T11 is dot-sourced inside the E4 Context `BeforeAll`, so its functions and `$script:` fixtures are visible to every E4 `It` added later (P1-T2, P4-T8, P5-T4, P5-T5) without moving them; the `Get-ArtifactFileContent` mock stays a literal script block in T2's `BeforeEach`, so the Hermeticity mock rule and E4-ST6 (which parses T3 only) are unaffected. (l) T11 is not named `*.Tests.ps1`, so Pester discovery over `tests/scripts` (`pester.runsettings.psd1:3`) does not run it as a container; it is excluded from LIST-CLAUDE-SUITES and included in LIST-TEST, so it is formatted, analyzed, size-checked (P10-T1, P10-T2, P11-T1), and searched by the P11-T7 temporary-file grep. (m) T11 function verbs `Invoke`, `ConvertTo`, and `Use` are outside the PSSA state-changing verb set; only T3's `Set-ReviewArtifactMap` needed `SupportsShouldProcess`. (n) A CR-SHA or CR-MIRROR pair with a missing file now prints `MISSING` and counts as a difference, so the nine mirror and SHA acceptances (P0-T23, P2-T5, P3-T7, P4-T12, P5-T7, P6-T1, P6-T11, P8-T6, P9-T1) cannot pass on an absent file; CR-PSSA counts a missing file in `PSSA-TOTAL:`; CR-JSON stops non-zero on a missing manifest. (o) Under the PEF a gate artifact can carry `ExpectedExitCode: 1`; each such gate writes its own artifact file, which satisfies the per-file expectation rule of `evidence-and-timestamp-conventions`. (p) With `Branch:` failing, P0-T8 neither commits nor pushes, so no push targets a branch other than `<BRANCH>`. (q) The N1 relaxation applies only when P0-T12 records `N1-BASELINE: FAILING`; the S1, S2, and S6 acceptances stay exact.
+
+PLANNER-INTERNAL-REVIEW: PASS
+CITATION-TO-TREE: PASS
+CITATION: docs/features/active/subagentstop-envelope-feature-review-coverage-896/spec.md | Proposed Fix items 1, 2, 2a, 2b, 3, 6 (lines 68-119); AC-1 through AC-31 (lines 210-278)
+CITATION: .claude/hooks/validate-feature-review-coverage.ps1 | lines 29-35, 40-49, 51-343 (returns 293-339), 345-462 (349, 351-352, 354-371, 444-445, 450), 464-477 (467-469, 471-474); RawPayload lines 349, 354, 359, 471; python lines 23, 142, 224, 261, 281; 477 lines
+CITATION: .claude/hooks/feature-review-coverage-thresholds.ps1 | lines 19-41, 48, 57, 58-66; 77 lines
+CITATION: .codex/hooks/validate-feature-review-coverage.ps1 | lines 13, 22-25, 29, 43, 77, 135, 142-207 (152, 196, 201), 209-228, 237-304 (261, 268, 275, 284, 294-304); 304 lines
+CITATION: .claude/hooks/hook-dependency-guard.ps1 | lines 8-10, 104-105
+CITATION: tests/scripts/claude-runtime/HookGuardShape.Helpers.ps1 | lines 40-55, 101-105, 109-116
+CITATION: tests/scripts/claude-runtime/HookDependencyGraph.Helpers.ps1 | lines 64-118, 168-240, 250-296, 298-328
+CITATION: tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1 | lines 17-29, 117-139
+CITATION: tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1 | lines 19, 67-74 (failure message 73); 156 lines
+CITATION: tests/scripts/claude-hooks/validate-feature-review-coverage.Coverage.Tests.ps1 | lines 13-37 (14, 16, 25-29), 170-198, 200-280, 282-295; 296 lines
+CITATION: .claude/rules/powershell.md | line 30
+CITATION: config/poshqc-coverage.json | lines 3-9
+CITATION: tests/scripts/claude-hooks/enforce-completion-consistency.Tests.ps1 | lines 8-12 (dot-source at 11)
+CITATION: tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1 | lines 26-135
+CITATION: tests/scripts/claude-hooks/validate-feature-review-coverage.Issue824.Tests.ps1 | lines 21, 34, 39-52, 55-127, 129-256, 242-255 (mock 244), 258-288 (F824-V rows 269-277); F824 It lines 56, 79, 103, 130, 153, 176, 198, 220, 242; 289 lines
+CITATION: tests/scripts/claude-hooks/validate-feature-review-coverage.ThresholdsGuard.Tests.ps1 | lines 32-50, 59-75, 77-99, 101-120
+CITATION: tests/scripts/claude-hooks/feature-review-coverage-thresholds.Tests.ps1 | lines 28-38, 39-50
+CITATION: tests/scripts/codex-hooks/validate-feature-review-coverage.Coverage.Tests.ps1 | lines 26-46, 135, 150-198 (183)
+CITATION: tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 | line 30; 497 lines
+CITATION: tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1 | lines 18-33, 97, 104-124, 134-164, 183-190
+CITATION: tests/scripts/claude-hooks/hook-dependency-failure.SpecialCases.Tests.ps1 | lines 27-33, 53-58
+CITATION: tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py | lines 27-29, 70, 94, 181-196, 241-242
+CITATION: extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json | lines 58, 59, 70, 71
+CITATION: extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json | lines 4, 46, 68
+CITATION: .agents/skills/feature-review-workflow/SKILL.md | lines 111-114, 148
+CITATION: .github/skills/feature-review-workflow/SKILL.md | line 126
+CITATION: .codex/agents/feature-review.toml | lines 121-123, 133-135
+CITATION: scripts/powershell/PoshQC/PoshQC.Analyzer.psm1 | lines 56-66
+CITATION: scripts/powershell/PoshQC/PoshQC.psm1 | line 2
+CITATION: scripts/powershell/PoshQC/settings/pester.runsettings.psd1 | lines 3, 4, 15, 22
+CITATION: docs/features/active/epic-852-main-sync/evidence/qa-gates/final-pester-coverage.md | lines 11-12, 20-23
+CITATION: tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1 | file exists
+AC-TRACEABILITY: PASS
+SCOPE-BOUNDARY: PASS
+AC-INVENTORY: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22, AC-23, AC-24, AC-25, AC-26, AC-27, AC-28, AC-29, AC-30, AC-31
+AC-MAPPING: AC-1 | IMPLEMENTATION: P0-T2, P0-T3, P0-T4, P0-T5, P0-T6, P0-T7, P0-T8, P0-T9 | TESTS: P0-T8, P0-T24 | EVIDENCE: evidence/other/upstream-merge-check.TS.md
+AC-MAPPING: AC-2 | IMPLEMENTATION: P4-T1, P4-T4, P4-T12 | TESTS: P4-T11, P4-T13 | EVIDENCE: evidence/qa-gates/phase4-transport-pester.TS.md
+AC-MAPPING: AC-3 | IMPLEMENTATION: P4-T4 | TESTS: P1-T1, P1-T5, P4-T13, P11-T3 | EVIDENCE: evidence/regression-testing/fail-first.TS.md
+AC-MAPPING: AC-4 | IMPLEMENTATION: P4-T3, P4-T4 | TESTS: P4-T7, P4-T8, P4-T13 | EVIDENCE: evidence/qa-gates/phase4-transport-pester.TS.md
+AC-MAPPING: AC-5 | IMPLEMENTATION: P4-T3 | TESTS: P4-T10, P4-T11, P4-T13 | EVIDENCE: evidence/qa-gates/phase4-transport-pester.TS.md
+AC-MAPPING: AC-6 | IMPLEMENTATION: P4-T6, P4-T7, P4-T9, P4-T10 | TESTS: P4-T14, P5-T9 | EVIDENCE: evidence/qa-gates/claude-suites-transport-grep.TS.md
+AC-MAPPING: AC-7 | IMPLEMENTATION: P5-T1, P5-T2 | TESTS: P1-T2, P1-T5, P5-T4, P5-T9 | EVIDENCE: evidence/qa-gates/phase5-cr4-pester.TS.md
+AC-MAPPING: AC-8 | IMPLEMENTATION: P5-T3, P6-T5 | TESTS: P6-T12, P6-T13, P8-T10 | EVIDENCE: evidence/qa-gates/phase6-codex-pester.TS.md
+AC-MAPPING: AC-9 | IMPLEMENTATION: P2-T1, P2-T2, P2-T3, P2-T4, P5-T1 | TESTS: P2-T6, P5-T6, P5-T9, P9-T3 | EVIDENCE: evidence/qa-gates/manifest-pytest.TS.md
+AC-MAPPING: AC-10 | IMPLEMENTATION: P2-T1, P2-T2, P2-T3 | TESTS: P11-T1 | EVIDENCE: evidence/qa-gates/file-size.TS.md
+AC-MAPPING: AC-11 | IMPLEMENTATION: P3-T1 | TESTS: P1-T3, P1-T5, P3-T8 | EVIDENCE: evidence/qa-gates/phase3-resolver-pester.TS.md
+AC-MAPPING: AC-12 | IMPLEMENTATION: P3-T2, P3-T3, P3-T4 | TESTS: P3-T5, P3-T6, P3-T8, P3-T9 | EVIDENCE: evidence/qa-gates/phase3-claude-pester.TS.md
+AC-MAPPING: AC-13 | IMPLEMENTATION: P4-T9 | TESTS: P4-T11, P4-T13 | EVIDENCE: evidence/qa-gates/phase4-transport-pester.TS.md
+AC-MAPPING: AC-14 | IMPLEMENTATION: P6-T1, P6-T11 | TESTS: P6-T8, P6-T13 | EVIDENCE: evidence/qa-gates/phase6-codex-pester.TS.md
+AC-MAPPING: AC-15 | IMPLEMENTATION: P6-T2, P6-T3, P6-T4, P6-T5 | TESTS: P6-T7, P6-T13 | EVIDENCE: evidence/qa-gates/phase6-codex-pester.TS.md
+AC-MAPPING: AC-16 | IMPLEMENTATION: P6-T3, P6-T4 | TESTS: P1-T4, P1-T5, P6-T6, P6-T7, P6-T13 | EVIDENCE: evidence/qa-gates/phase6-codex-pester.TS.md
+AC-MAPPING: AC-17 | IMPLEMENTATION: P6-T4 | TESTS: P6-T13, P6-T14 | EVIDENCE: evidence/qa-gates/codex-config-unchanged.TS.md
+AC-MAPPING: AC-18 | IMPLEMENTATION: P6-T9, P6-T10 | TESTS: P6-T13, P9-T3 | EVIDENCE: evidence/qa-gates/manifest-pytest.TS.md
+AC-MAPPING: AC-19 | IMPLEMENTATION: P6-T3, P6-T4 | TESTS: P7-T1, P7-T2 | EVIDENCE: evidence/qa-gates/phase7-parity-pester.TS.md
+AC-MAPPING: AC-20 | IMPLEMENTATION: P8-T1, P8-T2, P8-T3, P8-T4, P8-T5, P8-T6 | TESTS: P8-T7, P8-T8 | EVIDENCE: evidence/qa-gates/phase8-texts-pytest.TS.md
+AC-MAPPING: AC-21 | IMPLEMENTATION: P8-T7 | TESTS: P8-T9 | EVIDENCE: evidence/qa-gates/phase8-step-eight-pytest.TS.md
+AC-MAPPING: AC-22 | IMPLEMENTATION: P8-T1, P8-T3, P8-T4 | TESTS: P8-T11 | EVIDENCE: evidence/qa-gates/policy-files-unchanged.TS.md
+AC-MAPPING: AC-23 | IMPLEMENTATION: P2-T5, P3-T7, P4-T12, P5-T7, P6-T1, P6-T11, P8-T6 | TESTS: P9-T1, P9-T2 | EVIDENCE: evidence/other/mirror-log.TS.md
+AC-MAPPING: AC-24 | IMPLEMENTATION: P1-T1, P1-T2, P1-T3, P1-T4 | TESTS: P1-T5, P11-T3 | EVIDENCE: evidence/regression-testing/fail-first.TS.md
+AC-MAPPING: AC-25 | IMPLEMENTATION: P0-T13, P10-T7 | TESTS: P0-T14, P10-T8, P11-T2 | EVIDENCE: evidence/qa-gates/final-pester-coverage.TS.md
+AC-MAPPING: AC-26 | IMPLEMENTATION: P2-T1, P2-T2, P6-T1 | TESTS: P0-T22, P11-T4, P11-T5, P11-T6, P11-T7 | EVIDENCE: evidence/qa-gates/constraints.TS.md, evidence/qa-gates/constraints-no-python.TS.md, evidence/qa-gates/constraints-temp-files.TS.md
+AC-MAPPING: AC-27 | IMPLEMENTATION: P0-T9 | TESTS: P11-T8 | EVIDENCE: evidence/qa-gates/scope-boundary.TS.md
+AC-MAPPING: AC-28 | IMPLEMENTATION: P10-T1, P10-T3 | TESTS: P10-T2, P10-T4, P10-T5, P10-T6, P10-T7, P10-T9 | EVIDENCE: evidence/qa-gates/final-qc-loop.TS.md
+AC-MAPPING: AC-29 | IMPLEMENTATION: P11-T9 | TESTS: PR-time gh pr view body check under the epic orchestrator | EVIDENCE: evidence/other/ac-29-handoff.TS.md
+AC-MAPPING: AC-30 | IMPLEMENTATION: P4-T2, P4-T3, P5-T2 | TESTS: P5-T4, P5-T5, P5-T9 | EVIDENCE: evidence/qa-gates/phase5-cr4-pester.TS.md
+AC-MAPPING: AC-31 | IMPLEMENTATION: P4-T1, P4-T3, P4-T4 | TESTS: P4-T10, P4-T13 | EVIDENCE: evidence/qa-gates/phase4-transport-pester.TS.md
+UNRESOLVED-GAPS: NONE
