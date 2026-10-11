@@ -18,8 +18,8 @@ Merge `origin/main` into `chore/epic-852-main-sync-852` with a merge commit, res
 
 - [x] 1. origin/main is merged into the branch with a merge commit (no rebase, no force-push).
 - [x] 2. The only textual conflict, `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, is resolved by keeping both sides' entries in sorted order. The three lines are `".claude/hooks/feature-folder-resolution.ps1",`, `".claude/hooks/feature-review-coverage-thresholds.ps1",` and `".claude/hooks/hook-command-heredoc.ps1",`. Any further conflict that appears is resolved by keeping both sides' intent and is recorded.
-- [ ] 3. 786's hook dependency-guard completeness test (`hook-dependency-guard-completeness.Tests.ps1`), the import-failure exemption guard and FailClosed suites, the bundle-parity tests, and the Claude and Codex hook Pester suites all pass on the merged tree. Before and after evidence is recorded.
-- [ ] 4. main's new hook `.claude/hooks/validate-feature-review-coverage.ps1` (with `feature-review-coverage-thresholds.ps1` and their Codex copies and bundled mirrors) satisfies 786's rules: either it carries the standard import guard, so a dependency load failure denies or blocks (SubagentStop: exit 2), or it is named as an exemption under the 786 rules with a recorded fail-closed proof (a test or cited code path showing it never allows on import failure). If it can fail open, it is converted to the uniform guard. Claude, Codex and bundle copies are parity-consistent. No Python in hooks. 500-line cap. Line coverage >= 85% on changed PowerShell files.
+- [x] 3. 786's hook dependency-guard completeness test (`hook-dependency-guard-completeness.Tests.ps1`), the import-failure exemption guard and FailClosed suites, the bundle-parity tests, and the Claude and Codex hook Pester suites all pass on the merged tree. Before and after evidence is recorded.
+- [x] 4. main's new hook `.claude/hooks/validate-feature-review-coverage.ps1` (with `feature-review-coverage-thresholds.ps1` and their Codex copies and bundled mirrors) satisfies 786's rules: either it carries the standard import guard, so a dependency load failure denies or blocks (SubagentStop: exit 2), or it is named as an exemption under the 786 rules with a recorded fail-closed proof (a test or cited code path showing it never allows on import failure). If it can fail open, it is converted to the uniform guard. Claude, Codex and bundle copies are parity-consistent. No Python in hooks. 500-line cap. Line coverage >= 85% on changed PowerShell files.
 - [ ] 5. The PR into the integration branch is green on ALL checks (positive assertion; a non-zero check count with every check SUCCESS) and is merged.
 
 ## Dependencies / Risks
@@ -34,6 +34,6 @@ Merge `origin/main` into `chore/epic-852-main-sync-852` with a merge commit, res
 - PR checks: non-zero count, all SUCCESS.
 
 ## Evidence Checklist
-- [ ] baseline
-- [ ] targeted verification
-- [ ] end-state
+- [x] baseline
+- [x] targeted verification
+- [x] end-state
