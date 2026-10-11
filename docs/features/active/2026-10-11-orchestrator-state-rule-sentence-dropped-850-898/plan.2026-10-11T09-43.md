@@ -5,40 +5,79 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-11T09-43
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 1.0
+- **Work Mode:** minor-audit (documentation-only)
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+**Fail-closed evidence rule:** If any required baseline artifact, targeted-verification artifact, or end-state artifact is missing or lacks `Timestamp:`, `Command:`, `EXIT_CODE:`, or `Output Summary:`, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+**Evidence accounting rule:** Each evidence-producing task names its artifact path. Do not mark evidence-backed work complete without the artifact. All evidence lives under `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/<kind>/` (the feature folder, abbreviated FEATURE below). No path under `artifacts/` other than `artifacts/orchestration/` is used for evidence.
 
+**Requirements source:** `FEATURE/issue.md`, section `## Acceptance Criteria` (AC-1 through AC-5) only. `spec.md` and `user-story.md` are intentionally absent for minor-audit. Research context: `FEATURE/research/2026-10-11T13-45-orchestrator-state-rule-sentence-research.md`.
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+**Scope (operator-approved, documentation only):** three edits and nothing else. No source, hook, test, manifest, or `.github/` file changes. Line 204 of the rule is owned by concurrent item #886 and must not be edited. No other file under `.claude/rules/`, `.github/instructions/`, or their bundled mirrors under `extensions/drm-copilot/resources/claude-customizations/` changes.
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+**Coverage statement:** no production source file changes, so coverage thresholds are not applicable and no coverage gate is invented. This is recorded as an artifact in P2-T9.
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#898-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+**Operator constraints:** no `sh`/`bash`/`pwsh` wrapper scripts; no PowerShell or TypeScript verification is needed; never force-push; delete nothing; create no GitHub issues; any scratch or helper file name must include 898.
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+**Verbatim sentence (SENTENCE-898)** to append to the end of line 238 of `.claude/rules/orchestrator-state.md` and of the bundled mirror, one space after "have all declined.", on the same line:
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+```text
+For a command that names an explicit pull request number, the gate reads the per-feature checkpoint `artifacts/orchestration/orchestrator-state.json` beneath the one live worktree whose checkpoint records that number in `pr_gate.pr_number` or in a `standalone_merge_authorizations` entry, and it reads no per-feature checkpoint when no live worktree or more than one records it; a bare command reads the checkpoint beneath the session worktree.
+```
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+Single-line presence token for SENTENCE-898 (fixed-string search): reads no per-feature checkpoint when no live worktree or more than one records it
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+**Verbatim correction sub-bullet (CORRECTION-898)** to insert as a new line directly after line 284 of the #850 spec, indented two spaces, line 284 left unchanged:
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+```text
+  - Correction (2026-10-11): `orchestrator-state.md` was not updated under #850; plan decision D4 dropped the one-sentence alignment named in the In-scope list, and the sentence stating which per-feature checkpoint the merge gate reads for an explicit pull request number lands under #898. The #788 behavior change and its remedy are documented in this spec (Accepted behavior change, #788).
+```
+
+Single-line presence token for CORRECTION-898 (fixed-string search): Correction (2026-10-11)
+
+Test commands used (the Rule-content set is the five files named in research section 8):
+
+- Parity test node: `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts`
+- Rule-content set: `tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`, `tests/scripts/dev_tools/test_orchestrator_state_blocked_reason.py`, `tests/scripts/dev_tools/test_orchestrator_state_remediation_docs.py`, `tests/scripts/dev_tools/test_parallel_issue_adoption_skill_contracts.py`, `tests/scripts/dev_tools/test_claude_rules_frontmatter.py`
+
+### Phase 0 — Baseline Capture
+
+- [ ] [P0-T1] Read `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, and `.claude/rules/python.md` in that order, then write `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/baseline/phase0-instructions-read.md`. Acceptance: the artifact exists and contains `Timestamp:`, `Policy Order:`, and a list of the four files read.
+- [ ] [P0-T2] Record the branch and commit baseline in `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/baseline/baseline-git-state-898.md` by running `git rev-parse HEAD` and `git rev-parse origin/main`. Acceptance: the artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` naming both SHAs and the branch `bug/orchestrator-state-rule-sentence-dropped-850-898`.
+- [ ] [P0-T3] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -k all_repo_runtime_contracts` and write `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/baseline/baseline-parity-test-898.md`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` states `1 passed`, 0 failed. This is the pre-edit parity baseline.
+- [ ] [P0-T4] Run `poetry run pytest tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py tests/scripts/dev_tools/test_orchestrator_state_blocked_reason.py tests/scripts/dev_tools/test_orchestrator_state_remediation_docs.py tests/scripts/dev_tools/test_parallel_issue_adoption_skill_contracts.py tests/scripts/dev_tools/test_claude_rules_frontmatter.py` and write `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/baseline/baseline-rule-content-tests-898.md`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` records the numeric passed count N (the pytest summary line) with 0 failed. N is the reference count for P2-T4.
+- [ ] [P0-T5] Run `git grep -c -F "reads no per-feature checkpoint when no live worktree or more than one records it" -- .claude/rules/orchestrator-state.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md` and write `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/baseline/baseline-sentence-absent-898.md`. Acceptance: the artifact records `EXIT_CODE: 1` (no matches in either file, so no count lines printed) in `Output Summary:`; the artifact also carries `ExpectedExitCode: 1`.
+- [ ] [P0-T6] Run `git grep -c -F "Correction (2026-10-11)" -- docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/spec.md` and write `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/baseline/baseline-correction-absent-898.md`. Acceptance: the artifact records `EXIT_CODE: 1` (no match) in `Output Summary:` and carries `ExpectedExitCode: 1`.
+- [ ] [P0-T7] Commit the Phase 0 evidence with `git add docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898` then `git commit -m "docs(898): record phase 0 baseline evidence"` and run `git push origin bug/orchestrator-state-rule-sentence-dropped-850-898` (never force-push). Acceptance: `git status --porcelain` prints nothing for the feature folder and the push exits 0.
+
+### Phase 1 — Constrained Implementation
+
+- [ ] [P1-T1] Hand off to the small-path implementation engineer (the executor may perform these documentation edits directly) with scope limited to P1-T2 through P1-T4 and the prohibition on editing line 204 of the rule, any other `.claude/rules/` file, or any `.github/instructions/` file. Acceptance: the handoff is recorded in `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/other/implementation-handoff-898.md` with `Timestamp:` and the three target paths; P1-T2 through P1-T4 are complete before this task is checked.
+- [ ] [P1-T2] Append SENTENCE-898 (quoted verbatim in the preamble) to the end of line 238 of `.claude/rules/orchestrator-state.md`, one space after "have all declined.", on the same line, adding no new line. Acceptance: `git grep -c -F "reads no per-feature checkpoint when no live worktree or more than one records it" -- .claude/rules/orchestrator-state.md` prints `.claude/rules/orchestrator-state.md:1`.
+- [ ] [P1-T3] Make the identical append to line 238 of `extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md`. Acceptance: `git grep -c -F "reads no per-feature checkpoint when no live worktree or more than one records it" -- extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md` prints the path followed by `:1`.
+- [ ] [P1-T4] Insert CORRECTION-898 (quoted verbatim in the preamble) as a new line directly after line 284 of `docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/spec.md`, leaving line 284 unchanged. Acceptance: `git grep -c -F "Correction (2026-10-11)" -- docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/spec.md` prints the path followed by `:1`.
+- [ ] [P1-T5] Record the implementation outcome in `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/other/implementation-outcome-898.md` with `Timestamp:`, `Command:` (the three presence-count commands from P1-T2 to P1-T4), `EXIT_CODE: 0`, and `Output Summary:` stating each count is 1.
+- [ ] [P1-T6] Commit the three edits and the Phase 1 evidence with `git add .claude/rules/orchestrator-state.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/spec.md docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898` then `git commit -m "docs(898): add merge-gate checkpoint sentence to orchestrator-state rule and correct 850 spec"` and run `git push origin bug/orchestrator-state-rule-sentence-dropped-850-898` (never force-push). Acceptance: the push exits 0 and `git status --porcelain` prints nothing.
+
+### Phase 2 — Final QC, Targeted Verification, and End-State Evidence
+
+No format, lint, or type-check stage applies: the change set contains no Python, PowerShell, TypeScript, or C# file, and the Markdown files have no formatter or linter configured in the repository toolchain. The language-appropriate test stage (pytest) is run in P2-T3 and P2-T4. If any step fails or changes a file, fix the cause and restart Phase 2 from P2-T1.
+
+- [ ] [P2-T1] Run `git diff origin/main...HEAD --name-only -- .claude/rules .github/instructions extensions/drm-copilot/resources/claude-customizations/.claude/rules extensions/drm-copilot/resources/claude-customizations/.github/instructions` and `git status --porcelain -- .claude/rules .github/instructions extensions/drm-copilot/resources/claude-customizations/.claude/rules extensions/drm-copilot/resources/claude-customizations/.github/instructions`, writing `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/regression-testing/scope-rules-898.md`. Acceptance (AC-4): the diff lists exactly two paths, `.claude/rules/orchestrator-state.md` and `extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md`; `.github/instructions` and the bundled `.github/instructions` have no change; the porcelain output is empty because the change is committed. `Output Summary:` states both observations. Any other listed path fails the task.
+- [ ] [P2-T2] Run `git diff origin/main...HEAD --numstat -- .claude/rules/orchestrator-state.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md` and write `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/regression-testing/numstat-rule-pair-898.md`. Acceptance (AC-1): exactly two lines print, each `1	1` (one line added, one removed, meaning only line 238 changed) for the respective path; `Output Summary:` records both rows. A different count fails the task.
+- [ ] [P2-T3] Run `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py -k all_repo_runtime_contracts` and write `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/qa-gates/final-parity-test-898.md`. Acceptance (AC-2): `EXIT_CODE: 0` and `Output Summary:` states `1 passed`, 0 failed, matching the P0-T3 baseline.
+- [ ] [P2-T4] Run `poetry run pytest tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py tests/scripts/dev_tools/test_orchestrator_state_blocked_reason.py tests/scripts/dev_tools/test_orchestrator_state_remediation_docs.py tests/scripts/dev_tools/test_parallel_issue_adoption_skill_contracts.py tests/scripts/dev_tools/test_claude_rules_frontmatter.py` and write `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/qa-gates/final-rule-content-tests-898.md`. Acceptance (AC-5): `EXIT_CODE: 0` and `Output Summary:` records a passed count equal to the N recorded by P0-T4, with 0 failed.
+- [ ] [P2-T5] Run `git diff --no-index --quiet .claude/rules/orchestrator-state.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md` and write `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/regression-testing/byte-identity-898.md`. Acceptance (AC-2): `EXIT_CODE: 0`; the artifact carries `ExpectedExitCode: 0` and `Output Summary:` states the two files are identical (the command prints nothing).
+- [ ] [P2-T6] Run `git grep -c -F "reads no per-feature checkpoint when no live worktree or more than one records it" -- .claude/rules/orchestrator-state.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md` and write `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/regression-testing/sentence-present-898.md`. Acceptance (AC-1, AC-2): output is exactly two lines, each ending `:1`, one per file; `Output Summary:` records both counts.
+- [ ] [P2-T7] Run `git grep -c -F "Correction (2026-10-11)" -- docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/spec.md` and `git diff origin/main...HEAD --numstat -- docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/spec.md`, writing `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/regression-testing/correction-present-898.md`. Acceptance (AC-3): the grep prints the path followed by `:1`, and the numstat prints `1	0` (one line added, none removed, so line 284 and every other original line is unchanged).
+- [ ] [P2-T8] Run `git grep -n -F "Risk: epic children on routes without" -- docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/spec.md` and write `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/regression-testing/line-284-unchanged-898.md`. Acceptance (AC-3): the output has line number `284` and the Correction sub-bullet is at line 285 per `git grep -n -F "Correction (2026-10-11)"` on the same file; `Output Summary:` records both line numbers.
+- [ ] [P2-T9] Write `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/other/coverage-not-applicable-898.md` with `Timestamp:`, `Command:` (the P2-T1 scope listing), `EXIT_CODE: 0`, and `Output Summary:` stating that no production source file changed, so coverage is not applicable and no coverage gate was run. Acceptance: the artifact exists with all four fields.
+- [ ] [P2-T10] Write the end-state evidence `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/other/end-state-898.md` with `Timestamp:`, `Command:` (`git rev-parse HEAD`), `EXIT_CODE: 0`, and `Output Summary:` listing the final HEAD SHA, the three changed files, and links to the artifacts of P2-T1 through P2-T9. Acceptance: the artifact exists with all four fields.
+- [ ] [P2-T11] Check the AC-1 box in `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/issue.md` (`- [x] AC-1`), citing `numstat-rule-pair-898.md` and `sentence-present-898.md`. Acceptance: the AC-1 line begins with `- [x]` and both artifacts exist and pass (P2-T2, P2-T6).
+- [ ] [P2-T12] Check the AC-2 box in `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/issue.md`, citing `final-parity-test-898.md` and `byte-identity-898.md`. Acceptance: the AC-2 line begins with `- [x]` and both artifacts show pass (P2-T3, P2-T5).
+- [ ] [P2-T13] Check the AC-3 box in `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/issue.md`, citing `correction-present-898.md` and `line-284-unchanged-898.md`. Acceptance: the AC-3 line begins with `- [x]` and both artifacts show pass (P2-T7, P2-T8).
+- [ ] [P2-T14] Check the AC-4 box in `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/issue.md`, citing `scope-rules-898.md`. Acceptance: the AC-4 line begins with `- [x]` and the artifact shows pass (P2-T1).
+- [ ] [P2-T15] Check the AC-5 box in `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/issue.md`, citing `final-rule-content-tests-898.md`. Acceptance: the AC-5 line begins with `- [x]` and the artifact shows pass (P2-T4).
+- [ ] [P2-T16] Check the three `## Evidence Checklist` boxes (baseline, targeted verification, end-state) in `docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/issue.md`. Acceptance: all three lines begin with `- [x]` and the matching artifacts exist under `evidence/baseline/`, `evidence/regression-testing/` plus `evidence/qa-gates/`, and `evidence/other/`.
+- [ ] [P2-T17] Commit the final evidence and checklist updates with `git add docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898` then `git commit -m "docs(898): record final verification evidence and check off acceptance criteria"` and run `git push origin bug/orchestrator-state-rule-sentence-dropped-850-898` (never force-push). Acceptance: the push exits 0 and `git status --porcelain` prints nothing.
