@@ -22,3 +22,10 @@ AC-18: CHECKED | P3-T4 | evidence/regression-testing/p3-helper-suite-pass-after.
 AC-19: CHECKED | P3-T4 | evidence/regression-testing/p3-helper-suite-pass-after.md
 AC-20: CHECKED | P4-T4 | evidence/regression-testing/p4-claude-settings-pass-after.md
 AC-21: CHECKED | P4-T4 | evidence/regression-testing/p4-claude-settings-pass-after.md
+AC-24: CHECKED | P5-T11 | evidence/qa-gates/final-helper-coverage.md
+AC-23: CHECKED | P5-T11 | evidence/qa-gates/final-pester-targeted.md
+AC-25: CHECKED | P5-T11 | evidence/qa-gates/final-poshqc-format.md, evidence/qa-gates/final-poshqc-analyze.md, evidence/qa-gates/final-pester-targeted.md
+AC-26: CHECKED | P5-T11 | evidence/qa-gates/final-line-counts.md
+AC-22: CHECKED | P5-T11 | evidence/qa-gates/final-pester-targeted.md, evidence/qa-gates/final-pytest-parity.md, evidence/qa-gates/final-mirror-parity.md
+AC-3: CHECKED | P5-T11 | evidence/qa-gates/final-pytest-parity.md, evidence/qa-gates/final-jest-manifest.md
+AC-2: CHECKED | P5-T11 | evidence/qa-gates/final-pytest-parity.md
