@@ -20,3 +20,5 @@ AC-16: CHECKED | P3-T4 | evidence/regression-testing/p3-helper-suite-pass-after.
 AC-17: CHECKED | P3-T4 | evidence/regression-testing/p3-helper-suite-pass-after.md
 AC-18: CHECKED | P3-T4 | evidence/regression-testing/p3-helper-suite-pass-after.md
 AC-19: CHECKED | P3-T4 | evidence/regression-testing/p3-helper-suite-pass-after.md
+AC-20: CHECKED | P4-T4 | evidence/regression-testing/p4-claude-settings-pass-after.md
+AC-21: CHECKED | P4-T4 | evidence/regression-testing/p4-claude-settings-pass-after.md

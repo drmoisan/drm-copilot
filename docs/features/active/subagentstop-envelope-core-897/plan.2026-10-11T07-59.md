@@ -259,19 +259,19 @@ All test code below lives in `tests/scripts/claude-hooks/subagentstop-envelope.T
 
 ### Phase 4 — Inline SubagentStop Command Removal
 
-- [ ] [P4-T1] Delete the inline SubagentStop command object from `.claude/settings.json`.
+- [x] [P4-T1] Delete the inline SubagentStop command object from `.claude/settings.json`.
   - Remove exactly lines 216-219: the `{` line, the `"type": "command",` line, the line-218 `"command": "pwsh -NoProfile -Command \"$input = $env:CLAUDE_HOOK_INPUT ...` line, and its closing `},` line. The group at line 213, its matcher at line 214, the `"hooks": [` line at 215, and the `validate-discovery-artifact-gate.ps1` object (lines 220-223) remain unchanged.
   - Acceptance: `(Get-Content .claude/settings.json).Count` is 291 and `Get-Content -Raw .claude/settings.json | ConvertFrom-Json` succeeds (recorded in the [P4-T3] artifact).
-- [ ] [P4-T2] Apply the identical deletion to `extensions/drm-copilot/resources/claude-customizations/.claude/settings.json`.
+- [x] [P4-T2] Apply the identical deletion to `extensions/drm-copilot/resources/claude-customizations/.claude/settings.json`.
   - Same four lines (216-219), same method.
   - Acceptance: the bundled file has 291 lines and parses as JSON (recorded in the [P4-T3] artifact).
-- [ ] [P4-T3] Verify both settings copies and record `docs/features/active/subagentstop-envelope-core-897/evidence/other/p4-settings-edit.md`.
+- [x] [P4-T3] Verify both settings copies and record `docs/features/active/subagentstop-envelope-core-897/evidence/other/p4-settings-edit.md`.
   - `Select-String -LiteralPath .claude/settings.json -SimpleMatch 'CLAUDE_HOOK_INPUT'` and the same on the bundled copy each report 0 matches; `Get-FileHash -Algorithm SHA256` of the two copies is equal; the broad matcher string is still present exactly once in each copy (`Select-String -SimpleMatch 'atomic-planner|atomic-executor|feature-review'` count 1 per copy); the 291-line counts and JSON parse results from [P4-T1] and [P4-T2].
   - Acceptance: every value above is recorded and matches.
-- [ ] [P4-T4] Run the settings suite after the edit and record `docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/p4-claude-settings-pass-after.md`; then check off AC-20 and AC-21 in `docs/features/active/subagentstop-envelope-core-897/spec.md`.
+- [x] [P4-T4] Run the settings suite after the edit and record `docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/p4-claude-settings-pass-after.md`; then check off AC-20 and AC-21 in `docs/features/active/subagentstop-envelope-core-897/spec.md`.
   - R-TARGETED over `tests/scripts/claude-runtime/claude-settings.Tests.ps1`.
   - Acceptance: `failed=0`; the four new `It` blocks and every pre-existing `It` pass. Then flip AC-20 (group-retention test passed) and AC-21 (the `CLAUDE_HOOK_INPUT`, `exit 1`, and `subagentstop-envelope.ps1` reference tests passed) one at a time, appending two rows to `evidence/other/ac-status.md`.
-- [ ] [P4-T5] Commit and push the Phase 4 settings changes to `.claude/settings.json` and its bundled copy.
+- [x] [P4-T5] Commit and push the Phase 4 settings changes to `.claude/settings.json` and its bundled copy.
   - `git add .claude/settings.json extensions/drm-copilot/resources/claude-customizations/.claude/settings.json docs/features/active/subagentstop-envelope-core-897/spec.md docs/features/active/subagentstop-envelope-core-897/evidence/other/ docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/ docs/features/active/subagentstop-envelope-core-897/plan.2026-10-11T07-59.md`
   - Subject: `chore(897): remove the inline SubagentStop command from both settings copies`; second paragraph `Refs #897`; final paragraph `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`; then `git push -u origin bug/subagentstop-envelope-core-exec-897`.
   - Acceptance: the push exits 0 and `git status --porcelain` prints nothing.
