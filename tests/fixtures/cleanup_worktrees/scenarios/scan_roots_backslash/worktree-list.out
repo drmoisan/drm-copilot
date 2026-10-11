@@ -1,0 +1,12 @@
+worktree C:/repo/main
+HEAD aaaa0000
+branch refs/heads/main
+
+worktree C:\repo\main-wt\a
+HEAD aaaa0001
+branch refs/heads/wt-a
+
+worktree C:\scratch\plan\p1
+HEAD aaaa0002
+branch refs/heads/p1
+

@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as nodePath from "node:path";
+import { compareCodePoint } from "../string-ordering";
 
 /**
  * Filesystem contract required by the push-down customization publisher.
@@ -138,9 +139,7 @@ export class RealPushDownFileSystem implements PushDownFileSystem {
 
     walk(normalizedRoot);
     // Sort lexicographically to match Python's `sorted(files)` on POSIX paths.
-    return files.sort((left, right) =>
-      left < right ? -1 : left > right ? 1 : 0,
-    );
+    return files.sort(compareCodePoint);
   }
 
   /**

@@ -203,4 +203,22 @@ describe("buildRootSessionPickEntries", () => {
       originalOrder,
     );
   });
+
+  it("issue #796 breaks an equal-timestamp tie with a U+E000 path before a supplementary-character path", () => {
+    // Arrange: equal timestamps fall through to the path tiebreak; code-unit
+    // order would put the surrogate-pair path first.
+    const candidates = [
+      { path: "/s/\u{1F600}.jsonl", lastActivityMs: 1000 },
+      { path: "/s/\uE000.jsonl", lastActivityMs: 1000 },
+    ];
+
+    // Act
+    const entries = buildRootSessionPickEntries(candidates, 60);
+
+    // Assert: code-point order places the U+E000 path first.
+    expect(entries.map((entry) => entry.path)).toEqual([
+      "/s/\uE000.jsonl",
+      "/s/\u{1F600}.jsonl",
+    ]);
+  });
 });

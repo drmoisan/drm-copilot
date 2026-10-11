@@ -220,3 +220,131 @@ setup() {
     pcoh_compute_concurrency_batches "3 1 2" 2
     [ "$PCOH_RESULT" = "[[1,2],[3]]" ]
 }
+
+# Helpers for the separator rows below. Each asserts exit status 0 and the exact
+# stdout, so a multi-separator value is compared with its single-line control.
+cohorts_print() {
+    run bash "$COHORTS" --keys "$2" --edges "$3"
+    [ "$status:$output" = "0:$1" ] || { printf 'expected 0:%s but got %s:%s\n' "$1" "$status" "$output"; return 1; }
+}
+
+batches_print() {
+    run bash "$BATCHES" --keys "$2" --max-concurrency 2
+    [ "$status:$output" = "0:$1" ] || { printf 'expected 0:%s but got %s:%s\n' "$1" "$status" "$output"; return 1; }
+}
+
+@test "separator-parity: a newline-separated --keys value matches the single-line control" {
+    cohorts_print "[[1,2,3]]" "1 2 3" ""
+    cohorts_print "[[1,2,3]]" $'1\n2\n3' ""
+}
+
+@test "separator-parity: a newline-separated batching --keys value matches the single-line control" {
+    batches_print "[[1,2],[3]]" "1 2 3"
+    batches_print "[[1,2],[3]]" $'1\n2\n3'
+}
+
+@test "separator-parity: a newline-separated --edges value honors an edge after the first newline" {
+    cohorts_print "[[1,3],[2]]" "1 2 3" "1:2"
+    cohorts_print "[[2],[1,3]]" "1 2 3" "1:2 2:3"
+    cohorts_print "[[2],[1,3]]" "1 2 3" $'1:2\n2:3'
+}
+
+@test "separator-parity: newline-separated --keys and --edges together match the single-line control" {
+    cohorts_print "[[2],[1,3]]" $'1\n2\n3' $'1:2\n2:3'
+}
+
+@test "separator-parity: a tab-separated value matches the single-line control" {
+    cohorts_print "[[2],[1,3]]" $'1\t2\t3' "1:2 2:3"
+    cohorts_print "[[2],[1,3]]" "1 2 3" $'1:2\t2:3'
+    cohorts_print "[[2],[1,3]]" $'1\t2\t3' $'1:2\t2:3'
+    batches_print "[[1,2],[3]]" $'1\t2\t3'
+}
+
+@test "separator-parity: a CR-separated value matches the single-line control" {
+    cohorts_print "[[2],[1,3]]" $'1\r2\r3' "1:2 2:3"
+    cohorts_print "[[2],[1,3]]" "1 2 3" $'1:2\r2:3'
+    cohorts_print "[[2],[1,3]]" $'1\r2\r3' $'1:2\r2:3'
+    batches_print "[[1,2],[3]]" $'1\r2\r3'
+}
+
+@test "separator-parity: a VT-separated value matches the single-line control" {
+    cohorts_print "[[2],[1,3]]" $'1\v2\v3' "1:2 2:3"
+    cohorts_print "[[2],[1,3]]" "1 2 3" $'1:2\v2:3'
+    cohorts_print "[[2],[1,3]]" $'1\v2\v3' $'1:2\v2:3'
+    batches_print "[[1,2],[3]]" $'1\v2\v3'
+}
+
+@test "separator-parity: a FF-separated value matches the single-line control" {
+    cohorts_print "[[2],[1,3]]" $'1\f2\f3' "1:2 2:3"
+    cohorts_print "[[2],[1,3]]" "1 2 3" $'1:2\f2:3'
+    cohorts_print "[[2],[1,3]]" $'1\f2\f3' $'1:2\f2:3'
+    batches_print "[[1,2],[3]]" $'1\f2\f3'
+}
+
+@test "separator-parity: a CRLF-terminated final token is kept" {
+    cohorts_print "[[1,2,3]]" $'1 2 3\r\n' ""
+    cohorts_print "[[2],[1,3]]" $'1\r\n2\r\n3\r\n' $'1:2\r\n2:3\r\n'
+    batches_print "[[1,2],[3]]" $'1\r\n2\r\n3\r\n'
+}
+
+@test "separator-parity: mixed separators with a trailing newline match the single-line control" {
+    cohorts_print "[[2],[1,3]]" $'1\n\t2 \r\n3\n' $'1:2\n\t2:3\r\n'
+    batches_print "[[1,2],[3]]" $'1\n\t2 \r\n3\n'
+}
+
+@test "separator-parity: whitespace-only and newline-only values yield the empty graph" {
+    local value
+    for value in $'\n' $' \t\n' $'\n\n' $'\r\n' $'\v\f'; do
+        cohorts_print "[]" "$value" ""
+        batches_print "[]" "$value"
+    done
+    cohorts_print "[[1,2]]" "1 2" $'\n'
+}
+
+@test "separator-parity: a malformed token after a newline is rejected with exit 2" {
+    run bash "$COHORTS" --keys $'1\n02'
+    [ "$status" -eq 2 ]
+    case "$output" in
+    *"found: 02"*) ;;
+    *) return 1 ;;
+    esac
+    run bash "$COHORTS" --keys "1 2 3" --edges $'1:2\n2-3'
+    [ "$status" -eq 2 ]
+    run bash "$COHORTS" --keys "1 2 3" --edges $'1:2\n2:03'
+    [ "$status" -eq 2 ]
+    run bash "$BATCHES" --keys $'1\n02' --max-concurrency 2
+    [ "$status" -eq 2 ]
+}
+
+@test "separator-parity: a duplicate key after a newline is rejected with the reference message" {
+    run bash "$COHORTS" --keys $'1\n2\n1'
+    [ "$status" -eq 1 ]
+    [ "$output" = "Duplicate item key 1 in item_keys; item keys must be unique because cohort ordering relies on key uniqueness." ]
+}
+
+@test "separator-parity: pcoh_split_words splits on every ASCII whitespace separator" {
+    pcoh_split_words $'1\n2\t3\r4\v5\f6 7\r\n'
+    [ "${#PCOH_WORDS[@]}" -eq 7 ]
+    [ "${PCOH_WORDS[0]}" = "1" ]
+    [ "${PCOH_WORDS[1]}" = "2" ]
+    [ "${PCOH_WORDS[2]}" = "3" ]
+    [ "${PCOH_WORDS[3]}" = "4" ]
+    [ "${PCOH_WORDS[4]}" = "5" ]
+    [ "${PCOH_WORDS[5]}" = "6" ]
+    [ "${PCOH_WORDS[6]}" = "7" ]
+    pcoh_split_words $'\n'
+    [ "${#PCOH_WORDS[@]}" -eq 0 ]
+    pcoh_split_words $'*\n?'
+    [ "${#PCOH_WORDS[@]}" -eq 2 ]
+    [ "${PCOH_WORDS[0]}" = "*" ]
+    [ "${PCOH_WORDS[1]}" = "?" ]
+    pcoh_split_words
+    [ "${#PCOH_WORDS[@]}" -eq 0 ]
+}
+
+@test "separator-parity: the sourced library accepts multi-line keys and edges" {
+    pcoh_compute_cohorts $'1\n2\n3' $'1:2\n2:3'
+    [ "$PCOH_RESULT" = "[[2],[1,3]]" ]
+    pcoh_compute_concurrency_batches $'3\n1\n2' 2
+    [ "$PCOH_RESULT" = "[[1,2],[3]]" ]
+}

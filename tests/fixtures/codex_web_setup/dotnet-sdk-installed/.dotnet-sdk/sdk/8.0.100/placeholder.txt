@@ -1,0 +1,1 @@
+Fixture: the installed SDK 8.0.100 directory for tests/shell/test_codex_web_setup_codex_dotnet.bats (issue #824).

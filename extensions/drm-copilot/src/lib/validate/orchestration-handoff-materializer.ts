@@ -68,6 +68,7 @@ export interface HandoffEnvelopeValidationResult {
   readonly primaryFailureCode: HandoffFailureCode | null;
   readonly affectedPaths: readonly string[];
   readonly unsupportedCapabilities: readonly string[];
+  readonly failureCause?: string;
 }
 
 /** Contract and destination-candidate validation seam. */
@@ -196,6 +197,7 @@ export class OrchestrationHandoffMaterializer {
         {
           affectedPaths: validation.affectedPaths,
           unsupportedCapabilities: validation.unsupportedCapabilities,
+          failureCause: validation.failureCause,
         },
       );
     }
@@ -288,6 +290,10 @@ export class OrchestrationHandoffMaterializer {
         {
           handoffId: envelope.handoffId,
           handoffHistorySha256: lastHistoryEntry.entrySha256,
+          failureCause: describeHandoffFailureCause(
+            "destination-projection",
+            error,
+          ),
         },
       );
     }

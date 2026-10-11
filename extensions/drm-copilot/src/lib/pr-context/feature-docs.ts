@@ -18,12 +18,8 @@
  */
 
 import { type FileSystem, toPosixPath } from "../file-system";
-import {
-  type FeatureDocExcerpt,
-  compareCodePoint,
-  section,
-  truncate,
-} from "./models";
+import { compareCodePoint } from "../string-ordering";
+import { type FeatureDocExcerpt, section, truncate } from "./models";
 import {
   completedPlanTasks,
   extractIssueReferences,

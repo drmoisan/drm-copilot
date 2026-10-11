@@ -138,6 +138,7 @@ exclude_lines = [
     "@abc.abstractmethod",
     "^\\s*\\.\\.\\.\\s*$",
 ]
+partial_also = ["^\\s*(async\\s+)?def\\s.*:\\s*\\.\\.\\.\\s*(#.*)?$"]
 
 [tool.pyright]
 typeCheckingMode = "strict"

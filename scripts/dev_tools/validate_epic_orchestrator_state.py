@@ -235,7 +235,9 @@ def _validate_merge_status_enum(features: list[dict[str, Any]]) -> list[str]:
     for feature in features:
         folder = feature.get("feature_folder", "<unknown>")
         merge_status = feature.get("merge_status")
-        if merge_status is not None and merge_status not in VALID_MERGE_STATUS:
+        if merge_status is not None and (
+            not isinstance(merge_status, str) or merge_status not in VALID_MERGE_STATUS
+        ):
             errors.append(
                 f"Epic checkpoint feature '{folder}' has invalid merge_status: "
                 f"{merge_status!r}"
@@ -318,7 +320,8 @@ def _validate_completion(
     errors: list[str] = []
     for feature in features:
         folder = feature.get("feature_folder", "<unknown>")
-        if feature.get("merge_status") not in MERGED_STATUSES:
+        merge_status = feature.get("merge_status")
+        if not isinstance(merge_status, str) or merge_status not in MERGED_STATUSES:
             errors.append(
                 "Epic checkpoint completion validation failed: feature "
                 f"'{folder}' merge_status is not merged/worktree_removed."

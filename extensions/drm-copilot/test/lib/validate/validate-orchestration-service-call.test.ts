@@ -202,6 +202,13 @@ describe("validateOrchestrationServiceCall", () => {
     expect(routing).toContain("features[0] launch binding.branch_name");
     expect(topology).toContain("features[0] launch binding.branch_name");
     expect(keyGated).not.toContain(" launch binding");
+    expect(routing).toContain(
+      "Epic planner topology_receipt must be an object.",
+    );
+    expect(topology).toContain(
+      "Epic planner topology_receipt must be an object.",
+    );
+    expect(keyGated).not.toContain("Epic planner topology_receipt");
   });
 
   it("throws with the aggregated error text when validation errors are present", () => {

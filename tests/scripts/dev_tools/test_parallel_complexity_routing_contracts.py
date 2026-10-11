@@ -22,6 +22,24 @@ PARALLEL_PLANNER_AGENT = Path(".claude/agents/parallel-planner.md")
 PARALLEL_ORCHESTRATOR_AGENT = Path(".claude/agents/parallel-orchestrator.md")
 PARALLEL_ORCHESTRATION_RULE = Path(".claude/rules/parallel-orchestration.md")
 PLANNER_CHECKPOINT = "artifacts/orchestration/parallel-planner-state.json"
+ORCHESTRATOR_CHECKPOINT = "artifacts/orchestration/parallel-orchestrator-state.json"
+ADMITTED_ITEM_TOKENS = (
+    ORCHESTRATOR_CHECKPOINT,
+    "/parallel-add",
+    "complexity_to_model",
+    "clamped to `opus`",
+)
+SKILL_ADMITTED_TOKENS = (
+    *ADMITTED_ITEM_TOKENS,
+    "preferred_overlay.agents",
+    "rather than spawning without `model`",
+)
+AGENT_ADMITTED_TOKENS = (*ADMITTED_ITEM_TOKENS, "rather than spawn without `model`")
+STEP_TWO_TOKENS = (
+    "parallel-orchestrate",
+    "## Model Selection",
+    "model_routing_receipt",
+)
 
 
 def read_text(relative_path: Path) -> str:
@@ -186,3 +204,61 @@ def test_parallel_orchestration_rule_defines_p10() -> None:
     # Assert
     for token in tokens:
         assert token in text, token
+
+
+def test_parallel_orchestrate_kickoff_band_source_names_admitted_item_source() -> None:
+    """The kickoff band-source paragraph names the admitted-item band source."""
+
+    # Arrange
+    text = read_text(PARALLEL_ORCHESTRATE_SKILL)
+
+    # Act
+    paragraph = collapse(between(text, "**Band and receipt source.**", "\n\n"))
+
+    # Assert
+    for token in SKILL_ADMITTED_TOKENS:
+        assert token in paragraph, token
+
+
+def test_parallel_orchestrate_model_selection_names_admitted_item_source() -> None:
+    """Model Selection names the admitted-item band source and resolution."""
+
+    # Arrange
+    text = read_text(PARALLEL_ORCHESTRATE_SKILL)
+
+    # Act
+    model_selection = collapse(section(text, "## Model Selection"))
+
+    # Assert
+    for token in SKILL_ADMITTED_TOKENS:
+        assert token in model_selection, token
+
+
+def test_parallel_orchestrator_agent_names_admitted_item_source() -> None:
+    """The agent's Delegation Model names the admitted-item band source."""
+
+    # Arrange
+    text = read_text(PARALLEL_ORCHESTRATOR_AGENT)
+
+    # Act
+    delegation = collapse(section(text, "## Delegation Model"))
+
+    # Assert
+    for token in AGENT_ADMITTED_TOKENS:
+        assert token in delegation, token
+
+
+def test_parallel_add_step_two_defers_model_to_parallel_orchestrate() -> None:
+    """Admission step 2 defers model resolution to parallel-orchestrate."""
+
+    # Arrange
+    text = read_text(PARALLEL_ADD_SKILL)
+
+    # Act
+    step_two = collapse(
+        between(text, "2. **Prepare the item.**", "3. **Compute conflict edges")
+    )
+
+    # Assert
+    for token in STEP_TWO_TOKENS:
+        assert token in step_two, token

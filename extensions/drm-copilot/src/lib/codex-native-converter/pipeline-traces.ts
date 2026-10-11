@@ -11,6 +11,7 @@
  */
 
 import { type FileSystem } from "../file-system";
+import { compareCodePoint } from "../string-ordering";
 import { classifyPromptSections } from "./classifier";
 import { planSectionTargetPath } from "./mapping";
 import {
@@ -108,15 +109,14 @@ export function buildPromptTranslationTraces(
   }
 
   return [...translationTraces].sort((left, right) => {
-    if (left.sourcePath !== right.sourcePath) {
-      return left.sourcePath < right.sourcePath ? -1 : 1;
+    const bySource = compareCodePoint(left.sourcePath, right.sourcePath);
+    if (bySource !== 0) {
+      return bySource;
     }
-    if (left.sectionId !== right.sectionId) {
-      return left.sectionId < right.sectionId ? -1 : 1;
+    const bySection = compareCodePoint(left.sectionId, right.sectionId);
+    if (bySection !== 0) {
+      return bySection;
     }
-    if (left.targetRole !== right.targetRole) {
-      return left.targetRole < right.targetRole ? -1 : 1;
-    }
-    return 0;
+    return compareCodePoint(left.targetRole, right.targetRole);
   });
 }

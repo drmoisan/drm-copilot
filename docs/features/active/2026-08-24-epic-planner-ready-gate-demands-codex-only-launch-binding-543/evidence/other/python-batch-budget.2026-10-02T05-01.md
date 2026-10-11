@@ -1,7 +1,7 @@
 # Python batch-budget plan (issue #543)
 
-Timestamp: 2026-10-02T05-18
-Timestamp-Correction: original value 2026-10-02T05-01 was a reused reading rather than a clock reading for this artifact; the corrected value is the artifact's observed file write time (remediation-inputs.2026-10-02T07-08.md), an upper bound on the write time.
+Timestamp: 2026-10-02T05-14
+Timestamp-Correction: original value 2026-10-02T05-01 was a reused reading rather than a clock reading; a first correction to 2026-10-02T05-18 (observed file write time, remediation-inputs.2026-10-02T07-08.md) was later than commit 0c6abb95 (authored 2026-10-02 05:14:57 -04:00), which already contained this row; the value is now that commit time, an upper bound on the write time (corrected under #846, code-review.2026-10-07T09-34.md CR-11).
 Task: P0-T5
 
 Cap: 3 production, 3 test (planning-time citation: `.claude/hooks/enforce-python-batch-budget.ps1` lines 9-10).

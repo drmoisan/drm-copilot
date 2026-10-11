@@ -1,0 +1,10 @@
+{
+  "case": "decide-in-flight-no-disposition",
+  "subcommand": "decide",
+  "argv": ["decide", "--item", "7", "--state", "in_flight"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation rejected: removal of in-flight item 7 requires an explicit disposition, one of detach, abandon; no default is inferred."
+  }
+}

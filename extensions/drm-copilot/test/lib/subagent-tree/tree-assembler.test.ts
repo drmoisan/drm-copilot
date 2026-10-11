@@ -164,4 +164,25 @@ describe("assembleTree", () => {
       "alpha description",
     ]);
   });
+
+  it("issue #796 orders orphans with a U+E000 agentId before a supplementary-character agentId", () => {
+    // Arrange: neither subagent is spawned by the root, so both are orphans
+    // ordered by compareByAgentId; code-unit order would put U+1F600 first.
+    const scanned: ScannedSession = {
+      root: { models: [], agentToolUseIds: [] },
+      subagents: [
+        subagent({ agentId: "\u{1F600}", toolUseId: "toolu_orphan_1" }),
+        subagent({ agentId: "\uE000", toolUseId: "toolu_orphan_2" }),
+      ],
+    };
+
+    // Act
+    const tree = assembleTree(scanned);
+
+    // Assert: code-point order places the U+E000 agentId first.
+    expect(tree.children.map((child) => child.description)).toEqual([
+      "\uE000 description",
+      "\u{1F600} description",
+    ]);
+  });
 });

@@ -1,0 +1,10 @@
+{
+  "case": "decide-merged",
+  "subcommand": "decide",
+  "argv": ["decide", "--item", "9", "--state", "merged"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation rejected: item 9 is already merged into main and cannot be removed."
+  }
+}

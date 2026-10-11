@@ -173,10 +173,11 @@ This protocol follows the remediation-handoff skill and the strict-handoff memor
 Update `artifacts/orchestration/orchestrator-state.json` after every completed step with:
 
 - `objective`, `change_budget_estimate`, `path_selected` (small or large)
-- Variables: `promotion-type`, `short-name`, `issue-num`, `feature-folder`
-- `completed_steps`, `next_step`, `last_updated`
-- Step statuses: `step5_status` through `step10_status`
+- Variables: `promotion-type`, `short-name`, `relativeFile`, `long-name`, `issue-num`, `feature-folder`, `work-mode`, `plan-path`
+- `completed_steps`, `next_step`, `last_updated` (ISO-8601 UTC date-time string, rewritten on every checkpoint write)
+- Step statuses: `step5_status`, `step6_status`, `step7_status`, `step8_status`, `step9_status`, `step10_status`
 - `delegation_receipts`, `blocked_reason`
+- The complete required-key set and the `last_updated` contract are defined in `.claude/rules/orchestrator-state.md` under `## Required Top-Level Keys`.
 - Persist raw promotion MCP receipts under:
   - `delegation_receipts.promotion.potential_entry`
   - `delegation_receipts.promotion.issue`

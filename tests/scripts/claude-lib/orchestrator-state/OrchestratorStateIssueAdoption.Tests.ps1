@@ -378,3 +378,57 @@ Describe 'Routing contract wiring for issue adoption' {
         Join-Text $errors | Should -BeExactly (Join-Text $expected)
     }
 }
+
+Describe 'Issue adoption potential record requirement by origin (issue 849)' {
+
+    It 'waives the bug entry tool without a record when origin is filed_before_orchestration' {
+        $adoption = Get-AdoptionRecord -Override @{ origin = 'filed_before_orchestration'; waived_tools = @('potential_to_issue', 'new_potential_bug_entry') }
+        $result = Invoke-Adoption -State (Get-AdoptionState -Adoption $adoption -PromotionType 'bug') -Required $script:LargeBugTools
+        Join-Text $result.Errors | Should -BeExactly ''
+        Join-Sorted $result.WaivedTools | Should -BeExactly 'new_potential_bug_entry,potential_to_issue'
+    }
+
+    It 'waives the feature entry tool without a record when origin is transferred' {
+        $adoption = Get-AdoptionRecord -Override @{ origin = 'transferred'; waived_tools = @('potential_to_issue', 'new_potential_entry') }
+        $result = Invoke-Adoption -State (Get-AdoptionState -Adoption $adoption)
+        Join-Text $result.Errors | Should -BeExactly ''
+        Join-Sorted $result.WaivedTools | Should -BeExactly 'new_potential_entry,potential_to_issue'
+    }
+
+    It 'waives the bug entry tool without a record on the preparation route' {
+        $preparationBugTools = [string[]]@('new_potential_bug_entry', 'potential_to_issue', 'new_active_feature_folder', 'validate_orchestration_artifacts')
+        $successful = [string[]]@('new_active_feature_folder', 'validate_orchestration_artifacts')
+        $adoption = Get-AdoptionRecord -Override @{ origin = 'filed_before_orchestration'; waived_tools = @('potential_to_issue', 'new_potential_bug_entry') }
+        $result = Invoke-Adoption -State (Get-AdoptionState -Adoption $adoption -PromotionType 'bug') -RouteId 'preparation' -Required $preparationBugTools -Successful $successful
+        Join-Text $result.Errors | Should -BeExactly ''
+        Join-Sorted $result.WaivedTools | Should -BeExactly 'new_potential_bug_entry,potential_to_issue'
+    }
+
+    It 'still reports rule 9 when origin is epic_decomposition and the record is absent' {
+        $adoption = Get-AdoptionRecord -Override @{ origin = 'epic_decomposition'; waived_tools = @('potential_to_issue', 'new_potential_entry') }
+        $result = Invoke-Adoption -State (Get-AdoptionState -Adoption $adoption)
+        Join-Text $result.Errors | Should -BeExactly (Get-E9 -Tool 'new_potential_entry')
+        @($result.WaivedTools).Count | Should -Be 0
+    }
+
+    It 'still reports rule 9 when origin is filed_before_orchestration and the record is null' {
+        $adoption = Get-AdoptionRecord -Override @{ origin = 'filed_before_orchestration'; waived_tools = @('potential_to_issue', 'new_potential_entry'); potential_record = $null }
+        $result = Invoke-Adoption -State (Get-AdoptionState -Adoption $adoption)
+        Join-Text $result.Errors | Should -BeExactly (Get-E9 -Tool 'new_potential_entry')
+        @($result.WaivedTools).Count | Should -Be 0
+    }
+
+    It 'still reports rule 9 when origin is transferred and the record path is invalid' {
+        $adoption = Get-AdoptionRecord -Override @{ origin = 'transferred'; waived_tools = @('potential_to_issue', 'new_potential_entry'); potential_record = 'notes/record.txt' }
+        $result = Invoke-Adoption -State (Get-AdoptionState -Adoption $adoption)
+        Join-Text $result.Errors | Should -BeExactly (Get-E9 -Tool 'new_potential_entry')
+        @($result.WaivedTools).Count | Should -Be 0
+    }
+
+    It 'reports the origin error and rule 9 when origin is invalid and the record is absent' {
+        $adoption = Get-AdoptionRecord -Override @{ origin = 'imported'; waived_tools = @('potential_to_issue', 'new_potential_entry') }
+        $result = Invoke-Adoption -State (Get-AdoptionState -Adoption $adoption)
+        Join-Text $result.Errors | Should -BeExactly (Join-Text @($script:E4, (Get-E9 -Tool 'new_potential_entry')))
+        @($result.WaivedTools).Count | Should -Be 0
+    }
+}

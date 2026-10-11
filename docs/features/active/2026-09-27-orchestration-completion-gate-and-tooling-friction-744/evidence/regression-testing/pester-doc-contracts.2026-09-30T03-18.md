@@ -1,6 +1,7 @@
 # Regression: Pester Documentation-Contract Suites Unmodified
 
-Timestamp: 2026-10-02T01-44
+Timestamp: 2026-10-02T01-43
+Timestamp-Correction: original value 2026-10-02T01-44 was later than the file's observed write time 01:43:48 recorded in code-review.2026-10-02T02-55.md (CR-5); corrected under #846.
 Command: git diff --name-only b080a69ecb60b65d016362b21fffed0a34be9144 -- tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1 tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1 tests/scripts/claude-runtime/claude-runtime-structure.Tests.ps1 tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1 tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1
 Companion command: git status --porcelain --untracked-files=all -- tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1 tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1 tests/scripts/claude-runtime/claude-runtime-structure.Tests.ps1 tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1 tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1
 EXIT_CODE: 0

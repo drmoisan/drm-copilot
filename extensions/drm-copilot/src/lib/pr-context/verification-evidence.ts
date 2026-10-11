@@ -19,8 +19,9 @@
  */
 
 import { type FileSystem, toPosixPath } from "../file-system";
+import { compareCodePoint } from "../string-ordering";
 import { relativeToPosix } from "./feature-docs-parsers";
-import { compareCodePoint, splitLines } from "./models";
+import { splitLines } from "./models";
 
 /** Required schema fields parsed from an evidence markdown file. */
 export const REQUIRED_FIELDS = ["Timestamp", "Command", "EXIT_CODE"] as const;

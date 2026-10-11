@@ -81,6 +81,17 @@ const MATERIALIZE: Partial<TransitionPreparedOrchestrationRequest> = {
  * the cause string.
  */
 
+/**
+ * An Error subclass whose `name` is supplied by the caller, so a case can pin
+ * the token produced for an arbitrary (and possibly unsafe) error class name.
+ */
+class NamedFailure extends Error {
+  constructor(errorName: string) {
+    super("x");
+    this.name = errorName;
+  }
+}
+
 describe("describeHandoffFailureCause", () => {
   it.each([
     {
@@ -117,6 +128,22 @@ describe("describeHandoffFailureCause", () => {
       label: "(g) a plain object with an uppercase code uses the code",
       error: { code: "ENOENT" },
       expected: "checkpoint-read: ENOENT",
+    },
+    {
+      label:
+        "(h) a custom Error name with non-identifier characters falls back to Error",
+      error: new NamedFailure("Bad Name: /home/operator"),
+      expected: "checkpoint-read: Error",
+    },
+    {
+      label: "(i) a custom Error name that is an identifier is the token",
+      error: new NamedFailure("CustomFailure"),
+      expected: "checkpoint-read: CustomFailure",
+    },
+    {
+      label: "(j) an empty custom Error name falls back to Error",
+      error: new NamedFailure(""),
+      expected: "checkpoint-read: Error",
     },
   ])("$label", ({ error, expected }) => {
     // Arrange

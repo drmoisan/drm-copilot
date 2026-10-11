@@ -399,3 +399,44 @@ def assert_single_csharp_toolchain(
             "C# mutual exclusion violated: both modern and legacy C# packs were "
             f"selected ({sorted(selected_csharp)}); select exactly one C# variant."
         )
+
+
+def resolve_published_paths(
+    *,
+    packs: frozenset[str] | None,
+    manifest_dir: Path,
+    fs: PushDownFileSystem,
+) -> frozenset[str] | None:
+    """Compute the published `.claude`-relative path set for a pack selection.
+
+    Purpose:
+        Load the selected pack manifests, compute the union of their paths
+        (always including ``core``), and assert C# mutual exclusion. Moved from
+        ``push_down_claude_customizations`` (issue #790) to keep the entry
+        module under the 500-line limit.
+
+    Args:
+        packs (frozenset[str] | None): Selected pack names, or ``None``/empty
+            for the publish-everything default.
+        manifest_dir (Path): Directory holding the ``<pack>.json`` manifests.
+        fs (PushDownFileSystem): Adapter used to read the manifest files.
+
+    Returns:
+        frozenset[str] | None: The published paths, or ``None`` to signal the
+        publish-everything default (no manifest is read).
+
+    Raises:
+        ManifestError: When a manifest is missing or malformed, or both C#
+            variants are selected.
+    """
+
+    if not packs:
+        return None
+    manifests = load_pack_manifests(manifest_dir, packs, fs)
+    published = compute_published_paths(packs, manifests)
+    # compute_published_paths returns None only for an empty selection, which
+    # the early return excludes; an empty set keeps the C# check concrete.
+    empty: frozenset[str] = frozenset()
+    effective_published = published if published is not None else empty
+    assert_single_csharp_toolchain(effective_published, packs)
+    return effective_published

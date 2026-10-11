@@ -1,0 +1,1 @@
+Fixture: .dotnet-sdk/dotnet is a directory, so the [ -x ] test in install_dotnet_sdk passes without a checked-in executable (issue #824).

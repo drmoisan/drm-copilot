@@ -165,4 +165,15 @@ describe("normalizeSelectedPaths", () => {
     // Assert: deduplicated and sorted by POSIX text.
     expect(normalized).toEqual([".github/agents", ".github/prompts"]);
   });
+
+  it("issue #796 sorts a supplementary-character path after a U+E000 path by code point", () => {
+    // Arrange: under UTF-16 code-unit order the surrogate pair sorts first.
+    const selected = [".github/\u{1F600}.md", ".github/\uE000.md"];
+
+    // Act
+    const normalized = normalizeSelectedPaths(SOURCE_ROOT, selected);
+
+    // Assert: code-point order places U+E000 before U+1F600.
+    expect(normalized).toEqual([".github/\uE000.md", ".github/\u{1F600}.md"]);
+  });
 });

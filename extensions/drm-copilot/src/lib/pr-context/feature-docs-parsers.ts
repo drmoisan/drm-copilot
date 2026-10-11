@@ -15,12 +15,8 @@
  */
 
 import { type FileSystem, toPosixPath } from "../file-system";
-import {
-  ISSUE_REFERENCE_PATTERN,
-  compareCodePoint,
-  escapeRegExp,
-  splitLines,
-} from "./models";
+import { compareCodePoint } from "../string-ordering";
+import { ISSUE_REFERENCE_PATTERN, escapeRegExp, splitLines } from "./models";
 
 /**
  * Extract markdown content under a top-level `##` heading.

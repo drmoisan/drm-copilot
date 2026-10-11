@@ -687,7 +687,7 @@
         "b": 622,
         "reason": "path_overlap",
         "hard": false,
-        "cost": 152,
+        "cost": 160,
         "benefit": 4
       }
     ],

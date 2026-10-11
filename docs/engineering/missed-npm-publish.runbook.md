@@ -133,6 +133,12 @@ A red verify step after a green Publish to npm step is not a failed release.
 
 Check the exact version on the registry instead of re-running the publish, because re-publishing an existing version fails.
 
+```
+npm view @danmoisan/drm-copilot-mcp@<version> version
+```
+
+Substitute the version under investigation for `<version>`.
+
 The paired extension tag still needs to be pushed, because the VS Code extension release is not published until that tag is pushed.
 
 ## VERSION_CONSUMED_ELSEWHERE

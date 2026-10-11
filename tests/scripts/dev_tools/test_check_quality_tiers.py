@@ -68,6 +68,7 @@ class FakeRunResult:
 
     returncode: int
     stdout: bytes
+    stderr: bytes = b""
 
 
 def _reader(text: str) -> Callable[[Path], str]:
@@ -212,6 +213,66 @@ def test_main_returns_one_with_qt009_when_git_exits_nonzero(
     lines = _assert_failure_output(capsys)
     assert exit_code == 1
     assert [line[:5] for line in lines] == ["QT009"]
+
+
+def test_qt009_message_includes_git_stderr(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A non-zero git exit reports git's stderr text on the single QT009 line."""
+
+    # Arrange
+    def fake_run(argv: Sequence[str], **kwargs: object) -> FakeRunResult:
+        del argv, kwargs
+        return FakeRunResult(
+            returncode=128, stdout=b"", stderr=b"fatal: not a git repository\n"
+        )
+
+    lister = functools.partial(
+        list_tracked_files, which=lambda name: "git", run=fake_run
+    )
+
+    # Act
+    exit_code = main(
+        [], read_manifest_text=_reader(SMALL_MANIFEST_TEXT), list_tracked_files=lister
+    )
+
+    # Assert
+    lines = _assert_failure_output(capsys)
+    assert exit_code == 1
+    assert len(lines) == 1, f"expected one QT009 line: {lines}"
+    assert lines[0].startswith("QT009: ")
+    assert "fatal: not a git repository" in lines[0]
+
+
+def test_qt009_message_collapses_multiline_git_stderr(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Multi-line git stderr is collapsed onto the single QT009 line."""
+
+    # Arrange
+    def fake_run(argv: Sequence[str], **kwargs: object) -> FakeRunResult:
+        del argv, kwargs
+        return FakeRunResult(
+            returncode=128,
+            stdout=b"",
+            stderr=b"fatal: first line\nhint: second line\n",
+        )
+
+    lister = functools.partial(
+        list_tracked_files, which=lambda name: "git", run=fake_run
+    )
+
+    # Act
+    exit_code = main(
+        [], read_manifest_text=_reader(SMALL_MANIFEST_TEXT), list_tracked_files=lister
+    )
+
+    # Assert
+    lines = _assert_failure_output(capsys)
+    assert exit_code == 1
+    assert len(lines) == 1, f"expected one QT009 line: {lines}"
+    assert lines[0].startswith("QT009: ")
+    assert "fatal: first line hint: second line" in lines[0]
 
 
 def test_main_returns_one_with_qt009_when_git_not_found(

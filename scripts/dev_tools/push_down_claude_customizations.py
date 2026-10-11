@@ -47,14 +47,14 @@ try:
         is_general_memory_file,
         read_memory_scope,
     )
+    from scripts.dev_tools.push_down_claude_gitignore_merge import (
+        deliver_destination_gitignore,
+    )
     from scripts.dev_tools.push_down_claude_pack_selection import (
         CSharpVariant,
         ManifestError,
         MemoryMode,
-        PackManifest,
-        assert_single_csharp_toolchain,
-        compute_published_paths,
-        load_pack_manifests,
+        resolve_published_paths,
     )
     from scripts.dev_tools.push_down_exclusion_manifest import (
         EXCLUSION_MANIFEST_RELATIVE_PATH,
@@ -88,14 +88,14 @@ except ModuleNotFoundError as error:  # pragma: no cover - bundled import fallba
         is_general_memory_file,
         read_memory_scope,
     )
+    from dev_tools.push_down_claude_gitignore_merge import (
+        deliver_destination_gitignore,
+    )
     from dev_tools.push_down_claude_pack_selection import (
         CSharpVariant,
         ManifestError,
         MemoryMode,
-        PackManifest,
-        assert_single_csharp_toolchain,
-        compute_published_paths,
-        load_pack_manifests,
+        resolve_published_paths,
     )
     from dev_tools.push_down_exclusion_manifest import (
         EXCLUSION_MANIFEST_RELATIVE_PATH,
@@ -188,57 +188,6 @@ def _passthrough_rewrite(
     return text, 0, 0, []
 
 
-def _resolve_published_paths(
-    *,
-    packs: frozenset[str] | None,
-    bundle_root: Path,
-    fs: PushDownFileSystem,
-) -> frozenset[str] | None:
-    """Compute the published `.claude`-relative path set for a pack selection.
-
-    Purpose:
-        Load the selected pack manifests from the bundle, compute the union of
-        their destination paths (always including ``core``), and assert C#
-        mutual exclusion. Returns ``None`` when no pack selection was supplied so
-        the publisher falls back to the backward-compatible publish-everything
-        path with no manifest read.
-
-    Args:
-        packs (frozenset[str] | None): Selected pack names, or ``None``/empty for
-            the publish-everything default.
-        bundle_root (Path): Bundle root that contains the ``pack-manifests``
-            subdirectory and the legacy variant subtree.
-        fs (PushDownFileSystem): Adapter used to read the manifest files.
-
-    Returns:
-        frozenset[str] | None: The union of selected packs' paths plus ``core``,
-        or ``None`` to signal the publish-everything default.
-
-    Raises:
-        ManifestError: When a manifest is missing/malformed or both C# variants
-            are selected in the same run.
-
-    Side Effects:
-        Reads manifest files through the adapter when a selection is present.
-    """
-
-    # No explicit selection means the backward-compatible default: publish the
-    # full tree without reading any manifest.
-    if not packs:
-        return None
-
-    manifest_dir = bundle_root / PACK_MANIFEST_SUBDIR
-    manifests: dict[str, PackManifest] = load_pack_manifests(manifest_dir, packs, fs)
-    published = compute_published_paths(packs, manifests)
-    # compute_published_paths returns None only for an empty selection, which the
-    # early return above already excluded; treat a None here as an empty set so
-    # the C# exclusion check still runs on a concrete value.
-    empty: frozenset[str] = frozenset()
-    effective_published = published if published is not None else empty
-    assert_single_csharp_toolchain(effective_published, packs)
-    return effective_published
-
-
 def push_down_customizations(
     *,
     repo_root: Path,
@@ -265,6 +214,13 @@ def push_down_customizations(
         `config/orchestration-routing.json` is merged into an existing
         destination file and `config/blast-radius.json` is derived from the
         destination layout, matching the TypeScript push-down.
+
+        After the copy and the summary artifact write,
+        ``deliver_destination_gitignore`` merges the managed ignore block into
+        the destination ``.gitignore`` through the raw adapter, matching the
+        TypeScript push-down. A destination exclusion-manifest entry matching
+        ``.gitignore`` suppresses that read and write; the skip is reported
+        after the enumeration skips.
 
     Args:
         repo_root (Path): Source repository root.
@@ -321,9 +277,9 @@ def push_down_customizations(
     manifest = read_exclusion_manifest(fs, destination_root)  # before any write
     # Resolve the published-path set only when a pack selection is supplied so
     # the no-argument path performs no manifest I/O and stays byte-equivalent.
-    published_paths = _resolve_published_paths(
+    published_paths = resolve_published_paths(
         packs=packs,
-        bundle_root=effective_bundle,
+        manifest_dir=effective_bundle / PACK_MANIFEST_SUBDIR,
         fs=fs,
     )
 
@@ -364,9 +320,15 @@ def push_down_customizations(
         artifact_directory=ARTIFACT_DIRECTORY,
         rewrite_references=_passthrough_rewrite,
     )
+    # Post-copy delivery through the raw adapter, after the summary artifact
+    # write and before the exclusion report is appended (issue #790).
+    gitignore_skip = deliver_destination_gitignore(fs, destination_root, manifest)
     if manifest is None or not isinstance(engine_fs, ExclusionFilterFileSystem):
         return extend_summary(summary, None)
-    report = build_exclusion_report(manifest, engine_fs.skipped)
+    skipped = [*engine_fs.skipped]
+    if gitignore_skip is not None:
+        skipped.append(gitignore_skip)
+    report = build_exclusion_report(manifest, skipped)
     append_exclusions_to_artifact(fs, Path(summary.artifact_path), report)
     return extend_summary(summary, report)
 

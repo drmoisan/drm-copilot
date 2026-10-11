@@ -195,3 +195,163 @@ Describe 'Test-MultipleFeatureFolderSpan after relocation (issue #489 behavior p
         }
     }
 }
+
+Describe 'File-shaped token classification (issue #797)' {
+    Context 'Tokens whose final component names a file' {
+        # Letter-led extensions outside the former allowlist, a known dotfile, a
+        # known extensionless file name, and a line-suffixed citation. Each is a
+        # file a plan writes, so the classifier must record it as a path.
+        It 'classifies the file-shaped token <_> as concrete' -ForEach @(
+            'tests/shell/foo.bats',
+            'extensions/drm-copilot/jest.config.cjs',
+            'tests/out/run.out',
+            '.agents/skills/x/refs/foo.bats',
+            '.claude/lib/x/.shellcheckrc',
+            '.devcontainer/codespaces/Dockerfile',
+            'tests/shell/parallel_lane_assertion.bats:12'
+        ) {
+            # Arrange
+            $token = $_
+
+            # Act
+            $kind = Get-PathTokenKind -Token $token
+
+            # Assert
+            $kind | Should -Be 'concrete'
+        }
+    }
+
+    Context 'Tokens that name no file stay rejected' {
+        # Directories, dot-directories, version strings, refs, URLs, rooted and
+        # drive-qualified tokens, and separator-free tokens are not file
+        # citations; the file-shape rule must not re-admit them (issue #489).
+        It 'still rejects the non-file token <_>' -ForEach @(
+            'extensions/drm-copilot',
+            'scripts/dev_tools',
+            '.claude/rules/',
+            'extensions/drm-copilot/resources/claude-customizations/.claude',
+            'good_wt/.git',
+            'release/v1.2.0',
+            'actions/setup-node@v4.0.2',
+            'origin/main',
+            'https://x/y.md',
+            'C:/x.md',
+            '/etc/hosts',
+            'scripts.dev_tools._blast_radius_extraction',
+            'Sample.*',
+            'README.md',
+            'pyproject.toml'
+        ) {
+            # Arrange
+            $token = $_
+
+            # Act
+            $kind = Get-PathTokenKind -Token $token
+
+            # Assert
+            $kind | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'Documented fail-closed residual' {
+        It 'classifies the dotted-directory residual as concrete' {
+            # Arrange: a dotted directory cited without a trailing slash has a
+            # letter-led dotted tail, so it reads as a file. The cost is at most
+            # an extra contention edge, which serializes work.
+            $token = 'src/TaskMaster.Domain'
+
+            # Act
+            $kind = Get-PathTokenKind -Token $token
+
+            # Assert
+            $kind | Should -Be 'concrete'
+        }
+    }
+}
+
+Describe 'Test-FileShapedComponent (issue #797)' {
+    BeforeAll {
+        # The Python leaf module is the authoritative reference for the known-name
+        # set and the extension pattern; the parity cases read it from source.
+        $script:PythonTokenShapePath = Join-Path $script:RepoRoot 'scripts/dev_tools/_blast_radius_token_shapes.py'
+    }
+
+    Context 'Predicate cases' {
+        # The non-ASCII case is built from a character code so this file holds no
+        # byte above 127.
+        It 'reports the component case <Name>' -ForEach @(
+            @{ Name = 'letter-led-extension'; Component = 'parallel_lane_assertion.bats'; Expected = $true }
+            @{ Name = 'uppercase-extension'; Component = 'Main.TS'; Expected = $true }
+            @{ Name = 'multi-dot-name'; Component = 'jest.config.cjs'; Expected = $true }
+            @{ Name = 'alphanumeric-extension'; Component = 'Thing.psd1'; Expected = $true }
+            @{ Name = 'known-name'; Component = 'Dockerfile'; Expected = $true }
+            @{ Name = 'known-dotfile'; Component = '.shellcheckrc'; Expected = $true }
+            @{ Name = 'empty-string'; Component = ''; Expected = $false }
+            @{ Name = 'lone-dot'; Component = '.'; Expected = $false }
+            @{ Name = 'trailing-dot'; Component = 'beta.'; Expected = $false }
+            @{ Name = 'dot-leading-unknown'; Component = '.claude'; Expected = $false }
+            @{ Name = 'digit-led-extension'; Component = 'v1.2.0'; Expected = $false }
+            @{ Name = 'hyphenated-extension'; Component = 'archive.tar-gz'; Expected = $false }
+            @{ Name = 'non-ascii-extension'; Component = 'notes.' + [char]0xE9; Expected = $false }
+            @{ Name = 'known-name-case-variant'; Component = 'dockerfile'; Expected = $false }
+            @{ Name = 'extensionless-unknown'; Component = 'thing'; Expected = $false }
+        ) {
+            # Arrange / Act
+            $observed = Test-FileShapedComponent -Component $Component
+
+            # Assert
+            $observed | Should -Be $Expected
+        }
+    }
+
+    Context 'Parity with the Python reference' {
+        It 'pins the known file names to the Python source' {
+            # Arrange: read the quoted segments between KNOWN_FILE_NAMES and its
+            # .split() call. The Python double quote is matched with \x22 so this
+            # file keeps its no-double-quote constraint.
+            $pythonText = Get-Content -LiteralPath $script:PythonTokenShapePath -Raw
+            $body = [regex]::Match($pythonText, '(?s)KNOWN_FILE_NAMES: frozenset\[str\] = frozenset\((.*?)\.split\(\)').Groups[1].Value
+            $joined = (@([regex]::Matches($body, '\x22([^\x22]*)\x22') | ForEach-Object { $_.Groups[1].Value }) -join '')
+            [string[]] $pythonName = @($joined -split '\s+' | Where-Object { $_.Length -gt 0 })
+            # The command resolves through the re-exporting extraction module, so
+            # the defining module is read from the function's own script block.
+            $tokenShapeModule = (Get-Command -Name Test-FileShapedComponent).ScriptBlock.Module
+            [string[]] $powerShellName = @(& $tokenShapeModule { [string[]] @($script:KnownFileName) })
+
+            # Act: sort both ordinally so the comparison ignores declaration order.
+            [Array]::Sort($pythonName, [StringComparer]::Ordinal)
+            [Array]::Sort($powerShellName, [StringComparer]::Ordinal)
+
+            # Assert
+            $pythonName.Count | Should -Be 18
+            $powerShellName.Count | Should -Be 18
+            ($powerShellName -join ' ') | Should -BeExactly ($pythonName -join ' ')
+        }
+
+        It 'pins the extension pattern text to the Python source' {
+            # Arrange
+            $pythonText = Get-Content -LiteralPath $script:PythonTokenShapePath -Raw
+            $pythonPattern = [regex]::Match($pythonText, 'FILE_EXTENSION_PATTERN_TEXT = \x22([^\x22]*)\x22').Groups[1].Value
+
+            $tokenShapeModule = (Get-Command -Name Test-FileShapedComponent).ScriptBlock.Module
+
+            # Act
+            $powerShellPattern = & $tokenShapeModule { $script:FileExtensionPatternText }
+
+            # Assert
+            $pythonPattern | Should -Not -BeNullOrEmpty
+            $powerShellPattern | Should -BeExactly $pythonPattern
+        }
+    }
+
+    Context 'Module export surface' {
+        It 're-exports Test-FileShapedComponent from the extraction module' {
+            # Arrange: callers resolve token-shape predicates through the
+            # extraction module, so the new predicate must be re-exported there.
+            $exported = (Get-Module BlastRadiusExtraction).ExportedFunctions.Keys
+
+            # Act / Assert
+            $exported | Should -Contain 'Test-FileShapedComponent'
+        }
+    }
+}

@@ -47,6 +47,14 @@ const RECEIPT_BAND_MISMATCH =
   "Parallel planner checkpoint items[0] model_routing_receipt.complexity_band 'C2' does not equal complexity_band 'C3'.";
 const UNKNOWN_FABLE_POLICY =
   "Parallel planner checkpoint items[0] model_routing_receipt.fable_policy must be one of disabled, available, preferred; found: 'sometimes'.";
+const ASSESSMENT_BAND_VS_ABSENT =
+  "Parallel planner checkpoint items[0] complexity_assessment.band 'C3' does not equal complexity_band None.";
+const RECEIPT_BAND_VS_ABSENT =
+  "Parallel planner checkpoint items[0] model_routing_receipt.complexity_band 'C3' does not equal complexity_band None.";
+const RECEIPT_BAND_ABSENT_ENUM =
+  "Parallel planner checkpoint items[0] model_routing_receipt complexity_band must be one of C1, C2, C3, C4; got: None.";
+const RECEIPT_BAND_ABSENT_VS_ITEM =
+  "Parallel planner checkpoint items[0] model_routing_receipt.complexity_band None does not equal complexity_band 'C3'.";
 const ASSESSMENT_BAND_LIST = ASSESSMENT_BAND_ENUM.replace("C9.", "['C3'].");
 const RECEIPT_BAND_LIST = RECEIPT_BAND_ENUM.replace("C9.", "['C3'].");
 const ROUTING_FIELDS = [
@@ -227,6 +235,33 @@ describe("parallel planner ready gate P10 routing record", () => {
     const errors = validateReadyItemRouting(record, CTX);
 
     expect(errors).toEqual([]);
+  });
+
+  it("reports checks 1, 5, and 9 with None when only the item band is absent", () => {
+    const record = buildPlannerRoutingFields();
+    delete record["complexity_band"];
+
+    const errors = validateReadyItemRouting(record, CTX);
+
+    expect(errors).toEqual([
+      BAND_ABSENT,
+      ASSESSMENT_BAND_VS_ABSENT,
+      RECEIPT_BAND_VS_ABSENT,
+    ]);
+  });
+
+  it("reports checks 7 and 9 with None when only the receipt band is absent", () => {
+    const record = buildPlannerRoutingFields();
+    delete nested(record, "model_routing_receipt")["complexity_band"];
+
+    const errors = validateReadyItemRouting(record, CTX);
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        RECEIPT_BAND_ABSENT_ENUM,
+        RECEIPT_BAND_ABSENT_VS_ITEM,
+      ]),
+    );
   });
 
   it.each<[string, (item: JsonRecord) => void]>([

@@ -1,6 +1,7 @@
 # Local Acceptance-Criteria Status Summary
 
 Timestamp: 2026-10-02T01-55
+Note (added under #846, policy-audit PA-2): this file is a summary artifact of other evidence; no command was executed to produce it, so it carries no Command or EXIT_CODE row.
 
 ### Acceptance Criteria Status
 - Source: docs/features/active/2026-09-27-orchestration-completion-gate-and-tooling-friction-744/spec.md
