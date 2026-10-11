@@ -174,7 +174,7 @@ Describe 'preimplementation gate helpers chain escapes (<Surface>)' -ForEach @(
         @($result.Segments).Count | Should -Be 0
     }
 
-    It 'exempts a commit whose message contains an escaped semicolon' {
+    It 'does not exempt a commit whose message contains an escaped semicolon (issue #732 D2a)' {
         # Arrange
         $commandText = 'git commit -m fix\;done -- docs/features/active/x/spec.md'
 
@@ -182,7 +182,7 @@ Describe 'preimplementation gate helpers chain escapes (<Surface>)' -ForEach @(
         $isExempt = Test-ExemptOrchestrationStagingCommand -CommandText $commandText
 
         # Assert
-        $isExempt | Should -BeTrue -Because 'the shell runs one git commit whose message is fix;done'
+        $isExempt | Should -BeFalse -Because 'under PowerShell this is a pathless commit followed by done (issue #735)'
     }
 
     It 'does not exempt a chained command after an escaped backslash' {

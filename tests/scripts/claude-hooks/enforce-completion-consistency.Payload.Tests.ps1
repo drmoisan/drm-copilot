@@ -16,6 +16,7 @@ Describe 'enforce-completion-consistency.ps1 payload envelope' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-completion-consistency.ps1").Path
         . $script:UnderTest
+        Mock Get-CheckpointFileContent { $null }
     }
 
     Context 'envelope anomalies fail closed' {

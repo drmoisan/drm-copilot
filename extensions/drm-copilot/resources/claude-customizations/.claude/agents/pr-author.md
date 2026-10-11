@@ -11,8 +11,15 @@ tools:
   - "Bash(git rev-parse *)"
   - "Bash(gh pr create *)"
   - "Bash(gh pr edit *)"
+  - "Bash(sha256sum *)"
+  - "Bash(date *)"
   - "Write(/artifacts/**)"
 hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/enforce-pr-author-command-allowlist.ps1
   SubagentStop:
     - matcher: "pr-author"
       hooks:
@@ -49,7 +56,7 @@ Before any `gh pr create` or `gh pr edit --body*` command, you MUST perform thes
 
 1. Write the PR body text to `artifacts/pr_body_<N>.md`, where `<N>` is the target issue or PR
    number for this change.
-2. Compute the SHA-256 of the body file bytes and render it as lowercase hexadecimal.
+2. Compute the SHA-256 of the body file by running `sha256sum artifacts/pr_body_<N>.md` as a single command (no chaining) and take the lowercase hexadecimal digest.
 3. Write the sibling receipt `artifacts/pr_body_<N>.receipt.json` with exactly these fields:
    - `skill`: `"pr-author"`
    - `pr_body_path`: `"artifacts/pr_body_<N>.md"`
@@ -57,7 +64,7 @@ Before any `gh pr create` or `gh pr edit --body*` command, you MUST perform thes
    - `sha256`: the lowercase-hex SHA-256 of the body file bytes from step 2
    - `context_summary_path`: `"artifacts/pr_context.summary.txt"`
    - `created_at`: the current time as a UTC ISO-8601 timestamp (for example `2026-06-24T16:00:00Z`),
-     strictly newer than the last-write time of `artifacts/pr_context.summary.txt`
+     strictly newer than the last-write time of `artifacts/pr_context.summary.txt`. Obtain it by running `date -u +%Y-%m-%dT%H:%M:%SZ` as a single command.
 4. Issue the command immediately, passing the body via `--body-file`:
    `gh pr create --body-file artifacts/pr_body_<N>.md`. The PreToolUse hook verifies, in five ordered
    checks, that the `--body-file` path is canonical, that the receipt exists, that `number` matches
@@ -68,6 +75,12 @@ The body file is `artifacts/pr_body_<N>.md` and the receipt is `artifacts/pr_bod
 The PR body must be passed via `--body-file`; inline `--body` is blocked by the hook (Case A). This
 agent does not write or delete any short-lived authorization file; provenance is established solely by
 the SHA-256 receipt.
+
+The `enforce-pr-author-command-allowlist.ps1` PreToolUse hook registered in this agent's frontmatter
+evaluates every Bash segment and denies anything outside the allowed forms (`git log`,
+`git rev-parse`, `gh pr create`, `gh pr edit`, and, each as a single command,
+`sha256sum artifacts/pr_body_<N>.md` and `date -u +%Y-%m-%dT%H:%M:%SZ`) with
+`PR_AUTHOR_COMMAND_NOT_ALLOWED:`.
 
 ## Final Output Requirement
 

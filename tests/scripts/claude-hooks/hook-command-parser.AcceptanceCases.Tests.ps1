@@ -67,6 +67,7 @@ Describe 'hook-command-parser acceptance cases (issue #545)' {
                 } | ConvertTo-Json -Compress -Depth 5)
         }
         Mock Resolve-EpicMergeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
+        Mock Resolve-EpicMergeGateItemTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #850)' } }
         Mock Resolve-EpicWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
@@ -191,11 +192,10 @@ JSON
             # runtimes have silently diverged.
             $commandText = 'git worktree remove --force /repo/worktrees/item-a-101'
 
-            # Act + Assert: both gates must resolve the same path.
-            Get-ParallelWorktreeRemovalCommandPath -CommandText $commandText |
-                Should -Be '/repo/worktrees/item-a-101'
-            Get-EpicWorktreeRemovalCommandPath -CommandText $commandText |
-                Should -Be '/repo/worktrees/item-a-101'
+            # Act + Assert: both removal gates consume Resolve-CommandLineInvocationTarget
+            # (issue #824), so one resolver call fixes the path for both of them.
+            (Resolve-CommandLineInvocationTarget -CommandText $commandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Targets |
+                Should -Be @('/repo/worktrees/item-a-101')
         }
     }
 

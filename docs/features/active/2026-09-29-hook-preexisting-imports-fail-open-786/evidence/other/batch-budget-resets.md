@@ -1,0 +1,28 @@
+# Batch-Budget Resets (rule 5, R-RESET)
+
+- P4-T2#1 | 2026-10-09T23-17 | deleted: none present
+- P5-T1#1 | 2026-10-09T23-24 | deleted: none present
+- P5-T2#1 | 2026-10-09T23-30 | deleted: none present
+- P5-T2#2 | 2026-10-09T23-30 | deleted: none present
+- P5-T2#3 | 2026-10-09T23-31 | deleted: none present
+- P5-T4#1 | 2026-10-09T23-39 | deleted: none present
+- P5-T4#2 | 2026-10-09T23-39 | deleted: none present
+- P5-T4#3 | 2026-10-09T23-40 | deleted: none present
+- P5-T6#1 | 2026-10-09T23-44 | deleted: none present
+- P5-T6#2 | 2026-10-09T23-44 | deleted: none present
+- P6-T1#1 | 2026-10-09T23-48 | deleted: none present
+- P6-T1#2 | 2026-10-09T23-48 | deleted: none present
+- P6-T3#1 | 2026-10-09T23-53 | deleted: none present
+- P6-T3#2 | 2026-10-09T23-53 | deleted: none present
+- P7-T1#1 | 2026-10-10T00-06 | deleted: none present
+- P7-T1#2 | 2026-10-10T00-06 | deleted: none present
+- P7-T1#3 | 2026-10-10T00-06 | deleted: none present
+- P7-T3#1 | 2026-10-10T00-10 | deleted: none present
+- P7-T3#2 | 2026-10-10T00-10 | deleted: none present
+- P7-T3#3 | 2026-10-10T00-10 | deleted: none present
+- P7-T5#1 | 2026-10-10T00-12 | deleted: none present
+- P8-T7#1 | 2026-10-10T00-20 | deleted: none present
+- P8-T8#1 | 2026-10-10T00-23 | deleted: none present
+- P10-T1#RS10-1 | 2026-10-10T01-27 | deleted: none present
+- P10-T1#RS10-2 | 2026-10-10T01-27 | deleted: none present
+- P2-T9#1 | 2026-10-10T16-21 | deleted: none present

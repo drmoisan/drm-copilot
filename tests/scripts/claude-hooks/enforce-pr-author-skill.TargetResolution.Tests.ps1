@@ -22,6 +22,14 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-pr-author-skill.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/orchestrator-state/OrchestratorState.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-OrchestratorStateCheckpoint -ModuleName OrchestratorState { $null }
+        Mock Get-PrAuthorCheckpointContent { $null }
+        Mock Get-PrAuthorReceiptContent { $null }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution/EpicScopeResolution.psm1").Path
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
 
@@ -38,6 +46,8 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     }
 
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     Context 'the checkpoint is taken from the resolved target, not the session root' {
         It 'validates the sibling worktree checkpoint when --head names another worktree' {
             Mock -CommandName Resolve-PrAuthorWorktreeTarget -MockWith {
@@ -48,8 +58,9 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
                 [pscustomobject]@{ HasErrors = $false; ErrorText = '' }
             }
             Mock -CommandName Test-PrAuthorReceiptVerification -MockWith { $null }
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
 
-            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --head feature/item-701 --body-file artifacts/pr_body_701.md' -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --head feature/item-701 --body-file artifacts/pr_body_701.md'
 
             $reason | Should -BeNullOrEmpty
             $script:capturedPath | Should -BeLike ("{0}*" -f $script:ItemRoot)
@@ -65,8 +76,9 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
                 [pscustomobject]@{ HasErrors = $false; ErrorText = '' }
             }
             Mock -CommandName Test-PrAuthorReceiptVerification -MockWith { $null }
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
 
-            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --head feature/self --body-file artifacts/pr_body_1.md' -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --head feature/self --body-file artifacts/pr_body_1.md'
 
             $reason | Should -BeNullOrEmpty
             $script:capturedPath | Should -BeExactly "$($script:SessionRootPath)/$($script:CheckpointRelative)"
@@ -80,7 +92,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
             }
             Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { throw 'the gate must not consult any checkpoint for an underivable target' }
 
-            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --title x --body-file artifacts/pr_body_1.md' -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --title x --body-file artifacts/pr_body_1.md'
 
             $reason | Should -BeLike ("{0}*" -f (Get-WorktreeResolutionNoTargetReasonCode))
             $reason | Should -BeLike '*--head*'
@@ -93,7 +105,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
             }
             Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { throw 'the gate must not consult any checkpoint for an ambiguous target' }
 
-            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --head feature/shared --body-file artifacts/pr_body_1.md' -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --head feature/shared --body-file artifacts/pr_body_1.md'
 
             $reason | Should -BeLike ("{0}*" -f (Get-WorktreeResolutionAmbiguityReasonCode))
             Should -Invoke -CommandName Invoke-OrchestratorStatePreflight -Times 0 -Exactly
@@ -107,7 +119,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
             }
             Mock -CommandName Invoke-OrchestratorStatePreflight -MockWith { [pscustomobject]@{ HasErrors = $false; ErrorText = '' } }
 
-            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --body-file artifacts/pr_body_838.md' -ContextExists $true
+            $reason = Get-PrAuthorBypassReason -CommandText 'gh pr create --body-file artifacts/pr_body_838.md'
 
             $reason | Should -Not -BeNullOrEmpty
             $reason | Should -BeLike ("{0}*" -f (Get-WorktreeResolutionNoTargetReasonCode))

@@ -1,6 +1,5 @@
 #Requires -Version 7.0
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
-
 <#
 .SYNOPSIS
     Target-resolution matrix for the prd-feature gate (issue #672).
@@ -24,14 +23,12 @@
     leaves every one of those properties in place: the mocked seam is now the identity
     resolver, but it is still mocked.
 #>
-
 # --- Synthetic worktree roots ----------------------------------------------------
 # Bare string literals. Neither root exists on disk, and no assertion here depends
 # on whether it does: every filesystem seam is mocked and keyed on the fully
 # composed path.
 $CoordinatingSessionRoot = '/synthetic-worktrees/coordinating-session'
 $ItemWorktreeRoot = '/synthetic-worktrees/item-worktree'
-
 # The feature folder every row resolves to, and a second folder used only to build
 # a two-candidate tie.
 $TargetFeatureFolder = 'docs/features/active/2026-09-13-synthetic-target-672'
@@ -99,6 +96,9 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner.ps1").Path
         $script:Helpers = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner-helpers.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-PrdFeatureCheckpointFolder' -Surface 'Codex'
         . $script:Helpers
 
         # The modelled target results below are built with F1's own constructor, so the
@@ -149,6 +149,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
                     -Candidate @($WorktreeRoot) -Detail "modelled target '$WorktreeRoot'")
         }
     }
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 
     Context 'cross-file mock resolution smoke' {
         It 'observes a test-scope mock across the dot-source boundary' {

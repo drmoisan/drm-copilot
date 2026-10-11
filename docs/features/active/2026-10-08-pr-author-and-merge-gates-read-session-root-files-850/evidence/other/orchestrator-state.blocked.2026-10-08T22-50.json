@@ -1,0 +1,399 @@
+{
+  "objective": "Preparation mode for epic #852 child C3 (residual session-root reads): issue #850 with bundled #788, #789, #851. Promotion, research, spec, atomic planning, and preflight clearance only.",
+  "route_id": "large",
+  "path_selected": "large",
+  "epic_mode": true,
+  "preparation_mode": false,
+  "epic_feature_folder": "enforcement-hook-precision",
+  "integration_branch": "epic/enforcement-hook-precision-integration",
+  "branch_name": "bug/pr-author-and-merge-gates-read-session-root-files-exec-850",
+  "change_budget_estimate": "Large: 4+ production files across .claude/hooks (enforce-pr-author-skill.ps1 and helpers, enforce-epic-merge-gate.ps1 and resolution, enforce-epic-worktree-removal-gate.ps1, enforce-parallel-worktree-removal-gate.ps1), .claude/lib/worktree-resolution/WorktreeRunResolution.psm1, their .codex copies and extensions/drm-copilot/resources mirrors, plus Pester suites.",
+  "promotion-type": "bug",
+  "short-name": "pr-author-and-merge-gates-read-session-root-files",
+  "relativeFile": "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/issue.md",
+  "long-name": "2026-10-08-pr-author-and-merge-gates-read-session-root-files-850",
+  "issue-num": "850",
+  "feature-folder": "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850",
+  "work-mode": "full-bug",
+  "plan-path": "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md",
+  "research-path": "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/research/",
+  "bundled_issues": [
+    788,
+    789,
+    851
+  ],
+  "lifecycle_ready": true,
+  "required_agents": [
+    "task-researcher",
+    "prd-feature",
+    "atomic-planner",
+    "atomic-executor"
+  ],
+  "required_skills": [
+    "orchestrate",
+    "feature-promotion-lifecycle",
+    "atomic-plan-contract"
+  ],
+  "required_mcp_tools": [
+    "new_potential_bug_entry",
+    "potential_to_issue",
+    "new_active_feature_folder",
+    "validate_orchestration_artifacts"
+  ],
+  "completed_steps": [
+    "S1_change_budget",
+    "S3_promotion",
+    "S3b_research",
+    "S3c_feature_documents",
+    "S4_atomic_planning",
+    "S4b_preflight",
+    "S5_phase0_P0-T1_to_P0-T11"
+  ],
+  "next_step": "S4_atomic_planning_revision",
+  "last_updated": "2026-10-08T22:50:00Z",
+  "preflight": {
+    "status": "PREFLIGHT: ALL CLEAR",
+    "rounds": 4,
+    "convergence": "CONVERGENCE: NO FURTHER ROUNDS EXPECTED",
+    "plan_sha256": "0b82514e4ac901c07435b6f1052aab1154358a91b641da6bce12ff3d2962e77e",
+    "plan_commit": "c79642f7",
+    "cleared_at": "2026-10-08T19:51:17Z",
+    "execution_preconditions": "C1a (#824) merged into epic/enforcement-hook-precision-integration (P0-T9 stops with C1A-NOT-MERGED otherwise); executing checkpoint on a batch-budget-exempt route (P0-T7)",
+    "non_blocking_note": "plan header Status/Version lines still read revision 2 / 1.2"
+  },
+  "step5_status": "blocked",
+  "step6_status": "pending",
+  "step7_status": "pending",
+  "step8_status": "pending",
+  "step9_status": "pending",
+  "step10_status": "pending",
+  "blocked_reason": "C1A-REGION-UNANTICIPATED at P0-T12 (evidence: docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/evidence/other/c1a-reverification.2026-10-08T22-39.md). Regions: (1) .claude/hooks/hook-command-invocation.ps1: Get-CommandLineFlagValue and Test-CommandLineFlag moved by #824 to new sibling .claude/hooks/hook-command-invocation-operands.ps1 (lines 70, 125; dot-sourced at hook-command-invocation.ps1 line 24; params unchanged), so the A15 FUNCTION check naming hook-command-invocation.ps1 fails. (2) -ContextExists search returns 4 files, plan expects 2: added by #824 tests/scripts/claude-hooks/enforce-pr-author-skill.Issue824.Tests.ps1 (lines 135,139,146,149) and tests/scripts/claude-hooks/hook-command-invocation.Issue824Regression.Tests.ps1 (lines 184,192,200,208); neither is in C10/C11, EDITED-TESTS, SET-PRA, BASELINE-GREEN or LC-TESTS. (3) Removal-gate final denies moved into new per-target functions, so Appendix B B2/B4 name the wrong functions: enforce-epic-worktree-removal-gate.ps1 final deny (lines 396,398) now in Get-EpicWorktreeRemovalTargetDenial (337-399), Invoke-EpicWorktreeRemovalGateDecision is 277-335 and loops targets; enforce-parallel-worktree-removal-gate.ps1 final deny (lines 408,410) now in Get-ParallelWorktreeRemovalTargetDenial (from 338), Invoke-ParallelWorktreeRemovalGateDecision is 277-336. Check 1 rewritten by #824 (Get-PrAuthorBodyFileValue; anticipated by D5). All other P0-T12 checks and line caps passed. No production or test file edited; re-plan required by atomic-planner.",
+  "local_execution_overrides": [],
+  "delegation_bypasses": [],
+  "completion_gate_residuals": [
+    {
+      "item": "mcp_call_receipts: new_potential_bug_entry and potential_to_issue",
+      "reason": "Issue #850 pre-existed and was supplied by epic-planner; no potential entry was created and no promotion was performed, per the delegation instruction. No receipt is fabricated."
+    }
+  ],
+  "delegation_receipts": {
+    "promotion": {
+      "potential_entry": null,
+      "issue": {
+        "number": 850,
+        "state": "OPEN",
+        "title": "Bug: pr-author-and-merge-gates-read-session-root-files",
+        "url": "https://github.com/drmoisan/drm-copilot/issues/850"
+      },
+      "feature_folder": {
+        "ok": true,
+        "tool": "new_active_feature_folder",
+        "workspace_root": "<worktree-root>",
+        "summary": "Created a new active bug feature folder for '2026-10-08-pr-author-and-merge-gates-read-session-root-files'.",
+        "destination_path": "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850"
+      }
+    },
+    "agents": [
+      {
+        "agent_name": "task-researcher",
+        "step": "S3b_research",
+        "agent_id": "task-researcher-850-r1",
+        "skill_source": ".claude/agents/task-researcher.md",
+        "started_at": "2026-10-08T17:58:00Z",
+        "completed_at": "2026-10-08T18:13:08Z",
+        "result_signal": "RESEARCH COMPLETE",
+        "artifact_paths": [
+          "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/research/research.2026-10-08T14-00.md"
+        ]
+      },
+      {
+        "agent_name": "prd-feature",
+        "step": "S3c_feature_documents",
+        "agent_id": "prd-feature-850-r1",
+        "skill_source": ".claude/agents/prd-feature.md",
+        "started_at": "2026-10-08T18:15:00Z",
+        "completed_at": "2026-10-08T18:20:00Z",
+        "result_signal": "SPEC COMPLETE (47 acceptance criteria; user-story.md absent by design)",
+        "artifact_paths": [
+          "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/spec.md"
+        ]
+      },
+      {
+        "agent_name": "atomic-planner",
+        "step": "S4_atomic_planning",
+        "agent_id": "atomic-planner-850-r1",
+        "skill_source": ".claude/agents/atomic-planner.md",
+        "started_at": "2026-10-08T18:22:00Z",
+        "completed_at": "2026-10-08T18:55:00Z",
+        "result_signal": "PLAN WRITTEN; SELF-REVIEW: RE-DERIVED THIS PASS; validator ok with 2 G8b warnings (P8-T17)",
+        "artifact_paths": [
+          "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md"
+        ]
+      },
+      {
+        "agent_name": "atomic-executor",
+        "step": "S4b_preflight_round_1",
+        "agent_id": "atomic-executor-850-pf1",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-10-08T18:56:00Z",
+        "completed_at": "2026-10-08T19:17:00Z",
+        "result_signal": "PREFLIGHT: REVISIONS REQUIRED (14 findings)",
+        "artifact_paths": [
+          "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md"
+        ]
+      },
+      {
+        "agent_name": "atomic-planner",
+        "step": "S4_atomic_planning_revision_1",
+        "agent_id": "atomic-planner-850-r2",
+        "skill_source": ".claude/agents/atomic-planner.md",
+        "started_at": "2026-10-08T19:18:00Z",
+        "completed_at": "2026-10-08T19:27:00Z",
+        "result_signal": "14 of 14 applied; SELF-REVIEW: RE-DERIVED THIS PASS",
+        "artifact_paths": [
+          "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md"
+        ]
+      },
+      {
+        "agent_name": "atomic-executor",
+        "step": "S4b_preflight_round_2",
+        "agent_id": "atomic-executor-850-pf2",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-10-08T19:28:00Z",
+        "completed_at": "2026-10-08T19:34:00Z",
+        "result_signal": "PREFLIGHT: REVISIONS REQUIRED (3 findings)",
+        "artifact_paths": [
+          "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md"
+        ]
+      },
+      {
+        "agent_name": "atomic-planner",
+        "step": "S4_atomic_planning_revision_2",
+        "agent_id": "atomic-planner-850-r3",
+        "skill_source": ".claude/agents/atomic-planner.md",
+        "started_at": "2026-10-08T19:35:00Z",
+        "completed_at": "2026-10-08T19:41:00Z",
+        "result_signal": "3 of 3 applied; SELF-REVIEW: RE-DERIVED THIS PASS",
+        "artifact_paths": [
+          "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md"
+        ]
+      },
+      {
+        "agent_name": "atomic-executor",
+        "step": "S4b_preflight_round_3",
+        "agent_id": "atomic-executor-850-pf3",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-10-08T19:42:00Z",
+        "completed_at": "2026-10-08T19:45:00Z",
+        "result_signal": "PREFLIGHT: REVISIONS REQUIRED (3 findings)",
+        "artifact_paths": [
+          "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md"
+        ]
+      },
+      {
+        "agent_name": "atomic-planner",
+        "step": "S4_atomic_planning_revision_3",
+        "agent_id": "atomic-planner-850-r4",
+        "skill_source": ".claude/agents/atomic-planner.md",
+        "started_at": "2026-10-08T19:46:00Z",
+        "completed_at": "2026-10-08T19:48:00Z",
+        "result_signal": "3 of 3 applied; SELF-REVIEW: RE-DERIVED THIS PASS",
+        "artifact_paths": [
+          "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md"
+        ]
+      },
+      {
+        "agent_name": "atomic-executor",
+        "step": "S4b_preflight_round_4",
+        "agent_id": "atomic-executor-850-pf4",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-10-08T19:49:00Z",
+        "completed_at": "2026-10-08T19:51:17Z",
+        "result_signal": "PREFLIGHT: ALL CLEAR; CONVERGENCE: NO FURTHER ROUNDS EXPECTED",
+        "artifact_paths": [
+          "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md"
+        ]
+      }
+    ],
+    "atomic_execution": {
+      "agent": "atomic-executor",
+      "model": "opus",
+      "status": "stopped",
+      "launched_at": "2026-10-08T19:15:00Z",
+      "plan_path": "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md",
+      "start_commit": "0982ac62",
+      "stop_code": "C1A-REGION-UNANTICIPATED",
+      "last_completed_task": "P0-T11",
+      "last_push_commit": "b3fe6a72e71e2519e9492ed172a4d9b2a6f1d47d",
+      "base_sha": "497cb504ad9a4e5435dc8946333ebc28baea50c4",
+      "completed_at": "2026-10-08T22:50:00Z"
+    }
+  },
+  "research_decisions": {
+    "open_item_1_resolution_before_pr_context_missing": "accepted",
+    "open_item_2_relative_body_path_denied_for_other_worktree": "accepted",
+    "open_item_3_788_fail_closed_for_routes_without_pr_gate": "accepted",
+    "open_item_4_epic_removal_gate_doubled_token": "fixed in this child alongside #851 diagnostics",
+    "open_item_5_codex_hooks": "out of scope: .codex merge and removal gates are independent implementations, not copies, with no byte-parity requirement; recorded as a follow-up candidate, no new issue created in this run"
+  },
+  "skill_receipts": [
+    {
+      "skill": "orchestrate",
+      "required": true,
+      "evidence": "Preparation-mode procedure applied per .claude/skills/orchestrate/SKILL.md ## Preparation Mode."
+    },
+    {
+      "skill": "feature-promotion-lifecycle",
+      "required": true,
+      "evidence": "Existing issue #850 recorded as promotion issue receipt; active folder created via mcp__drm-copilot__new_active_feature_folder (full-bug)."
+    },
+    {
+      "skill": "atomic-plan-contract",
+      "required": true,
+      "evidence": "Plan docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/plan.2026-10-08T13-54.md validated (plan route, zero warnings) and cleared by atomic-executor preflight round 4."
+    }
+  ],
+  "mcp_call_receipts": [
+    {
+      "tool": "new_active_feature_folder",
+      "ok": true,
+      "evidence": "destination_path docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850"
+    },
+    {
+      "tool": "validate_orchestration_artifacts",
+      "ok": true,
+      "evidence": "plan artifact validated at commit c79642f7 with zero warnings; orchestrator-state validated with require_model_routing"
+    }
+  ],
+  "model_routing_preflight": {
+    "status": "pass",
+    "checked_at": "2026-10-08T19:10:30Z",
+    "validator_command": "poetry run python scripts/dev_tools/validate_orchestration_artifacts.py orchestrator-state artifacts/orchestration/orchestrator-state.json --require-model-routing",
+    "output_summary": "orchestrator-state validation passed (exit 0) after adding the atomic_execution complexity assessment and atomic-executor routing receipt"
+  },
+  "model_budget": {
+    "fable_policy": "disabled",
+    "source": "no kickoff marker line in the delegation prompt; skill default disabled applied"
+  },
+  "complexity_assessments": [
+    {
+      "phase": "research",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Shared resolver WorktreeRunResolution.psm1 and the pr-author and merge gate read contracts change across hook and module boundaries; epic manifest assesses C3 as band C3.",
+      "assessed_at": "2026-10-08T17:56:03Z"
+    },
+    {
+      "phase": "feature_documents",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Spec must define cross-module resolution contracts for two gates and the shared resolver.",
+      "assessed_at": "2026-10-08T17:56:03Z"
+    },
+    {
+      "phase": "atomic_planning",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Plan spans hooks, shared module, Codex copies, bundled mirrors, and two-worktree topology tests.",
+      "assessed_at": "2026-10-08T17:56:03Z"
+    },
+    {
+      "phase": "preflight",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Preflight validates a cross-module plan against the post-C1a tree.",
+      "assessed_at": "2026-10-08T17:56:03Z"
+    },
+    {
+      "phase": "atomic_execution",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": [
+        "cross_module_contract_change"
+      ],
+      "rationale": "Execution edits the shared WorktreeRunResolution resolver and the pr-author and merge gates across hook and module boundaries.",
+      "assessed_at": "2026-10-08T19:10:00Z"
+    }
+  ],
+  "model_routing_receipts": [
+    {
+      "agent": "task-researcher",
+      "phase": "research",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "prd-feature",
+      "phase": "feature_documents",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-planner",
+      "phase": "atomic_planning",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "preflight",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "atomic_execution",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    }
+  ],
+  "epic_context": {
+    "epic_feature_folder": "enforcement-hook-precision",
+    "integration_branch": "epic/enforcement-hook-precision-integration",
+    "epic_checkpoint_path": "artifacts/orchestration/epic-orchestrator-state.json"
+  },
+  "orchestrator_decisions": [
+    {
+      "id": "D-EXEC-1",
+      "summary": "Plan BRANCH and CMD-GIT-PUSH substituted with the execution branch."
+    },
+    {
+      "id": "D-EXEC-2",
+      "summary": "PRE_MERGE_HEAD for P0-T9 set to prepared-branch tip c79642f73e360122443eaf665f363b065f0efb2d."
+    }
+  ],
+  "hook_load_check": {
+    "status": "pass",
+    "checked_at": "2026-10-08T19:12:00Z",
+    "files_parsed": 140,
+    "parse_failures": 0,
+    "evidence_path": "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/evidence/other/hook-load-check.2026-10-08T19-12.md"
+  }
+}

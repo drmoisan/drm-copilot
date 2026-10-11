@@ -39,9 +39,11 @@
     enforce-pr-author-skill.ps1's own receipt mechanism. It is not a cryptographic control.
 
     Issue #690: with an explicit PR number, the epic and parallel checkpoints are read
-    beneath the live worktree whose run checkpoint records that number, and the child
-    branch binds the number to pr_gate.pr_number when the per-feature checkpoint records
-    it. A bare command reads every checkpoint beneath the session worktree.
+    beneath the live worktree whose run checkpoint records that number. Issue #850: with
+    an explicit PR number, the per-feature checkpoint is read beneath the live worktree
+    whose checkpoint records the number in pr_gate.pr_number or a standalone record, and
+    the child branch requires that checkpoint to bind the number (issue #788). A bare
+    command reads every checkpoint beneath the session worktree.
 
 .NOTES
     Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 through the
@@ -57,16 +59,17 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Shared command-line parser (issue #545), consumed by the scope filter in
 # Invoke-EpicMergeGateDecision and by Get-EpicMergeGateCommandPrNumber.
-. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
-. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 # Standalone-merge authorization predicates and the two decision-envelope factories (issue #670).
-. (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-authorization.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-authorization.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-authorization.ps1' -ErrorRecord $_ }
 # Checkpoint read seams, the import guard, and run-target resolution (issue #690).
-. (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-resolution.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-resolution.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-resolution.ps1' -ErrorRecord $_ }
 
 function ConvertFrom-EpicMergeGateJson {
     <#
@@ -312,10 +315,8 @@ function Invoke-EpicMergeGateDecision {
     )
 
     # A failed worktree-resolution import denies before any other logic (issue #690).
-    $importFailure = Get-EpicMergeGateImportFailureDecision
-    if ($null -ne $importFailure) {
-        return $importFailure
-    }
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_MERGE_GATE_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $payload.IsValid) {
@@ -357,9 +358,17 @@ function Invoke-EpicMergeGateDecision {
     $commandPrNumber = Get-EpicMergeGateCommandPrNumber -CommandText $commandText
     $sessionRoot = Get-EpicMergeGateSessionWorktreeRoot
 
-    # The child merges from its own worktree, so its checkpoint is the session worktree's;
-    # a recorded pr_gate.pr_number must match an explicit command PR number (issue #690).
-    $childCheckpoint = ConvertFrom-EpicMergeGateJson -Raw (Get-ChildOrchestratorCheckpointContent -Path (Get-WorktreeRunCheckpointPath -Kind item -WorktreeRoot $sessionRoot))
+    # With an explicit PR number, the per-feature checkpoint is read beneath the live
+    # worktree whose checkpoint records the number in pr_gate.pr_number or a standalone
+    # record (issue #850); an unresolved item target reads none. A bare command reads the
+    # session worktree. The checkpoint read must still bind the number (issue #788).
+    $itemTarget = $null
+    $childRoot = $sessionRoot
+    if ($null -ne $commandPrNumber) {
+        $itemTarget = Resolve-EpicMergeGateItemTarget -PrNumber $commandPrNumber
+        $childRoot = if (@('SessionRoot', 'OtherWorktree') -contains $itemTarget.Status) { $itemTarget.WorktreeRoot } else { $null }
+    }
+    $childCheckpoint = if ($childRoot) { ConvertFrom-EpicMergeGateJson -Raw (Get-ChildOrchestratorCheckpointContent -Path (Get-WorktreeRunCheckpointPath -Kind item -WorktreeRoot $childRoot)) } else { $null }
     if ((Test-ChildCheckpointAllowsEpicMerge -Checkpoint $childCheckpoint) -and
         (Test-ChildCheckpointPrGateBinding -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber)) {
         return Get-EpicMergeGateAllowDecision
@@ -396,8 +405,9 @@ function Invoke-EpicMergeGateDecision {
         if ($standalone.Allowed) {
             return Get-EpicMergeGateAllowDecision
         }
-        # When neither run branch resolved, its reason code and detail precede the standalone reason.
-        $unresolved = Get-EpicMergeGateUnresolvedReason -EpicTarget $epicTarget -ParallelTarget $parallelTarget
+        # When neither the item target nor a run branch resolved, the reason code and the
+        # three details precede the standalone reason (issue #850).
+        $unresolved = Get-EpicMergeGateUnresolvedReason -ItemTarget $itemTarget -EpicTarget $epicTarget -ParallelTarget $parallelTarget
         $prefix = if ($unresolved) { $unresolved + '; ' } else { '' }
         return Get-EpicMergeGateBlockDecision -Reason ('EPIC_MERGE_GATE_BLOCKED: ' + $prefix + $standalone.ReasonCode + ': ' + $standalone.Message)
     }
@@ -447,6 +457,9 @@ function Invoke-EpicMergeGateEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_MERGE_GATE_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_MERGE_GATE_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 # The entry point returns its [int] exit code as the last pipeline element and the
 # decision JSON before it. `exit (<call>)` would capture BOTH into the exit

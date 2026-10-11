@@ -7,6 +7,8 @@ param()
 Describe 'bundled Codex enforce-completion-consistency.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/enforce-completion-consistency.ps1").Path
+        . $script:UnderTest
+        Mock Get-CheckpointFileContent { $null }
 
         function ConvertTo-CodexCheckpointToolInput {
             param(
@@ -21,6 +23,7 @@ Describe 'bundled Codex enforce-completion-consistency.ps1' {
 
     BeforeEach {
         . $script:UnderTest
+        Mock Get-CheckpointFileContent { $null }
     }
 
     It 'emits the PreToolUse deny shape for a completion checkpoint with missing evidence' {

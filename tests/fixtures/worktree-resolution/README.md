@@ -12,10 +12,10 @@ Two properties make that split work:
 - `.gitignore` ignores `/artifacts` with a root anchor, so the repository-root
   `artifacts/` tree is untracked and absent on a clean checkout, while
   `tests/fixtures/worktree-resolution/<root>/artifacts/...` is tracked normally.
-- The pr-author gate reads three paths relative to the process directory:
+- The pr-author gate reads three paths beneath the resolved worktree (issue #850):
   `artifacts/pr_body_<N>.receipt.json` (check 2), `artifacts/pr_body_<N>.md` (check 4),
   and the last-write time of `artifacts/pr_context.summary.txt` (check 5). A matrix row
-  that left the working directory to the executing process would therefore pass in a
+  whose resolved worktree is left to the executing process would therefore pass in a
   development worktree that happens to hold `/artifacts` and fail on a clean checkout,
   before reaching the behaviour it asserts. Every row runs inside one of these roots
   with an explicit working directory instead.
@@ -32,7 +32,7 @@ entrypoint production uses and exercises the Case C branch rather than bypassing
 | `pr-author/session-root` | `838` | base checkpoint; `artifacts/pr_context.summary.txt`; `artifacts/pr_body_1.md`; `artifacts/pr_body_1.receipt.json` |
 | `pr-author/item-own-ready` | `901` | base checkpoint with `objective` `Own item B fixture.`; the same three artifact files |
 | `pr-author/item-own-not-ready` | `901` | base checkpoint with `step5_status` `pending` |
-| `pr-author/item-own-epic-mode` | `901` | base checkpoint plus `"epic_mode": true` and `"epic_context": {"integration_branch": "epic/f5-fixture-integration"}` |
+| `pr-author/item-own-epic-mode` | `901` | base checkpoint plus `"epic_mode": true` and `"epic_context": {"integration_branch": "epic/f5-fixture-integration"}`; byte-identical copies of the three artifact files of `item-own-ready` (issue #850) |
 | `model-routing/session-root` | `838` | a minimal checkpoint recording an `atomic-planner` routing receipt |
 | `model-routing/item-own-receipt` | `901` | a minimal checkpoint recording an `atomic-planner` routing receipt |
 | `model-routing/item-own-no-receipt` | `901` | a minimal checkpoint recording a `feature-review` receipt only |
@@ -41,11 +41,13 @@ entrypoint production uses and exercises the Case C branch rather than bypassing
 | `shared/item-own-empty` | unknown | a checkpoint of zero bytes |
 | `shared/item-no-checkpoint` | none | `artifacts/pr_context.summary.txt` only |
 
-`pr-author/item-own-epic-mode` deliberately carries no artifact files. A matrix row
-resolves its target there while *running* in `pr-author/session-root`, which is what lets
-that row read the committed receipt, body, and context-summary bytes from the working
-directory and take the epic base-branch verdict from the resolved checkpoint. That row is
-the direct pass-after evidence for the epic base-branch binding.
+`pr-author/item-own-epic-mode` carries byte-identical copies of the three artifact files
+of `item-own-ready` (issue #850), because the pr-author gate reads PR artifacts beneath
+the resolved worktree. A matrix row resolves its target there while *running* in
+`pr-author/session-root`, which is what lets that row read the committed receipt, body,
+and context-summary bytes beneath the resolved epic-mode worktree and take the epic
+base-branch verdict from the resolved checkpoint. That row is the direct pass-after
+evidence for the epic base-branch binding.
 
 Fixture branch names appear only inside mocks and never in a checkpoint:
 `f5-fixture-own`, `f5-fixture-sibling`, `f5-fixture-missing`. Issue `902` is recorded by

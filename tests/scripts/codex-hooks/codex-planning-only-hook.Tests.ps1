@@ -22,6 +22,9 @@ Describe 'enforce-epic-planning-only.ps1 planning-boundary functions' {
         $script:PlanningHookPath = Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-planning-only.ps1'
 
         . $script:PlanningHookPath
+        $script:RealTestEpicPlanningBashAllowed = ${function:Test-EpicPlanningBashAllowed}
+        Mock Get-EpicPlanningRegisteredMcpTool { $null }
+        Mock Test-EpicPlanningBashAllowed { $null }
 
         $script:PreparationCheckpoint = '{"route_id":"preparation"}'
 
@@ -68,6 +71,10 @@ Describe 'enforce-epic-planning-only.ps1 planning-boundary functions' {
     }
 
     Context 'Test-EpicPlanningBashAllowed' {
+        BeforeAll {
+            Mock Test-EpicPlanningBashAllowed -MockWith $script:RealTestEpicPlanningBashAllowed
+        }
+
         It 'allows a read-only inspection command from the allowlist' -ForEach @(
             @{ Command = 'git status' }
             @{ Command = 'git log --oneline -5' }

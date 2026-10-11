@@ -22,6 +22,7 @@ Describe 'Codex completion-consistency gate epic checkpoint (issue #707)' {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $script:RepoRoot '.codex/hooks/enforce-completion-consistency.ps1')
+        Mock Get-CheckpointFileContent { $null }
 
         $script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
         $script:FeatureCheckpointPath = 'artifacts/orchestration/orchestrator-state.json'

@@ -1,0 +1,334 @@
+{
+  "schema_version": 1,
+  "envelope": {
+    "objective": "pin the epic wave-barrier Layer 2 parity edge cases",
+    "route_id": "epic",
+    "epic_feature_folder": "2026-10-08-layer2-parity-epic-852",
+    "integration_branch": "epic/layer2-parity-852-integration",
+    "max_parallel_features": 4,
+    "completed_steps": [],
+    "next_step": "wave_1_launch",
+    "last_updated": "2026-10-08T00-00",
+    "waves": []
+  },
+  "cases": [
+    {
+      "name": "issue-num-reference-confirmed-before-start",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "An integer issue_num reference resolves through the union index; a confirmation earlier than the start is not a violation.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-10-08T09-00"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": [901], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "issue-num-reference-confirmed-after-start",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "A confirmation later than the start is a timing violation that renders the raw integer reference.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-10-08T11-00"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": [901], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 worktree_created_at precedes dependency 901 merge_confirmed_at"
+      ]
+    },
+    {
+      "name": "active-prefixed-hint-unmerged",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "A docs/features/active/ hint resolves after prefix normalization and renders the raw hint text.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["docs/features/active/2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency docs/features/active/2026-10-08-alpha-901 is not merged"
+      ]
+    },
+    {
+      "name": "completed-prefixed-hint-unmerged",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "A completed/ hint resolves after prefix normalization and renders the raw hint text.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["completed/2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency completed/2026-10-08-alpha-901 is not merged"
+      ]
+    },
+    {
+      "name": "unresolved-and-non-string-references-skipped",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "Unresolved strings and integers, a string against an integer issue_num, null, list, and object references are skipped.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-missing-999", 999, "901", null, [901], {"issue_num": 901}], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "bool-reference-without-issue-num-one",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "A true reference resolves only to an issue_num equal to 1; with none it is skipped.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": [true], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "bool-reference-matches-issue-num-one",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "A true reference matches issue_num 1 and renders as True.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-001", "issue_num": 1, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": [true], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency True is not merged"
+      ]
+    },
+    {
+      "name": "integer-reference-matches-bool-issue-num",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "An integer reference 1 matches an issue_num of true and renders as 1.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-001", "issue_num": true, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": [1], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency 1 is not merged"
+      ]
+    },
+    {
+      "name": "integer-reference-against-string-issue-num",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "An integer reference never matches a string issue_num.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": "901", "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": [901], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "skipped-malformed-entries",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "Non-object entries, a string depends_on, a non-string dependent folder, and an absent depends_on produce no error.",
+      "features": [
+        "not-an-object",
+        42,
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": "2026-10-08-alpha-901", "merge_status": "worktree_created"},
+        {"feature_folder": 7, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created"},
+        {"feature_folder": "2026-10-08-charlie-903", "issue_num": 903, "merge_status": "worktree_created"}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "features-is-an-object",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "A features value that is an object rather than a list yields no features.",
+      "features": {"feature_folder": "2026-10-08-alpha-901", "depends_on": [], "merge_status": "pr_open"},
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "dependency-merge-status-integer",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "A non-string dependency merge_status is a status violation.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": 5},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency 2026-10-08-alpha-901 is not merged"
+      ]
+    },
+    {
+      "name": "dependency-merge-status-case-variant",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "The merged-status comparison is case-sensitive.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "Merged"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency 2026-10-08-alpha-901 is not merged"
+      ]
+    },
+    {
+      "name": "dependency-merge-status-key-case-variant",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "A Merge_Status key is not merge_status, so the status is absent and the edge is a status violation.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "Merge_Status": "merged"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency 2026-10-08-alpha-901 is not merged"
+      ]
+    },
+    {
+      "name": "equal-timestamps-no-violation",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "Equal confirmation and start strings are not a timing violation.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-10-08T10-00"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "lowercase-t-confirmation-orders-after-uppercase",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "Ordinal comparison places a lowercase t after an uppercase T.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-10-08t09-00"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 worktree_created_at precedes dependency 2026-10-08-alpha-901 merge_confirmed_at"
+      ]
+    },
+    {
+      "name": "offset-timestamps-compare-as-strings",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "Timestamps compare as strings, so a chronologically later offset time that sorts earlier is not a violation.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-10-08T09:00:00-05:00"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10:00:00Z"}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "utc-timestamps-confirmation-later",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "ISO-8601 Z timestamps stay strings; a later confirmation is a timing violation.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-10-08T11:00:00Z"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10:00:00Z"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 worktree_created_at precedes dependency 2026-10-08-alpha-901 merge_confirmed_at"
+      ]
+    },
+    {
+      "name": "non-string-confirmations-skip-timing",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "A numeric or null merge_confirmed_at never produces a timing violation.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": 20261008},
+        {"feature_folder": "2026-10-08-charlie-903", "issue_num": 903, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": null},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901", "2026-10-08-charlie-903"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "empty-string-start-guard-timing",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "An empty worktree_created_at marks a not_started feature as started, and any confirmation string sorts after it.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-10-08T09-00"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "not_started", "worktree_created_at": ""}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 worktree_created_at precedes dependency 2026-10-08-alpha-901 merge_confirmed_at"
+      ]
+    },
+    {
+      "name": "self-dependency-of-started-feature",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "A started feature that depends on itself reports a status violation naming itself.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-alpha-901 is treated as started while dependency 2026-10-08-alpha-901 is not merged"
+      ]
+    },
+    {
+      "name": "duplicate-folder-later-record-merged",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "A later record with the same feature_folder replaces the earlier one.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-10-08T09-00"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "empty-dependent-folder",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "An empty dependent feature_folder is iterated and renders as an empty name.",
+      "features": [
+        {"feature_folder": "", "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created"},
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION:  is treated as started while dependency 2026-10-08-alpha-901 is not merged"
+      ]
+    },
+    {
+      "name": "empty-string-dependency-never-resolves",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "An empty dependency string never resolves, even when a feature has an empty folder.",
+      "features": [
+        {"feature_folder": "", "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": [""], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "negative-zero-integer-reference",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "A -0 reference matches issue_num 0 and renders as 0.",
+      "features": [
+        {"feature_folder": "2026-10-08-zulu-900", "issue_num": 0, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": [-0], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency 0 is not merged"
+      ]
+    },
+    {
+      "name": "integer-reference-beyond-int64",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "An integer beyond the 64-bit range matches and renders exactly.",
+      "features": [
+        {"feature_folder": "2026-10-08-big-904", "issue_num": 123456789012345678901234567890, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": [123456789012345678901234567890], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency 123456789012345678901234567890 is not merged"
+      ]
+    },
+    {
+      "name": "status-violation-takes-precedence-over-timing",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "An unmerged dependency with a later confirmation reports only the status violation.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open", "merge_confirmed_at": "2026-10-08T11-00"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency 2026-10-08-alpha-901 is not merged"
+      ]
+    },
+    {
+      "name": "multiple-edges-reported-in-depends-on-order",
+      "acceptance_criteria": ["AC-14"],
+      "notes": "Violations are reported in depends_on order, one per edge.",
+      "features": [
+        {"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-10-08-charlie-903", "issue_num": 903, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-10-08T11-00"},
+        {"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-charlie-903", "2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 worktree_created_at precedes dependency 2026-10-08-charlie-903 merge_confirmed_at",
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency 2026-10-08-alpha-901 is not merged"
+      ]
+    }
+  ]
+}

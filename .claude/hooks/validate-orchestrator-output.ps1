@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     SubagentStop hook for the orchestrator subagent.
 
@@ -19,11 +19,21 @@
             objective, completed_steps, next_step, last_updated,
       - the `objective` field is non-empty.
 
+    The checkpoint is resolved through WorktreeRunResolution.psm1 by the dot-sourced
+    sibling validate-orchestrator-output-resolution.ps1 (issue #787), so every read uses
+    an absolute path beneath the worktree of the run that stopped. An unresolved,
+    ambiguous, or mismatched target blocks with ORCHESTRATOR_CHECKPOINT_UNRESOLVED:
+    before any checkpoint is read. For epic-orchestrator-state, the Layer 2 wave-barrier
+    ordering check (OrchestratorStateEpicWaveBarrier.psm1, issue #840) runs after the
+    routing dispatch passes.
+
 .NOTES
     Reads the hook payload from CLAUDE_HOOK_INPUT as JSON. Exits 0 to allow
     termination; exits 1 with an error message to block. Filesystem reads go
     through Get-CheckpointFileContent so tests can mock the boundary without
-    writing temporary files.
+    writing temporary files. The sibling dot-source and the resolver imports are
+    guarded: a failure is recorded and blocks every validation, naming the file,
+    before any read. A failed Layer 2 import blocks the epic leg only.
 #>
 
 [CmdletBinding()]
@@ -34,11 +44,20 @@ param(
     [Parameter(Mandatory = $false)]
     [string] $ArtifactType = 'orchestrator-state'
 )
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
 
-Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
+
+try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-resolution.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-resolution.ps1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateEpicWaveBarrier.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateCompletion.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateCompletion.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
+$ErrorActionPreference = 'Stop'
 
 function Get-CheckpointFileContent {
     <#
@@ -311,6 +330,8 @@ function Invoke-OrchestratorOutputValidation {
         Returns a hashtable with keys:
           - Ok:      $true to allow termination, $false to block.
           - Message: error message when blocking; $null on success.
+        SessionRoot is the calling process's path, used only to find the repository
+        when the run checkpoint is resolved.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -318,10 +339,13 @@ function Invoke-OrchestratorOutputValidation {
         [string] $RawPayload,
         [string] $CheckpointPath = 'artifacts/orchestration/orchestrator-state.json',
         [string] $ArtifactType = 'orchestrator-state',
+        [string] $SessionRoot = (Get-Location).Path,
 
         [Parameter(Mandatory = $false)]
         [scriptblock] $RoutingInvoker
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if ([string]::IsNullOrWhiteSpace($RawPayload)) {
         return @{ Ok = $false; Message = 'orchestrator hook: CLAUDE_HOOK_INPUT is empty; cannot validate orchestrator output.' }
@@ -341,19 +365,27 @@ function Invoke-OrchestratorOutputValidation {
         return @{ Ok = $false; Message = 'orchestrator hook: agent output is empty; orchestrator must report final completion summary before termination.' }
     }
 
-    $file = Get-CheckpointFileContent -Path $CheckpointPath
+    # Resolve the run checkpoint before any read (issue #787). A failed import, or an
+    # unresolved, ambiguous, or mismatched target, blocks here, so nothing is read.
+    $resolution = Resolve-OrchestratorOutputCheckpointPath -ArtifactType $ArtifactType -CheckpointPath $CheckpointPath -AgentOutput ([string]$agentOutput) -SessionRoot $SessionRoot
+    if (-not $resolution.Resolved) {
+        return @{ Ok = $false; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: {1} ({2}): {3}' -f
+                $ArtifactType, $resolution.Status, $resolution.ReasonCode, $resolution.Detail) }
+    }
+
+    $file = Get-CheckpointFileContent -Path $resolution.CheckpointPath
     if (-not $file.Exists) {
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$CheckpointPath' does not exist. Orchestrator must persist progress per powershell-orchestration-state-machine before termination." }
+        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' does not exist. Orchestrator must persist progress per powershell-orchestration-state-machine before termination." }
     }
 
     if ([string]::IsNullOrWhiteSpace($file.Content)) {
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$CheckpointPath' is empty; cannot validate orchestrator progress." }
+        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is empty; cannot validate orchestrator progress." }
     }
 
     try {
         $checkpoint = $file.Content | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$CheckpointPath' is not valid JSON: $($_.Exception.Message)" }
+        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is not valid JSON: $($_.Exception.Message)" }
     }
 
     $requiredFields = @('objective', 'completed_steps', 'next_step', 'last_updated')
@@ -367,18 +399,21 @@ function Invoke-OrchestratorOutputValidation {
 
     if ($missingFields.Count -gt 0) {
         $missingList = ($missingFields -join ', ')
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$CheckpointPath' is missing required field(s): $missingList. Orchestrator must persist objective, completed_steps, next_step, and last_updated." }
+        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is missing required field(s): $missingList. Orchestrator must persist objective, completed_steps, next_step, and last_updated." }
     }
 
     if ([string]::IsNullOrWhiteSpace([string]$checkpoint.objective)) {
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$CheckpointPath' has an empty 'objective' field; orchestrator must record the active objective." }
+        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' has an empty 'objective' field; orchestrator must record the active objective." }
     }
 
     $humanInteraction = $null
     if ($checkpointProps -contains 'human_interaction') {
         $humanInteraction = $checkpoint.human_interaction
     }
-    $hiResult = Test-HumanInteractionShape -HumanInteraction $humanInteraction
+    # A relative runbook_path is checked beneath the resolved root, not the process location.
+    $hiResult = Test-HumanInteractionShape -HumanInteraction $humanInteraction -FileExistsCheck {
+        param($Path) Test-OrchestratorOutputRunbookFile -Path (Resolve-OrchestratorOutputRunbookPath -WorktreeRoot $resolution.WorktreeRoot -RunbookPath $Path)
+    }
     if (-not $hiResult.Ok) {
         return @{ Ok = $false; Message = $hiResult.Message }
     }
@@ -387,7 +422,7 @@ function Invoke-OrchestratorOutputValidation {
     # ArtifactType. The optional RoutingInvoker seam lets tests inject a mock; the
     # default seam runs the in-process PowerShell validation and starts no
     # subprocess.
-    $routingArgs = @{ CheckpointPath = $CheckpointPath; ArtifactType = $ArtifactType }
+    $routingArgs = @{ CheckpointPath = $resolution.CheckpointPath; ArtifactType = $ArtifactType }
     if ($PSBoundParameters.ContainsKey('RoutingInvoker') -and $null -ne $RoutingInvoker) {
         $routingArgs['Invoker'] = $RoutingInvoker
     }
@@ -404,6 +439,13 @@ function Invoke-OrchestratorOutputValidation {
         return @{ Ok = $false; Message = "ROUTING_CONTRACT_BLOCKED: $($routingResult.ErrorText)" }
     }
 
+    # Layer 2 (issue #840): the epic checkpoint only, after the routing dispatch passes,
+    # on the checkpoint text already read.
+    if ($ArtifactType -eq 'epic-orchestrator-state') {
+        $barrier = Get-OrchestratorOutputWaveBarrierDecision -CheckpointText $file.Content
+        if (-not $barrier.Ok) { return @{ Ok = $false; Message = $barrier.Message } }
+    }
+
     return @{ Ok = $true; Message = $null }
 }
 
@@ -411,6 +453,9 @@ function Invoke-OrchestratorOutputValidation {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
+if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
 $result = Invoke-OrchestratorOutputValidation -RawPayload $env:CLAUDE_HOOK_INPUT -CheckpointPath $CheckpointPath -ArtifactType $ArtifactType
 if (-not $result.Ok) {

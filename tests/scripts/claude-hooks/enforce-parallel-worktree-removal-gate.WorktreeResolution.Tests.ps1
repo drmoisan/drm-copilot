@@ -20,6 +20,16 @@
 
 BeforeAll {
     . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-worktree-removal-gate.ps1").Path
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+    Mock Get-CleanupWorktreeManifestContent -ModuleName CleanupWorktreeManifest { $null }
+    Mock Get-ParallelWorktreeRemovalGateCheckpointContent { $null }
+    Mock Get-ParallelWorktreeRemovalGateEpicCheckpointContent { $null }
+    Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
     $libRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution").Path
     Import-Module (Join-Path $libRoot 'WorktreeRunResolution.psm1')
     Import-Module (Join-Path $libRoot 'WorktreeTargetResolution.psm1')
@@ -66,6 +76,9 @@ BeforeAll {
 }
 
 Describe 'parallel worktree-removal gate run-target resolution' {
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     BeforeEach {
         Mock -CommandName Test-CleanupWorktreeManifestAuthorizesRemoval -MockWith { $false }
     }
@@ -147,14 +160,14 @@ Describe 'parallel worktree-removal gate run-target resolution' {
     It 'Y6 denies naming WorktreeRunResolution.psm1 when the import failed, and the entry point exits 0' {
         # Arrange
         $payload = ConvertTo-RemovalPayload -Command $script:Command
-        $script:ParallelWorktreeGateResolutionImportFailure = 'WorktreeRunResolution.psm1'
+        Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1'
         try {
             # Act
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $payload
             $output = @(Invoke-ParallelWorktreeRemovalGateEntryPoint -ToolInputRaw $payload)
         }
         finally {
-            $script:ParallelWorktreeGateResolutionImportFailure = $null
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
         }
 
         # Assert
@@ -162,5 +175,19 @@ Describe 'parallel worktree-removal gate run-target resolution' {
         $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'WorktreeRunResolution\.psm1'
         $output[-1] | Should -Be 0
         ($output[0..($output.Count - 2)] -join "`n") | Should -Match 'deny'
+    }
+
+    It 'Y7 emits a single leading token when both run kinds are unresolved' {
+        # Arrange
+        Set-RemovalRunTopology -Live @('/synthetic-worktrees/w-par')
+        Set-RemovalReadSeam -Parallel $null -Epic $null
+
+        # Act
+        $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-RemovalPayload -Command $script:Command)
+        $reason = $decision.hookSpecificOutput.permissionDecisionReason
+
+        # Assert
+        $reason.StartsWith('PARALLEL_WORKTREE_REMOVAL_BLOCKED: ') | Should -BeTrue -Because 'the deny text begins with the gate token'
+        ([regex]::Matches($reason, 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:')).Count | Should -Be 1 -Because 'the gate token appears exactly once'
     }
 }

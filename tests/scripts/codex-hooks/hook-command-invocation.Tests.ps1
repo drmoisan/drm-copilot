@@ -198,7 +198,7 @@ Describe 'hook-command-invocation, Codex copy (issue #545 D2 Piece 3 and D12)' {
     }
 
     Context 'fail-closed rules' {
-        It 'classifies a wrapper-led segment whose raw text carries the words in any arrangement' {
+        It 'classifies a wrapper-led segment whose payload invokes the command' {
             Test-CommandLineInvocation -CommandText "bash -c 'git add .'" -CommandWord 'git' -SubcommandPath @('add') |
                 Should -BeTrue
             Test-CommandLineInvocation -CommandText 'echo x | xargs git add' -CommandWord 'git' -SubcommandPath @('add') |
@@ -239,9 +239,9 @@ Describe 'hook-command-invocation, Codex copy (issue #545 D2 Piece 3 and D12)' {
         It 'exposes exactly the modeled git global options' {
             $table = Get-CommandLineGlobalOption -CommandWord 'git'
             (@($table.WithArgument) | Sort-Object) -join ',' |
-                Should -Be '--exec-path,--git-dir,--namespace,--work-tree,-C,-c'
+                Should -Be ((@('-C', '-c', '--git-dir', '--work-tree', '--namespace') | Sort-Object) -join ',')
             (@($table.Standalone) | Sort-Object) -join ',' |
-                Should -Be '--bare,--literal-pathspecs,--no-optional-locks,--no-pager,--paginate,-p'
+                Should -Be ((@('-p', '--paginate', '--no-pager', '--literal-pathspecs', '--no-optional-locks', '--bare', '--exec-path') | Sort-Object) -join ',')
         }
 
         It 'exposes exactly the modeled gh global options' {

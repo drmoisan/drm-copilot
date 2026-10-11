@@ -363,48 +363,6 @@ Describe 'Codex PreToolUse hooks honour the native stdin transport contract' {
             Test-CompletionAsserted -Payload ($Json | ConvertFrom-Json) | Should -BeFalse
         }
 
-        It 'returns null edited content when the tool input carries no old_string' {
-            $toolInput = [pscustomobject]@{ file_path = $script:CheckpointRelativePath }
-
-            Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader { param($Path) if ($Path) { 'ignored' } } |
-                Should -BeNullOrEmpty
-        }
-
-        It 'returns null edited content when the on-disk checkpoint is empty' {
-            $toolInput = [pscustomobject]@{ old_string = 'a'; new_string = 'b' }
-
-            Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader { param($Path) if ($Path) { '' } } |
-                Should -BeNullOrEmpty
-        }
-
-        It 'returns null edited content when the old_string is absent from the checkpoint' {
-            $toolInput = [pscustomobject]@{ old_string = 'absent'; new_string = 'b' }
-
-            Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader { param($Path) if ($Path) { '{"next_step":"S07"}' } } |
-                Should -BeNullOrEmpty
-        }
-
-        It 'applies the old_string to new_string replacement in memory' {
-            $toolInput = [pscustomobject]@{ old_string = 'S07'; new_string = 'complete' }
-
-            $patched = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader { param($Path) if ($Path) { '{"next_step":"S07"}' } }
-
-            $patched | Should -Be '{"next_step":"complete"}'
-        }
-
-        It 'reads the governed checkpoint path through the injected reader' {
-            $script:ObservedReaderPath = ''
-            $toolInput = [pscustomobject]@{ old_string = 'S07'; new_string = 'complete' }
-
-            $null = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader {
-                param($Path)
-                $script:ObservedReaderPath = $Path
-                return '{"next_step":"S07"}'
-            }
-
-            $script:ObservedReaderPath | Should -Be 'artifacts/orchestration/orchestrator-state.json'
-        }
-
         It 'allows when no mapped tool_input is supplied' {
             $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw ''
 

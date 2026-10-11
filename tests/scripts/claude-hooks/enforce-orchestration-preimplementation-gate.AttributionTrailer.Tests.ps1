@@ -11,12 +11,15 @@
 # child process, and no network access.
 
 Describe 'preimplementation gate attribution trailers (<Runtime>)' -ForEach @(
-    @{ Runtime = 'claude'; GateRelativePath = '.claude/hooks/enforce-orchestration-preimplementation-gate.ps1'; PayloadKind = 'envelope' }
-    @{ Runtime = 'codex'; GateRelativePath = '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'; PayloadKind = 'mapped' }
+    @{ Runtime = 'claude'; GateRelativePath = '.claude/hooks/enforce-orchestration-preimplementation-gate.ps1'; PayloadKind = 'envelope'; Surface = 'Claude'; Seam = @('Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-EpicScopeCheckpointText'); ExtraSeam = @('Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent') }
+    @{ Runtime = 'codex'; GateRelativePath = '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'; PayloadKind = 'mapped'; Surface = 'Codex'; Seam = @('Get-EpicScopeCheckpointText'); ExtraSeam = @('Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText') }
 ) {
     BeforeAll {
         $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
         . (Join-Path $repoRoot $GateRelativePath)
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam $Seam -Surface $Surface
+        Register-EpicStateBaselineMock -Seam $ExtraSeam -Surface $Surface
 
         function Get-AttributionTrailerDecision {
             <#
@@ -40,6 +43,8 @@ Describe 'preimplementation gate attribution trailers (<Runtime>)' -ForEach @(
         if ($Runtime -eq 'claude') { Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } } }
     }
 
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface $Surface -Seam $Seam }
+
     It 'admits <Label>' -ForEach @(
         @{ Label = 'a separate-value trailer option'; Command = 'git commit -m ''docs: plan'' --trailer ''Co-Authored-By: C <n@a.com>'' -- docs/features/active/x/plan.md' }
         @{ Label = 'an equals-form trailer option'; Command = 'git commit -m ''docs: plan'' --trailer=''Co-Authored-By: C <n@a.com>'' -- docs/features/active/x/plan.md' }
@@ -53,6 +58,7 @@ Describe 'preimplementation gate attribution trailers (<Runtime>)' -ForEach @(
         @{ Label = 'a hash inside a double-quoted message'; Command = 'git commit -m "docs: step #2" -- docs/features/active/x/plan.md' }
         @{ Label = 'an inline angle-bracket attribution in a double-quoted subject'; Command = 'git commit -m "docs: plan Co-Authored-By: C <n@a.com>" -- docs/features/active/x/plan.md' }
         @{ Label = 'an empty single-quoted trailer value'; Command = 'git commit -m ''docs: plan'' --trailer '''' -- docs/features/active/x/plan.md' }
+        @{ Label = 'a trailer option taking the double-dash separator as its value (CR-4)'; Command = 'git commit -m x --trailer -- docs/features/active/x/a.md' }
     ) {
         # Arrange: the command text is supplied by the data row.
 
@@ -91,6 +97,10 @@ Describe 'preimplementation gate attribution trailers (<Runtime>)' -ForEach @(
         @{ Label = 'a typographic single-quoted command substitution'; Command = ('git commit -m ''a' + [char]0x2019 + ' $(x) ' + [char]0x2018 + 'b'' -- docs/features/active/x/plan.md') }
         @{ Label = 'a typographic double-quoted command substitution'; Command = ('git commit -m ''a' + [char]0x2019 + ' ' + [char]0x201C + '$(x)' + [char]0x201D + ' ' + [char]0x2018 + 'b'' -- docs/features/active/x/plan.md') }
         @{ Label = 'a typographic single quote around a non-exempt pathspec'; Command = ('git commit -m ''a' + [char]0x2019 + ' src/prod.ts ' + [char]0x2018 + 'b'' -- docs/features/active/x/plan.md') }
+        @{ Label = 'a trailer option taking the double-dash separator before a non-exempt operand (CR-4)'; Command = 'git commit -m x --trailer -- src/x.ts' }
+        @{ Label = 'a single low-9 quotation mark (U+201A)'; Command = ('git commit -m ''a' + [char]0x201A + 'b'' -- docs/features/active/x/plan.md') }
+        @{ Label = 'a single high-reversed-9 quotation mark (U+201B)'; Command = ('git commit -m ''a' + [char]0x201B + 'b'' -- docs/features/active/x/plan.md') }
+        @{ Label = 'a double low-9 quotation mark (U+201E)'; Command = ('git commit -m ''a' + [char]0x201E + 'b'' -- docs/features/active/x/plan.md') }
     ) {
         # Act
         $isExempt = Test-ExemptOrchestrationStagingCommand -CommandText $Command

@@ -8,6 +8,8 @@ Describe 'enforce-completion-consistency.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-completion-consistency.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex'
 
         # Builds a Write-shaped PreToolUse envelope for a checkpoint payload.
         function ConvertTo-CheckpointToolInput {
@@ -45,9 +47,9 @@ Describe 'enforce-completion-consistency.ps1' {
     }
 
     Context 'Edit tool calls (no full content)' {
-        It 'allows an Edit-style call that only supplies old_string/new_string on the checkpoint path' {
+        It 'denies an Edit-style call with old_string/new_string as checkpoint-empty when the injected reader returns an empty string' {
             $json = '{"tool_name":"Edit","tool_input":{"file_path":"artifacts/orchestration/orchestrator-state.json","old_string":"a","new_string":"b"}}'
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader { param($Path) '' }).hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
     }
 
@@ -371,7 +373,7 @@ Describe 'enforce-completion-consistency.ps1' {
             (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'allows an Edit when the on-disk checkpoint file does not exist' {
+        It 'denies an Edit when the on-disk checkpoint file does not exist' {
             $reader = { param($Path) $null }
             $json = @{
                 tool_name  = 'Edit'
@@ -382,10 +384,10 @@ Describe 'enforce-completion-consistency.ps1' {
                 }
             } | ConvertTo-Json -Compress -Depth 8
 
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
-        It 'allows an Edit when old_string is not found in the on-disk content' {
+        It 'denies an Edit when old_string is not found in the on-disk content' {
             $onDisk = '{"objective":"x","next_step":"S5_atomic_execution"}'
             $reader = { param($Path) $onDisk }
             $json = @{
@@ -397,7 +399,7 @@ Describe 'enforce-completion-consistency.ps1' {
                 }
             } | ConvertTo-Json -Compress -Depth 8
 
-            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            (Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader).hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
         It 'allows an Edit on a non-checkpoint path' {

@@ -31,49 +31,9 @@ BeforeAll {
     # exercise one single code path.
     . (Join-Path -Path $PSScriptRoot -ChildPath 'EnforcementHooksNoPythonInvocation.Helpers.ps1')
 
-    # Exactly two scan roots, anchored at the resolved repository root. A repo-wide
-    # recursive glob is deliberately NOT used: the bundled mirror under
-    # `extensions/drm-copilot/resources/claude-customizations/.claude/**` is a
-    # byte-identical second copy of these files and must stay out of scope, because
-    # allowlist keys are repo-root-relative paths.
-    $script:ScanRoot = @(
-        (Join-Path -Path $script:RepoRoot -ChildPath '.claude/hooks'),
-        (Join-Path -Path $script:RepoRoot -ChildPath '.claude/lib')
-    )
-
-    <#
-    .SYNOPSIS
-        Enumerates every `*.ps1` and `*.psm1` beneath the two scan roots, excluding
-        `.claude/lib/bash/**` (shell, not PowerShell). Each result carries the
-        absolute path and the repo-root-relative label used by the allowlist.
-    #>
-    function Get-GuardedPowerShellFile {
-        [CmdletBinding()]
-        [OutputType([object[]])]
-        param()
-
-        $results = [System.Collections.Generic.List[object]]::new()
-        foreach ($root in $script:ScanRoot) {
-            if (-not (Test-Path -Path $root)) {
-                continue
-            }
-            $files = Get-ChildItem -Path $root -Recurse -File |
-                Where-Object { $_.Extension -in @('.ps1', '.psm1') }
-            foreach ($file in $files) {
-                $relative = $file.FullName.Substring($script:RepoRoot.Length).TrimStart('\', '/')
-                $relative = $relative -replace '\\', '/'
-                # `.claude/lib/bash/**` holds shell scripts, not PowerShell.
-                if ($relative -like '.claude/lib/bash/*') {
-                    continue
-                }
-                $results.Add([pscustomobject]@{
-                        FullName = $file.FullName
-                        Relative = $relative
-                    })
-            }
-        }
-        return , $results.ToArray()
-    }
+    # The scan roots and the guarded-file enumeration live in a sibling helper that
+    # reads $script:RepoRoot, resolved above.
+    . (Join-Path -Path $PSScriptRoot -ChildPath 'EnforcementHooksNoPythonInvocation.ScanRoots.Helpers.ps1')
 
     <#
     .SYNOPSIS
@@ -449,7 +409,7 @@ $script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-help
     }
 
     Context 'repository scan' -Tag 'RepositoryScan' {
-        It 'enumerates only the two guarded roots and never the bundled mirror' {
+        It 'enumerates only the guarded roots and never the bundled mirror' {
             # Arrange / Act
             $files = Get-GuardedPowerShellFile
 
@@ -457,10 +417,10 @@ $script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-help
             @($files | Where-Object { $null -ne $_ }).Count | Should -BeGreaterThan 0
 
             $outsideRoots = @($files | Where-Object {
-                    $_.Relative -notlike '.claude/hooks/*' -and $_.Relative -notlike '.claude/lib/*'
+                    -not (Test-GuardedPathUnderScanRoot -RelativePath $_.Relative)
                 })
             $outsideRoots.Count | Should -Be 0 -Because (
-                'enumerated paths outside the two scan roots: ' + (($outsideRoots | ForEach-Object { $_.Relative }) -join ', '))
+                'enumerated paths outside the three scan roots: ' + (($outsideRoots | ForEach-Object { $_.Relative }) -join ', '))
 
             $bashPaths = @($files | Where-Object { $_.Relative -like '.claude/lib/bash/*' })
             $bashPaths.Count | Should -Be 0 -Because 'the bash library is shell, not PowerShell'
@@ -495,6 +455,34 @@ $script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-help
             # Assert
             @($stale).Count | Should -Be 0 -Because (
                 'stale allowlist entries: ' + (($stale | ForEach-Object { "$($_['Path'])::$($_['Function'])" }) -join ', '))
+        }
+    }
+
+    Context 'scan roots (issue #707)' {
+        It 'AC-15 claude hooks path is under a scan root' {
+            Test-GuardedPathUnderScanRoot -RelativePath '.claude/hooks/validate-bash.ps1' |
+                Should -BeTrue -Because 'the Claude hooks directory is a scan root'
+        }
+
+        It 'AC-15 codex hooks path is under a scan root' {
+            Test-GuardedPathUnderScanRoot -RelativePath '.codex/hooks/validate-bash.ps1' |
+                Should -BeTrue -Because 'the Codex hooks directory is a scan root'
+        }
+
+        It 'AC-15 bundled mirror path is outside every scan root' {
+            Test-GuardedPathUnderScanRoot -RelativePath 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-bash.ps1' |
+                Should -BeFalse -Because 'the bundled mirror is out of scan scope'
+        }
+
+        It 'AC-15 unrelated path is outside every scan root' {
+            Test-GuardedPathUnderScanRoot -RelativePath 'scripts/dev_tools/example.ps1' |
+                Should -BeFalse -Because 'only the configured hook roots are scanned'
+        }
+
+        It 'AC-15 enumeration includes at least one codex hooks file' {
+            $files = Get-GuardedPowerShellFile
+            @($files | Where-Object { $_.Relative -like '.codex/hooks/*' }).Count |
+                Should -BeGreaterThan 0 -Because 'the Codex hooks directory is enumerated'
         }
     }
 }

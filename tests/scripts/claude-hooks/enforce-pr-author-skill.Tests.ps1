@@ -5,10 +5,25 @@ Describe 'enforce-pr-author-skill.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-pr-author-skill.ps1").Path
         . $script:UnderTest
+        $script:RealGetPrAuthorReceiptContent = ${function:Get-PrAuthorReceiptContent}
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/EpicScopeResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/orchestrator-state/OrchestratorState.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        Mock Get-OrchestratorStateCheckpoint -ModuleName OrchestratorState { $null }
+        Mock Get-PrAuthorCheckpointContent { $null }
+        Mock Get-PrAuthorReceiptContent { $null }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 
         # SHA-256 (lowercase hex) of a single 0x41 ('A') byte, used by the receipt allow/hash tests.
         $script:HashOf0x41 = '559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd'
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     # Issue #687 routes the checkpoint through a resolution seam. Defaulting it to the
     # session root keeps these tests exercising receipt behaviour, and keeps them
@@ -146,6 +161,8 @@ Describe 'enforce-pr-author-skill.ps1' {
                 "{`"number`":12,`"sha256`":`"$script:HashOf0x41`",`"created_at`":`"2026-06-24T12:00:05Z`"}"
             }
             Mock -CommandName Get-PrContextSummaryLastWriteUtc -MockWith { [DateTime]::Parse('2026-06-24T12:00:00Z').ToUniversalTime() }
+            # Isolate the sixth (epic-mode base-branch) check from any local checkpoint: an epic-mode checkpoint in the executing worktree would otherwise deny gh pr create (issue #850).
+            Mock -CommandName Get-PrAuthorCheckpointContent -MockWith { $null }
         }
 
         It 'allows gh pr create --body-file artifacts/pr_body_12.md when context exists' {
@@ -327,17 +344,19 @@ Describe 'enforce-pr-author-skill.ps1' {
         }
 
         It 'returns null for allowed command' {
-            $result = Get-PrAuthorBypassReason -CommandText 'gh pr create --body-file artifacts/pr_body_1.md' -ContextExists $true
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            $result = Get-PrAuthorBypassReason -CommandText 'gh pr create --body-file artifacts/pr_body_1.md'
             $result | Should -BeNullOrEmpty
         }
 
         It 'returns PR_AUTHOR_SKILL_BLOCKED for inline --body' {
-            $result = Get-PrAuthorBypassReason -CommandText 'gh pr create --body "some text"' -ContextExists $true
+            $result = Get-PrAuthorBypassReason -CommandText 'gh pr create --body "some text"'
             $result | Should -Match 'PR_AUTHOR_SKILL_BLOCKED'
         }
 
         It 'returns PR_CONTEXT_MISSING when --body-file present but context absent' {
-            $result = Get-PrAuthorBypassReason -CommandText 'gh pr create --body-file artifacts/pr_body_1.md' -ContextExists $false
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $false }
+            $result = Get-PrAuthorBypassReason -CommandText 'gh pr create --body-file artifacts/pr_body_1.md'
             $result | Should -Match 'PR_CONTEXT_MISSING'
         }
     }
@@ -373,24 +392,26 @@ Describe 'enforce-pr-author-skill.ps1' {
         }
 
         It 'returns false for an allowed command' {
-            Test-PrAuthorBypassRequired -CommandText 'gh pr create --body-file artifacts/pr_body_1.md' -ContextExists $true |
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $true }
+            Test-PrAuthorBypassRequired -CommandText 'gh pr create --body-file artifacts/pr_body_1.md' |
                 Should -BeFalse
         }
 
         It 'returns true for a blocked command (inline --body)' {
-            Test-PrAuthorBypassRequired -CommandText 'gh pr create --body "text"' -ContextExists $true |
+            Test-PrAuthorBypassRequired -CommandText 'gh pr create --body "text"' |
                 Should -BeTrue
         }
 
         It 'returns true when context is missing for --body-file command' {
-            Test-PrAuthorBypassRequired -CommandText 'gh pr edit 5 --body-file artifacts/pr_body_1.md' -ContextExists $false |
+            Mock -CommandName Get-PrContextArtifactExistence -MockWith { $false }
+            Test-PrAuthorBypassRequired -CommandText 'gh pr edit 5 --body-file artifacts/pr_body_1.md' |
                 Should -BeTrue
         }
     }
 
     Context 'Get-PrContextArtifactExistence real Test-Path wrapper' {
         It 'returns a boolean result without throwing' {
-            $result = Get-PrContextArtifactExistence
+            $result = Get-PrContextArtifactExistence -Path '/synthetic-worktrees/pra-seam/artifacts/pr_context.summary.txt'
             $result | Should -BeOfType [bool]
         }
     }
@@ -409,6 +430,10 @@ Describe 'enforce-pr-author-skill.ps1' {
     }
 
     Context 'Get-PrAuthorReceiptContent real read seam' {
+        BeforeAll {
+            Mock Get-PrAuthorReceiptContent -MockWith $script:RealGetPrAuthorReceiptContent
+        }
+
         It 'returns $null when the receipt path does not exist' {
             Get-PrAuthorReceiptContent -ReceiptFilePath 'artifacts/this-receipt-path-does-not-exist.json' | Should -BeNullOrEmpty
         }
@@ -423,25 +448,13 @@ Describe 'enforce-pr-author-skill.ps1' {
 
     Context 'Get-PrContextSummaryLastWriteUtc real seam' {
         It 'returns $null when the context summary path does not exist' {
-            $prev = $script:PrContextArtifactPath
-            try {
-                $script:PrContextArtifactPath = 'artifacts/this-context-path-does-not-exist.txt'
-                Get-PrContextSummaryLastWriteUtc | Should -BeNullOrEmpty
-            } finally {
-                $script:PrContextArtifactPath = $prev
-            }
+            Get-PrContextSummaryLastWriteUtc -Path '/synthetic-worktrees/pra-seam/artifacts/this-context-path-does-not-exist.txt' | Should -BeNullOrEmpty
         }
 
         It 'returns a UTC DateTime when the context path exists (points at the hook script itself)' {
-            $prev = $script:PrContextArtifactPath
-            try {
-                $script:PrContextArtifactPath = $script:UnderTest
-                $when = Get-PrContextSummaryLastWriteUtc
-                $when | Should -BeOfType [datetime]
-                $when.Kind | Should -Be ([System.DateTimeKind]::Utc)
-            } finally {
-                $script:PrContextArtifactPath = $prev
-            }
+            $when = Get-PrContextSummaryLastWriteUtc -Path $script:UnderTest
+            $when | Should -BeOfType [datetime]
+            $when.Kind | Should -Be ([System.DateTimeKind]::Utc)
         }
     }
 

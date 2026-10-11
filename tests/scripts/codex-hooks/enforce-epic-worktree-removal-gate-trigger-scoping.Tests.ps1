@@ -35,6 +35,16 @@ Describe 'Codex enforce-epic-worktree-removal-gate trigger scoping (issue #545)'
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:UnderTest = Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-worktree-removal-gate.ps1'
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-CleanupWorktreeManifestContent -ModuleName CleanupWorktreeManifest { $null }
+        if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-EpicWorktreeGateCheckpointContent { $null } }
+        if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-EpicWorktreeGateParallelCheckpointContent { $null } }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 
         $script:TargetPath = Join-Path $script:RepoRoot 'worktrees/item-a-101'
         $script:OtherPath = Join-Path $script:RepoRoot 'worktrees/item-b-102'
@@ -62,6 +72,8 @@ Describe 'Codex enforce-epic-worktree-removal-gate trigger scoping (issue #545)'
         }
     }
 
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     Context 'under-match removal - a relocating spelling is now in scope' {
         It 'denies git -C /repo/main worktree remove against a checkpoint with no authorizing record' {
             $command = 'git -C "' + $script:RepoRoot + '" worktree remove "' + $script:TargetPath + '"'
@@ -80,13 +92,13 @@ Describe 'Codex enforce-epic-worktree-removal-gate trigger scoping (issue #545)'
         It 'resolves the operand when --force precedes the path' {
             # Preservation pin. The previous pattern's optional (?:\s+--force)? group already
             # handled this spelling; the shared parser must not lose it.
-            Get-CodexWorktreeRemovalPath -Command ('git worktree remove --force "' + $script:TargetPath + '"') |
-                Should -Be $script:TargetPath
+            (Resolve-CommandLineInvocationTarget -CommandText ('git worktree remove --force "' + $script:TargetPath + '"') -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Targets |
+                Should -Be @($script:TargetPath)
         }
 
         It 'resolves the same operand when --force follows the path' {
-            Get-CodexWorktreeRemovalPath -Command ('git worktree remove "' + $script:TargetPath + '" --force') |
-                Should -Be $script:TargetPath
+            (Resolve-CommandLineInvocationTarget -CommandText ('git worktree remove "' + $script:TargetPath + '" --force') -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Targets |
+                Should -Be @($script:TargetPath)
         }
     }
 

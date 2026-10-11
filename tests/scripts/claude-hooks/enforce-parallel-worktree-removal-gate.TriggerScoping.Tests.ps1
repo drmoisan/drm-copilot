@@ -26,6 +26,16 @@ Describe 'enforce-parallel-worktree-removal-gate trigger scoping (issue #545)' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-worktree-removal-gate.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/cleanup-manifest/CleanupWorktreeManifest.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        Mock Get-CleanupWorktreeManifestContent -ModuleName CleanupWorktreeManifest { $null }
+        Mock Get-ParallelWorktreeRemovalGateCheckpointContent { $null }
+        Mock Get-ParallelWorktreeRemovalGateEpicCheckpointContent { $null }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 
         function ConvertTo-CommandEnvelope {
             <#
@@ -46,13 +56,15 @@ Describe 'enforce-parallel-worktree-removal-gate trigger scoping (issue #545)' {
         Mock Resolve-ParallelWorktreeGateRunTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     Context 'operand resolution - the --force flag never becomes the path' {
         It 'resolves the operand when --force precedes the path' {
             # The AT-7 half this gate owns. The previous pattern returned the literal
             # --force, which matches no recorded worktree_path and falsely denies a
             # legitimate removal.
-            Get-ParallelWorktreeRemovalCommandPath -CommandText 'git worktree remove --force /repo/worktrees/item-a-101' |
-                Should -Be '/repo/worktrees/item-a-101'
+            (Resolve-CommandLineInvocationTarget -CommandText 'git worktree remove --force /repo/worktrees/item-a-101' -CommandWord 'git' -SubcommandPath @('worktree', 'remove')).Targets |
+                Should -Be @('/repo/worktrees/item-a-101')
         }
     }
 

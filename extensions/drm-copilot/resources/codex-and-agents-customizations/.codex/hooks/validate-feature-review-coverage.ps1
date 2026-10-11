@@ -40,6 +40,7 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 $ErrorActionPreference = 'Stop'
 
@@ -229,6 +230,9 @@ function Get-FeatureReviewCoverageContinuation {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-feature-review-coverage: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-feature-review-coverage:'
+if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
 try {
     $payloadRaw = [Console]::In.ReadToEnd()

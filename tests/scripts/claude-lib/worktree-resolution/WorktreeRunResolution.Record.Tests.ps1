@@ -248,6 +248,17 @@ Describe 'Resolve-WorktreeRunTargetByRecord' {
         $target.ReasonCode | Should -Be $script:NoTargetCode
         Should -Invoke Get-WorktreeItemLiveRoot -ModuleName WorktreeRunResolution -Times 0 -Exactly
     }
+
+    It 'B14 compares UNC paths case-insensitively' {
+        # Arrange
+        Set-RecordTopology -Live @('/synthetic-worktrees/w-par') -Parallel @{ '/synthetic-worktrees/w-par' = '{"route_id":"parallel","items":[{"worktree_path":"//Server/Share/x"}]}' }
+
+        # Act
+        $target = Resolve-WorktreeRunTargetByRecord -Kind parallel -RecordField worktree_path -Value '//server/share/X' -SessionRoot $script:Session
+
+        # Assert
+        $target.Status | Should -Be 'OtherWorktree'
+    }
 }
 
 Describe 'Resolve-WorktreeOperandTarget' {

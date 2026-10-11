@@ -20,6 +20,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-completion-consistency.ps1").Path
         . $script:UnderTest
+        Mock Get-CheckpointFileContent { $null }
 
         $script:AbsoluteTarget = '/work/item-worktree/artifacts/orchestration/orchestrator-state.json'
         $script:BackslashTarget = '\work\item-worktree\artifacts\orchestration\orchestrator-state.json'
@@ -139,7 +140,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $captured[0] | Should -BeExactly $script:BackslashTarget
     }
 
-    It 'allows an Edit when the reader returns null for the targeted file_path' {
+    It 'denies an Edit when the reader returns null for the targeted file_path' {
         # Arrange: the reader reports no checkpoint for any path.
         $reader = { param($Path) $null }
         $json = ConvertTo-EditToolInputJson -FilePath $script:AbsoluteTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
@@ -147,8 +148,9 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         # Act
         $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
 
-        # Assert: an unresolvable patch is allowed (fail semantics unchanged).
-        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        # Assert: an unresolvable patch is denied with the checkpoint-missing cause.
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*checkpoint-missing*'
     }
 
     It 'denies a completion-asserting Edit with a relative file_path read through that relative path' {
@@ -164,7 +166,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
     }
 
-    It 'allows an Edit whose old_string is absent from the targeted file_path content' {
+    It 'denies an Edit whose old_string is absent from the targeted file_path content' {
         # Arrange: the targeted content lacks the patch anchor; the relative literal has it.
         $map = @{
             $script:AbsoluteTarget = $script:AnchorlessCheckpoint
@@ -176,11 +178,12 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         # Act
         $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
 
-        # Assert: a patch that does not apply to the targeted content is allowed.
-        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        # Assert: a patch that does not apply to the targeted content is denied with the old_string-not-found cause.
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*old_string-not-found*'
     }
 
-    It 'allows an Edit that supplies no old_string' {
+    It 'denies an Edit that supplies no old_string' {
         # Arrange: both paths hold a checkpoint; the Edit carries only new_string.
         $map = @{
             $script:AbsoluteTarget = $script:NonCompletionCheckpoint
@@ -192,11 +195,12 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         # Act
         $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
 
-        # Assert: an Edit without old_string cannot be resolved and is allowed.
-        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        # Assert: an Edit without old_string cannot be resolved and is denied with the no-old_string cause.
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*no-old_string*'
     }
 
-    It 'allows an Edit when the targeted file_path content is empty' {
+    It 'denies an Edit when the targeted file_path content is empty' {
         # Arrange: the targeted content is empty; the relative literal holds a checkpoint.
         $map = @{
             $script:AbsoluteTarget = ''
@@ -208,8 +212,9 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         # Act
         $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
 
-        # Assert: empty targeted content cannot be patched, so the Edit is allowed.
-        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        # Assert: empty targeted content cannot be patched, so the Edit is denied with the checkpoint-empty cause.
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $result.hookSpecificOutput.permissionDecisionReason | Should -BeLike '*checkpoint-empty*'
     }
 
     It 'declares CheckpointPath as a mandatory parameter of Resolve-EditedCheckpointContent' {
