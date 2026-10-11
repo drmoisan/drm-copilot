@@ -4,203 +4,892 @@ mode: "closed"
 max_concurrency: 4
 created_at: "2026-10-11T11:55:42Z"
 items:
-  - issue_num: 899
-    feature_folder: "2026-10-11-ci-green-gate-all-checks-and-codex-parity-899"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 890
-    feature_folder: "2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 885
-    feature_folder: "2026-10-11-parallel-add-children-not-told-to-record-issue-adoption-885"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 902
-    feature_folder: "2026-10-11-epic-integration-branch-not-synced-with-main-902"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 901
-    feature_folder: "2026-10-11-pr-author-hook-docs-only-exemption-901"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 900
-    feature_folder: "2026-10-11-concurrent-children-share-scratchpad-file-names-900"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 903
-    feature_folder: "2026-10-11-round-2-review-nits-and-evidence-timestamps-903"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 886
-    feature_folder: "2026-10-11-validator-file-path-invocation-repo-root-first-886"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 894
-    feature_folder: "2026-10-11-product-name-examples-remain-in-generic-rules-894"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 898
-    feature_folder: "2026-10-11-orchestrator-state-rule-sentence-dropped-850-898"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 895
-    feature_folder: "2026-10-11-codex-web-setup-review-follow-ups-895"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 884
-    feature_folder: "2026-10-11-compute-concurrency-batches-coverage-884"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 887
-    feature_folder: "2026-10-11-host-tools-manifest-and-bootstrap-behavior-887"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
-  - issue_num: 889
-    feature_folder: "2026-10-11-argumentless-sort-ordering-and-comparator-coverage-gaps-889"
-    kind: "bug"
-    state: "proposed"
-    blast_radius:
-      paths: []
-      modules: []
-      shared_surfaces: []
-      contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
   - issue_num: 543
-    feature_folder: "2026-10-11-epic-planner-field-list-remainder-543"
+    feature_folder: "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543"
     kind: "bug"
-    state: "proposed"
+    state: "prepared"
     blast_radius:
-      paths: []
+      paths:
+        - ".claude/agents/epic-planner.md"
+        - ".codex/agents/epic-planner.toml"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/**"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/baseline/concurrent-edit-check.2026-10-11T13-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/baseline/git-baseline.2026-10-11T13-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/baseline/max-parallel-features-absent.2026-10-11T13-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/baseline/poshqc-checkpoint-hygiene-contract.2026-10-11T13-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/baseline/pytest-frontmatter-contracts.2026-10-11T13-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/baseline/pytest-push-down-parity.2026-10-11T13-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/baseline/research-path-absent.2026-10-11T13-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/baseline/spec-ac-source.2026-10-11T13-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/qa-gates/ac-checkoff.2026-10-11T14-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/qa-gates/ac1-max-parallel-features-in-section.2026-10-11T13-30.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/qa-gates/ac2-research-path-before-plan-path.2026-10-11T13-30.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/qa-gates/ac3-mirror-tokens.2026-10-11T13-30.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/qa-gates/ac5-persona-key-coverage.2026-10-11T13-30.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/qa-gates/ac5-validator-required-key-set.2026-10-11T13-30.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/qa-gates/changed-files.2026-10-11T14-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/qa-gates/codex-non-change.2026-10-11T14-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/qa-gates/edit-footprint.2026-10-11T13-30.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/qa-gates/mirror-byte-identity.2026-10-11T13-30.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/qa-gates/policy-paths-untouched.2026-10-11T14-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/regression-testing/poshqc-checkpoint-hygiene-contract.2026-10-11T14-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/regression-testing/pytest-bundled-payload-node.2026-10-11T13-30.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/regression-testing/pytest-frontmatter-contracts.2026-10-11T14-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/regression-testing/pytest-push-down-parity.2026-10-11T13-30.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/evidence/regression-testing/pytest-push-down-parity.2026-10-11T14-00.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/plan.2026-10-11T07-59.md"
+        - "docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/spec.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-planner.md"
+        - "scripts/dev_tools/validate_epic_planner_state.py"
+        - "tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1"
+        - "tests/scripts/dev_tools/claude_payload_scope_test_support.py"
+        - "tests/scripts/dev_tools/test_claude_rules_frontmatter.py"
+        - "tests/scripts/dev_tools/test_parallel_planner_surface_contracts.py"
+      modules:
+        - "codex-runtime"
+      shared_surfaces:
+        - "scripts/dev_tools/validate_epic_planner_state.py"
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 12:12:00"
+  - issue_num: 884
+    feature_folder: "docs/features/active/2026-10-11-compute-concurrency-batches-coverage-884"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/lib/bash/compute-concurrency-batches.sh"
+        - ".codex/hooks/validate-feature-review-coverage.ps1"
+        - ".github/workflows/_shell-coverage.yml"
+        - "docs/features/active/2026-10-11-compute-concurrency-batches-coverage-884/**"
+        - "tests/shell/compute_concurrency_batches_cli.bats"
+        - "tests/shell/compute_concurrency_batches_cli.bats:1"
+        - "tests/shell/compute_concurrency_batches_cli.bats:2"
+        - "tests/shell/compute_concurrency_batches_cli.bats:3"
+        - "tests/shell/compute_concurrency_batches_cli.bats:5"
+        - "tests/shell/parallel_cohorts_parity.bats"
+        - "tests/shell/parallel_cohorts.bats"
+      modules:
+        - "codex-runtime"
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 12:15:07"
+  - issue_num: 885
+    feature_folder: "docs/features/active/2026-10-11-parallel-add-children-not-told-to-record-issue-adoption-885"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/skills/parallel-add/SKILL.md"
+        - ".claude/skills/parallel-plan/SKILL.md"
+        - "docs/features/active/2026-07-24-potential-to-issue-python-files-oversized-406/evidence/qa-gates/black.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/remediation-baseline/black-check-baseline.2026-09-30T11-59.md"
+        - "docs/features/active/2026-08-23-unauthorized-noqa-e501-in-blast-radius-parity-test-512/evidence/remediation-baseline/ruff-file-baseline.2026-09-30T11-59.md"
+        - "docs/features/active/2026-10-11-parallel-add-children-not-told-to-record-issue-adoption-885/**"
+        - "docs/features/active/2026-10-11-parallel-add-children-not-told-to-record-issue-adoption-885/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-10-11-parallel-add-children-not-told-to-record-issue-adoption-885/issue.md"
+        - "docs/features/active/2026-10-11-parallel-add-children-not-told-to-record-issue-adoption-885/research/research.2026-10-11T08-05.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+        - "tests/scripts/dev_tools/test_parallel_issue_adoption_skill_contracts.py"
       modules: []
       shared_surfaces: []
       contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
+      source: "declared"
+      computed_at: "10/11/2026 12:18:12"
+  - issue_num: 886
+    feature_folder: "docs/features/active/2026-10-11-validator-file-path-invocation-repo-root-first-886"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - "docs/features/active/2026-10-11-validator-file-path-invocation-repo-root-first-886/**"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md"
+        - "scripts/dev_tools/validate_orchestration_artifacts.py"
+        - "scripts/dev_tools/validate_orchestration_artifacts.py:17"
+        - "scripts/dev_tools/validate_orchestration_artifacts.py:498"
+        - "tests/scripts/dev_tools/test_blast_radius_extraction.py"
+        - "tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py"
+        - "tests/scripts/dev_tools/test_plan_gate_parity.py"
+        - "tests/scripts/dev_tools/test_validate_epic_orchestrator_state_merge_status.py"
+        - "tests/scripts/dev_tools/test_validate_epic_planner_state.py"
+        - "tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py"
+        - "tests/scripts/dev_tools/test_validate_orchestration_artifacts_invocation.py:203"
+        - "tests/scripts/dev_tools/test_validate_orchestrator_state_cli.py"
+      modules: []
+      shared_surfaces:
+        - "scripts/dev_tools/validate_orchestration_artifacts.py"
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 12:26:46"
+  - issue_num: 887
+    feature_folder: "docs/features/active/2026-10-11-host-tools-manifest-and-bootstrap-behavior-887"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".devcontainer/README.md"
+        - ".github/workflows/_poshqc.yml"
+        - ".github/workflows/ci.yml"
+        - "config/poshqc-coverage.json"
+        - "config/poshqc-scan.json"
+        - "docs/features/active/2026-10-11-host-tools-manifest-and-bootstrap-behavior-887/**"
+        - "docs/features/active/2026-10-11-host-tools-manifest-and-bootstrap-behavior-887/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-10-11-host-tools-manifest-and-bootstrap-behavior-887/issue.md"
+        - "docs/features/active/2026-10-11-host-tools-manifest-and-bootstrap-behavior-887/research/research.2026-10-11T08-40.md"
+        - "scripts/dev-tools/bootstrap-host.ps1"
+        - "scripts/dev-tools/HostBootstrap.psm1"
+        - "scripts/dev-tools/HostBootstrap.psm1:335"
+        - "scripts/dev-tools/HostBootstrapWorkspace.psm1"
+        - "scripts/dev-tools/HostTooling.psm1"
+        - "scripts/dev-tools/HostVerification.psm1"
+        - "scripts/dev-tools/publish-sideloaded-extension.ps1"
+        - "scripts/dev-tools/SideloadedExtensionPublish.psm1"
+        - "scripts/dev-tools/verify-host.ps1"
+        - "scripts/host-tools.manifest.json"
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+        - "tests/scripts/dev-tools/bootstrap-host.Tests.ps1"
+        - "tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1"
+        - "tests/scripts/dev-tools/HostBootstrap.Tests.ps1"
+        - "tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1"
+        - "tests/scripts/dev-tools/HostTooling.Tests.ps1"
+        - "tests/scripts/dev-tools/HostVerification.Invoke.Tests.ps1"
+        - "tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1"
+        - "tests/scripts/host-tools.manifest.Tests.ps1"
+      modules:
+        - "config"
+        - "poshqc"
+        - "powershell-dev-tools"
+      shared_surfaces:
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 13:41:05"
+  - issue_num: 889
+    feature_folder: "docs/features/active/2026-10-11-argumentless-sort-ordering-and-comparator-coverage-gaps-889"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - "docs/features/active/2026-10-11-argumentless-sort-ordering-and-comparator-coverage-gaps-889/**"
+        - "docs/features/active/2026-10-11-argumentless-sort-ordering-and-comparator-coverage-gaps-889/issue.md"
+        - "docs/features/active/2026-10-11-argumentless-sort-ordering-and-comparator-coverage-gaps-889/research/2026-10-11T08-35-argumentless-sort-sites-and-comparator-test-gaps.md"
+        - "docs/features/completed/2026-06-17-remove-secondary-worktrees-command-194/policy-audit.2026-06-17T16-36.md"
+        - "extensions/drm-copilot/jest.config.cjs"
+        - "extensions/drm-copilot/package-lock.json"
+        - "extensions/drm-copilot/package.json"
+        - "extensions/drm-copilot/src/lib/codex-native-converter/engine-pipeline.ts"
+        - "extensions/drm-copilot/src/lib/push-down/claude-pack-selection.ts"
+        - "extensions/drm-copilot/src/lib/push-down/codex-pack-selection.ts"
+        - "extensions/drm-copilot/src/lib/resolve/file-prompt-transforms.ts"
+        - "extensions/drm-copilot/src/lib/subagent-tree/tree-assembler.ts"
+        - "extensions/drm-copilot/src/lib/subagent-tree/tree-formatter.ts"
+        - "extensions/drm-copilot/src/lib/validate/codex-topology-resolver.ts"
+        - "extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-core.ts"
+        - "extensions/drm-copilot/src/lib/validate/epic-planner-git-integrity.ts"
+        - "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-model-routing.ts"
+        - "extensions/drm-copilot/src/lib/validate/orchestrator-state-codex-topology.ts"
+        - "extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts"
+        - "extensions/drm-copilot/src/lib/validate/orchestrator-state-model-routing-existence.ts"
+        - "extensions/drm-copilot/test/lib/codex-native-converter/engine-pipeline.test.ts"
+        - "extensions/drm-copilot/test/lib/codex-native-converter/reporting-coverage.test.ts"
+        - "extensions/drm-copilot/test/lib/codex-native-converter/reporting-render.test.ts"
+        - "extensions/drm-copilot/test/lib/codex-native-converter/validation.test.ts"
+        - "extensions/drm-copilot/test/lib/push-down/claude-pack-selection.test.ts"
+        - "extensions/drm-copilot/test/lib/push-down/codex-pack-selection.test.ts"
+        - "extensions/drm-copilot/test/lib/resolve/file-prompt-transforms.test.ts"
+        - "extensions/drm-copilot/test/lib/subagent-tree/tree-assembler.test.ts"
+        - "extensions/drm-copilot/test/lib/subagent-tree/tree-formatter.test.ts"
+        - "extensions/drm-copilot/test/lib/validate/codex-topology-resolver.test.ts"
+        - "extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.ordering.test.ts"
+        - "extensions/drm-copilot/test/lib/validate/epic-planner-git-integrity.test.ts"
+        - "extensions/drm-copilot/test/lib/validate/orchestrator-state-codex-model-routing.test.ts"
+        - "extensions/drm-copilot/test/lib/validate/orchestrator-state-core.test.ts"
+        - "extensions/drm-copilot/test/lib/validate/orchestrator-state-model-routing-existence.test.ts"
+        - "package-lock.json"
+        - "src/lib/codex-native-converter/engine-pipeline.ts"
+        - "src/lib/push-down/claude-pack-selection.ts"
+        - "src/lib/push-down/codex-pack-selection.ts"
+        - "src/lib/resolve/file-prompt-transforms.ts"
+        - "src/lib/subagent-tree/tree-assembler.ts"
+        - "src/lib/subagent-tree/tree-formatter.ts"
+        - "src/lib/validate/codex-topology-resolver.ts"
+        - "src/lib/validate/epic-orchestrator-state-core.ts"
+        - "src/lib/validate/epic-planner-git-integrity.ts"
+        - "src/lib/validate/orchestrator-state-codex-model-routing.ts"
+        - "src/lib/validate/orchestrator-state-codex-topology.ts"
+        - "src/lib/validate/orchestrator-state-core.ts"
+        - "src/lib/validate/orchestrator-state-model-routing-existence.ts"
+      modules: []
+      shared_surfaces:
+        - "extensions/drm-copilot/package-lock.json"
+        - "package-lock.json"
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 13:40:41"
+  - issue_num: 890
+    feature_folder: "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/agents/parallel-orchestrator.md"
+        - ".claude/agents/parallel-orchestrator.md:16"
+        - ".claude/lib/bash/mutate-parallel-run.sh"
+        - ".claude/lib/bash/parallel-mutation-cli.sh"
+        - ".claude/lib/bash/parallel-mutation-ops.sh"
+        - ".claude/lib/bash/parallel-mutation.sh"
+        - ".claude/lib/bash/parallel-mutation.sh:18"
+        - ".claude/lib/bash/remove-parallel-item.sh"
+        - ".claude/lib/bash/remove-parallel-item.sh:37"
+        - ".claude/settings.json"
+        - ".claude/skills/parallel-add/SKILL.md"
+        - ".claude/skills/parallel-close/SKILL.md"
+        - ".claude/skills/parallel-orchestrate/SKILL.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/**"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/baseline/black-baseline-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/baseline/divergence-token-baseline-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/baseline/engine-name-baseline-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/baseline/merge-base-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/baseline/minor-audit-preconditions-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/baseline/pyright-baseline-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/baseline/pytest-coverage-baseline-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/baseline/python-c-grant-baseline-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/baseline/ruff-baseline-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/baseline/shell-ci-baseline-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/baseline/surface-contracts-baseline-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/other/file-sizes-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/other/mirror-hashes-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/other/pr-body-carry-forward-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/other/pr-handoff-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/other/python-c-grant-decision-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/black-final-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/ci-shell-coverage-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/coverage-delta-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/divergence-token-final-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/engine-name-final-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/overlap-zones-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/pyright-final-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/pytest-coverage-final-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/qc-loop-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/ruff-final-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/scope-check-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/shell-lint-local-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/qa-gates/surface-contracts-final-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/regression-testing/fail-before-enum-error-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/regression-testing/fail-before-skill-port-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/regression-testing/pass-after-enum-error-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/regression-testing/pass-after-skill-port-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/evidence/regression-testing/run-parity-python-lane-890.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/issue.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/plan.2026-10-11T08-29.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/research/2026-10-11T12-35-parallel-skills-python-engine-calls-research.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/spec.md"
+        - "docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/user-story.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/agents/parallel-orchestrator.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/mutate-parallel-run.sh"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-mutation-cli.sh"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-mutation-ops.sh"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/parallel-mutation.sh"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/lib/bash/remove-parallel-item.sh"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/settings.json"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-close/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+        - "scripts/dev_tools/_parallel_mutation_errors.py"
+        - "scripts/dev_tools/skill_bundle_contract.py"
+        - "tests/fixtures/parallel_mutation_run/add-entry-admit.json"
+        - "tests/fixtures/parallel_mutation_run/add-entry-deferred-generation-minus-one.json"
+        - "tests/fixtures/parallel_mutation_run/add-entry-deferred.json"
+        - "tests/fixtures/parallel_mutation_run/add-entry-negative-generation.json"
+        - "tests/fixtures/parallel_mutation_run/add-entry-non-positive-item.json"
+        - "tests/fixtures/parallel_mutation_run/admit-conflict-in-flight.json"
+        - "tests/fixtures/parallel_mutation_run/admit-conflict-outside-cohort.json"
+        - "tests/fixtures/parallel_mutation_run/admit-conflict-scheduled-member.json"
+        - "tests/fixtures/parallel_mutation_run/admit-no-conflict.json"
+        - "tests/fixtures/parallel_mutation_run/close-entry-negative-generation.json"
+        - "tests/fixtures/parallel_mutation_run/close-entry.json"
+        - "tests/fixtures/parallel_mutation_run/close-in-flight.json"
+        - "tests/fixtures/parallel_mutation_run/close-non-positive-key.json"
+        - "tests/fixtures/parallel_mutation_run/close-permitted.json"
+        - "tests/fixtures/parallel_mutation_run/close-unknown-state.json"
+        - "tests/fixtures/parallel_mutation_run/recolor-overlap.json"
+        - "tests/fixtures/parallel_mutation_run/recolor-pinned-edge-offset.json"
+        - "tests/fixtures/parallel_mutation_run/requeue-entry-generation-minus-one.json"
+        - "tests/fixtures/parallel_mutation_run/requeue-entry-negative-generation.json"
+        - "tests/fixtures/parallel_mutation_run/requeue-entry-non-positive-item.json"
+        - "tests/fixtures/parallel_mutation_run/requeue-entry.json"
+        - "tests/scripts/dev_tools/parallel_orchestrator_permission_seam_support.py"
+        - "tests/scripts/dev_tools/test_parallel_mutation_errors.py"
+        - "tests/scripts/dev_tools/test_parallel_mutation_remove_bash_parity.py"
+        - "tests/scripts/dev_tools/test_parallel_mutation_remove_bash_parity.py:25"
+        - "tests/scripts/dev_tools/test_parallel_mutation_run_bash_parity.py"
+        - "tests/scripts/dev_tools/test_skill_bundle_contract_repo.py"
+        - "tests/shell/parallel_bash_manifest_membership.bats"
+        - "tests/shell/parallel_mutation_remove_parity.bats"
+        - "tests/shell/parallel_mutation_remove_parity.bats:15"
+        - "tests/shell/parallel_mutation_remove.bats"
+        - "tests/shell/parallel_mutation_run_parity.bats"
+        - "tests/shell/parallel_mutation_run.bats"
+        - "tests/shell/parallel_payload_only.bats"
+      modules: []
+      shared_surfaces:
+        - ".claude/settings.json"
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 13:40:00"
   - issue_num: 892
-    feature_folder: "2026-10-11-push-down-ac22-test-command-omits-memory-tests-892"
+    feature_folder: "docs/features/active/2026-10-11-push-down-ac22-test-command-omits-memory-tests-892"
     kind: "bug"
-    state: "proposed"
+    state: "prepared"
     blast_radius:
-      paths: []
+      paths:
+        - "docs/features/active/2026-09-29-issue-507-python-push-down-divergence-follow-ups-790/evidence/qa-gates/remediation-pytest-targeted-coverage.2026-10-10T09-07.md"
+        - "docs/features/active/2026-09-29-issue-507-python-push-down-divergence-follow-ups-790/spec.md"
+        - "docs/features/active/2026-09-29-issue-507-python-push-down-divergence-follow-ups-790/spec.md:1"
+        - "docs/features/active/2026-09-29-issue-507-python-push-down-divergence-follow-ups-790/spec.md:26"
+        - "docs/features/active/2026-10-11-push-down-ac22-test-command-omits-memory-tests-892/**"
+        - "docs/features/active/2026-10-11-push-down-ac22-test-command-omits-memory-tests-892/issue.md"
+        - "docs/features/active/2026-10-11-push-down-ac22-test-command-omits-memory-tests-892/plan.2026-10-11T08-29.md"
+        - "poetry.lock"
+        - "tests/scripts/dev_tools/test_push_down_claude_exclusion_filter.py"
+        - "tests/scripts/dev_tools/test_push_down_claude_memory_scope.py"
+        - "tests/scripts/dev_tools/test_push_down_claude_pack_memory_modes.py"
+      modules: []
+      shared_surfaces:
+        - "poetry.lock"
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 12:53:53"
+  - issue_num: 894
+    feature_folder: "docs/features/active/2026-10-11-product-name-examples-remain-in-generic-rules-894"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/rules/csharp.md"
+        - ".claude/rules/parallel-orchestration.md"
+        - ".claude/rules/typescript.md"
+        - "docs/features/active/2026-10-11-product-name-examples-remain-in-generic-rules-894/**"
+        - "docs/features/active/2026-10-11-product-name-examples-remain-in-generic-rules-894/issue.md"
+        - "docs/features/active/2026-10-11-product-name-examples-remain-in-generic-rules-894/plan.2026-10-11T09-43.md"
+        - "docs/features/active/2026-10-11-product-name-examples-remain-in-generic-rules-894/research/research.2026-10-11T13-50.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/rules/csharp.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/rules/typescript.md"
+        - "src/TaskMaster.Domain"
+        - "tests/scripts/claude-lib/blast-radius/BlastRadiusTokenShape.Tests.ps1"
+        - "tests/scripts/dev_tools/test_blast_radius_extraction_rules.py"
+        - "tests/scripts/dev_tools/test_claude_rules_frontmatter.py"
+        - "tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py"
+        - "tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py"
+        - "tests/scripts/dev_tools/test_parallel_planner_surface_contracts_landed.py"
+        - "tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py"
+        - "tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py"
+        - "tests/scripts/dev_tools/test_typescript_toolchain_instruction_contracts.py"
+        - "tests/scripts/dev_tools/test_validate_orchestration_artifacts_parallel_dispatch.py"
       modules: []
       shared_surfaces: []
       contracts: []
-      source: "derived"
-      computed_at: "2026-10-11T11:55:42Z"
+      source: "declared"
+      computed_at: "10/11/2026 14:24:44"
+  - issue_num: 895
+    feature_folder: "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".codex/codex-web-setup.sh"
+        - ".github/codex/codex-web-setup.sh"
+        - ".github/workflows/_shell-coverage.yml"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/**"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/baseline/ci-baseline-bats-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/baseline/ci-baseline-kcov-coverage-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/baseline/ci-baseline-shell-check-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/baseline/git-branch-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/baseline/git-head-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/baseline/git-status-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/baseline/line-counts-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/baseline/mirror-hash-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/baseline/pytest-push-down-824-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/baseline/requirements-source-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/other/kcov-subshell-attribution-limit-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/other/mirror-hash-post-edit-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/other/pytest-push-down-824-post-edit-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/other/s9-handoff-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/other/scope-boundary-phase1-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/other/scope-lock-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/ac1-script-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/ac1-tests-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/ac2-fixture-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/ac3-comment-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/ac4-helpers-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/ac5-arrange-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/ac6-stub-path-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/ac7-document-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/ci-bats-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/ci-kcov-coverage-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/ci-shell-check-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/line-counts-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/mirror-hash-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/pytest-push-down-824-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/evidence/qa-gates/scope-boundary-895.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/issue.md"
+        - "docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/research/2026-10-11T13-50-codex-web-setup-review-follow-ups-research.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh"
+        - "scripts/bash/kcov_trace_env.sh"
+        - "tests/fixtures/codex_web_setup/empty-path/.gitkeep"
+        - "tests/fixtures/codex_web_setup/solution-root/Alpha.sln"
+        - "tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py"
+        - "tests/shell/helpers/codex_web_setup_common.bash"
+        - "tests/shell/helpers/codex_web_setup_common.bash:5"
+        - "tests/shell/test_codex_web_setup_codex_copy.bats"
+        - "tests/shell/test_codex_web_setup_codex_dotnet.bats"
+        - "tests/shell/test_codex_web_setup_codex_installers.bats"
+        - "tests/shell/test_codex_web_setup_codex_verify.bats"
+      modules:
+        - "codex-runtime"
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 14:04:47"
+  - issue_num: 898
+    feature_folder: "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/rules/orchestrator-state.md"
+        - "docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/spec.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/**"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/baseline/baseline-correction-absent-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/baseline/baseline-git-state-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/baseline/baseline-parity-test-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/baseline/baseline-rule-content-tests-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/baseline/baseline-sentence-absent-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/other/coverage-not-applicable-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/other/end-state-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/other/implementation-handoff-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/other/implementation-outcome-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/qa-gates/final-parity-test-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/qa-gates/final-rule-content-tests-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/regression-testing/byte-identity-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/regression-testing/correction-present-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/regression-testing/line-284-unchanged-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/regression-testing/numstat-rule-pair-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/regression-testing/scope-rules-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/evidence/regression-testing/sentence-present-898.md"
+        - "docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/issue.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md"
+        - "tests/scripts/dev_tools/test_claude_rules_frontmatter.py"
+        - "tests/scripts/dev_tools/test_orchestrator_state_blocked_reason.py"
+        - "tests/scripts/dev_tools/test_orchestrator_state_remediation_docs.py"
+        - "tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py"
+        - "tests/scripts/dev_tools/test_parallel_issue_adoption_skill_contracts.py"
+      modules: []
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 13:59:04"
+  - issue_num: 899
+    feature_folder: "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".agents/skills/orchestrate/SKILL.md"
+        - ".agents/skills/orchestrator-workflow/SKILL.md"
+        - ".claude/agents/epic-orchestrator.md"
+        - ".claude/agents/orchestrator.md"
+        - ".claude/agents/parallel-orchestrator.md"
+        - ".claude/agents/parallel-orchestrator.md:51"
+        - ".claude/lib/ci-gate/Invoke-CiGateParser.ps1"
+        - ".claude/skills/epic-orchestrate/SKILL.md"
+        - ".claude/skills/orchestrate/SKILL.md"
+        - ".claude/skills/parallel-orchestrate/SKILL.md"
+        - ".claude/skills/remediation-handoff-atomic-planner/SKILL.md"
+        - ".codex/agents/orchestrator-c1.toml"
+        - ".codex/agents/orchestrator-c2.toml"
+        - ".codex/agents/orchestrator-c3-elevated.toml"
+        - ".codex/agents/orchestrator-c3.toml"
+        - ".codex/agents/orchestrator-c4.toml"
+        - ".codex/agents/orchestrator.toml"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/**"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/baseline/branch-state.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/baseline/codex-variants-check.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/baseline/line-counts.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/baseline/line-endings.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/baseline/mirror-hashes.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/baseline/pester-ci-gate.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/baseline/phase0-instructions-read.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/baseline/powershell-analyze.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/baseline/powershell-coverage-reference.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/baseline/powershell-format.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/baseline/python-contract-suites.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/baseline/python-coverage.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/other/codex-variants-regenerate.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/other/mirror-sync.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/other/reduced-audit-handoff.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/qa-gates/ac-verification.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/qa-gates/coverage-comparison.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/qa-gates/final-pester-ci-gate.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/qa-gates/final-powershell-analyze.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/qa-gates/final-powershell-coverage-status.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/qa-gates/final-powershell-format.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/qa-gates/final-python-black.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/qa-gates/final-python-contract-suites.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/qa-gates/final-python-coverage.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/qa-gates/final-python-pyright.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/qa-gates/final-python-ruff.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/regression-testing/pytest-all-checks-after-edit.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/evidence/regression-testing/pytest-all-checks-before-edit.2026-10-11T09-44.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/issue.md"
+        - "docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/research/research.2026-10-11T09-50.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/agents/orchestrator.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/lib/ci-gate/Invoke-CiGateParser.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/remediation-handoff-atomic-planner/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrate/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrator-workflow/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c1.toml"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c2.toml"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c3-elevated.toml"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c3.toml"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator-c4.toml"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/orchestrator.toml"
+        - "scripts/dev_tools/generate_codex_agent_variants.py"
+        - "scripts/dev-tools/Invoke-FullReleaseFlow.ps1"
+        - "tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1"
+        - "tests/scripts/dev_tools/test_ci_gate_all_checks_contracts.py"
+      modules:
+        - "codex-runtime"
+        - "powershell-dev-tools"
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 14:36:32"
+  - issue_num: 900
+    feature_folder: "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".agents/skills/atomic-executor/SKILL.md"
+        - ".agents/skills/atomic-planner/SKILL.md"
+        - ".claude/agents/atomic-executor.md"
+        - ".claude/agents/atomic-planner.md"
+        - ".claude/agents/orchestrator.md"
+        - ".claude/hooks/validate-planner-output.ps1"
+        - ".claude/skills/epic-orchestrate/SKILL.md"
+        - ".claude/skills/orchestrate/SKILL.md"
+        - ".claude/skills/remediation-handoff-atomic-planner/SKILL.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/**"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/baseline/black-check-baseline.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/baseline/branch-commit-baseline.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/baseline/issue-510-node-baseline.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/baseline/line-endings-baseline.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/baseline/mirror-parity-baseline.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/baseline/poshqc-claude-runtime-baseline.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/baseline/pyright-baseline.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/baseline/pytest-coverage-baseline.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/baseline/ruff-baseline.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/qa-gates/ac-status.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/qa-gates/coverage-comparison.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/qa-gates/final-black-check.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/qa-gates/final-issue-510-node.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/qa-gates/final-poshqc-claude-runtime.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/qa-gates/final-pyright.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/qa-gates/final-pytest-coverage.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/qa-gates/final-qc-loop-pass.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/qa-gates/final-ruff.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/qa-gates/scope-check.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/insertion-only-numstat.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/issue-510-node-after.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/line-endings-after.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/mirror-parity-after.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/neighbour-contracts.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/new-module-black-check.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/new-module-pyright.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/new-module-ruff.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/push-down-claude-parity.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/push-down-codex-agents-parity.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/red-run-precondition.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/scratch-contract-green.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/evidence/regression-testing/scratch-contract-red.2026-10-11T10-38.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/issue.md"
+        - "docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/research/scratch-file-naming.2026-10-11T10-45.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-planner.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-executor/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-planner/SKILL.md"
+        - "scripts/dev_tools/plan_gate_observability.py"
+        - "scripts/dev_tools/push_down_claude_customizations.py"
+        - "tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1"
+        - "tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py"
+        - "tests/scripts/dev_tools/test_codex_handoff_contract_parity.py"
+        - "tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py"
+        - "tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py"
+        - "tests/scripts/dev_tools/test_scratch_location_contracts.py"
+        - "tests/scripts/dev_tools/test_typescript_toolchain_instruction_contracts.py"
+      modules: []
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 15:21:41"
+  - issue_num: 901
+    feature_folder: "docs/features/active/2026-10-11-pr-author-hook-docs-only-exemption-901"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/agents/orchestrator.md"
+        - ".claude/agents/pr-author.md"
+        - ".claude/hooks/enforce-epic-merge-gate-authorization.ps1"
+        - ".claude/hooks/enforce-epic-merge-gate-resolution.ps1"
+        - ".claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1"
+        - ".claude/hooks/enforce-epic-worktree-removal-gate.ps1"
+        - ".claude/hooks/enforce-powershell-batch-budget.ps1"
+        - ".claude/hooks/enforce-pr-author-skill-helpers.ps1"
+        - ".claude/hooks/enforce-pr-author-skill.artifact-root.ps1"
+        - ".claude/hooks/enforce-pr-author-skill.docs-only.ps1"
+        - ".claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1"
+        - ".claude/hooks/enforce-pr-author-skill.ps1"
+        - ".claude/lib/worktree-resolution/WorktreeItemResolution.psm1"
+        - ".claude/skills/orchestrate/SKILL.md"
+        - ".claude/skills/pr-author/SKILL.md"
+        - ".github/workflows/ci.yml"
+        - "docs/features/active/2026-10-11-pr-author-hook-docs-only-exemption-901/**"
+        - "docs/features/active/2026-10-11-pr-author-hook-docs-only-exemption-901/issue.md"
+        - "docs/features/x/plan.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill-helpers.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.artifact-root.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.docs-only.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+        - "tests/scripts/claude-hooks/enforce-epic-merge-gate.ItemResolution.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-epic-worktree-removal-gate.Diagnostics.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-pr-author-skill.BodyNumber.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Decision.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Exemption.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-pr-author-skill.OrchestratorStatePreflight.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-pr-author-skill.WorktreeResolution.Tests.ps1"
+        - "tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1"
+        - "tests/scripts/claude-runtime/hook-import-failure-exemptions.Guard.Tests.ps1"
+      modules:
+        - "poshqc"
+      shared_surfaces:
+        - "scripts/powershell/PoshQC/settings/pester.runsettings.psd1"
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 15:48:38"
+  - issue_num: 902
+    feature_folder: "docs/features/active/2026-10-11-epic-integration-branch-not-synced-with-main-902"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".agents/skills/epic-orchestrate/SKILL.md"
+        - ".claude/agents/epic-orchestrator.md"
+        - ".claude/hooks/enforce-epic-wave-barrier.ps1"
+        - ".claude/hooks/enforce-python-batch-budget.ps1"
+        - ".claude/skills/epic-orchestrate/SKILL.md"
+        - ".claude/skills/epic-plan/SKILL.md"
+        - ".claude/skills/epic-run/SKILL.md"
+        - ".codex/agents/epic-orchestrator.toml"
+        - ".github/workflows/_poshqc.yml"
+        - "docs/features/active/2026-10-11-epic-integration-branch-not-synced-with-main-902/**"
+        - "docs/features/active/2026-10-11-epic-integration-branch-not-synced-with-main-902/issue.md"
+        - "docs/features/active/2026-10-11-epic-integration-branch-not-synced-with-main-902/research/research.2026-10-11T10-45.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md"
+        - "scripts/dev_tools/_epic_orchestrator_state_resolution.py"
+        - "tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1"
+        - "tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1"
+        - "tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py"
+        - "tests/scripts/dev_tools/parallel_orchestrator_surface_test_support.py"
+        - "tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py"
+        - "tests/scripts/dev_tools/test_epic_orchestrate_main_sync_contract.py"
+        - "tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py"
+      modules:
+        - "codex-runtime"
+      shared_surfaces:
+        - "scripts/dev_tools/_epic_orchestrator_state_resolution.py"
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 15:18:50"
+  - issue_num: 903
+    feature_folder: "docs/features/active/2026-10-11-round-2-review-nits-and-evidence-timestamps-903"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".agents/skills/atomic-plan-contract/SKILL.md"
+        - ".agents/skills/epic-plan/SKILL.md"
+        - ".agents/skills/evidence-and-timestamp-conventions/SKILL.md"
+        - ".claude/agents/atomic-executor.md"
+        - ".claude/agents/atomic-planner.md"
+        - ".claude/hooks/enforce-completion-consistency.ps1"
+        - ".claude/hooks/enforce-completion-consistency.ps1:466"
+        - ".claude/hooks/enforce-feature-folder-order.ps1:51"
+        - ".claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1"
+        - ".claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1"
+        - ".claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1:41"
+        - ".claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1"
+        - ".claude/hooks/enforce-parallel-drift-gate.ps1:86"
+        - ".claude/hooks/enforce-powershell-batch-budget.ps1"
+        - ".claude/hooks/enforce-prd-feature-before-planner-helpers.ps1:39"
+        - ".claude/hooks/feature-folder-resolution.ps1"
+        - ".claude/hooks/feature-folder-resolution.ps1:256"
+        - ".claude/lib/blast-radius/BlastRadiusTokenShape.psm1"
+        - ".claude/lib/hook-payload/HookPayload.psm1"
+        - ".claude/lib/worktree-resolution/WorktreeTargetResolution.psm1"
+        - ".claude/skills/atomic-plan-contract/SKILL.md"
+        - ".claude/skills/epic-plan/SKILL.md:212"
+        - ".claude/skills/evidence-and-timestamp-conventions/SKILL.md"
+        - ".claude/skills/evidence-and-timestamp-conventions/SKILL.md:49"
+        - ".codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1"
+        - ".codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1"
+        - ".codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1:41"
+        - ".codex/hooks/enforce-orchestration-preimplementation-gate-targets.ps1"
+        - ".codex/hooks/feature-folder-resolution.ps1"
+        - ".github/skills/atomic-plan-contract/SKILL.md"
+        - ".github/skills/evidence-and-timestamp-conventions/SKILL.md"
+        - ".github/workflows/_poshqc.yml"
+        - ".github/workflows/ci.yml"
+        - "docs/features/active/2026-09-27-quality-tiers-yml-missing-and-unenforced-734/code-review.2026-10-02T03-55.md:34"
+        - "docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/other/**"
+        - "docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/other/closure-dispositions.2026-10-09T09-00.md"
+        - "docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/ci-evidence-pr873.2026-10-10T03-00.md"
+        - "docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/ps-pester.2026-10-09T09-00.md"
+        - "docs/features/active/2026-10-08-bug-burndown-2026-09-29-review-nits-846/evidence/qa-gates/py-cov-whole-repo.2026-10-09T09-00.md"
+        - "docs/features/active/2026-10-11-round-2-review-nits-and-evidence-timestamps-903/**"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-consistency.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-orchestration-preimplementation-gate-targets.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/hooks/feature-folder-resolution.ps1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/lib/blast-radius/BlastRadiusTokenShape.psm1"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md"
+        - "extensions/drm-copilot/resources/claude-customizations/.claude/skills/evidence-and-timestamp-conventions/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-plan/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/evidence-and-timestamp-conventions/SKILL.md"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-orchestration-preimplementation-gate-targets.ps1"
+        - "extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/feature-folder-resolution.ps1"
+        - "extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md"
+        - "extensions/drm-copilot/resources/customizations/.github/skills/evidence-and-timestamp-conventions/SKILL.md"
+        - "extensions/drm-copilot/test/subagent-tree-command-test-support.ts"
+        - "extensions/drm-copilot/test/subagent-tree-command-test-support.ts:11"
+        - "extensions/drm-copilot/test/subagent-tree-command.quick-pick.test.ts"
+        - "extensions/drm-copilot/test/subagent-tree-command.quick-pick.test.ts:13"
+        - "scripts/dev_tools/_blast_radius_token_shapes.py"
+        - "scripts/dev_tools/check_quality_tiers.py:185"
+        - "scripts/dev_tools/new_active_feature_folder_models.py"
+        - "scripts/dev_tools/quality_tiers_contract.py:110"
+        - "tests/scripts/claude-hooks/enforce-completion-consistency.Payload.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-completion-consistency.Payload.Tests.ps1:54"
+        - "tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Branches.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Predicate.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.TargetFolder.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.Parity.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-targets.Tests.ps1"
+        - "tests/scripts/claude-hooks/enforce-prd-feature-before-planner.TargetResolution.Tests.ps1"
+        - "tests/scripts/claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1"
+        - "tests/scripts/claude-hooks/EpicStateIsolation.Discovery.Helpers.ps1"
+        - "tests/scripts/claude-hooks/EpicStateIsolation.Helpers.ps1"
+        - "tests/scripts/claude-hooks/feature-folder-resolution.Tests.ps1"
+        - "tests/scripts/claude-lib/blast-radius/BlastRadiusTokenShape.Tests.ps1"
+        - "tests/scripts/claude-lib/blast-radius/BlastRadiusTokenShape.Tests.ps1:279"
+        - "tests/scripts/claude-lib/codex-routing/CodexDeployment.GeneratedFamilies.Parity.Tests.ps1"
+        - "tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.ScanRoots.Helpers.ps1"
+        - "tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1"
+        - "tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1"
+        - "tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.TargetFolder.Tests.ps1"
+        - "tests/scripts/codex-hooks/feature-folder-resolution.Tests.ps1"
+        - "tests/scripts/dev_tools/npm_token_guard_test_support.py"
+        - "tests/scripts/dev_tools/parallel_orchestrator_surface_test_support.py"
+        - "tests/scripts/dev_tools/test_blast_radius_token_shapes.py"
+        - "tests/scripts/dev_tools/test_check_quality_tiers.py"
+        - "tests/scripts/dev_tools/test_completion_gate_documentation_contracts.py"
+        - "tests/scripts/dev_tools/test_evidence_timestamp_contracts.py"
+        - "tests/scripts/dev_tools/test_validate_epic_orchestrator_state_merge_status.py"
+        - "tests/scripts/dev_tools/test_workflow_npm_token_guard.py"
+        - "tests/scripts/workflows/PublishMcpNpmWorkflow.Tests.ps1"
+      modules:
+        - "codex-runtime"
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "10/11/2026 16:20:41"
 ---
 
 # Parallel Run: bug-burndown-2026-10-11
 
-Draft manifest written at intake. Items are in state `proposed`; blast radii are placeholders until each item is prepared, and the final manifest replaces them with declared radii.
+Run branch: `parallel/bug-burndown-2026-10-11-plan`. Each item opens its own pull request against `main`; this branch is not an integration branch.
 
-| group | issue_num | also closes | scope summary |
-| --- | --- | --- | --- |
-| P1 | 899 | #891 | CI green gate rules require every check, not only required checks (#899): orchestrate S9 and the parallel-orchestrate child-DONE acceptance |
-| P2 | 890 |  | Port the parallel-add, parallel-close and parallel-orchestrate skills' remaining Python engine calls (parallel_mutation_protocol decide_admission, recolor_unstarted, build_add_entry, decide_close, build_close_entry, build_requeue_entry) to the bash engine under .claude/lib/bash, with bundled mirrors; review the parallel-orchestrator.md poetry run python -c grant |
-| P3 | 885 |  | parallel-add tells issue-number preparation children to record a top-level issue_adoption object, using the same issue-adoption line as parallel-plan; update the bundled mirror. |
-| P4 | 902 |  | Operator decision (A): add an epic-orchestrate skill step that, before each wave, runs a main-sync as a dedicated chore child when the integration branch is behind origin/main (the PR #882 pattern) |
-| P5 | 901 |  | Operator decision (A): the pr-author hook exempts branches whose diff from the base touches only docs/**, and fails closed on any other path (and on any diff it cannot compute) |
-| P6 | 900 |  | Unique per-child scratch file names: the planning and execution contracts (atomic-plan Appendix H helper-script guidance and any orchestrate or executor text that names SCRATCH files) direct each child to a location or name unique to that child, for example SCRATCH/<issue>/ or an issue-number suffix. |
-| P7+P8 | 903 |  | P7: evidence-timestamp conventions - evidence filenames carry the time each file is written, and internal Timestamp lines use one stated time zone; update the evidence-and-timestamp-conventions skill and whatever plan or executor guidance produces plan-time filenames |
-| P9 | 886 |  | File-path entry scripts put the repository root FIRST in sys.path (insert at index 0) so the scripts package always imports from the invoked worktree, starting with scripts/dev_tools/validate_orchestration_artifacts.py and covering every other file-path entry script with the same append pattern |
-| P10 | 894 |  | Remove product-name examples from pushed rule surfaces: src/TaskMaster.Domain in .claude/rules/parallel-orchestration.md, No-COM in .claude/rules/typescript.md and .claude/rules/csharp.md, with bundled mirrors; fix the typescript.md cross-reference to the renamed heading; pin per-file occurrence counts in test_push_down_issue_824_follow_ups.py (CR-5) |
-| P11 | 898 |  | The operator APPROVED adding the #850 sentence to .claude/rules/orchestrator-state.md and its bundled mirror: for an explicit pull request number, the per-feature checkpoint the merge gate consults is the live worktree whose checkpoint records that number in pr_gate.pr_number or a standalone_merge_authorizations entry |
-| P12 | 895 |  | codex-web-setup review follow-ups CR-1, CR-2, CR-3, CR-10, CR-11, CR-12, CR-14 for .codex/codex-web-setup.sh and its bats suites under tests/shell. |
-| P13 | 884 |  | Bash half of #884 only: raise .claude/lib/bash/compute-concurrency-batches.sh kcov line coverage to at least 85% |
-| P14+P15 | 887 | #888 | One item for the host-tool scripts (#887 and #888) |
-| P16 | 889 |  | Operator decision: convert all 19 argument-less .sort() calls in extensions/drm-copilot/src/lib to compareCodePoint, and add the two test gaps (null-path tie branches; targetRole order assertion in engine-pipeline.test.ts). |
-| P17 | 543 |  | #543 remainder |
-| P18 | 892 |  | Docs only: amend the #790 spec.md Test Strategy pytest command (spec.md:196) used by AC-22 to include test_push_down_claude_memory_scope.py and test_push_down_claude_pack_memory_modes.py, as a planning-agent amendment with a recorded rationale; do not change the AC text itself. |
+| group | issue_num | state | band | branch | plan-path |
+| --- | --- | --- | --- | --- | --- |
+| P1 | 899 | prepared | C3 | bug/ci-green-gate-all-checks-and-codex-parity-899 | docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899/plan.2026-10-11T09-44.md |
+| P2 | 890 | prepared | C3 | bug/parallel-skills-python-engine-calls-and-enum-error-members-890 | docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890/plan.2026-10-11T08-29.md |
+| P3 | 885 | prepared | C2 | bug/parallel-add-children-not-told-to-record-issue-adoption-885 | docs/features/active/2026-10-11-parallel-add-children-not-told-to-record-issue-adoption-885/plan.2026-10-11T07-58.md |
+| P4 | 902 | prepared | C3 | bug/epic-integration-branch-not-synced-with-main-902 | docs/features/active/2026-10-11-epic-integration-branch-not-synced-with-main-902/plan.2026-10-11T10-38.md |
+| P5 | 901 | prepared | C3 | bug/pr-author-hook-docs-only-exemption-901 | docs/features/active/2026-10-11-pr-author-hook-docs-only-exemption-901/plan.2026-10-11T10-38.md |
+| P6 | 900 | prepared | C3 | bug/concurrent-children-share-scratchpad-file-names-900 | docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/plan.2026-10-11T10-38.md |
+| P7+P8 | 903 | prepared | C3 | bug/round-2-review-nits-and-evidence-timestamps-903 | docs/features/active/2026-10-11-round-2-review-nits-and-evidence-timestamps-903/plan.2026-10-11T10-39.md |
+| P9 | 886 | prepared | C2 | bug/validator-file-path-invocation-repo-root-first-886 | docs/features/active/2026-10-11-validator-file-path-invocation-repo-root-first-886/plan.2026-10-11T07-58.md |
+| P10 | 894 | prepared | C2 | bug/product-name-examples-remain-in-generic-rules-894 | docs/features/active/2026-10-11-product-name-examples-remain-in-generic-rules-894/plan.2026-10-11T09-43.md |
+| P11 | 898 | prepared | C2 | bug/orchestrator-state-rule-sentence-dropped-850-898 | docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898/plan.2026-10-11T09-43.md |
+| P12 | 895 | prepared | C2 | bug/codex-web-setup-review-follow-ups-895 | docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895/plan.2026-10-11T09-42.md |
+| P13 | 884 | prepared | C2 | bug/compute-concurrency-batches-coverage-884 | docs/features/active/2026-10-11-compute-concurrency-batches-coverage-884/plan.2026-10-11T07-58.md |
+| P14+P15 | 887 | prepared | C3 | bug/host-tools-manifest-and-bootstrap-behavior-887 | docs/features/active/2026-10-11-host-tools-manifest-and-bootstrap-behavior-887/plan.2026-10-11T08-29.md |
+| P16 | 889 | prepared | C3 | bug/argumentless-sort-ordering-and-comparator-coverage-gaps-889 | docs/features/active/2026-10-11-argumentless-sort-ordering-and-comparator-coverage-gaps-889/plan.2026-10-11T08-31.md |
+| P17 | 543 | prepared | C2 | bug/epic-planner-field-list-remainder-543 | docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/plan.2026-10-11T07-59.md |
+| P18 | 892 | prepared | C2 | bug/push-down-ac22-test-command-omits-memory-tests-892 | docs/features/active/2026-10-11-push-down-ac22-test-command-omits-memory-tests-892/plan.2026-10-11T08-29.md |
+
+## Scheduling (generation 0)
+
+Get-BlastRadiusConflictEdge derived 25 conflict edges over the declared radii and returned 14 tolerated overlaps under the configured conflict_tolerance. The operator conflict policy for this run was then applied per edge, and every derived edge was classified as tolerated; no radius was narrowed. With no retained edge, compute-cohorts returns one cohort of all 16 items, and execution concurrency is bounded by max_concurrency 4. For each tolerated pair, the later-merging item merges origin/main and re-passes CI before it merges.
+
+| pair | engine cost | engine hard | classification | rationale |
+| --- | --- | --- | --- | --- |
+| 543:894 | 8 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): tests/scripts/dev_tools/test_claude_rules_frontmatter.py (read or run by both). |
+| 543:898 | 8 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): tests/scripts/dev_tools/test_claude_rules_frontmatter.py (read or run by both). |
+| 543:902 | 10 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1 (read or run by both). |
+| 884:895 | 10 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): .github/workflows/_shell-coverage.yml (read or run by both). |
+| 885:890 | 17 | False | separable_writes | Both write .claude/skills/parallel-add/SKILL.md and its bundled mirror, in separate passages: #885 inserts an issue-adoption block after step 2 (after line 64); #890 rewrites the engine-call text of steps 3-6. Separable writes (a few minutes of merge work), not edits to the same rule. Tolerated; the later-merging item merges origin/main and re-passes CI. |
+| 885:898 | 8 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): tests/scripts/dev_tools/test_parallel_issue_adoption_skill_contracts.py (written by 885). |
+| 886:898 | 16 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md (written by 898); tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py (read or run by both). |
+| 886:903 | 8 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): tests/scripts/dev_tools/test_validate_epic_orchestrator_state_merge_status.py (written by 903). |
+| 887:901 | 18 | True | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): .github/workflows/ci.yml (read or run by both); scripts/powershell/PoshQC/settings/pester.runsettings.psd1 (read or run by both). The engine marked the pair hard because a shared path is a configured shared surface, but neither item writes it. |
+| 887:902 | 8 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): .github/workflows/_poshqc.yml (read or run by both). |
+| 887:903 | 16 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): .github/workflows/_poshqc.yml (read or run by both); .github/workflows/ci.yml (read or run by both). |
+| 890:899 | 24 | False | separable_writes | Both write .claude/skills/parallel-orchestrate/SKILL.md and its bundled mirror, in separate passages: #899 edits the child-DONE CI acceptance at lines 373-380; #890 edits the engine-call text at lines 665-666, 821 and 829. Separable writes (a few minutes), not the same rule. Tolerated; the later-merging item merges origin/main and re-passes CI. |
+| 894:895 | 8 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py (written by 894). |
+| 894:898 | 8 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): tests/scripts/dev_tools/test_claude_rules_frontmatter.py (read or run by both). |
+| 894:900 | 16 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py (read or run by both); tests/scripts/dev_tools/test_typescript_toolchain_instruction_contracts.py (read or run by both). |
+| 894:902 | 8 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py (read or run by both). |
+| 894:903 | 8 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): tests/scripts/claude-lib/blast-radius/BlastRadiusTokenShape.Tests.ps1 (written by 903). |
+| 899:900 | 32 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): .claude/agents/orchestrator.md (written by 899); .claude/skills/epic-orchestrate/SKILL.md (read or run by both); .claude/skills/orchestrate/SKILL.md (written by 899); .claude/skills/remediation-handoff-atomic-planner/SKILL.md (written by 899). |
+| 899:901 | 16 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): .claude/agents/orchestrator.md (written by 899); .claude/skills/orchestrate/SKILL.md (written by 899). |
+| 899:902 | 18 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): .claude/agents/epic-orchestrator.md (read or run by both); .claude/skills/epic-orchestrate/SKILL.md (written by 902). |
+| 900:901 | 16 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): .claude/agents/orchestrator.md (read or run by both); .claude/skills/orchestrate/SKILL.md (read or run by both). |
+| 900:902 | 8 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): .claude/skills/epic-orchestrate/SKILL.md (written by 902). |
+| 900:903 | 16 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): .claude/agents/atomic-executor.md (written by 900); .claude/agents/atomic-planner.md (written by 900). |
+| 901:903 | 16 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): .claude/hooks/enforce-powershell-batch-budget.ps1 (read or run by both); .github/workflows/ci.yml (read or run by both). |
+| 902:903 | 26 | False | read_only_one_side | Every shared declared path is read or run only on at least one side (cost 0 under the operator conflict policy): .github/workflows/_poshqc.yml (read or run by both); tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1 (written by 903); tests/scripts/dev_tools/parallel_orchestrator_surface_test_support.py (read or run by both). |
+
+Item #903 covers operator groups P7 and P8 because both derive from #903 and `issue_num` must be unique across items (manifest invariant M6).
