@@ -110,7 +110,7 @@
   | `validate-required-artifact-output.ps1` | `<AgentName> hook:` (the bound `-AgentName` value) |
 
   The anomaly block is a non-repairable condition (rows O-1, X-1, P-1, R-2 in the re-entry table), so the anomaly message is followed by the report-and-halt line defined below.
-- Valid envelope with empty or whitespace `AssistantText`: each validator returns its existing empty-output block, reworded so it names `last_assistant_message` rather than `CLAUDE_HOOK_INPUT` or "agent output". This is a repairable condition.
+- Valid envelope with empty or whitespace `AssistantText`: each validator returns its existing empty-output block, reworded so it names `last_assistant_message` instead of `CLAUDE_HOOK_INPUT`; the existing token `agent output is empty` is retained because existing rows assert it. This is a repairable condition.
 
 ### Re-entry policy (`StopHookActive`)
 
