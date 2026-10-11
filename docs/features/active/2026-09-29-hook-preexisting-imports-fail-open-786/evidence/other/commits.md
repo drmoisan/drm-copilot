@@ -195,3 +195,13 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## r2-p2
+
+- Subject: test(786): use drive-free fixture roots and isolate the module family for Linux CI
+- Commit SHA: b054e8a59d90aeeca486893468e2b80205d17abb
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
+- git diff --name-only f72a63752fc43c8d78fe3d952bd68c68a2b62547 HEAD -- .claude/hooks .claude/lib .codex/hooks .codex/scripts extensions scripts config: (no output)
+- git status --porcelain -- .claude/hooks .claude/lib .codex/hooks .codex/scripts extensions scripts config: (no output)

@@ -138,3 +138,13 @@ OPERATOR-DECISION-RESOLVED: AC-24 coverage measurement route | evidence/other/r1
 Timestamp: 2026-10-10T18-47
 
 - [P6-T6] commits commits.md alone after its r1-p6 record and requires an empty porcelain after that push (verified: empty after cf6645a5f284fc5163d2ce7f7ac919f80611ed08). Marking the [P6-T6] box on disk afterwards modifies the plan, so the check-off and this note are committed in one further commit (operator rule: commit and push at any pause). No production or test file is part of it.
+
+## Remediation cycle 2: execution notes
+
+Timestamp: 2026-10-10T21-47
+
+- [P0-T5]: the R-CIARTIFACT download was run as `gh run download 38093728445 --repo drmoisan/drm-copilot --name poshqc-linux-hook-test-results --dir <SCRATCHPAD>/r2-ci-linux`; the `--repo` flag was added so the run identifier resolves against the PR repository. The download branch was taken (exit 0); the fallback was not used.
+- [P0-T9] to [P0-T12] and the [P1-T1] scripts were prepared while the [P0-T8] R-PESTER run was in progress; each was checked off only after [P0-T8] passed, so the plan file records the tasks in order. No repository file changed between those runs.
+- [P3-T6] to [P3-T9] of pass 1 were executed while the [P3-T3] R-PESTER run and the [P3-T4] current-tree probe were in progress, and before [P3-T5]; they were checked off after [P3-T5], so the plan file records the tasks in order. No repository file outside the feature folder changed during pass 1 (the [P3-T5] porcelain and 149 SHA pairs were equal before and after the MCP calls), so every pass 1 row observes the same tree.
+- Initial evidence timestamps of [P0-T2] to [P0-T7] were estimates that ran ahead of the clock; they were corrected to the observed file modification times before the [P0-T14] commit.
+- [P1-T4]: the `## [P1-T4] Row 6 census` section contains the `INSTANCE-MISMATCH:` line twice (once in the extracted census lines and once in the required full output); the census run printed it once.
