@@ -3,9 +3,9 @@
 - **Issue:** #897
 - **Parent (optional):** epic `subagentstop-envelope` (epic issue #904), child E1, wave 0, band C4
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-11T12-30
+- **Last Updated:** 2026-10-11T13-15
 - **Status:** Ready for planning
-- **Version:** 1.0
+- **Version:** 1.1
 
 ## Authoritative Helper Contract
 
@@ -52,8 +52,9 @@ Input-to-result table:
 | JSON object whose `last_assistant_message` is a number, boolean, object or array | `$false` | `NonStringAssistantMessage` |
 | JSON object whose `last_assistant_message` is `""` | `$true` | `$null` |
 | JSON object whose `last_assistant_message` is a non-empty string | `$true` | `$null` |
+| JSON object whose `last_assistant_message` is `"2026-10-11T12:00:00Z"` (string in ISO-8601 date form) | `$true` | `$null`; `AssistantText` equals the exact string `2026-10-11T12:00:00Z` |
 
-Parsing uses `ConvertFrom-Json -NoEnumerate` so that a single-element JSON array is classified as `NonObjectEnvelope` rather than unwrapped. Any exception raised by `ConvertFrom-Json` (including duplicate keys that differ only in case) maps to `UnparseableJson`. JSON whitespace including CRLF line endings is accepted by the parser; no separate CRLF normalization step is part of the contract.
+Parsing uses `ConvertFrom-Json -NoEnumerate -DateKind String` (PowerShell 7.5 or later; hooks run under `pwsh`) so that a single-element JSON array is classified as `NonObjectEnvelope` rather than unwrapped, and so that a string in ISO-8601 date form remains a `[string]`. The `-DateKind String` addition is a parsing refinement made after preflight (finding D5); it is not a rename and does not change any function name, parameter, or the seven-field return shape. Any exception raised by `ConvertFrom-Json` (including duplicate keys that differ only in case) maps to `UnparseableJson`. JSON whitespace including CRLF line endings is accepted by the parser; no separate CRLF normalization step is part of the contract.
 
 ### `Get-SubagentStopEnvelopeAnomalyReason -Anomaly <string>`
 
@@ -193,7 +194,7 @@ Rejected alternative: convert the inline command to a file-based hook that uses 
 
 #### Data flow and validation changes:
 
-- stdin (or bound `-InputText`) -> BOM strip -> emptiness check -> `ConvertFrom-Json -NoEnumerate` -> root-type check -> `last_assistant_message` presence, null and type checks -> result object. Derived fields (`StopHookActive`, `AgentType`, `HookEventName`) are read from any object root regardless of `IsValid`.
+- stdin (or bound `-InputText`) -> BOM strip -> emptiness check -> `ConvertFrom-Json -NoEnumerate -DateKind String` -> root-type check -> `last_assistant_message` presence, null and type checks -> result object. Derived fields (`StopHookActive`, `AgentType`, `HookEventName`) are read from any object root regardless of `IsValid`.
 
 #### Error handling and logging updates:
 
@@ -244,6 +245,7 @@ Rejected alternative: convert the inline command to a file-based hook that uses 
   - Surface: the three functions are defined after dot-sourcing.
   - Source constraints (AST scan of the helper): no `$env:` variable reference, no `[Environment]::GetEnvironmentVariable` call, no `Get-ChildItem env:`/`Get-Item env:`; no `Import-Module`, `using module`, or dot-source; no `Write-Output`, `Write-Host`, `Write-Warning` or `Write-Information`.
   - One `It` per row of the input-to-result table, using `-InputText`, asserting `IsValid`, `Anomaly`, `Envelope` null or non-null, and `AssistantText`.
+  - A `last_assistant_message` of `2026-10-11T12:00:00Z` yields `IsValid` `$true` and `AssistantText` equal to that exact string (AC-5).
   - Result shape: exactly the seven property names, exactly one object emitted, no exception, for every row.
   - Derived fields: `stop_hook_active` true, false, absent, and string `"true"`; `agent_type` and `hook_event_name` present, absent, and non-string.
   - BOM-prefixed valid envelope; BOM-only input (`EmptyPayload`); CRLF-formatted valid envelope.
@@ -264,7 +266,7 @@ Rejected alternative: convert the inline command to a file-based hook that uses 
 - [ ] AC-2: The bundled mirror `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/subagentstop-envelope.ps1` is byte-identical to the source. Verified by `test_bundled_claude_payload_contains_all_repo_runtime_contracts` in `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passing.
 - [ ] AC-3: `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` lists `.claude/hooks/subagentstop-envelope.ps1`. Verified by `extensions/drm-copilot/test/lib/push-down/claude-pack-manifest-completeness.test.ts` and `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py` both passing.
 - [ ] AC-4: The helper source contains no environment-variable read, no module import or dot-source, and no success-stream, host, information or warning write. Verified by the source-constraints AST `It` blocks in `subagentstop-envelope.Tests.ps1`.
-- [ ] AC-5: For a valid envelope with a non-empty string `last_assistant_message`, `Read-SubagentStopEnvelope -InputText` returns `IsValid` `$true`, `Anomaly` `$null`, a non-null `Envelope`, `AssistantText` equal to the message, and `StopHookActive`, `AgentType` and `HookEventName` taken from the root. Verified by the valid-envelope `It` in `subagentstop-envelope.Tests.ps1`.
+- [ ] AC-5: For a valid envelope with a non-empty string `last_assistant_message`, `Read-SubagentStopEnvelope -InputText` returns `IsValid` `$true`, `Anomaly` `$null`, a non-null `Envelope`, `AssistantText` equal to the message, and `StopHookActive`, `AgentType` and `HookEventName` taken from the root; a message in ISO-8601 date form (`2026-10-11T12:00:00Z`) likewise yields `IsValid` `$true` and `AssistantText` equal to that exact string. Verified by the valid-envelope and ISO-date-string `It` blocks in `subagentstop-envelope.Tests.ps1`.
 - [ ] AC-6: A `last_assistant_message` of `""` yields `IsValid` `$true`, `Anomaly` `$null`, `AssistantText` `''`. Verified by the empty-string-message `It` in `subagentstop-envelope.Tests.ps1`.
 - [ ] AC-7: `$null`, `''`, whitespace-only and BOM-only `-InputText` each yield `IsValid` `$false`, `Anomaly` `EmptyPayload`, `Envelope` `$null`. Verified by the `EmptyPayload` `It` blocks in `subagentstop-envelope.Tests.ps1`.
 - [ ] AC-8: Non-JSON input and JSON with case-duplicate keys yield `IsValid` `$false`, `Anomaly` `UnparseableJson`, `Envelope` `$null`. Verified by the `UnparseableJson` `It` blocks in `subagentstop-envelope.Tests.ps1`.
