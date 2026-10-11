@@ -1,13 +1,13 @@
 # Preflight Clearance — E3 subagentstop-envelope-artifact-gates (#897)
 
 Timestamp: 2026-10-11T16-30
-Command: atomic-executor preflight (DIRECTIVE: PREFLIGHT VALIDATION ONLY), followed by `poetry run python scripts/dev_tools/validate_orchestration_artifacts.py plan docs/features/active/subagentstop-envelope-artifact-gates-897/plan.2026-10-11T07-59.md`
+Command: atomic-executor preflight (DIRECTIVE: PREFLIGHT VALIDATION ONLY), followed by `poetry run python scripts/dev_tools/validate_orchestration_artifacts.py plan docs/features/active/subagentstop-envelope-artifact-gates-905/plan.2026-10-11T07-59.md`
 EXIT_CODE: 0
 Output Summary: Round 8 returned PREFLIGHT: ALL CLEAR with CONVERGENCE: NO FURTHER ROUNDS EXPECTED; plan validator printed `plan validation passed`.
 
 PREFLIGHT: ALL CLEAR
 
-- Plan path: `docs/features/active/subagentstop-envelope-artifact-gates-897/plan.2026-10-11T07-59.md`
+- Plan path: `docs/features/active/subagentstop-envelope-artifact-gates-905/plan.2026-10-11T07-59.md`
 - Plan commit at clearance: `3e0f070c5`
 - Preflight round count: 8
 

@@ -1,7 +1,7 @@
 # Research: SubagentStop envelope for the artifact-gate validators (E3, issue #897)
 
 - Timestamp: 2026-10-11T12-05
-- Branch: `bug/subagentstop-envelope-artifact-gates-897` (based on `origin/epic/subagentstop-envelope-integration`)
+- Branch: `bug/subagentstop-envelope-artifact-gates-905` (based on `origin/epic/subagentstop-envelope-integration`)
 - Mode: preparation only; no production code changed.
 - Method: every claim below was read from the worktree with Read/Grep/Glob. No shell was available to this agent, so `git ls-remote`, `git fetch`, `git show` and `git log --grep` were not executed; substitutes are stated where used.
 

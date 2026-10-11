@@ -8,8 +8,8 @@
 - **Version:** 0.2
 - **Work Mode:** full-bug (this file is the sole acceptance-criteria source; `user-story.md` is intentionally absent)
 - **Complexity:** C3
-- **Branch:** `bug/subagentstop-envelope-artifact-gates-897` (based on `origin/epic/subagentstop-envelope-integration`)
-- **Authoritative research:** `docs/features/active/subagentstop-envelope-artifact-gates-897/research/2026-10-11T12-05-subagentstop-envelope-artifact-gates-research.md` (cited below as "research §N")
+- **Branch:** `bug/subagentstop-envelope-artifact-gates-905` (based on `origin/epic/subagentstop-envelope-integration`)
+- **Authoritative research:** `docs/features/active/subagentstop-envelope-artifact-gates-905/research/2026-10-11T12-05-subagentstop-envelope-artifact-gates-research.md` (cited below as "research §N")
 
 ## Context
 - Summary of the bug and its impact: the SubagentStop validators `validate-discovery-artifact-gate.ps1`, `validate-pr-author-output.ps1`, `validate-prd-feature-output.ps1` and `validate-task-researcher-output.ps1` under `.claude/hooks/` read `$env:CLAUDE_HOOK_INPUT`, take an `output` property off the parsed root, and block with exit code 1 (`issue.md:44-51`; line citations re-derived and confirmed in research §2). The documented SubagentStop envelope arrives as JSON on stdin and carries `last_assistant_message`, not `output`; `CLAUDE_HOOK_INPUT` is not set; and for SubagentStop only exit code 2 blocks. The validators therefore fail open: they receive no input and their block exit code is ignored by the runtime.
@@ -181,7 +181,7 @@ Research §6.1 candidate A. Each of the four hooks dot-sources the E1 helper `.c
 - Unit tests (Pester, not pytest; these are PowerShell hooks) for the fixed behavior and boundaries: as above. At most one subprocess case per hook (`$json | & $PwshExe -NoProfile -File $hook`) as the end-to-end exit-code check; all other entry-point cases run in process for coverage.
 - Edge cases and negative scenarios: blank `last_assistant_message`; absent `last_assistant_message`; envelope carrying only `output`; `CLAUDE_HOOK_INPUT` set with stdin lacking the artifact (must still block); `stop_hook_active: true` re-entry per E1 contract; `Get-Content` read exceptions in prd-feature and task-researcher map to a block result.
 - Error handling and logging verification: each block test asserts exit 2 and a non-empty stderr reason containing the hook's existing token or prefix; no test sets or relies on `CLAUDE_HOOK_INPUT` except to prove it is ignored.
-- Coverage impact and targets: >= 85% line coverage per changed hook file, measured from the self-hosted PoshQC module (`Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCTest ...`), parsing `artifacts/pester/powershell-coverage.xml` per file; the MCP runner is called for route compliance but returns no figures (research §4.3, §9 item 9). Evidence is written under `docs/features/active/subagentstop-envelope-artifact-gates-897/evidence/<kind>/`.
+- Coverage impact and targets: >= 85% line coverage per changed hook file, measured from the self-hosted PoshQC module (`Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCTest ...`), parsing `artifacts/pester/powershell-coverage.xml` per file; the MCP runner is called for route compliance but returns no figures (research §4.3, §9 item 9). Evidence is written under `docs/features/active/subagentstop-envelope-artifact-gates-905/evidence/<kind>/`.
 - Toolchain commands to run (format -> lint -> type-check -> test): PowerShell toolchain via the PoshQC route: `Invoke-Formatter` (format), PSScriptAnalyzer (lint), type check skipped for PowerShell, Pester (tests with coverage). Also run the registration-driven suites (`hook-dependency-failure.Claude.Tests.ps1`, `hook-dependency-failure.SpecialCases.Tests.ps1`, `hook-dependency-guard-completeness.Tests.ps1`, `enforcement-hooks-no-python-invocation.Tests.ps1`, `claude-settings.Tests.ps1`, `enforce-pr-author-command-allowlist.Tests.ps1`) and the content and parity pytest checks (`test_claude_planning_integrity_contracts.py`, `test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`).
 - Manual validation steps: after E1 merges, one live smoke run per agent type (pr-author, prd-feature, task-researcher, one discovery agent) is recommended to confirm stdin delivery to frontmatter hooks and the working-directory assumption (research §9 items 5-6). This is recorded as follow-up evidence and is not a merge gate for E3.
 
@@ -247,6 +247,6 @@ Research §6.1 candidate A. Each of the four hooks dot-sources the E1 helper `.c
 - Links:
   - Issue: https://github.com/drmoisan/drm-copilot/issues/897
   - Epic: `docs/features/epics/subagentstop-envelope/epic.md` (epic issue #904)
-  - Research: `docs/features/active/subagentstop-envelope-artifact-gates-897/research/2026-10-11T12-05-subagentstop-envelope-artifact-gates-research.md`
+  - Research: `docs/features/active/subagentstop-envelope-artifact-gates-905/research/2026-10-11T12-05-subagentstop-envelope-artifact-gates-research.md`
   - Upstream: E1 `docs/features/active/subagentstop-envelope-core-897/spec.md` (branch `bug/subagentstop-envelope-core-897`)
   - Precedents: #501 (`docs/features/completed/2026-08-21-pretooluse-hooks-parse-flat-payload-and-always-allow-501/spec.md`), #786 / PR #881 (`docs/features/active/2026-09-29-hook-preexisting-imports-fail-open-786/spec.md`)
