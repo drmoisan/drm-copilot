@@ -11,8 +11,11 @@ from __future__ import annotations
 import pytest
 
 from scripts.dev_tools._blast_radius_token_shapes import (
+    FILE_EXTENSION_PATTERN_TEXT,
+    KNOWN_FILE_NAMES,
     PLACEHOLDER_MARKERS,
     contains_placeholder_marker,
+    is_file_shaped_component,
     spans_multiple_feature_folders,
 )
 from scripts.dev_tools.plan_gate_coverage import (
@@ -144,3 +147,67 @@ def test_spans_multiple_feature_folders_ignores_a_token_rooted_elsewhere() -> No
     """The span rule is scoped to the documentation corpus and nothing else."""
     # Arrange / Act / Assert
     assert spans_multiple_feature_folders("scripts/dev_tools/**") is False
+
+
+# Predicate cases for the file-shape rule (issue #797). The non-ASCII case is
+# built with ``chr`` so this file contains no byte above 127.
+FILE_SHAPE_CASES = [
+    pytest.param("parallel_lane_assertion.bats", True, id="letter-led-extension"),
+    pytest.param("Main.TS", True, id="uppercase-extension"),
+    pytest.param("jest.config.cjs", True, id="multi-dot-name"),
+    pytest.param("Thing.psd1", True, id="alphanumeric-extension"),
+    pytest.param("Dockerfile", True, id="known-name"),
+    pytest.param(".shellcheckrc", True, id="known-dotfile"),
+    pytest.param("", False, id="empty-string"),
+    pytest.param(".", False, id="lone-dot"),
+    pytest.param("beta.", False, id="trailing-dot"),
+    pytest.param(".claude", False, id="dot-leading-unknown"),
+    pytest.param("v1.2.0", False, id="digit-led-extension"),
+    pytest.param("archive.tar-gz", False, id="hyphenated-extension"),
+    pytest.param("notes." + chr(0xE9), False, id="non-ascii-extension"),
+    pytest.param("dockerfile", False, id="known-name-case-variant"),
+    pytest.param("thing", False, id="extensionless-unknown"),
+]
+
+
+@pytest.mark.parametrize(("component", "expected"), FILE_SHAPE_CASES)
+def test_is_file_shaped_component_classifies_a_component(
+    component: str, expected: bool
+) -> None:
+    """Report whether a final path component names a file (issue #797).
+
+    A letter-led extension or a known file name names a file; a missing or
+    empty stem, a digit-led or punctuated tail, a non-ASCII extension, and a
+    case variant of a known name do not. The predicate is total, so the
+    degenerate inputs return a verdict without raising.
+    """
+    # Arrange / Act
+    observed = is_file_shaped_component(component)
+
+    # Assert
+    assert (
+        observed is expected
+    ), f"Expected {component!r} to report {expected}; observed {observed}."
+
+
+def test_known_file_names_are_the_adopted_set() -> None:
+    """Pin the closed known-name set to the membership the spec adopted."""
+    # Arrange
+    adopted = frozenset(
+        (
+            "Dockerfile Makefile LICENSE CODEOWNERS NOTICE .gitignore "
+            ".gitattributes .gitkeep .gitmodules .vscodeignore .npmignore .npmrc "
+            ".nvmrc .editorconfig .prettierrc .prettierignore .eslintignore "
+            ".shellcheckrc"
+        ).split()
+    )
+
+    # Act / Assert
+    assert KNOWN_FILE_NAMES == adopted
+    assert len(KNOWN_FILE_NAMES) == 18
+
+
+def test_file_extension_pattern_text_uses_explicit_ascii_classes() -> None:
+    """Pin the extension pattern to explicit ASCII classes for runtime parity."""
+    # Arrange / Act / Assert
+    assert FILE_EXTENSION_PATTERN_TEXT == "[a-z][a-z0-9]*"

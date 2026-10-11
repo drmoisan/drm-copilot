@@ -219,7 +219,7 @@ def test_readiness_requires_epic_preparation_topology_receipts() -> None:
     state["features"][1]["topology_receipt"]["execution_context"] = "standalone"
 
     errors = validate_epic_planner_state_text(
-        json.dumps(state), require_ready_for_execution=True
+        json.dumps(state), require_ready_for_execution=True, require_codex_topology=True
     )
 
     assert any(
@@ -249,6 +249,70 @@ def test_readiness_requires_forced_epic_planner_persona() -> None:
     )
 
     assert any("root_persona must be 'epic-planner'" in error for error in errors)
+
+
+def test_ready_gate_skips_planner_topology_receipt_when_key_absent() -> None:
+    """Skip the planner receipt check for a Claude checkpoint without the key."""
+
+    state = _ready_state()
+    state.pop("topology_receipt")
+
+    errors = validate_epic_planner_state_text(
+        json.dumps(state), require_ready_for_execution=True
+    )
+
+    offending = [error for error in errors if "Epic planner topology_receipt" in error]
+    assert offending == []
+
+
+@pytest.mark.parametrize(
+    "flag", ["require_codex_model_routing", "require_codex_topology"]
+)
+def test_codex_flag_keeps_planner_topology_receipt_unconditional(flag: str) -> None:
+    """Require the planner receipt under either Codex flag when the key is absent."""
+
+    state = _ready_state()
+    state.pop("topology_receipt")
+
+    errors = validate_epic_planner_state_text(
+        json.dumps(state),
+        require_ready_for_execution=True,
+        require_codex_model_routing=flag == "require_codex_model_routing",
+        require_codex_topology=flag == "require_codex_topology",
+    )
+
+    assert "Epic planner topology_receipt must be an object." in errors
+
+
+def test_ready_gate_validates_present_null_planner_topology_receipt() -> None:
+    """Validate a present null planner receipt, since key presence arms the check."""
+
+    state = _ready_state()
+    state["topology_receipt"] = None
+
+    errors = validate_epic_planner_state_text(
+        json.dumps(state), require_ready_for_execution=True
+    )
+
+    assert "Epic planner topology_receipt must be an object." in errors
+
+
+@pytest.mark.parametrize("require_codex_topology", [False, True])
+def test_ready_gate_accepts_present_valid_planner_topology_receipt(
+    require_codex_topology: bool,
+) -> None:
+    """Accept the forced planner receipt with or without the Codex topology flag."""
+
+    state = _ready_state()
+
+    errors = validate_epic_planner_state_text(
+        json.dumps(state),
+        require_ready_for_execution=True,
+        require_codex_topology=require_codex_topology,
+    )
+
+    offending = [error for error in errors if "Epic planner topology_receipt" in error]
+    assert offending == []
 
 
 def test_readiness_requires_canonical_kickoff_path() -> None:

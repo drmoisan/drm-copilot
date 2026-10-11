@@ -18,6 +18,7 @@
  */
 
 import { type FileSystem, toPosixPath } from "../file-system";
+import { compareCodePoint } from "../string-ordering";
 import { SourceEcosystem } from "./models";
 
 /**
@@ -165,9 +166,7 @@ export function normalizeSelectedPaths(
   for (const candidatePath of selectedPaths) {
     normalized.add(normalizeRelativePath(sourceRoot, candidatePath));
   }
-  return [...normalized].sort((left, right) =>
-    left < right ? -1 : left > right ? 1 : 0,
-  );
+  return [...normalized].sort(compareCodePoint);
 }
 
 /**
@@ -235,9 +234,7 @@ function iterSupportedArtifacts(
     }
   }
 
-  return [...discovered].sort((left, right) =>
-    left < right ? -1 : left > right ? 1 : 0,
-  );
+  return [...discovered].sort(compareCodePoint);
 }
 
 /**
@@ -290,9 +287,7 @@ export function discoverSourceArtifacts(
     }
   }
 
-  return matched.sort((left, right) =>
-    left < right ? -1 : left > right ? 1 : 0,
-  );
+  return matched.sort(compareCodePoint);
 }
 
 /**

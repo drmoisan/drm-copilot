@@ -63,6 +63,17 @@ Always apply:
   - if the marker is missing or malformed, use `full-feature`
   - if `minor-audit` is selected and `issue.md` lacks `## Acceptance Criteria`, require remediation
 
+## Policy Rules
+
+### modified-workflow-needs-green-run
+
+If the branch diff modifies any path matching `.github/workflows/**`, `scripts/benchmarks/**`, or `.github/actions/**`, the policy audit emits a Blocking finding unless evidence of a green workflow run against the branch head is present in the remediation inputs.
+
+- The rule provides a second, independent line of defense for CI-gate-modifying features, separate from and prior to the orchestrator CI Green Gate (S9).
+- "Green workflow run against the branch head" means a run of the affected workflow whose conclusion is success and which satisfies either (a) or (b): (a) its head SHA equals the current branch head; or (b) all three predecessor-head conditions hold: (1) the run's head SHA is an ancestor of, or equal to, the current branch head and contains the latest commit that changes any path outside the active feature folder (`git merge-base --is-ancestor <commit> <run-sha>`); (2) every commit after the run's head SHA changes only paths inside the active feature folder (`git log <run-sha>..HEAD -- . ":!<feature-folder>"` returns no commits); (3) the policy audit states that the orchestrator CI Green Gate (S9) remains responsible for `ci_gate.conclusion == "success"` with `ci_gate.head_sha` equal to the final PR head before DONE. Condition (b) exists because an in-repo evidence artifact cannot name the SHA of the commit that contains it.
+- A green `workflow_dispatch` run against the branch head also satisfies the rule, not only a PR-context run. This mitigates the chicken-and-egg case where a feature must land its CI gate before the gate can run in PR context (see spec.md Risks & Mitigations).
+- When the rule fires and no qualifying green-run evidence is present, record a Blocking finding classified `awaiting_ci` (the remediation inputs carry `Remediability: awaiting_ci` and a `Remediability-Evidence:` line naming the awaited workflow) and route it to the wait path (`AWAITING_CI` when no other class is present) instead of the remediation handoff.
+
 ## Ordered Procedure
 
 1. **Resolve the base branch**

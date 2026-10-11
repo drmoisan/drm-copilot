@@ -20,7 +20,7 @@ Every unit test must satisfy all five of these properties:
 
 ## Coverage Requirements
 
-- Threshold precedence: when the repository's root `CLAUDE.md` states line or branch coverage thresholds, those thresholds govern. The 85% line and 75% branch figures are defaults that apply only when the root `CLAUDE.md` states none. This precedence applies to every restatement of these figures in other rule files, agents, and skills.
+- Threshold precedence: when the repository's root `CLAUDE.md` states line or branch coverage thresholds, those thresholds govern. The 85% line and 75% branch figures are defaults that apply only when the root `CLAUDE.md` states none. This precedence applies to every restatement of these figures in other rule files, agents, and skills. Each metric falls back independently: when the root `CLAUDE.md` states only a line threshold or only a branch threshold, the stated threshold governs that metric and the default governs the other.
 - **Line coverage must remain >= 85% across all tiers (T1–T4).**
 - **Branch coverage must remain >= 75% across all tiers (T1–T4) for languages whose coverage tooling measures branch coverage.** PowerShell (Pester) and bash (kcov) are the exceptions: neither tool measures branch coverage in any output format, so only the line threshold applies to them and there is no branch-coverage gate. This is a threshold exemption only; PowerShell and bash production files remain in the coverage denominator under the Coverage Exclusion Policy below.
 - Code changes or refactors must not reduce coverage for the lines that were changed.

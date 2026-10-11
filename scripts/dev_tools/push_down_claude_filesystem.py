@@ -60,6 +60,12 @@ if TYPE_CHECKING:
 AGENT_MEMORY_RELATIVE_ROOT = Path(".claude/agent-memory")
 GENERAL_MEMORY_SCOPE = "general"
 REPO_MEMORY_SCOPE = "repo"
+# Source-relative directories holding machine-local runtime state; nothing below
+# them is published (issue #790). Mirrors claude-filesystem-adapter.ts.
+LOCAL_RUNTIME_RELATIVE_DIRECTORIES: tuple[str, ...] = (
+    ".claude/state",
+    ".claude/worktrees",
+)
 
 # Match a leading YAML frontmatter block: the first `---` line, the block body,
 # and the closing `---` line. DOTALL lets the body span multiple lines.
@@ -289,6 +295,17 @@ class ExcludingFileSystem:
         except ValueError:
             return None
 
+    def _is_local_runtime_path(self, path: Path) -> bool:
+        """Return whether a path is a local runtime directory or lies below one."""
+
+        relative = self._source_relative_posix(path)
+        if relative is None:
+            return False
+        return any(
+            relative == directory or relative.startswith(directory + "/")
+            for directory in LOCAL_RUNTIME_RELATIVE_DIRECTORIES
+        )
+
     def _is_pack_included(self, path: Path) -> bool:
         """Return whether a candidate path is in the active published set.
 
@@ -431,17 +448,17 @@ class ExcludingFileSystem:
     def list_files(self, root: Path) -> list[Path]:
         """Return inner list_files output with all active filters applied.
 
-        Drops paths in ``EXCLUDED_RELATIVE_PATHS``, any agent-memory file that
-        is not general-scoped, any file outside the active published-pack set,
-        and any agent-memory file excluded by the selected memory mode.
+        Drops local runtime directories first, then paths in
+        ``EXCLUDED_RELATIVE_PATHS``, non-general agent memories, files outside
+        the published-pack set, and memories excluded by the memory mode.
         """
 
-        # Apply the four enumeration filters in sequence: hard exclusions, pack
-        # selection, agent-memory scope, then memory mode.
+        # Runtime directories are dropped before any filter that reads content.
         return [
             p
             for p in self._inner.list_files(root)
-            if p.resolve() not in self._excluded
+            if not self._is_local_runtime_path(p)
+            and p.resolve() not in self._excluded
             and self._is_pack_included(p)
             and self._is_scope_included(p)
             and self._is_memory_mode_included(p)

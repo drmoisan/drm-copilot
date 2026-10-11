@@ -1,0 +1,10 @@
+{
+  "case": "decide-in-flight-detach",
+  "subcommand": "decide",
+  "argv": ["decide", "--item", "7", "--state", "in_flight", "--removal-disposition", "detach"],
+  "expected": {
+    "exit_code": 0,
+    "stdout": "{\"item_key\":7,\"prior_state\":\"in_flight\",\"new_state\":\"withdrawn\",\"disposition\":\"detach\",\"triggers_recompute\":false}",
+    "stderr": null
+  }
+}

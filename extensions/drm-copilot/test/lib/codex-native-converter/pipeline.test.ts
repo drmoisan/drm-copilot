@@ -246,3 +246,50 @@ describe("buildTopologyEdges", () => {
     ).toBe(true);
   });
 });
+
+describe("coverage: pipeline.ts", () => {
+  it("orders referenced destinations found at the same position by path text", () => {
+    // Arrange: "docs/out.md" is a prefix of "docs/out.md.txt", so both known
+    // destinations are first found at the same position in the rendered body.
+    const fs = new InMemoryFileSystem();
+    fs.addFile(
+      `${SOURCE_ROOT}/.github/copilot-instructions.md`,
+      "Read docs/out.md.txt before starting.",
+    );
+    fs.addFile(`${SOURCE_ROOT}/.github/skills/one/SKILL.md`, "skill one");
+    fs.addFile(`${SOURCE_ROOT}/.github/skills/two/SKILL.md`, "skill two");
+
+    // Act
+    const edges = buildTopologyEdges(
+      fs,
+      runOptions(),
+      [
+        record({ sourcePath: ".github/copilot-instructions.md" }),
+        record({
+          sourcePath: ".github/skills/two/SKILL.md",
+          sourceKind: SourceKind.REUSABLE_SKILL,
+          targetRole: TargetRole.SHARED_SKILL,
+          targetPath: "docs/out.md.txt",
+        }),
+        record({
+          sourcePath: ".github/skills/one/SKILL.md",
+          sourceKind: SourceKind.REUSABLE_SKILL,
+          targetRole: TargetRole.SHARED_SKILL,
+          targetPath: "docs/out.md",
+        }),
+      ],
+      [],
+    );
+
+    // Assert: the standing-guidance source fans out to its primary target and
+    // both equal-position references, ordered by path text.
+    const standingDestinations = edges
+      .filter((edge) => edge.sourcePath === ".github/copilot-instructions.md")
+      .map((edge) => edge.destinationPath);
+    expect(standingDestinations).toEqual([
+      "AGENTS.md",
+      "docs/out.md",
+      "docs/out.md.txt",
+    ]);
+  });
+});

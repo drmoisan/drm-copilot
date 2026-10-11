@@ -3,16 +3,16 @@ import * as fs from "node:fs";
 import type { FileSystem } from "../file-system";
 import type { CommandRunner } from "../subprocess-runner";
 import type { PortableHandoffProvider } from "../../mcp-repo-automation-tool-definitions-handoff";
-import {
-  HandoffContractError,
-  parseHandoffEnvelopeText,
-} from "./orchestration-handoff-contract";
+import { parseHandoffEnvelopeText } from "./orchestration-handoff-contract";
 import {
   OrchestrationHandoffMaterializer,
   type HandoffEnvelopeValidationResult,
   type HandoffMaterializerDependencies,
 } from "./orchestration-handoff-materializer";
-import { describeHandoffFailureCause } from "./orchestration-handoff-materializer-request";
+import {
+  describeEnvelopeParseFailure,
+  describeHandoffFailureCause,
+} from "./orchestration-handoff-materializer-request";
 import { providerAdapterFor } from "./orchestration-handoff-provider-adapters";
 import { resolvePortableHandoffAuthority } from "./orchestration-handoff-authority-service";
 import { createGitCheckoutContext } from "./orchestration-handoff-checkout-context";
@@ -31,14 +31,13 @@ function validateEnvelope(text: string): HandoffEnvelopeValidationResult {
       unsupportedCapabilities: [],
     };
   } catch (error: unknown) {
+    const failure = describeEnvelopeParseFailure(error);
     return {
       envelope: null,
-      primaryFailureCode:
-        error instanceof HandoffContractError
-          ? error.code
-          : "HANDOFF_UNSUPPORTED_VERSION",
+      primaryFailureCode: failure.code,
       affectedPaths: [],
       unsupportedCapabilities: [],
+      failureCause: failure.failureCause,
     };
   }
 }

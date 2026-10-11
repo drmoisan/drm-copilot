@@ -16,8 +16,8 @@
  *       live in `autoclose.ts` since issue #622 (D7).
  */
 
+import { compareCodePoint } from "../string-ordering";
 import {
-  compareCodePoint,
   CONVENTIONAL_TYPES,
   ISSUE_REFERENCE_PATTERN,
   type IssueDetails,

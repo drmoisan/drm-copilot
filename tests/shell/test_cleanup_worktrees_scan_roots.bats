@@ -55,6 +55,13 @@ report_run() { # report_run <scenario> -> run the full report driver, stderr RET
         bash -c "source '${ELIB}' && source '${LIB}' && source '${DIRTLIB}' && source '${RLIB}' && source '${DLIB}' && run_report"
 }
 
+derive_run() { # derive_run <scenario> -> cleanup_wt_derive_scan_roots over parse_worktree_list output, stderr discarded
+    # Derivation reads only the git stub's worktree list. The brace group sends the stub's
+    # argv log (stderr) to /dev/null so $output is the emitted roots only.
+    run env CLEANUP_WT_GIT_BIN="${STUB}" CLEANUP_WT_STUB_SCENARIO="${SCEN}/$1" \
+        bash -c "source '${ELIB}' && { cleanup_wt_derive_scan_roots \"\$(parse_worktree_list)\"; } 2>/dev/null"
+}
+
 @test "cleanup_wt_scan_roots appends registration-derived parents after the default pair" {
     # AC-1: with no override, the default pair comes first, then the kept parents of the
     # non-main registrations in LC_ALL=C order; /repo/main-wt (a default) and the
@@ -239,4 +246,69 @@ report_run() { # report_run <scenario> -> run the full report driver, stderr RET
     ' _ "${ELIB}" "${PLIB}"
     [ "$status" -eq 0 ]
     [ "$output" = "source_path is absolute: C:/x/lesson.md" ]
+}
+
+@test "cleanup_wt_derive_scan_roots drops a drive-relative parent for a registration directly under another drive root" {
+    # AC-1 (M-3): D:/wt has the drive-relative parent D:, which is not absolute and is
+    # dropped; D:/other/x still contributes D:/other.
+    derive_run scan_roots_drive_relative
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -eq 1 ]
+    [ "${lines[0]}" = "D:/other" ]
+}
+
+@test "cleanup_wt_scan_roots does not emit a drive-relative root for a D:/wt registration" {
+    # AC-3 (M-3): the combined root list keeps the default pair and D:/other and never
+    # contains the bare drive D:.
+    roots_run scan_roots_drive_relative ""
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -eq 3 ]
+    [ "${lines[0]}" = "C:/repo/main/.claude/worktrees" ]
+    [ "${lines[1]}" = "C:/repo/main-wt" ]
+    [ "${lines[2]}" = "D:/other" ]
+    local line
+    for line in "${lines[@]}"; do
+        if [ "$line" = "D:" ]; then
+            echo "drive-relative root emitted: ${line}"
+            return 1
+        fi
+    done
+}
+
+@test "run_report passes no drive-relative root to its single filesystem scan" {
+    # AC-1 (M-3): run_report still performs exactly one scan, and its argv carries no D:.
+    report_run scan_roots_drive_relative
+    # grep -c exits 1 on a zero count; neutralize it so each assertion reports the count.
+    scan_calls=$(printf '%s\n' "$output" | grep -c 'stub-scan: scan-dirs' || true)
+    [ "$scan_calls" -eq 1 ]
+    argv_lines=$(printf '%s\n' "$output" | grep -cxF "stub-scan: scan-dirs C:/repo/main/.claude/worktrees C:/repo/main-wt D:/other" || true)
+    [ "$argv_lines" -eq 1 ]
+}
+
+@test "cleanup_wt_derive_scan_roots converts a backslash registration path before taking its parent" {
+    # AC-2 (N-1): C:\repo\main-wt\a and C:\scratch\plan\p1 are converted to / before the
+    # parent is taken, so the emitted parents use forward slashes.
+    derive_run scan_roots_backslash
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -eq 2 ]
+    [ "${lines[0]}" = "C:/repo/main-wt" ]
+    [ "${lines[1]}" = "C:/scratch/plan" ]
+}
+
+@test "cleanup_wt_scan_roots emits forward-slash roots for backslash registrations" {
+    # AC-2 (N-1): the combined root list is three forward-slash roots; C:/repo/main-wt
+    # from the derivation duplicates the default and is emitted once.
+    roots_run scan_roots_backslash ""
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -eq 3 ]
+    [ "${lines[0]}" = "C:/repo/main/.claude/worktrees" ]
+    [ "${lines[1]}" = "C:/repo/main-wt" ]
+    [ "${lines[2]}" = "C:/scratch/plan" ]
+    local line
+    for line in "${lines[@]}"; do
+        if [[ $line == *\\* ]]; then
+            echo "backslash in emitted root: ${line}"
+            return 1
+        fi
+    done
 }

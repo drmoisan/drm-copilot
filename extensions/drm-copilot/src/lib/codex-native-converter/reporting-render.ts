@@ -13,6 +13,7 @@
  */
 
 import { toPosixPath } from "../file-system";
+import { compareCodePoint } from "../string-ordering";
 import {
   type MappingRecord,
   type RunOptions,
@@ -25,17 +26,6 @@ import {
   renderSourceToDestinationChart,
   renderSourceToRepeatedDestinationChart,
 } from "./reporting-topology";
-
-/**
- * Compare two strings with stable ascending ordering.
- *
- * @param left Left operand.
- * @param right Right operand.
- * @returns Negative, zero, or positive ordering value.
- */
-function compareStrings(left: string, right: string): number {
-  return left < right ? -1 : left > right ? 1 : 0;
-}
 
 /**
  * Render the human-readable Markdown conversion report.
@@ -68,29 +58,29 @@ export function renderConversionReport(
       : "review-only";
 
   const sortedMappingRecords = [...mappingRecords].sort((left, right) =>
-    compareStrings(left.sourcePath, right.sourcePath),
+    compareCodePoint(left.sourcePath, right.sourcePath),
   );
   const sortedTopologyEdges = [...topologyEdges].sort((left, right) => {
-    const bySource = compareStrings(left.sourcePath, right.sourcePath);
+    const bySource = compareCodePoint(left.sourcePath, right.sourcePath);
     if (bySource !== 0) {
       return bySource;
     }
-    return compareStrings(left.destinationPath, right.destinationPath);
+    return compareCodePoint(left.destinationPath, right.destinationPath);
   });
   const sortedTranslationTraces = [...translationTraces].sort((left, right) => {
-    const bySource = compareStrings(left.sourcePath, right.sourcePath);
+    const bySource = compareCodePoint(left.sourcePath, right.sourcePath);
     if (bySource !== 0) {
       return bySource;
     }
-    const bySection = compareStrings(left.sectionId, right.sectionId);
+    const bySection = compareCodePoint(left.sectionId, right.sectionId);
     if (bySection !== 0) {
       return bySection;
     }
-    const byRole = compareStrings(left.targetRole, right.targetRole);
+    const byRole = compareCodePoint(left.targetRole, right.targetRole);
     if (byRole !== 0) {
       return byRole;
     }
-    return compareStrings(left.targetPath ?? "", right.targetPath ?? "");
+    return compareCodePoint(left.targetPath ?? "", right.targetPath ?? "");
   });
 
   const lines: string[] = [
@@ -185,18 +175,18 @@ export function renderConversionReport(
     // Render validation findings in a stable order so the Markdown summary
     // mirrors JSON output.
     const sortedFindings = [...validationFindings].sort((left, right) => {
-      const byCode = compareStrings(left.code, right.code);
+      const byCode = compareCodePoint(left.code, right.code);
       if (byCode !== 0) {
         return byCode;
       }
-      const bySource = compareStrings(
+      const bySource = compareCodePoint(
         left.sourcePath ?? "",
         right.sourcePath ?? "",
       );
       if (bySource !== 0) {
         return bySource;
       }
-      return compareStrings(left.targetPath ?? "", right.targetPath ?? "");
+      return compareCodePoint(left.targetPath ?? "", right.targetPath ?? "");
     });
     for (const validationFinding of sortedFindings) {
       lines.push(

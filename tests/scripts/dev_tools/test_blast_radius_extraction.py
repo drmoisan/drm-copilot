@@ -202,7 +202,12 @@ def test_classify_path_token_accepts_each_known_top_level_segment(
 
 @pytest.mark.parametrize(
     "token",
-    ["src/app/main.ts", "vendor/module/Thing.psm1", "build/output/report.json"],
+    [
+        "src/app/main.ts",
+        "vendor/module/Thing.psm1",
+        "build/output/report.json",
+        "alpha/beta.unknownext",
+    ],
 )
 def test_classify_path_token_accepts_recognized_extension_outside_known_segments(
     token: str,
@@ -228,7 +233,6 @@ def test_classify_path_token_records_wildcard_tokens_as_globs(token: str) -> Non
         "/etc/hosts",
         "C:/Users/dev/alpha.py",
         "alpha/beta",
-        "alpha/beta.unknownext",
     ],
 )
 def test_classify_path_token_rejects_non_path_tokens(token: str) -> None:

@@ -43,7 +43,7 @@ $failingCase = @($fixtureCase | Where-Object { $_['ExpectedCount'] -gt 0 })
 # Floor on corpus size, matching MINIMUM_CORPUS_COUNT in the Python and
 # TypeScript readers. An empty or partially matched glob would make every case
 # below disappear and the suite would pass vacuously.
-$minimumFixtureCount = 29
+$minimumFixtureCount = 34
 
 BeforeAll {
     $libDir = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/orchestrator-state").Path

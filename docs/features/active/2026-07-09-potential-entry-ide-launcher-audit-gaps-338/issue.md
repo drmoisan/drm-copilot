@@ -35,13 +35,15 @@ Either the live-Windows same-window-reuse behavior (AC-1/AC-2) and the changed/n
 
 ## Actual Behavior
 
-The feature merged without the two Major findings being closed out, and no closure evidence or documented exception exists for either. The Minor docstring literal remains in both the root and bundled copies of `_resolve_code_cli()`.
+The feature merged without the two Major findings being closed out, and no closure evidence or documented exception exists for either. The Minor docstring literal remains in both `_resolve_code_cli()` docstrings, in `new_potential_bug_entry.py` and `new_active_feature_folder_io.py`.
+
+Correction (#846): no bundled mirror copies of the two Python modules exist (code-review.2026-10-08T07-05.md CR-3).
 
 ## Acceptance Criteria
 
 - [x] The stray docstring literal is removed from `_resolve_code_cli()` with no behavior change: a search for the token `as_posix() for file_path in files` in `scripts/dev_tools/new_potential_bug_entry.py` and `scripts/dev_tools/new_active_feature_folder_io.py` returns no matches, and `poetry run ruff check` on those two files passes. The TypeScript launcher sources and both `new-potential-entry.ps1` copies are unchanged.
 - [x] New Python tests pass and drive the previously untested launcher branches (backslash-to-forward-slash argv conversion, symmetric CLI fallback with a successful second probe, and each Insiders signal variable in `_INSIDERS_SIGNAL_NAMES`) for both modules: `poetry run pytest tests/scripts/dev_tools/test_new_potential_bug_entry.py tests/scripts/dev_tools/test_new_active_feature_folder_launcher.py` exits 0, and no test file exceeds 500 lines.
-- [x] New TypeScript tests pass and drive the previously untested launcher branches (backslash conversion, symmetric CLI fallback, each Insiders signal variable, and the default lookup helpers) in `extensions/drm-copilot/test/lib/new-potential-bug-entry-launcher.test.ts` and `extensions/drm-copilot/test/lib/new-active-feature-folder/io.test.ts`: `npm run test:unit -- test/lib/new-potential-bug-entry-launcher.test.ts test/lib/new-active-feature-folder/io.test.ts` run from `extensions/drm-copilot` exits 0.
+- [x] New TypeScript tests pass and drive the previously untested launcher branches (backslash conversion, symmetric CLI fallback, each Insiders signal variable, and the default lookup helpers) in `extensions/drm-copilot/test/lib/new-potential-bug-entry-launcher.test.ts`, `extensions/drm-copilot/test/lib/new-active-feature-folder/io.test.ts`, and `extensions/drm-copilot/test/lib/new-active-feature-folder/io-launcher.test.ts` (the default lookup helper tests are in `io-launcher.test.ts`): `npm run test:unit -- test/lib/new-potential-bug-entry-launcher.test.ts test/lib/new-active-feature-folder/io.test.ts test/lib/new-active-feature-folder/io-launcher.test.ts` run from `extensions/drm-copilot` exits 0. (AC text corrected under #846; the original text named only io.test.ts; verifying run: `evidence/regression-testing/ac3-jest-new-tests.2026-10-08T02-45.md`.)
 - [x] Finding (B) is closed by isolated launcher coverage evidence stored under `docs/features/active/2026-07-09-potential-entry-ide-launcher-audit-gaps-338/evidence/qa-gates/` (each file recording Timestamp, Command, and EXIT_CODE) showing `scripts/dev_tools/new_potential_bug_entry.py`, `scripts/dev_tools/new_active_feature_folder_io.py`, `extensions/drm-copilot/src/lib/new-potential-bug-entry.ts`, and `extensions/drm-copilot/src/lib/new-active-feature-folder/io-launcher.ts` each at line coverage >= 85% and branch coverage >= 75%. The 90% new-code figure is reported for information only.
 - [x] Finding (C) (AC-1/AC-2 live-Windows verification) is resolved by `scope_change`: a timestamped closure record `docs/features/active/2026-07-09-potential-entry-ide-launcher-audit-gaps-338/evidence/other/ac1-ac2-scope-change-closure.<timestamp>.md` exists, names by file and test name the Python and TypeScript argv/CLI-selection contract tests asserting `--reuse-window`, file arguments, and Insiders-first CLI selection, and states the residual unobserved desktop-UI risk.
 
@@ -63,9 +65,9 @@ Surfaced during the 2026-07-09 repository housekeeping audit (`docs/research/202
 
 ## Proposed Fix / Validation Ideas
 
-- [ ] Unit coverage areas: isolate changed/new-code coverage for the four launcher files (`new_potential_bug_entry.py`, `new_active_feature_folder_io.py`, and their bundled mirrors) to close the 90% new-code coverage policy gap, or document an approved exception if isolation is not feasible.
+- [ ] Unit coverage areas: isolate changed/new-code coverage for the four launcher files (`new_potential_bug_entry.py`, `new_active_feature_folder_io.py`, `new-potential-bug-entry.ts`, `io-launcher.ts`) to close the 90% new-code coverage policy gap, or document an approved exception if isolation is not feasible.
 - [ ] Integration scenario to retest: manually verify the same-window-reuse behavior on Windows with VS Code / VS Code Insiders and record the observed behavior as a timestamped evidence artifact, closing AC-1 and AC-2.
-- [ ] Manual verification notes: remove the stray literal command fragment from both `_resolve_code_cli()` docstrings (root and bundled copies).
+- [ ] Manual verification notes: remove the stray literal command fragment from both `_resolve_code_cli()` docstrings.
 
 ## Next Step
 

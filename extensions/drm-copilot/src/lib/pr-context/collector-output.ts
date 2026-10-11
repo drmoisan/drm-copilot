@@ -15,6 +15,7 @@
  */
 
 import { type FileSystem, toPosixPath } from "../file-system";
+import { compareCodePoint } from "../string-ordering";
 import {
   type FeatureDocExcerpt,
   formatList,
@@ -110,11 +111,7 @@ export function renderVerificationEvidenceSection(
   const lines: string[] = [];
   // Render deterministic rows sorted by source path for stable artifacts.
   const sorted = [...parseableRecords].sort((left, right) =>
-    left.sourceFile < right.sourceFile
-      ? -1
-      : left.sourceFile > right.sourceFile
-        ? 1
-        : 0,
+    compareCodePoint(left.sourceFile, right.sourceFile),
   );
   for (const record of sorted) {
     // Show a declared expectation only when non-zero; other rows render as before.

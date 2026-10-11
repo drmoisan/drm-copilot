@@ -2,7 +2,7 @@
 
 - Date captured: 2026-09-28
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/feature-review-skill-cites-nonexistent-validator/ (Issue #764)
+- Status: Promoted -> docs/features/active/2026-09-28-feature-review-skill-cites-nonexistent-validator-764/ (Issue #764)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 

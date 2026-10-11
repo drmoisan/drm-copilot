@@ -256,6 +256,14 @@ carries exactly these five elements.
    execution from that plan rather than re-running promotion, research, or planning. The item's
    prepared feature folder and approved atomic plan are already committed and preflight-clear on the
    item's own pushed feature branch.
+   The execution child starts a new checkpoint in its own worktree, and the preparation checkpoint
+   does not carry over, so the prompt also instructs the child to verify the item's GitHub issue
+   read-only (gh issue view), not to call `potential_to_issue` or the promotion-entry tool, and to
+   record its own top-level `issue_adoption` object per `.claude/rules/orchestrator-state.md`,
+   with origin `filed_before_orchestration` unless the issue was transferred, waiving
+   `potential_to_issue` and the promotion-entry tool for the checkpoint's promotion-type. When a
+   lifecycle record for the item exists under `docs/features/potential/promoted/`, the child cites
+   it as `potential_record`.
 5. The model-budget marker line `model_budget.fable_policy: <disabled|available|preferred>.`
 
 Spawn parameters, passed on the `Agent` call and never written into the prompt text:
@@ -269,6 +277,18 @@ When the planner checkpoint is unavailable, the committed kickoff artifact's `##
 `model` when the run's `fable_policy` equals the receipt's `fable_policy`; otherwise it re-resolves
 with `Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>` and
 passes that result.
+An item admitted through `/parallel-add` appears neither in the planner checkpoint
+`artifacts/orchestration/parallel-planner-state.json` `items[]` nor in the kickoff
+`## Item Summary`; for such an item the band source is that item's `complexity_band` on the
+orchestrator checkpoint `artifacts/orchestration/parallel-orchestrator-state.json` `items[]`. An
+admitted item carries no `model_routing_receipt`, so the parent resolves `model` at spawn time as
+`model_policy.complexity_to_model[<band>]` from `config/orchestration-routing.json` under the
+run's `fable_policy`, with `fable` clamped to `opus` when `fable_policy` is `disabled`. That result
+equals `Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>`
+because `preferred_overlay.agents` does not include `orchestrator`. The parent passes that explicit
+`model` on the spawn rather than relying on the frontmatter default, and it stops rather than
+spawning without `model` when the admitted item has no `complexity_band` on the orchestrator
+checkpoint.
 
 Negative obligations on the prompt:
 
@@ -317,6 +337,18 @@ artifact's `## Item Summary` `complexity` column is the fallback band source. Th
 `fable_policy`; otherwise it re-resolves with
 `Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>` and
 passes that result.
+An item admitted through `/parallel-add` appears neither in the planner checkpoint
+`artifacts/orchestration/parallel-planner-state.json` `items[]` nor in the kickoff
+`## Item Summary`; for such an item the band source is that item's `complexity_band` on the
+orchestrator checkpoint `artifacts/orchestration/parallel-orchestrator-state.json` `items[]`. An
+admitted item carries no `model_routing_receipt`, so the parent resolves `model` at spawn time as
+`model_policy.complexity_to_model[<band>]` from `config/orchestration-routing.json` under the
+run's `fable_policy`, with `fable` clamped to `opus` when `fable_policy` is `disabled`. That result
+equals `Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>`
+because `preferred_overlay.agents` does not include `orchestrator`. The parent passes that explicit
+`model` on the spawn rather than relying on the frontmatter default, and it stops rather than
+spawning without `model` when the admitted item has no `complexity_band` on the orchestrator
+checkpoint.
 
 `route` is never an input to model selection. `route` remains file-count driven and governs only
 agents, skills, and MCP tools. A skill whose frontmatter `context` field holds the value `fork`

@@ -43,6 +43,17 @@ export {
 } from "./claude-memory-scope";
 
 /**
+ * Source-relative directories that hold machine-local runtime state.
+ *
+ * Nothing beneath them is published (issue #790). Mirrors
+ * `LOCAL_RUNTIME_RELATIVE_DIRECTORIES` in `push_down_claude_filesystem.py`.
+ */
+export const LOCAL_RUNTIME_RELATIVE_DIRECTORIES: ReadonlyArray<string> = [
+  ".claude/state",
+  ".claude/worktrees",
+];
+
+/**
  * Normalize a path to forward-slash separators with no trailing slash.
  *
  * @param value Path that may use OS-specific separators.
@@ -171,6 +182,23 @@ export class ExcludingFileSystem implements PushDownFileSystem {
   }
 
   /**
+   * Return whether a path is a local runtime directory or lies below one.
+   *
+   * @param path An absolute candidate POSIX path from the inner adapter.
+   * @returns True when the source-relative path is in a runtime directory.
+   */
+  private isLocalRuntimePath(path: string): boolean {
+    const relative = this.sourceRelativePosix(path);
+    if (relative === null) {
+      return false;
+    }
+    return LOCAL_RUNTIME_RELATIVE_DIRECTORIES.some(
+      (directory) =>
+        relative === directory || relative.startsWith(`${directory}/`),
+    );
+  }
+
+  /**
    * Return whether a candidate path is in the active published set.
    *
    * @param path An absolute candidate POSIX path.
@@ -264,12 +292,13 @@ export class ExcludingFileSystem implements PushDownFileSystem {
   }
 
   listFiles(root: string): string[] {
-    // Apply the four enumeration filters in sequence: hard exclusions, pack
-    // selection, agent-memory scope, then memory mode.
+    // Drop runtime directories first, then apply hard exclusions, pack
+    // selection, agent-memory scope, and memory mode.
     return this.inner
       .listFiles(root)
       .filter(
         (p) =>
+          !this.isLocalRuntimePath(p) &&
           !this.excluded.has(normalizePosix(p)) &&
           this.isPackIncluded(p) &&
           this.isScopeIncluded(p) &&

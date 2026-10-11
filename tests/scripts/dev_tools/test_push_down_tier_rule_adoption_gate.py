@@ -15,6 +15,7 @@ no process, and consults no external service.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -147,6 +148,15 @@ def normalize_whitespace(text: str) -> str:
     """Collapse every whitespace run, including line breaks, to one space."""
 
     return " ".join(text.split())
+
+
+def coverage_threshold_context(text: str) -> str:
+    """Return the blank-line-separated paragraphs that mention coverage."""
+
+    paragraphs = re.split(r"\n\s*\n", text)
+    return "\n\n".join(
+        paragraph for paragraph in paragraphs if "coverage" in paragraph.lower()
+    )
 
 
 def present_fragments(text: str, fragments: tuple[str, ...]) -> list[str]:
@@ -390,7 +400,11 @@ def test_review_agent_copy_uses_governing_thresholds(relative_path: str) -> None
     text = read_copy(relative_path)
 
     # Act
-    retired = [token for token in RETIRED_REVIEW_THRESHOLDS if token in text]
+    retired = [
+        token
+        for token in RETIRED_REVIEW_THRESHOLDS
+        if token in coverage_threshold_context(text)
+    ]
     governing = present_fragments(text, (GOVERNING_THRESHOLD_FRAGMENT,))
 
     # Assert
@@ -461,3 +475,19 @@ def test_preamble_and_section_split_on_level_two_headings() -> None:
     assert "Body text." in tiers
     assert "Tail text." not in tiers
     assert absent == ""
+
+
+def test_retired_threshold_scan_reads_coverage_context_only() -> None:
+    """80% outside a coverage paragraph is not flagged; inside one it is flagged."""
+
+    # Arrange
+    unrelated = "Throttle new work at 80% of the quota window.\n"
+    related = unrelated + "\nLine coverage under 80% fails the review.\n"
+
+    # Act
+    unrelated_context = coverage_threshold_context(unrelated)
+    related_context = coverage_threshold_context(related)
+
+    # Assert
+    assert "80%" not in unrelated_context
+    assert "80%" in related_context

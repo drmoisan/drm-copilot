@@ -287,8 +287,10 @@ def validate_epic_planner_state_text(
     """Validate planner checkpoint structure and optional execution readiness.
 
     ``require_codex_model_routing`` and ``require_codex_topology`` make launch
-    evidence unconditional under execution readiness. When neither is set, launch
-    evidence is validated only for features that carry a launch path key.
+    evidence and the planner ``topology_receipt`` unconditional under execution
+    readiness. When neither is set, launch evidence is validated only for
+    features that carry a launch path key, and the planner receipt only when the
+    checkpoint carries a top-level ``topology_receipt`` key.
     """
 
     try:
@@ -325,7 +327,8 @@ def validate_epic_planner_state_text(
             f"Non-epic planner checkpoint next_step must be {NON_EPIC_NEXT_STEP!r}."
         )
     if require_ready_for_execution:
-        # Launch evidence is key-gated per feature unless a Codex flag is asserted.
+        # Launch evidence (per feature) and the planner topology receipt (top-level
+        # key) are key-gated unless a Codex flag is asserted.
         key_gated = not (require_codex_model_routing or require_codex_topology)
         if verdict != "epic":
             errors.append(
@@ -342,7 +345,10 @@ def validate_epic_planner_state_text(
                 features, require_launch_paths=key_gated
             )
         )
-        errors.extend(_validate_planner_topology_receipt(state.get("topology_receipt")))
+        if not key_gated or "topology_receipt" in state:
+            errors.extend(
+                _validate_planner_topology_receipt(state.get("topology_receipt"))
+            )
         slug = state.get("epic_feature_folder")
         expected_kickoff = f"artifacts/orchestration/epic-kickoff-{slug}.md"
         if state.get("kickoff_prompt_path") != expected_kickoff:

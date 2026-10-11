@@ -1,0 +1,73 @@
+# AC Node Listing
+
+Timestamp: 2026-10-09T20-57
+Command: poetry run pytest tests/scripts/dev_tools/test_workflow_npm_token_guard.py -v
+EXIT_CODE: 0
+Output Summary: 56 passed in 0.13s. All 8 detects_assignment nodes (including empty-assignment-end-of-line) and all 9 ignores_non_matching_text nodes (including equality-comparison, shell-equality-test, inequality-comparison) are PASSED.
+
+Every node line, verbatim apart from the repeated path prefix `tests/scripts/dev_tools/test_workflow_npm_token_guard.py::` and the progress percentage:
+
+```text
+test_find_npm_token_references_detects_reintroduced_reference[dot-access] PASSED
+test_find_npm_token_references_detects_reintroduced_reference[single-quoted-bracket] PASSED
+test_find_npm_token_references_detects_reintroduced_reference[double-quoted-bracket] PASSED
+test_find_npm_token_references_detects_reintroduced_reference[spaced-lowercase-dot] PASSED
+test_find_npm_token_references_detects_reintroduced_reference[third-line-of-three] PASSED
+test_find_npm_token_references_detects_reintroduced_reference[spaced-bracket] PASSED
+test_find_npm_token_references_detects_reintroduced_reference[lowercase-bracket] PASSED
+test_find_npm_token_references_detects_reintroduced_reference[vars-dot] PASSED
+test_find_npm_token_references_detects_reintroduced_reference[vars-bracket] PASSED
+test_find_npm_token_references_ignores_non_matching_text[unrelated-secret] PASSED
+test_find_npm_token_references_ignores_non_matching_text[longer-secret-name] PASSED
+test_find_npm_token_references_ignores_non_matching_text[no-secrets-context] PASSED
+test_find_npm_token_references_ignores_non_matching_text[empty] PASSED
+test_find_npm_token_references_ignores_non_matching_text[vars-longer-name] PASSED
+test_find_npm_token_references_ignores_non_matching_text[prefixed-context-name] PASSED
+test_find_node_auth_token_references_detects_reference[other-secret-name] PASSED
+test_find_node_auth_token_references_detects_reference[lowercase-second-line] PASSED
+test_find_node_auth_token_references_ignores_non_matching_text[oidc-permission] PASSED
+test_find_node_auth_token_references_ignores_non_matching_text[longer-name] PASSED
+test_find_node_auth_token_references_ignores_non_matching_text[empty] PASSED
+test_find_npm_auth_token_config_references_detects_config_key[npmrc-echo-registry-scoped] PASSED
+test_find_npm_auth_token_config_references_detects_config_key[npmrc-bare-key] PASSED
+test_find_npm_auth_token_config_references_detects_config_key[npm-config-env-upper] PASSED
+test_find_npm_auth_token_config_references_detects_config_key[npm-config-env-lower] PASSED
+test_find_npm_auth_token_config_references_detects_config_key[npm-config-env-registry-scoped] PASSED
+test_find_npm_auth_token_config_references_detects_config_key[npm-config-set-bare] PASSED
+test_find_npm_auth_token_config_references_detects_config_key[npm-config-set-registry-scoped] PASSED
+test_find_npm_auth_token_config_references_ignores_non_matching_text[oidc-permission] PASSED
+test_find_npm_auth_token_config_references_ignores_non_matching_text[setup-node-registry-url] PASSED
+test_find_npm_auth_token_config_references_ignores_non_matching_text[always-auth] PASSED
+test_find_npm_auth_token_config_references_ignores_non_matching_text[node-auth-token-is-separate-family] PASSED
+test_find_npm_auth_token_config_references_ignores_non_matching_text[letter-prefixed-name] PASSED
+test_find_npm_auth_token_config_references_ignores_non_matching_text[empty] PASSED
+test_find_npm_token_assignments_detects_assignment[yaml-env-key-other-secret] PASSED
+test_find_npm_token_assignments_detects_assignment[yaml-flow-mapping] PASSED
+test_find_npm_token_assignments_detects_assignment[quoted-key] PASSED
+test_find_npm_token_assignments_detects_assignment[shell-export] PASSED
+test_find_npm_token_assignments_detects_assignment[github-env-append] PASSED
+test_find_npm_token_assignments_detects_assignment[powershell-env] PASSED
+test_find_npm_token_assignments_detects_assignment[lowercase-key] PASSED
+test_find_npm_token_assignments_detects_assignment[empty-assignment-end-of-line] PASSED
+test_find_npm_token_assignments_ignores_non_matching_text[secrets-dot-context] PASSED
+test_find_npm_token_assignments_ignores_non_matching_text[env-context-read] PASSED
+test_find_npm_token_assignments_ignores_non_matching_text[longer-name-key] PASSED
+test_find_npm_token_assignments_ignores_non_matching_text[prefixed-name-key] PASSED
+test_find_npm_token_assignments_ignores_non_matching_text[prose-comment] PASSED
+test_find_npm_token_assignments_ignores_non_matching_text[empty] PASSED
+test_find_npm_token_assignments_ignores_non_matching_text[equality-comparison] PASSED
+test_find_npm_token_assignments_ignores_non_matching_text[shell-equality-test] PASSED
+test_find_npm_token_assignments_ignores_non_matching_text[inequality-comparison] PASSED
+test_collect_offenders_names_each_matching_line PASSED
+test_github_yaml_enumeration_is_non_vacuous PASSED
+test_github_yaml_files_contain_no_npm_token_route[npm-token-context] PASSED
+test_github_yaml_files_contain_no_npm_token_route[node-auth-token] PASSED
+test_github_yaml_files_contain_no_npm_token_route[npm-auth-token-config] PASSED
+test_github_yaml_files_contain_no_npm_token_route[npm-token-assignment] PASSED
+```
+
+Result line:
+
+```text
+============================== 56 passed in 0.13s ==============================
+```

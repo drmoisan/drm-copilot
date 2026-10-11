@@ -116,7 +116,7 @@ Coverage metrics are mandatory for every language that has changed files in the 
 
 ### Coverage Thresholds
 
-Coverage thresholds follow the threshold precedence defined in `.claude/rules/quality-tiers.md` and `.claude/rules/general-unit-test.md`: when the repository's root `CLAUDE.md` states line or branch coverage thresholds, those thresholds govern; otherwise the default thresholds below govern. The thresholds that govern under this precedence are the governing thresholds referred to in the Verification Procedure below. The defaults are:
+Coverage thresholds follow the threshold precedence defined in `.claude/rules/quality-tiers.md` and `.claude/rules/general-unit-test.md`: when the repository's root `CLAUDE.md` states line or branch coverage thresholds, those thresholds govern; otherwise the default thresholds below govern. Each metric falls back independently: when the root `CLAUDE.md` states only a line threshold or only a branch threshold, the stated threshold governs that metric and the default below governs the other. The thresholds that govern under this precedence are the governing thresholds referred to in the Verification Procedure below. The defaults are:
 
 - **New code files** (files added in this feature, not previously existing): line coverage >= 85%, branch coverage >= 75% for branch-capable languages.
 - **Modified files** (files that existed before and were changed): line coverage >= 85%, branch coverage >= 75% for branch-capable languages, and no regression on changed lines relative to baseline.

@@ -1,0 +1,13 @@
+# P13-T9 Commit and Push Phase 13
+
+Timestamp: 2026-10-10T09-44
+Command: git add -- .claude/rules/shell.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md scripts/bash/shell_qc_lib.sh tests/fixtures/shell_qc/.codex/codex_entry.sh tests/shell/test_shell_qc_discovery.bats tests/shell/test_shell_qc_commands.bats docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/plan.2026-10-08T22-16.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/other/commit-p12.2026-10-10T09-28.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/other/ci-hold-round0.2026-10-10T09-28.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/baseline/ci-shell-round0.2026-10-10T09-40.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/other/p13-t2.2026-10-10T09-40.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/other/p13-t3.2026-10-10T09-41.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/other/p13-t4.2026-10-10T09-41.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/other/p13-t5.2026-10-10T09-42.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/other/p13-t6.2026-10-10T09-42.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/other/p13-t7.2026-10-10T09-43.md docs/features/active/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824/evidence/qa-gates/claude-bundle-parity-widening.2026-10-10T09-43.md; git commit -m "feat(824): bring .codex into shell-qc discovery and the kcov include roots" -m "Refs #824"; git push origin bug/issue-823-tier-rule-adoption-follow-ups-824; git status --porcelain --untracked-files=all; git fetch origin bug/issue-823-tier-rule-adoption-follow-ups-824; git rev-parse HEAD origin/bug/issue-823-tier-rule-adoption-follow-ups-824
+EXIT_CODE: 0
+Output Summary:
+- git add: exit 0 (17 paths named individually).
+- git commit: exit 0; created ce0d5906b4f728f7513ad6223c61bba25dfa0ea6, 17 files changed, 197 insertions(+), 40 deletions(-). The commit message also carries the session attribution trailer lines after `Refs #824`.
+- git push: exit 0; `db0ef5187..ce0d5906b` (fast-forward, not forced).
+- git status --porcelain --untracked-files=all: exit 0; printed nothing.
+- git fetch: exit 0.
+- git rev-parse: exit 0; printed ce0d5906b4f728f7513ad6223c61bba25dfa0ea6 twice (local HEAD equals origin).
+- Per the plan, this artifact and the P13-T9 check-off are committed by P14-T5.

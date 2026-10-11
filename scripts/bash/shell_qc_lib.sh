@@ -73,8 +73,8 @@ is_shell_script() {
 }
 
 discover_shell_scripts() {
-	# Discover shell scripts under tools/, scripts/, .claude/lib/bash/, and
-	# .claude/skills/ relative to the current dir.
+	# Discover shell scripts under tools/, scripts/, .claude/lib/bash/, .claude/skills/,
+	# and .codex/ relative to the current dir.
 	#
 	# Missing roots are silently skipped. Traversal prunes .venv, .git, node_modules,
 	# dist, and build at any depth. Output is de-duplicated and sorted with LC_ALL=C
@@ -82,7 +82,7 @@ discover_shell_scripts() {
 	local -a roots=()
 	local root
 	# Collect only the search roots that exist, mirroring Path.exists() skipping.
-	for root in tools scripts .claude/lib/bash .claude/skills; do
+	for root in tools scripts .claude/lib/bash .claude/skills .codex; do
 		if [[ -d $root ]]; then
 			roots+=("$root")
 		fi
@@ -345,9 +345,9 @@ run_test_coverage() {
 	mkdir -p "$out_dir"
 	local runs_dir="$out_dir/.kcov_runs"
 	mkdir -p "$runs_dir"
-	# Scope coverage to repo scripts/tools, the Claude bash library, and scripts bundled
-	# inside skill folders; exclude the test sources themselves.
-	local include_pattern="$repo_root/tools,$repo_root/scripts,$repo_root/.claude/lib/bash,$repo_root/.claude/skills"
+	# Scope coverage to repo scripts/tools, the Claude bash library, scripts bundled inside
+	# skill folders, and the Codex runtime scripts; exclude the test sources themselves.
+	local include_pattern="$repo_root/tools,$repo_root/scripts,$repo_root/.claude/lib/bash,$repo_root/.claude/skills,$repo_root/.codex"
 	local exclude_pattern="$repo_root/tests"
 	local exit_code=0 rc=0 test_dir
 	local -a run_dirs=()

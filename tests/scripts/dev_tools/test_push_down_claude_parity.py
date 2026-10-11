@@ -41,6 +41,10 @@ PY_CUSTOMIZATIONS = "scripts/dev_tools/push_down_claude_customizations.py"
 PY_DESTINATION_WRITES = "scripts/dev_tools/push_down_claude_destination_writes.py"
 PY_DERIVE_CORE = "scripts/dev_tools/push_down_claude_blast_radius_derive_core.py"
 FIXTURE_PATH = Path("tests/fixtures/push_down/routing-merge-parity.json")
+TS_FILESYSTEM_ADAPTER = (
+    "extensions/drm-copilot/src/lib/push-down/claude-filesystem-adapter.ts"
+)
+PY_FILESYSTEM = "scripts/dev_tools/push_down_claude_filesystem.py"
 
 # Matches the TypeScript merged-path declaration names other than the registry.
 _MERGE_NAME = re.compile(r"^[A-Z_]*MERGE[A-Z_]*_RELATIVE_PATHS?$")
@@ -117,16 +121,22 @@ def _ts_declarations(text: str) -> dict[str, str]:
     }
 
 
+def _ts_string_array(text: str, label: str, name: str) -> tuple[str, ...]:
+    """Extract the ordered string literals of a TypeScript array declaration."""
+
+    initializer = _ts_declarations(text).get(name)
+    if initializer is None:
+        raise AssertionError(f"{label}: found zero {name} declarations")
+    if not (initializer.startswith("[") and initializer.endswith("]")):
+        raise AssertionError(f"{label}: {name} is not a bracketed literal")
+    tokens = [token for token in initializer[1:-1].split(",") if token.strip()]
+    return tuple(_literal_value(token, label, name) for token in tokens)
+
+
 def _ts_root_folders(text: str, label: str) -> tuple[str, ...]:
     """Extract the ordered TypeScript ``ROOT_FOLDERS`` literals."""
 
-    initializer = _ts_declarations(text).get("ROOT_FOLDERS")
-    if initializer is None:
-        raise AssertionError(f"{label}: found zero ROOT_FOLDERS declarations")
-    if not (initializer.startswith("[") and initializer.endswith("]")):
-        raise AssertionError(f"{label}: ROOT_FOLDERS is not a bracketed literal")
-    tokens = [token for token in initializer[1:-1].split(",") if token.strip()]
-    return tuple(_literal_value(token, label, "ROOT_FOLDERS") for token in tokens)
+    return _ts_string_array(text, label, name="ROOT_FOLDERS")
 
 
 def _registry_keys(initializer: str, label: str) -> set[str]:
@@ -198,6 +208,15 @@ def _py_string(node: ast.expr, label: str, name: str) -> str:
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         return node.value
     raise AssertionError(f"{label}: {name} has a non-literal element")
+
+
+def _py_string_tuple(source: str, label: str, name: str) -> tuple[str, ...]:
+    """Extract the string elements of a Python module-level tuple literal."""
+
+    value = _py_assignment(source, label, name)
+    if not isinstance(value, ast.Tuple):
+        raise AssertionError(f"{label}: {name} is not a tuple literal")
+    return tuple(_py_string(element, label, name) for element in value.elts)
 
 
 def _py_root_folders(source: str, label: str) -> tuple[str, ...]:
@@ -293,6 +312,37 @@ def test_derived_relative_paths_match_typescript() -> None:
     _assert_same(ts_paths, py_paths, TS_DERIVE_CORE, PY_DERIVE_CORE)
     assert len(ts_paths) == 1, f"{TS_DERIVE_CORE} derived paths: {ts_paths!r}"
     assert len(py_paths) == 1, f"{PY_DERIVE_CORE} derived paths: {py_paths!r}"
+
+
+def test_local_runtime_directories_match_typescript() -> None:
+    """Python LOCAL_RUNTIME_RELATIVE_DIRECTORIES equals the TypeScript set."""
+
+    name = "LOCAL_RUNTIME_RELATIVE_DIRECTORIES"
+    ts_text = _read_repo_text(TS_FILESYSTEM_ADAPTER)
+    ts_dirs = set(_ts_string_array(ts_text, TS_FILESYSTEM_ADAPTER, name))
+    py_text = _read_repo_text(PY_FILESYSTEM)
+    py_dirs = set(_py_string_tuple(py_text, PY_FILESYSTEM, name))
+
+    _assert_same(ts_dirs, py_dirs, TS_FILESYSTEM_ADAPTER, PY_FILESYSTEM)
+    assert len(ts_dirs) == 2, f"{TS_FILESYSTEM_ADAPTER} directories: {ts_dirs!r}"
+    assert len(py_dirs) == 2, f"{PY_FILESYSTEM} directories: {py_dirs!r}"
+
+
+def test_local_runtime_directories_comparison_detects_divergence() -> None:
+    """A TypeScript declaration missing a directory fails the set comparison."""
+
+    name = "LOCAL_RUNTIME_RELATIVE_DIRECTORIES"
+    ts_text = 'export const LOCAL_RUNTIME_RELATIVE_DIRECTORIES = [".claude/state"];\n'
+    py_text = (
+        'LOCAL_RUNTIME_RELATIVE_DIRECTORIES = (".claude/state", ".claude/worktrees")\n'
+    )
+
+    ts_dirs = set(_ts_string_array(ts_text, "synthetic.ts", name))
+    py_dirs = set(_py_string_tuple(py_text, "synthetic.py", name))
+
+    assert ts_dirs != py_dirs
+    with pytest.raises(AssertionError, match=r"synthetic\.ts.*synthetic\.py"):
+        _assert_same(ts_dirs, py_dirs, "synthetic.ts", "synthetic.py")
 
 
 def test_typescript_root_folder_extraction_detects_divergence() -> None:

@@ -18,8 +18,8 @@
 
 import { type FileSystem } from "../file-system";
 import { type CommandRunner } from "../subprocess-runner";
+import { compareCodePoint } from "../string-ordering";
 import {
-  compareCodePoint,
   sortedSet,
   type FeatureDocExcerpt,
   type IssueDetails,

@@ -14,6 +14,7 @@
  */
 
 import { type FileSystem } from "../file-system";
+import { compareCodePoint } from "../string-ordering";
 import {
   type MappingRecord,
   mappingRecordToJson,
@@ -51,7 +52,7 @@ function sortKeysDeep(value: unknown): unknown {
   if (value !== null && typeof value === "object") {
     const sorted: Record<string, unknown> = {};
     for (const key of Object.keys(value as Record<string, unknown>).sort(
-      (left, right) => (left < right ? -1 : left > right ? 1 : 0),
+      compareCodePoint,
     )) {
       sorted[key] = sortKeysDeep((value as Record<string, unknown>)[key]);
     }
@@ -128,11 +129,7 @@ function sortBySourcePath(
   mappingRecords: ReadonlyArray<MappingRecord>,
 ): MappingRecord[] {
   return [...mappingRecords].sort((left, right) =>
-    left.sourcePath < right.sourcePath
-      ? -1
-      : left.sourcePath > right.sourcePath
-        ? 1
-        : 0,
+    compareCodePoint(left.sourcePath, right.sourcePath),
   );
 }
 
@@ -145,18 +142,19 @@ function sortBySourcePath(
 function sortFindings(
   validationFindings: ReadonlyArray<ValidationFinding>,
 ): ValidationFinding[] {
-  const compare = (left: string, right: string): number =>
-    left < right ? -1 : left > right ? 1 : 0;
   return [...validationFindings].sort((left, right) => {
-    const byCode = compare(left.code, right.code);
+    const byCode = compareCodePoint(left.code, right.code);
     if (byCode !== 0) {
       return byCode;
     }
-    const bySource = compare(left.sourcePath ?? "", right.sourcePath ?? "");
+    const bySource = compareCodePoint(
+      left.sourcePath ?? "",
+      right.sourcePath ?? "",
+    );
     if (bySource !== 0) {
       return bySource;
     }
-    return compare(left.targetPath ?? "", right.targetPath ?? "");
+    return compareCodePoint(left.targetPath ?? "", right.targetPath ?? "");
   });
 }
 
@@ -226,8 +224,8 @@ export function writeConversionReportSet(
 
   // Write the proposed tree in stable path order so review runs always emit a
   // deterministic snapshot of the generated content.
-  for (const targetPath of Object.keys(generatedOutput).sort((left, right) =>
-    left < right ? -1 : left > right ? 1 : 0,
+  for (const targetPath of Object.keys(generatedOutput).sort(
+    compareCodePoint,
   )) {
     fileSystem.writeTextFile(
       joinPosix(proposedTreeRoot, targetPath),
