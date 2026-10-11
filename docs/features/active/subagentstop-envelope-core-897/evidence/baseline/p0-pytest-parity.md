@@ -1,0 +1,42 @@
+# Phase 0 Baseline Python Parity Tests (issue #897, epic child E1)
+
+Timestamp: 2026-10-11T12-34
+Task: [P0-T11]
+Command: `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py -v`
+EXIT_CODE: 0
+Output Summary: `22 passed in 0.34s`; every node PASSED, including `test_bundled_claude_payload_contains_all_repo_runtime_contracts` (the issue-510 local-state failure did not occur in this worktree).
+
+## Final pytest summary line
+
+```text
+============================= 22 passed in 0.34s ==============================
+```
+
+## Per-node status
+
+```text
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_required_runtime_files PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_planner_review_resources_exist_and_are_byte_identical PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_handoff_runtime_has_bundle_pack_and_effective_install_parity PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_pack_manifests_are_outside_the_parity_scope PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_excludes_settings_local_json PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_excludes_variant_subtree_from_parity PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_variant_subtree_is_bundle_only_and_non_colliding PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_agent_memory_scopes_are_well_formed PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_claude_legacy_variant_files_contain_corrected_gate_commands PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_claude_legacy_variant_files_exclude_stale_gate_commands PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_claude_modern_csharp_profile_retains_modern_gate_commands PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_claude_consumer_uses_published_typescript_handoff_authority PASSED
+tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_claude_orchestrate_requires_independent_expected_context PASSED
+tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py::test_bundled_claude_files_are_listed_in_some_pack_manifest PASSED
+tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py::test_documented_exceptions_remain_absent_from_every_manifest PASSED
+tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py::test_numeric_provenance_contract_requires_full_family_and_cross_check PASSED
+tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py::test_planner_review_contract_requires_all_three_dimensions PASSED
+tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py::test_planner_review_record_contract_is_parseable_and_scoped PASSED
+tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py::test_generated_document_counter_requires_named_section_boundaries PASSED
+tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py::test_prd_feature_runtime_registration_is_exact_and_bundle_identical PASSED
+tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py::test_prd_feature_runtime_registration_rejects_invalid_fixtures PASSED
+```
+
+FAILED nodes: none.
