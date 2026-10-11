@@ -29,3 +29,16 @@ AC-26: CHECKED | P5-T11 | evidence/qa-gates/final-line-counts.md
 AC-22: CHECKED | P5-T11 | evidence/qa-gates/final-pester-targeted.md, evidence/qa-gates/final-pytest-parity.md, evidence/qa-gates/final-mirror-parity.md
 AC-3: CHECKED | P5-T11 | evidence/qa-gates/final-pytest-parity.md, evidence/qa-gates/final-jest-manifest.md
 AC-2: CHECKED | P5-T11 | evidence/qa-gates/final-pytest-parity.md
+AC-27: CHECKED | P5-T13 | evidence/qa-gates/final-scope.md
+AC-28: CHECKED | P5-T14 | evidence/qa-gates/final-no-python.md
+AC-29: DEFERRED | P5-T15 | evidence/other/ac29-commit-messages.md
+
+### Acceptance Criteria Status
+- Source: docs/features/active/subagentstop-envelope-core-897/spec.md
+- Total AC items: 29
+- Checked off (delivered): 28
+- Remaining (unchecked): 1
+- Items remaining:
+  - AC-29: Every E1 commit message and the E1 pull request body reference the issue as `Refs #897` and contain no closing keyword (`close`, `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, `resolved`) applied to #897. Verified by `git log --format=%B epic/subagentstop-envelope-integration..HEAD` and `gh pr view <pr> --json body` at PR authoring time. (DEFERRED: the commit-message portion is verified in `evidence/other/ac29-commit-messages.md`; the PR-body portion is verified at PR authoring, outside this plan.)
+
+Reconciliation ([P5-T16]): `Select-String -LiteralPath docs/features/active/subagentstop-envelope-core-897/spec.md -Pattern '^- \[x\] AC-'` count = 28, equal to the checked count above. Timestamp: 2026-10-11T13-16.
