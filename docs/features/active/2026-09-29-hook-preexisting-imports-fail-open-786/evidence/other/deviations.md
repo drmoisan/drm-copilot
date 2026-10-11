@@ -148,3 +148,10 @@ Timestamp: 2026-10-10T21-47
 - [P3-T6] to [P3-T9] of pass 1 were executed while the [P3-T3] R-PESTER run and the [P3-T4] current-tree probe were in progress, and before [P3-T5]; they were checked off after [P3-T5], so the plan file records the tasks in order. No repository file outside the feature folder changed during pass 1 (the [P3-T5] porcelain and 149 SHA pairs were equal before and after the MCP calls), so every pass 1 row observes the same tree.
 - Initial evidence timestamps of [P0-T2] to [P0-T7] were estimates that ran ahead of the clock; they were corrected to the observed file modification times before the [P0-T14] commit.
 - [P1-T4]: the `## [P1-T4] Row 6 census` section contains the `INSTANCE-MISMATCH:` line twice (once in the extracted census lines and once in the required full output); the census run printed it once.
+
+## Remediation cycle 2: [P4-T3] check-off commit
+
+Timestamp: 2026-10-10T22-14
+
+- [P4-T3] check-off commit (plan file alone, subject `docs(786): check off the remediation cycle 2 final task`): 23d8eb660f015b485dddfdd8491ddf18d64be1b9, pushed with `git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786` (exit 0). Not appended to commits.md, as [P4-T3] specifies.
+- Recording this SHA modifies deviations.md after that commit, so this note is committed and pushed in one further documentation-only commit (operator rule: commit and push at any pause). Its code tree equals CHECKED-HEAD d83e7af6117fed48fa3cf3df1d133143f5548064.
