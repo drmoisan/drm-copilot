@@ -153,17 +153,17 @@ The executor stops, writes the named artifact, and reports to the caller without
 
 All test code below lives in `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1` unless a task names `tests/scripts/claude-runtime/claude-settings.Tests.ps1`. Test inputs are inline strings only: build a BOM with `"$([char]0xFEFF)"` and CRLF with `` "`r`n" `` inside test code; never store a BOM character or CRLF bytes in the test file itself. No temporary files, no child processes, no `Start-Sleep`. Keep the suite at or under 450 lines by using `-TestCases`.
 
-- [ ] [P2-T1] Create `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1` with the suite skeleton and the surface test (AC-1).
+- [x] [P2-T1] Create `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1` with the suite skeleton and the surface test (AC-1).
   - `Set-StrictMode -Version Latest`; `Describe 'subagentstop-envelope helper'` with `BeforeAll` that sets `$script:RepoRoot = (Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath '..', '..')).Path`, `$script:HelperPath = Join-Path $script:RepoRoot '.claude/hooks/subagentstop-envelope.ps1'`, `$script:FixturePath = Join-Path $script:RepoRoot 'tests/fixtures/claude-hooks/Invoke-SubagentStopBlock.Fixture.ps1'`, `$script:ExpectedProperties = @('IsValid', 'Anomaly', 'Envelope', 'AssistantText', 'StopHookActive', 'AgentType', 'HookEventName')`, `$script:AnomalyCodes = @('EmptyPayload', 'UnparseableJson', 'NonObjectEnvelope', 'MissingAssistantMessage', 'NullAssistantMessage', 'NonStringAssistantMessage')`, and dot-sources `$script:HelperPath`.
   - `It 'defines Read-SubagentStopEnvelope, Get-SubagentStopEnvelopeAnomalyReason and Exit-SubagentStopBlock'`: each of the three `Get-Command -Name <name> -CommandType Function -ErrorAction SilentlyContinue` results is not null.
   - Acceptance: the file parses with zero errors (`[System.Management.Automation.Language.Parser]::ParseFile`).
-- [ ] [P2-T2] Add the source-constraint AST tests (AC-4) to `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
+- [x] [P2-T2] Add the source-constraint AST tests (AC-4) to `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
   - `Context 'source constraints'` parses `$script:HelperPath` with `[System.Management.Automation.Language.Parser]::ParseFile` and uses `FindAll` with `$true` (search nested script blocks).
   - `It 'reads no environment variable'`: zero `VariableExpressionAst` whose `VariablePath.DriveName` is `env`; zero `InvokeMemberExpressionAst` whose member text is `GetEnvironmentVariable`; zero `CommandAst` named `Get-ChildItem` or `Get-Item` (also `gci`, `ls`, `dir`, `gi`) whose argument text begins with `env:`.
   - `It 'imports and dot-sources nothing'`: zero `CommandAst` named `Import-Module` (also `ipmo`); zero `UsingStatementAst` with `UsingStatementKind` `Module`; zero `CommandAst` whose `InvocationOperator` is `Dot`.
   - `It 'writes nothing to the success, host, information or warning streams'`: zero `CommandAst` named `Write-Output` (also `echo`, `write`), `Write-Host`, `Write-Warning`, or `Write-Information`.
   - Acceptance: the file parses with zero errors.
-- [ ] [P2-T3] Add the input-to-result row tests and the result-shape tests (AC-5 to AC-13) to `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
+- [x] [P2-T3] Add the input-to-result row tests and the result-shape tests (AC-5 to AC-13) to `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
   - One `It` per row via `-TestCases`, each calling `$results = @(Read-SubagentStopEnvelope -InputText $InputText)` directly in the `It` body (an exception fails the `It`, so a pass also proves no throw), and asserting `IsValid`, `Anomaly`, `Envelope` null or non-null, and `AssistantText`:
     - valid (AC-5): `{"hook_event_name":"SubagentStop","agent_type":"atomic-planner","stop_hook_active":true,"last_assistant_message":"plan-path: x"}` gives `IsValid` true, `Anomaly` null, `Envelope` not null, `AssistantText` `plan-path: x`, `StopHookActive` true, `AgentType` `atomic-planner`, `HookEventName` `SubagentStop`;
     - ISO-date string (AC-5): `{"last_assistant_message":"2026-10-11T12:00:00Z"}` gives `IsValid` true, `Anomaly` null, `Envelope` not null, `AssistantText` `2026-10-11T12:00:00Z` (asserted with `Should -BeOfType [string]` and `Should -BeExactly '2026-10-11T12:00:00Z'`);
@@ -177,43 +177,43 @@ All test code below lives in `tests/scripts/claude-hooks/subagentstop-envelope.T
     - Envelope expectation: null for EmptyPayload, UnparseableJson, NonObjectEnvelope; not null for every object root. `AssistantText` is the empty string for every invalid row.
   - Result-shape (AC-13): a second `-TestCases` `It` over the same inputs (including the ISO-date string row) asserting `$results.Count | Should -Be 1` and `@($results[0].PSObject.Properties.Name) | Should -Be $script:ExpectedProperties`.
   - Acceptance: the file parses with zero errors; the `-TestCases` arrays contain every input listed above.
-- [ ] [P2-T4] Add the derived-field tests (AC-14) to `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
+- [x] [P2-T4] Add the derived-field tests (AC-14) to `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
   - `-TestCases` over `stop_hook_active` values `true` (expect `$true`), `false`, absent, and the string `"true"` (each expect `$false`), all with a string `last_assistant_message`.
   - `-TestCases` over `agent_type` and `hook_event_name` present as strings (expect the value), absent (expect empty string), and non-string `5` (expect empty string).
   - Acceptance: the file parses with zero errors.
-- [ ] [P2-T5] Add the BOM and CRLF tests (AC-15) to `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
+- [x] [P2-T5] Add the BOM and CRLF tests (AC-15) to `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
   - `It 'accepts a BOM-prefixed valid envelope'`: input `"$([char]0xFEFF)" + '{"last_assistant_message":"bom"}'` gives `IsValid` true and `AssistantText` `bom`.
   - `It 'accepts a CRLF-formatted valid envelope'`: input built as `"{`r`n  ""last_assistant_message"": ""crlf""`r`n}"` gives `IsValid` true and `AssistantText` `crlf`.
   - Acceptance: the file parses with zero errors; `(Get-Content -Raw tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1).IndexOf([char]0xFEFF, 1)` returns -1 (no BOM character stored in the file body); the CRLF test's source line, quoted in the [P2-T9] artifact, contains the backtick-r escape rather than a literal carriage return.
-- [ ] [P2-T6] Add the stdin-default tests (AC-16) to `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
+- [x] [P2-T6] Add the stdin-default tests (AC-16) to `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
   - Each `It` saves `[Console]::In`, calls `[Console]::SetIn(...)` inside `try`, and restores the saved reader in `finally`.
   - `It 'reads the envelope from stdin when InputText is not bound'`: `SetIn([System.IO.StringReader]::new('{"last_assistant_message":"stdin"}'))`, then `Read-SubagentStopEnvelope` with no arguments gives `IsValid` true and `AssistantText` `stdin`.
   - `It 'treats a stdin read failure as EmptyPayload'`: create `$reader = [System.IO.StringReader]::new('x')`, call `$reader.Dispose()`, `SetIn($reader)`, then `Read-SubagentStopEnvelope` gives `Anomaly` `EmptyPayload` and does not throw.
   - `It 'prefers a bound empty InputText over non-empty stdin'`: `SetIn` a valid envelope, then `Read-SubagentStopEnvelope -InputText ''` gives `Anomaly` `EmptyPayload`.
   - Acceptance: the file parses with zero errors.
-- [ ] [P2-T7] Add the anomaly-reason tests (AC-17) to `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
+- [x] [P2-T7] Add the anomaly-reason tests (AC-17) to `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
   - `-TestCases` over the six codes `EmptyPayload`, `UnparseableJson`, `NonObjectEnvelope`, `MissingAssistantMessage`, `NullAssistantMessage`, `NonStringAssistantMessage`: the result is a non-empty string.
   - `It 'returns six pairwise distinct clauses'`: `@($script:AnomalyCodes | ForEach-Object { Get-SubagentStopEnvelopeAnomalyReason -Anomaly $_ } | Select-Object -Unique).Count | Should -Be 6`.
   - `-TestCases` over `'NotACode'`, `$null`, `''`, and `'emptypayload'`: `{ Get-SubagentStopEnvelopeAnomalyReason -Anomaly $Code } | Should -Throw -ExceptionType ([System.ArgumentException])`.
   - Acceptance: the file parses with zero errors.
-- [ ] [P2-T8] Add the exit-block tests (AC-18, AC-19) as the last `Context` in `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
+- [x] [P2-T8] Add the exit-block tests (AC-18, AC-19) as the last `Context` in `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
   - `It 'blocks through the & route with stderr and exit code 2'` (first in the context): same mechanics as the [P1-T3] probe's first `It`, using `$script:FixturePath` and the message `SUBAGENTSTOP_TEST_BLOCK: missing plan-path token`; asserts `$code` is 2, stderr equals the message plus `[Environment]::NewLine`, and the captured success output count is 0; `finally` restores `[Console]::Error` and sets `$global:LASTEXITCODE = 0`.
   - `It 'rejects an empty or null Message at parameter binding without exiting'` (after the `&`-route `It`, so its execution also shows the runner continued): `{ Exit-SubagentStopBlock -Message '' } | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException])` and the same for `-Message $null`.
   - Acceptance: the file parses with zero errors.
-- [ ] [P2-T9] [expect-fail] Run the helper suite before the remaining implementation and record `docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/p2-helper-suite-fail-before.md`.
+- [x] [P2-T9] [expect-fail] Run the helper suite before the remaining implementation and record `docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/p2-helper-suite-fail-before.md`.
   - R-TARGETED over `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`. Record `ExpectedExitCode: 1`.
   - Acceptance: `failed` is at least 1; every `FAILED:` test is either the AC-1 surface test (whose message reports a null `Get-Command` result) or belongs to the AC-5 to AC-17 groups, and each failure message outside the surface test names `Read-SubagentStopEnvelope` or `Get-SubagentStopEnvelopeAnomalyReason` as not recognized or, for the [P2-T7] `Should -Throw -ExceptionType ([System.ArgumentException])` cases, reports that the exception type was `[System.Management.Automation.CommandNotFoundException]`; the AC-4 source-constraint tests and both AC-18/AC-19 exit-block tests pass. The artifact also records `(Get-Content tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1).Count` and the [P2-T5] BOM check and quoted CRLF source line.
-- [ ] [P2-T10] Add the settings regression tests (AC-20, AC-21) to `tests/scripts/claude-runtime/claude-settings.Tests.ps1`.
+- [x] [P2-T10] Add the settings regression tests (AC-20, AC-21) to `tests/scripts/claude-runtime/claude-settings.Tests.ps1`.
   - Inside the existing `Describe "claude-settings"`, add `$script:SettingsCopies` (canonical `.claude/settings.json` and bundled `extensions/drm-copilot/resources/claude-customizations/.claude/settings.json`, each parsed with `ConvertFrom-Json`) and `$script:BroadSubagentStopMatcher` set to the exact fifteen-agent string from `spec.md` AC-20, in the existing `BeforeAll`. Do not change any existing `It`.
   - `It "removes every SubagentStop command that reads CLAUDE_HOOK_INPUT from both settings copies"`: for each copy, no `hooks.SubagentStop[*].hooks[*].command` contains the literal `CLAUDE_HOOK_INPUT` (use `-cmatch [regex]::Escape(...)` or `.Contains`).
   - `It "keeps no SubagentStop command that ends with exit 1 in either settings copy"`: no such command's trimmed text matches `'exit\s+1\W*$'`.
   - `It "retains the fifteen-agent SubagentStop group with only the discovery-artifact gate in both settings copies"`: exactly one `SubagentStop` entry has `matcher -ceq $script:BroadSubagentStopMatcher`, and `@($entry.hooks.command)` equals exactly `@('pwsh -NoProfile -File .claude/hooks/validate-discovery-artifact-gate.ps1')`.
   - `It "registers no hook command that references subagentstop-envelope.ps1 in either settings copy"`: across every event under `hooks`, no command contains `subagentstop-envelope.ps1`.
   - Acceptance: the file parses with zero errors and `(Get-Content tests/scripts/claude-runtime/claude-settings.Tests.ps1).Count` is at most 500 (recorded in the [P2-T11] artifact).
-- [ ] [P2-T11] [expect-fail] Run the settings suite before the settings edit and record `docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/p2-claude-settings-fail-before.md`.
+- [x] [P2-T11] [expect-fail] Run the settings suite before the settings edit and record `docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/p2-claude-settings-fail-before.md`.
   - R-TARGETED over `tests/scripts/claude-runtime/claude-settings.Tests.ps1`. Record `ExpectedExitCode: 1`.
   - Acceptance: exactly two `FAILED:` lines, naming the `CLAUDE_HOOK_INPUT` test and the group-retention test; every pre-existing `It` in the file passes, as do the `exit 1` test and the `subagentstop-envelope.ps1` reference test.
-- [ ] [P2-T12] Commit and push the Phase 2 tests `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1` and `tests/scripts/claude-runtime/claude-settings.Tests.ps1`.
+- [x] [P2-T12] Commit and push the Phase 2 tests `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1` and `tests/scripts/claude-runtime/claude-settings.Tests.ps1`.
   - `git add tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1 tests/scripts/claude-runtime/claude-settings.Tests.ps1 docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/ docs/features/active/subagentstop-envelope-core-897/plan.2026-10-11T07-59.md`
   - Subject: `test(897): add SubagentStop envelope helper and settings regression tests`; second paragraph `Refs #897`; final paragraph `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`; then `git push -u origin bug/subagentstop-envelope-core-exec-897`.
   - Acceptance: the push exits 0 and `git status --porcelain` prints nothing.
