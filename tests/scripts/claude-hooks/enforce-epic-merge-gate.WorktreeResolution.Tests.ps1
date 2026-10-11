@@ -236,14 +236,14 @@ Describe 'epic merge gate run-target resolution' {
     It 'M10 denies naming WorktreeRunResolution.psm1 when the import failed, and the entry point exits 0' {
         # Arrange
         $payload = ConvertTo-MergePayload -Command 'gh pr merge --merge 812'
-        $script:EpicMergeGateResolutionImportFailure = 'WorktreeRunResolution.psm1'
+        Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1'
         try {
             # Act
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $payload
             $output = @(Invoke-EpicMergeGateEntryPoint -ToolInputRaw $payload)
         }
         finally {
-            $script:EpicMergeGateResolutionImportFailure = $null
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
         }
 
         # Assert

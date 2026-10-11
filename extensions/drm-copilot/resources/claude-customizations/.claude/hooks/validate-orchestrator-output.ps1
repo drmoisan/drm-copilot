@@ -44,37 +44,20 @@ param(
     [Parameter(Mandatory = $false)]
     [string] $ArtifactType = 'orchestrator-state'
 )
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 Set-StrictMode -Version Latest
+
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
+
+try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-resolution.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-resolution.ps1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateEpicWaveBarrier.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateCompletion.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateCompletion.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
 $ErrorActionPreference = 'Stop'
-
-Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force
-
-# Import guards (issues #787, #840). The first failure among the sibling and the two
-# resolver modules is recorded; the Layer 2 module is recorded separately.
-$script:OrchestratorOutputResolverImportFailure = $null
-$script:OrchestratorOutputWaveBarrierImportFailure = $null
-try {
-    . (Join-Path $PSScriptRoot 'validate-orchestrator-output-resolution.ps1')
-}
-catch {
-    $script:OrchestratorOutputResolverImportFailure = 'validate-orchestrator-output-resolution.ps1'
-}
-foreach ($resolverModule in @('WorktreeItemResolution.psm1', 'WorktreeRunResolution.psm1')) {
-    if ($script:OrchestratorOutputResolverImportFailure) { break }
-    try {
-        Import-Module (Join-Path $PSScriptRoot "../lib/worktree-resolution/$resolverModule") -Force -ErrorAction Stop
-    }
-    catch {
-        $script:OrchestratorOutputResolverImportFailure = $resolverModule
-    }
-}
-try {
-    Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1') -Force -ErrorAction Stop
-}
-catch {
-    $script:OrchestratorOutputWaveBarrierImportFailure = 'OrchestratorStateEpicWaveBarrier.psm1'
-}
 
 function Get-CheckpointFileContent {
     <#
@@ -361,6 +344,8 @@ function Invoke-OrchestratorOutputValidation {
         [Parameter(Mandatory = $false)]
         [scriptblock] $RoutingInvoker
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if ([string]::IsNullOrWhiteSpace($RawPayload)) {
         return @{ Ok = $false; Message = 'orchestrator hook: CLAUDE_HOOK_INPUT is empty; cannot validate orchestrator output.' }
@@ -382,10 +367,6 @@ function Invoke-OrchestratorOutputValidation {
 
     # Resolve the run checkpoint before any read (issue #787). A failed import, or an
     # unresolved, ambiguous, or mismatched target, blocks here, so nothing is read.
-    if ($script:OrchestratorOutputResolverImportFailure) {
-        return @{ Ok = $false; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: NoTarget (RESOLVER_IMPORT_FAILED): {1} failed to import; no checkpoint was read.' -f
-                $ArtifactType, $script:OrchestratorOutputResolverImportFailure) }
-    }
     $resolution = Resolve-OrchestratorOutputCheckpointPath -ArtifactType $ArtifactType -CheckpointPath $CheckpointPath -AgentOutput ([string]$agentOutput) -SessionRoot $SessionRoot
     if (-not $resolution.Resolved) {
         return @{ Ok = $false; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: {1} ({2}): {3}' -f
@@ -472,6 +453,9 @@ function Invoke-OrchestratorOutputValidation {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
+if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
 $result = Invoke-OrchestratorOutputValidation -RawPayload $env:CLAUDE_HOOK_INPUT -CheckpointPath $CheckpointPath -ArtifactType $ArtifactType
 if (-not $result.Ok) {

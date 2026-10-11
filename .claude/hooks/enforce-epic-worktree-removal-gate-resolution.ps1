@@ -7,8 +7,8 @@
     dot-sources. Holds:
 
     - The import guard for WorktreeRunResolution.psm1. A failed import is recorded in
-      $script:EpicWorktreeGateResolutionImportFailure, and
-      Get-EpicWorktreeGateImportFailureDecision turns it into a deny, so a missing module
+      $script:HookDependencyFailures, and the gate's call to
+      Get-HookDependencyFailureDecision turns it into a deny, so a missing module
       cannot make the gate exit non-zero and fail open.
     - The two checkpoint read seams, relocated from the gate file with their names kept.
       Each takes a mandatory absolute path composed beneath a resolved worktree root.
@@ -29,33 +29,7 @@
     extensions/drm-copilot/resources/claude-customizations/.
 #>
 
-# Import guard (issue #690): a failed import denies instead of failing open.
-$script:EpicWorktreeGateResolutionImportFailure = $null
-try {
-    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop
-}
-catch {
-    $script:EpicWorktreeGateResolutionImportFailure = 'WorktreeRunResolution.psm1'
-}
-
-function Get-EpicWorktreeGateImportFailureDecision {
-    <#
-    .SYNOPSIS
-        Returns the deny for a failed worktree-resolution import, or $null.
-    .OUTPUTS
-        System.Collections.Specialized.OrderedDictionary, or $null when the import succeeded.
-    #>
-    [CmdletBinding()]
-    [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param()
-
-    if (-not $script:EpicWorktreeGateResolutionImportFailure) {
-        return $null
-    }
-    return Get-EpicWorktreeGateBlockDecision -Reason (
-        "EPIC_WORKTREE_REMOVAL_BLOCKED: the worktree-resolution module '$($script:EpicWorktreeGateResolutionImportFailure)' " +
-        'failed to import, so the run checkpoint that governs this removal cannot be located; the gate fails closed.')
-}
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 
 function Get-EpicWorktreeGateCheckpointContent {
     <#

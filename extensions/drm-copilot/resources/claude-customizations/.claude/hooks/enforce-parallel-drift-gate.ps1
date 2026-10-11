@@ -68,21 +68,14 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 
-# Import guard (issue #690): a failed import denies instead of failing open. The item
-# module supplies Find-WorktreeItemIssueSignal, which the run module does not re-export.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 $script:ParallelDriftGateResolutionImportFailure = $null
-foreach ($resolutionModule in @('WorktreeItemResolution.psm1', 'WorktreeRunResolution.psm1')) {
-    try {
-        Import-Module (Join-Path $PSScriptRoot "../lib/worktree-resolution/$resolutionModule") -Force -ErrorAction Stop
-    }
-    catch {
-        if (-not $script:ParallelDriftGateResolutionImportFailure) { $script:ParallelDriftGateResolutionImportFailure = $resolutionModule }
-    }
-}
 
 # Shared feature-folder resolution (issue #565). Guarded so a failed dot-source denies
 # rather than failing open; an earlier recorded failure is kept.
@@ -95,8 +88,7 @@ catch {
 
 # Dot-source the shape-and-derivation helpers. Guarded so a missing file produces a clear error
 # and so dot-sourcing this hook in tests loads the helpers too.
-$script:ParallelDriftGateHelpersPath = Join-Path $PSScriptRoot 'enforce-parallel-drift-gate-helpers.ps1'
-. $script:ParallelDriftGateHelpersPath
+try { . (Join-Path $PSScriptRoot 'enforce-parallel-drift-gate-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-parallel-drift-gate-helpers.ps1' -ErrorRecord $_ }
 
 $script:ParallelModeMarker = 'Parallel mode: true'
 $script:ReviewSubagentType = 'feature-review'
@@ -317,8 +309,10 @@ function Invoke-ParallelDriftGateDecision {
         [AllowEmptyString()]
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PARALLEL_DRIFT_GATE_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
-    # A failed dependency import denies before any other logic (issues #690 and #565).
+    # A failed dependency import denies before any other logic (issue #565).
     if ($script:ParallelDriftGateResolutionImportFailure) {
         return Get-ParallelDriftGateBlockDecision -Reason (
             "PARALLEL_DRIFT_GATE_BLOCKED: the dependency '$($script:ParallelDriftGateResolutionImportFailure)' " +
@@ -450,5 +444,8 @@ function Invoke-ParallelDriftGateEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PARALLEL_DRIFT_GATE_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PARALLEL_DRIFT_GATE_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 exit (Invoke-ParallelDriftGateEntryPoint)

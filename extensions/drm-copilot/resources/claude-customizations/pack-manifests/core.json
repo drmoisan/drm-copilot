@@ -62,6 +62,7 @@
     ".claude/hooks/hook-command-payload.ps1",
     ".claude/hooks/hook-command-payload-powershell.ps1",
     ".claude/hooks/hook-command-scanner.ps1",
+    ".claude/hooks/hook-dependency-guard.ps1",
     ".claude/hooks/persist-session-id.ps1",
     ".claude/hooks/validate-bash.ps1",
     ".claude/hooks/validate-discovery-artifact-gate.ps1",

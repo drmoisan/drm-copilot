@@ -35,6 +35,7 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 $ErrorActionPreference = 'Stop'
 
@@ -337,6 +338,8 @@ function Invoke-FeatureReviewCoverageValidation {
     param(
         [string] $RawPayload
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-feature-review-coverage:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if ([string]::IsNullOrWhiteSpace($RawPayload)) {
         return @{ Ok = $false; Message = 'feature-review hook: CLAUDE_HOOK_INPUT is empty; cannot validate review output.' }
@@ -449,6 +452,9 @@ function Invoke-FeatureReviewCoverageValidation {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-feature-review-coverage: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-feature-review-coverage:'
+if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
 $result = Invoke-FeatureReviewCoverageValidation -RawPayload $env:CLAUDE_HOOK_INPUT
 if (-not $result.Ok) {

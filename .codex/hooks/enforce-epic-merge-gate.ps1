@@ -4,12 +4,13 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 # Shared command-line parser (issue #545). The scope filter and the PR-number resolver below
 # both run against the segment that structurally invokes `gh pr merge`, which is what keeps
 # the two runtimes on one implementation of the same concern.
-. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
-. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 
 # Reason codes for the standalone-merge authorization branch (issue #670), spelled
 # byte-identically to the Claude helpers file. Each of the four assignments below is the only
@@ -127,6 +128,8 @@ function Invoke-CodexEpicMergeDecision {
         [AllowNull()][AllowEmptyString()][string] $ChildCheckpointRaw,
         [AllowNull()][AllowEmptyString()][string] $EpicCheckpointRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_MERGE_GATE_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = ConvertFrom-CodexMergeJson -Raw $PayloadRaw -Name 'PreToolUse input'
     if ([string]$payload.tool_name -ne 'Bash') {
@@ -360,6 +363,9 @@ function Test-CodexStandaloneMergeAuthorization {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_MERGE_GATE_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_MERGE_GATE_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     $payloadRaw = [Console]::In.ReadToEnd()

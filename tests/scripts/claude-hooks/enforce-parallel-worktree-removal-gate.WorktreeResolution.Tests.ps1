@@ -160,14 +160,14 @@ Describe 'parallel worktree-removal gate run-target resolution' {
     It 'Y6 denies naming WorktreeRunResolution.psm1 when the import failed, and the entry point exits 0' {
         # Arrange
         $payload = ConvertTo-RemovalPayload -Command $script:Command
-        $script:ParallelWorktreeGateResolutionImportFailure = 'WorktreeRunResolution.psm1'
+        Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1'
         try {
             # Act
             $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw $payload
             $output = @(Invoke-ParallelWorktreeRemovalGateEntryPoint -ToolInputRaw $payload)
         }
         finally {
-            $script:ParallelWorktreeGateResolutionImportFailure = $null
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
         }
 
         # Assert

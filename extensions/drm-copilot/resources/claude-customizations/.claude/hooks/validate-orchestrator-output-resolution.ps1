@@ -291,11 +291,6 @@ function Get-OrchestratorOutputWaveBarrierDecision {
         [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $CheckpointText
     )
 
-    if ($script:OrchestratorOutputWaveBarrierImportFailure) {
-        return @{ Ok = $false; Message = ('{0} {1} failed to import; the wave-barrier ordering check did not run.' -f
-                $script:OrchestratorOutputUnevaluableToken, $script:OrchestratorOutputWaveBarrierImportFailure) }
-    }
-
     $lines = [System.Collections.Generic.List[string]]::new()
     try {
         foreach ($line in (Get-OrchestratorStateEpicWaveBarrierError -CheckpointText $CheckpointText)) { $lines.Add([string]$line) }

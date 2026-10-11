@@ -45,13 +45,14 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 # Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
 # mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
-. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
 
 # Shared route helpers; this file is byte-identical to the Claude runtime copy.
-. (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-batch-budget-route.ps1' -ErrorRecord $_ }
 
 function Get-PowerShellBatchBudgetState {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TestCap', Justification = 'Accepted and ignored for callers written against the removed test-file cap.')]
@@ -134,6 +135,8 @@ function Invoke-PowerShellBatchBudgetDecision {
         [AllowEmptyString()]
         [string] $ObservedRoute = ''
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'POWERSHELL_LARGE_PATH_REQUIRED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $normalized = $FilePath -replace '\\', '/'
     if ($normalized -notmatch '\.(ps1|psm1|psd1)$') {
@@ -330,6 +333,9 @@ function Invoke-PowerShellBatchBudgetCodexEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('POWERSHELL_LARGE_PATH_REQUIRED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'POWERSHELL_LARGE_PATH_REQUIRED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 # The entry point returns its [int] exit code as the last pipeline element and any
 # deny JSON before it, so the JSON is written explicitly before the process exits.

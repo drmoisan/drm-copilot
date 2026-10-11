@@ -46,13 +46,13 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Dot-source the shared validation helpers. Guarded so a missing file produces a
 # clear error and so dot-sourcing this hook in tests loads the helpers too.
-$script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1'
-. $script:CompletionHelpersPath
+try { . (Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-completion-helpers.ps1' -ErrorRecord $_ }
 
 function ConvertFrom-CheckpointJson {
     <#
@@ -376,6 +376,8 @@ function Invoke-CompletionConsistencyDecision {
         [Parameter(Mandatory = $false)]
         [scriptblock] $RoutingMatrixReader
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'COMPLETION_CONSISTENCY_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $envelope.IsValid) {
@@ -457,6 +459,9 @@ function Invoke-CompletionConsistencyDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('COMPLETION_CONSISTENCY_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'COMPLETION_CONSISTENCY_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 

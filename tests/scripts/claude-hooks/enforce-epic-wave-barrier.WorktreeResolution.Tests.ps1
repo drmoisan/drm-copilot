@@ -181,7 +181,7 @@ Describe 'epic wave barrier target resolution' {
             $output = @(Invoke-EpicWaveBarrierEntryPoint -ToolInputRaw $payload)
         }
         finally {
-            $script:EpicWaveBarrierResolutionImportFailure = $null
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
         }
 
         # Assert

@@ -27,7 +27,7 @@
 # Issue #669 owns path normalisation and the ambiguity reason code. The import is
 # unguarded for the same reason the parent's is: a resolution module that cannot be
 # loaded is itself the target-not-resolvable state.
-Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeResolution.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeResolution.psm1') -Force -ErrorAction Stop
 
 # Shared work-mode parser (issue #565). Guarded so a failed dot-source fails closed
 # through the planner gate's deny-on-unknown branch.

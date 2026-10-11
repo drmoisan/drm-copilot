@@ -156,7 +156,7 @@ Describe 'parallel drift gate target resolution' {
             $output = @(Invoke-ParallelDriftGateEntryPoint -ToolInputRaw $payload)
         }
         finally {
-            $script:ParallelDriftGateResolutionImportFailure = $null
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
         }
 
         # Assert

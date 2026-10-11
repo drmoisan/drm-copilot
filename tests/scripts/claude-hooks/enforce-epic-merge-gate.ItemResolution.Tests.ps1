@@ -221,13 +221,13 @@ Describe 'epic merge gate item-worktree resolution' {
     It 'denies naming WorktreeItemResolution.psm1 when its import failed' {
         # Arrange
         $payload = ConvertTo-MergePayload -Command 'gh pr merge --merge 812'
-        $script:EpicMergeGateResolutionImportFailure = 'WorktreeItemResolution.psm1'
+        Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1'
         try {
             # Act
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $payload
         }
         finally {
-            $script:EpicMergeGateResolutionImportFailure = $null
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
         }
 
         # Assert

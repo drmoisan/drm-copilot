@@ -67,18 +67,19 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Sanctioned-removal manifest reader (issue #635), consumed by the manifest branch in
 # Invoke-EpicWorktreeRemovalGateDecision.
-Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'CleanupWorktreeManifest.psm1' -ErrorRecord $_ }
 # Shared command-line parser (issue #545), consumed by the scope filter in
 # Invoke-EpicWorktreeRemovalGateDecision and by Resolve-CommandLineInvocationTarget.
-. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
-. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 # Checkpoint read seams, the import guard, and run-target resolution (issue #690).
-. (Join-Path $PSScriptRoot 'enforce-epic-worktree-removal-gate-resolution.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-epic-worktree-removal-gate-resolution.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-worktree-removal-gate-resolution.ps1' -ErrorRecord $_ }
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
 # Sanctioned-removal manifest location. Recorded here so every hook-read document this
 # gate consults is named; the module owns the read itself.
@@ -294,10 +295,8 @@ function Invoke-EpicWorktreeRemovalGateDecision {
     )
 
     # A failed worktree-resolution import denies before any other logic (issue #690).
-    $importFailure = Get-EpicWorktreeGateImportFailureDecision
-    if ($null -ne $importFailure) {
-        return $importFailure
-    }
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WORKTREE_REMOVAL_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $payload.IsValid) {
@@ -447,6 +446,9 @@ function Invoke-EpicWorktreeRemovalGateEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_WORKTREE_REMOVAL_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WORKTREE_REMOVAL_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 # The entry point returns its [int] exit code as the last pipeline element and the
 # decision JSON before it. `exit (<call>)` would capture BOTH into the exit
