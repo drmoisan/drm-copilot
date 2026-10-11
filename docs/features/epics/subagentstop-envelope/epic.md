@@ -34,10 +34,19 @@ features:
 
 Epic issue: #904.
 
-> **Manifest status.** Draft written 2026-10-11 before preparation. The `feature_folder` values are
-> hints and are back-filled from each prepared child's active folder at fan-in. `depends_on` uses
-> folder hints rather than issue numbers because E1 and E3 are both keyed to #897; the
+> **Manifest status.** Resolved on 2026-10-11 after all four children were prepared and fanned in.
+> Each `feature_folder` value is the prepared child's active folder basename. `depends_on` uses
+> folder basenames rather than issue numbers because E1 and E3 are both keyed to #897; the
 > uniqueness of that key is an open decision recorded under Open Decisions.
+>
+> **Authoritative helper contract.** E1's `spec.md`
+> (`docs/features/active/subagentstop-envelope-core-897/spec.md`, section
+> `Authoritative Helper Contract`) supersedes the Shared Design below. It keeps the file path and
+> the two function names, adds `Get-SubagentStopEnvelopeAnomalyReason`, returns a structured result
+> (`IsValid`, `Anomaly`, `Envelope`, `AssistantText`, `StopHookActive`, `AgentType`,
+> `HookEventName`), takes `-InputText` as the test seam, and parses with `-DateKind String`. E2,
+> E3 and E4 plans are pinned to that spec version. E1 deletes the inline SubagentStop command at
+> `.claude/settings.json:218` instead of converting it.
 
 ## Goal
 
