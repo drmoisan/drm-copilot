@@ -6,7 +6,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - Integration branch: `epic/subagentstop-envelope-integration`
 - Current wave: 0
 - Next step: `E3_await_wave0_merge (897)`
-- Last updated: 2026-10-11T16:26:00Z
+- Last updated: 2026-10-11T18:20:00Z
 
 ## Waves
 
@@ -19,7 +19,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 
 | feature_folder | issue_num | wave_number | merge_status | pr | merge_commit_sha | worktree_created_at | pr_opened_at | merge_confirmed_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| subagentstop-envelope-core-897 | 897 | 0 | worktree_created | - | - | 2026-10-11T16:26:00Z | - | - | - |
+| subagentstop-envelope-core-897 | 897 | 0 | pr_open | [#906](https://github.com/drmoisan/drm-copilot/pull/906) | - | 2026-10-11T16:26:00Z | 2026-10-11T18:18:17Z | - | - |
 | subagentstop-envelope-artifact-gates-905 | 905 | 1 | not_started | - | - | - | - | - | - |
 | subagentstop-envelope-feature-review-coverage-896 | 896 | 1 | not_started | - | - | - | - | - | - |
 | subagentstop-envelope-orchestrator-family-903 | 903 | 1 | not_started | - | - | - | - | - | - |
