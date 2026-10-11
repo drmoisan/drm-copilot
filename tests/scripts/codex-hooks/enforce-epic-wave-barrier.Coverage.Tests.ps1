@@ -43,11 +43,11 @@ Describe 'Codex enforce-epic-wave-barrier coverage (issue #786)' {
             param([string] $IssueNum, [string] $Folder)
             $prior = @{ R = $env:CODEX_EPIC_CHILD_LAUNCH_RECEIPT; C = $env:CODEX_EPIC_CHILD_EXECUTION_CONTEXT; L = $env:CODEX_EPIC_CHILD_LAUNCH_ID }
             # Locals, not script variables: the mocks run inside the hook, whose script scope hides this file's.
-            $launchReceiptText = '{"issue_num":"' + $IssueNum + '","feature_folder":"' + $Folder + '","checkpoint_path":"C:/epic-786.json"}'
+            $launchReceiptText = '{"issue_num":"' + $IssueNum + '","feature_folder":"' + $Folder + '","checkpoint_path":"/synthetic-root/epic-786.json"}'
             $epicText = $script:Epic
             Write-Verbose -Message "launch receipt $launchReceiptText and epic checkpoint $epicText are read by the mocks"
             try {
-                $env:CODEX_EPIC_CHILD_LAUNCH_RECEIPT = 'C:/receipts/r-786.json'
+                $env:CODEX_EPIC_CHILD_LAUNCH_RECEIPT = '/synthetic-root/receipts/r-786.json'
                 $env:CODEX_EPIC_CHILD_EXECUTION_CONTEXT = 'epic_execution_child'
                 $env:CODEX_EPIC_CHILD_LAUNCH_ID = 'l-786'
                 return Invoke-WaveEntry -Stdin '{"tool_name":"Write","tool_input":{"file_path":"a.txt"}}'
@@ -122,14 +122,14 @@ Describe 'Codex enforce-epic-wave-barrier coverage (issue #786)' {
 
         It 'denies an execution child without launch authority' {
             Mock Test-CodexEpicChildRoutingLaunchAuthority { $false }
-            (Invoke-CodexEpicWaveDecision -PayloadRaw $script:Write -LocalCheckpointRaw '' -EpicCheckpointRaw '' -LauncherEnvironment ([pscustomobject]@{ launch_id = 'l'; execution_context = 'epic_execution_child' }) -RepositoryRoot 'C:\repo').hookSpecificOutput.permissionDecisionReason | Should -Match 'no valid session-bound launcher receipt'
+            (Invoke-CodexEpicWaveDecision -PayloadRaw $script:Write -LocalCheckpointRaw '' -EpicCheckpointRaw '' -LauncherEnvironment ([pscustomobject]@{ launch_id = 'l'; execution_context = 'epic_execution_child' }) -RepositoryRoot '/synthetic-root/repo').hookSpecificOutput.permissionDecisionReason | Should -Match 'no valid session-bound launcher receipt'
         }
 
         It 'allows a ready launch feature and denies an unready one' {
             Mock Test-CodexEpicChildRoutingLaunchAuthority { $true }
             $environment = [pscustomobject]@{ launch_id = 'l'; execution_context = 'epic_execution_child' }
-            Invoke-CodexEpicWaveDecision -PayloadRaw $script:Write -LocalCheckpointRaw '' -EpicCheckpointRaw $script:Epic -LauncherReceiptRaw '{"issue_num":"2","feature_folder":"docs/features/active/two"}' -LauncherEnvironment $environment -RepositoryRoot 'C:\repo' | Should -BeNullOrEmpty
-            (Invoke-CodexEpicWaveDecision -PayloadRaw $script:Write -LocalCheckpointRaw '' -EpicCheckpointRaw $script:Epic -LauncherReceiptRaw '{"issue_num":"3","feature_folder":"docs/features/active/three"}' -LauncherEnvironment $environment -RepositoryRoot 'C:\repo').hookSpecificOutput.permissionDecisionReason | Should -Match 'receipt-bound epic checkpoint'
+            Invoke-CodexEpicWaveDecision -PayloadRaw $script:Write -LocalCheckpointRaw '' -EpicCheckpointRaw $script:Epic -LauncherReceiptRaw '{"issue_num":"2","feature_folder":"docs/features/active/two"}' -LauncherEnvironment $environment -RepositoryRoot '/synthetic-root/repo' | Should -BeNullOrEmpty
+            (Invoke-CodexEpicWaveDecision -PayloadRaw $script:Write -LocalCheckpointRaw '' -EpicCheckpointRaw $script:Epic -LauncherReceiptRaw '{"issue_num":"3","feature_folder":"docs/features/active/three"}' -LauncherEnvironment $environment -RepositoryRoot '/synthetic-root/repo').hookSpecificOutput.permissionDecisionReason | Should -Match 'receipt-bound epic checkpoint'
         }
 
         It 'judges a local child by its checkpoint and its epic dependencies' {
@@ -142,7 +142,7 @@ Describe 'Codex enforce-epic-wave-barrier coverage (issue #786)' {
 
     Context 'entry point' {
         BeforeEach {
-            Mock Get-CodexPrimaryWorktreeRoot { 'C:/primary' }
+            Mock Get-CodexPrimaryWorktreeRoot { '/synthetic-root/primary' }
         }
 
         It 'exits 0 for a non-mutating tool with no local or launcher state' {

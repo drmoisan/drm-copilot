@@ -75,21 +75,21 @@ Describe 'Codex validate-codex-subagent-routing coverage (issue #786)' {
     Context 'Find-CodexStopAttestationRaw' {
         It 'returns nothing when the state root is absent' {
             Mock Test-Path { $false }
-            Find-CodexStopAttestationRaw -StateRoot 'C:\state' -AgentId 'a' | Should -Be ''
+            Find-CodexStopAttestationRaw -StateRoot '/synthetic-root/state' -AgentId 'a' | Should -Be ''
         }
 
         It 'returns the attestation whose agent id matches and skips unreadable files' {
             Mock Test-Path { $true }
-            Mock Get-ChildItem { @([pscustomobject]@{ FullName = 'C:\state\bad.json' }, [pscustomobject]@{ FullName = 'C:\state\other.json' }, [pscustomobject]@{ FullName = 'C:\state\good.json' }) }
+            Mock Get-ChildItem { @([pscustomobject]@{ FullName = '/synthetic-root/state/bad.json' }, [pscustomobject]@{ FullName = '/synthetic-root/state/other.json' }, [pscustomobject]@{ FullName = '/synthetic-root/state/good.json' }) }
             Mock Get-Content { param($LiteralPath) switch -Wildcard ([string]$LiteralPath) { '*bad.json' { '{bad' } '*other.json' { '{"agent_id":"z"}' } default { '{"agent_id":"a"}' } } }
-            Find-CodexStopAttestationRaw -StateRoot 'C:\state' -AgentId 'a' | Should -Be '{"agent_id":"a"}'
+            Find-CodexStopAttestationRaw -StateRoot '/synthetic-root/state' -AgentId 'a' | Should -Be '{"agent_id":"a"}'
         }
 
         It 'returns nothing when no attestation matches' {
             Mock Test-Path { $true }
-            Mock Get-ChildItem { @([pscustomobject]@{ FullName = 'C:\state\other.json' }) }
+            Mock Get-ChildItem { @([pscustomobject]@{ FullName = '/synthetic-root/state/other.json' }) }
             Mock Get-Content { '{"agent_id":"z"}' }
-            Find-CodexStopAttestationRaw -StateRoot 'C:\state' -AgentId 'a' | Should -Be ''
+            Find-CodexStopAttestationRaw -StateRoot '/synthetic-root/state' -AgentId 'a' | Should -Be ''
         }
     }
 

@@ -55,31 +55,31 @@ Describe 'Codex enforce-codex-model-routing coverage (issue #786)' {
         }
 
         It 'derives a 64-character lowercase attestation key' {
-            Get-CodexModelGateAttestationKey -TranscriptPath 'C:\t.jsonl' | Should -Match '^[0-9a-f]{64}$'
+            Get-CodexModelGateAttestationKey -TranscriptPath '/synthetic-root/t.jsonl' | Should -Match '^[0-9a-f]{64}$'
         }
 
         It 'rejects an attestation missing <Case>' -ForEach @(
             @{ Case = 'a required field'; Override = @{ profile_name = '' } },
             @{ Case = 'a well-formed profile hash'; Override = @{ profile_sha256 = 'xyz' } }
         ) {
-            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (Get-SampleAttestation -Override $Override) -RepositoryRoot 'C:\repo' | Should -BeFalse
+            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (Get-SampleAttestation -Override $Override) -RepositoryRoot '/synthetic-root/repo' | Should -BeFalse
         }
 
         It 'rejects an attestation whose agent profile cannot be read' {
             Mock Get-CodexAgentProfileAttestation { throw 'simulated profile read failure' }
-            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (Get-SampleAttestation) -RepositoryRoot 'C:\repo' | Should -BeFalse
+            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (Get-SampleAttestation) -RepositoryRoot '/synthetic-root/repo' | Should -BeFalse
         }
 
         It 'rejects an attestation whose profile binding does not hold' {
             Mock Get-CodexAgentProfileAttestation { [pscustomobject]@{ profile_name = 'p'; profile_model = 'm'; profile_reasoning_effort = 'high' } }
             Mock Test-CodexAgentProfileBinding { $false }
-            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (Get-SampleAttestation) -RepositoryRoot 'C:\repo' | Should -BeFalse
+            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (Get-SampleAttestation) -RepositoryRoot '/synthetic-root/repo' | Should -BeFalse
         }
 
         It 'accepts an attestation whose profile and payload agree' {
             Mock Get-CodexAgentProfileAttestation { [pscustomobject]@{ profile_name = 'p'; profile_model = 'm'; profile_reasoning_effort = 'high' } }
             Mock Test-CodexAgentProfileBinding { $true }
-            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (Get-SampleAttestation) -RepositoryRoot 'C:\repo' | Should -BeTrue
+            Test-CodexModelGateProfileAttestation -Payload ([pscustomobject]@{ model = 'm' }) -Attestation (Get-SampleAttestation) -RepositoryRoot '/synthetic-root/repo' | Should -BeTrue
         }
 
         It 'allows a valid attestation and denies a routed agent without one' {
@@ -106,13 +106,13 @@ Describe 'Codex enforce-codex-model-routing coverage (issue #786)' {
         It 'reads the transcript-keyed attestation and denies profile drift' {
             Mock Test-Path { $true } -ParameterFilter { ([string]$LiteralPath) -like '*codex-routing-attestation.*' }
             Mock Get-Content { '{"schema_version":1,"agent_type":"atomic-executor"}' } -ParameterFilter { ([string]$LiteralPath) -like '*codex-routing-attestation.*' }
-            $result = Invoke-ModelRoutingEntry -Stdin '{"session_id":"s-786","transcript_path":"C:\\t.jsonl","agent_type":"atomic-executor","model":"m"}'
+            $result = Invoke-ModelRoutingEntry -Stdin '{"session_id":"s-786","transcript_path":"/synthetic-root/t.jsonl","agent_type":"atomic-executor","model":"m"}'
             $result.ExitCode | Should -Be 0
             ($result.Stdout | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
 
         It 'falls back to the agent-id attestation scan' {
-            Mock Get-ChildItem { @([pscustomobject]@{ FullName = 'C:\state\bad.json' }, [pscustomobject]@{ FullName = 'C:\state\good.json' }) }
+            Mock Get-ChildItem { @([pscustomobject]@{ FullName = '/synthetic-root/state/bad.json' }, [pscustomobject]@{ FullName = '/synthetic-root/state/good.json' }) }
             Mock Get-Content { param($LiteralPath) if (([string]$LiteralPath).EndsWith('bad.json')) { '{bad' } else { '{"agent_id":"a-786","schema_version":1}' } }
             $result = Invoke-ModelRoutingEntry -Stdin '{"session_id":"s-786","agent_id":"a-786","agent_type":"atomic-executor","model":"m"}'
             $result.ExitCode | Should -Be 0

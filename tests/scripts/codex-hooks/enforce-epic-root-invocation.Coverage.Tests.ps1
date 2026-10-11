@@ -41,7 +41,7 @@ Describe 'Codex enforce-epic-root-invocation coverage (issue #786)' {
         }
 
         It 'derives a 64-character lowercase attestation key' {
-            Get-EpicRootGateAttestationKey -TranscriptPath 'C:\t.jsonl' | Should -Match '^[0-9a-f]{64}$'
+            Get-EpicRootGateAttestationKey -TranscriptPath '/synthetic-root/t.jsonl' | Should -Match '^[0-9a-f]{64}$'
         }
 
         It 'allows a non-epic agent without an attestation' {
@@ -78,13 +78,13 @@ Describe 'Codex enforce-epic-root-invocation coverage (issue #786)' {
         It 'reads the transcript-keyed attestation and allows valid provenance' {
             Mock Test-Path { $true } -ParameterFilter { ([string]$LiteralPath) -like '*codex-routing-attestation.*' }
             Mock Get-Content { '{"agent_type":"epic-planner","provenance_valid":true}' } -ParameterFilter { ([string]$LiteralPath) -like '*codex-routing-attestation.*' }
-            $result = Invoke-RootInvocationEntry -Stdin '{"session_id":"s-786","transcript_path":"C:\\t.jsonl","agent_type":"epic-planner"}'
+            $result = Invoke-RootInvocationEntry -Stdin '{"session_id":"s-786","transcript_path":"/synthetic-root/t.jsonl","agent_type":"epic-planner"}'
             $result.ExitCode | Should -Be 0
             $result.Stdout | Should -BeNullOrEmpty
         }
 
         It 'falls back to the agent-id attestation scan and denies missing provenance' {
-            Mock Get-ChildItem { @([pscustomobject]@{ FullName = 'C:\state\bad.json' }, [pscustomobject]@{ FullName = 'C:\state\good.json' }) }
+            Mock Get-ChildItem { @([pscustomobject]@{ FullName = '/synthetic-root/state/bad.json' }, [pscustomobject]@{ FullName = '/synthetic-root/state/good.json' }) }
             Mock Get-Content { param($LiteralPath) if (([string]$LiteralPath).EndsWith('bad.json')) { '{bad' } else { '{"agent_id":"a-786","agent_type":"epic-orchestrator"}' } }
             $result = Invoke-RootInvocationEntry -Stdin '{"session_id":"s-786","agent_id":"a-786","agent_type":"epic-orchestrator"}'
             $result.ExitCode | Should -Be 0

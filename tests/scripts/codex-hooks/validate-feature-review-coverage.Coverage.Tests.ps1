@@ -60,24 +60,24 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
 
         It 'returns no audit when the active folder is absent' {
             Mock Test-Path { $false }
-            Get-LatestPolicyAudit -RepoRoot 'C:\repo' | Should -BeNullOrEmpty
+            Get-LatestPolicyAudit -RepoRoot '/synthetic-root/repo' | Should -BeNullOrEmpty
         }
 
         It 'returns the most recently written audit' {
             Mock Test-Path { $true }
             Mock Get-ChildItem { @([pscustomobject]@{ Name = 'old'; LastWriteTime = [datetime]'2026-01-01' }, [pscustomobject]@{ Name = 'new'; LastWriteTime = [datetime]'2026-02-01' }) }
-            (Get-LatestPolicyAudit -RepoRoot 'C:\repo').Name | Should -Be 'new'
+            (Get-LatestPolicyAudit -RepoRoot '/synthetic-root/repo').Name | Should -Be 'new'
         }
 
         It 'returns no language when the PR summary is absent' {
             Mock Test-Path { $false }
-            (Get-ChangedLanguageSet -RepoRoot 'C:\repo').Count | Should -Be 0
+            (Get-ChangedLanguageSet -RepoRoot '/synthetic-root/repo').Count | Should -Be 0
         }
 
         It 'maps changed files to their languages' {
             Mock Test-Path { $true }
             Mock Get-Content { @('- a.ts (+1/-0)', '- b.py (+1/-0)', '- c.ps1 (+1/-0)', '- d.cs (+1/-0)', 'not a file line', '- e.md (+1/-0)') }
-            @((Get-ChangedLanguageSet -RepoRoot 'C:\repo').Keys) | Should -Be @('TypeScript', 'Python', 'PowerShell', 'CSharp')
+            @((Get-ChangedLanguageSet -RepoRoot '/synthetic-root/repo').Keys) | Should -Be @('TypeScript', 'Python', 'PowerShell', 'CSharp')
         }
 
         It 'parses LCOV line counters' {
@@ -118,11 +118,11 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
         ) {
             Mock Get-LcovRepoCoverage { param($Path) Split-Path -Leaf $Path }
             Mock Get-JacocoRepoCoverage { param($Path) Split-Path -Leaf $Path }
-            Get-LanguageRepoCoverage -RepoRoot 'C:\repo' -Language $Language | Should -Be $Leaf
+            Get-LanguageRepoCoverage -RepoRoot '/synthetic-root/repo' -Language $Language | Should -Be $Leaf
         }
 
         It 'returns null for an unknown language' {
-            Get-LanguageRepoCoverage -RepoRoot 'C:\repo' -Language 'Rust' | Should -BeNullOrEmpty
+            Get-LanguageRepoCoverage -RepoRoot '/synthetic-root/repo' -Language 'Rust' | Should -BeNullOrEmpty
         }
     }
 
@@ -173,14 +173,14 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
 
         It 'exits 0 when the branch changes no tracked language' {
             Mock Test-Path { param($Path) -not ([string]$Path).EndsWith('pr_context.summary.txt') }
-            Mock Get-ChildItem { [pscustomobject]@{ FullName = 'C:\repo\docs\features\active\f\policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
+            Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
             Mock Get-Content { 'audit text' }
             (Invoke-CodexReviewEntry -Stdin $script:ReviewStop).ExitCode | Should -Be 0
         }
 
         It 'requests a continuation when a changed language lacks a verdict' {
             Mock Test-Path { param($Path) -not ([string]$Path).EndsWith('.info') -and -not ([string]$Path).EndsWith('.xml') }
-            Mock Get-ChildItem { [pscustomobject]@{ FullName = 'C:\repo\docs\features\active\f\policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
+            Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
             Mock Get-Content { param($Path) if (([string]$Path).EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } else { 'Python coverage 90%' } }
             $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStop
             $result.ExitCode | Should -Be 0
@@ -189,7 +189,7 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
 
         It 'stops the continuation loop when a validator error occurs with the stop hook active' {
             Mock Test-Path { $true }
-            Mock Get-ChildItem { [pscustomobject]@{ FullName = 'C:\repo\docs\features\active\f\policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
+            Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
             Mock Get-Content { throw 'simulated read failure' }
             $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStopActive
             $result.ExitCode | Should -Be 0
