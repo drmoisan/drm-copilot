@@ -5,8 +5,8 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - Epic issue: #852
 - Integration branch: `epic/enforcement-hook-precision-integration`
 - Current wave: 2
-- Next step: `E7_await_wave2 (786 BLOCKED: operator decision required on DESIGN_CONFLICT; all other 7 merged)`
-- Last updated: 2026-10-09T11:10:00Z
+- Next step: `E8b_main_sync_2 BLOCKED: origin/main (278 commits ahead) conflicts in pack-manifests/core.json; coordinator cannot edit (preimplementation gate); operator decision on resolution route`
+- Last updated: 2026-10-11T02:58:00Z
 
 ## Waves
 
@@ -14,7 +14,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 | --- | --- | --- |
 | 0 | merged | 2026-08-26-epic-wave-barrier-resolves-nested-artifact-as-feature-folder-565, 2026-09-27-completion-consistency-codex-copy-and-fail-open-divergence-736, promotion-hook-raw-containment-false-positive-deny-824 |
 | 1 | merged | 2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732, 2026-09-29-validate-orchestrator-output-session-relative-read-787, 2026-10-08-pr-author-and-merge-gates-read-session-root-files-850 |
-| 2 | in_progress | 2026-09-27-hook-test-isolation-remaining-gaps-737, 2026-09-29-hook-preexisting-imports-fail-open-786 |
+| 2 | merged | 2026-09-27-hook-test-isolation-remaining-gaps-737, 2026-09-29-hook-preexisting-imports-fail-open-786 |
 
 ## Features
 
@@ -27,7 +27,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 | 2026-09-29-validate-orchestrator-output-session-relative-read-787 | 787 | 1 | merged | [#856](https://github.com/drmoisan/drm-copilot/pull/856) | 191e69069d0198ef66be581568da781ea89fa3fb | 2026-10-09T02:35:00Z | 2026-10-09T04:24:51Z | 2026-10-09T04:44:27Z | - |
 | 2026-10-08-pr-author-and-merge-gates-read-session-root-files-850 | 850 | 1 | merged | [#857](https://github.com/drmoisan/drm-copilot/pull/857) | f8f7d0ab1b0ed927cccfedd25608a48d28083c57 | 2026-10-09T02:35:00Z | 2026-10-09T05:21:23Z | 2026-10-09T05:36:11Z | - |
 | 2026-09-27-hook-test-isolation-remaining-gaps-737 | 737 | 2 | merged | [#863](https://github.com/drmoisan/drm-copilot/pull/863) | 71dd62b0797a4aea9602936a33b2099c54703e70 | 2026-10-09T06:25:00Z | 2026-10-09T10:54:11Z | 2026-10-09T11:03:03Z | - |
-| 2026-09-29-hook-preexisting-imports-fail-open-786 | 786 | 2 | worktree_created | - | - | 2026-10-09T06:25:00Z | - | - | - |
+| 2026-09-29-hook-preexisting-imports-fail-open-786 | 786 | 2 | merged | [#881](https://github.com/drmoisan/drm-copilot/pull/881) | 919dbfa4d5075944ff4242c95c2ebb534ea248bf | 2026-10-09T06:25:00Z | 2026-10-10T23:04:12Z | 2026-10-11T02:48:05Z | - |
 
 ## Integration PR
 
