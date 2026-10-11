@@ -125,26 +125,26 @@ The executor stops, writes the named artifact, and reports to the caller without
 
 ### Phase 1 — Exit-Route De-Risking Gate
 
-- [ ] [P1-T1] Create the checked-in test entry script `tests/fixtures/claude-hooks/Invoke-SubagentStopBlock.Fixture.ps1`.
+- [x] [P1-T1] Create the checked-in test entry script `tests/fixtures/claude-hooks/Invoke-SubagentStopBlock.Fixture.ps1`.
   - Content, in order: a comment-based help block stating that the script is a test-only entry point that dot-sources the SubagentStop envelope helper and calls `Exit-SubagentStopBlock`; `[CmdletBinding()]`; `param([Parameter(Mandatory = $true)][string] $Message)`; the statement `. (Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath '..', '..', '.claude', 'hooks', 'subagentstop-envelope.ps1')`; the statement `Exit-SubagentStopBlock -Message $Message`. No other statements.
   - Acceptance: the file exists; `[System.Management.Automation.Language.Parser]::ParseFile` reports zero parse errors (command and result recorded in the [P1-T3] artifact).
-- [ ] [P1-T2] Create `.claude/hooks/subagentstop-envelope.ps1` containing only the file header and the final form of `Exit-SubagentStopBlock`.
+- [x] [P1-T2] Create `.claude/hooks/subagentstop-envelope.ps1` containing only the file header and the final form of `Exit-SubagentStopBlock`.
   - File header: a comment block stating the file is dot-sourced by SubagentStop validators, is not registered as a hook, imports nothing, reads no environment variable, and writes nothing to the success or warning streams; it names `spec.md` `## Authoritative Helper Contract` for issue #897 as the governing contract.
   - Function exactly: comment-based help; `[CmdletBinding()]`; `param([Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $Message)`; body `[Console]::Error.WriteLine($Message)` then `exit 2`. No other statement in the body.
   - No file-level statement other than function definitions (no `Set-StrictMode`, no `Import-Module`, no `using`, no dot-source).
   - Written with the Write tool (this is the only production PowerShell path the plan writes with Write or Edit; the mirror is created with `Copy-Item` in [P3-T5]).
   - Acceptance: the file exists and parses with zero errors (recorded in the [P1-T3] artifact).
-- [ ] [P1-T3] Run the exit-route probe inside a Pester run and record it in `docs/features/active/subagentstop-envelope-core-897/evidence/other/p1-exit-route-probe.md`.
+- [x] [P1-T3] Run the exit-route probe inside a Pester run and record it in `docs/features/active/subagentstop-envelope-core-897/evidence/other/p1-exit-route-probe.md`.
   - In-session block, no temporary files and no child process: `Import-Module Pester -MinimumVersion 5.0 -Force`; build `$c = New-PesterContainer -ScriptBlock { ... }` whose `Describe 'exit-route probe'` holds two `It` blocks in this order:
     1. `It 'fixture exit 2 ends only the fixture'`: set `$fixture = Join-Path (Get-Location).Path 'tests/fixtures/claude-hooks/Invoke-SubagentStopBlock.Fixture.ps1'`; save `[Console]::Error`; create `$w = [System.IO.StringWriter]::new()`; in `try` call `[Console]::SetError($w)`, set `$global:LASTEXITCODE = 0`, run `$out = @(& $fixture -Message 'PROBE_BLOCK_897')`, capture `$code = $LASTEXITCODE`; in `finally` restore the saved error writer and set `$global:LASTEXITCODE = 0`; assert `$code | Should -Be 2`, `$w.ToString() | Should -Be ('PROBE_BLOCK_897' + [Environment]::NewLine)`, `$out.Count | Should -Be 0`.
     2. `It 'runner continues after the fixture exit'`: `$true | Should -BeTrue`.
   - Then `$cfg = New-PesterConfiguration; $cfg.Run.Container = $c; $cfg.Run.PassThru = $true; $cfg.Run.Exit = $false; $cfg.Output.Verbosity = 'Detailed'; $r = Invoke-Pester -Configuration $cfg`, then print `PROBE_RESULT: passed=<PassedCount> failed=<FailedCount> total=<TotalCount>` and, as the last statement, `RUNNER_CONTINUED: yes`.
   - Acceptance: the artifact records `Timestamp:`, `Command:` (the full block), `EXIT_CODE:`, `Output Summary:`, the two parse results from [P1-T1] and [P1-T2], the verbatim `PROBE_RESULT:` line, and whether the `RUNNER_CONTINUED: yes` line was printed. If the PowerShell session ended before printing it, the artifact records `RUNNER_CONTINUED: absent (runner terminated)`.
-- [ ] [P1-T4] Record the exit-route decision gate in `docs/features/active/subagentstop-envelope-core-897/evidence/other/p1-exit-route-decision.md`.
+- [x] [P1-T4] Record the exit-route decision gate in `docs/features/active/subagentstop-envelope-core-897/evidence/other/p1-exit-route-decision.md`.
   - `DECISION: PROCEED` only when the [P1-T3] artifact shows `PROBE_RESULT: passed=2 failed=0 total=2` and `RUNNER_CONTINUED: yes`.
   - Otherwise `DECISION: STOP`, with the observed lines quoted, the statement that the `-ExitAction` scriptblock fallback is a contract change requiring a `spec.md` amendment by the spec owner, and execution halts under STOP-EXIT-ROUTE. The executor does not add an `-ExitAction` parameter.
   - Acceptance: the artifact carries `Timestamp:`, the quoted evidence lines, and exactly one `DECISION:` line.
-- [ ] [P1-T5] Commit and push the Phase 1 files `.claude/hooks/subagentstop-envelope.ps1` and `tests/fixtures/claude-hooks/Invoke-SubagentStopBlock.Fixture.ps1`.
+- [x] [P1-T5] Commit and push the Phase 1 files `.claude/hooks/subagentstop-envelope.ps1` and `tests/fixtures/claude-hooks/Invoke-SubagentStopBlock.Fixture.ps1`.
   - `git add .claude/hooks/subagentstop-envelope.ps1 tests/fixtures/claude-hooks/Invoke-SubagentStopBlock.Fixture.ps1 docs/features/active/subagentstop-envelope-core-897/evidence/other/p1-exit-route-probe.md docs/features/active/subagentstop-envelope-core-897/evidence/other/p1-exit-route-decision.md docs/features/active/subagentstop-envelope-core-897/plan.2026-10-11T07-59.md`
   - Subject: `feat(897): add Exit-SubagentStopBlock and its exit-route test entry script`; second paragraph `Refs #897`; final paragraph `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`; then `git push -u origin bug/subagentstop-envelope-core-exec-897`.
   - Acceptance: the push exits 0 and `git status --porcelain` prints nothing.
