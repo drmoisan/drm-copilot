@@ -18,9 +18,23 @@
     one absent path; nothing is written, no process is started, and no clock is read.
 #>
 
+BeforeAll {
+    . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-feature-review-coverage.ps1')
+    $script:RealGetArtifactFileContent = ${function:Get-ArtifactFileContent}
+    $script:RealGetChangedLanguageSet = ${function:Get-ChangedLanguageSet}
+    $script:RealGetJacocoRepoCoverage = ${function:Get-JacocoRepoCoverage}
+    $script:RealGetLcovRepoCoverage = ${function:Get-LcovRepoCoverage}
+    Mock Get-ArtifactFileContent { $null }
+    if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Mock Get-ChangedLanguageSet { $null } }
+    if (Get-Command Get-JacocoRepoCoverage -ErrorAction SilentlyContinue) { Mock Get-JacocoRepoCoverage { $null } }
+    if (Get-Command Get-LcovRepoCoverage -ErrorAction SilentlyContinue) { Mock Get-LcovRepoCoverage { $null } }
+}
+
 Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
     BeforeAll {
-        . "$PSScriptRoot/../../../.claude/hooks/validate-feature-review-coverage.ps1"
+        Mock Get-ChangedLanguageSet -MockWith $script:RealGetChangedLanguageSet
+        Mock Get-JacocoRepoCoverage -MockWith $script:RealGetJacocoRepoCoverage
+        Mock Get-LcovRepoCoverage -MockWith $script:RealGetLcovRepoCoverage
 
         function ConvertTo-FeatureReviewPayload {
             <#
@@ -226,7 +240,8 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
         }
 
         It 'F824-9 reads a tracked file and reports a missing one' -Tag 'Issue824' {
-            # Arrange: no mock; this test file is the tracked file that is read.
+            # Arrange: restore the real Get-ArtifactFileContent over the file-level null mock; this test file is the tracked file that is read.
+            Mock Get-ArtifactFileContent -MockWith $script:RealGetArtifactFileContent
             $absentPath = 'docs/features/active/__absent__/none.md'
 
             # Act

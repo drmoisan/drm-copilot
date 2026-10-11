@@ -21,3 +21,25 @@ To https://github.com/drmoisan/drm-copilot.git
 FORCED_UPDATE_TEXT_PRESENT: no
 
 Output Summary: Phase 0 evidence committed as 9add694e4 and pushed as a fast-forward; local HEAD equals the remote branch.
+
+## Phase 1 ([P1-T9])
+
+Timestamp: 2026-10-11T00-10
+Command: git add docs/features/active/epic-852-main-sync/evidence <plan> ; git commit -F <SCRATCHPAD>/p1-msg.txt ; git push origin chore/epic-852-main-sync-852 ; git rev-parse HEAD origin/chore/epic-852-main-sync-852 ; git merge-base --is-ancestor 0ac05da8f4309c6dfb4865ef676f90de59b9e785 HEAD
+EXIT_CODE: 0
+
+PHASE1_HEAD: 2b28c2946d4ac5fed09488fc62d2b5f78b7b3885
+origin/chore/epic-852-main-sync-852: 2b28c2946d4ac5fed09488fc62d2b5f78b7b3885
+HEAD_EQUALS_REMOTE: yes
+MERGE_SHA_ANCESTOR_OF_HEAD: EXIT_CODE 0
+
+Push output (the push published both the merge commit 0ac05da8f and the evidence commit):
+
+```text
+To https://github.com/drmoisan/drm-copilot.git
+   9add694e4..2b28c2946  chore/epic-852-main-sync-852 -> chore/epic-852-main-sync-852
+```
+
+FORCED_UPDATE_TEXT_PRESENT: no
+
+Output Summary: merge commit and Phase 1 evidence pushed as a fast-forward; HEAD equals the remote; the merge commit is an ancestor of HEAD.

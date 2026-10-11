@@ -44,9 +44,9 @@
 [CmdletBinding()]
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
+try { . (Join-Path $PSScriptRoot 'feature-review-coverage-thresholds.ps1') } catch { Add-HookDependencyFailure -Name 'feature-review-coverage-thresholds.ps1' -ErrorRecord $_ }
 
 $ErrorActionPreference = 'Stop'
-. (Join-Path $PSScriptRoot 'feature-review-coverage-thresholds.ps1')
 
 function Get-ArtifactFileContent {
     [CmdletBinding()]
