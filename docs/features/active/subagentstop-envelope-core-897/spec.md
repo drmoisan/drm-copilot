@@ -290,7 +290,7 @@ Rejected alternative: convert the inline command to a file-based hook that uses 
 - [x] AC-26: Every new or changed `.ps1` file is at most 500 lines. Verified by `(Get-Content <file>).Count` for each file, recorded under `evidence/qa-gates/`.
 - [x] AC-27: The E1 diff touches no file outside the scope list: `git diff --name-only epic/subagentstop-envelope-integration...HEAD` lists no `.claude/hooks/validate-*.ps1`, no file under `tests/scripts/claude-hooks/` other than `subagentstop-envelope.Tests.ps1`, no `.claude/agents/epic-orchestrator.md`, no `.codex/` path, and no `.claude/lib/hook-payload/HookPayload.psm1`.
 - [x] AC-28: The E1 diff adds no Python file under `.claude/hooks/` or its bundled mirror. Verified by `git diff --name-only --diff-filter=A epic/subagentstop-envelope-integration...HEAD` listing no `.py` path under those directories.
-- [ ] AC-29: Every E1 commit message and the E1 pull request body reference the issue as `Refs #897` and contain no closing keyword (`close`, `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, `resolved`) applied to #897. Verified by `git log --format=%B epic/subagentstop-envelope-integration..HEAD` and `gh pr view <pr> --json body` at PR authoring time.
+- [x] AC-29: Every E1 commit message and the E1 pull request body reference the issue as `Refs #897` and contain no closing keyword (`close`, `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, `resolved`) applied to #897. Verified by `git log --format=%B epic/subagentstop-envelope-integration..HEAD` and `gh pr view <pr> --json body` at PR authoring time.
 
 ## Risks & Mitigations
 
