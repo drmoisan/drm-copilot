@@ -220,11 +220,11 @@ All test code below lives in `tests/scripts/claude-hooks/subagentstop-envelope.T
 
 ### Phase 3 — Helper Implementation, Mirror, and Manifest
 
-- [ ] [P3-T1] Implement `Get-SubagentStopEnvelopeAnomalyReason` in `.claude/hooks/subagentstop-envelope.ps1`.
+- [x] [P3-T1] Implement `Get-SubagentStopEnvelopeAnomalyReason` in `.claude/hooks/subagentstop-envelope.ps1`.
   - Signature: comment-based help; `[CmdletBinding()]`; `[OutputType([string])]`; `param([Parameter()][AllowNull()][AllowEmptyString()][string] $Anomaly)`. No `[ValidateSet()]` and no `Mandatory`, so `$null` and `''` reach the body.
   - Body: `switch -CaseSensitive ($Anomaly)` returning these clauses: `EmptyPayload` -> `the SubagentStop payload on stdin was empty`; `UnparseableJson` -> `the SubagentStop payload is not valid JSON`; `NonObjectEnvelope` -> `the SubagentStop payload root is not a JSON object`; `MissingAssistantMessage` -> `the SubagentStop payload has no last_assistant_message field`; `NullAssistantMessage` -> `the SubagentStop payload last_assistant_message is null`; `NonStringAssistantMessage` -> `the SubagentStop payload last_assistant_message is not a string`; `default` -> `throw [System.ArgumentException]::new("Unknown SubagentStop envelope anomaly code: '$Anomaly'.", 'Anomaly')`.
   - Acceptance: the file parses with zero errors and `Get-Command Get-SubagentStopEnvelopeAnomalyReason` resolves after dot-sourcing it (recorded in the [P3-T3] artifact).
-- [ ] [P3-T2] Implement `Read-SubagentStopEnvelope` in `.claude/hooks/subagentstop-envelope.ps1`.
+- [x] [P3-T2] Implement `Read-SubagentStopEnvelope` in `.claude/hooks/subagentstop-envelope.ps1`.
   - Signature: comment-based help whose description states that, with `-InputText` unbound, the function reads standard input to end and a manual run without redirected stdin waits for end-of-input; `[CmdletBinding()]`; `[OutputType([pscustomobject])]`; `param([Parameter()][AllowNull()][AllowEmptyString()][string] $InputText)`.
   - Flow, with one result object emitted at the end and no other output:
     1. Text source: when `$PSBoundParameters.ContainsKey('InputText')` use `$InputText`; otherwise `try { $text = [Console]::In.ReadToEnd() } catch { $text = '' }`. No `[Console]::IsInputRedirected` probe and no environment read.
@@ -237,22 +237,22 @@ All test code below lives in `tests/scripts/claude-hooks/subagentstop-envelope.T
     8. Emit `[pscustomobject][ordered]@{ IsValid = ...; Anomaly = ...; Envelope = ...; AssistantText = ...; StopHookActive = ...; AgentType = ...; HookEventName = ... }` with properties in exactly that order; `AssistantText` is `''` whenever `IsValid` is `$false`.
   - The function never calls `exit` and never throws (every exception path is inside a `try`).
   - Acceptance: the file parses with zero errors and `(Get-Content .claude/hooks/subagentstop-envelope.ps1).Count` is at most 500 (both recorded in the [P3-T3] artifact).
-- [ ] [P3-T3] Run the helper suite after implementation and record `docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/p3-helper-suite-pass-after.md`.
+- [x] [P3-T3] Run the helper suite after implementation and record `docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/p3-helper-suite-pass-after.md`.
   - R-TARGETED over `tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1`.
   - Acceptance: `TOTAL:` shows `failed=0`, `skipped=0`, and `passed` equal to `$r.TotalCount` (both values recorded); no `FAILED:` line. If any test fails, correct `.claude/hooks/subagentstop-envelope.ps1` within the contract and rerun this task; tests are not weakened.
-- [ ] [P3-T4] Check off AC-1 and AC-4 through AC-19 in `docs/features/active/subagentstop-envelope-core-897/spec.md`, one at a time, from the [P3-T3] results.
+- [x] [P3-T4] Check off AC-1 and AC-4 through AC-19 in `docs/features/active/subagentstop-envelope-core-897/spec.md`, one at a time, from the [P3-T3] results.
   - For each AC, confirm in the [P3-T3] Detailed output that every `It` the AC names passed, then flip only that AC line and append `AC-<n>: CHECKED | P3-T4 | evidence/regression-testing/p3-helper-suite-pass-after.md` to `docs/features/active/subagentstop-envelope-core-897/evidence/other/ac-status.md`.
   - Acceptance: exactly 17 AC lines (AC-1, AC-4 to AC-19) change from unchecked to checked; criterion text is unchanged; `ac-status.md` has 17 matching rows.
-- [ ] [P3-T5] Create the bundled mirror `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/subagentstop-envelope.ps1` with `Copy-Item` and record parity in `docs/features/active/subagentstop-envelope-core-897/evidence/other/p3-mirror-parity.md`.
+- [x] [P3-T5] Create the bundled mirror `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/subagentstop-envelope.ps1` with `Copy-Item` and record parity in `docs/features/active/subagentstop-envelope-core-897/evidence/other/p3-mirror-parity.md`.
   - Command: `Copy-Item -LiteralPath .claude/hooks/subagentstop-envelope.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/subagentstop-envelope.ps1`.
   - Acceptance: `(Get-FileHash -Algorithm SHA256 <path>).Hash` is equal for the two paths; both hashes are recorded.
-- [ ] [P3-T6] Add the helper to `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`.
+- [x] [P3-T6] Add the helper to `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`.
   - Insert the line `    ".claude/hooks/subagentstop-envelope.ps1",` immediately after the existing `".claude/hooks/persist-session-id.ps1",` line and before `".claude/hooks/validate-bash.ps1",`, preserving indentation and alphabetical order. No other change.
   - Acceptance: `Get-Content -Raw extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json | ConvertFrom-Json` succeeds; its `paths` array contains `.claude/hooks/subagentstop-envelope.ps1` exactly once; the line count equals the [P0-T5] value plus 1 (all recorded in the [P3-T7] artifact).
-- [ ] [P3-T7] Run the parity and manifest-completeness tests and record `docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/p3-parity.md`.
+- [x] [P3-T7] Run the parity and manifest-completeness tests and record `docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/p3-parity.md`.
   - Commands: the [P0-T11] `poetry run pytest ... -v` command, and from `extensions/drm-copilot` the [P0-T12] `npx jest test/lib/push-down/claude-pack-manifest-completeness.test.ts` command.
   - Acceptance: both process exit codes are 0, or every failing identifier and message matches a row in `pre-existing-failures.md`; the node `test_bundled_claude_payload_contains_all_repo_runtime_contracts`, every node in `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`, and the verbatim Jest `Tests:` summary line are recorded with their status; the [P3-T6] JSON and line-count checks are recorded.
-- [ ] [P3-T8] Commit and push the Phase 3 changes to `.claude/hooks/subagentstop-envelope.ps1`, its mirror, and `core.json`.
+- [x] [P3-T8] Commit and push the Phase 3 changes to `.claude/hooks/subagentstop-envelope.ps1`, its mirror, and `core.json`.
   - `git add .claude/hooks/subagentstop-envelope.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/subagentstop-envelope.ps1 extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json docs/features/active/subagentstop-envelope-core-897/spec.md docs/features/active/subagentstop-envelope-core-897/evidence/regression-testing/ docs/features/active/subagentstop-envelope-core-897/evidence/other/ docs/features/active/subagentstop-envelope-core-897/plan.2026-10-11T07-59.md`
   - Subject: `feat(897): implement Read-SubagentStopEnvelope and anomaly reasons with bundled mirror and core manifest entry`; second paragraph `Refs #897`; final paragraph `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`; then `git push -u origin bug/subagentstop-envelope-core-exec-897`.
   - Acceptance: the push exits 0 and `git status --porcelain` prints nothing.
