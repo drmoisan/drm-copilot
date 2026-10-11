@@ -214,3 +214,12 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## r2-p4
+
+- Subject: docs(786): record remediation cycle 2 CI results
+- Commit SHA: 97a6e538d379c2dbb7d3e2788fb170efd8424af3
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
+- Note: the commit recording this entry (subject `docs(786): record remediation cycle 2 final commit`) is committed alone and pushed with the same refspec; neither documentation-only head is awaited by [P4-T1], and their code tree equals CHECKED-HEAD d83e7af6117fed48fa3cf3df1d133143f5548064.
