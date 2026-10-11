@@ -179,3 +179,11 @@
 - Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
 - Push exit code: 0
 - Porcelain (post-commit, pre-append): empty
+
+## r2-p0
+
+- Subject: docs(786): remediation cycle 2 baselines
+- Commit SHA: 86db141aed6b662746c371e452a534308cd02860
+- Push: git push origin HEAD:bug/hook-preexisting-imports-fail-open-exec-786
+- Push exit code: 0
+- Porcelain (post-commit, pre-append): empty
