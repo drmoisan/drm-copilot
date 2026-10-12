@@ -6,9 +6,9 @@ repo-local copies and their bundled mirrors under
 name no consuming product, no pushed surface hard-codes a solution file, the
 feature-review workflow's step 8 defers to the governing thresholds, and every
 threshold-precedence copy states the per-metric fallback. A scan of every pushed
-rule and skill file guards against the product names reappearing; the files in
-``PRE_EXISTING_NAME_EXCEPTIONS`` are out of scope for issue #824 and are
-checked for staleness.
+rule and skill file compares each file's product-name occurrence count with
+``PINNED_NAME_OCCURRENCES``, so a new occurrence fails in any file, including a
+pinned one, and a pinned entry that is absent or not positive is reported as stale.
 
 Every phrase search runs over whitespace-normalized text, so a reflowed sentence
 is still found. The module reads repository files only: it creates no file,
@@ -123,20 +123,11 @@ PUSHED_RULE_AND_SKILL_GLOBS: tuple[tuple[str, str], ...] = (
     (CODEX_BUNDLE + ".agents/skills", "**/SKILL.md"),
     (CODEX_BUNDLE + ".agents-variants", "*/skills/**/SKILL.md"),
 )
-# Pushed files outside the FU-823-2 listed set that still name a product. They
-# are out of scope for issue #824 and recorded as a follow-up; the staleness
-# test below fails once an entry no longer names one.
-PRE_EXISTING_NAME_EXCEPTIONS: frozenset[str] = frozenset(
-    {
-        ".claude/rules/typescript.md",
-        ".claude/rules/csharp.md",
-        CLAUDE_BUNDLE + ".claude/rules/typescript.md",
-        CLAUDE_BUNDLE + ".claude/rules/csharp.md",
-        # Added by #797 after #824 planning; out of scope for #824 (follow-up).
-        ".claude/rules/parallel-orchestration.md",
-        CLAUDE_BUNDLE + ".claude/rules/parallel-orchestration.md",
-    }
-)
+# Exact expected count of CONSUMING_NAMES occurrences per pushed file. A file
+# absent from the map is expected to hold none. An entry records an accepted,
+# counted occurrence; the count must match exactly, so a new occurrence and a
+# removed one both fail. Issue #894 removed the last occurrences, so it is empty.
+PINNED_NAME_OCCURRENCES: dict[str, int] = {}
 
 
 def read_copy(relative_path: str) -> str:
@@ -175,6 +166,35 @@ def pushed_rule_and_skill_files() -> list[str]:
             if candidate.is_file():
                 found.add(candidate.relative_to(REPO_ROOT).as_posix())
     return sorted(found)
+
+
+def count_name_occurrences(text: str) -> int:
+    """Return the total number of CONSUMING_NAMES occurrences in the text."""
+
+    return sum(text.count(name) for name in CONSUMING_NAMES)
+
+
+def pinned_count_mismatches(
+    observed: dict[str, int], pinned: dict[str, int]
+) -> list[str]:
+    """Return one message per observed path whose count differs from its pin."""
+
+    return [
+        f"{path}: observed {count}, pinned {pinned.get(path, 0)}"
+        for path, count in sorted(observed.items())
+        if count != pinned.get(path, 0)
+    ]
+
+
+def stale_pinned_entries(pinned: dict[str, int], scanned: list[str]) -> list[str]:
+    """Return the pinned paths that are not scanned or whose pin is not positive."""
+
+    scanned_paths = set(scanned)
+    return sorted(
+        path
+        for path, count in pinned.items()
+        if path not in scanned_paths or count <= 0
+    )
 
 
 def step_eight(text: str) -> str:
@@ -359,40 +379,121 @@ def test_pushed_rule_and_skill_scan_covers_the_listed_copies() -> None:
     assert missed == [], f"scan misses listed copies: {missed}"
 
 
-def test_pushed_rule_and_skill_files_name_no_consuming_product() -> None:
-    """FU-823-2: no pushed rule or skill file names a consuming product."""
+def test_pushed_rule_and_skill_files_match_pinned_name_counts() -> None:
+    """FU-823-2 and #894: every pushed file holds exactly its pinned name count."""
 
     # Arrange
-    scanned = [
-        path
+    observed = {
+        path: count_name_occurrences(read_copy(path))
         for path in pushed_rule_and_skill_files()
-        if path not in PRE_EXISTING_NAME_EXCEPTIONS
-    ]
+    }
 
     # Act
-    offenders = [
-        path
-        for path in scanned
-        if any(name in read_copy(path) for name in CONSUMING_NAMES)
-    ]
+    mismatches = pinned_count_mismatches(observed, PINNED_NAME_OCCURRENCES)
 
     # Assert
-    assert offenders == [], f"pushed files naming a product: {offenders}"
+    assert mismatches == [], f"product-name counts differ from pins: {mismatches}"
 
 
-def test_name_exceptions_still_name_a_consuming_product() -> None:
-    """Each documented exception still names a product, so the set is not stale."""
+def test_pinned_name_entries_are_pushed_files_with_positive_counts() -> None:
+    """Each pinned entry names a scanned pushed file and a positive count."""
 
     # Arrange
-    exceptions = sorted(PRE_EXISTING_NAME_EXCEPTIONS)
+    scanned = pushed_rule_and_skill_files()
 
     # Act
-    stale = [
-        path
-        for path in exceptions
-        if not (REPO_ROOT / path).is_file()
-        or not any(name in read_copy(path) for name in CONSUMING_NAMES)
-    ]
+    stale = stale_pinned_entries(PINNED_NAME_OCCURRENCES, scanned)
 
     # Assert
-    assert stale == [], f"remove stale entries from the exception set: {stale}"
+    assert stale == [], f"remove or correct stale pinned entries: {stale}"
+
+
+def test_pinned_count_mismatches_flags_new_occurrence_in_unpinned_file() -> None:
+    """A new occurrence in a file with no pin is reported."""
+
+    # Arrange
+    observed = {".claude/rules/example.md": 1}
+    pinned: dict[str, int] = {}
+
+    # Act
+    mismatches = pinned_count_mismatches(observed, pinned)
+
+    # Assert
+    assert mismatches == [".claude/rules/example.md: observed 1, pinned 0"]
+
+
+def test_pinned_count_mismatches_flags_new_occurrence_in_pinned_file() -> None:
+    """A new occurrence beyond a file's pinned count is reported."""
+
+    # Arrange
+    observed = {".claude/rules/example.md": 2}
+    pinned = {".claude/rules/example.md": 1}
+
+    # Act
+    mismatches = pinned_count_mismatches(observed, pinned)
+
+    # Assert
+    assert mismatches == [".claude/rules/example.md: observed 2, pinned 1"]
+
+
+def test_pinned_count_mismatches_flags_removed_occurrence_in_pinned_file() -> None:
+    """A pinned file that lost an occurrence is reported, so a pin cannot go stale."""
+
+    # Arrange
+    observed = {".claude/rules/example.md": 0}
+    pinned = {".claude/rules/example.md": 1}
+
+    # Act
+    mismatches = pinned_count_mismatches(observed, pinned)
+
+    # Assert
+    assert mismatches == [".claude/rules/example.md: observed 0, pinned 1"]
+
+
+def test_pinned_count_mismatches_accepts_matching_counts() -> None:
+    """Counts equal to their pins, and zero in unpinned files, are accepted."""
+
+    # Arrange
+    observed = {".claude/rules/example.md": 1, ".claude/rules/other.md": 0}
+    pinned = {".claude/rules/example.md": 1}
+
+    # Act
+    mismatches = pinned_count_mismatches(observed, pinned)
+
+    # Assert
+    assert mismatches == []
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("TaskMaster and No-COM and TaskMaster", 3),
+        ("`src/<Product>.Domain` with host-neutral wording", 0),
+    ],
+)
+def test_count_name_occurrences_counts_every_token(text: str, expected: int) -> None:
+    """Every consuming-name occurrence is counted; neutral text counts zero."""
+
+    # Act
+    count = count_name_occurrences(text)
+
+    # Assert
+    assert count == expected
+
+
+def test_stale_pinned_entries_flags_unscanned_path_and_non_positive_pin() -> None:
+    """A pin for an unscanned file and a zero pin are both reported as stale."""
+
+    # Arrange
+    pinned = {
+        ".claude/rules/gone.md": 1,
+        ".claude/rules/zero.md": 0,
+        ".claude/rules/kept.md": 2,
+    }
+    scanned = [".claude/rules/kept.md", ".claude/rules/zero.md"]
+
+    # Act
+    stale = stale_pinned_entries(pinned, scanned)
+
+    # Assert
+    assert stale == [".claude/rules/gone.md", ".claude/rules/zero.md"]
