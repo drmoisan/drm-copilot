@@ -95,14 +95,32 @@ function of the DAG.
 2. Before starting each wave, `epic-orchestrator` runs
    `git fetch origin epic/<epic-slug>-integration` so the wave's child worktrees branch off the
    current remote tip, not a stale local ref.
-3. Each child feature's worktree/branch (created via
+3. Before each wave launches (wave 0 included), `epic-orchestrator` runs
+   `git fetch origin main` and then
+   `git rev-list --count origin/epic/<epic-slug>-integration..origin/main`. A zero count
+   proceeds directly to the wave. A non-zero count means `origin/main` has commits the
+   integration branch lacks, and the main-sync runs as a dedicated chore child item before the
+   wave launches, following the `epic-852-main-sync` / PR #882 pattern. Before delegating it,
+   `epic-orchestrator` writes the sync child's `features[]` row (with `depends_on: []`) and its
+   own `waves[]` entry to the epic checkpoint, because `enforce-epic-wave-barrier.ps1` denies a
+   delegation whose feature record is absent. The sync child must not reuse a manifest child's
+   issue number; it uses the epic issue number or a dedicated chore issue. Its branch is created
+   from the integration branch, merges `origin/main` with a merge commit
+   (`git merge --no-ff origin/main`; no rebase, no force-push), resolves any conflict inside its
+   own remediation loop, and opens a PR into the integration branch. The wave does not launch
+   until that PR has merged into the integration branch and the sync entry's `merge_status` is
+   `merged`. At most one main-sync child runs per wave: after it merges, `epic-orchestrator`
+   re-runs step 2 and launches the wave without repeating the count, and commits that reach
+   `origin/main` afterwards are picked up by the next wave's check or by the final integration
+   PR in step 6.
+4. Each child feature's worktree/branch (created via
    `Agent(orchestrator, isolation: "worktree", run_in_background: true)`) is branched from
    `origin/<integration_branch>`, not `origin/main`. The child's own `orchestrator` instance
    honors this via the epic-mode kickoff line below.
-4. Each child feature's PR base branch is the integration branch, not `main` — an explicit
+5. Each child feature's PR base branch is the integration branch, not `main` — an explicit
    epic-mode override recorded in the checkpoint, not a reliance on `pr-base-branch-merge-base`'s
    ancestry heuristic. Non-epic (standalone) orchestration is unchanged.
-5. At epic completion (every feature in the final wave has `merge_status: "merged"`),
+6. At epic completion (every feature in the final wave has `merge_status: "merged"`),
    `epic-orchestrator` drives a final PR merging `epic/<epic-slug>-integration` into `main`,
    delegating PR authoring to `Agent(pr-author)` and refreshing context via
    `mcp__drm-copilot__collect_pr_context`. `epic-orchestrator` runs the same S9 CI-green

@@ -157,6 +157,11 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # agent's `## Wave Scheduling` paragraph to describe the PowerShell port invoked
 # at epic-orchestrator SubagentStop. Both digests moved, and the pin stays live
 # for both entries.
+#
+# RE-BASELINED by issue #902. That change added a pre-wave main-sync step
+# as step 3 of the epic skill's `## Epic Integration Branch Lifecycle` section
+# and renumbered the former steps 3-5 to 4-6. Only the skill digest moved; the
+# agent digest is unchanged and the pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -164,7 +169,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "66c7baa9b6fe4340a479d7de62d73fbdf57dbf6c96aa6c747456ef9d425e1326",
+        "0b1a629aa81d78673e43c8f2bbd825d1377e0d6ae114e15e8bb65450c5d8b4f2",
     ),
 )
 
