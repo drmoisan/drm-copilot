@@ -381,7 +381,7 @@ Procedure, per item:
    alone. Run `gh pr checks <PR> --json bucket,name,state,link,workflow` and parse its output with
    `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1 -ChecksJson <checks-json> -HeadSha <headRefOid>`.
    Record `merge_status: ci_green` only when that parser conclusion is `success`; on `failure` or
-   `pending`, or when `gh pr checks` fails with a `no checks reported` error, do not record
+   `pending`, or when `gh pr checks` fails with a "no checks reported" error, do not record
    `merge_status: ci_green` and do not run `gh pr merge`.
    Before recording `merge_status: ci_green`, confirm that the `headRefOid` value equals the
    `ci_gate.head_sha` the child reported at DONE and that the child reported no pending
