@@ -89,3 +89,11 @@ Push refspec (branch substitution 1): `git push origin HEAD:bug/subagentstop-env
 - Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`aab401160..fe96ab715`)
 - Post-commit `git status --porcelain`: (empty)
 - CORPUS-AFTER-COMMIT: task-researcher | fe96ab7156418ebf05ecd8f73b333ba6408937d2
+
+## [P10-T7] Phase 10
+
+- Pre-commit `git status --porcelain`: task-researcher hook and mirror modified; feature-folder evidence, plan, spec (AC-16, AC-19) modified; new pass-after-task-researcher and registration-task-researcher-switch evidence (all within W-ALLOWED). The corpus evidence file is unchanged and not included.
+- Commit: 489b66cdfb844432dc69947daf9722fb33fb0a3a (`fix(905): block task-researcher SubagentStop through Exit-SubagentStopBlock`)
+- Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`fe96ab715..489b66cdf`)
+- Post-commit `git status --porcelain`: (empty)
+- SWITCH-COMMIT: task-researcher | 489b66cdfb844432dc69947daf9722fb33fb0a3a
