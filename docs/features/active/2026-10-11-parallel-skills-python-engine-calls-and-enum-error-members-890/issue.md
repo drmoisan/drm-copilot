@@ -44,6 +44,10 @@ Source: `docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follo
 - Bats and kcov results come only from PR CI; local verification of shell and PowerShell code uses PoshQC MCP tools only.
 - Out of scope, recorded for a later follow-up (no new issue is filed by this run): `parallel-orchestrate/SKILL.md` names two further Python-only functions, `has_unresolved_drift` and `request_requeue_via_recolor`, which are not invoked through the `python -c` grant.
 
+## Operator Approvals
+
+- 2026-10-12: the operator approved adding the allow entry `"Bash(bash .claude/lib/bash/mutate-parallel-run.sh*)"` to `.claude/settings.json` and its bundled copy under `extensions/drm-copilot/resources/claude-customizations/.claude/settings.json` (precedent: #791). No other permission change beyond the plan is approved. Evidence: `evidence/other/operator-approval-settings-allow-890.md`.
+
 ## Verification Steps
 
 - Search the three skills and mirrors for the six function names and `parallel_mutation_protocol`.
