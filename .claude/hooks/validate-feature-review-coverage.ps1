@@ -33,6 +33,9 @@
       - Each metric falls back independently, so a root CLAUDE.md that states only
         a line threshold leaves the 75 percent branch default in force. The figures are
         read by Get-FeatureReviewCoverageThreshold (feature-review-coverage-thresholds.ps1).
+      - The root CLAUDE.md is read by Get-FeatureReviewClaudeMdText: an absent root
+        CLAUDE.md uses the defaults, and an unreadable root CLAUDE.md fails closed (the
+        gate blocks, because the governing floors cannot be resolved).
       - When repo-wide line coverage for an available artifact is below the governing
         line threshold, the policy audit must carry a FAIL verdict for that language;
         branch coverage below the governing branch threshold blocks termination.
@@ -149,7 +152,10 @@ function Invoke-FeatureReviewCoverageValidation {
             }
 
             $policyAuditText = $artifactMeta['policy-audit'].Text
-            $claudeMd = Get-ArtifactFileContent -Path 'CLAUDE.md'
+            $claudeMd = Get-FeatureReviewClaudeMdText
+            if ($null -ne $claudeMd.ReadError) {
+                return @{ Message = "validate-feature-review-coverage: root CLAUDE.md exists but could not be read ($($claudeMd.ReadError)); coverage floors cannot be resolved, so the gate fails closed."; HasRepairable = $false; HasNonRepairable = $true }
+            }
             $thresholds = Get-FeatureReviewCoverageThreshold -ClaudeMdText $claudeMd.Text
             $coverageFailures = [System.Collections.Generic.List[hashtable]]::new()
             foreach ($lang in $changedLanguages.Keys) {

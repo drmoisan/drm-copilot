@@ -38,6 +38,29 @@ function Get-ArtifactFileContent {
     return @{ Exists = $true; Text = $text; Lines = $lines }
 }
 
+function Get-FeatureReviewClaudeMdText {
+    <#
+    .SYNOPSIS
+        Reads the repository's root CLAUDE.md for the coverage-floor lookup (CR-4).
+    .DESCRIPTION
+        Returns a hashtable with Text and ReadError. An absent file yields Text = $null and
+        ReadError = $null, so the caller applies the default floors. A file that exists but
+        cannot be read yields Text = $null and ReadError set to the first line of the
+        exception message, so the caller fails closed. The function never throws.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param()
+
+    try {
+        $file = Get-ArtifactFileContent -Path 'CLAUDE.md'
+        return @{ Text = $file.Text; ReadError = $null }
+    }
+    catch {
+        return @{ Text = $null; ReadError = ([string]$_.Exception.Message -split "`r?`n")[0] }
+    }
+}
+
 function Get-LcovRepoCoverage {
     [OutputType([Nullable[double]])]
     param([string]$Path)

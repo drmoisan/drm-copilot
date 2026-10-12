@@ -384,5 +384,92 @@ Describe 'validate-feature-review-coverage coverage (issue #786)' {
             $decision.Ok | Should -BeFalse
             $decision.Message | Should -Be $expected
         }
+
+        It 'E4-TR4a: an absent root CLAUDE.md applies the default <Metric> floor' -ForEach @(
+            @{ Metric = 'line'; Fixture = 'LineBelowFloor'; Expected = '85% line coverage floor (default)' }
+            @{ Metric = 'branch'; Fixture = 'BranchBelowFloor'; Expected = '75% branch coverage floor (default)' }
+        ) {
+            # Arrange: the fixture map has no CLAUDE.md entry, so the file is absent.
+            $text = Use-E4Fixture -Name $Fixture
+
+            # Act
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ClaudeEnvelope -AssistantText $text)
+
+            # Assert
+            $decision.Ok | Should -BeFalse
+            $decision.Message.Contains($Expected) | Should -BeTrue -Because $decision.Message
+        }
+
+        It 'E4-TR4c: the CLAUDE.md reader reports a read error without throwing' {
+            # Arrange: the real reader runs; the file exists but its read throws.
+            Mock Get-ArtifactFileContent -MockWith $script:RealGetArtifactFileContent
+            Mock Test-Path { $true }
+            Mock Get-Content { throw 'simulated read failure: access denied' }
+
+            # Act
+            $result = Get-FeatureReviewClaudeMdText
+
+            # Assert
+            $result.Text | Should -BeNullOrEmpty
+            $result.ReadError | Should -BeLike '*access denied*'
+        }
+
+        It 'E4-TR10a: <Fixture> is repairable with stop_hook_active <Active>' -ForEach @(
+            @{ Fixture = 'MissingToken'; Active = $false }
+            @{ Fixture = 'MissingToken'; Active = $true }
+            @{ Fixture = 'AbsentArtifact'; Active = $false }
+            @{ Fixture = 'AbsentArtifact'; Active = $true }
+            @{ Fixture = 'NoCoverageRow'; Active = $false }
+            @{ Fixture = 'NoCoverageRow'; Active = $true }
+            @{ Fixture = 'LineBelowFloor'; Active = $false }
+            @{ Fixture = 'LineBelowFloor'; Active = $true }
+        ) {
+            # Act
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ClaudeEnvelope -AssistantText (Use-E4Fixture -Name $Fixture) -StopHookActive $Active)
+
+            # Assert: a repairable condition blocks again and carries no report-and-halt clause.
+            $decision.Ok | Should -BeFalse
+            $decision.Message | Should -Not -BeLike '*cannot repair this condition*'
+        }
+
+        It 'E4-TR10b: <Fixture> is not repairable with stop_hook_active <Active>' -ForEach @(
+            @{ Fixture = 'UnreadableClaudeMd'; Active = $false }
+            @{ Fixture = 'UnreadableClaudeMd'; Active = $true }
+            @{ Fixture = 'BranchBelowFloor'; Active = $false }
+            @{ Fixture = 'BranchBelowFloor'; Active = $true }
+            @{ Fixture = 'ValidatorError'; Active = $false }
+            @{ Fixture = 'ValidatorError'; Active = $true }
+        ) {
+            # Act
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ClaudeEnvelope -AssistantText (Use-E4Fixture -Name $Fixture) -StopHookActive $Active)
+
+            # Assert: a non-repairable condition blocks once with the report-and-halt clause.
+            if ($Active) {
+                $decision.Ok | Should -BeTrue
+            }
+            else {
+                $decision.Ok | Should -BeFalse
+                $decision.Message | Should -BeLike '*cannot repair this condition*'
+            }
+        }
+
+        It 'E4-TR10c: a repairable and a non-repairable coverage condition still block with stop_hook_active true' {
+            # Act: Python line below floor (repairable) and TypeScript branch below floor (non-repairable).
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ClaudeEnvelope -AssistantText (Use-E4Fixture -Name 'Mixed') -StopHookActive $true)
+
+            # Assert
+            $decision.Ok | Should -BeFalse
+        }
+
+        It 'E4-TR10d: an unreadable root CLAUDE.md through the entry point exits <ExitCode> with stop_hook_active <Active>' -ForEach @(
+            @{ Active = $false; ExitCode = 2 }
+            @{ Active = $true; ExitCode = 0 }
+        ) {
+            # Act
+            $entry = Invoke-ClaudeReviewEntry -Stdin (ConvertTo-ClaudeEnvelope -AssistantText (Use-E4Fixture -Name 'UnreadableClaudeMd') -StopHookActive $Active)
+
+            # Assert
+            $entry.ExitCode | Should -Be $ExitCode -Because $entry.Stderr
+        }
     }
 }
