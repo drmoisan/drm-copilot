@@ -293,4 +293,39 @@ Describe 'validate-feature-review-coverage coverage (issue #786)' {
             [string]$thrown | Should -Match 'CLAUDE_HOOK_INPUT is empty'
         }
     }
+
+    Context 'E4 (issue #896)' {
+        BeforeAll {
+            . (Join-Path $PSScriptRoot 'validate-feature-review-coverage.E4.Helpers.ps1')
+        }
+
+        BeforeEach {
+            $script:E4ArtifactMap = @{}
+            Mock Get-ArtifactFileContent { param([string] $Path) $entry = $script:E4ArtifactMap[$Path]; if ($null -eq $entry) { return @{ Exists = $false; Text = $null; Lines = @() } }; if ($entry -is [string] -and $entry -eq 'THROW') { throw 'simulated read failure: access denied' }; return Get-ArtifactFileResult -Lines @($entry) }
+        }
+
+        It 'E4-TR1: the entry point exits 2 for an envelope without review-artifact tokens' -Tag 'E4-Regression', 'E4-TR1' {
+            # Arrange / Act: a valid envelope whose assistant text advertises no review artifact.
+            $result = Invoke-ClaudeReviewEntry -Stdin (ConvertTo-ClaudeEnvelope -AssistantText 'Review complete.')
+
+            # Assert
+            $result.ExitCode | Should -Be 2 -Because $result.Stderr
+            $result.Stderr.StartsWith('validate-feature-review-coverage:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Stderr
+        }
+
+        It 'E4-TR4: an unreadable root CLAUDE.md blocks with a structured message and exit 2' -Tag 'E4-Regression', 'E4-TR4' {
+            # Arrange: the root CLAUDE.md exists in the fixture map but its read throws.
+            $text = Use-E4Fixture -Name 'UnreadableClaudeMd'
+
+            # Act
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ClaudeEnvelope -AssistantText $text)
+            $entry = Invoke-ClaudeReviewEntry -Stdin (ConvertTo-ClaudeEnvelope -AssistantText $text)
+
+            # Assert
+            $decision.Ok | Should -BeFalse
+            $decision.Message | Should -BeLike '*root CLAUDE.md*'
+            $decision.Message | Should -BeLike '*could not be read*'
+            $entry.ExitCode | Should -Be 2 -Because $entry.Stderr
+        }
+    }
 }

@@ -195,5 +195,21 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
             $result.ExitCode | Should -Be 0
             ($result.Stdout | ConvertFrom-Json).continue | Should -BeFalse
         }
+
+        It 'E4-TR7: with no CLAUDE.md figure an 80.5% line row fails against the 85% floor' -Tag 'E4-Regression', 'E4-TR7' {
+            # Arrange: a Python change, an 80.5 percent LCOV report, and a root CLAUDE.md without coverage figures.
+            Mock Test-Path { param($Path) -not ([string]$Path).EndsWith('.xml') }
+            Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
+            Mock Get-Content { param($Path) $p = [string]$Path; if ($p.EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } elseif ($p.EndsWith('lcov.info')) { @('LF:1000', 'LH:805') } elseif ($p.EndsWith('CLAUDE.md')) { 'Project notes without coverage figures.' } else { 'Python coverage PASS' } }
+
+            # Act
+            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStop
+
+            # Assert
+            $result.ExitCode | Should -Be 0
+            $result.Stdout | Should -Not -BeNullOrEmpty
+            ($result.Stdout | ConvertFrom-Json).decision | Should -Be 'block'
+            ($result.Stdout | ConvertFrom-Json).reason | Should -BeLike '*below the 85% line coverage floor*'
+        }
     }
 }
