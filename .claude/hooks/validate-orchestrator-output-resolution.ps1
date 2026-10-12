@@ -155,8 +155,8 @@ function Find-OrchestratorOutputRunSignalValue {
         try { $parsed = ConvertFrom-Json -InputObject $text -NoEnumerate -ErrorAction Stop } catch { continue }
         if ($parsed -isnot [System.Management.Automation.PSCustomObject]) { continue }
         $names = @($parsed.PSObject.Properties.Name)
-        if (-not ($names -ccontains 'route_id') -or ([string]$parsed.route_id -cne $route)) { continue }
-        if (-not ($names -ccontains $field)) { continue }
+        if (-not ($names -contains 'route_id') -or ([string]$parsed.route_id -cne $route)) { continue }
+        if (-not ($names -contains $field)) { continue }
         $value = $parsed.$field
         if ($value -isnot [string] -or [string]::IsNullOrWhiteSpace($value)) { continue }
         if (-not $values.Contains($value)) { $values.Add($value) }
