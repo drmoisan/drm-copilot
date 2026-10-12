@@ -59,7 +59,7 @@ BeforeAll {
 
     function ConvertTo-OutputPayload {
         param([string] $Output)
-        return (@{ output = $Output } | ConvertTo-Json -Compress)
+        return (@{ last_assistant_message = $Output } | ConvertTo-Json -Compress)
     }
 
     # Model the live worktrees for the shipped resolver and for the sibling's discovery.
@@ -125,7 +125,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead -Map @{ $path = $text }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'Done. integration_branch: epic/c6-integration') `
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'Done. integration_branch: epic/c6-integration') `
             -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
 
         # Assert
@@ -145,7 +145,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead -Map @{ $owner = $text; $stale = $text }
 
         # Act
-        $null = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'integration_branch: epic/c6-integration') `
+        $null = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'integration_branch: epic/c6-integration') `
             -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
 
         # Assert
@@ -162,7 +162,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead -Map @{ $pathB = $textB }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'integration_branch: epic/b') `
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'integration_branch: epic/b') `
             -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
 
         # Assert
@@ -178,7 +178,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead -Map @{ $path = $text }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'Final summary.') `
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'Final summary.') `
             -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
 
         # Assert
@@ -195,7 +195,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'Final summary.') `
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'Final summary.') `
             -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session -RoutingInvoker $script:RoutingStub
 
         # Assert
@@ -212,7 +212,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'Final summary.') `
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'Final summary.') `
             -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session -RoutingInvoker $script:RoutingStub
 
         # Assert
@@ -229,7 +229,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead -Map @{ "$($script:Session)/$script:EpicLeaf" = '{}' }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'integration_branch: epic/new') `
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'integration_branch: epic/new') `
             -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session -RoutingInvoker $script:RoutingStub
 
         # Assert
@@ -246,7 +246,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'Final summary.') `
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'Final summary.') `
             -CheckpointPath $script:ParallelLeaf -ArtifactType 'parallel-orchestrator-state' -SessionRoot $script:Session -RoutingInvoker $script:RoutingStub
 
         # Assert
@@ -265,7 +265,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead -Map @{ $path = $text }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'Final summary.') `
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'Final summary.') `
             -CheckpointPath $script:ParallelLeaf -ArtifactType 'parallel-orchestrator-state' -SessionRoot $script:Session
 
         # Assert
@@ -284,7 +284,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'Final summary.') `
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'Final summary.') `
             -CheckpointPath $script:ParallelLeaf -ArtifactType 'parallel-orchestrator-state' -SessionRoot $script:Session -RoutingInvoker $script:RoutingStub
 
         # Assert
@@ -306,7 +306,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead -Map @{ $pathBeta = $textBeta }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'parallel_slug: beta') `
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'parallel_slug: beta') `
             -CheckpointPath $script:ParallelLeaf -ArtifactType 'parallel-orchestrator-state' -SessionRoot $script:Session
 
         # Assert
@@ -322,7 +322,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead -Map @{ $path = '{"objective":"deliver feature X","completed_steps":["step1"],"next_step":"complete","last_updated":"2026-10-08T00-00"}' }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'Final summary.') -SessionRoot $script:Session
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'Final summary.') -SessionRoot $script:Session
 
         # Assert
         $result.Ok | Should -BeTrue -Because $result.Message
@@ -341,7 +341,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Mock Test-OrchestratorOutputRunbookFile { $true }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'integration_branch: epic/c6-integration') `
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'integration_branch: epic/c6-integration') `
             -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
 
         # Assert
@@ -356,7 +356,7 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Set-OutputCheckpointRead
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-OutputPayload -Output 'integration_branch: epic/c6-integration') `
+        $result = Invoke-OrchestratorOutputValidation -InputText (ConvertTo-OutputPayload -Output 'integration_branch: epic/c6-integration') `
             -CheckpointPath 'artifacts/orchestration/orchestrator-state.json' -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
 
         # Assert

@@ -416,18 +416,16 @@ Describe 'orchestrator output validator handler proof' {
         if (Get-Command Test-CodexEpicChildRoutingLaunchAuthority -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Test-CodexEpicChildRoutingLaunchAuthority' -Surface 'Codex' }
 
         function Invoke-OrchestratorOutputHookProcess {
-            # Drives the hook through the & route with stdin and stderr redirected and the
-            # payload environment variable set for this one invocation; all are restored in finally.
+            # Drives the hook through the & route with the SubagentStop stdin envelope supplied
+            # through SetIn and stderr redirected for this one invocation; both are restored in finally.
             param([hashtable] $HookParameter = @{})
             $priorIn = [System.Console]::In
             $priorError = [System.Console]::Error
-            $priorInput = $env:CLAUDE_HOOK_INPUT
             $errorWriter = [System.IO.StringWriter]::new()
             $thrown = $null
             try {
-                [System.Console]::SetIn([System.IO.StringReader]::new(''))
+                [System.Console]::SetIn([System.IO.StringReader]::new('{"hook_event_name":"SubagentStop","last_assistant_message":"Final summary."}'))
                 [System.Console]::SetError($errorWriter)
-                $env:CLAUDE_HOOK_INPUT = '{"output":"Final summary."}'
                 $global:LASTEXITCODE = 0
                 try { $null = & $script:OrchestratorOutputHook @HookParameter } catch { $thrown = $_ }
                 $exitCode = $LASTEXITCODE
@@ -435,7 +433,6 @@ Describe 'orchestrator output validator handler proof' {
             finally {
                 [System.Console]::SetIn($priorIn)
                 [System.Console]::SetError($priorError)
-                $env:CLAUDE_HOOK_INPUT = $priorInput
             }
             return [pscustomobject]@{ Thrown = $thrown; ExitCode = $exitCode; Stderr = $errorWriter.ToString() }
         }
@@ -445,13 +442,8 @@ Describe 'orchestrator output validator handler proof' {
         # Arrange
         Mock Import-Module { }
         Mock Import-Module { throw 'simulated load failure: WorktreeRunResolution.psm1' } -ParameterFilter { $Name -like '*WorktreeRunResolution.psm1' }
-        try {
-            # Act
-            $result = Invoke-OrchestratorOutputHookProcess
-        }
-        finally {
-            $script:OrchestratorOutputResolverImportFailure = $null
-        }
+        # Act
+        $result = Invoke-OrchestratorOutputHookProcess
         # Assert
         $result.Thrown | Should -BeNullOrEmpty -Because "the hook must not throw ($($result.Thrown))"
         $result.ExitCode | Should -Be 2
@@ -461,12 +453,7 @@ Describe 'orchestrator output validator handler proof' {
     It 'H8 validate-orchestrator-output.ps1 exits 2 naming OrchestratorStateEpicWaveBarrier.psm1 when the Layer 2 import fails' {
         Mock Import-Module { }
         Mock Import-Module { throw 'simulated load failure: OrchestratorStateEpicWaveBarrier.psm1' } -ParameterFilter { $Name -like '*OrchestratorStateEpicWaveBarrier.psm1' }
-        try {
-            $result = Invoke-OrchestratorOutputHookProcess -HookParameter @{ ArtifactType = 'epic-orchestrator-state' }
-        }
-        finally {
-            $script:OrchestratorOutputWaveBarrierImportFailure = $null
-        }
+        $result = Invoke-OrchestratorOutputHookProcess -HookParameter @{ ArtifactType = 'epic-orchestrator-state' }
         $result.Thrown | Should -BeNullOrEmpty -Because "the hook must not throw ($($result.Thrown))"
         $result.ExitCode | Should -Be 2
         $result.Stderr.Contains('OrchestratorStateEpicWaveBarrier.psm1') | Should -BeTrue -Because $result.Stderr

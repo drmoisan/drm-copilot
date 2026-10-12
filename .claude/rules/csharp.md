@@ -2,12 +2,12 @@
 paths:
   - "**/*.cs"
   - "**/*.csproj"
-description: C#-specific toolchain and coding standards (No-COM, xUnit).
+description: C#-specific toolchain and coding standards (xUnit).
 ---
 
 # C# Code Standards
 
-This rule file summarizes the C#-specific policies for this repository. It targets the No-COM .NET foundation: xUnit, NSubstitute, FluentAssertions, `dotnet build`, the analyzer stack, `TimeProvider`, and uniform coverage thresholds.
+This rule file summarizes the C#-specific policies for this repository. It targets a host-neutral .NET foundation: xUnit, NSubstitute, FluentAssertions, `dotnet build`, the analyzer stack, `TimeProvider`, and uniform coverage thresholds.
 
 ## Toolchain
 
