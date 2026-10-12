@@ -324,7 +324,7 @@ function Get-OrchestratorOutputBlockDecision {
     # on the checkpoint text already read.
     if ($ArtifactType -eq 'epic-orchestrator-state') {
         $barrier = Get-OrchestratorOutputWaveBarrierDecision -CheckpointText $file.Content
-        if (-not $barrier.Ok) { return @{ Ok = $false; Message = $barrier.Message } }
+        if (-not $barrier.Ok) { return @{ Ok = $false; Repairable = $barrier.Repairable; Message = $barrier.Message } }
     }
 
     return @{ Ok = $true; Message = $null }
