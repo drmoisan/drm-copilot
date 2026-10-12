@@ -5,8 +5,8 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - Epic issue: #904
 - Integration branch: `epic/subagentstop-envelope-integration`
 - Current wave: 1
-- Next step: `E5_await_E2_903 (then resume E3, then E4, one subtree at a time)`
-- Last updated: 2026-10-12T02:42:18Z
+- Next step: `WAIT_FOR_GO (running child finishes; then E3, then E4 one at a time after GO)`
+- Last updated: 2026-10-12T03:03:00Z
 
 ## Waves
 
@@ -35,3 +35,4 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - 2026-10-11T18:45Z: started E2 (903), E3 (905), E4 (896) execution; all three died on an account weekly limit.
 - 2026-10-12T02:42Z: started E3, E4, E2 resumes in their existing worktrees (before the throttle directive arrived).
 - 2026-10-12: THROTTLE received: one child subtree at a time, order E2, E3, E4. Coordinator asked to stop the E3 and E4 resumes; E2 continues.
+- 2026-10-12T03:03Z: THROTTLE: no new child or agent-launching step until GO; the running child finishes.
