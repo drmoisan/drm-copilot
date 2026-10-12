@@ -155,7 +155,7 @@ function Invoke-FeatureReviewCoverageValidation {
     foreach ($lang in $changedLanguages.Keys) {
         $repoPct = Get-LanguageRepoCoverage -Language $lang
         $branchPct = Get-LanguageBranchCoverage -Language $lang
-        $result = Test-LanguageCoverageRow -AuditText $policyAuditText -Language $lang -RepoWidePct $repoPct -BranchPct $branchPct -LineFloor $thresholds.Line -BranchFloor $thresholds.Branch
+        $result = Test-LanguageCoverageRow -AuditText $policyAuditText -Language $lang -RepoWidePct $repoPct -BranchPct $branchPct -LineFloor $thresholds.Line -BranchFloor $thresholds.Branch -LineSource $thresholds.LineSource -BranchSource $thresholds.BranchSource
         if (-not $result.Ok) {
             $coverageFailures.Add($result.Reason)
         }

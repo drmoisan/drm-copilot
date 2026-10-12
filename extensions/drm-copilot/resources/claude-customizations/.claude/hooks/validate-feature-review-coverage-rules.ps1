@@ -98,8 +98,13 @@ function Test-LanguageCoverageRow {
         [Nullable[double]]$RepoWidePct,
         [Nullable[double]]$BranchPct,
         [double]$LineFloor = 85.0,
-        [double]$BranchFloor = 75.0
+        [double]$BranchFloor = 75.0,
+        [string] $LineSource = 'default',
+        [string] $BranchSource = 'default'
     )
+
+    $lineSourceLabel = if ($LineSource -eq 'claude-md') { '(root CLAUDE.md)' } else { '(default)' }
+    $branchSourceLabel = if ($BranchSource -eq 'claude-md') { '(root CLAUDE.md)' } else { '(default)' }
 
     $languageLabelMap = @{
         'TypeScript' = @('TypeScript', 'typescript')
@@ -152,7 +157,7 @@ function Test-LanguageCoverageRow {
         if (-not $failLines -or $failLines.Count -eq 0) {
             return @{
                 Ok     = $false
-                Reason = ("{0} repo-wide coverage is {1}% (below the {2}% line coverage floor) but the policy-audit contains no FAIL verdict on a coverage row for {0}." -f $Language, $RepoWidePct, $LineFloor)
+                Reason = ("{0} repo-wide coverage is {1}% (below the {2}% line coverage floor {3}) but the policy-audit contains no FAIL verdict on a coverage row for {0}." -f $Language, $RepoWidePct, $LineFloor, $lineSourceLabel)
             }
         }
     }
@@ -160,7 +165,7 @@ function Test-LanguageCoverageRow {
     if ($null -ne $BranchPct -and $BranchPct -lt $BranchFloor) {
         return @{
             Ok     = $false
-            Reason = ("{0} branch coverage is {1}% (below the {2}% branch coverage floor); policy-audit must record FAIL on the corresponding coverage row." -f $Language, $BranchPct, $BranchFloor)
+            Reason = ("{0} branch coverage is {1}% (below the {2}% branch coverage floor {3}); policy-audit must record FAIL on the corresponding coverage row." -f $Language, $BranchPct, $BranchFloor, $branchSourceLabel)
         }
     }
 

@@ -195,6 +195,22 @@ Describe 'validate-feature-review-coverage coverage (issue #786)' {
         It 'accepts a FAIL verdict for coverage below the line floor' {
             (Test-LanguageCoverageRow -AuditText 'Python coverage FAIL' -Language 'Python' -RepoWidePct 80).Ok | Should -BeTrue
         }
+
+        It 'E4-TR6: <Metric> floor message names <Expected>' -ForEach @(
+            @{ Metric = 'line'; Arguments = @{ RepoWidePct = 60; LineFloor = 70; LineSource = 'claude-md' }; Expected = '70% line coverage floor (root CLAUDE.md)' }
+            @{ Metric = 'line'; Arguments = @{ RepoWidePct = 60 }; Expected = '85% line coverage floor (default)' }
+            @{ Metric = 'branch'; Arguments = @{ RepoWidePct = 90; BranchPct = 50; BranchFloor = 60; BranchSource = 'claude-md' }; Expected = '60% branch coverage floor (root CLAUDE.md)' }
+            @{ Metric = 'branch'; Arguments = @{ RepoWidePct = 90; BranchPct = 50 }; Expected = '75% branch coverage floor (default)' }
+        ) {
+            # Arrange: the row supplies the measured figures, the floor, and the floor source.
+            $splat = $Arguments
+
+            # Act
+            $result = Test-LanguageCoverageRow -AuditText 'Python coverage PASS' -Language 'Python' @splat
+
+            # Assert
+            $result.Reason.Contains($Expected) | Should -BeTrue -Because $result.Reason
+        }
     }
 
     Context 'Invoke-FeatureReviewCoverageValidation' {

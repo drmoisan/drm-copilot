@@ -69,6 +69,22 @@ Describe 'feature-review-coverage-thresholds (issue #824)' {
         $result.BranchSource | Should -Be $BranchSource
     }
 
+    It 'E4-ST5: the resolver help names every accepted comparator form' {
+        # Arrange: parse the resolver file and take the function's comment-based help.
+        $tokens = $null
+        $parseErrors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $script:HookRoot 'feature-review-coverage-thresholds.ps1'), [ref]$tokens, [ref]$parseErrors)
+        $function = $ast.Find({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Get-FeatureReviewCoverageThreshold' }, $true)
+
+        # Act
+        $description = ($function.GetHelpContent().Description) -replace '\s+', ' '
+
+        # Assert
+        foreach ($form in @('>=', 'U+2265', 'at least', 'minimum of', 'no less than', 'or more', 'or higher', 'or above', 'or greater')) {
+            $description.Contains($form) | Should -BeTrue -Because "the resolver help must name the accepted form '$form'"
+        }
+    }
+
     It 'E4-TR5-N<Id> keeps the defaults for <Label>' -ForEach @(
         @{ Id = 1; Label = 'Line coverage was 62% last release'; Text = 'Line coverage was 62% last release'; Line = 85; Branch = 75; LineSource = 'default'; BranchSource = 'default' }
         @{ Id = 2; Label = 'Line and branch coverage: 70% minimum'; Text = 'Line and branch coverage: 70% minimum'; Line = 85; Branch = 75; LineSource = 'default'; BranchSource = 'default' }
