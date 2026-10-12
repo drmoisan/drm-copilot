@@ -56,7 +56,9 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/Orchestr
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateCompletion.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateCompletion.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
 $ErrorActionPreference = 'Stop'
+$script:SubagentStopReportAndHaltLine = 'This condition is not repairable by the subagent. Report it to the operator and halt.'
 
 function Get-CheckpointFileContent {
     <#
@@ -125,7 +127,7 @@ function Test-HumanInteractionShape {
 
     $hiProps = @($HumanInteraction.PSObject.Properties.Name)
     if ($hiProps -notcontains 'requirements') {
-        return @{ Ok = $false; Message = "orchestrator hook: 'human_interaction' is present but 'requirements' array is missing." }
+        return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: 'human_interaction' is present but 'requirements' array is missing." }
     }
 
     $requirements = @($HumanInteraction.requirements)
@@ -139,15 +141,15 @@ function Test-HumanInteractionShape {
         if ($reqProps -contains 'response') { $response = [string]$req.response }
 
         if ([string]::IsNullOrWhiteSpace($response)) {
-            return @{ Ok = $false; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has no resolved 'response'. Every unautomatable requirement must resolve to one of: scope_change, exception, halt." }
+            return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has no resolved 'response'. Every unautomatable requirement must resolve to one of: scope_change, exception, halt." }
         }
 
         if ($allowedResponses -notcontains $response) {
-            return @{ Ok = $false; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has 'response' value '$response' outside the allowed set (scope_change, exception, halt)." }
+            return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has 'response' value '$response' outside the allowed set (scope_change, exception, halt)." }
         }
 
         if ($response -eq 'halt') {
-            return @{ Ok = $false; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has 'response' == 'halt'; DONE is blocked while a halt is present." }
+            return @{ Ok = $false; Repairable = $false; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has 'response' == 'halt'; DONE is blocked while a halt is present." }
         }
 
         if ($response -eq 'exception') {
@@ -155,11 +157,11 @@ function Test-HumanInteractionShape {
             if ($reqProps -contains 'runbook_path') { $runbookPath = [string]$req.runbook_path }
 
             if ([string]::IsNullOrWhiteSpace($runbookPath)) {
-                return @{ Ok = $false; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has 'response' == 'exception' but no non-empty 'runbook_path'. A permitted exception requires a runbook." }
+                return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has 'response' == 'exception' but no non-empty 'runbook_path'. A permitted exception requires a runbook." }
             }
 
             if (-not (& $FileExistsCheck $runbookPath)) {
-                return @{ Ok = $false; Message = "orchestrator hook: 'human_interaction.requirements[$i]' references runbook_path '$runbookPath' but no file exists at that location." }
+                return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: 'human_interaction.requirements[$i]' references runbook_path '$runbookPath' but no file exists at that location." }
             }
         }
     }
@@ -206,8 +208,36 @@ function Invoke-OrchestratorOutputValidation {
     if ($payload.PSObject.Properties.Name -contains 'output') {
         $agentOutput = $payload.output
     }
+    $blockArguments = @{ AgentOutput = ([string]$agentOutput); CheckpointPath = $CheckpointPath; ArtifactType = $ArtifactType; SessionRoot = $SessionRoot }
+    if ($PSBoundParameters.ContainsKey('RoutingInvoker')) { $blockArguments['RoutingInvoker'] = $RoutingInvoker }
+    return Get-OrchestratorOutputBlockDecision @blockArguments
+}
+
+function Get-OrchestratorOutputBlockDecision {
+    <#
+    .SYNOPSIS
+        Applies the orchestrator completion checks to the assistant text and returns the block decision.
+    .DESCRIPTION
+        Returns @{ Ok = $true; Message = $null } to allow, or a hashtable with Ok = $false, a
+        Repairable boolean, and Message. Repairable is $true when the resumed subagent can clear
+        the condition (message content, its checkpoint, or its runbook) and $false when it cannot
+        (a registration argument, an internal evaluation failure, or a state it may not clear).
+        The caller applies the re-entry policy to that flag.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $AgentOutput,
+        [string] $CheckpointPath = 'artifacts/orchestration/orchestrator-state.json',
+        [string] $ArtifactType = 'orchestrator-state',
+        [string] $SessionRoot = (Get-Location).Path,
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $RoutingInvoker
+    )
+
     if ([string]::IsNullOrWhiteSpace($agentOutput)) {
-        return @{ Ok = $false; Message = 'orchestrator hook: agent output is empty; orchestrator must report final completion summary before termination.' }
+        return @{ Ok = $false; Repairable = $true; Message = 'orchestrator hook: agent output is empty (last_assistant_message carries no text); orchestrator must report final completion summary before termination.' }
     }
 
     # Resolve the run checkpoint before any read (issue #787). A failed import, or an
@@ -219,23 +249,24 @@ function Invoke-OrchestratorOutputValidation {
         return @{ Ok = $false; Repairable = $false; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: NoTarget (RESOLVER_FAILED): {1}' -f $ArtifactType, $_.Exception.Message) }
     }
     if (-not $resolution.Resolved) {
-        return @{ Ok = $false; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: {1} ({2}): {3}' -f
+        $resolutionRepairable = ($resolution.Status -in @('NoTarget', 'Ambiguous')) -and ($ArtifactType -in @('epic-orchestrator-state', 'parallel-orchestrator-state'))
+        return @{ Ok = $false; Repairable = $resolutionRepairable; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: {1} ({2}): {3}' -f
                 $ArtifactType, $resolution.Status, $resolution.ReasonCode, $resolution.Detail) }
     }
 
     $file = Get-CheckpointFileContent -Path $resolution.CheckpointPath
     if (-not $file.Exists) {
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' does not exist. Orchestrator must persist progress per powershell-orchestration-state-machine before termination." }
+        return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' does not exist. Orchestrator must persist progress per powershell-orchestration-state-machine before termination." }
     }
 
     if ([string]::IsNullOrWhiteSpace($file.Content)) {
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is empty; cannot validate orchestrator progress." }
+        return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is empty; cannot validate orchestrator progress." }
     }
 
     try {
         $checkpoint = $file.Content | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is not valid JSON: $($_.Exception.Message)" }
+        return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is not valid JSON: $($_.Exception.Message)" }
     }
 
     $requiredFields = @('objective', 'completed_steps', 'next_step', 'last_updated')
@@ -249,11 +280,11 @@ function Invoke-OrchestratorOutputValidation {
 
     if ($missingFields.Count -gt 0) {
         $missingList = ($missingFields -join ', ')
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is missing required field(s): $missingList. Orchestrator must persist objective, completed_steps, next_step, and last_updated." }
+        return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is missing required field(s): $missingList. Orchestrator must persist objective, completed_steps, next_step, and last_updated." }
     }
 
     if ([string]::IsNullOrWhiteSpace([string]$checkpoint.objective)) {
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' has an empty 'objective' field; orchestrator must record the active objective." }
+        return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' has an empty 'objective' field; orchestrator must record the active objective." }
     }
 
     $humanInteraction = $null
@@ -265,7 +296,7 @@ function Invoke-OrchestratorOutputValidation {
         param($Path) Test-OrchestratorOutputRunbookFile -Path (Resolve-OrchestratorOutputRunbookPath -WorktreeRoot $resolution.WorktreeRoot -RunbookPath $Path)
     }
     if (-not $hiResult.Ok) {
-        return @{ Ok = $false; Message = $hiResult.Message }
+        return @{ Ok = $false; Repairable = $hiResult.Repairable; Message = $hiResult.Message }
     }
 
     # Delegate to the portable routing-contract validation, dispatched on
@@ -284,9 +315,9 @@ function Invoke-OrchestratorOutputValidation {
         # or complexity_assessments); otherwise fall back to the routing-contract
         # block reason for a generic completion/routing failure.
         if ($routingResult.ErrorText -match 'model_routing_receipts|complexity_assessments') {
-            return @{ Ok = $false; Message = "MODEL_ROUTING_BLOCKED: $($routingResult.ErrorText)" }
+            return @{ Ok = $false; Repairable = $true; Message = "MODEL_ROUTING_BLOCKED: $($routingResult.ErrorText)" }
         }
-        return @{ Ok = $false; Message = "ROUTING_CONTRACT_BLOCKED: $($routingResult.ErrorText)" }
+        return @{ Ok = $false; Repairable = $true; Message = "ROUTING_CONTRACT_BLOCKED: $($routingResult.ErrorText)" }
     }
 
     # Layer 2 (issue #840): the epic checkpoint only, after the routing dispatch passes,
