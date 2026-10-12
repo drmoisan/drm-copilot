@@ -21,6 +21,7 @@ tools:
   - "Bash(bash .claude/lib/bash/mutate-parallel-run.sh*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1*)"
   - "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1*)"
+  - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
   - "Bash(dotnet tool restore*)"
   - "Bash(dotnet csharpier check *)"
   - "Bash(dotnet build *)"
