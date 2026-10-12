@@ -125,5 +125,5 @@ $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop 
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
 $decision = Get-PrAuthorOutputDecision
-if (-not $decision['allowed']) { Write-Error $decision['reason']; exit 1 }
+if (-not $decision['allowed']) { Exit-SubagentStopBlock -Message $decision['reason'] }
 exit 0

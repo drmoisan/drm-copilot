@@ -33,3 +33,11 @@ Push refspec (branch substitution 1): `git push origin HEAD:bug/subagentstop-env
 - Commit: 31bee75cd (`test(905): add stdin-envelope regression tests for the four artifact-gate validators`)
 - Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`3aad71302..31bee75cd`)
 - Post-commit `git status --porcelain`: (empty)
+
+## [P3-T8] Phase 3
+
+- Pre-commit `git status --porcelain`: pr-author hook, mirror, and two suites modified; feature-folder evidence, plan, spec modified; two committed evidence files renamed (`git mv`); new mirror-log, static-checks-pr-author, conversion-pr-author evidence (all within W-ALLOWED).
+- Commit: 53cf0fb1fd800955296a80780bc9296ddfec38da (`fix(905): read the pr-author gate input from the SubagentStop stdin envelope`)
+- Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`31bee75cd..53cf0fb1f`)
+- Post-commit `git status --porcelain`: (empty)
+- CORPUS-AFTER-COMMIT: pr-author | 53cf0fb1fd800955296a80780bc9296ddfec38da

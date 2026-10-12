@@ -81,3 +81,19 @@ IT-TITLE: exits 2 with a payload anomaly reason when last_assistant_message is a
 IT-TITLE: keeps validating when stop_hook_active is true | TAGS: E3-Entry
 PARSE-ERRORS: 0
 ```
+
+## [P4-T1] Blocking switch of .claude/hooks/validate-pr-author-output.ps1
+
+Timestamp: 2026-10-11T23-02
+Command: sh <SCRATCHPAD>/route.sh <SCRATCHPAD>/e905-static.ps1 -File .claude/hooks/validate-pr-author-output.ps1 -Absent 'CLAUDE_HOOK_INPUT||\bexit 1\b||Write-Error' -Simple 'Exit-SubagentStopBlock -Message' -TrimLine 'exit 0'
+EXIT_CODE: 0
+Output Summary: ParseFile reports 0 errors; the scan for `CLAUDE_HOOK_INPUT`, `\bexit 1\b`, `Write-Error` returns no match; `Exit-SubagentStopBlock -Message` count is 1; the trimmed line `exit 0` matches exactly one line (129). Only the tail block line changed (`git diff --stat 53cf0fb1f -- .claude/hooks/validate-pr-author-output.ps1`: 1 insertion, 1 deletion). R-RESET: `P4-T1: none present`.
+
+```text
+FILE: .claude/hooks/validate-pr-author-output.ps1
+PARSE-ERRORS: 0
+PATTERN-SCAN: CLAUDE_HOOK_INPUT , \bexit 1\b , Write-Error | matches=0
+SIMPLE-COUNT: Exit-SubagentStopBlock -Message | 1
+TRIMLINE-COUNT: exit 0 | 1 | lines=129
+LINES: .claude/hooks/validate-pr-author-output.ps1 | 129
+```
