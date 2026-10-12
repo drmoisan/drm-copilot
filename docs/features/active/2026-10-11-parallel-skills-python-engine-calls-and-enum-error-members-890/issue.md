@@ -24,11 +24,11 @@ Three items remain after #791 (PR #875):
 ## Acceptance Criteria
 
 - [x] AC-1: No line in `.claude/skills/parallel-add/SKILL.md`, `.claude/skills/parallel-close/SKILL.md`, or `.claude/skills/parallel-orchestrate/SKILL.md`, or in their bundled mirrors under `extensions/drm-copilot/resources/claude-customizations/.claude/skills/`, instructs the agent to call `scripts/dev_tools/parallel_mutation_protocol.py` or any of `decide_admission`, `recolor_unstarted`, `build_add_entry`, `decide_close`, `build_close_entry`, `build_requeue_entry`; each former call site names a bash entry point under `.claude/lib/bash/`.
-- [ ] AC-2: Every bash entry point the rewritten skill text names exists under `.claude/lib/bash/`, is mirrored byte-identically into the bundled payload and listed in the core pack manifest, and is covered by bats tests that include a parity corpus shared with a Python test against the Python engine; every new or edited file stays at or under 500 lines.
+- [x] AC-2: Every bash entry point the rewritten skill text names exists under `.claude/lib/bash/`, is mirrored byte-identically into the bundled payload and listed in the core pack manifest, and is covered by bats tests that include a parity corpus shared with a Python test against the Python engine; every new or edited file stays at or under 500 lines.
 - [x] AC-3: `Bash(poetry run python -c *)` is removed from `.claude/agents/parallel-orchestrator.md` (and its bundled mirror, if one exists) only if no skill or agent the persona uses still depends on it; the decision and its evidence are recorded in the feature folder, and every new command line added to `parallel-orchestrate` has a matching `Bash(...)` grant so `tests/scripts/dev_tools/test_parallel_orchestrator_permission_contracts.py` passes.
 - [x] AC-4: `UnknownEnumMemberError` lists the allowed members of the rejected field for `state`, `merge_status`, and `disposition` (and any other field passed by a raise site), proven by one unit test per field; the docstring no longer restricts the field to `state` or `merge_status`; the bash message selection in `.claude/lib/bash/parallel-mutation.sh` and the comments describing the former divergence are aligned.
 - [x] AC-5: The two operator-accepted residual risks from #791 are recorded unchanged in this feature folder under `## Operator-Accepted Residual Risks`, with their acceptance status unchanged, for carry-forward into the PR body.
-- [ ] AC-6: Python toolchain (black, ruff, pyright, pytest) passes on the changed Python files with line coverage >= 85% and branch coverage >= 75% for each changed Python production module; PoshQC analysis is clean for any changed PowerShell file; the PR CI `shell-coverage` job (Bats + kcov) passes with the new bats tests included.
+- [x] AC-6: Python toolchain (black, ruff, pyright, pytest) passes on the changed Python files with line coverage >= 85% and branch coverage >= 75% for each changed Python production module; PoshQC analysis is clean for any changed PowerShell file; the PR CI `shell-coverage` job (Bats + kcov) passes with the new bats tests included.
 - [x] AC-7: The overlap zones owned by other items in run bug-burndown-2026-10-11 are not rewritten: `parallel-add` step 2 (#885) and the child-DONE CI acceptance passage of `parallel-orchestrate` (#899).
 
 ## Operator-Accepted Residual Risks
@@ -58,4 +58,4 @@ Source: `docs/features/active/2026-09-29-issue-763-parallel-skill-cli-port-follo
 ## Evidence Checklist
 - [x] baseline
 - [x] targeted verification
-- [ ] end-state
+- [x] end-state
