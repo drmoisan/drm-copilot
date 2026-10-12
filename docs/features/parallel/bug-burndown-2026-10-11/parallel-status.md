@@ -15,8 +15,8 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 4
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-12T20:13:28Z
-- `next_step`: #890 and #899 in flight. Launch #900 when one merges and the other is past Phase 0.
+- `last_updated`: 2026-10-12T21:19:04Z
+- `next_step`: #899 and #900 in flight. Launch #901 when one merges and the other is past Phase 0.
 
 **Items**
 
@@ -28,13 +28,13 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 886 | docs/features/active/2026-10-11-validator-file-path-invocation-repo-root-first-886 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/914 | 8e83185fa6e7729f979f9f2b44d5d71ba51f2b38 | 2026-10-12T15:05:23Z | 2026-10-12T15:48:00Z |  |
 | 887 | docs/features/active/2026-10-11-host-tools-manifest-and-bootstrap-behavior-887 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/919 | 85ffd5aaecd9004b7d82e9db6ab0f18a4add02f6 | 2026-10-12T18:25:46Z | 2026-10-12T19:41:54Z |  |
 | 889 | docs/features/active/2026-10-11-argumentless-sort-ordering-and-comparator-coverage-gaps-889 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/920 | 9338ed463c63a039cadbe4f0548af7151f43f687 | 2026-10-12T19:00:02Z | 2026-10-12T20:13:00Z |  |
-| 890 | docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890 | 0 | in_flight | worktree_created |  |  | 2026-10-12T20:02:39Z |  |  |
+| 890 | docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/921 | dc8a0fcac4a8f137f5288e63eda097e8826ed117 | 2026-10-12T20:02:39Z | 2026-10-12T21:18:44Z |  |
 | 892 | docs/features/active/2026-10-11-push-down-ac22-test-command-omits-memory-tests-892 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/911 | b6fd76ecdfb07f860e4ec809d8b2658c16ef1f21 | 2026-10-12T13:02:40Z | 2026-10-12T13:33:01Z |  |
 | 894 | docs/features/active/2026-10-11-product-name-examples-remain-in-generic-rules-894 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/916 | 72ba7058be67a2bdbedb2fc920a98893ee8edad2 | 2026-10-12T16:18:11Z | 2026-10-12T16:52:00Z |  |
 | 895 | docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/918 | 153534cdba5ea322efa8486a20df45d20ae38296 | 2026-10-12T17:43:20Z | 2026-10-12T18:24:43Z |  |
 | 898 | docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/915 | 5dd9d1f33d1c0ccb01a6c34f6fefd959e020aa74 | 2026-10-12T15:48:17Z | 2026-10-12T16:17:51Z |  |
 | 899 | docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899 | 0 | in_flight | worktree_created |  |  | 2026-10-12T20:13:28Z |  |  |
-| 900 | docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900 | 0 | scheduled | not_started |  |  |  |  |  |
+| 900 | docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900 | 0 | in_flight | worktree_created |  |  | 2026-10-12T21:19:04Z |  |  |
 | 901 | docs/features/active/2026-10-11-pr-author-hook-docs-only-exemption-901 | 0 | scheduled | not_started |  |  |  |  |  |
 | 902 | docs/features/active/2026-10-11-epic-integration-branch-not-synced-with-main-902 | 0 | scheduled | not_started |  |  |  |  |  |
 | 903 | docs/features/active/2026-10-11-round-2-review-nits-and-evidence-timestamps-903 | 0 | scheduled | not_started |  |  |  |  |  |
