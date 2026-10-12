@@ -667,9 +667,10 @@ Every mutation re-derives durable state (`git worktree list --porcelain`, `git b
 `gh pr view`) before it is applied, because the checkpoint is a cache of durable state and not the
 source of truth. A rejected mutation appends no entry and changes no state.
 
-The decision logic for all three commands is the pure engine
-`scripts/dev_tools/parallel_mutation_protocol.py`. It decides; it never applies. Item keys are
-integers (`items[].issue_num`) everywhere on this surface.
+The decision logic for all three commands runs through the bundled bash entry points, which need no
+Python interpreter: `bash .claude/lib/bash/mutate-parallel-run.sh` for add, close, and requeue, and
+`bash .claude/lib/bash/remove-parallel-item.sh` for remove. They decide; they never apply. Item
+keys are integers (`items[].issue_num`) everywhere on this surface.
 
 ### Pinning invariant
 
@@ -773,8 +774,9 @@ lost and is not recorded in the mutation entry: it is recorded as an item-state 
 with the checkpoint's lifecycle timestamps, the same mechanism that records
 `proposed` -> `admitted` -> `prepared` during preparation. `new_state` is null for `close` only, and
 `item_key` is null for `close` only. `disposition` is non-null only on a `remove` entry whose
-`prior_state` is `in_flight`. Every `at` timestamp comes from the engine's injected clock seam; the
-engine never reads the wall clock. No field and no enum member is added to `mutations[]`; the nine
+`prior_state` is `in_flight`. Every `at` timestamp is supplied by the caller through `--at`; an
+entry point reads the clock only when `--at` is omitted, and then stamps the current UTC minute. No
+field and no enum member is added to `mutations[]`; the nine
 parallel enums of `.claude/rules/parallel-orchestration.md` are consumed, never extended.
 
 Retrospective validation of the log is the helper
@@ -822,18 +824,25 @@ command to evade the match: that defeats the only mechanism protecting a destruc
 ### Drift-requeue append contract
 
 Radius drift detection consumes this protocol rather than reimplementing it. When drift halts the
-later-started item of a newly conflicting pair, the requeue is recorded through the mutation
-engine's `build_requeue_entry` constructor and the recolor through `recolor_unstarted`:
+later-started item of a newly conflicting pair, the requeue is recorded through the `requeue-entry`
+subcommand of the bundled entry point and the recolor through its `recolor` subcommand:
+
+```bash
+bash .claude/lib/bash/mutate-parallel-run.sh requeue-entry --item <key> --generation <g> --at <timestamp>
+```
 
 - Item state becomes `blocked` and per-item `merge_status` becomes `blocked_drift`.
 - Exactly one `mutations[]` entry is appended with `op: requeue`, `prior_state: in_flight`,
   `new_state: blocked`, `disposition: null`, and `recolor_generation` equal to `g` + 1 — the requeue
   is a recompute.
-- The recolor runs over the unstarted subgraph only, so no other in-flight item moves. Its call
-  shape is the six-argument form
-  `recolor_unstarted(unstarted_items, conflict_edges, pinned, current_generation, current_cohort=current_cohort, highest_pinned_cohort=highest_pinned_cohort)`,
-  where `current_cohort` and `highest_pinned_cohort` are both required and keyword-only.
-  `highest_pinned_cohort` is derived from re-verified durable state: the highest
+- The recolor runs over the unstarted subgraph only, so no other in-flight item moves. Run it as:
+
+  ```bash
+  bash .claude/lib/bash/mutate-parallel-run.sh recolor --unstarted "<k> ..." --edges "<a>:<b> ..." --pinned "<k> ..." --generation <g> --current-cohort <c> --highest-pinned-cohort <h>
+  ```
+
+  where `--current-cohort` and `--highest-pinned-cohort` are both required.
+  `--highest-pinned-cohort` is derived from re-verified durable state: the highest
   current-generation cohort index occupied by any in-flight item.
 
 The drift event itself is recorded in `drift_events[]`, which this protocol does not write. See

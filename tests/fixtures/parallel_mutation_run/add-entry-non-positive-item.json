@@ -1,0 +1,10 @@
+{
+  "case": "add-entry-non-positive-item",
+  "subcommand": "add-entry",
+  "argv": ["add-entry", "--item", "0", "--deferred", "false", "--generation", "3", "--at", "2026-10-11T08-29"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation entry rejected: item_key 0 violates the F3 mutations[] contract for op 'add'."
+  }
+}

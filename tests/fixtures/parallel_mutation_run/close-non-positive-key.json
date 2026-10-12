@@ -1,0 +1,10 @@
+{
+  "case": "close-non-positive-key",
+  "subcommand": "close",
+  "argv": ["close", "--items", "0:scheduled"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation rejected: item key 0 does not resolve to a tracked items[].issue_num."
+  }
+}

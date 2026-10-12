@@ -1,0 +1,10 @@
+{
+  "case": "admit-no-conflict",
+  "subcommand": "admit",
+  "argv": ["admit", "--candidate", "9", "--edges", "9:5", "--in-flight", "1", "--current-cohort-members", "1 2"],
+  "expected": {
+    "exit_code": 0,
+    "stdout": "{\"candidate\":9,\"outcome\":\"admit_current_cohort\",\"triggers_recompute\":false}",
+    "stderr": null
+  }
+}

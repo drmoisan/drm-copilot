@@ -8,6 +8,7 @@
       "Bash(bash .claude/lib/bash/abandon-parallel-item.sh*)",
       "Bash(bash .claude/lib/bash/compute-cohorts.sh*)",
       "Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)",
+      "Bash(bash .claude/lib/bash/mutate-parallel-run.sh*)",
       "Bash(bash .claude/lib/bash/remove-parallel-item.sh*)",
       "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)",
       "Read",
