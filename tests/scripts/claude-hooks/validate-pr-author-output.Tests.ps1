@@ -11,6 +11,15 @@ Describe 'validate-pr-author-output.ps1' {
         } else {
             (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
         }
+
+        function New-SubagentStopEnvelopeJson {
+            # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
+            param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
+            $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'pr-author'; stop_hook_active = [bool]$StopHookActive }
+            if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }
+            if ($PSBoundParameters.ContainsKey('OutputField')) { $envelope['output'] = $OutputField }
+            return ($envelope | ConvertTo-Json -Compress)
+        }
     }
 
     Context 'Get-PrAuthorOutputDecision - allow scenarios' {
@@ -122,6 +131,16 @@ Describe 'validate-pr-author-output.ps1' {
             } finally {
                 $env:CLAUDE_HOOK_INPUT = $prev
             }
+        }
+
+        It 'exits 2 in a separate process when the stdin envelope lacks a PR reference' -Tag 'E3-Entry' {
+            # Arrange: a valid envelope whose last assistant message reports no pull request.
+            $stdinText = New-SubagentStopEnvelopeJson -AssistantMessage 'I generated a PR body but did not open a pull request.'
+            # Act
+            $global:LASTEXITCODE = 0
+            $null = $stdinText | & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
+            # Assert
+            $LASTEXITCODE | Should -Be 2
         }
     }
 }
