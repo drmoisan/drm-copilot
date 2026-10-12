@@ -41,3 +41,11 @@ Push refspec (branch substitution 1): `git push origin HEAD:bug/subagentstop-env
 - Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`31bee75cd..53cf0fb1f`)
 - Post-commit `git status --porcelain`: (empty)
 - CORPUS-AFTER-COMMIT: pr-author | 53cf0fb1fd800955296a80780bc9296ddfec38da
+
+## [P4-T6] Phase 4
+
+- Pre-commit `git status --porcelain`: pr-author hook and mirror modified; feature-folder evidence, plan, spec modified; new pass-after-pr-author and registration-pr-author evidence (all within W-ALLOWED). The corpus evidence file is unchanged and not included.
+- Commit: 5b168a45232fbd8d3c72cd541c9493777d9b3321 (`fix(905): block pr-author SubagentStop through Exit-SubagentStopBlock`)
+- Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`53cf0fb1f..5b168a452`)
+- Post-commit `git status --porcelain`: (empty)
+- SWITCH-COMMIT: pr-author | 5b168a45232fbd8d3c72cd541c9493777d9b3321

@@ -28,6 +28,15 @@ BeforeAll {
 - Member-set Comparison: normalized sets match
 "@
     }
+
+    function New-SubagentStopEnvelopeJson {
+        # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
+        param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
+        $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'prd-feature'; stop_hook_active = [bool]$StopHookActive }
+        if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }
+        if ($PSBoundParameters.ContainsKey('OutputField')) { $envelope['output'] = $OutputField }
+        return ($envelope | ConvertTo-Json -Compress)
+    }
 }
 
 Describe 'validate-prd-feature-output.ps1' {
@@ -73,32 +82,33 @@ Describe 'validate-prd-feature-output.ps1' {
         $result.Ok | Should -BeTrue
     }
 
-    It 'rejects empty, malformed, and output-free invocation payloads' {
-        (Invoke-PrdFeatureOutputValidation -RawPayload '').Ok | Should -BeFalse
-        (Invoke-PrdFeatureOutputValidation -RawPayload '{bad').Ok | Should -BeFalse
-        (Invoke-PrdFeatureOutputValidation -RawPayload '{}').Ok | Should -BeFalse
+    It 'rejects an invalid envelope and a blank assistant message' {
+        (Invoke-PrdFeatureOutputValidation -InputText '').Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText '{bad').Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText '{}').Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage '')).Ok | Should -BeFalse
     }
 
     It 'rejects missing and nonexistent spec paths' {
         Mock Test-Path { $false }
 
-        (Invoke-PrdFeatureOutputValidation -RawPayload (@{ output = 'spec-path: missing.md' } | ConvertTo-Json -Compress)).Ok | Should -BeFalse
-        (Invoke-PrdFeatureOutputValidation -RawPayload (@{ output = 'spec-path: nonexistent.md' } | ConvertTo-Json -Compress)).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: missing.md')).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: nonexistent.md')).Ok | Should -BeFalse
     }
 
     It 'accepts a nonnumeric spec without research evidence' {
         Mock Test-Path { $true }
         Mock Get-Content { '## Acceptance Criteria' + [Environment]::NewLine + '- [ ] A textual criterion' }
 
-        (Invoke-PrdFeatureOutputValidation -RawPayload (@{ output = 'spec-path: textual.md' } | ConvertTo-Json -Compress)).Ok | Should -BeTrue
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: textual.md')).Ok | Should -BeTrue
     }
 
     It 'rejects numeric specs with missing or nonexistent research paths' {
         Mock Test-Path { param($LiteralPath) $LiteralPath -eq 'numeric.md' }
         Mock Get-Content { '## Acceptance Criteria' + [Environment]::NewLine + '- [ ] The 2 call sites are covered' }
 
-        (Invoke-PrdFeatureOutputValidation -RawPayload (@{ output = 'spec-path: numeric.md' } | ConvertTo-Json -Compress)).Ok | Should -BeFalse
-        (Invoke-PrdFeatureOutputValidation -RawPayload (@{ output = "spec-path: numeric.md`nresearch-path: missing.md" } | ConvertTo-Json -Compress)).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: numeric.md')).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage "spec-path: numeric.md`nresearch-path: missing.md")).Ok | Should -BeFalse
     }
 
     It 'accepts matching numeric provenance and extracts artifact labels' {
@@ -106,7 +116,7 @@ Describe 'validate-prd-feature-output.ps1' {
         Mock Test-Path { $true }
         Mock Get-Content { param($LiteralPath) if ($LiteralPath -eq 'numeric.md') { "## Acceptance Criteria`n- [ ] The 2 call sites are covered" } else { $complete } }
 
-        (Invoke-PrdFeatureOutputValidation -RawPayload (@{ output = "spec-path: numeric.md`nresearch-path: research.md" } | ConvertTo-Json -Compress)).Ok | Should -BeTrue
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage "spec-path: numeric.md`nresearch-path: research.md")).Ok | Should -BeTrue
         Get-ArtifactPathFromOutput -Output 'spec-path: numeric.md' -Label 'spec-path' | Should -Be 'numeric.md'
     }
 
