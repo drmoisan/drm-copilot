@@ -35,3 +35,12 @@ EXIT_CODE: 0
 Output Summary: SHA256 equal; git hash-object equal.
 - SHA256: .claude/hooks/validate-prd-feature-output.ps1 = 88C16F39D3B40A293F19C49B6047518CD6BF5B61113CCE0F1AE74E44AE21CFC2; extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-prd-feature-output.ps1 = 88C16F39D3B40A293F19C49B6047518CD6BF5B61113CCE0F1AE74E44AE21CFC2 | equal
 - git hash-object: .claude/hooks/validate-prd-feature-output.ps1 = 9f3ff43cf9c714d535690287f51df6eacd25d6b2; extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-prd-feature-output.ps1 = 9f3ff43cf9c714d535690287f51df6eacd25d6b2 | equal
+
+## [P7-T5] validate-discovery-artifact-gate.ps1
+
+Timestamp: 2026-10-11T23-15
+Command: Copy-Item -LiteralPath .claude/hooks/validate-discovery-artifact-gate.ps1 -Destination extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-discovery-artifact-gate.ps1 -Force (through sh <SCRATCHPAD>/route.sh <SCRATCHPAD>/e905-mirror.ps1 -Name validate-discovery-artifact-gate -TaskId P7-T5)
+EXIT_CODE: 0
+Output Summary: SHA256 equal; git hash-object equal.
+- SHA256: .claude/hooks/validate-discovery-artifact-gate.ps1 = ACF0D265C3AA7A03A164FF30B0206ACFE57CE96E481594DD332C6F3A82979F26; extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-discovery-artifact-gate.ps1 = ACF0D265C3AA7A03A164FF30B0206ACFE57CE96E481594DD332C6F3A82979F26 | equal
+- git hash-object: .claude/hooks/validate-discovery-artifact-gate.ps1 = 242a56eafebbd1a66b6d98c56349947d418fbdd0; extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-discovery-artifact-gate.ps1 = 242a56eafebbd1a66b6d98c56349947d418fbdd0 | equal

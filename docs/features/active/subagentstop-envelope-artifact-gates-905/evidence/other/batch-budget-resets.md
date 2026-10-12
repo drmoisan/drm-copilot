@@ -21,3 +21,5 @@ Timestamp: 2026-10-11T15-06
 - P5-T4: none present
 - P5-T5: none present
 - P6-T1: none present
+- P7-T1: none present
+- P7-T2: none present

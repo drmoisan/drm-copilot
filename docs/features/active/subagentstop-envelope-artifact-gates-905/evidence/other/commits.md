@@ -57,3 +57,11 @@ Push refspec (branch substitution 1): `git push origin HEAD:bug/subagentstop-env
 - Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`5b168a452..14aaf7c52`)
 - Post-commit `git status --porcelain`: (empty)
 - CORPUS-AFTER-COMMIT: prd-feature | 14aaf7c52010478dcb3f40116ecc6c6d60b0b649
+
+## [P6-T7] Phase 6
+
+- Pre-commit `git status --porcelain`: prd-feature hook and mirror modified; feature-folder evidence, plan, spec modified; new pass-after-prd-feature and registration-prd-feature evidence (all within W-ALLOWED). The corpus evidence file is unchanged and not included.
+- Commit: 9fb0f6da6ce034520b7caf995b0bd44d445365f0 (`fix(905): block prd-feature SubagentStop through Exit-SubagentStopBlock`)
+- Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`14aaf7c52..9fb0f6da6`)
+- Post-commit `git status --porcelain`: (empty)
+- SWITCH-COMMIT: prd-feature | 9fb0f6da6ce034520b7caf995b0bd44d445365f0
