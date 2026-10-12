@@ -19,6 +19,7 @@ Refs #897
 ## Open follow-ups (spec Rollout & Follow-up)
 
 - Frontmatter `SubagentStop` firing question: still unverified. Observation artifact: `docs/features/active/subagentstop-envelope-orchestrator-family-903/evidence/other/subagentstop-firing-observation.2026-10-12T04-13.md` (FIRING_CONCLUSION: UNVERIFIED; five frontmatter-only agents: atomic-executor, epic-review, prd-feature, staged-review, status-updater; four dual-registered agents; the settings matcher `orchestrator` is a substring of `epic-orchestrator` and `parallel-orchestrator`, and whether matching is by regex, substring, or exact name is unverified).
+  - Superseded: this firing conclusion is superseded by `evidence/other/subagentstop-firing-runtime-observation.2026-10-12T08-55.md`, which records that a frontmatter-only SubagentStop registration was observed to fire for atomic-executor.
 - The always-true conditional in the three PreToolUse hooks (review of issue 786): out of E2 scope, open.
 - The Codex `SilentlyContinue` nit in `tests/scripts/codex-hooks/hook-dependency-failure.Codex.Tests.ps1:42` (review of issue 786): out of E2 scope, open.
 - The `prd-feature.md` `user-story-path` requirement for full-feature mode: removed by Amendment A; a mode-aware replacement is a separate follow-up.
