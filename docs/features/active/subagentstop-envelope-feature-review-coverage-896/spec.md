@@ -260,7 +260,7 @@ Evidence paths below are relative to `docs/features/active/subagentstop-envelope
 - [x] AC-28: The full toolchain passes in a single pass and is recorded in `evidence/qa-gates/`: PoshQC format (no changes), PoshQC analyze (0 errors), the full Pester suite including `hook-dependency-failure.Claude.Tests.ps1` and `hook-dependency-failure.SpecialCases.Tests.ps1`, and the pytest command listed in the Test Strategy.
 
 ### Issue closure
-- [ ] AC-29: The pull request body for this child contains `Refs #884` and `Refs #897`, contains no closing keyword (`close`, `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, `resolved`) adjacent to `#884` or `#897`, and may use a closing keyword for `#896` only; verified from `gh pr view <number> --json body` output recorded in `evidence/issue-updates/`.
+- [x] AC-29: The pull request body for this child contains `Refs #884` and `Refs #897`, contains no closing keyword (`close`, `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, `resolved`) adjacent to `#884` or `#897`, and may use a closing keyword for `#896` only; verified from `gh pr view <number> --json body` output recorded in `evidence/issue-updates/`.
 
 ### E1 consumer policy (reconciliation with E1)
 - [x] AC-30: Re-entry policy (E1 consumer rule 2; Proposed Fix item 2a). Tests named with `E4-TR10` in `tests/scripts/claude-hooks/validate-feature-review-coverage.Coverage.Tests.ps1` pass. They drive `Invoke-FeatureReviewCoverageValidation -InputText` with valid envelopes and show the following:
