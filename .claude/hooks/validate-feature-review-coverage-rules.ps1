@@ -126,16 +126,18 @@ function Test-LanguageCoverageRow {
 
     if (-not $languageLines -or $languageLines.Count -eq 0) {
         return @{
-            Ok     = $false
-            Reason = "$Language has changed files on the branch but the policy-audit does not mention $Language."
+            Ok         = $false
+            Reason     = "$Language has changed files on the branch but the policy-audit does not mention $Language."
+            Repairable = $true
         }
     }
 
     $coverageLines = $languageLines | Where-Object { $_ -match '(?i)(coverage|lcov|line[s]?\s+hit|pester)' }
     if (-not $coverageLines -or $coverageLines.Count -eq 0) {
         return @{
-            Ok     = $false
-            Reason = "$Language has changed files on the branch but no coverage-scoped row in the policy-audit mentions $Language."
+            Ok         = $false
+            Reason     = "$Language has changed files on the branch but no coverage-scoped row in the policy-audit mentions $Language."
+            Repairable = $true
         }
     }
 
@@ -155,16 +157,18 @@ function Test-LanguageCoverageRow {
     if ($narrowing.Count -gt 0) {
         $first = ($narrowing | Select-Object -First 1).ToString().Trim()
         return @{
-            Ok     = $false
-            Reason = "$Language has changed files on the branch but a coverage-scoped row narrows scope: '$first'. Scope narrowing is not permitted for languages with changed files."
+            Ok         = $false
+            Reason     = "$Language has changed files on the branch but a coverage-scoped row narrows scope: '$first'. Scope narrowing is not permitted for languages with changed files."
+            Repairable = $true
         }
     }
 
     $verdictLines = $coverageLines | Where-Object { $_ -match '\b(PASS|FAIL)\b' }
     if (-not $verdictLines -or $verdictLines.Count -eq 0) {
         return @{
-            Ok     = $false
-            Reason = "$Language coverage rows contain neither a PASS nor a FAIL verdict."
+            Ok         = $false
+            Reason     = "$Language coverage rows contain neither a PASS nor a FAIL verdict."
+            Repairable = $true
         }
     }
 
@@ -172,16 +176,18 @@ function Test-LanguageCoverageRow {
         $failLines = $coverageLines | Where-Object { $_ -match '\bFAIL\b' }
         if (-not $failLines -or $failLines.Count -eq 0) {
             return @{
-                Ok     = $false
-                Reason = ("{0} repo-wide coverage is {1}% (below the {2}% line coverage floor {3}) but the policy-audit contains no FAIL verdict on a coverage row for {0}." -f $Language, $RepoWidePct, $LineFloor, $lineSourceLabel)
+                Ok         = $false
+                Reason     = ("{0} repo-wide coverage is {1}% (below the {2}% line coverage floor {3}) but the policy-audit contains no FAIL verdict on a coverage row for {0}." -f $Language, $RepoWidePct, $LineFloor, $lineSourceLabel)
+                Repairable = $true
             }
         }
     }
 
     if ($null -ne $BranchPct -and $BranchPct -lt $BranchFloor) {
         return @{
-            Ok     = $false
-            Reason = ("{0} branch coverage is {1}% (below the {2}% branch coverage floor {3}); policy-audit must record FAIL on the corresponding coverage row." -f $Language, $BranchPct, $BranchFloor, $branchSourceLabel)
+            Ok         = $false
+            Reason     = ("{0} branch coverage is {1}% (below the {2}% branch coverage floor {3}); policy-audit must record FAIL on the corresponding coverage row." -f $Language, $BranchPct, $BranchFloor, $branchSourceLabel)
+            Repairable = $false
         }
     }
 

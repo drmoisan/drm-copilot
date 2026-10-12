@@ -25,9 +25,9 @@ Describe 'validate-feature-review-coverage.ps1' {
 
     Context 'required artifact tokens' {
         It 'blocks when required review artifact tokens are missing' {
-            $raw = @{ output = 'Review complete.' } | ConvertTo-Json -Compress
+            $raw = [ordered]@{ session_id = 't1-896'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $false; last_assistant_message = 'Review complete.' } | ConvertTo-Json -Compress
 
-            $result = Invoke-FeatureReviewCoverageValidation -RawPayload $raw
+            $result = Invoke-FeatureReviewCoverageValidation -InputText $raw
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'policy-audit-path'
@@ -52,15 +52,15 @@ Describe 'validate-feature-review-coverage.ps1' {
                 }
                 return @{ Exists = $false; Text = $null; Lines = @() }
             }
-            $raw = @{
-                output = @"
+            $raw = [ordered]@{
+                session_id = 't1-896'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $false; last_assistant_message = @"
 policy-audit-path: docs/features/active/foo/policy-audit.2026-05-04T08-00.md
 code-review-path: docs/features/active/foo/code-review.2026-05-04T08-01.md
 feature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md
 "@
             } | ConvertTo-Json -Compress
 
-            $result = Invoke-FeatureReviewCoverageValidation -RawPayload $raw
+            $result = Invoke-FeatureReviewCoverageValidation -InputText $raw
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'same feature folder and timestamp'
@@ -96,15 +96,15 @@ Python coverage artifact present.
                     }
                 }
             }
-            $raw = @{
-                output = @"
+            $raw = [ordered]@{
+                session_id = 't1-896'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $false; last_assistant_message = @"
 policy-audit-path: docs/features/active/foo/policy-audit.2026-05-04T08-00.md
 code-review-path: docs/features/active/foo/code-review.2026-05-04T08-00.md
 feature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md
 "@
             } | ConvertTo-Json -Compress
 
-            $result = Invoke-FeatureReviewCoverageValidation -RawPayload $raw
+            $result = Invoke-FeatureReviewCoverageValidation -InputText $raw
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'PASS nor a FAIL verdict'
@@ -118,15 +118,15 @@ feature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md
                 }
                 return @{ Exists = $true; Text = 'ok'; Lines = @('ok') }
             }
-            $raw = @{
-                output = @"
+            $raw = [ordered]@{
+                session_id = 't1-896'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $false; last_assistant_message = @"
 policy-audit-path: docs/features/active/foo/policy-audit.2026-05-04T08-00.md
 code-review-path: docs/features/active/foo/code-review.2026-05-04T08-00.md
 feature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md
 "@
             } | ConvertTo-Json -Compress
 
-            $result = Invoke-FeatureReviewCoverageValidation -RawPayload $raw
+            $result = Invoke-FeatureReviewCoverageValidation -InputText $raw
 
             $result.Ok | Should -BeTrue
             $result.Message | Should -BeNullOrEmpty
@@ -151,6 +151,87 @@ feature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md
             # Assert
             @($parseErrors).Count | Should -Be 0
             ($defined -join ',') | Should -Be ((@($Functions) | Sort-Object) -join ',') -Because "$File must define exactly its assigned functions"
+        }
+
+        It 'E4-ST1: <File> has no legacy transport or exit-1 block path' -ForEach @(
+            @{ File = '.claude/hooks/validate-feature-review-coverage.ps1' }
+            @{ File = '.claude/hooks/validate-feature-review-coverage-metrics.ps1' }
+            @{ File = '.claude/hooks/validate-feature-review-coverage-rules.ps1' }
+            @{ File = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage.ps1' }
+            @{ File = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage-metrics.ps1' }
+            @{ File = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage-rules.ps1' }
+        ) {
+            # Arrange: the legacy variable name is built so that this file does not carry it literally.
+            $path = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "../../../$File"))
+            $legacyName = 'CLAUDE_' + 'HOOK_INPUT'
+            $tokens = $null
+            $parseErrors = $null
+
+            # Act
+            $text = Get-Content -Raw -LiteralPath $path
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$parseErrors)
+            $writeErrors = @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -eq 'Write-Error' }, $true))
+            $exitOnes = @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.ExitStatementAst] -and $null -ne $node.Pipeline -and $node.Pipeline.Extent.Text -eq '1' }, $true))
+
+            # Assert
+            $text.Contains($legacyName) | Should -BeFalse -Because "$File must not read the legacy environment transport"
+            $writeErrors.Count | Should -Be 0 -Because "$File must not block through Write-Error"
+            $exitOnes.Count | Should -Be 0 -Because "$File must not block with exit 1"
+        }
+
+        It 'E4-ST1: <File> dot-sources the E1 helper through the guarded pattern' -ForEach @(
+            @{ File = '.claude/hooks/validate-feature-review-coverage.ps1' }
+            @{ File = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage.ps1' }
+        ) {
+            # Arrange
+            $path = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "../../../$File"))
+            $guarded = "try { . (Join-Path `$PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord `$_ }"
+
+            # Act
+            $text = Get-Content -Raw -LiteralPath $path
+
+            # Assert
+            $text.Contains($guarded) | Should -BeTrue -Because "$File must dot-source subagentstop-envelope.ps1 through the guarded pattern"
+        }
+
+        It 'E4-ST2: Invoke-FeatureReviewCoverageValidation takes InputText and passes it to the E1 reader' {
+            # Arrange
+            $path = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.claude/hooks/validate-feature-review-coverage.ps1'))
+
+            # Act
+            $keys = @((Get-Command Invoke-FeatureReviewCoverageValidation).Parameters.Keys)
+            $text = Get-Content -Raw -LiteralPath $path
+
+            # Assert
+            $keys | Should -Contain 'InputText'
+            $keys | Should -Not -Contain 'RawPayload'
+            $keys | Should -Not -Contain 'AssistantText'
+            $text.Contains('Read-SubagentStopEnvelope -InputText $InputText') | Should -BeTrue
+        }
+
+        It 'E4-ST6: the Issue824 suite declares no Get-ArtifactFileContent mock inside an It block' {
+            # Arrange
+            $path = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'validate-feature-review-coverage.Issue824.Tests.ps1'))
+            $tokens = $null
+            $parseErrors = $null
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$parseErrors)
+            $isCommand = { param($node, [string] $Name) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -eq $Name }
+
+            # Act
+            $itMocks = @($ast.FindAll({ param($node) & $isCommand $node 'It' }, $true) | ForEach-Object {
+                    $_.FindAll({ param($node) (& $isCommand $node 'Mock') -and @($node.CommandElements | Where-Object { $_.Extent.Text -eq 'Get-ArtifactFileContent' }).Count -gt 0 }, $true)
+                })
+            $describe = $ast.Find({ param($node) & $isCommand $node 'Describe' }, $true)
+            $describeBody = @($describe.CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.ScriptBlockExpressionAst] })[0].ScriptBlock
+            $beforeAll = $describeBody.Find({ param($node) (& $isCommand $node 'BeforeAll') -and $node.Parent.Parent.Parent -eq $describeBody }, $true)
+            $helpers = @($beforeAll.FindAll({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true) | ForEach-Object Name)
+
+            # Assert
+            @($parseErrors).Count | Should -Be 0
+            $itMocks.Count | Should -Be 0 -Because 'Get-ArtifactFileContent mocks belong in BeforeEach blocks'
+            $helpers | Should -Contain 'Get-ArtifactFileResult'
+            $helpers | Should -Contain 'Set-ReviewArtifactMap'
+            (Get-Content -Raw -LiteralPath $path).Contains('[scriptblock]::Create') | Should -BeFalse
         }
     }
 

@@ -38,8 +38,14 @@
         branch coverage below the governing branch threshold blocks termination.
 
 .NOTES
-    Reads the hook payload from CLAUDE_HOOK_INPUT as JSON. Exits 0 to allow
-    termination; exits 1 with an error message to block.
+    Reads the SubagentStop envelope from stdin through Read-SubagentStopEnvelope
+    (subagentstop-envelope.ps1). Exits 0 to allow termination. Every block path,
+    including a payload anomaly and a validator error, blocks through
+    Exit-SubagentStopBlock, which writes the reason to stderr and exits 2. A hook
+    dependency failure blocks through the inline guard tail (stderr reason, exit 2).
+    A condition the subagent can repair (a missing token, path, file, or coverage
+    verdict) may block again; a condition it cannot repair blocks once and does not
+    block again when stop_hook_active is true.
 #>
 [CmdletBinding()]
 param()
@@ -47,6 +53,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 try { . (Join-Path $PSScriptRoot 'feature-review-coverage-thresholds.ps1') } catch { Add-HookDependencyFailure -Name 'feature-review-coverage-thresholds.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'validate-feature-review-coverage-metrics.ps1') } catch { Add-HookDependencyFailure -Name 'validate-feature-review-coverage-metrics.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'validate-feature-review-coverage-rules.ps1') } catch { Add-HookDependencyFailure -Name 'validate-feature-review-coverage-rules.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
 
 $ErrorActionPreference = 'Stop'
 
@@ -54,119 +61,124 @@ function Invoke-FeatureReviewCoverageValidation {
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
-        [string] $RawPayload
+        [AllowNull()] [AllowEmptyString()] [string] $InputText
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-feature-review-coverage:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
-    if ([string]::IsNullOrWhiteSpace($RawPayload)) {
-        return @{ Ok = $false; Message = 'feature-review hook: CLAUDE_HOOK_INPUT is empty; cannot validate review output.' }
+    $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
+    if (-not $envelope.IsValid) {
+        return @{ Ok = $false; Message = ('validate-feature-review-coverage: payload anomaly - ' + (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)) }
     }
 
     try {
-        $payload = $RawPayload | ConvertFrom-Json -ErrorAction Stop
+        $finding = & {
+            $agentOutput = [string]$envelope.AssistantText
+            if ([string]::IsNullOrWhiteSpace($agentOutput)) {
+                return @{ Message = 'validate-feature-review-coverage: agent output is empty; feature-review must report required artifact paths before termination.'; HasRepairable = $true; HasNonRepairable = $false }
+            }
+
+            $requiredArtifacts = @(
+                @{ Token = 'policy-audit-path'; Stem = 'policy-audit'; Description = 'policy audit artifact' },
+                @{ Token = 'code-review-path'; Stem = 'code-review'; Description = 'code review artifact' },
+                @{ Token = 'feature-audit-path'; Stem = 'feature-audit'; Description = 'feature audit artifact' }
+            )
+
+            $artifactMeta = @{}
+            $errors = [System.Collections.Generic.List[string]]::new()
+
+            foreach ($artifact in $requiredArtifacts) {
+                $path = Get-ReviewArtifactPathFromOutput -AgentOutput $agentOutput -Token $artifact.Token
+                if ($null -eq $path) {
+                    $errors.Add("missing $($artifact.Token): <path> for the required $($artifact.Description)")
+                    continue
+                }
+
+                $metadata = Get-ReviewArtifactInfo -Path $path -Stem $artifact.Stem
+                if ($null -eq $metadata) {
+                    $errors.Add("$($artifact.Token) '$path' is outside the required docs/features/active/.../$($artifact.Stem).<timestamp>.md location")
+                    continue
+                }
+
+                $file = Get-ArtifactFileContent -Path $path
+                if (-not $file.Exists) {
+                    $errors.Add("$($artifact.Token) '$path' was advertised for the $($artifact.Description) but no file exists at that location")
+                    continue
+                }
+
+                $metadata['Text'] = $file.Text
+                $artifactMeta[$artifact.Stem] = $metadata
+            }
+
+            if ($artifactMeta.ContainsKey('policy-audit')) {
+                $reference = $artifactMeta['policy-audit']
+                foreach ($stem in @('code-review', 'feature-audit')) {
+                    if (-not $artifactMeta.ContainsKey($stem)) {
+                        continue
+                    }
+                    $candidate = $artifactMeta[$stem]
+                    if ($candidate.Folder -ne $reference.Folder -or $candidate.Timestamp -ne $reference.Timestamp) {
+                        $errors.Add("$stem artifact must share the same feature folder and timestamp as the policy audit artifact.")
+                    }
+                }
+
+                $remediationPath = Get-ReviewArtifactPathFromOutput -AgentOutput $agentOutput -Token 'remediation-inputs-path'
+                if ($null -ne $remediationPath) {
+                    $remediation = Get-ReviewArtifactInfo -Path $remediationPath -Stem 'remediation-inputs'
+                    if ($null -eq $remediation) {
+                        $errors.Add("remediation-inputs-path '$remediationPath' is outside the required docs/features/active/.../remediation-inputs.<timestamp>.md location")
+                    }
+                    elseif ($remediation.Folder -ne $reference.Folder -or $remediation.Timestamp -ne $reference.Timestamp) {
+                        $errors.Add('remediation-inputs artifact must share the same feature folder and timestamp as the policy audit artifact.')
+                    }
+                    elseif (-not (Get-ArtifactFileContent -Path $remediationPath).Exists) {
+                        $errors.Add("remediation-inputs-path '$remediationPath' was advertised but no file exists at that location")
+                    }
+                }
+            }
+
+            if ($errors.Count -gt 0) {
+                $message = "validate-feature-review-coverage: required review artifact validation failed:`n  - " + ($errors -join "`n  - ")
+                return @{ Message = $message; HasRepairable = $true; HasNonRepairable = $false }
+            }
+
+            $prSummary = Get-ArtifactFileContent -Path 'artifacts/pr_context.summary.txt'
+            $changedLanguages = if ($prSummary.Exists) { Get-ChangedLanguageSet -Lines $prSummary.Lines } else { [ordered]@{} }
+            if ($changedLanguages.Count -eq 0) {
+                return $null
+            }
+
+            $policyAuditText = $artifactMeta['policy-audit'].Text
+            $claudeMd = Get-ArtifactFileContent -Path 'CLAUDE.md'
+            $thresholds = Get-FeatureReviewCoverageThreshold -ClaudeMdText $claudeMd.Text
+            $coverageFailures = [System.Collections.Generic.List[hashtable]]::new()
+            foreach ($lang in $changedLanguages.Keys) {
+                $repoPct = Get-LanguageRepoCoverage -Language $lang
+                $branchPct = Get-LanguageBranchCoverage -Language $lang
+                $result = Test-LanguageCoverageRow -AuditText $policyAuditText -Language $lang -RepoWidePct $repoPct -BranchPct $branchPct -LineFloor $thresholds.Line -BranchFloor $thresholds.Branch -LineSource $thresholds.LineSource -BranchSource $thresholds.BranchSource
+                if (-not $result.Ok) {
+                    $coverageFailures.Add($result)
+                }
+            }
+
+            if ($coverageFailures.Count -gt 0) {
+                $message = "validate-feature-review-coverage: coverage validation failed against branch diff:`n  - " + (@($coverageFailures | ForEach-Object { $_.Reason }) -join "`n  - ")
+                $hasRepairable = @($coverageFailures | Where-Object { $_.Repairable -eq $true }).Count -gt 0
+                $hasNonRepairable = @($coverageFailures | Where-Object { $_.Repairable -eq $false }).Count -gt 0
+                return @{ Message = $message; HasRepairable = $hasRepairable; HasNonRepairable = $hasNonRepairable }
+            }
+
+            return $null
+        }
     }
     catch {
-        return @{ Ok = $false; Message = "feature-review hook: failed to parse CLAUDE_HOOK_INPUT as JSON: $($_.Exception.Message)" }
+        $finding = @{ Message = ('validate-feature-review-coverage: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.'); HasRepairable = $false; HasNonRepairable = $true }
     }
 
-    $agentOutput = $null
-    if ($payload.PSObject.Properties.Name -contains 'output') {
-        $agentOutput = $payload.output
-    }
-    if ([string]::IsNullOrWhiteSpace($agentOutput)) {
-        return @{ Ok = $false; Message = 'feature-review hook: agent output is empty; feature-review must report required artifact paths before termination.' }
-    }
-
-    $requiredArtifacts = @(
-        @{ Token = 'policy-audit-path'; Stem = 'policy-audit'; Description = 'policy audit artifact' },
-        @{ Token = 'code-review-path'; Stem = 'code-review'; Description = 'code review artifact' },
-        @{ Token = 'feature-audit-path'; Stem = 'feature-audit'; Description = 'feature audit artifact' }
-    )
-
-    $artifactMeta = @{}
-    $errors = [System.Collections.Generic.List[string]]::new()
-
-    foreach ($artifact in $requiredArtifacts) {
-        $path = Get-ReviewArtifactPathFromOutput -AgentOutput $agentOutput -Token $artifact.Token
-        if ($null -eq $path) {
-            $errors.Add("missing $($artifact.Token): <path> for the required $($artifact.Description)")
-            continue
-        }
-
-        $metadata = Get-ReviewArtifactInfo -Path $path -Stem $artifact.Stem
-        if ($null -eq $metadata) {
-            $errors.Add("$($artifact.Token) '$path' is outside the required docs/features/active/.../$($artifact.Stem).<timestamp>.md location")
-            continue
-        }
-
-        $file = Get-ArtifactFileContent -Path $path
-        if (-not $file.Exists) {
-            $errors.Add("$($artifact.Token) '$path' was advertised for the $($artifact.Description) but no file exists at that location")
-            continue
-        }
-
-        $metadata['Text'] = $file.Text
-        $artifactMeta[$artifact.Stem] = $metadata
-    }
-
-    if ($artifactMeta.ContainsKey('policy-audit')) {
-        $reference = $artifactMeta['policy-audit']
-        foreach ($stem in @('code-review', 'feature-audit')) {
-            if (-not $artifactMeta.ContainsKey($stem)) {
-                continue
-            }
-            $candidate = $artifactMeta[$stem]
-            if ($candidate.Folder -ne $reference.Folder -or $candidate.Timestamp -ne $reference.Timestamp) {
-                $errors.Add("$stem artifact must share the same feature folder and timestamp as the policy audit artifact.")
-            }
-        }
-
-        $remediationPath = Get-ReviewArtifactPathFromOutput -AgentOutput $agentOutput -Token 'remediation-inputs-path'
-        if ($null -ne $remediationPath) {
-            $remediation = Get-ReviewArtifactInfo -Path $remediationPath -Stem 'remediation-inputs'
-            if ($null -eq $remediation) {
-                $errors.Add("remediation-inputs-path '$remediationPath' is outside the required docs/features/active/.../remediation-inputs.<timestamp>.md location")
-            }
-            elseif ($remediation.Folder -ne $reference.Folder -or $remediation.Timestamp -ne $reference.Timestamp) {
-                $errors.Add('remediation-inputs artifact must share the same feature folder and timestamp as the policy audit artifact.')
-            }
-            elseif (-not (Get-ArtifactFileContent -Path $remediationPath).Exists) {
-                $errors.Add("remediation-inputs-path '$remediationPath' was advertised but no file exists at that location")
-            }
-        }
-    }
-
-    if ($errors.Count -gt 0) {
-        $message = "feature-review hook: required review artifact validation failed:`n  - " + ($errors -join "`n  - ")
-        return @{ Ok = $false; Message = $message }
-    }
-
-    $prSummary = Get-ArtifactFileContent -Path 'artifacts/pr_context.summary.txt'
-    $changedLanguages = if ($prSummary.Exists) { Get-ChangedLanguageSet -Lines $prSummary.Lines } else { [ordered]@{} }
-    if ($changedLanguages.Count -eq 0) {
-        return @{ Ok = $true; Message = $null }
-    }
-
-    $policyAuditText = $artifactMeta['policy-audit'].Text
-    $claudeMd = Get-ArtifactFileContent -Path 'CLAUDE.md'
-    $thresholds = Get-FeatureReviewCoverageThreshold -ClaudeMdText $claudeMd.Text
-    $coverageFailures = [System.Collections.Generic.List[string]]::new()
-    foreach ($lang in $changedLanguages.Keys) {
-        $repoPct = Get-LanguageRepoCoverage -Language $lang
-        $branchPct = Get-LanguageBranchCoverage -Language $lang
-        $result = Test-LanguageCoverageRow -AuditText $policyAuditText -Language $lang -RepoWidePct $repoPct -BranchPct $branchPct -LineFloor $thresholds.Line -BranchFloor $thresholds.Branch -LineSource $thresholds.LineSource -BranchSource $thresholds.BranchSource
-        if (-not $result.Ok) {
-            $coverageFailures.Add($result.Reason)
-        }
-    }
-
-    if ($coverageFailures.Count -gt 0) {
-        $message = "feature-review hook: coverage validation failed against branch diff:`n  - " + ($coverageFailures -join "`n  - ")
-        return @{ Ok = $false; Message = $message }
-    }
-
-    return @{ Ok = $true; Message = $null }
+    if ($null -eq $finding) { return @{ Ok = $true; Message = $null } }
+    if ($envelope.StopHookActive -and -not $finding.HasRepairable) { return @{ Ok = $true; Message = $null } }
+    $message = if ($finding.HasNonRepairable) { "$($finding.Message) The subagent cannot repair this condition; report it in the final response and stop." } else { $finding.Message }
+    return @{ Ok = $false; Message = $message }
 }
 
 if ($MyInvocation.InvocationName -eq '.') {
@@ -176,10 +188,7 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validat
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-feature-review-coverage:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
-$result = Invoke-FeatureReviewCoverageValidation -RawPayload $env:CLAUDE_HOOK_INPUT
-if (-not $result.Ok) {
-    Write-Error $result.Message
-    exit 1
-}
-
+try { $result = Invoke-FeatureReviewCoverageValidation }
+catch { Exit-SubagentStopBlock -Message ('validate-feature-review-coverage: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed. The subagent cannot repair this condition; report it in the final response and stop.') }
+if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0
