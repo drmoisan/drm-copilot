@@ -137,4 +137,21 @@ Describe 'E2 SubagentStop registrations and seams' {
         $writeLines.Count | Should -BeGreaterOrEqual 2 -Because 'the S1 tail keeps its inline stderr writes'
         $dependencyExits.Count | Should -Be 1 -Because 'the S1 tail keeps exit $dependencyDecision.ExitCode inline'
     }
+
+    It 'REG-5 no registration passes the same parameter name twice' {
+        # Arrange
+        $failures = [System.Collections.Generic.List[string]]::new()
+
+        # Act: pwsh -File cannot bind a repeated parameter, so a repeated name fails every run at binding.
+        foreach ($registration in Get-E2Registration) {
+            $names = @(Get-RegistrationArgumentName -Arguments $registration.Arguments)
+            $caseInsensitive = [System.Collections.Generic.Dictionary[string, int]]::new([System.StringComparer]::OrdinalIgnoreCase)
+            foreach ($name in $names) { $caseInsensitive[$name] = 1 + $(if ($caseInsensitive.ContainsKey($name)) { $caseInsensitive[$name] } else { 0 }) }
+            $repeated = @($caseInsensitive.Keys | Where-Object { $caseInsensitive[$_] -gt 1 })
+            if ($repeated.Count -gt 0) { $failures.Add("$($registration.Agent): repeated -$($repeated -join ', -')") }
+        }
+
+        # Assert
+        $failures | Should -BeNullOrEmpty -Because ($failures -join '; ')
+    }
 }
