@@ -1,6 +1,7 @@
 # Expect-Fail Run - HostBootstrapWorkspace.Tests.ps1 (Issue 887)
 
-Timestamp: 2026-10-12T14-56
+Timestamp: 2026-10-12T14-40
+Timestamp note: the filename timestamp 2026-10-12T14-56 was estimated rather than read from the system clock; 2026-10-12T14-40 is the file modification time recorded when the artifact was written.
 Command: mcp__drm-copilot__run_poshqc_test scan_folders=["tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1"]
 EXIT_CODE: 1
 ExpectedExitCode: 1

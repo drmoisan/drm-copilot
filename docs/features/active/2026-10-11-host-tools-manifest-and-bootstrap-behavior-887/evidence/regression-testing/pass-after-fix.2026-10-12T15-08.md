@@ -1,6 +1,7 @@
 # Pass-After-Fix Run (Issue 887)
 
-Timestamp: 2026-10-12T15-08
+Timestamp: 2026-10-12T14-45
+Timestamp note: the filename timestamp 2026-10-12T15-08 was estimated rather than read from the system clock; 2026-10-12T14-45 is the file modification time recorded when the artifact was written.
 Command: mcp__drm-copilot__run_poshqc_test scan_folders=["tests/scripts/host-tools.manifest.Tests.ps1", "tests/scripts/dev-tools/HostTooling.Tests.ps1", "tests/scripts/dev-tools/HostBootstrap.Tests.ps1", "tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1", "tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1", "tests/scripts/dev-tools/bootstrap-host.Tests.ps1", "tests/scripts/dev-tools/HostVerification.Invoke.Tests.ps1", "tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1"]
 EXIT_CODE: 0
 Phase: post-fix
