@@ -5,8 +5,8 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - Epic issue: #904
 - Integration branch: `epic/subagentstop-envelope-integration`
 - Current wave: 1
-- Next step: `WAIT_FOR_GO then E4 896 (reconcile exec-896-local into item branch, resume one subtree)`
-- Last updated: 2026-10-12T09:39:00Z
+- Next step: `E5_await_896 (then integration PR to main)`
+- Last updated: 2026-10-12T09:39:54Z
 
 ## Waves
 
@@ -42,3 +42,4 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - 2026-10-12T09:03Z: E2 (903) PR 907 merged (47a4175f, 20/20 checks). E3 (905) running.
 - 2026-10-12T09:07Z: THROTTLE: no new starts until GO. E3 (905) already running since 08:50Z (only active subtree); E4 (896) held.
 - 2026-10-12T09:37Z: E3 (905) PR 908 merged (8450a904, 20/20 checks). E4 (896) held until GO.
+- 2026-10-12T09:39Z: GO for E4. Started E4 (896) resume in its resume worktree (amendment v1.8, preflight, integration merge, execution from P4-T4).
