@@ -1,5 +1,7 @@
 /** Deterministic Codex deployment resolution and checkpoint receipt validation. */
 
+import { compareCodePoint } from "../string-ordering";
+
 export const CODEX_MODEL_ROUTING_RECEIPTS_KEY = "codex_model_routing_receipts";
 
 export const BAND_ORDER = ["C1", "C2", "C3", "C4"] as const;
@@ -454,7 +456,7 @@ export function validateCodexModelRoutingGate(
     }
   }
 
-  for (const agent of [...delegated].sort()) {
+  for (const agent of [...delegated].sort(compareCodePoint)) {
     if (!logicalAgents.has(agent) && !deploymentAgents.has(agent)) {
       errors.push(
         `Checkpoint ${CODEX_MODEL_ROUTING_RECEIPTS_KEY} is missing a ` +

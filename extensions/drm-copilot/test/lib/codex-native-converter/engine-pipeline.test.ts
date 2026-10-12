@@ -41,6 +41,36 @@ const PROMPT_RECORD: MappingRecord = {
   isRequired: true,
 };
 
+const SKILL_TEXT =
+  "# P\n\nIntro.\n\n## Gate\n\n1. Collect context.\n2. Run the review.\n";
+const HOOK_TEXT =
+  "# P\n\nIntro.\n\n## Gate\n\nExecution must not begin until the plan is validated.\n";
+
+/**
+ * In-memory filesystem that returns queued texts, in order, for successive
+ * reads of the prompt source path and delegates every other read.
+ */
+class SequencedReadFileSystem extends InMemoryFileSystem {
+  private readonly queuedTexts: string[];
+
+  constructor(texts: readonly string[]) {
+    super();
+    this.queuedTexts = [...texts];
+    this.addFile(`${SOURCE_ROOT}/${PROMPT_PATH}`, texts[0] ?? "");
+  }
+
+  override readTextFile(path: string): string {
+    if (path === `${SOURCE_ROOT}/${PROMPT_PATH}`) {
+      const next = this.queuedTexts.shift();
+      if (next === undefined) {
+        throw new Error(`No queued text remains for ${path}`);
+      }
+      return next;
+    }
+    return super.readTextFile(path);
+  }
+}
+
 describe("coverage: engine-pipeline.ts", () => {
   it("orders traces with equal source and section by target role, keeping duplicates adjacent", () => {
     // Arrange: the same prompt record twice yields pairs of traces whose
@@ -61,5 +91,42 @@ describe("coverage: engine-pipeline.ts", () => {
     expect(doubled.map((trace) => trace.sectionId)).toEqual(
       single.flatMap((trace) => [trace.sectionId, trace.sectionId]),
     );
+  });
+
+  it("889-target-role: orders traces sharing source path and section id by target role", () => {
+    // Arrange: two texts whose "Gate" section shares one section id but
+    // classifies to different target roles. The sequenced filesystem returns
+    // the shared-skill text on the first read and the hook text on the second,
+    // so the pre-sort order is ["shared-skill", "hook"].
+    const gateRoles = (fs: InMemoryFileSystem, records: MappingRecord[]) =>
+      buildTranslationTraces(fs, RUN_OPTIONS, records).filter((trace) =>
+        trace.sectionId.includes("#gate-"),
+      );
+    const skillOnly = gateRoles(new SequencedReadFileSystem([SKILL_TEXT]), [
+      PROMPT_RECORD,
+    ]);
+    const hookOnly = gateRoles(new SequencedReadFileSystem([HOOK_TEXT]), [
+      PROMPT_RECORD,
+    ]);
+
+    // Act
+    const combined = gateRoles(
+      new SequencedReadFileSystem([SKILL_TEXT, HOOK_TEXT]),
+      [PROMPT_RECORD, PROMPT_RECORD],
+    );
+
+    // Assert: each text alone yields one gate trace with the expected role and
+    // the same section id; combined, the targetRole key orders hook first.
+    expect(skillOnly.map((trace) => trace.targetRole)).toEqual([
+      "shared-skill",
+    ]);
+    expect(hookOnly.map((trace) => trace.targetRole)).toEqual(["hook"]);
+    expect(skillOnly.map((trace) => trace.sectionId)).toEqual(
+      hookOnly.map((trace) => trace.sectionId),
+    );
+    expect(combined.map((trace) => trace.targetRole)).toEqual([
+      "hook",
+      "shared-skill",
+    ]);
   });
 });

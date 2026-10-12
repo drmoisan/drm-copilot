@@ -20,6 +20,7 @@
  *     None beyond reads performed through the injected adapter.
  */
 
+import { compareCodePoint } from "../string-ordering";
 import { type PushDownFileSystem } from "./filesystem-adapter";
 
 /** Pack name reserved for the always-included non-language customization set. */
@@ -114,7 +115,7 @@ export function loadPackManifests(
 
   const manifests = new Map<string, PackManifest>();
   // Load each selected manifest in sorted order so any error order is stable.
-  for (const name of [...namesToLoad].sort()) {
+  for (const name of [...namesToLoad].sort(compareCodePoint)) {
     const manifestPath = joinPosix(manifestDir, `${name}.json`);
     if (!fs.isFile(manifestPath)) {
       throw new ManifestError(
@@ -296,7 +297,7 @@ export function assertSingleCsharpToolchain(
   // Selecting both C# packs would route two sources to the same destinations.
   const selectedCsharp = [...selectedPackNames]
     .filter((name) => CSHARP_PACK_NAMES.has(name))
-    .sort();
+    .sort(compareCodePoint);
   if (selectedCsharp.length > 1) {
     throw new ManifestError(
       "C# mutual exclusion violated: both modern and legacy C# packs were " +

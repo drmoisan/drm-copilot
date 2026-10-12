@@ -106,9 +106,9 @@ function Get-SessionPathFromMachineAndUser {
 function Invoke-HostNativeCommand {
     <#
     .SYNOPSIS
-        Runs a host command and returns its captured output and ExitCode value.
+        Runs a host command and either captures its output or streams it to the host, returning Output and ExitCode.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Capture')]
     [OutputType([psobject])]
     param(
         [Parameter(Mandatory = $true)]
@@ -117,11 +117,20 @@ function Invoke-HostNativeCommand {
         [Parameter()]
         [string[]]$ArgumentList = @(),
 
-        [Parameter()]
-        [switch]$MergeErrorStream
+        [Parameter(ParameterSetName = 'Capture')]
+        [switch]$MergeErrorStream,
+
+        [Parameter(ParameterSetName = 'Stream')]
+        [switch]$StreamToHost
     )
 
-    if ($MergeErrorStream) {
+    Set-Variable -Name 'LASTEXITCODE' -Value 0 -Scope Global
+
+    $output = @()
+    if ($StreamToHost) {
+        & $FilePath @ArgumentList | Out-Host
+    }
+    elseif ($MergeErrorStream) {
         $output = & $FilePath @ArgumentList 2>&1
     }
     else {

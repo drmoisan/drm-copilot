@@ -195,15 +195,31 @@ Describe 'validate-feature-review-coverage coverage (issue #786)' {
         It 'accepts a FAIL verdict for coverage below the line floor' {
             (Test-LanguageCoverageRow -AuditText 'Python coverage FAIL' -Language 'Python' -RepoWidePct 80).Ok | Should -BeTrue
         }
+
+        It 'E4-TR6: <Metric> floor message names <Expected>' -ForEach @(
+            @{ Metric = 'line'; Arguments = @{ RepoWidePct = 60; LineFloor = 70; LineSource = 'claude-md' }; Expected = '70% line coverage floor (root CLAUDE.md)' }
+            @{ Metric = 'line'; Arguments = @{ RepoWidePct = 60 }; Expected = '85% line coverage floor (default)' }
+            @{ Metric = 'branch'; Arguments = @{ RepoWidePct = 90; BranchPct = 50; BranchFloor = 60; BranchSource = 'claude-md' }; Expected = '60% branch coverage floor (root CLAUDE.md)' }
+            @{ Metric = 'branch'; Arguments = @{ RepoWidePct = 90; BranchPct = 50 }; Expected = '75% branch coverage floor (default)' }
+        ) {
+            # Arrange: the row supplies the measured figures, the floor, and the floor source.
+            $splat = $Arguments
+
+            # Act
+            $result = Test-LanguageCoverageRow -AuditText 'Python coverage PASS' -Language 'Python' @splat
+
+            # Assert
+            $result.Reason.Contains($Expected) | Should -BeTrue -Because $result.Reason
+        }
     }
 
     Context 'Invoke-FeatureReviewCoverageValidation' {
         BeforeAll {
             $script:Folder = 'docs/features/active/2026-10-10-sample'
             $script:Stamp = '2026-10-10T00-00'
-            function ConvertTo-ReviewPayload {
-                param([string] $Output)
-                return (@{ output = $Output } | ConvertTo-Json -Compress)
+            function ConvertTo-ReviewEnvelope {
+                param([AllowEmptyString()] [string] $Output)
+                return ([ordered]@{ session_id = 't1-896'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $false; last_assistant_message = $Output } | ConvertTo-Json -Compress)
             }
             function Get-ReviewOutput {
                 param([string] $Extra = '', [string] $CodeStamp = $script:Stamp)
@@ -214,83 +230,246 @@ Describe 'validate-feature-review-coverage coverage (issue #786)' {
         }
 
         It 'blocks an empty payload' {
-            (Invoke-FeatureReviewCoverageValidation -RawPayload '').Message | Should -Match 'CLAUDE_HOOK_INPUT is empty'
+            $result = Invoke-FeatureReviewCoverageValidation -InputText ''
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -BeLike 'validate-feature-review-coverage: payload anomaly - *'
         }
 
         It 'blocks a malformed payload' {
-            (Invoke-FeatureReviewCoverageValidation -RawPayload '{not json').Message | Should -Match 'failed to parse'
+            $result = Invoke-FeatureReviewCoverageValidation -InputText '{not json'
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -BeLike 'validate-feature-review-coverage: payload anomaly - *'
         }
 
         It 'blocks an empty agent output' {
-            (Invoke-FeatureReviewCoverageValidation -RawPayload '{"output":""}').Message | Should -Match 'agent output is empty'
+            $result = Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ReviewEnvelope -Output '')
+            $result.Ok | Should -BeFalse
+            $result.Message.StartsWith('validate-feature-review-coverage:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Message
         }
 
         It 'blocks an artifact path outside the required location' {
-            $raw = ConvertTo-ReviewPayload -Output "policy-audit-path: elsewhere/policy-audit.md`ncode-review-path: x`nfeature-audit-path: y"
-            (Invoke-FeatureReviewCoverageValidation -RawPayload $raw).Message | Should -Match 'outside the required'
+            $raw = ConvertTo-ReviewEnvelope -Output "policy-audit-path: elsewhere/policy-audit.md`ncode-review-path: x`nfeature-audit-path: y"
+            (Invoke-FeatureReviewCoverageValidation -InputText $raw).Message | Should -Match 'outside the required'
         }
 
         It 'blocks an advertised artifact that does not exist' {
             Mock Get-ArtifactFileContent { @{ Exists = $false; Text = $null; Lines = @() } }
-            (Invoke-FeatureReviewCoverageValidation -RawPayload (ConvertTo-ReviewPayload -Output (Get-ReviewOutput))).Message | Should -Match 'no file exists'
+            (Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ReviewEnvelope -Output (Get-ReviewOutput))).Message | Should -Match 'no file exists'
         }
 
         It 'blocks an artifact whose timestamp differs from the policy audit' {
             Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('text') }
-            $raw = ConvertTo-ReviewPayload -Output (Get-ReviewOutput -CodeStamp '2026-10-10T00-01')
-            (Invoke-FeatureReviewCoverageValidation -RawPayload $raw).Message | Should -Match 'code-review artifact must share'
+            $raw = ConvertTo-ReviewEnvelope -Output (Get-ReviewOutput -CodeStamp '2026-10-10T00-01')
+            (Invoke-FeatureReviewCoverageValidation -InputText $raw).Message | Should -Match 'code-review artifact must share'
         }
 
         It 'blocks a remediation-inputs path outside the required location' {
             Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('text') }
-            $raw = ConvertTo-ReviewPayload -Output (Get-ReviewOutput -Extra 'remediation-inputs-path: elsewhere/r.md')
-            (Invoke-FeatureReviewCoverageValidation -RawPayload $raw).Message | Should -Match 'remediation-inputs-path .* is outside'
+            $raw = ConvertTo-ReviewEnvelope -Output (Get-ReviewOutput -Extra 'remediation-inputs-path: elsewhere/r.md')
+            (Invoke-FeatureReviewCoverageValidation -InputText $raw).Message | Should -Match 'remediation-inputs-path .* is outside'
         }
 
         It 'blocks a remediation-inputs artifact with a different timestamp' {
             Mock Get-ArtifactFileContent { Get-ArtifactFileResult -Lines @('text') }
-            $raw = ConvertTo-ReviewPayload -Output (Get-ReviewOutput -Extra "remediation-inputs-path: $script:Folder/remediation-inputs.2026-10-10T00-05.md")
-            (Invoke-FeatureReviewCoverageValidation -RawPayload $raw).Message | Should -Match 'remediation-inputs artifact must share'
+            $raw = ConvertTo-ReviewEnvelope -Output (Get-ReviewOutput -Extra "remediation-inputs-path: $script:Folder/remediation-inputs.2026-10-10T00-05.md")
+            (Invoke-FeatureReviewCoverageValidation -InputText $raw).Message | Should -Match 'remediation-inputs artifact must share'
         }
 
         It 'blocks an advertised remediation-inputs artifact that does not exist' {
             Mock Get-ArtifactFileContent { param([string] $Path) if ($Path -like '*remediation-inputs*') { @{ Exists = $false; Text = $null; Lines = @() } } else { Get-ArtifactFileResult -Lines @('text') } }
-            $raw = ConvertTo-ReviewPayload -Output (Get-ReviewOutput -Extra "remediation-inputs-path: $script:Folder/remediation-inputs.$script:Stamp.md")
-            (Invoke-FeatureReviewCoverageValidation -RawPayload $raw).Message | Should -Match 'was advertised but no file exists'
+            $raw = ConvertTo-ReviewEnvelope -Output (Get-ReviewOutput -Extra "remediation-inputs-path: $script:Folder/remediation-inputs.$script:Stamp.md")
+            (Invoke-FeatureReviewCoverageValidation -InputText $raw).Message | Should -Match 'was advertised but no file exists'
         }
 
         It 'allows valid artifacts when the branch changes no tracked language' {
             Mock Get-ArtifactFileContent { param([string] $Path) if ($Path -eq 'artifacts/pr_context.summary.txt') { @{ Exists = $false; Text = $null; Lines = @() } } else { Get-ArtifactFileResult -Lines @('text') } }
-            (Invoke-FeatureReviewCoverageValidation -RawPayload (ConvertTo-ReviewPayload -Output (Get-ReviewOutput))).Ok | Should -BeTrue
+            (Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ReviewEnvelope -Output (Get-ReviewOutput))).Ok | Should -BeTrue
         }
 
         It 'blocks when a changed language has no coverage verdict' {
             Mock Get-ArtifactFileContent { param([string] $Path) if ($Path -eq 'artifacts/pr_context.summary.txt') { Get-ArtifactFileResult -Lines @('- src/a.py (+1/-0)') } else { Get-ArtifactFileResult -Lines @('Python coverage 90%') } }
             Mock Get-LanguageRepoCoverage { $null }
             Mock Get-LanguageBranchCoverage { $null }
-            (Invoke-FeatureReviewCoverageValidation -RawPayload (ConvertTo-ReviewPayload -Output (Get-ReviewOutput))).Message | Should -Match 'coverage validation failed'
+            (Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ReviewEnvelope -Output (Get-ReviewOutput))).Message | Should -Match 'coverage validation failed'
         }
 
         It 'allows a changed language whose coverage row carries a verdict' {
             Mock Get-ArtifactFileContent { param([string] $Path) if ($Path -eq 'artifacts/pr_context.summary.txt') { Get-ArtifactFileResult -Lines @('- src/a.py (+1/-0)') } else { Get-ArtifactFileResult -Lines @('Python coverage PASS') } }
             Mock Get-LanguageRepoCoverage { 90 }
             Mock Get-LanguageBranchCoverage { 80 }
-            (Invoke-FeatureReviewCoverageValidation -RawPayload (ConvertTo-ReviewPayload -Output (Get-ReviewOutput))).Ok | Should -BeTrue
+            (Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ReviewEnvelope -Output (Get-ReviewOutput))).Ok | Should -BeTrue
         }
     }
 
-    Context 'entry point' {
-        It 'blocks through Write-Error when CLAUDE_HOOK_INPUT is empty' {
-            $ErrorActionPreference = 'Continue'
-            $priorInput = $env:CLAUDE_HOOK_INPUT
-            $thrown = $null
-            try {
-                $env:CLAUDE_HOOK_INPUT = ''
-                try { $null = & $script:HookFile 2>&1 } catch { $thrown = $_ }
+    Context 'E4 (issue #896)' {
+        BeforeAll {
+            . (Join-Path $PSScriptRoot 'validate-feature-review-coverage.E4.Helpers.ps1')
+        }
+
+        BeforeEach {
+            $script:E4ArtifactMap = @{}
+            # The map is read without a scope modifier: inside the entry point driven through the & route,
+            # $script: names the hook's own script scope, so dynamic lookup reaches this file's map instead.
+            Mock Get-ArtifactFileContent { param([string] $Path) $entry = $E4ArtifactMap[$Path]; if ($null -eq $entry) { return @{ Exists = $false; Text = $null; Lines = @() } }; if ($entry -is [string] -and $entry -eq 'THROW') { throw 'simulated read failure: access denied' }; return Get-ArtifactFileResult -Lines @($entry) }
+        }
+
+        It 'E4-TR1: the entry point exits 2 for an envelope without review-artifact tokens' -Tag 'E4-Regression', 'E4-TR1' {
+            # Arrange / Act: a valid envelope whose assistant text advertises no review artifact.
+            $result = Invoke-ClaudeReviewEntry -Stdin (ConvertTo-ClaudeEnvelope -AssistantText 'Review complete.')
+
+            # Assert
+            $result.ExitCode | Should -Be 2 -Because $result.Stderr
+            $result.Stderr.StartsWith('validate-feature-review-coverage:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Stderr
+        }
+
+        It 'E4-TR4: an unreadable root CLAUDE.md blocks with a structured message and exit 2' -Tag 'E4-Regression', 'E4-TR4' {
+            # Arrange: the root CLAUDE.md exists in the fixture map but its read throws.
+            $text = Use-E4Fixture -Name 'UnreadableClaudeMd'
+
+            # Act
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ClaudeEnvelope -AssistantText $text)
+            $entry = Invoke-ClaudeReviewEntry -Stdin (ConvertTo-ClaudeEnvelope -AssistantText $text)
+
+            # Assert
+            $decision.Ok | Should -BeFalse
+            $decision.Message | Should -BeLike '*root CLAUDE.md*'
+            $decision.Message | Should -BeLike '*could not be read*'
+            $entry.ExitCode | Should -Be 2 -Because $entry.Stderr
+        }
+
+        It 'E4-TR2: a valid envelope whose advertised artifact does not exist blocks' {
+            # Arrange: the three tokens are advertised but no artifact exists.
+            $text = Use-E4Fixture -Name 'AbsentArtifact'
+            $envelope = ConvertTo-ClaudeEnvelope -AssistantText $text
+
+            # Act
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText $envelope
+            $entry = Invoke-ClaudeReviewEntry -Stdin $envelope
+
+            # Assert
+            $decision.Ok | Should -BeFalse
+            $decision.Message | Should -BeLike '*no file exists at that location*'
+            $entry.ExitCode | Should -Be 2 -Because $entry.Stderr
+            $entry.Stderr | Should -BeLike '*no file exists at that location*'
+        }
+
+        It 'E4-TR3: an unhandled exception in the decision blocks with a validator error and exit 2' {
+            # Arrange: the PowerShell coverage report is malformed XML, so the parser throws.
+            $text = Use-E4Fixture -Name 'ValidatorError'
+
+            # Act
+            $entry = Invoke-ClaudeReviewEntry -Stdin (ConvertTo-ClaudeEnvelope -AssistantText $text -StopHookActive $false)
+
+            # Assert
+            $entry.ExitCode | Should -Be 2 -Because $entry.Stderr
+            $entry.Stderr | Should -BeLike '*validator error*'
+        }
+
+        It 'E4-TR3b: the <Anomaly> anomaly blocks with the E1 anomaly clause' -ForEach @(
+            @{ Anomaly = 'EmptyPayload'; Stdin = '' }
+            @{ Anomaly = 'UnparseableJson'; Stdin = '{bad' }
+        ) {
+            # Arrange
+            $envelope = Read-SubagentStopEnvelope -InputText $Stdin
+            [string]$envelope.Anomaly | Should -Be $Anomaly
+            $expected = 'validate-feature-review-coverage: payload anomaly - ' + (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)
+
+            # Act
+            $entry = Invoke-ClaudeReviewEntry -Stdin $Stdin
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText $Stdin
+
+            # Assert
+            $entry.ExitCode | Should -Be 2 -Because $entry.Stderr
+            $entry.Stderr.StartsWith($expected, [System.StringComparison]::Ordinal) | Should -BeTrue -Because $entry.Stderr
+            $decision.Ok | Should -BeFalse
+            $decision.Message | Should -Be $expected
+        }
+
+        It 'E4-TR4a: an absent root CLAUDE.md applies the default <Metric> floor' -ForEach @(
+            @{ Metric = 'line'; Fixture = 'LineBelowFloor'; Expected = '85% line coverage floor (default)' }
+            @{ Metric = 'branch'; Fixture = 'BranchBelowFloor'; Expected = '75% branch coverage floor (default)' }
+        ) {
+            # Arrange: the fixture map has no CLAUDE.md entry, so the file is absent.
+            $text = Use-E4Fixture -Name $Fixture
+
+            # Act
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ClaudeEnvelope -AssistantText $text)
+
+            # Assert
+            $decision.Ok | Should -BeFalse
+            $decision.Message.Contains($Expected) | Should -BeTrue -Because $decision.Message
+        }
+
+        It 'E4-TR4c: the CLAUDE.md reader reports a read error without throwing' {
+            # Arrange: the real reader runs; the file exists but its read throws.
+            Mock Get-ArtifactFileContent -MockWith $script:RealGetArtifactFileContent
+            Mock Test-Path { $true }
+            Mock Get-Content { throw 'simulated read failure: access denied' }
+
+            # Act
+            $result = Get-FeatureReviewClaudeMdText
+
+            # Assert
+            $result.Text | Should -BeNullOrEmpty
+            $result.ReadError | Should -BeLike '*access denied*'
+        }
+
+        It 'E4-TR10a: <Fixture> is repairable with stop_hook_active <Active>' -ForEach @(
+            @{ Fixture = 'MissingToken'; Active = $false }
+            @{ Fixture = 'MissingToken'; Active = $true }
+            @{ Fixture = 'AbsentArtifact'; Active = $false }
+            @{ Fixture = 'AbsentArtifact'; Active = $true }
+            @{ Fixture = 'NoCoverageRow'; Active = $false }
+            @{ Fixture = 'NoCoverageRow'; Active = $true }
+            @{ Fixture = 'LineBelowFloor'; Active = $false }
+            @{ Fixture = 'LineBelowFloor'; Active = $true }
+        ) {
+            # Act
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ClaudeEnvelope -AssistantText (Use-E4Fixture -Name $Fixture) -StopHookActive $Active)
+
+            # Assert: a repairable condition blocks again and carries no report-and-halt clause.
+            $decision.Ok | Should -BeFalse
+            $decision.Message | Should -Not -BeLike '*cannot repair this condition*'
+        }
+
+        It 'E4-TR10b: <Fixture> is not repairable with stop_hook_active <Active>' -ForEach @(
+            @{ Fixture = 'UnreadableClaudeMd'; Active = $false }
+            @{ Fixture = 'UnreadableClaudeMd'; Active = $true }
+            @{ Fixture = 'BranchBelowFloor'; Active = $false }
+            @{ Fixture = 'BranchBelowFloor'; Active = $true }
+            @{ Fixture = 'ValidatorError'; Active = $false }
+            @{ Fixture = 'ValidatorError'; Active = $true }
+        ) {
+            # Act
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ClaudeEnvelope -AssistantText (Use-E4Fixture -Name $Fixture) -StopHookActive $Active)
+
+            # Assert: a non-repairable condition blocks once with the report-and-halt clause.
+            if ($Active) {
+                $decision.Ok | Should -BeTrue
             }
-            finally { $env:CLAUDE_HOOK_INPUT = $priorInput }
-            # The hook sets $ErrorActionPreference = 'Stop', so the Write-Error before exit 1 terminates the script.
-            [string]$thrown | Should -Match 'CLAUDE_HOOK_INPUT is empty'
+            else {
+                $decision.Ok | Should -BeFalse
+                $decision.Message | Should -BeLike '*cannot repair this condition*'
+            }
+        }
+
+        It 'E4-TR10c: a repairable and a non-repairable coverage condition still block with stop_hook_active true' {
+            # Act: Python line below floor (repairable) and TypeScript branch below floor (non-repairable).
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText (ConvertTo-ClaudeEnvelope -AssistantText (Use-E4Fixture -Name 'Mixed') -StopHookActive $true)
+
+            # Assert
+            $decision.Ok | Should -BeFalse
+        }
+
+        It 'E4-TR10d: an unreadable root CLAUDE.md through the entry point exits <ExitCode> with stop_hook_active <Active>' -ForEach @(
+            @{ Active = $false; ExitCode = 2 }
+            @{ Active = $true; ExitCode = 0 }
+        ) {
+            # Act
+            $entry = Invoke-ClaudeReviewEntry -Stdin (ConvertTo-ClaudeEnvelope -AssistantText (Use-E4Fixture -Name 'UnreadableClaudeMd') -StopHookActive $Active)
+
+            # Assert
+            $entry.ExitCode | Should -Be $ExitCode -Because $entry.Stderr
         }
     }
 }

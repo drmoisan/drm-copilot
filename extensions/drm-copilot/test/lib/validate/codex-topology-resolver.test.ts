@@ -196,4 +196,22 @@ describe("resolveCodexTopology", () => {
       "production_budget_exceeded",
     ]);
   });
+
+  it("889-cp-order: normalizes languages in code-point order (U+FF5E before U+1F600)", () => {
+    // Arrange: supplementary-plane language inserted first.
+    const supplementary = "\u{1F600}";
+    const highBmp = "～";
+
+    // Act
+    const receipt = resolveCodexTopology(
+      [supplementary, highBmp],
+      1,
+      1,
+      "standalone",
+    );
+
+    // Assert
+    expect(receipt.languages).toEqual([highBmp, supplementary]);
+    expect(receipt.routing_reason).toBe("cross_language");
+  });
 });

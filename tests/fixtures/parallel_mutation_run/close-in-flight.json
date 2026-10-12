@@ -1,0 +1,10 @@
+{
+  "case": "close-in-flight",
+  "subcommand": "close",
+  "argv": ["close", "--items", "7:in_flight 3:in_flight 5:scheduled"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation rejected: close requires no item in flight; still in flight: [3, 7]."
+  }
+}
