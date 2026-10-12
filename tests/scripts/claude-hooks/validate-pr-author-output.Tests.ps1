@@ -11,64 +11,74 @@ Describe 'validate-pr-author-output.ps1' {
         } else {
             (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
         }
+
+        function New-SubagentStopEnvelopeJson {
+            # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds and returns envelope JSON text only; it changes no system state.')]
+            param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
+            $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'pr-author'; stop_hook_active = [bool]$StopHookActive }
+            if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }
+            if ($PSBoundParameters.ContainsKey('OutputField')) { $envelope['output'] = $OutputField }
+            return ($envelope | ConvertTo-Json -Compress)
+        }
     }
 
     Context 'Get-PrAuthorOutputDecision - allow scenarios' {
         It 'allows when output contains a GitHub PR URL' {
-            $json = '{"output":"Opened the PR at https://github.com/drmoisan/drm-copilot/pull/231 successfully."}'
-            $decision = Get-PrAuthorOutputDecision -HookInputRaw $json
+            $inputText = New-SubagentStopEnvelopeJson -AssistantMessage 'Opened the PR at https://github.com/drmoisan/drm-copilot/pull/231 successfully.'
+            $decision = Get-PrAuthorOutputDecision -InputText $inputText
             $decision['allowed'] | Should -BeTrue
         }
 
         It 'allows when output contains a PR #<n> reference' {
-            $json = '{"output":"Created PR #231 for the feature branch."}'
-            $decision = Get-PrAuthorOutputDecision -HookInputRaw $json
+            $inputText = New-SubagentStopEnvelopeJson -AssistantMessage 'Created PR #231 for the feature branch.'
+            $decision = Get-PrAuthorOutputDecision -InputText $inputText
             $decision['allowed'] | Should -BeTrue
         }
 
         It 'allows when output contains a gh pr create confirmation with a PR number' {
-            $json = '{"output":"Ran gh pr create and the result was #231."}'
-            $decision = Get-PrAuthorOutputDecision -HookInputRaw $json
+            $inputText = New-SubagentStopEnvelopeJson -AssistantMessage 'Ran gh pr create and the result was #231.'
+            $decision = Get-PrAuthorOutputDecision -InputText $inputText
             $decision['allowed'] | Should -BeTrue
         }
 
         It 'allows when output contains a gh pr edit confirmation with a PR number' {
-            $json = '{"output":"Ran gh pr edit on #231 to update the body."}'
-            $decision = Get-PrAuthorOutputDecision -HookInputRaw $json
+            $inputText = New-SubagentStopEnvelopeJson -AssistantMessage 'Ran gh pr edit on #231 to update the body.'
+            $decision = Get-PrAuthorOutputDecision -InputText $inputText
             $decision['allowed'] | Should -BeTrue
         }
     }
 
     Context 'Get-PrAuthorOutputDecision - block scenarios' {
-        It 'blocks when output is empty' {
-            $json = '{"output":""}'
-            $decision = Get-PrAuthorOutputDecision -HookInputRaw $json
+        It 'blocks with PR_AUTHOR_OUTPUT_EMPTY when the assistant message is blank' {
+            $inputText = New-SubagentStopEnvelopeJson -AssistantMessage ''
+            $decision = Get-PrAuthorOutputDecision -InputText $inputText
             $decision['allowed'] | Should -BeFalse
             $decision['reason'] | Should -Match 'PR_AUTHOR_OUTPUT_EMPTY'
         }
 
         It 'blocks when output has no PR URL or number' {
-            $json = '{"output":"I generated a PR body but did not open a pull request."}'
-            $decision = Get-PrAuthorOutputDecision -HookInputRaw $json
+            $inputText = New-SubagentStopEnvelopeJson -AssistantMessage 'I generated a PR body but did not open a pull request.'
+            $decision = Get-PrAuthorOutputDecision -InputText $inputText
             $decision['allowed'] | Should -BeFalse
             $decision['reason'] | Should -Match 'PR_AUTHOR_OUTPUT_NO_PR'
         }
 
-        It 'blocks when CLAUDE_HOOK_INPUT content is empty' {
-            $decision = Get-PrAuthorOutputDecision -HookInputRaw ''
+        It 'blocks with a payload anomaly when the input text is empty' {
+            $decision = Get-PrAuthorOutputDecision -InputText ''
             $decision['allowed'] | Should -BeFalse
-            $decision['reason'] | Should -Match 'PR_AUTHOR_OUTPUT_MISSING'
+            $decision['reason'] | Should -Match 'PR_AUTHOR_OUTPUT_MALFORMED: payload anomaly'
         }
 
-        It 'blocks when CLAUDE_HOOK_INPUT is malformed JSON' {
-            $decision = Get-PrAuthorOutputDecision -HookInputRaw '{not-json'
+        It 'blocks with a payload anomaly when the input text is malformed JSON' {
+            $decision = Get-PrAuthorOutputDecision -InputText '{not-json'
             $decision['allowed'] | Should -BeFalse
-            $decision['reason'] | Should -Match 'PR_AUTHOR_OUTPUT_MALFORMED'
+            $decision['reason'] | Should -Match 'PR_AUTHOR_OUTPUT_MALFORMED: payload anomaly'
         }
 
         It 'blocks when the output mentions gh pr create but has no PR number' {
-            $json = '{"output":"I intend to run gh pr create later."}'
-            $decision = Get-PrAuthorOutputDecision -HookInputRaw $json
+            $inputText = New-SubagentStopEnvelopeJson -AssistantMessage 'I intend to run gh pr create later.'
+            $decision = Get-PrAuthorOutputDecision -InputText $inputText
             $decision['allowed'] | Should -BeFalse
             $decision['reason'] | Should -Match 'PR_AUTHOR_OUTPUT_NO_PR'
         }
@@ -91,37 +101,14 @@ Describe 'validate-pr-author-output.ps1' {
     }
 
     Context 'script entrypoint (end-to-end)' {
-        It 'exits 0 when CLAUDE_HOOK_INPUT reports a PR URL' {
-            $prev = $env:CLAUDE_HOOK_INPUT
-            try {
-                $env:CLAUDE_HOOK_INPUT = '{"output":"Opened https://github.com/o/r/pull/231"}'
-                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
-                $LASTEXITCODE | Should -Be 0
-            } finally {
-                $env:CLAUDE_HOOK_INPUT = $prev
-            }
-        }
-
-        It 'exits 1 when CLAUDE_HOOK_INPUT is empty' {
-            $prev = $env:CLAUDE_HOOK_INPUT
-            try {
-                $env:CLAUDE_HOOK_INPUT = ''
-                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
-                $LASTEXITCODE | Should -Be 1
-            } finally {
-                $env:CLAUDE_HOOK_INPUT = $prev
-            }
-        }
-
-        It 'exits 1 when CLAUDE_HOOK_INPUT is malformed JSON' {
-            $prev = $env:CLAUDE_HOOK_INPUT
-            try {
-                $env:CLAUDE_HOOK_INPUT = '{not-json'
-                $null = & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
-                $LASTEXITCODE | Should -Be 1
-            } finally {
-                $env:CLAUDE_HOOK_INPUT = $prev
-            }
+        It 'exits 2 in a separate process when the stdin envelope lacks a PR reference' -Tag 'E3-Entry' {
+            # Arrange: a valid envelope whose last assistant message reports no pull request.
+            $stdinText = New-SubagentStopEnvelopeJson -AssistantMessage 'I generated a PR body but did not open a pull request.'
+            # Act
+            $global:LASTEXITCODE = 0
+            $null = $stdinText | & $script:PwshExe -NoProfile -File $script:HookPath 2>&1
+            # Assert
+            $LASTEXITCODE | Should -Be 2
         }
     }
 }

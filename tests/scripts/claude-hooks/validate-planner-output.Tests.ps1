@@ -28,32 +28,32 @@ PREFLIGHT: $Preflight
 
 Describe 'validate-planner-output.ps1' {
     Context 'payload validation' {
-        It 'blocks when CLAUDE_HOOK_INPUT is empty' {
-            $result = Invoke-PlannerOutputValidation -RawPayload ''
+        It 'blocks with a payload anomaly when the input text is empty' {
+            $result = Invoke-PlannerOutputValidation -InputText ''
 
             $result.Ok | Should -BeFalse
-            $result.Message | Should -Match 'CLAUDE_HOOK_INPUT is empty'
+            $result.Message | Should -Match 'payload anomaly'
         }
 
         It 'blocks when the output is missing an exact preflight signal' {
             Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $true; Lines = @() } }
-            $raw = @{ output = 'plan-path: docs/features/active/foo/plan.md' } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = 'plan-path: docs/features/active/foo/plan.md' } | ConvertTo-Json -Compress
 
-            $result = Invoke-PlannerOutputValidation -RawPayload $raw
+            $result = Invoke-PlannerOutputValidation -InputText $raw
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'PREFLIGHT: ALL CLEAR'
         }
 
-        It 'blocks when CLAUDE_HOOK_INPUT is not valid JSON' {
-            $result = Invoke-PlannerOutputValidation -RawPayload '{not valid json'
+        It 'blocks with a payload anomaly when the input text is not valid JSON' {
+            $result = Invoke-PlannerOutputValidation -InputText '{not valid json'
 
             $result.Ok | Should -BeFalse
-            $result.Message | Should -Match 'failed to parse'
+            $result.Message | Should -Match 'payload anomaly'
         }
 
-        It 'blocks when the parsed payload has no output property' {
-            $result = Invoke-PlannerOutputValidation -RawPayload '{}'
+        It 'blocks when last_assistant_message is empty' {
+            $result = Invoke-PlannerOutputValidation -InputText '{"last_assistant_message":""}'
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'agent output is empty'
@@ -62,9 +62,9 @@ Describe 'validate-planner-output.ps1' {
 
     Context 'plan-path extraction' {
         It 'blocks when the output has a valid preflight signal but no plan-path token' {
-            $raw = @{ output = 'PREFLIGHT: ALL CLEAR' } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = 'PREFLIGHT: ALL CLEAR' } | ConvertTo-Json -Compress
 
-            $result = Invoke-PlannerOutputValidation -RawPayload $raw
+            $result = Invoke-PlannerOutputValidation -InputText $raw
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'does not advertise a plan-path'
@@ -72,9 +72,9 @@ Describe 'validate-planner-output.ps1' {
 
         It 'blocks when the markdown-link plan-path form points at a nonexistent file' {
             Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $false; Lines = @() } }
-            $raw = @{ output = "[plan-path](docs/features/active/foo/plan.md)`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "[plan-path](docs/features/active/foo/plan.md)`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
 
-            $result = Invoke-PlannerOutputValidation -RawPayload $raw
+            $result = Invoke-PlannerOutputValidation -InputText $raw
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'no file exists'
@@ -82,9 +82,9 @@ Describe 'validate-planner-output.ps1' {
         }
 
         It 'blocks when the markdown-link plan-path form captures a whitespace-only value' {
-            $raw = @{ output = "[plan-path]( )`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "[plan-path]( )`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
 
-            $result = Invoke-PlannerOutputValidation -RawPayload $raw
+            $result = Invoke-PlannerOutputValidation -InputText $raw
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'does not advertise a plan-path'
@@ -130,9 +130,9 @@ Describe 'validate-planner-output.ps1' {
     Context 'plan structure validation' {
         It 'blocks when the advertised plan-path does not exist on disk' {
             Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $false; Lines = @() } }
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
 
-            $result = Invoke-PlannerOutputValidation -RawPayload $raw
+            $result = Invoke-PlannerOutputValidation -InputText $raw
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'no file exists'
@@ -150,9 +150,9 @@ Describe 'validate-planner-output.ps1' {
                     )
                 }
             }
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
 
-            $result = Invoke-PlannerOutputValidation -RawPayload $raw
+            $result = Invoke-PlannerOutputValidation -InputText $raw
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'Phase 0'
@@ -172,9 +172,9 @@ Describe 'validate-planner-output.ps1' {
                 }
             }
             # Intentional structural negative: review validation is masked by the malformed task path.
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord -Preflight 'REVISIONS REQUIRED')" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord -Preflight 'REVISIONS REQUIRED')" } | ConvertTo-Json -Compress
 
-            $result = Invoke-PlannerOutputValidation -RawPayload $raw
+            $result = Invoke-PlannerOutputValidation -InputText $raw
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'explicit path'
@@ -191,9 +191,9 @@ Describe 'validate-planner-output.ps1' {
                 }
             }
             # Intentional structural negative: review validation is masked by the malformed phase heading.
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
 
-            $result = Invoke-PlannerOutputValidation -RawPayload $raw
+            $result = Invoke-PlannerOutputValidation -InputText $raw
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'phase heading must match'
@@ -214,9 +214,9 @@ Describe 'validate-planner-output.ps1' {
                     )
                 }
             }
-            $raw = @{ output = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
 
-            $result = Invoke-PlannerOutputValidation -RawPayload $raw
+            $result = Invoke-PlannerOutputValidation -InputText $raw
 
             $result.Ok | Should -BeTrue
             $result.Message | Should -BeNullOrEmpty
@@ -309,6 +309,24 @@ Describe 'validate-planner-output.ps1' {
 
             ($errors -match 'QA or toolchain validation').Count | Should -BeGreaterThan 0
         }
+
+        It 'CORPUS-PLN-1 ignores a non-task checkbox line under a level-2 heading after the final phase' {
+            $lines = @(
+                "### Phase 0 `u{2014} Baseline",
+                '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record docs/features/active/foo/evidence/baseline/phase0-instructions-read.md',
+                '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/baseline/pester.md',
+                "### Phase 1 `u{2014} Implement",
+                '- [ ] [P1-T1] Update .claude/hooks/validate-planner-output.ps1 and tests/scripts/claude-hooks/validate-planner-output.Tests.ps1',
+                "### Phase 2 `u{2014} Final QA",
+                '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md',
+                '', '## Preflight Checklist',
+                '- [x] Phase headings follow the required format.'
+            )
+
+            $errors = @(Get-PlanStructureValidationReport -Lines $lines)
+
+            $errors.Count | Should -Be 0
+        }
     }
 
     Context 'planner internal review' {
@@ -326,7 +344,7 @@ Describe 'validate-planner-output.ps1' {
             }
             foreach ($signal in @('ALL CLEAR', 'REVISIONS REQUIRED')) {
                 $output = "Unrelated prose.`nplan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord -Preflight $signal)`nMore unrelated prose."
-                $result = Invoke-PlannerOutputValidation -RawPayload (@{ output = $output } | ConvertTo-Json -Compress)
+                $result = Invoke-PlannerOutputValidation -InputText (@{ last_assistant_message = $output } | ConvertTo-Json -Compress)
 
                 $result.Ok | Should -BeTrue
             }

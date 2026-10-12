@@ -33,7 +33,7 @@ BeforeAll {
     Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 
     $script:RoutingStub = { param($Path, $Type) [pscustomobject]@{ ExitCode = 0; Output = '' } }
-    $script:Payload = (@{ output = 'Final summary. integration_branch: epic/c6-integration' } | ConvertTo-Json -Compress)
+    $script:Payload = (@{ last_assistant_message = 'Final summary. integration_branch: epic/c6-integration' } | ConvertTo-Json -Compress)
     $script:EpicLeaf = 'artifacts/orchestration/epic-orchestrator-state.json'
     $script:Alpha = '{"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"}'
     $script:Bravo = '{"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}'
@@ -77,7 +77,7 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
         Set-BarrierCheckpointRead -Text (ConvertTo-BarrierCheckpointText -Feature @($script:Alpha, $script:Bravo))
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
+        $result = Invoke-OrchestratorOutputValidation -InputText $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
         $lines = @($result.Message -split "`n")
 
         # Assert
@@ -95,7 +95,7 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
                 '{"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-charlie-903", "2026-10-08-alpha-901"], "merge_status": "worktree_created", "worktree_created_at": "2026-10-08T10-00"}'))
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
+        $result = Invoke-OrchestratorOutputValidation -InputText $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
         $lines = @($result.Message -split "`n")
 
         # Assert
@@ -110,7 +110,7 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
         Set-BarrierCheckpointRead -Text (ConvertTo-BarrierCheckpointText -Feature @($script:Alpha, $script:Bravo))
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
+        $result = Invoke-OrchestratorOutputValidation -InputText $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
         $lastLine = @($result.Message -split "`n")[-1]
 
         # Assert
@@ -126,7 +126,7 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
                 $script:Bravo))
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
+        $result = Invoke-OrchestratorOutputValidation -InputText $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
 
         # Assert
         $result.Ok | Should -BeTrue -Because $result.Message
@@ -138,7 +138,7 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
         Mock Get-OrchestratorStateEpicWaveBarrierError { throw 'the port must not run (issue #840)' }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -CheckpointPath 'artifacts/orchestration/parallel-orchestrator-state.json' -ArtifactType 'parallel-orchestrator-state' -RoutingInvoker $script:RoutingStub
+        $result = Invoke-OrchestratorOutputValidation -InputText $script:Payload -CheckpointPath 'artifacts/orchestration/parallel-orchestrator-state.json' -ArtifactType 'parallel-orchestrator-state' -RoutingInvoker $script:RoutingStub
 
         # Assert
         $result.Ok | Should -BeTrue -Because $result.Message
@@ -151,7 +151,7 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
         Mock Get-OrchestratorStateEpicWaveBarrierError { throw 'the port must not run (issue #840)' }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -RoutingInvoker $script:RoutingStub
+        $result = Invoke-OrchestratorOutputValidation -InputText $script:Payload -RoutingInvoker $script:RoutingStub
 
         # Assert
         $result.Ok | Should -BeTrue -Because $result.Message
@@ -165,7 +165,7 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
         $failingStub = { param($Path, $Type) [pscustomobject]@{ ExitCode = 1; Output = 'x' } }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $failingStub
+        $result = Invoke-OrchestratorOutputValidation -InputText $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $failingStub
 
         # Assert
         $result.Message.StartsWith('ROUTING_CONTRACT_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Message
@@ -179,7 +179,7 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
                 $script:Bravo))
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
+        $result = Invoke-OrchestratorOutputValidation -InputText $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
 
         # Assert
         $result.Message.StartsWith('EPIC_WAVE_BARRIER_UNEVALUABLE:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Message
@@ -193,7 +193,7 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
                 $script:Bravo))
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
+        $result = Invoke-OrchestratorOutputValidation -InputText $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
 
         # Assert
         $result.Message.StartsWith('EPIC_WAVE_BARRIER_UNEVALUABLE:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Message
@@ -207,7 +207,7 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
                 $script:Bravo))
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
+        $result = Invoke-OrchestratorOutputValidation -InputText $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
 
         # Assert
         $result.Message.StartsWith('EPIC_WAVE_BARRIER_UNEVALUABLE:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Message
@@ -219,7 +219,7 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
         Mock Get-OrchestratorStateEpicWaveBarrierError { throw 'simulated port failure (issue #840)' }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
+        $result = Invoke-OrchestratorOutputValidation -InputText $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
 
         # Assert
         $result.Message.StartsWith('EPIC_WAVE_BARRIER_UNEVALUABLE:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Message
@@ -236,7 +236,7 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
         Set-BarrierCheckpointRead -Text (ConvertTo-BarrierCheckpointText -Feature @($script:Alpha, $script:Bravo))
         try {
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
+            $result = Invoke-OrchestratorOutputValidation -InputText $script:Payload -CheckpointPath $script:EpicLeaf -ArtifactType 'epic-orchestrator-state' -RoutingInvoker $script:RoutingStub
         }
         finally {
             $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
