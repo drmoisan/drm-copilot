@@ -61,6 +61,11 @@ function Get-ReviewArtifactInfo {
     $pattern = "^docs/features/active/(?<Folder>.+)/$Stem\.(?<Timestamp>\d{4}-\d{2}-\d{2}T\d{2}-\d{2})\.md$"
     $match = [regex]::Match($normalized, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
     if (-not $match.Success) {
+        # Remediation-handoff layout: <slug>/audit/<timestamp>/<stem>.md (timestamp on the folder).
+        $auditPattern = "^docs/features/active/(?<Folder>[^/]+)/audit/(?<Timestamp>\d{4}-\d{2}-\d{2}T\d{2}-\d{2})/$Stem\.md$"
+        $match = [regex]::Match($normalized, $auditPattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+    }
+    if (-not $match.Success) {
         return $null
     }
 
@@ -134,9 +139,20 @@ function Test-LanguageCoverageRow {
         }
     }
 
+    # Sanctioned narrowing text is not a scope narrowing by the audit: a line inside a
+    # '## Rejected Scope Narrowing' section (caller text recorded verbatim), and a PowerShell
+    # line naming branch coverage but not line coverage (Pester measures no branch coverage).
     $narrowingPattern = '(?i)(informational only|context only|out of plan scope|out of scope|not applicable|\bN/A\b|\bUNVERIFIED\b)'
-    $narrowing = $coverageLines | Where-Object { $_ -match $narrowingPattern }
-    if ($narrowing -and $narrowing.Count -gt 0) {
+    $insideRejectedSection = $false
+    $narrowing = foreach ($line in $lines) {
+        if ($line -match '^##\s') { $insideRejectedSection = $line -match '^##\s+Rejected Scope Narrowing\b' }
+        elseif ($insideRejectedSection) { continue }
+        if ($line -notmatch $labelPattern -or $line -notmatch '(?i)(coverage|lcov|line[s]?\s+hit|pester)' -or $line -notmatch $narrowingPattern) { continue }
+        if ($Language -eq 'PowerShell' -and $line -match '(?i)\bbranch\b' -and $line -notmatch '(?i)\bline\s+coverage\b') { continue }
+        $line
+    }
+    $narrowing = @($narrowing)
+    if ($narrowing.Count -gt 0) {
         $first = ($narrowing | Select-Object -First 1).ToString().Trim()
         return @{
             Ok     = $false
