@@ -21,8 +21,10 @@ How it runs the reference:
 
 Declared divergences (also listed in the script header and in the bats lane):
     1. A `--removal-disposition` value outside `detach abandon` is a usage error
-       (exit 2) instead of the Python `UnknownEnumMemberError` text, which lists
-       merge-status members (`_parallel_mutation_errors.py:192`, spec D5).
+       (exit 2) raised by the command line before the library runs. A direct
+       library call and the Python `UnknownEnumMemberError` both reject it with
+       the same message, which lists `detach, abandon`
+       (spec D5; aligned under #890).
     2. `at` is a caller-supplied string instead of a `datetime`.
     3. Option abbreviations are rejected.
 

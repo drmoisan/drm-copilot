@@ -1,0 +1,10 @@
+{
+  "case": "close-permitted",
+  "subcommand": "close",
+  "argv": ["close", "--items", "3:scheduled 7:merged"],
+  "expected": {
+    "exit_code": 0,
+    "stdout": "{\"close_permitted\":true}",
+    "stderr": null
+  }
+}
