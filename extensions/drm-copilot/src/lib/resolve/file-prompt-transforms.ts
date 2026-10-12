@@ -21,6 +21,8 @@
  *     strings are byte-identical to the Python source.
  */
 
+import { compareCodePoint } from "../string-ordering";
+
 /**
  * Split text into lines while preserving trailing newlines on each line.
  *
@@ -181,14 +183,16 @@ export function replaceAllVariables(
   variables: Readonly<Record<string, string>>,
 ): string {
   const referenced = extractTemplateVariables(template);
-  const missing = [...referenced].filter((name) => !(name in variables)).sort();
+  const missing = [...referenced]
+    .filter((name) => !(name in variables))
+    .sort(compareCodePoint);
   if (missing.length > 0) {
     throw new Error(`Unresolved template variables: ${missing.join(", ")}`);
   }
 
   let resolved = template;
   // Apply substitutions deterministically in sorted key order for stability.
-  for (const key of [...referenced].sort()) {
+  for (const key of [...referenced].sort(compareCodePoint)) {
     resolved = resolved.split(`\${${key}}`).join(variables[key] ?? "");
   }
 

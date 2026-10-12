@@ -67,4 +67,54 @@ describe("coverage: reporting.ts", () => {
       "fourth",
     ]);
   });
+
+  /**
+   * Write the report set for the given findings on a fresh in-memory
+   * filesystem and return the validation-result messages in written order.
+   */
+  function writtenMessages(findings: ValidationFinding[]): string[] {
+    const fileSystem = new InMemoryFileSystem();
+    writeConversionReportSet(fileSystem, RUN_OPTIONS, [], [], [], findings, {});
+    const results = fileSystem.readTextFile(
+      "fixtures/artifacts/validation-results.json",
+    );
+    const parsed = JSON.parse(results) as Array<{ message: string }>;
+    return parsed.map((item) => item.message);
+  }
+
+  it("889-null-arm: sorts a null source path before a non-null one in both input orders", () => {
+    // Arrange: equal codes, so the source path decides.
+    const nonNull = finding("same-code", "a.md", null, "two");
+    const nullPath = finding("same-code", null, null, "one");
+    const inputOrders = [
+      [nonNull, nullPath],
+      [nullPath, nonNull],
+    ];
+
+    for (const findings of inputOrders) {
+      // Act
+      const messages = writtenMessages(findings);
+
+      // Assert
+      expect(messages).toEqual(["one", "two"]);
+    }
+  });
+
+  it("889-null-arm: sorts a null target path before a non-null one in both input orders", () => {
+    // Arrange: equal codes and source paths, so the target path decides.
+    const nonNull = finding("same-code", "a.md", "z.md", "two");
+    const nullPath = finding("same-code", "a.md", null, "one");
+    const inputOrders = [
+      [nonNull, nullPath],
+      [nullPath, nonNull],
+    ];
+
+    for (const findings of inputOrders) {
+      // Act
+      const messages = writtenMessages(findings);
+
+      // Assert
+      expect(messages).toEqual(["one", "two"]);
+    }
+  });
 });

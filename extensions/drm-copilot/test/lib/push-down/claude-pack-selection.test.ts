@@ -168,6 +168,29 @@ describe("loadPackManifests", () => {
       `Pack manifest 'source_prefix' must be a string when present: ${MANIFEST_DIR}/core.json`,
     );
   });
+
+  it("889-cp-order: loads missing manifests in code-point order (U+FF5E before U+1F600)", () => {
+    // Arrange: only core present; both selected packs are missing. The
+    // supplementary-plane name is inserted first so default UTF-16 order would
+    // report it first.
+    const supplementary = "\u{1F600}";
+    const highBmp = "～";
+    const fs = buildInMemoryFileSystem({
+      [`${MANIFEST_DIR}/core.json`]: manifestJson({
+        name: "core",
+        label: "Core",
+        paths: [],
+      }),
+    });
+
+    // Act
+    const act = (): unknown =>
+      loadPackManifests(MANIFEST_DIR, new Set([supplementary, highBmp]), fs);
+
+    // Assert: the first missing pack reported is the U+FF5E name.
+    expect(act).toThrow(ManifestError);
+    expect(act).toThrow(/^Pack manifest is missing for pack '～'/u);
+  });
 });
 
 describe("computePublishedPaths", () => {
