@@ -132,3 +132,19 @@ IT-TITLE: exits 0 without a research-path when the acceptance criteria contain o
 IT-TITLE: exits 2 with a stderr reason when the research-path file cannot be read | TAGS: E3-Entry
 PARSE-ERRORS: 0
 ```
+
+## [P6-T1] Blocking switch of .claude/hooks/validate-prd-feature-output.ps1
+
+Timestamp: 2026-10-11T23-10
+Command: sh <SCRATCHPAD>/route.sh <SCRATCHPAD>/e905-static.ps1 -File .claude/hooks/validate-prd-feature-output.ps1 -Absent 'CLAUDE_HOOK_INPUT||\bexit 1\b||Write-Error' -Simple 'Exit-SubagentStopBlock -Message' -TrimLine 'exit 0'
+EXIT_CODE: 0
+Output Summary: ParseFile reports 0 errors; the scan for `CLAUDE_HOOK_INPUT`, `\bexit 1\b`, `Write-Error` returns no match; `Exit-SubagentStopBlock -Message` count is 1; the trimmed line `exit 0` matches exactly one line (118). Only the tail block line changed (`git diff --stat 14aaf7c52 -- .claude/hooks/validate-prd-feature-output.ps1`: 1 insertion, 1 deletion). R-RESET: `P6-T1: none present`.
+
+```text
+FILE: .claude/hooks/validate-prd-feature-output.ps1
+PARSE-ERRORS: 0
+PATTERN-SCAN: CLAUDE_HOOK_INPUT , \bexit 1\b , Write-Error | matches=0
+SIMPLE-COUNT: Exit-SubagentStopBlock -Message | 1
+TRIMLINE-COUNT: exit 0 | 1 | lines=118
+LINES: .claude/hooks/validate-prd-feature-output.ps1 | 118
+```
