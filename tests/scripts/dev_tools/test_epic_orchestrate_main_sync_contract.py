@@ -69,18 +69,26 @@ CLAUDE_SURFACES = (
 
 # Baseline steps 1 through 3 of the Claude lifecycle section before issue #902,
 # with no main-sync step. The contract must reject this text.
-PRE_CHANGE_LIFECYCLE_TEXT = """\
-1. Before wave 0's launch, `epic-orchestrator` creates the integration branch off the tip of
-   `main`: `git fetch origin main`, `git checkout -b epic/<epic-slug>-integration origin/main`,
-   `git push -u origin epic/<epic-slug>-integration`.
-2. Before starting each wave, `epic-orchestrator` runs
-   `git fetch origin epic/<epic-slug>-integration` so the wave's child worktrees branch off the
-   current remote tip, not a stale local ref.
-3. Each child feature's worktree/branch (created via
-   `Agent(orchestrator, isolation: "worktree", run_in_background: true)`) is branched from
-   `origin/<integration_branch>`, not `origin/main`. The child's own `orchestrator` instance
-   honors this via the epic-mode kickoff line below.
-"""
+PRE_CHANGE_LIFECYCLE_TEXT = "\n".join(
+    (
+        "1. Before wave 0's launch, `epic-orchestrator` creates the integration"
+        " branch off the tip of",
+        "   `main`: `git fetch origin main`,"
+        " `git checkout -b epic/<epic-slug>-integration origin/main`,",
+        "   `git push -u origin epic/<epic-slug>-integration`.",
+        "2. Before starting each wave, `epic-orchestrator` runs",
+        "   `git fetch origin epic/<epic-slug>-integration` so the wave's child"
+        " worktrees branch off the",
+        "   current remote tip, not a stale local ref.",
+        "3. Each child feature's worktree/branch (created via",
+        '   `Agent(orchestrator, isolation: "worktree", run_in_background: true)`)'
+        " is branched from",
+        "   `origin/<integration_branch>`, not `origin/main`. The child's own"
+        " `orchestrator` instance",
+        "   honors this via the epic-mode kickoff line below.",
+        "",
+    )
+)
 
 NUMBERED_STEP_PATTERN = re.compile(r"^(\d+)\. ", re.MULTILINE)
 
