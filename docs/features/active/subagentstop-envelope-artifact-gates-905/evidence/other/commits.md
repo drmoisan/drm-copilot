@@ -14,3 +14,10 @@ Push refspec (branch substitution 1): `git push origin HEAD:bug/subagentstop-env
 - Commit: 44c720f67 (`docs(905): record upstream-merge check and Phase 0 baselines`)
 - Push exit code: 0 (`f11f1814b..44c720f67  HEAD -> bug/subagentstop-envelope-artifact-gates-exec-905`; the merge commit c0cfec94d was pushed with it)
 - Post-commit `git status --porcelain`: (empty)
+
+## [P1-T6] Phase 1
+
+- Pre-commit `git status --porcelain`: plan and deviations modified; untracked commits.md, corpus-scripts evidence, and evidence/qa-gates/ (all under the feature folder).
+- Commit: 329dc7b01a74584a29cf821176bdc588d2e0c131 (`docs(905): record before-change corpus runs for the four validators`)
+- Push exit code: 0 (`44c720f67..329dc7b01`)
+- Post-commit `git status --porcelain`: (empty)
