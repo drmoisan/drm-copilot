@@ -5,8 +5,8 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - Epic issue: #904
 - Integration branch: `epic/subagentstop-envelope-integration`
 - Current wave: 1
-- Next step: `E5_await_905 (then E4 896)`
-- Last updated: 2026-10-12T09:03:30Z
+- Next step: `E5_await_905 (E4 896 held until GO)`
+- Last updated: 2026-10-12T09:07:00Z
 
 ## Waves
 
@@ -40,3 +40,4 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - 2026-10-12T07:36Z: GO. Started E2 (903) resume in its original worktree after fast-forwarding the item branch to aa17afdb5 (no other child running; integration not behind main).
 - 2026-10-12T08:46Z: E2 (903) PR 907 opened and waiting on CI. Started E3 (905) resume from S6 in its resume worktree.
 - 2026-10-12T09:03Z: E2 (903) PR 907 merged (47a4175f, 20/20 checks). E3 (905) running.
+- 2026-10-12T09:07Z: THROTTLE: no new starts until GO. E3 (905) already running since 08:50Z (only active subtree); E4 (896) held.
