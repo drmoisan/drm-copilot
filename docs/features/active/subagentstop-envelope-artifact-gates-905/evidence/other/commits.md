@@ -21,3 +21,15 @@ Push refspec (branch substitution 1): `git push origin HEAD:bug/subagentstop-env
 - Commit: 329dc7b01a74584a29cf821176bdc588d2e0c131 (`docs(905): record before-change corpus runs for the four validators`)
 - Push exit code: 0 (`44c720f67..329dc7b01`)
 - Post-commit `git status --porcelain`: (empty)
+
+## WIP checkpoint (previous executor, weekly-limit stop)
+
+- Commit: 3aad71302d4a76cbe7022103f7aff68063b52916 (`wip: checkpoint after weekly-limit stop`); pushed before this resume.
+
+## [P2-T11] Phase 2
+
+- Branch: `exec905-resume` (resume relocation; tracking `origin/bug/subagentstop-envelope-artifact-gates-exec-905`)
+- Pre-commit `git status --porcelain`: five suites modified or added under `tests/scripts/claude-hooks/`; plan, batch-budget-resets, deviations modified; new evidence under `evidence/other/` and `evidence/regression-testing/` (all within W-ALLOWED).
+- Commit: 31bee75cd (`test(905): add stdin-envelope regression tests for the four artifact-gate validators`)
+- Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`3aad71302..31bee75cd`)
+- Post-commit `git status --porcelain`: (empty)

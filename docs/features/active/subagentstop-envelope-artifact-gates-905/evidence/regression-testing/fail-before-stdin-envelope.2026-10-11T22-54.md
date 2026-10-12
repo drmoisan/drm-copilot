@@ -1,6 +1,6 @@
 # Fail-before: new tests against the unchanged hooks (plan [P2-T10], issue #905) [expect-fail]
 
-Timestamp: 2026-10-11T23-16
+Timestamp: 2026-10-11T22-54
 Command: sh <SCRATCHPAD>/route.sh <SCRATCHPAD>/r-scoped.ps1 tests/scripts/claude-hooks/validate-discovery-artifact-gate.Tests.ps1 tests/scripts/claude-hooks/validate-pr-author-output.Tests.ps1 tests/scripts/claude-hooks/validate-pr-author-output.Coverage.Tests.ps1 tests/scripts/claude-hooks/validate-prd-feature-output.Tests.ps1 tests/scripts/claude-hooks/validate-prd-feature-output.Coverage.Tests.ps1 tests/scripts/claude-hooks/validate-task-researcher-output.Coverage.Tests.ps1 tests/scripts/claude-hooks/validate-task-researcher-output.Tests.ps1
 EXIT_CODE: 1
 ExpectedExitCode: 1

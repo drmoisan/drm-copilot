@@ -73,7 +73,7 @@ LINES: tests/scripts/claude-hooks/validate-discovery-artifact-gate.Tests.ps1 | 3
 
 ## [P2-T2] validate-pr-author-output.Tests.ps1 (P9)
 
-Timestamp: 2026-10-11T22-49
+Timestamp: 2026-10-11T22-46
 Command: sh <SCRATCHPAD>/route.sh <SCRATCHPAD>/r-its.ps1 -File tests/scripts/claude-hooks/validate-pr-author-output.Tests.ps1
 EXIT_CODE: 0
 Output Summary: PARSE-ERRORS: 0; `exits 2 in a separate process when the stdin envelope lacks a PR reference` appears once with TAGS: E3-Entry. The builder `New-SubagentStopEnvelopeJson` is the last statement of the outer `BeforeAll`. R-RESET: `P2-T2: none present`.
@@ -101,7 +101,7 @@ PARSE-ERRORS: 0
 
 ## [P2-T3] validate-pr-author-output.Coverage.Tests.ps1 (P1 to P8)
 
-Timestamp: 2026-10-11T22-52
+Timestamp: 2026-10-11T22-48
 Command: sh <SCRATCHPAD>/route.sh <SCRATCHPAD>/r-its.ps1 -File tests/scripts/claude-hooks/validate-pr-author-output.Coverage.Tests.ps1
 EXIT_CODE: 0
 Output Summary: PARSE-ERRORS: 0; each P1 to P8 title appears once with TAGS: E3-Entry, inside the new `Describe 'validate-pr-author-output entry point (stdin envelope, issue #905)'`. The existing issue #786 `Describe` is unchanged. R-RESET: `P2-T3: none present`.
@@ -123,7 +123,7 @@ PARSE-ERRORS: 0
 
 ## [P2-T4] validate-prd-feature-output.Coverage.Tests.ps1 (F1 to F12)
 
-Timestamp: 2026-10-11T22-56
+Timestamp: 2026-10-11T22-48
 Command: sh <SCRATCHPAD>/route.sh <SCRATCHPAD>/r-its.ps1 -File tests/scripts/claude-hooks/validate-prd-feature-output.Coverage.Tests.ps1
 EXIT_CODE: 0
 Output Summary: PARSE-ERRORS: 0; each F1 to F12 title appears once with TAGS: E3-Entry, inside the new `Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)'` whose `BeforeAll` defines `New-SubagentStopEnvelopeJson`, `Invoke-PrdFeatureOutputStdinEntry`, and `$script:PwshExe`. The existing issue #786 `Describe` is unchanged. Every built-in mock carries a `-ParameterFilter` on the literal path. R-RESET: `P2-T4: none present`.
@@ -148,7 +148,7 @@ PARSE-ERRORS: 0
 
 ## [P2-T5] validate-prd-feature-output.Tests.ps1 (R2 rows and RS-18 fixtures)
 
-Timestamp: 2026-10-11T22-59
+Timestamp: 2026-10-11T22-50
 Command: sh <SCRATCHPAD>/route.sh <SCRATCHPAD>/r-its.ps1 -File tests/scripts/claude-hooks/validate-prd-feature-output.Tests.ps1
 EXIT_CODE: 0
 Output Summary: PARSE-ERRORS: 0; the two R2 template titles `R2 triggers on <Name>` (10 rows) and `R2 does not trigger on <Name>` (15 rows) appear with TAGS: NONE inside the new `Context 'Test-SpecNumericCriterion rule R2 (issue #905)'`, the last child block of `Describe 'validate-prd-feature-output.ps1'`. RS-18 applied: line 41 `- [ ] All 8 call sites are covered`; line 47 `- [ ] All 99 unrelated boxes` and `- [ ] All 7 unrelated boxes`; lines 98 and 107 `- [ ] The 2 call sites are covered`; no test title changed. `Select-String ... -Pattern '\[ \] 1 call','\[ \] 8 call'` returned no match (SEL-COUNT: 0). R-RESET: `P2-T5: none present`.
@@ -179,7 +179,7 @@ SEL-COUNT: 0
 
 ## [P2-T6] validate-task-researcher-output.Coverage.Tests.ps1 (new; T1 to T13 and R1 rows)
 
-Timestamp: 2026-10-11T23-05
+Timestamp: 2026-10-11T22-52
 Command: sh <SCRATCHPAD>/route.sh <SCRATCHPAD>/r-its.ps1 -File tests/scripts/claude-hooks/validate-task-researcher-output.Coverage.Tests.ps1
 EXIT_CODE: 0
 Output Summary: PARSE-ERRORS: 0; each T1 to T13 title appears once with TAGS: E3-Entry; the R1 template titles `R1 accepts <Name>` (13 rows, a1 to a13) and `R1 rejects <Name> (<Category>)` (22 rows, r1 to r22) appear with TAGS: NONE. `git status --porcelain` lists `?? tests/scripts/claude-hooks/validate-task-researcher-output.Coverage.Tests.ps1` (untracked). R-SIZE: 272 lines (at most 500). R-RESET: `P2-T6: none present`.
@@ -223,7 +223,7 @@ LINES: tests/scripts/claude-hooks/validate-task-researcher-output.Coverage.Tests
 
 ## [P2-T7] validate-prd-feature-output.Tests.ps1 (R3 rows)
 
-Timestamp: 2026-10-11T23-07
+Timestamp: 2026-10-11T22-52
 Command: sh <SCRATCHPAD>/route.sh <SCRATCHPAD>/r-its.ps1 -File tests/scripts/claude-hooks/validate-prd-feature-output.Tests.ps1
 EXIT_CODE: 0
 Output Summary: PARSE-ERRORS: 0; `R3 accepts the exhaustive scope <Name>` (3 rows) and `R3 rejects the exhaustive scope <Name>` (1 row) each appear once with TAGS: NONE, inside the new `Context 'Test-NumericDerivationEvidence rule R3 (issue #905)'` placed after the R2 context as the last child block of `Describe 'validate-prd-feature-output.ps1'`. No existing test changed. R-SIZE: 212 lines (at most 500). R-RESET: `P2-T7: none present`.
@@ -256,7 +256,7 @@ LINES: tests/scripts/claude-hooks/validate-prd-feature-output.Tests.ps1 | 212
 
 ## [P2-T8] validate-task-researcher-output.Coverage.Tests.ps1 (R3 rows)
 
-Timestamp: 2026-10-11T23-09
+Timestamp: 2026-10-11T22-53
 Command: sh <SCRATCHPAD>/route.sh <SCRATCHPAD>/r-its.ps1 -File tests/scripts/claude-hooks/validate-task-researcher-output.Coverage.Tests.ps1
 EXIT_CODE: 0
 Output Summary: PARSE-ERRORS: 0; `R3 accepts the exhaustive scope <Name>` (3 rows) and `R3 rejects the exhaustive scope <Name>` (1 row) each appear once with TAGS: NONE, inside the new `Describe 'Test-NumericDerivationEvidence rule R3 (issue #905)'` placed after the R1 `Describe`; its `BeforeAll` dot-sources the hook and defines `$script:R3EvidenceText` as the thirteen default builder lines joined with LF. R-SIZE: 319 lines (at most 500). R-RESET: `P2-T8: none present`.

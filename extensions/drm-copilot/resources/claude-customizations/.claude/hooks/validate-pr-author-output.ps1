@@ -3,18 +3,21 @@
     SubagentStop hook that verifies the pr-author agent reported a created or updated PR.
 
 .DESCRIPTION
-    Invoked by the Claude Code SubagentStop hook for the pr-author matcher. Reads the agent
-    transcript JSON from the CLAUDE_HOOK_INPUT environment variable, extracts the .output field,
-    and confirms the output reports that a pull request was created or updated. The hook allows
-    (exit 0) when the output contains:
+    Invoked by the Claude Code SubagentStop hook for the pr-author matcher. Reads the SubagentStop
+    envelope JSON from stdin through the shared envelope helper (subagentstop-envelope.ps1) and
+    validates its last_assistant_message field, the pr-author agent's last assistant message. The
+    hook allows (exit 0) when that message contains:
       - a GitHub PR URL (github.com/<owner>/<repo>/pull/<n>), or
       - a PR reference of the form "PR #<n>", or
       - a "gh pr create"/"gh pr edit" confirmation that includes a PR number.
-    The hook blocks (exit 1) when:
-      - CLAUDE_HOOK_INPUT is empty,
-      - the input is not valid JSON,
-      - the .output field is empty, or
-      - the output contains no PR URL or PR number.
+    The hook blocks, writing the reason to stderr and exiting 2 through the shared envelope
+    helper, when:
+      - the envelope is empty, is not valid JSON, is not a JSON object, or carries no string
+        last_assistant_message (reason prefix "PR_AUTHOR_OUTPUT_MALFORMED: payload anomaly"),
+      - the last assistant message is blank (PR_AUTHOR_OUTPUT_EMPTY), or
+      - the last assistant message contains no PR URL or PR number (PR_AUTHOR_OUTPUT_NO_PR).
+    A hook dependency that fails to load blocks with exit 2 and the PR_AUTHOR_OUTPUT_MISSING:
+    prefix.
 
 .NOTES
     Compatible with PowerShell 7+. No external module dependencies.
@@ -28,6 +31,7 @@
 [CmdletBinding()]
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
+try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
 
 function Test-PrAuthorOutputReportsPr {
     <#
@@ -37,7 +41,7 @@ function Test-PrAuthorOutputReportsPr {
         Detection helper (injectable boundary for tests). Matches a GitHub PR URL, a "PR #<n>"
         reference, or a "gh pr create"/"gh pr edit" confirmation that contains a PR number.
     .PARAMETER OutputText
-        The pr-author agent's final output text extracted from CLAUDE_HOOK_INPUT.output.
+        The pr-author agent's last assistant message text.
     .OUTPUTS
         System.Boolean
     #>
@@ -72,55 +76,43 @@ function Test-PrAuthorOutputReportsPr {
 function Get-PrAuthorOutputDecision {
     <#
     .SYNOPSIS
-        Parse CLAUDE_HOOK_INPUT and return an allow-or-block decision with exit code semantics.
+        Read the SubagentStop envelope and return an allow-or-block decision.
     .DESCRIPTION
         Returns an ordered dictionary with 'allowed' (bool) and 'reason' (string). Allowed is $true
-        only when the parsed .output reports a PR per Test-PrAuthorOutputReportsPr. Empty input,
-        malformed JSON, empty output, and PR-less output all yield allowed = $false.
-    .PARAMETER HookInputRaw
-        The raw JSON transcript payload supplied by Claude Code via CLAUDE_HOOK_INPUT.
+        only when the envelope's last assistant message reports a PR per
+        Test-PrAuthorOutputReportsPr. An invalid envelope (payload anomaly), a blank last assistant
+        message, and a message without a PR reference all yield allowed = $false.
+    .PARAMETER InputText
+        The SubagentStop envelope JSON. When the parameter is not bound, Read-SubagentStopEnvelope
+        reads the envelope from stdin.
     .OUTPUTS
         System.Collections.Specialized.OrderedDictionary
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
-        [string] $HookInputRaw
+        [AllowNull()] [AllowEmptyString()] [string] $InputText
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'PR_AUTHOR_OUTPUT_MISSING:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
+    $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
+    if (-not $envelope.IsValid) { return [ordered]@{ allowed = $false; reason = "PR_AUTHOR_OUTPUT_MALFORMED: payload anomaly - $(Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)" } }
+    $assistantMessage = [string]$envelope.AssistantText
 
-    if ([string]::IsNullOrWhiteSpace($HookInputRaw)) {
+    if ([string]::IsNullOrWhiteSpace($assistantMessage)) {
         return [ordered]@{
             allowed = $false
-            reason  = 'PR_AUTHOR_OUTPUT_MISSING: CLAUDE_HOOK_INPUT is empty; the pr-author agent produced no transcript to validate.'
+            reason  = 'PR_AUTHOR_OUTPUT_EMPTY: the pr-author last assistant message is empty; it must report the created or updated PR URL or number.'
         }
     }
 
-    try {
-        $parsed = $HookInputRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        return [ordered]@{
-            allowed = $false
-            reason  = 'PR_AUTHOR_OUTPUT_MALFORMED: CLAUDE_HOOK_INPUT is not valid JSON.'
-        }
-    }
-
-    $outputText = [string]$parsed.output
-    if ([string]::IsNullOrWhiteSpace($outputText)) {
-        return [ordered]@{
-            allowed = $false
-            reason  = 'PR_AUTHOR_OUTPUT_EMPTY: the pr-author agent output is empty; it must report the created or updated PR URL or number.'
-        }
-    }
-
-    if (Test-PrAuthorOutputReportsPr -OutputText $outputText) {
+    if (Test-PrAuthorOutputReportsPr -OutputText $assistantMessage) {
         return [ordered]@{ allowed = $true }
     }
 
     return [ordered]@{
         allowed = $false
-        reason  = 'PR_AUTHOR_OUTPUT_NO_PR: the pr-author agent output does not reference a PR URL or PR number; it must report the created or updated pull request.'
+        reason  = 'PR_AUTHOR_OUTPUT_NO_PR: the pr-author last assistant message does not reference a PR URL or PR number; it must report the created or updated pull request.'
     }
 }
 
@@ -132,11 +124,6 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PR_AUTH
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'PR_AUTHOR_OUTPUT_MISSING:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
-$decision = Get-PrAuthorOutputDecision -HookInputRaw $env:CLAUDE_HOOK_INPUT
-
-if (-not $decision['allowed']) {
-    Write-Error $decision['reason']
-    exit 1
-}
-
+$decision = Get-PrAuthorOutputDecision
+if (-not $decision['allowed']) { Write-Error $decision['reason']; exit 1 }
 exit 0
