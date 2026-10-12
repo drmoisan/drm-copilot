@@ -141,8 +141,7 @@ function Install-PoetryWithPip {
     }
 
     Write-Output "Installing poetry via python -m pip"
-    $pipResult = Invoke-HostNativeCommand -FilePath $pythonCommand.Source -ArgumentList @('-m', 'pip', 'install', '--user', 'poetry')
-    $pipResult.Output
+    $pipResult = Invoke-HostNativeCommand -FilePath $pythonCommand.Source -ArgumentList @('-m', 'pip', 'install', '--user', 'poetry') -StreamToHost
     if ($pipResult.ExitCode -ne 0) {
         throw "Poetry fallback install failed with exit code $($pipResult.ExitCode)"
     }
@@ -332,7 +331,7 @@ function Invoke-BootstrapHost {
     Write-Output "========================================="
 
     if (-not $IsWindowsHost) {
-        Write-Error -Message 'This script targets Windows. Use ./scripts/bash/bootstrap-host.sh on Linux/macOS.' -ErrorAction Stop
+        Write-Error -Message 'This script targets Windows. On Linux/macOS, use the dev container defined under .devcontainer/ (see .devcontainer/README.md).' -ErrorAction Stop
     }
 
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
@@ -347,7 +346,7 @@ function Invoke-BootstrapHost {
 
     $manifest = Get-HostManifest
     $wingetPackages = Get-WingetPackagesFromManifest -Manifest $manifest
-    $projects = Get-ProjectRepositoriesFromManifest -Manifest $manifest
+    $projects = @(Get-ProjectRepositoriesFromManifest -Manifest $manifest)
 
     if ($Apply -and $EnableAutoResumeAfterReboot) {
         $resumeArguments = Get-BootstrapResumeArgument -WorkspaceRoot $WorkspaceRoot -RepoRoot $RepoRoot -SkipProjectPoetryInstall:$SkipProjectPoetryInstall

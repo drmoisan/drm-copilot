@@ -112,6 +112,28 @@ Describe 'Invoke-BootstrapHost' {
         }
     }
 
+    Context 'committed manifest' {
+        BeforeAll {
+            $script:CommittedManifest = Get-Content -LiteralPath (Resolve-Path "$PSScriptRoot/../../../scripts/host-tools.manifest.json").Path -Raw | ConvertFrom-Json
+        }
+
+        It 'AC07-DRYRUN-COMMITTED-MANIFEST previews every winget entry and the pinned modules' {
+            # Arrange
+            Mock -CommandName Read-HostToolsManifest -ModuleName HostBootstrap -MockWith { $script:CommittedManifest }
+
+            # Act
+            $actual = @(Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+
+            # Assert: every committed winget entry is previewed, and nothing else is.
+            foreach ($pkg in @($script:CommittedManifest.installPackages.windows.winget)) {
+                $actual | Should -Contain "- Would install $($pkg.name) using winget id '$($pkg.id)'"
+            }
+            @($actual | Where-Object { $_ -like '- Would install * using winget id *' }).Count | Should -Be @($script:CommittedManifest.installPackages.windows.winget).Count
+            $actual | Should -Contain '- Would install PowerShell modules: Pester 5.6.1, PSScriptAnalyzer 1.22.0'
+            $actual[-1] | Should -BeExactly 'Dry run complete. Re-run with -Apply to install tools.'
+        }
+    }
+
     Context 'failure paths' {
         It 'AC06-BOOTSTRAP-NOMANIFEST-THROWS throws when the host tools manifest is missing' {
             Mock -CommandName Read-HostToolsManifest -ModuleName HostBootstrap -MockWith { }
@@ -121,7 +143,7 @@ Describe 'Invoke-BootstrapHost' {
 
         It 'AC06-BOOTSTRAP-PRECONDITION-ERRORS raises terminating errors for a non-Windows host and a missing winget' {
             # Act / Assert: non-Windows host.
-            { Invoke-BootstrapHost -IsWindowsHost $false } | Should -Throw -ExpectedMessage 'This script targets Windows. Use ./scripts/bash/bootstrap-host.sh on Linux/macOS.'
+            { Invoke-BootstrapHost -IsWindowsHost $false } | Should -Throw -ExpectedMessage 'This script targets Windows. On Linux/macOS, use the dev container defined under .devcontainer/ (see .devcontainer/README.md).'
 
             # Arrange / Act / Assert: winget missing.
             Mock -CommandName Get-Command -ModuleName HostBootstrap -MockWith { }
@@ -167,6 +189,26 @@ Describe 'Invoke-BootstrapHost' {
     }
 
     Context 'apply' {
+        It 'AC08-APPLY-EMPTY-PROJECTS completes without a binding error and runs the poetry project install' {
+            # Arrange: a manifest with an empty projectRepositories list.
+            Mock -CommandName Read-HostToolsManifest -ModuleName HostBootstrap -MockWith {
+                [pscustomobject]@{
+                    installPackages     = [pscustomobject]@{
+                        windows = [pscustomobject]@{
+                            winget = @([pscustomobject]@{ id = 'Git.Git'; name = 'git' })
+                        }
+                    }
+                    powershellModules   = @([pscustomobject]@{ name = 'Pester'; minimumVersion = '5.6.1' })
+                    projectRepositories = @()
+                }
+            }
+
+            # Act / Assert
+            { $script:applyOutput = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo') } | Should -Not -Throw
+            Should -Invoke -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -Times 1 -Exactly
+            Should -Invoke -CommandName Invoke-HostBootstrapGit -ModuleName HostBootstrapWorkspace -Times 0 -Exactly
+        }
+
         It 'installs packages, modules, Graphite CLI, and clones projects' {
             $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
 
