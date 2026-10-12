@@ -30,13 +30,13 @@ Describe 'validate-feature-review-coverage.ps1 thresholds dot-source guard (issu
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path -replace '\\', '/'
 
         function Invoke-ThresholdsGuardHookProcess {
-            # Runs one hook copy through the & route with stderr and CLAUDE_HOOK_INPUT redirected; both restored in finally.
+            # Runs one hook copy through the & route with stdin (a SubagentStop envelope) and stderr redirected; both restored in finally.
             param([string] $Hook)
             $priorError = [System.Console]::Error
-            $priorInput = $env:CLAUDE_HOOK_INPUT
+            $priorIn = [System.Console]::In
             $errorWriter = [System.IO.StringWriter]::new()
             try {
-                $env:CLAUDE_HOOK_INPUT = '{"output":""}'
+                [System.Console]::SetIn([System.IO.StringReader]::new('{"session_id":"tg-896","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":""}'))
                 [System.Console]::SetError($errorWriter)
                 $global:LASTEXITCODE = 0
                 $null = & (Join-Path $script:RepoRoot $Hook)
@@ -44,7 +44,7 @@ Describe 'validate-feature-review-coverage.ps1 thresholds dot-source guard (issu
             }
             finally {
                 [System.Console]::SetError($priorError)
-                $env:CLAUDE_HOOK_INPUT = $priorInput
+                [System.Console]::SetIn($priorIn)
             }
             return [pscustomobject]@{ Stderr = $errorWriter.ToString(); ExitCode = $exitCode }
         }
@@ -110,12 +110,30 @@ Describe 'validate-feature-review-coverage.ps1 thresholds dot-source guard (issu
         # Act
         try {
             . $hookPath
-            $decision = Invoke-FeatureReviewCoverageValidation -RawPayload '{"output":""}'
+            $decision = Invoke-FeatureReviewCoverageValidation -InputText ''
         }
         finally { Initialize-ThresholdsGuardDependencyState }
 
         # Assert
         $decision.ExitCode | Should -Be 2
         $decision.Reason | Should -BeLike '*feature-review-coverage-thresholds.ps1*'
+    }
+
+    It 'E4-TG4: <Copy> exits 2 naming subagentstop-envelope.ps1 when the E1 helper dot-source fails' -ForEach @(
+        @{ Copy = 'claude'; Hook = '.claude/hooks/validate-feature-review-coverage.ps1' }
+        @{ Copy = 'bundle'; Hook = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-feature-review-coverage.ps1' }
+    ) {
+        # Arrange: fail only the E1 helper dot-source; every other Join-Path call runs normally.
+        Mock Join-Path { throw 'simulated load failure: subagentstop-envelope.ps1' } -ParameterFilter { $ChildPath -eq 'subagentstop-envelope.ps1' }
+        Initialize-ThresholdsGuardDependencyState
+
+        # Act
+        try { $result = Invoke-ThresholdsGuardHookProcess -Hook $Hook }
+        finally { Initialize-ThresholdsGuardDependencyState }
+
+        # Assert
+        $result.ExitCode | Should -Be 2 -Because $result.Stderr
+        $result.Stderr.StartsWith('validate-feature-review-coverage:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Stderr
+        $result.Stderr.Contains('subagentstop-envelope.ps1') | Should -BeTrue -Because $result.Stderr
     }
 }

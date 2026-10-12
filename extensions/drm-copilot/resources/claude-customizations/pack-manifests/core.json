@@ -69,6 +69,8 @@
     ".claude/hooks/validate-bash.ps1",
     ".claude/hooks/validate-discovery-artifact-gate.ps1",
     ".claude/hooks/validate-executor-output.ps1",
+    ".claude/hooks/validate-feature-review-coverage-metrics.ps1",
+    ".claude/hooks/validate-feature-review-coverage-rules.ps1",
     ".claude/hooks/validate-feature-review-coverage.ps1",
     ".claude/hooks/validate-orchestrator-output-resolution.ps1",
     ".claude/hooks/validate-orchestrator-output-routing.ps1",
