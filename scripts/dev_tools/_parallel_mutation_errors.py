@@ -42,6 +42,16 @@ from scripts.dev_tools._parallel_state_common import (
 # that this feature's errors are prefixed ``Parallel``.
 REJECTION_PREFIX = "Parallel mutation rejected:"
 
+# The allowed members of each enum field a raise site may name, keyed by field
+# name. A rejection quotes the members of the rejected field itself, so a
+# rejected ``disposition`` can never list merge-status values. Insertion order
+# is load-bearing: it is the order the unmapped-field error names the fields.
+_ENUM_MEMBERS_BY_FIELD: dict[str, tuple[str, ...]] = {
+    "state": VALID_ITEM_STATES,
+    "merge_status": VALID_MERGE_STATUS,
+    "disposition": VALID_DISPOSITIONS,
+}
+
 
 class ParallelMutationError(ValueError):
     """Base class for every rejection and lookup failure of the engine.
@@ -163,10 +173,13 @@ class CloseWhileInFlightRejectedError(ParallelMutationError):
 class UnknownEnumMemberError(ParallelMutationError):
     """Raised when a value outside one of F3's enums is supplied.
 
-    Covers item ``state`` and per-item ``merge_status``. One parameterized type
-    rather than one class per field keeps the consume-never-extend check in a
-    single place: an unrecognized member is rejected at construction rather
-    than propagated into a record the landed validator would reject.
+    Covers item ``state``, per-item ``merge_status``, and an in-flight
+    removal's ``disposition``; the message lists the allowed members of the
+    rejected field itself. One parameterized type rather than one class per
+    field keeps the consume-never-extend check in a single place: an
+    unrecognized member is rejected at construction rather than propagated into
+    a record the landed validator would reject. A field with no known member
+    list is a caller defect and raises ``ValueError`` instead.
 
     Attributes:
         item_key (int | None): The owning key, or None for a run-scoped record.
@@ -179,17 +192,28 @@ class UnknownEnumMemberError(ParallelMutationError):
 
         Args:
             item_key (int | None): The owning ``items[].issue_num``, or None.
-            field_name (str): Either ``state`` or ``merge_status``.
+            field_name (str): One of ``state``, ``merge_status``, or
+                ``disposition``; any other name raises ``ValueError``.
             value (object): The value that is not a member of that enum.
 
         Returns:
             None.
+
+        Raises:
+            ValueError: If ``field_name`` has no member list, since the message
+                could otherwise only quote an unrelated enum.
         """
 
+        allowed = _ENUM_MEMBERS_BY_FIELD.get(field_name)
+        if allowed is None:
+            raise ValueError(
+                f"UnknownEnumMemberError has no member list for field "
+                f"{field_name!r}; expected one of "
+                f"{', '.join(_ENUM_MEMBERS_BY_FIELD)}."
+            )
         self.item_key = item_key
         self.field_name = field_name
         self.value = value
-        allowed = VALID_ITEM_STATES if field_name == "state" else VALID_MERGE_STATUS
         super().__init__(
             f"{REJECTION_PREFIX} item {item_key!r} {field_name} {value!r} is "
             f"not one of {', '.join(allowed)}."

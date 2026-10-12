@@ -1,0 +1,10 @@
+{
+  "case": "close-unknown-state",
+  "subcommand": "close",
+  "argv": ["close", "--items", "4:paused"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation rejected: item 4 state 'paused' is not one of proposed, admitted, prepared, scheduled, in_flight, merged, withdrawn, blocked."
+  }
+}

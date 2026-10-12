@@ -1,6 +1,6 @@
 # Shell CI Baseline (Issue #890)
 
-Timestamp: 2026-10-12T20-12
+Timestamp: 2026-10-12T20-10
 Task: P0-T12
 Command: (1) `gh run list --workflow ci.yml --branch main --status completed --limit 1 --json databaseId,headSha,conclusion`; (2) `gh run view 38299364773 --json jobs --jq '.jobs[] | select(.name|test("shell-coverage")) | [.name,.conclusion] | @tsv'`; (3) `gh run view 38299364773 --log | grep -F 'Bash coverage (lines):'`
 EXIT_CODE: 0

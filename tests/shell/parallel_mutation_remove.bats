@@ -272,6 +272,14 @@ assert_usage_error() {
     [ -z "$PM_ERROR" ]
 }
 
+@test "pm_decide_removal lists the dispositions for an out-of-enum disposition" {
+    rc=0
+    pm_decide_removal 21 in_flight delete || rc=$?
+    [ "$rc" -eq 1 ]
+    [ -z "$PM_RESULT" ]
+    [ "$PM_ERROR" = "Parallel mutation rejected: item 21 disposition 'delete' is not one of detach, abandon." ]
+}
+
 @test "pm_recolor_unstarted sets PM_ERROR on an overlap" {
     rc=0
     pm_recolor_unstarted "2 4" "" "4" 0 0 0 || rc=$?

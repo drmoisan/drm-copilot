@@ -1,6 +1,6 @@
 # Scratch File Name Substitution (Issue #890)
 
-Timestamp: 2026-10-12T20-13
+Timestamp: 2026-10-12T20-10
 Source: operator constraint 2 in the executor delegation prompt (every scratch file name must begin with `issue-890-`).
 
 | Plan name | Name used |
