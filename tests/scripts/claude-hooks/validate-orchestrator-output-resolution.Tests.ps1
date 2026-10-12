@@ -232,4 +232,28 @@ Describe 'validate-orchestrator-output resolution sibling' {
         $result.Reason.Contains('WorktreeRunResolution.psm1') | Should -BeTrue -Because $result.Reason
         Should -Invoke Get-CheckpointFileContent -Times 0 -Exactly
     }
+
+    It 'S2-13 keeps a checkpoint whose route and field keys differ only in case (CR-1)' {
+        # Arrange
+        Set-ResolutionRunTopology -Live @('/synthetic-worktrees/r-case') -Epic @{ '/synthetic-worktrees/r-case' = '{"Route_Id":"epic","Integration_Branch":"epic/case"}' }
+
+        # Act
+        $values = Find-OrchestratorOutputRunSignalValue -Kind 'epic' -SessionRoot $script:Session
+
+        # Assert
+        ($values -join ',') | Should -BeExactly 'epic/case'
+    }
+
+    It 'S2-14 returns ORCHESTRATOR_CHECKPOINT_UNRESOLVED: when the resolver throws (CR-3)' {
+        # Arrange
+        Mock Resolve-OrchestratorOutputCheckpointPath { throw 'simulated resolver failure (CR-3)' }
+
+        # Act
+        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-ResolutionPayload -Output 'Final summary.') -CheckpointPath 'artifacts/orchestration/epic-orchestrator-state.json' -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Message.StartsWith('ORCHESTRATOR_CHECKPOINT_UNRESOLVED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Message
+        $result.Message.Contains('RESOLVER_FAILED') | Should -BeTrue -Because $result.Message
+    }
 }
