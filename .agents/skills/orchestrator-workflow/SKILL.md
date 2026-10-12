@@ -436,7 +436,7 @@ Do not claim mission completion until all of the following are true:
 - any required remediation loop run also includes a remediation execution receipt, a remediation commit receipt, and a final `REVIEW_STATUS: PASS`
 - validator-backed checks for the approved plan, policy audit, code review, feature audit, and checkpoint state pass
 - the canonical checkpoint passes `validate_orchestration_artifacts` with `artifact_type: "orchestrator-state"`, `require_complete: true`, `require_codex_topology: true`, and `require_codex_model_routing: true`
-- required GitHub checks pass for the current PR head SHA before PR/DONE completion
+- every GitHub check on the current PR head SHA passed or was skipped before PR/DONE completion
 
 ## Hard Constraints
 
