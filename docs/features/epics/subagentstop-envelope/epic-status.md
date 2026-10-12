@@ -5,8 +5,8 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - Epic issue: #904
 - Integration branch: `epic/subagentstop-envelope-integration`
 - Current wave: 1
-- Next step: `WAIT_FOR_GO (running child finishes; then E3, then E4 one at a time after GO)`
-- Last updated: 2026-10-12T03:03:00Z
+- Next step: `WAIT_FOR_GO after ~07:30Z reset; then re-derive each wave-1 child from its committed tip and resume one at a time (E2, E3, E4)`
+- Last updated: 2026-10-12T04:28:12Z
 
 ## Waves
 
@@ -36,3 +36,4 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - 2026-10-12T02:42Z: started E3, E4, E2 resumes in their existing worktrees (before the throttle directive arrived).
 - 2026-10-12: THROTTLE received: one child subtree at a time, order E2, E3, E4. Coordinator asked to stop the E3 and E4 resumes; E2 continues.
 - 2026-10-12T03:03Z: THROTTLE: no new child or agent-launching step until GO; the running child finishes.
+- 2026-10-12T04:28Z: COMMIT NOW: checkpoint and status committed; child remote tips 905 642050f8, 896 f32cfc84, 903 5e695d73; no PRs open; waiting for GO after the ~07:30Z reset.
