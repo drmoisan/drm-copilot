@@ -155,8 +155,8 @@ function Find-OrchestratorOutputRunSignalValue {
         try { $parsed = ConvertFrom-Json -InputObject $text -NoEnumerate -ErrorAction Stop } catch { continue }
         if ($parsed -isnot [System.Management.Automation.PSCustomObject]) { continue }
         $names = @($parsed.PSObject.Properties.Name)
-        if (-not ($names -ccontains 'route_id') -or ([string]$parsed.route_id -cne $route)) { continue }
-        if (-not ($names -ccontains $field)) { continue }
+        if (-not ($names -contains 'route_id') -or ([string]$parsed.route_id -cne $route)) { continue }
+        if (-not ($names -contains $field)) { continue }
         $value = $parsed.$field
         if ($value -isnot [string] -or [string]::IsNullOrWhiteSpace($value)) { continue }
         if (-not $values.Contains($value)) { $values.Add($value) }
@@ -280,7 +280,9 @@ function Get-OrchestratorOutputWaveBarrierDecision {
     .SYNOPSIS
         Run the Layer 2 wave-barrier ordering check on epic checkpoint text.
     .DESCRIPTION
-        Returns @{ Ok; Message }. Violation lines are surfaced unwrapped and followed by
+        Returns @{ Ok; Message } on success and @{ Ok; Repairable; Message } on a block, with
+        Repairable set to $false on every block (the agent cannot clear it, so it blocks once under
+        the re-entry policy of issue #903). Violation lines are surfaced unwrapped and followed by
         the fixed report-and-halt instruction. A failed port import, an
         EPIC_WAVE_BARRIER_UNEVALUABLE: error, or any other port failure blocks with a
         message that starts with EPIC_WAVE_BARRIER_UNEVALUABLE:.
@@ -298,12 +300,12 @@ function Get-OrchestratorOutputWaveBarrierDecision {
     catch {
         $message = $_.Exception.Message
         if ($message.StartsWith($script:OrchestratorOutputUnevaluableToken, [System.StringComparison]::Ordinal)) {
-            return @{ Ok = $false; Message = $message }
+            return @{ Ok = $false; Repairable = $false; Message = $message }
         }
-        return @{ Ok = $false; Message = ('{0} the wave-barrier ordering check failed: {1}' -f $script:OrchestratorOutputUnevaluableToken, $message) }
+        return @{ Ok = $false; Repairable = $false; Message = ('{0} the wave-barrier ordering check failed: {1}' -f $script:OrchestratorOutputUnevaluableToken, $message) }
     }
 
     if ($lines.Count -eq 0) { return @{ Ok = $true; Message = $null } }
     $lines.Add($script:OrchestratorOutputHaltInstruction)
-    return @{ Ok = $false; Message = ($lines -join "`n") }
+    return @{ Ok = $false; Repairable = $false; Message = ($lines -join "`n") }
 }

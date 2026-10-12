@@ -11,7 +11,7 @@
     skills, the orchestrator must persist progress to the checkpoint file
     after every completed step. This hook confirms that:
 
-      - the hook payload is well-formed JSON,
+      - the SubagentStop envelope read from stdin through Read-SubagentStopEnvelope is valid,
       - the orchestrator's final output is non-empty,
       - the checkpoint file exists on disk,
       - the checkpoint is valid JSON,
@@ -28,12 +28,16 @@
     routing dispatch passes.
 
 .NOTES
-    Reads the hook payload from CLAUDE_HOOK_INPUT as JSON. Exits 0 to allow
-    termination; exits 1 with an error message to block. Filesystem reads go
-    through Get-CheckpointFileContent so tests can mock the boundary without
-    writing temporary files. The sibling dot-source and the resolver imports are
-    guarded: a failure is recorded and blocks every validation, naming the file,
-    before any read. A failed Layer 2 import blocks the epic leg only.
+    Reads the SubagentStop envelope from stdin through Read-SubagentStopEnvelope
+    (subagentstop-envelope.ps1); the assistant text comes from the helper's
+    AssistantText. A non-repairable condition blocks once: when StopHookActive is
+    set, the re-entered stop is allowed. Exits 0 to allow termination; a block is
+    written to stderr with exit 2 through Exit-SubagentStopBlock. Filesystem reads
+    go through Get-CheckpointFileContent so tests can mock the boundary without
+    writing temporary files. The routing sibling, the resolution sibling, the E1
+    helper, and the modules are guarded loads: a failure is recorded and blocks
+    every validation, naming the file, before any read. A failed Layer 2 import
+    blocks the epic leg only.
 #>
 
 [CmdletBinding()]
@@ -48,16 +52,17 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 Set-StrictMode -Version Latest
 
-try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
-
 try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-resolution.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-resolution.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-routing.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-routing.ps1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateEpicWaveBarrier.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateCompletion.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateCompletion.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
 $ErrorActionPreference = 'Stop'
+$script:SubagentStopReportAndHaltLine = 'This condition is not repairable by the subagent. Report it to the operator and halt.'
 
 function Get-CheckpointFileContent {
     <#
@@ -126,7 +131,7 @@ function Test-HumanInteractionShape {
 
     $hiProps = @($HumanInteraction.PSObject.Properties.Name)
     if ($hiProps -notcontains 'requirements') {
-        return @{ Ok = $false; Message = "orchestrator hook: 'human_interaction' is present but 'requirements' array is missing." }
+        return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: 'human_interaction' is present but 'requirements' array is missing." }
     }
 
     $requirements = @($HumanInteraction.requirements)
@@ -140,15 +145,15 @@ function Test-HumanInteractionShape {
         if ($reqProps -contains 'response') { $response = [string]$req.response }
 
         if ([string]::IsNullOrWhiteSpace($response)) {
-            return @{ Ok = $false; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has no resolved 'response'. Every unautomatable requirement must resolve to one of: scope_change, exception, halt." }
+            return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has no resolved 'response'. Every unautomatable requirement must resolve to one of: scope_change, exception, halt." }
         }
 
         if ($allowedResponses -notcontains $response) {
-            return @{ Ok = $false; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has 'response' value '$response' outside the allowed set (scope_change, exception, halt)." }
+            return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has 'response' value '$response' outside the allowed set (scope_change, exception, halt)." }
         }
 
         if ($response -eq 'halt') {
-            return @{ Ok = $false; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has 'response' == 'halt'; DONE is blocked while a halt is present." }
+            return @{ Ok = $false; Repairable = $false; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has 'response' == 'halt'; DONE is blocked while a halt is present." }
         }
 
         if ($response -eq 'exception') {
@@ -156,11 +161,11 @@ function Test-HumanInteractionShape {
             if ($reqProps -contains 'runbook_path') { $runbookPath = [string]$req.runbook_path }
 
             if ([string]::IsNullOrWhiteSpace($runbookPath)) {
-                return @{ Ok = $false; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has 'response' == 'exception' but no non-empty 'runbook_path'. A permitted exception requires a runbook." }
+                return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: 'human_interaction.requirements[$i]' has 'response' == 'exception' but no non-empty 'runbook_path'. A permitted exception requires a runbook." }
             }
 
             if (-not (& $FileExistsCheck $runbookPath)) {
-                return @{ Ok = $false; Message = "orchestrator hook: 'human_interaction.requirements[$i]' references runbook_path '$runbookPath' but no file exists at that location." }
+                return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: 'human_interaction.requirements[$i]' references runbook_path '$runbookPath' but no file exists at that location." }
             }
         }
     }
@@ -168,164 +173,10 @@ function Test-HumanInteractionShape {
     return @{ Ok = $true; Message = $null }
 }
 
-function Test-OrchestratorCheckpointStructure {
-    <#
-    .SYNOPSIS
-        Type-scoped structural check for the epic and parallel checkpoint types.
-    .DESCRIPTION
-        PD-3 implementation. The Python reference exposes no validation surface for
-        `epic-orchestrator-state` or `parallel-orchestrator-state` under this hook's
-        flag pair: argparse rejects the pair and exits 2 without running a single
-        check, so parity is UNDEFINED in this region. Rather than inherit an
-        undefined behavior, this hook defines it: the checkpoint must exist, parse
-        as JSON, and have an object root. That is the largest assertion that holds
-        for every checkpoint type without importing a schema this hook does not own.
-
-        Deliberately NOT applied here:
-          - the standard-checkpoint REQUIRED_STATE_KEYS presence block, whose key
-            set belongs to the standard checkpoint and would produce false
-            ROUTING_CONTRACT_BLOCKED verdicts against a well-formed epic or
-            parallel checkpoint (defect D-1),
-          - the model-routing gate, whose receipts live on the standard checkpoint.
-
-        The check fails closed: a missing file, unreadable content, invalid JSON, or
-        a non-object root all yield ExitCode 1 with the load error as Output.
-    .PARAMETER CheckpointPath
-        The path to the checkpoint JSON file.
-    .OUTPUTS
-        System.Collections.Hashtable with keys ExitCode (int, 0 or 1) and Output (string).
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string] $CheckpointPath
-    )
-
-    # Get-OrchestratorStateCheckpoint already implements exactly the three
-    # structural conditions (exists, parses, object root) and reports each as a
-    # fail-closed Error string, so the structural leg reuses it rather than
-    # duplicating the load contract.
-    $loaded = Get-OrchestratorStateCheckpoint -CheckpointPath $CheckpointPath
-    if (-not $loaded.Ok) {
-        return @{ ExitCode = 1; Output = $loaded.Error }
-    }
-
-    return @{ ExitCode = 0; Output = '' }
-}
-
-function Invoke-RoutingContractValidation {
-    <#
-    .SYNOPSIS
-        Runs the portable routing-contract validation against the on-disk
-        checkpoint and reports whether it emitted errors.
-    .DESCRIPTION
-        Invokes the validation through an injectable scriptblock seam. As of issue
-        #475 the default Invoker names no interpreter and starts no subprocess: the
-        portable PowerShell path is the ONLY path, so the hook behaves identically
-        in this repository and in every destination that received only the
-        pushed-down `.claude` pack. The former capability-detection probe and the
-        interpreter-subprocess leg it guarded are both gone.
-
-        The default Invoker dispatches on ArtifactType:
-
-          orchestrator-state
-              the COMPLETE-PARITY completion validation
-              (Test-OrchestratorStateCompletionReadiness), a row-by-row port of the
-              Python call surface `--require-complete --require-model-routing`.
-
-          epic-orchestrator-state, parallel-orchestrator-state
-              the type-scoped structural check
-              (Test-OrchestratorCheckpointStructure): exists, parses as JSON,
-              object root. PD-3: this is DEFINED behavior in a region where Python
-              parity is UNDEFINED (argparse exit 2, zero checks run). It is a
-              design decision, not a deferral. The standard-checkpoint
-              REQUIRED_STATE_KEYS block and the model-routing gate are deliberately
-              not applied, which is the D-1 fix.
-
-          anything else
-              fail closed, naming the unsupported type. An unrecognized type must
-              never read as a clean pass.
-
-        ArtifactType defaults to 'orchestrator-state' so every existing caller of
-        this hook keeps its current behavior.
-
-        Returns a hashtable with keys:
-          - HasErrors:  $true only when the validation reported a non-zero exit
-                        code; $false when it exited 0. The exit code is the sole
-                        discriminator.
-          - ErrorText:  the validation's output text, carried through unchanged:
-                        the error lines on a failure, empty on a clean pass.
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string] $CheckpointPath,
-
-        [Parameter(Mandatory = $false)]
-        [string] $ArtifactType = 'orchestrator-state',
-
-        [Parameter(Mandatory = $false)]
-        [scriptblock] $Invoker = {
-            param($Path, $Type)
-            switch ($Type) {
-                'orchestrator-state' {
-                    # Import the portable completion module only when its function is not
-                    # already available, so a repeated call (or a test that pre-imports and
-                    # mocks the function) does not reload the module and reset the seam.
-                    if (-not (Get-Command -Name Test-OrchestratorStateCompletionReadiness -ErrorAction SilentlyContinue)) {
-                        Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateCompletion.psm1') -Force
-                    }
-                    $portable = Test-OrchestratorStateCompletionReadiness -CheckpointPath $Path
-                    [pscustomobject]@{
-                        ExitCode = $portable.ExitCode
-                        Output   = $portable.Output
-                    }
-                }
-                { $_ -in @('epic-orchestrator-state', 'parallel-orchestrator-state') } {
-                    # PD-3: defined fail-closed structural behavior in an
-                    # undefined-parity region. See Test-OrchestratorCheckpointStructure.
-                    $structural = Test-OrchestratorCheckpointStructure -CheckpointPath $Path
-                    [pscustomobject]@{
-                        ExitCode = $structural.ExitCode
-                        Output   = $structural.Output
-                    }
-                }
-                default {
-                    # Fail closed on an unwired type: an unrecognized artifact type is
-                    # not a clean pass.
-                    [pscustomobject]@{
-                        ExitCode = 1
-                        Output   = "orchestrator hook: unsupported artifact type '$Type'; no validation surface is wired for it. Supported types: orchestrator-state, epic-orchestrator-state, parallel-orchestrator-state."
-                    }
-                }
-            }
-        }
-    )
-
-    $result = & $Invoker $CheckpointPath $ArtifactType
-    $exitCode = 0
-    if ($null -ne $result -and ($result.PSObject.Properties.Name -contains 'ExitCode')) {
-        $exitCode = [int]$result.ExitCode
-    }
-    $outputText = ''
-    if ($null -ne $result -and ($result.PSObject.Properties.Name -contains 'Output')) {
-        $outputText = ([string]$result.Output).Trim()
-    }
-
-    # The exit code is the complete failure discriminator: every dispatch leg
-    # returns a non-zero ExitCode with its error text on failure and ExitCode 0
-    # with empty Output on a clean pass, so output text must not influence this
-    # decision.
-    $hasErrors = ($exitCode -ne 0)
-    return @{ HasErrors = $hasErrors; ErrorText = $outputText }
-}
-
 function Invoke-OrchestratorOutputValidation {
     <#
     .SYNOPSIS
-        Parses the hook payload and returns an ok-or-block decision.
+        Reads the SubagentStop envelope, validates the assistant text, and applies the re-entry policy.
     .DESCRIPTION
         Returns a hashtable with keys:
           - Ok:      $true to allow termination, $false to block.
@@ -336,7 +187,7 @@ function Invoke-OrchestratorOutputValidation {
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
-        [string] $RawPayload,
+        [AllowNull()] [AllowEmptyString()] [string] $InputText,
         [string] $CheckpointPath = 'artifacts/orchestration/orchestrator-state.json',
         [string] $ArtifactType = 'orchestrator-state',
         [string] $SessionRoot = (Get-Location).Path,
@@ -347,45 +198,76 @@ function Invoke-OrchestratorOutputValidation {
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
-    if ([string]::IsNullOrWhiteSpace($RawPayload)) {
-        return @{ Ok = $false; Message = 'orchestrator hook: CLAUDE_HOOK_INPUT is empty; cannot validate orchestrator output.' }
+    $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
+    if (-not $envelope.IsValid) { $decision = @{ Ok = $false; Repairable = $false; Message = ('{0} payload anomaly - {1}' -f 'orchestrator hook:', (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)) } }
+    else {
+        $agentOutput = $envelope.AssistantText
+        $blockArguments = @{ AgentOutput = ([string]$agentOutput); CheckpointPath = $CheckpointPath; ArtifactType = $ArtifactType; SessionRoot = $SessionRoot }
+        if ($PSBoundParameters.ContainsKey('RoutingInvoker')) { $blockArguments['RoutingInvoker'] = $RoutingInvoker }
+        $decision = Get-OrchestratorOutputBlockDecision @blockArguments
     }
+    if ($decision.Ok) { return @{ Ok = $true; Message = $null } }
+    if (-not $decision.Repairable) {
+        if ($envelope.StopHookActive) { return @{ Ok = $true; Message = $null } }
+        if (-not $decision.Message.Contains('to the operator and halt.')) { $decision.Message = $decision.Message + "`n" + $script:SubagentStopReportAndHaltLine }
+    }
+    return @{ Ok = $false; Message = $decision.Message }
+}
 
-    try {
-        $payload = $RawPayload | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        return @{ Ok = $false; Message = "orchestrator hook: failed to parse CLAUDE_HOOK_INPUT as JSON: $($_.Exception.Message)" }
-    }
+function Get-OrchestratorOutputBlockDecision {
+    <#
+    .SYNOPSIS
+        Applies the orchestrator completion checks to the assistant text and returns the block decision.
+    .DESCRIPTION
+        Returns @{ Ok = $true; Message = $null } to allow, or a hashtable with Ok = $false, a
+        Repairable boolean, and Message. Repairable is $true when the resumed subagent can clear
+        the condition (message content, its checkpoint, or its runbook) and $false when it cannot
+        (a registration argument, an internal evaluation failure, or a state it may not clear).
+        The caller applies the re-entry policy to that flag.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $AgentOutput,
+        [string] $CheckpointPath = 'artifacts/orchestration/orchestrator-state.json',
+        [string] $ArtifactType = 'orchestrator-state',
+        [string] $SessionRoot = (Get-Location).Path,
 
-    $agentOutput = $null
-    if ($payload.PSObject.Properties.Name -contains 'output') {
-        $agentOutput = $payload.output
-    }
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $RoutingInvoker
+    )
+
     if ([string]::IsNullOrWhiteSpace($agentOutput)) {
-        return @{ Ok = $false; Message = 'orchestrator hook: agent output is empty; orchestrator must report final completion summary before termination.' }
+        return @{ Ok = $false; Repairable = $true; Message = 'orchestrator hook: agent output is empty (last_assistant_message carries no text); orchestrator must report final completion summary before termination.' }
     }
 
     # Resolve the run checkpoint before any read (issue #787). A failed import, or an
     # unresolved, ambiguous, or mismatched target, blocks here, so nothing is read.
-    $resolution = Resolve-OrchestratorOutputCheckpointPath -ArtifactType $ArtifactType -CheckpointPath $CheckpointPath -AgentOutput ([string]$agentOutput) -SessionRoot $SessionRoot
+    try {
+        $resolution = Resolve-OrchestratorOutputCheckpointPath -ArtifactType $ArtifactType -CheckpointPath $CheckpointPath -AgentOutput ([string]$agentOutput) -SessionRoot $SessionRoot
+    }
+    catch {
+        return @{ Ok = $false; Repairable = $false; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: NoTarget (RESOLVER_FAILED): {1}' -f $ArtifactType, $_.Exception.Message) }
+    }
     if (-not $resolution.Resolved) {
-        return @{ Ok = $false; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: {1} ({2}): {3}' -f
+        $resolutionRepairable = ($resolution.Status -in @('NoTarget', 'Ambiguous')) -and ($ArtifactType -in @('epic-orchestrator-state', 'parallel-orchestrator-state'))
+        return @{ Ok = $false; Repairable = $resolutionRepairable; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: {1} ({2}): {3}' -f
                 $ArtifactType, $resolution.Status, $resolution.ReasonCode, $resolution.Detail) }
     }
 
     $file = Get-CheckpointFileContent -Path $resolution.CheckpointPath
     if (-not $file.Exists) {
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' does not exist. Orchestrator must persist progress per powershell-orchestration-state-machine before termination." }
+        return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' does not exist. Orchestrator must persist progress per powershell-orchestration-state-machine before termination." }
     }
 
     if ([string]::IsNullOrWhiteSpace($file.Content)) {
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is empty; cannot validate orchestrator progress." }
+        return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is empty; cannot validate orchestrator progress." }
     }
 
     try {
         $checkpoint = $file.Content | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is not valid JSON: $($_.Exception.Message)" }
+        return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is not valid JSON: $($_.Exception.Message)" }
     }
 
     $requiredFields = @('objective', 'completed_steps', 'next_step', 'last_updated')
@@ -399,11 +281,11 @@ function Invoke-OrchestratorOutputValidation {
 
     if ($missingFields.Count -gt 0) {
         $missingList = ($missingFields -join ', ')
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is missing required field(s): $missingList. Orchestrator must persist objective, completed_steps, next_step, and last_updated." }
+        return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' is missing required field(s): $missingList. Orchestrator must persist objective, completed_steps, next_step, and last_updated." }
     }
 
     if ([string]::IsNullOrWhiteSpace([string]$checkpoint.objective)) {
-        return @{ Ok = $false; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' has an empty 'objective' field; orchestrator must record the active objective." }
+        return @{ Ok = $false; Repairable = $true; Message = "orchestrator hook: checkpoint file '$($resolution.CheckpointPath)' has an empty 'objective' field; orchestrator must record the active objective." }
     }
 
     $humanInteraction = $null
@@ -415,7 +297,7 @@ function Invoke-OrchestratorOutputValidation {
         param($Path) Test-OrchestratorOutputRunbookFile -Path (Resolve-OrchestratorOutputRunbookPath -WorktreeRoot $resolution.WorktreeRoot -RunbookPath $Path)
     }
     if (-not $hiResult.Ok) {
-        return @{ Ok = $false; Message = $hiResult.Message }
+        return @{ Ok = $false; Repairable = $hiResult.Repairable; Message = $hiResult.Message }
     }
 
     # Delegate to the portable routing-contract validation, dispatched on
@@ -428,22 +310,22 @@ function Invoke-OrchestratorOutputValidation {
     }
     $routingResult = Invoke-RoutingContractValidation @routingArgs
     if ($routingResult.HasErrors) {
-        # One subprocess call now covers both --require-complete and
-        # --require-model-routing. Surface a model-routing gate failure under its
-        # own block reason (its errors name model_routing_receipts or
-        # complexity_assessments); otherwise fall back to the routing-contract
+        # The in-process validation (issue #475) covers both the completion check
+        # and the model-routing check in one call. Surface a model-routing gate
+        # failure under its own block reason (its errors name model_routing_receipts
+        # or complexity_assessments); otherwise fall back to the routing-contract
         # block reason for a generic completion/routing failure.
         if ($routingResult.ErrorText -match 'model_routing_receipts|complexity_assessments') {
-            return @{ Ok = $false; Message = "MODEL_ROUTING_BLOCKED: $($routingResult.ErrorText)" }
+            return @{ Ok = $false; Repairable = $true; Message = "MODEL_ROUTING_BLOCKED: $($routingResult.ErrorText)" }
         }
-        return @{ Ok = $false; Message = "ROUTING_CONTRACT_BLOCKED: $($routingResult.ErrorText)" }
+        return @{ Ok = $false; Repairable = $true; Message = "ROUTING_CONTRACT_BLOCKED: $($routingResult.ErrorText)" }
     }
 
     # Layer 2 (issue #840): the epic checkpoint only, after the routing dispatch passes,
     # on the checkpoint text already read.
     if ($ArtifactType -eq 'epic-orchestrator-state') {
         $barrier = Get-OrchestratorOutputWaveBarrierDecision -CheckpointText $file.Content
-        if (-not $barrier.Ok) { return @{ Ok = $false; Message = $barrier.Message } }
+        if (-not $barrier.Ok) { return @{ Ok = $false; Repairable = $barrier.Repairable; Message = $barrier.Message } }
     }
 
     return @{ Ok = $true; Message = $null }
@@ -457,10 +339,6 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('ORCHEST
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
-$result = Invoke-OrchestratorOutputValidation -RawPayload $env:CLAUDE_HOOK_INPUT -CheckpointPath $CheckpointPath -ArtifactType $ArtifactType
-if (-not $result.Ok) {
-    Write-Error $result.Message
-    exit 1
-}
-
+$result = Invoke-OrchestratorOutputValidation -CheckpointPath $CheckpointPath -ArtifactType $ArtifactType
+if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0

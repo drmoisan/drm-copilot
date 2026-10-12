@@ -258,7 +258,7 @@ Describe 'validate-orchestrator-output.ps1 $ArtifactType dispatch' {
             }
 
             $result = Invoke-OrchestratorOutputValidation `
-                -RawPayload '{"output":"Final summary."}' `
+                -InputText '{"last_assistant_message":"Final summary."}' `
                 -ArtifactType 'parallel-orchestrator-state' `
                 -RoutingInvoker $routingStub
 
@@ -284,7 +284,7 @@ Describe 'validate-orchestrator-output.ps1 $ArtifactType dispatch' {
                 [pscustomobject]@{ ExitCode = 0; Output = '' }
             }
 
-            $result = Invoke-OrchestratorOutputValidation -RawPayload '{"output":"Final summary."}' -RoutingInvoker $routingStub
+            $result = Invoke-OrchestratorOutputValidation -InputText '{"last_assistant_message":"Final summary."}' -RoutingInvoker $routingStub
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match "DONE is blocked while a halt is present"
