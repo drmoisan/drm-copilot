@@ -137,11 +137,17 @@ Describe 'Install-PoetryWithPip' {
         { Install-PoetryWithPip -ApplyMode } | Should -Throw -ExpectedMessage 'Poetry fallback install failed with exit code 1'
     }
 
-    It 'installs poetry, emits pip output, adds the poetry directory, and refreshes the session Path' {
+    It 'AC11-PIP-STREAMS installs poetry with -StreamToHost, emits no pip output, adds the poetry directory, and refreshes the session Path' {
         # Arrange
         Mock -CommandName Get-Command -ModuleName HostBootstrap -MockWith { } -ParameterFilter { $Name -eq 'poetry' }
         Mock -CommandName Get-Command -ModuleName HostBootstrap -MockWith { [pscustomobject]@{ Source = 'C:\fixture\python.exe' } } -ParameterFilter { $Name -eq 'python' }
-        Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrap -MockWith { [pscustomobject]@{ Output = @('Successfully installed poetry-fixture-1.0'); ExitCode = 0 } }
+        Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrap -MockWith {
+            param([string]$FilePath, [string[]]$ArgumentList, [switch]$StreamToHost)
+            $null = $FilePath
+            $null = $ArgumentList
+            $null = $StreamToHost
+            [pscustomobject]@{ Output = @('Successfully installed poetry-fixture-1.0'); ExitCode = 0 }
+        }
         Mock -CommandName Get-HostEnvironmentVariable -ModuleName HostBootstrap -MockWith { 'C:\fixture\AppData' } -ParameterFilter { $Name -eq 'APPDATA' }
         Mock -CommandName Get-ChildItem -ModuleName HostBootstrap -MockWith { [pscustomobject]@{ Directory = [pscustomobject]@{ FullName = 'C:\fixture\AppData\Python\Scripts' } } }
         Mock -CommandName Add-DirectoryToUserPath -ModuleName HostBootstrap -MockWith { }
@@ -152,9 +158,9 @@ Describe 'Install-PoetryWithPip' {
         $actual = @(Install-PoetryWithPip -ApplyMode)
 
         # Assert
-        $actual | Should -Be @('Installing poetry via python -m pip', 'Successfully installed poetry-fixture-1.0')
+        $actual | Should -Be @('Installing poetry via python -m pip')
         Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter {
-            $FilePath -eq 'C:\fixture\python.exe' -and ($ArgumentList -join ' ') -eq '-m pip install --user poetry'
+            $FilePath -eq 'C:\fixture\python.exe' -and ($ArgumentList -join ' ') -eq '-m pip install --user poetry' -and $StreamToHost
         }
         Should -Invoke -CommandName Get-ChildItem -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $Path -eq 'C:\fixture\AppData\Python' }
         Should -Invoke -CommandName Add-DirectoryToUserPath -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $DirectoryPath -eq 'C:\fixture\AppData\Python\Scripts' }
