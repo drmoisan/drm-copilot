@@ -118,9 +118,9 @@ Coverage metrics are mandatory for every language that has changed files in the 
 
 ### Coverage Thresholds
 
-- **New code files** (files added in this feature, not previously existing): line coverage must be >= 90%.
-- **Modified files** (files that existed before and were changed): line coverage must show no regression relative to the baseline and must remain >= 80%.
-- **Repo-wide**: line coverage must remain >= 80% for each language.
+- **Governing thresholds**: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently.
+- **New and modified files**: line coverage must meet the governing line threshold (and the branch threshold where measured); modified files must also show no regression on changed lines.
+- **Repo-wide**: coverage for each language must meet the governing thresholds.
 
 ### Verification Procedure
 
@@ -130,9 +130,9 @@ For each language that has changed files in the feature branch:
 2. Check whether the coverage artifact exists for that language.
 3. If the artifact exists:
    - Parse the repo-wide coverage percentage and report it in the policy audit.
-   - If repo-wide coverage is below 80%, flag as FAIL and add to remediation triggers.
-   - For each new file: if line coverage is below 90%, flag as FAIL and add to remediation triggers.
-   - For each modified file: if line coverage has regressed from baseline or is below 80%, flag as FAIL and add to remediation triggers.
+   - If repo-wide coverage is below the governing line threshold, flag as FAIL and add to remediation triggers.
+   - For each new file: if line coverage is below the governing line threshold, flag as FAIL and add to remediation triggers.
+   - For each modified file: if line coverage has regressed from baseline or is below the governing line threshold, flag as FAIL and add to remediation triggers.
 4. If no coverage artifact is found for a language that has changed files, flag as **FAIL** with reason: "coverage artifact absent for [language]; coverage verification is mandatory for all languages with changed files." Add to remediation triggers.
 
 The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
