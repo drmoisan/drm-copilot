@@ -2,9 +2,11 @@
 
 Each entry records one source and bundle-mirror pair after the identical Edit-tool operations were applied to the mirror.
 
+Timestamp correction (recorded during Phase 2): the per-entry timestamps were originally estimated rather than read from the host clock. Because this file was appended to once per entry, only its final write time (2026-10-12T16-26) is recoverable from the filesystem; each entry's `Timestamp:` is therefore set to that value as an upper bound. The entries ran in the order listed, after the P1-T2 run at 16-20.
+
 ## P1-T7 — claude-orchestrate
 
-Timestamp: 2026-10-12T16-31
+Timestamp: 2026-10-12T16-26
 Command: git hash-object .claude/skills/orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md
 EXIT_CODE: 0
 Hashes:
@@ -14,7 +16,7 @@ Output Summary: PAIR_EQUAL=true claude-orchestrate
 
 ## P1-T10 — claude-parallel-orchestrate
 
-Timestamp: 2026-10-12T16-34
+Timestamp: 2026-10-12T16-26
 Command: git hash-object .claude/skills/parallel-orchestrate/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md
 EXIT_CODE: 0
 Hashes:
@@ -24,7 +26,7 @@ Output Summary: PAIR_EQUAL=true claude-parallel-orchestrate
 
 ## P1-T15 — agents-orchestrate
 
-Timestamp: 2026-10-12T16-38
+Timestamp: 2026-10-12T16-26
 Command: git hash-object .agents/skills/orchestrate/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrate/SKILL.md
 EXIT_CODE: 0
 Hashes:
@@ -34,7 +36,7 @@ Output Summary: PAIR_EQUAL=true agents-orchestrate
 
 ## P1-T17 — claude-orchestrator-agent
 
-Timestamp: 2026-10-12T16-40
+Timestamp: 2026-10-12T16-26
 Command: git hash-object .claude/agents/orchestrator.md extensions/drm-copilot/resources/claude-customizations/.claude/agents/orchestrator.md
 EXIT_CODE: 0
 Hashes:
@@ -44,7 +46,7 @@ Output Summary: PAIR_EQUAL=true claude-orchestrator-agent
 
 ## P1-T22 — agents-orchestrator-workflow
 
-Timestamp: 2026-10-12T16-45
+Timestamp: 2026-10-12T16-26
 Command: git hash-object .agents/skills/orchestrator-workflow/SKILL.md extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrator-workflow/SKILL.md
 EXIT_CODE: 0
 Hashes:
@@ -54,7 +56,7 @@ Output Summary: PAIR_EQUAL=true agents-orchestrator-workflow
 
 ## P1-T25 — claude-remediation-handoff
 
-Timestamp: 2026-10-12T16-47
+Timestamp: 2026-10-12T16-26
 Command: git hash-object .claude/skills/remediation-handoff-atomic-planner/SKILL.md extensions/drm-copilot/resources/claude-customizations/.claude/skills/remediation-handoff-atomic-planner/SKILL.md
 EXIT_CODE: 0
 Hashes:
@@ -64,7 +66,7 @@ Output Summary: PAIR_EQUAL=true claude-remediation-handoff
 
 ## P1-T29 — claude-ci-gate-parser
 
-Timestamp: 2026-10-12T16-50
+Timestamp: 2026-10-12T16-26
 Command: git hash-object .claude/lib/ci-gate/Invoke-CiGateParser.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/lib/ci-gate/Invoke-CiGateParser.ps1
 EXIT_CODE: 0
 Hashes:
