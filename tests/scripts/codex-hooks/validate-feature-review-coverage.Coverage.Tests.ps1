@@ -132,7 +132,7 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
             @{ Case = 'no coverage row'; Text = 'Python style PASS'; Pct = $null; Pattern = 'no coverage-scoped row' },
             @{ Case = 'a narrowing row'; Text = 'Python coverage PASS (out of scope)'; Pct = $null; Pattern = 'narrows scope' },
             @{ Case = 'a row without a verdict'; Text = 'Python coverage 90%'; Pct = $null; Pattern = 'neither a PASS nor a FAIL' },
-            @{ Case = 'low coverage without FAIL'; Text = 'Python coverage PASS'; Pct = 70.0; Pattern = 'below the 80% floor' }
+            @{ Case = 'low coverage without FAIL'; Text = 'Python coverage PASS'; Pct = 70.0; Pattern = 'below the 85% line coverage floor' }
         ) {
             (Test-LanguageCoverageRow -AuditText $Text -Language 'Python' -RepoWidePct $Pct).Reason | Should -Match $Pattern
         }
@@ -210,6 +210,65 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
             $result.Stdout | Should -Not -BeNullOrEmpty
             ($result.Stdout | ConvertFrom-Json).decision | Should -Be 'block'
             ($result.Stdout | ConvertFrom-Json).reason | Should -BeLike '*below the 85% line coverage floor*'
+        }
+
+        It 'E4-TR8: a CLAUDE.md line floor of 70 lets a 72% row pass' {
+            # Arrange: a Python change, a 72 percent LCOV report, and a root CLAUDE.md stating a 70 percent line floor.
+            Mock Test-Path { param($Path) -not ([string]$Path).EndsWith('.xml') }
+            Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
+            Mock Get-Content { param($Path) $p = [string]$Path; if ($p.EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } elseif ($p.EndsWith('lcov.info')) { @('LF:100', 'LH:72') } elseif ($p.EndsWith('CLAUDE.md')) { 'Line coverage >= 70%' } else { 'Python coverage PASS' } }
+
+            # Act
+            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStop
+
+            # Assert
+            $result.ExitCode | Should -Be 0 -Because $result.Stderr
+            $result.Stdout | Should -BeNullOrEmpty
+        }
+
+        It 'E4-TR9: an unreadable CLAUDE.md <Case>' -ForEach @(
+            @{ Case = 'stop_hook_active false exits 2'; Active = $false }
+            @{ Case = 'stop_hook_active true emits continue false'; Active = $true }
+        ) {
+            # Arrange: the root CLAUDE.md exists but its read throws.
+            Mock Test-Path { param($Path) -not ([string]$Path).EndsWith('.xml') }
+            Mock Get-ChildItem { [pscustomobject]@{ FullName = '/synthetic-root/repo/docs/features/active/f/policy-audit.2026-10-10T00-00.md'; LastWriteTime = [datetime]'2026-10-10' } }
+            Mock Get-Content { param($Path) $p = [string]$Path; if ($p.EndsWith('CLAUDE.md')) { throw 'simulated read failure: access denied' } elseif ($p.EndsWith('pr_context.summary.txt')) { @('- src/a.py (+1/-0)') } elseif ($p.EndsWith('lcov.info')) { @('LF:1000', 'LH:805') } else { 'Python coverage PASS' } }
+            $stdin = if ($Active) { $script:ReviewStopActive } else { $script:ReviewStop }
+
+            # Act
+            $result = Invoke-CodexReviewEntry -Stdin $stdin
+
+            # Assert
+            if ($Active) {
+                $result.ExitCode | Should -Be 0 -Because $result.Stderr
+                $result.Stdout | Should -BeLike '*"continue":false*'
+                ($result.Stdout | ConvertFrom-Json).continue | Should -BeFalse
+            }
+            else {
+                $result.ExitCode | Should -Be 2
+                $result.Stderr | Should -BeLike '*root CLAUDE.md*'
+                $result.Stderr | Should -BeLike '*could not be read*'
+            }
+        }
+
+        It 'E4-ST7: the Codex hook reads the floor from its own thresholds copy' {
+            # Arrange
+            $tokens = $null
+            $parseErrors = $null
+            $guarded = "try { . (Join-Path `$PSScriptRoot 'feature-review-coverage-thresholds.ps1') } catch { Add-HookDependencyFailure -Name 'feature-review-coverage-thresholds.ps1' -ErrorRecord `$_ }"
+
+            # Act
+            $text = Get-Content -Raw -LiteralPath $script:HookFile
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:HookFile, [ref]$tokens, [ref]$parseErrors)
+            $claudeDotSources = @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.InvocationOperator -eq [System.Management.Automation.Language.TokenKind]::Dot -and $node.Extent.Text.Contains('.claude') }, $true))
+
+            # Assert
+            $text.Contains($guarded) | Should -BeTrue
+            $claudeDotSources.Count | Should -Be 0 -Because 'the Codex hook must not dot-source a .claude path'
+            $text.Contains('subagentstop-envelope.ps1') | Should -BeFalse
+            $text.Contains('Exit-SubagentStopBlock') | Should -BeFalse
+            foreach ($figure in @('80.0', '80%', '80 percent')) { $text.Contains($figure) | Should -BeFalse -Because "the Codex hook must not carry the retired figure '$figure'" }
         }
     }
 }

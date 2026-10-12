@@ -194,6 +194,25 @@ feature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md
             $text.Contains($guarded) | Should -BeTrue -Because "$File must dot-source subagentstop-envelope.ps1 through the guarded pattern"
         }
 
+        It 'E4-ST3: <File> help states the absent and unreadable CLAUDE.md rules' -ForEach @(
+            @{ File = '.claude/hooks/validate-feature-review-coverage.ps1'; Extra = @('falls back independently') }
+            @{ File = '.codex/hooks/validate-feature-review-coverage.ps1'; Extra = @() }
+        ) {
+            # Arrange: the script-level help is the file's first comment token.
+            $path = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "../../../$File"))
+            $tokens = $null
+            $parseErrors = $null
+            $null = [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$parseErrors)
+
+            # Act
+            $help = (@($tokens | Where-Object { $_.Kind -eq [System.Management.Automation.Language.TokenKind]::Comment })[0].Text) -replace '\s+', ' '
+
+            # Assert
+            foreach ($sentence in @('an absent root CLAUDE.md uses the defaults', 'an unreadable root CLAUDE.md fails closed') + @($Extra)) {
+                $help.Contains($sentence) | Should -BeTrue -Because "$File help must state '$sentence'"
+            }
+        }
+
         It 'E4-ST2: Invoke-FeatureReviewCoverageValidation takes InputText and passes it to the E1 reader' {
             # Arrange
             $path = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.claude/hooks/validate-feature-review-coverage.ps1'))
