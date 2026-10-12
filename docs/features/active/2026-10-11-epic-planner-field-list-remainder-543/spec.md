@@ -144,14 +144,14 @@ None.
 
 ## Acceptance Criteria
 
-- [ ] `.claude/agents/epic-planner.md` contains the token `max_parallel_features` inside the `## Checkpoint Persistence` section, in the top-level field list.
-- [ ] `.claude/agents/epic-planner.md` contains the token `research_path` inside the `## Checkpoint Persistence` section, in the per-feature list, positioned before `plan_path`.
-- [ ] The bundled mirror `extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-planner.md` carries the same two additions and is byte-identical to the root file, verified by `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passing (including `test_bundled_claude_payload_contains_all_repo_runtime_contracts`) together with `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`.
-- [ ] `tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1` passes (PoshQC MCP test tool or CI evidence), confirming the `## Checkpoint Persistence` heading and the `epic_issue_num` / `promotion_type: epic` text are unchanged.
-- [ ] Every key in `REQUIRED_KEYS` and `REQUIRED_FEATURE_KEYS` of `scripts/dev_tools/validate_epic_planner_state.py` appears in the documented list of `.claude/agents/epic-planner.md` (a comparison of the two tuples against the section text reports no missing key).
-- [ ] `.codex/agents/epic-planner.toml`, `.agents/skills/epic-plan/SKILL.md`, and their bundled mirrors are unchanged, recorded as a verified non-change.
-- [ ] No file outside the two persona files and `docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/` changes (verified with `git diff --name-only origin/main`).
-- [ ] The frontmatter-contract tests `tests/scripts/dev_tools/test_parallel_planner_surface_contracts.py` and `tests/scripts/dev_tools/test_claude_rules_frontmatter.py` still pass.
+- [x] `.claude/agents/epic-planner.md` contains the token `max_parallel_features` inside the `## Checkpoint Persistence` section, in the top-level field list.
+- [x] `.claude/agents/epic-planner.md` contains the token `research_path` inside the `## Checkpoint Persistence` section, in the per-feature list, positioned before `plan_path`.
+- [x] The bundled mirror `extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-planner.md` carries the same two additions and is byte-identical to the root file, verified by `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` passing (including `test_bundled_claude_payload_contains_all_repo_runtime_contracts`) together with `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`.
+- [x] `tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1` passes (PoshQC MCP test tool or CI evidence), confirming the `## Checkpoint Persistence` heading and the `epic_issue_num` / `promotion_type: epic` text are unchanged.
+- [x] Every key in `REQUIRED_KEYS` and `REQUIRED_FEATURE_KEYS` of `scripts/dev_tools/validate_epic_planner_state.py` appears in the documented list of `.claude/agents/epic-planner.md` (a comparison of the two tuples against the section text reports no missing key).
+- [x] `.codex/agents/epic-planner.toml`, `.agents/skills/epic-plan/SKILL.md`, and their bundled mirrors are unchanged, recorded as a verified non-change.
+- [x] No file outside the two persona files and `docs/features/active/2026-10-11-epic-planner-field-list-remainder-543/` changes (verified with `git diff --name-only origin/main`).
+- [x] The frontmatter-contract tests `tests/scripts/dev_tools/test_parallel_planner_surface_contracts.py` and `tests/scripts/dev_tools/test_claude_rules_frontmatter.py` still pass.
 
 ## Risks & Mitigations
 
