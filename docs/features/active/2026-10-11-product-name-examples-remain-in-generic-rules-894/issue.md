@@ -41,13 +41,13 @@ Expected outcome: pushed rule surfaces contain no repository-specific product na
 
 ## Acceptance Criteria
 
-- [ ] `src/TaskMaster.Domain` no longer appears in `.claude/rules/parallel-orchestration.md` or its bundled mirror under `extensions/drm-copilot/resources/claude-customizations/.claude/rules/`; the example is replaced with neutral wording (the placeholder form `src/<Product>.Domain` already used in `architecture-boundaries.md`).
-- [ ] `No-COM` no longer appears anywhere (including the `csharp.md` frontmatter `description`) in `.claude/rules/typescript.md` or `.claude/rules/csharp.md`, or in their bundled mirrors; the replacement wording is neutral.
-- [ ] The cross-reference in `.claude/rules/typescript.md` to `.claude/rules/architecture-boundaries.md` names the current heading text ("Host-Neutral Architecture Rules" wording) rather than the former "No-COM" heading.
-- [ ] (#797 CR-2) In `parallel-orchestration.md` "Known false negatives", the separator-free bare-file-name case (former item 7) sits under a lead-in that correctly attributes it to the file-shape classifier rather than write-intent extraction, in the source rule file and in its bundled mirror.
-- [ ] Each of the three bundled mirrors (`parallel-orchestration.md`, `typescript.md`, `csharp.md`) is byte-identical to its source rule file, and `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes.
-- [ ] In `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`, `PRE_EXISTING_NAME_EXCEPTIONS` is replaced by pinned per-file occurrence counts that require an exact match, with the stale six-file exemptions removed; new in-memory negative tests show the guard fails on a new occurrence in an unpinned file and on a new occurrence in a pinned file; and the staleness check on pinned entries still exists.
-- [ ] The changed Python test file is clean under black, ruff, pyright, and pytest; the guard test and the bundle parity test pass; no changed file exceeds 500 lines.
+- [x] `src/TaskMaster.Domain` no longer appears in `.claude/rules/parallel-orchestration.md` or its bundled mirror under `extensions/drm-copilot/resources/claude-customizations/.claude/rules/`; the example is replaced with neutral wording (the placeholder form `src/<Product>.Domain` already used in `architecture-boundaries.md`).
+- [x] `No-COM` no longer appears anywhere (including the `csharp.md` frontmatter `description`) in `.claude/rules/typescript.md` or `.claude/rules/csharp.md`, or in their bundled mirrors; the replacement wording is neutral.
+- [x] The cross-reference in `.claude/rules/typescript.md` to `.claude/rules/architecture-boundaries.md` names the current heading text ("Host-Neutral Architecture Rules" wording) rather than the former "No-COM" heading.
+- [x] (#797 CR-2) In `parallel-orchestration.md` "Known false negatives", the separator-free bare-file-name case (former item 7) sits under a lead-in that correctly attributes it to the file-shape classifier rather than write-intent extraction, in the source rule file and in its bundled mirror.
+- [x] Each of the three bundled mirrors (`parallel-orchestration.md`, `typescript.md`, `csharp.md`) is byte-identical to its source rule file, and `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes.
+- [x] In `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`, `PRE_EXISTING_NAME_EXCEPTIONS` is replaced by pinned per-file occurrence counts that require an exact match, with the stale six-file exemptions removed; new in-memory negative tests show the guard fails on a new occurrence in an unpinned file and on a new occurrence in a pinned file; and the staleness check on pinned entries still exists.
+- [x] The changed Python test file is clean under black, ruff, pyright, and pytest; the guard test and the bundle parity test pass; no changed file exceeds 500 lines.
 
 ## Dependencies / Risks
 
@@ -82,6 +82,6 @@ The operator approved, for this item only, editing `.claude/rules/parallel-orche
 - No CHANGELOG entry is added.
 
 ## Evidence Checklist
-- [ ] baseline
-- [ ] targeted verification
-- [ ] end-state
+- [x] baseline
+- [x] targeted verification
+- [x] end-state
