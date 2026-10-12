@@ -30,7 +30,7 @@ The #850 notes are each fixed, or, where a note should not change, the reason is
 - [x] AC-6: #850 note L20: research (`research/research.2026-10-11T10-45.md`) located the unparseable `pr_gate.pr_number` branch in the epic merge-gate resolution code, outside the pr-author hook family that this item is restricted to. The note is recorded in an evidence artifact under this feature folder with the exact file, line, and the test row that would cover it, and the no-change-in-this-item rationale (scope boundary set by the operator because a concurrent epic may own those files).
 - [x] AC-7: #850 notes L21 (`PSUseSingularNouns` suppression), L22 (duplicated positive-JSON-integer rule), and L23 (`[long]` vs `[int]` TryParse) are each either fixed or recorded with a no-change rationale in an evidence artifact under this feature folder.
 - [x] AC-8: #850 note L25: the stale `.NOTES` text "No external module dependencies" in `enforce-pr-author-skill.ps1` (and the same sentence in `enforce-pr-author-skill-helpers.ps1`) is corrected to match each file's actual dependencies.
-- [ ] AC-9: No edited PowerShell file exceeds 500 lines; PoshQC format and analyze report no new findings on the edited files; the Pester suites for the pr-author hook family pass; line coverage of the edited hook files is at least 85% as reported by CI.
+- [x] AC-9: No edited PowerShell file exceeds 500 lines; PoshQC format and analyze report no new findings on the edited files; the Pester suites for the pr-author hook family pass; line coverage of the edited hook files is at least 85% as reported by CI.
 - [x] AC-10: The hook's header documentation (`.SYNOPSIS`/`.DESCRIPTION`/`.NOTES`) describes the docs-only exemption and its fail-closed conditions.
 
 ## Dependencies / Risks
