@@ -5,8 +5,8 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - Epic issue: #904
 - Integration branch: `epic/subagentstop-envelope-integration`
 - Current wave: 1
-- Next step: `E5_await_E2_903 (one subtree; then E3, then E4)`
-- Last updated: 2026-10-12T07:36:55Z
+- Next step: `E5_await_903_merge_and_905 (then E4)`
+- Last updated: 2026-10-12T08:46:48Z
 
 ## Waves
 
@@ -22,7 +22,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 | subagentstop-envelope-core-897 | 897 | 0 | merged | [#906](https://github.com/drmoisan/drm-copilot/pull/906) | 039e53339103ced2ccc89471c67754cc311852c3 | 2026-10-11T16:26:00Z | 2026-10-11T18:18:17Z | 2026-10-11T18:33:08Z | - |
 | subagentstop-envelope-artifact-gates-905 | 905 | 1 | worktree_created | - | - | 2026-10-11T18:45:00Z | - | - | - |
 | subagentstop-envelope-feature-review-coverage-896 | 896 | 1 | worktree_created | - | - | 2026-10-11T18:45:00Z | - | - | - |
-| subagentstop-envelope-orchestrator-family-903 | 903 | 1 | worktree_created | - | - | 2026-10-11T18:45:00Z | - | - | - |
+| subagentstop-envelope-orchestrator-family-903 | 903 | 1 | pr_open | [#907](https://github.com/drmoisan/drm-copilot/pull/907) | - | 2026-10-11T18:45:00Z | 2026-10-12T08:45:01Z | - | - |
 
 ## Integration PR
 
@@ -38,3 +38,4 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - 2026-10-12T03:03Z: THROTTLE: no new child or agent-launching step until GO; the running child finishes.
 - 2026-10-12T04:28Z: COMMIT NOW: checkpoint and status committed; child remote tips 905 642050f8, 896 f32cfc84, 903 5e695d73; no PRs open; waiting for GO after the ~07:30Z reset.
 - 2026-10-12T07:36Z: GO. Started E2 (903) resume in its original worktree after fast-forwarding the item branch to aa17afdb5 (no other child running; integration not behind main).
+- 2026-10-12T08:46Z: E2 (903) PR 907 opened and waiting on CI. Started E3 (905) resume from S6 in its resume worktree.
