@@ -1,7 +1,7 @@
-# CI baseline: bats (issue 895)
+# CI baseline: bats stage (issue 895)
 
-Timestamp: 2026-10-12T17-46
+Timestamp: 2026-10-12T18-10
 Command: CI step "Run shell-qc test with coverage" in job shell-coverage of .github/workflows/_shell-coverage.yml; not run locally per Option A.
-EXIT_CODE: DEFERRED-S9
-Output Summary: Baseline is the bats pass count read from that single step log in the latest green main run, to be recorded by the orchestrator at the S9 CI gate.
-S9-EVIDENCE: PENDING
+EXIT_CODE: 0
+Output Summary: Latest green main push run 38280367474, head 72ba7058be67a2bdbedb2fc920a98893ee8edad2, job 114915920535; step "Run shell-qc test with coverage" concluded success. The step log reports TAP plan 1..659, 659 "ok" lines and 0 "not ok" lines (baseline bats pass count 659).
+S9-EVIDENCE: RECORDED
