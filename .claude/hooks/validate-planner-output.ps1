@@ -9,7 +9,7 @@
     structure requirements.
 
     Enforced checks:
-      - hook payload is valid JSON and contains non-empty output,
+      - the SubagentStop envelope read from stdin carries a non-empty last_assistant_message,
       - output advertises `plan-path: <path>` (or supported equivalent forms),
       - output contains `PREFLIGHT: ALL CLEAR` or
         `PREFLIGHT: REVISIONS REQUIRED`,
@@ -22,10 +22,14 @@
       - the final phase contains QA-oriented work.
 
 .NOTES
-    Reads the hook payload from CLAUDE_HOOK_INPUT as JSON. Exits 0 to allow
-    termination; exits 1 with an error message to block. Filesystem reads go
-    through Get-PlanFileContent so tests can mock the boundary without writing
-    temporary files.
+    Reads the SubagentStop envelope from stdin through Read-SubagentStopEnvelope
+    (subagentstop-envelope.ps1); the assistant text comes from the helper's
+    AssistantText. A non-repairable condition blocks once: when StopHookActive is
+    set, the re-entered stop is allowed. Exits 0 to allow termination; a block is
+    written to stderr with exit 2 through Exit-SubagentStopBlock. The dependency
+    guard and the E1 helper are guarded loads: a failure blocks with exit 2,
+    naming the file. Filesystem reads go through Get-PlanFileContent so tests can
+    mock the boundary without writing temporary files.
 #>
 
 [CmdletBinding()]
@@ -33,7 +37,9 @@ param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 Set-StrictMode -Version Latest
+try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
 $ErrorActionPreference = 'Stop'
+$script:SubagentStopReportAndHaltLine = 'This condition is not repairable by the subagent. Report it to the operator and halt.'
 
 function Get-PlanFileContent {
     [CmdletBinding()]
@@ -349,56 +355,74 @@ function Get-PlanStructureValidationReport {
 }
 
 function Invoke-PlannerOutputValidation {
+    <#
+    .SYNOPSIS
+        Reads the SubagentStop envelope, validates the assistant text, and applies the re-entry policy.
+    #>
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
-        [string] $RawPayload
+        [AllowNull()] [AllowEmptyString()] [string] $InputText
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-planner-output:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
+    $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
+    if (-not $envelope.IsValid) { $decision = @{ Ok = $false; Repairable = $false; Message = ('{0} payload anomaly - {1}' -f 'atomic-planner hook:', (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)) } }
+    else {
+        $agentOutput = $envelope.AssistantText
+        $decision = Get-PlannerOutputBlockDecision -AgentOutput ([string]$agentOutput)
+    }
+    if ($decision.Ok) { return @{ Ok = $true; Message = $null } }
+    if (-not $decision.Repairable) {
+        if ($envelope.StopHookActive) { return @{ Ok = $true; Message = $null } }
+        if (-not $decision.Message.Contains('to the operator and halt.')) { $decision.Message = $decision.Message + "`n" + $script:SubagentStopReportAndHaltLine }
+    }
+    return @{ Ok = $false; Message = $decision.Message }
+}
 
-    if ([string]::IsNullOrWhiteSpace($RawPayload)) {
-        return @{ Ok = $false; Message = 'atomic-planner hook: CLAUDE_HOOK_INPUT is empty; cannot validate planner output.' }
-    }
+function Get-PlannerOutputBlockDecision {
+    <#
+    .SYNOPSIS
+        Applies the planner completion checks to the assistant text and returns the block decision.
+    .DESCRIPTION
+        Returns @{ Ok = $true; Message = $null } to allow, or a hashtable with Ok = $false, a
+        Repairable boolean, and Message. Every planner content check is repairable by the subagent.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string] $AgentOutput
+    )
 
-    try {
-        $payload = $RawPayload | ConvertFrom-Json -ErrorAction Stop
-    }
-    catch {
-        return @{ Ok = $false; Message = "atomic-planner hook: failed to parse CLAUDE_HOOK_INPUT as JSON: $($_.Exception.Message)" }
-    }
-
-    $agentOutput = $null
-    if ($null -ne $payload.PSObject.Properties['output']) {
-        $agentOutput = $payload.output
-    }
     if ([string]::IsNullOrWhiteSpace($agentOutput)) {
-        return @{ Ok = $false; Message = 'atomic-planner hook: agent output is empty; planner must return plan-path and final preflight signal.' }
+        return @{ Ok = $false; Repairable = $true; Message = 'atomic-planner hook: agent output is empty (last_assistant_message carries no text); planner must return plan-path and final preflight signal.' }
     }
 
     if (-not (Test-HasPreflightSignal -AgentOutput $agentOutput)) {
-        return @{ Ok = $false; Message = 'atomic-planner hook: agent output must include `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`.' }
+        return @{ Ok = $false; Repairable = $true; Message = 'atomic-planner hook: agent output must include `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`.' }
     }
 
     $planPath = Get-PlanPathFromOutput -AgentOutput $agentOutput
     if ($null -eq $planPath) {
-        return @{ Ok = $false; Message = 'atomic-planner hook: agent output does not advertise a plan-path. Planner must report `plan-path: <path>` per atomic-plan-contract.' }
+        return @{ Ok = $false; Repairable = $true; Message = 'atomic-planner hook: agent output does not advertise a plan-path. Planner must report `plan-path: <path>` per atomic-plan-contract.' }
     }
 
     $file = Get-PlanFileContent -Path $planPath
     if (-not $file.Exists) {
-        return @{ Ok = $false; Message = "atomic-planner hook: planner advertised plan-path '$planPath' but no file exists at that location." }
+        return @{ Ok = $false; Repairable = $true; Message = "atomic-planner hook: planner advertised plan-path '$planPath' but no file exists at that location." }
     }
 
     $errors = @(Get-PlanStructureValidationReport -Lines $file.Lines)
     if ($errors.Count -gt 0) {
         $message = "atomic-planner hook: plan '$planPath' violates the atomic plan contract:`n  - " + ($errors -join "`n  - ")
-        return @{ Ok = $false; Message = $message }
+        return @{ Ok = $false; Repairable = $true; Message = $message }
     }
 
     $review = Get-PlannerInternalReviewValidation -AgentOutput $agentOutput
     if (-not $review.Ok) {
-        return @{ Ok = $false; Message = "atomic-planner hook: $($review.Message)" }
+        return @{ Ok = $false; Repairable = $true; Message = "atomic-planner hook: $($review.Message)" }
     }
 
     return @{ Ok = $true; Message = $null }
@@ -411,10 +435,6 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validat
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-planner-output:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
-$result = Invoke-PlannerOutputValidation -RawPayload $env:CLAUDE_HOOK_INPUT
-if (-not $result.Ok) {
-    Write-Error $result.Message
-    exit 1
-}
-
+$result = Invoke-PlannerOutputValidation
+if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0
