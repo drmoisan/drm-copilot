@@ -29,8 +29,8 @@ Operator decision (A), recorded by the parallel planner for run `bug-burndown-20
 - [x] AC-2: The new step states that a non-zero count causes the main-sync to run as a dedicated chore child item (a child branch created from the integration branch that merges `origin/main` and opens a PR into the integration branch, per the `epic-852-main-sync` / PR #882 pattern) that must merge before the wave launches, and that a zero count proceeds directly to the wave.
 - [x] AC-3: Every parity surface the research identifies (bundled mirror, epic-orchestrator persona where it restates the lifecycle, Codex counterpart skill) carries the same step, and the existing parity or bundle-sync checks for those surfaces pass.
 - [x] AC-4: New contract tests pin the presence of the pre-wave main-sync step (the `rev-list --count` check and the chore-child route) in the canonical skill and in each parity surface, and fail when the step is removed.
-- [ ] AC-5: No hook file under `.claude/hooks/` or `.codex/hooks/` and no policy document under `.claude/rules/` or `.github/instructions/` is modified.
-- [ ] AC-6: The final QC loop for every language touched by the change (formatter, linter, type checker where applicable, tests with coverage) passes, with evidence recorded under the feature folder's `evidence/` tree.
+- [x] AC-5: No hook file under `.claude/hooks/` or `.codex/hooks/` and no policy document under `.claude/rules/` or `.github/instructions/` is modified.
+- [x] AC-6: The final QC loop for every language touched by the change (formatter, linter, type checker where applicable, tests with coverage) passes, with evidence recorded under the feature folder's `evidence/` tree.
 
 ## Dependencies / Risks
 
@@ -46,4 +46,4 @@ Operator decision (A), recorded by the parallel planner for run `bug-burndown-20
 ## Evidence Checklist
 - [x] baseline
 - [x] targeted verification
-- [ ] end-state
+- [x] end-state
