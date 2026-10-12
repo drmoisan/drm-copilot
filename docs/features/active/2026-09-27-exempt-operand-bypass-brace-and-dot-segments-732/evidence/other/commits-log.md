@@ -17,3 +17,5 @@ COMMIT: 7d1fea6264c1b6bc638c1b71d0f13a607e037633 docs(745): document admitted co
 PUSH_EXIT: 0
 COMMIT: 8918b5c044d8a8dbe4dab1a8302f85788dbf9fce docs(732): record final QA evidence
 PUSH_EXIT: 0
+COMMIT: 6370c4145c5ef488faf206abcaef4e3f7267d0f8 docs(732): check off verified acceptance criteria and record follow-ups
+PUSH_EXIT: 0
