@@ -48,4 +48,57 @@ Describe 'feature-review-coverage-thresholds (issue #824)' {
         $result.LineSource | Should -Be $LineSource
         $result.BranchSource | Should -Be $BranchSource
     }
+
+    It 'E4-TR5-P<Id> resolves <Label>' -Tag 'E4-Regression', 'E4-TR5' -ForEach @(
+        @{ Id = 1; Label = 'line coverage: 70% minimum'; Text = 'line coverage: 70% minimum'; Line = 70; Branch = 75; LineSource = 'claude-md'; BranchSource = 'default' }
+        @{ Id = 2; Label = 'line coverage 80% at least'; Text = 'line coverage 80% at least'; Line = 80; Branch = 75; LineSource = 'claude-md'; BranchSource = 'default' }
+        @{ Id = 3; Label = 'line coverage of 80% or more'; Text = 'line coverage of 80% or more'; Line = 80; Branch = 75; LineSource = 'claude-md'; BranchSource = 'default' }
+        @{ Id = 4; Label = 'branch coverage: 60% or higher'; Text = 'branch coverage: 60% or higher'; Line = 85; Branch = 60; LineSource = 'default'; BranchSource = 'claude-md' }
+        @{ Id = 5; Label = 'line coverage 81% or above'; Text = 'line coverage 81% or above'; Line = 81; Branch = 75; LineSource = 'claude-md'; BranchSource = 'default' }
+        @{ Id = 6; Label = 'branch coverage 62% or greater'; Text = 'branch coverage 62% or greater'; Line = 85; Branch = 62; LineSource = 'default'; BranchSource = 'claude-md' }
+    ) {
+        # Arrange: the row supplies a trailing-floor statement and the expected thresholds and sources.
+
+        # Act
+        $result = Get-FeatureReviewCoverageThreshold -ClaudeMdText $Text
+
+        # Assert
+        $result.Line | Should -Be $Line -Because "the governing line threshold for '$Text'"
+        $result.Branch | Should -Be $Branch -Because "the governing branch threshold for '$Text'"
+        $result.LineSource | Should -Be $LineSource
+        $result.BranchSource | Should -Be $BranchSource
+    }
+
+    It 'E4-ST5: the resolver help names every accepted comparator form' {
+        # Arrange: parse the resolver file and take the function's comment-based help.
+        $tokens = $null
+        $parseErrors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $script:HookRoot 'feature-review-coverage-thresholds.ps1'), [ref]$tokens, [ref]$parseErrors)
+        $function = $ast.Find({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Get-FeatureReviewCoverageThreshold' }, $true)
+
+        # Act
+        $description = ($function.GetHelpContent().Description) -replace '\s+', ' '
+
+        # Assert
+        foreach ($form in @('>=', 'U+2265', 'at least', 'minimum of', 'no less than', 'or more', 'or higher', 'or above', 'or greater')) {
+            $description.Contains($form) | Should -BeTrue -Because "the resolver help must name the accepted form '$form'"
+        }
+    }
+
+    It 'E4-TR5-N<Id> keeps the defaults for <Label>' -ForEach @(
+        @{ Id = 1; Label = 'Line coverage was 62% last release'; Text = 'Line coverage was 62% last release'; Line = 85; Branch = 75; LineSource = 'default'; BranchSource = 'default' }
+        @{ Id = 2; Label = 'Line and branch coverage: 70% minimum'; Text = 'Line and branch coverage: 70% minimum'; Line = 85; Branch = 75; LineSource = 'default'; BranchSource = 'default' }
+        @{ Id = 3; Label = 'line coverage: 150% minimum'; Text = 'line coverage: 150% minimum'; Line = 85; Branch = 75; LineSource = 'default'; BranchSource = 'default' }
+    ) {
+        # Arrange: the row supplies a statement the resolver must not read.
+
+        # Act
+        $result = Get-FeatureReviewCoverageThreshold -ClaudeMdText $Text
+
+        # Assert
+        $result.Line | Should -Be $Line -Because "the governing line threshold for '$Text'"
+        $result.Branch | Should -Be $Branch -Because "the governing branch threshold for '$Text'"
+        $result.LineSource | Should -Be $LineSource
+        $result.BranchSource | Should -Be $BranchSource
+    }
 }
