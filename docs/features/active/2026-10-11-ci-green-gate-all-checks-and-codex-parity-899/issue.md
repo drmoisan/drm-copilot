@@ -33,7 +33,7 @@
 - [x] AC-6: No orchestrator surface in scope restates a required-only CI population (`.claude/agents/orchestrator.md`, `.codex/agents/orchestrator*.toml`, `.agents/skills/orchestrator-workflow/SKILL.md`, `.claude/skills/remediation-handoff-atomic-planner/SKILL.md`, and their mirrors); verified by `tests/scripts/dev_tools/test_ci_gate_all_checks_contracts.py`.
 - [x] AC-7: Codex agent variants are in sync: `poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check` exits 0.
 - [x] AC-8: Both default clock delegates of `Invoke-CiGateParser.ps1` execute under test: the two new Pester tests in `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1` pass through `run_poshqc_test`, with no failed tests.
-- [ ] AC-9 (CI-dependent): The PR `CI` run artifact `poshqc-test-results` reports zero missed lines for `Invoke-CiGateParser.ps1` in `artifacts/pester/powershell-coverage.xml`.
+- [x] AC-9 (CI-dependent): The PR `CI` run artifact `poshqc-test-results` reports zero missed lines for `Invoke-CiGateParser.ps1` in `artifacts/pester/powershell-coverage.xml`.
 - [x] AC-10: Every edited surface is byte-identical to its bundle mirror; the Claude and Codex push-down resource contract tests and the completion-gate mirror parity test pass.
 - [x] AC-11: The hash-pinned epic surfaces are unchanged; `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py` passes.
 
