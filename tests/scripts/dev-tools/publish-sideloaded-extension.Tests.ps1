@@ -60,6 +60,22 @@ Describe 'publish-sideloaded-extension.ps1 entry point - real orchestrator' {
         Should -Invoke -CommandName Invoke-ExternalCommand -ModuleName SideloadedExtensionPublish -Times 0 -Exactly
         Should -Invoke -CommandName Invoke-SideloadedExtensionProcess -ModuleName SideloadedExtensionPublish -Times 0 -Exactly
     }
+
+    It 'AC15-PUBLISH-INHERITED-WHATIF-NOSEAMS makes no state-changing seam call under an inherited WhatIfPreference' {
+        # Act: the preference is set in a child scope that the entry script inherits.
+        $output = @(& {
+                Set-Variable -Name WhatIfPreference -Value $true
+                @(& $script:entryPath -RepoRoot 'C:\fixture\repo' -VsixOutputDir 'C:\fixture\vsix')
+            })
+
+        # Assert
+        $output[-1] | Should -BeLike '*drm-copilot-*.vsix'
+        Should -Invoke -CommandName New-Item -ModuleName SideloadedExtensionPublish -Times 0 -Exactly
+        Should -Invoke -CommandName Invoke-NpmCiWithRetry -ModuleName SideloadedExtensionPublish -Times 0 -Exactly
+        Should -Invoke -CommandName Invoke-ProjectCompile -ModuleName SideloadedExtensionPublish -Times 0 -Exactly
+        Should -Invoke -CommandName Invoke-ExternalCommand -ModuleName SideloadedExtensionPublish -Times 0 -Exactly
+        Should -Invoke -CommandName Invoke-SideloadedExtensionProcess -ModuleName SideloadedExtensionPublish -Times 0 -Exactly
+    }
 }
 
 Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
@@ -123,6 +139,104 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
             $UseInsiders -and $SkipNpmCi -and $SkipCompile -and $SkipInstall -and $Force -and
+            -not $PesterBoundParameters.ContainsKey('WhatIf')
+        }
+    }
+
+    It 'AC13-WHATIF-INHERITED forwards WhatIf true when WhatIfPreference is inherited and -WhatIf is unbound' {
+        & {
+            Set-Variable -Name WhatIfPreference -Value $true
+            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo'
+        }
+
+        Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
+            $PesterBoundParameters.ContainsKey('WhatIf') -and [bool]$PesterBoundParameters['WhatIf']
+        }
+    }
+
+    It 'AC13-WHATIF-BOUND-FALSE-WINS forwards WhatIf false when -WhatIf:$false is bound under an inherited true preference' {
+        & {
+            Set-Variable -Name WhatIfPreference -Value $true
+            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo' -WhatIf:$false
+        }
+
+        Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
+            $PesterBoundParameters.ContainsKey('WhatIf') -and -not [bool]$PesterBoundParameters['WhatIf']
+        }
+    }
+
+    It 'AC13-CONFIRM-NONE forwards Confirm false for an inherited ConfirmPreference of None' {
+        & {
+            Set-Variable -Name ConfirmPreference -Value 'None'
+            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo'
+        }
+
+        Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
+            $PesterBoundParameters.ContainsKey('Confirm') -and -not [bool]$PesterBoundParameters['Confirm']
+        }
+    }
+
+    It 'AC13-CONFIRM-LOW forwards Confirm true for an inherited ConfirmPreference of Low' {
+        & {
+            Set-Variable -Name ConfirmPreference -Value 'Low'
+            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo'
+        }
+
+        Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
+            $PesterBoundParameters.ContainsKey('Confirm') -and [bool]$PesterBoundParameters['Confirm']
+        }
+    }
+
+    It 'AC13-CONFIRM-HIGH adds no Confirm key for an inherited ConfirmPreference of High' {
+        & {
+            Set-Variable -Name ConfirmPreference -Value 'High'
+            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo'
+        }
+
+        Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
+            -not $PesterBoundParameters.ContainsKey('Confirm')
+        }
+    }
+
+    It 'AC13-VERBOSE-INHERITED forwards Verbose true for an inherited VerbosePreference of Continue' {
+        & {
+            Set-Variable -Name VerbosePreference -Value 'Continue'
+            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo' 4>$null
+        }
+
+        Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
+            $PesterBoundParameters.ContainsKey('Verbose') -and [bool]$PesterBoundParameters['Verbose']
+        }
+    }
+
+    It 'AC13-DEBUG-INHERITED forwards Debug true for an inherited DebugPreference of Continue' {
+        & {
+            Set-Variable -Name DebugPreference -Value 'Continue'
+            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo' 5>$null
+        }
+
+        Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
+            $PesterBoundParameters.ContainsKey('Debug') -and [bool]$PesterBoundParameters['Debug']
+        }
+    }
+
+    It 'AC13-BOUND-DEBUG-INFO-PROGRESS forwards bound -Debug, -InformationAction, and -ProgressAction' {
+        $null = & $script:entryPath -RepoRoot 'C:\fixture\repo' -Debug -InformationAction Continue -ProgressAction SilentlyContinue 5>$null
+
+        Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
+            $PesterBoundParameters.ContainsKey('Debug') -and
+            [bool]$PesterBoundParameters['Debug'] -and
+            $PesterBoundParameters.ContainsKey('InformationAction') -and
+            $PesterBoundParameters['InformationAction'] -eq 'Continue' -and
+            $PesterBoundParameters.ContainsKey('ProgressAction') -and
+            $PesterBoundParameters['ProgressAction'] -eq 'SilentlyContinue'
+        }
+    }
+
+    It 'AC13-DEFAULT-NO-WHATIF adds no WhatIf key under default preferences' {
+        $null = & $script:entryPath -RepoRoot 'C:\fixture\repo'
+
+        Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
             -not $PesterBoundParameters.ContainsKey('WhatIf')
         }
     }

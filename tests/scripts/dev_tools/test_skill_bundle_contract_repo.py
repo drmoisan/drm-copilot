@@ -10,6 +10,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import pytest
+
 from scripts.dev_tools.skill_bundle_contract import (
     PUBLISHED_ROOT_FOLDERS,
     evaluate_skill_bundle,
@@ -24,6 +26,36 @@ _CI_GATE_PARSER = ".claude/lib/ci-gate/Invoke-CiGateParser.ps1"
 _TYPESCRIPT_ROOT_FOLDERS_FILE = (
     _REPO_ROOT / "extensions/drm-copilot/src/lib/push-down/claude-customizations.ts"
 )
+_MUTATION_SCRIPT = ".claude/lib/bash/mutate-parallel-run.sh"
+
+# The Python engine module and the six engine functions no mutation skill may
+# still instruct the agent to call (issue #890, FU-791-1).
+_PYTHON_ENGINE_NAMES = (
+    "parallel_mutation_protocol",
+    "decide_admission",
+    "recolor_unstarted",
+    "build_add_entry",
+    "decide_close",
+    "build_close_entry",
+    "build_requeue_entry",
+)
+
+# The subcommand invocations each mutation skill must carry.
+_MUTATION_SKILL_SUBCOMMANDS = {
+    "parallel-add": (
+        "mutate-parallel-run.sh admit",
+        "mutate-parallel-run.sh recolor",
+        "mutate-parallel-run.sh add-entry",
+    ),
+    "parallel-close": (
+        "mutate-parallel-run.sh close --items",
+        "mutate-parallel-run.sh close-entry",
+    ),
+    "parallel-orchestrate": (
+        "mutate-parallel-run.sh requeue-entry",
+        "mutate-parallel-run.sh recolor",
+    ),
+}
 
 
 def test_every_skill_script_reference_is_bundled() -> None:
@@ -133,6 +165,43 @@ def test_parallel_remove_invokes_bundled_remove_script() -> None:
     assert (
         protocol_mentions <= 1
     ), f"parallel-remove cites parallel_mutation_protocol {protocol_mentions} times"
+
+
+@pytest.mark.parametrize(
+    "skill_name",
+    sorted(_MUTATION_SKILL_SUBCOMMANDS),
+    ids=sorted(_MUTATION_SKILL_SUBCOMMANDS),
+)
+def test_mutation_skills_invoke_bundled_mutation_script(skill_name: str) -> None:
+    """Each mutation skill invokes the bundled bash mutation script, not Python.
+
+    Regression for issue #890 (FU-791-1): the add, close, and requeue steps must
+    run through ``mutate-parallel-run.sh`` so they work in a pushed-down
+    workspace that has no Python engine.
+    """
+
+    # Arrange
+    text = (_REPO_ROOT / ".claude/skills" / skill_name / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+
+    # Act
+    references = extract_script_references(text)
+
+    # Assert: (a) the bundled entry point is an extracted script reference.
+    assert (
+        _MUTATION_SCRIPT in references
+    ), f"{_MUTATION_SCRIPT} not extracted from {skill_name}; got {references}"
+    # Assert: (b) each required subcommand form is present.
+    missing_forms = [
+        form for form in _MUTATION_SKILL_SUBCOMMANDS[skill_name] if form not in text
+    ]
+    assert (
+        not missing_forms
+    ), f"{skill_name} lacks subcommand invocations: {missing_forms}"
+    # Assert: (c) no Python engine module or function name remains.
+    remaining = [name for name in _PYTHON_ENGINE_NAMES if name in text]
+    assert not remaining, f"{skill_name} still names Python engine items: {remaining}"
 
 
 def test_every_skill_folder_file_is_carried_by_skill_packs() -> None:

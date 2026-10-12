@@ -1,0 +1,10 @@
+{
+  "case": "requeue-entry-negative-generation",
+  "subcommand": "requeue-entry",
+  "argv": ["requeue-entry", "--item", "7", "--generation", "-2", "--at", "2026-10-11T08-29"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation entry rejected: recolor_generation -1 violates the F3 mutations[] contract for op 'requeue'."
+  }
+}

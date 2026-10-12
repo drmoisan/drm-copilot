@@ -13,12 +13,12 @@ tools:
   - "Edit(artifacts/orchestration/**)"
   - "Bash(git *)"
   - "Bash(gh *)"
-  - "Bash(poetry run python -c *)"
   - "Bash(bash .claude/lib/bash/compute-cohorts.sh*)"
   - "Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"
   - "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"
   - "Bash(bash .claude/lib/bash/abandon-parallel-item.sh*)"
   - "Bash(bash .claude/lib/bash/remove-parallel-item.sh*)"
+  - "Bash(bash .claude/lib/bash/mutate-parallel-run.sh*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1*)"
   - "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1*)"
   - "Bash(dotnet tool restore*)"
@@ -95,18 +95,19 @@ reference; it is not invoked on the destination-runtime path. Cohort recoloring 
 batching use `compute-cohorts.sh` and `compute-concurrency-batches.sh` under the same allowlist
 entry.
 
-The inline-code (`-c`) grant remains for the repository-local engine calls that `parallel-add`,
-`parallel-close`, and `parallel-orchestrate` still make. It stays scoped to that one invocation form
-— not to `poetry run` as a whole — so `pytest`, `black`, `ruff`, and every other `poetry run`
-subcommand remain outside the allowlist. The former module-form (`-m`) grant was removed under issue
-#791 because no skill in this agent's caller set invokes a module through it. The skill's
+No `poetry run python` grant is held. The inline-code (`-c`) grant was removed under issue #890
+after `parallel-add`, `parallel-close`, and `parallel-orchestrate` moved their engine calls to the
+bundled entry point `.claude/lib/bash/mutate-parallel-run.sh`, and the former module-form (`-m`)
+grant was removed under issue #791; in both cases no skill in this agent's caller set still invokes
+Python through the grant. The skill's
 `## Parallel-Level Checkpoint` section validates through
 `mcp__drm-copilot__validate_orchestration_artifacts`; since issue #763 radius drift detection runs
 through the destination-runtime PowerShell entry point
 `.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1` and the abandon disposition through the
-bundled entry point `.claude/lib/bash/abandon-parallel-item.sh`; and since issue #791 the
+bundled entry point `.claude/lib/bash/abandon-parallel-item.sh`; since issue #791 the
 `parallel-remove` decide, recolor, and entry steps run through the bundled entry point
-`.claude/lib/bash/remove-parallel-item.sh`. The sibling persona `.claude/agents/parallel-planner.md`
+`.claude/lib/bash/remove-parallel-item.sh`; and since issue #890 the add, close, and requeue steps
+run through the bundled entry point `.claude/lib/bash/mutate-parallel-run.sh`. The sibling persona `.claude/agents/parallel-planner.md`
 records the same destination-runtime posture.
 
 ## Startup Protocol

@@ -54,7 +54,7 @@ Run the toolchain in order: format → lint → type-check → test. Restart fro
 
 ## Architecture Boundaries
 
-Layer rules and the No-COM architecture assertions are defined in `.claude/rules/architecture-boundaries.md`. The TypeScript enforcement tool is `dependency-cruiser` with configuration file `.dependency-cruiser.cjs`.
+Layer rules and the host-neutral architecture assertions are defined in `.claude/rules/architecture-boundaries.md` under the heading "Host-Neutral Architecture Rules (enforceable assertions)". The TypeScript enforcement tool is `dependency-cruiser` with configuration file `.dependency-cruiser.cjs`.
 
 ## Property-Based and Mutation Testing
 
