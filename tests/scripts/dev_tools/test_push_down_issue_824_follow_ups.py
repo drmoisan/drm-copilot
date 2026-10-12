@@ -70,9 +70,28 @@ SOLUTION_SCAN_ROOTS = (
 STEP_EIGHT_COPIES = (
     ".claude/skills/feature-review-workflow/SKILL.md",
     CLAUDE_BUNDLE + ".claude/skills/feature-review-workflow/SKILL.md",
+    ".agents/skills/feature-review-workflow/SKILL.md",
+    CODEX_BUNDLE + ".agents/skills/feature-review-workflow/SKILL.md",
+    ".github/skills/feature-review-workflow/SKILL.md",
+    GITHUB_BUNDLE + ".github/skills/feature-review-workflow/SKILL.md",
 )
 RETIRED_STEP_EIGHT_FIGURES = ("80%", "90%")
 GOVERNING_THRESHOLDS_PHRASE = "governing thresholds"
+
+# Issue #896: every feature-review text copy names the root CLAUDE.md as the floor
+# source and states the 85/75 defaults, with no retired 80/90 figure anywhere.
+FEATURE_REVIEW_TEXT_COPIES = (
+    ".claude/skills/feature-review-workflow/SKILL.md",
+    CLAUDE_BUNDLE + ".claude/skills/feature-review-workflow/SKILL.md",
+    ".agents/skills/feature-review-workflow/SKILL.md",
+    CODEX_BUNDLE + ".agents/skills/feature-review-workflow/SKILL.md",
+    ".github/skills/feature-review-workflow/SKILL.md",
+    GITHUB_BUNDLE + ".github/skills/feature-review-workflow/SKILL.md",
+    ".codex/agents/feature-review.toml",
+    CODEX_BUNDLE + ".codex/agents/feature-review.toml",
+)
+CLAUDE_MD_FLOOR_SOURCE = "CLAUDE.md"
+DEFAULT_FLOOR_FIGURES = ("85%", "75%")
 
 FALLBACK_PHRASE = "falls back independently"
 FALLBACK_COPIES = (
@@ -91,7 +110,7 @@ FALLBACK_COPIES = (
     ".claude/hooks/validate-feature-review-coverage.ps1",
     CLAUDE_BUNDLE + ".claude/hooks/validate-feature-review-coverage.ps1",
 )
-EXPECTED_LISTED_COPY_COUNT = 36
+EXPECTED_LISTED_COPY_COUNT = 40
 
 PUSHED_RULE_AND_SKILL_GLOBS: tuple[tuple[str, str], ...] = (
     (".claude/rules", "*.md"),
@@ -255,6 +274,29 @@ def test_review_workflow_step_eight_uses_governing_thresholds(
     assert step != "", f"{relative_path} has no step 8"
     assert retired == [], f"{relative_path} step 8 still states: {retired}"
     assert GOVERNING_THRESHOLDS_PHRASE in normalize_whitespace(step)
+
+
+@pytest.mark.parametrize("relative_path", FEATURE_REVIEW_TEXT_COPIES)
+def test_feature_review_texts_name_claude_md_floor_source(relative_path: str) -> None:
+    """Issue #896: the feature-review text names root CLAUDE.md and the 85/75 defaults.
+
+    The copy must contain no retired 80% or 90% figure, must name ``CLAUDE.md`` as
+    the floor source, and must state the 85% line and 75% branch defaults.
+    """
+
+    # Arrange
+    text = read_copy(relative_path)
+
+    # Act
+    retired = [figure for figure in RETIRED_STEP_EIGHT_FIGURES if figure in text]
+    missing_defaults = [
+        figure for figure in DEFAULT_FLOOR_FIGURES if figure not in text
+    ]
+
+    # Assert
+    assert retired == [], f"{relative_path} still states: {retired}"
+    assert CLAUDE_MD_FLOOR_SOURCE in text, f"{relative_path} does not name CLAUDE.md"
+    assert missing_defaults == [], f"{relative_path} lacks: {missing_defaults}"
 
 
 @pytest.mark.parametrize("relative_path", FALLBACK_COPIES)
