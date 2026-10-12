@@ -73,11 +73,11 @@ Describe 'bootstrap-host.ps1 entry point' {
         # Arrange
         Set-Variable -Name LASTEXITCODE -Value 99 -Scope Global
         Mock -CommandName Invoke-BootstrapHost -MockWith {
-            Write-Error -Message 'This script targets Windows. Use ./scripts/bash/bootstrap-host.sh on Linux/macOS.' -ErrorAction Stop
+            Write-Error -Message 'This script targets Windows. On Linux/macOS, use the dev container defined under .devcontainer/ (see .devcontainer/README.md).' -ErrorAction Stop
         }
 
         # Act / Assert
-        { & $script:entryPath } | Should -Throw -ExpectedMessage 'This script targets Windows. Use ./scripts/bash/bootstrap-host.sh on Linux/macOS.*'
+        { & $script:entryPath } | Should -Throw -ExpectedMessage 'This script targets Windows. On Linux/macOS, use the dev container defined under .devcontainer/ (see .devcontainer/README.md).*'
         $LASTEXITCODE | Should -Be 1
     }
 
