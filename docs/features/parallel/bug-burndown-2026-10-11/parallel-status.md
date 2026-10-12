@@ -15,8 +15,8 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 4
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-12T14:31:48Z
-- `next_step`: #885 in flight. On DONE verify (review artifacts, closing keyword, all checks) and merge; then launch #886.
+- `last_updated`: 2026-10-12T15:05:23Z
+- `next_step`: #886 in flight. On DONE verify (review, Closes #886, line-204 edit in both copies, all checks) and merge; then launch #898.
 
 **Items**
 
@@ -24,8 +24,8 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 543 | docs/features/active/2026-10-11-epic-planner-field-list-remainder-543 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/912 | 2fec67d5187a33a9c67aa706f087673fb4151920 | 2026-10-12T13:33:19Z | 2026-10-12T14:31:29Z |  |
 | 884 | docs/features/active/2026-10-11-compute-concurrency-batches-coverage-884 | 0 | scheduled | not_started |  |  |  |  |  |
-| 885 | docs/features/active/2026-10-11-parallel-add-children-not-told-to-record-issue-adoption-885 | 0 | in_flight | worktree_created |  |  | 2026-10-12T14:31:48Z |  |  |
-| 886 | docs/features/active/2026-10-11-validator-file-path-invocation-repo-root-first-886 | 0 | scheduled | not_started |  |  |  |  |  |
+| 885 | docs/features/active/2026-10-11-parallel-add-children-not-told-to-record-issue-adoption-885 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/913 | c68bad4cfeedf10ab5f7358f8093d264106eb5f7 | 2026-10-12T14:31:48Z | 2026-10-12T15:04:48Z |  |
+| 886 | docs/features/active/2026-10-11-validator-file-path-invocation-repo-root-first-886 | 0 | in_flight | worktree_created |  |  | 2026-10-12T15:05:23Z |  |  |
 | 887 | docs/features/active/2026-10-11-host-tools-manifest-and-bootstrap-behavior-887 | 0 | scheduled | not_started |  |  |  |  |  |
 | 889 | docs/features/active/2026-10-11-argumentless-sort-ordering-and-comparator-coverage-gaps-889 | 0 | scheduled | not_started |  |  |  |  |  |
 | 890 | docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890 | 0 | scheduled | not_started |  |  |  |  |  |
