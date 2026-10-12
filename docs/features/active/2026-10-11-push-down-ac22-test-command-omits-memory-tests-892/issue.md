@@ -20,12 +20,12 @@ Documentation-only amendment, made as a planning-agent amendment:
 - `spec.md` and `user-story.md` are intentionally not created for this item (minor-audit).
 
 ## Acceptance Criteria
-- [ ] AC-1 The pytest command at spec.md line 196 of the #790 spec contains both `test_push_down_claude_memory_scope.py` and `test_push_down_claude_pack_memory_modes.py`, each as a `tests/scripts/dev_tools/` path placed before the first `--cov=` flag. Verification: a single-token Grep of each file name in the #790 `spec.md` matches line 196 (and the amendment note); do not pattern-match the full command because the line is long.
-- [ ] AC-2 A sub-bullet beginning `- Amendment (2026-10-11, issue #892, planning agent)` sits directly beneath the Python toolchain bullet and states the rationale. Verification: Grep for `Amendment (2026-10-11, issue #892` in the #790 `spec.md` returns one match on line 197.
-- [ ] AC-3 AC-22 (line 223), AC-24 (line 225), and every other acceptance-criterion line in the #790 spec are byte-unchanged versus `origin/main`, including checkbox state. Verification: `git diff origin/main -U0 -- <#790 spec.md>` shows added or changed hunks only at the line 196 command and the new amendment sub-bullet; no hunk touches a line beginning `- [x]` or `- [ ]`.
-- [ ] AC-4 The only file changed outside this item's feature folder is the #790 `spec.md`. Verification: `git diff --name-only origin/main` lists the #790 `spec.md` plus paths under `docs/features/active/2026-10-11-push-down-ac22-test-command-omits-memory-tests-892/` and no other path.
-- [ ] AC-5 The amended command (dotted `--cov=` form for the four modules `scripts.dev_tools.push_down_claude_gitignore_merge`, `scripts.dev_tools.push_down_claude_filesystem`, `scripts.dev_tools.push_down_claude_customizations`, and `scripts.dev_tools.push_down_claude_pack_selection`, with `--cov-branch` and `--cov-report=term-missing`) runs and exits 0, and a file under this item's `evidence/` folder records the exact command, the exit code, and numeric line and branch coverage for each of the four modules. Verification: read the evidence file and confirm four module rows with numeric percentages and an exit code of 0.
-- [ ] AC-6 The change is Markdown-only: no production or test file is modified. Verification: `git diff --name-only origin/main` lists no path under `scripts/`, `src/`, `tests/`, `extensions/`, or `.claude/`, and every listed path ends in `.md` except evidence capture files recorded under this item's `evidence/` folder.
+- [x] AC-1 The pytest command at spec.md line 196 of the #790 spec contains both `test_push_down_claude_memory_scope.py` and `test_push_down_claude_pack_memory_modes.py`, each as a `tests/scripts/dev_tools/` path placed before the first `--cov=` flag. Verification: a single-token Grep of each file name in the #790 `spec.md` matches line 196 (and the amendment note); do not pattern-match the full command because the line is long.
+- [x] AC-2 A sub-bullet beginning `- Amendment (2026-10-11, issue #892, planning agent)` sits directly beneath the Python toolchain bullet and states the rationale. Verification: Grep for `Amendment (2026-10-11, issue #892` in the #790 `spec.md` returns one match on line 197.
+- [x] AC-3 AC-22 (line 223), AC-24 (line 225), and every other acceptance-criterion line in the #790 spec are byte-unchanged versus `origin/main`, including checkbox state. Verification: `git diff origin/main -U0 -- <#790 spec.md>` shows added or changed hunks only at the line 196 command and the new amendment sub-bullet; no hunk touches a line beginning `- [x]` or `- [ ]`.
+- [x] AC-4 The only file changed outside this item's feature folder is the #790 `spec.md`. Verification: `git diff --name-only origin/main` lists the #790 `spec.md` plus paths under `docs/features/active/2026-10-11-push-down-ac22-test-command-omits-memory-tests-892/` and no other path.
+- [x] AC-5 The amended command (dotted `--cov=` form for the four modules `scripts.dev_tools.push_down_claude_gitignore_merge`, `scripts.dev_tools.push_down_claude_filesystem`, `scripts.dev_tools.push_down_claude_customizations`, and `scripts.dev_tools.push_down_claude_pack_selection`, with `--cov-branch` and `--cov-report=term-missing`) runs and exits 0, and a file under this item's `evidence/` folder records the exact command, the exit code, and numeric line and branch coverage for each of the four modules. Verification: read the evidence file and confirm four module rows with numeric percentages and an exit code of 0.
+- [x] AC-6 The change is Markdown-only: no production or test file is modified. Verification: `git diff --name-only origin/main` lists no path under `scripts/`, `src/`, `tests/`, `extensions/`, or `.claude/`, and every listed path ends in `.md` except evidence capture files recorded under this item's `evidence/` folder.
 
 ## Dependencies / Risks
 - Dependency: the #790 spec file must remain at its current path; no repository test, script, hook, or workflow reads it by path (per research section 5).
@@ -41,6 +41,6 @@ Documentation-only amendment, made as a planning-agent amendment:
 4. From the repository root, run `poetry run pytest` with the amended path list followed by `--cov=scripts.dev_tools.push_down_claude_filesystem --cov=scripts.dev_tools.push_down_claude_gitignore_merge --cov=scripts.dev_tools.push_down_claude_customizations --cov=scripts.dev_tools.push_down_claude_pack_selection --cov-branch --cov-report=term-missing`; save output and exit code under `evidence/` (AC-5).
 
 ## Evidence Checklist
-- [ ] baseline
-- [ ] targeted verification
-- [ ] end-state
+- [x] baseline
+- [x] targeted verification
+- [x] end-state
