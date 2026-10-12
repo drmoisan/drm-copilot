@@ -10,9 +10,10 @@
 #
 # Determinism: discovery is driven through functions that take their candidates
 # as arguments; the only directories read are this test directory and the
-# committed fixture tests/fixtures/codex_web_setup/populated-packages. External
-# commands (nuget, pwsh) are replaced by shell functions that print to stderr.
-# No temporary file is created.
+# committed fixtures tests/fixtures/codex_web_setup/populated-packages and
+# tests/fixtures/codex_web_setup/solution-root. External commands (nuget, pwsh)
+# are replaced by shell functions that print to stderr. No temporary file is
+# created.
 # ------------------------------------------------------------------------------
 
 # Canonical absolute path, so kcov reports the sourced file as <repo>/.codex/codex-web-setup.sh.
@@ -184,4 +185,36 @@ setup() {
     # Assert
     [ "$status" -eq 0 ]
     [[ "$output" == *"-SolutionPath <solution>.sln"* ]]
+}
+
+@test "C824-62 log_solution_selection logs the selected file and the count of root solution files" {
+    # Arrange
+    local listed
+    local selected
+    listed="$(printf '%s\n' Beta.sln Alpha.sln)"
+    selected="$(select_solution_file "${listed}")"
+    # Act
+    run log_solution_selection "${listed}" "${selected}"
+    # Assert
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Selected solution file Alpha.sln"* ]]
+    [[ "$output" == *"root *.sln files found: 2."* ]]
+}
+
+@test "C824-63 log_solution_selection prints nothing when no solution file is listed" {
+    # Act
+    run log_solution_selection "" ""
+    # Assert
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
+}
+
+@test "C824-64 list_root_solution_files lists Alpha.sln for the committed solution-root fixture" {
+    # Arrange
+    local fixture="${BATS_TEST_DIRNAME}/../fixtures/codex_web_setup/solution-root"
+    # Act
+    run list_root_solution_files "${fixture}"
+    # Assert
+    [ "$status" -eq 0 ]
+    [ "$output" = "Alpha.sln" ]
 }

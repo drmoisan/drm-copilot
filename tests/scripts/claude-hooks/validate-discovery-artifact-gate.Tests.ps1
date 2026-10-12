@@ -6,13 +6,13 @@ Describe 'validate-discovery-artifact-gate.ps1' {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/validate-discovery-artifact-gate.ps1").Path
         . $script:UnderTest
 
-        # Builds a CLAUDE_HOOK_INPUT JSON string carrying a subagent's final
-        # output text.
-        function ConvertTo-DiscoveryHookInput {
+        # Builds a SubagentStop envelope JSON string whose last_assistant_message
+        # carries a subagent's last assistant message.
+        function ConvertTo-DiscoveryEnvelopeJson {
             param(
-                [string] $OutputText
+                [AllowEmptyString()] [string] $AssistantMessage
             )
-            return (@{ output = $OutputText } | ConvertTo-Json -Compress -Depth 8)
+            return ([ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; stop_hook_active = $false; last_assistant_message = $AssistantMessage } | ConvertTo-Json -Compress -Depth 8)
         }
 
         # A required-artifact reader stub that reports the domain-profile
@@ -24,8 +24,8 @@ Describe 'validate-discovery-artifact-gate.ps1' {
         It 'returns Ok = $true and invokes the validator exactly once' {
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
 
-            $json = ConvertTo-DiscoveryHookInput -OutputText 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
-            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload $json -RequiredArtifactReader $script:PresentReader
+            $json = ConvertTo-DiscoveryEnvelopeJson -AssistantMessage 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
+            $result = Invoke-DiscoveryArtifactGateValidation -InputText $json -RequiredArtifactReader $script:PresentReader
 
             $result.Ok | Should -Be $true
             $result.Message | Should -BeNullOrEmpty
@@ -37,8 +37,8 @@ Describe 'validate-discovery-artifact-gate.ps1' {
         It 'returns Ok = $false with the validator text embedded verbatim' {
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'schema violation: missing field x' } }
 
-            $json = ConvertTo-DiscoveryHookInput -OutputText 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
-            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload $json -RequiredArtifactReader $script:PresentReader
+            $json = ConvertTo-DiscoveryEnvelopeJson -AssistantMessage 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
+            $result = Invoke-DiscoveryArtifactGateValidation -InputText $json -RequiredArtifactReader $script:PresentReader
 
             $result.Ok | Should -Be $false
             $result.Message | Should -BeLike 'DISCOVERY_ARTIFACT_GATE_BLOCKED:*'
@@ -50,8 +50,8 @@ Describe 'validate-discovery-artifact-gate.ps1' {
         It 'returns Ok = $true without invoking the validator' {
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
 
-            $json = ConvertTo-DiscoveryHookInput -OutputText 'Completed the assigned task with no artifact writes.'
-            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload $json -RequiredArtifactReader $script:PresentReader
+            $json = ConvertTo-DiscoveryEnvelopeJson -AssistantMessage 'Completed the assigned task with no artifact writes.'
+            $result = Invoke-DiscoveryArtifactGateValidation -InputText $json -RequiredArtifactReader $script:PresentReader
 
             $result.Ok | Should -Be $true
             Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
@@ -62,38 +62,29 @@ Describe 'validate-discovery-artifact-gate.ps1' {
         It 'returns Ok = $true without invoking the validator when the seam reports absent' {
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
 
-            $json = ConvertTo-DiscoveryHookInput -OutputText 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
+            $json = ConvertTo-DiscoveryEnvelopeJson -AssistantMessage 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
             # No -RequiredArtifactReader override: exercises the default seam,
             # which reports the domain profile absent (Present = $false).
-            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload $json
+            $result = Invoke-DiscoveryArtifactGateValidation -InputText $json
 
             $result.Ok | Should -Be $true
             Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
         }
     }
 
-    Context 'empty or absent CLAUDE_HOOK_INPUT' {
-        It 'returns Ok = $false with the documented empty-input message for an empty string' {
-            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload ''
+    Context 'invalid envelope' {
+        It 'returns Ok = $false with a payload anomaly message for empty input text' {
+            $result = Invoke-DiscoveryArtifactGateValidation -InputText ''
 
             $result.Ok | Should -Be $false
-            $result.Message | Should -Match 'CLAUDE_HOOK_INPUT is empty'
+            $result.Message | Should -Match 'DISCOVERY_ARTIFACT_GATE_BLOCKED: payload anomaly'
         }
 
-        It 'returns Ok = $false with the documented empty-input message for $null' {
-            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload $null
+        It 'returns Ok = $false with a payload anomaly message for malformed input text' {
+            $result = Invoke-DiscoveryArtifactGateValidation -InputText '{not-json'
 
             $result.Ok | Should -Be $false
-            $result.Message | Should -Match 'CLAUDE_HOOK_INPUT is empty'
-        }
-    }
-
-    Context 'malformed CLAUDE_HOOK_INPUT JSON' {
-        It 'returns Ok = $false with a non-empty message describing the parse failure' {
-            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload '{not-json'
-
-            $result.Ok | Should -Be $false
-            $result.Message | Should -Not -BeNullOrEmpty
+            $result.Message | Should -Match 'DISCOVERY_ARTIFACT_GATE_BLOCKED: payload anomaly'
         }
     }
 
@@ -101,8 +92,8 @@ Describe 'validate-discovery-artifact-gate.ps1' {
         It 'returns Ok = $false identically to any other non-conforming result' {
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'ModuleNotFoundError: No module named scripts.dev_tools.validate_discovery_artifacts' } }
 
-            $json = ConvertTo-DiscoveryHookInput -OutputText 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
-            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload $json -RequiredArtifactReader $script:PresentReader
+            $json = ConvertTo-DiscoveryEnvelopeJson -AssistantMessage 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
+            $result = Invoke-DiscoveryArtifactGateValidation -InputText $json -RequiredArtifactReader $script:PresentReader
 
             $result.Ok | Should -Be $false
         }
@@ -115,11 +106,11 @@ Describe 'validate-discovery-artifact-gate.ps1' {
         }
     }
 
-    Context 'payload with no output field' {
-        It 'returns Ok = $true without invoking the validator when the payload carries no output property' {
+    Context 'empty assistant message' {
+        It 'returns Ok = $true without invoking the validator when last_assistant_message is an empty string' {
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
 
-            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload '{"other":"value"}' -RequiredArtifactReader $script:PresentReader
+            $result = Invoke-DiscoveryArtifactGateValidation -InputText (ConvertTo-DiscoveryEnvelopeJson -AssistantMessage '') -RequiredArtifactReader $script:PresentReader
 
             $result.Ok | Should -Be $true
             Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
@@ -137,38 +128,6 @@ Describe 'validate-discovery-artifact-gate.ps1' {
         }
     }
 
-    Context 'script entrypoint (end-to-end)' {
-        BeforeAll {
-            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
-                (Get-Process -Id $PID).Path
-            } else {
-                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
-            }
-        }
-
-        It 'exits 0 when the subagent output references no discovery artifact' {
-            $prev = $env:CLAUDE_HOOK_INPUT
-            try {
-                $env:CLAUDE_HOOK_INPUT = '{"output":"Completed the assigned task with no artifact writes."}'
-                $null = & $script:PwshExe -NoProfile -File $script:UnderTest 2>&1
-                $LASTEXITCODE | Should -Be 0
-            } finally {
-                $env:CLAUDE_HOOK_INPUT = $prev
-            }
-        }
-
-        It 'exits 1 with a Write-Error when CLAUDE_HOOK_INPUT is empty' {
-            $prev = $env:CLAUDE_HOOK_INPUT
-            try {
-                $env:CLAUDE_HOOK_INPUT = ''
-                $null = & $script:PwshExe -NoProfile -File $script:UnderTest 2>&1
-                $LASTEXITCODE | Should -Be 1
-            } finally {
-                $env:CLAUDE_HOOK_INPUT = $prev
-            }
-        }
-    }
-
     Context 'defect D-2 avoidance: a passing validation must yield an Ok result' {
         It 'returns Ok = $true when the validator reports success with EMPTY output' {
             # This is the shape the portable module now returns on success. The gate
@@ -176,8 +135,8 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             # silent for a passing validation to be accepted.
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
 
-            $json = ConvertTo-DiscoveryHookInput -OutputText 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
-            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload $json -RequiredArtifactReader $script:PresentReader
+            $json = ConvertTo-DiscoveryEnvelopeJson -AssistantMessage 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
+            $result = Invoke-DiscoveryArtifactGateValidation -InputText $json -RequiredArtifactReader $script:PresentReader
 
             $result.Ok | Should -Be $true
             $result.Message | Should -BeNullOrEmpty
@@ -191,8 +150,8 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             # module's empty-output success contract, not a relaxed gate.
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = 'coverage-ledger validation passed: discovery/coverage-ledger/coverage-ledger.json' } }
 
-            $json = ConvertTo-DiscoveryHookInput -OutputText 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
-            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload $json -RequiredArtifactReader $script:PresentReader
+            $json = ConvertTo-DiscoveryEnvelopeJson -AssistantMessage 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
+            $result = Invoke-DiscoveryArtifactGateValidation -InputText $json -RequiredArtifactReader $script:PresentReader
 
             $result.Ok | Should -Be $false
             $result.Message | Should -BeLike 'DISCOVERY_ARTIFACT_GATE_BLOCKED:*'
@@ -202,10 +161,198 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             # The gate treats whitespace-only output as empty.
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = "   " } }
 
-            $json = ConvertTo-DiscoveryHookInput -OutputText 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
-            $result = Invoke-DiscoveryArtifactGateValidation -RawPayload $json -RequiredArtifactReader $script:PresentReader
+            $json = ConvertTo-DiscoveryEnvelopeJson -AssistantMessage 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
+            $result = Invoke-DiscoveryArtifactGateValidation -InputText $json -RequiredArtifactReader $script:PresentReader
 
             $result.Ok | Should -Be $true
+        }
+    }
+
+    Context 'script entrypoint (stdin envelope, issue #905)' {
+        BeforeAll {
+            $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
+                (Get-Process -Id $PID).Path
+            } else {
+                (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+            }
+            $script:FailingArtifactText = 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
+
+            function New-SubagentStopEnvelopeJson {
+                # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds and returns envelope JSON text only; it changes no system state.')]
+                param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
+                $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'general-purpose'; stop_hook_active = [bool]$StopHookActive }
+                if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }
+                if ($PSBoundParameters.ContainsKey('OutputField')) { $envelope['output'] = $OutputField }
+                return ($envelope | ConvertTo-Json -Compress)
+            }
+
+            function Invoke-DiscoveryStdinEntry {
+                # Drives the hook through the & route with stdin and stderr redirected; both are restored in finally.
+                param([AllowEmptyString()] [string] $Stdin)
+                $ErrorActionPreference = 'Continue'
+                $priorIn = [System.Console]::In
+                $priorError = [System.Console]::Error
+                $errorWriter = [System.IO.StringWriter]::new()
+                $thrown = $null
+                $exitCode = $null
+                try {
+                    [System.Console]::SetIn([System.IO.StringReader]::new($Stdin))
+                    [System.Console]::SetError($errorWriter)
+                    $global:LASTEXITCODE = 0
+                    try { $null = & $script:UnderTest 2>&1 } catch { $thrown = $_ }
+                    $exitCode = $LASTEXITCODE
+                }
+                finally {
+                    [System.Console]::SetIn($priorIn)
+                    [System.Console]::SetError($priorError)
+                }
+                return [pscustomobject]@{ ExitCode = $exitCode; Stderr = $errorWriter.ToString(); Thrown = $thrown }
+            }
+        }
+
+        It 'exits 2 with a DISCOVERY_ARTIFACT_GATE_BLOCKED reason on stderr when last_assistant_message references a failing artifact' -Tag 'E3-Entry' {
+            # Arrange: a present declaration and a validator that rejects the referenced artifact.
+            Mock Get-RequiredDiscoveryArtifactDeclaration { @{ Present = $true; Declaration = @{ types = @('coverage-ledger') } } }
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'schema violation: missing field x' } }
+            # Act
+            $result = Invoke-DiscoveryStdinEntry -Stdin (New-SubagentStopEnvelopeJson -AssistantMessage $script:FailingArtifactText)
+            # Assert
+            $result.Thrown | Should -BeNullOrEmpty
+            $result.ExitCode | Should -Be 2
+            $result.Stderr | Should -Match 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+        }
+
+        It 'exits 0 when last_assistant_message references a conforming artifact' -Tag 'E3-Entry' {
+            # Arrange: a present declaration and a validator that accepts the referenced artifact.
+            Mock Get-RequiredDiscoveryArtifactDeclaration { @{ Present = $true; Declaration = @{ types = @('coverage-ledger') } } }
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
+            # Act
+            $result = Invoke-DiscoveryStdinEntry -Stdin (New-SubagentStopEnvelopeJson -AssistantMessage $script:FailingArtifactText)
+            # Assert
+            $result.Thrown | Should -BeNullOrEmpty
+            $result.ExitCode | Should -Be 0
+            $result.Stderr | Should -BeNullOrEmpty
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 1 -Exactly
+        }
+
+        It 'exits 0 when last_assistant_message carries no discovery artifact reference' -Tag 'E3-Entry' {
+            # Arrange: a message without any discovery/<type> token.
+            $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'Completed the assigned task with no artifact writes.'
+            # Act
+            $result = Invoke-DiscoveryStdinEntry -Stdin $stdin
+            # Assert
+            $result.Thrown | Should -BeNullOrEmpty
+            $result.ExitCode | Should -Be 0
+            $result.Stderr | Should -BeNullOrEmpty
+        }
+
+        It 'exits 0 when last_assistant_message is an empty string' -Tag 'E3-Entry' {
+            # Arrange: a valid envelope with a blank assistant message.
+            $stdin = New-SubagentStopEnvelopeJson -AssistantMessage ''
+            # Act
+            $result = Invoke-DiscoveryStdinEntry -Stdin $stdin
+            # Assert
+            $result.Thrown | Should -BeNullOrEmpty
+            $result.ExitCode | Should -Be 0
+            $result.Stderr | Should -BeNullOrEmpty
+        }
+
+        It 'exits 0 when the required-artifact declaration is absent' -Tag 'E3-Entry' {
+            # Arrange: the default reader reports the declaration absent; the validator must not run.
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'schema violation: missing field x' } }
+            # Act
+            $result = Invoke-DiscoveryStdinEntry -Stdin (New-SubagentStopEnvelopeJson -AssistantMessage $script:FailingArtifactText)
+            # Assert
+            $result.Thrown | Should -BeNullOrEmpty
+            $result.ExitCode | Should -Be 0
+            $result.Stderr | Should -BeNullOrEmpty
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
+        }
+
+        It 'blocks with a payload anomaly when the artifact reference is supplied only in an output field or through CLAUDE_HOOK_INPUT' -Tag 'E3-Entry' {
+            # Arrange: the reference appears only in an output key and in the environment variable.
+            Mock Get-RequiredDiscoveryArtifactDeclaration { @{ Present = $true; Declaration = @{ types = @('coverage-ledger') } } }
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'schema violation: missing field x' } }
+            $priorInput = $env:CLAUDE_HOOK_INPUT
+            try {
+                $env:CLAUDE_HOOK_INPUT = '{"output":"' + $script:FailingArtifactText + '"}'
+                # Act
+                $result = Invoke-DiscoveryStdinEntry -Stdin (New-SubagentStopEnvelopeJson -OmitAssistantMessage -OutputField $script:FailingArtifactText)
+            }
+            finally { $env:CLAUDE_HOOK_INPUT = $priorInput }
+            # Assert
+            $result.Thrown | Should -BeNullOrEmpty
+            $result.ExitCode | Should -Be 2
+            $result.Stderr | Should -Match 'payload anomaly'
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
+        }
+
+        It 'exits 2 with a payload anomaly reason for empty stdin' -Tag 'E3-Entry' {
+            # Arrange and act: no stdin content.
+            $result = Invoke-DiscoveryStdinEntry -Stdin ''
+            # Assert
+            $result.Thrown | Should -BeNullOrEmpty
+            $result.ExitCode | Should -Be 2
+            $result.Stderr | Should -Match 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+            $result.Stderr | Should -Match 'payload anomaly'
+        }
+
+        It 'exits 2 with a payload anomaly reason for malformed stdin' -Tag 'E3-Entry' {
+            # Arrange and act: stdin that is not JSON.
+            $result = Invoke-DiscoveryStdinEntry -Stdin '{not-json'
+            # Assert
+            $result.Thrown | Should -BeNullOrEmpty
+            $result.ExitCode | Should -Be 2
+            $result.Stderr | Should -Match 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+            $result.Stderr | Should -Match 'payload anomaly'
+        }
+
+        It 'exits 2 with a payload anomaly reason when last_assistant_message is absent' -Tag 'E3-Entry' {
+            # Arrange and act: an envelope without last_assistant_message.
+            $result = Invoke-DiscoveryStdinEntry -Stdin (New-SubagentStopEnvelopeJson -OmitAssistantMessage)
+            # Assert
+            $result.Thrown | Should -BeNullOrEmpty
+            $result.ExitCode | Should -Be 2
+            $result.Stderr | Should -Match 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+            $result.Stderr | Should -Match 'payload anomaly'
+        }
+
+        It 'keeps validating when stop_hook_active is true' -Tag 'E3-Entry' {
+            # Arrange: a re-entry envelope that still references a failing artifact.
+            Mock Get-RequiredDiscoveryArtifactDeclaration { @{ Present = $true; Declaration = @{ types = @('coverage-ledger') } } }
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'schema violation: missing field x' } }
+            # Act
+            $result = Invoke-DiscoveryStdinEntry -Stdin (New-SubagentStopEnvelopeJson -AssistantMessage $script:FailingArtifactText -StopHookActive)
+            # Assert
+            $result.Thrown | Should -BeNullOrEmpty
+            $result.ExitCode | Should -Be 2
+            $result.Stderr | Should -Match 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+        }
+
+        It 'exits 2 in a separate process when stdin is not a JSON envelope' -Tag 'E3-Entry' {
+            # Arrange
+            $stdinText = '{not-json'
+            # Act
+            $global:LASTEXITCODE = 0
+            $null = $stdinText | & $script:PwshExe -NoProfile -File $script:UnderTest 2>&1
+            # Assert
+            $LASTEXITCODE | Should -Be 2
+        }
+    }
+
+    Context 'Find-DiscoveryArtifactReference rule R4 (issue #905)' {
+        It 'R4 skips a token that is empty after trimming' {
+            # Arrange: two double-quote characters form one token that is empty after trimming.
+            $text = 'Wrote "" and discovery/coverage-ledger/coverage-ledger.json'
+            $thrown = $null
+            $references = $null
+            # Act
+            try { $references = @(Find-DiscoveryArtifactReference -OutputText $text -ErrorAction Stop) } catch { $thrown = $_ }
+            # Assert
+            $thrown | Should -BeNullOrEmpty
+            $references | Should -HaveCount 1
+            $references[0] | Should -BeExactly 'discovery/coverage-ledger/coverage-ledger.json'
         }
     }
 }

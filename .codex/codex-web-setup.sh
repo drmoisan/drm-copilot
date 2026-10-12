@@ -26,6 +26,7 @@ select_solution_file() {
 # Print the names of the solution files at the root of a directory, one per line.
 # Args: $1 = directory.
 list_root_solution_files() {
+	# GNU find is required: -printf is a GNU extension, and other find implementations fail with the error hidden by 2>/dev/null.
 	find "$1" -maxdepth 1 -type f -name '*.sln' -printf '%f\n' 2>/dev/null
 }
 
@@ -45,6 +46,20 @@ fail() {
 
 warn() {
 	printf '[codex-web-setup] warning: %s\n' "$*" >&2
+}
+
+# Log the selected solution file and the number of root solution files found; log nothing
+# when no solution file is listed.
+# Args: $1 = solution file names, one per line; $2 = the selected solution file name.
+log_solution_selection() {
+	local listing="$1"
+	local selected="$2"
+	local count=""
+
+	if [ -n "${listing}" ]; then
+		count="$(printf '%s\n' "${listing}" | sed -n '$=')"
+		log "Selected solution file ${selected}; root *.sln files found: ${count}."
+	fi
 }
 
 read_global_json_sdk_version() {
@@ -379,6 +394,7 @@ EOF
 
 main() {
 	log "Bootstrapping a Codex Web environment for ${REPO_ROOT}"
+	log_solution_selection "$(list_root_solution_files "${REPO_ROOT}")" "${SOLUTION_FILE}"
 
 	export CI=true
 	export DOTNET_CLI_TELEMETRY_OPTOUT=1
