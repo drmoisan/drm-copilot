@@ -42,11 +42,15 @@ PARALLEL_ORCHESTRATE_SKILL = Path(".claude/skills/parallel-orchestrate/SKILL.md"
 ORCHESTRATE_SKILL = Path(".claude/skills/orchestrate/SKILL.md")
 LIFECYCLE_SKILL = Path(".claude/skills/feature-promotion-lifecycle/SKILL.md")
 ORCHESTRATOR_STATE_RULE = Path(".claude/rules/orchestrator-state.md")
+PARALLEL_ADD_SKILL = Path(".claude/skills/parallel-add/SKILL.md")
 
 ITEM_INTAKE_HEADING = "## Item Intake"
 FAN_OUT_HEADING = "## Preparation Fan-Out"
 KICKOFF_PARAMETER_HEADING = "## Parallel-Mode Kickoff Parameter"
 INVARIANTS_HEADING = "## Invariants (issue_adoption object)"
+PROCEDURE_HEADING = "## Procedure"
+STEP_TWO_START = "2. **Prepare the item.**"
+STEP_THREE_START = "3. **Compute conflict edges"
 
 ADOPTION_LINE_PREFIX = "> `Issue adoption:"
 INTAKE_FRAGMENT = "Issue-number items are adopted, not promoted."
@@ -64,6 +68,16 @@ SHARED_RECORD_FRAGMENTS: tuple[str, ...] = (
 PROMOTED_RECORD_FRAGMENT = (
     "A lifecycle record moved to `docs/features/potential/promoted/` satisfies "
     "the `potential_record` path rule"
+)
+
+# The quoted issue-adoption line in parallel-add step 2, matched on collapsed text.
+ADOPTION_SPAN = re.compile(r"`(Issue adoption:[^`]*)`")
+CONDITION_FRAGMENT = "an issue-number item, the preparation delegation prompt"
+OMISSION_FRAGMENT = "omitted for a potential-entry item, whose child promotes it"
+STEP_TWO_ADOPTION_FRAGMENTS: tuple[str, ...] = (
+    "Verify it read-only (gh issue view)",
+    "do not call potential_to_issue or the promotion-entry tool",
+    "record a top-level issue_adoption object",
 )
 
 # The issue-number shape the preimplementation-gate hook resolves from a prompt.
@@ -131,7 +145,58 @@ def _element_four_text() -> str:
     return "\n".join(lines[starts[0] : ends[0]])
 
 
+def _parallel_add_step_two_text() -> str:
+    """Return step 2 of the parallel-add ``## Procedure`` list, joined.
+
+    Raises:
+        AssertionError: If the step 2 or step 3 line cannot be located.
+    """
+
+    section = extract_section(read_repo_text(PARALLEL_ADD_SKILL), PROCEDURE_HEADING)
+    lines = section.splitlines()
+    starts = [
+        index for index, line in enumerate(lines) if line.startswith(STEP_TWO_START)
+    ]
+    ends = [
+        index for index, line in enumerate(lines) if line.startswith(STEP_THREE_START)
+    ]
+    if len(starts) != 1 or len(ends) != 1 or ends[0] <= starts[0]:
+        raise AssertionError(
+            f"parallel-add step 2 boundaries not found: starts={starts}, ends={ends}"
+        )
+    return "\n".join(lines[starts[0] : ends[0]])
+
+
+def _step_two_adoption_text() -> str:
+    """Return the quoted issue-adoption line from parallel-add step 2, collapsed.
+
+    Raises:
+        AssertionError: If step 2 does not hold exactly one quoted adoption span.
+    """
+
+    collapsed = collapse_whitespace(_parallel_add_step_two_text())
+    spans = ADOPTION_SPAN.findall(collapsed)
+    if len(spans) != 1:
+        raise AssertionError(
+            "expected exactly one quoted adoption span in parallel-add step 2, "
+            f"found {len(spans)}"
+        )
+    return spans[0]
+
+
+def _step_two_text_requiring_adoption() -> str:
+    """Return step 2 text, failing when the adoption span is absent.
+
+    A text-exclusion check over step 2 as it stood before the adoption sentence
+    was added would pass without examining any added text, so presence is first.
+    """
+
+    _step_two_adoption_text()
+    return _parallel_add_step_two_text()
+
+
 ADDED_TEXT_SOURCES: dict[str, Callable[[], str]] = {
+    "parallel-add-step-two": _step_two_text_requiring_adoption,
     "parallel-plan-adoption-line": _adoption_line,
     "parallel-orchestrate-element-four": _element_four_text,
 }
@@ -266,3 +331,58 @@ def test_skill_states_origin_conditional_potential_record(skill_id: str) -> None
     # Assert
     for fragment in SHARED_RECORD_FRAGMENTS:
         assert fragment in collapsed, f"{skill_id} skill lacks: {fragment}"
+
+
+def test_parallel_add_step_two_carries_issue_adoption_instruction() -> None:
+    """Step 2 tells the preparation child to adopt the issue read-only."""
+
+    # Arrange
+    adoption = _step_two_adoption_text()
+
+    # Act / Assert
+    for fragment in STEP_TWO_ADOPTION_FRAGMENTS:
+        assert fragment in adoption, f"step 2 adoption text lacks: {fragment}"
+
+
+def test_parallel_add_step_two_adoption_line_equals_parallel_plan_line() -> None:
+    """Step 2 quotes the parallel-plan adoption line after whitespace collapse."""
+
+    # Arrange
+    plan_line = collapse_whitespace(_adoption_line())
+
+    # Act
+    expected = plan_line.removeprefix("> `").removesuffix("`")
+    actual = _step_two_adoption_text()
+
+    # Assert
+    assert actual == expected, f"parallel-add adoption text drifted: {actual}"
+
+
+def test_parallel_add_step_two_adoption_is_issue_number_only() -> None:
+    """Step 2 conditions the line on issue-number items and omits it otherwise."""
+
+    # Arrange
+    collapsed = collapse_whitespace(_parallel_add_step_two_text())
+    span = ADOPTION_SPAN.search(collapsed)
+
+    # Act
+    condition_at = collapsed.find(CONDITION_FRAGMENT)
+    omission_at = collapsed.find(OMISSION_FRAGMENT)
+
+    # Assert
+    assert span is not None, "parallel-add step 2 lacks the quoted adoption span"
+    assert 0 <= condition_at < span.start(), "condition does not precede the line"
+    assert span.end() < omission_at, "omission does not follow the line"
+
+
+def test_parallel_add_step_two_adoption_carries_no_mode_marker() -> None:
+    """Step 2 carries no epic, parallel, or preparation mode marker."""
+
+    # Arrange
+    text = _step_two_text_requiring_adoption()
+
+    # Act
+    present = [marker for marker in MODE_MARKERS if marker in text]
+
+    # Assert
+    assert present == [], f"parallel-add step 2 carries mode markers: {present}"

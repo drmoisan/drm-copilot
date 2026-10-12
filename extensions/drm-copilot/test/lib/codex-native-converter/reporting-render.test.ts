@@ -103,4 +103,46 @@ describe("coverage: reporting-render.ts", () => {
       "- `C1`: msg-four",
     ]);
   });
+
+  it("889-null-arm: sorts a null trace target path before a non-null one in both input orders", () => {
+    // Arrange: equal source, section, and role, so the target path decides;
+    // both input orders exercise the null default on each operand.
+    const nonNull = trace("second", TargetRole.SHARED_SKILL, "a/SKILL.md");
+    const nullPath = trace("first", TargetRole.SHARED_SKILL, null);
+    const inputOrders = [
+      [nonNull, nullPath],
+      [nullPath, nonNull],
+    ];
+
+    for (const traces of inputOrders) {
+      // Act
+      const report = renderConversionReport(RUN_OPTIONS, [], [], traces, []);
+
+      // Assert: the null-path trace renders first.
+      const first = report.indexOf("`first`");
+      expect(first).toBeGreaterThan(-1);
+      expect(first).toBeLessThan(report.indexOf("`second`"));
+    }
+  });
+
+  it("889-null-arm: sorts a null finding target path before a non-null one in both input orders", () => {
+    // Arrange: equal code and source path, so the target path decides.
+    const nonNull = finding("C", "a.md", "z.md", "two");
+    const nullPath = finding("C", "a.md", null, "one");
+    const inputOrders = [
+      [nonNull, nullPath],
+      [nullPath, nonNull],
+    ];
+
+    for (const findings of inputOrders) {
+      // Act
+      const report = renderConversionReport(RUN_OPTIONS, [], [], [], findings);
+
+      // Assert
+      const lines = report
+        .split("\n")
+        .filter((line) => line.startsWith("- `C`:"));
+      expect(lines).toEqual(["- `C`: one", "- `C`: two"]);
+    }
+  });
 });

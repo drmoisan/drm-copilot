@@ -1,5 +1,6 @@
 /** Deterministic Codex topology receipt validation and delegation gates. */
 
+import { compareCodePoint } from "../string-ordering";
 import {
   resolveCodexTopology,
   type CodexTopologyReceipt,
@@ -296,7 +297,7 @@ export function validateCodexTopologyGate(
       errors.push(
         "Checkpoint delegation_receipts is missing the exact resolved " +
           `topology agent for ${receipt.logical_agent}: ` +
-          `${[...allowedNames].sort().join(", ")}.`,
+          `${[...allowedNames].sort(compareCodePoint).join(", ")}.`,
       );
     }
   }

@@ -289,6 +289,50 @@ describe("validateOrchestratorStateText delegation receipts", () => {
     // Assert
     expect(errors).toEqual([]);
   });
+
+  it("889-cp-order: reports unsupported top-level keys in code-point order (U+FF5E before U+1F600)", () => {
+    // Arrange: supplementary-plane key inserted first.
+    const supplementary = "\u{1F600}";
+    const highBmp = "～";
+    const state = buildValidState();
+    state["delegation_receipts"] = { [supplementary]: {}, [highBmp]: {} };
+
+    // Act
+    const errors = validateOrchestratorStateText(JSON.stringify(state));
+
+    // Assert
+    expect(
+      errors.filter((error) =>
+        error.includes("object contains unsupported key:"),
+      ),
+    ).toEqual([
+      `Checkpoint delegation_receipts object contains unsupported key: ${highBmp}`,
+      `Checkpoint delegation_receipts object contains unsupported key: ${supplementary}`,
+    ]);
+  });
+
+  it("889-cp-order: reports unsupported promotion keys in code-point order (U+FF5E before U+1F600)", () => {
+    // Arrange: supplementary-plane nested key inserted first.
+    const supplementary = "\u{1F600}";
+    const highBmp = "～";
+    const state = buildValidState();
+    state["delegation_receipts"] = {
+      promotion: { [supplementary]: {}, [highBmp]: {} },
+    };
+
+    // Act
+    const errors = validateOrchestratorStateText(JSON.stringify(state));
+
+    // Assert
+    expect(
+      errors.filter((error) =>
+        error.includes("promotion contains unsupported key:"),
+      ),
+    ).toEqual([
+      `Checkpoint delegation_receipts.promotion contains unsupported key: ${highBmp}`,
+      `Checkpoint delegation_receipts.promotion contains unsupported key: ${supplementary}`,
+    ]);
+  });
 });
 
 describe("validateOrchestratorStateText optional blocks", () => {

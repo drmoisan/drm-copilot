@@ -1,3 +1,4 @@
+import { compareCodePoint } from "../string-ordering";
 import type { TreeNode } from "./types";
 
 /**
@@ -26,7 +27,7 @@ export function formatTree(node: TreeNode): string {
  */
 function renderLines(node: TreeNode): string[] {
   const indent = "  ".repeat(node.depth);
-  const sortedModels = [...node.models].sort();
+  const sortedModels = [...node.models].sort(compareCodePoint);
   const line = `${indent}${node.agentType} · [${sortedModels.join(",")}] · ${node.depth} · ${node.description}`;
   const childLines = node.children.flatMap((child) => renderLines(child));
   return [line, ...childLines];
