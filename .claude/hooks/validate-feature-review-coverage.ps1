@@ -74,11 +74,16 @@ function Invoke-FeatureReviewCoverageValidation {
         return @{ Ok = $false; Message = ('validate-feature-review-coverage: payload anomaly - ' + (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)) }
     }
 
+    # A single-pass do-while block carries the validation so that each finding exits with break; a
+    # script-block invocation would be a non-constant command position, which the enforcement-hook
+    # invocation scan rejects as unverifiable.
+    $finding = $null
     try {
-        $finding = & {
+        do {
             $agentOutput = [string]$envelope.AssistantText
             if ([string]::IsNullOrWhiteSpace($agentOutput)) {
-                return @{ Message = 'validate-feature-review-coverage: agent output is empty; feature-review must report required artifact paths before termination.'; HasRepairable = $true; HasNonRepairable = $false }
+                $finding = @{ Message = 'validate-feature-review-coverage: agent output is empty; feature-review must report required artifact paths before termination.'; HasRepairable = $true; HasNonRepairable = $false }
+                break
             }
 
             $requiredArtifacts = @(
@@ -142,19 +147,21 @@ function Invoke-FeatureReviewCoverageValidation {
 
             if ($errors.Count -gt 0) {
                 $message = "validate-feature-review-coverage: required review artifact validation failed:`n  - " + ($errors -join "`n  - ")
-                return @{ Message = $message; HasRepairable = $true; HasNonRepairable = $false }
+                $finding = @{ Message = $message; HasRepairable = $true; HasNonRepairable = $false }
+                break
             }
 
             $prSummary = Get-ArtifactFileContent -Path 'artifacts/pr_context.summary.txt'
             $changedLanguages = if ($prSummary.Exists) { Get-ChangedLanguageSet -Lines $prSummary.Lines } else { [ordered]@{} }
             if ($changedLanguages.Count -eq 0) {
-                return $null
+                break
             }
 
             $policyAuditText = $artifactMeta['policy-audit'].Text
             $claudeMd = Get-FeatureReviewClaudeMdText
             if ($null -ne $claudeMd.ReadError) {
-                return @{ Message = "validate-feature-review-coverage: root CLAUDE.md exists but could not be read ($($claudeMd.ReadError)); coverage floors cannot be resolved, so the gate fails closed."; HasRepairable = $false; HasNonRepairable = $true }
+                $finding = @{ Message = "validate-feature-review-coverage: root CLAUDE.md exists but could not be read ($($claudeMd.ReadError)); coverage floors cannot be resolved, so the gate fails closed."; HasRepairable = $false; HasNonRepairable = $true }
+                break
             }
             $thresholds = Get-FeatureReviewCoverageThreshold -ClaudeMdText $claudeMd.Text
             $coverageFailures = [System.Collections.Generic.List[hashtable]]::new()
@@ -171,11 +178,9 @@ function Invoke-FeatureReviewCoverageValidation {
                 $message = "validate-feature-review-coverage: coverage validation failed against branch diff:`n  - " + (@($coverageFailures | ForEach-Object { $_.Reason }) -join "`n  - ")
                 $hasRepairable = @($coverageFailures | Where-Object { $_.Repairable -eq $true }).Count -gt 0
                 $hasNonRepairable = @($coverageFailures | Where-Object { $_.Repairable -eq $false }).Count -gt 0
-                return @{ Message = $message; HasRepairable = $hasRepairable; HasNonRepairable = $hasNonRepairable }
+                $finding = @{ Message = $message; HasRepairable = $hasRepairable; HasNonRepairable = $hasNonRepairable }
             }
-
-            return $null
-        }
+        } while ($false)
     }
     catch {
         $finding = @{ Message = ('validate-feature-review-coverage: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.'); HasRepairable = $false; HasNonRepairable = $true }

@@ -22,6 +22,14 @@ Describe 'feature-review coverage floor parity (issue #896)' {
         $script:ClaudeHook = Join-Path $script:RepoRoot '.claude/hooks/validate-feature-review-coverage.ps1'
         $script:CodexHook = Join-Path $script:RepoRoot '.codex/hooks/validate-feature-review-coverage.ps1'
 
+        # Baseline isolation for the closure seams of the two hooks (epic-state discovery guard): no
+        # seam reads live repository state. The parity cases call only the resolver and the row rule.
+        . $script:ClaudeHook
+        Mock Get-ArtifactFileContent { $null }
+        if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Mock Get-ChangedLanguageSet { $null } }
+        if (Get-Command Get-JacocoRepoCoverage -ErrorAction SilentlyContinue) { Mock Get-JacocoRepoCoverage { $null } }
+        if (Get-Command Get-LcovRepoCoverage -ErrorAction SilentlyContinue) { Mock Get-LcovRepoCoverage { $null } }
+
         function Get-FloorFromReason {
             # Returns the line floor a failing-row reason cites, or $null when none is cited.
             param([string] $Reason)
