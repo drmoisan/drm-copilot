@@ -1,5 +1,6 @@
 /** Git provenance checks for execution-ready epic planning. */
 
+import { compareCodePoint } from "../string-ordering";
 import type { CommandRunner } from "../subprocess-runner";
 import type { ParsedEpicKickoff } from "./epic-kickoff-artifact";
 
@@ -281,7 +282,7 @@ export function validatePlanningGitIntegrity(
   });
   for (const extra of Object.keys(integrity.planHashes)
     .filter((path) => !plans.includes(path))
-    .sort()) {
+    .sort(compareCodePoint)) {
     errors.push(
       `Optional plan_hashes contains unknown planner path: '${extra}'.`,
     );

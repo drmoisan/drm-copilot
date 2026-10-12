@@ -90,6 +90,25 @@ describe("Codex loadPackManifests", () => {
       loadPackManifests(MANIFEST_DIR, new Set(["core"]), fs),
     ).toThrow(message);
   });
+
+  it("889-cp-order: lists unknown pack names in code-point order (U+FF5E before U+1F600)", () => {
+    // Arrange: supplementary-plane name inserted first.
+    const supplementary = "\u{1F600}";
+    const highBmp = "～";
+
+    // Act
+    const act = (): unknown =>
+      loadPackManifests(
+        MANIFEST_DIR,
+        new Set([supplementary, highBmp]),
+        buildInMemoryFileSystem(),
+      );
+
+    // Assert: exact message with the U+FF5E name first.
+    expect(act).toThrow(
+      new ManifestError("Unknown Codex pack name(s): ～,\u{1F600}"),
+    );
+  });
 });
 
 describe("Codex computePublishedPaths", () => {
@@ -147,6 +166,21 @@ describe("Codex resolveManifestPackNames", () => {
   it("rejects unknown public pack names", () => {
     expect(() => resolveManifestPackNames(new Set(["ruby"]), "modern")).toThrow(
       "Unknown Codex pack",
+    );
+  });
+
+  it("889-cp-order: lists unknown public pack names in code-point order (U+FF5E before U+1F600)", () => {
+    // Arrange: supplementary-plane name inserted first.
+    const supplementary = "\u{1F600}";
+    const highBmp = "～";
+
+    // Act
+    const act = (): unknown =>
+      resolveManifestPackNames(new Set([supplementary, highBmp]), "modern");
+
+    // Assert: exact message with the U+FF5E name first.
+    expect(act).toThrow(
+      new ManifestError("Unknown Codex pack name(s): ～,\u{1F600}"),
     );
   });
 });

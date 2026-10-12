@@ -1,3 +1,4 @@
+import { compareCodePoint } from "../string-ordering";
 import { type PushDownFileSystem } from "./filesystem-adapter";
 
 export const CORE_PACK_NAME = "core";
@@ -63,12 +64,14 @@ export function loadPackManifests(
     (name) => !MANIFEST_PACK_NAMES.has(name),
   );
   if (unknown.length > 0) {
-    throw new ManifestError(`Unknown Codex pack name(s): ${unknown.sort()}`);
+    throw new ManifestError(
+      `Unknown Codex pack name(s): ${unknown.sort(compareCodePoint)}`,
+    );
   }
   const namesToLoad = new Set<string>(selectedPackNames);
   namesToLoad.add(CORE_PACK_NAME);
   const manifests = new Map<string, PackManifest>();
-  for (const name of [...namesToLoad].sort()) {
+  for (const name of [...namesToLoad].sort(compareCodePoint)) {
     const manifestPath = joinPosix(manifestDir, `${name}.json`);
     if (!fs.isFile(manifestPath)) {
       throw new ManifestError(
@@ -97,7 +100,7 @@ export function resolveManifestPackNames(
   if (variantSpecific.length > 0) {
     throw new ManifestError(
       "Use public Codex pack 'csharp' with csharpVariant instead of " +
-        `variant-specific pack name(s): ${variantSpecific.sort().join(", ")}.`,
+        `variant-specific pack name(s): ${variantSpecific.sort(compareCodePoint).join(", ")}.`,
     );
   }
 
@@ -105,7 +108,9 @@ export function resolveManifestPackNames(
     (name) => !SUPPORTED_PACK_NAMES.has(name),
   );
   if (unknown.length > 0) {
-    throw new ManifestError(`Unknown Codex pack name(s): ${unknown.sort()}`);
+    throw new ManifestError(
+      `Unknown Codex pack name(s): ${unknown.sort(compareCodePoint)}`,
+    );
   }
 
   const manifestNames = new Set(selectedPackNames);
@@ -229,7 +234,7 @@ export function assertSingleCsharpToolchain(
 ): void {
   const selectedCsharp = [...selectedPackNames]
     .filter((name) => CSHARP_PACK_NAMES.has(name))
-    .sort();
+    .sort(compareCodePoint);
   if (selectedCsharp.length > 1) {
     throw new ManifestError(
       "C# mutual exclusion violated: both modern and legacy Codex C# packs were " +
