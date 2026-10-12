@@ -104,3 +104,14 @@ Push refspec (branch substitution 1): `git push origin HEAD:bug/subagentstop-env
 - Commit: c45e420c799a8a66c0b9e715d9377983421ff6aa (`docs(905): record cross-hook verification evidence`)
 - Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`489b66cdf..c45e420c7`)
 - Post-commit `git status --porcelain`: (empty)
+
+## [P12-T1] Integration re-sync merge
+
+- Merge commit: 1b0ca6cde618fd7a492300c01063068764a62060 (`Merge origin/epic/subagentstop-envelope-integration into bug/subagentstop-envelope-artifact-gates-exec-905`); pushed with the Phase 12 commit.
+
+## [P12-T22] Phase 12
+
+- Pre-commit `git status --porcelain`: seven W-SUITES-CHANGED files modified (loop pass 1 lint fix); deviations, batch-budget-resets, commits, plan, spec modified; new Phase 12 evidence under `evidence/qa-gates/` and `evidence/other/` (all within W-ALLOWED).
+- Commit: 444baa6e3f03aada34051bdfdeec8b30aec66268 (`test(905): record the final QA loop and suppress the builder ShouldProcess warning`)
+- Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`c45e420c7..444baa6e3`)
+- Post-commit `git status --porcelain`: (empty)
