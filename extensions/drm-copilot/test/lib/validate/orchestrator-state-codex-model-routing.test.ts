@@ -373,4 +373,26 @@ describe("Codex model-routing checkpoint receipts", () => {
     // Assert
     expect(absent).toEqual(explicitFalse);
   });
+
+  it("889-cp-order: reports missing receipts in code-point order (U+FF5E before U+1F600)", () => {
+    // Arrange: supplementary-plane agent delegated first.
+    const supplementary = "\u{1F600}";
+    const highBmp = "～";
+    const state: Record<string, unknown> = {
+      delegation_receipts: [
+        { agent_name: supplementary },
+        { agent_name: highBmp },
+      ],
+      codex_model_routing_receipts: [],
+    };
+
+    // Act
+    const errors = validateCodexModelRoutingGate(state);
+
+    // Assert
+    expect(errors).toEqual([
+      `Checkpoint codex_model_routing_receipts is missing a receipt for delegated agent: ${highBmp}.`,
+      `Checkpoint codex_model_routing_receipts is missing a receipt for delegated agent: ${supplementary}.`,
+    ]);
+  });
 });
