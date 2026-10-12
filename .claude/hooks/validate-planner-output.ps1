@@ -233,7 +233,7 @@ function Get-PlanStructureValidationReport {
     [OutputType([string[]])]
     param(
         [Parameter(Mandatory = $true)]
-        [string[]] $Lines
+        [AllowEmptyString()] [string[]] $Lines
     )
 
     $phasePattern = '^### Phase (?<Phase>\d+)\s+—\s+(?<Title>.+)$'
@@ -244,12 +244,14 @@ function Get-PlanStructureValidationReport {
     $currentPhase = $null
     $expectedPhase = 0
     $foundTask = $false
+    $insidePhaseSection = $false
 
     for ($i = 0; $i -lt $Lines.Count; $i++) {
         $lineNumber = $i + 1
         $line = $Lines[$i]
 
         if ($line -match '^### Phase ') {
+            $insidePhaseSection = $true
             $phaseMatch = [regex]::Match($line, $phasePattern)
             if (-not $phaseMatch.Success) {
                 $errors.Add("Line ${lineNumber}: phase heading must match `### Phase N — <Title>`.")
@@ -270,10 +272,12 @@ function Get-PlanStructureValidationReport {
             continue
         }
 
+        if ($line -match '^#{1,2} ') { $insidePhaseSection = $false; continue }
         if ($line -notmatch '^- \[') {
             continue
         }
 
+        if (-not $insidePhaseSection -and $line -notmatch $taskPattern) { continue }
         $foundTask = $true
         $taskMatch = [regex]::Match($line, $taskPattern)
         if (-not $taskMatch.Success) {

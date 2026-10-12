@@ -83,7 +83,7 @@ function Test-IsPreflightPlan {
     [OutputType([bool])]
     param(
         [Parameter(Mandatory = $true)]
-        [string[]] $Lines
+        [AllowEmptyString()] [string[]] $Lines
     )
 
     return @($Lines | Where-Object { $_ -match '(?i)^\s*DIRECTIVE:\s*PREFLIGHT VALIDATION ONLY\s*$' }).Count -gt 0
@@ -94,7 +94,7 @@ function Get-TouchedLanguagesFromPlan {
     [OutputType([string[]])]
     param(
         [Parameter(Mandatory = $true)]
-        [string[]] $Lines
+        [AllowEmptyString()] [string[]] $Lines
     )
 
     $languages = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)

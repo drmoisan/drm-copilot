@@ -309,6 +309,24 @@ Describe 'validate-planner-output.ps1' {
 
             ($errors -match 'QA or toolchain validation').Count | Should -BeGreaterThan 0
         }
+
+        It 'CORPUS-PLN-1 ignores a non-task checkbox line under a level-2 heading after the final phase' {
+            $lines = @(
+                "### Phase 0 `u{2014} Baseline",
+                '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record docs/features/active/foo/evidence/baseline/phase0-instructions-read.md',
+                '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/baseline/pester.md',
+                "### Phase 1 `u{2014} Implement",
+                '- [ ] [P1-T1] Update .claude/hooks/validate-planner-output.ps1 and tests/scripts/claude-hooks/validate-planner-output.Tests.ps1',
+                "### Phase 2 `u{2014} Final QA",
+                '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md',
+                '', '## Preflight Checklist',
+                '- [x] Phase headings follow the required format.'
+            )
+
+            $errors = @(Get-PlanStructureValidationReport -Lines $lines)
+
+            $errors.Count | Should -Be 0
+        }
     }
 
     Context 'planner internal review' {

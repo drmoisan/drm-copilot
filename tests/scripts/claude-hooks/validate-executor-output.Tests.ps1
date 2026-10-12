@@ -187,6 +187,13 @@ Results:
 
             $languages | Should -Contain 'PowerShell'
         }
+
+        It 'CORPUS-EXE-1 accepts a plan line array that contains an empty line' {
+            $lines = @('- [x] [P1-T1] Update .claude/hooks/validate-executor-output.ps1', '')
+
+            Test-IsPreflightPlan -Lines $lines | Should -BeFalse
+            Get-TouchedLanguagesFromPlan -Lines $lines | Should -Contain 'PowerShell'
+        }
     }
 
     # fixture-marker-for-coverage
