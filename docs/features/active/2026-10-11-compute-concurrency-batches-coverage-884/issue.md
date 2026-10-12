@@ -34,10 +34,10 @@ Issue #884 reports two production files below the repository's uniform 85% line-
 
 ## Acceptance Criteria
 
-- [ ] AC-1: The CI kcov report for the PR head reports `.claude/lib/bash/compute-concurrency-batches.sh` at or above 85% line coverage.
-- [ ] AC-2: New bats test cases exercise the previously uncovered lines of `.claude/lib/bash/compute-concurrency-batches.sh`, live under `tests/shell/`, and pass in the PR's CI bats job.
-- [ ] AC-3: The observable behavior of `.claude/lib/bash/compute-concurrency-batches.sh` (stdout, stderr, and exit codes 0, 1, and 2) is unchanged; if a refactor is needed to make a line testable, the existing bats suites that invoke the script still pass unchanged in CI.
-- [ ] AC-4: `.codex/hooks/validate-feature-review-coverage.ps1` and its tests are not modified, and the eventual PR references #884 without a closing keyword, so the issue stays open for the PowerShell half.
+- [x] AC-1: The CI kcov report for the PR head reports `.claude/lib/bash/compute-concurrency-batches.sh` at or above 85% line coverage.
+- [x] AC-2: New bats test cases exercise the previously uncovered lines of `.claude/lib/bash/compute-concurrency-batches.sh`, live under `tests/shell/`, and pass in the PR's CI bats job.
+- [x] AC-3: The observable behavior of `.claude/lib/bash/compute-concurrency-batches.sh` (stdout, stderr, and exit codes 0, 1, and 2) is unchanged; if a refactor is needed to make a line testable, the existing bats suites that invoke the script still pass unchanged in CI.
+- [x] AC-4: `.codex/hooks/validate-feature-review-coverage.ps1` and its tests are not modified, and the eventual PR references #884 without a closing keyword, so the issue stays open for the PowerShell half.
 
 Scope note (orchestrator, 2026-10-11): Issue #884 covers two files. This item, prepared in parallel run `bug-burndown-2026-10-11`, covers only the bash half. The PowerShell half (`.codex/hooks/validate-feature-review-coverage.ps1`, 7.30% line coverage) is out of scope and remains tracked by #884; the PR for this item must reference #884 without closing it. The acceptance criteria above were authored by the orchestrator from the Expected Behavior and Proposed Fix sections because the lifecycle record carried no explicit `## Acceptance Criteria` section. Verification follows operator Option A: bats and kcov results are taken from the PR's CI run; no local bats, kcov, sh, bash, or pwsh wrapper invocation is part of the plan.
 
@@ -61,6 +61,6 @@ Medium. The aggregate gate passes, so the per-file gap is not visible in CI.
 
 ## Evidence Checklist
 
-- [ ] baseline
-- [ ] targeted verification
-- [ ] end-state
+- [x] baseline
+- [x] targeted verification
+- [x] end-state
