@@ -24,11 +24,11 @@ The operator has already corrected the shared `.pth` file. This item covers the 
 
 ## Acceptance Criteria
 
-- [ ] AC-1: Invoking `scripts/dev_tools/validate_orchestration_artifacts.py` by file path inserts the repository root at `sys.path` index 0 (not appended), and the root appears in `sys.path` exactly once.
-- [ ] AC-2: Module-form invocation (`python -m scripts.dev_tools.validate_orchestration_artifacts`) leaves `sys.path` unchanged by the bootstrap.
-- [ ] AC-3: A regression test simulates a foreign `scripts` package resolvable from a later `sys.path` entry, uses no temporary files, and proves the file-path form imports the local `scripts` package; the test fails when run against the pre-fix code.
-- [ ] AC-4: The existing test `test_file_path_bootstrap_appends_repo_root_once` is replaced by a test that pins prepend-first ordering, and no test remains that asserts append-last behavior.
-- [ ] AC-5: A recorded search of `scripts/` (command or query and resulting file list stored in the evidence folder) confirms which file-path entry scripts mutate `sys.path`, and every such script other than the validator, if any, is fixed consistently with AC-1.
+- [x] AC-1: Invoking `scripts/dev_tools/validate_orchestration_artifacts.py` by file path inserts the repository root at `sys.path` index 0 (not appended), and the root appears in `sys.path` exactly once.
+- [x] AC-2: Module-form invocation (`python -m scripts.dev_tools.validate_orchestration_artifacts`) leaves `sys.path` unchanged by the bootstrap.
+- [x] AC-3: A regression test simulates a foreign `scripts` package resolvable from a later `sys.path` entry, uses no temporary files, and proves the file-path form imports the local `scripts` package; the test fails when run against the pre-fix code.
+- [x] AC-4: The existing test `test_file_path_bootstrap_appends_repo_root_once` is replaced by a test that pins prepend-first ordering, and no test remains that asserts append-last behavior.
+- [x] AC-5: A recorded search of `scripts/` (command or query and resulting file list stored in the evidence folder) confirms which file-path entry scripts mutate `sys.path`, and every such script other than the validator, if any, is fixed consistently with AC-1.
 - [ ] AC-6: No new Ruff suppression is introduced (no `# noqa: E402` and no new per-file-ignore), and every changed production and test file is at or under 500 lines.
 - [ ] AC-7: Black, Ruff, Pyright, and Pytest pass for the Python toolchain, and coverage for `scripts.dev_tools.validate_orchestration_artifacts` is at least 85% line and at least 75% branch, with no coverage regression on changed lines.
 
@@ -39,6 +39,8 @@ The operator has already corrected the shared `.pth` file. This item covers the 
 - Risk: tests must not create temporary files, so the foreign-package simulation must use in-memory mechanisms such as patched `sys.path`, `sys.modules`, or an import hook.
 - Risk: any other file-path entry script with the same pattern would remain vulnerable; AC-5 addresses this through the recorded search.
 - Out of scope (not an acceptance criterion): editing `.claude/rules/orchestrator-state.md` and its bundled mirror, whose line ~204 still says "appends". That wording is owned by item #898.
+
+Operator-approved scope addition: the operator approved editing the single sentence at line 204 of `.claude/rules/orchestrator-state.md` and of its bundled copy `extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md`, changing `appends it to` to `inserts it first in` before `` `sys.path` ``. This supersedes the "Out of scope" bullet above for that sentence only. No acceptance criterion changes and none is added.
 
 ## Verification Steps
 
