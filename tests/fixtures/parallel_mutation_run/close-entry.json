@@ -1,0 +1,10 @@
+{
+  "case": "close-entry",
+  "subcommand": "close-entry",
+  "argv": ["close-entry", "--generation", "4", "--at", "2026-10-11T08-29"],
+  "expected": {
+    "exit_code": 0,
+    "stdout": "{\"op\":\"close\",\"item_key\":null,\"at\":\"2026-10-11T08-29\",\"prior_state\":null,\"new_state\":null,\"disposition\":null,\"recolor_generation\":4}",
+    "stderr": null
+  }
+}

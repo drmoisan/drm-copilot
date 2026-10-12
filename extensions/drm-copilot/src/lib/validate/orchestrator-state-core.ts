@@ -1,4 +1,5 @@
 import type { FileSystem } from "../file-system";
+import { compareCodePoint } from "../string-ordering";
 import { VALID_BLOCKED_REASONS } from "./orchestrator-state-blocked-reason";
 import { validateCodexModelRoutingState } from "./orchestrator-state-codex-model-routing";
 import { validateCodexTopologyState } from "./orchestrator-state-codex-topology";
@@ -250,7 +251,7 @@ function validateNamespacedDelegationReceipts(
         key !== AGENT_RECEIPT_NAMESPACE_KEY &&
         key !== PROMOTION_RECEIPT_NAMESPACE_KEY,
     )
-    .sort();
+    .sort(compareCodePoint);
   for (const key of unsupportedKeys) {
     errors.push(
       `Checkpoint delegation_receipts object contains unsupported key: ${key}`,
@@ -282,7 +283,7 @@ function validateNamespacedDelegationReceipts(
     .filter(
       (key) => !(PROMOTION_RECEIPT_KEYS as readonly string[]).includes(key),
     )
-    .sort();
+    .sort(compareCodePoint);
   for (const key of unsupportedPromotionKeys) {
     errors.push(
       "Checkpoint delegation_receipts.promotion contains unsupported key: " +

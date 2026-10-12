@@ -210,4 +210,26 @@ describe("validatePlanningGitIntegrity", () => {
       validatePlanningGitIntegrity(state(), parsed(), [PLAN], git)[0],
     ).toContain("is not on");
   });
+
+  it("889-cp-order: reports unknown planner paths in code-point order (U+FF5E before U+1F600)", () => {
+    // Arrange: supplementary-plane path inserted first.
+    const supplementary = "\u{1F600}";
+    const highBmp = "～";
+
+    // Act
+    const errors = validatePlanningGitIntegrity(
+      state({ plan_hashes: { [supplementary]: HASH, [highBmp]: HASH } }),
+      parsed(),
+      [],
+      new GitStub(),
+    );
+
+    // Assert
+    expect(
+      errors.filter((error) => error.includes("unknown planner path")),
+    ).toEqual([
+      `Optional plan_hashes contains unknown planner path: '${highBmp}'.`,
+      `Optional plan_hashes contains unknown planner path: '${supplementary}'.`,
+    ]);
+  });
 });

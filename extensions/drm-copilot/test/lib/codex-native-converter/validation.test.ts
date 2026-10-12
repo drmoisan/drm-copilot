@@ -239,4 +239,66 @@ describe("validateConversionPlan", () => {
       "second.md",
     ]);
   });
+
+  it("889-null-arm: applies the null source-path default on both operands and orders by target path", () => {
+    // Arrange: lingering-reference findings always carry a null source path,
+    // so the source-path default applies to both operands and the target path
+    // decides. Both generated-output insertion orders are exercised.
+    const trigger =
+      "This output still points at .github/instructions/runtime.instructions.md.";
+    const outputs = [
+      { "z.md": trigger, "a.md": trigger },
+      { "a.md": trigger, "z.md": trigger },
+    ];
+
+    for (const generatedOutput of outputs) {
+      // Act
+      const lingering = validateConversionPlan(
+        runOptions(),
+        [],
+        [],
+        generatedOutput,
+      ).filter((f) => f.code === "lingering-source-runtime-reference");
+
+      // Assert
+      expect(lingering.map((f) => f.sourcePath)).toEqual([null, null]);
+      expect(lingering.map((f) => f.targetPath)).toEqual(["a.md", "z.md"]);
+    }
+  });
+
+  it("889-null-arm: sorts a null target path before a non-null one in both input orders", () => {
+    // Arrange: equal code and source path, so the target path decides.
+    const nonNull = record({
+      sourcePath: "s.md",
+      conversionClass: ConversionClass.UNSUPPORTED,
+      targetRole: TargetRole.UNSUPPORTED,
+      targetPath: ".agents/x/SKILL.md",
+    });
+    const nullPath = record({
+      sourcePath: "s.md",
+      conversionClass: ConversionClass.UNSUPPORTED,
+      targetRole: TargetRole.UNSUPPORTED,
+      targetPath: null,
+    });
+    const inputOrders = [
+      [nonNull, nullPath],
+      [nullPath, nonNull],
+    ];
+
+    for (const records of inputOrders) {
+      // Act
+      const unsupported = validateConversionPlan(
+        runOptions(),
+        records,
+        [],
+        {},
+      ).filter((f) => f.code === "unsupported-ecosystem");
+
+      // Assert
+      expect(unsupported.map((f) => f.targetPath)).toEqual([
+        null,
+        ".agents/x/SKILL.md",
+      ]);
+    }
+  });
 });

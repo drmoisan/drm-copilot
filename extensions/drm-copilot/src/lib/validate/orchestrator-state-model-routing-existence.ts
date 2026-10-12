@@ -1,5 +1,7 @@
 /** Legacy model-routing receipt existence gate. */
 
+import { compareCodePoint } from "../string-ordering";
+
 const DELEGATING_AGENTS: ReadonlySet<string> = new Set([
   "atomic-planner",
   "atomic-executor",
@@ -63,7 +65,7 @@ export function validateModelRoutingExistence(
 
   return [...delegated]
     .filter((agent) => !receiptAgents.has(agent))
-    .sort()
+    .sort(compareCodePoint)
     .map(
       (agent) =>
         "Checkpoint model_routing_receipts is missing a receipt for " +

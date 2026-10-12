@@ -58,7 +58,7 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
         }
 
         It 'blocks DONE with MODEL_ROUTING_BLOCKED when the validator names model_routing_receipts' {
-            $raw = '{"output":"Final summary."}'
+            $raw = '{"last_assistant_message":"Final summary."}'
             $routingStub = {
                 param($Path)
                 [pscustomobject]@{
@@ -67,7 +67,7 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
                 }
             }
 
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw -RoutingInvoker $routingStub
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match '^MODEL_ROUTING_BLOCKED:'
@@ -75,7 +75,7 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
         }
 
         It 'blocks DONE with MODEL_ROUTING_BLOCKED when the validator names complexity_assessments' {
-            $raw = '{"output":"Final summary."}'
+            $raw = '{"last_assistant_message":"Final summary."}'
             $routingStub = {
                 param($Path)
                 [pscustomobject]@{
@@ -84,14 +84,14 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
                 }
             }
 
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw -RoutingInvoker $routingStub
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match '^MODEL_ROUTING_BLOCKED:'
         }
 
         It 'falls back to ROUTING_CONTRACT_BLOCKED for a generic routing error' {
-            $raw = '{"output":"Final summary."}'
+            $raw = '{"last_assistant_message":"Final summary."}'
             $routingStub = {
                 param($Path)
                 [pscustomobject]@{
@@ -100,7 +100,7 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
                 }
             }
 
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw -RoutingInvoker $routingStub
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match '^ROUTING_CONTRACT_BLOCKED:'
@@ -137,7 +137,7 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
                 @{ ExitCode = 1; Output = 'Checkpoint model_routing_receipts is missing a receipt for delegated agent: atomic-executor.' }
             }
 
-            $result = Invoke-OrchestratorOutputValidation -RawPayload '{"output":"Final summary."}'
+            $result = Invoke-OrchestratorOutputValidation -InputText '{"last_assistant_message":"Final summary."}'
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match '^MODEL_ROUTING_BLOCKED:'
@@ -152,7 +152,7 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
                 @{ ExitCode = 0; Output = '' }
             }
 
-            $result = Invoke-OrchestratorOutputValidation -RawPayload '{"output":"Final summary."}'
+            $result = Invoke-OrchestratorOutputValidation -InputText '{"last_assistant_message":"Final summary."}'
 
             $result.Ok | Should -BeTrue
             $result.Message | Should -BeNullOrEmpty

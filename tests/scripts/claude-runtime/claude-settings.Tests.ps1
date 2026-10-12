@@ -5,6 +5,18 @@ Describe "claude-settings" {
         $script:RepoRoot = (Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath '..', '..')).Path
         $script:PrdFeatureMatcher = 'prd-feature'
         $script:PrdFeatureCommand = 'pwsh -NoProfile -File .claude/hooks/validate-prd-feature-output.ps1'
+        # Issue #897: the fifteen-agent SubagentStop group keeps this exact matcher after the inline command is removed.
+        $script:BroadSubagentStopMatcher = 'atomic-planner|atomic-executor|feature-review|task-researcher|prd-feature|staged-review|epic-review|status-updater|python-typed-engineer|powershell-typed-engineer|csharp-typed-engineer|typescript-engineer|orchestrator|epic-orchestrator|epic-planner'
+        $script:SettingsCopies = @(
+            @{ Name = 'canonical'; Settings = (Get-Content -Path (Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'settings.json') -Raw | ConvertFrom-Json) },
+            @{ Name = 'bundled'; Settings = (Get-Content -Path (Join-Path -Path $script:RepoRoot -ChildPath 'extensions' -AdditionalChildPath 'drm-copilot', 'resources', 'claude-customizations', '.claude', 'settings.json') -Raw | ConvertFrom-Json) }
+        )
+
+        function Get-SubagentStopCommand {
+            # Every command string registered under hooks.SubagentStop in one parsed settings copy.
+            param([Parameter(Mandatory)] $Settings)
+            return @($Settings.hooks.SubagentStop | ForEach-Object { $_.hooks } | ForEach-Object { $_.command })
+        }
 
         function Test-PrdFeatureRegistrationContract {
             param(
@@ -151,5 +163,35 @@ Describe "claude-settings" {
         (Test-PrdFeatureRegistrationContract -CanonicalContent ($wrongMatcher | ConvertTo-Json -Depth 20) -BundleContent ($wrongMatcher | ConvertTo-Json -Depth 20)) | Should -Match 'exactly one'
 
         (Test-PrdFeatureRegistrationContract -CanonicalContent $content -BundleContent "$content ") | Should -Match 'differ'
+    }
+
+    It "removes every SubagentStop command that reads CLAUDE_HOOK_INPUT from both settings copies" {
+        foreach ($copy in $script:SettingsCopies) {
+            $offenders = @(Get-SubagentStopCommand -Settings $copy.Settings | Where-Object { $_.Contains('CLAUDE_HOOK_INPUT') })
+            $offenders.Count | Should -Be 0 -Because "the $($copy.Name) settings must register no SubagentStop command that reads CLAUDE_HOOK_INPUT"
+        }
+    }
+
+    It "keeps no SubagentStop command that ends with exit 1 in either settings copy" {
+        foreach ($copy in $script:SettingsCopies) {
+            $offenders = @(Get-SubagentStopCommand -Settings $copy.Settings | Where-Object { $_.Trim() -match 'exit\s+1\W*$' })
+            $offenders.Count | Should -Be 0 -Because "exit 1 does not block a SubagentStop; the $($copy.Name) settings must register no such command"
+        }
+    }
+
+    It "retains the fifteen-agent SubagentStop group with only the discovery-artifact gate in both settings copies" {
+        foreach ($copy in $script:SettingsCopies) {
+            $entries = @($copy.Settings.hooks.SubagentStop | Where-Object { $_.matcher -ceq $script:BroadSubagentStopMatcher })
+            $entries.Count | Should -Be 1 -Because "the $($copy.Name) settings must keep exactly one group with the unchanged fifteen-agent matcher"
+            @($entries[0].hooks.command) | Should -Be @('pwsh -NoProfile -File .claude/hooks/validate-discovery-artifact-gate.ps1')
+        }
+    }
+
+    It "registers no hook command that references subagentstop-envelope.ps1 in either settings copy" {
+        foreach ($copy in $script:SettingsCopies) {
+            $commands = @($copy.Settings.hooks.PSObject.Properties | ForEach-Object { $_.Value } | ForEach-Object { $_.hooks } | ForEach-Object { $_.command })
+            $references = @($commands | Where-Object { $_.Contains('subagentstop-envelope.ps1') })
+            $references.Count | Should -Be 0 -Because "the helper is dot-sourced by validators and is not a registered hook in the $($copy.Name) settings"
+        }
     }
 }

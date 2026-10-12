@@ -30,6 +30,11 @@
 # no-interpreter shim directory above. Every case passes an explicit --at, so
 # the entry point reads no clock and needs no utility beyond sort, cut, and
 # dirname.
+#
+# The run-mutation entry point mutate-parallel-run.sh (issue #890) is proven
+# with the same no-interpreter shim directory. Its admit, add-entry, and close
+# cases pass every input explicitly (add-entry passes --at), so it likewise
+# reads no clock and needs no utility beyond sort and dirname.
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)"
@@ -163,4 +168,22 @@ run_payload() {
     run_payload remove-parallel-item.sh recolor --unstarted "1 2" --edges "1:4" --pinned "4" --generation 0 --current-cohort 0 --highest-pinned-cohort 2
     [ "$status" -eq 0 ]
     [ "$output" = '{"cohort_assignments":{"1":3,"2":3},"generation":1}' ]
+}
+
+@test "the payload decides an admission without Python on PATH" {
+    run_payload mutate-parallel-run.sh admit --candidate 9 --edges "1:9" --in-flight "1" --current-cohort-members "1 2"
+    [ "$status" -eq 0 ]
+    [ "$output" = '{"candidate":9,"outcome":"defer_and_recolor","triggers_recompute":true}' ]
+}
+
+@test "the payload builds an add entry without Python on PATH" {
+    run_payload mutate-parallel-run.sh add-entry --item 9 --deferred false --generation 3 --at 2026-10-11T08-29
+    [ "$status" -eq 0 ]
+    [ "$output" = '{"op":"add","item_key":9,"at":"2026-10-11T08-29","prior_state":null,"new_state":"scheduled","disposition":null,"recolor_generation":3}' ]
+}
+
+@test "the payload rejects a close with items in flight without Python on PATH" {
+    run_payload mutate-parallel-run.sh close --items "7:in_flight 3:in_flight 5:scheduled"
+    [ "$status" -eq 1 ]
+    [ "$output" = 'Parallel mutation rejected: close requires no item in flight; still in flight: [3, 7].' ]
 }

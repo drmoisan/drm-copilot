@@ -185,4 +185,20 @@ describe("assembleTree", () => {
       "\u{1F600} description",
     ]);
   });
+
+  it("889-cp-order: sorts root models in code-point order (U+FF5E before U+1F600)", () => {
+    // Arrange: supplementary-plane model inserted first.
+    const supplementary = "\u{1F600}";
+    const highBmp = "\uFF5E";
+    const scanned: ScannedSession = {
+      root: { models: [supplementary, highBmp], agentToolUseIds: [] },
+      subagents: [],
+    };
+
+    // Act
+    const tree = assembleTree(scanned);
+
+    // Assert
+    expect(tree.models).toEqual([highBmp, supplementary]);
+  });
 });

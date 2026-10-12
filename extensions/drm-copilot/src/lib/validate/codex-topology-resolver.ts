@@ -1,5 +1,7 @@
 /** Resolve Codex implementation topology from deterministic scope inputs. */
 
+import { compareCodePoint } from "../string-ordering";
+
 export type ExecutionContext =
   "standalone" | "epic_preparation_child" | "epic_execution_child";
 export type TopologyRoute = "small" | "large" | "epic";
@@ -120,7 +122,7 @@ function normalizeLanguages(value: unknown): string[] {
   const normalized = new Set(
     value.map((language) => (language as string).trim().toLowerCase()),
   );
-  return [...normalized].sort();
+  return [...normalized].sort(compareCodePoint);
 }
 
 function requireInteger(value: unknown, fieldName: string): number {

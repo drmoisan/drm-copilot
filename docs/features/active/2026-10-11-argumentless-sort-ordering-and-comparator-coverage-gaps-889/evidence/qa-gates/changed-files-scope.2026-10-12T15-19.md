@@ -1,0 +1,14 @@
+# Changed-File Scope, Size, and Placement (P2-T8 step 1; AC-9, AC-10)
+
+Timestamp: 2026-10-12T15-19
+Command: git diff --name-only origin/main...HEAD && git status --porcelain && git grep --untracked -c -e "^" -- <the 27 code paths: 12 TARGET-PROD under extensions/drm-copilot/src/lib/ and 15 test files under extensions/drm-copilot/test/lib/> (all run from the repository root)
+EXIT_CODE: 0
+Output Summary:
+- `git diff --name-only origin/main...HEAD` lists 53 paths: 26 under `docs/features/active/2026-10-11-argumentless-sort-ordering-and-comparator-coverage-gaps-889/` (evidence, issue.md, plan, research) and the 27 code paths (12 production, 15 test). `extensions/drm-copilot/src/lib/codex-native-converter/engine-pipeline.ts` is absent. No `.py`, `.ps1`, `.psm1`, or `.psd1` path; no `tests/fixtures/` path; no package.json, package-lock.json, or jest.config.cjs path.
+- `git status --porcelain`: ` M FEATURE/plan.2026-10-11T08-31.md`, `?? FEATURE/evidence/other/non-observable-sites.2026-10-12T15-19.md`, `?? FEATURE/evidence/qa-gates/`. Every entry is under FEATURE.
+- Line counts (all <= 500):
+  - src/lib/push-down/claude-pack-selection.ts 309; push-down/codex-pack-selection.ts 245; resolve/file-prompt-transforms.ts 206; subagent-tree/tree-assembler.ts 184; subagent-tree/tree-formatter.ts 34; validate/codex-topology-resolver.ts 270; validate/epic-orchestrator-state-core.ts 492; validate/epic-planner-git-integrity.ts 291; validate/orchestrator-state-codex-model-routing.ts 487; validate/orchestrator-state-codex-topology.ts 323; validate/orchestrator-state-core.ts 459; validate/orchestrator-state-model-routing-existence.ts 74.
+  - test/lib/codex-native-converter/engine-pipeline.test.ts 132; reporting-coverage.test.ts 120; reporting-render.test.ts 148; validation.test.ts 304; push-down/claude-pack-selection.test.ts 286; push-down/codex-pack-selection.test.ts 218; resolve/file-prompt-transforms.test.ts 31; subagent-tree/tree-assembler.test.ts 204; subagent-tree/tree-formatter.test.ts 91; validate/codex-topology-resolver.test.ts 217; validate/epic-orchestrator-state-core.ordering.test.ts 32; validate/epic-planner-git-integrity.test.ts 235; validate/orchestrator-state-codex-model-routing.test.ts 398; validate/orchestrator-state-core.test.ts 425; validate/orchestrator-state-model-routing-existence.test.ts 26.
+  - Maximum: 492 (epic-orchestrator-state-core.ts).
+- Created test files mirror their production sources under `extensions/drm-copilot/test/lib/`: `resolve/file-prompt-transforms.test.ts` (src/lib/resolve/file-prompt-transforms.ts), `validate/epic-orchestrator-state-core.ordering.test.ts` (src/lib/validate/epic-orchestrator-state-core.ts), `validate/orchestrator-state-model-routing-existence.test.ts` (src/lib/validate/orchestrator-state-model-routing-existence.ts).
+- Result: PASS.

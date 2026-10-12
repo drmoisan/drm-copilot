@@ -25,6 +25,7 @@
  *     None; pure text-in, errors-out validation.
  */
 
+import { compareCodePoint } from "../string-ordering";
 import {
   buildFeatureReferenceIndex,
   detectDependencyCycle,
@@ -200,7 +201,7 @@ function validateFeatureFolderUniquenessAndDependencies(
     }
   }
 
-  for (const folder of [...duplicates].sort()) {
+  for (const folder of [...duplicates].sort(compareCodePoint)) {
     errors.push(
       `Epic checkpoint has duplicate features[].feature_folder: ${folder}`,
     );
