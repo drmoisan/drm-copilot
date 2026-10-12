@@ -28,6 +28,16 @@ BeforeAll {
 - Member-set Comparison: normalized sets match
 "@
     }
+
+    function New-SubagentStopEnvelopeJson {
+        # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds and returns envelope JSON text only; it changes no system state.')]
+        param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
+        $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'prd-feature'; stop_hook_active = [bool]$StopHookActive }
+        if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }
+        if ($PSBoundParameters.ContainsKey('OutputField')) { $envelope['output'] = $OutputField }
+        return ($envelope | ConvertTo-Json -Compress)
+    }
 }
 
 Describe 'validate-prd-feature-output.ps1' {
@@ -38,13 +48,13 @@ Describe 'validate-prd-feature-output.ps1' {
     }
 
     It 'detects a numeric spec acceptance criterion' {
-        $result = Test-SpecNumericCriterion -SpecContent "## Acceptance Criteria`n- [ ] 8 call sites are covered"
+        $result = Test-SpecNumericCriterion -SpecContent "## Acceptance Criteria`n- [ ] All 8 call sites are covered"
 
         $result | Should -BeTrue
     }
 
     It 'does not count numeric boxes outside Acceptance Criteria' {
-        $result = Test-SpecNumericCriterion -SpecContent "- [ ] 99 unrelated boxes`n## Acceptance Criteria`n- [ ] A textual criterion`n## Notes`n- [ ] 7 unrelated boxes"
+        $result = Test-SpecNumericCriterion -SpecContent "- [ ] All 99 unrelated boxes`n## Acceptance Criteria`n- [ ] A textual criterion`n## Notes`n- [ ] All 7 unrelated boxes"
 
         $result | Should -BeFalse
     }
@@ -73,40 +83,41 @@ Describe 'validate-prd-feature-output.ps1' {
         $result.Ok | Should -BeTrue
     }
 
-    It 'rejects empty, malformed, and output-free invocation payloads' {
-        (Invoke-PrdFeatureOutputValidation -RawPayload '').Ok | Should -BeFalse
-        (Invoke-PrdFeatureOutputValidation -RawPayload '{bad').Ok | Should -BeFalse
-        (Invoke-PrdFeatureOutputValidation -RawPayload '{}').Ok | Should -BeFalse
+    It 'rejects an invalid envelope and a blank assistant message' {
+        (Invoke-PrdFeatureOutputValidation -InputText '').Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText '{bad').Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText '{}').Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage '')).Ok | Should -BeFalse
     }
 
     It 'rejects missing and nonexistent spec paths' {
         Mock Test-Path { $false }
 
-        (Invoke-PrdFeatureOutputValidation -RawPayload (@{ output = 'spec-path: missing.md' } | ConvertTo-Json -Compress)).Ok | Should -BeFalse
-        (Invoke-PrdFeatureOutputValidation -RawPayload (@{ output = 'spec-path: nonexistent.md' } | ConvertTo-Json -Compress)).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: missing.md')).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: nonexistent.md')).Ok | Should -BeFalse
     }
 
     It 'accepts a nonnumeric spec without research evidence' {
         Mock Test-Path { $true }
         Mock Get-Content { '## Acceptance Criteria' + [Environment]::NewLine + '- [ ] A textual criterion' }
 
-        (Invoke-PrdFeatureOutputValidation -RawPayload (@{ output = 'spec-path: textual.md' } | ConvertTo-Json -Compress)).Ok | Should -BeTrue
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: textual.md')).Ok | Should -BeTrue
     }
 
     It 'rejects numeric specs with missing or nonexistent research paths' {
         Mock Test-Path { param($LiteralPath) $LiteralPath -eq 'numeric.md' }
-        Mock Get-Content { '## Acceptance Criteria' + [Environment]::NewLine + '- [ ] 1 call site is covered' }
+        Mock Get-Content { '## Acceptance Criteria' + [Environment]::NewLine + '- [ ] The 2 call sites are covered' }
 
-        (Invoke-PrdFeatureOutputValidation -RawPayload (@{ output = 'spec-path: numeric.md' } | ConvertTo-Json -Compress)).Ok | Should -BeFalse
-        (Invoke-PrdFeatureOutputValidation -RawPayload (@{ output = "spec-path: numeric.md`nresearch-path: missing.md" } | ConvertTo-Json -Compress)).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: numeric.md')).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage "spec-path: numeric.md`nresearch-path: missing.md")).Ok | Should -BeFalse
     }
 
     It 'accepts matching numeric provenance and extracts artifact labels' {
         $complete = Get-CompleteNumericDerivationEvidence
         Mock Test-Path { $true }
-        Mock Get-Content { param($LiteralPath) if ($LiteralPath -eq 'numeric.md') { "## Acceptance Criteria`n- [ ] 1 call" } else { $complete } }
+        Mock Get-Content { param($LiteralPath) if ($LiteralPath -eq 'numeric.md') { "## Acceptance Criteria`n- [ ] The 2 call sites are covered" } else { $complete } }
 
-        (Invoke-PrdFeatureOutputValidation -RawPayload (@{ output = "spec-path: numeric.md`nresearch-path: research.md" } | ConvertTo-Json -Compress)).Ok | Should -BeTrue
+        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage "spec-path: numeric.md`nresearch-path: research.md")).Ok | Should -BeTrue
         Get-ArtifactPathFromOutput -Output 'spec-path: numeric.md' -Label 'spec-path' | Should -Be 'numeric.md'
     }
 
@@ -130,6 +141,83 @@ Describe 'validate-prd-feature-output.ps1' {
 
         foreach ($content in @($copiedCount, $duplicateSearch, $memberMismatch, $scopeMissing, $narrowSearch)) {
             (Test-NumericDerivationEvidence -Content $content).Ok | Should -BeFalse
+        }
+    }
+
+    Context 'Test-SpecNumericCriterion rule R2 (issue #905)' {
+        # Each row is a single acceptance-criterion line; R2 triggers only on a determiner-led cardinal count of a plural noun
+        # that cites no policy file.
+        It 'R2 triggers on <Name>' -ForEach @(
+            @{ Name = 'all with a digit cardinal'; Line = 'All 12 agent files contain the marker.' }
+            @{ Name = 'all with a word cardinal'; Line = 'All twelve agent files contain the marker.' }
+            @{ Name = 'exactly with a digit cardinal'; Line = 'The managed block lists exactly 2 entries.' }
+            @{ Name = 'exactly with a word cardinal'; Line = 'The managed block lists exactly two entries.' }
+            @{ Name = 'the with a digit cardinal'; Line = 'Each of the 24 PreToolUse hooks has a guard.' }
+            @{ Name = 'the with a word cardinal'; Line = 'None of the nine Python files invokes Python.' }
+            @{ Name = 'these with a digit cardinal'; Line = 'These 3 suites pass.' }
+            @{ Name = 'these with a word cardinal'; Line = 'These three suites pass.' }
+            @{ Name = 'those with a digit cardinal'; Line = 'Those 4 mirrors are byte-identical.' }
+            @{ Name = 'those with a word cardinal'; Line = 'Those four mirrors are byte-identical.' }
+        ) {
+            # Arrange
+            $specContent = "## Acceptance Criteria`n- [ ] " + $Line
+            # Act
+            $result = Test-SpecNumericCriterion -SpecContent $specContent
+            # Assert
+            $result | Should -BeTrue -Because "R2 must trigger on: $Line"
+        }
+
+        It 'R2 does not trigger on <Name>' -ForEach @(
+            @{ Name = 'a threshold'; Line = 'Line coverage is at or above 85% for each changed file.' }
+            @{ Name = 'a comparator'; Line = 'Repository-wide line coverage is >= 85% after the change.' }
+            @{ Name = 'an exit code'; Line = 'The hook exits 2 with a reason on stderr.' }
+            @{ Name = 'an issue or PR number'; Line = 'The PR body contains Refs #905 and Refs #897.' }
+            @{ Name = 'a line number or file:line'; Line = 'The rule at typescript.md:57 and Pester.psm1:8567-8588 stays unchanged.' }
+            @{ Name = 'an AC or task identifier'; Line = 'AC-01, AC-5.4, P1-T2 and E4-ST3 are recorded.' }
+            @{ Name = 'a version'; Line = 'The extension requires node >=18.0.0 to run.' }
+            @{ Name = 'a date or timestamp'; Line = 'Evidence is written on 2026-10-11 at 2026-10-11T17-00.' }
+            @{ Name = 'a section reference'; Line = "The behavior follows research $([char]0x00A7)12." }
+            @{ Name = 'zero'; Line = 'PSScriptAnalyzer reports zero findings and 0 errors.' }
+            @{ Name = 'a unit of size or duration'; Line = 'No file exceeds the 500 lines limit within the 30 seconds timeout.' }
+            @{ Name = 'a count citing .claude/rules/'; Line = 'The four toolchain stages pass per .claude/rules/general-code-change.md.' }
+            @{ Name = 'a count citing .github/instructions/'; Line = 'The three rule files under .github/instructions/ stay unchanged.' }
+            @{ Name = 'a count citing .github/copilot-instructions.md'; Line = 'The two tone sections of .github/copilot-instructions.md apply.' }
+            @{ Name = 'a non-noun word after the cardinal'; Line = 'The value is exactly 2 as documented.' }
+        ) {
+            # Arrange
+            $specContent = "## Acceptance Criteria`n- [ ] " + $Line
+            # Act
+            $result = Test-SpecNumericCriterion -SpecContent $specContent
+            # Assert
+            $result | Should -BeFalse -Because "R2 must not trigger on: $Line"
+        }
+    }
+
+    Context 'Test-NumericDerivationEvidence rule R3 (issue #905)' {
+        # Each row replaces only the Exhaustive Search Scope value of the complete evidence record.
+        It 'R3 accepts the exhaustive scope <Name>' -ForEach @(
+            @{ Name = 'entire worktree'; Value = 'entire worktree.' }
+            @{ Name = 'whole worktree with all directories'; Value = 'the whole worktree, all directories.' }
+            @{ Name = 'entire repository accepted before R3'; Value = 'entire repository' }
+        ) {
+            # Arrange
+            $content = (Get-CompleteNumericDerivationEvidence).Replace('- Exhaustive Search Scope: entire repository source tree', '- Exhaustive Search Scope: ' + $Value)
+            # Act
+            $result = Test-NumericDerivationEvidence -Content $content
+            # Assert
+            $result.Ok | Should -BeTrue -Because "$($result.Message)"
+        }
+
+        It 'R3 rejects the exhaustive scope <Name>' -ForEach @(
+            @{ Name = 'the hooks folder'; Value = 'the hooks folder' }
+        ) {
+            # Arrange
+            $content = (Get-CompleteNumericDerivationEvidence).Replace('- Exhaustive Search Scope: entire repository source tree', '- Exhaustive Search Scope: ' + $Value)
+            # Act
+            $result = Test-NumericDerivationEvidence -Content $content
+            # Assert
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -Be 'prd-feature hook: numeric derivation evidence does not declare an exhaustive repository search scope.'
         }
     }
 }

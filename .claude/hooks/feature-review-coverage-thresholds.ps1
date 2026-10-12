@@ -15,20 +15,28 @@
     . (Join-Path $PSScriptRoot 'feature-review-coverage-thresholds.ps1')
 #>
 
+
 function Get-FeatureReviewCoverageThreshold {
     <#
     .SYNOPSIS
         Return the governing line and branch coverage thresholds for a root CLAUDE.md text.
     .DESCRIPTION
         For each metric M in 'line' and 'branch', a figure is read only when a comparator
-        or floor phrase links it to the metric: the text must contain 'M coverage', then
-        any text on the same line without a percent sign, then one of '>=', the U+2265
-        sign, 'at least', 'minimum', 'minimum of', or 'no less than', an optional colon,
-        and the figure followed by a percent sign. Prose such as 'line coverage was 62%
-        last release' is not read. The first match whose value parses (invariant culture)
-        to a number from 0 to 100 sets that metric and its source to 'claude-md'.
-        Otherwise the metric keeps its default (line 85, branch 75) and its source is
-        'default'.
+        or floor phrase links it to the metric on the same line as 'M coverage'. Two forms
+        are accepted, and any text without a percent sign may sit between 'M coverage' and
+        the comparator or the figure:
+
+          - Comparator before the figure: one of '>=', the U+2265 sign, 'at least',
+            'minimum', 'minimum of', or 'no less than', an optional colon, and the figure
+            followed by a percent sign (for example 'line coverage >= 85%').
+          - Trailing floor phrase after the figure: the figure followed by a percent sign,
+            then one of 'minimum', 'at least', 'or more', 'or higher', 'or above', or
+            'or greater' (for example 'line coverage: 70% minimum').
+
+        Prose such as 'line coverage was 62% last release' is not read. The first match in
+        text order across both forms whose value parses (invariant culture) to a number
+        from 0 to 100 sets that metric and its source to 'claude-md'. Otherwise the metric
+        keeps its default (line 85, branch 75) and its source is 'default'.
 
         Known limitation: a combined statement such as 'line and branch coverage >= 70%'
         matches neither metric, because the metric name must be followed directly by
@@ -54,7 +62,7 @@ function Get-FeatureReviewCoverageThreshold {
         $value = [double]$defaults[$metric]
         $source = 'default'
         if (-not [string]::IsNullOrEmpty($ClaudeMdText)) {
-            $pattern = '(?im)(?<!\b(?:line|branch)\s*(?:and|or|&|/)\s*)\b' + $metric + '\s+coverage\b[^\r\n%]*?(?:>=|' + [char]0x2265 + '|\bat\s+least\b|\bminimum(?:\s+of)?\b|\bno\s+less\s+than\b)\s*:?\s*(?<![\d.])(?<pct>\d{1,3}(?:\.\d+)?)\s*%'
+            $pattern = '(?im)(?<!\b(?:line|branch)\s*(?:and|or|&|/)\s*)\b' + $metric + '\s+coverage\b[^\r\n%]*?(?:(?:>=|' + [char]0x2265 + '|\bat\s+least\b|\bminimum(?:\s+of)?\b|\bno\s+less\s+than\b)\s*:?\s*(?<![\d.])(?<pct>\d{1,3}(?:\.\d+)?)\s*%|(?<![\d.])(?<pct>\d{1,3}(?:\.\d+)?)\s*%\s*(?:minimum|at\s+least|or\s+(?:more|higher|above|greater))\b)'
             foreach ($match in [regex]::Matches($ClaudeMdText, $pattern)) {
                 $parsed = 0.0
                 $isNumber = [double]::TryParse($match.Groups['pct'].Value, $style, $culture, [ref]$parsed)
