@@ -34,12 +34,12 @@ Impact: Low. The script works for the single-solution case; the findings affect 
 
 ## Acceptance Criteria
 
-- [ ] AC-1 (CR-1): When one or more root `*.sln` files exist, `.codex/codex-web-setup.sh` emits a log line naming the selected solution file and the number of root `*.sln` files found; a bats case with two root `*.sln` files asserts both values in the output.
-- [ ] AC-2 (CR-2): A committed fixture directory containing an empty `Alpha.sln` exists under `tests/fixtures/codex_web_setup/` (fixture location per `.claude/rules/shell.md`), and a bats case asserts that `list_root_solution_files` lists `Alpha.sln` for that fixture.
-- [ ] AC-3 (CR-3): `.codex/codex-web-setup.sh` contains a comment, adjacent to the `find -printf` call, stating that GNU `find` is required.
-- [ ] AC-4 (CR-10): The helpers duplicated across `test_codex_web_setup_codex_installers.bats`, `test_codex_web_setup_codex_dotnet.bats` and `test_codex_web_setup_codex_verify.bats` are defined once in a shared helper file under `tests/shell/` that each of the three suites loads with `load`, and none of the three suites redefines them.
-- [ ] AC-5 (CR-11): Case C824-37 in `test_codex_web_setup_codex_dotnet.bats` asserts its fixture precondition in the Arrange section before the act step.
-- [ ] AC-6 (CR-12): `run_with_stub_path` places a dedicated empty fixture directory under `tests/fixtures/codex_web_setup/` (committed with a `.gitkeep`), not `tests/shell`, on the stub `PATH`.
+- [x] AC-1 (CR-1): When one or more root `*.sln` files exist, `.codex/codex-web-setup.sh` emits a log line naming the selected solution file and the number of root `*.sln` files found; a bats case with two root `*.sln` files asserts both values in the output.
+- [x] AC-2 (CR-2): A committed fixture directory containing an empty `Alpha.sln` exists under `tests/fixtures/codex_web_setup/` (fixture location per `.claude/rules/shell.md`), and a bats case asserts that `list_root_solution_files` lists `Alpha.sln` for that fixture.
+- [x] AC-3 (CR-3): `.codex/codex-web-setup.sh` contains a comment, adjacent to the `find -printf` call, stating that GNU `find` is required.
+- [x] AC-4 (CR-10): The helpers duplicated across `test_codex_web_setup_codex_installers.bats`, `test_codex_web_setup_codex_dotnet.bats` and `test_codex_web_setup_codex_verify.bats` are defined once in a shared helper file under `tests/shell/` that each of the three suites loads with `load`, and none of the three suites redefines them.
+- [x] AC-5 (CR-11): Case C824-37 in `test_codex_web_setup_codex_dotnet.bats` asserts its fixture precondition in the Arrange section before the act step.
+- [x] AC-6 (CR-12): `run_with_stub_path` places a dedicated empty fixture directory under `tests/fixtures/codex_web_setup/` (committed with a `.gitkeep`), not `tests/shell`, on the stub `PATH`.
 - [ ] AC-7 (CR-14): The three kcov-uncovered subshell lines are either covered in the PR's CI kcov report or documented in the feature folder as a kcov attribution limit with the CI kcov evidence cited.
 - [ ] AC-8: `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh` is byte-identical to `.codex/codex-web-setup.sh`, and the PR's CI shell-qc, bats and kcov jobs pass.
 
@@ -55,6 +55,6 @@ Impact: Low. The script works for the single-solution case; the findings affect 
 - Mirror parity: no repository test compares the two script copies byte for byte, so parity is verified with `git hash-object` on both paths; the existing push-down existence test `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py` must still pass.
 
 ## Evidence Checklist
-- [ ] baseline
-- [ ] targeted verification
+- [x] baseline
+- [x] targeted verification
 - [ ] end-state
