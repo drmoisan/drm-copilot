@@ -54,9 +54,9 @@ Child-prompt templates do not change. Children derive the directory from the can
 - [x] Each bundled copy (`extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-planner.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-planner/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-executor/SKILL.md`) is byte-identical to its primary source. `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py` and `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py` pass; the only accepted local failure is the issue #510 gitignored `.claude/state/**` signature in `test_bundled_claude_payload_contains_all_repo_runtime_contracts`.
 - [x] `tests/scripts/dev_tools/test_scratch_location_contracts.py` exists. It asserts that `.claude/agents/atomic-planner.md`, `.claude/agents/atomic-executor.md`, `.agents/skills/atomic-planner/SKILL.md`, and `.agents/skills/atomic-executor/SKILL.md` each contain the pinned rule phrase and the `issue-<issue-num>` token. It also asserts that no file under `.claude/agents/*.md`, `.claude/skills/**/SKILL.md`, or `.agents/skills/**/SKILL.md` directs a scratch file to a bare fixed scratchpad path such as `SCRATCH/run-ps.sh` or a root-level `<scratchpad>/` path.
 - [x] A recorded red run of `tests/scripts/dev_tools/test_scratch_location_contracts.py` against the pre-change sources shows the positive assertions failing, and a recorded green run after the edits shows the module passing. Both runs are stored under the feature folder's `evidence/` tree.
-- [ ] Historical plans and evidence under feature folders other than this one are not modified. The diff contains no file under `docs/features/` outside `docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/`.
-- [ ] The diff contains no edit to `.claude/rules/**`, `.github/instructions/**`, `.claude/skills/atomic-plan-contract/SKILL.md`, `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, `.claude/skills/orchestrate/SKILL.md`, `.claude/agents/orchestrator.md`, `.agents/skills/orchestrate/SKILL.md`, `.agents/skills/orchestrator-workflow/SKILL.md`, `.claude/skills/remediation-handoff-atomic-planner/SKILL.md`, `.claude/skills/epic-orchestrate/SKILL.md`, `.codex/agents/*.toml`, any child-prompt template, or any plan-validator source.
-- [ ] The Python toolchain passes on the new test module: `poetry run black --check`, `poetry run ruff check`, and `poetry run pyright` report no errors. `poetry run pytest` passes for `test_scratch_location_contracts.py`, `test_claude_planning_integrity_contracts.py`, `test_typescript_toolchain_instruction_contracts.py`, `test_push_down_claude_resource_contracts.py` (with the #510 exception above), `test_push_down_codex_and_agents_resource_contracts.py`, and `test_codex_handoff_contract_parity.py`. Python baseline and final coverage artifacts are recorded under the feature folder's `evidence/` tree.
+- [x] Historical plans and evidence under feature folders other than this one are not modified. The diff contains no file under `docs/features/` outside `docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900/`.
+- [x] The diff contains no edit to `.claude/rules/**`, `.github/instructions/**`, `.claude/skills/atomic-plan-contract/SKILL.md`, `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, `.claude/skills/orchestrate/SKILL.md`, `.claude/agents/orchestrator.md`, `.agents/skills/orchestrate/SKILL.md`, `.agents/skills/orchestrator-workflow/SKILL.md`, `.claude/skills/remediation-handoff-atomic-planner/SKILL.md`, `.claude/skills/epic-orchestrate/SKILL.md`, `.codex/agents/*.toml`, any child-prompt template, or any plan-validator source.
+- [x] The Python toolchain passes on the new test module: `poetry run black --check`, `poetry run ruff check`, and `poetry run pyright` report no errors. `poetry run pytest` passes for `test_scratch_location_contracts.py`, `test_claude_planning_integrity_contracts.py`, `test_typescript_toolchain_instruction_contracts.py`, `test_push_down_claude_resource_contracts.py` (with the #510 exception above), `test_push_down_codex_and_agents_resource_contracts.py`, and `test_codex_handoff_contract_parity.py`. Python baseline and final coverage artifacts are recorded under the feature folder's `evidence/` tree.
 - [ ] PR CI is green, including the Pester suite `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1`, which reads `.claude/agents/atomic-executor.md`. The CI run is cited as evidence.
 
 ## Dependencies / Risks
@@ -82,9 +82,9 @@ Child-prompt templates do not change. Children derive the directory from the can
 7. Confirm that PR CI is green, including `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1`, and cite the run.
 
 ## Evidence Checklist
-- [ ] baseline
-- [ ] targeted verification
-- [ ] end-state
+- [x] baseline
+- [x] targeted verification
+- [x] end-state
 
 ## Source
 
