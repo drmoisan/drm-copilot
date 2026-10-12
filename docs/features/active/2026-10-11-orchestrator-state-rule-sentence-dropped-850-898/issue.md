@@ -34,11 +34,11 @@ Recorded 2026-10-11 by the operator in the delegation prompt for parallel run bu
 
 ## Acceptance Criteria
 
-- [ ] AC-1: `.claude/rules/orchestrator-state.md` line 238 ends with the Implementation Intent sentence verbatim, appended after "have all declined." on the same line, and no other line of the file changes relative to `origin/main`.
-- [ ] AC-2: `extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md` is byte-identical to `.claude/rules/orchestrator-state.md`, and the bundle parity test `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes.
-- [ ] AC-3: `docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/spec.md` carries the dated "Correction (2026-10-11)" sub-bullet directly after the `orchestrator-state.md updated` mitigation line, and the original line text is unchanged.
-- [ ] AC-4: No file under `.claude/rules/` or `.github/instructions/` other than the two approved copies of `orchestrator-state.md` changes relative to `origin/main`.
-- [ ] AC-5: The existing Python tests that read `.claude/rules/orchestrator-state.md` pass after the edit.
+- [x] AC-1: `.claude/rules/orchestrator-state.md` line 238 ends with the Implementation Intent sentence verbatim, appended after "have all declined." on the same line, and no other line of the file changes relative to `origin/main`.
+- [x] AC-2: `extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md` is byte-identical to `.claude/rules/orchestrator-state.md`, and the bundle parity test `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py::test_bundled_claude_payload_contains_all_repo_runtime_contracts` passes.
+- [x] AC-3: `docs/features/active/2026-10-08-pr-author-and-merge-gates-read-session-root-files-850/spec.md` carries the dated "Correction (2026-10-11)" sub-bullet directly after the `orchestrator-state.md updated` mitigation line, and the original line text is unchanged.
+- [x] AC-4: No file under `.claude/rules/` or `.github/instructions/` other than the two approved copies of `orchestrator-state.md` changes relative to `origin/main`.
+- [x] AC-5: The existing Python tests that read `.claude/rules/orchestrator-state.md` pass after the edit.
 
 ## Dependencies / Risks
 
@@ -53,6 +53,6 @@ Recorded 2026-10-11 by the operator in the delegation prompt for parallel run bu
 
 ## Evidence Checklist
 
-- [ ] baseline
-- [ ] targeted verification
-- [ ] end-state
+- [x] baseline
+- [x] targeted verification
+- [x] end-state
