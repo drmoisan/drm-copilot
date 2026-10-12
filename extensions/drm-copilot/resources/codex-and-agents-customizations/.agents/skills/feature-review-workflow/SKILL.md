@@ -108,10 +108,7 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
         - Python: `poetry run pytest --cov` → artifact: `artifacts/python/lcov.info`
         - PowerShell: `mcp__drm-copilot__run_poshqc_test` → artifact: `artifacts/pester/powershell-coverage.xml`
         - C#: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` → artifact: `artifacts/csharp/coverage.xml`
-        - Coverage thresholds:
-          - New code files (added in this feature): line coverage must be >= 90%. Flag as FAIL otherwise.
-          - Modified files (changed but previously existing): line coverage must show no regression relative to baseline and must remain >= 80%. Flag as FAIL otherwise.
-          - Repo-wide line coverage must remain >= 80% per language. Flag as FAIL otherwise.
+        - Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured); modified files must also show no regression on changed lines. Repo-wide coverage per language must meet the governing thresholds. Flag as FAIL otherwise.
         - If coverage artifacts already exist from the executor run, inspect them instead of re-running.
         - If no coverage artifact exists for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
    - Run the smallest relevant subset first when the repo policy permits it.
@@ -145,7 +142,7 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
      - toolchain checks fail
      - the code review contains blockers
      - required acceptance criteria are FAIL or PARTIAL
-     - coverage regression below policy threshold (< 80% repo-wide per language, < 80% or regression for modified files, or < 90% for new files)
+     - coverage below the governing thresholds defined in step 5 (repo-wide per language, modified files including any regression on changed lines, or new files)
      - coverage artifact absent for any language that has changed files
    - Classify each blocking finding before triggering remediation: every blocking finding receives one `Remediability` class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated).
    - Trigger remediation only for `autonomous` findings. When no blocking finding is `autonomous`, write the remediation inputs, report `HALT_NON_REMEDIABLE` (at least one `external_dependency`, `policy_hold`, or `human_decision_required` finding) or `AWAITING_CI` (every finding `awaiting_ci`) with `REMEDIATION_PLAN: NONE`, create no remediation plan target, and do not hand off to `atomic-planner`.

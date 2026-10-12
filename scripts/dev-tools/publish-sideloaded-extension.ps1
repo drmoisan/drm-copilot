@@ -67,17 +67,30 @@ $invokeParameters = @{
 if ($PSBoundParameters.ContainsKey('CodeCommand')) {
     $invokeParameters['CodeCommand'] = $CodeCommand
 }
-if ($PSBoundParameters.ContainsKey('WhatIf')) {
-    $invokeParameters['WhatIf'] = $PSBoundParameters['WhatIf']
+$forwardedCommonParameterNames = @('WhatIf', 'Confirm', 'Verbose', 'Debug', 'WarningAction', 'InformationAction', 'ProgressAction')
+foreach ($name in $forwardedCommonParameterNames) {
+    if ($PSBoundParameters.ContainsKey($name)) {
+        $invokeParameters[$name] = $PSBoundParameters[$name]
+    }
 }
-if ($PSBoundParameters.ContainsKey('Confirm')) {
-    $invokeParameters['Confirm'] = $PSBoundParameters['Confirm']
+if (-not $invokeParameters.ContainsKey('WhatIf') -and $WhatIfPreference) {
+    $invokeParameters['WhatIf'] = $true
 }
-if ($PSBoundParameters.ContainsKey('Verbose')) {
-    $invokeParameters['Verbose'] = $PSBoundParameters['Verbose']
+if (-not $invokeParameters.ContainsKey('Confirm')) {
+    # Cast so an inherited string-valued preference compares by impact level, not alphabetically.
+    $inheritedConfirmImpact = [System.Management.Automation.ConfirmImpact]$ConfirmPreference
+    if ($inheritedConfirmImpact -eq [System.Management.Automation.ConfirmImpact]::None) {
+        $invokeParameters['Confirm'] = $false
+    }
+    elseif ($inheritedConfirmImpact -le [System.Management.Automation.ConfirmImpact]::Medium) {
+        $invokeParameters['Confirm'] = $true
+    }
 }
-if ($PSBoundParameters.ContainsKey('WarningAction')) {
-    $invokeParameters['WarningAction'] = $PSBoundParameters['WarningAction']
+if (-not $invokeParameters.ContainsKey('Verbose') -and $VerbosePreference -eq 'Continue') {
+    $invokeParameters['Verbose'] = $true
+}
+if (-not $invokeParameters.ContainsKey('Debug') -and $DebugPreference -eq 'Continue') {
+    $invokeParameters['Debug'] = $true
 }
 
 Invoke-SideloadedExtensionPublish @invokeParameters

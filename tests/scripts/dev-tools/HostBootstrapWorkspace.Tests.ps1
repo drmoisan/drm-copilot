@@ -28,13 +28,19 @@ AfterAll {
 
 Describe 'process wrappers' {
     Context 'Invoke-HostBootstrapGit' {
-        It 'emits the git output when git exits 0' {
-            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Output = @('git fixture output'); ExitCode = 0 } }
+        It 'AC11-GIT-STREAMS passes -StreamToHost and emits no captured output when git exits 0' {
+            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith {
+                param([string]$FilePath, [string[]]$ArgumentList, [switch]$StreamToHost)
+                $null = $FilePath
+                $null = $ArgumentList
+                $null = $StreamToHost
+                [pscustomobject]@{ Output = @('git fixture output'); ExitCode = 0 }
+            }
 
-            $actual = @(Invoke-HostBootstrapGit -GitArgs @('status'))
-
-            $actual | Should -Be @('git fixture output')
-            Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter { $FilePath -eq 'git' -and ($ArgumentList -join ' ') -eq 'status' }
+            @(Invoke-HostBootstrapGit -GitArgs @('status')).Count | Should -Be 0
+            Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter {
+                $FilePath -eq 'git' -and ($ArgumentList -join ' ') -eq 'status' -and $StreamToHost
+            }
         }
 
         It 'throws when git exits nonzero' {
@@ -45,13 +51,19 @@ Describe 'process wrappers' {
     }
 
     Context 'Invoke-HostBootstrapWinget' {
-        It 'emits the winget output when winget exits 0' {
-            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Output = @('winget fixture output'); ExitCode = 0 } }
+        It 'AC11-WINGET-STREAMS passes -StreamToHost and emits no captured output when winget exits 0' {
+            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith {
+                param([string]$FilePath, [string[]]$ArgumentList, [switch]$StreamToHost)
+                $null = $FilePath
+                $null = $ArgumentList
+                $null = $StreamToHost
+                [pscustomobject]@{ Output = @('winget fixture output'); ExitCode = 0 }
+            }
 
-            $actual = @(Invoke-HostBootstrapWinget -WingetArgs @('install', '--id', 'Git.Git'))
-
-            $actual | Should -Be @('winget fixture output')
-            Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter { $FilePath -eq 'winget' }
+            @(Invoke-HostBootstrapWinget -WingetArgs @('install', '--id', 'Git.Git')).Count | Should -Be 0
+            Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter {
+                $FilePath -eq 'winget' -and $StreamToHost
+            }
         }
 
         It 'throws when winget exits nonzero' {
@@ -62,32 +74,49 @@ Describe 'process wrappers' {
     }
 
     Context 'Invoke-HostBootstrapNpm' {
-        It 'emits the npm output when npm exits 0' {
-            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Output = @('npm fixture output'); ExitCode = 0 } }
+        It 'AC11-NPM-STREAMS passes -StreamToHost and emits no captured output' {
+            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith {
+                param([string]$FilePath, [string[]]$ArgumentList, [switch]$StreamToHost)
+                $null = $FilePath
+                $null = $ArgumentList
+                $null = $StreamToHost
+                [pscustomobject]@{ Output = @('npm fixture output'); ExitCode = 0 }
+            }
 
-            $actual = @(Invoke-HostBootstrapNpm -NpmArgs @('install', '-g', 'fixture'))
-
-            $actual | Should -Be @('npm fixture output')
-            Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter { $FilePath -eq 'npm' }
+            @(Invoke-HostBootstrapNpm -NpmArgs @('install', '-g', 'fixture')).Count | Should -Be 0
+            Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter {
+                $FilePath -eq 'npm' -and $StreamToHost
+            }
         }
 
-        It 'does not throw when npm exits nonzero' {
-            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Output = @('npm ERR! fixture'); ExitCode = 1 } }
+        It 'AC11-NPM-NONZERO-NO-THROW does not throw and emits nothing when npm exits nonzero' {
+            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith {
+                param([string]$FilePath, [string[]]$ArgumentList, [switch]$StreamToHost)
+                $null = $FilePath
+                $null = $ArgumentList
+                $null = $StreamToHost
+                [pscustomobject]@{ Output = @('npm ERR! fixture'); ExitCode = 1 }
+            }
 
-            $actual = @(Invoke-HostBootstrapNpm -NpmArgs @('install'))
-
-            $actual | Should -Be @('npm ERR! fixture')
+            { $script:npmOutput = @(Invoke-HostBootstrapNpm -NpmArgs @('install')) } | Should -Not -Throw
+            $script:npmOutput.Count | Should -Be 0
         }
     }
 
     Context 'Invoke-HostBootstrapWsl' {
-        It 'emits the wsl output when wsl exits 0' {
-            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Output = @('wsl fixture output'); ExitCode = 0 } }
+        It 'AC11-WSL-STREAMS passes -StreamToHost and emits no captured output when wsl exits 0' {
+            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith {
+                param([string]$FilePath, [string[]]$ArgumentList, [switch]$StreamToHost)
+                $null = $FilePath
+                $null = $ArgumentList
+                $null = $StreamToHost
+                [pscustomobject]@{ Output = @('wsl fixture output'); ExitCode = 0 }
+            }
 
-            $actual = @(Invoke-HostBootstrapWsl -WslArgs @('--install', '--no-distribution'))
-
-            $actual | Should -Be @('wsl fixture output')
-            Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter { $FilePath -eq 'wsl' }
+            @(Invoke-HostBootstrapWsl -WslArgs @('--install', '--no-distribution')).Count | Should -Be 0
+            Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter {
+                $FilePath -eq 'wsl' -and $StreamToHost
+            }
         }
 
         It 'throws when wsl exits nonzero' {
@@ -113,15 +142,19 @@ Describe 'process wrappers' {
     }
 
     Context 'Invoke-HostBootstrapPoetry' {
-        It 'runs poetry directly when poetry is available and exits 0' {
+        It 'AC11-POETRY-STREAMS passes -StreamToHost and emits no captured output when poetry exits 0' {
             Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Source = 'C:\fixture\poetry.exe' } } -ParameterFilter { $Name -eq 'poetry' }
-            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Output = @('poetry fixture output'); ExitCode = 0 } }
+            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith {
+                param([string]$FilePath, [string[]]$ArgumentList, [switch]$StreamToHost)
+                $null = $FilePath
+                $null = $ArgumentList
+                $null = $StreamToHost
+                [pscustomobject]@{ Output = @('poetry fixture output'); ExitCode = 0 }
+            }
 
-            $actual = @(Invoke-HostBootstrapPoetry -PoetryArgs @('install', '--no-interaction'))
-
-            $actual | Should -Be @('poetry fixture output')
+            @(Invoke-HostBootstrapPoetry -PoetryArgs @('install', '--no-interaction')).Count | Should -Be 0
             Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter {
-                $FilePath -eq 'C:\fixture\poetry.exe' -and ($ArgumentList -join ' ') -eq 'install --no-interaction'
+                $FilePath -eq 'C:\fixture\poetry.exe' -and ($ArgumentList -join ' ') -eq 'install --no-interaction' -and $StreamToHost
             }
         }
 
@@ -132,16 +165,20 @@ Describe 'process wrappers' {
             { Invoke-HostBootstrapPoetry -PoetryArgs @('install') } | Should -Throw -ExpectedMessage 'poetry command failed with exit code 2'
         }
 
-        It 'runs python -m poetry when poetry is missing and python exits 0' {
+        It 'AC11-PYTHON-POETRY-STREAMS passes -StreamToHost and emits no captured output when python -m poetry exits 0' {
             Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { } -ParameterFilter { $Name -eq 'poetry' }
             Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Source = 'C:\fixture\python.exe' } } -ParameterFilter { $Name -eq 'python' }
-            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Output = @('python poetry fixture output'); ExitCode = 0 } }
+            Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith {
+                param([string]$FilePath, [string[]]$ArgumentList, [switch]$StreamToHost)
+                $null = $FilePath
+                $null = $ArgumentList
+                $null = $StreamToHost
+                [pscustomobject]@{ Output = @('python poetry fixture output'); ExitCode = 0 }
+            }
 
-            $actual = @(Invoke-HostBootstrapPoetry -PoetryArgs @('install', '--no-interaction'))
-
-            $actual | Should -Be @('python poetry fixture output')
+            @(Invoke-HostBootstrapPoetry -PoetryArgs @('install', '--no-interaction')).Count | Should -Be 0
             Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter {
-                $FilePath -eq 'C:\fixture\python.exe' -and ($ArgumentList -join ' ') -eq '-m poetry install --no-interaction'
+                $FilePath -eq 'C:\fixture\python.exe' -and ($ArgumentList -join ' ') -eq '-m poetry install --no-interaction' -and $StreamToHost
             }
         }
 
@@ -278,6 +315,12 @@ Describe 'Sync-ProjectsFromManifest' {
 }
 
 Describe 'Resolve-ProjectRepoRoot' {
+    It 'AC08-RESOLVE-EMPTY-PROJECTS returns the default repo root for an empty project list' {
+        Mock -CommandName Test-Path -ModuleName HostBootstrapWorkspace -MockWith { $true }
+
+        Resolve-ProjectRepoRoot -RepoRootPath '' -WorkspaceRootPath 'C:\fixture\ws' -Projects @() | Should -BeExactly (Resolve-Path "$PSScriptRoot/../../..").Path
+    }
+
     It 'returns the full form of an explicit repo root' {
         $projects = @([pscustomobject]@{ name = 'other'; url = 'https://example.invalid/other.git' })
 

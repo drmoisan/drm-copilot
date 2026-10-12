@@ -27,8 +27,7 @@ function Invoke-HostBootstrapGit {
         [string[]]$GitArgs
     )
 
-    $result = Invoke-HostNativeCommand -FilePath 'git' -ArgumentList $GitArgs
-    $result.Output
+    $result = Invoke-HostNativeCommand -FilePath 'git' -ArgumentList $GitArgs -StreamToHost
     if ($result.ExitCode -ne 0) {
         throw "git command failed with exit code $($result.ExitCode)"
     }
@@ -167,6 +166,7 @@ function Resolve-ProjectRepoRoot {
         [string]$WorkspaceRootPath,
 
         [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
         [object[]]$Projects
     )
 
@@ -199,8 +199,7 @@ function Invoke-HostBootstrapWinget {
         [string[]]$WingetArgs
     )
 
-    $result = Invoke-HostNativeCommand -FilePath 'winget' -ArgumentList $WingetArgs
-    $result.Output
+    $result = Invoke-HostNativeCommand -FilePath 'winget' -ArgumentList $WingetArgs -StreamToHost
     if ($result.ExitCode -ne 0) {
         throw "winget command failed with exit code $($result.ExitCode)"
     }
@@ -217,8 +216,7 @@ function Invoke-HostBootstrapNpm {
         [string[]]$NpmArgs
     )
 
-    $result = Invoke-HostNativeCommand -FilePath 'npm' -ArgumentList $NpmArgs
-    $result.Output
+    $null = Invoke-HostNativeCommand -FilePath 'npm' -ArgumentList $NpmArgs -StreamToHost
 }
 
 function Invoke-HostBootstrapWsl {
@@ -232,8 +230,7 @@ function Invoke-HostBootstrapWsl {
         [string[]]$WslArgs
     )
 
-    $result = Invoke-HostNativeCommand -FilePath 'wsl' -ArgumentList $WslArgs
-    $result.Output
+    $result = Invoke-HostNativeCommand -FilePath 'wsl' -ArgumentList $WslArgs -StreamToHost
     if ($result.ExitCode -ne 0) {
         throw "wsl command failed with exit code $($result.ExitCode)"
     }
@@ -266,8 +263,7 @@ function Invoke-HostBootstrapPoetry {
 
     $poetryCommand = Get-Command poetry -ErrorAction SilentlyContinue
     if ($poetryCommand) {
-        $result = Invoke-HostNativeCommand -FilePath $poetryCommand.Source -ArgumentList $PoetryArgs
-        $result.Output
+        $result = Invoke-HostNativeCommand -FilePath $poetryCommand.Source -ArgumentList $PoetryArgs -StreamToHost
         if ($result.ExitCode -ne 0) {
             throw "poetry command failed with exit code $($result.ExitCode)"
         }
@@ -280,8 +276,7 @@ function Invoke-HostBootstrapPoetry {
         throw "python is required to execute poetry"
     }
 
-    $result = Invoke-HostNativeCommand -FilePath $pythonCommand.Source -ArgumentList (@('-m', 'poetry') + $PoetryArgs)
-    $result.Output
+    $result = Invoke-HostNativeCommand -FilePath $pythonCommand.Source -ArgumentList (@('-m', 'poetry') + $PoetryArgs) -StreamToHost
     if ($result.ExitCode -ne 0) {
         throw "python -m poetry failed with exit code $($result.ExitCode)"
     }

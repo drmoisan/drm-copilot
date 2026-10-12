@@ -18,29 +18,11 @@
 # already holds the line, so no file changes. No temporary file is created.
 # ------------------------------------------------------------------------------
 
-# Canonical absolute path, so kcov reports the sourced file as <repo>/.codex/codex-web-setup.sh.
-SCRIPT_UNDER_TEST="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)/.codex/codex-web-setup.sh"
-FIXTURES="$(cd "${BATS_TEST_DIRNAME}/../fixtures/codex_web_setup" && pwd)"
-
-setup() {
-    # Sourcing defines the functions without running main (C824-1 pins the guard).
-    source "${SCRIPT_UNDER_TEST}"
-}
+# The shared helper defines SCRIPT_UNDER_TEST, FIXTURES, setup, run_with_stub_path, and record.
+load 'helpers/codex_web_setup_common'
 
 teardown() {
     unset -f append_if_missing bash curl dotnet dotnet-coverage grep mkdir mktemp rm touch
-}
-
-# Run a command with PATH and HOME limited to this test directory.
-run_with_stub_path() {
-    local PATH="${BATS_TEST_DIRNAME}"
-    local HOME="${BATS_TEST_DIRNAME}"
-    "$@"
-}
-
-# Print a replaced command's name and arguments to stderr, which run captures.
-record() {
-    printf '%s\n' "$*" >&2
 }
 
 @test "C824-34 read_global_json_sdk_version fails when global.json is absent" {
@@ -74,7 +56,8 @@ record() {
 }
 
 @test "C824-37 append_if_missing leaves a file that already contains the line" {
-    # Arrange
+    # Arrange: fixture precondition (C824-37), the file holds the line exactly once.
+    [ "$(grep -c -x 'export CI=true' "${FIXTURES}/bashrc-with-ci.txt")" = "1" ]
     touch() { record "touch $*"; }
     # Act
     run append_if_missing "${FIXTURES}/bashrc-with-ci.txt" 'export CI=true'
