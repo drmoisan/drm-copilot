@@ -13,33 +13,16 @@
 # Determinism: dotnet, dotnet-coverage, pwsh, and git are replaced by shell
 # functions; main runs with every step it calls replaced by a function that
 # records the step name, so nothing is installed and ~/.bashrc is not written.
-# A test that needs a tool to be absent runs through run_with_stub_path, which
-# limits PATH and HOME to this test directory. No temporary file is created.
+# A test that needs a tool to be absent runs through run_with_stub_path (defined
+# in the shared helper file), which limits PATH and HOME to the empty fixture
+# directory under tests/fixtures/codex_web_setup. No temporary file is created.
 # ------------------------------------------------------------------------------
 
-# Canonical absolute path, so kcov reports the sourced file as <repo>/.codex/codex-web-setup.sh.
-SCRIPT_UNDER_TEST="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)/.codex/codex-web-setup.sh"
-FIXTURES="$(cd "${BATS_TEST_DIRNAME}/../fixtures/codex_web_setup" && pwd)"
-
-setup() {
-    # Sourcing defines the functions without running main (C824-1 pins the guard).
-    source "${SCRIPT_UNDER_TEST}"
-}
+# The shared helper defines SCRIPT_UNDER_TEST, FIXTURES, setup, run_with_stub_path, and record.
+load 'helpers/codex_web_setup_common'
 
 teardown() {
     unset -f dotnet dotnet-coverage git pwsh
-}
-
-# Run a command with PATH and HOME limited to this test directory.
-run_with_stub_path() {
-    local PATH="${BATS_TEST_DIRNAME}"
-    local HOME="${BATS_TEST_DIRNAME}"
-    "$@"
-}
-
-# Print a replaced command's name and arguments to stderr, which run captures.
-record() {
-    printf '%s\n' "$*" >&2
 }
 
 @test "C824-48 verify_formatting_capability fails when dotnet is unavailable" {

@@ -11,35 +11,19 @@
 # Determinism: every external command an installer reaches (apt-get, id, sudo,
 # mktemp, curl, dpkg, rm, tar, mono, pwsh, nuget, actionlint) is replaced by a
 # shell function that prints its arguments to stderr. A test that needs a tool
-# to be absent runs through run_with_stub_path, which limits PATH and HOME to
-# this test directory (it holds no executable), so only the functions the test
-# defines satisfy `command -v`. Nothing is downloaded or installed and no
+# to be absent runs through run_with_stub_path (defined in the shared helper
+# file), which limits PATH and HOME to the empty fixture directory under
+# tests/fixtures/codex_web_setup (it holds no executable), so only the
+# functions the test defines satisfy `command -v`. Nothing is downloaded or installed and no
 # temporary file is created. teardown removes the stubs before bats-core runs
 # its own cleanup.
 # ------------------------------------------------------------------------------
 
-# Canonical absolute path, so kcov reports the sourced file as <repo>/.codex/codex-web-setup.sh.
-SCRIPT_UNDER_TEST="$(cd "${BATS_TEST_DIRNAME}/../.." && pwd)/.codex/codex-web-setup.sh"
-
-setup() {
-    # Sourcing defines the functions without running main (C824-1 pins the guard).
-    source "${SCRIPT_UNDER_TEST}"
-}
+# The shared helper defines SCRIPT_UNDER_TEST, FIXTURES, setup, run_with_stub_path, and record.
+load 'helpers/codex_web_setup_common'
 
 teardown() {
     unset -f actionlint apt-get curl dpkg id mktemp mono nuget pwsh rm sudo tar
-}
-
-# Run a command with PATH and HOME limited to this test directory.
-run_with_stub_path() {
-    local PATH="${BATS_TEST_DIRNAME}"
-    local HOME="${BATS_TEST_DIRNAME}"
-    "$@"
-}
-
-# Print a replaced command's name and arguments to stderr, which run captures.
-record() {
-    printf '%s\n' "$*" >&2
 }
 
 @test "C824-16 install_apt_packages warns and skips when apt-get is unavailable" {
