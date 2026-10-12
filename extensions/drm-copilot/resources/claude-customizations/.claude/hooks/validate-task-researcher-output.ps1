@@ -286,5 +286,5 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validat
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-task-researcher-output:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 $result = Invoke-TaskResearcherOutputValidation
-if (-not $result.Ok) { Write-Error $result.Message; exit 1 }
+if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0

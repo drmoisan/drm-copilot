@@ -81,3 +81,11 @@ Push refspec (branch substitution 1): `git push origin HEAD:bug/subagentstop-env
 - Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`e2284acf4..aab401160`)
 - Post-commit `git status --porcelain`: (empty)
 - SWITCH-COMMIT: discovery | aab401160783f07c65c54a0efe567802e1988d23
+
+## [P9-T15] Phase 9
+
+- Pre-commit `git status --porcelain`: task-researcher hook, mirror, and Tests suite modified; feature-folder evidence (corpus-task-researcher After section, static-checks-task-researcher, conversion-task-researcher, r3-verification, registration-task-researcher, mirror-log), plan, spec modified (all within W-ALLOWED).
+- Commit: fe96ab7156418ebf05ecd8f73b333ba6408937d2 (`fix(905): apply rules R1 and R3, add the #786 guard, and read the task-researcher gate from the stdin envelope`)
+- Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`aab401160..fe96ab715`)
+- Post-commit `git status --porcelain`: (empty)
+- CORPUS-AFTER-COMMIT: task-researcher | fe96ab7156418ebf05ecd8f73b333ba6408937d2
