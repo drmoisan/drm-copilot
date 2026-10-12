@@ -408,7 +408,7 @@ tail such as `v1.2.0`, and a trailing dot all fail the predicate.
 
 **Accepted residuals (fail-closed direction).** Three token shapes that do not name a file are
 accepted by this rule: a dotted directory cited without a trailing slash, such as the C#-style
-`src/TaskMaster.Domain`; host-qualified tokens such as `example.com/page.html` or `owner/repo.git`;
+`src/<Product>.Domain`; host-qualified tokens such as `example.com/page.html` or `owner/repo.git`;
 and refs whose final segment has a letter-led dotted tail. Each produces at most an extra contention
 edge, which serializes work. A missed write schedules concurrent edits, which is the unsafe
 direction under this doctrine. In the self-hosted repository W4 removes the host-qualified cases; in
@@ -564,7 +564,11 @@ Write-intent extraction can drop a genuine write in these cases:
 4. a read-verb task that also writes without a write verb in its title (W3);
 5. a new top-level directory not yet in `path_roots` (W4);
 6. a genuine file whose stem is in the placeholder set (W6).
-7. a genuine file cited only as a separator-free bare file name is not recorded, because only repository-relative paths and configured root surfaces are accepted (issue #797); the planner cites the repository-relative path or appends it to the declared radius.
+
+The file-shape classifier, which runs before write-intent extraction, drops one further case: a
+genuine file cited only as a separator-free bare file name is not recorded, because only
+repository-relative paths and configured root surfaces are accepted (issue #797). The planner
+cites the repository-relative path or appends it to the declared radius.
 
 Three mitigations bound these cases:
 
