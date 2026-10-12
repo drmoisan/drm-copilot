@@ -31,3 +31,18 @@ Output Summary: all five pairs have equal SHA-256 values. Precondition checked f
 | `.claude/skills/parallel-orchestrate/SKILL.md` | 35cc60377f37465fd4ea463bfdb1a78e462161ce9c094a64ac61c1f9cf49c9dc | 35cc60377f37465fd4ea463bfdb1a78e462161ce9c094a64ac61c1f9cf49c9dc | yes |
 | `.claude/agents/parallel-orchestrator.md` | 49eba236cd68ce736120827f6d52596937c4fc2eff47d54219decbd9c14f0844 | 49eba236cd68ce736120827f6d52596937c4fc2eff47d54219decbd9c14f0844 | yes |
 | `.claude/settings.json` | cb9893ee9d71397106cb17a71843eacd96b22e59691a101540f9f4e30d32d082 | cb9893ee9d71397106cb17a71843eacd96b22e59691a101540f9f4e30d32d082 | yes |
+
+## P1-T31 — committed index blobs of the bash pairs
+
+Timestamp: 2026-10-12T20-29
+Command: `git ls-files -s <repo path> <mirror path>` over the five bash pairs, after the Phase 1 commit eba4d72cc81110b979f7534c898cf3cc3121f676 was pushed.
+EXIT_CODE: 0
+Output Summary: each repository/mirror pair reports the same blob SHA (mode 100644).
+
+| File | Blob SHA (repository and mirror) |
+| --- | --- |
+| `parallel-mutation.sh` | 8e1629e54a664decae04915a1eb9c8a654741d8c |
+| `remove-parallel-item.sh` | 3af7c826bc65712d2b9796aff368112909f3fce4 |
+| `parallel-mutation-cli.sh` | 111c8d0c3557df39735fb5adcad9c26fba2e6dd9 |
+| `parallel-mutation-ops.sh` | 997345e73615a51b1e45a1d25d03aebe5fa951b8 |
+| `mutate-parallel-run.sh` | 9bd6ee6f7d76d4f8ee8a61769d3e12677c882f47 |
