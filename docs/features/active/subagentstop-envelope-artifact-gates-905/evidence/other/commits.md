@@ -73,3 +73,11 @@ Push refspec (branch substitution 1): `git push origin HEAD:bug/subagentstop-env
 - Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`9fb0f6da6..e2284acf4`)
 - Post-commit `git status --porcelain`: (empty)
 - CORPUS-AFTER-COMMIT: discovery | e2284acf4a4054084c6f5ee52ceabeef346d069d
+
+## [P8-T7] Phase 8
+
+- Pre-commit `git status --porcelain`: discovery hook and mirror modified; feature-folder evidence, plan, spec (AC-12, AC-13, AC-33) modified; new pass-after-discovery and registration-discovery evidence (all within W-ALLOWED). The corpus evidence file is unchanged and not included.
+- Commit: aab401160783f07c65c54a0efe567802e1988d23 (`fix(905): block discovery SubagentStop through Exit-SubagentStopBlock`)
+- Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`e2284acf4..aab401160`)
+- Post-commit `git status --porcelain`: (empty)
+- SWITCH-COMMIT: discovery | aab401160783f07c65c54a0efe567802e1988d23

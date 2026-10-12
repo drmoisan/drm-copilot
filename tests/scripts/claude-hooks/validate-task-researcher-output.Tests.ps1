@@ -37,41 +37,46 @@ BeforeAll {
 - Member-set Comparison: normalized sets match
 "@
     }
+
+    function New-SubagentStopEnvelopeJson {
+        # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
+        param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
+        $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'task-researcher'; stop_hook_active = [bool]$StopHookActive }
+        if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }
+        if ($PSBoundParameters.ContainsKey('OutputField')) { $envelope['output'] = $OutputField }
+        return ($envelope | ConvertTo-Json -Compress)
+    }
 }
 
 Describe 'validate-task-researcher-output.ps1' {
     Context 'payload validation' {
-        It 'blocks when CLAUDE_HOOK_INPUT is empty' {
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload ''
+        It 'blocks with a payload anomaly when the input text is empty' {
+            $result = Invoke-TaskResearcherOutputValidation -InputText ''
 
             $result.Ok | Should -BeFalse
-            $result.Message | Should -Match 'CLAUDE_HOOK_INPUT is empty'
+            $result.Message | Should -Match 'task-researcher hook: payload anomaly'
         }
 
         It 'blocks when the output does not advertise a research-path token' {
-            $raw = @{ output = 'Done. Findings recorded.' } | ConvertTo-Json -Compress
-
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload $raw
+            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'Done. Findings recorded.')
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'does not advertise a research-path'
         }
 
-        It 'blocks when CLAUDE_HOOK_INPUT is malformed JSON' {
-            # Arrange - non-parseable payload
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload '{ not valid json'
+        It 'blocks with a payload anomaly when the input text is malformed JSON' {
+            # Arrange - non-parseable envelope
+            $result = Invoke-TaskResearcherOutputValidation -InputText '{ not valid json'
 
             # Assert
             $result.Ok | Should -BeFalse
-            $result.Message | Should -Match 'failed to parse CLAUDE_HOOK_INPUT as JSON'
+            $result.Message | Should -Match 'task-researcher hook: payload anomaly'
         }
 
-        It 'blocks when the output field is empty' {
-            # Arrange - valid JSON with an empty output value
-            $raw = @{ output = '' } | ConvertTo-Json -Compress
-
+        It 'blocks with the existing empty-output reason when the assistant message is blank' {
+            # Arrange - valid envelope whose last_assistant_message is empty
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload $raw
+            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage '')
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -81,9 +86,7 @@ Describe 'validate-task-researcher-output.ps1' {
 
     Context 'research root and filename enforcement' {
         It 'blocks when the research-path is not under a tracked research root' {
-            $raw = @{ output = 'research-path: docs/features/active/foo/notes.md' } | ConvertTo-Json -Compress
-
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload $raw
+            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/foo/notes.md')
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'is not under a tracked research root'
@@ -91,9 +94,8 @@ Describe 'validate-task-researcher-output.ps1' {
 
         It 'blocks when the research-path filename does not match the documented convention' {
             Mock -CommandName Test-ResearchFile -MockWith { $true }
-            $raw = @{ output = 'research-path: docs/features/active/foo/research/foo.md' } | ConvertTo-Json -Compress
 
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload $raw
+            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/foo/research/foo.md')
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'filename convention'
@@ -101,9 +103,8 @@ Describe 'validate-task-researcher-output.ps1' {
 
         It 'allows termination when the research-path is valid and the file exists' {
             Mock -CommandName Test-ResearchFile -MockWith { $true }
-            $raw = @{ output = 'research-path: docs/features/active/foo/research/2026-05-04T00-00-hook-contract-research.md' } | ConvertTo-Json -Compress
 
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload $raw
+            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/foo/research/2026-05-04T00-00-hook-contract-research.md')
 
             $result.Ok | Should -BeTrue
             $result.Message | Should -BeNullOrEmpty
@@ -112,10 +113,9 @@ Describe 'validate-task-researcher-output.ps1' {
         It 'blocks when the advertised research file does not exist on disk' {
             # Arrange - valid path and filename, but the file is absent
             Mock -CommandName Test-ResearchFile -MockWith { $false }
-            $raw = @{ output = 'research-path: docs/features/active/foo/research/2026-05-04T00-00-hook-contract-research.md' } | ConvertTo-Json -Compress
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload $raw
+            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/foo/research/2026-05-04T00-00-hook-contract-research.md')
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -127,10 +127,9 @@ Describe 'validate-task-researcher-output.ps1' {
         It 'accepts a feature-folder research path' {
             # Arrange - feature-associated research under docs/features/.../research/
             Mock -CommandName Test-ResearchFile -MockWith { $true }
-            $raw = @{ output = 'research-path: docs/features/active/some-feature-227/research/2026-06-24T13-02-some-feature-research.md' } | ConvertTo-Json -Compress
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload $raw
+            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/some-feature-227/research/2026-06-24T13-02-some-feature-research.md')
 
             # Assert
             $result.Ok | Should -BeTrue
@@ -140,10 +139,9 @@ Describe 'validate-task-researcher-output.ps1' {
         It 'accepts a one-off research path under docs/research/' {
             # Arrange - one-off research under docs/research/
             Mock -CommandName Test-ResearchFile -MockWith { $true }
-            $raw = @{ output = 'research-path: docs/research/2026-06-24T13-02-some-topic-research.md' } | ConvertTo-Json -Compress
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload $raw
+            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/research/2026-06-24T13-02-some-topic-research.md')
 
             # Assert
             $result.Ok | Should -BeTrue
@@ -153,10 +151,9 @@ Describe 'validate-task-researcher-output.ps1' {
         It 'rejects the retired artifacts/research/ path with a message naming the new roots' {
             # Arrange - the old artifacts/research/ root is no longer accepted
             Mock -CommandName Test-ResearchFile -MockWith { $true }
-            $raw = @{ output = 'research-path: artifacts/research/2026-06-24T13-02-some-topic-research.md' } | ConvertTo-Json -Compress
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload $raw
+            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: artifacts/research/2026-06-24T13-02-some-topic-research.md')
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -168,10 +165,9 @@ Describe 'validate-task-researcher-output.ps1' {
         It 'rejects a feature path that lacks a /research/ segment' {
             # Arrange - under docs/features/ but with no /research/ segment
             Mock -CommandName Test-ResearchFile -MockWith { $true }
-            $raw = @{ output = 'research-path: docs/features/active/some-feature/2026-06-24T13-02-some-feature-research.md' } | ConvertTo-Json -Compress
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload $raw
+            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/some-feature/2026-06-24T13-02-some-feature-research.md')
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -181,10 +177,9 @@ Describe 'validate-task-researcher-output.ps1' {
         It 'rejects a feature research path whose filename does not conform' {
             # Arrange - correct /research/ segment but non-conforming filename
             Mock -CommandName Test-ResearchFile -MockWith { $true }
-            $raw = @{ output = 'research-path: docs/features/active/some-feature/research/bad-name.md' } | ConvertTo-Json -Compress
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload $raw
+            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/some-feature/research/bad-name.md')
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -281,10 +276,9 @@ Describe 'validate-task-researcher-output.ps1' {
             Mock -CommandName Test-AutomationFeasibilitySection -MockWith {
                 @{ Ok = $false; Message = 'task-researcher hook: missing the required automation feasibility section.' }
             }
-            $raw = @{ output = 'research-path: docs/features/active/foo/research/2026-05-04T00-00-autonomous-execution-research.md' } | ConvertTo-Json -Compress
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -RawPayload $raw
+            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/foo/research/2026-05-04T00-00-autonomous-execution-research.md')
 
             # Assert
             $result.Ok | Should -BeFalse
