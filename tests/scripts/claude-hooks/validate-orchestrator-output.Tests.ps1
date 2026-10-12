@@ -32,52 +32,52 @@ Describe 'validate-orchestrator-output.ps1' {
     BeforeAll { Mock Resolve-OrchestratorOutputCheckpointPath { [pscustomobject]@{ Resolved = $true; CheckpointPath = '/synthetic-worktrees/default-session/artifacts/orchestration/orchestrator-state.json'; WorktreeRoot = '/synthetic-worktrees/default-session'; Status = 'SessionRoot'; ReasonCode = $null; Detail = 'default resolved target (issue #787)' } } }
 
     Context 'payload validation' {
-        It 'blocks when CLAUDE_HOOK_INPUT is empty' {
+        It 'blocks with a payload anomaly when the input text is empty' {
             # Arrange
             $raw = ''
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw
 
             # Assert
             $result.Ok | Should -BeFalse
-            $result.Message | Should -Match 'CLAUDE_HOOK_INPUT is empty'
+            $result.Message.StartsWith('orchestrator hook: payload anomaly - ', [System.StringComparison]::Ordinal) | Should -BeTrue
         }
 
-        It 'blocks when CLAUDE_HOOK_INPUT contains malformed JSON' {
+        It 'blocks with a payload anomaly when the input text is malformed JSON' {
             # Arrange
             $raw = '{ this is not valid json'
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw
 
             # Assert
             $result.Ok | Should -BeFalse
-            $result.Message | Should -Match 'failed to parse CLAUDE_HOOK_INPUT as JSON'
+            $result.Message.StartsWith('orchestrator hook: payload anomaly - ', [System.StringComparison]::Ordinal) | Should -BeTrue
         }
 
-        It 'blocks when the output field is empty' {
+        It 'blocks when last_assistant_message is empty' {
             # Arrange
-            $raw = '{"output":""}'
+            $raw = '{"last_assistant_message":""}'
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw
 
             # Assert
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'agent output is empty'
         }
 
-        It 'blocks when the JSON payload omits the output field entirely' {
-            # Arrange — valid JSON but no "output" property
+        It 'blocks with a payload anomaly when last_assistant_message is absent' {
+            # Arrange — valid JSON but no last_assistant_message property
             $raw = '{"sessionId":"abc"}'
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw
 
             # Assert
             $result.Ok | Should -BeFalse
-            $result.Message | Should -Match 'agent output is empty'
+            $result.Message | Should -Match 'payload anomaly'
         }
     }
 
@@ -85,10 +85,10 @@ Describe 'validate-orchestrator-output.ps1' {
         It 'blocks when the checkpoint file does not exist' {
             # Arrange
             Mock -CommandName Get-CheckpointFileContent -MockWith { @{ Exists = $false; Content = $null } }
-            $raw = '{"output":"All steps complete."}'
+            $raw = '{"last_assistant_message":"All steps complete."}'
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -99,10 +99,10 @@ Describe 'validate-orchestrator-output.ps1' {
         It 'blocks when the checkpoint file content is empty' {
             # Arrange
             Mock -CommandName Get-CheckpointFileContent -MockWith { @{ Exists = $true; Content = '   ' } }
-            $raw = '{"output":"Done."}'
+            $raw = '{"last_assistant_message":"Done."}'
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -114,10 +114,10 @@ Describe 'validate-orchestrator-output.ps1' {
         It 'blocks when the checkpoint file is not valid JSON' {
             # Arrange
             Mock -CommandName Get-CheckpointFileContent -MockWith { @{ Exists = $true; Content = '{ broken json' } }
-            $raw = '{"output":"Done."}'
+            $raw = '{"last_assistant_message":"Done."}'
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -129,10 +129,10 @@ Describe 'validate-orchestrator-output.ps1' {
             Mock -CommandName Get-CheckpointFileContent -MockWith {
                 @{ Exists = $true; Content = '{"objective":"work"}' }
             }
-            $raw = '{"output":"Done."}'
+            $raw = '{"last_assistant_message":"Done."}'
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -150,10 +150,10 @@ Describe 'validate-orchestrator-output.ps1' {
                     Content = '{"objective":"","completed_steps":[],"next_step":"x","last_updated":"2026-05-04T00-00"}'
                 }
             }
-            $raw = '{"output":"Done."}'
+            $raw = '{"last_assistant_message":"Done."}'
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -168,12 +168,12 @@ Describe 'validate-orchestrator-output.ps1' {
                     Content = '{"objective":"deliver feature X","completed_steps":["step1"],"next_step":"step2","last_updated":"2026-05-04T00-00"}'
                 }
             }
-            $raw = '{"output":"Final summary: orchestration complete."}'
+            $raw = '{"last_assistant_message":"Final summary: orchestration complete."}'
             # Inject a clean routing seam so no real Python subprocess runs.
             $routingStub = { param($Path) [pscustomobject]@{ ExitCode = 0; Output = '' } }
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw -RoutingInvoker $routingStub
 
             # Assert
             $result.Ok | Should -BeTrue
@@ -196,7 +196,7 @@ Describe 'validate-orchestrator-output.ps1' {
         It 'blocks DONE with ROUTING_CONTRACT_BLOCKED when the validator reports errors' {
             # Arrange — fabricated-route checkpoint: the injected seam reports the
             # validator error the Python validator would emit for an unknown route.
-            $raw = '{"output":"Final summary."}'
+            $raw = '{"last_assistant_message":"Final summary."}'
             $routingStub = {
                 param($Path)
                 [pscustomobject]@{
@@ -206,7 +206,7 @@ Describe 'validate-orchestrator-output.ps1' {
             }
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw -RoutingInvoker $routingStub
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -216,11 +216,11 @@ Describe 'validate-orchestrator-output.ps1' {
 
         It 'allows DONE when the routing validator returns a clean result' {
             # Arrange — seam reports a clean validator run (exit 0, no output).
-            $raw = '{"output":"Final summary."}'
+            $raw = '{"last_assistant_message":"Final summary."}'
             $routingStub = { param($Path) [pscustomobject]@{ ExitCode = 0; Output = '' } }
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw -RoutingInvoker $routingStub
 
             # Assert
             $result.Ok | Should -BeTrue
@@ -230,7 +230,7 @@ Describe 'validate-orchestrator-output.ps1' {
         It 'allows DONE when the validator exits 0 and prints its success line (issue #413)' {
             # Arrange — the live validator path: exit 0 with the success line on stdout,
             # folded into Output by the default invoker's 2>&1 capture. This must ALLOW.
-            $raw = '{"output":"Final summary."}'
+            $raw = '{"last_assistant_message":"Final summary."}'
             $routingStub = {
                 param($Path, $Type)
                 [pscustomobject]@{
@@ -240,7 +240,7 @@ Describe 'validate-orchestrator-output.ps1' {
             }
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw -RoutingInvoker $routingStub
 
             # Assert
             $result.Ok | Should -BeTrue
@@ -250,7 +250,7 @@ Describe 'validate-orchestrator-output.ps1' {
         It 'is mockable without invoking Python (the injected scriptblock is used)' {
             # Arrange — a tracking seam that records it was called; if the hook
             # invoked Python instead, the tracker would not flip.
-            $raw = '{"output":"Final summary."}'
+            $raw = '{"last_assistant_message":"Final summary."}'
             $script:seamInvoked = $false
             $routingStub = {
                 param($Path)
@@ -259,7 +259,7 @@ Describe 'validate-orchestrator-output.ps1' {
             }
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw -RoutingInvoker $routingStub
 
             # Assert
             $script:seamInvoked | Should -BeTrue
@@ -269,7 +269,7 @@ Describe 'validate-orchestrator-output.ps1' {
         It 'blocks a fabricated-route checkpoint (pass-after for the P3-T1 fail-before)' {
             # Arrange — the silent-deviation scenario: a structurally valid
             # checkpoint selecting a fabricated route is now blocked.
-            $raw = '{"output":"Final summary."}'
+            $raw = '{"last_assistant_message":"Final summary."}'
             $routingStub = {
                 param($Path)
                 [pscustomobject]@{
@@ -279,7 +279,7 @@ Describe 'validate-orchestrator-output.ps1' {
             }
 
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload $raw -RoutingInvoker $routingStub
+            $result = Invoke-OrchestratorOutputValidation -InputText $raw -RoutingInvoker $routingStub
 
             # Assert
             $result.Ok | Should -BeFalse
