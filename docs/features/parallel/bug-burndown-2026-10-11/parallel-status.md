@@ -15,8 +15,8 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 4
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-12T15:48:17Z
-- `next_step`: #898 in flight; on DONE verify and merge; then launch #894.
+- `last_updated`: 2026-10-12T16:18:11Z
+- `next_step`: #894 in flight; on DONE verify and merge; then launch #884.
 
 **Items**
 
@@ -30,9 +30,9 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 889 | docs/features/active/2026-10-11-argumentless-sort-ordering-and-comparator-coverage-gaps-889 | 0 | scheduled | not_started |  |  |  |  |  |
 | 890 | docs/features/active/2026-10-11-parallel-skills-python-engine-calls-and-enum-error-members-890 | 0 | scheduled | not_started |  |  |  |  |  |
 | 892 | docs/features/active/2026-10-11-push-down-ac22-test-command-omits-memory-tests-892 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/911 | b6fd76ecdfb07f860e4ec809d8b2658c16ef1f21 | 2026-10-12T13:02:40Z | 2026-10-12T13:33:01Z |  |
-| 894 | docs/features/active/2026-10-11-product-name-examples-remain-in-generic-rules-894 | 0 | scheduled | not_started |  |  |  |  |  |
+| 894 | docs/features/active/2026-10-11-product-name-examples-remain-in-generic-rules-894 | 0 | in_flight | worktree_created |  |  | 2026-10-12T16:18:11Z |  |  |
 | 895 | docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895 | 0 | scheduled | not_started |  |  |  |  |  |
-| 898 | docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898 | 0 | in_flight | worktree_created |  |  | 2026-10-12T15:48:17Z |  |  |
+| 898 | docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/915 | 5dd9d1f33d1c0ccb01a6c34f6fefd959e020aa74 | 2026-10-12T15:48:17Z | 2026-10-12T16:17:51Z |  |
 | 899 | docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899 | 0 | scheduled | not_started |  |  |  |  |  |
 | 900 | docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900 | 0 | scheduled | not_started |  |  |  |  |  |
 | 901 | docs/features/active/2026-10-11-pr-author-hook-docs-only-exemption-901 | 0 | scheduled | not_started |  |  |  |  |  |
