@@ -859,6 +859,113 @@ Initial mode computes exit code 1 only when `CORPUS-UNEXPECTED:` is non-zero; a 
 
 Success-output observation for CR-CORPUS. No Phase 0 run exists, because the validator CR-CORPUS evaluates is the post-Phase-3 validator. CR-CORPUS's success-case output is observed by P4-T2 for the initial-mode literals and by P4-T3 for the final-mode literals. Both print every summary line unconditionally with a numeric value. If any literal named in those tasks is absent from a run that exits 0, record the observed output and stop with BLOCKED.
 
+### CR-EXEMPLAR (v1.8; rule3 exemplar selection and representativeness guard; read-only)
+
+Always run through the scratchpad route, once per rule3 `## FIX-<j>` section, before step (a) of that `j`. It reads corpus files only through `git show <CORPUS-SHA>:<path>`. It reads the candidate list from `$InitialArtifact` (the P4-T1 artifact) with `Get-Content`. It reads the denied-token patterns by parsing `.claude/hooks/check-powershell-test-purity.ps1` (the `Pattern` values of the `$forbiddenPatterns` hashtables), so they are applied by reference and not copied. It loads `Test-LanguageCoverageRow` from `git show HEAD:.claude/hooks/validate-feature-review-coverage-rules.ps1`, not from the working tree. HEAD holds no Phase 4 rule fix until P4-T10 commits, so the guard observes the unchanged rule even after earlier `j` values have edited the working-tree H3. It writes no repository file.
+
+```powershell
+$CorpusSha = '<CORPUS-SHA>'                 # the P4-T1 CorpusSha value
+$InitialArtifact = '<INITIAL-ARTIFACT>'     # repository-relative path of the P4-T1 artifact
+$FormKey = '<FORM-KEY>'                     # the FormKey of the rule3 FIX section
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$ErrorActionPreference = 'Stop'
+$LabelMap = @{ 'TypeScript' = @('TypeScript', 'typescript'); 'Python' = @('Python', 'python', 'pytest'); 'PowerShell' = @('PowerShell', 'powershell', 'pester'); 'CSharp' = @('C#', 'CSharp', 'csharp', '.NET', 'dotnet') }
+$CovRe = '(?i)(coverage|lcov|line[s]?\s+hit|pester)'
+$Fragments = @{ 'NARROWING' = 'narrows scope'; 'NO-COVERAGE-ROW' = 'no coverage-scoped row'; 'NO-VERDICT' = 'neither a PASS nor a FAIL' }
+$TempLiterals = @('New-TemporaryFile', 'GetTempFileName', 'TestDrive', '$env:TEMP')
+$Ascii = @{ 0x2010 = '-'; 0x2011 = '-'; 0x2012 = '-'; 0x2013 = '-'; 0x2014 = '-'; 0x2212 = '-'; 0x2018 = "'"; 0x2019 = "'"; 0x201C = '"'; 0x201D = '"'; 0x2026 = '...'; 0x00A0 = ' '; 0x2190 = '<-'; 0x2192 = '->'; 0x2264 = '<='; 0x2265 = '>='; 0x00D7 = 'x' }
+$parts = $FormKey -split '\|'
+if ($parts.Count -lt 3 -or $parts[0] -ne 'rule3' -or -not $LabelMap.ContainsKey($parts[1]) -or -not $Fragments.ContainsKey($parts[2])) { throw "not a rule3 form key: $FormKey" }
+$Language = $parts[1]; $ReasonClass = $parts[2]; $Fragment = $Fragments[$ReasonClass]
+$LabelRe = '(?i)(' + (($LabelMap[$Language] | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
+$tk = $null; $pe = $null
+$purityAst = [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path -LiteralPath '.claude/hooks/check-powershell-test-purity.ps1').Path, [ref]$tk, [ref]$pe)
+$assign = $purityAst.Find({ param($n) $n -is [System.Management.Automation.Language.AssignmentStatementAst] -and $n.Left.Extent.Text -eq '$forbiddenPatterns' }, $true)
+$Purity = @($assign.Right.FindAll({ param($n) $n -is [System.Management.Automation.Language.HashtableAst] }, $true) | ForEach-Object { foreach ($kv in $_.KeyValuePairs) { if ($kv.Item1.Extent.Text -eq 'Pattern') { $kv.Item2.GetPureExpression().SafeGetValue() } } })
+if ($Purity.Count -eq 0) { throw 'no purity patterns read' }
+"PURITY-PATTERNS: $($Purity.Count)"
+$h3Text = (@(git show 'HEAD:.claude/hooks/validate-feature-review-coverage-rules.ps1') -join "`n")
+if ($LASTEXITCODE -ne 0) { throw 'git show HEAD rules file failed' }
+. ([scriptblock]::Create($h3Text))
+$cands = [System.Collections.Generic.List[string]]::new()
+foreach ($l in @(Get-Content -LiteralPath $InitialArtifact)) {
+    if ($l -match '^CORPUS-REJECT: .+? \| rule3 \| (?:TRUE-POSITIVE|FALSE-POSITIVE) \| (?<A>.+?) ; (?<L>.+?) ; (?<B>.+?) ; (?<K>.+?) ; ' -and $Matches['K'] -eq $FormKey -and -not $cands.Contains($Matches['A'])) { $cands.Add($Matches['A']) }
+}
+"EXEMPLAR-CANDIDATES: $FormKey | $($cands.Count)"
+function Get-FullSet([string[]] $Lines) { foreach ($x in $Lines) { if ($x -match $LabelRe -or $x -match '^##\s') { $x.TrimEnd() } } }
+function Get-ReducedSet([string[]] $Lines) {
+    $keep = [System.Collections.Generic.SortedSet[int]]::new(); $heading = -1
+    for ($i = 0; $i -lt $Lines.Count; $i++) {
+        if ($Lines[$i] -match '^##\s') { $heading = $i }
+        $hit = $Lines[$i] -match $LabelRe -and ($ReasonClass -eq 'NO-COVERAGE-ROW' -or $Lines[$i] -match $CovRe)
+        if ($hit) { [void]$keep.Add($i); if ($heading -ge 0) { [void]$keep.Add($heading) } }
+    }
+    foreach ($i in $keep) {
+        $sb = [System.Text.StringBuilder]::new()
+        foreach ($ch in $Lines[$i].ToCharArray()) { $c = [int]$ch; if ($c -lt 128) { [void]$sb.Append($ch) } elseif ($Ascii.ContainsKey($c)) { [void]$sb.Append($Ascii[$c]) } else { [void]$sb.Append('?') } }
+        $sb.ToString().TrimEnd()
+    }
+}
+function Get-QualifyFailures([string[]] $Set) {
+    $fails = @()
+    if (@($Set | Where-Object { $_ -match '[^\x00-\x7F]' }).Count -gt 0) { $fails += 'non-ascii' }
+    foreach ($p in $Purity) { if (@($Set | Where-Object { $_ -match $p }).Count -gt 0) { $fails += 'purity'; break } }
+    foreach ($t in $TempLiterals) { if (@($Set | Where-Object { $_.Contains($t) }).Count -gt 0) { $fails += 'temp-literal'; break } }
+    if (@($Set | Where-Object { $_.StartsWith("'@") }).Count -gt 0) { $fails += 'here-string-terminator' }
+    if (@($Set).Count -gt 40) { $fails += "lines=$(@($Set).Count)" }
+    return $fails
+}
+$texts = @{}
+foreach ($a in $cands) {
+    $t = @(git show "$($CorpusSha):$a")
+    if ($LASTEXITCODE -ne 0) { throw "git show failed for $a" }
+    $texts[$a] = (($t -join "`n") -split "`r?`n")
+}
+$selected = $null
+foreach ($form in @('FULL', 'REDUCED')) {
+    foreach ($a in $cands) {
+        $set = @(if ($form -eq 'FULL') { Get-FullSet $texts[$a] } else { Get-ReducedSet $texts[$a] })
+        $fails = @(Get-QualifyFailures $set)
+        $reason = ''
+        if ($fails.Count -eq 0) { $r = Test-LanguageCoverageRow -AuditText ($set -join "`n") -Language $Language -RepoWidePct $null -BranchPct $null; if (-not $r.Ok) { $reason = [string]$r.Reason } }
+        $guard = if ($fails.Count -gt 0) { 'NOT-EVALUATED' } elseif ($reason.Contains($Fragment)) { 'REPRODUCED' } else { 'NOT-REPRODUCED' }
+        $state = if ($fails.Count -gt 0) { $fails -join ',' } else { 'QUALIFIES' }
+        "EXEMPLAR-CANDIDATE: $FormKey | $form | $a | lines=$($set.Count) | $state | guard=$guard"
+        if ($guard -eq 'NOT-REPRODUCED') { "EXEMPLAR-GUARD: $FormKey | $form | $a | HEAD Test-LanguageCoverageRow | NOT-REPRODUCED | $Fragment | $(($reason -replace '\s+', ' ').Trim())" }
+        if ($guard -eq 'REPRODUCED') {
+            "EXEMPLAR-GUARD: $FormKey | $form | $a | HEAD Test-LanguageCoverageRow | REPRODUCED | $Fragment | $(($reason -replace '\s+', ' ').Trim())"
+            $selected = @{ Form = $form; Path = $a; Set = $set }
+            break
+        }
+    }
+    if ($null -ne $selected) { break }
+}
+if ($null -eq $selected) { "EXEMPLAR: $FormKey | NONE"; $code = 1 }
+else {
+    "EXEMPLAR: $FormKey | ExemplarForm=$($selected.Form) | $($selected.Path) | lines=$($selected.Set.Count)"
+    foreach ($line in $selected.Set) { "EXEMPLAR-LINE: $line" }
+    $code = 0
+}
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+Derivations, stated once so that a third party re-running CR-EXEMPLAR with the same `$CorpusSha`, `$InitialArtifact`, and `$FormKey` obtains the same selection:
+- Candidates: the distinct artifact paths of the `$InitialArtifact` `CORPUS-REJECT:` lines whose rule is `rule3` and whose form-key field equals `$FormKey`, in file order (the P4-T2 output order).
+- FULL line set (the v1.5 definition): the lines of `git show <CorpusSha>:<candidate>` that match the language label pattern (`$LabelRe`, the CR-CORPUS `Get-LabelRe` value) or `^##\s`, in file order, trailing whitespace trimmed. No character is replaced.
+- REDUCED line set. Key lines are selected by reason class. For `NARROWING` and `NO-VERDICT`, a key line matches `$LabelRe` and `$CovRe`, which are the `$coverageLines` filter of `Test-LanguageCoverageRow`, H3 lines 120 and 129. For `NO-COVERAGE-ROW`, a key line matches `$LabelRe`, the `$languageLines` filter of H3 line 120. Each key line's section heading is also kept: the nearest line at or before it that matches `^##\s`. Lines are emitted in file order without duplicates. In each emitted line, every UTF-16 code unit at or above 128 is replaced through the fixed `$Ascii` table below, and trailing whitespace is trimmed after the replacement:
+  - U+2010, U+2011, U+2012, U+2013, U+2014, U+2212 become `-`;
+  - U+2018, U+2019 become `'`, and U+201C, U+201D become `"`;
+  - U+2026 becomes `...`, and U+00A0 becomes a space;
+  - U+2190 becomes `<-`, U+2192 becomes `->`, U+2264 becomes `<=`, U+2265 becomes `>=`, and U+00D7 becomes `x`;
+  - any other unit becomes `?`, so a surrogate pair becomes `??`.
+- Why REDUCED stays representative. Every key line is kept with its own section heading, so it falls in the same section in the reduced set as in the artifact. The reduced set therefore keeps every line that the function's narrowing and verdict checks read, and keeps each line's membership in a `## Rejected Scope Narrowing` section, which is the S2 condition. The replacement table maps no character to a narrowing phrase, a label, or a coverage term, so it cannot create a match. A substitution that removed a match would show up as a failed guard, not as a passing exemplar.
+- Qualification (both forms, after replacement): no non-ASCII character; no line matches any purity pattern; no line contains any of the four P12-T7 literals; no line starts with `'@`; at most 40 lines.
+- Guard (both forms): `Test-LanguageCoverageRow -AuditText <set joined by LF> -Language <language> -RepoWidePct $null -BranchPct $null`, loaded from HEAD, returns `Ok` false with a `Reason` containing the form key's original fragment (`narrows scope` for `NARROWING`, `no coverage-scoped row` for `NO-COVERAGE-ROW`, `neither a PASS nor a FAIL` for `NO-VERDICT`).
+- Selection: the first candidate in candidate order whose FULL set qualifies and reproduces. When there is none, the first candidate in candidate order whose REDUCED set qualifies and reproduces. When there is none, `EXEMPLAR: <form key> | NONE` and exit 1.
+
+Success-case literals: `PURITY-PATTERNS:` with a value greater than 0 (17 in the current tree; lines 103-119 of the hook file); `EXEMPLAR-CANDIDATES:` with a value greater than 0; one `EXEMPLAR-CANDIDATE:` line per evaluated candidate and form; exactly one `EXEMPLAR-GUARD:` line ending `| REPRODUCED | <fragment> | <reason>`; exactly one `EXEMPLAR: <form key> | ExemplarForm=<FULL or REDUCED> | <path> | lines=<n>` line; `<n>` `EXEMPLAR-LINE:` lines; `EXIT_CODE_COMPUTED: 0`. Success-output observation: no Phase 0 run exists, because CR-EXEMPLAR reads the P4-T1 artifact and the post-Phase-3 HEAD rules file. Its first P4-T4 run is the observation run. In the restart after the 2026-10-12 BLOCKED record, that is FIX-2 (`rule3|PowerShell|NARROWING|sanctioned`), whose FULL candidate `docs/features/completed/2026-06-16-propagate-claude-ecosystem-hardening-187/policy-audit.2026-06-16T16-45.md` was recorded as qualifying (37 lines) in the BLOCKED artifact. If a run that exits 0 lacks any literal named here, record the observed output and stop with BLOCKED.
+
 ## Guarded Dot-Source Literals
 
 Each line below is added verbatim (one statement per line) and asserted by the static tests and by guard-completeness rule S2 (`HookGuardShape.Helpers.ps1:101-105`):
