@@ -132,4 +132,25 @@ feature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md
             $result.Message | Should -BeNullOrEmpty
         }
     }
+
+    Context 'E4 static structure (issue #896)' {
+        It 'E4-ST4: <File> defines exactly its assigned functions' -ForEach @(
+            @{ File = '.claude/hooks/validate-feature-review-coverage.ps1'; Functions = @('Invoke-FeatureReviewCoverageValidation') }
+            @{ File = '.claude/hooks/validate-feature-review-coverage-metrics.ps1'; Functions = @('Get-ArtifactFileContent', 'Get-JacocoBranchCoverage', 'Get-JacocoRepoCoverage', 'Get-LanguageBranchCoverage', 'Get-LanguageRepoCoverage', 'Get-LcovBranchCoverage', 'Get-LcovRepoCoverage') }
+            @{ File = '.claude/hooks/validate-feature-review-coverage-rules.ps1'; Functions = @('Get-ChangedLanguageSet', 'Get-ReviewArtifactInfo', 'Get-ReviewArtifactPathFromOutput', 'Test-LanguageCoverageRow') }
+        ) {
+            # Arrange
+            $path = Join-Path $PSScriptRoot "../../../$File"
+            $tokens = $null
+            $parseErrors = $null
+
+            # Act
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile([System.IO.Path]::GetFullPath($path), [ref]$tokens, [ref]$parseErrors)
+            $defined = @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true) | ForEach-Object Name | Sort-Object)
+
+            # Assert
+            @($parseErrors).Count | Should -Be 0
+            ($defined -join ',') | Should -Be ((@($Functions) | Sort-Object) -join ',') -Because "$File must define exactly its assigned functions"
+        }
+    }
 }
