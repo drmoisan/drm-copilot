@@ -29,8 +29,8 @@ The operator has already corrected the shared `.pth` file. This item covers the 
 - [x] AC-3: A regression test simulates a foreign `scripts` package resolvable from a later `sys.path` entry, uses no temporary files, and proves the file-path form imports the local `scripts` package; the test fails when run against the pre-fix code.
 - [x] AC-4: The existing test `test_file_path_bootstrap_appends_repo_root_once` is replaced by a test that pins prepend-first ordering, and no test remains that asserts append-last behavior.
 - [x] AC-5: A recorded search of `scripts/` (command or query and resulting file list stored in the evidence folder) confirms which file-path entry scripts mutate `sys.path`, and every such script other than the validator, if any, is fixed consistently with AC-1.
-- [ ] AC-6: No new Ruff suppression is introduced (no `# noqa: E402` and no new per-file-ignore), and every changed production and test file is at or under 500 lines.
-- [ ] AC-7: Black, Ruff, Pyright, and Pytest pass for the Python toolchain, and coverage for `scripts.dev_tools.validate_orchestration_artifacts` is at least 85% line and at least 75% branch, with no coverage regression on changed lines.
+- [x] AC-6: No new Ruff suppression is introduced (no `# noqa: E402` and no new per-file-ignore), and every changed production and test file is at or under 500 lines.
+- [x] AC-7: Black, Ruff, Pyright, and Pytest pass for the Python toolchain, and coverage for `scripts.dev_tools.validate_orchestration_artifacts` is at least 85% line and at least 75% branch, with no coverage regression on changed lines.
 
 ## Dependencies / Risks
 
