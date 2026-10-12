@@ -5,7 +5,7 @@
 
 .DESCRIPTION
     Consumes the JSON array emitted by
-    `gh pr checks --required --json bucket,name,state,link,workflow` and produces
+    `gh pr checks --json bucket,name,state,link,workflow` and produces
     the `ci_gate` object the orchestrator writes to its checkpoint. The object
     carries the five contract fields: head_sha, pr_pipeline_run_id,
     pr_pipeline_run_url, conclusion, and verified_at.
@@ -17,11 +17,11 @@
     the logic is deterministically testable.
 
     Conclusion derivation (per the documented bucket mapping):
-      - Any required check with bucket 'fail' or 'cancel'  -> conclusion 'failure'
-      - Else any required check with bucket 'pending'       -> conclusion 'pending'
+      - Any check with bucket 'fail' or 'cancel'  -> conclusion 'failure'
+      - Else any check with bucket 'pending'       -> conclusion 'pending'
       - Else (all checks 'pass' or 'skipping', or empty set) -> conclusion 'success'
-    An empty required-check set is treated as 'success' (vacuously satisfied: no
-    required check can fail or be in progress). An unrecognized bucket value is a
+    An empty check set is treated as 'success' (vacuously satisfied: no
+    check can fail or be in progress). An unrecognized bucket value is a
     fail-fast error so the parser never silently passes an enum it does not
     understand.
 
@@ -38,12 +38,12 @@
     reading the wall clock.
 
 .PARAMETER ChecksJson
-    The JSON array string emitted by `gh pr checks --required --json ...`. Each
+    The JSON array string emitted by `gh pr checks --json ...`. Each
     element is expected to expose at least a `bucket` property. Accepts pipeline
     / stdin input so the orchestrator can pipe the `gh` output directly.
 
 .PARAMETER HeadSha
-    The PR head SHA the required checks were observed against. Recorded verbatim
+    The PR head SHA the queried checks were observed against. Recorded verbatim
     as ci_gate.head_sha.
 
 .PARAMETER PrPipelineRunId
@@ -72,7 +72,7 @@
     JSON output is convenient for checkpoint serialization.
 
 .EXAMPLE
-    gh pr checks --required --json bucket,name,state,link,workflow |
+    gh pr checks --json bucket,name,state,link,workflow |
         ./.claude/lib/ci-gate/Invoke-CiGateParser.ps1 -HeadSha $sha
 
 .EXAMPLE
@@ -118,7 +118,7 @@ begin {
     function Get-CiGateConclusion {
         <#
     .SYNOPSIS
-        Pure derivation of ci_gate.conclusion from a parsed required-check set.
+        Pure derivation of ci_gate.conclusion from a parsed check set.
 
     .DESCRIPTION
         Implements the documented bucket precedence with no I/O and no external
@@ -188,7 +188,7 @@ begin {
         # Track whether a passing check from the named workflow was observed.
         $requiredWorkflowPassed = $false
 
-        # Inspect each required check once, classifying by its bucket value. Failure
+        # Inspect each check once, classifying by its bucket value. Failure
         # short-circuits immediately because it is the highest-precedence outcome.
         foreach ($check in $Checks) {
             # A check element must expose a bucket; absence is an undefined state and
@@ -203,8 +203,8 @@ begin {
             # change semantics because failure short-circuits via return; pending is
             # only recorded (not returned) so a later failure can still take priority.
             switch ($bucket) {
-                'fail' { return 'failure' }       # a failed required check is terminal-non-success
-                'cancel' { return 'failure' }       # a cancelled required check is treated conservatively as failure
+                'fail' { return 'failure' }       # a failed check is terminal-non-success
+                'cancel' { return 'failure' }       # a cancelled check is treated conservatively as failure
                 'pending' { $anyPending = $true }     # in-progress; defer until failures are ruled out
                 'pass' {
                     # Under the guard, record a pass from the named workflow. The

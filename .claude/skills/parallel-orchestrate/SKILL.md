@@ -373,11 +373,16 @@ Procedure, per item:
 1. The item's child orchestration runs unmodified, with `epic_mode` `false` or absent, and finishes
    at its own DONE. The child's PR Creation Gate condition 6 already requires
    `ci_gate.conclusion == "success"`, so at child DONE the item's pull request is open against
-   `main` and its checks are green. The child is never instructed to merge its own pull request.
+   `main` and every check on its head SHA passed or was skipped. The child is never instructed to
+   merge its own pull request.
 2. On child completion, durably confirm pull-request state and check conclusion with
-   `gh pr view --json state,mergedAt,headRefOid`, and with `gh pr checks` when the check conclusion
-   must be re-read — never from an in-memory completion notification — then record
-   `merge_status: ci_green`.
+   `gh pr view --json state,mergedAt,headRefOid` and an unconditional re-read of every check on
+   that head, never from an in-memory completion notification or from the child's DONE report
+   alone. Run `gh pr checks <PR> --json bucket,name,state,link,workflow` and parse its output with
+   `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1 -ChecksJson <checks-json> -HeadSha <headRefOid>`.
+   Record `merge_status: ci_green` only when that parser conclusion is `success`; on `failure` or
+   `pending`, or when `gh pr checks` fails with a `no checks reported` error, do not record
+   `merge_status: ci_green` and do not run `gh pr merge`.
    Before recording `merge_status: ci_green`, confirm that the `headRefOid` value equals the
    `ci_gate.head_sha` the child reported at DONE and that the child reported no pending
    CI-dependent acceptance criteria. When either check fails, do not record

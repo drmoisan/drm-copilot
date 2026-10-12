@@ -407,4 +407,33 @@ Describe "Invoke-CiGateParser.ps1" {
             $result.conclusion | Should -Be 'pending'
         }
     }
+
+    Context "default NowProvider delegates" {
+        It "uses the Invoke-CiGateParser default NowProvider when none is injected" {
+            # Arrange: replace Get-Date with a fixed UTC instant so the default
+            # delegate never reads the wall clock.
+            Mock -CommandName Get-Date -MockWith { [datetime]::new(2026, 6, 24, 17, 0, 0, [System.DateTimeKind]::Utc) }
+
+            # Act: call the function without -NowProvider so its param-block default runs.
+            $result = Invoke-CiGateParser -ChecksJson '[]' -HeadSha 'sha1'
+
+            # Assert: each '?' matches the culture time separator, so the result
+            # does not depend on the host culture; the digits come from the mock.
+            $result.verified_at | Should -BeLike '2026-06-24T17?00?00Z'
+            Should -Invoke -CommandName Get-Date -Times 1 -Exactly
+        }
+
+        It "uses the script-level default NowProvider when the script runs without -NowProvider" {
+            # Arrange: the same fixed UTC instant for the script-level default delegate.
+            Mock -CommandName Get-Date -MockWith { [datetime]::new(2026, 6, 24, 17, 0, 0, [System.DateTimeKind]::Utc) }
+
+            # Act: run the script file without -NowProvider so the process block
+            # forwards the script-level default delegate to Invoke-CiGateParser.
+            $result = & $script:scriptPath -ChecksJson '[]' -HeadSha 'x'
+
+            # Assert
+            $result.verified_at | Should -BeLike '2026-06-24T17?00?00Z'
+            Should -Invoke -CommandName Get-Date -Times 1 -Exactly
+        }
+    }
 }

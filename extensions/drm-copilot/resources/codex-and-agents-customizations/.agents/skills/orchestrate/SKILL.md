@@ -422,7 +422,7 @@ After each `feature-reviewer` delegation returns:
    Halt precedence: human_decision_required > policy_hold > external_dependency
 
 8. If the result is `REVIEW_STATUS: AWAITING_CI`, require `REMEDIATION_PLAN: NONE` and wait: set `blocked_reason: "awaiting_ci"`, set `next_step` to the step that re-checks (`S7_feature_review` for a review-time wait, `S9_ci_green` for a CI poll timeout), record no `human_interaction.requirements[]` entry for the wait, write no cycle, and create no remediation plan. Poll within the existing bounded CI interval and timeout; when the bound is exhausted, persist and stop. On resume, set `blocked_reason: "none"` and re-run the named step. For a review-time wait, the awaited workflow is named in the finding's `Remediability-Evidence:` line.
-9. A CI Green Gate poll timeout is recorded as a finding with `Remediability: awaiting_ci` and follows the wait path; a failed required check stays `autonomous` and enters the remediation loop.
+9. A CI Green Gate poll timeout is recorded as a finding with `Remediability: awaiting_ci` and follows the wait path; a failed check stays `autonomous` and enters the remediation loop.
 
 ## Remediation Loop (R1–R5)
 
@@ -453,11 +453,20 @@ If a subagent artifact references a different issue number, the orchestrator rej
 ## CI Green Gate
 
 Before PR/DONE completion, the orchestrator must observe the live PR head SHA
-and required GitHub checks through `gh`. The checkpoint must record the checked
-head SHA and CI result. DONE is blocked unless the required checks pass for the
-current PR head SHA.
+and every GitHub check on that head SHA through `gh`. The checkpoint must record
+the checked head SHA and CI result. DONE is blocked unless every check on the
+current PR head SHA passed or was skipped.
 
-The checkpoint records the CI result in a top-level `ci_gate` object with the required keys `conclusion`, `head_sha`, and `verified_at`. `conclusion` is one of `success`, `failure`, or `pending`; `head_sha` is the PR head SHA the required checks were observed against; `verified_at` is the ISO-8601 time at which this gate (S9) recorded the result. DONE requires `ci_gate.conclusion` equal to `success` and `ci_gate.head_sha` equal to the current PR head SHA. The key set is defined by `CI_GATE_KEYS` in `scripts/dev_tools/validate_orchestrator_state.py`, and the TypeScript MCP validator used by the Codex runtime requires the same keys.
+Gate procedure:
+
+1. Resolve the live PR head SHA and the PR base branch with `gh pr view --json headRefOid,baseRefName`.
+2. Invoke `gh pr checks --json bucket,name,state,link,workflow` against that head SHA. The query covers every check on the head SHA for every PR, whether or not branch protection marks the check as required.
+3. Parse the JSON by running `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1 -ChecksJson <checks-json> -HeadSha <head-sha>`, appending `-RequireWorkflow CI` when the PR base branch is an `epic/<slug>-integration` branch. The parser derives `ci_gate.conclusion` over every queried check: `success` when every check passed or was skipped, `failure` when any check failed or was cancelled, and `pending` when any check is still in progress.
+4. Epic-child rule: when the PR base branch is an `epic/<slug>-integration` branch, an empty check list is not accepted as green. Every check returned by the unfiltered query counts: a failing or cancelled non-`CI` check fails the gate, and a pending one keeps it pending. With `-RequireWorkflow CI`, the parser never returns `success` until at least one passing `CI` check is observed.
+5. No-checks rule: when `gh pr checks` fails with a `no checks reported` error, that error is never treated as green for any PR. On an epic child, the parser runs with `-ChecksJson '[]'` and `-RequireWorkflow CI`, which returns `pending`; on any other PR the gate stays `pending` within the bounded poll.
+6. Parser-absent rule: when `.claude/lib/ci-gate/Invoke-CiGateParser.ps1` does not exist in the repository, the orchestrator does not derive `success` by hand; it must stop and persist blocked state before PR/DONE completion.
+
+The checkpoint records the CI result in a top-level `ci_gate` object with the required keys `conclusion`, `head_sha`, and `verified_at`. `conclusion` is one of `success`, `failure`, or `pending`; `head_sha` is the PR head SHA the queried checks were observed against; `verified_at` is the ISO-8601 time at which this gate (S9) recorded the result. DONE requires `ci_gate.conclusion` equal to `success` and `ci_gate.head_sha` equal to the current PR head SHA. The key set is defined by `CI_GATE_KEYS` in `scripts/dev_tools/validate_orchestrator_state.py`, and the TypeScript MCP validator used by the Codex runtime requires the same keys.
 
 The checkpoint records the pull request in a top-level `pr_gate` object with the keys `pr_number`, `pr_url`, `head_branch`, and `head_sha`. The key set is defined by `PR_GATE_KEYS` in `scripts/dev_tools/_orchestrator_state_routing.py`.
 
@@ -473,7 +482,7 @@ The orchestrator must not create a PR, push a branch for PR purposes, or report 
 2. The AC verification artifact (`p14-acceptance-criteria-checkoff.md` or equivalent) confirms all acceptance criteria pass.
 3. The mandatory toolchain passed in its most recent run on the branch (no linting/type-check/test failures).
 4. The checkpoint `next_step` is `S8_create_pr`.
-5. The required CI checks pass for the current PR head SHA.
+5. Every check on the current PR head SHA passed or was skipped (`ci_gate.conclusion` is `success`).
 
 This gate is non-negotiable. Each condition is independently verified before PR creation proceeds.
 
