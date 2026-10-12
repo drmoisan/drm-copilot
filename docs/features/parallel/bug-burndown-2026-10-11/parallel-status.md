@@ -15,8 +15,8 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 4
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-12T21:19:04Z
-- `next_step`: #899 and #900 in flight. Launch #901 when one merges and the other is past Phase 0.
+- `last_updated`: 2026-10-12T22:19:26Z
+- `next_step`: #899 and #901 in flight. Launch #902 when one merges and the other is past Phase 0.
 
 **Items**
 
@@ -34,8 +34,8 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 895 | docs/features/active/2026-10-11-codex-web-setup-review-follow-ups-895 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/918 | 153534cdba5ea322efa8486a20df45d20ae38296 | 2026-10-12T17:43:20Z | 2026-10-12T18:24:43Z |  |
 | 898 | docs/features/active/2026-10-11-orchestrator-state-rule-sentence-dropped-850-898 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/915 | 5dd9d1f33d1c0ccb01a6c34f6fefd959e020aa74 | 2026-10-12T15:48:17Z | 2026-10-12T16:17:51Z |  |
 | 899 | docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899 | 0 | in_flight | worktree_created |  |  | 2026-10-12T20:13:28Z |  |  |
-| 900 | docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900 | 0 | in_flight | worktree_created |  |  | 2026-10-12T21:19:04Z |  |  |
-| 901 | docs/features/active/2026-10-11-pr-author-hook-docs-only-exemption-901 | 0 | scheduled | not_started |  |  |  |  |  |
+| 900 | docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/922 | 7d9a5c33526d7a98d5577ab4a9ad6f465f3dff3c | 2026-10-12T21:19:04Z | 2026-10-12T22:18:59Z |  |
+| 901 | docs/features/active/2026-10-11-pr-author-hook-docs-only-exemption-901 | 0 | in_flight | worktree_created |  |  | 2026-10-12T22:19:26Z |  |  |
 | 902 | docs/features/active/2026-10-11-epic-integration-branch-not-synced-with-main-902 | 0 | scheduled | not_started |  |  |  |  |  |
 | 903 | docs/features/active/2026-10-11-round-2-review-nits-and-evidence-timestamps-903 | 0 | scheduled | not_started |  |  |  |  |  |
 
