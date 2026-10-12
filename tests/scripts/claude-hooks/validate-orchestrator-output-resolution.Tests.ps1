@@ -42,11 +42,6 @@ BeforeAll {
     $script:Session = (Get-Location).Path.Replace([string][char]92, '/')
     $script:EpicCanonical = '/synthetic-worktrees/w-reg/artifacts/orchestration/epic-orchestrator-state.json'
 
-    function ConvertTo-ResolutionPayload {
-        param([string] $Output)
-        return (@{ output = $Output } | ConvertTo-Json -Compress)
-    }
-
     # Model the live worktrees and their epic checkpoint texts in both mock scopes.
     function Set-ResolutionRunTopology {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
@@ -107,7 +102,7 @@ Describe 'validate-orchestrator-output resolution sibling' {
         Set-ResolutionRunTopology -Live @($script:Session)
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-ResolutionPayload -Output 'Final summary.') `
+        $result = Invoke-OrchestratorOutputValidation -InputText '{"last_assistant_message":"Final summary."}' `
             -CheckpointPath '/abs/artifacts/orchestration/epic-orchestrator-state.json' -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
 
         # Assert
@@ -122,7 +117,7 @@ Describe 'validate-orchestrator-output resolution sibling' {
         Set-ResolutionRunTopology -Live @($script:Session)
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-ResolutionPayload -Output 'Final summary.') `
+        $result = Invoke-OrchestratorOutputValidation -InputText '{"last_assistant_message":"Final summary."}' `
             -CheckpointPath 'artifacts/../artifacts/orchestration/epic-orchestrator-state.json' -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
 
         # Assert
@@ -219,7 +214,7 @@ Describe 'validate-orchestrator-output resolution sibling' {
         Mock Get-CheckpointFileContent { @{ Exists = $false; Content = $null } }
         try {
             # Act
-            $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-ResolutionPayload -Output 'Final summary.') `
+            $result = Invoke-OrchestratorOutputValidation -InputText '{"last_assistant_message":"Final summary."}' `
                 -CheckpointPath 'artifacts/orchestration/epic-orchestrator-state.json' -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
         }
         finally {
@@ -249,7 +244,7 @@ Describe 'validate-orchestrator-output resolution sibling' {
         Mock Resolve-OrchestratorOutputCheckpointPath { throw 'simulated resolver failure (CR-3)' }
 
         # Act
-        $result = Invoke-OrchestratorOutputValidation -RawPayload (ConvertTo-ResolutionPayload -Output 'Final summary.') -CheckpointPath 'artifacts/orchestration/epic-orchestrator-state.json' -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
+        $result = Invoke-OrchestratorOutputValidation -InputText '{"last_assistant_message":"Final summary."}' -CheckpointPath 'artifacts/orchestration/epic-orchestrator-state.json' -ArtifactType 'epic-orchestrator-state' -SessionRoot $script:Session
 
         # Assert
         $result.Ok | Should -BeFalse

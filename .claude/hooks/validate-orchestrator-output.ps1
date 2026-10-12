@@ -11,7 +11,7 @@
     skills, the orchestrator must persist progress to the checkpoint file
     after every completed step. This hook confirms that:
 
-      - the hook payload is well-formed JSON,
+      - the SubagentStop envelope read from stdin through Read-SubagentStopEnvelope is valid,
       - the orchestrator's final output is non-empty,
       - the checkpoint file exists on disk,
       - the checkpoint is valid JSON,
@@ -28,12 +28,16 @@
     routing dispatch passes.
 
 .NOTES
-    Reads the hook payload from CLAUDE_HOOK_INPUT as JSON. Exits 0 to allow
-    termination; exits 1 with an error message to block. Filesystem reads go
-    through Get-CheckpointFileContent so tests can mock the boundary without
-    writing temporary files. The sibling dot-source and the resolver imports are
-    guarded: a failure is recorded and blocks every validation, naming the file,
-    before any read. A failed Layer 2 import blocks the epic leg only.
+    Reads the SubagentStop envelope from stdin through Read-SubagentStopEnvelope
+    (subagentstop-envelope.ps1); the assistant text comes from the helper's
+    AssistantText. A non-repairable condition blocks once: when StopHookActive is
+    set, the re-entered stop is allowed. Exits 0 to allow termination; a block is
+    written to stderr with exit 2 through Exit-SubagentStopBlock. Filesystem reads
+    go through Get-CheckpointFileContent so tests can mock the boundary without
+    writing temporary files. The routing sibling, the resolution sibling, the E1
+    helper, and the modules are guarded loads: a failure is recorded and blocks
+    every validation, naming the file, before any read. A failed Layer 2 import
+    blocks the epic leg only.
 #>
 
 [CmdletBinding()]
@@ -172,7 +176,7 @@ function Test-HumanInteractionShape {
 function Invoke-OrchestratorOutputValidation {
     <#
     .SYNOPSIS
-        Parses the hook payload and returns an ok-or-block decision.
+        Reads the SubagentStop envelope, validates the assistant text, and applies the re-entry policy.
     .DESCRIPTION
         Returns a hashtable with keys:
           - Ok:      $true to allow termination, $false to block.
@@ -183,7 +187,7 @@ function Invoke-OrchestratorOutputValidation {
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
-        [string] $RawPayload,
+        [AllowNull()] [AllowEmptyString()] [string] $InputText,
         [string] $CheckpointPath = 'artifacts/orchestration/orchestrator-state.json',
         [string] $ArtifactType = 'orchestrator-state',
         [string] $SessionRoot = (Get-Location).Path,
@@ -194,23 +198,20 @@ function Invoke-OrchestratorOutputValidation {
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
-    if ([string]::IsNullOrWhiteSpace($RawPayload)) {
-        return @{ Ok = $false; Message = 'orchestrator hook: CLAUDE_HOOK_INPUT is empty; cannot validate orchestrator output.' }
+    $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
+    if (-not $envelope.IsValid) { $decision = @{ Ok = $false; Repairable = $false; Message = ('{0} payload anomaly - {1}' -f 'orchestrator hook:', (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)) } }
+    else {
+        $agentOutput = $envelope.AssistantText
+        $blockArguments = @{ AgentOutput = ([string]$agentOutput); CheckpointPath = $CheckpointPath; ArtifactType = $ArtifactType; SessionRoot = $SessionRoot }
+        if ($PSBoundParameters.ContainsKey('RoutingInvoker')) { $blockArguments['RoutingInvoker'] = $RoutingInvoker }
+        $decision = Get-OrchestratorOutputBlockDecision @blockArguments
     }
-
-    try {
-        $payload = $RawPayload | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        return @{ Ok = $false; Message = "orchestrator hook: failed to parse CLAUDE_HOOK_INPUT as JSON: $($_.Exception.Message)" }
+    if ($decision.Ok) { return @{ Ok = $true; Message = $null } }
+    if (-not $decision.Repairable) {
+        if ($envelope.StopHookActive) { return @{ Ok = $true; Message = $null } }
+        if (-not $decision.Message.Contains('to the operator and halt.')) { $decision.Message = $decision.Message + "`n" + $script:SubagentStopReportAndHaltLine }
     }
-
-    $agentOutput = $null
-    if ($payload.PSObject.Properties.Name -contains 'output') {
-        $agentOutput = $payload.output
-    }
-    $blockArguments = @{ AgentOutput = ([string]$agentOutput); CheckpointPath = $CheckpointPath; ArtifactType = $ArtifactType; SessionRoot = $SessionRoot }
-    if ($PSBoundParameters.ContainsKey('RoutingInvoker')) { $blockArguments['RoutingInvoker'] = $RoutingInvoker }
-    return Get-OrchestratorOutputBlockDecision @blockArguments
+    return @{ Ok = $false; Message = $decision.Message }
 }
 
 function Get-OrchestratorOutputBlockDecision {
@@ -338,10 +339,6 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('ORCHEST
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
-$result = Invoke-OrchestratorOutputValidation -RawPayload $env:CLAUDE_HOOK_INPUT -CheckpointPath $CheckpointPath -ArtifactType $ArtifactType
-if (-not $result.Ok) {
-    Write-Error $result.Message
-    exit 1
-}
-
+$result = Invoke-OrchestratorOutputValidation -CheckpointPath $CheckpointPath -ArtifactType $ArtifactType
+if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0
