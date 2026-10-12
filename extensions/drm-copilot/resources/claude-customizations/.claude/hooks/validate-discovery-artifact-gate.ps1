@@ -249,5 +249,5 @@ $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop 
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
 $result = Invoke-DiscoveryArtifactGateValidation
-if (-not $result.Ok) { Write-Error $result.Message; exit 1 }
+if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0

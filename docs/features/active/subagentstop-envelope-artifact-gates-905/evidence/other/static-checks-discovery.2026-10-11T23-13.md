@@ -188,3 +188,19 @@ SIMPLE-COUNT: if ($trimmed -and (Get-DiscoveryArtifactType -Path $trimmed)) { | 
 SIMPLE-COUNT: if (Get-DiscoveryArtifactType -Path $trimmed) { | 0
 LINES: extensions/drm-copilot/resources/claude-customizations/.claude/hooks/validate-discovery-artifact-gate.ps1 | 253
 ```
+
+## [P8-T1] Blocking switch of .claude/hooks/validate-discovery-artifact-gate.ps1
+
+Timestamp: 2026-10-11T23-16
+Command: sh <SCRATCHPAD>/route.sh <SCRATCHPAD>/e905-static.ps1 -File .claude/hooks/validate-discovery-artifact-gate.ps1 -Absent 'CLAUDE_HOOK_INPUT||\bexit 1\b||Write-Error' -Simple 'Exit-SubagentStopBlock -Message' -TrimLine 'exit 0'
+EXIT_CODE: 0
+Output Summary: ParseFile reports 0 errors; the scan for `CLAUDE_HOOK_INPUT`, `\bexit 1\b`, `Write-Error` returns no match; `Exit-SubagentStopBlock -Message` count is 1; the trimmed line `exit 0` matches exactly one line (253). Only the tail block line changed (`git diff --stat e2284acf4 -- .claude/hooks/validate-discovery-artifact-gate.ps1`: 1 insertion, 1 deletion). R-RESET: `P8-T1: none present`.
+
+```text
+FILE: .claude/hooks/validate-discovery-artifact-gate.ps1
+PARSE-ERRORS: 0
+PATTERN-SCAN: CLAUDE_HOOK_INPUT , \bexit 1\b , Write-Error | matches=0
+SIMPLE-COUNT: Exit-SubagentStopBlock -Message | 1
+TRIMLINE-COUNT: exit 0 | 1 | lines=253
+LINES: .claude/hooks/validate-discovery-artifact-gate.ps1 | 253
+```

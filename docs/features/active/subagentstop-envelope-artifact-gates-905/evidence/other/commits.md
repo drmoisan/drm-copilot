@@ -65,3 +65,11 @@ Push refspec (branch substitution 1): `git push origin HEAD:bug/subagentstop-env
 - Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`14aaf7c52..9fb0f6da6`)
 - Post-commit `git status --porcelain`: (empty)
 - SWITCH-COMMIT: prd-feature | 9fb0f6da6ce034520b7caf995b0bd44d445365f0
+
+## [P7-T8] Phase 7
+
+- Pre-commit `git status --porcelain`: discovery hook, mirror, and suite modified; feature-folder evidence (corpus-discovery After section, static-checks-discovery, conversion-discovery, mirror-log), plan, spec modified (all within W-ALLOWED).
+- Commit: e2284acf4a4054084c6f5ee52ceabeef346d069d (`fix(905): apply rule R4 and read the discovery gate from the stdin envelope`)
+- Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`9fb0f6da6..e2284acf4`)
+- Post-commit `git status --porcelain`: (empty)
+- CORPUS-AFTER-COMMIT: discovery | e2284acf4a4054084c6f5ee52ceabeef346d069d
