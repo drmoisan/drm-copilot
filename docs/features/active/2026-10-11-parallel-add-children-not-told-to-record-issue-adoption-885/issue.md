@@ -17,12 +17,12 @@ Add the `/parallel-plan` `## Preparation Fan-Out` issue-adoption line (`.claude/
 
 ## Acceptance Criteria
 
-- [ ] AC-1: `.claude/skills/parallel-add/SKILL.md` step 2 instructs the preparation child for an issue-number item to verify the issue read-only, not call `potential_to_issue` or the promotion-entry tool, and record a top-level `issue_adoption` object, using text equal (after whitespace collapse) to the `/parallel-plan` issue-adoption line.
-- [ ] AC-2: The added step-2 text states that the issue-adoption line applies to issue-number items only and is omitted for potential-entry items, whose child promotes them.
-- [ ] AC-3: The added step-2 text contains no mode marker, no text matching the hook issue-number pattern, and no `docs/features/active/` path.
-- [ ] AC-4: Only step 2 of `.claude/skills/parallel-add/SKILL.md` changes; the `2. **Prepare the item.**` and `3. **Compute conflict edges` markers and all text from step 3 onward are unchanged.
-- [ ] AC-5: `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md` is byte-identical to `.claude/skills/parallel-add/SKILL.md`.
-- [ ] AC-6: `tests/scripts/dev_tools/test_parallel_issue_adoption_skill_contracts.py` gains contract tests for the parallel-add step-2 text (presence, equality with the parallel-plan line, issue-number-only conditioning, no mode marker, hook-pattern and active-path exclusion) that fail before the skill edit and pass after it.
+- [x] AC-1: `.claude/skills/parallel-add/SKILL.md` step 2 instructs the preparation child for an issue-number item to verify the issue read-only, not call `potential_to_issue` or the promotion-entry tool, and record a top-level `issue_adoption` object, using text equal (after whitespace collapse) to the `/parallel-plan` issue-adoption line.
+- [x] AC-2: The added step-2 text states that the issue-adoption line applies to issue-number items only and is omitted for potential-entry items, whose child promotes them.
+- [x] AC-3: The added step-2 text contains no mode marker, no text matching the hook issue-number pattern, and no `docs/features/active/` path.
+- [x] AC-4: Only step 2 of `.claude/skills/parallel-add/SKILL.md` changes; the `2. **Prepare the item.**` and `3. **Compute conflict edges` markers and all text from step 3 onward are unchanged.
+- [x] AC-5: `extensions/drm-copilot/resources/claude-customizations/.claude/skills/parallel-add/SKILL.md` is byte-identical to `.claude/skills/parallel-add/SKILL.md`.
+- [x] AC-6: `tests/scripts/dev_tools/test_parallel_issue_adoption_skill_contracts.py` gains contract tests for the parallel-add step-2 text (presence, equality with the parallel-plan line, issue-number-only conditioning, no mode marker, hook-pattern and active-path exclusion) that fail before the skill edit and pass after it.
 - [ ] AC-7: The issue-adoption contract tests, the complexity-routing contract tests, the planner-surface contract tests, and the bundle-parity test `test_bundled_claude_payload_contains_all_repo_runtime_contracts` pass, and the Python toolchain (Black, Ruff, Pyright) is clean for the edited test file.
 - [ ] AC-8: No file under `.claude/rules/` or `.github/instructions/` is modified.
 

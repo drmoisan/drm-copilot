@@ -62,6 +62,15 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    edge derivation and the parent's model routing read the same band.
    The admitted item records `complexity_band` and no `model_routing_receipt`; the parent resolves
    the item's model from that band at spawn time per `parallel-orchestrate` `## Model Selection`.
+   For an issue-number item, the preparation delegation prompt carries the issue-adoption line used
+   by `/parallel-plan` `## Preparation Fan-Out`, quoted verbatim: `Issue adoption: this item's GitHub
+   issue already exists. Verify it read-only (gh issue view), do not call potential_to_issue or the
+   promotion-entry tool, and record a top-level issue_adoption object in the checkpoint per
+   .claude/rules/orchestrator-state.md with origin filed_before_orchestration (or transferred when
+   the issue was transferred), waiving potential_to_issue and the promotion-entry tool for the
+   checkpoint's promotion-type. When a lifecycle record for the item exists under
+   docs/features/potential/promoted/, cite it as potential_record.` The line is omitted for a
+   potential-entry item, whose child promotes it.
 
 3. **Compute conflict edges over ALL items, including in-flight ones.** Invoke the scheduling
    entry point Get-BlastRadiusConflictEdge from the destination-runtime PowerShell port
