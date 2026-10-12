@@ -37,3 +37,17 @@ TOTAL: Passed=0 | Failed=9 | Skipped=0 | NotRun=86 | FailedBlocks=0 | FailedCont
 EXIT_CODE_COMPUTED: 1
 PROCESS_EXIT: 1
 ```
+
+## Branch-head run
+
+Timestamp: 2026-10-12T08-39
+Command: scratchpad route; CR-PESTER-LIST with <LIST> = T2, T5, T6; <TAGS-IN> = E4-Regression; <TAGS-OUT> empty; <PATTERNS> = E4-TR1:*, E4-TR4:*, E4-TR5-P*, E4-TR7:* (branch head b32ea7d75)
+
+```
+NAMED: E4-TR1:* | Passed=1 | Failed=0 | NotRun=0 | Total=1
+NAMED: E4-TR4:* | Passed=1 | Failed=0 | NotRun=0 | Total=1
+NAMED: E4-TR5-P* | Passed=6 | Failed=0 | NotRun=0 | Total=6
+NAMED: E4-TR7:* | Passed=1 | Failed=0 | NotRun=0 | Total=1
+```
+
+HEAD_RUN_EXIT_CODE: 0
