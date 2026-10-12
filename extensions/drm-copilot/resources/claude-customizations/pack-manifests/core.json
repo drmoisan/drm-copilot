@@ -73,6 +73,7 @@
     ".claude/hooks/validate-feature-review-coverage-rules.ps1",
     ".claude/hooks/validate-feature-review-coverage.ps1",
     ".claude/hooks/validate-orchestrator-output-resolution.ps1",
+    ".claude/hooks/validate-orchestrator-output-routing.ps1",
     ".claude/hooks/validate-orchestrator-output.ps1",
     ".claude/hooks/validate-planner-output.ps1",
     ".claude/hooks/validate-prd-feature-output.ps1",
