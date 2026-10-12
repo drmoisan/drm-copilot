@@ -179,6 +179,7 @@ Describe 'validate-discovery-artifact-gate.ps1' {
 
             function New-SubagentStopEnvelopeJson {
                 # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds and returns envelope JSON text only; it changes no system state.')]
                 param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
                 $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'general-purpose'; stop_hook_active = [bool]$StopHookActive }
                 if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }

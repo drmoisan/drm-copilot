@@ -97,3 +97,10 @@ Push refspec (branch substitution 1): `git push origin HEAD:bug/subagentstop-env
 - Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`fe96ab715..489b66cdf`)
 - Post-commit `git status --porcelain`: (empty)
 - SWITCH-COMMIT: task-researcher | 489b66cdfb844432dc69947daf9722fb33fb0a3a
+
+## [P11-T22] Phase 11
+
+- Pre-commit `git status --porcelain`: commits.md, deviations.md, plan, spec modified; new Phase 11 evidence under `evidence/qa-gates/`, `evidence/regression-testing/`, `evidence/other/` (all within W-ALLOWED); no suite changed by [P11-T21].
+- Commit: c45e420c799a8a66c0b9e715d9377983421ff6aa (`docs(905): record cross-hook verification evidence`)
+- Push: `git push origin HEAD:bug/subagentstop-envelope-artifact-gates-exec-905`; exit code 0 (`489b66cdf..c45e420c7`)
+- Post-commit `git status --porcelain`: (empty)
