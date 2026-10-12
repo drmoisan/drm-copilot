@@ -44,6 +44,6 @@ Operator decision (A), recorded by the parallel planner for run `bug-burndown-20
 - Run the toolchain loop for each touched language with coverage.
 
 ## Evidence Checklist
-- [ ] baseline
+- [x] baseline
 - [ ] targeted verification
 - [ ] end-state
