@@ -44,6 +44,28 @@ The subshell delimiters could be removed by replacing each subshell with a brace
 
 ## CI kcov evidence
 
-S9-EVIDENCE: PENDING
+S9-EVIDENCE: RECORDED
 
-The orchestrator replaces the line above with the `cov.xml` hit counts cited from the `shell-coverage` artifact of the PR run: the hit counts for the three bare delimiter lines and for the neighbouring command lines inside the same subshells.
+Source: `cov.xml` in the `shell-coverage` artifact of CI run 38287725741 (https://github.com/drmoisan/drm-copilot/actions/runs/38287725741), job "shell-coverage / Shell Coverage (Bats + kcov)" (job 114939999004), PR #918, tested head 28dd119ab898f82379664da02d5a1c498054576a. The class entry for `.codex/codex-web-setup.sh` has line-rate 0.958 (206 of 215 recorded lines covered). The nine uncovered lines are 222, 225, 317, 332, 333, 334, 337, 338, and 339.
+
+Hit counts for the three bare delimiter lines and for the neighbouring command lines in the same subshells (post-edit line numbers; `absent` means the line has no entry in `cov.xml`):
+
+| Line | Content role | Hits |
+|---|---|---|
+| 221 | command before the `install_dotnet_tools` subshell | 1 |
+| 222 | bare opening `(` in `install_dotnet_tools` | 0 |
+| 223 | command inside the subshell | 1 |
+| 224 | command inside the subshell | 1 |
+| 225 | bare closing `)` in `install_dotnet_tools` | 0 |
+| 314 | command before the `verify_formatting_capability` subshell | 1 |
+| 315 | command before the `verify_formatting_capability` subshell | 1 |
+| 317 | bare opening `(` in `verify_formatting_capability` | 0 |
+| 318 | command inside the subshell | 1 |
+| 319 | command inside the subshell | 1 |
+| 320 | command inside the subshell | 1 |
+
+All three bare delimiter lines record 0 hits while every command line adjacent to them records at least 1 hit, which matches the mechanism above: the enclosing commands run and only the delimiter syntax carries no trace event. The attribution limit is confirmed by CI evidence.
+
+Lines 332 through 339 are also reported as uncovered in this run and were not part of CR-14; they are outside the scope of this change.
+
+Whole-run figures from the same step log: `Bash coverage (lines): 94.8%` (3064 of 3232 lines in `cov.xml`), against the baseline of 94.5% in main run 38280367474.

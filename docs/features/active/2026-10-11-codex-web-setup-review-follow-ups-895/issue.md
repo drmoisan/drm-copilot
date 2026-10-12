@@ -40,8 +40,8 @@ Impact: Low. The script works for the single-solution case; the findings affect 
 - [x] AC-4 (CR-10): The helpers duplicated across `test_codex_web_setup_codex_installers.bats`, `test_codex_web_setup_codex_dotnet.bats` and `test_codex_web_setup_codex_verify.bats` are defined once in a shared helper file under `tests/shell/` that each of the three suites loads with `load`, and none of the three suites redefines them.
 - [x] AC-5 (CR-11): Case C824-37 in `test_codex_web_setup_codex_dotnet.bats` asserts its fixture precondition in the Arrange section before the act step.
 - [x] AC-6 (CR-12): `run_with_stub_path` places a dedicated empty fixture directory under `tests/fixtures/codex_web_setup/` (committed with a `.gitkeep`), not `tests/shell`, on the stub `PATH`.
-- [ ] AC-7 (CR-14): The three kcov-uncovered subshell lines are either covered in the PR's CI kcov report or documented in the feature folder as a kcov attribution limit with the CI kcov evidence cited.
-- [ ] AC-8: `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh` is byte-identical to `.codex/codex-web-setup.sh`, and the PR's CI shell-qc, bats and kcov jobs pass.
+- [x] AC-7 (CR-14): The three kcov-uncovered subshell lines are either covered in the PR's CI kcov report or documented in the feature folder as a kcov attribution limit with the CI kcov evidence cited.
+- [x] AC-8: `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/codex-web-setup.sh` is byte-identical to `.codex/codex-web-setup.sh`, and the PR's CI shell-qc, bats and kcov jobs pass.
 
 ## Dependencies / Risks
 
@@ -57,4 +57,4 @@ Impact: Low. The script works for the single-solution case; the findings affect 
 ## Evidence Checklist
 - [x] baseline
 - [x] targeted verification
-- [ ] end-state
+- [x] end-state
