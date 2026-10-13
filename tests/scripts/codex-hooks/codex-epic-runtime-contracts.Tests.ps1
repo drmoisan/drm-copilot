@@ -128,6 +128,14 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
         $content | Should -Match 'S5_atomic_execution'
     }
 
+    It 'documents the one-paragraph multi-message trailer form in the Codex epic-plan skill' {
+        # Arrange / Act
+        $content = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.agents/skills/epic-plan/SKILL.md')
+
+        # Assert (issue #903, #732 CR-9)
+        $content | Should -Match 'one-paragraph multi-message form'
+    }
+
     It 'keeps deterministic topology independent from C1-C4 deployment selection' {
         $entry = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.agents/skills/orchestrate/SKILL.md')
         $workflow = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.agents/skills/orchestrator-workflow/SKILL.md')

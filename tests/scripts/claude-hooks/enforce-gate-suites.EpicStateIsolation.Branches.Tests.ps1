@@ -195,3 +195,135 @@ Describe 'fixture' {
         @($findings).Count | Should -Be 0 -Because ($findings -join '; ')
     }
 }
+
+Describe 'issue #903 F-1 conditional ancestors' {
+    It 'F-1 non-compliant <Branch>' -ForEach @(
+        @{
+            Branch = 'ESR mock inside if ($false)'
+            Source = @'
+Describe 'fixture' {
+    BeforeAll {
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        if ($false) {
+            Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+        }
+        @{
+            Branch = 'ESR mock inside try/catch'
+            Source = @'
+Describe 'fixture' {
+    BeforeAll {
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        try {
+            Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        } catch { }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+        }
+        @{
+            Branch = 'ESR mock inside a Get-Command guard naming another seam'
+            Source = @'
+Describe 'fixture' {
+    BeforeAll {
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        if (Get-Command Get-OtherSeam -ErrorAction SilentlyContinue) {
+            Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+        }
+    ) {
+        # Arrange
+        $ast = ConvertTo-EpicStateFixtureAst -Source $Source
+
+        # Act
+        $findings = @(Get-EpicStateIsolationFinding -Ast $ast)
+
+        # Assert
+        ($findings -join '; ') | Should -BeLike '*Mock of Get-EpicScopeCheckpointText missing from outermost BeforeAll*' -Because "the $Branch fixture must be rejected"
+    }
+
+    It 'F-1 compliant <Branch>' -ForEach @(
+        @{
+            Branch = 'ESR mock inside a matching Get-Command guard'
+            Source = @'
+Describe 'fixture' {
+    BeforeAll {
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        . $script:UnderTest
+        Import-Module ./EpicScopeResolution.psm1
+        if (Get-Command Get-EpicScopeCheckpointText -ErrorAction SilentlyContinue) {
+            Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+        }
+        @{
+            Branch = 'baseline helper inside a matching Get-Command guard'
+            Source = @'
+Describe 'fixture' {
+    BeforeAll {
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        . $script:UnderTest
+        if (Get-Command Get-EpicScopeCheckpointText -ErrorAction SilentlyContinue) {
+            Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText' -Surface 'Claude'
+        }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+        }
+    ) {
+        # Arrange
+        $ast = ConvertTo-EpicStateFixtureAst -Source $Source
+
+        # Act
+        $findings = @(Get-EpicStateIsolationFinding -Ast $ast)
+
+        # Assert
+        @($findings).Count | Should -Be 0 -Because ($findings -join '; ')
+    }
+
+    It 'F-2: reports no dot-source loads the hook when only a helper is dot-sourced' {
+        # Arrange
+        $source = @'
+Describe 'fixture' {
+    BeforeAll {
+        . (Join-Path $PSScriptRoot 'Helper.ps1')
+        Import-Module ./EpicScopeResolution.psm1
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
+        Import-Module ./WorktreeRunResolution.psm1
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    }
+}
+'@
+        $ast = ConvertTo-EpicStateFixtureAst -Source $source
+
+        # Act
+        $findings = @(Get-EpicStateIsolationFinding -Ast $ast)
+
+        # Assert
+        ($findings -join '; ') | Should -BeLike '*no dot-source loads the hook*' -Because 'a helper dot-source does not load the hook under test'
+    }
+}

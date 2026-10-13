@@ -148,6 +148,36 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         $result.Detail.StartsWith('git-relocation') | Should -BeTrue -Because 'the detail names rule R5'
     }
 
+    It 'U11b resolves <Command> to the session root (identifier-embedded name)' -ForEach @(
+        @{ Command = 'git add docs/legit_dir-notes.md' }
+        @{ Command = 'MY_GIT_DIR=1 git add a.ps1' }
+    ) {
+        # Act
+        $result = Get-CommandTargetResult -Command $Command
+
+        # Assert
+        $result.Resolved | Should -BeTrue -Because 'a relocation name embedded in a longer identifier is not a relocation (issue #903, #732 CR-2)'
+        $result.Targets | Should -Be @($script:Root) -Because 'the segment runs in the session root'
+    }
+
+    It 'U11c gives git-relocation for an env-drive assignment' {
+        # Act
+        $result = Get-CommandTargetResult -Command '$env:GIT_DIR=''/x''; git add a.ps1'
+
+        # Assert
+        $result.Resolved | Should -BeFalse -Because 'a PowerShell env-drive assignment moves the git directory'
+        $result.Detail.StartsWith('git-relocation') | Should -BeTrue -Because 'the detail names rule R5'
+    }
+
+    It 'U11d still denies a standalone-word mention of a relocation name (recorded fail-closed residual)' {
+        # Act
+        $result = Get-CommandTargetResult -Command 'git commit -m ''mention GIT_DIR here'' -- a.ps1'
+
+        # Assert
+        $result.Resolved | Should -BeFalse -Because 'a standalone relocation word fails closed (issue #903, #732 CR-2 residual)'
+        $result.Detail.StartsWith('git-relocation') | Should -BeTrue -Because 'the detail names rule R5'
+    }
+
     It 'U12 gives git-relocation for <Command>' -ForEach @(
         @{ Command = 'git --git-dir=/x add a.ps1' }
         @{ Command = 'git --git-dir /x add a.ps1' }
@@ -302,5 +332,13 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         # Assert
         $calls.Count | Should -Be 1 -Because 'the session-root scope is reused for an equal target'
         $verdict.Verdict | Should -Be 'evaluate' -Because 'the only target is epic scope'
+    }
+
+    It 'U24 gives git-command-word-missing for a token array without git' {
+        # Act
+        $result = Get-OrchestrationGitSelectorTarget -Token @('status')
+
+        # Assert
+        $result.Rule | Should -Be 'git-command-word-missing' -Because 'a token array without git has no command word (issue #903, #732 CR-6)'
     }
 }
