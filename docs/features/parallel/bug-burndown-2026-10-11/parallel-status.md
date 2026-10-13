@@ -15,8 +15,8 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 4
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-13T00:03:49Z
-- `next_step`: #901 (PR 924) and #903 in flight; verify and merge each on DONE; then final status regeneration and require_complete validation.
+- `last_updated`: 2026-10-13T10:40:07Z
+- `next_step`: Resumed #901 (remediation cycle 2 P1-T1 onward, re-audit, merge origin/main, PR 924) and #903 (S5 after P0-T25) in existing worktrees; verify and merge each on DONE; then final status regeneration and require_complete validation.
 
 **Items**
 
