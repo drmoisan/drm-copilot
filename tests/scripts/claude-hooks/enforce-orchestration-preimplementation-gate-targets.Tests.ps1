@@ -383,4 +383,17 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         $outcome.Outcome | Should -Be $Expected -Because "$Label decides the outcome"
         $outcome.Reason | Should -BeExactly $expectedReason -Because "$Label carries the unchanged reason text"
     }
+
+    It 'U26 gives the exact deny reason for <Label>' -ForEach @(
+        @{ Label = 'target-ambiguous'; Code = 'target-ambiguous'; Detail = '/a'; Expected = 'PREIMPLEMENTATION_GATE_BLOCKED: target-ambiguous: more than one worktree claims the epic integration branch for target /a. Implementation operations in epic scope require an unambiguous target worktree.' }
+        @{ Label = 'target-unresolvable (fall-through)'; Code = 'target-unresolvable'; Detail = 'directory-change: cd /x'; Expected = 'PREIMPLEMENTATION_GATE_BLOCKED: target-unresolvable: the target worktree of this epic-scope operation cannot be resolved (directory-change: cd /x). Implementation operations in epic scope require every command segment and path to name an absolute, resolvable target.' }
+    ) {
+        # Arrange (issue #903 remediation RI-1): the reason code and detail come from the data row.
+
+        # Act
+        $reason = Get-OrchestrationEpicTargetDenyReason -ReasonCode $Code -Detail $Detail
+
+        # Assert
+        $reason | Should -BeExactly $Expected -Because "$Label keeps its unchanged reason text"
+    }
 }
