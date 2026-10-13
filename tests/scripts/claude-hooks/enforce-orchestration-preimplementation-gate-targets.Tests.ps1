@@ -341,4 +341,46 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         # Assert
         $result.Rule | Should -Be 'git-command-word-missing' -Because 'a token array without git has no command word (issue #903, #732 CR-6)'
     }
+
+    It 'U25 gives outcome <Expected> for <Label>' -ForEach @(
+        @{ Label = 'a none verdict'; Case = 'none'; Expected = 'none' }
+        @{ Label = 'a deny verdict'; Case = 'deny'; Expected = 'deny' }
+        @{ Label = 'a failing session-root scope'; Case = 'session-root'; Expected = 'deny' }
+        @{ Label = 'a failing non-session-root target'; Case = 'target'; Expected = 'deny' }
+        @{ Label = 'an evaluation with no failure'; Case = 'ready'; Expected = 'allow' }
+    ) {
+        # Arrange (issue #903, #732 CR-3): in-memory verdicts; the readiness predicate reads Scope.Failure.
+        $checkpointPath = '/synthetic-worktrees/session/artifacts/orchestration/epic-orchestrator-state.json'
+        $failing = [pscustomobject]@{ CheckpointPath = $checkpointPath; Failure = 'merge-in-progress' }
+        $ready = [pscustomobject]@{ CheckpointPath = $checkpointPath; Failure = '' }
+        $verdict = switch ($Case) {
+            'none' { [pscustomobject]@{ Verdict = 'none'; ReasonCode = ''; Detail = ''; Evaluations = @() } }
+            'deny' { [pscustomobject]@{ Verdict = 'deny'; ReasonCode = 'target-mixed'; Detail = '/a'; Evaluations = @() } }
+            'session-root' {
+                $evaluation = [pscustomobject]@{ Target = $script:Root; IsSessionRoot = $true; Scope = $failing }
+                [pscustomobject]@{ Verdict = 'evaluate'; ReasonCode = ''; Detail = ''; Evaluations = @($evaluation) }
+            }
+            'target' {
+                $evaluation = [pscustomobject]@{ Target = '/a'; IsSessionRoot = $false; Scope = $failing }
+                [pscustomobject]@{ Verdict = 'evaluate'; ReasonCode = ''; Detail = ''; Evaluations = @($evaluation) }
+            }
+            default {
+                $evaluation = [pscustomobject]@{ Target = $script:Root; IsSessionRoot = $true; Scope = $ready }
+                [pscustomobject]@{ Verdict = 'evaluate'; ReasonCode = ''; Detail = ''; Evaluations = @($evaluation) }
+            }
+        }
+        $expectedReason = switch ($Case) {
+            'deny' { Get-OrchestrationEpicTargetDenyReason -ReasonCode 'target-mixed' -Detail '/a' }
+            'session-root' { "PREIMPLEMENTATION_GATE_BLOCKED: this epic-scope operation was evaluated against /synthetic-worktrees/session/artifacts/orchestration/epic-orchestrator-state.json, and the failed readiness predicate is 'merge-in-progress'. Implementation operations in epic scope require that checkpoint to satisfy every readiness predicate, and a production path may be staged or edited only while a merge is in progress." }
+            'target' { Get-OrchestrationEpicTargetDenyReason -ReasonCode 'target-not-ready' -Detail '/a' -CheckpointPath $checkpointPath -Failure 'merge-in-progress' }
+            default { '' }
+        }
+
+        # Act
+        $outcome = Resolve-OrchestrationEpicTargetOutcome -Verdict $verdict -ReadinessFailure { param($Scope) $Scope.Failure }
+
+        # Assert
+        $outcome.Outcome | Should -Be $Expected -Because "$Label decides the outcome"
+        $outcome.Reason | Should -BeExactly $expectedReason -Because "$Label carries the unchanged reason text"
+    }
 }

@@ -371,3 +371,54 @@ function Get-OrchestrationEpicTargetDenyReason {
     'Implementation operations in epic scope require every command segment and path to name ' +
     'an absolute, resolvable target.'
 }
+
+function Resolve-OrchestrationEpicTargetOutcome {
+    <#
+    .SYNOPSIS
+        Decides the shared epic-scope outcome of a target verdict (issue #903, #732 CR-3).
+    .DESCRIPTION
+        Pure decision logic shared by the Claude and the Codex epic-scope gates; reads no file,
+        process, or environment value. Returns Outcome 'none' (not epic scope), 'deny' (with
+        the deny Reason), or 'allow' (empty Reason). The caller supplies the readiness predicate,
+        invoked as & $ReadinessFailure $evaluation.Scope; the first evaluation with a non-empty
+        failure denies, and the session-root wording is unchanged.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][pscustomobject] $Verdict,
+        [Parameter(Mandatory)][scriptblock] $ReadinessFailure
+    )
+
+    if ($Verdict.Verdict -eq 'none') {
+        return [pscustomobject]@{ Outcome = 'none'; Reason = '' }
+    }
+    if ($Verdict.Verdict -eq 'deny') {
+        $reason = Get-OrchestrationEpicTargetDenyReason -ReasonCode $Verdict.ReasonCode -Detail $Verdict.Detail
+        return [pscustomobject]@{ Outcome = 'deny'; Reason = $reason }
+    }
+    foreach ($evaluation in $Verdict.Evaluations) {
+        $scope = $evaluation.Scope
+        $failure = & $ReadinessFailure $evaluation.Scope
+        if (-not $failure) {
+            continue
+        }
+        if ($evaluation.IsSessionRoot) {
+            $reason = 'PREIMPLEMENTATION_GATE_BLOCKED: this epic-scope operation was evaluated against ' +
+            "$($scope.CheckpointPath), and the failed readiness predicate is '$failure'. " +
+            'Implementation operations in epic scope require that checkpoint to satisfy every ' +
+            'readiness predicate, and a production path may be staged or edited only while a merge is in progress.'
+            return [pscustomobject]@{ Outcome = 'deny'; Reason = $reason }
+        }
+        $reasonArguments = @{
+            ReasonCode     = 'target-not-ready'
+            Detail         = $evaluation.Target
+            CheckpointPath = $scope.CheckpointPath
+            Failure        = $failure
+        }
+        return [pscustomobject]@{ Outcome = 'deny'; Reason = (Get-OrchestrationEpicTargetDenyReason @reasonArguments) }
+    }
+    return [pscustomobject]@{ Outcome = 'allow'; Reason = '' }
+}
