@@ -68,6 +68,14 @@ Create a missing integration branch from current `origin/main` and push it. Befo
 fetch the current remote integration tip. Create every child worktree from that tip, never from
 `main`, and set each feature PR base explicitly to the integration branch.
 
+Before each wave launches, run `git fetch origin main` and then
+`git rev-list --count <integration>..origin/main`. A zero count proceeds directly to the wave.
+A non-zero count runs the main-sync as a dedicated chore child item (the `epic-852-main-sync` /
+PR #882 pattern) whose branch starts from the integration tip, merges `origin/main` with a merge
+commit, and opens a PR into the integration branch; that PR must merge before the wave launches.
+Record the sync child's `features[]` row before its launch, and do not reuse a manifest child's
+issue number for it. Run at most one main-sync child per wave, then re-fetch the integration tip.
+
 Launch all ready children in one bounded parallel wave. Before each launch, persist the
 epic-child topology receipt, reviewed complexity assessment, delegation receipt, and Codex
 model-routing receipt with the same `delegation_id`, then select the generated deployment agent.
