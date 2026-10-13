@@ -15,8 +15,8 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 4
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 2026-10-12T23:19:50Z
-- `next_step`: #901 (PR 924) and #902 in flight. Launch #903 when one merges and the other is past Phase 0.
+- `last_updated`: 2026-10-13T00:03:49Z
+- `next_step`: #901 (PR 924) and #903 in flight; verify and merge each on DONE; then final status regeneration and require_complete validation.
 
 **Items**
 
@@ -36,8 +36,8 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 899 | docs/features/active/2026-10-11-ci-green-gate-all-checks-and-codex-parity-899 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/923 | 12b2454256cfa11ff809d5d2333ddaf988574e21 | 2026-10-12T20:13:28Z | 2026-10-12T23:19:32Z |  |
 | 900 | docs/features/active/2026-10-11-concurrent-children-share-scratchpad-file-names-900 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/922 | 7d9a5c33526d7a98d5577ab4a9ad6f465f3dff3c | 2026-10-12T21:19:04Z | 2026-10-12T22:18:59Z |  |
 | 901 | docs/features/active/2026-10-11-pr-author-hook-docs-only-exemption-901 | 0 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/924 |  | 2026-10-12T22:19:26Z |  |  |
-| 902 | docs/features/active/2026-10-11-epic-integration-branch-not-synced-with-main-902 | 0 | in_flight | worktree_created |  |  | 2026-10-12T23:19:50Z |  |  |
-| 903 | docs/features/active/2026-10-11-round-2-review-nits-and-evidence-timestamps-903 | 0 | scheduled | not_started |  |  |  |  |  |
+| 902 | docs/features/active/2026-10-11-epic-integration-branch-not-synced-with-main-902 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/925 | fd81a43b45de65078236da6c1cbfd077c3eb010c | 2026-10-12T23:19:50Z | 2026-10-13T00:03:23Z |  |
+| 903 | docs/features/active/2026-10-11-round-2-review-nits-and-evidence-timestamps-903 | 0 | in_flight | worktree_created |  |  | 2026-10-13T00:03:49Z |  |  |
 
 **Cohorts**
 
