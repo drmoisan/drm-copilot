@@ -8,14 +8,14 @@ import type { FileTimes } from "../src/lib/file-system";
 import { InMemoryFileSystem } from "./lib/subagent-tree/in-memory-file-system";
 
 /** Absolute workspace root used across scenarios (mirrors a real Windows cwd). */
-export const WORKSPACE_ROOT = "C:\\Users\\DanMoisan\\repos\\drm-copilot";
+export const WORKSPACE_ROOT = "C:\\Users\\example\\repos\\drm-copilot";
 /** Fake resolved user-global Claude projects directory (distinct from any
  * path under `WORKSPACE_ROOT`, so tests fail loudly if discovery regresses
  * to scanning the workspace root instead). */
 export const CLAUDE_PROJECTS_ROOT = "/claude-root/projects";
 /** Encoded directory name matching `WORKSPACE_ROOT`, using a lowercase
  * drive-letter segment to exercise the case-insensitive matching rule. */
-export const MATCHING_DIR = "c--users-danmoisan-repos-drm-copilot";
+export const MATCHING_DIR = "c--users-example-repos-drm-copilot";
 
 /** In-test `TerminalWriter` fake capturing writes and reveal calls. */
 export class FakeTerminalWriter implements TerminalWriter {
