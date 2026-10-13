@@ -220,12 +220,24 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
             Should -BeFalse -Because 'benign payloads must not create PowerShell batch-budget state for the synthetic session'
     }
 
-    It 'DEV-2 wave barrier allows a benign Bash payload when no local checkpoint text is supplied' {
-        $payload = ConvertTo-CodexPreToolPayload -ToolName 'Bash' -ToolInput (Get-CodexBenignToolInput -ToolName 'Bash' -RepoRoot $script:RepoRoot)
+    It 'DEV-2 wave barrier allows a benign payload for every admitted tool name when no local checkpoint text is supplied' {
+        # Arrange (issue #903, #737 F-4): every candidate name a wave-barrier registration's matcher admits.
+        $waveRegistrations = @($script:Registrations | Where-Object { $_.HookName -eq 'enforce-epic-wave-barrier.ps1' })
+        $admitted = @(foreach ($registration in $waveRegistrations) {
+                $script:CandidateToolNames | Where-Object { $_ -match $registration.Matcher }
+            }) | Select-Object -Unique
+        $failures = [System.Collections.Generic.List[string]]::new()
 
-        $decision = Invoke-CodexEpicWaveDecision -PayloadRaw $payload -LocalCheckpointRaw '' -EpicCheckpointRaw '' -LauncherEnvironment $null
+        # Act
+        foreach ($toolName in $admitted) {
+            $payload = ConvertTo-CodexPreToolPayload -ToolName $toolName -ToolInput (Get-CodexBenignToolInput -ToolName $toolName -RepoRoot $script:RepoRoot)
+            $decision = Invoke-CodexEpicWaveDecision -PayloadRaw $payload -LocalCheckpointRaw '' -EpicCheckpointRaw '' -LauncherEnvironment $null
+            if ($null -ne $decision) { $failures.Add(('{0}: {1}' -f $toolName, ($decision | ConvertTo-Json -Compress -Depth 5))) }
+        }
 
-        $decision | Should -BeNullOrEmpty -Because 'an empty local checkpoint text must allow a benign payload in the native context'
+        # Assert
+        @($admitted).Count | Should -BeGreaterThan 0 -Because 'at least one candidate tool name must be admitted by a wave-barrier matcher'
+        $failures -join "`n" | Should -BeNullOrEmpty -Because 'an empty local checkpoint text must allow a benign payload for every admitted tool name in the native context'
     }
 
     It 'AC-20 one registration returns an array of count one' {

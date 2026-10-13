@@ -13,6 +13,14 @@
     from a supplied repository root. Callers inject a reader script block, so fixtures run over
     in-memory text. No function creates a file, runs a process, or reads gitignored state.
 
+    Discovery identifies hook loads only through hooks/<name>.ps1 string literals, so a suite
+    that builds the hook path from a root variable (for example Join-Path $script:HookRoot
+    '<name>.ps1') or launches a process with a variable-built path is outside the population
+    (issue #903, #737 F-3; detector work is Operator Follow-up 4).
+
+    $script:EpicStateParseCache is a deliberate memo exception to the no-mutable-state rule: it
+    is deterministic, keyed by source text, and lives for one test session only (#737 F-6).
+
     This file is not mirrored under extensions/drm-copilot/resources/.
 #>
 

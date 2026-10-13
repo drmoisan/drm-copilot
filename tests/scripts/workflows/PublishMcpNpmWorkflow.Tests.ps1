@@ -63,6 +63,25 @@ Describe "publish-mcp-npm.yml workflow invariants" {
         $script:publishStep = @($script:stepBlocks | Where-Object { $_.Text -match 'npm publish' })[0]
         $script:equalityStep = @($script:stepBlocks | Where-Object { $_.Text -match 'packages/mcp-server/package\.json' })[0]
         $script:pollStep = @($script:stepBlocks | Where-Object { $_.Text -match 'npm view' })[0]
+
+        function Get-BraceBlockText {
+            <#
+                The first line matching HeaderPattern through the first later line that closes it at the
+                same indentation, joined with newlines; an empty string when the header or the close is
+                absent (issue #903, #846 CR-2). A nested '}' sits deeper and does not end the block.
+            #>
+            param([Parameter(Mandatory)] [string] $Text, [Parameter(Mandatory)] [string] $HeaderPattern)
+            $lines = $Text -split "`n"
+            for ($i = 0; $i -lt $lines.Count; $i++) {
+                if ($lines[$i] -notmatch $HeaderPattern) { continue }
+                $indent = [regex]::Match($lines[$i], '^\s*').Value
+                for ($j = $i + 1; $j -lt $lines.Count; $j++) {
+                    if ($lines[$j] -match ('^' + [regex]::Escape($indent) + '\}\s*$')) { return ($lines[$i..$j] -join "`n") }
+                }
+                return ''
+            }
+            return ''
+        }
     }
 
     It "declares a pull_request trigger scoped to the mcp-server package and the workflow file" {
@@ -108,7 +127,9 @@ Describe "publish-mcp-npm.yml workflow invariants" {
         # Fails the job on inequality rather than merely reporting it.
         $script:equalityStep.Text | Should -Match '-ne'
         [regex]::Matches($script:equalityStep.Text, '(?m)^\s*exit 1\s*$').Count | Should -Be 1
-        $script:equalityStep.Text | Should -Match '(?s)if \(\$tagVersion -ne \$manifestVersion\) \{[^}]*::error::[^}]*\bexit 1\b[^}]*\}'
+        $block = Get-BraceBlockText -Text $script:equalityStep.Text -HeaderPattern 'if \(\$tagVersion -ne \$manifestVersion\) \{'
+        $block | Should -Not -BeNullOrEmpty
+        $block | Should -Match '(?ms)::error::.*^\s*exit 1\s*$'
     }
 
     It "polls the exact published version after publishing and fails the job on budget expiry" {
@@ -124,7 +145,9 @@ Describe "publish-mcp-npm.yml workflow invariants" {
         # falls through silently would report success for a version that never published.
         $script:pollStep.Text | Should -Match 'maxAttempts'
         [regex]::Matches($script:pollStep.Text, '(?m)^\s*exit 1\s*$').Count | Should -Be 1
-        $script:pollStep.Text | Should -Match '(?s)if \(-not \$resolved\) \{[^}]*::error::[^}]*\bexit 1\b[^}]*\}'
+        $block = Get-BraceBlockText -Text $script:pollStep.Text -HeaderPattern 'if \(-not \$resolved\) \{'
+        $block | Should -Not -BeNullOrEmpty
+        $block | Should -Match '(?ms)::error::.*^\s*exit 1\s*$'
     }
 
     It "ref-guards the post-publish registry poll step" {
@@ -223,8 +246,7 @@ Describe "publish-mcp-npm.yml workflow invariants" {
         $text | Should -Match '\$LASTEXITCODE\s*=\s*0'
         $text | Should -Match '@danmoisan/drm-copilot-mcp@\$version'
         $text | Should -Match '(?m)^\s*exit 0\s*$'
-        [regex]::Matches($text, '(?m)^\s*exit 1\s*$').Count | Should -Be 1
-        $text | Should -Match '(?s)if \(-not \$resolved\) \{[^}]*::error::[^}]*\bexit 1\b[^}]*\}'
+        # The failing-exit count and block check live only in the budget-expiry row above (issue #903, #846 CR-3).
         $text | Should -Match $script:refGuardPattern
     }
 
@@ -239,6 +261,7 @@ Describe "publish-mcp-npm.yml workflow invariants" {
 
         $pollConditions = @(($script:pollStep.Text -split "`n") | Where-Object { $_ -match '^\s+if:' })
         $pollConditions.Count | Should -Be 1
+        $pollConditions[0] | Should -Match '^\s+if:\s*[^\s>|]' -Because 'the poll condition must be inline so the status-function check reads the whole expression'
         $pollConditions[0] | Should -Not -Match 'always\(\)|failure\(\)|cancelled\(\)'
 
         $script:publishStep.Text | Should -Not -Match 'continue-on-error'
