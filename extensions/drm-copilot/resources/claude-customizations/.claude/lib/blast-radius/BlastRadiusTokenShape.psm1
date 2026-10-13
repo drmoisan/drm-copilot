@@ -52,9 +52,9 @@
       - Test-FileShapedComponent (issue #797) ports is_file_shaped_component.
         Its extension pattern text is identical to FILE_EXTENSION_PATTERN_TEXT
         and its known-name set equals KNOWN_FILE_NAMES; a Pester test reads both
-        from the Python source and pins them equal. Lower-casing uses
-        ToLowerInvariant, matching Python's str.lower on the ASCII inputs the
-        pattern can accept, and known-name membership is ordinal.
+        from the Python source and pins them equal. A non-ASCII extension is
+        rejected before lower-casing (issue #903); ToLowerInvariant then matches
+        Python's str.lower on ASCII input, and known-name membership is ordinal.
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
@@ -99,6 +99,7 @@ $script:FeatureFolderSegmentIndex = 1
 # exactly the inputs the Python pattern matches.
 $script:FileExtensionPatternText = '[a-z][a-z0-9]*'
 $script:FileExtensionPattern = [regex]::new('\A' + $script:FileExtensionPatternText + '\z')
+$script:NonAsciiPattern = [regex]::new('[^\x00-\x7F]')
 
 # Known extensionless file names and dotfiles (issue #797). Membership is exact
 # and ordinal, matching Python's frozenset membership. The set is closed and is
@@ -257,8 +258,9 @@ function Test-FileShapedComponent {
         return $false
     }
 
-    $extension = $Component.Substring($dotIndex + 1).ToLowerInvariant()
-    return $script:FileExtensionPattern.IsMatch($extension)
+    $extension = $Component.Substring($dotIndex + 1)
+    if ($script:NonAsciiPattern.IsMatch($extension)) { return $false }
+    return $script:FileExtensionPattern.IsMatch($extension.ToLowerInvariant())
 }
 
 Export-ModuleMember -Function `

@@ -403,7 +403,7 @@ function Get-EpicOrchestrationReadinessFailure {
     if ($IssueNumber -match '^\d+$' -and [int]::TryParse($IssueNumber, [ref]$declared)) { $selectionArguments['DeclaredIssueNumber'] = $declared }
     $selection = Select-FeatureFolderTarget @selectionArguments
     if ($selection.Status -eq 'Ambiguous') { return 'target-ambiguous: ' + ($selection.Remaining -join ', ') }
-    $record = Find-OrchestrationModeRecord -Records $features -TargetFolder $selection.Basename -IssueNumber $(if ($IssueNumber) { $IssueNumber } else { $FallbackIssueNumber })
+    $record = Find-OrchestrationModeRecord -Records $features -TargetFolder $selection.Basename -IssueNumber $(if ($IssueNumber -or @($selection.Remaining).Count -gt 0) { $IssueNumber } else { $FallbackIssueNumber })
     if ($null -eq $record) { return 'target-record' }
     if (Test-OrchestrationModeTerminalMergeStatus -Record $record) { return 'merge_status' }
     return ''
@@ -468,7 +468,7 @@ function Get-ParallelOrchestrationReadinessFailure {
     if ($IssueNumber -match '^\d+$' -and [int]::TryParse($IssueNumber, [ref]$declared)) { $selectionArguments['DeclaredIssueNumber'] = $declared }
     $selection = Select-FeatureFolderTarget @selectionArguments
     if ($selection.Status -eq 'Ambiguous') { return 'target-ambiguous: ' + ($selection.Remaining -join ', ') }
-    $record = Find-OrchestrationModeRecord -Records $items -TargetFolder $selection.Basename -IssueNumber $(if ($IssueNumber) { $IssueNumber } else { $FallbackIssueNumber })
+    $record = Find-OrchestrationModeRecord -Records $items -TargetFolder $selection.Basename -IssueNumber $(if ($IssueNumber -or @($selection.Remaining).Count -gt 0) { $IssueNumber } else { $FallbackIssueNumber })
     if ($null -eq $record) { return 'target-record' }
     if (Test-OrchestrationModeTerminalMergeStatus -Record $record) { return 'merge_status' }
     return ''

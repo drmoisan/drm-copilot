@@ -455,6 +455,24 @@ function Invoke-CompletionConsistencyDecision {
     }
 }
 
+function Invoke-CompletionConsistencyEntryPoint {
+    <#
+    .SYNOPSIS
+        Reads the payload and returns the gate decision, failing closed when the read or evaluation throws
+        (issue #903, #736 O-4).
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param([scriptblock] $ReadPayload = { Read-ClaudeHookRawPayload })
+
+    try {
+        return Invoke-CompletionConsistencyDecision -ToolInputRaw ([string](& $ReadPayload))
+    }
+    catch {
+        return ConvertTo-CompletionDenyDecision -Reason "COMPLETION_CONSISTENCY_BLOCKED: the gate could not evaluate the payload ($($_.Exception.Message)) and fails closed."
+    }
+}
+
 # Guard allows dot-sourcing in tests without executing the entrypoint.
 if ($MyInvocation.InvocationName -eq '.') {
     return
@@ -463,7 +481,7 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('COMPLET
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'COMPLETION_CONSISTENCY_BLOCKED:'
 if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
-$decision = Invoke-CompletionConsistencyDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
+$decision = Invoke-CompletionConsistencyEntryPoint
 
 $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 
