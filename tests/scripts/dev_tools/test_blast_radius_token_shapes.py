@@ -149,8 +149,10 @@ def test_spans_multiple_feature_folders_ignores_a_token_rooted_elsewhere() -> No
     assert spans_multiple_feature_folders("scripts/dev_tools/**") is False
 
 
-# Predicate cases for the file-shape rule (issue #797). The non-ASCII case is
-# built with ``chr`` so this file contains no byte above 127.
+# Predicate cases for the file-shape rule (issue #797). The non-ASCII cases
+# (including the Kelvin sign and the dotted capital I, which lower-case to
+# ASCII letters, issue #903) are built with ``chr`` so this file contains no
+# byte above 127.
 FILE_SHAPE_CASES = [
     pytest.param("parallel_lane_assertion.bats", True, id="letter-led-extension"),
     pytest.param("Main.TS", True, id="uppercase-extension"),
@@ -165,6 +167,8 @@ FILE_SHAPE_CASES = [
     pytest.param("v1.2.0", False, id="digit-led-extension"),
     pytest.param("archive.tar-gz", False, id="hyphenated-extension"),
     pytest.param("notes." + chr(0xE9), False, id="non-ascii-extension"),
+    pytest.param("notes." + chr(0x212A), False, id="kelvin-sign-extension"),
+    pytest.param("notes." + chr(0x130), False, id="dotted-capital-i-extension"),
     pytest.param("dockerfile", False, id="known-name-case-variant"),
     pytest.param("thing", False, id="extensionless-unknown"),
 ]
@@ -203,11 +207,18 @@ def test_known_file_names_are_the_adopted_set() -> None:
     )
 
     # Act / Assert
-    assert KNOWN_FILE_NAMES == adopted
-    assert len(KNOWN_FILE_NAMES) == 18
+    assert KNOWN_FILE_NAMES == adopted, (
+        f"extra {sorted(KNOWN_FILE_NAMES - adopted)}, "
+        f"missing {sorted(adopted - KNOWN_FILE_NAMES)}"
+    )
+    assert (
+        len(KNOWN_FILE_NAMES) == 18
+    ), f"expected 18 known file names; observed {len(KNOWN_FILE_NAMES)}"
 
 
 def test_file_extension_pattern_text_uses_explicit_ascii_classes() -> None:
     """Pin the extension pattern to explicit ASCII classes for runtime parity."""
     # Arrange / Act / Assert
-    assert FILE_EXTENSION_PATTERN_TEXT == "[a-z][a-z0-9]*"
+    assert (
+        FILE_EXTENSION_PATTERN_TEXT == "[a-z][a-z0-9]*"
+    ), f"observed {FILE_EXTENSION_PATTERN_TEXT!r}"

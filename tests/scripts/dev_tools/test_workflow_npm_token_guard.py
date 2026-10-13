@@ -1,182 +1,31 @@
 """Guard against reintroducing a token-based npm publish under ``.github/``.
 
-Purpose: ``.github/workflows/publish-mcp-npm.yml`` publishes the MCP server
-package through npm trusted publishing (OIDC), which needs no stored token.
-These tests fail if any YAML file under ``.github/`` configures a long-lived
-npm token through any of four detected families: a reference to the
-``NPM_TOKEN`` secret or variable (``secrets`` or ``vars`` context), any
-mention of ``NODE_AUTH_TOKEN``, an ``_authToken`` configuration key in any
-form (an ``.npmrc`` line, an ``npm_config_`` environment variable, or
-``npm config set``), and an ``NPM_TOKEN`` assignment fed from any secret
-(issues #712 and #739).
-
-Scope: every ``*.yml`` and ``*.yaml`` file under ``.github/``, enumerated
-recursively. Detection is textual and line-wise, so a match in any key,
-block scalar, expression, or comment is reported. Detection is also proven
-against in-memory strings, so no workflow edit is needed to show that the
-helpers report a reintroduced route.
-
-The repository root is derived from this file's own resolved location, and
-files are enumerated and read from disk through ``pathlib`` only, whether or
-not version control tracks them. The module has no dependency on the current
-working directory, version-control state, or network access.
+These tests prove each detection helper in
+``tests/scripts/dev_tools/npm_token_guard_test_support.py`` against in-memory
+strings and then scan every YAML file under ``.github/`` with it. The detected
+families, the scan scope, and the filesystem-only reading rules are described
+in that module's docstring (issues #712, #739, and #845).
 """
 
 from __future__ import annotations
 
-import re
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
 
+from tests.scripts.dev_tools.npm_token_guard_test_support import (
+    GITHUB_DIR,
+    REPO_ROOT,
+    collect_offenders,
+    enumerate_github_yaml_files,
+    find_node_auth_token_references,
+    find_npm_auth_token_config_references,
+    find_npm_token_assignments,
+    find_npm_token_references,
+)
+
 if TYPE_CHECKING:
     from collections.abc import Callable
-
-REPO_ROOT: Path = Path(__file__).resolve().parents[3]
-GITHUB_DIR: Path = REPO_ROOT / ".github"
-
-_NPM_TOKEN_CONTEXT_REFERENCE = re.compile(
-    r"\b(?:secrets|vars)\s*(?:\.\s*NPM_TOKEN\b|\[\s*['\"]NPM_TOKEN['\"]\s*\])",
-    re.IGNORECASE,
-)
-_NODE_AUTH_TOKEN_REFERENCE = re.compile(r"\bNODE_AUTH_TOKEN\b", re.IGNORECASE)
-_NPM_AUTH_TOKEN_CONFIG_REFERENCE = re.compile(
-    r"(?<![A-Za-z0-9])_authtoken\b", re.IGNORECASE
-)
-_NPM_TOKEN_ASSIGNMENT = re.compile(
-    r"(?<![\w.-])[\"']?NPM_TOKEN[\"']?\s*:|\bNPM_TOKEN\s*=(?!=)", re.IGNORECASE
-)
-
-
-def _matching_line_numbers(pattern: re.Pattern[str], text: str) -> list[int]:
-    """Return the 1-based numbers of the lines of ``text`` that ``pattern`` matches.
-
-    Shared by every finder so each detected family scans text the same way:
-    line by line, with ``pattern.search`` applied to each line on its own.
-
-    Args:
-        pattern: Compiled expression searched for within each line.
-        text: YAML document text to scan.
-
-    Returns:
-        Ascending 1-based line numbers of matching lines, or an empty list.
-    """
-    # Scan each line independently so a diagnostic can name the exact line.
-    return [
-        line_number
-        for line_number, line in enumerate(text.splitlines(), start=1)
-        if pattern.search(line)
-    ]
-
-
-def find_npm_token_references(text: str) -> list[int]:
-    """Return the line numbers of ``text`` that reference the ``NPM_TOKEN`` secret
-    or variable.
-
-    Both the ``secrets`` and ``vars`` contexts are detected, through dot access
-    (``secrets.NPM_TOKEN``) or bracket access (``vars['NPM_TOKEN']``), in any
-    casing and with optional whitespace. Both names are word-bounded, so
-    ``NPM_TOKEN_V2``, ``mysecrets.NPM_TOKEN``, and a bare mention are ignored.
-
-    Args:
-        text: YAML document text to scan.
-
-    Returns:
-        Ascending 1-based line numbers of matching lines, or an empty list.
-    """
-    return _matching_line_numbers(_NPM_TOKEN_CONTEXT_REFERENCE, text)
-
-
-def find_node_auth_token_references(text: str) -> list[int]:
-    """Return the line numbers of ``text`` that mention ``NODE_AUTH_TOKEN``.
-
-    Any word-bounded, case-insensitive occurrence is reported, whichever
-    secret name feeds it, because OIDC trusted publishing needs no token.
-
-    Args:
-        text: YAML document text to scan.
-
-    Returns:
-        Ascending 1-based line numbers of matching lines, or an empty list.
-    """
-    return _matching_line_numbers(_NODE_AUTH_TOKEN_REFERENCE, text)
-
-
-def find_npm_auth_token_config_references(text: str) -> list[int]:
-    """Return the line numbers of ``text`` that set an ``_authToken`` config key.
-
-    The key is reported in any casing and in any form: an ``.npmrc`` line, an
-    ``npm_config_`` environment variable, or ``npm config set``. A letter- or
-    digit-prefixed name such as ``GH_AUTHTOKEN`` is not reported.
-
-    Args:
-        text: YAML document text to scan.
-
-    Returns:
-        Ascending 1-based line numbers of matching lines, or an empty list.
-    """
-    return _matching_line_numbers(_NPM_AUTH_TOKEN_CONFIG_REFERENCE, text)
-
-
-def find_npm_token_assignments(text: str) -> list[int]:
-    """Return the line numbers of ``text`` that assign a value to ``NPM_TOKEN``.
-
-    A YAML mapping key (block, flow, or quoted) and a shell or PowerShell
-    assignment are reported whichever secret feeds them. A context read
-    (``secrets.NPM_TOKEN``, ``env.NPM_TOKEN``), an ``==`` comparison, a longer
-    or prefixed name, and prose without ``:`` or ``=`` after the name are not
-    reported.
-
-    Args:
-        text: YAML document text to scan.
-
-    Returns:
-        Ascending 1-based line numbers of matching lines, or an empty list.
-    """
-    return _matching_line_numbers(_NPM_TOKEN_ASSIGNMENT, text)
-
-
-def collect_offenders(
-    relative_path: str, text: str, finder: Callable[[str], list[int]]
-) -> list[str]:
-    """Return one ``<relative_path>:<line>`` diagnostic per line ``finder`` reports.
-
-    Formats the tree-scan diagnostics so every offending line is named, in the
-    ascending order ``finder`` returns.
-
-    Args:
-        relative_path: POSIX path of the scanned file relative to the repo root.
-        text: Full text of the scanned file.
-        finder: Helper that returns the matching 1-based line numbers of text.
-
-    Returns:
-        Diagnostics in line order, or an empty list when ``finder`` reports none.
-    """
-    # Name each matching line separately so the failure message lists them all.
-    return [f"{relative_path}:{line_number}" for line_number in finder(text)]
-
-
-def enumerate_github_yaml_files(github_dir: Path) -> list[Path]:
-    """Return every ``*.yml`` and ``*.yaml`` file under ``github_dir``, recursively.
-
-    Args:
-        github_dir: Directory to enumerate, normally ``GITHUB_DIR``.
-
-    Returns:
-        File paths sorted by their POSIX path relative to ``github_dir``, so
-        diagnostics are listed in a deterministic order. The list is empty when
-        the directory holds no YAML file or does not exist.
-    """
-    # Collect both YAML extensions, since workflows, dependabot configuration,
-    # and composite actions may use either spelling.
-    candidates = [
-        path
-        for pattern in ("*.yml", "*.yaml")
-        for path in github_dir.rglob(pattern)
-        if path.is_file()
-    ]
-    return sorted(candidates, key=lambda path: path.relative_to(github_dir).as_posix())
 
 
 @pytest.mark.parametrize(
@@ -410,6 +259,48 @@ def test_find_npm_token_assignments_ignores_non_matching_text(text: str) -> None
 
     # Assert
     assert result == [], f"input {text!a} returned {result}, expected []"
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        pytest.param(
+            '[ $NPM_TOKEN = "" ]',
+            [1],
+            id="residual-single-equals-shell-test-reported",
+        ),
+        pytest.param(
+            "[[ $NPM_TOKEN =~ ^npm_ ]]",
+            [1],
+            id="residual-bash-regex-match-reported",
+        ),
+        pytest.param("NPM_TOKEN+=x", [], id="residual-bash-append-not-reported"),
+        pytest.param(
+            "NPM_TOKEN==value",
+            [],
+            id="accepted-double-equals-narrowing-not-reported",
+        ),
+    ],
+)
+def test_find_npm_token_assignments_pins_documented_residuals(
+    text: str, expected: list[int]
+) -> None:
+    """Pin the documented residual and narrowing behavior of the assignment finder.
+
+    The #845 spec non-goal accepts three residuals of the textual
+    ``NPM_TOKEN`` assignment rule: a single ``=`` shell test and a bash ``=~``
+    regex match are reported, and a bash ``+=`` append is not. The #845
+    backward-compatibility section accepts the ``==`` narrowing, so
+    ``NPM_TOKEN==value`` is not reported. These rows characterize existing
+    behavior so a change to either outcome is visible.
+    """
+    # Arrange: the parametrized text and its expected line numbers.
+
+    # Act
+    result = find_npm_token_assignments(text)
+
+    # Assert
+    assert result == expected, f"input {text!a} returned {result}, expected {expected}"
 
 
 def test_collect_offenders_names_each_matching_line() -> None:
