@@ -155,8 +155,8 @@ function Get-EpicStateIsolationHookDotSource {
     <#
         Pure: the dot-source command that loads the hook. Order: (i) the dot-source whose argument
         holds a hooks/<name>.ps1 literal; (ii) otherwise the dot-source whose argument references a
-        variable that the suite binds to such a literal. The first in source order wins within a
-        step. $null when no dot-source identifies the hook (issue #903, #737 F-2).
+        variable that the suite binds to such a literal; (iii) otherwise the first dot-source. The
+        first in source order wins within a step. $null when there is no dot-source.
     #>
     [OutputType([System.Management.Automation.Language.CommandAst])]
     param(
@@ -175,27 +175,7 @@ function Get-EpicStateIsolationHookDotSource {
             if (Test-EpicStateIsolationVariableBoundToHook -SuiteAst $SuiteAst -Key $key) { return $candidate }
         }
     }
-    return $null
-}
-
-function Test-EpicStateIsolationConditionalAncestor {
-    # Pure (issue #903, #737 F-1): true when Node is an if, switch, loop, try, or trap that may skip Command, except a single-clause if with no else whose condition is one Get-Command <Name> pipeline naming the Command's target.
-    [OutputType([bool])]
-    param([Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $Node, [Parameter(Mandatory)] [System.Management.Automation.Language.CommandAst] $Command)
-    if ($Node -isnot [System.Management.Automation.Language.IfStatementAst]) {
-        return ($Node -is [System.Management.Automation.Language.SwitchStatementAst] -or $Node -is [System.Management.Automation.Language.LoopStatementAst] -or
-            $Node -is [System.Management.Automation.Language.TryStatementAst] -or $Node -is [System.Management.Automation.Language.TrapStatementAst])
-    }
-    if ($Node.Clauses.Count -ne 1 -or $null -ne $Node.ElseClause) { return $true }
-    $condition = $Node.Clauses[0].Item1
-    if ($condition -isnot [System.Management.Automation.Language.PipelineAst] -or $condition.PipelineElements.Count -ne 1) { return $true }
-    $guard = $condition.PipelineElements[0]
-    if ($guard -isnot [System.Management.Automation.Language.CommandAst] -or $guard.GetCommandName() -ne 'Get-Command' -or $guard.CommandElements.Count -lt 2) { return $true }
-    $targets = switch ($Command.GetCommandName()) {
-        'Mock' { (Get-EpicStateIsolationMockBinding -Command $Command).CommandName }
-        'Register-EpicStateBaselineMock' { Get-EpicStateIsolationStringConstant -Node $Command }
-    }
-    return -not (@($targets) -contains (Get-EpicStateIsolationElementText -Element $guard.CommandElements[1]))
+    return $candidates[0]
 }
 
 function Get-EpicStateIsolationDirectCommand {
@@ -214,7 +194,6 @@ function Get-EpicStateIsolationDirectCommand {
                 $nested = $true
                 break
             }
-            if (Test-EpicStateIsolationConditionalAncestor -Node $parent -Command $command) { $nested = $true; break }
             $parent = $parent.Parent
         }
         if (-not $nested) { $command }
@@ -449,7 +428,6 @@ function Get-EpicStateIsolationFinding {
         $commands = @(Get-EpicStateIsolationDirectCommand -Block $block | Sort-Object -Property { $_.Extent.StartOffset })
         $dotSources = @($commands | Where-Object { $_.InvocationOperator -eq [System.Management.Automation.Language.TokenKind]::Dot })
         $dotSource = Get-EpicStateIsolationHookDotSource -DotSource $dotSources -SuiteAst $Ast
-        if ($dotSources.Count -gt 0 -and $null -eq $dotSource) { 'no dot-source loads the hook' }
 
         $helperSeam = @(Get-EpicStateIsolationHelperSeam -Commands $commands -DotSource $dotSource -SuiteAst $Ast)
         foreach ($item in $Requirement) {
