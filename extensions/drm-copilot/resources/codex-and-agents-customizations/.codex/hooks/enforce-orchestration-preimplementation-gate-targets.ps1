@@ -22,10 +22,15 @@
 #>
 
 # Command words that change the working directory of later segments (rule R3).
-$script:OrchestrationTargetDirectoryChangeWords = @('cd', 'pushd', 'popd', 'chdir', 'Set-Location', 'sl', 'Push-Location', 'Pop-Location')
+$script:OrchestrationTargetDirectoryChangeWords = @(
+    'cd', 'pushd', 'popd', 'chdir', 'Set-Location', 'sl', 'Push-Location', 'Pop-Location'
+)
 
 # Environment names that relocate the git directory or work tree (rule R5).
 $script:OrchestrationTargetRelocationNames = @('GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR', 'GIT_INDEX_FILE')
+# A relocation name not embedded in a longer identifier (issue #903, #732 CR-2).
+$script:OrchestrationTargetRelocationPattern = '(?i)(?<![A-Za-z0-9_])(?:' +
+($script:OrchestrationTargetRelocationNames -join '|') + ')(?![A-Za-z0-9_])'
 
 # An absolute target: a drive-lettered or a rooted, non-UNC path after separator normalization.
 $script:OrchestrationTargetAbsolutePattern = '^([A-Za-z]:/|/(?!/))'
@@ -94,8 +99,11 @@ function Test-OrchestrationTargetDotSegment {
     return ($segments -contains '.' -or $segments -contains '..')
 }
 
-function Get-OrchestrationTargetResult {
+function New-OrchestrationTargetResult {
     # Builds the FR-3 result object; an unresolved result carries no targets.
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions', '',
+        Justification = 'Pure in-memory factory that changes no system state.')]
     [CmdletBinding()]
     [OutputType([pscustomobject])]
     param(
@@ -106,7 +114,9 @@ function Get-OrchestrationTargetResult {
 
     if ($Rule) {
         Write-Debug "PREIMPL_TARGET_UNRESOLVABLE: ${Rule}: $Value"
-        return [pscustomobject]@{ Resolved = $false; Targets = [string[]]@(); ReasonCode = 'target-unresolvable'; Detail = "${Rule}: $Value" }
+        return [pscustomobject]@{
+            Resolved = $false; Targets = [string[]]@(); ReasonCode = 'target-unresolvable'; Detail = "${Rule}: $Value"
+        }
     }
     return [pscustomobject]@{ Resolved = $true; Targets = [string[]]$Targets; ReasonCode = ''; Detail = '' }
 }
@@ -126,7 +136,11 @@ function Get-OrchestrationGitSelectorTarget {
     param([Parameter(Mandatory)][AllowEmptyCollection()][AllowEmptyString()][string[]] $Token)
 
     $table = Get-CommandLineGlobalOption -CommandWord 'git'
-    $start = [array]::IndexOf($Token, 'git') + 1
+    $gitIndex = [array]::IndexOf($Token, 'git')
+    if ($gitIndex -lt 0) {
+        return [pscustomobject]@{ Rule = 'git-command-word-missing'; Value = ''; Selectors = [string[]]@() }
+    }
+    $start = $gitIndex + 1
     $selectors = [System.Collections.Generic.List[string]]::new()
     $relocation = ''
     $unmodeled = ''
@@ -143,13 +157,23 @@ function Get-OrchestrationGitSelectorTarget {
         if ($table.WithArgument -ccontains $name) {
             if ($null -eq $value) {
                 $index++
-                if ($index -lt $Token.Count) { $value = $Token[$index] } elseif ($name -ceq '-C') { $missing = $true } else { $value = '' }
+                if ($index -lt $Token.Count) {
+                    $value = $Token[$index]
+                }
+                elseif ($name -ceq '-C') {
+                    $missing = $true
+                }
+                else {
+                    $value = ''
+                }
             }
         } elseif ($table.Standalone -notcontains $name -and $table.Terminal -notcontains $name) {
             $unmodeled = $name
             break
         }
-        if ($name -ceq '--git-dir' -or $name -ceq '--work-tree' -or ($name -ceq '-c' -and $null -ne $value -and $value.StartsWith('core.worktree', [System.StringComparison]::OrdinalIgnoreCase))) {
+        $isWorktreeConfig = $name -ceq '-c' -and $null -ne $value -and
+        $value.StartsWith('core.worktree', [System.StringComparison]::OrdinalIgnoreCase)
+        if ($name -ceq '--git-dir' -or $name -ceq '--work-tree' -or $isWorktreeConfig) {
             if (-not $relocation) { $relocation = "$name $value".Trim() }
         }
         if ($name -ceq '-C' -and -not $missing) { $selectors.Add($value) }
@@ -192,14 +216,16 @@ function Get-OrchestrationCommandTarget {
 
     $root = ConvertTo-OrchestrationTargetPath -Path $SessionRoot
     if ($root -notmatch $script:OrchestrationTargetAbsolutePattern) {
-        return (Get-OrchestrationTargetResult -Rule 'session-root-not-absolute' -Value $SessionRoot)
+        return (New-OrchestrationTargetResult -Rule 'session-root-not-absolute' -Value $SessionRoot)
     }
     $targets = [System.Collections.Generic.List[string]]::new()
 
     foreach ($rawPath in @($FilePath | Where-Object { $_ })) {
         $path = ConvertTo-OrchestrationTargetPath -Path $rawPath
         if ($path -notmatch $script:OrchestrationTargetAbsolutePattern) { $targets.Add($root); continue }
-        if (Test-OrchestrationTargetDotSegment -Path $path) { return (Get-OrchestrationTargetResult -Rule 'path-dot-segment' -Value $rawPath) }
+        if (Test-OrchestrationTargetDotSegment -Path $path) {
+            return (New-OrchestrationTargetResult -Rule 'path-dot-segment' -Value $rawPath)
+        }
         $targets.Add($path)
     }
 
@@ -208,35 +234,42 @@ function Get-OrchestrationCommandTarget {
         if ($records.Count -eq 0) { $targets.Add($root) }
         foreach ($record in $records) {
             $text = ([string]$record.RawText).Trim()
-            if ($record.Unbalanced) { return (Get-OrchestrationTargetResult -Rule 'segment-unbalanced' -Value $text) }
+            if ($record.Unbalanced) { return (New-OrchestrationTargetResult -Rule 'segment-unbalanced' -Value $text) }
             if ($script:OrchestrationTargetDirectoryChangeWords -contains [string]$record.CommandWord) {
-                return (Get-OrchestrationTargetResult -Rule 'directory-change' -Value $text)
+                return (New-OrchestrationTargetResult -Rule 'directory-change' -Value $text)
             }
             $wrapped = [bool]$record.IsWrapperLed -or [bool]$record.HasLiveSubstitution
             if ($wrapped) {
                 $matchCount = 0
                 foreach ($sub in @('add', 'commit')) {
-                    $matchCount += @(Get-CommandLineInvocation -CommandText $record.RawText -CommandWord 'git' -SubcommandPath @($sub)).Count
+                    $invocationArguments = @{
+                        CommandText = $record.RawText; CommandWord = 'git'; SubcommandPath = @($sub)
+                    }
+                    $matchCount += @(Get-CommandLineInvocation @invocationArguments).Count
                 }
-                if ($matchCount -gt 0) { return (Get-OrchestrationTargetResult -Rule 'wrapper-git' -Value $text) }
+                if ($matchCount -gt 0) { return (New-OrchestrationTargetResult -Rule 'wrapper-git' -Value $text) }
             }
-            foreach ($name in $script:OrchestrationTargetRelocationNames) {
-                if ($text.IndexOf($name, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
-                    return (Get-OrchestrationTargetResult -Rule 'git-relocation' -Value $text)
-                }
+            if ($text -match $script:OrchestrationTargetRelocationPattern) {
+                return (New-OrchestrationTargetResult -Rule 'git-relocation' -Value $text)
             }
             if ($wrapped -or [string]$record.CommandWord -cne 'git') { $targets.Add($root); continue }
             $git = Get-OrchestrationGitSelectorTarget -Token ([string[]]@($record.Tokens))
-            if ($git.Rule) { return (Get-OrchestrationTargetResult -Rule $git.Rule -Value $git.Value) }
-            if ($git.Selectors.Count -eq 0) { $targets.Add($root) } else { foreach ($selector in $git.Selectors) { $targets.Add($selector) } }
+            if ($git.Rule) { return (New-OrchestrationTargetResult -Rule $git.Rule -Value $git.Value) }
+            if ($git.Selectors.Count -eq 0) {
+                $targets.Add($root)
+            }
+            else {
+                foreach ($selector in $git.Selectors) { $targets.Add($selector) }
+            }
         }
     }
 
     $distinct = [System.Collections.Generic.List[string]]::new()
     foreach ($target in $targets) {
-        if (-not ($distinct | Where-Object { [string]::Equals($_, $target, [System.StringComparison]::OrdinalIgnoreCase) })) { $distinct.Add($target) }
+        $seen = $distinct | Where-Object { [string]::Equals($_, $target, [System.StringComparison]::OrdinalIgnoreCase) }
+        if (-not $seen) { $distinct.Add($target) }
     }
-    return (Get-OrchestrationTargetResult -Targets $distinct.ToArray())
+    return (New-OrchestrationTargetResult -Targets $distinct.ToArray())
 }
 
 function Resolve-OrchestrationEpicTargetVerdict {
@@ -267,7 +300,10 @@ function Resolve-OrchestrationEpicTargetVerdict {
     if ($TargetResult.Resolved) {
         foreach ($target in @($TargetResult.Targets)) {
             if (-not $cache.ContainsKey($target)) { $cache[$target] = & $ScopeResolver $target }
-            $evaluations.Add([pscustomobject]@{ Target = $target; IsSessionRoot = [string]::Equals($target, $root, [System.StringComparison]::OrdinalIgnoreCase); Scope = $cache[$target] })
+            $isSessionRoot = [string]::Equals($target, $root, [System.StringComparison]::OrdinalIgnoreCase)
+            $evaluations.Add([pscustomobject]@{
+                    Target = $target; IsSessionRoot = $isSessionRoot; Scope = $cache[$target]
+                })
         }
     }
 
@@ -283,7 +319,9 @@ function Resolve-OrchestrationEpicTargetVerdict {
     $unresolved = @($evaluations | Where-Object { $_.Scope.Reason -eq 'selector-unresolved' })
     $mixed = @($evaluations | Where-Object { -not $_.Scope.IsEpicScope })
     if (-not $code -and $ambiguous.Count -gt 0) { $code = 'target-ambiguous'; $detail = $ambiguous[0].Target }
-    if (-not $code -and $unresolved.Count -gt 0) { $code = 'target-unresolvable'; $detail = "selector-unresolved: $($unresolved[0].Target)" }
+    if (-not $code -and $unresolved.Count -gt 0) {
+        $code = 'target-unresolvable'; $detail = "selector-unresolved: $($unresolved[0].Target)"
+    }
     if (-not $code -and $mixed.Count -gt 0) { $code = 'target-mixed'; $detail = $mixed[0].Target }
     if ($code) {
         return [pscustomobject]@{ Verdict = 'deny'; ReasonCode = $code; Detail = $detail; Evaluations = @() }
@@ -315,14 +353,21 @@ function Get-OrchestrationEpicTargetDenyReason {
     $prefix = "PREIMPLEMENTATION_GATE_BLOCKED: ${ReasonCode}: "
     switch ($ReasonCode) {
         'target-ambiguous' {
-            return $prefix + "more than one worktree claims the epic integration branch for target $Detail. Implementation operations in epic scope require an unambiguous target worktree."
+            return $prefix + "more than one worktree claims the epic integration branch for target $Detail. " +
+            'Implementation operations in epic scope require an unambiguous target worktree.'
         }
         'target-mixed' {
-            return $prefix + "target $Detail is not in the epic scope that governs this operation. Implementation operations in epic scope may not also target a worktree outside it."
+            return $prefix + "target $Detail is not in the epic scope that governs this operation. " +
+            'Implementation operations in epic scope may not also target a worktree outside it.'
         }
         'target-not-ready' {
-            return $prefix + "the epic-scope target $Detail was evaluated against $CheckpointPath, and the failed readiness predicate is '$Failure'. Implementation operations in epic scope require that checkpoint to satisfy every readiness predicate, and a production path may be staged or edited only while a merge is in progress."
+            return $prefix + "the epic-scope target $Detail was evaluated against $CheckpointPath, " +
+            "and the failed readiness predicate is '$Failure'. " +
+            'Implementation operations in epic scope require that checkpoint to satisfy every ' +
+            'readiness predicate, and a production path may be staged or edited only while a merge is in progress.'
         }
     }
-    return $prefix + "the target worktree of this epic-scope operation cannot be resolved ($Detail). Implementation operations in epic scope require every command segment and path to name an absolute, resolvable target."
+    return $prefix + "the target worktree of this epic-scope operation cannot be resolved ($Detail). " +
+    'Implementation operations in epic scope require every command segment and path to name ' +
+    'an absolute, resolvable target.'
 }
