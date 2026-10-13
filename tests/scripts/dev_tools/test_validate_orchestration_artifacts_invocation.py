@@ -1,4 +1,4 @@
-"""Invocation-contract tests for the orchestration-artifact dispatcher (issue #798).
+"""Invocation-contract tests for the orchestration-artifact dispatcher (#798, #886).
 
 Purpose:
     Pin the two supported invocation forms of
@@ -16,6 +16,15 @@ Purpose:
     editable-install entry names another checkout of this repository. Without
     the bootstrap the run raises ``ModuleNotFoundError``.
 
+    Issue #886: the file-path bootstrap inserts the repository root at
+    ``sys.path`` index 0, so a foreign checkout that supplies ``scripts`` from a
+    later entry cannot shadow the local package. The regression test appends a
+    sentinel ``sys.path`` entry, mirroring the site-packages position of an
+    editable-install entry, and backs it with an in-memory finder registered in
+    ``sys.path_importer_cache``. The finder serves a stand-in ``scripts`` package
+    that carries a marker attribute, so the test can tell which package the run
+    imported.
+
 Invariants / Constraints:
     No child process and no temporary file is used. ``sys.path`` and the
     original ``scripts.*`` module objects are restored after every isolated run.
@@ -23,6 +32,8 @@ Invariants / Constraints:
 
 from __future__ import annotations
 
+import importlib.abc
+import importlib.util
 import os
 import runpy
 import sys
@@ -36,6 +47,7 @@ import scripts.dev_tools.validate_orchestration_artifacts as dispatcher
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+    from importlib.machinery import ModuleSpec
     from types import ModuleType
 
 # This file lives at tests/scripts/dev_tools/, three parents below the repo root.
@@ -81,6 +93,38 @@ def repo_root_entry_count() -> int:
     """Return how many ``sys.path`` entries name the repository root."""
 
     return sum(1 for entry in sys.path if resolves_to_repo_root(entry))
+
+
+class ForeignScriptsLoader(importlib.abc.Loader):
+    """Build an in-memory stand-in for the ``scripts`` package of another checkout."""
+
+    def create_module(self, spec: ModuleSpec) -> ModuleType | None:
+        """Request default module creation."""
+
+        del spec
+        return None
+
+    def exec_module(self, module: ModuleType) -> None:
+        """Mark the module as foreign and make it a regular package without members."""
+
+        module.__path__ = []
+        module.__dict__["foreign_checkout_886"] = True
+
+
+class ForeignScriptsFinder(importlib.abc.PathEntryFinder):
+    """Serve ``scripts`` from memory for one sentinel ``sys.path`` entry."""
+
+    def find_spec(
+        self, fullname: str, target: ModuleType | None = None
+    ) -> ModuleSpec | None:
+        """Return a package spec for ``scripts`` and no spec for any other name."""
+
+        del target
+        if fullname != "scripts":
+            return None
+        return importlib.util.spec_from_loader(
+            fullname, ForeignScriptsLoader(), is_package=True
+        )
 
 
 @contextmanager
@@ -184,20 +228,68 @@ def test_module_invocation_leaves_sys_path_unchanged(
     assert sys.path == snapshot, "module invocation must not modify sys.path"
 
 
-def test_file_path_bootstrap_appends_repo_root_once(
+def test_file_path_bootstrap_prepends_repo_root_once(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """The bootstrap appends the repository root exactly once, at the end."""
+    """The bootstrap inserts the repository root exactly once, at index 0."""
 
     # Arrange / Act
     with isolated_import_state():
         entries_before = repo_root_entry_count()
         exit_code = run_file_path_form(monkeypatch, ["--help"])
         entries_after = repo_root_entry_count()
-        last_entry = sys.path[-1]
+        first_entry = sys.path[0]
 
     # Assert
     assert entries_before == 0, "isolation must remove the repository root first"
     assert exit_code == 0, f"--help must exit 0, got {exit_code!r}"
     assert entries_after == 1, f"expected one root entry, found {entries_after}"
-    assert resolves_to_repo_root(last_entry), "the root must be appended last"
+    assert resolves_to_repo_root(first_entry), "the root must be inserted first"
+
+
+def test_file_path_bootstrap_keeps_existing_entries_in_order(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The bootstrap adds one leading entry and leaves every other entry in place."""
+
+    # Arrange / Act
+    with isolated_import_state():
+        snapshot = list(sys.path)
+        exit_code = run_file_path_form(monkeypatch, ["--help"])
+        after = list(sys.path)
+
+    # Assert
+    assert exit_code == 0, f"--help must exit 0, got {exit_code!r}"
+    assert after[1:] == snapshot, "existing entries must keep their order"
+
+
+def test_file_path_invocation_prefers_worktree_over_foreign_scripts_entry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """File-path invocation imports this checkout's ``scripts``, not a foreign one.
+
+    The sentinel entry follows every other ``sys.path`` entry, as an editable-install
+    entry does. Appending the root would let the foreign package win and the run would
+    raise ``ModuleNotFoundError`` for ``scripts.dev_tools``.
+    """
+
+    # Arrange
+    foreign_entry = "<foreign-checkout-886>"
+    monkeypatch.setitem(sys.path_importer_cache, foreign_entry, ForeignScriptsFinder())
+
+    # Act
+    with isolated_import_state():
+        sys.path.append(foreign_entry)
+        exit_code = run_file_path_form(monkeypatch, ["--help"])
+        imported_scripts = sys.modules["scripts"]
+
+    # Assert
+    assert exit_code == 0, f"--help must exit 0, got {exit_code!r}"
+    assert (
+        "foreign_checkout_886" not in imported_scripts.__dict__
+    ), "the run must not import the foreign scripts package"
+    package_file = imported_scripts.__file__
+    assert package_file is not None, "the imported scripts package must have a file"
+    assert resolves_to_repo_root(
+        str(Path(package_file).resolve().parents[1])
+    ), "the imported scripts package must come from this repository root"

@@ -1,0 +1,15 @@
+# Non-Observable Sort Sites (P2-T7; AC-4)
+
+Timestamp: 2026-10-12T15-19
+
+The five sites below sort values that are restricted to ASCII by a constant set or guard, so code-point order and default UTF-16 order cannot differ there. Constant and guard line numbers are pre-change (as in the plan "Site inventory"); post-change sort lines are taken from `evidence/qa-gates/coverage-delta.2026-10-12T15-19.md`. Paths are relative to `extensions/drm-copilot/`.
+
+| # | Site (pre-change) | Post-change line | Constant set or guard restricting values to ASCII | Existing tests that execute the line | In P2-T5 `Uncovered Line #s`? |
+|---|---|---|---|---|---|
+| 1 | src/lib/push-down/claude-pack-selection.ts:299 | :300 | Filter `CSHARP_PACK_NAMES.has(name)` at :297-298; constant `CSHARP_PACK_NAMES` at :40-43 (ASCII names `csharp-modern`, `csharp-legacy`) | test/lib/push-down/claude-pack-selection.test.ts `assertSingleCsharpToolchain > rejects selecting both C# packs` and `> accepts selecting a single C# variant` | No (column `90`) |
+| 2 | src/lib/push-down/codex-pack-selection.ts:71 | :74 | Guard at :62-67 rejects any name outside `MANIFEST_PACK_NAMES` (constant at :12-19, ASCII names) before the loop; `core` is the only added name | test/lib/push-down/codex-pack-selection.test.ts `Codex loadPackManifests > loads selected manifests and always includes core` and the `rejects invalid manifest shape %#` cases (successful guard pass, loop entered) | No (column `202-205`) |
+| 3 | src/lib/push-down/codex-pack-selection.ts:100 | :103 | Filter `CSHARP_PACK_NAMES.has(name)` at :94-96; constant `CSHARP_PACK_NAMES` at :26-29 (ASCII) | test/lib/push-down/codex-pack-selection.test.ts `Codex resolveManifestPackNames > rejects variant-specific pack names in public input` | No (column `202-205`) |
+| 4 | src/lib/push-down/codex-pack-selection.ts:232 | :237 | Filter `CSHARP_PACK_NAMES.has(name)` at :230-231; constant `CSHARP_PACK_NAMES` at :26-29 (ASCII) | test/lib/push-down/codex-pack-selection.test.ts `Codex C# variant routing > rejects selecting both C# variants` (calls `assertSingleCsharpToolchain`) | No (column `202-205`) |
+| 5 | src/lib/validate/orchestrator-state-codex-topology.ts:299 | :300 | `allowedNames` (:293-294 pre-change) holds only `receipt.logical_agent` of a receipt that passed `validReceipts` (:209-214) against `resolveCodexTopology`, plus `deployment_agent` values from `modelDeployments` (:216-239) that passed `validateCodexModelRoutingReceipt`; all such names derive from ASCII agent families and profiles | test/lib/validate/orchestrator-state-codex-topology.test.ts tests asserting `missing the exact resolved topology agent` (assertions at test lines 142 and 269) | No (column `44-45,56-57,61-68`) |
+
+Confirmation: none of the five post-change lines (claude-pack-selection.ts:300; codex-pack-selection.ts:74, :103, :237; orchestrator-state-codex-topology.ts:300) appears in the P2-T5 `Uncovered Line #s` column (`evidence/qa-gates/ts-coverage-per-file.2026-10-12T15-19.md`), so the existing tests execute each changed line.

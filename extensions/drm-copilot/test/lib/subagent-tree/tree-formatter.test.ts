@@ -69,4 +69,23 @@ describe("formatTree", () => {
     expect(rendered.split("\n")).toHaveLength(1);
     expect(rendered).toBe("root · [] · 0 · ");
   });
+
+  it("889-cp-order: renders models in code-point order (U+FF5E before U+1F600)", () => {
+    // Arrange: supplementary-plane model inserted first.
+    const supplementary = "\u{1F600}";
+    const highBmp = "～";
+    const tree: TreeNode = {
+      agentType: "root",
+      description: "",
+      depth: 0,
+      models: [supplementary, highBmp],
+      children: [],
+    };
+
+    // Act
+    const rendered = formatTree(tree);
+
+    // Assert
+    expect(rendered).toBe(`root · [${highBmp},${supplementary}] · 0 · `);
+  });
 });

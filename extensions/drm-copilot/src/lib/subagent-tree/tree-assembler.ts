@@ -178,7 +178,7 @@ function buildNode(input: BuildNodeInput): TreeNode {
     agentType,
     description,
     depth,
-    models: [...models].sort(),
+    models: [...models].sort(compareCodePoint),
     children,
   };
 }

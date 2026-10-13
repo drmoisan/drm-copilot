@@ -1,0 +1,10 @@
+{
+  "case": "add-entry-deferred-generation-minus-one",
+  "subcommand": "add-entry",
+  "argv": ["add-entry", "--item", "9", "--deferred", "true", "--generation", "-1", "--at", "2026-10-11T08-29"],
+  "expected": {
+    "exit_code": 0,
+    "stdout": "{\"op\":\"add\",\"item_key\":9,\"at\":\"2026-10-11T08-29\",\"prior_state\":null,\"new_state\":\"scheduled\",\"disposition\":null,\"recolor_generation\":0}",
+    "stderr": null
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "case": "requeue-entry",
+  "subcommand": "requeue-entry",
+  "argv": ["requeue-entry", "--item", "7", "--generation", "4", "--at", "2026-10-11T08-29"],
+  "expected": {
+    "exit_code": 0,
+    "stdout": "{\"op\":\"requeue\",\"item_key\":7,\"at\":\"2026-10-11T08-29\",\"prior_state\":\"in_flight\",\"new_state\":\"blocked\",\"disposition\":null,\"recolor_generation\":5}",
+    "stderr": null
+  }
+}

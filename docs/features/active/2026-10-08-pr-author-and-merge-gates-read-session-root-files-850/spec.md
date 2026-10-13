@@ -282,6 +282,7 @@ Each criterion is verified by the named Pester or parity test. The research reco
 - Risk: a partially written gate takes effect on the executing session's next tool call. Mitigation: staged-write procedure (research section 9).
 - Risk: `WorktreeRunResolution.psm1` or `enforce-pr-author-skill-helpers.ps1` breaches the line cap. Mitigation: CR-4 in place only; move pr-author artifact-root logic to a new dot-sourced sibling if needed.
 - Risk: epic children on routes without `pr_gate` lose explicit-number merges (#788). Mitigation: documented as an accepted behavior change with its remedy; `orchestrator-state.md` updated.
+  - Correction (2026-10-11): `orchestrator-state.md` was not updated under #850; plan decision D4 dropped the one-sentence alignment named in the In-scope list, and the sentence stating which per-feature checkpoint the merge gate reads for an explicit pull request number lands under #898. The #788 behavior change and its remedy are documented in this spec (Accepted behavior change, #788).
 - Risk: the execution session hits the PowerShell batch budget. Mitigation: execute on an exempt route with a non-terminal checkpoint.
 
 ## Rollout & Follow-up

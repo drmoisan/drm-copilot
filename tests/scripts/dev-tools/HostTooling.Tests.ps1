@@ -35,6 +35,11 @@ Describe 'Get-HostToolsManifestPath' {
         # Assert: the '..' segment is preserved so error messages keep their form.
         $actual | Should -BeLike '*scripts/dev-tools/../host-tools.manifest.json'
     }
+
+    It 'AC05-MANIFEST-PATH-EXISTS resolves to an existing manifest file' {
+        # Arrange / Act / Assert: the committed manifest exists at the resolved path.
+        Test-Path -LiteralPath (Get-HostToolsManifestPath) -PathType Leaf | Should -BeTrue
+    }
 }
 
 Describe 'Read-HostToolsManifest' {
@@ -140,6 +145,10 @@ Describe 'Set-HostEnvironmentVariable' {
 }
 
 Describe 'Invoke-HostNativeCommand' {
+    AfterEach {
+        Set-Variable -Name LASTEXITCODE -Value 0 -Scope Global
+    }
+
     It 'returns the command output without merging the error stream' {
         # Arrange / Act
         $actual = Invoke-HostNativeCommand -FilePath 'Write-Output' -ArgumentList @('alpha')
@@ -156,6 +165,33 @@ Describe 'Invoke-HostNativeCommand' {
         # Assert
         @($actual.Output) | Should -Be @('alpha')
         $actual.ExitCode | Should -BeOfType [int]
+    }
+
+    It 'AC10-STREAM-OUTHOST-RESETS-EXITCODE streams to Out-Host and returns an empty Output and ExitCode 0' {
+        # Arrange
+        Mock -CommandName Out-Host -ModuleName HostTooling -MockWith { }
+        Set-Variable -Name LASTEXITCODE -Value 7 -Scope Global
+
+        # Act
+        $returned = @(Invoke-HostNativeCommand -FilePath 'Write-Output' -ArgumentList @('alpha') -StreamToHost)
+
+        # Assert: the native line went to the host, not the pipeline.
+        $returned.Count | Should -Be 1
+        @($returned[0].Output).Count | Should -Be 0
+        $returned[0].ExitCode | Should -Be 0
+        Should -Invoke -CommandName Out-Host -ModuleName HostTooling -Times 1
+    }
+
+    It 'AC10-CAPTURE-RESETS-STALE-EXITCODE resets a stale LASTEXITCODE before a capture-mode call' {
+        # Arrange
+        Set-Variable -Name LASTEXITCODE -Value 7 -Scope Global
+
+        # Act
+        $actual = Invoke-HostNativeCommand -FilePath 'Write-Output' -ArgumentList @('alpha')
+
+        # Assert
+        @($actual.Output) | Should -Be @('alpha')
+        $actual.ExitCode | Should -Be 0
     }
 }
 

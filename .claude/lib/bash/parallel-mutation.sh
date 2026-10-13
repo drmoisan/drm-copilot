@@ -14,8 +14,10 @@
 #
 # Declared divergences (also listed in both parity lanes):
 #   1. A `--removal-disposition` value outside `detach abandon` is a usage error
-#      (exit 2) instead of the Python `UnknownEnumMemberError` text, which lists
-#      merge-status members (`_parallel_mutation_errors.py:192`, spec D5).
+#      (exit 2) raised by the command line before the library runs. A direct
+#      library call and the Python `UnknownEnumMemberError` both reject it with
+#      the same message, which lists `detach, abandon`
+#      (spec D5; aligned under #890).
 #   2. `at` is a caller-supplied string instead of a `datetime`.
 #   3. Option abbreviations are rejected.
 #
@@ -99,11 +101,13 @@ pm_unknown_item_message() {
 }
 
 pm_entry_contract_message() {
-	# Echo the MutationEntryContractError message for op `remove`.
+	# Echo the MutationEntryContractError message for one op.
 	#
-	# Args: $1 = field name, $2 = the already-rendered repr of the value.
-	printf "Parallel mutation entry rejected: %s %s violates the F3 mutations[] contract for op 'remove'." \
-		"$1" "$2"
+	# Args: $1 = field name, $2 = the already-rendered repr of the value, $3 =
+	# the op name, optional and defaulting to `remove` so every removal call
+	# site passes two arguments unchanged.
+	printf "Parallel mutation entry rejected: %s %s violates the F3 mutations[] contract for op '%s'." \
+		"$1" "$2" "${3:-remove}"
 }
 
 pm_decide_removal() {
@@ -140,7 +144,7 @@ pm_decide_removal() {
 			return 1
 		fi
 		if ! pc_contains_word "$PM_VALID_DISPOSITIONS" "$disposition"; then
-			pm_fail "$PM_REJECTION_PREFIX item $item_key disposition $(pc_repr str "$disposition") is not one of $PC_VALID_MERGE_STATUS."
+			pm_fail "$PM_REJECTION_PREFIX item $item_key disposition $(pc_repr str "$disposition") is not one of ${PM_VALID_DISPOSITIONS// /, }."
 			return 1
 		fi
 		prior="$PM_PINNED_STATE"

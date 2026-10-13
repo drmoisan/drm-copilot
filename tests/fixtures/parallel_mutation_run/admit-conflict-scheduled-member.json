@@ -1,0 +1,10 @@
+{
+  "case": "admit-conflict-scheduled-member",
+  "subcommand": "admit",
+  "argv": ["admit", "--candidate", "9", "--edges", "9:2", "--in-flight", "1", "--current-cohort-members", "1 2"],
+  "expected": {
+    "exit_code": 0,
+    "stdout": "{\"candidate\":9,\"outcome\":\"defer_and_recolor\",\"triggers_recompute\":true}",
+    "stderr": null
+  }
+}

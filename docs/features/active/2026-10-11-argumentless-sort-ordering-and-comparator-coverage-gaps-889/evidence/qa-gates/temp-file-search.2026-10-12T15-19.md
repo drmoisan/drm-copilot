@@ -1,0 +1,8 @@
+# Temporary-File Usage Search (P2-T8 step 2; AC-9)
+
+Timestamp: 2026-10-12T15-19
+Command: git grep --untracked -n -E "tmpdir|mkdtemp|writeFileSync|readFileSync|node:fs|from \"fs\"|from \"os\"|require\(\"fs\"\)" -- extensions/drm-copilot/test/lib/push-down/claude-pack-selection.test.ts extensions/drm-copilot/test/lib/push-down/codex-pack-selection.test.ts extensions/drm-copilot/test/lib/subagent-tree/tree-assembler.test.ts extensions/drm-copilot/test/lib/subagent-tree/tree-formatter.test.ts extensions/drm-copilot/test/lib/validate/codex-topology-resolver.test.ts extensions/drm-copilot/test/lib/validate/epic-planner-git-integrity.test.ts extensions/drm-copilot/test/lib/validate/orchestrator-state-codex-model-routing.test.ts extensions/drm-copilot/test/lib/validate/orchestrator-state-core.test.ts extensions/drm-copilot/test/lib/codex-native-converter/reporting-render.test.ts extensions/drm-copilot/test/lib/codex-native-converter/reporting-coverage.test.ts extensions/drm-copilot/test/lib/codex-native-converter/validation.test.ts extensions/drm-copilot/test/lib/codex-native-converter/engine-pipeline.test.ts extensions/drm-copilot/test/lib/resolve/file-prompt-transforms.test.ts extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.ordering.test.ts extensions/drm-copilot/test/lib/validate/orchestrator-state-model-routing-existence.test.ts (run from the repository root)
+EXIT_CODE: 1
+ExpectedExitCode: 1
+Output Summary:
+- No output; zero matches across the 15 created or modified test files. The new tests use `InMemoryFileSystem`, `buildInMemoryFileSystem`, `GitStub`, or pure inputs. PASS.

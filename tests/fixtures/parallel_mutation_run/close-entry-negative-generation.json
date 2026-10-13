@@ -1,0 +1,10 @@
+{
+  "case": "close-entry-negative-generation",
+  "subcommand": "close-entry",
+  "argv": ["close-entry", "--generation", "-1", "--at", "2026-10-11T08-29"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation entry rejected: recolor_generation -1 violates the F3 mutations[] contract for op 'close'."
+  }
+}

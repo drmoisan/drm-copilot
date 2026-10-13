@@ -1,0 +1,10 @@
+{
+  "case": "requeue-entry-non-positive-item",
+  "subcommand": "requeue-entry",
+  "argv": ["requeue-entry", "--item", "0", "--generation", "4", "--at", "2026-10-11T08-29"],
+  "expected": {
+    "exit_code": 1,
+    "stdout": null,
+    "stderr": "Parallel mutation entry rejected: item_key 0 violates the F3 mutations[] contract for op 'requeue'."
+  }
+}
