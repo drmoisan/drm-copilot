@@ -26,7 +26,10 @@
     reader receives one resolved path rather than deriving its own.
 
 .NOTES
-    Compatible with PowerShell 7+. No external module dependencies.
+    Compatible with PowerShell 7+. Dependencies are in-repository only: the command parsers
+    and worktree-resolution modules loaded below, and the artifact-root and docs-only siblings.
+    No PowerShell Gallery module is required.
+    The docs-only sibling runs the git executable at call time (issue #901).
 #>
 [CmdletBinding()]
 param()
@@ -51,6 +54,8 @@ Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeReso
 Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeReadiness.psm1') -Force -ErrorAction Stop
 # Artifact-root resolution and the Check 1 body-path binding (issue #850).
 . (Join-Path $PSScriptRoot 'enforce-pr-author-skill.artifact-root.ps1')
+# Docs-only exemption from the orchestrator-state preflight (issue #901).
+. (Join-Path $PSScriptRoot 'enforce-pr-author-skill.docs-only.ps1')
 
 function Resolve-PrAuthorWorktreeTarget {
     <#
@@ -307,9 +312,10 @@ function Get-PrAuthorBypassReason {
         gh pr edit no-body allow perform no resolution. For a --body-file command the artifact root
         is resolved once (issue #850), and the deny precedence is: the resolution reason
         (no-target or ambiguity code, or an underivable epic worktree), PR_CONTEXT_MISSING when the
-        context summary is absent beneath the resolved worktree, ORCHESTRATOR_STATE_PREFLIGHT_FAILED,
-        then receipt checks 1-6 via Test-PrAuthorReceiptVerification. Returns $null for all
-        allowed patterns.
+        context summary is absent beneath the resolved worktree, ORCHESTRATOR_STATE_PREFLIGHT_FAILED
+        unless Get-PrAuthorDocsOnlyExemption exempts a docs-only gh pr create (issue #901), then
+        receipt checks 1-6 via Test-PrAuthorReceiptVerification. Returns $null for all allowed
+        patterns.
     .PARAMETER CommandText
         The Bash command text extracted from the envelope's tool_input.
     .OUTPUTS
@@ -415,7 +421,10 @@ function Get-PrAuthorBypassReason {
             } else {
                 $preflightResult.ErrorText
             }
-            return "ORCHESTRATOR_STATE_PREFLIGHT_FAILED: $preflightSummary"
+            $exemption = Get-PrAuthorDocsOnlyExemption -CommandText $CommandText -WorktreeRoot $artifact.ArtifactRoot -CheckpointPath $checkpointPath
+            if (-not $exemption.Exempt) {
+                return "ORCHESTRATOR_STATE_PREFLIGHT_FAILED: $preflightSummary (docs-only exemption not applied: $($exemption.Reason))"
+            }
         }
     }
 

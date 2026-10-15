@@ -15,6 +15,7 @@
       because gh reads a relative path from its own process directory; an absolute value is
       accepted only when it equals the canonical path beneath the resolved root.
     - Test-PrAuthorBodyPathEqual and Get-PrAuthorEpicArtifactRoot, the pure path helpers.
+    - ConvertTo-PrAuthorBodyNumber, the strict body-number parse (issue #901, #850 note L19).
 
 .NOTES
     PowerShell 7+. Depends, at call time, on Get-PrAuthorBodyFileValue and
@@ -139,6 +140,33 @@ function Resolve-PrAuthorArtifactRoot {
     }
 }
 
+function ConvertTo-PrAuthorBodyNumber {
+    <#
+    .SYNOPSIS
+        Parse the <N> of artifacts/pr_body_<N>.md, or return $null.
+    .DESCRIPTION
+        Accepts only ASCII digits that parse as an Int32 and whose canonical invariant spelling
+        equals the input, so a value above Int32.MaxValue, a leading zero, and a non-ASCII
+        decimal digit all return $null instead of throwing or naming a different file.
+    .PARAMETER Digits
+        The digit run captured from the body-file name.
+    .OUTPUTS
+        System.Int32 or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [AllowNull()][AllowEmptyString()][string] $Digits
+    )
+
+    $number = 0
+    $parsed = [int]::TryParse($Digits, [System.Globalization.NumberStyles]::None, [System.Globalization.CultureInfo]::InvariantCulture, [ref] $number)
+    if (-not $parsed -or $number.ToString([System.Globalization.CultureInfo]::InvariantCulture) -cne $Digits) {
+        return $null
+    }
+    return $number
+}
+
 function Get-PrAuthorBodyPathBindingReason {
     <#
     .SYNOPSIS
@@ -177,7 +205,10 @@ function Get-PrAuthorBodyPathBindingReason {
     }
 
     if ($value -cmatch '^artifacts/pr_body_(\d+)\.md$') {
-        $number = [int]$Matches[1]
+        $number = ConvertTo-PrAuthorBodyNumber -Digits $Matches[1]
+        if ($null -eq $number) {
+            return [ordered]@{ Reason = $generic; BodyNumber = $null }
+        }
         if (-not $RelativeBodyAllowed) {
             $canonical = Join-WorktreeResolutionPath -WorktreeRoot $ArtifactRoot -RepoRelativePath "artifacts/pr_body_$number.md"
             return [ordered]@{
@@ -189,10 +220,12 @@ function Get-PrAuthorBodyPathBindingReason {
     }
 
     if ($value -match '/artifacts/pr_body_(\d+)\.md$') {
-        $number = [int]$Matches[1]
-        $canonical = Join-WorktreeResolutionPath -WorktreeRoot $ArtifactRoot -RepoRelativePath "artifacts/pr_body_$number.md"
-        if (Test-PrAuthorBodyPathEqual -Left $value -Right $canonical) {
-            return [ordered]@{ Reason = $null; BodyNumber = $number }
+        $number = ConvertTo-PrAuthorBodyNumber -Digits $Matches[1]
+        if ($null -ne $number) {
+            $canonical = Join-WorktreeResolutionPath -WorktreeRoot $ArtifactRoot -RepoRelativePath "artifacts/pr_body_$number.md"
+            if (Test-PrAuthorBodyPathEqual -Left $value -Right $canonical) {
+                return [ordered]@{ Reason = $null; BodyNumber = $number }
+            }
         }
     }
 
