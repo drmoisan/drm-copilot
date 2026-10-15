@@ -190,15 +190,22 @@ def test_main_returns_one_with_qt009_when_runner_raises_oserror(
     assert [line[:5] for line in lines] == ["QT009"]
 
 
+@pytest.mark.parametrize(
+    "stderr",
+    [
+        pytest.param(b"", id="empty-stderr"),
+        pytest.param(b"  \n\t", id="whitespace-only-stderr"),
+    ],
+)
 def test_main_returns_one_with_qt009_when_git_exits_nonzero(
-    capsys: pytest.CaptureFixture[str],
+    capsys: pytest.CaptureFixture[str], stderr: bytes
 ) -> None:
-    """A non-zero git exit code fails closed with QT009."""
+    """A non-zero git exit code with blank stderr fails closed with QT009."""
 
     # Arrange
     def fake_run(argv: Sequence[str], **kwargs: object) -> FakeRunResult:
         del argv, kwargs
-        return FakeRunResult(returncode=128, stdout=b"")
+        return FakeRunResult(returncode=128, stdout=b"", stderr=stderr)
 
     lister = functools.partial(
         list_tracked_files, which=lambda name: "git", run=fake_run
@@ -212,7 +219,9 @@ def test_main_returns_one_with_qt009_when_git_exits_nonzero(
     # Assert
     lines = _assert_failure_output(capsys)
     assert exit_code == 1
-    assert [line[:5] for line in lines] == ["QT009"]
+    assert lines == [
+        "QT009: cannot list tracked files: git ls-files exited with code 128"
+    ], lines
 
 
 def test_qt009_message_includes_git_stderr(

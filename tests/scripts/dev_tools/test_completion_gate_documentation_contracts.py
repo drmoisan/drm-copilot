@@ -87,9 +87,12 @@ MIRROR_PAIRS: tuple[tuple[str, tuple[Path, Path]], ...] = (
 )
 
 TIMESTAMP_SOURCE_BLOCK = (
-    "The `Timestamp` value is local time read from the host system clock when the"
-    " recorded command runs (for example `Get-Date -Format yyyy-MM-ddTHH-mm`);"
-    " the agent never composes or estimates it."
+    "The `Timestamp` value is UTC read from the host system clock when the recorded"
+    " command runs (for example `Get-Date -AsUTC -Format yyyy-MM-ddTHH-mm` in"
+    " PowerShell 7, `(Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH-mm')` in"
+    " Windows PowerShell 5.1, or `date -u +%Y-%m-%dT%H-%M` in a POSIX shell); the"
+    " agent never composes or estimates it. The value is written without a zone"
+    " suffix."
 )
 
 

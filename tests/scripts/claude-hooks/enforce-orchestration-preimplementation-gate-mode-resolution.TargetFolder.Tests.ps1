@@ -275,5 +275,19 @@ Describe 'enforce-orchestration-preimplementation-gate-modes.ps1 target folder (
             $decision.permissionDecision | Should -Be 'deny'
             $decision.permissionDecisionReason | Should -Match "predicate is 'target-record'"
         }
+
+        It 'M8fe: denies an epic delegation that cites an unrecorded folder with only a bare #302 as target-record' {
+            $prompt = 'Epic mode: true. Coordinate with #302. Execute docs/features/active/unrecorded-999 now.'
+            $decision = Invoke-ModesEpicDecision -Prompt $prompt -FeaturesJson $script:CrossRecords
+            $decision.permissionDecision | Should -Be 'deny'
+            $decision.permissionDecisionReason | Should -Match "predicate is 'target-record'"
+        }
+
+        It 'M8fp: denies a parallel delegation that cites an unrecorded folder with only a bare #302 as target-record' {
+            $prompt = 'Parallel mode: true. Coordinate with #302. Execute docs/features/active/unrecorded-999 now.'
+            $decision = Invoke-ModesParallelDecision -Prompt $prompt -ItemsJson $script:CrossRecords
+            $decision.permissionDecision | Should -Be 'deny'
+            $decision.permissionDecisionReason | Should -Match "predicate is 'target-record'"
+        }
     }
 }

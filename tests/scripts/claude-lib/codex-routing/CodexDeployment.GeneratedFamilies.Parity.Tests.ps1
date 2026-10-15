@@ -77,6 +77,20 @@ BeforeAll {
             throw "The $Name family set is null or empty."
         }
     }
+
+    function Assert-FamilySetEqual {
+        <# Throws when the two sets differ under the case-sensitive ordinal comparison (issue #903, #737 F-5). #>
+        param(
+            [Parameter(Mandatory)] [AllowEmptyCollection()] [string[]] $Expected,
+            [Parameter(Mandatory)] [AllowEmptyCollection()] [string[]] $Actual,
+            [Parameter(Mandatory)] [string] $Name
+        )
+        $expectedText = ConvertTo-OrdinalSortedText -Set $Expected
+        $actualText = ConvertTo-OrdinalSortedText -Set $Actual
+        if ($expectedText -cne $actualText) {
+            throw "The $Name family set [$actualText] differs from the expected set [$expectedText]."
+        }
+    }
 }
 
 Describe 'GENERATED_AGENT_FAMILIES parity' {
@@ -90,21 +104,21 @@ Describe 'GENERATED_AGENT_FAMILIES parity' {
 
         $extracted = Get-GeneratedFamilyFromPythonText -Text $fixture
 
-        (ConvertTo-OrdinalSortedText -Set $extracted.Members) | Should -Not -BeExactly (ConvertTo-OrdinalSortedText -Set $moduleSet) -Because 'a fixture literal with an extra member must differ from the module set'
+        { Assert-FamilySetEqual -Expected $moduleSet -Actual $extracted.Members -Name 'fixture' } | Should -Throw -Because 'a fixture literal with an extra member must differ from the module set'
     }
 
     It 'AC-19 module set equals the central config set' {
         $moduleSet = Get-ModuleFamilySet
         $configSet = Get-ConfigFamilySet
 
-        (ConvertTo-OrdinalSortedText -Set $moduleSet) | Should -BeExactly (ConvertTo-OrdinalSortedText -Set $configSet) -Because 'the module list and codex_model_policy.generated_agent_families must be the same set'
+        { Assert-FamilySetEqual -Expected $moduleSet -Actual $configSet -Name 'config' } | Should -Not -Throw -Because 'the module list and codex_model_policy.generated_agent_families must be the same set'
     }
 
     It 'AC-19 module set equals the Python authority set' {
         $moduleSet = Get-ModuleFamilySet
         $pythonSet = Get-PythonFamilySet
 
-        (ConvertTo-OrdinalSortedText -Set $moduleSet) | Should -BeExactly (ConvertTo-OrdinalSortedText -Set $pythonSet) -Because 'the module list and the Python frozenset literal must be the same set'
+        { Assert-FamilySetEqual -Expected $moduleSet -Actual $pythonSet -Name 'Python' } | Should -Not -Throw -Because 'the module list and the Python frozenset literal must be the same set'
     }
 
     It 'AC-19 module set is non-empty' {

@@ -9,9 +9,6 @@ import {
 import type { TerminalWriter } from "../src/terminal-writer";
 import type { FileTimes } from "../src/lib/file-system";
 import { InMemoryFileSystem } from "./lib/subagent-tree/in-memory-file-system";
-
-type CommandHandler = () => Promise<void> | void;
-
 import {
   CLAUDE_PROJECTS_ROOT,
   MATCHING_DIR,
@@ -20,6 +17,8 @@ import {
   FakeTerminalWriter,
   addRootSession,
 } from "./subagent-tree-command-test-support";
+
+type CommandHandler = () => Promise<void> | void;
 
 const commandHandlers = new Map<string, CommandHandler>();
 type PickItem = { path: string };
@@ -179,6 +178,7 @@ describe("drm-copilot showSubagentTree command quick pick", () => {
     // Act
     await handler();
 
+    // Assert: no prompt is shown and the single candidate is rendered.
     expect(showQuickPickMock).not.toHaveBeenCalled();
     expect(terminalWriter.writes).toHaveLength(1);
     expect(terminalWriter.writes[0]?.header).toContain(soloPath);

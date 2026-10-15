@@ -37,6 +37,8 @@ function Register-EpicStateBaselineMock {
     <#
         Register the null-returning baseline mock of each named seam. An empty array registers
         nothing and does not throw (the -ForEach shape passes an ExtraSeam array that can be empty).
+        -Surface 'Codex' requests script-scope mocking for every seam; Claude suites use it for
+        hook-local seams (issue #903, #737 N-2).
     #>
     [CmdletBinding()]
     param(

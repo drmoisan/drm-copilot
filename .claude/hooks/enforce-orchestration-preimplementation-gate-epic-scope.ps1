@@ -253,23 +253,15 @@ function Get-OrchestrationEpicScopeDecision {
         Resolve-EpicScopeCheckpoint -Text $epicScopeText -SessionRoot $epicScopeSessionRoot -WorktreeSelector $Selector -MatchWorktreeHead
     }
     $verdict = Resolve-OrchestrationEpicTargetVerdict -SessionRoot $epicScopeSessionRoot -TargetResult $targetResult -ScopeResolver $scopeResolver
-    if ($verdict.Verdict -eq 'none') {
+    $outcome = Resolve-OrchestrationEpicTargetOutcome -Verdict $verdict -ReadinessFailure {
+        param($Scope)
+        Get-EpicCommandLegReadinessFailure -Checkpoint $Scope.Checkpoint -MergeInProgress $Scope.MergeInProgress
+    }
+    if ($outcome.Outcome -eq 'none') {
         return $null
     }
-    if ($verdict.Verdict -eq 'deny') {
-        return Get-OrchestrationPreimplementationGateBlockDecision -Reason (Get-OrchestrationEpicTargetDenyReason -ReasonCode $verdict.ReasonCode -Detail $verdict.Detail)
-    }
-
-    foreach ($evaluation in $verdict.Evaluations) {
-        $scope = $evaluation.Scope
-        $failure = Get-EpicCommandLegReadinessFailure -Checkpoint $scope.Checkpoint -MergeInProgress $scope.MergeInProgress
-        if (-not $failure) {
-            continue
-        }
-        if ($evaluation.IsSessionRoot) {
-            return Get-OrchestrationPreimplementationGateBlockDecision -Reason ("PREIMPLEMENTATION_GATE_BLOCKED: this epic-scope operation was evaluated against $($scope.CheckpointPath), and the failed readiness predicate is '$failure'. Implementation operations in epic scope require that checkpoint to satisfy every readiness predicate, and a production path may be staged or edited only while a merge is in progress.")
-        }
-        return Get-OrchestrationPreimplementationGateBlockDecision -Reason (Get-OrchestrationEpicTargetDenyReason -ReasonCode 'target-not-ready' -Detail $evaluation.Target -CheckpointPath $scope.CheckpointPath -Failure $failure)
+    if ($outcome.Outcome -eq 'deny') {
+        return Get-OrchestrationPreimplementationGateBlockDecision -Reason $outcome.Reason
     }
     return Get-OrchestrationPreimplementationGateAllowDecision
 }

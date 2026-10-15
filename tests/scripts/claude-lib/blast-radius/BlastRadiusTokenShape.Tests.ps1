@@ -293,6 +293,8 @@ Describe 'Test-FileShapedComponent (issue #797)' {
             @{ Name = 'digit-led-extension'; Component = 'v1.2.0'; Expected = $false }
             @{ Name = 'hyphenated-extension'; Component = 'archive.tar-gz'; Expected = $false }
             @{ Name = 'non-ascii-extension'; Component = 'notes.' + [char]0xE9; Expected = $false }
+            @{ Name = 'kelvin-sign-extension'; Component = 'notes.' + [char]0x212A; Expected = $false }
+            @{ Name = 'dotted-capital-i-extension'; Component = 'notes.' + [char]0x130; Expected = $false }
             @{ Name = 'known-name-case-variant'; Component = 'dockerfile'; Expected = $false }
             @{ Name = 'extensionless-unknown'; Component = 'thing'; Expected = $false }
         ) {

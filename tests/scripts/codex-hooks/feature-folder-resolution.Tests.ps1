@@ -65,8 +65,20 @@ Describe 'feature-folder-resolution.ps1 (Codex surface)' {
             @{ Char = ',' }
             @{ Char = ';' }
             @{ Char = ':' }
+            @{ Char = ')' }
+            @{ Char = ']' }
+            @{ Char = '>' }
+            @{ Char = '*' }
+            @{ Char = '_' }
         ) {
             Get-CandidateText -Text ("Target docs/features/active/x$Char next") | Should -BeExactly 'x'
+        }
+
+        It 'S06c: trims wrapping punctuation from a composite citation (<Text>)' -ForEach @(
+            @{ Text = '(docs/features/active/x)' }
+            @{ Text = '**docs/features/active/x**' }
+        ) {
+            Get-CandidateText -Text $Text | Should -BeExactly 'x'
         }
 
         It 'S07: yields no candidate for a bare docs/features/active/ token' {

@@ -148,6 +148,36 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         $result.Detail.StartsWith('git-relocation') | Should -BeTrue -Because 'the detail names rule R5'
     }
 
+    It 'U11b resolves <Command> to the session root (identifier-embedded name)' -ForEach @(
+        @{ Command = 'git add docs/legit_dir-notes.md' }
+        @{ Command = 'MY_GIT_DIR=1 git add a.ps1' }
+    ) {
+        # Act
+        $result = Get-CommandTargetResult -Command $Command
+
+        # Assert
+        $result.Resolved | Should -BeTrue -Because 'a relocation name embedded in a longer identifier is not a relocation (issue #903, #732 CR-2)'
+        $result.Targets | Should -Be @($script:Root) -Because 'the segment runs in the session root'
+    }
+
+    It 'U11c gives git-relocation for an env-drive assignment' {
+        # Act
+        $result = Get-CommandTargetResult -Command '$env:GIT_DIR=''/x''; git add a.ps1'
+
+        # Assert
+        $result.Resolved | Should -BeFalse -Because 'a PowerShell env-drive assignment moves the git directory'
+        $result.Detail.StartsWith('git-relocation') | Should -BeTrue -Because 'the detail names rule R5'
+    }
+
+    It 'U11d still denies a standalone-word mention of a relocation name (recorded fail-closed residual)' {
+        # Act
+        $result = Get-CommandTargetResult -Command 'git commit -m ''mention GIT_DIR here'' -- a.ps1'
+
+        # Assert
+        $result.Resolved | Should -BeFalse -Because 'a standalone relocation word fails closed (issue #903, #732 CR-2 residual)'
+        $result.Detail.StartsWith('git-relocation') | Should -BeTrue -Because 'the detail names rule R5'
+    }
+
     It 'U12 gives git-relocation for <Command>' -ForEach @(
         @{ Command = 'git --git-dir=/x add a.ps1' }
         @{ Command = 'git --git-dir /x add a.ps1' }
@@ -302,5 +332,68 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         # Assert
         $calls.Count | Should -Be 1 -Because 'the session-root scope is reused for an equal target'
         $verdict.Verdict | Should -Be 'evaluate' -Because 'the only target is epic scope'
+    }
+
+    It 'U24 gives git-command-word-missing for a token array without git' {
+        # Act
+        $result = Get-OrchestrationGitSelectorTarget -Token @('status')
+
+        # Assert
+        $result.Rule | Should -Be 'git-command-word-missing' -Because 'a token array without git has no command word (issue #903, #732 CR-6)'
+    }
+
+    It 'U25 gives outcome <Expected> for <Label>' -ForEach @(
+        @{ Label = 'a none verdict'; Case = 'none'; Expected = 'none' }
+        @{ Label = 'a deny verdict'; Case = 'deny'; Expected = 'deny' }
+        @{ Label = 'a failing session-root scope'; Case = 'session-root'; Expected = 'deny' }
+        @{ Label = 'a failing non-session-root target'; Case = 'target'; Expected = 'deny' }
+        @{ Label = 'an evaluation with no failure'; Case = 'ready'; Expected = 'allow' }
+    ) {
+        # Arrange (issue #903, #732 CR-3): in-memory verdicts; the readiness predicate reads Scope.Failure.
+        $checkpointPath = '/synthetic-worktrees/session/artifacts/orchestration/epic-orchestrator-state.json'
+        $failing = [pscustomobject]@{ CheckpointPath = $checkpointPath; Failure = 'merge-in-progress' }
+        $ready = [pscustomobject]@{ CheckpointPath = $checkpointPath; Failure = '' }
+        $verdict = switch ($Case) {
+            'none' { [pscustomobject]@{ Verdict = 'none'; ReasonCode = ''; Detail = ''; Evaluations = @() } }
+            'deny' { [pscustomobject]@{ Verdict = 'deny'; ReasonCode = 'target-mixed'; Detail = '/a'; Evaluations = @() } }
+            'session-root' {
+                $evaluation = [pscustomobject]@{ Target = $script:Root; IsSessionRoot = $true; Scope = $failing }
+                [pscustomobject]@{ Verdict = 'evaluate'; ReasonCode = ''; Detail = ''; Evaluations = @($evaluation) }
+            }
+            'target' {
+                $evaluation = [pscustomobject]@{ Target = '/a'; IsSessionRoot = $false; Scope = $failing }
+                [pscustomobject]@{ Verdict = 'evaluate'; ReasonCode = ''; Detail = ''; Evaluations = @($evaluation) }
+            }
+            default {
+                $evaluation = [pscustomobject]@{ Target = $script:Root; IsSessionRoot = $true; Scope = $ready }
+                [pscustomobject]@{ Verdict = 'evaluate'; ReasonCode = ''; Detail = ''; Evaluations = @($evaluation) }
+            }
+        }
+        $expectedReason = switch ($Case) {
+            'deny' { Get-OrchestrationEpicTargetDenyReason -ReasonCode 'target-mixed' -Detail '/a' }
+            'session-root' { "PREIMPLEMENTATION_GATE_BLOCKED: this epic-scope operation was evaluated against /synthetic-worktrees/session/artifacts/orchestration/epic-orchestrator-state.json, and the failed readiness predicate is 'merge-in-progress'. Implementation operations in epic scope require that checkpoint to satisfy every readiness predicate, and a production path may be staged or edited only while a merge is in progress." }
+            'target' { Get-OrchestrationEpicTargetDenyReason -ReasonCode 'target-not-ready' -Detail '/a' -CheckpointPath $checkpointPath -Failure 'merge-in-progress' }
+            default { '' }
+        }
+
+        # Act
+        $outcome = Resolve-OrchestrationEpicTargetOutcome -Verdict $verdict -ReadinessFailure { param($Scope) $Scope.Failure }
+
+        # Assert
+        $outcome.Outcome | Should -Be $Expected -Because "$Label decides the outcome"
+        $outcome.Reason | Should -BeExactly $expectedReason -Because "$Label carries the unchanged reason text"
+    }
+
+    It 'U26 gives the exact deny reason for <Label>' -ForEach @(
+        @{ Label = 'target-ambiguous'; Code = 'target-ambiguous'; Detail = '/a'; Expected = 'PREIMPLEMENTATION_GATE_BLOCKED: target-ambiguous: more than one worktree claims the epic integration branch for target /a. Implementation operations in epic scope require an unambiguous target worktree.' }
+        @{ Label = 'target-unresolvable (fall-through)'; Code = 'target-unresolvable'; Detail = 'directory-change: cd /x'; Expected = 'PREIMPLEMENTATION_GATE_BLOCKED: target-unresolvable: the target worktree of this epic-scope operation cannot be resolved (directory-change: cd /x). Implementation operations in epic scope require every command segment and path to name an absolute, resolvable target.' }
+    ) {
+        # Arrange (issue #903 remediation RI-1): the reason code and detail come from the data row.
+
+        # Act
+        $reason = Get-OrchestrationEpicTargetDenyReason -ReasonCode $Code -Detail $Detail
+
+        # Assert
+        $reason | Should -BeExactly $Expected -Because "$Label keeps its unchanged reason text"
     }
 }

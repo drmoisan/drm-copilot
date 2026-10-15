@@ -86,7 +86,9 @@ FEATURE_FOLDER_SEGMENT_INDEX = 1
 # letters or digits. Explicit ASCII classes are used instead of ``\w`` so the
 # .NET port, which anchors the same text with ``\A`` and ``\z``, matches exactly
 # the same inputs. A digit-led tail (a version such as ``v1.2.0``) and a tail
-# carrying punctuation do not match.
+# carrying punctuation do not match. A non-ASCII extension is rejected before
+# lower-casing (issue #903), because a character such as the Kelvin sign
+# lower-cases to an ASCII letter and would otherwise match.
 FILE_EXTENSION_PATTERN_TEXT = "[a-z][a-z0-9]*"
 FILE_EXTENSION_RE = re.compile(FILE_EXTENSION_PATTERN_TEXT)
 
@@ -200,7 +202,10 @@ def is_file_shaped_component(component: str) -> bool:
         bool: ``True`` when ``component`` is an ordinal member of
         ``KNOWN_FILE_NAMES``, or when it has a non-empty stem before its last
         dot and the lower-cased text after that dot fully matches
-        ``FILE_EXTENSION_PATTERN_TEXT``; otherwise ``False``.
+        ``FILE_EXTENSION_PATTERN_TEXT``; otherwise ``False``. A non-ASCII
+        extension is rejected before lower-casing (issue #903), so a character
+        that lower-cases to an ASCII letter, such as the Kelvin sign, does not
+        match.
 
     Raises:
         None.
@@ -215,4 +220,6 @@ def is_file_shaped_component(component: str) -> bool:
     if not separator or not stem:
         return False
 
+    if not extension.isascii():
+        return False
     return FILE_EXTENSION_RE.fullmatch(extension.lower()) is not None

@@ -39,6 +39,12 @@ UNHASHABLE_ROWS = [
     pytest.param(["x"], id="list"),
     pytest.param({"x": 1}, id="dict"),
 ]
+NON_STRING_ROWS = [
+    pytest.param(["x"], id="list"),
+    pytest.param({"x": 1}, id="dict"),
+    pytest.param(5, id="int"),
+    pytest.param(True, id="bool"),
+]
 COMPLETION_STATE: dict[str, Any] = {"epic_merge_pr": {"merge_commit_sha": "abc123"}}
 COMPLETION_ERROR_A = (
     "Epic checkpoint completion validation failed: "
@@ -92,17 +98,17 @@ def test_enum_site_reports_non_string_merge_status(
     ]
 
 
-@pytest.mark.parametrize(("value", "expected_repr"), VALUE_ROWS)
-def test_completion_site_reports_non_string_merge_status(
-    value: object, expected_repr: str
-) -> None:
+@pytest.mark.parametrize("value", NON_STRING_ROWS)
+def test_completion_site_reports_non_string_merge_status(value: object) -> None:
     """Report a non-string merge_status at the completion gate without raising."""
 
     features: list[dict[str, Any]] = [{"feature_folder": "a", "merge_status": value}]
 
     errors = completion_site()(features, COMPLETION_STATE)
 
-    assert errors == [COMPLETION_ERROR_A], expected_repr
+    assert errors == [
+        COMPLETION_ERROR_A
+    ], f"non-string merge_status {value!r} was not reported"
 
 
 @pytest.mark.parametrize("value", UNHASHABLE_ROWS)
@@ -148,17 +154,15 @@ def test_cli_returns_exit_code_1_for_non_string_merge_status(
     assert result == 1
 
 
-def test_enum_site_accepts_every_valid_string_status() -> None:
-    """Accept every member of the valid merge_status set without errors."""
+@pytest.mark.parametrize("status", sorted(validator.VALID_MERGE_STATUS))
+def test_enum_site_accepts_every_valid_string_status(status: str) -> None:
+    """Accept each member of the valid merge_status set without errors."""
 
-    for status in sorted(validator.VALID_MERGE_STATUS):
-        features: list[dict[str, Any]] = [
-            {"feature_folder": "a", "merge_status": status}
-        ]
+    features: list[dict[str, Any]] = [{"feature_folder": "a", "merge_status": status}]
 
-        errors = enum_site()(features)
+    errors = enum_site()(features)
 
-        assert errors == [], status
+    assert errors == [], f"valid merge_status {status!r} was reported: {errors}"
 
 
 def test_enum_site_reports_invalid_string_status_with_unchanged_text() -> None:

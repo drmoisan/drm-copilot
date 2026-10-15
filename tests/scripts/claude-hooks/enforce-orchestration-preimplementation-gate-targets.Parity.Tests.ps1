@@ -50,4 +50,15 @@ Describe 'enforce-orchestration-preimplementation-gate-targets.ps1 surface parit
                 Should -BeLessOrEqual 500 -Because "$path must stay within the repository file-size limit"
         }
     }
+
+    It 'keeps every line of every surface copy at or under 120 characters (issue #903, #732 CR-4)' {
+        # Arrange
+        $paths = $script:TargetsPaths
+
+        # Act and Assert
+        foreach ($path in $paths) {
+            $longLineCount = @(Get-Content -LiteralPath $path | Where-Object { $_.Length -gt 120 }).Count
+            $longLineCount | Should -Be 0 -Because "$path must keep every line at or under 120 characters"
+        }
+    }
 }

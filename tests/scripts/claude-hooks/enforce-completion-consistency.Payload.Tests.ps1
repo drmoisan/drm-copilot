@@ -72,5 +72,37 @@ Describe 'enforce-completion-consistency.ps1 payload envelope' {
             $output | Should -Match '"permissionDecision"\s*:\s*"deny"'
             $output | Should -Match 'COMPLETION_CONSISTENCY_BLOCKED'
         }
+
+        It 'O-4: converts a throwing payload reader into a COMPLETION_CONSISTENCY_BLOCKED deny without throwing' {
+            # Arrange / Act
+            $decision = Invoke-CompletionConsistencyEntryPoint -ReadPayload { throw 'simulated reader failure' }
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'COMPLETION_CONSISTENCY_BLOCKED'
+        }
+
+        It 'O-4: returns allow for a benign non-checkpoint payload read through the entry point' {
+            # Arrange
+            $payload = '{"tool_name":"Write","tool_input":{"file_path":"README.md","content":"x"}}'
+            $reader = { $payload }.GetNewClosure()
+
+            # Act
+            $decision = Invoke-CompletionConsistencyEntryPoint -ReadPayload $reader
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+
+        It 'O-4: reads the payload through the default reader when no -ReadPayload is supplied' {
+            # Arrange
+            Mock Read-ClaudeHookRawPayload { '{"tool_name":"Write","tool_input":{"file_path":"README.md","content":"x"}}' }
+
+            # Act
+            $decision = Invoke-CompletionConsistencyEntryPoint
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
     }
 }

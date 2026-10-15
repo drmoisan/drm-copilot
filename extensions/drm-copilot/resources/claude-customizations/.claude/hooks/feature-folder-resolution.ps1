@@ -35,7 +35,7 @@ function Find-FeatureFolderCandidate {
         Scans for docs/features/active/ path tokens with any prefix and either separator.
         Each token is normalized to forward slashes and split into segments; empty and '.'
         segments are dropped. A token with fewer than four segments yields no candidate.
-        The fourth segment is the folder, with trailing '.', ',', ';', and ':' trimmed.
+        The fourth segment is the folder, with trailing '.', ',', ';', ':', ')', ']', '>', '*', and '_' trimmed.
         Duplicates are removed ordinally, keeping the first occurrence.
     .PARAMETER Text
         The prompt or other text to scan. Null or empty text yields no output.
@@ -60,7 +60,7 @@ function Find-FeatureFolderCandidate {
         if ($segments.Count -lt 4) {
             continue
         }
-        $folder = $segments[3].TrimEnd('.', ',', ';', ':')
+        $folder = $segments[3].TrimEnd('.', ',', ';', ':', ')', ']', '>', '*', '_')
         if (-not $folder -or $found.Contains($folder)) {
             continue
         }

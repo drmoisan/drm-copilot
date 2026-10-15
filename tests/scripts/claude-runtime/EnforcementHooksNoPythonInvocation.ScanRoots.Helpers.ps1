@@ -4,9 +4,8 @@
 
     This file is test support and is not mirrored under
     `extensions/drm-copilot/resources/`. It is dot-sourced by
-    `enforcement-hooks-no-python-invocation.Tests.ps1` (and by the scan-root rows file when
-    that file exists) after `$script:RepoRoot` has been resolved, because the scan roots
-    below are built from that variable. The functions read `$script:RepoRoot` and
+    `enforcement-hooks-no-python-invocation.Tests.ps1` after `$script:RepoRoot` has been
+    resolved, because the scan roots below are built from that variable. The functions read `$script:RepoRoot` and
     `$script:ScanRoot` at call time and create, write, or delete no file.
 #>
 
