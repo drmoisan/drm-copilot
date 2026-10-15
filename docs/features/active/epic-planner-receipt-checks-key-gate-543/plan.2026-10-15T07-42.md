@@ -621,3 +621,4 @@ AC-MAPPING: AC16 | IMPLEMENTATION: P7-T1 through P7-T8 | TESTS: black, ruff, pyr
 AC-MAPPING: AC17 | IMPLEMENTATION: P8-T1 through P8-T7 | TESTS: prettier --check, npm run lint, npm run typecheck, node run-jest.cjs --coverage with text reporters | EVIDENCE: evidence/qa-gates/final-typescript-test-coverage.<timestamp>.md, evidence/qa-gates/coverage-delta-verification.<timestamp>.md, evidence/qa-gates/final-qa-clean-pass.<timestamp>.md
 AC-MAPPING: AC18 | IMPLEMENTATION: deferred to S9 pr-author (P9-T5 leaves it unchecked) | TESTS: CI conclusion on the final PR head | EVIDENCE: PR body containing Closes #543 and the CI result recorded at S9
 UNRESOLVED-GAPS: NONE
+DIRECTIVE: PREFLIGHT VALIDATION ONLY
