@@ -253,6 +253,9 @@ Feature-folder documents (create or edit):
 - `docs/features/active/2026-10-15-hook-test-isolation-737-remainder-935/evidence/regression-testing/`
 - `docs/features/active/2026-10-15-hook-test-isolation-737-remainder-935/evidence/qa-gates/`
 - `docs/features/active/2026-10-15-hook-test-isolation-737-remainder-935/evidence/other/`
+- `docs/features/active/2026-10-15-hook-test-isolation-737-remainder-935/issue.md`
+- `docs/features/active/2026-10-15-hook-test-isolation-737-remainder-935/research/research.2026-10-15T22-03.md`
+- review and orchestration artifacts under `docs/features/active/2026-10-15-hook-test-isolation-737-remainder-935/`
 
 Delete: none.
 
