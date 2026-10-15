@@ -1,10 +1,13 @@
-# host-tools-manifest-and-bash-bootstrap-missing (Potential)
+# host-tools-manifest-and-bash-bootstrap-missing (Issue #887)
 
 - Date captured: 2026-10-09
 - Author: drmoisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/host-tools-manifest-and-bash-bootstrap-missing/ (Issue #887)
 - Origin: issue #847 (PowerShell aggregate line coverage below floor), recorded as a pre-existing defect outside that issue's scope
 
+- Issue: #887
+- Issue URL: https://github.com/drmoisan/drm-copilot/issues/887
+- Last Updated: 2026-10-11
 ## Problem / Why
 
 `scripts/host-tools.manifest.json` is read by `scripts/dev-tools/bootstrap-host.ps1` (now through `scripts/dev-tools/HostBootstrap.psm1`) and by `scripts/dev-tools/verify-host.ps1` (now through `scripts/dev-tools/HostVerification.psm1`), but the file does not exist in the repository. Both scripts resolve the path as `scripts/dev-tools/../host-tools.manifest.json` and fail early on every host: bootstrap raises `Host tools manifest not found at <path>` and verify raises `Manifest not found at <path>`. Neither script can perform its documented work on any machine.
