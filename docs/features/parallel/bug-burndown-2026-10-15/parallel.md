@@ -1,7 +1,7 @@
 ---
 parallel: "bug-burndown-2026-10-15"
 mode: "closed"
-max_concurrency: 6
+max_concurrency: 15
 created_at: "2026-10-15T11:39:07Z"
 items:
   - issue_num: 927
