@@ -23,8 +23,24 @@
                the resolved worktree: blocked.
       Preflight - --body-file/context present: orchestrator-state checkpoint must pass
                   --require-pr-creation-ready before receipt verification runs, else blocked.
-      Receipt - preflight passed: the SHA-256 receipt is verified in five ordered checks
-                (Section below). The first failing check blocks.
+      Docs-only - issue #901: when the preflight fails, gh pr create proceeds to receipt
+                  verification only when every condition holds: no checkpoint file exists
+                  beneath the resolved worktree; the command carries exactly one explicit
+                  --base <branch> and no -B token; refs/remotes/origin/<branch> resolves to
+                  a commit; git diff --name-only -z --no-renames <commit>...HEAD exits 0 and
+                  lists at least one path; and every listed path starts with docs/ (ordinal,
+                  case-sensitive). Otherwise the deny keeps ORCHESTRATOR_STATE_PREFLIGHT_FAILED
+                  and appends one sub-code:
+                    DOCS_ONLY_EXEMPTION_NOT_CREATE         - gh pr edit is never exempt.
+                    DOCS_ONLY_EXEMPTION_CHECKPOINT_PRESENT - a checkpoint file exists.
+                    DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED    - no single explicit --base, or it
+                                                             does not resolve on origin.
+                    DOCS_ONLY_EXEMPTION_DIFF_FAILED        - the diff exits non-zero or throws.
+                    DOCS_ONLY_EXEMPTION_EMPTY_DIFF         - the diff lists no path.
+                    DOCS_ONLY_EXEMPTION_NON_DOCS_PATH      - a listed path is outside docs/.
+                  The exemption never applies under epic scope.
+      Receipt - preflight passed or docs-only exemption applied: the SHA-256 receipt is
+                verified in the ordered checks (Section below). The first failing check blocks.
 
     Receipt verification decision order on the --body-file-with-context path:
       PR_BODY_PATH_NONCANONICAL -> PR_AUTHOR_RECEIPT_MISSING -> PR_AUTHOR_RECEIPT_NUMBER_MISMATCH
@@ -36,7 +52,12 @@
     validates the artifacts of the item it gates.
 
 .NOTES
-    Compatible with PowerShell 7+. No external module dependencies.
+    Compatible with PowerShell 7+. Dependencies are in-repository only: hook-dependency-guard.ps1,
+    the HookPayload, OrchestratorState, and OrchestratorStateUnconditional modules, and the
+    epic-base-branch and helpers siblings; the helpers load the command parsers, the
+    worktree-resolution modules, and the artifact-root and docs-only siblings.
+    No PowerShell Gallery module is required.
+    The docs-only exemption runs the git executable at call time (issue #901).
 
     Enforcement strength: the SHA-256 receipt is a policy-level integrity check that binds the
     PR body bytes to the receipt the pr-author agent wrote. It is not a cryptographic or security
