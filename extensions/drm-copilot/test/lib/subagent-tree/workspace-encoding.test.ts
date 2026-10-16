@@ -18,8 +18,8 @@ function workspacePathOf(separator: string, ...segments: string[]): string {
 }
 
 // Expected encoded directory name, derived without calling the code under test.
-function encodedNameOf(drive: string, ...segments: string[]): string {
-  return `${drive}--${[...PARENT_SEGMENTS, ...segments].join("-")}`;
+function encodedNameOf(...segments: string[]): string {
+  return `${UPPER_DRIVE}--${[...PARENT_SEGMENTS, ...segments].join("-")}`;
 }
 
 describe("encodeWorkspacePath", () => {
@@ -31,7 +31,7 @@ describe("encodeWorkspacePath", () => {
     const encoded = encodeWorkspacePath(workspacePath);
 
     // Assert
-    expect(encoded).toBe(encodedNameOf(UPPER_DRIVE, REPO));
+    expect(encoded).toBe(encodedNameOf(REPO));
   });
 
   it("encodes a forward-slash workspace path identically to a backslash one", () => {
@@ -55,11 +55,8 @@ describe("matchEncodedDirectories", () => {
     const encodedWorkspaceName = encodeWorkspacePath(
       workspacePathOf(BACKSLASH, REPO),
     );
-    const lowercaseDirectory = encodedNameOf(UPPER_DRIVE, REPO).toLowerCase();
-    const directoryNames = [
-      lowercaseDirectory,
-      encodedNameOf(UPPER_DRIVE, OTHER_REPO),
-    ];
+    const lowercaseDirectory = encodedNameOf(REPO).toLowerCase();
+    const directoryNames = [lowercaseDirectory, encodedNameOf(OTHER_REPO)];
 
     // Act
     const matches = matchEncodedDirectories(
@@ -76,16 +73,13 @@ describe("matchEncodedDirectories", () => {
     const encodedWorkspaceName = encodeWorkspacePath(
       workspacePathOf(BACKSLASH, REPO),
     );
-    const baseDirectory = encodedNameOf(UPPER_DRIVE, REPO);
-    const siblingDirectory = encodedNameOf(
-      UPPER_DRIVE,
-      `${REPO}-wt-2026-06-13-11-51`,
-    );
+    const baseDirectory = encodedNameOf(REPO);
+    const siblingDirectory = encodedNameOf(`${REPO}-wt-2026-06-13-11-51`);
     const directoryNames = [
       baseDirectory,
       siblingDirectory,
-      encodedNameOf(UPPER_DRIVE, `${REPO}-unrelated-suffix`),
-      encodedNameOf(UPPER_DRIVE, OTHER_REPO),
+      encodedNameOf(`${REPO}-unrelated-suffix`),
+      encodedNameOf(OTHER_REPO),
     ];
 
     // Act
@@ -107,11 +101,8 @@ describe("matchEncodedDirectories", () => {
       workspacePathOf(BACKSLASH, `${REPO}-wt-2026-07-03-16-18`),
     );
     const directoryNames = [
-      encodedNameOf(UPPER_DRIVE, `${REPO}-wt-2026-07-03-16-18`),
-      encodedNameOf(
-        UPPER_DRIVE,
-        `${REPO}-wt-2026-07-03-16-18-wt-2026-07-03-22-30`,
-      ),
+      encodedNameOf(`${REPO}-wt-2026-07-03-16-18`),
+      encodedNameOf(`${REPO}-wt-2026-07-03-16-18-wt-2026-07-03-22-30`),
     ];
 
     // Act
@@ -129,7 +120,7 @@ describe("matchEncodedDirectories", () => {
     const encodedWorkspaceName = encodeWorkspacePath(
       workspacePathOf(BACKSLASH, REPO),
     );
-    const directoryNames = [encodedNameOf(UPPER_DRIVE, OTHER_REPO)];
+    const directoryNames = [encodedNameOf(OTHER_REPO)];
 
     // Act
     const matches = matchEncodedDirectories(
@@ -150,11 +141,8 @@ describe("matchEncodedDirectories", () => {
     const encodedWorkspaceName = encodeWorkspacePath(
       workspacePathOf(BACKSLASH, REPO),
     );
-    const baseDirectory = encodedNameOf(UPPER_DRIVE, REPO);
-    const nestedDirectory = encodedNameOf(
-      UPPER_DRIVE,
-      `${REPO}-wt-2026-07-07T12-00`,
-    );
+    const baseDirectory = encodedNameOf(REPO);
+    const nestedDirectory = encodedNameOf(`${REPO}-wt-2026-07-07T12-00`);
     const directoryNames = [baseDirectory, nestedDirectory];
 
     // Act
@@ -175,11 +163,8 @@ describe("matchEncodedDirectories", () => {
       workspacePathOf(SLASH, `${REPO}-wt`, "2026-07-07T12-00"),
     );
     const directoryNames = [
-      encodedNameOf(UPPER_DRIVE, `${REPO}-wt-2026-07-07T12-00`),
-      encodedNameOf(
-        UPPER_DRIVE,
-        `${REPO}-wt-2026-07-07T12-00-wt-2026-07-07T18-00`,
-      ),
+      encodedNameOf(`${REPO}-wt-2026-07-07T12-00`),
+      encodedNameOf(`${REPO}-wt-2026-07-07T12-00-wt-2026-07-07T18-00`),
     ];
 
     // Act
@@ -198,14 +183,8 @@ describe("matchEncodedDirectories", () => {
     const encodedWorkspaceName = encodeWorkspacePath(
       workspacePathOf(SLASH, `${REPO}-wt`, "2026-07-07T12-00"),
     );
-    const leafDirectory = encodedNameOf(
-      UPPER_DRIVE,
-      `${REPO}-wt-2026-07-07T12-00`,
-    );
-    const directoryNames = [
-      leafDirectory,
-      encodedNameOf(UPPER_DRIVE, OTHER_REPO),
-    ];
+    const leafDirectory = encodedNameOf(`${REPO}-wt-2026-07-07T12-00`);
+    const directoryNames = [leafDirectory, encodedNameOf(OTHER_REPO)];
 
     // Act
     const matches = matchEncodedDirectories(
