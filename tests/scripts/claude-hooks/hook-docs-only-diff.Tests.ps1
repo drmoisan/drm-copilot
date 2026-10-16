@@ -8,7 +8,7 @@
 .DESCRIPTION
     Exercises the pure classifiers (relocated from the issue #901 suite under their shared
     names), the NUL guard, and the bodies of both process seams through test-local functions
-    passed by name, so no row starts a process. No row creates, writes, or deletes a file.
+    passed as scriptblocks, so no row starts a process. No row creates, writes, or deletes a file.
 #>
 
 Describe 'hook-docs-only-diff shared helper (issue #927)' {
@@ -16,7 +16,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $script:RepoRoot '.claude/hooks/hook-docs-only-diff.ps1')
 
-        # Test-local stand-ins for git and gh, passed by name to the seams' command parameters.
+        # Test-local stand-ins for git and gh, passed as scriptblocks to the seams' invoker parameters.
         function Invoke-DocsOnlyFakeEcho {
             $global:LASTEXITCODE = 0
             ($args -join '|') + "`0"
@@ -197,7 +197,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             $expected = '-C|' + $PSScriptRoot + '|diff|--name-only|-z' + "`0"
 
             # Act
-            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeEcho'
+            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitInvoker ${function:Invoke-DocsOnlyFakeEcho}
 
             # Assert
             $result.ExitCode | Should -Be 0
@@ -206,7 +206,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
 
         It 'returns the non-zero exit code of the injected git command (issue #927)' {
             # Act
-            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs @('status') -GitCommand 'Invoke-DocsOnlyFakeExit2'
+            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs @('status') -GitInvoker ${function:Invoke-DocsOnlyFakeExit2}
 
             # Assert
             $result.ExitCode | Should -Be 2
@@ -215,7 +215,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
 
         It 'returns the failure object when the injected git command throws (issue #927)' {
             # Act
-            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs @('status') -GitCommand 'Invoke-DocsOnlyFakeThrow'
+            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs @('status') -GitInvoker ${function:Invoke-DocsOnlyFakeThrow}
 
             # Assert
             $result.ExitCode | Should -Be -1
@@ -227,7 +227,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             @{ Name = 'a nonexistent root'; Root = '/synthetic-worktrees/no-such-root-927' }
         ) {
             # Act
-            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $Root -GitArgs @('status') -GitCommand 'Invoke-DocsOnlyFakeMarker'
+            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $Root -GitArgs @('status') -GitInvoker ${function:Invoke-DocsOnlyFakeMarker}
 
             # Assert
             $result.ExitCode | Should -Be -1
@@ -242,7 +242,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             $before = (Get-Location).Path
 
             # Act
-            $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhCommand 'Invoke-DocsOnlyFakeLocation'
+            $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhInvoker ${function:Invoke-DocsOnlyFakeLocation}
 
             # Assert
             $result.ExitCode | Should -Be 0
@@ -252,7 +252,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
 
         It 'returns the non-zero exit code of the injected gh command (issue #927)' {
             # Act
-            $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhCommand 'Invoke-DocsOnlyFakeExit2'
+            $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhInvoker ${function:Invoke-DocsOnlyFakeExit2}
 
             # Assert
             $result.ExitCode | Should -Be 2
@@ -264,7 +264,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             $before = (Get-Location).Path
 
             # Act
-            $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhCommand 'Invoke-DocsOnlyFakeThrow'
+            $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhInvoker ${function:Invoke-DocsOnlyFakeThrow}
 
             # Assert
             $result.ExitCode | Should -Be -1
@@ -277,7 +277,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             @{ Name = 'a nonexistent root'; Root = '/synthetic-worktrees/no-such-root-927' }
         ) {
             # Act
-            $result = Invoke-DocsOnlyGhExe -WorkingRoot $Root -GhArgs @('pr', 'view', '5') -GhCommand 'Invoke-DocsOnlyFakeMarker'
+            $result = Invoke-DocsOnlyGhExe -WorkingRoot $Root -GhArgs @('pr', 'view', '5') -GhInvoker ${function:Invoke-DocsOnlyFakeMarker}
 
             # Assert
             $result.ExitCode | Should -Be -1

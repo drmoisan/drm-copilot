@@ -255,8 +255,8 @@ Describe 'enforce-pr-author-skill docs-only helpers (issue #901)' {
 
     Context 'Invoke-PrAuthorDocsOnlyGitExe command injection (issue #927)' {
         BeforeAll {
-            # Test-local stand-ins for the git executable, passed by name to the seam's
-            # GitCommand parameter, so the seam body runs without starting a process.
+            # Test-local stand-ins for the git executable, passed as scriptblocks to the seam's
+            # GitInvoker parameter, so the seam body runs without starting a process.
             function Invoke-DocsOnlyFakeGitEcho {
                 $global:LASTEXITCODE = 0
                 ($args -join '|') + "`0"
@@ -288,7 +288,7 @@ Describe 'enforce-pr-author-skill docs-only helpers (issue #901)' {
             $expected = '-C|' + $PSScriptRoot + '|diff|--name-only|-z' + "`0"
 
             # Act
-            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeGitEcho'
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitInvoker ${function:Invoke-DocsOnlyFakeGitEcho}
 
             # Assert
             $result.ExitCode | Should -Be 0
@@ -301,7 +301,7 @@ Describe 'enforce-pr-author-skill docs-only helpers (issue #901)' {
             $gitArgs = @('status')
 
             # Act
-            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeGitMultiLine'
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitInvoker ${function:Invoke-DocsOnlyFakeGitMultiLine}
 
             # Assert
             $result.ExitCode | Should -Be 0
@@ -313,7 +313,7 @@ Describe 'enforce-pr-author-skill docs-only helpers (issue #901)' {
             $gitArgs = @('status')
 
             # Act
-            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeGitExit128'
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitInvoker ${function:Invoke-DocsOnlyFakeGitExit128}
 
             # Assert
             $result.ExitCode | Should -Be 128
@@ -325,7 +325,7 @@ Describe 'enforce-pr-author-skill docs-only helpers (issue #901)' {
             $gitArgs = @('status')
 
             # Act
-            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeGitThrow'
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitInvoker ${function:Invoke-DocsOnlyFakeGitThrow}
 
             # Assert
             $result.ExitCode | Should -Be -1

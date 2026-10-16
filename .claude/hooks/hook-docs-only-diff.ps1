@@ -48,8 +48,8 @@
 .NOTES
     PowerShell 7+. Byte-identical at .claude/hooks, .codex/hooks, and both bundle mirrors.
     git and gh run only through Invoke-DocsOnlyGitExe and Invoke-DocsOnlyGhExe, which never
-    throw; unit tests pass the name of a test-local function through -GitCommand and
-    -GhCommand so the seam bodies run without starting a process.
+    throw; unit tests pass a test-local scriptblock through -GitInvoker and -GhInvoker so
+    the seam bodies run without starting a process.
 #>
 
 function ConvertFrom-DocsOnlyNameList {
@@ -144,7 +144,7 @@ function Get-DocsOnlyDiffTextViolation {
 function Invoke-DocsOnlyGitExe {
     <#
     .SYNOPSIS
-        Run <GitCommand> -C <root> with the given arguments; the git seam of the merge exemption.
+        Run git -C <root> with the given arguments; the git seam of the merge exemption.
     .DESCRIPTION
         Never throws. A root that is not an existing directory returns ExitCode -1 without
         running the command, and so does a command that cannot start. Standard error is
@@ -154,8 +154,8 @@ function Invoke-DocsOnlyGitExe {
         The directory git runs in.
     .PARAMETER GitArgs
         The git arguments that follow -C <root>.
-    .PARAMETER GitCommand
-        The command to run; git unless a unit test passes the name of a test-local function.
+    .PARAMETER GitInvoker
+        The scriptblock that runs git; a unit test passes a test-local stand-in instead.
     .OUTPUTS
         System.Management.Automation.PSCustomObject with ExitCode and Output.
     #>
@@ -164,7 +164,7 @@ function Invoke-DocsOnlyGitExe {
     param(
         [AllowNull()][AllowEmptyString()][string] $WorktreeRoot,
         [Parameter(Mandatory)][string[]] $GitArgs,
-        [ValidateNotNullOrEmpty()][string] $GitCommand = 'git'
+        [ValidateNotNull()][scriptblock] $GitInvoker = { git @args 2>$null }
     )
 
     $failure = [pscustomobject]@{ ExitCode = -1; Output = '' }
@@ -172,7 +172,7 @@ function Invoke-DocsOnlyGitExe {
         return $failure
     }
     try {
-        $lines = @(& $GitCommand -C $WorktreeRoot @GitArgs 2>$null)
+        $lines = @(& $GitInvoker -C $WorktreeRoot @GitArgs 2>$null)
         $code = $LASTEXITCODE
     }
     catch {
@@ -184,7 +184,7 @@ function Invoke-DocsOnlyGitExe {
 function Invoke-DocsOnlyGhExe {
     <#
     .SYNOPSIS
-        Run <GhCommand> with the given arguments inside a working root; the gh seam.
+        Run gh with the given arguments inside a working root; the gh seam.
     .DESCRIPTION
         Never throws. gh has no -C option, so the seam pushes the working root and pops it in
         finally, restoring the caller's location after success and after a throw. A root that
@@ -194,8 +194,8 @@ function Invoke-DocsOnlyGhExe {
         The directory gh runs in.
     .PARAMETER GhArgs
         The gh arguments.
-    .PARAMETER GhCommand
-        The command to run; gh unless a unit test passes the name of a test-local function.
+    .PARAMETER GhInvoker
+        The scriptblock that runs gh; a unit test passes a test-local stand-in instead.
     .OUTPUTS
         System.Management.Automation.PSCustomObject with ExitCode and Output.
     #>
@@ -204,7 +204,7 @@ function Invoke-DocsOnlyGhExe {
     param(
         [AllowNull()][AllowEmptyString()][string] $WorkingRoot,
         [Parameter(Mandatory)][string[]] $GhArgs,
-        [ValidateNotNullOrEmpty()][string] $GhCommand = 'gh'
+        [ValidateNotNull()][scriptblock] $GhInvoker = { gh @args 2>$null }
     )
 
     $failure = [pscustomobject]@{ ExitCode = -1; Output = '' }
@@ -218,7 +218,7 @@ function Invoke-DocsOnlyGhExe {
         return $failure
     }
     try {
-        $lines = @(& $GhCommand @GhArgs 2>$null)
+        $lines = @(& $GhInvoker @GhArgs 2>$null)
         $code = $LASTEXITCODE
     }
     catch {

@@ -98,7 +98,7 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
         $workingRoot = if ($Root -eq 'exists') { $PSScriptRoot } else { $Root }
 
         # Act
-        $result = Invoke-DocsOnlyGitExe -WorktreeRoot $workingRoot -GitArgs @('status') -GitCommand $Fake
+        $result = Invoke-DocsOnlyGitExe -WorktreeRoot $workingRoot -GitArgs @('status') -GitInvoker (Get-Command -Name $Fake -CommandType Function).ScriptBlock
 
         # Assert
         $result.ExitCode | Should -Be $ExitCode
@@ -116,7 +116,7 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
         $before = (Get-Location).Path
 
         # Act
-        $result = Invoke-DocsOnlyGhExe -WorkingRoot $workingRoot -GhArgs @('pr', 'view', '5') -GhCommand $Fake
+        $result = Invoke-DocsOnlyGhExe -WorkingRoot $workingRoot -GhArgs @('pr', 'view', '5') -GhInvoker (Get-Command -Name $Fake -CommandType Function).ScriptBlock
 
         # Assert
         $result.ExitCode | Should -Be $ExitCode
