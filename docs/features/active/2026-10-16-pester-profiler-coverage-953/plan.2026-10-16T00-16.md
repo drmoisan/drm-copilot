@@ -7,7 +7,7 @@
 - **Work Mode:** full-bug (acceptance criteria source: `spec.md` AC-01 to AC-16 only; `user-story.md` is intentionally absent)
 - **Inputs:** `docs/features/active/2026-10-16-pester-profiler-coverage-953/issue.md`, `docs/features/active/2026-10-16-pester-profiler-coverage-953/spec.md`, `docs/features/active/2026-10-16-pester-profiler-coverage-953/research/research.2026-10-16T04-28.md`
 - **Last Updated:** 2026-10-16
-- **Status:** Draft revision 1.4 (preflight round 1 deltas D2-D13 applied, D1 replaced by orchestrator decision D5; round 2 deltas R2-D1 to R2-D7 applied; round 3 deltas R3-D1 (option A, orchestrator decision D6) and R3-D2 to R3-D4 applied; revision 1.3 cleared preflight round 4; revision 1.4 folds in coordinator decision D8 (Pester major-version ceiling below 6.0, AC-16) after the branch merged `origin/main`; pending executor preflight of revision 1.4)
+- **Status:** Draft revision 1.4 (preflight round 1 deltas D2-D13 applied, D1 replaced by orchestrator decision D5; round 2 deltas R2-D1 to R2-D7 applied; round 3 deltas R3-D1 (option A, orchestrator decision D6) and R3-D2 to R3-D4 applied; revision 1.3 cleared preflight round 4; revision 1.4 folds in coordinator decision D8 (Pester major-version ceiling below 6.0, AC-16) after the branch merged `origin/main`; revision 1.4, round-5 delta D1 applied (docs-only: `spec.md` statements aligned with decisions D8 and D6, and "Files Written" items 15 and 21 updated to match); pending executor preflight of revision 1.4)
 - **Version:** 1.4
 
 ## Files Written
@@ -32,7 +32,7 @@ Source, configuration, documentation, and tests (19 paths):
 12. `tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1` (line 132 only)
 13. `extensions/drm-copilot/CHANGELOG.md` (`[Unreleased]` section only)
 14. `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1` (new file)
-15. `tests/scripts/powershell/PoshQC/PoshQC.ModuleCoverage.Tests.ps1` (new file; an addition to the spec "Files in Scope" list decided by the orchestrator, decision D6; `spec.md` itself is not edited for this)
+15. `tests/scripts/powershell/PoshQC/PoshQC.ModuleCoverage.Tests.ps1` (new file; an addition to the spec "Files in Scope" list decided by the orchestrator, decision D6; listed in `spec.md` "Files in Scope" as primary item 20 by the round-5 delta D1)
 16. `scripts/powershell/PoshQC/PoshQC.Testing.psm1` (the default `$EnsureModule` seam at lines 163-169 and its call at line 305 only; decision D8)
 17. `extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1` (identical to item 16, by `Copy-Item`)
 18. `tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1` (lines 118 and 135 only; decision D8)
@@ -41,7 +41,7 @@ Source, configuration, documentation, and tests (19 paths):
 Feature folder (planning and evidence):
 
 20. `docs/features/active/2026-10-16-pester-profiler-coverage-953/plan.2026-10-16T00-16.md` (this plan; checkbox state only during execution)
-21. `docs/features/active/2026-10-16-pester-profiler-coverage-953/spec.md` (the revision 1.4 planner text for decision D8 (AC-16, the D8 Decision Record line, and the amended ceiling non-goal line); during execution, acceptance-criteria checkbox state only, written by the executor (P3-T8, P6-T18) and by the orchestrator (P7-T10, P8-T2, P8-T20))
+21. `docs/features/active/2026-10-16-pester-profiler-coverage-953/spec.md` (planning time, planner text only: (a) revision 1.4 for decision D8: AC-16, the D8 Decision Record line, and the amended ceiling non-goal line; (b) round-5 delta D1, which aligns existing statements with decisions D8 and D6: goal G3; the two "Scope & Non-Goals" in-scope bullets for the ceiling and the regression test; "Design summary"; "Functions/classes/CLI commands impacted"; "Data flow and validation changes"; "Required configuration keys and defaults"; "Files in Scope" primary items 3, 4, 5, 7, 9, and 10, new primary items 16-20 and their note, and the split of the sharding list into sharding-only files and primary-path files with additional sharding edits; the "Data / API / Config Impact" compatibility note; the "Test Strategy" unit-test and edge-case bullets; and the "Risks & Mitigations" rows "Linux hook job", "Pester 6 on a future image", and "File-size limit". The planner changes no acceptance-criterion text and no checkbox. During execution, acceptance-criteria checkbox state only, written by the executor (P3-T8, P6-T18) and by the orchestrator (P7-T10, P8-T2, P8-T20))
 22. `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/baseline/*.md`
 23. `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/*.md`
 24. `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/*.md`

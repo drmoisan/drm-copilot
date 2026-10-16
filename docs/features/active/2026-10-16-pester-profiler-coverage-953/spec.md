@@ -59,7 +59,7 @@ Baseline figures are taken from `issue.md`; research §7 records that they were 
 
 - G1: Shorten the CI `Test PowerShell` step by switching coverage to profiler mode through shipped configuration data.
 - G2: Keep coverage enforcement unchanged: same population, same denominator, same thresholds, no production file excluded.
-- G3: Reconcile the declared Pester minimum to 5.9.0 at every site listed in research §2.3.
+- G3: Reconcile the declared Pester minimum to 5.9.0 at every site listed in research §2.3, and bound Pester below 6.0 at the sites listed in AC-16 (D8).
 - G4: Record before/after CI timings and per-file coverage changes as evidence.
 - G5: If the step remains above the sharding trigger, shard it inside `_poshqc.yml` job bodies without changing the reported check name.
 - G6: Record the profiler-mode `ci` values of the #936 attribution-gap lines.
@@ -69,7 +69,8 @@ Baseline figures are taken from `issue.md`; research §7 records that they were 
 - In scope:
   - `CodeCoverage.UseBreakpoints = $false` in both runsettings copies.
   - Pester minimum 5.9.0 at the research §2.3 sites and in the tests that read the committed host-tools manifest.
-  - A new regression test for the runsettings key and the installer version.
+  - A Pester major-version ceiling below 6.0 at the sites listed in AC-16 (D8), and the existing test fixtures that inject a present module above that ceiling.
+  - A new regression test for the runsettings key, the installer version, and the Pester version ceiling.
   - CI timing and coverage evidence under the feature folder.
   - The conditional sharding phase (FR-09), executed only if its trigger fires.
 - Out of scope / non-goals:
@@ -131,7 +132,7 @@ Baseline figures are taken from `issue.md`; research §7 records that they were 
 
 ### Design summary (what changes where):
 
-Data-only switch to profiler coverage in both runsettings copies (research §6.2), Pester minimum reconciled to 5.9.0 (research §2.3), one new regression test, a CHANGELOG entry, and CI evidence. No workflow change is needed for the speedup because the workflow uses module defaults; the only primary-path workflow edit is the Linux job `-MinimumVersion` string at `_poshqc.yml:73`.
+Data-only switch to profiler coverage in both runsettings copies (research §6.2), Pester minimum reconciled to 5.9.0 (research §2.3), a Pester major-version ceiling below 6.0 (D8), one new regression test, a CHANGELOG entry, and CI evidence. No workflow change is needed for the speedup because the workflow uses module defaults; the only primary-path workflow edit is the version arguments of the Linux job `Import-Module Pester` line at `_poshqc.yml:73` (`-MinimumVersion 5.9.0 -MaximumVersion 5.99.99`).
 
 ### Boundaries and invariants to preserve:
 
@@ -154,13 +155,13 @@ See "Files in Scope".
 
 #### Functions/classes/CLI commands impacted:
 
-- `Invoke-PoshQCTest` behavior changes through loaded settings only (no code change on the primary path).
-- `Install-PoshQCTool` requested Pester version changes from 5.6.1 to 5.9.0 (data in `$requiredModules`).
+- `Invoke-PoshQCTest` coverage mode changes through loaded settings only. Its only primary-path code change is the default `EnsureModule` seam, which imports Pester with `-MaximumVersion 5.99.99` (D8).
+- `Install-PoshQCTool` requested Pester version changes from 5.6.1 to 5.9.0, and its present and post-install checks accept only installed Pester versions below 6.0.0 (data in `$requiredModules`, `UpperBound`; D8).
 - `HostBootstrap` Pester install via `scripts/host-tools.manifest.json` `minimumVersion` (drives `-RequiredVersion`, research §2.3).
 
 #### Data flow and validation changes:
 
-None on the primary path beyond the configuration value. Coverage XML format (CoverageGutters, JaCoCo-structured) is unchanged.
+None on the primary path beyond the configuration value and the Pester version range (D8). Coverage XML format (CoverageGutters, JaCoCo-structured) is unchanged.
 
 #### Error handling and logging updates:
 
@@ -180,7 +181,7 @@ Rollback is removal of the `UseBreakpoints = $false` line from both runsettings 
 #### Required configuration keys and defaults:
 
 - `CodeCoverage.UseBreakpoints = $false` (new explicit key; Pester 5 default is `$true`).
-- Pester minimum `5.9.0`.
+- Pester minimum `5.9.0`, with a ceiling below 6.0 (D8): `UpperBound = '6.0.0'` (exclusive) in installed-version filters and `-MaximumVersion 5.99.99` on `Import-Module`.
 
 #### Backward-compatibility expectations:
 
@@ -197,32 +198,40 @@ See "Timing Requirements" and "Conditional Sharding Requirement".
 
 1. `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`
 2. `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1`
-3. `scripts/powershell/PoshQC/PoshQC.psm1` (line 57 pin)
-4. `extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psm1` (line 57 pin, identical)
-5. `scripts/powershell/PoshQC/README.md` (line 16 pin text and profiler-mode note)
+3. `scripts/powershell/PoshQC/PoshQC.psm1` (the `$requiredModules` block at lines 55-58, with the line 57 pin, plus the version filters at lines 61 and 74: pin, ceiling, and one inserted comment line; D8)
+4. `extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psm1` (identical to item 3)
+5. `scripts/powershell/PoshQC/README.md` (line 16 pin and ceiling text, and profiler-mode note)
 6. `extensions/drm-copilot/resources/powershell/PoshQC/README.md` (identical)
-7. `.github/workflows/_poshqc.yml` (line 73 `-MinimumVersion` only; job body)
+7. `.github/workflows/_poshqc.yml` (line 73 `Import-Module Pester` version arguments only, `-MinimumVersion` and `-MaximumVersion`; job body)
 8. `scripts/host-tools.manifest.json` (line 15)
-9. `.devcontainer/post-create.sh` (line 246)
-10. `.github/codex/codex-web-setup.sh` (line 226)
+9. `.devcontainer/post-create.sh` (line 246 pin and ceiling, line 262 version filter)
+10. `.github/codex/codex-web-setup.sh` (line 226 pin and ceiling, line 231 version filter)
 11. `tests/scripts/host-tools.manifest.Tests.ps1` (Pester 5.6.1 test name, assertion, and mocked installed version)
 12. `tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1` (line 132, context `committed manifest`, test `AC07-DRYRUN-COMMITTED-MANIFEST`: expected text `Pester 5.6.1` becomes `Pester 5.9.0`)
 13. `extensions/drm-copilot/CHANGELOG.md` (`[Unreleased]` entry)
 14. `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1` (new regression test)
 15. Evidence under `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/` (`baseline/`, `qa-gates/`, `regression-testing/`)
+16. `scripts/powershell/PoshQC/PoshQC.Testing.psm1` (default `EnsureModule` seam at lines 163-169 and its call at line 305; D8)
+17. `extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1` (identical to item 16)
+18. `tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1` (lines 118 and 135: present-module fixture version `9.9.9` becomes `5.9.5`; D8)
+19. `tests/scripts/powershell/PoshQC/PoshQC.EntryPoints.Tests.ps1` (lines 46, 58, and 59: the same fixture change and its expected log text; D8)
+20. `tests/scripts/powershell/PoshQC/PoshQC.ModuleCoverage.Tests.ps1` (new coverage test for `PoshQC.psm1`; orchestrator decision D6, recorded in the plan)
+
+Items 16-20 are not in research §2.3 or §10. Items 16-19 follow from D8: the import ceiling is set in the default `EnsureModule` seam, and the existing fixtures inject a present module at `9.9.9`, which is above the 6.0.0 ceiling and would make the install seam and its post-install check run. Item 20 follows from orchestrator decision D6, which raises the per-file LINE coverage of the modified `PoshQC.psm1` toward the 85% per-file gate for modified files.
 
 Spec-time correction to research: item 12 is not in research §2.3 or §10. Research N2 excluded `HostBootstrap.Invoke.Tests.ps1` as a synthetic-manifest fixture, but its `committed manifest` context reads `scripts/host-tools.manifest.json` (line 117) and asserts `Pester 5.6.1` at line 132; that assertion fails once the manifest says 5.9.0. Because the research N2 cross-check covered only `tests/scripts/host-tools.manifest.Tests.ps1`, the N2 family is not exhaustive. This spec therefore states no count of affected test lines; completeness of the test-side pin change is verified by the full PoshQC test run (AC-07) rather than by a fixed count.
 
 ### Additional files written only if the sharding trigger fires
 
-- `.github/workflows/_poshqc.yml` (job and step bodies)
+Sharding-only files (the files that AC-11 requires to be unchanged when the trigger does not fire):
+
 - `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`
 - New PoshQC sub-module(s) for the shard selector and coverage merge, in both `scripts/powershell/PoshQC/` and `extensions/drm-copilot/resources/powershell/PoshQC/`
-- `scripts/powershell/PoshQC/PoshQC.psm1` and `extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psm1` (sub-module load list)
-- `scripts/powershell/PoshQC/PoshQC.Testing.psm1` and `extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1` (parameters only)
 - `scripts/powershell/PoshQC/PoshQC.psd1` and its bundled copy, only if the new sub-module must be declared there
 - `tests/scripts/dev_tools/test_poshqc_bundled_parity.py` (`POSHQC_PARITY_PATHS`)
 - New unit tests under `tests/scripts/powershell/PoshQC/` for the selector and merge functions
+
+Primary-path files that receive additional edits on the sharding path (they are not sharding-only files): `.github/workflows/_poshqc.yml` (item 7; job and step bodies), `scripts/powershell/PoshQC/PoshQC.psm1` and its bundled copy (items 3-4; sub-module load list), and `scripts/powershell/PoshQC/PoshQC.Testing.psm1` and its bundled copy (items 16-17; shard parameters only).
 
 ## Assumptions, Constraints, Dependencies
 
@@ -243,7 +252,7 @@ Spec-time correction to research: item 12 is not in research §2.3 or §10. Rese
 - User-facing or API changes: none to cmdlet signatures on the primary path. Sharding path adds `-ShardIndex`/`-ShardCount` to `Invoke-PoshQCTest`.
 - Data or migration considerations: per-file covered counts may shift; every shift is documented (FR-03).
 - Logging/telemetry updates (if any): none.
-- Compatibility notes (CLI flags, config schemas, versioning): runsettings gains one key; Pester minimum raised to 5.9.0; bundled change reaches MCP consumers on the next package release.
+- Compatibility notes (CLI flags, config schemas, versioning): runsettings gains one key; Pester minimum raised to 5.9.0 with a ceiling below 6.0 (D8), so an installed Pester 6.x satisfies neither `Install-PoshQCTool` nor the `Invoke-PoshQCTest` import; bundled change reaches MCP consumers on the next package release.
 
 ## Test Strategy
 
@@ -254,8 +263,8 @@ Seeded from issue:
 - [x] Manual verification notes: record the CI step and job times before and after. If the step is still above about 8 minutes, shard it across a matrix and merge the coverage reports.
 
 - Regression tests to add or update: `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1` (FR-05); fail-before output stored under `evidence/regression-testing/` before the fix, pass-after output after the fix.
-- Unit tests (Pester) for the fixed behavior and boundaries: the regression test; updated `tests/scripts/host-tools.manifest.Tests.ps1` and `tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1`.
-- Edge cases and negative scenarios: `Install-PoshQCTool` case where `FindModule` first returns no qualifying version, so the install seam is invoked; assertion on the exact version argument.
+- Unit tests (Pester) for the fixed behavior and boundaries: the regression test, including the D8 ceiling cases named in AC-16; updated `tests/scripts/host-tools.manifest.Tests.ps1` and `tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1`; the D8 fixture updates in `tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1` and `tests/scripts/powershell/PoshQC/PoshQC.EntryPoints.Tests.ps1`; and the new `tests/scripts/powershell/PoshQC/PoshQC.ModuleCoverage.Tests.ps1` (D6).
+- Edge cases and negative scenarios: `Install-PoshQCTool` case where `FindModule` first returns no qualifying version, so the install seam is invoked; assertion on the exact version argument; `Install-PoshQCTool` case where only Pester 6.0.0 is installed, so the install seam still receives 5.9.0 (D8).
 - Error handling and logging verification: none added.
 - Coverage impact and targets for changed lines/modules: repo-wide LINE >= 85% on the PR-head artifact; denominator equal to baseline; per-file diff documented.
 - Toolchain commands to run: self-hosted PoshQC `Invoke-PoshQCFormat`, `Invoke-PoshQCAnalyze`, `Invoke-PoshQCTest` (import `scripts/powershell/PoshQC/PoshQC.psd1` directly, not the MCP route; research §8); `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py`; actionlint on `_poshqc.yml` if available.
@@ -288,13 +297,13 @@ CI-dependent criteria: AC-08, AC-09, AC-10, AC-11, AC-12. They remain unchecked 
 | Risk | Assessment (research §9) | Mitigation |
 |---|---|---|
 | Windows PowerShell 5.1 | Tracer patches by major version; CI uses pwsh 7.x; many suites require 7.0. | No action; README note (FR-10). |
-| Linux hook job | Coverage disabled there; only the `-MinimumVersion` string changes. | `PoshQcWorkflow.Tests.ps1` continues to pass (AC-07). |
+| Linux hook job | Coverage disabled there; only the `Import-Module Pester` version arguments change (`-MinimumVersion 5.9.0 -MaximumVersion 5.99.99`). | `PoshQcWorkflow.Tests.ps1` continues to pass (AC-07); `RS07-WORKFLOW-LINUX-PESTER-RANGE` asserts the range (AC-16). |
 | Experimental flag in Pester 5 | `UseBreakpoints = $false` is labeled experimental in v5 docs; default in v6. | Per-file diff gate (AC-09); one-key rollback in two files. |
 | Tracer interaction with tests | Tracer uses `Set-PSDebug -Trace 1`; no test calls `Set-PSDebug`, `Set-PSBreakpoint`, or real nested `Invoke-Pester`. | Re-check if the CI run shows tracer errors. |
 | Per-file coverage shift | Hits can differ by path string or breakpoint binding (research §3.2). | Per-file LINE diff of every sourcefile (AC-09); denominator equality (AC-08). |
 | Report-generation duplicate key | `Get-CoverageReport` uses `Hashtable.Add` without a duplicate guard (source observation, not a confirmed defect). | First place to inspect on such a failure. |
-| Pester 6 on a future image | Floor-only install and highest-version import. | Optional ceiling deferred (non-goal). |
-| File-size limit | Primary fix adds one line per runsettings copy; sharding would pressure `PoshQC.Testing.psm1`. | New logic in new small files (AC-15). |
+| Pester 6 on a future image | Without a ceiling, floor-only install and highest-version import would select Pester 6 silently. | Ceiling below 6.0 at the AC-16 sites (D8). `scripts/dev-tools/HostVerification.psm1` still accepts an installed Pester 6.x (residual, candidate follow-up; non-goal). |
+| File-size limit | Primary fix adds one line per runsettings copy and one comment line to `PoshQC.Testing.psm1` (D8); sharding would pressure `PoshQC.Testing.psm1`. | New logic in new small files (AC-15). |
 | Concurrent item #952 | Owns `ci.yml` and `on:` blocks. | Edits limited to `_poshqc.yml` job/step bodies (AC-13). |
 | Bundle/MCP lag | MCP consumers keep breakpoint mode until republish. | CHANGELOG entry (AC-06). |
 | Baseline artifact expiry | Run 38846579572 artifacts may be unavailable. | Fallback baseline run defined in "Assumptions". |
