@@ -45,3 +45,31 @@ Current text (verbatim):
 Why it becomes stale after issue #952: the gate is now method-agnostic, so the parallel allow-branch authorizes any gated merge or enqueue command for the item, not only `gh pr merge --merge`.
 
 Proposed replacement wording (for "authorizes a per-item `gh pr merge --merge`"): "authorizes a per-item merge or merge-queue enqueue (any `gh pr merge` spelling except a pure `--disable-auto`, or a `gh api` merge or enqueue mutation; issue #952)".
+
+## Record 4
+
+File: scripts/powershell/PoshQC/settings/pester.runsettings.psd1 (mirror: extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1)
+
+Lines: 17-27 (both copies)
+
+Type: operator decision on coverage configuration, not a rule-file edit; carried forward from the open question of issue #936 (`docs/features/active/2026-10-15-hook-coverage-attribution-gaps-936/research/2026-10-15T18-30-hook-coverage-attribution-research.md`, Risks and Open Questions, item 2).
+
+Current text (verbatim, both copies):
+
+```powershell
+    CodeCoverage = @{
+        Enabled               = $true
+        # Use Pester's CoverageGutters format so VS Code Coverage Gutters
+        # can map file paths correctly.
+        OutputFormat          = 'CoverageGutters'
+        OutputPath            = 'artifacts/pester/powershell-coverage.xml'
+        # Issue #527: no Path list. Invoke-PoshQCTest derives the coverage population from the
+        # workspace (config/poshqc-coverage.json, else the effective test scan folders); see README.md.
+        # Optional: don't fail the run on coverage percentage
+        CoveragePercentTarget = 0
+    }
+```
+
+Why it is recorded here: CI coverage runs Pester 5.x in breakpoint mode because this block sets no UseBreakpoints key. Under the issue #936 mechanism (likely, not experimentally verified), a line breakpoint binds to the first compiled instance of a file, so a suite that runs after a script-block cache clear executes a new compiled instance whose hits are not credited. This is a repository-wide attribution defect, not a defect of one file. Issue #952 adds a further instance: on run 38933561015 `.codex/hooks/enforce-epic-merge-gate-command.ps1` reports 74.07% line coverage while its byte-identical Claude copy reports 100.00%, and each of its 14 uncredited lines is executed by a passing Codex row (`evidence/regression-testing/codex-helper-coverage-diagnosis.*.md`).
+
+Proposed change (operator decision required): add `UseBreakpoints = $false` to this block in both copies, after a one-off CI dispatch with the setting shows its effect on the repository-wide figures. Issue #936 did not adopt this change because it alters measurement for every file in the coverage population and for extension consumers of PoshQC, Pester 5.x labels the option experimental, and it may affect `tests/scripts/powershell/PoshQC/PoshQC.Coverage.Tests.ps1` and `tests/scripts/powershell/PoshQC/PoshQC.CoverageConfig.Tests.ps1`. Issue #952 makes no change to either copy.

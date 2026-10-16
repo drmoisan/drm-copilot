@@ -26,6 +26,14 @@
     Determinism: every case drives the pure decision seam or a pure string function with
     literal fixtures, and both checkpoints arrive as parameters rather than from disk. No
     disk I/O, no child process, no temporary file, and no clock read.
+
+    Coverage attribution note (issue #952 R1). The reader row for
+    https://github.com/o/r/pull/5 executes Codex helper lines 67-68, and the REST rows
+    (gh api -X PUT .../pulls/5/merge, as reader and as decision) execute lines 182-186,
+    in-process. Full-run CI coverage can still report those lines as uncovered through the
+    issue #936 mechanism (line breakpoints bound to an earlier compiled instance of the
+    helper code); enforce-epic-merge-gate-command.Tests.ps1 in this folder names the
+    assertion for each line.
 #>
 
 Describe 'Codex enforce-epic-merge-gate merge-queue scope (issue #952)' {
@@ -65,8 +73,8 @@ Describe 'Codex enforce-epic-merge-gate merge-queue scope (issue #952)' {
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     It 'resolves the selector helper functions from the Codex helper file' {
-        # Coverage is credited to the file that defines the executing function, so this suite
-        # must run the Codex copy rather than its byte-identical Claude twin (issue #952 R1).
+        # The Codex gate dot-sources the selector helper from its own directory, so each
+        # function must be defined by the Codex helper file (issue #952 R1 provenance check).
         foreach ($name in @('Get-EpicMergeGateSelectorPrNumber', 'ConvertFrom-EpicMergeGateSelector', 'Test-EpicMergeGateCommandInScope')) {
             $definitionFile = [string](Get-Command -Name $name -CommandType Function).ScriptBlock.File
             ($definitionFile -replace '\\', '/') | Should -BeLike '*/.codex/hooks/enforce-epic-merge-gate-command.ps1' -Because "$name must be defined by the Codex helper copy"

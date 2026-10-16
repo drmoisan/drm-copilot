@@ -11,6 +11,22 @@
     helper file (issue #952 remediation R1). The CR-4 row pins that a non-numeric
     --merge=<value> does not end the selector scan.
 
+    Coverage attribution note (issue #952 R1). These rows execute, in-process, every
+    Codex helper line that full-run CI coverage reports as uncovered, and each named
+    assertion can pass only through those lines. Lines 67-68: the two pull-URL converter
+    rows return 5. Line 72: the feature-branch and 99999999999 converter rows return no
+    number. Lines 165 and 166: 'gh pr merge -- 5' returns 5 and 'gh pr merge --merge --'
+    returns no number. Lines 171-172: 'gh pr merge --merge=5' returns 5. Line 179:
+    'gh pr merge --merge' returns no number. Lines 182-186: 'gh api -X PUT
+    repos/o/r/pulls/5/merge' returns 5. Line 189: 'gh api repos/o/r/pulls/5' and
+    'git status' return no number. The likely cause is the issue #936 mechanism: Pester
+    5.x breakpoint coverage binds each line breakpoint to the first compiled instance of
+    the helper code, created earlier in the run by the codex CN-09 rows of
+    tests/scripts/claude-hooks/hook-command-consumers.Issue824.Tests.ps1; this suite later
+    runs a recompiled instance whose hits are not credited. The issue #936 research and
+    this issue's evidence/regression-testing/codex-helper-coverage-diagnosis.*.md record
+    the details.
+
     Determinism: every case calls a pure string function with literal fixtures. No disk I/O,
     no child process, no temporary file, and no clock read.
 #>
