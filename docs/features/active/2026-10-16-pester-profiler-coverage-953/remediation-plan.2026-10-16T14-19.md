@@ -6,7 +6,7 @@
 - **Inputs:** `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-inputs.2026-10-16T14-11.md` (PA-3 / CR-7), `docs/features/active/2026-10-16-pester-profiler-coverage-953/code-review.2026-10-16T14-11.md` (CR-7 to CR-17), `docs/features/active/2026-10-16-pester-profiler-coverage-953/policy-audit.2026-10-16T14-11.md`, `docs/features/active/2026-10-16-pester-profiler-coverage-953/feature-audit.2026-10-16T14-11.md`; reference plans `docs/features/active/2026-10-16-pester-profiler-coverage-953/plan.2026-10-16T00-16.md` (Phase 8 executed through P8-T18) and `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-plan.2026-10-16T10-24.md` (cycle 1).
 - **Planning-time head:** `50c4e6ee8`. Every line citation below was re-derived against the working tree at this head.
 - **Last Updated:** 2026-10-16
-- **Status:** Draft revision 1.1 (preflight delta D1 applied; orchestrator decision D17 drops CR-14), pending executor preflight
+- **Status:** Draft revision 1.2 (preflight delta D1 applied; orchestrator decision D17 drops CR-14; round-2 delta D1 re-derives the P2-T13 `if: always()` line citation against the edited file), pending executor preflight
 - **Version:** 1.1
 
 ## Scope
@@ -728,7 +728,7 @@ Number of shards. When greater than 0, Run.Path is set to this shard's size-bala
   - From the Bash tool, run `git diff --numstat <REM_BASE_SHA> -- .github/workflows/_poshqc.yml` and `git show <REM_BASE_SHA>:.github/workflows/_poshqc.yml` (SHA written literally).
   - Through the Tool route: `(Get-Content -LiteralPath .github/workflows/_poshqc.yml).Count`; `@(Select-String -LiteralPath .github/workflows/_poshqc.yml -SimpleMatch -Pattern 'if: always()').Count`; `@(Select-String -LiteralPath .github/workflows/_poshqc.yml -SimpleMatch -Pattern 'cancelled()').Count`; compare lines 1-5 of the file with lines 1-5 of the `git show` output; and compare the `poshqc-linux-hooks` block of both texts (the line `  poshqc-linux-hooks:` and every following line up to the next line matching `^  [A-Za-z0-9_-]+:\s*$` or the end of the text, trailing blank lines dropped).
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
-  - Acceptance: the numstat row reads `6` added and `5` deleted (lines 38-39, 62, 129, and 133 replaced, plus the `$shardCount` line); the line count is 186; the `if: always()` count is 3 (lines 65, 79, and 180; the job-level line 79 is kept under D17) and the `cancelled()` count is 0; lines 1-5 are identical; the `poshqc-linux-hooks` blocks are identical.
+  - Acceptance: the numstat row reads `6` added and `5` deleted (lines 38-39, 62, 129, and 133 replaced, plus the `$shardCount` line); the line count is 186; the `if: always()` count is 3 (lines 65, 79, and 181 of the edited file; head lines 65, 79, and 180; the job-level line 79 is kept under D17) and the `cancelled()` count is 0; lines 1-5 are identical; the `poshqc-linux-hooks` blocks are identical.
 - [ ] [P2-T14] Run actionlint on the edited workflow through the Tool route with the P0-T16 task text and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-actionlint-after-edit.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: EXIT_CODE 0 with no actionlint output (the `${{ strategy.job-total }}` expression is accepted).
 
