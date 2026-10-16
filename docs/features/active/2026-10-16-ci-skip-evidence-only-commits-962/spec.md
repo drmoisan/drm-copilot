@@ -317,22 +317,22 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
 
 ## Acceptance Criteria
 
-- [ ] AC-1: Event gate. For each `EVENT_NAME` of `merge_group`, `push` and `workflow_dispatch`, `Invoke-CiChangeScope.ps1` writes `code=true` with reason `EVENT_NOT_PULL_REQUEST`, and the injected `-GhInvoker` and `-GitInvoker` are each invoked zero times. Verified by named Pester tests in `tests/scripts/ci/Invoke-CiChangeScope.Tests.ps1`, with matching pure-function tests of `Test-CiChangeScopeEventEligible` in `tests/scripts/ci/CiChangeScope.Tests.ps1`.
-- [ ] AC-2: Fork gate. For a `pull_request` event whose `HEAD_REPO` differs from `REPOSITORY`, the entry script writes `code=true` with reason `FORK_PULL_REQUEST`, and neither invoker is called. Verified by a named Pester test.
-- [ ] AC-3: Run-list failure. When the injected `gh` run-list call returns a non-zero exit, or output that is not valid JSON, the entry script writes `code=true` with reason `RUN_LIST_FAILED`. Verified by two named Pester tests, one per failure form.
-- [ ] AC-4: Job-list failure. When the run list parses but a jobs call for a candidate run fails, the entry script writes `code=true` with reason `JOB_LIST_FAILED`. Verified by a named Pester test.
+- [x] AC-1: Event gate. For each `EVENT_NAME` of `merge_group`, `push` and `workflow_dispatch`, `Invoke-CiChangeScope.ps1` writes `code=true` with reason `EVENT_NOT_PULL_REQUEST`, and the injected `-GhInvoker` and `-GitInvoker` are each invoked zero times. Verified by named Pester tests in `tests/scripts/ci/Invoke-CiChangeScope.Tests.ps1`, with matching pure-function tests of `Test-CiChangeScopeEventEligible` in `tests/scripts/ci/CiChangeScope.Tests.ps1`.
+- [x] AC-2: Fork gate. For a `pull_request` event whose `HEAD_REPO` differs from `REPOSITORY`, the entry script writes `code=true` with reason `FORK_PULL_REQUEST`, and neither invoker is called. Verified by a named Pester test.
+- [x] AC-3: Run-list failure. When the injected `gh` run-list call returns a non-zero exit, or output that is not valid JSON, the entry script writes `code=true` with reason `RUN_LIST_FAILED`. Verified by two named Pester tests, one per failure form.
+- [x] AC-4: Job-list failure. When the run list parses but a jobs call for a candidate run fails, the entry script writes `code=true` with reason `JOB_LIST_FAILED`. Verified by a named Pester test.
 - [x] AC-5: Candidate selection. `Select-CiGreenBaseCandidates` excludes the run whose id equals `RUN_ID` and runs whose `head_repository.full_name` differs from `REPOSITORY`. It returns the remaining runs ordered by `run_number` descending when the input is in unsorted order. Verified by named Pester tests covering current-run exclusion, foreign-head-repository exclusion, and an unsorted input fixture.
-- [ ] AC-6: Full-run marker. `Test-CiFullRunMarker` returns true only when the jobs payload contains a job named `CI full run` with conclusion `success`. It returns false for `skipped`, for any other conclusion, and when the job is absent. When no candidate in the page qualifies, including a page whose only successful runs have a skipped `CI full run`, the entry script writes `code=true` with reason `NO_FULL_GREEN_RUN`. When an older candidate qualifies and a newer one does not, the older candidate is chosen as the base. Verified by named Pester tests.
-- [ ] AC-7: Ancestry. For each of the following injected `git` outcomes, the entry script writes `code=true` with the stated reason:
+- [x] AC-6: Full-run marker. `Test-CiFullRunMarker` returns true only when the jobs payload contains a job named `CI full run` with conclusion `success`. It returns false for `skipped`, for any other conclusion, and when the job is absent. When no candidate in the page qualifies, including a page whose only successful runs have a skipped `CI full run`, the entry script writes `code=true` with reason `NO_FULL_GREEN_RUN`. When an older candidate qualifies and a newer one does not, the older candidate is chosen as the base. Verified by named Pester tests.
+- [x] AC-7: Ancestry. For each of the following injected `git` outcomes, the entry script writes `code=true` with the stated reason:
   - `git cat-file -e <base>^{commit}` fails: `BASE_NOT_PRESENT`;
   - `git merge-base --is-ancestor` exits 1: `BASE_NOT_ANCESTOR`;
   - `git merge-base --is-ancestor` exits with any other non-zero code: `ANCESTRY_CHECK_FAILED`.
 
   Verified by three named Pester tests.
-- [ ] AC-8: Diff invocation. The diff call made through `-GitInvoker` contains each of the arguments `--name-only`, `-z`, `--no-renames`, `--no-color`, `--no-ext-diff` and `--no-relative`, plus the base and head SHAs. A non-zero diff exit, or non-empty output that does not end in NUL, produces `code=true` with reason `DIFF_FAILED`. Verified by named Pester tests, including one that asserts the argument set and one per failure form.
-- [ ] AC-9: Empty diff. An empty path set from the diff produces `code=true` with reason `EMPTY_DIFF`. Verified by a named Pester test of `Get-CiChangeScopePathDecision` and a named entry-script test.
+- [x] AC-8: Diff invocation. The diff call made through `-GitInvoker` contains each of the arguments `--name-only`, `-z`, `--no-renames`, `--no-color`, `--no-ext-diff` and `--no-relative`, plus the base and head SHAs. A non-zero diff exit, or non-empty output that does not end in NUL, produces `code=true` with reason `DIFF_FAILED`. Verified by named Pester tests, including one that asserts the argument set and one per failure form.
+- [x] AC-9: Empty diff. An empty path set from the diff produces `code=true` with reason `EMPTY_DIFF`. Verified by a named Pester test of `Get-CiChangeScopePathDecision` and a named entry-script test.
 - [x] AC-10: Mixed diff. A path set that contains at least one allowlisted path and at least one non-allowlisted path (for example `docs/features/active/x/evidence/a.md` plus `scripts/ci/CiChangeScope.psm1`) produces `code=true` with reason `NON_ALLOWLISTED_PATH: <first non-allowlisted path>`. Verified by a named Pester test.
-- [ ] AC-11: Docs-only diff. When every path is allowlisted and the base qualifies and is an ancestor, the entry script:
+- [x] AC-11: Docs-only diff. When every path is allowlisted and the base qualifies and is an ancestor, the entry script:
   - writes `code=false` to the injected `-OutputWriter` output target;
   - logs `code=false reason=DOCS_ONLY_SINCE_<base sha>`;
   - writes the reason and base SHA to the step-summary target.
@@ -350,7 +350,7 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   - a path with a leading `/`;
   - a prefix with different case (for example `Docs/features/active/x.md`);
   - a path outside `docs/` (for example `config/ci-docs-only-paths.json`).
-- [ ] AC-14: Invalid config.
+- [x] AC-14: Invalid config.
   - `ConvertFrom-CiDocsOnlyPathConfig` throws a specific error for each of: malformed JSON, `version` not equal to 1, an empty or missing `include_prefixes`, and an extension that does not start with `.`.
   - When the entry script receives an invalid config, it writes `code=true` with reason `UNEXPECTED_ERROR` and emits a `::warning::` annotation.
 
@@ -362,8 +362,8 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   - no configured extension is one of `.py`, `.ps1`, `.psm1`, `.psd1`, `.sh`, `.bats`, `.ts`, `.tsx`, `.js`, `.mjs`, `.cjs`, `.cs`, `.yml`, `.yaml` or `.toml`.
 
   The suite passes.
-- [ ] AC-16: Unexpected exception. When an injected seam throws an unexpected exception, the entry script writes `code=true` with reason `UNEXPECTED_ERROR`, emits a `::warning::` annotation, and exits 0. Verified by a named Pester test.
-- [ ] AC-17: Structure. The following hold, verified by file inspection and by the passing suites:
+- [x] AC-16: Unexpected exception. When an injected seam throws an unexpected exception, the entry script writes `code=true` with reason `UNEXPECTED_ERROR`, emits a `::warning::` annotation, and exits 0. Verified by a named Pester test.
+- [x] AC-17: Structure. The following hold, verified by file inspection and by the passing suites:
   - `scripts/ci/CiChangeScope.psm1` contains only the pure functions listed under `## Proposed Fix`, with no `gh`, `git`, file or network calls.
   - `scripts/ci/Invoke-CiChangeScope.ps1` exposes `-GhInvoker`, `-GitInvoker` and `-OutputWriter` parameters and has a dot-source guard.
   - Tests live in `tests/scripts/ci/CiChangeScope.Tests.ps1`, `tests/scripts/ci/Invoke-CiChangeScope.Tests.ps1` and `tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1`.
