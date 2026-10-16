@@ -21,11 +21,11 @@ Evidence-only. No production or test file is changed. Verification evidence is r
 
 ## Acceptance Criteria
 
-- [ ] AC1: `.claude/lib/bash/compute-concurrency-batches.sh` per-file line coverage on main CI run 38683717593 (head f6915d429, kcov artifact `shell-coverage`) is recorded as 100.00% (44/44), at or above the 85% floor, in an evidence artifact under the feature folder `evidence/` tree.
-- [ ] AC2: `.codex/hooks/validate-feature-review-coverage.ps1` per-file line coverage on main CI run 38683717593 (Pester artifact `poshqc-test-results`) is recorded as 100.00% (146/146), at or above the 85% floor, in an evidence artifact under the feature folder `evidence/` tree.
-- [ ] AC3: A verification evidence artifact cites the corroborating committed records with file and line references: the #917 kcov record (81.82% to 100.00%), the #896 Pester records (99.29% to 100.00%), and the statement that the 7.30% figure is superseded.
-- [ ] AC4: No file outside `docs/features/active/untouched-files-coverage-verification-884/` differs from `origin/main` on this branch, so neither production file is modified.
-- [ ] AC5: An issue-update mirror under `evidence/issue-updates/` records the closing comment text for #884 citing CI run 38683717593 and the evidence artifacts.
+- [x] AC1: `.claude/lib/bash/compute-concurrency-batches.sh` per-file line coverage on main CI run 38683717593 (head f6915d429, kcov artifact `shell-coverage`) is recorded as 100.00% (44/44), at or above the 85% floor, in an evidence artifact under the feature folder `evidence/` tree.
+- [x] AC2: `.codex/hooks/validate-feature-review-coverage.ps1` per-file line coverage on main CI run 38683717593 (Pester artifact `poshqc-test-results`) is recorded as 100.00% (146/146), at or above the 85% floor, in an evidence artifact under the feature folder `evidence/` tree.
+- [x] AC3: A verification evidence artifact cites the corroborating committed records with file and line references: the #917 kcov record (81.82% to 100.00%), the #896 Pester records (99.29% to 100.00%), and the statement that the 7.30% figure is superseded.
+- [x] AC4: No file outside `docs/features/active/untouched-files-coverage-verification-884/` differs from `origin/main` on this branch, so neither production file is modified.
+- [x] AC5: An issue-update mirror under `evidence/issue-updates/` records the closing comment text for #884 citing CI run 38683717593 and the evidence artifacts.
 
 ## Dependencies / Risks
 
@@ -43,9 +43,9 @@ Evidence-only. No production or test file is changed. Verification evidence is r
 
 ## Evidence Checklist
 
-- [ ] baseline
-- [ ] targeted verification
-- [ ] end-state
+- [x] baseline
+- [x] targeted verification
+- [x] end-state
 
 ## Follow-ups
 
