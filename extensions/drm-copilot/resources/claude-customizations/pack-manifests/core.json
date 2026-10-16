@@ -181,6 +181,7 @@
     ".claude/lib/project-file-merge/ProjectFileMerge.psm1",
     ".claude/lib/project-file-merge/Resolve-MergeableConflict.ps1",
     ".claude/lib/ci-gate/Invoke-CiGateParser.ps1",
+    ".claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1",
     ".claude/lib/parallel-drift/ParallelDriftHalt.psm1",
     ".claude/lib/parallel-drift/ParallelDrift.psm1",
     ".claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1",
