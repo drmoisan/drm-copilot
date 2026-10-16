@@ -49,7 +49,7 @@ Describe 'fixture' {
             Source   = @'
 Describe 'fixture' {
     BeforeAll {
-$script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
         . $script:UnderTest
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }
         Import-Module ./WorktreeRunResolution.psm1
@@ -78,7 +78,7 @@ Describe 'fixture' {
             Source   = @'
 Describe 'fixture' {
     BeforeAll {
-$script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
         . $script:UnderTest
         Import-Module ./EpicScopeResolution.psm1
         Mock Get-EpicScopeCheckpointText -ModuleName:WrongModule { $null }
@@ -94,7 +94,7 @@ $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
             Source   = @'
 Describe 'fixture' {
     BeforeAll {
-$script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
         . $script:UnderTest
         Import-Module ./EpicScopeResolution.psm1
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { param($Path) $null }
@@ -110,7 +110,7 @@ $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
             Source   = @'
 Describe 'fixture' {
     BeforeAll {
-$script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
         . $script:UnderTest
         Import-Module ./EpicScopeResolution.psm1
         Mock Get-EpicScopeCheckpointText -ModuleName $moduleName { $null }
@@ -150,7 +150,7 @@ $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
             Source = @'
 Describe 'fixture' {
     BeforeAll {
-$script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
         . $script:UnderTest
         Import-Module ./EpicScopeResolution.psm1
         Mock Get-EpicScopeCheckpointText -ModuleName:EpicScopeResolution { $null }
@@ -165,7 +165,7 @@ $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
             Source = @'
 Describe 'fixture' {
     BeforeAll {
-$script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
+        $script:UnderTest = Join-Path $PSScriptRoot 'hooks/enforce-x.ps1'
         . $script:UnderTest
         Import-Module ./EpicScopeResolution.psm1
         Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $null }

@@ -107,9 +107,14 @@ function Test-EpicStateIsolationNullBody {
 }
 
 function Test-EpicStateIsolationConditionalAncestor {
-    # Pure (issue #903, #737 F-1): true when Node is an if, switch, loop, try, or trap that may skip Command, except a single-clause if with no else whose condition is one Get-Command <Name> pipeline naming the Command's target.
+    # Pure (issue #903, #737 F-1): true when Node is an if, switch, loop, try, or trap that may skip
+    # Command, except a single-clause if with no else whose condition is one Get-Command <Name>
+    # pipeline naming the Command's target.
     [OutputType([bool])]
-    param([Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $Node, [Parameter(Mandatory)] [System.Management.Automation.Language.CommandAst] $Command)
+    param(
+        [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $Node,
+        [Parameter(Mandatory)] [System.Management.Automation.Language.CommandAst] $Command
+    )
     if ($Node -isnot [System.Management.Automation.Language.IfStatementAst]) {
         return ($Node -is [System.Management.Automation.Language.SwitchStatementAst] -or $Node -is [System.Management.Automation.Language.LoopStatementAst] -or
             $Node -is [System.Management.Automation.Language.TryStatementAst] -or $Node -is [System.Management.Automation.Language.TrapStatementAst])

@@ -8,6 +8,11 @@
     loaded-source closure of a suite from string literals, take a census of the read seams in
     that closure, and detect process-spawning suites.
 
+    Get-EpicStateProcessSpawningHook and Get-EpicStateVariableHookLoad call
+    Get-EpicStateIsolationHookReference, defined in EpicStateIsolation.HookReference.Helpers.ps1,
+    which EpicStateIsolation.Helpers.ps1 dot-sources; dot-source EpicStateIsolation.Helpers.ps1
+    before calling either function (issue #935).
+
     Every function is pure over text and AST except the two readers at the file boundary,
     Get-EpicStateDiscoveredSuite and Get-EpicStateSourceReader, which read the committed tree
     from a supplied repository root. Callers inject a reader script block, so fixtures run over
