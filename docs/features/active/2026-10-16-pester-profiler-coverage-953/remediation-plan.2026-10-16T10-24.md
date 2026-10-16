@@ -250,7 +250,7 @@ Ownership: P0-T1 is `(owner: orchestrator)` and completes before the executor st
 
 ### Phase 1 — Regression Tests for CR-1 and CR-2 (must fail first)
 
-- [ ] [P1-T1] Edit `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1` with the Edit tool.
+- [x] [P1-T1] Edit `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1` with the Edit tool.
   - Insert the two lines below immediately after line 130 (`            Mock -CommandName Import-Module -MockWith { }`, inside RS06), at the same 12-space indentation.
   - No other line changes. RS06's assertion is unchanged; the mock makes the case independent of the host's installed Pester (see "Assumptions and Advisories", Test determinism).
   - Acceptance: `RS06-TEST-IMPORT-PESTER-MAXIMUM` occurs once in the file, and the file contains `Version = [version]'5.9.5'` (quoted here as the literal this task creates).
@@ -260,7 +260,7 @@ Ownership: P0-T1 is `(owner: orchestrator)` and completes before the executor st
             Mock -CommandName Get-Module -MockWith { [pscustomobject]@{ Name = 'Pester'; Version = [version]'5.9.5' } }
 ```
 
-- [ ] [P1-T2] Edit `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1` with the Edit tool: append the 68 lines below after the current last line (the closing `}` of the `PoshQC Linux hook job Pester import` Describe block), starting with one blank line and ending with one final newline.
+- [x] [P1-T2] Edit `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1` with the Edit tool: append the 68 lines below after the current last line (the closing `}` of the `PoshQC Linux hook job Pester import` Describe block), starting with one blank line and ending with one final newline.
   - The block reads no file, writes no file, installs no module, and mocks `Get-Module` and `Import-Module` only inside `InModuleScope PoshQC`. It follows the precedent of RS06 and `tests/scripts/powershell/PoshQC/PoshQC.TestingSeamDefaults.Tests.ps1:90-99`.
   - The unfiltered `Get-Module` mock models the pre-fix query (`-ListAvailable -Name`). The `-ParameterFilter { $null -ne $FullyQualifiedName }` mock models the range-qualified query by applying the requested bounds to the same version list.
   - How each case fails on the pre-fix tree:
@@ -339,7 +339,7 @@ Describe 'Invoke-PoshQCTest Pester presence check and import range (issue #953, 
 }
 ```
 
-- [ ] [P1-T3] Edit `tests/scripts/powershell/PoshQC/PoshQC.TestingSeamDefaults.Tests.ps1` with the Edit tool.
+- [x] [P1-T3] Edit `tests/scripts/powershell/PoshQC/PoshQC.TestingSeamDefaults.Tests.ps1` with the Edit tool.
   - Insert the two lines below immediately after line 78 (`            Mock -CommandName Import-Module -MockWith { }`, inside the case `imports the requested module with -Global`), at the same 12-space indentation.
   - No other line changes; the assertion at lines 84-86 is unchanged.
   - Acceptance: the file contains `Version = [version]'5.9.5'` exactly once.
@@ -349,13 +349,13 @@ Describe 'Invoke-PoshQCTest Pester presence check and import range (issue #953, 
             Mock -CommandName Get-Module -MockWith { [pscustomobject]@{ Name = 'Pester'; Version = [version]'5.9.5' } }
 ```
 
-- [ ] [P1-T4] Verify the test edits for `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1` and `tests/scripts/powershell/PoshQC/PoshQC.TestingSeamDefaults.Tests.ps1`.
+- [x] [P1-T4] Verify the test edits for `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1` and `tests/scripts/powershell/PoshQC/PoshQC.TestingSeamDefaults.Tests.ps1`.
   - Run `git diff --numstat <REM_BASE_SHA> -- tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1 tests/scripts/powershell/PoshQC/PoshQC.TestingSeamDefaults.Tests.ps1` from the Bash tool, and `(Get-Content -LiteralPath <path>).Count` for each file through the Tool route.
   - Write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r1-test-edits.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (both numstat rows and both counts).
   - Acceptance:
     - The RunSettings row reads `70` added and `0` deleted, and the TestingSeamDefaults row reads `2` added and `0` deleted.
     - The line counts are 233 and 124 (both at most 500, AC-15).
-- [ ] [P1-T5] [expect-fail] Run TARGETED_RUN(`cr-before`, `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1`) on the pre-fix production tree and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r1-cr-regression-fail-before.<ts>.md`.
+- [x] [P1-T5] [expect-fail] Run TARGETED_RUN(`cr-before`, `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1`) on the pre-fix production tree and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r1-cr-regression-fail-before.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 3`, and `Output Summary:` with the JRP totals, the JRP token check (step 4) for RS01-RS07, and the JRP failure check (step 5) with the failure message for RS08, RS09, and RS10.
   - Acceptance:
     - Run valid, EXIT_CODE 3 (Pester exits with the failed-test count when `Run.Exit` is set), JRP `tests` 10, `failures` 3, and `errors` 0.

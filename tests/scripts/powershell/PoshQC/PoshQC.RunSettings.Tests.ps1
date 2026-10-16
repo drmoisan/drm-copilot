@@ -128,6 +128,8 @@ Describe 'Invoke-PoshQCTest Pester import ceiling (issue #953)' {
         InModuleScope PoshQC {
             # Arrange: intercept the import; a nonexistent settings path stops the run right after the seam.
             Mock -CommandName Import-Module -MockWith { }
+            # Report a supported Pester so the result does not depend on the modules installed on the host (issue #953, CR-1).
+            Mock -CommandName Get-Module -MockWith { [pscustomobject]@{ Name = 'Pester'; Version = [version]'5.9.5' } }
 
             # Act
             { Invoke-PoshQCTest -Root '/rs06-root' -SettingsPath '/rs06-missing-settings.psd1' } | Should -Throw '*Settings not found*'
@@ -159,5 +161,73 @@ Describe 'PoshQC Linux hook job Pester import (issue #953)' {
         $imports.Count | Should -Be 1 -Because 'the Linux hook job imports Pester once'
         $imports[0] | Should -Match '-MinimumVersion 5\.9\.0(\s|$)'
         $imports[0] | Should -Match '-MaximumVersion 5\.99\.99(\s|$)'
+    }
+}
+
+Describe 'Invoke-PoshQCTest Pester presence check and import range (issue #953, CR-1, CR-2)' {
+    It 'RS08-TEST-IMPORT-PESTER-RANGE-BOUNDS queries and imports Pester with minimum 5.9.0 and maximum 5.99.99' {
+        InModuleScope PoshQC {
+            # Arrange: one installed Pester is below, one inside, and one above the supported range. The
+            # unqualified lookup returns all three; the range-qualified lookup applies the requested bounds.
+            Mock -CommandName Get-Module -MockWith {
+                foreach ($version in '3.4.0', '5.9.5', '6.0.0') { [pscustomobject]@{ Name = 'Pester'; Version = [version]$version } }
+            }
+            Mock -CommandName Get-Module -ParameterFilter { $null -ne $FullyQualifiedName } -MockWith {
+                $range = $FullyQualifiedName[0]
+                foreach ($version in '3.4.0', '5.9.5', '6.0.0') {
+                    if ([version]$version -ge $range.Version -and [version]$version -le [version]$range.MaximumVersion) {
+                        [pscustomobject]@{ Name = 'Pester'; Version = [version]$version }
+                    }
+                }
+            }
+            Mock -CommandName Import-Module -MockWith { }
+
+            # Act: a nonexistent settings path stops the run right after the seam.
+            { Invoke-PoshQCTest -Root '/rs08-root' -SettingsPath '/rs08-missing-settings.psd1' } | Should -Throw '*Settings not found*'
+
+            # Assert: the import carries both bounds, and the presence query carries the same range.
+            Should -Invoke -CommandName Import-Module -Times 1 -Exactly -ParameterFilter {
+                $Name -eq 'Pester' -and $Global -eq $true -and $MinimumVersion -eq [version]'5.9.0' -and $MaximumVersion -eq '5.99.99'
+            }
+            Should -Invoke -CommandName Get-Module -Times 1 -Exactly -ParameterFilter {
+                $ListAvailable -and $null -ne $FullyQualifiedName -and $FullyQualifiedName[0].Name -eq 'Pester' -and $FullyQualifiedName[0].Version -eq [version]'5.9.0' -and $FullyQualifiedName[0].MaximumVersion -eq '5.99.99'
+            }
+        }
+    }
+
+    It 'RS09-TEST-PESTER-6-ONLY-ACTIONABLE-ERROR throws the install message without importing when only Pester 6.0.0 is installed' {
+        InModuleScope PoshQC {
+            # Arrange: the only installed Pester is above the ceiling, so the range-qualified lookup returns nothing.
+            Mock -CommandName Get-Module -MockWith { [pscustomobject]@{ Name = 'Pester'; Version = [version]'6.0.0' } }
+            Mock -CommandName Get-Module -ParameterFilter { $null -ne $FullyQualifiedName } -MockWith {
+                $range = $FullyQualifiedName[0]
+                if ([version]'6.0.0' -ge $range.Version -and [version]'6.0.0' -le [version]$range.MaximumVersion) {
+                    [pscustomobject]@{ Name = 'Pester'; Version = [version]'6.0.0' }
+                }
+            }
+            Mock -CommandName Import-Module -MockWith { }
+
+            # Act / Assert
+            { Invoke-PoshQCTest -Root '/rs09-root' -SettingsPath '/rs09-missing-settings.psd1' } | Should -Throw '*Run Install-PoshQCTool*'
+            Should -Invoke -CommandName Import-Module -Times 0 -Exactly
+        }
+    }
+
+    It 'RS10-TEST-PESTER-INBOX-ONLY-ACTIONABLE-ERROR throws the install message without importing when only Pester 3.4.0 is installed' {
+        InModuleScope PoshQC {
+            # Arrange: the only installed Pester is the inbox 3.4.0 below the minimum, so the range-qualified lookup returns nothing.
+            Mock -CommandName Get-Module -MockWith { [pscustomobject]@{ Name = 'Pester'; Version = [version]'3.4.0' } }
+            Mock -CommandName Get-Module -ParameterFilter { $null -ne $FullyQualifiedName } -MockWith {
+                $range = $FullyQualifiedName[0]
+                if ([version]'3.4.0' -ge $range.Version -and [version]'3.4.0' -le [version]$range.MaximumVersion) {
+                    [pscustomobject]@{ Name = 'Pester'; Version = [version]'3.4.0' }
+                }
+            }
+            Mock -CommandName Import-Module -MockWith { }
+
+            # Act / Assert
+            { Invoke-PoshQCTest -Root '/rs10-root' -SettingsPath '/rs10-missing-settings.psd1' } | Should -Throw '*Run Install-PoshQCTool*'
+            Should -Invoke -CommandName Import-Module -Times 0 -Exactly
+        }
     }
 }
