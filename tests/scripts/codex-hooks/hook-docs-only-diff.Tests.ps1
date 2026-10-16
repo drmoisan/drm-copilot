@@ -17,7 +17,7 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
         . (Join-Path $script:RepoRoot '.codex/hooks/hook-command-invocation.ps1')
         . (Join-Path $script:RepoRoot '.codex/hooks/hook-docs-only-diff.ps1')
 
-        function Invoke-CodexDocsOnlyFakeDocs {
+        function Invoke-CodexDocsOnlyFakeDocPath {
             $global:LASTEXITCODE = 0
             "docs/a.md`0"
         }
@@ -53,11 +53,16 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
                 [string] $DiffOutput = "docs/a.md`0"
             )
 
-            Mock Invoke-DocsOnlyGhExe -MockWith ({ [pscustomobject]@{ ExitCode = $GhExit; Output = $GhOutput } }.GetNewClosure())
+            # The parameters are read here, outside the mock scriptblocks, so each is used directly.
+            $ghResult = [pscustomobject]@{ ExitCode = $GhExit; Output = $GhOutput }
+            $baseResult = [pscustomobject]@{ ExitCode = $BaseExit; Output = $BaseOutput }
+            $headResult = [pscustomobject]@{ ExitCode = $HeadExit; Output = $HeadOutput }
+            $diffResult = [pscustomobject]@{ ExitCode = $DiffExit; Output = $DiffOutput }
+            Mock Invoke-DocsOnlyGhExe -MockWith ({ $ghResult }.GetNewClosure())
             Mock Invoke-DocsOnlyGitExe -MockWith { [pscustomobject]@{ ExitCode = 1; Output = '' } }
-            Mock Invoke-DocsOnlyGitExe -ParameterFilter { $GitArgs[-1] -ceq 'refs/remotes/origin/main^{commit}' } -MockWith ({ [pscustomobject]@{ ExitCode = $BaseExit; Output = $BaseOutput } }.GetNewClosure())
-            Mock Invoke-DocsOnlyGitExe -ParameterFilter { $GitArgs[-1] -ceq '0123456789abcdef0123456789abcdef01234567^{commit}' } -MockWith ({ [pscustomobject]@{ ExitCode = $HeadExit; Output = $HeadOutput } }.GetNewClosure())
-            Mock Invoke-DocsOnlyGitExe -ParameterFilter { $GitArgs[0] -eq 'diff' } -MockWith ({ [pscustomobject]@{ ExitCode = $DiffExit; Output = $DiffOutput } }.GetNewClosure())
+            Mock Invoke-DocsOnlyGitExe -ParameterFilter { $GitArgs[-1] -ceq 'refs/remotes/origin/main^{commit}' } -MockWith ({ $baseResult }.GetNewClosure())
+            Mock Invoke-DocsOnlyGitExe -ParameterFilter { $GitArgs[-1] -ceq '0123456789abcdef0123456789abcdef01234567^{commit}' } -MockWith ({ $headResult }.GetNewClosure())
+            Mock Invoke-DocsOnlyGitExe -ParameterFilter { $GitArgs[0] -eq 'diff' } -MockWith ({ $diffResult }.GetNewClosure())
         }
     }
 
@@ -89,7 +94,7 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
     }
 
     It 'runs the git seam for <Name> (codex copy, issue #927)' -ForEach @(
-        @{ Name = 'a success'; Root = 'exists'; Fake = 'Invoke-CodexDocsOnlyFakeDocs'; ExitCode = 0; Output = "docs/a.md`0" }
+        @{ Name = 'a success'; Root = 'exists'; Fake = 'Invoke-CodexDocsOnlyFakeDocPath'; ExitCode = 0; Output = "docs/a.md`0" }
         @{ Name = 'a non-zero exit'; Root = 'exists'; Fake = 'Invoke-CodexDocsOnlyFakeExit2'; ExitCode = 2; Output = '' }
         @{ Name = 'a throw'; Root = 'exists'; Fake = 'Invoke-CodexDocsOnlyFakeThrow'; ExitCode = -1; Output = '' }
         @{ Name = 'a blank root'; Root = ''; Fake = 'Invoke-CodexDocsOnlyFakeMarker'; ExitCode = -1; Output = '' }
