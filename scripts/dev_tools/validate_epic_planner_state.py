@@ -219,8 +219,52 @@ def _validate_dependency_waves(features: list[dict[str, Any]]) -> list[str]:
     return errors
 
 
-def _validate_ready_features(features: list[dict[str, Any]]) -> list[str]:
-    """Require every child to be fully prepared and preflight-cleared."""
+def _validate_feature_model_receipt(
+    feature: dict[str, Any], *, prefix: str
+) -> list[str]:
+    """Validate one prepared child's orchestrator model routing receipt."""
+
+    errors: list[str] = []
+    model_receipt = feature.get("model_routing_receipt")
+    receipt_errors = validate_codex_model_routing_receipts([model_receipt])
+    errors.extend(
+        error.replace(
+            "Checkpoint codex_model_routing_receipts[0]",
+            f"{prefix}.model_routing_receipt",
+        )
+        for error in receipt_errors
+    )
+    if (
+        isinstance(model_receipt, dict)
+        and cast("dict[str, Any]", model_receipt).get("logical_agent") != "orchestrator"
+    ):
+        errors.append(
+            f"{prefix}.model_routing_receipt.logical_agent must be 'orchestrator'."
+        )
+    if isinstance(model_receipt, dict):
+        model_map = cast("dict[str, Any]", model_receipt)
+        if model_map.get("complexity_band") != feature.get("complexity_band"):
+            errors.append(
+                f"{prefix}.model_routing_receipt.complexity_band must match "
+                f"feature complexity_band {feature.get('complexity_band')!r}."
+            )
+        if model_map.get("execution_context") != "epic_preparation_child":
+            errors.append(
+                f"{prefix}.model_routing_receipt.execution_context must be "
+                "'epic_preparation_child'."
+            )
+    return errors
+
+
+def _validate_ready_features(
+    features: list[dict[str, Any]], *, key_gated: bool = False
+) -> list[str]:
+    """Require every child to be fully prepared and preflight-cleared.
+
+    When ``key_gated`` is true (no Codex flag), each per-feature receipt check
+    runs only for a feature that carries its key (``model_routing_receipt``,
+    ``topology_receipt``).
+    """
 
     errors: list[str] = []
     if len(features) < 2:
@@ -238,41 +282,15 @@ def _validate_ready_features(features: list[dict[str, Any]]) -> list[str]:
             errors.append(f"{prefix}.preparation_status must be 'prepared'.")
         if feature.get("preflight_status") != "PREFLIGHT: ALL CLEAR":
             errors.append(f"{prefix}.preflight_status must be 'PREFLIGHT: ALL CLEAR'.")
-        model_receipt = feature.get("model_routing_receipt")
-        receipt_errors = validate_codex_model_routing_receipts([model_receipt])
-        errors.extend(
-            error.replace(
-                "Checkpoint codex_model_routing_receipts[0]",
-                f"{prefix}.model_routing_receipt",
-            )
-            for error in receipt_errors
-        )
-        if (
-            isinstance(model_receipt, dict)
-            and cast("dict[str, Any]", model_receipt).get("logical_agent")
-            != "orchestrator"
-        ):
-            errors.append(
-                f"{prefix}.model_routing_receipt.logical_agent must be 'orchestrator'."
-            )
-        if isinstance(model_receipt, dict):
-            model_map = cast("dict[str, Any]", model_receipt)
-            if model_map.get("complexity_band") != feature.get("complexity_band"):
-                errors.append(
-                    f"{prefix}.model_routing_receipt.complexity_band must match "
-                    f"feature complexity_band {feature.get('complexity_band')!r}."
+        if not key_gated or "model_routing_receipt" in feature:
+            errors.extend(_validate_feature_model_receipt(feature, prefix=prefix))
+        if not key_gated or "topology_receipt" in feature:
+            errors.extend(
+                _validate_child_topology_receipt(
+                    feature.get("topology_receipt"),
+                    prefix=f"{prefix}.topology_receipt",
                 )
-            if model_map.get("execution_context") != "epic_preparation_child":
-                errors.append(
-                    f"{prefix}.model_routing_receipt.execution_context must be "
-                    "'epic_preparation_child'."
-                )
-        errors.extend(
-            _validate_child_topology_receipt(
-                feature.get("topology_receipt"),
-                prefix=f"{prefix}.topology_receipt",
             )
-        )
     return errors
 
 
@@ -287,10 +305,12 @@ def validate_epic_planner_state_text(
     """Validate planner checkpoint structure and optional execution readiness.
 
     ``require_codex_model_routing`` and ``require_codex_topology`` make launch
-    evidence and the planner ``topology_receipt`` unconditional under execution
-    readiness. When neither is set, launch evidence is validated only for
-    features that carry a launch path key, and the planner receipt only when the
-    checkpoint carries a top-level ``topology_receipt`` key.
+    evidence, the per-feature receipt checks, and the planner ``topology_receipt``
+    unconditional under execution readiness. When neither is set, launch evidence
+    is validated only for features that carry a launch path key, the per-feature
+    ``model_routing_receipt`` and ``topology_receipt`` checks only for features
+    that carry that key, and the planner receipt only when the checkpoint carries
+    a top-level ``topology_receipt`` key.
     """
 
     try:
@@ -327,8 +347,10 @@ def validate_epic_planner_state_text(
             f"Non-epic planner checkpoint next_step must be {NON_EPIC_NEXT_STEP!r}."
         )
     if require_ready_for_execution:
-        # Launch evidence (per feature) and the planner topology receipt (top-level
-        # key) are key-gated unless a Codex flag is asserted.
+        # Launch evidence and the per-feature receipt checks
+        # (model_routing_receipt, topology_receipt) are key-gated per feature, and
+        # the planner topology receipt by its top-level key, unless a Codex flag
+        # is asserted.
         key_gated = not (require_codex_model_routing or require_codex_topology)
         if verdict != "epic":
             errors.append(
@@ -339,7 +361,7 @@ def validate_epic_planner_state_text(
                 "Execution-ready planner checkpoint next_step must be "
                 f"{READY_NEXT_STEP!r}."
             )
-        errors.extend(_validate_ready_features(features))
+        errors.extend(_validate_ready_features(features, key_gated=key_gated))
         errors.extend(
             validate_epic_planner_child_launch_bindings(
                 features, require_launch_paths=key_gated

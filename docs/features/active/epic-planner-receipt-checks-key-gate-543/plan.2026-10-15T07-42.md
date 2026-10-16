@@ -252,7 +252,7 @@ TypeScript, in `extensions/drm-copilot/test/lib/validate/validate-orchestration-
 
 ### Phase 2 — Python minimal fix
 
-- [ ] [P2-T1] Update `scripts/dev_tools/validate_epic_planner_state.py`:
+- [x] [P2-T1] Update `scripts/dev_tools/validate_epic_planner_state.py`:
   - Add `def _validate_feature_model_receipt(feature: dict[str, Any], *, prefix: str) -> list[str]:` (Black wraps the signature) directly above `_validate_ready_features`, with the docstring `"""Validate one prepared child's orchestrator model routing receipt."""`, a local `errors: list[str] = []`, the statements of planning-time lines 241-269 moved verbatim (only their indentation changes), and `return errors`.
   - Change the `_validate_ready_features` signature to take `features: list[dict[str, Any]], *, key_gated: bool = False`, written without a trailing comma, so Black wraps it to the three-line form `def _validate_ready_features(` / that parameter line / `) -> list[str]:`.
   - In the loop, replace planning-time lines 241-275 with `if not key_gated or "model_routing_receipt" in feature:` followed by `errors.extend(_validate_feature_model_receipt(feature, prefix=prefix))`, then `if not key_gated or "topology_receipt" in feature:` followed by the existing `_validate_child_topology_receipt(feature.get("topology_receipt"), prefix=f"{prefix}.topology_receipt")` call inside `errors.extend(...)`, unchanged apart from indentation.
@@ -260,7 +260,7 @@ TypeScript, in `extensions/drm-copilot/test/lib/validate/validate-orchestration-
   - Leave every error string, the `key_gated` assignment (line 332), the lines `validate_epic_planner_child_launch_bindings(` and `features, require_launch_paths=key_gated` (lines 344-345), the planner topology gate (lines 348-351), and the non-Codex checks (lines 226-240) unchanged.
   - Acceptance: `grep -c -F -e 'if not key_gated or "model_routing_receipt" in feature:' -e 'if not key_gated or "topology_receipt" in feature:' -e 'errors.extend(_validate_ready_features(features, key_gated=key_gated))' scripts/dev_tools/validate_epic_planner_state.py` prints `3` (it prints `0` before this task); `poetry run black --check scripts/dev_tools/validate_epic_planner_state.py` exits 0 printing `1 file would be left unchanged.` (if it fails, run `poetry run black scripts/dev_tools/validate_epic_planner_state.py`, which prints `reformatted scripts/dev_tools/validate_epic_planner_state.py` and `1 file reformatted.`, then re-run the check); `poetry run ruff check scripts/dev_tools/validate_epic_planner_state.py` prints `All checks passed!`.
 
-- [ ] [P2-T2] Update the documentation in `scripts/dev_tools/validate_epic_planner_state.py` with exactly the text in the three blocks below (each block line carries four leading spaces of list indentation that are not part of the text; the remaining indentation is the source indentation):
+- [x] [P2-T2] Update the documentation in `scripts/dev_tools/validate_epic_planner_state.py` with exactly the text in the three blocks below (each block line carries four leading spaces of list indentation that are not part of the text; the remaining indentation is the source indentation):
   - Replace the `_validate_ready_features` one-line docstring (planning-time line 223) with:
 
     ```text
@@ -296,10 +296,10 @@ TypeScript, in `extensions/drm-copilot/test/lib/validate/validate-orchestration-
   - No added docstring or comment line contains `Epic planner`, `must be`, or `must match` (P6-T2 depends on this). Every line above is at most 88 columns.
   - Acceptance: `grep -c -F -e 'per-feature receipt' scripts/dev_tools/validate_epic_planner_state.py` prints `3` (it prints `0` before this task); `poetry run ruff check scripts/dev_tools/validate_epic_planner_state.py` prints `All checks passed!`.
 
-- [ ] [P2-T3] Record the Python pass-after run by running `poetry run pytest "tests/scripts/dev_tools/test_validate_epic_planner_state_feature_receipts.py::test_ready_gate_skips_feature_receipts_when_keys_absent" -vv`.
+- [x] [P2-T3] Record the Python pass-after run by running `poetry run pytest "tests/scripts/dev_tools/test_validate_epic_planner_state_feature_receipts.py::test_ready_gate_skips_feature_receipts_when_keys_absent" -vv`.
   - Acceptance: `docs/features/active/epic-planner-receipt-checks-key-gate-543/evidence/regression-testing/pass-after-python.<timestamp>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` showing `1 passed` for that node and naming the P1-T2 artifact as the paired fail-before run.
 
-- [ ] [P2-T4] Run the existing Python validator suites against the fix: `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py tests/scripts/dev_tools/test_epic_planner_readiness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py tests/scripts/dev_tools/test_validate_epic_planner_state_feature_receipts.py -q`.
+- [x] [P2-T4] Run the existing Python validator suites against the fix: `poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state.py tests/scripts/dev_tools/test_validate_epic_planner_state_launch_binding.py tests/scripts/dev_tools/test_epic_planner_readiness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py tests/scripts/dev_tools/test_validate_epic_planner_state_feature_receipts.py -q`.
   - Acceptance: `docs/features/active/epic-planner-receipt-checks-key-gate-543/evidence/regression-testing/python-post-fix-suite.<timestamp>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording the result line with 0 failed and a passed count equal to the P0-T10 passed count plus 1.
 
 - [ ] [P2-T5] Commit and push Phase 2: run `git add scripts/dev_tools/validate_epic_planner_state.py docs/features/active/epic-planner-receipt-checks-key-gate-543`, `git commit -m "fix(543): key-gate per-feature receipt checks in Python planner ready gate"` (with the required trailers), and `git push origin bug/epic-planner-receipt-checks-key-gate-543`.
