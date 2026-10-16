@@ -315,6 +315,7 @@ Describe 'Invoke-BootstrapHost' {
             }
             Mock -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -MockWith {
                 param([switch]$ApplyMode)
+                $null = $ApplyMode
                 $script:calls.Add('PoetryInstall')
             }
             Mock -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -MockWith { $script:calls.Add('ProjectPoetry') }
