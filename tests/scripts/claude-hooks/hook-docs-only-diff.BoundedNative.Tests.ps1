@@ -23,7 +23,7 @@ Describe 'hook-docs-only-diff bounded runner (issue #927)' {
             $output = [pscustomobject]@{ Result = $Text; Completes = $OutputCompletes; Limit = 0 }
             $output | Add-Member -MemberType ScriptMethod -Name Wait -Value { param([int] $Milliseconds) $this.Limit = $Milliseconds; $this.Completes }
             $drain = [pscustomobject]@{ Result = 'ignored error text' }
-            $process = [pscustomobject]@{ ExitCode = $ExitCode; Exits = $Exits; KillThrows = $KillThrows; Killed = $false; WaitLimit = 0; StandardOutput = [pscustomobject]@{ Task = $output }; StandardError = [pscustomobject]@{ Task = $drain } }
+            $process = [pscustomobject]@{ ExitCode = $ExitCode; Exits = $Exits; KillThrows = $KillThrows; Killed = $false; Disposed = $false; WaitLimit = 0; StandardOutput = [pscustomobject]@{ Task = $output }; StandardError = [pscustomobject]@{ Task = $drain } }
             $process.StandardOutput | Add-Member -MemberType ScriptMethod -Name ReadToEndAsync -Value { $this.Task }
             $process.StandardError | Add-Member -MemberType ScriptMethod -Name ReadToEndAsync -Value { $this.Task }
             $process | Add-Member -MemberType ScriptMethod -Name WaitForExit -Value { param([int] $Milliseconds) $this.WaitLimit = $Milliseconds; $this.Exits }
@@ -34,6 +34,7 @@ Describe 'hook-docs-only-diff bounded runner (issue #927)' {
                 }
                 $this.Killed = $EntireTree
             }
+            $process | Add-Member -MemberType ScriptMethod -Name Dispose -Value { $this.Disposed = $true }
             return $process
         }
         function Invoke-DocsOnlyFakeStart {
@@ -81,6 +82,7 @@ Describe 'hook-docs-only-diff bounded runner (issue #927)' {
             $info.StandardOutputEncoding.WebName | Should -Be 'utf-8'
             $script:DocsOnlyFakeProcess.WaitLimit | Should -Be 2500
             $script:DocsOnlyFakeProcess.StandardOutput.Task.Limit | Should -Be 1000
+            $script:DocsOnlyFakeProcess.Disposed | Should -BeTrue -Because 'the runner disposes the process object on every return path'
         }
 
         It 'emits <Name> as output lines (issue #927)' -ForEach @(
@@ -99,6 +101,7 @@ Describe 'hook-docs-only-diff bounded runner (issue #927)' {
             ($lines -join '|') | Should -BeExactly $Expected
             $global:LASTEXITCODE | Should -Be 0
             $script:DocsOnlyFakeProcess.Killed | Should -BeFalse
+            $script:DocsOnlyFakeProcess.Disposed | Should -BeTrue -Because 'the runner disposes the process object on every return path'
         }
 
         It 'reports the non-zero exit code of a process that exits in time (issue #927)' {
@@ -112,6 +115,7 @@ Describe 'hook-docs-only-diff bounded runner (issue #927)' {
             $lines.Count | Should -Be 0
             $global:LASTEXITCODE | Should -Be 2
             $script:DocsOnlyFakeProcess.Killed | Should -BeFalse
+            $script:DocsOnlyFakeProcess.Disposed | Should -BeTrue -Because 'the runner disposes the process object on every return path'
         }
 
         It 'stops the process tree, emits nothing, and reports 124 when <Name> (issue #927)' -ForEach @(
@@ -130,6 +134,7 @@ Describe 'hook-docs-only-diff bounded runner (issue #927)' {
             $global:LASTEXITCODE | Should -Be 124
             $script:DocsOnlyFakeProcess.Killed | Should -Be $Killed
             $script:DocsOnlyFakeProcess.WaitLimit | Should -Be 7000
+            $script:DocsOnlyFakeProcess.Disposed | Should -BeTrue -Because 'the runner disposes the process object on every return path'
         }
 
         It 'returns the seam failure object when the process cannot start (issue #927)' {
@@ -157,6 +162,7 @@ Describe 'hook-docs-only-diff bounded runner (issue #927)' {
             $result.Output | Should -BeExactly ''
             (@($script:DocsOnlyStartInfo.ArgumentList) -join '|') | Should -BeExactly ('-C|' + $PSScriptRoot + '|diff|--name-only|-z')
             $script:DocsOnlyFakeProcess.Killed | Should -BeTrue
+            $script:DocsOnlyFakeProcess.Disposed | Should -BeTrue -Because 'the runner disposes the process object on every return path'
         }
 
         It 'routes the default git invoker through the bounded runner with a 3000 ms limit (issue #927)' {

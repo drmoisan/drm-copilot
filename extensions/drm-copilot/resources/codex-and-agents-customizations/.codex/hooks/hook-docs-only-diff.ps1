@@ -166,6 +166,7 @@ function Invoke-DocsOnlyBoundedNative {
         Standard error is drained and discarded. A start failure throws to the calling
         seam, which returns its failure object. $LASTEXITCODE is set in the global scope
         because the seams read it after the invoker, as they do after a native command.
+        The process object is disposed on every return path once it has started.
     .PARAMETER FileName
         The executable, git or gh, resolved from PATH.
     .PARAMETER ArgumentList
@@ -197,28 +198,33 @@ function Invoke-DocsOnlyBoundedNative {
     $startInfo.RedirectStandardError = $true
     $startInfo.StandardOutputEncoding = [System.Text.Encoding]::UTF8
     $process = & $ProcessStarter $startInfo
-    $output = $process.StandardOutput.ReadToEndAsync()
-    $null = $process.StandardError.ReadToEndAsync()
-    if (-not $process.WaitForExit($TimeoutMilliseconds) -or -not $output.Wait(1000)) {
-        try {
-            $process.Kill($true)
+    try {
+        $output = $process.StandardOutput.ReadToEndAsync()
+        $null = $process.StandardError.ReadToEndAsync()
+        if (-not $process.WaitForExit($TimeoutMilliseconds) -or -not $output.Wait(1000)) {
+            try {
+                $process.Kill($true)
+            }
+            catch {
+                $null = $_
+            }
+            Set-Variable -Name LASTEXITCODE -Value 124 -Scope Global
+            return
         }
-        catch {
-            $null = $_
+        Set-Variable -Name LASTEXITCODE -Value ([int]$process.ExitCode) -Scope Global
+        $text = [string]$output.Result
+        if ($text.EndsWith("`n")) {
+            $text = $text.Substring(0, $text.Length - 1)
         }
-        Set-Variable -Name LASTEXITCODE -Value 124 -Scope Global
-        return
+        if ($text.Length -eq 0) {
+            return
+        }
+        foreach ($line in $text.Split("`n")) {
+            $line.TrimEnd("`r")
+        }
     }
-    Set-Variable -Name LASTEXITCODE -Value ([int]$process.ExitCode) -Scope Global
-    $text = [string]$output.Result
-    if ($text.EndsWith("`n")) {
-        $text = $text.Substring(0, $text.Length - 1)
-    }
-    if ($text.Length -eq 0) {
-        return
-    }
-    foreach ($line in $text.Split("`n")) {
-        $line.TrimEnd("`r")
+    finally {
+        $process.Dispose()
     }
 }
 

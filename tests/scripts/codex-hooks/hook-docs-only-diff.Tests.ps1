@@ -42,7 +42,7 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
             $output = [pscustomobject]@{ Result = $Text; Completes = $OutputCompletes; Limit = 0 }
             $output | Add-Member -MemberType ScriptMethod -Name Wait -Value { param([int] $Milliseconds) $this.Limit = $Milliseconds; $this.Completes }
             $drain = [pscustomobject]@{ Result = 'ignored error text' }
-            $process = [pscustomobject]@{ ExitCode = $ExitCode; Exits = $Exits; KillThrows = $KillThrows; Killed = $false; WaitLimit = 0; StandardOutput = [pscustomobject]@{ Task = $output }; StandardError = [pscustomobject]@{ Task = $drain } }
+            $process = [pscustomobject]@{ ExitCode = $ExitCode; Exits = $Exits; KillThrows = $KillThrows; Killed = $false; Disposed = $false; WaitLimit = 0; StandardOutput = [pscustomobject]@{ Task = $output }; StandardError = [pscustomobject]@{ Task = $drain } }
             $process.StandardOutput | Add-Member -MemberType ScriptMethod -Name ReadToEndAsync -Value { $this.Task }
             $process.StandardError | Add-Member -MemberType ScriptMethod -Name ReadToEndAsync -Value { $this.Task }
             $process | Add-Member -MemberType ScriptMethod -Name WaitForExit -Value { param([int] $Milliseconds) $this.WaitLimit = $Milliseconds; $this.Exits }
@@ -53,6 +53,7 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
                 }
                 $this.Killed = $EntireTree
             }
+            $process | Add-Member -MemberType ScriptMethod -Name Dispose -Value { $this.Disposed = $true }
             return $process
         }
         function Invoke-CodexDocsOnlyFakeStart {
@@ -211,6 +212,7 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
         $global:LASTEXITCODE | Should -Be $ExitCode
         $script:CodexDocsOnlyFakeProcess.Killed | Should -Be $Killed
         $script:CodexDocsOnlyStartInfo.FileName | Should -BeExactly 'git'
+        $script:CodexDocsOnlyFakeProcess.Disposed | Should -BeTrue -Because 'the runner disposes the process object on every return path'
     }
 
     It 'routes the default git invoker through the bounded runner (codex copy, issue #927)' {
