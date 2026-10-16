@@ -68,7 +68,7 @@ Describe 'host-tools.manifest.json shape' {
         }
     }
 
-    It 'AC03-POWERSHELL-MODULES-PINNED lists Pester 5.6.1 and PSScriptAnalyzer 1.22.0' {
+    It 'AC03-POWERSHELL-MODULES-PINNED lists Pester 5.9.0 and PSScriptAnalyzer 1.22.0' {
         # Arrange
         $modules = @($script:Manifest.powershellModules)
 
@@ -78,7 +78,7 @@ Describe 'host-tools.manifest.json shape' {
 
         # Assert
         $pester.Count | Should -Be 1
-        $pester[0].minimumVersion | Should -BeExactly '5.6.1'
+        $pester[0].minimumVersion | Should -BeExactly '5.9.0'
         $analyzer.Count | Should -Be 1
         $analyzer[0].minimumVersion | Should -BeExactly '1.22.0'
     }
@@ -131,7 +131,7 @@ Describe 'HostVerification sections over the committed manifest' {
             param([string[]]$Name)
             $moduleName = @($Name)[0]
             switch ($moduleName) {
-                'Pester' { [pscustomobject]@{ Name = $moduleName; Version = [version]'5.6.1' } }
+                'Pester' { [pscustomobject]@{ Name = $moduleName; Version = [version]'5.9.0' } }
                 'PSScriptAnalyzer' { [pscustomobject]@{ Name = $moduleName; Version = [version]'1.22.0' } }
                 default { $null }
             }
