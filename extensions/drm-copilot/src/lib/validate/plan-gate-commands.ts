@@ -265,9 +265,9 @@ export function splitPlanLines(text: string): string[] {
     return [];
   }
   const lines = text.split(/\r\n|\n|\r/);
-  // Python `str.splitlines()` yields no trailing empty line for text that ends
-  // with a line terminator, while `String.prototype.split` does. Dropping that
-  // element keeps every record field identical across the two runtimes,
+  // The Python `split_plan_lines` yields no trailing empty line for text that
+  // ends with a line terminator, while `String.prototype.split` does. Dropping
+  // that element keeps every record field identical across the two runtimes,
   // including the newline-joined whole-window task text. No record was ever
   // produced from the dropped element, so no existing finding changes.
   if (lines[lines.length - 1] === "") {

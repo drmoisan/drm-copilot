@@ -19,6 +19,9 @@
  *     - The module imports only type declarations from `plan-gate-rules.ts`
  *       and the shared line splitter from `plan-gate-commands.ts`, so the
  *       import graph stays acyclic.
+ *     - Blank-line, continuation, and normalization tests use
+ *       `PLAN_WHITESPACE_CLASS`, whose pattern string is identical in the
+ *       Python module.
  *
  * Side Effects:
  *     None. The module reads no file, clock, environment variable, or git
@@ -62,14 +65,29 @@ const DEFINITION_RE = new RegExp(SCRATCH_DEFINITION_PATTERN);
 const NAMESPACE_RE = new RegExp(SCRATCH_NAMESPACE_PATTERN);
 
 /**
- * Join whitespace runs with one space and trim, matching Python `split()`.
+ * One explicit whitespace class for the blank-line test, the continuation
+ * test, and whitespace normalization.
+ *
+ * The string is identical to the Python `PLAN_WHITESPACE_CLASS`, and a parity
+ * test compares the two. The class is the set on which the Python whitespace
+ * predicate and the JavaScript whitespace class agree: NEL, the information
+ * separators, and the byte-order mark are excluded, so both runtimes treat
+ * them as ordinary characters.
+ */
+export const PLAN_WHITESPACE_CLASS = String.raw`[\t\n\v\f\r \u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]`;
+
+const WHITESPACE_RUN_RE = new RegExp(`${PLAN_WHITESPACE_CLASS}+`);
+const LEADING_WHITESPACE_RE = new RegExp(`^${PLAN_WHITESPACE_CLASS}`);
+
+/**
+ * Join runs of `PLAN_WHITESPACE_CLASS` with one space and trim the ends.
  *
  * @param value Text to normalize.
- * @returns The normalized text.
+ * @returns The normalized text, identical to the Python `_normalize_whitespace`.
  */
 function normalizeWhitespace(value: string): string {
   return value
-    .split(/\s+/)
+    .split(WHITESPACE_RUN_RE)
     .filter((word) => word !== "")
     .join(" ");
 }
@@ -80,12 +98,13 @@ function normalizeWhitespace(value: string): string {
  * A continuation is non-blank, begins with whitespace, and is not a fence
  * line. A Markdown ATX heading or task line written at column 0 therefore ends
  * the logical line, while an indented heading or task line is absorbed into it.
+ * Whitespace here means `PLAN_WHITESPACE_CLASS`.
  *
  * @param line Physical line following the logical line's last line.
  * @returns True when the line continues the logical line.
  */
 function continuesLogicalLine(line: string): boolean {
-  if (line.trim() === "" || !/^\s/.test(line)) {
+  if (normalizeWhitespace(line) === "" || !LEADING_WHITESPACE_RE.test(line)) {
     return false;
   }
   return !FENCE_RE.test(line);
@@ -157,7 +176,7 @@ export function bareScratchDefinitions(text: string): Array<[number, string]> {
       inFence = !inFence;
       continue;
     }
-    if (inFence || line.trim() === "") {
+    if (inFence || normalizeWhitespace(line) === "") {
       continue;
     }
     // A logical line starts here and absorbs its continuation lines.
