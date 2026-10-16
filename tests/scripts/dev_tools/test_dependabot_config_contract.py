@@ -50,9 +50,9 @@ def npm_entry_for(directory: str) -> dict[str, object]:
     matches = [
         entry for entry in load_target_npm_entries() if entry["directory"] == directory
     ]
-    assert len(matches) == 1, (
-        f"expected one npm entry for directory {directory}, found {len(matches)}"
-    )
+    assert (
+        len(matches) == 1
+    ), f"expected one npm entry for directory {directory}, found {len(matches)}"
     return matches[0]
 
 
