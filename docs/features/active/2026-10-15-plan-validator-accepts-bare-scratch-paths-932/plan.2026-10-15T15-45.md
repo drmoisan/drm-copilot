@@ -217,31 +217,31 @@ Static checks (format, lint, type-check) for the files written in this phase are
 
 The inserted planner text is exactly lines 58 through 67 of `.claude/agents/atomic-planner.md` (the `## Scratch Location` heading, the blank line, the introductory sentence, the blank line, the five bullets, and one trailing blank line). The inserted executor text is exactly lines 85 through 95 of `.claude/agents/atomic-executor.md` (heading, introductory sentence, six bullets, and one trailing blank line). Each insertion is made with the Edit tool immediately before the line `## Preflight Validation` inside the `developer_instructions` literal string. The generator is not run in write mode.
 
-- [ ] [P4-T1] Insert the planner section into the six root planner TOMLs under `.codex/agents/`
+- [x] [P4-T1] Insert the planner section into the six root planner TOMLs under `.codex/agents/`
   - Files: `.codex/agents/atomic-planner.toml`, `.codex/agents/atomic-planner-c1.toml`, `.codex/agents/atomic-planner-c2.toml`, `.codex/agents/atomic-planner-c3.toml`, `.codex/agents/atomic-planner-c3-elevated.toml`, `.codex/agents/atomic-planner-c4.toml`.
   - Acceptance: each file has `## Scratch Location` directly preceded (as the nearest `## ` heading) by `## Requirements` and followed by `## Preflight Validation`.
-- [ ] [P4-T2] Insert the executor section into the six root executor TOMLs under `.codex/agents/`
+- [x] [P4-T2] Insert the executor section into the six root executor TOMLs under `.codex/agents/`
   - Files: `.codex/agents/atomic-executor.toml`, `.codex/agents/atomic-executor-c1.toml`, `.codex/agents/atomic-executor-c2.toml`, `.codex/agents/atomic-executor-c3.toml`, `.codex/agents/atomic-executor-c3-elevated.toml`, `.codex/agents/atomic-executor-c4.toml`.
   - Acceptance: each file has `## Scratch Location` between `## Toolchain Commands` and `## Preflight Validation`.
-- [ ] [P4-T3] Insert the planner section into the six bundle planner TOMLs under `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/`
+- [x] [P4-T3] Insert the planner section into the six bundle planner TOMLs under `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/`
   - Files: the same six planner file names as [P4-T1] under that directory.
   - Acceptance: same placement as [P4-T1].
-- [ ] [P4-T4] Insert the executor section into the six bundle executor TOMLs under `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/`
+- [x] [P4-T4] Insert the executor section into the six bundle executor TOMLs under `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/`
   - Files: the same six executor file names as [P4-T2] under that directory.
   - Acceptance: same placement as [P4-T2].
-- [ ] [P4-T5] Verify root-to-bundle byte identity for the twelve TOML pairs and record `<FEATURE>/evidence/regression-testing/codex-toml-identity.<timestamp>.md`
+- [x] [P4-T5] Verify root-to-bundle byte identity for the twelve TOML pairs and record `<FEATURE>/evidence/regression-testing/codex-toml-identity.<timestamp>.md`
   - Command, once per pair: `git hash-object .codex/agents/<file> extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/<file>` for each of the twelve file names in [P4-T1] and [P4-T2].
   - Acceptance: for every pair the two printed object IDs are equal; the artifact lists the twelve pairs with both IDs.
-- [ ] [P4-T6] Run the full scratch contract suite in `tests/scripts/dev_tools/test_scratch_location_contracts.py` and record `<FEATURE>/evidence/regression-testing/scratch-contract-green.<timestamp>.md`
+- [x] [P4-T6] Run the full scratch contract suite in `tests/scripts/dev_tools/test_scratch_location_contracts.py` and record `<FEATURE>/evidence/regression-testing/scratch-contract-green.<timestamp>.md`
   - Command: `poetry run pytest tests/scripts/dev_tools/test_scratch_location_contracts.py -v`
   - Acceptance: exit 0, 0 failed, and the verbose output lists passing `codex-planner` and `codex-executor` parametrizations for `test_scratch_location_section_states_the_rule` and `test_scratch_location_section_avoids_forbidden_shapes`, `codex-planner` for `test_planner_scratch_location_placement`, and `codex-executor` for `test_executor_scratch_location_placement` and `test_executor_scratch_location_handles_pre_rule_plans`.
-- [ ] [P4-T7] Run the Codex parity, generator, and schema suites and record `<FEATURE>/evidence/regression-testing/codex-suites-green.<timestamp>.md`
+- [x] [P4-T7] Run the Codex parity, generator, and schema suites and record `<FEATURE>/evidence/regression-testing/codex-suites-green.<timestamp>.md`
   - Command: `poetry run pytest tests/scripts/dev_tools/test_generate_codex_agent_variants.py tests/scripts/dev_tools/test_codex_agent_wrapper_contracts.py tests/scripts/dev_tools/test_codex_handoff_contract_parity.py tests/scripts/dev_tools/test_codex_agent_role_schema.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py -v`
   - Acceptance: exit 0 and 0 failed; the output shows `test_generator_check_mode_reports_no_drift` and `test_checked_in_variants_match_generator_output_in_both_surfaces` passing.
-- [ ] [P4-T8] Run the TypeScript push-down suites under `extensions/drm-copilot/test/lib/push-down` and record `<FEATURE>/evidence/regression-testing/ts-push-down-green.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P4-T8] Run the TypeScript push-down suites under `extensions/drm-copilot/test/lib/push-down` and record `<FEATURE>/evidence/regression-testing/ts-push-down-green.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx jest --config jest.config.cjs test/lib/push-down`
   - Acceptance: exit 0 and 0 failed.
-- [ ] [P4-T9] Commit and push the 24 TOML files under `.codex/agents/` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/`, the evidence, and the plan check-offs
+- [x] [P4-T9] Commit and push the 24 TOML files under `.codex/agents/` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/`, the evidence, and the plan check-offs
   - Pre-commit check: `git status --porcelain` lists exactly the 24 TOML paths, the new evidence files, and the plan file; no pack manifest under `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/` appears.
   - Commands: `git add` naming the 24 TOML paths, the evidence folder, and the plan file; `git commit -m "fix(932): add Scratch Location section to Codex planner and executor agents"`; `git push origin HEAD`.
   - Acceptance: the pre-commit listing matches; `git status --porcelain` prints nothing after the push.
