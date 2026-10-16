@@ -114,18 +114,23 @@ Describe 'Invoke-PoshQCTest shard parameters' {
     }
 
     It 'TS04-DEFAULT-FILELIST-SEAM-WRITES-UTF8-JSON writes the manifest through Set-Content in the default WriteShardFileList seam' {
-        # Arrange: Set-Content is mocked in the module scope, so no file is written.
+        # Arrange: Set-Content is mocked and Invoke-PoshQCTest is called inside the PoshQC module scope, so the mock
+        # and the default seam belong to the same module instance in a full-suite run and no file is written.
         $capture = @{}
         $seams = & $script:NewSeams $capture $script:TestPaths
         $seams.Remove('WriteShardFileList')
-        Mock -CommandName Set-Content -ModuleName PoshQC -MockWith { }
 
-        # Act
-        Invoke-PoshQCTest @seams -ShardIndex 2 -ShardCount 2 -ShardFileListPath '/shard-root/artifacts/pester/shard-files.json'
+        InModuleScope PoshQC -Parameters @{ Seams = $seams } {
+            param([hashtable] $Seams)
+            Mock -CommandName Set-Content -MockWith { }
 
-        # Assert
-        Should -Invoke -CommandName Set-Content -ModuleName PoshQC -Times 1 -Exactly -ParameterFilter {
-            $LiteralPath -eq '/shard-root/artifacts/pester/shard-files.json' -and ([string] $Encoding -match '(?i)utf-?8') -and ((@((($Value -join "`n") | ConvertFrom-Json).selected) -join ',') -eq 'tests/t2.Tests.ps1,tests/t4.Tests.ps1')
+            # Act
+            Invoke-PoshQCTest @Seams -ShardIndex 2 -ShardCount 2 -ShardFileListPath '/shard-root/artifacts/pester/shard-files.json'
+
+            # Assert
+            Should -Invoke -CommandName Set-Content -Times 1 -Exactly -ParameterFilter {
+                $LiteralPath -eq '/shard-root/artifacts/pester/shard-files.json' -and ([string] $Encoding -match '(?i)utf-?8') -and ((@((($Value -join "`n") | ConvertFrom-Json).selected) -join ',') -eq 'tests/t2.Tests.ps1,tests/t4.Tests.ps1')
+            }
         }
         (@($capture['RunPath']) -join ',') | Should -BeExactly '/shard-root/tests/t2.Tests.ps1,/shard-root/tests/t4.Tests.ps1'
     }
