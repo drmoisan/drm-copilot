@@ -14,7 +14,20 @@
     Every function is pure except Get-EpicStateIsolationSuiteFinding, which reads one
     committed suite file located from the supplied repository root. No function creates a
     file, runs a process, or reads gitignored state.
+
+    The hook-reference functions (hook-literal and root-variable identification and the
+    dot-source selector) live in the dot-sourced EpicStateIsolation.HookReference.Helpers.ps1
+    (issue #935).
+
+    The shape-B residual limit (issue #935, #737): a suite that loads its hook only inside It
+    bodies is outside this BeforeAll model. Its module seams stay covered by the baseline mocks,
+    but hook-local seams guarded by if (Get-Command X) are runtime no-ops in such suites.
+
+    The R2 helper-only relaxation (issue #935): a BeforeAll whose dot-sources are all .Helpers.ps1
+    test-helper loads yields no 'no dot-source loads the hook' finding; its ordering anchor is
+    the last helper dot-source, and the presence rules still apply.
 #>
+. (Join-Path $PSScriptRoot 'EpicStateIsolation.HookReference.Helpers.ps1')
 
 function Get-EpicStateIsolationCommandDepth {
     # Pure: the number of CommandAst ancestors of an AST node.
@@ -93,89 +106,29 @@ function Test-EpicStateIsolationNullBody {
     return ($statements.Count -eq 1 -and $statements[0].Extent.Text.Trim() -ceq '$null')
 }
 
-function Test-EpicStateIsolationHookLiteral {
-    # Pure: true when an AST holds a string literal that names a hook script, hooks/<name>.ps1,
-    # other than the EpicStateIsolation helper files and other than a test file path.
-    [OutputType([bool])]
-    param([AllowNull()] [System.Management.Automation.Language.Ast] $Node)
-    if ($null -eq $Node) { return $false }
-    $isLiteral = {
-        param($candidate)
-        $candidate -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
-        $candidate -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
-    }
-    foreach ($literal in $Node.FindAll($isLiteral, $true)) {
-        foreach ($match in [regex]::Matches([string]$literal.Value, '(?<![A-Za-z0-9_-])hooks/(?<name>[A-Za-z0-9._-]+\.ps1)')) {
-            $name = $match.Groups['name'].Value
-            if ($name.StartsWith('EpicStateIsolation.', [System.StringComparison]::Ordinal)) { continue }
-            if ($name.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)) { continue }
-            return $true
-        }
-    }
-    return $false
-}
-
-function Get-EpicStateIsolationVariableKey {
-    # Pure: a variable name without its scope qualifier, lower-cased, for binding comparison.
-    [OutputType([string])]
-    param([Parameter(Mandatory)] [string] $UserPath)
-    $separator = $UserPath.IndexOf(':')
-    $name = if ($separator -ge 0) { $UserPath.Substring($separator + 1) } else { $UserPath }
-    return $name.ToLowerInvariant()
-}
-
-function Test-EpicStateIsolationVariableBoundToHook {
-    # Pure: true when the suite binds the named variable, by assignment or by a hashtable entry
-    # with the same key name (the -ForEach data shape), to an expression holding a hook literal.
+function Test-EpicStateIsolationConditionalAncestor {
+    # Pure (issue #903, #737 F-1): true when Node is an if, switch, loop, try, or trap that may skip
+    # Command, except a single-clause if with no else whose condition is one Get-Command <Name>
+    # pipeline naming the Command's target.
     [OutputType([bool])]
     param(
-        [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst,
-        [Parameter(Mandatory)] [string] $Key
+        [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $Node,
+        [Parameter(Mandatory)] [System.Management.Automation.Language.CommandAst] $Command
     )
-    $isAssignment = { param($candidate) $candidate -is [System.Management.Automation.Language.AssignmentStatementAst] }
-    foreach ($assignment in $SuiteAst.FindAll($isAssignment, $true)) {
-        $left = $assignment.Left
-        if ($left -is [System.Management.Automation.Language.ConvertExpressionAst]) { $left = $left.Child }
-        if ($left -isnot [System.Management.Automation.Language.VariableExpressionAst]) { continue }
-        if ((Get-EpicStateIsolationVariableKey -UserPath $left.VariablePath.UserPath) -ne $Key) { continue }
-        if (Test-EpicStateIsolationHookLiteral -Node $assignment.Right) { return $true }
+    if ($Node -isnot [System.Management.Automation.Language.IfStatementAst]) {
+        return ($Node -is [System.Management.Automation.Language.SwitchStatementAst] -or $Node -is [System.Management.Automation.Language.LoopStatementAst] -or
+            $Node -is [System.Management.Automation.Language.TryStatementAst] -or $Node -is [System.Management.Automation.Language.TrapStatementAst])
     }
-    $isHashtable = { param($candidate) $candidate -is [System.Management.Automation.Language.HashtableAst] }
-    foreach ($table in $SuiteAst.FindAll($isHashtable, $true)) {
-        foreach ($pair in $table.KeyValuePairs) {
-            $keyText = Get-EpicStateIsolationElementText -Element $pair.Item1
-            if ($null -eq $keyText -or $keyText.ToLowerInvariant() -ne $Key) { continue }
-            if (Test-EpicStateIsolationHookLiteral -Node $pair.Item2) { return $true }
-        }
+    if ($Node.Clauses.Count -ne 1 -or $null -ne $Node.ElseClause) { return $true }
+    $condition = $Node.Clauses[0].Item1
+    if ($condition -isnot [System.Management.Automation.Language.PipelineAst] -or $condition.PipelineElements.Count -ne 1) { return $true }
+    $guard = $condition.PipelineElements[0]
+    if ($guard -isnot [System.Management.Automation.Language.CommandAst] -or $guard.GetCommandName() -ne 'Get-Command' -or $guard.CommandElements.Count -lt 2) { return $true }
+    $targets = switch ($Command.GetCommandName()) {
+        'Mock' { (Get-EpicStateIsolationMockBinding -Command $Command).CommandName }
+        'Register-EpicStateBaselineMock' { Get-EpicStateIsolationStringConstant -Node $Command }
     }
-    return $false
-}
-
-function Get-EpicStateIsolationHookDotSource {
-    <#
-        Pure: the dot-source command that loads the hook. Order: (i) the dot-source whose argument
-        holds a hooks/<name>.ps1 literal; (ii) otherwise the dot-source whose argument references a
-        variable that the suite binds to such a literal; (iii) otherwise the first dot-source. The
-        first in source order wins within a step. $null when there is no dot-source.
-    #>
-    [OutputType([System.Management.Automation.Language.CommandAst])]
-    param(
-        [AllowEmptyCollection()] [object[]] $DotSource,
-        [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst
-    )
-    $candidates = @($DotSource)
-    if ($candidates.Count -eq 0) { return $null }
-    foreach ($candidate in $candidates) {
-        if (Test-EpicStateIsolationHookLiteral -Node $candidate) { return $candidate }
-    }
-    $isVariable = { param($node) $node -is [System.Management.Automation.Language.VariableExpressionAst] }
-    foreach ($candidate in $candidates) {
-        foreach ($variable in $candidate.FindAll($isVariable, $true)) {
-            $key = Get-EpicStateIsolationVariableKey -UserPath $variable.VariablePath.UserPath
-            if (Test-EpicStateIsolationVariableBoundToHook -SuiteAst $SuiteAst -Key $key) { return $candidate }
-        }
-    }
-    return $candidates[0]
+    return -not (@($targets) -contains (Get-EpicStateIsolationElementText -Element $guard.CommandElements[1]))
 }
 
 function Get-EpicStateIsolationDirectCommand {
@@ -194,6 +147,7 @@ function Get-EpicStateIsolationDirectCommand {
                 $nested = $true
                 break
             }
+            if (Test-EpicStateIsolationConditionalAncestor -Node $parent -Command $command) { $nested = $true; break }
             $parent = $parent.Parent
         }
         if (-not $nested) { $command }
@@ -428,11 +382,16 @@ function Get-EpicStateIsolationFinding {
         $commands = @(Get-EpicStateIsolationDirectCommand -Block $block | Sort-Object -Property { $_.Extent.StartOffset })
         $dotSources = @($commands | Where-Object { $_.InvocationOperator -eq [System.Management.Automation.Language.TokenKind]::Dot })
         $dotSource = Get-EpicStateIsolationHookDotSource -DotSource $dotSources -SuiteAst $Ast
+        # R2 (issue #935): a block whose dot-sources are all test-helper loads is anchored at the last one.
+        $helperOnly = $dotSources.Count -gt 0 -and $null -eq $dotSource -and
+        @($dotSources | Where-Object { -not (Test-EpicStateIsolationHelperDotSource -Command $_ -SuiteAst $Ast) }).Count -eq 0
+        if ($dotSources.Count -gt 0 -and $null -eq $dotSource -and -not $helperOnly) { 'no dot-source loads the hook' }
+        $anchor = if ($helperOnly) { $dotSources[-1] } else { $dotSource }
 
-        $helperSeam = @(Get-EpicStateIsolationHelperSeam -Commands $commands -DotSource $dotSource -SuiteAst $Ast)
+        $helperSeam = @(Get-EpicStateIsolationHelperSeam -Commands $commands -DotSource $anchor -SuiteAst $Ast)
         foreach ($item in $Requirement) {
             if ($helperSeam -contains $item.Seam) { continue }
-            Get-EpicStateIsolationPairFinding -Commands $commands -DotSource $dotSource -MockCommand $item.Seam -ModuleName $item.ModuleName -ModuleFile $item.ModuleFile
+            Get-EpicStateIsolationPairFinding -Commands $commands -DotSource $anchor -MockCommand $item.Seam -ModuleName $item.ModuleName -ModuleFile $item.ModuleFile
         }
     }
 }
