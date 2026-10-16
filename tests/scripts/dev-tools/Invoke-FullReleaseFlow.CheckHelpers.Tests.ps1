@@ -1,8 +1,8 @@
 Set-StrictMode -Version Latest
-Describe "Invoke-FullReleaseFlow.ps1 - Get-CheckSetVerdict" {
+Describe "Invoke-FullReleaseFlow.CheckHelpers.ps1 - Get-CheckSetVerdict" {
     BeforeAll {
-        $script:scriptPath = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/Invoke-FullReleaseFlow.ps1")).Path
-        . $script:scriptPath -ConfirmToken 'no'
+        $script:helpersPath = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/Invoke-FullReleaseFlow.CheckHelpers.ps1")).Path
+        . $script:helpersPath
     }
 
     It "reports pass for a set of pass buckets" {
@@ -100,10 +100,10 @@ Describe "Invoke-FullReleaseFlow.ps1 - Get-CheckSetVerdict" {
     }
 }
 
-Describe "Invoke-FullReleaseFlow.ps1 - ConvertFrom-CheckPollOutput" {
+Describe "Invoke-FullReleaseFlow.CheckHelpers.ps1 - ConvertFrom-CheckPollOutput" {
     BeforeAll {
-        $script:scriptPath = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/Invoke-FullReleaseFlow.ps1")).Path
-        . $script:scriptPath -ConfirmToken 'no'
+        $script:helpersPath = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/Invoke-FullReleaseFlow.CheckHelpers.ps1")).Path
+        . $script:helpersPath
     }
 
     It "parses a JSON array into check objects" {
@@ -156,5 +156,42 @@ Describe "Invoke-FullReleaseFlow.ps1 - ConvertFrom-CheckPollOutput" {
         $parsed = ConvertFrom-CheckPollOutput -Output @('[1]')
 
         $parsed.Succeeded | Should -BeFalse
+    }
+}
+
+Describe "Invoke-FullReleaseFlow.CheckHelpers.ps1 - Test-UnregisteredCheckPollOutput" {
+    BeforeAll {
+        $script:helpersPath = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath "../../../scripts/dev-tools/Invoke-FullReleaseFlow.CheckHelpers.ps1")).Path
+        . $script:helpersPath
+    }
+
+    It "reports true for the gh no-checks message" {
+        $output = @("no checks reported on the 'release/full-20260703171500' branch")
+
+        $result = Test-UnregisteredCheckPollOutput -Output $output
+
+        $result | Should -BeTrue
+    }
+
+    It "reports true for the gh no-checks message delivered as an error record" {
+        $record = [System.Management.Automation.ErrorRecord]::new([System.Exception]::new("no checks reported on the 'release/full-20260703171500' branch"), 'gh', [System.Management.Automation.ErrorCategory]::NotSpecified, $null)
+
+        $result = Test-UnregisteredCheckPollOutput -Output @($record)
+
+        $result | Should -BeTrue
+    }
+
+    It "reports false for a gh authentication failure" {
+        $output = @('HTTP 401: Bad credentials (https://api.github.com/graphql)')
+
+        $result = Test-UnregisteredCheckPollOutput -Output $output
+
+        $result | Should -BeFalse
+    }
+
+    It "reports false for empty output" {
+        $result = Test-UnregisteredCheckPollOutput -Output @()
+
+        $result | Should -BeFalse
     }
 }

@@ -53,6 +53,55 @@ Describe "Invoke-FullReleaseFlow.ps1 - Wait-ForPullRequestChecks" {
             $script:capturedMessage | Should -Match "did not register within the timeout"
             Should -Invoke -CommandName Invoke-GhExe -Times 3 -Exactly
         }
+
+        It "returns failure at once without sleeping when gh fails with '<FailureText>'" -ForEach @(
+            @{ FailureText = 'HTTP 401: Bad credentials (https://api.github.com/graphql)'; FailureExitCode = 1 }
+            @{ FailureText = 'To get started with GitHub CLI, please run:  gh auth login'; FailureExitCode = 4 }
+            @{ FailureText = 'error connecting to api.github.com'; FailureExitCode = 1 }
+        ) {
+            $script:failurePoll = @{ Output = @($FailureText); ExitCode = $FailureExitCode }
+            Mock -CommandName Invoke-GhExe -MockWith {
+                param([string[]]$GhArgs)
+                $null = $GhArgs
+                return $script:failurePoll
+            }
+            Mock -CommandName Invoke-Sleep -MockWith { param([int]$Seconds) $null = $Seconds }
+            Mock -CommandName Write-StderrLine -MockWith {
+                param([string]$Message)
+                $script:capturedMessage = $Message
+            }
+
+            $result = Wait-ForPullRequestChecks -PrNumber '291'
+
+            $result | Should -Be 1
+            $script:capturedMessage | Should -Match "Could not query the checks for PR #291"
+            Should -Invoke -CommandName Invoke-GhExe -Times 1 -Exactly
+            Should -Invoke -CommandName Invoke-Sleep -Times 0 -Exactly
+        }
+
+        It "keeps retrying while gh reports no registered checks as an error record" {
+            $script:notRegistered = [System.Management.Automation.ErrorRecord]::new([System.Exception]::new("no checks reported on the 'release/full-20260703171500' branch"), 'gh', [System.Management.Automation.ErrorCategory]::NotSpecified, $null)
+            Mock -CommandName Invoke-GhExe -MockWith {
+                param([string[]]$GhArgs)
+                $null = $GhArgs
+                $script:ghCallCount++
+                if ($script:ghCallCount -le 2) {
+                    return @{ Output = @($script:notRegistered); ExitCode = 1 }
+                }
+                return @{ Output = @('[{"bucket":"pass"}]'); ExitCode = 0 }
+            }
+            Mock -CommandName Invoke-Sleep -MockWith {
+                param([int]$Seconds)
+                $null = $Seconds
+                $script:sleepCallCount++
+            }
+
+            $result = Wait-ForPullRequestChecks -PrNumber '291' -RegistrationMaxAttempts 5 -RegistrationIntervalSeconds 1
+
+            $result | Should -Be 0
+            Should -Invoke -CommandName Invoke-Sleep -Times 2 -Exactly
+            Should -Invoke -CommandName Invoke-GhExe -Times 3 -Exactly
+        }
     }
 
     Context "completion phase" {

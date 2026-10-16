@@ -406,6 +406,18 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded" {
             $result.Output.Count | Should -Be 0
             $result.ExitCode | Should -Be 0
         }
+
+        It "declares the command-result output type on '<CommandName>'" -ForEach @(
+            @{ CommandName = 'Invoke-GitExe' }
+            @{ CommandName = 'Invoke-GhExe' }
+        ) {
+            $expected = (Get-Command -Name ConvertTo-CommandResult).OutputType[0].Type
+
+            $declared = @((Get-Command -Name $CommandName).OutputType)
+
+            $declared.Count | Should -Be 1
+            $declared[0].Type | Should -Be $expected
+        }
     }
 
     Context "entry point" {
