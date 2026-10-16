@@ -9,7 +9,7 @@
     stream it ever writes is standard error, from Exit-SubagentStopBlock.
 
     The governing contract is the section "## Authoritative Helper Contract" of
-    docs/features/active/subagentstop-envelope-core-897/spec.md (issue #897). Where this file and any
+    docs/features/archive/subagentstop-envelope-core-897/spec.md (issue #897; at docs/features/active/subagentstop-envelope-core-897/ until the archive move). Where this file and any
     other document differ, that section governs.
 
 .NOTES
