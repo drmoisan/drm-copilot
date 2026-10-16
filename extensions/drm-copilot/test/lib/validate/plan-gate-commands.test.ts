@@ -4,6 +4,7 @@ import {
   extractPlanCommands,
   PLAN_GATE_HEADING_PATTERN,
   PLAN_GATE_TASK_PATTERN,
+  splitPlanLines,
   splitShellWords,
 } from "../../../src/lib/validate/plan-gate-commands";
 
@@ -241,5 +242,38 @@ describe("extractPlanCommands", () => {
     // Arrange / Act / Assert
     expect(PLAN_GATE_TASK_PATTERN.test("- [x] [P1-T2] Second task")).toBe(true);
     expect(PLAN_GATE_HEADING_PATTERN.test("#### Notes")).toBe(true);
+  });
+
+  it("reports line numbers that ignore a form feed and a line separator", () => {
+    // Arrange: each separator sits at the end of the heading line.
+    const fixtures = [
+      "### Phase 1 — Work\f\n- [ ] [P1-T1] Run `poetry run pytest tests/a.py`\n",
+      "### Phase 1 — Work\u2028\n- [ ] [P1-T1] Run `poetry run pytest tests/a.py`\n",
+    ];
+
+    // Act
+    const results = fixtures.map((text) =>
+      extractPlanCommands(text).map((command) => [
+        command.taskId,
+        command.sourceLine,
+      ]),
+    );
+
+    // Assert
+    expect(results).toEqual([[["P1-T1", 2]], [["P1-T1", 2]]]);
+  });
+});
+
+describe("splitPlanLines", () => {
+  it("splits only on CR LF, LF, and CR terminators", () => {
+    // Arrange
+    const fixtures = ["", "a\n", "a\r\nb\rc\n\n", "a\fb\u2028c"];
+    const expected = [[], ["a"], ["a", "b", "c", ""], ["a\fb\u2028c"]];
+
+    // Act
+    const results = fixtures.map((text) => splitPlanLines(text));
+
+    // Assert
+    expect(results).toEqual(expected);
   });
 });

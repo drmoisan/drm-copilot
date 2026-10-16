@@ -26,6 +26,13 @@ const COMBINED_ERROR_AND_WARNING_PLAN = [
   "",
 ].join("\n");
 
+const BARE_SCRATCH_PLAN = [
+  "SCRATCH is the session scratchpad outside the repository.",
+  "### Phase 1 — Work",
+  "- [ ] [P1-T1] Do the thing",
+  "",
+].join("\n");
+
 /** Filesystem stub returning one fixed artifact text for any path. */
 function stubFileSystem(text: string): FileSystem {
   return {
@@ -115,6 +122,27 @@ describe("validateOrchestrationServiceCall plan acceptance gates", () => {
         "PLAN GATE WARNING: [P1-T2] --cov argument value `tests.bar` is " +
         "supplied space-separated; the ambiguous form can bind the " +
         "following positional argument. Use the --cov=<module> form.",
+    );
+  });
+
+  it("throws with the G10 message when a SCRATCH definition is not namespaced", () => {
+    // Arrange: the plan's first line defines SCRATCH without an issue
+    // namespace, which G10 reports on the Blocking channel.
+    const fileSystem = stubFileSystem(BARE_SCRATCH_PLAN);
+
+    // Act / Assert
+    expect(() =>
+      validateOrchestrationServiceCall({
+        fileSystem,
+        workspaceRoot: "/workspace",
+        artifactType: "plan",
+        artifactPath: "docs/plan.md",
+      }),
+    ).toThrow(
+      "Validation failed for plan artifact at 'docs/plan.md':\n" +
+        "Line 1: SCRATCH definition `SCRATCH is the session scratchpad " +
+        "outside the repository.` is not namespaced by issue number; define " +
+        "SCRATCH as `<session scratchpad>/issue-<issue-num>/`.",
     );
   });
 });

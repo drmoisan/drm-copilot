@@ -130,9 +130,9 @@ check inside `validate_epic_orchestrator_state_text` invoked by
 `.claude/hooks/validate-orchestrator-output.ps1`; parity is pinned by
 `tests/fixtures/epic_wave_barrier/`, and the Python validator remains the authority used through
 the `mcp__drm-copilot__validate_orchestration_artifacts` call. If the check reports a violation,
-report it to the operator and halt. Its runtime effect is likely to depend on the `SubagentStop`
-transport and exit-code defect recorded in
-`docs/features/potential/2026-08-21-subagentstop-validators-read-undocumented-envelope.md`.
+report it to the operator and halt. The `SubagentStop` transport and exit-code defect this check
+previously depended on was resolved by epic #904 and issue #928: a violation blocks the stop with
+exit 2 and a stderr reason.
 
 ## Checkpoint Persistence
 

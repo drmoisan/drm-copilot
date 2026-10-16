@@ -209,6 +209,20 @@ describe("validateOrchestrationServiceCall", () => {
       "Epic planner topology_receipt must be an object.",
     );
     expect(keyGated).not.toContain("Epic planner topology_receipt");
+    expect(routing).toContain(
+      "features[0].model_routing_receipt must be an object.",
+    );
+    expect(routing).toContain(
+      "features[0].topology_receipt must be an object.",
+    );
+    expect(topology).toContain(
+      "features[0].model_routing_receipt must be an object.",
+    );
+    expect(topology).toContain(
+      "features[0].topology_receipt must be an object.",
+    );
+    expect(keyGated).not.toContain("features[0].model_routing_receipt");
+    expect(keyGated).not.toContain("features[0].topology_receipt");
   });
 
   it("throws with the aggregated error text when validation errors are present", () => {

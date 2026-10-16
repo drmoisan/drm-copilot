@@ -1,0 +1,6 @@
+# Remediation cycle 1 scope check
+
+Timestamp: 2026-10-16T05-01
+Command: git diff --name-status 8ec75b09384ee7d6d21f555f76832b952812f30c ; git diff --name-status 8ec75b09384ee7d6d21f555f76832b952812f30c | grep -v -e '^M' | wc -l ; git diff --name-status 8ec75b09384ee7d6d21f555f76832b952812f30c | grep -v -F -e FA -e FB -e FC -e remediation-plan.2026-10-16T04-12.md | wc -l ; git diff --name-status 8ec75b09384ee7d6d21f555f76832b952812f30c | grep -c -F -e FA -e FB -e FC ; git status --porcelain | grep -v -F -e FA -e FB -e FC -e remediation-plan.2026-10-16T04-12.md -e docs/features/active/2026-10-15-host-bootstrap-does-not-install-poetry-930/evidence/ -e SCRATCH/ | wc -l (FA, FB, and FC stand for the full repository-relative paths of the three evidence files named in the remediation plan; they were substituted with the literal paths when the commands were run)
+EXIT_CODE: 0
+Output Summary: Name-status listing had four entries, all M: the three evidence files and the remediation plan checkbox state. No D, R, or A entry. Outputs of the commands in order: listing (4 M lines), 0 non-M entries, 0 entries outside the allowed set, 3 matches for the three files, 0 porcelain lines outside the allowed set.

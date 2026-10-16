@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from pathlib import PurePosixPath
 from typing import TYPE_CHECKING, Any, Protocol, cast
 
 from scripts.dev_tools.pr_context.git import SubprocessRunner
@@ -15,6 +16,7 @@ if TYPE_CHECKING:
 
 HASH_RE = re.compile(r"^[0-9a-fA-F]{40,64}$")
 COMMIT_RE = re.compile(r"^[0-9a-fA-F]{7,64}$")
+DRIVE_RE = re.compile(r"^[A-Za-z]:")
 
 
 class ReadinessGitRepository(Protocol):
@@ -163,6 +165,74 @@ def validate_committed_file(
     return []
 
 
+def repository_relative_path(
+    value: object, *, field: str
+) -> tuple[str | None, list[str]]:
+    """Validate and normalize a safe repository-relative POSIX path.
+
+    The readiness gate derives every checkpoint path through this function, and
+    plan pairing derives each entry's ``plan_path`` through it, so the two cannot
+    disagree on a plan's normalized spelling.
+    """
+
+    if not isinstance(value, str) or not value.strip():
+        return None, [f"{field} must be a non-empty repository-relative path."]
+    if "\\" in value:
+        return None, [f"{field} must use forward slashes."]
+    path = PurePosixPath(value)
+    if (
+        path.is_absolute()
+        or DRIVE_RE.match(value) is not None
+        or ".." in path.parts
+        or "." in path.parts
+    ):
+        return None, [f"{field} must stay within the workspace root."]
+    return path.as_posix(), []
+
+
+def _plan_path(feature: dict[str, Any]) -> str | None:
+    """Return the ``plan_path`` the readiness gate derives, if any."""
+
+    plan, _ = repository_relative_path(feature.get("plan_path"), field="plan_path")
+    return plan
+
+
+def _pair_plans_with_features(
+    features: object, plans: list[str]
+) -> list[tuple[int, dict[str, Any], str]]:
+    """Pair each plan with its checkpoint entry and that entry's original index.
+
+    Plans are matched in order to object entries whose ``plan_path`` normalizes
+    to the plan, so non-object and plan-less entries keep their positions in the
+    checkpoint ``features`` array. When any plan has no such entry, the
+    positional pairing over object entries is kept, so a caller whose plans are
+    not drawn from the checkpoint sees unchanged behaviour.
+    """
+
+    items: list[object] = (
+        cast("list[object]", features) if isinstance(features, list) else []
+    )
+    entries = [
+        (index, cast("dict[str, Any]", item))
+        for index, item in enumerate(items)
+        if isinstance(item, dict)
+    ]
+    paired: list[tuple[int, dict[str, Any], str]] = []
+    position = 0
+    for plan in plans:
+        while position < len(entries) and _plan_path(entries[position][1]) != plan:
+            position += 1
+        if position == len(entries):
+            return [
+                (slot, entries[slot][1] if slot < len(entries) else {}, fallback_plan)
+                for slot, fallback_plan in enumerate(plans)
+            ]
+        index, feature = entries[position]
+        paired.append((index, feature, plan))
+        position += 1
+    return paired
+
+
 def validate_planning_git_integrity(
     state: dict[str, Any],
     parsed: ParsedEpicKickoff,
@@ -187,17 +257,8 @@ def validate_planning_git_integrity(
                 f"Execution readiness planning commit {commit} is not an ancestor "
                 f"of {branch}."
             )
-    features = state.get("features")
-    feature_maps = (
-        [
-            cast("dict[str, Any]", item)
-            for item in cast("list[object]", features)
-            if isinstance(item, dict)
-        ]
-        if isinstance(features, list)
-        else []
-    )
-    for index, plan in enumerate(plans):
+    pairs = _pair_plans_with_features(state.get("features"), plans)
+    for index, feature, plan in pairs:
         derived = git.last_commit(plan)
         if derived is None:
             errors.append(
@@ -210,7 +271,6 @@ def validate_planning_git_integrity(
             )
             continue
         candidate_commits = [derived]
-        feature = feature_maps[index] if index < len(feature_maps) else {}
         feature_commit = feature.get("planning_commit")
         if feature_commit is not None:
             if (
