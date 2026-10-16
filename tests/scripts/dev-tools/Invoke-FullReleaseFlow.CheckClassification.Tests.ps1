@@ -75,6 +75,15 @@ Describe "Invoke-FullReleaseFlow.ps1 - Get-CheckSetVerdict" {
         $verdict.Detail | Should -Be '(missing)'
     }
 
+    It "reports unknown for a blank bucket value" {
+        $checks = @([pscustomobject]@{ bucket = '   ' })
+
+        $verdict = Get-CheckSetVerdict -Checks $checks
+
+        $verdict.Verdict | Should -Be 'unknown'
+        $verdict.Detail | Should -Be '(missing)'
+    }
+
     It "reports unknown for a bucket that differs only in case" {
         $checks = @([pscustomobject]@{ bucket = 'PASS' })
 
