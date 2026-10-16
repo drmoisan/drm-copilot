@@ -1,0 +1,27 @@
+# Final PoshQC Format (issue #953, P6-T1, post-split restart pass)
+
+Timestamp: 2026-10-16T09-37
+Command: SCRATCH/issue-953-p6-t1.sh: `Get-FileHash -Algorithm SHA256` for the 20 primary-path files (items 1-20 of "Files Written"); `$before = git status --porcelain`; `pwsh -NoProfile -Command "Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCFormat -Root (Get-Location).Path" *> (Join-Path $S 'issue-953-final-format.log')`; `$exit = $LASTEXITCODE`; `$after = git status --porcelain`; count log lines starting with `Formatted: ` (ordinal, case-sensitive) and `Already formatted:`
+EXIT_CODE: 0
+Output Summary: Formatter exited 0. Log lines starting with `Formatted: `: 0. Log lines starting with `Already formatted:`: 785 (785 log lines total). `$before` equals `$after`: True (both empty; the worktree was clean at commit 9e2378321). No diff produced (AC-07).
+
+HASH_BEFORE: scripts/powershell/PoshQC/settings/pester.runsettings.psd1 5F33F8E2C4224D2626D928A2A54453F2F4E991BE920763DBEDA1F0F12D95B1EE
+HASH_BEFORE: extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1 5F33F8E2C4224D2626D928A2A54453F2F4E991BE920763DBEDA1F0F12D95B1EE
+HASH_BEFORE: scripts/powershell/PoshQC/PoshQC.psm1 CE9D8565CF915841A0C435DC52FAEFA8A4EAE08109736F6801C1E05945BAD834
+HASH_BEFORE: extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psm1 CE9D8565CF915841A0C435DC52FAEFA8A4EAE08109736F6801C1E05945BAD834
+HASH_BEFORE: scripts/powershell/PoshQC/README.md 3E1A3BBCCB0D2148ED625504F379DF499E380895E8FCE1435556A32B86A53859
+HASH_BEFORE: extensions/drm-copilot/resources/powershell/PoshQC/README.md 3E1A3BBCCB0D2148ED625504F379DF499E380895E8FCE1435556A32B86A53859
+HASH_BEFORE: .github/workflows/_poshqc.yml 4C2EA722BBC57558084F8C2BE2844F3AB3FA5FE326EF3DCEF7BC544611624F34
+HASH_BEFORE: scripts/host-tools.manifest.json E6E4CC2404880E09BE582EC22CDBD30F9FA58D6F24D6B365DA3C2872A54484E6
+HASH_BEFORE: .devcontainer/post-create.sh 7AA9190A669EC8FEA7726AAEA03F4C1FC0115643E1CB157D501B7283FB526041
+HASH_BEFORE: .github/codex/codex-web-setup.sh F865EA45EF9AAA9BEB8655F252F34CD5103B1528CD254EE977EB780FD80BF3B9
+HASH_BEFORE: tests/scripts/host-tools.manifest.Tests.ps1 A55D392791FBC0CD6E8C3E087D17190D8A68A1B671DD577B06978A3C57FA1377
+HASH_BEFORE: tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 3DFAB438DB6B0886FDB6720440955CC43504E1A05B68A7ACA3F11BC890F3FD7F
+HASH_BEFORE: extensions/drm-copilot/CHANGELOG.md FD2AB56B9A640A033F28FB4AC0B112820D85BE05021A10636513F2EEF5E51F73
+HASH_BEFORE: tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1 E7A9B7B7E1A2615082B4D696B753A9B7EBC5B9683137311AD6C95AE6EC498545
+HASH_BEFORE: tests/scripts/powershell/PoshQC/PoshQC.ModuleCoverage.Tests.ps1 433F1023783AB84556F76F0E60763278D974147C05EDF161379A324222CF048F
+HASH_BEFORE: scripts/powershell/PoshQC/PoshQC.Testing.psm1 A898747A299FF47D545547E45733248FF741A79966E5E90413570066E86108F3
+HASH_BEFORE: extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1 A898747A299FF47D545547E45733248FF741A79966E5E90413570066E86108F3
+HASH_BEFORE: tests/scripts/powershell/PoshQC/PoshQC.Tests.ps1 E8C936A3CF605F365EBA856A676600D04BF390032B479B995EB80FFF1F48E5E8
+HASH_BEFORE: tests/scripts/powershell/PoshQC/PoshQC.EntryPoints.Tests.ps1 B154AC913B0CA2762A4A8CE9C0CCC957496AAE517D9056E4BE51DFA666CEAE5C
+HASH_BEFORE: tests/scripts/powershell/PoshQC/PoshQC.TestingCommands.Tests.ps1 B35E416A236BB9C53A220ECD04DAF1A7F3D56B2E7E9C74413656D0BA218CCBF7
