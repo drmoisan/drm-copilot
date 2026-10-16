@@ -24,6 +24,9 @@
         # workspace (config/poshqc-coverage.json, else the effective test scan folders); see README.md.
         # Optional: don't fail the run on coverage percentage
         CoveragePercentTarget = 0
+        # Issue #953: collect coverage with Pester's profiler-based tracer instead of
+        # breakpoints. The coverage population and denominator are unchanged.
+        UseBreakpoints        = $false
     }
 }
 
