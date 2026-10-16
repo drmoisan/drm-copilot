@@ -1,11 +1,11 @@
 """Discriminate falsifiable from non-discriminating atomic-plan acceptance gates.
 
 Purpose:
-    Evaluate the fixed G1 through G6 rule set against the commands an atomic
-    plan states as acceptance conditions, and report each finding on the
-    Blocking or Warning channel the specification assigns to its rule. The
-    module re-exports `PlanCommand` and `extract_plan_commands` so the
-    specification's public surface is a single module. It imports the extractor
+    Evaluate the plan acceptance-gate rule set G1 through G10 against an
+    atomic plan, and report each finding on the Blocking or Warning channel
+    the specification assigns to its rule. The module re-exports `PlanCommand`
+    and `extract_plan_commands` so the specification's public surface is a
+    single module. It imports the extractor
     and never imports `scripts.dev_tools.validate_orchestration_artifacts`,
     which imports this module.
 
@@ -14,6 +14,7 @@ Purpose:
     module holds the shared report and context types, the G5 and G6 literal
     rules, and the public entry point. That module depends on the types defined
     here only under `TYPE_CHECKING`, so the runtime import graph is acyclic.
+    The document-level G10 rule lives in `scripts.dev_tools.plan_gate_scratch`.
 """
 
 from __future__ import annotations
@@ -37,6 +38,7 @@ from scripts.dev_tools.plan_gate_coverage import (
     is_placeholder,
 )
 from scripts.dev_tools.plan_gate_observability import evaluate_observability_gates
+from scripts.dev_tools.plan_gate_scratch import evaluate_scratch_gate
 from scripts.dev_tools.pr_context.git import SubprocessRunner
 
 if TYPE_CHECKING:
@@ -356,8 +358,8 @@ def evaluate_plan_gates(
     Args:
         text (str): Full plan document text.
         context (PlanGateContext | None): Repository seam. When `None` only the
-            context-free rules G1 and G4 run, so the returned Blocking list is
-            byte-identical to the pre-change output for the same text.
+            context-free rules G1, G4, G7, G8, G8b, and G10 run. G10 is
+            document-level and can add Blocking findings without a context.
 
     Returns:
         PlanGateReport: Blocking and Warning findings in source order.
@@ -389,4 +391,6 @@ def evaluate_plan_gates(
     if context is not None:
         _evaluate_literal_rules(report, text, commands, context)
 
+    # G10 is document-level and context-free, so it runs on every invocation.
+    evaluate_scratch_gate(report, text)
     return report

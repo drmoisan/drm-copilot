@@ -26,7 +26,7 @@ _BUNDLED_SKILL_FILE = (
     _BUNDLE_ROOT / ".claude" / "skills" / "atomic-plan-contract" / "SKILL.md"
 )
 
-ENFORCEMENT_TOKEN = "`scripts/dev_tools/plan_gate_scratch.py` evaluates G10"
+ENFORCEMENT_TOKEN = "`scripts/dev_tools/plan_gate_scratch.py` evaluates G10"  # noqa: S105 - test fixture data
 
 _G10_HEADING = "### G10 — ships as Blocking"
 _REQUIRED_RULE_TOKENS = (

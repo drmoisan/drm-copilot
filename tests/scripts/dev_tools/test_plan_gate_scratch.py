@@ -31,6 +31,9 @@ from scripts.dev_tools.plan_gate_scratch import (
     bare_scratch_definitions,
     evaluate_scratch_gate,
 )
+from tests.scripts.dev_tools.test_validate_orchestration_artifacts import (
+    build_read_text_stub,
+)
 
 if TYPE_CHECKING:
     from pytest import CaptureFixture, MonkeyPatch
@@ -334,7 +337,7 @@ def test_cli_rejects_bare_scratch_definition(
 
     # Arrange
     text = _plan_with_first_line(_BARE_LINE)
-    monkeypatch.setattr(validator, "_read_text", lambda _path: text)
+    monkeypatch.setattr(validator, "_read_text", build_read_text_stub(text))
 
     # Act
     exit_code = validator.main(["plan", "ignored.md"])
@@ -352,7 +355,7 @@ def test_cli_accepts_namespaced_scratch_definition(
 
     # Arrange
     text = _plan_with_first_line(_NAMESPACED_LINE)
-    monkeypatch.setattr(validator, "_read_text", lambda _path: text)
+    monkeypatch.setattr(validator, "_read_text", build_read_text_stub(text))
 
     # Act
     exit_code = validator.main(["plan", "ignored.md"])
