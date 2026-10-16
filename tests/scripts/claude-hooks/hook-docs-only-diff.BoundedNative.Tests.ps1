@@ -19,11 +19,20 @@ Describe 'hook-docs-only-diff bounded runner (issue #927)' {
 
         # Test-local stand-ins for the process object and the starter of Invoke-DocsOnlyBoundedNative.
         function Get-DocsOnlyFakeProcess {
-            param([bool] $Exits = $true, [bool] $OutputCompletes = $true, [bool] $KillThrows = $false, [int] $ExitCode = 0, [string] $Text = '')
-            $output = [pscustomobject]@{ Result = $Text; Completes = $OutputCompletes; Limit = 0 }
-            $output | Add-Member -MemberType ScriptMethod -Name Wait -Value { param([int] $Milliseconds) $this.Limit = $Milliseconds; $this.Completes }
-            $drain = [pscustomobject]@{ Result = 'ignored error text' }
-            $process = [pscustomobject]@{ ExitCode = $ExitCode; Exits = $Exits; KillThrows = $KillThrows; Killed = $false; Disposed = $false; WaitLimit = 0; StandardOutput = [pscustomobject]@{ Task = $output }; StandardError = [pscustomobject]@{ Task = $drain } }
+            param([bool] $Exits = $true, [bool] $OutputCompletes = $true, [bool] $KillThrows = $false, [int] $ExitCode = 0, [string] $Text = '', [bool] $ReadFaults = $false)
+            $events = [System.Collections.Generic.List[string]]::new()
+            $output = [pscustomobject]@{ Result = $Text; Completes = $OutputCompletes; Limit = 0; Events = $events }
+            $output | Add-Member -MemberType ScriptMethod -Name Wait -Value { param([int] $Milliseconds) $this.Limit = $Milliseconds; $this.Events.Add("output-wait $Milliseconds"); $this.Completes }
+            $drain = [pscustomobject]@{ Result = 'ignored error text'; Faults = $ReadFaults; Events = $events }
+            $drain | Add-Member -MemberType ScriptMethod -Name Wait -Value {
+                param([int] $Milliseconds)
+                $this.Events.Add("error-wait $Milliseconds")
+                if ($this.Faults) {
+                    throw 'simulated read fault'
+                }
+                return $true
+            }
+            $process = [pscustomobject]@{ ExitCode = $ExitCode; Exits = $Exits; KillThrows = $KillThrows; Killed = $false; Disposed = $false; Events = $events; WaitLimit = 0; StandardOutput = [pscustomobject]@{ Task = $output }; StandardError = [pscustomobject]@{ Task = $drain } }
             $process.StandardOutput | Add-Member -MemberType ScriptMethod -Name ReadToEndAsync -Value { $this.Task }
             $process.StandardError | Add-Member -MemberType ScriptMethod -Name ReadToEndAsync -Value { $this.Task }
             $process | Add-Member -MemberType ScriptMethod -Name WaitForExit -Value { param([int] $Milliseconds) $this.WaitLimit = $Milliseconds; $this.Exits }
@@ -34,7 +43,7 @@ Describe 'hook-docs-only-diff bounded runner (issue #927)' {
                 }
                 $this.Killed = $EntireTree
             }
-            $process | Add-Member -MemberType ScriptMethod -Name Dispose -Value { $this.Disposed = $true }
+            $process | Add-Member -MemberType ScriptMethod -Name Dispose -Value { $this.Disposed = $true; $this.Events.Add('dispose') }
             return $process
         }
         function Invoke-DocsOnlyFakeStart {
@@ -83,6 +92,7 @@ Describe 'hook-docs-only-diff bounded runner (issue #927)' {
             $script:DocsOnlyFakeProcess.WaitLimit | Should -Be 2500
             $script:DocsOnlyFakeProcess.StandardOutput.Task.Limit | Should -Be 1000
             $script:DocsOnlyFakeProcess.Disposed | Should -BeTrue -Because 'the runner disposes the process object on every return path'
+            ($script:DocsOnlyFakeProcess.Events -join '|') | Should -BeExactly 'output-wait 1000|dispose' -Because 'a read is checked without waiting only after an expired wait'
         }
 
         It 'emits <Name> as output lines (issue #927)' -ForEach @(
@@ -119,12 +129,13 @@ Describe 'hook-docs-only-diff bounded runner (issue #927)' {
         }
 
         It 'stops the process tree, emits nothing, and reports 124 when <Name> (issue #927)' -ForEach @(
-            @{ Name = 'the exit wait expires'; Exits = $false; OutputCompletes = $true; KillThrows = $false; Killed = $true }
-            @{ Name = 'the output wait expires'; Exits = $true; OutputCompletes = $false; KillThrows = $false; Killed = $true }
-            @{ Name = 'stopping the process throws'; Exits = $false; OutputCompletes = $true; KillThrows = $true; Killed = $false }
+            @{ Name = 'the exit wait expires'; Exits = $false; OutputCompletes = $true; KillThrows = $false; ReadFaults = $false; Killed = $true; Order = 'output-wait 0|error-wait 0|dispose' }
+            @{ Name = 'the output wait expires'; Exits = $true; OutputCompletes = $false; KillThrows = $false; ReadFaults = $false; Killed = $true; Order = 'output-wait 1000|output-wait 0|error-wait 0|dispose' }
+            @{ Name = 'stopping the process throws'; Exits = $false; OutputCompletes = $true; KillThrows = $true; ReadFaults = $false; Killed = $false; Order = 'output-wait 0|error-wait 0|dispose' }
+            @{ Name = 'a read check faults'; Exits = $false; OutputCompletes = $true; KillThrows = $false; ReadFaults = $true; Killed = $true; Order = 'output-wait 0|error-wait 0|dispose' }
         ) {
-            # Arrange: the row supplies which wait expires and whether stopping the process throws.
-            $script:DocsOnlyFakeProcess = Get-DocsOnlyFakeProcess -Exits $Exits -OutputCompletes $OutputCompletes -KillThrows $KillThrows -Text 'docs/a.md'
+            # Arrange: the row supplies which wait expires, whether stopping the process throws, and whether checking a read faults.
+            $script:DocsOnlyFakeProcess = Get-DocsOnlyFakeProcess -Exits $Exits -OutputCompletes $OutputCompletes -KillThrows $KillThrows -ReadFaults $ReadFaults -Text 'docs/a.md'
 
             # Act
             $lines = @(Invoke-DocsOnlyBoundedNative -FileName 'gh' -ArgumentList @('pr', 'view', '5') -TimeoutMilliseconds 7000 -ProcessStarter ${function:Invoke-DocsOnlyFakeStart})
@@ -135,6 +146,7 @@ Describe 'hook-docs-only-diff bounded runner (issue #927)' {
             $script:DocsOnlyFakeProcess.Killed | Should -Be $Killed
             $script:DocsOnlyFakeProcess.WaitLimit | Should -Be 7000
             $script:DocsOnlyFakeProcess.Disposed | Should -BeTrue -Because 'the runner disposes the process object on every return path'
+            ($script:DocsOnlyFakeProcess.Events -join '|') | Should -BeExactly $Order -Because 'each read is checked once without waiting before the process object is disposed'
         }
 
         It 'returns the seam failure object when the process cannot start (issue #927)' {

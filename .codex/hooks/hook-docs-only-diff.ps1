@@ -167,6 +167,7 @@ function Invoke-DocsOnlyBoundedNative {
         seam, which returns its failure object. $LASTEXITCODE is set in the global scope
         because the seams read it after the invoker, as they do after a native command.
         The process object is disposed on every return path once it has started.
+        After an expired wait, each read is checked once without waiting before disposal.
     .PARAMETER FileName
         The executable, git or gh, resolved from PATH.
     .PARAMETER ArgumentList
@@ -200,13 +201,21 @@ function Invoke-DocsOnlyBoundedNative {
     $process = & $ProcessStarter $startInfo
     try {
         $output = $process.StandardOutput.ReadToEndAsync()
-        $null = $process.StandardError.ReadToEndAsync()
+        $errorRead = $process.StandardError.ReadToEndAsync()
         if (-not $process.WaitForExit($TimeoutMilliseconds) -or -not $output.Wait(1000)) {
             try {
                 $process.Kill($true)
             }
             catch {
                 $null = $_
+            }
+            foreach ($pendingRead in @($output, $errorRead)) {
+                try {
+                    $null = $pendingRead.Wait(0)
+                }
+                catch {
+                    $null = $_
+                }
             }
             Set-Variable -Name LASTEXITCODE -Value 124 -Scope Global
             return

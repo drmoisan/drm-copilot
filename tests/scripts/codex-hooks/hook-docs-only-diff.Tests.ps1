@@ -42,6 +42,7 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
             $output = [pscustomobject]@{ Result = $Text; Completes = $OutputCompletes; Limit = 0 }
             $output | Add-Member -MemberType ScriptMethod -Name Wait -Value { param([int] $Milliseconds) $this.Limit = $Milliseconds; $this.Completes }
             $drain = [pscustomobject]@{ Result = 'ignored error text' }
+            $drain | Add-Member -MemberType ScriptMethod -Name Wait -Value { param([int] $Milliseconds) $Milliseconds -ge 0 }
             $process = [pscustomobject]@{ ExitCode = $ExitCode; Exits = $Exits; KillThrows = $KillThrows; Killed = $false; Disposed = $false; WaitLimit = 0; StandardOutput = [pscustomobject]@{ Task = $output }; StandardError = [pscustomobject]@{ Task = $drain } }
             $process.StandardOutput | Add-Member -MemberType ScriptMethod -Name ReadToEndAsync -Value { $this.Task }
             $process.StandardError | Add-Member -MemberType ScriptMethod -Name ReadToEndAsync -Value { $this.Task }
@@ -196,13 +197,14 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
     }
 
     It 'runs the bounded runner when <Name> (codex copy, issue #927)' -ForEach @(
-        @{ Name = 'the process exits in time'; Exits = $true; OutputCompletes = $true; KillThrows = $false; ExitCode = 0; Output = "docs/a.md`0"; Killed = $false }
-        @{ Name = 'the exit wait expires'; Exits = $false; OutputCompletes = $true; KillThrows = $false; ExitCode = 124; Output = ''; Killed = $true }
-        @{ Name = 'the output wait expires'; Exits = $true; OutputCompletes = $false; KillThrows = $false; ExitCode = 124; Output = ''; Killed = $true }
-        @{ Name = 'stopping the process throws'; Exits = $false; OutputCompletes = $true; KillThrows = $true; ExitCode = 124; Output = ''; Killed = $false }
+        @{ Name = 'the process exits in time'; Exits = $true; OutputCompletes = $true; KillThrows = $false; Text = "docs/a.md`0"; ExitCode = 0; Output = "docs/a.md`0"; Killed = $false }
+        @{ Name = 'the exit wait expires'; Exits = $false; OutputCompletes = $true; KillThrows = $false; Text = "docs/a.md`0"; ExitCode = 124; Output = ''; Killed = $true }
+        @{ Name = 'the output wait expires'; Exits = $true; OutputCompletes = $false; KillThrows = $false; Text = "docs/a.md`0"; ExitCode = 124; Output = ''; Killed = $true }
+        @{ Name = 'stopping the process throws'; Exits = $false; OutputCompletes = $true; KillThrows = $true; Text = "docs/a.md`0"; ExitCode = 124; Output = ''; Killed = $false }
+        @{ Name = 'the process emits LF-terminated lines'; Exits = $true; OutputCompletes = $true; KillThrows = $false; Text = "a`nb`n"; ExitCode = 0; Output = 'a|b'; Killed = $false }
     ) {
-        # Arrange: the row supplies which wait expires and whether stopping the process throws.
-        $script:CodexDocsOnlyFakeProcess = Get-CodexDocsOnlyFakeProcess -Exits $Exits -OutputCompletes $OutputCompletes -KillThrows $KillThrows -Text "docs/a.md`0"
+        # Arrange: the row supplies the output text, which wait expires, and whether stopping the process throws.
+        $script:CodexDocsOnlyFakeProcess = Get-CodexDocsOnlyFakeProcess -Exits $Exits -OutputCompletes $OutputCompletes -KillThrows $KillThrows -Text $Text
 
         # Act
         $lines = @(Invoke-DocsOnlyBoundedNative -FileName 'git' -ArgumentList @('-C', $PSScriptRoot, 'status') -ProcessStarter ${function:Invoke-CodexDocsOnlyFakeStart})
