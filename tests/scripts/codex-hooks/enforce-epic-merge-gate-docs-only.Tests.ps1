@@ -133,6 +133,23 @@ Describe 'Codex enforce-epic-merge-gate docs-only branch (issue #927)' {
         Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
     }
 
+    It 'denies a pull-request URL selector with PR_UNRESOLVED and no process call (codex, issue #952)' {
+        # Arrange: the URL resolves to 5 and the local pull request 5 is docs-only, so only
+        # the M1 URL rule keeps the exemption from reading the local repository.
+        Set-CodexGateDocsOnlySeam -DiffOutput "docs/a.md`0"
+        $payload = ConvertTo-CodexDocsOnlyPayload -Command 'gh pr merge https://github.com/o/r/pull/5 --merge'
+
+        # Act
+        $decision = Invoke-CodexEpicMergeDecision -PayloadRaw $payload -ChildCheckpointRaw '' -EpicCheckpointRaw '' -RepositoryRoot $PSScriptRoot
+        $reason = [string]$decision.hookSpecificOutput.permissionDecisionReason
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $reason.Contains(" (docs-only exemption not applied: DOCS_ONLY_EXEMPTION_PR_UNRESOLVED: the URL selector 'https://github.com/o/r/pull/5' is not accepted.)") | Should -BeTrue
+        Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+        Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
+    }
+
     It 'denies a failed gh lookup with PR_UNRESOLVED (codex, issue #927)' {
         # Arrange: the BeforeAll seam mocks report a failed lookup.
         $payload = ConvertTo-CodexDocsOnlyPayload -Command 'gh pr merge 5 --merge'
