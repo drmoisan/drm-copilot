@@ -431,7 +431,7 @@ function Get-EpicStateIsolationHookReference {
         if ((Get-EpicStateIsolationElementText -Element $invoke.Member) -ne 'Add' -or $invoke.Expression -isnot [System.Management.Automation.Language.MemberExpressionAst]) { continue }
         if ((Get-EpicStateIsolationElementText -Element $invoke.Expression.Member) -eq 'ArgumentList') { foreach ($argument in @($invoke.Arguments)) { $loads.Add($argument) } }
     }
-    $seen =[System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
     foreach ($node in $loads) {
         if ($null -eq $node -or $node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]) { continue }
         $records = [System.Collections.Generic.List[object]]::new()

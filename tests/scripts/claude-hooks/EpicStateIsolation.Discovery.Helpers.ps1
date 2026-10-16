@@ -8,10 +8,10 @@
     loaded-source closure of a suite from string literals, take a census of the read seams in
     that closure, and detect process-spawning suites.
 
-    Get-EpicStateProcessSpawningHook and Get-EpicStateVariableHookLoad call
-    Get-EpicStateIsolationHookReference, defined in EpicStateIsolation.HookReference.Helpers.ps1,
-    which EpicStateIsolation.Helpers.ps1 dot-sources; dot-source EpicStateIsolation.Helpers.ps1
-    before calling either function (issue #935).
+    Get-EpicStateHookLiteral, Get-EpicStateProcessSpawningHook and Get-EpicStateVariableHookLoad call
+    functions defined in EpicStateIsolation.HookReference.Helpers.ps1 (Test-EpicStateIsolationExcludedHookName,
+    Get-EpicStateIsolationHookReference), which EpicStateIsolation.Helpers.ps1 dot-sources; dot-source
+    EpicStateIsolation.Helpers.ps1 before calling any of them (issue #935, CR-R4).
 
     Every function is pure over text and AST except the two readers at the file boundary,
     Get-EpicStateDiscoveredSuite and Get-EpicStateSourceReader, which read the committed tree
@@ -136,8 +136,7 @@ function Get-EpicStateHookLiteral {
         # The lookbehind keeps a test path such as tests/scripts/claude-hooks/X.Tests.ps1 from reading as a hook.
         foreach ($match in [regex]::Matches($literal, '(?<![A-Za-z0-9_-])hooks/(?<name>[A-Za-z0-9._-]+\.ps1)')) {
             $name = $match.Groups['name'].Value
-            if ($name.StartsWith('EpicStateIsolation.', [System.StringComparison]::Ordinal)) { continue }
-            if ($name.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)) { continue }
+            if (Test-EpicStateIsolationExcludedHookName -Name $name) { continue }
             if (-not $names.Contains($name)) { $names.Add($name) }
         }
     }
