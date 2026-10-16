@@ -2,7 +2,7 @@
 
 - Date captured: 2026-10-15
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/workspace-encoding-test-host-specific-paths/ (Issue #934)
+- Status: Promoted -> docs/features/active/2026-10-15-workspace-encoding-test-host-specific-paths-934/ (Issue #934)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 

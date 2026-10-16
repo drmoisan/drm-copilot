@@ -52,7 +52,7 @@ Additional host-shaped content without the user token: the literal drive-letter 
 - The user-name token (case-insensitive) in `.ts` files under `extensions/drm-copilot`: 33 lines, all in `workspace-encoding.test.ts`. No other `.ts` file under `extensions/drm-copilot/test` or `src` contains it.
 - Conclusion: scope is exactly this one test file. No byte-identical mirror must be kept in sync.
 - Outside scope, candidate unrelated follow-ups (not to be fixed under #934):
-  - `extensions/drm-copilot/test/lib/subagent-tree/session-transcript-resolver.test.ts` lines 6, 10, 12 use the literal `C:\\Users\\Dan\\repos\\drm-copilot` and its encoded form. It is a truncated user name rather than the full host segment, but it is still a literal absolute path.
+  - `extensions/drm-copilot/test/lib/subagent-tree/session-transcript-resolver.test.ts` lines 6, 10, 12 use the literal `<drive>:\\Users\\<host-user>\\repos\\drm-copilot` and its encoded form. It is a truncated user name rather than the full host segment, but it is still a literal absolute path.
   - Across the whole repository the user-name token appears in hundreds of lines in docs, workflows, `package.json` publisher fields (`"publisher": "DanMoisan"` is a real marketplace publisher id, not a path), and PowerShell tests. These are not enumerated here.
 
 ## 4. Candidate approaches and recommendation
@@ -104,11 +104,11 @@ Derivations (old literal to new expression):
 
 | Old | New |
 |---|---|
-| `"C:\\Users\\DanMoisan\\repos\\drm-copilot"` (10, 21, 39, 59, 107, 128) | `workspacePathOf(BACKSLASH, REPO)` |
-| `"C:/Users/DanMoisan/repos/drm-copilot"` (22) | `workspacePathOf(SLASH, REPO)` |
-| `"C--Users-DanMoisan-repos-drm-copilot"` (16, 62, 78, 131, 143) | `encodedNameOf(UPPER_DRIVE, REPO)` |
-| `"c--users-danmoisan-repos-drm-copilot"` (42, 53) | `encodedNameOf(UPPER_DRIVE, REPO).toLowerCase()` (equals the old lowercase literal, which is the point of the test) |
-| `"C--Users-DanMoisan-repos-some-other-repo"` (43, 65, 109, 178) | `encodedNameOf(UPPER_DRIVE, OTHER_REPO)` |
+| `"<drive>:\\Users\\<host-user>\\repos\\drm-copilot"` (10, 21, 39, 59, 107, 128) | `workspacePathOf(BACKSLASH, REPO)` |
+| `"<drive>:/Users/<host-user>/repos/drm-copilot"` (22) | `workspacePathOf(SLASH, REPO)` |
+| `"<drive>--Users-<host-user>-repos-drm-copilot"` (16, 62, 78, 131, 143) | `encodedNameOf(UPPER_DRIVE, REPO)` |
+| `"<drive-lowercase>--users-<host-user>-repos-drm-copilot"` (42, 53) | `encodedNameOf(UPPER_DRIVE, REPO).toLowerCase()` (equals the old lowercase literal, which is the point of the test) |
+| `"<drive>--Users-<host-user>-repos-some-other-repo"` (43, 65, 109, 178) | `encodedNameOf(UPPER_DRIVE, OTHER_REPO)` |
 | `...-drm-copilot-wt-2026-06-13-11-51` (63, 79) | `encodedNameOf(UPPER_DRIVE, `${REPO}-wt-2026-06-13-11-51`)` |
 | `...-drm-copilot-unrelated-suffix` (64) | `encodedNameOf(UPPER_DRIVE, `${REPO}-unrelated-suffix`)` |
 | `"C:\\...\\drm-copilot-wt-2026-07-03-16-18"` (87) | `workspacePathOf(BACKSLASH, `${REPO}-wt-2026-07-03-16-18`)` |
@@ -122,7 +122,7 @@ Derivations (old literal to new expression):
 
 `LOWER_DRIVE` is unnecessary when `.toLowerCase()` is used; omit it.
 
-Assertion equivalence: every assertion keeps the same input shape and the same expected value except for the substituted user segment (`DanMoisan` to `fixtureuser`) and Users/repos path now being assembled. Covered shapes preserved: backslash (tests 1, 3-7), forward slash (tests 2, 8, 9), drive-letter case (test 3, uppercase input vs lowercase directory), `-wt-` suffix variants (tests 4, 5, 7, 8, 9), unrelated-suffix rejection (test 4), other-repo rejection (tests 3, 4, 6, 9). Test 2 still compares production output against production output for the two separators; test 1 still compares against an expected string independent of the production function. The expected-name helper deliberately does not call `encodeWorkspacePath`, so the helper cannot mask a production regression.
+Assertion equivalence: every assertion keeps the same input shape and the same expected value except for the substituted user segment (`<host-user>` to `fixtureuser`) and Users/repos path now being assembled. Covered shapes preserved: backslash (tests 1, 3-7), forward slash (tests 2, 8, 9), drive-letter case (test 3, uppercase input vs lowercase directory), `-wt-` suffix variants (tests 4, 5, 7, 8, 9), unrelated-suffix rejection (test 4), other-repo rejection (tests 3, 4, 6, 9). Test 2 still compares production output against production output for the two separators; test 1 still compares against an expected string independent of the production function. The expected-name helper deliberately does not call `encodeWorkspacePath`, so the helper cannot mask a production regression.
 
 Residual risk: `encodedNameOf` restates the encoding rule (colon plus separator gives `--`). That is the same coupling the old literals had, expressed once. If a reviewer wants the first test to keep a visible literal for the rule, a short relative-only example (for example the encoding of a relative path containing `:` and both separators) can be added, but that is optional and would change the test inventory.
 
