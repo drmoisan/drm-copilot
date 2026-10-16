@@ -31,7 +31,7 @@ from scripts.dev_tools.plan_gate_scratch import (
     bare_scratch_definitions,
     evaluate_scratch_gate,
 )
-from tests.scripts.dev_tools.test_validate_orchestration_artifacts import (
+from tests.scripts.dev_tools.validate_orchestration_artifacts_test_support import (
     build_read_text_stub,
 )
 
