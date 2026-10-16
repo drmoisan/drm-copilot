@@ -14,7 +14,10 @@ def literals_missing_from_twin(messages: tuple[str, ...], twin: str) -> list[str
 
     ``twin`` is relative to ``extensions/drm-copilot/test``. A message counts as
     present only when the twin contains it as one double-quoted literal.
+    A missing twin fails with an assertion that names it.
     """
 
-    text = (TYPESCRIPT_TEST_ROOT / twin).read_text(encoding="utf-8")
+    path = TYPESCRIPT_TEST_ROOT / twin
+    assert path.is_file(), f"TypeScript twin test file is missing: {twin}"
+    text = path.read_text(encoding="utf-8")
     return [message for message in messages if f'"{message}"' not in text]
