@@ -158,6 +158,43 @@ Describe 'enforce-pr-author-skill docs-only helpers (issue #901)' {
             $result | Should -BeNullOrEmpty -Because "$Name must not resolve a base"
         }
 
+        It 'denies the base or repository override <Name>' -ForEach @(
+            @{ Name = 'B cluster -dB'; Command = 'gh pr create --base main -dB other --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'B attached -Bother'; Command = 'gh pr create --base main -Bother --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'B equals -B=main'; Command = 'gh pr create -B=main --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'R separate -R'; Command = 'gh pr create --base main -R o/r --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'R attached -Ro/r'; Command = 'gh pr create --base main -Ro/r --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'R cluster -dR'; Command = 'gh pr create --base main -dR o/r --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'long --repo'; Command = 'gh pr create --base main --repo o/r --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'long --repo='; Command = 'gh pr create --base main --repo=o/r --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'global -R before pr create'; Command = 'gh -R o/r pr create --base main --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'global --repo before pr create'; Command = 'gh --repo o/r pr create --base main --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'inline GH_REPO prefix'; Command = 'GH_REPO=o/r gh pr create --base main --body-file artifacts/pr_body_1.md' }
+        ) {
+            # Arrange: the row supplies a command that retargets the base or the repository.
+
+            # Act
+            $result = Get-PrAuthorDocsOnlyBaseName -CommandText $Command
+
+            # Assert
+            $result | Should -BeNullOrEmpty -Because "$Name retargets gh away from the diffed base"
+        }
+
+        It 'still resolves main for <Name>' -ForEach @(
+            @{ Name = 'boolean -d'; Command = 'gh pr create -d --base main --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'head shorthand -H'; Command = 'gh pr create --base main -H feature/x --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'title shorthand -t'; Command = 'gh pr create --base main -t Docs --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'pr-author long-flag shape'; Command = 'gh pr create --title "docs: x" --body-file artifacts/pr_body_927.md --head bug/x --base main' }
+        ) {
+            # Arrange: the row supplies a command whose single-dash tokens carry neither B nor R.
+
+            # Act
+            $result = Get-PrAuthorDocsOnlyBaseName -CommandText $Command
+
+            # Assert
+            $result | Should -BeExactly 'main' -Because "$Name does not retarget the base or the repository"
+        }
+
         It 'returns null for gh pr edit' {
             # Arrange
             $command = 'gh pr edit 12 --base main --body-file artifacts/pr_body_1.md'
@@ -209,6 +246,86 @@ Describe 'enforce-pr-author-skill docs-only helpers (issue #901)' {
 
             # Act
             $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $root -GitArgs @('status')
+
+            # Assert
+            $result.ExitCode | Should -Be -1
+            $result.Output | Should -BeExactly ''
+        }
+    }
+
+    Context 'Invoke-PrAuthorDocsOnlyGitExe command injection (issue #927)' {
+        BeforeAll {
+            # Test-local stand-ins for the git executable, passed by name to the seam's
+            # GitCommand parameter, so the seam body runs without starting a process.
+            function Invoke-DocsOnlyFakeGitEcho {
+                $global:LASTEXITCODE = 0
+                ($args -join '|') + "`0"
+            }
+            function Invoke-DocsOnlyFakeGitMultiLine {
+                $global:LASTEXITCODE = 0
+                'docs/a.md'
+                'docs/b.md'
+            }
+            function Invoke-DocsOnlyFakeGitExit128 {
+                $global:LASTEXITCODE = 128
+            }
+            function Invoke-DocsOnlyFakeGitThrow {
+                throw 'simulated git start failure'
+            }
+        }
+
+        BeforeEach {
+            $global:LASTEXITCODE = 0
+        }
+
+        AfterEach {
+            $global:LASTEXITCODE = 0
+        }
+
+        It 'returns exit code 0 and NUL-terminated output with -C, the root, and the arguments in order' {
+            # Arrange
+            $gitArgs = @('diff', '--name-only', '-z')
+            $expected = '-C|' + $PSScriptRoot + '|diff|--name-only|-z' + "`0"
+
+            # Act
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeGitEcho'
+
+            # Assert
+            $result.ExitCode | Should -Be 0
+            $result.Output | Should -BeExactly $expected -Because 'the seam passes -C, the root, then the arguments'
+            $result.Output.EndsWith([char]0) | Should -BeTrue -Because 'NUL-terminated output is preserved'
+        }
+
+        It 'joins multi-line output with a line feed' {
+            # Arrange
+            $gitArgs = @('status')
+
+            # Act
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeGitMultiLine'
+
+            # Assert
+            $result.ExitCode | Should -Be 0
+            $result.Output | Should -BeExactly "docs/a.md`ndocs/b.md"
+        }
+
+        It 'returns the non-zero exit code of the injected command' {
+            # Arrange
+            $gitArgs = @('status')
+
+            # Act
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeGitExit128'
+
+            # Assert
+            $result.ExitCode | Should -Be 128
+            $result.Output | Should -BeExactly ''
+        }
+
+        It 'returns the failure object when the injected command throws' {
+            # Arrange
+            $gitArgs = @('status')
+
+            # Act
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeGitThrow'
 
             # Assert
             $result.ExitCode | Should -Be -1
