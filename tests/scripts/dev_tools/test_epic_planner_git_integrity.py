@@ -23,6 +23,10 @@ FINAL_COMMIT = "2" * 40
 HASH = "a" * 40
 OTHER_HASH = "b" * 40
 PLAN = "docs/features/active/feature-101/plan.md"
+PLAN_HASH_ERROR = (
+    "Optional plan hash for docs/features/active/feature-101/plan.md "
+    "must be 40-64 hexadecimal characters."
+)
 
 
 class GitStub(ReadinessGitRepository):
@@ -205,6 +209,18 @@ def test_optional_commits_and_plan_blob_failures_are_blocking() -> None:
         git,
     )
     assert "does not contain" in "\n".join(errors)
+
+
+def test_feature_plan_hash_must_be_hexadecimal() -> None:
+    """Reject a feature plan_hash that is not 40-64 hexadecimal characters."""
+
+    git = GitStub()
+
+    errors = validate_planning_git_integrity(
+        _state(features=[{"plan_hash": "not-hex"}]), _parsed(), [PLAN], git
+    )
+
+    assert errors == [PLAN_HASH_ERROR]
 
 
 class ScriptRunner:
