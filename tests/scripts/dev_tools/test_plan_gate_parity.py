@@ -6,11 +6,11 @@ with the same expected finding strings, so a divergence in either runtime's
 message text fails on both sides (spec AC9).
 
 The no-`repr` message-formatting prohibition is asserted against the set of
-Python gate modules named by `_PYTHON_GATE_MODULES` — currently
-`plan_gate_discrimination.py` and `plan_gate_coverage.py` — rather than against
-a single file, so relocating finding-string code between those modules cannot
-escape the check. Its TypeScript companion asserts over the three TypeScript
-gate modules for the same reason.
+Python gate modules named by `_PYTHON_GATE_MODULES` (the discrimination,
+coverage, observability, and scratch modules) rather than against a single
+file, so relocating finding-string code between those modules cannot escape
+the check. Its TypeScript companion asserts over the TypeScript gate modules
+for the same reason.
 """
 
 from __future__ import annotations
@@ -46,6 +46,7 @@ _PYTHON_GATE_MODULES = (
     _REPO_ROOT / "scripts" / "dev_tools" / "plan_gate_discrimination.py",
     _REPO_ROOT / "scripts" / "dev_tools" / "plan_gate_coverage.py",
     _REPO_ROOT / "scripts" / "dev_tools" / "plan_gate_observability.py",
+    _REPO_ROOT / "scripts" / "dev_tools" / "plan_gate_scratch.py",
 )
 
 _TYPESCRIPT_OBSERVABILITY_MODULE = (

@@ -16,6 +16,20 @@ export default tseslint.config(
     },
   },
   {
+    // CommonJS configuration and build scripts (for example jest.config.cjs)
+    // run under Node; declare the module system and the Node globals they use.
+    files: ["**/*.cjs"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: {
+        module: "writable",
+        require: "readonly",
+        __dirname: "readonly",
+        process: "readonly",
+      },
+    },
+  },
+  {
     ignores: ["out/**", "node_modules/**"],
   },
-); 
+);
