@@ -47,15 +47,17 @@ Describe '_poshqc.yml workflow invariants' {
         }
     }
 
-    It 'declares exactly the poshqc and poshqc-linux-hooks jobs' {
-        (@($script:JobText.Keys | Sort-Object) -join ',') | Should -BeExactly 'poshqc,poshqc-linux-hooks'
+    It 'declares exactly the poshqc, poshqc-linux-hooks, poshqc-shard, and poshqc-static jobs' {
+        (@($script:JobText.Keys | Sort-Object) -join ',') | Should -BeExactly 'poshqc,poshqc-linux-hooks,poshqc-shard,poshqc-static'
     }
 
-    It 'keeps the poshqc job on windows-latest running Invoke-PoshQCTest' {
+    It 'keeps the poshqc job as the PowerShell QC merge job on windows-latest after the static and shard jobs' {
         $job = $script:JobText['poshqc']
         $job | Should -Match '(?m)^ {4}name:[ \t]*PowerShell QC[ \t]*$'
         $job | Should -Match '(?m)^ {4}runs-on:[ \t]*windows-latest[ \t]*$'
-        $job | Should -Match 'Invoke-PoshQCTest -Root'
+        $job | Should -Match '(?m)^ {4}needs:[ \t]*\[[ \t]*poshqc-static[ \t]*,[ \t]*poshqc-shard[ \t]*\][ \t]*$'
+        $job | Should -Match 'Test-PoshQCShardCompleteness'
+        $job | Should -Match 'Merge-PoshQCCoverageReport'
         $job | Should -Match '(?m)^ +name:[ \t]*poshqc-test-results[ \t]*$'
     }
 
@@ -91,5 +93,29 @@ Describe '_poshqc.yml workflow invariants' {
         $job | Should -Match "TestResult\.OutputPath\s*=\s*'artifacts/pester/pester-junit-linux-hooks\.xml'"
         $job | Should -Match '(?m)^ +name:[ \t]*poshqc-linux-hook-test-results[ \t]*$'
         $job | Should -Not -Match '(?m)^ +name:[ \t]*poshqc-test-results[ \t]*$'
+    }
+
+    It 'runs the poshqc-shard job as a three-shard matrix that does not cancel sibling shards (issue #953)' {
+        $job = $script:JobText['poshqc-shard']
+        $job | Should -Match '(?m)^ {6}fail-fast:[ \t]*false[ \t]*$'
+        $job | Should -Match '(?m)^ {8}shard:[ \t]*\[1, 2, 3\][ \t]*$'
+        $job | Should -Match '(?m)^ {4}runs-on:[ \t]*windows-latest[ \t]*$'
+    }
+
+    It 'runs Invoke-PoshQCTest with the shard parameters and uploads the shard results even on failure (issue #953)' {
+        $job = $script:JobText['poshqc-shard']
+        $job | Should -Match 'Invoke-PoshQCTest -Root'
+        $job | Should -Match '-ShardIndex \$\{\{ matrix\.shard \}\} -ShardCount 3'
+        $job | Should -Match '(?m)^ +- name:[ \t]*Test PowerShell[ \t]*$'
+        $job | Should -Match '(?m)^ {8}if:[ \t]*always\(\)[ \t]*\n {8}uses:[ \t]*actions/upload-artifact@'
+        $job | Should -Match '(?m)^ +name:[ \t]*poshqc-test-results-shard-\$\{\{ matrix\.shard \}\}[ \t]*$'
+    }
+
+    It 'runs the format and analyze gates in the poshqc-static job (issue #953)' {
+        $job = $script:JobText['poshqc-static']
+        $job | Should -Match '(?m)^ {4}name:[ \t]*PowerShell QC static[ \t]*$'
+        $job | Should -Match 'Invoke-PoshQCFormat -Root'
+        $job | Should -Match 'Invoke-PoshQCAnalyze -Root'
+        $job | Should -Not -Match 'Invoke-PoshQCTest'
     }
 }
