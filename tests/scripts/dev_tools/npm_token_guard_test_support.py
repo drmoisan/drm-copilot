@@ -129,7 +129,7 @@ def find_npm_token_assignments(text: str) -> list[int]:
     is also reported, because the assignment form needs only a word boundary
     before the name. A context read without an assignment operator
     (``secrets.NPM_TOKEN``, or ``env.NPM_TOKEN`` in an expression), an ``==``
-    comparison, an ``+==`` sequence, a name extended by a letter, digit, or
+    comparison, a ``+==`` sequence, a name extended by a letter, digit, or
     underscore (``NPM_TOKEN_V2``, ``MY_NPM_TOKEN``), and prose without ``:``,
     ``=``, or ``+=`` after the name are not reported.
 

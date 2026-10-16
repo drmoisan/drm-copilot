@@ -262,7 +262,7 @@ def test_find_npm_token_assignments_detects_assignment(
     ],
 )
 def test_find_npm_token_assignments_ignores_non_matching_text(text: str) -> None:
-    """Text that reads but does not assign ``NPM_TOKEN`` is not reported."""
+    """Text with no assignment operator applied to ``NPM_TOKEN`` is not reported."""
     # Arrange: the parametrized non-matching text.
 
     # Act
