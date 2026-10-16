@@ -734,7 +734,7 @@ Number of shards. When greater than 0, Run.Path is set to this shard's size-bala
 
 ### Phase 3 — Documentation (CR-9)
 
-- [ ] [P3-T1] Edit `scripts/powershell/PoshQC/README.md`: insert the six lines below immediately after line 61 (``- `Convert-PoshQCCoverageToRelative`: utility to strip repo-root prefixes and write a `.koverage.xml` copy (used internally by `Invoke-PoshQCTest`).``), anchored on that line. No other line changes.
+- [x] [P3-T1] Edit `scripts/powershell/PoshQC/README.md`: insert the six lines below immediately after line 61 (``- `Convert-PoshQCCoverageToRelative`: utility to strip repo-root prefixes and write a `.koverage.xml` copy (used internally by `Invoke-PoshQCTest`).``), anchored on that line. No other line changes.
   - Acceptance: each of the six function names appears at the start of a list item (a line starting with ``- `<name>`:``) exactly once.
 
 ```markdown
@@ -746,7 +746,7 @@ Number of shards. When greater than 0, Run.Path is set to this shard's size-bala
 - `Get-PoshQCCoverageLineSummary`: return covered, missed, total, and percent from a report's LINE counter.
 ```
 
-- [ ] [P3-T2] Edit `scripts/powershell/PoshQC/README.md`: insert the five lines below immediately after the line ``  - Each run logs `Code coverage population: source=<source>; files=<count>` before Pester starts.`` (line 76 at PLAN_HEAD, line 82 after P3-T1), anchored on that line. No other line changes.
+- [x] [P3-T2] Edit `scripts/powershell/PoshQC/README.md`: insert the five lines below immediately after the line ``  - Each run logs `Code coverage population: source=<source>; files=<count>` before Pester starts.`` (line 76 at PLAN_HEAD, line 82 after P3-T1), anchored on that line. No other line changes.
   - Acceptance: the file contains `Sharded runs (issue #953)` exactly once and 98 lines in total.
 
 ```markdown
@@ -757,7 +757,7 @@ Number of shards. When greater than 0, Run.Path is set to this shard's size-bala
   - `Merge-PoshQCCoverageReport` merges the shard reports with `ci = max(ci)` per line and recomputes the LINE and INSTRUCTION counters, so the merged LINE figures are exact. It omits `class` and `method` elements and METHOD and CLASS counters, because those cannot be recomputed from line hits.
 ```
 
-- [ ] [P3-T3] Edit `extensions/drm-copilot/CHANGELOG.md`: insert the five lines below immediately after line 28 (``  stops with a message to run `Install-PoshQCTool` instead of loading another version.``) and before the blank line 29, anchored on line 28. No other line changes; lines 1-28 and the `## [0.0.1] - 2026-05-02` section are unchanged.
+- [x] [P3-T3] Edit `extensions/drm-copilot/CHANGELOG.md`: insert the five lines below immediately after line 28 (``  stops with a message to run `Install-PoshQCTool` instead of loading another version.``) and before the blank line 29, anchored on line 28. No other line changes; lines 1-28 and the `## [0.0.1] - 2026-05-02` section are unchanged.
   - Acceptance: `git diff --numstat <REM_BASE_SHA> -- extensions/drm-copilot/CHANGELOG.md` (Bash tool) reports `5` added and `0` deleted.
 
 ```markdown
