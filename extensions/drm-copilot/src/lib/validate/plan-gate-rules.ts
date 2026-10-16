@@ -3,6 +3,7 @@ import {
   COV_FLAG,
   COV_FLAG_PREFIX,
   grepExecutableIndex,
+  normalizePlanWhitespace,
   type PlanCommand,
 } from "./plan-gate-commands";
 
@@ -338,6 +339,7 @@ export function isCheckableLiteral(
  * Collapse every whitespace run to a single space and drop empty segments.
  *
  * Mirrors Python `" ".join(value.split())`.
+ * Used by the plan-quotation check only; G6 uses `normalizePlanWhitespace`.
  *
  * @param value Text to normalise.
  * @returns The whitespace-normalised text.
@@ -391,8 +393,8 @@ export function windowJoin(
   size: number = WINDOW_SIZE,
 ): string[] {
   const dense = lines
-    .filter((line) => line.trim() !== "")
-    .map((line) => normalizeWhitespace(line));
+    .map((line) => normalizePlanWhitespace(line))
+    .filter((line) => line !== "");
   const windows: string[] = [];
   // Emit one window per start position so the boundary is exact.
   for (let index = 0; index < dense.length; index += 1) {
@@ -416,17 +418,17 @@ export function hasCrossLinePresence(
   context: PlanGateContext,
   literal: string,
 ): boolean {
-  const words = literal.split(/\s+/).filter((word) => word !== "");
+  const needle = normalizePlanWhitespace(literal);
+  const words = needle.split(" ");
   if (words.length < 2) {
     return false;
   }
-  const needle = words.join(" ");
   const firstWord = words[0] ?? "";
 
   // A candidate carries the first word on one line: necessary for a wrap.
   for (const path of context.git.filesContaining(firstWord)) {
     const lines = context.git.readTrackedText(path).split(/\r\n|\n|\r/);
-    if (lines.some((line) => normalizeWhitespace(line).includes(needle))) {
+    if (lines.some((line) => normalizePlanWhitespace(line).includes(needle))) {
       continue;
     }
     if (windowJoin(lines).some((window) => window.includes(needle))) {

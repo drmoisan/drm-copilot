@@ -28,6 +28,7 @@
     guard and the E1 helper are guarded loads: a failure blocks with exit 2,
     naming the file. Plan file contents are read through Get-PlanFileContent so
     tests can mock the filesystem boundary without writing temporary files.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 
 [CmdletBinding()]
@@ -317,6 +318,7 @@ if ($MyInvocation.InvocationName -eq '.') {
 if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-executor-output: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-executor-output:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
-$result = Invoke-ExecutorOutputValidation
+try { $result = Invoke-ExecutorOutputValidation }
+catch { Exit-SubagentStopBlock -Message ('validate-executor-output: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + $script:SubagentStopReportAndHaltLine) }
 if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0
