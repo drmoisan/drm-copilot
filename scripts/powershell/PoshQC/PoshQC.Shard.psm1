@@ -2,15 +2,20 @@
 .SYNOPSIS
 Selects the test files assigned to one shard (issue #953).
 .DESCRIPTION
-Returns, in input order, the entries at zero-based positions i where i % ShardCount equals
-ShardIndex - 1 (round-robin assignment). Throws when ShardCount is below 1 or ShardIndex is
-outside 1..ShardCount.
+Assigns the files in longest-processing-time order (issue #953, CR-10): heaviest file first, equal weights
+in ordinal path order, each file to the shard with the least assigned weight, then the fewest files, then
+the lowest index, so the shard loads differ by at most the weight of one file. When Weight is omitted every
+file weighs 1, which assigns the files round-robin in ordinal path order. Returns this shard's files in
+input order. Throws when ShardCount is below 1, ShardIndex is outside 1..ShardCount, or Weight and TestFile
+differ in length.
 .PARAMETER TestFile
 Ordered list of test file paths to distribute.
 .PARAMETER ShardIndex
 One-based index of the shard to select.
 .PARAMETER ShardCount
 Total number of shards.
+.PARAMETER Weight
+Optional non-negative weight of each test file (for example its size in bytes), parallel to TestFile.
 #>
 function Get-PoshQCShardSlice {
     [CmdletBinding()]
@@ -18,7 +23,8 @@ function Get-PoshQCShardSlice {
     param(
         [Parameter(Mandatory)][AllowEmptyCollection()][string[]] $TestFile,
         [Parameter(Mandatory)][int] $ShardIndex,
-        [Parameter(Mandatory)][int] $ShardCount
+        [Parameter(Mandatory)][int] $ShardCount,
+        [long[]] $Weight
     )
 
     if ($ShardCount -lt 1) {
@@ -27,9 +33,41 @@ function Get-PoshQCShardSlice {
     if ($ShardIndex -lt 1 -or $ShardIndex -gt $ShardCount) {
         throw "ShardIndex must be between 1 and $ShardCount; received $ShardIndex."
     }
+    if ($null -eq $Weight) {
+        $Weight = [long[]] (@(1) * $TestFile.Count)
+    }
+    if ($Weight.Count -ne $TestFile.Count) {
+        throw "Weight lists $($Weight.Count) values; TestFile lists $($TestFile.Count) files."
+    }
+
+    $order = [int[]] @(for ($position = 0; $position -lt $TestFile.Count; $position++) { $position })
+    $heaviestFirst = [System.Comparison[int]] {
+        param([int] $Left, [int] $Right)
+        $byWeight = $Weight[$Right].CompareTo($Weight[$Left])
+        if ($byWeight -ne 0) { return $byWeight }
+        [string]::CompareOrdinal($TestFile[$Left], $TestFile[$Right])
+    }
+    [System.Array]::Sort($order, $heaviestFirst)
+
+    $load = New-Object 'long[]' $ShardCount
+    $fileCount = New-Object 'int[]' $ShardCount
+    $selected = New-Object 'System.Collections.Generic.HashSet[int]'
+    foreach ($position in $order) {
+        $target = 0
+        for ($shard = 1; $shard -lt $ShardCount; $shard++) {
+            if ($load[$shard] -lt $load[$target] -or ($load[$shard] -eq $load[$target] -and $fileCount[$shard] -lt $fileCount[$target])) {
+                $target = $shard
+            }
+        }
+        $load[$target] += $Weight[$position]
+        $fileCount[$target]++
+        if ($target -eq $ShardIndex - 1) {
+            [void] $selected.Add($position)
+        }
+    }
 
     for ($position = 0; $position -lt $TestFile.Count; $position++) {
-        if ($position % $ShardCount -eq $ShardIndex - 1) {
+        if ($selected.Contains($position)) {
             $TestFile[$position]
         }
     }
@@ -51,6 +89,8 @@ Ordered list of test file paths to distribute.
 One-based index of the shard.
 .PARAMETER ShardCount
 Total number of shards.
+.PARAMETER Weight
+Optional weight of each test file, passed to Get-PoshQCShardSlice.
 #>
 function New-PoshQCShardManifest {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory factory that changes no system state.')]
@@ -59,10 +99,15 @@ function New-PoshQCShardManifest {
         [Parameter(Mandatory)][string] $RootPath,
         [Parameter(Mandatory)][AllowEmptyCollection()][string[]] $TestFile,
         [Parameter(Mandatory)][int] $ShardIndex,
-        [Parameter(Mandatory)][int] $ShardCount
+        [Parameter(Mandatory)][int] $ShardCount,
+        [long[]] $Weight
     )
 
-    $selected = @(Get-PoshQCShardSlice -TestFile $TestFile -ShardIndex $ShardIndex -ShardCount $ShardCount)
+    $sliceArguments = @{ TestFile = $TestFile; ShardIndex = $ShardIndex; ShardCount = $ShardCount }
+    if ($PSBoundParameters.ContainsKey('Weight')) {
+        $sliceArguments['Weight'] = $Weight
+    }
+    $selected = @(Get-PoshQCShardSlice @sliceArguments)
     $prefix = ($RootPath -replace '\\', '/').TrimEnd('/') + '/'
     $toRelative = {
         param([string] $Path)
@@ -162,4 +207,50 @@ function Test-PoshQCShardTestCount {
     }
 
     $true
+}
+
+<#
+.SYNOPSIS
+Selects this shard's test files for Invoke-PoshQCTest (issue #953).
+.DESCRIPTION
+Weights each enumerated test file by its Length property (the size in bytes of the FileInfo items that the
+default EnumerateTests seam returns; 1 for a plain path string or an item without a Length property), builds
+the manifest with New-PoshQCShardManifest, and throws when the shard selects no test file (CR-13), so Pester
+never runs with an empty Run.Path. When ShardFileListPath is set, WriteShardFileList receives the path and
+the manifest JSON without selectedFullPath. Returns the full paths of the selected files.
+.PARAMETER RootPath
+Workspace root that the manifest paths are relative to.
+.PARAMETER TestFile
+Enumerated test files: FileInfo items, objects with FullName (and optionally Length), or path strings.
+.PARAMETER ShardIndex
+One-based index of the shard.
+.PARAMETER ShardCount
+Total number of shards.
+.PARAMETER ShardFileListPath
+Optional path that receives the shard manifest JSON.
+.PARAMETER WriteShardFileList
+Seam that writes the manifest JSON; receives the path and the JSON text.
+#>
+function Select-PoshQCShardTestFile {
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory)][string] $RootPath,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]] $TestFile,
+        [Parameter(Mandatory)][int] $ShardIndex,
+        [Parameter(Mandatory)][int] $ShardCount,
+        [string] $ShardFileListPath,
+        [Parameter(Mandatory)][scriptblock] $WriteShardFileList
+    )
+
+    $paths = [string[]] @($TestFile | ForEach-Object { if ($_ -is [string]) { $_ } else { $_.FullName } })
+    $weights = [long[]] @($TestFile | ForEach-Object { if ($_ -isnot [string] -and $null -ne $_.PSObject.Properties['Length']) { [long] $_.Length } else { [long] 1 } })
+    $manifest = New-PoshQCShardManifest -RootPath $RootPath -TestFile $paths -ShardIndex $ShardIndex -ShardCount $ShardCount -Weight $weights
+    if (@($manifest.selected).Count -eq 0) {
+        throw "Shard $ShardIndex of $ShardCount selects no test file; $($paths.Count) test files cannot fill $ShardCount shards. Lower the shard count."
+    }
+    if ($ShardFileListPath) {
+        & $WriteShardFileList $ShardFileListPath ($manifest | Select-Object -Property shardIndex, shardCount, all, selected | ConvertTo-Json -Depth 4)
+    }
+    [string[]] $manifest.selectedFullPath
 }

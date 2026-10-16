@@ -31,7 +31,8 @@ line carries ci = max(ci) and mi = (mi + ci of the first report) - max(ci). The 
 INSTRUCTION counters of every sourcefile, every package, and the report are then recomputed
 bottom-up: LINE covered counts lines with ci greater than 0 and LINE missed counts lines with ci
 equal to 0; INSTRUCTION covered is the sum of ci and INSTRUCTION missed is the sum of mi.
-No coverage threshold is enforced. Returns the merged XML text.
+Class and method elements and every counter other than LINE and INSTRUCTION are removed, because they
+cannot be recomputed from merged line hits (CR-8). No coverage threshold is enforced. Returns the merged XML text.
 .PARAMETER CoverageXml
 The XML text of each shard's coverage report; at least one is required.
 #>
@@ -84,6 +85,12 @@ function Merge-PoshQCCoverageReport {
                 $line.SetAttribute('mi', [string] ($commandTotal - $otherCovered))
             }
         }
+    }
+
+    # Issue #953 (CR-8): class and method elements, and counters other than LINE and INSTRUCTION, cannot be
+    # recomputed from merged line hits and would keep the figures of report 1, so the merged report omits them.
+    foreach ($staleNode in @($merged.SelectNodes("//class | //counter[@type!='LINE' and @type!='INSTRUCTION']"))) {
+        [void] $staleNode.ParentNode.RemoveChild($staleNode)
     }
 
     $setCounter = {

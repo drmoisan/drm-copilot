@@ -506,7 +506,7 @@ Every edit in this phase uses the Edit tool on a test file (no batch-budget slot
 
 No test runs in this phase (Task-ordering rule). The Edit tool writes exactly three production PowerShell files in this phase (Batch budget).
 
-- [ ] [P2-T1] Edit `scripts/powershell/PoshQC/PoshQC.Shard.psm1`: replace lines 1-36 (from the opening `<#` through the closing `}` of `Get-PoshQCShardSlice`) with the 74 lines below. No other line changes in this task.
+- [x] [P2-T1] Edit `scripts/powershell/PoshQC/PoshQC.Shard.psm1`: replace lines 1-36 (from the opening `<#` through the closing `}` of `Get-PoshQCShardSlice`) with the 74 lines below. No other line changes in this task.
   - Acceptance: the file contains `[System.Array]::Sort($order, $heaviestFirst)` and `Weight lists $($Weight.Count) values` (quoted here as literals this task creates), each once.
 
 ```powershell
@@ -586,7 +586,7 @@ function Get-PoshQCShardSlice {
 }
 ```
 
-- [ ] [P2-T2] Edit `New-PoshQCShardManifest` in `scripts/powershell/PoshQC/PoshQC.Shard.psm1` with two Edit calls and no other line change:
+- [x] [P2-T2] Edit `New-PoshQCShardManifest` in `scripts/powershell/PoshQC/PoshQC.Shard.psm1` with two Edit calls and no other line change:
   1. Replace the three lines `.PARAMETER ShardCount`, `Total number of shards.`, `#>` that are immediately followed by `function New-PoshQCShardManifest {` (anchor on all four lines) with the five lines `.PARAMETER ShardCount`, `Total number of shards.`, `.PARAMETER Weight`, `Optional weight of each test file, passed to Get-PoshQCShardSlice.`, `#>`, keeping the function line.
   2. Replace the four lines `        [Parameter(Mandatory)][int] $ShardCount`, `    )`, blank, `    $selected = @(Get-PoshQCShardSlice -TestFile $TestFile -ShardIndex $ShardIndex -ShardCount $ShardCount)` with the nine lines below.
   - Acceptance: the file contains `$sliceArguments['Weight'] = $Weight` (quoted here as the literal this task creates) exactly once and no `-TestFile $TestFile -ShardIndex $ShardIndex -ShardCount $ShardCount)`.
@@ -603,7 +603,7 @@ function Get-PoshQCShardSlice {
     $selected = @(Get-PoshQCShardSlice @sliceArguments)
 ```
 
-- [ ] [P2-T3] Edit `scripts/powershell/PoshQC/PoshQC.Shard.psm1`: append the 46 lines below after the final `}` of `Test-PoshQCShardTestCount`. Anchor the Edit on the last six lines of the file (from `    if ($sum -ne $DiscoveryCount) {` through the final `}`). No other line changes.
+- [x] [P2-T3] Edit `scripts/powershell/PoshQC/PoshQC.Shard.psm1`: append the 46 lines below after the final `}` of `Test-PoshQCShardTestCount`. Anchor the Edit on the last six lines of the file (from `    if ($sum -ne $DiscoveryCount) {` through the final `}`). No other line changes.
   - Acceptance: the file contains `function Select-PoshQCShardTestFile {`, `selects no test file; $($paths.Count) test files cannot fill`, and `[OutputType([string[]])]` (quoted here as literals this task creates), each once.
 
 ```powershell
@@ -655,7 +655,7 @@ function Select-PoshQCShardTestFile {
 }
 ```
 
-- [ ] [P2-T4] Edit `scripts/powershell/PoshQC/PoshQC.CoverageMerge.psm1` line 34 (help of `Merge-PoshQCCoverageReport`): replace `No coverage threshold is enforced. Returns the merged XML text.` with the two lines below. No other line changes.
+- [x] [P2-T4] Edit `scripts/powershell/PoshQC/PoshQC.CoverageMerge.psm1` line 34 (help of `Merge-PoshQCCoverageReport`): replace `No coverage threshold is enforced. Returns the merged XML text.` with the two lines below. No other line changes.
   - Acceptance: the file contains `cannot be recomputed from merged line hits (CR-8)` exactly once, and the count of lines containing both `throw` and `percent` (case-insensitive) is 0.
 
 ```text
@@ -663,7 +663,7 @@ Class and method elements and every counter other than LINE and INSTRUCTION are 
 cannot be recomputed from merged line hits (CR-8). No coverage threshold is enforced. Returns the merged XML text.
 ```
 
-- [ ] [P2-T5] Edit `scripts/powershell/PoshQC/PoshQC.CoverageMerge.psm1`: insert the six lines below immediately before the line `    $setCounter = {` (line 89 at PLAN_HEAD, line 90 after P2-T4), so the existing blank line before it stays and the inserted block ends with a blank line. Anchor the Edit on `    $setCounter = {`. No other line changes.
+- [x] [P2-T5] Edit `scripts/powershell/PoshQC/PoshQC.CoverageMerge.psm1`: insert the six lines below immediately before the line `    $setCounter = {` (line 89 at PLAN_HEAD, line 90 after P2-T4), so the existing blank line before it stays and the inserted block ends with a blank line. Anchor the Edit on `    $setCounter = {`. No other line changes.
   - Acceptance: the file contains `[void] $staleNode.ParentNode.RemoveChild($staleNode)` (quoted here as the literal this task creates) exactly once.
 
 ```powershell
@@ -675,18 +675,18 @@ cannot be recomputed from merged line hits (CR-8). No coverage threshold is enfo
 
 ```
 
-- [ ] [P2-T6] Verify the two edited modules `scripts/powershell/PoshQC/PoshQC.Shard.psm1` and `scripts/powershell/PoshQC/PoshQC.CoverageMerge.psm1` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-merge-shard-edit.<ts>.md`.
+- [x] [P2-T6] Verify the two edited modules `scripts/powershell/PoshQC/PoshQC.Shard.psm1` and `scripts/powershell/PoshQC/PoshQC.CoverageMerge.psm1` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-merge-shard-edit.<ts>.md`.
   - Through the Tool route, for each file run `$errors = $null; [void][System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path <path>).Path, [ref]$null, [ref]$errors); $errors.Count` and `(Get-Content -LiteralPath <path>).Count`, and count the lines that start with `function ` and name `Get-PoshQCShardSlice`, `New-PoshQCShardManifest`, `Test-PoshQCShardCompleteness`, `Test-PoshQCShardTestCount`, and `Select-PoshQCShardTestFile` in `PoshQC.Shard.psm1`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: both parse-error counts are 0; the line counts are 256 (`PoshQC.Shard.psm1`: 165 - 36 + 74 after P2-T1, + 2 + 5 after P2-T2, + 46 after P2-T3) and 163 (`PoshQC.CoverageMerge.psm1`); each of the five function names is defined exactly once.
-- [ ] [P2-T7] Edit `scripts/powershell/PoshQC/PoshQC.Testing.psm1` line 156 (help of `Invoke-PoshQCTest`): replace `Number of shards. When greater than 0, Run.Path is set to this shard's round-robin slice of the test files.` with the line below. No other line changes.
+- [x] [P2-T7] Edit `scripts/powershell/PoshQC/PoshQC.Testing.psm1` line 156 (help of `Invoke-PoshQCTest`): replace `Number of shards. When greater than 0, Run.Path is set to this shard's round-robin slice of the test files.` with the line below. No other line changes.
   - Acceptance: the file contains `size-balanced slice of the test files (Select-PoshQCShardTestFile)` (quoted here as the literal this task creates) exactly once. Line 412 still contains `round-robin` until P2-T8.
 
 ```text
 Number of shards. When greater than 0, Run.Path is set to this shard's size-balanced slice of the test files (Select-PoshQCShardTestFile).
 ```
 
-- [ ] [P2-T8] Edit `scripts/powershell/PoshQC/PoshQC.Testing.psm1`: replace lines 411-419 (from `    if ($ShardCount -gt 0) {` through its closing `    }`, the block that calls `New-PoshQCShardManifest` and `$WriteShardFileList`) with the four lines below. No other line changes. Line 174 (the default `WriteShardFileList` seam) is unchanged.
+- [x] [P2-T8] Edit `scripts/powershell/PoshQC/PoshQC.Testing.psm1`: replace lines 411-419 (from `    if ($ShardCount -gt 0) {` through its closing `    }`, the block that calls `New-PoshQCShardManifest` and `$WriteShardFileList`) with the four lines below. No other line changes. Line 174 (the default `WriteShardFileList` seam) is unchanged.
   - Acceptance: the file contains `Select-PoshQCShardTestFile -RootPath $Root` (quoted here as the literal this task creates) exactly once and no `New-PoshQCShardManifest`.
 
 ```powershell
@@ -696,12 +696,12 @@ Number of shards. When greater than 0, Run.Path is set to this shard's size-bala
     }
 ```
 
-- [ ] [P2-T9] Verify `scripts/powershell/PoshQC/PoshQC.Testing.psm1` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-testing-psm1-edit.<ts>.md`.
+- [x] [P2-T9] Verify `scripts/powershell/PoshQC/PoshQC.Testing.psm1` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-testing-psm1-edit.<ts>.md`.
   - Through the Tool route: the `ParseFile` error count, `(Get-Content -LiteralPath scripts/powershell/PoshQC/PoshQC.Testing.psm1).Count`, and `@(Select-String -LiteralPath scripts/powershell/PoshQC/PoshQC.Testing.psm1 -SimpleMatch -Pattern '<token>').Count` for the tokens `5.99.99`, `-MaximumVersion $MaximumVersion`, and `Set-Content -LiteralPath $Path -Value $Json -Encoding utf8` (tokens with `$` in single quotes).
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Through the Tool route, also count the lines containing `round-robin` (`Select-String -SimpleMatch`).
   - Acceptance: 0 parse errors; 479 lines (CR-17, AC-15); each token count is 1 (the cycle-1 ceiling rows still hold, and the default seam body is intact); the `round-robin` count is 0.
-- [ ] [P2-T10] Edit `.github/workflows/_poshqc.yml` lines 38-39 (the comment above `poshqc-shard:`): replace `  # Issue #953 (FR-09): the Pester suite runs in three round-robin shards; the poshqc job` and `  # below verifies shard completeness and merges the shard coverage reports.` with the two lines below. No other line changes.
+- [x] [P2-T10] Edit `.github/workflows/_poshqc.yml` lines 38-39 (the comment above `poshqc-shard:`): replace `  # Issue #953 (FR-09): the Pester suite runs in three round-robin shards; the poshqc job` and `  # below verifies shard completeness and merges the shard coverage reports.` with the two lines below. No other line changes.
   - Acceptance: the file contains no `round-robin`.
 
 ```yaml
@@ -709,14 +709,14 @@ Number of shards. When greater than 0, Run.Path is set to this shard's size-bala
   # only place the shard count is written; the poshqc job verifies shard completeness and merges coverage.
 ```
 
-- [ ] [P2-T11] Edit `.github/workflows/_poshqc.yml` line 62: replace `-ShardCount 3` with `-ShardCount ${{ strategy.job-total }}` in the `Invoke-PoshQCTest` line, giving the line below. No other line changes.
+- [x] [P2-T11] Edit `.github/workflows/_poshqc.yml` line 62: replace `-ShardCount 3` with `-ShardCount ${{ strategy.job-total }}` in the `Invoke-PoshQCTest` line, giving the line below. No other line changes.
   - Acceptance: the file contains `-ShardCount ${{ strategy.job-total }}` exactly once and no `-ShardCount 3`.
 
 ```yaml
           Invoke-PoshQCTest -Root "${{ github.workspace }}" -ShardIndex ${{ matrix.shard }} -ShardCount ${{ strategy.job-total }} -ShardFileListPath artifacts/pester/shard-files.json -DisableKoverageCopy
 ```
 
-- [ ] [P2-T12] Edit `.github/workflows/_poshqc.yml` in the step `Merge PowerShell shard coverage`: replace line 129 (`          $coverageXml = @(1..3 | ...`) with the two lines below (the `$shardCount` line, then the `$coverageXml` line), and replace line 133 (`          foreach ($shardNumber in 1..3) {`) with `          foreach ($shardNumber in 1..$shardCount) {`. No other line changes.
+- [x] [P2-T12] Edit `.github/workflows/_poshqc.yml` in the step `Merge PowerShell shard coverage`: replace line 129 (`          $coverageXml = @(1..3 | ...`) with the two lines below (the `$shardCount` line, then the `$coverageXml` line), and replace line 133 (`          foreach ($shardNumber in 1..3) {`) with `          foreach ($shardNumber in 1..$shardCount) {`. No other line changes.
   - Acceptance: the file contains no `1..3`, and `1..$shardCount` occurs on exactly two lines.
 
 ```yaml
@@ -724,12 +724,12 @@ Number of shards. When greater than 0, Run.Path is set to this shard's size-bala
           $coverageXml = @(1..$shardCount | ForEach-Object { Get-Content -Raw -LiteralPath "artifacts/shards/poshqc-test-results-shard-$_/powershell-coverage.xml" })
 ```
 
-- [ ] [P2-T13] Verify `.github/workflows/_poshqc.yml` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-workflow-edit.<ts>.md`.
+- [x] [P2-T13] Verify `.github/workflows/_poshqc.yml` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-workflow-edit.<ts>.md`.
   - From the Bash tool, run `git diff --numstat <REM_BASE_SHA> -- .github/workflows/_poshqc.yml` and `git show <REM_BASE_SHA>:.github/workflows/_poshqc.yml` (SHA written literally).
   - Through the Tool route: `(Get-Content -LiteralPath .github/workflows/_poshqc.yml).Count`; `@(Select-String -LiteralPath .github/workflows/_poshqc.yml -SimpleMatch -Pattern 'if: always()').Count`; `@(Select-String -LiteralPath .github/workflows/_poshqc.yml -SimpleMatch -Pattern 'cancelled()').Count`; compare lines 1-5 of the file with lines 1-5 of the `git show` output; and compare the `poshqc-linux-hooks` block of both texts (the line `  poshqc-linux-hooks:` and every following line up to the next line matching `^  [A-Za-z0-9_-]+:\s*$` or the end of the text, trailing blank lines dropped).
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: the numstat row reads `6` added and `5` deleted (lines 38-39, 62, 129, and 133 replaced, plus the `$shardCount` line); the line count is 186; the `if: always()` count is 3 (lines 65, 79, and 181 of the edited file; head lines 65, 79, and 180; the job-level line 79 is kept under D17) and the `cancelled()` count is 0; lines 1-5 are identical; the `poshqc-linux-hooks` blocks are identical.
-- [ ] [P2-T14] Run actionlint on the edited workflow through the Tool route with the P0-T16 task text and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-actionlint-after-edit.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+- [x] [P2-T14] Run actionlint on the edited workflow through the Tool route with the P0-T16 task text and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-actionlint-after-edit.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: EXIT_CODE 0 with no actionlint output (the `${{ strategy.job-total }}` expression is accepted).
 
 ### Phase 3 — Documentation (CR-9)

@@ -35,8 +35,8 @@ jobs:
           Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
           Invoke-PoshQCAnalyze -Root "${{ github.workspace }}"
 
-  # Issue #953 (FR-09): the Pester suite runs in three round-robin shards; the poshqc job
-  # below verifies shard completeness and merges the shard coverage reports.
+  # Issue #953 (FR-09, CR-10, CR-11): the Pester suite runs in size-balanced shards. The matrix below is the
+  # only place the shard count is written; the poshqc job verifies shard completeness and merges coverage.
   poshqc-shard:
     name: PowerShell QC shard ${{ matrix.shard }}
     runs-on: windows-latest
@@ -59,7 +59,7 @@ jobs:
         shell: pwsh
         run: |
           Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
-          Invoke-PoshQCTest -Root "${{ github.workspace }}" -ShardIndex ${{ matrix.shard }} -ShardCount 3 -ShardFileListPath artifacts/pester/shard-files.json -DisableKoverageCopy
+          Invoke-PoshQCTest -Root "${{ github.workspace }}" -ShardIndex ${{ matrix.shard }} -ShardCount ${{ strategy.job-total }} -ShardFileListPath artifacts/pester/shard-files.json -DisableKoverageCopy
 
       - name: Upload PowerShell shard test artifacts
         if: always()
@@ -126,11 +126,12 @@ jobs:
         run: |
           Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
           New-Item -ItemType Directory -Force -Path artifacts/pester | Out-Null
-          $coverageXml = @(1..3 | ForEach-Object { Get-Content -Raw -LiteralPath "artifacts/shards/poshqc-test-results-shard-$_/powershell-coverage.xml" })
+          $shardCount = [int] (Get-Content -Raw -LiteralPath artifacts/shards/poshqc-test-results-shard-1/shard-files.json | ConvertFrom-Json).shardCount
+          $coverageXml = @(1..$shardCount | ForEach-Object { Get-Content -Raw -LiteralPath "artifacts/shards/poshqc-test-results-shard-$_/powershell-coverage.xml" })
           $merged = Merge-PoshQCCoverageReport -CoverageXml $coverageXml
           Set-Content -LiteralPath artifacts/pester/powershell-coverage.xml -Value $merged -Encoding utf8 -NoNewline
           Convert-PoshQCCoverageToRelative -InputPath artifacts/pester/powershell-coverage.xml -OutputPath artifacts/pester/powershell-coverage.koverage.xml -RepoRoot "${{ github.workspace }}"
-          foreach ($shardNumber in 1..3) {
+          foreach ($shardNumber in 1..$shardCount) {
             Copy-Item -LiteralPath "artifacts/shards/poshqc-test-results-shard-$shardNumber/pester-junit.xml" -Destination "artifacts/pester/pester-junit-shard-$shardNumber.xml"
           }
           $summary = Get-PoshQCCoverageLineSummary -CoverageXml $merged
