@@ -168,14 +168,20 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # matching paragraph (lines 133-135) to state that the defect was resolved by
 # epic #904 and issue #928. Both digests moved, and the pin stays live for
 # both entries.
+#
+# RE-BASELINED by issue #952. That change made the epic skill and the epic agent
+# record the integration-branch merge commit SHA only after the merge is
+# confirmed by polling and ancestry check, and granted the epic agent the two
+# parser invocations its skill prescribes. Both digests moved, and the pin
+# stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "c5b50974afe1718efce7023b2a7e6965d43979de333a84fb4d9fc2192eadd96d",
+        "e0691d2a05dfd97b886694262eb900293f38d9927fc2803f7e4574af856ce740",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "b7af3a42d128a140951a07d592067a780429bc9beba0b6ec16afe54c3084b83f",
+        "84b0555d0db146274fc5bfb9f06909c0b892a1f59522cc9feb0312d08721cf30",
     ),
 )
 

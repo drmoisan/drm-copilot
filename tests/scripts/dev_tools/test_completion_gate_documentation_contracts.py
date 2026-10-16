@@ -20,6 +20,10 @@ import pytest
 
 from scripts.dev_tools._orchestrator_state_routing import PR_GATE_KEYS
 from scripts.dev_tools.validate_orchestrator_state import CI_GATE_KEYS
+from tests.scripts.dev_tools.merge_queue_documentation_expectations import (
+    MERGE_QUEUE_FRAGMENT_PINS,
+    MERGE_QUEUE_MIRROR_PAIRS,
+)
 from tests.scripts.dev_tools.parallel_orchestrator_surface_test_support import (
     REPO_ROOT,
     collapse_whitespace,
@@ -410,9 +414,25 @@ def test_evidence_skill_states_timestamp_system_clock_source(skill_path: Path) -
 
 
 @pytest.mark.parametrize(
+    ("relative_path", "heading", "fragments"),
+    [
+        (path, heading, fragments)
+        for _, path, heading, fragments in MERGE_QUEUE_FRAGMENT_PINS
+    ],
+    ids=[pin_id for pin_id, _, _, _ in MERGE_QUEUE_FRAGMENT_PINS],
+)
+def test_merge_procedure_records_merge_only_after_confirmation(
+    relative_path: Path, heading: str, fragments: tuple[str, ...]
+) -> None:
+    """Each merge procedure records a merge only after confirmation (#952)."""
+    # Arrange / Act / Assert
+    _assert_section_contains(relative_path, heading, fragments)
+
+
+@pytest.mark.parametrize(
     ("source", "mirror"),
-    [pair for _, pair in MIRROR_PAIRS],
-    ids=[pair_id for pair_id, _ in MIRROR_PAIRS],
+    [pair for _, pair in MIRROR_PAIRS + MERGE_QUEUE_MIRROR_PAIRS],
+    ids=[pair_id for pair_id, _ in MIRROR_PAIRS + MERGE_QUEUE_MIRROR_PAIRS],
 )
 def test_edited_surface_matches_bundled_mirror(source: Path, mirror: Path) -> None:
     """Each edited surface is byte-identical to its bundled extension mirror."""
