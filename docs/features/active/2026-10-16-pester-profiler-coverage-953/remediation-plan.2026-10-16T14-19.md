@@ -6,8 +6,8 @@
 - **Inputs:** `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-inputs.2026-10-16T14-11.md` (PA-3 / CR-7), `docs/features/active/2026-10-16-pester-profiler-coverage-953/code-review.2026-10-16T14-11.md` (CR-7 to CR-17), `docs/features/active/2026-10-16-pester-profiler-coverage-953/policy-audit.2026-10-16T14-11.md`, `docs/features/active/2026-10-16-pester-profiler-coverage-953/feature-audit.2026-10-16T14-11.md`; reference plans `docs/features/active/2026-10-16-pester-profiler-coverage-953/plan.2026-10-16T00-16.md` (Phase 8 executed through P8-T18) and `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-plan.2026-10-16T10-24.md` (cycle 1).
 - **Planning-time head:** `50c4e6ee8`. Every line citation below was re-derived against the working tree at this head.
 - **Last Updated:** 2026-10-16
-- **Status:** Draft revision 1.0, pending executor preflight
-- **Version:** 1.0
+- **Status:** Draft revision 1.1 (preflight delta D1 applied; orchestrator decision D17 drops CR-14), pending executor preflight
+- **Version:** 1.1
 
 ## Scope
 
@@ -20,10 +20,11 @@ Orchestrator decision D16 brings these findings of `code-review.2026-10-16T14-11
 - **CR-11:** the shard count is written four times in `_poshqc.yml`.
 - **CR-12:** the default `WriteShardFileList` seam body is not executed by any test.
 - **CR-13:** an empty shard slice reaches Pester with an empty `Run.Path`.
-- **CR-14:** the merge job uses `if: always()` and therefore also runs on a cancelled run.
 - **CR-17:** `PoshQC.Testing.psm1` is at 484 of 500 lines.
 
-Out of scope: CR-15 and CR-16 (informational); PA-N1 and PA-N5 (orchestrator, P8-T19); PA-N6; `.github/workflows/ci.yml`; every workflow `on:` block (lines 1-5 of `_poshqc.yml` unchanged); the `poshqc-linux-hooks` job (unchanged). The job id `poshqc` and its name `PowerShell QC` stay. PA-1 and PA-2 (`awaiting_ci`) are resolved by reference-plan tasks P8-T19 and P8-T20 on the PR head that contains this cycle's commits; this plan adds no CI task.
+Orchestrator decision D17 (revision 1.1, from executor preflight observation O1) removes CR-14 from this cycle. The `poshqc` merge job keeps `if: always()` at `.github/workflows/_poshqc.yml:79`. Reason: with `if: ${{ !cancelled() }}`, a cancelled run can leave the required check `poshqc / PowerShell QC` skipped, and GitHub treats a skipped required check as non-blocking; with `if: always()` the job runs the result-check step (`_poshqc.yml:82-90`) and fails the check. Test WF01 is retained as a CR-7 test that asserts the job-level `if: always()` condition, which strengthens the CR-7 coverage.
+
+Out of scope: CR-14 (D17; the job-level condition stays `if: always()`); CR-15 and CR-16 (informational); PA-N1 and PA-N5 (orchestrator, P8-T19); PA-N6; `.github/workflows/ci.yml`; every workflow `on:` block (lines 1-5 of `_poshqc.yml` unchanged); the `poshqc-linux-hooks` job (unchanged). The job id `poshqc` and its name `PowerShell QC` stay. PA-1 and PA-2 (`awaiting_ci`) are resolved by reference-plan tasks P8-T19 and P8-T20 on the PR head that contains this cycle's commits; this plan adds no CI task.
 
 ## Files Written
 
@@ -37,7 +38,7 @@ Source, workflow, tests, and documentation (14 paths, the CYCLE_FILES set):
 4. `extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.CoverageMerge.psm1`: identical to item 3, written with `Copy-Item`.
 5. `scripts/powershell/PoshQC/PoshQC.Testing.psm1`: help line 156 and lines 411-419 only. Edit tool.
 6. `extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1`: identical to item 5, written with `Copy-Item`.
-7. `.github/workflows/_poshqc.yml`: lines 38-39, 62, 79, 129, and 133, and one line inserted after line 128. Edit tool.
+7. `.github/workflows/_poshqc.yml`: lines 38-39, 62, 129, and 133, and one line inserted after line 128 (line 79, `    if: always()`, is unchanged under D17). Edit tool.
 8. `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`: line 108, one block inserted after line 47, and one block inserted after line 120.
 9. `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1`: line 34 and one block inserted after line 57.
 10. `tests/scripts/powershell/PoshQC/PoshQC.CoverageMerge.Tests.ps1`: lines 93, 136, and 137, and one block inserted after line 140.
@@ -125,8 +126,8 @@ $env:ISSUE953_PATHS = '<paths joined with ;>'; $env:ISSUE953_JUNIT = Join-Path $
 - **MOD_KEYS** (the CRP keys of the three production modules this cycle changes): `scripts/powershell/poshqc/poshqc.shard.psm1`, `scripts/powershell/poshqc/poshqc.coveragemerge.psm1`, `scripts/powershell/poshqc/poshqc.testing.psm1`.
 - **R2_SET** (the targeted test set, joined with `;` for TARGETED_RUN): `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`, `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1`, `tests/scripts/powershell/PoshQC/PoshQC.CoverageMerge.Tests.ps1`, `tests/scripts/powershell/PoshQC/PoshQC.TestingShard.Tests.ps1`.
 - **OLD_TOKENS** (existing test-name tokens in R2_SET): `SH01-SLICE-ROUND-ROBIN`, `SH02-SLICE-INVALID-INDEX-THROWS`, `SH03-MANIFEST-RELATIVE-PATHS`, `SH04-COMPLETENESS-PASS`, `SH05-COMPLETENESS-MISSING-FILE-THROWS`, `SH06-COMPLETENESS-OVERLAP-THROWS`, `SH07-COMPLETENESS-DIVERGENT-ALL-THROWS`, `SH08-TESTCOUNT-MISMATCH-THROWS`, `SH09-TESTCOUNT-MATCH-PASSES`, `CM01-MERGE-MAX-CI`, `CM02-MERGE-RECOMPUTES-LINE-COUNTERS`, `CM03-MERGE-PRESERVES-DENOMINATOR`, `CM04-MERGE-MISMATCHED-LINES-THROWS`, `CM05-MERGE-SINGLE-REPORT-IDENTITY`, `CM06-MERGE-EMPTY-INPUT-THROWS`, `CM07-SUMMARY-REPORT-LINE`, `TS01-SHARD-RUNPATH-SELECTED`, `TS02-SHARD-FILELIST-WRITTEN-VIA-SEAM`, `TS03-NO-SHARD-RUNPATH-UNCHANGED`.
-- **NEW_TOKENS** (the twelve test-name tokens Phase 1 adds): `WF01-POSHQC-MERGE-JOB-RUNS-UNLESS-CANCELLED`, `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS`, `WF04-SHARD-COUNT-FROM-MATRIX`, `WF05-MERGE-LOOPS-DERIVE-SHARD-COUNT`, `SH10-SLICE-WEIGHTED-LPT`, `SH11-SLICE-EQUAL-WEIGHTS-ORDINAL-PATH-ORDER`, `SH12-SLICE-WEIGHT-COUNT-MISMATCH-THROWS`, `CM08-MERGE-OMITS-CLASS-AND-METHOD-FIGURES`, `TS04-DEFAULT-FILELIST-SEAM-WRITES-UTF8-JSON`, `TS05-EMPTY-SHARD-SLICE-THROWS`, `TS06-SHARD-WEIGHTED-BY-FILE-SIZE`.
-- **FAIL_BEFORE_TOKENS** (the ten cases that fail on the pre-fix production tree): `WF01-POSHQC-MERGE-JOB-RUNS-UNLESS-CANCELLED`, `WF04-SHARD-COUNT-FROM-MATRIX`, `WF05-MERGE-LOOPS-DERIVE-SHARD-COUNT`, `SH10-SLICE-WEIGHTED-LPT`, `SH11-SLICE-EQUAL-WEIGHTS-ORDINAL-PATH-ORDER`, `SH12-SLICE-WEIGHT-COUNT-MISMATCH-THROWS`, `CM02-MERGE-RECOMPUTES-LINE-COUNTERS`, `CM08-MERGE-OMITS-CLASS-AND-METHOD-FIGURES`, `TS05-EMPTY-SHARD-SLICE-THROWS`, `TS06-SHARD-WEIGHTED-BY-FILE-SIZE`.
+- **NEW_TOKENS** (the twelve test-name tokens Phase 1 adds): `WF01-POSHQC-MERGE-JOB-RUNS-ALWAYS`, `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS`, `WF04-SHARD-COUNT-FROM-MATRIX`, `WF05-MERGE-LOOPS-DERIVE-SHARD-COUNT`, `SH10-SLICE-WEIGHTED-LPT`, `SH11-SLICE-EQUAL-WEIGHTS-ORDINAL-PATH-ORDER`, `SH12-SLICE-WEIGHT-COUNT-MISMATCH-THROWS`, `CM08-MERGE-OMITS-CLASS-AND-METHOD-FIGURES`, `TS04-DEFAULT-FILELIST-SEAM-WRITES-UTF8-JSON`, `TS05-EMPTY-SHARD-SLICE-THROWS`, `TS06-SHARD-WEIGHTED-BY-FILE-SIZE`.
+- **FAIL_BEFORE_TOKENS** (the nine cases that fail on the pre-fix production tree): `WF04-SHARD-COUNT-FROM-MATRIX`, `WF05-MERGE-LOOPS-DERIVE-SHARD-COUNT`, `SH10-SLICE-WEIGHTED-LPT`, `SH11-SLICE-EQUAL-WEIGHTS-ORDINAL-PATH-ORDER`, `SH12-SLICE-WEIGHT-COUNT-MISMATCH-THROWS`, `CM02-MERGE-RECOMPUTES-LINE-COUNTERS`, `CM08-MERGE-OMITS-CLASS-AND-METHOD-FIGURES`, `TS05-EMPTY-SHARD-SLICE-THROWS`, `TS06-SHARD-WEIGHTED-BY-FILE-SIZE`.
 - **RS tokens** (regression guard for cycle 1; test names in `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1:35,49,61,74,98,127,146,168,198,216`): `RS01-RUNSETTINGS-PROFILER-MODE`, `RS02-PESTER-CONFIG-USEBREAKPOINTS-FALSE`, `RS03-INSTALLER-PESTER-590`, `RS04-BUNDLED-RUNSETTINGS-PROFILER-MODE`, `RS05-INSTALLER-PESTER-CEILING-BELOW-6`, `RS06-TEST-IMPORT-PESTER-MAXIMUM`, `RS07-WORKFLOW-LINUX-PESTER-RANGE`, `RS08-TEST-IMPORT-PESTER-RANGE-BOUNDS`, `RS09-TEST-PESTER-6-ONLY-ACTIONABLE-ERROR`, `RS10-TEST-PESTER-INBOX-ONLY-ACTIONABLE-ERROR`.
 - **BUNDLE_PAIRS** (repository file and bundled copy): `PoshQC.Shard.psm1`, `PoshQC.CoverageMerge.psm1`, `PoshQC.Testing.psm1`, and `README.md`, each under `scripts/powershell/PoshQC/` and `extensions/drm-copilot/resources/powershell/PoshQC/`.
 - **CYCLE_FILES**: items 1-14 of "Files Written".
@@ -136,8 +137,8 @@ $env:ISSUE953_PATHS = '<paths joined with ;>'; $env:ISSUE953_JUNIT = Join-Path $
 - **CR-7 design.** A scriptblock `$script:GetResultGateViolation` in the `BeforeAll` of `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` returns the reasons a `poshqc` job text fails to gate on the two job results. It splits the job text into steps at lines of six spaces and `- name:`, finds the first step whose body contains both `${{ needs.poshqc-static.result }}` and `${{ needs.poshqc-shard.result }}`, and requires: both assignments, the `-or` comparison with `'success'`, an `exit 1` line, no step-level `if:`, and a position before the steps `Verify shard completeness` and `Merge PowerShell shard coverage` (`.github/workflows/_poshqc.yml:82-90`, `:107`, `:124`).
   - WF02 asserts zero violations on the committed text.
   - WF03 builds four in-memory mutations of the committed job text (step removed, `-or` replaced by `-and`, `exit 1` replaced by `exit 0`, step moved to the end) and asserts that each yields at least one violation. This is the in-memory fail-before evidence that `remediation-inputs.2026-10-16T14-11.md:25` requests for the gate assertion, kept as a permanent test.
-  - WF01 asserts the job-level condition (see CR-14).
-- **CR-14 design.** The merge job condition becomes `if: ${{ !cancelled() }}` (`_poshqc.yml:79`). The job still runs after a failed shard, and the gate step still fails it, so a failing shard cannot produce a green `poshqc / PowerShell QC` check. On a cancelled run the job is skipped. WF01 fails before the change, which gives the CR-7 and CR-14 pair a genuine fail-before case.
+  - WF01 asserts that the `poshqc` job carries exactly one job-level `    if: always()` line (`_poshqc.yml:79`) and no `${{ !cancelled() }}` condition, so the gate step runs on every run outcome, including a failed or cancelled shard run. The existing test at `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1:110` asserts only the 8-space step-level `if: always()` of the shard upload step, so no pre-cycle test asserts the job-level condition.
+- **D17 (CR-14 removed).** The merge job condition stays `if: always()`; no workflow task edits line 79. WF01 therefore passes on the pre-fix tree, and its fail-before evidence is the exception dossier of P4-T4 (absence-of-test proof: no line of the pre-cycle test file contains `{4}if:`).
 - **CR-8 design: omit, do not recompute.** METHOD and CLASS counters and the `class` and `method` elements describe function and file units whose line ranges the report does not record (a `method` element carries only its first line), so they cannot be recomputed from merged line hits. `Merge-PoshQCCoverageReport` therefore removes every `class` element and every `counter` whose `type` is neither `LINE` nor `INSTRUCTION` before it recomputes the counters. LINE figures remain exact, and INSTRUCTION remains the lower bound described by CR-15. No repository consumer reads METHOD or CLASS (`code-review.2026-10-16T14-11.md:27`); `Convert-PoshQCCoverageToRelative` rewrites path text only (`scripts/powershell/PoshQC/PoshQC.Testing.psm1:107-115`). CM02 (line 93) changes from asserting the kept METHOD counter to asserting its absence, CM05 (lines 136-137) compares only `LINE` and `INSTRUCTION` counters, and CM08 covers `class`, `method`, and `CLASS` input.
 - **CR-10 design: longest-processing-time greedy by file size, shard count stays 3.**
   - `Get-PoshQCShardSlice` gains an optional `-Weight [long[]]`. Files are ordered heaviest first, equal weights by `[string]::CompareOrdinal` of the path, and each file goes to the shard with the least assigned weight, then the fewest files, then the lowest index. The function returns the shard's files in input order. For this greedy order the final spread between the heaviest and lightest shard is at most the weight of one file.
@@ -158,19 +159,18 @@ $env:ISSUE953_PATHS = '<paths joined with ;>'; $env:ISSUE953_JUNIT = Join-Path $
 
 | Item | Implementation tasks | Tests | Evidence tasks |
 |---|---|---|---|
-| CR-7 | P1-T2, P1-T3 (test-only; the workflow gate step at `_poshqc.yml:82-90` is unchanged) | `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS` | P1-T11, P4-T3, P4-T4, P5-T3 |
+| CR-7 | P1-T2, P1-T3 (test-only; the workflow gate step at `_poshqc.yml:82-90` and the job condition at `_poshqc.yml:79` are unchanged) | `WF01-POSHQC-MERGE-JOB-RUNS-ALWAYS`, `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS` | P1-T11, P2-T13, P4-T3, P4-T4, P5-T3 |
 | CR-8 | P2-T4, P2-T5 | `CM02-MERGE-RECOMPUTES-LINE-COUNTERS`, `CM05-MERGE-SINGLE-REPORT-IDENTITY`, `CM08-MERGE-OMITS-CLASS-AND-METHOD-FIGURES` | P1-T11, P4-T3, P5-T3, P5-T4 |
 | CR-9 | P3-T1, P3-T2, P3-T3, P4-T2 | README and CHANGELOG token counts | P5-T11 |
 | CR-10 | P2-T1, P2-T2, P2-T3, P2-T8, P2-T10 | `SH10-SLICE-WEIGHTED-LPT`, `SH11-SLICE-EQUAL-WEIGHTS-ORDINAL-PATH-ORDER`, `SH12-SLICE-WEIGHT-COUNT-MISMATCH-THROWS`, `TS06-SHARD-WEIGHTED-BY-FILE-SIZE` | P1-T11, P4-T3, P4-T5, P5-T3 |
-| CR-11 | P2-T11, P2-T13 | `WF04-SHARD-COUNT-FROM-MATRIX`, `WF05-MERGE-LOOPS-DERIVE-SHARD-COUNT` | P1-T11, P2-T14, P2-T15, P4-T3, P5-T7 |
+| CR-11 | P2-T11, P2-T12 | `WF04-SHARD-COUNT-FROM-MATRIX`, `WF05-MERGE-LOOPS-DERIVE-SHARD-COUNT` | P1-T11, P2-T13, P2-T14, P4-T3, P5-T7 |
 | CR-12 | P1-T9 (test) | `TS04-DEFAULT-FILELIST-SEAM-WRITES-UTF8-JSON` | P0-T18, P4-T3, P4-T4, P5-T4 |
 | CR-13 | P2-T3, P2-T8 | `TS05-EMPTY-SHARD-SLICE-THROWS` | P1-T11, P4-T3, P5-T3 |
-| CR-14 | P2-T12 | `WF01-POSHQC-MERGE-JOB-RUNS-UNLESS-CANCELLED` | P1-T11, P2-T15, P4-T3, P5-T7 |
 | CR-17 | P2-T8 | line counts | P2-T9, P5-T8 |
 | AC-02 | P4-T2 | `tests/scripts/dev_tools/test_poshqc_bundled_parity.py::test_poshqc_bundled_module_files_match_repo_root_sources` | P4-T2, P5-T5, P5-T6 |
 | AC-06 | P3-T3 | CHANGELOG token counts | P5-T11 |
 | AC-07 | P1-T1 through P3-T3 | full self-hosted suite | P5-T1, P5-T2, P5-T3, P5-T13 |
-| AC-11 | P2-T1 through P2-T13 | `PoshQcWorkflow.Tests.ps1`, `PoshQC.Shard.Tests.ps1`, `PoshQC.CoverageMerge.Tests.ps1`, `PoshQC.TestingShard.Tests.ps1` | P5-T3, P5-T9, P5-T10 |
+| AC-11 | P2-T1 through P2-T12 | `PoshQcWorkflow.Tests.ps1`, `PoshQC.Shard.Tests.ps1`, `PoshQC.CoverageMerge.Tests.ps1`, `PoshQC.TestingShard.Tests.ps1` | P5-T3, P5-T9, P5-T10 |
 | AC-13 | scope constraint | `on:` block and `ci.yml` comparison | P5-T9 |
 | AC-14 | scope constraint | path-prefix check | P5-T12 |
 | AC-15 | size constraint | line counts | P1-T10, P2-T6, P2-T9, P5-T8 |
@@ -304,14 +304,14 @@ Every edit in this phase uses the Edit tool on a test file (no batch-budget slot
 ```
 
 - [ ] [P1-T3] Edit `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`: insert the 47 lines below between the `    }` that closes the case `runs the format and analyze gates in the poshqc-static job (issue #953)` (line 120 at PLAN_HEAD, line 169 after P1-T2) and the final `}` that closes the Describe block. Anchor the Edit on the last three lines of the file (`        $job | Should -Not -Match 'Invoke-PoshQCTest'`, `    }`, `}`) together with the preceding line `        $job | Should -Match 'Invoke-PoshQCAnalyze -Root'`. No other line changes.
-  - Acceptance: each of `WF01-POSHQC-MERGE-JOB-RUNS-UNLESS-CANCELLED`, `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS`, `WF04-SHARD-COUNT-FROM-MATRIX`, and `WF05-MERGE-LOOPS-DERIVE-SHARD-COUNT` occurs exactly once in the file (counted with `Select-String -SimpleMatch` through the Tool route).
+  - Acceptance: each of `WF01-POSHQC-MERGE-JOB-RUNS-ALWAYS`, `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS`, `WF04-SHARD-COUNT-FROM-MATRIX`, and `WF05-MERGE-LOOPS-DERIVE-SHARD-COUNT` occurs exactly once in the file (counted with `Select-String -SimpleMatch` through the Tool route).
 
 ```powershell
 
-    It 'WF01-POSHQC-MERGE-JOB-RUNS-UNLESS-CANCELLED runs the poshqc merge job after a failed shard but not on a cancelled run (issue #953, CR-14)' {
+    It 'WF01-POSHQC-MERGE-JOB-RUNS-ALWAYS runs the poshqc merge job on every run outcome so a failed or cancelled shard run fails the check (issue #953, CR-7)' {
         $job = $script:JobText['poshqc']
-        $job | Should -Match '(?m)^ {4}if:[ \t]*\$\{\{ !cancelled\(\) \}\}[ \t]*$'
-        $job | Should -Not -Match '(?m)^ {4}if:[ \t]*always\(\)'
+        @([regex]::Matches($job, '(?m)^ {4}if:[ \t]*always\(\)[ \t]*$')).Count | Should -Be 1 -Because 'a skipped required check does not block a merge; always() runs the result gate step'
+        $job | Should -Not -Match '(?m)^ {4}if:[ \t]*\$\{\{ !cancelled\(\) \}\}'
     }
 
     It 'WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE fails the poshqc check unless the static and shard jobs succeeded (issue #953, CR-7)' {
@@ -496,13 +496,13 @@ Every edit in this phase uses the Edit tool on a test file (no batch-budget slot
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (the four numstat rows and the four counts).
   - Acceptance: the line counts are 217 (`PoshQcWorkflow.Tests.ps1`), 172 (`PoshQC.Shard.Tests.ps1`), 189 (`PoshQC.CoverageMerge.Tests.ps1`), and 157 (`PoshQC.TestingShard.Tests.ps1`), each at most 500 (AC-15); the numstat rows list exactly these four files.
 - [ ] [P1-T11] [expect-fail] Run TARGETED_RUN(`r2-before`, R2_SET) on the pre-fix production tree and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r2-regression-fail-before.<ts>.md`.
-  - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 10`, and `Output Summary:` with the JRP totals, the JRP failure check (step 5) with the failure message for every FAIL_BEFORE_TOKENS entry, and the JRP token check (step 4) for every OLD_TOKENS entry other than `CM02-MERGE-RECOMPUTES-LINE-COUNTERS` and for `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS`, and `TS04-DEFAULT-FILELIST-SEAM-WRITES-UTF8-JSON`.
+  - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 9`, and `Output Summary:` with the JRP totals, the JRP failure check (step 5) with the failure message for every FAIL_BEFORE_TOKENS entry, and the JRP token check (step 4) for every OLD_TOKENS entry other than `CM02-MERGE-RECOMPUTES-LINE-COUNTERS` and for `WF01-POSHQC-MERGE-JOB-RUNS-ALWAYS`, `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS`, and `TS04-DEFAULT-FILELIST-SEAM-WRITES-UTF8-JSON`.
   - Acceptance:
-    - Run valid, EXIT_CODE 10 (Pester exits with the failed-test count when `Run.Exit` is set), JRP `tests` equal to `R2_TARGETED_BASELINE_TESTS` (latest `r2-targeted-tests.*.md` in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/`) plus 12, `failures` 10, and `errors` 0.
+    - Run valid, EXIT_CODE 9 (Pester exits with the failed-test count when `Run.Exit` is set), JRP `tests` equal to `R2_TARGETED_BASELINE_TESTS` (latest `r2-targeted-tests.*.md` in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/`) plus 12, `failures` 9, and `errors` 0.
     - Every FAIL_BEFORE_TOKENS failure check PASS, and every listed token check PASS.
   - If any condition fails, stop and report; do not start Phase 2.
 
-### Phase 2 — Production Changes (CR-8, CR-10, CR-11, CR-13, CR-14, CR-17)
+### Phase 2 — Production Changes (CR-8, CR-10, CR-11, CR-13, CR-17)
 
 No test runs in this phase (Task-ordering rule). The Edit tool writes exactly three production PowerShell files in this phase (Batch budget).
 
@@ -604,7 +604,7 @@ function Get-PoshQCShardSlice {
 ```
 
 - [ ] [P2-T3] Edit `scripts/powershell/PoshQC/PoshQC.Shard.psm1`: append the 46 lines below after the final `}` of `Test-PoshQCShardTestCount`. Anchor the Edit on the last six lines of the file (from `    if ($sum -ne $DiscoveryCount) {` through the final `}`). No other line changes.
-  - Acceptance: the file contains `function Select-PoshQCShardTestFile {` and `selects no test file; $($paths.Count) test files cannot fill` (quoted here as literals this task creates), each once.
+  - Acceptance: the file contains `function Select-PoshQCShardTestFile {`, `selects no test file; $($paths.Count) test files cannot fill`, and `[OutputType([string[]])]` (quoted here as literals this task creates), each once.
 
 ```powershell
 
@@ -632,7 +632,7 @@ Seam that writes the manifest JSON; receives the path and the JSON text.
 #>
 function Select-PoshQCShardTestFile {
     [CmdletBinding()]
-    [OutputType([string])]
+    [OutputType([string[]])]
     param(
         [Parameter(Mandatory)][string] $RootPath,
         [Parameter(Mandatory)][AllowEmptyCollection()][object[]] $TestFile,
@@ -716,9 +716,7 @@ Number of shards. When greater than 0, Run.Path is set to this shard's size-bala
           Invoke-PoshQCTest -Root "${{ github.workspace }}" -ShardIndex ${{ matrix.shard }} -ShardCount ${{ strategy.job-total }} -ShardFileListPath artifacts/pester/shard-files.json -DisableKoverageCopy
 ```
 
-- [ ] [P2-T12] Edit `.github/workflows/_poshqc.yml` line 79 (job `poshqc`): replace `    if: always()` with `    if: ${{ !cancelled() }}`. No other line changes; the `if: always()` lines of the two upload steps (lines 65 and 180) are unchanged.
-  - Acceptance: the file contains `if: ${{ !cancelled() }}` exactly once, and exactly two lines contain `if: always()`.
-- [ ] [P2-T13] Edit `.github/workflows/_poshqc.yml` in the step `Merge PowerShell shard coverage`: replace line 129 (`          $coverageXml = @(1..3 | ...`) with the two lines below (the `$shardCount` line, then the `$coverageXml` line), and replace line 133 (`          foreach ($shardNumber in 1..3) {`) with `          foreach ($shardNumber in 1..$shardCount) {`. No other line changes.
+- [ ] [P2-T12] Edit `.github/workflows/_poshqc.yml` in the step `Merge PowerShell shard coverage`: replace line 129 (`          $coverageXml = @(1..3 | ...`) with the two lines below (the `$shardCount` line, then the `$coverageXml` line), and replace line 133 (`          foreach ($shardNumber in 1..3) {`) with `          foreach ($shardNumber in 1..$shardCount) {`. No other line changes.
   - Acceptance: the file contains no `1..3`, and `1..$shardCount` occurs on exactly two lines.
 
 ```yaml
@@ -726,13 +724,13 @@ Number of shards. When greater than 0, Run.Path is set to this shard's size-bala
           $coverageXml = @(1..$shardCount | ForEach-Object { Get-Content -Raw -LiteralPath "artifacts/shards/poshqc-test-results-shard-$_/powershell-coverage.xml" })
 ```
 
-- [ ] [P2-T14] Verify `.github/workflows/_poshqc.yml` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-workflow-edit.<ts>.md`.
+- [ ] [P2-T13] Verify `.github/workflows/_poshqc.yml` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-workflow-edit.<ts>.md`.
   - From the Bash tool, run `git diff --numstat <REM_BASE_SHA> -- .github/workflows/_poshqc.yml` and `git show <REM_BASE_SHA>:.github/workflows/_poshqc.yml` (SHA written literally).
-  - Through the Tool route: `(Get-Content -LiteralPath .github/workflows/_poshqc.yml).Count`; compare lines 1-5 of the file with lines 1-5 of the `git show` output; and compare the `poshqc-linux-hooks` block of both texts (the line `  poshqc-linux-hooks:` and every following line up to the next line matching `^  [A-Za-z0-9_-]+:\s*$` or the end of the text, trailing blank lines dropped).
+  - Through the Tool route: `(Get-Content -LiteralPath .github/workflows/_poshqc.yml).Count`; `@(Select-String -LiteralPath .github/workflows/_poshqc.yml -SimpleMatch -Pattern 'if: always()').Count`; `@(Select-String -LiteralPath .github/workflows/_poshqc.yml -SimpleMatch -Pattern 'cancelled()').Count`; compare lines 1-5 of the file with lines 1-5 of the `git show` output; and compare the `poshqc-linux-hooks` block of both texts (the line `  poshqc-linux-hooks:` and every following line up to the next line matching `^  [A-Za-z0-9_-]+:\s*$` or the end of the text, trailing blank lines dropped).
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
-  - Acceptance: the numstat row reads `7` added and `6` deleted (lines 38-39, 62, 79, 129, and 133 replaced, plus the `$shardCount` line); the line count is 186; lines 1-5 are identical; the `poshqc-linux-hooks` blocks are identical.
-- [ ] [P2-T15] Run actionlint on the edited workflow through the Tool route with the P0-T16 task text and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-actionlint-after-edit.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
-  - Acceptance: EXIT_CODE 0 with no actionlint output (the `${{ strategy.job-total }}` and `${{ !cancelled() }}` expressions are accepted).
+  - Acceptance: the numstat row reads `6` added and `5` deleted (lines 38-39, 62, 129, and 133 replaced, plus the `$shardCount` line); the line count is 186; the `if: always()` count is 3 (lines 65, 79, and 180; the job-level line 79 is kept under D17) and the `cancelled()` count is 0; lines 1-5 are identical; the `poshqc-linux-hooks` blocks are identical.
+- [ ] [P2-T14] Run actionlint on the edited workflow through the Tool route with the P0-T16 task text and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-actionlint-after-edit.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+  - Acceptance: EXIT_CODE 0 with no actionlint output (the `${{ strategy.job-total }}` expression is accepted).
 
 ### Phase 3 — Documentation (CR-9)
 
@@ -781,12 +779,13 @@ Number of shards. When greater than 0, Run.Path is set to this shard's size-bala
 - [ ] [P4-T3] Run TARGETED_RUN(`r2-after`, R2_SET) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r2-regression-pass-after.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the JRP totals and the JRP token check for every OLD_TOKENS and NEW_TOKENS entry.
   - Acceptance: run valid, EXIT_CODE 0, JRP `tests` equal to `R2_TARGETED_BASELINE_TESTS` plus 12, `failures` 0, `errors` 0, and every token PASS.
-- [ ] [P4-T4] Write the fail-before exception dossier `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/fail-before-exception.<ts>.md` for the three new cases that pass on the pre-fix tree: `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS`, and `TS04-DEFAULT-FILELIST-SEAM-WRITES-UTF8-JSON`.
-  - Fields: `Timestamp:`, `Command:` (the JRP and CRP reads below), `EXIT_CODE:`, `Output Summary:`, and `WhyFailingRunImpossible:` stating that WF02 asserts a gate step that is already committed and must not be removed from the workflow, that WF03 is a check of the WF02 helper, and that TS04 covers an existing seam whose behavior this cycle does not change.
-  - Alternative proof section, with values read from evidence on disk:
+- [ ] [P4-T4] Write the fail-before exception dossier `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/fail-before-exception.<ts>.md` for the four new cases that pass on the pre-fix tree: `WF01-POSHQC-MERGE-JOB-RUNS-ALWAYS`, `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS`, and `TS04-DEFAULT-FILELIST-SEAM-WRITES-UTF8-JSON`.
+  - Fields: `Timestamp:`, `Command:` (the JRP and CRP reads and the `git show` count below), `EXIT_CODE:`, `Output Summary:`, and `WhyFailingRunImpossible:` stating that WF01 asserts the job-level `if: always()` condition that decision D17 keeps unchanged, that WF02 asserts a gate step that is already committed and must not be removed from the workflow, that WF03 is a check of the WF02 helper, and that TS04 covers an existing seam whose behavior this cycle does not change.
+  - Alternative proof section, with values read from evidence on disk or from the pre-cycle commit:
+    - WF01: through the Tool route, `@(git show <REM_BASE_SHA>:tests/scripts/workflows/PoshQcWorkflow.Tests.ps1 | Select-String -SimpleMatch -Pattern '{4}if:').Count` (SHA written literally), recorded as `WF01_PRE_CYCLE_JOB_IF_ASSERTIONS: <count>`; 0 is the absence-of-test proof that no pre-cycle test asserts the job-level condition of any job (the only pre-cycle `if:` assertion, line 110, uses `{8}if:`).
     - WF02: the `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS` token PASS in the latest `r2-regression-fail-before.*.md` and `r2-regression-pass-after.*.md`, which shows that the WF02 helper reports each of the four in-memory mutations (removed, weakened, no exit, moved).
     - TS04: `L('scripts/powershell/poshqc/poshqc.testing.psm1', 174)` from the latest `r2-poshqc-test-coverage.*.md` in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/` (the pre-cycle hit count of the default seam body; absence-of-test proof when `ci=0`).
-  - Acceptance: every field is present, both cited values are copied from the named files, and the WF03 token reads PASS in both files.
+  - Acceptance: every field is present, both cited evidence values are copied from the named files, the WF03 token reads PASS in both files, and `WF01_PRE_CYCLE_JOB_IF_ASSERTIONS` is 0.
 - [ ] [P4-T5] Record the projected shard balance on the local tree (CR-10) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-shard-balance.<ts>.md`.
   - Run through the Tool route this task PowerShell text, which drives the real `Invoke-PoshQCTest` enumeration with only the Pester run and the file-list write injected (no file is written; the injected `InvokePester` does not run Pester):
 
@@ -860,7 +859,7 @@ Restart rule: if any task from P5-T1 through P5-T12 fails or changes a tracked f
   - Recompute the SHA256 of every CYCLE_FILES path and compare each with the `HASH_BEFORE:` lines of the latest `r2-final-poshqc-format.*.md` in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/`.
   - Acceptance: every hash is unchanged, P5-T1 through P5-T12 of this pass passed, and `LOOP_CLEAN_PASS: YES`.
 - [ ] [P5-T14] Record the re-verification and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r2-ac-reverification.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
-  - The Output Summary has one line per item, `RECHECK: <item> | <evidence tasks> | PASS|FAIL`, for CR-7, CR-8, CR-9, CR-10, CR-11, CR-12, CR-13, CR-14, CR-17, AC-02, AC-06, AC-07, AC-11, AC-13, AC-14, and AC-15, using the "Requirements Traceability" evidence tasks.
+  - The Output Summary has one line per item, `RECHECK: <item> | <evidence tasks> | PASS|FAIL`, for CR-7, CR-8, CR-9, CR-10, CR-11, CR-12, CR-13, CR-17, AC-02, AC-06, AC-07, AC-11, AC-13, AC-14, and AC-15, using the "Requirements Traceability" evidence tasks.
   - Run `git diff --numstat <REM_BASE_SHA> -- docs/features/active/2026-10-16-pester-profiler-coverage-953/spec.md` and `git status --porcelain -- docs/features/active/2026-10-16-pester-profiler-coverage-953/spec.md` from the Bash tool, and record both outputs.
   - Acceptance: every line reads PASS, and both `spec.md` outputs are empty (no checkbox changed and no acceptance criterion added).
   - If any line reads FAIL, record `AC_RECHECK_FAILED: <item>` and stop for an orchestrator decision; the executor does not edit `spec.md`.
