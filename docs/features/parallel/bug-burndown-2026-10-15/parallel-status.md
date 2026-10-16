@@ -15,27 +15,27 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 15
 - `current_cohort`: 0
 - `recolor_generation`: 0
-- `last_updated`: 10/16/2026 01:59:12
-- `next_step`: post @dependabot recreate on 832/833; merge 927 next when green, then 884 (held ci_green, needs main merged in)
+- `last_updated`: 10/16/2026 05:12:18
+- `next_step`: merge queue empty; await 930 (re-audit), 931 (cycle 2), 952/953 preparation, and remaining executions
 
 **Items**
 
 | issue_num | feature_folder | cohort_index | state | merge_status | pr_url | merge_commit_sha | worktree_created_at | merged_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 543 | docs/features/active/epic-planner-receipt-checks-key-gate-543 | 0 | in_flight | worktree_created |  |  | 10/16/2026 00:01:22 |  |  |
-| 884 | docs/features/active/untouched-files-coverage-verification-884 | 0 | in_flight | ci_green | https://github.com/drmoisan/drm-copilot/pull/942 |  | 10/16/2026 00:01:22 |  |  |
+| 884 | docs/features/active/untouched-files-coverage-verification-884 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/942 | afa951ac0207eae934ac695e7340f18b3cf77522 | 10/16/2026 00:01:22 | 10/16/2026 04:51:16 |  |
 | 927 | docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927 | 0 | in_flight | worktree_created |  |  | 10/16/2026 00:01:22 |  |  |
 | 928 | docs/features/active/2026-10-15-subagentstop-hook-uncaught-error-exits-1-928 | 0 | in_flight | worktree_created |  |  | 10/16/2026 00:01:22 |  |  |
 | 929 | docs/features/active/subagentstop-artifact-gates-review-notes-929 | 0 | in_flight | worktree_created |  |  | 10/16/2026 00:01:22 |  |  |
-| 930 | docs/features/active/2026-10-15-host-bootstrap-does-not-install-poetry-930 | 0 | in_flight | worktree_created |  |  | 10/16/2026 00:01:22 |  |  |
-| 931 | docs/features/active/2026-10-15-release-flow-waits-on-required-checks-only-931 | 0 | in_flight | worktree_created |  |  | 10/16/2026 00:01:22 |  |  |
+| 930 | docs/features/active/2026-10-15-host-bootstrap-does-not-install-poetry-930 | 0 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/950 |  | 10/16/2026 00:01:22 |  |  |
+| 931 | docs/features/active/2026-10-15-release-flow-waits-on-required-checks-only-931 | 0 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/948 |  | 10/16/2026 00:01:22 |  |  |
 | 932 | docs/features/active/2026-10-15-plan-validator-accepts-bare-scratch-paths-932 | 0 | in_flight | worktree_created |  |  | 10/16/2026 00:01:22 |  |  |
-| 933 | docs/features/active/2026-10-15-npm-token-guard-misses-append-assignment-933 | 0 | in_flight | worktree_created |  |  | 10/16/2026 00:01:22 |  |  |
-| 934 | docs/features/active/2026-10-15-workspace-encoding-test-host-specific-paths-934 | 0 | in_flight | worktree_created |  |  | 10/16/2026 00:01:22 |  |  |
+| 933 | docs/features/active/2026-10-15-npm-token-guard-misses-append-assignment-933 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/949 | 5bc97774b8322e57abb94dfac3cd0a000a136c5b | 10/16/2026 00:01:22 | 10/16/2026 05:11:57 |  |
+| 934 | docs/features/active/2026-10-15-workspace-encoding-test-host-specific-paths-934 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/951 | 47ce9b9abfa6ef63cc1944b7a0401bf30056a798 | 10/16/2026 00:01:22 | 10/16/2026 04:36:31 |  |
 | 935 | docs/features/active/2026-10-15-hook-test-isolation-737-remainder-935 | 0 | in_flight | worktree_created |  |  | 10/16/2026 00:01:22 |  |  |
-| 936 | docs/features/active/2026-10-15-hook-coverage-attribution-gaps-936 | 0 | in_flight | worktree_created |  |  | 10/16/2026 00:01:22 |  |  |
+| 936 | docs/features/active/2026-10-15-hook-coverage-attribution-gaps-936 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/947 | de4f91294daa230cebc0df0434c6e2873001d927 | 10/16/2026 00:01:22 | 10/16/2026 04:14:53 |  |
 | 937 | docs/features/active/exempt-operand-unc-path-leg-937 | 0 | in_flight | worktree_created |  |  | 10/16/2026 00:01:22 |  |  |
-| 938 | docs/features/active/2026-10-15-test-support-hygiene-793-skipif-938 | 0 | in_flight | pr_open | https://github.com/drmoisan/drm-copilot/pull/944 |  | 10/16/2026 00:01:22 |  |  |
+| 938 | docs/features/active/2026-10-15-test-support-hygiene-793-skipif-938 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/944 | ba53ff5694a42e975d5d1db99b2b6ef505143e66 | 10/16/2026 00:01:22 | 10/16/2026 03:54:52 |  |
 | 940 | docs/features/active/dependabot-bumps-types-vscode-past-engines-940 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/943 | 97559c3e0dcfceb807ae330d3c9e6ae4c5d67964 | 10/16/2026 00:01:22 | 10/16/2026 01:58:55 |  |
 
 **Cohorts**
