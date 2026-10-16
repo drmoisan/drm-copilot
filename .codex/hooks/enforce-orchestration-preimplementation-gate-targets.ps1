@@ -35,6 +35,12 @@ $script:OrchestrationTargetRelocationPattern = '(?i)(?<![A-Za-z0-9_])(?:' +
 # An absolute target: a drive-lettered or a rooted, non-UNC path after separator normalization.
 $script:OrchestrationTargetAbsolutePattern = '^([A-Za-z]:/|/(?!/))'
 
+# A non-local path-leg spelling, tested before normalization (issue #937): UNC, extended-length,
+# device, or NT-object prefixes in either separator style, a drive-relative drive letter, a
+# current-drive-rooted single backslash, a URI scheme, a ~-prefixed home path, or surrounding whitespace.
+$script:OrchestrationTargetNonLocalPattern = '^(?:\s|[\\/]{2}|[\\/]\?\?[\\/]|\\(?![\\/])|[A-Za-z]:(?![\\/])' +
+'|[A-Za-z][A-Za-z0-9+.-]+:|~)|\s$'
+
 # The apply_patch markers whose path names a file the patch writes (Codex path leg).
 $script:OrchestrationPatchMarkers = @('*** Add File:', '*** Update File:', '*** Delete File:', '*** Move to:')
 
@@ -221,6 +227,9 @@ function Get-OrchestrationCommandTarget {
     $targets = [System.Collections.Generic.List[string]]::new()
 
     foreach ($rawPath in @($FilePath | Where-Object { $_ })) {
+        if ($rawPath -match $script:OrchestrationTargetNonLocalPattern) {
+            return (New-OrchestrationTargetResult -Rule 'path-not-local' -Value $rawPath)
+        }
         $path = ConvertTo-OrchestrationTargetPath -Path $rawPath
         if ($path -notmatch $script:OrchestrationTargetAbsolutePattern) { $targets.Add($root); continue }
         if (Test-OrchestrationTargetDotSegment -Path $path) {

@@ -1,11 +1,25 @@
 <#
 .SYNOPSIS
     Gates epic child and integration PR merges behind checkpointed green state.
+
 .DESCRIPTION
     Trigger scope (issue #952): every gh pr merge invocation (any merge method, --auto, --admin,
     or no method flag) and every gh api merge or enqueue mutation is gated, because under a merge
     queue each of them reaches the base branch; only a pure --disable-auto is out of scope. The
     predicate and the PR selector reader live in enforce-epic-merge-gate-command.ps1.
+
+    Docs-only branch (issue #927): after the standalone branch denies an explicit PR number,
+    and only when no checkpoint is present at the repository root (both checkpoint texts are
+    blank; operator decision OD-1, stricter than the Claude per-PR rule), the gate calls
+    Get-DocsOnlyMergeExemption from hook-docs-only-diff.ps1 with the repository root. That
+    function runs gh pr view and git there and allows the merge when its conditions M1-M9
+    hold; otherwise the deny gains " (docs-only exemption not applied: <Reason>)", where the
+    reason may be DOCS_ONLY_EXEMPTION_PR_UNRESOLVED. A blank RepositoryRoot denies at M2
+    before any process starts. The hook never fetches; --match-head-commit, when present,
+    must equal headRefOid (OD-2). Residual limits: an ambient GH_REPO or GH_HOST is not
+    visible in the command text; gh and git run in the repository root, so a cd made by an
+    earlier shell call is not visible either; a push after the lookup can change the head
+    unless --match-head-commit is passed; and the control is policy-level, not cryptographic.
 #>
 [CmdletBinding()]
 param()
@@ -19,6 +33,8 @@ try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-Ho
 # Merge and enqueue scope predicate and the PR selector reader (issue #952), byte-identical to the
 # Claude copy.
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-command.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-command.ps1' -ErrorRecord $_ }
+# Shared docs-only diff classification and the merge-side docs-only exemption (issue #927).
+try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDependencyFailure -Name 'hook-docs-only-diff.ps1' -ErrorRecord $_ }
 
 # Reason codes for the standalone-merge authorization branch (issue #670), spelled
 # byte-identically to the Claude helpers file. Each of the four assignments below is the only
@@ -119,7 +135,8 @@ function Invoke-CodexEpicMergeDecision {
     param(
         [Parameter(Mandatory)][string] $PayloadRaw,
         [AllowNull()][AllowEmptyString()][string] $ChildCheckpointRaw,
-        [AllowNull()][AllowEmptyString()][string] $EpicCheckpointRaw
+        [AllowNull()][AllowEmptyString()][string] $EpicCheckpointRaw,
+        [AllowNull()][AllowEmptyString()][string] $RepositoryRoot
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_MERGE_GATE_BLOCKED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
@@ -154,11 +171,20 @@ function Invoke-CodexEpicMergeDecision {
         if ($verdict.Allowed) {
             return $null
         }
+        # Docs-only branch (issue #927, OD-1): only when no checkpoint is present at the root.
+        $docsOnlySuffix = ''
+        if ([string]::IsNullOrWhiteSpace($ChildCheckpointRaw) -and [string]::IsNullOrWhiteSpace($EpicCheckpointRaw)) {
+            $docsOnly = Get-DocsOnlyMergeExemption -CommandText $command -PrNumber $prNumber -WorktreeRoot $RepositoryRoot
+            if ($docsOnly.Exempt) {
+                return $null
+            }
+            $docsOnlySuffix = ' (docs-only exemption not applied: ' + $docsOnly.Reason + ')'
+        }
         return [ordered]@{
             hookSpecificOutput = [ordered]@{
                 hookEventName            = 'PreToolUse'
                 permissionDecision       = 'deny'
-                permissionDecisionReason = 'EPIC_MERGE_GATE_BLOCKED: ' + $verdict.ReasonCode + ': ' + $verdict.Message
+                permissionDecisionReason = 'EPIC_MERGE_GATE_BLOCKED: ' + $verdict.ReasonCode + ': ' + $verdict.Message + $docsOnlySuffix
             }
         }
     }
@@ -353,7 +379,7 @@ try {
     $epicPath = Join-Path $repositoryRoot 'artifacts/orchestration/epic-orchestrator-state.json'
     $childRaw = if (Test-Path -LiteralPath $childPath -PathType Leaf) { Get-Content -Raw -LiteralPath $childPath } else { '' }
     $epicRaw = if (Test-Path -LiteralPath $epicPath -PathType Leaf) { Get-Content -Raw -LiteralPath $epicPath } else { '' }
-    $decision = Invoke-CodexEpicMergeDecision -PayloadRaw $payloadRaw -ChildCheckpointRaw $childRaw -EpicCheckpointRaw $epicRaw
+    $decision = Invoke-CodexEpicMergeDecision -PayloadRaw $payloadRaw -ChildCheckpointRaw $childRaw -EpicCheckpointRaw $epicRaw -RepositoryRoot $repositoryRoot
     if ($null -ne $decision) {
         $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
     }

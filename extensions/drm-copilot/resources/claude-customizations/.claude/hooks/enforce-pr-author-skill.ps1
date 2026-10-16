@@ -26,16 +26,20 @@
       Docs-only - issue #901: when the preflight fails, gh pr create proceeds to receipt
                   verification only when every condition holds: no checkpoint file exists
                   beneath the resolved worktree; the command carries exactly one explicit
-                  --base <branch> and no -B token; refs/remotes/origin/<branch> resolves to
-                  a commit; git diff --name-only -z --no-renames <commit>...HEAD exits 0 and
-                  lists at least one path; and every listed path starts with docs/ (ordinal,
-                  case-sensitive). Otherwise the deny keeps ORCHESTRATOR_STATE_PREFLIGHT_FAILED
-                  and appends one sub-code:
+                  --base <branch> and no base or repository override (issue #927: no
+                  single-dash token whose letters include B or R, such as -B, -R, or -dB; no
+                  --repo or --repo= token; no inline GH_REPO= prefix); refs/remotes/origin/<branch>
+                  resolves to a commit; git diff --name-only -z --no-renames <commit>...HEAD
+                  exits 0, ends its non-empty output with NUL, and lists at least one path; and
+                  every listed path starts with docs/ (ordinal, case-sensitive). Otherwise the
+                  deny keeps ORCHESTRATOR_STATE_PREFLIGHT_FAILED and appends one sub-code:
                     DOCS_ONLY_EXEMPTION_NOT_CREATE         - gh pr edit is never exempt.
                     DOCS_ONLY_EXEMPTION_CHECKPOINT_PRESENT - a checkpoint file exists.
-                    DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED    - no single explicit --base, or it
-                                                             does not resolve on origin.
-                    DOCS_ONLY_EXEMPTION_DIFF_FAILED        - the diff exits non-zero or throws.
+                    DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED    - no single explicit --base, a base or
+                                                             repository override is present, or
+                                                             the base does not resolve on origin.
+                    DOCS_ONLY_EXEMPTION_DIFF_FAILED        - the diff exits non-zero, throws, or
+                                                             returns output not ending with NUL.
                     DOCS_ONLY_EXEMPTION_EMPTY_DIFF         - the diff lists no path.
                     DOCS_ONLY_EXEMPTION_NON_DOCS_PATH      - a listed path is outside docs/.
                   The exemption never applies under epic scope.

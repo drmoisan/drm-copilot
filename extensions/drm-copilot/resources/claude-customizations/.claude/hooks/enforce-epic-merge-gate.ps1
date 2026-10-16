@@ -37,10 +37,18 @@
     enqueues the pull request; only a pure --disable-auto is out of scope. The predicate and the
     PR selector reader live in enforce-epic-merge-gate-command.ps1.
 
-    Design decision: this gate trusts the on-disk checkpoint rather than shelling out live
-    to gh pr view for a real-time head-SHA check, matching the same non-adversarial,
-    policy-level-not-cryptographic posture already accepted for
-    enforce-pr-author-skill.ps1's own receipt mechanism. It is not a cryptographic control.
+    Design decision: branches 1-4 trust the on-disk checkpoint and never call gh. Issue #927
+    adds a docs-only branch after branch 4 fails, only for an explicit PR number whose item,
+    epic, and parallel targets are all NoTarget (no checkpoint records the PR): it calls
+    Get-DocsOnlyMergeExemption (hook-docs-only-diff.ps1), which runs gh pr view and git in the
+    session worktree and allows the merge when conditions M1-M9 of that file hold. Otherwise
+    the deny gains " (docs-only exemption not applied: <Reason>)", where the reason may be
+    DOCS_ONLY_EXEMPTION_PR_UNRESOLVED. The hook never fetches; --match-head-commit, when
+    present, must equal headRefOid (OD-2). Residual limits: an ambient GH_REPO or GH_HOST is
+    not visible in the command text; gh and git run in the session worktree root, so a cd
+    made by an earlier Bash call is not visible either; and a push after the lookup can
+    change the head unless --match-head-commit is passed. Like the receipt mechanism of
+    enforce-pr-author-skill.ps1, this is a policy-level control, not a cryptographic one.
 
     Issue #690: with an explicit PR number, the epic and parallel checkpoints are read
     beneath the live worktree whose run checkpoint records that number. Issue #850: with
@@ -76,6 +84,8 @@ try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-authorization.ps1') } 
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-resolution.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-resolution.ps1' -ErrorRecord $_ }
 # Merge and enqueue scope predicate and the PR selector reader (issue #952).
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-command.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-command.ps1' -ErrorRecord $_ }
+# Shared docs-only diff classification and the merge-side docs-only exemption (issue #927).
+try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDependencyFailure -Name 'hook-docs-only-diff.ps1' -ErrorRecord $_ }
 
 function ConvertFrom-EpicMergeGateJson {
     <#
@@ -374,11 +384,20 @@ function Invoke-EpicMergeGateDecision {
         if ($standalone.Allowed) {
             return Get-EpicMergeGateAllowDecision
         }
+        # Docs-only branch (issue #927): evaluated only when no checkpoint records the PR.
+        $docsOnlySuffix = ''
+        if (Test-EpicMergeGateNoRecordingTarget -ItemTarget $itemTarget -EpicTarget $epicTarget -ParallelTarget $parallelTarget) {
+            $docsOnly = Get-DocsOnlyMergeExemption -CommandText $commandText -PrNumber $commandPrNumber -WorktreeRoot $sessionRoot
+            if ($docsOnly.Exempt) {
+                return Get-EpicMergeGateAllowDecision
+            }
+            $docsOnlySuffix = ' (docs-only exemption not applied: ' + $docsOnly.Reason + ')'
+        }
         # When neither the item target nor a run branch resolved, the reason code and the
         # three details precede the standalone reason (issue #850).
         $unresolved = Get-EpicMergeGateUnresolvedReason -ItemTarget $itemTarget -EpicTarget $epicTarget -ParallelTarget $parallelTarget
         $prefix = if ($unresolved) { $unresolved + '; ' } else { '' }
-        return Get-EpicMergeGateBlockDecision -Reason ('EPIC_MERGE_GATE_BLOCKED: ' + $prefix + $standalone.ReasonCode + ': ' + $standalone.Message)
+        return Get-EpicMergeGateBlockDecision -Reason ('EPIC_MERGE_GATE_BLOCKED: ' + $prefix + $standalone.ReasonCode + ': ' + $standalone.Message + $docsOnlySuffix)
     }
 
     return Get-EpicMergeGateBlockDecision -Reason 'EPIC_MERGE_GATE_BLOCKED: a pull-request merge or merge-queue enqueue (gh pr merge with any method, --auto, or --admin, or a gh api merge or enqueue mutation) requires either a per-feature checkpoint with epic_mode == true and step9_status == "passed", an epic checkpoint with epic_merge_pr.ci_gate.conclusion == "success" and a matching pr_number, or a parallel-orchestrator checkpoint with route_id == "parallel" whose target item (matched by pr_number) has merge_status == "ci_green". No checkpoint satisfied this gate.'
