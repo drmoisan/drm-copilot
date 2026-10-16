@@ -288,9 +288,15 @@ function validateDependencyWaves(
   return errors;
 }
 
-/** Require every child to be fully prepared and preflight-cleared. */
+/**
+ * Require every child to be fully prepared and preflight-cleared. When
+ * `keyGated` is true (no Codex flag), each per-feature receipt check runs only
+ * for a feature that carries its key (`model_routing_receipt`,
+ * `topology_receipt`).
+ */
 function validateReadyFeatures(
   features: ReadonlyArray<Record<string, unknown>>,
+  keyGated: boolean,
 ): string[] {
   const errors: string[] = [];
   if (features.length < 2) {
@@ -326,38 +332,42 @@ function validateReadyFeatures(
       errors.push(`${prefix}.preflight_status must be 'PREFLIGHT: ALL CLEAR'.`);
     }
 
-    const receipt = feature["model_routing_receipt"];
-    errors.push(
-      ...validateCodexModelRoutingReceipt(
-        receipt,
-        `${prefix}.model_routing_receipt`,
-      ),
-    );
-    if (isObject(receipt) && receipt["logical_agent"] !== "orchestrator") {
+    if (!keyGated || "model_routing_receipt" in feature) {
+      const receipt = feature["model_routing_receipt"];
       errors.push(
-        `${prefix}.model_routing_receipt.logical_agent must be 'orchestrator'.`,
+        ...validateCodexModelRoutingReceipt(
+          receipt,
+          `${prefix}.model_routing_receipt`,
+        ),
+      );
+      if (isObject(receipt) && receipt["logical_agent"] !== "orchestrator") {
+        errors.push(
+          `${prefix}.model_routing_receipt.logical_agent must be 'orchestrator'.`,
+        );
+      }
+      if (isObject(receipt)) {
+        if (receipt["complexity_band"] !== feature["complexity_band"]) {
+          errors.push(
+            `${prefix}.model_routing_receipt.complexity_band must match ` +
+              `feature complexity_band ${pythonRepr(feature["complexity_band"])}.`,
+          );
+        }
+        if (receipt["execution_context"] !== "epic_preparation_child") {
+          errors.push(
+            `${prefix}.model_routing_receipt.execution_context must be ` +
+              "'epic_preparation_child'.",
+          );
+        }
+      }
+    }
+    if (!keyGated || "topology_receipt" in feature) {
+      errors.push(
+        ...validateChildTopologyReceipt(
+          feature["topology_receipt"],
+          `${prefix}.topology_receipt`,
+        ),
       );
     }
-    if (isObject(receipt)) {
-      if (receipt["complexity_band"] !== feature["complexity_band"]) {
-        errors.push(
-          `${prefix}.model_routing_receipt.complexity_band must match ` +
-            `feature complexity_band ${pythonRepr(feature["complexity_band"])}.`,
-        );
-      }
-      if (receipt["execution_context"] !== "epic_preparation_child") {
-        errors.push(
-          `${prefix}.model_routing_receipt.execution_context must be ` +
-            "'epic_preparation_child'.",
-        );
-      }
-    }
-    errors.push(
-      ...validateChildTopologyReceipt(
-        feature["topology_receipt"],
-        `${prefix}.topology_receipt`,
-      ),
-    );
   });
 
   return errors;
@@ -420,8 +430,10 @@ export function validateEpicPlannerStateText(
   }
 
   if (options.requireReadyForExecution === true) {
-    // Launch evidence (per feature) and the planner topology receipt (top-level
-    // key) are key-gated unless a Codex flag is asserted.
+    // Launch evidence and the per-feature receipt checks
+    // (model_routing_receipt, topology_receipt) are key-gated per feature, and
+    // the planner topology receipt by its top-level key, unless a Codex flag
+    // is asserted.
     const requireLaunchPaths =
       options.requireCodexModelRouting !== true &&
       options.requireCodexTopology !== true;
@@ -435,7 +447,9 @@ export function validateEpicPlannerStateText(
         `Execution-ready planner checkpoint next_step must be '${READY_NEXT_STEP}'.`,
       );
     }
-    errors.push(...validateReadyFeatures(featureResult.features));
+    errors.push(
+      ...validateReadyFeatures(featureResult.features, requireLaunchPaths),
+    );
     errors.push(
       ...validateEpicPlannerChildLaunchBindings(featureResult.features, {
         requireLaunchPaths,
