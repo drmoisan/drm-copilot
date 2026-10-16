@@ -293,6 +293,29 @@ def test_g6_normalization_uses_plan_whitespace_class(
     assert (report.blocking, report.warnings) == ([], [expected])
 
 
+def test_g5_whitespace_only_literal_is_never_quoted() -> None:
+    """A whitespace-only literal normalizes to an empty needle, never quoted.
+
+    The TypeScript suite holds the same case.
+    """
+
+    # Arrange
+    text = _plan("grep -F -n ' ' docs/design.md")
+    git = StubGitRepository()
+    expected = (
+        "[P2-T1] search literal ` ` is absent from the tracked tree and is "
+        "not quoted in the plan; the search returns zero matches whatever "
+        "the executor does. Quote the exact literal the task will create, "
+        "or assert a literal that exists."
+    )
+
+    # Act
+    report = evaluate_plan_gates(text, context=_context(git))
+
+    # Assert
+    assert (report.blocking, report.warnings) == ([], [expected])
+
+
 def test_checkable_literal_skips_regex_metacharacters() -> None:
     """A pattern carrying metacharacters without `-F` is not checkable."""
 

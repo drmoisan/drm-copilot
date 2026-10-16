@@ -213,6 +213,24 @@ describe("evaluatePlanGates search literals", () => {
     ]);
   });
 
+  it("never treats a whitespace-only literal as quoted in the plan", () => {
+    // Arrange: the literal normalizes to an empty needle, which the
+    // plan-quotation check must not find in the plan text.
+    const text = plan("grep -F -n ' ' docs/design.md");
+
+    // Act
+    const report = evaluatePlanGates(text, context(new StubGitRepository()));
+
+    // Assert
+    expect(report.blocking).toEqual([]);
+    expect(report.warnings).toEqual([
+      "[P2-T1] search literal ` ` is absent from the tracked tree and is " +
+        "not quoted in the plan; the search returns zero matches whatever " +
+        "the executor does. Quote the exact literal the task will create, " +
+        "or assert a literal that exists.",
+    ]);
+  });
+
   it("skips context rules with no context", () => {
     // Arrange
     const text = plan(ACCEPTANCE, [
