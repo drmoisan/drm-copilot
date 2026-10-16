@@ -27,12 +27,14 @@ The production change is two inserted lines, each `- dependency-name: "@types/vs
 
 ## Findings Table
 
-| # | Severity | Location | Finding |
-|---|----------|----------|---------|
-| 1 | Non-blocking (observation) | `tests/scripts/dev_tools/test_dependabot_config_contract.py:75-82` | Assertions inspect only `items[0]`. A second, restricted `@types/vscode` ignore item placed earlier in the list would be evaluated first. The current file has one item per entry, so this has no present effect. |
-| 2 | Non-blocking (observation) | `tests/scripts/dev_tools/test_dependabot_config_contract.py:48-56` | `npm_entry_for` re-parses the file on each call (five parses in total). The cost is negligible; caching is optional. |
-| 3 | Non-blocking (observation) | `evidence/qa-gates/*.2026-10-16T00-28.md`, `evidence/baseline/*.2026-10-16T00-16.md` | Evidence timestamps are dated 2026-10-16 while the plan is dated 2026-10-15T07-42. This is consistent with a run that crossed midnight and has no effect on correctness. |
-| 4 | Non-blocking (observation) | `evidence/qa-gates/coverage-thresholds-final.2026-10-16T00-28.md:5` | The recorded command references `SCRATCH/940/coverage-final.json`, a session scratchpad token that a reader cannot resolve. The reviewer independently recomputed totals from `artifacts/python/lcov.info` (93.80% lines, 88.13% branches). |
+Blocking findings: 0. Non-blocking findings: 4 (CR-N1..CR-N4).
+
+| Severity | File | Location | Finding | Recommendation | Rationale | Evidence |
+|---|---|---|---|---|---|---|
+| Non-blocking | `tests/scripts/dev_tools/test_dependabot_config_contract.py` | lines 75-82 | CR-N1: assertions inspect only `items[0]` of the matching ignore items. | Optionally assert over all matching items. | A restricted `@types/vscode` item listed earlier would be evaluated first; no present effect because each entry has one item. | Diff shows one `@types/vscode` item per entry. |
+| Non-blocking | `tests/scripts/dev_tools/test_dependabot_config_contract.py` | lines 48-56 | CR-N2: `npm_entry_for` re-parses the file on each call (five parses). | Optionally cache the parse. | Cost is negligible (0.25 s for the module). | `5 passed in 0.25s`. |
+| Non-blocking | `evidence/qa-gates/*.2026-10-16T00-28.md` | timestamps | CR-N3: evidence timestamps are dated 2026-10-16 while the plan is dated 2026-10-15T07-42. | None. | Consistent with a run that crossed midnight; no effect on correctness. | Evidence file names. |
+| Non-blocking | `evidence/qa-gates/coverage-thresholds-final.2026-10-16T00-28.md` | line 5 | CR-N4: the recorded command references the session-scratchpad token `SCRATCH/940/coverage-final.json`, which a reader cannot resolve. | None. | The reviewer recomputed totals from `artifacts/python/lcov.info` (93.80% lines, 88.13% branches). | lcov summation. |
 
 ## Positive Observations
 
