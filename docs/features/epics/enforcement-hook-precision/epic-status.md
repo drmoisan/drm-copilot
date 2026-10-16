@@ -5,8 +5,8 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - Epic issue: #852
 - Integration branch: `epic/enforcement-hook-precision-integration`
 - Current wave: 3
-- Next step: `E8b_await_sync_child`
-- Last updated: 2026-10-11T03:05:00Z
+- Next step: `DONE (deferred: removal of harness-locked child worktrees; operator rule 'delete nothing')`
+- Last updated: 2026-10-11T06:30:00Z
 
 ## Waves
 
@@ -15,7 +15,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 | 0 | merged | 2026-08-26-epic-wave-barrier-resolves-nested-artifact-as-feature-folder-565, 2026-09-27-completion-consistency-codex-copy-and-fail-open-divergence-736, promotion-hook-raw-containment-false-positive-deny-824 |
 | 1 | merged | 2026-09-27-exempt-operand-bypass-brace-and-dot-segments-732, 2026-09-29-validate-orchestrator-output-session-relative-read-787, 2026-10-08-pr-author-and-merge-gates-read-session-root-files-850 |
 | 2 | merged | 2026-09-27-hook-test-isolation-remaining-gaps-737, 2026-09-29-hook-preexisting-imports-fail-open-786 |
-| 3 | in_progress | epic-852-main-sync |
+| 3 | merged | epic-852-main-sync |
 
 ## Features
 
@@ -29,9 +29,9 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 | 2026-10-08-pr-author-and-merge-gates-read-session-root-files-850 | 850 | 1 | merged | [#857](https://github.com/drmoisan/drm-copilot/pull/857) | f8f7d0ab1b0ed927cccfedd25608a48d28083c57 | 2026-10-09T02:35:00Z | 2026-10-09T05:21:23Z | 2026-10-09T05:36:11Z | - |
 | 2026-09-27-hook-test-isolation-remaining-gaps-737 | 737 | 2 | merged | [#863](https://github.com/drmoisan/drm-copilot/pull/863) | 71dd62b0797a4aea9602936a33b2099c54703e70 | 2026-10-09T06:25:00Z | 2026-10-09T10:54:11Z | 2026-10-09T11:03:03Z | - |
 | 2026-09-29-hook-preexisting-imports-fail-open-786 | 786 | 2 | merged | [#881](https://github.com/drmoisan/drm-copilot/pull/881) | 919dbfa4d5075944ff4242c95c2ebb534ea248bf | 2026-10-09T06:25:00Z | 2026-10-10T23:04:12Z | 2026-10-11T02:48:05Z | - |
-| epic-852-main-sync | 852 | 3 | worktree_created | - | - | 2026-10-11T03:05:00Z | - | - | - |
+| epic-852-main-sync | 852 | 3 | merged | [#882](https://github.com/drmoisan/drm-copilot/pull/882) | 8d84cd9eaf33df9f1ff2a853d5b22542c5b1e528 | 2026-10-11T03:05:00Z | 2026-10-11T05:40:33Z | 2026-10-11T05:59:29Z | - |
 
 ## Integration PR
 
-- PR: -
-- Merge commit: -
+- PR: #883
+- Merge commit: 2ef8d361e978ca8b7733a545d76a87e8418005ce
