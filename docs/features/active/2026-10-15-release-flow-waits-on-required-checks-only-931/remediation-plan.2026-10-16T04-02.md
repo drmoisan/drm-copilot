@@ -12,9 +12,6 @@
 
 DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED
 
-DIRECTIVE: PREFLIGHT VALIDATION ONLY
-Note: the preceding directive governs preflight validation rounds only; an execution delegation removes it or is instructed to disregard it, and it is not a task.
-
 **Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
 
 **Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
