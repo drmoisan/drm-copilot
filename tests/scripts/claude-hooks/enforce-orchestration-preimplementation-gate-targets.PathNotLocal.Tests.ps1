@@ -44,6 +44,10 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         @{ Label = 'tilde-forward'; Spelling = '~/wt/a.ps1' }
         @{ Label = 'tilde-backslash'; Spelling = '~\wt\a.ps1' }
         @{ Label = 'root-relative-backslash'; Spelling = '\wt\a.ps1' }
+        @{ Label = 'http-uri'; Spelling = 'http://server/share/a.ps1' }
+        @{ Label = 'smb-uri'; Spelling = 'smb://server/share/a.ps1' }
+        @{ Label = 'vscode-remote-uri'; Spelling = 'vscode-remote://wsl/wt/a.ps1' }
+        @{ Label = 'scheme-plus-uri'; Spelling = 'git+ssh://server/repo/a.ps1' }
     ) {
         # Arrange (issue #937): the raw path-leg spelling comes from the data row.
 
@@ -115,5 +119,16 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         $result.Resolved | Should -BeFalse -Because 'an extended-length marker path is not a local path'
         $detailBecause = 'the detail names the rule and the raw marker path'
         $result.Detail | Should -BeExactly 'path-not-local: \\?\C:\wt\a.ps1' -Because $detailBecause
+    }
+
+    It 'U32 keeps a relative path-leg input with a later colon on the session root' {
+        # Arrange (issue #937 RI-7): a colon after a separator does not form a URI scheme.
+
+        # Act
+        $result = Get-OrchestrationCommandTarget -FilePath @('scripts/a:b.ps1') -SessionRoot $script:Root
+
+        # Assert
+        $result.Resolved | Should -BeTrue -Because 'a relative path with a later colon is not a URI scheme'
+        $result.Targets | Should -Be @($script:Root) -Because 'a relative path is resolved against the session root'
     }
 }

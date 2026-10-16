@@ -103,6 +103,24 @@ Describe 'Codex preimplementation gate epic-scope targets (issue #738)' {
             "`n@@`n-old`n+new`n*** End Patch"
             Code    = 'target-unresolvable'
         }
+        @{
+            Name    = 'denies an apply_patch http URI marker in epic scope (issue #937 RI-7)'
+            Command = "*** Begin Patch`n*** Update File: http://server/share/wt/scripts/powershell/Sample.ps1" +
+            "`n@@`n-old`n+new`n*** End Patch"
+            Code    = 'target-unresolvable'
+        }
+        @{
+            Name    = 'denies an apply_patch smb URI marker in epic scope (issue #937 RI-7)'
+            Command = "*** Begin Patch`n*** Update File: smb://server/share/wt/scripts/powershell/Sample.ps1" +
+            "`n@@`n-old`n+new`n*** End Patch"
+            Code    = 'target-unresolvable'
+        }
+        @{
+            Name    = 'denies an apply_patch vscode-remote URI marker in epic scope (issue #937 RI-7)'
+            Command = "*** Begin Patch`n*** Update File: vscode-remote://wsl/wt/scripts/powershell/Sample.ps1" +
+            "`n@@`n-old`n+new`n*** End Patch"
+            Code    = 'target-unresolvable'
+        }
     ) {
         # Arrange
         Set-CodexTargetSeam -CheckpointText $script:ReadyEpicJson

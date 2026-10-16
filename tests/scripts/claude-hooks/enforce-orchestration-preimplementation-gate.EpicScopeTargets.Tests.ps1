@@ -112,6 +112,24 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 epic-scope targets (i
             FilePath = '\wt\scripts\powershell\Sample.ps1'
             Code     = 'target-unresolvable'
         }
+        @{
+            Name     = 'denies a Write to an http URI path in epic scope (issue #937 RI-7)'
+            Command  = ''
+            FilePath = 'http://server/share/wt/scripts/powershell/Sample.ps1'
+            Code     = 'target-unresolvable'
+        }
+        @{
+            Name     = 'denies a Write to an smb URI path in epic scope (issue #937 RI-7)'
+            Command  = ''
+            FilePath = 'smb://server/share/wt/scripts/powershell/Sample.ps1'
+            Code     = 'target-unresolvable'
+        }
+        @{
+            Name     = 'denies a Write to a vscode-remote URI path in epic scope (issue #937 RI-7)'
+            Command  = ''
+            FilePath = 'vscode-remote://wsl/wt/scripts/powershell/Sample.ps1'
+            Code     = 'target-unresolvable'
+        }
     ) {
         # Arrange
         Set-TargetSeam -CheckpointText $script:ReadyEpicJson
