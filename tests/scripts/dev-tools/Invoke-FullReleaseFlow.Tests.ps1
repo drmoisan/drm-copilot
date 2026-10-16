@@ -72,8 +72,11 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded" {
                 return @{ Output = @('[{"bucket":"pass"}]'); ExitCode = 0 }
             }
 
-            if ($joined -eq 'pr merge 291 --merge --delete-branch') {
+            if ($joined -eq 'pr merge 291 --merge') {
                 return @{ Output = @('merged'); ExitCode = 0 }
+            }
+            if ($joined -match '^api graphql ') {
+                return @{ Output = @('{"state":"MERGED","mergedAt":"2026-07-03T17:30:00Z","isInMergeQueue":false,"mergeCommit":{"oid":"def456"},"autoMergeRequest":null}'); ExitCode = 0 }
             }
 
             return @{ Output = @(); ExitCode = 0 }
@@ -165,11 +168,9 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded" {
             $gitFlat | Should -Contain 'pull origin main'
 
             $ghFlat = @($script:capturedGhArgsList | ForEach-Object { $_ -join " " })
-            $ghFlat | Should -Be @(
-                'pr view release/full-20260703171500 --json number --jq .number',
-                'pr checks 291 --json bucket',
-                'pr merge 291 --merge --delete-branch'
-            )
+            $ghFlat.Count | Should -Be 4
+            $ghFlat[0..2] | Should -Be @('pr view release/full-20260703171500 --json number --jq .number', 'pr checks 291 --json bucket', 'pr merge 291 --merge')
+            $ghFlat[3] | Should -Match '^api graphql '
         }
     }
 
@@ -335,7 +336,7 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded" {
                 if ($joined -eq 'pr checks 291 --json bucket') {
                     return @{ Output = @('[{"bucket":"pass"}]'); ExitCode = 0 }
                 }
-                if ($joined -eq 'pr merge 291 --merge --delete-branch') {
+                if ($joined -eq 'pr merge 291 --merge') {
                     return @{ Output = @('merge blocked'); ExitCode = 1 }
                 }
                 return @{ Output = @(); ExitCode = 0 }
