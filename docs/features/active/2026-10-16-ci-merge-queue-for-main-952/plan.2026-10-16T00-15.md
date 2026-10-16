@@ -11,10 +11,6 @@
 - **Feature folder:** `docs/features/active/2026-10-16-ci-merge-queue-for-main-952`
 - **Requirements sources:** `docs/features/active/2026-10-16-ci-merge-queue-for-main-952/spec.md`; `docs/features/active/2026-10-16-ci-merge-queue-for-main-952/issue.md`; `docs/features/active/2026-10-16-ci-merge-queue-for-main-952/research/research.2026-10-16T01-30.md`; `docs/features/active/2026-10-16-ci-merge-queue-for-main-952/ruleset/protect-main.current.2026-10-16.json` (read-only snapshot of ruleset 15241672)
 
-DIRECTIVE: PREFLIGHT VALIDATION ONLY
-
-The directive line above serves preflight rounds only, and it must be absent from this file before execution is delegated. The executor stop hook `.claude/hooks/validate-executor-output.ps1` decides preflight mode from the plan file alone: `Test-IsPreflightPlan` (`:89-98`) returns true when any line of the plan file consists, case-insensitively and apart from surrounding whitespace, of exactly the directive text, and the branch at `:242-251` then validates the stop as a preflight return and skips the unchecked-checkbox check of `:257-287`. The delegation prompt is not read by that function and does not change the outcome. The orchestrator therefore deletes the directive line and this paragraph in ORCH-0 (`## Orchestrator-Owned Verification`) before it delegates execution, and P0-T2 confirms the deletion.
-
 ## Conventions (binding for every task)
 
 **FEATURE.** `FEATURE` = `docs/features/active/2026-10-16-ci-merge-queue-for-main-952`. Every evidence artifact is written under `FEATURE/evidence/<kind>/` with `<kind>` one of `baseline`, `regression-testing`, `qa-gates`, `other`. No artifact is written under `artifacts/`. No artifact records an absolute host path; the worktree root is recorded as the literal token `WORKTREE_ROOT`.
