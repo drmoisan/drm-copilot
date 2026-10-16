@@ -2,7 +2,7 @@
 
 - Date captured: 2026-10-15
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/test-support-hygiene-793-skipif/ (Issue #938)
+- Status: Promoted -> docs/features/active/2026-10-15-test-support-hygiene-793-skipif-938/ (Issue #938)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
