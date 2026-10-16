@@ -12,6 +12,9 @@ from scripts.dev_tools.resolve_codex_topology import resolve_codex_topology
 from scripts.dev_tools.validate_epic_planner_state import (
     validate_epic_planner_state_text,
 )
+from tests.scripts.dev_tools.typescript_twin_test_support import (
+    literals_missing_from_twin,
+)
 
 REPOSITORY_CONTEXT_ERROR = (
     "Execution-ready planner validation requires repository context."
@@ -202,3 +205,13 @@ def test_ready_gate_preserves_feature_index_when_receipts_skipped() -> None:
         for error in errors
         if FEATURE0_TOPOLOGY_TOKEN in error or FEATURE0_MODEL_TOKEN in error
     ] == []
+
+
+def test_asserted_messages_match_typescript_twin() -> None:
+    """Keep every asserted message identical to its TypeScript twin literal."""
+
+    missing = literals_missing_from_twin(
+        ASSERTED_MESSAGES, "lib/validate/epic-planner-state-feature-receipts.test.ts"
+    )
+
+    assert missing == []

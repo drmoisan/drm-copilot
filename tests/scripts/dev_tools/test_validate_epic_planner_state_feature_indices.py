@@ -10,6 +10,9 @@ import pytest
 from scripts.dev_tools.validate_epic_planner_state import (
     validate_epic_planner_state_text,
 )
+from tests.scripts.dev_tools.typescript_twin_test_support import (
+    literals_missing_from_twin,
+)
 
 REPOSITORY_CONTEXT_ERROR = (
     "Execution-ready planner validation requires repository context."
@@ -199,3 +202,13 @@ def test_ready_gate_prefix_unchanged_without_non_object_entries() -> None:
     errors = _ready_errors(state)
 
     assert errors == [UNSHIFTED_PREPARATION_ERROR, REPOSITORY_CONTEXT_ERROR]
+
+
+def test_asserted_messages_match_typescript_twin() -> None:
+    """Keep every asserted message identical to its TypeScript twin literal."""
+
+    missing = literals_missing_from_twin(
+        ASSERTED_MESSAGES, "lib/validate/epic-planner-state-feature-indices.test.ts"
+    )
+
+    assert missing == []

@@ -9,6 +9,9 @@ from scripts.dev_tools.epic_planner_git_integrity import (
     ReadinessGitRepository,
     validate_planning_git_integrity,
 )
+from tests.scripts.dev_tools.typescript_twin_test_support import (
+    literals_missing_from_twin,
+)
 
 BRANCH = "epic/sample-epic-integration"
 COMMIT = "1" * 40
@@ -137,3 +140,14 @@ def test_plans_without_object_entries_report_no_feature_error(
     errors = _errors(features, [PLAN_101])
 
     assert errors == []
+
+
+def test_asserted_messages_match_typescript_twin() -> None:
+    """Keep every asserted message identical to its TypeScript twin literal."""
+
+    missing = literals_missing_from_twin(
+        ASSERTED_MESSAGES,
+        "lib/validate/epic-planner-git-integrity-feature-indices.test.ts",
+    )
+
+    assert missing == []
