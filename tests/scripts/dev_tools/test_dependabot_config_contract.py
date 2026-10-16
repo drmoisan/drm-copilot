@@ -8,6 +8,7 @@ tests assert configuration shape only; they cannot simulate Dependabot.
 
 from __future__ import annotations
 
+import functools
 from pathlib import Path
 from typing import cast
 
@@ -25,11 +26,13 @@ TYPESCRIPT_NAME = "typescript"
 SEMVER_MAJOR_UPDATE_TYPE = "version-update:semver-major"
 
 
+@functools.cache
 def load_target_npm_entries() -> tuple[dict[str, object], ...]:
     """Return the npm update entries for the two directories under test.
 
     Isolates the untyped ``yaml.safe_load`` boundary so callers work against
-    narrowed mappings.
+    narrowed mappings. The result is cached for the session and must not be
+    mutated.
     """
     text = (REPO_ROOT / DEPENDABOT_CONFIG_PATH).read_text(encoding="utf-8")
     parsed = yaml.safe_load(text)
@@ -78,8 +81,10 @@ def test_npm_entry_ignores_types_vscode_for_all_update_types(directory: str) -> 
         f"npm entry for directory {directory} lacks an ignore item for "
         f"{TYPES_VSCODE_NAME}"
     )
-    assert "update-types" not in items[0], "ignore item must not restrict update-types"
-    assert "versions" not in items[0], "ignore item must not restrict versions"
+    unrestricted = any(
+        "update-types" not in item and "versions" not in item for item in items
+    )
+    assert unrestricted, f"no unrestricted ignore item for {TYPES_VSCODE_NAME}"
 
 
 @pytest.mark.parametrize(
