@@ -1,0 +1,113 @@
+{
+  "id": 15241672,
+  "name": "protect-main",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "drmoisan/drm-copilot",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [],
+      "include": [
+        "~DEFAULT_BRANCH"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "non_fast_forward"
+    },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": false,
+        "required_reviewers": [],
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "allowed_merge_methods": [
+          "merge",
+          "squash",
+          "rebase"
+        ]
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {
+            "context": "drm-copilot-extension-tests / drm-copilot Extension Tests (ubuntu-latest)",
+            "integration_id": 15368
+          },
+          {
+            "context": "drm-copilot-extension-tests / drm-copilot Extension Tests (windows-latest)",
+            "integration_id": 15368
+          },
+          {
+            "context": "docs-validation / Documentation Validation",
+            "integration_id": 15368
+          },
+          {
+            "context": "poshqc / PowerShell QC",
+            "integration_id": 15368
+          },
+          {
+            "context": "shell-coverage / Shell Coverage (Bats + kcov)",
+            "integration_id": 15368
+          },
+          {
+            "context": "security-scan / Security Scanning",
+            "integration_id": 15368
+          },
+          {
+            "context": "quality-checks7 / Code Quality & Tests (3.10)",
+            "integration_id": 15368
+          },
+          {
+            "context": "quality-checks7 / Code Quality & Tests (3.11)",
+            "integration_id": 15368
+          },
+          {
+            "context": "quality-checks7 / Code Quality & Tests (3.12)",
+            "integration_id": 15368
+          },
+          {
+            "context": "quality-checks7 / Code Quality & Tests (3.13)",
+            "integration_id": 15368
+          },
+          {
+            "context": "build-check / Build Package",
+            "integration_id": 15368
+          }
+        ]
+      }
+    }
+  ],
+  "node_id": "RRS_lACqUmVwb3NpdG9yec5EONpXzgDokcg",
+  "created_at": "2026-04-18T11:47:24.848-04:00",
+  "updated_at": "2026-09-28T18:49:28.995-04:00",
+  "bypass_actors": [
+    {
+      "actor_id": 54180981,
+      "actor_type": "User",
+      "bypass_mode": "pull_request"
+    }
+  ],
+  "current_user_can_bypass": "pull_requests_only",
+  "_links": {
+    "self": {
+      "href": "https://api.github.com/repos/drmoisan/drm-copilot/rulesets/15241672"
+    },
+    "html": {
+      "href": "https://github.com/drmoisan/drm-copilot/rules/15241672"
+    }
+  }
+}
