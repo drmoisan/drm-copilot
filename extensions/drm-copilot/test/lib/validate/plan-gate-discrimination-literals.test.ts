@@ -140,6 +140,37 @@ describe("evaluatePlanGates search literals", () => {
     ]);
   });
 
+  it("treats a form feed or line separator in a tracked file as part of one line", () => {
+    // Arrange: form-feed and line-separator tracked-text cases.
+    const gits = [
+      "the pinned\fitems occupy the cohort\n",
+      "the pinned\u2028items occupy the cohort\n",
+    ].map(
+      (trackedText) =>
+        new StubGitRepository(
+          { pinned: ["docs/design.md"] },
+          { "docs/design.md": trackedText },
+        ),
+    );
+    const finding =
+      "[P2-T1] search literal `pinned items occupy` is absent from the " +
+      "tracked tree and is not quoted in the plan; the search returns zero " +
+      "matches whatever the executor does. Quote the exact literal the task " +
+      "will create, or assert a literal that exists.";
+
+    // Act
+    const results = gits.map((git) => {
+      const report = evaluatePlanGates(plan(ACCEPTANCE), context(git));
+      return [channel(report), otherChannel(report)];
+    });
+
+    // Assert
+    expect(results).toEqual([
+      [[finding], []],
+      [[finding], []],
+    ]);
+  });
+
   it("skips context rules with no context", () => {
     // Arrange
     const text = plan(ACCEPTANCE, [

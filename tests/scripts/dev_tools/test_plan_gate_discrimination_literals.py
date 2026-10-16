@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from scripts.dev_tools.plan_gate_discrimination import (
     G5_SEVERITY,
     PlanGateContext,
@@ -187,6 +189,44 @@ def test_g6_cross_line_literal_is_warning_and_not_blocking() -> None:
     # The same fixture plus a prose quotation outside the span is exonerated.
     assert exonerated.warnings == []
     assert exonerated.blocking == []
+
+
+@pytest.mark.parametrize(
+    "tracked_text",
+    [
+        pytest.param("the pinned\fitems occupy the cohort\n", id="form-feed"),
+        pytest.param("the pinned\u2028items occupy the cohort\n", id="line-separator"),
+    ],
+)
+def test_g6_window_split_ignores_form_feed_and_line_separator(
+    tracked_text: str,
+) -> None:
+    """A form feed or U+2028 does not end a tracked line, so G6 does not fire.
+
+    The tracked file is split on CR LF, LF, and CR only, as the TypeScript
+    `hasCrossLinePresence` does, so the phrase never spans two lines and the
+    G5 finding is reported instead of the G6 cross-line warning.
+    """
+
+    # Arrange
+    git = StubGitRepository(
+        matches={"pinned": ["docs/design.md"]},
+        texts={"docs/design.md": tracked_text},
+    )
+    text = _plan(_ACCEPTANCE)
+    expected = (
+        "[P2-T1] search literal `pinned items occupy` is absent from the tracked "
+        "tree and is not quoted in the plan; the search returns zero matches "
+        "whatever the executor does. Quote the exact literal the task will "
+        "create, or assert a literal that exists."
+    )
+
+    # Act
+    report = evaluate_plan_gates(text, context=_context(git))
+
+    # Assert
+    assert _channel(report) == [expected]
+    assert _other_channel(report) == []
 
 
 def test_checkable_literal_skips_regex_metacharacters() -> None:

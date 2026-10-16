@@ -57,10 +57,15 @@ _ISSUE_CLASS_BULLET = "**Any issue token after the definition.**"
 _G10_LINE_RULE_PHRASES = (
     "an indented heading or task line is absorbed",
     "do not end a physical line",
-    "One parity residual remains",
     _ISSUE_CLASS_BULLET,
 )
 _G10_FALSE_NEGATIVE_HEADING = "### Known false-negative classes — G10"
+_WHITESPACE_ALIGNMENT_PHRASES = (
+    "share one explicit whitespace class",
+    "`PLAN_WHITESPACE_CLASS`",
+    "keeps the command extractor's fence pattern",
+)
+_SUPERSEDED_RESIDUAL_SENTENCE = "One parity residual remains"
 
 
 def test_rule_file_documents_g10() -> None:
@@ -167,3 +172,20 @@ def test_rule_file_documents_g10_line_rules_and_issue_token_class() -> None:
     bullet = text.index(_ISSUE_CLASS_BULLET)
     register = text.index("## The Write-Mode Register")
     assert heading < bullet < register
+
+
+def test_rule_file_states_g10_whitespace_alignment() -> None:
+    """The rule file states the shared G10 whitespace class and the fence residual."""
+
+    # Arrange
+    text = _RULE_FILE.read_text(encoding="utf-8")
+
+    # Act
+    missing = [
+        phrase for phrase in _WHITESPACE_ALIGNMENT_PHRASES if phrase not in text
+    ]
+    stale = _SUPERSEDED_RESIDUAL_SENTENCE in text
+
+    # Assert
+    assert missing == [], f"rule file lacks {missing}"
+    assert not stale, f"rule file still states `{_SUPERSEDED_RESIDUAL_SENTENCE}`"

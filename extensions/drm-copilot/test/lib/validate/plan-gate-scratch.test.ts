@@ -268,6 +268,52 @@ describe("plan-gate-scratch G10", () => {
     expect(results).toEqual(expected);
   });
 
+  it("decides continuation with the plan whitespace class", () => {
+    // Arrange: nel-led, unit-separator-led, bom-led, nbsp-led, space-then-nel.
+    const fixtures = [
+      DEFINITION_LINE + "\n\u0085continued text",
+      DEFINITION_LINE + "\n\u001fcontinued text",
+      DEFINITION_LINE + "\n\ufeffcontinued text",
+      DEFINITION_LINE + "\n\u00a0continued text",
+      DEFINITION_LINE + "\n \u0085",
+    ];
+    const expected = [
+      [[1, "- SCRATCH means the session scratchpad."]],
+      [[1, "- SCRATCH means the session scratchpad."]],
+      [[1, "- SCRATCH means the session scratchpad."]],
+      [[1, "- SCRATCH means the session scratchpad. continued text"]],
+      [[1, "- SCRATCH means the session scratchpad. \u0085"]],
+    ];
+
+    // Act
+    const results = fixtures.map((text) => bareScratchDefinitions(text));
+
+    // Assert
+    expect(results).toEqual(expected);
+  });
+
+  it("normalizes whitespace with the plan whitespace class", () => {
+    // Arrange: nel-inline, unit-separator-inline, bom-inline, nbsp-inline.
+    const fixtures = [
+      "intro\u0085SCRATCH is the session scratchpad.",
+      "intro\u001fSCRATCH is the session scratchpad.",
+      "intro\ufeffSCRATCH is the session scratchpad.",
+      "intro\u00a0SCRATCH is the session scratchpad.",
+    ];
+    const expected = [
+      [[1, "intro\u0085SCRATCH is the session scratchpad."]],
+      [[1, "intro\u001fSCRATCH is the session scratchpad."]],
+      [[1, "intro\ufeffSCRATCH is the session scratchpad."]],
+      [[1, "intro SCRATCH is the session scratchpad."]],
+    ];
+
+    // Act
+    const results = fixtures.map((text) => bareScratchDefinitions(text));
+
+    // Assert
+    expect(results).toEqual(expected);
+  });
+
   it("renders the frozen message for the apostrophe and tab fixtures", () => {
     // Arrange
     const apostropheReport = emptyPlanGateReport();

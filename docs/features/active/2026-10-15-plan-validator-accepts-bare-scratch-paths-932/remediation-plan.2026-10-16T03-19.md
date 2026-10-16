@@ -128,7 +128,7 @@ All Phase 0 commands are read-only check modes. No write-mode formatter runs in 
 
 Static checks for the files written in this phase are deferred to Phase 2 (Python) and Phase 3 (TypeScript). No test in this phase imports a symbol that does not yet exist: the Python whitespace-class parity test reads the constant through `vars()` at run time, and no TypeScript test imports the new constant. No task in this phase runs a test node that a later phase makes pass, except the two `[expect-fail]` runs.
 
-- [ ] [P1-T1] Create `tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py` (N-1)
+- [x] [P1-T1] Create `tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py` (N-1)
   - Module docstring: states that the file pins the G10 whitespace class shared with `extensions/drm-copilot/test/lib/validate/plan-gate-scratch.test.ts`, issue #932 remediation cycle 2.
   - Imports: `re`, `Path`, `pytest`, the module `scripts.dev_tools.plan_gate_scratch` (as `plan_gate_scratch`), and `bare_scratch_definitions` from it.
   - Module constants:
@@ -148,7 +148,7 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
     - The line count (Grep pattern `^`, output mode `count`) is at most 500.
     - The raw-character zero-count check in Conventions returns 0.
     - The counts are recorded in the [P1-T6] artifact.
-- [ ] [P1-T2] Add the U-1 parity test to `tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py`
+- [x] [P1-T2] Add the U-1 parity test to `tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py`
   - Add `test_g6_window_split_ignores_form_feed_and_line_separator`, parametrized over the two Appendix B tracked-text cases (ids `form-feed` and `line-separator`).
     - Arrange: a `StubGitRepository` with `matches={"pinned": ["docs/design.md"]}` and `texts={"docs/design.md": <case text>}`, and the plan `_plan(_ACCEPTANCE)`.
     - Act: `evaluate_plan_gates(text, context=_context(git))`.
@@ -159,7 +159,7 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
     - The line count is at most 500.
     - The raw-character zero-count check returns 0.
     - The counts are recorded in the [P1-T6] artifact.
-- [ ] [P1-T3] Update the rule-file documentation tests in `tests/scripts/dev_tools/test_plan_gate_scratch_docs.py` (N-1)
+- [x] [P1-T3] Update the rule-file documentation tests in `tests/scripts/dev_tools/test_plan_gate_scratch_docs.py` (N-1)
   - Remove the element `"One parity residual remains"` from `_G10_LINE_RULE_PHRASES` (line 60); the other three elements are unchanged.
   - Add the module constants:
     - `_WHITESPACE_ALIGNMENT_PHRASES`, holding the three tokens `share one explicit whitespace class`, `` `PLAN_WHITESPACE_CLASS` `` (backticks included), and `keeps the command extractor's fence pattern`;
@@ -171,7 +171,7 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
     - It returns exactly 1 for the pattern `One parity residual remains` (the superseded constant only).
     - The Grep tool with pattern `^`, output mode `count`, on the file returns at most 500 (169 before this task).
     - The counts are recorded in the [P1-T6] artifact.
-- [ ] [P1-T4] Add the N-1 cases to `extensions/drm-copilot/test/lib/validate/plan-gate-scratch.test.ts`
+- [x] [P1-T4] Add the N-1 cases to `extensions/drm-copilot/test/lib/validate/plan-gate-scratch.test.ts`
   - Inside the existing `describe("plan-gate-scratch G10", ...)` block (line 163), after the case `does not end a physical line at a form feed or a line separator`, add two cases. Each uses the TypeScript escapes in Appendix B and the existing `DEFINITION_LINE` constant (line 67):
     - `it("decides continuation with the plan whitespace class", ...)`: maps the five continuation fixtures through `bareScratchDefinitions` and compares the array of results to the array of their frozen findings, each wrapped in a one-element array.
     - `it("normalizes whitespace with the plan whitespace class", ...)`: the same for the four normalization fixtures.
@@ -186,7 +186,7 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
     - The Grep tool with pattern `^`, output mode `count`, on the file returns at most 500 (385 before this task).
     - The raw-character zero-count check returns 0.
     - The counts are recorded in the [P1-T7] artifact.
-- [ ] [P1-T5] Add the U-1 parity case to `extensions/drm-copilot/test/lib/validate/plan-gate-discrimination-literals.test.ts`
+- [x] [P1-T5] Add the U-1 parity case to `extensions/drm-copilot/test/lib/validate/plan-gate-discrimination-literals.test.ts`
   - Inside `describe("evaluatePlanGates search literals", ...)` (line 90) add `it("treats a form feed or line separator in a tracked file as part of one line", ...)`.
     - Arrange: for each of the two Appendix B tracked-text cases (TypeScript escapes), builds `new StubGitRepository({ pinned: ["docs/design.md"] }, { "docs/design.md": <case text> })`.
     - Act: evaluates `plan(ACCEPTANCE)` once per case.
@@ -197,7 +197,7 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
     - The Grep tool with pattern `^`, output mode `count`, on the file returns at most 500 (283 before this task).
     - The raw-character zero-count check returns 0.
     - The counts are recorded in the [P1-T7] artifact.
-- [ ] [P1-T6] [expect-fail] Run the Python red set and record `<FEATURE>/evidence/regression-testing/python-red-rc2.<timestamp>.md`
+- [x] [P1-T6] [expect-fail] Run the Python red set and record `<FEATURE>/evidence/regression-testing/python-red-rc2.<timestamp>.md`
   - Command: `poetry run pytest -v tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`
   - Expected failures, nine nodes:
     - `test_whitespace_class_matches_typescript`, with `KeyError: 'PLAN_WHITESPACE_CLASS'`.
@@ -215,7 +215,7 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
     - `Output Summary:` names each failing node with its first error line and each expected-pass node, as printed by the `-v` per-node lines.
     - The artifact also records the Grep counts from [P1-T1], [P1-T2], and [P1-T3].
     - Any unexpected signature halts the task for a plan revision.
-- [ ] [P1-T7] [expect-fail] Run the TypeScript red set and record `<FEATURE>/evidence/regression-testing/ts-red-rc2.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P1-T7] [expect-fail] Run the TypeScript red set and record `<FEATURE>/evidence/regression-testing/ts-red-rc2.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx jest --config jest.config.cjs --verbose test/lib/validate/plan-gate-scratch.test.ts test/lib/validate/plan-gate-discrimination-literals.test.ts --reporters=default`
   - Expected failures, two cases:
     - `decides continuation with the plan whitespace class`: the `bom-led` element differs because the JavaScript whitespace class currently continues a line led by the byte-order mark.
@@ -226,7 +226,7 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
     - `Output Summary:` names the two failing cases with their first differing element, and quotes the verbose passing line of the U-1 case.
     - The artifact also records the Grep counts from [P1-T4] and [P1-T5].
     - Any other failure halts the task for a plan revision.
-- [ ] [P1-T8] Commit and push the Phase 1 test changes, the `<FEATURE>/evidence/regression-testing/` red artifacts, and the plan check-offs
+- [x] [P1-T8] Commit and push the Phase 1 test changes, the `<FEATURE>/evidence/regression-testing/` red artifacts, and the plan check-offs
   - Commands: `git add tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py extensions/drm-copilot/test/lib/validate/plan-gate-scratch.test.ts extensions/drm-copilot/test/lib/validate/plan-gate-discrimination-literals.test.ts` plus the two red artifacts and this plan file, `git commit -m "test(932): add remediation cycle 2 red tests for the whitespace class and the G6 split"`, `git push origin HEAD`.
   - Acceptance: the push exits 0, and after the push `git status --porcelain` lists no path other than `SCRATCH/`.
 
