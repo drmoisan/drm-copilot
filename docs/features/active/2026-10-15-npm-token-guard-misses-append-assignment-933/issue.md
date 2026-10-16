@@ -66,7 +66,7 @@ Adopted approach (orchestrator decision D1, recorded 2026-10-15 under the autono
 - [x] AC-6: Fail-before / pass-after evidence. The AC-1 and AC-2 rows fail against the unmodified pattern and pass after the change. Both pytest runs are recorded under `evidence/regression-testing/`.
 - [x] AC-7: The Python toolchain (black, ruff, pyright, pytest) reports no formatting changes, no lint findings, no type errors, and no test failures on the two changed files and the full suite. Full-suite coverage after the change does not fall below baseline and meets the repository thresholds (line >= 85%, branch >= 75%). No production line changes, so new-code coverage is recorded as not applicable, supported by an empty `git diff --name-only origin/main...HEAD -- src scripts`.
 - [x] AC-8: Both changed files stay at or under 500 lines, verified by a line count.
-- [ ] AC-9: The CI job `quality-checks7` (Code Quality & Tests) passes on the PR head (CI-dependent).
+- [x] AC-9: The CI job `quality-checks7` (Code Quality & Tests) passes on the PR head (CI-dependent).
 
 ## Next Step
 
