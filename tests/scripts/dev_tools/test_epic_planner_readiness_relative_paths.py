@@ -26,7 +26,7 @@ FOLDER_ESCAPE_ERROR = (
     "must stay within the workspace root."
 )
 FOLDER_SLASH_ERROR = (
-    "Epic planner checkpoint features[0].feature_folder " "must use forward slashes."
+    "Epic planner checkpoint features[0].feature_folder must use forward slashes."
 )
 FOLDER_EMPTY_ERROR = (
     "Epic planner checkpoint features[0].feature_folder "
@@ -101,8 +101,10 @@ def test_feature_folder_spelling_normalizes_to_repository_path(
         (f"/{FOLDER}", FOLDER_ESCAPE_ERROR),
         ("docs\\features\\active\\feature-101", FOLDER_SLASH_ERROR),
         ("   ", FOLDER_EMPTY_ERROR),
+        ("C:/docs/features/active/feature-101", FOLDER_ESCAPE_ERROR),
+        ("c:docs/features/active/feature-101", FOLDER_ESCAPE_ERROR),
     ],
-    ids=["parent", "absolute", "backslash", "blank"],
+    ids=["parent", "absolute", "backslash", "blank", "drive-letter", "drive-relative"],
 )
 def test_unsafe_feature_folder_is_rejected(folder: str, expected: str) -> None:
     """Reject a feature_folder that is blank, uses backslashes, or escapes."""

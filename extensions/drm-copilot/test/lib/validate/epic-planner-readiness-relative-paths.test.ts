@@ -81,6 +81,16 @@ const rejectedCases: ReadonlyArray<{
     expected: FOLDER_SLASH_ERROR,
   },
   { label: "blank", folder: "   ", expected: FOLDER_EMPTY_ERROR },
+  {
+    label: "drive-letter",
+    folder: "C:/docs/features/active/feature-101",
+    expected: FOLDER_ESCAPE_ERROR,
+  },
+  {
+    label: "drive-relative",
+    folder: "c:docs/features/active/feature-101",
+    expected: FOLDER_ESCAPE_ERROR,
+  },
 ];
 
 describe("validateEpicReadinessIntegrity repository-relative paths", () => {
