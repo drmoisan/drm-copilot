@@ -248,10 +248,10 @@ The inserted planner text is exactly lines 58 through 67 of `.claude/agents/atom
 
 ### Phase 5 — Severity Governance, Corpus Measurement, and Policy Documentation
 
-- [ ] [P5-T1] Write the pre-declared severity decision rule for G10 in `<FEATURE>/evidence/other/g10-severity-decision-rule.<timestamp>.md` before any measurement
+- [x] [P5-T1] Write the pre-declared severity decision rule for G10 in `<FEATURE>/evidence/other/g10-severity-decision-rule.<timestamp>.md` before any measurement
   - Content: `Timestamp:`; the decision rule "G10 ships Blocking if and only if the measured finding count is greater than zero and the recorded false-positive count is zero; otherwise the measurement indicates Warning", stated as the same two-conjunct rule used for G5 through G9 in `.claude/rules/plan-acceptance-gates.md`; the false-positive definition "a flagged logical line that is not a SCRATCH definition, or that defines SCRATCH in the canonical issue-namespaced form"; the true-positive definition (a flagged logical line that defines SCRATCH without an accepted issue namespace); the corpus derivation "every path listed by `git ls-tree -r -z --name-only <MERGE_BASE> -- docs` whose final path component matches the case-sensitive glob `*plan.*.md`, read at `<MERGE_BASE>` with `git show`" (this includes `docs/features/active/`, `docs/features/archive/`, and every other `docs/` tree); the statement that G10 ships Blocking by operator-approved scope for issue #932 and that a Warning outcome is recorded as a discrepancy, not acted on by changing `G10_SEVERITY` or narrowing the predicate.
   - Acceptance: the artifact exists with all listed elements and no count.
-- [ ] [P5-T2] Commit and push the decision-rule artifact under `<FEATURE>/evidence/other/` alone, so its precedence over the measurement is visible in git history
+- [x] [P5-T2] Commit and push the decision-rule artifact under `<FEATURE>/evidence/other/` alone, so its precedence over the measurement is visible in git history
   - Commands: `git add` naming the decision-rule artifact and the plan file, `git commit -m "docs(932): pre-declare the G10 severity decision rule"`, `git push origin HEAD`.
   - Acceptance: `git log -1 --name-only` lists only the artifact and the plan file; the push exits 0.
 - [ ] [P5-T3] Write the scratch driver `SCRATCH/g10/test_g10_drivers.py` with the exact content of Appendix A and record it in `<FEATURE>/evidence/other/g10-driver-setup.<timestamp>.md`
