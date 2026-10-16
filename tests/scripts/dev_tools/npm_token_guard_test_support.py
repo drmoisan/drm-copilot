@@ -44,7 +44,7 @@ _NPM_AUTH_TOKEN_CONFIG_REFERENCE = re.compile(
     r"(?<![A-Za-z0-9])_authtoken\b", re.IGNORECASE
 )
 _NPM_TOKEN_ASSIGNMENT = re.compile(
-    r"(?<![\w.-])[\"']?NPM_TOKEN[\"']?\s*:|\bNPM_TOKEN\s*=(?!=)", re.IGNORECASE
+    r"(?<![\w.-])[\"']?NPM_TOKEN[\"']?\s*:|\bNPM_TOKEN\s*\+?=(?!=)", re.IGNORECASE
 )
 
 
@@ -122,10 +122,12 @@ def find_npm_token_assignments(text: str) -> list[int]:
     """Return the line numbers of ``text`` that assign a value to ``NPM_TOKEN``.
 
     A YAML mapping key (block, flow, or quoted) and a shell or PowerShell
-    assignment are reported whichever secret feeds them. A context read
-    (``secrets.NPM_TOKEN``, ``env.NPM_TOKEN``), an ``==`` comparison, a longer
-    or prefixed name, and prose without ``:`` or ``=`` after the name are not
-    reported.
+    assignment are reported whichever secret feeds them. An append is also
+    reported (issue #933): a bash ``NPM_TOKEN+=x``, an ``export NPM_TOKEN+=x``,
+    and a PowerShell ``$env:NPM_TOKEN += 'x'``. A context read
+    (``secrets.NPM_TOKEN``, ``env.NPM_TOKEN``), an ``==`` comparison, an
+    ``+==`` sequence, a longer or prefixed name, and prose without ``:``,
+    ``=``, or ``+=`` after the name are not reported.
 
     Args:
         text: YAML document text to scan.
