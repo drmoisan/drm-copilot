@@ -66,6 +66,12 @@ _WHITESPACE_ALIGNMENT_PHRASES = (
     "keeps the command extractor's fence pattern",
 )
 _SUPERSEDED_RESIDUAL_SENTENCE = "One parity residual remains"
+_G6_WHITESPACE_PHRASES = (
+    "declared once per runtime",
+    "G6 uses the same class",
+    "plan-quotation exoneration, which reads the plan text",
+)
+_SUPERSEDED_DECLARATION_PHRASE = "identical pattern string in each module"
 
 
 def test_rule_file_documents_g10() -> None:
@@ -187,3 +193,18 @@ def test_rule_file_states_g10_whitespace_alignment() -> None:
     # Assert
     assert missing == [], f"rule file lacks {missing}"
     assert not stale, f"rule file still states `{_SUPERSEDED_RESIDUAL_SENTENCE}`"
+
+
+def test_rule_file_states_g6_whitespace_alignment() -> None:
+    """The rule file states that G6 shares the whitespace class and where it lives."""
+
+    # Arrange
+    text = _RULE_FILE.read_text(encoding="utf-8")
+
+    # Act
+    missing = [phrase for phrase in _G6_WHITESPACE_PHRASES if phrase not in text]
+    stale = _SUPERSEDED_DECLARATION_PHRASE in text
+
+    # Assert
+    assert missing == [], f"rule file lacks {missing}"
+    assert not stale, f"rule file still states `{_SUPERSEDED_DECLARATION_PHRASE}`"

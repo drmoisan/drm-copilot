@@ -171,6 +171,48 @@ describe("evaluatePlanGates search literals", () => {
     ]);
   });
 
+  it("normalizes G6 tracked lines with the plan whitespace class", () => {
+    // Arrange: NEL is Python-only whitespace and the byte-order mark is
+    // JavaScript-only whitespace; the shared class contains neither. G5 ships
+    // on the Warning channel, so both expected findings are Warnings.
+    const nel = "\x85";
+    const bom = String.fromCharCode(0xfeff);
+    const trackedTexts = [
+      `the pinned\n${nel}\nitems occupy\n`,
+      `the pinned\n${bom}\nitems occupy\n`,
+      `the pinned${nel}items occupy\nthe pinned\nitems occupy\n`,
+      `the pinned${bom}items occupy\nthe pinned\nitems occupy\n`,
+    ];
+    const absent =
+      "[P2-T1] search literal `pinned items occupy` is absent from the " +
+      "tracked tree and is not quoted in the plan; the search returns zero " +
+      "matches whatever the executor does. Quote the exact literal the task " +
+      "will create, or assert a literal that exists.";
+    const crossLine =
+      "[P2-T1] search literal `pinned items occupy` is present only " +
+      "across adjacent lines of a tracked file and matches no single " +
+      "line; a line-oriented search returns zero matches. Search a " +
+      "shorter single-line token.";
+
+    // Act
+    const results = trackedTexts.map((trackedText) => {
+      const git = new StubGitRepository(
+        { pinned: ["docs/design.md"] },
+        { "docs/design.md": trackedText },
+      );
+      const report = evaluatePlanGates(plan(ACCEPTANCE), context(git));
+      return [report.blocking, report.warnings];
+    });
+
+    // Assert
+    expect(results).toEqual([
+      [[], [absent]],
+      [[], [absent]],
+      [[], [crossLine]],
+      [[], [crossLine]],
+    ]);
+  });
+
   it("skips context rules with no context", () => {
     // Arrange
     const text = plan(ACCEPTANCE, [

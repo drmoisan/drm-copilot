@@ -12,6 +12,11 @@ Every special character is written as an escape: NEL, the unit separator, the
 byte-order mark, and the no-break space are the characters on which the Python
 whitespace predicate and the JavaScript whitespace class disagree, or which
 pin the class against shrinking to ASCII.
+
+Since remediation cycle 3 the class and its normalizer are declared once
+per runtime, in `scripts/dev_tools/plan_gate_commands.py` and
+`extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts`, and G6
+uses them as well; the declaration-count test pins that location.
 """
 
 from __future__ import annotations
@@ -21,7 +26,7 @@ from pathlib import Path
 
 import pytest
 
-import scripts.dev_tools.plan_gate_scratch as plan_gate_scratch
+import scripts.dev_tools.plan_gate_commands as plan_gate_commands
 from scripts.dev_tools.plan_gate_scratch import bare_scratch_definitions
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -32,11 +37,20 @@ _TYPESCRIPT_MODULE = (
     / "src"
     / "lib"
     / "validate"
-    / "plan-gate-scratch.ts"
+    / "plan-gate-commands.ts"
 )
 _WHITESPACE_CLASS_TS_RE = re.compile(
     r"PLAN_WHITESPACE_CLASS\s*=\s*String\.raw`([^`]*)`"
 )
+_PYTHON_DECLARATION_RE = re.compile(r"^PLAN_WHITESPACE_CLASS = ", re.MULTILINE)
+_DECLARATION_COUNTS = {
+    "scripts/dev_tools/plan_gate_commands.py": 1,
+    "scripts/dev_tools/plan_gate_scratch.py": 0,
+    "scripts/dev_tools/plan_gate_discrimination.py": 0,
+    "extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts": 1,
+    "extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts": 0,
+    "extensions/drm-copilot/src/lib/validate/plan-gate-rules.ts": 0,
+}
 
 _DEFINITION_LINE = "- SCRATCH means the session scratchpad."
 
@@ -96,7 +110,7 @@ def test_whitespace_class_matches_typescript() -> None:
     """The TypeScript module declares the identical whitespace class string."""
 
     # Arrange
-    python_class: str = vars(plan_gate_scratch)["PLAN_WHITESPACE_CLASS"]
+    python_class: str = vars(plan_gate_commands)["PLAN_WHITESPACE_CLASS"]
     source = _TYPESCRIPT_MODULE.read_text(encoding="utf-8")
 
     # Act
@@ -105,7 +119,7 @@ def test_whitespace_class_matches_typescript() -> None:
     # Assert
     assert match is not None, (
         "PLAN_WHITESPACE_CLASS is not declared with String.raw in "
-        "plan-gate-scratch.ts"
+        "plan-gate-commands.ts"
     )
     typescript_class = match.group(1)
     assert typescript_class == python_class, (
@@ -113,8 +127,35 @@ def test_whitespace_class_matches_typescript() -> None:
         f"Python `{python_class}`"
     )
     assert typescript_class.isascii(), (
-        "PLAN_WHITESPACE_CLASS in plan-gate-scratch.ts must be written with "
+        "PLAN_WHITESPACE_CLASS in plan-gate-commands.ts must be written with "
         "escapes, not raw characters"
+    )
+
+
+def test_whitespace_class_declared_once_per_runtime() -> None:
+    """Each runtime declares the class once, in its command extractor module."""
+
+    # Arrange
+    sources = {
+        relative: (_REPO_ROOT / relative).read_text(encoding="utf-8")
+        for relative in _DECLARATION_COUNTS
+    }
+
+    # Act
+    counts = {
+        relative: len(
+            (
+                _PYTHON_DECLARATION_RE
+                if relative.endswith(".py")
+                else _WHITESPACE_CLASS_TS_RE
+            ).findall(source)
+        )
+        for relative, source in sources.items()
+    }
+
+    # Assert
+    assert counts == _DECLARATION_COUNTS, (
+        f"PLAN_WHITESPACE_CLASS declarations differ: {counts}"
     )
 
 

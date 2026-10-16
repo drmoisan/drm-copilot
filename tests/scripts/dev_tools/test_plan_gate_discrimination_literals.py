@@ -16,6 +16,20 @@ from scripts.dev_tools.plan_gate_discrimination import (
 _PHASE = "### Phase 2 — Work"
 _LITERAL = "pinned items occupy"
 _ACCEPTANCE = f"grep -F -n '{_LITERAL}' docs/design.md"
+_NEL = "\x85"
+_BOM = chr(0xFEFF)
+_G5_ABSENT_FINDING = (
+    "[P2-T1] search literal `pinned items occupy` is absent from the tracked "
+    "tree and is not quoted in the plan; the search returns zero matches "
+    "whatever the executor does. Quote the exact literal the task will "
+    "create, or assert a literal that exists."
+)
+_G6_CROSS_LINE_WARNING = (
+    "[P2-T1] search literal `pinned items occupy` is present only across "
+    "adjacent lines of a tracked file and matches no single line; a "
+    "line-oriented search returns zero matches. Search a shorter single-line "
+    "token."
+)
 
 
 class StubGitRepository:
@@ -227,6 +241,56 @@ def test_g6_window_split_ignores_form_feed_and_line_separator(
     # Assert
     assert _channel(report) == [expected]
     assert _other_channel(report) == []
+
+
+@pytest.mark.parametrize(
+    ("tracked_text", "expected"),
+    [
+        pytest.param(
+            "the pinned\n" + _NEL + "\nitems occupy\n",
+            _G5_ABSENT_FINDING,
+            id="nel-only-line",
+        ),
+        pytest.param(
+            "the pinned\n" + _BOM + "\nitems occupy\n",
+            _G5_ABSENT_FINDING,
+            id="bom-only-line",
+        ),
+        pytest.param(
+            "the pinned" + _NEL + "items occupy\nthe pinned\nitems occupy\n",
+            _G6_CROSS_LINE_WARNING,
+            id="nel-joined-line",
+        ),
+        pytest.param(
+            "the pinned" + _BOM + "items occupy\nthe pinned\nitems occupy\n",
+            _G6_CROSS_LINE_WARNING,
+            id="bom-joined-line",
+        ),
+    ],
+)
+def test_g6_normalization_uses_plan_whitespace_class(
+    tracked_text: str, expected: str
+) -> None:
+    """G6 treats NEL and the byte-order mark as ordinary characters.
+
+    Both are outside `PLAN_WHITESPACE_CLASS`, so a line holding only one of
+    them is not blank, and a phrase joined by one of them is not on one line.
+    The TypeScript suite holds the same four cases. G5 ships on the Warning
+    channel, so both expected findings are Warnings.
+    """
+
+    # Arrange
+    git = StubGitRepository(
+        matches={"pinned": ["docs/design.md"]},
+        texts={"docs/design.md": tracked_text},
+    )
+    text = _plan(_ACCEPTANCE)
+
+    # Act
+    report = evaluate_plan_gates(text, context=_context(git))
+
+    # Assert
+    assert (report.blocking, report.warnings) == ([], [expected])
 
 
 def test_checkable_literal_skips_regex_metacharacters() -> None:
