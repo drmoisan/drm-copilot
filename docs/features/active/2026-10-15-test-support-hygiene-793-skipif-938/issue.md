@@ -33,16 +33,16 @@ Shared builders live in a test-support module; skip reasons are accurate or the 
 
 ## Acceptance Criteria
 
-- [ ] `tests/scripts/dev_tools/validate_orchestration_artifacts_test_support.py` exists and defines `build_valid_epic_state` and `build_read_text_stub`, moved verbatim from their prior test modules.
-- [ ] No `test_*.py` file under `tests/` contains `def build_valid_epic_state` or `def build_read_text_stub`; the only definition of each is in the support module (verified by a single-line token search).
-- [ ] No `test_*.py` module imports `build_valid_epic_state` or `build_read_text_stub` from another `test_*.py` module, and the support module is not re-exported from any test module; `test_validate_epic_orchestrator_state_merge_status.py`, `test_validate_orchestration_artifacts_dispatch.py`, `test_validate_orchestration_artifacts_plan_gates.py`, and `test_validate_orchestration_artifacts_parallel_dispatch.py` import the builders from `tests.scripts.dev_tools.validate_orchestration_artifacts_test_support`.
-- [ ] The docstring in `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py` and the comment in `extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts` cite `validate_orchestration_artifacts_test_support` instead of the former test-module locations.
-- [ ] `tests/scripts/dev_tools/test_codex_handoff_contract_parity.py` contains no `skipif` token and no `_requires_codex_runtime` token, and `import pytest` is removed if it is otherwise unused.
-- [ ] `poetry run pytest tests/scripts/dev_tools/test_codex_handoff_contract_parity.py -q -rs` reports all five tests passed with no skipped tests.
-- [ ] `poetry run pytest` over `test_validate_epic_orchestrator_state.py`, `test_validate_epic_orchestrator_state_merge_status.py`, `test_validate_orchestration_artifacts.py`, `test_validate_orchestration_artifacts_dispatch.py`, `test_validate_orchestration_artifacts_plan_gates.py`, `test_validate_orchestration_artifacts_parallel_dispatch.py`, and `test_validate_discovery_artifacts_dispatch.py` passes with zero failures and a collected-test count not lower than the pre-change baseline.
-- [ ] `poetry run black --check`, `poetry run ruff check`, and `poetry run pyright` report no errors on every touched Python file, including the new support module.
-- [ ] The TypeScript toolchain (Prettier, ESLint, tsc, and the jest run for `epic-orchestrator-state-core.test.ts`) passes in `extensions/drm-copilot` with the touched `.ts` file.
-- [ ] Every touched or created file stays at or under 500 lines.
+- [x] `tests/scripts/dev_tools/validate_orchestration_artifacts_test_support.py` exists and defines `build_valid_epic_state` and `build_read_text_stub`, moved verbatim from their prior test modules.
+- [x] No `test_*.py` file under `tests/` contains `def build_valid_epic_state` or `def build_read_text_stub`; the only definition of each is in the support module (verified by a single-line token search).
+- [x] No `test_*.py` module imports `build_valid_epic_state` or `build_read_text_stub` from another `test_*.py` module, and the support module is not re-exported from any test module; `test_validate_epic_orchestrator_state_merge_status.py`, `test_validate_orchestration_artifacts_dispatch.py`, `test_validate_orchestration_artifacts_plan_gates.py`, and `test_validate_orchestration_artifacts_parallel_dispatch.py` import the builders from `tests.scripts.dev_tools.validate_orchestration_artifacts_test_support`.
+- [x] The docstring in `tests/scripts/dev_tools/test_validate_discovery_artifacts_dispatch.py` and the comment in `extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts` cite `validate_orchestration_artifacts_test_support` instead of the former test-module locations.
+- [x] `tests/scripts/dev_tools/test_codex_handoff_contract_parity.py` contains no `skipif` token and no `_requires_codex_runtime` token, and `import pytest` is removed if it is otherwise unused.
+- [x] `poetry run pytest tests/scripts/dev_tools/test_codex_handoff_contract_parity.py -q -rs` reports all five tests passed with no skipped tests.
+- [x] `poetry run pytest` over `test_validate_epic_orchestrator_state.py`, `test_validate_epic_orchestrator_state_merge_status.py`, `test_validate_orchestration_artifacts.py`, `test_validate_orchestration_artifacts_dispatch.py`, `test_validate_orchestration_artifacts_plan_gates.py`, `test_validate_orchestration_artifacts_parallel_dispatch.py`, and `test_validate_discovery_artifacts_dispatch.py` passes with zero failures and a collected-test count not lower than the pre-change baseline.
+- [x] `poetry run black --check`, `poetry run ruff check`, and `poetry run pyright` report no errors on every touched Python file, including the new support module.
+- [x] The TypeScript toolchain (Prettier, ESLint, tsc, and the jest run for `epic-orchestrator-state-core.test.ts`) passes in `extensions/drm-copilot` with the touched `.ts` file.
+- [x] Every touched or created file stays at or under 500 lines.
 
 ## Actual Behavior
 

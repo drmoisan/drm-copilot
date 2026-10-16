@@ -2,16 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 import scripts.dev_tools.validate_epic_orchestrator_state as epic_state_validator
 import scripts.dev_tools.validate_orchestration_artifacts as validator
 import scripts.dev_tools.validate_orchestration_review_artifacts as review_validator
 import scripts.dev_tools.validate_orchestrator_state as state_validator
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from pathlib import Path
 
 
 def build_valid_orchestrator_state() -> dict[str, object]:
@@ -135,15 +131,6 @@ def build_valid_policy_audit_text() -> str:
             "## Appendix B: Toolchain Commands Reference",
         )
     )
-
-
-def build_read_text_stub(text: str) -> Callable[[Path], str]:
-    """Return a typed `_read_text` replacement for monkeypatched CLI tests."""
-
-    def _stub(_path: Path) -> str:
-        return text
-
-    return _stub
 
 
 def build_complete_large_orchestrator_state() -> dict[str, object]:

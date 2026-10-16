@@ -17,9 +17,11 @@ from typing import TYPE_CHECKING, cast
 import scripts.dev_tools.validate_orchestration_artifacts as validator
 from tests.scripts.dev_tools.test_validate_orchestration_artifacts import (
     build_complete_large_orchestrator_state,
-    build_read_text_stub,
     build_valid_orchestrator_state,
     build_valid_policy_audit_text,
+)
+from tests.scripts.dev_tools.validate_orchestration_artifacts_test_support import (
+    build_read_text_stub,
 )
 
 # `get_first_receipt` is not imported: none of the 10 functions moved into this module

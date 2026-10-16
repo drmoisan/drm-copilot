@@ -29,7 +29,7 @@ def _stub_read_text(text: str) -> Callable[[Path], str]:
     """Return a typed `_read_text` replacement for monkeypatched CLI tests.
 
     Mirrors the `build_read_text_stub` pattern in
-    `tests/scripts/dev_tools/test_validate_orchestration_artifacts.py`.
+    `tests/scripts/dev_tools/validate_orchestration_artifacts_test_support.py`.
     """
 
     def _stub(_path: Path) -> str:
