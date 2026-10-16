@@ -60,7 +60,7 @@ Concrete exit-1 sources identified in research (Q2, path 2): `Get-Content -Error
 - Dependency load failures are already converted to exit 2 by the #786 guard pattern (single-statement guarded loads plus the S1 tail; covered by B1/B2/B3 in `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1:134-190`).
 - The remaining gap is the validation call that follows the S1 tail. Any terminating error raised there that is not caught locally propagates to the script top level, and `pwsh -File` exits 1.
 - `validate-feature-review-coverage.ps1` already wraps its validation call in a tail `try`/`catch` (`:202-203`) and is compliant. The other validators in the family have no such wrapper.
-- In `validate-discovery-artifact-gate.ps1` and `validate-pr-author-output.ps1`, `$ErrorActionPreference` is the default (Continue), so a .NET method exception can be statement-terminating and fall through to `exit 0`. With a `try` on the call stack, PowerShell routes such errors to the enclosing `catch`; the fix is expected to convert these to exit 2 as well (inferred from documented semantics; not confirmed by a run).
+- In `validate-discovery-artifact-gate.ps1` and `validate-pr-author-output.ps1`, `$ErrorActionPreference` is the default (Continue), so a .NET method exception can be statement-terminating and fall through to `exit 0`. With a `try` on the call stack, PowerShell routes such errors to the enclosing `catch`; the fix is expected to convert these to exit 2 as well (confirmed in-process by the U1-ST rows of tests/scripts/claude-hooks/subagentstop-uncaught-error.Tests.ps1, remediation cycle 1).
 
 ## Proposed Fix
 
@@ -194,7 +194,7 @@ Seeded from issue:
   - Per-row assertions: no exception propagated to the test; `$LASTEXITCODE` equals 2; stderr starts with the row's prefix (ordinal) and contains `simulated unhandled error (issue #928)`; `Should -Invoke Read-SubagentStopEnvelope -Times 1 -Exactly`.
   - Completeness row (modelled on B4, `hook-dependency-failure.Claude.Tests.ps1:192-195`): the table's Hook keys equal the set of `.claude/hooks/*.ps1` files whose AST contains the guarded `subagentstop-envelope.ps1` dot-source.
 - Unit tests: Pester only (no pytest unit tests for this change). Existing pytest bundle-parity tests are rerun.
-- Edge cases: the `validate-feature-review-coverage.ps1` row is a characterization row and passes before the fix. Statement-terminating errors under `$ErrorActionPreference = Continue` (discovery gate, pr-author) are exercised by the thrown mock.
+- Edge cases: the `validate-feature-review-coverage.ps1` row is a characterization row and passes before the fix. Statement-terminating errors under `$ErrorActionPreference = Continue` (discovery gate, pr-author) are exercised by the U1-ST rows, whose mock raises a .NET method exception.
 - Error handling verification: stderr reason text asserted per row.
 - Coverage: line coverage >= 85% for changed PowerShell under `.claude/hooks` (in the `config/poshqc-coverage.json` population). No branch-coverage gate applies to Pester. New `catch` lines are executed by the new rows.
 - Toolchain commands: PoshQC MCP tools in order format, analyze, test (`mcp__drm-copilot__run_poshqc_*`); `poetry run pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`. Type checking does not apply to PowerShell.
@@ -276,7 +276,7 @@ tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py
 - Re-entry suppression on the crash path: the crash block always applies regardless of `stop_hook_active`.
 - Moving `docs/features/active/subagentstop-envelope-core-897/` to `docs/features/archive/`; only the citations change.
 - Citations of the 897 spec inside `docs/` other than those listed in AC9.
-- `docs/engineering/claude-code-architecture.md:237` (PreToolUse `validate-bash.ps1` exit-code description); it concerns PreToolUse, not SubagentStop, and is not changed here.
+- Any change to `docs/engineering/claude-code-architecture.md` other than the line-239 paragraph (AC10) and the line-237 PreToolUse sentence (corrected in remediation cycle 1, CR-N3).
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md` (does not contain the stale statement).
 - Any change to hook registrations, agent frontmatter hook blocks, or `core.json`.
 - Live Claude Code differential runs; the in-process exit-code harness is the verification route.
@@ -286,7 +286,7 @@ tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py
 - Risk: a deterministic validator crash re-blocks on every stop. Mitigation: the reason ends with the report-and-halt line directing the subagent to report to the operator; this matches the existing dependency-failure tail exposure.
 - Risk: placing the `try` before or around the S1 tail breaks the S1 structural test. Mitigation: AC1 placement rule and AC13 rerun of `hook-dependency-guard-completeness.Tests.ps1`.
 - Risk: mirror drift. Mitigation: byte copies and AC8 parity test.
-- Risk: the Continue-preference conversion for the discovery gate and pr-author is inferred, not observed. Mitigation: the new rows exercise those validators with a thrown mock and assert exit 2.
+- Risk: the Continue-preference conversion for the discovery gate and pr-author could differ from documented semantics. Mitigation: the U1-ST rows exercise those validators with a statement-terminating .NET method exception and assert exit 2 (observed in remediation cycle 1).
 - Rollback: revert the tail `try`/`catch` edits and their mirrors.
 
 ## Rollout & Follow-up
