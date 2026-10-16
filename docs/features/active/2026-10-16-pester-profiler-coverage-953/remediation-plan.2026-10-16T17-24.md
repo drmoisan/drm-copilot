@@ -6,8 +6,8 @@
 - **Inputs:** `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-inputs.2026-10-16T17-02.md` (PA-3 / CR-21), `docs/features/active/2026-10-16-pester-profiler-coverage-953/code-review.2026-10-16T17-02.md` (CR-18, CR-19, CR-21), `docs/features/active/2026-10-16-pester-profiler-coverage-953/policy-audit.2026-10-16T17-02.md`, `docs/features/active/2026-10-16-pester-profiler-coverage-953/feature-audit.2026-10-16T17-02.md`; reference plans `docs/features/active/2026-10-16-pester-profiler-coverage-953/plan.2026-10-16T00-16.md`, `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-plan.2026-10-16T10-24.md` (cycle 1), and `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-plan.2026-10-16T14-19.md` (cycle 2; source of the Tool route, FULL_RUN, TARGETED_RUN, JRP, CRP, and CLD definitions restated below).
 - **Planning-time head:** `3d60e3f76`. Every line citation below was re-derived against the working tree at this head.
 - **Last Updated:** 2026-10-16
-- **Status:** Draft revision 1.0, pending executor preflight
-- **Version:** 1.0
+- **Status:** Draft revision 1.1, pending executor preflight (revision 1.1 applies executor preflight deltas D1-D4 and adds the second alone-failing suite found by the orchestrator alone sweep; its citations were re-derived at `789843870`, which differs from PLAN_HEAD only under the feature folder)
+- **Version:** 1.1
 - **Attempt:** cycle 3 of the three-attempt remediation guard (final attempt).
 
 ## Scope
@@ -15,6 +15,8 @@
 Orchestrator decision D19 brings these findings into this cycle:
 
 - **PA-3 / CR-21 (Blocking, `autonomous`):** CI runs 38935591244 and 38936152953 fail `poshqc / PowerShell QC shard 1` on `tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1:80` (`issue #850 changed-file constraints.baseline mock interception probe`: "Expected Get-EpicScopeCheckpointText in module EpicScopeResolution to be called 1 times exactly, but was called 0 times"). The suite passes alone and fails when the CI shard 1 file list runs in order up to it in one Pester process.
+- **PA-3 / CR-21, second suite (found in executor preflight):** with this cycle's byte changes, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScopeTargets.Tests.ps1` moves into a shard 1 that contains no suite importing `WorktreeResolution` into the global scope, and its outermost `BeforeAll` fails (`Could not find Command Get-WorktreeResolutionGitFileText`). The suite also fails alone on PLAN_HEAD. P2-T7 through P2-T10 remove that dependency on the victim side.
+- **PA-3 / CR-21, third suite (found by the orchestrator alone sweep):** `SCRATCH/issue-953-alone-sweep.sh` ran each of the 388 `tests/scripts/**/*.Tests.ps1` suites alone in its own `pwsh -NoProfile` process (Pester 5.9.0, no coverage); exactly two fail alone: EST_SUITE (22 of 22 failed, 1 failed container) and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Tests.ps1` (49 tests, 45 failed). The second suite is in the same class as CR-21: its result depends on what ran before it in the process, and sharding can separate it from the state it depends on. It is not a FILES_936 path. P2-T11 through P2-T15 record its alone failure, diagnose the cause, apply a test-side fix, and record its pass-after; P5-T17 re-runs the alone sweep on the final tree.
 - **CR-18 (Info, same files):** `Get-PoshQCShardSlice` documents non-negative weights but does not reject a negative weight.
 - **CR-19 (Info, same files):** shard weights are file sizes in bytes on the checked-out tree, so they depend on the checkout's line-ending conversion; the README sentence overstates the determinism.
 
@@ -26,7 +28,7 @@ Out of scope and never written: `.github/workflows/**` (no workflow change in th
 
 This section is the declared blast radius of this cycle. No other tracked path is written.
 
-Tests, source, and documentation (6 paths, the CYCLE_FILES set):
+Tests, source, and documentation (8 paths, the CYCLE_FILES set):
 
 1. `tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1`: four lines inserted after line 21. Edit tool (test file; no batch-budget slot).
 2. `scripts/powershell/PoshQC/PoshQC.Shard.psm1`: lines 9-10, 216-217, and 247 replaced; five lines inserted after line 41; 35 lines appended after line 256. Edit tool (the only production PowerShell file this cycle writes).
@@ -34,14 +36,16 @@ Tests, source, and documentation (6 paths, the CYCLE_FILES set):
 4. `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1`: five lines inserted after line 92 and 46 lines appended after line 172. Edit tool.
 5. `scripts/powershell/PoshQC/README.md`: lines 62 and 84 replaced. Edit tool.
 6. `extensions/drm-copilot/resources/powershell/PoshQC/README.md`: identical to item 5, written with `Copy-Item`.
+7. `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScopeTargets.Tests.ps1`: three lines inserted after line 24. Edit tool (test file; no batch-budget slot).
+8. `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Tests.ps1`: lines 29-30 replaced by five lines. Edit tool (test file; no batch-budget slot).
 
 Feature folder (planning and evidence):
 
-7. `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-plan.2026-10-16T17-24.md` (this plan; checkbox state only during execution).
-8. `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/*.md`
-9. `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/*.md`
-10. `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/*.md`
-11. `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/*.md`
+9. `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-plan.2026-10-16T17-24.md` (this plan; checkbox state only during execution).
+10. `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/*.md`
+11. `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/*.md`
+12. `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/*.md`
+13. `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/*.md`
 
 Not tracked: `artifacts/pester/*` (git-ignored), `.claude/state/*` (git-ignored), and every scratch file under SCRATCH.
 
@@ -67,8 +71,8 @@ Not tracked: `artifacts/pester/*` (git-ignored), `.claude/state/*` (git-ignored)
 - **Never edit a bundled copy.** No Write or Edit tool call targets a file under `extensions/drm-copilot/resources/powershell/PoshQC/`.
 - **Never edit a predecessor or #936 file.** No Write or Edit tool call targets `tests/scripts/claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1`, a file listed in `MINIMAL_SET`, or either #936-owned file named in Scope.
 - **No temporary files in tests.** Every test added or edited by this plan reads only checked-in files and in-memory values. SH14 constructs `System.IO.FileInfo` objects for paths that are never opened; SH15 reads two checked-in module files and writes nothing.
-- **Task-ordering rule.** Two deliberately failing states exist. (1) The pre-fix 850 suite: P1-T4 (`[expect-fail]` repro) and P1-T5 (bisection) run before P2-T1 edits the suite. (2) The CR-18/CR-19 tests: P3-T4 (`[expect-fail]`) runs after P3-T1 and P3-T2 add them and before P4-T1 edits production code. No Pester run takes place between P3-T1 and P4-T8, the pass-after run, other than P3-T4; the only other test between them is the Python parity pytest of P4-T7, which reads no Pester file.
-- **Restart rule (Phase 5).** If any task from P5-T1 through P5-T4 or P5-T9 through P5-T16 fails or changes a tracked file, the executor fixes the cause, re-runs P4-T7 (mirror) when the fix changes a file under `scripts/powershell/PoshQC/`, and restarts at P5-T1, writing new evidence files. Evidence from an abandoned pass is kept; consumers read the latest file.
+- **Task-ordering rule.** Four deliberately failing states exist. (1) The pre-fix 850 suite: P1-T4 (`[expect-fail]` repro) and P1-T5 (bisection) run before P2-T1 edits the suite. (2) The CR-18/CR-19 tests: P3-T4 (`[expect-fail]`) runs after P3-T1 and P3-T2 add them and before P4-T1 edits production code. (3) The pre-fix EST_SUITE: P2-T7 (`[expect-fail]`, EST_SUITE alone) runs before P2-T8 edits it. (4) The pre-fix OIA_SUITE: P2-T11 (`[expect-fail]`, OIA_SUITE alone) and P2-T12 (diagnosis) run before P2-T13 edits it. No Pester run takes place between P3-T1 and P4-T8, the pass-after run, other than P3-T4; the only other test between them is the Python parity pytest of P4-T7, which reads no Pester file.
+- **Restart rule (Phase 5).** If any task from P5-T1 through P5-T4 or P5-T9 through P5-T17 fails or changes a tracked file, the executor fixes the cause, re-runs P4-T7 (mirror) when the fix changes a file under `scripts/powershell/PoshQC/`, and restarts at P5-T1, writing new evidence files. Evidence from an abandoned pass is kept; consumers read the latest file. A P5-T17 failure is repaired inside the loop only when every `FAIL_ALONE:` path is a CYCLE_FILES path; a `FAIL_ALONE:` path outside CYCLE_FILES lies outside the declared blast radius, so the executor records it and stops BLOCKED for an orchestrator decision.
 - **Shard-failure stop rule (Phase 5).** A failure in P5-T5, P5-T6, P5-T7, or P5-T8 is not repaired inside the loop: the executor completes the diagnostics stated in that task and stops BLOCKED for an orchestrator decision.
 - **Stop rule.** A task whose acceptance states "stop BLOCKED" ends execution: the executor reports the recorded values and does not start the next task.
 
@@ -78,6 +82,18 @@ Not tracked: `artifacts/pester/*` (git-ignored), `.claude/state/*` (git-ignored)
 - **SCRATCH** = `<session scratchpad>/issue-953/`, where `<session scratchpad>` is the session scratchpad directory supplied to the executor at run time (outside the repository). Every file this cycle creates directly under SCRATCH starts with `issue-953-r3-`. In PowerShell text, `$S` holds the absolute SCRATCH path. Evidence records the literal token `SCRATCH`, never a host path.
 - **CI_MANIFEST** = `SCRATCH/issue-953-ci3-shard1/shard-files.json`, the shard 1 manifest downloaded by the orchestrator from CI run 38936152953 (head `44fb40097`). It is an input; no task writes it.
 - **TARGET_SUITE** = `tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1`.
+- **EST_SUITE** = `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScopeTargets.Tests.ps1`.
+- **EST_TOKEN** = `enforce-orchestration-preimplementation-gate.ps1 epic-scope targets (issue #738).baseline mock interception probe` (the JUnit `testcase/@name` of the EST_SUITE probe; the shorter `epic-scope targets (issue #738).baseline mock interception probe` also matches the Codex twin in `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope-targets.Tests.ps1`).
+- **OIA_SUITE** = `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Tests.ps1` (434 lines at PLAN_HEAD; 41 `It` blocks, four of them `-ForEach` over three cases each, so 49 tests).
+- **OIA_DIRECT_TOKEN** = `Issue adoption accepts valid records (AC-6).` (matches the 10 testcases of the first `Describe` of OIA_SUITE, OIA_SUITE:117-160, which call `Get-OrchestratorStateIssueAdoptionResult` directly through `Invoke-Adoption`, OIA_SUITE:85-93).
+- **OIA_WIRING_TOKEN** = `Routing contract wiring for issue adoption.` (matches the 4 testcases of the `Describe` at OIA_SUITE:355, which call only `Get-OrchestratorStateRoutingContractError`).
+- **ALONE_SWEEP(tag)**: the orchestrator sweep `SCRATCH/issue-953-alone-sweep.sh`, restated in Tool-route form. Every `*.Tests.ps1` under `tests/scripts`, sorted, runs alone in its own `pwsh -NoProfile` process with Pester 5.9.0 to 5.99.99, the default Pester configuration (coverage off), and `Run.PassThru`; a suite counts as failing alone unless it reports `RESULT <total> 0 0 0`. Runs through the Tool route in the background. Task PowerShell text:
+
+```powershell
+$files = @(Get-ChildItem -Recurse -File -Filter *.Tests.ps1 -Path tests/scripts | ForEach-Object { [IO.Path]::GetRelativePath((Get-Location).Path, $_.FullName) -replace "\\","/" } | Sort-Object); $inner = "Import-Module Pester -MinimumVersion 5.9.0 -MaximumVersion 5.99.99; `$c = New-PesterConfiguration; `$c.Run.Path = @(`$env:ISSUE953_ONE); `$c.Run.PassThru = `$true; `$r = Invoke-Pester -Configuration `$c; Write-Output (`"RESULT `" + `$r.TotalCount + `" `" + `$r.FailedCount + `" `" + `$r.FailedBlocksCount + `" `" + `$r.FailedContainersCount)"; $fail = 0; $out = [System.Collections.Generic.List[string]]::new(); $out.Add("FILES=$($files.Count)"); foreach ($f in $files) { $env:ISSUE953_ONE = $f; $o = @(pwsh -NoProfile -Command $inner 2>&1 | ForEach-Object { "$_" } | Where-Object { $_ -like "RESULT *" }); $line = if ($o.Count -gt 0) { $o[-1] } else { "NO_RESULT" }; if ($line -notmatch "^RESULT \d+ 0 0 0$") { $fail++; $out.Add("FAIL_ALONE: $f :: $line") } }; $out.Add("FAILED_ALONE_COUNT=$fail"); $out.Add("TRACKED_TEST_FILES=$(@(git ls-files -- 'tests/scripts/*.Tests.ps1').Count)"); Set-Content -LiteralPath (Join-Path $S 'issue-953-r3-<tag>-alone-sweep.txt') -Value $out -Encoding utf8; $out; exit $fail
+```
+
+  The git pathspec `tests/scripts/*.Tests.ps1` has no glob magic, so `*` also matches `/` and the count covers every tracked suite under `tests/scripts`. This cycle adds no test file, so `TRACKED_TEST_FILES` is expected to equal the orchestrator sweep's `FILES=388`.
 - **WATCH_TEST** = `issue #850 changed-file constraints.baseline mock interception probe` (the Pester `ExpandedPath` and the JUnit `testcase/@name` of the failing case; observed in the CI shard 1 JUnit artifact of run 38936152953).
 - **PLAN_HEAD** = `3d60e3f76` (the head at which every citation was derived).
 - **REM_BASE_SHA** = the commit printed by `git rev-parse HEAD` in P0-T10, before any cycle edit.
@@ -109,7 +125,7 @@ New-Item -ItemType Directory -Force -Path artifacts/pester | Out-Null; $start = 
 $env:ISSUE953_SHARD = '<n>'; $env:ISSUE953_JUNIT = Join-Path $S 'issue-953-r3-<tag>-shard-<n>-junit.xml'; $env:ISSUE953_LIST = Join-Path $S 'issue-953-r3-<tag>-shard-<n>.json'; $start = [datetime]::UtcNow; pwsh -NoProfile -Command 'Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; $build = { param($Settings) $c = New-PesterConfiguration -Hashtable $Settings; $c.CodeCoverage.Enabled = $false; $c.TestResult.OutputPath = $env:ISSUE953_JUNIT; $c }; Invoke-PoshQCTest -Root (Get-Location).Path -ShardIndex ([int] $env:ISSUE953_SHARD) -ShardCount 3 -ShardFileListPath $env:ISSUE953_LIST -BuildConfiguration $build -DisableKoverageCopy' *> (Join-Path $S 'issue-953-r3-<tag>-shard-<n>.log'); $code = $LASTEXITCODE; $end = [datetime]::UtcNow; "EXIT_CODE=$code SECONDS=$([int]($end - $start).TotalSeconds) START_UTC=$($start.ToString('o'))"
 ```
 
-  Valid only when the JUnit file and the manifest JSON both have `LastWriteTimeUtc` later than the printed `START_UTC` (parsed as for FULL_RUN) and the log contains no line with the literal `Code coverage population:` (coverage stayed off).
+  Valid only when the JUnit file and the manifest JSON both have `LastWriteTimeUtc` later than the printed `START_UTC` (parsed as for FULL_RUN) and the log contains no line with the literal `Code coverage population: source=config` (coverage stayed off; PoshQC unit tests that inject a settings file print `source=settings` lines, which do not count).
 - **TARGETED_RUN(tag, paths)**: no coverage. It runs through the Tool route, and its doubled single quotes become `'\'''\''` under the Tool-route quoting rule. Task PowerShell text:
 
 ```powershell
@@ -141,7 +157,7 @@ $env:ISSUE953_PATHS = '<paths joined with ;>'; $env:ISSUE953_JUNIT = Join-Path $
 - **CYCLE2_TOKENS** (regression guard for the earlier cycles): `CM01-MERGE-MAX-CI`, `CM02-MERGE-RECOMPUTES-LINE-COUNTERS`, `CM03-MERGE-PRESERVES-DENOMINATOR`, `CM04-MERGE-MISMATCHED-LINES-THROWS`, `CM05-MERGE-SINGLE-REPORT-IDENTITY`, `CM06-MERGE-EMPTY-INPUT-THROWS`, `CM07-SUMMARY-REPORT-LINE`, `CM08-MERGE-OMITS-CLASS-AND-METHOD-FIGURES`, `WF01-POSHQC-MERGE-JOB-RUNS-ALWAYS`, `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS`, `WF04-SHARD-COUNT-FROM-MATRIX`, `WF05-MERGE-LOOPS-DERIVE-SHARD-COUNT`, `RS01-RUNSETTINGS-PROFILER-MODE`, `RS02-PESTER-CONFIG-USEBREAKPOINTS-FALSE`, `RS03-INSTALLER-PESTER-590`, `RS04-BUNDLED-RUNSETTINGS-PROFILER-MODE`, `RS05-INSTALLER-PESTER-CEILING-BELOW-6`, `RS06-TEST-IMPORT-PESTER-MAXIMUM`, `RS07-WORKFLOW-LINUX-PESTER-RANGE`, `RS08-TEST-IMPORT-PESTER-RANGE-BOUNDS`, `RS09-TEST-PESTER-6-ONLY-ACTIONABLE-ERROR`, `RS10-TEST-PESTER-INBOX-ONLY-ACTIONABLE-ERROR`.
 - **BUNDLE_PAIRS** (repository file and bundled copy): `PoshQC.Shard.psm1`, `PoshQC.CoverageMerge.psm1`, `PoshQC.Testing.psm1`, and `README.md`, each under `scripts/powershell/PoshQC/` and `extensions/drm-copilot/resources/powershell/PoshQC/`.
 - **FILES_936**: `tests/scripts/codex-hooks/hook-import-failure-exemptions.FailClosed.Tests.ps1`, `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-epic-scope.Decision.Tests.ps1`.
-- **CYCLE_FILES**: items 1-6 of "Files Written". **PS_CYCLE_FILES**: items 1, 2, and 4.
+- **CYCLE_FILES**: items 1-8 of "Files Written". **PS_CYCLE_FILES**: items 1, 2, 4, 7, and 8.
 
 ## Assumptions and Advisories
 
@@ -166,6 +182,21 @@ $env:ISSUE953_PATHS = '<paths joined with ;>'; $env:ISSUE953_JUNIT = Join-Path $
   - Weaken the probe, or change shard weights, the shard count, or the matrix: prohibited by D19 and `remediation-inputs.2026-10-16T17-02.md:28`.
 - **Files touched for PA-3:** one test file. No production file, no helper, no predecessor.
 
+### OIA_SUITE root-cause hypothesis (H2; confirmed or refuted by P2-T12)
+
+- The planner could not execute commands in this revision; H2 is derived from the source text and the sweep counts, and P2-T12 decides it mechanically before any edit.
+- OIA_SUITE's `BeforeAll` imports `OrchestratorStateIssueAdoption.psm1` with `-Force` (OIA_SUITE:29) and then `OrchestratorStateRoutingContract.psm1` with `-Force` (OIA_SUITE:30). The routing-contract module imports its sibling `OrchestratorStateIssueAdoption.psm1` again with `-Force` at module scope (`.claude/lib/orchestrator-state/OrchestratorStateRoutingContract.psm1:61`). H2: that nested forced import unloads the instance the suite imported at line 29, so `Get-OrchestratorStateIssueAdoptionResult` is no longer visible to the suite, and every test that calls it through `Invoke-Adoption` (OIA_SUITE:85-93) fails, while the 4 tests of the `Describe` at OIA_SUITE:355 pass because they reach the adoption function only through the routing contract's own nested instance.
+- The sweep counts match H2 exactly: 49 tests minus the 4 wiring tests is 45 failed, with 0 failed blocks and 0 failed containers (the `BeforeAll` itself succeeds).
+- In a full or sharded run, a predecessor suite (for example `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Parity.Tests.ps1:50`, which sorts before OIA_SUITE and imports the routing contract with `-Force`) leaves module state under which the function stays visible. P2-T12 records whether that predecessor state makes the function visible, as an observation.
+- The module is not judged defective under H2: importing siblings with `-Force -ErrorAction Stop` at module scope is the documented convention of the routing contract (`OrchestratorStateRoutingContract.psm1:50`), and every assertion that calls it passes alone.
+
+### OIA_SUITE design decision (D-R3-4): import the routing contract first, then the adoption module without -Force
+
+- **Change.** Replace OIA_SUITE:29-30 with a three-line comment, the routing-contract import with `-Force`, and the adoption-module import without `-Force`. The routing contract's nested forced import then runs first, and the later unforced import makes the already-loaded adoption module visible in the suite's scope without unloading anything, whatever ran earlier in the process.
+- **What stays the same.** No `It`, `Describe`, helper function, fixture, or assertion changes; the count of lines containing `Should -` is unchanged (P2-T14). Both modules are still loaded from the working tree in this process: the forced routing-contract import re-runs its nested forced adoption import.
+- **Rejected alternatives.** Changing `OrchestratorStateRoutingContract.psm1:61` (a production change the diagnosis does not justify, and a convention shared by its sibling imports at `:59-60`); module-qualifying the calls (the module would still be unloaded); adding `-Global` imports (leaks state to later suites).
+- **Files touched:** one test file. If P2-T12 does not confirm H2, no edit is made and execution stops BLOCKED.
+
 ### CR-18 design decision (D-R3-2)
 
 - `Get-PoshQCShardSlice` throws `Weight must not be negative; '<file>' has weight <w>.` after the existing length check (`scripts/powershell/PoshQC/PoshQC.Shard.psm1:39-41`), so the failing position always has a file name. A zero weight stays valid. The help sentence at lines 9-10 names the new condition. `New-PoshQCShardManifest` passes `-Weight` through (`:106-110`), so the check covers both public entry points.
@@ -183,7 +214,7 @@ $env:ISSUE953_PATHS = '<paths joined with ;>'; $env:ISSUE953_JUNIT = Join-Path $
 
 - **Local Pester.** Cycle 1 installed Pester 5.9.0 for the CurrentUser scope; `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r2-local-pester.2026-10-16T15-32.md:6` recorded `RANGE=5.9.0`. P0-T2 confirms it; no task installs a module.
 - **Reproduction fidelity.** P1-T4 runs `selected[0..40]` of CI_MANIFEST, which is the same file list and order as the orchestrator's `SCRATCH/issue-953-repro-shard1.sh`. It does not recompute shard 1 locally, because the pre-fix local weights depend on the local checkout's line endings (CR-19). P0-T17 records whether the local computation matches CI_MANIFEST as an observation.
-- **Linux hook job.** `poshqc / PowerShell hook suites (Linux)` runs `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks` on `ubuntu-latest` with coverage disabled; the TARGET_SUITE change uses only cross-platform cmdlets. No acceptance criterion in this plan cites `ubuntu-latest`.
+- **Linux hook job.** `poshqc / PowerShell hook suites (Linux)` runs `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks` on `ubuntu-latest` with coverage disabled; the TARGET_SUITE and EST_SUITE changes use only cross-platform cmdlets. OIA_SUITE is under `tests/scripts/claude-lib` and runs only in `poshqc / PowerShell QC`. No acceptance criterion in this plan cites `ubuntu-latest`.
 - **Coverage authority.** Local FULL_RUN values (cycle baseline and final) supply the policy-required baseline, post-change, and changed-line values. The CI artifact comparison stays with reference task P8-T19. Only `PoshQC.Shard.psm1` changes among coverage-measured files, so every other per-file LINE total must be unchanged.
 - **Acceptance-criteria re-verification.** This cycle changes files that carry evidence for AC-02, AC-07, AC-11, AC-12 (the "no #936-owned test file is modified" clause), AC-13, AC-14, and AC-15. Phase 5 re-verifies them. The executor does not change any checkbox in `spec.md`.
 - **Validator.** The planner has no access to `mcp__drm-copilot__validate_orchestration_artifacts`; the caller runs it with `artifact_type: "plan"` before treating this plan as approved.
@@ -193,16 +224,16 @@ $env:ISSUE953_PATHS = '<paths joined with ;>'; $env:ISSUE953_JUNIT = Join-Path $
 
 | Item | Implementation tasks | Tests | Evidence tasks |
 |---|---|---|---|
-| CR-21 (PA-3) | P2-T1 | TARGET_SUITE `baseline mock interception probe`; GUARD_SET; HELPER_SET; MINIMAL_SET pair | P1-T4, P1-T5, P1-T6, P2-T2, P2-T3, P2-T4, P2-T5, P2-T6, P5-T3, P5-T5, P5-T6, P5-T7, P5-T8 |
+| CR-21 (PA-3) | P2-T1, P2-T8, P2-T13 | TARGET_SUITE `baseline mock interception probe`; GUARD_SET; HELPER_SET; MINIMAL_SET pair; EST_SUITE alone (EST_TOKEN); OIA_SUITE alone (OIA_DIRECT_TOKEN, OIA_WIRING_TOKEN); ALONE_SWEEP | P1-T4, P1-T5, P1-T6, P2-T2, P2-T3, P2-T4, P2-T5, P2-T6, P2-T7, P2-T9, P2-T10, P2-T11, P2-T12, P2-T14, P2-T15, P5-T3, P5-T5, P5-T6, P5-T7, P5-T8, P5-T17 |
 | CR-18 | P4-T1 | `SH13-SLICE-NEGATIVE-WEIGHT-THROWS` | P3-T4, P4-T8, P5-T3, P5-T4 |
 | CR-19 | P4-T2, P4-T3, P4-T5, P4-T7 | `SH14-WEIGHT-IGNORES-LINE-ENDINGS`, `SH15-SELECT-WEIGHS-CHECKED-IN-FILES-BY-NORMALIZED-TEXT`, `TS06-SHARD-WEIGHTED-BY-FILE-SIZE` | P3-T4, P4-T8, P5-T3, P5-T4, P5-T8, P5-T15 |
 | AC-02 | P4-T7 | `tests/scripts/dev_tools/test_poshqc_bundled_parity.py::test_poshqc_bundled_module_files_match_repo_root_sources` | P4-T7, P5-T9, P5-T10 |
-| AC-07 | P2-T1 through P4-T5 | full self-hosted suite | P5-T1, P5-T2, P5-T3, P5-T17 |
+| AC-07 | P2-T1 through P4-T5 | full self-hosted suite | P5-T1, P5-T2, P5-T3, P5-T18 |
 | AC-11 | scope constraint (check name, completeness guard, no threshold) | `Test-PoshQCShardCompleteness` over the three final manifests | P5-T8, P5-T13, P5-T14 |
 | AC-12 | scope constraint (no #936-owned test file modified) | path check | P5-T16 |
 | AC-13 | scope constraint | `on:` block and `ci.yml` comparison | P5-T13 |
 | AC-14 | scope constraint | path-prefix check | P5-T16 |
-| AC-15 | size constraint | line counts | P2-T2, P3-T3, P4-T4, P5-T12 |
+| AC-15 | size constraint | line counts | P2-T2, P2-T9, P2-T14, P3-T3, P4-T4, P5-T12 |
 
 ## Implementation Plan
 
@@ -240,7 +271,7 @@ All baseline artifacts go to `docs/features/active/2026-10-16-pester-profiler-co
 - [ ] [P0-T12] Record baseline line counts and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r3-line-counts.<ts>.md`.
   - Through the Tool route, run `(Get-Content -LiteralPath <path>).Count` for every path in the acceptance list below.
   - The file contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and one `LINES: <path> <count>` line per file.
-  - Acceptance: the counts are `scripts/powershell/PoshQC/PoshQC.Shard.psm1` 256, `scripts/powershell/PoshQC/PoshQC.Testing.psm1` 479, `scripts/powershell/PoshQC/README.md` 98, `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1` 172, `tests/scripts/powershell/PoshQC/PoshQC.TestingShard.Tests.ps1` 162, `tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1` 114, and `tests/scripts/claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1` 179. If any count differs, the planning-time line citations no longer hold: stop BLOCKED.
+  - Acceptance: the counts are `scripts/powershell/PoshQC/PoshQC.Shard.psm1` 256, `scripts/powershell/PoshQC/PoshQC.Testing.psm1` 479, `scripts/powershell/PoshQC/README.md` 98, `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1` 172, `tests/scripts/powershell/PoshQC/PoshQC.TestingShard.Tests.ps1` 162, `tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1` 114, `tests/scripts/claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1` 179, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScopeTargets.Tests.ps1` 203, and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Tests.ps1` 434. If any count differs, the planning-time line citations no longer hold: stop BLOCKED.
 - [ ] [P0-T13] Capture the bundled-parity baseline with `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py -q` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r3-parity-pytest.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` quoting the summary line. The Output Summary also states that Python coverage is not measured because no Python file is written in this cycle.
   - Acceptance: EXIT_CODE 0 and the summary line contains `1 passed`.
@@ -315,7 +346,7 @@ if ($epic.Count -eq 1 -and $runModule.Count -eq 1) {
         $boundInstance = $runModule[0]
         $epicInstance = $epic[0]
         & $boundInstance { $script:Issue953InstanceMarker = 'bound' }
-        $seen = & $epicInstance { $nested = (Get-Command -Name Resolve-WorktreeEpicTarget -CommandType Function).Module; & $nested { $script:Issue953InstanceMarker } }
+        $seen = & $epicInstance { $nested = (Get-Command -Name Resolve-WorktreeEpicTarget -CommandType Function).Module; & $nested { $ExecutionContext.SessionState.PSVariable.GetValue('Issue953InstanceMarker') } }
         $stale = if ($seen -ceq 'bound') { 'NO' } else { 'YES' }
     } catch {
         $stale = 'ERROR'
@@ -493,6 +524,56 @@ exit 0
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the hash line, the `RESULT=` line, and the latest `R3_HELPER_SET_BASELINE_FAILED_TESTS` value from `r3-helper-set-baseline.*.md`.
   - Acceptance: the hash equals the `HELPER_SET_SHA256` of the latest `r3-helper-set-baseline.*.md`; RUN_SET valid; EXIT_CODE 0; `failed` 0, `failedBlocks` 0, `failedContainers` 0; `watch` is `Passed`.
   - If `failed` is greater than 0, every failed test also appears in `R3_HELPER_SET_BASELINE_FAILED_TESTS`, and none is WATCH_TEST, record `PRE_EXISTING_HELPER_SET_FAILURE: <names>` and stop BLOCKED for an orchestrator decision. Any other failure: record it and stop BLOCKED.
+- [ ] [P2-T7] [expect-fail] Run TARGETED_RUN(`est-before`, EST_SUITE) on the pre-fix tree and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-est-fail-before.<ts>.md`.
+  - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 23`, and `Output Summary:` with the JRP totals and the first log line that contains `Could not find Command`.
+  - Acceptance: run valid; EXIT_CODE 23; JRP `tests` 22, `failures` 22, `errors` 1; the log `SCRATCH/issue-953-r3-est-before.log` contains `Could not find Command Get-WorktreeResolutionGitFileText`. Any other outcome: record it and stop BLOCKED.
+- [ ] [P2-T8] Edit `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScopeTargets.Tests.ps1`: insert the three lines below immediately after line 24 (`    Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'`, unique in the file) and before line 25 (the `-Surface 'Codex'` registration). Anchor the Edit on line 24. No other line changes.
+  - Acceptance: the file contains `lib/worktree-resolution/WorktreeResolution.psm1` (quoted here as the literal this task creates) exactly once.
+
+```powershell
+    # Issue #953 (CR-21): the Codex-surface registration below mocks Get-WorktreeResolutionGitFileText at script
+    # scope; importing its module here keeps the suite independent of the suites that ran earlier in the process.
+    Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeResolution.psm1')
+```
+
+- [ ] [P2-T9] Verify the EST_SUITE edit and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-est-suite-edit.<ts>.md`.
+  - Run `git diff --numstat <REM_BASE_SHA> -- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScopeTargets.Tests.ps1` from the Bash tool. Through the Tool route: the `ParseFile` error count of the file and `(Get-Content -LiteralPath tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScopeTargets.Tests.ps1).Count`.
+  - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+  - Acceptance: numstat `3` added and `0` deleted; 0 parse errors; 206 lines (AC-15).
+- [ ] [P2-T10] Run TARGETED_RUN(`est-after`, EST_SUITE) and TARGETED_RUN(`guard-est-after`, GUARD_SET), and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-est-pass-after.<ts>.md`.
+  - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:` (the `est-after` exit code), and `Output Summary:` with both printed lines, both sets of JRP totals, the JRP token check for EST_TOKEN on the `est-after` JUnit file, and the JRP token check for every GUARD_TOKENS entry on the `guard-est-after` JUnit file.
+  - Acceptance: both runs valid with EXIT_CODE 0; `est-after` JRP `tests` 22, `failures` 0, `errors` 0, and EST_TOKEN PASS; `guard-est-after` JRP `failures` 0, `errors` 0, `tests` equal to `R3_GUARD_BASELINE_TESTS`, and every GUARD_TOKENS entry PASS (the discovery guard still accepts the edited suites).
+- [ ] [P2-T11] [expect-fail] Run TARGETED_RUN(`oia-before`, OIA_SUITE) on the pre-fix tree and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-oia-fail-before.<ts>.md`.
+  - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 45`, and `Output Summary:` with the printed line, the JRP totals, the JRP failure check (step 5) for OIA_DIRECT_TOKEN, the JRP token check (step 4) for OIA_WIRING_TOKEN with its hit count, and `OIA_FIRST_FAILURE_MESSAGE: <failure/@message of the first failed testcase in document order>`.
+  - Acceptance: run valid; EXIT_CODE 45 (Pester exits with the failed-test count when `Run.Exit` is set); JRP `tests` 49, `failures` 45, `errors` 0; the OIA_DIRECT_TOKEN failure check PASS; the OIA_WIRING_TOKEN token check PASS with exactly 4 hits. These are the counts of the orchestrator sweep line `RESULT 49 45 0 0`. Any other outcome: record it and stop BLOCKED.
+- [ ] [P2-T12] Diagnose the OIA_SUITE alone failure (H2) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-oia-diagnosis.<ts>.md`. Three Tool-route scripts, each its own new `pwsh` process, run no test and write no file:
+  - Script `-1` (suite import order, OIA_SUITE:28-30): `$lib = (Resolve-Path '.claude/lib/orchestrator-state').Path; Import-Module (Join-Path $lib 'OrchestratorStateIssueAdoption.psm1') -Force; "AFTER_ADOPTION_IMPORT=$([bool](Get-Command -Name Get-OrchestratorStateIssueAdoptionResult -ErrorAction SilentlyContinue))"; Import-Module (Join-Path $lib 'OrchestratorStateRoutingContract.psm1') -Force; "AFTER_ROUTING_IMPORT=$([bool](Get-Command -Name Get-OrchestratorStateIssueAdoptionResult -ErrorAction SilentlyContinue))"; "ROUTING_FN=$([bool](Get-Command -Name Get-OrchestratorStateRoutingContractError -ErrorAction SilentlyContinue))"`.
+  - Script `-2` (D-R3-4 order): `$lib = (Resolve-Path '.claude/lib/orchestrator-state').Path; Import-Module (Join-Path $lib 'OrchestratorStateRoutingContract.psm1') -Force; Import-Module (Join-Path $lib 'OrchestratorStateIssueAdoption.psm1'); $visible = Get-Command -Name Get-OrchestratorStateIssueAdoptionResult -ErrorAction SilentlyContinue; "FIXED_ORDER_HAS_FN=$([bool]$visible)"; "FIXED_ORDER_ROUTING_FN=$([bool](Get-Command -Name Get-OrchestratorStateRoutingContractError -ErrorAction SilentlyContinue))"; $nested = & (Get-Module -Name OrchestratorStateRoutingContract) { (Get-Command -Name Get-OrchestratorStateIssueAdoptionResult -ErrorAction SilentlyContinue).Module }; "FIXED_ORDER_SAME_INSTANCE=$([object]::ReferenceEquals($visible.Module, $nested))"`.
+  - Script `-3` (predecessor state; `OrchestratorStateIssueAdoption.Parity.Tests.ps1:50` imports the routing contract with `-Force` before OIA_SUITE runs in the same process): `$lib = (Resolve-Path '.claude/lib/orchestrator-state').Path; Import-Module (Join-Path $lib 'OrchestratorStateRoutingContract.psm1') -Force; Import-Module (Join-Path $lib 'OrchestratorStateIssueAdoption.psm1') -Force; Import-Module (Join-Path $lib 'OrchestratorStateRoutingContract.psm1') -Force; "PREDECESSOR_STATE_HAS_FN=$([bool](Get-Command -Name Get-OrchestratorStateIssueAdoptionResult -ErrorAction SilentlyContinue))"`.
+  - Fields: `Timestamp:`, `Command:` (the three script bodies), `EXIT_CODE:`, `Output Summary:` with every printed line and the `OIA_FIRST_FAILURE_MESSAGE` of the latest `r3-oia-fail-before.*.md`, and `MECHANISM_OIA: <statement>`.
+  - Mechanism statement: when `AFTER_ADOPTION_IMPORT=True`, `AFTER_ROUTING_IMPORT=False`, `ROUTING_FN=True`, and `OIA_FIRST_FAILURE_MESSAGE` contains `Get-OrchestratorStateIssueAdoptionResult`, write `MECHANISM_OIA: H2 CONFIRMED - the forced nested import at OrchestratorStateRoutingContract.psm1:61 unloads the adoption module that OIA_SUITE:29 imported, so the suite relies on a predecessor's module state to see Get-OrchestratorStateIssueAdoptionResult`. Otherwise write `MECHANISM_OIA: NOT CONFIRMED` with the observed values.
+  - Acceptance: every script exits 0; `MECHANISM_OIA: H2 CONFIRMED`; `FIXED_ORDER_HAS_FN=True` and `FIXED_ORDER_ROUTING_FN=True`. `FIXED_ORDER_SAME_INSTANCE` and `PREDECESSOR_STATE_HAS_FN` are recorded as observations and do not gate this task.
+  - On `MECHANISM_OIA: NOT CONFIRMED` or `FIXED_ORDER_HAS_FN=False`: do not edit OIA_SUITE; record the values and stop BLOCKED. If the observed values show that `OrchestratorStateIssueAdoption.psm1` or `OrchestratorStateRoutingContract.psm1` itself fails (for example a module-scope error on import), record `OIA_MODULE_DEFECT_SUSPECTED:` with the evidence and stop BLOCKED; no production file is changed in this cycle.
+- [ ] [P2-T13] Edit `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Tests.ps1`: replace lines 29-30 (`    Import-Module (Join-Path $libDir 'OrchestratorStateIssueAdoption.psm1') -Force` and `    Import-Module (Join-Path $libDir 'OrchestratorStateRoutingContract.psm1') -Force`, each unique in the file) with the five lines below in one Edit call anchored on those two lines. No other line changes.
+  - Acceptance: no line of the file contains `'OrchestratorStateIssueAdoption.psm1') -Force`, and the file contains `Import-Module (Join-Path $libDir 'OrchestratorStateIssueAdoption.psm1')` (quoted here as the literal this task creates) exactly once (verified in P2-T14).
+
+```powershell
+    # Issue #953 (CR-21): OrchestratorStateRoutingContract.psm1 imports OrchestratorStateIssueAdoption.psm1 with
+    # -Force, which unloads an instance imported here first. Importing the routing contract first and the adoption
+    # module second, without -Force, keeps both visible whatever ran earlier in the Pester process.
+    Import-Module (Join-Path $libDir 'OrchestratorStateRoutingContract.psm1') -Force
+    Import-Module (Join-Path $libDir 'OrchestratorStateIssueAdoption.psm1')
+```
+
+- [ ] [P2-T14] Verify the OIA_SUITE edit and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-oia-suite-edit.<ts>.md`.
+  - Run `git diff --numstat <REM_BASE_SHA> -- tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Tests.ps1` from the Bash tool (SHA written literally).
+  - Through the Tool route: the `ParseFile` error count of the file; `(Get-Content -LiteralPath tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Tests.ps1).Count`; the 1-based line numbers of the lines containing `'OrchestratorStateRoutingContract.psm1') -Force` and `'OrchestratorStateIssueAdoption.psm1')` (`Select-String -SimpleMatch`); the count of lines containing `'OrchestratorStateIssueAdoption.psm1') -Force`; and `SHOULD_BEFORE=` and `SHOULD_AFTER=`, the counts of lines containing `Should -` in `git show <REM_BASE_SHA>:tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Tests.ps1` and in the working-tree file.
+  - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+  - Acceptance: numstat `4` added and `1` deleted; 0 parse errors; 437 lines (434 - 2 + 5; AC-15); the routing-contract import is line 32 and the adoption-module import is line 33, each found exactly once; the forced adoption-import count is 0; `SHOULD_BEFORE` equals `SHOULD_AFTER` (no assertion removed).
+- [ ] [P2-T15] Run TARGETED_RUN(`oia-after`, OIA_SUITE) and TARGETED_RUN(`oia-dir-after`, `tests/scripts/claude-lib/orchestrator-state`), and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-oia-pass-after.<ts>.md`.
+  - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:` (the `oia-after` exit code), and `Output Summary:` with both printed lines, both sets of JRP totals, the JRP token check for OIA_DIRECT_TOKEN and OIA_WIRING_TOKEN on both JUnit files, and the `tests` value of the latest `r3-oia-fail-before.*.md`.
+  - Acceptance: both runs valid with EXIT_CODE 0; `oia-after` JRP `tests` 49 (equal to the fail-before `tests`), `failures` 0, `errors` 0; `oia-dir-after` JRP `failures` 0 and `errors` 0 (the sibling suites of the directory still pass in one process after the edited suite); OIA_DIRECT_TOKEN and OIA_WIRING_TOKEN PASS on both files.
+  - If `oia-after` still fails, record the failed testcases and stop BLOCKED for an orchestrator decision.
 
 ### Phase 3 — CR-18 and CR-19 Regression Tests (must fail first)
 
@@ -518,16 +599,16 @@ Describe 'Get-PoshQCShardTestFileWeight and Select-PoshQCShardTestFile weights' 
     It 'SH14-WEIGHT-IGNORES-LINE-ENDINGS weights a FileInfo item by the UTF-8 size of its text with CRLF counted as LF (CR-19)' {
         # Arrange: in-memory texts only; the FileInfo items name paths that are never opened.
         $texts = @{ 'a.Tests.ps1' = ("x`n" * 10); 'b.Tests.ps1' = (('y' * 24) + "`n") }
+        $readLf = { param([string] $Path) $texts[[System.IO.Path]::GetFileName($Path)] }.GetNewClosure()
+        $readCrLf = { param([string] $Path) $texts[[System.IO.Path]::GetFileName($Path)].Replace("`n", "`r`n") }.GetNewClosure()
 
-        InModuleScope PoshQC -Parameters @{ Texts = $texts } {
-            param([hashtable] $Texts)
+        InModuleScope PoshQC -Parameters @{ LfReader = $readLf; CrLfReader = $readCrLf } {
+            param([scriptblock] $LfReader, [scriptblock] $CrLfReader)
             $items = @([System.IO.FileInfo]::new('/shard-root/tests/a.Tests.ps1'), [System.IO.FileInfo]::new('/shard-root/tests/b.Tests.ps1'))
-            $readLf = { param([string] $Path) $Texts[[System.IO.Path]::GetFileName($Path)] }.GetNewClosure()
-            $readCrLf = { param([string] $Path) $Texts[[System.IO.Path]::GetFileName($Path)].Replace("`n", "`r`n") }.GetNewClosure()
 
             # Act
-            $lfWeights = @(Get-PoshQCShardTestFileWeight -TestFile $items -ReadTestFileText $readLf)
-            $crLfWeights = @(Get-PoshQCShardTestFileWeight -TestFile $items -ReadTestFileText $readCrLf)
+            $lfWeights = @(Get-PoshQCShardTestFileWeight -TestFile $items -ReadTestFileText $LfReader)
+            $crLfWeights = @(Get-PoshQCShardTestFileWeight -TestFile $items -ReadTestFileText $CrLfReader)
             $otherWeights = @(Get-PoshQCShardTestFileWeight -TestFile @('/shard-root/tests/c.Tests.ps1', [pscustomobject]@{ FullName = '/shard-root/tests/d.Tests.ps1'; Length = [long] 7 }))
 
             # Assert: raw CRLF sizes (30 and 26) would make a heavier than b; the normalized sizes keep b heavier.
@@ -666,7 +747,7 @@ function Get-PoshQCShardTestFileWeight {
 - [ ] [P4-T6] Run the PoshQC formatter once over the edited tree (write-mode tool) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-format-prepass.<ts>.md`.
   - Through the Tool route: record `$before = git status --porcelain`, run `pwsh -NoProfile -Command "Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCFormat -Root (Get-Location).Path" *> (Join-Path $S 'issue-953-r3-prepass-format.log')`, record `$LASTEXITCODE`, then record `$after = git status --porcelain`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with every log line that starts with `Formatted: ` and whether `$before` equals `$after`.
-  - Acceptance: EXIT_CODE 0, and the path of every `Formatted: ` line, normalized to forward slashes, ends with one of the three PS_CYCLE_FILES paths. Otherwise stop BLOCKED and record the path. This pass may reformat those files; P5-T1 later requires zero `Formatted: ` lines.
+  - Acceptance: EXIT_CODE 0, and the path of every `Formatted: ` line, normalized to forward slashes, ends with one of the five PS_CYCLE_FILES paths. Otherwise stop BLOCKED and record the path. This pass may reformat those files; P5-T1 later requires zero `Formatted: ` lines.
 - [ ] [P4-T7] Mirror and check parity. Through the Tool route, run `Copy-Item -LiteralPath scripts/powershell/PoshQC/<name> -Destination extensions/drm-copilot/resources/powershell/PoshQC/<name> -Force` for `<name>` in `PoshQC.Shard.psm1` and `README.md`, then print one `PAIR_EQUAL: <name> True|False` line per BUNDLE_PAIRS pair from `Get-FileHash -Algorithm SHA256`. Then run `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py -q` from the Bash tool. Write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-mirror-parity.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (the four lines and the pytest summary line).
   - Acceptance: all four lines read `True`, and the pytest summary line contains `1 passed` (AC-02; `PoshQC.Shard.psm1` is in `POSHQC_PARITY_PATHS`, `tests/scripts/dev_tools/test_poshqc_bundled_parity.py:16`).
 - [ ] [P4-T8] Run TARGETED_RUN(`shard-after`, R3_SHARD_SET) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-shard-pass-after.<ts>.md`.
@@ -709,9 +790,9 @@ Restart rule and shard-failure stop rule: see Fail-Closed Rules. All QC artifact
 - [ ] [P5-T7] Run SHARD_RUN(`final`, 3) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r3-final-shard-3.<ts>.md` with the same fields as P5-T5 for shard 3 (`issue-953-r3-final-shard-3.json`, `issue-953-r3-final-shard-3-junit.xml`).
   - Acceptance and failure handling: as P5-T5, with shard 3 file names and the work prefix `issue-953-r3-final-shard-3-bisect`.
 - [ ] [P5-T8] Verify the three final shards together and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r3-final-shard-completeness.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
-  - Through the Tool route: `Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; $manifests = @(1..3 | ForEach-Object { Get-Content -Raw -LiteralPath (Join-Path $S "issue-953-r3-final-shard-$_.json") | ConvertFrom-Json }); "COMPLETE=$(Test-PoshQCShardCompleteness -ShardManifest $manifests)"; "SHARD_FILES=$(@($manifests | ForEach-Object { @($_.selected).Count }) -join ',')"; "SHARD_OF_850=$(@(1..3 | Where-Object { @($manifests[$_ - 1].selected) -contains 'tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1' }) -join ',')"`. Then apply JRP to the three shard JUnit files: record each `tests` value and `SHARD_TEST_SUM`, and count the hits of the token `issue #850 changed-file constraints.baseline mock interception probe` across the three files with their results.
+  - Through the Tool route: `Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; $manifests = @(1..3 | ForEach-Object { Get-Content -Raw -LiteralPath (Join-Path $S "issue-953-r3-final-shard-$_.json") | ConvertFrom-Json }); "COMPLETE=$(Test-PoshQCShardCompleteness -ShardManifest $manifests)"; "SHARD_FILES=$(@($manifests | ForEach-Object { @($_.selected).Count }) -join ',')"; "SHARD_OF_850=$(@(1..3 | Where-Object { @($manifests[$_ - 1].selected) -contains 'tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1' }) -join ',')"`. Then apply JRP to the three shard JUnit files: record each `tests` value and `SHARD_TEST_SUM`, and count the hits of each of WATCH_TEST and EST_TOKEN across the three files with their results.
   - The Output Summary also records the three wall-second values from the latest `r3-final-shard-1.*.md`, `r3-final-shard-2.*.md`, and `r3-final-shard-3.*.md`, and `R3_FINAL_JUNIT_TESTS` from the latest `r3-final-poshqc-test-coverage.*.md`.
-  - Acceptance: `COMPLETE=True`; every `SHARD_FILES` value is at least 1; `SHARD_OF_850` names exactly one shard; `SHARD_TEST_SUM` equals `R3_FINAL_JUNIT_TESTS`; the WATCH_TEST token has exactly one hit across the three files, and it is passed (CR-21 holds in the composition CI will run; AC-11 completeness guard).
+  - Acceptance: `COMPLETE=True`; every `SHARD_FILES` value is at least 1; `SHARD_OF_850` names exactly one shard; `SHARD_TEST_SUM` equals `R3_FINAL_JUNIT_TESTS`; each of WATCH_TEST and EST_TOKEN has exactly one hit across the three files, and that hit is passed (CR-21 holds in the composition CI will run; AC-11 completeness guard).
   - On any failed condition, record the values and stop BLOCKED (shard-failure stop rule).
 - [ ] [P5-T9] Run `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py -q` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r3-final-parity-pytest.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` quoting the summary line.
   - Acceptance: EXIT_CODE 0 and the summary line contains `1 passed` (AC-02).
@@ -723,7 +804,7 @@ Restart rule and shard-failure stop rule: see Fail-Closed Rules. All QC artifact
   - Build the changed-file set as the union of the paths from `git diff --name-only origin/main...HEAD` and from `git status --porcelain --untracked-files=all` (both from the Bash tool). Keep only paths for which `Test-Path -LiteralPath <path> -PathType Leaf` is true, drop paths ending in `.md`, and record `(Get-Content -LiteralPath <path>).Count` for each remaining path (Tool route).
   - Acceptance:
     - Every count is at most 500.
-    - The set includes `scripts/powershell/PoshQC/PoshQC.Shard.psm1`, `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1`, and `tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1`.
+    - The set includes `scripts/powershell/PoshQC/PoshQC.Shard.psm1`, `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1`, `tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1`, `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicScopeTargets.Tests.ps1`, and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Tests.ps1`.
 - [ ] [P5-T13] Verify AC-13 and the check name, and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r3-final-scope-ac13.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Run `git diff --name-only origin/main...HEAD` and `git status --porcelain` from the Bash tool.
   - With `$mb = git merge-base origin/main HEAD`, for every file in `Get-ChildItem .github/workflows -Filter *.yml`, extract the `on:` block (from the line matching `^on:` through the line before the next line matching `^\S`) from the worktree file and from `git show "${mb}:.github/workflows/<name>"`, and compare the two (Tool route).
@@ -743,10 +824,15 @@ Restart rule and shard-failure stop rule: see Fail-Closed Rules. All QC artifact
     - No path in the cycle set ends in `.py`, `.sh`, `.json`, or `.yml`.
     - No path in either set starts with `.claude/rules/` or `.github/instructions/` (AC-14).
     - Neither set contains a FILES_936 path (AC-12: no #936-owned test file is modified), `tests/scripts/claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1`, or any path listed in `SCRATCH/issue-953-r3-bisect-minimal.txt`.
-- [ ] [P5-T17] Record loop closure and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r3-final-loop-closure.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and `LOOP_CLEAN_PASS: YES|NO`.
+- [ ] [P5-T17] Run ALONE_SWEEP(`final`) on the final tree through the Tool route in the background and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r3-final-alone-sweep.<ts>.md`.
+  - The sweep writes `SCRATCH/issue-953-r3-final-alone-sweep.txt` and prints the same lines.
+  - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the `FILES=`, `FAILED_ALONE_COUNT=`, and `TRACKED_TEST_FILES=` lines and every `FAIL_ALONE:` line.
+  - Acceptance: EXIT_CODE 0; the output contains exactly one `FAILED_ALONE_COUNT=` line and it reads `FAILED_ALONE_COUNT=0`; no `FAIL_ALONE:` line is present; the `FILES=` value equals the `TRACKED_TEST_FILES=` value (the count of `*.Tests.ps1` under `tests/scripts`). The orchestrator sweep on `789843870` recorded `FILES=388` and `FAILED_ALONE_COUNT=2` (EST_SUITE and OIA_SUITE); this task shows that P2-T8 and P2-T13 removed both and that no other suite fails alone.
+  - On failure: restart rule (Phase 5), including its BLOCKED condition for a `FAIL_ALONE:` path outside CYCLE_FILES.
+- [ ] [P5-T18] Record loop closure and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r3-final-loop-closure.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and `LOOP_CLEAN_PASS: YES|NO`.
   - Recompute the SHA256 of every CYCLE_FILES path and compare each with the `HASH_BEFORE:` lines of the latest `r3-final-poshqc-format.*.md` in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/`.
-  - Acceptance: every hash is unchanged, P5-T1 through P5-T16 of this pass passed, and `LOOP_CLEAN_PASS: YES`.
-- [ ] [P5-T18] Record the re-verification and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r3-ac-reverification.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+  - Acceptance: every hash is unchanged, P5-T1 through P5-T17 of this pass passed, and `LOOP_CLEAN_PASS: YES`.
+- [ ] [P5-T19] Record the re-verification and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r3-ac-reverification.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - The Output Summary has one line per item, `RECHECK: <item> | <evidence tasks> | PASS|FAIL`, for CR-21, CR-18, CR-19, AC-02, AC-07, AC-11, AC-12, AC-13, AC-14, and AC-15, using the "Requirements Traceability" evidence tasks.
   - Run `git diff --numstat <REM_BASE_SHA> -- docs/features/active/2026-10-16-pester-profiler-coverage-953/spec.md` and `git status --porcelain -- docs/features/active/2026-10-16-pester-profiler-coverage-953/spec.md` from the Bash tool, and record both outputs.
   - Acceptance: every line reads PASS, and both `spec.md` outputs are empty (no checkbox changed and no acceptance criterion added).
