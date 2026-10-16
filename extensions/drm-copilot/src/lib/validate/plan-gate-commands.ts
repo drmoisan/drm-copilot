@@ -253,13 +253,14 @@ export function classifyKind(argv: readonly string[]): PlanCommandKind {
 /**
  * Split document text into lines tolerantly of every line-ending convention.
  *
- * The split expression matches `orchestration-artifacts.ts` line 82 so a CRLF
- * plan and its LF equivalent produce identical records.
+ * The split expression matches the one in `orchestration-artifacts.ts` and the
+ * Python `split_plan_lines`, so a CRLF plan and its LF equivalent produce
+ * identical records.
  *
  * @param text Full document text.
  * @returns Lines without their terminators.
  */
-function splitLines(text: string): string[] {
+export function splitPlanLines(text: string): string[] {
   if (text === "") {
     return [];
   }
@@ -378,7 +379,7 @@ export function extractPlanCommands(text: string): PlanCommand[] {
   let windowLines: string[] = [];
   let windowStart = 0;
 
-  const lines = splitLines(text);
+  const lines = splitPlanLines(text);
   // Walk the plan in source order, maintaining the attribution window so each
   // span is reported against the task whose acceptance condition states it.
   for (let index = 0; index < lines.length; index += 1) {

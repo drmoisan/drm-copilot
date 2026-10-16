@@ -17,18 +17,15 @@
  *       The logical line is rendered verbatim between backticks; no
  *       `pythonRepr`-style helper is called.
  *     - The module imports only type declarations from `plan-gate-rules.ts`
- *       and the task-line and heading patterns from `plan-gate-commands.ts`,
- *       so the import graph stays acyclic.
+ *       and the shared line splitter from `plan-gate-commands.ts`, so the
+ *       import graph stays acyclic.
  *
  * Side Effects:
  *     None. The module reads no file, clock, environment variable, or git
  *     state.
  */
 
-import {
-  PLAN_GATE_HEADING_PATTERN,
-  PLAN_GATE_TASK_PATTERN,
-} from "./plan-gate-commands";
+import { splitPlanLines } from "./plan-gate-commands";
 import type { PlanGateReport } from "./plan-gate-rules";
 
 /**
@@ -65,26 +62,6 @@ const DEFINITION_RE = new RegExp(SCRATCH_DEFINITION_PATTERN);
 const NAMESPACE_RE = new RegExp(SCRATCH_NAMESPACE_PATTERN);
 
 /**
- * Split text into lines exactly as the command extractor does.
- *
- * An empty text yields no lines, and a trailing empty element after a final
- * line terminator is dropped, so line numbers match Python `splitlines()`.
- *
- * @param text Full document text.
- * @returns Lines without their terminators.
- */
-function splitLines(text: string): string[] {
-  if (text === "") {
-    return [];
-  }
-  const lines = text.split(/\r\n|\n|\r/);
-  if (lines[lines.length - 1] === "") {
-    lines.pop();
-  }
-  return lines;
-}
-
-/**
  * Join whitespace runs with one space and trim, matching Python `split()`.
  *
  * @param value Text to normalize.
@@ -100,18 +77,18 @@ function normalizeWhitespace(value: string): string {
 /**
  * Return whether a physical line continues the current logical line.
  *
+ * A continuation is non-blank, begins with whitespace, and is not a fence
+ * line. A Markdown ATX heading or task line written at column 0 therefore ends
+ * the logical line, while an indented heading or task line is absorbed into it.
+ *
  * @param line Physical line following the logical line's last line.
- * @returns True when the line is non-blank, begins with whitespace, and is not
- *     a fence line, a Markdown ATX heading, or a canonical task line.
+ * @returns True when the line continues the logical line.
  */
 function continuesLogicalLine(line: string): boolean {
   if (line.trim() === "" || !/^\s/.test(line)) {
     return false;
   }
-  if (FENCE_RE.test(line) || PLAN_GATE_HEADING_PATTERN.test(line)) {
-    return false;
-  }
-  return !PLAN_GATE_TASK_PATTERN.test(line);
+  return !FENCE_RE.test(line);
 }
 
 /**
@@ -167,7 +144,7 @@ export function bareScratchDefinitions(text: string): Array<[number, string]> {
   // Walk the document once. A continuation line extends the pending logical
   // line; any other line completes it. A fence line toggles the fence state,
   // and every fenced line is skipped, so a fenced definition is not reported.
-  for (const [index, line] of splitLines(text).entries()) {
+  for (const [index, line] of splitPlanLines(text).entries()) {
     if (pending !== null && continuesLogicalLine(line)) {
       pending.parts.push(line);
       continue;
