@@ -297,6 +297,15 @@ Describe 'Test-NumericDerivationEvidence rule R3 (issue #905)' {
         @{ Name = 'entire worktree'; Value = 'entire worktree.' }
         @{ Name = 'whole worktree with all directories'; Value = 'the whole worktree, all directories.' }
         @{ Name = 'entire repository accepted before R3'; Value = 'entire repository' }
+        @{ Name = 'complete source tree'; Value = 'the complete source tree' }
+        @{ Name = 'whole repo'; Value = 'the whole repo' }
+        @{ Name = 'upper-case entire worktree'; Value = 'ENTIRE WORKTREE' }
+        @{ Name = 'entire worktree root'; Value = 'entire worktree root.' }
+        @{ Name = 'whole repository excluding docs'; Value = 'the whole repository excluding `docs/`' }
+        # NB-2 characterization (issue #929): breadth documented in E3 spec Risk 5a; a whole-worktree value that lists a narrower covered set is accepted.
+        @{ Name = 'NB-2 whole worktree restricted to code'; Value = 'the whole worktree with ripgrep, restricted to code by excluding `docs/`; covers `.claude/hooks`, `.claude/lib`, `.codex/hooks`, and both bundle roots.' }
+        # NB-2 characterization (issue #929): breadth documented in E3 spec Risk 5a; an entire-repository value with an exclusion is accepted.
+        @{ Name = 'NB-2 entire repository excluding docs'; Value = 'entire repository excluding docs/**' }
     ) {
         # Arrange
         $content = $script:R3EvidenceText.Replace('- Exhaustive Search Scope: entire repository source tree', '- Exhaustive Search Scope: ' + $Value)
@@ -308,6 +317,12 @@ Describe 'Test-NumericDerivationEvidence rule R3 (issue #905)' {
 
     It 'R3 rejects the exhaustive scope <Name>' -ForEach @(
         @{ Name = 'the hooks folder'; Value = 'the hooks folder' }
+        @{ Name = 'noun without a quantifier'; Value = 'those four files on the current worktree.' }
+        @{ Name = 'quantifier without a noun'; Value = 'the whole file, lines 1-335.' }
+        @{ Name = 'path-shaped value'; Value = '`.claude/hooks/`' }
+        @{ Name = 'all inside allocated'; Value = 'the allocated repository subset' }
+        @{ Name = 'tree inside subtree'; Value = 'the entire subtree' }
+        @{ Name = 'worktree inside worktrees'; Value = 'the whole worktrees folder' }
     ) {
         # Arrange
         $content = $script:R3EvidenceText.Replace('- Exhaustive Search Scope: entire repository source tree', '- Exhaustive Search Scope: ' + $Value)

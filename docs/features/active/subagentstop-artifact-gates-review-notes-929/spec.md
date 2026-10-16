@@ -202,11 +202,11 @@ Edited (this feature folder):
 ## Acceptance Criteria
 
 NB-1 (R3 rejection and acceptance tables):
-- [ ] AC-01: `tests/scripts/claude-hooks/validate-prd-feature-output.Tests.ps1` `It 'R3 rejects the exhaustive scope <Name>'` includes rows for `those four files on the current worktree.`, `the whole file, lines 1-335.`, `` `.claude/hooks/` ``, `the allocated repository subset`, `the entire subtree` and `the whole worktrees folder`, each asserting `Ok = $false` and the unchanged R3 message; and `It 'R3 accepts the exhaustive scope <Name>'` includes rows for `the complete source tree`, `the whole repo`, `ENTIRE WORKTREE`, `entire worktree root.` and ``the whole repository excluding `docs/` ``; all rows pass.
-- [ ] AC-02: `tests/scripts/claude-hooks/validate-task-researcher-output.Coverage.Tests.ps1` Describe `Test-NumericDerivationEvidence rule R3 (issue #905)` contains the same reject and accept rows as AC-01 with the task-researcher message prefix; all rows pass.
+- [x] AC-01: `tests/scripts/claude-hooks/validate-prd-feature-output.Tests.ps1` `It 'R3 rejects the exhaustive scope <Name>'` includes rows for `those four files on the current worktree.`, `the whole file, lines 1-335.`, `` `.claude/hooks/` ``, `the allocated repository subset`, `the entire subtree` and `the whole worktrees folder`, each asserting `Ok = $false` and the unchanged R3 message; and `It 'R3 accepts the exhaustive scope <Name>'` includes rows for `the complete source tree`, `the whole repo`, `ENTIRE WORKTREE`, `entire worktree root.` and ``the whole repository excluding `docs/` ``; all rows pass.
+- [x] AC-02: `tests/scripts/claude-hooks/validate-task-researcher-output.Coverage.Tests.ps1` Describe `Test-NumericDerivationEvidence rule R3 (issue #905)` contains the same reject and accept rows as AC-01 with the task-researcher message prefix; all rows pass.
 
 NB-2 (R3 breadth, no rule change):
-- [ ] AC-03: both R3 accept tables (the files in AC-01 and AC-02) contain a characterization row for the NB-2 example value and a row for `entire repository excluding docs/**`, each with a comment citing E3 spec Risk 5a; both rows pass.
+- [x] AC-03: both R3 accept tables (the files in AC-01 and AC-02) contain a characterization row for the NB-2 example value and a row for `entire repository excluding docs/**`, each with a comment citing E3 spec Risk 5a; both rows pass.
 - [ ] AC-04: the R3 pattern string `(?i)\b(entire|whole|all|complete)\b.*\b(repository|repo|worktree|source tree|tree)\b` is present unchanged in `.claude/hooks/validate-prd-feature-output.ps1` and `.claude/hooks/validate-task-researcher-output.ps1` (`git diff main -- .claude/hooks/validate-prd-feature-output.ps1` is empty), and this spec records the NB-2 no-change decision with the candidate-rule table.
 
 NB-3 (R4 trim-only tokens):
