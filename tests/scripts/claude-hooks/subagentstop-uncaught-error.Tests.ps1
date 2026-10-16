@@ -89,6 +89,8 @@ Describe 'SubagentStop validator unhandled-error block (issue #928)' {
         }
     }
 
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     It 'U1: <Hook> blocks with exit 2 when the validation call throws' -ForEach $script:ValidatorRows {
         # Arrange
         Mock Read-SubagentStopEnvelope { throw 'simulated unhandled error (issue #928)' }
