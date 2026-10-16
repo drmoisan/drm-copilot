@@ -302,7 +302,7 @@ Restart rule: run [P6-T1] to [P6-T11] in order. If any task fails, or [P6-T1] or
 - [x] [P7-T43] Check off AC-20 in `FEATURE/spec.md`. Acceptance: `grep -c -F -e '- [x] AC-20 (' docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927/spec.md` prints `1`.
 - [x] [P7-T44] Check off AC-22 in `FEATURE/spec.md`. Acceptance: `grep -c -F -e '- [x] AC-22 (' docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927/spec.md` prints `1`.
 - [x] [P7-T45] Write `FEATURE/evidence/qa-gates/p7-ac-state.<timestamp>.md`. Commands: `grep -c -E '^- \[x\] AC-M?[0-9]+ ' docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927/spec.md`; `grep -c -E '^- \[ \] AC-(9|18|19|21|M23|M24) ' docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927/spec.md`. Acceptance: the counts print `41` and `6`.
-- [ ] [P7-T46] Commit and push Phase 7 (rule 14). Paths: `docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927`. Subject: `docs(927): record final QC and acceptance-criteria evidence`. Acceptance: the push exits 0; the status lists no path other than this plan file; the two `rev-parse` values are equal. The executor run ends after this task with AC-9, AC-18, AC-19, AC-21, AC-M23, and AC-M24 pending-CI.
+- [x] [P7-T46] Commit and push Phase 7 (rule 14). Paths: `docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927`. Subject: `docs(927): record final QC and acceptance-criteria evidence`. Acceptance: the push exits 0; the status lists no path other than this plan file; the two `rev-parse` values are equal. The executor run ends after this task with AC-9, AC-18, AC-19, AC-21, AC-M23, and AC-M24 pending-CI.
 
 ### Phase 8 — S9 CI Quality Gate Verification
 
