@@ -390,7 +390,7 @@ Describe 'fixture' {
     BeforeAll { . (Join-Path -Credential $FixtureCredential $HookRoot 'gate.ps1') }
 }
 '@
-        $ast = ConvertTo-HookReferenceFixtureAst -Source $Source.Replace('__SPAWN__', 'Start' + '-' + 'Process')
+        $ast = ConvertTo-HookReferenceFixtureAst -Source $Source
 
         # Act
         $references = @(Get-EpicStateIsolationHookReference -Ast $ast)
@@ -425,5 +425,30 @@ Describe 'fixture' {
         $match = @($references | Where-Object { $_.Name -eq 'gate.ps1' -and $_.Form -eq 'RootVariable' -and $_.Root -eq $Root })
         $references.Count | Should -Be 1 -Because "a switch takes no value, so the positional after $Switch is still a load"
         $match.Count | Should -Be 1 -Because "the record names gate.ps1 as a RootVariable load from $Root"
+    }
+}
+
+Describe 'issue #935 CR-R1 separate-value edge cases' {
+    # Direct rows for Test-EpicStateIsolationSeparateValue over in-memory command ASTs (issue #935, CR-R1).
+    It 'CR-R1 separate value: <Case>' -ForEach @(
+        @{ Case = 'value parameter as the last element'; Source = 'Import-Module ./Fixture.psm1 -Prefix'; Index = 2; Expected = $false }
+        @{ Case = 'value parameter followed by another parameter'; Source = 'Import-Module -Prefix -Force ./Fixture.psm1'; Index = 1; Expected = $false }
+        @{ Case = 'value parameter with an attached argument'; Source = 'Import-Module -Prefix:Pre ./Fixture.psm1'; Index = 1; Expected = $false }
+        @{ Case = 'abbreviated parameter name'; Source = 'Import-Module -Pref Pre ./Fixture.psm1'; Index = 1; Expected = $false }
+        @{ Case = 'element that is not a parameter'; Source = 'Import-Module ./Fixture.psm1 -Force'; Index = 1; Expected = $false }
+        @{ Case = 'value parameter followed by its value'; Source = 'Import-Module -Prefix Pre ./Fixture.psm1'; Index = 1; Expected = $true }
+        @{ Case = 'common parameter -ErrorAction followed by its value'; Source = 'Import-Module -ErrorAction Stop ./Fixture.psm1'; Index = 1; Expected = $true }
+        @{ Case = 'common parameter -OutVariable followed by its value'; Source = 'Import-Module -OutVariable loaded ./Fixture.psm1'; Index = 1; Expected = $true }
+    ) {
+        # Arrange
+        $isCommand = { param($node) $node -is [System.Management.Automation.Language.CommandAst] }
+        $command = (ConvertTo-HookReferenceFixtureAst -Source $Source).Find($isCommand, $true)
+        $elements = @($command.CommandElements)
+
+        # Act
+        $result = Test-EpicStateIsolationSeparateValue -Element $elements -Index $Index
+
+        # Assert
+        $result | Should -Be $Expected -Because "element $Index of '$Source' ($Case)"
     }
 }
