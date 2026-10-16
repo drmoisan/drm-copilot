@@ -5,6 +5,7 @@
 - **Timestamp:** 2026-10-15T19-46
 - **Tree:** branch `rev/927-merge-gate` (tracks `bug/pr-author-docs-only-exemption-hardening-927`), origin/main `adb9aa5f` merged in.
 - **Method:** every citation below was read from the current tree with the Read and Grep tools. No command was executed (no git, gh, or pwsh), so no runtime behavior is claimed as observed. Statements about PR #939 are taken from the delegation prompt and were not verified here.
+- **Superseded duplicate (remediation cycle R1, CR-6):** this file duplicates `research/2026-10-15T19-46-merge-gate-addendum-research.md`, the convention-compliant copy that `spec.md` and the plan cite. It is retained and is not a design input.
 
 ## 0. Scope addition (primary criterion)
 
