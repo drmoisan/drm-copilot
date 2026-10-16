@@ -328,7 +328,7 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
 
 Every sentence quoted in this phase is inserted verbatim as part of one line of the target file. The rule file does not hard-wrap prose.
 
-- [ ] [P4-T1] Replace the parity-residual sentence in `.claude/rules/plan-acceptance-gates.md` (line 153)
+- [x] [P4-T1] Replace the parity-residual sentence in `.claude/rules/plan-acceptance-gates.md` (line 153)
   - On line 153, keep the first two sentences unchanged: the one beginning `A continuation line is non-blank` and the one beginning `Both runtimes split the document`.
   - Replace the third sentence, which begins `One parity residual remains:` and runs to the end of the line, with these three sentences, in order and on the same line:
     - `Both runtimes share one explicit whitespace class for the blank-line test, the continuation test, and whitespace normalization, declared as PLAN_WHITESPACE_CLASS with an identical pattern string in each module: tab, line feed, vertical tab, form feed, carriage return, space, the Unicode space separators, and the Unicode line and paragraph separators.`
@@ -337,12 +337,12 @@ Every sentence quoted in this phase is inserted verbatim as part of one line of 
   - In the file, `PLAN_WHITESPACE_CLASS` is written between backticks. The apostrophes are ASCII.
   - No literal bare SCRATCH definition is added outside a fenced block. No other line changes.
   - Acceptance: `poetry run pytest tests/scripts/dev_tools/test_plan_gate_scratch_docs.py::test_rule_file_states_g10_whitespace_alignment tests/scripts/dev_tools/test_plan_gate_scratch_docs.py::test_rule_file_documents_g10_line_rules_and_issue_token_class tests/scripts/dev_tools/test_plan_gate_scratch_docs.py::test_rule_file_documents_g10` exits 0 with 3 passed.
-- [ ] [P4-T2] Copy the rule file byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/rules/plan-acceptance-gates.md`
+- [x] [P4-T2] Copy the rule file byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/rules/plan-acceptance-gates.md`
   - Command (repository root): `cp .claude/rules/plan-acceptance-gates.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/plan-acceptance-gates.md`. Fallback when the tool layer refuses `cp`: read the source with the Read tool and write the identical content to the destination with the Write tool.
   - Acceptance:
     - `poetry run pytest tests/scripts/dev_tools/test_plan_gate_scratch_docs.py::test_rule_file_bundle_copy_is_byte_identical` exits 0 with 1 passed.
     - `git hash-object .claude/rules/plan-acceptance-gates.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/plan-acceptance-gates.md` prints two equal object IDs, which are recorded in the [P4-T4] artifact.
-- [ ] [P4-T3] Update the detection contract and the NFR-2 note in `docs/features/active/2026-10-15-plan-validator-accepts-bare-scratch-paths-932/spec.md`
+- [x] [P4-T3] Update the detection contract and the NFR-2 note in `docs/features/active/2026-10-15-plan-validator-accepts-bare-scratch-paths-932/spec.md`
   - After item 5 of `### Logical lines` (line 70), add item 6: `6. The blank-line test, the continuation test, and whitespace normalization use one explicit whitespace class, PLAN_WHITESPACE_CLASS, with an identical pattern string in both runtimes: tab, line feed, vertical tab, form feed, carriage return, space, the Unicode space separators, and the Unicode line and paragraph separators. NEL, the information separators, and the byte-order mark are not whitespace for these tests. The fence test keeps the command extractor's pattern (item 1) (remediation cycle 2).`
   - Replace the NFR-2 sub-bullet at line 211 with: `  - Remediation cycle 1 and 2 note: line splitting is aligned on the CR LF, LF, and CR terminators in both runtimes, in the command extractor, and in the G6 cross-line check (cycle 2). The blank-line test, the continuation test, and whitespace normalization share one explicit whitespace class, PLAN_WHITESPACE_CLASS, with an identical pattern string in both runtimes (cycle 2), so NEL, the information separators, and the byte-order mark no longer produce different G10 results. The fence test keeps the command extractor's fence pattern, whose leading whitespace is each runtime's native class; that difference is shared with G1 through G9 and is documented in .claude/rules/plan-acceptance-gates.md.`
   - Replace item 4 of `### Logical lines` (line 69) with: `4. The logical line is normalized for matching and for the message by joining each run of the shared whitespace class defined in item 6 with a single space and trimming the ends. The continuation test in item 2 uses the same class, and both runtimes declare that class with an identical pattern string, so they produce byte-identical text.`
@@ -355,10 +355,10 @@ Every sentence quoted in this phase is inserted verbatim as part of one line of 
     - It returns 1 for the pattern `Remediation cycle 1 and 2 note` and 0 for the pattern `One residual difference remains` (1 before, at line 211).
     - The count for the pattern `^- \[x\] ` is 31 and the count for the pattern `^- \[ \] ` is 1, both unchanged from before the edit.
   - Line numbers in this task are pre-edit values; after item 6 is inserted, locate the NFR-2 sub-bullet by the text `Remediation cycle 1 note` and the risk row by the text `| Whitespace normalization differs`.
-- [ ] [P4-T4] Run the documentation, contract, push-down, and frontmatter suites and record `<FEATURE>/evidence/regression-testing/docs-green-rc2.<timestamp>.md`
+- [x] [P4-T4] Run the documentation, contract, push-down, and frontmatter suites and record `<FEATURE>/evidence/regression-testing/docs-green-rc2.<timestamp>.md`
   - Command: `poetry run pytest -v tests/scripts/dev_tools/test_plan_gate_scratch_docs.py tests/scripts/dev_tools/test_scratch_location_contracts.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_claude_rules_frontmatter.py`
   - Acceptance: 0 failed, or exactly one failure that is the #510 node with the #510 signature described in Conventions. The artifact records which case applies and the two object IDs from [P4-T2].
-- [ ] [P4-T5] Commit and push `.claude/rules/plan-acceptance-gates.md`, its bundle copy, `spec.md`, the evidence, and the plan check-offs
+- [x] [P4-T5] Commit and push `.claude/rules/plan-acceptance-gates.md`, its bundle copy, `spec.md`, the evidence, and the plan check-offs
   - Commands: `git add .claude/rules/plan-acceptance-gates.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/plan-acceptance-gates.md <FEATURE>/spec.md` (with the concrete folder path) plus the new evidence and this plan file; `git commit -m "docs(932): state the shared G10 whitespace class in the rule file and spec"`; `git push origin HEAD`.
   - Acceptance: the push exits 0, and after the push `git status --porcelain` lists no path other than `SCRATCH/`.
 
