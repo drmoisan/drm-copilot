@@ -14,6 +14,18 @@
     Every function is pure except Get-EpicStateIsolationSuiteFinding, which reads one
     committed suite file located from the supplied repository root. No function creates a
     file, runs a process, or reads gitignored state.
+
+    The hook-reference functions (hook-literal and root-variable identification and the
+    dot-source selector) live in the dot-sourced EpicStateIsolation.HookReference.Helpers.ps1
+    (issue #935).
+
+    The shape-B residual limit (issue #935, #737): a suite that loads its hook only inside It
+    bodies is outside this BeforeAll model. Its module seams stay covered by the baseline mocks,
+    but hook-local seams guarded by if (Get-Command X) are runtime no-ops in such suites.
+
+    The R2 helper-only relaxation (issue #935): a BeforeAll whose dot-sources are all .Helpers.ps1
+    test-helper loads yields no 'no dot-source loads the hook' finding; its ordering anchor is
+    the last helper dot-source, and the presence rules still apply.
 #>
 . (Join-Path $PSScriptRoot 'EpicStateIsolation.HookReference.Helpers.ps1')
 
@@ -365,12 +377,16 @@ function Get-EpicStateIsolationFinding {
         $commands = @(Get-EpicStateIsolationDirectCommand -Block $block | Sort-Object -Property { $_.Extent.StartOffset })
         $dotSources = @($commands | Where-Object { $_.InvocationOperator -eq [System.Management.Automation.Language.TokenKind]::Dot })
         $dotSource = Get-EpicStateIsolationHookDotSource -DotSource $dotSources -SuiteAst $Ast
-        if ($dotSources.Count -gt 0 -and $null -eq $dotSource) { 'no dot-source loads the hook' }
+        # R2 (issue #935): a block whose dot-sources are all test-helper loads is anchored at the last one.
+        $helperOnly = $dotSources.Count -gt 0 -and $null -eq $dotSource -and
+            @($dotSources | Where-Object { -not (Test-EpicStateIsolationHelperDotSource -Command $_ -SuiteAst $Ast) }).Count -eq 0
+        if ($dotSources.Count -gt 0 -and $null -eq $dotSource -and -not $helperOnly) { 'no dot-source loads the hook' }
+        $anchor = if ($helperOnly) { $dotSources[-1] } else { $dotSource }
 
-        $helperSeam = @(Get-EpicStateIsolationHelperSeam -Commands $commands -DotSource $dotSource -SuiteAst $Ast)
+        $helperSeam = @(Get-EpicStateIsolationHelperSeam -Commands $commands -DotSource $anchor -SuiteAst $Ast)
         foreach ($item in $Requirement) {
             if ($helperSeam -contains $item.Seam) { continue }
-            Get-EpicStateIsolationPairFinding -Commands $commands -DotSource $dotSource -MockCommand $item.Seam -ModuleName $item.ModuleName -ModuleFile $item.ModuleFile
+            Get-EpicStateIsolationPairFinding -Commands $commands -DotSource $anchor -MockCommand $item.Seam -ModuleName $item.ModuleName -ModuleFile $item.ModuleFile
         }
     }
 }
