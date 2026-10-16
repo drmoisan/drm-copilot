@@ -38,6 +38,7 @@
     helper, and the modules are guarded loads: a failure is recorded and blocks
     every validation, naming the file, before any read. A failed Layer 2 import
     blocks the epic leg only.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 
 [CmdletBinding()]
@@ -339,6 +340,7 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('ORCHEST
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
-$result = Invoke-OrchestratorOutputValidation -CheckpointPath $CheckpointPath -ArtifactType $ArtifactType
+try { $result = Invoke-OrchestratorOutputValidation -CheckpointPath $CheckpointPath -ArtifactType $ArtifactType }
+catch { Exit-SubagentStopBlock -Message ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + $script:SubagentStopReportAndHaltLine) }
 if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0

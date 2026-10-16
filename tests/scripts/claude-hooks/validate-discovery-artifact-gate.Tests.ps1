@@ -177,15 +177,7 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             }
             $script:FailingArtifactText = 'Wrote discovery/coverage-ledger/coverage-ledger.json successfully.'
 
-            function New-SubagentStopEnvelopeJson {
-                # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds and returns envelope JSON text only; it changes no system state.')]
-                param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
-                $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'general-purpose'; stop_hook_active = [bool]$StopHookActive }
-                if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }
-                if ($PSBoundParameters.ContainsKey('OutputField')) { $envelope['output'] = $OutputField }
-                return ($envelope | ConvertTo-Json -Compress)
-            }
+            . (Join-Path $PSScriptRoot 'SubagentStopEnvelope.Helpers.ps1')
 
             function Invoke-DiscoveryStdinEntry {
                 # Drives the hook through the & route with stdin and stderr redirected; both are restored in finally.
@@ -216,7 +208,7 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             Mock Get-RequiredDiscoveryArtifactDeclaration { @{ Present = $true; Declaration = @{ types = @('coverage-ledger') } } }
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'schema violation: missing field x' } }
             # Act
-            $result = Invoke-DiscoveryStdinEntry -Stdin (New-SubagentStopEnvelopeJson -AssistantMessage $script:FailingArtifactText)
+            $result = Invoke-DiscoveryStdinEntry -Stdin (ConvertTo-SubagentStopEnvelopeJson -AssistantMessage $script:FailingArtifactText)
             # Assert
             $result.Thrown | Should -BeNullOrEmpty
             $result.ExitCode | Should -Be 2
@@ -228,7 +220,7 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             Mock Get-RequiredDiscoveryArtifactDeclaration { @{ Present = $true; Declaration = @{ types = @('coverage-ledger') } } }
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 0; Output = '' } }
             # Act
-            $result = Invoke-DiscoveryStdinEntry -Stdin (New-SubagentStopEnvelopeJson -AssistantMessage $script:FailingArtifactText)
+            $result = Invoke-DiscoveryStdinEntry -Stdin (ConvertTo-SubagentStopEnvelopeJson -AssistantMessage $script:FailingArtifactText)
             # Assert
             $result.Thrown | Should -BeNullOrEmpty
             $result.ExitCode | Should -Be 0
@@ -238,7 +230,7 @@ Describe 'validate-discovery-artifact-gate.ps1' {
 
         It 'exits 0 when last_assistant_message carries no discovery artifact reference' -Tag 'E3-Entry' {
             # Arrange: a message without any discovery/<type> token.
-            $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'Completed the assigned task with no artifact writes.'
+            $stdin = ConvertTo-SubagentStopEnvelopeJson -AssistantMessage 'Completed the assigned task with no artifact writes.'
             # Act
             $result = Invoke-DiscoveryStdinEntry -Stdin $stdin
             # Assert
@@ -249,7 +241,7 @@ Describe 'validate-discovery-artifact-gate.ps1' {
 
         It 'exits 0 when last_assistant_message is an empty string' -Tag 'E3-Entry' {
             # Arrange: a valid envelope with a blank assistant message.
-            $stdin = New-SubagentStopEnvelopeJson -AssistantMessage ''
+            $stdin = ConvertTo-SubagentStopEnvelopeJson -AssistantMessage ''
             # Act
             $result = Invoke-DiscoveryStdinEntry -Stdin $stdin
             # Assert
@@ -262,7 +254,7 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             # Arrange: the default reader reports the declaration absent; the validator must not run.
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'schema violation: missing field x' } }
             # Act
-            $result = Invoke-DiscoveryStdinEntry -Stdin (New-SubagentStopEnvelopeJson -AssistantMessage $script:FailingArtifactText)
+            $result = Invoke-DiscoveryStdinEntry -Stdin (ConvertTo-SubagentStopEnvelopeJson -AssistantMessage $script:FailingArtifactText)
             # Assert
             $result.Thrown | Should -BeNullOrEmpty
             $result.ExitCode | Should -Be 0
@@ -278,7 +270,7 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             try {
                 $env:CLAUDE_HOOK_INPUT = '{"output":"' + $script:FailingArtifactText + '"}'
                 # Act
-                $result = Invoke-DiscoveryStdinEntry -Stdin (New-SubagentStopEnvelopeJson -OmitAssistantMessage -OutputField $script:FailingArtifactText)
+                $result = Invoke-DiscoveryStdinEntry -Stdin (ConvertTo-SubagentStopEnvelopeJson -OmitAssistantMessage -OutputField $script:FailingArtifactText)
             }
             finally { $env:CLAUDE_HOOK_INPUT = $priorInput }
             # Assert
@@ -310,7 +302,7 @@ Describe 'validate-discovery-artifact-gate.ps1' {
 
         It 'exits 2 with a payload anomaly reason when last_assistant_message is absent' -Tag 'E3-Entry' {
             # Arrange and act: an envelope without last_assistant_message.
-            $result = Invoke-DiscoveryStdinEntry -Stdin (New-SubagentStopEnvelopeJson -OmitAssistantMessage)
+            $result = Invoke-DiscoveryStdinEntry -Stdin (ConvertTo-SubagentStopEnvelopeJson -OmitAssistantMessage)
             # Assert
             $result.Thrown | Should -BeNullOrEmpty
             $result.ExitCode | Should -Be 2
@@ -323,7 +315,7 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             Mock Get-RequiredDiscoveryArtifactDeclaration { @{ Present = $true; Declaration = @{ types = @('coverage-ledger') } } }
             Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'schema violation: missing field x' } }
             # Act
-            $result = Invoke-DiscoveryStdinEntry -Stdin (New-SubagentStopEnvelopeJson -AssistantMessage $script:FailingArtifactText -StopHookActive)
+            $result = Invoke-DiscoveryStdinEntry -Stdin (ConvertTo-SubagentStopEnvelopeJson -AssistantMessage $script:FailingArtifactText -StopHookActive)
             # Assert
             $result.Thrown | Should -BeNullOrEmpty
             $result.ExitCode | Should -Be 2
@@ -353,6 +345,76 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             $thrown | Should -BeNullOrEmpty
             $references | Should -HaveCount 1
             $references[0] | Should -BeExactly 'discovery/coverage-ledger/coverage-ledger.json'
+        }
+
+        It 'R4 returns no reference for a lone backtick token' {
+            # Arrange: the only punctuation token is a lone backtick, which is empty after trimming; no discovery path is present.
+            $text = 'Wrote ` and finished the task'
+            $thrown = $null
+            $references = $null
+            # Act
+            try { $references = @(Find-DiscoveryArtifactReference -OutputText $text -ErrorAction Stop) } catch { $thrown = $_ }
+            # Assert
+            $thrown | Should -BeNullOrEmpty
+            $references | Should -HaveCount 0
+        }
+
+        It 'R4 returns no reference for an empty-after-trim token' {
+            # Arrange: two double-quote characters form one token that is empty after trimming; no discovery path is present.
+            $text = 'Wrote "" and finished the task'
+            $thrown = $null
+            $references = $null
+            # Act
+            try { $references = @(Find-DiscoveryArtifactReference -OutputText $text -ErrorAction Stop) } catch { $thrown = $_ }
+            # Assert
+            $thrown | Should -BeNullOrEmpty
+            $references | Should -HaveCount 0
+        }
+
+        It 'R4 skips a lone backtick token and returns the following discovery reference' {
+            # Arrange: a lone backtick token precedes a discovery reference.
+            $text = 'Wrote ` and discovery/coverage-ledger/coverage-ledger.json'
+            $thrown = $null
+            $references = $null
+            # Act
+            try { $references = @(Find-DiscoveryArtifactReference -OutputText $text -ErrorAction Stop) } catch { $thrown = $_ }
+            # Assert
+            $thrown | Should -BeNullOrEmpty
+            $references | Should -HaveCount 1
+            $references[0] | Should -BeExactly 'discovery/coverage-ledger/coverage-ledger.json'
+        }
+
+        It 'R4 skips the trim-only token <Name> and returns the discovery reference' -ForEach @(
+            @{ Name = '()'; Token = '()' }
+            @{ Name = '[]'; Token = '[]' }
+            @{ Name = ''''''; Token = '''''' }
+            @{ Name = ','; Token = ',' }
+            @{ Name = ';'; Token = ';' }
+        ) {
+            # Arrange: the trim-only token precedes a discovery reference.
+            $text = 'Wrote ' + $Token + ' and discovery/coverage-ledger/coverage-ledger.json'
+            $thrown = $null
+            $references = $null
+            # Act
+            try { $references = @(Find-DiscoveryArtifactReference -OutputText $text -ErrorAction Stop) } catch { $thrown = $_ }
+            # Assert
+            $thrown | Should -BeNullOrEmpty
+            $references | Should -HaveCount 1
+            $references[0] | Should -BeExactly 'discovery/coverage-ledger/coverage-ledger.json'
+        }
+
+        It 'R4 gate allows a message containing only a lone backtick without invoking the validator' {
+            # Arrange: a present declaration and a failing validator mock, so any dispatch would block.
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'schema violation: missing field x' } }
+            $json = ConvertTo-DiscoveryEnvelopeJson -AssistantMessage '`'
+            $thrown = $null
+            $result = $null
+            # Act
+            try { $result = Invoke-DiscoveryArtifactGateValidation -InputText $json -RequiredArtifactReader $script:PresentReader -ErrorAction Stop } catch { $thrown = $_ }
+            # Assert
+            $thrown | Should -BeNullOrEmpty
+            $result.Ok | Should -Be $true
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
         }
     }
 }

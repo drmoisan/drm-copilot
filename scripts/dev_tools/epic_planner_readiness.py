@@ -14,6 +14,7 @@ from scripts.dev_tools.epic_kickoff_contract import (
 from scripts.dev_tools.epic_planner_git_integrity import (
     GitReadinessRepository,
     ReadinessGitRepository,
+    repository_relative_path,
     validate_committed_file,
     validate_planning_git_integrity,
 )
@@ -99,19 +100,6 @@ def build_epic_readiness_context(
     )
 
 
-def _relative_path(value: object, *, field: str) -> tuple[str | None, list[str]]:
-    """Validate and normalize a safe repository-relative POSIX path."""
-
-    if not isinstance(value, str) or not value.strip():
-        return None, [f"{field} must be a non-empty repository-relative path."]
-    if "\\" in value:
-        return None, [f"{field} must use forward slashes."]
-    path = PurePosixPath(value)
-    if path.is_absolute() or ".." in path.parts or "." in path.parts:
-        return None, [f"{field} must stay within the workspace root."]
-    return path.as_posix(), []
-
-
 def _read_required(
     context: EpicReadinessContext, relative: str, *, label: str
 ) -> tuple[str | None, list[str]]:
@@ -158,14 +146,14 @@ def _validate_feature_files(
     """Require the prepared folder, documents, plan, and preflight evidence."""
 
     prefix = f"Epic planner checkpoint features[{index}]"
-    folder, errors = _relative_path(
+    folder, errors = repository_relative_path(
         feature.get("feature_folder"), field=f"{prefix}.feature_folder"
     )
-    plan, plan_errors = _relative_path(
+    plan, plan_errors = repository_relative_path(
         feature.get("plan_path"), field=f"{prefix}.plan_path"
     )
     errors.extend(plan_errors)
-    research_path, research_errors = _relative_path(
+    research_path, research_errors = repository_relative_path(
         feature.get("research_path"), field=f"{prefix}.research_path"
     )
     errors.extend(research_errors)
@@ -182,7 +170,7 @@ def _validate_feature_files(
     if not context.file_system.is_dir(folder_path):
         errors.append(f"Execution readiness requires feature folder: {folder}")
         return plan, errors
-    if not (plan == folder or plan.startswith(f"{folder}/")):
+    if not plan.startswith(f"{folder}/"):
         errors.append(f"{prefix}.plan_path must be inside its feature_folder.")
     for name in ("issue.md", "spec.md", "user-story.md"):
         _, file_errors = _read_required(
@@ -206,7 +194,7 @@ def _validate_feature_files(
     evidence_value = feature.get("preflight_evidence_path")
     evidence_paths: list[Path] = []
     if evidence_value is not None:
-        evidence, evidence_errors = _relative_path(
+        evidence, evidence_errors = repository_relative_path(
             evidence_value, field=f"{prefix}.preflight_evidence_path"
         )
         errors.extend(evidence_errors)
@@ -315,7 +303,7 @@ def validate_epic_readiness_integrity(
     )
     errors.extend(manifest_errors)
     ignored = state.get("kickoff_prompt_path")
-    ignored_path, ignored_path_errors = _relative_path(
+    ignored_path, ignored_path_errors = repository_relative_path(
         ignored, field="Epic planner checkpoint kickoff_prompt_path"
     )
     errors.extend(ignored_path_errors)

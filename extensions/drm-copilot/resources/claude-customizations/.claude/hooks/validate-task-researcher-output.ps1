@@ -20,6 +20,7 @@
     blocks with exit 2 and the validate-task-researcher-output: prefix.
     Filesystem reads go through Test-ResearchFile so tests can mock the
     boundary without writing temporary files.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 
 [CmdletBinding()]
@@ -241,12 +242,11 @@ function Invoke-TaskResearcherOutputValidation {
     $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
     if (-not $envelope.IsValid) { return @{ Ok = $false; Message = "task-researcher hook: payload anomaly - $(Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)" } }
     $assistantMessage = [string]$envelope.AssistantText
-    $agentOutput = $assistantMessage
-    if ([string]::IsNullOrWhiteSpace($agentOutput)) {
+    if ([string]::IsNullOrWhiteSpace($assistantMessage)) {
         return @{ Ok = $false; Message = 'task-researcher hook: agent output is empty; researcher must return research-path before termination.' }
     }
 
-    $researchPath = Get-ResearchPathFromOutput -AgentOutput $agentOutput
+    $researchPath = Get-ResearchPathFromOutput -AgentOutput $assistantMessage
     if ($null -eq $researchPath) {
         return @{ Ok = $false; Message = 'task-researcher hook: agent output does not advertise a research-path. Researcher must report `research-path: <path>` pointing to docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off).' }
     }
@@ -263,7 +263,7 @@ function Invoke-TaskResearcherOutputValidation {
         return @{ Ok = $false; Message = "task-researcher hook: researcher advertised research-path '$researchPath' but no file exists at that location." }
     }
 
-    $feasibilityResult = Test-AutomationFeasibilitySection -ResearchFilePath $researchPath -AgentOutput $agentOutput
+    $feasibilityResult = Test-AutomationFeasibilitySection -ResearchFilePath $researchPath -AgentOutput $assistantMessage
     if (-not $feasibilityResult.Ok) {
         return @{ Ok = $false; Message = $feasibilityResult.Message }
     }
@@ -285,6 +285,7 @@ if ($MyInvocation.InvocationName -eq '.') {
 if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-task-researcher-output: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-task-researcher-output:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
-$result = Invoke-TaskResearcherOutputValidation
+try { $result = Invoke-TaskResearcherOutputValidation }
+catch { Exit-SubagentStopBlock -Message ('validate-task-researcher-output: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + 'This condition is not repairable by the subagent. Report it to the operator and halt.') }
 if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0
