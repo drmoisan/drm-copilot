@@ -54,11 +54,16 @@ function Install-PoshQCTool {
 
     $requiredModules = @(
         @{ Name = 'PSScriptAnalyzer'; Version = '1.22.0' },
-        @{ Name = 'Pester'; Version = '5.6.1' }
+        # Issue #953 (D8): UpperBound is exclusive; an installed Pester 6.x does not satisfy the requirement.
+        @{ Name = 'Pester'; Version = '5.9.0'; UpperBound = '6.0.0' }
     )
 
+    # Issue #953 (CR-3): one version-range predicate serves the present check and the post-install check.
+    # Where-Object runs it in this function's scope, so $module is the requirement of the current iteration.
+    $isSupportedVersion = { $_.Version -ge [version]$module.Version -and (-not $module.ContainsKey('UpperBound') -or $_.Version -lt [version]$module.UpperBound) }
+
     foreach ($module in $requiredModules) {
-        $installed = & $FindModule $module.Name | Where-Object { $_.Version -ge [version]$module.Version } | Select-Object -First 1
+        $installed = & $FindModule $module.Name | Where-Object -FilterScript $isSupportedVersion | Select-Object -First 1
         if ($installed) {
             & $Logger "$($module.Name) $($installed.Version) already present."
             continue
@@ -71,8 +76,7 @@ function Install-PoshQCTool {
             throw "Failed to install $($module.Name) $($module.Version): $($_.Exception.Message)"
         }
 
-        $post = & $FindModule $module.Name | Where-Object { $_.Version -ge [version]$module.Version } | Select-Object -First 1
-        if (-not $post) {
+        if (-not (& $FindModule $module.Name | Where-Object -FilterScript $isSupportedVersion | Select-Object -First 1)) {
             throw "Failed to install $($module.Name) $($module.Version)."
         }
         & $Logger "$($module.Name) $($module.Version) installed."
@@ -115,6 +119,8 @@ foreach ($subModuleName in @(
         'PoshQC.ScanConfig.psm1',
         'PoshQC.Coverage.psm1',
         'PoshQC.Analyzer.psm1',
+        'PoshQC.Shard.psm1',
+        'PoshQC.CoverageMerge.psm1',
         'PoshQC.Testing.psm1'
     )) {
     $subModulePath = Join-Path $script:ModuleRoot $subModuleName
@@ -143,6 +149,12 @@ Export-ModuleMember -Function @(
     'Invoke-PoshQCSuite',
     'Invoke-PoshQCTest',
     'Convert-PoshQCCoverageToRelative',
-    'Get-PoshQCScanConfigFolder'
+    'Get-PoshQCScanConfigFolder',
+    'Get-PoshQCShardSlice',
+    'Merge-PoshQCCoverageReport',
+    'Get-PoshQCCoverageLineSummary',
+    'New-PoshQCShardManifest',
+    'Test-PoshQCShardCompleteness',
+    'Test-PoshQCShardTestCount'
 ) -Alias @('Install-PoshQCTools')
 

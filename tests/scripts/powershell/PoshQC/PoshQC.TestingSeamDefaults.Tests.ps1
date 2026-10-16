@@ -76,6 +76,8 @@ Describe 'Invoke-PoshQCTest default $EnsureModule seam (issue #392)' {
             # intercepted; provide a nonexistent settings path so Invoke-PoshQCTest throws at the
             # settings check immediately after $EnsureModule runs, isolating the import behavior.
             Mock -CommandName Import-Module -MockWith { }
+            # Report a supported Pester so the result does not depend on the modules installed on the host (issue #953, CR-1).
+            Mock -CommandName Get-Module -MockWith { [pscustomobject]@{ Name = 'Pester'; Version = [version]'5.9.5' } }
 
             { Invoke-PoshQCTest -Root '/seam-test-root' -SettingsPath '/nonexistent-seam-settings.psd1' } |
                 Should -Throw '*Settings not found*'
