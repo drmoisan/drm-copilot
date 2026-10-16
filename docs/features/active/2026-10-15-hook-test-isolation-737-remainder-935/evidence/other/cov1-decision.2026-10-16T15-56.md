@@ -20,6 +20,15 @@ Option 2 of the P3-T5 decision options: Pester profiler-mode coverage (`CodeCove
 - If it remains below 142 under profiler mode, AC-24 is recorded as accepted under option 1 (accept the attribution loss), with the per-file evidence, and the attribution loss is reported as an unrelated follow-up for filing.
 - AC-24 is decided from the PR CI coverage file on the final PR head (plan task P7-T6) together with the re-measurement above.
 
+## Amendment 2026-10-16T16-06 (review EV-2)
+
+The cycle 3 re-audit (`feature-audit.2026-10-16T16-02.md`, finding EV-2) showed that main's own CI now also credits `WorktreeResolution.psm1` with 112 of 144 lines, and that at an equal 18437-line population the PR's remaining gap against main (105 covered lines) lies in `.claude/lib/orchestrator-state/` and `.claude/lib/worktree-resolution/EpicScopeResolution.psm1`, which this branch does not change. A single-file check against 142 therefore does not decide AC-24. AC-24 is decided as follows, from the PR CI coverage file on the final PR head after PR #959 has merged and origin/main has been merged into the branch:
+
+- Compare the root LINE percentage with the baseline (90.42%, `evidence/baseline/ci-baseline.2026-10-16T00-11.md`) and with main's CI coverage file at the final merge-base, and record a per-file LINE diff against main at that merge-base.
+- PASS when the root percentage is at or above 85% and not lower than main at the final merge-base, and the per-file diff shows no file covered less on the PR than on main.
+- Otherwise, when every file covered less on the PR is a production file that the branch does not change (confirmed by `git diff --name-only <merge-base> HEAD`), AC-24 is recorded as accepted under option 1 (attribution loss), and the loss is listed in the final report as an unrelated follow-up with the per-file evidence.
+- A file covered less on the PR that the branch does change would be a #935 defect and is not covered by this acceptance.
+
 ## Related cycle 3 evidence
 
 - Bisection: `evidence/other/r3-cov-bisection.2026-10-16T14-13.md` (terminal `T-U4-NO-LONGER`; after the origin/main merge at `1d364d0c1`, reverting all nine U4 paths no longer restores 142).
