@@ -36,8 +36,10 @@ $script:OrchestrationTargetRelocationPattern = '(?i)(?<![A-Za-z0-9_])(?:' +
 $script:OrchestrationTargetAbsolutePattern = '^([A-Za-z]:/|/(?!/))'
 
 # A non-local path-leg spelling, tested before normalization (issue #937): UNC, extended-length,
-# device, or NT-object prefixes in either separator style, or a drive-relative drive letter.
-$script:OrchestrationTargetNonLocalPattern = '^(?:[\\/]{2}|[\\/]\?\?[\\/]|[A-Za-z]:(?![\\/]))'
+# device, or NT-object prefixes in either separator style, a drive-relative drive letter, a
+# current-drive-rooted single backslash, a file: URI, a ~-prefixed home path, or surrounding whitespace.
+$script:OrchestrationTargetNonLocalPattern = '^(?:\s|[\\/]{2}|[\\/]\?\?[\\/]|\\(?![\\/])|[A-Za-z]:(?![\\/])' +
+'|file:|~)|\s$'
 
 # The apply_patch markers whose path names a file the patch writes (Codex path leg).
 $script:OrchestrationPatchMarkers = @('*** Add File:', '*** Update File:', '*** Delete File:', '*** Move to:')
