@@ -1,9 +1,5 @@
 # 2026-10-16-ci-merge-queue-for-main (Remediation Plan, cycle 2)
 
-DIRECTIVE: PREFLIGHT VALIDATION ONLY
-
-The directive line above serves preflight rounds only; ORCH-R0 deletes it and this paragraph before execution is delegated.
-
 - **Issue:** #952
 - **Parent (optional):** none
 - **Owner:** drmoisan
