@@ -241,3 +241,136 @@ function Test-EpicStateIsolationHelperDotSource {
     }
     return $false
 }
+
+function Get-EpicStateIsolationHookRoot {
+    # Pure: '.claude/hooks' or '.codex/hooks' when the text names that root, otherwise $null.
+    [OutputType([string])]
+    param([AllowNull()] [string] $Text)
+    if ([string]::IsNullOrEmpty($Text)) { return $null }
+    $normal = $Text.Replace([string][char]92, '/')
+    foreach ($root in '.claude/hooks', '.codex/hooks') {
+        if ([regex]::IsMatch($normal, '(^|/)' + [regex]::Escape($root) + '(/|$)')) { return $root }
+    }
+    return $null
+}
+
+function Get-EpicStateIsolationReferenceRecord {
+    <#
+        Pure (issue #935, F-3): the hook-reference records of one expression found in a load position.
+        Nested script blocks are not searched. Each record carries Name (the leaf, or * when the leaf is
+        not a literal), Form (Literal, RootVariable, Segment, Dynamic) and Root (.claude/hooks,
+        .codex/hooks, or $null).
+    #>
+    [OutputType([pscustomobject])]
+    param(
+        [AllowNull()] [System.Management.Automation.Language.Ast] $Node,
+        [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst
+    )
+    if ($null -eq $Node -or $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]) { return }
+    $leafPattern = '^(?!.*\.Tests\.ps1$)[A-Za-z0-9._-]+\.ps1$'
+    $hooksPattern = '(^|[\\/])hooks[\\/]?$'
+    $isLiteral = {
+        param($candidate)
+        $candidate -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
+        $candidate -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
+    }
+    $isVariable = { param($candidate) $candidate -is [System.Management.Automation.Language.VariableExpressionAst] }
+    $rootOf = {
+        param([string] $Key)
+        foreach ($bound in @(Get-EpicStateIsolationVariableBinding -SuiteAst $SuiteAst -Key $Key)) {
+            foreach ($text in @($bound.FindAll($isLiteral, $true) | ForEach-Object { [string]$_.Value })) {
+                if ([regex]::IsMatch($text, $hooksPattern)) { return (Get-EpicStateIsolationHookRoot -Text $text) }
+            }
+        }
+        return $null
+    }
+    foreach ($literal in $Node.FindAll($isLiteral, $false)) {
+        $value = [string]$literal.Value
+        foreach ($match in [regex]::Matches($value, '(?<![A-Za-z0-9_-])hooks/(?<name>[A-Za-z0-9._-]+\.ps1)')) {
+            $name = $match.Groups['name'].Value
+            if ($name.StartsWith('EpicStateIsolation.', [System.StringComparison]::Ordinal) -or $name.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)) { continue }
+            [pscustomobject]@{ Name = $name; Form = 'Literal'; Root = (Get-EpicStateIsolationHookRoot -Text $value.Substring(0, $match.Index + 5)) }
+        }
+        if ($literal -isnot [System.Management.Automation.Language.ExpandableStringExpressionAst]) { continue }
+        $match = [regex]::Match($value, '^\$\{?(?<var>[A-Za-z_][A-Za-z0-9_]*(:[A-Za-z_][A-Za-z0-9_]*)?)\}?[\\/](?<leaf>[^\\/]+)$')
+        if (-not $match.Success) { continue }
+        $key = Get-EpicStateIsolationVariableKey -UserPath $match.Groups['var'].Value
+        if (-not (Test-EpicStateIsolationHooksRootBinding -SuiteAst $SuiteAst -Key $key)) { continue }
+        $leaf = $match.Groups['leaf'].Value
+        if ($leaf -match $leafPattern) { [pscustomobject]@{ Name = $leaf; Form = 'RootVariable'; Root = (& $rootOf $key) } }
+        elseif ($leaf.StartsWith('$', [System.StringComparison]::Ordinal)) { [pscustomobject]@{ Name = '*'; Form = 'Dynamic'; Root = (& $rootOf $key) } }
+    }
+    $isJoinPath = { param($candidate) $candidate -is [System.Management.Automation.Language.CommandAst] -and $candidate.GetCommandName() -eq 'Join-Path' }
+    foreach ($command in $Node.FindAll($isJoinPath, $false)) {
+        $part = Get-EpicStateIsolationJoinPathPart -Command $command
+        $segment = @(Get-EpicStateIsolationJoinPathSegment -Part $part)
+        $count = $segment.Count
+        if ($count -ge 2 -and [string]$segment[$count - 1] -match $leafPattern -and [regex]::IsMatch([string]$segment[$count - 2], $hooksPattern)) {
+            [pscustomobject]@{ Name = [string]$segment[$count - 1]; Form = 'Segment'; Root = (Get-EpicStateIsolationHookRoot -Text (@($segment[0..($count - 2)]) -join '/')) }
+            continue
+        }
+        if ($null -eq $part.Path -or $null -eq $part.ChildPath -or $part.Additional.Count -gt 0) { continue }
+        $rootKey = @($part.Path.FindAll($isVariable, $true) | ForEach-Object { Get-EpicStateIsolationVariableKey -UserPath $_.VariablePath.UserPath } |
+                Where-Object { Test-EpicStateIsolationHooksRootBinding -SuiteAst $SuiteAst -Key $_ }) | Select-Object -First 1
+        if ($null -eq $rootKey) { continue }
+        if ($part.ChildPath -is [System.Management.Automation.Language.StringConstantExpressionAst]) {
+            if ([string]$part.ChildPath.Value -match $leafPattern) { [pscustomobject]@{ Name = [string]$part.ChildPath.Value; Form = 'RootVariable'; Root = (& $rootOf $rootKey) } }
+        } else {
+            [pscustomobject]@{ Name = '*'; Form = 'Dynamic'; Root = (& $rootOf $rootKey) }
+        }
+    }
+}
+
+function Get-EpicStateIsolationHookReference {
+    <#
+        Pure (issue #935, #737 F-3): one record per hook reference in a load position, deduplicated.
+        Load positions: the argument of a . or & invocation; Import-Module path arguments; ProcessStartInfo
+        FileName assignments and ArgumentList.Add arguments; process-start cmdlet -FilePath and
+        -ArgumentList arguments (and its positional arguments); and the expressions bound to a variable
+        used in one of those positions. A Join-Path read only by Get-FileHash, Get-Content or ParseFile is
+        in no load position and is not reported. The cmdlet name is composed from fragments.
+    #>
+    [OutputType([pscustomobject])]
+    param([Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $Ast)
+    $cmdlet = 'Start' + '-' + 'Process'
+    $loads = [System.Collections.Generic.List[object]]::new()
+    foreach ($command in $Ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true)) {
+        $elements = $command.CommandElements
+        $operator = $command.InvocationOperator
+        if ($operator -eq [System.Management.Automation.Language.TokenKind]::Dot -or $operator -eq [System.Management.Automation.Language.TokenKind]::Ampersand) { $loads.Add($elements[0]); continue }
+        $pathParameter = $null
+        if ($command.GetCommandName() -eq 'Import-Module') { $pathParameter = @('Name', 'Path') }
+        elseif ($command.GetCommandName() -eq $cmdlet) { $pathParameter = @('FilePath', 'ArgumentList') }
+        if ($null -eq $pathParameter) { continue }
+        for ($index = 1; $index -lt $elements.Count; $index++) {
+            $element = $elements[$index]
+            if ($element -isnot [System.Management.Automation.Language.CommandParameterAst]) { $loads.Add($element); continue }
+            if ($pathParameter -notcontains $element.ParameterName) { continue }
+            $value = $element.Argument
+            if ($null -eq $value -and ($index + 1) -lt $elements.Count) { $index++; $value = $elements[$index] }
+            if ($null -ne $value) { $loads.Add($value) }
+        }
+    }
+    foreach ($assignment in $Ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.AssignmentStatementAst] }, $true)) {
+        if ($assignment.Left -is [System.Management.Automation.Language.MemberExpressionAst] -and (Get-EpicStateIsolationElementText -Element $assignment.Left.Member) -eq 'FileName') { $loads.Add($assignment.Right) }
+    }
+    foreach ($invoke in $Ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] }, $true)) {
+        if ((Get-EpicStateIsolationElementText -Element $invoke.Member) -ne 'Add' -or $invoke.Expression -isnot [System.Management.Automation.Language.MemberExpressionAst]) { continue }
+        if ((Get-EpicStateIsolationElementText -Element $invoke.Expression.Member) -eq 'ArgumentList') { foreach ($argument in @($invoke.Arguments)) { $loads.Add($argument) } }
+    }
+    $isVariable = { param($node) $node -is [System.Management.Automation.Language.VariableExpressionAst] }
+    $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    foreach ($node in $loads) {
+        if ($null -eq $node -or $node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]) { continue }
+        $records = [System.Collections.Generic.List[object]]::new()
+        foreach ($record in @(Get-EpicStateIsolationReferenceRecord -Node $node -SuiteAst $Ast)) { $records.Add($record) }
+        foreach ($variable in $node.FindAll($isVariable, $false)) {
+            foreach ($bound in @(Get-EpicStateIsolationVariableBinding -SuiteAst $Ast -Key (Get-EpicStateIsolationVariableKey -UserPath $variable.VariablePath.UserPath))) {
+                foreach ($record in @(Get-EpicStateIsolationReferenceRecord -Node $bound -SuiteAst $Ast)) { $records.Add($record) }
+            }
+        }
+        foreach ($record in $records) {
+            if ($seen.Add("$($record.Form)|$($record.Name)|$($record.Root)")) { $record }
+        }
+    }
+}

@@ -205,3 +205,20 @@ function Get-EpicStateProcessSpawningReport {
     $launched = @(Get-EpicStateProcessSpawningHook -SuiteText $text)
     if ($launched.Count -gt 0) { "REPORT: $RelativePath launches $($launched -join ', ')" }
 }
+
+function Get-EpicStateVariableHookLoadReport {
+    # One REPORT-VARIABLE-LOAD line for a suite with variable-built hook loads and nothing otherwise;
+    # report-only, never a finding (issue #935, #737 F-3).
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)] [string] $RepoRoot,
+        [Parameter(Mandatory)] [string] $RelativePath,
+        [scriptblock] $ReadSource
+    )
+    $reader = $ReadSource
+    if ($null -eq $reader) { $reader = Get-EpicStateSourceReader -RepoRoot $RepoRoot }
+    $text = & $reader $RelativePath
+    if ($null -eq $text) { return }
+    $loads = @(Get-EpicStateVariableHookLoad -SuiteText $text)
+    if ($loads.Count -gt 0) { "REPORT-VARIABLE-LOAD: $RelativePath loads $($loads -join ', ')" }
+}

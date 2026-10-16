@@ -13,10 +13,10 @@
     from a supplied repository root. Callers inject a reader script block, so fixtures run over
     in-memory text. No function creates a file, runs a process, or reads gitignored state.
 
-    Discovery identifies hook loads only through hooks/<name>.ps1 string literals, so a suite
-    that builds the hook path from a root variable (for example Join-Path $script:HookRoot
-    '<name>.ps1') or launches a process with a variable-built path is outside the population
-    (issue #903, #737 F-3; detector work is Operator Follow-up 4).
+    The closure is seeded only from hooks/<name>.ps1 string literals. Variable-built hook loads
+    (root-variable, segment and dynamic forms, for example Join-Path $script:HookRoot '<name>.ps1')
+    are detected by Get-EpicStateIsolationHookReference and reported through the AC-5b row; they are
+    reported, not added to the closure (issue #935, #737 F-3).
 
     $script:EpicStateParseCache is a deliberate memo exception to the no-mutable-state rule: it
     is deterministic, keyed by source text, and lives for one test session only (#737 F-6).
@@ -220,9 +220,10 @@ function Get-EpicStateProcessSpawningHook {
     <#
         Pure: the hook script names a suite launches as child processes. The suite is
         process-spawning when its text contains ProcessStartInfo or the process-start cmdlet
-        name (written literally or composed from two fragments) and names a hook script by a
-        hooks/<name>.ps1 literal. The cmdlet name is built here from two fragments so this file
-        never holds it as one token.
+        name (written literally or composed from two fragments). The result is the distinct union
+        of its hooks/<name>.ps1 literal names and its variable-built hook loads, a dynamic leaf
+        rendered as *(<root>) (issue #935, F-3). The cmdlet name is built here from two fragments
+        so this file never holds it as one token.
     #>
     [OutputType([string])]
     param([Parameter(Mandatory)] [AllowEmptyString()] [string] $SuiteText)
@@ -232,7 +233,27 @@ function Get-EpicStateProcessSpawningHook {
     $spawns = $SuiteText.Contains('ProcessStartInfo') -or $SuiteText.Contains($cmdlet) -or
     $SuiteText -match $composedLeading -or $SuiteText -match $composedTrailing
     if (-not $spawns) { return }
-    return (Get-EpicStateHookLiteral -SuiteText $SuiteText)
+    return [string[]](@(Get-EpicStateHookLiteral -SuiteText $SuiteText) + @(Get-EpicStateVariableHookLoad -SuiteText $SuiteText))
+}
+
+function Get-EpicStateVariableHookLoad {
+    <#
+        Pure (issue #935, #737 F-3): the variable-built hook loads of a suite whose names are not
+        already named by a hooks/<name>.ps1 literal, distinct and in source order. A dynamic leaf is
+        rendered as *(<root>), or * when its root names neither hook surface. Parses through the
+        Get-EpicStateParsedSource memo, so no additional parse is made.
+    #>
+    [OutputType([string])]
+    param([Parameter(Mandatory)] [AllowEmptyString()] [string] $SuiteText)
+    $literal = @(Get-EpicStateHookLiteral -SuiteText $SuiteText)
+    $names = [System.Collections.Generic.List[string]]::new()
+    foreach ($reference in @(Get-EpicStateIsolationHookReference -Ast (Get-EpicStateParsedSource -Text $SuiteText).Ast)) {
+        if ($reference.Form -eq 'Literal') { continue }
+        $name = if ($reference.Form -ne 'Dynamic') { $reference.Name } elseif ($null -ne $reference.Root) { "*($($reference.Root))" } else { '*' }
+        if ($literal -contains $name -or $names.Contains($name)) { continue }
+        $names.Add($name)
+    }
+    return [string[]]$names.ToArray()
 }
 
 function Get-EpicStateSuiteCensusRow {

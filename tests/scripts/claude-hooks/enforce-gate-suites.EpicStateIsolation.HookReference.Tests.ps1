@@ -236,3 +236,121 @@ Describe 'fixture' {
         $text | Should -BeLike '*no dot-source loads the hook*' -Because 'a non-helper dot-source that loads no identified hook keeps the F-2 finding'
     }
 }
+
+Describe 'issue #935 F-3 hook-reference detector' {
+    It 'F-3 detects <Form>' -ForEach @(
+        @{ Form = 'RootVariable bare'; Name = 'gate.ps1'; Kind = 'RootVariable'; Root = '.claude/hooks'; Source = @'
+$HookRoot = Join-Path $RepoRoot '.claude/hooks'
+Describe 'fixture' {
+    BeforeAll { . (Join-Path $HookRoot 'gate.ps1') }
+}
+'@ }
+        @{ Form = 'RootVariable expandable'; Name = 'gate.ps1'; Kind = 'RootVariable'; Root = '.codex/hooks'; Source = @'
+Describe 'fixture <Name>' -ForEach @(@{ Name = 'codex'; HookRoot = '.codex/hooks' }) {
+    BeforeAll { . (Join-Path $script:RepoRoot "$HookRoot/gate.ps1") }
+}
+'@ }
+        @{ Form = 'two-level binding'; Name = 'gate.ps1'; Kind = 'RootVariable'; Root = '.claude/hooks'; Source = @'
+$script:HookDirectory = Join-Path $RepoRoot '.claude/hooks'
+$script:HookPath = Join-Path $script:HookDirectory 'gate.ps1'
+Describe 'fixture' {
+    BeforeAll { . $script:HookPath }
+}
+'@ }
+        @{ Form = 'Segment'; Name = 'gate.ps1'; Kind = 'Segment'; Root = '.claude/hooks'; Source = @'
+Describe 'fixture' {
+    It 'runs the hook' { & (Join-Path $RepoRoot '.claude' 'hooks' 'gate.ps1') }
+}
+'@ }
+        @{ Form = 'Dynamic spawn'; Name = '*'; Kind = 'Dynamic'; Root = '.codex/hooks'; Source = @'
+$HookRoot = '.codex/hooks'
+Describe 'fixture' {
+    It 'spawns every hook' {
+        foreach ($hookName in $script:HookNames) {
+            $info = [System.Diagnostics.ProcessStartInfo]::new()
+            $info.ArgumentList.Add((Join-Path $HookRoot $hookName))
+        }
+    }
+}
+'@ }
+    ) {
+        # Arrange
+        $ast = ConvertTo-HookReferenceFixtureAst -Source $Source
+
+        # Act
+        $references = @(Get-EpicStateIsolationHookReference -Ast $ast)
+
+        # Assert
+        $match = @($references | Where-Object { $_.Name -eq $Name -and $_.Form -eq $Kind -and $_.Root -eq $Root })
+        $match.Count | Should -Be 1 -Because "the $Form fixture loads $Name from $Root; got: $(@($references | ForEach-Object { "$($_.Form):$($_.Name):$($_.Root)" }) -join ', ')"
+    }
+
+    It 'F-3 ignores a Join-Path used only by <Reader>' -ForEach @(
+        @{ Reader = 'Get-FileHash'; Source = @'
+$HookRoot = '.claude/hooks'
+Describe 'fixture' {
+    It 'hashes the hook' { (Get-FileHash -LiteralPath (Join-Path $HookRoot 'gate.ps1')).Hash | Should -Not -BeNullOrEmpty }
+}
+'@ }
+        @{ Reader = 'Get-Content'; Source = @'
+$HookRoot = '.claude/hooks'
+Describe 'fixture' {
+    It 'reads the hook' { Get-Content -Raw -LiteralPath (Join-Path $HookRoot 'gate.ps1') | Should -Not -BeNullOrEmpty }
+}
+'@ }
+        @{ Reader = 'ParseFile'; Source = @'
+$HookRoot = '.claude/hooks'
+Describe 'fixture' {
+    It 'parses the hook' { [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $HookRoot 'gate.ps1'), [ref] $null, [ref] $null) | Should -Not -BeNullOrEmpty }
+}
+'@ }
+    ) {
+        # Arrange
+        $ast = ConvertTo-HookReferenceFixtureAst -Source $Source
+
+        # Act
+        $references = @(Get-EpicStateIsolationHookReference -Ast $ast)
+
+        # Assert
+        $references.Count | Should -Be 0 -Because "a Join-Path read by $Reader does not load the hook"
+    }
+
+    It 'F-3 process-spawning report includes a variable-built hook path' {
+        # Arrange: a process start description whose arguments are built from a .codex/hooks root.
+        $suite = @'
+$HookRoot = Join-Path $RepoRoot '.codex/hooks'
+Describe 'fixture' {
+    It 'spawns the hooks' {
+        $info = [System.Diagnostics.ProcessStartInfo]::new()
+        $info.ArgumentList.Add((Join-Path $HookRoot 'gate.ps1'))
+        $info.ArgumentList.Add((Join-Path $HookRoot $script:HookName))
+    }
+}
+'@
+
+        # Act
+        $launched = @(Get-EpicStateProcessSpawningHook -SuiteText $suite)
+
+        # Assert
+        $launched | Should -Contain 'gate.ps1' -Because 'a literal leaf over a hooks root is reported by name'
+        $launched | Should -Contain '*(.codex/hooks)' -Because 'a non-literal leaf is reported as a dynamic load of its root'
+    }
+
+    It 'F-3 closure stays literal-seeded' {
+        # Arrange: the reader holds the hook, and the suite reaches it only through a root variable.
+        $table = @{ '.claude/hooks/gate.ps1' = "function Get-FixtureCheckpointText {`n    param([string] `$Path)`n    return (Get-Content -Raw -LiteralPath `$Path)`n}`n" }
+        $reader = { param([string] $RelativePath) if ($table.ContainsKey($RelativePath)) { $table[$RelativePath] } else { $null } }.GetNewClosure()
+        $suite = @'
+$HookRoot = '.claude/hooks'
+Describe 'fixture' {
+    BeforeAll { . (Join-Path $HookRoot 'gate.ps1') }
+}
+'@
+
+        # Act
+        $closure = @(Get-EpicStateLoadedSourceClosure -SuiteText $suite -ReadSource $reader)
+
+        # Assert
+        $closure.Count | Should -Be 0 -Because 'variable-built loads are reported, not added to the closure'
+    }
+}
