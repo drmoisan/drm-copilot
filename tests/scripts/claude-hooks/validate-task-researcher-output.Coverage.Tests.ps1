@@ -333,3 +333,26 @@ Describe 'Test-NumericDerivationEvidence rule R3 (issue #905)' {
         $result.Message | Should -Be 'task-researcher hook: numeric derivation evidence does not declare an exhaustive repository search scope.'
     }
 }
+
+Describe 'Invoke-TaskResearcherOutputValidation dependency decision in process (issue #929)' {
+    BeforeAll {
+        . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-task-researcher-output.ps1')
+    }
+
+    It 'returns the guard ExitCode and Reason object in process when a dependency failure is recorded (S6 by design)' {
+        # Arrange: a failure recorded after the hook loaded; the leading dependency-decision statement returns the guard object unchanged (rule S6).
+        $inputText = '{"session_id":"e3-905","hook_event_name":"SubagentStop","agent_type":"task-researcher","stop_hook_active":false,"last_assistant_message":"Done. Findings recorded."}'
+        try {
+            Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1'
+            # Act
+            $result = Invoke-TaskResearcherOutputValidation -InputText $inputText
+        }
+        finally {
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
+        }
+        # Assert
+        $result.ExitCode | Should -Be 2 -Because $result.Reason
+        $result.Reason.StartsWith('validate-task-researcher-output:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Reason
+        $result.Reason.Contains('subagentstop-envelope.ps1') | Should -BeTrue -Because $result.Reason
+    }
+}
