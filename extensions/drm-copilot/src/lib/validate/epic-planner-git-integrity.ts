@@ -243,10 +243,10 @@ function pairPlansWithFeatures(
       entry = entries[position];
     }
     if (entry === undefined) {
-      return plans.map((item, slot): PlanEntry => [
+      return plans.map((fallbackPlan, slot): PlanEntry => [
         slot,
         entries[slot]?.[1] ?? {},
-        item,
+        fallbackPlan,
       ]);
     }
     paired.push([entry[0], entry[1], plan]);
