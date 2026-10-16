@@ -241,14 +241,14 @@ All baseline artifacts go to `docs/features/active/2026-10-16-pester-profiler-co
 
 Every edit in this phase uses the Edit tool on a test file (no batch-budget slot). The anchor text quoted in each task is unique in its file at PLAN_HEAD.
 
-- [ ] [P1-T1] Edit `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` line 108: replace `        $job | Should -Match '-ShardIndex \$\{\{ matrix\.shard \}\} -ShardCount 3'` with the line below. No other line changes. WF04 takes over the shard-count assertion.
+- [x] [P1-T1] Edit `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` line 108: replace `        $job | Should -Match '-ShardIndex \$\{\{ matrix\.shard \}\} -ShardCount 3'` with the line below. No other line changes. WF04 takes over the shard-count assertion.
   - Acceptance: the file contains no `-ShardCount 3` (`@(Select-String -LiteralPath tests/scripts/workflows/PoshQcWorkflow.Tests.ps1 -SimpleMatch -Pattern '-ShardCount 3').Count` is 0, Tool route).
 
 ```powershell
         $job | Should -Match '-ShardIndex \$\{\{ matrix\.shard \}\}'
 ```
 
-- [ ] [P1-T2] Edit `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`: insert the 49 lines below between line 47 (`        }`, closing the `foreach ($jobId in $jobLines.Keys)` loop) and line 48 (`    }`, closing `BeforeAll`), at the indentation shown. Anchor the Edit on lines 44-48 (from `        $script:JobText = @{}` through `    }`). No other line changes.
+- [x] [P1-T2] Edit `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`: insert the 49 lines below between line 47 (`        }`, closing the `foreach ($jobId in $jobLines.Keys)` loop) and line 48 (`    }`, closing `BeforeAll`), at the indentation shown. Anchor the Edit on lines 44-48 (from `        $script:JobText = @{}` through `    }`). No other line changes.
   - Acceptance: the file contains `$script:GetResultGateViolation = {` (quoted here as the literal this task creates) exactly once.
 
 ```powershell
@@ -303,7 +303,7 @@ Every edit in this phase uses the Edit tool on a test file (no batch-budget slot
         }
 ```
 
-- [ ] [P1-T3] Edit `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`: insert the 47 lines below between the `    }` that closes the case `runs the format and analyze gates in the poshqc-static job (issue #953)` (line 120 at PLAN_HEAD, line 169 after P1-T2) and the final `}` that closes the Describe block. Anchor the Edit on the last three lines of the file (`        $job | Should -Not -Match 'Invoke-PoshQCTest'`, `    }`, `}`) together with the preceding line `        $job | Should -Match 'Invoke-PoshQCAnalyze -Root'`. No other line changes.
+- [x] [P1-T3] Edit `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`: insert the 47 lines below between the `    }` that closes the case `runs the format and analyze gates in the poshqc-static job (issue #953)` (line 120 at PLAN_HEAD, line 169 after P1-T2) and the final `}` that closes the Describe block. Anchor the Edit on the last three lines of the file (`        $job | Should -Not -Match 'Invoke-PoshQCTest'`, `    }`, `}`) together with the preceding line `        $job | Should -Match 'Invoke-PoshQCAnalyze -Root'`. No other line changes.
   - Acceptance: each of `WF01-POSHQC-MERGE-JOB-RUNS-ALWAYS`, `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS`, `WF04-SHARD-COUNT-FROM-MATRIX`, and `WF05-MERGE-LOOPS-DERIVE-SHARD-COUNT` occurs exactly once in the file (counted with `Select-String -SimpleMatch` through the Tool route).
 
 ```powershell
@@ -356,14 +356,14 @@ Every edit in this phase uses the Edit tool on a test file (no batch-budget slot
     }
 ```
 
-- [ ] [P1-T4] Edit `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1` line 34: replace `    It 'SH01-SLICE-ROUND-ROBIN assigns positions i where i % ShardCount equals ShardIndex - 1, in input order' {` with the line below. The token and the case body are unchanged; only the description is corrected for the weighted algorithm.
+- [x] [P1-T4] Edit `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1` line 34: replace `    It 'SH01-SLICE-ROUND-ROBIN assigns positions i where i % ShardCount equals ShardIndex - 1, in input order' {` with the line below. The token and the case body are unchanged; only the description is corrected for the weighted algorithm.
   - Acceptance: `SH01-SLICE-ROUND-ROBIN` occurs exactly once in the file, and the file contains `assigns equally weighted files round-robin in ordinal path order` (quoted here as the literal this task creates).
 
 ```powershell
     It 'SH01-SLICE-ROUND-ROBIN assigns equally weighted files round-robin in ordinal path order and returns them in input order' {
 ```
 
-- [ ] [P1-T5] Edit `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1`: insert the 35 lines below between line 57 (`    }`, closing SH02) and line 58 (`}`, closing `Describe 'Get-PoshQCShardSlice'`). Anchor the Edit on line 56 (`        { Get-PoshQCShardSlice -TestFile $files -ShardIndex 1 -ShardCount 0 } | Should -Throw '*ShardCount must be at least 1*'`) and lines 57-58. No other line changes.
+- [x] [P1-T5] Edit `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1`: insert the 35 lines below between line 57 (`    }`, closing SH02) and line 58 (`}`, closing `Describe 'Get-PoshQCShardSlice'`). Anchor the Edit on line 56 (`        { Get-PoshQCShardSlice -TestFile $files -ShardIndex 1 -ShardCount 0 } | Should -Throw '*ShardCount must be at least 1*'`) and lines 57-58. No other line changes.
   - Acceptance: each of `SH10-SLICE-WEIGHTED-LPT`, `SH11-SLICE-EQUAL-WEIGHTS-ORDINAL-PATH-ORDER`, and `SH12-SLICE-WEIGHT-COUNT-MISMATCH-THROWS` occurs exactly once in the file.
 
 ```powershell
@@ -404,14 +404,14 @@ Every edit in this phase uses the Edit tool on a test file (no batch-budget slot
     }
 ```
 
-- [ ] [P1-T6] Edit `tests/scripts/powershell/PoshQC/PoshQC.CoverageMerge.Tests.ps1` line 93 (inside CM02): replace `        & $script:Counter $merged "/report/counter[@type='METHOD']" | Should -BeExactly '1/0' -Because 'counters other than LINE and INSTRUCTION are kept from the first report'` with the line below. No other line changes.
+- [x] [P1-T6] Edit `tests/scripts/powershell/PoshQC/PoshQC.CoverageMerge.Tests.ps1` line 93 (inside CM02): replace `        & $script:Counter $merged "/report/counter[@type='METHOD']" | Should -BeExactly '1/0' -Because 'counters other than LINE and INSTRUCTION are kept from the first report'` with the line below. No other line changes.
   - Acceptance: the file contains `METHOD figures cannot be recomputed from merged line hits` (quoted here as the literal this task creates) exactly once, and no `are kept from the first report`.
 
 ```powershell
         $merged.SelectNodes("//counter[@type='METHOD']").Count | Should -Be 0 -Because 'METHOD figures cannot be recomputed from merged line hits, so the merged report omits them (CR-8)'
 ```
 
-- [ ] [P1-T7] Edit `tests/scripts/powershell/PoshQC/PoshQC.CoverageMerge.Tests.ps1` lines 136-137 (inside CM05): replace `        $before = @($original.SelectNodes('//line | //counter') | ForEach-Object { $_.OuterXml })` and `        $after = @($merged.SelectNodes('//line | //counter') | ForEach-Object { $_.OuterXml })` with the two lines below. No other line changes.
+- [x] [P1-T7] Edit `tests/scripts/powershell/PoshQC/PoshQC.CoverageMerge.Tests.ps1` lines 136-137 (inside CM05): replace `        $before = @($original.SelectNodes('//line | //counter') | ForEach-Object { $_.OuterXml })` and `        $after = @($merged.SelectNodes('//line | //counter') | ForEach-Object { $_.OuterXml })` with the two lines below. No other line changes.
   - Acceptance: the file contains `//line | //counter[@type='LINE' or @type='INSTRUCTION']` on exactly two lines.
 
 ```powershell
@@ -419,7 +419,7 @@ Every edit in this phase uses the Edit tool on a test file (no batch-budget slot
         $after = @($merged.SelectNodes("//line | //counter[@type='LINE' or @type='INSTRUCTION']") | ForEach-Object { $_.OuterXml })
 ```
 
-- [ ] [P1-T8] Edit `tests/scripts/powershell/PoshQC/PoshQC.CoverageMerge.Tests.ps1`: insert the 18 lines below between line 140 (`    }`, closing CM05) and line 141 (blank, before CM06). Anchor the Edit on line 139 (``        ($after -join "`n") | Should -BeExactly ($before -join "`n")``), line 140, line 141, and line 142 (`    It 'CM06-MERGE-EMPTY-INPUT-THROWS when no report is supplied' {`). No other line changes.
+- [x] [P1-T8] Edit `tests/scripts/powershell/PoshQC/PoshQC.CoverageMerge.Tests.ps1`: insert the 18 lines below between line 140 (`    }`, closing CM05) and line 141 (blank, before CM06). Anchor the Edit on line 139 (``        ($after -join "`n") | Should -BeExactly ($before -join "`n")``), line 140, line 141, and line 142 (`    It 'CM06-MERGE-EMPTY-INPUT-THROWS when no report is supplied' {`). No other line changes.
   - Acceptance: `CM08-MERGE-OMITS-CLASS-AND-METHOD-FIGURES` occurs exactly once in the file.
 
 ```powershell
@@ -443,7 +443,7 @@ Every edit in this phase uses the Edit tool on a test file (no batch-budget slot
     }
 ```
 
-- [ ] [P1-T9] Edit `tests/scripts/powershell/PoshQC/PoshQC.TestingShard.Tests.ps1`: insert the 42 lines below between line 114 (`    }`, closing the case `rejects a shard index outside 1..ShardCount before Pester runs`) and line 115 (`}`, closing the Describe block). Anchor the Edit on line 112 (`        { Invoke-PoshQCTest @seams -ShardIndex 4 -ShardCount 3 } | Should -Throw '*ShardIndex must be between 1 and 3*'`) through line 115. No other line changes.
+- [x] [P1-T9] Edit `tests/scripts/powershell/PoshQC/PoshQC.TestingShard.Tests.ps1`: insert the 42 lines below between line 114 (`    }`, closing the case `rejects a shard index outside 1..ShardCount before Pester runs`) and line 115 (`}`, closing the Describe block). Anchor the Edit on line 112 (`        { Invoke-PoshQCTest @seams -ShardIndex 4 -ShardCount 3 } | Should -Throw '*ShardIndex must be between 1 and 3*'`) through line 115. No other line changes.
   - Acceptance: each of `TS04-DEFAULT-FILELIST-SEAM-WRITES-UTF8-JSON`, `TS05-EMPTY-SHARD-SLICE-THROWS`, and `TS06-SHARD-WEIGHTED-BY-FILE-SIZE` occurs exactly once in the file.
 
 ```powershell
@@ -491,11 +491,11 @@ Every edit in this phase uses the Edit tool on a test file (no batch-budget slot
     }
 ```
 
-- [ ] [P1-T10] Verify the test edits and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-test-edits.<ts>.md`.
+- [x] [P1-T10] Verify the test edits and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r2-test-edits.<ts>.md`.
   - Run `git diff --numstat <REM_BASE_SHA> -- tests/scripts/workflows/PoshQcWorkflow.Tests.ps1 tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1 tests/scripts/powershell/PoshQC/PoshQC.CoverageMerge.Tests.ps1 tests/scripts/powershell/PoshQC/PoshQC.TestingShard.Tests.ps1` from the Bash tool, and `(Get-Content -LiteralPath <path>).Count` for each of the four files through the Tool route.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (the four numstat rows and the four counts).
   - Acceptance: the line counts are 217 (`PoshQcWorkflow.Tests.ps1`), 172 (`PoshQC.Shard.Tests.ps1`), 189 (`PoshQC.CoverageMerge.Tests.ps1`), and 157 (`PoshQC.TestingShard.Tests.ps1`), each at most 500 (AC-15); the numstat rows list exactly these four files.
-- [ ] [P1-T11] [expect-fail] Run TARGETED_RUN(`r2-before`, R2_SET) on the pre-fix production tree and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r2-regression-fail-before.<ts>.md`.
+- [x] [P1-T11] [expect-fail] Run TARGETED_RUN(`r2-before`, R2_SET) on the pre-fix production tree and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r2-regression-fail-before.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 9`, and `Output Summary:` with the JRP totals, the JRP failure check (step 5) with the failure message for every FAIL_BEFORE_TOKENS entry, and the JRP token check (step 4) for every OLD_TOKENS entry other than `CM02-MERGE-RECOMPUTES-LINE-COUNTERS` and for `WF01-POSHQC-MERGE-JOB-RUNS-ALWAYS`, `WF02-POSHQC-RESULT-GATE-PRECEDES-MERGE`, `WF03-RESULT-GATE-CHECK-DETECTS-MUTATIONS`, and `TS04-DEFAULT-FILELIST-SEAM-WRITES-UTF8-JSON`.
   - Acceptance:
     - Run valid, EXIT_CODE 9 (Pester exits with the failed-test count when `Run.Exit` is set), JRP `tests` equal to `R2_TARGETED_BASELINE_TESTS` (latest `r2-targeted-tests.*.md` in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/`) plus 12, `failures` 9, and `errors` 0.

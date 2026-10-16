@@ -112,4 +112,46 @@ Describe 'Invoke-PoshQCTest shard parameters' {
         { Invoke-PoshQCTest @seams -ShardIndex 4 -ShardCount 3 } | Should -Throw '*ShardIndex must be between 1 and 3*'
         $capture.ContainsKey('RunPath') | Should -BeFalse
     }
+
+    It 'TS04-DEFAULT-FILELIST-SEAM-WRITES-UTF8-JSON writes the manifest through Set-Content in the default WriteShardFileList seam' {
+        # Arrange: Set-Content is mocked in the module scope, so no file is written.
+        $capture = @{}
+        $seams = & $script:NewSeams $capture $script:TestPaths
+        $seams.Remove('WriteShardFileList')
+        Mock -CommandName Set-Content -ModuleName PoshQC -MockWith { }
+
+        # Act
+        Invoke-PoshQCTest @seams -ShardIndex 2 -ShardCount 2 -ShardFileListPath '/shard-root/artifacts/pester/shard-files.json'
+
+        # Assert
+        Should -Invoke -CommandName Set-Content -ModuleName PoshQC -Times 1 -Exactly -ParameterFilter {
+            $LiteralPath -eq '/shard-root/artifacts/pester/shard-files.json' -and ([string] $Encoding -match '(?i)utf-?8') -and ((@((($Value -join "`n") | ConvertFrom-Json).selected) -join ',') -eq 'tests/t2.Tests.ps1,tests/t4.Tests.ps1')
+        }
+        (@($capture['RunPath']) -join ',') | Should -BeExactly '/shard-root/tests/t2.Tests.ps1,/shard-root/tests/t4.Tests.ps1'
+    }
+
+    It 'TS05-EMPTY-SHARD-SLICE-THROWS stops before Pester runs when the shard selects no test file' {
+        # Arrange: two test files cannot fill three shards, so shard 3 selects none.
+        $capture = @{}
+        $seams = & $script:NewSeams $capture @($script:TestPaths[0], $script:TestPaths[1])
+
+        # Act / Assert
+        { Invoke-PoshQCTest @seams -ShardIndex 3 -ShardCount 3 -ShardFileListPath '/shard-root/artifacts/pester/shard-files.json' } | Should -Throw '*Shard 3 of 3 selects no test file*'
+        $capture.ContainsKey('RunPath') | Should -BeFalse -Because 'Pester must not run with an empty Run.Path'
+        $capture.ContainsKey('ListJson') | Should -BeFalse -Because 'no manifest is written for an empty shard'
+    }
+
+    It 'TS06-SHARD-WEIGHTED-BY-FILE-SIZE assigns the heaviest test files first to the least-loaded shard' {
+        # Arrange: the injected EnumerateTests seam supplies in-memory sizes through a Length property, as FileInfo items do.
+        $capture = @{}
+        $sizes = @(400, 100, 300, 200)
+        $enumerated = @(0..3 | ForEach-Object { [pscustomobject]@{ FullName = $script:TestPaths[$_]; Length = [long] $sizes[$_] } })
+        $seams = & $script:NewSeams $capture $enumerated
+
+        # Act
+        Invoke-PoshQCTest @seams -ShardIndex 1 -ShardCount 2
+
+        # Assert: t1 (400) and t2 (100) total 500, as do t3 (300) and t4 (200); assignment by position would give t1 and t3 (700).
+        (@($capture['RunPath']) -join ',') | Should -BeExactly '/shard-root/tests/t1.Tests.ps1,/shard-root/tests/t2.Tests.ps1'
+    }
 }

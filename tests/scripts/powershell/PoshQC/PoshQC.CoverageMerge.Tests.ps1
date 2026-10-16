@@ -90,7 +90,7 @@ Describe 'Merge-PoshQCCoverageReport' {
         & $script:Counter $merged "/report/counter[@type='LINE']" | Should -BeExactly '3/1'
         & $script:Counter $merged "/report/counter[@type='INSTRUCTION']" | Should -BeExactly '6/6'
         & $script:Counter $merged "//sourcefile[@name='a.ps1']/counter[@type='INSTRUCTION']" | Should -BeExactly '3/3'
-        & $script:Counter $merged "/report/counter[@type='METHOD']" | Should -BeExactly '1/0' -Because 'counters other than LINE and INSTRUCTION are kept from the first report'
+        $merged.SelectNodes("//counter[@type='METHOD']").Count | Should -Be 0 -Because 'METHOD figures cannot be recomputed from merged line hits, so the merged report omits them (CR-8)'
     }
 
     It 'CM03-MERGE-PRESERVES-DENOMINATOR keeps the line set and every line command total' {
@@ -133,10 +133,28 @@ Describe 'Merge-PoshQCCoverageReport' {
         [xml] $merged = Merge-PoshQCCoverageReport -CoverageXml @($text)
 
         # Assert
-        $before = @($original.SelectNodes('//line | //counter') | ForEach-Object { $_.OuterXml })
-        $after = @($merged.SelectNodes('//line | //counter') | ForEach-Object { $_.OuterXml })
+        $before = @($original.SelectNodes("//line | //counter[@type='LINE' or @type='INSTRUCTION']") | ForEach-Object { $_.OuterXml })
+        $after = @($merged.SelectNodes("//line | //counter[@type='LINE' or @type='INSTRUCTION']") | ForEach-Object { $_.OuterXml })
         $after.Count | Should -Be $before.Count
         ($after -join "`n") | Should -BeExactly ($before -join "`n")
+    }
+
+    It 'CM08-MERGE-OMITS-CLASS-AND-METHOD-FIGURES removes class and method elements and every counter other than LINE and INSTRUCTION' {
+        # Arrange: each report also carries a class element with one method and a report-level CLASS counter, as Pester writes them.
+        $classXml = '<class name="C:/repo/scripts/a/a" sourcefilename="a.ps1"><method name="Invoke-A" desc="()" line="1"><counter type="LINE" missed="1" covered="0" /><counter type="METHOD" missed="1" covered="0" /></method><counter type="CLASS" missed="1" covered="0" /></class>'
+        $reports = foreach ($ci in @(@(0, 1, 3, 0), @(2, 0, 1, 0))) {
+            (& $script:NewReport $ci).Replace('<package name="C:/repo/scripts/a">', '<package name="C:/repo/scripts/a">' + $classXml).Replace('</report>', '<counter type="CLASS" missed="1" covered="0" /></report>')
+        }
+
+        # Act
+        [xml] $merged = Merge-PoshQCCoverageReport -CoverageXml $reports
+
+        # Assert
+        $merged.SelectNodes('//class').Count | Should -Be 0
+        $merged.SelectNodes('//method').Count | Should -Be 0
+        $merged.SelectNodes("//counter[@type!='LINE' and @type!='INSTRUCTION']").Count | Should -Be 0
+        $merged.SelectNodes('//sourcefile').Count | Should -Be 2 -Because 'sourcefile elements and their lines are kept'
+        & $script:Counter $merged "/report/counter[@type='LINE']" | Should -BeExactly '3/1' -Because 'the LINE counters stay exact'
     }
 
     It 'CM06-MERGE-EMPTY-INPUT-THROWS when no report is supplied' {

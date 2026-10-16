@@ -31,7 +31,7 @@ BeforeAll {
 }
 
 Describe 'Get-PoshQCShardSlice' {
-    It 'SH01-SLICE-ROUND-ROBIN assigns positions i where i % ShardCount equals ShardIndex - 1, in input order' {
+    It 'SH01-SLICE-ROUND-ROBIN assigns equally weighted files round-robin in ordinal path order and returns them in input order' {
         # Arrange
         $files = @(0..9 | ForEach-Object { "f$_" })
 
@@ -54,6 +54,41 @@ Describe 'Get-PoshQCShardSlice' {
         { Get-PoshQCShardSlice -TestFile $files -ShardIndex 0 -ShardCount 3 } | Should -Throw '*ShardIndex must be between 1 and 3*'
         { Get-PoshQCShardSlice -TestFile $files -ShardIndex 4 -ShardCount 3 } | Should -Throw '*ShardIndex must be between 1 and 3*'
         { Get-PoshQCShardSlice -TestFile $files -ShardIndex 1 -ShardCount 0 } | Should -Throw '*ShardCount must be at least 1*'
+    }
+
+    It 'SH10-SLICE-WEIGHTED-LPT assigns the heaviest file first to the shard with the least assigned weight' {
+        # Arrange
+        $files = @('t1', 't2', 't3', 't4', 't5', 't6')
+        $weights = [long[]] @(4, 9, 3, 8, 5, 1)
+
+        # Act
+        $shard1 = @(Get-PoshQCShardSlice -TestFile $files -Weight $weights -ShardIndex 1 -ShardCount 3)
+        $shard2 = @(Get-PoshQCShardSlice -TestFile $files -Weight $weights -ShardIndex 2 -ShardCount 3)
+        $shard3 = @(Get-PoshQCShardSlice -TestFile $files -Weight $weights -ShardIndex 3 -ShardCount 3)
+
+        # Assert: the loads are 9 + 1, 3 + 8, and 4 + 5; assignment by position would load 12, 14, and 4.
+        ($shard1 -join ',') | Should -BeExactly 't2,t6'
+        ($shard2 -join ',') | Should -BeExactly 't3,t4' -Because 'each slice keeps input order'
+        ($shard3 -join ',') | Should -BeExactly 't1,t5'
+        (@($shard1 + $shard2 + $shard3 | Sort-Object) -join ',') | Should -BeExactly 't1,t2,t3,t4,t5,t6' -Because 'every file is assigned to exactly one shard'
+    }
+
+    It 'SH11-SLICE-EQUAL-WEIGHTS-ORDINAL-PATH-ORDER breaks weight ties by ordinal path order, not culture order' {
+        # Arrange: the ordinal order is 'A', 'B', 'a'; a culture-aware sort would place 'a' before 'B'.
+        $files = @('B', 'a', 'A')
+        $weights = [long[]] @(5, 5, 5)
+
+        # Act
+        $shard1 = @(Get-PoshQCShardSlice -TestFile $files -Weight $weights -ShardIndex 1 -ShardCount 2)
+        $shard2 = @(Get-PoshQCShardSlice -TestFile $files -Weight $weights -ShardIndex 2 -ShardCount 2)
+
+        # Assert: 'A' goes to shard 1 and 'B' to shard 2; 'a' then goes to shard 1, the lower index among equal loads and file counts.
+        ($shard1 -join ',') | Should -BeExactly 'a,A' -Because 'each slice keeps input order'
+        ($shard2 -join ',') | Should -BeExactly 'B'
+    }
+
+    It 'SH12-SLICE-WEIGHT-COUNT-MISMATCH-THROWS rejects a weight list whose length differs from the file list' {
+        { Get-PoshQCShardSlice -TestFile @('a', 'b', 'c') -Weight @(1, 2) -ShardIndex 1 -ShardCount 2 } | Should -Throw '*Weight lists 2 values; TestFile lists 3 files*'
     }
 }
 
