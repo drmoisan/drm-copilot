@@ -1,5 +1,6 @@
 import type { CommandRunner } from "../subprocess-runner";
 import { extractPlanCommands, type PlanCommand } from "./plan-gate-commands";
+import { evaluateDocumentGates } from "./plan-gate-document";
 import { evaluateObservabilityGates } from "./plan-gate-observability";
 import {
   BLOCKING_CHANNEL,
@@ -68,6 +69,12 @@ export {
   WRITE_MODE_REGISTER,
 } from "./plan-gate-observability";
 export type { WriteModeEntry, WriteModeShape } from "./plan-gate-observability";
+export {
+  evaluateDocumentGates,
+  G11_SEVERITY,
+  G12_SEVERITY,
+  G13_SEVERITY,
+} from "./plan-gate-document";
 export {
   bareScratchDefinitions,
   evaluateScratchGate,
@@ -255,12 +262,12 @@ function evaluateLiteralRules(
 }
 
 /**
- * Evaluate the plan acceptance-gate rule set G1 through G10 against plan text.
+ * Evaluate the plan acceptance-gate rule set G1 through G13 against plan text.
  *
  * @param text Full plan document text.
  * @param context Repository seam. When omitted only the context-free rules G1,
- *     G4, G7, G8, G8b, and G10 run. G10 is document-level and can add Blocking
- *     findings without a context.
+ *     G4, G7, G8, G8b, and G10 to G13 run. G10 to G13 are document-level and
+ *     can add Blocking findings without a context.
  * @returns Blocking and Warning findings in source order. A failing repository
  *     seam degrades to zero literal findings rather than propagating.
  */
@@ -287,7 +294,9 @@ export function evaluatePlanGates(
     evaluateLiteralRules(report, text, commands, context);
   }
 
-  // G10 is document-level and context-free, so it runs on every invocation.
+  // G10 to G13 are document-level and context-free, so they run on every
+  // invocation, G11 to G13 after G10.
   evaluateScratchGate(report, text);
+  evaluateDocumentGates(report, text);
   return report;
 }

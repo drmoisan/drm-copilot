@@ -388,6 +388,10 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/lib/validate/plan-gate-document.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #525 changed files. `gh-client.ts` gained the optional `repo`
     // selector, `repo-slug.ts` is the new target-repository resolver, and
     // `potential-to-issue-service-call.ts` resolves the slug and threads it
