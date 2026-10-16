@@ -19,7 +19,9 @@ Key invariants:
     `PlanGateReport` from `plan_gate_discrimination` under `TYPE_CHECKING`
     only, because `plan_gate_discrimination` imports this module. Physical
     lines are split on CR LF, LF, and CR only, matching the TypeScript twin.
-    Every finding renders the logical line between backticks; the
+    Blank-line, continuation, and normalization tests use
+    `PLAN_WHITESPACE_CLASS`, whose pattern string is identical in the
+    TypeScript twin. Every finding renders the logical line between backticks; the
     f-string conversion flag and the builtin that produce a Python
     representation are prohibited here, because that builtin selects its quote
     character from the value's contents while the TypeScript twin renders the
@@ -68,6 +70,23 @@ SCRATCH_NAMESPACE_PATTERN = r"issue-(?:<issue-num>|[0-9]+)"
 _DEFINITION_RE = re.compile(SCRATCH_DEFINITION_PATTERN, re.ASCII)
 _NAMESPACE_RE = re.compile(SCRATCH_NAMESPACE_PATTERN, re.ASCII)
 
+# One explicit whitespace class for the blank-line test, the continuation test,
+# and whitespace normalization. The TypeScript twin declares the identical
+# pattern string, and a parity test compares the two. The class is the set on
+# which the Python whitespace predicate (`str.isspace`) and the JavaScript
+# whitespace class agree: NEL, the information separators, and the byte-order
+# mark are excluded, so both runtimes treat them as ordinary characters.
+PLAN_WHITESPACE_CLASS = (
+    r"[\t\n\v\f\r \u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]"
+)
+_WHITESPACE_RUN_RE = re.compile(PLAN_WHITESPACE_CLASS + "+")
+
+
+def _normalize_whitespace(text: str) -> str:
+    """Join runs of `PLAN_WHITESPACE_CLASS` with one space and trim the ends."""
+
+    return " ".join(filter(None, _WHITESPACE_RUN_RE.split(text)))
+
 
 def _continues_logical_line(line: str) -> bool:
     """Return whether a physical line continues the current logical line.
@@ -75,10 +94,10 @@ def _continues_logical_line(line: str) -> bool:
     A continuation is non-blank, begins with whitespace, and is not a fence
     line. A Markdown ATX heading or task line written at column 0 therefore
     ends the logical line, while an indented heading or task line is absorbed
-    into it.
+    into it. Whitespace here means `PLAN_WHITESPACE_CLASS`.
     """
 
-    if not line.strip() or not line[:1].isspace():
+    if not _normalize_whitespace(line) or _WHITESPACE_RUN_RE.match(line) is None:
         return False
     return FENCE_RE.match(line) is None
 
@@ -128,7 +147,7 @@ def bare_scratch_definitions(text: str) -> list[tuple[int, str]]:
             in_fence = not in_fence
             index += 1
             continue
-        if in_fence or not line.strip():
+        if in_fence or not _normalize_whitespace(line):
             index += 1
             continue
 
@@ -140,7 +159,7 @@ def bare_scratch_definitions(text: str) -> list[tuple[int, str]]:
             parts.append(lines[index])
             index += 1
 
-        logical_line = " ".join(" ".join(parts).split())
+        logical_line = _normalize_whitespace(" ".join(parts))
         if _is_bare_definition(logical_line):
             findings.append((start + 1, logical_line))
     return findings

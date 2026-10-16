@@ -181,9 +181,7 @@ def test_rule_file_states_g10_whitespace_alignment() -> None:
     text = _RULE_FILE.read_text(encoding="utf-8")
 
     # Act
-    missing = [
-        phrase for phrase in _WHITESPACE_ALIGNMENT_PHRASES if phrase not in text
-    ]
+    missing = [phrase for phrase in _WHITESPACE_ALIGNMENT_PHRASES if phrase not in text]
     stale = _SUPERSEDED_RESIDUAL_SENTENCE in text
 
     # Assert

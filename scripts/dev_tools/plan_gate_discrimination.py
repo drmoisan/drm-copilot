@@ -31,6 +31,7 @@ from scripts.dev_tools.plan_gate_commands import (
     PlanCommand,
     extract_plan_commands,
     grep_executable_index,
+    split_plan_lines,
 )
 from scripts.dev_tools.plan_gate_coverage import (
     cov_values,
@@ -274,7 +275,8 @@ def _has_cross_line_presence(context: PlanGateContext, literal: str) -> bool:
 
     # A candidate carries the first word on one line: necessary for a wrap.
     for path in context.git.files_containing(words[0]):
-        lines = context.git.read_tracked_text(path).splitlines()
+        # Split on CR LF, LF, and CR only, as the TypeScript hasCrossLinePresence does.
+        lines = split_plan_lines(context.git.read_tracked_text(path))
         if any(needle in " ".join(line.split()) for line in lines):
             continue
         if any(needle in window for window in _window_join(lines)):

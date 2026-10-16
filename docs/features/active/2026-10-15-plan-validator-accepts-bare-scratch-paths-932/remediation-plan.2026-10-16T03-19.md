@@ -232,7 +232,7 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
 
 ### Phase 2 — Python Implementation (N-1, U-1)
 
-- [ ] [P2-T1] Apply the whitespace class to `scripts/dev_tools/plan_gate_scratch.py` (N-1)
+- [x] [P2-T1] Apply the whitespace class to `scripts/dev_tools/plan_gate_scratch.py` (N-1)
   - Add the comment, `PLAN_WHITESPACE_CLASS`, `_WHITESPACE_RUN_RE`, and `_normalize_whitespace` exactly as in Appendix C, placed immediately after the `_NAMESPACE_RE` line (line 69).
   - Replace the first condition of `_continues_logical_line` (line 81) with the Appendix C condition, and append the Appendix C sentence to its docstring.
   - Replace the blank test at line 131 with `if in_fence or not _normalize_whitespace(line):`.
@@ -244,7 +244,7 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
     - It returns 1 for the pattern `^PLAN_WHITESPACE_CLASS = ` and 1 for the pattern `^def _normalize_whitespace\(`.
     - The raw-character zero-count check in Conventions returns 0 for the file.
     - `poetry run pytest tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py tests/scripts/dev_tools/test_plan_gate_scratch.py --deselect=tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py::test_whitespace_class_matches_typescript` exits 0 with 0 failed. The deselected parity node reads the TypeScript constant, which [P3-T1] adds; [P3-T5] runs it.
-- [ ] [P2-T2] Route the G6 tracked-file split through `split_plan_lines` in `scripts/dev_tools/plan_gate_discrimination.py` (U-1)
+- [x] [P2-T2] Route the G6 tracked-file split through `split_plan_lines` in `scripts/dev_tools/plan_gate_discrimination.py` (U-1)
   - Add `split_plan_lines` as the last name in the `from scripts.dev_tools.plan_gate_commands import (...)` block (lines 29-34).
   - Replace line 277 with `lines = split_plan_lines(context.git.read_tracked_text(path))`, preceded by the one-line comment `# Split on CR LF, LF, and CR only, as the TypeScript hasCrossLinePresence does.`.
   - No other line changes. The module must look the splitter up as a module global so the Appendix D A/B helper can substitute it.
@@ -252,13 +252,13 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
     - The Grep tool, output mode `count`, on the file returns 0 for the pattern `read_tracked_text\(path\)\.splitlines\(` (1 before this task, at line 277).
     - It returns 1 for the pattern `split_plan_lines\(context\.git\.read_tracked_text\(path\)\)` and 1 for the pattern `^    split_plan_lines,`.
     - `poetry run pytest tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py` exits 0 with 0 failed.
-- [ ] [P2-T3] Run the Python green set with coverage and record `<FEATURE>/evidence/regression-testing/python-green-rc2.<timestamp>.md`
+- [x] [P2-T3] Run the Python green set with coverage and record `<FEATURE>/evidence/regression-testing/python-green-rc2.<timestamp>.md`
   - Command: `poetry run pytest tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py tests/scripts/dev_tools/test_plan_gate_scratch.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_parity.py tests/scripts/dev_tools/test_plan_gate_commands.py --deselect=tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py::test_whitespace_class_matches_typescript --cov=scripts.dev_tools.plan_gate_scratch --cov=scripts.dev_tools.plan_gate_discrimination --cov-branch --cov-report=term-missing`
   - Acceptance:
     - `EXIT_CODE: 0` and 0 failed; the pytest summary line reports 1 deselected.
     - `Output Summary:` records the pass count and the `term-missing` rows for both files.
     - The `plan_gate_scratch.py` row shows `100%` with an empty `Missing` column.
-- [ ] [P2-T4] Run the G1-G9 corpus A/B check for U-1 and record `<FEATURE>/evidence/regression-testing/g1-g9-corpus-ab-rc2.<timestamp>.md`
+- [x] [P2-T4] Run the G1-G9 corpus A/B check for U-1 and record `<FEATURE>/evidence/regression-testing/g1-g9-corpus-ab-rc2.<timestamp>.md`
   - Method: the Write tool writes `SCRATCH/corpus/g1_g9_splitter_ab.py` with the exact content of Appendix D, with `SCRATCH` resolved for the tool call only. Then, at the repository root, run `poetry run python SCRATCH/corpus/g1_g9_splitter_ab.py SCRATCH/corpus/g1-g9-splitter-ab.json`. The executor runs this command with a 600000 ms tool timeout.
   - The helper evaluates every `plan.*.md` and `remediation-plan.*.md` file under `docs/` twice, against one memoized production git seam: once with the production splitter, and once with `str.splitlines` substituted into `plan_gate_discrimination`. It drops G10 findings and compares the G1-G9 Blocking and Warning lists per file. A built-in probe, a stub tracked file containing a form feed, must differ between the two passes, which shows that the substitution took effect.
   - Acceptance:
@@ -266,23 +266,23 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
     - `Output Summary:` quotes the printed lines `PROBE_DIFFERS: True` and `PLANS_DIFFERING: 0`, and the `PLANS_SCANNED:`, `FINDINGS_BEFORE:`, and `FINDINGS_AFTER:` lines.
     - `PLANS_SCANNED` is at least 100, and `FINDINGS_BEFORE` equals `FINDINGS_AFTER`.
     - A `DIFFERS:` line, `PROBE_DIFFERS: False`, or a non-zero exit halts the task for a plan revision.
-- [ ] [P2-T5] Run the Python plan-gate regression suites and record `<FEATURE>/evidence/regression-testing/python-plan-gate-regression-rc2.<timestamp>.md`
+- [x] [P2-T5] Run the Python plan-gate regression suites and record `<FEATURE>/evidence/regression-testing/python-plan-gate-regression-rc2.<timestamp>.md`
   - Command: `poetry run pytest tests/scripts/dev_tools/test_plan_gate_discrimination_context.py tests/scripts/dev_tools/test_plan_gate_discrimination_cov.py tests/scripts/dev_tools/test_plan_gate_observability.py tests/scripts/dev_tools/test_plan_gate_observability_boundaries.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_validate_orchestration_artifacts_plan_gates.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`
   - Acceptance:
     - `EXIT_CODE: 1` with exactly one failure, `test_rule_file_states_g10_whitespace_alignment`, because the rule file changes in Phase 4. `ExpectedExitCode: 1` is recorded only in that case.
     - `Output Summary:` records the pass count and names the single failing node.
     - Any other failure halts the task.
-- [ ] [P2-T6] Run the Python format check on the five Python files and record `<FEATURE>/evidence/regression-testing/python-format-rc2.<timestamp>.md`
+- [x] [P2-T6] Run the Python format check on the five Python files and record `<FEATURE>/evidence/regression-testing/python-format-rc2.<timestamp>.md`
   - Command: `poetry run black --check scripts/dev_tools/plan_gate_scratch.py scripts/dev_tools/plan_gate_discrimination.py tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`
   - Acceptance: `EXIT_CODE: 0` and the summary line `5 files would be left unchanged.`
   - Remediation branch: run `poetry run black scripts/dev_tools/plan_gate_scratch.py scripts/dev_tools/plan_gate_discrimination.py tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`, record its `reformatted` and `left unchanged` summary, then rerun from [P2-T3].
-- [ ] [P2-T7] Run the Python lint check on the same five files and record `<FEATURE>/evidence/regression-testing/python-lint-rc2.<timestamp>.md`
+- [x] [P2-T7] Run the Python lint check on the same five files and record `<FEATURE>/evidence/regression-testing/python-lint-rc2.<timestamp>.md`
   - Command: `poetry run ruff check --no-fix scripts/dev_tools/plan_gate_scratch.py scripts/dev_tools/plan_gate_discrimination.py tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`
   - Acceptance: `EXIT_CODE: 0` and the output line `All checks passed!`. Any suppression added follows `.claude/rules/python-suppressions.md`.
-- [ ] [P2-T8] Run the Python strict type check on the same five files and record `<FEATURE>/evidence/regression-testing/python-typecheck-rc2.<timestamp>.md`
+- [x] [P2-T8] Run the Python strict type check on the same five files and record `<FEATURE>/evidence/regression-testing/python-typecheck-rc2.<timestamp>.md`
   - Command: `poetry run pyright scripts/dev_tools/plan_gate_scratch.py scripts/dev_tools/plan_gate_discrimination.py tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`
   - Acceptance: `EXIT_CODE: 0` and the summary `0 errors`.
-- [ ] [P2-T9] Commit and push `scripts/dev_tools/plan_gate_scratch.py`, `scripts/dev_tools/plan_gate_discrimination.py`, the evidence, and the plan check-offs
+- [x] [P2-T9] Commit and push `scripts/dev_tools/plan_gate_scratch.py`, `scripts/dev_tools/plan_gate_discrimination.py`, the evidence, and the plan check-offs
   - Commands: `git add scripts/dev_tools/plan_gate_scratch.py scripts/dev_tools/plan_gate_discrimination.py` plus any file reformatted in [P2-T6], the new `<FEATURE>/evidence/regression-testing/` artifacts, and this plan file; `git commit -m "fix(932): share one whitespace class in Python G10 and split G6 tracked text on CR LF only"`; `git push origin HEAD`.
   - Acceptance: the push exits 0, and after the push `git status --porcelain` lists no path other than `SCRATCH/`.
 
