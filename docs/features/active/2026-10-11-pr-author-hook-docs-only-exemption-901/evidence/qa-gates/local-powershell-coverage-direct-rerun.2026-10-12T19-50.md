@@ -1,6 +1,10 @@
 # P1-T8 Local PowerShell coverage after the direct run (re-read after the P1-T5 re-run, second invocation)
 
-Timestamp: 2026-10-13T11-37
+Timestamp: 2026-10-13T11-34
+TIMESTAMP_RECONSTRUCTED: true
+TIMESTAMP_ORIGINAL: 2026-10-13T11-37
+TIMESTAMP_BOUNDS_UTC: 2026-10-13T11-28 .. 2026-10-13T11-34
+TIMESTAMP_DERIVATION: lower: COVERAGE_XML_MTIME_EPOCH 1791890931 (2026-10-13T11:28:51Z) recorded in this file; upper: committer time of 70e58ca84 confirmed in the #927 pa-n3-commit-confirmation evidence
 Command: pwsh -NoProfile -NonInteractive -Command '$ErrorActionPreference="Stop"; Set-Location -LiteralPath "<WORKTREE_ROOT>"; $x=[xml](Get-Content -Raw "artifacts/pester/powershell-coverage.xml"); $bad=0; foreach($f in "enforce-pr-author-skill.docs-only.ps1","enforce-pr-author-skill-helpers.ps1","enforce-pr-author-skill.ps1","enforce-pr-author-skill.artifact-root.ps1"){ $c=@($x.report.package | where {$_.name -match "[.]claude.hooks$"} | foreach {$_.class} | where {$_.sourcefilename -eq $f}); if($c.Count -ne 1){ "COVERAGE_RESULT: .claude/hooks/$f MISSING"; $bad++; continue }; $l=$c[0].counter | where {$_.type -eq "LINE"}; $cv=[int]$l.covered; $ms=[int]$l.missed; $p=[math]::Round(100*$cv/($cv+$ms),2); "COVERAGE_RESULT: .claude/hooks/$f covered=$cv missed=$ms line_pct=$p"; if(100*$cv -lt 85*($cv+$ms)){$bad++} }; $t=$x.report.counter | where {$_.type -eq "LINE"}; $tc=[int]$t.covered; $tm=[int]$t.missed; $tp=[math]::Round(100*$tc/($tc+$tm),2); "COVERAGE_REPO_TOTAL: covered=$tc missed=$tm line_pct=$tp"; if(100*$tc -lt 85*($tc+$tm)){$bad++}; if($bad -gt 0){exit 1}'
 EXIT_CODE: 0
 Output Summary: docs-only 93.44, helpers 97.37, enforce-pr-author-skill 92.98, artifact-root 96.97. Repo-wide LINE 90.4. The local XML now meets 85.00.
