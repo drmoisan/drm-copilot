@@ -165,6 +165,7 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
         @{ Name = 'an inline prefix'; Command = 'GH_HOST=h gh pr merge 5 --merge'; Pr = 5; Root = 'exists'; Seam = @{}; Expected = 'DOCS_ONLY_EXEMPTION_PR_UNRESOLVED*' }
         @{ Name = 'an --auto flag'; Command = 'gh pr merge 5 --merge --auto'; Pr = 5; Root = 'exists'; Seam = @{}; Expected = 'DOCS_ONLY_EXEMPTION_PR_UNRESOLVED*' }
         @{ Name = 'a chained command'; Command = 'gh pr merge 5 --merge; echo x'; Pr = 5; Root = 'exists'; Seam = @{}; Expected = 'DOCS_ONLY_EXEMPTION_PR_UNRESOLVED*' }
+        @{ Name = 'a pull-request URL selector'; Command = 'gh pr merge https://github.com/o/r/pull/5 --merge'; Pr = 5; Root = 'exists'; Seam = @{}; Expected = 'DOCS_ONLY_EXEMPTION_PR_UNRESOLVED*' }
         @{ Name = 'a non-merge command'; Command = 'gh pr view 5'; Pr = 5; Root = 'exists'; Seam = @{}; Expected = 'DOCS_ONLY_EXEMPTION_PR_UNRESOLVED*' }
         @{ Name = 'a blank root'; Command = 'gh pr merge 5 --merge'; Pr = 5; Root = ''; Seam = @{}; Expected = 'DOCS_ONLY_EXEMPTION_PR_UNRESOLVED*' }
         @{ Name = 'a failing lookup'; Command = 'gh pr merge 5 --merge'; Pr = 5; Root = 'exists'; Seam = @{ GhExit = 1; GhOutput = '' }; Expected = 'DOCS_ONLY_EXEMPTION_PR_UNRESOLVED*' }

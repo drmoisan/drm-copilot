@@ -56,7 +56,7 @@ Describe 'Codex enforce-epic-merge-gate docs-only branch (issue #927)' {
             Mock Invoke-DocsOnlyGitExe -ParameterFilter { $GitArgs[0] -eq 'diff' } -MockWith ({ [pscustomobject]@{ ExitCode = 0; Output = $listing } }.GetNewClosure())
         }
 
-        $script:CodexBareDenyText = 'EPIC_MERGE_GATE_BLOCKED: gh pr merge --merge requires a safe epic child checkpoint or a successful final epic CI gate with a matching PR number.'
+        $script:CodexBareDenyText = 'EPIC_MERGE_GATE_BLOCKED: a pull-request merge or merge-queue enqueue (gh pr merge with any method, --auto, or --admin, or a gh api merge or enqueue mutation) requires a safe epic child checkpoint or a successful final epic CI gate with a matching PR number.'
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
@@ -129,6 +129,23 @@ Describe 'Codex enforce-epic-merge-gate docs-only branch (issue #927)' {
 
         # Assert
         ([string]$decision.hookSpecificOutput.permissionDecisionReason).Contains('DOCS_ONLY_EXEMPTION_PR_UNRESOLVED') | Should -BeTrue
+        Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+        Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
+    }
+
+    It 'denies a pull-request URL selector with PR_UNRESOLVED and no process call (codex, issue #952)' {
+        # Arrange: the URL resolves to 5 and the local pull request 5 is docs-only, so only
+        # the M1 URL rule keeps the exemption from reading the local repository.
+        Set-CodexGateDocsOnlySeam -DiffOutput "docs/a.md`0"
+        $payload = ConvertTo-CodexDocsOnlyPayload -Command 'gh pr merge https://github.com/o/r/pull/5 --merge'
+
+        # Act
+        $decision = Invoke-CodexEpicMergeDecision -PayloadRaw $payload -ChildCheckpointRaw '' -EpicCheckpointRaw '' -RepositoryRoot $PSScriptRoot
+        $reason = [string]$decision.hookSpecificOutput.permissionDecisionReason
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $reason.Contains(" (docs-only exemption not applied: DOCS_ONLY_EXEMPTION_PR_UNRESOLVED: the URL selector 'https://github.com/o/r/pull/5' is not accepted.)") | Should -BeTrue
         Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
         Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
     }

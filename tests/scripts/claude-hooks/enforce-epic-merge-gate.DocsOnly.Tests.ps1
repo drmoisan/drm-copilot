@@ -60,7 +60,7 @@ Describe 'enforce-epic-merge-gate docs-only branch (issue #927)' {
             Mock Invoke-DocsOnlyGitExe -ParameterFilter { $GitArgs[0] -eq 'diff' } -MockWith ({ [pscustomobject]@{ ExitCode = 0; Output = $listing } }.GetNewClosure())
         }
 
-        $script:BareDenyText = 'EPIC_MERGE_GATE_BLOCKED: gh pr merge --merge requires either a per-feature checkpoint with epic_mode == true and step9_status == "passed", an epic checkpoint with epic_merge_pr.ci_gate.conclusion == "success" and a matching pr_number, or a parallel-orchestrator checkpoint with route_id == "parallel" whose target item (matched by pr_number) has merge_status == "ci_green". No checkpoint satisfied this gate.'
+        $script:BareDenyText = 'EPIC_MERGE_GATE_BLOCKED: a pull-request merge or merge-queue enqueue (gh pr merge with any method, --auto, or --admin, or a gh api merge or enqueue mutation) requires either a per-feature checkpoint with epic_mode == true and step9_status == "passed", an epic checkpoint with epic_merge_pr.ci_gate.conclusion == "success" and a matching pr_number, or a parallel-orchestrator checkpoint with route_id == "parallel" whose target item (matched by pr_number) has merge_status == "ci_green". No checkpoint satisfied this gate.'
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
@@ -121,6 +121,23 @@ Describe 'enforce-epic-merge-gate docs-only branch (issue #927)' {
             # Assert
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $reason | Should -Match 'TARGET_WORKTREE_NOT_DERIVABLE.*STANDALONE_MERGE_AUTHORIZATION_ABSENT.*docs-only exemption not applied: DOCS_ONLY_EXEMPTION_PR_UNRESOLVED'
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+            Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
+        }
+
+        It 'denies a pull-request URL selector with the PR_UNRESOLVED docs-only reason and no process call (issue #952)' {
+            # Arrange: the URL resolves to 5 and the local pull request 5 is docs-only, so only
+            # the M1 URL rule keeps the exemption from reading the session repository.
+            Set-DocsOnlyMergeSeam -DiffOutput "docs/a.md`0"
+            $envelope = ConvertTo-DocsOnlyMergeEnvelope -Command 'gh pr merge https://github.com/o/r/pull/5 --merge'
+
+            # Act
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $envelope
+            $reason = [string]$decision.hookSpecificOutput.permissionDecisionReason
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $reason.Contains(" (docs-only exemption not applied: DOCS_ONLY_EXEMPTION_PR_UNRESOLVED: the URL selector 'https://github.com/o/r/pull/5' is not accepted.)") | Should -BeTrue
             Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
             Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
         }

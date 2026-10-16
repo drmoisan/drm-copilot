@@ -12,8 +12,9 @@
       2. Invokes scripts/dev-tools/Invoke-FullRelease.ps1 to open the release
          version-bump PR.
       3. Resolves the release branch and pull request number.
-      4. Waits through gh for every GitHub check on the pull request head and
-         merges only after every reported check passed or was skipped.
+      4. Waits through gh for every GitHub check on the pull request head,
+         merges only after every reported check passed or was skipped, and
+         waits until the merge is confirmed (issue #952).
       5. Checks out main, pulls origin main, and invokes
          scripts/dev-tools/Invoke-ReleaseTagPush.ps1.
 
@@ -45,6 +46,10 @@ param(
 # the 500-line cap. Dot-sourcing through $PSScriptRoot also resolves them when a
 # Pester suite dot-sources this script.
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Invoke-FullReleaseFlow.CheckHelpers.ps1')
+
+# The merge-confirmation wait (issue #952) lives in a second sibling file,
+# which also loads the shared merge-state parser.
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Invoke-FullReleaseFlow.MergeWait.ps1')
 
 function Write-StderrLine {
     [CmdletBinding()]
@@ -400,9 +405,15 @@ function Invoke-FullReleaseFlowGuarded {
         return 1
     }
 
-    $merge = Invoke-GhExe -GhArgs @('pr', 'merge', $prNumber, '--merge', '--delete-branch')
+    $merge = Invoke-GhExe -GhArgs @('pr', 'merge', $prNumber, '--merge')
     if ($merge.ExitCode -ne 0) {
         Write-StderrLine -Message "Pull request merge failed for PR #$prNumber (gh exit code $($merge.ExitCode)). Stopping before checkout, pull, and tag push."
+        return 1
+    }
+
+    # A merge queue makes gh pr merge return before the merge happens (issue #952).
+    $mergeWait = Wait-ForPullRequestMerged -PrNumber $prNumber
+    if ($mergeWait -ne 0) {
         return 1
     }
 
