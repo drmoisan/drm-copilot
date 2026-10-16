@@ -241,12 +241,11 @@ function Invoke-TaskResearcherOutputValidation {
     $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
     if (-not $envelope.IsValid) { return @{ Ok = $false; Message = "task-researcher hook: payload anomaly - $(Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)" } }
     $assistantMessage = [string]$envelope.AssistantText
-    $agentOutput = $assistantMessage
-    if ([string]::IsNullOrWhiteSpace($agentOutput)) {
+    if ([string]::IsNullOrWhiteSpace($assistantMessage)) {
         return @{ Ok = $false; Message = 'task-researcher hook: agent output is empty; researcher must return research-path before termination.' }
     }
 
-    $researchPath = Get-ResearchPathFromOutput -AgentOutput $agentOutput
+    $researchPath = Get-ResearchPathFromOutput -AgentOutput $assistantMessage
     if ($null -eq $researchPath) {
         return @{ Ok = $false; Message = 'task-researcher hook: agent output does not advertise a research-path. Researcher must report `research-path: <path>` pointing to docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off).' }
     }
@@ -263,7 +262,7 @@ function Invoke-TaskResearcherOutputValidation {
         return @{ Ok = $false; Message = "task-researcher hook: researcher advertised research-path '$researchPath' but no file exists at that location." }
     }
 
-    $feasibilityResult = Test-AutomationFeasibilitySection -ResearchFilePath $researchPath -AgentOutput $agentOutput
+    $feasibilityResult = Test-AutomationFeasibilitySection -ResearchFilePath $researchPath -AgentOutput $assistantMessage
     if (-not $feasibilityResult.Ok) {
         return @{ Ok = $false; Message = $feasibilityResult.Message }
     }
