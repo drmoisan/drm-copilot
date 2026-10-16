@@ -38,6 +38,7 @@
     helper, and the modules are guarded loads: a failure is recorded and blocks
     every validation, naming the file, before any read. A failed Layer 2 import
     blocks the epic leg only.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 
 [CmdletBinding()]

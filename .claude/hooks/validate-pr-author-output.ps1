@@ -27,6 +27,7 @@
     that the referenced PR actually exists on GitHub, and the output text is forgeable by any actor
     that controls the agent transcript. It MUST NOT be described as tamper-proof or as a security
     boundary.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 [CmdletBinding()]
 param()

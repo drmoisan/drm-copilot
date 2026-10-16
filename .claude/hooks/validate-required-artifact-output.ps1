@@ -25,6 +25,7 @@
     exit 2, naming the file. Filesystem existence checks go through
     Test-ArtifactFile so tests can mock the boundary without writing temporary
     files.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 
 [CmdletBinding()]

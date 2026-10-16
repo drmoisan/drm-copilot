@@ -141,16 +141,16 @@ Each task edits one file with the Edit tool and applies the tail replacement tem
 
 Each task inserts the `.NOTES` sentence from "Exact edit content" into one file with the Edit tool. Acceptance for each is `grep -c -F "validation blocks with exit 2 and a reason" <file>` printing 1.
 
-- [ ] [P3-T1] Insert the sentence into the `.NOTES` section (starts at line 35) of `.claude/hooks/validate-discovery-artifact-gate.ps1`. Acceptance: the count for that file is 1.
-- [ ] [P3-T2] Insert the sentence into the `.NOTES` section (starts at line 22) of `.claude/hooks/validate-executor-output.ps1`. Acceptance: the count for that file is 1.
-- [ ] [P3-T3] Insert the sentence into the `.NOTES` section (starts at line 30) of `.claude/hooks/validate-orchestrator-output.ps1`. Acceptance: the count for that file is 1.
-- [ ] [P3-T4] Insert the sentence into the `.NOTES` section (starts at line 24) of `.claude/hooks/validate-planner-output.ps1`. Acceptance: the count for that file is 1.
-- [ ] [P3-T5] Insert the sentence into the `.NOTES` section (starts at line 22) of `.claude/hooks/validate-pr-author-output.ps1`. Acceptance: the count for that file is 1.
-- [ ] [P3-T6] Insert the sentence into the `.NOTES` section (starts at line 5) of `.claude/hooks/validate-prd-feature-output.ps1`. Acceptance: the count for that file is 1.
-- [ ] [P3-T7] Insert the sentence into the `.NOTES` section (starts at line 17) of `.claude/hooks/validate-required-artifact-output.ps1`. Acceptance: the count for that file is 1.
-- [ ] [P3-T8] Insert the sentence into the `.NOTES` section (starts at line 13) of `.claude/hooks/validate-task-researcher-output.ps1`. Acceptance: the count for that file is 1.
-- [ ] [P3-T9] Run `grep -c -F "validation blocks with exit 2 and a reason"` over the nine validator files and write `FEATURE/evidence/qa-gates/notes-sentence-count.<timestamp>.md` with the command, `EXIT_CODE:`, and per-file counts. Acceptance: count 1 for each of the eight AC1 validators and 0 for `.claude/hooks/validate-feature-review-coverage.ps1`.
-- [ ] [P3-T10] Stage the eight validator files and `FEATURE/` with `git add`, commit with `git commit -F SCRATCH/928/commit-message.txt` (message `docs(928): state the unhandled-error block in validator .NOTES`), and run `git push -u origin HEAD:refs/heads/bug/subagentstop-hook-uncaught-error-exits-1-928`. Acceptance: `git status --porcelain -- .claude/hooks docs/features/active/2026-10-15-subagentstop-hook-uncaught-error-exits-1-928` prints nothing, `git ls-remote origin refs/heads/bug/subagentstop-hook-uncaught-error-exits-1-928` prints the same 40-hex commit as `git rev-parse HEAD`, and the first line of `git status -sb` names `origin/bug/subagentstop-hook-uncaught-error-exits-1-928` with no `ahead` marker.
+- [x] [P3-T1] Insert the sentence into the `.NOTES` section (starts at line 35) of `.claude/hooks/validate-discovery-artifact-gate.ps1`. Acceptance: the count for that file is 1.
+- [x] [P3-T2] Insert the sentence into the `.NOTES` section (starts at line 22) of `.claude/hooks/validate-executor-output.ps1`. Acceptance: the count for that file is 1.
+- [x] [P3-T3] Insert the sentence into the `.NOTES` section (starts at line 30) of `.claude/hooks/validate-orchestrator-output.ps1`. Acceptance: the count for that file is 1.
+- [x] [P3-T4] Insert the sentence into the `.NOTES` section (starts at line 24) of `.claude/hooks/validate-planner-output.ps1`. Acceptance: the count for that file is 1.
+- [x] [P3-T5] Insert the sentence into the `.NOTES` section (starts at line 22) of `.claude/hooks/validate-pr-author-output.ps1`. Acceptance: the count for that file is 1.
+- [x] [P3-T6] Insert the sentence into the `.NOTES` section (starts at line 5) of `.claude/hooks/validate-prd-feature-output.ps1`. Acceptance: the count for that file is 1.
+- [x] [P3-T7] Insert the sentence into the `.NOTES` section (starts at line 17) of `.claude/hooks/validate-required-artifact-output.ps1`. Acceptance: the count for that file is 1.
+- [x] [P3-T8] Insert the sentence into the `.NOTES` section (starts at line 13) of `.claude/hooks/validate-task-researcher-output.ps1`. Acceptance: the count for that file is 1.
+- [x] [P3-T9] Run `grep -c -F "validation blocks with exit 2 and a reason"` over the nine validator files and write `FEATURE/evidence/qa-gates/notes-sentence-count.<timestamp>.md` with the command, `EXIT_CODE:`, and per-file counts. Acceptance: count 1 for each of the eight AC1 validators and 0 for `.claude/hooks/validate-feature-review-coverage.ps1`.
+- [x] [P3-T10] Stage the eight validator files and `FEATURE/` with `git add`, commit with `git commit -F SCRATCH/928/commit-message.txt` (message `docs(928): state the unhandled-error block in validator .NOTES`), and run `git push -u origin HEAD:refs/heads/bug/subagentstop-hook-uncaught-error-exits-1-928`. Acceptance: `git status --porcelain -- .claude/hooks docs/features/active/2026-10-15-subagentstop-hook-uncaught-error-exits-1-928` prints nothing, `git ls-remote origin refs/heads/bug/subagentstop-hook-uncaught-error-exits-1-928` prints the same 40-hex commit as `git rev-parse HEAD`, and the first line of `git status -sb` names `origin/bug/subagentstop-hook-uncaught-error-exits-1-928` with no `ahead` marker.
 
 ### Phase 4 — Citation and documentation corrections
 

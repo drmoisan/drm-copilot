@@ -28,6 +28,7 @@
     guard and the E1 helper are guarded loads: a failure blocks with exit 2,
     naming the file. Plan file contents are read through Get-PlanFileContent so
     tests can mock the filesystem boundary without writing temporary files.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 
 [CmdletBinding()]

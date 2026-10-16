@@ -9,6 +9,7 @@
     exits 2 through the shared envelope helper; an invalid envelope blocks with a payload anomaly
     reason. A hook dependency that fails to load blocks with exit 2 and the
     validate-prd-feature-output: prefix.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 
 [CmdletBinding()]

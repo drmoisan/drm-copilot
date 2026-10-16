@@ -37,6 +37,7 @@
     `Test-Json -SchemaFile` Draft 2020-12 support). Read-only validation gate that
     invokes NO external process: validation runs in-process through
     `.claude/lib/discovery-validation/DiscoveryValidation.psm1` (issue #475).
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 [CmdletBinding()]
 param()
