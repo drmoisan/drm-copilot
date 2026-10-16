@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from pathlib import PurePosixPath
 from typing import TYPE_CHECKING, Any, Protocol, cast
 
 from scripts.dev_tools.pr_context.git import SubprocessRunner
@@ -163,6 +164,51 @@ def validate_committed_file(
     return []
 
 
+def _plan_path(feature: dict[str, Any]) -> str | None:
+    """Return the normalized ``plan_path`` the readiness gate derives, if any."""
+
+    value = feature.get("plan_path")
+    if not isinstance(value, str) or not value.strip():
+        return None
+    return PurePosixPath(value).as_posix()
+
+
+def _pair_plans_with_features(
+    features: object, plans: list[str]
+) -> list[tuple[int, dict[str, Any], str]]:
+    """Pair each plan with its checkpoint entry and that entry's original index.
+
+    Plans are matched in order to object entries whose ``plan_path`` normalizes
+    to the plan, so non-object and plan-less entries keep their positions in the
+    checkpoint ``features`` array. When any plan has no such entry, the
+    positional pairing over object entries is kept, so a caller whose plans are
+    not drawn from the checkpoint sees unchanged behaviour.
+    """
+
+    items: list[object] = (
+        cast("list[object]", features) if isinstance(features, list) else []
+    )
+    entries = [
+        (index, cast("dict[str, Any]", item))
+        for index, item in enumerate(items)
+        if isinstance(item, dict)
+    ]
+    paired: list[tuple[int, dict[str, Any], str]] = []
+    position = 0
+    for plan in plans:
+        while position < len(entries) and _plan_path(entries[position][1]) != plan:
+            position += 1
+        if position == len(entries):
+            return [
+                (slot, entries[slot][1] if slot < len(entries) else {}, item)
+                for slot, item in enumerate(plans)
+            ]
+        index, feature = entries[position]
+        paired.append((index, feature, plan))
+        position += 1
+    return paired
+
+
 def validate_planning_git_integrity(
     state: dict[str, Any],
     parsed: ParsedEpicKickoff,
@@ -187,17 +233,8 @@ def validate_planning_git_integrity(
                 f"Execution readiness planning commit {commit} is not an ancestor "
                 f"of {branch}."
             )
-    features = state.get("features")
-    feature_maps = (
-        [
-            cast("dict[str, Any]", item)
-            for item in cast("list[object]", features)
-            if isinstance(item, dict)
-        ]
-        if isinstance(features, list)
-        else []
-    )
-    for index, plan in enumerate(plans):
+    pairs = _pair_plans_with_features(state.get("features"), plans)
+    for index, feature, plan in pairs:
         derived = git.last_commit(plan)
         if derived is None:
             errors.append(
@@ -210,7 +247,6 @@ def validate_planning_git_integrity(
             )
             continue
         candidate_commits = [derived]
-        feature = feature_maps[index] if index < len(feature_maps) else {}
         feature_commit = feature.get("planning_commit")
         if feature_commit is not None:
             if (
