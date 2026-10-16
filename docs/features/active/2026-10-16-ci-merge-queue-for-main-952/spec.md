@@ -334,4 +334,5 @@ Seeded from issue:
   - Follow-up: update `.claude/skills/cleanup-merged-worktrees/SKILL.md:206-208` once a queue is applied.
   - Follow-up (optional): update `.github/workflows/README.md:34-75`, which documents the legacy branch-protection endpoint rather than the ruleset endpoint in use.
   - Follow-up: evaluate gating `gh` invocations issued through the Claude PowerShell tool.
+  - Follow-up: the merge gate's `gh api` scope reads command text only, so a GraphQL mutation supplied from a file (`gh api graphql -F query=@mutation.graphql` or `gh api --input payload.json`) is not visible to the text-based gh api scope and is not gated; evaluate fail-closed handling for an `@file` query or `--input` (issue #952 code review CR-5).
 - Links: issue https://github.com/drmoisan/drm-copilot/issues/952; research `research/research.2026-10-16T01-30.md`; snapshot `ruleset/protect-main.current.2026-10-16.json`; related items #927, #953.

@@ -20,7 +20,7 @@ GitHub documents merge queues for organization-owned repositories, and `drmoisan
 
 ## Capture and Diff Before Applying
 
-1. Capture the live ruleset: `gh api repos/drmoisan/drm-copilot/rulesets/15241672 > protect-main.live.json`.
+1. Capture the live ruleset to a scratch directory outside the repository: `gh api repos/drmoisan/drm-copilot/rulesets/15241672 > <scratch-dir>/protect-main.live.json`, where `<scratch-dir>` is any directory outside the working tree. The capture file is not committed.
 2. Diff the capture against `protect-main.current.2026-10-16.json`.
 3. If any writable field differs (`name`, `target`, `enforcement`, `conditions`, `rules`, `bypass_actors`), regenerate the three payloads from the fresh capture before applying anything. Differences in read-only fields (`id`, `source_type`, `source`, `node_id`, `created_at`, `updated_at`, `current_user_can_bypass`, `_links`) do not require regeneration.
 
