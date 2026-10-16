@@ -63,6 +63,8 @@ Describe 'Get-DocsOnlyMergeExemption (issue #927)' {
             @{ Name = 'a blank root'; Root = '' }
             @{ Name = 'a nonexistent root'; Root = '/synthetic-worktrees/no-such-root-927' }
         ) {
+            # Arrange: the row supplies a blank or nonexistent root.
+
             # Act
             $result = Get-DocsOnlyMergeExemption -CommandText $script:Merge -PrNumber 5 -WorktreeRoot $Root
 
@@ -140,6 +142,8 @@ Describe 'Get-DocsOnlyMergeExemption (issue #927)' {
         }
 
         It 'calls gh pr view with the number and the two JSON fields in the root (issue #927)' {
+            # Arrange: the BeforeEach mocks return a valid pull request.
+
             # Act
             $null = Get-DocsOnlyMergeExemption -CommandText $script:Merge -PrNumber 5 -WorktreeRoot $PSScriptRoot
 
@@ -208,6 +212,8 @@ Describe 'Get-DocsOnlyMergeExemption (issue #927)' {
         }
 
         It 'allows a NUL-terminated docs-only diff (issue #927)' {
+            # Arrange: the BeforeEach mocks resolve both commits and return a NUL-terminated docs-only diff.
+
             # Act
             $result = Get-DocsOnlyMergeExemption -CommandText $script:Merge -PrNumber 5 -WorktreeRoot $PSScriptRoot
 
@@ -217,6 +223,8 @@ Describe 'Get-DocsOnlyMergeExemption (issue #927)' {
         }
 
         It 'runs the diff with -z, --no-renames, and the base...head range (issue #927)' {
+            # Arrange: the BeforeEach mocks resolve the base commit and the head commit.
+
             # Act
             $null = Get-DocsOnlyMergeExemption -CommandText $script:Merge -PrNumber 5 -WorktreeRoot $PSScriptRoot
 
@@ -225,6 +233,8 @@ Describe 'Get-DocsOnlyMergeExemption (issue #927)' {
         }
 
         It 'never runs git fetch on the allow path (issue #927)' {
+            # Arrange: the BeforeEach mocks include a fetch guard that throws.
+
             # Act
             $null = Get-DocsOnlyMergeExemption -CommandText $script:Merge -PrNumber 5 -WorktreeRoot $PSScriptRoot
 

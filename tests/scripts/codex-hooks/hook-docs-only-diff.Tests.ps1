@@ -106,6 +106,8 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
         @{ Name = 'the bare docs directory'; Text = "docs`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
         @{ Name = 'docs-only paths'; Text = "docs/a.md`0docs/b.md`0"; Expected = 'NONE' }
     ) {
+        # Arrange: the row supplies the diff text and the expected result.
+
         # Act
         $result = Get-DocsOnlyDiffTextViolation -DiffText $Text -BaseName 'main'
 

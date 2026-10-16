@@ -205,6 +205,8 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
         }
 
         It 'returns the non-zero exit code of the injected git command (issue #927)' {
+            # Arrange: the injected stand-in sets exit code 2 and emits nothing.
+
             # Act
             $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs @('status') -GitInvoker ${function:Invoke-DocsOnlyFakeExit2}
 
@@ -214,6 +216,8 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
         }
 
         It 'returns the failure object when the injected git command throws (issue #927)' {
+            # Arrange: the injected stand-in throws.
+
             # Act
             $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs @('status') -GitInvoker ${function:Invoke-DocsOnlyFakeThrow}
 
@@ -226,6 +230,8 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             @{ Name = 'a blank root'; Root = '' }
             @{ Name = 'a nonexistent root'; Root = '/synthetic-worktrees/no-such-root-927' }
         ) {
+            # Arrange: the row supplies a blank or nonexistent root.
+
             # Act
             $result = Invoke-DocsOnlyGitExe -WorktreeRoot $Root -GitArgs @('status') -GitInvoker ${function:Invoke-DocsOnlyFakeMarker}
 
@@ -251,6 +257,8 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
         }
 
         It 'returns the non-zero exit code of the injected gh command (issue #927)' {
+            # Arrange: the injected stand-in sets exit code 2 and emits nothing.
+
             # Act
             $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhInvoker ${function:Invoke-DocsOnlyFakeExit2}
 
@@ -276,6 +284,8 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             @{ Name = 'a blank root'; Root = '' }
             @{ Name = 'a nonexistent root'; Root = '/synthetic-worktrees/no-such-root-927' }
         ) {
+            # Arrange: the row supplies a blank or nonexistent root.
+
             # Act
             $result = Invoke-DocsOnlyGhExe -WorkingRoot $Root -GhArgs @('pr', 'view', '5') -GhInvoker ${function:Invoke-DocsOnlyFakeMarker}
 
