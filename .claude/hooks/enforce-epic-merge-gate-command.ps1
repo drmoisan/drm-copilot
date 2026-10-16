@@ -12,6 +12,10 @@
     Pure string logic only: no disk, process, network, clock, or environment access. The file
     dot-sources and imports nothing; it consumes Get-CommandLineInvocation and
     Get-CommandLineStructuralMatch, which the gate loads from hook-command-invocation.ps1 first.
+
+    Known limitation (issue #952 code review CR-5): the gh api scope reads the command text
+    only. A GraphQL mutation supplied from a file (gh api graphql -F query=@mutation.graphql,
+    or gh api --input payload.json) is not visible to this text-based scope and is not gated.
 #>
 
 # gh pr merge flags that perform or schedule a merge. Any of them keeps a command in scope even
@@ -140,7 +144,8 @@ function Get-EpicMergeGateSelectorPrNumber {
     .DESCRIPTION
         For gh pr merge, only the first Structural match is read. Value flags are skipped with
         their values, other flags are skipped, an equals-joined --merge=<digits> yields its
-        digits, and the first non-flag token (or the token after a bare '--') is the selector.
+        digits (an equals-joined value that is not a number is skipped like any other flag),
+        and the first non-flag token (or the token after a bare '--') is the selector.
         For gh api, the number comes from a pulls/<n>/merge token. Any other command yields
         $null, which the gate handles through its no-number branches.
     .OUTPUTS
@@ -163,7 +168,8 @@ function Get-EpicMergeGateSelectorPrNumber {
             if ($token.StartsWith('-') -and $token.Length -gt 1) {
                 $name = Get-EpicMergeGateFlagName -Token $token
                 if ($name -ceq '--merge' -and $token.Length -gt $name.Length) {
-                    return ConvertFrom-EpicMergeGateSelector -Selector $token.Substring($name.Length + 1)
+                    $equalsNumber = ConvertFrom-EpicMergeGateSelector -Selector $token.Substring($name.Length + 1)
+                    if ($null -ne $equalsNumber) { return $equalsNumber }
                 }
                 $index += if ($script:EpicMergeGateValueFlags -ccontains $token) { 2 } else { 1 }
                 continue
