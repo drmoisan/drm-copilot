@@ -174,6 +174,87 @@ export function validateCommittedFile(
   return [];
 }
 
+/**
+ * Validate and normalize a safe repository-relative POSIX path. Empty and `.`
+ * segments are dropped and an empty result becomes `.`, as Python
+ * `PurePosixPath(value).as_posix()` does, so the readiness gate and plan
+ * pairing derive the same path in both runtimes.
+ */
+export function repositoryRelativePath(
+  value: unknown,
+  field: string,
+): { readonly path?: string; readonly errors: string[] } {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    return {
+      errors: [`${field} must be a non-empty repository-relative path.`],
+    };
+  }
+  if (value.includes("\\")) {
+    return { errors: [`${field} must use forward slashes.`] };
+  }
+  const parts = value
+    .split("/")
+    .filter((part) => part.length > 0 && part !== ".");
+  if (
+    value.startsWith("/") ||
+    /^[A-Za-z]:/.test(value) ||
+    parts.includes("..")
+  ) {
+    return { errors: [`${field} must stay within the workspace root.`] };
+  }
+  return { path: parts.length === 0 ? "." : parts.join("/"), errors: [] };
+}
+
+/** Return the `plan_path` the readiness gate derives, if any. */
+function derivedPlanPath(
+  feature: Readonly<Record<string, unknown>>,
+): string | undefined {
+  return repositoryRelativePath(feature["plan_path"], "plan_path").path;
+}
+
+type PlanEntry = readonly [number, Readonly<Record<string, unknown>>, string];
+
+/**
+ * Pair each plan with its checkpoint entry and that entry's original index.
+ * Plans are matched in order to object entries whose `plan_path` normalizes to the
+ * plan, so non-object and plan-less entries keep their positions in the
+ * checkpoint `features` array. When any plan has no such entry, the
+ * positional pairing over object entries is kept, so a caller whose plans
+ * are not drawn from the checkpoint sees unchanged behaviour.
+ */
+function pairPlansWithFeatures(
+  features: unknown,
+  plans: ReadonlyArray<string>,
+): PlanEntry[] {
+  const entries: [number, Record<string, unknown>][] = [];
+  if (Array.isArray(features)) {
+    features.forEach((item: unknown, index: number) => {
+      if (isRecord(item)) {
+        entries.push([index, item]);
+      }
+    });
+  }
+  const paired: PlanEntry[] = [];
+  let position = 0;
+  for (const plan of plans) {
+    let entry = entries[position];
+    while (entry !== undefined && derivedPlanPath(entry[1]) !== plan) {
+      position += 1;
+      entry = entries[position];
+    }
+    if (entry === undefined) {
+      return plans.map((fallbackPlan, slot): PlanEntry => [
+        slot,
+        entries[slot]?.[1] ?? {},
+        fallbackPlan,
+      ]);
+    }
+    paired.push([entry[0], entry[1], plan]);
+    position += 1;
+  }
+  return paired;
+}
+
 /** Verify integration ancestry and byte-exact committed plan provenance. */
 export function validatePlanningGitIntegrity(
   state: Readonly<Record<string, unknown>>,
@@ -202,10 +283,8 @@ export function validatePlanningGitIntegrity(
       );
     }
   }
-  const features = Array.isArray(state["features"])
-    ? state["features"].filter(isRecord)
-    : [];
-  plans.forEach((plan, index) => {
+  const pairs = pairPlansWithFeatures(state["features"], plans);
+  pairs.forEach(([index, feature, plan]) => {
     const derived = git.lastCommit(plan);
     if (derived === undefined) {
       errors.push(
@@ -220,7 +299,6 @@ export function validatePlanningGitIntegrity(
       return;
     }
     const candidates = [derived];
-    const feature = features[index] ?? {};
     const featureCommit = feature["planning_commit"];
     if (featureCommit !== undefined) {
       if (typeof featureCommit !== "string" || !COMMIT_RE.test(featureCommit)) {

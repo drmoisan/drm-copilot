@@ -64,8 +64,10 @@ const PARITY_G6 = PARITY_G5;
 /**
  * The two context-free blocking strings recorded by [P0-T13] in
  * `docs/features/active/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/baseline/plan-gate-preexisting-output.2026-08-24T00-00.md`.
- * Both are G1 findings; G1 is the only Blocking rule that decides without the
- * repository seam.
+ * Both are G1 findings; G1 is the only command-attributed Blocking rule that
+ * decides without the repository seam. The document-level G10 rule (issue
+ * #932) also runs without it, and these fixtures carry no SCRATCH definition,
+ * so G10 adds nothing here.
  */
 const EXPECTED_BLOCKING_G1 =
   "[P1-T1] --cov argument `scripts/dev_tools/foo.py` names a filesystem " +
@@ -208,8 +210,10 @@ describe("plan-gate observability boundaries", () => {
     const blockingG1 = evaluatePlanGates(PARITY_G1).blocking;
     const blockingG4 = evaluatePlanGates(PARITY_G4).blocking;
 
-    // Assert: G1 is the only Blocking rule that runs without the seam, and no
-    // new rule may leak onto the blocking channel beside it.
+    // Assert: G1 is the only command-attributed Blocking rule that runs without
+    // the seam, and no new rule may leak onto the blocking channel beside it.
+    // The document-level G10 rule also runs without the seam, but these
+    // fixtures carry no SCRATCH definition.
     expect(blockingG1).toEqual([EXPECTED_BLOCKING_G1]);
     expect(blockingG4).toEqual([]);
     for (const [name, fixture] of SEAM_REQUIRING_FIXTURES) {

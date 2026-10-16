@@ -6,8 +6,9 @@
 
 .DESCRIPTION
     Dot-sources the helper and verifies the Authoritative Helper Contract recorded in
-    docs/features/active/subagentstop-envelope-core-897/spec.md: the three-function surface, the
-    source constraints (no environment read, no import or dot-source, no success, host, information
+    docs/features/archive/subagentstop-envelope-core-897/spec.md (at
+    docs/features/active/subagentstop-envelope-core-897/ until the archive move): the three-function
+    surface, the source constraints (no environment read, no import or dot-source, no success, host, information
     or warning write), every input-to-result row, the seven-property result shape, the derived
     fields, BOM and CRLF handling, the stdin default, the anomaly-reason map, and
     Exit-SubagentStopBlock through the call-operator route over a checked-in fixture script.
