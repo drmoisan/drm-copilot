@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 HASH_RE = re.compile(r"^[0-9a-fA-F]{40,64}$")
 COMMIT_RE = re.compile(r"^[0-9a-fA-F]{7,64}$")
+DRIVE_RE = re.compile(r"^[A-Za-z]:")
 
 
 class ReadinessGitRepository(Protocol):
@@ -179,7 +180,12 @@ def repository_relative_path(
     if "\\" in value:
         return None, [f"{field} must use forward slashes."]
     path = PurePosixPath(value)
-    if path.is_absolute() or ".." in path.parts or "." in path.parts:
+    if (
+        path.is_absolute()
+        or DRIVE_RE.match(value) is not None
+        or ".." in path.parts
+        or "." in path.parts
+    ):
         return None, [f"{field} must stay within the workspace root."]
     return path.as_posix(), []
 
@@ -218,8 +224,8 @@ def _pair_plans_with_features(
             position += 1
         if position == len(entries):
             return [
-                (slot, entries[slot][1] if slot < len(entries) else {}, item)
-                for slot, item in enumerate(plans)
+                (slot, entries[slot][1] if slot < len(entries) else {}, fallback_plan)
+                for slot, fallback_plan in enumerate(plans)
             ]
         index, feature = entries[position]
         paired.append((index, feature, plan))

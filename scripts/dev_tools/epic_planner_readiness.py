@@ -170,7 +170,7 @@ def _validate_feature_files(
     if not context.file_system.is_dir(folder_path):
         errors.append(f"Execution readiness requires feature folder: {folder}")
         return plan, errors
-    if not (plan == folder or plan.startswith(f"{folder}/")):
+    if not plan.startswith(f"{folder}/"):
         errors.append(f"{prefix}.plan_path must be inside its feature_folder.")
     for name in ("issue.md", "spec.md", "user-story.md"):
         _, file_errors = _read_required(
