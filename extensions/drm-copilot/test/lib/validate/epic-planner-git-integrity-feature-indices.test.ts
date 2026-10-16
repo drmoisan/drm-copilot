@@ -98,6 +98,18 @@ describe("validatePlanningGitIntegrity original feature index", () => {
     expect(errors).toEqual([INDEX_ZERO_COMMIT_ERROR]);
   });
 
+  it("matches a dot-prefixed plan_path to its normalized plan", () => {
+    const features = [
+      "not-a-feature",
+      { plan_path: PLAN_101 },
+      { plan_path: `./${PLAN_102}`, planning_commit: "bad" },
+    ];
+
+    const errors = errorsFor(features, [PLAN_101, PLAN_102]);
+
+    expect(errors).toEqual([INDEX_TWO_COMMIT_ERROR]);
+  });
+
   it.each(emptyCases)(
     "reports no feature error for a $label features value",
     ({ features }) => {

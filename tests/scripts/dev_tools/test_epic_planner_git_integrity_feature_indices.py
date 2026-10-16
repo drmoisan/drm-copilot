@@ -131,6 +131,20 @@ def test_planning_commit_prefix_keeps_positional_pairing_without_plan_paths() ->
     assert errors == [INDEX_ZERO_COMMIT_ERROR]
 
 
+def test_planning_commit_prefix_matches_dot_prefixed_plan_path() -> None:
+    """Pair a dot-prefixed plan_path with the plan the readiness gate derives."""
+
+    features = [
+        "not-a-feature",
+        {"plan_path": PLAN_101},
+        {"plan_path": f"./{PLAN_102}", "planning_commit": "bad"},
+    ]
+
+    errors = _errors(features, [PLAN_101, PLAN_102])
+
+    assert errors == [INDEX_TWO_COMMIT_ERROR]
+
+
 @pytest.mark.parametrize("features", [[], "not-a-list"], ids=["empty", "not-list"])
 def test_plans_without_object_entries_report_no_feature_error(
     features: object,
