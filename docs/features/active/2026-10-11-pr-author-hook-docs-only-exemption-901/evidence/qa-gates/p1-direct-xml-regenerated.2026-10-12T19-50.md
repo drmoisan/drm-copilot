@@ -1,6 +1,10 @@
 # P1-T6 Direct run regenerated both result files
 
-Timestamp: 2026-10-13T11-32
+Timestamp: 2026-10-13T11-17
+TIMESTAMP_RECONSTRUCTED: true
+TIMESTAMP_ORIGINAL: 2026-10-13T11-32
+TIMESTAMP_BOUNDS_UTC: 2026-10-13T11-14 .. 2026-10-13T11-17
+TIMESTAMP_DERIVATION: lower: XML_MTIME_AFTER_EPOCH 1791890071 (2026-10-13T11:14:31Z) recorded in this file; upper: committer time of ff1b7cbd4 confirmed in the #927 pa-n3-commit-confirmation evidence
 Command: test -f SCRATCHPAD/issue-901-direct-run-start.marker
 EXIT_CODE: 0
 CMD2_EXIT_CODE: 0 (test -f SCRATCHPAD/issue-901-plan-start.marker)
