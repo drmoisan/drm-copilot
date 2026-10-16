@@ -12,19 +12,46 @@
     state. This file is not mirrored under extensions/drm-copilot/resources/.
 #>
 
+function Get-EpicStateIsolationPattern {
+    # Pure (issue #935, CR-N2): the shared regular-expression patterns of the hook-reference helpers.
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)] [ValidateSet('HookLiteral', 'Leaf', 'HooksRoot', 'ExpandableLeaf')] [string] $Name
+    )
+    switch ($Name) {
+        'HookLiteral' { '(?<![A-Za-z0-9_-])hooks/(?<name>[A-Za-z0-9._-]+\.ps1)' }
+        'Leaf' { '^(?!.*\.Tests\.ps1$)[A-Za-z0-9._-]+\.ps1$' }
+        'HooksRoot' { '(^|[\\/])hooks[\\/]?$' }
+        'ExpandableLeaf' { '^\$\{?(?<var>[A-Za-z_][A-Za-z0-9_]*(:[A-Za-z_][A-Za-z0-9_]*)?)\}?[\\/](?<leaf>[^\\/]+)$' }
+    }
+}
+
+function Get-EpicStateIsolationStringNode {
+    # Pure (issue #935, CR-N2): the string-constant and expandable-string nodes under Node, in FindAll order.
+    [CmdletBinding()]
+    [OutputType([System.Management.Automation.Language.Ast])]
+    param(
+        [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $Node,
+        [bool] $SearchNestedScriptBlock = $true
+    )
+    $isString = {
+        param($candidate)
+        $candidate -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
+        $candidate -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
+    }
+    foreach ($candidate in $Node.FindAll($isString, $SearchNestedScriptBlock)) { $candidate }
+}
+
 function Test-EpicStateIsolationHookLiteral {
     # Pure: true when an AST holds a string literal that names a hook script, hooks/<name>.ps1,
     # other than the EpicStateIsolation helper files and other than a test file path.
     [OutputType([bool])]
     param([AllowNull()] [System.Management.Automation.Language.Ast] $Node)
     if ($null -eq $Node) { return $false }
-    $isLiteral = {
-        param($candidate)
-        $candidate -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
-        $candidate -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
-    }
-    foreach ($literal in $Node.FindAll($isLiteral, $true)) {
-        foreach ($match in [regex]::Matches([string]$literal.Value, '(?<![A-Za-z0-9_-])hooks/(?<name>[A-Za-z0-9._-]+\.ps1)')) {
+    $hookLiteralPattern = Get-EpicStateIsolationPattern -Name HookLiteral
+    foreach ($literal in @(Get-EpicStateIsolationStringNode -Node $Node)) {
+        foreach ($match in [regex]::Matches([string]$literal.Value, $hookLiteralPattern)) {
             $name = $match.Groups['name'].Value
             if ($name.StartsWith('EpicStateIsolation.', [System.StringComparison]::Ordinal)) { continue }
             if ($name.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)) { continue }
@@ -51,21 +78,8 @@ function Test-EpicStateIsolationVariableBoundToHook {
         [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst,
         [Parameter(Mandatory)] [string] $Key
     )
-    $isAssignment = { param($candidate) $candidate -is [System.Management.Automation.Language.AssignmentStatementAst] }
-    foreach ($assignment in $SuiteAst.FindAll($isAssignment, $true)) {
-        $left = $assignment.Left
-        if ($left -is [System.Management.Automation.Language.ConvertExpressionAst]) { $left = $left.Child }
-        if ($left -isnot [System.Management.Automation.Language.VariableExpressionAst]) { continue }
-        if ((Get-EpicStateIsolationVariableKey -UserPath $left.VariablePath.UserPath) -ne $Key) { continue }
-        if (Test-EpicStateIsolationHookLiteral -Node $assignment.Right) { return $true }
-    }
-    $isHashtable = { param($candidate) $candidate -is [System.Management.Automation.Language.HashtableAst] }
-    foreach ($table in $SuiteAst.FindAll($isHashtable, $true)) {
-        foreach ($pair in $table.KeyValuePairs) {
-            $keyText = Get-EpicStateIsolationElementText -Element $pair.Item1
-            if ($null -eq $keyText -or $keyText.ToLowerInvariant() -ne $Key) { continue }
-            if (Test-EpicStateIsolationHookLiteral -Node $pair.Item2) { return $true }
-        }
+    foreach ($bound in @(Get-EpicStateIsolationVariableBinding -SuiteAst $SuiteAst -Key $Key)) {
+        if (Test-EpicStateIsolationHookLiteral -Node $bound) { return $true }
     }
     return $false
 }
@@ -102,14 +116,10 @@ function Test-EpicStateIsolationHooksRootBinding {
         [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst,
         [Parameter(Mandatory)] [string] $Key
     )
-    $isLiteral = {
-        param($candidate)
-        $candidate -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
-        $candidate -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
-    }
+    $hooksRootPattern = Get-EpicStateIsolationPattern -Name HooksRoot
     foreach ($bound in @(Get-EpicStateIsolationVariableBinding -SuiteAst $SuiteAst -Key $Key)) {
-        foreach ($literal in $bound.FindAll($isLiteral, $true)) {
-            if ([regex]::IsMatch([string]$literal.Value, '(^|[\\/])hooks[\\/]?$')) { return $true }
+        foreach ($literal in @(Get-EpicStateIsolationStringNode -Node $bound)) {
+            if ([regex]::IsMatch([string]$literal.Value, $hooksRootPattern)) { return $true }
         }
     }
     return $false
@@ -167,10 +177,12 @@ function Test-EpicStateIsolationHookReference {
     )
     if ($null -eq $Node) { return $false }
     if (Test-EpicStateIsolationHookLiteral -Node $Node) { return $true }
-    $leafPattern = '^(?!.*\.Tests\.ps1$)[A-Za-z0-9._-]+\.ps1$'
+    $leafPattern = Get-EpicStateIsolationPattern -Name Leaf
+    $expandablePattern = Get-EpicStateIsolationPattern -Name ExpandableLeaf
+    $hooksRootPattern = Get-EpicStateIsolationPattern -Name HooksRoot
     $isExpandable = { param($candidate) $candidate -is [System.Management.Automation.Language.ExpandableStringExpressionAst] }
     foreach ($string in $Node.FindAll($isExpandable, $true)) {
-        $match = [regex]::Match([string]$string.Value, '^\$\{?(?<var>[A-Za-z_][A-Za-z0-9_]*(:[A-Za-z_][A-Za-z0-9_]*)?)\}?[\\/](?<leaf>[^\\/]+)$')
+        $match = [regex]::Match([string]$string.Value, $expandablePattern)
         if (-not $match.Success -or $match.Groups['leaf'].Value -notmatch $leafPattern) { continue }
         if (Test-EpicStateIsolationHooksRootBinding -SuiteAst $SuiteAst -Key (Get-EpicStateIsolationVariableKey -UserPath $match.Groups['var'].Value)) { return $true }
     }
@@ -180,7 +192,7 @@ function Test-EpicStateIsolationHookReference {
         $part = Get-EpicStateIsolationJoinPathPart -Command $command
         $segment = @(Get-EpicStateIsolationJoinPathSegment -Part $part)
         $count = $segment.Count
-        if ($count -ge 2 -and [string]$segment[$count - 1] -match $leafPattern -and [regex]::IsMatch([string]$segment[$count - 2], '(^|[\\/])hooks[\\/]?$')) { return $true }
+        if ($count -ge 2 -and [string]$segment[$count - 1] -match $leafPattern -and [regex]::IsMatch([string]$segment[$count - 2], $hooksRootPattern)) { return $true }
         $childIsLeaf = $part.ChildPath -is [System.Management.Automation.Language.StringConstantExpressionAst] -and [string]$part.ChildPath.Value -match $leafPattern
         if (-not $childIsLeaf -or $null -eq $part.Path -or $part.Additional.Count -gt 0) { continue }
         foreach ($variable in $part.Path.FindAll($isVariable, $true)) {
@@ -230,12 +242,7 @@ function Test-EpicStateIsolationHelperDotSource {
         [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst
     )
     if (Test-EpicStateIsolationHookReference -Node $Command -SuiteAst $SuiteAst) { return $false }
-    $isLiteral = {
-        param($candidate)
-        $candidate -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
-        $candidate -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
-    }
-    foreach ($literal in $Command.FindAll($isLiteral, $true)) {
+    foreach ($literal in @(Get-EpicStateIsolationStringNode -Node $Command)) {
         $leaf = @([string]$literal.Value -split '[\\/]')[-1]
         if ($leaf -cmatch '\.Helpers\.ps1$') { return $true }
     }
@@ -267,32 +274,30 @@ function Get-EpicStateIsolationReferenceRecord {
         [Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $SuiteAst
     )
     if ($null -eq $Node -or $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]) { return }
-    $leafPattern = '^(?!.*\.Tests\.ps1$)[A-Za-z0-9._-]+\.ps1$'
-    $hooksPattern = '(^|[\\/])hooks[\\/]?$'
-    $isLiteral = {
-        param($candidate)
-        $candidate -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
-        $candidate -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
-    }
+    $leafPattern = Get-EpicStateIsolationPattern -Name Leaf
+    $hooksPattern = Get-EpicStateIsolationPattern -Name HooksRoot
+    $hookLiteralPattern = Get-EpicStateIsolationPattern -Name HookLiteral
+    $expandablePattern = Get-EpicStateIsolationPattern -Name ExpandableLeaf
     $isVariable = { param($candidate) $candidate -is [System.Management.Automation.Language.VariableExpressionAst] }
     $rootOf = {
         param([string] $Key)
         foreach ($bound in @(Get-EpicStateIsolationVariableBinding -SuiteAst $SuiteAst -Key $Key)) {
-            foreach ($text in @($bound.FindAll($isLiteral, $true) | ForEach-Object { [string]$_.Value })) {
+            foreach ($text in @(Get-EpicStateIsolationStringNode -Node $bound | ForEach-Object { [string]$_.Value })) {
                 if ([regex]::IsMatch($text, $hooksPattern)) { return (Get-EpicStateIsolationHookRoot -Text $text) }
             }
         }
         return $null
     }
-    foreach ($literal in $Node.FindAll($isLiteral, $false)) {
+    $hooksSegmentLength = 'hooks'.Length
+    foreach ($literal in @(Get-EpicStateIsolationStringNode -Node $Node -SearchNestedScriptBlock $false)) {
         $value = [string]$literal.Value
-        foreach ($match in [regex]::Matches($value, '(?<![A-Za-z0-9_-])hooks/(?<name>[A-Za-z0-9._-]+\.ps1)')) {
+        foreach ($match in [regex]::Matches($value, $hookLiteralPattern)) {
             $name = $match.Groups['name'].Value
             if ($name.StartsWith('EpicStateIsolation.', [System.StringComparison]::Ordinal) -or $name.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)) { continue }
-            [pscustomobject]@{ Name = $name; Form = 'Literal'; Root = (Get-EpicStateIsolationHookRoot -Text $value.Substring(0, $match.Index + 5)) }
+            [pscustomobject]@{ Name = $name; Form = 'Literal'; Root = (Get-EpicStateIsolationHookRoot -Text $value.Substring(0, $match.Index + $hooksSegmentLength)) }
         }
         if ($literal -isnot [System.Management.Automation.Language.ExpandableStringExpressionAst]) { continue }
-        $match = [regex]::Match($value, '^\$\{?(?<var>[A-Za-z_][A-Za-z0-9_]*(:[A-Za-z_][A-Za-z0-9_]*)?)\}?[\\/](?<leaf>[^\\/]+)$')
+        $match = [regex]::Match($value, $expandablePattern)
         if (-not $match.Success) { continue }
         $key = Get-EpicStateIsolationVariableKey -UserPath $match.Groups['var'].Value
         if (-not (Test-EpicStateIsolationHooksRootBinding -SuiteAst $SuiteAst -Key $key)) { continue }
