@@ -124,9 +124,13 @@ def find_npm_token_assignments(text: str) -> list[int]:
     A YAML mapping key (block, flow, or quoted) and a shell or PowerShell
     assignment are reported whichever secret feeds them. An append is also
     reported (issue #933): a bash ``NPM_TOKEN+=x``, an ``export NPM_TOKEN+=x``,
-    and a PowerShell ``$env:NPM_TOKEN += 'x'``. A context read
-    (``secrets.NPM_TOKEN``, ``env.NPM_TOKEN``), an ``==`` comparison, an
-    ``+==`` sequence, a longer or prefixed name, and prose without ``:``,
+    and a PowerShell ``$env:NPM_TOKEN += 'x'``. A dot- or hyphen-prefixed ``=``
+    or ``+=`` assignment such as ``env.NPM_TOKEN += x`` or ``MY-NPM_TOKEN+=x``
+    is also reported, because the assignment form needs only a word boundary
+    before the name. A context read without an assignment operator
+    (``secrets.NPM_TOKEN``, or ``env.NPM_TOKEN`` in an expression), an ``==``
+    comparison, an ``+==`` sequence, a name extended by a letter, digit, or
+    underscore (``NPM_TOKEN_V2``, ``MY_NPM_TOKEN``), and prose without ``:``,
     ``=``, or ``+=`` after the name are not reported.
 
     Args:
