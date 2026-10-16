@@ -5,8 +5,8 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - Epic issue: #904
 - Integration branch: `epic/subagentstop-envelope-integration`
 - Current wave: 1
-- Next step: `E8_collect_pr_context_and_open_integration_pr`
-- Last updated: 2026-10-12T12:39:27Z
+- Next step: `DONE (deferred: removal of harness-locked child worktrees; operator rule 'delete nothing')`
+- Last updated: 2026-10-12T13:03:00Z
 
 ## Waves
 
@@ -26,7 +26,8 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 
 ## Integration PR
 
-- Not opened.
+- PR: #910
+- Merge commit: 049d56e34307a035570acf1d74744b56121474da
 
 ## Child Starts and Throttle Log
 
@@ -44,3 +45,5 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json` `
 - 2026-10-12T09:37Z: E3 (905) PR 908 merged (8450a904, 20/20 checks). E4 (896) held until GO.
 - 2026-10-12T09:39Z: GO for E4. Started E4 (896) resume in its resume worktree (amendment v1.8, preflight, integration merge, execution from P4-T4).
 - 2026-10-12T12:39Z: E4 (896) PR 909 merged (c9610481, 20/20 checks). All four children merged; preparing integration PR to main.
+- 2026-10-12T12:42Z: integration PR 910 opened (main <- epic/subagentstop-envelope-integration, head 83821c95).
+- 2026-10-12T13:01Z: integration PR 910 merged into main (049d56e3, 20/20 checks). Issues 897, 905, 896 closed.
