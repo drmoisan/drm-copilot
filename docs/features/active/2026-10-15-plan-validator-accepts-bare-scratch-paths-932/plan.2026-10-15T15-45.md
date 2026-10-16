@@ -45,54 +45,54 @@ This plan must itself pass G10. It therefore quotes no bare SCRATCH definition o
 
 All Phase 0 commands are read-only check modes, except [P0-T10], which installs untracked dependencies under `extensions/drm-copilot/node_modules/` when they are absent and changes no tracked file. No write-mode formatter runs before every baseline artifact in this phase exists.
 
-- [ ] [P0-T1] Read the policy files in policy-compliance order and record them in `<FEATURE>/evidence/baseline/phase0-instructions-read.<timestamp>.md`
+- [x] [P0-T1] Read the policy files in policy-compliance order and record them in `<FEATURE>/evidence/baseline/phase0-instructions-read.<timestamp>.md`
   - Files, in order: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`, `.claude/rules/typescript.md`, `.claude/rules/typescript-suppressions.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/plan-acceptance-gates.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and a list naming all nine files in that order.
-- [ ] [P0-T2] Record the git baseline in `<FEATURE>/evidence/baseline/git-baseline.<timestamp>.md`
+- [x] [P0-T2] Record the git baseline in `<FEATURE>/evidence/baseline/git-baseline.<timestamp>.md`
   - Commands: `git fetch origin main`, `git rev-parse HEAD`, `git merge-base origin/main HEAD`, `git status --porcelain`.
   - Acceptance: the artifact records each command with its `EXIT_CODE:` (all 0), the HEAD SHA, the merge-base SHA under the label `MERGE_BASE:`, and the porcelain output (expected empty).
-- [ ] [P0-T3] Create the scratch directories `SCRATCH/cov/` and `SCRATCH/g10/` and record their creation in `<FEATURE>/evidence/baseline/scratch-setup.<timestamp>.md`
+- [x] [P0-T3] Create the scratch directories `SCRATCH/cov/` and `SCRATCH/g10/` and record their creation in `<FEATURE>/evidence/baseline/scratch-setup.<timestamp>.md`
   - Method: the Write tool writes a one-line `README.txt` (content: `Issue 932 scratch directory; not committed.`) to `SCRATCH/cov/README.txt` and to `SCRATCH/g10/README.txt`, with `SCRATCH` resolved to its absolute path for the tool call only. The Write tool creates the missing parent directories. No shell command is used.
   - Acceptance: the Glob tool with pattern `*/README.txt` rooted at the resolved `SCRATCH` directory returns exactly the two files `cov/README.txt` and `g10/README.txt`; the artifact records the method, the two relative results, and uses the token `SCRATCH` only.
-- [ ] [P0-T4] Capture the Python format baseline in `<FEATURE>/evidence/baseline/python-format-baseline.<timestamp>.md`
+- [x] [P0-T4] Capture the Python format baseline in `<FEATURE>/evidence/baseline/python-format-baseline.<timestamp>.md`
   - Command: `poetry run black --check scripts/dev_tools/plan_gate_discrimination.py tests/scripts/dev_tools/test_plan_gate_parity.py tests/scripts/dev_tools/test_scratch_location_contracts.py tests/scripts/dev_tools/test_plan_gate_observability_boundaries.py`
   - Acceptance: artifact fields present; `Output Summary:` quotes the black summary line (for example `4 files would be left unchanged.`) and the observed exit code, whatever it is.
-- [ ] [P0-T5] Capture the Python lint baseline in `<FEATURE>/evidence/baseline/python-lint-baseline.<timestamp>.md`
+- [x] [P0-T5] Capture the Python lint baseline in `<FEATURE>/evidence/baseline/python-lint-baseline.<timestamp>.md`
   - Command: `poetry run ruff check --no-fix scripts/dev_tools/plan_gate_discrimination.py tests/scripts/dev_tools/test_plan_gate_parity.py tests/scripts/dev_tools/test_scratch_location_contracts.py tests/scripts/dev_tools/test_plan_gate_observability_boundaries.py`
   - Acceptance: artifact fields present; `Output Summary:` quotes either `All checks passed!` or the diagnostic count.
-- [ ] [P0-T6] Capture the Python type-check baseline in `<FEATURE>/evidence/baseline/python-typecheck-baseline.<timestamp>.md`
+- [x] [P0-T6] Capture the Python type-check baseline in `<FEATURE>/evidence/baseline/python-typecheck-baseline.<timestamp>.md`
   - Command: `poetry run pyright scripts/dev_tools/plan_gate_discrimination.py tests/scripts/dev_tools/test_plan_gate_parity.py tests/scripts/dev_tools/test_scratch_location_contracts.py tests/scripts/dev_tools/test_plan_gate_observability_boundaries.py`
   - Acceptance: artifact fields present; `Output Summary:` quotes the pyright summary line (`N errors, N warnings, N informations`).
-- [ ] [P0-T7] Capture the Python coverage baseline for `scripts.dev_tools.plan_gate_discrimination` in `<FEATURE>/evidence/baseline/python-coverage-baseline.<timestamp>.md`
+- [x] [P0-T7] Capture the Python coverage baseline for `scripts.dev_tools.plan_gate_discrimination` in `<FEATURE>/evidence/baseline/python-coverage-baseline.<timestamp>.md`
   - Command: `poetry run pytest tests/scripts/dev_tools/test_plan_gate_parity.py tests/scripts/dev_tools/test_plan_gate_commands.py tests/scripts/dev_tools/test_plan_gate_discrimination_context.py tests/scripts/dev_tools/test_plan_gate_discrimination_cov.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_observability.py tests/scripts/dev_tools/test_plan_gate_observability_boundaries.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_validate_orchestration_artifacts_plan_gates.py --cov=scripts.dev_tools.plan_gate_discrimination --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/cov/baseline-py.json`
   - Acceptance: `Output Summary:` records the pytest pass/fail counts, the `term-missing` table row for `plan_gate_discrimination.py` (Stmts, Miss, Branch, BrPart, Cover, Missing), and numeric line coverage (`covered_lines / num_statements`) and branch coverage (`covered_branches / num_branches`) read from that file's `summary` object in `SCRATCH/cov/baseline-py.json`. The artifact also lists the file's `missing_lines` and `missing_branches` for the changed-line comparison in [P6-T4].
-- [ ] [P0-T8] Capture the contract-suite baseline in `<FEATURE>/evidence/baseline/python-contract-baseline.<timestamp>.md`
+- [x] [P0-T8] Capture the contract-suite baseline in `<FEATURE>/evidence/baseline/python-contract-baseline.<timestamp>.md`
   - Command: `poetry run pytest tests/scripts/dev_tools/test_scratch_location_contracts.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_codex_agent_wrapper_contracts.py tests/scripts/dev_tools/test_codex_handoff_contract_parity.py tests/scripts/dev_tools/test_generate_codex_agent_variants.py tests/scripts/dev_tools/test_codex_agent_role_schema.py tests/scripts/dev_tools/test_claude_rules_frontmatter.py`
   - Acceptance: `Output Summary:` records pass/fail counts and every failing node ID with its first failure line; a #510 failure is labelled as such.
-- [ ] [P0-T9] Capture the broad dev-tools regression baseline in `<FEATURE>/evidence/baseline/python-devtools-baseline.<timestamp>.md`
+- [x] [P0-T9] Capture the broad dev-tools regression baseline in `<FEATURE>/evidence/baseline/python-devtools-baseline.<timestamp>.md`
   - Command: `poetry run pytest tests/scripts/dev_tools -q -p no:cacheprovider`
   - Acceptance: `Output Summary:` records the pass/fail/error/skip counts and lists every failing or erroring node ID (the reference set for [P6-T6]).
-- [ ] [P0-T10] Install the extension's locked npm dependencies in `extensions/drm-copilot/node_modules/` only when they are missing, and record `<FEATURE>/evidence/baseline/npm-dependencies.<timestamp>.md`
+- [x] [P0-T10] Install the extension's locked npm dependencies in `extensions/drm-copilot/node_modules/` only when they are missing, and record `<FEATURE>/evidence/baseline/npm-dependencies.<timestamp>.md`
   - Presence probe: the Glob tool with pattern `extensions/drm-copilot/node_modules/jest/package.json` (repository root).
   - Skip branch (explicitly authorized): when the probe returns that file, no install command runs; the artifact records `NPM_CI: not required`, the probe result, and `EXIT_CODE: 0` for the probe.
   - Install branch: when the probe returns no file, run `npm ci --prefix extensions/drm-copilot --no-audit --no-fund` from the repository root (the `--prefix` form avoids a `cd` chain), then repeat the probe, then run `git status --porcelain -- extensions/drm-copilot/package.json extensions/drm-copilot/package-lock.json`. Route note: `npm ci` is not among the `Bash(...)` patterns in the `.claude/agents/atomic-executor.md` frontmatter (which lists only `npx prettier`, `npx eslint`, `npx tsc`, and `npx jest` for Node), and no generic `npx` pattern exists there that could carry an install. The command contains no token blocked by `.claude/hooks/validate-bash.ps1` and no `cd` chain; whether the tool layer accepts it is determined when the command runs, and the BLOCKED branch below covers refusal. If the tool layer refuses the command, the task stops with `BLOCKED: npm ci refused` in the artifact and the executor reports it to the caller; it does not continue to [P0-T11] without dependencies.
   - Acceptance (install branch): `npm ci` records `EXIT_CODE: 0`; the repeated probe returns `extensions/drm-copilot/node_modules/jest/package.json`; the porcelain command prints nothing (no tracked file changed). `Output Summary:` records the npm `added N packages` line, the probe result before and after, and the empty porcelain output.
-- [ ] [P0-T11] Capture the TypeScript format baseline in `<FEATURE>/evidence/baseline/ts-format-baseline.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P0-T11] Capture the TypeScript format baseline in `<FEATURE>/evidence/baseline/ts-format-baseline.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"`
   - Acceptance: `Output Summary:` quotes either `All matched files use Prettier code style!` or the list of files reported with warnings.
-- [ ] [P0-T12] Capture the TypeScript lint baseline in `<FEATURE>/evidence/baseline/ts-lint-baseline.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P0-T12] Capture the TypeScript lint baseline in `<FEATURE>/evidence/baseline/ts-lint-baseline.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx eslint --no-error-on-unmatched-pattern src test`
   - Acceptance: artifact fields present; `Output Summary:` records the error and warning counts (zero output on a clean run is recorded as `0 errors, 0 warnings`).
-- [ ] [P0-T13] Capture the TypeScript production type-check baseline in `<FEATURE>/evidence/baseline/ts-typecheck-baseline.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P0-T13] Capture the TypeScript production type-check baseline in `<FEATURE>/evidence/baseline/ts-typecheck-baseline.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx tsc -p ./ --noEmit`
   - Acceptance: artifact fields present; `Output Summary:` records the diagnostic count (no output on success).
-- [ ] [P0-T14] Capture the TypeScript test type-check baseline in `<FEATURE>/evidence/baseline/ts-typecheck-test-baseline.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P0-T14] Capture the TypeScript test type-check baseline in `<FEATURE>/evidence/baseline/ts-typecheck-test-baseline.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx tsc -p tsconfig.jest.json --noEmit`
   - Acceptance: artifact fields present; `Output Summary:` records the diagnostic count.
-- [ ] [P0-T15] Capture the full jest coverage baseline in `<FEATURE>/evidence/baseline/ts-coverage-baseline.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P0-T15] Capture the full jest coverage baseline in `<FEATURE>/evidence/baseline/ts-coverage-baseline.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx jest --config jest.config.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary --coverageReporters=json-summary`
   - Acceptance: `Output Summary:` records the suite and test pass/fail counts, the `text-summary` totals, every failing suite, any coverage-threshold message, and the `lines.pct` and `branches.pct` values for `src/lib/validate/plan-gate-discrimination.ts` read from `extensions/drm-copilot/coverage/coverage-summary.json`. The artifact also lists the zero-hit `DA:` line numbers for that file read from `extensions/drm-copilot/coverage/lcov.info` (input to [P6-T11]).
-- [ ] [P0-T16] Commit and push the Phase 0 evidence under `<FEATURE>/evidence/baseline/` together with the plan check-offs
+- [x] [P0-T16] Commit and push the Phase 0 evidence under `<FEATURE>/evidence/baseline/` together with the plan check-offs
   - Commands: `git add <FEATURE>/evidence/baseline <FEATURE>/plan.2026-10-15T15-45.md` (with the concrete folder path), `git commit -m "docs(932): record phase 0 baselines"`, `git push origin HEAD`.
   - Acceptance: `git status --porcelain` prints nothing after the push; the push exits 0.
 
