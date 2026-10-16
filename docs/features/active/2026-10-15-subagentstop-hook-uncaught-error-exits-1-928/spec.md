@@ -216,8 +216,8 @@ Seeded from issue:
 - [x] AC11: The stale SubagentStop "transport and exit-code defect" statements in `.claude/skills/epic-orchestrate/SKILL.md` (lines 279-281), `.claude/agents/epic-orchestrator.md` (lines 133-135), and `.claude/hooks/enforce-epic-wave-barrier.ps1` (comment lines 34-35), and the "SubagentStop, exit 1" row in `.agents/skills/translate-claude-to-codex/SKILL.md` (line 285), are corrected to describe exit-2 blocking, together with their bundle mirrors listed in Documentation Corrections; `enforce-epic-wave-barrier.ps1` has no non-comment change.
 - [x] AC12: No file under `.codex/` or `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/` is changed, and no registration in `.claude/settings.json`, `.claude/agents/*.md` frontmatter, or `core.json` is changed.
 - [x] AC13: Existing suites still pass, including `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1` (S1 structural shape), `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1` (B1-B4), and `tests/scripts/claude-runtime/claude-settings.Tests.ps1`.
-- [ ] AC14: PoshQC format, analyze, and test (via the `mcp__drm-copilot__run_poshqc_*` tools) pass with zero analyzer errors, and line coverage for changed PowerShell under `.claude/hooks` is >= 85%.
-- [ ] AC15: CI on the PR head reports success for `poshqc / PowerShell QC` (windows coverage job) and `poshqc / PowerShell hook suites (Linux)` (Pester over `tests/scripts/claude-hooks`), and for the pytest job running the bundle-parity tests. (CI-dependent; checked off at S9.)
+- [x] AC14: PoshQC format, analyze, and test (via the `mcp__drm-copilot__run_poshqc_*` tools) pass with zero analyzer errors, and line coverage for changed PowerShell under `.claude/hooks` is >= 85%.
+- [x] AC15: CI on the PR head reports success for `poshqc / PowerShell QC` (windows coverage job) and `poshqc / PowerShell hook suites (Linux)` (Pester over `tests/scripts/claude-hooks`), and for the pytest job running the bundle-parity tests. (CI-dependent; checked off at S9.)
 - [x] AC16: Every changed or added production, test, or script file is at most 500 lines.
 
 ## Files In Scope
