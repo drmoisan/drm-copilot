@@ -379,7 +379,7 @@ function Get-EpicStateIsolationFinding {
         $dotSource = Get-EpicStateIsolationHookDotSource -DotSource $dotSources -SuiteAst $Ast
         # R2 (issue #935): a block whose dot-sources are all test-helper loads is anchored at the last one.
         $helperOnly = $dotSources.Count -gt 0 -and $null -eq $dotSource -and
-            @($dotSources | Where-Object { -not (Test-EpicStateIsolationHelperDotSource -Command $_ -SuiteAst $Ast) }).Count -eq 0
+        @($dotSources | Where-Object { -not (Test-EpicStateIsolationHelperDotSource -Command $_ -SuiteAst $Ast) }).Count -eq 0
         if ($dotSources.Count -gt 0 -and $null -eq $dotSource -and -not $helperOnly) { 'no dot-source loads the hook' }
         $anchor = if ($helperOnly) { $dotSources[-1] } else { $dotSource }
 
