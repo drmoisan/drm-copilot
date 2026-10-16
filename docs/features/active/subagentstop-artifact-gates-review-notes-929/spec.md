@@ -216,7 +216,7 @@ NB-3 (R4 trim-only tokens):
 NB-4 (shared envelope helper):
 - [x] AC-07: `tests/scripts/claude-hooks/SubagentStopEnvelope.Helpers.ps1` exists, defines `function ConvertTo-SubagentStopEnvelopeJson` with an `AgentType` parameter defaulting to `general-purpose`, and contains no `SuppressMessageAttribute` (`Select-String -Path tests/scripts/claude-hooks/SubagentStopEnvelope.Helpers.ps1 -Pattern 'SuppressMessageAttribute'` returns no match).
 - [x] AC-08: each of the seven suites `validate-prd-feature-output.Tests.ps1`, `validate-prd-feature-output.Coverage.Tests.ps1`, `validate-task-researcher-output.Tests.ps1`, `validate-task-researcher-output.Coverage.Tests.ps1`, `validate-pr-author-output.Tests.ps1`, `validate-pr-author-output.Coverage.Tests.ps1` and `validate-discovery-artifact-gate.Tests.ps1` under `tests/scripts/claude-hooks/` contains the line fragment `Join-Path $PSScriptRoot 'SubagentStopEnvelope.Helpers.ps1'`, and each suite passes.
-- [ ] AC-09: `git grep -n "New-SubagentStopEnvelopeJson" -- tests` and `git grep -n "Builds and returns envelope JSON text only" -- tests` each return no match after the final rebase on `main`, including any call site introduced by #928.
+- [x] AC-09: `git grep -n "New-SubagentStopEnvelopeJson" -- tests` and `git grep -n "Builds and returns envelope JSON text only" -- tests` each return no match after the final rebase on `main`, including any call site introduced by #928.
 - [x] AC-10: the NB-4 conversion is committed after every other implementation commit of this item (verified from `git log --reverse main..HEAD`), and the plan records the #928 sequencing check result.
 
 NB-5 (alias removal; only production edit):
