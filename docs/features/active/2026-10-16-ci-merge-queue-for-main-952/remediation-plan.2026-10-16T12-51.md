@@ -1,9 +1,5 @@
 # 2026-10-16-ci-merge-queue-for-main (Remediation Plan, cycle 1)
 
-DIRECTIVE: PREFLIGHT VALIDATION ONLY
-
-The directive line above serves preflight rounds only. The orchestrator deletes the directive line and this paragraph (ORCH-R0) before delegating execution, because the executor stop hook `.claude/hooks/validate-executor-output.ps1` selects preflight mode from the plan file (`:97`).
-
 - **Issue:** #952
 - **Parent (optional):** none
 - **Owner:** drmoisan
