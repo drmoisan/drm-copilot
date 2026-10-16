@@ -12,8 +12,9 @@
     reason may be DOCS_ONLY_EXEMPTION_PR_UNRESOLVED. A blank RepositoryRoot denies at M2
     before any process starts. The hook never fetches; --match-head-commit, when present,
     must equal headRefOid (OD-2). Residual limits: an ambient GH_REPO or GH_HOST is not
-    visible in the command text, a push after the lookup can change the head unless
-    --match-head-commit is passed, and the control is policy-level, not cryptographic.
+    visible in the command text; gh and git run in the repository root, so a cd made by an
+    earlier shell call is not visible either; a push after the lookup can change the head
+    unless --match-head-commit is passed; and the control is policy-level, not cryptographic.
 #>
 [CmdletBinding()]
 param()

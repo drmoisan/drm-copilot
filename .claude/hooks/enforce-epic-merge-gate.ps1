@@ -41,9 +41,10 @@
     the deny gains " (docs-only exemption not applied: <Reason>)", where the reason may be
     DOCS_ONLY_EXEMPTION_PR_UNRESOLVED. The hook never fetches; --match-head-commit, when
     present, must equal headRefOid (OD-2). Residual limits: an ambient GH_REPO or GH_HOST is
-    not visible in the command text, and a push after the lookup can change the head unless
-    --match-head-commit is passed. Like the receipt mechanism of enforce-pr-author-skill.ps1,
-    this is a policy-level control, not a cryptographic one.
+    not visible in the command text; gh and git run in the session worktree root, so a cd
+    made by an earlier Bash call is not visible either; and a push after the lookup can
+    change the head unless --match-head-commit is passed. Like the receipt mechanism of
+    enforce-pr-author-skill.ps1, this is a policy-level control, not a cryptographic one.
 
     Issue #690: with an explicit PR number, the epic and parallel checkpoints are read
     beneath the live worktree whose run checkpoint records that number. Issue #850: with
