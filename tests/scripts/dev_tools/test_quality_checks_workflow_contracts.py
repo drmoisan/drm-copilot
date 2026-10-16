@@ -24,6 +24,7 @@ THRESHOLD_CHECKER_MODULE = "check_python_coverage_thresholds"
 MIN_LINE_FLOOR = "85"
 MIN_BRANCH_FLOOR = "75"
 CODECOV_ACTION = "codecov/codecov-action"
+RUN_HEAVY_GATE = "${{ inputs.run-heavy }}"
 
 
 def read_repo_text(relative_path: str) -> str:
@@ -134,13 +135,18 @@ def test_threshold_step_invokes_the_checker_with_both_floors() -> None:
 def test_threshold_step_runs_on_every_matrix_leg() -> None:
     """The enforcement step must not be conditioned onto one matrix leg.
 
-    Scenario: the step running the threshold checker is inspected for a
-    condition key, per decision D3 of the spec. Expected outcome: the step
-    mapping carries no ``if`` key.
+    Scenario: the step running the threshold checker is inspected for its
+    condition, per decision D3 of the spec. The only permitted condition is the
+    issue #962 run-heavy gate, whose value is the same on every matrix leg.
+    Expected outcome: the step's ``if`` value equals the run-heavy gate exactly;
+    an absent key or any other condition fails.
     """
     step = step_running(THRESHOLD_CHECKER_MODULE)
 
-    assert "if" not in step
+    assert step.get("if") == RUN_HEAVY_GATE, (
+        "the threshold step must carry exactly the run-heavy gate, found "
+        f"{step.get('if')!r}"
+    )
 
 
 def test_codecov_step_uses_the_declared_files_input() -> None:

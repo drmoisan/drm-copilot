@@ -2,7 +2,19 @@ name: drm-copilot Extension Tests (reusable)
 
 on:
   workflow_call:
+    inputs:
+      run-heavy:
+        description: "Run the heavy steps. ci.yml passes false only for a docs-only change scope."
+        required: false
+        type: boolean
+        default: true
   workflow_dispatch:
+    inputs:
+      run-heavy:
+        description: "Run the heavy steps. ci.yml passes false only for a docs-only change scope."
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   drm-copilot-extension-tests:
@@ -14,9 +26,11 @@ jobs:
 
     steps:
       - name: Check out repository
+        if: ${{ inputs.run-heavy }}
         uses: actions/checkout@v7
 
       - name: Set up Node.js
+        if: ${{ inputs.run-heavy }}
         uses: actions/setup-node@v7
         with:
           node-version: "20"
@@ -24,10 +38,13 @@ jobs:
           cache-dependency-path: extensions/drm-copilot/package-lock.json
 
       - name: Install extension dependencies
+        if: ${{ inputs.run-heavy }}
         run: npm --prefix extensions/drm-copilot ci
 
       - name: Type-check extension source and test tree
+        if: ${{ inputs.run-heavy }}
         run: npm --prefix extensions/drm-copilot run typecheck
 
       - name: Run extension unit/integration tests
+        if: ${{ inputs.run-heavy }}
         run: npm --prefix extensions/drm-copilot run test

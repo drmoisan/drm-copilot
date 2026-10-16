@@ -370,22 +370,22 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   - No test creates temporary files or starts a process.
   - No Python or bash file is added for the decision logic.
   - Every new production and test file is 500 lines or fewer.
-- [ ] AC-18: `ci.yml` decision jobs. `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1` asserts and passes on the following:
+- [x] AC-18: `ci.yml` decision jobs. `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1` asserts and passes on the following:
   - `ci.yml` contains a `changes` job named `Change scope` with:
     - `permissions` `actions: read` and `contents: read`;
     - `outputs.code` bound to `steps.scope.outputs.code`;
     - a checkout step with `fetch-depth: 0`, `filter: blob:none` and `persist-credentials: false`;
     - a `pwsh` step with `id: scope` and `continue-on-error: true` that runs `scripts/ci/Invoke-CiChangeScope.ps1`.
   - `ci.yml` contains a `full-run-marker` job named `CI full run` with `needs: changes` and `if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}`.
-- [ ] AC-19: `ci.yml` callers. `CiChangeScopeWorkflow.Tests.ps1` asserts and passes on the following:
+- [x] AC-19: `ci.yml` callers. `CiChangeScopeWorkflow.Tests.ps1` asserts and passes on the following:
   - each of `quality-checks7`, `security-scan`, `build-check`, `poshqc`, `shell-coverage` and `drm-copilot-extension-tests` has `needs: changes` and `if: ${{ !cancelled() }}`, and passes `run-heavy: ${{ needs.changes.outputs.code != 'false' }}`;
   - `root-typescript-tests` and `npm-audit-gate` have `needs: changes` and an `if:` that requires `needs.changes.outputs.code != 'false'`;
   - `docs-validation` has no `needs:` and no `if:`.
-- [ ] AC-20: Reusable-workflow gating. `CiChangeScopeWorkflow.Tests.ps1` asserts and passes on the following, for each of `_quality-checks.yml`, `_security-scan.yml`, `_build-check.yml`, `_shell-coverage.yml`, `_drm-copilot-extension-tests.yml` and `_poshqc.yml`:
+- [x] AC-20: Reusable-workflow gating. `CiChangeScopeWorkflow.Tests.ps1` asserts and passes on the following, for each of `_quality-checks.yml`, `_security-scan.yml`, `_build-check.yml`, `_shell-coverage.yml`, `_drm-copilot-extension-tests.yml` and `_poshqc.yml`:
   - the file declares `run-heavy` with `type: boolean` and `default: true` under both `workflow_call` and `workflow_dispatch`;
   - every step of every job that produces a required context carries an `if:` that references `inputs.run-heavy`;
   - the combined conditions from research §2.3 are present for `_quality-checks.yml` (poetry cache-miss step and the `3.13`-only step), for `_shell-coverage.yml` (kcov cache-miss step), and for every `if: always()` step of a job that has no job-level `run-heavy` gate (`always() && inputs.run-heavy`); a step in a job gated at job level keeps its condition unchanged.
-- [ ] AC-21: `_poshqc.yml` gating in the shape present on the branch head (unsharded, or sharded after #953). `CiChangeScopeWorkflow.Tests.ps1` asserts and passes on the following:
+- [x] AC-21: `_poshqc.yml` gating in the shape present on the branch head (unsharded, or sharded after #953). `CiChangeScopeWorkflow.Tests.ps1` asserts and passes on the following:
   - every `_poshqc.yml` job other than `poshqc` (`poshqc-linux-hooks`, and in the sharded shape also `poshqc-static` and `poshqc-shard`) carries a job-level `if: ${{ inputs.run-heavy }}`;
   - the `poshqc` job carries no job-level `run-heavy` condition; in the sharded shape it keeps `if: always()`;
   - every `poshqc` step carries `inputs.run-heavy`, including, in the sharded shape, the step that requires the static and shard jobs to succeed.
@@ -401,7 +401,7 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   In addition:
   - the `on:` block of `.github/workflows/ci.yml` is identical to `origin/main`;
   - `tests/scripts/workflows/CiWorkflow.Tests.ps1` and `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` are either unchanged, or changed only in an assertion that #962's gating broke, with that change recorded in the execution evidence (D6).
-- [ ] AC-23: Regression test fails first. Before the workflow edits, `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1` fails against the pre-change workflows (missing `changes` job and `run-heavy` input). After the edits it passes. Both runs are recorded under the feature `evidence/` folder with `Timestamp`, `Command` and `EXIT_CODE`.
+- [x] AC-23: Regression test fails first. Before the workflow edits, `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1` fails against the pre-change workflows (missing `changes` job and `run-heavy` input). After the edits it passes. Both runs are recorded under the feature `evidence/` folder with `Timestamp`, `Command` and `EXIT_CODE`.
 - [ ] AC-24: Workflow README (D9). `.github/workflows/README.md` has a new section, appended at the end of the file, that documents:
   - the change-scope decision and its reason codes;
   - the allowlist file and its rules;
