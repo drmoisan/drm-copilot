@@ -41,15 +41,26 @@
     the operator can run before retrying.
 
     Residual limits: a GH_REPO or GH_HOST value exported by an earlier shell command or
-    inherited from the session environment is not visible in the command text; a push
-    between the gh pr view lookup and the merge can change the head, which only
-    --match-head-commit closes; the control is policy-level, not cryptographic.
+    inherited from the session environment is not visible in the command text; gh and git
+    run in the WorktreeRoot the gate passes (the Claude session worktree root or the Codex
+    repository root), so a working directory set by an earlier shell call is not visible
+    either; a push between the gh pr view lookup and the merge can change the head, which
+    only --match-head-commit closes; the control is policy-level, not cryptographic.
+
+    Time limit: Claude Code lets a tool call continue through the permission flow when a
+    PreToolUse hook exceeds its timeout, and the repository records no Codex behavior for
+    that case, so this file bounds every gh and git call itself. The default invokers run
+    the executable through Invoke-DocsOnlyBoundedNative: at most 7000 ms for gh and 3000 ms
+    for each git call, plus at most 1000 ms for the output. An expired wait stops the
+    process tree and reports exit code 124, which denies. The worst case for one gh and
+    three git calls is 20 s, below the 30 s Codex registration timeout.
 
 .NOTES
     PowerShell 7+. Byte-identical at .claude/hooks, .codex/hooks, and both bundle mirrors.
     git and gh run only through Invoke-DocsOnlyGitExe and Invoke-DocsOnlyGhExe, which never
     throw; unit tests pass a test-local scriptblock through -GitInvoker and -GhInvoker so
-    the seam bodies run without starting a process.
+    the seam bodies run without starting a process, and pass a test-local process starter
+    through the -ProcessStarter parameter of Invoke-DocsOnlyBoundedNative.
 #>
 
 function ConvertFrom-DocsOnlyNameList {
@@ -141,6 +152,76 @@ function Get-DocsOnlyDiffTextViolation {
     return (Get-DocsOnlyPathViolation -Path @(ConvertFrom-DocsOnlyNameList -Text $text))
 }
 
+function Invoke-DocsOnlyBoundedNative {
+    <#
+    .SYNOPSIS
+        Run git or gh with a fail-closed time limit; the body of the default seam invokers.
+    .DESCRIPTION
+        Starts FileName in the current file-system location with each argument passed
+        unchanged and standard output and standard error redirected, then waits at most
+        TimeoutMilliseconds for the exit and at most 1000 ms more for the output. When a
+        wait expires, the process tree is stopped, nothing is emitted, and $LASTEXITCODE is
+        set to 124, so the calling seam reports a non-zero exit and the exemption denies.
+        Otherwise the output lines are emitted and $LASTEXITCODE is set to the exit code.
+        Standard error is drained and discarded. A start failure throws to the calling
+        seam, which returns its failure object. $LASTEXITCODE is set in the global scope
+        because the seams read it after the invoker, as they do after a native command.
+    .PARAMETER FileName
+        The executable, git or gh, resolved from PATH.
+    .PARAMETER ArgumentList
+        The arguments, one element per argument.
+    .PARAMETER TimeoutMilliseconds
+        The longest wait for the process to exit.
+    .PARAMETER ProcessStarter
+        The scriptblock that starts the process from its start description; a unit test
+        passes a test-local stand-in that returns a fake process object.
+    .OUTPUTS
+        System.String, one per output line
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $FileName,
+        [AllowEmptyCollection()][string[]] $ArgumentList = @(),
+        [ValidateRange(1, 10000)][int] $TimeoutMilliseconds = 3000,
+        [ValidateNotNull()][scriptblock] $ProcessStarter = { param($StartInfo) [System.Diagnostics.Process]::Start($StartInfo) }
+    )
+
+    $startInfo = [System.Diagnostics.ProcessStartInfo]::new($FileName)
+    foreach ($argument in $ArgumentList) {
+        $startInfo.ArgumentList.Add($argument)
+    }
+    $startInfo.WorkingDirectory = $ExecutionContext.SessionState.Path.CurrentFileSystemLocation.ProviderPath
+    $startInfo.UseShellExecute = $false
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $startInfo.StandardOutputEncoding = [System.Text.Encoding]::UTF8
+    $process = & $ProcessStarter $startInfo
+    $output = $process.StandardOutput.ReadToEndAsync()
+    $null = $process.StandardError.ReadToEndAsync()
+    if (-not $process.WaitForExit($TimeoutMilliseconds) -or -not $output.Wait(1000)) {
+        try {
+            $process.Kill($true)
+        }
+        catch {
+            $null = $_
+        }
+        Set-Variable -Name LASTEXITCODE -Value 124 -Scope Global
+        return
+    }
+    Set-Variable -Name LASTEXITCODE -Value ([int]$process.ExitCode) -Scope Global
+    $text = [string]$output.Result
+    if ($text.EndsWith("`n")) {
+        $text = $text.Substring(0, $text.Length - 1)
+    }
+    if ($text.Length -eq 0) {
+        return
+    }
+    foreach ($line in $text.Split("`n")) {
+        $line.TrimEnd("`r")
+    }
+}
+
 function Invoke-DocsOnlyGitExe {
     <#
     .SYNOPSIS
@@ -164,7 +245,7 @@ function Invoke-DocsOnlyGitExe {
     param(
         [AllowNull()][AllowEmptyString()][string] $WorktreeRoot,
         [Parameter(Mandatory)][string[]] $GitArgs,
-        [ValidateNotNull()][scriptblock] $GitInvoker = { git @args 2>$null }
+        [ValidateNotNull()][scriptblock] $GitInvoker = { Invoke-DocsOnlyBoundedNative -FileName 'git' -ArgumentList $args -TimeoutMilliseconds 3000 }
     )
 
     $failure = [pscustomobject]@{ ExitCode = -1; Output = '' }
@@ -204,7 +285,7 @@ function Invoke-DocsOnlyGhExe {
     param(
         [AllowNull()][AllowEmptyString()][string] $WorkingRoot,
         [Parameter(Mandatory)][string[]] $GhArgs,
-        [ValidateNotNull()][scriptblock] $GhInvoker = { gh @args 2>$null }
+        [ValidateNotNull()][scriptblock] $GhInvoker = { Invoke-DocsOnlyBoundedNative -FileName 'gh' -ArgumentList $args -TimeoutMilliseconds 7000 }
     )
 
     $failure = [pscustomobject]@{ ExitCode = -1; Output = '' }
