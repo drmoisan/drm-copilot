@@ -221,7 +221,9 @@ def test_find_npm_auth_token_config_references_ignores_non_matching_text(
         pytest.param("$env:NPM_TOKEN = 'x'", [1], id="powershell-env"),
         pytest.param("npm_token: x", [1], id="lowercase-key"),
         pytest.param("NPM_TOKEN=", [1], id="empty-assignment-end-of-line"),
-        pytest.param("NPM_TOKEN+=${{ secrets.X }}", [1], id="bash-append-secret-expression"),
+        pytest.param(
+            "NPM_TOKEN+=${{ secrets.X }}", [1], id="bash-append-secret-expression"
+        ),
         pytest.param("export NPM_TOKEN+=x", [1], id="shell-export-append"),
         pytest.param("$env:NPM_TOKEN += 'x'", [1], id="powershell-env-append"),
     ],
@@ -285,7 +287,9 @@ def test_find_npm_token_assignments_ignores_non_matching_text(text: str) -> None
             [],
             id="accepted-double-equals-narrowing-not-reported",
         ),
-        pytest.param("NPM_TOKEN+==x", [], id="accepted-append-double-equals-not-reported"),
+        pytest.param(
+            "NPM_TOKEN+==x", [], id="accepted-append-double-equals-not-reported"
+        ),
     ],
 )
 def test_find_npm_token_assignments_pins_documented_residuals(
