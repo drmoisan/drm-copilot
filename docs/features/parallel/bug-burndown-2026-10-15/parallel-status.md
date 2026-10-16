@@ -15,7 +15,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 15
 - `current_cohort`: 0
 - `recolor_generation`: 2
-- `last_updated`: 10/16/2026 23:14:53
+- `last_updated`: 10/16/2026 23:15:23
 - `next_step`: merge 952 first when green; merge 935 when it reports ready (verify rescue commit b8eb85631 content is on its branch); 962 executing; 953 under merge hold pending '953 VERIFIED – merge authorized'
 
 **Items**
