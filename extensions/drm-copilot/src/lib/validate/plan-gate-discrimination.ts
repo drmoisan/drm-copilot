@@ -14,6 +14,7 @@ import {
   type PlanGateGitRepository,
   type PlanGateReport,
 } from "./plan-gate-rules";
+import { evaluateScratchGate } from "./plan-gate-scratch";
 
 /**
  * Discriminate falsifiable from non-discriminating atomic-plan acceptance gates.
@@ -67,6 +68,12 @@ export {
   WRITE_MODE_REGISTER,
 } from "./plan-gate-observability";
 export type { WriteModeEntry, WriteModeShape } from "./plan-gate-observability";
+export {
+  bareScratchDefinitions,
+  evaluateScratchGate,
+  G10_SEVERITY,
+  scratchFindingMessage,
+} from "./plan-gate-scratch";
 
 /**
  * G5's severity channel, mirroring the Python constant exactly.
@@ -248,12 +255,12 @@ function evaluateLiteralRules(
 }
 
 /**
- * Evaluate the plan acceptance-gate rule set against plan text.
+ * Evaluate the plan acceptance-gate rule set G1 through G10 against plan text.
  *
  * @param text Full plan document text.
- * @param context Repository seam. When omitted only the context-free rules G1
- *     and G4 run, so the returned Blocking list is byte-identical to the
- *     pre-change output for the same text.
+ * @param context Repository seam. When omitted only the context-free rules G1,
+ *     G4, G7, G8, G8b, and G10 run. G10 is document-level and can add Blocking
+ *     findings without a context.
  * @returns Blocking and Warning findings in source order. A failing repository
  *     seam degrades to zero literal findings rather than propagating.
  */
@@ -280,5 +287,7 @@ export function evaluatePlanGates(
     evaluateLiteralRules(report, text, commands, context);
   }
 
+  // G10 is document-level and context-free, so it runs on every invocation.
+  evaluateScratchGate(report, text);
   return report;
 }
