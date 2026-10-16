@@ -12,10 +12,14 @@
 
       E1 DOCS_ONLY_EXEMPTION_NOT_CREATE         - the command is a structural gh pr create.
       E2 DOCS_ONLY_EXEMPTION_CHECKPOINT_PRESENT - no checkpoint file exists at the resolved path.
-      E3 DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED    - exactly one explicit --base, no -B token, and a
-                                                  conservative branch spelling without '..'.
+      E3 DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED    - exactly one explicit --base, a conservative branch
+                                                  spelling without '..', and no base or repository
+                                                  override: no single-dash token whose letters
+                                                  include B or R (-B, -R, -dB, -Rx), no --repo or
+                                                  --repo= token, and no inline GH_REPO= prefix.
       E4 DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED    - refs/remotes/origin/<base> resolves to a commit.
-      E5 DOCS_ONLY_EXEMPTION_DIFF_FAILED        - git diff <commit>...HEAD exits 0 without throwing.
+      E5 DOCS_ONLY_EXEMPTION_DIFF_FAILED        - git diff <commit>...HEAD exits 0 without throwing,
+                                                  and non-empty output ends with NUL.
       E6 DOCS_ONLY_EXEMPTION_EMPTY_DIFF         - the diff lists at least one path.
       E7 DOCS_ONLY_EXEMPTION_NON_DOCS_PATH      - every path starts with docs/ (ordinal).
 
@@ -23,15 +27,21 @@
     so no path is quoted, and with --no-relative, --no-color, and --no-ext-diff so repository
     configuration cannot change the listing.
 
+    Residual limit: a GH_REPO value exported by an earlier shell command or inherited from the
+    session environment is not visible in the command text, so this file cannot detect it.
+
 .NOTES
     PowerShell 7+. Depends, at call time, on Test-CommandLineInvocation,
     Get-CommandLineStructuralMatch, and Get-CommandLineFlagValue from the command parsers the
     helpers file loads. It reads no file content. The git executable runs only through
     Invoke-PrAuthorDocsOnlyGitExe, the single executable seam, which never throws. Mirrored
     byte-identically under extensions/drm-copilot/resources/claude-customizations/.
+    Dot-sources hook-docs-only-diff.ps1 (issue #927), whose Get-DocsOnlyDiffTextViolation
+    performs the E5 NUL check and the E6 and E7 path classification.
 #>
 [CmdletBinding()]
 param()
+. (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1')
 
 function Invoke-PrAuthorDocsOnlyGitExe {
     <#
@@ -46,6 +56,9 @@ function Invoke-PrAuthorDocsOnlyGitExe {
         The resolved worktree root git runs in.
     .PARAMETER GitArgs
         The git arguments that follow -C <root>.
+    .PARAMETER GitInvoker
+        The scriptblock that runs git; a unit test passes a test-local stand-in so that this
+        body runs without starting a process.
     .OUTPUTS
         System.Management.Automation.PSCustomObject with ExitCode and Output.
     #>
@@ -53,7 +66,8 @@ function Invoke-PrAuthorDocsOnlyGitExe {
     [OutputType([pscustomobject])]
     param(
         [AllowNull()][AllowEmptyString()][string] $WorktreeRoot,
-        [Parameter(Mandatory)][string[]] $GitArgs
+        [Parameter(Mandatory)][string[]] $GitArgs,
+        [ValidateNotNull()][scriptblock] $GitInvoker = { git @args 2>$null }
     )
 
     $failure = [pscustomobject]@{ ExitCode = -1; Output = '' }
@@ -61,7 +75,7 @@ function Invoke-PrAuthorDocsOnlyGitExe {
         return $failure
     }
     try {
-        $lines = @(& git -C $WorktreeRoot @GitArgs 2>$null)
+        $lines = @(& $GitInvoker -C $WorktreeRoot @GitArgs 2>$null)
         $code = $LASTEXITCODE
     }
     catch {
@@ -98,10 +112,11 @@ function Get-PrAuthorDocsOnlyBaseName {
     .SYNOPSIS
         Return the single explicit --base value of a gh pr create command, or $null.
     .DESCRIPTION
-        Returns $null when the command is not a structural gh pr create, when any token begins
-        with -B (the short form the shared parser does not read), when --base appears other
-        than exactly once, when its value is missing or dash-leading, when the value is not a
-        conservative branch spelling, or when it contains '..'.
+        Returns $null when the command is not a structural gh pr create; when a single-dash
+        token has B or R among its letters (-B base and -R repository, alone or clustered as in
+        -dB or -dR); when a token is --repo, starts with --repo=, or starts with GH_REPO=; when
+        --base appears other than exactly once; when its value is missing or dash-leading; when
+        the value is not a conservative branch spelling; or when it contains '..'.
     .PARAMETER CommandText
         The Bash command text under evaluation.
     .OUTPUTS
@@ -121,7 +136,10 @@ function Get-PrAuthorDocsOnlyBaseName {
     $baseTokenCount = 0
     foreach ($token in @($match.Segment.Tokens)) {
         $text = [string]$token
-        if ($text.StartsWith('-B', [System.StringComparison]::Ordinal)) {
+        if ($text.Length -ge 2 -and $text[0] -eq '-' -and $text[1] -ne '-' -and $text.Substring(1).IndexOfAny([char[]]@('B', 'R')) -ge 0) {
+            return $null
+        }
+        if ($text -eq '--repo' -or $text.StartsWith('--repo=', [System.StringComparison]::OrdinalIgnoreCase) -or $text.StartsWith('GH_REPO=', [System.StringComparison]::OrdinalIgnoreCase)) {
             return $null
         }
         if ($text -eq '--base' -or $text.StartsWith('--base=', [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -136,65 +154,6 @@ function Get-PrAuthorDocsOnlyBaseName {
         return $null
     }
     return $base
-}
-
-function ConvertFrom-PrAuthorDocsOnlyNameList {
-    <#
-    .SYNOPSIS
-        Split NUL-separated git output into paths, discarding empty elements.
-    .DESCRIPTION
-        Callers wrap the result in @() so that an empty listing is an empty array. A path that
-        contains a line feed stays one element, because only NUL separates entries.
-    .PARAMETER Text
-        The captured git output.
-    .OUTPUTS
-        System.String, one per path
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [AllowNull()][AllowEmptyString()][string] $Text
-    )
-
-    if ([string]::IsNullOrEmpty($Text)) {
-        return
-    }
-    foreach ($entry in $Text.Split([char]0)) {
-        if ($entry.Length -gt 0) {
-            $entry
-        }
-    }
-}
-
-function Get-PrAuthorDocsOnlyPathViolation {
-    <#
-    .SYNOPSIS
-        Return $null when every path is under docs/, else the denial sub-code text.
-    .DESCRIPTION
-        An empty set returns DOCS_ONLY_EXEMPTION_EMPTY_DIFF. Otherwise the first path that does
-        not start with docs/ under ordinal comparison, or that is not longer than docs/ itself,
-        returns DOCS_ONLY_EXEMPTION_NON_DOCS_PATH naming that path.
-    .PARAMETER Path
-        The changed paths, repository-relative, as git reports them.
-    .OUTPUTS
-        System.String or $null
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [AllowNull()][AllowEmptyCollection()][string[]] $Path
-    )
-
-    $paths = @($Path | Where-Object { $null -ne $_ })
-    if ($paths.Count -eq 0) {
-        return 'DOCS_ONLY_EXEMPTION_EMPTY_DIFF: the branch diff lists no path.'
-    }
-    foreach ($entry in $paths) {
-        if ($entry.Length -le 5 -or -not $entry.StartsWith('docs/', [System.StringComparison]::Ordinal)) {
-            return "DOCS_ONLY_EXEMPTION_NON_DOCS_PATH: '$entry' is outside docs/."
-        }
-    }
-    return $null
 }
 
 function Get-PrAuthorDocsOnlyExemption {
@@ -229,7 +188,7 @@ function Get-PrAuthorDocsOnlyExemption {
     }
     $base = Get-PrAuthorDocsOnlyBaseName -CommandText $CommandText
     if ($null -eq $base) {
-        return [ordered]@{ Exempt = $false; Reason = 'DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED: pass exactly one explicit --base <branch>; the -B short form is not read.' }
+        return [ordered]@{ Exempt = $false; Reason = 'DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED: pass exactly one explicit --base <branch>; -B, -R, --repo, a single-dash shorthand cluster containing B or R, and an inline GH_REPO= prefix are not accepted.' }
     }
 
     $baseRef = 'refs/remotes/origin/' + $base + '^{commit}'
@@ -257,7 +216,7 @@ function Get-PrAuthorDocsOnlyExemption {
         return [ordered]@{ Exempt = $false; Reason = "DOCS_ONLY_EXEMPTION_DIFF_FAILED: git diff against origin/$base could not be computed." }
     }
 
-    $violation = Get-PrAuthorDocsOnlyPathViolation -Path @(ConvertFrom-PrAuthorDocsOnlyNameList -Text ([string]$diff.Output))
+    $violation = Get-DocsOnlyDiffTextViolation -DiffText ([string]$diff.Output) -BaseName $base
     if ($violation) {
         return [ordered]@{ Exempt = $false; Reason = $violation }
     }

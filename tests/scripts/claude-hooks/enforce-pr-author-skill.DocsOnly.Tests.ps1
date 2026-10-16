@@ -6,10 +6,11 @@
     Unit coverage for the docs-only exemption helpers of enforce-pr-author-skill.ps1 (issue #901).
 
 .DESCRIPTION
-    Exercises the pure helpers of enforce-pr-author-skill.docs-only.ps1 directly: the path-set
-    classifier, the NUL-list parser, the --base extraction, the checkpoint-presence seam, and
-    the git seam's failure object for a root that does not exist. No row creates, writes, or
-    deletes a file, starts a process, or runs the git executable.
+    Exercises the helpers of enforce-pr-author-skill.docs-only.ps1 directly: the --base
+    extraction, the checkpoint-presence seam, and the git seam (failure object and command
+    injection). The path-set classifier and the NUL-list parser moved with their rows to
+    hook-docs-only-diff.Tests.ps1 (issue #927). No row creates, writes, or deletes a file,
+    starts a process, or runs the git executable.
 #>
 
 Describe 'enforce-pr-author-skill docs-only helpers (issue #901)' {
@@ -31,100 +32,6 @@ Describe 'enforce-pr-author-skill docs-only helpers (issue #901)' {
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
-
-    Context 'Get-PrAuthorDocsOnlyPathViolation' {
-        It 'returns null for an all-docs set' {
-            # Arrange
-            $paths = @('docs/a.md', 'docs/features/x/plan.md')
-
-            # Act
-            $result = Get-PrAuthorDocsOnlyPathViolation -Path $paths
-
-            # Assert
-            $result | Should -BeNullOrEmpty -Because 'every path is under docs/'
-        }
-
-        It 'returns NON_DOCS_PATH for <Path>' -ForEach @(
-            @{ Path = '.claude/hooks/x.ps1' }
-            @{ Path = '.github/workflows/ci.yml' }
-            @{ Path = 'README.md' }
-            @{ Path = 'docsx/a.md' }
-            @{ Path = 'doc/a.md' }
-            @{ Path = 'Docs/a.md' }
-            @{ Path = 'docs' }
-        ) {
-            # Arrange
-            $paths = @($Path)
-
-            # Act
-            $result = Get-PrAuthorDocsOnlyPathViolation -Path $paths
-
-            # Assert
-            $result | Should -BeLike 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*'
-            $result.Contains($Path) | Should -BeTrue -Because 'the denial names the offending path'
-        }
-
-        It 'names the first offending path of a mixed set' {
-            # Arrange
-            $paths = @('docs/a.md', 'src/b.ps1', '.github/c.yml')
-
-            # Act
-            $result = Get-PrAuthorDocsOnlyPathViolation -Path $paths
-
-            # Assert
-            $result.Contains('src/b.ps1') | Should -BeTrue -Because 'the first non-docs path is reported'
-            $result.Contains('.github/c.yml') | Should -BeFalse -Because 'evaluation stops at the first violation'
-        }
-
-        It 'returns EMPTY_DIFF for an empty set' {
-            # Arrange
-            $paths = @()
-
-            # Act
-            $result = Get-PrAuthorDocsOnlyPathViolation -Path $paths
-
-            # Assert
-            $result | Should -BeLike 'DOCS_ONLY_EXEMPTION_EMPTY_DIFF*'
-        }
-    }
-
-    Context 'ConvertFrom-PrAuthorDocsOnlyNameList' {
-        It 'splits a NUL list with spaces and non-ASCII names' {
-            # Arrange
-            $accented = 'docs/' + [char]0x00E9 + '.md'
-            $text = "docs/a b.md`0" + $accented + "`0"
-
-            # Act
-            $result = @(ConvertFrom-PrAuthorDocsOnlyNameList -Text $text)
-
-            # Assert
-            $result.Count | Should -Be 2
-            $result[0] | Should -BeExactly 'docs/a b.md'
-            $result[1] | Should -BeExactly $accented
-        }
-
-        It 'keeps a line feed inside a name as one element' {
-            # Arrange
-            $text = "docs/line`nbreak.md`0"
-
-            # Act
-            $result = @(ConvertFrom-PrAuthorDocsOnlyNameList -Text $text)
-
-            # Assert
-            $result.Count | Should -Be 1 -Because 'only NUL separates entries'
-            $result[0].Contains("`n") | Should -BeTrue
-        }
-
-        It 'returns no element for empty and null text' {
-            # Arrange and Act
-            $fromEmpty = @(ConvertFrom-PrAuthorDocsOnlyNameList -Text '')
-            $fromNull = @(ConvertFrom-PrAuthorDocsOnlyNameList -Text $null)
-
-            # Assert
-            $fromEmpty.Count | Should -Be 0
-            $fromNull.Count | Should -Be 0
-        }
-    }
 
     Context 'Get-PrAuthorDocsOnlyBaseName' {
         It 'accepts <Command>' -ForEach @(
