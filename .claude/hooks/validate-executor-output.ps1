@@ -317,6 +317,7 @@ if ($MyInvocation.InvocationName -eq '.') {
 if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-executor-output: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-executor-output:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
-$result = Invoke-ExecutorOutputValidation
+try { $result = Invoke-ExecutorOutputValidation }
+catch { Exit-SubagentStopBlock -Message ('validate-executor-output: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + $script:SubagentStopReportAndHaltLine) }
 if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0

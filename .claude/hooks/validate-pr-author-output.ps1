@@ -124,6 +124,7 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PR_AUTH
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'PR_AUTHOR_OUTPUT_MISSING:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
-$decision = Get-PrAuthorOutputDecision
+try { $decision = Get-PrAuthorOutputDecision }
+catch { Exit-SubagentStopBlock -Message ('PR_AUTHOR_OUTPUT_MISSING: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + 'This condition is not repairable by the subagent. Report it to the operator and halt.') }
 if (-not $decision['allowed']) { Exit-SubagentStopBlock -Message $decision['reason'] }
 exit 0

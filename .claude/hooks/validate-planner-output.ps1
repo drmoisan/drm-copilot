@@ -435,6 +435,7 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validat
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-planner-output:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
-$result = Invoke-PlannerOutputValidation
+try { $result = Invoke-PlannerOutputValidation }
+catch { Exit-SubagentStopBlock -Message ('validate-planner-output: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + $script:SubagentStopReportAndHaltLine) }
 if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0
