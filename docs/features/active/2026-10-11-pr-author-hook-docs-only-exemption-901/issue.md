@@ -46,6 +46,6 @@ The #850 notes are each fixed, or, where a note should not change, the reason is
 - CI per-file coverage for the edited hook files.
 
 ## Evidence Checklist
-- [ ] baseline
-- [ ] targeted verification
-- [ ] end-state
+- [x] baseline (evidence/baseline/)
+- [x] targeted verification (evidence/qa-gates/ and evidence/regression-testing/)
+- [x] end-state (evidence/qa-gates/ci-pr-924.2026-10-12T19-05.md and the PR #924 merge at e467c693)
