@@ -24,12 +24,12 @@ Out of scope:
 
 ## Acceptance Criteria
 
-- [ ] AC-1: In `.github/dependabot.yml`, the npm entry for directory `/` has an `ignore` item `dependency-name: "@types/vscode"` with no `update-types` or `versions` key, and its existing `typescript` major-version ignore is retained.
-- [ ] AC-2: In `.github/dependabot.yml`, the npm entry for directory `/extensions/drm-copilot` has the same `@types/vscode` ignore item (no `update-types` or `versions` key), and its existing `typescript` major-version ignore is retained.
-- [ ] AC-3: The `/packages/mcp-server` npm entry and the github-actions entry in `.github/dependabot.yml` are unchanged (verified by diff against the pre-change file).
-- [ ] AC-4: A new pytest module at `tests/scripts/dev_tools/test_dependabot_config_contract.py` parses the real `.github/dependabot.yml` with `yaml.safe_load` (no temporary files), asserts both npm entries (`/` and `/extensions/drm-copilot`) ignore `@types/vscode` for all update types, and asserts exactly two entries were checked.
-- [ ] AC-5: The new test fails against the pre-change `.github/dependabot.yml` and passes after the change, with red/green evidence recorded in the feature evidence folder.
-- [ ] AC-6: `poetry run black --check`, `poetry run ruff check`, `poetry run pyright`, and `poetry run pytest` pass for the new test file, and the full `poetry run pytest` suite passes with the line (85%) and branch (75%) coverage gates unchanged.
+- [x] AC-1: In `.github/dependabot.yml`, the npm entry for directory `/` has an `ignore` item `dependency-name: "@types/vscode"` with no `update-types` or `versions` key, and its existing `typescript` major-version ignore is retained.
+- [x] AC-2: In `.github/dependabot.yml`, the npm entry for directory `/extensions/drm-copilot` has the same `@types/vscode` ignore item (no `update-types` or `versions` key), and its existing `typescript` major-version ignore is retained.
+- [x] AC-3: The `/packages/mcp-server` npm entry and the github-actions entry in `.github/dependabot.yml` are unchanged (verified by diff against the pre-change file).
+- [x] AC-4: A new pytest module at `tests/scripts/dev_tools/test_dependabot_config_contract.py` parses the real `.github/dependabot.yml` with `yaml.safe_load` (no temporary files), asserts both npm entries (`/` and `/extensions/drm-copilot`) ignore `@types/vscode` for all update types, and asserts exactly two entries were checked.
+- [x] AC-5: The new test fails against the pre-change `.github/dependabot.yml` and passes after the change, with red/green evidence recorded in the feature evidence folder.
+- [x] AC-6: `poetry run black --check`, `poetry run ruff check`, `poetry run pyright`, and `poetry run pytest` pass for the new test file, and the full `poetry run pytest` suite passes with the line (85%) and branch (75%) coverage gates unchanged.
 
 ## Dependencies / Risks
 
@@ -52,6 +52,6 @@ Out of scope:
 5. After merge, perform the post-merge `@dependabot recreate` check described under Dependencies / Risks.
 
 ## Evidence Checklist
-- [ ] baseline
-- [ ] targeted verification
-- [ ] end-state
+- [x] baseline
+- [x] targeted verification
+- [x] end-state
