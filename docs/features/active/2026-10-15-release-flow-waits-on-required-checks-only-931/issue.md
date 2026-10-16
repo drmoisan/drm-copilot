@@ -57,11 +57,11 @@ Recorded as an end-of-run follow-up by the bug-burndown-2026-10-11 planner (#899
 
 ## Acceptance Criteria
 
-- [ ] AC1: `Wait-ForPullRequestChecks` in `scripts/dev-tools/Invoke-FullReleaseFlow.ps1` polls `gh pr checks <PrNumber> --json bucket` without the `--required` flag, so every check on the pull request head is queried, required or not.
-- [ ] AC2: `Wait-ForPullRequestChecks` returns 0 only by positive assertion: at least one check is reported and every reported bucket is `pass` or `skipping`.
-- [ ] AC3: A `fail` or `cancel` bucket on any check, including a check that branch protection does not mark as required, makes `Wait-ForPullRequestChecks` return 1; a `pending` bucket continues polling within the existing completion bounds.
-- [ ] AC4: An empty reported check set, or a bucket value outside `pass`, `skipping`, `pending`, `fail`, and `cancel`, never makes `Wait-ForPullRequestChecks` return 0.
-- [ ] AC5: The comment-based help of `Wait-ForPullRequestChecks` and its stderr messages describe all checks on the pull request head rather than required checks, and no other in-repository reference describes the release flow as waiting on required checks only.
+- [x] AC1: `Wait-ForPullRequestChecks` in `scripts/dev-tools/Invoke-FullReleaseFlow.ps1` polls `gh pr checks <PrNumber> --json bucket` without the `--required` flag, so every check on the pull request head is queried, required or not.
+- [x] AC2: `Wait-ForPullRequestChecks` returns 0 only by positive assertion: at least one check is reported and every reported bucket is `pass` or `skipping`.
+- [x] AC3: A `fail` or `cancel` bucket on any check, including a check that branch protection does not mark as required, makes `Wait-ForPullRequestChecks` return 1; a `pending` bucket continues polling within the existing completion bounds.
+- [x] AC4: An empty reported check set, or a bucket value outside `pass`, `skipping`, `pending`, `fail`, and `cancel`, never makes `Wait-ForPullRequestChecks` return 0.
+- [x] AC5: The comment-based help of `Wait-ForPullRequestChecks` and its stderr messages describe all checks on the pull request head rather than required checks, and no other in-repository reference describes the release flow as waiting on required checks only.
 - [ ] AC6: The Pester suites under `tests/scripts/dev-tools/` for `Invoke-FullReleaseFlow.ps1` assert the new `gh` argument list and cover a failing non-required check, an empty check set, an unrecognized bucket, and an all-pass-or-skipping set; PoshQC format, analyze, and test pass, and line coverage of `scripts/dev-tools/Invoke-FullReleaseFlow.ps1` does not regress from the Phase 0 baseline.
 
 ## Next Step
