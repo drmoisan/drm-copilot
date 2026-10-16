@@ -161,12 +161,14 @@ function Invoke-PoshQCTest {
         [string] $KoverageOutputPath,
         [switch] $DisableKoverageCopy,
         [scriptblock] $EnsureModule = {
-            param([string] $Name, [string] $ErrorMessage, [string] $MaximumVersion)
-            if (-not (Get-Module -ListAvailable -Name $Name)) { throw $ErrorMessage }
+            param([string] $Name, [string] $ErrorMessage, [string] $MinimumVersion, [string] $MaximumVersion)
+            # Issue #953 (CR-1): only an installed version inside the supported range counts as present, so a host
+            # whose only Pester is 6.x or the inbox 3.4.0 receives the actionable message instead of an import error.
+            if (-not (Get-Module -ListAvailable -FullyQualifiedName @{ ModuleName = $Name; ModuleVersion = $MinimumVersion; MaximumVersion = $MaximumVersion })) { throw $ErrorMessage }
             # Import globally so Pester's Describe/It/Mock resolve in test containers that the
             # default $InvokePester trampoline now hosts in the global session state (issue #392).
-            # Issue #953 (D8): -MaximumVersion keeps the import below the next major version.
-            Import-Module $Name -Global -MaximumVersion $MaximumVersion -ErrorAction Stop
+            # Issue #953 (D8, CR-2): -MinimumVersion and -MaximumVersion keep the import inside the supported range.
+            Import-Module $Name -Global -MinimumVersion $MinimumVersion -MaximumVersion $MaximumVersion -ErrorAction Stop
         },
         [scriptblock] $TestPathExists = { param([string] $Path) Test-Path $Path },
         [scriptblock] $LoadSettings = { param([string] $Path) Import-PowerShellDataFile -Path $Path },
@@ -303,7 +305,7 @@ function Invoke-PoshQCTest {
         $Root = [IO.Path]::GetFullPath([IO.Path]::Combine($PWD.ProviderPath, $Root))
     }
 
-    & $EnsureModule 'Pester' "Pester is not installed. Run Install-PoshQCTool (alias Install-PoshQCTools) first." '5.99.99'
+    & $EnsureModule 'Pester' "Pester is not installed in the supported range (5.9.0 to 5.99.99). Run Install-PoshQCTool (alias Install-PoshQCTools) first." '5.9.0' '5.99.99'
 
     if (-not (& $TestPathExists $SettingsPath)) {
         throw "Settings not found: $SettingsPath"

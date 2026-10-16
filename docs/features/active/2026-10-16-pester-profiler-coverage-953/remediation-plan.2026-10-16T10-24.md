@@ -366,7 +366,7 @@ Describe 'Invoke-PoshQCTest Pester presence check and import range (issue #953, 
 
 ### Phase 2 — CR-1 and CR-2 Fix in the Default EnsureModule Seam
 
-- [ ] [P2-T1] Edit `scripts/powershell/PoshQC/PoshQC.Testing.psm1` with the Edit tool: replace the default `$EnsureModule` value at lines 163-170 (from `        [scriptblock] $EnsureModule = {` through its closing `        },`) with the ten lines below. No other line changes in this task.
+- [x] [P2-T1] Edit `scripts/powershell/PoshQC/PoshQC.Testing.psm1` with the Edit tool: replace the default `$EnsureModule` value at lines 163-170 (from `        [scriptblock] $EnsureModule = {` through its closing `        },`) with the ten lines below. No other line changes in this task.
   - Counted coverage lines stay at two: the presence `if` line and the import line. Every other changed or inserted line is a `param` or comment line.
   - Acceptance: the file contains `-FullyQualifiedName @{ ModuleName = $Name; ModuleVersion = $MinimumVersion; MaximumVersion = $MaximumVersion }` and `-MinimumVersion $MinimumVersion -MaximumVersion $MaximumVersion` (quoted here as literals this task creates), each once.
 
@@ -383,30 +383,30 @@ Describe 'Invoke-PoshQCTest Pester presence check and import range (issue #953, 
         },
 ```
 
-- [ ] [P2-T2] Edit `scripts/powershell/PoshQC/PoshQC.Testing.psm1` with the Edit tool: replace the call line (line 306 before P2-T1, line 308 after it), `    & $EnsureModule 'Pester' "Pester is not installed. Run Install-PoshQCTool (alias Install-PoshQCTools) first." '5.99.99'`, with the single line below. No other line changes.
+- [x] [P2-T2] Edit `scripts/powershell/PoshQC/PoshQC.Testing.psm1` with the Edit tool: replace the call line (line 306 before P2-T1, line 308 after it), `    & $EnsureModule 'Pester' "Pester is not installed. Run Install-PoshQCTool (alias Install-PoshQCTools) first." '5.99.99'`, with the single line below. No other line changes.
   - Acceptance: the file contains `'5.9.0' '5.99.99'` (quoted here as the literal this task creates) exactly once.
 
 ```powershell
     & $EnsureModule 'Pester' "Pester is not installed in the supported range (5.9.0 to 5.99.99). Run Install-PoshQCTool (alias Install-PoshQCTools) first." '5.9.0' '5.99.99'
 ```
 
-- [ ] [P2-T3] Verify the `scripts/powershell/PoshQC/PoshQC.Testing.psm1` edit.
+- [x] [P2-T3] Verify the `scripts/powershell/PoshQC/PoshQC.Testing.psm1` edit.
   - Run `git diff --numstat <REM_BASE_SHA> -- scripts/powershell/PoshQC/PoshQC.Testing.psm1` from the Bash tool.
   - Through the Tool route, run `(Get-Content -LiteralPath scripts/powershell/PoshQC/PoshQC.Testing.psm1).Count` and `@(Select-String -LiteralPath scripts/powershell/PoshQC/PoshQC.Testing.psm1 -SimpleMatch -Pattern '<token>').Count` for each CEIL_R1 token of the `PoshQC.Testing.psm1` row.
   - Write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r1-testing-psm1-edit.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: the numstat row reads `7` added and `5` deleted; the line count is 463; and every CEIL_R1 count for that file equals its expected value.
-- [ ] [P2-T4] Mirror the file through the Tool route with `Copy-Item -LiteralPath scripts/powershell/PoshQC/PoshQC.Testing.psm1 -Destination extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1 -Force`, then print `(Get-FileHash -Algorithm SHA256 -LiteralPath scripts/powershell/PoshQC/PoshQC.Testing.psm1).Hash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1).Hash`.
+- [x] [P2-T4] Mirror the file through the Tool route with `Copy-Item -LiteralPath scripts/powershell/PoshQC/PoshQC.Testing.psm1 -Destination extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1 -Force`, then print `(Get-FileHash -Algorithm SHA256 -LiteralPath scripts/powershell/PoshQC/PoshQC.Testing.psm1).Hash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1).Hash`.
   - Acceptance: the printed value is `True`.
-- [ ] [P2-T5] Run TARGETED_RUN(`cr-after`, `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1`) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r1-cr-regression-pass-after.<ts>.md`.
+- [x] [P2-T5] Run TARGETED_RUN(`cr-after`, `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1`) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r1-cr-regression-pass-after.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the JRP totals and the JRP token check for RS01-RS10.
   - Acceptance: run valid, EXIT_CODE 0, `tests` 10, `failures` 0, `errors` 0, and all ten RS tokens PASS.
-- [ ] [P2-T6] Run TARGETED_RUN(`seam-after`, R1_SET) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-seam-consumers-after.<ts>.md`.
+- [x] [P2-T6] Run TARGETED_RUN(`seam-after`, R1_SET) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-seam-consumers-after.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the JRP totals and the token check for every RS, SEAM, and INST token.
   - Acceptance:
     - Run valid, EXIT_CODE 0, `failures` 0, and `errors` 0.
     - JRP `tests` equals `R1_TARGETED_BASELINE_TESTS` (latest `r1-targeted-tests.*.md` in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/`) plus 3.
     - Every listed token PASS. This confirms that the 9 `Get-Module` mocks of `tests/scripts/powershell/PoshQC/PoshQC.Comprehensive.Tests.ps1` still pass unedited.
-- [ ] [P2-T7] Verify on the local host the real range query that `scripts/powershell/PoshQC/PoshQC.Testing.psm1` line 167 now issues. Through the Tool route, print one line built from:
+- [x] [P2-T7] Verify on the local host the real range query that `scripts/powershell/PoshQC/PoshQC.Testing.psm1` line 167 now issues. Through the Tool route, print one line built from:
   - `RANGE=` followed by `(@(Get-Module -ListAvailable -FullyQualifiedName @{ ModuleName = 'Pester'; ModuleVersion = '5.9.0'; MaximumVersion = '5.99.99' } | ForEach-Object { $_.Version.ToString() }) -join ',')`.
   - ` ALL=` followed by `(@(Get-Module -ListAvailable -Name Pester | ForEach-Object { $_.Version.ToString() }) -join ',')`.
 
