@@ -24,6 +24,8 @@
       otherwise a positive-integer standalone record must name it (issue #788).
     - Get-EpicMergeGateUnresolvedReason, the reason prefix used when neither the item
       target nor either run branch resolves.
+    - Test-EpicMergeGateNoRecordingTarget, the precondition of the docs-only merge branch:
+      the item, epic, and parallel targets all resolve NoTarget (issue #927).
 
 .NOTES
     PowerShell 7+. Depends on Get-EpicMergeGateBlockDecision and
@@ -240,4 +242,37 @@ function Get-EpicMergeGateUnresolvedReason {
     $ambiguous = @($targets | Where-Object { $_.Status -eq 'Ambiguous' })
     $code = if ($ambiguous.Count -gt 0) { $ambiguous[0].ReasonCode } else { $ItemTarget.ReasonCode }
     return ('{0}: {1}; {2}; {3}' -f $code, $ItemTarget.Detail, $EpicTarget.Detail, $ParallelTarget.Detail)
+}
+
+function Test-EpicMergeGateNoRecordingTarget {
+    <#
+    .SYNOPSIS
+        True only when the item, epic, and parallel targets all have status NoTarget (issue #927).
+    .DESCRIPTION
+        Pure. That combination means no checkpoint records the command's pull request number,
+        which is the only case the docs-only merge branch evaluates. A $null target (a bare
+        command), an Ambiguous target, and any resolved target return $false.
+    .PARAMETER ItemTarget
+        The item target, or $null.
+    .PARAMETER EpicTarget
+        The epic run target, or $null.
+    .PARAMETER ParallelTarget
+        The parallel run target, or $null.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [AllowNull()] $ItemTarget,
+        [AllowNull()] $EpicTarget,
+        [AllowNull()] $ParallelTarget
+    )
+
+    foreach ($target in @($ItemTarget, $EpicTarget, $ParallelTarget)) {
+        if ($null -eq $target -or [string]$target.Status -cne 'NoTarget') {
+            return $false
+        }
+    }
+    return $true
 }
