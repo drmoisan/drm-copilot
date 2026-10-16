@@ -20,6 +20,7 @@
     blocks with exit 2 and the validate-task-researcher-output: prefix.
     Filesystem reads go through Test-ResearchFile so tests can mock the
     boundary without writing temporary files.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 
 [CmdletBinding()]
@@ -284,6 +285,7 @@ if ($MyInvocation.InvocationName -eq '.') {
 if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-task-researcher-output: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-task-researcher-output:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
-$result = Invoke-TaskResearcherOutputValidation
+try { $result = Invoke-TaskResearcherOutputValidation }
+catch { Exit-SubagentStopBlock -Message ('validate-task-researcher-output: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + 'This condition is not repairable by the subagent. Report it to the operator and halt.') }
 if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0

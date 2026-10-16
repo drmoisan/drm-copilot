@@ -25,6 +25,7 @@
     exit 2, naming the file. Filesystem existence checks go through
     Test-ArtifactFile so tests can mock the boundary without writing temporary
     files.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 
 [CmdletBinding()]
@@ -194,6 +195,7 @@ if ([string]::IsNullOrWhiteSpace($AgentName) -or $null -eq $RequiredArtifact -or
     [Console]::Error.WriteLine("validate-required-artifact-output hook: AgentName and at least one RequiredArtifact spec are required.`n$($script:SubagentStopReportAndHaltLine)")
     exit 2
 }
-$result = Invoke-RequiredArtifactOutputValidation -AgentName $AgentName -RequiredArtifact $RequiredArtifact
+try { $result = Invoke-RequiredArtifactOutputValidation -AgentName $AgentName -RequiredArtifact $RequiredArtifact }
+catch { Exit-SubagentStopBlock -Message ('validate-required-artifact-output: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + $script:SubagentStopReportAndHaltLine) }
 if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0

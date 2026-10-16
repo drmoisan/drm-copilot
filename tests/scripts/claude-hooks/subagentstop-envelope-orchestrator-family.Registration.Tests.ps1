@@ -114,7 +114,7 @@ Describe 'E2 SubagentStop registrations and seams' {
         $reads.Count | Should -BeGreaterThan 0 -Because "$Function must read the envelope through the helper"
     }
 
-    It 'REG-4 <Leaf> calls Exit-SubagentStopBlock once at script scope after the inline S1 tail' -ForEach @(
+    It 'REG-4 <Leaf> calls Exit-SubagentStopBlock twice at script scope after the inline S1 tail' -ForEach @(
         @{ Leaf = 'validate-orchestrator-output.ps1' }
         @{ Leaf = 'validate-executor-output.ps1' }
         @{ Leaf = 'validate-planner-output.ps1' }
@@ -130,8 +130,8 @@ Describe 'E2 SubagentStop registrations and seams' {
         $dependencyExits = @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.ExitStatementAst] -and $null -ne $node.Pipeline -and $node.Pipeline.Extent.Text -eq '$dependencyDecision.ExitCode' }, $true) | Where-Object { Test-IsScriptScope -Node $_ })
 
         # Assert
-        $exitCalls.Count | Should -Be 1 -Because "$Leaf must call Exit-SubagentStopBlock exactly once"
-        (Test-IsScriptScope -Node $exitCalls[0]) | Should -BeTrue -Because 'the call sits in the entry tail'
+        $exitCalls.Count | Should -Be 2 -Because "$Leaf must call Exit-SubagentStopBlock exactly twice: the unhandled-error catch and the validation-failure line (issue #928)"
+        @($exitCalls | Where-Object { -not (Test-IsScriptScope -Node $_) }).Count | Should -Be 0 -Because 'both calls sit in the entry tail'
         $decisionAssignments.Count | Should -Be 1 -Because 'the inline S1 tail assigns $dependencyDecision once at script scope'
         $decisionAssignments[0].Extent.StartOffset | Should -BeLessThan $exitCalls[0].Extent.StartOffset
         $writeLines.Count | Should -BeGreaterOrEqual 2 -Because 'the S1 tail keeps its inline stderr writes'
