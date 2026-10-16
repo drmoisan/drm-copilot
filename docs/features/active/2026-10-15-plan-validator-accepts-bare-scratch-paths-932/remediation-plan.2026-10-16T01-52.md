@@ -296,7 +296,7 @@ Loop rule: [P5-T1] through [P5-T12] form one pass. If any of them fails or chang
 - [x] [P5-T16] Verify the change scope and record `<FEATURE>/evidence/qa-gates/scope-diff-rc1.<timestamp>.md`
   - Commands: `git diff --name-only <RC1_BASE> HEAD`, `git diff --name-status --diff-filter=D <MERGE_BASE> HEAD`, `git status --porcelain`.
   - Acceptance: every path listed by the first command is in the WRITES list of this plan, or under `docs/features/active/2026-10-15-plan-validator-accepts-bare-scratch-paths-932/`, or on a `PATH: ` line of an `out-of-scope-remediation.*.md` artifact written in this cycle (the artifact records `REMEDIATION-LOG: none` when no such file exists, with the Glob search that established it); `extensions/drm-copilot/jest.config.cjs`, `extensions/drm-copilot/package.json`, and `research/bare-scratch-plan-gate.2026-10-15T19-52.md` are not listed; the deletion listing is empty; the porcelain listing shows only new evidence files, this plan file, and `SCRATCH/`.
-- [ ] [P5-T17] Commit and push the final evidence under `<FEATURE>/evidence/qa-gates/` and the plan check-offs
+- [x] [P5-T17] Commit and push the final evidence under `<FEATURE>/evidence/qa-gates/` and the plan check-offs
   - Commands: `git add` naming the new `<FEATURE>/evidence/qa-gates/` artifacts and this plan file; `git commit -m "docs(932): record remediation cycle 1 final QA evidence"`; `git push origin HEAD`.
   - Acceptance: after the push, `git status --porcelain` lists no path other than `SCRATCH/`; the push exits 0.
 
