@@ -17,6 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `CodeCoverage.Path` is still honored. Without the configuration file, the population
   falls back to the effective test scan folders. Migration: move any coverage paths that
   were added to the shipped settings file into `config/poshqc-coverage.json`.
+- PoshQC test coverage (issue #953): the bundled `settings/pester.runsettings.psd1` now sets
+  `CodeCoverage.UseBreakpoints = $false`, so `Invoke-PoshQCTest` collects coverage with
+  Pester's profiler-based tracer instead of breakpoints. The coverage population and
+  thresholds are unchanged; per-file covered-line counts can differ from breakpoint mode.
+  The bundled installer minimum is now Pester 5.9.0.
+  Pester versions are bounded below Pester 6.0: `Install-PoshQCTool` does not accept an
+  installed Pester 6.x, and `Invoke-PoshQCTest` imports Pester with `-MaximumVersion 5.99.99`.
 
 ## [0.0.1] - 2026-05-02
 

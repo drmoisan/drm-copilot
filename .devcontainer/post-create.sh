@@ -243,7 +243,7 @@ pwsh -NoLogo -NoProfile -Command - <<'PWSH'
 $ErrorActionPreference = 'Stop'
 $required = @(
     @{ Name = 'PSScriptAnalyzer'; Version = '1.22.0' },
-    @{ Name = 'Pester'; Version = '5.6.1' }
+    @{ Name = 'Pester'; Version = '5.9.0'; UpperBound = '6.0.0' }
 )
 
 $gallery = Get-PSRepository -Name PSGallery -ErrorAction SilentlyContinue
@@ -259,7 +259,7 @@ if (-not $gallery) {
 
 foreach ($module in $required) {
     $installed = Get-Module -ListAvailable -Name $module.Name |
-        Where-Object { $_.Version -ge [version]$module.Version } |
+        Where-Object { $_.Version -ge [version]$module.Version -and (-not $module.ContainsKey('UpperBound') -or $_.Version -lt [version]$module.UpperBound) } |
         Sort-Object Version -Descending |
         Select-Object -First 1
 

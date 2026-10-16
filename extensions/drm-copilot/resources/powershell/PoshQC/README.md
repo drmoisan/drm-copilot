@@ -13,7 +13,7 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
 ## Requirements
 
 - PowerShell 5.1 or 7.6+
-- Modules: PSScriptAnalyzer 1.22.0, Pester 5.6.1 (installed automatically via the helper if missing)
+- Modules: PSScriptAnalyzer 1.22.0, Pester 5.9.0 or later, below 6.0 (installed automatically via the helper if missing)
 
 ## Getting started
 
@@ -66,6 +66,7 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
    - Enforces compatible syntax for 5.1 and 7.6, 4-space indentation, ShouldProcess for state-changing functions, and safety guards (no Invoke-Expression, no global vars, etc.).
 - Pester settings: `./settings/pester.runsettings.psd1`
   - Runs tests under `scripts` and `tests/powershell`, outputs JUnit XML and CoverageGutters coverage, and enables coverage. The shipped runsettings carry no `CodeCoverage.Path` list; `Invoke-PoshQCTest` derives the coverage population from the workspace (see Coverage population below).
+  - Coverage uses Pester's profiler-based mode (`CodeCoverage.UseBreakpoints = $false`, issue #953), which needs Pester 5.4 or later and is faster than breakpoint mode on the same coverage population. The PoshQC suites target PowerShell 7; profiler mode under Windows PowerShell 5.1 is not exercised in CI. To use breakpoint mode, pass a settings file with `UseBreakpoints = $true` through `-SettingsPath`.
   - When `-ScanFolders` is supplied to `Invoke-PoshQCSuite` or the lower-level commands, the suite narrows discovery to those workspace-relative or workspace-contained folders.
 - Coverage population (issue #527): `Invoke-PoshQCTest` measures the same file set for the same workspace whichever module copy is loaded.
   - Workspace configuration: `config/poshqc-coverage.json` with the schema `{"version": 1, "roots": [...]}`. Each root is a workspace-relative folder. The file is validated fail-fast, and every error names `config/poshqc-coverage.json`: empty content, invalid JSON, a `version` other than 1, a missing or non-array `roots`, and a blank, absolute, or `..`-segment entry are rejected. An empty `roots` array yields an empty population.
