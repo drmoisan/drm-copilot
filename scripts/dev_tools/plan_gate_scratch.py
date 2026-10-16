@@ -15,10 +15,11 @@ Responsibilities and scope boundaries:
 
 Key invariants:
     The runtime import graph stays acyclic. This module imports only the
-    task-line and heading patterns from `plan_gate_commands` at runtime, and it
-    reads `PlanGateReport` from `plan_gate_discrimination` under
-    `TYPE_CHECKING` only, because `plan_gate_discrimination` imports this
-    module. Every finding renders the logical line between backticks; the
+    shared line splitter from `plan_gate_commands` at runtime, and it reads
+    `PlanGateReport` from `plan_gate_discrimination` under `TYPE_CHECKING`
+    only, because `plan_gate_discrimination` imports this module. Physical
+    lines are split on CR LF, LF, and CR only, matching the TypeScript twin.
+    Every finding renders the logical line between backticks; the
     f-string conversion flag and the builtin that produce a Python
     representation are prohibited here, because that builtin selects its quote
     character from the value's contents while the TypeScript twin renders the
@@ -33,10 +34,7 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-from scripts.dev_tools.plan_gate_commands import (
-    PLAN_GATE_HEADING_RE,
-    PLAN_GATE_TASK_RE,
-)
+from scripts.dev_tools.plan_gate_commands import split_plan_lines
 
 if TYPE_CHECKING:
     from scripts.dev_tools.plan_gate_discrimination import PlanGateReport
@@ -74,15 +72,15 @@ _NAMESPACE_RE = re.compile(SCRATCH_NAMESPACE_PATTERN, re.ASCII)
 def _continues_logical_line(line: str) -> bool:
     """Return whether a physical line continues the current logical line.
 
-    A continuation is non-blank and begins with whitespace, and it is not a
-    fence line, a Markdown ATX heading, or a canonical task line.
+    A continuation is non-blank, begins with whitespace, and is not a fence
+    line. A Markdown ATX heading or task line written at column 0 therefore
+    ends the logical line, while an indented heading or task line is absorbed
+    into it.
     """
 
     if not line.strip() or not line[:1].isspace():
         return False
-    if FENCE_RE.match(line) or PLAN_GATE_HEADING_RE.match(line):
-        return False
-    return PLAN_GATE_TASK_RE.match(line) is None
+    return FENCE_RE.match(line) is None
 
 
 def _is_bare_definition(logical_line: str) -> bool:
@@ -117,7 +115,7 @@ def bare_scratch_definitions(text: str) -> list[tuple[int, str]]:
         None.
     """
 
-    lines = text.splitlines()
+    lines = split_plan_lines(text)
     findings: list[tuple[int, str]] = []
     in_fence = False
     index = 0

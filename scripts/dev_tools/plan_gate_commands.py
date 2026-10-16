@@ -289,6 +289,44 @@ def _close_window(
         commands[index] = replace(commands[index], task_text=task_text)
 
 
+_LINE_BREAK_RE = re.compile(r"\r\n|\n|\r")
+
+
+def split_plan_lines(text: str) -> list[str]:
+    """Split plan text into physical lines on CR LF, LF, and CR only.
+
+    Purpose:
+        Share one line-splitting rule between the command extractor and the
+        G10 rule, matching the TypeScript `splitPlanLines` byte for byte.
+        `str.splitlines()` also breaks on form feed, vertical tab, the
+        information separators, NEL, and the Unicode line and paragraph
+        separators, which the TypeScript split does not, so the two runtimes
+        would otherwise report different line numbers for the same text.
+
+    Args:
+        text (str): Full document text.
+
+    Returns:
+        list[str]: Lines without their terminators. Empty text yields no
+        lines, and the empty element after a final terminator is dropped.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    if not text:
+        return []
+    lines = _LINE_BREAK_RE.split(text)
+    # Drop the empty element after a final terminator, as `str.splitlines()`
+    # and the TypeScript twin both do.
+    if lines[-1] == "":
+        lines.pop()
+    return lines
+
+
 def extract_plan_commands(text: str) -> list[PlanCommand]:
     """Extract every task-attributed command candidate from plan text.
 
@@ -319,7 +357,7 @@ def extract_plan_commands(text: str) -> list[PlanCommand]:
 
     # Walk the plan in source order, maintaining the attribution window so each
     # span is reported against the task whose acceptance condition states it.
-    for line_number, line in enumerate(text.splitlines(), start=1):
+    for line_number, line in enumerate(split_plan_lines(text), start=1):
         if _FENCE_RE.match(line):
             in_fence = not in_fence
             if current_task is not None:

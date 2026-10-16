@@ -53,12 +53,12 @@ _SCOPE_SUPERSEDED_PHRASES = (
     "both fed by the command extractor",
     "evaluates G1 through G6",
 )
-_ISSUE_TOKEN_BULLET = "**Any issue token after the definition.**"
+_ISSUE_CLASS_BULLET = "**Any issue token after the definition.**"
 _G10_LINE_RULE_PHRASES = (
     "an indented heading or task line is absorbed",
     "do not end a physical line",
     "One parity residual remains",
-    _ISSUE_TOKEN_BULLET,
+    _ISSUE_CLASS_BULLET,
 )
 _G10_FALSE_NEGATIVE_HEADING = "### Known false-negative classes — G10"
 
@@ -164,6 +164,6 @@ def test_rule_file_documents_g10_line_rules_and_issue_token_class() -> None:
     # Assert
     assert missing == [], f"rule file lacks {missing}"
     heading = text.index(_G10_FALSE_NEGATIVE_HEADING)
-    bullet = text.index(_ISSUE_TOKEN_BULLET)
+    bullet = text.index(_ISSUE_CLASS_BULLET)
     register = text.index("## The Write-Mode Register")
     assert heading < bullet < register

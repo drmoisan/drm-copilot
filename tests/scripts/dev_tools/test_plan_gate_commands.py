@@ -330,8 +330,7 @@ def test_split_plan_lines_splits_only_on_cr_lf_terminators(
 
 _EXTRACTOR_SPLIT_CASES = [
     pytest.param(
-        "### Phase 1 — Work\f\n"
-        "- [ ] [P1-T1] Run `poetry run pytest tests/a.py`\n",
+        "### Phase 1 — Work\f\n- [ ] [P1-T1] Run `poetry run pytest tests/a.py`\n",
         id="form-feed",
     ),
     pytest.param(
