@@ -158,27 +158,29 @@ function validateWorthiness(value: unknown): {
   };
 }
 
-/** Validate baseline feature shape and return object entries. */
+/** Validate baseline feature shape and return indexed and raw entries. */
 function extractFeatures(value: unknown): {
   readonly errors: string[];
-  readonly features: Record<string, unknown>[];
+  readonly indexedFeatures: [number, Record<string, unknown>][];
+  readonly entries: readonly unknown[];
 } {
   if (!Array.isArray(value)) {
     return {
       errors: ["Epic planner checkpoint features must be a list."],
-      features: [],
+      indexedFeatures: [],
+      entries: [],
     };
   }
 
   const errors: string[] = [];
-  const features: Record<string, unknown>[] = [];
+  const indexedFeatures: [number, Record<string, unknown>][] = [];
   value.forEach((item, index) => {
     const prefix = `Epic planner checkpoint features[${index}]`;
     if (!isObject(item)) {
       errors.push(`${prefix} must be an object.`);
       return;
     }
-    features.push(item);
+    indexedFeatures.push([index, item]);
 
     const missing = REQUIRED_FEATURE_KEYS.filter((key) => !(key in item));
     if (missing.length > 0) {
@@ -203,17 +205,18 @@ function extractFeatures(value: unknown): {
     }
   });
 
-  return { errors, features };
+  return { errors, indexedFeatures, entries: value };
 }
 
 /** Require unique resolved dependencies and deterministic longest-path waves. */
 function validateDependencyWaves(
-  features: Record<string, unknown>[],
+  indexedFeatures: ReadonlyArray<readonly [number, Record<string, unknown>]>,
 ): string[] {
+  const features = indexedFeatures.map(([, feature]) => feature);
   const errors: string[] = [];
   const seenFolders = new Set<string>();
   const seenIssues = new Set<unknown>();
-  features.forEach((feature, index) => {
+  indexedFeatures.forEach(([index, feature]) => {
     const prefix = `Epic planner checkpoint features[${index}]`;
     const folder = feature["feature_folder"];
     if (typeof folder === "string" && folder.length > 0) {
@@ -237,7 +240,7 @@ function validateDependencyWaves(
 
   const index = buildFeatureReferenceIndex(features);
   const manifest = new Map<string, string[]>();
-  features.forEach((feature, featureIndex) => {
+  indexedFeatures.forEach(([featureIndex, feature]) => {
     const folder = feature["feature_folder"];
     const dependencies = feature["depends_on"];
     if (
@@ -272,7 +275,7 @@ function validateDependencyWaves(
     }
     throw error;
   }
-  features.forEach((feature, index) => {
+  indexedFeatures.forEach(([index, feature]) => {
     const folder = feature["feature_folder"];
     if (typeof folder !== "string" || !expectedWaves.has(folder)) {
       return;
@@ -292,20 +295,21 @@ function validateDependencyWaves(
  * Require every child to be fully prepared and preflight-cleared. When
  * `keyGated` is true (no Codex flag), each per-feature receipt check runs only
  * for a feature that carries its key (`model_routing_receipt`,
- * `topology_receipt`).
+ * `topology_receipt`). Each error prefix uses the feature's original index in
+ * the checkpoint `features` array.
  */
 function validateReadyFeatures(
-  features: ReadonlyArray<Record<string, unknown>>,
+  indexedFeatures: ReadonlyArray<readonly [number, Record<string, unknown>]>,
   keyGated: boolean,
 ): string[] {
   const errors: string[] = [];
-  if (features.length < 2) {
+  if (indexedFeatures.length < 2) {
     errors.push(
       "Execution-ready epic planning requires at least two features.",
     );
   }
 
-  features.forEach((feature, index) => {
+  indexedFeatures.forEach(([index, feature]) => {
     const prefix = `Epic planner checkpoint features[${index}]`;
     const issueNum = feature["issue_num"];
     if (
@@ -406,7 +410,7 @@ export function validateEpicPlannerStateText(
   const featureResult = extractFeatures(value["features"]);
   errors.push(...featureResult.errors);
 
-  errors.push(...validateDependencyWaves(featureResult.features));
+  errors.push(...validateDependencyWaves(featureResult.indexedFeatures));
   const maxParallel = value["max_parallel_features"];
   if (
     typeof maxParallel !== "number" ||
@@ -448,10 +452,13 @@ export function validateEpicPlannerStateText(
       );
     }
     errors.push(
-      ...validateReadyFeatures(featureResult.features, requireLaunchPaths),
+      ...validateReadyFeatures(
+        featureResult.indexedFeatures,
+        requireLaunchPaths,
+      ),
     );
     errors.push(
-      ...validateEpicPlannerChildLaunchBindings(featureResult.features, {
+      ...validateEpicPlannerChildLaunchBindings(featureResult.entries, {
         requireLaunchPaths,
       }),
     );

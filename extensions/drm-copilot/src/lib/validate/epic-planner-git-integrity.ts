@@ -174,6 +174,49 @@ export function validateCommittedFile(
   return [];
 }
 
+type PlanEntry = readonly [number, Readonly<Record<string, unknown>>, string];
+
+/**
+ * Pair each plan with its checkpoint entry and that entry's original index.
+ * Plans are matched in order to object entries whose `plan_path` equals the
+ * plan, so non-object and plan-less entries keep their positions in the
+ * checkpoint `features` array. When any plan has no such entry, the
+ * positional pairing over object entries is kept, so a caller whose plans
+ * are not drawn from the checkpoint sees unchanged behaviour.
+ */
+function pairPlansWithFeatures(
+  features: unknown,
+  plans: ReadonlyArray<string>,
+): PlanEntry[] {
+  const entries: [number, Record<string, unknown>][] = [];
+  if (Array.isArray(features)) {
+    features.forEach((item: unknown, index: number) => {
+      if (isRecord(item)) {
+        entries.push([index, item]);
+      }
+    });
+  }
+  const paired: PlanEntry[] = [];
+  let position = 0;
+  for (const plan of plans) {
+    let entry = entries[position];
+    while (entry !== undefined && entry[1]["plan_path"] !== plan) {
+      position += 1;
+      entry = entries[position];
+    }
+    if (entry === undefined) {
+      return plans.map((item, slot): PlanEntry => [
+        slot,
+        entries[slot]?.[1] ?? {},
+        item,
+      ]);
+    }
+    paired.push([entry[0], entry[1], plan]);
+    position += 1;
+  }
+  return paired;
+}
+
 /** Verify integration ancestry and byte-exact committed plan provenance. */
 export function validatePlanningGitIntegrity(
   state: Readonly<Record<string, unknown>>,
@@ -202,10 +245,8 @@ export function validatePlanningGitIntegrity(
       );
     }
   }
-  const features = Array.isArray(state["features"])
-    ? state["features"].filter(isRecord)
-    : [];
-  plans.forEach((plan, index) => {
+  const pairs = pairPlansWithFeatures(state["features"], plans);
+  pairs.forEach(([index, feature, plan]) => {
     const derived = git.lastCommit(plan);
     if (derived === undefined) {
       errors.push(
@@ -220,7 +261,6 @@ export function validatePlanningGitIntegrity(
       return;
     }
     const candidates = [derived];
-    const feature = features[index] ?? {};
     const featureCommit = feature["planning_commit"];
     if (featureCommit !== undefined) {
       if (typeof featureCommit !== "string" || !COMMIT_RE.test(featureCommit)) {
