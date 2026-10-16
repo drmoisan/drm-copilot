@@ -1,0 +1,15 @@
+# Python Feature-Receipt Suite (P4-T6)
+
+Timestamp: 2026-10-16T00-54
+Command: poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state_feature_receipts.py "tests/scripts/dev_tools/test_validate_epic_planner_state.py::test_readiness_requires_resolved_child_model_receipt" -v
+EXIT_CODE: 0
+Output Summary:
+- Result line: 8 passed in 0.23s (0 failed)
+- PASSED tests/scripts/dev_tools/test_validate_epic_planner_state_feature_receipts.py::test_ready_gate_skips_feature_receipts_when_keys_absent
+- PASSED tests/scripts/dev_tools/test_validate_epic_planner_state_feature_receipts.py::test_codex_flag_keeps_feature_receipts_unconditional[require_codex_model_routing]
+- PASSED tests/scripts/dev_tools/test_validate_epic_planner_state_feature_receipts.py::test_codex_flag_keeps_feature_receipts_unconditional[require_codex_topology]
+- PASSED tests/scripts/dev_tools/test_validate_epic_planner_state_feature_receipts.py::test_ready_gate_validates_present_null_feature_receipt[model_routing_receipt]
+- PASSED tests/scripts/dev_tools/test_validate_epic_planner_state_feature_receipts.py::test_ready_gate_validates_present_null_feature_receipt[topology_receipt]
+- PASSED tests/scripts/dev_tools/test_validate_epic_planner_state_feature_receipts.py::test_ready_gate_gates_each_feature_receipt_independently
+- PASSED tests/scripts/dev_tools/test_validate_epic_planner_state_feature_receipts.py::test_ready_gate_preserves_feature_index_when_receipts_skipped
+- PASSED tests/scripts/dev_tools/test_validate_epic_planner_state.py::test_readiness_requires_resolved_child_model_receipt

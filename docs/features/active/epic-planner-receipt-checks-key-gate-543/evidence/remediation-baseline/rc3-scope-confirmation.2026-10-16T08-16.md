@@ -1,0 +1,18 @@
+# Remediation Cycle 3 Scope Confirmation (P0-T2)
+
+Timestamp: 2026-10-16T08-16
+Command: read code-review.2026-10-16T07-16.md (findings table), policy-audit.2026-10-16T07-16.md (PA-N1 to PA-N4), feature-audit.2026-10-16T07-16.md (summary and AC status), the Plan Deviations sections of remediation-plan.2026-10-16T04-40.md and remediation-plan.2026-10-16T01-36.md, and the Acceptance Criteria list of spec.md
+EXIT_CODE: 0
+Work Mode: full-bug
+Cycle findings: CR-11, CR-12, CR-13, CR-14, CR-15, CR-16
+Not in scope: CR-3, CR-4, CR-7, PA-N1, PA-N2
+Output Summary:
+- Review verdicts: code review Ready (no Blocker or Major); policy audit no FAIL; feature audit READY, 17 PASS, AC18 UNVERIFIED (CI-dependent, S9).
+- Write set (9): scripts/dev_tools/epic_planner_git_integrity.py; scripts/dev_tools/epic_planner_readiness.py; extensions/drm-copilot/src/lib/validate/epic-planner-git-integrity.ts; tests/scripts/dev_tools/typescript_twin_test_support.py; tests/scripts/dev_tools/test_epic_planner_readiness_relative_paths.py; extensions/drm-copilot/test/lib/validate/epic-planner-readiness-relative-paths.test.ts; tests/scripts/dev_tools/test_typescript_twin_test_support.py (new); tests/scripts/dev_tools/test_epic_planner_readiness_edges.py (new); extensions/drm-copilot/test/lib/validate/epic-planner-readiness-edges.test.ts (new).
+- Out of scope (unchanged): the spec AC13 list (validate_orchestration_artifacts.py, .claude/**, .github/**, .agents/**, .codex/**, extensions/drm-copilot/resources/**, jest.config.cjs, mcp-tool-inputs.ts, orchestration-artifacts.ts, epic-planner-state-core.test.ts, test_push_down_codex_and_agents_customizations.py); production neighbours epic-planner-readiness-integrity.ts, epic-planner-state-core.ts, validate_epic_planner_state.py, _epic_orchestrator_state_launch_binding.py, epic-orchestrator-state-launch-binding.ts, epic_kickoff_contract.py, epic-kickoff-artifact.ts; existing tests not in the write set; spec.md, plan.2026-10-15T07-42.md, remediation-plan.2026-10-16T01-36.md, remediation-plan.2026-10-16T04-40.md.
+- CR-11 file correction: repository_relative_path lives in scripts/dev_tools/epic_planner_git_integrity.py (moved there from epic_planner_readiness.py in cycle 2), not in the readiness module named by the review.
+- CR-12 direction: Python aligned to TypeScript (strict "${folder}/" prefix). Evidence: (a) both runtimes' message reads "plan_path must be inside its feature_folder.", and a path equal to the folder is not inside it; (b) the sibling research_path and preflight_evidence_path rules already use the strict prefix; (c) the plan path is read as a file while the folder is checked as a directory, so an equal value cannot name a plan file; (d) no Python or TypeScript test asserts acceptance of an equal value and no document permits it.
+- CR-13 naming reason: fallback_plan / fallbackPlan, not plan, because plan is the enclosing loop variable in both functions and shadowing it would recreate the ambiguity CR-13 reports.
+- Observation O-4: for an unreadable required file Python reports "...: denied" (str(exc)) and TypeScript "...: Error: denied" (String(error)); the edge tests assert each runtime's own text and the string is excluded from the parity tuple; not changed in this cycle.
+- Environment constraints carried from earlier cycles: awk -f, awk --version, shell variables in option positions, for loops, and cd-chained reads are refused; awk programs are passed inline; empty-pattern grep -f prints nothing; Black may join adjacent literals.
+- AC state: spec.md AC1-AC17 checked, AC18 unchecked (CI-dependent); this cycle changes neither.
