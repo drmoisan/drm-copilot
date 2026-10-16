@@ -70,7 +70,7 @@ Adopted approach: `Invoke-BootstrapHost` in `scripts/dev-tools/HostBootstrap.psm
 - [x] AC-8: Expect-fail evidence: the new tests for AC-1 through AC-5 fail when run against the unmodified `HostBootstrap.psm1` and pass after the fix. Both PoshQC MCP test results are recorded under the feature `evidence/` folder (baseline before the change, QA gate after).
 - [x] AC-9: `scripts/dev-tools/HostBootstrap.psm1` and every touched or added test file are at or under 500 lines, verified by a line count. If `HostBootstrap.Invoke.Tests.ps1` would exceed 500 lines, the new tests are placed in `tests/scripts/dev-tools/HostBootstrap.Poetry.Tests.ps1`.
 - [x] AC-10: Local verification using the PoshQC MCP tools (format, analyze, test) on the changed module and test files reports zero formatting changes, zero analyzer findings, and zero test failures.
-- [ ] AC-11: The `poshqc / PowerShell QC` CI job (windows-latest) passes on the PR head with line coverage at or above the repository threshold (CI-dependent).
+- [x] AC-11: The `poshqc / PowerShell QC` CI job (windows-latest) passes on the PR head with line coverage at or above the repository threshold (CI-dependent).
 
 ## Next Step
 
