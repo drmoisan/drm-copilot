@@ -5,12 +5,44 @@ from __future__ import annotations
 import json
 from typing import Any
 
+import pytest
+
+from scripts.dev_tools.resolve_codex_deployment import resolve_codex_deployment
+from scripts.dev_tools.resolve_codex_topology import resolve_codex_topology
 from scripts.dev_tools.validate_epic_planner_state import (
     validate_epic_planner_state_text,
 )
 
 REPOSITORY_CONTEXT_ERROR = (
     "Execution-ready planner validation requires repository context."
+)
+MODEL_RECEIPT_OBJECT_ERROR = (
+    "Epic planner checkpoint features[0].model_routing_receipt must be an object."
+)
+TOPOLOGY_RECEIPT_OBJECT_ERROR = (
+    "Epic planner checkpoint features[0].topology_receipt must be an object."
+)
+LOGICAL_AGENT_ERROR = (
+    "Epic planner checkpoint features[0].model_routing_receipt.logical_agent "
+    "must be 'orchestrator'."
+)
+SECOND_TOPOLOGY_RECEIPT_OBJECT_ERROR = (
+    "Epic planner checkpoint features[1].topology_receipt must be an object."
+)
+FEATURE0_TOPOLOGY_TOKEN = (
+    "features[0].topology_receipt"  # noqa: S105 - test fixture data
+)
+FEATURE0_MODEL_TOKEN = (
+    "features[0].model_routing_receipt"  # noqa: S105 - test fixture data
+)
+ASSERTED_MESSAGES = (
+    REPOSITORY_CONTEXT_ERROR,
+    MODEL_RECEIPT_OBJECT_ERROR,
+    TOPOLOGY_RECEIPT_OBJECT_ERROR,
+    LOGICAL_AGENT_ERROR,
+    SECOND_TOPOLOGY_RECEIPT_OBJECT_ERROR,
+    FEATURE0_TOPOLOGY_TOKEN,
+    FEATURE0_MODEL_TOKEN,
 )
 
 
@@ -50,6 +82,32 @@ def _claude_state() -> dict[str, Any]:
     }
 
 
+def _with_receipts(feature: dict[str, Any]) -> dict[str, Any]:
+    """Attach resolved model routing and topology receipts to one feature."""
+
+    issue_num = feature["issue_num"]
+    model_receipt: dict[str, object] = dict(
+        resolve_codex_deployment("orchestrator", "C3", "epic_preparation_child", "C3")
+    )
+    model_receipt["phase"] = f"prepare-feature-{issue_num}"
+    model_receipt["delegation_id"] = f"prepare-feature-{issue_num}"
+    topology_receipt: dict[str, object] = dict(
+        resolve_codex_topology(["python"], 1, 1, "epic_preparation_child")
+    )
+    topology_receipt["phase"] = f"prepare-feature-{issue_num}"
+    feature["model_routing_receipt"] = model_receipt
+    feature["topology_receipt"] = topology_receipt
+    return feature
+
+
+def _state_with_receipts() -> dict[str, Any]:
+    """Build the Claude-shaped checkpoint with both receipts on every feature."""
+
+    state = _claude_state()
+    state["features"] = [_with_receipts(feature) for feature in state["features"]]
+    return state
+
+
 def _ready_errors(
     state: dict[str, Any],
     *,
@@ -72,3 +130,75 @@ def test_ready_gate_skips_feature_receipts_when_keys_absent() -> None:
     errors = _ready_errors(_claude_state())
 
     assert errors == [REPOSITORY_CONTEXT_ERROR]
+
+
+@pytest.mark.parametrize(
+    "flag", ["require_codex_model_routing", "require_codex_topology"]
+)
+def test_codex_flag_keeps_feature_receipts_unconditional(flag: str) -> None:
+    """Require both per-feature receipts when either Codex flag is asserted."""
+
+    state = _state_with_receipts()
+    state["features"][0].pop("model_routing_receipt")
+    state["features"][0].pop("topology_receipt")
+
+    errors = _ready_errors(
+        state,
+        require_codex_model_routing=flag == "require_codex_model_routing",
+        require_codex_topology=flag == "require_codex_topology",
+    )
+
+    assert MODEL_RECEIPT_OBJECT_ERROR in errors
+    assert TOPOLOGY_RECEIPT_OBJECT_ERROR in errors
+
+
+@pytest.mark.parametrize(
+    ("key", "expected"),
+    [
+        ("model_routing_receipt", MODEL_RECEIPT_OBJECT_ERROR),
+        ("topology_receipt", TOPOLOGY_RECEIPT_OBJECT_ERROR),
+    ],
+    ids=["model_routing_receipt", "topology_receipt"],
+)
+def test_ready_gate_validates_present_null_feature_receipt(
+    key: str, expected: str
+) -> None:
+    """Arm the check for a present null receipt key without a Codex flag."""
+
+    state = _state_with_receipts()
+    state["features"][0][key] = None
+
+    errors = _ready_errors(state)
+
+    assert expected in errors
+
+
+def test_ready_gate_gates_each_feature_receipt_independently() -> None:
+    """Validate a present model receipt while skipping an absent topology receipt."""
+
+    state = _state_with_receipts()
+    state["features"][0].pop("topology_receipt")
+    state["features"][0]["model_routing_receipt"]["logical_agent"] = "planner"
+
+    errors = _ready_errors(state)
+
+    assert LOGICAL_AGENT_ERROR in errors
+    assert [error for error in errors if FEATURE0_TOPOLOGY_TOKEN in error] == []
+
+
+def test_ready_gate_preserves_feature_index_when_receipts_skipped() -> None:
+    """Keep the original feature index after skipping a receipt-less feature."""
+
+    state = _state_with_receipts()
+    state["features"][0].pop("model_routing_receipt")
+    state["features"][0].pop("topology_receipt")
+    state["features"][1]["topology_receipt"] = None
+
+    errors = _ready_errors(state)
+
+    assert SECOND_TOPOLOGY_RECEIPT_OBJECT_ERROR in errors
+    assert [
+        error
+        for error in errors
+        if FEATURE0_TOPOLOGY_TOKEN in error or FEATURE0_MODEL_TOKEN in error
+    ] == []
