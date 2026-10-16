@@ -12,8 +12,8 @@
       2. Invokes scripts/dev-tools/Invoke-FullRelease.ps1 to open the release
          version-bump PR.
       3. Resolves the release branch and pull request number.
-      4. Waits for GitHub checks through gh and merges only after gh reports
-         checks success.
+      4. Waits through gh for every GitHub check on the pull request head and
+         merges only after every reported check passed or was skipped.
       5. Checks out main, pulls origin main, and invokes
          scripts/dev-tools/Invoke-ReleaseTagPush.ps1.
 
@@ -159,13 +159,89 @@ function Get-FirstOutputLine {
     return ''
 }
 
+function ConvertFrom-CheckPollOutput {
+    <#
+    .SYNOPSIS
+        Parses gh check poll output into check objects without throwing.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [AllowEmptyCollection()]
+        [Parameter(Mandatory = $true)]
+        [object[]]$Output
+    )
+    $failed = [pscustomobject]@{ Succeeded = $false; Checks = @() }
+    $text = $Output -join "`n"
+    if ([string]::IsNullOrWhiteSpace($text)) {
+        return $failed
+    }
+    try {
+        $parsed = @($text | ConvertFrom-Json -ErrorAction Stop)
+    }
+    catch [System.ArgumentException] {
+        return $failed
+    }
+    foreach ($item in $parsed) {
+        if ($item -isnot [System.Management.Automation.PSCustomObject]) {
+            return $failed
+        }
+    }
+
+    return [pscustomobject]@{ Succeeded = $true; Checks = $parsed }
+}
+
+function Get-CheckSetVerdict {
+    <#
+    .SYNOPSIS
+        Classifies a check set as pass, fail, unknown, pending, or empty.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [AllowEmptyCollection()]
+        [Parameter(Mandatory = $true)]
+        [object[]]$Checks
+    )
+    if ($Checks.Count -eq 0) {
+        return [pscustomobject]@{ Verdict = 'empty'; Detail = '' }
+    }
+    $known = @('pass', 'skipping', 'pending', 'fail', 'cancel')
+    $buckets = @(foreach ($check in $Checks) {
+            $property = if ($null -eq $check) { $null } else { $check.PSObject.Properties['bucket'] }
+            if ($null -eq $property -or [string]::IsNullOrWhiteSpace([string]$property.Value)) {
+                '(missing)'
+            }
+            else {
+                [string]$property.Value
+            }
+        })
+    if ($buckets -ccontains 'fail' -or $buckets -ccontains 'cancel') {
+        return [pscustomobject]@{ Verdict = 'fail'; Detail = '' }
+    }
+
+    $unknown = @($buckets | Where-Object { $_ -cnotin $known })
+    if ($unknown.Count -gt 0) {
+        return [pscustomobject]@{ Verdict = 'unknown'; Detail = $unknown[0] }
+    }
+
+    if ($buckets -ccontains 'pending') {
+        return [pscustomobject]@{ Verdict = 'pending'; Detail = '' }
+    }
+
+    return [pscustomobject]@{ Verdict = 'pass'; Detail = '' }
+}
+
 function Wait-ForPullRequestChecks {
     <#
     .SYNOPSIS
-        Waits for a pull request's required checks to register and complete.
+        Waits for every check on a pull request head to register and complete.
     .DESCRIPTION
-        Polls `gh pr checks <PrNumber> --required --json bucket` through the
-        Invoke-GhExe seam in two bounded phases:
+        Polls `gh pr checks <PrNumber> --json bucket` through the Invoke-GhExe
+        seam in two bounded phases.
+        The poll queries every check on the pull request head, whether or not branch protection requires it.
 
         Phase A (registration): GitHub takes several seconds to register
         workflow checks after a pull request is opened. While the poll
@@ -175,13 +251,17 @@ function Wait-ForPullRequestChecks {
         declaring a registration timeout.
 
         Phase B (completion): once the poll succeeds, its JSON output is
-        parsed into an array of check objects with a `bucket` property. If
-        any bucket is 'fail' or 'cancel', this is a genuine check failure and
-        the function returns 1 immediately without further waiting. If every
-        bucket is 'pass' or 'skipping', the function returns 0. If any bucket
-        is 'pending', the function sleeps CompletionIntervalSeconds and
-        re-polls, up to CompletionMaxAttempts times, before declaring a
-        completion timeout.
+        parsed into an array of check objects with a `bucket` property; an
+        unparsable first result returns 1. If any bucket is 'fail' or
+        'cancel', the function returns 1 immediately. If any check reports a
+        bucket outside 'pass', 'skipping', 'pending', 'fail', and 'cancel', or
+        has no bucket property, the function returns 1. If any bucket is
+        'pending', or no check is reported, the function sleeps
+        CompletionIntervalSeconds and re-polls, up to CompletionMaxAttempts
+        times, before declaring a completion timeout; a re-poll that fails or
+        cannot be parsed consumes an attempt and counts as an empty set. The
+        function returns 0 only when at least one check is reported and every
+        bucket is 'pass' or 'skipping'.
     .PARAMETER PrNumber
         The pull request number to poll checks for.
     .PARAMETER RegistrationMaxAttempts
@@ -193,11 +273,12 @@ function Wait-ForPullRequestChecks {
     .PARAMETER CompletionIntervalSeconds
         Seconds to sleep between completion-phase poll attempts.
     .OUTPUTS
-        Integer: 0 on success (every required check bucket is pass or
-        skipping); 1 on registration timeout, completion timeout, or a
-        genuine check failure (bucket fail or cancel).
+        Integer: 0 when at least one check is reported and every bucket is
+        pass or skipping; 1 on registration timeout, completion timeout, an
+        unparsable result, an unrecognized bucket, or a failing or cancelled
+        check.
     #>
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification = 'Function name matches the gh CLI concept of a pull request''s set of required checks (plural); the plan contract for issue #310 binds this exact name.')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification = 'Function name matches the gh CLI concept of the set of checks on a pull request (plural); the plan contract for issue #310 binds this exact name.')]
     [CmdletBinding()]
     [OutputType([int])]
     param(
@@ -217,7 +298,7 @@ function Wait-ForPullRequestChecks {
         [int]$CompletionIntervalSeconds = 10
     )
 
-    $ghArgs = @('pr', 'checks', $PrNumber, '--required', '--json', 'bucket')
+    $ghArgs = @('pr', 'checks', $PrNumber, '--json', 'bucket')
     $poll = Invoke-GhExe -GhArgs $ghArgs
 
     $registrationAttempt = 1
@@ -231,17 +312,28 @@ function Wait-ForPullRequestChecks {
         $registrationAttempt++
     }
 
-    $buckets = @(($poll.Output -join "`n") | ConvertFrom-Json) | ForEach-Object { $_.bucket }
+    $parsed = ConvertFrom-CheckPollOutput -Output $poll.Output
+    if (-not $parsed.Succeeded) {
+        Write-StderrLine -Message "Could not parse the check results for PR #$PrNumber."
+        return 1
+    }
+    $checks = $parsed.Checks
 
     $completionAttempt = 1
     while ($true) {
-        if ($buckets -contains 'fail' -or $buckets -contains 'cancel') {
-            Write-StderrLine -Message "A required check failed for PR #$PrNumber."
+        $verdict = Get-CheckSetVerdict -Checks $checks
+        if ($verdict.Verdict -ceq 'fail') {
+            Write-StderrLine -Message "A check failed for PR #$PrNumber."
             return 1
         }
 
-        $stillPending = $buckets | Where-Object { $_ -eq 'pending' }
-        if (-not $stillPending) {
+        if ($verdict.Verdict -ceq 'unknown') {
+            $value = $verdict.Detail
+            Write-StderrLine -Message "A check reported an unrecognized bucket for PR #${PrNumber}: ${value}."
+            return 1
+        }
+
+        if ($verdict.Verdict -ceq 'pass') {
             return 0
         }
 
@@ -252,7 +344,13 @@ function Wait-ForPullRequestChecks {
 
         Invoke-Sleep -Seconds $CompletionIntervalSeconds
         $poll = Invoke-GhExe -GhArgs $ghArgs
-        $buckets = @(($poll.Output -join "`n") | ConvertFrom-Json) | ForEach-Object { $_.bucket }
+        $checks = @()
+        if ($poll.ExitCode -eq 0) {
+            $parsed = ConvertFrom-CheckPollOutput -Output $poll.Output
+            if ($parsed.Succeeded) {
+                $checks = $parsed.Checks
+            }
+        }
         $completionAttempt++
     }
 }
