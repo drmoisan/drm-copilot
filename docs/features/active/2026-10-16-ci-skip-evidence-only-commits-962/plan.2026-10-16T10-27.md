@@ -4,27 +4,30 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-16
-- **Status:** Ready for executor preflight
-- **Version:** 1.0
+- **Status:** Ready for executor preflight (revision 1: preflight round 1 defects D1 to D10 resolved)
+- **Version:** 1.1
 - **Work Mode:** full-bug (`issue.md` marker `- Work Mode: full-bug`). The acceptance-criteria source is `spec.md`, section `## Acceptance Criteria`, AC-1 to AC-34. AC-32, AC-33, and AC-34 are CI-dependent. `user-story.md` is absent by design.
 - **Design inputs:** `spec.md` (Decisions D1 to D9, `## Proof Procedure`, `## Out of Scope`), `research/research.2026-10-16T14-39.md` (cited as "research §n"), and `issue.md` for context.
 - **Branch:** `bug/ci-skip-evidence-only-commits-962`. Every push is `git push origin HEAD:refs/heads/bug/ci-skip-evidence-only-commits-962` (fast-forward only). No force push, no `--amend`, no rebase, no deletion of any repository file or branch.
 
-**Fail-closed evidence rule:** PowerShell is the only code language this plan changes; the workflow YAML files are linted with actionlint. Baseline artifacts are produced in Phase 0, expect-fail regression artifacts in Phase 1, pass artifacts in Phases 2 to 5, final-QA and coverage artifacts in Phase 6, and CI proof artifacts in Phase 7. If any required baseline, QA, or coverage artifact is missing or incomplete, the audit verdict is BLOCKED or INCOMPLETE, never PASS.
+**Fail-closed evidence rule:** PowerShell is the only production code language this plan changes; one existing Python test file is adjusted (PD-13) and runs the Python toolchain stages; the workflow YAML files are linted with actionlint. Baseline artifacts are produced in Phase 0, expect-fail regression artifacts in Phase 1, pass artifacts in Phases 2 to 5, final-QA and coverage artifacts in Phase 6, and CI proof artifacts in Phase 7. If any required baseline, QA, or coverage artifact is missing or incomplete, the audit verdict is BLOCKED or INCOMPLETE, never PASS.
 
 **Evidence accounting rule:** every evidence-producing task names its artifact path. No evidence-backed task is checked off without its artifact on disk carrying `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
 
 ## 1. Terms
 
 - `FEATURE` denotes `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962`.
-- `SCRATCH` resolves to `<session scratchpad>/issue-962/`. Every scratch file this plan names lives under `SCRATCH/tools/`. Artifacts record the literal token `SCRATCH`, never a host path.
+- `SCRATCH` resolves to `<session scratchpad>/issue-962/`. Every scratch file this plan names lives under `SCRATCH/tools/` (the launcher and the recipes) or `SCRATCH/stage/` (the launcher's staged copies). Artifacts record the literal token `SCRATCH`, never a host path. In Bash command text the executor substitutes the forward-slash form of the resolved path for `SCRATCH`.
 - Evidence paths are `FEATURE/evidence/<kind>/<name>.<timestamp>.md` with `<kind>` one of `baseline`, `regression-testing`, `qa-gates`, `other`. `<timestamp>` is the UTC write time read from the host clock immediately before the write (`Get-Date -AsUTC -Format yyyy-MM-ddTHH-mm` or `date -u +%Y-%m-%dT%H-%M`), never fixed in this plan. A task that consumes an artifact selects the lexicographically greatest file matching `<name>.*.md`.
-- `CR-<NAME>` is a command recipe in section 5. `cr-<name>.ps1` is its scratch file under `SCRATCH/tools/`.
+- `CR-<NAME>` is a command recipe in section 5. `cr-<name>.txt` is its scratch file under `SCRATCH/tools/` (PowerShell 7 source stored with a `.txt` extension). `SCRATCH/tools/run-cr.sh` is the POSIX launcher of section 5; a CR is always run as `sh SCRATCH/tools/run-cr.sh cr-<name> <arguments>` (rule 3).
 - Named lists (comma-separated when passed to a CR):
   - `LIST-NEW-TESTS` = `tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1,tests/scripts/ci/CiChangeScope.Tests.ps1,tests/scripts/ci/Invoke-CiChangeScope.Tests.ps1,tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1`
   - `LIST-CI-TESTS` = `tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1,tests/scripts/ci/CiChangeScope.Tests.ps1,tests/scripts/ci/Invoke-CiChangeScope.Tests.ps1`
-  - `LIST-NEW-PS` = `scripts/ci/CiChangeScope.psm1,scripts/ci/Invoke-CiChangeScope.ps1` followed by `LIST-NEW-TESTS`, plus any suite edited under P4-T10.
-  - `LIST-EXISTING-SUITES` = the `LIST-EXISTING-SUITES:` line of the latest `FEATURE/evidence/other/edit-points.*.md` (derived mechanically by CR-INVENTORY in P0-T9: every `tests/scripts/workflows/*.Tests.ps1` present after the merge, sorted, plus `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1`).
+  - `LIST-NEW-PS` = `scripts/ci/CiChangeScope.psm1,scripts/ci/Invoke-CiChangeScope.ps1` followed by `LIST-NEW-TESTS` (the six new PowerShell files).
+  - `LIST-EDITED-SUITES` = `tests/scripts/workflows/CiWorkflow.Tests.ps1,tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` (the two existing suites adjusted by A2 and A3 of section 7).
+  - `LIST-PS-WRITTEN` = `LIST-NEW-PS` followed by `LIST-EDITED-SUITES` (every PowerShell file this plan writes).
+  - `LIST-EXISTING-SUITES` = the `LIST-EXISTING-SUITES:` line of the latest `FEATURE/evidence/other/edit-points.*.md` (derived mechanically by CR-INVENTORY in P0-T9: every `tests/scripts/workflows/*.Tests.ps1` present after the merge, every other `*.Tests.ps1` under `tests/` whose text names one of the seven files of `LIST-WORKFLOWS` by its `.github/workflows/` path, and `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1`, de-duplicated and sorted).
+  - `LIST-PY-WORKFLOW-TESTS` = `tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py tests/scripts/dev_tools/test_ruff_config_alignment.py tests/scripts/dev_tools/test_workflow_npm_token_guard.py` (space-separated; the Python suites that read `.github/workflows/`; only the first is edited, by A1 of section 7).
   - `LIST-WORKFLOWS` = `.github/workflows/ci.yml,.github/workflows/_quality-checks.yml,.github/workflows/_security-scan.yml,.github/workflows/_build-check.yml,.github/workflows/_shell-coverage.yml,.github/workflows/_drm-copilot-extension-tests.yml,.github/workflows/_poshqc.yml`
   - `SCAN-BASE` = `tests/scripts/workflows,tests/scripts/claude-lib/ci-gate`; `SCAN-FINAL` = `tests/scripts/ci,tests/scripts/workflows,tests/scripts/claude-lib/ci-gate`.
   - `PATTERNS-UNIT` = `*(AC-1)*,*(AC-2)*,*(AC-3)*,*(AC-4)*,*(AC-5)*,*(AC-6)*,*(AC-7)*,*(AC-8)*,*(AC-9)*,*(AC-10)*,*(AC-11)*,*(AC-12)*,*(AC-13)*,*(AC-14)*,*(AC-15)*,*(AC-16)*,*(AC-17)*`
@@ -35,8 +38,9 @@
 
 1. **Evidence schema.** Every artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`, followed by the command output with host paths redacted (rule 2). When one artifact records several commands, `Command:` and `EXIT_CODE:` describe the first command and each later command's exit code is recorded on its own labelled line. An artifact whose expected exit code is non-zero also carries `ExpectedExitCode: 1`. A PoshQC MCP call records `EXIT_CODE: 0` for `MCP_CALL: returned` and `EXIT_CODE: 1` for `MCP_CALL: error <message>`; that value implies no count, percentage, or finding. `EXIT_CODE: SKIPPED` is never a passing outcome.
 2. **No host data.** No artifact or test written by this plan contains an absolute host path, a drive letter, a user-profile path, a host name, or an account name. The worktree root is written as `<WORKSPACE_ROOT>` and scratch paths as `SCRATCH/...`.
-3. **Command route (decided once by P0-T4).** Every CR runs from the worktree root as `pwsh -NoProfile -File SCRATCH/tools/<cr>.ps1 <arguments>` through the Bash tool (the executor allowlist carries `Bash(pwsh *)`). If the Bash tool refuses command text containing `pwsh`, the same command runs through a PowerShell tool when the executing agent has one. If neither route runs, P0-T4 records `CR-ROUTE: BLOCKED` with the refusal text and execution stops. `git` runs directly through the Bash tool. The executor does not call `gh`, `grep`, `sh`, or `actionlint` directly; `actionlint` and `poetry run python` run inside CR scripts, and `poetry run pytest` runs directly (allowlisted).
-4. **Bash command text.** One command per call: no `&&`, no `;`, no `cd`, no heredoc. A search pattern that begins with `-` is passed through `-e`.
+3. **Command route (decided once by P0-T4).** The worktree isolation guard refuses any Bash command text that contains the token `pwsh`, and the executor has no PowerShell tool, so a CR never runs as a direct `pwsh` command. Every CR runs from the worktree root through the Bash tool as `sh SCRATCH/tools/run-cr.sh cr-<name> <arguments>`. The launcher `SCRATCH/tools/run-cr.sh` (section 5) copies `SCRATCH/tools/cr-<name>.txt` to `SCRATCH/stage/cr-<name>.ps1` with `cp` and then executes that copy with PowerShell 7 (`-NoProfile -NonInteractive -File`), passing the arguments through unchanged and returning the recipe's exit code. If P0-T4 observes a refusal or a missing interpreter, it records `CR-ROUTE: BLOCKED` with the refusal or launcher text and execution stops. `git` runs directly through the Bash tool. The executor does not call `gh`, `grep`, or `actionlint` directly, and calls `sh` only in the launcher form above; `actionlint`, `poetry install`, and `poetry run python` run inside recipes, and `poetry run black`, `poetry run ruff`, `poetry run pyright`, and `poetry run pytest` run directly (allowlisted).
+4. **Bash command text.** One command per call: no `&&`, no `;`, no `cd`, no heredoc, and no `pwsh` token anywhere in the command text (the interpreter name appears only inside `run-cr.sh` and inside recipe files). A search pattern that begins with `-` is passed through `-e`. The launcher file is written with LF line endings.
+4a. **No PowerShell scratch file is written with Write or Edit (coordinator directive for this item).** The executor writes exactly two kinds of scratch file with Write: `SCRATCH/tools/run-cr.sh` and the recipe files `SCRATCH/tools/cr-<name>.txt`. No `.ps1`, `.psm1`, or `.psd1` file under `SCRATCH` is created or changed with Write or Edit. The only `.ps1` files under `SCRATCH` are the staged copies `SCRATCH/stage/cr-<name>.ps1`, which the launcher creates with `cp` at run time; nobody edits them, and a recipe change is made in its `.txt` file only.
 5. **PoshQC MCP results carry no output.** `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, and `mcp__drm-copilot__run_poshqc_test` run as toolchain stages (P6-T1, P6-T2, P6-T4) and their record is the call disposition plus a tree observation. No task reads a count, a percentage, or a finding from an MCP result; every asserted number is read from CR output. `mcp__drm-copilot__run_poshqc_test` overwrites `artifacts/pester/powershell-coverage.xml`, so it never runs between CR-PESTER-COV and CR-COV-FILES.
 6. **Success-output observation rule.** The Phase 0 run of each CR is the reference observation. Before a later task asserts a CR literal, a Phase 0 artifact (or, for CRs that cannot pass at baseline, the first passing run) must show that literal on a successful run. If a named literal is absent from a successful run, record the observed output and stop BLOCKED; do not substitute a different literal.
 7. **Hook denials.** If any hook denies a Write, Edit, or Bash call, record the denial text in the task's artifact and stop BLOCKED. Never work around a hook, never delete hook state, never reset a budget file. This plan writes two production PowerShell files (`scripts/ci/CiChangeScope.psm1`, `scripts/ci/Invoke-CiChangeScope.ps1`), below the direct-mode threshold of `.claude/hooks/enforce-powershell-batch-budget.ps1`; test files and scratch files outside the worktree root are not counted.
@@ -47,10 +51,12 @@
 12. **Untracked tool output.** `scripts/dev-tools/run-actionlint.ps1` downloads `actionlint` into `tools/actionlint/bin/` when the binary is not on PATH (lines 26-27, 151-153), and `.gitignore` does not ignore `tools/`. A porcelain line `?? tools/` is expected after the first actionlint run, is never staged, and is excluded from every porcelain assertion. Nothing under `tools/` is deleted.
 13. **Scope boundary.** The complete repository write set is `## Files Written`. Policy documents under `.claude/rules/` and `.github/instructions/` are read-only. `.claude/lib/ci-gate/Invoke-CiGateParser.ps1`, its bundle mirror, `.claude/skills/orchestrate/SKILL.md`, and `.claude/skills/parallel-orchestrate/SKILL.md` are not edited (D4).
 14. **AC check-off.** The executor changes `- [ ]` to `- [x]` for an AC in `FEATURE/spec.md` only in the task named for it in section 4, after that task's acceptance condition holds, and changes no criterion text (`.claude/skills/acceptance-criteria-tracking/SKILL.md`). AC-32, AC-33, and AC-34 stay unchecked until Phase 7.
+15. **Pester runner and CI job.** Every Pester acceptance condition in this plan is observed in a local run through CR-PESTER-LIST or CR-PESTER-COV on the executor's Windows host. The CI job that runs the same suites is `poshqc / PowerShell QC` on `windows-latest` (after #953 the suites execute in the `poshqc-shard` matrix that this aggregator requires, and the coverage report is merged there); PowerShell coverage is produced only in that job. No acceptance condition in this plan relies on `poshqc / PowerShell hook suites (Linux)` or on `ubuntu-latest` for Pester or for coverage. Each Pester task below names this job as `CI job: poshqc / PowerShell QC (windows-latest)`.
+16. **Python scope and coverage.** The only Python file this plan writes is the test file `tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py` (PD-13). No Python production file changes, and test files are excluded from coverage measurement by policy, so no Python coverage threshold applies and no Python coverage command is run; the Python stages are format (`black --check`), lint (`ruff check`), type check (`pyright`), and test (`pytest`), each recorded with its success literal. The CI job that runs these checks is `quality-checks7 / Code Quality & Tests` (four Python versions on `ubuntu-latest`).
 
 ## 3. Decisions fixed by this plan
 
-- **PD-1 (dependency tokens, AC-30).** #952 is present when `origin/main:.github/workflows/ci.yml` contains the token "merge_group:". #953 is present when `origin/main:.github/workflows/_poshqc.yml` contains both "poshqc-shard:" and "poshqc-static:" and still contains "name: PowerShell QC". Integration is `git merge --no-ff --no-edit origin/main` so a merge commit always exists.
+- **PD-1 (dependency tokens, AC-30).** Each token is an anchored extended regular expression searched with `git grep -c -E -e '<regex>'` (git grep has no `-x`; the `^` and `[[:space:]]*$` anchors make the match whole-line, and `[[:space:]]*` tolerates a trailing carriage return). #952 is present when `origin/main:.github/workflows/ci.yml` has a line matching `^  merge_group:[[:space:]]*$` (the two-space trigger key; the #952 branch copy has it at line 9). #953 is present when `origin/main:.github/workflows/_poshqc.yml` has a line matching `^  poshqc-shard:[[:space:]]*$` and a line matching `^  poshqc-static:[[:space:]]*$` (two-space job keys; lines 40 and 8 of the #953 branch copy). The aggregator check `^    name: PowerShell QC[[:space:]]*$` (four-space job name, line 76 of the #953 branch copy) is a retention check, not a #953 presence check: it already matches on today's `origin/main`, and the anchors keep it from matching `name: PowerShell QC static` or `name: PowerShell QC shard ${{ matrix.shard }}`. Integration is `git merge --no-ff --no-edit origin/main` so a merge commit always exists.
 - **PD-2 (edit points re-derived).** This worktree's `ci.yml` and `_poshqc.yml` are the pre-#952/#953 shapes (D5). P0-T9 re-derives the post-merge job and step inventory mechanically (CR-INVENTORY) and stops BLOCKED on any of: B1 the `_poshqc.yml` job set is not exactly `poshqc`, `poshqc-linux-hooks`, `poshqc-shard`, `poshqc-static`; B2 the `poshqc` job has no job-level `if:` equal to `always()` or `${{ always() }}`; B3 the `poshqc` job does not have exactly one step whose name begins `Require`; B4 any of the steps `Install dependencies` and `Upload coverage to Codecov` (in `_quality-checks.yml`) or `Build kcov from source` (in `_shell-coverage.yml`) is absent; B5 any of the nine `ci.yml` caller jobs of research N2 is absent.
 - **PD-3 (pre-existing suite failures).** If a suite in `LIST-EXISTING-SUITES` fails at baseline (P0-T10), execution stops BLOCKED with `PREEXISTING_SUITE_FAILURE`, because D6 forbids editing those suites for reasons other than #962 gating and AC-26 requires them to pass (spec Out of Scope item 4).
 - **PD-4 (seam contract).** `-GhInvoker` and `-GitInvoker` are scriptblocks invoked as `& $GhInvoker <arg1> <arg2> ...`; they receive the arguments in `$args` and return `[pscustomobject]@{ ExitCode = <int>; Output = <string> }`. `-OutputWriter` is a scriptblock `param([string] $Target, [string] $Text)` with `Target` one of `Output`, `Summary`, `Log`, `Warning`. Section 6 fixes every signature.
@@ -62,6 +68,8 @@
 - **PD-10 (proof derivations).** `id1` is the newest completed `pull_request` run of `ci.yml` on the branch whose `CI full run` job concluded `success`; `head1` is its `headSha`. `id2` is the run for `head2`, the head pushed by P7-T4. `id3` is the run for `head3`, the head pushed by P7-T13.
 - **PD-11 (P3 proof edit, AC-34).** P7-T12 appends exactly one line at the end of `scripts/ci/CiChangeScope.psm1`: `# Changes to this module fall outside the docs-only allowlist, so they always start a full CI run (issue #962, proof step P3).`
 - **PD-12 (Phase 7 ownership).** Phase 7 runs after the pull request exists, at S9, by the item's orchestrator run, not by the executor during plan execution. AC-32, AC-33, and AC-34 stay unchecked until the Phase 7 task that verifies each.
+- **PD-13 (Python workflow contract test, preflight D4).** `tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py::test_threshold_step_runs_on_every_matrix_leg` (lines 134-143 of the current tree; identical in the #952 and #953 branch copies) asserts `"if" not in step` for the step running `check_python_coverage_thresholds` (`_quality-checks.yml` lines 87-92). G1 gives that step `if: ${{ inputs.run-heavy }}`, so the unmodified test fails on every CI matrix leg and AC-32 could not pass. The minimal change is A1 of section 7: the test requires the step's `if` value to equal exactly `${{ inputs.run-heavy }}` (a condition with the same value on every matrix leg) and fails on an absent key or on any other condition. The adjustment is planned fail-first (P4-T8, expect-fail) and pass-after (P4-T10), and is recorded with the D6 adjustments (P4-T13). The spec's D6 names only the two Pester suites; this Python test is the same class of gating-caused assertion change, and the spec does not exclude it from the write set. No other test in `tests/` pins a step or job condition of `ci.yml` or the six reusable workflows: the search recorded in section 7 found only A1 to A3.
+- **PD-14 (Pester suites from #952 and #953, preflight D5 and D6).** The dependency gate guarantees that both suites are in their #952 and #953 shapes when Phase 4 runs, so their adjustments are unconditional and task-ordered: A3 is made in P4-T6 together with the `_poshqc.yml` edit, and A2 is made in P4-T7 together with the `ci.yml` edit, so the existing-suite run P4-T12 can reach `Failed=0`. Both files are in `## Files Written` under `### Always written`.
 
 ## 4. Requirements trace
 
@@ -86,29 +94,98 @@ Row identifiers are those of section 8 (suite C = `tests/scripts/ci/CiDocsOnlyPa
 | AC-15 | section 9 config | C1-C6, I25 | P2-T2 |
 | AC-16 | F10, F12 | I20, I24, I27 | P3-T2 |
 | AC-17 | section 6 layout | P27, I21, I22, CR-STRUCTURE, CR-HERMETIC | P3-T3 |
-| AC-18 | G7 | W1-W5 | P4-T8 |
-| AC-19 | G7 | W6-W8 | P4-T8 |
-| AC-20 | G0-G6 | W9-W14 | P4-T8 |
-| AC-21 | G6 | W15-W17 | P4-T8 |
-| AC-22 | `## Files Written` | CR-SCOPE, CR-ONBLOCK | P6-T15 (from P4-T11, P6-T10) |
-| AC-23 | Phase 1 before Phase 4 | W suite | P4-T8 (with P1-T6) |
+| AC-18 | G7 | W1-W5 | P4-T11 |
+| AC-19 | G7 | W6-W8 | P4-T11 |
+| AC-20 | G0-G6 | W9-W14 | P4-T11 |
+| AC-21 | G6 | W15-W17 | P4-T11 |
+| AC-22 | `## Files Written`, A2, A3 | CR-SCOPE, CR-ONBLOCK, the D6 record | P6-T19 (from P4-T13, P4-T14, P6-T10) |
+| AC-23 | Phase 1 before Phase 4 | W suite | P4-T11 (with P1-T6) |
 | AC-24 | section 10 | CR-README | P5-T2 |
-| AC-25 | G0-G7 | CR-ACTIONLINT | P6-T15 (from P6-T3) |
-| AC-26 | all new PowerShell files | CR-FORMAT, CR-PSSA, CR-PESTER-LIST | P6-T15 (from P6-T1, P6-T2, P6-T5) |
-| AC-27 | F1-F12 | CR-PESTER-COV, CR-COV-FILES, CR-COV-DELTA | P6-T15 (from P6-T6, P6-T7, P6-T8) |
-| AC-28 | none (unchanged surfaces) | `PATTERNS-PARSER` rows, CR-SCOPE | P6-T15 (from P6-T5, P6-T10) |
+| AC-25 | G0-G7 | CR-ACTIONLINT | P6-T19 (from P6-T3) |
+| AC-26 | `LIST-PS-WRITTEN` (new files and the A2, A3 suites) | CR-FORMAT, CR-PSSA, CR-PESTER-LIST | P6-T19 (from P6-T1, P6-T2, P6-T5) |
+| AC-27 | F1-F12 | CR-PESTER-COV, CR-COV-FILES, CR-COV-DELTA | P6-T19 (from P6-T6, P6-T7, P6-T8) |
+| AC-28 | none (unchanged surfaces) | `PATTERNS-PARSER` rows, CR-SCOPE | P6-T19 (from P6-T5, P6-T10) |
 | AC-29 | section 9 tier entry | `check_quality_tiers`, quality-tiers pytest files | P2-T6 |
-| AC-30 | P0-T5 to P0-T8 | dependency-gate `git grep`, CR-SCOPE history lines | P6-T15 (from P0-T5, P0-T8, P6-T10) |
-| AC-31 | section 1 evidence rule | CR-EVIDENCE | P6-T15 (from P6-T13) |
+| AC-30 | P0-T5 to P0-T8 | dependency-gate `git grep`, CR-SCOPE history lines | P6-T19 (from P0-T5, P0-T8, P6-T10) |
+| AC-31 | section 1 evidence rule | CR-EVIDENCE | P6-T19 (from P6-T13) |
 | AC-32 | G7 decision jobs | CI run `id1` | P7-T3 |
 | AC-33 | G0-G7, F1-F12 | CI run `id2`, baseline run 38896898318 | P7-T11 |
 | AC-34 | G0-G7, F1-F12, PD-11 | CI run `id3` | P7-T14 |
 
 ## 5. Command recipes (CR)
 
-P0-T3 writes each recipe below, verbatim, to `SCRATCH/tools/<file>`. These files are outside the worktree, are not test files, and are not committed. Every recipe ends by printing `EXIT_CODE_COMPUTED: <n>` and exiting with that code, so the process exit code and the printed value agree; a disagreement stops the task BLOCKED. The one exception is CR-PESTER-COV, where Pester can end the process itself (`Run.Exit = $true`); its success observation is the process exit code 0 plus the `Tests Passed:` line, and its trailing lines are not asserted.
+P0-T3 writes the launcher below, verbatim, to `SCRATCH/tools/run-cr.sh` (LF line endings), and each recipe below, verbatim, to `SCRATCH/tools/<file>` where `<file>` is the `.txt` name in its heading. Recipe bodies are PowerShell 7 source; the `.txt` extension keeps every scratch file written with Write outside the `.ps1`/`.psm1`/`.psd1` set (rule 4a). These files are outside the worktree, are not test files, and are not committed. Every recipe ends by printing `EXIT_CODE_COMPUTED: <n>` and exiting with that code, so the process exit code and the printed value agree; a disagreement stops the task BLOCKED. The one exception is CR-PESTER-COV, where Pester can end the process itself (`Run.Exit = $true`); its success observation is the process exit code 0 plus the `Tests Passed:` line, and its trailing lines are not asserted. Every recipe run through the launcher prints `RUN-CR: cr-<name>` first.
 
-### cr-probe.ps1 (CR-PROBE)
+### run-cr.sh (the POSIX launcher)
+
+```sh
+#!/bin/sh
+# Runs one command recipe, SCRATCH/tools/<name>.txt, with PowerShell 7 from the current directory.
+# Usage: sh SCRATCH/tools/run-cr.sh cr-<name> [recipe arguments...]
+set -u
+MSYS_NO_PATHCONV=1
+MSYS2_ARG_CONV_EXCL='*'
+export MSYS_NO_PATHCONV MSYS2_ARG_CONV_EXCL
+if [ "$#" -lt 1 ]; then
+  echo "RUN-CR-USAGE: run-cr.sh cr-<name> [arguments]"
+  echo "EXIT_CODE_COMPUTED: 2"
+  exit 2
+fi
+name="$1"
+shift
+case "$name" in
+  cr-*) ;;
+  *)
+    echo "RUN-CR-BAD-NAME: $name"
+    echo "EXIT_CODE_COMPUTED: 2"
+    exit 2
+    ;;
+esac
+tools_dir=$(dirname "$0")
+recipe="$tools_dir/$name.txt"
+stage_dir="$tools_dir/../stage"
+if [ ! -f "$recipe" ]; then
+  echo "RUN-CR-RECIPE-MISSING: $name"
+  echo "EXIT_CODE_COMPUTED: 2"
+  exit 2
+fi
+if ! command -v pwsh >/dev/null 2>&1; then
+  echo "RUN-CR-INTERPRETER-ABSENT: PowerShell 7"
+  echo "EXIT_CODE_COMPUTED: 2"
+  exit 2
+fi
+mkdir -p "$stage_dir"
+cp "$recipe" "$stage_dir/$name.ps1"
+echo "RUN-CR: $name"
+exec pwsh -NoProfile -NonInteractive -File "$stage_dir/$name.ps1" "$@"
+```
+
+The launcher passes every argument as one argv element, so a quoted list or pattern containing spaces or parentheses reaches the recipe intact, and the `MSYS` variables stop Git for Windows `sh` from rewriting path-like arguments. Success-case literals: `RUN-CR: cr-<name>` followed by the recipe's own output; the process exit code is the recipe's. Failure literals: `RUN-CR-USAGE:`, `RUN-CR-BAD-NAME:`, `RUN-CR-RECIPE-MISSING:`, `RUN-CR-INTERPRETER-ABSENT:` with exit code 2.
+
+### cr-python-env.txt (CR-PYTHON-ENV, preflight D3)
+
+```powershell
+[CmdletBinding()]
+param()
+$install = @(& poetry install --no-interaction 2>&1)
+$installExit = $LASTEXITCODE
+foreach ($line in $install) { "PYENV-INSTALL: $line" }
+"PYENV-INSTALL-EXIT: $installExit"
+$probe = @(& poetry run python -c "import pytest, yaml; print('PYTHON-IMPORTS-OK')" 2>&1)
+$probeExit = $LASTEXITCODE
+foreach ($line in $probe) { "PYENV-PROBE: $line" }
+"PYENV-PROBE-EXIT: $probeExit"
+$importsOk = @($probe | Where-Object { ([string]$_).Trim() -ceq 'PYTHON-IMPORTS-OK' }).Count -eq 1
+$ready = ($installExit -eq 0) -and ($probeExit -eq 0) -and $importsOk
+if ($ready) { 'PYTHON-ENV-READY' } else { 'PYTHON-ENV-NOT-READY' }
+$code = if ($ready) { 0 } else { 1 }
+"EXIT_CODE_COMPUTED: $code"
+exit $code
+```
+
+`poetry install --no-interaction` creates or updates the worktree's Poetry environment from `pyproject.toml` and `poetry.lock` (it is a write-mode command; its observation is the printed readiness literal, not its exit code). The probe is a single-line `-c` program, because a multi-line `-c` argument can exit 0 without running. Success-case literals: `PYENV-INSTALL-EXIT: 0`, `PYENV-PROBE: PYTHON-IMPORTS-OK`, `PYENV-PROBE-EXIT: 0`, `PYTHON-ENV-READY`, `EXIT_CODE_COMPUTED: 0`. `PYTHON-ENV-READY` is printed only when all three conditions hold, so it cannot appear on a failed install or a failed import.
+
+### cr-probe.txt (CR-PROBE)
 
 ```powershell
 [CmdletBinding()]
@@ -131,7 +208,7 @@ exit $code
 
 Success-case literals: `PROBE-PESTER: 5.` (prefix), `PROBE-CWD-IS-REPO-ROOT: True`, `EXIT_CODE_COMPUTED: 0`.
 
-### cr-inventory.ps1 (CR-INVENTORY)
+### cr-inventory.txt (CR-INVENTORY)
 
 ```powershell
 [CmdletBinding()]
@@ -159,15 +236,20 @@ foreach ($file in $files) {
         if ($line -match '^ {8}if:\s*(?<cond>.+)$') { "STEP-IF: $file | $job | $stepIndex | $($Matches['cond'])" }
     }
 }
-$suites = @(Get-ChildItem -LiteralPath 'tests/scripts/workflows' -Filter '*.Tests.ps1' -File | ForEach-Object { 'tests/scripts/workflows/' + $_.Name } | Sort-Object)
-"LIST-EXISTING-SUITES: $((@($suites) + 'tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1') -join ',')"
+$root = (Get-Location).Path
+$workflowSuites = @(Get-ChildItem -LiteralPath 'tests/scripts/workflows' -Filter '*.Tests.ps1' -File | ForEach-Object { 'tests/scripts/workflows/' + $_.Name })
+$referencePattern = '\.github/workflows/(ci|_quality-checks|_security-scan|_build-check|_shell-coverage|_drm-copilot-extension-tests|_poshqc)\.yml'
+$referencing = @(Get-ChildItem -LiteralPath 'tests' -Filter '*.Tests.ps1' -File -Recurse | Where-Object { [string](Get-Content -Raw -LiteralPath $_.FullName) -match $referencePattern } | ForEach-Object { $_.FullName.Substring($root.Length + 1).Replace([string][char]92, '/') })
+foreach ($suite in $referencing) { "WORKFLOW-REFERENCING-SUITE: $suite" }
+$suites = @(@($workflowSuites) + @($referencing) + 'tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1' | Sort-Object -Unique)
+"LIST-EXISTING-SUITES: $($suites -join ',')"
 "EXIT_CODE_COMPUTED: 0"
 exit 0
 ```
 
-Success-case literals: one `JOB:` line per job, one `STEP:` line per step, a `LIST-EXISTING-SUITES:` line, `EXIT_CODE_COMPUTED: 0`.
+Success-case literals: one `JOB:` line per job, one `STEP:` line per step, one `WORKFLOW-REFERENCING-SUITE:` line per suite under `tests/` that names one of the seven workflow files by path, a `LIST-EXISTING-SUITES:` line, `EXIT_CODE_COMPUTED: 0`. In the #952 and #953 branch copies the referencing suites are `tests/scripts/workflows/CiWorkflow.Tests.ps1`, `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`, `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` (which names `ci.yml` only as test data), and, on the #953 copy, `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1` (row `RS07-WORKFLOW-LINUX-PESTER-RANGE` reads the `poshqc-linux-hooks` job; G6 adds no `Import-Module Pester` line, so it is unaffected).
 
-### cr-pester-list.ps1 (CR-PESTER-LIST)
+### cr-pester-list.txt (CR-PESTER-LIST)
 
 ```powershell
 [CmdletBinding()]
@@ -208,7 +290,7 @@ exit $code
 
 Success-case literals: one `CONTAINER:` line per file with `Result=Passed`, one `SUITE:` line per file, one `NAMED:` line per pattern, a `TOTAL:` line with `Failed=0`, `EXIT_CODE_COMPUTED: 0`.
 
-### cr-pester-cov.ps1 (CR-PESTER-COV, the PoshQC coverage run)
+### cr-pester-cov.txt (CR-PESTER-COV, the PoshQC coverage run)
 
 ```powershell
 [CmdletBinding()]
@@ -225,7 +307,7 @@ exit 0
 
 `Invoke-PoshQCTest` uses `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` (`Run.Exit = $true` at line 4, coverage output `artifacts/pester/powershell-coverage.xml` at line 22, `CoveragePercentTarget = 0` at line 26) and derives the coverage population from `config/poshqc-coverage.json`, whose `scripts` root includes `scripts/ci`. A failing run ends the process inside Pester with a non-zero code. Success-case observation: the line `COVERAGE-RUN-START-UTC:` (its value is passed to CR-COV-FILES as `-NotBefore`), the line `Code coverage population: source=config`, a `Tests Passed: <n>, Failed: 0` line, and process exit code 0. This CR always runs in a child process (rule 3), never in-process.
 
-### cr-cov-files.ps1 (CR-COV-FILES)
+### cr-cov-files.txt (CR-COV-FILES)
 
 ```powershell
 [CmdletBinding()]
@@ -279,7 +361,7 @@ exit $code
 
 `-NotBefore` is the `COVERAGE-RUN-START-UTC:` value printed by the CR-PESTER-COV run being read, so a stale coverage file from an earlier run cannot be read. Success-case literals: `COVERAGE-FILE-FRESH: True`, a positive `SOURCEFILE-COUNT:`, one numeric `TOTAL-LINE-COVERAGE:` line, one `COV-FILE:` line per target ending in `PASS`, `COV-FILES-FAILING: 0`, `EXIT_CODE_COMPUTED: 0`. Pester measures line and command coverage only; no branch figure is recorded for PowerShell.
 
-### cr-cov-delta.ps1 (CR-COV-DELTA)
+### cr-cov-delta.txt (CR-COV-DELTA)
 
 ```powershell
 [CmdletBinding()]
@@ -305,7 +387,7 @@ exit $code
 
 Success-case literals: `BASELINE TOTAL-LINE-COVERAGE:`, two `BASELINE COV-FILE:` lines ending `MISSING`, `FINAL TOTAL-LINE-COVERAGE:`, two `FINAL COV-FILE:` lines ending `PASS`, `DELTA-NEW-CODE-FILES-FAILING: 0`, `EXIT_CODE_COMPUTED: 0`.
 
-### cr-format.ps1 (CR-FORMAT; mirrors `Invoke-PoshQCFormat` in `scripts/powershell/PoshQC/PoshQC.Analyzer.psm1` lines 56-66)
+### cr-format.txt (CR-FORMAT; mirrors `Invoke-PoshQCFormat` in `scripts/powershell/PoshQC/PoshQC.Analyzer.psm1` lines 56-66)
 
 ```powershell
 [CmdletBinding()]
@@ -332,7 +414,7 @@ exit $code
 
 Success-case literals (clean, unchanged run): one `FORMAT-CLEAN:` line per file and `FORMAT-DRIFT-COUNT: 0`. In `-Write` mode the exit code is 0 whether or not a file was formatted, so a write-mode task asserts `FORMAT-DRIFT-COUNT: 0` and treats any `FORMAT-WRITTEN:` line as a change that restarts the loop.
 
-### cr-pssa.ps1 (CR-PSSA)
+### cr-pssa.txt (CR-PSSA)
 
 ```powershell
 [CmdletBinding()]
@@ -356,7 +438,7 @@ exit $code
 
 Success-case literals: one `PSSA:` line per file with `findings=0`, `PSSA-TOTAL: 0`, `EXIT_CODE_COMPUTED: 0`.
 
-### cr-hermetic.ps1 (CR-HERMETIC)
+### cr-hermetic.txt (CR-HERMETIC)
 
 ```powershell
 [CmdletBinding()]
@@ -384,7 +466,7 @@ exit $code
 
 Success-case literals: one `LINES:` line per file, `HERMETIC-HITS: 0`, `LINES-OVER-500: 0`, `EXIT_CODE_COMPUTED: 0`.
 
-### cr-structure.ps1 (CR-STRUCTURE, AC-17)
+### cr-structure.txt (CR-STRUCTURE, AC-17)
 
 ```powershell
 [CmdletBinding()]
@@ -429,7 +511,7 @@ exit $code
 
 Success-case literals: `STRUCT-MODULE-FUNCTIONS-MATCH: True`, `STRUCT-MODULE-BANNED-COMMANDS: 0`, `STRUCT-MODULE-INVOCATION-OPERATORS: 0`, `STRUCT-MODULE-IO-TYPES: 0`, `STRUCT-ENTRY-SEAMS: 3`, `STRUCT-ENTRY-GUARD: True`, `STRUCT-NON-POWERSHELL-FILES: 0`, `EXIT_CODE_COMPUTED: 0`.
 
-### cr-onblock.ps1 (CR-ONBLOCK)
+### cr-onblock.txt (CR-ONBLOCK)
 
 ```powershell
 [CmdletBinding()]
@@ -460,7 +542,7 @@ exit $code
 
 Success-case literals: `ONBLOCK-HAS-MERGE-GROUP: True`, `ONBLOCK-IDENTICAL: True`, `EXIT_CODE_COMPUTED: 0`. The comparison uses the merge base so that a later advance of `origin/main` does not change the result.
 
-### cr-readme.ps1 (CR-README, AC-24)
+### cr-readme.txt (CR-README, AC-24)
 
 ```powershell
 [CmdletBinding()]
@@ -485,7 +567,7 @@ exit $code
 
 Success-case literals: `README-PREFIX-IDENTICAL: True` (every pre-existing line, including the Triggers section, is unchanged and the new text is appended), `README-TOKENS-MISSING: 0`, `EXIT_CODE_COMPUTED: 0`.
 
-### cr-scope.ps1 (CR-SCOPE, AC-22, AC-28, AC-30)
+### cr-scope.txt (CR-SCOPE, AC-22, AC-28, AC-30)
 
 ```powershell
 [CmdletBinding()]
@@ -521,7 +603,7 @@ exit $code
 
 Success-case literals: `SCOPE-FORBIDDEN-PRESENT: 0`, `SCOPE-POLICY-PRESENT: 0`, `SCOPE-OUTSIDE-WRITE-SET: 0`, `SCOPE-HISTORY-REWRITES: 0`, `SCOPE-MERGE-COMMIT-CONTAINED: True`, `EXIT_CODE_COMPUTED: 0`. `SCOPE-PORCELAIN-ENTRIES` is informational (the plan file and unstaged evidence appear there before a commit).
 
-### cr-evidence.ps1 (CR-EVIDENCE, AC-31)
+### cr-evidence.txt (CR-EVIDENCE, AC-31)
 
 ```powershell
 [CmdletBinding()]
@@ -550,7 +632,7 @@ exit $code
 
 Success-case literals: a positive `EVIDENCE-FILES:`, `EVIDENCE-NONCANONICAL-COUNT: 0`, `EVIDENCE-OUTSIDE-FEATURE-COUNT: 0`, `EXIT_CODE_COMPUTED: 0`.
 
-### cr-actionlint.ps1 (CR-ACTIONLINT, AC-25)
+### cr-actionlint.txt (CR-ACTIONLINT, AC-25)
 
 ```powershell
 [CmdletBinding()]
@@ -578,7 +660,7 @@ exit $code
 
 `scripts/dev-tools/run-actionlint.ps1` discards the binary's output (line 128) and exits non-zero exactly when the binary does (lines 159-161), so the direct run supplies the finding text. Success-case literals: `ACTIONLINT-WRAPPER-EXIT: 0`, `ACTIONLINT-DIRECT-EXIT: 0`, `ACTIONLINT-FINDINGS: 0`, `EXIT_CODE_COMPUTED: 0`.
 
-### cr-quality-tiers.ps1 (CR-QUALITY-TIERS, AC-29)
+### cr-quality-tiers.txt (CR-QUALITY-TIERS, AC-29)
 
 ```powershell
 [CmdletBinding()]
@@ -594,7 +676,7 @@ exit $exit
 
 `scripts/dev_tools/check_quality_tiers.py` lists tracked files with `git ls-files -z` (line 96) and prints `quality-tiers: OK (<n> entries, <m> discovered projects)` on success (lines 196-198). Success-case literals: `QT-OUTPUT: quality-tiers: OK`, `QT-EXIT: 0`, `EXIT_CODE_COMPUTED: 0`.
 
-### cr-ac-status.ps1 (CR-AC-STATUS)
+### cr-ac-status.txt (CR-AC-STATUS)
 
 ```powershell
 [CmdletBinding()]
@@ -745,6 +827,74 @@ Insert the following two jobs directly after the `jobs:` line:
 ```
 
 The explicit `exit 0` follows `.claude/rules/ci-workflows.md` (a nested `git merge-base --is-ancestor` exit 1 must not leak). Each of `quality-checks7`, `security-scan`, `build-check`, `poshqc`, `shell-coverage`, and `drm-copilot-extension-tests` receives, directly after its job-id line, `    needs: changes` and `    if: ${{ !cancelled() }}`, and after its `uses:` line a `with:` block (or an added entry in an existing one) `      run-heavy: ${{ needs.changes.outputs.code != 'false' }}`. `root-typescript-tests` receives `    needs: changes` and `    if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}` directly after its job-id line; `npm-audit-gate` receives the same two lines directly after its `name:` line, and its `permissions:` and `with: audit-level: moderate` are unchanged. `docs-validation` is unchanged. Any job present after the merge that is not one of the nine is left unchanged.
+
+### A1 to A3. Existing contract-test adjustments (PD-13, PD-14)
+
+Search recorded for preflight D4: the tree under `tests/` (excluding `tests/fixtures/`) was searched for every reference to `ci.yml` and the six reusable workflow files, in the current tree and in the #952 and #953 branch copies. Files that read one of them: `tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py`, `tests/scripts/dev_tools/test_ruff_config_alignment.py`, `tests/scripts/workflows/CiWorkflow.Tests.ps1`, `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`, `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1`, and (on the #953 copy) `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1`; `tests/scripts/dev_tools/test_workflow_npm_token_guard.py` enumerates every workflow file for `NPM_TOKEN` and `NODE_AUTH_TOKEN` references, which G0 to G7 do not add. Of these, exactly three pin a condition or a condition-adjacent line that G0 to G7 change; they are A1, A2, and A3. `test_ruff_config_alignment.py::test_quality_checks_workflow_still_runs_a_ruff_lint_step` asserts only that a Ruff invocation line exists, which gating keeps; `hook-docs-only-diff.Tests.ps1` uses `.github/workflows/ci.yml` as a path literal in test data; `PoshQC.RunSettings.Tests.ps1` row `RS07-WORKFLOW-LINUX-PESTER-RANGE` counts `Import-Module Pester` lines, which G6 does not add. Those files are not edited; the Pester ones run in `LIST-EXISTING-SUITES` and the Python ones in `LIST-PY-WORKFLOW-TESTS`.
+
+**A1. `tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py` (P4-T9).** Add the module constant `RUN_HEAVY_GATE = "${{ inputs.run-heavy }}"` directly after the line `CODECOV_ACTION = "codecov/codecov-action"` (line 26 of the current tree), and replace the body of `test_threshold_step_runs_on_every_matrix_leg` (lines 134-143) with exactly:
+
+```python
+def test_threshold_step_runs_on_every_matrix_leg() -> None:
+    """The enforcement step must not be conditioned onto one matrix leg.
+
+    Scenario: the step running the threshold checker is inspected for its
+    condition, per decision D3 of the spec. The only permitted condition is the
+    issue #962 run-heavy gate, whose value is the same on every matrix leg.
+    Expected outcome: the step's ``if`` value equals the run-heavy gate exactly;
+    an absent key or any other condition fails.
+    """
+    step = step_running(THRESHOLD_CHECKER_MODULE)
+
+    assert step.get("if") == RUN_HEAVY_GATE, (
+        "the threshold step must carry exactly the run-heavy gate, found "
+        f"{step.get('if')!r}"
+    )
+```
+
+No other line of the file changes. `yaml.safe_load` reads the G1 line `if: ${{ inputs.run-heavy }}` as the string `${{ inputs.run-heavy }}`.
+
+**A2. `tests/scripts/workflows/CiWorkflow.Tests.ps1` (P4-T7, #952 shape).** In the row `reads no pull-request event field and declares no path filter anywhere in the ci.yml call graph` (lines 212-239 of the #952 branch copy), the line
+
+`            $eventFieldLines = @($graphLines | Where-Object { $_ -match 'github\.event\.pull_request|github\.head_ref|github\.base_ref|github\.event_name' })`
+
+(line 232 of that copy) is replaced by the following lines, at the same indentation:
+
+```powershell
+            # Issue #962: the ci.yml 'changes' job reads these five pull-request fields only with
+            # merge_group-safe fallbacks, and its decision returns code=true for every event other
+            # than pull_request before it uses them. Exactly these lines, once each, are allowed.
+            $allowedEventFieldLines = @()
+            if ($graphFile -eq $script:workflowPath) {
+                $allowedEventFieldLines = @(
+                    'ref: ${{ github.event.pull_request.head.sha || github.sha }}'
+                    'EVENT_NAME: ${{ github.event_name }}'
+                    'HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}'
+                    'HEAD_REF: ${{ github.head_ref }}'
+                    'HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}'
+                )
+            }
+            $allowedHits = @($graphLines | Where-Object { $allowedEventFieldLines -ccontains $_.Trim() })
+            $eventFieldLines = @($graphLines | Where-Object { $_ -match 'github\.event\.pull_request|github\.head_ref|github\.base_ref|github\.event_name' } | Where-Object { $allowedEventFieldLines -cnotcontains $_.Trim() })
+```
+
+and directly after the existing line `            $eventFieldLines.Count | Should -Be 0 -Because "$graphFile must not read a pull-request event field, which a merge_group run does not carry"` (line 236 of that copy) this line is inserted:
+
+```powershell
+            $allowedHits.Count | Should -Be $allowedEventFieldLines.Count -Because "$graphFile must carry each issue #962 change-scope event-field line exactly once"
+```
+
+The row name and every other line are unchanged. The five allowed lines are exactly the G7 lines that match the suite's event-field pattern (`ref:` of the checkout step and `EVENT_NAME`, `HEAD_SHA`, `HEAD_REF`, `HEAD_REPO` of the decision step); any other event-field line in `ci.yml` or any event-field line in a called workflow still fails the row. If the post-merge copy of this row differs from the text quoted above, P4-T7 stops BLOCKED and requests a plan revision.
+
+**A3. `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` (P4-T6, #953 shape).** In the row `runs Invoke-PoshQCTest with the shard parameters and uploads the shard results even on failure (issue #953)` (lines 105-112 of the #953 branch copy), the line
+
+`        $job | Should -Match '(?m)^ {8}if:[ \t]*always\(\)[ \t]*\n {8}uses:[ \t]*actions/upload-artifact@'`
+
+(line 110 of that copy) is replaced by exactly:
+
+`        $job | Should -Match '(?m)^ {8}if:[ \t]*\$\{\{ always\(\) && inputs\.run-heavy \}\}[ \t]*\n {8}uses:[ \t]*actions/upload-artifact@'`
+
+G6 turns the shard upload step's `if: always()` (line 65 of the #953 copy) into `if: ${{ always() && inputs.run-heavy }}` on the same line position, directly before its `uses: actions/upload-artifact@v7` line, so the replacement keeps the row's intent (the upload still runs after a failed test step) and accepts only the combined condition. The row name and every other line are unchanged. If the post-merge copy of this line differs from the text quoted above, P4-T6 stops BLOCKED and requests a plan revision.
 
 ## 8. Test row inventory
 
@@ -946,39 +1096,41 @@ Non-required jobs under `code=false`: `Change scope` reports `success`, `CI full
 ### Phase 0 — Baseline Capture and Dependency Gate
 
 - [ ] [P0-T1] Read the policy files in order and write `FEATURE/evidence/baseline/phase0-instructions-read.<timestamp>.md` with `Timestamp:`, `Policy Order:`, and the list of files read.
-  - Order: `CLAUDE.md`; `.claude/rules/general-code-change.md`; `.claude/rules/general-unit-test.md`; `.claude/rules/powershell.md`; `.claude/rules/quality-tiers.md`; `.claude/rules/ci-workflows.md`; `.claude/rules/plan-acceptance-gates.md`; `.claude/rules/self-explanatory-code-commenting.md`; `.claude/rules/tonality.md`; `.github/copilot-instructions.md`; `.github/instructions/general-code-change.instructions.md`; `.github/instructions/general-unit-test.instructions.md`; `.github/instructions/powershell-code-change.instructions.md`; `.github/instructions/powershell-unit-test.instructions.md`; `.github/instructions/github-actions.instructions.md`; `.claude/skills/acceptance-criteria-tracking/SKILL.md`; `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`.
-  - Done when the artifact lists all 17 files in that order. No policy file is edited.
+  - Order: `CLAUDE.md`; `.claude/rules/general-code-change.md`; `.claude/rules/general-unit-test.md`; `.claude/rules/powershell.md`; `.claude/rules/python.md`; `.claude/rules/python-suppressions.md`; `.claude/rules/quality-tiers.md`; `.claude/rules/ci-workflows.md`; `.claude/rules/plan-acceptance-gates.md`; `.claude/rules/self-explanatory-code-commenting.md`; `.claude/rules/tonality.md`; `.github/copilot-instructions.md`; `.github/instructions/general-code-change.instructions.md`; `.github/instructions/general-unit-test.instructions.md`; `.github/instructions/powershell-code-change.instructions.md`; `.github/instructions/powershell-unit-test.instructions.md`; `.github/instructions/python-code-change.instructions.md`; `.github/instructions/python-unit-test.instructions.md`; `.github/instructions/github-actions.instructions.md`; `.claude/skills/acceptance-criteria-tracking/SKILL.md`; `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`.
+  - Done when the artifact lists all 21 files in that order. No policy file is edited.
 - [ ] [P0-T2] Record the baseline branch state in `FEATURE/evidence/baseline/branch-state.<timestamp>.md` by running `git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`, `git status --porcelain`, and `git log -3 --format=%H%x09%s`.
   - Done when the branch is `bug/ci-skip-evidence-only-commits-962` and the porcelain output lists nothing except this plan file. Any other entry stops the task BLOCKED.
-- [ ] [P0-T3] Write every recipe of section 5 verbatim to `SCRATCH/tools/` (`cr-probe.ps1`, `cr-inventory.ps1`, `cr-pester-list.ps1`, `cr-pester-cov.ps1`, `cr-cov-files.ps1`, `cr-cov-delta.ps1`, `cr-format.ps1`, `cr-pssa.ps1`, `cr-hermetic.ps1`, `cr-structure.ps1`, `cr-onblock.ps1`, `cr-readme.ps1`, `cr-scope.ps1`, `cr-evidence.ps1`, `cr-actionlint.ps1`, `cr-quality-tiers.ps1`, `cr-ac-status.ps1`).
-  - Done when the 17 files exist with content identical to section 5. No file is written inside the worktree.
-- [ ] [P0-T4] Run `pwsh -NoProfile -File SCRATCH/tools/cr-probe.ps1` (rule 3) and write `FEATURE/evidence/baseline/cr-route-probe.<timestamp>.md` with `CR-ROUTE: Bash`, `CR-ROUTE: PowerShell tool`, or `CR-ROUTE: BLOCKED` and the refusal text.
-  - Done when the output shows `PROBE-PESTER: 5.` (prefix), `PROBE-CWD-IS-REPO-ROOT: True`, and `EXIT_CODE_COMPUTED: 0`. `CR-ROUTE: BLOCKED` or a non-zero exit stops execution BLOCKED.
-- [ ] [P0-T5] Run the dependency gate (AC-30, PD-1) and write `FEATURE/evidence/other/dependency-gate.<timestamp>.md`: `git fetch origin`, then `git grep -c -F -e "merge_group:" origin/main -- .github/workflows/ci.yml`, `git grep -c -F -e "poshqc-shard:" origin/main -- .github/workflows/_poshqc.yml`, `git grep -c -F -e "poshqc-static:" origin/main -- .github/workflows/_poshqc.yml`, and `git grep -c -F -e "name: PowerShell QC" origin/main -- .github/workflows/_poshqc.yml`, plus `git rev-parse origin/main`.
-  - Done with `DEPENDENCY_GATE: PASS` when all four searches exit 0 with a count of at least 1. Otherwise write `DEPENDENCY_GATE: BLOCKED` naming the missing tokens, run P0-T6 to commit and push the feature folder, and stop: no workflow file is edited and no later task runs.
+- [ ] [P0-T3] Write the launcher and every recipe of section 5 verbatim with the Write tool to `SCRATCH/tools/`: `run-cr.sh` (LF line endings) and the 18 recipe files `cr-python-env.txt`, `cr-probe.txt`, `cr-inventory.txt`, `cr-pester-list.txt`, `cr-pester-cov.txt`, `cr-cov-files.txt`, `cr-cov-delta.txt`, `cr-format.txt`, `cr-pssa.txt`, `cr-hermetic.txt`, `cr-structure.txt`, `cr-onblock.txt`, `cr-readme.txt`, `cr-scope.txt`, `cr-evidence.txt`, `cr-actionlint.txt`, `cr-quality-tiers.txt`, `cr-ac-status.txt`.
+  - Done when the 19 files exist with content identical to section 5, no `.ps1`, `.psm1`, or `.psd1` file was written with Write or Edit (rule 4a), and no file is written inside the worktree.
+- [ ] [P0-T4] Probe the command route and prepare the Python environment (rule 3, preflight D1 and D3): run `sh SCRATCH/tools/run-cr.sh cr-probe`, then `sh SCRATCH/tools/run-cr.sh cr-python-env` (which runs `poetry install --no-interaction` and an import probe), and write `FEATURE/evidence/baseline/cr-route-probe.<timestamp>.md` with both outputs and the line `CR-ROUTE: sh-launcher` or `CR-ROUTE: BLOCKED` followed by the refusal or launcher text.
+  - Done when the first output shows `RUN-CR: cr-probe`, `PROBE-PESTER: 5.` (prefix), `PROBE-CWD-IS-REPO-ROOT: True`, and `EXIT_CODE_COMPUTED: 0`, and the second shows `PYENV-INSTALL-EXIT: 0`, `PYENV-PROBE: PYTHON-IMPORTS-OK`, `PYTHON-ENV-READY`, and `EXIT_CODE_COMPUTED: 0`. A Bash refusal, any `RUN-CR-` failure literal, `PYTHON-ENV-NOT-READY`, or a non-zero exit records `CR-ROUTE: BLOCKED` (or `PYTHON-ENV: BLOCKED`) and stops execution BLOCKED. These two runs are the rule 6 reference observations for the launcher and for `PYTHON-ENV-READY`.
+- [ ] [P0-T5] Run the dependency gate (AC-30, PD-1) and write `FEATURE/evidence/other/dependency-gate.<timestamp>.md`: `git fetch origin`, then `git grep -c -E -e '^  merge_group:[[:space:]]*$' origin/main -- .github/workflows/ci.yml`, `git grep -c -E -e '^  poshqc-shard:[[:space:]]*$' origin/main -- .github/workflows/_poshqc.yml`, `git grep -c -E -e '^  poshqc-static:[[:space:]]*$' origin/main -- .github/workflows/_poshqc.yml`, and `git grep -c -E -e '^    name: PowerShell QC[[:space:]]*$' origin/main -- .github/workflows/_poshqc.yml`, plus `git rev-parse origin/main`.
+  - Done with `DEPENDENCY_GATE: PASS` when all four searches exit 0 and each prints exactly one `origin/main:<path>:<count>` line with a count of at least 1 (git grep exits 1 with no output when a pattern has no match). Otherwise write `DEPENDENCY_GATE: BLOCKED` naming the missing patterns, run P0-T6 to commit and push the feature folder, and stop: no workflow file is edited and no later task runs.
 - [ ] [P0-T6] Commit the Phase 0 artifacts written so far before the merge: `git add -- docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962`, then `git commit -m "docs(962): record Phase 0 policy reads and the dependency gate" -m "<trailer>"` (no push in this task unless P0-T5 recorded BLOCKED, in which case push per rule 11 and stop).
   - Done when `git status --porcelain` lists nothing except `?? tools/` (rule 12).
-- [ ] [P0-T7] Integrate the dependencies with `git merge --no-ff --no-edit origin/main` and write `FEATURE/evidence/other/merge-integration.<timestamp>.md` with the output of `git rev-parse HEAD`, `git rev-parse HEAD^1`, `git rev-parse HEAD^2`, `git merge-base --is-ancestor origin/main HEAD` (exit code), and `git grep -c -F -e "poshqc-shard:" HEAD -- .github/workflows/_poshqc.yml`.
+- [ ] [P0-T7] Integrate the dependencies with `git merge --no-ff --no-edit origin/main` and write `FEATURE/evidence/other/merge-integration.<timestamp>.md` with the output of `git rev-parse HEAD`, `git rev-parse HEAD^1`, `git rev-parse HEAD^2`, `git merge-base --is-ancestor origin/main HEAD` (exit code), and `git grep -c -E -e '^  poshqc-shard:[[:space:]]*$' HEAD -- .github/workflows/_poshqc.yml`.
   - Done when the merge exits 0, `HEAD^2` equals the `origin/main` SHA recorded by P0-T5, the ancestry check exits 0, and the search count is at least 1. Record `MERGE-COMMIT: <sha>`. On a conflict, run `git merge --abort`, record the conflicting paths, and stop BLOCKED. No rebase is used.
 - [ ] [P0-T8] Push the merge with `git push origin HEAD:refs/heads/bug/ci-skip-evidence-only-commits-962` and append to the P0-T7 artifact under `FEATURE/evidence/other/` the output of `git rev-parse HEAD` and `git rev-parse origin/bug/ci-skip-evidence-only-commits-962`.
   - Done when the push is a fast-forward and both SHAs are equal. A rejected push stops BLOCKED; no force push.
-- [ ] [P0-T9] Re-derive the edit points by running `pwsh -NoProfile -File SCRATCH/tools/cr-inventory.ps1` after reading the post-merge `.github/workflows/ci.yml`, `.github/workflows/_poshqc.yml`, and every `tests/scripts/workflows/*.Tests.ps1`, and write `FEATURE/evidence/other/edit-points.<timestamp>.md` with the full CR output plus the derived lines `POSHQC-JOBS:`, `POSHQC-AGGREGATOR-IF:`, `POSHQC-REQUIRE-STEP: <exact step name>`, `W-PASS-BEFORE: <row list>` (section 8), and `BLOCK-CHECKS: B1=<pass|fail> B2=... B3=... B4=... B5=...` (PD-2).
+- [ ] [P0-T9] Re-derive the edit points by running `sh SCRATCH/tools/run-cr.sh cr-inventory` after reading the post-merge `.github/workflows/ci.yml`, `.github/workflows/_poshqc.yml`, and every `tests/scripts/workflows/*.Tests.ps1`, and write `FEATURE/evidence/other/edit-points.<timestamp>.md` with the full CR output plus the derived lines `POSHQC-JOBS:`, `POSHQC-AGGREGATOR-IF:`, `POSHQC-REQUIRE-STEP: <exact step name>`, `W-PASS-BEFORE: <row list>` (section 8), and `BLOCK-CHECKS: B1=<pass|fail> B2=... B3=... B4=... B5=...` (PD-2).
   - Done when the CR prints `EXIT_CODE_COMPUTED: 0` and all five block checks pass. Any failing block check stops BLOCKED and requests a plan revision.
-- [ ] [P0-T10] Capture the baseline Pester state of the existing suites: `pwsh -NoProfile -File SCRATCH/tools/cr-pester-list.ps1 -PathList "<LIST-EXISTING-SUITES>" -NamePatternList "<PATTERNS-PARSER>"`, written to `FEATURE/evidence/baseline/baseline-pester-list.<timestamp>.md`.
-  - Done when the output shows `TOTAL:` with `Failed=0`, each of the three `NAMED:` lines shows `Passed=1 | Failed=0 | Total=1`, and `EXIT_CODE_COMPUTED: 0`. Any failing row stops BLOCKED with `PREEXISTING_SUITE_FAILURE` (PD-3).
-- [ ] [P0-T11] Run the baseline PoshQC coverage run `pwsh -NoProfile -File SCRATCH/tools/cr-pester-cov.ps1 -ScanFolderList "tests/scripts/workflows,tests/scripts/claude-lib/ci-gate"` and write `FEATURE/evidence/baseline/baseline-pester-coverage.<timestamp>.md`.
-  - Done when the output shows a `COVERAGE-RUN-START-UTC:` line, `Code coverage population: source=config`, and a `Tests Passed:` line with `Failed: 0`, and the process exit code is 0.
-- [ ] [P0-T12] Read the baseline per-file coverage with `pwsh -NoProfile -File SCRATCH/tools/cr-cov-files.ps1 -TargetList "scripts/ci/CiChangeScope.psm1,scripts/ci/Invoke-CiChangeScope.ps1" -NotBefore "<COVERAGE-RUN-START-UTC value from P0-T11>"` and write `FEATURE/evidence/baseline/baseline-coverage-files.<timestamp>.md` with `ExpectedExitCode: 1`.
+- [ ] [P0-T10] Capture the baseline Pester state of the existing suites: `sh SCRATCH/tools/run-cr.sh cr-pester-list -PathList "<LIST-EXISTING-SUITES>" -NamePatternList "<PATTERNS-PARSER>"`, written to `FEATURE/evidence/baseline/baseline-pester-list.<timestamp>.md`.
+  - Done when the output shows one `CONTAINER:` line with `Result=Passed` per suite of `LIST-EXISTING-SUITES`, `TOTAL:` with `Failed=0`, each of the three `NAMED:` lines shows `Passed=1 | Failed=0 | Total=1`, and `EXIT_CODE_COMPUTED: 0`. Any failing row stops BLOCKED with `PREEXISTING_SUITE_FAILURE` (PD-3). CI job: `poshqc / PowerShell QC` (windows-latest).
+- [ ] [P0-T11] Run the baseline PoshQC coverage run `sh SCRATCH/tools/run-cr.sh cr-pester-cov -ScanFolderList "tests/scripts/workflows,tests/scripts/claude-lib/ci-gate"` and write `FEATURE/evidence/baseline/baseline-pester-coverage.<timestamp>.md`.
+  - Done when the output shows a `COVERAGE-RUN-START-UTC:` line, `Code coverage population: source=config`, and a `Tests Passed:` line with `Failed: 0`, and the process exit code is 0. CI job (the only job that measures PowerShell coverage): `poshqc / PowerShell QC` (windows-latest).
+- [ ] [P0-T12] Read the baseline per-file coverage with `sh SCRATCH/tools/run-cr.sh cr-cov-files -TargetList "scripts/ci/CiChangeScope.psm1,scripts/ci/Invoke-CiChangeScope.ps1" -NotBefore "<COVERAGE-RUN-START-UTC value from P0-T11>"` and write `FEATURE/evidence/baseline/baseline-coverage-files.<timestamp>.md` with `ExpectedExitCode: 1`.
   - Done when the output shows `COVERAGE-FILE-FRESH: True`, a positive `SOURCEFILE-COUNT:`, a numeric `TOTAL-LINE-COVERAGE:` percent (the baseline headline), both `COV-FILE:` lines ending `MISSING` (the files do not exist yet), and `EXIT_CODE_COMPUTED: 1`. The Output Summary records the numeric baseline percent.
-- [ ] [P0-T13] Capture the baseline format state (read-only) with `pwsh -NoProfile -File SCRATCH/tools/cr-format.ps1 -PathList "<LIST-EXISTING-SUITES>"` and write `FEATURE/evidence/baseline/baseline-format-check.<timestamp>.md`.
-  - Done when the artifact records every `FORMAT-CLEAN:` or `FORMAT-DRIFT:` line and the `FORMAT-DRIFT-COUNT:` value; the result is informational because these suites are not edited (pre-existing drift is recorded, not fixed).
-- [ ] [P0-T14] Capture the baseline analyzer state with `pwsh -NoProfile -File SCRATCH/tools/cr-pssa.ps1 -PathList "<LIST-EXISTING-SUITES>"` and write `FEATURE/evidence/baseline/baseline-pssa.<timestamp>.md`.
+- [ ] [P0-T13] Capture the baseline format state (read-only) with `sh SCRATCH/tools/run-cr.sh cr-format -PathList "<LIST-EXISTING-SUITES>"` and write `FEATURE/evidence/baseline/baseline-format-check.<timestamp>.md`.
+  - Done when the artifact records every `FORMAT-CLEAN:` or `FORMAT-DRIFT:` line and the `FORMAT-DRIFT-COUNT:` value. The result is informational: pre-existing drift in a suite that is not edited is recorded, not fixed; drift recorded here for a suite of `LIST-EDITED-SUITES` is cleared by the Phase 6 format stage, which runs over `LIST-PS-WRITTEN`.
+- [ ] [P0-T14] Capture the baseline analyzer state with `sh SCRATCH/tools/run-cr.sh cr-pssa -PathList "<LIST-EXISTING-SUITES>"` and write `FEATURE/evidence/baseline/baseline-pssa.<timestamp>.md`.
   - Done when the artifact records each `PSSA:` line and the `PSSA-TOTAL:` value (informational, as for P0-T13).
-- [ ] [P0-T15] Capture the baseline actionlint state of the seven workflow files with `pwsh -NoProfile -File SCRATCH/tools/cr-actionlint.ps1 -PathList "<LIST-WORKFLOWS>"` and write `FEATURE/evidence/baseline/baseline-actionlint.<timestamp>.md`.
+- [ ] [P0-T15] Capture the baseline actionlint state of the seven workflow files with `sh SCRATCH/tools/run-cr.sh cr-actionlint -PathList "<LIST-WORKFLOWS>"` and write `FEATURE/evidence/baseline/baseline-actionlint.<timestamp>.md`.
   - Done when the artifact records `ACTIONLINT-WRAPPER-EXIT:`, `ACTIONLINT-DIRECT-EXIT:`, every `ACTIONLINT-FINDING:` line, and `ACTIONLINT-FINDINGS:`. Findings are fixed in Phase 4 under PD-9. `ACTIONLINT-BINARY: absent` stops BLOCKED.
-- [ ] [P0-T16] Capture the baseline tier classification with `pwsh -NoProfile -File SCRATCH/tools/cr-quality-tiers.ps1` and `poetry run pytest tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/scripts/dev_tools/test_check_quality_tiers.py tests/scripts/dev_tools/test_quality_tiers_contract.py`, written to `FEATURE/evidence/baseline/baseline-quality-tiers.<timestamp>.md`.
+- [ ] [P0-T16] Capture the baseline tier classification with `sh SCRATCH/tools/run-cr.sh cr-quality-tiers` and `poetry run pytest tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/scripts/dev_tools/test_check_quality_tiers.py tests/scripts/dev_tools/test_quality_tiers_contract.py`, written to `FEATURE/evidence/baseline/baseline-quality-tiers.<timestamp>.md`.
   - Done when the CR shows `QT-OUTPUT: quality-tiers: OK`, `QT-SCRIPTS-CI-ENTRY: False`, and `EXIT_CODE_COMPUTED: 0`, and the pytest summary line reports `passed` with no `failed`.
-- [ ] [P0-T17] Commit and push the Phase 0 baseline evidence (rule 11): `git add -- docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962`, `git commit -m "docs(962): record Phase 0 baselines after merging origin/main" -m "<trailer>"`, push, and write `FEATURE/evidence/other/commit-phase-0.<timestamp>.md`.
+- [ ] [P0-T17] Capture the Python toolchain baseline for `LIST-PY-WORKFLOW-TESTS` (rule 16) in `FEATURE/evidence/baseline/baseline-python.<timestamp>.md`, one labelled exit-code line per command: `poetry run black --check tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py`, `poetry run ruff check tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py`, `poetry run pyright tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py`, `poetry run pytest tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py`, and `poetry run pytest tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py tests/scripts/dev_tools/test_ruff_config_alignment.py tests/scripts/dev_tools/test_workflow_npm_token_guard.py`.
+  - Done when Black prints `1 file would be left unchanged.`, Ruff prints `All checks passed!`, Pyright prints a summary beginning `0 errors`, the single-file pytest summary reports `6 passed` with no `failed` (the count B used by P4-T8; if the post-merge file has a different number of tests, the printed number is B and is recorded as `PY-CONTRACT-BASELINE-PASSED: <B>`), the three-file pytest summary reports `passed` with no `failed`, and every exit code is 0. These runs are the rule 6 reference observations for the Python literals. A failure here stops BLOCKED with `PREEXISTING_PYTHON_FAILURE`, because the Phase 6 Python stages could not then pass. CI job: `quality-checks7 / Code Quality & Tests` (ubuntu-latest).
+- [ ] [P0-T18] Commit and push the Phase 0 baseline evidence (rule 11): `git add -- docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962`, `git commit -m "docs(962): record Phase 0 baselines after merging origin/main" -m "<trailer>"`, push, and write `FEATURE/evidence/other/commit-phase-0.<timestamp>.md`.
   - Done when `git rev-parse HEAD` equals `git rev-parse origin/bug/ci-skip-evidence-only-commits-962` and `git status --porcelain` lists nothing except `?? tools/`.
 
 ### Phase 1 — Regression Tests (Expect-Fail)
@@ -991,10 +1143,10 @@ Non-required jobs under `code=false`: `Change scope` reports `success`, `CI full
   - Done when the file exists, is 500 lines or fewer, and its row names match section 8 (P1-T6 `ROW:` lines).
 - [ ] [P1-T4] Write `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1` with exactly rows W1 to W17 of section 8 (40 expanded rows), using the `POSHQC-REQUIRE-STEP:` name from the latest `FEATURE/evidence/other/edit-points.*.md` in W17.
   - Done when the file exists, is 500 lines or fewer, and its row names match section 8 (P1-T6 `ROW:` lines).
-- [ ] [P1-T5] Check the four new suites for purity and size with `pwsh -NoProfile -File SCRATCH/tools/cr-hermetic.ps1 -PathList "<LIST-NEW-TESTS>"` and write `FEATURE/evidence/regression-testing/p1-test-hygiene.<timestamp>.md`.
+- [ ] [P1-T5] Check the four new suites for purity and size with `sh SCRATCH/tools/run-cr.sh cr-hermetic -PathList "<LIST-NEW-TESTS>"` and write `FEATURE/evidence/regression-testing/p1-test-hygiene.<timestamp>.md`.
   - Done when the output shows `HERMETIC-HITS: 0`, `LINES-OVER-500: 0`, and `EXIT_CODE_COMPUTED: 0`.
-- [ ] [P1-T6] [expect-fail] Run the four new suites against the unchanged production tree with `pwsh -NoProfile -File SCRATCH/tools/cr-pester-list.ps1 -PathList "<LIST-NEW-TESTS>" -NamePatternList "<PATTERNS-WORKFLOW>"` and write `FEATURE/evidence/regression-testing/expect-fail-new-suites.<timestamp>.md` with `ExpectedExitCode: 1` (AC-23 fail-before).
-  - Done when: the `SUITE: tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1` line shows `Passed=` equal to the size of `W-PASS-BEFORE` and `Failed=` equal to 40 minus that size; every `ROW: Passed` line for that suite names a `W-PASS-BEFORE` row and every other W row appears as `ROW: Failed`; for each of the three `tests/scripts/ci` suites either its `CONTAINER:` line shows `Result=Failed` or its `SUITE:` line shows `Passed=0` (the module, script, and config do not exist yet); and `EXIT_CODE_COMPUTED: 1`. Any other outcome stops BLOCKED with the observed rows.
+- [ ] [P1-T6] [expect-fail] Run the four new suites against the unchanged production tree with `sh SCRATCH/tools/run-cr.sh cr-pester-list -PathList "<LIST-NEW-TESTS>" -NamePatternList "<PATTERNS-WORKFLOW>"` and write `FEATURE/evidence/regression-testing/expect-fail-new-suites.<timestamp>.md` with `ExpectedExitCode: 1` (AC-23 fail-before).
+  - Done when: the `SUITE: tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1` line shows `Passed=` equal to the size of `W-PASS-BEFORE` and `Failed=` equal to 40 minus that size; every `ROW: Passed` line for that suite names a `W-PASS-BEFORE` row and every other W row appears as `ROW: Failed`; for each of the three `tests/scripts/ci` suites either its `CONTAINER:` line shows `Result=Failed` or its `SUITE:` line shows `Passed=0` (the module, script, and config do not exist yet); and `EXIT_CODE_COMPUTED: 1`. Any other outcome stops BLOCKED with the observed rows. CI job: `poshqc / PowerShell QC` (windows-latest).
 - [ ] [P1-T7] Commit and push the regression suites (rule 11): `git add -- tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1 tests/scripts/ci/CiChangeScope.Tests.ps1 tests/scripts/ci/Invoke-CiChangeScope.Tests.ps1 tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1 docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962`, `git commit -m "test(962): add failing change-scope and workflow-gating regression suites" -m "<trailer>"`, push, and write `FEATURE/evidence/other/commit-phase-1.<timestamp>.md`.
   - Done when `git rev-parse HEAD` equals `git rev-parse origin/bug/ci-skip-evidence-only-commits-962` and `git status --porcelain` lists nothing except `?? tools/`.
 
@@ -1002,15 +1154,15 @@ Non-required jobs under `code=false`: `Change scope` reports `success`, `CI full
 
 - [ ] [P2-T1] Write `config/ci-docs-only-paths.json` with the exact content of section 9.
   - Done when the file exists with that content (verified by P2-T2 rows C1 and C6).
-- [ ] [P2-T2] Run the config suite with `pwsh -NoProfile -File SCRATCH/tools/cr-pester-list.ps1 -PathList "tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1" -NamePatternList "*(AC-15)*"` and write `FEATURE/evidence/regression-testing/p2-config-suite.<timestamp>.md`; then check off AC-15 in `FEATURE/spec.md`.
-  - Done when the output shows `NAMED: *(AC-15)* | Passed=23 | Failed=0 | Total=23`, `TOTAL:` with `Failed=0`, and `EXIT_CODE_COMPUTED: 0`.
-- [ ] [P2-T3] Write `scripts/ci/CiChangeScope.psm1` implementing F1 to F8 of section 6 with the PD-6 suppressions and no other function.
-  - Done when the file exists, is 500 lines or fewer, and P2-T4 passes.
-- [ ] [P2-T4] Run the pure suite with `pwsh -NoProfile -File SCRATCH/tools/cr-pester-list.ps1 -PathList "tests/scripts/ci/CiChangeScope.Tests.ps1" -NamePatternList "*(AC-5)*,*(AC-10)*,*(AC-12)*,*(AC-13)*"` and write `FEATURE/evidence/regression-testing/p2-pure-suite.<timestamp>.md`; then check off AC-5, AC-10, AC-12, and AC-13 in `FEATURE/spec.md`.
-  - Done when the `SUITE:` line shows `Passed=54 | Failed=0`, the `NAMED:` lines show `Total=4`, `Total=1`, `Total=6`, and `Total=13` respectively with `Failed=0`, and `EXIT_CODE_COMPUTED: 0`.
-- [ ] [P2-T5] Append the `scripts/ci` entry of section 9 to `quality-tiers.yml` after the last existing entry.
-  - Done when the file ends with that three-line entry and no other line changes.
-- [ ] [P2-T6] Stage the new tracked files and verify the tier classification (AC-29): `git add -- scripts/ci/CiChangeScope.psm1 config/ci-docs-only-paths.json quality-tiers.yml`, then `pwsh -NoProfile -File SCRATCH/tools/cr-quality-tiers.ps1` and `poetry run pytest tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/scripts/dev_tools/test_check_quality_tiers.py tests/scripts/dev_tools/test_quality_tiers_contract.py`, written to `FEATURE/evidence/regression-testing/p2-quality-tiers.<timestamp>.md`; then check off AC-29 in `FEATURE/spec.md`.
+- [ ] [P2-T2] Run the config suite with `sh SCRATCH/tools/run-cr.sh cr-pester-list -PathList "tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1" -NamePatternList "*(AC-15)*"` and write `FEATURE/evidence/regression-testing/p2-config-suite.<timestamp>.md`; then check off AC-15 in `FEATURE/spec.md`.
+  - Done when the output shows `NAMED: *(AC-15)* | Passed=23 | Failed=0 | Total=23`, `TOTAL:` with `Failed=0`, and `EXIT_CODE_COMPUTED: 0`. CI job: `poshqc / PowerShell QC` (windows-latest).
+- [ ] [P2-T3] Write `scripts/ci/CiChangeScope.psm1` implementing F1 to F8 of section 6 with the PD-6 suppressions and no other function; the file ends with a newline (P7-T12 relies on it).
+  - Done when the file exists, is 500 lines or fewer, ends with a newline, and P2-T4 passes.
+- [ ] [P2-T4] Run the pure suite with `sh SCRATCH/tools/run-cr.sh cr-pester-list -PathList "tests/scripts/ci/CiChangeScope.Tests.ps1" -NamePatternList "*(AC-5)*,*(AC-10)*,*(AC-12)*,*(AC-13)*"` and write `FEATURE/evidence/regression-testing/p2-pure-suite.<timestamp>.md`; then check off AC-5, AC-10, AC-12, and AC-13 in `FEATURE/spec.md`.
+  - Done when the `SUITE:` line shows `Passed=54 | Failed=0`, the `NAMED:` lines show `Total=4`, `Total=1`, `Total=6`, and `Total=13` respectively with `Failed=0`, and `EXIT_CODE_COMPUTED: 0`. CI job: `poshqc / PowerShell QC` (windows-latest).
+- [ ] [P2-T5] Append the `scripts/ci` entry of section 9 to `quality-tiers.yml` after the last existing entry, then run `git diff --numstat HEAD -- quality-tiers.yml` and record its output in `FEATURE/evidence/regression-testing/p2-tier-entry-diff.<timestamp>.md`.
+  - Done when the file ends with that three-line entry and the numstat output is exactly one line reading `3`, a tab, `0`, a tab, `quality-tiers.yml` (three lines added, none deleted; the file ends with a newline today, after line 75, so nothing else changes). Any other numstat line stops the task BLOCKED.
+- [ ] [P2-T6] Stage the new tracked files and verify the tier classification (AC-29): `git add -- scripts/ci/CiChangeScope.psm1 config/ci-docs-only-paths.json quality-tiers.yml`, then `sh SCRATCH/tools/run-cr.sh cr-quality-tiers` and `poetry run pytest tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/scripts/dev_tools/test_check_quality_tiers.py tests/scripts/dev_tools/test_quality_tiers_contract.py`, written to `FEATURE/evidence/regression-testing/p2-quality-tiers.<timestamp>.md`; then check off AC-29 in `FEATURE/spec.md`.
   - Done when the CR shows `QT-OUTPUT: quality-tiers: OK`, `QT-SCRIPTS-CI-ENTRY: True`, and `EXIT_CODE_COMPUTED: 0`, and the pytest summary reports `passed` with no `failed`.
 - [ ] [P2-T7] Commit and push Phase 2 (rule 11): `git add -- scripts/ci/CiChangeScope.psm1 config/ci-docs-only-paths.json quality-tiers.yml docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962`, `git commit -m "feat(962): add the docs-only allowlist, the pure change-scope module, and the scripts/ci tier entry" -m "<trailer>"`, push, and write `FEATURE/evidence/other/commit-phase-2.<timestamp>.md`.
   - Done when `git rev-parse HEAD` equals `git rev-parse origin/bug/ci-skip-evidence-only-commits-962` and `git status --porcelain` lists nothing except `?? tools/`.
@@ -1019,9 +1171,9 @@ Non-required jobs under `code=false`: `Change scope` reports `success`, `CI full
 
 - [ ] [P3-T1] Write `scripts/ci/Invoke-CiChangeScope.ps1` implementing F9 to F12 of section 6, with the dot-source guard as its last statement.
   - Done when the file exists, is 500 lines or fewer, and P3-T2 passes.
-- [ ] [P3-T2] Run the three `tests/scripts/ci` suites with `pwsh -NoProfile -File SCRATCH/tools/cr-pester-list.ps1 -PathList "<LIST-CI-TESTS>" -NamePatternList "<PATTERNS-UNIT>"` and write `FEATURE/evidence/regression-testing/p3-ci-suites.<timestamp>.md`; then check off AC-1, AC-2, AC-3, AC-4, AC-6, AC-7, AC-8, AC-9, AC-11, AC-14, and AC-16 in `FEATURE/spec.md`.
-  - Done when `TOTAL:` shows `Passed=107 | Failed=0`, every `NAMED:` line shows `Failed=0` with the section 8 per-AC total (AC-1 8, AC-2 3, AC-3 4, AC-4 2, AC-5 5, AC-6 8, AC-7 3, AC-8 5, AC-9 3, AC-10 2, AC-11 7, AC-12 6, AC-13 13, AC-14 8, AC-15 24, AC-16 3, AC-17 3), and `EXIT_CODE_COMPUTED: 0`.
-- [ ] [P3-T3] Verify the structure of `scripts/ci/` (AC-17) with `pwsh -NoProfile -File SCRATCH/tools/cr-structure.ps1` and `pwsh -NoProfile -File SCRATCH/tools/cr-hermetic.ps1 -PathList "<LIST-NEW-PS>"`, written to `FEATURE/evidence/regression-testing/p3-structure.<timestamp>.md`; then check off AC-17 in `FEATURE/spec.md`.
+- [ ] [P3-T2] Run the three `tests/scripts/ci` suites with `sh SCRATCH/tools/run-cr.sh cr-pester-list -PathList "<LIST-CI-TESTS>" -NamePatternList "<PATTERNS-UNIT>"` and write `FEATURE/evidence/regression-testing/p3-ci-suites.<timestamp>.md`; then check off AC-1, AC-2, AC-3, AC-4, AC-6, AC-7, AC-8, AC-9, AC-11, AC-14, and AC-16 in `FEATURE/spec.md`.
+  - Done when `TOTAL:` shows `Passed=107 | Failed=0`, every `NAMED:` line shows `Failed=0` with the section 8 per-AC total (AC-1 8, AC-2 3, AC-3 4, AC-4 2, AC-5 5, AC-6 8, AC-7 3, AC-8 5, AC-9 3, AC-10 2, AC-11 7, AC-12 6, AC-13 13, AC-14 8, AC-15 24, AC-16 3, AC-17 3), and `EXIT_CODE_COMPUTED: 0`. CI job: `poshqc / PowerShell QC` (windows-latest).
+- [ ] [P3-T3] Verify the structure of `scripts/ci/` (AC-17) with `sh SCRATCH/tools/run-cr.sh cr-structure` and `sh SCRATCH/tools/run-cr.sh cr-hermetic -PathList "<LIST-NEW-PS>"`, written to `FEATURE/evidence/regression-testing/p3-structure.<timestamp>.md`; then check off AC-17 in `FEATURE/spec.md`.
   - Done when CR-STRUCTURE shows every section 5 success literal (`STRUCT-MODULE-FUNCTIONS-MATCH: True`, `STRUCT-ENTRY-SEAMS: 3`, `STRUCT-ENTRY-GUARD: True`, `STRUCT-NON-POWERSHELL-FILES: 0`, `EXIT_CODE_COMPUTED: 0`) and CR-HERMETIC shows `HERMETIC-HITS: 0` and `LINES-OVER-500: 0`.
 - [ ] [P3-T4] Commit and push Phase 3 (rule 11): `git add -- scripts/ci/Invoke-CiChangeScope.ps1 docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962`, `git commit -m "feat(962): add the change-scope entry script" -m "<trailer>"`, push, and write `FEATURE/evidence/other/commit-phase-3.<timestamp>.md`.
   - Done when `git rev-parse HEAD` equals `git rev-parse origin/bug/ci-skip-evidence-only-commits-962` and `git status --porcelain` lists nothing except `?? tools/`.
@@ -1029,84 +1181,95 @@ Non-required jobs under `code=false`: `Change scope` reports `success`, `CI full
 ### Phase 4 — Workflow Gating
 
 - [ ] [P4-T1] Edit `.github/workflows/_quality-checks.yml` per G0 and G1 (and PD-9 for any baseline actionlint finding in this file).
-  - Done when every step of `quality-checks7` carries an `if:` referencing `inputs.run-heavy` and the two G1 lines are exact (verified by P4-T8 rows W9 to W14 for this file).
+  - Done when every step of `quality-checks7` carries an `if:` referencing `inputs.run-heavy` and the two G1 lines are exact (verified by P4-T11 rows W9 to W14 for this file; the threshold step's new `if:` is the cause of the P4-T8 expect-fail).
 - [ ] [P4-T2] Edit `.github/workflows/_security-scan.yml` per G0 and G2 (and PD-9).
-  - Done when every step of `security-scan` carries `if: ${{ inputs.run-heavy }}` and `continue-on-error: true` is unchanged (P4-T8 rows W9, W10, W14 for this file).
+  - Done when every step of `security-scan` carries `if: ${{ inputs.run-heavy }}` and `continue-on-error: true` is unchanged (P4-T11 rows W9, W10, W14 for this file).
 - [ ] [P4-T3] Edit `.github/workflows/_build-check.yml` per G0 and G3 (and PD-9).
-  - Done when every step of `build-check` carries `if: ${{ inputs.run-heavy }}` (P4-T8 rows W9, W10, W14 for this file).
+  - Done when every step of `build-check` carries `if: ${{ inputs.run-heavy }}` (P4-T11 rows W9, W10, W14 for this file).
 - [ ] [P4-T4] Edit `.github/workflows/_shell-coverage.yml` per G0 and G4 (and PD-9).
-  - Done when every step of `shell-coverage`, including the `if-no-files-found: error` upload, carries an `if:` referencing `inputs.run-heavy` and the G4 line is exact (P4-T8 rows W9, W10, W13, W14 for this file).
+  - Done when every step of `shell-coverage`, including the `if-no-files-found: error` upload, carries an `if:` referencing `inputs.run-heavy` and the G4 line is exact (P4-T11 rows W9, W10, W13, W14 for this file).
 - [ ] [P4-T5] Edit `.github/workflows/_drm-copilot-extension-tests.yml` per G0 and G5 (and PD-9).
-  - Done when every step of `drm-copilot-extension-tests` carries `if: ${{ inputs.run-heavy }}` (P4-T8 rows W9, W10, W14 for this file).
-- [ ] [P4-T6] Edit `.github/workflows/_poshqc.yml` per G0 and G6 against the sharded shape recorded in the edit-points artifact (and PD-9).
-  - Done when `poshqc-static`, `poshqc-shard`, and `poshqc-linux-hooks` carry a job-level `if:` referencing `inputs.run-heavy`, the aggregator's job-level `if: always()` line is unchanged, and every aggregator step carries an `if:` referencing `inputs.run-heavy` (P4-T8 rows W9, W10, W14 to W17).
-- [ ] [P4-T7] Edit `.github/workflows/ci.yml` per G7 (and PD-9), leaving every line of the `on:` block unchanged.
-  - Done when the `changes` and `full-run-marker` jobs and the caller lines of G7 are present (P4-T8 rows W1 to W8) and P4-T11 reports the `on:` block identical.
-- [ ] [P4-T8] Run the workflow suite with `pwsh -NoProfile -File SCRATCH/tools/cr-pester-list.ps1 -PathList "tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1" -NamePatternList "<PATTERNS-WORKFLOW>"` and write `FEATURE/evidence/regression-testing/p4-workflow-suite-pass.<timestamp>.md` (AC-23 pass-after); then check off AC-18, AC-19, AC-20, AC-21, and AC-23 in `FEATURE/spec.md`.
-  - Done when the `SUITE:` line shows `Passed=40 | Failed=0`, the `NAMED:` lines show `Total=5`, `Total=9`, `Total=21`, and `Total=5` with `Failed=0`, and `EXIT_CODE_COMPUTED: 0`. AC-23 is checked only if the P1-T6 artifact exists with its expected fail outcome.
-- [ ] [P4-T9] Run the existing suites against the edited workflows with `pwsh -NoProfile -File SCRATCH/tools/cr-pester-list.ps1 -PathList "<LIST-EXISTING-SUITES>" -NamePatternList "<PATTERNS-PARSER>"` and write `FEATURE/evidence/regression-testing/p4-existing-suites.<timestamp>.md`.
-  - Done when `TOTAL:` shows `Failed=0` and `EXIT_CODE_COMPUTED: 0`. A failure goes to P4-T10.
-- [ ] [P4-T10] Record the D6 decision for `tests/scripts/workflows/CiWorkflow.Tests.ps1` and `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` in `FEATURE/evidence/other/workflow-suite-adjustment.<timestamp>.md`.
-  - When P4-T9 had `Failed=0`: write `D6-ADJUSTMENT: NONE`.
-  - When the only failing rows are in those two suites and each failure is caused by a line that G0 to G7 added: change only the failing assertion so it accepts the added line, record the row name, the old and new assertion text, and the cause, re-run P4-T9, and write `D6-ADJUSTMENT: <suite> | <row>`.
-  - Any other failure stops BLOCKED and requests a plan revision.
-  - Done when the artifact carries a `D6-ADJUSTMENT:` line and the latest P4-T9 run shows `Failed=0`.
-- [ ] [P4-T11] Verify the `ci.yml` trigger block (AC-22) with `pwsh -NoProfile -File SCRATCH/tools/cr-onblock.ps1` and write `FEATURE/evidence/regression-testing/p4-onblock.<timestamp>.md`.
+  - Done when every step of `drm-copilot-extension-tests` carries `if: ${{ inputs.run-heavy }}` (P4-T11 rows W9, W10, W14 for this file).
+- [ ] [P4-T6] Edit `.github/workflows/_poshqc.yml` per G0 and G6 against the sharded shape recorded in the edit-points artifact (and PD-9), and in the same task apply A3 of section 7 to `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` (PD-14, preflight D6), so the existing-suite run P4-T12 can pass in task order; record the numstat output below in `FEATURE/evidence/regression-testing/p4-poshqc-suite-edit.<timestamp>.md`.
+  - Done when `poshqc-static`, `poshqc-shard`, and `poshqc-linux-hooks` carry a job-level `if:` referencing `inputs.run-heavy`, the aggregator's job-level `if: always()` line is unchanged, every aggregator step carries an `if:` referencing `inputs.run-heavy` (P4-T11 rows W9, W10, W14 to W17), and the A3 line is the only changed line of `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` (`git diff --numstat HEAD -- tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` prints one line reading `1`, a tab, `1`, a tab, and the path; the row's pass is observed by P4-T12). If the post-merge line differs from the A3 quotation, stop BLOCKED.
+- [ ] [P4-T7] Edit `.github/workflows/ci.yml` per G7 (and PD-9), leaving every line of the `on:` block unchanged, and in the same task apply A2 of section 7 to `tests/scripts/workflows/CiWorkflow.Tests.ps1` (PD-14, preflight D5), so the existing-suite run P4-T12 can pass in task order; record the numstat output below in `FEATURE/evidence/regression-testing/p4-ci-suite-edit.<timestamp>.md`.
+  - Done when the `changes` and `full-run-marker` jobs and the caller lines of G7 are present (P4-T11 rows W1 to W8), P4-T14 reports the `on:` block identical, and `git diff --numstat HEAD -- tests/scripts/workflows/CiWorkflow.Tests.ps1` prints one line reading `16`, a tab, `1`, a tab, and the path (A2 replaces one line with fifteen and inserts one more; the row's pass is observed by P4-T12). If the post-merge row differs from the A2 quotation, stop BLOCKED.
+- [ ] [P4-T8] [expect-fail] Observe the gating-caused failure of the Python contract test before adjusting it (PD-13, preflight D4): run `poetry run pytest tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py` and write `FEATURE/evidence/regression-testing/p4-py-contract-fail-before.<timestamp>.md` with `ExpectedExitCode: 1`.
+  - Done when the exit code is 1, the short summary carries the line `FAILED tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py::test_threshold_step_runs_on_every_matrix_leg` (pytest `-ra` from the project `addopts`) and no other `FAILED` line, and the summary line reports `1 failed` and `<B-1> passed`, where B is the passed count recorded by P0-T17 (6 in the current tree, so `1 failed, 5 passed`). Any other outcome stops BLOCKED with the observed output. CI job: `quality-checks7 / Code Quality & Tests` (ubuntu-latest).
+- [ ] [P4-T9] Apply A1 of section 7 to `tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py` and record the numstat output below in `FEATURE/evidence/regression-testing/p4-py-contract-edit.<timestamp>.md`.
+  - Done when `git diff --numstat HEAD -- tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py` prints one line reading `10`, a tab, `4`, a tab, and the path (A1 adds the constant line, replaces three docstring lines with five, and replaces the one-line assertion with four lines; six lines of the test are unchanged). Any other count stops BLOCKED with the diff recorded. The behavioural check is P4-T10.
+- [ ] [P4-T10] Pass-after for the Python contract test and the other Python workflow readers: run `poetry run pytest tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py tests/scripts/dev_tools/test_ruff_config_alignment.py tests/scripts/dev_tools/test_workflow_npm_token_guard.py` and write `FEATURE/evidence/regression-testing/p4-py-contract-pass-after.<timestamp>.md`.
+  - Done when the exit code is 0, the short summary has no `FAILED` or `ERROR` line, and the summary line reports `passed` with no `failed` and a passed count equal to the P0-T17 three-file count. CI job: `quality-checks7 / Code Quality & Tests` (ubuntu-latest).
+- [ ] [P4-T11] Run the workflow suite with `sh SCRATCH/tools/run-cr.sh cr-pester-list -PathList "tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1" -NamePatternList "<PATTERNS-WORKFLOW>"` and write `FEATURE/evidence/regression-testing/p4-workflow-suite-pass.<timestamp>.md` (AC-23 pass-after); then check off AC-18, AC-19, AC-20, AC-21, and AC-23 in `FEATURE/spec.md`.
+  - Done when the `SUITE:` line shows `Passed=40 | Failed=0`, the `NAMED:` lines show `Total=5`, `Total=9`, `Total=21`, and `Total=5` with `Failed=0`, and `EXIT_CODE_COMPUTED: 0`. AC-23 is checked only if the P1-T6 artifact exists with its expected fail outcome. CI job: `poshqc / PowerShell QC` (windows-latest).
+- [ ] [P4-T12] Run the existing suites, including the A2 and A3 suites, against the edited workflows with `sh SCRATCH/tools/run-cr.sh cr-pester-list -PathList "<LIST-EXISTING-SUITES>" -NamePatternList "reads no pull-request event field and declares no path filter anywhere in the ci.yml call graph,runs Invoke-PoshQCTest with the shard parameters and uploads the shard results even on failure (issue #953),<PATTERNS-PARSER>"` and write `FEATURE/evidence/regression-testing/p4-existing-suites.<timestamp>.md`.
+  - Done when every `CONTAINER:` line shows `Result=Passed`, `TOTAL:` shows `Failed=0`, the two adjusted-row `NAMED:` lines each show `Passed=1 | Failed=0 | Total=1`, the three `PATTERNS-PARSER` lines each show `Passed=1 | Failed=0 | Total=1`, and `EXIT_CODE_COMPUTED: 0`. A failing row in any suite stops BLOCKED and requests a plan revision; no suite outside `## Files Written` is edited. CI job: `poshqc / PowerShell QC` (windows-latest).
+- [ ] [P4-T13] Record the D6 adjustments (AC-22) in `FEATURE/evidence/other/workflow-suite-adjustment.<timestamp>.md`: for each of A1, A2, and A3, one line `D6-ADJUSTMENT: <file> | <row or test name>` followed by the old text, the new text, and the cause (the G1, G7, or G6 line that broke it), plus the P4-T8 fail-before and P4-T12, P4-T10 pass-after artifact names.
+  - Done when the artifact carries exactly three `D6-ADJUSTMENT:` lines naming `tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py`, `tests/scripts/workflows/CiWorkflow.Tests.ps1`, and `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`, and the latest P4-T10 and P4-T12 artifacts show their pass conditions.
+- [ ] [P4-T14] Verify the `ci.yml` trigger block (AC-22) with `sh SCRATCH/tools/run-cr.sh cr-onblock` and write `FEATURE/evidence/regression-testing/p4-onblock.<timestamp>.md`.
   - Done when the output shows `ONBLOCK-HAS-MERGE-GROUP: True`, `ONBLOCK-IDENTICAL: True`, and `EXIT_CODE_COMPUTED: 0`.
-- [ ] [P4-T12] Lint the seven edited workflows with `pwsh -NoProfile -File SCRATCH/tools/cr-actionlint.ps1 -PathList "<LIST-WORKFLOWS>"` and write `FEATURE/evidence/regression-testing/p4-actionlint.<timestamp>.md`.
+- [ ] [P4-T15] Lint the seven edited workflows with `sh SCRATCH/tools/run-cr.sh cr-actionlint -PathList "<LIST-WORKFLOWS>"` and write `FEATURE/evidence/regression-testing/p4-actionlint.<timestamp>.md`.
   - Done when the output shows `ACTIONLINT-WRAPPER-EXIT: 0`, `ACTIONLINT-DIRECT-EXIT: 0`, `ACTIONLINT-FINDINGS: 0`, and `EXIT_CODE_COMPUTED: 0`. A finding that `filter` is not an input of `actions/checkout@v7` stops BLOCKED for an operator decision, because removing it changes D2.
-- [ ] [P4-T13] Commit and push Phase 4 (rule 11): `git add -- .github/workflows/ci.yml .github/workflows/_quality-checks.yml .github/workflows/_security-scan.yml .github/workflows/_build-check.yml .github/workflows/_shell-coverage.yml .github/workflows/_drm-copilot-extension-tests.yml .github/workflows/_poshqc.yml docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962` (plus any suite named by a `D6-ADJUSTMENT:` line), `git commit -m "ci(962): gate heavy CI steps on the change-scope decision" -m "<trailer>"`, push, and write `FEATURE/evidence/other/commit-phase-4.<timestamp>.md`.
+- [ ] [P4-T16] Commit and push Phase 4 (rule 11): `git add -- .github/workflows/ci.yml .github/workflows/_quality-checks.yml .github/workflows/_security-scan.yml .github/workflows/_build-check.yml .github/workflows/_shell-coverage.yml .github/workflows/_drm-copilot-extension-tests.yml .github/workflows/_poshqc.yml tests/scripts/workflows/CiWorkflow.Tests.ps1 tests/scripts/workflows/PoshQcWorkflow.Tests.ps1 tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962`, `git commit -m "ci(962): gate heavy CI steps on the change-scope decision" -m "<trailer>"`, push, and write `FEATURE/evidence/other/commit-phase-4.<timestamp>.md`.
   - Done when `git rev-parse HEAD` equals `git rev-parse origin/bug/ci-skip-evidence-only-commits-962` and `git status --porcelain` lists nothing except `?? tools/`.
 
 ### Phase 5 — Workflow README
 
 - [ ] [P5-T1] Append the section 10 text to `.github/workflows/README.md` after its last line, changing no existing line.
   - Done when P5-T2 passes.
-- [ ] [P5-T2] Verify the README (AC-24) with `pwsh -NoProfile -File SCRATCH/tools/cr-readme.ps1` and write `FEATURE/evidence/regression-testing/p5-readme.<timestamp>.md`; then check off AC-24 in `FEATURE/spec.md`.
+- [ ] [P5-T2] Verify the README (AC-24) with `sh SCRATCH/tools/run-cr.sh cr-readme` and write `FEATURE/evidence/regression-testing/p5-readme.<timestamp>.md`; then check off AC-24 in `FEATURE/spec.md`.
   - Done when the output shows `README-PREFIX-IDENTICAL: True`, `README-TOKENS-MISSING: 0`, and `EXIT_CODE_COMPUTED: 0`.
 - [ ] [P5-T3] Commit and push Phase 5 (rule 11): `git add -- .github/workflows/README.md docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962`, `git commit -m "docs(962): document the change-scope decision in the workflows README" -m "<trailer>"`, push, and write `FEATURE/evidence/other/commit-phase-5.<timestamp>.md`.
   - Done when `git rev-parse HEAD` equals `git rev-parse origin/bug/ci-skip-evidence-only-commits-962` and `git status --porcelain` lists nothing except `?? tools/`.
 
 ### Phase 6 — Final QA Loop
 
-Loop rule: P6-T1 to P6-T13 form one pass. If any of them fails, or if P6-T1 or P6-T2 changes a file, fix the cause (only within `## Files Written`) and restart at P6-T1; each pass writes new artifacts. Stage mapping to `.claude/rules/general-code-change.md`: 1 formatting (P6-T1), 2 linting (P6-T2, P6-T3), 3 type checking (not applicable to PowerShell), 4 architecture-boundary tests (no boundary test exists for `scripts/ci`; the purity boundary is CR-STRUCTURE in P6-T11), 5 unit tests with coverage (P6-T4 to P6-T8), 6 contract and schema checks (P6-T9, plus the suite C config contract and actionlint schema checks), 7 integration (the CI-dependent Phase 7).
+Loop rule: P6-T1 to P6-T17 form one pass. If any of them fails, or if P6-T1 or P6-T2 changes a file, fix the cause (only within `## Files Written`) and restart at P6-T1; each pass writes new artifacts. Stage mapping to `.claude/rules/general-code-change.md`: 1 formatting (PowerShell P6-T1, Python P6-T14), 2 linting (P6-T2, P6-T3, Python P6-T15), 3 type checking (not applicable to PowerShell; Pyright for the Python test file in P6-T16), 4 architecture-boundary tests (no boundary test exists for `scripts/ci`; the purity boundary is CR-STRUCTURE in P6-T11), 5 unit tests (PowerShell with coverage in P6-T4 to P6-T8; Python in P6-T17, without coverage per rule 16), 6 contract and schema checks (P6-T9, plus the suite C config contract and actionlint schema checks), 7 integration (the CI-dependent Phase 7).
 
-- [ ] [P6-T1] Formatting stage: run `pwsh -NoProfile -File SCRATCH/tools/cr-format.ps1 -PathList "<LIST-NEW-PS>" -Write`, then `mcp__drm-copilot__run_poshqc_format` with `workspace_root` set to the output of `git rev-parse --show-toplevel` and `scan_folders` `["scripts/ci", "tests/scripts/ci"]`, recording `git status --porcelain` before and after the MCP call, in `FEATURE/evidence/qa-gates/final-format.<timestamp>.md`.
+- [ ] [P6-T1] Formatting stage: run `sh SCRATCH/tools/run-cr.sh cr-format -PathList "<LIST-PS-WRITTEN>" -Write`, then `mcp__drm-copilot__run_poshqc_format` with `workspace_root` set to the output of `git rev-parse --show-toplevel` and `scan_folders` `["scripts/ci", "tests/scripts/ci"]`, recording `git status --porcelain` before and after the MCP call, in `FEATURE/evidence/qa-gates/final-format.<timestamp>.md`.
   - Done when CR-FORMAT shows one `FORMAT-CLEAN:` line per file (every file unchanged) and `FORMAT-DRIFT-COUNT: 0`, and the porcelain output after the MCP call equals the output before it (no file formatted by the MCP stage). Any `FORMAT-WRITTEN:` line or porcelain difference restarts the loop.
-- [ ] [P6-T2] Linting stage: run `pwsh -NoProfile -File SCRATCH/tools/cr-pssa.ps1 -PathList "<LIST-NEW-PS>"`, then `mcp__drm-copilot__run_poshqc_analyze` with the same `workspace_root` and `scan_folders`, in `FEATURE/evidence/qa-gates/final-pssa.<timestamp>.md`.
+- [ ] [P6-T2] Linting stage: run `sh SCRATCH/tools/run-cr.sh cr-pssa -PathList "<LIST-PS-WRITTEN>"`, then `mcp__drm-copilot__run_poshqc_analyze` with the same `workspace_root` and `scan_folders`, in `FEATURE/evidence/qa-gates/final-pssa.<timestamp>.md`.
   - Done when CR-PSSA shows `findings=0` for every file, `PSSA-TOTAL: 0`, and `EXIT_CODE_COMPUTED: 0`, and the MCP disposition is `MCP_CALL: returned`.
-- [ ] [P6-T3] Workflow lint (AC-25): run `pwsh -NoProfile -File SCRATCH/tools/cr-actionlint.ps1 -PathList "<LIST-WORKFLOWS>"` and write `FEATURE/evidence/qa-gates/final-actionlint.<timestamp>.md`.
+- [ ] [P6-T3] Workflow lint (AC-25): run `sh SCRATCH/tools/run-cr.sh cr-actionlint -PathList "<LIST-WORKFLOWS>"` and write `FEATURE/evidence/qa-gates/final-actionlint.<timestamp>.md`.
   - Done when the output shows `ACTIONLINT-WRAPPER-EXIT: 0`, `ACTIONLINT-DIRECT-EXIT: 0`, `ACTIONLINT-FINDINGS: 0`, and `EXIT_CODE_COMPUTED: 0`.
 - [ ] [P6-T4] Unit-test stage, route compliance: call `mcp__drm-copilot__run_poshqc_test` with the same `workspace_root` and `scan_folders` `["tests/scripts/ci", "tests/scripts/workflows"]` and write `FEATURE/evidence/qa-gates/final-mcp-test.<timestamp>.md`.
-  - Done when the artifact records the call disposition `MCP_CALL: returned` (rule 5: no count is read from it). This task runs before P6-T6 because the MCP run overwrites the coverage file.
-- [ ] [P6-T5] Unit-test stage, counts (AC-26, AC-28): run `pwsh -NoProfile -File SCRATCH/tools/cr-pester-list.ps1 -PathList "<LIST-NEW-TESTS>,<LIST-EXISTING-SUITES>" -NamePatternList "<PATTERNS-UNIT>,<PATTERNS-WORKFLOW>,<PATTERNS-PARSER>"` in one invocation and write `FEATURE/evidence/qa-gates/final-pester-list.<timestamp>.md`.
-  - Done when every `CONTAINER:` line shows `Result=Passed`, `TOTAL:` shows `Failed=0`, every AC `NAMED:` line shows `Failed=0` with its section 8 total, each `PATTERNS-PARSER` line shows `Passed=1 | Failed=0 | Total=1`, and `EXIT_CODE_COMPUTED: 0`.
-- [ ] [P6-T6] Unit-test stage, PoshQC coverage run: run `pwsh -NoProfile -File SCRATCH/tools/cr-pester-cov.ps1 -ScanFolderList "tests/scripts/ci,tests/scripts/workflows,tests/scripts/claude-lib/ci-gate"` and write `FEATURE/evidence/qa-gates/final-pester-coverage.<timestamp>.md`.
-  - Done when the output shows a `COVERAGE-RUN-START-UTC:` line, `Code coverage population: source=config`, and a `Tests Passed:` line with `Failed: 0`, and the process exit code is 0.
-- [ ] [P6-T7] Per-file coverage (AC-27): run `pwsh -NoProfile -File SCRATCH/tools/cr-cov-files.ps1 -TargetList "scripts/ci/CiChangeScope.psm1,scripts/ci/Invoke-CiChangeScope.ps1" -NotBefore "<COVERAGE-RUN-START-UTC value from P6-T6>"` and write `FEATURE/evidence/qa-gates/final-coverage-files.<timestamp>.md`.
-  - Done when the output shows `COVERAGE-FILE-FRESH: True`, both `COV-FILE:` lines show a numeric `percent=` of at least 85 ending `PASS`, `COV-FILES-FAILING: 0`, and `EXIT_CODE_COMPUTED: 0`. A file below 85% is remediated under PD-8 and the loop restarts.
-- [ ] [P6-T8] Coverage comparison: run `pwsh -NoProfile -File SCRATCH/tools/cr-cov-delta.ps1` and write `FEATURE/evidence/qa-gates/coverage-delta.<timestamp>.md` reporting the baseline total, the post-change total, and the new-code (per-file) coverage.
+  - Done when the artifact records the call disposition `MCP_CALL: returned` (rule 5: no count is read from it). This task runs before P6-T6 because the MCP run overwrites the coverage file. CI job: `poshqc / PowerShell QC` (windows-latest).
+- [ ] [P6-T5] Unit-test stage, counts (AC-26, AC-28): run `sh SCRATCH/tools/run-cr.sh cr-pester-list -PathList "<LIST-NEW-TESTS>,<LIST-EXISTING-SUITES>" -NamePatternList "<PATTERNS-UNIT>,<PATTERNS-WORKFLOW>,<PATTERNS-PARSER>"` in one invocation and write `FEATURE/evidence/qa-gates/final-pester-list.<timestamp>.md`.
+  - Done when every `CONTAINER:` line shows `Result=Passed`, `TOTAL:` shows `Failed=0`, every AC `NAMED:` line shows `Failed=0` with its section 8 total, each `PATTERNS-PARSER` line shows `Passed=1 | Failed=0 | Total=1`, and `EXIT_CODE_COMPUTED: 0`. `LIST-EXISTING-SUITES` includes the A2 and A3 suites. CI job: `poshqc / PowerShell QC` (windows-latest).
+- [ ] [P6-T6] Unit-test stage, PoshQC coverage run: run `sh SCRATCH/tools/run-cr.sh cr-pester-cov -ScanFolderList "tests/scripts/ci,tests/scripts/workflows,tests/scripts/claude-lib/ci-gate"` and write `FEATURE/evidence/qa-gates/final-pester-coverage.<timestamp>.md`.
+  - Done when the output shows a `COVERAGE-RUN-START-UTC:` line, `Code coverage population: source=config`, and a `Tests Passed:` line with `Failed: 0`, and the process exit code is 0. CI job (the only job that measures PowerShell coverage): `poshqc / PowerShell QC` (windows-latest).
+- [ ] [P6-T7] Per-file coverage (AC-27): run `sh SCRATCH/tools/run-cr.sh cr-cov-files -TargetList "scripts/ci/CiChangeScope.psm1,scripts/ci/Invoke-CiChangeScope.ps1" -NotBefore "<COVERAGE-RUN-START-UTC value from P6-T6>"` and write `FEATURE/evidence/qa-gates/final-coverage-files.<timestamp>.md`.
+  - Done when the output shows `COVERAGE-FILE-FRESH: True`, both `COV-FILE:` lines show a numeric `percent=` of at least 85 ending `PASS`, `COV-FILES-FAILING: 0`, and `EXIT_CODE_COMPUTED: 0`. A file below 85% is remediated under PD-8 and the loop restarts. CI job (the only job that measures PowerShell coverage): `poshqc / PowerShell QC` (windows-latest).
+- [ ] [P6-T8] Coverage comparison: run `sh SCRATCH/tools/run-cr.sh cr-cov-delta` and write `FEATURE/evidence/qa-gates/coverage-delta.<timestamp>.md` reporting the baseline total, the post-change total, and the new-code (per-file) coverage.
   - Done when the output shows `BASELINE TOTAL-LINE-COVERAGE:`, `FINAL TOTAL-LINE-COVERAGE:`, two `FINAL COV-FILE:` lines ending `PASS`, `DELTA-NEW-CODE-FILES-FAILING: 0`, and `EXIT_CODE_COMPUTED: 0`. Both changed files are new, so the changed-line coverage is the per-file coverage.
-- [ ] [P6-T9] Contract stage (AC-29 recheck): run `pwsh -NoProfile -File SCRATCH/tools/cr-quality-tiers.ps1` and `poetry run pytest tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/scripts/dev_tools/test_check_quality_tiers.py tests/scripts/dev_tools/test_quality_tiers_contract.py`, written to `FEATURE/evidence/qa-gates/final-quality-tiers.<timestamp>.md`.
+- [ ] [P6-T9] Contract stage (AC-29 recheck): run `sh SCRATCH/tools/run-cr.sh cr-quality-tiers` and `poetry run pytest tests/scripts/dev_tools/test_quality_tiers_contract_classification.py tests/scripts/dev_tools/test_check_quality_tiers.py tests/scripts/dev_tools/test_quality_tiers_contract.py`, written to `FEATURE/evidence/qa-gates/final-quality-tiers.<timestamp>.md`.
   - Done when the CR shows `QT-OUTPUT: quality-tiers: OK`, `QT-SCRIPTS-CI-ENTRY: True`, and `EXIT_CODE_COMPUTED: 0`, and the pytest summary reports `passed` with no `failed`.
-- [ ] [P6-T10] Scope and history check (AC-22, AC-28, AC-30): run `pwsh -NoProfile -File SCRATCH/tools/cr-scope.ps1 -AllowedList "<the always-written and recorded conditionally-written paths of ## Files Written>" -MergeCommit "<MERGE-COMMIT from the merge-integration artifact>"` (it runs `git diff --name-only origin/main...HEAD`, `git status --porcelain`, and the reflog and ancestry checks) and `pwsh -NoProfile -File SCRATCH/tools/cr-onblock.ps1`, written to `FEATURE/evidence/qa-gates/final-scope.<timestamp>.md`.
-  - Done when CR-SCOPE shows `SCOPE-FORBIDDEN-PRESENT: 0`, `SCOPE-POLICY-PRESENT: 0`, `SCOPE-OUTSIDE-WRITE-SET: 0`, `SCOPE-HISTORY-REWRITES: 0`, `SCOPE-MERGE-COMMIT-CONTAINED: True`, and `EXIT_CODE_COMPUTED: 0`, and CR-ONBLOCK shows `ONBLOCK-IDENTICAL: True`. The latest workflow-suite-adjustment artifact's `D6-ADJUSTMENT:` line is quoted in this artifact.
-- [ ] [P6-T11] Structure and purity recheck (AC-17): run `pwsh -NoProfile -File SCRATCH/tools/cr-structure.ps1` and `pwsh -NoProfile -File SCRATCH/tools/cr-hermetic.ps1 -PathList "<LIST-NEW-PS>"`, written to `FEATURE/evidence/qa-gates/final-structure.<timestamp>.md`.
-  - Done when CR-STRUCTURE shows its section 5 success literals with `EXIT_CODE_COMPUTED: 0`, and CR-HERMETIC shows one `LINES:` line per file of `LIST-NEW-PS`, `HERMETIC-HITS: 0`, `LINES-OVER-500: 0`, and `EXIT_CODE_COMPUTED: 0`.
-- [ ] [P6-T12] README recheck (AC-24): run `pwsh -NoProfile -File SCRATCH/tools/cr-readme.ps1` and write `FEATURE/evidence/qa-gates/final-readme.<timestamp>.md`.
+- [ ] [P6-T10] Scope and history check (AC-22, AC-28, AC-30): run `sh SCRATCH/tools/run-cr.sh cr-scope -AllowedList ".github/workflows/ci.yml,.github/workflows/_quality-checks.yml,.github/workflows/_security-scan.yml,.github/workflows/_build-check.yml,.github/workflows/_shell-coverage.yml,.github/workflows/_drm-copilot-extension-tests.yml,.github/workflows/_poshqc.yml,.github/workflows/README.md,config/ci-docs-only-paths.json,scripts/ci/CiChangeScope.psm1,scripts/ci/Invoke-CiChangeScope.ps1,quality-tiers.yml,tests/scripts/ci/CiChangeScope.Tests.ps1,tests/scripts/ci/Invoke-CiChangeScope.Tests.ps1,tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1,tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1,tests/scripts/workflows/CiWorkflow.Tests.ps1,tests/scripts/workflows/PoshQcWorkflow.Tests.ps1,tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py" -MergeCommit "<MERGE-COMMIT from the merge-integration artifact>"` (the 19 always-written paths of `## Files Written`) (it runs `git diff --name-only origin/main...HEAD`, `git status --porcelain`, and the reflog and ancestry checks) and `sh SCRATCH/tools/run-cr.sh cr-onblock`, written to `FEATURE/evidence/qa-gates/final-scope.<timestamp>.md`.
+  - Done when CR-SCOPE shows `SCOPE-FORBIDDEN-PRESENT: 0`, `SCOPE-POLICY-PRESENT: 0`, `SCOPE-OUTSIDE-WRITE-SET: 0`, `SCOPE-HISTORY-REWRITES: 0`, `SCOPE-MERGE-COMMIT-CONTAINED: True`, and `EXIT_CODE_COMPUTED: 0`, and CR-ONBLOCK shows `ONBLOCK-IDENTICAL: True`. The three `D6-ADJUSTMENT:` lines of the latest workflow-suite-adjustment artifact are quoted in this artifact.
+- [ ] [P6-T11] Structure and purity recheck (AC-17): run `sh SCRATCH/tools/run-cr.sh cr-structure` and `sh SCRATCH/tools/run-cr.sh cr-hermetic -PathList "<LIST-PS-WRITTEN>"`, written to `FEATURE/evidence/qa-gates/final-structure.<timestamp>.md`.
+  - Done when CR-STRUCTURE shows its section 5 success literals with `EXIT_CODE_COMPUTED: 0`, and CR-HERMETIC shows one `LINES:` line per file of `LIST-PS-WRITTEN`, `HERMETIC-HITS: 0`, `LINES-OVER-500: 0`, and `EXIT_CODE_COMPUTED: 0`.
+- [ ] [P6-T12] README recheck (AC-24): run `sh SCRATCH/tools/run-cr.sh cr-readme` and write `FEATURE/evidence/qa-gates/final-readme.<timestamp>.md`.
   - Done when the output shows `README-PREFIX-IDENTICAL: True`, `README-TOKENS-MISSING: 0`, and `EXIT_CODE_COMPUTED: 0`.
-- [ ] [P6-T13] Evidence-location check (AC-31): run `pwsh -NoProfile -File SCRATCH/tools/cr-evidence.ps1` and write `FEATURE/evidence/qa-gates/evidence-location.<timestamp>.md`.
+- [ ] [P6-T13] Evidence-location check (AC-31): run `sh SCRATCH/tools/run-cr.sh cr-evidence` and write `FEATURE/evidence/qa-gates/evidence-location.<timestamp>.md`.
   - Done when the output shows a positive `EVIDENCE-FILES:`, `EVIDENCE-NONCANONICAL-COUNT: 0`, `EVIDENCE-OUTSIDE-FEATURE-COUNT: 0`, and `EXIT_CODE_COMPUTED: 0`.
-- [ ] [P6-T14] Record the clean loop pass in `FEATURE/evidence/qa-gates/qa-loop.<timestamp>.md`: `QA-LOOP-PASS: <n>` and, for each of P6-T1 to P6-T13, the artifact name of that pass and its `EXIT_CODE`.
-  - Done when the listed pass has every task passing with no file changed by P6-T1 or P6-T2 in that pass.
-- [ ] [P6-T15] Check off the QA-dependent criteria and record AC status: check off AC-22, AC-25, AC-26, AC-27, AC-28, AC-30, and AC-31 in `FEATURE/spec.md`, then run `pwsh -NoProfile -File SCRATCH/tools/cr-ac-status.ps1` and write `FEATURE/evidence/qa-gates/ac-verification.<timestamp>.md` listing each AC with its status, the verifying artifact, and `PENDING-CI` for AC-32 to AC-34.
+- [ ] [P6-T14] Python formatting stage (rule 16): run `poetry run black --check tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py` and write `FEATURE/evidence/qa-gates/final-python-format.<timestamp>.md`.
+  - Done when the output carries `1 file would be left unchanged.` (the success line observed by P0-T17) and the exit code is 0. A `would reformat` line fails the stage; the executor then runs `poetry run black tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py`, records its `1 file reformatted.` line, and restarts the loop at P6-T1. CI job: `quality-checks7 / Code Quality & Tests` (ubuntu-latest).
+- [ ] [P6-T15] Python linting stage: run `poetry run ruff check tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py` and write `FEATURE/evidence/qa-gates/final-python-lint.<timestamp>.md`.
+  - Done when the output carries `All checks passed!` (observed by P0-T17) and the exit code is 0. The command runs without `--fix`, and the repository Ruff configuration does not enable fix mode (`tests/scripts/dev_tools/test_ruff_config_alignment.py::test_ruff_config_does_not_enable_fix_mode`), so the stage changes no file.
+- [ ] [P6-T16] Python type-checking stage: run `poetry run pyright tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py` and write `FEATURE/evidence/qa-gates/final-python-types.<timestamp>.md`.
+  - Done when the summary line begins `0 errors` (observed by P0-T17) and the exit code is 0.
+- [ ] [P6-T17] Python test stage: run `poetry run pytest tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py tests/scripts/dev_tools/test_ruff_config_alignment.py tests/scripts/dev_tools/test_workflow_npm_token_guard.py` and write `FEATURE/evidence/qa-gates/final-python-tests.<timestamp>.md`.
+  - Done when the exit code is 0, the short summary has no `FAILED` or `ERROR` line, and the summary line reports `passed` with no `failed` and a passed count equal to the P0-T17 three-file count. No coverage argument is passed (rule 16). CI job: `quality-checks7 / Code Quality & Tests` (ubuntu-latest).
+- [ ] [P6-T18] Record the clean loop pass in `FEATURE/evidence/qa-gates/qa-loop.<timestamp>.md`: `QA-LOOP-PASS: <n>` and, for each of P6-T1 to P6-T17, the artifact name of that pass and its `EXIT_CODE`.
+  - Done when the listed pass has every task passing with no file changed by P6-T1, P6-T2, or P6-T14 in that pass.
+- [ ] [P6-T19] Check off the QA-dependent criteria and record AC status: check off AC-22, AC-25, AC-26, AC-27, AC-28, AC-30, and AC-31 in `FEATURE/spec.md`, then run `sh SCRATCH/tools/run-cr.sh cr-ac-status` and write `FEATURE/evidence/qa-gates/ac-verification.<timestamp>.md` listing each AC with its status, the verifying artifact, and `PENDING-CI` for AC-32 to AC-34.
   - Done when the output shows `AC-CHECKED: 31` and `AC-UNCHECKED: 3`, and the three unchecked IDs are AC-32, AC-33, and AC-34.
-- [ ] [P6-T16] Commit and push the final QA evidence (rule 11): `git add -- docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962` plus any file in `## Files Written` changed by a loop restart, `git commit -m "docs(962): record final QA evidence" -m "<trailer>"`, push, and write `FEATURE/evidence/other/commit-phase-6.<timestamp>.md`.
+- [ ] [P6-T20] Commit and push the final QA evidence (rule 11): `git add -- docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962` plus any file in `## Files Written` changed by a loop restart, `git commit -m "docs(962): record final QA evidence" -m "<trailer>"`, push, and write `FEATURE/evidence/other/commit-phase-6.<timestamp>.md`.
   - Done when `git rev-parse HEAD` equals `git rev-parse origin/bug/ci-skip-evidence-only-commits-962` and `git status --porcelain` lists nothing except `?? tools/` (the observation precedes the `commit-phase-6` artifact and this checkbox, per rule 11).
 
 ### Phase 7 — CI-Dependent Proof and Post-Proof QA (Orchestrator-Owned, S9)
 
-Owner and timing (PD-12): the item's orchestrator run executes this phase after the pull request exists, at S9 (`.claude/skills/orchestrate/SKILL.md` section `## Step S9 — CI Green Gate`). `<PR>` is the pull request number of the branch. Each command below is the spec `## Proof Procedure` command with the observed values substituted; each artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` and the verbatim output. AC-32, AC-33, and AC-34 stay unchecked until P7-T3, P7-T11, and P7-T14 respectively verify them. `SCRATCH` is session-scoped: if the running session's `SCRATCH/tools/` does not hold the section 5 recipes, write them first exactly as P0-T3 does. Commands follow rule 3 for `pwsh` and run `gh` and `git` through whichever shell the orchestrator session permits.
+Owner and timing (PD-12): the item's orchestrator run executes this phase after the pull request exists, at S9 (`.claude/skills/orchestrate/SKILL.md` section `## Step S9 — CI Green Gate`). `<PR>` is the pull request number of the branch. Each command below is the spec `## Proof Procedure` command with the observed values substituted; each artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` and the verbatim output. AC-32, AC-33, and AC-34 stay unchecked until P7-T3, P7-T11, and P7-T14 respectively verify them. `SCRATCH` is session-scoped: if the running session's `SCRATCH/tools/` does not hold the section 5 launcher and recipes, write them first exactly as P0-T3 does (rule 4a applies: `.txt` recipes and `run-cr.sh` only). Recipes run through the launcher form of rule 3 (`sh SCRATCH/tools/run-cr.sh cr-<name> <arguments>`, no `pwsh` token in Bash command text), and `gh` and `git` run through whichever shell the orchestrator session permits.
 
 - [ ] [P7-T1] [orchestrator, S9] Proof step P0, baseline timing: run `gh run view 38896898318 --repo drmoisan/drm-copilot --json createdAt,updatedAt,conclusion,headSha` and write `FEATURE/evidence/regression-testing/ci-p0-baseline-timing.<timestamp>.md` with `createdAt`, `updatedAt`, `conclusion`, `headSha`, and `BASELINE-DURATION-SECONDS: <updatedAt - createdAt>`.
   - Done when the artifact carries both timestamps verbatim and a positive integer duration.
@@ -1118,8 +1281,8 @@ Owner and timing (PD-12): the item's orchestrator run executes this phase after 
   - Done when every path listed by the diff starts with `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/` and ends with `.md` (all allowlisted), the porcelain lists nothing except `?? tools/`, and the push is a fast-forward.
 - [ ] [P7-T5] [orchestrator, S9] Proof step P2.1 after the run `id2` for `HEAD2` completes: run `gh run view <id2> --repo drmoisan/drm-copilot --json conclusion,createdAt,updatedAt,jobs --jq '.conclusion, .createdAt, .updatedAt, (.jobs[] | [.name,.conclusion] | @tsv)'` and write `FEATURE/evidence/regression-testing/ci-p2-run.<timestamp>.md` with `ID2: <id2>`.
   - Expected: run `success`; `Change scope` `success`; `CI full run` `skipped`; every job whose name starts with `root-typescript-tests` or `NPM Audit Gate` (or `npm-audit-gate`) `skipped`; the 11 required job names of the section 10 table present with `success`.
-- [ ] [P7-T6] [orchestrator, S9] Proof steps P2.2 and P2.3: run `gh run view <id2> --repo drmoisan/drm-copilot --json jobs --jq '.jobs[] | select(.name | test("Code Quality")) | [.name, ([.steps[] | select(.conclusion == "success")] | length)] | @tsv'` and `gh run view <id2> --repo drmoisan/drm-copilot --json jobs --jq '.jobs[] | select(.name | test("Code Quality")) | .steps[] | select(.name == "Run tests with Pytest") | .conclusion'`, written to `FEATURE/evidence/regression-testing/ci-p2-steps.<timestamp>.md`.
-  - Expected: each of the four `Code Quality & Tests` jobs reports only its runner set-up and tear-down steps as succeeded (the step names are recorded from the full `.steps` list); the second command prints `skipped` four times.
+- [ ] [P7-T6] [orchestrator, S9] Proof steps P2.2 and P2.3: run `gh run view <id2> --repo drmoisan/drm-copilot --json jobs --jq '.jobs[] | select(.name | test("Code Quality")) | [.name, ([.steps[] | select(.conclusion == "success")] | length)] | @tsv'`, `gh run view <id2> --repo drmoisan/drm-copilot --json jobs --jq '.jobs[] | select(.name | test("Code Quality")) | .name as $job | .steps[] | select(.conclusion == "success") | [$job, .name] | @tsv'`, and `gh run view <id2> --repo drmoisan/drm-copilot --json jobs --jq '.jobs[] | select(.name | test("Code Quality")) | .steps[] | select(.name == "Run tests with Pytest") | .conclusion'`, written to `FEATURE/evidence/regression-testing/ci-p2-steps.<timestamp>.md`.
+  - Expected: the first command prints four lines, one per `Code Quality & Tests` job, each with the count `2`; the second command prints exactly eight lines, and for each of the four jobs the succeeded step names are exactly `Set up job` and `Complete job` (no other step name appears); the third command prints `skipped` four times. Any other succeeded step name records `AC-33: FAIL` with the printed lines.
 - [ ] [P7-T7] [orchestrator, S9] Proof step P2.4: run `gh run view <id2> --repo drmoisan/drm-copilot --json jobs --jq '.jobs[] | select(.name | test("Change scope")) | .databaseId'` and `gh run view <id2> --repo drmoisan/drm-copilot --log --job <changes-job-id-2>`, written to `FEATURE/evidence/regression-testing/ci-p2-decision-log.<timestamp>.md`.
   - Expected: the log line `code=false reason=DOCS_ONLY_SINCE_<HEAD1>`, quoted verbatim, where the SHA equals `HEAD1` from P7-T2 (or the head of a later run whose `CI full run` concluded `success`, recorded with its run id).
 - [ ] [P7-T8] [orchestrator, S9] Proof step P2.5: run `gh api repos/drmoisan/drm-copilot/commits/<HEAD2>/check-runs --paginate --jq '.check_runs[] | [.name,.status,.conclusion] | @tsv'` and write `FEATURE/evidence/regression-testing/ci-p2-check-runs.<timestamp>.md` comparing the names line by line with the 11 contexts of the section 10 table.
@@ -1130,13 +1293,13 @@ Owner and timing (PD-12): the item's orchestrator run executes this phase after 
   - Expected: not `BLOCKED` because of checks (`CLEAN`, or `BEHIND` if `main` moved). If the value is `BLOCKED`, also run `gh pr view <PR> --repo drmoisan/drm-copilot --json reviewDecision,mergeable` and record whether the block is attributable to checks; with P7-T9 at 11 `pass`, a block from review state is recorded as not caused by checks.
 - [ ] [P7-T11] [orchestrator, S9] Timing comparison for AC-33: run `gh run view <id2> --repo drmoisan/drm-copilot --json createdAt,updatedAt` and write `FEATURE/evidence/regression-testing/ci-timing-comparison.<timestamp>.md` with `BASELINE-RUN: 38896898318 | <seconds>` (from P7-T1), `DOCS-ONLY-RUN: <id2> | <seconds>`, and `DIFFERENCE-SECONDS: <baseline minus docs-only>`; then check off AC-33 in `FEATURE/spec.md` when P7-T5 to P7-T10 all met their expected values.
   - Done when both durations are recorded as positive integers next to each other (no fixed threshold, per spec). Any unmet P7-T5 to P7-T10 expectation records `AC-33: FAIL` and leaves the box unchecked.
-- [ ] [P7-T12] [orchestrator, S9] Proof step P3 edit and its local QA: append the PD-11 line at the end of `scripts/ci/CiChangeScope.psm1`, then run `pwsh -NoProfile -File SCRATCH/tools/cr-format.ps1 -PathList "scripts/ci/CiChangeScope.psm1"`, `pwsh -NoProfile -File SCRATCH/tools/cr-pssa.ps1 -PathList "scripts/ci/CiChangeScope.psm1"`, `pwsh -NoProfile -File SCRATCH/tools/cr-structure.ps1`, and `pwsh -NoProfile -File SCRATCH/tools/cr-pester-list.ps1 -PathList "tests/scripts/ci/CiChangeScope.Tests.ps1"`, written to `FEATURE/evidence/regression-testing/ci-p3-edit-qa.<timestamp>.md`.
-  - Done when the only change to the file is the one appended line, CR-FORMAT shows `FORMAT-CLEAN: scripts/ci/CiChangeScope.psm1` (unchanged) and `FORMAT-DRIFT-COUNT: 0`, CR-PSSA shows `PSSA-TOTAL: 0`, CR-STRUCTURE shows `EXIT_CODE_COMPUTED: 0`, and the suite shows `Passed=54 | Failed=0`.
+- [ ] [P7-T12] [orchestrator, S9] Proof step P3 edit and its local QA: append the PD-11 line at the end of `scripts/ci/CiChangeScope.psm1` (followed by a newline), then run `git diff --numstat HEAD -- scripts/ci/CiChangeScope.psm1`, `sh SCRATCH/tools/run-cr.sh cr-format -PathList "scripts/ci/CiChangeScope.psm1"`, `sh SCRATCH/tools/run-cr.sh cr-pssa -PathList "scripts/ci/CiChangeScope.psm1"`, `sh SCRATCH/tools/run-cr.sh cr-structure`, and `sh SCRATCH/tools/run-cr.sh cr-pester-list -PathList "tests/scripts/ci/CiChangeScope.Tests.ps1"`, written to `FEATURE/evidence/regression-testing/ci-p3-edit-qa.<timestamp>.md`.
+  - Done when the numstat output is exactly one line reading `1`, a tab, `0`, a tab, `scripts/ci/CiChangeScope.psm1` (one line added, none deleted; P2-T3 left the file ending in a newline), CR-FORMAT shows `FORMAT-CLEAN: scripts/ci/CiChangeScope.psm1` (unchanged) and `FORMAT-DRIFT-COUNT: 0`, CR-PSSA shows `PSSA-TOTAL: 0`, CR-STRUCTURE shows `EXIT_CODE_COMPUTED: 0`, and the suite shows `Passed=54 | Failed=0`. CI job for the suite: `poshqc / PowerShell QC` (windows-latest).
 - [ ] [P7-T13] [orchestrator, S9] Commit and push the non-allowlisted change: `git add -- scripts/ci/CiChangeScope.psm1 docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962`, `git commit -m "test(962): touch CiChangeScope.psm1 to prove a full run after a docs-only skip" -m "<trailer>"`, push per rule 11, and record `git rev-parse HEAD` (as `HEAD3`) and `git status --porcelain` in `FEATURE/evidence/regression-testing/ci-p3-commit.<timestamp>.md`.
   - Done when the push is a fast-forward and the porcelain lists nothing except `?? tools/`.
 - [ ] [P7-T14] [orchestrator, S9] Proof step P3 verification for run `id3` on `HEAD3`: repeat the P1 commands of P7-T3 for `id3` and write `FEATURE/evidence/regression-testing/ci-p3-full-run.<timestamp>.md`; then check off AC-34 in `FEATURE/spec.md` when every expected value holds.
   - Expected (AC-34): `CI full run` `success`; every heavy job `success`; the `Change scope` log line `code=true reason=NON_ALLOWLISTED_PATH: scripts/ci/CiChangeScope.psm1`, quoted verbatim. Any mismatch records `AC-34: FAIL` and leaves the box unchecked.
-- [ ] [P7-T15] [orchestrator, S9] Final evidence commit and gate re-run: run `pwsh -NoProfile -File SCRATCH/tools/cr-ac-status.ps1`, commit `FEATURE` with `git commit -m "docs(962): record CI proof evidence and check off AC-32 to AC-34" -m "<trailer>"`, push per rule 11, and write `FEATURE/evidence/regression-testing/ci-final-head.<timestamp>.md` with the final `git rev-parse HEAD`, the CR-AC-STATUS output, and the S9 gate result re-run against that head.
+- [ ] [P7-T15] [orchestrator, S9] Final evidence commit and gate re-run: run `sh SCRATCH/tools/run-cr.sh cr-ac-status`, commit `FEATURE` with `git commit -m "docs(962): record CI proof evidence and check off AC-32 to AC-34" -m "<trailer>"`, push per rule 11, and write `FEATURE/evidence/regression-testing/ci-final-head.<timestamp>.md` with the final `git rev-parse HEAD`, the CR-AC-STATUS output, and the S9 gate result re-run against that head.
   - Done when CR-AC-STATUS shows `AC-CHECKED: 34` and `AC-UNCHECKED: 0` (or names each failed CI criterion), and the S9 gate records `ci_gate.head_sha` equal to the final head with `ci_gate.conclusion` `success`. This last push changes only allowlisted paths, so its run skips the heavy steps and must still report every required context as `success`.
 
 ## Files Written
@@ -1159,28 +1322,28 @@ Owner and timing (PD-12): the item's orchestrator run executes this phase after 
 14. `tests/scripts/ci/Invoke-CiChangeScope.Tests.ps1`
 15. `tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1`
 16. `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1`
+17. `tests/scripts/workflows/CiWorkflow.Tests.ps1` (A2, P4-T7; one assertion of the #952 row `reads no pull-request event field and declares no path filter anywhere in the ci.yml call graph`; written unconditionally because the dependency gate P0-T5 guarantees the #952 shape before Phase 4)
+18. `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` (A3, P4-T6; one assertion line of the #953 row `runs Invoke-PoshQCTest with the shard parameters and uploads the shard results even on failure (issue #953)`; written unconditionally because the dependency gate guarantees the #953 shape)
+19. `tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py` (A1, P4-T9; the `RUN_HEAVY_GATE` constant and the body of `test_threshold_step_runs_on_every_matrix_leg`)
 
-Verified against the spec and the current tree: no module manifest is required (the entry script imports `scripts/ci/CiChangeScope.psm1` by path, and tier discovery rule R3 needs only a tracked code file under `scripts/ci`); no `quality-tiers.yml` test fixture changes (section 9); no bundle mirror, CHANGELOG, or `.codex/` copy is affected (research §6, §9).
+Verified against the spec and the current tree: no module manifest is required (the entry script imports `scripts/ci/CiChangeScope.psm1` by path, and tier discovery rule R3 needs only a tracked code file under `scripts/ci`); no `quality-tiers.yml` test fixture changes (section 9); no bundle mirror, CHANGELOG, or `.codex/` copy is affected (research §6, §9). The contract-test search of section 7 (A1 to A3) found no other test under `tests/` that pins a step or job condition of `ci.yml` or the six reusable workflows.
 
 ### Conditionally written
 
-1. `tests/scripts/workflows/CiWorkflow.Tests.ps1` — only if P4-T9 records a failing row of this suite caused by a line that G0 to G7 added; the change is limited to that assertion and recorded by a `D6-ADJUSTMENT:` line (P4-T10).
-2. `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` — same condition as item 1.
-
-No other existing suite is edited; a gating-caused failure in any other suite stops BLOCKED (P4-T10).
+None. No other existing suite or test is edited; a failure in any other suite after the workflow edits stops BLOCKED (P4-T10, P4-T12).
 
 ### Feature-folder artifacts
 
 1. `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/plan.2026-10-16T10-27.md` (checkbox updates only)
 2. `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/spec.md` (AC check-offs only; no criterion text changes)
-3. `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/evidence/baseline/<name>.<timestamp>.md` for `phase0-instructions-read`, `branch-state`, `cr-route-probe`, `baseline-pester-list`, `baseline-pester-coverage`, `baseline-coverage-files`, `baseline-format-check`, `baseline-pssa`, `baseline-actionlint`, `baseline-quality-tiers`
-4. `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/evidence/regression-testing/<name>.<timestamp>.md` for `p1-test-hygiene`, `expect-fail-new-suites`, `p2-config-suite`, `p2-pure-suite`, `p2-quality-tiers`, `p3-ci-suites`, `p3-structure`, `p4-workflow-suite-pass`, `p4-existing-suites`, `p4-onblock`, `p4-actionlint`, `p5-readme`, `ci-p0-baseline-timing`, `ci-p1-run-list`, `ci-p1-full-run`, `ci-p2-commit`, `ci-p2-run`, `ci-p2-steps`, `ci-p2-decision-log`, `ci-p2-check-runs`, `ci-p2-required-checks`, `ci-p2-merge-state`, `ci-timing-comparison`, `ci-p3-edit-qa`, `ci-p3-commit`, `ci-p3-full-run`, `ci-final-head`
-5. `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/evidence/qa-gates/<name>.<timestamp>.md` for `final-format`, `final-pssa`, `final-actionlint`, `final-mcp-test`, `final-pester-list`, `final-pester-coverage`, `final-coverage-files`, `coverage-delta`, `final-quality-tiers`, `final-scope`, `final-structure`, `final-readme`, `evidence-location`, `qa-loop`, `ac-verification`
+3. `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/evidence/baseline/<name>.<timestamp>.md` for `phase0-instructions-read`, `branch-state`, `cr-route-probe`, `baseline-pester-list`, `baseline-pester-coverage`, `baseline-coverage-files`, `baseline-format-check`, `baseline-pssa`, `baseline-actionlint`, `baseline-quality-tiers`, `baseline-python`
+4. `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/evidence/regression-testing/<name>.<timestamp>.md` for `p1-test-hygiene`, `expect-fail-new-suites`, `p2-config-suite`, `p2-pure-suite`, `p2-tier-entry-diff`, `p2-quality-tiers`, `p3-ci-suites`, `p3-structure`, `p4-poshqc-suite-edit`, `p4-ci-suite-edit`, `p4-py-contract-fail-before`, `p4-py-contract-edit`, `p4-py-contract-pass-after`, `p4-workflow-suite-pass`, `p4-existing-suites`, `p4-onblock`, `p4-actionlint`, `p5-readme`, `ci-p0-baseline-timing`, `ci-p1-run-list`, `ci-p1-full-run`, `ci-p2-commit`, `ci-p2-run`, `ci-p2-steps`, `ci-p2-decision-log`, `ci-p2-check-runs`, `ci-p2-required-checks`, `ci-p2-merge-state`, `ci-timing-comparison`, `ci-p3-edit-qa`, `ci-p3-commit`, `ci-p3-full-run`, `ci-final-head`
+5. `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/evidence/qa-gates/<name>.<timestamp>.md` for `final-format`, `final-pssa`, `final-actionlint`, `final-mcp-test`, `final-pester-list`, `final-pester-coverage`, `final-coverage-files`, `coverage-delta`, `final-quality-tiers`, `final-scope`, `final-structure`, `final-readme`, `evidence-location`, `final-python-format`, `final-python-lint`, `final-python-types`, `final-python-tests`, `qa-loop`, `ac-verification`
 6. `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/evidence/other/<name>.<timestamp>.md` for `dependency-gate`, `merge-integration`, `edit-points`, `workflow-suite-adjustment`, and `commit-phase-0` to `commit-phase-6`
 
 ### Not written by this plan
 
 - The merge commit of P0-T7 brings `origin/main` content into the branch; those paths are not changes of this branch (`git diff origin/main...HEAD` excludes them).
-- Tool outputs that are never staged: `artifacts/pester/*` (gitignored) and, when actionlint is not on PATH, `tools/actionlint/bin/*` (rule 12).
-- Scratch files under `SCRATCH/tools/` (outside the repository).
+- Tool outputs that are never staged: `artifacts/pester/*` (gitignored), the Poetry environment `.venv` and the Python caches `__pycache__/` and `.pytest_cache/` (gitignored, `.gitignore` lines 12, 36, 50), and, when actionlint is not on PATH, `tools/actionlint/bin/*` (rule 12).
+- Scratch files under `SCRATCH/tools/` (`run-cr.sh` and the `cr-<name>.txt` recipes, written with Write) and `SCRATCH/stage/` (the `cr-<name>.ps1` copies made by the launcher with `cp`), all outside the repository (rule 4a).
 - Read-only: `issue.md`, `research/research.2026-10-16T14-39.md`, every file under `.claude/rules/` and `.github/instructions/`, `.github/workflows/_docs-validation.yml`, `.github/workflows/_root-typescript-tests.yml`, `.github/workflows/_npm-audit-gate.yml`, `.claude/lib/ci-gate/Invoke-CiGateParser.ps1`, `extensions/drm-copilot/resources/claude-customizations/.claude/lib/ci-gate/Invoke-CiGateParser.ps1`, `.claude/skills/orchestrate/SKILL.md`, `.claude/skills/parallel-orchestrate/SKILL.md`, `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1`.
