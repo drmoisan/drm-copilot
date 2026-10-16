@@ -161,6 +161,29 @@ Describe 'discovery guard (both hook surfaces)' {
         foreach ($line in $script:ReportLine) { Write-Information $line -InformationAction Continue }
     }
 
+    It 'AC-5b variable-built hook-load report <Surface>' -ForEach $script:SurfaceRow {
+        # Arrange and act: collect the variable-built hook-load line of every suite on the surface (issue #935, F-3).
+        $collect = {
+            foreach ($suite in @(Get-EpicStateDiscoveredSuite -RepoRoot $script:RepoRoot -Surface $Surface)) {
+                Get-EpicStateVariableHookLoadReport -RepoRoot $script:RepoRoot -RelativePath $suite
+            }
+        }
+        { $script:VariableLoadLine = @(& $collect) } | Should -Not -Throw
+
+        # Assert: the row reports and never fails on an entry; the lines go to the information stream.
+        foreach ($line in $script:VariableLoadLine) { Write-Information $line -InformationAction Continue }
+    }
+
+    It 'F-3 non-vacuity <Surface> reports at least one variable-built hook load' -ForEach $script:SurfaceRow {
+        # Arrange and act: collect the report lines independently of the AC-5b row.
+        $lines = @(foreach ($suite in @(Get-EpicStateDiscoveredSuite -RepoRoot $script:RepoRoot -Surface $Surface)) {
+                Get-EpicStateVariableHookLoadReport -RepoRoot $script:RepoRoot -RelativePath $suite
+            })
+
+        # Assert: a surface with no line would make the AC-5b report vacuous.
+        $lines.Count | Should -BeGreaterThan 0 -Because "the committed $Surface suites hold variable-built hook loads"
+    }
+
     It 'AC-2 no hard-coded suite list in N2' {
         # Arrange and act: parse this file.
         $literals = @(Get-HardCodedSuiteLiteral -Path (Join-Path $PSScriptRoot 'enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1'))
