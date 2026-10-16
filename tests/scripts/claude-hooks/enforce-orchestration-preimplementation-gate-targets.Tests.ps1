@@ -413,6 +413,14 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         @{ Label = 'nt-object-forward'; Spelling = '/??/C:/wt/a.ps1' }
         @{ Label = 'drive-relative'; Spelling = 'C:wt\a.ps1' }
         @{ Label = 'bare-drive-letter'; Spelling = 'C:' }
+        @{ Label = 'leading-space-unc'; Spelling = ' \\server\share\a.ps1' }
+        @{ Label = 'leading-space-absolute'; Spelling = ' /synthetic-worktrees/other/a.ps1' }
+        @{ Label = 'trailing-space-absolute'; Spelling = '/synthetic-worktrees/other/a.ps1 ' }
+        @{ Label = 'file-uri-drive'; Spelling = 'file:///C:/wt/a.ps1' }
+        @{ Label = 'file-uri-unc'; Spelling = 'file://server/share/a.ps1' }
+        @{ Label = 'tilde-forward'; Spelling = '~/wt/a.ps1' }
+        @{ Label = 'tilde-backslash'; Spelling = '~\wt\a.ps1' }
+        @{ Label = 'root-relative-backslash'; Spelling = '\wt\a.ps1' }
     ) {
         # Arrange (issue #937): the raw path-leg spelling comes from the data row.
 
@@ -420,10 +428,12 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         $result = Get-OrchestrationCommandTarget -FilePath @($Spelling) -SessionRoot $script:Root
 
         # Assert
-        $result.Resolved | Should -BeFalse -Because "$Label is not a local path and must not resolve to the session root"
+        $resolvedBecause = "$Label is not a local path and must not resolve to the session root"
+        $result.Resolved | Should -BeFalse -Because $resolvedBecause
         @($result.Targets).Count | Should -Be 0 -Because 'an unresolved result carries no targets'
         $result.ReasonCode | Should -Be 'target-unresolvable' -Because 'every unresolved result carries the same code'
-        $result.Detail | Should -BeExactly ('path-not-local: ' + $Spelling) -Because 'the detail names the rule and the raw input'
+        $detailBecause = 'the detail names the rule and the raw input'
+        $result.Detail | Should -BeExactly ('path-not-local: ' + $Spelling) -Because $detailBecause
     }
 
     It 'U28 keeps a bare drive root path-leg input as its own target (<Label>)' -ForEach @(
@@ -450,7 +460,8 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         # Assert
         $result.Resolved | Should -BeFalse -Because 'one non-local path makes the whole call unresolvable'
         @($result.Targets).Count | Should -Be 0 -Because 'an unresolved result carries no targets'
-        $result.Detail | Should -BeExactly 'path-not-local: \\server\share\b.ps1' -Because 'the first failing rule names the non-local path'
+        $detailBecause = 'the first failing rule names the non-local path'
+        $result.Detail | Should -BeExactly 'path-not-local: \\server\share\b.ps1' -Because $detailBecause
     }
 
     It 'U30 reports path-not-local before path-dot-segment for a UNC dot-dot path' {
@@ -462,7 +473,10 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
 
         # Assert
         $result.Resolved | Should -BeFalse -Because 'a UNC path is not a local path'
-        $result.Detail.StartsWith('path-not-local') | Should -BeTrue -Because 'the non-local check precedes the dot-segment check'
+        @($result.Targets).Count | Should -Be 0 -Because 'an unresolved result carries no targets'
+        $result.ReasonCode | Should -Be 'target-unresolvable' -Because 'every unresolved result carries the same code'
+        $detailBecause = 'the non-local check precedes the dot-segment check'
+        $result.Detail | Should -BeExactly 'path-not-local: \\server\share\..\x' -Because $detailBecause
     }
 
     It 'U31 gives path-not-local for a non-local apply_patch marker path' {
@@ -476,6 +490,7 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         # Assert
         $paths | Should -Be @('\\?\C:\wt\a.ps1') -Because 'the marker path is extracted unchanged'
         $result.Resolved | Should -BeFalse -Because 'an extended-length marker path is not a local path'
-        $result.Detail | Should -BeExactly 'path-not-local: \\?\C:\wt\a.ps1' -Because 'the detail names the rule and the raw marker path'
+        $detailBecause = 'the detail names the rule and the raw marker path'
+        $result.Detail | Should -BeExactly 'path-not-local: \\?\C:\wt\a.ps1' -Because $detailBecause
     }
 }
