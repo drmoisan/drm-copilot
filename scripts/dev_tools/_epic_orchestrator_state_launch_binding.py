@@ -8,7 +8,7 @@ import re
 from typing import TYPE_CHECKING, Any, TypeGuard, cast
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Mapping, Sequence
 
 _LAUNCH_ARTIFACT_PARTS = (
     "artifacts",
@@ -209,7 +209,7 @@ def feature_carries_launch_path(feature: Mapping[str, object]) -> bool:
 
 
 def _validate_launch_bindings(
-    features: list[object],
+    features: Sequence[object],
     *,
     planner: bool,
     expected_execution_context: str,
@@ -260,7 +260,7 @@ def _validate_launch_bindings(
 
 
 def validate_epic_planner_child_launch_bindings(
-    features: list[dict[str, Any]],
+    features: Sequence[object],
     *,
     require_launch_paths: bool = False,
 ) -> list[str]:
@@ -268,10 +268,13 @@ def validate_epic_planner_child_launch_bindings(
 
     When ``require_launch_paths`` is true, a feature carrying neither launch path
     key is skipped; otherwise every feature is validated.
+
+    Non-object entries are skipped, so each error prefix uses the entry's
+    original index in the checkpoint ``features`` array.
     """
 
     return _validate_launch_bindings(
-        cast("list[object]", features),
+        features,
         planner=True,
         expected_execution_context="epic_preparation_child",
         require_generated_orchestrator=True,
