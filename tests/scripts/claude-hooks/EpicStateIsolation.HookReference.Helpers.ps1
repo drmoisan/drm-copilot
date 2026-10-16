@@ -43,6 +43,27 @@ function Get-EpicStateIsolationStringNode {
     foreach ($candidate in $Node.FindAll($isString, $SearchNestedScriptBlock)) { $candidate }
 }
 
+function Test-EpicStateIsolationSeparateValue {
+    # Pure (issue #935, CR-N3): true when the element at Index is a value-taking parameter written without an
+    # attached argument and the next element is its value.
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)] [AllowEmptyCollection()] [object[]] $Element,
+        [Parameter(Mandatory)] [int] $Index
+    )
+    $valueParameter = @(
+        'Alias', 'ArgumentList', 'Assembly', 'Cmdlet', 'Credential', 'Environment', 'FullyQualifiedName', 'Function',
+        'MaximumVersion', 'MinimumVersion', 'Prefix', 'RedirectStandardError', 'RedirectStandardInput',
+        'RedirectStandardOutput', 'RequiredVersion', 'Scope', 'Variable', 'Verb', 'WindowStyle', 'WorkingDirectory'
+    )
+    $parameter = $Element[$Index]
+    if ($parameter -isnot [System.Management.Automation.Language.CommandParameterAst]) { return $false }
+    if ($null -ne $parameter.Argument -or $valueParameter -notcontains $parameter.ParameterName) { return $false }
+    if (($Index + 1) -ge $Element.Count) { return $false }
+    return ($Element[$Index + 1] -isnot [System.Management.Automation.Language.CommandParameterAst])
+}
+
 function Test-EpicStateIsolationHookLiteral {
     # Pure: true when an AST holds a string literal that names a hook script, hooks/<name>.ps1,
     # other than the EpicStateIsolation helper files and other than a test file path.
@@ -136,7 +157,10 @@ function Get-EpicStateIsolationJoinPathPart {
     for ($index = 1; $index -lt $elements.Count; $index++) {
         $element = $elements[$index]
         if ($element -isnot [System.Management.Automation.Language.CommandParameterAst]) { $positional.Add($element); continue }
-        if (@('Path', 'ChildPath', 'AdditionalChildPath') -notcontains $element.ParameterName) { continue }
+        if (@('Path', 'ChildPath', 'AdditionalChildPath') -notcontains $element.ParameterName) {
+            if (Test-EpicStateIsolationSeparateValue -Element $elements -Index $index) { $index++ }
+            continue
+        }
         $value = $element.Argument
         if ($null -eq $value -and ($index + 1) -lt $elements.Count) { $index++; $value = $elements[$index] }
         if ($null -eq $value) { continue }
@@ -333,7 +357,9 @@ function Get-EpicStateIsolationHookReference {
         FileName assignments and ArgumentList.Add arguments; process-start cmdlet -FilePath and
         -ArgumentList arguments (and its positional arguments); and the expressions bound to a variable
         used in one of those positions. A Join-Path read only by Get-FileHash, Get-Content or ParseFile is
-        in no load position and is not reported. The cmdlet name is composed from fragments.
+        in no load position and is not reported. The cmdlet name is composed from fragments. The
+        separate-token value of a value-taking parameter outside the load positions is not a load
+        (issue #935, CR-N3).
     #>
     [OutputType([pscustomobject])]
     param([Parameter(Mandatory)] [System.Management.Automation.Language.Ast] $Ast)
@@ -350,7 +376,10 @@ function Get-EpicStateIsolationHookReference {
         for ($index = 1; $index -lt $elements.Count; $index++) {
             $element = $elements[$index]
             if ($element -isnot [System.Management.Automation.Language.CommandParameterAst]) { $loads.Add($element); continue }
-            if ($pathParameter -notcontains $element.ParameterName) { continue }
+            if ($pathParameter -notcontains $element.ParameterName) {
+                if (Test-EpicStateIsolationSeparateValue -Element $elements -Index $index) { $index++ }
+                continue
+            }
             $value = $element.Argument
             if ($null -eq $value -and ($index + 1) -lt $elements.Count) { $index++; $value = $elements[$index] }
             if ($null -ne $value) { $loads.Add($value) }

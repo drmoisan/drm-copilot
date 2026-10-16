@@ -354,3 +354,76 @@ Describe 'fixture' {
         $closure.Count | Should -Be 0 -Because 'variable-built loads are reported, not added to the closure'
     }
 }
+
+Describe 'issue #935 CR-N3 load-position parameters' {
+    # The process-start cmdlet name is composed at run time from __SPAWN__, so it never appears as one token here.
+    It 'CR-N3 does not report the separate-token value of <Parameter>' -ForEach @(
+        @{ Parameter = 'Import-Module -Prefix'; Source = @'
+$HookRoot = '.claude/hooks'
+$Prefix = Join-Path $HookRoot 'gate.ps1'
+Describe 'fixture' {
+    BeforeAll { Import-Module -Prefix $Prefix ./Fixture.psm1 }
+}
+'@ }
+        @{ Parameter = 'process-start -WorkingDirectory'; Source = @'
+$HookRoot = '.codex/hooks'
+Describe 'fixture' {
+    It 'starts a shell' { __SPAWN__ -WorkingDirectory (Join-Path $HookRoot 'gate.ps1') -FilePath fixture-shell }
+}
+'@ }
+    ) {
+        # Arrange
+        $ast = ConvertTo-HookReferenceFixtureAst -Source $Source.Replace('__SPAWN__', 'Start' + '-' + 'Process')
+
+        # Act
+        $references = @(Get-EpicStateIsolationHookReference -Ast $ast)
+
+        # Assert
+        $references.Count | Should -Be 0 -Because "the value of $Parameter is not a load position; got: $(@($references | ForEach-Object { "$($_.Form):$($_.Name):$($_.Root)" }) -join ', ')"
+    }
+
+    It 'CR-N3 binds Join-Path positionals after the separate-token value of -Credential' {
+        # Arrange
+        $Source = @'
+$HookRoot = '.claude/hooks'
+Describe 'fixture' {
+    BeforeAll { . (Join-Path -Credential $FixtureCredential $HookRoot 'gate.ps1') }
+}
+'@
+        $ast = ConvertTo-HookReferenceFixtureAst -Source $Source.Replace('__SPAWN__', 'Start' + '-' + 'Process')
+
+        # Act
+        $references = @(Get-EpicStateIsolationHookReference -Ast $ast)
+
+        # Assert
+        $match = @($references | Where-Object { $_.Name -eq 'gate.ps1' -and $_.Form -eq 'RootVariable' -and $_.Root -eq '.claude/hooks' })
+        $references.Count | Should -Be 1 -Because "the -Credential value is skipped, so Path is `$HookRoot and ChildPath is 'gate.ps1'"
+        $match.Count | Should -Be 1 -Because 'the record names gate.ps1 as a RootVariable load from .claude/hooks'
+    }
+
+    It 'CR-N3 still reports a positional load after the switch <Switch>' -ForEach @(
+        @{ Switch = 'Import-Module -Force'; Root = '.claude/hooks'; Source = @'
+$HookRoot = '.claude/hooks'
+Describe 'fixture' {
+    BeforeAll { Import-Module -Force (Join-Path $HookRoot 'gate.ps1') }
+}
+'@ }
+        @{ Switch = 'process-start -NoNewWindow'; Root = '.codex/hooks'; Source = @'
+$HookRoot = '.codex/hooks'
+Describe 'fixture' {
+    It 'starts the hook' { __SPAWN__ -NoNewWindow (Join-Path $HookRoot 'gate.ps1') }
+}
+'@ }
+    ) {
+        # Arrange
+        $ast = ConvertTo-HookReferenceFixtureAst -Source $Source.Replace('__SPAWN__', 'Start' + '-' + 'Process')
+
+        # Act
+        $references = @(Get-EpicStateIsolationHookReference -Ast $ast)
+
+        # Assert
+        $match = @($references | Where-Object { $_.Name -eq 'gate.ps1' -and $_.Form -eq 'RootVariable' -and $_.Root -eq $Root })
+        $references.Count | Should -Be 1 -Because "a switch takes no value, so the positional after $Switch is still a load"
+        $match.Count | Should -Be 1 -Because "the record names gate.ps1 as a RootVariable load from $Root"
+    }
+}
