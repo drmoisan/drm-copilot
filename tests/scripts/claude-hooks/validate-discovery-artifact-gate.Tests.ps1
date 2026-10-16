@@ -354,5 +354,75 @@ Describe 'validate-discovery-artifact-gate.ps1' {
             $references | Should -HaveCount 1
             $references[0] | Should -BeExactly 'discovery/coverage-ledger/coverage-ledger.json'
         }
+
+        It 'R4 returns no reference for a lone backtick token' {
+            # Arrange: the only punctuation token is a lone backtick, which is empty after trimming; no discovery path is present.
+            $text = 'Wrote ` and finished the task'
+            $thrown = $null
+            $references = $null
+            # Act
+            try { $references = @(Find-DiscoveryArtifactReference -OutputText $text -ErrorAction Stop) } catch { $thrown = $_ }
+            # Assert
+            $thrown | Should -BeNullOrEmpty
+            $references | Should -HaveCount 0
+        }
+
+        It 'R4 returns no reference for an empty-after-trim token' {
+            # Arrange: two double-quote characters form one token that is empty after trimming; no discovery path is present.
+            $text = 'Wrote "" and finished the task'
+            $thrown = $null
+            $references = $null
+            # Act
+            try { $references = @(Find-DiscoveryArtifactReference -OutputText $text -ErrorAction Stop) } catch { $thrown = $_ }
+            # Assert
+            $thrown | Should -BeNullOrEmpty
+            $references | Should -HaveCount 0
+        }
+
+        It 'R4 skips a lone backtick token and returns the following discovery reference' {
+            # Arrange: a lone backtick token precedes a discovery reference.
+            $text = 'Wrote ` and discovery/coverage-ledger/coverage-ledger.json'
+            $thrown = $null
+            $references = $null
+            # Act
+            try { $references = @(Find-DiscoveryArtifactReference -OutputText $text -ErrorAction Stop) } catch { $thrown = $_ }
+            # Assert
+            $thrown | Should -BeNullOrEmpty
+            $references | Should -HaveCount 1
+            $references[0] | Should -BeExactly 'discovery/coverage-ledger/coverage-ledger.json'
+        }
+
+        It 'R4 skips the trim-only token <Name> and returns the discovery reference' -ForEach @(
+            @{ Name = '()'; Token = '()' }
+            @{ Name = '[]'; Token = '[]' }
+            @{ Name = ''''''; Token = '''''' }
+            @{ Name = ','; Token = ',' }
+            @{ Name = ';'; Token = ';' }
+        ) {
+            # Arrange: the trim-only token precedes a discovery reference.
+            $text = 'Wrote ' + $Token + ' and discovery/coverage-ledger/coverage-ledger.json'
+            $thrown = $null
+            $references = $null
+            # Act
+            try { $references = @(Find-DiscoveryArtifactReference -OutputText $text -ErrorAction Stop) } catch { $thrown = $_ }
+            # Assert
+            $thrown | Should -BeNullOrEmpty
+            $references | Should -HaveCount 1
+            $references[0] | Should -BeExactly 'discovery/coverage-ledger/coverage-ledger.json'
+        }
+
+        It 'R4 gate allows a message containing only a lone backtick without invoking the validator' {
+            # Arrange: a present declaration and a failing validator mock, so any dispatch would block.
+            Mock Invoke-DiscoveryValidatorExe { @{ ExitCode = 1; Output = 'schema violation: missing field x' } }
+            $json = ConvertTo-DiscoveryEnvelopeJson -AssistantMessage '`'
+            $thrown = $null
+            $result = $null
+            # Act
+            try { $result = Invoke-DiscoveryArtifactGateValidation -InputText $json -RequiredArtifactReader $script:PresentReader -ErrorAction Stop } catch { $thrown = $_ }
+            # Assert
+            $thrown | Should -BeNullOrEmpty
+            $result.Ok | Should -Be $true
+            Should -Invoke Invoke-DiscoveryValidatorExe -Times 0 -Exactly
+        }
     }
 }
