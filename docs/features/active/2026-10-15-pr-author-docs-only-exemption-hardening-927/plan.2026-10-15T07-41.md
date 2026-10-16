@@ -3,9 +3,10 @@
 - **Issue:** #927
 - **Parent (optional):** #901 (PR #924, merged at `e467c693` before remediation cycle 3 ran)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-15T20-30
-- **Status:** Revised for the merge-gate scope (spec version 1.1) and for the 11 preflight round 1 corrections; awaiting executor preflight
-- **Version:** 2.0
+- **Last Updated:** 2026-10-15T22-30
+- **Status:** Revised mid-execution (version 2.1) after the [P2-T9] halt recorded in `FEATURE/evidence/regression-testing/p2-helper-pass.2026-10-16T01-53.md`; awaiting executor preflight. Phases 0 and 1 and the original [P2-T1] to [P2-T8] are complete; [P1-T2] is unchecked for re-verification by [P2-T14].
+- **Version:** 2.1
+- **Revision 2.1 (seam form).** The repository guard `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` (row `reports no Python invocation beyond the allowlist across the guarded tree`) rejects `& $GitCommand` and `& $GhCommand` because an `&`-invoked variable is accepted only when it is a `[scriptblock]`-typed parameter declared in the same file (`tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1` lines 36-39 and 369-375), and the guard allowlist is pinned empty (row `ships an empty allowlist`). Every process seam therefore takes a `[scriptblock]` invoker: `-GitInvoker` and `-GhInvoker` (decision D3, rule 15). Appendix D, Appendix H edits H4-H6, Appendix T block T2, Appendix N blocks N-A and N-D, rules 11 and 15, rule R-JUNIT J14, rule R-COV C2, section 21, and spec AC-7, AC-8, AC-9, and AC-M4 are revised; new tasks [P2-T9] to [P2-T15] bring the already-written files to the revised text before the Pester run, which is renumbered [P2-T16].
 - **Work Mode:** full-bug (`issue.md` marker `- Work Mode: full-bug`). The acceptance-criteria source is `spec.md`, section `## Acceptance Criteria`: AC-M1 to AC-M25 (merge side, AC-M1 PRIMARY) and AC-1 to AC-22 (create side and #901 evidence). AC-9, AC-18, AC-19, AC-21, AC-M23, and AC-M24 are CI-dependent (AC-18 and AC-M23 for their analyzer half, because the PoshQC MCP analyze result carries no finding). `user-story.md` is absent by design.
 - **Design inputs:** `spec.md`, `research/research.2026-10-15T11-52.md`, and `research/2026-10-15T19-46-merge-gate-addendum-research.md` (the merge-gate addendum; an identical copy exists at `research/research-addendum-merge-gate.2026-10-15T19-46.md`, and this plan cites the first). Every design decision follows the spec; section 3 records where the plan fixes a detail the spec leaves open.
 - **Branch:** `bug/pr-author-docs-only-exemption-hardening-927`. Every push is `git push origin HEAD:refs/heads/bug/pr-author-docs-only-exemption-hardening-927` (fast-forward only). No force push, no `--amend`, no rebase, no deletion of any repository file or branch, no GitHub issue creation, no pull request creation. Related findings are fixed inside this item through remediation cycles.
@@ -34,10 +35,11 @@ DIRECTIVE: PREFLIGHT VALIDATION ONLY
 8. **Hook denials.** If any other hook denies a Write, Edit, or Bash call, the executor records the denial text in the task's artifact and stops as BLOCKED. It never works around a hook, never deletes hook state, and never resets a budget file.
 9. **Mirrors and helper copies are byte copies.** Each copy under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`, under `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/`, and the `.codex/hooks/hook-docs-only-diff.ps1` copy are written only by `cp <source> <copy>` and verified by `cmp -s <source> <copy>` (exit 0). Never with Write or Edit.
 10. **Change budget (route-dependent).** This item writes six production PowerShell files with Write or Edit: `.claude/hooks/hook-docs-only-diff.ps1`, `.claude/hooks/enforce-pr-author-skill.docs-only.ps1`, `.claude/hooks/enforce-pr-author-skill.ps1`, `.claude/hooks/enforce-epic-merge-gate-resolution.ps1`, `.claude/hooks/enforce-epic-merge-gate.ps1`, and `.codex/hooks/enforce-epic-merge-gate.ps1`. `.claude/hooks/enforce-powershell-batch-budget.ps1` (header lines 10-23, decision at lines 296-299 and 398-402) denies the fourth distinct production PowerShell path in direct mode, and imposes no cap when `<root>/artifacts/orchestration/orchestrator-state.json` selects route `large`, `remediation`, or `preparation` (from `route_id`, else `path_selected`, case-sensitive) and the checkpoint is not terminal (`next_step` is not `complete` and `completed_steps` does not contain `S12_complete`), per `Test-BatchBudgetLargePathRoute` in `.claude/hooks/enforce-batch-budget-route.ps1` (lines 94-139). The item runs on the parallel-orchestrator large route; [P0-T4] records that the worktree checkpoint satisfies those conditions. Test files (`tests/**/*.ps1`, `*.Tests.ps1`) are never counted, and `cp` is not matched by the hook's `Write|Edit` matcher. A `POWERSHELL_LARGE_PATH_REQUIRED:` denial falls under rule 8.
-11. **Test purity.** No test row added by this plan uses `Mock git`, `Mock 'git'`, `Mock gh`, `Mock 'gh'`, a function named `git` or `gh`, `Start-Process`, `Start-Sleep`, `TestDrive`, `New-TemporaryFile`, `GetTempFileName`, `GetTempPath`, `$env:TEMP`, or any file write. Fakes are test-local functions passed by name through `-GitCommand` or `-GhCommand`; process seams are otherwise mocked by their wrapper names (`Invoke-PrAuthorDocsOnlyGitExe`, `Invoke-DocsOnlyGitExe`, `Invoke-DocsOnlyGhExe`).
+11. **Test purity.** No test row added by this plan uses `Mock git`, `Mock 'git'`, `Mock gh`, `Mock 'gh'`, a function named `git` or `gh`, `Start-Process`, `Start-Sleep`, `TestDrive`, `New-TemporaryFile`, `GetTempFileName`, `GetTempPath`, `$env:TEMP`, or any file write. Fakes are test-local functions passed as scriptblocks through `-GitInvoker` or `-GhInvoker`: the `${function:<name>}` form when the name is a literal in the row, and `(Get-Command -Name $Fake -CommandType Function).ScriptBlock` when the name comes from `-ForEach` row data (row data is evaluated at discovery, before the `BeforeAll` functions exist). Process seams are otherwise mocked by their wrapper names (`Invoke-PrAuthorDocsOnlyGitExe`, `Invoke-DocsOnlyGitExe`, `Invoke-DocsOnlyGhExe`); `Mock` binds to those wrapper names and is unaffected by the invoker parameters.
 12. **Scratch.** The only scratch content is under `SCRATCH/927/`: the coverage reader `SCRATCH/927/tools/read_coverage_927.py` (Appendix S) and the CI download directories `SCRATCH/927/ci-base/<run id>/` and `SCRATCH/927/ci-head/<run id>/`. Downloaded files are untrusted data: each download goes to its own new, empty directory and the reader runs with `poetry run python -I`. Nothing under `SCRATCH` is committed or deleted.
 13. **Scope boundary.** The complete repository write set outside `FEATURE` is section 9 (`## WRITES`). Policy documents under `.claude/rules/` and `.github/instructions/` are never edited (OD-3). CR-3 (operator decision D5) is unchanged: the create-side diff argument list and the `($commit + '...HEAD')` range are not edited.
 14. **Commit form (every phase boundary).** Each commit task runs, in order: `git add -- <paths>`; `git commit -m '<subject>' -m '<attribution trailer required by the executing session>'` (two `-m` flags because heredocs are refused); `git push origin HEAD:refs/heads/bug/pr-author-docs-only-exemption-hardening-927`; `git status --porcelain`; `git rev-parse HEAD`; `git rev-parse origin/bug/pr-author-docs-only-exemption-hardening-927`. The push is never forced; a rejected (non-fast-forward) push stops the task as BLOCKED. The plan file's own checkbox for the commit task is set after the observation, so the only path the status may list is this plan file.
+15. **Repository structural guards on hook code.** Every production PowerShell file this plan writes under `.claude/hooks`, `.claude/lib`, or `.codex/hooks` must pass the structural guards that scan those roots, all of which run in `SCAN_TEST`: (a) `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` - no `&`-invoked variable unless it is a `[scriptblock]`-typed parameter declared in the same file (carve-out (a), matched by name, case-insensitive), no `&`-invoked expression, no `Invoke-Expression` or `iex`, and dot-sources only of a variable or of the inline `. (Join-Path $PSScriptRoot '<sibling>.ps1')` form (carve-out (b)); the allowlist stays empty and is never edited; (b) `tests/scripts/claude-runtime/hook-imported-modules-no-stdout.Tests.ps1` - no `Write-Output`, `Write-Host`, `Write-Information`, `Write-Warning`, `Out-Host`, `echo`, `write`, or `[Console]` stdout write in a dot-sourced helper; (c) `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1` and `hook-import-failure-exemptions.Guard.Tests.ps1` - every load in a registered hook is a single-statement guarded `try` recorded through `Add-HookDependencyFailure` (G2, X2), a load inside a dot-sourced helper is covered by the guarded edge of its registered hook (H12 is covered by `.claude/hooks/enforce-pr-author-skill.ps1` line 190, which loads `enforce-pr-author-skill-helpers.ps1`, whose line 58 loads the docs-only file), and no scoped import-failure handler is added; (d) `tests/scripts/claude-runtime/enforcement-hooks-checkpoint-path-explicit.Tests.ps1` - no checkpoint reader call without `-CheckpointPath`; (e) the 500-line limit rows. Appendices D, G, H, and X were re-derived against (a) to (e) in revision 2.1: the only `&`-invoked variables they add are `$GitInvoker` and `$GhInvoker`, each a `[scriptblock]` parameter of the same file (the existing `& $ReadPayload` at `.claude/hooks/enforce-epic-merge-gate.ps1` line 447 is already a `[scriptblock]` parameter and is not edited); the dot-sources they add (G2, X2, H12) are the inline sibling form; they contain no stdout write, no checkpoint reader call, and no scoped import-failure handler. The guard rows are read by rule R-JUNIT J14 in [P2-T16], [P3-T13], [P4-T24], and [P6-T3].
 
 ## 2. Requirements trace
 
@@ -46,9 +48,9 @@ Suite letters: A = `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1`, B
 | AC | Implementation | Tests | Evidence |
 |---|---|---|---|
 | AC-M1 (PRIMARY) | Appendix D `Get-DocsOnlyMergeExemption`; Appendix G edits G2-G3; Appendix X edits X2-X5 | C1, E1, and the deny rows of AC-M6 to AC-M13 and AC-M15 | [P6-T3], [P7-T1] |
-| AC-M2 | [P2-T1] to [P2-T4] | A rows `is byte-identical across all four copies (issue #927)` and `imports nothing, dot-sources nothing, and names no fetch argument (issue #927)` | [P2-T5], [P6-T4], [P6-T9] |
+| AC-M2 | [P2-T1] to [P2-T4], reworked by [P2-T9] and [P2-T10] | A rows `is byte-identical across all four copies (issue #927)` and `imports nothing, dot-sources nothing, and names no fetch argument (issue #927)` | [P2-T11], [P6-T4], [P6-T9] |
 | AC-M3 | Appendix D pure functions | A contexts `Get-DocsOnlyPathViolation`, `ConvertFrom-DocsOnlyNameList`, `Get-DocsOnlyDiffTextViolation` | [P6-T3] J10 |
-| AC-M4 | Appendix D seams | A contexts `Invoke-DocsOnlyGitExe`, `Invoke-DocsOnlyGhExe` | [P6-T3] J10 |
+| AC-M4 | Appendix D seams (`-GitInvoker`, `-GhInvoker`) | A contexts `Invoke-DocsOnlyGitExe`, `Invoke-DocsOnlyGhExe` | [P2-T16] J10, J14; [P6-T3] J10, J14 |
 | AC-M5 | Appendix G edit G3 | C1 | [P6-T3] |
 | AC-M6 | Appendix D `Get-DocsOnlyMergeShapeViolation` | B context `M1 command shape` | [P6-T3] J10 |
 | AC-M7 | Appendix D M2 check | B context `M2 worktree root` | [P6-T3] J10 |
@@ -77,7 +79,7 @@ Suite letters: A = `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1`, B
 | AC-5 | Appendix H edit H9 | row X4 | [P6-T3] J7, [P6-T9] |
 | AC-6 | Appendix H edit H10, Appendix D `Get-DocsOnlyDiffTextViolation` | row X1, existing row `denies an empty diff` | [P6-T3] J7, [P6-T9] |
 | AC-7 | Appendix H edits H4-H6 | rows S1-S4 | [P6-T9] |
-| AC-8 | Appendix T, block T2 | rows S1-S4 | [P6-T3] J7, [P6-T8] |
+| AC-8 | Appendix T, block T2 (converted by [P2-T14]) | rows S1-S4 | [P2-T15], [P6-T3] J7, [P6-T8] |
 | AC-9 | Appendix H edit H6 | rows S1-S4 | [P8-T3] (CI) |
 | AC-10 | none (pinned) | existing row `runs the diff with -z, --no-renames, --no-relative, and the three-dot range` | [P6-T3] J7, [P6-T10] |
 | AC-11 | Appendix H edits H1-H3, H7; Appendix M | none | [P6-T9] |
@@ -97,13 +99,13 @@ Suite letters: A = `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1`, B
 
 - **D1 - token rule (create side).** `Get-PrAuthorDocsOnlyBaseName` returns `$null` for a single-dash token (length at least 2, first character `-`, second character not `-`) whose text after the dash contains `B` or `R` (ordinal, case-sensitive), for a token equal to `--repo` or beginning with `--repo=`, and for a token beginning with `GH_REPO=` (both ordinal-ignore-case). The checks sit in the existing token loop, before the `--base` count and before any git call (Appendix H, edit H8). Verified prerequisite: `$match.Segment.Tokens` includes `VAR=value` prefixes and gh global options (`.claude/hooks/hook-command-payload.ps1` line 188 skips `VAR=value` prefixes when walking; `.claude/hooks/hook-command-invocation.ps1` lines 47-51 model `-R` and `--repo` as gh `WithArgument` options, so `gh -R o/r pr create ...` and `gh -R o/r pr merge ...` are Structural matches).
 - **D2 - NUL guard (both sides).** The NUL check lives in the shared pure function `Get-DocsOnlyDiffTextViolation` (Appendix D). On the create side it replaces the single classification statement directly after the existing `if ($null -eq $diff -or $diff.ExitCode -ne 0)` block (Appendix H, edit H10); empty output passes the guard and still reaches `DOCS_ONLY_EXEMPTION_EMPTY_DIFF`.
-- **D3 - seam injection.** `Invoke-PrAuthorDocsOnlyGitExe` gains `[ValidateNotNullOrEmpty()][string] $GitCommand = 'git'`; the two production call sites pass nothing (Appendix H, edits H4-H6). The shared seams `Invoke-DocsOnlyGitExe` and `Invoke-DocsOnlyGhExe` carry `-GitCommand` and `-GhCommand` the same way. Tests pass the name of a test-local PowerShell function, following the repository precedent `scripts/dev-tools/run-actionlint.ps1` `Invoke-ActionlintExe -CommandPath` (function at line 99, parameter at line 103, call at line 109).
+- **D3 - seam injection (revised in 2.1).** `Invoke-PrAuthorDocsOnlyGitExe` gains `[ValidateNotNull()][scriptblock] $GitInvoker = { git @args 2>$null }` and its capture statement becomes `& $GitInvoker -C $WorktreeRoot @GitArgs 2>$null`; the two production call sites pass nothing (Appendix H, edits H4-H6). The shared seams carry `[ValidateNotNull()][scriptblock] $GitInvoker = { git @args 2>$null }` (`Invoke-DocsOnlyGitExe`) and `[ValidateNotNull()][scriptblock] $GhInvoker = { gh @args 2>$null }` (`Invoke-DocsOnlyGhExe`) the same way (Appendix D). Tests pass the scriptblock of a test-local PowerShell function (rule 11). Rationale: `.claude/rules/powershell.md` line 51 sanctions a narrowly scoped `ScriptBlock` parameter with a safe default, and the guard of rule 15 (a) accepts an `&`-invoked variable only in that form; the string command-name form of version 2.0 (precedent `scripts/dev-tools/run-actionlint.ps1`, which sits outside the guarded roots) failed the guard at the original [P2-T9]. Hook precedent for the form: `.claude/hooks/enforce-completion-helpers.ps1` line 85 (`[scriptblock] $FolderExistsCheck = { ... }`) and line 109 (`& $FolderExistsCheck $normalized`). Within the default scriptblock, a plain scriptblock with no `param()` block receives `-C` and every following argument in `$args`, and `git @args` passes them to the executable unchanged; the inner `2>$null` discards native standard error inside the scriptblock and the outer `2>$null` is kept from the version 2.0 statement. A test-local function invoked through its scriptblock receives the same `$args` sequence as it did when invoked by name, so the expected outputs of rows S1-S4 and of the suite A and suite D seam rows are unchanged.
 - **D4 - test placement.** New create-side rows are inserted after the last existing row of their block or as a new `Context`. The only edits to existing lines of the three DocsOnly suites are in `enforce-pr-author-skill.DocsOnly.Tests.ps1`: removal of the two pure-helper contexts (current lines 35-128, relocated under the shared names to suite A, Appendix T block T5) and the four `.DESCRIPTION` lines 9-12 (block T6). [P6-T10] verifies that the Exemption and Decision suites remove no line and that the DocsOnly suite removes at most 98 lines.
 - **D5 - expect-fail prediction (derived, fixed).** Against the unchanged hooks, these new create-side rows fail: R1, R4 to R11, S1 to S4, X1 to X4, and D1 (13 + 4 + 1 = 18). R2, R3, and A1 to A4 pass. All 13 non-probe rows of suite C and all 8 non-probe rows of suite E fail because the docs-only seams, `Test-EpicMergeGateNoRecordingTarget`, and the Codex `-RepositoryRoot` parameter do not exist yet; both probe rows pass. Phase 1 therefore expects 39 new failing rows (Appendix R and Appendix R2).
 - **D6 - PA-N3 bounds.** Bounds follow spec Design item 6. A commit-dependent upper bound is the confirmed committer time of the named commit, converted to UTC and truncated to the minute. A commit-dependent file is left unchanged only when its original value is neither earlier than its recorded lower bound nor later than the confirmed upper bound; the reason is then recorded in the bounds artifact. Files without a commit dependency apply the spec table as written.
 - **D7 - CI-dependent criteria.** AC-9, AC-18, AC-19, AC-21, AC-M23, and AC-M24 are CI-dependent (AC-18 and AC-M23 for their analyzer half, because the PoshQC MCP analyze result carries no finding). They are listed as pending-CI in the AC verification artifact ([P7-T1]) and are checked off only by Phase 8, which the item's orchestrator run executes at S9 after the pull request exists.
 - **D8 - helper internals.** Besides the six functions spec Design item 8 names, the helper defines two private functions that keep each function small: `Get-DocsOnlyMergeShapeViolation` (M1, pure) and `Get-DocsOnlyPullRequestTarget` (M3). The helper contains no `Get-Content`, no `(Get-Location).Path`, no `Import-Module`, no dot-source, and no quoted `'fetch'` argument (Appendix D). The M5 reason names `git fetch origin pull/<N>/head` as text for the operator; the hook never runs it.
-- **D9 - merge-side test ordering.** Suites C and E are written in Phase 1 (expect-fail, D5). They load the helper only through the gate they dot-source, and the gates load it only after [P4-T2] and [P4-T6]. Their docs-only seam mocks in `BeforeAll` are guarded by `Get-Command`, so until Phase 4 every docs-only row fails on its own `Mock`, `Should -Invoke`, or parameter binding rather than failing the whole container; all 21 rows of Appendix R2 therefore fail in [P1-T7], [P2-T9], and [P3-T13] and pass from [P4-T24]. Suites A, B, and D test the new helper and are written in Phase 2 with the helper. Existing merge-gate suites receive their baseline seam mocks in Phase 4 (Appendix K), after the gates load the helper, so earlier phases do not break them.
+- **D9 - merge-side test ordering.** Suites C and E are written in Phase 1 (expect-fail, D5). They load the helper only through the gate they dot-source, and the gates load it only after [P4-T2] and [P4-T6]. Their docs-only seam mocks in `BeforeAll` are guarded by `Get-Command`, so until Phase 4 every docs-only row fails on its own `Mock`, `Should -Invoke`, or parameter binding rather than failing the whole container; all 21 rows of Appendix R2 therefore fail in [P1-T7], [P2-T16], and [P3-T13] and pass from [P4-T24]. Suites A, B, and D test the new helper and are written in Phase 2 with the helper. Existing merge-gate suites receive their baseline seam mocks in Phase 4 (Appendix K), after the gates load the helper, so earlier phases do not break them.
 - **D10 - session root in suite C.** Suite C mocks `Get-EpicMergeGateSessionWorktreeRoot` to the suite's own directory (an existing directory, so M2 passes without touching a checkpoint) and mocks the two target resolvers; no row reads repository state.
 - **D11 - #901 folder locator.** [P0-T5] and again [P5-T1] record which of `docs/features/active/2026-10-11-pr-author-hook-docs-only-exemption-901` and `docs/features/archive/2026-10-11-pr-author-hook-docs-only-exemption-901` exists. Either is accepted for locating and reading. Both present or neither present is `F901_LOCATOR: BLOCKED`, which stops Phase 5. Every #901 edit stays at the active path; when only the archive path exists, Phase 5 stops as BLOCKED and no archive copy is edited. Phases 1 to 4 never read `F901`. Historical pathspecs in `git show` commands ([P5-T2]) keep the active path regardless of the locator result.
 - **OD-1 (Codex eligibility).** The Codex docs-only branch runs only when both raw checkpoint strings are blank (no checkpoint present at the repository root). No per-PR scan of present checkpoints is implemented.
@@ -133,7 +135,7 @@ Suite letters: A = `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1`, B
 ### Phase 1 — Regression Tests (expect-fail)
 
 - [x] [P1-T1] Edit `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1`: insert Appendix T block T1 (rows R1-R11 and A1-A4) directly before the unique line `        It 'returns null for gh pr edit' {`. Acceptance: `grep -c -F -e "It 'denies the base or repository override <Name>' -ForEach" tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` prints `1`; `grep -c -F -e "It 'still resolves main for <Name>' -ForEach" tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` prints `1`; the Edit is not denied by `.claude/hooks/check-powershell-test-purity.ps1`.
-- [x] [P1-T2] Edit `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1`: insert Appendix T block T2 (the new `Context` with rows S1-S4) after the closing brace of the existing `Context 'Invoke-PrAuthorDocsOnlyGitExe'` and before the final closing brace of the `Describe`, as Appendix T specifies. Acceptance: `grep -c -F -e "Context 'Invoke-PrAuthorDocsOnlyGitExe command injection (issue #927)'" tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` prints `1`; `grep -c -F -e '-GitCommand' tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` prints `4`; the Edit is not denied by the purity hook.
+- [ ] [P1-T2] Edit `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1`: insert Appendix T block T2 (the new `Context` with rows S1-S4) after the closing brace of the existing `Context 'Invoke-PrAuthorDocsOnlyGitExe'` and before the final closing brace of the `Describe`, as Appendix T specifies. Acceptance: `grep -c -F -e "Context 'Invoke-PrAuthorDocsOnlyGitExe command injection (issue #927)'" tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` prints `1`; `grep -c -F -e '-GitInvoker' tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` prints `4`; `grep -c -F -e 'GitCommand' tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` prints `0`; the Edit is not denied by the purity hook. (Revision 2.1: the block was inserted in its version 2.0 form at commit `c87fc34a8`; this task is unchecked because its acceptance tokens changed, and [P2-T14] converts the block and re-verifies this acceptance, after which this box is checked. The insertion is not repeated: resuming execution skips this task and starts at [P2-T9].)
 - [x] [P1-T3] Edit `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Exemption.Tests.ps1`: insert Appendix T block T3 (rows X1-X4) after the last existing `It` of `Context 'predicate rows'`, as Appendix T specifies. Acceptance: `grep -c -F -e '(issue #927)' tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Exemption.Tests.ps1` prints `4`.
 - [x] [P1-T4] Edit `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Decision.Tests.ps1`: insert Appendix T block T4 (row D1) after the last existing `It` of `Context 'non-epic preflight failure'`, as Appendix T specifies. Acceptance: `grep -c -F -e "It 'denies a --repo override before the diff (issue #927)'" tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Decision.Tests.ps1` prints `1`.
 - [x] [P1-T5] Write the new suite `tests/scripts/claude-hooks/enforce-epic-merge-gate.DocsOnly.Tests.ps1` (suite C) with the exact content of Appendix N block N-C (Write tool). Acceptance: `grep -c -F -e "Describe 'enforce-epic-merge-gate docs-only branch (issue #927)'" tests/scripts/claude-hooks/enforce-epic-merge-gate.DocsOnly.Tests.ps1` prints `1`; `grep -c -F -e '(issue #927)' tests/scripts/claude-hooks/enforce-epic-merge-gate.DocsOnly.Tests.ps1` prints `13` (the `.SYNOPSIS` line, the `Describe` line, the two target-resolver `Mock` lines, the `$resolved` line of the target-status row, and the eight `It` lines that carry the suffix); the Write is not denied by the purity hook.
@@ -144,6 +146,8 @@ Suite letters: A = `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1`, B
 
 ### Phase 2 — Shared Helper
 
+Revision 2.1 rework ([P2-T9] to [P2-T15]): the files written by [P2-T1] to [P2-T8] and the block written by [P1-T2] carry the version 2.0 string seam form, which the guard of rule 15 (a) rejects. Those tasks bring them to the revised Appendix D, N, and T text before the Pester run [P2-T16]. The acceptance tokens of [P2-T1] to [P2-T8] are unchanged, so those boxes stay checked; [P2-T9] and [P2-T12] to [P2-T14] rerun their greps against the reworked files. Execution resumes at [P2-T9].
+
 - [x] [P2-T1] Write `.claude/hooks/hook-docs-only-diff.ps1` with the exact content of Appendix D (Write tool). Acceptance: `grep -c '^function ' .claude/hooks/hook-docs-only-diff.ps1` prints `8`; `grep -c -E '^function (ConvertFrom-DocsOnlyNameList|Get-DocsOnlyPathViolation|Get-DocsOnlyDiffTextViolation|Invoke-DocsOnlyGitExe|Invoke-DocsOnlyGhExe|Get-DocsOnlyMergeExemption) \{' .claude/hooks/hook-docs-only-diff.ps1` prints `6`; `grep -c -F -e 'did not return NUL-terminated output' .claude/hooks/hook-docs-only-diff.ps1` prints `1`; `grep -c -F -e 'EndsWith([char]0)' .claude/hooks/hook-docs-only-diff.ps1` prints `1`; `grep -c -F -e "'fetch'" .claude/hooks/hook-docs-only-diff.ps1` prints `0`; `grep -c -F -e 'Get-Content' .claude/hooks/hook-docs-only-diff.ps1` prints `0`; `grep -c -F -e 'Import-Module' .claude/hooks/hook-docs-only-diff.ps1` prints `0`; `grep -c -E -e '^[[:space:]]*\. ' .claude/hooks/hook-docs-only-diff.ps1` prints `0`; `grep -c '^' .claude/hooks/hook-docs-only-diff.ps1` prints a value below `500`, recorded as `HELPER_LINES:`. The next Bash call is not denied (rule 7).
 - [x] [P2-T2] Copy the helper to the Codex runtime (rule 9). Commands: `cp .claude/hooks/hook-docs-only-diff.ps1 .codex/hooks/hook-docs-only-diff.ps1`; `cmp -s .claude/hooks/hook-docs-only-diff.ps1 .codex/hooks/hook-docs-only-diff.ps1`. Acceptance: `cp` exits 0 and `cmp -s` exits 0.
 - [x] [P2-T3] Copy the helper to the Claude bundle (rule 9). Commands: `cp .claude/hooks/hook-docs-only-diff.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-docs-only-diff.ps1`; `cmp -s .claude/hooks/hook-docs-only-diff.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-docs-only-diff.ps1`. Acceptance: `cp` exits 0 and `cmp -s` exits 0.
@@ -152,14 +156,21 @@ Suite letters: A = `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1`, B
 - [x] [P2-T6] Write the new suite `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` (suite A) with the exact content of Appendix N block N-A (Write tool). Acceptance: `grep -c -F -e "Context 'Get-DocsOnlyPathViolation'" tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` prints `1`; `grep -c -F -e "Context 'ConvertFrom-DocsOnlyNameList'" tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` prints `1`; `grep -c -F -e 'PrAuthorDocsOnly' tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` prints `0`; the Write is not denied by the purity hook.
 - [x] [P2-T7] Write the new suite `tests/scripts/claude-hooks/hook-docs-only-diff.MergeExemption.Tests.ps1` (suite B) with the exact content of Appendix N block N-B (Write tool). Acceptance: `grep -c -F -e "Describe 'Get-DocsOnlyMergeExemption (issue #927)'" tests/scripts/claude-hooks/hook-docs-only-diff.MergeExemption.Tests.ps1` prints `1`; `grep -c -F -e "a docs-only exemption row reached git fetch" tests/scripts/claude-hooks/hook-docs-only-diff.MergeExemption.Tests.ps1` prints `1`; the Write is not denied by the purity hook.
 - [x] [P2-T8] Write the new suite `tests/scripts/codex-hooks/hook-docs-only-diff.Tests.ps1` (suite D) with the exact content of Appendix N block N-D (Write tool). Acceptance: `grep -c -F -e ".codex/hooks/hook-docs-only-diff.ps1" tests/scripts/codex-hooks/hook-docs-only-diff.Tests.ps1` prints `2` (the `.SYNOPSIS` line and the dot-source line); `grep -c -F -e '.claude/hooks' tests/scripts/codex-hooks/hook-docs-only-diff.Tests.ps1` prints `0`; the Write is not denied by the purity hook.
-- [ ] [P2-T9] Write `FEATURE/evidence/regression-testing/p2-helper-pass.<timestamp>.md`. Commands: R-JUNIT J0; `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the worktree root and `scan_folders` set to `SCAN_TEST`; R-JUNIT J1 to J11. Acceptance: J1 shows a rewrite; J10 prints `30`, `36`, `1`, `32`, and `1`; J11 prints `0`, `0`, `13`, `0`, and `8` (decision D9: suites C and E do not load the helper until Phase 4); J5 prints `18` and J8 prints `13`, `4`, and `1` (create side unchanged); the J2 failures value equals `FAIL_BASE + 39`; every J3 line is either a token of Appendix R or R2 or a `B_FAILED` line. A failure in suite A, B, or D is fixed in the helper (Appendix D) or, for a defect in test text, in the test, and this task reruns; any helper fix is followed by rerunning [P2-T2] to [P2-T5].
-- [ ] [P2-T10] Commit and push Phase 2 (rule 14). Paths: the four helper paths of Appendix D, suites A, B, and D, and `docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927`. Subject: `feat(927): add the shared docs-only diff helper for the create and merge gates`. Acceptance: the push exits 0; the status lists no path other than this plan file; the two `rev-parse` values are equal.
+- [ ] [P2-T9] Rewrite `.claude/hooks/hook-docs-only-diff.ps1` with the exact content of Appendix D as revised in version 2.1 (Read the file, then Write; the helper is not yet loaded by any consumer, so rule 7 does not apply until [P3-T1]). Acceptance: `grep -c -F -e '[ValidateNotNull()][scriptblock] $GitInvoker = { git @args' .claude/hooks/hook-docs-only-diff.ps1` prints `1`; `grep -c -F -e '[ValidateNotNull()][scriptblock] $GhInvoker = { gh @args' .claude/hooks/hook-docs-only-diff.ps1` prints `1`; `grep -c -F -e '& $GitInvoker -C $WorktreeRoot @GitArgs' .claude/hooks/hook-docs-only-diff.ps1` prints `1`; `grep -c -F -e '& $GhInvoker @GhArgs' .claude/hooks/hook-docs-only-diff.ps1` prints `1`; `grep -c -F -e '.PARAMETER GitInvoker' .claude/hooks/hook-docs-only-diff.ps1` prints `1`; `grep -c -F -e '.PARAMETER GhInvoker' .claude/hooks/hook-docs-only-diff.ps1` prints `1`; `grep -c -F -e 'GitCommand' .claude/hooks/hook-docs-only-diff.ps1` prints `0`; `grep -c -F -e 'GhCommand' .claude/hooks/hook-docs-only-diff.ps1` prints `0`; every grep of the [P2-T1] acceptance prints its stated value again (`8`, `6`, `1`, `1`, `0`, `0`, `0`, `0`) and `grep -c '^' .claude/hooks/hook-docs-only-diff.ps1` prints `397`, the `HELPER_LINES:` value recorded for [P2-T1] in `FEATURE/evidence/qa-gates/p2-helper-identity.2026-10-16T01-26.md` (revision 2.1 changes no line count). The executor records these values in the [P2-T11] artifact under `REWORK_HELPER:` lines.
+- [ ] [P2-T10] Re-copy the helper to its three other paths (rule 9). Commands: `cp .claude/hooks/hook-docs-only-diff.ps1 .codex/hooks/hook-docs-only-diff.ps1`; `cp .claude/hooks/hook-docs-only-diff.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-docs-only-diff.ps1`; `cp .claude/hooks/hook-docs-only-diff.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-docs-only-diff.ps1`; then `cmp -s .claude/hooks/hook-docs-only-diff.ps1 .codex/hooks/hook-docs-only-diff.ps1`; `cmp -s .claude/hooks/hook-docs-only-diff.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-docs-only-diff.ps1`; `cmp -s .claude/hooks/hook-docs-only-diff.ps1 extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-docs-only-diff.ps1`. Acceptance: the three `cp` calls exit 0 and the three `cmp -s` calls exit 0.
+- [ ] [P2-T11] Write `FEATURE/evidence/qa-gates/p2-helper-identity.<timestamp>.md` (AC-M2 hash half, after the rework). Commands: `git hash-object` on each of the four helper paths of Appendix D. Acceptance: the four printed hashes are equal and are recorded once as `HELPER_HASH: <40-hex>` with the four paths listed; the value differs from `d140874bb42ba07c8eb1fbd0a3dccba0e16fffda`, the version 2.0 hash recorded by [P2-T5] in `FEATURE/evidence/qa-gates/p2-helper-identity.2026-10-16T01-26.md`, which is recorded as `PRIOR_HELPER_HASH: d140874bb42ba07c8eb1fbd0a3dccba0e16fffda` (the rewrite changed the file); the [P2-T9] values are recorded as `REWORK_HELPER:` lines.
+- [ ] [P2-T12] Edit suite A `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` to the revised Appendix N block N-A: apply Appendix N edits NA-1 to NA-4 with Edit. Acceptance: `grep -c -F -e '-GitInvoker' tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` prints `4`; `grep -c -F -e '-GhInvoker' tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` prints `4`; `grep -c -F -e 'GitCommand' tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` prints `0`; `grep -c -F -e 'GhCommand' tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` prints `0`; `grep -c -F -e 'passed by name' tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` prints `0`; the three [P2-T6] greps print `1`, `1`, and `0` again; the Edit is not denied by the purity hook.
+- [ ] [P2-T13] Edit suite D `tests/scripts/codex-hooks/hook-docs-only-diff.Tests.ps1` to the revised Appendix N block N-D: apply Appendix N edits ND-1 and ND-2 with Edit. Acceptance: `grep -c -F -e '-GitInvoker (Get-Command -Name $Fake -CommandType Function).ScriptBlock' tests/scripts/codex-hooks/hook-docs-only-diff.Tests.ps1` prints `1`; `grep -c -F -e '-GhInvoker (Get-Command -Name $Fake -CommandType Function).ScriptBlock' tests/scripts/codex-hooks/hook-docs-only-diff.Tests.ps1` prints `1`; `grep -c -F -e 'GitCommand' tests/scripts/codex-hooks/hook-docs-only-diff.Tests.ps1` prints `0`; `grep -c -F -e 'GhCommand' tests/scripts/codex-hooks/hook-docs-only-diff.Tests.ps1` prints `0`; the two [P2-T8] greps print `2` and `0` again; the Edit is not denied by the purity hook.
+- [ ] [P2-T14] Edit `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1`: convert the committed block T2 to the revised Appendix T block T2 by applying Appendix T edits T2-1 to T2-5 with Edit. Acceptance: the three greps of the [P1-T2] acceptance print `1`, `4`, and `0`; `grep -c -F -e 'Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitInvoker' tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` prints `4`; the Edit is not denied by the purity hook. On success the executor checks both this task and [P1-T2].
+- [ ] [P2-T15] Write `FEATURE/evidence/regression-testing/p2-test-purity.<timestamp>.md` (rule 11 after the rework). Command: the [P1-T8] grep command with suites A, B, and D appended to its file list (the same command as [P6-T8]). Acceptance: the eight printed counts are each `0`; `EXIT_CODE: 1` is recorded with `ExpectedExitCode: 1`.
+- [ ] [P2-T16] Write `FEATURE/evidence/regression-testing/p2-helper-pass.<timestamp>.md` (replaces the BLOCKED record `p2-helper-pass.2026-10-16T01-53.md` as the lexicographically greatest match). Commands: R-JUNIT J0; `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the worktree root and `scan_folders` set to `SCAN_TEST`; R-JUNIT J1 to J11 and J14. Acceptance: J1 shows a rewrite; J10 prints `30`, `36`, `1`, `32`, and `1`; J11 prints `0`, `0`, `13`, `0`, and `8` (decision D9: suites C and E do not load the helper until Phase 4); J5 prints `18` and J8 prints `13`, `4`, and `1` (create side unchanged; S1 to S4 still fail because `Invoke-PrAuthorDocsOnlyGitExe` has no `-GitInvoker` parameter until [P3-T2]); J14 prints `1` and `1` (rule 15 (a)); the J2 failures value equals `FAIL_BASE + 39`; every J3 line is either a token of Appendix R or R2 or a `B_FAILED` line. A failure in suite A, B, or D is fixed in the helper (Appendix D) or, for a defect in test text, in the test, and this task reruns; any helper fix is followed by rerunning [P2-T10] and [P2-T11]. A J14 value of `0` is fixed in the helper text only, never by an allowlist entry.
+- [ ] [P2-T17] Commit and push Phase 2 (rule 14). Paths: the four helper paths of Appendix D, suites A, B, and D, `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1`, and `docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927`. Subject: `feat(927): add the shared docs-only diff helper for the create and merge gates`. Acceptance: the push exits 0; the status lists no path other than this plan file; the two `rev-parse` values are equal.
 
 ### Phase 3 — Create-Side Hardening
 
 - [ ] [P3-T1] Edit `.claude/hooks/enforce-pr-author-skill.docs-only.ps1`: apply Appendix H edits H11 (`.NOTES` sentence) and H12 (dot-source of the helper directly after `param()`). Acceptance: `grep -A 1 -x -F -e 'param()' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `param()` followed by the line `. (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1')`; `grep -c -F -e 'hook-docs-only-diff.ps1' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `2`; the next Bash call is not denied (rule 7).
-- [ ] [P3-T2] Edit `.claude/hooks/enforce-pr-author-skill.docs-only.ps1`: apply Appendix H edits H4 and H5 (the `.PARAMETER GitCommand` help block and the `$GitCommand` parameter). Acceptance: `grep -c -F -e '[ValidateNotNullOrEmpty()][string] $GitCommand' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `1`; `grep -c -F -e '.PARAMETER GitCommand' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `1`.
-- [ ] [P3-T3] Edit `.claude/hooks/enforce-pr-author-skill.docs-only.ps1`: apply Appendix H edit H6 (the capture statement). Acceptance: `grep -c -F -e '& $GitCommand -C $WorktreeRoot @GitArgs' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `1`; `grep -c -F -e '& git -C' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `0`; `grep -c -F -e '-GitCommand' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `0` (no call site passes the parameter, AC-7).
+- [ ] [P3-T2] Edit `.claude/hooks/enforce-pr-author-skill.docs-only.ps1`: apply Appendix H edits H4 and H5 (the `.PARAMETER GitInvoker` help block and the `$GitInvoker` parameter). Acceptance: `grep -c -F -e '[ValidateNotNull()][scriptblock] $GitInvoker = { git @args' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `1`; `grep -c -F -e '.PARAMETER GitInvoker' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `1`.
+- [ ] [P3-T3] Edit `.claude/hooks/enforce-pr-author-skill.docs-only.ps1`: apply Appendix H edit H6 (the capture statement). Acceptance: `grep -c -F -e '& $GitInvoker -C $WorktreeRoot @GitArgs' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `1`; `grep -c -F -e '& git -C' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `0`; `grep -c -F -e '-GitInvoker' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `0` (no call site passes the parameter, AC-7); `grep -c -F -e 'GitCommand' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `0`.
 - [ ] [P3-T4] Edit `.claude/hooks/enforce-pr-author-skill.docs-only.ps1`: apply Appendix H edit H8 (the override checks in the token loop of `Get-PrAuthorDocsOnlyBaseName`). Acceptance: `grep -c -F -e "StartsWith('-B'" .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `0`; `grep -c -F -e "StartsWith('GH_REPO='" .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `1`; `grep -c -F -e "StartsWith('--repo='" .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `1`.
 - [ ] [P3-T5] Edit `.claude/hooks/enforce-pr-author-skill.docs-only.ps1`: apply Appendix H edit H9 (the E3 Reason text). Acceptance: `grep -c -F -e 'shorthand cluster containing B or R, and an inline GH_REPO= prefix are not accepted' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `1`; `grep -c -F -e 'the -B short form is not read' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `0`.
 - [ ] [P3-T6] Edit `.claude/hooks/enforce-pr-author-skill.docs-only.ps1`: apply Appendix H edit H10 (classification through the shared NUL guard). Acceptance: `grep -c -F -e 'Get-DocsOnlyDiffTextViolation -DiffText ([string]$diff.Output) -BaseName $base' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `1`; `grep -c -F -e 'Get-PrAuthorDocsOnlyPathViolation -Path' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` prints `0`.
@@ -169,7 +180,7 @@ Suite letters: A = `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1`, B
 - [ ] [P3-T10] Edit `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1`: apply Appendix T blocks T5 (remove the two relocated contexts) and T6 (`.DESCRIPTION` text). Acceptance: `grep -c -F -e "Context 'Get-PrAuthorDocsOnlyPathViolation'" tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` prints `0`; `grep -c -F -e "Context 'ConvertFrom-PrAuthorDocsOnlyNameList'" tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` prints `0`; `grep -c -F -e "Context 'Get-PrAuthorDocsOnlyBaseName'" tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` prints `1`; `grep -c -F -e 'moved with their rows to' tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` prints `1`.
 - [ ] [P3-T11] Copy the docs-only hook to its mirror (rule 9). Commands: `cp .claude/hooks/enforce-pr-author-skill.docs-only.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.docs-only.ps1`; `cmp -s .claude/hooks/enforce-pr-author-skill.docs-only.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.docs-only.ps1`. Acceptance: `cp` exits 0 and `cmp -s` exits 0.
 - [ ] [P3-T12] Copy the main pr-author hook to its mirror (rule 9). Commands: `cp .claude/hooks/enforce-pr-author-skill.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.ps1`; `cmp -s .claude/hooks/enforce-pr-author-skill.ps1 extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.ps1`. Acceptance: `cp` exits 0 and `cmp -s` exits 0.
-- [ ] [P3-T13] Write `FEATURE/evidence/regression-testing/p3-create-side-pass.<timestamp>.md` (pass-after run for the create side). Commands: R-JUNIT J0; `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the worktree root and `scan_folders` set to `SCAN_TEST`; R-JUNIT J1 to J11. Acceptance: J1 shows a rewrite; J5 prints `0`; J8 prints `0`, `0`, and `0`; J6 prints `34`, `19`, and `9`; J4 equals `FAM_BASE + 11` (24 new rows, 13 rows relocated to suite A); J7 prints `1` for every token of Appendix R; J10 prints `30`, `36`, `1`, `32`, and `1`; J11 prints `0`, `0`, `13`, `0`, and `8`; the J2 failures value equals `FAIL_BASE + 21`; every J3 line is an Appendix R2 token or a `B_FAILED` line. A failure here is fixed in the hook (Appendix H) or, for a defect in test text, in the test, then this task reruns (a hook fix is followed by rerunning [P3-T11]).
+- [ ] [P3-T13] Write `FEATURE/evidence/regression-testing/p3-create-side-pass.<timestamp>.md` (pass-after run for the create side). Commands: R-JUNIT J0; `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the worktree root and `scan_folders` set to `SCAN_TEST`; R-JUNIT J1 to J11 and J14. Acceptance: J1 shows a rewrite; J14 prints `1` and `1` (rule 15 (a), after H6 and H12); J5 prints `0`; J8 prints `0`, `0`, and `0`; J6 prints `34`, `19`, and `9`; J4 equals `FAM_BASE + 11` (24 new rows, 13 rows relocated to suite A); J7 prints `1` for every token of Appendix R; J10 prints `30`, `36`, `1`, `32`, and `1`; J11 prints `0`, `0`, `13`, `0`, and `8`; the J2 failures value equals `FAIL_BASE + 21`; every J3 line is an Appendix R2 token or a `B_FAILED` line. A failure here is fixed in the hook (Appendix H) or, for a defect in test text, in the test, then this task reruns (a hook fix is followed by rerunning [P3-T11]).
 - [ ] [P3-T14] Commit and push Phase 3 (rule 14). Paths: `.claude/hooks/enforce-pr-author-skill.docs-only.ps1`, `.claude/hooks/enforce-pr-author-skill.ps1`, the two mirror paths of [P3-T11] and [P3-T12], `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1`, and `docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927`. Subject: `fix(927): deny base and repository overrides and non-NUL diff output in the docs-only exemption`. Acceptance: the push exits 0; the status lists no path other than this plan file; the two `rev-parse` values are equal.
 
 ### Phase 4 — Merge Gates (PRIMARY)
@@ -197,7 +208,7 @@ Suite letters: A = `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1`, B
 - [ ] [P4-T21] Edit `tests/scripts/claude-hooks/enforce-epic-merge-gate.Coverage.Tests.ps1`: apply Appendix K row K6. Commands after the edit: `git add -- tests/scripts/claude-hooks/enforce-epic-merge-gate.Coverage.Tests.ps1`; `git diff --cached --numstat -- tests/scripts/claude-hooks/enforce-epic-merge-gate.Coverage.Tests.ps1`. Acceptance: the two Appendix K mock greps each print `1` on this file; the numstat line begins with `2` then a tab then `0`.
 - [ ] [P4-T22] Edit `tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1`: apply Appendix K row K7. Commands after the edit: `git add -- tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1`; `git diff --cached --numstat -- tests/scripts/claude-hooks/hook-command-parser.AcceptanceCases.Tests.ps1`. Acceptance: the two Appendix K mock greps each print `1` on this file; the numstat line begins with `2` then a tab then `0`.
 - [ ] [P4-T23] Edit `tests/scripts/claude-hooks/hook-command-consumers.Issue824.Tests.ps1`: apply Appendix K row K8. Commands after the edit: `git add -- tests/scripts/claude-hooks/hook-command-consumers.Issue824.Tests.ps1`; `git diff --cached --numstat -- tests/scripts/claude-hooks/hook-command-consumers.Issue824.Tests.ps1`. Acceptance: the two Appendix K mock greps each print `1` on this file; the numstat line begins with `2` then a tab then `0`.
-- [ ] [P4-T24] Write `FEATURE/evidence/regression-testing/p4-merge-gate-pass.<timestamp>.md` (pass-after run for the merge side). Commands: R-JUNIT J0; `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the worktree root and `scan_folders` set to `SCAN_TEST`; R-JUNIT J1 to J13. Acceptance: J1 shows a rewrite; J5 prints `0`; J6 prints `34`, `19`, and `9`; J7 prints `1` for every token of Appendix R; J10 prints `30`, `36`, `14`, `32`, and `9`; J11 prints `0` for all five suites; J12 prints `0`; every J13 count is greater than 0; the J2 failures value equals `FAIL_BASE`; every J3 line is a `B_FAILED` line. A failure in an existing member suite caused only by the appended docs-only suffix is fixed by editing that assertion line, and each such edit is recorded as `SUFFIX_EDIT: <suite> <line>` (AC-M16); any other failure is fixed in the gate edits (Appendix G or X, followed by the matching mirror task) or, for a defect in new test text, in the test, and this task reruns.
+- [ ] [P4-T24] Write `FEATURE/evidence/regression-testing/p4-merge-gate-pass.<timestamp>.md` (pass-after run for the merge side). Commands: R-JUNIT J0; `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the worktree root and `scan_folders` set to `SCAN_TEST`; R-JUNIT J1 to J14. Acceptance: J1 shows a rewrite; J5 prints `0`; J6 prints `34`, `19`, and `9`; J7 prints `1` for every token of Appendix R; J10 prints `30`, `36`, `14`, `32`, and `9`; J11 prints `0` for all five suites; J12 prints `0`; every J13 count is greater than 0; J14 prints `1` and `1` (rule 15 (a), after G2 and X2); the J2 failures value equals `FAIL_BASE`; every J3 line is a `B_FAILED` line. A failure in an existing member suite caused only by the appended docs-only suffix is fixed by editing that assertion line, and each such edit is recorded as `SUFFIX_EDIT: <suite> <line>` (AC-M16); any other failure is fixed in the gate edits (Appendix G or X, followed by the matching mirror task) or, for a defect in new test text, in the test, and this task reruns.
 - [ ] [P4-T25] Write `FEATURE/evidence/qa-gates/p4-pytest-contracts.<timestamp>.md` (AC-M19, AC-M20 pytest half, AC-12). Command: the [P0-T10] pytest command, unchanged. Acceptance: exit 0 and the final summary line reports `passed` with no `failed` or `error` count; the summary line is recorded verbatim.
 - [ ] [P4-T26] Write `FEATURE/evidence/qa-gates/p4-jest-manifest.<timestamp>.md` (AC-M20 Jest half). Command: `npm --prefix extensions/drm-copilot run test -- test/lib/push-down/claude-pack-manifest-completeness.test.ts`. Acceptance: exit 0 and the `Tests:` summary line, recorded verbatim, contains `passed` and does not contain `failed`.
 - [ ] [P4-T27] Commit and push Phase 4 (rule 14). Paths: the three canonical gate files edited by [P4-T1] to [P4-T9] (`.claude/hooks/enforce-epic-merge-gate.ps1`, `.claude/hooks/enforce-epic-merge-gate-resolution.ps1`, `.codex/hooks/enforce-epic-merge-gate.ps1`) and their three mirrors of [P4-T10] to [P4-T12], both manifests, the eight Appendix K suites, and `docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927`. Subject: `feat(927): allow docs-only merges of unrecorded PRs in the Claude and Codex epic merge gates`. Acceptance: the push exits 0; the status lists no path other than this plan file; the two `rev-parse` values are equal.
@@ -228,17 +239,17 @@ Suite letters: A = `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1`, B
 
 ### Phase 6 — Final QC Loop
 
-Restart rule: run [P6-T1] to [P6-T11] in order. If any task fails, or [P6-T1] or [P6-T2] rewrites any file, apply the fix (a rewritten or fixed canonical hook requires rerunning its copy task: [P2-T2] to [P2-T4], [P3-T11], [P3-T12], or [P4-T10] to [P4-T12]), then commit and push the fix per rule 14 (paths: each fixed file, its copy targets, and `docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927`; subject `fix(927): final QC loop pass <n> corrections`), and only then restart at [P6-T1]. Each pass writes new artifacts with new write-time stamps. The loop ends only when one pass completes [P6-T1] to [P6-T11] with no failure and no file change; [P6-T13] records that pass. Type checking does not apply to PowerShell.
+Restart rule: run [P6-T1] to [P6-T11] in order. If any task fails, or [P6-T1] or [P6-T2] rewrites any file, apply the fix (a rewritten or fixed canonical hook requires rerunning its copy task: [P2-T10], [P3-T11], [P3-T12], or [P4-T10] to [P4-T12]), then commit and push the fix per rule 14 (paths: each fixed file, its copy targets, and `docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927`; subject `fix(927): final QC loop pass <n> corrections`), and only then restart at [P6-T1]. Each pass writes new artifacts with new write-time stamps. The loop ends only when one pass completes [P6-T1] to [P6-T11] with no failure and no file change; [P6-T13] records that pass. Type checking does not apply to PowerShell.
 
 - [ ] [P6-T1] Write `FEATURE/evidence/qa-gates/p6-poshqc-format.<timestamp>.md` (QC step 1, formatting; write-mode tool observed by tree state). Commands: `git status --porcelain -- '*.ps1' '*.psm1' '*.psd1'` (before); `mcp__drm-copilot__run_poshqc_format` with `workspace_root` set to the worktree root and `scan_folders` set to `SCAN_QC`; `git status --porcelain -- '*.ps1' '*.psm1' '*.psd1'` (after). Acceptance: the MCP disposition is `returned`; both status commands print nothing, meaning the formatter rewrote no PowerShell file in this pass (AC-18 and AC-M23 format half).
 - [ ] [P6-T2] Write `FEATURE/evidence/qa-gates/p6-poshqc-analyze.<timestamp>.md` (QC step 2, linting). Commands: `mcp__drm-copilot__run_poshqc_analyze` with `workspace_root` set to the worktree root and `scan_folders` set to `SCAN_QC`; `git status --porcelain -- '*.ps1' '*.psm1' '*.psd1'`. Acceptance: `MCP_CALL: returned`, matching the [P0-T8] baseline disposition; the status command prints nothing (MCP route compliance only; the analyzer half of AC-18 and AC-M23 is verified at [P8-T2]).
-- [ ] [P6-T3] Write `FEATURE/evidence/qa-gates/p6-pester.<timestamp>.md` (QC step 3, tests). Commands: R-JUNIT J0; `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the worktree root and `scan_folders` set to `SCAN_TEST`; R-JUNIT J1 to J13. Acceptance: J1 shows a rewrite; J5 prints `0`; J6 prints `34`, `19`, and `9`; J4 equals `FAM_BASE + 11`; J7 prints `1` for every token of Appendix R; J10 prints `30`, `36`, `14`, `32`, and `9`; J11 prints `0` for all five suites; J12 prints `0`; every J13 count is greater than 0; the J2 failures value equals `FAIL_BASE`; every J3 line is a `B_FAILED` line from [P0-T9] (AC-M1 to AC-M18 test halves, AC-M23 test half, AC-1 to AC-6, AC-8 test half, AC-10 test half, AC-18 test half). Coverage is not read from this run (rule 3); the `Output Summary:` names [P8-T3] as the coverage source.
+- [ ] [P6-T3] Write `FEATURE/evidence/qa-gates/p6-pester.<timestamp>.md` (QC step 3, tests). Commands: R-JUNIT J0; `mcp__drm-copilot__run_poshqc_test` with `workspace_root` set to the worktree root and `scan_folders` set to `SCAN_TEST`; R-JUNIT J1 to J14. Acceptance: J1 shows a rewrite; J5 prints `0`; J6 prints `34`, `19`, and `9`; J4 equals `FAM_BASE + 11`; J7 prints `1` for every token of Appendix R; J10 prints `30`, `36`, `14`, `32`, and `9`; J11 prints `0` for all five suites; J12 prints `0`; every J13 count is greater than 0; J14 prints `1` and `1`; the J2 failures value equals `FAIL_BASE`; every J3 line is a `B_FAILED` line from [P0-T9] (AC-M1 to AC-M18 test halves, AC-M23 test half, AC-1 to AC-6, AC-8 test half, AC-10 test half, AC-18 test half). Coverage is not read from this run (rule 3); the `Output Summary:` names [P8-T3] as the coverage source.
 - [ ] [P6-T4] Write `FEATURE/evidence/qa-gates/p6-mirror-parity.<timestamp>.md` (AC-12, AC-M2, AC-M19). Commands: `cmp -s` for each of these pairs: the five canonical/mirror pairs of [P0-T6]; `.claude/hooks/hook-docs-only-diff.ps1` against each of the three other helper paths of Appendix D; then `git hash-object` on all fourteen files. Acceptance: all eight `cmp -s` calls exit 0; each pair's hashes are equal; the five canonical hashes differ from their [P0-T6] values.
 - [ ] [P6-T5] Write `FEATURE/evidence/qa-gates/p6-pytest-contracts.<timestamp>.md` (AC-12, AC-M19, AC-M20). Command: the [P0-T10] pytest command, unchanged. Acceptance: exit 0 and the final summary line reports `passed` with no `failed` or `error` count.
 - [ ] [P6-T6] Write `FEATURE/evidence/qa-gates/p6-jest-manifest.<timestamp>.md` (AC-M20). Command: `npm --prefix extensions/drm-copilot run test -- test/lib/push-down/claude-pack-manifest-completeness.test.ts`. Acceptance: exit 0 and the `Tests:` summary line contains `passed` and does not contain `failed`.
 - [ ] [P6-T7] Write `FEATURE/evidence/qa-gates/p6-line-counts.<timestamp>.md` (AC-20, AC-M22). Commands: `grep -c '^'` on the ten canonical and mirror hook files of [P0-T6], on the four helper paths, on the three DocsOnly suites, on suites A to E, and on the eight Appendix K suites. Acceptance: the docs-only hook and mirror print `224`, the pr-author hook and mirror print `359`, the Claude gate and mirror print `490`, the resolution sibling and mirror print `278`, the Codex gate and mirror print `410`; every other printed count is less than `500`; all values are recorded.
 - [ ] [P6-T8] Write `FEATURE/evidence/qa-gates/p6-test-purity.<timestamp>.md` (AC-8 text half). Command: the [P1-T8] grep command with suites A, B, and D appended to its file list. Acceptance: the eight printed counts are each `0`; `EXIT_CODE: 1` is recorded with `ExpectedExitCode: 1`.
-- [ ] [P6-T9] Write `FEATURE/evidence/qa-gates/p6-source-tokens.<timestamp>.md` (AC-5, AC-6, AC-7, AC-11, AC-M2, AC-M10, AC-M14, AC-M17, AC-M21 source halves). Commands: every grep of the acceptance conditions of [P2-T1], [P3-T1] to [P3-T9], [P4-T1] to [P4-T9], [P4-T13], and [P4-T14], rerun unchanged against the current tree. Acceptance: every count and printed line equals the value its task states.
+- [ ] [P6-T9] Write `FEATURE/evidence/qa-gates/p6-source-tokens.<timestamp>.md` (AC-5, AC-6, AC-7, AC-11, AC-M2, AC-M10, AC-M14, AC-M17, AC-M21 source halves). Commands: every grep of the acceptance conditions of [P2-T1], [P2-T9], [P3-T1] to [P3-T9], [P4-T1] to [P4-T9], [P4-T13], and [P4-T14], rerun unchanged against the current tree. Acceptance: every count and printed line equals the value its task states.
 - [ ] [P6-T10] Write `FEATURE/evidence/qa-gates/p6-cr3-pin.<timestamp>.md` (AC-10 source half and decision D4). Commands: `git diff -U0 origin/main...HEAD -- .claude/hooks/enforce-pr-author-skill.docs-only.ps1`; `git diff --numstat origin/main...HEAD -- tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1 tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Exemption.Tests.ps1 tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Decision.Tests.ps1`; `git status --porcelain`. Acceptance: in the first diff, no removed or added line contains `'--no-ext-diff'` (with its single quotes, as written in the `-GitArgs` array) and no removed or added line contains `($commit + '...HEAD')`; in the numstat output the deletions column is `0` for the Exemption and Decision suites and at most `98` for the DocsOnly suite; every status line either names this plan file or begins with `?? docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927/evidence/qa-gates/p6-`.
 - [ ] [P6-T11] Write `FEATURE/evidence/qa-gates/p6-scope.<timestamp>.md` (AC-22, AC-M17 helpers half, AC-M20 path-only half, AC-M21 diff half, AC-M25 diff half). Commands: `git status --porcelain`; `git diff --name-only origin/main...HEAD`; `git diff --numstat origin/main...HEAD -- extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`. Acceptance: every path listed by the name diff is either under `FEATURE/` or a member of section 9 (`## WRITES`); no listed path contains `hook-command-invocation`, ends with `enforce-pr-author-skill-helpers.ps1`, ends with `enforce-epic-merge-gate-authorization.ps1`, begins with `.claude/rules/`, or begins with `docs/features/archive/2026-10-11-pr-author-hook-docs-only-exemption-901/`; every listed path beginning with `.codex/` is `.codex/hooks/enforce-epic-merge-gate.ps1` or `.codex/hooks/hook-docs-only-diff.ps1`; every listed path ending with `pack-manifests/core.json` is one of the two manifests named in section 9; each manifest numstat line begins with `1` then a tab then `0`; every status line either names this plan file or begins with `?? docs/features/active/2026-10-15-pr-author-docs-only-exemption-hardening-927/evidence/qa-gates/p6-`.
 - [ ] [P6-T12] Write `FEATURE/evidence/qa-gates/p6-coverage-pending-ci.<timestamp>.md` (final-QC coverage record). Command recorded: `Coverage source per rule R-COV: CI artifact poshqc-test-results of job poshqc / PowerShell QC (pending PR)`; `EXIT_CODE: 0`. Content: the [P0-T12] baseline `COVERAGE_RESULT:` lines (or `BASELINE_COVERAGE: UNAVAILABLE`); `COVERAGE_STATUS: PENDING_CI`; the post-change statement lines for AC-9 derived now by rule R-COV step C2 and recorded as `AC9_LINES: <n>,<n>,<n>,<n>`; the changed-line lists derived now by rule R-COV step C3 for the five edited canonical hook files, each recorded as `CHANGED_LINES <path>: <list>`. Acceptance: the artifact carries numeric baseline values or the authorized `UNAVAILABLE` marker, `COVERAGE_STATUS: PENDING_CI`, an `AC9_LINES:` value of four line numbers (`78,79,82,84` when Appendix H is applied verbatim), and five `CHANGED_LINES` lines.
@@ -329,11 +340,12 @@ The PoshQC test run writes `artifacts/pester/pester-junit.xml` (`scripts/powersh
 - **J11** failed count per new suite, in the J10 order, with `status="Failed"` in place of `status="Passed"`.
 - **J12** merge-family failed count: `grep -c -E 'status="Failed" classname="[^"]*(enforce-epic-merge-gate|epic-execution-gates|hook-command-parser\.AcceptanceCases|hook-command-consumers\.Issue824|hook-dependency-failure\.SpecialCases|hook-dependency-guard-completeness|hook-import-failure-exemptions\.Guard)' artifacts/pester/pester-junit.xml`; record the count.
 - **J13** passed count per named existing suite (each must be greater than 0): one `grep -c -E 'status="Passed" classname="[^"]*<suite pattern>"' artifacts/pester/pester-junit.xml` per pattern, with these patterns: `enforce-epic-merge-gate\.Tests\.ps1`, `enforce-epic-merge-gate\.Authorization\.Tests\.ps1`, `enforce-epic-merge-gate\.ItemResolution\.Tests\.ps1`, `enforce-epic-merge-gate\.WorktreeResolution\.Tests\.ps1`, `enforce-epic-merge-gate\.TriggerScoping\.Tests\.ps1`, `enforce-epic-merge-gate\.Coverage\.Tests\.ps1`, `hook-command-parser\.AcceptanceCases\.Tests\.ps1`, `hook-command-consumers\.Issue824\.Tests\.ps1`, `enforce-epic-merge-gate-authorization\.Tests\.ps1`, `enforce-epic-merge-gate-decision-surface\.Tests\.ps1`, `enforce-epic-merge-gate-trigger-scoping\.Tests\.ps1`, `epic-execution-gates\.Tests\.ps1`, `hook-dependency-failure\.SpecialCases\.Tests\.ps1`, `hook-dependency-guard-completeness\.Tests\.ps1`, `hook-import-failure-exemptions\.Guard\.Tests\.ps1`.
+- **J14** structural-guard rows of rule 15 (a), in this order: `grep -c -F -e 'across the guarded tree" status="Passed"' artifacts/pester/pester-junit.xml`; `grep -c -F -e 'ships an empty allowlist" status="Passed"' artifacts/pester/pester-junit.xml`. Each must print `1`. The tokens are the tails of the `testcase name` values of the rows `reports no Python invocation beyond the allowlist across the guarded tree` and `ships an empty allowlist` of `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` (lines 62 and 433); no other test name in the tree ends with either tail.
 
 ## 6. Rule R-COV (reading the CI coverage XML)
 
 - **C1** `poetry run python -I SCRATCH/927/tools/read_coverage_927.py <xml> .claude/hooks/enforce-pr-author-skill.docs-only.ps1:<AC9_LINES>,<docs-only CHANGED_LINES> .claude/hooks/enforce-pr-author-skill.ps1:<pr-author CHANGED_LINES> .claude/hooks/hook-docs-only-diff.ps1 .codex/hooks/hook-docs-only-diff.ps1 .claude/hooks/enforce-epic-merge-gate.ps1:<gate CHANGED_LINES> .claude/hooks/enforce-epic-merge-gate-resolution.ps1:<resolution CHANGED_LINES> .codex/hooks/enforce-epic-merge-gate.ps1:<Codex gate CHANGED_LINES>`, where `<xml>` is `powershell-coverage.xml` inside the download directory. The reader prints one `COVERAGE_RESULT:` line per file and one `LINE_RESULT:` line per requested line number (Appendix S).
-- **C2** `AC9_LINES` derivation (fixed): `grep -n -F -e '& $GitCommand -C $WorktreeRoot @GitArgs' .claude/hooks/enforce-pr-author-skill.docs-only.ps1`; `grep -n -F -e '$code = $LASTEXITCODE' .claude/hooks/enforce-pr-author-skill.docs-only.ps1`; `grep -n -F -e 'return $failure' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` (take the larger of the two printed line numbers: the catch-block return); `grep -n -F -e 'ExitCode = [int]$code' .claude/hooks/enforce-pr-author-skill.docs-only.ps1`. With Appendix H applied verbatim the four numbers are `78`, `79`, `82`, and `84`.
+- **C2** `AC9_LINES` derivation (fixed): `grep -n -F -e '& $GitInvoker -C $WorktreeRoot @GitArgs' .claude/hooks/enforce-pr-author-skill.docs-only.ps1`; `grep -n -F -e '$code = $LASTEXITCODE' .claude/hooks/enforce-pr-author-skill.docs-only.ps1`; `grep -n -F -e 'return $failure' .claude/hooks/enforce-pr-author-skill.docs-only.ps1` (take the larger of the two printed line numbers: the catch-block return); `grep -n -F -e 'ExitCode = [int]$code' .claude/hooks/enforce-pr-author-skill.docs-only.ps1`. With Appendix H applied verbatim the four numbers are `78`, `79`, `82`, and `84`.
 - **C3** `CHANGED_LINES` derivation (fixed), per edited canonical hook file (`.claude/hooks/enforce-pr-author-skill.docs-only.ps1`, `.claude/hooks/enforce-pr-author-skill.ps1`, `.claude/hooks/enforce-epic-merge-gate.ps1`, `.claude/hooks/enforce-epic-merge-gate-resolution.ps1`, `.codex/hooks/enforce-epic-merge-gate.ps1`): `git diff -U0 origin/main...HEAD -- <file>`; for each hunk header `@@ -a,b +c,d @@` (or `+c` meaning `d = 1`) with `d > 0`, the lines `c` to `c + d - 1`. A requested line that the reader reports as `NOT_EXECUTABLE_OR_ABSENT` is a comment or non-statement line and is excluded from the changed-line denominator. The two helper copies are new files and are measured by whole-file line coverage.
 
 ## 7. Appendix H — edits to `.claude/hooks/enforce-pr-author-skill.docs-only.ps1`
@@ -387,26 +399,28 @@ with
 
 The dot-source is unguarded, matching `.claude/hooks/enforce-pr-author-skill-helpers.ps1` line 58, which loads this file unguarded; both are covered by the guarded edge at `.claude/hooks/enforce-pr-author-skill.ps1` line 190 (addendum section 3.3).
 
-**H4 - seam help.** Directly after the two lines `    .PARAMETER GitArgs` and `        The git arguments that follow -C <root>.` insert
+**H4 - seam help (revised in 2.1).** Directly after the two lines `    .PARAMETER GitArgs` and `        The git arguments that follow -C <root>.` insert
 
 ```text
-    .PARAMETER GitCommand
-        The command the seam runs; git unless a unit test passes the name of a test-local
-        function so that this body runs without starting a process.
+    .PARAMETER GitInvoker
+        The scriptblock that runs git; a unit test passes a test-local stand-in so that this
+        body runs without starting a process.
 ```
 
-**H5 - seam parameter.** Replace the line `        [Parameter(Mandatory)][string[]] $GitArgs` (inside `Invoke-PrAuthorDocsOnlyGitExe`) with
+**H5 - seam parameter (revised in 2.1).** Replace the line `        [Parameter(Mandatory)][string[]] $GitArgs` (inside `Invoke-PrAuthorDocsOnlyGitExe`) with
 
 ```powershell
         [Parameter(Mandatory)][string[]] $GitArgs,
-        [ValidateNotNullOrEmpty()][string] $GitCommand = 'git'
+        [ValidateNotNull()][scriptblock] $GitInvoker = { git @args 2>$null }
 ```
 
-**H6 - capture statement.** Replace the line `        $lines = @(& git -C $WorktreeRoot @GitArgs 2>$null)` with
+**H6 - capture statement (revised in 2.1).** Replace the line `        $lines = @(& git -C $WorktreeRoot @GitArgs 2>$null)` with
 
 ```powershell
-        $lines = @(& $GitCommand -C $WorktreeRoot @GitArgs 2>$null)
+        $lines = @(& $GitInvoker -C $WorktreeRoot @GitArgs 2>$null)
 ```
+
+After H4-H6 the only `&`-invoked variable in the file is `$GitInvoker`, a `[scriptblock]` parameter of the same file, and the H12 dot-source is the inline sibling form, so the file satisfies rule 15 (a). Before H6 the capture statement is the constant command `& git -C`, which the guard accepts; after H6 the word `git` appears as a command only inside the default scriptblock, again a constant command.
 
 **H7 - `Get-PrAuthorDocsOnlyBaseName` description.** Replace the four lines beginning `        Returns $null when the command is not a structural gh pr create, when any token begins` and ending `        conservative branch spelling, or when it contains '..'.` with
 
@@ -486,7 +500,7 @@ Every repository file this plan creates or edits outside `FEATURE`. Nothing is d
 
 Production hook files (Write or Edit; rule 10):
 
-1. `.claude/hooks/hook-docs-only-diff.ps1` (create; [P2-T1])
+1. `.claude/hooks/hook-docs-only-diff.ps1` (create; [P2-T1]; rewritten by [P2-T9])
 2. `.claude/hooks/enforce-pr-author-skill.docs-only.ps1` ([P3-T1] to [P3-T8])
 3. `.claude/hooks/enforce-pr-author-skill.ps1` ([P3-T9], header comment only)
 4. `.claude/hooks/enforce-epic-merge-gate-resolution.ps1` ([P4-T1])
@@ -495,9 +509,9 @@ Production hook files (Write or Edit; rule 10):
 
 Helper copies and bundled mirrors (`cp` only, rule 9):
 
-7. `.codex/hooks/hook-docs-only-diff.ps1` (create; [P2-T2])
-8. `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-docs-only-diff.ps1` (create; [P2-T3])
-9. `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-docs-only-diff.ps1` (create; [P2-T4])
+7. `.codex/hooks/hook-docs-only-diff.ps1` (create; [P2-T2]; re-copied by [P2-T10])
+8. `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-docs-only-diff.ps1` (create; [P2-T3]; re-copied by [P2-T10])
+9. `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-docs-only-diff.ps1` (create; [P2-T4]; re-copied by [P2-T10])
 10. `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.docs-only.ps1` ([P3-T11])
 11. `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-pr-author-skill.ps1` ([P3-T12])
 12. `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate.ps1` ([P4-T10])
@@ -513,13 +527,13 @@ New test suites (Write):
 
 17. `tests/scripts/claude-hooks/enforce-epic-merge-gate.DocsOnly.Tests.ps1` (create; suite C; [P1-T5])
 18. `tests/scripts/codex-hooks/enforce-epic-merge-gate-docs-only.Tests.ps1` (create; suite E; [P1-T6])
-19. `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` (create; suite A; [P2-T6])
+19. `tests/scripts/claude-hooks/hook-docs-only-diff.Tests.ps1` (create; suite A; [P2-T6]; edited by [P2-T12])
 20. `tests/scripts/claude-hooks/hook-docs-only-diff.MergeExemption.Tests.ps1` (create; suite B; [P2-T7])
-21. `tests/scripts/codex-hooks/hook-docs-only-diff.Tests.ps1` (create; suite D; [P2-T8])
+21. `tests/scripts/codex-hooks/hook-docs-only-diff.Tests.ps1` (create; suite D; [P2-T8]; edited by [P2-T13])
 
 Existing test suites (Edit):
 
-22. `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` ([P1-T1], [P1-T2], [P3-T10])
+22. `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1` ([P1-T1], [P1-T2], [P2-T14], [P3-T10])
 23. `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Exemption.Tests.ps1` ([P1-T3], insertion only)
 24. `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Decision.Tests.ps1` ([P1-T4], insertion only)
 25. `tests/scripts/claude-hooks/enforce-epic-merge-gate.Tests.ps1` ([P4-T16])
@@ -548,7 +562,7 @@ Existing test suites (Edit):
 45. `docs/features/active/2026-10-11-pr-author-hook-docs-only-exemption-901/evidence/qa-gates/local-powershell-coverage-direct-rerun.2026-10-12T19-50.md` ([P5-T15])
 46. `docs/features/active/2026-10-11-pr-author-hook-docs-only-exemption-901/evidence/qa-gates/local-powershell-coverage.2026-10-12T19-50.md` ([P5-T16])
 
-Inside `FEATURE` (not counted above): this plan file (checkbox state only), `spec.md` (AC checkboxes only), and the evidence artifacts each task names.
+Inside `FEATURE` (not counted above): this plan file (checkbox state only during execution), `spec.md` (AC checkboxes only during execution; the version 1.2 wording revision of AC-7, AC-8, AC-9, AC-M4 and the matching design lines was made by the planner with this plan revision 2.1, before execution resumes), and the evidence artifacts each task names.
 
 Outside the repository: `SCRATCH/927/tools/read_coverage_927.py`, `SCRATCH/927/ci-base/`, `SCRATCH/927/ci-head/` (never committed, never deleted). Git-ignored `extensions/drm-copilot/node_modules` may be populated by the authorized branch of [P0-T11].
 
@@ -606,8 +620,8 @@ Every row follows Arrange-Act-Assert. No row starts a process, runs git, or writ
 
     Context 'Invoke-PrAuthorDocsOnlyGitExe command injection (issue #927)' {
         BeforeAll {
-            # Test-local stand-ins for the git executable, passed by name to the seam's
-            # GitCommand parameter, so the seam body runs without starting a process.
+            # Test-local stand-ins for the git executable, passed as scriptblocks to the seam's
+            # GitInvoker parameter, so the seam body runs without starting a process.
             function Invoke-DocsOnlyFakeGitEcho {
                 $global:LASTEXITCODE = 0
                 ($args -join '|') + "`0"
@@ -639,7 +653,7 @@ Every row follows Arrange-Act-Assert. No row starts a process, runs git, or writ
             $expected = '-C|' + $PSScriptRoot + '|diff|--name-only|-z' + "`0"
 
             # Act
-            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeGitEcho'
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitInvoker ${function:Invoke-DocsOnlyFakeGitEcho}
 
             # Assert
             $result.ExitCode | Should -Be 0
@@ -652,7 +666,7 @@ Every row follows Arrange-Act-Assert. No row starts a process, runs git, or writ
             $gitArgs = @('status')
 
             # Act
-            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeGitMultiLine'
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitInvoker ${function:Invoke-DocsOnlyFakeGitMultiLine}
 
             # Assert
             $result.ExitCode | Should -Be 0
@@ -664,7 +678,7 @@ Every row follows Arrange-Act-Assert. No row starts a process, runs git, or writ
             $gitArgs = @('status')
 
             # Act
-            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeGitExit128'
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitInvoker ${function:Invoke-DocsOnlyFakeGitExit128}
 
             # Assert
             $result.ExitCode | Should -Be 128
@@ -676,7 +690,7 @@ Every row follows Arrange-Act-Assert. No row starts a process, runs git, or writ
             $gitArgs = @('status')
 
             # Act
-            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeGitThrow'
+            $result = Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitInvoker ${function:Invoke-DocsOnlyFakeGitThrow}
 
             # Assert
             $result.ExitCode | Should -Be -1
@@ -684,6 +698,16 @@ Every row follows Arrange-Act-Assert. No row starts a process, runs git, or writ
         }
     }
 ```
+
+**T2 conversion edits (revision 2.1, [P2-T14]).** Block T2 was committed at `c87fc34a8` in its version 2.0 form. [P2-T14] converts it to the text above with these five Edit replacements, covering six lines, in `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Tests.ps1`; no line is added or removed, and no other line changes:
+
+- **T2-1** (two comment lines): `            # Test-local stand-ins for the git executable, passed by name to the seam's` and `            # GitCommand parameter, so the seam body runs without starting a process.` become `            # Test-local stand-ins for the git executable, passed as scriptblocks to the seam's` and `            # GitInvoker parameter, so the seam body runs without starting a process.`
+- **T2-2**: in the line ending `-GitCommand 'Invoke-DocsOnlyFakeGitEcho'`, replace that ending with `-GitInvoker ${function:Invoke-DocsOnlyFakeGitEcho}`.
+- **T2-3**: in the line ending `-GitCommand 'Invoke-DocsOnlyFakeGitMultiLine'`, replace that ending with `-GitInvoker ${function:Invoke-DocsOnlyFakeGitMultiLine}`.
+- **T2-4**: in the line ending `-GitCommand 'Invoke-DocsOnlyFakeGitExit128'`, replace that ending with `-GitInvoker ${function:Invoke-DocsOnlyFakeGitExit128}`.
+- **T2-5**: in the line ending `-GitCommand 'Invoke-DocsOnlyFakeGitThrow'`, replace that ending with `-GitInvoker ${function:Invoke-DocsOnlyFakeGitThrow}`.
+
+The four fakes stay defined in the `Context` `BeforeAll`, which runs once before the rows of that `Context` in a parent scope of each `It`, so `${function:<name>}` resolves inside the `It` body. Rows S1 to S4 keep their names and assertions; they fail until [P3-T2] adds `-GitInvoker` to `Invoke-PrAuthorDocsOnlyGitExe` (parameter-binding failure, as decision D5 predicts for the version 2.0 form) and pass from [P3-T13].
 
 **T3** — insert into `tests/scripts/claude-hooks/enforce-pr-author-skill.DocsOnly.Exemption.Tests.ps1`. Apply with Edit using as `old_string` the four final lines of the file (the line beginning `            Should -Invoke Invoke-PrAuthorDocsOnlyGitExe -Times 1 -Exactly -ParameterFilter { $GitArgs[0] -eq 'rev-parse'`, then `        }`, `    }`, `}`) and as `new_string` those lines with the block below inserted after the second line (`        }`, closing the last `It`):
 
@@ -811,7 +835,7 @@ Because J7 and J9 append `" status="` to the token, `override long --repo` (R7) 
 
 ## 12. Appendix R2 — merge-side expect-fail tokens (J9) and phase expectations
 
-All 21 tokens below fail in [P1-T7], [P2-T9], and [P3-T13], and every token passes from [P4-T24] onward (decisions D5 and D9).
+All 21 tokens below fail in [P1-T7], [P2-T16], and [P3-T13], and every token passes from [P4-T24] onward (decisions D5 and D9).
 
 | ID | Suite | Token |
 |---|---|---|
@@ -959,7 +983,7 @@ if __name__ == "__main__":
 
 ## 15. Appendix D — `hook-docs-only-diff.ps1` (four byte-identical paths)
 
-Paths: `.claude/hooks/hook-docs-only-diff.ps1` (Write, [P2-T1]); `.codex/hooks/hook-docs-only-diff.ps1`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-docs-only-diff.ps1`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-docs-only-diff.ps1` (`cp`, [P2-T2] to [P2-T4]). The bodies of `ConvertFrom-DocsOnlyNameList` and `Get-DocsOnlyPathViolation` are the current bodies of `ConvertFrom-PrAuthorDocsOnlyNameList` and `Get-PrAuthorDocsOnlyPathViolation` (`.claude/hooks/enforce-pr-author-skill.docs-only.ps1` lines 141-198) with only the function names changed.
+Paths: `.claude/hooks/hook-docs-only-diff.ps1` (Write, [P2-T1]; rewritten to this revision 2.1 text by [P2-T9]); `.codex/hooks/hook-docs-only-diff.ps1`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-docs-only-diff.ps1`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-docs-only-diff.ps1` (`cp`, [P2-T2] to [P2-T4]; re-copied by [P2-T10]). Revision 2.1 changes twelve lines relative to the version 2.0 text written at [P2-T1], with no line added or removed (397 lines): the last two `.NOTES` lines (seam parameter names), the two `.SYNOPSIS` lines of the seams, the two `.PARAMETER` names and their description lines, the two parameter declarations (`[ValidateNotNull()][scriptblock] $GitInvoker = { git @args 2>$null }` and `[ValidateNotNull()][scriptblock] $GhInvoker = { gh @args 2>$null }`), and the two capture statements (`& $GitInvoker -C $WorktreeRoot @GitArgs 2>$null` and `& $GhInvoker @GhArgs 2>$null`). The bodies of `ConvertFrom-DocsOnlyNameList` and `Get-DocsOnlyPathViolation` are the current bodies of `ConvertFrom-PrAuthorDocsOnlyNameList` and `Get-PrAuthorDocsOnlyPathViolation` (`.claude/hooks/enforce-pr-author-skill.docs-only.ps1` lines 141-198) with only the function names changed.
 
 ```powershell
 <#
@@ -1012,8 +1036,8 @@ Paths: `.claude/hooks/hook-docs-only-diff.ps1` (Write, [P2-T1]); `.codex/hooks/h
 .NOTES
     PowerShell 7+. Byte-identical at .claude/hooks, .codex/hooks, and both bundle mirrors.
     git and gh run only through Invoke-DocsOnlyGitExe and Invoke-DocsOnlyGhExe, which never
-    throw; unit tests pass the name of a test-local function through -GitCommand and
-    -GhCommand so the seam bodies run without starting a process.
+    throw; unit tests pass a test-local scriptblock through -GitInvoker and -GhInvoker so
+    the seam bodies run without starting a process.
 #>
 
 function ConvertFrom-DocsOnlyNameList {
@@ -1108,7 +1132,7 @@ function Get-DocsOnlyDiffTextViolation {
 function Invoke-DocsOnlyGitExe {
     <#
     .SYNOPSIS
-        Run <GitCommand> -C <root> with the given arguments; the git seam of the merge exemption.
+        Run git -C <root> with the given arguments; the git seam of the merge exemption.
     .DESCRIPTION
         Never throws. A root that is not an existing directory returns ExitCode -1 without
         running the command, and so does a command that cannot start. Standard error is
@@ -1118,8 +1142,8 @@ function Invoke-DocsOnlyGitExe {
         The directory git runs in.
     .PARAMETER GitArgs
         The git arguments that follow -C <root>.
-    .PARAMETER GitCommand
-        The command to run; git unless a unit test passes the name of a test-local function.
+    .PARAMETER GitInvoker
+        The scriptblock that runs git; a unit test passes a test-local stand-in instead.
     .OUTPUTS
         System.Management.Automation.PSCustomObject with ExitCode and Output.
     #>
@@ -1128,7 +1152,7 @@ function Invoke-DocsOnlyGitExe {
     param(
         [AllowNull()][AllowEmptyString()][string] $WorktreeRoot,
         [Parameter(Mandatory)][string[]] $GitArgs,
-        [ValidateNotNullOrEmpty()][string] $GitCommand = 'git'
+        [ValidateNotNull()][scriptblock] $GitInvoker = { git @args 2>$null }
     )
 
     $failure = [pscustomobject]@{ ExitCode = -1; Output = '' }
@@ -1136,7 +1160,7 @@ function Invoke-DocsOnlyGitExe {
         return $failure
     }
     try {
-        $lines = @(& $GitCommand -C $WorktreeRoot @GitArgs 2>$null)
+        $lines = @(& $GitInvoker -C $WorktreeRoot @GitArgs 2>$null)
         $code = $LASTEXITCODE
     }
     catch {
@@ -1148,7 +1172,7 @@ function Invoke-DocsOnlyGitExe {
 function Invoke-DocsOnlyGhExe {
     <#
     .SYNOPSIS
-        Run <GhCommand> with the given arguments inside a working root; the gh seam.
+        Run gh with the given arguments inside a working root; the gh seam.
     .DESCRIPTION
         Never throws. gh has no -C option, so the seam pushes the working root and pops it in
         finally, restoring the caller's location after success and after a throw. A root that
@@ -1158,8 +1182,8 @@ function Invoke-DocsOnlyGhExe {
         The directory gh runs in.
     .PARAMETER GhArgs
         The gh arguments.
-    .PARAMETER GhCommand
-        The command to run; gh unless a unit test passes the name of a test-local function.
+    .PARAMETER GhInvoker
+        The scriptblock that runs gh; a unit test passes a test-local stand-in instead.
     .OUTPUTS
         System.Management.Automation.PSCustomObject with ExitCode and Output.
     #>
@@ -1168,7 +1192,7 @@ function Invoke-DocsOnlyGhExe {
     param(
         [AllowNull()][AllowEmptyString()][string] $WorkingRoot,
         [Parameter(Mandatory)][string[]] $GhArgs,
-        [ValidateNotNullOrEmpty()][string] $GhCommand = 'gh'
+        [ValidateNotNull()][scriptblock] $GhInvoker = { gh @args 2>$null }
     )
 
     $failure = [pscustomobject]@{ ExitCode = -1; Output = '' }
@@ -1182,7 +1206,7 @@ function Invoke-DocsOnlyGhExe {
         return $failure
     }
     try {
-        $lines = @(& $GhCommand @GhArgs 2>$null)
+        $lines = @(& $GhInvoker @GhArgs 2>$null)
         $code = $LASTEXITCODE
     }
     catch {
@@ -1595,7 +1619,7 @@ Every row follows Arrange-Act-Assert. No row starts a process, runs git or gh, o
 .DESCRIPTION
     Exercises the pure classifiers (relocated from the issue #901 suite under their shared
     names), the NUL guard, and the bodies of both process seams through test-local functions
-    passed by name, so no row starts a process. No row creates, writes, or deletes a file.
+    passed as scriptblocks, so no row starts a process. No row creates, writes, or deletes a file.
 #>
 
 Describe 'hook-docs-only-diff shared helper (issue #927)' {
@@ -1603,7 +1627,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $script:RepoRoot '.claude/hooks/hook-docs-only-diff.ps1')
 
-        # Test-local stand-ins for git and gh, passed by name to the seams' command parameters.
+        # Test-local stand-ins for git and gh, passed as scriptblocks to the seams' invoker parameters.
         function Invoke-DocsOnlyFakeEcho {
             $global:LASTEXITCODE = 0
             ($args -join '|') + "`0"
@@ -1784,7 +1808,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             $expected = '-C|' + $PSScriptRoot + '|diff|--name-only|-z' + "`0"
 
             # Act
-            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitCommand 'Invoke-DocsOnlyFakeEcho'
+            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitInvoker ${function:Invoke-DocsOnlyFakeEcho}
 
             # Assert
             $result.ExitCode | Should -Be 0
@@ -1793,7 +1817,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
 
         It 'returns the non-zero exit code of the injected git command (issue #927)' {
             # Act
-            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs @('status') -GitCommand 'Invoke-DocsOnlyFakeExit2'
+            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs @('status') -GitInvoker ${function:Invoke-DocsOnlyFakeExit2}
 
             # Assert
             $result.ExitCode | Should -Be 2
@@ -1802,7 +1826,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
 
         It 'returns the failure object when the injected git command throws (issue #927)' {
             # Act
-            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs @('status') -GitCommand 'Invoke-DocsOnlyFakeThrow'
+            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs @('status') -GitInvoker ${function:Invoke-DocsOnlyFakeThrow}
 
             # Assert
             $result.ExitCode | Should -Be -1
@@ -1814,7 +1838,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             @{ Name = 'a nonexistent root'; Root = '/synthetic-worktrees/no-such-root-927' }
         ) {
             # Act
-            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $Root -GitArgs @('status') -GitCommand 'Invoke-DocsOnlyFakeMarker'
+            $result = Invoke-DocsOnlyGitExe -WorktreeRoot $Root -GitArgs @('status') -GitInvoker ${function:Invoke-DocsOnlyFakeMarker}
 
             # Assert
             $result.ExitCode | Should -Be -1
@@ -1829,7 +1853,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             $before = (Get-Location).Path
 
             # Act
-            $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhCommand 'Invoke-DocsOnlyFakeLocation'
+            $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhInvoker ${function:Invoke-DocsOnlyFakeLocation}
 
             # Assert
             $result.ExitCode | Should -Be 0
@@ -1839,7 +1863,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
 
         It 'returns the non-zero exit code of the injected gh command (issue #927)' {
             # Act
-            $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhCommand 'Invoke-DocsOnlyFakeExit2'
+            $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhInvoker ${function:Invoke-DocsOnlyFakeExit2}
 
             # Assert
             $result.ExitCode | Should -Be 2
@@ -1851,7 +1875,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             $before = (Get-Location).Path
 
             # Act
-            $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhCommand 'Invoke-DocsOnlyFakeThrow'
+            $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5') -GhInvoker ${function:Invoke-DocsOnlyFakeThrow}
 
             # Assert
             $result.ExitCode | Should -Be -1
@@ -1864,7 +1888,7 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             @{ Name = 'a nonexistent root'; Root = '/synthetic-worktrees/no-such-root-927' }
         ) {
             # Act
-            $result = Invoke-DocsOnlyGhExe -WorkingRoot $Root -GhArgs @('pr', 'view', '5') -GhCommand 'Invoke-DocsOnlyFakeMarker'
+            $result = Invoke-DocsOnlyGhExe -WorkingRoot $Root -GhArgs @('pr', 'view', '5') -GhInvoker ${function:Invoke-DocsOnlyFakeMarker}
 
             # Assert
             $result.ExitCode | Should -Be -1
@@ -1904,6 +1928,15 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
     }
 }
 ```
+
+**N-A conversion edits (revision 2.1, [P2-T12]).** Suite A was written at [P2-T6] in its version 2.0 form. [P2-T12] converts it to the text above with these Edit replacements; no line is added or removed, and no other line changes:
+
+- **NA-1**: the `.DESCRIPTION` line `    passed by name, so no row starts a process. No row creates, writes, or deletes a file.` becomes `    passed as scriptblocks, so no row starts a process. No row creates, writes, or deletes a file.`
+- **NA-2**: the comment line `        # Test-local stand-ins for git and gh, passed by name to the seams' command parameters.` becomes `        # Test-local stand-ins for git and gh, passed as scriptblocks to the seams' invoker parameters.`
+- **NA-3**: in each of the four `Invoke-DocsOnlyGitExe` call lines, the ending `-GitCommand '<name>'` becomes `-GitInvoker ${function:<name>}` with the same `<name>` (`Invoke-DocsOnlyFakeEcho`, `Invoke-DocsOnlyFakeExit2`, `Invoke-DocsOnlyFakeThrow`, `Invoke-DocsOnlyFakeMarker`).
+- **NA-4**: in each of the four `Invoke-DocsOnlyGhExe` call lines, the ending `-GhCommand '<name>'` becomes `-GhInvoker ${function:<name>}` with the same `<name>` (`Invoke-DocsOnlyFakeLocation`, `Invoke-DocsOnlyFakeExit2`, `Invoke-DocsOnlyFakeThrow`, `Invoke-DocsOnlyFakeMarker`).
+
+Each `${function:<name>}` is evaluated inside an `It` body, after the `Describe` `BeforeAll` has defined the function, including in the two `-ForEach` rows whose data carries only `Name` and `Root`. Expected outputs are unchanged: the fakes receive the same `$args` sequence through their scriptblocks, and the `Invoke-DocsOnlyFakeLocation` row still observes the pushed working root because the seam invokes the scriptblock after `Push-Location`.
 
 **N-B** — `tests/scripts/claude-hooks/hook-docs-only-diff.MergeExemption.Tests.ps1` (36 test cases):
 
@@ -2435,7 +2468,7 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
         $workingRoot = if ($Root -eq 'exists') { $PSScriptRoot } else { $Root }
 
         # Act
-        $result = Invoke-DocsOnlyGitExe -WorktreeRoot $workingRoot -GitArgs @('status') -GitCommand $Fake
+        $result = Invoke-DocsOnlyGitExe -WorktreeRoot $workingRoot -GitArgs @('status') -GitInvoker (Get-Command -Name $Fake -CommandType Function).ScriptBlock
 
         # Assert
         $result.ExitCode | Should -Be $ExitCode
@@ -2453,7 +2486,7 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
         $before = (Get-Location).Path
 
         # Act
-        $result = Invoke-DocsOnlyGhExe -WorkingRoot $workingRoot -GhArgs @('pr', 'view', '5') -GhCommand $Fake
+        $result = Invoke-DocsOnlyGhExe -WorkingRoot $workingRoot -GhArgs @('pr', 'view', '5') -GhInvoker (Get-Command -Name $Fake -CommandType Function).ScriptBlock
 
         # Assert
         $result.ExitCode | Should -Be $ExitCode
@@ -2500,6 +2533,11 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
     }
 }
 ```
+
+**N-D conversion edits (revision 2.1, [P2-T13]).** Suite D was written at [P2-T8] in its version 2.0 form. [P2-T13] converts it to the text above with these two Edit replacements; no line is added or removed, and no other line changes (the `-ForEach` row data keeps the fake names as strings because row data is evaluated at discovery, before the `BeforeAll` functions exist):
+
+- **ND-1**: `        $result = Invoke-DocsOnlyGitExe -WorktreeRoot $workingRoot -GitArgs @('status') -GitCommand $Fake` becomes `        $result = Invoke-DocsOnlyGitExe -WorktreeRoot $workingRoot -GitArgs @('status') -GitInvoker (Get-Command -Name $Fake -CommandType Function).ScriptBlock`.
+- **ND-2**: `        $result = Invoke-DocsOnlyGhExe -WorkingRoot $workingRoot -GhArgs @('pr', 'view', '5') -GhCommand $Fake` becomes `        $result = Invoke-DocsOnlyGhExe -WorkingRoot $workingRoot -GhArgs @('pr', 'view', '5') -GhInvoker (Get-Command -Name $Fake -CommandType Function).ScriptBlock`.
 
 **N-E** — `tests/scripts/codex-hooks/enforce-epic-merge-gate-docs-only.Tests.ps1` (9 test cases):
 
@@ -2667,4 +2705,6 @@ Describe 'Codex enforce-epic-merge-gate docs-only branch (issue #927)' {
 
 ## 21. Quoted literals created by this plan
 
-The following tokens do not exist in the tree before this plan runs; the tasks above create them verbatim: `TIMESTAMP_RECONSTRUCTED: true`, `TIMESTAMP_DERIVATION: `, `TIMESTAMP_ORIGINAL: 2026-10-13T00-00`, `TIMESTAMP_BOUNDS_UTC: 2026-10-13T10-51 .. 2026-10-13T11-17`, `TIMESTAMP_BOUNDS_UTC: UNRECORDED .. 2026-10-13T10-51`, `TIMESTAMP_BOUNDS_UTC: 2026-10-13T10-51 .. 2026-10-13T11-14`, `TIMESTAMP_BOUNDS_UTC: 2026-10-13T11-14 .. 2026-10-13T11-17`, `TIMESTAMP_BOUNDS_UTC: UNRECORDED .. 2026-10-13T11-17`, `TIMESTAMP_BOUNDS_UTC: 2026-10-13T11-14 .. 2026-10-13T11-28`, `TIMESTAMP_BOUNDS_UTC: 2026-10-13T11-28 .. 2026-10-13T11-34`, `EXIT_CODE_OBSERVED_IN: p1-poshqc-direct-run-rerun.2026-10-12T19-50.md`, `The process exit code of this run was not observed`, `- [x] baseline (evidence/baseline/)`, `[ValidateNotNullOrEmpty()][string] $GitCommand`, `.PARAMETER GitCommand`, `& $GitCommand -C $WorktreeRoot @GitArgs`, `shorthand cluster containing B or R, and an inline GH_REPO= prefix are not accepted`, `did not return NUL-terminated output`, `EndsWith([char]0)`, `Get-DocsOnlyDiffTextViolation -DiffText ([string]$diff.Output) -BaseName $base`, `hook-docs-only-diff.ps1`, `no inline GH_REPO= prefix.`, `and non-empty output ends with NUL.`, `Residual limit:`, `token has B or R among its letters`, `no inline GH_REPO= prefix);`, `single-dash token whose letters include B or R`, `repository override is present, or`, `returns output not ending with NUL.`, `Context 'Invoke-PrAuthorDocsOnlyGitExe command injection (issue #927)'`, `It 'denies a --repo override before the diff (issue #927)'`, `moved with their rows to`, `function Test-EpicMergeGateNoRecordingTarget`, `Test-EpicMergeGateNoRecordingTarget, the precondition`, `Add-HookDependencyFailure -Name 'hook-docs-only-diff.ps1'`, `Test-EpicMergeGateNoRecordingTarget -ItemTarget $itemTarget`, `Get-DocsOnlyMergeExemption -CommandText $commandText -PrNumber $commandPrNumber -WorktreeRoot $sessionRoot`, `$standalone.Message + $docsOnlySuffix)`, `' (docs-only exemption not applied: '`, `conditions M1-M9`, `DOCS_ONLY_EXEMPTION_PR_UNRESOLVED`, `The hook never fetches`, `operator decision OD-1`, `[AllowNull()][AllowEmptyString()][string] $RepositoryRoot`, `-WorktreeRoot $RepositoryRoot`, `$verdict.Message + $docsOnlySuffix`, `IsNullOrWhiteSpace($ChildCheckpointRaw) -and`, `-RepositoryRoot $repositoryRoot`, `".claude/hooks/hook-docs-only-diff.ps1",`, `".codex/hooks/hook-docs-only-diff.ps1",`, `Mock Invoke-DocsOnlyGhExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }`, `Mock Invoke-DocsOnlyGitExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }`, `Describe 'enforce-epic-merge-gate docs-only branch (issue #927)'`, `Describe 'Codex enforce-epic-merge-gate docs-only branch (issue #927)'`, `(codex, issue #927)`, `Context 'Get-DocsOnlyPathViolation'`, `Context 'ConvertFrom-DocsOnlyNameList'`, `Describe 'Get-DocsOnlyMergeExemption (issue #927)'`, `a docs-only exemption row reached git fetch`, `.codex/hooks/hook-docs-only-diff.ps1`.
+Revision 2.1 note: the version 2.0 literals `[ValidateNotNullOrEmpty()][string] $GitCommand`, `.PARAMETER GitCommand`, and `& $GitCommand -C $WorktreeRoot @GitArgs` are withdrawn; the seam literals below replace them. Tokens asserted to print `0` after the rework (`GitCommand`, `GhCommand`, `passed by name`) exist in the tree before [P2-T9] to [P2-T14] run, so those assertions can fail.
+
+The following tokens do not exist in the tree before this plan runs; the tasks above create them verbatim: `TIMESTAMP_RECONSTRUCTED: true`, `TIMESTAMP_DERIVATION: `, `TIMESTAMP_ORIGINAL: 2026-10-13T00-00`, `TIMESTAMP_BOUNDS_UTC: 2026-10-13T10-51 .. 2026-10-13T11-17`, `TIMESTAMP_BOUNDS_UTC: UNRECORDED .. 2026-10-13T10-51`, `TIMESTAMP_BOUNDS_UTC: 2026-10-13T10-51 .. 2026-10-13T11-14`, `TIMESTAMP_BOUNDS_UTC: 2026-10-13T11-14 .. 2026-10-13T11-17`, `TIMESTAMP_BOUNDS_UTC: UNRECORDED .. 2026-10-13T11-17`, `TIMESTAMP_BOUNDS_UTC: 2026-10-13T11-14 .. 2026-10-13T11-28`, `TIMESTAMP_BOUNDS_UTC: 2026-10-13T11-28 .. 2026-10-13T11-34`, `EXIT_CODE_OBSERVED_IN: p1-poshqc-direct-run-rerun.2026-10-12T19-50.md`, `The process exit code of this run was not observed`, `- [x] baseline (evidence/baseline/)`, `[ValidateNotNull()][scriptblock] $GitInvoker = { git @args`, `[ValidateNotNull()][scriptblock] $GhInvoker = { gh @args`, `.PARAMETER GitInvoker`, `.PARAMETER GhInvoker`, `& $GitInvoker -C $WorktreeRoot @GitArgs`, `& $GhInvoker @GhArgs`, `-GitInvoker`, `-GhInvoker`, `Invoke-PrAuthorDocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs $gitArgs -GitInvoker`, `-GitInvoker (Get-Command -Name $Fake -CommandType Function).ScriptBlock`, `-GhInvoker (Get-Command -Name $Fake -CommandType Function).ScriptBlock`, `PRIOR_HELPER_HASH: d140874bb42ba07c8eb1fbd0a3dccba0e16fffda`, `REWORK_HELPER:`, `shorthand cluster containing B or R, and an inline GH_REPO= prefix are not accepted`, `did not return NUL-terminated output`, `EndsWith([char]0)`, `Get-DocsOnlyDiffTextViolation -DiffText ([string]$diff.Output) -BaseName $base`, `hook-docs-only-diff.ps1`, `no inline GH_REPO= prefix.`, `and non-empty output ends with NUL.`, `Residual limit:`, `token has B or R among its letters`, `no inline GH_REPO= prefix);`, `single-dash token whose letters include B or R`, `repository override is present, or`, `returns output not ending with NUL.`, `Context 'Invoke-PrAuthorDocsOnlyGitExe command injection (issue #927)'`, `It 'denies a --repo override before the diff (issue #927)'`, `moved with their rows to`, `function Test-EpicMergeGateNoRecordingTarget`, `Test-EpicMergeGateNoRecordingTarget, the precondition`, `Add-HookDependencyFailure -Name 'hook-docs-only-diff.ps1'`, `Test-EpicMergeGateNoRecordingTarget -ItemTarget $itemTarget`, `Get-DocsOnlyMergeExemption -CommandText $commandText -PrNumber $commandPrNumber -WorktreeRoot $sessionRoot`, `$standalone.Message + $docsOnlySuffix)`, `' (docs-only exemption not applied: '`, `conditions M1-M9`, `DOCS_ONLY_EXEMPTION_PR_UNRESOLVED`, `The hook never fetches`, `operator decision OD-1`, `[AllowNull()][AllowEmptyString()][string] $RepositoryRoot`, `-WorktreeRoot $RepositoryRoot`, `$verdict.Message + $docsOnlySuffix`, `IsNullOrWhiteSpace($ChildCheckpointRaw) -and`, `-RepositoryRoot $repositoryRoot`, `".claude/hooks/hook-docs-only-diff.ps1",`, `".codex/hooks/hook-docs-only-diff.ps1",`, `Mock Invoke-DocsOnlyGhExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }`, `Mock Invoke-DocsOnlyGitExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }`, `Describe 'enforce-epic-merge-gate docs-only branch (issue #927)'`, `Describe 'Codex enforce-epic-merge-gate docs-only branch (issue #927)'`, `(codex, issue #927)`, `Context 'Get-DocsOnlyPathViolation'`, `Context 'ConvertFrom-DocsOnlyNameList'`, `Describe 'Get-DocsOnlyMergeExemption (issue #927)'`, `a docs-only exemption row reached git fetch`, `.codex/hooks/hook-docs-only-diff.ps1`.
