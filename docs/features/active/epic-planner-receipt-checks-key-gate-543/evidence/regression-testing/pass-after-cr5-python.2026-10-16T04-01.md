@@ -1,0 +1,22 @@
+# Pass-After CR-5 Python (P2-T7)
+
+Timestamp: 2026-10-16T04-01
+Command: poetry run pytest tests/scripts/dev_tools/test_validate_epic_planner_state_feature_indices.py tests/scripts/dev_tools/test_epic_planner_git_integrity_feature_indices.py -vv (output redirected to SCRATCH/rc1/py-pass-after.txt)
+EXIT_CODE: 0
+Output Summary:
+- Result: 14 passed in 0.17s
+- PASSED test_validate_epic_planner_state_feature_indices.py::test_ready_gate_prefix_uses_original_index_after_non_object_entry[string]
+- PASSED test_validate_epic_planner_state_feature_indices.py::test_ready_gate_prefix_uses_original_index_after_non_object_entry[null]
+- PASSED test_validate_epic_planner_state_feature_indices.py::test_ready_gate_prefix_uses_original_index_after_non_object_entry[number]
+- PASSED test_validate_epic_planner_state_feature_indices.py::test_ready_gate_prefix_uses_original_index_after_non_object_entry[list]
+- PASSED test_validate_epic_planner_state_feature_indices.py::test_ready_gate_receipt_prefix_uses_original_index_under_codex_flag
+- PASSED test_validate_epic_planner_state_feature_indices.py::test_dependency_wave_prefixes_use_original_index_after_non_object_entry
+- PASSED test_validate_epic_planner_state_feature_indices.py::test_launch_binding_prefix_uses_original_index_under_codex_flag
+- PASSED test_validate_epic_planner_state_feature_indices.py::test_ready_gate_prefix_unchanged_without_non_object_entries
+- PASSED test_epic_planner_git_integrity_feature_indices.py::test_planning_commit_prefix_uses_original_index_after_non_object_entry
+- PASSED test_epic_planner_git_integrity_feature_indices.py::test_planning_commit_prefix_uses_original_index_after_planless_entry
+- PASSED test_epic_planner_git_integrity_feature_indices.py::test_planning_commit_prefix_unchanged_without_skipped_entries
+- PASSED test_epic_planner_git_integrity_feature_indices.py::test_planning_commit_prefix_keeps_positional_pairing_without_plan_paths
+- PASSED test_epic_planner_git_integrity_feature_indices.py::test_plans_without_object_entries_report_no_feature_error[empty]
+- PASSED test_epic_planner_git_integrity_feature_indices.py::test_plans_without_object_entries_report_no_feature_error[not-list]
+- Paired fail-before runs: evidence/regression-testing/fail-before-cr5-python.2026-10-16T03-53.md (7 failed, 1 passed) and evidence/regression-testing/fail-before-cr5-git-python.2026-10-16T03-55.md (2 failed, 4 passed).

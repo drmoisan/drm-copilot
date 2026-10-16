@@ -21,15 +21,7 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
             (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
         }
 
-        function New-SubagentStopEnvelopeJson {
-            # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds and returns envelope JSON text only; it changes no system state.')]
-            param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
-            $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'task-researcher'; stop_hook_active = [bool]$StopHookActive }
-            if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }
-            if ($PSBoundParameters.ContainsKey('OutputField')) { $envelope['output'] = $OutputField }
-            return ($envelope | ConvertTo-Json -Compress)
-        }
+        . (Join-Path $PSScriptRoot 'SubagentStopEnvelope.Helpers.ps1')
 
         function Invoke-TaskResearcherOutputStdinEntry {
             # Drives the hook through the & route with stdin and stderr redirected; both are restored in finally.
@@ -57,7 +49,7 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
 
     It 'exits 2 with a stderr reason when last_assistant_message lacks a research-path' -Tag 'E3-Entry' {
         # Arrange
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'Done. Findings recorded.'
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'Done. Findings recorded.'
         # Act
         $result = Invoke-TaskResearcherOutputStdinEntry -Stdin $stdin
         # Assert
@@ -70,7 +62,7 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
         # Arrange: the synthetic research file is reported present with a plain body.
         Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'docs/research/2026-10-11T12-05-synthetic-research.md' }
         Mock Get-Content { '# Synthetic research' } -ParameterFilter { $LiteralPath -eq 'docs/research/2026-10-11T12-05-synthetic-research.md' }
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage "research-path: $script:ResearchPath"
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage "research-path: $script:ResearchPath"
         # Act
         $result = Invoke-TaskResearcherOutputStdinEntry -Stdin $stdin
         # Assert
@@ -83,7 +75,7 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
         # Arrange: the research path appears only in an output key and in the environment variable.
         Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'docs/research/2026-10-11T12-05-synthetic-research.md' }
         Mock Get-Content { '# Synthetic research' } -ParameterFilter { $LiteralPath -eq 'docs/research/2026-10-11T12-05-synthetic-research.md' }
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'Done. Findings recorded.' -OutputField "research-path: $script:ResearchPath"
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'Done. Findings recorded.' -OutputField "research-path: $script:ResearchPath"
         $priorInput = $env:CLAUDE_HOOK_INPUT
         try {
             $env:CLAUDE_HOOK_INPUT = (@{ output = "research-path: $script:ResearchPath" } | ConvertTo-Json -Compress)
@@ -99,7 +91,7 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
 
     It 'exits 2 with the existing empty-output reason when last_assistant_message is an empty string' -Tag 'E3-Entry' {
         # Arrange
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage ''
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage ''
         # Act
         $result = Invoke-TaskResearcherOutputStdinEntry -Stdin $stdin
         # Assert
@@ -130,7 +122,7 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
 
     It 'exits 2 with a payload anomaly reason when last_assistant_message is absent' -Tag 'E3-Entry' {
         # Arrange and act: an envelope without last_assistant_message.
-        $result = Invoke-TaskResearcherOutputStdinEntry -Stdin (New-SubagentStopEnvelopeJson -OmitAssistantMessage)
+        $result = Invoke-TaskResearcherOutputStdinEntry -Stdin (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -OmitAssistantMessage)
         # Assert
         $result.Thrown | Should -BeNullOrEmpty
         $result.ExitCode | Should -Be 2
@@ -140,7 +132,7 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
 
     It 'keeps validating when stop_hook_active is true' -Tag 'E3-Entry' {
         # Arrange: a re-entry envelope that still carries no research-path.
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'Done. Findings recorded.' -StopHookActive
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'Done. Findings recorded.' -StopHookActive
         # Act
         $result = Invoke-TaskResearcherOutputStdinEntry -Stdin $stdin
         # Assert
@@ -152,7 +144,7 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
         # Arrange: the research path is present but its read fails.
         Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'docs/research/2026-10-11T12-05-synthetic-research.md' }
         Mock Get-Content { throw 'simulated read failure' } -ParameterFilter { $LiteralPath -eq 'docs/research/2026-10-11T12-05-synthetic-research.md' }
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage "research-path: $script:ResearchPath"
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage "research-path: $script:ResearchPath"
         # Act
         $result = Invoke-TaskResearcherOutputStdinEntry -Stdin $stdin
         # Assert
@@ -164,7 +156,7 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
     It 'exits 2 with the validate-task-researcher-output: prefix when subagentstop-envelope.ps1 fails to load' -Tag 'E3-Entry' {
         # Arrange: only the helper dot-source fails; the dependency guard loads normally.
         Mock Join-Path { throw 'simulated load failure: subagentstop-envelope.ps1' } -ParameterFilter { $ChildPath -eq 'subagentstop-envelope.ps1' }
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage "research-path: $script:ResearchPath"
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage "research-path: $script:ResearchPath"
         # Act
         try { $result = Invoke-TaskResearcherOutputStdinEntry -Stdin $stdin }
         finally {
@@ -191,7 +183,7 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
 
     It 'exits 2 in a separate process when the stdin envelope lacks a research-path' -Tag 'E3-Entry' {
         # Arrange
-        $stdinText = New-SubagentStopEnvelopeJson -AssistantMessage 'Done. Findings recorded.'
+        $stdinText = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'Done. Findings recorded.'
         # Act
         $global:LASTEXITCODE = 0
         $null = $stdinText | & $script:PwshExe -NoProfile -File $script:StdinHook 2>&1
@@ -203,7 +195,7 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
         # Arrange: the timestamped research.<stamp>.md form, reported present with a plain body.
         Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'docs/research/research.2026-10-11T12-05.md' }
         Mock Get-Content { '# Synthetic research' } -ParameterFilter { $LiteralPath -eq 'docs/research/research.2026-10-11T12-05.md' }
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/research/research.2026-10-11T12-05.md'
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: docs/research/research.2026-10-11T12-05.md'
         # Act
         $result = Invoke-TaskResearcherOutputStdinEntry -Stdin $stdin
         # Assert
@@ -297,6 +289,15 @@ Describe 'Test-NumericDerivationEvidence rule R3 (issue #905)' {
         @{ Name = 'entire worktree'; Value = 'entire worktree.' }
         @{ Name = 'whole worktree with all directories'; Value = 'the whole worktree, all directories.' }
         @{ Name = 'entire repository accepted before R3'; Value = 'entire repository' }
+        @{ Name = 'complete source tree'; Value = 'the complete source tree' }
+        @{ Name = 'whole repo'; Value = 'the whole repo' }
+        @{ Name = 'upper-case entire worktree'; Value = 'ENTIRE WORKTREE' }
+        @{ Name = 'entire worktree root'; Value = 'entire worktree root.' }
+        @{ Name = 'whole repository excluding docs'; Value = 'the whole repository excluding `docs/`' }
+        # NB-2 characterization (issue #929): breadth documented in E3 spec Risk 5a; a whole-worktree value that lists a narrower covered set is accepted.
+        @{ Name = 'NB-2 whole worktree restricted to code'; Value = 'the whole worktree with ripgrep, restricted to code by excluding `docs/`; covers `.claude/hooks`, `.claude/lib`, `.codex/hooks`, and both bundle roots.' }
+        # NB-2 characterization (issue #929): breadth documented in E3 spec Risk 5a; an entire-repository value with an exclusion is accepted.
+        @{ Name = 'NB-2 entire repository excluding docs'; Value = 'entire repository excluding docs/**' }
     ) {
         # Arrange
         $content = $script:R3EvidenceText.Replace('- Exhaustive Search Scope: entire repository source tree', '- Exhaustive Search Scope: ' + $Value)
@@ -308,6 +309,12 @@ Describe 'Test-NumericDerivationEvidence rule R3 (issue #905)' {
 
     It 'R3 rejects the exhaustive scope <Name>' -ForEach @(
         @{ Name = 'the hooks folder'; Value = 'the hooks folder' }
+        @{ Name = 'noun without a quantifier'; Value = 'those four files on the current worktree.' }
+        @{ Name = 'quantifier without a noun'; Value = 'the whole file, lines 1-335.' }
+        @{ Name = 'path-shaped value'; Value = '`.claude/hooks/`' }
+        @{ Name = 'all inside allocated'; Value = 'the allocated repository subset' }
+        @{ Name = 'tree inside subtree'; Value = 'the entire subtree' }
+        @{ Name = 'worktree inside worktrees'; Value = 'the whole worktrees folder' }
     ) {
         # Arrange
         $content = $script:R3EvidenceText.Replace('- Exhaustive Search Scope: entire repository source tree', '- Exhaustive Search Scope: ' + $Value)
@@ -316,5 +323,29 @@ Describe 'Test-NumericDerivationEvidence rule R3 (issue #905)' {
         # Assert
         $result.Ok | Should -BeFalse
         $result.Message | Should -Be 'task-researcher hook: numeric derivation evidence does not declare an exhaustive repository search scope.'
+    }
+}
+
+Describe 'Invoke-TaskResearcherOutputValidation dependency decision in process (issue #929)' {
+    BeforeAll {
+        . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-task-researcher-output.ps1')
+        . (Join-Path $PSScriptRoot 'SubagentStopEnvelope.Helpers.ps1')
+    }
+
+    It 'returns the guard ExitCode and Reason object in process when a dependency failure is recorded (S6 by design)' {
+        # Arrange: a failure recorded after the hook loaded; the leading dependency-decision statement returns the guard object unchanged (rule S6).
+        $inputText = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'Done. Findings recorded.'
+        try {
+            Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1'
+            # Act
+            $result = Invoke-TaskResearcherOutputValidation -InputText $inputText
+        }
+        finally {
+            $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
+        }
+        # Assert
+        $result.ExitCode | Should -Be 2 -Because $result.Reason
+        $result.Reason.StartsWith('validate-task-researcher-output:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Reason
+        $result.Reason.Contains('subagentstop-envelope.ps1') | Should -BeTrue -Because $result.Reason
     }
 }
