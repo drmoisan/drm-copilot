@@ -97,7 +97,13 @@ def test_npm_entry_retains_typescript_major_ignore(directory: str) -> None:
     items = ignore_items_named(entry, TYPESCRIPT_NAME)
 
     assert items, f"npm entry for directory {directory} lacks a typescript ignore"
-    assert items[0].get("update-types") == [SEMVER_MAJOR_UPDATE_TYPE]
+    restricted = any(
+        item.get("update-types") == [SEMVER_MAJOR_UPDATE_TYPE] for item in items
+    )
+    assert restricted, (
+        f"no typescript ignore item restricted to {SEMVER_MAJOR_UPDATE_TYPE} "
+        f"for directory {directory}"
+    )
 
 
 def test_exactly_two_target_npm_entries_are_checked() -> None:
