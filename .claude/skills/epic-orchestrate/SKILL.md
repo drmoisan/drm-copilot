@@ -276,9 +276,9 @@ cross-call/conversation-state visibility.
   Otherwise, when the dependency's `merge_confirmed_at` is later than the dependent's
   `worktree_created_at`, the error is
   `EPIC_WAVE_BARRIER_VIOLATION: <f> worktree_created_at precedes dependency <d> merge_confirmed_at`.
-  A violation blocks with an instruction to report it to the operator and halt. The hook's runtime
-  effect is likely to depend on the `SubagentStop` transport and exit-code defect recorded in
-  `docs/features/potential/2026-08-21-subagentstop-validators-read-undocumented-envelope.md`.
+  A violation blocks with an instruction to report it to the operator and halt. The `SubagentStop`
+  transport and exit-code defect that this check previously depended on was resolved by epic #904
+  and issue #928: a violation blocks the stop with exit 2 and a stderr reason.
 
 Both layers are required; neither alone closes the gap. `epic-orchestrator` does not launch wave
 N+1 until every wave-N feature's dependency edges are durably confirmed merged, verified against

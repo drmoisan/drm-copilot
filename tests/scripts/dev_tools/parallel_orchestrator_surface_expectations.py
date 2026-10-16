@@ -162,14 +162,20 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # as step 3 of the epic skill's `## Epic Integration Branch Lifecycle` section
 # and renumbered the former steps 3-5 to 4-6. Only the skill digest moved; the
 # agent digest is unchanged and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #928. That change replaced the epic skill's
+# SubagentStop transport and exit-code note (lines 279-281) and the agent's
+# matching paragraph (lines 133-135) to state that the defect was resolved by
+# epic #904 and issue #928. Both digests moved, and the pin stays live for
+# both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "d5e5e3b015c810fd12911e0ecffee38e12122bcdf667683778c7bd6cbdf6f538",
+        "c5b50974afe1718efce7023b2a7e6965d43979de333a84fb4d9fc2192eadd96d",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "0b1a629aa81d78673e43c8f2bbd825d1377e0d6ae114e15e8bb65450c5d8b4f2",
+        "b7af3a42d128a140951a07d592067a780429bc9beba0b6ec16afe54c3084b83f",
     ),
 )
 
