@@ -28,6 +28,10 @@ BeforeDiscovery {
         @{ Hook = '.claude/hooks/validate-task-researcher-output.ps1'; Parameters = @{}; Prefix = 'validate-task-researcher-output:' }
     )
     $script:TableHooks = @($script:ValidatorRows | ForEach-Object { $_.Hook })
+    $script:StatementTerminatingRows = @(
+        @{ Hook = '.claude/hooks/validate-discovery-artifact-gate.ps1'; Parameters = @{}; Prefix = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:' }
+        @{ Hook = '.claude/hooks/validate-pr-author-output.ps1'; Parameters = @{}; Prefix = 'PR_AUTHOR_OUTPUT_MISSING:' }
+    )
 }
 
 Describe 'SubagentStop validator unhandled-error block (issue #928)' {
@@ -61,6 +65,7 @@ Describe 'SubagentStop validator unhandled-error block (issue #928)' {
             $originalError = [Console]::Error
             $savedFailures = Get-Variable -Name HookDependencyFailures -Scope Script -ErrorAction SilentlyContinue
             $savedGuardFlag = Get-Variable -Name HookDependencyGuardLoadFailed -Scope Script -ErrorAction SilentlyContinue
+            $savedLastExitCode = $global:LASTEXITCODE
             $stderr = [System.IO.StringWriter]::new()
             $thrown = $null
             $exitCode = $null
@@ -83,6 +88,7 @@ Describe 'SubagentStop validator unhandled-error block (issue #928)' {
                 else { Set-Variable -Name HookDependencyFailures -Scope Script -Value $savedFailures.Value }
                 if ($null -eq $savedGuardFlag) { Remove-Variable -Name HookDependencyGuardLoadFailed -Scope Script -ErrorAction SilentlyContinue }
                 else { Set-Variable -Name HookDependencyGuardLoadFailed -Scope Script -Value $savedGuardFlag.Value }
+                $global:LASTEXITCODE = $savedLastExitCode
             }
 
             return @{ ExitCode = $exitCode; Stderr = $stderr.ToString(); Thrown = $thrown }
@@ -106,6 +112,25 @@ Describe 'SubagentStop validator unhandled-error block (issue #928)' {
         $outcome.Stderr.StartsWith($Prefix, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "the stderr reason must start with '$Prefix'; actual stderr: '$($outcome.Stderr)'"
         $outcome.Stderr | Should -BeLike '*simulated unhandled error (issue #928)*' -Because 'the reason must carry the first line of the error message'
         Should -Invoke Read-SubagentStopEnvelope -Times 1 -Exactly
+    }
+
+    It 'U1-ST: <Hook> blocks with exit 2 when the validation call raises a statement-terminating error' -ForEach $script:StatementTerminatingRows {
+        # Arrange: a .NET method exception is statement-terminating, unlike the script-terminating throw used by U1.
+        Mock Read-SubagentStopEnvelope { [System.Runtime.ExceptionServices.ExceptionDispatchInfo]::Capture([System.InvalidOperationException]::new('simulated statement-terminating error (issue #928)')).Throw() }
+        Mock Import-Module { }
+        $hookPath = Join-Path $script:RepoRoot $Hook
+        $global:LASTEXITCODE = 0
+
+        # Act
+        $outcome = Invoke-ValidatorUnderTest -HookPath $hookPath -Parameters $Parameters
+
+        # Assert
+        $outcome.Thrown | Should -BeNullOrEmpty -Because "$Hook must catch the statement-terminating error instead of letting it escape"
+        $outcome.ExitCode | Should -Be 2 -Because "$Hook must block the SubagentStop with exit code 2"
+        $outcome.Stderr.StartsWith($Prefix, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "the stderr reason must start with '$Prefix'; actual stderr: '$($outcome.Stderr)'"
+        $outcome.Stderr | Should -BeLike '*simulated statement-terminating error (issue #928)*' -Because 'the reason must carry the first line of the error message'
+        Should -Invoke Read-SubagentStopEnvelope -Times 1 -Exactly
+        $global:LASTEXITCODE | Should -Be 0 -Because 'Invoke-ValidatorUnderTest restores the previous LASTEXITCODE'
     }
 
     It 'U2: has a row for every hook that dot-sources subagentstop-envelope.ps1 and no other' -TestCases @(@{ TableHooks = $script:TableHooks }) {
