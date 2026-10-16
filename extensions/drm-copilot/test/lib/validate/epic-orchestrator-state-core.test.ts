@@ -6,7 +6,7 @@ import { validateEpicOrchestratorStateText } from "../../../src/lib/validate/epi
  * Return a minimally valid, wave-barrier-clean epic checkpoint payload.
  *
  * Mirrors the Python test fixture `build_valid_epic_state()` in
- * `tests/scripts/dev_tools/test_validate_epic_orchestrator_state.py`.
+ * `tests/scripts/dev_tools/validate_orchestration_artifacts_test_support.py`.
  */
 function buildValidEpicState(): Record<string, unknown> {
   return {
