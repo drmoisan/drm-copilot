@@ -14,7 +14,6 @@
 
 The executor stop hook (.claude/hooks/validate-executor-output.ps1, Test-IsPreflightPlan) treats this plan as a preflight plan while the whole-line directive below is present. The orchestrator deletes that directive line after PREFLIGHT: ALL CLEAR and before delegating execution, so the hook applies its completion checks to the execution run. It is a control line, not a task.
 
-DIRECTIVE: PREFLIGHT VALIDATION ONLY
 
 **Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
 
