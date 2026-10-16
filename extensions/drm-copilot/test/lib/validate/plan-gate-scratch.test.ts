@@ -216,12 +216,53 @@ describe("plan-gate-scratch G10", () => {
     expect(results).toEqual(expected);
   });
 
-  it("stops a logical line at a fence, a heading, and a task line", () => {
+  it("stops a logical line at an indented fence and at a column-0 heading or task line", () => {
     // Arrange
     const expected = STOP_FIXTURES.map(() => [[1, DEFINITION_LINE]]);
 
     // Act
     const results = STOP_FIXTURES.map((text) => bareScratchDefinitions(text));
+
+    // Assert
+    expect(results).toEqual(expected);
+  });
+
+  it("absorbs an indented heading or task line into the logical line", () => {
+    // Arrange
+    const fixtures = [
+      DEFINITION_LINE + "\n  ## Indented heading",
+      DEFINITION_LINE + "\n  - [ ] [P1-T1] Do the thing",
+    ];
+    const expected = [
+      [[1, "- SCRATCH means the session scratchpad. ## Indented heading"]],
+      [
+        [
+          1,
+          "- SCRATCH means the session scratchpad. - [ ] [P1-T1] Do the thing",
+        ],
+      ],
+    ];
+
+    // Act
+    const results = fixtures.map((text) => bareScratchDefinitions(text));
+
+    // Assert
+    expect(results).toEqual(expected);
+  });
+
+  it("does not end a physical line at a form feed or a line separator", () => {
+    // Arrange
+    const fixtures = [
+      "intro\fSCRATCH is the session scratchpad.",
+      "intro\u2028SCRATCH is the session scratchpad.",
+    ];
+    const expected = [
+      [[1, "intro SCRATCH is the session scratchpad."]],
+      [[1, "intro SCRATCH is the session scratchpad."]],
+    ];
+
+    // Act
+    const results = fixtures.map((text) => bareScratchDefinitions(text));
 
     // Assert
     expect(results).toEqual(expected);

@@ -43,6 +43,25 @@ _SUPERSEDED_RULE_SENTENCE = "G1 through G9 are the complete shipped set."
 _SKILL_SHIPPED_SET = "The complete shipped set is therefore G1 through G10."
 _SKILL_SUPERSEDED = "The complete shipped set is therefore G1 through G9."
 
+_SCOPE_REQUIRED_PHRASES = (
+    "G1 through G9 judge the shell commands the plan states",
+    "G1 through G9 are fed by the command extractor",
+    "evaluates G1 through G9, calls",
+)
+_SCOPE_SUPERSEDED_PHRASES = (
+    "applies to the shell commands an atomic plan states",
+    "both fed by the command extractor",
+    "evaluates G1 through G6",
+)
+_ISSUE_TOKEN_BULLET = "**Any issue token after the definition.**"
+_G10_LINE_RULE_PHRASES = (
+    "an indented heading or task line is absorbed",
+    "do not end a physical line",
+    "One parity residual remains",
+    _ISSUE_TOKEN_BULLET,
+)
+_G10_FALSE_NEGATIVE_HEADING = "### Known false-negative classes — G10"
+
 
 def test_rule_file_documents_g10() -> None:
     """The rule file states G10 in each required section, in order."""
@@ -116,3 +135,35 @@ def test_discrimination_docstrings_name_g10() -> None:
     assert "G1 through G10" in module_doc
     assert "G10" in entry_doc
     assert "pre-change output" not in entry_doc
+
+
+def test_rule_file_scope_and_enforcement_state_the_shipped_set() -> None:
+    """The scope and enforcement text name G1 through G9 plus document-level G10."""
+
+    # Arrange
+    text = _RULE_FILE.read_text(encoding="utf-8")
+
+    # Act
+    missing = [phrase for phrase in _SCOPE_REQUIRED_PHRASES if phrase not in text]
+    stale = [phrase for phrase in _SCOPE_SUPERSEDED_PHRASES if phrase in text]
+
+    # Assert
+    assert missing == [], f"rule file lacks {missing}"
+    assert stale == [], f"rule file still states {stale}"
+
+
+def test_rule_file_documents_g10_line_rules_and_issue_token_class() -> None:
+    """The rule file states the G10 line rules and the issue-token class."""
+
+    # Arrange
+    text = _RULE_FILE.read_text(encoding="utf-8")
+
+    # Act
+    missing = [phrase for phrase in _G10_LINE_RULE_PHRASES if phrase not in text]
+
+    # Assert
+    assert missing == [], f"rule file lacks {missing}"
+    heading = text.index(_G10_FALSE_NEGATIVE_HEADING)
+    bullet = text.index(_ISSUE_TOKEN_BULLET)
+    register = text.index("## The Write-Mode Register")
+    assert heading < bullet < register

@@ -95,8 +95,34 @@ _STOP_FIXTURES = (
         [_DEFINITION_LINE, "  ```text", "  fenced content line", "  ```"],
         id="indented-fence",
     ),
-    pytest.param([_DEFINITION_LINE, "## Heading"], id="heading"),
-    pytest.param([_DEFINITION_LINE, "- [ ] [P1-T1] Do the thing"], id="task-line"),
+    pytest.param([_DEFINITION_LINE, "## Heading"], id="column-0-heading"),
+    pytest.param(
+        [_DEFINITION_LINE, "- [ ] [P1-T1] Do the thing"], id="column-0-task-line"
+    ),
+)
+_ABSORB_FIXTURES = (
+    pytest.param(
+        _DEFINITION_LINE + "\n  ## Indented heading",
+        (1, "- SCRATCH means the session scratchpad. ## Indented heading"),
+        id="indented-heading",
+    ),
+    pytest.param(
+        _DEFINITION_LINE + "\n  - [ ] [P1-T1] Do the thing",
+        (1, "- SCRATCH means the session scratchpad. - [ ] [P1-T1] Do the thing"),
+        id="indented-task-line",
+    ),
+)
+_SEPARATOR_FIXTURES = (
+    pytest.param(
+        "intro\fSCRATCH is the session scratchpad.",
+        (1, "intro SCRATCH is the session scratchpad."),
+        id="form-feed",
+    ),
+    pytest.param(
+        "intro\u2028SCRATCH is the session scratchpad.",
+        (1, "intro SCRATCH is the session scratchpad."),
+        id="line-separator",
+    ),
 )
 
 _APOSTROPHE_FIXTURE = (
@@ -263,7 +289,8 @@ def test_wrapped_definition_reports_first_line() -> None:
 
 @pytest.mark.parametrize("lines", _STOP_FIXTURES)
 def test_logical_line_stops_at_heading_fence_and_task_line(lines: list[str]) -> None:
-    """Continuation stops at a fence, a heading, or a task line."""
+    """Continuation stops at an indented fence and at any line not beginning with
+    whitespace."""
 
     # Arrange
     text = "\n".join(lines)
@@ -273,6 +300,38 @@ def test_logical_line_stops_at_heading_fence_and_task_line(lines: list[str]) -> 
 
     # Assert
     assert findings == [(1, _DEFINITION_LINE)]
+
+
+@pytest.mark.parametrize(("text", "expected"), _ABSORB_FIXTURES)
+def test_indented_heading_and_task_line_continue_logical_line(
+    text: str, expected: tuple[int, str]
+) -> None:
+    """An indented heading or task line is absorbed into the logical line."""
+
+    # Arrange
+    document = text
+
+    # Act
+    findings = bare_scratch_definitions(document)
+
+    # Assert
+    assert findings == [expected]
+
+
+@pytest.mark.parametrize(("text", "expected"), _SEPARATOR_FIXTURES)
+def test_bare_scratch_definitions_splits_only_on_cr_lf_terminators(
+    text: str, expected: tuple[int, str]
+) -> None:
+    """A form feed or line separator does not end a physical line."""
+
+    # Arrange
+    document = text
+
+    # Act
+    findings = bare_scratch_definitions(document)
+
+    # Assert
+    assert findings == [expected]
 
 
 @pytest.mark.parametrize(
