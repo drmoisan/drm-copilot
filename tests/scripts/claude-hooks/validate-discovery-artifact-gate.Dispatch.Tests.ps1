@@ -25,7 +25,8 @@ Describe 'validate-discovery-artifact-gate.ps1 validator dispatch (issue #929)' 
         # Corpus-shaped message: three discovery types, one duplicated reference, backtick-wrapped,
         # trailing-comma and parenthesized references, and two empty-after-trim tokens.
         $script:DispatchMessage = 'Wrote `discovery/coverage-ledger/coverage-ledger.json` and "" then discovery/parity-matrix/parity-matrix.json, plus ` (discovery/feature-contract/feature-contract.json) and re-checked discovery/coverage-ledger/coverage-ledger.json'
-        $script:DispatchEnvelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'general-purpose'; stop_hook_active = $false; last_assistant_message = $script:DispatchMessage } | ConvertTo-Json -Compress
+        . (Join-Path $PSScriptRoot 'SubagentStopEnvelope.Helpers.ps1')
+        $script:DispatchEnvelope = ConvertTo-SubagentStopEnvelopeJson -AssistantMessage $script:DispatchMessage
     }
 
     Context 'validator dispatch with a present declaration (issue #929)' {
