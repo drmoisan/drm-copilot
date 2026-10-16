@@ -9,8 +9,7 @@
     Drives Invoke-CodexEpicMergeDecision with literal checkpoint texts and mocked docs-only
     seams. An allow is asserted as $null, the Codex allow representation. No row starts a
     process, runs git or gh, or writes a file. The BeforeAll seam mocks are registered only
-    when the shared helper is loaded, so before it exists every docs-only row fails. The
-    Codex gate reads checkpoint text from parameters, so no epic-state baseline mock applies.
+    when the shared helper is loaded, so before it exists every docs-only row fails.
 #>
 
 Describe 'Codex enforce-epic-merge-gate docs-only branch (issue #927)' {
@@ -18,6 +17,15 @@ Describe 'Codex enforce-epic-merge-gate docs-only branch (issue #927)' {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:CodexHook = Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-merge-gate.ps1'
         . $script:CodexHook
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        if (Get-Command Get-ChildOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-ChildOrchestratorCheckpointContent { $null } }
+        if (Get-Command Get-EpicOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-EpicOrchestratorCheckpointContent { $null } }
+        if (Get-Command Get-ParallelOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-ParallelOrchestratorCheckpointContent { $null } }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
         if (Get-Command Invoke-DocsOnlyGhExe -ErrorAction SilentlyContinue) { Mock Invoke-DocsOnlyGhExe { [pscustomobject]@{ ExitCode = 1; Output = '' } } }
         if (Get-Command Invoke-DocsOnlyGitExe -ErrorAction SilentlyContinue) { Mock Invoke-DocsOnlyGitExe { [pscustomobject]@{ ExitCode = 1; Output = '' } } }
 
@@ -50,6 +58,8 @@ Describe 'Codex enforce-epic-merge-gate docs-only branch (issue #927)' {
 
         $script:CodexBareDenyText = 'EPIC_MERGE_GATE_BLOCKED: gh pr merge --merge requires a safe epic child checkpoint or a successful final epic CI gate with a matching PR number.'
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     It 'allows a docs-only merge when no checkpoint is present (codex, issue #927)' {
         # Arrange
