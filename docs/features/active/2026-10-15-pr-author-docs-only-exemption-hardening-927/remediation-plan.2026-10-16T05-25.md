@@ -1167,24 +1167,24 @@ AC-7, AC-8, AC-9, and AC-M4 were revised in wording only; their intent is unchan
 - `Invoke-DocsOnlyGitExe` has the same return shape; its default invoker is `{ Invoke-DocsOnlyBoundedNative -FileName 'git' -ArgumentList $args -TimeoutMilliseconds 3000 }`. `Invoke-DocsOnlyGhExe -WorkingRoot <string> -GhArgs <string[]> [-GhInvoker <scriptblock> = { Invoke-DocsOnlyBoundedNative -FileName 'gh' -ArgumentList $args -TimeoutMilliseconds 7000 }]` returns the same shape. `Invoke-DocsOnlyBoundedNative -FileName <string> -ArgumentList <string[]> [-TimeoutMilliseconds <int> = 3000] [-ProcessStarter <scriptblock>]` emits the output lines and sets `$LASTEXITCODE`; an expired wait stops the process tree, emits nothing, and sets `$LASTEXITCODE` to 124 (revision 1.3).
 ```
 
-**S-11** (line 337). Old / New. Post-execution note (R1 executor): the four-space indent of the S-11 and S-12 lines below is not part of the substring; it was added after [P6-T3] applied and verified these edits, so the executor completion hook does not read the quoted spec checkboxes as plan tasks.
+**S-11** (line 337). Old / New. Post-execution note (R1 executor): the leading `> ` of the S-11 and S-12 lines below is not part of the substring; it was added after [P6-T3] applied and verified these edits, so the executor completion hook does not read the quoted spec checkboxes as plan tasks.
 
 ```text
-    - [ ] AC-M23 (toolchain, merge side): PoshQC
+> - [ ] AC-M23 (toolchain, merge side): PoshQC
 ```
 
 ```text
-    - [ ] AC-M23 (toolchain, merge side) **[CI-dependent]** (analyzer half): PoshQC
+> - [ ] AC-M23 (toolchain, merge side) **[CI-dependent]** (analyzer half): PoshQC
 ```
 
 **S-12** (line 360). Old / New:
 
 ```text
-    - [ ] AC-18 (toolchain): PoshQC
+> - [ ] AC-18 (toolchain): PoshQC
 ```
 
 ```text
-    - [ ] AC-18 (toolchain) **[CI-dependent]** (analyzer half): PoshQC
+> - [ ] AC-18 (toolchain) **[CI-dependent]** (analyzer half): PoshQC
 ```
 
 **S-13** (line 373). Old / New:
