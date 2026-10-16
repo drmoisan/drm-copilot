@@ -327,6 +327,41 @@ def split_plan_lines(text: str) -> list[str]:
     return lines
 
 
+# One explicit whitespace class shared by G6 and G10. The TypeScript twin
+# declares the identical pattern string, and a parity test compares the two.
+# The class is the set on which the Python whitespace predicate
+# (`str.isspace`) and the JavaScript whitespace class agree: NEL, the
+# information separators, and the byte-order mark are excluded, so both
+# runtimes treat them as ordinary characters.
+PLAN_WHITESPACE_CLASS = (
+    r"[\t\n\v\f\r \u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]"
+)
+_PLAN_WHITESPACE_RUN_RE = re.compile(PLAN_WHITESPACE_CLASS + "+")
+
+
+def normalize_plan_whitespace(text: str) -> str:
+    """Join runs of `PLAN_WHITESPACE_CLASS` with one space and trim the ends.
+
+    Purpose:
+        Give G6 and G10 one whitespace normalization, byte-identical to the
+        TypeScript `normalizePlanWhitespace`.
+
+    Args:
+        text (str): Text to normalize.
+
+    Returns:
+        str: The normalized text, empty when the text holds only class members.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    return " ".join(filter(None, _PLAN_WHITESPACE_RUN_RE.split(text)))
+
+
 def extract_plan_commands(text: str) -> list[PlanCommand]:
     """Extract every task-attributed command candidate from plan text.
 

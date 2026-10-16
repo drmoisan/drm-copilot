@@ -31,6 +31,7 @@ from scripts.dev_tools.plan_gate_commands import (
     PlanCommand,
     extract_plan_commands,
     grep_executable_index,
+    normalize_plan_whitespace,
     split_plan_lines,
 )
 from scripts.dev_tools.plan_gate_coverage import (
@@ -253,9 +254,13 @@ def _plan_quotes_literal(text: str, literal: str, *, exclude_span: str) -> bool:
 
 
 def _window_join(lines: list[str], size: int = _WINDOW_SIZE) -> list[str]:
-    """Return the whitespace-normalised join of each sliding window of lines."""
+    """Return the whitespace-normalised join of each sliding window of lines.
 
-    dense = [" ".join(line.split()) for line in lines if line.strip()]
+    Whitespace means `PLAN_WHITESPACE_CLASS`, as in the TypeScript `windowJoin`.
+    """
+
+    normalized = [normalize_plan_whitespace(line) for line in lines]
+    dense = [line for line in normalized if line]
     # One window per start position keeps the boundary exact: lines further
     # apart than `size` never appear in the same join.
     return [" ".join(dense[index : index + size]) for index in range(len(dense))]
@@ -265,19 +270,21 @@ def _has_cross_line_presence(context: PlanGateContext, literal: str) -> bool:
     """Return whether a tracked file carries the literal only across lines.
 
     Candidate files are located by searching for the literal's first word,
-    which stays contiguous on one line however the literal wraps.
+    which stays contiguous on one line however the literal wraps. The literal
+    and every tracked line are normalized with `PLAN_WHITESPACE_CLASS`, as in
+    the TypeScript `hasCrossLinePresence`.
     """
 
-    words = literal.split()
+    needle = normalize_plan_whitespace(literal)
+    words = needle.split(" ")
     if len(words) < 2:
         return False
-    needle = " ".join(words)
 
     # A candidate carries the first word on one line: necessary for a wrap.
     for path in context.git.files_containing(words[0]):
         # Split on CR LF, LF, and CR only, as the TypeScript hasCrossLinePresence does.
         lines = split_plan_lines(context.git.read_tracked_text(path))
-        if any(needle in " ".join(line.split()) for line in lines):
+        if any(needle in normalize_plan_whitespace(line) for line in lines):
             continue
         if any(needle in window for window in _window_join(lines)):
             return True

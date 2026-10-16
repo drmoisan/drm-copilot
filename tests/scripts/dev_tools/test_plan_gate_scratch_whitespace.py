@@ -154,9 +154,9 @@ def test_whitespace_class_declared_once_per_runtime() -> None:
     }
 
     # Assert
-    assert counts == _DECLARATION_COUNTS, (
-        f"PLAN_WHITESPACE_CLASS declarations differ: {counts}"
-    )
+    assert (
+        counts == _DECLARATION_COUNTS
+    ), f"PLAN_WHITESPACE_CLASS declarations differ: {counts}"
 
 
 @pytest.mark.parametrize(("text", "expected"), _CONTINUATION_FIXTURES)
