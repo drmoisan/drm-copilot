@@ -76,7 +76,7 @@ Baseline figures are taken from `issue.md`; research §7 records that they were 
   - Editing `.github/workflows/ci.yml` or any workflow `on:` block (owned by concurrent item #952).
   - Adding a failing CI PowerShell coverage threshold on any path (D3).
   - Setting `UseBreakpoints` in code inside `Invoke-PoshQCTest`, or passing a CI-only settings file (rejected in research §6.2).
-  - A Pester major-version ceiling below 6.0 (optional hardening in research §2.2; deferred).
+  - A Pester version ceiling in `scripts/host-tools.manifest.json` or `scripts/dev-tools/HostVerification.psm1`. The major-version ceiling below 6.0 itself (optional hardening in research §2.2) is no longer deferred: decision D8 brings it into scope at the sites listed in AC-16.
   - Editing the #936 test files or their headers (D4).
   - Publishing the MCP package; the bundled-copy change reaches MCP consumers only on the next package release (research §9).
 - Explicitly excluded systems, integrations, or datasets:
@@ -279,6 +279,7 @@ Seeded from issue:
 - [ ] AC-13: `git diff --name-only origin/main...HEAD` lists no change to `.github/workflows/ci.yml`, and no `on:` block in any `.github/workflows/*.yml` file differs from `origin/main`.
 - [ ] AC-14: `git diff --name-only origin/main...HEAD` lists no path under `.claude/rules/` or `.github/instructions/`.
 - [ ] AC-15: No production, test, or reusable script file changed or added on the branch exceeds 500 lines.
+- [ ] AC-16: A Pester major-version ceiling below 6.0 accompanies the 5.9.0 minimum (D8): `Install-PoshQCTool` in both `PoshQC.psm1` copies and the present-checks in `.devcontainer/post-create.sh` and `.github/codex/codex-web-setup.sh` accept only installed Pester versions >= 5.9.0 and < 6.0.0; the default `EnsureModule` seam of `Invoke-PoshQCTest` in both `PoshQC.Testing.psm1` copies and the `_poshqc.yml` Linux job import Pester with `-MaximumVersion 5.99.99`; both `README.md` copies and the CHANGELOG `[Unreleased]` entry state the ceiling; the `PoshQC.RunSettings.Tests.ps1` cases `RS05-INSTALLER-PESTER-CEILING-BELOW-6`, `RS06-TEST-IMPORT-PESTER-MAXIMUM`, and `RS07-WORKFLOW-LINUX-PESTER-RANGE` fail on the pre-fix tree and pass after the fix, with evidence under `evidence/regression-testing/`; the tests create no temporary files.
 
 CI-dependent criteria: AC-08, AC-09, AC-10, AC-11, AC-12. They remain unchecked until CI has run on the PR head and are checked off by the item's orchestrator run at S9 per the acceptance-criteria-tracking skill.
 
@@ -305,6 +306,7 @@ CI-dependent criteria: AC-08, AC-09, AC-10, AC-11, AC-12. They remain unchecked 
 - D2: Profiler mode is set as data: `UseBreakpoints = $false` in the `CodeCoverage` block of both `pester.runsettings.psd1` copies, which `Invoke-PoshQCTest` loads. All local runners inherit it. The bundled-parity pytest requires both copies to change identically.
 - D3: If the conditional sharding phase triggers, it adds no new failing CI coverage threshold. The merge job enforces a completeness guard (no test file dropped) and reports repo-wide LINE coverage; threshold enforcement remains review-time.
 - D4: The #936 test-header notes are not on this branch. This item records the observed `ci` values of the three #936 lines from the PR-head coverage artifact as evidence and does not edit #936-owned test files.
+- D8: Add a Pester major-version ceiling below 6.0 alongside the 5.9.0 minimum, so that a runner image that ships Pester 6 cannot change the major version silently. Sites that filter installed versions (`Install-PoshQCTool` present and post-install checks, the `.devcontainer/post-create.sh` and `.github/codex/codex-web-setup.sh` present-checks) use an exclusive bound of 6.0.0. Sites that call `Import-Module` (the `Invoke-PoshQCTest` default `EnsureModule` seam and the `_poshqc.yml` Linux job) use `-MaximumVersion 5.99.99`, because `Import-Module` has only an inclusive maximum. `scripts/host-tools.manifest.json` carries no ceiling: HostBootstrap installs its exact `minimumVersion`, and `HostVerification.psm1` is unchanged.
 - Ownership: item #952 owns `.github/workflows/ci.yml` and every workflow `on:` block; this item edits only `_poshqc.yml` job and step bodies. Policy files are read-only.
 
 ## Rollout & Follow-up
