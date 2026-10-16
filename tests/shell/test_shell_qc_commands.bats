@@ -177,7 +177,7 @@ teardown() {
     run env SHELL_QC_BATS_BIN="${STUB_DIR}/bats-nounset-source" \
         bash -c "cd '${FIXTURE_ROOT}' && bash '${WRAPPER}' test"
     [ "$status" -ne 0 ]
-    [[ "$output" == *"nounset-stub ran: tests/shell"* ]]
+    [[ "$output" == *"nounset-stub ran: --recursive tests/shell"* ]]
     [[ "$output" == *"BASH_SOURCE"* ]]
 }
 
@@ -187,7 +187,7 @@ teardown() {
     run env SHELL_QC_BATS_BIN="${STUB_DIR}/bats-nounset-source-reset" \
         bash -c "cd '${FIXTURE_ROOT}' && bash '${WRAPPER}' test"
     [ "$status" -eq 0 ]
-    [[ "$output" == *"nounset-reset-stub ran: tests/shell"* ]]
+    [[ "$output" == *"nounset-reset-stub ran: --recursive tests/shell"* ]]
     [[ "$output" != *"kcov@"* ]]
 }
 
@@ -201,4 +201,65 @@ teardown() {
     run bash -c 'exec 2>/dev/null; source "$1"; set +x; printf "%s\n" "$PS4"' _ "${REPO_ROOT}/scripts/bash/kcov_trace_env.sh"
     [ "$status" -eq 0 ]
     [ "$output" = 'kcov@${BASH_SOURCE}@${LINENO}@' ]
+}
+
+@test "test passes --recursive to bats for each test directory" {
+    # Issue #962 follow-up (c): bats collects only the top-level files of a directory
+    # unless --recursive is given, so the wrapper passes it for every test directory.
+    run env SHELL_QC_BATS_BIN="${STUB_DIR}/bats" \
+        bash -c "cd '${FIXTURE_ROOT}' && bash '${WRAPPER}' test"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"bats --recursive tests/shell"* ]]
+}
+
+@test "test --coverage passes --recursive to bats under kcov" {
+    # Issue #962 follow-up (c): the coverage path collects nested test files as well.
+    run env SHELL_QC_BATS_BIN="${STUB_DIR}/bats" SHELL_QC_KCOV_BIN="${STUB_DIR}/kcov" \
+        SHELL_QC_KCOV_OUT_DIR="${KCOV_OUT}" \
+        bash -c "cd '${FIXTURE_ROOT}' && bash '${WRAPPER}' test --coverage"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"stub-bin/bats --recursive tests/shell"* ]]
+}
+
+@test "check_coverage_threshold fails below the default 85 percent minimum" {
+    # Issue #962 follow-up (d): the fixture cov.xml reports 75.0%, below the default.
+    run env -u SHELL_QC_MIN_LINE_COVERAGE \
+        bash -c "source '${LIB}' && check_coverage_threshold '${FIXTURE_ROOT}/cov/cov.xml'"
+    [ "$status" -eq 1 ]
+    [ "$output" = "Bash coverage 75.0% is below the minimum line coverage of 85%." ]
+}
+
+@test "check_coverage_threshold passes when coverage equals the minimum" {
+    run env SHELL_QC_MIN_LINE_COVERAGE=75 \
+        bash -c "source '${LIB}' && check_coverage_threshold '${FIXTURE_ROOT}/cov/cov.xml'"
+    [ "$status" -eq 0 ]
+    [ "$output" = "Bash coverage 75.0% meets the minimum line coverage of 75%." ]
+}
+
+@test "check_coverage_threshold passes when coverage is above the minimum" {
+    run env SHELL_QC_MIN_LINE_COVERAGE=70 \
+        bash -c "source '${LIB}' && check_coverage_threshold '${FIXTURE_ROOT}/cov/cov.xml'"
+    [ "$status" -eq 0 ]
+    [ "$output" = "Bash coverage 75.0% meets the minimum line coverage of 70%." ]
+}
+
+@test "check_coverage_threshold rejects a minimum that is not an integer" {
+    run env SHELL_QC_MIN_LINE_COVERAGE=abc \
+        bash -c "source '${LIB}' && check_coverage_threshold '${FIXTURE_ROOT}/cov/cov.xml'"
+    [ "$status" -eq 2 ]
+    [ "$output" = "Invalid SHELL_QC_MIN_LINE_COVERAGE: abc (expected an integer from 0 to 100)." ]
+}
+
+@test "check_coverage_threshold rejects a minimum above 100" {
+    run env SHELL_QC_MIN_LINE_COVERAGE=101 \
+        bash -c "source '${LIB}' && check_coverage_threshold '${FIXTURE_ROOT}/cov/cov.xml'"
+    [ "$status" -eq 2 ]
+    [ "$output" = "Invalid SHELL_QC_MIN_LINE_COVERAGE: 101 (expected an integer from 0 to 100)." ]
+}
+
+@test "check_coverage_threshold prints nothing and passes when cov.xml is missing" {
+    run env -u SHELL_QC_MIN_LINE_COVERAGE \
+        bash -c "source '${LIB}' && check_coverage_threshold '${FIXTURE_ROOT}/cov/missing.xml'"
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
 }
