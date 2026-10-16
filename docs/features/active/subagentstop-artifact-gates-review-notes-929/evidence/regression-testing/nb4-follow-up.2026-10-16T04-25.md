@@ -56,3 +56,5 @@ PASSED=224
 The full output is line-for-line identical to the P8-T12 output in `nb4-suites.2026-10-16T04-20.md` (`diff` exited 0 with no output).
 
 Output Summary: Follow-up branch taken; merge outcome `MERGED` at `dc91a92d58c8d2aa1ad99bcc86ad2f25dd604138`; no `ADDITIONAL:` path; both census totals are `0` on the second run; the runner exits 0 with `FAILED=0` and `PASSED=224`. The follow-up commit hash is recorded below after the commit.
+
+Follow-up commit: `e0e3d76136c2fd62db41c723f0d76159bf5bc689` (pushed; `git status --porcelain -- . ":(exclude)SCRATCH"` listed nothing after the push).
