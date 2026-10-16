@@ -321,7 +321,7 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
 - [ ] AC-2: Fork gate. For a `pull_request` event whose `HEAD_REPO` differs from `REPOSITORY`, the entry script writes `code=true` with reason `FORK_PULL_REQUEST`, and neither invoker is called. Verified by a named Pester test.
 - [ ] AC-3: Run-list failure. When the injected `gh` run-list call returns a non-zero exit, or output that is not valid JSON, the entry script writes `code=true` with reason `RUN_LIST_FAILED`. Verified by two named Pester tests, one per failure form.
 - [ ] AC-4: Job-list failure. When the run list parses but a jobs call for a candidate run fails, the entry script writes `code=true` with reason `JOB_LIST_FAILED`. Verified by a named Pester test.
-- [ ] AC-5: Candidate selection. `Select-CiGreenBaseCandidates` excludes the run whose id equals `RUN_ID` and runs whose `head_repository.full_name` differs from `REPOSITORY`. It returns the remaining runs ordered by `run_number` descending when the input is in unsorted order. Verified by named Pester tests covering current-run exclusion, foreign-head-repository exclusion, and an unsorted input fixture.
+- [x] AC-5: Candidate selection. `Select-CiGreenBaseCandidates` excludes the run whose id equals `RUN_ID` and runs whose `head_repository.full_name` differs from `REPOSITORY`. It returns the remaining runs ordered by `run_number` descending when the input is in unsorted order. Verified by named Pester tests covering current-run exclusion, foreign-head-repository exclusion, and an unsorted input fixture.
 - [ ] AC-6: Full-run marker. `Test-CiFullRunMarker` returns true only when the jobs payload contains a job named `CI full run` with conclusion `success`. It returns false for `skipped`, for any other conclusion, and when the job is absent. When no candidate in the page qualifies, including a page whose only successful runs have a skipped `CI full run`, the entry script writes `code=true` with reason `NO_FULL_GREEN_RUN`. When an older candidate qualifies and a newer one does not, the older candidate is chosen as the base. Verified by named Pester tests.
 - [ ] AC-7: Ancestry. For each of the following injected `git` outcomes, the entry script writes `code=true` with the stated reason:
   - `git cat-file -e <base>^{commit}` fails: `BASE_NOT_PRESENT`;
@@ -331,15 +331,15 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   Verified by three named Pester tests.
 - [ ] AC-8: Diff invocation. The diff call made through `-GitInvoker` contains each of the arguments `--name-only`, `-z`, `--no-renames`, `--no-color`, `--no-ext-diff` and `--no-relative`, plus the base and head SHAs. A non-zero diff exit, or non-empty output that does not end in NUL, produces `code=true` with reason `DIFF_FAILED`. Verified by named Pester tests, including one that asserts the argument set and one per failure form.
 - [ ] AC-9: Empty diff. An empty path set from the diff produces `code=true` with reason `EMPTY_DIFF`. Verified by a named Pester test of `Get-CiChangeScopePathDecision` and a named entry-script test.
-- [ ] AC-10: Mixed diff. A path set that contains at least one allowlisted path and at least one non-allowlisted path (for example `docs/features/active/x/evidence/a.md` plus `scripts/ci/CiChangeScope.psm1`) produces `code=true` with reason `NON_ALLOWLISTED_PATH: <first non-allowlisted path>`. Verified by a named Pester test.
+- [x] AC-10: Mixed diff. A path set that contains at least one allowlisted path and at least one non-allowlisted path (for example `docs/features/active/x/evidence/a.md` plus `scripts/ci/CiChangeScope.psm1`) produces `code=true` with reason `NON_ALLOWLISTED_PATH: <first non-allowlisted path>`. Verified by a named Pester test.
 - [ ] AC-11: Docs-only diff. When every path is allowlisted and the base qualifies and is an ancestor, the entry script:
   - writes `code=false` to the injected `-OutputWriter` output target;
   - logs `code=false reason=DOCS_ONLY_SINCE_<base sha>`;
   - writes the reason and base SHA to the step-summary target.
 
   Verified by a named Pester test that captures both targets through `-OutputWriter`.
-- [ ] AC-12: Allowlist positive cases. `Test-CiDocsOnlyPath` returns true for representative paths under each include prefix (`docs/features/active/`, `docs/features/completed/`, `docs/features/potential/`, `docs/research/`), for each configured extension (`.md`, `.txt`, `.log`, `.json`, `.xml`), and for an upper-case extension (for example `docs/features/active/x/evidence/RUN.MD`). Verified by named Pester tests.
-- [ ] AC-13: Allowlist negative cases. `Test-CiDocsOnlyPath` returns false for each of the following, each covered by a named Pester test:
+- [x] AC-12: Allowlist positive cases. `Test-CiDocsOnlyPath` returns true for representative paths under each include prefix (`docs/features/active/`, `docs/features/completed/`, `docs/features/potential/`, `docs/research/`), for each configured extension (`.md`, `.txt`, `.log`, `.json`, `.xml`), and for an upper-case extension (for example `docs/features/active/x/evidence/RUN.MD`). Verified by named Pester tests.
+- [x] AC-13: Allowlist negative cases. `Test-CiDocsOnlyPath` returns false for each of the following, each covered by a named Pester test:
   - `docs/features/templates/README.md`;
   - `docs/features/potential/template.md`;
   - a path under `docs/engineering/`;
@@ -355,7 +355,7 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   - When the entry script receives an invalid config, it writes `code=true` with reason `UNEXPECTED_ERROR` and emits a `::warning::` annotation.
 
   Verified by named Pester tests.
-- [ ] AC-15: Committed config. `config/ci-docs-only-paths.json` exists with the D3 content. `tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1` asserts, against the committed file, that:
+- [x] AC-15: Committed config. `config/ci-docs-only-paths.json` exists with the D3 content. `tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1` asserts, against the committed file, that:
   - every include prefix starts with `docs/`;
   - no include prefix covers `docs/features/templates/`, `docs/engineering/` or `docs/discovery/`;
   - `docs/features/templates/` and `docs/features/potential/template.md` are excluded;
@@ -419,7 +419,7 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
 - [ ] AC-28: CI-gate tooling unchanged and verified (D4).
   - `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1` passes unchanged. This includes the existing tests that pin `skipping` as non-blocking (around line 79) and the `-RequireWorkflow` empty-set refusal (around line 364); the executor records both test names.
   - `git diff --name-only origin/main...HEAD` lists neither the parser, its bundle mirror, nor either skill file named in AC-22.
-- [ ] AC-29: Tier classification. `quality-tiers.yml` contains an entry with `path: "scripts/ci"`, `tier: T4` and a rationale. `scripts/dev_tools/check_quality_tiers.py` and `tests/scripts/dev_tools/test_quality_tiers_contract_classification.py` pass.
+- [x] AC-29: Tier classification. `quality-tiers.yml` contains an entry with `path: "scripts/ci"`, `tier: T4` and a rationale. `scripts/dev_tools/check_quality_tiers.py` and `tests/scripts/dev_tools/test_quality_tiers_contract_classification.py` pass.
 - [ ] AC-30: Dependency composition (D5).
   - Before the first edit to `ci.yml` or `_poshqc.yml`, the executor records the `origin/main` SHA, the heads of the #952 and #953 branches, and whether each dependency is present in `origin/main`.
   - The branch contains `origin/main` through `git merge origin/main` (a merge commit, or a recorded "already up to date" state when the branch already contains it).
