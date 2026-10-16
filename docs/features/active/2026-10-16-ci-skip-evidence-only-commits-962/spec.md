@@ -57,6 +57,7 @@ Logs / Screenshots:
   - PowerShell 7 decision logic in `scripts/ci/`, the allowlist config `config/ci-docs-only-paths.json`, Pester suites under `tests/scripts/ci/`, and a new workflow-invariant suite `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1`.
   - A `quality-tiers.yml` entry for `scripts/ci`.
   - An appended section in `.github/workflows/README.md`.
+  - Related follow-ups added by coordinator decision D14 (AC-35 to AC-38): the two count statements and the dispatch table of `.github/workflows/README.md` (D14-a), a blocking `_security-scan.yml` scan step with a working `poetry export` (D14-b), recursive bats discovery in `scripts/bash/shell_qc_lib.sh` (D14-c), and an 85% bash line-coverage threshold (D14-d).
 - Out of scope / non-goals: see `## Out of Scope`.
 - Explicitly excluded systems, integrations, or datasets:
   - Ruleset 15241672. No ruleset change is made.
@@ -95,7 +96,7 @@ The fix therefore has to keep every required job running under its full-run name
   | 1 | `drm-copilot-extension-tests / drm-copilot Extension Tests (ubuntu-latest)` | `drm-copilot-extension-tests` | job and matrix start; every step skipped by `inputs.run-heavy` | `success` |
   | 2 | `drm-copilot-extension-tests / drm-copilot Extension Tests (windows-latest)` | `drm-copilot-extension-tests` | same as row 1 | `success` |
   | 3 | `docs-validation / Documentation Validation` | `docs-validation` | unchanged; runs in full | `success` (on a passing docs check) |
-  | 4 | `poshqc / PowerShell QC` | `poshqc` | aggregator runs (`if: always()`) with every step gated; `poshqc-static`, `poshqc-shard`, `poshqc-linux-hooks` skipped at job level (not required) | `success` |
+  | 4 | `poshqc / PowerShell QC` | `poshqc` | the `poshqc` job runs with every step gated (in the sharded shape of #953 it is the aggregator and keeps `if: always()`); every other `_poshqc.yml` job is skipped at job level (not required) | `success` |
   | 5 | `shell-coverage / Shell Coverage (Bats + kcov)` | `shell-coverage` | job runs; every step skipped, including the `if-no-files-found: error` upload | `success` |
   | 6 | `security-scan / Security Scanning` | `security-scan` | job runs; every step skipped | `success` |
   | 7 | `quality-checks7 / Code Quality & Tests (3.10)` | `quality-checks7` | matrix expands; every step skipped | `success` |
@@ -138,14 +139,14 @@ The fix therefore has to keep every required job running under its full-run name
   - `Invoke-CiGateParser.ps1`, orchestrate S9, and parallel merge-on-green already treat `skipped` and `neutral` checks as non-blocking, and they refuse an empty check set.
   - This branch does not modify the parser, its bundle mirror, or the two skill files.
   - AC-28 verifies this.
-- **D5. Dependency ordering (research §7).**
-  - #952 (`merge_group` trigger in `ci.yml`) and #953 (PR #959, sharded `_poshqc.yml` with the `poshqc / PowerShell QC` aggregator) must be merged into `origin/main` before #962 edits `ci.yml` or `_poshqc.yml`.
-  - Execution brings them into this branch with `git merge origin/main`, not with a rebase or a force push. This supersedes the rebase-and-force-push wording in research §7 and §11.
-  - The `_poshqc.yml` gating targets the sharded shape:
-    - the `poshqc-static`, `poshqc-shard` and `poshqc-linux-hooks` jobs skip at job level when `run-heavy` is false;
-    - the `poshqc` aggregator keeps `if: always()`, and every one of its steps is gated, so a skipped shard on a full run still fails the aggregator.
-  - If either dependency is not merged when execution starts, execution halts and records a blocked state. It does not edit against the pre-merge shape.
-  - At authoring time, this worktree's `ci.yml` has no `merge_group` trigger and `_poshqc.yml` has the unsharded `poshqc` / `poshqc-linux-hooks` job set.
+- **D5. Dependency composition (research §7; amended by coordinator decision 1 of 2026-10-16).**
+  - #952 (`merge_group` trigger in `ci.yml`) and #953 (PR #959, sharded `_poshqc.yml` with the `poshqc / PowerShell QC` aggregator) are not prerequisites. Execution starts without them and records, before the first edit to `ci.yml` or `_poshqc.yml`, whether each is present in `origin/main`.
+  - Execution brings `origin/main` into this branch with `git merge origin/main`, not with a rebase or a force push. This supersedes the rebase-and-force-push wording in research §7 and §11.
+  - The `_poshqc.yml` gating is selected by the shape present on the branch head:
+    - unsharded shape (`poshqc`, `poshqc-linux-hooks`): the `poshqc` job, which reports the required context, has every step gated and no job-level condition; `poshqc-linux-hooks` skips at job level when `run-heavy` is false;
+    - sharded shape (#953): the `poshqc-static`, `poshqc-shard` and `poshqc-linux-hooks` jobs skip at job level when `run-heavy` is false; the `poshqc` aggregator keeps `if: always()`, and every one of its steps is gated, so a skipped shard on a full run still fails the aggregator.
+  - If `origin/main` gains #952 or #953 before this item merges, the branch merges `origin/main` again and the affected gating and test adjustments are re-applied and re-verified. This is a recorded re-integration, not a halt.
+  - At authoring time, `origin/main` and this branch have no `merge_group` trigger in `ci.yml`, and `_poshqc.yml` has the unsharded `poshqc` / `poshqc-linux-hooks` job set.
 - **D6. Existing workflow tests (research §7, §9 item 16).**
   - #962 does not edit `tests/scripts/workflows/CiWorkflow.Tests.ps1` or `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1`, unless #962's gating breaks an existing assertion in one of them. If it does, the change is limited to that assertion and is recorded in the execution evidence.
   - #962's workflow invariants go in the new file `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1`.
@@ -161,7 +162,7 @@ The fix therefore has to keep every required job running under its full-run name
   - CI does not enforce the PowerShell threshold (`CoveragePercentTarget = 0`; research §5).
 - **D9. Workflow README.**
   - A section is appended to `.github/workflows/README.md`. It documents the change-scope decision, the allowlist, the fail-closed rules, the `run-heavy` input, and the per-context table from D1.
-  - The Triggers section is not edited, so the change composes with #952.
+  - The Triggers section is not edited, so the change composes with #952. The only pre-existing lines that change are the D14-a corrections of AC-35.
 
 ## Proposed Fix
 
@@ -184,7 +185,7 @@ The fix therefore has to keep every required job running under its full-run name
 
 ### Dependencies or blocked work:
 
-- #952 and #953 must be merged into `origin/main` first (D5).
+- None blocking. #952 and #953 compose with this item through `git merge origin/main` (D5).
 
 ### Implementation strategy (what changes, not sequencing):
 
@@ -199,6 +200,7 @@ Research §9 items 1–16:
 - `quality-tiers.yml`
 - `tests/scripts/ci/CiChangeScope.Tests.ps1`, `tests/scripts/ci/Invoke-CiChangeScope.Tests.ps1`, `tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1`
 - `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1`
+- D14 follow-ups: `scripts/bash/shell_qc_lib.sh`, `scripts/bash/shell-qc.sh`, `tests/shell/test_shell_qc_commands.bats` (the README and `_security-scan.yml` are already listed)
 
 #### Functions/classes/CLI commands impacted:
 
@@ -263,7 +265,7 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   - No temporary files in tests.
   - Each file is at most 500 lines.
 - External dependencies:
-  - #952 and #953 merged into `origin/main` (D5);
+  - #952 and #953 compose through `git merge origin/main` whenever they reach `origin/main` (D5);
   - the GitHub Actions REST API runs and jobs endpoints with `GITHUB_TOKEN`.
 
 ## Data / API / Config Impact
@@ -382,11 +384,11 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
 - [ ] AC-20: Reusable-workflow gating. `CiChangeScopeWorkflow.Tests.ps1` asserts and passes on the following, for each of `_quality-checks.yml`, `_security-scan.yml`, `_build-check.yml`, `_shell-coverage.yml`, `_drm-copilot-extension-tests.yml` and `_poshqc.yml`:
   - the file declares `run-heavy` with `type: boolean` and `default: true` under both `workflow_call` and `workflow_dispatch`;
   - every step of every job that produces a required context carries an `if:` that references `inputs.run-heavy`;
-  - the combined conditions from research §2.3 are present for `_quality-checks.yml` (poetry cache-miss step and the `3.13`-only step), for `_shell-coverage.yml` (kcov cache-miss step), and for `if: always()` upload steps (`always() && inputs.run-heavy`).
-- [ ] AC-21: `_poshqc.yml` sharded shape (after #953). `CiChangeScopeWorkflow.Tests.ps1` asserts and passes on the following:
-  - `poshqc-static`, `poshqc-shard` and `poshqc-linux-hooks` each carry a job-level `if: ${{ inputs.run-heavy }}`;
-  - the `poshqc` aggregator keeps `if: always()`;
-  - every aggregator step, including the step that requires the static and shard jobs to succeed, carries `inputs.run-heavy`.
+  - the combined conditions from research §2.3 are present for `_quality-checks.yml` (poetry cache-miss step and the `3.13`-only step), for `_shell-coverage.yml` (kcov cache-miss step), and for every `if: always()` step of a job that has no job-level `run-heavy` gate (`always() && inputs.run-heavy`); a step in a job gated at job level keeps its condition unchanged.
+- [ ] AC-21: `_poshqc.yml` gating in the shape present on the branch head (unsharded, or sharded after #953). `CiChangeScopeWorkflow.Tests.ps1` asserts and passes on the following:
+  - every `_poshqc.yml` job other than `poshqc` (`poshqc-linux-hooks`, and in the sharded shape also `poshqc-static` and `poshqc-shard`) carries a job-level `if: ${{ inputs.run-heavy }}`;
+  - the `poshqc` job carries no job-level `run-heavy` condition; in the sharded shape it keeps `if: always()`;
+  - every `poshqc` step carries `inputs.run-heavy`, including, in the sharded shape, the step that requires the static and shard jobs to succeed.
 - [ ] AC-22: Unchanged surfaces. `git diff --name-only origin/main...HEAD` lists none of the following:
   - `.github/workflows/_docs-validation.yml`;
   - `.github/workflows/_root-typescript-tests.yml`;
@@ -418,11 +420,11 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   - `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1` passes unchanged. This includes the existing tests that pin `skipping` as non-blocking (around line 79) and the `-RequireWorkflow` empty-set refusal (around line 364); the executor records both test names.
   - `git diff --name-only origin/main...HEAD` lists neither the parser, its bundle mirror, nor either skill file named in AC-22.
 - [ ] AC-29: Tier classification. `quality-tiers.yml` contains an entry with `path: "scripts/ci"`, `tier: T4` and a rationale. `scripts/dev_tools/check_quality_tiers.py` and `tests/scripts/dev_tools/test_quality_tiers_contract_classification.py` pass.
-- [ ] AC-30: Dependency ordering (D5).
-  - Before the first edit to `ci.yml` or `_poshqc.yml`, the executor records evidence that #952 and #953 are merged into `origin/main`.
-  - The branch contains a merge commit produced by `git merge origin/main` that includes both.
+- [ ] AC-30: Dependency composition (D5).
+  - Before the first edit to `ci.yml` or `_poshqc.yml`, the executor records the `origin/main` SHA, the heads of the #952 and #953 branches, and whether each dependency is present in `origin/main`.
+  - The branch contains `origin/main` through `git merge origin/main` (a merge commit, or a recorded "already up to date" state when the branch already contains it).
   - No rebase or force push is performed on `bug/ci-skip-evidence-only-commits-962`.
-  - If either dependency was not merged at execution start, a recorded blocked state exists instead, and neither workflow file was edited.
+  - If `origin/main` gained #952 or #953 after execution started, a recorded re-integration exists: `origin/main` merged again and the affected gating and test adjustments re-verified.
 - [ ] AC-31: Evidence location. Every evidence artifact produced by execution is written under `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/evidence/<kind>/`.
 - [ ] AC-32 (CI-AC-1): First implementation push runs full CI. On #962's own PR, the run for the first implementation push has:
   - run conclusion `success`;
@@ -446,6 +448,10 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   - the `Change scope` log shows `code=true reason=NON_ALLOWLISTED_PATH: <path>`.
 
   Proof Procedure step P3. (CI-dependent; verified at S9 on the PR head by the item's orchestrator)
+- [ ] AC-35 (D14-a): Workflow README counts. `.github/workflows/README.md` states that `ci.yml` composes nine reusable per-stage workflows, its Per-Stage Dispatch table lists `_npm-audit-gate.yml`, and the sentence that began "All seven jobs in" begins "The seven jobs it extracted from". No other pre-existing line changes. Verified by the plan's README check.
+- [ ] AC-36 (D14-b): Security scan is blocking. In `.github/workflows/_security-scan.yml`, a step named `Install the Poetry export plugin` runs `poetry self add poetry-plugin-export` directly before the step `Check for security vulnerabilities`, that step declares `shell: bash`, and the `security-scan` job carries no `continue-on-error`. Both steps are gated by `inputs.run-heavy`. Verified by a named Pester test tagged `(AC-36)` in `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1`. The safety result of the first full PR run is recorded; if it reports findings, each finding is recorded under the feature `evidence/other/` folder, a remediation cycle restores `continue-on-error: true` on the scan step only, and this criterion stays unchecked until that cycle completes. (CI-dependent; verified at S9 by the item's orchestrator)
+- [ ] AC-37 (D14-c): Recursive bats discovery. `scripts/bash/shell_qc_lib.sh` passes `--recursive` to bats in both `run_test` and `run_test_coverage`. The bats tests `test passes --recursive to bats for each test directory` and `test --coverage passes --recursive to bats under kcov` in `tests/shell/test_shell_qc_commands.bats` pass in the `shell-coverage / Shell Coverage (Bats + kcov)` job, and the number of tests that job runs equals the number of `@test` lines under `tests/shell/` at the run head. (CI-dependent; verified at S9 by the item's orchestrator)
+- [ ] AC-38 (D14-d): Bash coverage threshold. `scripts/bash/shell_qc_lib.sh` defines `check_coverage_threshold`, which `run_test_coverage` calls after the coverage summary, with the minimum taken from `SHELL_QC_MIN_LINE_COVERAGE` (default 85). Six named bats tests (below, equal to, and above the minimum; a non-integer minimum; a minimum above 100; a missing report) pass in the `shell-coverage / Shell Coverage (Bats + kcov)` job, whose log for the first full PR run prints `Bash coverage <NN.N>% meets the minimum line coverage of 85%.`. Every changed shell file is 500 lines or fewer. (CI-dependent; verified at S9 by the item's orchestrator)
 
 ## Proof Procedure
 
@@ -554,11 +560,11 @@ Expected:
 The following defects were observed in research §12 and are not fixed by this item:
 
 1. `.github/instructions/github-actions.instructions.md:15` cites a CI `actionlint` job in `ci.yml`. No such job exists, so workflow edits are not linted in CI. This item runs actionlint locally (AC-25) but does not add a CI job.
-2. `.github/workflows/README.md` describes "eight reusable per-stage workflows" and "All seven jobs", omits `_npm-audit-gate.yml`, and does not match the nine caller jobs in `ci.yml`. This item appends a section only and does not correct that text.
-3. The only substantive step in `_security-scan.yml` has `continue-on-error: true`, so `security-scan / Security Scanning` cannot fail on a finding. This item gates the steps but does not change `continue-on-error`.
+2. Moved into scope by coordinator decision D14-a (AC-35): `.github/workflows/README.md` described "eight reusable per-stage workflows" and "All seven jobs" and omitted `_npm-audit-gate.yml`; those lines are corrected.
+3. Moved into scope by coordinator decision D14-b (AC-36): the only substantive step in `_security-scan.yml` had `continue-on-error: true`, and `poetry export` was unavailable under Poetry 2.x, so the scan could neither fail nor read any package. The step is made blocking with a working export; if the first full PR run reports findings, the remediation rule of AC-36 applies.
 4. The supplied #953 patch does not update `tests/scripts/workflows/PoshQcWorkflow.Tests.ps1` (lines 51 and 58). Resolving this belongs to #953 (unverified whether it is already handled there).
-5. The bats runner discovers only top-level files in `tests/shell` and `tests/bash`, which conflicts with the mirrored test-location rule.
-6. CI does not enforce coverage thresholds for PowerShell (`CoveragePercentTarget = 0`) or for bash.
+5. Moved into scope by coordinator decision D14-c (AC-37): the bats runner discovered only top-level files in `tests/shell` and `tests/bash`.
+6. CI does not enforce a coverage threshold for PowerShell (`CoveragePercentTarget = 0`); that part remains owned by #953. The bash part is moved into scope by coordinator decision D14-d (AC-38).
 
 Also out of scope:
 - research Candidates A and C;
@@ -584,8 +590,8 @@ Also out of scope:
 ## Rollout & Follow-up
 
 - Release/rollout steps:
-  1. Merge #952 and #953.
-  2. Integrate with `git merge origin/main`.
+  1. Record whether #952 and #953 are in `origin/main` (they are not prerequisites).
+  2. Integrate with `git merge origin/main`, and again whenever `origin/main` gains #952 or #953 before this item merges.
   3. Implement.
   4. Prove on #962's own PR (`## Proof Procedure`).
   5. Merge.
