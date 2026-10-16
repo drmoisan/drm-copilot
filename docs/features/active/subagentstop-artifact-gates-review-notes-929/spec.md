@@ -245,8 +245,8 @@ Toolchain and CI:
 - [x] AC-23: line coverage of `.claude/hooks/validate-task-researcher-output.ps1` does not regress: in the counters recorded under AC-18, the final `missed` LINE value is not greater than the baseline `missed` LINE value.
 - [x] AC-24: no file created or edited by this item exceeds 500 lines (`(Get-Content <file>).Count` recorded for each PowerShell file in "Files/modules to change").
 - [x] AC-25: the plan contains no `[expect-fail]` task and states that every new test is a characterization test against unchanged behavior and that NB-5 preserves behavior.
-- [ ] AC-26 (CI-dependent): CI job `poshqc / PowerShell QC` concludes `success` on the PR head SHA.
-- [ ] AC-27 (CI-dependent): CI job `poshqc / PowerShell hook suites (Linux)` concludes `success` on the PR head SHA.
+- [x] AC-26 (CI-dependent): CI job `poshqc / PowerShell QC` concludes `success` on the PR head SHA.
+- [x] AC-27 (CI-dependent): CI job `poshqc / PowerShell hook suites (Linux)` concludes `success` on the PR head SHA.
 
 ## Risks & Mitigations
 - Technical or operational risks:
