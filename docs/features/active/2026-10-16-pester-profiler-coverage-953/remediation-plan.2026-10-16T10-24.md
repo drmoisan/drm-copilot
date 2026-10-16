@@ -195,50 +195,50 @@ Ownership: P0-T1 is `(owner: orchestrator)` and completes before the executor st
   - The file also contains `Timestamp:`, `Command:`, `EXIT_CODE:` (of the last command), `Output Summary:`, and `HOST_CHANGE_SCOPE: CurrentUser PowerShell module path (outside the repository)`.
   - Acceptance: `PESTER_IN_RANGE_AFTER` is not `NONE`, and `PESTER_VERSIONS_AFTER` lists at least one version outside the range (the out-of-range versions are the discrimination input of P2-T7). Otherwise stop BLOCKED.
   - The orchestrator commits this file, this plan, and `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-inputs.2026-10-16T10-24.md` before starting the executor.
-- [ ] [P0-T2] Verify the orchestrator precondition in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/` and probe the Tool route.
+- [x] [P0-T2] Verify the orchestrator precondition in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/` and probe the Tool route.
   - Select the lexicographically greatest `r1-local-pester-precondition.*.md`. Confirm that it contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and a `PESTER_IN_RANGE_AFTER:` value other than `NONE`.
   - Write `SCRATCH/issue-953-r1-probe.sh` with the Tool-route fixed body: line 1 `export MSYS_NO_PATHCONV=1`; line 2 `pwsh -NoProfile -Command '$S = "<SCRATCH absolute path, forward slashes>"; $PSVersionTable.PSVersion.ToString()'`. Run it from the Bash tool as `sh "<SCRATCH absolute path, forward slashes>/issue-953-r1-probe.sh"`.
   - Acceptance: the artifact check passes, and the probe exits 0 and prints a version. Otherwise record `TOOL_ROUTE: DENIED` or `PRECONDITION: MISSING` in the report and stop BLOCKED.
-- [ ] [P0-T3] Read the repository-root `CLAUDE.md` (standing instructions, policy reading order) and `.github/copilot-instructions.md` (the tone policy it names as authoritative).
-- [ ] [P0-T4] Read `.claude/rules/general-code-change.md` (toolchain loop, 500-line limit, error handling).
-- [ ] [P0-T5] Read `.claude/rules/general-unit-test.md` (coverage defaults and precedence, Coverage Exclusion Policy, no temporary files, determinism).
-- [ ] [P0-T6] Read `.claude/rules/quality-tiers.md` and confirm from `quality-tiers.yml:13-14` that `scripts/powershell/PoshQC` is tier T3 (no property-test or mutation obligation).
-- [ ] [P0-T7] Read `.claude/rules/powershell.md` (PoshQC toolchain order, change budget, seams, Pester standards).
-- [ ] [P0-T8] Read `.claude/rules/python.md` (toolchain for the bundled-parity pytest at `tests/scripts/dev_tools/test_poshqc_bundled_parity.py`).
-- [ ] [P0-T9] Write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/phase0-instructions-read.<ts>.md`.
+- [x] [P0-T3] Read the repository-root `CLAUDE.md` (standing instructions, policy reading order) and `.github/copilot-instructions.md` (the tone policy it names as authoritative).
+- [x] [P0-T4] Read `.claude/rules/general-code-change.md` (toolchain loop, 500-line limit, error handling).
+- [x] [P0-T5] Read `.claude/rules/general-unit-test.md` (coverage defaults and precedence, Coverage Exclusion Policy, no temporary files, determinism).
+- [x] [P0-T6] Read `.claude/rules/quality-tiers.md` and confirm from `quality-tiers.yml:13-14` that `scripts/powershell/PoshQC` is tier T3 (no property-test or mutation obligation).
+- [x] [P0-T7] Read `.claude/rules/powershell.md` (PoshQC toolchain order, change budget, seams, Pester standards).
+- [x] [P0-T8] Read `.claude/rules/python.md` (toolchain for the bundled-parity pytest at `tests/scripts/dev_tools/test_poshqc_bundled_parity.py`).
+- [x] [P0-T9] Write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/phase0-instructions-read.<ts>.md`.
   - Fields: `Timestamp:`, `Policy Order:` (CLAUDE.md, copilot-instructions, general-code-change, general-unit-test, quality-tiers, powershell, python), and the explicit list of the eight files read in P0-T3 through P0-T8: `CLAUDE.md`, `.github/copilot-instructions.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`, `quality-tiers.yml`, `.claude/rules/powershell.md`, `.claude/rules/python.md`.
   - Acceptance: all eight paths are listed in that order.
-- [ ] [P0-T10] Record the branch state and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-branch-state.<ts>.md`.
+- [x] [P0-T10] Record the branch state and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-branch-state.<ts>.md`.
   - Run `git fetch origin main`, `git merge-base HEAD origin/main`, `git rev-parse HEAD`, `git branch --show-current`, and `git status --porcelain --untracked-files=all` from the Bash tool.
   - The file contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (the porcelain output), `REM_BASE_SHA: <40-hex HEAD>`, `BASE_SHA: <40-hex merge base>`, and `BRANCH: bug/pester-profiler-coverage-953`.
   - Acceptance: every command exits 0; the branch value equals `bug/pester-profiler-coverage-953`; and every porcelain line is one of two permitted forms:
     - an untracked path under the feature folder: the line starts with `?? docs/features/active/2026-10-16-pester-profiler-coverage-953/`;
     - a modification of exactly this plan file (checkbox state from P0-T2 through P0-T9): the two-character status is ` M`, `M `, or `MM`, and the path is exactly `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-plan.2026-10-16T10-24.md`.
   - Any other porcelain line, including a modification of any other tracked file, fails the acceptance: no other tracked file is modified before the cycle starts. Stop BLOCKED and record the line.
-- [ ] [P0-T11] Record bundled-copy identity and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-bundle-identity.<ts>.md`.
+- [x] [P0-T11] Record bundled-copy identity and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-bundle-identity.<ts>.md`.
   - Compute `(Get-FileHash -Algorithm SHA256 -LiteralPath <path>).Hash` for two pairs:
     1. `scripts/powershell/PoshQC/PoshQC.Testing.psm1` and `extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1`.
     2. `scripts/powershell/PoshQC/PoshQC.psm1` and `extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psm1`.
   - The file contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, `PAIR_1_EQUAL: YES|NO`, and `PAIR_2_EQUAL: YES|NO`.
   - Acceptance: both pairs record `YES`. If either records `NO`, stop BLOCKED: an Edit-tool repair of a bundled copy is prohibited ("Never edit a bundled copy").
-- [ ] [P0-T12] Record baseline line counts and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-line-counts.<ts>.md`.
+- [x] [P0-T12] Record baseline line counts and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-line-counts.<ts>.md`.
   - Run `(Get-Content -LiteralPath <path>).Count` for `scripts/powershell/PoshQC/PoshQC.Testing.psm1`, `scripts/powershell/PoshQC/PoshQC.psm1`, `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1`, and `tests/scripts/powershell/PoshQC/PoshQC.TestingSeamDefaults.Tests.ps1`.
   - The file contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and one line `LINES: <path> <count>` per file.
   - Acceptance: `PoshQC.Testing.psm1` is 461, `PoshQC.RunSettings.Tests.ps1` is 163, `PoshQC.TestingSeamDefaults.Tests.ps1` is 122, and `PoshQC.psm1` records an integer (`PSM1_BASELINE_LINES`). If any of the three fixed counts differs, the planning-time line citations no longer hold: stop BLOCKED.
-- [ ] [P0-T13] Capture the bundled-parity baseline with `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py -q` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-parity-pytest.<ts>.md`.
+- [x] [P0-T13] Capture the bundled-parity baseline with `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py -q` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-parity-pytest.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` quoting the summary line. The Output Summary also states that Python coverage is not measured because no Python file is in scope.
   - Acceptance: EXIT_CODE 0 and the summary line contains `1 passed`.
-- [ ] [P0-T14] Capture the PoshQC format baseline (write-mode tool) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-poshqc-format.<ts>.md`.
+- [x] [P0-T14] Capture the PoshQC format baseline (write-mode tool) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-poshqc-format.<ts>.md`.
   - Record `$before = git status --porcelain`. Run `pwsh -NoProfile -Command "Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCFormat -Root (Get-Location).Path" *> (Join-Path $S 'issue-953-r1-baseline-format.log')`, record `$LASTEXITCODE`, then record `$after = git status --porcelain`.
   - The Output Summary states the count of log lines that start with `Formatted: ` (case-sensitive; `scripts/powershell/PoshQC/PoshQC.Analyzer.psm1:62`) and whether `$before` equals `$after`. A file that needs no change logs `Already formatted:` instead (`:64`).
   - Acceptance: EXIT_CODE 0, zero `Formatted: ` lines, and `$before` equal to `$after`. If any file was reformatted, record its path as `PRE_EXISTING_FORMAT_DRIFT:`, restore it with `git restore --source=HEAD --worktree -- <path>`, and stop BLOCKED.
-- [ ] [P0-T15] Capture the PoshQC analyze baseline with `pwsh -NoProfile -Command "Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCAnalyze -Root (Get-Location).Path" *> (Join-Path $S 'issue-953-r1-baseline-analyze.log')` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-poshqc-analyze.<ts>.md`.
+- [x] [P0-T15] Capture the PoshQC analyze baseline with `pwsh -NoProfile -Command "Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCAnalyze -Root (Get-Location).Path" *> (Join-Path $S 'issue-953-r1-baseline-analyze.log')` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-poshqc-analyze.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: EXIT_CODE 0 and the log contains the literal `PSScriptAnalyzer passed: no findings under` (`scripts/powershell/PoshQC/PoshQC.Analyzer.psm1:185`). On a non-zero exit, record the findings and stop BLOCKED.
-- [ ] [P0-T16] Capture the targeted baseline by running TARGETED_RUN(`baseline-targeted`, R1_SET) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-targeted-tests.<ts>.md`.
+- [x] [P0-T16] Capture the targeted baseline by running TARGETED_RUN(`baseline-targeted`, R1_SET) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-targeted-tests.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (the JRP totals `tests`, `failures`, and `errors`, and the JRP token check for RS01-RS07, every MC token, every INST token, and every SEAM token), and `R1_TARGETED_BASELINE_TESTS: <JRP tests>`.
   - Acceptance: run valid, EXIT_CODE 0, `failures` 0, `errors` 0, and every listed token PASS. This is the behavior baseline for CR-3.
-- [ ] [P0-T17] Capture the full Pester baseline with coverage by running FULL_RUN(baseline) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-poshqc-test-coverage.<ts>.md`.
+- [x] [P0-T17] Capture the full Pester baseline with coverage by running FULL_RUN(baseline) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-poshqc-test-coverage.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and `R1_BASELINE_JUNIT_TESTS: <JRP tests>`.
   - The Output Summary contains:
     - The JRP totals (`JUNIT_TESTS`, `JUNIT_FAILURES`, `JUNIT_ERRORS`) and the FULL_RUN wall seconds.
