@@ -579,7 +579,7 @@ exit 0
 
 Every edit in this phase uses the Edit tool on a test file (no batch-budget slot). The anchor text quoted in each task is unique in its file at PLAN_HEAD.
 
-- [ ] [P3-T1] Edit `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1`: insert the five lines below between line 92 (`    }`, closing SH12) and line 93 (`}`, closing `Describe 'Get-PoshQCShardSlice'`). Anchor the Edit on line 91 (`        { Get-PoshQCShardSlice -TestFile @('a', 'b', 'c') -Weight @(1, 2) -ShardIndex 1 -ShardCount 2 } | Should -Throw '*Weight lists 2 values; TestFile lists 3 files*'`) and lines 92-93. No other line changes.
+- [x] [P3-T1] Edit `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1`: insert the five lines below between line 92 (`    }`, closing SH12) and line 93 (`}`, closing `Describe 'Get-PoshQCShardSlice'`). Anchor the Edit on line 91 (`        { Get-PoshQCShardSlice -TestFile @('a', 'b', 'c') -Weight @(1, 2) -ShardIndex 1 -ShardCount 2 } | Should -Throw '*Weight lists 2 values; TestFile lists 3 files*'`) and lines 92-93. No other line changes.
   - Acceptance: `SH13-SLICE-NEGATIVE-WEIGHT-THROWS` occurs exactly once in the file.
 
 ```powershell
@@ -590,7 +590,7 @@ Every edit in this phase uses the Edit tool on a test file (no batch-budget slot
     }
 ```
 
-- [ ] [P3-T2] Edit `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1`: append the 46 lines below after the final `}` of the file (the `}` that closes `Describe 'Test-PoshQCShardTestCount'`, line 177 after P3-T1). Anchor the Edit on the last four lines of the file (`        Test-PoshQCShardTestCount -ShardTestCount @(10, 20, 30) -DiscoveryCount 60 | Should -BeTrue`, `        Test-PoshQCShardTestCount -ShardTestCount @() -DiscoveryCount 0 | Should -BeTrue`, `    }`, `}`). No other line changes.
+- [x] [P3-T2] Edit `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1`: append the 46 lines below after the final `}` of the file (the `}` that closes `Describe 'Test-PoshQCShardTestCount'`, line 177 after P3-T1). Anchor the Edit on the last four lines of the file (`        Test-PoshQCShardTestCount -ShardTestCount @(10, 20, 30) -DiscoveryCount 60 | Should -BeTrue`, `        Test-PoshQCShardTestCount -ShardTestCount @() -DiscoveryCount 0 | Should -BeTrue`, `    }`, `}`). No other line changes.
   - Acceptance: each of `SH14-WEIGHT-IGNORES-LINE-ENDINGS` and `SH15-SELECT-WEIGHS-CHECKED-IN-FILES-BY-NORMALIZED-TEXT` occurs exactly once in the file.
 
 ```powershell
@@ -642,11 +642,11 @@ Describe 'Get-PoshQCShardTestFileWeight and Select-PoshQCShardTestFile weights' 
 }
 ```
 
-- [ ] [P3-T3] Verify the test edits and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-shard-test-edits.<ts>.md`.
+- [x] [P3-T3] Verify the test edits and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-shard-test-edits.<ts>.md`.
   - Run `git diff --numstat <REM_BASE_SHA> -- tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1` from the Bash tool, and through the Tool route the `ParseFile` error count and `(Get-Content -LiteralPath tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1).Count`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: numstat `51` added and `0` deleted; 0 parse errors; 223 lines (172 + 5 + 46; AC-15).
-- [ ] [P3-T4] [expect-fail] Run TARGETED_RUN(`shard-before`, R3_SHARD_SET) on the pre-fix production tree and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-shard-fail-before.<ts>.md`.
+- [x] [P3-T4] [expect-fail] Run TARGETED_RUN(`shard-before`, R3_SHARD_SET) on the pre-fix production tree and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-shard-fail-before.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 3`, and `Output Summary:` with the JRP totals, the JRP failure check (step 5) with the failure message for every R3_NEW_TOKENS entry, and the JRP token check (step 4) for every R3_SHARD_OLD_TOKENS entry.
   - Acceptance:
     - Run valid, EXIT_CODE 3 (Pester exits with the failed-test count when `Run.Exit` is set), JRP `tests` equal to `R3_TARGETED_BASELINE_TESTS` (latest `r3-targeted-tests.*.md` in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/`) plus 3, `failures` 3, and `errors` 0.

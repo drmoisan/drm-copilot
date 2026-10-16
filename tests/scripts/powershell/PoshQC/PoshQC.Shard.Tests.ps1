@@ -90,6 +90,11 @@ Describe 'Get-PoshQCShardSlice' {
     It 'SH12-SLICE-WEIGHT-COUNT-MISMATCH-THROWS rejects a weight list whose length differs from the file list' {
         { Get-PoshQCShardSlice -TestFile @('a', 'b', 'c') -Weight @(1, 2) -ShardIndex 1 -ShardCount 2 } | Should -Throw '*Weight lists 2 values; TestFile lists 3 files*'
     }
+
+    It 'SH13-SLICE-NEGATIVE-WEIGHT-THROWS rejects a negative weight and names the file (CR-18)' {
+        { Get-PoshQCShardSlice -TestFile @('a', 'b', 'c') -Weight @(2, -1, 3) -ShardIndex 1 -ShardCount 2 } | Should -Throw "*Weight must not be negative; 'b' has weight -1*"
+        (@(Get-PoshQCShardSlice -TestFile @('a', 'b') -Weight @(0, 0) -ShardIndex 1 -ShardCount 2) -join ',') | Should -BeExactly 'a' -Because 'a zero weight is valid'
+    }
 }
 
 Describe 'New-PoshQCShardManifest' {
@@ -168,5 +173,51 @@ Describe 'Test-PoshQCShardTestCount' {
     It 'SH09-TESTCOUNT-MATCH-PASSES when the shard counts sum to the discovery count' {
         Test-PoshQCShardTestCount -ShardTestCount @(10, 20, 30) -DiscoveryCount 60 | Should -BeTrue
         Test-PoshQCShardTestCount -ShardTestCount @() -DiscoveryCount 0 | Should -BeTrue
+    }
+}
+
+Describe 'Get-PoshQCShardTestFileWeight and Select-PoshQCShardTestFile weights' {
+    It 'SH14-WEIGHT-IGNORES-LINE-ENDINGS weights a FileInfo item by the UTF-8 size of its text with CRLF counted as LF (CR-19)' {
+        # Arrange: in-memory texts only; the FileInfo items name paths that are never opened.
+        $texts = @{ 'a.Tests.ps1' = ("x`n" * 10); 'b.Tests.ps1' = (('y' * 24) + "`n") }
+        $readLf = { param([string] $Path) $texts[[System.IO.Path]::GetFileName($Path)] }.GetNewClosure()
+        $readCrLf = { param([string] $Path) $texts[[System.IO.Path]::GetFileName($Path)].Replace("`n", "`r`n") }.GetNewClosure()
+
+        InModuleScope PoshQC -Parameters @{ LfReader = $readLf; CrLfReader = $readCrLf } {
+            param([scriptblock] $LfReader, [scriptblock] $CrLfReader)
+            $items = @([System.IO.FileInfo]::new('/shard-root/tests/a.Tests.ps1'), [System.IO.FileInfo]::new('/shard-root/tests/b.Tests.ps1'))
+
+            # Act
+            $lfWeights = @(Get-PoshQCShardTestFileWeight -TestFile $items -ReadTestFileText $LfReader)
+            $crLfWeights = @(Get-PoshQCShardTestFileWeight -TestFile $items -ReadTestFileText $CrLfReader)
+            $otherWeights = @(Get-PoshQCShardTestFileWeight -TestFile @('/shard-root/tests/c.Tests.ps1', [pscustomobject]@{ FullName = '/shard-root/tests/d.Tests.ps1'; Length = [long] 7 }))
+
+            # Assert: raw CRLF sizes (30 and 26) would make a heavier than b; the normalized sizes keep b heavier.
+            ($lfWeights -join ',') | Should -BeExactly '20,25'
+            ($crLfWeights -join ',') | Should -BeExactly '20,25' -Because 'a CRLF checkout must compute the same weights as an LF checkout'
+            ($otherWeights -join ',') | Should -BeExactly '1,7' -Because 'a path string weighs 1 and another object weighs its Length property'
+        }
+    }
+
+    It 'SH15-SELECT-WEIGHS-CHECKED-IN-FILES-BY-NORMALIZED-TEXT reads FileInfo items through the default reader and gives shard 1 the heavier file (CR-19)' {
+        # Arrange: two checked-in module files are read; nothing is written.
+        $moduleRoot = Join-Path $PSScriptRoot '../../../../scripts/powershell/PoshQC'
+        $items = @(Get-Item -LiteralPath (Join-Path $moduleRoot 'PoshQC.Shard.psm1'), (Join-Path $moduleRoot 'PoshQC.CoverageMerge.psm1'))
+
+        InModuleScope PoshQC -Parameters @{ Items = $items } {
+            param([object[]] $Items)
+            $readCrLf = { param([string] $Path) [System.IO.File]::ReadAllText($Path) -replace "`r?`n", "`r`n" }
+
+            # Act
+            $defaultWeights = @(Get-PoshQCShardTestFileWeight -TestFile $Items)
+            $crLfWeights = @(Get-PoshQCShardTestFileWeight -TestFile $Items -ReadTestFileText $readCrLf)
+            $selected = @(Select-PoshQCShardTestFile -RootPath '/shard-root' -TestFile $Items -ShardIndex 1 -ShardCount 2 -WriteShardFileList { })
+
+            # Assert
+            ($defaultWeights -join ',') | Should -BeExactly ($crLfWeights -join ',') -Because 'the default reader and a CRLF copy of the same text give equal weights'
+            $defaultWeights[0] | Should -Not -Be $defaultWeights[1] -Because 'the two module files differ in size'
+            $heavier = if ($defaultWeights[0] -gt $defaultWeights[1]) { $Items[0].FullName } else { $Items[1].FullName }
+            ($selected -join ',') | Should -BeExactly $heavier -Because 'shard 1 receives the heaviest file first'
+        }
     }
 }
