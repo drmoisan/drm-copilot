@@ -182,34 +182,34 @@ Static checks (format, lint, type-check) for the files written in this phase are
 
 ### Phase 3 — TypeScript G10 Implementation
 
-- [ ] [P3-T1] Create `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` (the TypeScript twin)
+- [x] [P3-T1] Create `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` (the TypeScript twin)
   - Imports: `import type { PlanGateReport } from "./plan-gate-rules";` (types only from that module) and `PLAN_GATE_HEADING_PATTERN`, `PLAN_GATE_TASK_PATTERN` from `./plan-gate-commands`.
   - Exports: `G10_SEVERITY: string = "blocking"`; `SCRATCH_DEFINITION_PATTERN` and `SCRATCH_NAMESPACE_PATTERN` as `String.raw` template strings identical to the Python raw strings; `bareScratchDefinitions(text: string): Array<[number, string]>`; `scratchFindingMessage(lineNumber: number, logicalLine: string): string`; `evaluateScratchGate(report: PlanGateReport, text: string, severity: string = G10_SEVERITY): void`.
   - Behaviour: identical to [P2-T1]. Line splitting matches the extractor's private `splitLines` (`text.split(/\r\n|\n|\r/)`, an empty text yields no lines, and a trailing empty element after a final newline is dropped so line numbers match Python `splitlines()`); fence regex `/^\s*```/`; normalization `value.split(/\s+/).filter((word) => word !== "").join(" ")`; the namespace test runs on `logical.slice(match.index + match[0].length)`. No `pythonRepr(` call. TSDoc on every export. At most 500 lines.
   - Acceptance: `npx tsc -p ./ --noEmit` (working directory `extensions/drm-copilot/`) exits 0.
-- [ ] [P3-T2] Wire G10 into `extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts` and correct its JSDoc
+- [x] [P3-T2] Wire G10 into `extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts` and correct its JSDoc
   - Add `import { evaluateScratchGate } from "./plan-gate-scratch";`, a re-export block `export { bareScratchDefinitions, evaluateScratchGate, G10_SEVERITY, scratchFindingMessage } from "./plan-gate-scratch";`, and an unconditional `evaluateScratchGate(report, text);` as the last statement before `return report;` in `evaluatePlanGates`.
   - Replace the `@param context` text that states the Blocking list is byte-identical to the pre-change output with text stating that the context-free rules G1, G4, G7, G8, G8b, and G10 run without a context and that G10 can add Blocking findings; name the gate set through G10 in the JSDoc summary line.
   - Acceptance: the file stays at most 500 lines and contains no `pre-change output` text (verified by the JSDoc case in [P3-T7]).
-- [ ] [P3-T3] Add the per-file coverage threshold for the new module to `extensions/drm-copilot/jest.config.cjs`
+- [x] [P3-T3] Add the per-file coverage threshold for the new module to `extensions/drm-copilot/jest.config.cjs`
   - Insert, directly after the `./src/lib/validate/plan-gate-observability.ts` entry, a two-line comment (`// Issue #932: the document-level G10 rule module. This map carries no` / `// global key, so the new production file is gated by its own entry.`) followed by the entry `"./src/lib/validate/plan-gate-scratch.ts": { lines: 85, branches: 75 },` written across four lines in the file's existing style. Net addition at most 6 lines (file stays at most 489 lines).
   - Acceptance: the threshold-entry case in `plan-gate-scratch.test.ts` passes in [P3-T7].
-- [ ] [P3-T4] Update the stale context-free comments in `extensions/drm-copilot/test/lib/validate/plan-gate-observability-boundaries.test.ts`
+- [x] [P3-T4] Update the stale context-free comments in `extensions/drm-copilot/test/lib/validate/plan-gate-observability-boundaries.test.ts`
   - Edit the doc comment above the expected G1 blocking strings and the assertion comment in the blocking-channel case with the same meaning as [P2-T4]. Comment-only.
   - Acceptance: `npx jest --config jest.config.cjs test/lib/validate/plan-gate-observability-boundaries.test.ts` passes with 0 failed.
-- [ ] [P3-T5] Run the TypeScript format check on the Phase 1 and Phase 3 TypeScript files and record `<FEATURE>/evidence/regression-testing/ts-format-phase3.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P3-T5] Run the TypeScript format check on the Phase 1 and Phase 3 TypeScript files and record `<FEATURE>/evidence/regression-testing/ts-format-phase3.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx prettier --check src/lib/validate/plan-gate-scratch.ts src/lib/validate/plan-gate-discrimination.ts test/lib/validate/plan-gate-scratch.test.ts test/lib/validate/plan-gate-parity.test.ts test/lib/validate/validate-orchestration-service-call-plan-gates.test.ts test/lib/validate/plan-gate-observability-boundaries.test.ts jest.config.cjs`
   - Acceptance: `EXIT_CODE: 0` and the line `All matched files use Prettier code style!`. Remediation branch: run `npx prettier --write` over the same seven paths, record each path it reports as `(unchanged)` or rewritten, then rerun from [P3-T5].
 - [ ] [P3-T6] Run the TypeScript lint check on the same seven files and record `<FEATURE>/evidence/regression-testing/ts-lint-phase3.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx eslint src/lib/validate/plan-gate-scratch.ts src/lib/validate/plan-gate-discrimination.ts test/lib/validate/plan-gate-scratch.test.ts test/lib/validate/plan-gate-parity.test.ts test/lib/validate/validate-orchestration-service-call-plan-gates.test.ts test/lib/validate/plan-gate-observability-boundaries.test.ts jest.config.cjs`
   - Acceptance: `EXIT_CODE: 0` with no reported problems. Any suppression follows `.claude/rules/typescript-suppressions.md`.
-- [ ] [P3-T7] Run both TypeScript type checks and the validate test directory and record `<FEATURE>/evidence/regression-testing/ts-green.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P3-T7] Run both TypeScript type checks and the validate test directory and record `<FEATURE>/evidence/regression-testing/ts-green.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Commands: `npx tsc -p ./ --noEmit`, `npx tsc -p tsconfig.jest.json --noEmit`, `npx jest --config jest.config.cjs --verbose test/lib/validate`.
   - Acceptance: all three exit 0; `Output Summary:` records the jest suite and test pass counts and 0 failed. From the `--verbose` per-case lines: under the `plan-gate-scratch G10` describe title, the passing case titles equal, one for one, the `TS_CASE_COUNT:` title list recorded in the latest `<FEATURE>/evidence/regression-testing/ts-red.*.md` (no title missing, no extra title); the parity case `renders offending values without pythonRepr formatting` and the case `throws with the G10 message when a SCRATCH definition is not namespaced` are listed as passing. The artifact quotes those verbose lines.
-- [ ] [P3-T8] Run the Python severity parity node against the new TypeScript module in `tests/scripts/dev_tools/test_plan_gate_scratch.py` and append the result to the latest `<FEATURE>/evidence/regression-testing/ts-green.*.md`
+- [x] [P3-T8] Run the Python severity parity node against the new TypeScript module in `tests/scripts/dev_tools/test_plan_gate_scratch.py` and append the result to the latest `<FEATURE>/evidence/regression-testing/ts-green.*.md`
   - Command: `poetry run pytest tests/scripts/dev_tools/test_plan_gate_scratch.py::test_g10_severity_constant_matches_typescript`
   - Acceptance: exit 0 with 1 passed.
-- [ ] [P3-T9] Commit and push the TypeScript implementation in `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` and its wiring, the jest threshold, the comment edit, the evidence, and the plan check-offs
+- [x] [P3-T9] Commit and push the TypeScript implementation in `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` and its wiring, the jest threshold, the comment edit, the evidence, and the plan check-offs
   - Commands: `git add extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts extensions/drm-copilot/jest.config.cjs extensions/drm-copilot/test/lib/validate/plan-gate-observability-boundaries.test.ts` plus any file rewritten in [P3-T5], the evidence folder, and the plan file; `git commit -m "fix(932): add G10 bare SCRATCH definition gate to the TypeScript plan validator"`; `git push origin HEAD`.
   - Acceptance: `git status --porcelain` prints nothing after the push; the push exits 0.
 
