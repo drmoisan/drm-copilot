@@ -254,41 +254,41 @@ Static checks for the files written in this phase are deferred to Phase 2 (Pytho
 
 ### Phase 3 — TypeScript Implementation (N-3)
 
-- [ ] [P3-T1] Move the TypeScript declaration into `extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts` and record `<FEATURE>/evidence/regression-testing/move-typescript-rc3.<timestamp>.md`
+- [x] [P3-T1] Move the TypeScript declaration into `extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts` and record `<FEATURE>/evidence/regression-testing/move-typescript-rc3.<timestamp>.md`
   - Command (repository root): `poetry run python SCRATCH/stage/move_whitespace_class.py typescript`
   - The helper removes the TSDoc block, the `export const PLAN_WHITESPACE_CLASS` line, the blank line after it, and the `WHITESPACE_RUN_RE` line from `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` (lines 67-79), and inserts the new TSDoc, the same declaration line verbatim, `PLAN_WHITESPACE_RUN_RE`, and `normalizePlanWhitespace` after `splitPlanLines` in `plan-gate-commands.ts`.
   - Acceptance:
     - `EXIT_CODE: 0`, and the output line `TYPESCRIPT_DECLARATIONS: scratch=0 commands=1` is quoted in `Output Summary:`. An `ANCHOR_NOT_FOUND:` line halts the task.
     - The Grep tool, output mode `count`, on `plan-gate-commands.ts` returns 1 for the pattern `^export const PLAN_WHITESPACE_CLASS = String\.raw`, 1 for the pattern `^export function normalizePlanWhitespace\(`, and 0 for the raw-character pattern in Conventions.
     - The `plan-gate-commands.ts` line count is at most 500 (444 before; about 474 expected).
-- [ ] [P3-T2] Complete `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` to import the shared class and normalizer (N-3)
+- [x] [P3-T2] Complete `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` to import the shared class and normalizer (N-3)
   - Apply the Appendix F1 edits with the Edit tool: the import statement, the removal of `normalizeWhitespace` and its TSDoc, the three call-site renames, and the module-TSDoc bullet replacement. No other line changes. No edit parameter contains a `u`-form escape.
   - Acceptance:
     - The Grep tool, output mode `count`, on the file returns 0 for the pattern `PLAN_WHITESPACE_CLASS = String\.raw`, 0 for the pattern `\bnormalizeWhitespace\b`, 0 for the pattern `WHITESPACE_RUN_RE`, 3 for the pattern `normalizePlanWhitespace\(`, and 1 for the pattern `LEADING_WHITESPACE_RE = new RegExp`.
     - The raw-character zero-count check returns 0, and the line count is at most 500 (226 before).
     - `npx tsc -p ./ --noEmit` exits 0.
     - `npx jest --config jest.config.cjs test/lib/validate/plan-gate-scratch.test.ts --reporters=default` exits 0 with 0 failed.
-- [ ] [P3-T3] Apply the shared class to the G6 normalizers in `extensions/drm-copilot/src/lib/validate/plan-gate-rules.ts` (N-3)
+- [x] [P3-T3] Apply the shared class to the G6 normalizers in `extensions/drm-copilot/src/lib/validate/plan-gate-rules.ts` (N-3)
   - Apply the Appendix F2 edits with the Edit tool: add `normalizePlanWhitespace` to the `./plan-gate-commands` import, extend the `normalizeWhitespace` TSDoc, and replace the bodies of `windowJoin` and `hasCrossLinePresence`. `planQuotesLiteral` is not changed.
   - Acceptance:
     - The Grep tool, output mode `count`, on the file returns 0 for the pattern `\.trim\(\)` (1 before, at line 394), 2 for the pattern `split\(/` (3 before, at lines 347, 419, and 428), 3 for the pattern `normalizeWhitespace\(` (5 before), and 3 for the pattern `normalizePlanWhitespace\(`.
     - The line count is at most 500 (437 before).
     - `npx tsc -p ./ --noEmit` exits 0.
     - `npx jest --config jest.config.cjs test/lib/validate/plan-gate-discrimination-literals.test.ts --reporters=default` exits 0 with 0 failed.
-- [ ] [P3-T4] Run the TypeScript format check on the four changed TypeScript files and record `<FEATURE>/evidence/regression-testing/ts-format-rc3.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P3-T4] Run the TypeScript format check on the four changed TypeScript files and record `<FEATURE>/evidence/regression-testing/ts-format-rc3.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx prettier --check src/lib/validate/plan-gate-commands.ts src/lib/validate/plan-gate-scratch.ts src/lib/validate/plan-gate-rules.ts test/lib/validate/plan-gate-discrimination-literals.test.ts`
   - Acceptance: `EXIT_CODE: 0` and the line `All matched files use Prettier code style!`.
   - Remediation branch: run `npx prettier --write` over the reported paths, record each path it reports as `(unchanged)` or rewritten, rerun the raw-character check on any rewritten file, then rerun from [P3-T4].
-- [ ] [P3-T5] Run the TypeScript lint check on the same four files and record `<FEATURE>/evidence/regression-testing/ts-lint-rc3.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P3-T5] Run the TypeScript lint check on the same four files and record `<FEATURE>/evidence/regression-testing/ts-lint-rc3.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx eslint src/lib/validate/plan-gate-commands.ts src/lib/validate/plan-gate-scratch.ts src/lib/validate/plan-gate-rules.ts test/lib/validate/plan-gate-discrimination-literals.test.ts`
   - Acceptance: `EXIT_CODE: 0` with no reported problem line. Any suppression follows `.claude/rules/typescript-suppressions.md`.
-- [ ] [P3-T6] Run both TypeScript type checks, the validate test directory, and the two Python cross-runtime nodes, and record `<FEATURE>/evidence/regression-testing/ts-green-rc3.<timestamp>.md` (TypeScript commands in `extensions/drm-copilot/`, the pytest command at the repository root)
+- [x] [P3-T6] Run both TypeScript type checks, the validate test directory, and the two Python cross-runtime nodes, and record `<FEATURE>/evidence/regression-testing/ts-green-rc3.<timestamp>.md` (TypeScript commands in `extensions/drm-copilot/`, the pytest command at the repository root)
   - Commands: `npx tsc -p ./ --noEmit`, `npx tsc -p tsconfig.jest.json --noEmit`, `npx jest --config jest.config.cjs --verbose test/lib/validate --reporters=default`, `poetry run pytest -v tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py::test_whitespace_class_matches_typescript tests/scripts/dev_tools/test_plan_gate_scratch_whitespace.py::test_whitespace_class_declared_once_per_runtime`.
   - Acceptance:
     - All four exit 0, and the pytest command reports 2 passed.
     - `Output Summary:` records the jest suite and test pass counts and 0 failed.
     - It quotes the verbose passing lines for `normalizes G6 tracked lines with the plan whitespace class`, `decides continuation with the plan whitespace class`, and `normalizes whitespace with the plan whitespace class`.
-- [ ] [P3-T7] Commit and push `extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts`, `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts`, `extensions/drm-copilot/src/lib/validate/plan-gate-rules.ts`, the `<FEATURE>/evidence/regression-testing/` artifacts, and the plan check-offs
+- [x] [P3-T7] Commit and push `extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts`, `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts`, `extensions/drm-copilot/src/lib/validate/plan-gate-rules.ts`, the `<FEATURE>/evidence/regression-testing/` artifacts, and the plan check-offs
   - Commands: `git add extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts extensions/drm-copilot/src/lib/validate/plan-gate-rules.ts` plus any file rewritten in [P3-T4], the new `<FEATURE>/evidence/regression-testing/` artifacts, and this plan file; `git commit -m "fix(932): share PLAN_WHITESPACE_CLASS with TypeScript G6 from the command extractor module"`; `git push origin HEAD`.
   - Acceptance: the push exits 0, and after the push `git status --porcelain` lists no path other than `SCRATCH/`.
 

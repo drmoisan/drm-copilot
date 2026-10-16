@@ -17,18 +17,23 @@
  *       The logical line is rendered verbatim between backticks; no
  *       `pythonRepr`-style helper is called.
  *     - The module imports only type declarations from `plan-gate-rules.ts`
- *       and the shared line splitter from `plan-gate-commands.ts`, so the
- *       import graph stays acyclic.
+ *       and the shared line splitter, `PLAN_WHITESPACE_CLASS`, and
+ *       `normalizePlanWhitespace` from `plan-gate-commands.ts`, so the import
+ *       graph stays acyclic.
  *     - Blank-line, continuation, and normalization tests use
- *       `PLAN_WHITESPACE_CLASS`, whose pattern string is identical in the
- *       Python module.
+ *       `PLAN_WHITESPACE_CLASS`, which G6 also uses and whose pattern string
+ *       is identical in the Python module.
  *
  * Side Effects:
  *     None. The module reads no file, clock, environment variable, or git
  *     state.
  */
 
-import { splitPlanLines } from "./plan-gate-commands";
+import {
+  normalizePlanWhitespace,
+  PLAN_WHITESPACE_CLASS,
+  splitPlanLines,
+} from "./plan-gate-commands";
 import type { PlanGateReport } from "./plan-gate-rules";
 
 /**
@@ -64,33 +69,7 @@ const FENCE_RE = /^\s*```/;
 const DEFINITION_RE = new RegExp(SCRATCH_DEFINITION_PATTERN);
 const NAMESPACE_RE = new RegExp(SCRATCH_NAMESPACE_PATTERN);
 
-/**
- * One explicit whitespace class for the blank-line test, the continuation
- * test, and whitespace normalization.
- *
- * The string is identical to the Python `PLAN_WHITESPACE_CLASS`, and a parity
- * test compares the two. The class is the set on which the Python whitespace
- * predicate and the JavaScript whitespace class agree: NEL, the information
- * separators, and the byte-order mark are excluded, so both runtimes treat
- * them as ordinary characters.
- */
-export const PLAN_WHITESPACE_CLASS = String.raw`[\t\n\v\f\r \u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]`;
-
-const WHITESPACE_RUN_RE = new RegExp(`${PLAN_WHITESPACE_CLASS}+`);
 const LEADING_WHITESPACE_RE = new RegExp(`^${PLAN_WHITESPACE_CLASS}`);
-
-/**
- * Join runs of `PLAN_WHITESPACE_CLASS` with one space and trim the ends.
- *
- * @param value Text to normalize.
- * @returns The normalized text, identical to the Python `_normalize_whitespace`.
- */
-function normalizeWhitespace(value: string): string {
-  return value
-    .split(WHITESPACE_RUN_RE)
-    .filter((word) => word !== "")
-    .join(" ");
-}
 
 /**
  * Return whether a physical line continues the current logical line.
@@ -104,7 +83,10 @@ function normalizeWhitespace(value: string): string {
  * @returns True when the line continues the logical line.
  */
 function continuesLogicalLine(line: string): boolean {
-  if (normalizeWhitespace(line) === "" || !LEADING_WHITESPACE_RE.test(line)) {
+  if (
+    normalizePlanWhitespace(line) === "" ||
+    !LEADING_WHITESPACE_RE.test(line)
+  ) {
     return false;
   }
   return !FENCE_RE.test(line);
@@ -141,7 +123,7 @@ function recordIfBare(
   findings: Array<[number, string]>,
   pending: PendingLogicalLine,
 ): void {
-  const logical = normalizeWhitespace(pending.parts.join(" "));
+  const logical = normalizePlanWhitespace(pending.parts.join(" "));
   if (isBareDefinition(logical)) {
     findings.push([pending.start + 1, logical]);
   }
@@ -176,7 +158,7 @@ export function bareScratchDefinitions(text: string): Array<[number, string]> {
       inFence = !inFence;
       continue;
     }
-    if (inFence || normalizeWhitespace(line) === "") {
+    if (inFence || normalizePlanWhitespace(line) === "") {
       continue;
     }
     // A logical line starts here and absorbs its continuation lines.

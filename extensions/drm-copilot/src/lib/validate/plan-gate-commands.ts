@@ -277,6 +277,36 @@ export function splitPlanLines(text: string): string[] {
 }
 
 /**
+ * One explicit whitespace class shared by G6 and G10.
+ *
+ * The string is identical to the Python `PLAN_WHITESPACE_CLASS`, and a parity
+ * test compares the two. The class is the set on which the Python whitespace
+ * predicate and the JavaScript whitespace class agree: NEL, the information
+ * separators, and the byte-order mark are excluded, so both runtimes treat
+ * them as ordinary characters.
+ */
+export const PLAN_WHITESPACE_CLASS = String.raw`[\t\n\v\f\r \u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]`;
+
+/** One or more consecutive members of `PLAN_WHITESPACE_CLASS`. */
+const PLAN_WHITESPACE_RUN_RE = new RegExp(`${PLAN_WHITESPACE_CLASS}+`);
+
+/**
+ * Join runs of `PLAN_WHITESPACE_CLASS` with one space and trim the ends.
+ *
+ * G6 and G10 both normalize with this function.
+ *
+ * @param value Text to normalize.
+ * @returns The normalized text, identical to the Python
+ *     `normalize_plan_whitespace`.
+ */
+export function normalizePlanWhitespace(value: string): string {
+  return value
+    .split(PLAN_WHITESPACE_RUN_RE)
+    .filter((word) => word !== "")
+    .join(" ");
+}
+
+/**
  * Collect every inline code span on one line, in source order.
  *
  * A single line may carry several backticked spans; each is a candidate.
