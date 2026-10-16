@@ -31,7 +31,7 @@
 Describe 'Codex enforce-epic-merge-gate merge-queue scope (issue #952)' {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
-        $script:UnderTest = Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-merge-gate.ps1'
+        $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/enforce-epic-merge-gate.ps1").Path
         . $script:UnderTest
         . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
@@ -63,6 +63,15 @@ Describe 'Codex enforce-epic-merge-gate merge-queue scope (issue #952)' {
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
+    It 'resolves the selector helper functions from the Codex helper file' {
+        # Coverage is credited to the file that defines the executing function, so this suite
+        # must run the Codex copy rather than its byte-identical Claude twin (issue #952 R1).
+        foreach ($name in @('Get-EpicMergeGateSelectorPrNumber', 'ConvertFrom-EpicMergeGateSelector', 'Test-EpicMergeGateCommandInScope')) {
+            $definitionFile = [string](Get-Command -Name $name -CommandType Function).ScriptBlock.File
+            ($definitionFile -replace '\\', '/') | Should -BeLike '*/.codex/hooks/enforce-epic-merge-gate-command.ps1' -Because "$name must be defined by the Codex helper copy"
+        }
+    }
 
     Context 'every gh pr merge spelling is gated (AC-6)' {
         # Both checkpoints are empty, so an in-scope command necessarily denies.

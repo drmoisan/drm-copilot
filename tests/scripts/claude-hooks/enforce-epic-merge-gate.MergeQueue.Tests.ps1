@@ -137,6 +137,20 @@ Describe 'enforce-epic-merge-gate.ps1 merge-queue scope (issue #952)' {
             # Assert: the selector is the pull request 5 in every spelling.
             $prNumber | Should -Be 5 -Because "the selector of $Command is pull request 5"
         }
+
+        It 'returns <Label> for <Command>' -ForEach @(
+            @{ Command = 'gh pr merge -- 5'; Expected = 5; Label = '5' }
+            @{ Command = 'gh pr merge --merge --'; Expected = $null; Label = 'no number' }
+            @{ Command = 'gh pr merge feature-branch --merge'; Expected = $null; Label = 'no number' }
+            @{ Command = 'gh pr merge --merge=true 5'; Expected = 5; Label = '5' }
+        ) {
+            # Act: the reader is a pure string function and reads nothing from disk.
+            $prNumber = Get-EpicMergeGateCommandPrNumber -CommandText $Command
+
+            # Assert: a bare '--' passes the next token as the selector, a branch name carries no
+            # number, and a non-numeric --merge=<value> does not end the scan (issue #952 CR-2, CR-4).
+            $prNumber | Should -Be $Expected -Because "the selector of $Command resolves to $Label"
+        }
     }
 
     Context 'a matching authorization record allows every gated spelling (AC-8)' {

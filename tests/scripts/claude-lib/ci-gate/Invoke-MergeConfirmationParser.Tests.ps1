@@ -118,4 +118,36 @@ Describe 'Invoke-MergeConfirmationParser (issue #952)' {
 
         $result.Status | Should -BeExactly 'closed'
     }
+
+    It 'maps MERGED with a null mergedAt to merged with an empty merge time' {
+        # Arrange: gh can report a merged pull request whose mergedAt is null.
+        $json = '{"state":"MERGED","mergedAt":null,"mergeCommit":{"oid":"abc123"}}'
+
+        # Act
+        $result = Invoke-MergeConfirmationParser -PrJson $json
+
+        # Assert: the null merge time is rendered as an empty string, not an error.
+        $result.Status | Should -BeExactly 'merged'
+        $result.MergedAt | Should -BeExactly '' -Because 'a null mergedAt is handled (AC-12)'
+    }
+
+    It 'throws the null-or-empty message for an empty snapshot' {
+        { Invoke-MergeConfirmationParser -PrJson '' } | Should -Throw -ExpectedMessage 'Invoke-MergeConfirmationParser: the pull-request snapshot is null or empty.'
+    }
+
+    It 'renders a datetimeoffset merge time as UTC ISO-8601' {
+        # Arrange: a +02:00 value. ConvertFrom-Json does not produce this type, so the branch is
+        # exercised through the function directly.
+        $value = [datetimeoffset]::new(2026, 10, 16, 14, 34, 56, [timespan]::FromHours(2))
+
+        $text = ConvertTo-MergeConfirmationTimeText -Value $value
+
+        $text | Should -BeExactly '2026-10-16T12:34:56Z'
+    }
+
+    It 'returns a non-date merge time value verbatim' {
+        $text = ConvertTo-MergeConfirmationTimeText -Value 'not-a-date'
+
+        $text | Should -BeExactly 'not-a-date'
+    }
 }
