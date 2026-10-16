@@ -174,11 +174,49 @@ export function validateCommittedFile(
   return [];
 }
 
+/**
+ * Validate and normalize a safe repository-relative POSIX path. Empty and `.`
+ * segments are dropped and an empty result becomes `.`, as Python
+ * `PurePosixPath(value).as_posix()` does, so the readiness gate and plan
+ * pairing derive the same path in both runtimes.
+ */
+export function repositoryRelativePath(
+  value: unknown,
+  field: string,
+): { readonly path?: string; readonly errors: string[] } {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    return {
+      errors: [`${field} must be a non-empty repository-relative path.`],
+    };
+  }
+  if (value.includes("\\")) {
+    return { errors: [`${field} must use forward slashes.`] };
+  }
+  const parts = value
+    .split("/")
+    .filter((part) => part.length > 0 && part !== ".");
+  if (
+    value.startsWith("/") ||
+    /^[A-Za-z]:/.test(value) ||
+    parts.includes("..")
+  ) {
+    return { errors: [`${field} must stay within the workspace root.`] };
+  }
+  return { path: parts.length === 0 ? "." : parts.join("/"), errors: [] };
+}
+
+/** Return the `plan_path` the readiness gate derives, if any. */
+function derivedPlanPath(
+  feature: Readonly<Record<string, unknown>>,
+): string | undefined {
+  return repositoryRelativePath(feature["plan_path"], "plan_path").path;
+}
+
 type PlanEntry = readonly [number, Readonly<Record<string, unknown>>, string];
 
 /**
  * Pair each plan with its checkpoint entry and that entry's original index.
- * Plans are matched in order to object entries whose `plan_path` equals the
+ * Plans are matched in order to object entries whose `plan_path` normalizes to the
  * plan, so non-object and plan-less entries keep their positions in the
  * checkpoint `features` array. When any plan has no such entry, the
  * positional pairing over object entries is kept, so a caller whose plans
@@ -200,7 +238,7 @@ function pairPlansWithFeatures(
   let position = 0;
   for (const plan of plans) {
     let entry = entries[position];
-    while (entry !== undefined && entry[1]["plan_path"] !== plan) {
+    while (entry !== undefined && derivedPlanPath(entry[1]) !== plan) {
       position += 1;
       entry = entries[position];
     }
