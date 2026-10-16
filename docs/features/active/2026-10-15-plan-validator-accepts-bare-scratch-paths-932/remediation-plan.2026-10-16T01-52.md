@@ -241,7 +241,7 @@ Every sentence quoted in this phase is inserted verbatim as one line of the targ
 - [x] [P4-T5] Run the documentation, contract, push-down, and frontmatter suites and record `<FEATURE>/evidence/regression-testing/docs-green-rc1.<timestamp>.md`
   - Command: `poetry run pytest -v tests/scripts/dev_tools/test_plan_gate_scratch_docs.py tests/scripts/dev_tools/test_scratch_location_contracts.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_claude_rules_frontmatter.py`
   - Acceptance: 0 failed, or exactly one failure that is the #510 node with the #510 signature described in Conventions; the artifact records which case applies and the two object IDs from [P4-T3].
-- [ ] [P4-T6] Commit and push `.claude/rules/plan-acceptance-gates.md`, its bundle copy, `spec.md`, the evidence, and the plan check-offs
+- [x] [P4-T6] Commit and push `.claude/rules/plan-acceptance-gates.md`, its bundle copy, `spec.md`, the evidence, and the plan check-offs
   - Commands: `git add .claude/rules/plan-acceptance-gates.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/plan-acceptance-gates.md <FEATURE>/spec.md` (with the concrete folder path) plus the new evidence and this plan file; `git commit -m "docs(932): correct G10 scope, line-splitting, and false-negative text in the rule file"`; `git push origin HEAD`.
   - Acceptance: after the push, `git status --porcelain` lists no path other than `SCRATCH/`; the push exits 0.
 
@@ -249,51 +249,51 @@ Every sentence quoted in this phase is inserted verbatim as one line of the targ
 
 Loop rule: [P5-T1] through [P5-T12] form one pass. If any of them fails or changes a file, fix the cause, commit the fix, and restart at [P5-T1]; each pass writes new artifacts with new timestamps. The loop ends only when one pass completes with every step meeting its acceptance and no file change.
 
-- [ ] [P5-T1] Run the final Python format check and record `<FEATURE>/evidence/qa-gates/python-format-final-rc1.<timestamp>.md`
+- [x] [P5-T1] Run the final Python format check and record `<FEATURE>/evidence/qa-gates/python-format-final-rc1.<timestamp>.md`
   - Command: `poetry run black --check scripts/dev_tools/plan_gate_commands.py scripts/dev_tools/plan_gate_scratch.py tests/scripts/dev_tools/test_plan_gate_commands.py tests/scripts/dev_tools/test_plan_gate_scratch.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`
   - Acceptance: `EXIT_CODE: 0` and `5 files would be left unchanged.` Remediation branch: run `poetry run black` over the same five paths, record the `reformatted` and `left unchanged` summary, and restart the loop.
-- [ ] [P5-T2] Run the final Python lint check and record `<FEATURE>/evidence/qa-gates/python-lint-final-rc1.<timestamp>.md`
+- [x] [P5-T2] Run the final Python lint check and record `<FEATURE>/evidence/qa-gates/python-lint-final-rc1.<timestamp>.md`
   - Command: `poetry run ruff check --no-fix scripts/dev_tools/plan_gate_commands.py scripts/dev_tools/plan_gate_scratch.py tests/scripts/dev_tools/test_plan_gate_commands.py tests/scripts/dev_tools/test_plan_gate_scratch.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`
   - Acceptance: `EXIT_CODE: 0` and `All checks passed!`.
-- [ ] [P5-T3] Run the final Python strict type check and record `<FEATURE>/evidence/qa-gates/python-typecheck-final-rc1.<timestamp>.md`
+- [x] [P5-T3] Run the final Python strict type check and record `<FEATURE>/evidence/qa-gates/python-typecheck-final-rc1.<timestamp>.md`
   - Command: `poetry run pyright scripts/dev_tools/plan_gate_commands.py scripts/dev_tools/plan_gate_scratch.py tests/scripts/dev_tools/test_plan_gate_commands.py tests/scripts/dev_tools/test_plan_gate_scratch.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`
   - Acceptance: `EXIT_CODE: 0` and `0 errors`.
-- [ ] [P5-T4] Run the final Python coverage gate and record `<FEATURE>/evidence/qa-gates/python-coverage-final-rc1.<timestamp>.md`
+- [x] [P5-T4] Run the final Python coverage gate and record `<FEATURE>/evidence/qa-gates/python-coverage-final-rc1.<timestamp>.md`
   - Command: `poetry run pytest tests/scripts/dev_tools/test_plan_gate_commands.py tests/scripts/dev_tools/test_plan_gate_scratch.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py tests/scripts/dev_tools/test_plan_gate_parity.py tests/scripts/dev_tools/test_plan_gate_discrimination_context.py tests/scripts/dev_tools/test_plan_gate_discrimination_cov.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_observability.py tests/scripts/dev_tools/test_plan_gate_observability_boundaries.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_validate_orchestration_artifacts_plan_gates.py --cov=scripts.dev_tools.plan_gate_scratch --cov=scripts.dev_tools.plan_gate_commands --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/cov/final-py.json`
   - Acceptance: `EXIT_CODE: 0` and 0 failed; the total `passed` count is at least the [P0-T14] count. From each file's `summary` object in `SCRATCH/cov/final-py.json`: `plan_gate_scratch.py` has `covered_lines == num_statements` and `covered_branches == num_branches` (100% line and branch); `plan_gate_commands.py` line and branch percentages are not lower than the [P0-T14] values and each is at least the policy floor (85% line, 75% branch); no `+` line number in the hunks of `git diff -U0 <RC1_BASE> HEAD -- scripts/dev_tools/plan_gate_commands.py scripts/dev_tools/plan_gate_scratch.py` that is an executable statement appears in that file's `missing_lines`. `Output Summary:` records baseline, post-change, and changed-line figures for both files.
-- [ ] [P5-T5] Run the final Python contract and frontmatter suites and record `<FEATURE>/evidence/qa-gates/python-contract-final-rc1.<timestamp>.md`
+- [x] [P5-T5] Run the final Python contract and frontmatter suites and record `<FEATURE>/evidence/qa-gates/python-contract-final-rc1.<timestamp>.md`
   - Command: `poetry run pytest -v tests/scripts/dev_tools/test_scratch_location_contracts.py tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_claude_rules_frontmatter.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`
   - Acceptance: 0 failed, or exactly the #510 node with the #510 signature (recorded as `pending-CI` for that node); the artifact quotes the `PASSED` line of `test_rule_file_bundle_copy_is_byte_identical`.
-- [ ] [P5-T6] Run the final broad dev-tools regression and record `<FEATURE>/evidence/qa-gates/python-devtools-final-rc1.<timestamp>.md`
+- [x] [P5-T6] Run the final broad dev-tools regression and record `<FEATURE>/evidence/qa-gates/python-devtools-final-rc1.<timestamp>.md`
   - Command: `poetry run pytest tests/scripts/dev_tools -q -p no:cacheprovider`
   - Acceptance: every failing or erroring node ID is in the [P0-T15] reference set or is the #510 node; the artifact lists any node that newly passes or newly fails. A new failure related to this change is fixed inside this item and the loop restarts; when that fix edits a file outside the WRITES list, the out-of-scope remediation log in Conventions applies.
-- [ ] [P5-T7] Run the final TypeScript format check and record `<FEATURE>/evidence/qa-gates/ts-format-final-rc1.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P5-T7] Run the final TypeScript format check and record `<FEATURE>/evidence/qa-gates/ts-format-final-rc1.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs" eslint.config.mjs`
   - Acceptance: `EXIT_CODE: 0` and `All matched files use Prettier code style!`, or, if [P0-T6] recorded pre-existing warnings, the reported file set is a subset of the baseline set and contains no file changed by this plan. Remediation branch for a file changed by this plan: `npx prettier --write` on that file, record `(unchanged)` or the rewrite, and restart the loop.
-- [ ] [P5-T8] Run the final repository lint script command and record `<FEATURE>/evidence/qa-gates/ts-lint-final-rc1.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P5-T8] Run the final repository lint script command and record `<FEATURE>/evidence/qa-gates/ts-lint-final-rc1.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx eslint --no-error-on-unmatched-pattern src test`
   - Acceptance: `EXIT_CODE: 0` with 0 errors and no warning in a file changed by this plan.
-- [ ] [P5-T9] Run the final configuration-file lint and record `<FEATURE>/evidence/qa-gates/ts-lint-config-final-rc1.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P5-T9] Run the final configuration-file lint and record `<FEATURE>/evidence/qa-gates/ts-lint-config-final-rc1.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx eslint jest.config.cjs eslint.config.mjs`
   - Acceptance: `EXIT_CODE: 0` with no reported problem line.
-- [ ] [P5-T10] Run the final TypeScript production type check and record `<FEATURE>/evidence/qa-gates/ts-typecheck-final-rc1.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P5-T10] Run the final TypeScript production type check and record `<FEATURE>/evidence/qa-gates/ts-typecheck-final-rc1.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx tsc -p ./ --noEmit`
   - Acceptance: `EXIT_CODE: 0` with no diagnostics.
-- [ ] [P5-T11] Run the final TypeScript test type check and record `<FEATURE>/evidence/qa-gates/ts-typecheck-test-final-rc1.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P5-T11] Run the final TypeScript test type check and record `<FEATURE>/evidence/qa-gates/ts-typecheck-test-final-rc1.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx tsc -p tsconfig.jest.json --noEmit`
   - Acceptance: `EXIT_CODE: 0` with no diagnostics.
-- [ ] [P5-T12] Run the final full jest coverage gate and record `<FEATURE>/evidence/qa-gates/ts-coverage-final-rc1.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P5-T12] Run the final full jest coverage gate and record `<FEATURE>/evidence/qa-gates/ts-coverage-final-rc1.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx jest --config jest.config.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary --coverageReporters=json-summary`
   - Acceptance: `EXIT_CODE: 0`, 0 failed suites and tests, and no coverage-threshold message. From `extensions/drm-copilot/coverage/coverage-summary.json`: `src/lib/validate/plan-gate-scratch.ts` has `lines.pct` equal to 100 and `branches.pct` equal to 100; `src/lib/validate/plan-gate-commands.ts` percentages are not lower than the [P0-T10] values. From `extensions/drm-copilot/coverage/lcov.info`: no `+` line of `git diff -U0 <RC1_BASE> HEAD -- extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` has a zero-hit `DA:` record. `Output Summary:` records baseline, post-change, and changed-line figures.
-- [ ] [P5-T13] Confirm a single clean loop pass in `<FEATURE>/evidence/qa-gates/qa-loop-summary-rc1.<timestamp>.md`
+- [x] [P5-T13] Confirm a single clean loop pass in `<FEATURE>/evidence/qa-gates/qa-loop-summary-rc1.<timestamp>.md`
   - Acceptance: the latest artifacts of [P5-T1] through [P5-T12] all carry timestamps from one pass that started after the last code commit, each records an `EXIT_CODE:` meeting its task, and `git status --porcelain` lists only new evidence files, this plan file, and `SCRATCH/`.
-- [ ] [P5-T14] Validate this plan and the original plan with the production CLI and record `<FEATURE>/evidence/qa-gates/plan-self-validation-rc1.<timestamp>.md`
+- [x] [P5-T14] Validate this plan and the original plan with the production CLI and record `<FEATURE>/evidence/qa-gates/plan-self-validation-rc1.<timestamp>.md`
   - Commands: `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan docs/features/active/2026-10-15-plan-validator-accepts-bare-scratch-paths-932/remediation-plan.2026-10-16T01-52.md` and `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan docs/features/active/2026-10-15-plan-validator-accepts-bare-scratch-paths-932/plan.2026-10-15T15-45.md`.
   - Acceptance: both exit 0; neither prints a line containing `SCRATCH definition`; the artifact records each exit code and every printed `PLAN GATE WARNING: ` line verbatim.
-- [ ] [P5-T15] Check file size and temporary-file use for every changed non-Markdown file and record `<FEATURE>/evidence/qa-gates/file-size-and-tempfile-check-rc1.<timestamp>.md`
+- [x] [P5-T15] Check file size and temporary-file use for every changed non-Markdown file and record `<FEATURE>/evidence/qa-gates/file-size-and-tempfile-check-rc1.<timestamp>.md`
   - Method: the Grep tool with pattern `^` and output mode `count` on each of the ten non-Markdown files in the WRITES list below; the Grep tool with pattern `tmp_path|tempfile|mkdtemp|NamedTemporaryFile|tmpdir|writeFileSync|mkdtempSync` over the five changed test files.
   - Acceptance: every count is at most 500; the temporary-file search returns zero matches; the artifact lists each file with its count; for each of the five changed test files, the Grep tool, output mode count, on the file with the pattern [\x{2028}\x0c] returns 0.
-- [ ] [P5-T16] Verify the change scope and record `<FEATURE>/evidence/qa-gates/scope-diff-rc1.<timestamp>.md`
+- [x] [P5-T16] Verify the change scope and record `<FEATURE>/evidence/qa-gates/scope-diff-rc1.<timestamp>.md`
   - Commands: `git diff --name-only <RC1_BASE> HEAD`, `git diff --name-status --diff-filter=D <MERGE_BASE> HEAD`, `git status --porcelain`.
   - Acceptance: every path listed by the first command is in the WRITES list of this plan, or under `docs/features/active/2026-10-15-plan-validator-accepts-bare-scratch-paths-932/`, or on a `PATH: ` line of an `out-of-scope-remediation.*.md` artifact written in this cycle (the artifact records `REMEDIATION-LOG: none` when no such file exists, with the Glob search that established it); `extensions/drm-copilot/jest.config.cjs`, `extensions/drm-copilot/package.json`, and `research/bare-scratch-plan-gate.2026-10-15T19-52.md` are not listed; the deletion listing is empty; the porcelain listing shows only new evidence files, this plan file, and `SCRATCH/`.
 - [ ] [P5-T17] Commit and push the final evidence under `<FEATURE>/evidence/qa-gates/` and the plan check-offs
