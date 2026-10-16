@@ -6,8 +6,8 @@
 - **Inputs:** `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-inputs.2026-10-16T10-24.md` (findings CR-1, CR-2, CR-3), `docs/features/active/2026-10-16-pester-profiler-coverage-953/code-review.2026-10-16T10-17.md`, reference plan `docs/features/active/2026-10-16-pester-profiler-coverage-953/plan.2026-10-16T00-16.md` (revision 1.5, executed through Phase 6)
 - **Planning-time head:** `2004de667` (the branch contains merge commit `0087d2bc2` of `origin/main`). Every line citation below was re-derived against the working tree at this head.
 - **Last Updated:** 2026-10-16
-- **Status:** Draft revision 1.0, pending executor preflight
-- **Version:** 1.0
+- **Status:** Draft revision 1.1 (preflight findings D1-D3 applied), pending executor preflight
+- **Version:** 1.1
 
 ## Scope
 
@@ -62,7 +62,7 @@ Never written: `.github/workflows/ci.yml`; the `on:` block of any `.github/workf
   - **Script.** The executor writes the POSIX shell file `SCRATCH/issue-953-r1-<step>.sh` with the Write tool and runs it from the Bash tool as `sh "<SCRATCH absolute path, forward slashes>/issue-953-r1-<step>.sh"`.
   - **Command line.** The path is written literally: no shell variable, and no `;`, `&&`, `|`, or redirection on that command line.
   - **Fixed body.** Line 1 is `export MSYS_NO_PATHCONV=1`. Line 2 is `pwsh -NoProfile -Command '$S = "<SCRATCH absolute path, forward slashes>"; <task PowerShell text>'`. Inside the single-quoted argument every `'` of the task text is written `'\''`. When the task records the exit code of a final native command, the text ends with `; exit $LASTEXITCODE`.
-  - **Step names.** `<step>` is the lowercased task ID (for example `issue-953-r1-p2-t5.sh`), with a `-<n>` suffix when a task needs more than one script. The route probe uses `issue-953-r1-probe.sh`.
+  - **Step names.** `<step>` is the lowercased task ID (for example `issue-953-r1-p2-t5.sh`), with a `-<n>` suffix when a task needs more than one script. The route probe uses `issue-953-r1-probe.sh` and the same fixed body; it is not exempt from it.
   - **Long runs.** A run longer than the Bash tool timeout (FULL_RUN) is started with the Bash tool's background option; the executor waits for the completion notification, with no sleep or polling loop.
   - **Non-PowerShell commands.** `git` and `poetry run ...` run directly from the Bash tool.
   - **Evidence.** `Command:` fields record the script body with the literal `SCRATCH` in place of the host path.
@@ -142,7 +142,7 @@ $env:ISSUE953_PATHS = '<paths joined with ;>'; $env:ISSUE953_JUNIT = Join-Path $
   - RS08 asserts the query shape. P2-T7 confirms on the local host that the real `Get-Module` applies the range.
 - **CR-2 design.** The seam gains `[string] $MinimumVersion`, placed before `$MaximumVersion`. The call passes `'5.9.0' '5.99.99'`, and the import passes both bounds. These values match `.github/workflows/_poshqc.yml:73` and the installer floor at `scripts/powershell/PoshQC/PoshQC.psm1:58`.
   - The error message gains the range: `Pester is not installed in the supported range (5.9.0 to 5.99.99). Run Install-PoshQCTool (alias Install-PoshQCTools) first.`
-  - Every existing assertion on that message uses the wildcard `*Pester is not installed*`, which still matches: `tests/scripts/powershell/PoshQC/PoshQC.TestingSeamDefaults.Tests.ps1:97`, `tests/scripts/powershell/PoshQC/PoshQC.Comprehensive.Tests.ps1:340`, `tests/scripts/powershell/PoshQC/PoshQC.EntryPoints.Tests.ps1:93`, and `tests/scripts/powershell/PoshQC/PoshQC.TestingCommands.Tests.ps1:134`.
+  - Every existing assertion on that message uses the wildcard `*Pester is not installed*`, which still matches: `tests/scripts/powershell/PoshQC/PoshQC.TestingSeamDefaults.Tests.ps1:97`, `tests/scripts/powershell/PoshQC/PoshQC.Comprehensive.Tests.ps1:340`, `tests/scripts/powershell/PoshQC/PoshQC.EntryPoints.Tests.ps1:93`, and `tests/scripts/powershell/PoshQC/PoshQC.TestingCommands.Tests.ps1:135`.
   - Injected seams in existing tests declare at most `$Name` and `$ErrorMessage` (`tests/scripts/powershell/PoshQC/PoshQC.EntryPoints.Tests.ps1:89`, `tests/scripts/powershell/PoshQC/PoshQC.TestingCommands.Tests.ps1:134`) or no parameters (`-EnsureModule { }`). The extra positional arguments go to `$args` and do not affect them.
 - **Test determinism.** Two existing cases run the default seam against the host's real `Get-Module`: RS06 (`tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1:127-140`) and `imports the requested module with -Global` (`tests/scripts/powershell/PoshQC/PoshQC.TestingSeamDefaults.Tests.ps1:73-88`). After CR-1 they would pass only on a host with an in-range Pester. P1-T1 and P1-T3 add a `Get-Module` mock to each, so their result no longer depends on the host.
 - **CR-3 design and the AC-08 denominator.** AC-08 (CI-dependent, unchecked) requires the PR-head repository-wide LINE total to equal the baseline artifact's total. Pester counts one coverage line per source line that starts a command, including the body of a scriptblock literal.
@@ -197,7 +197,7 @@ Ownership: P0-T1 is `(owner: orchestrator)` and completes before the executor st
   - The orchestrator commits this file, this plan, and `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-inputs.2026-10-16T10-24.md` before starting the executor.
 - [ ] [P0-T2] Verify the orchestrator precondition in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/` and probe the Tool route.
   - Select the lexicographically greatest `r1-local-pester-precondition.*.md`. Confirm that it contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and a `PESTER_IN_RANGE_AFTER:` value other than `NONE`.
-  - Write `SCRATCH/issue-953-r1-probe.sh` with the single line `pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()'` and run `sh "<SCRATCH absolute path>/issue-953-r1-probe.sh"`.
+  - Write `SCRATCH/issue-953-r1-probe.sh` with the Tool-route fixed body: line 1 `export MSYS_NO_PATHCONV=1`; line 2 `pwsh -NoProfile -Command '$S = "<SCRATCH absolute path, forward slashes>"; $PSVersionTable.PSVersion.ToString()'`. Run it from the Bash tool as `sh "<SCRATCH absolute path, forward slashes>/issue-953-r1-probe.sh"`.
   - Acceptance: the artifact check passes, and the probe exits 0 and prints a version. Otherwise record `TOOL_ROUTE: DENIED` or `PRECONDITION: MISSING` in the report and stop BLOCKED.
 - [ ] [P0-T3] Read the repository-root `CLAUDE.md` (standing instructions, policy reading order) and `.github/copilot-instructions.md` (the tone policy it names as authoritative).
 - [ ] [P0-T4] Read `.claude/rules/general-code-change.md` (toolchain loop, 500-line limit, error handling).
@@ -211,7 +211,10 @@ Ownership: P0-T1 is `(owner: orchestrator)` and completes before the executor st
 - [ ] [P0-T10] Record the branch state and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-branch-state.<ts>.md`.
   - Run `git fetch origin main`, `git merge-base HEAD origin/main`, `git rev-parse HEAD`, `git branch --show-current`, and `git status --porcelain --untracked-files=all` from the Bash tool.
   - The file contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (the porcelain output), `REM_BASE_SHA: <40-hex HEAD>`, `BASE_SHA: <40-hex merge base>`, and `BRANCH: bug/pester-profiler-coverage-953`.
-  - Acceptance: every command exits 0; the branch value equals `bug/pester-profiler-coverage-953`; and every porcelain line starts with `?? docs/features/active/2026-10-16-pester-profiler-coverage-953/` (no tracked modification before the cycle starts).
+  - Acceptance: every command exits 0; the branch value equals `bug/pester-profiler-coverage-953`; and every porcelain line is one of two permitted forms:
+    - an untracked path under the feature folder: the line starts with `?? docs/features/active/2026-10-16-pester-profiler-coverage-953/`;
+    - a modification of exactly this plan file (checkbox state from P0-T2 through P0-T9): the two-character status is ` M`, `M `, or `MM`, and the path is exactly `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-plan.2026-10-16T10-24.md`.
+  - Any other porcelain line, including a modification of any other tracked file, fails the acceptance: no other tracked file is modified before the cycle starts. Stop BLOCKED and record the line.
 - [ ] [P0-T11] Record bundled-copy identity and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r1-bundle-identity.<ts>.md`.
   - Compute `(Get-FileHash -Algorithm SHA256 -LiteralPath <path>).Hash` for two pairs:
     1. `scripts/powershell/PoshQC/PoshQC.Testing.psm1` and `extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.Testing.psm1`.
@@ -525,7 +528,7 @@ Restart rule: if any task from P5-T1 through P5-T11 fails or changes a tracked f
   - Build the set as the union of the paths from `git diff --name-only <REM_BASE_SHA>` (`REM_BASE_SHA` against the working tree, covering committed and uncommitted tracked changes) and from `git status --porcelain --untracked-files=all` (covering untracked files), both run from the Bash tool.
   - Acceptance: every path in the set is one of these:
     - A CYCLE_FILES path.
-    - `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-plan.2026-10-16T10-24.md`.
+    - `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-plan.2026-10-16T10-24.md` (this plan; it appears in both listings as a modified tracked file because the executor ticks its checkboxes, and that modification is permitted).
     - `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-inputs.2026-10-16T10-24.md`.
     - A path under `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/`.
   - Acceptance also requires that no path in the set ends in `.py`, `.sh`, `.yml`, or `.json`. The Python, shell, and workflow toolchains are therefore not applicable to this cycle, and the three `NONE` lines record that.
