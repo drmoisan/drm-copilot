@@ -36,6 +36,31 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
             'invoked'
         }
 
+        # Test-local stand-ins for the process object and the starter of Invoke-DocsOnlyBoundedNative.
+        function Get-CodexDocsOnlyFakeProcess {
+            param([bool] $Exits = $true, [bool] $OutputCompletes = $true, [bool] $KillThrows = $false, [int] $ExitCode = 0, [string] $Text = '')
+            $output = [pscustomobject]@{ Result = $Text; Completes = $OutputCompletes; Limit = 0 }
+            $output | Add-Member -MemberType ScriptMethod -Name Wait -Value { param([int] $Milliseconds) $this.Limit = $Milliseconds; $this.Completes }
+            $drain = [pscustomobject]@{ Result = 'ignored error text' }
+            $process = [pscustomobject]@{ ExitCode = $ExitCode; Exits = $Exits; KillThrows = $KillThrows; Killed = $false; WaitLimit = 0; StandardOutput = [pscustomobject]@{ Task = $output }; StandardError = [pscustomobject]@{ Task = $drain } }
+            $process.StandardOutput | Add-Member -MemberType ScriptMethod -Name ReadToEndAsync -Value { $this.Task }
+            $process.StandardError | Add-Member -MemberType ScriptMethod -Name ReadToEndAsync -Value { $this.Task }
+            $process | Add-Member -MemberType ScriptMethod -Name WaitForExit -Value { param([int] $Milliseconds) $this.WaitLimit = $Milliseconds; $this.Exits }
+            $process | Add-Member -MemberType ScriptMethod -Name Kill -Value {
+                param([bool] $EntireTree)
+                if ($this.KillThrows) {
+                    throw 'simulated stop failure'
+                }
+                $this.Killed = $EntireTree
+            }
+            return $process
+        }
+        function Invoke-CodexDocsOnlyFakeStart {
+            param($StartInfo)
+            $script:CodexDocsOnlyStartInfo = $StartInfo
+            $script:CodexDocsOnlyFakeProcess
+        }
+
         function Set-CodexDocsOnlySeam {
             <#
             .SYNOPSIS
@@ -165,5 +190,48 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
             $result.Exempt | Should -BeFalse
             $result.Reason | Should -BeLike $Expected
         }
+    }
+
+    It 'runs the bounded runner when <Name> (codex copy, issue #927)' -ForEach @(
+        @{ Name = 'the process exits in time'; Exits = $true; OutputCompletes = $true; KillThrows = $false; ExitCode = 0; Output = "docs/a.md`0"; Killed = $false }
+        @{ Name = 'the exit wait expires'; Exits = $false; OutputCompletes = $true; KillThrows = $false; ExitCode = 124; Output = ''; Killed = $true }
+        @{ Name = 'the output wait expires'; Exits = $true; OutputCompletes = $false; KillThrows = $false; ExitCode = 124; Output = ''; Killed = $true }
+        @{ Name = 'stopping the process throws'; Exits = $false; OutputCompletes = $true; KillThrows = $true; ExitCode = 124; Output = ''; Killed = $false }
+    ) {
+        # Arrange: the row supplies which wait expires and whether stopping the process throws.
+        $script:CodexDocsOnlyFakeProcess = Get-CodexDocsOnlyFakeProcess -Exits $Exits -OutputCompletes $OutputCompletes -KillThrows $KillThrows -Text "docs/a.md`0"
+
+        # Act
+        $lines = @(Invoke-DocsOnlyBoundedNative -FileName 'git' -ArgumentList @('-C', $PSScriptRoot, 'status') -ProcessStarter ${function:Invoke-CodexDocsOnlyFakeStart})
+
+        # Assert
+        ($lines -join '|') | Should -BeExactly $Output
+        $global:LASTEXITCODE | Should -Be $ExitCode
+        $script:CodexDocsOnlyFakeProcess.Killed | Should -Be $Killed
+        $script:CodexDocsOnlyStartInfo.FileName | Should -BeExactly 'git'
+    }
+
+    It 'routes the default git invoker through the bounded runner (codex copy, issue #927)' {
+        # Arrange
+        Mock Invoke-DocsOnlyBoundedNative { $global:LASTEXITCODE = 0; 'routed' }
+
+        # Act
+        $result = Invoke-DocsOnlyGitExe -WorktreeRoot $PSScriptRoot -GitArgs @('status')
+
+        # Assert
+        $result.Output | Should -BeExactly 'routed'
+        Should -Invoke Invoke-DocsOnlyBoundedNative -Times 1 -Exactly -ParameterFilter { $FileName -ceq 'git' -and $TimeoutMilliseconds -eq 3000 }
+    }
+
+    It 'routes the default gh invoker through the bounded runner (codex copy, issue #927)' {
+        # Arrange
+        Mock Invoke-DocsOnlyBoundedNative { $global:LASTEXITCODE = 0; 'routed' }
+
+        # Act
+        $result = Invoke-DocsOnlyGhExe -WorkingRoot $PSScriptRoot -GhArgs @('pr', 'view', '5')
+
+        # Assert
+        $result.Output | Should -BeExactly 'routed'
+        Should -Invoke Invoke-DocsOnlyBoundedNative -Times 1 -Exactly -ParameterFilter { $FileName -ceq 'gh' -and $TimeoutMilliseconds -eq 7000 }
     }
 }

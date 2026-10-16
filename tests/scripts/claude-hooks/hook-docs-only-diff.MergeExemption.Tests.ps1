@@ -42,6 +42,7 @@ Describe 'Get-DocsOnlyMergeExemption (issue #927)' {
             @{ Name = 'a cd chain'; Command = 'cd x && gh pr merge 5 --merge'; Pr = 5 }
             @{ Name = 'two merges in one command'; Command = 'gh pr merge 5 --merge; gh pr merge 6 --merge'; Pr = 5 }
             @{ Name = 'an --auto flag'; Command = 'gh pr merge 5 --merge --auto'; Pr = 5 }
+            @{ Name = 'an --auto= value'; Command = 'gh pr merge 5 --merge --auto=true'; Pr = 5 }
             @{ Name = 'a bash -c wrapper'; Command = 'bash -c "gh pr merge 5 --merge"'; Pr = 5 }
         ) {
             # Arrange: the row supplies the command and the number the gate read.
@@ -81,6 +82,9 @@ Describe 'Get-DocsOnlyMergeExemption (issue #927)' {
             @{ Name = 'an uppercase head oid'; Command = 'gh pr merge 5 --merge'; GhExit = 0; GhOutput = '{"baseRefName":"main","headRefOid":"0123456789ABCDEF0123456789ABCDEF01234567"}' }
             @{ Name = 'a mismatched --match-head-commit'; Command = 'gh pr merge 5 --merge --match-head-commit 1111111111111111111111111111111111111111'; GhExit = 0; GhOutput = '{"baseRefName":"main","headRefOid":"0123456789abcdef0123456789abcdef01234567"}' }
             @{ Name = 'a --match-head-commit with no value'; Command = 'gh pr merge 5 --merge --match-head-commit'; GhExit = 0; GhOutput = '{"baseRefName":"main","headRefOid":"0123456789abcdef0123456789abcdef01234567"}' }
+            @{ Name = 'a mismatched --match-head-commit= value'; Command = 'gh pr merge 5 --merge --match-head-commit=1111111111111111111111111111111111111111'; GhExit = 0; GhOutput = '{"baseRefName":"main","headRefOid":"0123456789abcdef0123456789abcdef01234567"}' }
+            @{ Name = 'a timed-out gh lookup (exit 124)'; Command = 'gh pr merge 5 --merge'; GhExit = 124; GhOutput = '' }
+            @{ Name = 'a JSON array lookup result'; Command = 'gh pr merge 5 --merge'; GhExit = 0; GhOutput = '[]' }
         ) {
             # Arrange
             $exitCode = $GhExit
@@ -124,6 +128,17 @@ Describe 'Get-DocsOnlyMergeExemption (issue #927)' {
             $result.Exempt | Should -BeTrue -Because "a matching head pin is accepted (OD-2); reason: $($result.Reason)"
         }
 
+        It 'does not deny a matching --match-head-commit= value (issue #927)' {
+            # Arrange
+            $command = 'gh pr merge 5 --merge --match-head-commit=0123456789abcdef0123456789abcdef01234567'
+
+            # Act
+            $result = Get-DocsOnlyMergeExemption -CommandText $command -PrNumber 5 -WorktreeRoot $PSScriptRoot
+
+            # Assert
+            $result.Exempt | Should -BeTrue -Because "a matching head pin in the equals form is accepted (OD-2); reason: $($result.Reason)"
+        }
+
         It 'calls gh pr view with the number and the two JSON fields in the root (issue #927)' {
             # Act
             $null = Get-DocsOnlyMergeExemption -CommandText $script:Merge -PrNumber 5 -WorktreeRoot $PSScriptRoot
@@ -137,6 +152,7 @@ Describe 'Get-DocsOnlyMergeExemption (issue #927)' {
         It 'denies <Name> with BASE_UNRESOLVED and no diff call (issue #927)' -ForEach @(
             @{ Name = 'a failing base rev-parse'; RevExit = 128; RevOutput = '' }
             @{ Name = 'a non-hex base rev-parse'; RevExit = 0; RevOutput = 'main' }
+            @{ Name = 'a timed-out base rev-parse (exit 124)'; RevExit = 124; RevOutput = '' }
         ) {
             # Arrange
             $exitCode = $RevExit
@@ -176,6 +192,7 @@ Describe 'Get-DocsOnlyMergeExemption (issue #927)' {
             @{ Name = 'merge diff output without a trailing NUL'; DiffExit = 0; DiffOutput = 'docs/a.md'; Expected = 'DOCS_ONLY_EXEMPTION_DIFF_FAILED*NUL-terminated*' }
             @{ Name = 'an empty merge diff'; DiffExit = 0; DiffOutput = ''; Expected = 'DOCS_ONLY_EXEMPTION_EMPTY_DIFF*' }
             @{ Name = 'a merge diff with a path outside docs'; DiffExit = 0; DiffOutput = "docs/a.md`0src/b.ps1`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
+            @{ Name = 'a timed-out merge diff (exit 124)'; DiffExit = 124; DiffOutput = ''; Expected = 'DOCS_ONLY_EXEMPTION_DIFF_FAILED*could not be computed*' }
         ) {
             # Arrange
             $exitCode = $DiffExit

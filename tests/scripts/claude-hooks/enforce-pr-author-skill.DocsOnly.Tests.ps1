@@ -68,7 +68,8 @@ Describe 'enforce-pr-author-skill docs-only helpers (issue #901)' {
         It 'denies the base or repository override <Name>' -ForEach @(
             @{ Name = 'B cluster -dB'; Command = 'gh pr create --base main -dB other --body-file artifacts/pr_body_1.md' }
             @{ Name = 'B attached -Bother'; Command = 'gh pr create --base main -Bother --body-file artifacts/pr_body_1.md' }
-            @{ Name = 'B equals -B=main'; Command = 'gh pr create -B=main --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'B equals -B=main'; Command = 'gh pr create --base main -B=main --body-file artifacts/pr_body_1.md' }
+            @{ Name = 'B cluster with equals -dB=other'; Command = 'gh pr create --base main -dB=other --body-file artifacts/pr_body_1.md' }
             @{ Name = 'R separate -R'; Command = 'gh pr create --base main -R o/r --body-file artifacts/pr_body_1.md' }
             @{ Name = 'R attached -Ro/r'; Command = 'gh pr create --base main -Ro/r --body-file artifacts/pr_body_1.md' }
             @{ Name = 'R cluster -dR'; Command = 'gh pr create --base main -dR o/r --body-file artifacts/pr_body_1.md' }
