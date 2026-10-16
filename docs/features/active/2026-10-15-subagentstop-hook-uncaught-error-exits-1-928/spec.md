@@ -3,9 +3,9 @@
 - **Issue:** #928
 - **Parent (optional):** none (follow-up to epic #904, code-review finding NB-6)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-15T16-40
+- **Last Updated:** 2026-10-16T06-23
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 - **Work Mode:** full-bug (AC source: this file only)
 - **Research:** `docs/features/active/2026-10-15-subagentstop-hook-uncaught-error-exits-1-928/research/research.2026-10-15T16-10.md`
 

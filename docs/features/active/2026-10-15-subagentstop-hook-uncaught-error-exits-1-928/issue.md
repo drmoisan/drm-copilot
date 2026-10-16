@@ -2,7 +2,7 @@
 
 - Date captured: 2026-10-15
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/subagentstop-hook-uncaught-error-exits-1/ (Issue #928)
+- Status: Promoted -> docs/features/active/2026-10-15-subagentstop-hook-uncaught-error-exits-1-928/ (Issue #928)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
