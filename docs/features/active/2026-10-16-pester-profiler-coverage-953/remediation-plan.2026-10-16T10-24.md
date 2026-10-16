@@ -422,7 +422,7 @@ Describe 'Invoke-PoshQCTest Pester presence check and import range (issue #953, 
 
 No test runs between P3-T1 and P3-T5 (Task-ordering rule).
 
-- [ ] [P3-T1] Edit `scripts/powershell/PoshQC/PoshQC.psm1` with the Edit tool: replace lines 61-62 (the `foreach ($module in $requiredModules) {` line and the `$installed = & $FindModule ...` line that follows it) with the six lines below. No other line changes in this task; line 60 (blank) stays in place.
+- [x] [P3-T1] Edit `scripts/powershell/PoshQC/PoshQC.psm1` with the Edit tool: replace lines 61-62 (the `foreach ($module in $requiredModules) {` line and the `$installed = & $FindModule ...` line that follows it) with the six lines below. No other line changes in this task; line 60 (blank) stays in place.
   - Acceptance: the file contains `$isSupportedVersion = {` (quoted here as the literal this task creates) exactly once.
 
 ```powershell
@@ -434,27 +434,27 @@ No test runs between P3-T1 and P3-T5 (Task-ordering rule).
         $installed = & $FindModule $module.Name | Where-Object -FilterScript $isSupportedVersion | Select-Object -First 1
 ```
 
-- [ ] [P3-T2] Edit `scripts/powershell/PoshQC/PoshQC.psm1` with the Edit tool: replace the two lines `        $post = & $FindModule $module.Name | Where-Object { $_.Version -ge [version]$module.Version -and (-not $module.ContainsKey('UpperBound') -or $_.Version -lt [version]$module.UpperBound) } | Select-Object -First 1` and `        if (-not $post) {` (lines 75-76 before P3-T1, lines 79-80 after it) with the single line below. The `throw` line and the closing brace that follow are unchanged.
+- [x] [P3-T2] Edit `scripts/powershell/PoshQC/PoshQC.psm1` with the Edit tool: replace the two lines `        $post = & $FindModule $module.Name | Where-Object { $_.Version -ge [version]$module.Version -and (-not $module.ContainsKey('UpperBound') -or $_.Version -lt [version]$module.UpperBound) } | Select-Object -First 1` and `        if (-not $post) {` (lines 75-76 before P3-T1, lines 79-80 after it) with the single line below. The `throw` line and the closing brace that follow are unchanged.
   - Acceptance: the file contains no `$post` (`@(Select-String -LiteralPath scripts/powershell/PoshQC/PoshQC.psm1 -SimpleMatch -Pattern '$post').Count` is 0, with the token in single quotes).
 
 ```powershell
         if (-not (& $FindModule $module.Name | Where-Object -FilterScript $isSupportedVersion | Select-Object -First 1)) {
 ```
 
-- [ ] [P3-T3] Verify the `scripts/powershell/PoshQC/PoshQC.psm1` edit.
+- [x] [P3-T3] Verify the `scripts/powershell/PoshQC/PoshQC.psm1` edit.
   - Run `git diff --numstat <REM_BASE_SHA> -- scripts/powershell/PoshQC/PoshQC.psm1` from the Bash tool.
   - Through the Tool route, run `(Get-Content -LiteralPath scripts/powershell/PoshQC/PoshQC.psm1).Count` and the CEIL_R1 counts of the `PoshQC.psm1` row.
   - Write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r1-psm1-edit.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: the numstat row reads `6` added and `3` deleted; the line count equals `PSM1_BASELINE_LINES` (from the latest `r1-line-counts.*.md` in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/`) plus 3; and every CEIL_R1 count for that file equals its expected value.
-- [ ] [P3-T4] Mirror the file through the Tool route with `Copy-Item -LiteralPath scripts/powershell/PoshQC/PoshQC.psm1 -Destination extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psm1 -Force`, then print `(Get-FileHash -Algorithm SHA256 -LiteralPath scripts/powershell/PoshQC/PoshQC.psm1).Hash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psm1).Hash`.
+- [x] [P3-T4] Mirror the file through the Tool route with `Copy-Item -LiteralPath scripts/powershell/PoshQC/PoshQC.psm1 -Destination extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psm1 -Force`, then print `(Get-FileHash -Algorithm SHA256 -LiteralPath scripts/powershell/PoshQC/PoshQC.psm1).Hash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath extensions/drm-copilot/resources/powershell/PoshQC/PoshQC.psm1).Hash`.
   - Acceptance: the printed value is `True`.
-- [ ] [P3-T5] Prove CR-3 leaves behavior unchanged. Run TARGETED_RUN(`cr3-after`, R1_SET) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-cr3-installer-tests-after.<ts>.md`.
+- [x] [P3-T5] Prove CR-3 leaves behavior unchanged. Run TARGETED_RUN(`cr3-after`, R1_SET) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-cr3-installer-tests-after.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the JRP totals and the token check for every RS, MC, INST, and SEAM token.
   - Acceptance:
     - Run valid, EXIT_CODE 0, `failures` 0, and `errors` 0.
     - JRP `tests` equals `R1_TARGETED_BASELINE_TESTS` plus 3.
     - RS03, RS05, MC01-MC05, and every INST token PASS (the same cases that passed in P0-T16 before the refactor), as do all other listed tokens.
-- [ ] [P3-T6] Run `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py -q` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r1-parity-after-mirror.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` quoting the summary line.
+- [x] [P3-T6] Run `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py -q` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r1-parity-after-mirror.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` quoting the summary line.
   - Acceptance: EXIT_CODE 0 and the summary line contains `1 passed`.
 
 ### Phase 4 — CHANGELOG Accuracy
