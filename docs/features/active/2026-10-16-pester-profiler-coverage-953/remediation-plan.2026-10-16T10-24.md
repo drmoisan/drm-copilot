@@ -472,14 +472,14 @@ No test runs between P3-T1 and P3-T5 (Task-ordering rule).
 
 Restart rule: if any task from P5-T1 through P5-T11 fails or changes a tracked file, the executor fixes the cause and restarts at P5-T1, writing new evidence files. All QC artifacts go to `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/`.
 
-- [ ] [P5-T1] Run the PoshQC formatter (write-mode tool) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-poshqc-format.<ts>.md`.
+- [x] [P5-T1] Run the PoshQC formatter (write-mode tool) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-poshqc-format.<ts>.md`.
   - Before the formatter runs, compute the SHA256 of every CYCLE_FILES path and record `$before = git status --porcelain`.
   - Run `pwsh -NoProfile -Command "Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCFormat -Root (Get-Location).Path" *> (Join-Path $S 'issue-953-r1-final-format.log')`, record `$LASTEXITCODE`, then record `$after = git status --porcelain`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (the count of log lines starting with `Formatted: `, the count starting with `Already formatted:`, and whether `$before` equals `$after`), and one `HASH_BEFORE: <path> <SHA256>` line per CYCLE_FILES path.
   - Acceptance: EXIT_CODE 0, zero `Formatted: ` lines, and `$before` equal to `$after` (AC-07: no diff).
-- [ ] [P5-T2] Run `pwsh -NoProfile -Command "Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCAnalyze -Root (Get-Location).Path" *> (Join-Path $S 'issue-953-r1-final-analyze.log')` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-poshqc-analyze.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+- [x] [P5-T2] Run `pwsh -NoProfile -Command "Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCAnalyze -Root (Get-Location).Path" *> (Join-Path $S 'issue-953-r1-final-analyze.log')` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-poshqc-analyze.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: EXIT_CODE 0 and the log contains the literal `PSScriptAnalyzer passed: no findings under` (AC-07: zero findings).
-- [ ] [P5-T3] Run FULL_RUN(final) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-poshqc-test-coverage.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+- [x] [P5-T3] Run FULL_RUN(final) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-poshqc-test-coverage.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - The Output Summary contains:
     - The JRP totals, and the JRP token check for every RS, MC, INST, and SEAM token.
     - The FULL_RUN wall seconds.
@@ -489,7 +489,7 @@ Restart rule: if any task from P5-T1 through P5-T11 fails or changes a tracked f
     - FULL_RUN valid, EXIT_CODE 0, `JUNIT_FAILURES` 0, and `JUNIT_ERRORS` 0 (AC-07: zero failed tests).
     - Every listed token PASS.
     - JRP `tests` equals `R1_BASELINE_JUNIT_TESTS` (latest `r1-poshqc-test-coverage.*.md` in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/`) plus 3.
-- [ ] [P5-T4] Compute the coverage delta from `issue-953-r1-baseline-coverage.xml` and `issue-953-r1-final-coverage.xml` under SCRATCH with CRP, and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-coverage-delta.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+- [x] [P5-T4] Compute the coverage delta from `issue-953-r1-baseline-coverage.xml` and `issue-953-r1-final-coverage.xml` under SCRATCH with CRP, and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-coverage-delta.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - The Output Summary contains:
     - Baseline and final `LINE_COVERED`, `LINE_TOTAL`, and `LINE_PERCENT`.
     - Baseline and final per-file `covered` and `missed` for the keys `scripts/powershell/poshqc/poshqc.psm1` and `scripts/powershell/poshqc/poshqc.testing.psm1`.
@@ -500,31 +500,31 @@ Restart rule: if any task from P5-T1 through P5-T11 fails or changes a tracked f
     - For each of the two keys, the final per-file values satisfy `100 * covered -ge 85 * (covered + missed)`.
     - Each of the six listed lines is present with `ci` greater than 0 (every changed line covered).
   - The Output Summary states that the bundled copies are outside the coverage roots of `config/poshqc-coverage.json:3-9` and are not measured.
-- [ ] [P5-T5] Run `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py -q` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-parity-pytest.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` quoting the summary line.
+- [x] [P5-T5] Run `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py -q` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-parity-pytest.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` quoting the summary line.
   - Acceptance: EXIT_CODE 0 and the summary line contains `1 passed` (AC-02).
-- [ ] [P5-T6] Verify file sizes (AC-15) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-file-size.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` listing each path and its line count.
+- [x] [P5-T6] Verify file sizes (AC-15) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-file-size.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` listing each path and its line count.
   - Build the changed-file set as the union of the paths from `git diff --name-only origin/main...HEAD` and from `git status --porcelain --untracked-files=all` (both from the Bash tool).
   - Keep only paths for which `Test-Path -LiteralPath <path> -PathType Leaf` is true, drop paths ending in `.md`, and record `(Get-Content -LiteralPath <path>).Count` for each remaining path.
   - Acceptance:
     - Every count is at most 500.
     - The set includes `scripts/powershell/PoshQC/PoshQC.Testing.psm1` (463), `scripts/powershell/PoshQC/PoshQC.psm1` (`PSM1_BASELINE_LINES` plus 3), `tests/scripts/powershell/PoshQC/PoshQC.RunSettings.Tests.ps1` (233), and `tests/scripts/powershell/PoshQC/PoshQC.TestingSeamDefaults.Tests.ps1` (124).
     - The set does not include `tests/scripts/powershell/PoshQC/PoshQC.Comprehensive.Tests.ps1`.
-- [ ] [P5-T7] Run the ceiling and pin sweep (AC-04, AC-16): for every CEIL_R1 row and file, run `@(Select-String -LiteralPath <path> -SimpleMatch -Pattern '<token>').Count` through the Tool route, and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-ceiling-sweep.<ts>.md`.
+- [x] [P5-T7] Run the ceiling and pin sweep (AC-04, AC-16): for every CEIL_R1 row and file, run `@(Select-String -LiteralPath <path> -SimpleMatch -Pattern '<token>').Count` through the Tool route, and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-ceiling-sweep.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with one `CEIL: <path> | <token> | <count>` line per row and file.
   - Acceptance:
     - Every count equals its CEIL_R1 expected value.
     - P5-T3 recorded `RS03-INSTALLER-PESTER-590`, `RS05-INSTALLER-PESTER-CEILING-BELOW-6`, `RS06-TEST-IMPORT-PESTER-MAXIMUM`, and `RS07-WORKFLOW-LINUX-PESTER-RANGE` as PASS.
-- [ ] [P5-T8] Verify the CHANGELOG (AC-06) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-changelog.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the four counts.
+- [x] [P5-T8] Verify the CHANGELOG (AC-06) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-changelog.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the four counts.
   - Read `extensions/drm-copilot/CHANGELOG.md`. Take the lines strictly between the line `## [Unreleased]` and the next line that starts with `## [`.
   - Count the lines containing `profiler-based`, `Pester 5.9.0`, `below Pester 6.0`, and `-MinimumVersion 5.9.0`.
   - Acceptance: each of the four counts is at least 1.
-- [ ] [P5-T9] Verify AC-13 and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-scope-ac13.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+- [x] [P5-T9] Verify AC-13 and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-scope-ac13.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Run `git diff --name-only origin/main...HEAD` and `git status --porcelain`.
   - With `$mb = git merge-base origin/main HEAD`, for every file in `Get-ChildItem .github/workflows -Filter *.yml`, extract the `on:` block (from the line matching `^on:` through the line before the next line matching `^\S`) from the worktree file and from `git show "${mb}:.github/workflows/<name>"`, and compare the two.
   - Acceptance: neither listing contains `.github/workflows/ci.yml`, and every `on:` block is identical to the merge-base text.
-- [ ] [P5-T10] Verify AC-14: run `git diff --name-only origin/main...HEAD` and `git status --porcelain`, and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-scope-ac14.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+- [x] [P5-T10] Verify AC-14: run `git diff --name-only origin/main...HEAD` and `git status --porcelain`, and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-scope-ac14.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: neither listing contains a path starting with `.claude/rules/` or `.github/instructions/`.
-- [ ] [P5-T11] Verify the cycle blast radius and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-blast-radius.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, `PYTHON_FILES_CHANGED_THIS_CYCLE: NONE`, `SHELL_FILES_CHANGED_THIS_CYCLE: NONE`, and `WORKFLOW_FILES_CHANGED_THIS_CYCLE: NONE`.
+- [x] [P5-T11] Verify the cycle blast radius and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-blast-radius.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, `PYTHON_FILES_CHANGED_THIS_CYCLE: NONE`, `SHELL_FILES_CHANGED_THIS_CYCLE: NONE`, and `WORKFLOW_FILES_CHANGED_THIS_CYCLE: NONE`.
   - Build the set as the union of the paths from `git diff --name-only <REM_BASE_SHA>` (`REM_BASE_SHA` against the working tree, covering committed and uncommitted tracked changes) and from `git status --porcelain --untracked-files=all` (covering untracked files), both run from the Bash tool.
   - Acceptance: every path in the set is one of these:
     - A CYCLE_FILES path.
@@ -532,10 +532,10 @@ Restart rule: if any task from P5-T1 through P5-T11 fails or changes a tracked f
     - `docs/features/active/2026-10-16-pester-profiler-coverage-953/remediation-inputs.2026-10-16T10-24.md`.
     - A path under `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/`.
   - Acceptance also requires that no path in the set ends in `.py`, `.sh`, `.yml`, or `.json`. The Python, shell, and workflow toolchains are therefore not applicable to this cycle, and the three `NONE` lines record that.
-- [ ] [P5-T12] Record loop closure and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-loop-closure.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and `LOOP_CLEAN_PASS: YES|NO`.
+- [x] [P5-T12] Record loop closure and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-final-loop-closure.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and `LOOP_CLEAN_PASS: YES|NO`.
   - Recompute the SHA256 of every CYCLE_FILES path and compare each with the `HASH_BEFORE:` lines of the latest `r1-final-poshqc-format.*.md` in `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/`.
   - Acceptance: every hash is unchanged, P5-T1 through P5-T11 of this pass passed, and `LOOP_CLEAN_PASS: YES`.
-- [ ] [P5-T13] Record the acceptance-criteria re-verification and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-ac-reverification.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+- [x] [P5-T13] Record the acceptance-criteria re-verification and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/qa-gates/r1-ac-reverification.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - The Output Summary has one line per item, `RECHECK: <item> | <evidence tasks> | PASS|FAIL`, for CR-1, CR-2, CR-3, AC-02, AC-03, AC-04, AC-06, AC-07, AC-13, AC-14, AC-15, and AC-16, using the "Requirements Traceability" evidence tasks.
   - Run `git diff --numstat <REM_BASE_SHA> -- docs/features/active/2026-10-16-pester-profiler-coverage-953/spec.md` and `git status --porcelain -- docs/features/active/2026-10-16-pester-profiler-coverage-953/spec.md` from the Bash tool, and record both outputs.
   - Acceptance:
