@@ -31,3 +31,8 @@ Files read:
 - .claude/rules/tonality.md
 
 Output Summary: All eleven policy files were read in the order above. CLAUDE.md and the four .claude/rules files other than powershell.md were provided in loaded session context and the remaining files were read from disk.
+Command: test -f CLAUDE.md && test -f .github/copilot-instructions.md && test -f .github/instructions/general-code-change.instructions.md && test -f .github/instructions/general-unit-test.instructions.md && test -f .github/instructions/powershell-code-change.instructions.md && test -f .github/instructions/powershell-unit-test.instructions.md && test -f .claude/rules/general-code-change.md && test -f .claude/rules/general-unit-test.md && test -f .claude/rules/powershell.md && test -f .claude/rules/quality-tiers.md && test -f .claude/rules/tonality.md && echo ALL-11-PRESENT
+EXIT_CODE: 0
+Fields Added At: 2026-10-16T04-56
+Verification Output: ALL-11-PRESENT (all eleven listed policy files exist on disk).
+Note: No command was run when this artifact was first written; the read was an observation. The command shown above is the verifying command run when the missing fields were added, and it confirms that each of the eleven files listed under Files read exists.

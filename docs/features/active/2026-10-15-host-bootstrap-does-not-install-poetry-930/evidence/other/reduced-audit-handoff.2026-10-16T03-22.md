@@ -17,3 +17,8 @@ Checked-off AC (issue.md): AC-1 through AC-10.
 Pending CI: AC-11 (evidence/other/ac11-pending-ci.2026-10-16T03-22.md).
 
 Note: the loop restarted once (analyzer finding PSReviewUnusedParameter at the AC930-POETRY-INSTALL-ORDER mock, fixed with `$null = $ApplyMode`); the final pass is clean.
+Command: missing=0; total=0; for n in $(grep -v '^Command:' docs/features/active/2026-10-15-host-bootstrap-does-not-install-poetry-930/evidence/other/reduced-audit-handoff.2026-10-16T03-22.md | grep -o -E '[a-z0-9-]+\.2026-10-16T[0-9]{2}-[0-9]{2}\.md' | sort -u); do total=$((total+1)); find docs/features/active/2026-10-15-host-bootstrap-does-not-install-poetry-930/evidence -type f -name "$n" | grep -q . || missing=$((missing+1)); done; echo "TOTAL=$total MISSING=$missing"; test "$total" -eq 29 && test "$missing" -eq 0
+EXIT_CODE: 0
+Output Summary: TOTAL=29 MISSING=0
+Fields Added At: 2026-10-16T04-57
+Note: No command was run when this artifact was first written; it recorded a handoff to the reduced audit. The command shown above is the verifying command run when the missing fields were added. It confirms that every artifact named in this handoff exists under the evidence folder (29 distinct names, none missing).
