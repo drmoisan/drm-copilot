@@ -1,12 +1,16 @@
-# subagentstop-validators-read-undocumented-envelope (Potential Bug)
+# subagentstop-validators-read-undocumented-envelope (Issue #897)
 
 - Date captured: 2026-08-21
 - Author: Dan Moisan
-- Status: Draft
-- Related: #501 (PreToolUse hooks parse a flat payload and always allow)
+- Status: Promoted -> docs/features/active/subagentstop-validators-read-undocumented-envelope/ (Issue #897)
+- Related: #501 (PreToolUse hooks parse a flat payload and always allow); #787 (PR #856); #840; #786 (PR #881)
+- Updated: 2026-10-11 with evidence from epic #852 enforcement-hook-precision
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #897
+- Issue URL: https://github.com/drmoisan/drm-copilot/issues/897
+- Last Updated: 2026-10-11
 ## Summary
 
 The eight `SubagentStop` validators read `$env:CLAUDE_HOOK_INPUT` and take an `output` property off the parsed root. The documented `SubagentStop` envelope arrives on stdin and exposes `last_assistant_message`, not `output`, and the documented hook environment does not include `CLAUDE_HOOK_INPUT`. These validators are therefore very likely inert for the same two reasons #501 established for the `PreToolUse` surface: wrong transport beneath wrong shape.
@@ -43,6 +47,28 @@ Affected validators:
 `validate-discovery-artifact-gate.ps1`, `validate-executor-output.ps1`, `validate-feature-review-coverage.ps1`, `validate-orchestrator-output.ps1`, `validate-planner-output.ps1`, `validate-pr-author-output.ps1`, `validate-required-artifact-output.ps1`, `validate-task-researcher-output.ps1`.
 
 Two of these — `validate-discovery-artifact-gate.Tests.ps1` and `validate-pr-author-output.Tests.ps1` — also carry the `$LASTEXITCODE | Should -Be 1` assertion that #501 inverted for the `PreToolUse` suites, so their exit-code contract needs the same review.
+
+**Update 2026-10-11 (main at 2ef8d361):**
+
+- The defect is still present on main. Each validator below reads `$env:CLAUDE_HOOK_INPUT`, parses `.output`, and blocks with `exit 1` (all in `.claude/hooks/`):
+
+| File | Reads `.output` at line | Passes `$env:CLAUDE_HOOK_INPUT` at line | `exit 1` at line |
+|---|---|---|---|
+| `validate-discovery-artifact-gate.ps1` | 224 | 258 | 261 |
+| `validate-executor-output.ps1` | 198 | 290 | 293 |
+| `validate-feature-review-coverage.ps1` | 367 | 471 | 474 |
+| `validate-orchestrator-output.ps1` | 362 | 460 | 463 |
+| `validate-planner-output.ps1` | 369 | 410 | 413 |
+| `validate-pr-author-output.ps1` | 109 | 135 | 139 |
+| `validate-required-artifact-output.ps1` | 114 | 163 | 159 and 168 |
+| `validate-task-researcher-output.ps1` | 246 | 288 | 291 |
+| `validate-prd-feature-output.ps1` | 80 | 95 | 96 |
+
+- A ninth validator not in the original list is affected: `validate-prd-feature-output.ps1`, registered in `.claude/agents/prd-feature.md:20`.
+- The inline command at `.claude/settings.json:218` is unchanged: it reads `$env:CLAUDE_HOOK_INPUT`, takes `$input.output`, and ends with `Write-Error '...'; exit 1`.
+- PR #881 (#786) established the rule "For SubagentStop, blocking means exit code 2. A `Write-Error` followed by `exit 1` does not block." It reported that "Two handlers in `validate-orchestrator-output.ps1` (H7 #787, H8 #840) were proven fail-open and converted to the uniform helper-based block", and deferred the rest: "Exit-1 SubagentStop block paths in the other validators remain out of scope (NG1). They are tracked in the potential entry dated 2026-08-21." The `exit 2` paths now on main (for example `validate-orchestrator-output.ps1:456`) fire only when `hook-dependency-guard.ps1` fails to load; the normal validation path still exits 1.
+- PR #856 (#787 and #840) recorded: "SubagentStop stdin/exit-2 envelope is out of scope (potential entry ...2026-08-21-subagentstop-validators-read-undocumented-envelope.md). The Layer 2 port is therefore proven by tests only; whether the block reaches the agent at runtime depends on that separate defect."
+- The two #881 conversions are runtime evidence that exit-1 blocks in this validator family fail open. The stdin-versus-environment transport claim remains unmeasured by a differential run.
 
 ## Logs / Screenshots
 
