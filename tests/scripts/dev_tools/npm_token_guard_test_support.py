@@ -44,7 +44,7 @@ _NPM_AUTH_TOKEN_CONFIG_REFERENCE = re.compile(
     r"(?<![A-Za-z0-9])_authtoken\b", re.IGNORECASE
 )
 _NPM_TOKEN_ASSIGNMENT = re.compile(
-    r"(?<![\w.-])[\"']?NPM_TOKEN[\"']?\s*:|\bNPM_TOKEN\s*=(?!=)", re.IGNORECASE
+    r"(?<![\w.-])[\"']?NPM_TOKEN[\"']?\s*:|\bNPM_TOKEN\s*\+?=(?!=)", re.IGNORECASE
 )
 
 
@@ -122,10 +122,16 @@ def find_npm_token_assignments(text: str) -> list[int]:
     """Return the line numbers of ``text`` that assign a value to ``NPM_TOKEN``.
 
     A YAML mapping key (block, flow, or quoted) and a shell or PowerShell
-    assignment are reported whichever secret feeds them. A context read
-    (``secrets.NPM_TOKEN``, ``env.NPM_TOKEN``), an ``==`` comparison, a longer
-    or prefixed name, and prose without ``:`` or ``=`` after the name are not
-    reported.
+    assignment are reported whichever secret feeds them. An append is also
+    reported (issue #933): a bash ``NPM_TOKEN+=x``, an ``export NPM_TOKEN+=x``,
+    and a PowerShell ``$env:NPM_TOKEN += 'x'``. A dot- or hyphen-prefixed ``=``
+    or ``+=`` assignment such as ``env.NPM_TOKEN += x`` or ``MY-NPM_TOKEN+=x``
+    is also reported, because the assignment form needs only a word boundary
+    before the name. A context read without an assignment operator
+    (``secrets.NPM_TOKEN``, or ``env.NPM_TOKEN`` in an expression), an ``==``
+    comparison, a ``+==`` sequence, a name extended by a letter, digit, or
+    underscore (``NPM_TOKEN_V2``, ``MY_NPM_TOKEN``), and prose without ``:``,
+    ``=``, or ``+=`` after the name are not reported.
 
     Args:
         text: YAML document text to scan.
