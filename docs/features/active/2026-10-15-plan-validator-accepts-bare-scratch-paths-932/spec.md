@@ -64,9 +64,10 @@ Expected behavior: plan preflight rejects a SCRATCH definition that is not names
 ### Logical lines
 
 1. Lines inside fenced code blocks are skipped. Fence recognition uses the same fence regex as the command extractor (`_FENCE_RE` in `plan_gate_commands.py`, `^\s*` followed by three backticks) and its TypeScript equivalent.
-2. A logical line is a non-fenced physical line plus each immediately following physical line that is non-blank and begins with whitespace. Continuation stops at a fence line, a Markdown ATX heading, or a task line (as recognized by `PLAN_GATE_TASK_RE` / its TypeScript twin).
+2. A logical line is a non-fenced physical line plus each immediately following physical line that is non-blank and begins with whitespace. Continuation stops at a fence line (an indented fence included) and at any line that does not begin with whitespace; a Markdown ATX heading or task line written at column 0 therefore ends the logical line, and an indented heading or task line is absorbed into it.
 3. The reported line number is the 1-based physical line number of the first line of the logical line.
 4. The logical line is normalized for matching and for the message by the same whitespace normalization as the existing `_window_join` / `windowJoin` pair (whitespace runs joined by a single space, trimmed), so that both runtimes produce byte-identical text.
+5. Physical lines are split on the CR LF, LF, and CR terminators only, in both runtimes and in the command extractor (remediation cycle 1).
 
 ### Predicate
 
@@ -207,6 +208,7 @@ Line {n}: SCRATCH definition `{normalized logical line}` is not namespaced by is
 
 - **NFR-1 (determinism).** G10 is a pure function of the plan text. It reads no file, clock, environment variable, or git state.
 - **NFR-2 (runtime parity).** For any input, the Python and TypeScript detectors return the same line numbers and byte-identical messages. The definition and namespace regexes use only constructs that behave identically in both dialects (no lookbehind).
+  - Remediation cycle 1 note: line splitting is aligned on the CR LF, LF, and CR terminators in both runtimes and in the command extractor. One residual difference remains in whitespace normalization (Python `str.split()` against the JavaScript whitespace class) for the information separators, NEL, and the byte-order mark; it is documented in `.claude/rules/plan-acceptance-gates.md` and is not fixed in this item.
 - **NFR-3 (performance).** G10 runs in a single linear pass over the plan lines. It adds no measurable latency relative to the existing gates for plans of typical size.
 - **NFR-4 (file size).** No production, test, or script file exceeds 500 lines. G10 lives in new sibling modules because `plan_gate_observability.py`, `plan-gate-observability.ts`, `validate_orchestration_artifacts.py`, and `test_plan_gate_parity.py` are close to that limit; G10 frozen strings and severity parity therefore live in `test_plan_gate_scratch.py`, and `test_plan_gate_parity.py` changes only its module list.
 - **NFR-5 (quality tiers).** `scripts/dev_tools` is T4 and `extensions/drm-copilot` is T3 under `quality-tiers.yml`; no property or mutation tests are required. Coverage thresholds are 85% line and 75% branch, uniform.
@@ -232,6 +234,7 @@ Line {n}: SCRATCH definition `{normalized logical line}` is not namespaced by is
 - `SCRATCHPAD`, `<SCRATCHPAD>`, and `<SCRATCH>` tokens and root paths under them.
 - A SCRATCH definition made by reference to another plan.
 - A SCRATCH definition inside a fenced code block.
+- Any `issue-<digits>` or `issue-<issue-num>` token after the definition match, including a cross-reference that is not the scratch location.
 
 ## References
 

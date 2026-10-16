@@ -12,9 +12,9 @@ description: Acceptance-gate rules G1 through G10 for atomic plans. G1 through G
 
 # Atomic-Plan Acceptance Gates (G1 through G6)
 
-This rule governs the acceptance-gate rules the plan validator applies to the shell commands an atomic plan states as acceptance conditions. It exists because a plan can state an acceptance condition that cannot fail: a coverage argument that collects no data, or a search for a literal that returns zero matches whatever the executor does. Such a condition reads as a verification step and gates nothing (issue #486).
+This rule governs the acceptance-gate rules the plan validator applies to an atomic plan: G1 through G9 judge the shell commands the plan states as acceptance conditions, and G10 judges the whole plan document. It exists because a plan can state an acceptance condition that cannot fail: a coverage argument that collects no data, or a search for a literal that returns zero matches whatever the executor does. Such a condition reads as a verification step and gates nothing (issue #486).
 
-The rules are enforced by `scripts/dev_tools/plan_gate_discrimination.py` and by the TypeScript parity port at `extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts` with its shared-predicate module `plan-gate-rules.ts`, both fed by the command extractor (`scripts/dev_tools/plan_gate_commands.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts`). Enforcement is validator logic plus this prose file. No JSON Schema is authored, imported, or read.
+The rules are enforced by `scripts/dev_tools/plan_gate_discrimination.py` and by the TypeScript parity port at `extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts` with its shared-predicate module `plan-gate-rules.ts`. G1 through G9 are fed by the command extractor (`scripts/dev_tools/plan_gate_commands.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts`); G10 reads the whole document through `scripts/dev_tools/plan_gate_scratch.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts`. Enforcement is validator logic plus this prose file. No JSON Schema is authored, imported, or read.
 
 ## Scope of Invocation — no grandfathering or exemption mechanism
 
@@ -150,6 +150,8 @@ issue-(?:<issue-num>|[0-9]+)
 
 Lines inside fenced code blocks are skipped, and a logical line is reported once however many definition matches it contains.
 
+A continuation line is non-blank, begins with whitespace, and is not a fence line, so a heading or task line written at column 0 ends the logical line, and an indented heading or task line is absorbed into it. Both runtimes split the document into physical lines on the CR LF, LF, and CR terminators only; a form feed, a vertical tab, the information separators, NEL, and the Unicode line and paragraph separators do not end a physical line. One parity residual remains: whitespace normalization uses Python `str.split()` in one runtime and the JavaScript whitespace class in the other, and the two disagree on the information separators, NEL, and the byte-order mark, so a logical line containing one of those characters can produce a different finding or message text in the two runtimes.
+
 The severity was fixed by the same two-conjunct decision rule used for G5 through G9, written and committed before the measurement was taken: Blocking if and only if the total G10 finding count is greater than zero **and** the recorded false-positive count is zero; otherwise the measurement indicates Warning. The pre-declared false-positive definition is a flagged logical line that is not a SCRATCH definition, or that defines SCRATCH in the canonical issue-namespaced form.
 
 The measurement is recorded in `docs/features/active/2026-10-15-plan-validator-accepts-bare-scratch-paths-932/evidence/qa-gates/g10-corpus-measurement.2026-10-16T01-21.md`. It scanned 493 plan and remediation-plan files under `docs/` at the merge base and produced 17 findings, all 17 true positives and 0 false positives, so both conjuncts hold and the rule yields Blocking.
@@ -164,6 +166,7 @@ G10 does not report the following, and each is a stated limitation rather than a
 - **`SCRATCHPAD`-family tokens.** `SCRATCHPAD`, `<SCRATCHPAD>`, and `<SCRATCH>` tokens, and root paths written under them, are excluded by the preceding-character class and the token boundary.
 - **Definition by reference.** A plan that defines SCRATCH by pointing at another plan's definition carries no definition text for the predicate to match.
 - **Fenced definitions.** A definition placed inside a fenced code block is skipped, which is also what lets plans and specifications quote rejected forms as examples.
+- **Any issue token after the definition.** A logical line is accepted when an `issue-<digits>` or `issue-<issue-num>` token appears anywhere in its text after the first definition match, including a cross-reference that is not the scratch location, such as `(see issue-900 for context)`. Step 2 checks the namespace shape anywhere in that text, not inside a path segment.
 
 One false-positive class is possible and recorded: the colon connector matches prose in which the word SCRATCH is directly followed by a colon that introduces something other than a definition, as in the line below. The measured corpus contains no instance.
 
@@ -286,7 +289,7 @@ The prohibition is enforced by tests, not only by prose: a parity test asserts t
 
 ## Enforcement
 
-- `scripts/dev_tools/plan_gate_commands.py` extracts task-attributed command candidates; `scripts/dev_tools/plan_gate_discrimination.py` evaluates G1 through G6 and returns the two severity channels.
+- `scripts/dev_tools/plan_gate_commands.py` extracts task-attributed command candidates; `scripts/dev_tools/plan_gate_discrimination.py` evaluates G1 through G9, calls `scripts/dev_tools/plan_gate_scratch.py` for G10, and returns the two severity channels.
 - `scripts/dev_tools/validate_orchestration_artifacts.py` routes the existing `plan` artifact type through the two-channel entry point, prints each Warning to stderr prefixed with `PLAN GATE WARNING: `, and derives its exit code from the error channel alone. No new flag, option, or artifact type is added.
 - The TypeScript parity port is dispatched from `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` for the existing `plan` artifact type. The MCP `validate_orchestration_artifacts` input-schema property-key set is unchanged; Warnings surface on an optional `warnings` field that is absent when there are none.
 - `scripts/dev_tools/plan_gate_scratch.py` evaluates G10, the document-level SCRATCH definition rule, and `evaluate_plan_gates` in `scripts/dev_tools/plan_gate_discrimination.py` calls it on every invocation, with or without a context. The TypeScript twin `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` is called the same way from `evaluatePlanGates`. Through the Python CLI a G10 finding is printed as an error and the process exits 1; through the MCP service call it causes the call to throw with the message included.
