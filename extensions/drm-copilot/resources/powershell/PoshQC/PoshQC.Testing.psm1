@@ -150,6 +150,14 @@ Optional workspace-relative or workspace-contained folders to scan instead of th
 .PARAMETER ResolveCoveragePopulation
 Injectable seam that derives the code-coverage file population from the workspace (issue #527).
 Defaults to Resolve-PoshQCCoveragePopulation.
+.PARAMETER ShardIndex
+One-based shard index; used only when ShardCount is greater than 0 (issue #953).
+.PARAMETER ShardCount
+Number of shards. When greater than 0, Run.Path is set to this shard's size-balanced slice of the test files (Select-PoshQCShardTestFile).
+.PARAMETER ShardFileListPath
+Optional path that receives the shard manifest (shardIndex, shardCount, all, selected) as JSON.
+.PARAMETER WriteShardFileList
+Injectable seam that writes the shard manifest JSON. Defaults to Set-Content.
 #>
 function Invoke-PoshQCTest {
     [CmdletBinding()]
@@ -160,12 +168,19 @@ function Invoke-PoshQCTest {
         [string[]] $ExcludeDirs = $script:DefaultExcludedDirs,
         [string] $KoverageOutputPath,
         [switch] $DisableKoverageCopy,
+        [int] $ShardIndex = 0,
+        [int] $ShardCount = 0,
+        [string] $ShardFileListPath,
+        [scriptblock] $WriteShardFileList = { param([string] $Path, [string] $Json) Set-Content -LiteralPath $Path -Value $Json -Encoding utf8 },
         [scriptblock] $EnsureModule = {
-            param([string] $Name, [string] $ErrorMessage)
-            if (-not (Get-Module -ListAvailable -Name $Name)) { throw $ErrorMessage }
+            param([string] $Name, [string] $ErrorMessage, [string] $MinimumVersion, [string] $MaximumVersion)
+            # Issue #953 (CR-1): only an installed version inside the supported range counts as present, so a host
+            # whose only Pester is 6.x or the inbox 3.4.0 receives the actionable message instead of an import error.
+            if (-not (Get-Module -ListAvailable -FullyQualifiedName @{ ModuleName = $Name; ModuleVersion = $MinimumVersion; MaximumVersion = $MaximumVersion })) { throw $ErrorMessage }
             # Import globally so Pester's Describe/It/Mock resolve in test containers that the
             # default $InvokePester trampoline now hosts in the global session state (issue #392).
-            Import-Module $Name -Global -ErrorAction Stop
+            # Issue #953 (D8, CR-2): -MinimumVersion and -MaximumVersion keep the import inside the supported range.
+            Import-Module $Name -Global -MinimumVersion $MinimumVersion -MaximumVersion $MaximumVersion -ErrorAction Stop
         },
         [scriptblock] $TestPathExists = { param([string] $Path) Test-Path $Path },
         [scriptblock] $LoadSettings = { param([string] $Path) Import-PowerShellDataFile -Path $Path },
@@ -302,7 +317,7 @@ function Invoke-PoshQCTest {
         $Root = [IO.Path]::GetFullPath([IO.Path]::Combine($PWD.ProviderPath, $Root))
     }
 
-    & $EnsureModule 'Pester' "Pester is not installed. Run Install-PoshQCTool (alias Install-PoshQCTools) first."
+    & $EnsureModule 'Pester' "Pester is not installed in the supported range (5.9.0 to 5.99.99). Run Install-PoshQCTool (alias Install-PoshQCTools) first." '5.9.0' '5.99.99'
 
     if (-not (& $TestPathExists $SettingsPath)) {
         throw "Settings not found: $SettingsPath"
@@ -392,6 +407,10 @@ function Invoke-PoshQCTest {
     if (-not $testFiles) {
         & $Logger "No Pester test files found under configured paths for root $Root"
         return
+    }
+    if ($ShardCount -gt 0) {
+        # Issue #953 (FR-09, CR-10, CR-13): run only this shard's size-balanced slice of the enumerated test files.
+        $config.Run.Path = [string[]] @(Select-PoshQCShardTestFile -RootPath $Root -TestFile @($testFiles) -ShardIndex $ShardIndex -ShardCount $ShardCount -ShardFileListPath $ShardFileListPath -WriteShardFileList $WriteShardFileList)
     }
 
     $pesterResult = & $InvokePester $config

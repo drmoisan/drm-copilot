@@ -13,7 +13,7 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
 ## Requirements
 
 - PowerShell 5.1 or 7.6+
-- Modules: PSScriptAnalyzer 1.22.0, Pester 5.6.1 (installed automatically via the helper if missing)
+- Modules: PSScriptAnalyzer 1.22.0, Pester 5.9.0 or later, below 6.0 (installed automatically via the helper if missing)
 
 ## Getting started
 
@@ -59,6 +59,12 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
 - `Invoke-PoshQCSuite`: run format, analyze, and test in one pass, optionally narrowing the scan scope with `-ScanFolders`.
 - `Invoke-PoshQCTest`: run Pester using the bundled runsettings, including coverage and optional Koverage copy.
 - `Convert-PoshQCCoverageToRelative`: utility to strip repo-root prefixes and write a `.koverage.xml` copy (used internally by `Invoke-PoshQCTest`).
+- `Get-PoshQCShardSlice`: select one shard's test files; with `-Weight` (non-negative values, for example text sizes in bytes) the heaviest files are assigned first to the least-loaded shard, and a negative weight is rejected.
+- `New-PoshQCShardManifest`: build the in-memory shard manifest (`shardIndex`, `shardCount`, `all`, `selected`, `selectedFullPath`).
+- `Test-PoshQCShardCompleteness`: throw unless a set of shard manifests selects every test file exactly once.
+- `Test-PoshQCShardTestCount`: throw unless the shard test counts sum to a discovery-pass test count.
+- `Merge-PoshQCCoverageReport`: merge the CoverageGutters XML texts of the shards at LINE granularity (no file I/O, no threshold).
+- `Get-PoshQCCoverageLineSummary`: return covered, missed, total, and percent from a report's LINE counter.
 
 ## Configuration
 
@@ -66,6 +72,7 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
    - Enforces compatible syntax for 5.1 and 7.6, 4-space indentation, ShouldProcess for state-changing functions, and safety guards (no Invoke-Expression, no global vars, etc.).
 - Pester settings: `./settings/pester.runsettings.psd1`
   - Runs tests under `scripts` and `tests/powershell`, outputs JUnit XML and CoverageGutters coverage, and enables coverage. The shipped runsettings carry no `CodeCoverage.Path` list; `Invoke-PoshQCTest` derives the coverage population from the workspace (see Coverage population below).
+  - Coverage uses Pester's profiler-based mode (`CodeCoverage.UseBreakpoints = $false`, issue #953), which needs Pester 5.4 or later and is faster than breakpoint mode on the same coverage population. The PoshQC suites target PowerShell 7; profiler mode under Windows PowerShell 5.1 is not exercised in CI. To use breakpoint mode, pass a settings file with `UseBreakpoints = $true` through `-SettingsPath`.
   - When `-ScanFolders` is supplied to `Invoke-PoshQCSuite` or the lower-level commands, the suite narrows discovery to those workspace-relative or workspace-contained folders.
 - Coverage population (issue #527): `Invoke-PoshQCTest` measures the same file set for the same workspace whichever module copy is loaded.
   - Workspace configuration: `config/poshqc-coverage.json` with the schema `{"version": 1, "roots": [...]}`. Each root is a workspace-relative folder. The file is validated fail-fast, and every error names `config/poshqc-coverage.json`: empty content, invalid JSON, a `version` other than 1, a missing or non-array `roots`, and a blank, absolute, or `..`-segment entry are rejected. An empty `roots` array yields an empty population.
@@ -73,6 +80,11 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
   - Built-in exclusions: `.ps1` and `.psm1` files only; files named `*.Tests.ps1` are excluded, as are files whose first root-relative segment is `tests` and files under any root-relative directory named in `DefaultExcludedDirs` (for example `node_modules`, `artifacts`, `.venv`). A nonexistent root is skipped with a warning.
   - An empty population disables coverage for that invocation, logs `Code coverage disabled for this invocation`, and still runs the tests.
   - Each run logs `Code coverage population: source=<source>; files=<count>` before Pester starts.
+- Sharded runs (issue #953): `Invoke-PoshQCTest -ShardIndex <n> -ShardCount <N>` runs only shard n of N.
+  - Test files are weighted by the UTF-8 size in bytes of their text with CRLF line endings counted as LF, and assigned heaviest first to the shard with the least assigned weight (ties: fewer files, then the lower shard index; equal sizes are taken in ordinal path order), so runners whose checkouts differ only in line-ending conversion compute the same assignment.
+  - `-ShardFileListPath <path>` writes the shard manifest (`shardIndex`, `shardCount`, `all`, `selected`) as JSON through the `-WriteShardFileList` seam.
+  - A shard that selects no test file (more shards than test files) stops with an error before Pester runs.
+  - `Merge-PoshQCCoverageReport` merges the shard reports with `ci = max(ci)` per line and recomputes the LINE and INSTRUCTION counters, so the merged LINE figures are exact. It omits `class` and `method` elements and METHOD and CLASS counters, because those cannot be recomputed from line hits.
 
 ## Typical workflow
 
