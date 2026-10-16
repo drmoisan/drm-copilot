@@ -5,7 +5,7 @@ Task: P4-T6 (remediation-plan.2026-10-16T08-40.md)
 Command: mcp__drm-copilot__run_poshqc_test with workspace_root WORKTREE and no scan_folders (the final-pass P4-T3 call); files read with date -u -r, SCRATCH/jacoco_report.py, SCRATCH/jacoco_targets.py, SCRATCH/junit_totals.py, SCRATCH/junit_status.py (via sh SCRATCH/c2_local_cov.sh from WORKTREE)
 EXIT_CODE: 0
 Output Summary: Files written at 11-54 (coverage) and 11-56 (JUnit), both at or after RunStart 11-42. Report line coverage 94.58% (11629 covered, 667 missed, 127 source files), at least 85.00. jacoco_targets.py prints NO_MATCH and exits 3, as expected under the OrchestratorDecision. JUnit TESTCASES=10507 = L + 17 (L = 10490 from coverage-local-baseline-c2.2026-10-16T10-04.md), FAILED=0, SKIPPED=10. No run_poshqc_test call follows P4-T3.
-OrchestratorDecision: per-copy coverage read from CI artifact pending P4-T12; local MCP runner reads installed-extension runsettings
+OrchestratorDecision: per-copy coverage read from CI artifact 38898218767; local MCP runner reads installed-extension runsettings
 RunStart: 2026-10-16T11-42 (from poshqc-test-final-c2.2026-10-16T11-56.md)
 
 ## File times
