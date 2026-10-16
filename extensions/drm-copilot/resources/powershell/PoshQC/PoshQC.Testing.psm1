@@ -153,7 +153,7 @@ Defaults to Resolve-PoshQCCoveragePopulation.
 .PARAMETER ShardIndex
 One-based shard index; used only when ShardCount is greater than 0 (issue #953).
 .PARAMETER ShardCount
-Number of shards. When greater than 0, Run.Path is set to this shard's round-robin slice of the test files.
+Number of shards. When greater than 0, Run.Path is set to this shard's size-balanced slice of the test files (Select-PoshQCShardTestFile).
 .PARAMETER ShardFileListPath
 Optional path that receives the shard manifest (shardIndex, shardCount, all, selected) as JSON.
 .PARAMETER WriteShardFileList
@@ -409,13 +409,8 @@ function Invoke-PoshQCTest {
         return
     }
     if ($ShardCount -gt 0) {
-        # Issue #953 (FR-09): run only this shard's round-robin slice of the enumerated test files.
-        $testFilePaths = @($testFiles | ForEach-Object { if ($_ -is [string]) { $_ } else { $_.FullName } })
-        $shardManifest = New-PoshQCShardManifest -RootPath $Root -TestFile $testFilePaths -ShardIndex $ShardIndex -ShardCount $ShardCount
-        $config.Run.Path = [string[]] $shardManifest.selectedFullPath
-        if ($ShardFileListPath) {
-            & $WriteShardFileList $ShardFileListPath ($shardManifest | Select-Object -Property shardIndex, shardCount, all, selected | ConvertTo-Json -Depth 4)
-        }
+        # Issue #953 (FR-09, CR-10, CR-13): run only this shard's size-balanced slice of the enumerated test files.
+        $config.Run.Path = [string[]] @(Select-PoshQCShardTestFile -RootPath $Root -TestFile @($testFiles) -ShardIndex $ShardIndex -ShardCount $ShardCount -ShardFileListPath $ShardFileListPath -WriteShardFileList $WriteShardFileList)
     }
 
     $pesterResult = & $InvokePester $config
