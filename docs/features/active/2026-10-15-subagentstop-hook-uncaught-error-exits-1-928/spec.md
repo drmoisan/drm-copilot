@@ -251,6 +251,8 @@ extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/
 docs/engineering/claude-code-architecture.md
 tests/scripts/claude-hooks/subagentstop-uncaught-error.Tests.ps1
 tests/scripts/claude-hooks/subagentstop-envelope.Tests.ps1
+tests/scripts/claude-hooks/subagentstop-envelope-orchestrator-family.Registration.Tests.ps1
+tests/scripts/claude-hooks/validate-required-artifact-output.Envelope.Tests.ps1
 
 Referenced without change (verification only):
 
