@@ -1,5 +1,8 @@
 # Research: Issue #884 untouched-files coverage verification
 
+SUPERSESSION-NOTE: the acceptance criteria AC1 to AC5 in issue.md supersede the acceptance-criteria proposal (AC1 to AC6) in this document.
+TEMPLATE-STATEMENTS-HISTORICAL: YES (statements below that describe issue.md and the plan as unfilled templates describe the state when this research was written and are historical).
+
 - Issue: #884 (bug, "untouched-files-coverage-below-floor")
 - Branch: bug/untouched-files-coverage-verification-884
 - Base: origin/main f6915d429

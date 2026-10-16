@@ -1,6 +1,10 @@
 # Phase 0 policy reads (#884)
 
 Timestamp: 2026-10-16T00-26
+Command: Read tool reads of the six policy files; Write tool write of this artifact
+EXIT_CODE: 0
+EXIT-CODE-SCOPE: file-write only; the Read tool reads are not commands and have no exit code; the artifact file was observed to exist after the write
+Output Summary: Six policy files were read in the order listed under Policy Order, and this artifact was written.
 
 Policy Order:
 1. CLAUDE.md

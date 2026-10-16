@@ -1,6 +1,10 @@
 # Issue update mirror (#884)
 
 Timestamp: 2026-10-16T00-37
+Command: Write tool write of this issue-update mirror; no gh command was run
+EXIT_CODE: 0
+EXIT-CODE-SCOPE: file-write only; no gh or other command was run; the mirror file was observed to exist after the write
+Output Summary: The mirror records the closing comment text for #884 with posting blocked and not yet posted.
 
 POSTING BLOCKED
 
