@@ -164,13 +164,31 @@ def validate_committed_file(
     return []
 
 
-def _plan_path(feature: dict[str, Any]) -> str | None:
-    """Return the normalized ``plan_path`` the readiness gate derives, if any."""
+def repository_relative_path(
+    value: object, *, field: str
+) -> tuple[str | None, list[str]]:
+    """Validate and normalize a safe repository-relative POSIX path.
 
-    value = feature.get("plan_path")
+    The readiness gate derives every checkpoint path through this function, and
+    plan pairing derives each entry's ``plan_path`` through it, so the two cannot
+    disagree on a plan's normalized spelling.
+    """
+
     if not isinstance(value, str) or not value.strip():
-        return None
-    return PurePosixPath(value).as_posix()
+        return None, [f"{field} must be a non-empty repository-relative path."]
+    if "\\" in value:
+        return None, [f"{field} must use forward slashes."]
+    path = PurePosixPath(value)
+    if path.is_absolute() or ".." in path.parts or "." in path.parts:
+        return None, [f"{field} must stay within the workspace root."]
+    return path.as_posix(), []
+
+
+def _plan_path(feature: dict[str, Any]) -> str | None:
+    """Return the ``plan_path`` the readiness gate derives, if any."""
+
+    plan, _ = repository_relative_path(feature.get("plan_path"), field="plan_path")
+    return plan
 
 
 def _pair_plans_with_features(
