@@ -72,55 +72,55 @@ This plan must pass G10. It therefore quotes no bare SCRATCH definition outside 
 
 All Phase 0 commands are read-only check modes. No write-mode formatter runs in this phase. All artifacts go to `<FEATURE>/evidence/remediation-baseline/`.
 
-- [ ] [P0-T1] Read the policy files in policy-compliance order and record them in `<FEATURE>/evidence/remediation-baseline/phase0-instructions-read-rc2.<timestamp>.md`
+- [x] [P0-T1] Read the policy files in policy-compliance order and record them in `<FEATURE>/evidence/remediation-baseline/phase0-instructions-read-rc2.<timestamp>.md`
   - Files, in order: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`, `.claude/rules/typescript.md`, `.claude/rules/typescript-suppressions.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/plan-acceptance-gates.md`.
   - Acceptance: the artifact carries `Timestamp:`, `Policy Order:`, and a list naming all nine files in that order.
-- [ ] [P0-T2] Read the cycle inputs and record them in `<FEATURE>/evidence/remediation-baseline/remediation-inputs-read-rc2.<timestamp>.md`
+- [x] [P0-T2] Read the cycle inputs and record them in `<FEATURE>/evidence/remediation-baseline/remediation-inputs-read-rc2.<timestamp>.md`
   - Files: `<FEATURE>/remediation-inputs.2026-10-16T03-19.md`, `<FEATURE>/policy-audit.2026-10-16T03-15.md`, `<FEATURE>/code-review.2026-10-16T03-15.md`, `<FEATURE>/feature-audit.2026-10-16T03-15.md`.
   - Acceptance: the artifact carries `Timestamp:` and lists the four files. It lists the in-scope IDs `N-1`, `N-2`, and `U-1`, and the declined IDs `U-2`, `U-3`, `CR-6`, and `CR-7`, each with the reason stated in Cycle Scope.
-- [ ] [P0-T3] Record the git baseline in `<FEATURE>/evidence/remediation-baseline/git-baseline-rc2.<timestamp>.md`
+- [x] [P0-T3] Record the git baseline in `<FEATURE>/evidence/remediation-baseline/git-baseline-rc2.<timestamp>.md`
   - Commands: `git fetch origin main`, `git rev-parse HEAD`, `git merge-base origin/main HEAD`, `git status --porcelain`.
   - Acceptance: each command records `EXIT_CODE: 0`. The artifact records the HEAD SHA under the label `RC2_BASE:` and the merge-base SHA under the label `MERGE_BASE:`. The porcelain output lists no path other than `SCRATCH/` and `<FEATURE>/remediation-plan.2026-10-16T03-19.md`; either may be absent.
-- [ ] [P0-T4] Create the scratch subdirectories `SCRATCH/cov/` and `SCRATCH/corpus/` and record them in `<FEATURE>/evidence/remediation-baseline/scratch-setup-rc2.<timestamp>.md`
+- [x] [P0-T4] Create the scratch subdirectories `SCRATCH/cov/` and `SCRATCH/corpus/` and record them in `<FEATURE>/evidence/remediation-baseline/scratch-setup-rc2.<timestamp>.md`
   - Method: the Write tool writes `SCRATCH/cov/README.txt` and `SCRATCH/corpus/README.txt`, each with the one-line content `Issue 932 remediation cycle 2 scratch directory; not committed.`. `SCRATCH` is resolved to its absolute path for the tool calls only.
   - Acceptance: the Glob tool with pattern `*/README.txt`, rooted at the resolved `SCRATCH` directory, returns both files. The artifact records the method and the relative results using the token `SCRATCH` only.
-- [ ] [P0-T5] Capture the TypeScript format baseline in `<FEATURE>/evidence/remediation-baseline/ts-format-baseline-rc2.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P0-T5] Capture the TypeScript format baseline in `<FEATURE>/evidence/remediation-baseline/ts-format-baseline-rc2.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs" eslint.config.mjs`
   - Acceptance: `Output Summary:` quotes either `All matched files use Prettier code style!` or the list of files reported with warnings, and records the observed exit code.
-- [ ] [P0-T6] Capture the TypeScript lint baseline in `<FEATURE>/evidence/remediation-baseline/ts-lint-baseline-rc2.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P0-T6] Capture the TypeScript lint baseline in `<FEATURE>/evidence/remediation-baseline/ts-lint-baseline-rc2.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx eslint --no-error-on-unmatched-pattern src test`
   - Acceptance: `Output Summary:` records the error and warning counts (no output on a clean run is recorded as `0 errors, 0 warnings`).
-- [ ] [P0-T7] Capture the TypeScript production type-check baseline in `<FEATURE>/evidence/remediation-baseline/ts-typecheck-baseline-rc2.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P0-T7] Capture the TypeScript production type-check baseline in `<FEATURE>/evidence/remediation-baseline/ts-typecheck-baseline-rc2.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx tsc -p ./ --noEmit`
   - Acceptance: `Output Summary:` records the diagnostic count (no output on success).
-- [ ] [P0-T8] Capture the TypeScript test type-check baseline in `<FEATURE>/evidence/remediation-baseline/ts-typecheck-test-baseline-rc2.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P0-T8] Capture the TypeScript test type-check baseline in `<FEATURE>/evidence/remediation-baseline/ts-typecheck-test-baseline-rc2.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx tsc -p tsconfig.jest.json --noEmit`
   - Acceptance: `Output Summary:` records the diagnostic count.
-- [ ] [P0-T9] Capture the full jest coverage baseline in `<FEATURE>/evidence/remediation-baseline/ts-coverage-baseline-rc2.<timestamp>.md` (working directory `extensions/drm-copilot/`)
+- [x] [P0-T9] Capture the full jest coverage baseline in `<FEATURE>/evidence/remediation-baseline/ts-coverage-baseline-rc2.<timestamp>.md` (working directory `extensions/drm-copilot/`)
   - Command: `npx jest --config jest.config.cjs --coverage --coverageReporters=lcov --coverageReporters=text-summary --coverageReporters=json-summary`
   - Acceptance: `Output Summary:` records:
     - the suite and test pass/fail counts and the `text-summary` totals;
     - every failing suite and any coverage-threshold message;
     - the `lines.pct` and `branches.pct` values for `src/lib/validate/plan-gate-scratch.ts`, `src/lib/validate/plan-gate-commands.ts`, and `src/lib/validate/plan-gate-rules.ts`, read from `extensions/drm-copilot/coverage/coverage-summary.json`.
-- [ ] [P0-T10] Capture the Python format baseline in `<FEATURE>/evidence/remediation-baseline/python-format-baseline-rc2.<timestamp>.md`
+- [x] [P0-T10] Capture the Python format baseline in `<FEATURE>/evidence/remediation-baseline/python-format-baseline-rc2.<timestamp>.md`
   - Command: `poetry run black --check scripts/dev_tools/plan_gate_scratch.py scripts/dev_tools/plan_gate_discrimination.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`
   - Acceptance: `Output Summary:` quotes the black summary line (for example `4 files would be left unchanged.`) and records the observed exit code.
-- [ ] [P0-T11] Capture the Python lint baseline in `<FEATURE>/evidence/remediation-baseline/python-lint-baseline-rc2.<timestamp>.md`
+- [x] [P0-T11] Capture the Python lint baseline in `<FEATURE>/evidence/remediation-baseline/python-lint-baseline-rc2.<timestamp>.md`
   - Command: `poetry run ruff check --no-fix scripts/dev_tools/plan_gate_scratch.py scripts/dev_tools/plan_gate_discrimination.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`
   - Acceptance: `Output Summary:` quotes either `All checks passed!` or the diagnostic count.
-- [ ] [P0-T12] Capture the Python type-check baseline in `<FEATURE>/evidence/remediation-baseline/python-typecheck-baseline-rc2.<timestamp>.md`
+- [x] [P0-T12] Capture the Python type-check baseline in `<FEATURE>/evidence/remediation-baseline/python-typecheck-baseline-rc2.<timestamp>.md`
   - Command: `poetry run pyright scripts/dev_tools/plan_gate_scratch.py scripts/dev_tools/plan_gate_discrimination.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py`
   - Acceptance: `Output Summary:` quotes the pyright summary line (`N errors, N warnings, N informations`).
-- [ ] [P0-T13] Capture the Python coverage baseline for `scripts.dev_tools.plan_gate_scratch` and `scripts.dev_tools.plan_gate_discrimination` in `<FEATURE>/evidence/remediation-baseline/python-coverage-baseline-rc2.<timestamp>.md`
+- [x] [P0-T13] Capture the Python coverage baseline for `scripts.dev_tools.plan_gate_scratch` and `scripts.dev_tools.plan_gate_discrimination` in `<FEATURE>/evidence/remediation-baseline/python-coverage-baseline-rc2.<timestamp>.md`
   - Command: `poetry run pytest tests/scripts/dev_tools/test_plan_gate_commands.py tests/scripts/dev_tools/test_plan_gate_scratch.py tests/scripts/dev_tools/test_plan_gate_scratch_docs.py tests/scripts/dev_tools/test_plan_gate_parity.py tests/scripts/dev_tools/test_plan_gate_discrimination_context.py tests/scripts/dev_tools/test_plan_gate_discrimination_cov.py tests/scripts/dev_tools/test_plan_gate_discrimination_literals.py tests/scripts/dev_tools/test_plan_gate_observability.py tests/scripts/dev_tools/test_plan_gate_observability_boundaries.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_validate_orchestration_artifacts_plan_gates.py --cov=scripts.dev_tools.plan_gate_scratch --cov=scripts.dev_tools.plan_gate_discrimination --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/cov/baseline-py-rc2.json`
   - Acceptance: `Output Summary:` records:
     - the total `passed` and `failed` counts from the final pytest summary line;
     - the `term-missing` rows for `plan_gate_scratch.py` and `plan_gate_discrimination.py`;
     - for each of those two files, the numeric line coverage (`covered_lines / num_statements`) and branch coverage (`covered_branches / num_branches`), read from its `summary` object in `SCRATCH/cov/baseline-py-rc2.json`.
-- [ ] [P0-T14] Capture the broad dev-tools regression baseline in `<FEATURE>/evidence/remediation-baseline/python-devtools-baseline-rc2.<timestamp>.md`
+- [x] [P0-T14] Capture the broad dev-tools regression baseline in `<FEATURE>/evidence/remediation-baseline/python-devtools-baseline-rc2.<timestamp>.md`
   - Command: `poetry run pytest tests/scripts/dev_tools -q -p no:cacheprovider`
   - Acceptance: `Output Summary:` records the pass/fail/error/skip counts and lists every failing or erroring node ID (the reference set for [P5-T6]).
-- [ ] [P0-T15] Commit and push the Phase 0 evidence under `<FEATURE>/evidence/remediation-baseline/` with this plan file
+- [x] [P0-T15] Commit and push the Phase 0 evidence under `<FEATURE>/evidence/remediation-baseline/` with this plan file
   - Commands: `git add <FEATURE>/evidence/remediation-baseline <FEATURE>/remediation-plan.2026-10-16T03-19.md` (with the concrete folder path), `git commit -m "docs(932): record remediation cycle 2 baselines"`, `git push origin HEAD`.
   - Acceptance: the push exits 0, and after the push `git status --porcelain` lists no path other than `SCRATCH/`.
 
