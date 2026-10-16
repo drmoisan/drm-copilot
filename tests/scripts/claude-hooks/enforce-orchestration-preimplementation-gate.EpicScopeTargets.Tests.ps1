@@ -76,6 +76,9 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 epic-scope targets (i
         @{ Name = 'denies a wrapper-led git segment in epic scope'; Command = 'nohup git -C /synthetic-worktrees/epic-child add scripts/powershell/Sample.ps1'; FilePath = ''; Code = 'target-unresolvable' }
         @{ Name = 'denies a Write into a not-ready epic worktree'; Command = ''; FilePath = '/synthetic-worktrees/epic-child/scripts/powershell/Sample.ps1'; Code = 'target-not-ready' }
         @{ Name = 'denies a target outside the epic scope of the session root'; Command = 'git -C /synthetic-worktrees/epic-other add scripts/powershell/Sample.ps1'; FilePath = ''; Code = 'target-mixed' }
+        @{ Name = 'denies a Write to a UNC path in epic scope (issue #937)'; Command = ''; FilePath = '\\server\share\wt\scripts\powershell\Sample.ps1'; Code = 'target-unresolvable' }
+        @{ Name = 'denies a Write to an extended-length path in epic scope (issue #937)'; Command = ''; FilePath = '\\?\C:\wt\scripts\powershell\Sample.ps1'; Code = 'target-unresolvable' }
+        @{ Name = 'denies a Write to a drive-relative path in epic scope (issue #937)'; Command = ''; FilePath = 'C:wt\scripts\powershell\Sample.ps1'; Code = 'target-unresolvable' }
     ) {
         # Arrange
         Set-TargetSeam -CheckpointText $script:ReadyEpicJson

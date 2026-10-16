@@ -396,4 +396,86 @@ Describe 'preimplementation gate targets (<Surface>)' -ForEach @(
         # Assert
         $reason | Should -BeExactly $Expected -Because "$Label keeps its unchanged reason text"
     }
+
+    It 'U27 gives path-not-local for <Label>' -ForEach @(
+        @{ Label = 'unc-backslash'; Spelling = '\\server\share\wt\a.ps1' }
+        @{ Label = 'unc-forward'; Spelling = '//server/share/wt/a.ps1' }
+        @{ Label = 'unc-mixed-backslash-first'; Spelling = '\/server/share/a.ps1' }
+        @{ Label = 'unc-mixed-forward-first'; Spelling = '/\server\share\a.ps1' }
+        @{ Label = 'bare-double-backslash'; Spelling = '\\' }
+        @{ Label = 'bare-double-forward'; Spelling = '//' }
+        @{ Label = 'extended-length-backslash'; Spelling = '\\?\C:\wt\a.ps1' }
+        @{ Label = 'extended-length-forward'; Spelling = '//?/C:/wt/a.ps1' }
+        @{ Label = 'extended-length-unc'; Spelling = '\\?\UNC\server\share\a.ps1' }
+        @{ Label = 'device-backslash'; Spelling = '\\.\C:\wt\a.ps1' }
+        @{ Label = 'device-forward'; Spelling = '//./C:/wt/a.ps1' }
+        @{ Label = 'nt-object-backslash'; Spelling = '\??\C:\wt\a.ps1' }
+        @{ Label = 'nt-object-forward'; Spelling = '/??/C:/wt/a.ps1' }
+        @{ Label = 'drive-relative'; Spelling = 'C:wt\a.ps1' }
+        @{ Label = 'bare-drive-letter'; Spelling = 'C:' }
+    ) {
+        # Arrange (issue #937): the raw path-leg spelling comes from the data row.
+
+        # Act
+        $result = Get-OrchestrationCommandTarget -FilePath @($Spelling) -SessionRoot $script:Root
+
+        # Assert
+        $result.Resolved | Should -BeFalse -Because "$Label is not a local path and must not resolve to the session root"
+        @($result.Targets).Count | Should -Be 0 -Because 'an unresolved result carries no targets'
+        $result.ReasonCode | Should -Be 'target-unresolvable' -Because 'every unresolved result carries the same code'
+        $result.Detail | Should -BeExactly ('path-not-local: ' + $Spelling) -Because 'the detail names the rule and the raw input'
+    }
+
+    It 'U28 keeps a bare drive root path-leg input as its own target (<Label>)' -ForEach @(
+        @{ Label = 'drive-root-backslash'; Spelling = 'C:\' }
+        @{ Label = 'drive-root-forward'; Spelling = 'C:/' }
+    ) {
+        # Arrange (issue #937): a separator after the colon makes the spelling a drive root.
+
+        # Act
+        $result = Get-OrchestrationCommandTarget -FilePath @($Spelling) -SessionRoot $script:Root
+
+        # Assert
+        $result.Resolved | Should -BeTrue -Because "$Label is an absolute local drive root"
+        $result.Targets | Should -Be @('C:/') -Because 'a bare drive root is contributed as its own target'
+    }
+
+    It 'U29 denies a non-local path-leg input even when a sibling path is valid' {
+        # Arrange (issue #937)
+        $paths = @('/synthetic-worktrees/other/a.ps1', '\\server\share\b.ps1')
+
+        # Act
+        $result = Get-OrchestrationCommandTarget -FilePath $paths -SessionRoot $script:Root
+
+        # Assert
+        $result.Resolved | Should -BeFalse -Because 'one non-local path makes the whole call unresolvable'
+        @($result.Targets).Count | Should -Be 0 -Because 'an unresolved result carries no targets'
+        $result.Detail | Should -BeExactly 'path-not-local: \\server\share\b.ps1' -Because 'the first failing rule names the non-local path'
+    }
+
+    It 'U30 reports path-not-local before path-dot-segment for a UNC dot-dot path' {
+        # Arrange (issue #937)
+        $paths = @('\\server\share\..\x')
+
+        # Act
+        $result = Get-OrchestrationCommandTarget -FilePath $paths -SessionRoot $script:Root
+
+        # Assert
+        $result.Resolved | Should -BeFalse -Because 'a UNC path is not a local path'
+        $result.Detail.StartsWith('path-not-local') | Should -BeTrue -Because 'the non-local check precedes the dot-segment check'
+    }
+
+    It 'U31 gives path-not-local for a non-local apply_patch marker path' {
+        # Arrange (issue #937)
+        $patch = "*** Begin Patch`n*** Update File: \\?\C:\wt\a.ps1`n@@`n-old`n+new`n*** End Patch"
+        $paths = @(Get-OrchestrationPatchMarkerPath -PatchText $patch)
+
+        # Act
+        $result = Get-OrchestrationCommandTarget -FilePath $paths -SessionRoot $script:Root
+
+        # Assert
+        $paths | Should -Be @('\\?\C:\wt\a.ps1') -Because 'the marker path is extracted unchanged'
+        $result.Resolved | Should -BeFalse -Because 'an extended-length marker path is not a local path'
+        $result.Detail | Should -BeExactly 'path-not-local: \\?\C:\wt\a.ps1' -Because 'the detail names the rule and the raw marker path'
+    }
 }
