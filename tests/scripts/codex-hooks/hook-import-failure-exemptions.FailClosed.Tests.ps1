@@ -11,6 +11,16 @@
     for feature-folder-resolution.ps1 and assert that the gate denies naming the readiness failure.
     Construction assertions carry -Because 'E-CONSTRUCTION'. Checkpoint content is a literal, so no
     case reads orchestration state, and no test creates, renames, moves, or deletes a file.
+
+    Coverage attribution note (issue #936). The two H2 codex deny rows execute line 41 of
+    .codex/hooks/enforce-orchestration-preimplementation-gate-modes.ps1, the catch body of
+    the feature-folder-resolution.ps1 import guard. Their line-unique assertion checks that
+    OrchestrationFeatureFolderResolutionImportFailure equals 'feature-folder-resolution.ps1';
+    only line 41 assigns that value. A full-run CI coverage report can still show line 41
+    with ci="0". The likely cause is Pester 5.x breakpoint mode: each line breakpoint binds
+    to the first compiled instance of a script, and a later recompilation of the unchanged
+    file leaves later executions of the line unattributed. A coverage run scoped to
+    tests/scripts/codex-hooks attributes the line; the #936 evidence records both results.
 #>
 
 Describe 'preimplementation gate modes handler proof on the codex surface' {
