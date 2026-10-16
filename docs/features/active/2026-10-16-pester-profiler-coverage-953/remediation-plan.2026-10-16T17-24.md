@@ -309,7 +309,7 @@ $m = Get-Content -Raw -LiteralPath (Join-Path $S 'issue-953-ci3-shard1/shard-fil
 
 The two scripts below are written with the Write tool under SCRATCH (outside the repository; not tracked, not counted by the batch-budget hook). If the Write tool is denied for either path, stop and report the denial text; do not work around it.
 
-- [ ] [P1-T1] Write `SCRATCH/issue-953-r3-run-set.ps1` with exactly the content below.
+- [x] [P1-T1] Write `SCRATCH/issue-953-r3-run-set.ps1` with exactly the content below.
   - Acceptance: the file exists and its content equals the block below (verified in P1-T3).
 
 ```powershell
@@ -369,7 +369,7 @@ $summary = [ordered]@{
 exit ([int] ($run.FailedCount + $run.FailedBlocksCount + $run.FailedContainersCount))
 ```
 
-- [ ] [P1-T2] Write `SCRATCH/issue-953-r3-bisect.ps1` with exactly the content below.
+- [x] [P1-T2] Write `SCRATCH/issue-953-r3-bisect.ps1` with exactly the content below.
   - Acceptance: the file exists and its content equals the block below (verified in P1-T3).
 
 ```powershell
@@ -471,22 +471,22 @@ $script:Log
 exit 0
 ```
 
-- [ ] [P1-T3] Verify both scripts and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-scripts-written.<ts>.md`.
+- [x] [P1-T3] Verify both scripts and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-scripts-written.<ts>.md`.
   - Through the Tool route, for each of `issue-953-r3-run-set.ps1` and `issue-953-r3-bisect.ps1` under SCRATCH: `$errors = $null; [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $S '<name>'), [ref]$null, [ref]$errors); "PARSE_ERRORS=<name> $($errors.Count)"`, `"LINES=<name> $((Get-Content -LiteralPath (Join-Path $S '<name>')).Count)"`, and `"SHA256=<name> $((Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $S '<name>')).Hash)"`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the six printed lines.
   - Acceptance: both parse-error counts are 0; the line counts are 54 (`issue-953-r3-run-set.ps1`) and 96 (`issue-953-r3-bisect.ps1`), the line counts of the two blocks above. Otherwise rewrite the file from the block and repeat this task.
-- [ ] [P1-T4] [expect-fail] Reproduce the CI failure on the pre-fix tree and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-pa3-repro-fail-before.<ts>.md`.
+- [x] [P1-T4] [expect-fail] Reproduce the CI failure on the pre-fix tree and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-pa3-repro-fail-before.<ts>.md`.
   - Through the Tool route, first build the repro list: `$m = Get-Content -Raw -LiteralPath (Join-Path $S 'issue-953-ci3-shard1/shard-files.json') | ConvertFrom-Json; Set-Content -LiteralPath (Join-Path $S 'issue-953-r3-repro.txt') -Value @(@($m.selected)[0..40]) -Encoding utf8; "REPRO_FILES=$(@(Get-Content -LiteralPath (Join-Path $S 'issue-953-r3-repro.txt')).Count)"`. This is `selected[0..40]` of CI_MANIFEST, the same list and order that `SCRATCH/issue-953-repro-shard1.sh` runs.
   - Then run RUN_SET(`repro-before`, `issue-953-r3-repro.txt`) in a second Tool-route script.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:` with `REPRO_FILES`, the `RESULT=` line, and its fields `total`, `failed`, `failedBlocks`, `failedContainers`, `watch`, `watchMessage`, `staleRunInstance`, and `failedTests`.
   - Acceptance: `REPRO_FILES=41`; RUN_SET valid; EXIT_CODE 1; `failed` 1, `failedBlocks` 0, `failedContainers` 0; `watch` is `Failed`; `failedTests` contains exactly WATCH_TEST; `watchMessage` contains both `Get-EpicScopeCheckpointText` and `but was called 0 times`.
   - If `watch` is `Passed`, the failure does not reproduce on this host: record `REPRO: NOT REPRODUCED`, write the artifact, and stop BLOCKED (a fix cannot be proven without a failing run). Any other deviation: record it and stop BLOCKED.
-- [ ] [P1-T5] Bisect the 40 predecessors and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-pa3-bisect.<ts>.md`.
+- [x] [P1-T5] Bisect the 40 predecessors and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-pa3-bisect.<ts>.md`.
   - Through the Tool route, in the background: `& (Join-Path $S 'issue-953-r3-bisect.ps1') -ManifestPath (Join-Path $S 'issue-953-ci3-shard1/shard-files.json') -Target 'tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1' -WatchTest 'issue #850 changed-file constraints.baseline mock interception probe' -WorkPrefix (Join-Path $S 'issue-953-r3-bisect') *> (Join-Path $S 'issue-953-r3-bisect.log'); $code = $LASTEXITCODE; Get-Content -LiteralPath (Join-Path $S 'issue-953-r3-bisect.log'); "EXIT_CODE=$code"; exit $code`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with every `RUN` line and every summary line, `MINIMAL_SET: <paths joined with |>`, and `MECHANISM: <one of the two statements below>`.
   - Mechanism statement: when `MECHANISM_STALE_RUN_INSTANCE=YES`, write `MECHANISM: H1 CONFIRMED - after MINIMAL_SET runs, the WorktreeRunResolution instance that EpicScopeResolution calls is not the instance that Mock -ModuleName WorktreeRunResolution binds to`. Otherwise write `MECHANISM_HYPOTHESIS: NOT CONFIRMED (MECHANISM_STALE_RUN_INSTANCE=<value>)`.
   - Acceptance: EXIT_CODE 0; `REPRO_FAILS=YES`; `TARGET_ALONE=Passed`; `BOUNDARY_FAILS=Failed`; `BELOW_BOUNDARY=Passed`; `MINIMAL_SET_WITH_TARGET=Failed`; `MINIMAL_SET_MESSAGE` contains `Get-EpicScopeCheckpointText`; `SCRATCH/issue-953-r3-bisect-minimal.txt` exists and lists the `MINIMAL_SET` paths. The mechanism value is recorded and does not gate this task. On exit code 3, 4, or 5, or any other failed condition, record the output and stop BLOCKED.
-- [ ] [P1-T6] Derive HELPER_SET, run it on the pre-fix tree, and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r3-helper-set-baseline.<ts>.md`.
+- [x] [P1-T6] Derive HELPER_SET, run it on the pre-fix tree, and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/remediation-baseline/r3-helper-set-baseline.<ts>.md`.
   - Through the Tool route: `$root = (Get-Location).Path; [string[]] $set = @(Get-ChildItem -LiteralPath tests -Recurse -File -Filter *.Tests.ps1 | Where-Object { Select-String -LiteralPath $_.FullName -SimpleMatch -Pattern 'EpicStateIsolation.Baseline.Helpers.ps1' -Quiet } | ForEach-Object { [System.IO.Path]::GetRelativePath($root, $_.FullName) -replace '\\', '/' }); [System.Array]::Sort($set, [System.StringComparer]::Ordinal); Set-Content -LiteralPath (Join-Path $S 'issue-953-r3-helper-set.txt') -Value $set -Encoding utf8; "HELPER_SET_COUNT=$($set.Count) CONTAINS_850=$($set -contains 'tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1') HELPER_SET_SHA256=$((Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $S 'issue-953-r3-helper-set.txt')).Hash)"`.
   - Then run RUN_SET(`helper-set-before`, `issue-953-r3-helper-set.txt`) in the background in a second Tool-route script.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the printed line, the `RESULT=` line, and its `total`, `failed`, `failedBlocks`, `failedContainers`, `watch`, and `failedTests` fields as `R3_HELPER_SET_BASELINE_FAILED_TESTS: <failedTests joined with |, or NONE>`.
