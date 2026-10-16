@@ -459,7 +459,7 @@ No test runs between P3-T1 and P3-T5 (Task-ordering rule).
 
 ### Phase 4 — CHANGELOG Accuracy
 
-- [ ] [P4-T1] Edit `extensions/drm-copilot/CHANGELOG.md` with the Edit tool: replace line 26 (``  installed Pester 6.x, and `Invoke-PoshQCTest` imports Pester with `-MaximumVersion 5.99.99`.``) with the three lines below. No other line changes; lines 20-25 and the `## [0.0.1] - 2026-05-02` section are unchanged.
+- [x] [P4-T1] Edit `extensions/drm-copilot/CHANGELOG.md` with the Edit tool: replace line 26 (``  installed Pester 6.x, and `Invoke-PoshQCTest` imports Pester with `-MaximumVersion 5.99.99`.``) with the three lines below. No other line changes; lines 20-25 and the `## [0.0.1] - 2026-05-02` section are unchanged.
   - Acceptance: `git diff --numstat <REM_BASE_SHA> -- extensions/drm-copilot/CHANGELOG.md` reports `3` added and `1` deleted.
 
 ```markdown

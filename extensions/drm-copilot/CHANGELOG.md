@@ -23,7 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   thresholds are unchanged; per-file covered-line counts can differ from breakpoint mode.
   The bundled installer minimum is now Pester 5.9.0.
   Pester versions are bounded below Pester 6.0: `Install-PoshQCTool` does not accept an
-  installed Pester 6.x, and `Invoke-PoshQCTest` imports Pester with `-MaximumVersion 5.99.99`.
+  installed Pester 6.x, and `Invoke-PoshQCTest` imports Pester with `-MinimumVersion 5.9.0`
+  and `-MaximumVersion 5.99.99`. When no installed Pester is in that range, `Invoke-PoshQCTest`
+  stops with a message to run `Install-PoshQCTool` instead of loading another version.
 
 ## [0.0.1] - 2026-05-02
 
