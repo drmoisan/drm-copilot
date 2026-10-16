@@ -56,3 +56,17 @@ Remediability-Evidence: The shortfall comes from a scoped local test run; a full
 
 - The canonical artifact `artifacts/pester/powershell-coverage.xml` comes from a full-suite run, reads >= 85.00% repo-wide, and is recorded under `evidence/qa-gates/`.
 - The re-review artifacts (policy-audit, code-review, feature-audit) report a blocking count of 0.
+
+## Orchestrator Scope Dispositions (cycle 1)
+
+Per the run rule that related non-blocking findings are fixed inside the item, the orchestrator sets the cycle 1 scope as follows.
+
+- RI-1: required (blocking, autonomous).
+- RI-2 (CR-1): required. Fail closed on surrounding whitespace in the R1 path leg.
+- RI-3 (CR-3): required. Complete the U30 assertions.
+- RI-4 (CR-2): required. `file:` URI spellings (`file:///C:/wt/a.ps1`, `file://server/share/a.ps1`) and `~`-prefixed spellings (`~/wt/a.ps1`, `~\wt\a.ps1`) take the relative fallback to the session root, which is the misresolution class #937 fixes. Extend the non-local check in the R1 loop so these deny with `path-not-local`, with expect-fail rows first on both surfaces.
+- RI-5 (CR-4): required. A single-backslash root-relative spelling (`\wt\a.ps1`, current-drive-rooted on Windows) cannot be resolved to a local absolute path deterministically. Deny it with `path-not-local` through the non-local check, without editing `OrchestrationTargetAbsolutePattern` (spec Non-Goal kept). A single forward-slash POSIX absolute path (`/wt/a.ps1`) stays resolvable.
+- RI-6 (CR-6): required. Wrap the 11 added test lines that exceed 120 characters, without altering row names or values.
+- spec.md: add acceptance criteria for RI-2, RI-4, and RI-5 behavior (planner-authored), and keep AC-1 through AC-15 text unchanged.
+- PA-1 / CR-5 (P3-T12 report-row variance in the unchanged `WorktreeTargetResolution.psm1`): accepted plan deviation; unrelated to the #937 change surface; not fixed in this item.
+- CR-7 (single-feature fallback in `Resolve-WorktreeOperandTarget`): unrelated module with documented fallback semantics; not fixed in this item.
