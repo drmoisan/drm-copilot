@@ -150,6 +150,14 @@ Optional workspace-relative or workspace-contained folders to scan instead of th
 .PARAMETER ResolveCoveragePopulation
 Injectable seam that derives the code-coverage file population from the workspace (issue #527).
 Defaults to Resolve-PoshQCCoveragePopulation.
+.PARAMETER ShardIndex
+One-based shard index; used only when ShardCount is greater than 0 (issue #953).
+.PARAMETER ShardCount
+Number of shards. When greater than 0, Run.Path is set to this shard's round-robin slice of the test files.
+.PARAMETER ShardFileListPath
+Optional path that receives the shard manifest (shardIndex, shardCount, all, selected) as JSON.
+.PARAMETER WriteShardFileList
+Injectable seam that writes the shard manifest JSON. Defaults to Set-Content.
 #>
 function Invoke-PoshQCTest {
     [CmdletBinding()]
@@ -160,6 +168,10 @@ function Invoke-PoshQCTest {
         [string[]] $ExcludeDirs = $script:DefaultExcludedDirs,
         [string] $KoverageOutputPath,
         [switch] $DisableKoverageCopy,
+        [int] $ShardIndex = 0,
+        [int] $ShardCount = 0,
+        [string] $ShardFileListPath,
+        [scriptblock] $WriteShardFileList = { param([string] $Path, [string] $Json) Set-Content -LiteralPath $Path -Value $Json -Encoding utf8 },
         [scriptblock] $EnsureModule = {
             param([string] $Name, [string] $ErrorMessage, [string] $MinimumVersion, [string] $MaximumVersion)
             # Issue #953 (CR-1): only an installed version inside the supported range counts as present, so a host
@@ -395,6 +407,15 @@ function Invoke-PoshQCTest {
     if (-not $testFiles) {
         & $Logger "No Pester test files found under configured paths for root $Root"
         return
+    }
+    if ($ShardCount -gt 0) {
+        # Issue #953 (FR-09): run only this shard's round-robin slice of the enumerated test files.
+        $testFilePaths = @($testFiles | ForEach-Object { if ($_ -is [string]) { $_ } else { $_.FullName } })
+        $shardManifest = New-PoshQCShardManifest -RootPath $Root -TestFile $testFilePaths -ShardIndex $ShardIndex -ShardCount $ShardCount
+        $config.Run.Path = [string[]] $shardManifest.selectedFullPath
+        if ($ShardFileListPath) {
+            & $WriteShardFileList $ShardFileListPath ($shardManifest | Select-Object -Property shardIndex, shardCount, all, selected | ConvertTo-Json -Depth 4)
+        }
     }
 
     $pesterResult = & $InvokePester $config
