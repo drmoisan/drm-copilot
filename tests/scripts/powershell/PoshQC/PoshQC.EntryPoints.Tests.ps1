@@ -43,7 +43,7 @@ Describe 'Install-PoshQCTool' {
         {
             Install-PoshQCTool -FindModule {
                 param([string] $Name)
-                [pscustomobject]@{ Name = $Name; Version = [version]'9.9.9' }
+                [pscustomobject]@{ Name = $Name; Version = [version]'5.9.5' }
             } -InstallModule {
                 throw 'InstallModule should not be called for already-installed modules.'
             } -SetTls { } -GetRepository {
@@ -55,8 +55,8 @@ Describe 'Install-PoshQCTool' {
             }
         } | Should -Not -Throw
 
-        $logs | Should -Contain 'PSScriptAnalyzer 9.9.9 already present.'
-        $logs | Should -Contain 'Pester 9.9.9 already present.'
+        $logs | Should -Contain 'PSScriptAnalyzer 5.9.5 already present.'
+        $logs | Should -Contain 'Pester 5.9.5 already present.'
     }
 }
 

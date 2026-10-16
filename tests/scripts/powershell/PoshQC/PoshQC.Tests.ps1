@@ -115,7 +115,7 @@ Describe 'Install-PoshQCTool' {
         Install-PoshQCTool -GetRepository { [pscustomobject]@{ InstallationPolicy = 'Untrusted' } } `
             -SetRepository { throw 'cannot set' } -FindModule {
             param([string] $Name)
-            [pscustomobject]@{ Name = $Name; Version = [version]'9.9.9' }
+            [pscustomobject]@{ Name = $Name; Version = [version]'5.9.5' }
         } `
             -InstallModule { param([string] $Name, [string] $Version) [void] $Name; [void] $Version } -RegisterRepository { } -SetTls { } -Logger {
             param([string] $Message, [string] $Level)
@@ -132,7 +132,7 @@ Describe 'Install-PoshQCTool' {
 
         Install-PoshQCTool -FindModule {
             param([string] $Name)
-            [pscustomobject]@{ Name = $Name; Version = [version]'9.9.9' }
+            [pscustomobject]@{ Name = $Name; Version = [version]'5.9.5' }
         } -InstallModule {
             param([string] $Name, [string] $Version)
             [void] $Name

@@ -70,7 +70,7 @@ jobs:
       - name: Test PowerShell hook suites
         shell: pwsh
         run: |
-          Import-Module Pester -MinimumVersion 5.6.1
+          Import-Module Pester -MinimumVersion 5.9.0 -MaximumVersion 5.99.99
           New-Item -ItemType Directory -Force -Path artifacts/pester | Out-Null
           $config = New-PesterConfiguration
           $config.Run.Path = @('tests/scripts/claude-hooks', 'tests/scripts/codex-hooks')
