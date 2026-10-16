@@ -17,11 +17,9 @@ import pytest
 
 import scripts.dev_tools.validate_epic_orchestrator_state as validator
 import scripts.dev_tools.validate_orchestration_artifacts as cli
-from tests.scripts.dev_tools.test_validate_epic_orchestrator_state import (
-    build_valid_epic_state,
-)
-from tests.scripts.dev_tools.test_validate_orchestration_artifacts import (
+from tests.scripts.dev_tools.validate_orchestration_artifacts_test_support import (
     build_read_text_stub,
+    build_valid_epic_state,
 )
 
 if TYPE_CHECKING:
