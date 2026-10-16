@@ -6,8 +6,8 @@ Assigns the files in longest-processing-time order (issue #953, CR-10): heaviest
 in ordinal path order, each file to the shard with the least assigned weight, then the fewest files, then
 the lowest index, so the shard loads differ by at most the weight of one file. When Weight is omitted every
 file weighs 1, which assigns the files round-robin in ordinal path order. Returns this shard's files in
-input order. Throws when ShardCount is below 1, ShardIndex is outside 1..ShardCount, or Weight and TestFile
-differ in length.
+input order. Throws when ShardCount is below 1, ShardIndex is outside 1..ShardCount, Weight and TestFile
+differ in length, or a weight is negative (CR-18).
 .PARAMETER TestFile
 Ordered list of test file paths to distribute.
 .PARAMETER ShardIndex
@@ -38,6 +38,11 @@ function Get-PoshQCShardSlice {
     }
     if ($Weight.Count -ne $TestFile.Count) {
         throw "Weight lists $($Weight.Count) values; TestFile lists $($TestFile.Count) files."
+    }
+    for ($position = 0; $position -lt $Weight.Count; $position++) {
+        if ($Weight[$position] -lt 0) {
+            throw "Weight must not be negative; '$($TestFile[$position])' has weight $($Weight[$position])."
+        }
     }
 
     $order = [int[]] @(for ($position = 0; $position -lt $TestFile.Count; $position++) { $position })
@@ -213,8 +218,8 @@ function Test-PoshQCShardTestCount {
 .SYNOPSIS
 Selects this shard's test files for Invoke-PoshQCTest (issue #953).
 .DESCRIPTION
-Weights each enumerated test file by its Length property (the size in bytes of the FileInfo items that the
-default EnumerateTests seam returns; 1 for a plain path string or an item without a Length property), builds
+Weights each enumerated test file with Get-PoshQCShardTestFileWeight (a FileInfo item, as the default
+EnumerateTests seam returns, weighs the UTF-8 size of its text with CRLF counted as LF; CR-19), builds
 the manifest with New-PoshQCShardManifest, and throws when the shard selects no test file (CR-13), so Pester
 never runs with an empty Run.Path. When ShardFileListPath is set, WriteShardFileList receives the path and
 the manifest JSON without selectedFullPath. Returns the full paths of the selected files.
@@ -244,7 +249,7 @@ function Select-PoshQCShardTestFile {
     )
 
     $paths = [string[]] @($TestFile | ForEach-Object { if ($_ -is [string]) { $_ } else { $_.FullName } })
-    $weights = [long[]] @($TestFile | ForEach-Object { if ($_ -isnot [string] -and $null -ne $_.PSObject.Properties['Length']) { [long] $_.Length } else { [long] 1 } })
+    $weights = [long[]] @(Get-PoshQCShardTestFileWeight -TestFile $TestFile)
     $manifest = New-PoshQCShardManifest -RootPath $RootPath -TestFile $paths -ShardIndex $ShardIndex -ShardCount $ShardCount -Weight $weights
     if (@($manifest.selected).Count -eq 0) {
         throw "Shard $ShardIndex of $ShardCount selects no test file; $($paths.Count) test files cannot fill $ShardCount shards. Lower the shard count."
@@ -253,4 +258,39 @@ function Select-PoshQCShardTestFile {
         & $WriteShardFileList $ShardFileListPath ($manifest | Select-Object -Property shardIndex, shardCount, all, selected | ConvertTo-Json -Depth 4)
     }
     [string[]] $manifest.selectedFullPath
+}
+
+<#
+.SYNOPSIS
+Returns the shard weight of each enumerated test file (issue #953, CR-19).
+.DESCRIPTION
+A FileInfo item weighs the UTF-8 byte count of its text after every CRLF pair is replaced by LF, so a checkout
+with CRLF line endings computes the same weights, and therefore the same shard assignment, as a checkout with
+LF line endings. Another object weighs its Length property when it has one; a plain path string, or an object
+without a Length property, weighs 1. Returns one weight per item, in input order.
+.PARAMETER TestFile
+Enumerated test files: FileInfo items, objects with FullName (and optionally Length), or path strings.
+.PARAMETER ReadTestFileText
+Seam that returns the text of a test file from its full path. Defaults to [System.IO.File]::ReadAllText.
+#>
+function Get-PoshQCShardTestFileWeight {
+    [CmdletBinding()]
+    [OutputType([long[]])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]] $TestFile,
+        [scriptblock] $ReadTestFileText = { param([string] $Path) [System.IO.File]::ReadAllText($Path) }
+    )
+
+    $weights = New-Object 'System.Collections.Generic.List[long]'
+    foreach ($item in $TestFile) {
+        if ($item -is [System.IO.FileInfo]) {
+            $text = [string] (& $ReadTestFileText $item.FullName)
+            $weights.Add([System.Text.Encoding]::UTF8.GetByteCount($text.Replace("`r`n", "`n")))
+        } elseif ($item -isnot [string] -and $null -ne $item.PSObject.Properties['Length']) {
+            $weights.Add([long] $item.Length)
+        } else {
+            $weights.Add(1)
+        }
+    }
+    [long[]] $weights.ToArray()
 }

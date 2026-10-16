@@ -657,7 +657,7 @@ Describe 'Get-PoshQCShardTestFileWeight and Select-PoshQCShardTestFile weights' 
 
 No test runs in this phase before P4-T7 and P4-T8 (Task-ordering rule). The Edit tool writes exactly one production PowerShell file in this phase (Batch budget).
 
-- [ ] [P4-T1] Edit `scripts/powershell/PoshQC/PoshQC.Shard.psm1` (CR-18) with two Edit calls and no other line change:
+- [x] [P4-T1] Edit `scripts/powershell/PoshQC/PoshQC.Shard.psm1` (CR-18) with two Edit calls and no other line change:
   1. Replace lines 9-10 (`input order. Throws when ShardCount is below 1, ShardIndex is outside 1..ShardCount, or Weight and TestFile` and `differ in length.`) with the two lines in the first block below.
   2. Insert the five lines of the second block immediately after line 41 (the `    }` that closes the `if ($Weight.Count -ne $TestFile.Count)` block), so the existing blank line 42 stays before `$order`. Anchor the Edit on line 40 (`        throw "Weight lists $($Weight.Count) values; TestFile lists $($TestFile.Count) files."`) and line 41.
   - Acceptance: the file contains `Weight must not be negative;` and `or a weight is negative (CR-18).` (quoted here as literals this task creates), each exactly once.
@@ -675,7 +675,7 @@ differ in length, or a weight is negative (CR-18).
     }
 ```
 
-- [ ] [P4-T2] Edit `Select-PoshQCShardTestFile` in `scripts/powershell/PoshQC/PoshQC.Shard.psm1` (CR-19) with two Edit calls and no other line change:
+- [x] [P4-T2] Edit `Select-PoshQCShardTestFile` in `scripts/powershell/PoshQC/PoshQC.Shard.psm1` (CR-19) with two Edit calls and no other line change:
   1. Replace the help lines `Weights each enumerated test file by its Length property (the size in bytes of the FileInfo items that the` and `default EnumerateTests seam returns; 1 for a plain path string or an item without a Length property), builds` (lines 216-217 at PLAN_HEAD, 221-222 after P4-T1) with the two lines in the first block below.
   2. Replace the line `    $weights = [long[]] @($TestFile | ForEach-Object { if ($_ -isnot [string] -and $null -ne $_.PSObject.Properties['Length']) { [long] $_.Length } else { [long] 1 } })` (line 247 at PLAN_HEAD, 252 after P4-T1) with the line in the second block below.
   - Acceptance: the file contains `$weights = [long[]] @(Get-PoshQCShardTestFileWeight -TestFile $TestFile)` (quoted here as the literal this task creates) exactly once, and no line contains `[long] $_.Length`.
@@ -689,7 +689,7 @@ EnumerateTests seam returns, weighs the UTF-8 size of its text with CRLF counted
     $weights = [long[]] @(Get-PoshQCShardTestFileWeight -TestFile $TestFile)
 ```
 
-- [ ] [P4-T3] Edit `scripts/powershell/PoshQC/PoshQC.Shard.psm1`: append the 35 lines below after the final `}` of the file (the `}` that closes `Select-PoshQCShardTestFile`). Anchor the Edit on the last five lines of the file (from `    if ($ShardFileListPath) {` through the final `}`). No other line changes.
+- [x] [P4-T3] Edit `scripts/powershell/PoshQC/PoshQC.Shard.psm1`: append the 35 lines below after the final `}` of the file (the `}` that closes `Select-PoshQCShardTestFile`). Anchor the Edit on the last five lines of the file (from `    if ($ShardFileListPath) {` through the final `}`). No other line changes.
   - Acceptance: the file contains `function Get-PoshQCShardTestFileWeight {` and `$weights.Add([System.Text.Encoding]::UTF8.GetByteCount($text.Replace(` (quoted here as literals this task creates), each exactly once.
 
 ```powershell
@@ -730,11 +730,11 @@ function Get-PoshQCShardTestFileWeight {
 }
 ```
 
-- [ ] [P4-T4] Verify `scripts/powershell/PoshQC/PoshQC.Shard.psm1` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-shard-psm1-edit.<ts>.md`.
+- [x] [P4-T4] Verify `scripts/powershell/PoshQC/PoshQC.Shard.psm1` and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-shard-psm1-edit.<ts>.md`.
   - Run `git diff --numstat <REM_BASE_SHA> -- scripts/powershell/PoshQC/PoshQC.Shard.psm1` from the Bash tool. Through the Tool route: the `ParseFile` error count, `(Get-Content -LiteralPath scripts/powershell/PoshQC/PoshQC.Shard.psm1).Count`, and the count of lines that start with `function ` and name each of `Get-PoshQCShardSlice`, `New-PoshQCShardManifest`, `Test-PoshQCShardCompleteness`, `Test-PoshQCShardTestCount`, `Select-PoshQCShardTestFile`, and `Get-PoshQCShardTestFileWeight`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
   - Acceptance: numstat `45` added and `5` deleted; 0 parse errors; 296 lines (256 + 5 + 35; AC-15); each of the six function names is defined exactly once.
-- [ ] [P4-T5] Edit `scripts/powershell/PoshQC/README.md` with two Edit calls and no other line change:
+- [x] [P4-T5] Edit `scripts/powershell/PoshQC/README.md` with two Edit calls and no other line change:
   1. Replace line 62 (``- `Get-PoshQCShardSlice`: select one shard's test files; with `-Weight` (for example file sizes in bytes) the heaviest files are assigned first to the least-loaded shard.``) with the first line below.
   2. Replace line 84 (the line that starts `  - Test files are weighted by size in bytes and assigned heaviest first`) with the second line below.
   - Acceptance: the file contains `a negative weight is rejected` and `CRLF line endings counted as LF` (quoted here as literals this task creates), each exactly once; it contains no line with `every runner that checks out the same tree`; it has 98 lines.
@@ -744,13 +744,13 @@ function Get-PoshQCShardTestFileWeight {
   - Test files are weighted by the UTF-8 size in bytes of their text with CRLF line endings counted as LF, and assigned heaviest first to the shard with the least assigned weight (ties: fewer files, then the lower shard index; equal sizes are taken in ordinal path order), so runners whose checkouts differ only in line-ending conversion compute the same assignment.
 ```
 
-- [ ] [P4-T6] Run the PoshQC formatter once over the edited tree (write-mode tool) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-format-prepass.<ts>.md`.
+- [x] [P4-T6] Run the PoshQC formatter once over the edited tree (write-mode tool) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-format-prepass.<ts>.md`.
   - Through the Tool route: record `$before = git status --porcelain`, run `pwsh -NoProfile -Command "Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCFormat -Root (Get-Location).Path" *> (Join-Path $S 'issue-953-r3-prepass-format.log')`, record `$LASTEXITCODE`, then record `$after = git status --porcelain`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with every log line that starts with `Formatted: ` and whether `$before` equals `$after`.
   - Acceptance: EXIT_CODE 0, and the path of every `Formatted: ` line, normalized to forward slashes, ends with one of the five PS_CYCLE_FILES paths. Otherwise stop BLOCKED and record the path. This pass may reformat those files; P5-T1 later requires zero `Formatted: ` lines.
-- [ ] [P4-T7] Mirror and check parity. Through the Tool route, run `Copy-Item -LiteralPath scripts/powershell/PoshQC/<name> -Destination extensions/drm-copilot/resources/powershell/PoshQC/<name> -Force` for `<name>` in `PoshQC.Shard.psm1` and `README.md`, then print one `PAIR_EQUAL: <name> True|False` line per BUNDLE_PAIRS pair from `Get-FileHash -Algorithm SHA256`. Then run `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py -q` from the Bash tool. Write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-mirror-parity.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (the four lines and the pytest summary line).
+- [x] [P4-T7] Mirror and check parity. Through the Tool route, run `Copy-Item -LiteralPath scripts/powershell/PoshQC/<name> -Destination extensions/drm-copilot/resources/powershell/PoshQC/<name> -Force` for `<name>` in `PoshQC.Shard.psm1` and `README.md`, then print one `PAIR_EQUAL: <name> True|False` line per BUNDLE_PAIRS pair from `Get-FileHash -Algorithm SHA256`. Then run `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py -q` from the Bash tool. Write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/other/r3-mirror-parity.<ts>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (the four lines and the pytest summary line).
   - Acceptance: all four lines read `True`, and the pytest summary line contains `1 passed` (AC-02; `PoshQC.Shard.psm1` is in `POSHQC_PARITY_PATHS`, `tests/scripts/dev_tools/test_poshqc_bundled_parity.py:16`).
-- [ ] [P4-T8] Run TARGETED_RUN(`shard-after`, R3_SHARD_SET) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-shard-pass-after.<ts>.md`.
+- [x] [P4-T8] Run TARGETED_RUN(`shard-after`, R3_SHARD_SET) and write `docs/features/active/2026-10-16-pester-profiler-coverage-953/evidence/regression-testing/r3-shard-pass-after.<ts>.md`.
   - Fields: `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the JRP totals and the JRP token check for every R3_SHARD_OLD_TOKENS and R3_NEW_TOKENS entry.
   - Acceptance: run valid, EXIT_CODE 0, JRP `tests` equal to `R3_TARGETED_BASELINE_TESTS` plus 3, `failures` 0, `errors` 0, and every token PASS.
 

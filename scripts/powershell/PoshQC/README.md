@@ -59,7 +59,7 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
 - `Invoke-PoshQCSuite`: run format, analyze, and test in one pass, optionally narrowing the scan scope with `-ScanFolders`.
 - `Invoke-PoshQCTest`: run Pester using the bundled runsettings, including coverage and optional Koverage copy.
 - `Convert-PoshQCCoverageToRelative`: utility to strip repo-root prefixes and write a `.koverage.xml` copy (used internally by `Invoke-PoshQCTest`).
-- `Get-PoshQCShardSlice`: select one shard's test files; with `-Weight` (for example file sizes in bytes) the heaviest files are assigned first to the least-loaded shard.
+- `Get-PoshQCShardSlice`: select one shard's test files; with `-Weight` (non-negative values, for example text sizes in bytes) the heaviest files are assigned first to the least-loaded shard, and a negative weight is rejected.
 - `New-PoshQCShardManifest`: build the in-memory shard manifest (`shardIndex`, `shardCount`, `all`, `selected`, `selectedFullPath`).
 - `Test-PoshQCShardCompleteness`: throw unless a set of shard manifests selects every test file exactly once.
 - `Test-PoshQCShardTestCount`: throw unless the shard test counts sum to a discovery-pass test count.
@@ -81,7 +81,7 @@ PoshQC is a lightweight PowerShell quality gate that wraps Invoke-Formatter, PSS
   - An empty population disables coverage for that invocation, logs `Code coverage disabled for this invocation`, and still runs the tests.
   - Each run logs `Code coverage population: source=<source>; files=<count>` before Pester starts.
 - Sharded runs (issue #953): `Invoke-PoshQCTest -ShardIndex <n> -ShardCount <N>` runs only shard n of N.
-  - Test files are weighted by size in bytes and assigned heaviest first to the shard with the least assigned weight (ties: fewer files, then the lower shard index; equal sizes are taken in ordinal path order), so every runner that checks out the same tree computes the same assignment.
+  - Test files are weighted by the UTF-8 size in bytes of their text with CRLF line endings counted as LF, and assigned heaviest first to the shard with the least assigned weight (ties: fewer files, then the lower shard index; equal sizes are taken in ordinal path order), so runners whose checkouts differ only in line-ending conversion compute the same assignment.
   - `-ShardFileListPath <path>` writes the shard manifest (`shardIndex`, `shardCount`, `all`, `selected`) as JSON through the `-WriteShardFileList` seam.
   - A shard that selects no test file (more shards than test files) stops with an error before Pester runs.
   - `Merge-PoshQCCoverageReport` merges the shard reports with `ci = max(ci)` per line and recomputes the LINE and INSTRUCTION counters, so the merged LINE figures are exact. It omits `class` and `method` elements and METHOD and CLASS counters, because those cannot be recomputed from line hits.
