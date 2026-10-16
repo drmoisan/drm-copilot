@@ -1,4 +1,8 @@
-Timestamp: 2026-10-13T00-00
+Timestamp: 2026-10-13T11-17
+TIMESTAMP_RECONSTRUCTED: true
+TIMESTAMP_ORIGINAL: 2026-10-13T00-00
+TIMESTAMP_BOUNDS_UTC: 2026-10-13T10-51 .. 2026-10-13T11-17
+TIMESTAMP_DERIVATION: lower: XML_MTIME_AFTER_EPOCH 1791888677 (2026-10-13T10:51:17Z) recorded in this file; upper: committer time of ff1b7cbd4 confirmed in the #927 pa-n3-commit-confirmation evidence
 Command: test -f SCRATCHPAD/issue-901-plan-start.marker
 EXIT_CODE: 0
 CMD2_EXIT_CODE: 0 (test artifacts/pester/powershell-coverage.xml -nt SCRATCHPAD/issue-901-plan-start.marker)
