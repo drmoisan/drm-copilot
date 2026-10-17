@@ -102,6 +102,7 @@ These pass every validator rule and are found only by reading the plan against t
 - `Measure-Object -Line` counts non-empty lines only; physical line counts use `wc -l` or `@(Get-Content -LiteralPath <path>).Count`.
 - A coverage argument written as a filesystem path measures nothing; the dotted module form is required, and branch figures come from the JSON report, not the combined terminal column.
 - A task that changes the observable behavior of an existing function, script, fixture, or test stub (signature, argv, output, exit status, or written files) while the tests that assert that behavior are outside the task's file set: those tests fail once the change lands, and the plan's own acceptance cannot be met. Preflight searches the test tree for the changed symbol, the file name, and the asserted output, and confirms that the task names each matching test with its disposition (unchanged because unaffected, or updated with the reason).
+- A plan that alters a fact this brief states (it adds or renames a CI job, changes a required status context, a tool route, or a batch-budget rule) with no task that updates the brief in the same change, in all six byte-identical copies: the plan then breaks the maintenance rule in `## Purpose and Maintenance`. Preflight compares each task's changes against the facts this brief states and confirms that a brief-update task exists and that the plan's `Mirror parity` Pre-Mortem bullet names it.
 
 ## Evidence and Documentation Rules
 

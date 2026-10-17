@@ -376,3 +376,34 @@ def test_contract_premortem_test_isolation_requires_seeded_pester_shuffle() -> N
 
     # Assert
     assert lacking == {}, f"Test isolation definition missing: {lacking}"
+
+
+def test_contract_premortem_mirror_parity_requires_brief_update_task() -> None:
+    """The contract's Mirror parity label requires a task that updates the brief.
+
+    The obligation sits inside the design-level section of every contract
+    copy and names the triggering fact kinds, the six copies, and the bullet.
+    """
+
+    # Arrange
+    tokens = (
+        "The `Mirror parity` bullet also covers the execution-environment brief",
+        "adds or renames a CI job, changes a required status context, a tool "
+        "route, or a batch-budget rule",
+        "includes a task that updates the brief in the same change, in all six "
+        "byte-identical copies",
+        "the bullet names that task",
+    )
+
+    # Act
+    lacking: dict[str, list[str]] = {}
+    for path in _CONTRACTS:
+        text = _read(path)
+        start = text.index("## Design-Level Plan Contract (Mandatory)")
+        section = text[start : text.index(" ## ", start + 1)]
+        missing = [token for token in tokens if token not in section]
+        if missing:
+            lacking[path] = missing
+
+    # Assert
+    assert lacking == {}, f"Mirror parity brief obligation missing: {lacking}"

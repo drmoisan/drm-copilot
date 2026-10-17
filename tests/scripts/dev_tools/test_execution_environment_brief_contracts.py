@@ -381,6 +381,29 @@ def test_brief_preflight_classes_include_changed_existing_behavior() -> None:
     assert missing == [], f"Preflight Defect Classes lacks {missing}"
 
 
+def test_brief_preflight_classes_include_brief_maintenance() -> None:
+    """The preflight section states the brief-maintenance class and its check."""
+
+    # Arrange
+    section = _section("## Preflight Defect Classes the Validator Cannot See")
+
+    # Act
+    missing = _missing(
+        section,
+        (
+            "A plan that alters a fact this brief states",
+            "adds or renames a CI job, changes a required status context, a tool "
+            "route, or a batch-budget rule",
+            "updates the brief in the same change, in all six byte-identical copies",
+            "breaks the maintenance rule in `## Purpose and Maintenance`",
+            "the plan's `Mirror parity` Pre-Mortem bullet names it",
+        ),
+    )
+
+    # Assert
+    assert missing == [], f"Preflight Defect Classes lacks {missing}"
+
+
 def test_brief_npm_run_tokens_exist_in_package_json() -> None:
     """Every backticked npm script token in the brief exists in the root package."""
 
