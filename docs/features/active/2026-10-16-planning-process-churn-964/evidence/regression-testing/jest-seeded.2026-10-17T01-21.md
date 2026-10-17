@@ -12,7 +12,7 @@ Output Summary:
 
 ## Order Dependence Found and Fixed
 
-The first seeded run (2026-10-17T00-54, seed 964964) failed 9 tests in `test/extension.test.ts`. Cause: the test "helloPowerShell preserves C:/extension on POSIX hosts" called `jest.resetModules()` in its `finally` block, so every later test in the file re-required `src/extension` into a fresh module graph bound to new `node:fs` and `node:child_process` mock instances, while the harness kept configuring the original instances. In the default order the test runs last in its block, so the dependence was hidden.
+The first seeded run (2026-10-17T00-54, seed 964964) failed 9 tests in `test/extension.test.ts`. Cause: the POSIX-path test of the helloPowerShell command called `jest.resetModules()` in its `finally` block, so every later test in the file re-required `src/extension` into a fresh module graph bound to new `node:fs` and `node:child_process` mock instances, while the harness kept configuring the original instances. In the default order the test runs last in its block, so the dependence was hidden.
 
 - Leaker side: the POSIX-path tests in `test/extension.test.ts` and `test/repo-automation-dispatch.test.ts` now load their fresh module graph inside `jest.isolateModulesAsync` with the new `mockPosixPathResolve` helper (`test/runtime-test-helpers.ts`), so the shared registry is never reset; the registry-resetting helper was removed.
 - Victim side: `test/extension-test-harness.ts` keeps the primary `src/extension` instance (loaded in `resetExtensionHarnessState`, before any test body), so a registry reset cannot hand a test a module bound to unconfigured mocks.

@@ -208,10 +208,10 @@ Research, planning, preflight and remediation produce large, literal-heavy plans
 
 ### Scope 6: Validation and quality gates
 
-- [ ] AC-29: The full toolchain (format, lint, type-check, architecture, unit, contract, integration) passes for Python, TypeScript and PowerShell in one pass, including the generator `--check`, `test_push_down_issue_824_follow_ups.py` and `test_typescript_toolchain_instruction_contracts.py`, recorded under `evidence/qa-gates/`.
-- [ ] AC-30: The seeded shuffled Jest run (seed recorded), reversed-order Python run and single-process Pester run over `tests/scripts` pass, recorded under `evidence/regression-testing/`.
-- [ ] AC-31: Every touched non-Markdown file is at or below 500 physical lines, recorded under `evidence/qa-gates/`.
-- [ ] AC-32: `evidence/qa-gates/self-review.<timestamp>.md` for this item covers the policy-audit, code-review and feature-audit templates and records no FAIL row before the first review push.
+- [x] AC-29: The full toolchain (format, lint, type-check, architecture, unit, contract, integration) passes for Python, TypeScript and PowerShell in one pass, including the generator `--check`, `test_push_down_issue_824_follow_ups.py` and `test_typescript_toolchain_instruction_contracts.py`, recorded under `evidence/qa-gates/`.
+- [x] AC-30: The seeded shuffled Jest run (seed recorded), reversed-order Python run and single-process Pester run over `tests/scripts` pass, recorded under `evidence/regression-testing/`.
+- [x] AC-31: Every touched non-Markdown file is at or below 500 physical lines, recorded under `evidence/qa-gates/`.
+- [x] AC-32: `evidence/qa-gates/self-review.<timestamp>.md` for this item covers the policy-audit, code-review and feature-audit templates and records no FAIL row before the first review push.
 - [ ] AC-33 (orchestrator-owned): `evidence/other/replan-962/spec.md` and `summary.<timestamp>.md` exist; the summary records the source ref, the original and re-plan line and task counts, no G11 or G12 finding, G13 within guideline or a justification present, a passing Python CLI validation, a first preflight of `PREFLIGHT: ALL CLEAR` (in-place fixes permitted), and a re-plan smaller than the original in both lines and tasks. #962's folder is unmodified.
 - [ ] AC-34 (pending-CI, orchestrator-owned at S9): every ruleset 15241672 required context succeeds on the final PR head.
 

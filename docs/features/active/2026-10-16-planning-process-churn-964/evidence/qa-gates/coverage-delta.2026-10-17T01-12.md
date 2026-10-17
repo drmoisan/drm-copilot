@@ -34,4 +34,4 @@ Output Summary:
 | `.claude/hooks/premortem-section.ps1` (new) | n/a | 100.00% | PASS |
 | `.claude/hooks/validate-planner-output.ps1` | 99.50% | 99.52% | PASS |
 | `.claude/hooks/validate-task-researcher-output.ps1` | 97.09% | 97.25% | PASS |
-| `.claude/hooks/validate-executor-output.ps1` | 98.33% | 98.19% | PASS (above 85%; the file grew from 120 to 166 measured lines, and the 3 uncovered lines are the hook entry tail and the default transcript reader's existing-file branch) |
+| `.claude/hooks/validate-executor-output.ps1` | 98.33% | 98.19% | PASS (above 85%; the file grew from 120 to 166 measured lines; the coverage XML lists 3 uncovered lines: the new `Test-PreflightFixRecord` body and two pre-existing branches, a blank markdown plan-path link and a canonical block without a plan delta; cases for all three were added afterwards, see `coverage-delta.2026-10-17T02-04.md`) |
