@@ -225,7 +225,7 @@ def test_brief_batch_budget_section_states_cap_codes_and_exemptions() -> None:
 
 
 def test_brief_ci_section_names_jobs_and_required_contexts() -> None:
-    """The CI section names the job shape, merge_group, and every required context."""
+    """The CI section names every job, the change scope, and each required context."""
 
     # Arrange
     section = _section("## CI Shape and Required Checks")
@@ -238,6 +238,14 @@ def test_brief_ci_section_names_jobs_and_required_contexts() -> None:
             "`poshqc / PowerShell QC static`",
             "`poshqc / PowerShell QC shard 1`",
             "the aggregator `poshqc / PowerShell QC`",
+            "`Change scope`",
+            "`CI full run`",
+            "`root-typescript-tests / Root TypeScript Tests (<os>)`",
+            "`NPM Audit Gate / npm audit (<manifest>)`",
+            "`scripts/ci/Invoke-CiChangeScope.ps1`",
+            "`config/ci-docs-only-paths.json`",
+            "`run-heavy: false`",
+            "every required context reports `success` without running its suite",
             "`merge_group`",
             "ruleset 15241672",
             "2026-10-16",
