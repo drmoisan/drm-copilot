@@ -2,7 +2,19 @@ name: Quality Checks (reusable)
 
 on:
   workflow_call:
+    inputs:
+      run-heavy:
+        description: "Run the heavy steps. ci.yml passes false only for a docs-only change scope."
+        required: false
+        type: boolean
+        default: true
   workflow_dispatch:
+    inputs:
+      run-heavy:
+        description: "Run the heavy steps. ci.yml passes false only for a docs-only change scope."
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   quality-checks7:
@@ -14,14 +26,17 @@ jobs:
 
     steps:
       - name: Check out repository
+        if: ${{ inputs.run-heavy }}
         uses: actions/checkout@v7
 
       - name: Set up Python ${{ matrix.python-version }}
+        if: ${{ inputs.run-heavy }}
         uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Poetry
+        if: ${{ inputs.run-heavy }}
         uses: snok/install-poetry@v1
         with:
           version: latest
@@ -29,6 +44,7 @@ jobs:
           virtualenvs-in-project: true
 
       - name: Load cached venv
+        if: ${{ inputs.run-heavy }}
         id: cached-poetry-dependencies
         uses: actions/cache@v6
         with:
@@ -36,13 +52,15 @@ jobs:
           key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        if: ${{ inputs.run-heavy && steps.cached-poetry-dependencies.outputs.cache-hit != 'true' }}
         run: poetry install --no-interaction --no-root
 
       - name: Install project
+        if: ${{ inputs.run-heavy }}
         run: poetry install --no-interaction
 
       - name: Verify poetry.lock is in sync
+        if: ${{ inputs.run-heavy }}
         run: |
           poetry check --lock
           if ! git diff --exit-code poetry.lock; then
@@ -52,31 +70,37 @@ jobs:
           fi
 
       - name: Check formatting with Black
+        if: ${{ inputs.run-heavy }}
         run: |
           poetry run black --check .
         continue-on-error: false
 
       - name: Lint with Ruff
+        if: ${{ inputs.run-heavy }}
         run: |
           poetry run ruff check
         continue-on-error: false
 
       - name: Type check with Pyright
+        if: ${{ inputs.run-heavy }}
         run: |
           poetry run pyright
         continue-on-error: false
 
       - name: Verify Codex agent deployment profiles
+        if: ${{ inputs.run-heavy }}
         run: |
           poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check
         continue-on-error: false
 
       - name: tier-classification
+        if: ${{ inputs.run-heavy }}
         run: |
           poetry run python -m scripts.dev_tools.check_quality_tiers
         continue-on-error: false
 
       - name: Run tests with Pytest
+        if: ${{ inputs.run-heavy }}
         run: |
           poetry run pytest --cov --cov-branch \
             --cov-report=xml \
@@ -85,6 +109,7 @@ jobs:
         continue-on-error: false
 
       - name: Enforce Python coverage thresholds
+        if: ${{ inputs.run-heavy }}
         run: |
           poetry run python -m scripts.dev_tools.check_python_coverage_thresholds \
             --report artifacts/python/coverage.json \
@@ -92,7 +117,7 @@ jobs:
         continue-on-error: false
 
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.13'
+        if: ${{ inputs.run-heavy && matrix.python-version == '3.13' }}
         uses: codecov/codecov-action@v7
         with:
           files: ./coverage.xml

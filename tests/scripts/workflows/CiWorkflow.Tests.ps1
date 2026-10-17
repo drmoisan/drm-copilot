@@ -229,11 +229,26 @@ Describe "ci.yml workflow triggers" {
         foreach ($graphFile in $graphFiles) {
             # Act: read the workflow file as text.
             $graphLines = @(Get-Content -LiteralPath $graphFile)
-            $eventFieldLines = @($graphLines | Where-Object { $_ -match 'github\.event\.pull_request|github\.head_ref|github\.base_ref|github\.event_name' })
+            # Issue #962: the ci.yml 'changes' job reads these five pull-request fields only with
+            # merge_group-safe fallbacks, and its decision returns code=true for every event other
+            # than pull_request before it uses them. Exactly these lines, once each, are allowed.
+            $allowedEventFieldLines = @()
+            if ($graphFile -eq $script:workflowPath) {
+                $allowedEventFieldLines = @(
+                    'ref: ${{ github.event.pull_request.head.sha || github.sha }}'
+                    'EVENT_NAME: ${{ github.event_name }}'
+                    'HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}'
+                    'HEAD_REF: ${{ github.head_ref }}'
+                    'HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}'
+                )
+            }
+            $allowedHits = @($graphLines | Where-Object { $allowedEventFieldLines -ccontains $_.Trim() })
+            $eventFieldLines = @($graphLines | Where-Object { $_ -match 'github\.event\.pull_request|github\.head_ref|github\.base_ref|github\.event_name' } | Where-Object { $allowedEventFieldLines -cnotcontains $_.Trim() })
             $pathFilterLines = @($graphLines | Where-Object { $_ -match '^\s*(paths|paths-ignore):' })
 
             # Assert: no pull-request event field and no path filter in this file.
             $eventFieldLines.Count | Should -Be 0 -Because "$graphFile must not read a pull-request event field, which a merge_group run does not carry"
+            $allowedHits.Count | Should -Be $allowedEventFieldLines.Count -Because "$graphFile must carry each issue #962 change-scope event-field line exactly once"
             $pathFilterLines.Count | Should -Be 0 -Because "$graphFile must not declare a path filter, which would leave a required check unreported for a queue entry"
         }
     }

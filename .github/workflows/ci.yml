@@ -10,32 +10,102 @@ on:
     types: [checks_requested]
 
 jobs:
+  changes:
+    name: Change scope
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      code: ${{ steps.scope.outputs.code }}
+    steps:
+      - name: Check out the pull request head
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          filter: blob:none
+          persist-credentials: false
+
+      - name: Decide the change scope
+        id: scope
+        shell: pwsh
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          ./scripts/ci/Invoke-CiChangeScope.ps1
+          exit 0
+
+  full-run-marker:
+    name: CI full run
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record that the heavy jobs run in full
+        run: echo "The heavy CI jobs run in full for this commit."
+
   quality-checks7:
+    needs: changes
+    if: ${{ !cancelled() }}
     uses: ./.github/workflows/_quality-checks.yml
+    with:
+      run-heavy: ${{ needs.changes.outputs.code != 'false' }}
 
   security-scan:
+    needs: changes
+    if: ${{ !cancelled() }}
     uses: ./.github/workflows/_security-scan.yml
+    with:
+      run-heavy: ${{ needs.changes.outputs.code != 'false' }}
 
   docs-validation:
     uses: ./.github/workflows/_docs-validation.yml
 
   build-check:
+    needs: changes
+    if: ${{ !cancelled() }}
     uses: ./.github/workflows/_build-check.yml
+    with:
+      run-heavy: ${{ needs.changes.outputs.code != 'false' }}
 
   poshqc:
+    needs: changes
+    if: ${{ !cancelled() }}
     uses: ./.github/workflows/_poshqc.yml
+    with:
+      run-heavy: ${{ needs.changes.outputs.code != 'false' }}
 
   shell-coverage:
+    needs: changes
+    if: ${{ !cancelled() }}
     uses: ./.github/workflows/_shell-coverage.yml
+    with:
+      run-heavy: ${{ needs.changes.outputs.code != 'false' }}
 
   drm-copilot-extension-tests:
+    needs: changes
+    if: ${{ !cancelled() }}
     uses: ./.github/workflows/_drm-copilot-extension-tests.yml
+    with:
+      run-heavy: ${{ needs.changes.outputs.code != 'false' }}
 
   root-typescript-tests:
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
     uses: ./.github/workflows/_root-typescript-tests.yml
 
   npm-audit-gate:
     name: NPM Audit Gate
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
     permissions:
       contents: read
     uses: ./.github/workflows/_npm-audit-gate.yml
