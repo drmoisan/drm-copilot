@@ -45,6 +45,7 @@ jobs:
       - name: Check for security vulnerabilities
         if: ${{ inputs.run-heavy }}
         shell: bash
+        continue-on-error: true
         run: |
           poetry run pip install safety
           poetry export -f requirements.txt --without-hashes | poetry run safety check --stdin

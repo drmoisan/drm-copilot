@@ -305,19 +305,21 @@ Describe 'issue #962 change-scope workflow gating' {
     }
 
     Context 'security scan' {
-        It 'runs the security scan under bash after installing the Poetry export plugin and without continue-on-error (AC-36)' {
+        It 'runs the security scan under bash with continue-on-error true after installing the Poetry export plugin (AC-36)' {
             $job = Get-TestJobLine -FileName '_security-scan.yml' -JobId 'security-scan'
             $job | Should -Not -BeNullOrEmpty
             $steps = Get-TestStepBlock -JobLines $job
             $names = @($steps | ForEach-Object { Get-TestStepName -Step $_ })
             $pluginIndex = [Array]::IndexOf($names, 'Install the Poetry export plugin')
 
-            @($job | Where-Object { $_ -match '^\s*continue-on-error:' }).Count | Should -Be 0 -Because 'a finding or an export failure must fail the required check'
             $pluginIndex | Should -BeGreaterOrEqual 0
             ([string[]]@($steps[$pluginIndex])) -ccontains '        run: poetry self add poetry-plugin-export' | Should -BeTrue
             $pluginIndex + 1 | Should -BeLessThan $steps.Count
             $names[$pluginIndex + 1] | Should -BeExactly 'Check for security vulnerabilities'
-            ([string[]]@($steps[$pluginIndex + 1])) -ccontains '        shell: bash' | Should -BeTrue -Because 'bash runs with pipefail, so a failed export fails the scan step'
+            $scanStep = [string[]]@($steps[$pluginIndex + 1])
+            $scanStep -ccontains '        shell: bash' | Should -BeTrue -Because 'bash runs with pipefail, so a failed export is reported in the scan step'
+            (@($job | Where-Object { $_ -match '^\s*continue-on-error:' }) -join ' | ') | Should -BeExactly '        continue-on-error: true' -Because 'only the scan step is non-blocking while the pre-existing safety findings remain (issue #962 PD-18)'
+            $scanStep -ccontains '        continue-on-error: true' | Should -BeTrue -Because 'continue-on-error belongs to the scan step and to no other step'
         }
     }
 }

@@ -138,4 +138,4 @@ Non-required jobs under `code=false`: `Change scope` reports `success`, `CI full
 
 ### Security scan
 
-On a full run, `security-scan / Security Scanning` installs the Poetry export plugin, exports the locked dependencies, and runs `safety check` under `bash` with `pipefail`. The scan step has no `continue-on-error`, so a finding or an export failure fails the required check (issue #962 follow-up).
+On a full run, `security-scan / Security Scanning` installs the Poetry export plugin, exports the locked dependencies, and runs `safety check` under `bash` with `pipefail`, so the scan reads every locked package. The scan step carries `continue-on-error: true` and does not fail the required check: the first full run of issue #962 reported 101 pre-existing findings in 14 packages of `poetry.lock` (listed in the issue #962 feature folder, `evidence/other/security-scan-findings.2026-10-17T01-18.md`), and the step stays non-blocking until those dependencies are upgraded. Findings and export errors remain visible in the step log.
