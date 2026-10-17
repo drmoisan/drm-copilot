@@ -58,7 +58,7 @@ _REMEDIATION_SURFACES = (
     ".github/skills/remediation-handoff-atomic-planner/SKILL.md",
     ".codex/prompts/feature-review-remediate.md",
 )
-_COPILOT_EDITED = (
+_COPILOT_BASE_EDITED = (
     ".github/agents/atomic_executor.agent.md",
     ".github/agents/atomic_planning.agent.md",
     ".github/agents/task-researcher.agent.md",
@@ -68,11 +68,51 @@ _COPILOT_EDITED = (
     ".github/skills/execution-environment/SKILL.md",
     ".github/prompts/generate-atomic-plan.prompt.md",
 )
+_COPILOT_LANGUAGE_EXECUTORS = tuple(
+    f".github/agents/{lang}-atomic-executor.agent.md"
+    for lang in ("csharp", "powershell", "python")
+)
+_COPILOT_LANGUAGE_AGENTS = (
+    *(
+        f".github/agents/{lang}-{role}.agent.md"
+        for lang in ("csharp", "powershell", "python")
+        for role in ("atomic-planning", "orchestrator")
+    ),
+    ".github/agents/csharp-typed-engineer.agent.md",
+    ".github/agents/powershell-typed-engineer.agent.md",
+)
+_ROUTER_AND_PROMPT_SURFACES = (
+    *(
+        f"{root}/skills/{lang}-change-budget-router/SKILL.md"
+        for root in (".claude", ".agents")
+        for lang in ("csharp", "powershell", "python")
+    ),
+    ".github/skills/csharp-change-budget-router/SKILL.md",
+    ".github/skills/powershell-change-budget-router/SKILL.md",
+    *(
+        f".github/prompts/{name}.prompt.md"
+        for name in (
+            "orchestrate-work",
+            "orchestrate-python-work",
+            "orchestrate-powershell-work",
+            "orchestrate-csharp-work",
+        )
+    ),
+)
+_COPILOT_EDITED = (
+    *_COPILOT_BASE_EDITED,
+    *_COPILOT_LANGUAGE_EXECUTORS,
+    *_COPILOT_LANGUAGE_AGENTS,
+)
 _LOOP_MANDATES = (
     "validate -> delta -> planner-revise -> validate loop",
     "validate → delta → planner-revise → validate loop",
     "automatically hand off back",
     "Loop requirement:",
+    "iterate until final `PREFLIGHT: ALL CLEAR`",
+    "preflight validation loop",
+    "repeat until `PREFLIGHT: ALL CLEAR`",
+    "preflight until `PREFLIGHT: ALL CLEAR`",
 )
 _WHITESPACE = re.compile(r"\s+")
 
@@ -137,18 +177,32 @@ def test_at_most_one_return_is_stated() -> None:
 
 
 def test_codex_and_copilot_executors_drop_loop_mandates() -> None:
-    """The Codex and Copilot executors carry no loop mandate and state single pass."""
+    """The Codex and Copilot executors carry no loop mandate and state single pass.
+
+    The language-specific Copilot executors, planners, orchestrators, and typed
+    engineers are checked too, because they repeated the base loop mandates.
+    """
 
     # Arrange
     paths = (
         ".codex/agents/atomic-executor.toml",
         ".github/agents/atomic_executor.agent.md",
+        *_COPILOT_LANGUAGE_EXECUTORS,
+    )
+    copilot_agents = (
+        *paths[1:],
+        *_COPILOT_LANGUAGE_AGENTS,
+        *_ROUTER_AND_PROMPT_SURFACES,
     )
 
     # Act
     present = {
-        path: [mandate for mandate in _LOOP_MANDATES if mandate in _read(path)]
-        for path in paths
+        path: [
+            mandate
+            for mandate in _LOOP_MANDATES
+            if mandate.lower() in _read(path).lower()
+        ]
+        for path in (*paths, *copilot_agents)
     }
     lacking = _lacking(
         paths, ("A plan returns to the planner at most once", "PREFLIGHT-DEFECT:")

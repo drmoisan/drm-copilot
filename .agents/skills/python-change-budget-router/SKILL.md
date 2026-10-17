@@ -40,7 +40,7 @@ When routed through the orchestrator, the small path still requires lifecycle sc
 - promote the potential item to a GitHub issue with `--work-mode minor-audit`,
 - create the active feature folder with `--work-mode minor-audit`,
 - delegate minimal-audit plan creation to `atomic_planner` with `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`,
-- require `atomic_executor` preflight until `PREFLIGHT: ALL CLEAR`,
+- require single-pass `atomic_executor` preflight ending in `PREFLIGHT: ALL CLEAR` (at most one return to the planner),
 - execute Phase 0 only via `atomic_executor` before branching,
 - run the reduced small-audit after implementation and QC.
 

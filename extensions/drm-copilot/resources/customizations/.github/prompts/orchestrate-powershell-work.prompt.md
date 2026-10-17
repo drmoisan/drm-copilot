@@ -29,7 +29,7 @@ Coordinate the user request from intake to completion using the correct path bas
      2) Promote to GitHub issue and capture issue metadata
      3) Create branch and active feature folder
      4) Delegate research + spec/story completion
-   5) Delegate plan creation to `powershell-atomic-planning` (which delegates to `atomic_planner`, then validates preflight via `atomic_executor` until `PREFLIGHT: ALL CLEAR`)
+   5) Delegate plan creation to `powershell-atomic-planning` (which delegates to `atomic_planner`, then runs single-pass preflight via `atomic_executor` ending in `PREFLIGHT: ALL CLEAR`)
    6) After all-clear, delegate implementation + QA directly to `powershell_atomic_executor`
    7) Delegate post-implementation feature review
 

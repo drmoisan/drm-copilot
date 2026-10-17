@@ -6,7 +6,7 @@ tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/killTerm
 handoffs:
   - label: Architecture + testability plan only (no edits)
     agent: csharp-atomic-planning
-    prompt: "Create a plan ONLY (no implementation edits). Use `.github/prompts/generate-atomic-plan.prompt.md` as the planning contract and resolve it with concrete paths/inputs (`name`, `file`, `spec`, `user-story`, `research`) so there are no placeholders. Produce an executor-ready atomic plan with canonical `### Phase N — ...` headings, `- [ ] [P#-T#]` tasks, mandatory Phase 0 baseline capture, and mandatory final QA loop for all affected toolchains. Plan content must explicitly include: proposed class/module structure, minimal DI seams, MSTest scenario-level test strategy, Moq mock strategy, and exact files to change. After drafting, run the mandatory validation-only preflight loop through the C# planning chain and iterate until `PREFLIGHT: ALL CLEAR`, then return the finalized plan plus the final all-clear signal."
+    prompt: "Create a plan ONLY (no implementation edits). Use `.github/prompts/generate-atomic-plan.prompt.md` as the planning contract and resolve it with concrete paths/inputs (`name`, `file`, `spec`, `user-story`, `research`) so there are no placeholders. Produce an executor-ready atomic plan with canonical `### Phase N — ...` headings, `- [ ] [P#-T#]` tasks, mandatory Phase 0 baseline capture, and mandatory final QA loop for all affected toolchains. Plan content must explicitly include: proposed class/module structure, minimal DI seams, MSTest scenario-level test strategy, Moq mock strategy, and exact files to change. After drafting, run the mandatory single-pass validation-only preflight through the C# planning chain (trivial defects fixed in place, at most one return to the planner) ending in `PREFLIGHT: ALL CLEAR`, then return the finalized plan plus the final all-clear signal."
     send: true
   - label: Implement approved plan
     agent: csharp-atomic-executor
@@ -94,7 +94,7 @@ If any required item is missing in orchestrator handoff mode, STOP and request t
 When in **Orchestrator handoff mode**, this agent MUST run the following delegation chain and MUST NOT bypass it with direct implementation:
 
 1) Delegate to `csharp-atomic-planning` (handoff: **Architecture + testability plan only (no edits)**).
-2) Require planner output to include final `PREFLIGHT: ALL CLEAR` from the preflight validation loop.
+2) Require planner output to include final `PREFLIGHT: ALL CLEAR` from single-pass preflight.
 3) Delegate plan execution to `csharp-atomic-executor` (handoff: **Implement approved plan**).
 4) Delegate final QA to `csharp-atomic-executor` (handoff: **Post-change QA gate (format + analyze + build + tests + coverage)**).
 5) Delegate post-implementation review to `feature_code_review_agent` (handoff: **Post-implementation feature review**).
@@ -205,7 +205,7 @@ The plan should include:
 - Exact files to change (must satisfy scope guardrails).
 
 Orchestrator handoff mode requirement:
-- Even if a draft plan is supplied, delegate to `csharp-atomic-planning` to normalize/validate the plan and run the mandatory preflight validation loop to `PREFLIGHT: ALL CLEAR` before any implementation delegation.
+- Even if a draft plan is supplied, delegate to `csharp-atomic-planning` to normalize/validate the plan and run mandatory single-pass preflight to `PREFLIGHT: ALL CLEAR` before any implementation delegation.
 
 Orchestrator handoff mode hard stop:
 - In this mode, ignore implicit approval shortcuts for direct local execution.
