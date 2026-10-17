@@ -3,9 +3,9 @@
 - **Issue:** #527 (canonical; absorbs item 1 of #623)
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-29T16-00
+- **Last Updated:** 2026-10-17
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 - **Work Mode:** full-bug
 - **Technical basis:** `research/research.2026-09-29T15-40.md`
 
@@ -23,11 +23,11 @@ have the same root cause (see Root Cause Analysis). Items 2 and 3 of #623 are ou
 
 Impact / Severity:
 - [ ] Blocker
-- [ ] High
-- [x] Medium
+- [x] High
+- [ ] Medium
 - [ ] Low
 
-Severity is Medium. No gate currently fails, and the defect does not affect the correctness of shipped code. The
+Severity is High (GitHub label `severity:high`, set at triage on 2026-08-25). No gate currently fails, and the defect does not affect the correctness of shipped code. The
 defect affects the integrity of the measurement. A coverage figure that cannot be reproduced cannot
 be compared against a baseline, so the "no regression on changed lines" requirement in
 `.claude/rules/general-unit-test.md` cannot be evaluated for PowerShell. Because Pester does not
@@ -261,9 +261,29 @@ Enumeration for sources 2 and 3:
   - Run the consumer fixture before and after the fix.
   - Parse the coverage XML for each run.
 
+## Revision 2026-10-17 (round 2)
+
+Technical basis for this revision: `research/research.2026-10-17T12-35.md`.
+
+- Verdict: the defect is resolved in substance by PR #821, which derived the coverage population from the workspace. PR #959 (for #953) did not regress it; that change altered only hit collection and test-file sharding, not the population. The merge guard in `Merge-PoshQCCoverageReport` enforces cross-shard denominator equality on every CI run.
+- Per-route evidence (orchestrator-measured on 2026-10-17; the figures change whenever a PowerShell file is added, so they are not pinned by any criterion):
+  - CI merged report and all three shard reports, across two runs with different shard assignments, agree on the same 215 files, a LINE total of 19095, and an identical normalized `package|sourcefile` key set, with zero per-file differences. The shards ran different test subsets.
+  - Two local runs with a targeted test subset, started from the repository root and from a subdirectory, report the same 215 files and LINE total of 19095 as the CI merged report, with zero per-file differences.
+  - The installed extension 1.1.19 module over the same tree reports the same denominator. Its numerator differs because it predates #953.
+  - CI history shows 214 files (LINE total 18990) before one production file was added and 215 files (19095) afterward; the change is a documented tree change, not variance.
+  - The consumer fixture run reports a one-file population (source `fallback`) containing only the fixture's production file, and the JUnit report shows zero failures.
+- Round-2 scope: evidence-only closure. No production, test, configuration, or workflow change is made.
+- The round-1 plan `plan.2026-09-29T15-32.md` and its open blocker tasks are superseded by the round-2 plan `plan.2026-10-17T08-20.md`. The round-1 plan is not edited.
+- Closure is by the auto-close reference in the round-2 pull request.
+- Follow-up decisions (none is filed as a new issue):
+  - Numerator values recorded under breakpoint mode (extension 1.1.19 and earlier) are not comparable with profiler-mode values. Denominators are comparable.
+  - Installing extension 1.1.20 is an operator step.
+  - Logging the Pester version and the line total was declined. It is an optional enhancement, not a defect.
+  - An automated consumer-fixture guard was declined. The population logic is already unit-tested with an injected tree in `PoshQC.Coverage.Tests.ps1`.
+
 ## Acceptance Criteria
 
-- [ ] Deterministic derivation: two self-hosted `Invoke-PoshQCTest` runs over this unchanged repository produce an identical set of `<sourcefile>` entries and an identical root `LINE` counter total (missed + covered) in `artifacts/pester/powershell-coverage.xml`. A third run launched from a different current directory with the same absolute `-Root` matches as well. The comparison is recorded under `evidence/`.
+- [ ] Deterministic derivation: two self-hosted `Invoke-PoshQCTest` runs over this unchanged repository produce an identical set of `package|sourcefile` keys, normalized to repository-relative paths (the `sourcefile` leaf name alone is ambiguous), with identical per-file and root `LINE` counter totals (missed + covered) in `artifacts/pester/powershell-coverage.xml`. The runs may use a targeted test subset, because the denominator is independent of which tests run (shown by the CI shard reports). A third run launched from a current directory outside the repository tree with the same absolute `-Root` matches as well. The local denominator equals the CI merged report for the same production tree. The comparison of the three runs is recorded under `evidence/`.
 - [x] Route independence: a Pester test in `tests/scripts/powershell/PoshQC/PoshQC.Coverage.Tests.ps1` runs `Invoke-PoshQCTest` with an identical injected tree and workspace config but two different settings tables, and asserts that the captured coverage population is identical. Evidence shows the test failing against pre-fix code.
 - [x] Derived population contents: for sources `config` and `fallback`, the population equals the set of `.ps1` and `.psm1` files under the effective roots. That set excludes `*.Tests.ps1`, paths whose first repository-relative segment is `tests`, and `DefaultExcludedDirs` segments. It is de-duplicated case-insensitively and sorted ordinally. Unit tests with shuffled enumeration order, case-variant duplicates, and overlapping roots verify this.
 - [x] Precedence order: unit tests verify that a non-empty `CodeCoverage.Path` in a caller-supplied settings file takes precedence over `config/poshqc-coverage.json`, and that the config file takes precedence over the fallback to the effective test scan folders (explicit `-ScanFolders`, else `config/poshqc-scan.json`, else settings `Run.Path`).
@@ -273,14 +293,15 @@ Enumeration for sources 2 and 3:
 - [x] Allow-list removed: neither `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` nor `extensions/drm-copilot/resources/powershell/PoshQC/settings/pester.runsettings.psd1` contains a `CodeCoverage.Path` entry list. Both keep `Enabled`, `OutputFormat`, `OutputPath`, and `CoveragePercentTarget`.
 - [x] Parity preserved: `PoshQC.Coverage.psm1` is added to `POSHQC_PARITY_PATHS`, and every changed or new PoshQC file is byte-identical to its mirror under `extensions/drm-copilot/resources/powershell/PoshQC/`. `poetry run pytest tests/scripts/dev_tools/test_poshqc_bundled_parity.py` passes.
 - [x] `config/poshqc-coverage.json` exists with `"version": 1` and exactly these roots: `.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts`. A self-hosted repository run logs source `config`.
-- [ ] Consumer fixture coverage: `tests/fixtures/poshqc-consumer/` is committed. It contains a small production script, a Pester test that exercises it, and a pushed-down stand-in `.claude/hooks/validate-bash.ps1`, and it has no `config/poshqc-coverage.json`. The self-hosted `Invoke-PoshQCTest -Root <fixture>` run records a covered `LINE` count greater than zero for the fixture's production file, and `pester-junit.xml` reports zero failures. Evidence records the pre-fix run failing this check.
-- [ ] Consumer isolation: in the fixture run's `powershell-coverage.xml`, no `<sourcefile>` refers to a drm-copilot file. This includes the stand-in `validate-bash.ps1` and any path outside the fixture tree.
+- [ ] Consumer fixture coverage: `tests/fixtures/poshqc-consumer/` is committed. It contains a small production script, a Pester test that exercises it, and a pushed-down stand-in `.claude/hooks/validate-bash.ps1`, and it has no `config/poshqc-coverage.json`. The self-hosted `Invoke-PoshQCTest -Root <fixture>` run records a covered `LINE` count greater than zero for the fixture's production file, and `pester-junit.xml` reports zero failures. Evidence records the pre-fix run failing this check; the pre-fix failing run is the existing evidence `evidence/regression-testing/fail-first-fixture-run.2026-10-02T07-55.md` and `fail-first-fixture-check.2026-10-02T07-55.md`.
+- [ ] Consumer isolation: in the fixture run's `powershell-coverage.xml`, no `<sourcefile>` refers to a drm-copilot file. This includes the stand-in `validate-bash.ps1` and any path outside the fixture tree. The single entry's `package` attribute, made relative to the fixture root, is `scripts`.
 - [ ] Fixture output hygiene: after the fixture run, `git status --porcelain` shows no untracked or modified files produced by the run, either because the output is gitignored or because it is removed. The plan chooses the mechanism.
 - [x] New code coverage: `PoshQC.Coverage.psm1` and the changed lines in `PoshQC.Testing.psm1` and `PoshQC.psm1` reach at least 85% line coverage in the self-hosted run. The repository aggregate is recorded in evidence, and any aggregate below 85% is recorded as a follow-up item. No production file is excluded to raise it.
 - [x] Existing suite: the full self-hosted Pester suite passes with zero failures, and PoshQC format and analyze report no findings on changed files.
 - [x] Documentation: `scripts/powershell/PoshQC/README.md` and its bundled mirror replace the stale coverage-glob description. The new text documents `config/poshqc-coverage.json`, the precedence order, the built-in exclusions, and the fallback behavior.
 - [x] No temporary files in tests: no new or changed test uses `TestDrive:`, `New-TemporaryFile`, `GetTempFileName`, `GetTempPath`, `$env:TEMP`, or `$env:TMP`. Filesystem and JSON access in unit tests goes through injected seams, and `.claude/hooks/check-powershell-test-purity.ps1` reports no violation.
 - [x] `PoshQC.Testing.psm1` and every new production or test file remain at or under 500 lines. Pre-existing over-limit test files are not grown.
+- [ ] Order independence: a seeded shuffled file-order run of `tests/scripts/powershell/PoshQC` in one process, with three recorded seeds, reports zero failures in each run and the same normalized key set and root LINE total as the unshuffled runs.
 
 ## Risks & Mitigations
 
