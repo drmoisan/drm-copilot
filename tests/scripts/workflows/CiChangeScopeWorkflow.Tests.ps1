@@ -143,6 +143,21 @@ Describe 'issue #962 change-scope workflow gating' {
             $matching.Count | Should -Be 1 -Because 'one pwsh step runs the decision script and cannot fail the job'
         }
 
+        It 'passes BASE_SHA and BASE_REF to the scope step of the changes job (#973)' {
+            $job = Get-TestJobLine -FileName 'ci.yml' -JobId 'changes'
+            $job | Should -Not -BeNullOrEmpty
+            $scopeSteps = @((Get-TestStepBlock -JobLines $job) | Where-Object { ([string[]]@($_)) -ccontains '        id: scope' })
+            $scopeSteps.Count | Should -Be 1
+            $step = [string[]]@($scopeSteps[0])
+
+            # The env entries of the scope step are indented ten spaces under its 'env:' key.
+            $baseShaLines = @($step | Where-Object { $_ -ceq '          BASE_SHA: ${{ github.event.pull_request.base.sha }}' })
+            $baseRefLines = @($step | Where-Object { $_ -ceq '          BASE_REF: ${{ github.base_ref }}' })
+
+            $baseShaLines.Count | Should -Be 1 -Because 'the merge-base fallback reads the payload base SHA from BASE_SHA'
+            $baseRefLines.Count | Should -Be 1 -Because 'the merge-base fallback applies only when BASE_REF is main'
+        }
+
         It 'declares full-run-marker as CI full run that needs changes and runs only when code is not false (AC-18)' {
             $job = Get-TestJobLine -FileName 'ci.yml' -JobId 'full-run-marker'
 

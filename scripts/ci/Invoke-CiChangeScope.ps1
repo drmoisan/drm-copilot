@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Decides whether the heavy CI steps run for the commit under test (issue #962).
+    Decides whether the heavy CI steps run for the commit under test (issues #962 and #973).
 
 .DESCRIPTION
     Runs in the ci.yml 'changes' job. On a same-repository pull_request event it finds the newest
@@ -8,6 +8,15 @@
     commit is present and is an ancestor of the current head, and lists the files changed since that
     commit. When every changed file is on the docs-only allowlist (config/ci-docs-only-paths.json), it
     writes code=false; in every other case, including any failure, it writes code=true (a full run).
+
+    Merge-base fallback (issue #973): when the branch has no full green run (NO_FULL_GREEN_RUN), or the
+    green run's head commit is missing (BASE_NOT_PRESENT) or not an ancestor of the head
+    (BASE_NOT_ANCESTOR), and the pull request's base ref is exactly 'main', the script computes the merge
+    base of the payload base SHA (BASE_SHA) and the head and lists the files changed since that merge
+    base with the same diff arguments. An all-allowlisted diff gives code=false with the reason
+    DOCS_ONLY_SINCE_MERGE_BASE_<merge base sha>. A merge base that cannot be resolved gives code=true
+    with the reason MERGE_BASE_UNRESOLVED. Pull requests into any other base ref keep the green-run
+    decision only.
 
     The decision logic lives in the pure module CiChangeScope.psm1. This script holds the I/O: the
     gh and git calls, the environment reads, and the writes to GITHUB_OUTPUT, GITHUB_STEP_SUMMARY,
@@ -79,7 +88,10 @@ function Write-CiChangeScopeTarget {
 function Get-CiChangeScopeContext {
     <#
     .SYNOPSIS
-        Reads the six decision inputs that the workflow step passes as environment variables.
+        Reads the eight decision inputs that the workflow step passes as environment variables.
+    .DESCRIPTION
+        BaseSha and BaseRef (issue #973) are blank on events other than pull_request; they are read only
+        by the merge-base fallback, so they are not required context values.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -94,6 +106,8 @@ function Get-CiChangeScopeContext {
         HeadRepository = [string](& $ReadVariable 'HEAD_REPO')
         Repository     = [string](& $ReadVariable 'REPOSITORY')
         RunId          = [string](& $ReadVariable 'RUN_ID')
+        BaseSha        = [string](& $ReadVariable 'BASE_SHA')
+        BaseRef        = [string](& $ReadVariable 'BASE_REF')
     }
 }
 
@@ -164,6 +178,79 @@ function Find-CiChangeScopeBase {
     return [pscustomobject]@{ Reason = 'NO_FULL_GREEN_RUN'; BaseSha = '' }
 }
 
+function Find-CiChangeScopeMergeBase {
+    <#
+    .SYNOPSIS
+        Resolves the merge base of the pull request base commit and the head (issue #973).
+    .DESCRIPTION
+        Returns an object with Reason (blank when the merge base was resolved) and BaseSha. A blank base
+        SHA, a base commit missing from the checkout, a failed git merge-base, or output that is not
+        exactly one full SHA gives MERGE_BASE_UNRESOLVED with a blank BaseSha. The base ref is never
+        passed to git.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [AllowEmptyString()][string] $BaseSha = '',
+        [Parameter(Mandatory = $true)][string] $HeadSha,
+        [Parameter(Mandatory = $true)][scriptblock] $GitInvoker
+    )
+
+    $unresolved = [pscustomobject]@{ Reason = 'MERGE_BASE_UNRESOLVED'; BaseSha = '' }
+    if ([string]::IsNullOrWhiteSpace($BaseSha)) {
+        return $unresolved
+    }
+    $present = & $GitInvoker 'cat-file' '-e' "$($BaseSha)^{commit}"
+    if ($present.ExitCode -ne 0) {
+        return $unresolved
+    }
+    $mergeBase = & $GitInvoker 'merge-base' $BaseSha $HeadSha
+    if ($mergeBase.ExitCode -ne 0) {
+        return $unresolved
+    }
+    $mergeBaseSha = ConvertFrom-CiMergeBaseOutput -Text ([string]$mergeBase.Output)
+    if (-not $mergeBaseSha) {
+        return $unresolved
+    }
+    return [pscustomobject]@{ Reason = ''; BaseSha = $mergeBaseSha }
+}
+
+function Get-CiChangeScopeDiffDecision {
+    <#
+    .SYNOPSIS
+        Lists the files changed from a base commit to the head and returns the decision for them.
+    .DESCRIPTION
+        Shared by the green-run path and the merge-base path. Rename detection is off, so both the old
+        and the new path of a rename are listed and classified. A failed diff or output that is not git
+        diff -z output gives DIFF_FAILED; an empty diff or a path outside the allowlist gives the path
+        decision reason; otherwise the decision is code=false with DocsOnlyReasonPrefix followed by the
+        base SHA. Every decision carries BaseSha.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)][string] $BaseSha,
+        [Parameter(Mandatory = $true)][string] $HeadSha,
+        [Parameter(Mandatory = $true)][pscustomobject] $Config,
+        [Parameter(Mandatory = $true)][scriptblock] $GitInvoker,
+        [Parameter(Mandatory = $true)][string] $DocsOnlyReasonPrefix
+    )
+
+    $diff = & $GitInvoker 'diff' '--name-only' '-z' '--no-renames' '--no-color' '--no-ext-diff' '--no-relative' $BaseSha $HeadSha
+    if ($diff.ExitCode -ne 0) {
+        return New-CiChangeScopeDecision -Code $true -Reason 'DIFF_FAILED' -BaseSha $BaseSha
+    }
+    $pathList = ConvertFrom-CiNulPathList -Text ([string]$diff.Output)
+    if (-not $pathList.Valid) {
+        return New-CiChangeScopeDecision -Code $true -Reason 'DIFF_FAILED' -BaseSha $BaseSha
+    }
+    $pathReason = Get-CiChangeScopePathDecision -Paths $pathList.Paths -Config $Config
+    if ($pathReason) {
+        return New-CiChangeScopeDecision -Code $true -Reason $pathReason -BaseSha $BaseSha
+    }
+    return New-CiChangeScopeDecision -Code $false -Reason "$DocsOnlyReasonPrefix$BaseSha" -BaseSha $BaseSha
+}
+
 function Resolve-CiChangeScopeDecision {
     <#
     .SYNOPSIS
@@ -198,39 +285,46 @@ function Resolve-CiChangeScopeDecision {
     if (-not $HasConfigJson) { $configText = Read-CiChangeScopeConfigText }
     $config = ConvertFrom-CiDocsOnlyPathConfig -Json $configText
 
+    # Primary comparison: the newest full green run on the branch. A reason that means no usable green
+    # base exists is kept in $primary so that the merge-base fallback below can replace it.
+    $primary = $null
     $base = Find-CiChangeScopeBase -Repository ([string]$Context['Repository']) -HeadRef ([string]$Context['HeadRef']) -RunId ([string]$Context['RunId']) -GhInvoker $GhInvoker
     if ($base.Reason) {
-        return New-CiChangeScopeDecision -Code $true -Reason $base.Reason
+        $primary = New-CiChangeScopeDecision -Code $true -Reason $base.Reason
     }
-    $baseSha = [string]$base.BaseSha
+    if ($null -eq $primary) {
+        # The base must be present in the checkout and an ancestor of the head; otherwise the diff since the
+        # base would not describe what this branch changed.
+        $baseSha = [string]$base.BaseSha
+        $present = & $GitInvoker 'cat-file' '-e' "$($baseSha)^{commit}"
+        if ($present.ExitCode -ne 0) {
+            $primary = New-CiChangeScopeDecision -Code $true -Reason 'BASE_NOT_PRESENT' -BaseSha $baseSha
+        }
+    }
+    if ($null -eq $primary) {
+        $ancestry = & $GitInvoker 'merge-base' '--is-ancestor' $baseSha $headSha
+        if ($ancestry.ExitCode -eq 1) {
+            $primary = New-CiChangeScopeDecision -Code $true -Reason 'BASE_NOT_ANCESTOR' -BaseSha $baseSha
+        }
+        elseif ($ancestry.ExitCode -ne 0) {
+            return New-CiChangeScopeDecision -Code $true -Reason 'ANCESTRY_CHECK_FAILED' -BaseSha $baseSha
+        }
+        else {
+            return Get-CiChangeScopeDiffDecision -BaseSha $baseSha -HeadSha $headSha -Config $config -GitInvoker $GitInvoker -DocsOnlyReasonPrefix 'DOCS_ONLY_SINCE_'
+        }
+    }
 
-    # The base must be present in the checkout and an ancestor of the head; otherwise the diff since the
-    # base would not describe what this branch changed.
-    $present = & $GitInvoker 'cat-file' '-e' "$($baseSha)^{commit}"
-    if ($present.ExitCode -ne 0) {
-        return New-CiChangeScopeDecision -Code $true -Reason 'BASE_NOT_PRESENT' -BaseSha $baseSha
+    # Merge-base fallback (issue #973): only for NO_FULL_GREEN_RUN, BASE_NOT_PRESENT, or BASE_NOT_ANCESTOR
+    # on a pull request whose base ref is exactly main. RUN_LIST_FAILED and JOB_LIST_FAILED are returned
+    # unchanged here, as is every primary reason for another base ref.
+    if (-not (Test-CiMergeBaseFallbackApplicable -PrimaryReason $primary.Reason -BaseRef ([string]$Context['BaseRef']))) {
+        return $primary
     }
-    $ancestry = & $GitInvoker 'merge-base' '--is-ancestor' $baseSha $headSha
-    if ($ancestry.ExitCode -eq 1) {
-        return New-CiChangeScopeDecision -Code $true -Reason 'BASE_NOT_ANCESTOR' -BaseSha $baseSha
+    $mergeBase = Find-CiChangeScopeMergeBase -BaseSha ([string]$Context['BaseSha']) -HeadSha $headSha -GitInvoker $GitInvoker
+    if ($mergeBase.Reason) {
+        return New-CiChangeScopeDecision -Code $true -Reason $mergeBase.Reason
     }
-    if ($ancestry.ExitCode -ne 0) {
-        return New-CiChangeScopeDecision -Code $true -Reason 'ANCESTRY_CHECK_FAILED' -BaseSha $baseSha
-    }
-
-    $diff = & $GitInvoker 'diff' '--name-only' '-z' '--no-renames' '--no-color' '--no-ext-diff' '--no-relative' $baseSha $headSha
-    if ($diff.ExitCode -ne 0) {
-        return New-CiChangeScopeDecision -Code $true -Reason 'DIFF_FAILED' -BaseSha $baseSha
-    }
-    $pathList = ConvertFrom-CiNulPathList -Text ([string]$diff.Output)
-    if (-not $pathList.Valid) {
-        return New-CiChangeScopeDecision -Code $true -Reason 'DIFF_FAILED' -BaseSha $baseSha
-    }
-    $pathReason = Get-CiChangeScopePathDecision -Paths $pathList.Paths -Config $config
-    if ($pathReason) {
-        return New-CiChangeScopeDecision -Code $true -Reason $pathReason -BaseSha $baseSha
-    }
-    return New-CiChangeScopeDecision -Code $false -Reason "DOCS_ONLY_SINCE_$baseSha" -BaseSha $baseSha
+    return Get-CiChangeScopeDiffDecision -BaseSha $mergeBase.BaseSha -HeadSha $headSha -Config $config -GitInvoker $GitInvoker -DocsOnlyReasonPrefix 'DOCS_ONLY_SINCE_MERGE_BASE_'
 }
 
 function Invoke-CiChangeScope {
