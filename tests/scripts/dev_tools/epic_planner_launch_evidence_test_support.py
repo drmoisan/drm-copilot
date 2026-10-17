@@ -158,7 +158,7 @@ def _minimal_feature(issue_num: int) -> dict[str, Any]:
         "model_routing_receipt": {
             "delegation_id": delegation_id,
             "deployment_agent": "orchestrator-c3-elevated",
-            "model": "gpt-5.6-sol",
+            "model": "gpt-6-astra",
             "model_reasoning_effort": "high",
             "execution_context": "epic_preparation_child",
         },

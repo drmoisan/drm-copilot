@@ -22,7 +22,7 @@ Describe 'Codex epic-child launcher hardening' {
                 }
                 model_routing_receipt = [pscustomobject]@{
                     delegation_id = $delegationId; deployment_agent = $agent
-                    model = 'gpt-5.6-sol'; model_reasoning_effort = 'high'
+                    model = 'gpt-6-astra'; model_reasoning_effort = 'high'
                     execution_context = 'epic_execution_child'
                 }
             }
@@ -34,7 +34,7 @@ Describe 'Codex epic-child launcher hardening' {
                 launch_id     = "launch-$(Split-Path ([string]$Feature.feature_folder) -Leaf)"
                 delegation_id = [string]$Feature.delegation_receipt.delegation_id
                 feature_folder = [string]$Feature.feature_folder; issue_num = $Feature.issue_num
-                deployment_agent = 'orchestrator-c3-elevated'; model = 'gpt-5.6-sol'
+                deployment_agent = 'orchestrator-c3-elevated'; model = 'gpt-6-astra'
                 model_reasoning_effort = 'high'; permissions = 'orchestrator-workspace'
                 execution_context = $Context; worktree_path = [string]$Feature.worktree_path
                 branch_name   = [string]$Feature.branch_name
@@ -49,7 +49,7 @@ Describe 'Codex epic-child launcher hardening' {
         function Get-TestProfile {
             param([string] $Worktree)
             return [pscustomobject]@{
-                name = 'orchestrator-c3-elevated'; model = 'gpt-5.6-sol'
+                name = 'orchestrator-c3-elevated'; model = 'gpt-6-astra'
                 model_reasoning_effort = 'high'; default_permissions = 'orchestrator-workspace'
                 developer_instructions = 'exact'; skills_config = '[]'; worktree_path = $Worktree
                 profile_path   = Join-Path $Worktree '.codex/agents/orchestrator-c3-elevated.toml'
@@ -201,7 +201,7 @@ Describe 'Codex epic-child launcher hardening' {
             schema_version = 2; state = 'active'; codex_session_id = 'session-a'
             session_bound_at = '2026-07-10T12:00:00Z'; expires_at = '2026-07-12T12:00:00Z'
             launch_id = 'launch-a'; delegation_id = 'delegate-a'; feature_folder = 'child-a'
-            deployment_agent = 'orchestrator-c3'; model = 'gpt-5.6-terra'
+            deployment_agent = 'orchestrator-c3'; model = 'gpt-6.1-sol'
             model_reasoning_effort = 'high'; execution_context = 'epic_execution_child'
             worktree_path = $script:WorktreeA; branch_name = 'feature/child-a'
             receipt_path = 'C:\receipt.json'; spec_path = 'C:\spec.json'
@@ -229,7 +229,7 @@ Describe 'Codex epic-child launcher hardening' {
         $receipt = [pscustomobject]@{
             launch_id = 'launch-a'; receipt_path = 'C:\receipt.json'; spec_path = 'C:\spec.json'
             worktree_path = $script:WorktreeA; delegation_id = 'delegate-a'
-            deployment_agent = 'orchestrator-c3-elevated'; model = 'gpt-5.6-sol'
+            deployment_agent = 'orchestrator-c3-elevated'; model = 'gpt-6-astra'
             model_reasoning_effort = 'high'; execution_context = 'epic_execution_child'
             profile_sha256 = ('a' * 64); codex_command_path = 'codex.exe'
             codex_denied_paths = @('C:\Tools\codex.exe', 'C:\Tools\node_modules\@openai\codex')
@@ -252,7 +252,7 @@ Describe 'Codex epic-child launcher hardening' {
     It 'builds resume with the exact sealed session and runtime controls' {
         $context = [pscustomobject]@{
             Receipt      = [pscustomobject]@{
-                worktree_path = $script:WorktreeA; model = 'gpt-5.6-sol'
+                worktree_path = $script:WorktreeA; model = 'gpt-6-astra'
                 model_reasoning_effort = 'high'; codex_denied_paths = @('C:\codex.exe')
                 codex_home_path = 'C:\isolated'
                 codex_session_id = 'session-a'; launch_id = 'launch-a'

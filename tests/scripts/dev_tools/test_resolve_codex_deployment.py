@@ -14,10 +14,10 @@ from scripts.dev_tools.resolve_codex_deployment import (
 @pytest.mark.parametrize(
     ("band", "expected_agent", "expected_model", "expected_reasoning"),
     [
-        ("C1", "atomic-executor-c1", "gpt-5.6-luna", "low"),
-        ("C2", "atomic-executor-c2", "gpt-5.6-terra", "medium"),
-        ("C3", "atomic-executor-c3", "gpt-5.6-terra", "high"),
-        ("C4", "atomic-executor-c4", "gpt-5.6-sol", "max"),
+        ("C1", "atomic-executor-c1", "gpt-6-luna", "low"),
+        ("C2", "atomic-executor-c2", "gpt-6.1-sol", "medium"),
+        ("C3", "atomic-executor-c3", "gpt-6.1-sol", "high"),
+        ("C4", "atomic-executor-c4", "gpt-6-astra", "max"),
     ],
 )
 def test_resolves_standalone_base_profiles(
@@ -39,19 +39,19 @@ def test_resolves_standalone_base_profiles(
 
 @pytest.mark.parametrize("context", ["epic_preparation_child", "epic_execution_child"])
 def test_elevates_c3_for_epic_children(context: str) -> None:
-    """Route C3 epic children to the Sol/high elevated agent profile."""
+    """Route C3 epic children to the Astra/high elevated agent profile."""
 
     receipt = resolve_codex_deployment("orchestrator", "C3", context, "C3")
 
     assert receipt["deployment_agent"] == "orchestrator-c3-elevated"
-    assert receipt["model"] == "gpt-5.6-sol"
+    assert receipt["model"] == "gpt-6-astra"
     assert receipt["model_reasoning_effort"] == "high"
     assert receipt["c3_overlay_applied"] is True
     assert receipt["c3_overlay_reason"] == "epic_context"
 
 
 def test_elevates_standalone_c3_when_orchestration_ceiling_is_c4() -> None:
-    """Route standalone C3 to Sol/high when sibling scope establishes C4."""
+    """Route standalone C3 to Astra/high when sibling scope establishes C4."""
 
     receipt = resolve_codex_deployment("task-researcher", "C3", "standalone", "C4")
 
@@ -73,7 +73,7 @@ def test_elevates_standalone_c3_when_orchestration_ceiling_is_c4() -> None:
             "standalone",
             "C3",
             "task-researcher-c3",
-            "gpt-5.6-terra",
+            "gpt-6.1-sol",
             False,
             None,
         ),
@@ -81,7 +81,7 @@ def test_elevates_standalone_c3_when_orchestration_ceiling_is_c4() -> None:
             "epic_execution_child",
             "C3",
             "task-researcher-c3-elevated",
-            "gpt-5.6-sol",
+            "gpt-6-astra",
             True,
             "epic_context",
         ),
@@ -89,7 +89,7 @@ def test_elevates_standalone_c3_when_orchestration_ceiling_is_c4() -> None:
             "standalone",
             "C4",
             "task-researcher-c3-elevated",
-            "gpt-5.6-sol",
+            "gpt-6-astra",
             True,
             "c4_orchestration_ceiling",
         ),
@@ -128,13 +128,13 @@ def test_records_combined_c3_overlay_reason() -> None:
 
 
 @pytest.mark.parametrize("persona", ["epic-planner", "epic-orchestrator"])
-def test_forces_epic_personas_to_sol_ultra(persona: str) -> None:
+def test_forces_epic_personas_to_astra_ultra(persona: str) -> None:
     """Keep both epic master personas on the forced highest deployment."""
 
     receipt = resolve_codex_deployment(persona, "C1", "standalone", "C1")
 
     assert receipt["deployment_agent"] == persona
-    assert receipt["model"] == "gpt-5.6-sol"
+    assert receipt["model"] == "gpt-6-astra"
     assert receipt["model_reasoning_effort"] == "ultra"
     assert receipt["c3_overlay_applied"] is False
 
@@ -147,7 +147,7 @@ def test_does_not_overlay_non_c3_epic_work() -> None:
     )
 
     assert receipt["deployment_agent"] == "atomic-planner-c2"
-    assert receipt["model"] == "gpt-5.6-terra"
+    assert receipt["model"] == "gpt-6.1-sol"
     assert receipt["model_reasoning_effort"] == "medium"
     assert receipt["c3_overlay_applied"] is False
 
@@ -162,7 +162,7 @@ def test_maps_route_feature_review_name_to_codex_reviewer_family() -> None:
 
 
 def test_resolves_commit_steward_standalone_c3_without_overlay() -> None:
-    """Route commit-steward standalone C3 to its exact Terra/high profile."""
+    """Route commit-steward standalone C3 to its exact Sol/high profile."""
 
     receipt = resolve_codex_deployment("commit-steward", "C3", "standalone", "C3")
 
@@ -174,7 +174,7 @@ def test_resolves_commit_steward_standalone_c3_without_overlay() -> None:
         "orchestration_complexity_ceiling": "C3",
         "c3_overlay_applied": False,
         "c3_overlay_reason": None,
-        "model": "gpt-5.6-terra",
+        "model": "gpt-6.1-sol",
         "model_reasoning_effort": "high",
     }
 
@@ -212,7 +212,7 @@ def test_fails_without_model_fallback_when_exact_model_is_unavailable() -> None:
             "C4",
             "standalone",
             "C4",
-            available_models={"gpt-5.6-terra", "gpt-5.6-luna"},
+            available_models={"gpt-6.1-sol", "gpt-6-luna"},
         )
 
 
@@ -224,10 +224,10 @@ def test_accepts_exact_routed_model_when_available() -> None:
         "C4",
         "standalone",
         "C4",
-        available_models={"gpt-5.6-sol"},
+        available_models={"gpt-6-astra"},
     )
 
-    assert receipt["model"] == "gpt-5.6-sol"
+    assert receipt["model"] == "gpt-6-astra"
 
 
 def test_cli_emits_stable_deployment_receipt(
@@ -251,4 +251,4 @@ def test_cli_emits_stable_deployment_receipt(
     output = capsys.readouterr().out
     assert result == 0
     assert '"deployment_agent": "orchestrator-c3"' in output
-    assert '"model": "gpt-5.6-terra"' in output
+    assert '"model": "gpt-6.1-sol"' in output

@@ -1,0 +1,9 @@
+Timestamp: 2026-10-17T17:33:48.070869+00:00
+Command: npm run lint
+EXIT_CODE: 0
+Output Summary:
+
+> drm-copilot@1.1.20 lint
+> eslint --no-error-on-unmatched-pattern src test
+
+Full sanitized output: SCRATCH/issue-977-baseline-typescript-lint.log

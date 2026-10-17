@@ -73,39 +73,39 @@ class CodexDeploymentReceipt(TypedDict):
 BASE_PROFILES: dict[ComplexityBand, DeploymentProfile] = {
     "C1": {
         "suffix": "c1",
-        "model": "gpt-5.6-luna",
+        "model": "gpt-6-luna",
         "model_reasoning_effort": "low",
     },
     "C2": {
         "suffix": "c2",
-        "model": "gpt-5.6-terra",
+        "model": "gpt-6.1-sol",
         "model_reasoning_effort": "medium",
     },
     "C3": {
         "suffix": "c3",
-        "model": "gpt-5.6-terra",
+        "model": "gpt-6.1-sol",
         "model_reasoning_effort": "high",
     },
     "C4": {
         "suffix": "c4",
-        "model": "gpt-5.6-sol",
+        "model": "gpt-6-astra",
         "model_reasoning_effort": "max",
     },
 }
 C3_ELEVATED_PROFILE: DeploymentProfile = {
     "suffix": "c3-elevated",
-    "model": "gpt-5.6-sol",
+    "model": "gpt-6-astra",
     "model_reasoning_effort": "high",
 }
 FORCED_PERSONA_PROFILES: dict[str, DeploymentProfile] = {
     "epic-planner": {
         "suffix": "",
-        "model": "gpt-5.6-sol",
+        "model": "gpt-6-astra",
         "model_reasoning_effort": "ultra",
     },
     "epic-orchestrator": {
         "suffix": "",
-        "model": "gpt-5.6-sol",
+        "model": "gpt-6-astra",
         "model_reasoning_effort": "ultra",
     },
 }
@@ -173,9 +173,9 @@ def resolve_codex_deployment(
 ) -> CodexDeploymentReceipt:
     """Resolve the exact Codex agent, model, and reasoning deployment.
 
-    C3 defaults to Terra/high. It elevates to Sol/high only for an epic child
+    C3 defaults to Sol/high. It elevates to Astra/high only for an epic child
     or when the orchestration ceiling is C4. Epic planner and orchestrator
-    personas are always forced to Sol/ultra. No model alias or fallback is
+    personas are always forced to Astra/ultra. No model alias or fallback is
     accepted.
     """
 

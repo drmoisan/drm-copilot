@@ -86,7 +86,7 @@ def test_launch_evidence_accepts_sealed_completed_preparation_wave() -> None:
         ("feature_folder", "docs/features/active/other", ".feature_folder"),
         ("delegation_id", "other", ".delegation_id"),
         ("deployment_agent", "orchestrator-c1", ".deployment_agent"),
-        ("model", "gpt-5.6-luna", ".model must match"),
+        ("model", "gpt-6-luna", ".model must match"),
         ("model_reasoning_effort", "low", ".model_reasoning_effort"),
         ("execution_context", "epic_execution_child", ".execution_context"),
         ("branch_name", "feature/other", ".branch_name"),
@@ -182,7 +182,7 @@ def test_launch_spec_entry_is_cross_bound_to_receipt_and_feature() -> None:
     spec_path = cast("str", receipt["spec_path"])
     spec = _json_file(files, spec_path)
     launches = cast("list[dict[str, Any]]", spec["launches"])
-    launches[0]["model"] = "gpt-5.6-luna"
+    launches[0]["model"] = "gpt-6-luna"
     spec_text = json.dumps(spec)
     files[spec_path] = spec_text
     receipt["spec_sha256"] = hashlib.sha256(spec_text.encode("utf-8")).hexdigest()

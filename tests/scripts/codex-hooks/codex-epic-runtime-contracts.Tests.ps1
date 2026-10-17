@@ -95,7 +95,7 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
         $content | Should -Not -Match '(?m)^agent\s*='
     }
 
-    It 'pins both epic personas to Sol with ultra reasoning' -ForEach @(
+    It 'pins both epic personas to Astra with ultra reasoning' -ForEach @(
         @{ Name = 'epic-planner' }
         @{ Name = 'epic-orchestrator' }
     ) {
@@ -103,7 +103,7 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
         $content = Get-Content -Raw -LiteralPath $path
 
         $content | Should -Match ('(?m)^name = "' + [regex]::Escape($Name) + '"$')
-        $content | Should -Match '(?m)^model = "gpt-5\.6-sol"$'
+        $content | Should -Match '(?m)^model = "gpt-6-astra"$'
         $content | Should -Match '(?m)^model_reasoning_effort = "ultra"$'
         $content | Should -Match '(?m)^developer_instructions = '
     }
@@ -142,8 +142,8 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
 
         $entry | Should -Match 'Inside the applicable language budget'
         $entry | Should -Match 'orchestrator-<profile>'
-        $entry | Should -Match 'epic-planner.*Sol/Ultra'
-        $entry | Should -Match 'epic-orchestrator.*Sol/Ultra'
+        $entry | Should -Match 'epic-planner.*Astra/Ultra'
+        $entry | Should -Match 'epic-orchestrator.*Astra/Ultra'
         $entry | Should -Match 'File\s+count does not choose a model'
         $workflow | Should -Match 'Delegate constrained implementation'
         $workflow | Should -Match 'python-typed-engineer-<profile>'

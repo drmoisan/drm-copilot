@@ -49,7 +49,7 @@ def test_render_variant_replaces_only_top_level_profile_fields() -> None:
     rendered = render_agent_variant(base, "atomic-executor", PROFILES[-1])
 
     assert 'name = "atomic-executor-c4"' in rendered
-    assert 'model = "gpt-5.6-sol"' in rendered
+    assert 'model = "gpt-6-astra"' in rendered
     assert 'model_reasoning_effort = "max"' in rendered
     assert 'model = "instruction example"' in rendered
     assert 'model = "old"' not in rendered
@@ -78,14 +78,14 @@ def test_render_variant_rejects_invalid_canonical_agents(
 
 
 def test_render_base_alias_pins_default_c3_profile_without_renaming() -> None:
-    """Keep compatibility agent names while pinning Terra/high explicitly."""
+    """Keep compatibility agent names while pinning Sol/high explicitly."""
 
     base = 'name = "atomic-executor"\ndescription = "Executor"\n'
 
     rendered = render_base_alias(base, "atomic-executor")
 
     assert 'name = "atomic-executor"' in rendered
-    assert 'model = "gpt-5.6-terra"' in rendered
+    assert 'model = "gpt-6.1-sol"' in rendered
     assert 'model_reasoning_effort = "high"' in rendered
 
 

@@ -34,7 +34,7 @@ BeforeAll {
             delegation_id           = 'delegation-2'
             feature_folder          = 'docs/features/active/feature-two'
             deployment_agent        = 'orchestrator-c3-elevated'
-            model                   = 'gpt-5.6-sol'
+            model                   = 'gpt-6-astra'
             model_reasoning_effort  = 'high'
             execution_context       = $Context
             worktree_path           = $script:RepoRoot

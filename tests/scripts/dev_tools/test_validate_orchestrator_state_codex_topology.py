@@ -137,7 +137,7 @@ def test_invalid_model_receipt_does_not_authorize_variant_name() -> None:
 
     model_receipt = _model_receipt()
     state = _base_state(str(model_receipt["deployment_agent"]))
-    model_receipt["model"] = "gpt-5.6-sol"
+    model_receipt["model"] = "gpt-6-astra"
     state["codex_model_routing_receipts"] = [model_receipt]
     state["codex_topology_receipts"] = [_topology_receipt()]
 

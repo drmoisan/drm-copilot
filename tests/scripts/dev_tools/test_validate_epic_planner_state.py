@@ -178,7 +178,7 @@ def test_readiness_requires_resolved_child_model_receipt() -> None:
 
     state = _ready_state()
     state["features"][0].pop("model_routing_receipt")
-    state["features"][1]["model_routing_receipt"]["model"] = "gpt-5.6-terra"
+    state["features"][1]["model_routing_receipt"]["model"] = "gpt-6.1-sol"
 
     errors = validate_epic_planner_state_text(
         json.dumps(state),
@@ -190,7 +190,7 @@ def test_readiness_requires_resolved_child_model_receipt() -> None:
         "Epic planner checkpoint features[0].model_routing_receipt must be an object."
     )
     assert expected in errors
-    assert any(".model must be 'gpt-5.6-sol'" in error for error in errors)
+    assert any(".model must be 'gpt-6-astra'" in error for error in errors)
 
 
 def test_readiness_cross_binds_feature_complexity_and_model_context() -> None:

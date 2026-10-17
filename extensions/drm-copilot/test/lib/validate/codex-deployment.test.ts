@@ -7,10 +7,10 @@ import {
 
 describe("resolveCodexDeployment", () => {
   it.each([
-    ["C1", "atomic-executor-c1", "gpt-5.6-luna", "low"],
-    ["C2", "atomic-executor-c2", "gpt-5.6-terra", "medium"],
-    ["C3", "atomic-executor-c3", "gpt-5.6-terra", "high"],
-    ["C4", "atomic-executor-c4", "gpt-5.6-sol", "max"],
+    ["C1", "atomic-executor-c1", "gpt-6-luna", "low"],
+    ["C2", "atomic-executor-c2", "gpt-6.1-sol", "medium"],
+    ["C3", "atomic-executor-c3", "gpt-6.1-sol", "high"],
+    ["C4", "atomic-executor-c4", "gpt-6-astra", "max"],
   ])(
     "routes standalone %s work to its exact base profile",
     (band, expectedAgent, expectedModel, expectedReasoning) => {
@@ -44,7 +44,7 @@ describe("resolveCodexDeployment", () => {
 
       // Assert
       expect(receipt.deployment_agent).toBe("orchestrator-c3-elevated");
-      expect(receipt.model).toBe("gpt-5.6-sol");
+      expect(receipt.model).toBe("gpt-6-astra");
       expect(receipt.model_reasoning_effort).toBe("high");
       expect(receipt.c3_overlay_applied).toBe(true);
       expect(receipt.c3_overlay_reason).toBe("epic_context");
@@ -86,7 +86,7 @@ describe("resolveCodexDeployment", () => {
 
       // Assert
       expect(receipt.deployment_agent).toBe(persona);
-      expect(receipt.model).toBe("gpt-5.6-sol");
+      expect(receipt.model).toBe("gpt-6-astra");
       expect(receipt.model_reasoning_effort).toBe("ultra");
       expect(receipt.c3_overlay_applied).toBe(false);
     },
@@ -103,7 +103,7 @@ describe("resolveCodexDeployment", () => {
 
     // Assert
     expect(receipt.deployment_agent).toBe("atomic-planner-c2");
-    expect(receipt.model).toBe("gpt-5.6-terra");
+    expect(receipt.model).toBe("gpt-6.1-sol");
     expect(receipt.model_reasoning_effort).toBe("medium");
     expect(receipt.c3_overlay_applied).toBe(false);
   });
@@ -133,7 +133,7 @@ describe("resolveCodexDeployment", () => {
 
     // Assert
     expect(receipt.deployment_agent).toBe("commit-steward-c3");
-    expect(receipt.model).toBe("gpt-5.6-terra");
+    expect(receipt.model).toBe("gpt-6.1-sol");
     expect(receipt.model_reasoning_effort).toBe("high");
   });
 
@@ -166,7 +166,7 @@ describe("resolveCodexDeployment", () => {
         "C4",
         "standalone",
         "C4",
-        new Set(["gpt-5.6-terra", "gpt-5.6-luna"]),
+        new Set(["gpt-6.1-sol", "gpt-6-luna"]),
       ),
     ).toThrow(ModelUnavailableError);
     expect(() =>
@@ -175,7 +175,7 @@ describe("resolveCodexDeployment", () => {
         "C4",
         "standalone",
         "C4",
-        new Set(["gpt-5.6-terra", "gpt-5.6-luna"]),
+        new Set(["gpt-6.1-sol", "gpt-6-luna"]),
       ),
     ).toThrow("model_unavailable");
   });
@@ -187,10 +187,10 @@ describe("resolveCodexDeployment", () => {
       "C4",
       "standalone",
       "C4",
-      new Set(["gpt-5.6-sol"]),
+      new Set(["gpt-6-astra"]),
     );
 
     // Assert
-    expect(receipt.model).toBe("gpt-5.6-sol");
+    expect(receipt.model).toBe("gpt-6-astra");
   });
 });

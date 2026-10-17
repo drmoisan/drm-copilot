@@ -117,7 +117,7 @@ describe("Codex bundle publish (real bundle, in-memory destination)", () => {
     const roleText = fsDouble.readTextFile(
       "/dest/.codex/agents/csharp-typed-engineer.toml",
     );
-    expect(roleText).toContain('model = "gpt-5.6-terra"');
+    expect(roleText).toContain('model = "gpt-6.1-sol"');
     expect(roleText).not.toMatch(/^variant\s*=/m);
   });
 });

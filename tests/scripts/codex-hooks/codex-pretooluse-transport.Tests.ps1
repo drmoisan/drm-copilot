@@ -40,7 +40,7 @@ Describe 'Codex PreToolUse hooks honour the native stdin transport contract' {
                 transcript_path = $null
                 cwd             = $script:RepoRoot
                 hook_event_name = 'PreToolUse'
-                model           = 'gpt-5.6-terra'
+                model           = 'gpt-6.1-sol'
                 permission_mode = 'default'
                 turn_id         = 'turn-contract'
                 tool_name       = $ToolName
