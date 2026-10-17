@@ -172,4 +172,3 @@ Configured PoshQC coverage does not instrument bundled resources. Keep its compl
 - SPEC-04/SPEC-05/STORY-04: P1-T6 through P1-T11, generator/parity/frozen contracts, P2-T14.
 - SPEC-07: Phase 0 and P2-T1 through P2-T14.
 - SPEC-08/STORY-05: P2-T15 prepares evidence handoff; final-head CI and authoritative completion remain parent-owned.
-

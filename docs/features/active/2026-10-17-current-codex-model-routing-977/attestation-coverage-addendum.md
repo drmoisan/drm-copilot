@@ -62,4 +62,3 @@ Tests execute the actual imported source or actual bundled file, with injected m
 - Test isolation: memory streams/delegates/mocks replace external I/O; parent P2-T13 includes the new suites in >=3 recorded shuffled Pester file-order seeds and fresh single-process tests/scripts. Seeded shuffled Jest and reversed changed Python modules remain parent-plan requirements, with no additional Python/TypeScript changes here.
 - CI-only behavior: preserve portable paths, exact casing, LF normalization, guarded imports, and runtime defaults; parent full required CI remains necessary at final PR head.
 - Evidence: record true target identity, pass counts, coverage numerator/denominator, baseline delta, and unresolved failures; neither mirror parity nor invocation acknowledgement proves coverage.
-
