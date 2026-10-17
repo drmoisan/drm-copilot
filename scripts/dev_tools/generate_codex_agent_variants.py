@@ -171,7 +171,7 @@ def render_agent_variant(base_text: str, family: str, profile: AgentProfile) -> 
 
 
 def render_base_alias(base_text: str, family: str) -> str:
-    """Pin the compatibility alias to the default C3 Terra/high profile."""
+    """Pin the compatibility alias to the default C3 Sol/high profile."""
 
     c3_profile = next(profile for profile in PROFILES if profile.suffix == "c3")
     rendered = render_agent_variant(base_text, family, c3_profile)
@@ -243,7 +243,7 @@ def _synchronize(*, check: bool) -> list[str]:
             != BASE_PROFILES["C3"]["model_reasoning_effort"]
         ):
             errors.append(
-                f"Canonical Codex agent is not pinned to C3 Terra/high: {relative_base}"
+                f"Canonical Codex agent is not pinned to C3 Sol/high: {relative_base}"
             )
     for relative_path, expected_text in expected_variant_files().items():
         for root in (REPO_ROOT, BUNDLE_ROOT):

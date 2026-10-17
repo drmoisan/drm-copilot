@@ -130,7 +130,7 @@ describe("Codex topology checkpoint receipts", () => {
   it("does not trust an invalid model receipt as deployment evidence", () => {
     const model = modelReceipt();
     const state = baseState(String(model["deployment_agent"]));
-    model["model"] = "gpt-5.6-sol";
+    model["model"] = "gpt-6-astra";
     state["codex_model_routing_receipts"] = [model];
     state["codex_topology_receipts"] = [topologyReceipt()];
 

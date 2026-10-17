@@ -164,7 +164,7 @@ function feature(issueNum: number): JsonRecord {
     model_routing_receipt: {
       delegation_id: delegationId,
       deployment_agent: "orchestrator-c3-elevated",
-      model: "gpt-5.6-sol",
+      model: "gpt-6-astra",
       model_reasoning_effort: "high",
       execution_context: "epic_preparation_child",
     },

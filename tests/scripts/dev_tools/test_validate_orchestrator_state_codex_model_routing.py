@@ -133,21 +133,32 @@ def test_receipt_with_wrong_model_is_rejected() -> None:
 
     state = _base_state()
     receipt = _codex_receipt()
-    receipt["model"] = "gpt-5.6-sol"
+    receipt["model"] = "gpt-6-astra"
     state["codex_model_routing_receipts"] = [receipt]
 
     errors = _validate(state)
 
-    assert any(".model must be 'gpt-5.6-terra'" in error for error in errors)
+    assert any(".model must be 'gpt-6.1-sol'" in error for error in errors)
+
+
+def test_stale_former_model_receipt_is_rejected() -> None:
+    """Reject historical Terra identity under the current C3 deployment policy."""
+
+    state = _base_state()
+    receipt = _codex_receipt()
+    receipt["model"] = "gpt-5.6-terra"
+    state["codex_model_routing_receipts"] = [receipt]
+
+    assert any(".model must be 'gpt-6.1-sol'" in error for error in _validate(state))
 
 
 def test_receipt_with_wrong_c3_overlay_is_rejected() -> None:
-    """Reject a Terra receipt when epic context deterministically requires Sol."""
+    """Reject a Sol receipt when epic context deterministically requires Astra."""
 
     state = _base_state()
     receipt = _codex_receipt(context="epic_execution_child")
     receipt["deployment_agent"] = "atomic-executor-c3"
-    receipt["model"] = "gpt-5.6-terra"
+    receipt["model"] = "gpt-6.1-sol"
     receipt["c3_overlay_applied"] = False
     receipt["c3_overlay_reason"] = None
     state["codex_model_routing_receipts"] = [receipt]

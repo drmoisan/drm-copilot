@@ -9,7 +9,7 @@ Describe 'Codex epic-child worktree launcher and guard' {
 
         $script:Profile = [pscustomobject]@{
             name                   = 'orchestrator-c3-elevated'
-            model                  = 'gpt-5.6-sol'
+            model                  = 'gpt-6-astra'
             model_reasoning_effort = 'high'
             default_permissions    = 'orchestrator-workspace'
             developer_instructions = "exact`ninstructions"
@@ -24,7 +24,7 @@ Describe 'Codex epic-child worktree launcher and guard' {
             feature_folder         = 'docs/features/active/child-a'
             issue_num              = 101
             deployment_agent       = 'orchestrator-c3-elevated'
-            model                  = 'gpt-5.6-sol'
+            model                  = 'gpt-6-astra'
             model_reasoning_effort = 'high'
             permissions            = 'orchestrator-workspace'
             execution_context      = 'epic_execution_child'
@@ -35,7 +35,7 @@ Describe 'Codex epic-child worktree launcher and guard' {
         $script:ModelReceipt = [pscustomobject]@{
             delegation_id          = 'delegate-child-a'
             deployment_agent       = 'orchestrator-c3-elevated'
-            model                  = 'gpt-5.6-sol'
+            model                  = 'gpt-6-astra'
             model_reasoning_effort = 'high'
             execution_context      = 'epic_execution_child'
         }
@@ -263,7 +263,7 @@ Describe 'Codex epic-child worktree launcher and guard' {
         It 'extracts the exact executable agent profile values' {
             $raw = @'
 name = "orchestrator-c3-elevated"
-model = "gpt-5.6-sol"
+model = "gpt-6-astra"
 model_reasoning_effort = "high"
 default_permissions = "orchestrator-workspace"
 developer_instructions = '''
@@ -290,7 +290,7 @@ config = [
                 worktree_path          = $script:RepoRoot
                 delegation_id          = 'delegate-child-a'
                 deployment_agent       = 'orchestrator-c3-elevated'
-                model                  = 'gpt-5.6-sol'
+                model                  = 'gpt-6-astra'
                 model_reasoning_effort = 'high'
                 execution_context      = 'epic_execution_child'
                 profile_sha256         = ('a' * 64)
@@ -305,7 +305,7 @@ config = [
             $arguments = [string[]]$info.ArgumentList
 
             $arguments | Should -Contain $script:RepoRoot
-            $arguments | Should -Contain 'gpt-5.6-sol'
+            $arguments | Should -Contain 'gpt-6-astra'
             $arguments | Should -Contain 'model_reasoning_effort=high'
             ($arguments -join "`n") | Should -Match 'developer_instructions='
             ($arguments -join "`n") | Should -Match 'skills\.config='
@@ -363,7 +363,7 @@ config = [
                 delegation_id           = 'delegate-child-a'
                 feature_folder          = 'child-a'
                 deployment_agent        = 'orchestrator-c3-elevated'
-                model                   = 'gpt-5.6-sol'
+                model                   = 'gpt-6-astra'
                 model_reasoning_effort  = 'high'
                 execution_context       = 'epic_execution_child'
                 worktree_path           = $script:RepoRoot
@@ -385,7 +385,7 @@ config = [
                 delegation_id     = 'delegate-child-a'
                 execution_context = 'epic_execution_child'
                 agent             = 'orchestrator-c3-elevated'
-                model             = 'gpt-5.6-sol'
+                model             = 'gpt-6-astra'
                 reasoning_effort  = 'high'
                 expected_worktree = $script:RepoRoot
                 profile_sha256    = ('a' * 64)
@@ -396,7 +396,7 @@ config = [
                 cwd        = $script:RepoRoot
                 session_id = '019f-session-id'
                 tool_name  = 'apply_patch'
-                model      = 'gpt-5.6-sol'
+                model      = 'gpt-6-astra'
                 tool_input = @{ command = '*** Update File: src/service.py' }
             } | ConvertTo-Json -Compress
         }

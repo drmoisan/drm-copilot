@@ -26,7 +26,7 @@ function modelReceipt(
     orchestration_complexity_ceiling: "C3",
     c3_overlay_applied: true,
     c3_overlay_reason: "epic_context",
-    model: "gpt-5.6-sol",
+    model: "gpt-6-astra",
     model_reasoning_effort: "high",
     ...overrides,
   };
@@ -299,7 +299,7 @@ describe("validateEpicPlannerStateText", () => {
     const state = readyState();
     state["features"] = [
       feature(101, {
-        model_routing_receipt: modelReceipt({ model: "gpt-5.6-terra" }),
+        model_routing_receipt: modelReceipt({ model: "gpt-6.1-sol" }),
       }),
       feature(102, {
         model_routing_receipt: modelReceipt({
@@ -314,7 +314,7 @@ describe("validateEpicPlannerStateText", () => {
     });
 
     expect(errors).toContain(
-      "Epic planner checkpoint features[0].model_routing_receipt.model must be 'gpt-5.6-sol', found 'gpt-5.6-terra'.",
+      "Epic planner checkpoint features[0].model_routing_receipt.model must be 'gpt-6-astra', found 'gpt-6.1-sol'.",
     );
     expect(errors).toContain(
       "Epic planner checkpoint features[1].model_routing_receipt.logical_agent must be 'orchestrator'.",

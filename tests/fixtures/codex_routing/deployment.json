@@ -12,7 +12,7 @@
       "C1"
     ],
     "expected_exit": 0,
-    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C1\",\n  \"deployment_agent\": \"atomic-executor-c1\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"atomic-executor\",\n  \"model\": \"gpt-5.6-luna\",\n  \"model_reasoning_effort\": \"low\",\n  \"orchestration_complexity_ceiling\": \"C1\"\n}",
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C1\",\n  \"deployment_agent\": \"atomic-executor-c1\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"atomic-executor\",\n  \"model\": \"gpt-6-luna\",\n  \"model_reasoning_effort\": \"low\",\n  \"orchestration_complexity_ceiling\": \"C1\"\n}",
     "expected_stderr_contains": null
   },
   {
@@ -28,7 +28,7 @@
       "C3"
     ],
     "expected_exit": 0,
-    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C2\",\n  \"deployment_agent\": \"commit-steward-c2\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"commit-steward\",\n  \"model\": \"gpt-5.6-terra\",\n  \"model_reasoning_effort\": \"medium\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C2\",\n  \"deployment_agent\": \"commit-steward-c2\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"commit-steward\",\n  \"model\": \"gpt-6.1-sol\",\n  \"model_reasoning_effort\": \"medium\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
     "expected_stderr_contains": null
   },
   {
@@ -44,7 +44,7 @@
       "C3"
     ],
     "expected_exit": 0,
-    "expected_stdout": "{\n  \"c3_overlay_applied\": true,\n  \"c3_overlay_reason\": \"epic_context\",\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"feature-reviewer-c3-elevated\",\n  \"execution_context\": \"epic_preparation_child\",\n  \"logical_agent\": \"feature-review\",\n  \"model\": \"gpt-5.6-sol\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
+    "expected_stdout": "{\n  \"c3_overlay_applied\": true,\n  \"c3_overlay_reason\": \"epic_context\",\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"feature-reviewer-c3-elevated\",\n  \"execution_context\": \"epic_preparation_child\",\n  \"logical_agent\": \"feature-review\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C3\"\n}",
     "expected_stderr_contains": null
   },
   {
@@ -60,7 +60,7 @@
       "C4"
     ],
     "expected_exit": 0,
-    "expected_stdout": "{\n  \"c3_overlay_applied\": true,\n  \"c3_overlay_reason\": \"epic_context_and_c4_ceiling\",\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"python-typed-engineer-c3-elevated\",\n  \"execution_context\": \"epic_execution_child\",\n  \"logical_agent\": \"python-typed-engineer\",\n  \"model\": \"gpt-5.6-sol\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C4\"\n}",
+    "expected_stdout": "{\n  \"c3_overlay_applied\": true,\n  \"c3_overlay_reason\": \"epic_context_and_c4_ceiling\",\n  \"complexity_band\": \"C3\",\n  \"deployment_agent\": \"python-typed-engineer-c3-elevated\",\n  \"execution_context\": \"epic_execution_child\",\n  \"logical_agent\": \"python-typed-engineer\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"high\",\n  \"orchestration_complexity_ceiling\": \"C4\"\n}",
     "expected_stderr_contains": null
   },
   {
@@ -76,7 +76,7 @@
       "C4"
     ],
     "expected_exit": 0,
-    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C4\",\n  \"deployment_agent\": \"epic-planner\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"epic-planner\",\n  \"model\": \"gpt-5.6-sol\",\n  \"model_reasoning_effort\": \"ultra\",\n  \"orchestration_complexity_ceiling\": \"C4\"\n}",
+    "expected_stdout": "{\n  \"c3_overlay_applied\": false,\n  \"c3_overlay_reason\": null,\n  \"complexity_band\": \"C4\",\n  \"deployment_agent\": \"epic-planner\",\n  \"execution_context\": \"standalone\",\n  \"logical_agent\": \"epic-planner\",\n  \"model\": \"gpt-6-astra\",\n  \"model_reasoning_effort\": \"ultra\",\n  \"orchestration_complexity_ceiling\": \"C4\"\n}",
     "expected_stderr_contains": null
   },
   {

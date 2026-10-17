@@ -55,7 +55,7 @@ describe("epic planner launch receipt evidence", () => {
     ["feature_folder", "docs/features/active/other", ".feature_folder"],
     ["delegation_id", "other", ".delegation_id"],
     ["deployment_agent", "orchestrator-c1", ".deployment_agent"],
-    ["model", "gpt-5.6-luna", ".model must match"],
+    ["model", "gpt-6-luna", ".model must match"],
     ["model_reasoning_effort", "low", ".model_reasoning_effort"],
     ["execution_context", "epic_execution_child", ".execution_context"],
     ["branch_name", "feature/other", ".branch_name"],
@@ -133,7 +133,7 @@ describe("epic planner launch receipt evidence", () => {
     const specPath = String(receipt["spec_path"]);
     const spec = readJson(value, specPath);
     const launches = spec["launches"] as JsonRecord[];
-    launches[0]!["model"] = "gpt-5.6-luna";
+    launches[0]!["model"] = "gpt-6-luna";
     const specText = JSON.stringify(spec);
     value.files.set(specPath, specText);
     receipt["spec_sha256"] = createHash("sha256")

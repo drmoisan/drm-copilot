@@ -88,7 +88,7 @@ Describe 'Codex epic provenance and routing attestation hooks' {
             turn_id         = 'turn-1'
             agent_id        = 'agent-1'
             agent_type      = 'epic-planner'
-            model           = 'gpt-5.6-sol'
+            model           = 'gpt-6-astra'
             transcript_path = 'child-transcript.jsonl'
         }
 
@@ -129,7 +129,7 @@ Describe 'Codex epic provenance and routing attestation hooks' {
             turn_id         = 'turn-1'
             agent_id        = 'agent-2'
             agent_type      = 'epic-orchestrator'
-            model           = 'gpt-5.6-sol'
+            model           = 'gpt-6-astra'
             transcript_path = 'child-two.jsonl'
         }
 
@@ -223,14 +223,14 @@ Describe 'Codex epic provenance and routing attestation hooks' {
     }
 
     It 'binds a routed child to the deployment profile model' {
-        $checkpoint = '{"codex_model_routing_receipts":[{"deployment_agent":"orchestrator-c3-elevated","model":"gpt-5.6-sol","model_reasoning_effort":"high"}]}' |
+        $checkpoint = '{"codex_model_routing_receipts":[{"deployment_agent":"orchestrator-c3-elevated","model":"gpt-6-astra","model_reasoning_effort":"high"}]}' |
             ConvertFrom-Json
         $payload = [pscustomobject]@{
             session_id      = 'session-1'
             turn_id         = 'turn-1'
             agent_id        = 'agent-3'
             agent_type      = 'orchestrator-c3-elevated'
-            model           = 'gpt-5.6-sol'
+            model           = 'gpt-6-astra'
             transcript_path = 'child-three.jsonl'
         }
 
@@ -243,18 +243,18 @@ Describe 'Codex epic provenance and routing attestation hooks' {
             -Now $script:Now
 
         $attestation.routing_valid | Should -BeTrue
-        $attestation.expected_model | Should -Be 'gpt-5.6-sol'
+        $attestation.expected_model | Should -Be 'gpt-6-astra'
     }
 
     It 'rejects a base alias when the receipt requires a generated deployment profile' {
-        $checkpoint = '{"codex_model_routing_receipts":[{"logical_agent":"orchestrator","deployment_agent":"orchestrator-c3","model":"gpt-5.6-terra","model_reasoning_effort":"high"}]}' |
+        $checkpoint = '{"codex_model_routing_receipts":[{"logical_agent":"orchestrator","deployment_agent":"orchestrator-c3","model":"gpt-6.1-sol","model_reasoning_effort":"high"}]}' |
             ConvertFrom-Json
         $payload = [pscustomobject]@{
             session_id      = 'session-1'
             turn_id         = 'turn-1'
             agent_id        = 'agent-base-alias'
             agent_type      = 'orchestrator'
-            model           = 'gpt-5.6-terra'
+            model           = 'gpt-6.1-sol'
             transcript_path = 'base-alias.jsonl'
         }
 
@@ -271,14 +271,14 @@ Describe 'Codex epic provenance and routing attestation hooks' {
     }
 
     It 'binds a planner child to its per-feature Codex routing receipt' {
-        $checkpoint = '{"features":[{"model_routing_receipt":{"deployment_agent":"orchestrator-c3-elevated","model":"gpt-5.6-sol","model_reasoning_effort":"high"}}]}' |
+        $checkpoint = '{"features":[{"model_routing_receipt":{"deployment_agent":"orchestrator-c3-elevated","model":"gpt-6-astra","model_reasoning_effort":"high"}}]}' |
             ConvertFrom-Json
         $payload = [pscustomobject]@{
             session_id      = 'session-1'
             turn_id         = 'turn-1'
             agent_id        = 'agent-planner-child'
             agent_type      = 'orchestrator-c3-elevated'
-            model           = 'gpt-5.6-sol'
+            model           = 'gpt-6-astra'
             transcript_path = 'planner-child.jsonl'
         }
 
@@ -291,7 +291,7 @@ Describe 'Codex epic provenance and routing attestation hooks' {
             -Now $script:Now
 
         $attestation.routing_valid | Should -BeTrue
-        $attestation.expected_model | Should -Be 'gpt-5.6-sol'
+        $attestation.expected_model | Should -Be 'gpt-6-astra'
     }
 
     It 'denies epic mutation with the canonical origin marker' {
@@ -321,8 +321,8 @@ Describe 'Codex epic provenance and routing attestation hooks' {
     It 'denies mutation after a model mismatch attestation' {
         $attestation = @{
             agent_type     = 'orchestrator-c3-elevated'
-            actual_model   = 'gpt-5.6-terra'
-            expected_model = 'gpt-5.6-sol'
+            actual_model   = 'gpt-6.1-sol'
+            expected_model = 'gpt-6-astra'
             routing_valid  = $false
         } | ConvertTo-Json -Compress
 
@@ -340,8 +340,8 @@ Describe 'Codex epic provenance and routing attestation hooks' {
         $attestation = @{
             schema_version            = 2
             agent_type                = 'orchestrator-c3-elevated'
-            actual_model              = 'gpt-5.6-sol'
-            expected_model            = 'gpt-5.6-sol'
+            actual_model              = 'gpt-6-astra'
+            expected_model            = 'gpt-6-astra'
             actual_reasoning_effort   = 'high'
             expected_reasoning_effort = 'high'
             profile_name              = $agentProfile.profile_name
@@ -351,8 +351,8 @@ Describe 'Codex epic provenance and routing attestation hooks' {
             profile_validation_error  = $null
             routing_valid             = $true
         } | ConvertTo-Json -Compress
-        $matching = @{ tool_name = 'Bash'; model = 'gpt-5.6-sol' } | ConvertTo-Json -Compress
-        $drifted = @{ tool_name = 'Bash'; model = 'gpt-5.6-terra' } | ConvertTo-Json -Compress
+        $matching = @{ tool_name = 'Bash'; model = 'gpt-6-astra' } | ConvertTo-Json -Compress
+        $drifted = @{ tool_name = 'Bash'; model = 'gpt-6.1-sol' } | ConvertTo-Json -Compress
 
         Invoke-CodexModelRoutingDecision -PayloadRaw $matching -AttestationRaw $attestation |
             Should -BeNullOrEmpty
@@ -375,7 +375,7 @@ Describe 'Codex epic provenance and routing attestation hooks' {
         $payload = @{
             agent_id         = 'agent-4'
             agent_type       = 'epic-orchestrator'
-            model            = 'gpt-5.6-sol'
+            model            = 'gpt-6-astra'
             stop_hook_active = $false
         } | ConvertTo-Json -Compress
 

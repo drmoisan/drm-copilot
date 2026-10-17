@@ -51,7 +51,7 @@ BeforeAll {
     $script:ValidReceipt = '{"logical_agent":"atomic-executor","deployment_agent":"atomic-executor-c1",' +
     '"phase":"P1","complexity_band":"C1","execution_context":"standalone",' +
     '"orchestration_complexity_ceiling":"C1","c3_overlay_applied":false,"c3_overlay_reason":null,' +
-    '"model":"gpt-5.6-luna","model_reasoning_effort":"low"}'
+    '"model":"gpt-6-luna","model_reasoning_effort":"low"}'
 
     # The same receipt with a C3 ceiling, used by the ceiling-rise fixtures.
     $script:C3CeilingReceipt = $script:ValidReceipt -replace '"orchestration_complexity_ceiling":"C1"',
@@ -99,10 +99,10 @@ Describe 'OrchestratorStateCodexModelReceipts shape and key checks' {
     }
 
     It 'U6.X4 does not stop the receipt, so resolver checks still run' {
-        $json = $script:ValidReceipt -replace '"phase":"P1"', '"phase":""' -replace '"model":"gpt-5.6-luna"', '"model":"wrong"'
+        $json = $script:ValidReceipt -replace '"phase":"P1"', '"phase":""' -replace '"model":"gpt-6-luna"', '"model":"wrong"'
         $errors = @(Get-OrchestratorStateCodexModelRoutingReceiptError -Value (ConvertFrom-FixtureJson -Json "[$json]"))
         $errors | Should -Contain 'Checkpoint codex_model_routing_receipts[0].phase must be a non-empty string.'
-        $errors | Should -Contain "Checkpoint codex_model_routing_receipts[0].model must be 'gpt-5.6-luna', found 'wrong'."
+        $errors | Should -Contain "Checkpoint codex_model_routing_receipts[0].model must be 'gpt-6-luna', found 'wrong'."
     }
 
     It 'reports each malformed receipt with its own index' {
@@ -137,6 +137,12 @@ Describe 'OrchestratorStateCodexModelReceipts resolver-input and resolved-key ch
             Should -Contain "Checkpoint codex_model_routing_receipts[0].deployment_agent must be 'atomic-executor-c1', found 'wrong'."
     }
 
+    It 'rejects a stale former-model receipt under the current policy' {
+        $json = $script:ValidReceipt -replace '"model":"gpt-6-luna"', '"model":"gpt-5.6-luna"'
+        Get-OrchestratorStateCodexModelRoutingReceiptError -Value (ConvertFrom-FixtureJson -Json "[$json]") |
+            Should -Contain "Checkpoint codex_model_routing_receipts[0].model must be 'gpt-6-luna', found 'gpt-5.6-luna'."
+    }
+
     It 'U6.X11 reports a mismatched boolean key with Python capitalization' {
         $json = $script:ValidReceipt -replace '"c3_overlay_applied":false', '"c3_overlay_applied":true'
         Get-OrchestratorStateCodexModelRoutingReceiptError -Value (ConvertFrom-FixtureJson -Json "[$json]") |
@@ -150,10 +156,10 @@ Describe 'OrchestratorStateCodexModelReceipts resolver-input and resolved-key ch
     }
 
     It 'U6.X11 reports every mismatched key, not only the first' {
-        $json = $script:ValidReceipt -replace '"model":"gpt-5.6-luna"', '"model":"wrong"' `
+        $json = $script:ValidReceipt -replace '"model":"gpt-6-luna"', '"model":"wrong"' `
             -replace '"model_reasoning_effort":"low"', '"model_reasoning_effort":"max"'
         $errors = @(Get-OrchestratorStateCodexModelRoutingReceiptError -Value (ConvertFrom-FixtureJson -Json "[$json]"))
-        $errors | Should -Contain "Checkpoint codex_model_routing_receipts[0].model must be 'gpt-5.6-luna', found 'wrong'."
+        $errors | Should -Contain "Checkpoint codex_model_routing_receipts[0].model must be 'gpt-6-luna', found 'wrong'."
         $errors | Should -Contain "Checkpoint codex_model_routing_receipts[0].model_reasoning_effort must be 'low', found 'max'."
     }
 }
@@ -257,7 +263,7 @@ Describe 'Single-implementation rule for the Codex deployment resolver' {
         }
 
         Get-OrchestratorStateCodexModelRoutingReceiptError -Value (ConvertFrom-FixtureJson -Json "[$script:ValidReceipt]") |
-            Should -Contain "Checkpoint codex_model_routing_receipts[0].model must be 'sentinel-model', found 'gpt-5.6-luna'."
+            Should -Contain "Checkpoint codex_model_routing_receipts[0].model must be 'sentinel-model', found 'gpt-6-luna'."
 
         Should -Invoke -ModuleName $script:ModuleUnderTest -CommandName Resolve-CodexDeployment -Times 1 -Exactly
     }

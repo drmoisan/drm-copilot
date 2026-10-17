@@ -88,7 +88,7 @@ Describe 'Bundled Codex PreToolUse hooks run from the bundle location (issue #69
                 transcript_path = $null
                 cwd             = $script:BundleRoot
                 hook_event_name = 'PreToolUse'
-                model           = 'gpt-5.6-terra'
+                model           = 'gpt-6.1-sol'
                 permission_mode = 'default'
                 turn_id         = 'turn-bundle-probe'
                 tool_name       = $ToolName

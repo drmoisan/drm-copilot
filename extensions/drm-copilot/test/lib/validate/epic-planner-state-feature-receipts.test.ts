@@ -45,7 +45,7 @@ function modelReceipt(
     orchestration_complexity_ceiling: "C3",
     c3_overlay_applied: true,
     c3_overlay_reason: "epic_context",
-    model: "gpt-5.6-sol",
+    model: "gpt-6-astra",
     model_reasoning_effort: "high",
     ...overrides,
   };

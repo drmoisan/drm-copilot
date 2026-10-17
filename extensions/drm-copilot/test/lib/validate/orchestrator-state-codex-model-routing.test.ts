@@ -70,6 +70,21 @@ function validate(state: Record<string, unknown>): string[] {
 }
 
 describe("Codex model-routing checkpoint receipts", () => {
+  it("rejects a stale former-model receipt under current policy", () => {
+    // Arrange
+    const state = baseState();
+    state["codex_model_routing_receipts"] = [
+      { ...codexReceipt(), model: "gpt-5.6-terra" },
+    ];
+
+    // Act / Assert
+    expect(
+      validate(state).some((error) =>
+        error.includes(".model must be 'gpt-6.1-sol'"),
+      ),
+    ).toBe(true);
+  });
+
   it("accepts an exact receipt for a delegated logical agent", () => {
     // Arrange
     const state = baseState();
@@ -152,7 +167,7 @@ describe("Codex model-routing checkpoint receipts", () => {
     // Arrange
     const state = baseState();
     const receipt = codexReceipt();
-    receipt["model"] = "gpt-5.6-sol";
+    receipt["model"] = "gpt-6-astra";
     state["codex_model_routing_receipts"] = [receipt];
 
     // Act
@@ -160,7 +175,7 @@ describe("Codex model-routing checkpoint receipts", () => {
 
     // Assert
     expect(
-      errors.some((error) => error.includes(".model must be 'gpt-5.6-terra'")),
+      errors.some((error) => error.includes(".model must be 'gpt-6.1-sol'")),
     ).toBe(true);
   });
 
@@ -169,7 +184,7 @@ describe("Codex model-routing checkpoint receipts", () => {
     const state = baseState();
     const receipt = codexReceipt("atomic-executor", "epic_execution_child");
     receipt["deployment_agent"] = "atomic-executor-c3";
-    receipt["model"] = "gpt-5.6-terra";
+    receipt["model"] = "gpt-6.1-sol";
     receipt["c3_overlay_applied"] = false;
     receipt["c3_overlay_reason"] = null;
     state["codex_model_routing_receipts"] = [receipt];

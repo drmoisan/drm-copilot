@@ -39,7 +39,7 @@ Describe 'enforce-epic-child-worktree-binding.ps1 guard functions' {
                 delegation_id           = 'delegate-child-a'
                 feature_folder          = 'child-a'
                 deployment_agent        = 'orchestrator-c3-elevated'
-                model                   = 'gpt-5.6-sol'
+                model                   = 'gpt-6-astra'
                 model_reasoning_effort  = 'high'
                 execution_context       = 'epic_execution_child'
                 worktree_path           = $script:RepoRoot
@@ -64,7 +64,7 @@ Describe 'enforce-epic-child-worktree-binding.ps1 guard functions' {
                 delegation_id     = 'delegate-child-a'
                 execution_context = 'epic_execution_child'
                 agent             = 'orchestrator-c3-elevated'
-                model             = 'gpt-5.6-sol'
+                model             = 'gpt-6-astra'
                 reasoning_effort  = 'high'
                 expected_worktree = $script:RepoRoot
                 profile_sha256    = $script:ProfileHash

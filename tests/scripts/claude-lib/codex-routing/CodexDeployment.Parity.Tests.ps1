@@ -41,33 +41,33 @@ Describe 'Resolve-CodexDeployment base profile table' {
     It 'resolves C1 to luna at low reasoning' {
         $result = Resolve-CodexDeployment -LogicalAgent 'atomic-executor' -ComplexityBand 'C1' `
             -ExecutionContext 'standalone' -OrchestrationComplexityCeiling 'C1'
-        $result['model'] | Should -Be 'gpt-5.6-luna'
+        $result['model'] | Should -Be 'gpt-6-luna'
         $result['model_reasoning_effort'] | Should -Be 'low'
         $result['deployment_agent'] | Should -Be 'atomic-executor-c1'
     }
 
-    It 'resolves C2 to terra at medium reasoning' {
+    It 'resolves C2 to sol at medium reasoning' {
         $result = Resolve-CodexDeployment -LogicalAgent 'atomic-executor' -ComplexityBand 'C2' `
             -ExecutionContext 'standalone' -OrchestrationComplexityCeiling 'C2'
-        $result['model'] | Should -Be 'gpt-5.6-terra'
+        $result['model'] | Should -Be 'gpt-6.1-sol'
         $result['model_reasoning_effort'] | Should -Be 'medium'
         $result['deployment_agent'] | Should -Be 'atomic-executor-c2'
     }
 
-    It 'resolves C3 to terra at high reasoning when no overlay applies' {
+    It 'resolves C3 to sol at high reasoning when no overlay applies' {
         $result = Resolve-CodexDeployment -LogicalAgent 'atomic-executor' -ComplexityBand 'C3' `
             -ExecutionContext 'standalone' -OrchestrationComplexityCeiling 'C3'
-        $result['model'] | Should -Be 'gpt-5.6-terra'
+        $result['model'] | Should -Be 'gpt-6.1-sol'
         $result['model_reasoning_effort'] | Should -Be 'high'
         $result['deployment_agent'] | Should -Be 'atomic-executor-c3'
         $result['c3_overlay_applied'] | Should -BeFalse
         $result['c3_overlay_reason'] | Should -BeNullOrEmpty
     }
 
-    It 'resolves C4 to sol at max reasoning' {
+    It 'resolves C4 to astra at max reasoning' {
         $result = Resolve-CodexDeployment -LogicalAgent 'atomic-executor' -ComplexityBand 'C4' `
             -ExecutionContext 'standalone' -OrchestrationComplexityCeiling 'C4'
-        $result['model'] | Should -Be 'gpt-5.6-sol'
+        $result['model'] | Should -Be 'gpt-6-astra'
         $result['model_reasoning_effort'] | Should -Be 'max'
         $result['deployment_agent'] | Should -Be 'atomic-executor-c4'
     }
@@ -125,7 +125,7 @@ Describe 'Resolve-CodexDeployment agent family resolution' {
         $result['deployment_agent'] | Should -Be 'commit-steward-c2'
         $result['execution_context'] | Should -Be 'standalone'
         $result['logical_agent'] | Should -Be 'commit-steward'
-        $result['model'] | Should -Be 'gpt-5.6-terra'
+        $result['model'] | Should -Be 'gpt-6.1-sol'
         $result['model_reasoning_effort'] | Should -Be 'medium'
         $result['orchestration_complexity_ceiling'] | Should -Be 'C3'
         @($result.Keys).Count | Should -Be 9
@@ -145,7 +145,7 @@ Describe 'Resolve-CodexDeployment C3 overlay rule' {
             -ExecutionContext 'epic_execution_child' -OrchestrationComplexityCeiling 'C4'
         $result['c3_overlay_applied'] | Should -BeTrue
         $result['c3_overlay_reason'] | Should -Be 'epic_context_and_c4_ceiling'
-        $result['model'] | Should -Be 'gpt-5.6-sol'
+        $result['model'] | Should -Be 'gpt-6-astra'
         $result['model_reasoning_effort'] | Should -Be 'high'
         $result['deployment_agent'] | Should -Be 'atomic-executor-c3-elevated'
     }
@@ -154,14 +154,14 @@ Describe 'Resolve-CodexDeployment C3 overlay rule' {
         $result = Resolve-CodexDeployment -LogicalAgent 'atomic-executor' -ComplexityBand 'C3' `
             -ExecutionContext 'epic_preparation_child' -OrchestrationComplexityCeiling 'C3'
         $result['c3_overlay_reason'] | Should -Be 'epic_context'
-        $result['model'] | Should -Be 'gpt-5.6-sol'
+        $result['model'] | Should -Be 'gpt-6-astra'
     }
 
     It 'elevates a standalone delegation under a C4 ceiling, reporting c4_orchestration_ceiling' {
         $result = Resolve-CodexDeployment -LogicalAgent 'atomic-executor' -ComplexityBand 'C3' `
             -ExecutionContext 'standalone' -OrchestrationComplexityCeiling 'C4'
         $result['c3_overlay_reason'] | Should -Be 'c4_orchestration_ceiling'
-        $result['model'] | Should -Be 'gpt-5.6-sol'
+        $result['model'] | Should -Be 'gpt-6-astra'
     }
 
     It 'does not elevate a standalone C3 delegation under a C3 ceiling' {
@@ -174,23 +174,23 @@ Describe 'Resolve-CodexDeployment C3 overlay rule' {
         $result = Resolve-CodexDeployment -LogicalAgent 'atomic-executor' -ComplexityBand 'C2' `
             -ExecutionContext 'epic_execution_child' -OrchestrationComplexityCeiling 'C4'
         $result['c3_overlay_applied'] | Should -BeFalse
-        $result['model'] | Should -Be 'gpt-5.6-terra'
+        $result['model'] | Should -Be 'gpt-6.1-sol'
         $result['model_reasoning_effort'] | Should -Be 'medium'
     }
 }
 
 Describe 'Resolve-CodexDeployment forced personas' {
 
-    It 'forces the epic planner to sol at ultra reasoning with no suffix' {
+    It 'forces the epic planner to astra at ultra reasoning with no suffix' {
         $result = Resolve-CodexDeployment -LogicalAgent 'epic-planner' -ComplexityBand 'C1' `
             -ExecutionContext 'standalone' -OrchestrationComplexityCeiling 'C1'
         $result['deployment_agent'] | Should -Be 'epic-planner'
-        $result['model'] | Should -Be 'gpt-5.6-sol'
+        $result['model'] | Should -Be 'gpt-6-astra'
         $result['model_reasoning_effort'] | Should -Be 'ultra'
         $result['c3_overlay_applied'] | Should -BeFalse
     }
 
-    It 'forces the epic orchestrator to sol at ultra reasoning' {
+    It 'forces the epic orchestrator to astra at ultra reasoning' {
         $result = Resolve-CodexDeployment -LogicalAgent 'epic-orchestrator' -ComplexityBand 'C4' `
             -ExecutionContext 'epic_execution_child' -OrchestrationComplexityCeiling 'C4'
         $result['deployment_agent'] | Should -Be 'epic-orchestrator'
@@ -261,14 +261,14 @@ Describe 'Resolve-CodexDeployment model availability' {
     It 'returns normally when the routed model is in the availability set' {
         { Resolve-CodexDeployment -LogicalAgent 'atomic-executor' -ComplexityBand 'C1' `
                 -ExecutionContext 'standalone' -OrchestrationComplexityCeiling 'C1' `
-                -AvailableModel @('gpt-5.6-luna') } | Should -Not -Throw
+                -AvailableModel @('gpt-6-luna') } | Should -Not -Throw
     }
 
     It 'refuses to fall back when the routed model is absent from the availability set' {
         { Resolve-CodexDeployment -LogicalAgent 'atomic-executor' -ComplexityBand 'C1' `
                 -ExecutionContext 'standalone' -OrchestrationComplexityCeiling 'C1' `
-                -AvailableModel @('gpt-5.6-terra') } |
-            Should -Throw -ExpectedMessage "model_unavailable: required Codex model 'gpt-5.6-luna' is unavailable; silent fallback is prohibited."
+                -AvailableModel @('gpt-6.1-sol') } |
+            Should -Throw -ExpectedMessage "model_unavailable: required Codex model 'gpt-6-luna' is unavailable; silent fallback is prohibited."
     }
 
     It 'raises a non-ValueError exception type for model unavailability, so U6.X5 does not catch it' {
@@ -276,7 +276,7 @@ Describe 'Resolve-CodexDeployment model availability' {
         try {
             Resolve-CodexDeployment -LogicalAgent 'atomic-executor' -ComplexityBand 'C1' `
                 -ExecutionContext 'standalone' -OrchestrationComplexityCeiling 'C1' `
-                -AvailableModel @('gpt-5.6-terra') | Out-Null
+                -AvailableModel @('gpt-6.1-sol') | Out-Null
         } catch {
             $thrown = $_.Exception
         }

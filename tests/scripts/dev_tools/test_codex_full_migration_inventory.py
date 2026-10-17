@@ -130,7 +130,7 @@ def test_codex_agent_contracts_follow_expected_wrapper_or_native_patterns() -> N
         if target_name in NATIVE_EPIC_AGENT_SKILLS:
             agent_text = read_bundle_text(f".codex/agents/{codex_file}")
             assert f'name = "{target_name}"' in agent_text
-            assert 'model = "gpt-5.6-sol"' in agent_text
+            assert 'model = "gpt-6-astra"' in agent_text
             assert 'model_reasoning_effort = "ultra"' in agent_text
             assert NATIVE_EPIC_AGENT_SKILLS[target_name] in agent_text
             assert "## Root Invocation" in agent_text
