@@ -343,3 +343,4 @@ Export-ModuleMember -Function @(
     'Test-CiFullRunMarker'
     'New-CiChangeScopeDecision'
 )
+# Changes to this module fall outside the docs-only allowlist, so they always start a full CI run (issue #962, proof step P3).

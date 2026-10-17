@@ -433,7 +433,7 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   - a `Change scope` log line `code=true` with reason `NO_FULL_GREEN_RUN` or `NON_ALLOWLISTED_PATH: <path>`.
 
   Proof Procedure steps P1.1–P1.3. (CI-dependent; verified at S9 on the PR head by the item's orchestrator)
-- [ ] AC-33 (CI-AC-2): Docs-only evidence commit skips heavy steps. A subsequent commit that changes only allowlisted paths under the feature folder produces a run in which:
+- [x] AC-33 (CI-AC-2): Docs-only evidence commit skips heavy steps. A subsequent commit that changes only allowlisted paths under the feature folder produces a run in which:
   - the `Change scope` log shows `code=false reason=DOCS_ONLY_SINCE_<base sha>`, where `<base sha>` is the head of the AC-32 run (or of a later full run);
   - `CI full run` is `skipped`;
   - the `root-typescript-tests` and `npm-audit-gate` jobs are `skipped`;
@@ -442,7 +442,7 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   - `gh pr view <PR> --json mergeStateStatus` is not blocked by checks (recorded verbatim).
 
   The run duration (`updatedAt - createdAt`) is recorded next to the baseline run 38896898318 from PR #959. Proof Procedure steps P0 and P2.1–P2.7. (CI-dependent; verified at S9 on the PR head by the item's orchestrator)
-- [ ] AC-34 (CI-AC-3): Code change after a skip runs full CI. A subsequent commit that touches a non-allowlisted path produces a run in which:
+- [x] AC-34 (CI-AC-3): Code change after a skip runs full CI. A subsequent commit that touches a non-allowlisted path produces a run in which:
   - `CI full run` is `success`;
   - the heavy jobs are `success`;
   - the `Change scope` log shows `code=true reason=NON_ALLOWLISTED_PATH: <path>`.
