@@ -16,7 +16,7 @@ import {
 
 /**
  * Unit tests for the document-level plan-gate rules G11, G12, and G13 (issue
- * #964). The eleven cases carry the same names and fixtures as
+ * #964). The twelve cases carry the same names and fixtures as
  * `tests/scripts/dev_tools/test_plan_gate_document.py`. Every fixture is an
  * in-memory string with LF line endings.
  */
@@ -100,6 +100,21 @@ describe("plan-gate-document G11", () => {
 
     // Assert
     expect(report.blocking).toEqual([]);
+  });
+
+  // The scheme-less host-and-port class is documented in
+  // `.claude/rules/plan-acceptance-gates.md`; this case pins it.
+  it("test_g11_reports_scheme_less_host_and_port_as_documented_false_positive", () => {
+    // Arrange
+    const text = "# Plan\nAllow outbound traffic to api.github.com:443 only.\n";
+
+    // Act
+    const report = run(text);
+
+    // Assert
+    expect(report.blocking).toEqual([
+      lineCitationMessage(2, "api.github.com:443"),
+    ]);
   });
 });
 

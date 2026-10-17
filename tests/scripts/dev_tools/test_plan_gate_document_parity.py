@@ -14,6 +14,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import pytest
+
 from scripts.dev_tools import plan_gate_document
 from scripts.dev_tools.plan_gate_discrimination import PlanGateReport
 from scripts.dev_tools.plan_gate_document import (
@@ -99,16 +101,33 @@ _APOSTROPHE_EXPECTED = (
 )
 
 
-def test_document_gate_messages_match_expected_rows() -> None:
-    """Every expected row, including the apostrophe row, matches the Python output."""
+@pytest.mark.parametrize(
+    ("name", "text", "expected"), _ROWS, ids=[row[0] for row in _ROWS]
+)
+def test_document_gate_messages_match_expected_rows(
+    name: str, text: str, expected: tuple[str, ...]
+) -> None:
+    """Each expected row matches the Python output for its fixture."""
 
-    # Arrange / Act / Assert
-    for name, text, expected in _ROWS:
-        report = PlanGateReport()
-        evaluate_document_gates(report, text)
-        assert tuple(report.blocking) == expected, f"row {name}: {report.blocking}"
+    # Arrange
+    report = PlanGateReport()
+
+    # Act
+    evaluate_document_gates(report, text)
+
+    # Assert
+    assert tuple(report.blocking) == expected, f"row {name}: {report.blocking}"
+
+
+def test_apostrophe_row_renders_value_verbatim() -> None:
+    """The apostrophe row renders the value verbatim between backticks."""
+
+    # Arrange / Act
+    message = line_citation_message(9, _APOSTROPHE_VALUE)
+
+    # Assert
     assert (
-        line_citation_message(9, _APOSTROPHE_VALUE) == _APOSTROPHE_EXPECTED
+        message == _APOSTROPHE_EXPECTED
     ), "apostrophe row must render the value verbatim between backticks"
 
 

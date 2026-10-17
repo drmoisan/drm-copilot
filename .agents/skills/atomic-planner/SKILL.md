@@ -86,7 +86,7 @@ Forbidden writes:
 When a caller provides an explicit target plan path:
 
 - update that exact file in place,
-- reuse that same file for all preflight revision iterations,
+- reuse that same file for the single permitted preflight revision,
 - do not create additional sibling `plan.*.md` files during the same planning cycle.
 
 ## Determinism Gates

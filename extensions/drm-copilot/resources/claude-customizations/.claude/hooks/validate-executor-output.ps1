@@ -16,7 +16,8 @@
         PREFLIGHT-DEFECT lines, name an existing fix record for any PREFLIGHT-FIX line,
         and may not claim non-canonical blocked text,
       - non-preflight runs may not stop in a blocked state, except a canonical preflight
-        block with a plan delta and no checked task (combined proportionate run),
+        block with a plan delta and no checked task (combined proportionate run); only the
+        uppercase BLOCKED token counts as a blocked claim, and lowercase prose does not,
       - non-preflight plans contain checkboxes and all are checked,
       - non-preflight output includes `AC Status Summary`,
       - non-preflight output includes command/status reporting,
@@ -47,33 +48,21 @@ $script:SubagentStopReportAndHaltLine = 'This condition is not repairable by the
 function Get-PlanFileContent {
     [CmdletBinding()]
     [OutputType([hashtable])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string] $Path
-    )
+    param([Parameter(Mandatory = $true)] [string] $Path)
 
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
         return @{ Exists = $false; Lines = @() }
     }
 
-    $lines = Get-Content -LiteralPath $Path -ErrorAction Stop
-    if ($null -eq $lines) {
-        $lines = @()
-    }
-    elseif ($lines -isnot [array]) {
-        $lines = @($lines)
-    }
-
+    # @() yields an array for any line count; the filter drops a $null emitted at the read boundary.
+    $lines = @(Get-Content -LiteralPath $Path -ErrorAction Stop | Where-Object { $null -ne $_ })
     return @{ Exists = $true; Lines = $lines }
 }
 
 function Get-PlanPathFromOutput {
     [CmdletBinding()]
     [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string] $AgentOutput
-    )
+    param([Parameter(Mandatory = $true)] [string] $AgentOutput)
 
     $pattern = 'plan-path\s*[:=]\s*["'']?([^\s"''\)`]+)|\[plan-path\]\(([^)]+)\)'
     $match = [regex]::Match($AgentOutput, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
@@ -93,10 +82,7 @@ function Get-PlanPathFromOutput {
 function Test-IsPreflightPlan {
     [CmdletBinding()]
     [OutputType([bool])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $Lines
-    )
+    param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $Lines)
 
     return @($Lines | Where-Object { $_ -match '(?i)^\s*DIRECTIVE:\s*PREFLIGHT VALIDATION ONLY\s*$' }).Count -gt 0
 }
@@ -104,11 +90,17 @@ function Test-IsPreflightPlan {
 function Get-JsonPropertyValue {
     # Returns a named property of a parsed JSON object, or $null; safe under StrictMode.
     [CmdletBinding()]
+    [OutputType([object])]
     param([AllowNull()] [object] $Object, [Parameter(Mandatory = $true)] [string] $Name)
 
-    if ($null -eq $Object -or -not ($Object -is [System.Management.Automation.PSCustomObject])) { return $null }
+    if ($null -eq $Object -or -not ($Object -is [System.Management.Automation.PSCustomObject])) {
+        return $null
+    }
     $property = @($Object.PSObject.Properties | Where-Object { $_.Name -ceq $Name })
-    if ($property.Count -eq 0) { return $null } else { return $property[0].Value }
+    if ($property.Count -eq 0) {
+        return $null
+    }
+    return $property[0].Value
 }
 
 function Get-TranscriptPathFromEnvelope {
@@ -118,8 +110,12 @@ function Get-TranscriptPathFromEnvelope {
     param([AllowNull()] [object] $Envelope)
 
     $path = Get-JsonPropertyValue -Object $Envelope -Name 'agent_transcript_path'
-    if (-not ($path -is [string]) -or [string]::IsNullOrWhiteSpace($path)) { return $null }
-    if ($path.StartsWith('~')) { $path = $HOME + $path.Substring(1) }
+    if (-not ($path -is [string]) -or [string]::IsNullOrWhiteSpace($path)) {
+        return $null
+    }
+    if ($path.StartsWith('~')) {
+        $path = $HOME + $path.Substring(1)
+    }
     return $path
 }
 
@@ -130,16 +126,45 @@ function Get-TranscriptFirstUserText {
     param([AllowEmptyString()] [string[]] $Lines = @())
 
     foreach ($line in $Lines) {
-        if ([string]::IsNullOrWhiteSpace($line)) { continue }
-        try { $entry = ConvertFrom-Json -InputObject $line -ErrorAction Stop } catch { continue }
-        if ((Get-JsonPropertyValue -Object $entry -Name 'type') -ne 'user') { continue }
-        $message = Get-JsonPropertyValue -Object $entry -Name 'message'
-        $content = if ($null -ne $message) { Get-JsonPropertyValue -Object $message -Name 'content' } else { Get-JsonPropertyValue -Object $entry -Name 'content' }
-        if ($content -is [string]) { return $content }
-        $texts = @(@($content) | Where-Object { (Get-JsonPropertyValue -Object $_ -Name 'type') -eq 'text' } | ForEach-Object { [string](Get-JsonPropertyValue -Object $_ -Name 'text') })
-        if ($texts.Count -gt 0) { return ($texts -join "`n") }
+        if ([string]::IsNullOrWhiteSpace($line)) {
+            continue
+        }
+        try {
+            $entry = ConvertFrom-Json -InputObject $line -ErrorAction Stop
+        }
+        catch {
+            continue
+        }
+        if ((Get-JsonPropertyValue -Object $entry -Name 'type') -ne 'user') {
+            continue
+        }
+        $container = Get-JsonPropertyValue -Object $entry -Name 'message'
+        if ($null -eq $container) {
+            $container = $entry
+        }
+        $content = Get-JsonPropertyValue -Object $container -Name 'content'
+        if ($content -is [string]) {
+            return $content
+        }
+        $textBlocks = @(@($content) | Where-Object { (Get-JsonPropertyValue -Object $_ -Name 'type') -eq 'text' })
+        $texts = @($textBlocks | ForEach-Object { [string](Get-JsonPropertyValue -Object $_ -Name 'text') })
+        if ($texts.Count -gt 0) {
+            return ($texts -join "`n")
+        }
     }
     return $null
+}
+
+function Read-TranscriptHead {
+    # File seam: returns the first 50 lines of the transcript at Path, or $null when no file exists.
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param([Parameter(Mandatory = $true)] [string] $Path)
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        return $null
+    }
+    return [string[]]@(Get-Content -LiteralPath $Path -TotalCount 50 -ErrorAction Stop)
 }
 
 function Test-IsPreflightRun {
@@ -157,18 +182,27 @@ function Test-IsPreflightRun {
         [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $AgentOutput,
         [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $PlanLines,
         [AllowNull()] [AllowEmptyString()] [string] $TranscriptPath,
-        [scriptblock] $ReadTranscriptHead = { param([string] $Path) if (Test-Path -LiteralPath $Path -PathType Leaf) { [string[]]@(Get-Content -LiteralPath $Path -TotalCount 50 -ErrorAction Stop) } else { $null } }
+        [scriptblock] $ReadTranscriptHead = ${function:Read-TranscriptHead}
     )
 
     if (-not [string]::IsNullOrWhiteSpace($TranscriptPath)) {
         $head = $null
-        try { $head = & $ReadTranscriptHead $TranscriptPath } catch { $head = $null }
+        try {
+            $head = & $ReadTranscriptHead $TranscriptPath
+        }
+        catch {
+            $head = $null
+        }
         if ($null -ne $head) {
             $prompt = Get-TranscriptFirstUserText -Lines ([string[]]@($head))
-            if ($null -ne $prompt) { return [regex]::IsMatch($prompt, '(?im)^\s*DIRECTIVE:\s*PREFLIGHT VALIDATION ONLY\s*$') }
+            if ($null -ne $prompt) {
+                return [regex]::IsMatch($prompt, '(?im)^\s*DIRECTIVE:\s*PREFLIGHT VALIDATION ONLY\s*$')
+            }
         }
     }
-    if (Test-IsPreflightPlan -Lines $PlanLines) { return $true }
+    if (Test-IsPreflightPlan -Lines $PlanLines) {
+        return $true
+    }
     return [regex]::Matches($AgentOutput, '(?m)^\s*PREFLIGHT:\s*(ALL CLEAR|REVISIONS REQUIRED)\s*$').Count -eq 1
 }
 
@@ -192,7 +226,9 @@ function Get-PreflightRunBlockDecision {
     if (-not (Test-HasCanonicalBlockedText -AgentOutput $AgentOutput)) {
         return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: blocked preflight output must include the exact text `BLOCKED at preflight (before [P0-T1])` plus a concrete plan delta.' }
     }
-    if ($AgentOutput -cmatch 'BLOCKED') { return @{ Ok = $true; Message = $null } }
+    if ($AgentOutput -cmatch 'BLOCKED') {
+        return @{ Ok = $true; Message = $null }
+    }
 
     $signals = @([regex]::Matches($AgentOutput, '(?m)^\s*PREFLIGHT:\s*(?<Signal>ALL CLEAR|REVISIONS REQUIRED)\s*$'))
     if ($signals.Count -ne 1) {
@@ -218,10 +254,7 @@ function Get-PreflightRunBlockDecision {
 function Get-TouchedLanguagesFromPlan {
     [CmdletBinding()]
     [OutputType([string[]])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyString()] [string[]] $Lines
-    )
+    param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string[]] $Lines)
 
     $languages = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
     $pathPattern = '(?i)(?:[.\w*?-]+[\\/])+[.\w*?-]+'
@@ -244,13 +277,7 @@ function Get-TouchedLanguagesFromPlan {
 function Test-OutputHasLanguageStatus {
     [CmdletBinding()]
     [OutputType([bool])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string] $AgentOutput,
-
-        [Parameter(Mandatory = $true)]
-        [string] $Language
-    )
+    param([Parameter(Mandatory = $true)] [string] $AgentOutput, [Parameter(Mandatory = $true)] [string] $Language)
 
     $labelMap = @{
         'TypeScript' = @('TypeScript', 'typescript')
@@ -267,24 +294,15 @@ function Test-OutputHasLanguageStatus {
 function Test-HasPreflightSignal {
     [CmdletBinding()]
     [OutputType([bool])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string] $AgentOutput
-    )
+    param([Parameter(Mandatory = $true)] [string] $AgentOutput)
 
-    return [regex]::IsMatch(
-        $AgentOutput,
-        '(?m)^\s*PREFLIGHT:\s*(ALL CLEAR|REVISIONS REQUIRED)\s*$'
-    )
+    return [regex]::IsMatch($AgentOutput, '(?m)^\s*PREFLIGHT:\s*(ALL CLEAR|REVISIONS REQUIRED)\s*$')
 }
 
 function Test-HasCanonicalBlockedText {
     [CmdletBinding()]
     [OutputType([bool])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string] $AgentOutput
-    )
+    param([Parameter(Mandatory = $true)] [string] $AgentOutput)
 
     # Case-sensitive: lowercase prose such as `blocked_reason` is not a BLOCKED claim (issue #964).
     if ($AgentOutput -cnotmatch 'BLOCKED') {
@@ -295,8 +313,11 @@ function Test-HasCanonicalBlockedText {
         return $false
     }
 
-    $remainder = $AgentOutput -creplace 'BLOCKED at preflight \(before \[P0-T1\]\)', '' # the canonical phrase itself carries [P0-T1]
-    if ($remainder -notmatch '(?i)plan delta' -and $remainder -notmatch '\[P\d+-T\d+\]') { return $false }
+    # The canonical phrase itself carries [P0-T1], so it is removed before looking for a plan delta.
+    $remainder = $AgentOutput -creplace 'BLOCKED at preflight \(before \[P0-T1\]\)', ''
+    if ($remainder -notmatch '(?i)plan delta' -and $remainder -notmatch '\[P\d+-T\d+\]') {
+        return $false
+    }
 
     return $true
 }
@@ -308,9 +329,7 @@ function Invoke-ExecutorOutputValidation {
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
-    param(
-        [AllowNull()] [AllowEmptyString()] [string] $InputText
-    )
+    param([AllowNull()] [AllowEmptyString()] [string] $InputText)
 
     $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
     if (-not $envelope.IsValid) { $decision = @{ Ok = $false; Repairable = $false; Message = ('{0} payload anomaly - {1}' -f 'atomic-executor hook:', (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)) } }
@@ -341,9 +360,7 @@ function Get-ExecutorOutputBlockDecision {
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyString()]
-        [string] $AgentOutput,
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $AgentOutput,
         [AllowNull()] [AllowEmptyString()] [string] $TranscriptPath,
         [scriptblock] $ReadTranscriptHead
     )
@@ -379,19 +396,11 @@ function Get-ExecutorOutputBlockDecision {
         return @{ Ok = $false; Repairable = $false; Message = 'atomic-executor hook: blocking is permitted only during preflight validation (before [P0-T1]).' }
     }
 
-    $checkboxLineCount = 0
+    $checkboxLineCount = @($file.Lines | Where-Object { $_ -match '^\s*-\s\[(?:\s|[xX])\]\s' }).Count
     $uncheckedLineNumbers = [System.Collections.Generic.List[int]]::new()
-    $uncheckedPattern = '^\s*-\s\[\s\]\s'
-    $checkedPattern = '^\s*-\s\[[xX]\]\s'
-
     for ($i = 0; $i -lt $file.Lines.Count; $i++) {
-        $line = $file.Lines[$i]
-        if ($line -match $uncheckedPattern) {
-            $checkboxLineCount++
+        if ($file.Lines[$i] -match '^\s*-\s\[\s\]\s') {
             $uncheckedLineNumbers.Add($i + 1)
-        }
-        elseif ($line -match $checkedPattern) {
-            $checkboxLineCount++
         }
     }
 
@@ -406,8 +415,7 @@ function Get-ExecutorOutputBlockDecision {
             $reported = $uncheckedLineNumbers.GetRange(0, 5)
             $suffix = ' (showing first 5)'
         }
-        $lineList = ($reported -join ', ')
-        $message = "atomic-executor hook: plan file '$planPath' has $($uncheckedLineNumbers.Count) unchecked task(s) at line(s) ${lineList}${suffix}. All `- [ ]` items must be ticked to `- [x]` before termination."
+        $message = "atomic-executor hook: plan file '$planPath' has $($uncheckedLineNumbers.Count) unchecked task(s) at line(s) $($reported -join ', ')${suffix}. All `- [ ]` items must be ticked to `- [x]` before termination."
         return @{ Ok = $false; Repairable = $true; Message = $message }
     }
 
@@ -421,16 +429,9 @@ function Get-ExecutorOutputBlockDecision {
         return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: completion output must report commands run and pass/fail status results.' }
     }
 
-    $missingLanguageStatuses = [System.Collections.Generic.List[string]]::new()
-    foreach ($language in Get-TouchedLanguagesFromPlan -Lines $file.Lines) {
-        if (-not (Test-OutputHasLanguageStatus -AgentOutput $agentOutput -Language $language)) {
-            $missingLanguageStatuses.Add($language)
-        }
-    }
-
+    $missingLanguageStatuses = @(Get-TouchedLanguagesFromPlan -Lines $file.Lines | Where-Object { -not (Test-OutputHasLanguageStatus -AgentOutput $agentOutput -Language $_) })
     if ($missingLanguageStatuses.Count -gt 0) {
-        $missingList = $missingLanguageStatuses -join ', '
-        return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: completion output is missing explicit PASS/FAIL toolchain status lines for: $missingList." }
+        return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: completion output is missing explicit PASS/FAIL toolchain status lines for: $($missingLanguageStatuses -join ', ')." }
     }
 
     return @{ Ok = $true; Message = $null }

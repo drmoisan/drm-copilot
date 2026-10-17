@@ -88,8 +88,8 @@ def test_atomic_planner_wrapper_preserves_codex_preflight_handoff_contract() -> 
             "`PREFLIGHT: ALL CLEAR`",
             "`PREFLIGHT: REVISIONS REQUIRED`",
             "Treat executor preflight findings as binding plan defects",
-            "Reuse the same target plan file for every preflight revision "
-            "iteration in the same planning cycle.",
+            "Reuse the same target plan file for the single permitted "
+            "preflight revision in the same planning cycle.",
             "stop and report blocked state",
             "validate_orchestration_artifacts` MCP tool",
         ),

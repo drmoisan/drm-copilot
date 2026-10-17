@@ -542,7 +542,7 @@ When updating an existing file, preserve non-plan content (for example, problem 
 When the calling system or handoff provides an explicit target plan file path (for example `${file}` or `${plan-path}`), you MUST:
 
 - Update that exact file in place.
-- Reuse that same file for every preflight revision iteration.
+- Reuse that same file for the single permitted preflight revision.
 - Return the same path in `plan-path` outputs unless the caller explicitly changes it.
 
 You MUST NOT create additional timestamped sibling files (for example `plan.<timestamp>.md`) when an authoritative target path has been supplied.

@@ -3,7 +3,7 @@
 G11 reports line-number citations, G12 reports commit-SHA citations, and G13
 reports a plan above the size guideline without a `## Size Justification`
 section. Every fixture is an in-memory string with LF line endings. The same
-eleven cases are duplicated, with the same names, in
+twelve cases are duplicated, with the same names, in
 `extensions/drm-copilot/test/lib/validate/plan-gate-document.test.ts`.
 """
 
@@ -93,6 +93,25 @@ def test_g11_ignores_count_phrases_inline_code_prose_url_ports_and_fences() -> N
 
     # Assert
     assert report.blocking == [], f"expected no G11 finding: {report.blocking}"
+
+
+def test_g11_reports_scheme_less_host_and_port_as_documented_false_positive() -> None:
+    """A host and port written without a URL scheme yields one G11 finding.
+
+    The class is documented in `.claude/rules/plan-acceptance-gates.md` under
+    `### Known false-positive classes — G11 and G12`; this case pins it.
+    """
+
+    # Arrange
+    text = "# Plan\nAllow outbound traffic to api.github.com:443 only.\n"
+
+    # Act
+    report = _run(text)
+
+    # Assert
+    assert report.blocking == [
+        line_citation_message(2, "api.github.com:443"),
+    ], f"unexpected G11 findings: {report.blocking}"
 
 
 def test_g12_reports_full_and_abbreviated_shas_in_prose_and_inline_code() -> None:

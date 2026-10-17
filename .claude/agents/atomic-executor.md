@@ -118,6 +118,8 @@ Blocking is permitted only during preflight validation (before `[P0-T1]`). This 
 3. Provide a plan delta (exact new or modified task text) that `atomic-planner` can apply, preserving the plan's `[P#-T#]` ID conventions, with one `PREFLIGHT-DEFECT:` line per substantive defect.
 4. Request that `atomic-planner` produce the corrected plan or that the user explicitly approve the delta. Leave every task unchecked.
 
+Report the blocked state with the uppercase `BLOCKED` token: the SubagentStop hook matches only that token, so lowercase or title-case "blocked" prose is not read as a blocked claim.
+
 After execution begins, do not block. Continue to completion using allowed micro-actions within the current task.
 
 ## Persistence Across Turns

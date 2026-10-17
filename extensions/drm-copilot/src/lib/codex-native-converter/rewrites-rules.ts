@@ -176,8 +176,8 @@ const BASE_REWRITE_RULES: ReadonlyArray<RewriteRule> = [
       "place by the executor, and a plan returns to the planner at most " +
       'once; a second substantive result halts with `blocked_reason: "' +
       'validator_failed"`.\n' +
-      "- Reuse the same target plan file for every preflight revision " +
-      "iteration in the same planning cycle.\n" +
+      "- Reuse the same target plan file for the single permitted " +
+      "preflight revision in the same planning cycle.\n" +
       "- If the required `atomic-executor` handoff cannot be started or " +
       "completed, stop and report blocked state; do not self-approve the " +
       "plan.\n" +

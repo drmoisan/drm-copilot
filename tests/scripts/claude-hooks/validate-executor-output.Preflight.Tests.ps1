@@ -62,6 +62,18 @@ Describe 'Test-IsPreflightRun (issue #964)' {
         $result | Should -BeTrue
     }
 
+    It 'reads the directive from entry-level content when the user entry has no message' {
+        # Arrange
+        $entry = @{ type = 'user'; content = "$script:Directive`nPlan follows." } | ConvertTo-Json -Compress -Depth 5
+        $reader = { param([string] $Path) $null = $Path; [string[]]@($entry) }.GetNewClosure()
+
+        # Act
+        $result = Test-IsPreflightRun -AgentOutput '' -PlanLines @() -TranscriptPath $script:TranscriptPath -ReadTranscriptHead $reader
+
+        # Assert
+        $result | Should -BeTrue
+    }
+
     It 'classifies a run as execution when the transcript prompt lacks the directive, even with a plan directive' {
         # Arrange
         $reader = Get-TranscriptReader -Prompt 'Execute the approved plan.'
@@ -132,6 +144,20 @@ Describe 'Test-IsPreflightRun (issue #964)' {
         # Assert
         $result | Should -BeFalse
         Should -Invoke -CommandName Test-Path -Times 1 -Exactly
+    }
+
+    It 'classifies from the default reader when the transcript file exists' {
+        # Arrange
+        $entry = @{ type = 'user'; message = @{ content = "DIRECTIVE: PREFLIGHT VALIDATION ONLY`nplan" } } | ConvertTo-Json -Compress -Depth 5
+        Mock -CommandName Test-Path -MockWith { $true }
+        Mock -CommandName Get-Content -MockWith { @($entry) }.GetNewClosure()
+
+        # Act
+        $result = Test-IsPreflightRun -AgentOutput 'summary' -PlanLines $script:UncheckedPlan -TranscriptPath $script:TranscriptPath
+
+        # Assert
+        $result | Should -BeTrue
+        Should -Invoke -CommandName Get-Content -Times 1 -Exactly -ParameterFilter { $TotalCount -eq 50 }
     }
 }
 
