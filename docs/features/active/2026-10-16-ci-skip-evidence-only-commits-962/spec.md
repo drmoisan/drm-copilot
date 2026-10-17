@@ -389,7 +389,7 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   - every `_poshqc.yml` job other than `poshqc` (`poshqc-linux-hooks`, and in the sharded shape also `poshqc-static` and `poshqc-shard`) carries a job-level `if: ${{ inputs.run-heavy }}`;
   - the `poshqc` job carries no job-level `run-heavy` condition; in the sharded shape it keeps `if: always()`;
   - every `poshqc` step carries `inputs.run-heavy`, including, in the sharded shape, the step that requires the static and shard jobs to succeed.
-- [ ] AC-22: Unchanged surfaces. `git diff --name-only origin/main...HEAD` lists none of the following:
+- [x] AC-22: Unchanged surfaces. `git diff --name-only origin/main...HEAD` lists none of the following:
   - `.github/workflows/_docs-validation.yml`;
   - `.github/workflows/_root-typescript-tests.yml`;
   - `.github/workflows/_npm-audit-gate.yml`;
@@ -410,22 +410,22 @@ The decision flow is: event gate, then fork gate, then run listing, then marker 
   - the per-context table of all 11 required contexts with their docs-only behaviour (the D1 table).
 
   The Triggers section is identical to `origin/main`.
-- [ ] AC-25: actionlint. `scripts/dev-tools/run-actionlint.ps1` reports zero findings for every workflow file changed by this branch. The output is recorded under the feature `evidence/qa-gates/` folder.
-- [ ] AC-26: PowerShell toolchain.
+- [x] AC-25: actionlint. `scripts/dev-tools/run-actionlint.ps1` reports zero findings for every workflow file changed by this branch. The output is recorded under the feature `evidence/qa-gates/` folder.
+- [x] AC-26: PowerShell toolchain.
   - PoshQC format reports no changes required, and PoshQC analyze reports zero findings, for every new or changed `.ps1`, `.psm1` and `.Tests.ps1` file.
   - All Pester suites under `tests/scripts/ci/` and `tests/scripts/workflows/` pass in a single pass.
   - The results are recorded under the feature `evidence/qa-gates/` folder.
-- [ ] AC-27: Coverage (D8). Line coverage of `scripts/ci/CiChangeScope.psm1` and `scripts/ci/Invoke-CiChangeScope.ps1`, measured from PoshQC coverage output, is at least 85% for each file. The measured values are recorded under `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/evidence/qa-gates/`.
-- [ ] AC-28: CI-gate tooling unchanged and verified (D4).
+- [x] AC-27: Coverage (D8). Line coverage of `scripts/ci/CiChangeScope.psm1` and `scripts/ci/Invoke-CiChangeScope.ps1`, measured from PoshQC coverage output, is at least 85% for each file. The measured values are recorded under `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/evidence/qa-gates/`.
+- [x] AC-28: CI-gate tooling unchanged and verified (D4).
   - `tests/scripts/claude-lib/ci-gate/Invoke-CiGateParser.Tests.ps1` passes unchanged. This includes the existing tests that pin `skipping` as non-blocking (around line 79) and the `-RequireWorkflow` empty-set refusal (around line 364); the executor records both test names.
   - `git diff --name-only origin/main...HEAD` lists neither the parser, its bundle mirror, nor either skill file named in AC-22.
 - [x] AC-29: Tier classification. `quality-tiers.yml` contains an entry with `path: "scripts/ci"`, `tier: T4` and a rationale. `scripts/dev_tools/check_quality_tiers.py` and `tests/scripts/dev_tools/test_quality_tiers_contract_classification.py` pass.
-- [ ] AC-30: Dependency composition (D5).
+- [x] AC-30: Dependency composition (D5).
   - Before the first edit to `ci.yml` or `_poshqc.yml`, the executor records the `origin/main` SHA, the heads of the #952 and #953 branches, and whether each dependency is present in `origin/main`.
   - The branch contains `origin/main` through `git merge origin/main` (a merge commit, or a recorded "already up to date" state when the branch already contains it).
   - No rebase or force push is performed on `bug/ci-skip-evidence-only-commits-962`.
   - If `origin/main` gained #952 or #953 after execution started, a recorded re-integration exists: `origin/main` merged again and the affected gating and test adjustments re-verified.
-- [ ] AC-31: Evidence location. Every evidence artifact produced by execution is written under `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/evidence/<kind>/`.
+- [x] AC-31: Evidence location. Every evidence artifact produced by execution is written under `docs/features/active/2026-10-16-ci-skip-evidence-only-commits-962/evidence/<kind>/`.
 - [ ] AC-32 (CI-AC-1): First implementation push runs full CI. On #962's own PR, the run for the first implementation push has:
   - run conclusion `success`;
   - `CI full run` `success`;
