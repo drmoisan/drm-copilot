@@ -28,7 +28,7 @@ When routed through `csharp-orchestrator`, small path still requires lifecycle s
 - promote potential item to GitHub issue with `--work-mode minor-audit`,
 - create active feature folder with `--work-mode minor-audit`,
 - delegate minimal-audit plan creation to `atomic_planner` with `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`,
-- require `atomic_executor` preflight until `PREFLIGHT: ALL CLEAR`,
+- require single-pass `atomic_executor` preflight ending in `PREFLIGHT: ALL CLEAR` (at most one return to the planner),
 - execute Phase 0 only via atomic_executor before branching,
 - run reduced small-audit after implementation and QC.
 
@@ -69,7 +69,7 @@ In all modes, per-batch budget remains: at most **3 production files** and **3 t
 When `csharp-typed-engineer` runs in orchestrator handoff mode, it must execute the following delegation chain and must not bypass it with direct implementation:
 
 1. Delegate to `atomic_planner` for an architecture plus testability plan only (no edits).
-2. Require planner output to include final `PREFLIGHT: ALL CLEAR` from the preflight validation loop.
+2. Require planner output to include final `PREFLIGHT: ALL CLEAR` from single-pass preflight (at most one return to the planner).
 3. Delegate plan execution to `atomic_executor`.
 4. Delegate the final QA gate to `atomic_executor` per `csharp-qa-gate`.
 5. Delegate post-implementation review to `feature-review` per `feature-review-workflow`.

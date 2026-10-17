@@ -25,6 +25,7 @@ Before proceeding, the orchestrator must:
 1. Read `CLAUDE.md` for repository tone policy and architectural context.
 2. Read applicable `.claude/rules/` files for the languages in scope.
 3. Read the policy files listed in the compliance reading order section of `CLAUDE.md`.
+4. Read the `execution-environment` skill (`.claude/skills/execution-environment/SKILL.md`) before delegating any worker. Delegation prompts and plans reference that brief instead of restating tool routes, command-text restrictions, the batch budget, hook context, or CI shape.
 
 ## Checkpoint Handling
 
@@ -131,12 +132,18 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 
 The orchestrator does not perform deep implementation itself. It coordinates, tracks state, and enforces completion.
 
+Single-pass preflight for S4 planning (and for preparation mode). The directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY` goes in the `atomic-executor` delegation prompt only, never in the plan file. Preflight follows `### Single-Pass Preflight` in the `atomic-plan-contract` skill: the preflight executor fixes trivial defects in place and returns only substantive defects as `PREFLIGHT-DEFECT:` lines. The at-most-one-return rule applies:
+
+1. Preflight round one returns `PREFLIGHT: ALL CLEAR` (in-place `PREFLIGHT-FIX:` lines permitted) or `PREFLIGHT: REVISIONS REQUIRED` with every substantive defect listed.
+2. On `PREFLIGHT: REVISIONS REQUIRED`, delegate one `atomic-planner` revision of the same plan file carrying the full `PREFLIGHT-DEFECT:` list, then run preflight round two. A plan returns to the planner at most once.
+3. If round two still returns a substantive defect, halt with `blocked_reason: "validator_failed"` and record both preflight returns in the checkpoint. Do not open a third round.
+
 ## Preparation Mode
 
 A delegation prompt carrying the literal marker `Preparation mode: true` (issued by `epic-planner` per the `.claude/skills/epic-plan/SKILL.md` kickoff line) scopes the run to planning only:
 
 - **Route.** Select `route_id: preparation`. The route's routing-matrix entry requires receipts for `task-researcher`, `prd-feature`, `atomic-planner`, and `atomic-executor`; the skills `orchestrate`, `feature-promotion-lifecycle`, and `atomic-plan-contract`; and the promotion plus validator MCP tools.
-- **Scope.** Run promotion (MCP surface), research, feature documents (`spec.md`, `user-story.md`), atomic planning, and the atomic-executor preflight (precondition validation only, R2 semantics: iterate plan revisions until `PREFLIGHT: ALL CLEAR`). Atomic execution, PR authoring, CI monitoring, and feature review are out of scope and are executed later by `epic-orchestrator`.
+- **Scope.** Run promotion (MCP surface), research, feature documents (`spec.md`, `user-story.md`), atomic planning, and the atomic-executor preflight (precondition validation only, under the single-pass preflight and at-most-one-return rule stated under `## Delegation Model`). Atomic execution, PR authoring, CI monitoring, and feature review are out of scope and are executed later by `epic-orchestrator`.
 - **Terminal checkpoint.** Stop with `completed_steps` containing `S3_promotion` and `S4_atomic_planning`, `next_step: "S5_atomic_execution"`, out-of-scope step statuses set to `not-applicable`, and `blocked_reason: "none"`. Do NOT assert completion (`next_step: "complete"`, `S12_complete`, or a `completed` step8/9/10 status): the run has no PR or CI evidence, and the route's `requires_ci_gate: false` exempts it from `ci_gate` at the completion validator instead.
 - **Premise-falsified halt.** Use `blocked_reason: "premise_falsified"` when every delegation and validator succeeded but evidence gathered during execution falsified the plan's premise. Still record the evidence path in free-form checkpoint keys; `blocked_reason` carries only the classification. The preparation terminal checkpoint above still sets `blocked_reason: "none"`. The full `blocked_reason` vocabulary and its partition are in `.claude/rules/orchestrator-state.md`.
 - **Commit.** Commit the prepared feature folder and plan to the current branch (the worktree branch created off the epic integration branch) before stopping, and report the `plan-path` and preflight status in the final output.
@@ -228,10 +235,11 @@ The orchestrator must not report completion until:
 
 Before delegating to the `feature-review` subagent, the orchestrator must:
 
-1. Stage all modified and new files: `git add -A`.
-2. Delegate to `Agent(commit-message)` to generate a conventional commit message from the staged diff. The agent is read-only and returns message text only; it does not commit.
-3. Commit using the generated message: `git commit -m "<generated message>"`. The `git add` and `git commit` actions remain on the orchestrator.
-4. Only after a successful commit may the orchestrator proceed to the `feature-review` delegation.
+1. Confirm the self-review: the lexicographically greatest `self-review.*.md` under `<FEATURE>/evidence/qa-gates/` exists and records no FAIL row. If it is missing or records a FAIL row, run a proportionate correction (one planner delegation and one combined preflight-and-execute executor delegation, as under `## Remediation Loop (R1–R5)`) that fixes the failing items and rewrites the self-review, then repeat this check before the commit.
+2. Stage all modified and new files: `git add -A`.
+3. Delegate to `Agent(commit-message)` to generate a conventional commit message from the staged diff. The agent is read-only and returns message text only; it does not commit.
+4. Commit using the generated message: `git commit -m "<generated message>"`. The `git add` and `git commit` actions remain on the orchestrator.
+5. Only after a successful commit may the orchestrator proceed to the `feature-review` delegation.
 
 The review subagent compares against a base branch; uncommitted changes are invisible to the diff tool and cannot be audited.
 
@@ -259,8 +267,13 @@ A bounded loop consisting of five steps. The attempt count is `remediation_loop.
 
 Cycle accounting: a remediation attempt is complete when R3 execution finished (`execution_status: "complete"`) and the pre-R4 commit recorded a non-empty change set; only then set `candidate_applied: true` on that cycle and increment `completed_attempts`. A cycle that ends without a candidate (execution not started, execution failed, or an empty staged change set) records `candidate_applied: false` and consumes no number. It is followed by at most one re-plan under the same number when the executor output identifies an autonomous plan defect; otherwise reclassify the blocker (typically `external_dependency`) and halt. Two consecutive no-candidate cycles halt with `step6_status: "blocked_remediation_loop_limit"`. Local, CI-failure, merge-conflict, and parallel-drift cycles share the one count.
 
+Remediation mode. Before R1, the orchestrator writes exactly one line into the cycle's `remediation-inputs.<timestamp>.md`: `Remediation-Mode: proportionate` or `Remediation-Mode: design`. The classification rule: a cycle is proportionate when every `autonomous` finding can be fixed without changing a spec acceptance criterion, a public interface, or the item's file inventory beyond the files already in the branch diff plus their tests and mirrors; otherwise the cycle is design. CI-failure findings are normally proportionate.
+
+- **Proportionate cycle.** R1 is one `atomic-planner` delegation that writes a short remediation plan carrying a `## Pre-Mortem` section and a final self-review task. R2 and R3 run as one `atomic-executor` delegation: the executor runs single-pass preflight with in-place trivial fixes (`### Single-Pass Preflight` in `atomic-plan-contract`) and then executes the plan. Record `preflight: {iterations: 1, final_status: "clear"}` on the cycle before `execution_status`. If preflight finds a substantive defect, the executor stops with `BLOCKED at preflight (before [P0-T1])`, a plan delta, and no checked task; the orchestrator rewrites the mode line to `Remediation-Mode: design` and the cycle continues as a design cycle with one planner revision. The pre-R4 commit, R4, and R5 are unchanged.
+- **Design cycle.** R1 to R5 run as listed below, and R2 follows the single-pass preflight and at-most-one-return rule.
+
 - **R1 — Remediation planning:** Delegate to `atomic-planner` with `remediation-inputs.<timestamp>.md` path as primary context. Receive `remediation-plan.<timestamp>.md` in the active feature folder.
-- **R2 — Preflight clearance:** Delegate to `atomic-executor` for precondition validation only (no implementation). If the executor does not return `PREFLIGHT: ALL CLEAR`, return to R1 and re-delegate to `atomic-planner` with the required-changes output from the executor. Only after `PREFLIGHT: ALL CLEAR` may the orchestrator advance to R3.
+- **R2 — Preflight clearance:** Delegate to `atomic-executor` for precondition validation only (no implementation), with the preflight directive in the delegation prompt. Trivial defects are fixed in place. If the executor returns `PREFLIGHT: REVISIONS REQUIRED`, return to R1 once and re-delegate to `atomic-planner` with the full `PREFLIGHT-DEFECT:` list; if the following preflight still reports a substantive defect, record `final_status: "blocked_preflight_iteration_limit"` on the cycle and halt per `.claude/skills/remediation-handoff-atomic-planner/SKILL.md`. Only after `PREFLIGHT: ALL CLEAR` may the orchestrator advance to R3.
 - **R3 — Remediation execution:** Delegate to `atomic-executor` with full execution authorization. Each task's toolchain loop (format → lint → type-check → test) is mandatory; no skipping.
 - **Pre-R4 commit:** Stage all changes (`git add -A`), delegate to `Agent(commit-message)` to generate a commit message from the staged diff (the agent returns message text only and does not commit), then commit with the generated message. The `git commit` action remains on the orchestrator. Advance to R4 only after a successful commit.
 - **R4 — Re-audit:** Delegate to `feature-review` with the same inputs as the original review (resolved base branch, feature folder, refreshed PR context artifacts, acceptance-criteria source). No scope narrowing. The canonical issue number line must be included.
@@ -348,7 +361,7 @@ When S9 records `step9_status: "failed_remediation_required"` (a failed check; a
 
 1. The failed-check log from `gh run view <run-id> --log-failed` is written as `remediation-inputs.<timestamp>.md` in the active feature folder.
 2. The failure is converted to a synthetic finding with severity `Blocking` that identifies the failing check by name and the failing job by URL.
-3. The existing R1-R5 remediation loop processes that finding exactly as it processes a local blocking finding. No new loop is introduced.
+3. The existing R1-R5 remediation loop processes that finding exactly as it processes a local blocking finding. No new loop is introduced. The inputs file carries `Remediation-Mode: proportionate` unless the fix requires changing a spec acceptance criterion, a public interface, or the file inventory beyond the branch diff plus tests and mirrors, in which case it carries `Remediation-Mode: design`.
 4. CI-failure cycles share `remediation_loop.completed_attempts` with local-finding cycles; a CI-failure finding stays `autonomous`, and the active cycle number is `completed_attempts + 1`.
 5. The shared guard applies: after three completed attempts without a passing result, the orchestrator records `step9_status: "blocked_ci_loop_limit"`, does not write DONE, and halts. No further automation is attempted.
 

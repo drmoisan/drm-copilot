@@ -54,7 +54,7 @@ Plans must consist of discrete, atomic phases containing executable tasks. Each 
 
 Please fill out the template given in `${file}`. 
 
-## Mandatory post-output preflight validation loop
+## Mandatory post-output single-pass preflight
 
 After you have fully updated `${file}`, you MUST initiate a **validate-only** preflight validation
 handoff to the `atomic_executor` agent.
@@ -63,10 +63,14 @@ Purpose:
 	Ensure the plan you produced is ingestible by the executor without replanning.
 
 Hard constraints:
-	- The executor MUST perform **preflight checks only** (no task execution).
-	- You MUST iterate until the executor returns an all-clear signal.
+	- The executor MUST perform **preflight checks only** (no task execution), in one pass over the
+	  entire plan, fixing trivial defects in place and returning only substantive defects
+	  (`### Single-Pass Preflight` in the `atomic-plan-contract` skill).
+	- The plan is design-level (`## Design-Level Plan Contract (Mandatory)` in the
+	  `atomic-plan-contract` skill) and carries a `## Pre-Mortem` section.
+	- A plan returns to you at most once.
 
-Required handoff directive (exact text):
+Required handoff directive (exact text), placed in the handoff prompt and never in `${file}`:
 
 `DIRECTIVE: PREFLIGHT VALIDATION ONLY`
 
@@ -75,13 +79,15 @@ Required validation result signals (exact text; one must be present):
 - `PREFLIGHT: ALL CLEAR`
 - `PREFLIGHT: REVISIONS REQUIRED`
 
-Loop protocol (MANDATORY):
+Handoff protocol (MANDATORY):
 	1) Hand off `${file}` to `atomic_executor` with the directive above.
-	2) If the executor returns `PREFLIGHT: REVISIONS REQUIRED`, apply the executor’s plan delta to
-	   `${file}` (preserving task IDs and executor-compatible formatting), then hand off again.
-	3) Repeat until the executor returns `PREFLIGHT: ALL CLEAR`.
-	4) Only then may you return control to the calling system, including the final
-	   `PREFLIGHT: ALL CLEAR` signal verbatim.
+	2) If the executor returns `PREFLIGHT: REVISIONS REQUIRED`, apply every `PREFLIGHT-DEFECT:` change
+	   in the executor’s plan delta to `${file}` in one revision (preserving task IDs and
+	   executor-compatible formatting), then hand off once more.
+	3) If the confirming preflight still returns `PREFLIGHT: REVISIONS REQUIRED`, stop and report
+	   blocked state (`blocked_reason: "validator_failed"`); do not open another revision.
+	4) Only after `PREFLIGHT: ALL CLEAR` may you return control to the calling system, including the
+	   final `PREFLIGHT: ALL CLEAR` signal verbatim.
 
 ## Template Validation Rules
 

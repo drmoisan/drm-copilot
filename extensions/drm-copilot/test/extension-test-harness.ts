@@ -4,7 +4,7 @@ import {
   createMockProcessWithStderr,
   getFreshChildProcessMock,
   getFreshFsMock,
-  prepareFreshModulesWithPosixPathResolve,
+  mockPosixPathResolve,
   setExecutablePresenceOnFsMock,
   type ExecutablePresence,
   type MockChildProcess,
@@ -198,9 +198,22 @@ const childProcessMock = jest.requireMock("node:child_process") as {
   spawnSync: jest.Mock;
 };
 
-function getExtensionModule(): typeof import("../src/extension") {
+let primaryExtensionModule: typeof import("../src/extension") | undefined;
+
+function requireExtensionModule(): typeof import("../src/extension") {
   // eslint-disable-next-line @typescript-eslint/no-require-imports -- the harness must load the mocked extension module graph used by Jest tests
   return require("../src/extension") as typeof import("../src/extension");
+}
+
+/**
+ * Returns the primary extension module, loaded once and bound to the harness
+ * mocks. Keeping the first instance means a later module-registry reset cannot
+ * hand a test a module whose node:fs and node:child_process mocks are not the
+ * ones the harness configures (issue #964 seeded-order finding).
+ */
+function getExtensionModule(): typeof import("../src/extension") {
+  primaryExtensionModule ??= requireExtensionModule();
+  return primaryExtensionModule;
 }
 
 export function setGitBranchDiscoveryState(input: {
@@ -398,6 +411,8 @@ export function resetExtensionHarnessState(): void {
     remoteRefs: ["origin/HEAD", "origin/main", "origin/develop"],
     localRefs: ["main"],
   });
+  // Load the primary module before any test body can reset the registry.
+  getExtensionModule();
 }
 
 export function activateAndGetHandler(commandId: string): CommandHandler {
@@ -419,7 +434,8 @@ export function activateAndGetHandler(commandId: string): CommandHandler {
 export async function activateFreshHandlerWithPosixPathResolve(
   commandId: string,
 ): Promise<CommandHandler> {
-  const extensionModule = getExtensionModule();
+  // A fresh require, so the module graph of the caller's isolated registry is used.
+  const extensionModule = requireExtensionModule();
   const context = {
     extensionUri: { fsPath: "C:/extension" },
     subscriptions: [] as Array<{ dispose(): void }>,
@@ -463,7 +479,7 @@ export {
   fsMock,
   getConfigurationMock,
   getFreshChildProcessMock,
-  prepareFreshModulesWithPosixPathResolve,
+  mockPosixPathResolve,
   registerCommandMock,
   registerMcpServerDefinitionProviderMock,
   openTextDocumentMock,

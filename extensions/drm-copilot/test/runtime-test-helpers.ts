@@ -59,10 +59,15 @@ export function setExecutablePresenceOnFsMock(
 }
 
 /**
- * Forces node:path.resolve to use POSIX semantics for Windows-root fixture tests.
+ * Registers a node:path mock whose resolve uses POSIX semantics.
+ *
+ * Call it inside `jest.isolateModulesAsync` so the fresh module graph is
+ * sandboxed and the shared module registry is never reset; undo it with
+ * `jest.dontMock("node:path")`. Resetting the shared registry instead left
+ * later tests bound to mock instances the harness no longer configures
+ * (issue #964 seeded-order finding).
  */
-export function prepareFreshModulesWithPosixPathResolve(): void {
-  jest.resetModules();
+export function mockPosixPathResolve(): void {
   jest.doMock("node:path", () => {
     const actual = jest.requireActual(
       "node:path",

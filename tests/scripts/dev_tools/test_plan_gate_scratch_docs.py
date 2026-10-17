@@ -32,16 +32,23 @@ _G10_HEADING = "### G10 — ships as Blocking"
 _REQUIRED_RULE_TOKENS = (
     "| **G10** |",
     _G10_HEADING,
-    "G1 through G10 are the complete shipped set.",
+    "G1 through G13 are the complete shipped set.",
     "G10 exception",
     ENFORCEMENT_TOKEN,
     "### Known false-negative classes — G10",
     "operator-approved scope for issue #932",
     "g10-corpus-measurement.",
 )
-_SUPERSEDED_RULE_SENTENCE = "G1 through G9 are the complete shipped set."
-_SKILL_SHIPPED_SET = "The complete shipped set is therefore G1 through G10."
-_SKILL_SUPERSEDED = "The complete shipped set is therefore G1 through G9."
+# Issue #964 added G11 through G13, so the G1-through-G10 sentences moved here.
+_SUPERSEDED_RULE_SENTENCES = (
+    "G1 through G9 are the complete shipped set.",
+    "G1 through G10 are the complete shipped set.",
+)
+_SKILL_SHIPPED_SET = "The complete shipped set is therefore G1 through G13."
+_SKILL_SUPERSEDED = (
+    "The complete shipped set is therefore G1 through G9.",
+    "The complete shipped set is therefore G1 through G10.",
+)
 
 _SCOPE_REQUIRED_PHRASES = (
     "G1 through G9 judge the shell commands the plan states",
@@ -85,7 +92,8 @@ def test_rule_file_documents_g10() -> None:
 
     # Assert
     assert missing == [], f"rule file lacks {missing}"
-    assert _SUPERSEDED_RULE_SENTENCE not in text
+    for sentence in _SUPERSEDED_RULE_SENTENCES:
+        assert sentence not in text, f"rule file still states `{sentence}`"
     severity = text.index("## Severity Decisions")
     register = text.index("## The Write-Mode Register")
     assert severity < text.index(_G10_HEADING) < register
@@ -104,7 +112,7 @@ def test_rule_file_bundle_copy_is_byte_identical() -> None:
 
 
 def test_atomic_plan_contract_states_shipped_set_through_g10() -> None:
-    """Both skill copies name the shipped set through G10 and are identical."""
+    """Both skill copies name the shipped set through G13 and are identical."""
 
     # Arrange
     repository = _SKILL_FILE.read_bytes()
@@ -116,7 +124,8 @@ def test_atomic_plan_contract_states_shipped_set_through_g10() -> None:
     # Assert
     for text in texts:
         assert _SKILL_SHIPPED_SET in text
-        assert _SKILL_SUPERSEDED not in text
+        for superseded in _SKILL_SUPERSEDED:
+            assert superseded not in text, f"skill still states `{superseded}`"
     assert bundled == repository, "bundled atomic-plan-contract SKILL.md differs"
 
 
@@ -134,7 +143,7 @@ def test_rule_frontmatter_paths_reach_scratch_gate_modules() -> None:
 
 
 def test_discrimination_docstrings_name_g10() -> None:
-    """The discrimination docstrings name G10 and drop the stale claim."""
+    """The discrimination docstrings name G10 through G13 and drop the stale claim."""
 
     # Arrange
     module_doc = plan_gate_discrimination.__doc__
@@ -143,7 +152,8 @@ def test_discrimination_docstrings_name_g10() -> None:
     # Act / Assert
     assert module_doc is not None
     assert entry_doc is not None
-    assert "G1 through G10" in module_doc
+    assert "G1 through G13" in module_doc
+    assert "G1 through G10 against" not in module_doc
     assert "G10" in entry_doc
     assert "pre-change output" not in entry_doc
 

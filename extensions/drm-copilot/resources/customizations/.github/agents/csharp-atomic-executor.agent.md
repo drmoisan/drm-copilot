@@ -95,11 +95,11 @@ When all format and mode-gate requirements are satisfied, return:
 
 ### 2.0 Preflight validation-only mode (directive-driven)
 
-If you receive a plan along with the following directive line (exact text):
+If you receive a plan along with the following directive line (exact text) in the delegation prompt:
 
 `DIRECTIVE: PREFLIGHT VALIDATION ONLY`
 
-you MUST enter **validation-only** mode.
+you MUST enter **validation-only** mode. The preflight directive belongs in the delegation prompt, never in a plan file; a directive line inside a plan file does not make an execution run a preflight run.
 
 Validation-only mode rules (non-negotiable):
 1) Perform ONLY the steps in:
@@ -116,14 +116,18 @@ Validation-only required output:
   - `PREFLIGHT: ALL CLEAR`
   - `PREFLIGHT: REVISIONS REQUIRED`
 
-If revisions are required:
-  - Include a precise **plan delta** that `atomic_planner` can apply (exact edits/additions/removals).
-  - Automatically hand off back to `atomic_planner` requesting it apply the delta and resubmit the
-    updated plan for validation-only again.
+Single-pass rules (`### Single-Pass Preflight` in the `atomic-plan-contract` skill):
+  - Review the entire plan in one pass and classify every defect as trivial or substantive.
+  - Fix trivial defects in place, in task text only; never add, remove, or reorder tasks. Record each
+    fix in `<FEATURE>/evidence/other/preflight-fixes.<timestamp>.md`. This in-place edit is the only file
+    write validation-only mode permits.
+  - After the signal, emit one line per defect: `PREFLIGHT-FIX: <task id or heading> | <defect class> | <change made>`,
+    `PREFLIGHT-DEFECT: <task id or heading> | <defect class> | <required change>`, and
+    `preflight-fix-record: <path>` when at least one fix was made.
 
-Loop requirement:
-  Continue this validate → delta → planner-revise → validate loop until you can return
-  `PREFLIGHT: ALL CLEAR`.
+If revisions are required:
+  - Include a precise **plan delta** that `atomic_planner` can apply (exact edits/additions/removals), with one `PREFLIGHT-DEFECT:` line for every substantive defect found.
+  - Return the result to the caller. A plan returns to the planner at most once; the orchestrator routes the full defect list for one revision and runs one confirming preflight.
 
 When the user provides a plan (in chat or via file path), you must:
 

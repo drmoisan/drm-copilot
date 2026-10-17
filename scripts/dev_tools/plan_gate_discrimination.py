@@ -1,7 +1,7 @@
 """Discriminate falsifiable from non-discriminating atomic-plan acceptance gates.
 
 Purpose:
-    Evaluate the plan acceptance-gate rule set G1 through G10 against an
+    Evaluate the plan acceptance-gate rule set G1 through G13 against an
     atomic plan, and report each finding on the Blocking or Warning channel
     the specification assigns to its rule. The module re-exports `PlanCommand`
     and `extract_plan_commands` so the specification's public surface is a
@@ -14,7 +14,9 @@ Purpose:
     module holds the shared report and context types, the G5 and G6 literal
     rules, and the public entry point. That module depends on the types defined
     here only under `TYPE_CHECKING`, so the runtime import graph is acyclic.
-    The document-level G10 rule lives in `scripts.dev_tools.plan_gate_scratch`.
+    The document-level G10 rule lives in `scripts.dev_tools.plan_gate_scratch`,
+    and the document-level G11, G12, and G13 rules live in
+    `scripts.dev_tools.plan_gate_document`.
 """
 
 from __future__ import annotations
@@ -39,6 +41,7 @@ from scripts.dev_tools.plan_gate_coverage import (
     evaluate_cov_value,
     is_placeholder,
 )
+from scripts.dev_tools.plan_gate_document import evaluate_document_gates
 from scripts.dev_tools.plan_gate_observability import evaluate_observability_gates
 from scripts.dev_tools.plan_gate_scratch import evaluate_scratch_gate
 from scripts.dev_tools.pr_context.git import SubprocessRunner
@@ -367,8 +370,9 @@ def evaluate_plan_gates(
     Args:
         text (str): Full plan document text.
         context (PlanGateContext | None): Repository seam. When `None` only the
-            context-free rules G1, G4, G7, G8, G8b, and G10 run. G10 is
-            document-level and can add Blocking findings without a context.
+            context-free rules G1, G4, G7, G8, G8b, and G10 to G13 run. G10 to
+            G13 are document-level and can add Blocking findings without a
+            context.
 
     Returns:
         PlanGateReport: Blocking and Warning findings in source order.
@@ -400,6 +404,8 @@ def evaluate_plan_gates(
     if context is not None:
         _evaluate_literal_rules(report, text, commands, context)
 
-    # G10 is document-level and context-free, so it runs on every invocation.
+    # G10 to G13 are document-level and context-free, so they run on every
+    # invocation, G11 to G13 after G10.
     evaluate_scratch_gate(report, text)
+    evaluate_document_gates(report, text)
     return report

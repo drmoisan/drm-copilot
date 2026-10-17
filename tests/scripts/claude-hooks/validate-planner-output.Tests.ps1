@@ -7,6 +7,8 @@
 BeforeAll {
     $hookPath = Join-Path $PSScriptRoot '../../../.claude/hooks/validate-planner-output.ps1'
     . $hookPath
+    # Issue #964: allowed-plan fixtures carry a valid Pre-Mortem section.
+    $script:PreMortemFixture = @('## Pre-Mortem', '- Review checklists: walked.', '- Coverage: measured.', '- Mirror parity: copied.', '- File size: measured.', '- Test isolation: shuffled.', '- CI-only behavior: checked.', '- Evidence: recorded.', '## Phases')
 
     function Get-ValidPlannerReviewRecord {
         param([string] $Preflight = 'ALL CLEAR')
@@ -203,7 +205,7 @@ Describe 'validate-planner-output.ps1' {
             Mock -CommandName Get-PlanFileContent -MockWith {
                 @{
                     Exists = $true
-                    Lines  = @(
+                    Lines  = @($script:PreMortemFixture) + @(
                         "### Phase 0 `u{2014} Baseline",
                         '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record docs/features/active/foo/evidence/baseline/phase0-instructions-read.md',
                         '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/baseline/pester.md',
@@ -334,7 +336,7 @@ Describe 'validate-planner-output.ps1' {
             Mock -CommandName Get-PlanFileContent -MockWith {
                 @{
                     Exists = $true
-                    Lines  = @(
+                    Lines  = @($script:PreMortemFixture) + @(
                         "### Phase 0 `u{2014} Baseline",
                         '- [ ] [P0-T1] Read policy files and capture baseline for docs/features/active/foo/issue.md',
                         "### Phase 1 `u{2014} QA",
