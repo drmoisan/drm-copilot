@@ -105,9 +105,9 @@ Branch-specific required task sets:
 
 ---
 
-### 2.5.1 Mandatory preflight validation loop via `python-atomic-executor`
+### 2.5.1 Mandatory single-pass preflight via `python-atomic-executor`
 
-Follow the preflight validation loop rules in the `atomic-plan-contract` skill.
+Follow `### Single-Pass Preflight` in the `atomic-plan-contract` skill. The preflight directive belongs in the delegation prompt, never in the plan file. The preflight executor fixes trivial defects in place and returns only substantive defects as `PREFLIGHT-DEFECT:` lines. A plan returns to the planner at most once: apply every listed change in one revision of the same file; if the confirming preflight still reports a substantive defect, the orchestrator halts with `blocked_reason: "validator_failed"`.
 
 ---
 

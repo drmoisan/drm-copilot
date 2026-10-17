@@ -21,15 +21,7 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
             (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
         }
 
-        function New-SubagentStopEnvelopeJson {
-            # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds and returns envelope JSON text only; it changes no system state.')]
-            param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
-            $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'prd-feature'; stop_hook_active = [bool]$StopHookActive }
-            if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }
-            if ($PSBoundParameters.ContainsKey('OutputField')) { $envelope['output'] = $OutputField }
-            return ($envelope | ConvertTo-Json -Compress)
-        }
+        . (Join-Path $PSScriptRoot 'SubagentStopEnvelope.Helpers.ps1')
 
         function Invoke-PrdFeatureOutputStdinEntry {
             # Drives the hook through the & route with stdin and stderr redirected; both are restored in finally.
@@ -57,7 +49,7 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
 
     It 'exits 2 with a stderr reason when last_assistant_message lacks an existing spec-path' -Tag 'E3-Entry' {
         # Arrange
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'Wrote the specification.'
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage 'Wrote the specification.'
         # Act
         $result = Invoke-PrdFeatureOutputStdinEntry -Stdin $stdin
         # Assert
@@ -70,7 +62,7 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
         # Arrange: the synthetic spec path is reported present and holds a textual criterion.
         Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'synthetic/spec.md' }
         Mock Get-Content { "## Acceptance Criteria`n- [ ] A textual criterion" } -ParameterFilter { $LiteralPath -eq 'synthetic/spec.md' }
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: synthetic/spec.md'
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage 'spec-path: synthetic/spec.md'
         # Act
         $result = Invoke-PrdFeatureOutputStdinEntry -Stdin $stdin
         # Assert
@@ -83,7 +75,7 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
         # Arrange: the spec path appears only in an output key and in the environment variable.
         Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'synthetic/spec.md' }
         Mock Get-Content { "## Acceptance Criteria`n- [ ] A textual criterion" } -ParameterFilter { $LiteralPath -eq 'synthetic/spec.md' }
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'Wrote the specification.' -OutputField 'spec-path: synthetic/spec.md'
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage 'Wrote the specification.' -OutputField 'spec-path: synthetic/spec.md'
         $priorInput = $env:CLAUDE_HOOK_INPUT
         try {
             $env:CLAUDE_HOOK_INPUT = '{"output":"spec-path: synthetic/spec.md"}'
@@ -99,7 +91,7 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
 
     It 'exits 2 with the empty-message reason when last_assistant_message is an empty string' -Tag 'E3-Entry' {
         # Arrange
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage ''
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage ''
         # Act
         $result = Invoke-PrdFeatureOutputStdinEntry -Stdin $stdin
         # Assert
@@ -130,7 +122,7 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
 
     It 'exits 2 with a payload anomaly reason when last_assistant_message is absent' -Tag 'E3-Entry' {
         # Arrange and act: an envelope without last_assistant_message.
-        $result = Invoke-PrdFeatureOutputStdinEntry -Stdin (New-SubagentStopEnvelopeJson -OmitAssistantMessage)
+        $result = Invoke-PrdFeatureOutputStdinEntry -Stdin (ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -OmitAssistantMessage)
         # Assert
         $result.Thrown | Should -BeNullOrEmpty
         $result.ExitCode | Should -Be 2
@@ -140,7 +132,7 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
 
     It 'keeps validating when stop_hook_active is true' -Tag 'E3-Entry' {
         # Arrange: a re-entry envelope that still carries no spec-path.
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'Wrote the specification.' -StopHookActive
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage 'Wrote the specification.' -StopHookActive
         # Act
         $result = Invoke-PrdFeatureOutputStdinEntry -Stdin $stdin
         # Assert
@@ -152,7 +144,7 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
         # Arrange: the spec path is present but its read fails.
         Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'synthetic/spec.md' }
         Mock Get-Content { throw 'simulated read failure' } -ParameterFilter { $LiteralPath -eq 'synthetic/spec.md' }
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: synthetic/spec.md'
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage 'spec-path: synthetic/spec.md'
         # Act
         $result = Invoke-PrdFeatureOutputStdinEntry -Stdin $stdin
         # Assert
@@ -163,7 +155,7 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
 
     It 'exits 2 in a separate process when the stdin envelope lacks a spec-path' -Tag 'E3-Entry' {
         # Arrange
-        $stdinText = New-SubagentStopEnvelopeJson -AssistantMessage 'Wrote the specification.'
+        $stdinText = ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage 'Wrote the specification.'
         # Act
         $global:LASTEXITCODE = 0
         $null = $stdinText | & $script:PwshExe -NoProfile -File $script:StdinHook 2>&1
@@ -175,7 +167,7 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
         # Arrange: the criterion carries thresholds, exit codes, issue numbers, file:line and dates only.
         Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'synthetic/spec.md' }
         Mock Get-Content { "## Acceptance Criteria`n- [ ] AC-01: The hook exits 2 when line coverage is >= 85% (Refs #905, typescript.md:57, 2026-10-11)." } -ParameterFilter { $LiteralPath -eq 'synthetic/spec.md' }
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: synthetic/spec.md'
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage 'spec-path: synthetic/spec.md'
         # Act
         $result = Invoke-PrdFeatureOutputStdinEntry -Stdin $stdin
         # Assert
@@ -190,7 +182,7 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
         Mock Get-Content { "## Acceptance Criteria`n- [ ] All 12 agent files contain the marker." } -ParameterFilter { $LiteralPath -eq 'synthetic/spec.md' }
         Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'synthetic/research.md' }
         Mock Get-Content { throw 'simulated read failure' } -ParameterFilter { $LiteralPath -eq 'synthetic/research.md' }
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage "spec-path: synthetic/spec.md`nresearch-path: synthetic/research.md"
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage "spec-path: synthetic/spec.md`nresearch-path: synthetic/research.md"
         # Act
         $result = Invoke-PrdFeatureOutputStdinEntry -Stdin $stdin
         # Assert

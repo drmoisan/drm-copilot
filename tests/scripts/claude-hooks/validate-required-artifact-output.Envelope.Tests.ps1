@@ -195,15 +195,15 @@ Describe 'validate-required-artifact-output.ps1 SubagentStop envelope' {
         $result.Message.StartsWith($expected, [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Message
     }
 
-    It 'E-RA-10 calls Exit-SubagentStopBlock exactly once, outside the missing-argument if block' {
+    It 'E-RA-10 calls Exit-SubagentStopBlock exactly twice, neither inside the missing-argument if block' {
         # Arrange
         $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:Hook, [ref]$null, [ref]$null)
 
         # Act
         $calls = @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -eq 'Exit-SubagentStopBlock' }, $true))
         $insideArgumentBlock = $false
-        if ($calls.Count -eq 1) {
-            $parent = $calls[0].Parent
+        foreach ($call in $calls) {
+            $parent = $call.Parent
             while ($null -ne $parent) {
                 if ($parent -is [System.Management.Automation.Language.IfStatementAst] -and $parent.Clauses[0].Item1.Extent.Text.Contains('IsNullOrWhiteSpace($AgentName)')) { $insideArgumentBlock = $true }
                 $parent = $parent.Parent
@@ -211,7 +211,7 @@ Describe 'validate-required-artifact-output.ps1 SubagentStop envelope' {
         }
 
         # Assert
-        $calls.Count | Should -Be 1 -Because 'the final validation-failure exit is the only Exit-SubagentStopBlock call'
+        $calls.Count | Should -Be 2 -Because 'the unhandled-error catch and the final validation-failure exit are the only Exit-SubagentStopBlock calls (issue #928)'
         $insideArgumentBlock | Should -BeFalse -Because 'the missing-argument path exits inline'
     }
 }

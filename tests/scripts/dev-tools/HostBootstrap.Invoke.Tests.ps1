@@ -67,6 +67,7 @@ Describe 'Invoke-BootstrapHost' {
         Mock -CommandName Invoke-HostBootstrapWsl -ModuleName HostBootstrap -MockWith { }
         Mock -CommandName Invoke-HostBootstrapNpm -ModuleName HostBootstrap -MockWith { }
         Mock -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -MockWith { }
+        Mock -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -MockWith { }
         Mock -CommandName Install-HostPowerShellModule -ModuleName HostBootstrap -MockWith { }
         Mock -CommandName Set-BootstrapResumeRunOnce -ModuleName HostBootstrap -MockWith { }
         Mock -CommandName Remove-BootstrapResumeRunOnce -ModuleName HostBootstrap -MockWith { }
@@ -129,7 +130,7 @@ Describe 'Invoke-BootstrapHost' {
                 $actual | Should -Contain "- Would install $($pkg.name) using winget id '$($pkg.id)'"
             }
             @($actual | Where-Object { $_ -like '- Would install * using winget id *' }).Count | Should -Be @($script:CommittedManifest.installPackages.windows.winget).Count
-            $actual | Should -Contain '- Would install PowerShell modules: Pester 5.6.1, PSScriptAnalyzer 1.22.0'
+            $actual | Should -Contain '- Would install PowerShell modules: Pester 5.9.0, PSScriptAnalyzer 1.22.0'
             $actual[-1] | Should -BeExactly 'Dry run complete. Re-run with -Apply to install tools.'
         }
     }
@@ -286,6 +287,62 @@ Describe 'Invoke-BootstrapHost' {
             Should -Invoke -CommandName Invoke-HostBootstrapVerifyScript -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter {
                 ($ScriptPath -replace '\\', '/') -like '*/scripts/dev-tools/verify-host.ps1'
             }
+        }
+    }
+
+    Context 'poetry tool install' {
+        It 'AC930-APPLY-INVOKES-POETRY-INSTALL installs the poetry tool in apply mode' {
+            # Act
+            $null = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+
+            # Assert
+            Should -Invoke -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $ApplyMode }
+        }
+
+        It 'AC930-DRYRUN-INVOKES-POETRY-INSTALL routes the poetry tool install in dry-run mode' {
+            # Act
+            $null = @(Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+
+            # Assert
+            Should -Invoke -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { -not $ApplyMode }
+        }
+
+        It 'AC930-POETRY-INSTALL-ORDER installs poetry after the PATH refresh and before the project install' {
+            # Arrange
+            $script:calls = [System.Collections.Generic.List[string]]::new()
+            Mock -CommandName Set-HostEnvironmentVariable -ModuleName HostBootstrap -MockWith {
+                if ($Target -eq 'Process') { $script:calls.Add('PathRefresh') }
+            }
+            Mock -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -MockWith {
+                param([switch]$ApplyMode)
+                $null = $ApplyMode
+                $script:calls.Add('PoetryInstall')
+            }
+            Mock -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -MockWith { $script:calls.Add('ProjectPoetry') }
+
+            # Act
+            $null = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+
+            # Assert
+            ($script:calls -join ',') | Should -BeExactly 'PathRefresh,PoetryInstall,ProjectPoetry'
+        }
+
+        It 'AC930-POETRY-INSTALL-FAILURE-PROPAGATES stops bootstrap when the poetry tool install fails' {
+            # Arrange
+            Mock -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -MockWith { throw 'poetry install fixture failure' }
+
+            # Act and Assert
+            { Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo' } | Should -Throw -ExpectedMessage 'poetry install fixture failure'
+            Should -Invoke -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -Times 0 -Exactly
+        }
+
+        It 'AC930-SKIP-PROJECT-INSTALL-KEEPS-POETRY-TOOL-INSTALL still installs the poetry tool when the project install is skipped' {
+            # Act
+            $null = @(Invoke-BootstrapHost -Apply -SkipProjectPoetryInstall -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+
+            # Assert
+            Should -Invoke -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $ApplyMode }
+            Should -Invoke -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -Times 0 -Exactly
         }
     }
 }

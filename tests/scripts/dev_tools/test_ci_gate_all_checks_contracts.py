@@ -8,6 +8,8 @@ no orchestrator surface in scope restates a required-only check population.
 Issue #891 pins that the Codex ``## CI Green Gate`` invokes the same parser,
 passes ``-RequireWorkflow CI`` for an epic child, and fails closed when the
 parser file is absent.
+Issue #931 pins that the release flow script waits on every check on the
+pull-request head, with no ``--required`` flag and no required-check wording.
 
 Every fragment search runs over whitespace-collapsed text, so a reflowed
 sentence is still found. The module reads repository files only: it creates no
@@ -39,6 +41,7 @@ CODEX_ORCHESTRATOR_AGENTS: tuple[Path, ...] = tuple(
     Path(f".codex/agents/orchestrator{suffix}.toml")
     for suffix in ("", "-c1", "-c2", "-c3", "-c3-elevated", "-c4")
 )
+RELEASE_FLOW_SCRIPT = Path("scripts/dev-tools/Invoke-FullReleaseFlow.ps1")
 
 S9_HEADING = "## Step S9 — CI Green Gate"
 MERGE_ON_GREEN_HEADING = "## Per-Item Merge to Main (Merge-on-Green)"
@@ -98,6 +101,12 @@ REQUIRED_ONLY_PHRASES = (
     "required checks pass",
     "required checks were observed",
     "required checks on a non-epic pr",
+)
+RELEASE_FLOW_REQUIRED_PHRASES = ("required check",)
+RELEASE_FLOW_ALL_CHECKS_FRAGMENTS = (
+    "every check on the pull request head",
+    "every GitHub check on the pull request head",
+    "@('pr', 'checks', $PrNumber, '--json', 'bucket')",
 )
 
 
@@ -237,6 +246,29 @@ def test_surface_restates_no_required_only_population(relative_path: Path) -> No
 
     # Assert
     assert found == [], f"{relative_path.as_posix()} restates: {found}"
+
+
+def test_release_flow_waits_on_every_check_without_required_wording() -> None:
+    """The release flow polls every check and never describes required checks."""
+    # Arrange
+    text = collapse_whitespace(read_repo_text(RELEASE_FLOW_SCRIPT))
+
+    # Act
+    carries_required_flag = REQUIRED_FLAG in text
+    folded = text.lower()
+    required_wording = [
+        phrase for phrase in RELEASE_FLOW_REQUIRED_PHRASES if phrase in folded
+    ]
+    missing = missing_fragments(text, RELEASE_FLOW_ALL_CHECKS_FRAGMENTS)
+
+    # Assert
+    assert (
+        not carries_required_flag
+    ), f"{RELEASE_FLOW_SCRIPT.as_posix()} carries the --required flag"
+    assert (
+        required_wording == []
+    ), f"{RELEASE_FLOW_SCRIPT.as_posix()} describes required checks"
+    assert missing == [], f"{RELEASE_FLOW_SCRIPT.as_posix()} lacks fragments {missing}"
 
 
 def test_required_only_phrases_reports_wrapped_superseded_wording() -> None:

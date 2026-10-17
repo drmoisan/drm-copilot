@@ -41,6 +41,17 @@
 - [ ] [P2-T1] <Atomic task>
 - [ ] [P2-T2] <Atomic task>
 
+## Pre-Mortem
+
+<!-- One bullet per label; state how the next review or CI run could fail on that dimension and the mitigation, or "not applicable" with the reason. -->
+- Review checklists:
+- Coverage:
+- Mirror parity:
+- File size:
+- Test isolation:
+- CI-only behavior:
+- Evidence:
+
 ## Test Plan
 
 - Unit: ...

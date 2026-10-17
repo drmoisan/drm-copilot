@@ -221,6 +221,14 @@ def test_find_npm_auth_token_config_references_ignores_non_matching_text(
         pytest.param("$env:NPM_TOKEN = 'x'", [1], id="powershell-env"),
         pytest.param("npm_token: x", [1], id="lowercase-key"),
         pytest.param("NPM_TOKEN=", [1], id="empty-assignment-end-of-line"),
+        pytest.param(
+            "NPM_TOKEN+=${{ secrets.X }}", [1], id="bash-append-secret-expression"
+        ),
+        pytest.param("export NPM_TOKEN+=x", [1], id="shell-export-append"),
+        pytest.param("$env:NPM_TOKEN += 'x'", [1], id="powershell-env-append"),
+        pytest.param("env.NPM_TOKEN += x", [1], id="dot-prefixed-append-reported"),
+        pytest.param("MY-NPM_TOKEN+=x", [1], id="hyphen-prefixed-append-reported"),
+        pytest.param("(( NPM_TOKEN += 1 ))", [1], id="arithmetic-compound-append"),
     ],
 )
 def test_find_npm_token_assignments_detects_assignment(
@@ -248,10 +256,13 @@ def test_find_npm_token_assignments_detects_assignment(
         pytest.param("if: ${{ env.NPM_TOKEN == '' }}", id="equality-comparison"),
         pytest.param('[[ $NPM_TOKEN == "" ]]', id="shell-equality-test"),
         pytest.param("if: ${{ env.NPM_TOKEN != '' }}", id="inequality-comparison"),
+        pytest.param("NPM_TOKEN_V2+=x", id="longer-name-append"),
+        pytest.param("(( NPM_TOKEN++ ))", id="arithmetic-increment"),
+        pytest.param("NPM_TOKEN++=x", id="double-plus-equals-not-reported"),
     ],
 )
 def test_find_npm_token_assignments_ignores_non_matching_text(text: str) -> None:
-    """Text that reads but does not assign ``NPM_TOKEN`` is not reported."""
+    """Text with no assignment operator applied to ``NPM_TOKEN`` is not reported."""
     # Arrange: the parametrized non-matching text.
 
     # Act
@@ -274,11 +285,14 @@ def test_find_npm_token_assignments_ignores_non_matching_text(text: str) -> None
             [1],
             id="residual-bash-regex-match-reported",
         ),
-        pytest.param("NPM_TOKEN+=x", [], id="residual-bash-append-not-reported"),
+        pytest.param("NPM_TOKEN+=x", [1], id="bash-append-reported"),
         pytest.param(
             "NPM_TOKEN==value",
             [],
             id="accepted-double-equals-narrowing-not-reported",
+        ),
+        pytest.param(
+            "NPM_TOKEN+==x", [], id="accepted-append-double-equals-not-reported"
         ),
     ],
 )
@@ -287,12 +301,14 @@ def test_find_npm_token_assignments_pins_documented_residuals(
 ) -> None:
     """Pin the documented residual and narrowing behavior of the assignment finder.
 
-    The #845 spec non-goal accepts three residuals of the textual
-    ``NPM_TOKEN`` assignment rule: a single ``=`` shell test and a bash ``=~``
-    regex match are reported, and a bash ``+=`` append is not. The #845
-    backward-compatibility section accepts the ``==`` narrowing, so
-    ``NPM_TOKEN==value`` is not reported. These rows characterize existing
-    behavior so a change to either outcome is visible.
+    The #845 spec non-goal accepted a bash ``+=`` append as an unreported
+    residual of the textual ``NPM_TOKEN`` assignment rule. Issue #933 reversed
+    that non-goal, so ``NPM_TOKEN+=x`` is now reported. The other two #845
+    residuals remain reported: a single ``=`` shell test and a bash ``=~``
+    regex match. The #845 backward-compatibility section accepts the ``==``
+    narrowing, so ``NPM_TOKEN==value`` is not reported, and the same narrowing
+    leaves ``NPM_TOKEN+==x`` unreported. These rows pin the current behavior
+    so a change to any outcome is visible.
     """
     # Arrange: the parametrized text and its expected line numbers.
 

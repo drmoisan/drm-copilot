@@ -162,14 +162,26 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # as step 3 of the epic skill's `## Epic Integration Branch Lifecycle` section
 # and renumbered the former steps 3-5 to 4-6. Only the skill digest moved; the
 # agent digest is unchanged and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #928. That change replaced the epic skill's
+# SubagentStop transport and exit-code note (lines 279-281) and the agent's
+# matching paragraph (lines 133-135) to state that the defect was resolved by
+# epic #904 and issue #928. Both digests moved, and the pin stays live for
+# both entries.
+#
+# RE-BASELINED by issue #952. That change made the epic skill and the epic agent
+# record the integration-branch merge commit SHA only after the merge is
+# confirmed by polling and ancestry check, and granted the epic agent the two
+# parser invocations its skill prescribes. Both digests moved, and the pin
+# stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "d5e5e3b015c810fd12911e0ecffee38e12122bcdf667683778c7bd6cbdf6f538",
+        "e0691d2a05dfd97b886694262eb900293f38d9927fc2803f7e4574af856ce740",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "0b1a629aa81d78673e43c8f2bbd825d1377e0d6ae114e15e8bb65450c5d8b4f2",
+        "84b0555d0db146274fc5bfb9f06909c0b892a1f59522cc9feb0312d08721cf30",
     ),
 )
 

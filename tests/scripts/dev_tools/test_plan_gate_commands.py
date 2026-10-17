@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import pytest
+
 from scripts.dev_tools.plan_gate_commands import (
     PLAN_GATE_HEADING_RE,
     PLAN_GATE_TASK_RE,
     PlanCommand,
     extract_plan_commands,
+    split_plan_lines,
 )
 
 _TASK_LINE = "- [ ] [P1-T1] Do the thing"
@@ -295,3 +298,62 @@ def test_extract_plan_commands_attributes_continuation_bullet_to_task() -> None:
         ("P1-T2", 5),
     ]
     assert PLAN_GATE_TASK_RE.match("- [x] [P1-T2] Second task") is not None
+
+
+_SPLITTER_CASES = [
+    pytest.param("", [], id="empty"),
+    pytest.param("a\n", ["a"], id="trailing-lf"),
+    pytest.param("a\r\nb\rc\n\n", ["a", "b", "c", ""], id="mixed-terminators"),
+    pytest.param(
+        "a\fb\u2028c",
+        ["a\fb\u2028c"],
+        id="form-feed-and-line-separator",
+    ),
+]
+
+
+@pytest.mark.parametrize(("text", "expected"), _SPLITTER_CASES)
+def test_split_plan_lines_splits_only_on_cr_lf_terminators(
+    text: str, expected: list[str]
+) -> None:
+    """The shared splitter breaks on CR LF, LF, and CR, and on nothing else."""
+
+    # Arrange
+    document = text
+
+    # Act
+    lines = split_plan_lines(document)
+
+    # Assert
+    assert lines == expected
+
+
+_EXTRACTOR_SPLIT_CASES = [
+    pytest.param(
+        "### Phase 1 — Work\f\n- [ ] [P1-T1] Run `poetry run pytest tests/a.py`\n",
+        id="form-feed",
+    ),
+    pytest.param(
+        "### Phase 1 — Work\u2028\n"
+        "- [ ] [P1-T1] Run `poetry run pytest tests/a.py`\n",
+        id="line-separator",
+    ),
+]
+
+
+@pytest.mark.parametrize("text", _EXTRACTOR_SPLIT_CASES)
+def test_extract_plan_commands_line_numbers_ignore_form_feed_and_line_separator(
+    text: str,
+) -> None:
+    """A form feed or line separator does not add a physical line."""
+
+    # Arrange
+    document = text
+
+    # Act
+    commands = extract_plan_commands(document)
+
+    # Assert
+    assert len(commands) == 1
+    assert commands[0].task_id == "P1-T1"
+    assert commands[0].source_line == 2

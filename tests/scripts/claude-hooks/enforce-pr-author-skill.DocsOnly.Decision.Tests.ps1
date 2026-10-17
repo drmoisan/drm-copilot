@@ -145,5 +145,19 @@ Describe 'enforce-pr-author-skill.ps1 docs-only exemption decision (issue #901)'
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED'
         }
+
+        It 'denies a --repo override before the diff (issue #927)' {
+            # Arrange
+            $payload = ConvertTo-DocsOnlyPayload -Command 'gh pr create --title "Docs" --body-file artifacts/pr_body_1.md --repo o/r --base main'
+
+            # Act
+            $decision = Invoke-PrAuthorSkillDecision -ToolInputRaw $payload
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'ORCHESTRATOR_STATE_PREFLIGHT_FAILED*'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED'
+            Should -Invoke Invoke-PrAuthorDocsOnlyGitExe -Times 0 -Exactly
+        }
     }
 }

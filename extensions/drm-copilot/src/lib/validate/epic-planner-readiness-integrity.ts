@@ -9,6 +9,7 @@ import {
 import type { LaunchPathGateOptions } from "./epic-orchestrator-state-launch-binding";
 import {
   type ReadinessGitRepository,
+  repositoryRelativePath,
   validateCommittedFile,
   validatePlanningGitIntegrity,
 } from "./epic-planner-git-integrity";
@@ -27,30 +28,6 @@ export interface EpicReadinessContext {
 
 function join(root: string, relative: string): string {
   return `${toPosixPath(root).replace(/\/+$/, "")}/${relative.replace(/^\/+/, "")}`;
-}
-
-function relativePath(
-  value: unknown,
-  field: string,
-): { readonly path?: string; readonly errors: string[] } {
-  if (typeof value !== "string" || value.trim().length === 0) {
-    return {
-      errors: [`${field} must be a non-empty repository-relative path.`],
-    };
-  }
-  if (value.includes("\\")) {
-    return { errors: [`${field} must use forward slashes.`] };
-  }
-  const parts = value.split("/");
-  if (
-    value.startsWith("/") ||
-    /^[A-Za-z]:/.test(value) ||
-    parts.includes("..") ||
-    parts.includes(".")
-  ) {
-    return { errors: [`${field} must stay within the workspace root.`] };
-  }
-  return { path: parts.join("/"), errors: [] };
 }
 
 function readRequired(
@@ -106,12 +83,15 @@ function validateFeatureFiles(
   context: EpicReadinessContext,
 ): { readonly plan?: string; readonly errors: string[] } {
   const prefix = `Epic planner checkpoint features[${index}]`;
-  const folderResult = relativePath(
+  const folderResult = repositoryRelativePath(
     feature["feature_folder"],
     `${prefix}.feature_folder`,
   );
-  const planResult = relativePath(feature["plan_path"], `${prefix}.plan_path`);
-  const researchResult = relativePath(
+  const planResult = repositoryRelativePath(
+    feature["plan_path"],
+    `${prefix}.plan_path`,
+  );
+  const researchResult = repositoryRelativePath(
     feature["research_path"],
     `${prefix}.research_path`,
   );
@@ -168,7 +148,7 @@ function validateFeatureFiles(
   const evidenceValue = feature["preflight_evidence_path"];
   const evidencePaths: string[] = [];
   if (evidenceValue !== undefined) {
-    const evidence = relativePath(
+    const evidence = repositoryRelativePath(
       evidenceValue,
       `${prefix}.preflight_evidence_path`,
     );
@@ -293,7 +273,7 @@ export function validateEpicReadinessIntegrity(
   }
   const manifest = readRequired(context, manifestPath, "the epic manifest");
   errors.push(...manifest.errors);
-  const ignoredResult = relativePath(
+  const ignoredResult = repositoryRelativePath(
     state["kickoff_prompt_path"],
     "Epic planner checkpoint kickoff_prompt_path",
   );

@@ -9,6 +9,7 @@
     exits 2 through the shared envelope helper; an invalid envelope blocks with a payload anomaly
     reason. A hook dependency that fails to load blocks with exit 2 and the
     validate-prd-feature-output: prefix.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 
 [CmdletBinding()]
@@ -113,6 +114,7 @@ if ($MyInvocation.InvocationName -eq '.') { return }
 if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-prd-feature-output: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-prd-feature-output:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
-$result = Invoke-PrdFeatureOutputValidation
+try { $result = Invoke-PrdFeatureOutputValidation }
+catch { Exit-SubagentStopBlock -Message ('validate-prd-feature-output: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + 'This condition is not repairable by the subagent. Report it to the operator and halt.') }
 if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0

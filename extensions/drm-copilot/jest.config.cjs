@@ -382,6 +382,16 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #932: the document-level G10 rule module. This map carries no
+    // global key, so the new production file is gated by its own entry.
+    "./src/lib/validate/plan-gate-scratch.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/plan-gate-document.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #525 changed files. `gh-client.ts` gained the optional `repo`
     // selector, `repo-slug.ts` is the new target-repository resolver, and
     // `potential-to-issue-service-call.ts` resolves the slug and threads it

@@ -15,6 +15,7 @@ updates:
     ignore:
       - dependency-name: typescript
         update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/vscode"
     groups:
       npm-root:
         patterns:
@@ -34,6 +35,7 @@ updates:
     ignore:
       - dependency-name: typescript
         update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/vscode"
     groups:
       npm-extensions-drm-copilot:
         patterns:

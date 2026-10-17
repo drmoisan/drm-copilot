@@ -29,7 +29,9 @@ from tests.scripts.dev_tools.test_plan_gate_parity import (
 # docs/features/active/2026-08-23-plan-acceptance-gates-miss-unobservable-and-
 # ambient-state-gates-519/evidence/baseline/
 # plan-gate-preexisting-output.2026-08-24T00-00.md. Both are G1 findings; G1 is
-# the only Blocking rule that decides without the repository seam.
+# the only command-attributed Blocking rule that decides without the repository
+# seam. The document-level G10 rule (issue #932) also runs without it, and these
+# fixtures carry no SCRATCH definition, so G10 adds nothing here.
 _EXPECTED_BLOCKING_G1 = (
     "[P1-T1] --cov argument `scripts/dev_tools/foo.py` names a filesystem "
     "path; coverage.py accepts only directories or importable names. "
@@ -204,8 +206,10 @@ def test_blocking_channel_is_unchanged_without_context() -> None:
     blocking_g1 = evaluate_plan_gates(PARITY_G1).blocking
     blocking_g4 = evaluate_plan_gates(PARITY_G4).blocking
 
-    # Assert: G1 is the only Blocking rule that runs without the seam, and no
-    # new rule may leak onto the blocking channel beside it.
+    # Assert: G1 is the only command-attributed Blocking rule that runs without
+    # the seam, and no new rule may leak onto the blocking channel beside it.
+    # The document-level G10 rule also runs without the seam, but these
+    # fixtures carry no SCRATCH definition.
     assert blocking_g1 == [_EXPECTED_BLOCKING_G1]
     assert blocking_g4 == []
     for name, fixture in _SEAM_REQUIRING_FIXTURES:

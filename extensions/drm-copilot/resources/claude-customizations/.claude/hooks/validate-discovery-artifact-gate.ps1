@@ -37,6 +37,7 @@
     `Test-Json -SchemaFile` Draft 2020-12 support). Read-only validation gate that
     invokes NO external process: validation runs in-process through
     `.claude/lib/discovery-validation/DiscoveryValidation.psm1` (issue #475).
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 [CmdletBinding()]
 param()
@@ -248,6 +249,7 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('DISCOVE
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
-$result = Invoke-DiscoveryArtifactGateValidation
+try { $result = Invoke-DiscoveryArtifactGateValidation }
+catch { Exit-SubagentStopBlock -Message ('DISCOVERY_ARTIFACT_GATE_BLOCKED: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + 'This condition is not repairable by the subagent. Report it to the operator and halt.') }
 if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0

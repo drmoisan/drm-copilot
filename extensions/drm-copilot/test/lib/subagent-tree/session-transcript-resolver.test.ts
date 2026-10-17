@@ -1,15 +1,20 @@
 import { describe, expect, it, jest } from "@jest/globals";
+import * as path from "node:path";
 import { resolveSessionTranscriptPath } from "../../../src/lib/subagent-tree/session-transcript-resolver";
 import { InMemoryFileSystem } from "./in-memory-file-system";
 
-/** Absolute workspace root (mirrors a real Windows cwd). */
-const WORKSPACE_ROOT = "C:\\Users\\Dan\\repos\\drm-copilot";
+/** Uppercase drive letter of the Windows-style workspace root. */
+const DRIVE = "C";
+/** Path segments that follow the drive in the workspace root. */
+const WORKSPACE_SEGMENTS = ["Users", "fixtureuser", "repos", "drm-copilot"];
+/** Absolute workspace root, composed at runtime with Windows separators. */
+const WORKSPACE_ROOT = `${DRIVE}:${path.win32.sep}${WORKSPACE_SEGMENTS.join(path.win32.sep)}`;
 /** Fake resolved user-global Claude projects directory. */
 const PROJECTS_ROOT = "/claude-root/projects";
-/** Encoded directory name for WORKSPACE_ROOT (`:` and separators -> `-`). */
-const EXACT_DIR = "C--Users-Dan-repos-drm-copilot";
-/** A `-wt-` worktree sibling directory of EXACT_DIR. */
-const SIBLING_DIR = "C--Users-Dan-repos-drm-copilot-wt-2026-07-09T09-18";
+/** Encoded directory name for the workspace root (drive, double hyphen, hyphen-joined segments). */
+const EXACT_DIR = `${DRIVE}--${WORKSPACE_SEGMENTS.join("-")}`;
+/** A `-wt-` worktree sibling directory of the exact encoded directory. */
+const SIBLING_DIR = `${EXACT_DIR}-wt-2026-07-09T09-18`;
 /** A representative valid (UUIDv4-shaped) session id. */
 const VALID_ID = "ef8e8029-7c73-4346-80c7-5b0ad94b33fe";
 

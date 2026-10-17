@@ -22,6 +22,9 @@ BeforeAll {
     . (Join-Path $script:HookRoot 'hooks/enforce-orchestration-preimplementation-gate.ps1')
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
     Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
+    # Issue #953 (CR-21): the Codex-surface registration below mocks Get-WorktreeResolutionGitFileText at script
+    # scope; importing its module here keeps the suite independent of the suites that ran earlier in the process.
+    Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeResolution.psm1')
     Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-EpicScopeCheckpointText', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/EpicScopeResolution.psm1')
 
@@ -76,6 +79,60 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 epic-scope targets (i
         @{ Name = 'denies a wrapper-led git segment in epic scope'; Command = 'nohup git -C /synthetic-worktrees/epic-child add scripts/powershell/Sample.ps1'; FilePath = ''; Code = 'target-unresolvable' }
         @{ Name = 'denies a Write into a not-ready epic worktree'; Command = ''; FilePath = '/synthetic-worktrees/epic-child/scripts/powershell/Sample.ps1'; Code = 'target-not-ready' }
         @{ Name = 'denies a target outside the epic scope of the session root'; Command = 'git -C /synthetic-worktrees/epic-other add scripts/powershell/Sample.ps1'; FilePath = ''; Code = 'target-mixed' }
+        @{
+            Name     = 'denies a Write to a UNC path in epic scope (issue #937)'
+            Command  = ''
+            FilePath = '\\server\share\wt\scripts\powershell\Sample.ps1'
+            Code     = 'target-unresolvable'
+        }
+        @{
+            Name     = 'denies a Write to an extended-length path in epic scope (issue #937)'
+            Command  = ''
+            FilePath = '\\?\C:\wt\scripts\powershell\Sample.ps1'
+            Code     = 'target-unresolvable'
+        }
+        @{
+            Name     = 'denies a Write to a drive-relative path in epic scope (issue #937)'
+            Command  = ''
+            FilePath = 'C:wt\scripts\powershell\Sample.ps1'
+            Code     = 'target-unresolvable'
+        }
+        @{
+            Name     = 'denies a Write to a file: URI path in epic scope (issue #937 RI-4)'
+            Command  = ''
+            FilePath = 'file:///C:/wt/scripts/powershell/Sample.ps1'
+            Code     = 'target-unresolvable'
+        }
+        @{
+            Name     = 'denies a Write to a home-relative path in epic scope (issue #937 RI-4)'
+            Command  = ''
+            FilePath = '~/wt/scripts/powershell/Sample.ps1'
+            Code     = 'target-unresolvable'
+        }
+        @{
+            Name     = 'denies a Write to a root-relative backslash path in epic scope (issue #937 RI-5)'
+            Command  = ''
+            FilePath = '\wt\scripts\powershell\Sample.ps1'
+            Code     = 'target-unresolvable'
+        }
+        @{
+            Name     = 'denies a Write to an http URI path in epic scope (issue #937 RI-7)'
+            Command  = ''
+            FilePath = 'http://server/share/wt/scripts/powershell/Sample.ps1'
+            Code     = 'target-unresolvable'
+        }
+        @{
+            Name     = 'denies a Write to an smb URI path in epic scope (issue #937 RI-7)'
+            Command  = ''
+            FilePath = 'smb://server/share/wt/scripts/powershell/Sample.ps1'
+            Code     = 'target-unresolvable'
+        }
+        @{
+            Name     = 'denies a Write to a vscode-remote URI path in epic scope (issue #937 RI-7)'
+            Command  = ''
+            FilePath = 'vscode-remote://wsl/wt/scripts/powershell/Sample.ps1'
+            Code     = 'target-unresolvable'
+        }
     ) {
         # Arrange
         Set-TargetSeam -CheckpointText $script:ReadyEpicJson

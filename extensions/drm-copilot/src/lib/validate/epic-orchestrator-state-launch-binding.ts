@@ -292,9 +292,13 @@ export interface LaunchPathGateOptions {
   readonly requireLaunchPaths?: boolean;
 }
 
-/** Require durable preparation-child launch evidence for validated features. */
+/**
+ * Require durable preparation-child launch evidence for validated features.
+ * Non-object entries are skipped, so each error prefix uses the entry's
+ * original index in the checkpoint `features` array.
+ */
 export function validateEpicPlannerChildLaunchBindings(
-  features: ReadonlyArray<Record<string, unknown>>,
+  features: readonly unknown[],
   options: LaunchPathGateOptions = {},
 ): string[] {
   return validateLaunchBindings(features, {

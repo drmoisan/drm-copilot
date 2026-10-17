@@ -8,7 +8,10 @@
     under one of the two tracked research roots
     (docs/features/<feature>/research/ for feature-associated research, or
     docs/research/ for one-off research), matches the documented filename
-    convention, and the file exists on disk.
+    convention, and the file exists on disk. Feature-associated research under
+    docs/features/ must also carry a complete `## Pre-Mortem` section
+    (Test-PreMortemSection in premortem-section.ps1, issue #964); one-off
+    research under docs/research/ is exempt.
 
 .NOTES
     Reads the SubagentStop envelope JSON from stdin through the shared
@@ -18,14 +21,16 @@
     exits 2 through the shared envelope helper; an invalid envelope blocks
     with a payload anomaly reason. A hook dependency that fails to load
     blocks with exit 2 and the validate-task-researcher-output: prefix.
-    Filesystem reads go through Test-ResearchFile so tests can mock the
-    boundary without writing temporary files.
+    Filesystem reads go through Test-ResearchFile and Get-ResearchFileContent
+    so tests can mock the boundary without writing temporary files.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 
 [CmdletBinding()]
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'premortem-section.ps1') } catch { Add-HookDependencyFailure -Name 'premortem-section.ps1' -ErrorRecord $_ }
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -39,6 +44,16 @@ function Test-ResearchFile {
     )
 
     return [bool](Test-Path -LiteralPath $Path -PathType Leaf)
+}
+
+function Get-ResearchFileContent {
+    # File seam: returns the research file text, or $null when no file exists at the path.
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [string] $Path)
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }
+    return Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
 }
 
 function Get-ResearchPathFromOutput {
@@ -241,12 +256,11 @@ function Invoke-TaskResearcherOutputValidation {
     $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
     if (-not $envelope.IsValid) { return @{ Ok = $false; Message = "task-researcher hook: payload anomaly - $(Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)" } }
     $assistantMessage = [string]$envelope.AssistantText
-    $agentOutput = $assistantMessage
-    if ([string]::IsNullOrWhiteSpace($agentOutput)) {
+    if ([string]::IsNullOrWhiteSpace($assistantMessage)) {
         return @{ Ok = $false; Message = 'task-researcher hook: agent output is empty; researcher must return research-path before termination.' }
     }
 
-    $researchPath = Get-ResearchPathFromOutput -AgentOutput $agentOutput
+    $researchPath = Get-ResearchPathFromOutput -AgentOutput $assistantMessage
     if ($null -eq $researchPath) {
         return @{ Ok = $false; Message = 'task-researcher hook: agent output does not advertise a research-path. Researcher must report `research-path: <path>` pointing to docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off).' }
     }
@@ -263,16 +277,21 @@ function Invoke-TaskResearcherOutputValidation {
         return @{ Ok = $false; Message = "task-researcher hook: researcher advertised research-path '$researchPath' but no file exists at that location." }
     }
 
-    $feasibilityResult = Test-AutomationFeasibilitySection -ResearchFilePath $researchPath -AgentOutput $agentOutput
+    $feasibilityResult = Test-AutomationFeasibilitySection -ResearchFilePath $researchPath -AgentOutput $assistantMessage
     if (-not $feasibilityResult.Ok) {
         return @{ Ok = $false; Message = $feasibilityResult.Message }
     }
 
-    if (Test-Path -LiteralPath $researchPath -PathType Leaf) {
-        try { $researchContent = Get-Content -LiteralPath $researchPath -Raw -ErrorAction Stop } catch { return @{ Ok = $false; Message = "task-researcher hook: failed to read research-path '$researchPath': $($_.Exception.Message)" } }
+    try { $researchContent = Get-ResearchFileContent -Path $researchPath } catch { return @{ Ok = $false; Message = "task-researcher hook: failed to read research-path '$researchPath': $($_.Exception.Message)" } }
+    if ($null -ne $researchContent) {
         $numericEvidenceResult = Test-NumericDerivationEvidence -Content $researchContent
         if (-not $numericEvidenceResult.Ok) {
             return $numericEvidenceResult
+        }
+        # Issue #964: feature research carries a Pre-Mortem; one-off research under docs/research/ is exempt.
+        if ((($researchPath -replace '\\', '/') -replace '^\./', '').StartsWith('docs/features/', [System.StringComparison]::OrdinalIgnoreCase)) {
+            $preMortem = Test-PreMortemSection -Content ([string]$researchContent)
+            if (-not $preMortem.Ok) { return @{ Ok = $false; Message = "task-researcher hook: feature research '$researchPath' $($preMortem.Message)" } }
         }
     }
 
@@ -285,6 +304,7 @@ if ($MyInvocation.InvocationName -eq '.') {
 if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-task-researcher-output: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-task-researcher-output:'
 if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
-$result = Invoke-TaskResearcherOutputValidation
+try { $result = Invoke-TaskResearcherOutputValidation }
+catch { Exit-SubagentStopBlock -Message ('validate-task-researcher-output: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + 'This condition is not repairable by the subagent. Report it to the operator and halt.') }
 if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0

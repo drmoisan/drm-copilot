@@ -1,0 +1,6 @@
+# Cycle 2 final: six named tests that call the moved builders
+
+Timestamp: 2026-10-16T02-41
+Command: poetry run pytest tests/scripts/dev_tools/test_validate_orchestration_artifacts.py::test_validate_policy_audit_text_requires_checklist_lines tests/scripts/dev_tools/test_validate_orchestration_artifacts.py::test_validate_policy_audit_text_requires_numeric_coverage_values tests/scripts/dev_tools/test_validate_orchestration_artifacts_dispatch.py::test_main_returns_zero_for_valid_policy_audit tests/scripts/dev_tools/test_validate_orchestration_artifacts_dispatch.py::test_main_orchestrator_state_require_complete_returns_1_for_invalid tests/scripts/dev_tools/test_validate_orchestration_artifacts_dispatch.py::test_main_orchestrator_state_require_complete_returns_0_for_valid tests/scripts/dev_tools/test_validate_orchestration_artifacts_state_shape.py::test_validate_orchestrator_state_rejects_receipt_nonlist_artifact_paths -q -rs -p no:cacheprovider --no-cov
+EXIT_CODE: 0
+Output Summary: 6 passed in 0.30s (no SKIPPED line)

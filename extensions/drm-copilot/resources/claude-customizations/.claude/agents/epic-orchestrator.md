@@ -14,6 +14,8 @@ tools:
   - "Edit(artifacts/orchestration/**)"
   - "Bash(git *)"
   - "Bash(gh *)"
+  - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
+  - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
   - "mcp__drm-copilot__collect_pr_context"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
@@ -130,9 +132,9 @@ check inside `validate_epic_orchestrator_state_text` invoked by
 `.claude/hooks/validate-orchestrator-output.ps1`; parity is pinned by
 `tests/fixtures/epic_wave_barrier/`, and the Python validator remains the authority used through
 the `mcp__drm-copilot__validate_orchestration_artifacts` call. If the check reports a violation,
-report it to the operator and halt. Its runtime effect is likely to depend on the `SubagentStop`
-transport and exit-code defect recorded in
-`docs/features/potential/2026-08-21-subagentstop-validators-read-undocumented-envelope.md`.
+report it to the operator and halt. The `SubagentStop` transport and exit-code defect this check
+previously depended on was resolved by epic #904 and issue #928: a violation blocks the stop with
+exit 2 and a stderr reason.
 
 ## Checkpoint Persistence
 
@@ -161,6 +163,9 @@ Do not report completion until:
 
 1. Every feature in the manifest has `merge_status: "merged"` or `"worktree_removed"`.
 2. The final integration-to-`main` PR has merged (`epic_merge_pr.merge_commit_sha` recorded).
+   `epic_merge_pr.merge_commit_sha` is recorded only after the merge is confirmed by polling and
+   ancestry check, because under a merge queue on `main` `gh pr merge` can return before the
+   merge happens (issue #952).
 3. `docs/features/epics/<epic-slug>/epic-status.md` reflects the completed state.
 4. The epic checkpoint passes `validate_epic_orchestrator_state_text` with
    `require_complete=True` (no wave-barrier violations, all features merged/removed).

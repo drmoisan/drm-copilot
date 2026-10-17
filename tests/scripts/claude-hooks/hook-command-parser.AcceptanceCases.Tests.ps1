@@ -47,6 +47,8 @@ Describe 'hook-command-parser acceptance cases (issue #545)' {
         . (Join-Path $script:HookRoot 'enforce-epic-worktree-removal-gate.ps1')
         . (Join-Path $script:HookRoot 'enforce-parallel-worktree-removal-gate.ps1')
         . (Join-Path $script:HookRoot 'enforce-epic-merge-gate.ps1')
+        Mock Invoke-DocsOnlyGhExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
+        Mock Invoke-DocsOnlyGitExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
         . (Join-Path $script:HookRoot 'enforce-promotion-mcp-only.ps1')
         . (Join-Path $script:HookRoot 'enforce-orchestration-preimplementation-gate.ps1')
 

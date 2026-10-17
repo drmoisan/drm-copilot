@@ -1,4 +1,8 @@
-Timestamp: 2026-10-13T06-55
+Timestamp: 2026-10-13T11-17
+TIMESTAMP_RECONSTRUCTED: true
+TIMESTAMP_ORIGINAL: 2026-10-13T06-55
+TIMESTAMP_BOUNDS_UTC: 2026-10-13T10-51 .. 2026-10-13T11-17
+TIMESTAMP_DERIVATION: lower: MCP-run coverage XML mtime epoch 1791888677 (2026-10-13T10:51:17Z); upper: committer time of ff1b7cbd4 confirmed in the #927 pa-n3-commit-confirmation evidence; the original value matches America/New_York local time, not UTC
 Command: pwsh -NoProfile -NonInteractive -File SCRATCHPAD/i901-p1t4-read-coverage.ps1 -Root <WORKTREE_ROOT> (not run: script could not be written)
 EXIT_CODE: 1
 Output Summary: BLOCKED under rule 7. The Write tool call that creates SCRATCHPAD/i901-p1t4-read-coverage.ps1 was denied by a PreToolUse hook. The script did not run, so no coverage figure is recorded.

@@ -175,18 +175,22 @@ function Test-EpicStateProbeCalledFromIt {
 
 function Get-EpicStateProbeFinding {
     # One finding when a suite that complies by form F1 or the helper form for a named seam (PI-2)
-    # never calls the interception probe from inside an It; nothing otherwise.
+    # never calls the interception probe from inside an It; nothing otherwise. A caller that already
+    # holds the probe seams of the suite passes them as -Seam, which skips the scan (issue #935, PERF).
+    [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory)] [string] $RepoRoot,
         [Parameter(Mandatory)] [string] $RelativePath,
-        [scriptblock] $ReadSource
+        [scriptblock] $ReadSource,
+        [string[]] $Seam
     )
-    $seam = @(Get-EpicStateProbeSeam -RepoRoot $RepoRoot -RelativePath $RelativePath -ReadSource $ReadSource)
-    if ($seam.Count -eq 0) { return }
+    $probeSeam = @(if ($PSBoundParameters.ContainsKey('Seam')) { $Seam } else { Get-EpicStateProbeSeam -RepoRoot $RepoRoot -RelativePath $RelativePath -ReadSource $ReadSource })
+    if ($probeSeam.Count -eq 0) { return }
     $state = Get-EpicStateSuiteState -RepoRoot $RepoRoot -RelativePath $RelativePath -ReadSource $ReadSource
+    if ($null -ne $state.Error) { return $state.Error }
     if (-not (Test-EpicStateProbeCalledFromIt -Ast $state.Ast)) {
-        "${RelativePath}: complies for $($seam -join ', ') but never calls Invoke-EpicStateInterceptionProbe from inside an It"
+        "${RelativePath}: complies for $($probeSeam -join ', ') but never calls Invoke-EpicStateInterceptionProbe from inside an It"
     }
 }
 
@@ -204,4 +208,22 @@ function Get-EpicStateProcessSpawningReport {
     if ($null -eq $text) { return }
     $launched = @(Get-EpicStateProcessSpawningHook -SuiteText $text)
     if ($launched.Count -gt 0) { "REPORT: $RelativePath launches $($launched -join ', ')" }
+}
+
+function Get-EpicStateVariableHookLoadReport {
+    # One REPORT-VARIABLE-LOAD line for a suite with variable-built hook loads and nothing otherwise;
+    # report-only, never a finding (issue #935, #737 F-3).
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)] [string] $RepoRoot,
+        [Parameter(Mandatory)] [string] $RelativePath,
+        [scriptblock] $ReadSource
+    )
+    $reader = $ReadSource
+    if ($null -eq $reader) { $reader = Get-EpicStateSourceReader -RepoRoot $RepoRoot }
+    $text = & $reader $RelativePath
+    if ($null -eq $text) { return }
+    $loads = @(Get-EpicStateVariableHookLoad -SuiteText $text)
+    if ($loads.Count -gt 0) { "REPORT-VARIABLE-LOAD: $RelativePath loads $($loads -join ', ')" }
 }

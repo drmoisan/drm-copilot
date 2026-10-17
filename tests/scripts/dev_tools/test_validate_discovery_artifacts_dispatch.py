@@ -5,6 +5,9 @@ Purpose:
     console-script wrappers end-to-end (argv -> dispatch -> exit code ->
     stdout/stderr), using in-memory stubs for file I/O and schema loading per
     the repository's no-temp-file, no-network unit-test policy.
+
+    Shared builders (such as `build_read_text_stub`) live in
+    `tests/scripts/dev_tools/validate_orchestration_artifacts_test_support.py`.
 """
 
 from __future__ import annotations
@@ -17,6 +20,9 @@ import pytest
 
 import scripts.dev_tools.validate_discovery_artifacts as validator
 import scripts.dev_tools.validate_discovery_schema_artifacts as discovery_schema
+from tests.scripts.dev_tools.validate_orchestration_artifacts_test_support import (
+    build_read_text_stub,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -25,24 +31,11 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
 
-def _stub_read_text(text: str) -> Callable[[Path], str]:
-    """Return a typed `_read_text` replacement for monkeypatched CLI tests.
-
-    Mirrors the `build_read_text_stub` pattern in
-    `tests/scripts/dev_tools/test_validate_orchestration_artifacts.py`.
-    """
-
-    def _stub(_path: Path) -> str:
-        return text
-
-    return _stub
-
-
 def test_validate_from_args_returns_unsupported_artifact_type(
     monkeypatch: MonkeyPatch,
 ) -> None:
     """An unrecognized artifact_type should report a specific error."""
-    monkeypatch.setattr(validator, "_read_text", _stub_read_text("ignored"))
+    monkeypatch.setattr(validator, "_read_text", build_read_text_stub("ignored"))
 
     validate_from_args = cast(
         "Callable[[argparse.Namespace], list[str]]",
@@ -60,7 +53,7 @@ def test_main_profile_returns_zero_for_conforming_fixture(
 ) -> None:
     """A conforming profile fixture should exit 0 with a single stdout line."""
     monkeypatch.setattr(
-        validator, "_read_text", _stub_read_text("legacy_source_path: /x\n")
+        validator, "_read_text", build_read_text_stub("legacy_source_path: /x\n")
     )
 
     exit_code = validator.main(["profile", "ignored.yaml"])
@@ -74,7 +67,9 @@ def test_main_profile_returns_one_for_missing_legacy_source_path(
     monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """A profile fixture missing the required field should exit 1 with detail."""
-    monkeypatch.setattr(validator, "_read_text", _stub_read_text("other_key: value\n"))
+    monkeypatch.setattr(
+        validator, "_read_text", build_read_text_stub("other_key: value\n")
+    )
 
     exit_code = validator.main(["profile", "ignored.yaml"])
 
@@ -97,7 +92,7 @@ def test_main_feature_contract_returns_zero_for_conforming_fixture(
     monkeypatch.setattr(
         validator,
         "_read_text",
-        _stub_read_text(
+        build_read_text_stub(
             '{"$schema": "https://example.test/feature-contract.schema.json", '
             '"acceptance_criteria": []}'
         ),
@@ -123,7 +118,7 @@ def test_main_feature_contract_returns_one_for_non_conforming_fixture(
     monkeypatch.setattr(
         validator,
         "_read_text",
-        _stub_read_text(
+        build_read_text_stub(
             '{"$schema": "https://example.test/feature-contract.schema.json"}'
         ),
     )
@@ -144,7 +139,7 @@ def test_main_all_returns_zero_when_path_conforms_to_at_least_one_type(
 ) -> None:
     """`all` should exit 0 when the path conforms to at least one type."""
     monkeypatch.setattr(
-        validator, "_read_text", _stub_read_text("legacy_source_path: /x\n")
+        validator, "_read_text", build_read_text_stub("legacy_source_path: /x\n")
     )
 
     exit_code = validator.main(["all", "ignored.yaml"])
@@ -156,7 +151,7 @@ def test_main_all_returns_one_with_aggregated_errors_when_nothing_conforms(
     monkeypatch: MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """`all` should exit 1 with per-type-prefixed errors when nothing conforms."""
-    monkeypatch.setattr(validator, "_read_text", _stub_read_text(""))
+    monkeypatch.setattr(validator, "_read_text", build_read_text_stub(""))
 
     exit_code = validator.main(["all", "ignored.yaml"])
 

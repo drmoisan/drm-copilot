@@ -78,6 +78,7 @@ Describe "Invoke-FullReleaseFlow.ps1 - Invoke-FullReleaseFlowGuarded - additiona
                 if ($joined -match '^pr view ' -and $script:postPrScenario -eq 'EmptyPrNumber') { return @{ Output = @(''); ExitCode = 0 } }
                 if ($joined -match '^pr view ') { return @{ Output = @('291'); ExitCode = 0 } }
                 if ($joined -match '^pr checks ') { return @{ Output = @('[{"bucket":"pass"}]'); ExitCode = 0 } }
+                if ($joined -match '^api graphql ') { return @{ Output = @('{"state":"MERGED","mergedAt":"2026-07-03T17:30:00Z","isInMergeQueue":false,"mergeCommit":{"oid":"def456"},"autoMergeRequest":null}'); ExitCode = 0 } }
                 return @{ Output = @('ok'); ExitCode = 0 }
             }
             Mock -CommandName Invoke-ChildPowerShellScript -MockWith {

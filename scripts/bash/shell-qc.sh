@@ -34,6 +34,9 @@ Environment overrides:
   SHELL_QC_<TOOL>_BIN    Path to shfmt/shellcheck/bats/kcov; an empty or
                          nonexistent value is treated as missing.
   SHELL_QC_KCOV_OUT_DIR  Coverage output directory (default artifacts/pester/kcov).
+  SHELL_QC_MIN_LINE_COVERAGE
+                         Minimum line coverage for test --coverage, an integer
+                         percentage from 0 to 100 (default 85).
 EOF
 }
 

@@ -11,7 +11,7 @@ import {
   createMockProcess,
   getFreshChildProcessMock,
   getFreshFsMock,
-  prepareFreshModulesWithPosixPathResolve,
+  mockPosixPathResolve,
   setExecutablePresenceOnFsMock,
   type ExecutablePresence,
 } from "./runtime-test-helpers";
@@ -221,33 +221,34 @@ describe("repo automation dispatch", () => {
   });
 
   it("newPotentialEntry preserves C:/extension on POSIX hosts", async () => {
-    prepareFreshModulesWithPosixPathResolve();
-    setFreshExecutablePresence({ pwsh: true });
-    const freshChildProcessMock = getFreshChildProcessMock();
-    freshChildProcessMock.spawn.mockReturnValue(createMockProcess(0));
-    const freshModule = createFreshRepoAutomationService();
-    const service = freshModule.createRepoAutomationService({
-      extensionRoot: "C:/extension",
-      output: { appendLine: appendLineMock },
-    });
-
     try {
-      await service.newPotentialEntry({
-        workspaceRoot: "C:/workspace",
-        invocationId: "new_potential_entry",
-        shortName: "mcp-entry",
-      });
+      await jest.isolateModulesAsync(async () => {
+        mockPosixPathResolve();
+        setFreshExecutablePresence({ pwsh: true });
+        const freshChildProcessMock = getFreshChildProcessMock();
+        freshChildProcessMock.spawn.mockReturnValue(createMockProcess(0));
+        const freshModule = createFreshRepoAutomationService();
+        const service = freshModule.createRepoAutomationService({
+          extensionRoot: "C:/extension",
+          output: { appendLine: appendLineMock },
+        });
 
-      const [, args] = freshChildProcessMock.spawn.mock.calls[0] as [
-        string,
-        string[],
-      ];
-      expect(args[5]?.startsWith("C:/extension/resources/templates/")).toBe(
-        true,
-      );
+        await service.newPotentialEntry({
+          workspaceRoot: "C:/workspace",
+          invocationId: "new_potential_entry",
+          shortName: "mcp-entry",
+        });
+
+        const [, args] = freshChildProcessMock.spawn.mock.calls[0] as [
+          string,
+          string[],
+        ];
+        expect(args[5]?.startsWith("C:/extension/resources/templates/")).toBe(
+          true,
+        );
+      });
     } finally {
       jest.dontMock("node:path");
-      jest.resetModules();
     }
   });
 

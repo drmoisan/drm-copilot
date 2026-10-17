@@ -205,5 +205,57 @@ Describe 'Get-PrAuthorDocsOnlyExemption (issue #901)' {
             # Assert
             Should -Invoke Invoke-PrAuthorDocsOnlyGitExe -Times 1 -Exactly -ParameterFilter { $GitArgs[0] -eq 'rev-parse' -and $GitArgs[-1] -ceq 'refs/remotes/origin/main^{commit}' -and $WorktreeRoot -eq '/synthetic-worktrees/docs-only-901' }
         }
+
+        It 'denies diff output that is not NUL-terminated (issue #927)' {
+            # Arrange: the diff exits 0 but its output lacks the trailing NUL.
+            Mock Invoke-PrAuthorDocsOnlyGitExe -ParameterFilter { $GitArgs[0] -eq 'diff' } -MockWith { [pscustomobject]@{ ExitCode = 0; Output = 'docs/a.md' } }
+
+            # Act
+            $result = Invoke-DocsOnlyExemptionRow -Command $script:Create
+
+            # Assert
+            $result.Exempt | Should -BeFalse
+            $result.Reason | Should -BeLike 'DOCS_ONLY_EXEMPTION_DIFF_FAILED*'
+            $result.Reason | Should -Match 'NUL'
+        }
+
+        It 'denies a -R repository override before any git call (issue #927)' {
+            # Arrange
+            $command = 'gh pr create --base main -R o/r --title "Docs" --body-file artifacts/pr_body_1.md'
+
+            # Act
+            $result = Invoke-DocsOnlyExemptionRow -Command $command
+
+            # Assert
+            $result.Exempt | Should -BeFalse
+            $result.Reason | Should -BeLike 'DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED*'
+            Should -Invoke Invoke-PrAuthorDocsOnlyGitExe -Times 0 -Exactly
+        }
+
+        It 'denies a -dB shorthand cluster before any git call (issue #927)' {
+            # Arrange
+            $command = 'gh pr create --base main -dB other --title "Docs" --body-file artifacts/pr_body_1.md'
+
+            # Act
+            $result = Invoke-DocsOnlyExemptionRow -Command $command
+
+            # Assert
+            $result.Exempt | Should -BeFalse
+            $result.Reason | Should -BeLike 'DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED*'
+            Should -Invoke Invoke-PrAuthorDocsOnlyGitExe -Times 0 -Exactly
+        }
+
+        It 'names every rejected override form in the E3 reason (issue #927)' {
+            # Arrange: the create command carries no --base.
+
+            # Act
+            $result = Invoke-DocsOnlyExemptionRow -Command $script:CreateWithoutBase
+
+            # Assert
+            $result.Reason | Should -BeLike 'DOCS_ONLY_EXEMPTION_BASE_UNRESOLVED*'
+            foreach ($form in @('--base <branch>', '-B,', '-R,', '--repo,', 'shorthand cluster containing B or R', 'GH_REPO=')) {
+                $result.Reason.Contains($form) | Should -BeTrue -Because "the reason names $form"
+            }
+        }
     }
 }

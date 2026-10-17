@@ -4,8 +4,9 @@ Split out of `test_validate_orchestration_artifacts.py` (issue #275 remediation
 cycle 1, fix #4) because that file exceeded the repository's 500-line hard cap.
 This module contains the CLI-dispatch integration tests and the
 `epic-orchestrator-state` dispatch tests; the shared builder helpers are
-imported from the sibling module rather than duplicated, following the
-sibling-module convention already used by `test_validate_epic_orchestrator_state.py`.
+imported from
+`tests/scripts/dev_tools/validate_orchestration_artifacts_test_support.py`
+rather than duplicated.
 """
 
 from __future__ import annotations
@@ -15,7 +16,7 @@ import json
 from typing import TYPE_CHECKING, cast
 
 import scripts.dev_tools.validate_orchestration_artifacts as validator
-from tests.scripts.dev_tools.test_validate_orchestration_artifacts import (
+from tests.scripts.dev_tools.validate_orchestration_artifacts_test_support import (
     build_complete_large_orchestrator_state,
     build_read_text_stub,
     build_valid_orchestrator_state,

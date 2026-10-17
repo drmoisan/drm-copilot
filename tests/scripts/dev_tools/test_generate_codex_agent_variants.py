@@ -184,6 +184,35 @@ def test_generator_check_mode_reports_no_drift() -> None:
     assert main(["--check"]) == 0
 
 
+def test_generator_write_mode_writes_manifests_untranslated_with_lf(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Write mode routes every output, manifests included, through the LF helper.
+
+    The write helper is replaced by an in-memory recorder, so the run reads the
+    committed files and writes nothing to disk.
+    """
+
+    # Arrange
+    written: dict[str, str] = {}
+
+    def record_write(path: Path, text: str) -> None:
+        """Record one write instead of touching the filesystem."""
+
+        written[str(path).replace("\\", "/")] = text
+
+    monkeypatch.setattr(generator, "_write_text_preserving_newlines", record_write)
+
+    # Act
+    exit_code = main([])
+
+    # Assert
+    manifest_writes = [path for path in written if "/pack-manifests/" in path]
+    assert exit_code == 0, "write mode reported synchronization errors"
+    assert len(manifest_writes) == len(PACK_FAMILIES), f"manifests: {manifest_writes}"
+    assert all("\r\n" not in text for text in written.values()), "CRLF in output"
+
+
 def test_generator_main_reports_each_synchronization_error(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:

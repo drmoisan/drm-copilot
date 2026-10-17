@@ -316,6 +316,7 @@ const GATE_MODULE_PATHS = [
   path.join(__dirname, "../../../src/lib/validate/plan-gate-rules.ts"),
   path.join(__dirname, "../../../src/lib/validate/plan-gate-discrimination.ts"),
   path.join(__dirname, "../../../src/lib/validate/plan-gate-observability.ts"),
+  path.join(__dirname, "../../../src/lib/validate/plan-gate-scratch.ts"),
 ];
 
 describe("plan acceptance-gate cross-runtime parity", () => {

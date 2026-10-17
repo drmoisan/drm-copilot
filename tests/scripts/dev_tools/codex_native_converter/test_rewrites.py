@@ -174,6 +174,8 @@ def test_rewrite_supported_reference_expands_atomic_planner_preflight_contract()
     assert "`PREFLIGHT: REVISIONS REQUIRED`" in rewritten_text
     assert "Treat executor preflight findings as binding plan defects" in rewritten_text
     assert "Reuse the same target plan file" in rewritten_text
+    assert "a plan returns to the planner at most once" in rewritten_text
+    assert "re-run preflight" not in rewritten_text
     assert "stop and report blocked state" in rewritten_text
     assert "validate_orchestration_artifacts` MCP tool" in rewritten_text
     assert any(

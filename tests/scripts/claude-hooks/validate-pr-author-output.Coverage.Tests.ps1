@@ -15,15 +15,7 @@ Describe 'validate-pr-author-output entry point (stdin envelope, issue #905)' {
         $script:StdinHook = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.claude/hooks/validate-pr-author-output.ps1'))
         $script:NoPrMessage = 'I generated a PR body but did not open a pull request.'
 
-        function New-SubagentStopEnvelopeJson {
-            # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds and returns envelope JSON text only; it changes no system state.')]
-            param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
-            $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'pr-author'; stop_hook_active = [bool]$StopHookActive }
-            if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }
-            if ($PSBoundParameters.ContainsKey('OutputField')) { $envelope['output'] = $OutputField }
-            return ($envelope | ConvertTo-Json -Compress)
-        }
+        . (Join-Path $PSScriptRoot 'SubagentStopEnvelope.Helpers.ps1')
 
         function Invoke-PrAuthorOutputStdinEntry {
             # Drives the hook through the & route with stdin and stderr redirected; both are restored in finally.
@@ -51,7 +43,7 @@ Describe 'validate-pr-author-output entry point (stdin envelope, issue #905)' {
 
     It 'exits 2 with PR_AUTHOR_OUTPUT_NO_PR on stderr when last_assistant_message lacks a PR reference' -Tag 'E3-Entry' {
         # Arrange
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage $script:NoPrMessage
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'pr-author' -AssistantMessage $script:NoPrMessage
         # Act
         $result = Invoke-PrAuthorOutputStdinEntry -Stdin $stdin
         # Assert
@@ -62,7 +54,7 @@ Describe 'validate-pr-author-output entry point (stdin envelope, issue #905)' {
 
     It 'exits 0 when last_assistant_message reports a pull request URL' -Tag 'E3-Entry' {
         # Arrange
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage 'Created https://github.com/owner/repo/pull/905'
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'pr-author' -AssistantMessage 'Created https://github.com/owner/repo/pull/905'
         # Act
         $result = Invoke-PrAuthorOutputStdinEntry -Stdin $stdin
         # Assert
@@ -73,7 +65,7 @@ Describe 'validate-pr-author-output entry point (stdin envelope, issue #905)' {
 
     It 'blocks when the PR reference is supplied only in an output field or through CLAUDE_HOOK_INPUT' -Tag 'E3-Entry' {
         # Arrange: the PR URL appears only in an output key and in the environment variable.
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage $script:NoPrMessage -OutputField 'Created https://github.com/owner/repo/pull/905'
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'pr-author' -AssistantMessage $script:NoPrMessage -OutputField 'Created https://github.com/owner/repo/pull/905'
         $priorInput = $env:CLAUDE_HOOK_INPUT
         try {
             $env:CLAUDE_HOOK_INPUT = '{"output":"Created https://github.com/owner/repo/pull/905"}'
@@ -89,7 +81,7 @@ Describe 'validate-pr-author-output entry point (stdin envelope, issue #905)' {
 
     It 'exits 2 with PR_AUTHOR_OUTPUT_EMPTY when last_assistant_message is an empty string' -Tag 'E3-Entry' {
         # Arrange
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage ''
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'pr-author' -AssistantMessage ''
         # Act
         $result = Invoke-PrAuthorOutputStdinEntry -Stdin $stdin
         # Assert
@@ -120,7 +112,7 @@ Describe 'validate-pr-author-output entry point (stdin envelope, issue #905)' {
 
     It 'exits 2 with a payload anomaly reason when last_assistant_message is absent' -Tag 'E3-Entry' {
         # Arrange and act: an envelope without last_assistant_message.
-        $result = Invoke-PrAuthorOutputStdinEntry -Stdin (New-SubagentStopEnvelopeJson -OmitAssistantMessage)
+        $result = Invoke-PrAuthorOutputStdinEntry -Stdin (ConvertTo-SubagentStopEnvelopeJson -AgentType 'pr-author' -OmitAssistantMessage)
         # Assert
         $result.Thrown | Should -BeNullOrEmpty
         $result.ExitCode | Should -Be 2
@@ -130,7 +122,7 @@ Describe 'validate-pr-author-output entry point (stdin envelope, issue #905)' {
 
     It 'keeps validating when stop_hook_active is true' -Tag 'E3-Entry' {
         # Arrange: a re-entry envelope whose message still lacks a PR reference.
-        $stdin = New-SubagentStopEnvelopeJson -AssistantMessage $script:NoPrMessage -StopHookActive
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'pr-author' -AssistantMessage $script:NoPrMessage -StopHookActive
         # Act
         $result = Invoke-PrAuthorOutputStdinEntry -Stdin $stdin
         # Assert

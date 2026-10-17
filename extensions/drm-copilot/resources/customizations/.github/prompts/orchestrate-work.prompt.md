@@ -27,7 +27,7 @@ Coordinate the user request from intake to completion using the correct path bas
      1) Scope/create potential entry and promote with `--work-mode minor-audit`
    2) Create branch and active feature folder with `--work-mode minor-audit`, then verify `issue.md` contains an explicit `## Acceptance Criteria` section
      3) Delegate plan creation to `atomic_planner` with directive `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`
-     4) Require `atomic_executor` preflight until `PREFLIGHT: ALL CLEAR`
+     4) Require single-pass `atomic_executor` preflight ending in `PREFLIGHT: ALL CLEAR` (at most one return to the planner)
      5) Delegate to `atomic_executor` to execute **Phase 0 only**
      6) Branch behavior:
         - explicit initial manual bootstrap opt-in: save state and stop for manual resume
@@ -40,7 +40,7 @@ Coordinate the user request from intake to completion using the correct path bas
      2) Promote to GitHub issue and capture issue metadata
      3) Create branch and active feature folder
      4) Delegate research + spec/story completion
-   5) Delegate plan creation to `atomic_planner` (and require validation-only preflight through `atomic_executor` until `PREFLIGHT: ALL CLEAR`)
+   5) Delegate plan creation to `atomic_planner` (and require single-pass validation-only preflight through `atomic_executor` ending in `PREFLIGHT: ALL CLEAR`)
    6) After all-clear, delegate implementation + QA directly to `atomic_executor`
    7) Delegate post-implementation feature review
 

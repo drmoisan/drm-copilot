@@ -7,14 +7,14 @@ paths:
   - "docs/features/**/plan.*.md"
   - "docs/features/**/remediation-plan.*.md"
   - ".claude/skills/atomic-plan-contract/SKILL.md"
-description: Acceptance-gate rules G1 through G6 applied to the shell commands an atomic plan states as acceptance conditions.
+description: Acceptance-gate rules G1 through G13 for atomic plans. G1 through G9 judge the shell commands a plan states as acceptance conditions; the document-level rules G10 through G13 report a SCRATCH definition that is not namespaced by issue number, a line-number citation, a commit-SHA citation, and a plan above the size guideline without a size justification.
 ---
 
-# Atomic-Plan Acceptance Gates (G1 through G6)
+# Atomic-Plan Acceptance Gates (G1 through G13)
 
-This rule governs the acceptance-gate rules the plan validator applies to the shell commands an atomic plan states as acceptance conditions. It exists because a plan can state an acceptance condition that cannot fail: a coverage argument that collects no data, or a search for a literal that returns zero matches whatever the executor does. Such a condition reads as a verification step and gates nothing (issue #486).
+This rule governs the acceptance-gate rules the plan validator applies to an atomic plan: G1 through G9 judge the shell commands the plan states as acceptance conditions, and G10 through G13 judge the whole plan document. It exists because a plan can state an acceptance condition that cannot fail: a coverage argument that collects no data, or a search for a literal that returns zero matches whatever the executor does. Such a condition reads as a verification step and gates nothing (issue #486).
 
-The rules are enforced by `scripts/dev_tools/plan_gate_discrimination.py` and by the TypeScript parity port at `extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts` with its shared-predicate module `plan-gate-rules.ts`, both fed by the command extractor (`scripts/dev_tools/plan_gate_commands.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts`). Enforcement is validator logic plus this prose file. No JSON Schema is authored, imported, or read.
+The rules are enforced by `scripts/dev_tools/plan_gate_discrimination.py` and by the TypeScript parity port at `extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts` with its shared-predicate module `plan-gate-rules.ts`. G1 through G9 are fed by the command extractor (`scripts/dev_tools/plan_gate_commands.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts`); G10 reads the whole document through `scripts/dev_tools/plan_gate_scratch.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts`, and G11 through G13 read it through `scripts/dev_tools/plan_gate_document.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-document.ts`. Enforcement is validator logic plus this prose file. No JSON Schema is authored, imported, or read.
 
 ## Scope of Invocation — no grandfathering or exemption mechanism
 
@@ -26,7 +26,7 @@ The consequence is that adding a rule to this set is cheap in migration cost and
 
 ## Rule Table
 
-Every finding string begins with the square-bracketed `P#-T#` identifier of the task the command is attributed to, and renders the offending value or literal between backticks.
+Every finding string begins with the square-bracketed `P#-T#` identifier of the task the command is attributed to, and renders the offending value or literal between backticks. The G10 exception: a G10 finding begins with `Line N: ` instead, because a SCRATCH definition sits outside any task window; the prefix matches the structural-error prefix in the same error channel, and the offending logical line is still rendered between backticks. G11, G12, and G13 findings use the same `Line N: ` prefix for the same reason; G13 always reports `Line 1: ` because it judges the document as a whole.
 
 | Rule | Condition | Shipped severity |
 | --- | --- | --- |
@@ -40,14 +40,18 @@ Every finding string begins with the square-bracketed `P#-T#` identifier of the 
 | **G8** | A `git diff` invocation carrying no non-flag ref operand and neither `--cached` nor `--staged`. It compares the worktree against the index, which is ambient state: the comparison passes vacuously once the change is committed. Exonerated when the attributed task text carries a second `git diff` or a `git status` span. | **Warning** |
 | **G8b** | A `git diff` invocation carrying a non-flag ref operand together with `--name-only` or `--name-status`, whose attributed task text carries neither a `git add` span nor a `git status --porcelain` span. A name-listing diff enumerates tracked changes only, so a path the plan creates is invisible to it. | **Warning** |
 | **G9** | A command carrying a `--cov` token, carrying no token beginning `--cov-report=term` and no token beginning `--cov-fail-under`, whose project `addopts` value also carries no `--cov-report=term`. No coverage table is printed, so a coverage number the acceptance condition demands can never be read. | **Warning** |
+| **G10** | An unfenced logical line of the plan document (a physical line plus its indented continuation lines) that matches the SCRATCH definition predicate, and whose text after the first definition match carries neither an `issue-<issue-num>` nor an `issue-<digits>` namespace. One finding per logical line, reported against its first physical line. | **Blocking** |
+| **G11** | A line-number citation in unfenced text, in any of three forms: the prose form `\b[Ll]ines?[ \t]+[0-9]+` evaluated with inline code spans masked; the path form `[A-Za-z0-9_./-]+\.[A-Za-z][A-Za-z0-9]{0,5}:[0-9]+` evaluated including inline code, skipped when the enclosing whitespace-delimited token contains `://`; and the anchor form `#L[0-9]+`. A line position moves whenever `main` moves. One finding per match. | **Blocking** |
+| **G12** | A commit-SHA citation in unfenced text, including inline code: a bounded run `\b[0-9a-f]{7,40}\b` that holds at least one digit and at least one letter, is not preceded by `-`, `_`, or `.`, and is not followed by `-` or `_`. The adjacency conditions are checked in code, not by lookbehind. One finding per match. | **Blocking** |
+| **G13** | A plan whose unfenced canonical task lines exceed `PLAN_TASK_GUIDELINE` (40) or whose physical lines exceed `PLAN_LINE_GUIDELINE` (400), with no `## Size Justification` heading followed by at least one non-blank, non-heading line before the next heading of level one or two. One finding per document. | **Blocking** |
 
-G1 through G9 are the complete shipped set. G1 through G6 were added by issue #486 and G7 through G9 by issue #519; the parenthetical in this file's title names the original set only.
+G1 through G13 are the complete shipped set. G1 through G6 were added by issue #486, G7 through G9 by issue #519, G10 by issue #932, and G11 through G13 by issue #964.
 
 G1 through G4 form a cascade over each `--cov` value: the value is decided once, so a value G1 rejects is never additionally reported by G2 or G3. G4 is evaluated independently of the cascade because the ambiguous form is a defect whatever the value resolves to. G6 is evaluated before G5, because cross-line presence falsifies G5's tree-absence claim.
 
 G8b is a distinct rule from G8 and not a sub-case of it: G8 reports a diff with no ref operand, G8b reports one that has a ref operand but cannot observe an untracked path. A single invocation can satisfy only one of the two, because the presence of a ref operand decides between them.
 
-G1 and G4 are context-free and run on every invocation. G2, G3, G5, and G6 require a repository seam; with no context supplied they do not run, and the Blocking list is byte-identical to the pre-change output for the same text. G7, G8, and G8b are likewise context-free and run on every invocation. G9 requires the repository seam, because it reads the project `addopts` value through it, so with no context supplied G9 does not run. All four of the rules added by issue #519 ship in the Warning channel, so none of them can alter the Blocking list at all.
+G1 and G4 are context-free and run on every invocation. G2, G3, G5, and G6 require a repository seam; with no context supplied they do not run. G7, G8, and G8b are likewise context-free and run on every invocation. G9 requires the repository seam, because it reads the project `addopts` value through it, so with no context supplied G9 does not run. All four of the rules added by issue #519 ship in the Warning channel, so none of them can alter the Blocking list at all. G10 is context-free and document-level: it reads the whole plan text, including the preamble and terms lists the command extractor drops, runs on every invocation, and can add Blocking findings without a context. G11, G12, and G13 are context-free and document-level in the same way, skip fenced code blocks with the command extractor's fence pattern, split physical lines on CR LF, LF, and CR only, use no lookbehind, and run after G10 on every invocation.
 
 ### Attribution window
 
@@ -135,6 +139,73 @@ G9's finding count of 8 satisfies the first conjunct. It fails the second: 4 of 
 The remaining 4 findings are true positives, and each is the exact defect the rule was written for: the acceptance condition demands a numeric coverage percentage, the command supplies no terminal reporter, the project `addopts` supplies only an LCOV reporter, and the number the acceptance demands is therefore never printed.
 
 Counts, and every one of the 4 false positives named by plan path, task identifier, offending span, and the reason its acceptance condition is falsifiable: `docs/features/completed/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`.
+
+### G10 — ships as Blocking by operator-approved scope and the pre-declared rule
+
+G10 enforces the child-unique scratch location rule introduced by issue #900: a plan that uses scratch files points the `SCRATCH` token at `<session scratchpad>/issue-<issue-num>/`, so concurrent child runs in one session do not collide. Unlike G1 through G9, it judges document prose rather than task-attributed commands, because a SCRATCH definition is written in a plan preamble or terms list that the command extractor drops.
+
+The detection contract has two steps, and both patterns use no lookbehind so the Python and JavaScript dialects agree. Step 1 is the definition predicate; step 2 is the namespace that accepts the line when it appears in the text after the first definition match:
+
+```text
+(?:^|[^A-Za-z0-9_<>$/.-])`?SCRATCH`?(?:\*\*)?[ \t]*(?:means\b|:=|=|:|is (?:the|a|an)\b|resolves to\b|abbreviates\b|denotes\b|refers to\b|stands for\b)
+issue-(?:<issue-num>|[0-9]+)
+```
+
+Lines inside fenced code blocks are skipped, and a logical line is reported once however many definition matches it contains.
+
+A continuation line is non-blank, begins with whitespace, and is not a fence line, so a heading or task line written at column 0 ends the logical line, and an indented heading or task line is absorbed into it. Both runtimes split the document into physical lines on the CR LF, LF, and CR terminators only; a form feed, a vertical tab, the information separators, NEL, and the Unicode line and paragraph separators do not end a physical line. Both runtimes share one explicit whitespace class for the blank-line test, the continuation test, and whitespace normalization, declared once per runtime as `PLAN_WHITESPACE_CLASS` in the command extractor module, with an identical pattern string in both: tab, line feed, vertical tab, form feed, carriage return, space, the Unicode space separators, and the Unicode line and paragraph separators. NEL, the information separators, and the byte-order mark are outside that class, so in both runtimes a line that begins with one of them ends the logical line, and the character is kept verbatim in the normalized text. G6 uses the same class for its single-line test, its sliding-window join, and the split of the search literal into words, so a tracked file that contains NEL, an information separator, or the byte-order mark produces the same G6 result in both runtimes; the plan-quotation exoneration, which reads the plan text rather than a tracked file, keeps each runtime's native class. The fence test keeps the command extractor's fence pattern, whose leading whitespace is each runtime's native class, so a fence line that begins with NEL, an information separator, or the byte-order mark can be recognized differently by the two runtimes, for G1 through G9 as well as for G10.
+
+The severity was fixed by the same two-conjunct decision rule used for G5 through G9, written and committed before the measurement was taken: Blocking if and only if the total G10 finding count is greater than zero **and** the recorded false-positive count is zero; otherwise the measurement indicates Warning. The pre-declared false-positive definition is a flagged logical line that is not a SCRATCH definition, or that defines SCRATCH in the canonical issue-namespaced form.
+
+The measurement is recorded in `docs/features/archive/2026-10-15-plan-validator-accepts-bare-scratch-paths-932/evidence/qa-gates/g10-corpus-measurement.2026-10-16T01-21.md`. It scanned 493 plan and remediation-plan files under `docs/` at the merge base and produced 17 findings, all 17 true positives and 0 false positives, so both conjuncts hold and the rule yields Blocking.
+
+G10 also ships Blocking by operator-approved scope for issue #932. The measurement alone is a weaker basis than the G7 through G9 precedent, because the research for issue #932 observed the committed plan corpus, including the definition forms the predicate targets, before the measurement was taken. The severity is a single constant in each runtime (`G10_SEVERITY`), and a parity test asserts the two constants agree.
+
+### Known false-negative classes — G10
+
+G10 does not report the following, and each is a stated limitation rather than a deferred promise:
+
+- **Wrong issue number.** A namespaced definition whose issue number differs from the plan's own issue is accepted, because the predicate checks the namespace shape, not its value.
+- **`SCRATCHPAD`-family tokens.** `SCRATCHPAD`, `<SCRATCHPAD>`, and `<SCRATCH>` tokens, and root paths written under them, are excluded by the preceding-character class and the token boundary.
+- **Definition by reference.** A plan that defines SCRATCH by pointing at another plan's definition carries no definition text for the predicate to match.
+- **Fenced definitions.** A definition placed inside a fenced code block is skipped, which is also what lets plans and specifications quote rejected forms as examples.
+- **Any issue token after the definition.** A logical line is accepted when an `issue-<digits>` or `issue-<issue-num>` token appears anywhere in its text after the first definition match, including a cross-reference that is not the scratch location, such as `(see issue-900 for context)`. Step 2 checks the namespace shape anywhere in that text, not inside a path segment.
+
+One false-positive class is possible and recorded: the colon connector matches prose in which the word SCRATCH is directly followed by a colon that introduces something other than a definition, as in the line below. The measured corpus contains no instance.
+
+```text
+Each artifact names the token SCRATCH: it never records a host path.
+```
+
+### G11 — ships as Blocking by operator-approved scope
+
+G11 enforces the design-level plan contract introduced by issue #964: a plan anchors on symbols, headings, and test names, never on line positions, because a line position moves whenever `main` moves and every such citation becomes a preflight defect. The severity was set by operator-approved scope for issue #964, following the G10 precedent, and not by a pre-declared measurement. The severity is a single constant in each runtime (`G11_SEVERITY`), and a parity test asserts the two constants agree.
+
+The finding message is ``Line N: line-number citation `<match>` anchors on a position that moves when main moves; cite the symbol, heading, or test name instead.`` A G11 finding is a trivial preflight defect: the preflight executor replaces the citation in place and records the fix, so the Blocking channel does not cost a return to the planner.
+
+### G12 — ships as Blocking by operator-approved scope
+
+G12 enforces the same contract for commit identifiers: a commit SHA names a state that goes stale when `main` moves. The severity was set by operator-approved scope for issue #964. The digit-and-letter condition excludes decimal run and ruleset identifiers and all-letter words; the adjacency conditions exclude UUID segments and agent or worktree suffixes joined by `-` or `_`; and the bounded run excludes SHA-256 digests, because a 64-character run has no word boundary at 40 characters, so a digest literal can remain where it is the actual assertion. The severity is a single constant in each runtime (`G12_SEVERITY`), and a parity test asserts the two constants agree.
+
+The finding message is ``Line N: commit-SHA citation `<match>` names a commit that goes stale when main moves; cite the branch, ref name, or merge base derivation instead.``
+
+### G13 — ships as Blocking because its exoneration is author-controlled
+
+G13 reports a plan above 40 canonical task lines or 400 physical lines that carries no `## Size Justification` section with content. The guideline numbers were derived from the issue #962 item, whose specification maps to an estimated 35 to 45 design-level tasks in 300 to 400 lines. G13 ships Blocking because the author controls its exoneration: a plan that needs more states why in one paragraph, which costs less than a preflight round. A justification section that holds only blank lines or headings does not exonerate. The severity is a single constant in each runtime (`G13_SEVERITY`), and a parity test asserts the two constants agree.
+
+The finding message is ``Line 1: plan size `<T> tasks, <L> lines` exceeds the guideline of 40 tasks or 400 lines and carries no `## Size Justification` section; split the item or state why the size is necessary.``
+
+### Known false-positive classes — G11 and G12
+
+G11 and G12 do not suppress the following; each is a documented false-positive class rather than a deferred fix:
+
+- **G11, prose that refers to a line of command output.** A sentence such as "line 1 of the output" is reported, because the prose form cannot tell a file position from an output position.
+- **G11, a quoted validator message outside backticks.** A validator prefix such as `Line 5:` written as plain prose matches the prose form; the same text inside an inline code span is masked and not reported.
+- **G11, an inline code span opened with two or more backticks.** The mask pairs single backticks, so a span such as a doubled-backtick quotation of a finding message that itself contains backticks is masked only in part, and a line reference inside it can match the prose form.
+- **G11, a host and port written without a URL scheme.** A token such as `api.github.com:443` matches the path form, because only a token containing `://` is skipped and the path form is matched inside inline code spans as well as in prose; the same host and port written as a URL with a scheme, such as `https://api.github.com:443`, is not reported.
+- **G12, a hexadecimal identifier that is not a commit.** A run of seven or more hexadecimal characters with a digit and a letter that is not joined by `-` or `_` is reported. The measured instances are synthetic fixture identifiers written into test-scenario task text and git object identifiers that are not commits, such as blob hashes recorded as parity evidence; a bare hexadecimal color is the same class.
+
+The corpus measurement informed the false-positive class list and did not decide the channel. It is recorded in `docs/features/archive/2026-10-16-planning-process-churn-964/evidence/other/g11-g13-corpus-measurement.2026-10-16T23-46.md`. It scanned 615 committed plan and remediation-plan files under `docs/` and counted 13190 G11 findings in 350 files, 1681 G12 findings in 218 files, and 280 G13 findings. Those counts describe plans written before the rules existed; the validator runs only against the plan it is pointed at, so they do not enter any gate.
 
 ## The Write-Mode Register
 
@@ -239,19 +310,23 @@ The following are prohibited in gate messages:
 
 The reason is byte-identity across the two runtimes. Python's `repr` selects its quote character based on the value's contents, switching to double quotes when the value contains a single quote, while the TypeScript `pythonRepr` helper used elsewhere in this repository always single-quotes. A value carrying an apostrophe would therefore render differently in the two runtimes, and the parity requirement would fail on exactly the class of value a maintainer is most likely to encounter in a path or a prose literal. Backtick delimiting has no content-dependent behaviour and needs no helper.
 
-The prohibition is enforced by tests, not only by prose: a parity test asserts the Python gate module contains neither `!r` nor `repr(`, a companion test asserts no `pythonRepr(` call appears in any of the three TypeScript gate modules, and the parity fixture set includes an apostrophe-bearing `--cov` value and an apostrophe-bearing search literal whose expected strings are asserted identically in both runtimes.
+The prohibition is enforced by tests, not only by prose: a parity test asserts the Python gate module contains neither `!r` nor `repr(`, a companion test asserts no `pythonRepr(` call appears in any of the TypeScript gate modules, and the parity fixture set includes an apostrophe-bearing `--cov` value and an apostrophe-bearing search literal whose expected strings are asserted identically in both runtimes.
 
 ## Authoring Guidance for Plan Authors
 
 - Express coverage targets as importable dotted names (`--cov=scripts.dev_tools.module`), never as filesystem paths, and always with the `=` form.
 - Where an acceptance condition is a search, assert a short, single-line, non-interpolated token that the plan quotes verbatim.
 - Prefer a named test over a phrase search whenever a test can carry the assertion.
+- Cite a symbol, a heading, or a test name. Never cite a line number, a `path:line` locator, a `#L` anchor, or a commit SHA; name the branch, the ref, or the merge-base derivation instead (G11, G12).
+- Keep a plan within 40 tasks and 400 lines; a plan that needs more carries a non-empty `## Size Justification` section (G13).
 
 `.claude/skills/atomic-plan-contract/SKILL.md` carries the authoring-side statement of this guidance and cross-references this file.
 
 ## Enforcement
 
-- `scripts/dev_tools/plan_gate_commands.py` extracts task-attributed command candidates; `scripts/dev_tools/plan_gate_discrimination.py` evaluates G1 through G6 and returns the two severity channels.
+- `scripts/dev_tools/plan_gate_commands.py` extracts task-attributed command candidates; `scripts/dev_tools/plan_gate_discrimination.py` evaluates G1 through G9, calls `scripts/dev_tools/plan_gate_scratch.py` for G10 and `scripts/dev_tools/plan_gate_document.py` for G11 through G13, and returns the two severity channels.
 - `scripts/dev_tools/validate_orchestration_artifacts.py` routes the existing `plan` artifact type through the two-channel entry point, prints each Warning to stderr prefixed with `PLAN GATE WARNING: `, and derives its exit code from the error channel alone. No new flag, option, or artifact type is added.
 - The TypeScript parity port is dispatched from `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` for the existing `plan` artifact type. The MCP `validate_orchestration_artifacts` input-schema property-key set is unchanged; Warnings surface on an optional `warnings` field that is absent when there are none.
-- `.claude/hooks/validate-planner-output.ps1` is not modified by this rule and carries no part of its enforcement.
+- `scripts/dev_tools/plan_gate_scratch.py` evaluates G10, the document-level SCRATCH definition rule, and `evaluate_plan_gates` in `scripts/dev_tools/plan_gate_discrimination.py` calls it on every invocation, with or without a context. The TypeScript twin `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` is called the same way from `evaluatePlanGates`. Through the Python CLI a G10 finding is printed as an error and the process exits 1; through the MCP service call it causes the call to throw with the message included.
+- `scripts/dev_tools/plan_gate_document.py` evaluates G11, G12, and G13, and `evaluate_plan_gates` calls it on every invocation immediately after G10, with or without a context. The TypeScript twin `extensions/drm-copilot/src/lib/validate/plan-gate-document.ts` is called the same way from `evaluatePlanGates`. The MCP validator applies these rules only after the extension release that carries them is installed; until then, branch-current validation runs through `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan <path>`.
+- `.claude/hooks/validate-planner-output.ps1` carries no part of G1 through G13 enforcement. It separately rejects a line-reference locator in a `CITATION:` entry of the planner internal-review record, which is consistent with G11 but is a hook rule, not a validator rule.

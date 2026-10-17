@@ -365,6 +365,9 @@ function Invoke-BootstrapHost {
         Set-HostEnvironmentVariable -Name 'Path' -Value $sessionPath -Target 'Process'
     }
 
+    # Install poetry after the PATH refresh so a freshly installed python is visible.
+    Install-PoetryWithPip -ApplyMode:$Apply
+
     Write-Output ""
     if (Get-Command npm -ErrorAction SilentlyContinue) {
         if ($Apply) {

@@ -282,7 +282,7 @@ Every completion response must include:
 | `.claude/agents/<name>.md` | `.codex/agents/<name>.toml` | model + sandbox OS-enforced; tools allowlist re-grounded |
 | `.claude/settings.json` `permissions` | `[permissions.<name>]` in `config.toml` | OS-enforced via sandbox; more expressive than Claude |
 | `.claude/hooks/*.ps1` (PreToolUse) | `[hooks] PreToolUse` + script | direct equivalent; exit 2 / permissionDecision deny |
-| `.claude/hooks/*.ps1` (SubagentStop, exit 1) | `[hooks] SubagentStop` + required CI check | degraded; CI status check is the hard gate |
+| `.claude/hooks/*.ps1` (SubagentStop, exit 2) | `[hooks] SubagentStop` + required CI check | degraded; CI status check is the hard gate |
 | `permissions.deny` (secrets) | `[permissions.<name>.filesystem]` deny | OS-enforced |
 
 ## Invocation Examples

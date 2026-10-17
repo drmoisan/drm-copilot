@@ -30,14 +30,14 @@ import scripts.dev_tools.validate_orchestration_artifacts as validator
 from tests.scripts.dev_tools import (
     test_validate_parallel_orchestrator_state_completion as completion_tests,
 )
-from tests.scripts.dev_tools.test_validate_orchestration_artifacts import (
-    build_read_text_stub,
-)
 from tests.scripts.dev_tools.test_validate_parallel_orchestrator_state import (
     build_valid_parallel_state,
 )
 from tests.scripts.dev_tools.test_validate_parallel_planner_state import (
     build_valid_planner_state,
+)
+from tests.scripts.dev_tools.validate_orchestration_artifacts_test_support import (
+    build_read_text_stub,
 )
 
 if TYPE_CHECKING:

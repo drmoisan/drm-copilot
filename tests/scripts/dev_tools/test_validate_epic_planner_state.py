@@ -181,10 +181,15 @@ def test_readiness_requires_resolved_child_model_receipt() -> None:
     state["features"][1]["model_routing_receipt"]["model"] = "gpt-5.6-terra"
 
     errors = validate_epic_planner_state_text(
-        json.dumps(state), require_ready_for_execution=True
+        json.dumps(state),
+        require_ready_for_execution=True,
+        require_codex_model_routing=True,
     )
 
-    assert any("model_routing_receipt must be an object" in error for error in errors)
+    expected = (
+        "Epic planner checkpoint features[0].model_routing_receipt must be an object."
+    )
+    assert expected in errors
     assert any(".model must be 'gpt-5.6-sol'" in error for error in errors)
 
 

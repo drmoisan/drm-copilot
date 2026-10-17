@@ -31,8 +31,8 @@
     validate_epic_orchestrator_state_text, run at epic-orchestrator SubagentStop time by
     validate-orchestrator-output.ps1 through its PowerShell port
     OrchestratorStateEpicWaveBarrier.psm1, with parity pinned by tests/fixtures/epic_wave_barrier/.
-    That hook's runtime effect is likely to depend on the SubagentStop transport defect recorded in
-    docs/features/potential/2026-08-21-subagentstop-validators-read-undocumented-envelope.md.
+    The SubagentStop transport and exit-code defect that hook depended on was resolved by epic #904
+    and issue #928: a violation blocks the stop with exit 2 and a stderr reason.
     The two layers share no code.
 
 .NOTES

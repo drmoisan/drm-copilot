@@ -38,15 +38,7 @@ BeforeAll {
 "@
     }
 
-    function New-SubagentStopEnvelopeJson {
-        # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds and returns envelope JSON text only; it changes no system state.')]
-        param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
-        $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'task-researcher'; stop_hook_active = [bool]$StopHookActive }
-        if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }
-        if ($PSBoundParameters.ContainsKey('OutputField')) { $envelope['output'] = $OutputField }
-        return ($envelope | ConvertTo-Json -Compress)
-    }
+    . (Join-Path $PSScriptRoot 'SubagentStopEnvelope.Helpers.ps1')
 }
 
 Describe 'validate-task-researcher-output.ps1' {
@@ -59,7 +51,7 @@ Describe 'validate-task-researcher-output.ps1' {
         }
 
         It 'blocks when the output does not advertise a research-path token' {
-            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'Done. Findings recorded.')
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'Done. Findings recorded.')
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'does not advertise a research-path'
@@ -77,7 +69,7 @@ Describe 'validate-task-researcher-output.ps1' {
         It 'blocks with the existing empty-output reason when the assistant message is blank' {
             # Arrange - valid envelope whose last_assistant_message is empty
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage '')
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage '')
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -87,7 +79,7 @@ Describe 'validate-task-researcher-output.ps1' {
 
     Context 'research root and filename enforcement' {
         It 'blocks when the research-path is not under a tracked research root' {
-            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/foo/notes.md')
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: docs/features/active/foo/notes.md')
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'is not under a tracked research root'
@@ -96,7 +88,7 @@ Describe 'validate-task-researcher-output.ps1' {
         It 'blocks when the research-path filename does not match the documented convention' {
             Mock -CommandName Test-ResearchFile -MockWith { $true }
 
-            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/foo/research/foo.md')
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: docs/features/active/foo/research/foo.md')
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'filename convention'
@@ -105,7 +97,7 @@ Describe 'validate-task-researcher-output.ps1' {
         It 'allows termination when the research-path is valid and the file exists' {
             Mock -CommandName Test-ResearchFile -MockWith { $true }
 
-            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/foo/research/2026-05-04T00-00-hook-contract-research.md')
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: docs/features/active/foo/research/2026-05-04T00-00-hook-contract-research.md')
 
             $result.Ok | Should -BeTrue
             $result.Message | Should -BeNullOrEmpty
@@ -116,7 +108,7 @@ Describe 'validate-task-researcher-output.ps1' {
             Mock -CommandName Test-ResearchFile -MockWith { $false }
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/foo/research/2026-05-04T00-00-hook-contract-research.md')
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: docs/features/active/foo/research/2026-05-04T00-00-hook-contract-research.md')
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -130,7 +122,7 @@ Describe 'validate-task-researcher-output.ps1' {
             Mock -CommandName Test-ResearchFile -MockWith { $true }
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/some-feature-227/research/2026-06-24T13-02-some-feature-research.md')
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: docs/features/active/some-feature-227/research/2026-06-24T13-02-some-feature-research.md')
 
             # Assert
             $result.Ok | Should -BeTrue
@@ -142,7 +134,7 @@ Describe 'validate-task-researcher-output.ps1' {
             Mock -CommandName Test-ResearchFile -MockWith { $true }
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/research/2026-06-24T13-02-some-topic-research.md')
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: docs/research/2026-06-24T13-02-some-topic-research.md')
 
             # Assert
             $result.Ok | Should -BeTrue
@@ -154,7 +146,7 @@ Describe 'validate-task-researcher-output.ps1' {
             Mock -CommandName Test-ResearchFile -MockWith { $true }
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: artifacts/research/2026-06-24T13-02-some-topic-research.md')
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: artifacts/research/2026-06-24T13-02-some-topic-research.md')
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -168,7 +160,7 @@ Describe 'validate-task-researcher-output.ps1' {
             Mock -CommandName Test-ResearchFile -MockWith { $true }
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/some-feature/2026-06-24T13-02-some-feature-research.md')
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: docs/features/active/some-feature/2026-06-24T13-02-some-feature-research.md')
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -180,7 +172,7 @@ Describe 'validate-task-researcher-output.ps1' {
             Mock -CommandName Test-ResearchFile -MockWith { $true }
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/some-feature/research/bad-name.md')
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: docs/features/active/some-feature/research/bad-name.md')
 
             # Assert
             $result.Ok | Should -BeFalse
@@ -279,7 +271,7 @@ Describe 'validate-task-researcher-output.ps1' {
             }
 
             # Act
-            $result = Invoke-TaskResearcherOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'research-path: docs/features/active/foo/research/2026-05-04T00-00-autonomous-execution-research.md')
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: docs/features/active/foo/research/2026-05-04T00-00-autonomous-execution-research.md')
 
             # Assert
             $result.Ok | Should -BeFalse

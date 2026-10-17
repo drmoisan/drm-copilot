@@ -15,6 +15,10 @@
     root). Process-spawning suites are reported and never fail the guard. Fixture rows prove each
     rule over in-memory text.
 
+    Suite discovery and the probe-seam scan run once in BeforeDiscovery and reach the run phase
+    through the Describe -ForEach data; the AC-5b and F-3 non-vacuity rows read one report built
+    in the Describe BeforeAll (issue #935, PERF).
+
     This file loads no hook, creates no file, reads no gitignored state, and runs no git command.
     It reads only committed files located from $PSScriptRoot.
 #>
@@ -28,10 +32,14 @@ BeforeDiscovery {
     $script:SuiteRow = @(foreach ($row in $script:SurfaceRow) {
             foreach ($suite in @(Get-EpicStateDiscoveredSuite -RepoRoot $discoveryRoot -Surface $row.Surface)) { @{ Path = $suite; Surface = $row.Surface } }
         })
-    # Probe rows exist only for suites that comply by form F1 or the helper form for a named seam (PI-2).
+    # Probe rows exist only for suites that comply by form F1 or the helper form for a named seam (PI-2);
+    # each row carries its probe seams, so the AC-6 row does not repeat the scan (issue #935, PERF).
     $script:ProbeRow = @(foreach ($row in $script:SuiteRow) {
-            if (@(Get-EpicStateProbeSeam -RepoRoot $discoveryRoot -RelativePath $row.Path).Count -gt 0) { @{ Path = $row.Path } }
+            $probeSeam = @(Get-EpicStateProbeSeam -RepoRoot $discoveryRoot -RelativePath $row.Path)
+            if ($probeSeam.Count -gt 0) { @{ Path = $row.Path; Seam = $probeSeam } }
         })
+    $script:DiscoveredSuiteBySurface = @{}
+    foreach ($row in $script:SurfaceRow) { $script:DiscoveredSuiteBySurface[$row.Surface] = @($script:SuiteRow | Where-Object { $_.Surface -eq $row.Surface } | ForEach-Object { $_.Path }) }
 }
 
 BeforeAll {
@@ -101,7 +109,17 @@ Describe 'fixture' { It 'does not call the seam' { $true | Should -BeTrue } }
     }
 }
 
-Describe 'discovery guard (both hook surfaces)' {
+Describe 'discovery guard (both hook surfaces)' -ForEach @(@{ DiscoveredSuiteBySurface = $script:DiscoveredSuiteBySurface }) {
+    BeforeAll {
+        # One variable-built hook-load report per surface, read by the AC-5b and F-3 non-vacuity rows
+        # (operator direction, issue #935 PERF; supersedes the CR-N4 disposition).
+        $script:VariableLoadReport = @{}
+        $script:VariableLoadError = @{}
+        foreach ($surface in @($DiscoveredSuiteBySurface.Keys)) {
+            try { $script:VariableLoadReport[$surface] = @(foreach ($suite in $DiscoveredSuiteBySurface[$surface]) { Get-EpicStateVariableHookLoadReport -RepoRoot $script:RepoRoot -RelativePath $suite }) } catch { $script:VariableLoadError[$surface] = $_.Exception.Message; $script:VariableLoadReport[$surface] = @() }
+        }
+    }
+
     It 'AC-2 non-vacuity <Surface> yields at least one suite' -ForEach $script:SurfaceRow {
         # Arrange and act: enumerate the surface directory.
         $suites = @(Get-EpicStateDiscoveredSuite -RepoRoot $script:RepoRoot -Surface $Surface)
@@ -120,7 +138,7 @@ Describe 'discovery guard (both hook surfaces)' {
 
     It 'AC-6 <Path> calls the interception probe from inside an It' -ForEach $script:ProbeRow {
         # Arrange and act: parse the suite and look for a probe call inside an It.
-        $findings = @(Get-EpicStateProbeFinding -RepoRoot $script:RepoRoot -RelativePath $Path)
+        $findings = @(Get-EpicStateProbeFinding -RepoRoot $script:RepoRoot -RelativePath $Path -Seam $Seam)
 
         # Assert
         $findings.Count | Should -Be 0 -Because ($findings -join '; ')
@@ -151,7 +169,7 @@ Describe 'discovery guard (both hook surfaces)' {
     It 'AC-5 process-spawning report <Surface>' -ForEach $script:SurfaceRow {
         # Arrange and act: collect the report line of every process-spawning suite on the surface.
         $collect = {
-            foreach ($suite in @(Get-EpicStateDiscoveredSuite -RepoRoot $script:RepoRoot -Surface $Surface)) {
+            foreach ($suite in @($DiscoveredSuiteBySurface[$Surface])) {
                 Get-EpicStateProcessSpawningReport -RepoRoot $script:RepoRoot -RelativePath $suite
             }
         }
@@ -159,6 +177,23 @@ Describe 'discovery guard (both hook surfaces)' {
 
         # Assert: the row reports each launched hook and never fails on an entry; the lines go to the information stream.
         foreach ($line in $script:ReportLine) { Write-Information $line -InformationAction Continue }
+    }
+
+    It 'AC-5b variable-built hook-load report <Surface>' -ForEach $script:SurfaceRow {
+        # Arrange and act: read the lines of every suite on the surface from the Describe BeforeAll report (issue #935, F-3, PERF).
+        $script:VariableLoadError[$Surface] | Should -BeNullOrEmpty -Because 'building the variable-built hook-load report for the surface must not throw'
+        $script:VariableLoadLine = @($script:VariableLoadReport[$Surface])
+
+        # Assert: the row reports and never fails on an entry; the lines go to the information stream.
+        foreach ($line in $script:VariableLoadLine) { Write-Information $line -InformationAction Continue }
+    }
+
+    It 'F-3 non-vacuity <Surface> reports at least one variable-built hook load' -ForEach $script:SurfaceRow {
+        # Arrange and act: read the Describe BeforeAll report that the AC-5b row also reads (operator direction, issue #935 PERF; supersedes CR-N4).
+        $lines = @($script:VariableLoadReport[$Surface])
+
+        # Assert: a surface with no line would make the AC-5b report vacuous.
+        $lines.Count | Should -BeGreaterThan 0 -Because "the committed $Surface suites hold variable-built hook loads"
     }
 
     It 'AC-2 no hard-coded suite list in N2' {

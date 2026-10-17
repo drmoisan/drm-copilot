@@ -73,3 +73,6 @@ projects:
   - path: ".claude/lib/worktree-resolution"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: "scripts/ci"
+    tier: T4
+    rationale: "CI change-scope decision script and its pure helper module (CI scaffolding)"

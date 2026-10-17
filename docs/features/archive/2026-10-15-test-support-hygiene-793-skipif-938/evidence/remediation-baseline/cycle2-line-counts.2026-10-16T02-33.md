@@ -1,0 +1,11 @@
+# Cycle 2 baseline: line counts
+
+Timestamp: 2026-10-16T02-33
+Command: wc -l tests/scripts/dev_tools/validate_orchestration_artifacts_test_support.py tests/scripts/dev_tools/test_validate_orchestration_artifacts.py tests/scripts/dev_tools/test_validate_orchestration_artifacts_dispatch.py tests/scripts/dev_tools/test_validate_orchestration_artifacts_state_shape.py
+EXIT_CODE: 0
+Output Summary:
+60 validate_orchestration_artifacts_test_support.py
+368 test_validate_orchestration_artifacts.py
+279 test_validate_orchestration_artifacts_dispatch.py
+154 test_validate_orchestration_artifacts_state_shape.py
+861 total

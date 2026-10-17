@@ -17,21 +17,12 @@ import scripts.dev_tools.validate_orchestration_artifacts as validator
 from tests.scripts.dev_tools import (
     test_validate_orchestrator_state_pr_creation_readiness as state_fixtures,
 )
+from tests.scripts.dev_tools.validate_orchestration_artifacts_test_support import (
+    build_read_text_stub,
+)
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-    from pathlib import Path
-
     from pytest import MonkeyPatch
-
-
-def _build_read_text_stub(text: str) -> Callable[[Path], str]:
-    """Return a typed `_read_text` replacement for monkeypatched CLI tests."""
-
-    def _stub(_path: Path) -> str:
-        return text
-
-    return _stub
 
 
 def test_main_orchestrator_state_require_pr_creation_ready_returns_0_for_valid(
@@ -62,7 +53,7 @@ def test_main_orchestrator_state_require_pr_creation_ready_returns_0_for_valid(
 
     state = state_fixtures.build_pr_creation_ready_state()
     monkeypatch.setattr(
-        validator, "_read_text", _build_read_text_stub(json.dumps(state))
+        validator, "_read_text", build_read_text_stub(json.dumps(state))
     )
 
     result = validator.main(
@@ -100,7 +91,7 @@ def test_main_orchestrator_state_require_pr_creation_ready_returns_1_for_invalid
     state = state_fixtures.build_pr_creation_ready_state()
     state["step7_status"] = "pending"
     monkeypatch.setattr(
-        validator, "_read_text", _build_read_text_stub(json.dumps(state))
+        validator, "_read_text", build_read_text_stub(json.dumps(state))
     )
 
     result = validator.main(

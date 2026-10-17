@@ -67,6 +67,60 @@ Describe 'Codex preimplementation gate epic-scope targets (issue #738)' {
         @{ Name = 'denies a wrapper-led git segment in epic scope'; Command = 'nohup git -C /synthetic-worktrees/epic-child add scripts/powershell/Sample.ps1'; Code = 'target-unresolvable' }
         @{ Name = 'denies a target outside the epic scope of the session root'; Command = 'git -C /synthetic-worktrees/epic-other add scripts/powershell/Sample.ps1'; Code = 'target-mixed' }
         @{ Name = 'denies an apply_patch absolute file marker into a not-ready epic worktree'; Command = "*** Begin Patch`n*** Update File: /synthetic-worktrees/epic-child/scripts/powershell/Sample.ps1`n@@`n-old`n+new`n*** End Patch"; Code = 'target-not-ready' }
+        @{
+            Name    = 'denies an apply_patch UNC file marker in epic scope (issue #937)'
+            Command = "*** Begin Patch`n*** Update File: \\server\share\wt\scripts\powershell\Sample.ps1" +
+            "`n@@`n-old`n+new`n*** End Patch"
+            Code    = 'target-unresolvable'
+        }
+        @{
+            Name    = 'denies an apply_patch extended-length file marker in epic scope (issue #937)'
+            Command = "*** Begin Patch`n*** Update File: \\?\C:\wt\scripts\powershell\Sample.ps1" +
+            "`n@@`n-old`n+new`n*** End Patch"
+            Code    = 'target-unresolvable'
+        }
+        @{
+            Name    = 'denies an apply_patch drive-relative file marker in epic scope (issue #937)'
+            Command = "*** Begin Patch`n*** Update File: C:wt\scripts\powershell\Sample.ps1" +
+            "`n@@`n-old`n+new`n*** End Patch"
+            Code    = 'target-unresolvable'
+        }
+        @{
+            Name    = 'denies an apply_patch file: URI marker in epic scope (issue #937 RI-4)'
+            Command = "*** Begin Patch`n*** Update File: file:///C:/wt/scripts/powershell/Sample.ps1" +
+            "`n@@`n-old`n+new`n*** End Patch"
+            Code    = 'target-unresolvable'
+        }
+        @{
+            Name    = 'denies an apply_patch home-relative marker in epic scope (issue #937 RI-4)'
+            Command = "*** Begin Patch`n*** Update File: ~/wt/scripts/powershell/Sample.ps1" +
+            "`n@@`n-old`n+new`n*** End Patch"
+            Code    = 'target-unresolvable'
+        }
+        @{
+            Name    = 'denies an apply_patch root-relative backslash marker in epic scope (issue #937 RI-5)'
+            Command = "*** Begin Patch`n*** Update File: \wt\scripts\powershell\Sample.ps1" +
+            "`n@@`n-old`n+new`n*** End Patch"
+            Code    = 'target-unresolvable'
+        }
+        @{
+            Name    = 'denies an apply_patch http URI marker in epic scope (issue #937 RI-7)'
+            Command = "*** Begin Patch`n*** Update File: http://server/share/wt/scripts/powershell/Sample.ps1" +
+            "`n@@`n-old`n+new`n*** End Patch"
+            Code    = 'target-unresolvable'
+        }
+        @{
+            Name    = 'denies an apply_patch smb URI marker in epic scope (issue #937 RI-7)'
+            Command = "*** Begin Patch`n*** Update File: smb://server/share/wt/scripts/powershell/Sample.ps1" +
+            "`n@@`n-old`n+new`n*** End Patch"
+            Code    = 'target-unresolvable'
+        }
+        @{
+            Name    = 'denies an apply_patch vscode-remote URI marker in epic scope (issue #937 RI-7)'
+            Command = "*** Begin Patch`n*** Update File: vscode-remote://wsl/wt/scripts/powershell/Sample.ps1" +
+            "`n@@`n-old`n+new`n*** End Patch"
+            Code    = 'target-unresolvable'
+        }
     ) {
         # Arrange
         Set-CodexTargetSeam -CheckpointText $script:ReadyEpicJson

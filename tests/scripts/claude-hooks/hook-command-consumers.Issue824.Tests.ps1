@@ -88,6 +88,8 @@ Describe 'epic merge gate consumer rows, <Runtime> copy (issue #824)' -ForEach $
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $script:RepoRoot "$HookRoot/enforce-epic-merge-gate.ps1")
+        Mock Invoke-DocsOnlyGhExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
+        Mock Invoke-DocsOnlyGitExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
         if (Get-Command Get-PrAuthorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrAuthorCheckpointContent' -Surface 'Codex' }

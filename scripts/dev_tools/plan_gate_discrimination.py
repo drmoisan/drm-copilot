@@ -1,11 +1,11 @@
 """Discriminate falsifiable from non-discriminating atomic-plan acceptance gates.
 
 Purpose:
-    Evaluate the fixed G1 through G6 rule set against the commands an atomic
-    plan states as acceptance conditions, and report each finding on the
-    Blocking or Warning channel the specification assigns to its rule. The
-    module re-exports `PlanCommand` and `extract_plan_commands` so the
-    specification's public surface is a single module. It imports the extractor
+    Evaluate the plan acceptance-gate rule set G1 through G13 against an
+    atomic plan, and report each finding on the Blocking or Warning channel
+    the specification assigns to its rule. The module re-exports `PlanCommand`
+    and `extract_plan_commands` so the specification's public surface is a
+    single module. It imports the extractor
     and never imports `scripts.dev_tools.validate_orchestration_artifacts`,
     which imports this module.
 
@@ -14,6 +14,9 @@ Purpose:
     module holds the shared report and context types, the G5 and G6 literal
     rules, and the public entry point. That module depends on the types defined
     here only under `TYPE_CHECKING`, so the runtime import graph is acyclic.
+    The document-level G10 rule lives in `scripts.dev_tools.plan_gate_scratch`,
+    and the document-level G11, G12, and G13 rules live in
+    `scripts.dev_tools.plan_gate_document`.
 """
 
 from __future__ import annotations
@@ -30,13 +33,17 @@ from scripts.dev_tools.plan_gate_commands import (
     PlanCommand,
     extract_plan_commands,
     grep_executable_index,
+    normalize_plan_whitespace,
+    split_plan_lines,
 )
 from scripts.dev_tools.plan_gate_coverage import (
     cov_values,
     evaluate_cov_value,
     is_placeholder,
 )
+from scripts.dev_tools.plan_gate_document import evaluate_document_gates
 from scripts.dev_tools.plan_gate_observability import evaluate_observability_gates
+from scripts.dev_tools.plan_gate_scratch import evaluate_scratch_gate
 from scripts.dev_tools.pr_context.git import SubprocessRunner
 
 if TYPE_CHECKING:
@@ -250,9 +257,13 @@ def _plan_quotes_literal(text: str, literal: str, *, exclude_span: str) -> bool:
 
 
 def _window_join(lines: list[str], size: int = _WINDOW_SIZE) -> list[str]:
-    """Return the whitespace-normalised join of each sliding window of lines."""
+    """Return the whitespace-normalised join of each sliding window of lines.
 
-    dense = [" ".join(line.split()) for line in lines if line.strip()]
+    Whitespace means `PLAN_WHITESPACE_CLASS`, as in the TypeScript `windowJoin`.
+    """
+
+    normalized = [normalize_plan_whitespace(line) for line in lines]
+    dense = [line for line in normalized if line]
     # One window per start position keeps the boundary exact: lines further
     # apart than `size` never appear in the same join.
     return [" ".join(dense[index : index + size]) for index in range(len(dense))]
@@ -262,18 +273,21 @@ def _has_cross_line_presence(context: PlanGateContext, literal: str) -> bool:
     """Return whether a tracked file carries the literal only across lines.
 
     Candidate files are located by searching for the literal's first word,
-    which stays contiguous on one line however the literal wraps.
+    which stays contiguous on one line however the literal wraps. The literal
+    and every tracked line are normalized with `PLAN_WHITESPACE_CLASS`, as in
+    the TypeScript `hasCrossLinePresence`.
     """
 
-    words = literal.split()
+    needle = normalize_plan_whitespace(literal)
+    words = needle.split(" ")
     if len(words) < 2:
         return False
-    needle = " ".join(words)
 
     # A candidate carries the first word on one line: necessary for a wrap.
     for path in context.git.files_containing(words[0]):
-        lines = context.git.read_tracked_text(path).splitlines()
-        if any(needle in " ".join(line.split()) for line in lines):
+        # Split on CR LF, LF, and CR only, as the TypeScript hasCrossLinePresence does.
+        lines = split_plan_lines(context.git.read_tracked_text(path))
+        if any(needle in normalize_plan_whitespace(line) for line in lines):
             continue
         if any(needle in window for window in _window_join(lines)):
             return True
@@ -356,8 +370,9 @@ def evaluate_plan_gates(
     Args:
         text (str): Full plan document text.
         context (PlanGateContext | None): Repository seam. When `None` only the
-            context-free rules G1 and G4 run, so the returned Blocking list is
-            byte-identical to the pre-change output for the same text.
+            context-free rules G1, G4, G7, G8, G8b, and G10 to G13 run. G10 to
+            G13 are document-level and can add Blocking findings without a
+            context.
 
     Returns:
         PlanGateReport: Blocking and Warning findings in source order.
@@ -389,4 +404,8 @@ def evaluate_plan_gates(
     if context is not None:
         _evaluate_literal_rules(report, text, commands, context)
 
+    # G10 to G13 are document-level and context-free, so they run on every
+    # invocation, G11 to G13 after G10.
+    evaluate_scratch_gate(report, text)
+    evaluate_document_gates(report, text)
     return report

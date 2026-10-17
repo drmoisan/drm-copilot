@@ -16,7 +16,7 @@ import pytest
 
 import scripts.dev_tools.validate_orchestration_artifacts as validator
 from scripts.dev_tools.plan_gate_discrimination import PlanGateContext
-from tests.scripts.dev_tools.test_validate_orchestration_artifacts import (
+from tests.scripts.dev_tools.validate_orchestration_artifacts_test_support import (
     build_read_text_stub,
 )
 

@@ -4,9 +4,9 @@ Split out of `test_validate_orchestration_artifacts.py` (issue #275 remediation
 cycle 2) because that file exceeded the repository's 500-line hard cap. This
 module contains the residual, less-fixture-cohesive `orchestrator-state`
 payload-shape tests and the two helper functions used exclusively by them; the
-shared `build_valid_orchestrator_state` builder is imported from the sibling
-module rather than duplicated, following the sibling-module convention already
-used by `test_validate_orchestration_artifacts_dispatch.py`. This module is
+shared `build_valid_orchestrator_state` builder is imported from
+`tests/scripts/dev_tools/validate_orchestration_artifacts_test_support.py`
+rather than duplicated. This module is
 distinct from the pre-existing `test_validate_orchestrator_state.py`, which
 tests a different module, `scripts.dev_tools.validate_orchestrator_state`,
 directly.
@@ -18,7 +18,7 @@ import json
 from typing import cast
 
 import scripts.dev_tools.validate_orchestration_artifacts as validator
-from tests.scripts.dev_tools.test_validate_orchestration_artifacts import (
+from tests.scripts.dev_tools.validate_orchestration_artifacts_test_support import (
     build_valid_orchestrator_state,
 )
 

@@ -29,15 +29,7 @@ BeforeAll {
 "@
     }
 
-    function New-SubagentStopEnvelopeJson {
-        # Builds a SubagentStop stdin envelope; -OmitAssistantMessage drops last_assistant_message and -OutputField adds an output key.
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds and returns envelope JSON text only; it changes no system state.')]
-        param([AllowEmptyString()] [string] $AssistantMessage = '', [switch] $OmitAssistantMessage, [string] $OutputField, [switch] $StopHookActive)
-        $envelope = [ordered]@{ session_id = 'e3-905'; hook_event_name = 'SubagentStop'; agent_type = 'prd-feature'; stop_hook_active = [bool]$StopHookActive }
-        if (-not $OmitAssistantMessage) { $envelope['last_assistant_message'] = $AssistantMessage }
-        if ($PSBoundParameters.ContainsKey('OutputField')) { $envelope['output'] = $OutputField }
-        return ($envelope | ConvertTo-Json -Compress)
-    }
+    . (Join-Path $PSScriptRoot 'SubagentStopEnvelope.Helpers.ps1')
 }
 
 Describe 'validate-prd-feature-output.ps1' {
@@ -87,29 +79,29 @@ Describe 'validate-prd-feature-output.ps1' {
         (Invoke-PrdFeatureOutputValidation -InputText '').Ok | Should -BeFalse
         (Invoke-PrdFeatureOutputValidation -InputText '{bad').Ok | Should -BeFalse
         (Invoke-PrdFeatureOutputValidation -InputText '{}').Ok | Should -BeFalse
-        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage '')).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage '')).Ok | Should -BeFalse
     }
 
     It 'rejects missing and nonexistent spec paths' {
         Mock Test-Path { $false }
 
-        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: missing.md')).Ok | Should -BeFalse
-        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: nonexistent.md')).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage 'spec-path: missing.md')).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage 'spec-path: nonexistent.md')).Ok | Should -BeFalse
     }
 
     It 'accepts a nonnumeric spec without research evidence' {
         Mock Test-Path { $true }
         Mock Get-Content { '## Acceptance Criteria' + [Environment]::NewLine + '- [ ] A textual criterion' }
 
-        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: textual.md')).Ok | Should -BeTrue
+        (Invoke-PrdFeatureOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage 'spec-path: textual.md')).Ok | Should -BeTrue
     }
 
     It 'rejects numeric specs with missing or nonexistent research paths' {
         Mock Test-Path { param($LiteralPath) $LiteralPath -eq 'numeric.md' }
         Mock Get-Content { '## Acceptance Criteria' + [Environment]::NewLine + '- [ ] The 2 call sites are covered' }
 
-        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage 'spec-path: numeric.md')).Ok | Should -BeFalse
-        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage "spec-path: numeric.md`nresearch-path: missing.md")).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage 'spec-path: numeric.md')).Ok | Should -BeFalse
+        (Invoke-PrdFeatureOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage "spec-path: numeric.md`nresearch-path: missing.md")).Ok | Should -BeFalse
     }
 
     It 'accepts matching numeric provenance and extracts artifact labels' {
@@ -117,7 +109,7 @@ Describe 'validate-prd-feature-output.ps1' {
         Mock Test-Path { $true }
         Mock Get-Content { param($LiteralPath) if ($LiteralPath -eq 'numeric.md') { "## Acceptance Criteria`n- [ ] The 2 call sites are covered" } else { $complete } }
 
-        (Invoke-PrdFeatureOutputValidation -InputText (New-SubagentStopEnvelopeJson -AssistantMessage "spec-path: numeric.md`nresearch-path: research.md")).Ok | Should -BeTrue
+        (Invoke-PrdFeatureOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'prd-feature' -AssistantMessage "spec-path: numeric.md`nresearch-path: research.md")).Ok | Should -BeTrue
         Get-ArtifactPathFromOutput -Output 'spec-path: numeric.md' -Label 'spec-path' | Should -Be 'numeric.md'
     }
 
@@ -199,6 +191,15 @@ Describe 'validate-prd-feature-output.ps1' {
             @{ Name = 'entire worktree'; Value = 'entire worktree.' }
             @{ Name = 'whole worktree with all directories'; Value = 'the whole worktree, all directories.' }
             @{ Name = 'entire repository accepted before R3'; Value = 'entire repository' }
+            @{ Name = 'complete source tree'; Value = 'the complete source tree' }
+            @{ Name = 'whole repo'; Value = 'the whole repo' }
+            @{ Name = 'upper-case entire worktree'; Value = 'ENTIRE WORKTREE' }
+            @{ Name = 'entire worktree root'; Value = 'entire worktree root.' }
+            @{ Name = 'whole repository excluding docs'; Value = 'the whole repository excluding `docs/`' }
+            # NB-2 characterization (issue #929): breadth documented in E3 spec Risk 5a; a whole-worktree value that lists a narrower covered set is accepted.
+            @{ Name = 'NB-2 whole worktree restricted to code'; Value = 'the whole worktree with ripgrep, restricted to code by excluding `docs/`; covers `.claude/hooks`, `.claude/lib`, `.codex/hooks`, and both bundle roots.' }
+            # NB-2 characterization (issue #929): breadth documented in E3 spec Risk 5a; an entire-repository value with an exclusion is accepted.
+            @{ Name = 'NB-2 entire repository excluding docs'; Value = 'entire repository excluding docs/**' }
         ) {
             # Arrange
             $content = (Get-CompleteNumericDerivationEvidence).Replace('- Exhaustive Search Scope: entire repository source tree', '- Exhaustive Search Scope: ' + $Value)
@@ -210,6 +211,12 @@ Describe 'validate-prd-feature-output.ps1' {
 
         It 'R3 rejects the exhaustive scope <Name>' -ForEach @(
             @{ Name = 'the hooks folder'; Value = 'the hooks folder' }
+            @{ Name = 'noun without a quantifier'; Value = 'those four files on the current worktree.' }
+            @{ Name = 'quantifier without a noun'; Value = 'the whole file, lines 1-335.' }
+            @{ Name = 'path-shaped value'; Value = '`.claude/hooks/`' }
+            @{ Name = 'all inside allocated'; Value = 'the allocated repository subset' }
+            @{ Name = 'tree inside subtree'; Value = 'the entire subtree' }
+            @{ Name = 'worktree inside worktrees'; Value = 'the whole worktrees folder' }
         ) {
             # Arrange
             $content = (Get-CompleteNumericDerivationEvidence).Replace('- Exhaustive Search Scope: entire repository source tree', '- Exhaustive Search Scope: ' + $Value)

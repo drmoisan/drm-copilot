@@ -6,7 +6,7 @@ tools: [vscode/runCommand, vscode/extensions, execute, read, agent, edit, search
 handoffs:
   - label: Build minimal-audit atomic plan (preflight all clear)
     agent: atomic_planner
-    prompt: "Generate a minimal-audit atomic plan for `${feature-folder}` using `${feature-folder}/issue.md` as the only requirements source (no spec/user-story/research). Use directive `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`. Target plan file path is `${plan-path}` and MUST be updated in place. Do NOT create additional `plan.*.md` siblings during drafting or preflight revision loops. The plan MUST include exactly 3 phases: Phase 0 baseline capture, Phase 1 placeholder for constrained small-path implementation work, Phase 2 final QC loop. Final-QC command tasks MUST be unconditional when present in the plan: do not add IN_SCOPE/OUT_OF_SCOPE branching and do not allow SKIPPED as a valid completion state for those tasks. Require validation-only preflight through `atomic_executor` and iterate until final `PREFLIGHT: ALL CLEAR` while preserving the same target path. Return `plan-path` and final preflight signal."
+    prompt: "Generate a minimal-audit atomic plan for `${feature-folder}` using `${feature-folder}/issue.md` as the only requirements source (no spec/user-story/research). Use directive `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`. Target plan file path is `${plan-path}` and MUST be updated in place. Do NOT create additional `plan.*.md` siblings during drafting or preflight revision loops. The plan MUST include exactly 3 phases: Phase 0 baseline capture, Phase 1 placeholder for constrained small-path implementation work, Phase 2 final QC loop. Final-QC command tasks MUST be unconditional when present in the plan: do not add IN_SCOPE/OUT_OF_SCOPE branching and do not allow SKIPPED as a valid completion state for those tasks. Require single-pass validation-only preflight through `atomic_executor` (trivial defects fixed in place, at most one return to the planner) ending in `PREFLIGHT: ALL CLEAR` while preserving the same target path. Return `plan-path` and final preflight signal."
     send: true
   - label: Execute Phase 0 only
     agent: atomic_executor
@@ -38,7 +38,7 @@ handoffs:
     send: true
   - label: Build atomic plan (preflight all clear)
     agent: atomic_planner
-    prompt: "You are atomic_planner.\n\nUse the prompt structure and requirements from `.github/prompts/generate-atomic-plan.prompt.md` as the canonical template.\nThe calling agent provides a REQUIRED target plan path `${plan-path}`; update this file in place and do NOT create additional `plan.*.md` siblings during drafting or preflight revision loops.\n\nContext package:\n- objective + expected outcome\n- `${promotion-type}` and `${issue-num}` when available\n- `${feature-folder}`\n- `${feature-folder}/issue.md`\n- `${feature-folder}/spec.md`\n- `${feature-folder}/user-story.md` (or explicit `NONE`)\n- latest research artifact path(s)\n- constraints/APIs/invariants to preserve\n\nCore requirements:\n- Generate a deterministic phased atomic plan (planning only).\n- Require validation-only preflight through `atomic_executor` and iterate until final `PREFLIGHT: ALL CLEAR` while preserving the same target path `${plan-path}`.\n- Plan MUST include explicit coverage-bearing baseline and final-QC testing tasks for each language in scope where policy requires coverage; coverage MUST NOT be left as UNVERIFIED for PASS outcomes.\n- Return the finalized plan path and final preflight signal; do not execute implementation."
+    prompt: "You are atomic_planner.\n\nUse the prompt structure and requirements from `.github/prompts/generate-atomic-plan.prompt.md` as the canonical template.\nThe calling agent provides a REQUIRED target plan path `${plan-path}`; update this file in place and do NOT create additional `plan.*.md` siblings during drafting or preflight revision loops.\n\nContext package:\n- objective + expected outcome\n- `${promotion-type}` and `${issue-num}` when available\n- `${feature-folder}`\n- `${feature-folder}/issue.md`\n- `${feature-folder}/spec.md`\n- `${feature-folder}/user-story.md` (or explicit `NONE`)\n- latest research artifact path(s)\n- constraints/APIs/invariants to preserve\n\nCore requirements:\n- Generate a deterministic phased atomic plan (planning only).\n- Require single-pass validation-only preflight through `atomic_executor` (trivial defects fixed in place, at most one return to the planner) ending in `PREFLIGHT: ALL CLEAR` while preserving the same target path `${plan-path}`.\n- Follow the design-level plan contract and include a `## Pre-Mortem` section.\n- Plan MUST include explicit coverage-bearing baseline and final-QC testing tasks for each language in scope where policy requires coverage; coverage MUST NOT be left as UNVERIFIED for PASS outcomes.\n- Return the finalized plan path and final preflight signal; do not execute implementation."
     send: true
   - label: Execute approved atomic plan
     agent: atomic_executor
@@ -88,6 +88,9 @@ Use these reusable skills to avoid duplicating shared operations:
 - `repo-automation-adapter`
 - `atomic-plan-contract`
 - `acceptance-criteria-tracking`
+- `execution-environment`
+
+Read `.github/skills/execution-environment/SKILL.md` first, before any delegation. It states the tool routes, command-text restrictions, batch budget, hook context, CI shape, contract tests, evidence rules, coverage and file-size gates, and test-isolation checks; delegation prompts reference it instead of restating them.
 
 # Non-negotiable mission behavior
 
@@ -378,9 +381,9 @@ Apply this exact loop after the first feature-review result and after every re-r
    - `REVIEW_STATUS: REMEDIATION_REQUIRED`
    - `REMEDIATION_INPUTS: <path>`
    - `REMEDIATION_PLAN: <path>`
-2. Persist `${review-status}`, `${remediation-inputs-path}`, `${remediation-plan-path}`, and `${remediation-pass}` in the checkpoint.
-3. Delegate handoff **Preflight remediation plan clearance** against `${remediation-plan-path}`.
-4. If preflight returns `PREFLIGHT: REVISIONS REQUIRED`, delegate handoff **Revise remediation plan in place** and then repeat Step 3 against the same `${remediation-plan-path}` until the terminal signal is `PREFLIGHT: ALL CLEAR`.
+2. Persist `${review-status}`, `${remediation-inputs-path}`, `${remediation-plan-path}`, and `${remediation-pass}` in the checkpoint. Confirm that `${remediation-inputs-path}` carries exactly one line `Remediation-Mode: proportionate` or `Remediation-Mode: design`: proportionate when every autonomous finding can be fixed without changing a spec acceptance criterion, a public interface, or the file inventory beyond the branch diff plus tests and mirrors (CI-failure findings are normally proportionate), otherwise design.
+3. Delegate handoff **Preflight remediation plan clearance** against `${remediation-plan-path}`, with the preflight directive in the handoff prompt only. Preflight is single-pass: trivial defects are fixed in place. For `Remediation-Mode: proportionate`, the clearance and execution may run as one executor delegation that stops with `BLOCKED at preflight (before [P0-T1])` on a substantive defect; that converts the cycle to `Remediation-Mode: design`.
+4. If preflight returns `PREFLIGHT: REVISIONS REQUIRED`, delegate handoff **Revise remediation plan in place** once with the full `PREFLIGHT-DEFECT:` list and then run Step 3 once more against the same `${remediation-plan-path}`. If that confirming preflight still reports a substantive defect, record `blocked_preflight_iteration_limit` and stop; a plan returns to the planner at most once.
 5. Delegate handoff **Execute remediation plan** only after the exact preflight signal is `PREFLIGHT: ALL CLEAR`.
 6. Stage all files with `git add -A`.
 7. Do not continue unless staged changes now exist. If staging is empty, stop and record blocked state because remediation execution did not produce a commit-ready delta.
