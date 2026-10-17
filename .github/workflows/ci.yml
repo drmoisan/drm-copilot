@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [main, development, "epic/**"]
   workflow_dispatch:
+  merge_group:
+    types: [checks_requested]
 
 jobs:
   changes:

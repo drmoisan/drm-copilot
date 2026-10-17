@@ -171,4 +171,70 @@ Describe "ci.yml workflow triggers" {
         # Assert: the push filter lists exactly main and development, in that order.
         ($pushBranches -join ',') | Should -BeExactly 'main,development'
     }
+
+    It "declares merge_group with types checks_requested and no branch or path filter" {
+        # Arrange: a merge queue on main produces every required check from a merge_group
+        # run of ci.yml (issue #952), so the trigger block must be read before asserting it.
+        $script:triggerLines.Count | Should -BeGreaterThan 0 -Because "ci.yml must declare an 'on:' trigger block"
+
+        # Act: locate the two-space 'merge_group:' key and collect its body up to the next
+        # sibling event key.
+        $mergeGroupIndex = -1
+        for ($i = 0; $i -lt $script:triggerLines.Count; $i++) {
+            if ($script:triggerLines[$i] -match '^\s{2}merge_group:\s*$') {
+                $mergeGroupIndex = $i
+                break
+            }
+        }
+        $mergeGroupBody = [System.Collections.Generic.List[string]]::new()
+        if ($mergeGroupIndex -ge 0) {
+            for ($j = $mergeGroupIndex + 1; $j -lt $script:triggerLines.Count; $j++) {
+                if ($script:triggerLines[$j] -match '^\s{2}\S') {
+                    break
+                }
+                $mergeGroupBody.Add($script:triggerLines[$j])
+            }
+        }
+        $typesLines = @($mergeGroupBody | Where-Object { $_ -match '^\s{4}types:\s*\[\s*checks_requested\s*\]\s*$' })
+        $filterLines = @($mergeGroupBody | Where-Object { $_ -match '^\s{4}(branches|branches-ignore|paths|paths-ignore):' })
+        $dispatchLines = @($script:triggerLines | Where-Object { $_ -match '^\s{2}workflow_dispatch:\s*$' })
+        $pullRequestBranches = @(Get-CiTriggerBranchList -TriggerLines $script:triggerLines -EventName 'pull_request')
+
+        # Assert: the queue event is declared with checks_requested and no filter, and the
+        # existing workflow_dispatch and pull_request triggers are unchanged.
+        $mergeGroupIndex | Should -BeGreaterOrEqual 0 -Because "ci.yml must declare a merge_group trigger so a merge queue on main receives required checks (issue #952)"
+        $typesLines.Count | Should -Be 1 -Because "the merge_group trigger must declare 'types: [checks_requested]' exactly once"
+        $filterLines.Count | Should -Be 0 -Because "a branch or path filter on merge_group would leave required checks unreported for some queue entries"
+        $dispatchLines.Count | Should -BeGreaterThan 0 -Because "the workflow_dispatch trigger must remain declared"
+        ($pullRequestBranches -join ',') | Should -BeExactly 'main,development,epic/**' -Because "the pull_request branch filter must not change"
+    }
+
+    It "reads no pull-request event field and declares no path filter anywhere in the ci.yml call graph" {
+        # Arrange: collect ci.yml and every local reusable workflow it calls; a merge_group
+        # run carries no pull-request payload, so none of them may depend on one.
+        $workflowDirectory = Split-Path -Path $script:workflowPath -Parent
+        $calledFiles = [System.Collections.Generic.List[string]]::new()
+        foreach ($line in $script:workflowLines) {
+            if ($line -match 'uses:\s*\./\.github/workflows/(?<File>[^\s]+\.yml)') {
+                $calledFiles.Add($Matches['File'])
+            }
+        }
+        $calledFiles.Count | Should -BeGreaterThan 0 -Because "ci.yml must call at least one reusable workflow"
+        $graphFiles = [System.Collections.Generic.List[string]]::new()
+        $graphFiles.Add($script:workflowPath)
+        foreach ($file in $calledFiles) {
+            $graphFiles.Add((Join-Path -Path $workflowDirectory -ChildPath $file))
+        }
+
+        foreach ($graphFile in $graphFiles) {
+            # Act: read the workflow file as text.
+            $graphLines = @(Get-Content -LiteralPath $graphFile)
+            $eventFieldLines = @($graphLines | Where-Object { $_ -match 'github\.event\.pull_request|github\.head_ref|github\.base_ref|github\.event_name' })
+            $pathFilterLines = @($graphLines | Where-Object { $_ -match '^\s*(paths|paths-ignore):' })
+
+            # Assert: no pull-request event field and no path filter in this file.
+            $eventFieldLines.Count | Should -Be 0 -Because "$graphFile must not read a pull-request event field, which a merge_group run does not carry"
+            $pathFilterLines.Count | Should -Be 0 -Because "$graphFile must not declare a path filter, which would leave a required check unreported for a queue entry"
+        }
+    }
 }

@@ -56,6 +56,21 @@ Describe 'Get-DocsOnlyMergeExemption (issue #927)' {
             Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
             Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
         }
+
+        It 'denies a pull-request URL selector before any process (issue #952)' {
+            # Arrange: a /pull/<n> URL can name another repository, while gh pr view would read
+            # pull request 5 of the session repository.
+            $command = 'gh pr merge https://github.com/o/r/pull/5 --merge'
+
+            # Act
+            $result = Get-DocsOnlyMergeExemption -CommandText $command -PrNumber 5 -WorktreeRoot $PSScriptRoot
+
+            # Assert
+            $result.Exempt | Should -BeFalse
+            $result.Reason | Should -BeExactly "DOCS_ONLY_EXEMPTION_PR_UNRESOLVED: the URL selector 'https://github.com/o/r/pull/5' is not accepted."
+            Should -Invoke Invoke-DocsOnlyGhExe -Times 0 -Exactly
+            Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
+        }
     }
 
     Context 'M2 worktree root' {
