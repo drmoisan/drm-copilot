@@ -40,7 +40,7 @@ Codex routing pins unavailable GPT-5.6 models and prevents required specialist d
 - [x] STORY-02: Elevated C3 resolves `gpt-6-astra`/high under the existing epic-child or C4-ceiling conditions, C4 resolves Astra/max, and both root epic personas resolve Astra/ultra without changing file-count topology or ceiling rules.
 - [x] STORY-03: Missing/unavailable exact models and invalid profile/model/effort/hash receipts still block delegation; operators receive the existing diagnostic and no silent fallback occurs.
 - [x] STORY-04: Maintainers can regenerate a synchronized current policy/profile/bundle set that passes routing, generator, mirror, and manifest checks while preserving historical evidence and unrelated provider settings.
-- [ ] STORY-05 (CI-dependent): Completion includes applicable local toolchain evidence and required CI success recorded for the final PR head, with any CI check-off push reverified at its resulting head.
+- [x] STORY-05 (CI-dependent): Completion includes applicable local toolchain evidence and required CI success recorded for the final PR head, with any CI check-off push reverified at its resulting head.
 
 
 ## Non-Goals

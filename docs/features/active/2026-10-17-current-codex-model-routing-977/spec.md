@@ -82,9 +82,9 @@ Map SPEC-01/02/03/06 to deployment-resolution, model-receipt, topology, epic per
 - [x] SPEC-05: Current model-routing documentation and skills describe the replacement table and Codex epic ultra capability; historical checkpoint/fixture evidence and unrelated provider settings are preserved.
 - [x] SPEC-06: Receipt schema and diagnostic behavior remain unchanged; newly resolved receipts identify the actual current generated profile and hash, and validators continue to reject stale former-model receipts under current policy without a compatibility exception.
 - [x] SPEC-07: Complete applicable local Python, PowerShell, and TypeScript toolchains pass in formatting → linting → type-checking → testing order, with PowerShell type checking omitted; required changed-file coverage and isolation checks have recorded evidence.
-- [ ] SPEC-08 (CI-dependent): The item's orchestrator records required CI success at the final PR head, then pushes any CI criterion check-off and verifies CI again so the recorded head equals the final PR head before completion.
+- [x] SPEC-08 (CI-dependent): The item's orchestrator records required CI success at the final PR head, then pushes any CI criterion check-off and verifies CI again so the recorded head equals the final PR head before completion.
 
 ## Seeded Test Conditions (from potential)
 - [x] Boundary tests cover all four complexity bands, all three execution contexts, C3/C4 ceiling transitions, and both root epic personas.
 - [x] Current generated-profile freshness and mirror parity tests pass, and exact-model mismatch rejection is tested independently of successful resolution.
-- [ ] CI-dependent: Local toolchain evidence and final PR-head CI evidence are recorded separately; CI remains pending until the remote gate succeeds.
+- [x] CI-dependent: Local toolchain evidence and final PR-head CI evidence are recorded separately; CI remains pending until the remote gate succeeds.

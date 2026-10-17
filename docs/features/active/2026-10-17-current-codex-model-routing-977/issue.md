@@ -23,7 +23,7 @@ C1 uses Luna with low reasoning; C2 uses Sol with medium reasoning; C3 uses Sol 
 
 - [x] Current routing policy, base/generated Codex agents, runtime defaults, validators, current documentation and skills, and bundled mirrors agree on the approved model/effort table in `spec.md`.
 - [x] Routing preserves production-file topology, C3 elevated activation, monotonic ceilings, exact-profile receipts and hashes, epic ultra reasoning, and rejection of invalid or unavailable deployments.
-- [ ] Applicable local toolchains and routing/generator/mirror contracts pass; the item's orchestrator separately verifies required CI at the final PR head before completion.
+- [x] Applicable local toolchains and routing/generator/mirror contracts pass; the item's orchestrator separately verifies required CI at the final PR head before completion.
 
 ## Constraints & Risks
 
@@ -33,7 +33,7 @@ Preserve historical checkpoint evidence, historical fixture evidence, and unrela
 
 - [x] C1-C4, all three execution contexts, C3/C4 ceiling boundaries, logical-agent aliases, and both root epic personas.
 - [x] Fresh generated profiles and bundles; absent profiles, wrong model/effort/hash, invalid topology, and unavailable exact models remain rejected.
-- [ ] Complete applicable Python, PowerShell, and TypeScript toolchains, mirror/manifest contracts, and CI-dependent final-head verification.
+- [x] Complete applicable Python, PowerShell, and TypeScript toolchains, mirror/manifest contracts, and CI-dependent final-head verification.
 
 ## Next Step
 
