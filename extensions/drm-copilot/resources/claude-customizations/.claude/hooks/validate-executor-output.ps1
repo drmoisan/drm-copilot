@@ -295,9 +295,8 @@ function Test-HasCanonicalBlockedText {
         return $false
     }
 
-    if ($AgentOutput -notmatch '(?i)plan delta' -and $AgentOutput -notmatch '\[P\d+-T\d+\]') {
-        return $false
-    }
+    $remainder = $AgentOutput -creplace 'BLOCKED at preflight \(before \[P0-T1\]\)', '' # the canonical phrase itself carries [P0-T1]
+    if ($remainder -notmatch '(?i)plan delta' -and $remainder -notmatch '\[P\d+-T\d+\]') { return $false }
 
     return $true
 }

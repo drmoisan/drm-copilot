@@ -191,7 +191,7 @@ Before a plan can be treated as approved:
 - reject the plan if that validator exits non-zero,
 - do not treat human-readable summaries as a substitute for validator success.
 
-The validator applies the acceptance-gate rules of `.claude/rules/plan-acceptance-gates.md`. G1 through G9 judge the commands a plan states as acceptance conditions; G10 reports a SCRATCH definition not namespaced by issue number; and the document-level rules G11, G12, and G13 report a line-number citation, a commit-SHA citation, and a plan above 40 tasks or 400 lines without a non-empty `## Size Justification` section. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13 only after the extension release that carries them is installed; until then, validate a plan with `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan <path>`.
+The validator applies the acceptance-gate rules of `.claude/rules/plan-acceptance-gates.md`. G1 through G9 judge the commands a plan states as acceptance conditions; G10 reports a SCRATCH definition not namespaced by issue number; and the document-level rules G11, G12, and G13 report a line-number citation, a commit-SHA citation, and a plan above 40 tasks or 400 lines without a non-empty `## Size Justification` section. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13 only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
 
 ## Plan-Path Continuity Contract (Mandatory)
 

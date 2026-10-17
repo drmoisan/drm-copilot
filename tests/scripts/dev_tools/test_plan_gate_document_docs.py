@@ -14,9 +14,15 @@ _REPO_ROOT = Path(__file__).resolve().parents[3]
 _RESOURCES = _REPO_ROOT / "extensions" / "drm-copilot" / "resources"
 _RULE_FILE = _REPO_ROOT / ".claude" / "rules" / "plan-acceptance-gates.md"
 _BUNDLED_RULE_FILE = (
-    _RESOURCES / "claude-customizations" / ".claude" / "rules" / "plan-acceptance-gates.md"
+    _RESOURCES
+    / "claude-customizations"
+    / ".claude"
+    / "rules"
+    / "plan-acceptance-gates.md"
 )
-_CLAUDE_CONTRACT = _REPO_ROOT / ".claude" / "skills" / "atomic-plan-contract" / "SKILL.md"
+_CLAUDE_CONTRACT = (
+    _REPO_ROOT / ".claude" / "skills" / "atomic-plan-contract" / "SKILL.md"
+)
 _CLAUDE_CONTRACT_COPIES = (
     _CLAUDE_CONTRACT,
     _RESOURCES
@@ -46,7 +52,9 @@ _ALL_CONTRACT_COPIES = (
 
 _G11_HEADING = "### G11 — ships as Blocking by operator-approved scope"
 _G12_HEADING = "### G12 — ships as Blocking by operator-approved scope"
-_G13_HEADING = "### G13 — ships as Blocking because its exoneration is author-controlled"
+_G13_HEADING = (
+    "### G13 — ships as Blocking because its exoneration is author-controlled"
+)
 _FALSE_POSITIVE_HEADING = "### Known false-positive classes — G11 and G12"
 _RULE_TOKENS = (
     "| **G11** |",
@@ -64,7 +72,9 @@ _CORPUS_NOTE = (
 _DESIGN_HEADING = "## Design-Level Plan Contract (Mandatory)"
 _SHIPPED_SET = "The complete shipped set is therefore G1 through G13."
 _ANCHOR_RULE = "**Anchors are symbols, headings, or test names.**"
-_CITATION_FORMAT = "`CITATION: <repository-relative path> | <symbol, heading, or test name>`"
+_CITATION_FORMAT = (
+    "`CITATION: <repository-relative path> | <symbol, heading, or test name>`"
+)
 _SELF_REVIEW_LOCATOR = "naming the file and the symbol, heading, or test name"
 _STALE_LOCATORS = (
     "naming the file and the line, test, or identifier",
@@ -87,7 +97,12 @@ def test_rule_file_states_g11_to_g13_sections() -> None:
     register = text.index("## The Write-Mode Register")
     order = [
         text.index(heading)
-        for heading in (_G11_HEADING, _G12_HEADING, _G13_HEADING, _FALSE_POSITIVE_HEADING)
+        for heading in (
+            _G11_HEADING,
+            _G12_HEADING,
+            _G13_HEADING,
+            _FALSE_POSITIVE_HEADING,
+        )
     ]
     assert severity < order[0] < order[1] < order[2] < order[3] < register
 

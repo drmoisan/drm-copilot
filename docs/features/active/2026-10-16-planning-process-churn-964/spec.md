@@ -183,7 +183,7 @@ Research, planning, preflight and remediation produce large, literal-heavy plans
 - [x] AC-13: `atomic-plan-contract` (Claude, `.agents`, `.github` and bundle copies) contains `## Design-Level Plan Contract (Mandatory)`, uses symbol, heading or test locators in the self-review and internal-review record, and states G1 through G13 under `## Validator Gate (Mandatory)`. Verified by `test_plan_gate_document_docs.py`.
 - [x] AC-14: `validate-planner-output.ps1` issues a repairable block for a plan without a valid `## Pre-Mortem` section and for a `CITATION:` line-reference locator, and passes a plan with both correct. Verified by `validate-planner-output.PreMortem.Tests.ps1`; the modified planner suites pass.
 - [x] AC-15: A corpus measurement of G11, G12 and G13 finding counts over committed plans under `docs/`, with observed false-positive classes, is recorded under `evidence/other/`.
-- [ ] AC-16: `plan_gate_document.py` and `plan-gate-document.ts` each reach at least 85% line and 75% branch coverage, with a `jest.config.cjs` per-file threshold entry for the TypeScript module, recorded under `evidence/qa-gates/`.
+- [x] AC-16: `plan_gate_document.py` and `plan-gate-document.ts` each reach at least 85% line and 75% branch coverage, with a `jest.config.cjs` per-file threshold entry for the TypeScript module, recorded under `evidence/qa-gates/`.
 
 ### Scope 3: Single-pass preflight
 

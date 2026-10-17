@@ -52,7 +52,7 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
 ## MCP Surfaces Run the Installed Extension
 
 - Every `mcp__drm-copilot__*` tool runs the installed extension, not the branch. `validate_orchestration_artifacts` applies the installed rule set, so validator rules added on a branch apply through MCP only after the extension release that carries them is installed.
-- Branch-current plan validation is `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan <path>`.
+- Branch-current plan validation runs the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` with its `plan` subcommand, through Poetry in module form.
 - A push-down served by the MCP tools writes the installed extension's bundled payload; a repository-side edit under `extensions/drm-copilot/resources/` changes that payload only after a rebuild and reinstall.
 
 ## CI Shape and Required Checks
@@ -80,7 +80,7 @@ Run these after editing any mirrored or bundled file; each is under `tests/scrip
 
 - `test_push_down_claude_resource_contracts.py` and `test_push_down_codex_and_agents_resource_contracts.py`: every distributable `.claude`, `.agents`, and `.codex` file exists in the bundle with equal text.
 - `test_push_down_claude_pack_manifest_completeness.py` and `test_push_down_codex_and_agents_pack_manifest_completeness.py`: every bundled file is listed in a pack manifest.
-- The Codex generator check: `poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check` (base agents are hand-edited; variants, bundle copies, and the Codex `core.json` are generated).
+- The Codex generator check: `scripts/dev_tools/generate_codex_agent_variants.py` run in module form with `--check` (base agents are hand-edited; variants, bundle copies, and the Codex `core.json` are generated).
 - `test_codex_agent_wrapper_contracts.py` and `test_codex_handoff_contract_parity.py`: pinned Codex agent fragments and handoff parity.
 - `test_claude_rules_frontmatter.py`: rule `paths:` scopes and that every preloaded skill exists.
 - `parallel_orchestrator_surface_expectations.py` (`PINNED_FROZEN_SURFACE_HASHES`): byte hashes of frozen orchestration surfaces, including `.claude/skills/epic-orchestrate/SKILL.md` and `.claude/agents/epic-orchestrator.md`.

@@ -19,7 +19,7 @@ import {
   detectRuntime,
   fsMock,
   getFreshChildProcessMock,
-  prepareFreshModulesWithPosixPathResolve,
+  mockPosixPathResolve,
   registerCommandMock,
   resetExtensionHarnessState,
   resolveCodexExecutable,
@@ -309,26 +309,31 @@ describe("drm-copilot core command behavior", () => {
   });
 
   it("helloPowerShell preserves C:/extension on POSIX hosts", async () => {
+    // The fresh module graph lives in an isolated registry, so the shared
+    // registry the other tests use is never reset (issue #964).
     try {
-      prepareFreshModulesWithPosixPathResolve();
-      setFreshExecutablePresence({ pwsh: true });
-      const freshChildProcessMock = getFreshChildProcessMock();
-      freshChildProcessMock.spawn.mockReturnValue(createMockProcess(0));
-      const handler = await activateFreshHandlerWithPosixPathResolve(
-        "drmCopilotExtension.helloPowerShell",
-      );
-      await handler();
+      await jest.isolateModulesAsync(async () => {
+        mockPosixPathResolve();
+        setFreshExecutablePresence({ pwsh: true });
+        const freshChildProcessMock = getFreshChildProcessMock();
+        freshChildProcessMock.spawn.mockReturnValue(createMockProcess(0));
+        const handler = await activateFreshHandlerWithPosixPathResolve(
+          "drmCopilotExtension.helloPowerShell",
+        );
+        await handler();
 
-      const [, args] = freshChildProcessMock.spawn.mock.calls[0] as [
-        string,
-        string[],
-      ];
-      expect(
-        args[args.length - 1]?.startsWith("C:/extension/resources/templates/"),
-      ).toBe(true);
+        const [, args] = freshChildProcessMock.spawn.mock.calls[0] as [
+          string,
+          string[],
+        ];
+        expect(
+          args[args.length - 1]?.startsWith(
+            "C:/extension/resources/templates/",
+          ),
+        ).toBe(true);
+      });
     } finally {
       jest.dontMock("node:path");
-      jest.resetModules();
     }
   });
 });

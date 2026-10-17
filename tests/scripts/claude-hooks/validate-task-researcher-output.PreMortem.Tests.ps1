@@ -85,6 +85,19 @@ Describe 'validate-task-researcher-output Pre-Mortem rule (issue #964)' {
         $result.Ok | Should -BeTrue
     }
 
+    It 'reports a numeric-evidence failure before the Pre-Mortem check' {
+        # Arrange
+        Mock -CommandName Get-ResearchFileContent -MockWith { (Get-ResearchBody -WithPreMortem) + "`n- Numeric spec.md acceptance criterion: 12 files change." }
+        $inputText = ConvertTo-ResearcherInput -ResearchPath 'docs/features/active/foo-1/research/research.2026-10-16T22-36.md'
+
+        # Act
+        $result = Invoke-TaskResearcherOutputValidation -InputText $inputText
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -Match 'Numeric Derivation Evidence'
+    }
+
     It 'blocks with the read error when the file seam throws' {
         # Arrange
         Mock -CommandName Get-ResearchFileContent -MockWith { throw 'access denied' }

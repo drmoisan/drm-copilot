@@ -313,6 +313,37 @@ Describe 'Get-ExecutorOutputBlockDecision single-pass preflight rules (issue #96
     }
 }
 
+Describe 'executor hook helpers used by the preflight rules (issue #964)' {
+    It 'Test-PreflightFixRecord reports whether the record file exists' {
+        # Arrange
+        Mock -CommandName Test-Path -MockWith { $LiteralPath -eq 'docs/features/active/foo/evidence/other/preflight-fixes.2026-10-16T23-07.md' }
+
+        # Act
+        $present = Test-PreflightFixRecord -Path 'docs/features/active/foo/evidence/other/preflight-fixes.2026-10-16T23-07.md'
+        $absent = Test-PreflightFixRecord -Path 'docs/features/active/foo/evidence/other/missing.md'
+
+        # Assert
+        $present | Should -BeTrue
+        $absent | Should -BeFalse
+    }
+
+    It 'Test-HasCanonicalBlockedText rejects the canonical block text without a plan delta' {
+        # Arrange / Act
+        $result = Test-HasCanonicalBlockedText -AgentOutput 'BLOCKED at preflight (before [P0-T1]) because the plan is incomplete.'
+
+        # Assert
+        $result | Should -BeFalse
+    }
+
+    It 'Get-PlanPathFromOutput returns $null for a markdown plan-path link with a blank target' {
+        # Arrange / Act
+        $path = Get-PlanPathFromOutput -AgentOutput '[plan-path]( )'
+
+        # Assert
+        $path | Should -BeNullOrEmpty
+    }
+}
+
 Describe 'Invoke-ExecutorOutputValidation transcript wiring (issue #964)' {
     It 'passes the envelope transcript path to the block decision' {
         # Arrange
