@@ -130,6 +130,12 @@ Describe 'fixture <Name>' -ForEach @(@{ Name = 'codex'; HookDirectory = '.codex/
     BeforeAll { . (Join-Path $HookDirectory 'gate.ps1') }
 }
 '@ }
+        @{ Case = 'unbalanced brace'; Source = @'
+$HookRoot = '.claude/hooks'
+Describe 'fixture' {
+    BeforeAll { . (Join-Path $script:RepoRoot "$HookRoot}/enforce-x.ps1") }
+}
+'@ }
         @{ Case = 'unbound variable'; Source = @'
 Describe 'fixture' {
     BeforeAll { . (Join-Path $HookDirectory 'gate.ps1') }

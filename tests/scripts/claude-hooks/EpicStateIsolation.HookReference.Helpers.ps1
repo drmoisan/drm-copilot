@@ -23,7 +23,7 @@ function Get-EpicStateIsolationPattern {
         'HookLiteral' { '(?<![A-Za-z0-9_-])hooks/(?<name>[A-Za-z0-9._-]+\.ps1)' }
         'Leaf' { '^(?!.*\.Tests\.ps1$)[A-Za-z0-9._-]+\.ps1$' }
         'HooksRoot' { '(^|[\\/])hooks[\\/]?$' }
-        'ExpandableLeaf' { '^\$\{?(?<var>[A-Za-z_][A-Za-z0-9_]*(:[A-Za-z_][A-Za-z0-9_]*)?)\}?[\\/](?<leaf>[^\\/]+)$' }
+        'ExpandableLeaf' { '^\$(?:\{(?<var>[A-Za-z_][A-Za-z0-9_]*(:[A-Za-z_][A-Za-z0-9_]*)?)\}|(?<var>[A-Za-z_][A-Za-z0-9_]*(:[A-Za-z_][A-Za-z0-9_]*)?))[\\/](?<leaf>[^\\/]+)$' }
     }
 }
 
