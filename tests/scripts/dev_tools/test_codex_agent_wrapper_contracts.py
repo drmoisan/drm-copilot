@@ -98,7 +98,12 @@ def test_atomic_planner_wrapper_preserves_codex_preflight_handoff_contract() -> 
 
 
 def test_atomic_executor_wrapper_preserves_codex_preflight_return_handoff() -> None:
-    """Require the Codex executor wrapper to preserve planner-return handoff rules."""
+    """Require the Codex executor wrapper to state the single-pass preflight rules.
+
+    Issue #964 replaced the automatic planner re-handoff and the
+    validate-delta-revise loop with single-pass preflight, so those two
+    fragments must be absent.
+    """
 
     root_text = read_repo_text(".codex/agents/atomic-executor.toml")
     codex_text = read_bundle_text(".codex/agents/atomic-executor.toml")
@@ -109,14 +114,23 @@ def test_atomic_executor_wrapper_preserves_codex_preflight_return_handoff() -> N
             "perform validation only and return exactly one of "
             "`PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`",
             "include a precise plan delta that can be applied to the same " "plan file",
-            "automatically hand off back to `atomic-planner` and request "
-            "that it apply the delta to the same plan file",
-            "Continue the validate -> delta -> planner-revise -> validate "
-            "loop until preflight can return `PREFLIGHT: ALL CLEAR`.",
+            "The preflight directive belongs in the delegation prompt, never "
+            "in a plan file.",
+            "Review the entire plan in one pass",
+            "`PREFLIGHT-FIX: <task id or heading> | <defect class> | <change made>`",
+            "`PREFLIGHT-DEFECT: <task id or heading> | <defect class> | "
+            "<required change>`",
+            "`preflight-fix-record: <path>`",
+            "A plan returns to the planner at most once",
             "stop and report blocked state",
             "validate_orchestration_artifacts` MCP tool",
         ),
     )
+    for removed in (
+        "automatically hand off back to `atomic-planner`",
+        "Continue the validate -> delta -> planner-revise -> validate loop",
+    ):
+        assert removed not in codex_text, f"removed fragment present: {removed}"
     assert root_text == codex_text
 
 

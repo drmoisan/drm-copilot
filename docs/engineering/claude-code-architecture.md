@@ -83,6 +83,7 @@ The committed orchestrator allowlist delegates to the following repository-canon
 | `.github/skills/csharp-change-budget-router/SKILL.md` | `.claude/skills/csharp-change-budget-router/SKILL.md` | Runtime mirror for C# routing and budget rules |
 | `.github/skills/csharp-orchestration-state-machine/SKILL.md` | `.claude/skills/csharp-orchestration-state-machine/SKILL.md` | Runtime mirror for C# checkpoint state handling |
 | `.github/skills/evidence-and-timestamp-conventions/SKILL.md` | `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` | Runtime mirror for deterministic evidence artifact naming |
+| `.github/skills/execution-environment/SKILL.md` | `.claude/skills/execution-environment/SKILL.md` | Byte-identical execution-environment brief preloaded by researcher, planner, executor, and orchestrator |
 | `.github/skills/feature-promotion-lifecycle/SKILL.md` | `.claude/skills/feature-promotion-lifecycle/SKILL.md` | Runtime mirror for feature-promotion workflow rules |
 | `.github/skills/feature-review-workflow/SKILL.md` | `.claude/skills/feature-review-workflow/SKILL.md` | Runtime mirror for feature, staged, and epic review workflow rules |
 | `.github/skills/make-skill-template/SKILL.md` | `.claude/skills/make-skill-template/SKILL.md` | Maintenance-only runtime mirror for manual skill-authoring workflows |

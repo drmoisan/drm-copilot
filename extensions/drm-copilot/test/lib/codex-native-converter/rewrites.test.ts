@@ -141,6 +141,10 @@ describe("rewriteSupportedAutomationReference", () => {
       "Treat executor preflight findings as binding plan defects",
     );
     expect(rewritten).toContain("Reuse the same target plan file");
+    expect(rewritten).toContain(
+      "a plan returns to the planner at most once",
+    );
+    expect(rewritten).not.toContain("re-run preflight");
     expect(rewritten).toContain("stop and report blocked state");
     expect(rewritten).toContain("validate_orchestration_artifacts` MCP tool");
     expect(

@@ -11,6 +11,16 @@
 
 **Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
 
+## Pre-Mortem
+
+<!-- One bullet per label; state how the next review or CI run could fail on that dimension and the mitigation, or "not applicable" with the reason. -->
+- Review checklists:
+- Coverage:
+- Mirror parity:
+- File size:
+- Test isolation:
+- CI-only behavior:
+- Evidence:
 
 **Phase 0 — Context & Inputs**
 - [ ] [P0-T1] Link approved spec: <spec link>

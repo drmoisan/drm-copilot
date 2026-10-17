@@ -170,8 +170,12 @@ const BASE_REWRITE_RULES: ReadonlyArray<RewriteRule> = [
       "  - `PREFLIGHT: REVISIONS REQUIRED`\n" +
       "- Treat executor preflight findings as binding plan defects.\n" +
       "- If preflight returns `PREFLIGHT: REVISIONS REQUIRED`, revise the " +
-      "same target plan file using the executor's precise plan delta and " +
-      "re-run preflight.\n" +
+      "same target plan file once using the executor's precise plan delta " +
+      "and its full `PREFLIGHT-DEFECT:` list, and run one confirming " +
+      "preflight. Preflight is single-pass: trivial defects are fixed in " +
+      "place by the executor, and a plan returns to the planner at most " +
+      'once; a second substantive result halts with `blocked_reason: "' +
+      'validator_failed"`.\n' +
       "- Reuse the same target plan file for every preflight revision " +
       "iteration in the same planning cycle.\n" +
       "- If the required `atomic-executor` handoff cannot be started or " +
