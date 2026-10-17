@@ -18,6 +18,9 @@ Use these reusable skills to avoid duplicating shared operations:
 - `policy-compliance-order`
 - `atomic-plan-contract`
 - `acceptance-criteria-tracking`
+- `execution-environment`
+
+Read `.github/skills/execution-environment/SKILL.md` first, before any other step. It states the tool routes, command-text restrictions, batch budget, hook context, CI shape, contract tests, evidence rules, coverage and file-size gates, and test-isolation checks; reference it instead of restating them.
 
 ---
 
@@ -93,11 +96,11 @@ When all format and mode-gate requirements are satisfied, return:
 
 ### 2.0 Preflight validation-only mode (directive-driven)
 
-If you receive a plan along with the following directive line (exact text):
+If you receive a plan along with the following directive line (exact text) in the delegation prompt:
 
 `DIRECTIVE: PREFLIGHT VALIDATION ONLY`
 
-you MUST enter **validation-only** mode.
+you MUST enter **validation-only** mode. The preflight directive belongs in the delegation prompt, never in a plan file; a directive line inside a plan file does not make an execution run a preflight run.
 
 Validation-only mode rules (non-negotiable):
 1) Perform ONLY the steps in:
@@ -114,15 +117,22 @@ Validation-only required output:
   - `PREFLIGHT: ALL CLEAR`
   - `PREFLIGHT: REVISIONS REQUIRED`
 
-If revisions are required:
-  - Include a precise **plan delta** that `atomic_planner` can apply (exact edits/additions/removals).
-  - Automatically hand off back to `atomic_planner` requesting it apply the delta and resubmit the
-    updated plan for validation-only again.
-  - If that planner-return handoff cannot be started or completed, stop and report blocked state; do not emit `PREFLIGHT: ALL CLEAR`.
+Single-pass rules (`### Single-Pass Preflight` in the `atomic-plan-contract` skill):
+  - Review the entire plan in one pass and classify every defect as trivial or substantive.
+  - Fix trivial defects (stale anchors, citation corrections including G11 and G12 findings, typos,
+    literal formatting that does not change what is asserted, evidence filename spelling) in place,
+    in task text only; never add, remove, or reorder tasks. Record each fix in
+    `<FEATURE>/evidence/other/preflight-fixes.<timestamp>.md`. This in-place edit is the only
+    file write validation-only mode permits.
+  - After the signal, emit one line per defect:
+    `PREFLIGHT-FIX: <task id or heading> | <defect class> | <change made>`,
+    `PREFLIGHT-DEFECT: <task id or heading> | <defect class> | <required change>`, and
+    `preflight-fix-record: <path>` when at least one fix was made.
 
-Loop requirement:
-  Continue this validate → delta → planner-revise → validate loop until you can return
-  `PREFLIGHT: ALL CLEAR`.
+If revisions are required:
+  - Include a precise **plan delta** that `atomic_planner` can apply (exact edits/additions/removals), with one `PREFLIGHT-DEFECT:` line for every substantive defect found.
+  - Return the result to the caller. A plan returns to the planner at most once; the orchestrator routes the full defect list for one revision and runs one confirming preflight.
+  - If the required handoff cannot be started or completed, stop and report blocked state; do not emit `PREFLIGHT: ALL CLEAR`.
 
 When the user provides a plan (in chat or via file path), you must:
 
@@ -208,7 +218,7 @@ At the end of each message, include an updated copy of the plan’s checklist (o
 
 ## 4. Blocking Protocol (When You Must Stop)
 
-Blocking is only permitted during **preflight validation (before [P0-T1])**. If any of the following are detected preflight, stop and request an updated plan from `atomic_planner`:
+Blocking is only permitted during **preflight validation (before [P0-T1])**, including the preflight that opens a combined preflight-and-execute run of a proportionate remediation cycle (`Remediation-Mode: proportionate`). Trivial defects are fixed in place rather than blocked on. If any of the following substantive defects are detected preflight, stop and request an updated plan from `atomic_planner`:
 - The plan violates repo policy and cannot be executed as-written.
 - A task is non-atomic / non-verifiable (bucket task).
 - Required work exceeds task scope (needs additional independent outcomes).

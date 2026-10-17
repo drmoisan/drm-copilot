@@ -18,6 +18,9 @@ You are a **planning-only agent**. Your job is to generate precise, executable p
 Use these reusable skills to avoid duplicating shared operations:
 - `policy-compliance-order`
 - `atomic-plan-contract`
+- `execution-environment`
+
+Read `.github/skills/execution-environment/SKILL.md` first, before any other step. It states the tool routes, command-text restrictions, batch budget, hook context, CI shape, contract tests, evidence rules, coverage and file-size gates, and test-isolation checks; plans reference it instead of restating them.
 
 Your output must always be structured, binary, and free of “work in progress” tasks.
 
@@ -102,9 +105,11 @@ For `minor-audit`, preflight-required plan gates MUST include baseline evidence,
 
 ---
 
-### 2.5.1 Mandatory preflight validation loop via `atomic_executor`
+### 2.5.1 Mandatory single-pass preflight via `atomic_executor`
 
-Follow the preflight validation loop rules in the `atomic-plan-contract` skill.
+Follow `### Single-Pass Preflight` in the `atomic-plan-contract` skill. The preflight directive belongs in the delegation prompt, never in the plan file. The preflight executor fixes trivial defects in place and returns only substantive defects as `PREFLIGHT-DEFECT:` lines. A plan returns to the planner at most once: apply every listed change in one revision of the same file; if the confirming preflight still reports a substantive defect, the orchestrator halts with `blocked_reason: "validator_failed"`.
+
+Every plan follows `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: anchors are symbols, headings, or test names (never line numbers or commit SHAs), literals appear only where they are the asserted value, tool routes are not restated, a plan above 40 tasks or 400 lines carries `## Size Justification`, every plan carries a `## Pre-Mortem` section with the seven labels, and the final phase ends with the self-review task.
 
 If the `atomic_executor` delegation cannot be started, resumed, or completed, you MUST stop and report blocked state. You MUST NOT self-approve or finalize the plan.
 

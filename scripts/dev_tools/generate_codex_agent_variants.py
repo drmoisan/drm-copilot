@@ -264,7 +264,8 @@ def _synchronize(*, check: bool) -> list[str]:
             if actual_manifest != expected_manifest:
                 errors.append(f"Codex pack manifest is stale: {manifest_path}")
         else:
-            manifest_path.write_text(expected_manifest, encoding="utf-8")
+            # The rendered manifest uses LF; an untranslated write keeps it on Windows.
+            _write_text_preserving_newlines(manifest_path, expected_manifest)
     return errors
 
 

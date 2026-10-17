@@ -10,9 +10,13 @@
       - the SubagentStop envelope read from stdin carries a non-empty last_assistant_message,
       - output advertises `plan-path: <path>` (or supported equivalent forms),
       - the advertised plan exists on disk,
-      - preflight-only runs return an exact preflight signal and may not claim
-        non-canonical blocked text,
-      - non-preflight runs may not stop in a blocked state,
+      - a run is classified as preflight from the delegation prompt in the subagent
+        transcript (Test-IsPreflightRun), falling back to the plan file or one output signal,
+      - preflight runs return exactly one preflight signal consistent with their
+        PREFLIGHT-DEFECT lines, name an existing fix record for any PREFLIGHT-FIX line,
+        and may not claim non-canonical blocked text,
+      - non-preflight runs may not stop in a blocked state, except a canonical preflight
+        block with a plan delta and no checked task (combined proportionate run),
       - non-preflight plans contain checkboxes and all are checked,
       - non-preflight output includes `AC Status Summary`,
       - non-preflight output includes command/status reporting,
@@ -91,10 +95,124 @@ function Test-IsPreflightPlan {
     [OutputType([bool])]
     param(
         [Parameter(Mandatory = $true)]
-        [AllowEmptyString()] [string[]] $Lines
+        [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $Lines
     )
 
     return @($Lines | Where-Object { $_ -match '(?i)^\s*DIRECTIVE:\s*PREFLIGHT VALIDATION ONLY\s*$' }).Count -gt 0
+}
+
+function Get-JsonPropertyValue {
+    # Returns a named property of a parsed JSON object, or $null; safe under StrictMode.
+    [CmdletBinding()]
+    param([AllowNull()] [object] $Object, [Parameter(Mandatory = $true)] [string] $Name)
+
+    if ($null -eq $Object -or -not ($Object -is [System.Management.Automation.PSCustomObject])) { return $null }
+    $property = @($Object.PSObject.Properties | Where-Object { $_.Name -ceq $Name })
+    if ($property.Count -eq 0) { return $null } else { return $property[0].Value }
+}
+
+function Get-TranscriptPathFromEnvelope {
+    # Returns agent_transcript_path from the SubagentStop envelope with a leading ~ expanded, or $null.
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([AllowNull()] [object] $Envelope)
+
+    $path = Get-JsonPropertyValue -Object $Envelope -Name 'agent_transcript_path'
+    if (-not ($path -is [string]) -or [string]::IsNullOrWhiteSpace($path)) { return $null }
+    if ($path.StartsWith('~')) { $path = $HOME + $path.Substring(1) }
+    return $path
+}
+
+function Get-TranscriptFirstUserText {
+    # Returns the text of the first `user` entry of transcript JSONL lines, or $null when none parses.
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([AllowEmptyString()] [string[]] $Lines = @())
+
+    foreach ($line in $Lines) {
+        if ([string]::IsNullOrWhiteSpace($line)) { continue }
+        try { $entry = ConvertFrom-Json -InputObject $line -ErrorAction Stop } catch { continue }
+        if ((Get-JsonPropertyValue -Object $entry -Name 'type') -ne 'user') { continue }
+        $message = Get-JsonPropertyValue -Object $entry -Name 'message'
+        $content = if ($null -ne $message) { Get-JsonPropertyValue -Object $message -Name 'content' } else { Get-JsonPropertyValue -Object $entry -Name 'content' }
+        if ($content -is [string]) { return $content }
+        $texts = @(@($content) | Where-Object { (Get-JsonPropertyValue -Object $_ -Name 'type') -eq 'text' } | ForEach-Object { [string](Get-JsonPropertyValue -Object $_ -Name 'text') })
+        if ($texts.Count -gt 0) { return ($texts -join "`n") }
+    }
+    return $null
+}
+
+function Test-IsPreflightRun {
+    <#
+    .SYNOPSIS
+        Classifies an executor run as preflight or execution (issue #964).
+    .DESCRIPTION
+        A readable transcript is authoritative: its first `user` entry (the delegation prompt) decides, even
+        against a stale plan-file directive. Otherwise the plan-file directive, then exactly one output
+        `PREFLIGHT:` signal, decide (self-declared). ReadTranscriptHead returns JSONL lines or $null.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $AgentOutput,
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $PlanLines,
+        [AllowNull()] [AllowEmptyString()] [string] $TranscriptPath,
+        [scriptblock] $ReadTranscriptHead = { param([string] $Path) if (Test-Path -LiteralPath $Path -PathType Leaf) { [string[]]@(Get-Content -LiteralPath $Path -TotalCount 50 -ErrorAction Stop) } else { $null } }
+    )
+
+    if (-not [string]::IsNullOrWhiteSpace($TranscriptPath)) {
+        $head = $null
+        try { $head = & $ReadTranscriptHead $TranscriptPath } catch { $head = $null }
+        if ($null -ne $head) {
+            $prompt = Get-TranscriptFirstUserText -Lines ([string[]]@($head))
+            if ($null -ne $prompt) { return [regex]::IsMatch($prompt, '(?im)^\s*DIRECTIVE:\s*PREFLIGHT VALIDATION ONLY\s*$') }
+        }
+    }
+    if (Test-IsPreflightPlan -Lines $PlanLines) { return $true }
+    return [regex]::Matches($AgentOutput, '(?m)^\s*PREFLIGHT:\s*(ALL CLEAR|REVISIONS REQUIRED)\s*$').Count -eq 1
+}
+
+function Test-PreflightFixRecord {
+    # File seam for the preflight-fix-record path.
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory = $true)] [string] $Path)
+    return [bool](Test-Path -LiteralPath $Path -PathType Leaf)
+}
+
+function Get-PreflightRunBlockDecision {
+    <#
+    .SYNOPSIS
+        Applies the single-pass preflight output rules (issue #964); every block is repairable.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([Parameter(Mandatory = $true)] [string] $AgentOutput)
+
+    if (-not (Test-HasCanonicalBlockedText -AgentOutput $AgentOutput)) {
+        return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: blocked preflight output must include the exact text `BLOCKED at preflight (before [P0-T1])` plus a concrete plan delta.' }
+    }
+    if ($AgentOutput -cmatch 'BLOCKED') { return @{ Ok = $true; Message = $null } }
+
+    $signals = @([regex]::Matches($AgentOutput, '(?m)^\s*PREFLIGHT:\s*(?<Signal>ALL CLEAR|REVISIONS REQUIRED)\s*$'))
+    if ($signals.Count -ne 1) {
+        return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: preflight output must carry exactly one ``PREFLIGHT: ALL CLEAR`` or ``PREFLIGHT: REVISIONS REQUIRED`` signal line; found $($signals.Count)." }
+    }
+    $defectCount = [regex]::Matches($AgentOutput, '(?m)^\s*PREFLIGHT-DEFECT:\s*\S').Count
+    if ($signals[0].Groups['Signal'].Value -eq 'ALL CLEAR' -and $defectCount -gt 0) {
+        return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: `PREFLIGHT: ALL CLEAR` must not carry a `PREFLIGHT-DEFECT:` line; fix trivial defects in place or return `PREFLIGHT: REVISIONS REQUIRED`.' }
+    }
+    if ($signals[0].Groups['Signal'].Value -eq 'REVISIONS REQUIRED' -and $defectCount -eq 0) {
+        return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: `PREFLIGHT: REVISIONS REQUIRED` must list every substantive defect as a `PREFLIGHT-DEFECT:` line.' }
+    }
+    if ([regex]::IsMatch($AgentOutput, '(?m)^\s*PREFLIGHT-FIX:\s*\S')) {
+        $record = [regex]::Match($AgentOutput, '(?im)^\s*preflight-fix-record:\s*`?(?<Path>[^\s`]+)`?\s*$')
+        $recordPath = if ($record.Success) { ($record.Groups['Path'].Value -replace '\\', '/') -replace '^\./', '' } else { '' }
+        if (-not $recordPath.StartsWith('docs/features/', [System.StringComparison]::OrdinalIgnoreCase) -or -not (Test-PreflightFixRecord -Path $recordPath)) {
+            return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: a `PREFLIGHT-FIX:` line requires a `preflight-fix-record: <path>` line naming an existing record under docs/features/.' }
+        }
+    }
+    return @{ Ok = $true; Message = $null }
 }
 
 function Get-TouchedLanguagesFromPlan {
@@ -168,11 +286,12 @@ function Test-HasCanonicalBlockedText {
         [string] $AgentOutput
     )
 
-    if ($AgentOutput -notmatch 'BLOCKED') {
+    # Case-sensitive: lowercase prose such as `blocked_reason` is not a BLOCKED claim (issue #964).
+    if ($AgentOutput -cnotmatch 'BLOCKED') {
         return $true
     }
 
-    if ($AgentOutput -notmatch 'BLOCKED at preflight \(before \[P0-T1\]\)') {
+    if ($AgentOutput -cnotmatch 'BLOCKED at preflight \(before \[P0-T1\]\)') {
         return $false
     }
 
@@ -198,7 +317,7 @@ function Invoke-ExecutorOutputValidation {
     if (-not $envelope.IsValid) { $decision = @{ Ok = $false; Repairable = $false; Message = ('{0} payload anomaly - {1}' -f 'atomic-executor hook:', (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)) } }
     else {
         $agentOutput = $envelope.AssistantText
-        $decision = Get-ExecutorOutputBlockDecision -AgentOutput ([string]$agentOutput)
+        $decision = Get-ExecutorOutputBlockDecision -AgentOutput ([string]$agentOutput) -TranscriptPath (Get-TranscriptPathFromEnvelope -Envelope $envelope.Envelope)
     }
     if ($decision.Ok) { return @{ Ok = $true; Message = $null } }
     if (-not $decision.Repairable) {
@@ -216,13 +335,18 @@ function Get-ExecutorOutputBlockDecision {
         Returns @{ Ok = $true; Message = $null } to allow, or a hashtable with Ok = $false, a
         Repairable boolean, and Message. Repairable is $false for a non-preflight BLOCKED claim
         and for a plan with no task checkboxes; every other block is repairable by the subagent.
+        TranscriptPath and ReadTranscriptHead feed Test-IsPreflightRun. An execution run that
+        stops with the canonical preflight BLOCKED text, a plan delta, and no checked task is a
+        preflight block inside a combined proportionate run and is allowed.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
-        [string] $AgentOutput
+        [string] $AgentOutput,
+        [AllowNull()] [AllowEmptyString()] [string] $TranscriptPath,
+        [scriptblock] $ReadTranscriptHead
     )
 
     if ([string]::IsNullOrWhiteSpace($agentOutput)) {
@@ -239,18 +363,20 @@ function Get-ExecutorOutputBlockDecision {
         return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: executor advertised plan-path '$planPath' but no file exists at that location." }
     }
 
-    $isPreflight = Test-IsPreflightPlan -Lines $file.Lines
-    if ($isPreflight) {
-        if (-not (Test-HasCanonicalBlockedText -AgentOutput $agentOutput)) {
-            return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: blocked preflight output must include the exact text `BLOCKED at preflight (before [P0-T1])` plus a concrete plan delta.' }
-        }
-        if ($agentOutput -notmatch 'BLOCKED' -and -not (Test-HasPreflightSignal -AgentOutput $agentOutput)) {
+    $runArguments = @{ AgentOutput = $agentOutput; PlanLines = [string[]]@($file.Lines); TranscriptPath = $TranscriptPath }
+    if ($null -ne $ReadTranscriptHead) { $runArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
+    if (Test-IsPreflightRun @runArguments) {
+        if ($agentOutput -cnotmatch 'BLOCKED' -and -not (Test-HasPreflightSignal -AgentOutput $agentOutput)) {
             return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: preflight output must include `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`.' }
         }
-        return @{ Ok = $true; Message = $null }
+        return Get-PreflightRunBlockDecision -AgentOutput $agentOutput
     }
 
-    if ($agentOutput -match 'BLOCKED') {
+    if ($agentOutput -cmatch 'BLOCKED') {
+        $hasCheckedTask = @($file.Lines | Where-Object { $_ -match '^\s*-\s\[[xX]\]\s\[P\d+-T\d+\]' }).Count -gt 0
+        if ($agentOutput -cmatch 'BLOCKED at preflight \(before \[P0-T1\]\)' -and (Test-HasCanonicalBlockedText -AgentOutput $agentOutput) -and -not $hasCheckedTask) {
+            return @{ Ok = $true; Message = $null }
+        }
         return @{ Ok = $false; Repairable = $false; Message = 'atomic-executor hook: blocking is permitted only during preflight validation (before [P0-T1]).' }
     }
 
