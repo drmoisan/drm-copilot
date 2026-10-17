@@ -75,16 +75,16 @@ Map SPEC-01/02/03/06 to deployment-resolution, model-receipt, topology, epic per
 
 ## Definition of Done
 
-- [ ] SPEC-01: Current policy, base agents, generated variants, runtime defaults, and validators use the exact model/effort table above, with no stale legacy default in an active Codex routing path.
-- [ ] SPEC-02: C1-C4 decisions, elevated C3 activation in both epic-child contexts and under a C4 ceiling, forced epic Astra/ultra, aliases, and monotonic ceilings are verified against the shared routing corpus without changing topology budgets.
-- [ ] SPEC-03: Invalid/absent inputs and profiles, wrong exact model/effort/path/hash, invalid topology, failed start attestation, and unavailable exact models retain fail-closed behavior without fallback.
-- [ ] SPEC-04: The Codex generator passes `--check`; resource, pack-manifest, wrapper, handoff, and routing parity contracts pass for affected distributable surfaces.
-- [ ] SPEC-05: Current model-routing documentation and skills describe the replacement table and Codex epic ultra capability; historical checkpoint/fixture evidence and unrelated provider settings are preserved.
-- [ ] SPEC-06: Receipt schema and diagnostic behavior remain unchanged; newly resolved receipts identify the actual current generated profile and hash, and validators continue to reject stale former-model receipts under current policy without a compatibility exception.
-- [ ] SPEC-07: Complete applicable local Python, PowerShell, and TypeScript toolchains pass in formatting → linting → type-checking → testing order, with PowerShell type checking omitted; required changed-file coverage and isolation checks have recorded evidence.
+- [x] SPEC-01: Current policy, base agents, generated variants, runtime defaults, and validators use the exact model/effort table above, with no stale legacy default in an active Codex routing path.
+- [x] SPEC-02: C1-C4 decisions, elevated C3 activation in both epic-child contexts and under a C4 ceiling, forced epic Astra/ultra, aliases, and monotonic ceilings are verified against the shared routing corpus without changing topology budgets.
+- [x] SPEC-03: Invalid/absent inputs and profiles, wrong exact model/effort/path/hash, invalid topology, failed start attestation, and unavailable exact models retain fail-closed behavior without fallback.
+- [x] SPEC-04: The Codex generator passes `--check`; resource, pack-manifest, wrapper, handoff, and routing parity contracts pass for affected distributable surfaces.
+- [x] SPEC-05: Current model-routing documentation and skills describe the replacement table and Codex epic ultra capability; historical checkpoint/fixture evidence and unrelated provider settings are preserved.
+- [x] SPEC-06: Receipt schema and diagnostic behavior remain unchanged; newly resolved receipts identify the actual current generated profile and hash, and validators continue to reject stale former-model receipts under current policy without a compatibility exception.
+- [x] SPEC-07: Complete applicable local Python, PowerShell, and TypeScript toolchains pass in formatting → linting → type-checking → testing order, with PowerShell type checking omitted; required changed-file coverage and isolation checks have recorded evidence.
 - [ ] SPEC-08 (CI-dependent): The item's orchestrator records required CI success at the final PR head, then pushes any CI criterion check-off and verifies CI again so the recorded head equals the final PR head before completion.
 
 ## Seeded Test Conditions (from potential)
-- [ ] Boundary tests cover all four complexity bands, all three execution contexts, C3/C4 ceiling transitions, and both root epic personas.
-- [ ] Current generated-profile freshness and mirror parity tests pass, and exact-model mismatch rejection is tested independently of successful resolution.
+- [x] Boundary tests cover all four complexity bands, all three execution contexts, C3/C4 ceiling transitions, and both root epic personas.
+- [x] Current generated-profile freshness and mirror parity tests pass, and exact-model mismatch rejection is tested independently of successful resolution.
 - [ ] CI-dependent: Local toolchain evidence and final PR-head CI evidence are recorded separately; CI remains pending until the remote gate succeeds.

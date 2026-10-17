@@ -122,7 +122,7 @@ describe("resolveCodexDeployment", () => {
     expect(receipt.deployment_agent).toBe("feature-reviewer-c2");
   });
 
-  it("routes standalone C3 commit-steward work to its Terra high profile", () => {
+  it("routes standalone C3 commit-steward work to its Sol high profile", () => {
     // Arrange / Act
     const receipt = resolveCodexDeployment(
       "commit-steward",
